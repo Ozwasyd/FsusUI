@@ -1,4 +1,7 @@
-import { computed, defineComponent, nextTick, provide } from 'vue'
+import { computed, defineComponent, h, nextTick, provide, ref } from 'vue'
+import { mount } from '@vue/test-utils'
+import { ElSelectV2 } from '..'
+import { ElForm } from '../../form'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { hasClass } from '@element-plus/utils'
 import { EVENT_CODE } from '@element-plus/constants'
@@ -2106,5 +2109,271 @@ describe('Select', () => {
     expect(
       getOptions().every((option) => option.style.height !== 'undefinedpx'),
     ).toBe(true)
+  })
+})
+
+// Exercise the documented component ref and DOM semantics without an input-ref fallback.
+describe('SelectV2 public focus and accessible options', () => {
+  const wrappers: ReturnType<typeof mount>[] = []
+  const presenceOptions = [
+    { value: 0, label: 'Missing' },
+    { value: 1, label: 'Null' },
+    { value: 2, label: 'Present' },
+  ]
+  const createPublicSelect = (props = {}) => {
+    const selector = ref<InstanceType<typeof ElSelectV2> | null>(null)
+    const value = ref<number | number[]>(2)
+    const focus = vi.fn()
+    const blur = vi.fn()
+    const wrapper = mount(
+      defineComponent({
+        setup: () => () =>
+          h(ElSelectV2, {
+            ref: selector,
+            options: presenceOptions,
+            modelValue: value.value,
+            'onUpdate:modelValue': (next: number | number[]) => {
+              value.value = next
+            },
+            label: 'public-presence-label',
+            onFocus: focus,
+            onBlur: blur,
+            ...props,
+          }),
+      }),
+      { attachTo: document.body },
+    )
+    wrappers.push(wrapper)
+    return { wrapper, selector, value, focus, blur }
+  }
+  const settle = async () => {
+    await nextTick()
+    await rAF()
+    await nextTick()
+  }
+  afterEach(() => {
+    wrappers.splice(0).forEach((wrapper) => wrapper.unmount())
+    document.body.innerHTML = ''
+    vi.clearAllMocks()
+  })
+
+  it('focuses the real combobox through the public ref and existing focus event', async () => {
+    const { wrapper, selector, focus } = createPublicSelect()
+    selector.value!.focus()
+    await settle()
+    expect(document.activeElement).toBe(wrapper.get('[role="combobox"]').element)
+    expect(focus).toHaveBeenCalledTimes(1)
+    selector.value!.focus()
+    await settle()
+    expect(focus).toHaveBeenCalledTimes(1)
+  })
+
+  it('public blur releases input focus, closes the popup and emits the normal event', async () => {
+    const { wrapper, selector, blur } = createPublicSelect()
+    const combo = wrapper.get('[role="combobox"]')
+    ;(combo.element as HTMLInputElement).focus()
+    await combo.trigger('keydown', { code: 'ArrowDown', key: 'ArrowDown' })
+    await settle()
+    expect(combo.attributes('aria-expanded')).toBe('true')
+    selector.value!.blur()
+    await settle()
+    expect(document.activeElement).not.toBe(combo.element)
+    expect(combo.attributes('aria-expanded')).toBe('false')
+    expect(combo.attributes('aria-activedescendant')).toBeUndefined()
+    expect(blur).toHaveBeenCalledTimes(1)
+  })
+
+  it('does not focus a disabled input through the public ref', async () => {
+    const { wrapper, selector, focus } = createPublicSelect({ disabled: true })
+    selector.value!.focus()
+    await settle()
+    expect(document.activeElement).not.toBe(wrapper.get('input').element)
+    expect(focus).not.toHaveBeenCalled()
+  })
+
+  it('links the combobox, listbox and active option while preserving Null keyboard selection', async () => {
+    const { wrapper, value } = createPublicSelect()
+    const combo = wrapper.get('[role="combobox"]')
+    await combo.trigger('keydown', { code: 'ArrowDown', key: 'ArrowDown' })
+    await settle()
+    const listbox = document.querySelector('[role="listbox"]')!
+    const options = listbox.querySelectorAll('[role="option"]')
+    expect(options).toHaveLength(3)
+    expect(combo.attributes('aria-controls')).toBe(listbox.id)
+    expect(listbox.getAttribute('aria-labelledby')).toBe('public-presence-label')
+    expect(options[2].getAttribute('aria-selected')).toBe('true')
+    await combo.trigger('keydown', { code: 'ArrowUp', key: 'ArrowUp' })
+    await settle()
+    expect(combo.attributes('aria-activedescendant')).toBe(options[1].id)
+    await combo.trigger('keydown', { code: 'Enter', key: 'Enter' })
+    await settle()
+    expect(value.value).toBe(1)
+    expect(combo.attributes('aria-activedescendant')).toBeUndefined()
+  })
+
+  it('preserves grouped disabled options and skips their headers during navigation', async () => {
+    const { wrapper, value } = createPublicSelect({
+      options: [{ label: 'Presence group', options: [
+        presenceOptions[0], { ...presenceOptions[1], disabled: true }, presenceOptions[2],
+      ] }],
+    })
+    const combo = wrapper.get('[role="combobox"]')
+    await combo.trigger('keydown', { code: 'ArrowDown', key: 'ArrowDown' })
+    await settle()
+    const options = [...document.querySelectorAll('[role="option"]')]
+    expect(options.map((option) => option.textContent?.trim())).toEqual(['Missing', 'Null', 'Present'])
+    expect(options[1].getAttribute('aria-disabled')).toBe('true')
+    await combo.trigger('keydown', { code: 'ArrowUp', key: 'ArrowUp' })
+    await settle()
+    expect(combo.attributes('aria-activedescendant')).toBe(options[0].id)
+    await combo.trigger('keydown', { code: 'Enter', key: 'Enter' })
+    await settle()
+    expect(value.value).toBe(0)
+  })
+
+  it('exposes multiple selection and limit-disabled states', async () => {
+    const { wrapper } = createPublicSelect({ multiple: true, modelValue: [1], multipleLimit: 1 })
+    await wrapper.get('input').trigger('keydown', { code: 'ArrowDown', key: 'ArrowDown' })
+    await settle()
+    const listbox = document.querySelector('[role="listbox"]')!
+    expect(listbox.getAttribute('aria-multiselectable')).toBe('true')
+    const options = listbox.querySelectorAll('[role="option"]')
+    expect(options[1].getAttribute('aria-selected')).toBe('true')
+    expect(options[1].getAttribute('aria-disabled')).toBe('false')
+    expect(options[0].getAttribute('aria-disabled')).toBe('true')
+  })
+
+  it('keeps ids distinct between simultaneous public selectors', async () => {
+    const first = createPublicSelect()
+    const second = createPublicSelect()
+    await first.wrapper.get('input').trigger('keydown', { code: 'ArrowDown', key: 'ArrowDown' })
+    await second.wrapper.get('input').trigger('keydown', { code: 'ArrowDown', key: 'ArrowDown' })
+    await settle()
+    const ids = [...document.querySelectorAll('[role="listbox"], [role="option"]')].map((element) => element.id)
+    expect(ids).toHaveLength(8)
+    expect(new Set(ids).size).toBe(ids.length)
+  })
+
+  it.each([false, true])('preserves consumer outside focus when change calls blur, filterable=%s', async (filterable) => {
+    const outside = document.createElement('button')
+    document.body.append(outside)
+    const control = createPublicSelect({
+      multiple: true,
+      filterable,
+      reserveKeyword: false,
+      onChange: () => {
+        control.selector.value!.blur()
+        outside.focus()
+      },
+    })
+    control.selector.value!.focus()
+    const combo = control.wrapper.get('[role="combobox"]')
+    await combo.trigger('keydown', { code: 'ArrowDown', key: 'ArrowDown' })
+    await settle()
+    await combo.trigger('keydown', { code: 'ArrowDown', key: 'ArrowDown' })
+    await combo.trigger('keydown', { code: 'Enter', key: 'Enter' })
+    await settle()
+    expect(control.value.value).toEqual([0])
+    expect(document.activeElement).toBe(outside)
+    expect(combo.attributes('aria-expanded')).toBe('false')
+    expect(control.blur).toHaveBeenCalledTimes(1)
+    expect(control.focus).toHaveBeenCalledTimes(1)
+  })
+
+  it('cancels same-turn keyboard opening and repeated public blur without blocking a fresh opening', async () => {
+    const { wrapper, selector, focus, blur } = createPublicSelect()
+    const outside = document.createElement('button')
+    document.body.append(outside)
+    const combo = wrapper.get('[role="combobox"]')
+    selector.value!.focus()
+    combo.element.dispatchEvent(new KeyboardEvent('keydown', {
+      code: 'ArrowDown', key: 'ArrowDown', bubbles: true,
+    }))
+    selector.value!.blur()
+    selector.value!.blur()
+    outside.focus()
+    await settle()
+    expect(document.activeElement).toBe(outside)
+    expect(combo.attributes('aria-expanded')).toBe('false')
+    expect(blur).toHaveBeenCalledTimes(1)
+    selector.value!.focus()
+    await combo.trigger('keydown', { code: 'ArrowDown', key: 'ArrowDown' })
+    await settle()
+    expect(document.activeElement).toBe(combo.element)
+    expect(combo.attributes('aria-expanded')).toBe('true')
+    expect(focus).toHaveBeenCalledTimes(2)
+  })
+
+  it('allows explicit public focus from the consumer blur handler', async () => {
+    const control = createPublicSelect({ onBlur: () => control.selector.value!.focus() })
+    control.selector.value!.focus()
+    control.selector.value!.blur()
+    await settle()
+    expect(document.activeElement).toBe(control.wrapper.get('input').element)
+    expect(control.focus).toHaveBeenCalledTimes(2)
+  })
+
+  it.each(['clear', 'remove-tag'])('cancels queued refocus after %s emits change', async (action) => {
+    const outside = document.createElement('button')
+    document.body.append(outside)
+    let cancelOnChange = false
+    const control = createPublicSelect({
+      multiple: true,
+      clearable: true,
+      onChange: () => {
+        if (cancelOnChange) {
+          control.selector.value!.blur()
+          outside.focus()
+        }
+      },
+    })
+    control.selector.value!.focus()
+    const combo = control.wrapper.get('input')
+    await combo.trigger('keydown', { code: 'ArrowDown', key: 'ArrowDown' })
+    await settle()
+    await combo.trigger('keydown', { code: 'ArrowDown', key: 'ArrowDown' })
+    await combo.trigger('keydown', { code: 'Enter', key: 'Enter' })
+    await settle()
+    expect(control.value.value).toEqual([0])
+    cancelOnChange = true
+    if (action === 'clear') {
+      await control.wrapper.findComponent(ElSelectV2).trigger('mouseenter')
+      await clickSharedClearButton(control.wrapper.findComponent(CircleClose))
+    } else {
+      await clickTagCloseButton(control.wrapper)
+    }
+    await settle()
+    expect(control.value.value).toEqual([])
+    expect(document.activeElement).toBe(outside)
+    expect(combo.attributes('aria-expanded')).toBe('false')
+    expect(control.blur).toHaveBeenCalledTimes(1)
+    control.selector.value!.focus()
+    await settle()
+    expect(document.activeElement).toBe(combo.element)
+    expect(control.focus).toHaveBeenCalledTimes(2)
+  })
+
+  it.each([false, true])('inherits ElForm disabled on the native input, multiple=%s', async (multiple) => {
+    const selector = ref<InstanceType<typeof ElSelectV2> | null>(null)
+    const disabled = ref(true)
+    const wrapper = mount(defineComponent({
+      setup: () => () => h(ElForm, { disabled: disabled.value }, () =>
+        h(ElSelectV2, { ref: selector, multiple, options: presenceOptions }),
+      ),
+    }), { attachTo: document.body })
+    wrappers.push(wrapper)
+    const input = wrapper.get('input')
+    expect((input.element as HTMLInputElement).disabled).toBe(true)
+    selector.value!.focus()
+    ;(input.element as HTMLInputElement).focus()
+    await settle()
+    expect(document.activeElement).not.toBe(input.element)
+    await input.trigger('keydown', { code: 'ArrowDown', key: 'ArrowDown' })
+    expect(input.attributes('aria-expanded')).toBe('false')
+    disabled.value = false
+    await settle()
+    selector.value!.focus()
+    expect((input.element as HTMLInputElement).disabled).toBe(false)
+    expect(document.activeElement).toBe(input.element)
   })
 })
