@@ -100,9 +100,26 @@ test('actual installed tarball accepts the exact panel contract and rejects inva
     const selector = statement.declarationList.declarations.find(
       (declaration) => declaration.name.getText(file) === 'getPanel',
     ).initializer
-    return producerTs
-      .createPrinter()
-      .printNode(producerTs.EmitHint.Expression, selector, file)
+    const normalized = producerTs.transform(selector, [
+      (context) => {
+        const visit = (node) =>
+          producerTs.isStringLiteral(node)
+            ? producerTs.factory.createStringLiteral(node.text)
+            : producerTs.visitEachChild(node, visit, context)
+        return (node) => producerTs.visitNode(node, visit)
+      },
+    ])
+    try {
+      return producerTs
+        .createPrinter({ removeComments: true })
+        .printNode(
+          producerTs.EmitHint.Expression,
+          normalized.transformed[0],
+          file,
+        )
+    } finally {
+      normalized.dispose()
+    }
   }
   assert.equal(
     printSelector(packedJs),
