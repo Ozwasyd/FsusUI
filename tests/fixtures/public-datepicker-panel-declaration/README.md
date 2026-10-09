@@ -27,3 +27,27 @@ actual packed runtime selector with the original emitted JavaScript.
 The annotation repairs one producer TS7056. It does not repair the four missing
 component barrels or their six global exports; aggregate installed-package strict
 qualification must be reported separately.
+
+`authority.json` records measured source and artifact identities for the original
+`2d05f240e5fb04ac0cd602b4ed638ffe00b1859b`, the independent panel repair, and the
+real four-component combination `f4a094f300384185918fc6d4be86e88d9ab9f097`.
+The combination's producer and installed-test evidence is published at
+`736b981fba100a0c2e956e74b61ddef62ff4d508` under
+`docs/releases/evidence/public-declaration-four-component-f4a094/`.
+The fixture fingerprints all 2,450 tracked non-test Vue, script, configuration,
+and root package inputs, including working-tree changes and new untracked inputs.
+Only these exact recognized inputs select the complete expected diagnostic rows:
+12 original, 11 independent, and zero in the real combination. Unknown inputs or
+any additional diagnostic fail. There is no caller-supplied expected-count option.
+
+The installed test identifies the actual tarball by SHA256, checks the recorded
+canonical manifest against current build inputs, and compares every installed
+package file with the extracted real tarball, plus the exact recorded pnpm KaTeX
+binary shim added during installation. Other additions or changed bytes fail.
+The known independent artifact must
+produce exactly its four recorded missing-barrel diagnostics; the real combination
+must produce none. Both must reject the same four negative calls at their precise
+source lines. The diagnostic expectation control is recorded separately from the
+original strict positive assertion, which remains `positive === []`. Consequently
+the independent artifact still records strict FAIL, while the real combination
+can pass. The package's aggregate strict qualification remains a separate check.

@@ -11,12 +11,15 @@ const { execFileSync } = requireSource('node:child_process')
 const { createHash } = requireSource('node:crypto')
 const { Buffer } = requireSource('node:buffer')
 const { Project, ts } = requireSource('ts-morph')
+const { readSourceAuthority } = requireSource('./authority.mjs')
 
 const root = path.resolve(path.dirname(filename), '../../..')
+const sourceAuthority = readSourceAuthority(root)
 const baseline = '2d05f240e5fb04ac0cd602b4ed638ffe00b1859b'
 const target = 'vue/packages/components/date-picker/src/panel-utils.ts'
 const mode = process.argv[2]
 assert.ok(['baseline', 'verify'].includes(mode))
+assert.equal(sourceAuthority.name === 'original', mode === 'baseline')
 const output = path.resolve(process.argv[3])
 const originalSource = execFileSync('git', ['show', `${baseline}:${target}`], {
   cwd: root,
@@ -37,6 +40,8 @@ assert.equal(
   'runtime JS must be identical',
 )
 assert.equal(ts.version, '5.9.2')
+assert.equal(requireSource('ts-morph/package.json').version, '27.0.2')
+assert.equal(requireSource('vue/package.json').version, '3.5.32')
 for (const file of [
   'package.json',
   'pnpm-lock.yaml',
@@ -58,20 +63,6 @@ for (const file of [
   )
 }
 
-const expectedFiles = [
-  'cascader/index.ts',
-  'cascader/src/cascader.vue.ts',
-  'date-picker/src/panel-utils.ts',
-  'pagination/src/components/sizes.vue.ts',
-  'select/index.ts',
-  'select/src/select.vue.ts',
-  'select/src/useSelect.ts',
-  'slider/index.ts',
-  'slider/src/composables/use-slide.ts',
-  'slider/src/slider.vue.ts',
-  'time-select/index.ts',
-  'time-select/src/time-select.vue.ts',
-].map((file) => `vue/packages/components/${file}`)
 const diagnosticRows = (diagnostics) =>
   diagnostics.map((diagnostic) => ({
     code: diagnostic.getCode(),
@@ -91,8 +82,9 @@ Project.prototype.getPreEmitDiagnostics = function (...args) {
   const rows = diagnosticRows(diagnostics)
   const actual = rows.filter((row) => row.code === 7056)
   assert.deepEqual(
-    actual.map((row) => row.file),
-    expectedFiles.filter((file) => mode === 'baseline' || file !== target),
+    rows,
+    sourceAuthority.producerDiagnostics,
+    'all diagnostics must match the exact recognized source inputs',
   )
   assert.equal(rows.filter((row) => ![7056, 2742].includes(row.code)).length, 0)
   if (mode === 'baseline') {
@@ -163,6 +155,7 @@ type ReturnMutationRejected = Assert<Same<ReturnType<typeof getPanel>, typeof Da
       cwd: root,
       encoding: 'utf8',
     }).trim(),
+    sourceAuthority,
     baseline,
     producerTypeScript: ts.version,
     producerTsMorph: requireSource('ts-morph/package.json').version,
