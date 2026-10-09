@@ -1,5 +1,7 @@
 # Public declaration owner integration evidence
 
+**Correction:** the 10-diagnostic check below uses a preserved lock that still supplies vue-router/type-fest even though this artifact drops both in its authority projection. It qualifies only that locked diagnostic graph. It does not establish fresh-consumer dependency closure. The historical 48ac 191 result has the same caveat; both original artifacts and logs remain preserved. The worker is validating a separate source authority fix and new artifact.
+
 Source: `6b735fa3be7b6500de49e79c0a0dfee7cef12b83`, branch `integration/public-declaration-owner-offers-20261009`. The canonical local tarball SHA256 is `1cc60ea8e3cad4d05806f4024277e650610624344545d0b5e9c270be7fe5e5be`. It was built and verified at that exact source before any diagnostic-only generator rerun. No tarball or npm package was published.
 
 The isolated branch consumes five actual author offers recorded in `source-offers.json`. It also corrects three own Changesets package keys and the imported Markdown Changeset key to the actual workspace package `element-plus`; this does not rename the published `@ozwasyd/element-plus` package. The frozen 48ac implementation/evidence branches and real local alias `73a61e481fc6a2f684704585c496d004f86000cc` remain preserved. The held TableV2 runtime performance branch is not consumed.
