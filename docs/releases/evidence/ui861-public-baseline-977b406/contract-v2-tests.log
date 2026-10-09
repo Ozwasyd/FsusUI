@@ -1,0 +1,61 @@
+
+> @ test:contract-v2 /workspace/FsusUI-ui861-66-baseline-projection
+> node ./scripts/with-node-heap.mjs node --test tests/contract-v2.test.mjs
+
+✔ valid Contract V2 fixture registry passes validation (2.689725ms)
+✔ committed Contract V2 registry passes validation with the committed gate (92.271093ms)
+✔ Avalonia semantic baselines retain compiler and input freshness identity (5.314051ms)
+✔ Avalonia semantic output hash rejects payload drift (3.052993ms)
+✔ Avalonia semantic baseline distinguishes declared pseudo-class contracts from observed class implementation (0.508417ms)
+✔ pseudo-class and class-state mutations invalidate Contract V2 state identities (195.068295ms)
+✔ Avalonia automation baseline separates source observations from declared and runtime contracts (1.042842ms)
+✔ automation mutations invalidate independent Contract V2 identities without changing derived status (810.159936ms)
+✔ Avalonia token/theme baseline retains generated authorities and honest dependency ownership (0.721447ms)
+✔ token/theme dependency drift invalidates package and type Contract V2 identities without changing status (645.805795ms)
+✔ Avalonia semantic baseline retains real generic constraints and command surfaces (0.6826ms)
+✔ generic-constraint and command-nullability mutations invalidate Contract V2 identities (111.400862ms)
+✔ explicit command operation bindings remain partial without invocation semantics (258.084546ms)
+✔ Vue compiler AST retains dynamic names and scoped slot payload structure (0.262606ms)
+✔ Vue compiler AST binds deprecated metadata to the real declaration (41.855309ms)
+✔ enum and deprecated comparator mutations fail closed (0.309287ms)
+✔ real Vue slot source mutation reaches compiler baseline coverage (21.489226ms)
+✔ content-region comparator fails closed on unknown and drifted structure (0.423579ms)
+✔ content-region baseline mutation invalidates Avalonia-only surface identity (57.153532ms)
+✔ real Avalonia public surfaces have one current mapped or avalonia-extra state (44.916424ms)
+✔ real Avalonia surface mutations invalidate current registration (340.18736ms)
+✔ Avalonia registration mutations cannot hide missing or duplicate ownership (514.501137ms)
+✔ explicit semantic member bindings resolve real members from both baselines (260.598185ms)
+✔ inactive MarkdownEditor issue gate preserves evidence-derived partial status (461.473665ms)
+✔ explicit semantic member bindings reject stale and duplicate endpoints (13.177485ms)
+✔ explicit member dispositions register only exact reviewed Web surfaces (554.560808ms)
+✔ member disposition mutations fail closed (74.968979ms)
+✔ real mapped inputs use compiler-known metadata and keep unknown values partial (282.205299ms)
+✔ real mapped input baseline mutations expose default, required, access, and nullability drift (2744.7005ms)
+✔ mapped input semantic mutations invalidate the committed surface hash (235.412176ms)
+✔ real operation signatures are retained and fail closed when not comparable (267.18202ms)
+✔ TypeScript checker extracts mapped exposed signatures and source mutations change the contract (3282.796235ms)
+✔ real baseline mutations expose operation parameter drift (1103.340875ms)
+✔ real mapped event payload shapes fail closed on field drift (1429.50454ms)
+✔ real Vue source payload type mutation reaches the comparator (1388.458978ms)
+✔ mutation fixture kills auto-counterpart (0.925445ms)
+✔ mutation fixture kills broad-override (0.291119ms)
+✔ mutation fixture kills write-alias-modes (0.191769ms)
+✔ mutation fixture kills write-alias-flag (0.375305ms)
+✔ mutation fixture kills capability-set (0.207573ms)
+✔ mutation fixture kills capability-consumer-mapping (0.199932ms)
+✔ mutation fixture kills capability-numeric-codes (0.168404ms)
+✔ mutation fixture kills capability-unknown-fallback (0.158359ms)
+✔ mutation fixture kills unmapped-member (0.432722ms)
+✔ mutation fixture kills missing-scenario (0.500054ms)
+✔ mutation fixture kills missing-governance (0.247724ms)
+✔ mutation fixture kills aligned-false-claim (0.313082ms)
+✔ mutation fixture kills incomplete-markdown-editor-alignment (0.168774ms)
+✔ mutation fixture kills drift-aligned (0.160061ms)
+ℹ tests 49
+ℹ suites 0
+ℹ pass 49
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 15717.948223

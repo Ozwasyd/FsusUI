@@ -1,0 +1,13 @@
+{
+  "sourceHead": "66d6b56fe6033b5bdca723346847f3deac7d5e40",
+  "pid": 188238,
+  "argv": [
+    "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
+    "/workspace/FsusUI-ui861-66-baseline-projection/scripts/with-node-heap.mjs",
+    "node",
+    "./scripts/avalonia-vue-public-api-baseline.mjs"
+  ],
+  "observationOnly": true,
+  "originalReadArgumentsAndReturnUnchanged": true,
+  "inputs": []
+}

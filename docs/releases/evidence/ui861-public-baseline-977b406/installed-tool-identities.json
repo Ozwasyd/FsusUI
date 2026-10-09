@@ -1,0 +1,32 @@
+{
+  "node": "v24.19.0",
+  "pnpm": "10.33.0",
+  "tools": [
+    {
+      "package": "vue",
+      "version": "3.5.32",
+      "packageJsonSha256": "fc1afd2562b2ae3f0991b1a4ad37c2819a5486ca1172c5a1d17740b214936614"
+    },
+    {
+      "package": "@vue/compiler-sfc",
+      "version": "3.5.32",
+      "packageJsonSha256": "9cd5455467d29f8262c69ebc95fe5a7227b19f643eff919f89ca4dfa1fffb552"
+    },
+    {
+      "package": "@babel/parser",
+      "version": "7.29.2",
+      "packageJsonSha256": "475d2167de0b6cf8a8148431f08b4920eb33d81ce6edcde0746f0d6fd0d821de"
+    },
+    {
+      "package": "typescript",
+      "version": "6.0.2",
+      "packageJsonSha256": "bb6ee7e709ae60426e30b8d393df4d939ee61407794b4f053ce6338d6eaa8c63"
+    },
+    {
+      "package": "prettier",
+      "version": "3.8.1",
+      "packageJsonSha256": "b73c6d16f392858c9bad2b4b4d2357c96773676d5769c5e6b700a32be7609f2e"
+    }
+  ],
+  "sourceLockSha256": "9160eda59f2ebd9e27701d9df9718ccb7b327ceb83d418310ef542b1651451d7"
+}

@@ -1,0 +1,5 @@
+
+> @ check:update-surface /workspace/FsusUI-ui861-66-baseline-projection
+> node ./scripts/with-node-heap.mjs node ./scripts/check-update-surface.mjs
+
+[check:update-surface] ok surfaces=119 exclusions=11 groups=10

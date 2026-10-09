@@ -1,0 +1,8 @@
+{
+  "repository": "Ozwasyd/FsusUI",
+  "base": "main",
+  "head": "fix/ui861-66-public-baseline-projection-20261009",
+  "draft": true,
+  "title": "chore(contracts): capture the actual renderer lint source baseline",
+  "body": "Regenerate the Vue public baseline and dependent v1/v2 metadata with the original producers from actual renderer source 66d6b56f. The complete 1,600-input binding includes the changed renderer test; API payload and rules are unchanged.\n\nValidation: generation/checks and byte-identical fixed point PASS; 49 contract mutation tests PASS; update-surface/docs and fresh-main merge-tree PASS. This metadata offer carries no browser/native/package qualification. Prior 18b/3b evidence remains historical.\n\nEvidence: docs/releases/evidence/ui861-public-baseline-977b406/outcome.md on the separate review evidence branch."
+}

@@ -1,0 +1,5 @@
+
+> @ component-contracts:generate /workspace/FsusUI-ui861-66-baseline-projection
+> node ./scripts/with-node-heap.mjs node ./scripts/component-contract-registry.mjs
+
+component-contracts generated
