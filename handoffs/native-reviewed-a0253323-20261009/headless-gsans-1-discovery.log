@@ -1,0 +1,48 @@
+Test run for /workspace/native-reviewed-integration/dotnet/FsusUI.Avalonia.HeadlessTests/bin/Release/net10.0/FsusUI.Avalonia.HeadlessTests.dll (.NETCoreApp,Version=v10.0)
+The following Tests are available:
+    FsusUI.Avalonia.HeadlessTests.FsusBundledInterFontRegistrationRegressionTests.DeclaredBodyStackResolvesTheRegisteredBundledFamily
+    FsusUI.Avalonia.HeadlessTests.FsusBundledInterFontRegistrationRegressionTests.LinuxMonospaceAliasesResolveTheNativeFixedPitchFamilyAndLayout(family: "monospace")
+    FsusUI.Avalonia.HeadlessTests.FsusBundledInterFontRegistrationRegressionTests.LinuxMonospaceAliasesResolveTheNativeFixedPitchFamilyAndLayout(family: "ui-monospace, SFMono-Regular, Menlo, Monaco, Conso"···)
+    FsusUI.Avalonia.HeadlessTests.FsusBundledInterFontRegistrationRegressionTests.DeclaredMonospaceStackRetainsItsAvailableNamedFamily
+    FsusUI.Avalonia.HeadlessTests.FsusBundledInterFontRegistrationRegressionTests.BundledInterResolvesGlyphsAndLaysOutTextInAFluentWindow
+    FsusUI.Avalonia.HeadlessTests.FsusNativeMenuHeadlessTests.NativeMenuAttachesToWindowAndSynchronouslyReflectsCommandState
+    FsusUI.Avalonia.HeadlessTests.FsusNativeMenuHeadlessTests.InitiallyDisabledCommandStaysDisabledInRenderedMenu
+    FsusUI.Avalonia.HeadlessTests.FsusNativeMenuHeadlessTests.PreserveRootsProfileAttachesExactlySuppliedRootsAndKeepsCommandState
+    FsusUI.Avalonia.HeadlessTests.FsusNativeMenuHeadlessTests.CommandPaletteIntegratesWithSharedCommandsInHeadless
+    FsusUI.Avalonia.HeadlessTests.FsusNativeMenuTests.SameCommandModelUsableByCommandPaletteAndNativeMenu(platform: Windows, displayShortcut: "Ctrl+S", nativePrimaryModifier: Control)
+    FsusUI.Avalonia.HeadlessTests.FsusNativeMenuTests.SameCommandModelUsableByCommandPaletteAndNativeMenu(platform: Linux, displayShortcut: "Ctrl+S", nativePrimaryModifier: Control)
+    FsusUI.Avalonia.HeadlessTests.FsusNativeMenuTests.SameCommandModelUsableByCommandPaletteAndNativeMenu(platform: macOS, displayShortcut: "Command+S", nativePrimaryModifier: Meta)
+    FsusUI.Avalonia.HeadlessTests.FsusNativeMenuTests.DefaultPaletteSearchUsesHostPlatformAfterExplicitSearches
+    FsusUI.Avalonia.HeadlessTests.FsusNativeMenuTests.DocumentStateChangesSynchronouslyUpdateItemEnabledState
+    FsusUI.Avalonia.HeadlessTests.FsusNativeMenuTests.CustomShortcutUpdateImmediatelyRefreshesNativeMenuAccelerator(platform: Windows)
+    FsusUI.Avalonia.HeadlessTests.FsusNativeMenuTests.CustomShortcutUpdateImmediatelyRefreshesNativeMenuAccelerator(platform: Linux)
+    FsusUI.Avalonia.HeadlessTests.FsusNativeMenuTests.CustomShortcutUpdateImmediatelyRefreshesNativeMenuAccelerator(platform: macOS)
+    FsusUI.Avalonia.HeadlessTests.FsusNativeMenuTests.CustomShortcutUpdateImmediatelyRefreshesNativeMenuAccelerator(platform: Auto)
+    FsusUI.Avalonia.HeadlessTests.FsusNativeMenuTests.DockPrimaryAcceleratorUsesCommandWithoutMutatingSharedGesture
+    FsusUI.Avalonia.HeadlessTests.FsusNativeMenuTests.MacPlatformRolesInCorrectPositionsAndOtherPlatformsDoNotHaveInvalidItems
+    FsusUI.Avalonia.HeadlessTests.FsusNativeMenuTests.InitiallyDisabledCommandStaysDisabledAfterBuildAndReflectsNestedState
+    FsusUI.Avalonia.HeadlessTests.FsusNativeMenuTests.PreserveRootsProfileReturnsExactlySuppliedRootsWithMetadataAndCommandState
+    FsusUI.Avalonia.HeadlessTests.FsusNativeMenuTests.SynthesizedRootsOptionGatesMissingRequiredRoots
+    FsusUI.Avalonia.HeadlessTests.FsusNativeMenuTests.DockMenuContractAndWindowlessRoutingFallbackWorks
+    FsusUI.Avalonia.HeadlessTests.FsusNativeMenuTests.PlatformSimulationBindsRolesAndCanonicalTopLevelOrder
+    FsusUI.Avalonia.HeadlessTests.FsusNativeMenuTests.RebuildAndDisposeDetachPreviousCommandListeners
+    FsusUI.Avalonia.HeadlessTests.FsusNativeMenuTests.RecentSubmenuRebuildAndDockAttachmentUseNeutralRoles
+    FsusUI.Avalonia.HeadlessTests.FsusShortcutRecorderHeadlessTests.UserStartsRecordingAndPressesCtrlShiftPToCaptureOneShortcut(platform: Windows, primaryModifier: Control, displayShortcut: "Ctrl+Shift+P")
+    FsusUI.Avalonia.HeadlessTests.FsusShortcutRecorderHeadlessTests.UserStartsRecordingAndPressesCtrlShiftPToCaptureOneShortcut(platform: Linux, primaryModifier: Control, displayShortcut: "Ctrl+Shift+P")
+    FsusUI.Avalonia.HeadlessTests.FsusShortcutRecorderHeadlessTests.UserStartsRecordingAndPressesCtrlShiftPToCaptureOneShortcut(platform: macOS, primaryModifier: Meta, displayShortcut: "Command+Shift+P")
+    FsusUI.Avalonia.HeadlessTests.FsusShortcutRecorderHeadlessTests.EscapeCancelsRecordingAndDoesNotChangeOriginalValue
+    FsusUI.Avalonia.HeadlessTests.FsusShortcutRecorderHeadlessTests.BackspaceOrDeleteClearsRecordedValue
+    FsusUI.Avalonia.HeadlessTests.FsusShortcutRecorderHeadlessTests.InjectedExistingShortcutsShowAccessibleConflictStatus
+    FsusUI.Avalonia.HeadlessTests.FsusShortcutRecorderHeadlessTests.ControlTemplateAppliesAcrossLightAndDarkThemes
+    FsusUI.Avalonia.HeadlessTests.FsusShortcutRecorderHeadlessTests.PlaceholderAndAccessibleClearActionRestoreRecorderFocus
+    FsusUI.Avalonia.HeadlessTests.FsusTreeScrollingHeadlessTests.ScrollingExpandedRowsPreservesOffsetAndRoutesPointerToRetainedNode
+    FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests.AutoResizerObservesArrangedViewportAndHonorsDisabledAxes
+    FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests.AutoResizerAndTableV2VirtualizeRowsColumnsResizeAndBudget
+    FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests.TableV2BindsTypedRowsFixedColumnsAndRealKeyboardScroll
+    FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests.TableV2MeasuresDynamicRowsAndRaisesRealScrollCallbacks
+    FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests.TableV2UsesFixedDataGetterAndExpandedRowCallbacks
+    FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests.TableV2MapsViewportGeometryAndCacheToRealLayout
+    FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests.TableV2SortsTypedRowsAndReportsColumnSort
+    FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests.TableV2RendersBoundedContentRegions
+    FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests.TableV2ContentRegionsReceiveScopedPayloads
+    FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests.TableV2VirtualizesFrozenAxesNavigatesAndRejectsStaleBackgroundResults

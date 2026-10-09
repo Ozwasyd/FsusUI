@@ -1,0 +1,82 @@
+WIP shared native integration handoff
+
+Published source: a0253323cd2442184aa5a42e8ff84fca86a10118
+Branch: fix/native-reviewed-integration-20261009
+Actual main base: 8db0ac8f49749e3e5f28be5051bb3d3ed71ada71
+Root/monitor retain draft PR creation/body/labels; Root retains ready/merge.
+No GitHub content writes, publication or dependency-branch pushes occurred.
+
+Composition: only reviewed Font06123873 (three paths), Tree3ddcda32 (four),
+Shortcut68c4fa4a (nine own paths, identical shared Font duplicates omitted),
+PDFed80a940 (two), TableV2 90a7d58a (six source/assets plus shared project).
+Twenty-four unique changed paths. All23 non-project blobs exactly match their
+published supplier blobs. Final project is byte-identical to legitimate
+TableV2/shared resource supplier1a1fb1b8; no additional project settings changed.
+Complete source/owner/blob/SHA256 roster: complete-owned-inherited-roster.json.
+Canonical c53f37c0 was used only as read-only matching host/test composition
+context. Its font host/test blobs match canonical061; none of its ancestry or
+historical .108 dependency inputs were imported. Original source/evidence
+branches remain frozen. All supplier qualifications stay with their original
+source/toolchain/cases and are not relabeled as combined-tree results here.
+Typography be0a/989e, DesktopShell b680, Tag/Card are absent.
+
+PASS: real .401 normal original-project resource/dependency evaluation.
+Shared GoogleSans4 + dedicated TableV2 2 = six singular resource items;
+zero plural items. Package/project references remain the original graph.
+Before/after/base project bytes and raw resource graphs are attached.
+Audit evaluates true, all mode, low level. All main package locks, SDK policy,
+dependencies, budgets, baselines and assertions unchanged. No scratch locks,
+audit/signature overrides, SDK policy edits, custom targets or external include.
+
+PASS: actual SDK10.0.401 / runtime10.0.12 / Debian13 linux-x64.
+Both original projects locked-restored and Release-built. Headless build zero
+errors/one existing xUnit2013 warning at Markdown test line162; unit build
+zero warnings/errors. Exact tool/policy/assembly/input/lock hashes retained.
+
+PASS: new combined source's actual ordinary test results, not supplier results.
+Headless GSANS0: 38 methods, 46 discovery cases, 46 passed, failed0/skipped0.
+Headless GSANS1: 38 methods, 46 discovery cases, 46 passed, failed0/skipped0.
+Unit: 33 methods, 45 discovery cases, 45 passed, failed0/skipped0.
+All71 FQNs deduplicated;137 executions. Per-owner counts/outcomes are in
+combined-results.json. Exact admission and source/cardinality records attached.
+No empty selector, negative-only/broad filter, all-suite fallback or output
+filtering. All three discovery axes passed before any tests executed.
+Hooks, original methods, excluded routes and cleanup details: HOOKS_AND_SELECTION.txt.
+
+PDF tooling observations (not capture qualification): default PATH exposes
+mixed Poppler versions26.05/25.03. Read-only verification of all three package-
+owned /usr/bin tools passed at consistent25.03.0 (Debian poppler-utils
+25.03.0-5+deb13u4). The ordinary runner prepends /usr/bin for this explicit
+local tool selection; actual dotnet remains .401. The reviewed Ubuntu/macOS/
+Windows install action and real CI PDF-tool job were not executed locally.
+Original PDF adapter unit simulations passed12; native PDF captures UNRUN.
+
+All340 tracked PNGs are byte-identical to actual main; hash inventory attached.
+FSUSUI_UPDATE_VISUAL_ARTIFACTS unset. Final source worktree clean.
+
+UNRUN: both TableV2 PNGs; RepositoryRoot-linked Table contract metadata method;
+Shortcut state-matrix capture; WebView context/PDF matrix capture; optional
+native-menu bound-evidence producer; held routes and receipts/audits; broad
+suites/npm gates; actual Windows/macOS hardware and CI; independent visual
+acceptance. No workaround/harness/baseline update replaces missing cells.
+No full-suite, complete-native-gate or visual acceptance claim is made.
+
+Commands (source /workspace/.setup/activate.sh first), from checkout root:
+  dotnet msbuild dotnet/FsusUI.Avalonia.HeadlessTests/FsusUI.Avalonia.HeadlessTests.csproj -getItem:AvaloniaResource,AvaloniaResources,ProjectReference,PackageReference
+  dotnet msbuild dotnet/FsusUI.Avalonia.HeadlessTests/FsusUI.Avalonia.HeadlessTests.csproj -getProperty:NuGetAudit,NuGetAuditMode,NuGetAuditLevel,RestorePackagesWithLockFile,TargetFramework,NETCoreSdkVersion,MSBuildSDKsPath
+From dotnet/ (each project independently):
+  dotnet restore FsusUI.Avalonia.HeadlessTests/FsusUI.Avalonia.HeadlessTests.csproj --locked-mode
+  dotnet build FsusUI.Avalonia.HeadlessTests/FsusUI.Avalonia.HeadlessTests.csproj --no-restore -c Release
+  dotnet restore FsusUI.Avalonia.Tests/FsusUI.Avalonia.Tests.csproj --locked-mode
+  dotnet build FsusUI.Avalonia.Tests/FsusUI.Avalonia.Tests.csproj --no-restore -c Release
+Then from root:
+  python3 /workspace/native-reviewed-evidence/freeze-selectors.py
+  python3 /workspace/native-reviewed-evidence/run-admitted-controls.py
+Executable commands/filters, discovery, raw logs and TRX are all attached.
+
+Next ordinary commands on any reviewed changed composition: repeat the locked
+restore/build, frozen exact discovery/count admission, then admitted selectors.
+Missing captures/platform/visual cells require separately released Root scope;
+no alternate route is proposed or invoked. Public full WIP body: PR-DRAFT.md.
+Rollback: revert the five recorded integration commits in reverse order, or
+discard this independently named branch before merge. No supplier ref changes.

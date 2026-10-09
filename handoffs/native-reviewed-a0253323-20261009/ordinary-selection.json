@@ -1,0 +1,570 @@
+[
+  {
+    "project": "headless",
+    "owner": "Font",
+    "path": "dotnet/FsusUI.Avalonia.HeadlessTests/FsusBundledInterFontRegistrationRegressionTests.cs",
+    "fqn": "FsusUI.Avalonia.HeadlessTests.FsusBundledInterFontRegistrationRegressionTests.DeclaredBodyStackResolvesTheRegisteredBundledFamily",
+    "expectedCases": 1,
+    "sourceSha256": "caa81e90e3a04e2989582cf905a0cb2942a7684d07ae85a5521b4e81de0ed2f3"
+  },
+  {
+    "project": "headless",
+    "owner": "Font",
+    "path": "dotnet/FsusUI.Avalonia.HeadlessTests/FsusBundledInterFontRegistrationRegressionTests.cs",
+    "fqn": "FsusUI.Avalonia.HeadlessTests.FsusBundledInterFontRegistrationRegressionTests.LinuxMonospaceAliasesResolveTheNativeFixedPitchFamilyAndLayout",
+    "expectedCases": 2,
+    "sourceSha256": "caa81e90e3a04e2989582cf905a0cb2942a7684d07ae85a5521b4e81de0ed2f3"
+  },
+  {
+    "project": "headless",
+    "owner": "Font",
+    "path": "dotnet/FsusUI.Avalonia.HeadlessTests/FsusBundledInterFontRegistrationRegressionTests.cs",
+    "fqn": "FsusUI.Avalonia.HeadlessTests.FsusBundledInterFontRegistrationRegressionTests.DeclaredMonospaceStackRetainsItsAvailableNamedFamily",
+    "expectedCases": 1,
+    "sourceSha256": "caa81e90e3a04e2989582cf905a0cb2942a7684d07ae85a5521b4e81de0ed2f3"
+  },
+  {
+    "project": "headless",
+    "owner": "Font",
+    "path": "dotnet/FsusUI.Avalonia.HeadlessTests/FsusBundledInterFontRegistrationRegressionTests.cs",
+    "fqn": "FsusUI.Avalonia.HeadlessTests.FsusBundledInterFontRegistrationRegressionTests.BundledInterResolvesGlyphsAndLaysOutTextInAFluentWindow",
+    "expectedCases": 1,
+    "sourceSha256": "caa81e90e3a04e2989582cf905a0cb2942a7684d07ae85a5521b4e81de0ed2f3"
+  },
+  {
+    "project": "headless",
+    "owner": "Tree",
+    "path": "dotnet/FsusUI.Avalonia.HeadlessTests/FsusTreeScrollingHeadlessTests.cs",
+    "fqn": "FsusUI.Avalonia.HeadlessTests.FsusTreeScrollingHeadlessTests.ScrollingExpandedRowsPreservesOffsetAndRoutesPointerToRetainedNode",
+    "expectedCases": 1,
+    "sourceSha256": "6306eaad7b5ef7d59e40888eccacffa0b417f63457633644f172856914d45a09"
+  },
+  {
+    "project": "headless",
+    "owner": "TableV2",
+    "path": "dotnet/FsusUI.Avalonia.HeadlessTests/FsusVirtualizationHeadlessTests.cs",
+    "fqn": "FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests.AutoResizerObservesArrangedViewportAndHonorsDisabledAxes",
+    "expectedCases": 1,
+    "sourceSha256": "d542444788cf08a238b4b9c53fd9ba1a090c261b97a511ffca2ec3dd5ef48838"
+  },
+  {
+    "project": "headless",
+    "owner": "TableV2",
+    "path": "dotnet/FsusUI.Avalonia.HeadlessTests/FsusVirtualizationHeadlessTests.cs",
+    "fqn": "FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests.AutoResizerAndTableV2VirtualizeRowsColumnsResizeAndBudget",
+    "expectedCases": 1,
+    "sourceSha256": "d542444788cf08a238b4b9c53fd9ba1a090c261b97a511ffca2ec3dd5ef48838"
+  },
+  {
+    "project": "headless",
+    "owner": "TableV2",
+    "path": "dotnet/FsusUI.Avalonia.HeadlessTests/FsusVirtualizationHeadlessTests.cs",
+    "fqn": "FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests.TableV2BindsTypedRowsFixedColumnsAndRealKeyboardScroll",
+    "expectedCases": 1,
+    "sourceSha256": "d542444788cf08a238b4b9c53fd9ba1a090c261b97a511ffca2ec3dd5ef48838"
+  },
+  {
+    "project": "headless",
+    "owner": "TableV2",
+    "path": "dotnet/FsusUI.Avalonia.HeadlessTests/FsusVirtualizationHeadlessTests.cs",
+    "fqn": "FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests.TableV2MeasuresDynamicRowsAndRaisesRealScrollCallbacks",
+    "expectedCases": 1,
+    "sourceSha256": "d542444788cf08a238b4b9c53fd9ba1a090c261b97a511ffca2ec3dd5ef48838"
+  },
+  {
+    "project": "headless",
+    "owner": "TableV2",
+    "path": "dotnet/FsusUI.Avalonia.HeadlessTests/FsusVirtualizationHeadlessTests.cs",
+    "fqn": "FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests.TableV2UsesFixedDataGetterAndExpandedRowCallbacks",
+    "expectedCases": 1,
+    "sourceSha256": "d542444788cf08a238b4b9c53fd9ba1a090c261b97a511ffca2ec3dd5ef48838"
+  },
+  {
+    "project": "headless",
+    "owner": "TableV2",
+    "path": "dotnet/FsusUI.Avalonia.HeadlessTests/FsusVirtualizationHeadlessTests.cs",
+    "fqn": "FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests.TableV2MapsViewportGeometryAndCacheToRealLayout",
+    "expectedCases": 1,
+    "sourceSha256": "d542444788cf08a238b4b9c53fd9ba1a090c261b97a511ffca2ec3dd5ef48838"
+  },
+  {
+    "project": "headless",
+    "owner": "TableV2",
+    "path": "dotnet/FsusUI.Avalonia.HeadlessTests/FsusVirtualizationHeadlessTests.cs",
+    "fqn": "FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests.TableV2SortsTypedRowsAndReportsColumnSort",
+    "expectedCases": 1,
+    "sourceSha256": "d542444788cf08a238b4b9c53fd9ba1a090c261b97a511ffca2ec3dd5ef48838"
+  },
+  {
+    "project": "headless",
+    "owner": "TableV2",
+    "path": "dotnet/FsusUI.Avalonia.HeadlessTests/FsusVirtualizationHeadlessTests.cs",
+    "fqn": "FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests.TableV2RendersBoundedContentRegions",
+    "expectedCases": 1,
+    "sourceSha256": "d542444788cf08a238b4b9c53fd9ba1a090c261b97a511ffca2ec3dd5ef48838"
+  },
+  {
+    "project": "headless",
+    "owner": "TableV2",
+    "path": "dotnet/FsusUI.Avalonia.HeadlessTests/FsusVirtualizationHeadlessTests.cs",
+    "fqn": "FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests.TableV2ContentRegionsReceiveScopedPayloads",
+    "expectedCases": 1,
+    "sourceSha256": "d542444788cf08a238b4b9c53fd9ba1a090c261b97a511ffca2ec3dd5ef48838"
+  },
+  {
+    "project": "headless",
+    "owner": "TableV2",
+    "path": "dotnet/FsusUI.Avalonia.HeadlessTests/FsusVirtualizationHeadlessTests.cs",
+    "fqn": "FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests.TableV2VirtualizesFrozenAxesNavigatesAndRejectsStaleBackgroundResults",
+    "expectedCases": 1,
+    "sourceSha256": "d542444788cf08a238b4b9c53fd9ba1a090c261b97a511ffca2ec3dd5ef48838"
+  },
+  {
+    "project": "headless",
+    "owner": "Shortcut",
+    "path": "dotnet/FsusUI.Avalonia.HeadlessTests/FsusNativeMenuHeadlessTests.cs",
+    "fqn": "FsusUI.Avalonia.HeadlessTests.FsusNativeMenuHeadlessTests.NativeMenuAttachesToWindowAndSynchronouslyReflectsCommandState",
+    "expectedCases": 1,
+    "sourceSha256": "dbbd786383f4ef5619da882fbb3a81cfbd938ff3c08ea445e7e51a613d405874"
+  },
+  {
+    "project": "headless",
+    "owner": "Shortcut",
+    "path": "dotnet/FsusUI.Avalonia.HeadlessTests/FsusNativeMenuHeadlessTests.cs",
+    "fqn": "FsusUI.Avalonia.HeadlessTests.FsusNativeMenuHeadlessTests.InitiallyDisabledCommandStaysDisabledInRenderedMenu",
+    "expectedCases": 1,
+    "sourceSha256": "dbbd786383f4ef5619da882fbb3a81cfbd938ff3c08ea445e7e51a613d405874"
+  },
+  {
+    "project": "headless",
+    "owner": "Shortcut",
+    "path": "dotnet/FsusUI.Avalonia.HeadlessTests/FsusNativeMenuHeadlessTests.cs",
+    "fqn": "FsusUI.Avalonia.HeadlessTests.FsusNativeMenuHeadlessTests.PreserveRootsProfileAttachesExactlySuppliedRootsAndKeepsCommandState",
+    "expectedCases": 1,
+    "sourceSha256": "dbbd786383f4ef5619da882fbb3a81cfbd938ff3c08ea445e7e51a613d405874"
+  },
+  {
+    "project": "headless",
+    "owner": "Shortcut",
+    "path": "dotnet/FsusUI.Avalonia.HeadlessTests/FsusNativeMenuHeadlessTests.cs",
+    "fqn": "FsusUI.Avalonia.HeadlessTests.FsusNativeMenuHeadlessTests.CommandPaletteIntegratesWithSharedCommandsInHeadless",
+    "expectedCases": 1,
+    "sourceSha256": "dbbd786383f4ef5619da882fbb3a81cfbd938ff3c08ea445e7e51a613d405874"
+  },
+  {
+    "project": "headless",
+    "owner": "Shortcut",
+    "path": "dotnet/FsusUI.Avalonia.HeadlessTests/FsusNativeMenuTests.cs",
+    "fqn": "FsusUI.Avalonia.HeadlessTests.FsusNativeMenuTests.SameCommandModelUsableByCommandPaletteAndNativeMenu",
+    "expectedCases": 3,
+    "sourceSha256": "0bddad0db66541f1ee66191dc6fd1316bd417415bd8e33d911f76f66c71625bf"
+  },
+  {
+    "project": "headless",
+    "owner": "Shortcut",
+    "path": "dotnet/FsusUI.Avalonia.HeadlessTests/FsusNativeMenuTests.cs",
+    "fqn": "FsusUI.Avalonia.HeadlessTests.FsusNativeMenuTests.DefaultPaletteSearchUsesHostPlatformAfterExplicitSearches",
+    "expectedCases": 1,
+    "sourceSha256": "0bddad0db66541f1ee66191dc6fd1316bd417415bd8e33d911f76f66c71625bf"
+  },
+  {
+    "project": "headless",
+    "owner": "Shortcut",
+    "path": "dotnet/FsusUI.Avalonia.HeadlessTests/FsusNativeMenuTests.cs",
+    "fqn": "FsusUI.Avalonia.HeadlessTests.FsusNativeMenuTests.DocumentStateChangesSynchronouslyUpdateItemEnabledState",
+    "expectedCases": 1,
+    "sourceSha256": "0bddad0db66541f1ee66191dc6fd1316bd417415bd8e33d911f76f66c71625bf"
+  },
+  {
+    "project": "headless",
+    "owner": "Shortcut",
+    "path": "dotnet/FsusUI.Avalonia.HeadlessTests/FsusNativeMenuTests.cs",
+    "fqn": "FsusUI.Avalonia.HeadlessTests.FsusNativeMenuTests.CustomShortcutUpdateImmediatelyRefreshesNativeMenuAccelerator",
+    "expectedCases": 4,
+    "sourceSha256": "0bddad0db66541f1ee66191dc6fd1316bd417415bd8e33d911f76f66c71625bf"
+  },
+  {
+    "project": "headless",
+    "owner": "Shortcut",
+    "path": "dotnet/FsusUI.Avalonia.HeadlessTests/FsusNativeMenuTests.cs",
+    "fqn": "FsusUI.Avalonia.HeadlessTests.FsusNativeMenuTests.DockPrimaryAcceleratorUsesCommandWithoutMutatingSharedGesture",
+    "expectedCases": 1,
+    "sourceSha256": "0bddad0db66541f1ee66191dc6fd1316bd417415bd8e33d911f76f66c71625bf"
+  },
+  {
+    "project": "headless",
+    "owner": "Shortcut",
+    "path": "dotnet/FsusUI.Avalonia.HeadlessTests/FsusNativeMenuTests.cs",
+    "fqn": "FsusUI.Avalonia.HeadlessTests.FsusNativeMenuTests.MacPlatformRolesInCorrectPositionsAndOtherPlatformsDoNotHaveInvalidItems",
+    "expectedCases": 1,
+    "sourceSha256": "0bddad0db66541f1ee66191dc6fd1316bd417415bd8e33d911f76f66c71625bf"
+  },
+  {
+    "project": "headless",
+    "owner": "Shortcut",
+    "path": "dotnet/FsusUI.Avalonia.HeadlessTests/FsusNativeMenuTests.cs",
+    "fqn": "FsusUI.Avalonia.HeadlessTests.FsusNativeMenuTests.InitiallyDisabledCommandStaysDisabledAfterBuildAndReflectsNestedState",
+    "expectedCases": 1,
+    "sourceSha256": "0bddad0db66541f1ee66191dc6fd1316bd417415bd8e33d911f76f66c71625bf"
+  },
+  {
+    "project": "headless",
+    "owner": "Shortcut",
+    "path": "dotnet/FsusUI.Avalonia.HeadlessTests/FsusNativeMenuTests.cs",
+    "fqn": "FsusUI.Avalonia.HeadlessTests.FsusNativeMenuTests.PreserveRootsProfileReturnsExactlySuppliedRootsWithMetadataAndCommandState",
+    "expectedCases": 1,
+    "sourceSha256": "0bddad0db66541f1ee66191dc6fd1316bd417415bd8e33d911f76f66c71625bf"
+  },
+  {
+    "project": "headless",
+    "owner": "Shortcut",
+    "path": "dotnet/FsusUI.Avalonia.HeadlessTests/FsusNativeMenuTests.cs",
+    "fqn": "FsusUI.Avalonia.HeadlessTests.FsusNativeMenuTests.SynthesizedRootsOptionGatesMissingRequiredRoots",
+    "expectedCases": 1,
+    "sourceSha256": "0bddad0db66541f1ee66191dc6fd1316bd417415bd8e33d911f76f66c71625bf"
+  },
+  {
+    "project": "headless",
+    "owner": "Shortcut",
+    "path": "dotnet/FsusUI.Avalonia.HeadlessTests/FsusNativeMenuTests.cs",
+    "fqn": "FsusUI.Avalonia.HeadlessTests.FsusNativeMenuTests.DockMenuContractAndWindowlessRoutingFallbackWorks",
+    "expectedCases": 1,
+    "sourceSha256": "0bddad0db66541f1ee66191dc6fd1316bd417415bd8e33d911f76f66c71625bf"
+  },
+  {
+    "project": "headless",
+    "owner": "Shortcut",
+    "path": "dotnet/FsusUI.Avalonia.HeadlessTests/FsusNativeMenuTests.cs",
+    "fqn": "FsusUI.Avalonia.HeadlessTests.FsusNativeMenuTests.PlatformSimulationBindsRolesAndCanonicalTopLevelOrder",
+    "expectedCases": 1,
+    "sourceSha256": "0bddad0db66541f1ee66191dc6fd1316bd417415bd8e33d911f76f66c71625bf"
+  },
+  {
+    "project": "headless",
+    "owner": "Shortcut",
+    "path": "dotnet/FsusUI.Avalonia.HeadlessTests/FsusNativeMenuTests.cs",
+    "fqn": "FsusUI.Avalonia.HeadlessTests.FsusNativeMenuTests.RebuildAndDisposeDetachPreviousCommandListeners",
+    "expectedCases": 1,
+    "sourceSha256": "0bddad0db66541f1ee66191dc6fd1316bd417415bd8e33d911f76f66c71625bf"
+  },
+  {
+    "project": "headless",
+    "owner": "Shortcut",
+    "path": "dotnet/FsusUI.Avalonia.HeadlessTests/FsusNativeMenuTests.cs",
+    "fqn": "FsusUI.Avalonia.HeadlessTests.FsusNativeMenuTests.RecentSubmenuRebuildAndDockAttachmentUseNeutralRoles",
+    "expectedCases": 1,
+    "sourceSha256": "0bddad0db66541f1ee66191dc6fd1316bd417415bd8e33d911f76f66c71625bf"
+  },
+  {
+    "project": "headless",
+    "owner": "Shortcut",
+    "path": "dotnet/FsusUI.Avalonia.HeadlessTests/FsusShortcutRecorderHeadlessTests.cs",
+    "fqn": "FsusUI.Avalonia.HeadlessTests.FsusShortcutRecorderHeadlessTests.UserStartsRecordingAndPressesCtrlShiftPToCaptureOneShortcut",
+    "expectedCases": 3,
+    "sourceSha256": "24963f0d050cc325451bdf1d7ef11b4af00a215cec474b939b72afa3b616e13c"
+  },
+  {
+    "project": "headless",
+    "owner": "Shortcut",
+    "path": "dotnet/FsusUI.Avalonia.HeadlessTests/FsusShortcutRecorderHeadlessTests.cs",
+    "fqn": "FsusUI.Avalonia.HeadlessTests.FsusShortcutRecorderHeadlessTests.EscapeCancelsRecordingAndDoesNotChangeOriginalValue",
+    "expectedCases": 1,
+    "sourceSha256": "24963f0d050cc325451bdf1d7ef11b4af00a215cec474b939b72afa3b616e13c"
+  },
+  {
+    "project": "headless",
+    "owner": "Shortcut",
+    "path": "dotnet/FsusUI.Avalonia.HeadlessTests/FsusShortcutRecorderHeadlessTests.cs",
+    "fqn": "FsusUI.Avalonia.HeadlessTests.FsusShortcutRecorderHeadlessTests.BackspaceOrDeleteClearsRecordedValue",
+    "expectedCases": 1,
+    "sourceSha256": "24963f0d050cc325451bdf1d7ef11b4af00a215cec474b939b72afa3b616e13c"
+  },
+  {
+    "project": "headless",
+    "owner": "Shortcut",
+    "path": "dotnet/FsusUI.Avalonia.HeadlessTests/FsusShortcutRecorderHeadlessTests.cs",
+    "fqn": "FsusUI.Avalonia.HeadlessTests.FsusShortcutRecorderHeadlessTests.InjectedExistingShortcutsShowAccessibleConflictStatus",
+    "expectedCases": 1,
+    "sourceSha256": "24963f0d050cc325451bdf1d7ef11b4af00a215cec474b939b72afa3b616e13c"
+  },
+  {
+    "project": "headless",
+    "owner": "Shortcut",
+    "path": "dotnet/FsusUI.Avalonia.HeadlessTests/FsusShortcutRecorderHeadlessTests.cs",
+    "fqn": "FsusUI.Avalonia.HeadlessTests.FsusShortcutRecorderHeadlessTests.ControlTemplateAppliesAcrossLightAndDarkThemes",
+    "expectedCases": 1,
+    "sourceSha256": "24963f0d050cc325451bdf1d7ef11b4af00a215cec474b939b72afa3b616e13c"
+  },
+  {
+    "project": "headless",
+    "owner": "Shortcut",
+    "path": "dotnet/FsusUI.Avalonia.HeadlessTests/FsusShortcutRecorderHeadlessTests.cs",
+    "fqn": "FsusUI.Avalonia.HeadlessTests.FsusShortcutRecorderHeadlessTests.PlaceholderAndAccessibleClearActionRestoreRecorderFocus",
+    "expectedCases": 1,
+    "sourceSha256": "24963f0d050cc325451bdf1d7ef11b4af00a215cec474b939b72afa3b616e13c"
+  },
+  {
+    "project": "unit",
+    "owner": "Tree",
+    "path": "dotnet/FsusUI.Avalonia.Tests/Controls/FsusTreeRowRetentionTests.cs",
+    "fqn": "FsusUI.Avalonia.Tests.Controls.FsusTreeRowRetentionTests.LargeTreeExpansionAndFocusKeepUnaffectedRowsAttached",
+    "expectedCases": 1,
+    "sourceSha256": "0129464642a26de343f558c451aeff98d86057b6288d0ed764b485b0c5452792"
+  },
+  {
+    "project": "unit",
+    "owner": "Tree",
+    "path": "dotnet/FsusUI.Avalonia.Tests/Controls/FsusTreeRowRetentionTests.cs",
+    "fqn": "FsusUI.Avalonia.Tests.Controls.FsusTreeRowRetentionTests.ReorderingReplacingAndRemovingNodesUpdatesRowsAndSetMetadata",
+    "expectedCases": 1,
+    "sourceSha256": "0129464642a26de343f558c451aeff98d86057b6288d0ed764b485b0c5452792"
+  },
+  {
+    "project": "unit",
+    "owner": "Tree",
+    "path": "dotnet/FsusUI.Avalonia.Tests/Controls/FsusTreeRowRetentionTests.cs",
+    "fqn": "FsusUI.Avalonia.Tests.Controls.FsusTreeRowRetentionTests.CustomPresenterStillRefreshesMutablePayloadAndRestoresDefaultContent",
+    "expectedCases": 1,
+    "sourceSha256": "0129464642a26de343f558c451aeff98d86057b6288d0ed764b485b0c5452792"
+  },
+  {
+    "project": "unit",
+    "owner": "Tree",
+    "path": "dotnet/FsusUI.Avalonia.Tests/Controls/FsusTreeRowRetentionTests.cs",
+    "fqn": "FsusUI.Avalonia.Tests.Controls.FsusTreeRowRetentionTests.RetainedRowsUpdateGeometryPresentationSelectionAndAutomation",
+    "expectedCases": 1,
+    "sourceSha256": "0129464642a26de343f558c451aeff98d86057b6288d0ed764b485b0c5452792"
+  },
+  {
+    "project": "unit",
+    "owner": "Tree",
+    "path": "dotnet/FsusUI.Avalonia.Tests/Controls/FsusTreeRowRetentionTests.cs",
+    "fqn": "FsusUI.Avalonia.Tests.Controls.FsusTreeRowRetentionTests.RetainedRowLeavesRenameModeAndRemovesTransientCreateRows",
+    "expectedCases": 1,
+    "sourceSha256": "0129464642a26de343f558c451aeff98d86057b6288d0ed764b485b0c5452792"
+  },
+  {
+    "project": "unit",
+    "owner": "Shortcut",
+    "path": "dotnet/FsusUI.Avalonia.Tests/Controls/FsusCommandPaletteTests.cs",
+    "fqn": "FsusUI.Avalonia.Tests.Controls.FsusCommandPaletteTests.FiltersLocalAndAsyncCommandsCaseInsensitivelyWithPublicMetadata",
+    "expectedCases": 1,
+    "sourceSha256": "2d6cfdc5e329dd4fc321762fed2b1cf663cce66010711e779a43946d87e0f957"
+  },
+  {
+    "project": "unit",
+    "owner": "Shortcut",
+    "path": "dotnet/FsusUI.Avalonia.Tests/Controls/FsusCommandPaletteTests.cs",
+    "fqn": "FsusUI.Avalonia.Tests.Controls.FsusCommandPaletteTests.PlatformFormatsLocalAndProviderCommandsWithoutChangingGestures",
+    "expectedCases": 1,
+    "sourceSha256": "2d6cfdc5e329dd4fc321762fed2b1cf663cce66010711e779a43946d87e0f957"
+  },
+  {
+    "project": "unit",
+    "owner": "Shortcut",
+    "path": "dotnet/FsusUI.Avalonia.Tests/Controls/FsusCommandPaletteTests.cs",
+    "fqn": "FsusUI.Avalonia.Tests.Controls.FsusCommandPaletteTests.WraparoundNavigationNestedBackImeAndEscapeUsePublicControlApi",
+    "expectedCases": 1,
+    "sourceSha256": "2d6cfdc5e329dd4fc321762fed2b1cf663cce66010711e779a43946d87e0f957"
+  },
+  {
+    "project": "unit",
+    "owner": "Shortcut",
+    "path": "dotnet/FsusUI.Avalonia.Tests/Controls/FsusCommandPaletteTests.cs",
+    "fqn": "FsusUI.Avalonia.Tests.Controls.FsusCommandPaletteTests.ExecutesSyncAndAsyncCommandsWithBusyFailureAndDisabledGuards",
+    "expectedCases": 1,
+    "sourceSha256": "2d6cfdc5e329dd4fc321762fed2b1cf663cce66010711e779a43946d87e0f957"
+  },
+  {
+    "project": "unit",
+    "owner": "Shortcut",
+    "path": "dotnet/FsusUI.Avalonia.Tests/Controls/FsusShortcutRecorderTests.cs",
+    "fqn": "FsusUI.Avalonia.Tests.Controls.FsusShortcutRecorderTests.ShortcutGestureNormalizesKeysAndMaintainsStableSerialization",
+    "expectedCases": 1,
+    "sourceSha256": "2c7e62380f03e354201bec380859c53749608eb56f03455c205c62ee7f23bb36"
+  },
+  {
+    "project": "unit",
+    "owner": "Shortcut",
+    "path": "dotnet/FsusUI.Avalonia.Tests/Controls/FsusShortcutRecorderTests.cs",
+    "fqn": "FsusUI.Avalonia.Tests.Controls.FsusShortcutRecorderTests.RawKeyGestureInteropPreservesLiteralPhysicalControl",
+    "expectedCases": 1,
+    "sourceSha256": "2c7e62380f03e354201bec380859c53749608eb56f03455c205c62ee7f23bb36"
+  },
+  {
+    "project": "unit",
+    "owner": "Shortcut",
+    "path": "dotnet/FsusUI.Avalonia.Tests/Controls/FsusShortcutRecorderTests.cs",
+    "fqn": "FsusUI.Avalonia.Tests.Controls.FsusShortcutRecorderTests.ShortcutGestureDisplaysCommandOptionOnMacAndCtrlAltOnWindowsLinux",
+    "expectedCases": 1,
+    "sourceSha256": "2c7e62380f03e354201bec380859c53749608eb56f03455c205c62ee7f23bb36"
+  },
+  {
+    "project": "unit",
+    "owner": "Shortcut",
+    "path": "dotnet/FsusUI.Avalonia.Tests/Controls/FsusShortcutRecorderTests.cs",
+    "fqn": "FsusUI.Avalonia.Tests.Controls.FsusShortcutRecorderTests.ShortcutGestureNormalizesOemKeys",
+    "expectedCases": 1,
+    "sourceSha256": "2c7e62380f03e354201bec380859c53749608eb56f03455c205c62ee7f23bb36"
+  },
+  {
+    "project": "unit",
+    "owner": "Shortcut",
+    "path": "dotnet/FsusUI.Avalonia.Tests/Controls/FsusShortcutRecorderTests.cs",
+    "fqn": "FsusUI.Avalonia.Tests.Controls.FsusShortcutRecorderTests.CommonOemSerializationRoundTripsWithoutDelimiterAmbiguity",
+    "expectedCases": 8,
+    "sourceSha256": "2c7e62380f03e354201bec380859c53749608eb56f03455c205c62ee7f23bb36"
+  },
+  {
+    "project": "unit",
+    "owner": "Shortcut",
+    "path": "dotnet/FsusUI.Avalonia.Tests/Controls/FsusShortcutRecorderTests.cs",
+    "fqn": "FsusUI.Avalonia.Tests.Controls.FsusShortcutRecorderTests.MacMetaAndWindowsControlNormalizeToTheSameStableGesture",
+    "expectedCases": 1,
+    "sourceSha256": "2c7e62380f03e354201bec380859c53749608eb56f03455c205c62ee7f23bb36"
+  },
+  {
+    "project": "unit",
+    "owner": "Shortcut",
+    "path": "dotnet/FsusUI.Avalonia.Tests/Controls/FsusShortcutRecorderTests.cs",
+    "fqn": "FsusUI.Avalonia.Tests.Controls.FsusShortcutRecorderTests.WindowsMetaRemainsDistinctAndRoundTrips",
+    "expectedCases": 1,
+    "sourceSha256": "2c7e62380f03e354201bec380859c53749608eb56f03455c205c62ee7f23bb36"
+  },
+  {
+    "project": "unit",
+    "owner": "Shortcut",
+    "path": "dotnet/FsusUI.Avalonia.Tests/Controls/FsusShortcutRecorderTests.cs",
+    "fqn": "FsusUI.Avalonia.Tests.Controls.FsusShortcutRecorderTests.RecorderCapturesSingleShortcutOnKeyCombination",
+    "expectedCases": 3,
+    "sourceSha256": "2c7e62380f03e354201bec380859c53749608eb56f03455c205c62ee7f23bb36"
+  },
+  {
+    "project": "unit",
+    "owner": "Shortcut",
+    "path": "dotnet/FsusUI.Avalonia.Tests/Controls/FsusShortcutRecorderTests.cs",
+    "fqn": "FsusUI.Avalonia.Tests.Controls.FsusShortcutRecorderTests.EscapeCancelsRecordingAndPreservesOriginalValue",
+    "expectedCases": 1,
+    "sourceSha256": "2c7e62380f03e354201bec380859c53749608eb56f03455c205c62ee7f23bb36"
+  },
+  {
+    "project": "unit",
+    "owner": "Shortcut",
+    "path": "dotnet/FsusUI.Avalonia.Tests/Controls/FsusShortcutRecorderTests.cs",
+    "fqn": "FsusUI.Avalonia.Tests.Controls.FsusShortcutRecorderTests.BackspaceOrDeleteClearsRecordedValue",
+    "expectedCases": 1,
+    "sourceSha256": "2c7e62380f03e354201bec380859c53749608eb56f03455c205c62ee7f23bb36"
+  },
+  {
+    "project": "unit",
+    "owner": "Shortcut",
+    "path": "dotnet/FsusUI.Avalonia.Tests/Controls/FsusShortcutRecorderTests.cs",
+    "fqn": "FsusUI.Avalonia.Tests.Controls.FsusShortcutRecorderTests.InjectedExistingShortcutsShowAccessibleConflictStatus",
+    "expectedCases": 1,
+    "sourceSha256": "2c7e62380f03e354201bec380859c53749608eb56f03455c205c62ee7f23bb36"
+  },
+  {
+    "project": "unit",
+    "owner": "Shortcut",
+    "path": "dotnet/FsusUI.Avalonia.Tests/Controls/FsusShortcutRecorderTests.cs",
+    "fqn": "FsusUI.Avalonia.Tests.Controls.FsusShortcutRecorderTests.ReservedShortcutsShowReservedStatus",
+    "expectedCases": 1,
+    "sourceSha256": "2c7e62380f03e354201bec380859c53749608eb56f03455c205c62ee7f23bb36"
+  },
+  {
+    "project": "unit",
+    "owner": "Shortcut",
+    "path": "dotnet/FsusUI.Avalonia.Tests/Controls/FsusShortcutRecorderTests.cs",
+    "fqn": "FsusUI.Avalonia.Tests.Controls.FsusShortcutRecorderTests.InvalidBareKeyPreservesOriginalValueAndClearsStaleHelpAfterRecovery",
+    "expectedCases": 1,
+    "sourceSha256": "2c7e62380f03e354201bec380859c53749608eb56f03455c205c62ee7f23bb36"
+  },
+  {
+    "project": "unit",
+    "owner": "Shortcut",
+    "path": "dotnet/FsusUI.Avalonia.Tests/Controls/FsusShortcutRecorderTests.cs",
+    "fqn": "FsusUI.Avalonia.Tests.Controls.FsusShortcutRecorderTests.ClearabilityAndCommandAvailabilityTrackControlState",
+    "expectedCases": 1,
+    "sourceSha256": "2c7e62380f03e354201bec380859c53749608eb56f03455c205c62ee7f23bb36"
+  },
+  {
+    "project": "unit",
+    "owner": "Shortcut",
+    "path": "dotnet/FsusUI.Avalonia.Tests/Controls/FsusShortcutRecorderTests.cs",
+    "fqn": "FsusUI.Avalonia.Tests.Controls.FsusShortcutRecorderTests.AutoRecorderUsesHostPlatformAndExplicitDisplayChangesPreserveValue",
+    "expectedCases": 1,
+    "sourceSha256": "2c7e62380f03e354201bec380859c53749608eb56f03455c205c62ee7f23bb36"
+  },
+  {
+    "project": "unit",
+    "owner": "PDF",
+    "path": "dotnet/FsusUI.Avalonia.Tests/Controls/FsusWebViewAdapterTests.cs",
+    "fqn": "FsusUI.Avalonia.Tests.Controls.FsusWebViewAdapterTests.TaggedPdfAndHierarchicalOutlineAreProvenByAdapterSimulation",
+    "expectedCases": 4,
+    "sourceSha256": "354d6fa0a83ed1d7b0467ed42a6a90c1ba5085acccb4685012f3d2e4721d8614"
+  },
+  {
+    "project": "unit",
+    "owner": "PDF",
+    "path": "dotnet/FsusUI.Avalonia.Tests/Controls/FsusWebViewAdapterTests.cs",
+    "fqn": "FsusUI.Avalonia.Tests.Controls.FsusWebViewAdapterTests.UnsupportedPdfCapabilityDoesNotInvokeBackendOrTouchStream",
+    "expectedCases": 1,
+    "sourceSha256": "354d6fa0a83ed1d7b0467ed42a6a90c1ba5085acccb4685012f3d2e4721d8614"
+  },
+  {
+    "project": "unit",
+    "owner": "PDF",
+    "path": "dotnet/FsusUI.Avalonia.Tests/Controls/FsusWebViewAdapterTests.cs",
+    "fqn": "FsusUI.Avalonia.Tests.Controls.FsusWebViewAdapterTests.CancellationPropagatesAndDestinationOwnershipStaysWithCaller",
+    "expectedCases": 1,
+    "sourceSha256": "354d6fa0a83ed1d7b0467ed42a6a90c1ba5085acccb4685012f3d2e4721d8614"
+  },
+  {
+    "project": "unit",
+    "owner": "PDF",
+    "path": "dotnet/FsusUI.Avalonia.Tests/Controls/FsusWebViewAdapterTests.cs",
+    "fqn": "FsusUI.Avalonia.Tests.Controls.FsusWebViewAdapterTests.InFlightCancellationInterruptsBackendAndPreservesDestinationOwnership",
+    "expectedCases": 1,
+    "sourceSha256": "354d6fa0a83ed1d7b0467ed42a6a90c1ba5085acccb4685012f3d2e4721d8614"
+  },
+  {
+    "project": "unit",
+    "owner": "PDF",
+    "path": "dotnet/FsusUI.Avalonia.Tests/Controls/FsusWebViewAdapterTests.cs",
+    "fqn": "FsusUI.Avalonia.Tests.Controls.FsusWebViewAdapterTests.BackendCannotSilentlyClaimRequestedOutlineWasApplied",
+    "expectedCases": 1,
+    "sourceSha256": "354d6fa0a83ed1d7b0467ed42a6a90c1ba5085acccb4685012f3d2e4721d8614"
+  },
+  {
+    "project": "unit",
+    "owner": "PDF",
+    "path": "dotnet/FsusUI.Avalonia.Tests/Controls/FsusWebViewAdapterTests.cs",
+    "fqn": "FsusUI.Avalonia.Tests.Controls.FsusWebViewAdapterTests.BackendCannotCloseCallerOwnedPdfStream",
+    "expectedCases": 1,
+    "sourceSha256": "354d6fa0a83ed1d7b0467ed42a6a90c1ba5085acccb4685012f3d2e4721d8614"
+  },
+  {
+    "project": "unit",
+    "owner": "PDF",
+    "path": "dotnet/FsusUI.Avalonia.Tests/Controls/FsusWebViewAdapterTests.cs",
+    "fqn": "FsusUI.Avalonia.Tests.Controls.FsusWebViewAdapterTests.BackendCannotClaimSuccessWithoutWritingPdfBytes",
+    "expectedCases": 1,
+    "sourceSha256": "354d6fa0a83ed1d7b0467ed42a6a90c1ba5085acccb4685012f3d2e4721d8614"
+  },
+  {
+    "project": "unit",
+    "owner": "PDF",
+    "path": "dotnet/FsusUI.Avalonia.Tests/Controls/FsusWebViewAdapterTests.cs",
+    "fqn": "FsusUI.Avalonia.Tests.Controls.FsusWebViewAdapterTests.BackendCannotClaimPdfStructureOrMissingOutlineDestination",
+    "expectedCases": 1,
+    "sourceSha256": "354d6fa0a83ed1d7b0467ed42a6a90c1ba5085acccb4685012f3d2e4721d8614"
+  },
+  {
+    "project": "unit",
+    "owner": "PDF",
+    "path": "dotnet/FsusUI.Avalonia.Tests/Controls/FsusWebViewAdapterTests.cs",
+    "fqn": "FsusUI.Avalonia.Tests.Controls.FsusWebViewAdapterTests.BackendCannotClaimSuccessWithPdfMarkersButNoObjectGraph",
+    "expectedCases": 1,
+    "sourceSha256": "354d6fa0a83ed1d7b0467ed42a6a90c1ba5085acccb4685012f3d2e4721d8614"
+  }
+]

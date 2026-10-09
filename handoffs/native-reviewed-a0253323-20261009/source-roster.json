@@ -1,0 +1,61 @@
+[
+  {
+    "owner": "Font",
+    "supplier": "06123873e2a45fe866d93576cc7ef0db1edfc702",
+    "paths": [
+      "dotnet/FsusUI.Avalonia.HeadlessTests/FsusBundledInterFontRegistrationRegressionTests.cs",
+      "dotnet/FsusUI.Avalonia.HeadlessTests/FsusUI.Avalonia.HeadlessTests.csproj",
+      "dotnet/FsusUI.Avalonia.HeadlessTests/TestAppBuilder.cs"
+    ],
+    "integratedCommit": "1e51f074cd087584b912b51b3a0453fd63fd1d42"
+  },
+  {
+    "owner": "Tree",
+    "supplier": "3ddcda32c11925d152dfc25b946dcf4016fafd82",
+    "paths": [
+      ".changeset/avalonia-tree-row-retention.md",
+      "dotnet/FsusUI.Avalonia.HeadlessTests/FsusTreeScrollingHeadlessTests.cs",
+      "dotnet/FsusUI.Avalonia.Tests/Controls/FsusTreeRowRetentionTests.cs",
+      "dotnet/FsusUI.Avalonia/Controls/FsusTreeControls.cs"
+    ],
+    "integratedCommit": "0ad5f14801ee8f16ec92fa2128da4c192e56b5c8"
+  },
+  {
+    "owner": "Shortcut",
+    "supplier": "68c4fa4ab5b031d043a29ac945f44c6998b047fa",
+    "paths": [
+      ".changeset/avalonia-native-primary-modifier.md",
+      "docs/avalonia/components/navigation.md",
+      "dotnet/FsusUI.Avalonia.HeadlessTests/FsusNativeMenuHeadlessTests.cs",
+      "dotnet/FsusUI.Avalonia.HeadlessTests/FsusNativeMenuTests.cs",
+      "dotnet/FsusUI.Avalonia.HeadlessTests/FsusShortcutRecorderHeadlessTests.cs",
+      "dotnet/FsusUI.Avalonia.Tests/Controls/FsusCommandPaletteTests.cs",
+      "dotnet/FsusUI.Avalonia.Tests/Controls/FsusShortcutRecorderTests.cs",
+      "dotnet/FsusUI.Avalonia/Controls/FsusNativeMenuControls.cs",
+      "dotnet/FsusUI.Avalonia/Controls/FsusShortcutRecorder.cs"
+    ],
+    "integratedCommit": "d015611804875dd07e1b297bac846ddca3086e1b"
+  },
+  {
+    "owner": "PDF",
+    "supplier": "ed80a940757a1bf9ef3b9e86b12a0adb53bbcdd1",
+    "paths": [
+      ".github/actions/setup-pdf-tools/action.yml",
+      ".github/workflows/_quality.yml"
+    ],
+    "integratedCommit": "adc0ec1f3e24bb8f3931d685bc7183ea0307e72a"
+  },
+  {
+    "owner": "TableV2",
+    "supplier": "90a7d58aad585edbbeec8756fc6d6e5aa0a2c9a7",
+    "paths": [
+      "dotnet/FsusUI.Avalonia.HeadlessTests/Assets/TableV2Fonts/NotoSans-Bold.ttf",
+      "dotnet/FsusUI.Avalonia.HeadlessTests/Assets/TableV2Fonts/NotoSans-Regular.ttf",
+      "dotnet/FsusUI.Avalonia.HeadlessTests/Assets/TableV2Fonts/OFL.txt",
+      "dotnet/FsusUI.Avalonia.HeadlessTests/Assets/TableV2Fonts/README.md",
+      "dotnet/FsusUI.Avalonia.HeadlessTests/FsusTableV2RenderedEvidenceTests.cs",
+      "dotnet/FsusUI.Avalonia.HeadlessTests/FsusVirtualizationHeadlessTests.cs"
+    ],
+    "csprojResolution": "Preserve canonical Font shared singular item; add identical TableV2 unique-prefix item"
+  }
+]

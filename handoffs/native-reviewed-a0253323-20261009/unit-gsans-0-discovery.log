@@ -1,0 +1,47 @@
+Test run for /workspace/native-reviewed-integration/dotnet/FsusUI.Avalonia.Tests/bin/Release/net10.0/FsusUI.Avalonia.Tests.dll (.NETCoreApp,Version=v10.0)
+The following Tests are available:
+    FsusUI.Avalonia.Tests.Controls.FsusCommandPaletteTests.FiltersLocalAndAsyncCommandsCaseInsensitivelyWithPublicMetadata
+    FsusUI.Avalonia.Tests.Controls.FsusCommandPaletteTests.PlatformFormatsLocalAndProviderCommandsWithoutChangingGestures
+    FsusUI.Avalonia.Tests.Controls.FsusCommandPaletteTests.WraparoundNavigationNestedBackImeAndEscapeUsePublicControlApi
+    FsusUI.Avalonia.Tests.Controls.FsusCommandPaletteTests.ExecutesSyncAndAsyncCommandsWithBusyFailureAndDisabledGuards
+    FsusUI.Avalonia.Tests.Controls.FsusShortcutRecorderTests.ShortcutGestureNormalizesKeysAndMaintainsStableSerialization
+    FsusUI.Avalonia.Tests.Controls.FsusShortcutRecorderTests.RawKeyGestureInteropPreservesLiteralPhysicalControl
+    FsusUI.Avalonia.Tests.Controls.FsusShortcutRecorderTests.ShortcutGestureDisplaysCommandOptionOnMacAndCtrlAltOnWindowsLinux
+    FsusUI.Avalonia.Tests.Controls.FsusShortcutRecorderTests.ShortcutGestureNormalizesOemKeys
+    FsusUI.Avalonia.Tests.Controls.FsusShortcutRecorderTests.CommonOemSerializationRoundTripsWithoutDelimiterAmbiguity(key: OemPeriod)
+    FsusUI.Avalonia.Tests.Controls.FsusShortcutRecorderTests.CommonOemSerializationRoundTripsWithoutDelimiterAmbiguity(key: OemSemicolon)
+    FsusUI.Avalonia.Tests.Controls.FsusShortcutRecorderTests.CommonOemSerializationRoundTripsWithoutDelimiterAmbiguity(key: OemQuestion)
+    FsusUI.Avalonia.Tests.Controls.FsusShortcutRecorderTests.CommonOemSerializationRoundTripsWithoutDelimiterAmbiguity(key: Oem3)
+    FsusUI.Avalonia.Tests.Controls.FsusShortcutRecorderTests.CommonOemSerializationRoundTripsWithoutDelimiterAmbiguity(key: Oem4)
+    FsusUI.Avalonia.Tests.Controls.FsusShortcutRecorderTests.CommonOemSerializationRoundTripsWithoutDelimiterAmbiguity(key: OemPipe)
+    FsusUI.Avalonia.Tests.Controls.FsusShortcutRecorderTests.CommonOemSerializationRoundTripsWithoutDelimiterAmbiguity(key: OemCloseBrackets)
+    FsusUI.Avalonia.Tests.Controls.FsusShortcutRecorderTests.CommonOemSerializationRoundTripsWithoutDelimiterAmbiguity(key: OemQuotes)
+    FsusUI.Avalonia.Tests.Controls.FsusShortcutRecorderTests.MacMetaAndWindowsControlNormalizeToTheSameStableGesture
+    FsusUI.Avalonia.Tests.Controls.FsusShortcutRecorderTests.WindowsMetaRemainsDistinctAndRoundTrips
+    FsusUI.Avalonia.Tests.Controls.FsusShortcutRecorderTests.RecorderCapturesSingleShortcutOnKeyCombination(platform: Windows, primaryModifier: Control, displayShortcut: "Ctrl+Shift+P")
+    FsusUI.Avalonia.Tests.Controls.FsusShortcutRecorderTests.RecorderCapturesSingleShortcutOnKeyCombination(platform: Linux, primaryModifier: Control, displayShortcut: "Ctrl+Shift+P")
+    FsusUI.Avalonia.Tests.Controls.FsusShortcutRecorderTests.RecorderCapturesSingleShortcutOnKeyCombination(platform: macOS, primaryModifier: Meta, displayShortcut: "Command+Shift+P")
+    FsusUI.Avalonia.Tests.Controls.FsusShortcutRecorderTests.EscapeCancelsRecordingAndPreservesOriginalValue
+    FsusUI.Avalonia.Tests.Controls.FsusShortcutRecorderTests.BackspaceOrDeleteClearsRecordedValue
+    FsusUI.Avalonia.Tests.Controls.FsusShortcutRecorderTests.InjectedExistingShortcutsShowAccessibleConflictStatus
+    FsusUI.Avalonia.Tests.Controls.FsusShortcutRecorderTests.ReservedShortcutsShowReservedStatus
+    FsusUI.Avalonia.Tests.Controls.FsusShortcutRecorderTests.InvalidBareKeyPreservesOriginalValueAndClearsStaleHelpAfterRecovery
+    FsusUI.Avalonia.Tests.Controls.FsusShortcutRecorderTests.ClearabilityAndCommandAvailabilityTrackControlState
+    FsusUI.Avalonia.Tests.Controls.FsusShortcutRecorderTests.AutoRecorderUsesHostPlatformAndExplicitDisplayChangesPreserveValue
+    FsusUI.Avalonia.Tests.Controls.FsusTreeRowRetentionTests.LargeTreeExpansionAndFocusKeepUnaffectedRowsAttached
+    FsusUI.Avalonia.Tests.Controls.FsusTreeRowRetentionTests.ReorderingReplacingAndRemovingNodesUpdatesRowsAndSetMetadata
+    FsusUI.Avalonia.Tests.Controls.FsusTreeRowRetentionTests.CustomPresenterStillRefreshesMutablePayloadAndRestoresDefaultContent
+    FsusUI.Avalonia.Tests.Controls.FsusTreeRowRetentionTests.RetainedRowsUpdateGeometryPresentationSelectionAndAutomation
+    FsusUI.Avalonia.Tests.Controls.FsusTreeRowRetentionTests.RetainedRowLeavesRenameModeAndRemovesTransientCreateRows
+    FsusUI.Avalonia.Tests.Controls.FsusWebViewAdapterTests.TaggedPdfAndHierarchicalOutlineAreProvenByAdapterSimulation(platform: Windows, theme: Light, expectedPageBackground: "#FFFFFF", expectedTextColor: "#0F0F11")
+    FsusUI.Avalonia.Tests.Controls.FsusWebViewAdapterTests.TaggedPdfAndHierarchicalOutlineAreProvenByAdapterSimulation(platform: Windows, theme: Dark, expectedPageBackground: "#121214", expectedTextColor: "#F0F0F4")
+    FsusUI.Avalonia.Tests.Controls.FsusWebViewAdapterTests.TaggedPdfAndHierarchicalOutlineAreProvenByAdapterSimulation(platform: Linux, theme: Light, expectedPageBackground: "#FFFFFF", expectedTextColor: "#0F0F11")
+    FsusUI.Avalonia.Tests.Controls.FsusWebViewAdapterTests.TaggedPdfAndHierarchicalOutlineAreProvenByAdapterSimulation(platform: Linux, theme: Dark, expectedPageBackground: "#121214", expectedTextColor: "#F0F0F4")
+    FsusUI.Avalonia.Tests.Controls.FsusWebViewAdapterTests.UnsupportedPdfCapabilityDoesNotInvokeBackendOrTouchStream
+    FsusUI.Avalonia.Tests.Controls.FsusWebViewAdapterTests.CancellationPropagatesAndDestinationOwnershipStaysWithCaller
+    FsusUI.Avalonia.Tests.Controls.FsusWebViewAdapterTests.InFlightCancellationInterruptsBackendAndPreservesDestinationOwnership
+    FsusUI.Avalonia.Tests.Controls.FsusWebViewAdapterTests.BackendCannotSilentlyClaimRequestedOutlineWasApplied
+    FsusUI.Avalonia.Tests.Controls.FsusWebViewAdapterTests.BackendCannotCloseCallerOwnedPdfStream
+    FsusUI.Avalonia.Tests.Controls.FsusWebViewAdapterTests.BackendCannotClaimSuccessWithoutWritingPdfBytes
+    FsusUI.Avalonia.Tests.Controls.FsusWebViewAdapterTests.BackendCannotClaimPdfStructureOrMissingOutlineDestination
+    FsusUI.Avalonia.Tests.Controls.FsusWebViewAdapterTests.BackendCannotClaimSuccessWithPdfMarkersButNoObjectGraph

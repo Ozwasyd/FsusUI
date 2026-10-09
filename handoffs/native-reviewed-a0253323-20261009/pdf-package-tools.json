@@ -1,0 +1,25 @@
+{
+  "package": "poppler-utils",
+  "packageVersion": "25.03.0-5+deb13u4",
+  "tools": [
+    {
+      "tool": "pdfinfo",
+      "path": "/usr/bin/pdfinfo",
+      "versionOutput": "pdfinfo version 25.03.0\nCopyright 2005-2025 The Poppler Developers - http://poppler.freedesktop.org\nCopyright 1996-2011, 2022 Glyph & Cog, LLC\n",
+      "packageOwnership": "poppler-utils: /usr/bin/pdfinfo"
+    },
+    {
+      "tool": "pdftotext",
+      "path": "/usr/bin/pdftotext",
+      "versionOutput": "pdftotext version 25.03.0\nCopyright 2005-2025 The Poppler Developers - http://poppler.freedesktop.org\nCopyright 1996-2011, 2022 Glyph & Cog, LLC\n",
+      "packageOwnership": "poppler-utils: /usr/bin/pdftotext"
+    },
+    {
+      "tool": "pdftoppm",
+      "path": "/usr/bin/pdftoppm",
+      "versionOutput": "pdftoppm version 25.03.0\nCopyright 2005-2025 The Poppler Developers - http://poppler.freedesktop.org\nCopyright 1996-2011, 2022 Glyph & Cog, LLC\n",
+      "packageOwnership": "poppler-utils: /usr/bin/pdftoppm"
+    }
+  ],
+  "qualification": "Existing Debian package tools verified read-only; reviewed Ubuntu/macOS/Windows CI installation action UNRUN; PDF capture routes UNRUN"
+}

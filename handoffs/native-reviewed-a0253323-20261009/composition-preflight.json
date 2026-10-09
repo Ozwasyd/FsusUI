@@ -1,0 +1,107 @@
+{
+  "head": "a0253323cd2442184aa5a42e8ff84fca86a10118",
+  "base": "8db0ac8f49749e3e5f28be5051bb3d3ed71ada71",
+  "ownedIntegrationPaths": [
+    "dotnet/FsusUI.Avalonia.HeadlessTests/FsusUI.Avalonia.HeadlessTests.csproj"
+  ],
+  "inheritedReviewedPaths": [
+    {
+      "owner": "Font",
+      "supplier": "06123873e2a45fe866d93576cc7ef0db1edfc702",
+      "paths": [
+        "dotnet/FsusUI.Avalonia.HeadlessTests/FsusBundledInterFontRegistrationRegressionTests.cs",
+        "dotnet/FsusUI.Avalonia.HeadlessTests/FsusUI.Avalonia.HeadlessTests.csproj",
+        "dotnet/FsusUI.Avalonia.HeadlessTests/TestAppBuilder.cs"
+      ],
+      "integratedCommit": "1e51f074cd087584b912b51b3a0453fd63fd1d42"
+    },
+    {
+      "owner": "Tree",
+      "supplier": "3ddcda32c11925d152dfc25b946dcf4016fafd82",
+      "paths": [
+        ".changeset/avalonia-tree-row-retention.md",
+        "dotnet/FsusUI.Avalonia.HeadlessTests/FsusTreeScrollingHeadlessTests.cs",
+        "dotnet/FsusUI.Avalonia.Tests/Controls/FsusTreeRowRetentionTests.cs",
+        "dotnet/FsusUI.Avalonia/Controls/FsusTreeControls.cs"
+      ],
+      "integratedCommit": "0ad5f14801ee8f16ec92fa2128da4c192e56b5c8"
+    },
+    {
+      "owner": "Shortcut",
+      "supplier": "68c4fa4ab5b031d043a29ac945f44c6998b047fa",
+      "paths": [
+        ".changeset/avalonia-native-primary-modifier.md",
+        "docs/avalonia/components/navigation.md",
+        "dotnet/FsusUI.Avalonia.HeadlessTests/FsusNativeMenuHeadlessTests.cs",
+        "dotnet/FsusUI.Avalonia.HeadlessTests/FsusNativeMenuTests.cs",
+        "dotnet/FsusUI.Avalonia.HeadlessTests/FsusShortcutRecorderHeadlessTests.cs",
+        "dotnet/FsusUI.Avalonia.Tests/Controls/FsusCommandPaletteTests.cs",
+        "dotnet/FsusUI.Avalonia.Tests/Controls/FsusShortcutRecorderTests.cs",
+        "dotnet/FsusUI.Avalonia/Controls/FsusNativeMenuControls.cs",
+        "dotnet/FsusUI.Avalonia/Controls/FsusShortcutRecorder.cs"
+      ],
+      "integratedCommit": "d015611804875dd07e1b297bac846ddca3086e1b"
+    },
+    {
+      "owner": "PDF",
+      "supplier": "ed80a940757a1bf9ef3b9e86b12a0adb53bbcdd1",
+      "paths": [
+        ".github/actions/setup-pdf-tools/action.yml",
+        ".github/workflows/_quality.yml"
+      ],
+      "integratedCommit": "adc0ec1f3e24bb8f3931d685bc7183ea0307e72a"
+    },
+    {
+      "owner": "TableV2",
+      "supplier": "90a7d58aad585edbbeec8756fc6d6e5aa0a2c9a7",
+      "paths": [
+        "dotnet/FsusUI.Avalonia.HeadlessTests/Assets/TableV2Fonts/NotoSans-Bold.ttf",
+        "dotnet/FsusUI.Avalonia.HeadlessTests/Assets/TableV2Fonts/NotoSans-Regular.ttf",
+        "dotnet/FsusUI.Avalonia.HeadlessTests/Assets/TableV2Fonts/OFL.txt",
+        "dotnet/FsusUI.Avalonia.HeadlessTests/Assets/TableV2Fonts/README.md",
+        "dotnet/FsusUI.Avalonia.HeadlessTests/FsusTableV2RenderedEvidenceTests.cs",
+        "dotnet/FsusUI.Avalonia.HeadlessTests/FsusVirtualizationHeadlessTests.cs"
+      ],
+      "csprojResolution": "Preserve canonical Font shared singular item; add identical TableV2 unique-prefix item"
+    }
+  ],
+  "totalUniqueChangedPaths": 24,
+  "allNonProjectSupplierBlobsIdentical": true,
+  "projectFinalMatchesReleased1a1": true,
+  "resourceItems": [
+    "Assets/Fonts/GoogleSans-Bold.ttf",
+    "Assets/Fonts/GoogleSans-Regular.ttf",
+    "Assets/Fonts/GoogleSansExt-Bold.ttf",
+    "Assets/Fonts/GoogleSansExt-Regular.ttf",
+    "Assets/TableV2Fonts/NotoSans-Bold.ttf",
+    "Assets/TableV2Fonts/NotoSans-Regular.ttf"
+  ],
+  "counts": {
+    "shared": 4,
+    "tableV2": 2,
+    "totalSingular": 6,
+    "plural": 0
+  },
+  "matchingTestCompositionContext": "c53f37c06e0079bd64249cff9c854b23d088c508 (read only; not imported)",
+  "locksSha256": {
+    "dotnet/FsusUI.Avalonia.PerformanceTests/packages.lock.json": "a752d1785d3f8e62cf5647b2fcc35c37f3929f06ff92c549a92e9cb6f4c1882f",
+    "dotnet/FsusUI.Avalonia.ApiTool/packages.lock.json": "f4d1ebeb2337647bc72b6fba8b3c42e34d87ac2e4ab117288b7b5f75d21958d0",
+    "dotnet/FsusUI.Avalonia.Demo/packages.lock.json": "fc6ff427dc1c36a8c73e955708bdfc98e534e0e7c07ea3b03bbc3d77ad93e385",
+    "dotnet/FsusUI.Avalonia.FormGenerator/packages.lock.json": "b9c4438133868e312f2c1edfe34e914a22d40a609a318b6dc2a76a9f5d5295b6",
+    "dotnet/FsusUI.Avalonia.FormGenerator.Tests/packages.lock.json": "db94caa939765aa727e7d8ea63b2b0415eb5c6a1c95e02daf43275c36cae598a",
+    "dotnet/FsusUI.Avalonia.Themes.Smoke/packages.lock.json": "e06745835467980150e5a176be484b7215eb7819c57aef200712afe7a661fed0",
+    "dotnet/FsusUI.Avalonia.HeadlessTests/packages.lock.json": "9ceff33140e66773191d7bb7b85e0a4c4e50f17f16f3668842be072e647edecf",
+    "dotnet/FsusUI.Avalonia.Themes/packages.lock.json": "b47e2a2f69c44c6a17e6cef48eef06c490e0e3e30f7fded73644d749e520720c",
+    "dotnet/FsusUI.Avalonia/packages.lock.json": "758d99d10aeb737ba26545c0865a11f0ba2bd583b0de8cee34943157bc802344",
+    "dotnet/FsusUI.Avalonia.ConsumerSample/packages.lock.json": "159f61d92673bb3df16c3b02089be554edd115368d990c04dee31bae9da82b73",
+    "dotnet/FsusUI.Avalonia.Tests/packages.lock.json": "08d64b478603bad485eba27557061719e12016b924850520a8d4c21303e02c33",
+    "dotnet/FsusUI.Avalonia.Icons/packages.lock.json": "b47e2a2f69c44c6a17e6cef48eef06c490e0e3e30f7fded73644d749e520720c",
+    "dotnet/FsusUI.Avalonia.Icons/FsusUI.Avalonia.Icons/packages.lock.json": "e971bbe0b47f7002427a92a853dec83955600fe5f730414be55c8efdd36ffe44"
+  },
+  "excludedSuppliers": [
+    "be0a1127",
+    "989e7217",
+    "b680 DesktopShell",
+    "Tag/Card"
+  ]
+}

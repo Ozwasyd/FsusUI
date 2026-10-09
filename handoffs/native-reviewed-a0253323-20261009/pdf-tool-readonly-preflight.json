@@ -1,0 +1,20 @@
+[
+  {
+    "tool": "pdfinfo",
+    "path": "/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/override/pdfinfo",
+    "exit": 0,
+    "versionOutput": "pdfinfo version 26.05.0\nCopyright 2005-2026 The Poppler Developers - http://poppler.freedesktop.org\nCopyright 1996-2011, 2022 Glyph & Cog, LLC\n"
+  },
+  {
+    "tool": "pdftotext",
+    "path": "/usr/bin/pdftotext",
+    "exit": 0,
+    "versionOutput": "pdftotext version 25.03.0\nCopyright 2005-2025 The Poppler Developers - http://poppler.freedesktop.org\nCopyright 1996-2011, 2022 Glyph & Cog, LLC\n"
+  },
+  {
+    "tool": "pdftoppm",
+    "path": "/opt/codex/runtimes/codex-primary-runtime/dependencies/bin/override/pdftoppm",
+    "exit": 0,
+    "versionOutput": "pdftoppm version 26.05.0\nCopyright 2005-2026 The Poppler Developers - http://poppler.freedesktop.org\nCopyright 1996-2011, 2022 Glyph & Cog, LLC\n"
+  }
+]

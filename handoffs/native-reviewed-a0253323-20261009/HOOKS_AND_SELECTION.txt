@@ -1,0 +1,60 @@
+Exact ordinary selection on a0253323cd2442184aa5a42e8ff84fca86a10118
+
+Inspected before discovery/execution:
+- Original HeadlessTests assembly AvaloniaTestApplication -> canonical
+  TestAppBuilder from 06123873: real Skia drawing, original headless host,
+  bundled Inter, canonical named-family mappings and conditional shared
+  GoogleSans collection. Original TestAssembly disables parallel execution.
+- Unit TestAssembly disables parallel execution and sets one thread.
+  Its original assembly-wide AvaloniaDispatcherIsolation Before/After hook
+  invokes Dispatcher.ResetForUnitTests. That hook was retained and executed
+  through the ordinary xUnit project route, not an alternate host.
+- All selected classes have no class/collection fixtures or added Before/After
+  hook. Source hashes and per-method case cardinalities are in
+  ordinary-selection.json. Font Linux-only SkipUnless hooks resolve true on
+  this Linux host; no skip or assertion was removed.
+- Inspected called helpers: Shortcut MountWindow and theme setup, native-menu
+  traversal, Tree mounted pointer/layout lifecycle, TableV2 payload window and
+  callbacks, and PDF original FakeBackend/TestWebViewPdfDocument helpers.
+  The PDF unit adapter tests are existing simulations, not native PDF/tool
+  or screenshot qualification. Streams and layouts are disposed in their
+  original methods; original window cleanup paths were retained.
+
+Frozen exact FullyQualifiedName= selectors:
+headless-filter.txt: 38 distinct methods / 46 cases, repeated GSANS0 and1.
+  Font: 4 methods / 5 cases.
+  Tree: 1 method / 1 case.
+  TableV2 and its resizer: 10 methods / 10 cases.
+  Shortcut/native menu: 23 methods / 30 cases.
+unit-filter.txt: 33 distinct methods / 45 cases, run once; no font test host.
+  Tree: 5 methods / 5 cases.
+  Shortcut/command palette: 19 methods / 28 cases.
+  PDF adapter: 9 methods / 12 cases.
+Total unique methods71; unique admitted cases91; executions137 across axes.
+
+freeze-selectors.py verifies source attribute counts, uniqueness and specific
+admission before discovery. run-admitted-controls.py checks every axis's
+discovery for the exact method multiset and count before any execution.
+Any empty discovery, failed discovery or count/method mismatch stops testing.
+TRX checks require exact equality to each admitted case-name set, total and
+executed counts, and zero skips. Actual failed outcomes would be retained and
+reported; there is no filtering after a broad run or all-tests fallback.
+
+Excluded missing cells, all UNRUN:
+- FsusTableV2RenderedEvidenceTests.RendersPopulatedAndEmptyContentRegionsToPng
+- FsusTableV2RenderedEvidenceTests.RendersWholeHeaderAndOverlayContentRegionsToPng
+- FsusVirtualizationHeadlessTests.VirtualizationThemeVisualAccessibilityPerformanceAndPlatformBaselinesCoverStable34
+- FsusShortcutRecorderHeadlessTests.ProductionFixtureRendersShortcutRecorderStateMatrix
+- FsusWebViewAdapterHeadlessTests.ProductionContextMenuFixtureRendersThemeViewportZoomAndAutomationMatrix
+These invoke RepositoryRoot and/or file capture routes; their unchanged source
+was inspected but never executed. No held helper repair or alternate harness.
+- FsusNativeMenuTests.LocalPlatformSimulationProducesBoundEvidence was also
+  excluded from the bounded ordinary selector because it can write a separate
+  bound evidence artifact. No evidence-output environment was enabled.
+- Typography be0a/989e, DesktopShell b680, Tag/Card, broad suites and all other
+  unselected methods were excluded. No inference of their status is made.
+
+The actual .401 lock graph, resource evaluation and both builds passed first.
+All three discovery axes matched; all137 admitted executions passed.
+TableV2 PNG/theme/a11y contract artifacts remain frozen; their excluded
+acceptance cells are not replaced by the ten admitted ordinary Table controls.

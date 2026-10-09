@@ -1,0 +1,16 @@
+{
+  "dotnet/global.json": "4abaa2e11994cf8cc74205531dcdd8ec7c7d01b63489079b1b87b7b879b96e39",
+  "dotnet/Directory.Build.props": "4ec4e24a597f7e5afefe96fcb88c13bf39bfe57714ab3040fbdebb5ed2900760",
+  "dotnet/Directory.Packages.props": "824af0f9d84d1636422a1bd140fc9a0b83e2fc1d16206fb88103cbf9abaf880d",
+  "dotnet/FsusUI.Avalonia.HeadlessTests/TestAssembly.cs": "3f7edd72eac91614fcf49f709dd4e560c74ebef8da68a53a02947e5611cd1869",
+  "dotnet/FsusUI.Avalonia.HeadlessTests/TestAppBuilder.cs": "2818a9fdca033be90518e7d507e66e1b195af2bba7da62355ce9b85c01cf9928",
+  "dotnet/FsusUI.Avalonia.Tests/TestAssembly.cs": "f72c0b387e3729ded8549790e05b2de08f8524854bd8ac1168ab04143f0d2089",
+  "dotnet/FsusUI.Avalonia.Tests/AvaloniaDispatcherIsolationAttribute.cs": "49df5c2f97181ec305d9bf5247c5fa7ec7f617fae7532947c48f1567a1891622",
+  "dotnet/FsusUI.Avalonia.HeadlessTests/bin/Release/net10.0/FsusUI.Avalonia.HeadlessTests.dll": "38cafb266943785b1330646cd1c976aa52f2d43e8e81eaba518c135ae1288cf1",
+  "dotnet/FsusUI.Avalonia.Tests/bin/Release/net10.0/FsusUI.Avalonia.Tests.dll": "6c3d6d8b8f0a783b7dc74d89057f4705694038c2001a4b6705a0471d090712c8",
+  ".agents/skills/fsusui-design-conformance/SKILL.md": "c88357a6ba0340000bae5839daeb67a3cd2722e8242cf7e0148006c3610a44fe",
+  "docs/design.md": "24c88676101dde43bb0907ed173f001b6e1659973caf19701ea57eddf0617039",
+  "docs/design/governance.md": "d871bc86ed2a66f3a851f947530ff576c3d1d0a1a37c721d11cf09b1cbc4e104",
+  "docs/design/change-classification.md": "c5d43303e89931346f9d634dd592ecb54418d15a74ae923f72e52795a115544e",
+  "docs/workflows/visual-change.md": "0bd20f9ae6997aa9b7daeb0cec2f558738565bd0932828617aea2f5b84626042"
+}

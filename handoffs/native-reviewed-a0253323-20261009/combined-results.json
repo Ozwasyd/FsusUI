@@ -1,0 +1,709 @@
+[
+  {
+    "label": "headless-gsans-0",
+    "command": [
+      "dotnet",
+      "test",
+      "FsusUI.Avalonia.HeadlessTests/FsusUI.Avalonia.HeadlessTests.csproj",
+      "-c",
+      "Release",
+      "--no-build",
+      "--no-restore",
+      "--filter",
+      "FullyQualifiedName=FsusUI.Avalonia.HeadlessTests.FsusBundledInterFontRegistrationRegressionTests.DeclaredBodyStackResolvesTheRegisteredBundledFamily|FullyQualifiedName=FsusUI.Avalonia.HeadlessTests.FsusBundledInterFontRegistrationRegressionTests.LinuxMonospaceAliasesResolveTheNativeFixedPitchFamilyAndLayout|FullyQualifiedName=FsusUI.Avalonia.HeadlessTests.FsusBundledInterFontRegistrationRegressionTests.DeclaredMonospaceStackRetainsItsAvailableNamedFamily|FullyQualifiedName=FsusUI.Avalonia.HeadlessTests.FsusBundledInterFontRegistrationRegressionTests.BundledInterResolvesGlyphsAndLaysOutTextInAFluentWindow|FullyQualifiedName=FsusUI.Avalonia.HeadlessTests.FsusTreeScrollingHeadlessTests.ScrollingExpandedRowsPreservesOffsetAndRoutesPointerToRetainedNode|FullyQualifiedName=FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests.AutoResizerObservesArrangedViewportAndHonorsDisabledAxes|FullyQualifiedName=FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests.AutoResizerAndTableV2VirtualizeRowsColumnsResizeAndBudget|FullyQualifiedName=FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests.TableV2BindsTypedRowsFixedColumnsAndRealKeyboardScroll|FullyQualifiedName=FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests.TableV2MeasuresDynamicRowsAndRaisesRealScrollCallbacks|FullyQualifiedName=FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests.TableV2UsesFixedDataGetterAndExpandedRowCallbacks|FullyQualifiedName=FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests.TableV2MapsViewportGeometryAndCacheToRealLayout|FullyQualifiedName=FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests.TableV2SortsTypedRowsAndReportsColumnSort|FullyQualifiedName=FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests.TableV2RendersBoundedContentRegions|FullyQualifiedName=FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests.TableV2ContentRegionsReceiveScopedPayloads|FullyQualifiedName=FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests.TableV2VirtualizesFrozenAxesNavigatesAndRejectsStaleBackgroundResults|FullyQualifiedName=FsusUI.Avalonia.HeadlessTests.FsusNativeMenuHeadlessTests.NativeMenuAttachesToWindowAndSynchronouslyReflectsCommandState|FullyQualifiedName=FsusUI.Avalonia.HeadlessTests.FsusNativeMenuHeadlessTests.InitiallyDisabledCommandStaysDisabledInRenderedMenu|FullyQualifiedName=FsusUI.Avalonia.HeadlessTests.FsusNativeMenuHeadlessTests.PreserveRootsProfileAttachesExactlySuppliedRootsAndKeepsCommandState|FullyQualifiedName=FsusUI.Avalonia.HeadlessTests.FsusNativeMenuHeadlessTests.CommandPaletteIntegratesWithSharedCommandsInHeadless|FullyQualifiedName=FsusUI.Avalonia.HeadlessTests.FsusNativeMenuTests.SameCommandModelUsableByCommandPaletteAndNativeMenu|FullyQualifiedName=FsusUI.Avalonia.HeadlessTests.FsusNativeMenuTests.DefaultPaletteSearchUsesHostPlatformAfterExplicitSearches|FullyQualifiedName=FsusUI.Avalonia.HeadlessTests.FsusNativeMenuTests.DocumentStateChangesSynchronouslyUpdateItemEnabledState|FullyQualifiedName=FsusUI.Avalonia.HeadlessTests.FsusNativeMenuTests.CustomShortcutUpdateImmediatelyRefreshesNativeMenuAccelerator|FullyQualifiedName=FsusUI.Avalonia.HeadlessTests.FsusNativeMenuTests.DockPrimaryAcceleratorUsesCommandWithoutMutatingSharedGesture|FullyQualifiedName=FsusUI.Avalonia.HeadlessTests.FsusNativeMenuTests.MacPlatformRolesInCorrectPositionsAndOtherPlatformsDoNotHaveInvalidItems|FullyQualifiedName=FsusUI.Avalonia.HeadlessTests.FsusNativeMenuTests.InitiallyDisabledCommandStaysDisabledAfterBuildAndReflectsNestedState|FullyQualifiedName=FsusUI.Avalonia.HeadlessTests.FsusNativeMenuTests.PreserveRootsProfileReturnsExactlySuppliedRootsWithMetadataAndCommandState|FullyQualifiedName=FsusUI.Avalonia.HeadlessTests.FsusNativeMenuTests.SynthesizedRootsOptionGatesMissingRequiredRoots|FullyQualifiedName=FsusUI.Avalonia.HeadlessTests.FsusNativeMenuTests.DockMenuContractAndWindowlessRoutingFallbackWorks|FullyQualifiedName=FsusUI.Avalonia.HeadlessTests.FsusNativeMenuTests.PlatformSimulationBindsRolesAndCanonicalTopLevelOrder|FullyQualifiedName=FsusUI.Avalonia.HeadlessTests.FsusNativeMenuTests.RebuildAndDisposeDetachPreviousCommandListeners|FullyQualifiedName=FsusUI.Avalonia.HeadlessTests.FsusNativeMenuTests.RecentSubmenuRebuildAndDockAttachmentUseNeutralRoles|FullyQualifiedName=FsusUI.Avalonia.HeadlessTests.FsusShortcutRecorderHeadlessTests.UserStartsRecordingAndPressesCtrlShiftPToCaptureOneShortcut|FullyQualifiedName=FsusUI.Avalonia.HeadlessTests.FsusShortcutRecorderHeadlessTests.EscapeCancelsRecordingAndDoesNotChangeOriginalValue|FullyQualifiedName=FsusUI.Avalonia.HeadlessTests.FsusShortcutRecorderHeadlessTests.BackspaceOrDeleteClearsRecordedValue|FullyQualifiedName=FsusUI.Avalonia.HeadlessTests.FsusShortcutRecorderHeadlessTests.InjectedExistingShortcutsShowAccessibleConflictStatus|FullyQualifiedName=FsusUI.Avalonia.HeadlessTests.FsusShortcutRecorderHeadlessTests.ControlTemplateAppliesAcrossLightAndDarkThemes|FullyQualifiedName=FsusUI.Avalonia.HeadlessTests.FsusShortcutRecorderHeadlessTests.PlaceholderAndAccessibleClearActionRestoreRecorderFocus",
+      "--logger",
+      "trx;LogFileName=combined.trx",
+      "--results-directory",
+      "/workspace/native-reviewed-evidence/headless-gsans-0"
+    ],
+    "processExit": 0,
+    "counters": {
+      "total": "46",
+      "executed": "46",
+      "passed": "46",
+      "failed": "0",
+      "error": "0",
+      "timeout": "0",
+      "aborted": "0",
+      "inconclusive": "0",
+      "passedButRunAborted": "0",
+      "notRunnable": "0",
+      "notExecuted": "0",
+      "disconnected": "0",
+      "warning": "0",
+      "completed": "0",
+      "inProgress": "0",
+      "pending": "0"
+    },
+    "perOwner": {
+      "Shortcut": {
+        "Passed": 30
+      },
+      "Font": {
+        "Passed": 5
+      },
+      "TableV2": {
+        "Passed": 10
+      },
+      "Tree": {
+        "Passed": 1
+      }
+    },
+    "cases": [
+      {
+        "name": "FsusUI.Avalonia.HeadlessTests.FsusNativeMenuTests.PreserveRootsProfileReturnsExactlySuppliedRootsWithMetadataAndCommandState",
+        "outcome": "Passed"
+      },
+      {
+        "name": "FsusUI.Avalonia.HeadlessTests.FsusBundledInterFontRegistrationRegressionTests.LinuxMonospaceAliasesResolveTheNativeFixedPitchFamilyAndLayout(family: \"ui-monospace, SFMono-Regular, Menlo, Monaco, Conso\"\u00b7\u00b7\u00b7)",
+        "outcome": "Passed"
+      },
+      {
+        "name": "FsusUI.Avalonia.HeadlessTests.FsusNativeMenuHeadlessTests.PreserveRootsProfileAttachesExactlySuppliedRootsAndKeepsCommandState",
+        "outcome": "Passed"
+      },
+      {
+        "name": "FsusUI.Avalonia.HeadlessTests.FsusNativeMenuTests.CustomShortcutUpdateImmediatelyRefreshesNativeMenuAccelerator(platform: macOS)",
+        "outcome": "Passed"
+      },
+      {
+        "name": "FsusUI.Avalonia.HeadlessTests.FsusNativeMenuTests.CustomShortcutUpdateImmediatelyRefreshesNativeMenuAccelerator(platform: Linux)",
+        "outcome": "Passed"
+      },
+      {
+        "name": "FsusUI.Avalonia.HeadlessTests.FsusNativeMenuTests.CustomShortcutUpdateImmediatelyRefreshesNativeMenuAccelerator(platform: Windows)",
+        "outcome": "Passed"
+      },
+      {
+        "name": "FsusUI.Avalonia.HeadlessTests.FsusShortcutRecorderHeadlessTests.ControlTemplateAppliesAcrossLightAndDarkThemes",
+        "outcome": "Passed"
+      },
+      {
+        "name": "FsusUI.Avalonia.HeadlessTests.FsusShortcutRecorderHeadlessTests.PlaceholderAndAccessibleClearActionRestoreRecorderFocus",
+        "outcome": "Passed"
+      },
+      {
+        "name": "FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests.AutoResizerAndTableV2VirtualizeRowsColumnsResizeAndBudget",
+        "outcome": "Passed"
+      },
+      {
+        "name": "FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests.TableV2UsesFixedDataGetterAndExpandedRowCallbacks",
+        "outcome": "Passed"
+      },
+      {
+        "name": "FsusUI.Avalonia.HeadlessTests.FsusNativeMenuHeadlessTests.InitiallyDisabledCommandStaysDisabledInRenderedMenu",
+        "outcome": "Passed"
+      },
+      {
+        "name": "FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests.TableV2MeasuresDynamicRowsAndRaisesRealScrollCallbacks",
+        "outcome": "Passed"
+      },
+      {
+        "name": "FsusUI.Avalonia.HeadlessTests.FsusBundledInterFontRegistrationRegressionTests.DeclaredBodyStackResolvesTheRegisteredBundledFamily",
+        "outcome": "Passed"
+      },
+      {
+        "name": "FsusUI.Avalonia.HeadlessTests.FsusShortcutRecorderHeadlessTests.EscapeCancelsRecordingAndDoesNotChangeOriginalValue",
+        "outcome": "Passed"
+      },
+      {
+        "name": "FsusUI.Avalonia.HeadlessTests.FsusNativeMenuHeadlessTests.NativeMenuAttachesToWindowAndSynchronouslyReflectsCommandState",
+        "outcome": "Passed"
+      },
+      {
+        "name": "FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests.TableV2MapsViewportGeometryAndCacheToRealLayout",
+        "outcome": "Passed"
+      },
+      {
+        "name": "FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests.TableV2ContentRegionsReceiveScopedPayloads",
+        "outcome": "Passed"
+      },
+      {
+        "name": "FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests.TableV2BindsTypedRowsFixedColumnsAndRealKeyboardScroll",
+        "outcome": "Passed"
+      },
+      {
+        "name": "FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests.AutoResizerObservesArrangedViewportAndHonorsDisabledAxes",
+        "outcome": "Passed"
+      },
+      {
+        "name": "FsusUI.Avalonia.HeadlessTests.FsusShortcutRecorderHeadlessTests.UserStartsRecordingAndPressesCtrlShiftPToCaptureOneShortcut(platform: Windows, primaryModifier: Control, displayShortcut: \"Ctrl+Shift+P\")",
+        "outcome": "Passed"
+      },
+      {
+        "name": "FsusUI.Avalonia.HeadlessTests.FsusShortcutRecorderHeadlessTests.InjectedExistingShortcutsShowAccessibleConflictStatus",
+        "outcome": "Passed"
+      },
+      {
+        "name": "FsusUI.Avalonia.HeadlessTests.FsusNativeMenuTests.SameCommandModelUsableByCommandPaletteAndNativeMenu(platform: Linux, displayShortcut: \"Ctrl+S\", nativePrimaryModifier: Control)",
+        "outcome": "Passed"
+      },
+      {
+        "name": "FsusUI.Avalonia.HeadlessTests.FsusTreeScrollingHeadlessTests.ScrollingExpandedRowsPreservesOffsetAndRoutesPointerToRetainedNode",
+        "outcome": "Passed"
+      },
+      {
+        "name": "FsusUI.Avalonia.HeadlessTests.FsusNativeMenuTests.DockMenuContractAndWindowlessRoutingFallbackWorks",
+        "outcome": "Passed"
+      },
+      {
+        "name": "FsusUI.Avalonia.HeadlessTests.FsusNativeMenuHeadlessTests.CommandPaletteIntegratesWithSharedCommandsInHeadless",
+        "outcome": "Passed"
+      },
+      {
+        "name": "FsusUI.Avalonia.HeadlessTests.FsusNativeMenuTests.SameCommandModelUsableByCommandPaletteAndNativeMenu(platform: Windows, displayShortcut: \"Ctrl+S\", nativePrimaryModifier: Control)",
+        "outcome": "Passed"
+      },
+      {
+        "name": "FsusUI.Avalonia.HeadlessTests.FsusNativeMenuTests.RecentSubmenuRebuildAndDockAttachmentUseNeutralRoles",
+        "outcome": "Passed"
+      },
+      {
+        "name": "FsusUI.Avalonia.HeadlessTests.FsusNativeMenuTests.DocumentStateChangesSynchronouslyUpdateItemEnabledState",
+        "outcome": "Passed"
+      },
+      {
+        "name": "FsusUI.Avalonia.HeadlessTests.FsusNativeMenuTests.SameCommandModelUsableByCommandPaletteAndNativeMenu(platform: macOS, displayShortcut: \"Command+S\", nativePrimaryModifier: Meta)",
+        "outcome": "Passed"
+      },
+      {
+        "name": "FsusUI.Avalonia.HeadlessTests.FsusNativeMenuTests.DockPrimaryAcceleratorUsesCommandWithoutMutatingSharedGesture",
+        "outcome": "Passed"
+      },
+      {
+        "name": "FsusUI.Avalonia.HeadlessTests.FsusBundledInterFontRegistrationRegressionTests.BundledInterResolvesGlyphsAndLaysOutTextInAFluentWindow",
+        "outcome": "Passed"
+      },
+      {
+        "name": "FsusUI.Avalonia.HeadlessTests.FsusNativeMenuTests.RebuildAndDisposeDetachPreviousCommandListeners",
+        "outcome": "Passed"
+      },
+      {
+        "name": "FsusUI.Avalonia.HeadlessTests.FsusBundledInterFontRegistrationRegressionTests.LinuxMonospaceAliasesResolveTheNativeFixedPitchFamilyAndLayout(family: \"monospace\")",
+        "outcome": "Passed"
+      },
+      {
+        "name": "FsusUI.Avalonia.HeadlessTests.FsusNativeMenuTests.CustomShortcutUpdateImmediatelyRefreshesNativeMenuAccelerator(platform: Auto)",
+        "outcome": "Passed"
+      },
+      {
+        "name": "FsusUI.Avalonia.HeadlessTests.FsusShortcutRecorderHeadlessTests.UserStartsRecordingAndPressesCtrlShiftPToCaptureOneShortcut(platform: Linux, primaryModifier: Control, displayShortcut: \"Ctrl+Shift+P\")",
+        "outcome": "Passed"
+      },
+      {
+        "name": "FsusUI.Avalonia.HeadlessTests.FsusNativeMenuTests.InitiallyDisabledCommandStaysDisabledAfterBuildAndReflectsNestedState",
+        "outcome": "Passed"
+      },
+      {
+        "name": "FsusUI.Avalonia.HeadlessTests.FsusBundledInterFontRegistrationRegressionTests.DeclaredMonospaceStackRetainsItsAvailableNamedFamily",
+        "outcome": "Passed"
+      },
+      {
+        "name": "FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests.TableV2RendersBoundedContentRegions",
+        "outcome": "Passed"
+      },
+      {
+        "name": "FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests.TableV2SortsTypedRowsAndReportsColumnSort",
+        "outcome": "Passed"
+      },
+      {
+        "name": "FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests.TableV2VirtualizesFrozenAxesNavigatesAndRejectsStaleBackgroundResults",
+        "outcome": "Passed"
+      },
+      {
+        "name": "FsusUI.Avalonia.HeadlessTests.FsusNativeMenuTests.DefaultPaletteSearchUsesHostPlatformAfterExplicitSearches",
+        "outcome": "Passed"
+      },
+      {
+        "name": "FsusUI.Avalonia.HeadlessTests.FsusNativeMenuTests.SynthesizedRootsOptionGatesMissingRequiredRoots",
+        "outcome": "Passed"
+      },
+      {
+        "name": "FsusUI.Avalonia.HeadlessTests.FsusShortcutRecorderHeadlessTests.UserStartsRecordingAndPressesCtrlShiftPToCaptureOneShortcut(platform: macOS, primaryModifier: Meta, displayShortcut: \"Command+Shift+P\")",
+        "outcome": "Passed"
+      },
+      {
+        "name": "FsusUI.Avalonia.HeadlessTests.FsusNativeMenuTests.MacPlatformRolesInCorrectPositionsAndOtherPlatformsDoNotHaveInvalidItems",
+        "outcome": "Passed"
+      },
+      {
+        "name": "FsusUI.Avalonia.HeadlessTests.FsusNativeMenuTests.PlatformSimulationBindsRolesAndCanonicalTopLevelOrder",
+        "outcome": "Passed"
+      },
+      {
+        "name": "FsusUI.Avalonia.HeadlessTests.FsusShortcutRecorderHeadlessTests.BackspaceOrDeleteClearsRecordedValue",
+        "outcome": "Passed"
+      }
+    ],
+    "trxSha256": "4fb7698030b9a47215ef59497f4ad15ae3e63f67e23f9723c5b6dc151aaf522c"
+  },
+  {
+    "label": "headless-gsans-1",
+    "command": [
+      "dotnet",
+      "test",
+      "FsusUI.Avalonia.HeadlessTests/FsusUI.Avalonia.HeadlessTests.csproj",
+      "-c",
+      "Release",
+      "--no-build",
+      "--no-restore",
+      "--filter",
+      "FullyQualifiedName=FsusUI.Avalonia.HeadlessTests.FsusBundledInterFontRegistrationRegressionTests.DeclaredBodyStackResolvesTheRegisteredBundledFamily|FullyQualifiedName=FsusUI.Avalonia.HeadlessTests.FsusBundledInterFontRegistrationRegressionTests.LinuxMonospaceAliasesResolveTheNativeFixedPitchFamilyAndLayout|FullyQualifiedName=FsusUI.Avalonia.HeadlessTests.FsusBundledInterFontRegistrationRegressionTests.DeclaredMonospaceStackRetainsItsAvailableNamedFamily|FullyQualifiedName=FsusUI.Avalonia.HeadlessTests.FsusBundledInterFontRegistrationRegressionTests.BundledInterResolvesGlyphsAndLaysOutTextInAFluentWindow|FullyQualifiedName=FsusUI.Avalonia.HeadlessTests.FsusTreeScrollingHeadlessTests.ScrollingExpandedRowsPreservesOffsetAndRoutesPointerToRetainedNode|FullyQualifiedName=FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests.AutoResizerObservesArrangedViewportAndHonorsDisabledAxes|FullyQualifiedName=FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests.AutoResizerAndTableV2VirtualizeRowsColumnsResizeAndBudget|FullyQualifiedName=FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests.TableV2BindsTypedRowsFixedColumnsAndRealKeyboardScroll|FullyQualifiedName=FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests.TableV2MeasuresDynamicRowsAndRaisesRealScrollCallbacks|FullyQualifiedName=FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests.TableV2UsesFixedDataGetterAndExpandedRowCallbacks|FullyQualifiedName=FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests.TableV2MapsViewportGeometryAndCacheToRealLayout|FullyQualifiedName=FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests.TableV2SortsTypedRowsAndReportsColumnSort|FullyQualifiedName=FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests.TableV2RendersBoundedContentRegions|FullyQualifiedName=FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests.TableV2ContentRegionsReceiveScopedPayloads|FullyQualifiedName=FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests.TableV2VirtualizesFrozenAxesNavigatesAndRejectsStaleBackgroundResults|FullyQualifiedName=FsusUI.Avalonia.HeadlessTests.FsusNativeMenuHeadlessTests.NativeMenuAttachesToWindowAndSynchronouslyReflectsCommandState|FullyQualifiedName=FsusUI.Avalonia.HeadlessTests.FsusNativeMenuHeadlessTests.InitiallyDisabledCommandStaysDisabledInRenderedMenu|FullyQualifiedName=FsusUI.Avalonia.HeadlessTests.FsusNativeMenuHeadlessTests.PreserveRootsProfileAttachesExactlySuppliedRootsAndKeepsCommandState|FullyQualifiedName=FsusUI.Avalonia.HeadlessTests.FsusNativeMenuHeadlessTests.CommandPaletteIntegratesWithSharedCommandsInHeadless|FullyQualifiedName=FsusUI.Avalonia.HeadlessTests.FsusNativeMenuTests.SameCommandModelUsableByCommandPaletteAndNativeMenu|FullyQualifiedName=FsusUI.Avalonia.HeadlessTests.FsusNativeMenuTests.DefaultPaletteSearchUsesHostPlatformAfterExplicitSearches|FullyQualifiedName=FsusUI.Avalonia.HeadlessTests.FsusNativeMenuTests.DocumentStateChangesSynchronouslyUpdateItemEnabledState|FullyQualifiedName=FsusUI.Avalonia.HeadlessTests.FsusNativeMenuTests.CustomShortcutUpdateImmediatelyRefreshesNativeMenuAccelerator|FullyQualifiedName=FsusUI.Avalonia.HeadlessTests.FsusNativeMenuTests.DockPrimaryAcceleratorUsesCommandWithoutMutatingSharedGesture|FullyQualifiedName=FsusUI.Avalonia.HeadlessTests.FsusNativeMenuTests.MacPlatformRolesInCorrectPositionsAndOtherPlatformsDoNotHaveInvalidItems|FullyQualifiedName=FsusUI.Avalonia.HeadlessTests.FsusNativeMenuTests.InitiallyDisabledCommandStaysDisabledAfterBuildAndReflectsNestedState|FullyQualifiedName=FsusUI.Avalonia.HeadlessTests.FsusNativeMenuTests.PreserveRootsProfileReturnsExactlySuppliedRootsWithMetadataAndCommandState|FullyQualifiedName=FsusUI.Avalonia.HeadlessTests.FsusNativeMenuTests.SynthesizedRootsOptionGatesMissingRequiredRoots|FullyQualifiedName=FsusUI.Avalonia.HeadlessTests.FsusNativeMenuTests.DockMenuContractAndWindowlessRoutingFallbackWorks|FullyQualifiedName=FsusUI.Avalonia.HeadlessTests.FsusNativeMenuTests.PlatformSimulationBindsRolesAndCanonicalTopLevelOrder|FullyQualifiedName=FsusUI.Avalonia.HeadlessTests.FsusNativeMenuTests.RebuildAndDisposeDetachPreviousCommandListeners|FullyQualifiedName=FsusUI.Avalonia.HeadlessTests.FsusNativeMenuTests.RecentSubmenuRebuildAndDockAttachmentUseNeutralRoles|FullyQualifiedName=FsusUI.Avalonia.HeadlessTests.FsusShortcutRecorderHeadlessTests.UserStartsRecordingAndPressesCtrlShiftPToCaptureOneShortcut|FullyQualifiedName=FsusUI.Avalonia.HeadlessTests.FsusShortcutRecorderHeadlessTests.EscapeCancelsRecordingAndDoesNotChangeOriginalValue|FullyQualifiedName=FsusUI.Avalonia.HeadlessTests.FsusShortcutRecorderHeadlessTests.BackspaceOrDeleteClearsRecordedValue|FullyQualifiedName=FsusUI.Avalonia.HeadlessTests.FsusShortcutRecorderHeadlessTests.InjectedExistingShortcutsShowAccessibleConflictStatus|FullyQualifiedName=FsusUI.Avalonia.HeadlessTests.FsusShortcutRecorderHeadlessTests.ControlTemplateAppliesAcrossLightAndDarkThemes|FullyQualifiedName=FsusUI.Avalonia.HeadlessTests.FsusShortcutRecorderHeadlessTests.PlaceholderAndAccessibleClearActionRestoreRecorderFocus",
+      "--logger",
+      "trx;LogFileName=combined.trx",
+      "--results-directory",
+      "/workspace/native-reviewed-evidence/headless-gsans-1"
+    ],
+    "processExit": 0,
+    "counters": {
+      "total": "46",
+      "executed": "46",
+      "passed": "46",
+      "failed": "0",
+      "error": "0",
+      "timeout": "0",
+      "aborted": "0",
+      "inconclusive": "0",
+      "passedButRunAborted": "0",
+      "notRunnable": "0",
+      "notExecuted": "0",
+      "disconnected": "0",
+      "warning": "0",
+      "completed": "0",
+      "inProgress": "0",
+      "pending": "0"
+    },
+    "perOwner": {
+      "Shortcut": {
+        "Passed": 30
+      },
+      "Font": {
+        "Passed": 5
+      },
+      "TableV2": {
+        "Passed": 10
+      },
+      "Tree": {
+        "Passed": 1
+      }
+    },
+    "cases": [
+      {
+        "name": "FsusUI.Avalonia.HeadlessTests.FsusNativeMenuTests.RebuildAndDisposeDetachPreviousCommandListeners",
+        "outcome": "Passed"
+      },
+      {
+        "name": "FsusUI.Avalonia.HeadlessTests.FsusNativeMenuTests.SameCommandModelUsableByCommandPaletteAndNativeMenu(platform: Windows, displayShortcut: \"Ctrl+S\", nativePrimaryModifier: Control)",
+        "outcome": "Passed"
+      },
+      {
+        "name": "FsusUI.Avalonia.HeadlessTests.FsusBundledInterFontRegistrationRegressionTests.DeclaredBodyStackResolvesTheRegisteredBundledFamily",
+        "outcome": "Passed"
+      },
+      {
+        "name": "FsusUI.Avalonia.HeadlessTests.FsusNativeMenuTests.DefaultPaletteSearchUsesHostPlatformAfterExplicitSearches",
+        "outcome": "Passed"
+      },
+      {
+        "name": "FsusUI.Avalonia.HeadlessTests.FsusBundledInterFontRegistrationRegressionTests.BundledInterResolvesGlyphsAndLaysOutTextInAFluentWindow",
+        "outcome": "Passed"
+      },
+      {
+        "name": "FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests.AutoResizerAndTableV2VirtualizeRowsColumnsResizeAndBudget",
+        "outcome": "Passed"
+      },
+      {
+        "name": "FsusUI.Avalonia.HeadlessTests.FsusNativeMenuHeadlessTests.InitiallyDisabledCommandStaysDisabledInRenderedMenu",
+        "outcome": "Passed"
+      },
+      {
+        "name": "FsusUI.Avalonia.HeadlessTests.FsusNativeMenuTests.RecentSubmenuRebuildAndDockAttachmentUseNeutralRoles",
+        "outcome": "Passed"
+      },
+      {
+        "name": "FsusUI.Avalonia.HeadlessTests.FsusShortcutRecorderHeadlessTests.UserStartsRecordingAndPressesCtrlShiftPToCaptureOneShortcut(platform: Windows, primaryModifier: Control, displayShortcut: \"Ctrl+Shift+P\")",
+        "outcome": "Passed"
+      },
+      {
+        "name": "FsusUI.Avalonia.HeadlessTests.FsusNativeMenuHeadlessTests.NativeMenuAttachesToWindowAndSynchronouslyReflectsCommandState",
+        "outcome": "Passed"
+      },
+      {
+        "name": "FsusUI.Avalonia.HeadlessTests.FsusNativeMenuTests.CustomShortcutUpdateImmediatelyRefreshesNativeMenuAccelerator(platform: Windows)",
+        "outcome": "Passed"
+      },
+      {
+        "name": "FsusUI.Avalonia.HeadlessTests.FsusNativeMenuTests.CustomShortcutUpdateImmediatelyRefreshesNativeMenuAccelerator(platform: macOS)",
+        "outcome": "Passed"
+      },
+      {
+        "name": "FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests.TableV2RendersBoundedContentRegions",
+        "outcome": "Passed"
+      },
+      {
+        "name": "FsusUI.Avalonia.HeadlessTests.FsusTreeScrollingHeadlessTests.ScrollingExpandedRowsPreservesOffsetAndRoutesPointerToRetainedNode",
+        "outcome": "Passed"
+      },
+      {
+        "name": "FsusUI.Avalonia.HeadlessTests.FsusNativeMenuTests.SameCommandModelUsableByCommandPaletteAndNativeMenu(platform: Linux, displayShortcut: \"Ctrl+S\", nativePrimaryModifier: Control)",
+        "outcome": "Passed"
+      },
+      {
+        "name": "FsusUI.Avalonia.HeadlessTests.FsusBundledInterFontRegistrationRegressionTests.LinuxMonospaceAliasesResolveTheNativeFixedPitchFamilyAndLayout(family: \"monospace\")",
+        "outcome": "Passed"
+      },
+      {
+        "name": "FsusUI.Avalonia.HeadlessTests.FsusNativeMenuHeadlessTests.PreserveRootsProfileAttachesExactlySuppliedRootsAndKeepsCommandState",
+        "outcome": "Passed"
+      },
+      {
+        "name": "FsusUI.Avalonia.HeadlessTests.FsusShortcutRecorderHeadlessTests.ControlTemplateAppliesAcrossLightAndDarkThemes",
+        "outcome": "Passed"
+      },
+      {
+        "name": "FsusUI.Avalonia.HeadlessTests.FsusNativeMenuTests.SameCommandModelUsableByCommandPaletteAndNativeMenu(platform: macOS, displayShortcut: \"Command+S\", nativePrimaryModifier: Meta)",
+        "outcome": "Passed"
+      },
+      {
+        "name": "FsusUI.Avalonia.HeadlessTests.FsusNativeMenuTests.CustomShortcutUpdateImmediatelyRefreshesNativeMenuAccelerator(platform: Linux)",
+        "outcome": "Passed"
+      },
+      {
+        "name": "FsusUI.Avalonia.HeadlessTests.FsusShortcutRecorderHeadlessTests.UserStartsRecordingAndPressesCtrlShiftPToCaptureOneShortcut(platform: macOS, primaryModifier: Meta, displayShortcut: \"Command+Shift+P\")",
+        "outcome": "Passed"
+      },
+      {
+        "name": "FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests.TableV2UsesFixedDataGetterAndExpandedRowCallbacks",
+        "outcome": "Passed"
+      },
+      {
+        "name": "FsusUI.Avalonia.HeadlessTests.FsusNativeMenuTests.DockPrimaryAcceleratorUsesCommandWithoutMutatingSharedGesture",
+        "outcome": "Passed"
+      },
+      {
+        "name": "FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests.TableV2BindsTypedRowsFixedColumnsAndRealKeyboardScroll",
+        "outcome": "Passed"
+      },
+      {
+        "name": "FsusUI.Avalonia.HeadlessTests.FsusShortcutRecorderHeadlessTests.PlaceholderAndAccessibleClearActionRestoreRecorderFocus",
+        "outcome": "Passed"
+      },
+      {
+        "name": "FsusUI.Avalonia.HeadlessTests.FsusNativeMenuTests.MacPlatformRolesInCorrectPositionsAndOtherPlatformsDoNotHaveInvalidItems",
+        "outcome": "Passed"
+      },
+      {
+        "name": "FsusUI.Avalonia.HeadlessTests.FsusShortcutRecorderHeadlessTests.EscapeCancelsRecordingAndDoesNotChangeOriginalValue",
+        "outcome": "Passed"
+      },
+      {
+        "name": "FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests.TableV2ContentRegionsReceiveScopedPayloads",
+        "outcome": "Passed"
+      },
+      {
+        "name": "FsusUI.Avalonia.HeadlessTests.FsusShortcutRecorderHeadlessTests.BackspaceOrDeleteClearsRecordedValue",
+        "outcome": "Passed"
+      },
+      {
+        "name": "FsusUI.Avalonia.HeadlessTests.FsusNativeMenuTests.DockMenuContractAndWindowlessRoutingFallbackWorks",
+        "outcome": "Passed"
+      },
+      {
+        "name": "FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests.TableV2SortsTypedRowsAndReportsColumnSort",
+        "outcome": "Passed"
+      },
+      {
+        "name": "FsusUI.Avalonia.HeadlessTests.FsusShortcutRecorderHeadlessTests.InjectedExistingShortcutsShowAccessibleConflictStatus",
+        "outcome": "Passed"
+      },
+      {
+        "name": "FsusUI.Avalonia.HeadlessTests.FsusNativeMenuTests.SynthesizedRootsOptionGatesMissingRequiredRoots",
+        "outcome": "Passed"
+      },
+      {
+        "name": "FsusUI.Avalonia.HeadlessTests.FsusShortcutRecorderHeadlessTests.UserStartsRecordingAndPressesCtrlShiftPToCaptureOneShortcut(platform: Linux, primaryModifier: Control, displayShortcut: \"Ctrl+Shift+P\")",
+        "outcome": "Passed"
+      },
+      {
+        "name": "FsusUI.Avalonia.HeadlessTests.FsusBundledInterFontRegistrationRegressionTests.DeclaredMonospaceStackRetainsItsAvailableNamedFamily",
+        "outcome": "Passed"
+      },
+      {
+        "name": "FsusUI.Avalonia.HeadlessTests.FsusNativeMenuTests.PreserveRootsProfileReturnsExactlySuppliedRootsWithMetadataAndCommandState",
+        "outcome": "Passed"
+      },
+      {
+        "name": "FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests.TableV2VirtualizesFrozenAxesNavigatesAndRejectsStaleBackgroundResults",
+        "outcome": "Passed"
+      },
+      {
+        "name": "FsusUI.Avalonia.HeadlessTests.FsusNativeMenuTests.PlatformSimulationBindsRolesAndCanonicalTopLevelOrder",
+        "outcome": "Passed"
+      },
+      {
+        "name": "FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests.TableV2MapsViewportGeometryAndCacheToRealLayout",
+        "outcome": "Passed"
+      },
+      {
+        "name": "FsusUI.Avalonia.HeadlessTests.FsusNativeMenuTests.InitiallyDisabledCommandStaysDisabledAfterBuildAndReflectsNestedState",
+        "outcome": "Passed"
+      },
+      {
+        "name": "FsusUI.Avalonia.HeadlessTests.FsusNativeMenuTests.CustomShortcutUpdateImmediatelyRefreshesNativeMenuAccelerator(platform: Auto)",
+        "outcome": "Passed"
+      },
+      {
+        "name": "FsusUI.Avalonia.HeadlessTests.FsusBundledInterFontRegistrationRegressionTests.LinuxMonospaceAliasesResolveTheNativeFixedPitchFamilyAndLayout(family: \"ui-monospace, SFMono-Regular, Menlo, Monaco, Conso\"\u00b7\u00b7\u00b7)",
+        "outcome": "Passed"
+      },
+      {
+        "name": "FsusUI.Avalonia.HeadlessTests.FsusNativeMenuTests.DocumentStateChangesSynchronouslyUpdateItemEnabledState",
+        "outcome": "Passed"
+      },
+      {
+        "name": "FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests.TableV2MeasuresDynamicRowsAndRaisesRealScrollCallbacks",
+        "outcome": "Passed"
+      },
+      {
+        "name": "FsusUI.Avalonia.HeadlessTests.FsusNativeMenuHeadlessTests.CommandPaletteIntegratesWithSharedCommandsInHeadless",
+        "outcome": "Passed"
+      },
+      {
+        "name": "FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests.AutoResizerObservesArrangedViewportAndHonorsDisabledAxes",
+        "outcome": "Passed"
+      }
+    ],
+    "trxSha256": "08be16ebd73afe2d2233481b66d3f36c6da5864041304b9fa4926fccde409c55"
+  },
+  {
+    "label": "unit-gsans-0",
+    "command": [
+      "dotnet",
+      "test",
+      "FsusUI.Avalonia.Tests/FsusUI.Avalonia.Tests.csproj",
+      "-c",
+      "Release",
+      "--no-build",
+      "--no-restore",
+      "--filter",
+      "FullyQualifiedName=FsusUI.Avalonia.Tests.Controls.FsusTreeRowRetentionTests.LargeTreeExpansionAndFocusKeepUnaffectedRowsAttached|FullyQualifiedName=FsusUI.Avalonia.Tests.Controls.FsusTreeRowRetentionTests.ReorderingReplacingAndRemovingNodesUpdatesRowsAndSetMetadata|FullyQualifiedName=FsusUI.Avalonia.Tests.Controls.FsusTreeRowRetentionTests.CustomPresenterStillRefreshesMutablePayloadAndRestoresDefaultContent|FullyQualifiedName=FsusUI.Avalonia.Tests.Controls.FsusTreeRowRetentionTests.RetainedRowsUpdateGeometryPresentationSelectionAndAutomation|FullyQualifiedName=FsusUI.Avalonia.Tests.Controls.FsusTreeRowRetentionTests.RetainedRowLeavesRenameModeAndRemovesTransientCreateRows|FullyQualifiedName=FsusUI.Avalonia.Tests.Controls.FsusCommandPaletteTests.FiltersLocalAndAsyncCommandsCaseInsensitivelyWithPublicMetadata|FullyQualifiedName=FsusUI.Avalonia.Tests.Controls.FsusCommandPaletteTests.PlatformFormatsLocalAndProviderCommandsWithoutChangingGestures|FullyQualifiedName=FsusUI.Avalonia.Tests.Controls.FsusCommandPaletteTests.WraparoundNavigationNestedBackImeAndEscapeUsePublicControlApi|FullyQualifiedName=FsusUI.Avalonia.Tests.Controls.FsusCommandPaletteTests.ExecutesSyncAndAsyncCommandsWithBusyFailureAndDisabledGuards|FullyQualifiedName=FsusUI.Avalonia.Tests.Controls.FsusShortcutRecorderTests.ShortcutGestureNormalizesKeysAndMaintainsStableSerialization|FullyQualifiedName=FsusUI.Avalonia.Tests.Controls.FsusShortcutRecorderTests.RawKeyGestureInteropPreservesLiteralPhysicalControl|FullyQualifiedName=FsusUI.Avalonia.Tests.Controls.FsusShortcutRecorderTests.ShortcutGestureDisplaysCommandOptionOnMacAndCtrlAltOnWindowsLinux|FullyQualifiedName=FsusUI.Avalonia.Tests.Controls.FsusShortcutRecorderTests.ShortcutGestureNormalizesOemKeys|FullyQualifiedName=FsusUI.Avalonia.Tests.Controls.FsusShortcutRecorderTests.CommonOemSerializationRoundTripsWithoutDelimiterAmbiguity|FullyQualifiedName=FsusUI.Avalonia.Tests.Controls.FsusShortcutRecorderTests.MacMetaAndWindowsControlNormalizeToTheSameStableGesture|FullyQualifiedName=FsusUI.Avalonia.Tests.Controls.FsusShortcutRecorderTests.WindowsMetaRemainsDistinctAndRoundTrips|FullyQualifiedName=FsusUI.Avalonia.Tests.Controls.FsusShortcutRecorderTests.RecorderCapturesSingleShortcutOnKeyCombination|FullyQualifiedName=FsusUI.Avalonia.Tests.Controls.FsusShortcutRecorderTests.EscapeCancelsRecordingAndPreservesOriginalValue|FullyQualifiedName=FsusUI.Avalonia.Tests.Controls.FsusShortcutRecorderTests.BackspaceOrDeleteClearsRecordedValue|FullyQualifiedName=FsusUI.Avalonia.Tests.Controls.FsusShortcutRecorderTests.InjectedExistingShortcutsShowAccessibleConflictStatus|FullyQualifiedName=FsusUI.Avalonia.Tests.Controls.FsusShortcutRecorderTests.ReservedShortcutsShowReservedStatus|FullyQualifiedName=FsusUI.Avalonia.Tests.Controls.FsusShortcutRecorderTests.InvalidBareKeyPreservesOriginalValueAndClearsStaleHelpAfterRecovery|FullyQualifiedName=FsusUI.Avalonia.Tests.Controls.FsusShortcutRecorderTests.ClearabilityAndCommandAvailabilityTrackControlState|FullyQualifiedName=FsusUI.Avalonia.Tests.Controls.FsusShortcutRecorderTests.AutoRecorderUsesHostPlatformAndExplicitDisplayChangesPreserveValue|FullyQualifiedName=FsusUI.Avalonia.Tests.Controls.FsusWebViewAdapterTests.TaggedPdfAndHierarchicalOutlineAreProvenByAdapterSimulation|FullyQualifiedName=FsusUI.Avalonia.Tests.Controls.FsusWebViewAdapterTests.UnsupportedPdfCapabilityDoesNotInvokeBackendOrTouchStream|FullyQualifiedName=FsusUI.Avalonia.Tests.Controls.FsusWebViewAdapterTests.CancellationPropagatesAndDestinationOwnershipStaysWithCaller|FullyQualifiedName=FsusUI.Avalonia.Tests.Controls.FsusWebViewAdapterTests.InFlightCancellationInterruptsBackendAndPreservesDestinationOwnership|FullyQualifiedName=FsusUI.Avalonia.Tests.Controls.FsusWebViewAdapterTests.BackendCannotSilentlyClaimRequestedOutlineWasApplied|FullyQualifiedName=FsusUI.Avalonia.Tests.Controls.FsusWebViewAdapterTests.BackendCannotCloseCallerOwnedPdfStream|FullyQualifiedName=FsusUI.Avalonia.Tests.Controls.FsusWebViewAdapterTests.BackendCannotClaimSuccessWithoutWritingPdfBytes|FullyQualifiedName=FsusUI.Avalonia.Tests.Controls.FsusWebViewAdapterTests.BackendCannotClaimPdfStructureOrMissingOutlineDestination|FullyQualifiedName=FsusUI.Avalonia.Tests.Controls.FsusWebViewAdapterTests.BackendCannotClaimSuccessWithPdfMarkersButNoObjectGraph",
+      "--logger",
+      "trx;LogFileName=combined.trx",
+      "--results-directory",
+      "/workspace/native-reviewed-evidence/unit-gsans-0"
+    ],
+    "processExit": 0,
+    "counters": {
+      "total": "45",
+      "executed": "45",
+      "passed": "45",
+      "failed": "0",
+      "error": "0",
+      "timeout": "0",
+      "aborted": "0",
+      "inconclusive": "0",
+      "passedButRunAborted": "0",
+      "notRunnable": "0",
+      "notExecuted": "0",
+      "disconnected": "0",
+      "warning": "0",
+      "completed": "0",
+      "inProgress": "0",
+      "pending": "0"
+    },
+    "perOwner": {
+      "Shortcut": {
+        "Passed": 28
+      },
+      "PDF": {
+        "Passed": 12
+      },
+      "Tree": {
+        "Passed": 5
+      }
+    },
+    "cases": [
+      {
+        "name": "FsusUI.Avalonia.Tests.Controls.FsusShortcutRecorderTests.CommonOemSerializationRoundTripsWithoutDelimiterAmbiguity(key: OemPipe)",
+        "outcome": "Passed"
+      },
+      {
+        "name": "FsusUI.Avalonia.Tests.Controls.FsusWebViewAdapterTests.BackendCannotClaimPdfStructureOrMissingOutlineDestination",
+        "outcome": "Passed"
+      },
+      {
+        "name": "FsusUI.Avalonia.Tests.Controls.FsusShortcutRecorderTests.CommonOemSerializationRoundTripsWithoutDelimiterAmbiguity(key: OemQuestion)",
+        "outcome": "Passed"
+      },
+      {
+        "name": "FsusUI.Avalonia.Tests.Controls.FsusTreeRowRetentionTests.LargeTreeExpansionAndFocusKeepUnaffectedRowsAttached",
+        "outcome": "Passed"
+      },
+      {
+        "name": "FsusUI.Avalonia.Tests.Controls.FsusWebViewAdapterTests.CancellationPropagatesAndDestinationOwnershipStaysWithCaller",
+        "outcome": "Passed"
+      },
+      {
+        "name": "FsusUI.Avalonia.Tests.Controls.FsusShortcutRecorderTests.CommonOemSerializationRoundTripsWithoutDelimiterAmbiguity(key: OemSemicolon)",
+        "outcome": "Passed"
+      },
+      {
+        "name": "FsusUI.Avalonia.Tests.Controls.FsusShortcutRecorderTests.InjectedExistingShortcutsShowAccessibleConflictStatus",
+        "outcome": "Passed"
+      },
+      {
+        "name": "FsusUI.Avalonia.Tests.Controls.FsusShortcutRecorderTests.RawKeyGestureInteropPreservesLiteralPhysicalControl",
+        "outcome": "Passed"
+      },
+      {
+        "name": "FsusUI.Avalonia.Tests.Controls.FsusShortcutRecorderTests.ShortcutGestureNormalizesOemKeys",
+        "outcome": "Passed"
+      },
+      {
+        "name": "FsusUI.Avalonia.Tests.Controls.FsusWebViewAdapterTests.BackendCannotClaimSuccessWithPdfMarkersButNoObjectGraph",
+        "outcome": "Passed"
+      },
+      {
+        "name": "FsusUI.Avalonia.Tests.Controls.FsusShortcutRecorderTests.InvalidBareKeyPreservesOriginalValueAndClearsStaleHelpAfterRecovery",
+        "outcome": "Passed"
+      },
+      {
+        "name": "FsusUI.Avalonia.Tests.Controls.FsusShortcutRecorderTests.ShortcutGestureDisplaysCommandOptionOnMacAndCtrlAltOnWindowsLinux",
+        "outcome": "Passed"
+      },
+      {
+        "name": "FsusUI.Avalonia.Tests.Controls.FsusShortcutRecorderTests.RecorderCapturesSingleShortcutOnKeyCombination(platform: Linux, primaryModifier: Control, displayShortcut: \"Ctrl+Shift+P\")",
+        "outcome": "Passed"
+      },
+      {
+        "name": "FsusUI.Avalonia.Tests.Controls.FsusShortcutRecorderTests.RecorderCapturesSingleShortcutOnKeyCombination(platform: Windows, primaryModifier: Control, displayShortcut: \"Ctrl+Shift+P\")",
+        "outcome": "Passed"
+      },
+      {
+        "name": "FsusUI.Avalonia.Tests.Controls.FsusShortcutRecorderTests.CommonOemSerializationRoundTripsWithoutDelimiterAmbiguity(key: OemCloseBrackets)",
+        "outcome": "Passed"
+      },
+      {
+        "name": "FsusUI.Avalonia.Tests.Controls.FsusWebViewAdapterTests.TaggedPdfAndHierarchicalOutlineAreProvenByAdapterSimulation(platform: Windows, theme: Light, expectedPageBackground: \"#FFFFFF\", expectedTextColor: \"#0F0F11\")",
+        "outcome": "Passed"
+      },
+      {
+        "name": "FsusUI.Avalonia.Tests.Controls.FsusWebViewAdapterTests.TaggedPdfAndHierarchicalOutlineAreProvenByAdapterSimulation(platform: Windows, theme: Dark, expectedPageBackground: \"#121214\", expectedTextColor: \"#F0F0F4\")",
+        "outcome": "Passed"
+      },
+      {
+        "name": "FsusUI.Avalonia.Tests.Controls.FsusShortcutRecorderTests.CommonOemSerializationRoundTripsWithoutDelimiterAmbiguity(key: OemPeriod)",
+        "outcome": "Passed"
+      },
+      {
+        "name": "FsusUI.Avalonia.Tests.Controls.FsusWebViewAdapterTests.BackendCannotClaimSuccessWithoutWritingPdfBytes",
+        "outcome": "Passed"
+      },
+      {
+        "name": "FsusUI.Avalonia.Tests.Controls.FsusCommandPaletteTests.WraparoundNavigationNestedBackImeAndEscapeUsePublicControlApi",
+        "outcome": "Passed"
+      },
+      {
+        "name": "FsusUI.Avalonia.Tests.Controls.FsusShortcutRecorderTests.CommonOemSerializationRoundTripsWithoutDelimiterAmbiguity(key: Oem3)",
+        "outcome": "Passed"
+      },
+      {
+        "name": "FsusUI.Avalonia.Tests.Controls.FsusShortcutRecorderTests.ShortcutGestureNormalizesKeysAndMaintainsStableSerialization",
+        "outcome": "Passed"
+      },
+      {
+        "name": "FsusUI.Avalonia.Tests.Controls.FsusCommandPaletteTests.ExecutesSyncAndAsyncCommandsWithBusyFailureAndDisabledGuards",
+        "outcome": "Passed"
+      },
+      {
+        "name": "FsusUI.Avalonia.Tests.Controls.FsusShortcutRecorderTests.EscapeCancelsRecordingAndPreservesOriginalValue",
+        "outcome": "Passed"
+      },
+      {
+        "name": "FsusUI.Avalonia.Tests.Controls.FsusWebViewAdapterTests.InFlightCancellationInterruptsBackendAndPreservesDestinationOwnership",
+        "outcome": "Passed"
+      },
+      {
+        "name": "FsusUI.Avalonia.Tests.Controls.FsusShortcutRecorderTests.MacMetaAndWindowsControlNormalizeToTheSameStableGesture",
+        "outcome": "Passed"
+      },
+      {
+        "name": "FsusUI.Avalonia.Tests.Controls.FsusTreeRowRetentionTests.ReorderingReplacingAndRemovingNodesUpdatesRowsAndSetMetadata",
+        "outcome": "Passed"
+      },
+      {
+        "name": "FsusUI.Avalonia.Tests.Controls.FsusTreeRowRetentionTests.CustomPresenterStillRefreshesMutablePayloadAndRestoresDefaultContent",
+        "outcome": "Passed"
+      },
+      {
+        "name": "FsusUI.Avalonia.Tests.Controls.FsusCommandPaletteTests.FiltersLocalAndAsyncCommandsCaseInsensitivelyWithPublicMetadata",
+        "outcome": "Passed"
+      },
+      {
+        "name": "FsusUI.Avalonia.Tests.Controls.FsusWebViewAdapterTests.TaggedPdfAndHierarchicalOutlineAreProvenByAdapterSimulation(platform: Linux, theme: Dark, expectedPageBackground: \"#121214\", expectedTextColor: \"#F0F0F4\")",
+        "outcome": "Passed"
+      },
+      {
+        "name": "FsusUI.Avalonia.Tests.Controls.FsusShortcutRecorderTests.RecorderCapturesSingleShortcutOnKeyCombination(platform: macOS, primaryModifier: Meta, displayShortcut: \"Command+Shift+P\")",
+        "outcome": "Passed"
+      },
+      {
+        "name": "FsusUI.Avalonia.Tests.Controls.FsusWebViewAdapterTests.BackendCannotCloseCallerOwnedPdfStream",
+        "outcome": "Passed"
+      },
+      {
+        "name": "FsusUI.Avalonia.Tests.Controls.FsusWebViewAdapterTests.BackendCannotSilentlyClaimRequestedOutlineWasApplied",
+        "outcome": "Passed"
+      },
+      {
+        "name": "FsusUI.Avalonia.Tests.Controls.FsusTreeRowRetentionTests.RetainedRowLeavesRenameModeAndRemovesTransientCreateRows",
+        "outcome": "Passed"
+      },
+      {
+        "name": "FsusUI.Avalonia.Tests.Controls.FsusCommandPaletteTests.PlatformFormatsLocalAndProviderCommandsWithoutChangingGestures",
+        "outcome": "Passed"
+      },
+      {
+        "name": "FsusUI.Avalonia.Tests.Controls.FsusShortcutRecorderTests.WindowsMetaRemainsDistinctAndRoundTrips",
+        "outcome": "Passed"
+      },
+      {
+        "name": "FsusUI.Avalonia.Tests.Controls.FsusShortcutRecorderTests.CommonOemSerializationRoundTripsWithoutDelimiterAmbiguity(key: OemQuotes)",
+        "outcome": "Passed"
+      },
+      {
+        "name": "FsusUI.Avalonia.Tests.Controls.FsusWebViewAdapterTests.UnsupportedPdfCapabilityDoesNotInvokeBackendOrTouchStream",
+        "outcome": "Passed"
+      },
+      {
+        "name": "FsusUI.Avalonia.Tests.Controls.FsusShortcutRecorderTests.ReservedShortcutsShowReservedStatus",
+        "outcome": "Passed"
+      },
+      {
+        "name": "FsusUI.Avalonia.Tests.Controls.FsusShortcutRecorderTests.ClearabilityAndCommandAvailabilityTrackControlState",
+        "outcome": "Passed"
+      },
+      {
+        "name": "FsusUI.Avalonia.Tests.Controls.FsusWebViewAdapterTests.TaggedPdfAndHierarchicalOutlineAreProvenByAdapterSimulation(platform: Linux, theme: Light, expectedPageBackground: \"#FFFFFF\", expectedTextColor: \"#0F0F11\")",
+        "outcome": "Passed"
+      },
+      {
+        "name": "FsusUI.Avalonia.Tests.Controls.FsusShortcutRecorderTests.CommonOemSerializationRoundTripsWithoutDelimiterAmbiguity(key: Oem4)",
+        "outcome": "Passed"
+      },
+      {
+        "name": "FsusUI.Avalonia.Tests.Controls.FsusShortcutRecorderTests.BackspaceOrDeleteClearsRecordedValue",
+        "outcome": "Passed"
+      },
+      {
+        "name": "FsusUI.Avalonia.Tests.Controls.FsusTreeRowRetentionTests.RetainedRowsUpdateGeometryPresentationSelectionAndAutomation",
+        "outcome": "Passed"
+      },
+      {
+        "name": "FsusUI.Avalonia.Tests.Controls.FsusShortcutRecorderTests.AutoRecorderUsesHostPlatformAndExplicitDisplayChangesPreserveValue",
+        "outcome": "Passed"
+      }
+    ],
+    "trxSha256": "ead21a803b4ef6ee15bec0e572f2d2d8089e66f5c52ac854142284f4c9e64108"
+  }
+]

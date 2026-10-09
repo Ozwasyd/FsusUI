@@ -1,0 +1,7 @@
+  Determining projects to restore...
+  Restored /workspace/native-reviewed-integration/dotnet/FsusUI.Avalonia/FsusUI.Avalonia.csproj (in 487 ms).
+  Restored /workspace/native-reviewed-integration/dotnet/FsusUI.Avalonia.FormGenerator/FsusUI.Avalonia.FormGenerator.csproj (in 487 ms).
+  Restored /workspace/native-reviewed-integration/dotnet/FsusUI.Avalonia.Demo/FsusUI.Avalonia.Demo.csproj (in 491 ms).
+  Restored /workspace/native-reviewed-integration/dotnet/FsusUI.Avalonia.Icons/FsusUI.Avalonia.Icons.csproj (in 487 ms).
+  Restored /workspace/native-reviewed-integration/dotnet/FsusUI.Avalonia.Themes/FsusUI.Avalonia.Themes.csproj (in 7 ms).
+  Restored /workspace/native-reviewed-integration/dotnet/FsusUI.Avalonia.HeadlessTests/FsusUI.Avalonia.HeadlessTests.csproj (in 48 ms).

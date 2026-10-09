@@ -1,0 +1,8 @@
+{
+  "dotnetPath": "/workspace/.setup/dotnet/dotnet",
+  "sdk": "10.0.401",
+  "dotnetExecutableSha256": "01d89e0a0191052bfea616cd4ce624c8faf13b05bbddf7f64499c23e2a9d9269",
+  "pdfToolsPrefix": "/usr/bin",
+  "updateVisualArtifacts": null,
+  "externalImportOverride": null
+}
