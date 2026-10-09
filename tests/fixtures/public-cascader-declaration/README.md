@@ -25,8 +25,10 @@ node --test tests/public-cascader-declaration.test.mjs
 
 Both tarballs are required. Their actual ESM/CJS cascader runtime files must be
 byte-identical. The repaired tarball is installed into a fresh consumer with
-Vue 3.5.32 and TypeScript 6.0.2. Every compilation uses `strict: true` and
-`skipLibCheck: false`; no diagnostic is suppressed. All twenty negative cases
+Vue 3.5.32 and TypeScript 6.0.2. Every installed-consumer compilation uses
+`strict: true` and `skipLibCheck: false`; no consumer diagnostic is suppressed.
+The canonical producer retains its original `skipLibCheck: true`,
+`noImplicitAny: false`, and unchanged diagnostic filter. All twenty negative cases
 must produce exactly one consumer diagnostic each, and no positive consumer
 case may produce a diagnostic.
 
