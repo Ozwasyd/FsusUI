@@ -1,0 +1,5 @@
+
+> @ package:candidate:verify /workspace/FsusUI-public-declaration-closure
+> node ./scripts/with-node-heap.mjs node ./scripts/package-candidate.mjs verify -- --tarball dist/npm-candidate/fsusui-npm-candidate.tgz --commit 48ac5c2029a231e574a77a4aa537907f5bd447da
+
+Verified /workspace/FsusUI-public-declaration-closure/dist/npm-candidate/fsusui-npm-candidate.tgz (91dbac01c30df9c9b3d9f29811a3d045244ceb65f82845fba9f23f210f391256) for @ozwasyd/element-plus@1.5.1 with dist-tag latest.

@@ -1,0 +1,13 @@
+
+> @ test /workspace/FsusUI-public-declaration-closure
+> node ./scripts/with-node-heap.mjs vitest --config vue/vitest.config.ts run vue/packages/motion/__tests__/motion.test.tsx -t '^(motion primitives )?(reveals scroll content through a managed ScrollTrigger wrapper|finishes scroll reveal immediately when motion is reduced)$'
+
+
+ RUN  v4.1.5 /workspace/FsusUI-public-declaration-closure
+
+
+ Test Files  1 passed (1)
+      Tests  2 passed | 36 skipped (38)
+   Start at  08:36:11
+   Duration  3.64s (transform 1.58s, setup 172ms, import 1.61s, tests 144ms, environment 1.32s)
+

@@ -1,0 +1,9 @@
+Producer TypeScript 5.9.2
+
+/workspace/FsusUI-public-declaration-closure/dist/ambient-probe/empty.d.ts
+export type Vars = gsap.TweenVars;
+
+/workspace/FsusUI-public-declaration-closure/dist/ambient-probe/reference.d.ts
+/// <reference types="gsap" preserve="true" />
+export type Vars = gsap.TweenVars;
+

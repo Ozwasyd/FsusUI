@@ -1,0 +1,10 @@
+✔ worktree parent names do not become package path segments (0.828399ms)
+✔ owned test, mock, build, and dist paths stay excluded (0.872345ms)
+ℹ tests 2
+ℹ suites 0
+ℹ pass 2
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 409.372254
