@@ -4,9 +4,9 @@ import { useSelect, type SelectTooltipRef } from '@ozwasyd/element-plus/es/compo
 import type { App } from 'vue'
 
 declare const app: App
-Select.install(app)
-ElOption.install(app)
-ElOptionGroup.install(app)
+Select.install?.(app)
+ElOption.install?.(app)
+ElOptionGroup.install?.(app)
 const defaultIsNamed: typeof ElSelect = Select
 const cjsDefaultIsNamed: typeof CjsNamedSelect = CjsSelect
 const esmIsCjs: typeof CjsNamedSelect = ElSelect
