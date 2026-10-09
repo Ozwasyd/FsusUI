@@ -1,5 +1,5 @@
 ---
-'@ozwasyd/element-plus': patch
+'element-plus': patch
 ---
 
 Keep GSAP types in the emitted motion declarations so installed consumers can

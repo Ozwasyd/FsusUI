@@ -1,5 +1,5 @@
 ---
-'@ozwasyd/element-plus': patch
+'element-plus': patch
 ---
 
 Include the existing pinned Vue Router and type-fest dependencies needed by the

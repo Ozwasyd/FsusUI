@@ -1,5 +1,5 @@
 ---
-'@ozwasyd/element-plus': patch
+'element-plus': patch
 ---
 
 Resolve internal WASM declaration references within the installed package while
