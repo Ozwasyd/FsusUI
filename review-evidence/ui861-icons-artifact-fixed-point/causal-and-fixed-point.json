@@ -1,0 +1,63 @@
+{
+  "sourceSha": "332e7523cb3dd381c40b57f310df2b08411c5abc",
+  "baseSha": "ff88b88d73ca47bbd4be475eaf1d244b5d50d87a",
+  "H0": "7b834dc31290b28415a592b5c6902c436e28d8dcd23243b4013c6fbe1fc6b7b2",
+  "H1": "e54d4bf54fd2e97e165df00b614f5b3ab805a594860e57cffbbe1f8a9847a1ff",
+  "separateH0GroupDigest": "caccef4c5cbb0cdc37f8f43cca3480543e0830e93a6cf67872e783ec9cd859a0",
+  "changedOriginalInputs": [
+    "vue/packages/icons-vue/src/components/index.ts"
+  ],
+  "originalInputCount": 312,
+  "oldMarkerContainsH0": true,
+  "finalCompleteFingerprint": "995d5b5f98d005b60a12065d076b662ff05d32af456a7884c422a1bd9b44fcd4",
+  "all312FinalInputsEqualAfterBothGenerators": true,
+  "finalMarkerMatchesCurrentInputs": true,
+  "surfaceFailureInputBlobsUnchangedFromBase": [
+    {
+      "path": "config/dependencies/update-surface.json",
+      "baseBlob": "5fcd35ae938924b722b872c9c1d2865031b5d415",
+      "currentBlob": "5fcd35ae938924b722b872c9c1d2865031b5d415",
+      "match": true
+    },
+    {
+      "path": "config/dependencies/npm-authority.json",
+      "baseBlob": "645a00f6125a73755571a523708752211b3f5cb9",
+      "currentBlob": "645a00f6125a73755571a523708752211b3f5cb9",
+      "match": true
+    },
+    {
+      "path": "vue/internal/build-utils/package.json",
+      "baseBlob": "7e7d131869bfbfed9f98b53481e90a36fa2591ab",
+      "currentBlob": "7e7d131869bfbfed9f98b53481e90a36fa2591ab",
+      "match": true
+    },
+    {
+      "path": "vue/packages/element-plus/package.json",
+      "baseBlob": "d5efaed952a4b2cfc3db5dc49a2eddbbc209a376",
+      "currentBlob": "d5efaed952a4b2cfc3db5dc49a2eddbbc209a376",
+      "match": true
+    },
+    {
+      "path": "scripts/check-update-surface.mjs",
+      "baseBlob": "455229abbe59efe574826508d8dccd13ef05d16a",
+      "currentBlob": "455229abbe59efe574826508d8dccd13ef05d16a",
+      "match": true
+    },
+    {
+      "path": "scripts/update-surface-lib.mjs",
+      "baseBlob": "deb0e1f13353714bdb2cc1b5b31bbc56753df53b",
+      "currentBlob": "deb0e1f13353714bdb2cc1b5b31bbc56753df53b",
+      "match": true
+    }
+  ],
+  "changedPaths": [
+    "scripts/ensure-icons-artifacts.mjs",
+    "tests/ensure-icons-artifacts.test.mjs",
+    "vue/packages/icons-vue/build/build.ts",
+    "vue/packages/icons-vue/src/components/index.ts"
+  ],
+  "remoteRef": "332e7523cb3dd381c40b57f310df2b08411c5abc\trefs/heads/fix/ui861-icons-artifact-fixed-point-20261009",
+  "sourceStatus": "",
+  "frozenA6Head": "a6fafef49b2a22f90f6f3c5fc0d9639c3d44ae76",
+  "noSharedCheckerOrDependencyPolicyEdits": true
+}

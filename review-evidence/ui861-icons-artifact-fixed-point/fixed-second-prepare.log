@@ -1,0 +1,9 @@
+
+> @ prepare:test-artifacts /workspace/ui861-icons-artifact-fixed-point
+> node ./scripts/with-node-heap.mjs node ./scripts/prepare-test-artifacts.mjs
+
+[test-artifacts] icons cache-hit source-hash=eec6b923393829b8
+[test-artifacts] skipping ensure:icons
+[test-artifacts] wasm cache-hit source-hash=743a7500a128f6e6
+[test-artifacts] skipping ensure:wasm
+[test-artifacts] ready

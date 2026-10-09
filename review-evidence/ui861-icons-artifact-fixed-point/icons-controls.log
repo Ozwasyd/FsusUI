@@ -1,0 +1,12 @@
+✔ certifies the actual generated alias tree and reaches a cache fixed point (20158.922636ms)
+✔ direct bundle builds preserve declarations but invalidate certification until ensure completes (23683.11946ms)
+✔ rejects changed build inputs, failed builds and missing outputs before recovering (43633.067682ms)
+✔ does not certify a successful build whose source changes during compilation (27754.14078ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 4
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 115419.306276

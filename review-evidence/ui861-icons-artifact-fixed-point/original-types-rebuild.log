@@ -1,0 +1,4 @@
+
+> @element-plus/icons-vue@2.3.2 build:types /workspace/ui861-icons-artifact-fixed-point/vue/packages/icons-vue
+> node ../../../scripts/with-node-heap.mjs vue-tsc --declaration --emitDeclarationOnly
+

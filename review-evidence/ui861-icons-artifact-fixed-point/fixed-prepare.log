@@ -1,0 +1,34 @@
+
+> @ prepare:test-artifacts /workspace/ui861-icons-artifact-fixed-point
+> node ./scripts/with-node-heap.mjs node ./scripts/prepare-test-artifacts.mjs
+
+[test-artifacts] icons cache-miss source-hash=eec6b923393829b8
+[test-artifacts] icons miss: icons artifact fingerprint is missing
+[test-artifacts] wasm cache-hit source-hash=743a7500a128f6e6
+[test-artifacts] skipping ensure:wasm
+[ensure-icons] cache-miss source-hash=eec6b923393829b8; rebuilding icons-vue artifacts.
+  - icons artifact fingerprint is missing
+
+> @element-plus/icons-vue@2.3.2 build:generate /workspace/ui861-icons-artifact-fixed-point/vue/packages/icons-vue
+> node ../../../scripts/with-node-heap.mjs tsx build/generate.ts
+
+Generated 302 FsusUI design-aligned icons.
+
+> @element-plus/icons-vue@2.3.2 build /workspace/ui861-icons-artifact-fixed-point/vue/packages/icons-vue
+> node ../../../scripts/with-node-heap.mjs pnpm run build:generate && node ../../../scripts/with-node-heap.mjs run-p build:build build:types
+
+
+> @element-plus/icons-vue@2.3.2 build:generate /workspace/ui861-icons-artifact-fixed-point/vue/packages/icons-vue
+> node ../../../scripts/with-node-heap.mjs tsx build/generate.ts
+
+Generated 302 FsusUI design-aligned icons.
+
+> @element-plus/icons-vue@2.3.2 build:types /workspace/ui861-icons-artifact-fixed-point/vue/packages/icons-vue
+> node ../../../scripts/with-node-heap.mjs vue-tsc --declaration --emitDeclarationOnly
+
+
+> @element-plus/icons-vue@2.3.2 build:build /workspace/ui861-icons-artifact-fixed-point/vue/packages/icons-vue
+> NODE_ENV=production node ../../../scripts/with-node-heap.mjs tsx build/build.ts
+
+icons-vue bundles generated.
+[test-artifacts] ready

@@ -1,0 +1,7 @@
+
+> @ check:update-surface /workspace/ui861-icons-artifact-fixed-point
+> node ./scripts/with-node-heap.mjs node ./scripts/check-update-surface.mjs
+
+[check:update-surface] FAIL config/dependencies/update-surface.json is stale; run node scripts/generate-update-surface.mjs
+[check:update-surface] FAILED errors=1
+ ELIFECYCLE  Command failed with exit code 1.

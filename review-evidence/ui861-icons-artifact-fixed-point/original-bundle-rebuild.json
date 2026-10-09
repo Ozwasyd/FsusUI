@@ -1,0 +1,12 @@
+{
+  "sourceSha": "ff88b88d73ca47bbd4be475eaf1d244b5d50d87a",
+  "command": [
+    "pnpm",
+    "-C",
+    "vue/packages/icons-vue",
+    "run",
+    "build:build"
+  ],
+  "exitCode": 0,
+  "seconds": 5.65642556199964
+}

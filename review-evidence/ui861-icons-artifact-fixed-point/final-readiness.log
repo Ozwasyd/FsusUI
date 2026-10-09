@@ -1,0 +1,7 @@
+
+> @ check:test-artifacts-ready /workspace/ui861-icons-artifact-fixed-point
+> node ./scripts/with-node-heap.mjs node ./scripts/check-test-artifacts-ready.mjs
+
+[test-artifacts-ready] icons cache-hit source-hash=eec6b923393829b8
+[test-artifacts-ready] wasm cache-hit source-hash=743a7500a128f6e6
+[test-artifacts-ready] ok

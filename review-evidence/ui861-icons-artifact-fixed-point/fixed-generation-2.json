@@ -1,0 +1,12 @@
+{
+  "sourceSha": "332e7523cb3dd381c40b57f310df2b08411c5abc",
+  "command": [
+    "pnpm",
+    "-C",
+    "vue/packages/icons-vue",
+    "run",
+    "build:generate"
+  ],
+  "exitCode": 0,
+  "seconds": 2.791761820000829
+}

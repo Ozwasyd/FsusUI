@@ -1,0 +1,8 @@
+
+> @ check:test-artifacts-ready /workspace/ui861-icons-artifact-fixed-point
+> node ./scripts/with-node-heap.mjs node ./scripts/check-test-artifacts-ready.mjs
+
+[test-artifacts-ready] icons is missing or stale; run prepare:test-artifacts first.
+  - icons artifact fingerprint changed
+[test-artifacts-ready] wasm cache-hit source-hash=743a7500a128f6e6
+ ELIFECYCLE  Command failed with exit code 1.

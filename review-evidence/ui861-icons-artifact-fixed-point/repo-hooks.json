@@ -1,0 +1,11 @@
+{
+  "sourceSha": "332e7523cb3dd381c40b57f310df2b08411c5abc",
+  "hooksPath": ".husky/_",
+  "preCommit": "pnpm exec lint-staged\n",
+  "actualCommitHookResult": "PASS: original lint-staged eslint --fix task ran on staged build/build.ts and generated components/index.ts, no hook bypass",
+  "focusedLintReceipt": "focused-lint.json",
+  "mjsParserChecks": [
+    "ensure-syntax.json",
+    "control-syntax.json"
+  ]
+}

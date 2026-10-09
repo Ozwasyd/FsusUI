@@ -1,0 +1,10 @@
+{
+  "sourceSha": "332e7523cb3dd381c40b57f310df2b08411c5abc",
+  "command": [
+    "pnpm",
+    "run",
+    "prepare:test-artifacts"
+  ],
+  "exitCode": 0,
+  "seconds": 1.6139089969983615
+}

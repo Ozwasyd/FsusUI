@@ -1,0 +1,10 @@
+{
+  "sourceSha": "332e7523cb3dd381c40b57f310df2b08411c5abc",
+  "command": [
+    "node",
+    "--check",
+    "tests/ensure-icons-artifacts.test.mjs"
+  ],
+  "exitCode": 0,
+  "seconds": 0.05196557200179086
+}

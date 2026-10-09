@@ -1,0 +1,12 @@
+{
+  "command": [
+    "pnpm",
+    "install",
+    "--offline",
+    "--frozen-lockfile",
+    "--ignore-scripts",
+    "--store-dir",
+    "/workspace/.setup/pnpm-store"
+  ],
+  "exitCode": 0
+}

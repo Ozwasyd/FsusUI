@@ -1,0 +1,78 @@
+[
+  {
+    "key": "surfaces",
+    "id": "npm-pnpm-types",
+    "before": {
+      "id": "npm-pnpm-types",
+      "datasource": "npm",
+      "packageName": "@pnpm/types",
+      "authorityKey": "@pnpm/types",
+      "manager": "custom.jsonata",
+      "customManager": "npm-authority",
+      "files": [
+        "config/dependencies/npm-authority.json",
+        "package.json",
+        "pnpm-lock.yaml",
+        "vue/internal/build/package.json"
+      ],
+      "versioning": "npm",
+      "group": "npm-release-tooling",
+      "stabilityPolicy": "stable-only"
+    },
+    "expected": {
+      "id": "npm-pnpm-types",
+      "datasource": "npm",
+      "packageName": "@pnpm/types",
+      "authorityKey": "@pnpm/types",
+      "manager": "custom.jsonata",
+      "customManager": "npm-authority",
+      "files": [
+        "config/dependencies/npm-authority.json",
+        "package.json",
+        "pnpm-lock.yaml",
+        "vue/internal/build-utils/package.json",
+        "vue/internal/build/package.json"
+      ],
+      "versioning": "npm",
+      "group": "npm-release-tooling",
+      "stabilityPolicy": "stable-only"
+    }
+  },
+  {
+    "key": "surfaces",
+    "id": "npm-type-fest",
+    "before": {
+      "id": "npm-type-fest",
+      "datasource": "npm",
+      "packageName": "type-fest",
+      "authorityKey": "type-fest",
+      "manager": "custom.jsonata",
+      "customManager": "npm-authority",
+      "files": [
+        "config/dependencies/npm-authority.json",
+        "package.json",
+        "pnpm-lock.yaml"
+      ],
+      "versioning": "npm",
+      "group": "npm-release-tooling",
+      "stabilityPolicy": "stable-only"
+    },
+    "expected": {
+      "id": "npm-type-fest",
+      "datasource": "npm",
+      "packageName": "type-fest",
+      "authorityKey": "type-fest",
+      "manager": "custom.jsonata",
+      "customManager": "npm-authority",
+      "files": [
+        "config/dependencies/npm-authority.json",
+        "package.json",
+        "pnpm-lock.yaml",
+        "vue/packages/element-plus/package.json"
+      ],
+      "versioning": "npm",
+      "group": "npm-release-tooling",
+      "stabilityPolicy": "stable-only"
+    }
+  }
+]

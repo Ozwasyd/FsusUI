@@ -1,0 +1,15 @@
+{
+  "sourceSha": "332e7523cb3dd381c40b57f310df2b08411c5abc",
+  "command": [
+    "pnpm",
+    "exec",
+    "eslint",
+    "--config",
+    "vue/eslint.config.mjs",
+    "--no-warn-ignored",
+    "vue/packages/icons-vue/build/build.ts",
+    "vue/packages/icons-vue/src/components/index.ts"
+  ],
+  "exitCode": 0,
+  "seconds": 2.6820691930006433
+}
