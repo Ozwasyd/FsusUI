@@ -10,7 +10,7 @@ List before selecting; an empty or unknown selection exits before startup:
 
 ```sh
 node vue/packages/components/tag/__tests__/browser/check-tag.mjs --list
-node vue/packages/components/tag/__tests__/browser/check-tag.mjs --case default layout text semantics keyboard
+node vue/packages/components/tag/__tests__/browser/check-tag.mjs --case default layout text semantics keyboard locale
 ```
 
 Startup verifies the fixture state hook and exactly five real Tag roots.
@@ -21,6 +21,12 @@ Tone comparisons wait for actual theme transitions to finish. SVG viewport
 clipping is a browser drawing default; HTML label/control boxes must not clip,
 and all text ranges must fit within their Tag root. No clipping exception is
 made in the plain-text case.
+
+`locale` uses the real ElConfigProvider and shipped English/Simplified Chinese
+locale objects in both transition branches. It requires exact accessible
+removal names (`Delete` / `删除`), associates the full label description, and
+checks native Enter/Space/pointer activation and root click isolation. It
+rejects untranslated keys and dialog-specific close names.
 
 The `baseline` case retains the default-mode containment failure. The published
 consumer originally reported a 143px label inside a 20px small Tag at 160px.

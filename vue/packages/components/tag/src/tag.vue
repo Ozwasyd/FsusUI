@@ -14,7 +14,7 @@
       v-if="closable && multiline"
       type="button"
       :class="ns.e('close')"
-      :aria-label="t('el.messagebox.close')"
+      :aria-label="t('el.upload.delete')"
       :aria-describedby="contentId"
       v-on="closeIconEvents"
     >
@@ -41,7 +41,7 @@
         v-if="closable && multiline"
         type="button"
         :class="ns.e('close')"
-        :aria-label="t('el.messagebox.close')"
+        :aria-label="t('el.upload.delete')"
         :aria-describedby="contentId"
         v-on="closeIconEvents"
       >

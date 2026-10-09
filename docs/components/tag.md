@@ -49,7 +49,8 @@ Consumers do not need to target private Tag selectors.
 
 The mode preserves `size`, `type`, `effect`, text case, motion, and `click`/`close`
 events. With `closable`, the close icon occupies a separate, nonshrinking native
-button, with the localized close name and the label as its accessible description.
+button, with the existing localized removal action (`Delete` in English, `删除`
+in Simplified Chinese) and the label as its accessible description.
 It supports Enter and Space and emits the existing `MouseEvent` close payload
 without also emitting `click`. The close target can make a short multiline Tag
 taller than its size's single-line height. Tag itself remains a label, not a

@@ -6,7 +6,15 @@ import { createServer } from 'vite'
 import Vue from '@vitejs/plugin-vue'
 import { chromium } from '@playwright/test'
 
-const names = ['baseline', 'default', 'layout', 'text', 'semantics', 'keyboard']
+const names = [
+  'baseline',
+  'default',
+  'layout',
+  'text',
+  'semantics',
+  'keyboard',
+  'locale',
+]
 const args = process.argv.slice(2)
 if (args.length === 1 && args[0] === '--list') {
   console.log(JSON.stringify(names))
@@ -385,7 +393,7 @@ try {
         })
         const button = page.locator('[data-tag="0"] button')
         assert.equal(await button.count(), 1)
-        assert.ok(await button.getAttribute('aria-label'))
+        assert.equal(await button.getAttribute('aria-label'), 'Delete')
         const description = await button.getAttribute('aria-describedby')
         assert.equal(
           await page.locator(`[id="${description}"]`).textContent(),
@@ -408,6 +416,80 @@ try {
           'click',
         ])
         checks++
+      }
+    }
+    if (name === 'locale') {
+      const observations = []
+      for (const locale of ['en', 'zh-cn'])
+        for (const disableTransitions of [true, false]) {
+          await set({
+            multiline: true,
+            closable: true,
+            icon: false,
+            dir: 'ltr',
+            locale,
+            disableTransitions,
+          })
+          const labels = await page
+            .locator('[data-tag] button')
+            .evaluateAll((buttons) =>
+              buttons.map((button) => button.getAttribute('aria-label')),
+            )
+          observations.push({ locale, disableTransitions, labels })
+        }
+      if (evidence)
+        fs.writeFileSync(
+          path.join(evidence, 'locale-observations.json'),
+          JSON.stringify(observations, null, 2),
+        )
+      console.log('Locale observations: ' + JSON.stringify(observations))
+      for (const observation of observations) {
+        const expectedName = observation.locale === 'zh-cn' ? '删除' : 'Delete'
+        assert.deepEqual(
+          observation.labels,
+          Array(5).fill(expectedName),
+          'Exact localized removal names in both transition branches',
+        )
+        await set({
+          multiline: true,
+          closable: true,
+          icon: false,
+          dir: 'ltr',
+          locale: observation.locale,
+          disableTransitions: observation.disableTransitions,
+        })
+        const buttons = page.getByRole('button', {
+          name: expectedName,
+          exact: true,
+        })
+        assert.equal(
+          await buttons.count(),
+          5,
+          'Exact accessible role/name selection must be nonempty',
+        )
+        const button = buttons.first()
+        const description = await button.getAttribute('aria-describedby')
+        assert.equal(
+          await page.locator(`[id="${description}"]`).textContent(),
+          '状态 APIv2',
+        )
+        await button.focus()
+        await page.keyboard.press('Enter')
+        await page.keyboard.press('Space')
+        await button.click()
+        assert.deepEqual(await page.evaluate(() => window.tagFixture.events), [
+          'close',
+          'close',
+          'close',
+        ])
+        await page.locator('[data-tag="0"] .el-tag__content').click()
+        assert.deepEqual(await page.evaluate(() => window.tagFixture.events), [
+          'close',
+          'close',
+          'close',
+          'click',
+        ])
+        checks += observation.labels.length
       }
     }
     console.log('PASS selected case: ' + name)

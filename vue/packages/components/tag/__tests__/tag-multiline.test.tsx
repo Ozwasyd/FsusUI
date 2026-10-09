@@ -1,5 +1,8 @@
 import { mount } from '@vue/test-utils'
 import { describe, expect, expectTypeOf, test } from 'vitest'
+import { ElConfigProvider } from '@element-plus/components/config-provider'
+import English from '@element-plus/locale/lang/en'
+import Chinese from '@element-plus/locale/lang/zh-cn'
 import { ElTag, tagProps } from '../index'
 import type { TagProps } from '../index'
 
@@ -62,7 +65,7 @@ describe('ElTag public multiline mode', () => {
       })
       const button = wrapper.get('button')
       expect(button.attributes('type')).toBe('button')
-      expect(button.attributes('aria-label')).toBeTruthy()
+      expect(button.attributes('aria-label')).toBe('Delete')
       expect(button.attributes('aria-describedby')).toBe(
         wrapper.get('.el-tag__content').attributes('id'),
       )
@@ -75,6 +78,55 @@ describe('ElTag public multiline mode', () => {
       expect(wrapper.emitted('click')).toBeUndefined()
       await wrapper.get('.el-tag__content').trigger('click')
       expect(wrapper.emitted('click')).toHaveLength(1)
+    },
+  )
+
+  test.each([
+    {
+      locale: English,
+      language: 'en',
+      expectedName: 'Delete',
+      disableTransitions: true,
+    },
+    {
+      locale: English,
+      language: 'en',
+      expectedName: 'Delete',
+      disableTransitions: false,
+    },
+    {
+      locale: Chinese,
+      language: 'zh-cn',
+      expectedName: '删除',
+      disableTransitions: true,
+    },
+    {
+      locale: Chinese,
+      language: 'zh-cn',
+      expectedName: '删除',
+      disableTransitions: false,
+    },
+  ])(
+    'localized removal action under ElConfigProvider: $language / disableTransitions=$disableTransitions',
+    async ({ locale, expectedName, disableTransitions }) => {
+      const wrapper = mount(() => (
+        <ElConfigProvider locale={locale}>
+          <ElTag multiline closable disableTransitions={disableTransitions}>
+            {label}
+          </ElTag>
+        </ElConfigProvider>
+      ))
+      const tag = wrapper.getComponent(ElTag)
+      const button = tag.get('button')
+      expect(button.attributes('aria-label')).toBe(expectedName)
+      expect(button.attributes('aria-describedby')).toBe(
+        tag.get('.el-tag__content').attributes('id'),
+      )
+      expect(tag.get('.el-tag__content').text()).toBe(label)
+      await button.trigger('click')
+      expect(tag.emitted('close')).toHaveLength(1)
+      expect(tag.emitted('close')?.[0][0]).toBeInstanceOf(MouseEvent)
+      expect(tag.emitted('click')).toBeUndefined()
     },
   )
 
