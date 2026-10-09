@@ -11,6 +11,8 @@ import {
   sanitizeGsapVars,
 } from '../gsap/resolve'
 import { isMotionReducedOrDisabled } from '../runtime'
+import type { gsap } from 'gsap'
+import type { ScrollTrigger } from 'gsap/ScrollTrigger'
 import type { MotionTarget } from '../gsap/resolve'
 import type { MotionPresetInput, MotionPresetName } from '../types'
 

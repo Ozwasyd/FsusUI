@@ -1,5 +1,6 @@
 import { getCurrentScope, onScopeDispose, unref } from 'vue'
 import { getGsap } from '../gsap/register'
+import type { gsap } from 'gsap'
 import type { Ref } from 'vue'
 
 export type GsapScope =

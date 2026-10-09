@@ -7,6 +7,7 @@ import {
 } from '../gsap/resolve'
 import { normalizeMotionRecipeOptions } from '../recipes'
 import { isMotionReducedOrDisabled } from '../runtime'
+import type { gsap } from 'gsap'
 import type { MotionTarget } from '../gsap/resolve'
 import type {
   MotionPresetInput,

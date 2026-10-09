@@ -12,6 +12,8 @@ import {
 } from '../gsap/resolve'
 import { normalizeMotionRecipeOptions } from '../recipes'
 import { isMotionReducedOrDisabled } from '../runtime'
+import type { gsap } from 'gsap'
+import type { ScrollTrigger } from 'gsap/ScrollTrigger'
 import type { MotionTarget } from '../gsap/resolve'
 import type { MotionRecipeName } from '../types'
 
