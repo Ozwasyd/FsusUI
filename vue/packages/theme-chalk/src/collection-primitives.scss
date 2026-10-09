@@ -182,11 +182,17 @@
     border-bottom: 1px solid getCssVar('border-color-lighter');
   }
 
+  @include e(item) {
+    grid-column: 1 / -1;
+    min-width: 0;
+  }
+
   @include e(row) {
     display: grid;
     grid-column: 1 / -1;
     grid-template-columns: var(--el-data-list-columns);
     min-width: 0;
+    width: 100%;
     min-height: 56px;
     align-items: center;
     padding: 0;
@@ -206,9 +212,11 @@
       background: getCssVar('fill-color-light');
     }
 
-    @include when(loading) {
-      pointer-events: none;
-      opacity: 0.62;
+    @include when(disabled) {
+      cursor: not-allowed;
+      color: getCssVar('disabled-text-color');
+      background: getCssVar('disabled-bg-color');
+      border-bottom-color: getCssVar('disabled-border-color');
     }
   }
 
@@ -254,9 +262,11 @@
 
   @include when(interactive) {
     @include e(row) {
-      cursor: pointer;
+      &:not(.is-disabled) {
+        cursor: pointer;
+      }
 
-      &:hover {
+      &:not(.is-disabled):hover {
         background: getCssVar('fill-color-light');
       }
 
@@ -299,6 +309,11 @@
         background: var(--el-data-list-active-background);
         box-shadow: inset 2px 0 0 var(--el-data-list-active-indicator);
       }
+
+      @include when(disabled) {
+        background: getCssVar('disabled-bg-color');
+        border-bottom-color: getCssVar('disabled-border-color');
+      }
     }
 
     @include e(cell) {
@@ -316,7 +331,7 @@
 
     @include when(interactive) {
       @include e(row) {
-        &:hover {
+        &:not(.is-disabled):hover {
           --el-data-list-row-accent-color: #{getCssVar('color-primary')};
           --el-data-list-row-accent-opacity: 1;
 
@@ -330,6 +345,25 @@
           background: var(--el-data-list-hover-background);
           box-shadow: inset 0 0 0 2px var(--el-data-list-focus-ring);
           outline: none;
+        }
+      }
+    }
+  }
+
+  @include res(xs) {
+    @include when(responsive) {
+      @include e((head, row)) {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+  }
+
+  @media (forced-colors: active) {
+    @include when(interactive) {
+      @include e(row) {
+        &:focus-visible {
+          outline: 2px solid Highlight;
+          outline-offset: -2px;
         }
       }
     }
