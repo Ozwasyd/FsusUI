@@ -25,6 +25,7 @@ public static class TestAppBuilder
       {
         UseHeadlessDrawing = false,
       })
+      .WithInterFont()
       .ConfigureFonts(fontManager =>
       {
         if (Environment.GetEnvironmentVariable("FSUS_HEADLESS_GSANS") == "1")
