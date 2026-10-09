@@ -5,6 +5,7 @@ using Avalonia.Controls;
 using Avalonia.Controls.Templates;
 using Avalonia.Headless.XUnit;
 using Avalonia.Input;
+using Avalonia.Media;
 using Avalonia.Threading;
 using FsusUI.Avalonia.Controls;
 using System.Runtime.CompilerServices;
@@ -538,7 +539,14 @@ public class FsusVirtualizationHeadlessTests
     }));
 
     table.RefreshLayout();
-    var window = new Window { Width = 240, Height = 160, Content = table };
+    var window = new Window
+    {
+      Width = 240,
+      Height = 160,
+      Content = table,
+      FontFamily = new FontFamily(
+        "avares://FsusUI.Avalonia.HeadlessTests/Assets/TableV2Fonts#Noto Sans"),
+    };
     window.Show();
     window.Measure(new Size(240, 160));
     window.Arrange(new Rect(0, 0, 240, 160));

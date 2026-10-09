@@ -272,6 +272,9 @@ public class FsusTableV2RenderedEvidenceTests
 
   private static void AttachTheme(Window window)
   {
+    // The sealed TableV2 images use Noto Sans 2.004, including its layout metrics.
+    window.FontFamily = new FontFamily(
+      "avares://FsusUI.Avalonia.HeadlessTests/Assets/TableV2Fonts#Noto Sans");
     var resources = new ResourceDictionary();
     new FsusThemeManager().Apply(resources, new FsusThemeOptions
     {
@@ -328,6 +331,10 @@ public class FsusTableV2RenderedEvidenceTests
     }
 
     Assert.True(File.Exists(outputPath), $"sealed artifact missing: {outputPath}");
+    var evidenceDirectory = HeadlessVisualEvidenceOutput.ResolveOutputRoot(
+      FindRepositoryRoot(), "issue-285-table-v2");
+    File.WriteAllBytes(
+      Path.Combine(evidenceDirectory, Path.GetFileName(outputPath)), bytes);
     Assert.Equal(File.ReadAllBytes(outputPath), bytes);
     return bytes;
   }
