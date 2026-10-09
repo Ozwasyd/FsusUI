@@ -100,12 +100,14 @@ test('canonical producer emits Select and its downstream contracts with exact in
   const unboundOptions = originalSelectFile.getDescendantsOfKind(ts.SyntaxKind.Identifier)
     .filter((node) => node.getText() === 'Options')
   assert.equal(unboundOptions.length, 2)
-  assert.ok(unboundOptions.every((node) => !node.getSymbol()), 'Original SFC has an unbound existing Popper Options annotation.')
+  assert.ok(unboundOptions.every((node) => !node.getSymbol()?.getDeclarations().length), 'Original SFC has no declaration for its existing Popper Options annotation.')
   // The original SFC never emitted a usable declaration for this free name.
   // Bind its unchanged Partial<Options> annotation to the existing Popper owner
   // before comparing the complete inferred SFC contract. Original useSelect
   // parameters, return fields and ref types are compared without normalization.
-  originalSelectFile.insertText(0, "import type { Options } from '@popperjs/core'\n")
+  const originalDirectiveEnd = originalSelectFile.getFullText().indexOf('\n', originalSelectFile.getFullText().indexOf('// @ts-nocheck'))
+  assert.ok(originalDirectiveEnd >= 0)
+  originalSelectFile.insertText(originalDirectiveEnd + 1, "import type { Options } from '@popperjs/core'\n")
   capturedProject.createSourceFile(path.join(root, selectDir, 'index.original.ts'),
     original(`${selectDir}/index.ts`).replace("from './src/select.vue'", "from './src/select.original'"),
   )
