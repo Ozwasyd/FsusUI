@@ -1,0 +1,10 @@
+{
+  "producerExitCode": 1,
+  "artifacts": {
+    "vue/internal/build-utils/dist/index.d.cts": "36af9bc00e420ba7ebb6affdbb0184efa68c396d032568a12c9ea8db83d4d293",
+    "vue/internal/build-utils/dist/index.cjs": "df7aea464ad9d85264cbc50c465565039629edd1ff134f940afb5c5003b6841f",
+    "vue/internal/build-utils/dist/index.mjs": "7a52758238890366e3aa551ddb624214d36616e41f59908966dca3376368c546",
+    "vue/internal/build-utils/dist/index.d.mts": "36af9bc00e420ba7ebb6affdbb0184efa68c396d032568a12c9ea8db83d4d293",
+    "vue/internal/build-utils/dist/index.d.ts": "36af9bc00e420ba7ebb6affdbb0184efa68c396d032568a12c9ea8db83d4d293"
+  }
+}

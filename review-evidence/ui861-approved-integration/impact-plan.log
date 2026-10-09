@@ -1,0 +1,11 @@
+RUN  view-transitions                    suite-test-changed             3 cells  suite test/config changed: vue/packages/components/select-v2/__tests__/select.test.ts, vue/packages/components/select-v2/src/option-item.vue, vue/packages/components/select-v2/src/select-dropdown.tsx +2 more
+RUN  motion-ssr                          suite-test-changed             1 cells  suite test/config changed: vue/packages/components/select-v2/__tests__/select.test.ts, vue/packages/components/select-v2/src/option-item.vue, vue/packages/components/select-v2/src/select-dropdown.tsx +2 more
+RUN  dom-layout                          suite-test-changed             4 cells  suite test/config changed: vue/packages/components/select-v2/__tests__/select.test.ts, vue/packages/components/select-v2/src/option-item.vue, vue/packages/components/select-v2/src/select-dropdown.tsx +2 more
+RUN  geometry-smoke                      suite-test-changed             1 cells  suite test/config changed: vue/packages/components/select-v2/__tests__/select.test.ts, vue/packages/components/select-v2/src/option-item.vue, vue/packages/components/select-v2/src/select-dropdown.tsx +2 more
+RUN  markdown-editor-interaction         unknown-production-change      3 cells  unknown production change; conservative run
+RUN  visual-boundary-audit               suite-test-changed             8 cells  suite test/config changed: vue/packages/components/select-v2/__tests__/select.test.ts, vue/packages/components/select-v2/src/option-item.vue, vue/packages/components/select-v2/src/select-dropdown.tsx +2 more
+RUN  web-interaction-conformance         suite-test-changed             3 cells  suite test/config changed: spec/components/contracts/v1/vue-public-contracts.json, spec/components/contracts/v2/contract-v2.json, vue/packages/components/select-v2/__tests__/select.test.ts +4 more
+RUN  visual-runtime-reuse                unknown-production-change      4 cells  unknown production change; conservative run
+
+digest=82f6ebaf926aa71328b6d67ec82a0a911c1eddc48e30f2f21186447c089264b0
+receipt=/workspace/ui861-approved-integration/.tmp/ui861-combined-impact.json

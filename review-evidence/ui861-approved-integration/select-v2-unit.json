@@ -1,0 +1,15 @@
+{
+  "command": [
+    "pnpm",
+    "exec",
+    "vitest",
+    "run",
+    "--config",
+    "vue/vitest.config.ts",
+    "vue/packages/components/select-v2"
+  ],
+  "exitCode": 0,
+  "sourceSha": "a58cae49d4cbbed48e62c877bab24a7c0041bef6",
+  "startedAt": "2026-10-09T06:32:44.465300+00:00",
+  "endedAt": "2026-10-09T06:33:09.545908+00:00"
+}

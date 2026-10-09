@@ -1,0 +1,15 @@
+{
+  "command": [
+    "pnpm",
+    "-C",
+    "vue",
+    "exec",
+    "playwright",
+    "test",
+    "--config",
+    "playwright.conformance-interaction.config.ts",
+    "--list"
+  ],
+  "exitCode": 1,
+  "sourceSha": "a58cae49d4cbbed48e62c877bab24a7c0041bef6"
+}

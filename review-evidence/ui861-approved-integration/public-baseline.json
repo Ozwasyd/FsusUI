@@ -1,0 +1,12 @@
+{
+  "command": [
+    "node",
+    "scripts/avalonia-vue-public-api-baseline.mjs",
+    "--check"
+  ],
+  "exitCode": 0,
+  "sourceSha": "a58cae49d4cbbed48e62c877bab24a7c0041bef6",
+  "startedAt": "2026-10-09T06:31:55.225778+00:00",
+  "endedAt": "2026-10-09T06:32:07.641995+00:00",
+  "log": "public-baseline.log"
+}

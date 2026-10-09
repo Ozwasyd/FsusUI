@@ -1,0 +1,1 @@
+[deps:check] ok authority=config/dependencies/npm-authority.json packages=94 drifts=0

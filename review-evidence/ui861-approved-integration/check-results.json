@@ -1,0 +1,447 @@
+{
+  "sourceSha": "a58cae49d4cbbed48e62c877bab24a7c0041bef6",
+  "results": {
+    "authority": {
+      "command": [
+        "node",
+        "scripts/check-npm-authority.mjs"
+      ],
+      "exitCode": 0,
+      "sourceSha": "a58cae49d4cbbed48e62c877bab24a7c0041bef6",
+      "startedAt": "2026-10-09T06:31:53.976423+00:00",
+      "endedAt": "2026-10-09T06:31:54.114500+00:00",
+      "log": "authority.log"
+    },
+    "browser-collection-list-corrected": {
+      "command": [
+        "pnpm",
+        "exec",
+        "playwright",
+        "test",
+        "--config",
+        "vue/playwright.conformance-interaction.config.ts",
+        "--list"
+      ],
+      "exitCode": 0,
+      "sourceSha": "a58cae49d4cbbed48e62c877bab24a7c0041bef6"
+    },
+    "browser-collection-list": {
+      "command": [
+        "pnpm",
+        "-C",
+        "vue",
+        "exec",
+        "playwright",
+        "test",
+        "--config",
+        "playwright.conformance-interaction.config.ts",
+        "--list"
+      ],
+      "exitCode": 1,
+      "sourceSha": "a58cae49d4cbbed48e62c877bab24a7c0041bef6"
+    },
+    "build-utils-producer": {
+      "command": [
+        "pnpm",
+        "-C",
+        "vue/internal/build-utils",
+        "run",
+        "build"
+      ],
+      "exitCode": 1,
+      "sourceSha": "a58cae49d4cbbed48e62c877bab24a7c0041bef6",
+      "endedAt": "2026-10-09T06:34:23.262249+00:00"
+    },
+    "chromium-cell-prepared": {
+      "command": [
+        "node",
+        "scripts/conformance-playwright-runner.mjs",
+        "--cell",
+        "web-interaction-conformance/chromium",
+        "--group",
+        "pr",
+        "--impact-plan",
+        ".tmp/ui861-combined-impact-clean.json",
+        "--evidence-dir",
+        ".tmp/ui861-combined-conformance-prepared"
+      ],
+      "exitCode": 0,
+      "sourceSha": "a58cae49d4cbbed48e62c877bab24a7c0041bef6",
+      "environment": {
+        "CI": "true",
+        "FSUS_CONFORMANCE_INTERACTION_PORT": "5312",
+        "PLAYWRIGHT_BROWSERS_PATH": "/workspace/.setup/ms-playwright"
+      },
+      "startedAt": "2026-10-09T06:35:51.607906+00:00",
+      "endedAt": "2026-10-09T06:36:40.331487+00:00"
+    },
+    "chromium-cell": {
+      "command": [
+        "node",
+        "scripts/conformance-playwright-runner.mjs",
+        "--cell",
+        "web-interaction-conformance/chromium",
+        "--group",
+        "pr",
+        "--impact-plan",
+        ".tmp/ui861-combined-impact-clean.json",
+        "--evidence-dir",
+        ".tmp/ui861-combined-conformance"
+      ],
+      "exitCode": 1,
+      "sourceSha": "a58cae49d4cbbed48e62c877bab24a7c0041bef6",
+      "environment": {
+        "CI": "true",
+        "FSUS_CONFORMANCE_INTERACTION_PORT": "5312"
+      },
+      "startedAt": "2026-10-09T06:34:20.321486+00:00",
+      "endedAt": "2026-10-09T06:35:11.200365+00:00"
+    },
+    "component-contracts": {
+      "command": [
+        "node",
+        "scripts/component-contract-registry.mjs",
+        "--check"
+      ],
+      "exitCode": 0,
+      "sourceSha": "a58cae49d4cbbed48e62c877bab24a7c0041bef6",
+      "startedAt": "2026-10-09T06:31:56.631985+00:00",
+      "endedAt": "2026-10-09T06:31:57.432746+00:00",
+      "log": "component-contracts.log"
+    },
+    "conformance-aggregate": {
+      "command": [
+        "node",
+        "scripts/conformance-playwright-verify.mjs",
+        "--owner",
+        "playwright-conformance",
+        "--group",
+        "pr",
+        "--receipts-dir",
+        ".readiness/receipts/playwright-conformance",
+        "--commit-sha",
+        "a58cae49d4cbbed48e62c877bab24a7c0041bef6",
+        "--evidence-dir",
+        ".tmp/ui861-combined-conformance-prepared",
+        "--evidence-out",
+        ".tmp/ui861-combined-conformance-prepared/aggregate.json"
+      ],
+      "exitCode": 1,
+      "sourceSha": "a58cae49d4cbbed48e62c877bab24a7c0041bef6",
+      "endedAt": "2026-10-09T06:37:25.542550+00:00",
+      "meaning": "Strict original three-browser verifier; partial Chromium is not aggregate acceptance."
+    },
+    "conformance-policy": {
+      "command": [
+        "node",
+        "scripts/check-playwright-conformance-owner-policy.mjs"
+      ],
+      "exitCode": 0,
+      "sourceSha": "a58cae49d4cbbed48e62c877bab24a7c0041bef6",
+      "startedAt": "2026-10-09T06:31:58.629926+00:00",
+      "endedAt": "2026-10-09T06:31:59.403415+00:00",
+      "log": "conformance-policy.log"
+    },
+    "contract-v2-tests": {
+      "command": [
+        "node",
+        "--test",
+        "tests/contract-v2.test.mjs"
+      ],
+      "exitCode": 0,
+      "sourceSha": "a58cae49d4cbbed48e62c877bab24a7c0041bef6",
+      "startedAt": "2026-10-09T06:31:57.433057+00:00",
+      "endedAt": "2026-10-09T06:32:18.564487+00:00",
+      "log": "contract-v2-tests.log"
+    },
+    "contract-v2": {
+      "command": [
+        "node",
+        "scripts/contract-v2.mjs",
+        "--check"
+      ],
+      "exitCode": 0,
+      "sourceSha": "a58cae49d4cbbed48e62c877bab24a7c0041bef6",
+      "startedAt": "2026-10-09T06:31:55.749804+00:00",
+      "endedAt": "2026-10-09T06:31:56.631635+00:00",
+      "log": "contract-v2.log"
+    },
+    "dependency-policy-tests": {
+      "command": [
+        "node",
+        "scripts/test-dependency-pr-policy.mjs"
+      ],
+      "exitCode": 0,
+      "sourceSha": "a58cae49d4cbbed48e62c877bab24a7c0041bef6",
+      "startedAt": "2026-10-09T06:31:55.146350+00:00",
+      "endedAt": "2026-10-09T06:31:55.225357+00:00",
+      "log": "dependency-policy-tests.log"
+    },
+    "dependency-policy": {
+      "command": [
+        "node",
+        "scripts/check-dependency-pr-policy.mjs"
+      ],
+      "exitCode": 0,
+      "sourceSha": "a58cae49d4cbbed48e62c877bab24a7c0041bef6",
+      "startedAt": "2026-10-09T06:31:55.037464+00:00",
+      "endedAt": "2026-10-09T06:31:55.143284+00:00",
+      "log": "dependency-policy.log"
+    },
+    "deps-baseline": {
+      "command": [
+        "node",
+        "scripts/deps-baseline-verify.mjs"
+      ],
+      "exitCode": 0,
+      "sourceSha": "a58cae49d4cbbed48e62c877bab24a7c0041bef6",
+      "startedAt": "2026-10-09T06:31:54.127230+00:00",
+      "endedAt": "2026-10-09T06:31:54.198559+00:00",
+      "log": "deps-baseline.log"
+    },
+    "deps-check-tests": {
+      "command": [
+        "node",
+        "scripts/test-deps-check.mjs"
+      ],
+      "exitCode": 0,
+      "sourceSha": "a58cae49d4cbbed48e62c877bab24a7c0041bef6",
+      "startedAt": "2026-10-09T06:31:54.115000+00:00",
+      "endedAt": "2026-10-09T06:31:55.749415+00:00",
+      "log": "deps-check-tests.log"
+    },
+    "deps-check": {
+      "command": [
+        "node",
+        "scripts/deps-check.mjs"
+      ],
+      "exitCode": 0,
+      "sourceSha": "a58cae49d4cbbed48e62c877bab24a7c0041bef6",
+      "startedAt": "2026-10-09T06:31:53.976802+00:00",
+      "endedAt": "2026-10-09T06:31:55.037189+00:00",
+      "log": "deps-check.log"
+    },
+    "deps-sync-tests": {
+      "command": [
+        "node",
+        "scripts/test-deps-sync.mjs"
+      ],
+      "exitCode": 0,
+      "sourceSha": "a58cae49d4cbbed48e62c877bab24a7c0041bef6",
+      "startedAt": "2026-10-09T06:31:53.977143+00:00",
+      "endedAt": "2026-10-09T06:31:54.126816+00:00",
+      "log": "deps-sync-tests.log"
+    },
+    "ensure-icons": {
+      "command": [
+        "pnpm",
+        "run",
+        "ensure:icons"
+      ],
+      "exitCode": 0,
+      "sourceSha": "a58cae49d4cbbed48e62c877bab24a7c0041bef6",
+      "startedAt": "2026-10-09T06:32:18.975193+00:00"
+    },
+    "ensure-wasm": {
+      "command": [
+        "pnpm",
+        "run",
+        "ensure:wasm"
+      ],
+      "exitCode": 0,
+      "sourceSha": "a58cae49d4cbbed48e62c877bab24a7c0041bef6",
+      "startedAt": "2026-10-09T06:32:18.259314+00:00"
+    },
+    "focused-lint": {
+      "command": [
+        "pnpm",
+        "exec",
+        "eslint",
+        "--no-ignore",
+        "--config",
+        "vue/eslint.config.mjs",
+        "scripts/conformance-playwright-owner-run.mjs",
+        "scripts/conformance-playwright-runner.mjs",
+        "scripts/markdown-playwright-runner.mjs",
+        "tests/conformance-playwright-identity.test.mjs",
+        "tests/contract-v2.test.mjs",
+        "vue/packages/components/select-v2/__tests__/select.test.ts",
+        "vue/packages/components/select-v2/src/option-item.vue",
+        "vue/packages/components/select-v2/src/select-dropdown.tsx",
+        "vue/packages/components/select-v2/src/select.vue",
+        "vue/packages/components/select-v2/src/useSelect.ts"
+      ],
+      "exitCode": 0,
+      "sourceSha": "a58cae49d4cbbed48e62c877bab24a7c0041bef6",
+      "startedAt": "2026-10-09T06:33:09.546332+00:00",
+      "endedAt": "2026-10-09T06:33:13.941382+00:00"
+    },
+    "fresh-conflict-check": {
+      "head": "a58cae49d4cbbed48e62c877bab24a7c0041bef6",
+      "base": "b17077f3afd4a80ff3bdc0fe81d5dfc353ffddf2",
+      "command": [
+        "git",
+        "merge-tree",
+        "--write-tree",
+        "b17077f3afd4a80ff3bdc0fe81d5dfc353ffddf2",
+        "a58cae49d4cbbed48e62c877bab24a7c0041bef6"
+      ],
+      "exitCode": 0,
+      "stdout": "310d454ebc6f6197486569b9f9031ea71df600ce\n",
+      "stderr": "",
+      "checkedAt": "2026-10-09T06:36:32.612435+00:00"
+    },
+    "identity-tests-prepared": {
+      "command": [
+        "node",
+        "--test",
+        "tests/conformance-playwright-identity.test.mjs"
+      ],
+      "exitCode": 0,
+      "sourceSha": "a58cae49d4cbbed48e62c877bab24a7c0041bef6",
+      "startedAt": "2026-10-09T06:32:44.464850+00:00",
+      "endedAt": "2026-10-09T06:32:48.371711+00:00"
+    },
+    "identity-tests": {
+      "command": [
+        "node",
+        "--test",
+        "tests/conformance-playwright-identity.test.mjs"
+      ],
+      "exitCode": 1,
+      "sourceSha": "a58cae49d4cbbed48e62c877bab24a7c0041bef6",
+      "startedAt": "2026-10-09T06:31:55.201830+00:00",
+      "endedAt": "2026-10-09T06:31:58.629608+00:00",
+      "log": "identity-tests.log"
+    },
+    "impact-plan": {
+      "command": [
+        "node",
+        "scripts/playwright-impact-plan.mjs",
+        "--base",
+        "b17077f3afd4a80ff3bdc0fe81d5dfc353ffddf2",
+        "--receipt",
+        ".tmp/ui861-combined-impact.json",
+        "--group",
+        "pr"
+      ],
+      "exitCode": 0,
+      "sourceSha": "a58cae49d4cbbed48e62c877bab24a7c0041bef6"
+    },
+    "markdown-policy": {
+      "command": [
+        "node",
+        "scripts/check-playwright-markdown-owner-policy.mjs"
+      ],
+      "exitCode": 0,
+      "sourceSha": "a58cae49d4cbbed48e62c877bab24a7c0041bef6",
+      "startedAt": "2026-10-09T06:31:59.403902+00:00",
+      "endedAt": "2026-10-09T06:31:59.878464+00:00",
+      "log": "markdown-policy.log"
+    },
+    "public-baseline": {
+      "command": [
+        "node",
+        "scripts/avalonia-vue-public-api-baseline.mjs",
+        "--check"
+      ],
+      "exitCode": 0,
+      "sourceSha": "a58cae49d4cbbed48e62c877bab24a7c0041bef6",
+      "startedAt": "2026-10-09T06:31:55.225778+00:00",
+      "endedAt": "2026-10-09T06:32:07.641995+00:00",
+      "log": "public-baseline.log"
+    },
+    "renovate-tests": {
+      "command": [
+        "node",
+        "scripts/test-renovate-governance.mjs"
+      ],
+      "exitCode": 0,
+      "sourceSha": "a58cae49d4cbbed48e62c877bab24a7c0041bef6",
+      "startedAt": "2026-10-09T06:31:54.562076+00:00",
+      "endedAt": "2026-10-09T06:31:55.201500+00:00",
+      "log": "renovate-tests.log"
+    },
+    "select-v2-unit": {
+      "command": [
+        "pnpm",
+        "exec",
+        "vitest",
+        "run",
+        "--config",
+        "vue/vitest.config.ts",
+        "vue/packages/components/select-v2"
+      ],
+      "exitCode": 0,
+      "sourceSha": "a58cae49d4cbbed48e62c877bab24a7c0041bef6",
+      "startedAt": "2026-10-09T06:32:44.465300+00:00",
+      "endedAt": "2026-10-09T06:33:09.545908+00:00"
+    },
+    "update-surface": {
+      "command": [
+        "node",
+        "scripts/check-update-surface.mjs"
+      ],
+      "exitCode": 0,
+      "sourceSha": "a58cae49d4cbbed48e62c877bab24a7c0041bef6",
+      "startedAt": "2026-10-09T06:31:54.198831+00:00",
+      "endedAt": "2026-10-09T06:31:54.561714+00:00",
+      "log": "update-surface.log"
+    },
+    "vitest-typecheck-after-producer-attempt": {
+      "command": [
+        "pnpm",
+        "run",
+        "typecheck:vitest:no-cache"
+      ],
+      "exitCode": 0,
+      "sourceSha": "a58cae49d4cbbed48e62c877bab24a7c0041bef6",
+      "precondition": "Original unbuild producer created artifacts but failed strict warning gate (exit 1); this does not qualify producer as PASS."
+    },
+    "vitest-typecheck": {
+      "command": [
+        "pnpm",
+        "run",
+        "typecheck:vitest:no-cache"
+      ],
+      "exitCode": 2,
+      "sourceSha": "a58cae49d4cbbed48e62c877bab24a7c0041bef6",
+      "startedAt": "2026-10-09T06:32:48.372199+00:00",
+      "endedAt": "2026-10-09T06:33:42.001372+00:00"
+    },
+    "web-typecheck": {
+      "command": [
+        "pnpm",
+        "run",
+        "typecheck:web:no-cache"
+      ],
+      "exitCode": 0,
+      "sourceSha": "a58cae49d4cbbed48e62c877bab24a7c0041bef6",
+      "startedAt": "2026-10-09T06:32:44.465923+00:00",
+      "endedAt": "2026-10-09T06:33:29.030965+00:00"
+    }
+  },
+  "runtime": {
+    "chromium": {
+      "status": "PASS",
+      "tests": 2,
+      "interactionTraces": 2,
+      "actionSteps": 14,
+      "baseline": "b17077f3afd4a80ff3bdc0fe81d5dfc353ffddf2",
+      "candidate": "a58cae49d4cbbed48e62c877bab24a7c0041bef6"
+    },
+    "firefox": {
+      "status": "UNRUN",
+      "reason": "Known host launch failure; prior real cell evidence at source 80f6e96b8d5419942583711fb417492b1f0abb67 retained separately. /proc/self/uid_map is read-only (EROFS); Fontconfig and dconf caches are not writable."
+    },
+    "webkit": {
+      "status": "UNRUN",
+      "reason": "Known host dependencies unavailable: libgtk-4.so.1, libgraphene-1.0.so.0, libharfbuzz-icu.so.0, libmanette-0.2.so.0, libhyphen.so.0, libwoff2dec.so.1.0.2, libGLESv2.so.2."
+    },
+    "aggregate": {
+      "status": "FAIL",
+      "reason": "Original verifier exit 1: required Firefox and WebKit receipts absent; strict cardinality unchanged."
+    }
+  },
+  "notAllGreen": true
+}

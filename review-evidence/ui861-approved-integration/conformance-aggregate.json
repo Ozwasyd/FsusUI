@@ -1,0 +1,22 @@
+{
+  "command": [
+    "node",
+    "scripts/conformance-playwright-verify.mjs",
+    "--owner",
+    "playwright-conformance",
+    "--group",
+    "pr",
+    "--receipts-dir",
+    ".readiness/receipts/playwright-conformance",
+    "--commit-sha",
+    "a58cae49d4cbbed48e62c877bab24a7c0041bef6",
+    "--evidence-dir",
+    ".tmp/ui861-combined-conformance-prepared",
+    "--evidence-out",
+    ".tmp/ui861-combined-conformance-prepared/aggregate.json"
+  ],
+  "exitCode": 1,
+  "sourceSha": "a58cae49d4cbbed48e62c877bab24a7c0041bef6",
+  "endedAt": "2026-10-09T06:37:25.542550+00:00",
+  "meaning": "Strict original three-browser verifier; partial Chromium is not aggregate acceptance."
+}

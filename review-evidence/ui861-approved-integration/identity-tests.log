@@ -1,0 +1,45 @@
+✔ real shallow merge reproduces collection failure, acquires exact base and uses existing inputs (270.579456ms)
+✔ full local history accepts the exact ancestor baseline (116.44279ms)
+✔ non-PR retains the origin/main merge-base behavior (145.620078ms)
+✔ missing base rejects before child spawn or baseline fetch (148.181745ms)
+✔ malformed base rejects before child spawn or baseline fetch (148.051048ms)
+✔ stale GitHub candidate rejects before child spawn or baseline fetch (188.023479ms)
+✔ stale explicit candidate rejects before child spawn or baseline fetch (196.776436ms)
+✔ wrong supplied baseline rejects before child spawn or baseline fetch (168.89515ms)
+✔ stale merge base rejects before child spawn or baseline fetch (137.645947ms)
+✔ head parent used as base rejects before child spawn or baseline fetch (153.010558ms)
+✔ an unrelated existing commit is rejected (135.561028ms)
+✔ an annotated tag SHA cannot substitute for the exact baseline commit (198.79891ms)
+✔ an unavailable unrelated SHA is rejected without acquisition (235.367291ms)
+✔ failed exact baseline acquisition stays a failure (225.33484ms)
+✔ non-PR missing baseline stays a failure (264.403497ms)
+✔ child environment retains other owners and rejects inconsistent inputs (1.056498ms)
+✔ original report-level collection error survives diagnostic handling (0.567994ms)
+✖ failed collection retains the original JSON report and counters in its failure receipt (0.978841ms)
+ℹ tests 18
+ℹ suites 0
+ℹ pass 17
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3369.066188
+
+✖ failing tests:
+
+test at tests/conformance-playwright-identity.test.mjs:368:1
+✖ failed collection retains the original JSON report and counters in its failure receipt (0.978841ms)
+  Error: ENOENT: no such file or directory, mkdtemp '/workspace/ui861-approved-integration/.tmp/identity-diagnostic-XXXXXX'
+      at mkdtempSync (node:fs:3111:18)
+      at TestContext.<anonymous> (file:///workspace/ui861-approved-integration/tests/conformance-playwright-identity.test.mjs:369:19)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    errno: -2,
+    code: 'ENOENT',
+    syscall: 'mkdtemp',
+    path: '/workspace/ui861-approved-integration/.tmp/identity-diagnostic-XXXXXX'
+  }

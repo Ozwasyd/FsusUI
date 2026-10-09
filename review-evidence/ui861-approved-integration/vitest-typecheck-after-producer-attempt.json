@@ -1,0 +1,10 @@
+{
+  "command": [
+    "pnpm",
+    "run",
+    "typecheck:vitest:no-cache"
+  ],
+  "exitCode": 0,
+  "sourceSha": "a58cae49d4cbbed48e62c877bab24a7c0041bef6",
+  "precondition": "Original unbuild producer created artifacts but failed strict warning gate (exit 1); this does not qualify producer as PASS."
+}

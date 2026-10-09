@@ -1,0 +1,7 @@
+
+> @ typecheck:vitest:no-cache /workspace/ui861-approved-integration
+> node ./scripts/with-node-heap.mjs node ./scripts/run-typecheck.mjs vitest --no-cache
+
+[typecheck:vitest] no-cache project=vue/tsconfig.vitest.json
+vue/packages/theme-chalk/gulpfile.ts(11,26): error TS2307: Cannot find module '@element-plus/build-utils' or its corresponding type declarations.
+ ELIFECYCLE  Command failed with exit code 2.

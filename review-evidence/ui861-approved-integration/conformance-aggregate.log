@@ -1,0 +1,6 @@
+[playwright-conformance] missing receipt for web-interaction-conformance/firefox
+[playwright-conformance] missing receipt for web-interaction-conformance/webkit
+[playwright-conformance] browser cell cardinality is missing or duplicated
+[playwright-conformance] missing required firefox receipt
+[playwright-conformance] missing required webkit receipt
+[playwright-conformance] owner=playwright-conformance group=pr status=failure cells=3

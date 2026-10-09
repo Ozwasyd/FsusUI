@@ -1,0 +1,11 @@
+{
+  "command": [
+    "node",
+    "scripts/test-deps-sync.mjs"
+  ],
+  "exitCode": 0,
+  "sourceSha": "a58cae49d4cbbed48e62c877bab24a7c0041bef6",
+  "startedAt": "2026-10-09T06:31:53.977143+00:00",
+  "endedAt": "2026-10-09T06:31:54.126816+00:00",
+  "log": "deps-sync-tests.log"
+}

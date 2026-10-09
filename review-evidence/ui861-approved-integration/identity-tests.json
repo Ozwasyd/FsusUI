@@ -1,0 +1,12 @@
+{
+  "command": [
+    "node",
+    "--test",
+    "tests/conformance-playwright-identity.test.mjs"
+  ],
+  "exitCode": 1,
+  "sourceSha": "a58cae49d4cbbed48e62c877bab24a7c0041bef6",
+  "startedAt": "2026-10-09T06:31:55.201830+00:00",
+  "endedAt": "2026-10-09T06:31:58.629608+00:00",
+  "log": "identity-tests.log"
+}

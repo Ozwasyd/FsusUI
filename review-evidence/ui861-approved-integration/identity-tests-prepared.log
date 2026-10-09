@@ -1,0 +1,27 @@
+✔ real shallow merge reproduces collection failure, acquires exact base and uses existing inputs (492.751023ms)
+✔ full local history accepts the exact ancestor baseline (160.910325ms)
+✔ non-PR retains the origin/main merge-base behavior (195.781756ms)
+✔ missing base rejects before child spawn or baseline fetch (168.430975ms)
+✔ malformed base rejects before child spawn or baseline fetch (162.376183ms)
+✔ stale GitHub candidate rejects before child spawn or baseline fetch (189.974358ms)
+✔ stale explicit candidate rejects before child spawn or baseline fetch (252.118809ms)
+✔ wrong supplied baseline rejects before child spawn or baseline fetch (217.630112ms)
+✔ stale merge base rejects before child spawn or baseline fetch (202.719826ms)
+✔ head parent used as base rejects before child spawn or baseline fetch (192.693361ms)
+✔ an unrelated existing commit is rejected (198.654513ms)
+✔ an annotated tag SHA cannot substitute for the exact baseline commit (240.425595ms)
+✔ an unavailable unrelated SHA is rejected without acquisition (176.436899ms)
+✔ failed exact baseline acquisition stays a failure (116.155527ms)
+✔ non-PR missing baseline stays a failure (155.127421ms)
+✔ child environment retains other owners and rejects inconsistent inputs (0.517979ms)
+✔ original report-level collection error survives diagnostic handling (0.364177ms)
+[identity-unit] identity-unit/collection failed: Playwright collection failed: fatal: Not a valid object name origin/main
+✔ failed collection retains the original JSON report and counters in its failure receipt (80.598838ms)
+ℹ tests 18
+ℹ suites 0
+ℹ pass 18
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3845.09133

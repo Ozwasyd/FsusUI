@@ -1,0 +1,26 @@
+{
+  "checks": [
+    {
+      "cwd": "/workspace/FsusUI",
+      "head": "2103366e4a3d79e0dc5ab0ac5445afc2f1f35216",
+      "status": "",
+      "branch": "fix/issue-825-package-capability"
+    },
+    {
+      "cwd": "/workspace/FsusBlog",
+      "head": "6e287562b3f861d3eb81dcb23f93e6243205abd8",
+      "status": "",
+      "branch": "verify/issue-825-blog-6e287"
+    },
+    {
+      "cwd": "/workspace/issue825-conformance-identity",
+      "head": "6583b7a59a0a871e13b97594a583ca58ca63027e",
+      "status": "",
+      "branch": "fix/issue-825-conformance-identity"
+    }
+  ],
+  "localAliasVueTarget": "/workspace/FsusBlog/src/frontend/node_modules/vue",
+  "localAliasUnchanged": true,
+  "consumerRuntimeOwner": "original2228",
+  "consumerAcceptance": "OPEN; no duplicated manage-write run in this integration task"
+}

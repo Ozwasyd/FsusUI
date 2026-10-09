@@ -1,0 +1,24 @@
+{
+  "command": [
+    "pnpm",
+    "exec",
+    "eslint",
+    "--no-ignore",
+    "--config",
+    "vue/eslint.config.mjs",
+    "scripts/conformance-playwright-owner-run.mjs",
+    "scripts/conformance-playwright-runner.mjs",
+    "scripts/markdown-playwright-runner.mjs",
+    "tests/conformance-playwright-identity.test.mjs",
+    "tests/contract-v2.test.mjs",
+    "vue/packages/components/select-v2/__tests__/select.test.ts",
+    "vue/packages/components/select-v2/src/option-item.vue",
+    "vue/packages/components/select-v2/src/select-dropdown.tsx",
+    "vue/packages/components/select-v2/src/select.vue",
+    "vue/packages/components/select-v2/src/useSelect.ts"
+  ],
+  "exitCode": 0,
+  "sourceSha": "a58cae49d4cbbed48e62c877bab24a7c0041bef6",
+  "startedAt": "2026-10-09T06:33:09.546332+00:00",
+  "endedAt": "2026-10-09T06:33:13.941382+00:00"
+}

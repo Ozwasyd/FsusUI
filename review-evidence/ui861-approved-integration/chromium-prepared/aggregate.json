@@ -1,0 +1,30 @@
+{
+  "owner": "playwright-conformance",
+  "gate": "playwright-conformance",
+  "group": "pr",
+  "cells": [
+    {
+      "cellId": "web-interaction-conformance/chromium",
+      "status": "success",
+      "tests": {
+        "total": 2,
+        "passed": 2,
+        "failed": 0,
+        "skipped": 0,
+        "flaky": 0
+      }
+    },
+    {
+      "cellId": "web-interaction-conformance/firefox",
+      "status": "missing",
+      "tests": null
+    },
+    {
+      "cellId": "web-interaction-conformance/webkit",
+      "status": "missing",
+      "tests": null
+    }
+  ],
+  "status": "failure",
+  "traceDigest": null
+}

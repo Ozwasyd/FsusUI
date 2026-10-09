@@ -1,0 +1,46 @@
+{
+  "sourceSha": "a58cae49d4cbbed48e62c877bab24a7c0041bef6",
+  "currentRuntime": {
+    "chromium": {
+      "status": "PASS",
+      "tests": 2,
+      "interactionTraces": 2,
+      "actionSteps": 14,
+      "baseline": "b17077f3afd4a80ff3bdc0fe81d5dfc353ffddf2",
+      "candidate": "a58cae49d4cbbed48e62c877bab24a7c0041bef6"
+    },
+    "firefox": {
+      "status": "UNRUN",
+      "reason": "Known host launch failure; prior real cell evidence at source 80f6e96b8d5419942583711fb417492b1f0abb67 retained separately. /proc/self/uid_map is read-only (EROFS); Fontconfig and dconf caches are not writable."
+    },
+    "webkit": {
+      "status": "UNRUN",
+      "reason": "Known host dependencies unavailable: libgtk-4.so.1, libgraphene-1.0.so.0, libharfbuzz-icu.so.0, libmanette-0.2.so.0, libhyphen.so.0, libwoff2dec.so.1.0.2, libGLESv2.so.2."
+    },
+    "aggregate": {
+      "status": "FAIL",
+      "reason": "Original verifier exit 1: required Firefox and WebKit receipts absent; strict cardinality unchanged."
+    }
+  },
+  "priorBrowserEvidence": {
+    "repository": "Ozwasyd/FsusUI",
+    "branch": "evidence/issue-825-conformance-collection",
+    "evidenceCommit": "c5d85038a61109d9be31cf5cb7f7be69ce8faea1",
+    "sourceCommit": "80f6e96b8d5419942583711fb417492b1f0abb67",
+    "status": "Firefox and WebKit FAILED; historical evidence is not a current combined-head run."
+  },
+  "producer": {
+    "buildUtils": "FAIL exit 1 on implicit @pnpm/types bundling warning; original strict gate retained. Declarations emitted before failure allowed subsequent Vitest typecheck PASS.",
+    "wasm": "Original ensure:wasm cache HIT after 26 producer input files verified byte-equal to control; copied original artifacts and fingerprints, SHA manifest retained. No producer semantics edited.",
+    "icons": "Original ensure:icons PASS; five generated exports archived as patch and then restored, leaving the source worktree clean."
+  },
+  "otherAcceptance": {
+    "fullRepoLintTypecheckTestBuild": "UNRUN: focused checks only; full CI is not qualified.",
+    "visualSnapshots": "UNRUN on combined head; held audit not run. Previous visual failures remain unresolved.",
+    "nativeImePhysicalDevices": "UNRUN: no native IME/physical-device evidence available.",
+    "windowsMacOSAvaloniaAot": "UNRUN: Linux host; official platform/AOT producer and full CI acceptance remain separate and OPEN. Prior locked SDK/native-platform failures are not converted to PASS.",
+    "publishedArtifactConsumerInstall": "UNRUN on combined head; no package published, no package capability fabricated. Historical issue825 package consumer budget failure remains OPEN.",
+    "blogManageWriteBothThemes": "OPEN; original2228 owns actual consumer evidence. Blog local alias and frozen UI210 checkout preserved; this integration worktree is not substituted into that consumer alias."
+  },
+  "prohibitedActionsPerformed": []
+}

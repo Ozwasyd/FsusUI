@@ -1,0 +1,11 @@
+{
+  "command": [
+    "pnpm",
+    "run",
+    "typecheck:web:no-cache"
+  ],
+  "exitCode": 0,
+  "sourceSha": "a58cae49d4cbbed48e62c877bab24a7c0041bef6",
+  "startedAt": "2026-10-09T06:32:44.465923+00:00",
+  "endedAt": "2026-10-09T06:33:29.030965+00:00"
+}

@@ -1,0 +1,8 @@
+Listing tests:
+  [chromium] › markdown-interaction-trace.spec.ts:271:5 › mounts representative Vue components and traces real public interactions
+  [chromium] › markdown-interaction-trace.spec.ts:445:5 › traces MarkdownEditor input, paste, drop, exposed methods, and public state
+  [firefox] › markdown-interaction-trace.spec.ts:271:5 › mounts representative Vue components and traces real public interactions
+  [firefox] › markdown-interaction-trace.spec.ts:445:5 › traces MarkdownEditor input, paste, drop, exposed methods, and public state
+  [webkit] › markdown-interaction-trace.spec.ts:271:5 › mounts representative Vue components and traces real public interactions
+  [webkit] › markdown-interaction-trace.spec.ts:445:5 › traces MarkdownEditor input, paste, drop, exposed methods, and public state
+Total: 6 tests in 1 file

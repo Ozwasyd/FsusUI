@@ -1,0 +1,10 @@
+{
+  "command": [
+    "pnpm",
+    "run",
+    "ensure:icons"
+  ],
+  "exitCode": 0,
+  "sourceSha": "a58cae49d4cbbed48e62c877bab24a7c0041bef6",
+  "startedAt": "2026-10-09T06:32:18.975193+00:00"
+}
