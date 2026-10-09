@@ -39,6 +39,62 @@ def font(data):
     return TTFont(io.BytesIO(data), recalcTimestamp=False)
 
 
+def snapshot_tables(face):
+    # getTableData() compiles loaded tables. In particular, compiling OS/2
+    # loads cmap and replaces its original serialization with compiled bytes.
+    # Read the untouched decoded container instead, before any table access.
+    return {tag: face.reader[tag] for tag in face.reader.keys()}
+
+
+def cmap_signature(face):
+    subtables = []
+    for table in face["cmap"].tables:
+        assert table.format in {0, 2, 4, 6, 8, 10, 12, 13, 14}, table.format
+        subtables.append({
+            "format": table.format, "platformID": table.platformID,
+            "encodingID": table.platEncID, "language": table.language,
+            "characters": sorted((code, face.getGlyphID(glyph))
+                                 for code, glyph in table.cmap.items()),
+            "variationSelectors": sorted((selector, sorted(
+                (code, None if glyph is None else face.getGlyphID(glyph))
+                for code, glyph in mappings))
+                for selector, mappings in getattr(table, "uvsDict", {}).items()),
+        })
+    return {"version": face["cmap"].tableVersion, "subtables": subtables}
+
+
+def compare_cmaps(source, derived):
+    original = cmap_signature(source)
+    converted = cmap_signature(derived)
+    assert original == converted, "cmap subtable metadata, character maps or variation selectors changed"
+    return {
+        "sourceSemanticSha256": sha(json.dumps(original, sort_keys=True).encode()),
+        "derivedSemanticSha256": sha(json.dumps(converted, sort_keys=True).encode()),
+        "subtables": len(original["subtables"]),
+        "variationSelectors": sum(len(s["variationSelectors"]) for s in original["subtables"]),
+    }
+
+
+def compare_tables(source_tables, derived_tables, source_bytes, derived_bytes):
+    assert set(source_tables) == set(derived_tables), "table set changed"
+    hashes = {}
+    for tag, data in source_tables.items():
+        encoded = derived_tables[tag]
+        entry = {"source": sha(data), "derived": sha(encoded)}
+        if data != encoded:
+            if tag == "cmap":
+                # Fresh independent parses of the two containers; do not use
+                # the converter's already-loaded/compiled table objects.
+                semantic = compare_cmaps(font(source_bytes), font(derived_bytes))
+                entry.update({"sourceBytes": len(data), "derivedBytes": len(encoded),
+                              "comparison": "semantic-neutral reserialization", **semantic})
+            else:
+                assert tag == "head" and normalized(tag, data) == normalized(tag, encoded), (tag, "table bytes changed")
+                entry["comparison"] = "head.checkSumAdjustment only"
+        hashes[tag] = entry
+    return hashes
+
+
 def glyph_signature(face, code):
     name = face.getBestCmap()[code]
     glyphs = face.getGlyphSet()
@@ -64,6 +120,8 @@ def main():
     chinese = sorted({ord(c) for c in fixture.read_text() + baseline.read_text()
                       if 0x3400 <= ord(c) <= 0x9fff})
     report = {"fontsourceReleaseCommit": RELEASE, "conversion": "fontTools.ttLib.TTFont; flavor=None; recalcTimestamp=False",
+              "tableSnapshot": "Untouched WOFF2Reader/SFNTReader bytes, before TTFont table access or compilation",
+              "allowedTableDifferences": ["head.checkSumAdjustment", "cmap serialization with independently identical subtable metadata, character maps and variation selectors"],
               "fontTools": __version__, "brotli": "1.2.0", "packages": [], "assets": [],
               "scope": "Batch3 Latin, symbols and Simplified Chinese; not the complete multilingual Web repertoire",
               "chineseCodepoints": [f"U+{c:04X}" for c in chinese], "webSubsetChecks": []}
@@ -90,20 +148,17 @@ def main():
                 asset = f"files/{package}-{subset}-{weight}-normal.woff2"
                 original = contents[asset]
                 face = font(original)
+                tables = snapshot_tables(face)
                 assert face["OS/2"].usWeightClass == weight
                 assert "fvar" not in face
-                tables = {tag: face.getTableData(tag) for tag in face.reader.keys()}
                 destination = target / directory / f"{weight}.ttf"
                 destination.parent.mkdir(parents=True, exist_ok=True)
                 face.flavor = None
                 face.save(destination)
-                derived = font(destination.read_bytes())
-                assert set(tables) == set(derived.reader.keys())
-                table_hashes = {}
-                for tag, data in tables.items():
-                    encoded = derived.getTableData(tag)
-                    assert normalized(tag, data) == normalized(tag, encoded), (asset, tag)
-                    table_hashes[tag] = {"source": sha(data), "derived": sha(encoded)}
+                derived_bytes = destination.read_bytes()
+                derived = font(derived_bytes)
+                derived_tables = snapshot_tables(derived)
+                table_hashes = compare_tables(tables, derived_tables, original, derived_bytes)
                 report["assets"].append({"source": asset, "package": f"@fontsource/{package}@{version}",
                     "sourceSha256": sha(original), "derived": destination.relative_to(target).as_posix(),
                     "derivedSha256": sha(destination.read_bytes()), "weight": weight,
@@ -142,7 +197,9 @@ def main():
                             "outlinesAndHorizontalVerticalMetrics": "identical"})
                     assert checked == set(chinese), (weight, set(chinese) - checked)
     (target / "provenance.json").write_text(json.dumps(report, indent=2) + "\n")
-    print(f"PASS: {len(report['assets'])} real static faces, all decoded tables preserved (head checksum normalized); "
+    cmap_changes = sum(a["tables"]["cmap"]["source"] != a["tables"]["cmap"]["derived"] for a in report["assets"])
+    print(f"PASS: {len(report['assets'])} real static faces; {cmap_changes} cmap reserializations independently semantically identical; "
+          "all other untouched decoded table bytes identical except head.checkSumAdjustment; "
           f"{len(chinese)} CJK codepoints verified against Web unicode-range shards at each weight")
 
 

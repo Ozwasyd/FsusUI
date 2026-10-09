@@ -1,0 +1,291 @@
+{
+  "correctionBase": "be0a1127cc1ba8abce36b96559cd2bad9effe8fa",
+  "reviewedIntegrationCandidate": "989e721734a0b18188905c67057e6bcc617a204a",
+  "scope": "supplier verifier, provenance and related claims only; no native/resource integration change",
+  "fontTools": "4.61.1",
+  "brotli": "1.2.0",
+  "sourceSha256": {
+    "derive.py": "f83e6a3e8c5f5bd3f5eb26d5852fd10f9238d25a20d6c8a16fdd8da21a9fc82b",
+    "test_derive.py": "d3cb3d742b0d0dc2f10b24d8f50ab8077b6f42e09d6c4f00fdebf1f036484f47",
+    "provenance.json": "5b010360526a535d8617444cf8c14d906668bedaaab370366b292ede9635a943"
+  },
+  "fontBinariesUnchanged": {
+    "GoogleSans/Latin/400.ttf": "07e3614ca9d730de33ae786556674999e73618361e32c26ae2159776493f121f",
+    "GoogleSans/Latin/500.ttf": "5c24a30a32aacd57365b19f63dc3418ef11f3d798c864e687c96cb5d5d983de8",
+    "GoogleSans/Latin/700.ttf": "c5cfeaed0487aa74e431e885486ebcbd32a1e110123915ab9fe324c828ae4199",
+    "GoogleSans/Symbols/400.ttf": "17bfa6201158fb58e9ef62702bf75b51328d64a457f7bb596dbe08ac523398b0",
+    "GoogleSans/Symbols/500.ttf": "0fc3c76fc8b171e3200194d28e0a1564211469b778a00b28956a6b9893b13a2d",
+    "GoogleSans/Symbols/700.ttf": "65b876de497819eb3a1255040f6b44bd7a9f33a4e5b1e3dd5345bf0259481830",
+    "NotoSansSC/400.ttf": "5ef4a671129ea40431330c1e4d3d6af36c1f9c7cb89027ad7877ea5f1e79b9e7",
+    "NotoSansSC/500.ttf": "60c232db0f3a36217af4fd6107743fd497482b8782f922c903c40a980d2c0030",
+    "NotoSansSC/700.ttf": "bb0267a62c044b8a6c10db5678cde26ceedc5369196477b81e7a78fbaa9752d9"
+  },
+  "cmapComparisons": {
+    "NotoSansSC/400.ttf": {
+      "source": "e45bc35798d276268a8973d8fb052731c7366e9cc1ee50e6831b746e9199ab59",
+      "derived": "cc91e8176e45bda7a35500e532f4342fb758da90b5a03fa29e8c33d8fd111218",
+      "sourceBytes": 33328,
+      "derivedBytes": 33336,
+      "comparison": "semantic-neutral reserialization",
+      "sourceSemanticSha256": "674c3b92e421459ceadf4266f373a1b6766c3d454783f06146494a5f44226ed8",
+      "derivedSemanticSha256": "674c3b92e421459ceadf4266f373a1b6766c3d454783f06146494a5f44226ed8",
+      "subtables": 3,
+      "variationSelectors": 2
+    },
+    "NotoSansSC/500.ttf": {
+      "source": "e45bc35798d276268a8973d8fb052731c7366e9cc1ee50e6831b746e9199ab59",
+      "derived": "cc91e8176e45bda7a35500e532f4342fb758da90b5a03fa29e8c33d8fd111218",
+      "sourceBytes": 33328,
+      "derivedBytes": 33336,
+      "comparison": "semantic-neutral reserialization",
+      "sourceSemanticSha256": "674c3b92e421459ceadf4266f373a1b6766c3d454783f06146494a5f44226ed8",
+      "derivedSemanticSha256": "674c3b92e421459ceadf4266f373a1b6766c3d454783f06146494a5f44226ed8",
+      "subtables": 3,
+      "variationSelectors": 2
+    },
+    "NotoSansSC/700.ttf": {
+      "source": "e45bc35798d276268a8973d8fb052731c7366e9cc1ee50e6831b746e9199ab59",
+      "derived": "cc91e8176e45bda7a35500e532f4342fb758da90b5a03fa29e8c33d8fd111218",
+      "sourceBytes": 33328,
+      "derivedBytes": 33336,
+      "comparison": "semantic-neutral reserialization",
+      "sourceSemanticSha256": "674c3b92e421459ceadf4266f373a1b6766c3d454783f06146494a5f44226ed8",
+      "derivedSemanticSha256": "674c3b92e421459ceadf4266f373a1b6766c3d454783f06146494a5f44226ed8",
+      "subtables": 3,
+      "variationSelectors": 2
+    }
+  },
+  "currentVerifierTests": {
+    "selectedMethods": 6,
+    "passedMethods": 6,
+    "failed": 0,
+    "logSha256": "8e608432c89731b9674ab8d6e0b659386ba7a9b333edb07f28f226c5bd41f404",
+    "methods": [
+      "test_snapshot_catches_old_false_source_equality",
+      "test_nine_provenance_entries_match_independent_container_bytes",
+      "test_non_best_character_map_mutation_is_rejected",
+      "test_variation_selector_mutation_is_rejected",
+      "test_subtable_metadata_mutation_is_rejected",
+      "test_unrelated_table_change_is_rejected"
+    ]
+  },
+  "correctionTestHistoricalFailure": {
+    "selectedMethods": 6,
+    "failureRecords": 4,
+    "failedMethods": [
+      "test_non_best_character_map_mutation_is_rejected",
+      "test_snapshot_catches_old_false_source_equality"
+    ],
+    "snapshotFailedSubtests": [
+      400,
+      500,
+      700
+    ],
+    "reason": "Test setup omitted the old pre-snapshot OS/2 load and assumed the non-best cmap dictionary was not shared; corrected without weakening raw-hash or semantic assertions",
+    "logSha256": "fee4a24ca18d9c8f4af4846cfe0d2e38ac16735cfad80ce8862517703d69d8fe"
+  },
+  "withdrawnHistoricalDerivationAttestation": {
+    "sourceCommit": "be0a1127cc1ba8abce36b96559cd2bad9effe8fa",
+    "reportedStatus": "PASS",
+    "withdrawnClaim": "all decoded tables preserved (head checksum normalized)",
+    "reason": "getTableData compiled the loaded source cmap; three source table hashes were actually derived serialization hashes",
+    "originalProvenanceSha256": "af8b43089324eaafa0580554ad28768c0fd9f8891be36bcf380f75262813c639"
+  },
+  "nativeHistoricalFailedAttempts": [
+    {
+      "attempt": 1,
+      "stage": "Before the exact Noto family collection",
+      "source": "uncommitted candidate before original supplier commit; not a final-source run",
+      "FSUS_HEADLESS_GSANS": "0",
+      "trxSha256": "06f71233e9994e1b6d53846c99761aaefc7ac7b8e5d5af25ba5464bb75ea7cbf",
+      "counts": {
+        "total": 11,
+        "executed": 11,
+        "passed": 5,
+        "failed": 6,
+        "notExecuted": 0
+      },
+      "cases": [
+        {
+          "name": "FsusUI.Avalonia.HeadlessTests.FsusVueParityTypographyTests.MixedLayoutsUsePinnedLatinCjkAndSymbolFaces(value: 400)",
+          "outcome": "Failed"
+        },
+        {
+          "name": "FsusUI.Avalonia.HeadlessTests.FsusVueParityTypographyTests.UnavailableResourceFamilyIsRejected",
+          "outcome": "Passed"
+        },
+        {
+          "name": "FsusUI.Avalonia.HeadlessTests.FsusVueParityTypographyTests.StandaloneModeKeepsCjkBeforeGenericFallbacks",
+          "outcome": "Passed"
+        },
+        {
+          "name": "FsusUI.Avalonia.HeadlessTests.FsusVueParityTypographyTests.PinnedFacesHaveRealWeightsAndGlyphCoverage(value: 400)",
+          "outcome": "Failed"
+        },
+        {
+          "name": "FsusUI.Avalonia.HeadlessTests.FsusVueParityTypographyTests.FixtureUsesExplicitGsansMode",
+          "outcome": "Passed"
+        },
+        {
+          "name": "FsusUI.Avalonia.HeadlessTests.FsusVueParityTypographyTests.MixedLayoutsUsePinnedLatinCjkAndSymbolFaces(value: 500)",
+          "outcome": "Failed"
+        },
+        {
+          "name": "FsusUI.Avalonia.HeadlessTests.FsusVueParityTypographyTests.MissingWeightCannotUseANearestOrSynthesizedFace",
+          "outcome": "Passed"
+        },
+        {
+          "name": "FsusUI.Avalonia.HeadlessTests.FsusVueParityTypographyTests.PinnedFacesHaveRealWeightsAndGlyphCoverage(value: 500)",
+          "outcome": "Failed"
+        },
+        {
+          "name": "FsusUI.Avalonia.HeadlessTests.FsusVueParityTypographyTests.MixedLayoutsUsePinnedLatinCjkAndSymbolFaces(value: 700)",
+          "outcome": "Failed"
+        },
+        {
+          "name": "FsusUI.Avalonia.HeadlessTests.FsusVueParityTypographyTests.MissingResourceIsRejected",
+          "outcome": "Passed"
+        },
+        {
+          "name": "FsusUI.Avalonia.HeadlessTests.FsusVueParityTypographyTests.PinnedFacesHaveRealWeightsAndGlyphCoverage(value: 700)",
+          "outcome": "Failed"
+        }
+      ]
+    },
+    {
+      "attempt": 2,
+      "stage": "Before empty typographic-name handling",
+      "source": "uncommitted candidate before original supplier commit; not a final-source run",
+      "FSUS_HEADLESS_GSANS": "0",
+      "trxSha256": "4968f289c2f7daab6c1498a67c32903a7e941a64fd4914219dec3c96ab3319f9",
+      "counts": {
+        "total": 11,
+        "executed": 11,
+        "passed": 6,
+        "failed": 5,
+        "notExecuted": 0
+      },
+      "cases": [
+        {
+          "name": "FsusUI.Avalonia.HeadlessTests.FsusVueParityTypographyTests.UnavailableResourceFamilyIsRejected",
+          "outcome": "Passed"
+        },
+        {
+          "name": "FsusUI.Avalonia.HeadlessTests.FsusVueParityTypographyTests.MixedLayoutsUsePinnedLatinCjkAndSymbolFaces(value: 700)",
+          "outcome": "Failed"
+        },
+        {
+          "name": "FsusUI.Avalonia.HeadlessTests.FsusVueParityTypographyTests.MixedLayoutsUsePinnedLatinCjkAndSymbolFaces(value: 500)",
+          "outcome": "Failed"
+        },
+        {
+          "name": "FsusUI.Avalonia.HeadlessTests.FsusVueParityTypographyTests.MissingResourceIsRejected",
+          "outcome": "Passed"
+        },
+        {
+          "name": "FsusUI.Avalonia.HeadlessTests.FsusVueParityTypographyTests.PinnedFacesHaveRealWeightsAndGlyphCoverage(value: 700)",
+          "outcome": "Failed"
+        },
+        {
+          "name": "FsusUI.Avalonia.HeadlessTests.FsusVueParityTypographyTests.MixedLayoutsUsePinnedLatinCjkAndSymbolFaces(value: 400)",
+          "outcome": "Failed"
+        },
+        {
+          "name": "FsusUI.Avalonia.HeadlessTests.FsusVueParityTypographyTests.MissingWeightCannotUseANearestOrSynthesizedFace",
+          "outcome": "Passed"
+        },
+        {
+          "name": "FsusUI.Avalonia.HeadlessTests.FsusVueParityTypographyTests.PinnedFacesHaveRealWeightsAndGlyphCoverage(value: 400)",
+          "outcome": "Failed"
+        },
+        {
+          "name": "FsusUI.Avalonia.HeadlessTests.FsusVueParityTypographyTests.PinnedFacesHaveRealWeightsAndGlyphCoverage(value: 500)",
+          "outcome": "Passed"
+        },
+        {
+          "name": "FsusUI.Avalonia.HeadlessTests.FsusVueParityTypographyTests.FixtureUsesExplicitGsansMode",
+          "outcome": "Passed"
+        },
+        {
+          "name": "FsusUI.Avalonia.HeadlessTests.FsusVueParityTypographyTests.StandaloneModeKeepsCjkBeforeGenericFallbacks",
+          "outcome": "Passed"
+        }
+      ]
+    },
+    {
+      "attempt": 3,
+      "stage": "Legacy versus typographic 500-name assertion",
+      "source": "uncommitted candidate before original supplier commit; not a final-source run",
+      "FSUS_HEADLESS_GSANS": "0",
+      "trxSha256": "b249c9f689f0fdff3431998fb99c1d26ce7097c1a01fac15bc15a2c489ed1f8c",
+      "counts": {
+        "total": 11,
+        "executed": 11,
+        "passed": 10,
+        "failed": 1,
+        "notExecuted": 0
+      },
+      "cases": [
+        {
+          "name": "FsusUI.Avalonia.HeadlessTests.FsusVueParityTypographyTests.PinnedFacesHaveRealWeightsAndGlyphCoverage(value: 500)",
+          "outcome": "Failed"
+        },
+        {
+          "name": "FsusUI.Avalonia.HeadlessTests.FsusVueParityTypographyTests.StandaloneModeKeepsCjkBeforeGenericFallbacks",
+          "outcome": "Passed"
+        },
+        {
+          "name": "FsusUI.Avalonia.HeadlessTests.FsusVueParityTypographyTests.MissingWeightCannotUseANearestOrSynthesizedFace",
+          "outcome": "Passed"
+        },
+        {
+          "name": "FsusUI.Avalonia.HeadlessTests.FsusVueParityTypographyTests.PinnedFacesHaveRealWeightsAndGlyphCoverage(value: 700)",
+          "outcome": "Passed"
+        },
+        {
+          "name": "FsusUI.Avalonia.HeadlessTests.FsusVueParityTypographyTests.PinnedFacesHaveRealWeightsAndGlyphCoverage(value: 400)",
+          "outcome": "Passed"
+        },
+        {
+          "name": "FsusUI.Avalonia.HeadlessTests.FsusVueParityTypographyTests.MixedLayoutsUsePinnedLatinCjkAndSymbolFaces(value: 500)",
+          "outcome": "Passed"
+        },
+        {
+          "name": "FsusUI.Avalonia.HeadlessTests.FsusVueParityTypographyTests.FixtureUsesExplicitGsansMode",
+          "outcome": "Passed"
+        },
+        {
+          "name": "FsusUI.Avalonia.HeadlessTests.FsusVueParityTypographyTests.UnavailableResourceFamilyIsRejected",
+          "outcome": "Passed"
+        },
+        {
+          "name": "FsusUI.Avalonia.HeadlessTests.FsusVueParityTypographyTests.MixedLayoutsUsePinnedLatinCjkAndSymbolFaces(value: 400)",
+          "outcome": "Passed"
+        },
+        {
+          "name": "FsusUI.Avalonia.HeadlessTests.FsusVueParityTypographyTests.MixedLayoutsUsePinnedLatinCjkAndSymbolFaces(value: 700)",
+          "outcome": "Passed"
+        },
+        {
+          "name": "FsusUI.Avalonia.HeadlessTests.FsusVueParityTypographyTests.MissingResourceIsRejected",
+          "outcome": "Passed"
+        }
+      ]
+    }
+  ],
+  "nativeRegressionEvidence": "Original supplier 11/11 passes in each flag mode retained in validation-results.json, source and binaries unchanged; not rerun for this verifier-only correction",
+  "reviewerNativePasses": "Reported independently for 989e721734a0b18188905c67057e6bcc617a204a; not inherited as supplier evidence",
+  "fullCIQualification": "UNRUN",
+  "batch3CaptureAndVisualQualification": "UNRUN",
+  "rawSensitiveLogsPublished": false,
+  "changedFiles": [
+    "dotnet/FsusUI.Avalonia.HeadlessTests/Assets/VueParityTypography/CORRECTION.md",
+    "dotnet/FsusUI.Avalonia.HeadlessTests/Assets/VueParityTypography/PR-DRAFT.md",
+    "dotnet/FsusUI.Avalonia.HeadlessTests/Assets/VueParityTypography/README.md",
+    "dotnet/FsusUI.Avalonia.HeadlessTests/Assets/VueParityTypography/VALIDATION.md",
+    "dotnet/FsusUI.Avalonia.HeadlessTests/Assets/VueParityTypography/correction-results.json",
+    "dotnet/FsusUI.Avalonia.HeadlessTests/Assets/VueParityTypography/derive.py",
+    "dotnet/FsusUI.Avalonia.HeadlessTests/Assets/VueParityTypography/provenance.json",
+    "dotnet/FsusUI.Avalonia.HeadlessTests/Assets/VueParityTypography/test_derive.py"
+  ]
+}
