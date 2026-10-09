@@ -53,7 +53,18 @@ test('Node16 distinguishes ESM defaults and preserves CJS callable re-export typ
     'node_modules/interop-dependency/index.d.mts',
     'export declare function retain<T>(value: T): T;\nexport interface Item { key: string }\n',
   )
-  await put('es/index.d.ts', "export { default, create } from './component';\n")
+  const esmEntry =
+    "export { default, create } from './component';\nexport type { Bundle } from './motion/presets';\n"
+  await put('es/index.d.ts', esmEntry)
+  await put('es/motion.d.ts', 'export interface Facade { other: string }\n')
+  await put(
+    'es/motion/index.d.ts',
+    'export interface Internal { key: string }\n',
+  )
+  await put(
+    'es/motion/presets/index.d.ts',
+    'export type Bundle = import("..").Internal;\n',
+  )
   await put(
     'es/component.d.ts',
     'export declare function create(value: string): { value: string };\nexport default create;\n',
@@ -66,7 +77,7 @@ test('Node16 distinguishes ESM defaults and preserves CJS callable re-export typ
   await put('theme-chalk/fixture.css', '.fixture {}\n')
   await put('theme-chalk/fixture.css.d.ts', 'export {};\n')
   const esmProbe =
-    'import create from "element-plus";\nconst value: string = create("ok").value;\n'
+    'import create, { type Bundle } from "element-plus";\nconst value: string = create("ok").value;\nconst bundle: Bundle = { key: "ok" };\n'
   await put(
     'positive.mts',
     `${
@@ -103,7 +114,7 @@ test('Node16 distinguishes ESM defaults and preserves CJS callable re-export typ
   )
   assert.equal(
     await readFile(path.join(root, 'es/index.d.ts'), 'utf8'),
-    "export { default, create } from './component';\n",
+    esmEntry,
     'legacy ESM declarations stay intact',
   )
   const first = await readFile(path.join(root, 'lib/index.d.ts'), 'utf8')

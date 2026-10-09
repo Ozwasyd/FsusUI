@@ -97,11 +97,17 @@ export function rewriteNodeDeclaration(
     }
     if (!specifier.startsWith('.')) return specifier
     const absolute = path.resolve(path.dirname(filename), specifier)
-    const owner = [
-      `${absolute}.d.ts`,
-      path.join(absolute, 'index.d.ts'),
-      absolute.replace(/\.m?js$/u, '.d.ts'),
-    ].find((file) => declarations.has(file))
+    const directory =
+      specifier.endsWith('/') ||
+      ['.', '..'].includes(path.posix.basename(specifier))
+    const candidates = directory
+      ? [path.join(absolute, 'index.d.ts')]
+      : [
+          `${absolute}.d.ts`,
+          path.join(absolute, 'index.d.ts'),
+          absolute.replace(/\.m?js$/u, '.d.ts'),
+        ]
+    const owner = candidates.find((file) => declarations.has(file))
     if (!owner) {
       throw new Error(
         `Cannot resolve ESM declaration owner ${specifier} in ${filename}`,
