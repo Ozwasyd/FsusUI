@@ -1,0 +1,432 @@
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/breadcrumb/src/breadcrumb-item.d.ts(2,58): error TS2307: Cannot find module 'vue-router' or its corresponding type declarations.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/breadcrumb/src/breadcrumb-item.d.ts(9,145): error TS2307: Cannot find module 'vue-router' or its corresponding type declarations.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/breadcrumb/src/breadcrumb-item.d.ts(9,199): error TS2307: Cannot find module 'vue-router' or its corresponding type declarations.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/breadcrumb/src/breadcrumb-item.d.ts(9,266): error TS2307: Cannot find module 'vue-router' or its corresponding type declarations.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/breadcrumb/src/breadcrumb-item.d.ts(9,320): error TS2307: Cannot find module 'vue-router' or its corresponding type declarations.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/breadcrumb/src/breadcrumb-item.d.ts(9,407): error TS2307: Cannot find module 'vue-router' or its corresponding type declarations.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/breadcrumb/src/breadcrumb-item.d.ts(9,461): error TS2307: Cannot find module 'vue-router' or its corresponding type declarations.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/breadcrumb/src/breadcrumb-item.d.ts(9,528): error TS2307: Cannot find module 'vue-router' or its corresponding type declarations.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/breadcrumb/src/breadcrumb-item.d.ts(9,582): error TS2307: Cannot find module 'vue-router' or its corresponding type declarations.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/color-picker/index.d.ts(101,124): error TS2300: Duplicate identifier 'event'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/color-picker/index.d.ts(101,139): error TS2300: Duplicate identifier 'event'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/color-picker/index.d.ts(101,171): error TS2300: Duplicate identifier 'event'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/color-picker/index.d.ts(101,187): error TS2300: Duplicate identifier 'event'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/color-picker/src/color-picker.vue.d.ts(102,124): error TS2300: Duplicate identifier 'event'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/color-picker/src/color-picker.vue.d.ts(102,139): error TS2300: Duplicate identifier 'event'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/color-picker/src/color-picker.vue.d.ts(102,171): error TS2300: Duplicate identifier 'event'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/color-picker/src/color-picker.vue.d.ts(102,187): error TS2300: Duplicate identifier 'event'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/inbox-primitives/index.d.ts(207,26): error TS2344: Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.
+  Index signature for type 'string' is missing in type 'GlobalComponents'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/inbox-primitives/index.d.ts(392,24): error TS2344: Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.
+  Index signature for type 'string' is missing in type 'GlobalComponents'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/inbox-primitives/index.d.ts(484,22): error TS2344: Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.
+  Index signature for type 'string' is missing in type 'GlobalComponents'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/inbox-primitives/index.d.ts(669,20): error TS2344: Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.
+  Index signature for type 'string' is missing in type 'GlobalComponents'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/inbox-primitives/index.d.ts(878,26): error TS2344: Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.
+  Index signature for type 'string' is missing in type 'GlobalComponents'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/inbox-primitives/index.d.ts(1063,24): error TS2344: Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.
+  Index signature for type 'string' is missing in type 'GlobalComponents'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/inbox-primitives/index.d.ts(1155,22): error TS2344: Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.
+  Index signature for type 'string' is missing in type 'GlobalComponents'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/inbox-primitives/index.d.ts(1340,20): error TS2344: Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.
+  Index signature for type 'string' is missing in type 'GlobalComponents'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/inbox-primitives/index.d.ts(1505,26): error TS2344: Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.
+  Index signature for type 'string' is missing in type 'GlobalComponents'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/inbox-primitives/index.d.ts(1654,24): error TS2344: Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.
+  Index signature for type 'string' is missing in type 'GlobalComponents'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/inbox-primitives/index.d.ts(1728,22): error TS2344: Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.
+  Index signature for type 'string' is missing in type 'GlobalComponents'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/inbox-primitives/index.d.ts(1877,20): error TS2344: Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.
+  Index signature for type 'string' is missing in type 'GlobalComponents'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/inbox-primitives/index.d.ts(1974,12): error TS2300: Duplicate identifier 'event'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/inbox-primitives/index.d.ts(1974,29): error TS2300: Duplicate identifier 'event'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/inbox-primitives/index.d.ts(2159,20): error TS2300: Duplicate identifier 'event'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/inbox-primitives/index.d.ts(2159,37): error TS2300: Duplicate identifier 'event'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/inbox-primitives/index.d.ts(2199,26): error TS2344: Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.
+  Index signature for type 'string' is missing in type 'GlobalComponents'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/inbox-primitives/index.d.ts(2302,20): error TS2300: Duplicate identifier 'event'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/inbox-primitives/index.d.ts(2302,37): error TS2300: Duplicate identifier 'event'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/inbox-primitives/index.d.ts(2440,16): error TS2300: Duplicate identifier 'event'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/inbox-primitives/index.d.ts(2440,33): error TS2300: Duplicate identifier 'event'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/inbox-primitives/index.d.ts(2480,24): error TS2344: Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.
+  Index signature for type 'string' is missing in type 'GlobalComponents'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/inbox-primitives/index.d.ts(2581,16): error TS2300: Duplicate identifier 'event'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/inbox-primitives/index.d.ts(2581,33): error TS2300: Duplicate identifier 'event'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/inbox-primitives/index.d.ts(2621,22): error TS2344: Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.
+  Index signature for type 'string' is missing in type 'GlobalComponents'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/inbox-primitives/index.d.ts(2724,16): error TS2300: Duplicate identifier 'event'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/inbox-primitives/index.d.ts(2724,33): error TS2300: Duplicate identifier 'event'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/inbox-primitives/index.d.ts(2862,12): error TS2300: Duplicate identifier 'event'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/inbox-primitives/index.d.ts(2862,29): error TS2300: Duplicate identifier 'event'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/inbox-primitives/index.d.ts(2902,20): error TS2344: Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.
+  Index signature for type 'string' is missing in type 'GlobalComponents'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/inbox-primitives/index.d.ts(3091,26): error TS2344: Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.
+  Index signature for type 'string' is missing in type 'GlobalComponents'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/inbox-primitives/index.d.ts(3264,24): error TS2344: Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.
+  Index signature for type 'string' is missing in type 'GlobalComponents'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/inbox-primitives/index.d.ts(3350,22): error TS2344: Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.
+  Index signature for type 'string' is missing in type 'GlobalComponents'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/inbox-primitives/index.d.ts(3523,20): error TS2344: Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.
+  Index signature for type 'string' is missing in type 'GlobalComponents'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/inbox-primitives/index.d.ts(3651,26): error TS2344: Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.
+  Index signature for type 'string' is missing in type 'GlobalComponents'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/inbox-primitives/index.d.ts(3770,24): error TS2344: Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.
+  Index signature for type 'string' is missing in type 'GlobalComponents'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/inbox-primitives/index.d.ts(3829,22): error TS2344: Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.
+  Index signature for type 'string' is missing in type 'GlobalComponents'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/inbox-primitives/index.d.ts(3948,20): error TS2344: Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.
+  Index signature for type 'string' is missing in type 'GlobalComponents'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/inbox-primitives/index.d.ts(4162,26): error TS2344: Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.
+  Index signature for type 'string' is missing in type 'GlobalComponents'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/inbox-primitives/index.d.ts(4353,24): error TS2344: Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.
+  Index signature for type 'string' is missing in type 'GlobalComponents'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/inbox-primitives/index.d.ts(4448,22): error TS2344: Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.
+  Index signature for type 'string' is missing in type 'GlobalComponents'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/inbox-primitives/index.d.ts(4639,20): error TS2344: Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.
+  Index signature for type 'string' is missing in type 'GlobalComponents'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/inbox-primitives/index.d.ts(4730,26): error TS2344: Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.
+  Index signature for type 'string' is missing in type 'GlobalComponents'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/inbox-primitives/index.d.ts(4819,24): error TS2344: Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.
+  Index signature for type 'string' is missing in type 'GlobalComponents'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/inbox-primitives/index.d.ts(4863,22): error TS2344: Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.
+  Index signature for type 'string' is missing in type 'GlobalComponents'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/inbox-primitives/index.d.ts(4952,20): error TS2344: Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.
+  Index signature for type 'string' is missing in type 'GlobalComponents'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/inbox-primitives/index.d.ts(5097,26): error TS2344: Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.
+  Index signature for type 'string' is missing in type 'GlobalComponents'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/inbox-primitives/index.d.ts(5232,24): error TS2344: Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.
+  Index signature for type 'string' is missing in type 'GlobalComponents'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/inbox-primitives/index.d.ts(5299,22): error TS2344: Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.
+  Index signature for type 'string' is missing in type 'GlobalComponents'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/inbox-primitives/index.d.ts(5434,20): error TS2344: Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.
+  Index signature for type 'string' is missing in type 'GlobalComponents'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/inbox-primitives/index.d.ts(5611,26): error TS2344: Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.
+  Index signature for type 'string' is missing in type 'GlobalComponents'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/inbox-primitives/index.d.ts(5772,24): error TS2344: Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.
+  Index signature for type 'string' is missing in type 'GlobalComponents'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/inbox-primitives/index.d.ts(5852,22): error TS2344: Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.
+  Index signature for type 'string' is missing in type 'GlobalComponents'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/inbox-primitives/index.d.ts(6013,20): error TS2344: Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.
+  Index signature for type 'string' is missing in type 'GlobalComponents'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/inbox-primitives/index.d.ts(6190,26): error TS2344: Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.
+  Index signature for type 'string' is missing in type 'GlobalComponents'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/inbox-primitives/index.d.ts(6351,24): error TS2344: Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.
+  Index signature for type 'string' is missing in type 'GlobalComponents'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/inbox-primitives/index.d.ts(6431,22): error TS2344: Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.
+  Index signature for type 'string' is missing in type 'GlobalComponents'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/inbox-primitives/index.d.ts(6592,20): error TS2344: Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.
+  Index signature for type 'string' is missing in type 'GlobalComponents'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/inbox-primitives/src/conversation-list-item.vue.d.ts(95,12): error TS2300: Duplicate identifier 'event'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/inbox-primitives/src/conversation-list-item.vue.d.ts(95,29): error TS2300: Duplicate identifier 'event'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/index.d.ts(12,15): error TS2307: Cannot find module './cascader' or its corresponding type declarations.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/index.d.ts(56,15): error TS2307: Cannot find module './select' or its corresponding type declarations.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/index.d.ts(61,15): error TS2307: Cannot find module './slider' or its corresponding type declarations.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/index.d.ts(74,15): error TS2307: Cannot find module './time-select' or its corresponding type declarations.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/markdown-editor/index.d.ts(987,378): error TS2300: Duplicate identifier 'event'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/markdown-editor/index.d.ts(987,405): error TS2300: Duplicate identifier 'event'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/markdown-editor/index.d.ts(987,558): error TS2300: Duplicate identifier 'event'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/markdown-editor/index.d.ts(987,580): error TS2300: Duplicate identifier 'event'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/markdown-editor/src/markdown-editor-link-image.d.ts(173,40): error TS2307: Cannot find module '@ozwasyd/element-plus/es/wasm/markdown-syntax-identity' or its corresponding type declarations.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/markdown-editor/src/markdown-editor-table-structure.d.ts(13,146): error TS2307: Cannot find module '@ozwasyd/element-plus/es/wasm/markdown-syntax-identity' or its corresponding type declarations.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/markdown-editor/src/markdown-editor-table-structure.d.ts(81,32): error TS2307: Cannot find module '@ozwasyd/element-plus/es/wasm/markdown-syntax-consumers' or its corresponding type declarations.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/markdown-editor/src/markdown-editor.vue.d.ts(1039,337): error TS2300: Duplicate identifier 'event'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/markdown-editor/src/markdown-editor.vue.d.ts(1039,364): error TS2300: Duplicate identifier 'event'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/markdown-editor/src/markdown-editor.vue.d.ts(1039,517): error TS2300: Duplicate identifier 'event'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/markdown-editor/src/markdown-editor.vue.d.ts(1039,539): error TS2300: Duplicate identifier 'event'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/menu/index.d.ts(160,149): error TS2307: Cannot find module 'vue-router' or its corresponding type declarations.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/menu/index.d.ts(160,203): error TS2307: Cannot find module 'vue-router' or its corresponding type declarations.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/menu/index.d.ts(160,270): error TS2307: Cannot find module 'vue-router' or its corresponding type declarations.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/menu/index.d.ts(160,324): error TS2307: Cannot find module 'vue-router' or its corresponding type declarations.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/menu/index.d.ts(160,411): error TS2307: Cannot find module 'vue-router' or its corresponding type declarations.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/menu/index.d.ts(160,465): error TS2307: Cannot find module 'vue-router' or its corresponding type declarations.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/menu/index.d.ts(160,532): error TS2307: Cannot find module 'vue-router' or its corresponding type declarations.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/menu/index.d.ts(160,586): error TS2307: Cannot find module 'vue-router' or its corresponding type declarations.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/menu/index.d.ts(218,149): error TS2307: Cannot find module 'vue-router' or its corresponding type declarations.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/menu/index.d.ts(218,203): error TS2307: Cannot find module 'vue-router' or its corresponding type declarations.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/menu/index.d.ts(218,270): error TS2307: Cannot find module 'vue-router' or its corresponding type declarations.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/menu/index.d.ts(218,324): error TS2307: Cannot find module 'vue-router' or its corresponding type declarations.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/menu/index.d.ts(218,411): error TS2307: Cannot find module 'vue-router' or its corresponding type declarations.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/menu/index.d.ts(218,465): error TS2307: Cannot find module 'vue-router' or its corresponding type declarations.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/menu/index.d.ts(218,532): error TS2307: Cannot find module 'vue-router' or its corresponding type declarations.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/menu/index.d.ts(218,586): error TS2307: Cannot find module 'vue-router' or its corresponding type declarations.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/menu/index.d.ts(4873,145): error TS2307: Cannot find module 'vue-router' or its corresponding type declarations.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/menu/index.d.ts(4873,199): error TS2307: Cannot find module 'vue-router' or its corresponding type declarations.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/menu/index.d.ts(4873,266): error TS2307: Cannot find module 'vue-router' or its corresponding type declarations.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/menu/index.d.ts(4873,320): error TS2307: Cannot find module 'vue-router' or its corresponding type declarations.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/menu/index.d.ts(4873,407): error TS2307: Cannot find module 'vue-router' or its corresponding type declarations.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/menu/index.d.ts(4873,461): error TS2307: Cannot find module 'vue-router' or its corresponding type declarations.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/menu/index.d.ts(4873,528): error TS2307: Cannot find module 'vue-router' or its corresponding type declarations.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/menu/index.d.ts(4873,582): error TS2307: Cannot find module 'vue-router' or its corresponding type declarations.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/menu/index.d.ts(4931,145): error TS2307: Cannot find module 'vue-router' or its corresponding type declarations.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/menu/index.d.ts(4931,199): error TS2307: Cannot find module 'vue-router' or its corresponding type declarations.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/menu/index.d.ts(4931,266): error TS2307: Cannot find module 'vue-router' or its corresponding type declarations.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/menu/index.d.ts(4931,320): error TS2307: Cannot find module 'vue-router' or its corresponding type declarations.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/menu/index.d.ts(4931,407): error TS2307: Cannot find module 'vue-router' or its corresponding type declarations.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/menu/index.d.ts(4931,461): error TS2307: Cannot find module 'vue-router' or its corresponding type declarations.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/menu/index.d.ts(4931,528): error TS2307: Cannot find module 'vue-router' or its corresponding type declarations.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/menu/index.d.ts(4931,582): error TS2307: Cannot find module 'vue-router' or its corresponding type declarations.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/menu/src/menu-item.d.ts(12,145): error TS2307: Cannot find module 'vue-router' or its corresponding type declarations.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/menu/src/menu-item.d.ts(12,199): error TS2307: Cannot find module 'vue-router' or its corresponding type declarations.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/menu/src/menu-item.d.ts(12,266): error TS2307: Cannot find module 'vue-router' or its corresponding type declarations.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/menu/src/menu-item.d.ts(12,320): error TS2307: Cannot find module 'vue-router' or its corresponding type declarations.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/menu/src/menu-item.d.ts(12,407): error TS2307: Cannot find module 'vue-router' or its corresponding type declarations.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/menu/src/menu-item.d.ts(12,461): error TS2307: Cannot find module 'vue-router' or its corresponding type declarations.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/menu/src/menu-item.d.ts(12,528): error TS2307: Cannot find module 'vue-router' or its corresponding type declarations.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/menu/src/menu-item.d.ts(12,582): error TS2307: Cannot find module 'vue-router' or its corresponding type declarations.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/menu/src/menu-item.vue.d.ts(11,145): error TS2307: Cannot find module 'vue-router' or its corresponding type declarations.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/menu/src/menu-item.vue.d.ts(11,199): error TS2307: Cannot find module 'vue-router' or its corresponding type declarations.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/menu/src/menu-item.vue.d.ts(11,266): error TS2307: Cannot find module 'vue-router' or its corresponding type declarations.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/menu/src/menu-item.vue.d.ts(11,320): error TS2307: Cannot find module 'vue-router' or its corresponding type declarations.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/menu/src/menu-item.vue.d.ts(11,407): error TS2307: Cannot find module 'vue-router' or its corresponding type declarations.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/menu/src/menu-item.vue.d.ts(11,461): error TS2307: Cannot find module 'vue-router' or its corresponding type declarations.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/menu/src/menu-item.vue.d.ts(11,528): error TS2307: Cannot find module 'vue-router' or its corresponding type declarations.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/menu/src/menu-item.vue.d.ts(11,582): error TS2307: Cannot find module 'vue-router' or its corresponding type declarations.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/menu/src/menu-item.vue.d.ts(69,145): error TS2307: Cannot find module 'vue-router' or its corresponding type declarations.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/menu/src/menu-item.vue.d.ts(69,199): error TS2307: Cannot find module 'vue-router' or its corresponding type declarations.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/menu/src/menu-item.vue.d.ts(69,266): error TS2307: Cannot find module 'vue-router' or its corresponding type declarations.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/menu/src/menu-item.vue.d.ts(69,320): error TS2307: Cannot find module 'vue-router' or its corresponding type declarations.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/menu/src/menu-item.vue.d.ts(69,407): error TS2307: Cannot find module 'vue-router' or its corresponding type declarations.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/menu/src/menu-item.vue.d.ts(69,461): error TS2307: Cannot find module 'vue-router' or its corresponding type declarations.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/menu/src/menu-item.vue.d.ts(69,528): error TS2307: Cannot find module 'vue-router' or its corresponding type declarations.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/menu/src/menu-item.vue.d.ts(69,582): error TS2307: Cannot find module 'vue-router' or its corresponding type declarations.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/menu/src/menu.d.ts(2,58): error TS2307: Cannot find module 'vue-router' or its corresponding type declarations.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/menu/src/types.d.ts(2,39): error TS2307: Cannot find module 'vue-router' or its corresponding type declarations.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/metric-primitives/index.d.ts(126,26): error TS2344: Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.
+  Index signature for type 'string' is missing in type 'GlobalComponents'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/metric-primitives/index.d.ts(245,24): error TS2344: Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.
+  Index signature for type 'string' is missing in type 'GlobalComponents'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/metric-primitives/index.d.ts(304,22): error TS2344: Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.
+  Index signature for type 'string' is missing in type 'GlobalComponents'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/metric-primitives/index.d.ts(423,20): error TS2344: Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.
+  Index signature for type 'string' is missing in type 'GlobalComponents'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/metric-primitives/index.d.ts(678,26): error TS2344: Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.
+  Index signature for type 'string' is missing in type 'GlobalComponents'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/metric-primitives/index.d.ts(903,24): error TS2344: Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.
+  Index signature for type 'string' is missing in type 'GlobalComponents'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/metric-primitives/index.d.ts(1015,22): error TS2344: Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.
+  Index signature for type 'string' is missing in type 'GlobalComponents'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/metric-primitives/index.d.ts(1240,20): error TS2344: Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.
+  Index signature for type 'string' is missing in type 'GlobalComponents'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/metric-primitives/index.d.ts(1368,26): error TS2344: Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.
+  Index signature for type 'string' is missing in type 'GlobalComponents'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/metric-primitives/index.d.ts(1487,24): error TS2344: Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.
+  Index signature for type 'string' is missing in type 'GlobalComponents'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/metric-primitives/index.d.ts(1546,22): error TS2344: Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.
+  Index signature for type 'string' is missing in type 'GlobalComponents'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/metric-primitives/index.d.ts(1665,20): error TS2344: Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.
+  Index signature for type 'string' is missing in type 'GlobalComponents'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/metric-primitives/index.d.ts(1924,26): error TS2344: Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.
+  Index signature for type 'string' is missing in type 'GlobalComponents'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/metric-primitives/index.d.ts(2153,24): error TS2344: Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.
+  Index signature for type 'string' is missing in type 'GlobalComponents'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/metric-primitives/index.d.ts(2267,22): error TS2344: Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.
+  Index signature for type 'string' is missing in type 'GlobalComponents'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/metric-primitives/index.d.ts(2496,20): error TS2344: Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.
+  Index signature for type 'string' is missing in type 'GlobalComponents'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/metric-primitives/index.d.ts(2587,26): error TS2344: Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.
+  Index signature for type 'string' is missing in type 'GlobalComponents'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/metric-primitives/index.d.ts(2676,24): error TS2344: Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.
+  Index signature for type 'string' is missing in type 'GlobalComponents'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/metric-primitives/index.d.ts(2720,22): error TS2344: Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.
+  Index signature for type 'string' is missing in type 'GlobalComponents'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/metric-primitives/index.d.ts(2809,20): error TS2344: Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.
+  Index signature for type 'string' is missing in type 'GlobalComponents'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/metric-primitives/index.d.ts(2900,26): error TS2344: Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.
+  Index signature for type 'string' is missing in type 'GlobalComponents'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/metric-primitives/index.d.ts(2989,24): error TS2344: Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.
+  Index signature for type 'string' is missing in type 'GlobalComponents'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/metric-primitives/index.d.ts(3033,22): error TS2344: Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.
+  Index signature for type 'string' is missing in type 'GlobalComponents'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/metric-primitives/index.d.ts(3122,20): error TS2344: Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.
+  Index signature for type 'string' is missing in type 'GlobalComponents'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/metric-primitives/index.d.ts(3334,26): error TS2344: Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.
+  Index signature for type 'string' is missing in type 'GlobalComponents'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/metric-primitives/index.d.ts(3523,24): error TS2344: Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.
+  Index signature for type 'string' is missing in type 'GlobalComponents'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/metric-primitives/index.d.ts(3617,22): error TS2344: Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.
+  Index signature for type 'string' is missing in type 'GlobalComponents'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/metric-primitives/index.d.ts(3806,20): error TS2344: Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.
+  Index signature for type 'string' is missing in type 'GlobalComponents'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/metric-primitives/index.d.ts(4061,26): error TS2344: Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.
+  Index signature for type 'string' is missing in type 'GlobalComponents'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/metric-primitives/index.d.ts(4286,24): error TS2344: Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.
+  Index signature for type 'string' is missing in type 'GlobalComponents'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/metric-primitives/index.d.ts(4398,22): error TS2344: Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.
+  Index signature for type 'string' is missing in type 'GlobalComponents'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/metric-primitives/index.d.ts(4623,20): error TS2344: Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.
+  Index signature for type 'string' is missing in type 'GlobalComponents'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/metric-primitives/index.d.ts(4751,26): error TS2344: Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.
+  Index signature for type 'string' is missing in type 'GlobalComponents'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/metric-primitives/index.d.ts(4870,24): error TS2344: Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.
+  Index signature for type 'string' is missing in type 'GlobalComponents'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/metric-primitives/index.d.ts(4929,22): error TS2344: Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.
+  Index signature for type 'string' is missing in type 'GlobalComponents'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/metric-primitives/index.d.ts(5048,20): error TS2344: Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.
+  Index signature for type 'string' is missing in type 'GlobalComponents'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/metric-primitives/index.d.ts(5384,26): error TS2344: Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.
+  Index signature for type 'string' is missing in type 'GlobalComponents'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/metric-primitives/index.d.ts(5675,24): error TS2344: Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.
+  Index signature for type 'string' is missing in type 'GlobalComponents'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/metric-primitives/index.d.ts(5820,22): error TS2344: Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.
+  Index signature for type 'string' is missing in type 'GlobalComponents'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/metric-primitives/index.d.ts(6111,20): error TS2344: Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.
+  Index signature for type 'string' is missing in type 'GlobalComponents'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/metric-primitives/index.d.ts(6383,26): error TS2344: Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.
+  Index signature for type 'string' is missing in type 'GlobalComponents'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/metric-primitives/index.d.ts(6621,24): error TS2344: Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.
+  Index signature for type 'string' is missing in type 'GlobalComponents'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/metric-primitives/index.d.ts(6741,22): error TS2344: Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.
+  Index signature for type 'string' is missing in type 'GlobalComponents'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/metric-primitives/index.d.ts(6979,20): error TS2344: Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.
+  Index signature for type 'string' is missing in type 'GlobalComponents'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/settings-primitives/index.d.ts(172,26): error TS2344: Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.
+  Index signature for type 'string' is missing in type 'GlobalComponents'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/settings-primitives/index.d.ts(329,24): error TS2344: Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.
+  Index signature for type 'string' is missing in type 'GlobalComponents'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/settings-primitives/index.d.ts(407,22): error TS2344: Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.
+  Index signature for type 'string' is missing in type 'GlobalComponents'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/settings-primitives/index.d.ts(564,20): error TS2344: Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.
+  Index signature for type 'string' is missing in type 'GlobalComponents'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/settings-primitives/index.d.ts(664,26): error TS2344: Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.
+  Index signature for type 'string' is missing in type 'GlobalComponents'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/settings-primitives/index.d.ts(761,24): error TS2344: Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.
+  Index signature for type 'string' is missing in type 'GlobalComponents'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/settings-primitives/index.d.ts(809,22): error TS2344: Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.
+  Index signature for type 'string' is missing in type 'GlobalComponents'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/settings-primitives/index.d.ts(906,20): error TS2344: Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.
+  Index signature for type 'string' is missing in type 'GlobalComponents'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/settings-primitives/index.d.ts(1139,26): error TS2344: Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.
+  Index signature for type 'string' is missing in type 'GlobalComponents'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/settings-primitives/index.d.ts(1346,24): error TS2344: Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.
+  Index signature for type 'string' is missing in type 'GlobalComponents'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/settings-primitives/index.d.ts(1449,22): error TS2344: Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.
+  Index signature for type 'string' is missing in type 'GlobalComponents'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/settings-primitives/index.d.ts(1656,20): error TS2344: Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.
+  Index signature for type 'string' is missing in type 'GlobalComponents'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/settings-primitives/index.d.ts(1877,26): error TS2344: Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.
+  Index signature for type 'string' is missing in type 'GlobalComponents'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/settings-primitives/index.d.ts(2074,24): error TS2344: Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.
+  Index signature for type 'string' is missing in type 'GlobalComponents'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/settings-primitives/index.d.ts(2172,22): error TS2344: Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.
+  Index signature for type 'string' is missing in type 'GlobalComponents'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/settings-primitives/index.d.ts(2369,20): error TS2344: Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.
+  Index signature for type 'string' is missing in type 'GlobalComponents'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/settings-primitives/index.d.ts(2602,26): error TS2344: Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.
+  Index signature for type 'string' is missing in type 'GlobalComponents'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/settings-primitives/index.d.ts(2809,24): error TS2344: Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.
+  Index signature for type 'string' is missing in type 'GlobalComponents'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/settings-primitives/index.d.ts(2912,22): error TS2344: Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.
+  Index signature for type 'string' is missing in type 'GlobalComponents'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/settings-primitives/index.d.ts(3119,20): error TS2344: Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.
+  Index signature for type 'string' is missing in type 'GlobalComponents'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/settings-primitives/index.d.ts(3284,26): error TS2344: Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.
+  Index signature for type 'string' is missing in type 'GlobalComponents'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/settings-primitives/index.d.ts(3433,24): error TS2344: Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.
+  Index signature for type 'string' is missing in type 'GlobalComponents'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/settings-primitives/index.d.ts(3507,22): error TS2344: Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.
+  Index signature for type 'string' is missing in type 'GlobalComponents'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/settings-primitives/index.d.ts(3656,20): error TS2344: Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.
+  Index signature for type 'string' is missing in type 'GlobalComponents'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/settings-primitives/index.d.ts(3835,26): error TS2344: Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.
+  Index signature for type 'string' is missing in type 'GlobalComponents'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/settings-primitives/index.d.ts(3998,24): error TS2344: Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.
+  Index signature for type 'string' is missing in type 'GlobalComponents'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/settings-primitives/index.d.ts(4079,22): error TS2344: Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.
+  Index signature for type 'string' is missing in type 'GlobalComponents'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/settings-primitives/index.d.ts(4242,20): error TS2344: Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.
+  Index signature for type 'string' is missing in type 'GlobalComponents'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/settings-primitives/index.d.ts(4333,26): error TS2344: Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.
+  Index signature for type 'string' is missing in type 'GlobalComponents'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/settings-primitives/index.d.ts(4422,24): error TS2344: Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.
+  Index signature for type 'string' is missing in type 'GlobalComponents'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/settings-primitives/index.d.ts(4466,22): error TS2344: Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.
+  Index signature for type 'string' is missing in type 'GlobalComponents'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/settings-primitives/index.d.ts(4555,20): error TS2344: Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.
+  Index signature for type 'string' is missing in type 'GlobalComponents'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/settings-primitives/index.d.ts(4722,26): error TS2344: Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.
+  Index signature for type 'string' is missing in type 'GlobalComponents'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/settings-primitives/index.d.ts(4873,24): error TS2344: Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.
+  Index signature for type 'string' is missing in type 'GlobalComponents'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/settings-primitives/index.d.ts(4948,22): error TS2344: Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.
+  Index signature for type 'string' is missing in type 'GlobalComponents'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/settings-primitives/index.d.ts(5099,20): error TS2344: Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.
+  Index signature for type 'string' is missing in type 'GlobalComponents'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/settings-primitives/index.d.ts(5195,26): error TS2344: Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.
+  Index signature for type 'string' is missing in type 'GlobalComponents'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/settings-primitives/index.d.ts(5288,24): error TS2344: Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.
+  Index signature for type 'string' is missing in type 'GlobalComponents'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/settings-primitives/index.d.ts(5334,22): error TS2344: Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.
+  Index signature for type 'string' is missing in type 'GlobalComponents'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/settings-primitives/index.d.ts(5427,20): error TS2344: Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.
+  Index signature for type 'string' is missing in type 'GlobalComponents'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/settings-primitives/index.d.ts(5646,26): error TS2344: Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.
+  Index signature for type 'string' is missing in type 'GlobalComponents'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/settings-primitives/index.d.ts(5841,24): error TS2344: Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.
+  Index signature for type 'string' is missing in type 'GlobalComponents'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/settings-primitives/index.d.ts(5938,22): error TS2344: Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.
+  Index signature for type 'string' is missing in type 'GlobalComponents'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/settings-primitives/index.d.ts(6133,20): error TS2344: Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.
+  Index signature for type 'string' is missing in type 'GlobalComponents'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/settings-primitives/index.d.ts(6310,26): error TS2344: Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.
+  Index signature for type 'string' is missing in type 'GlobalComponents'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/settings-primitives/index.d.ts(6471,24): error TS2344: Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.
+  Index signature for type 'string' is missing in type 'GlobalComponents'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/settings-primitives/index.d.ts(6551,22): error TS2344: Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.
+  Index signature for type 'string' is missing in type 'GlobalComponents'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/settings-primitives/index.d.ts(6712,20): error TS2344: Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.
+  Index signature for type 'string' is missing in type 'GlobalComponents'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/settings-primitives/index.d.ts(6878,26): error TS2344: Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.
+  Index signature for type 'string' is missing in type 'GlobalComponents'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/settings-primitives/index.d.ts(7029,24): error TS2344: Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.
+  Index signature for type 'string' is missing in type 'GlobalComponents'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/settings-primitives/index.d.ts(7104,22): error TS2344: Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.
+  Index signature for type 'string' is missing in type 'GlobalComponents'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/settings-primitives/index.d.ts(7255,20): error TS2344: Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.
+  Index signature for type 'string' is missing in type 'GlobalComponents'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/settings-primitives/index.d.ts(7555,26): error TS2344: Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.
+  Index signature for type 'string' is missing in type 'GlobalComponents'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/settings-primitives/index.d.ts(7819,24): error TS2344: Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.
+  Index signature for type 'string' is missing in type 'GlobalComponents'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/settings-primitives/index.d.ts(7952,22): error TS2344: Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.
+  Index signature for type 'string' is missing in type 'GlobalComponents'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/settings-primitives/index.d.ts(8216,20): error TS2344: Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.
+  Index signature for type 'string' is missing in type 'GlobalComponents'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/table-v2/src/components/sort-icon.d.ts(5,13): error TS2503: Cannot find namespace 'JSX'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/table-v2/src/types.d.ts(92,13): error TS2503: Cannot find namespace 'JSX'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/table/src/util.d.ts(55,18): error TS2344: Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.
+  Index signature for type 'string' is missing in type 'GlobalComponents'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/tree-v2/index.d.ts(267,547): error TS2300: Duplicate identifier 'event'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/components/tree-v2/index.d.ts(267,574): error TS2300: Duplicate identifier 'event'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/motion/composables/use-gsap-context.d.ts(7,49): error TS2503: Cannot find namespace 'gsap'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/motion/composables/use-gsap-context.d.ts(9,19): error TS2503: Cannot find namespace 'gsap'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/motion/composables/use-scroll-reveal.d.ts(14,12): error TS2503: Cannot find namespace 'gsap'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/motion/composables/use-scroll-reveal.d.ts(15,21): error TS2503: Cannot find namespace 'ScrollTrigger'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/motion/composables/use-scroll-reveal.d.ts(19,76): error TS2503: Cannot find namespace 'gsap'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/motion/composables/use-scroll-reveal.d.ts(22,17): error TS2503: Cannot find namespace 'gsap'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/motion/composables/use-scroll-timeline.d.ts(9,12): error TS2503: Cannot find namespace 'gsap'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/motion/composables/use-scroll-timeline.d.ts(10,16): error TS2503: Cannot find namespace 'gsap'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/motion/composables/use-scroll-timeline.d.ts(11,14): error TS2503: Cannot find namespace 'gsap'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/motion/composables/use-scroll-timeline.d.ts(25,21): error TS2503: Cannot find namespace 'ScrollTrigger'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/motion/composables/use-scroll-timeline.d.ts(28,55): error TS2503: Cannot find namespace 'gsap'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/motion/composables/use-scroll-timeline.d.ts(31,20): error TS2503: Cannot find namespace 'gsap'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/motion/composables/use-timeline.d.ts(8,16): error TS2503: Cannot find namespace 'gsap'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/motion/composables/use-timeline.d.ts(9,12): error TS2503: Cannot find namespace 'gsap'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/motion/composables/use-timeline.d.ts(10,10): error TS2503: Cannot find namespace 'gsap'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/motion/composables/use-timeline.d.ts(11,12): error TS2503: Cannot find namespace 'gsap'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/motion/composables/use-timeline.d.ts(16,16): error TS2503: Cannot find namespace 'gsap'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/motion/composables/use-timeline.d.ts(19,15): error TS2503: Cannot find namespace 'gsap'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/motion/composables/use-timeline.d.ts(21,17): error TS2503: Cannot find namespace 'gsap'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/motion/composables/use-timeline.d.ts(22,18): error TS2503: Cannot find namespace 'gsap'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/motion/composables/use-timeline.d.ts(23,20): error TS2503: Cannot find namespace 'gsap'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/motion/composables/use-timeline.d.ts(24,20): error TS2503: Cannot find namespace 'gsap'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/motion/gsap/register.d.ts(1,31): error TS7016: Could not find a declaration file for module 'gsap/ScrollTrigger'. '/tmp/fsusui-consumer-Au9zsI/fixture/node_modules/gsap/ScrollTrigger.js' implicitly has an 'any' type.
+  Try `npm i --save-dev @types/gsap` if it exists or add a new declaration (.d.ts) file containing `declare module 'gsap/ScrollTrigger';`
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/motion/gsap/register.d.ts(2,55): error TS7017: Element implicitly has an 'any' type because type 'typeof globalThis' has no index signature.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/utils/objects.d.ts(1,30): error TS2307: Cannot find module 'type-fest' or its corresponding type declarations.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/global.d.ts(19,58): error TS2339: Property 'ElCascader' does not exist on type 'typeof import("/tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/index")'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/global.d.ts(108,56): error TS2339: Property 'ElOption' does not exist on type 'typeof import("/tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/index")'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/global.d.ts(109,61): error TS2339: Property 'ElOptionGroup' does not exist on type 'typeof import("/tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/index")'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/global.d.ts(136,56): error TS2339: Property 'ElSelect' does not exist on type 'typeof import("/tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/index")'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/global.d.ts(141,56): error TS2339: Property 'ElSlider' does not exist on type 'typeof import("/tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/index")'.
+../../../../../tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/global.d.ts(157,60): error TS2339: Property 'ElTimeSelect' does not exist on type 'typeof import("/tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus/es/index")'.
