@@ -186,7 +186,7 @@ test('actual installed tarball accepts the exact panel contract and rejects inva
   }
   writeFileSync(
     path.join(consumer, 'datepicker-panel-controls.json'),
-    JSON.stringify(result, null, 2) + '\n',
+    `${JSON.stringify(result, null, 2)}\n`,
   )
   assert.deepEqual(positive, [])
   assert.equal(negative.length, 4)

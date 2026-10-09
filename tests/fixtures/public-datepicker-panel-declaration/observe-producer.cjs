@@ -1,11 +1,18 @@
-const assert = require('node:assert/strict')
-const fs = require('node:fs')
-const path = require('node:path')
-const { execFileSync } = require('node:child_process')
-const { createHash } = require('node:crypto')
-const { Project, ts } = require('ts-morph')
+const filename = process
+  .getBuiltinModule('node:fs')
+  .realpathSync(process.argv[1])
+const requireSource = process
+  .getBuiltinModule('node:module')
+  .createRequire(filename)
+const assert = requireSource('node:assert/strict')
+const fs = requireSource('node:fs')
+const path = requireSource('node:path')
+const { execFileSync } = requireSource('node:child_process')
+const { createHash } = requireSource('node:crypto')
+const { Buffer } = requireSource('node:buffer')
+const { Project, ts } = requireSource('ts-morph')
 
-const root = path.resolve(__dirname, '../../..')
+const root = path.resolve(path.dirname(filename), '../../..')
 const baseline = '2d05f240e5fb04ac0cd602b4ed638ffe00b1859b'
 const target = 'vue/packages/components/date-picker/src/panel-utils.ts'
 const mode = process.argv[2]
@@ -158,7 +165,7 @@ type ReturnMutationRejected = Assert<Same<ReturnType<typeof getPanel>, typeof Da
     }).trim(),
     baseline,
     producerTypeScript: ts.version,
-    producerTsMorph: require('ts-morph/package.json').version,
+    producerTsMorph: requireSource('ts-morph/package.json').version,
     lockfileSha256: digest(fs.readFileSync(path.join(root, 'pnpm-lock.yaml'))),
     originalDiagnosticReturnUnchanged: true,
     runtimeJsSha256: digest(runtime(source)),
@@ -169,7 +176,7 @@ type ReturnMutationRejected = Assert<Same<ReturnType<typeof getPanel>, typeof Da
   return diagnostics
 }
 
-const { generateTypesDefinitions } = require(
+const { generateTypesDefinitions } = requireSource(
   path.join(root, 'vue/internal/build/src/tasks/types-definitions.ts'),
 )
 assert.equal(typeof generateTypesDefinitions, 'function')
@@ -189,7 +196,7 @@ generateTypesDefinitions((error) => {
     declaration,
   }
   fs.mkdirSync(path.dirname(output), { recursive: true })
-  fs.writeFileSync(output, JSON.stringify(result, null, 2) + '\n')
+  fs.writeFileSync(output, `${JSON.stringify(result, null, 2)}\n`)
   if (error) {
     console.error(error)
     process.exitCode = 1
@@ -204,7 +211,7 @@ generateTypesDefinitions((error) => {
       /getPanel: \(type: IDatePickerType\) => typeof DatePickPanel \| typeof DateRangePickPanel \| typeof MonthRangePickPanel/,
     )
   }
-  console.log(
-    `PASS canonical producer ${mode}; TS7056=${observation.diagnostics.filter((row) => row.code === 7056).length}`,
+  process.stdout.write(
+    `PASS canonical producer ${mode}; TS7056=${observation.diagnostics.filter((row) => row.code === 7056).length}\n`,
   )
 })
