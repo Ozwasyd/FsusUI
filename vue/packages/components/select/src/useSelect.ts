@@ -37,7 +37,7 @@ import {
 import { useDeprecated, useLocale, useNamespace } from '@element-plus/hooks'
 import { useFormItem, useFormSize } from '@element-plus/components/form'
 
-import type { ComponentPublicInstance } from 'vue'
+import type { ComponentPublicInstance, Ref, UnwrapRef } from 'vue'
 import type ElTooltip from '@element-plus/components/tooltip'
 import type { QueryChangeCtx, SelectOptionProxy } from './token'
 
@@ -73,8 +73,12 @@ export function useSelectStates(props) {
 type States = ReturnType<typeof useSelectStates>
 
 // Keep Vue's exact ref getter/setter contract named at the public return boundary.
+type SelectTooltipInstance = InstanceType<typeof ElTooltip>
 export interface SelectTooltipRef
-  extends ReturnType<typeof ref<InstanceType<typeof ElTooltip> | null>> {}
+  extends Ref<
+    UnwrapRef<SelectTooltipInstance> | null,
+    SelectTooltipInstance | UnwrapRef<SelectTooltipInstance> | null
+  > {}
 
 export const useSelect = (props, states: States, ctx) => {
   const { t } = useLocale()

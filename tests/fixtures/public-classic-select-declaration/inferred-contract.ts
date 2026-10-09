@@ -1,9 +1,9 @@
-import { useSelect as RepairedUseSelect, type SelectTooltipRef } from './vue/packages/components/select/src/useSelect'
-import { useSelect as OriginalUseSelect } from './vue/packages/components/select/src/useSelect.original'
-import RepairedSelect from './vue/packages/components/select/src/select.vue'
-import OriginalSelect from './vue/packages/components/select/src/select.original'
-import RepairedDefault, { ElSelect as RepairedInstalled, ElOption as RepairedOption, ElOptionGroup as RepairedGroup } from './vue/packages/components/select'
-import OriginalDefault, { ElSelect as OriginalInstalled, ElOption as OriginalOption, ElOptionGroup as OriginalGroup } from './vue/packages/components/select/index.original'
+import { useSelect as RepairedUseSelect, type SelectTooltipRef } from './packages/components/select/src/useSelect'
+import { useSelect as OriginalUseSelect } from './packages/components/select/src/useSelect.original'
+import RepairedSelect from './packages/components/select/src/select.vue'
+import OriginalSelect from './packages/components/select/src/select.original'
+import RepairedDefault, { ElSelect as RepairedInstalled, ElOption as RepairedOption, ElOptionGroup as RepairedGroup } from './packages/components/select'
+import OriginalDefault, { ElSelect as OriginalInstalled, ElOption as OriginalOption, ElOptionGroup as OriginalGroup } from './packages/components/select/index.original'
 
 type Assert<T extends true> = T
 type Equal<T, U> = (<V>() => V extends T ? 1 : 2) extends (<V>() => V extends U ? 1 : 2) ? true : false
