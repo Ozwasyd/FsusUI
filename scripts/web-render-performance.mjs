@@ -98,6 +98,8 @@ const profileMatrix = scenarioFilter
         ...dimensions[index % dimensions.length],
       ])
 
+if (caseFilter === undefined)
+  throw new Error('--case requires a full case ID')
 if (caseFilter && scenarioFilter)
   throw new Error('--case cannot be combined with --scenario')
 const matrix = caseFilter
