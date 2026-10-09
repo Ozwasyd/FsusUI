@@ -43,6 +43,8 @@ The WASM renderer preserves HTML, MathML, SVG, or placeholder data for Mermaid a
 
 The built-in renderer derives Mermaid themeVariables, KaTeX error colors, Shiki light/dark themes, and permitted dynamic `<style>` nonces from `data-theme-resolved`, Element Plus tokens, and `csp-nonce`. Mermaid, KaTeX, and Shiki activate only when their chunk nears the viewport. The security gateway and each third-party renderer load on demand in parallel, while all three activations share one gateway singleton result; Shiki loads only grammars actually encountered and the current theme. Activations across renderers use bounded concurrency rather than one global Promise lock. Failure does not crash the renderer: the component creates an `el-markdown-renderer__feature-error` node with `textContent` and reports the error in `features-activated.errors`.
 
+Shared theme changes invalidate enabled heavy features before lazy activation settles and while a replacement parse is pending. The renderer retains its theme listener across those generations, removes it when the committed result has no enabled heavy features, and releases it on unmount. Superseded generations do not emit render completion after their activation settles.
+
 Use `features` to disable an activation:
 
 ```vue
@@ -51,8 +53,6 @@ Use `features` to disable an activation:
   <el-markdown-renderer :content="content" :features="{ mermaid: false }" />
 </template>
 ```
-
-Shared theme changes invalidate heavy-feature work as soon as activation starts, including pending runtime imports. The previous activation is aborted before rendering the new theme, and unmount removes the listener.
 
 Feature renderers no longer accept a consumer DOM adapter. Built-in Mermaid, KaTeX, and Shiki read only immutable source, theme, and controlled tokens, then return a `FeatureRenderOutput` with `kind`. Output is committed only after passing separate FsusUI-owned gateway policies for Mermaid SVG, KaTeX MathML, and Shiki HTML. Mermaid must use native SVG text instead of `foreignObject`, and color tokens are validated against the controlled color grammar before entering a third-party renderer. The three policies do not share a union of tags or attributes; unknown tags, namespaces, attributes, events, executable URLs, and external resources are removed. See [Converging the Markdown feature output gateway](../migration/markdown-feature-output-gateway.md) for migration.
 
@@ -197,3 +197,5 @@ Large documents prefer the Render Pipeline adapter's shared Worker pool. Each po
 | 名称   | 说明         |
 | ------ | ------------ |
 | rootEl | 渲染容器元素 |
+
+Shared theme invalidation aborts pending heavy-feature work immediately and remains subscribed during replacement parsing. Aborted or superseded async stages cannot emit stale render completion/profile/error events; disabling heavy features and unmount remove the listener.
