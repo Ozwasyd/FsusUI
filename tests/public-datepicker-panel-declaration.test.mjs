@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict'
-import { spawnSync } from 'node:child_process'
+import { execFileSync, spawnSync } from 'node:child_process'
 import { mkdtempSync, readFileSync, copyFileSync, writeFileSync } from 'node:fs'
 import { createRequire } from 'node:module'
 import os from 'node:os'
@@ -60,6 +60,55 @@ test('actual installed tarball accepts the exact panel contract and rejects inva
   assert.equal(requireConsumer('vue/package.json').version, '3.5.32')
   const manifest = readJson(path.join(consumer, 'package.json'))
   assert.match(manifest.dependencies['@ozwasyd/element-plus'], /^file:.*\.tgz$/)
+  const requireRoot = createRequire(path.join(root, 'package.json'))
+  const producerTs = requireRoot('ts-morph').ts
+  const original = execFileSync(
+    'git',
+    [
+      'show',
+      '2d05f240e5fb04ac0cd602b4ed638ffe00b1859b:vue/packages/components/date-picker/src/panel-utils.ts',
+    ],
+    { cwd: root, encoding: 'utf8' },
+  )
+  const originalJs = producerTs.transpileModule(original, {
+    compilerOptions: {
+      target: producerTs.ScriptTarget.ES2022,
+      module: producerTs.ModuleKind.ESNext,
+    },
+  }).outputText
+  const packageRoot = path.join(consumer, 'node_modules/@ozwasyd/element-plus')
+  const packedJs = readFileSync(
+    path.join(packageRoot, 'es/components/date-picker/src/panel-utils.mjs'),
+    'utf8',
+  )
+  const printSelector = (text) => {
+    const file = producerTs.createSourceFile(
+      'panel-utils.js',
+      text,
+      producerTs.ScriptTarget.Latest,
+      true,
+      producerTs.ScriptKind.JS,
+    )
+    const statement = file.statements.find(
+      (node) =>
+        producerTs.isVariableStatement(node) &&
+        node.declarationList.declarations.some(
+          (declaration) => declaration.name.getText(file) === 'getPanel',
+        ),
+    )
+    assert.ok(statement, 'actual runtime selector must be present')
+    const selector = statement.declarationList.declarations.find(
+      (declaration) => declaration.name.getText(file) === 'getPanel',
+    ).initializer
+    return producerTs
+      .createPrinter()
+      .printNode(producerTs.EmitHint.Expression, selector, file)
+  }
+  assert.equal(
+    printSelector(packedJs),
+    printSelector(originalJs),
+    'actual packed runtime selector must match the original emitted JS',
+  )
   for (const file of ['positive.ts', 'negative.ts', 'tsconfig.json']) {
     copyFileSync(
       path.join(fixture, file),
@@ -87,7 +136,13 @@ test('actual installed tarball accepts the exact panel contract and rejects inva
       }))
   const positive = diagnostics('positive.ts')
   const negative = diagnostics('negative.ts')
-  const result = { strict: true, skipLibCheck: false, positive, negative }
+  const result = {
+    strict: true,
+    skipLibCheck: false,
+    actualPackedRuntimeSelectorParity: 'PASS',
+    positive,
+    negative,
+  }
   writeFileSync(
     path.join(consumer, 'datepicker-panel-controls.json'),
     JSON.stringify(result, null, 2) + '\n',
