@@ -1,0 +1,11 @@
+{
+  "dotnet/FsusUI.Avalonia.HeadlessTests/TestAppBuilder.cs": "2818a9fdca033be90518e7d507e66e1b195af2bba7da62355ce9b85c01cf9928",
+  "dotnet/FsusUI.Avalonia.HeadlessTests/TestAssembly.cs": "3f7edd72eac91614fcf49f709dd4e560c74ebef8da68a53a02947e5611cd1869",
+  "dotnet/FsusUI.Avalonia.HeadlessTests/FsusUI.Avalonia.HeadlessTests.csproj": "81b4ee86dffb69eacac1775c4da32ee22ea1da8154de0c707c2f552d820dbc79",
+  "dotnet/FsusUI.Avalonia.Demo/Program.cs": "22e90ff52747121468ef3c632c0c89cf77de526f59aa87ddcdf4b9097539800e",
+  "dotnet/FsusUI.Avalonia.Demo/App.axaml.cs": "7aed3f4e1fe652c0729d53ec68d913372bc2de003b2ca02d77dad7e84a8d1016",
+  "dotnet/FsusUI.Avalonia.Demo/App.axaml": "828021e21a39644bd2ee70ec11ca0bd3c3f3be6bea3e33e47d54b1028e7ba992",
+  "dotnet/FsusUI.Avalonia.Demo/RenderPerformanceRunner.cs": "847ac4385b6fec58b6e8fbf6a9e09289878853e6294936f1ab78fea46aff85e1",
+  "dotnet/FsusUI.Avalonia.Demo/bin/Release/net10.0/FsusUI.Avalonia.Demo.dll": "a88fb7c8caa39ea98c007b0fece28103972c040e8ead39b5957aa7d04ef817d4",
+  "dotnet/FsusUI.Avalonia.HeadlessTests/bin/Release/net10.0/FsusUI.Avalonia.HeadlessTests.dll": "f03e0076f199e2f5b46e5989c5febf47348b92b2c99d536d5bad880cf536e02b"
+}

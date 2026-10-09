@@ -1,0 +1,24 @@
+Use a clean checkout of source82ba61bda502230e4c1fcd1e9084ab2e6c006fda.
+source /workspace/.setup/activate.sh
+cd /workspace/native-desktop-successor/dotnet
+dotnet restore FsusUI.Avalonia.HeadlessTests/FsusUI.Avalonia.HeadlessTests.csproj --locked-mode
+dotnet build FsusUI.Avalonia.HeadlessTests/FsusUI.Avalonia.HeadlessTests.csproj --no-restore -c Release
+
+Original isolated reproduction (discovery must show exactly two cases first):
+FSUS_HEADLESS_GSANS=1 dotnet test FsusUI.Avalonia.HeadlessTests/FsusUI.Avalonia.HeadlessTests.csproj --no-build --no-restore -c Release --filter 'FullyQualifiedName=FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests.DocumentTabsSupportCloseDragReorderOverflowContextAndPlatformCycling' --list-tests
+FSUS_HEADLESS_GSANS=1 dotnet test FsusUI.Avalonia.HeadlessTests/FsusUI.Avalonia.HeadlessTests.csproj --no-build --no-restore -c Release --filter 'FullyQualifiedName=FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests.DocumentTabsSupportCloseDragReorderOverflowContextAndPlatformCycling' --logger 'trx;LogFileName=isolated.trx' --results-directory /tmp/native-desktop-reproduction
+
+After original Font/Desktop owner supplies a reviewed correction: publish a new
+successor identity, locked restore/build, original exact discovery7 in both
+modes, then run the five-method desktop-filter.txt separately in GSANS0/1.
+Preserve unchanged original TestAppBuilder/hooks unless owner coordinates the
+specific correction. Do not overwrite these source82 logs with later results.
+
+Tree command only after a valid live display is available (or existing standard
+wrapper /usr/bin/xvfb-run is supplied); preflight exact original scenario1:
+cd /workspace/native-desktop-successor
+GITHUB_SHA=82ba61bda502230e4c1fcd1e9084ab2e6c006fda dotnet run --project dotnet/FsusUI.Avalonia.Demo/FsusUI.Avalonia.Demo.csproj --no-build --no-restore -c Release -- --render-performance --profile quick --warmups 1 --samples 21 --long-scroll-iterations 256 --backend auto --scenario tree-expand-scroll --output /workspace/native-desktop-evidence/tree/avalonia/summary.json
+Retain original summary/raw/disposal outputs and p95. This single current run
+cannot establish the same-runner order-balanced relative regression gate.
+No Table/PDF repeats on unchanged inputs: Root already delegated those toa025
+reviewer. Never reuse a025's142 executions as successor82 execution evidence.

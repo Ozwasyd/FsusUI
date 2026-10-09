@@ -1,0 +1,21 @@
+Original assembly entry: AvaloniaTestApplication(TestAppBuilder).
+TestAppBuilder: original .UseHeadless(UseHeadlessDrawing=false), .WithInterFont(),
+.With(CreateFontManagerOptions()), original theme/resources and GSANS switch.
+TestAssembly: CollectionBehavior(DisableTestParallelization=true).
+No host, theme, resource, collection or serial hook changed by successor82.
+Actual input SHA256s: actual-input-sha256.json; owner/source28path roster attached.
+
+desktop-selection.json records five exact nonempty original methods and seven
+cases:1+1+2+2+1. Both exact positive discovery axes passed before execution.
+desktop-filter.txt contains only the five ordinary FullyQualifiedName equalities.
+No wildcard/broad suite followed by filtering. No capture or RepositoryRoot
+helper called by these selected methods. Source attributes and nonempty bodies
+were inspected before admission. Test class has no IClassFixture,
+ICollectionFixture, Collection or BeforeAfter hook. All results retained in TRX.
+
+Fresh-process isolation: only the original two-case width method, GSANS1,
+exact discovery2 before execution. No assertion/source/setup mutation between
+first red and isolation. This is a diagnostic repetition, not extra distinct
+coverage. Commands can be found in NEXT_COMMANDS.txt.
+Tree preflight selected one original scenario but native entry did not run
+because display inputs are absent. No replacement performance harness used.

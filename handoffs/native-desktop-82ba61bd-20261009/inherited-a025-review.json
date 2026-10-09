@@ -1,0 +1,13 @@
+{
+  "source": "a0253323cd2442184aa5a42e8ff84fca86a10118",
+  "rootReportedIndependentOrdinaryExecutions": 137,
+  "rootReportedAddedTableCases": {
+    "GSANS0": 2,
+    "GSANS1": 2
+  },
+  "rootReportedAddedOriginalPDFMatrix": 1,
+  "rootReportedIndependentTotal": 142,
+  "qualification": "Root-reported original-source review only; never relabeled as82 executions",
+  "unchangedTablesPDFSourceHostBlobs": "Preserved on82; raw new runs were not performed here",
+  "PDFLimitation": "Original deterministic VisualBackend/TestWebViewPdfDocument adapter/parse/render; not real OS WebView export or actual CI action"
+}

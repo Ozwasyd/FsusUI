@@ -1,0 +1,254 @@
+[
+  {
+    "owner": "Font",
+    "path": "dotnet/FsusUI.Avalonia.HeadlessTests/FsusBundledInterFontRegistrationRegressionTests.cs",
+    "supplier": "06123873e2a45fe866d93576cc7ef0db1edfc702",
+    "supplierBlob": "e956c1afee563aeba48a4736f6fdb373f0bfff59",
+    "candidateBlob": "e956c1afee563aeba48a4736f6fdb373f0bfff59",
+    "sha256": "caa81e90e3a04e2989582cf905a0cb2942a7684d07ae85a5521b4e81de0ed2f3",
+    "status": "IDENTICAL"
+  },
+  {
+    "owner": "Font",
+    "path": "dotnet/FsusUI.Avalonia.HeadlessTests/FsusUI.Avalonia.HeadlessTests.csproj",
+    "supplier": "06123873e2a45fe866d93576cc7ef0db1edfc702",
+    "supplierBlob": "fdeb000cab023ee4d547ddc4d34a57cc514314f3",
+    "candidateBlob": "f1c2ba0e0595aee4fdf04185f235979cd4092b20",
+    "sha256": "81b4ee86dffb69eacac1775c4da32ee22ea1da8154de0c707c2f552d820dbc79",
+    "status": "COMPOSED reviewed project resources only"
+  },
+  {
+    "owner": "Font",
+    "path": "dotnet/FsusUI.Avalonia.HeadlessTests/TestAppBuilder.cs",
+    "supplier": "06123873e2a45fe866d93576cc7ef0db1edfc702",
+    "supplierBlob": "857f3c18f4e01c2cb0f3212fb00f7f06e0c71904",
+    "candidateBlob": "857f3c18f4e01c2cb0f3212fb00f7f06e0c71904",
+    "sha256": "2818a9fdca033be90518e7d507e66e1b195af2bba7da62355ce9b85c01cf9928",
+    "status": "IDENTICAL"
+  },
+  {
+    "owner": "Tree",
+    "path": ".changeset/avalonia-tree-row-retention.md",
+    "supplier": "3ddcda32c11925d152dfc25b946dcf4016fafd82",
+    "supplierBlob": "02fe4a232f8085e6783db3efa76cff2236704ba9",
+    "candidateBlob": "02fe4a232f8085e6783db3efa76cff2236704ba9",
+    "sha256": "e7c5514f31f471c118faa916534afbab2d34c38f5376716f60d2ace29c854bfa",
+    "status": "IDENTICAL"
+  },
+  {
+    "owner": "Tree",
+    "path": "dotnet/FsusUI.Avalonia.HeadlessTests/FsusTreeScrollingHeadlessTests.cs",
+    "supplier": "3ddcda32c11925d152dfc25b946dcf4016fafd82",
+    "supplierBlob": "22fb133394ad63668e96e21c47b4058edbc70e22",
+    "candidateBlob": "22fb133394ad63668e96e21c47b4058edbc70e22",
+    "sha256": "6306eaad7b5ef7d59e40888eccacffa0b417f63457633644f172856914d45a09",
+    "status": "IDENTICAL"
+  },
+  {
+    "owner": "Tree",
+    "path": "dotnet/FsusUI.Avalonia.Tests/Controls/FsusTreeRowRetentionTests.cs",
+    "supplier": "3ddcda32c11925d152dfc25b946dcf4016fafd82",
+    "supplierBlob": "97f7a56a3e9e1a6086d10ea938735d1be54b1b40",
+    "candidateBlob": "97f7a56a3e9e1a6086d10ea938735d1be54b1b40",
+    "sha256": "0129464642a26de343f558c451aeff98d86057b6288d0ed764b485b0c5452792",
+    "status": "IDENTICAL"
+  },
+  {
+    "owner": "Tree",
+    "path": "dotnet/FsusUI.Avalonia/Controls/FsusTreeControls.cs",
+    "supplier": "3ddcda32c11925d152dfc25b946dcf4016fafd82",
+    "supplierBlob": "3ac7f3f180f1315aa4ff54e99346567a27ae5025",
+    "candidateBlob": "3ac7f3f180f1315aa4ff54e99346567a27ae5025",
+    "sha256": "4c5701bf9b117de22abcbb3c391a0cef404caf8916864c2da775c187bdbd1d2e",
+    "status": "IDENTICAL"
+  },
+  {
+    "owner": "Shortcut",
+    "path": ".changeset/avalonia-native-primary-modifier.md",
+    "supplier": "68c4fa4ab5b031d043a29ac945f44c6998b047fa",
+    "supplierBlob": "06897ce4a4811ddb464612f7048f5ebd13b01b4c",
+    "candidateBlob": "06897ce4a4811ddb464612f7048f5ebd13b01b4c",
+    "sha256": "441f83cfc8b72116534ca0f6dae3829d481ccfe1253be1aec19a9e3a7e5f94dc",
+    "status": "IDENTICAL"
+  },
+  {
+    "owner": "Shortcut",
+    "path": "docs/avalonia/components/navigation.md",
+    "supplier": "68c4fa4ab5b031d043a29ac945f44c6998b047fa",
+    "supplierBlob": "46cb421025db2fd3e1081958a4b123e61da46d45",
+    "candidateBlob": "46cb421025db2fd3e1081958a4b123e61da46d45",
+    "sha256": "b1d6d267576fd3af25e973efee17a9a343e3cffcbb03f04dc562e0659b4f627d",
+    "status": "IDENTICAL"
+  },
+  {
+    "owner": "Shortcut",
+    "path": "dotnet/FsusUI.Avalonia.HeadlessTests/FsusNativeMenuHeadlessTests.cs",
+    "supplier": "68c4fa4ab5b031d043a29ac945f44c6998b047fa",
+    "supplierBlob": "e725e88c37cda487fe10792a47ddb5f0204aa874",
+    "candidateBlob": "e725e88c37cda487fe10792a47ddb5f0204aa874",
+    "sha256": "dbbd786383f4ef5619da882fbb3a81cfbd938ff3c08ea445e7e51a613d405874",
+    "status": "IDENTICAL"
+  },
+  {
+    "owner": "Shortcut",
+    "path": "dotnet/FsusUI.Avalonia.HeadlessTests/FsusNativeMenuTests.cs",
+    "supplier": "68c4fa4ab5b031d043a29ac945f44c6998b047fa",
+    "supplierBlob": "c1464885e1bf7185c062c91da4b367c591b684f5",
+    "candidateBlob": "c1464885e1bf7185c062c91da4b367c591b684f5",
+    "sha256": "0bddad0db66541f1ee66191dc6fd1316bd417415bd8e33d911f76f66c71625bf",
+    "status": "IDENTICAL"
+  },
+  {
+    "owner": "Shortcut",
+    "path": "dotnet/FsusUI.Avalonia.HeadlessTests/FsusShortcutRecorderHeadlessTests.cs",
+    "supplier": "68c4fa4ab5b031d043a29ac945f44c6998b047fa",
+    "supplierBlob": "f68292ed8fbbacb789dd548f48190e029499374c",
+    "candidateBlob": "f68292ed8fbbacb789dd548f48190e029499374c",
+    "sha256": "24963f0d050cc325451bdf1d7ef11b4af00a215cec474b939b72afa3b616e13c",
+    "status": "IDENTICAL"
+  },
+  {
+    "owner": "Shortcut",
+    "path": "dotnet/FsusUI.Avalonia.Tests/Controls/FsusCommandPaletteTests.cs",
+    "supplier": "68c4fa4ab5b031d043a29ac945f44c6998b047fa",
+    "supplierBlob": "d7aec67fbf0189c13282d978ad55ba116b6745a9",
+    "candidateBlob": "d7aec67fbf0189c13282d978ad55ba116b6745a9",
+    "sha256": "2d6cfdc5e329dd4fc321762fed2b1cf663cce66010711e779a43946d87e0f957",
+    "status": "IDENTICAL"
+  },
+  {
+    "owner": "Shortcut",
+    "path": "dotnet/FsusUI.Avalonia.Tests/Controls/FsusShortcutRecorderTests.cs",
+    "supplier": "68c4fa4ab5b031d043a29ac945f44c6998b047fa",
+    "supplierBlob": "884e95f95605b1b34c089b98febdcffe2e4b4332",
+    "candidateBlob": "884e95f95605b1b34c089b98febdcffe2e4b4332",
+    "sha256": "2c7e62380f03e354201bec380859c53749608eb56f03455c205c62ee7f23bb36",
+    "status": "IDENTICAL"
+  },
+  {
+    "owner": "Shortcut",
+    "path": "dotnet/FsusUI.Avalonia/Controls/FsusNativeMenuControls.cs",
+    "supplier": "68c4fa4ab5b031d043a29ac945f44c6998b047fa",
+    "supplierBlob": "641af9fa070e0b030c8c20cfcf4a40c5caf6b8e8",
+    "candidateBlob": "641af9fa070e0b030c8c20cfcf4a40c5caf6b8e8",
+    "sha256": "15d7e0b865f9a754ac47cf77b78bf770059b9f2d11c51c2f5168bcebe56f2945",
+    "status": "IDENTICAL"
+  },
+  {
+    "owner": "Shortcut",
+    "path": "dotnet/FsusUI.Avalonia/Controls/FsusShortcutRecorder.cs",
+    "supplier": "68c4fa4ab5b031d043a29ac945f44c6998b047fa",
+    "supplierBlob": "382538a3eb73dd83118169db37e299f21dcc54b7",
+    "candidateBlob": "382538a3eb73dd83118169db37e299f21dcc54b7",
+    "sha256": "287e4a1fe14fc0547bb2c9e10e77f72262368252ec6a00d1845045777cff65d6",
+    "status": "IDENTICAL"
+  },
+  {
+    "owner": "PDF",
+    "path": ".github/actions/setup-pdf-tools/action.yml",
+    "supplier": "ed80a940757a1bf9ef3b9e86b12a0adb53bbcdd1",
+    "supplierBlob": "d5806a4bfa4f635d1ca51b9a2dd7cdfcd5109fff",
+    "candidateBlob": "d5806a4bfa4f635d1ca51b9a2dd7cdfcd5109fff",
+    "sha256": "c0e7da89317714754e31692b5fdd47b4242ae2cd5279601af5f5c07a02ce848b",
+    "status": "IDENTICAL"
+  },
+  {
+    "owner": "PDF",
+    "path": ".github/workflows/_quality.yml",
+    "supplier": "ed80a940757a1bf9ef3b9e86b12a0adb53bbcdd1",
+    "supplierBlob": "d944e1d08650edc438869a06c44d4db71cdd83ba",
+    "candidateBlob": "d944e1d08650edc438869a06c44d4db71cdd83ba",
+    "sha256": "88f967ce3faf2be1d6fa6e7fad1aca1fb0ef96e2134f36af76b9e1db6bec01ae",
+    "status": "IDENTICAL"
+  },
+  {
+    "owner": "TableV2",
+    "path": "dotnet/FsusUI.Avalonia.HeadlessTests/Assets/TableV2Fonts/NotoSans-Bold.ttf",
+    "supplier": "90a7d58aad585edbbeec8756fc6d6e5aa0a2c9a7",
+    "supplierBlob": "4d923cbfff4d25827689282c7bd8189b4fce825a",
+    "candidateBlob": "4d923cbfff4d25827689282c7bd8189b4fce825a",
+    "sha256": "e83493c945848ecd4a9ad0f6d19164541a0d3e23a9c952304a00a46e00272ac5",
+    "status": "IDENTICAL"
+  },
+  {
+    "owner": "TableV2",
+    "path": "dotnet/FsusUI.Avalonia.HeadlessTests/Assets/TableV2Fonts/NotoSans-Regular.ttf",
+    "supplier": "90a7d58aad585edbbeec8756fc6d6e5aa0a2c9a7",
+    "supplierBlob": "7e9c1696ae43d387278f5fae47a2590dd6f1b0f8",
+    "candidateBlob": "7e9c1696ae43d387278f5fae47a2590dd6f1b0f8",
+    "sha256": "89c3c497f618fdaa0b2d1e98fef93582f28c71debd2c4a8cdf41f190ced2909d",
+    "status": "IDENTICAL"
+  },
+  {
+    "owner": "TableV2",
+    "path": "dotnet/FsusUI.Avalonia.HeadlessTests/Assets/TableV2Fonts/OFL.txt",
+    "supplier": "90a7d58aad585edbbeec8756fc6d6e5aa0a2c9a7",
+    "supplierBlob": "c82d72e422e2d08c5ab439b6bac7c2177ea0c565",
+    "candidateBlob": "c82d72e422e2d08c5ab439b6bac7c2177ea0c565",
+    "sha256": "0dab92d0544f7b233403f14b84a663bdbfa746982eda629e7f4f9ffe1b036feb",
+    "status": "IDENTICAL"
+  },
+  {
+    "owner": "TableV2",
+    "path": "dotnet/FsusUI.Avalonia.HeadlessTests/Assets/TableV2Fonts/README.md",
+    "supplier": "90a7d58aad585edbbeec8756fc6d6e5aa0a2c9a7",
+    "supplierBlob": "f604f224d23dd08f19933577a72359ebd051c800",
+    "candidateBlob": "f604f224d23dd08f19933577a72359ebd051c800",
+    "sha256": "8cf65ed27df05350935be7069f10d2db5c23e26a8b6405aa7416e0b260b277d2",
+    "status": "IDENTICAL"
+  },
+  {
+    "owner": "TableV2",
+    "path": "dotnet/FsusUI.Avalonia.HeadlessTests/FsusTableV2RenderedEvidenceTests.cs",
+    "supplier": "90a7d58aad585edbbeec8756fc6d6e5aa0a2c9a7",
+    "supplierBlob": "a229e60151e44c361e262072b5a1fc6645925478",
+    "candidateBlob": "a229e60151e44c361e262072b5a1fc6645925478",
+    "sha256": "e39f81114c0c20dba52bb356be417c7a3c7c9e4f51f55f0f9913b99ba54c90c6",
+    "status": "IDENTICAL"
+  },
+  {
+    "owner": "TableV2",
+    "path": "dotnet/FsusUI.Avalonia.HeadlessTests/FsusVirtualizationHeadlessTests.cs",
+    "supplier": "90a7d58aad585edbbeec8756fc6d6e5aa0a2c9a7",
+    "supplierBlob": "c0b9e1c54392d9df6c55ff9b99e495006c640b94",
+    "candidateBlob": "c0b9e1c54392d9df6c55ff9b99e495006c640b94",
+    "sha256": "d542444788cf08a238b4b9c53fd9ba1a090c261b97a511ffca2ec3dd5ef48838",
+    "status": "IDENTICAL"
+  },
+  {
+    "owner": "Desktop",
+    "path": ".changeset/avalonia-document-tab-reorder-focus.md",
+    "supplier": "b680455bcb872864cebe8e8d0c60a69e6dec3065",
+    "supplierBlob": "6e61ed3dabf5a6627c989b2c155aabd6ce397869",
+    "candidateBlob": "6e61ed3dabf5a6627c989b2c155aabd6ce397869",
+    "sha256": "16f72a841a52d32ba432874e4b06b7920b965cfa159d18bab972d7e40a92d018",
+    "status": "IDENTICAL"
+  },
+  {
+    "owner": "Desktop",
+    "path": "docs/avalonia/components/desktop-shell.md",
+    "supplier": "b680455bcb872864cebe8e8d0c60a69e6dec3065",
+    "supplierBlob": "aef53a021914a0d4e722384c94f7919bad767ce2",
+    "candidateBlob": "aef53a021914a0d4e722384c94f7919bad767ce2",
+    "sha256": "4f81e17490c140a2564db545273d49ee48cdf438eaf8d98c525277cf33eb5f61",
+    "status": "IDENTICAL"
+  },
+  {
+    "owner": "Desktop",
+    "path": "dotnet/FsusUI.Avalonia.HeadlessTests/FsusDesktopShellHeadlessTests.cs",
+    "supplier": "b680455bcb872864cebe8e8d0c60a69e6dec3065",
+    "supplierBlob": "fc2d3f705e5490d74057c7468c3a0fdcfe94d4b7",
+    "candidateBlob": "fc2d3f705e5490d74057c7468c3a0fdcfe94d4b7",
+    "sha256": "f4c623d3b737f3077a4305d79efdd38528003c9f516629d868f1d2faec64489a",
+    "status": "IDENTICAL"
+  },
+  {
+    "owner": "Desktop",
+    "path": "dotnet/FsusUI.Avalonia/Controls/FsusDocumentTabs.cs",
+    "supplier": "b680455bcb872864cebe8e8d0c60a69e6dec3065",
+    "supplierBlob": "f5cb38c4735527a3d104363246c220db6737f814",
+    "candidateBlob": "f5cb38c4735527a3d104363246c220db6737f814",
+    "sha256": "66fd8a8847743c4c120a4bfce5ea9b58c7b0c913226a1230a2f99cae0448e376",
+    "status": "IDENTICAL"
+  }
+]

@@ -1,0 +1,168 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TestRun id="bd267378-a258-4d9c-ba88-ff35aa541268" name="@d45ac3896e5a 2026-10-09 09:52:07" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <Times creation="2026-10-09T09:52:07.7945048+00:00" queuing="2026-10-09T09:52:07.7945048+00:00" start="2026-10-09T09:52:03.3083097+00:00" finish="2026-10-09T09:52:10.3256820+00:00" />
+  <TestSettings name="default" id="840931bb-a5b2-49e4-8557-f49f93785980">
+    <Deployment runDeploymentRoot="_d45ac3896e5a_2026-10-09_09_52_07" />
+  </TestSettings>
+  <Results>
+    <UnitTestResult executionId="be3e4946-745e-4ddb-9ee1-be2b6cea44f9" testId="6099867e-9529-9021-cc97-339c459e2d8b" testName="FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests.DocumentContextRequestReturnsTypedStableAnchorWithoutSelectingTarget" computerName="d45ac3896e5a" duration="00:00:00.1418621" startTime="2026-10-09T09:52:06.5168401+00:00" endTime="2026-10-09T09:52:06.6721731+00:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="be3e4946-745e-4ddb-9ee1-be2b6cea44f9" />
+    <UnitTestResult executionId="4bedd4a5-18c1-4385-900c-9faec0080911" testId="c21d6414-7975-9d3c-e498-c8f996e10013" testName="FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests.AutomationPeersExposeSelectionDirtyExpandedAndCloseSemantics" computerName="d45ac3896e5a" duration="00:00:00.1027357" startTime="2026-10-09T09:52:10.0235175+00:00" endTime="2026-10-09T09:52:10.1264226+00:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="4bedd4a5-18c1-4385-900c-9faec0080911" />
+    <UnitTestResult executionId="f45fd0c4-2969-4f70-9cf9-398003746a24" testId="64edc53c-3435-a125-7425-e2147ecc441d" testName="FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests.DocumentContentKeepsSingleVisualParentAcrossThemeRemovalAndRemount(useRecyclingTemplate: True)" computerName="d45ac3896e5a" duration="00:00:00.0625333" startTime="2026-10-09T09:52:09.9535838+00:00" endTime="2026-10-09T09:52:10.0162452+00:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="f45fd0c4-2969-4f70-9cf9-398003746a24" />
+    <UnitTestResult executionId="3fd05155-2251-46db-87b2-f335867b14d0" testId="4389d04f-5406-36e1-1ac9-853ad083f317" testName="FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests.DocumentTabsCancelClosePreserveDirtyStateReorderAndSelectAdjacentFallback" computerName="d45ac3896e5a" duration="00:00:00.0052436" startTime="2026-10-09T09:52:10.1334958+00:00" endTime="2026-10-09T09:52:10.1388689+00:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="3fd05155-2251-46db-87b2-f335867b14d0" />
+    <UnitTestResult executionId="f69f6e33-8a03-4eb8-b7be-39dd984d3515" testId="710d308e-bdad-c2eb-0648-74436f282f1e" testName="FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests.DocumentContentKeepsSingleVisualParentAcrossThemeRemovalAndRemount(useRecyclingTemplate: False)" computerName="d45ac3896e5a" duration="00:00:00.0696981" startTime="2026-10-09T09:52:09.8766909+00:00" endTime="2026-10-09T09:52:09.9465296+00:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="f69f6e33-8a03-4eb8-b7be-39dd984d3515" />
+    <UnitTestResult executionId="50c745e5-143c-48ea-9f4b-1be35ab55440" testId="ba7e2d21-0c90-a864-58ba-b08783a3cf98" testName="FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests.DocumentTabsSupportCloseDragReorderOverflowContextAndPlatformCycling(headerWidth: 120)" computerName="d45ac3896e5a" duration="00:00:02.5034257" startTime="2026-10-09T09:52:06.7248142+00:00" endTime="2026-10-09T09:52:09.2513043+00:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="50c745e5-143c-48ea-9f4b-1be35ab55440">
+      <Output>
+        <ErrorInfo>
+          <Message>System.InvalidOperationException : Could not create glyphTypeface. Font family: $Default (key: ). Style: Normal. Weight: Normal. Stretch: Normal</Message>
+          <StackTrace>   at Avalonia.Media.Typeface.get_GlyphTypeface()
+   at Avalonia.Media.TextFormatting.TextRunProperties.get_CachedGlyphTypeface()
+   at Avalonia.Media.TextFormatting.TextLineImpl.CreateLineMetrics()
+   at Avalonia.Media.TextFormatting.TextLineImpl.FinalizeLine()
+   at Avalonia.Media.TextFormatting.TextFormatterImpl.FormatLine(ITextSource textSource, Int32 firstTextSourceIndex, Double paragraphWidth, TextParagraphProperties paragraphProperties, TextLineBreak previousLineBreak, TextRunCache textRunCache)
+   at Avalonia.Media.TextFormatting.TextLayout.CreateTextLines()
+   at Avalonia.Media.TextFormatting.TextLayout..ctor(ITextSource textSource, TextParagraphProperties paragraphProperties, TextTrimming textTrimming, Double maxWidth, Double maxHeight, Int32 maxLines, TextRunCache textRunCache)
+   at Avalonia.Controls.TextBlock.CreateTextLayout(String text)
+   at Avalonia.Controls.TextBlock.get_TextLayout()
+   at Avalonia.Controls.TextBlock.MeasureOverride(Size availableSize)
+   at Avalonia.Layout.Layoutable.MeasureCore(Size availableSize)
+   at Avalonia.Layout.Layoutable.Measure(Size availableSize)
+   at Avalonia.Layout.LayoutManager.Measure(Layoutable control)
+   at Avalonia.Layout.LayoutManager.ExecuteMeasurePass()
+   at Avalonia.Layout.LayoutManager.InnerLayoutPass()
+   at Avalonia.Layout.LayoutManager.ExecuteLayoutPass()
+   at Avalonia.Layout.LayoutManager.ExecuteQueuedLayoutPass()
+   at Avalonia.Media.MediaContext.FireInvokeOnRenderCallbacks()
+   at Avalonia.Media.MediaContext.RenderCore()
+   at Avalonia.Media.MediaContext.Render()
+   at Avalonia.Threading.DispatcherOperation.InvokeCore()
+   at Avalonia.Threading.DispatcherOperation.Execute()
+   at Avalonia.Threading.Dispatcher.ExecuteJob(DispatcherOperation job)
+   at Avalonia.Threading.Dispatcher.RunJobs(Nullable`1 priority, CancellationToken cancellationToken)
+   at Avalonia.Threading.Dispatcher.RunJobs(Nullable`1 priority)
+   at FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests.DocumentTabsSupportCloseDragReorderOverflowContextAndPlatformCycling(Double headerWidth) in /workspace/native-desktop-successor/dotnet/FsusUI.Avalonia.HeadlessTests/FsusDesktopShellHeadlessTests.cs:line 312
+   at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+   at System.Reflection.MethodBaseInvoker.InvokeDirectByRefWithFewArgs(Object obj, Span`1 copyOfArgs, BindingFlags invokeAttr)</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="c9d964b9-0554-4487-99ad-41a541883078" testId="8f2979c1-5b21-25fb-bab4-1630f98698ec" testName="FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests.DocumentTabsSupportCloseDragReorderOverflowContextAndPlatformCycling(headerWidth: 220)" computerName="d45ac3896e5a" duration="00:00:00.5923422" startTime="2026-10-09T09:52:09.2717045+00:00" endTime="2026-10-09T09:52:09.8641739+00:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="c9d964b9-0554-4487-99ad-41a541883078" />
+  </Results>
+  <TestDefinitions>
+    <UnitTest name="FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests.AutomationPeersExposeSelectionDirtyExpandedAndCloseSemantics" storage="/workspace/native-desktop-successor/dotnet/fsusui.avalonia.headlesstests/bin/release/net10.0/fsusui.avalonia.headlesstests.dll" id="c21d6414-7975-9d3c-e498-c8f996e10013">
+      <Execution id="4bedd4a5-18c1-4385-900c-9faec0080911" />
+      <TestMethod codeBase="/workspace/native-desktop-successor/dotnet/FsusUI.Avalonia.HeadlessTests/bin/Release/net10.0/FsusUI.Avalonia.HeadlessTests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests" name="AutomationPeersExposeSelectionDirtyExpandedAndCloseSemantics" />
+    </UnitTest>
+    <UnitTest name="FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests.DocumentContentKeepsSingleVisualParentAcrossThemeRemovalAndRemount(useRecyclingTemplate: True)" storage="/workspace/native-desktop-successor/dotnet/fsusui.avalonia.headlesstests/bin/release/net10.0/fsusui.avalonia.headlesstests.dll" id="64edc53c-3435-a125-7425-e2147ecc441d">
+      <Execution id="f45fd0c4-2969-4f70-9cf9-398003746a24" />
+      <TestMethod codeBase="/workspace/native-desktop-successor/dotnet/FsusUI.Avalonia.HeadlessTests/bin/Release/net10.0/FsusUI.Avalonia.HeadlessTests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests" name="DocumentContentKeepsSingleVisualParentAcrossThemeRemovalAndRemount" />
+    </UnitTest>
+    <UnitTest name="FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests.DocumentContentKeepsSingleVisualParentAcrossThemeRemovalAndRemount(useRecyclingTemplate: False)" storage="/workspace/native-desktop-successor/dotnet/fsusui.avalonia.headlesstests/bin/release/net10.0/fsusui.avalonia.headlesstests.dll" id="710d308e-bdad-c2eb-0648-74436f282f1e">
+      <Execution id="f69f6e33-8a03-4eb8-b7be-39dd984d3515" />
+      <TestMethod codeBase="/workspace/native-desktop-successor/dotnet/FsusUI.Avalonia.HeadlessTests/bin/Release/net10.0/FsusUI.Avalonia.HeadlessTests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests" name="DocumentContentKeepsSingleVisualParentAcrossThemeRemovalAndRemount" />
+    </UnitTest>
+    <UnitTest name="FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests.DocumentTabsSupportCloseDragReorderOverflowContextAndPlatformCycling(headerWidth: 220)" storage="/workspace/native-desktop-successor/dotnet/fsusui.avalonia.headlesstests/bin/release/net10.0/fsusui.avalonia.headlesstests.dll" id="8f2979c1-5b21-25fb-bab4-1630f98698ec">
+      <Execution id="c9d964b9-0554-4487-99ad-41a541883078" />
+      <TestMethod codeBase="/workspace/native-desktop-successor/dotnet/FsusUI.Avalonia.HeadlessTests/bin/Release/net10.0/FsusUI.Avalonia.HeadlessTests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests" name="DocumentTabsSupportCloseDragReorderOverflowContextAndPlatformCycling" />
+    </UnitTest>
+    <UnitTest name="FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests.DocumentTabsSupportCloseDragReorderOverflowContextAndPlatformCycling(headerWidth: 120)" storage="/workspace/native-desktop-successor/dotnet/fsusui.avalonia.headlesstests/bin/release/net10.0/fsusui.avalonia.headlesstests.dll" id="ba7e2d21-0c90-a864-58ba-b08783a3cf98">
+      <Execution id="50c745e5-143c-48ea-9f4b-1be35ab55440" />
+      <TestMethod codeBase="/workspace/native-desktop-successor/dotnet/FsusUI.Avalonia.HeadlessTests/bin/Release/net10.0/FsusUI.Avalonia.HeadlessTests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests" name="DocumentTabsSupportCloseDragReorderOverflowContextAndPlatformCycling" />
+    </UnitTest>
+    <UnitTest name="FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests.DocumentContextRequestReturnsTypedStableAnchorWithoutSelectingTarget" storage="/workspace/native-desktop-successor/dotnet/fsusui.avalonia.headlesstests/bin/release/net10.0/fsusui.avalonia.headlesstests.dll" id="6099867e-9529-9021-cc97-339c459e2d8b">
+      <Execution id="be3e4946-745e-4ddb-9ee1-be2b6cea44f9" />
+      <TestMethod codeBase="/workspace/native-desktop-successor/dotnet/FsusUI.Avalonia.HeadlessTests/bin/Release/net10.0/FsusUI.Avalonia.HeadlessTests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests" name="DocumentContextRequestReturnsTypedStableAnchorWithoutSelectingTarget" />
+    </UnitTest>
+    <UnitTest name="FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests.DocumentTabsCancelClosePreserveDirtyStateReorderAndSelectAdjacentFallback" storage="/workspace/native-desktop-successor/dotnet/fsusui.avalonia.headlesstests/bin/release/net10.0/fsusui.avalonia.headlesstests.dll" id="4389d04f-5406-36e1-1ac9-853ad083f317">
+      <Execution id="3fd05155-2251-46db-87b2-f335867b14d0" />
+      <TestMethod codeBase="/workspace/native-desktop-successor/dotnet/FsusUI.Avalonia.HeadlessTests/bin/Release/net10.0/FsusUI.Avalonia.HeadlessTests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests" name="DocumentTabsCancelClosePreserveDirtyStateReorderAndSelectAdjacentFallback" />
+    </UnitTest>
+  </TestDefinitions>
+  <TestEntries>
+    <TestEntry testId="6099867e-9529-9021-cc97-339c459e2d8b" executionId="be3e4946-745e-4ddb-9ee1-be2b6cea44f9" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="c21d6414-7975-9d3c-e498-c8f996e10013" executionId="4bedd4a5-18c1-4385-900c-9faec0080911" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="64edc53c-3435-a125-7425-e2147ecc441d" executionId="f45fd0c4-2969-4f70-9cf9-398003746a24" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="4389d04f-5406-36e1-1ac9-853ad083f317" executionId="3fd05155-2251-46db-87b2-f335867b14d0" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="710d308e-bdad-c2eb-0648-74436f282f1e" executionId="f69f6e33-8a03-4eb8-b7be-39dd984d3515" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="ba7e2d21-0c90-a864-58ba-b08783a3cf98" executionId="50c745e5-143c-48ea-9f4b-1be35ab55440" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="8f2979c1-5b21-25fb-bab4-1630f98698ec" executionId="c9d964b9-0554-4487-99ad-41a541883078" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+  </TestEntries>
+  <TestLists>
+    <TestList name="Results Not in a List" id="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestList name="All Loaded Results" id="19431567-8539-422a-85d7-44ee4e166bda" />
+  </TestLists>
+  <ResultSummary outcome="Failed">
+    <Counters total="7" executed="7" passed="6" failed="1" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
+    <Output>
+      <StdOut>[xUnit.net 00:00:00.00] xUnit.net VSTest Adapter v3.1.4+50e68bbb8b (64-bit .NET 10.0.12)
+[xUnit.net 00:00:00.25]   Discovering: FsusUI.Avalonia.HeadlessTests
+[xUnit.net 00:00:01.09]   Discovered:  FsusUI.Avalonia.HeadlessTests
+[xUnit.net 00:00:01.49]   Starting:    FsusUI.Avalonia.HeadlessTests
+Fontconfig error: No writable cache directories
+Fontconfig error: No writable cache directories
+Fontconfig error: No writable cache directories
+Fontconfig error: No writable cache directories
+Fontconfig error: No writable cache directories
+Fontconfig error: No writable cache directories
+Fontconfig error: No writable cache directories
+Fontconfig error: No writable cache directories
+Fontconfig error: No writable cache directories
+Fontconfig error: No writable cache directories
+Fontconfig error: No writable cache directories
+Fontconfig error: No writable cache directories
+Fontconfig error: No writable cache directories
+Fontconfig error: No writable cache directories
+Fontconfig error: No writable cache directories
+Fontconfig error: No writable cache directories
+Fontconfig error: No writable cache directories
+Fontconfig error: No writable cache directories
+Fontconfig error: No writable cache directories
+Fontconfig error: No writable cache directories
+Fontconfig error: No writable cache directories
+Fontconfig error: No writable cache directories
+Fontconfig error: No writable cache directories
+Fontconfig error: No writable cache directories
+Fontconfig error: No writable cache directories
+Fontconfig error: No writable cache directories
+Fontconfig error: No writable cache directories
+Fontconfig error: No writable cache directories
+Fontconfig error: No writable cache directories
+[xUnit.net 00:00:05.01]       System.InvalidOperationException : Could not create glyphTypeface. Font family: $Default (key: ). Style: Normal. Weight: Normal. Stretch: Normal
+[xUnit.net 00:00:05.01]       Stack Trace:
+[xUnit.net 00:00:05.02]            at Avalonia.Media.Typeface.get_GlyphTypeface()
+[xUnit.net 00:00:05.02]            at Avalonia.Media.TextFormatting.TextRunProperties.get_CachedGlyphTypeface()
+[xUnit.net 00:00:05.02]            at Avalonia.Media.TextFormatting.TextLineImpl.CreateLineMetrics()
+[xUnit.net 00:00:05.02]            at Avalonia.Media.TextFormatting.TextLineImpl.FinalizeLine()
+[xUnit.net 00:00:05.02]            at Avalonia.Media.TextFormatting.TextFormatterImpl.FormatLine(ITextSource textSource, Int32 firstTextSourceIndex, Double paragraphWidth, TextParagraphProperties paragraphProperties, TextLineBreak previousLineBreak, TextRunCache textRunCache)
+[xUnit.net 00:00:05.02]            at Avalonia.Media.TextFormatting.TextLayout.CreateTextLines()
+[xUnit.net 00:00:05.02]            at Avalonia.Media.TextFormatting.TextLayout..ctor(ITextSource textSource, TextParagraphProperties paragraphProperties, TextTrimming textTrimming, Double maxWidth, Double maxHeight, Int32 maxLines, TextRunCache textRunCache)
+[xUnit.net 00:00:05.02]            at Avalonia.Controls.TextBlock.CreateTextLayout(String text)
+[xUnit.net 00:00:05.02]            at Avalonia.Controls.TextBlock.get_TextLayout()
+[xUnit.net 00:00:05.02]            at Avalonia.Controls.TextBlock.MeasureOverride(Size availableSize)
+[xUnit.net 00:00:05.02]            at Avalonia.Layout.Layoutable.MeasureCore(Size availableSize)
+[xUnit.net 00:00:05.02]            at Avalonia.Layout.Layoutable.Measure(Size availableSize)
+[xUnit.net 00:00:05.02]            at Avalonia.Layout.LayoutManager.Measure(Layoutable control)
+[xUnit.net 00:00:05.02]            at Avalonia.Layout.LayoutManager.ExecuteMeasurePass()
+[xUnit.net 00:00:05.02]            at Avalonia.Layout.LayoutManager.InnerLayoutPass()
+[xUnit.net 00:00:05.02]            at Avalonia.Layout.LayoutManager.ExecuteLayoutPass()
+[xUnit.net 00:00:05.02]            at Avalonia.Layout.LayoutManager.ExecuteQueuedLayoutPass()
+[xUnit.net 00:00:05.02]            at Avalonia.Media.MediaContext.FireInvokeOnRenderCallbacks()
+[xUnit.net 00:00:05.02]            at Avalonia.Media.MediaContext.RenderCore()
+[xUnit.net 00:00:05.02]            at Avalonia.Media.MediaContext.Render()
+[xUnit.net 00:00:05.02]            at Avalonia.Threading.DispatcherOperation.InvokeCore()
+[xUnit.net 00:00:05.02]            at Avalonia.Threading.DispatcherOperation.Execute()
+[xUnit.net 00:00:05.02]            at Avalonia.Threading.Dispatcher.ExecuteJob(DispatcherOperation job)
+[xUnit.net 00:00:05.02]            at Avalonia.Threading.Dispatcher.RunJobs(Nullable`1 priority, CancellationToken cancellationToken)
+[xUnit.net 00:00:05.02]            at Avalonia.Threading.Dispatcher.RunJobs(Nullable`1 priority)
+[xUnit.net 00:00:05.02]         /workspace/native-desktop-successor/dotnet/FsusUI.Avalonia.HeadlessTests/FsusDesktopShellHeadlessTests.cs(312,0): at FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests.DocumentTabsSupportCloseDragReorderOverflowContextAndPlatformCycling(Double headerWidth)
+[xUnit.net 00:00:05.02]            at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+[xUnit.net 00:00:05.02]            at System.Reflection.MethodBaseInvoker.InvokeDirectByRefWithFewArgs(Object obj, Span`1 copyOfArgs, BindingFlags invokeAttr)
+[xUnit.net 00:00:05.91]   Finished:    FsusUI.Avalonia.HeadlessTests
+</StdOut>
+    </Output>
+    <RunInfos>
+      <RunInfo computerName="d45ac3896e5a" outcome="Error" timestamp="2026-10-09T09:52:09.2618109+00:00">
+        <Text>[xUnit.net 00:00:05.01]     FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests.DocumentTabsSupportCloseDragReorderOverflowContextAndPlatformCycling(headerWidth: 120) [FAIL]</Text>
+      </RunInfo>
+    </RunInfos>
+  </ResultSummary>
+</TestRun>

@@ -1,0 +1,7 @@
+{
+  "initialComparison": "Incorrect unnormalized whole item equality across distinct worktree paths",
+  "oldWorktree": "/workspace/native-reviewed-integration",
+  "newWorktree": "/workspace/native-desktop-successor",
+  "executionBeforeFailure": "NONE",
+  "correction": "Normalize only the known worktree-root prefix; retain all relative identities and other item metadata"
+}

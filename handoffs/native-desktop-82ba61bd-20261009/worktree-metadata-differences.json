@@ -1,0 +1,394 @@
+[
+  {
+    "kind": "AvaloniaResource",
+    "identity": "Assets/Fonts/GoogleSans-Bold.ttf",
+    "key": "FullPath",
+    "old": "/workspace/native-reviewed-integration/dotnet/FsusUI.Avalonia.HeadlessTests/Assets/Fonts/GoogleSans-Bold.ttf",
+    "new": "/workspace/native-desktop-successor/dotnet/FsusUI.Avalonia.HeadlessTests/Assets/Fonts/GoogleSans-Bold.ttf"
+  },
+  {
+    "kind": "AvaloniaResource",
+    "identity": "Assets/Fonts/GoogleSans-Bold.ttf",
+    "key": "Directory",
+    "old": "workspace/native-reviewed-integration/dotnet/FsusUI.Avalonia.HeadlessTests/Assets/Fonts/",
+    "new": "workspace/native-desktop-successor/dotnet/FsusUI.Avalonia.HeadlessTests/Assets/Fonts/"
+  },
+  {
+    "kind": "AvaloniaResource",
+    "identity": "Assets/Fonts/GoogleSans-Bold.ttf",
+    "key": "DefiningProjectFullPath",
+    "old": "/workspace/native-reviewed-integration/dotnet/FsusUI.Avalonia.HeadlessTests/FsusUI.Avalonia.HeadlessTests.csproj",
+    "new": "/workspace/native-desktop-successor/dotnet/FsusUI.Avalonia.HeadlessTests/FsusUI.Avalonia.HeadlessTests.csproj"
+  },
+  {
+    "kind": "AvaloniaResource",
+    "identity": "Assets/Fonts/GoogleSans-Bold.ttf",
+    "key": "DefiningProjectDirectory",
+    "old": "/workspace/native-reviewed-integration/dotnet/FsusUI.Avalonia.HeadlessTests/",
+    "new": "/workspace/native-desktop-successor/dotnet/FsusUI.Avalonia.HeadlessTests/"
+  },
+  {
+    "kind": "AvaloniaResource",
+    "identity": "Assets/Fonts/GoogleSans-Regular.ttf",
+    "key": "FullPath",
+    "old": "/workspace/native-reviewed-integration/dotnet/FsusUI.Avalonia.HeadlessTests/Assets/Fonts/GoogleSans-Regular.ttf",
+    "new": "/workspace/native-desktop-successor/dotnet/FsusUI.Avalonia.HeadlessTests/Assets/Fonts/GoogleSans-Regular.ttf"
+  },
+  {
+    "kind": "AvaloniaResource",
+    "identity": "Assets/Fonts/GoogleSans-Regular.ttf",
+    "key": "Directory",
+    "old": "workspace/native-reviewed-integration/dotnet/FsusUI.Avalonia.HeadlessTests/Assets/Fonts/",
+    "new": "workspace/native-desktop-successor/dotnet/FsusUI.Avalonia.HeadlessTests/Assets/Fonts/"
+  },
+  {
+    "kind": "AvaloniaResource",
+    "identity": "Assets/Fonts/GoogleSans-Regular.ttf",
+    "key": "DefiningProjectFullPath",
+    "old": "/workspace/native-reviewed-integration/dotnet/FsusUI.Avalonia.HeadlessTests/FsusUI.Avalonia.HeadlessTests.csproj",
+    "new": "/workspace/native-desktop-successor/dotnet/FsusUI.Avalonia.HeadlessTests/FsusUI.Avalonia.HeadlessTests.csproj"
+  },
+  {
+    "kind": "AvaloniaResource",
+    "identity": "Assets/Fonts/GoogleSans-Regular.ttf",
+    "key": "DefiningProjectDirectory",
+    "old": "/workspace/native-reviewed-integration/dotnet/FsusUI.Avalonia.HeadlessTests/",
+    "new": "/workspace/native-desktop-successor/dotnet/FsusUI.Avalonia.HeadlessTests/"
+  },
+  {
+    "kind": "AvaloniaResource",
+    "identity": "Assets/Fonts/GoogleSansExt-Bold.ttf",
+    "key": "FullPath",
+    "old": "/workspace/native-reviewed-integration/dotnet/FsusUI.Avalonia.HeadlessTests/Assets/Fonts/GoogleSansExt-Bold.ttf",
+    "new": "/workspace/native-desktop-successor/dotnet/FsusUI.Avalonia.HeadlessTests/Assets/Fonts/GoogleSansExt-Bold.ttf"
+  },
+  {
+    "kind": "AvaloniaResource",
+    "identity": "Assets/Fonts/GoogleSansExt-Bold.ttf",
+    "key": "Directory",
+    "old": "workspace/native-reviewed-integration/dotnet/FsusUI.Avalonia.HeadlessTests/Assets/Fonts/",
+    "new": "workspace/native-desktop-successor/dotnet/FsusUI.Avalonia.HeadlessTests/Assets/Fonts/"
+  },
+  {
+    "kind": "AvaloniaResource",
+    "identity": "Assets/Fonts/GoogleSansExt-Bold.ttf",
+    "key": "DefiningProjectFullPath",
+    "old": "/workspace/native-reviewed-integration/dotnet/FsusUI.Avalonia.HeadlessTests/FsusUI.Avalonia.HeadlessTests.csproj",
+    "new": "/workspace/native-desktop-successor/dotnet/FsusUI.Avalonia.HeadlessTests/FsusUI.Avalonia.HeadlessTests.csproj"
+  },
+  {
+    "kind": "AvaloniaResource",
+    "identity": "Assets/Fonts/GoogleSansExt-Bold.ttf",
+    "key": "DefiningProjectDirectory",
+    "old": "/workspace/native-reviewed-integration/dotnet/FsusUI.Avalonia.HeadlessTests/",
+    "new": "/workspace/native-desktop-successor/dotnet/FsusUI.Avalonia.HeadlessTests/"
+  },
+  {
+    "kind": "AvaloniaResource",
+    "identity": "Assets/Fonts/GoogleSansExt-Regular.ttf",
+    "key": "FullPath",
+    "old": "/workspace/native-reviewed-integration/dotnet/FsusUI.Avalonia.HeadlessTests/Assets/Fonts/GoogleSansExt-Regular.ttf",
+    "new": "/workspace/native-desktop-successor/dotnet/FsusUI.Avalonia.HeadlessTests/Assets/Fonts/GoogleSansExt-Regular.ttf"
+  },
+  {
+    "kind": "AvaloniaResource",
+    "identity": "Assets/Fonts/GoogleSansExt-Regular.ttf",
+    "key": "Directory",
+    "old": "workspace/native-reviewed-integration/dotnet/FsusUI.Avalonia.HeadlessTests/Assets/Fonts/",
+    "new": "workspace/native-desktop-successor/dotnet/FsusUI.Avalonia.HeadlessTests/Assets/Fonts/"
+  },
+  {
+    "kind": "AvaloniaResource",
+    "identity": "Assets/Fonts/GoogleSansExt-Regular.ttf",
+    "key": "DefiningProjectFullPath",
+    "old": "/workspace/native-reviewed-integration/dotnet/FsusUI.Avalonia.HeadlessTests/FsusUI.Avalonia.HeadlessTests.csproj",
+    "new": "/workspace/native-desktop-successor/dotnet/FsusUI.Avalonia.HeadlessTests/FsusUI.Avalonia.HeadlessTests.csproj"
+  },
+  {
+    "kind": "AvaloniaResource",
+    "identity": "Assets/Fonts/GoogleSansExt-Regular.ttf",
+    "key": "DefiningProjectDirectory",
+    "old": "/workspace/native-reviewed-integration/dotnet/FsusUI.Avalonia.HeadlessTests/",
+    "new": "/workspace/native-desktop-successor/dotnet/FsusUI.Avalonia.HeadlessTests/"
+  },
+  {
+    "kind": "AvaloniaResource",
+    "identity": "Assets/TableV2Fonts/NotoSans-Bold.ttf",
+    "key": "FullPath",
+    "old": "/workspace/native-reviewed-integration/dotnet/FsusUI.Avalonia.HeadlessTests/Assets/TableV2Fonts/NotoSans-Bold.ttf",
+    "new": "/workspace/native-desktop-successor/dotnet/FsusUI.Avalonia.HeadlessTests/Assets/TableV2Fonts/NotoSans-Bold.ttf"
+  },
+  {
+    "kind": "AvaloniaResource",
+    "identity": "Assets/TableV2Fonts/NotoSans-Bold.ttf",
+    "key": "Directory",
+    "old": "workspace/native-reviewed-integration/dotnet/FsusUI.Avalonia.HeadlessTests/Assets/TableV2Fonts/",
+    "new": "workspace/native-desktop-successor/dotnet/FsusUI.Avalonia.HeadlessTests/Assets/TableV2Fonts/"
+  },
+  {
+    "kind": "AvaloniaResource",
+    "identity": "Assets/TableV2Fonts/NotoSans-Bold.ttf",
+    "key": "DefiningProjectFullPath",
+    "old": "/workspace/native-reviewed-integration/dotnet/FsusUI.Avalonia.HeadlessTests/FsusUI.Avalonia.HeadlessTests.csproj",
+    "new": "/workspace/native-desktop-successor/dotnet/FsusUI.Avalonia.HeadlessTests/FsusUI.Avalonia.HeadlessTests.csproj"
+  },
+  {
+    "kind": "AvaloniaResource",
+    "identity": "Assets/TableV2Fonts/NotoSans-Bold.ttf",
+    "key": "DefiningProjectDirectory",
+    "old": "/workspace/native-reviewed-integration/dotnet/FsusUI.Avalonia.HeadlessTests/",
+    "new": "/workspace/native-desktop-successor/dotnet/FsusUI.Avalonia.HeadlessTests/"
+  },
+  {
+    "kind": "AvaloniaResource",
+    "identity": "Assets/TableV2Fonts/NotoSans-Regular.ttf",
+    "key": "FullPath",
+    "old": "/workspace/native-reviewed-integration/dotnet/FsusUI.Avalonia.HeadlessTests/Assets/TableV2Fonts/NotoSans-Regular.ttf",
+    "new": "/workspace/native-desktop-successor/dotnet/FsusUI.Avalonia.HeadlessTests/Assets/TableV2Fonts/NotoSans-Regular.ttf"
+  },
+  {
+    "kind": "AvaloniaResource",
+    "identity": "Assets/TableV2Fonts/NotoSans-Regular.ttf",
+    "key": "Directory",
+    "old": "workspace/native-reviewed-integration/dotnet/FsusUI.Avalonia.HeadlessTests/Assets/TableV2Fonts/",
+    "new": "workspace/native-desktop-successor/dotnet/FsusUI.Avalonia.HeadlessTests/Assets/TableV2Fonts/"
+  },
+  {
+    "kind": "AvaloniaResource",
+    "identity": "Assets/TableV2Fonts/NotoSans-Regular.ttf",
+    "key": "DefiningProjectFullPath",
+    "old": "/workspace/native-reviewed-integration/dotnet/FsusUI.Avalonia.HeadlessTests/FsusUI.Avalonia.HeadlessTests.csproj",
+    "new": "/workspace/native-desktop-successor/dotnet/FsusUI.Avalonia.HeadlessTests/FsusUI.Avalonia.HeadlessTests.csproj"
+  },
+  {
+    "kind": "AvaloniaResource",
+    "identity": "Assets/TableV2Fonts/NotoSans-Regular.ttf",
+    "key": "DefiningProjectDirectory",
+    "old": "/workspace/native-reviewed-integration/dotnet/FsusUI.Avalonia.HeadlessTests/",
+    "new": "/workspace/native-desktop-successor/dotnet/FsusUI.Avalonia.HeadlessTests/"
+  },
+  {
+    "kind": "ProjectReference",
+    "identity": "../FsusUI.Avalonia.Demo/FsusUI.Avalonia.Demo.csproj",
+    "key": "FullPath",
+    "old": "/workspace/native-reviewed-integration/dotnet/FsusUI.Avalonia.Demo/FsusUI.Avalonia.Demo.csproj",
+    "new": "/workspace/native-desktop-successor/dotnet/FsusUI.Avalonia.Demo/FsusUI.Avalonia.Demo.csproj"
+  },
+  {
+    "kind": "ProjectReference",
+    "identity": "../FsusUI.Avalonia.Demo/FsusUI.Avalonia.Demo.csproj",
+    "key": "Directory",
+    "old": "workspace/native-reviewed-integration/dotnet/FsusUI.Avalonia.Demo/",
+    "new": "workspace/native-desktop-successor/dotnet/FsusUI.Avalonia.Demo/"
+  },
+  {
+    "kind": "ProjectReference",
+    "identity": "../FsusUI.Avalonia.Demo/FsusUI.Avalonia.Demo.csproj",
+    "key": "DefiningProjectFullPath",
+    "old": "/workspace/native-reviewed-integration/dotnet/FsusUI.Avalonia.HeadlessTests/FsusUI.Avalonia.HeadlessTests.csproj",
+    "new": "/workspace/native-desktop-successor/dotnet/FsusUI.Avalonia.HeadlessTests/FsusUI.Avalonia.HeadlessTests.csproj"
+  },
+  {
+    "kind": "ProjectReference",
+    "identity": "../FsusUI.Avalonia.Demo/FsusUI.Avalonia.Demo.csproj",
+    "key": "DefiningProjectDirectory",
+    "old": "/workspace/native-reviewed-integration/dotnet/FsusUI.Avalonia.HeadlessTests/",
+    "new": "/workspace/native-desktop-successor/dotnet/FsusUI.Avalonia.HeadlessTests/"
+  },
+  {
+    "kind": "ProjectReference",
+    "identity": "../FsusUI.Avalonia/FsusUI.Avalonia.csproj",
+    "key": "FullPath",
+    "old": "/workspace/native-reviewed-integration/dotnet/FsusUI.Avalonia/FsusUI.Avalonia.csproj",
+    "new": "/workspace/native-desktop-successor/dotnet/FsusUI.Avalonia/FsusUI.Avalonia.csproj"
+  },
+  {
+    "kind": "ProjectReference",
+    "identity": "../FsusUI.Avalonia/FsusUI.Avalonia.csproj",
+    "key": "Directory",
+    "old": "workspace/native-reviewed-integration/dotnet/FsusUI.Avalonia/",
+    "new": "workspace/native-desktop-successor/dotnet/FsusUI.Avalonia/"
+  },
+  {
+    "kind": "ProjectReference",
+    "identity": "../FsusUI.Avalonia/FsusUI.Avalonia.csproj",
+    "key": "DefiningProjectFullPath",
+    "old": "/workspace/native-reviewed-integration/dotnet/FsusUI.Avalonia.HeadlessTests/FsusUI.Avalonia.HeadlessTests.csproj",
+    "new": "/workspace/native-desktop-successor/dotnet/FsusUI.Avalonia.HeadlessTests/FsusUI.Avalonia.HeadlessTests.csproj"
+  },
+  {
+    "kind": "ProjectReference",
+    "identity": "../FsusUI.Avalonia/FsusUI.Avalonia.csproj",
+    "key": "DefiningProjectDirectory",
+    "old": "/workspace/native-reviewed-integration/dotnet/FsusUI.Avalonia.HeadlessTests/",
+    "new": "/workspace/native-desktop-successor/dotnet/FsusUI.Avalonia.HeadlessTests/"
+  },
+  {
+    "kind": "ProjectReference",
+    "identity": "../FsusUI.Avalonia.Icons/FsusUI.Avalonia.Icons.csproj",
+    "key": "FullPath",
+    "old": "/workspace/native-reviewed-integration/dotnet/FsusUI.Avalonia.Icons/FsusUI.Avalonia.Icons.csproj",
+    "new": "/workspace/native-desktop-successor/dotnet/FsusUI.Avalonia.Icons/FsusUI.Avalonia.Icons.csproj"
+  },
+  {
+    "kind": "ProjectReference",
+    "identity": "../FsusUI.Avalonia.Icons/FsusUI.Avalonia.Icons.csproj",
+    "key": "Directory",
+    "old": "workspace/native-reviewed-integration/dotnet/FsusUI.Avalonia.Icons/",
+    "new": "workspace/native-desktop-successor/dotnet/FsusUI.Avalonia.Icons/"
+  },
+  {
+    "kind": "ProjectReference",
+    "identity": "../FsusUI.Avalonia.Icons/FsusUI.Avalonia.Icons.csproj",
+    "key": "DefiningProjectFullPath",
+    "old": "/workspace/native-reviewed-integration/dotnet/FsusUI.Avalonia.HeadlessTests/FsusUI.Avalonia.HeadlessTests.csproj",
+    "new": "/workspace/native-desktop-successor/dotnet/FsusUI.Avalonia.HeadlessTests/FsusUI.Avalonia.HeadlessTests.csproj"
+  },
+  {
+    "kind": "ProjectReference",
+    "identity": "../FsusUI.Avalonia.Icons/FsusUI.Avalonia.Icons.csproj",
+    "key": "DefiningProjectDirectory",
+    "old": "/workspace/native-reviewed-integration/dotnet/FsusUI.Avalonia.HeadlessTests/",
+    "new": "/workspace/native-desktop-successor/dotnet/FsusUI.Avalonia.HeadlessTests/"
+  },
+  {
+    "kind": "ProjectReference",
+    "identity": "../FsusUI.Avalonia.Themes/FsusUI.Avalonia.Themes.csproj",
+    "key": "FullPath",
+    "old": "/workspace/native-reviewed-integration/dotnet/FsusUI.Avalonia.Themes/FsusUI.Avalonia.Themes.csproj",
+    "new": "/workspace/native-desktop-successor/dotnet/FsusUI.Avalonia.Themes/FsusUI.Avalonia.Themes.csproj"
+  },
+  {
+    "kind": "ProjectReference",
+    "identity": "../FsusUI.Avalonia.Themes/FsusUI.Avalonia.Themes.csproj",
+    "key": "Directory",
+    "old": "workspace/native-reviewed-integration/dotnet/FsusUI.Avalonia.Themes/",
+    "new": "workspace/native-desktop-successor/dotnet/FsusUI.Avalonia.Themes/"
+  },
+  {
+    "kind": "ProjectReference",
+    "identity": "../FsusUI.Avalonia.Themes/FsusUI.Avalonia.Themes.csproj",
+    "key": "DefiningProjectFullPath",
+    "old": "/workspace/native-reviewed-integration/dotnet/FsusUI.Avalonia.HeadlessTests/FsusUI.Avalonia.HeadlessTests.csproj",
+    "new": "/workspace/native-desktop-successor/dotnet/FsusUI.Avalonia.HeadlessTests/FsusUI.Avalonia.HeadlessTests.csproj"
+  },
+  {
+    "kind": "ProjectReference",
+    "identity": "../FsusUI.Avalonia.Themes/FsusUI.Avalonia.Themes.csproj",
+    "key": "DefiningProjectDirectory",
+    "old": "/workspace/native-reviewed-integration/dotnet/FsusUI.Avalonia.HeadlessTests/",
+    "new": "/workspace/native-desktop-successor/dotnet/FsusUI.Avalonia.HeadlessTests/"
+  },
+  {
+    "kind": "PackageReference",
+    "identity": "Avalonia.Headless.XUnit",
+    "key": "FullPath",
+    "old": "/workspace/native-reviewed-integration/dotnet/FsusUI.Avalonia.HeadlessTests/Avalonia.Headless.XUnit",
+    "new": "/workspace/native-desktop-successor/dotnet/FsusUI.Avalonia.HeadlessTests/Avalonia.Headless.XUnit"
+  },
+  {
+    "kind": "PackageReference",
+    "identity": "Avalonia.Headless.XUnit",
+    "key": "Directory",
+    "old": "workspace/native-reviewed-integration/dotnet/FsusUI.Avalonia.HeadlessTests/",
+    "new": "workspace/native-desktop-successor/dotnet/FsusUI.Avalonia.HeadlessTests/"
+  },
+  {
+    "kind": "PackageReference",
+    "identity": "Avalonia.Headless.XUnit",
+    "key": "DefiningProjectFullPath",
+    "old": "/workspace/native-reviewed-integration/dotnet/FsusUI.Avalonia.HeadlessTests/FsusUI.Avalonia.HeadlessTests.csproj",
+    "new": "/workspace/native-desktop-successor/dotnet/FsusUI.Avalonia.HeadlessTests/FsusUI.Avalonia.HeadlessTests.csproj"
+  },
+  {
+    "kind": "PackageReference",
+    "identity": "Avalonia.Headless.XUnit",
+    "key": "DefiningProjectDirectory",
+    "old": "/workspace/native-reviewed-integration/dotnet/FsusUI.Avalonia.HeadlessTests/",
+    "new": "/workspace/native-desktop-successor/dotnet/FsusUI.Avalonia.HeadlessTests/"
+  },
+  {
+    "kind": "PackageReference",
+    "identity": "Microsoft.NET.Test.Sdk",
+    "key": "FullPath",
+    "old": "/workspace/native-reviewed-integration/dotnet/FsusUI.Avalonia.HeadlessTests/Microsoft.NET.Test.Sdk",
+    "new": "/workspace/native-desktop-successor/dotnet/FsusUI.Avalonia.HeadlessTests/Microsoft.NET.Test.Sdk"
+  },
+  {
+    "kind": "PackageReference",
+    "identity": "Microsoft.NET.Test.Sdk",
+    "key": "Directory",
+    "old": "workspace/native-reviewed-integration/dotnet/FsusUI.Avalonia.HeadlessTests/",
+    "new": "workspace/native-desktop-successor/dotnet/FsusUI.Avalonia.HeadlessTests/"
+  },
+  {
+    "kind": "PackageReference",
+    "identity": "Microsoft.NET.Test.Sdk",
+    "key": "DefiningProjectFullPath",
+    "old": "/workspace/native-reviewed-integration/dotnet/FsusUI.Avalonia.HeadlessTests/FsusUI.Avalonia.HeadlessTests.csproj",
+    "new": "/workspace/native-desktop-successor/dotnet/FsusUI.Avalonia.HeadlessTests/FsusUI.Avalonia.HeadlessTests.csproj"
+  },
+  {
+    "kind": "PackageReference",
+    "identity": "Microsoft.NET.Test.Sdk",
+    "key": "DefiningProjectDirectory",
+    "old": "/workspace/native-reviewed-integration/dotnet/FsusUI.Avalonia.HeadlessTests/",
+    "new": "/workspace/native-desktop-successor/dotnet/FsusUI.Avalonia.HeadlessTests/"
+  },
+  {
+    "kind": "PackageReference",
+    "identity": "xunit.runner.visualstudio",
+    "key": "FullPath",
+    "old": "/workspace/native-reviewed-integration/dotnet/FsusUI.Avalonia.HeadlessTests/xunit.runner.visualstudio",
+    "new": "/workspace/native-desktop-successor/dotnet/FsusUI.Avalonia.HeadlessTests/xunit.runner.visualstudio"
+  },
+  {
+    "kind": "PackageReference",
+    "identity": "xunit.runner.visualstudio",
+    "key": "Directory",
+    "old": "workspace/native-reviewed-integration/dotnet/FsusUI.Avalonia.HeadlessTests/",
+    "new": "workspace/native-desktop-successor/dotnet/FsusUI.Avalonia.HeadlessTests/"
+  },
+  {
+    "kind": "PackageReference",
+    "identity": "xunit.runner.visualstudio",
+    "key": "DefiningProjectFullPath",
+    "old": "/workspace/native-reviewed-integration/dotnet/FsusUI.Avalonia.HeadlessTests/FsusUI.Avalonia.HeadlessTests.csproj",
+    "new": "/workspace/native-desktop-successor/dotnet/FsusUI.Avalonia.HeadlessTests/FsusUI.Avalonia.HeadlessTests.csproj"
+  },
+  {
+    "kind": "PackageReference",
+    "identity": "xunit.runner.visualstudio",
+    "key": "DefiningProjectDirectory",
+    "old": "/workspace/native-reviewed-integration/dotnet/FsusUI.Avalonia.HeadlessTests/",
+    "new": "/workspace/native-desktop-successor/dotnet/FsusUI.Avalonia.HeadlessTests/"
+  },
+  {
+    "kind": "PackageReference",
+    "identity": "xunit.v3",
+    "key": "FullPath",
+    "old": "/workspace/native-reviewed-integration/dotnet/FsusUI.Avalonia.HeadlessTests/xunit.v3",
+    "new": "/workspace/native-desktop-successor/dotnet/FsusUI.Avalonia.HeadlessTests/xunit.v3"
+  },
+  {
+    "kind": "PackageReference",
+    "identity": "xunit.v3",
+    "key": "Directory",
+    "old": "workspace/native-reviewed-integration/dotnet/FsusUI.Avalonia.HeadlessTests/",
+    "new": "workspace/native-desktop-successor/dotnet/FsusUI.Avalonia.HeadlessTests/"
+  },
+  {
+    "kind": "PackageReference",
+    "identity": "xunit.v3",
+    "key": "DefiningProjectFullPath",
+    "old": "/workspace/native-reviewed-integration/dotnet/FsusUI.Avalonia.HeadlessTests/FsusUI.Avalonia.HeadlessTests.csproj",
+    "new": "/workspace/native-desktop-successor/dotnet/FsusUI.Avalonia.HeadlessTests/FsusUI.Avalonia.HeadlessTests.csproj"
+  },
+  {
+    "kind": "PackageReference",
+    "identity": "xunit.v3",
+    "key": "DefiningProjectDirectory",
+    "old": "/workspace/native-reviewed-integration/dotnet/FsusUI.Avalonia.HeadlessTests/",
+    "new": "/workspace/native-desktop-successor/dotnet/FsusUI.Avalonia.HeadlessTests/"
+  }
+]

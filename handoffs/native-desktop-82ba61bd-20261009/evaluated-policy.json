@@ -1,0 +1,9 @@
+{
+  "Properties": {
+    "NuGetAudit": "true",
+    "NuGetAuditMode": "all",
+    "NuGetAuditLevel": "low",
+    "RestorePackagesWithLockFile": "true",
+    "NETCoreSdkVersion": "10.0.401"
+  }
+}

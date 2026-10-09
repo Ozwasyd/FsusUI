@@ -1,0 +1,50 @@
+[
+  {
+    "flag": "0",
+    "names": [
+      "FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests.AutomationPeersExposeSelectionDirtyExpandedAndCloseSemantics",
+      "FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests.DocumentContentKeepsSingleVisualParentAcrossThemeRemovalAndRemount(useRecyclingTemplate: False)",
+      "FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests.DocumentContentKeepsSingleVisualParentAcrossThemeRemovalAndRemount(useRecyclingTemplate: True)",
+      "FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests.DocumentContextRequestReturnsTypedStableAnchorWithoutSelectingTarget",
+      "FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests.DocumentTabsCancelClosePreserveDirtyStateReorderAndSelectAdjacentFallback",
+      "FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests.DocumentTabsSupportCloseDragReorderOverflowContextAndPlatformCycling(headerWidth: 120)",
+      "FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests.DocumentTabsSupportCloseDragReorderOverflowContextAndPlatformCycling(headerWidth: 220)"
+    ],
+    "discoveryCommand": [
+      "dotnet",
+      "test",
+      "FsusUI.Avalonia.HeadlessTests/FsusUI.Avalonia.HeadlessTests.csproj",
+      "--no-build",
+      "--no-restore",
+      "-c",
+      "Release",
+      "--filter",
+      "FullyQualifiedName=FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests.DocumentTabsCancelClosePreserveDirtyStateReorderAndSelectAdjacentFallback|FullyQualifiedName=FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests.DocumentContextRequestReturnsTypedStableAnchorWithoutSelectingTarget|FullyQualifiedName=FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests.DocumentTabsSupportCloseDragReorderOverflowContextAndPlatformCycling|FullyQualifiedName=FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests.DocumentContentKeepsSingleVisualParentAcrossThemeRemovalAndRemount|FullyQualifiedName=FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests.AutomationPeersExposeSelectionDirtyExpandedAndCloseSemantics",
+      "--list-tests"
+    ]
+  },
+  {
+    "flag": "1",
+    "names": [
+      "FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests.AutomationPeersExposeSelectionDirtyExpandedAndCloseSemantics",
+      "FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests.DocumentContentKeepsSingleVisualParentAcrossThemeRemovalAndRemount(useRecyclingTemplate: False)",
+      "FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests.DocumentContentKeepsSingleVisualParentAcrossThemeRemovalAndRemount(useRecyclingTemplate: True)",
+      "FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests.DocumentContextRequestReturnsTypedStableAnchorWithoutSelectingTarget",
+      "FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests.DocumentTabsCancelClosePreserveDirtyStateReorderAndSelectAdjacentFallback",
+      "FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests.DocumentTabsSupportCloseDragReorderOverflowContextAndPlatformCycling(headerWidth: 120)",
+      "FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests.DocumentTabsSupportCloseDragReorderOverflowContextAndPlatformCycling(headerWidth: 220)"
+    ],
+    "discoveryCommand": [
+      "dotnet",
+      "test",
+      "FsusUI.Avalonia.HeadlessTests/FsusUI.Avalonia.HeadlessTests.csproj",
+      "--no-build",
+      "--no-restore",
+      "-c",
+      "Release",
+      "--filter",
+      "FullyQualifiedName=FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests.DocumentTabsCancelClosePreserveDirtyStateReorderAndSelectAdjacentFallback|FullyQualifiedName=FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests.DocumentContextRequestReturnsTypedStableAnchorWithoutSelectingTarget|FullyQualifiedName=FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests.DocumentTabsSupportCloseDragReorderOverflowContextAndPlatformCycling|FullyQualifiedName=FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests.DocumentContentKeepsSingleVisualParentAcrossThemeRemovalAndRemount|FullyQualifiedName=FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests.AutomationPeersExposeSelectionDirtyExpandedAndCloseSemantics",
+      "--list-tests"
+    ]
+  }
+]

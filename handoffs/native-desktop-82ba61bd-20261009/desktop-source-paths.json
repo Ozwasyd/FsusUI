@@ -1,0 +1,16 @@
+{
+  "supplier": "b680455bcb872864cebe8e8d0c60a69e6dec3065",
+  "paths": [
+    ".changeset/avalonia-document-tab-reorder-focus.md",
+    "docs/avalonia/components/desktop-shell.md",
+    "dotnet/FsusUI.Avalonia.HeadlessTests/FsusDesktopShellHeadlessTests.cs",
+    "dotnet/FsusUI.Avalonia/Controls/FsusDocumentTabs.cs"
+  ],
+  "allFourBlobsIdentical": true,
+  "base": "a0253323cd2442184aa5a42e8ff84fca86a10118",
+  "excluded": [
+    "Typography be0a/9ab",
+    "TextEditor f1ee",
+    "historical dependency/SDK ancestry"
+  ]
+}

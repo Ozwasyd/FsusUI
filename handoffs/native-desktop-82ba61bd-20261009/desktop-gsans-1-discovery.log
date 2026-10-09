@@ -1,0 +1,9 @@
+Test run for /workspace/native-desktop-successor/dotnet/FsusUI.Avalonia.HeadlessTests/bin/Release/net10.0/FsusUI.Avalonia.HeadlessTests.dll (.NETCoreApp,Version=v10.0)
+The following Tests are available:
+    FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests.DocumentTabsCancelClosePreserveDirtyStateReorderAndSelectAdjacentFallback
+    FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests.DocumentContextRequestReturnsTypedStableAnchorWithoutSelectingTarget
+    FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests.DocumentTabsSupportCloseDragReorderOverflowContextAndPlatformCycling(headerWidth: 120)
+    FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests.DocumentTabsSupportCloseDragReorderOverflowContextAndPlatformCycling(headerWidth: 220)
+    FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests.DocumentContentKeepsSingleVisualParentAcrossThemeRemovalAndRemount(useRecyclingTemplate: False)
+    FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests.DocumentContentKeepsSingleVisualParentAcrossThemeRemovalAndRemount(useRecyclingTemplate: True)
+    FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests.AutomationPeersExposeSelectionDirtyExpandedAndCloseSemantics

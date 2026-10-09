@@ -1,0 +1,5 @@
+Test run for /workspace/native-desktop-successor/dotnet/FsusUI.Avalonia.HeadlessTests/bin/Release/net10.0/FsusUI.Avalonia.HeadlessTests.dll (.NETCoreApp,Version=v10.0)
+A total of 1 test files matched the specified pattern.
+Results File: /workspace/native-desktop-evidence/desktop-gsans-0/desktop.trx
+
+Passed!  - Failed:     0, Passed:     7, Skipped:     0, Total:     7, Duration: 4 s - FsusUI.Avalonia.HeadlessTests.dll (net10.0)

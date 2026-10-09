@@ -1,0 +1,68 @@
+WIP native Desktop successor: exact source, first red and isolated reproduction
+
+Published source: 82ba61bda502230e4c1fcd1e9084ab2e6c006fda
+Source branch: fix/native-desktop-successor-20261009
+Frozen parent: a0253323cd2442184aa5a42e8ff84fca86a10118
+Actual main: 8db0ac8f49749e3e5f28be5051bb3d3ed71ada71
+Desktop supplier: b680455bcb872864cebe8e8d0c60a69e6dec3065
+Root owns draft PR creation, metadata, ready and merge. No GitHub content writes.
+
+Composition is exactly the four Desktop supplier blobs atop the frozen reviewed
+24-path native composition. All four match b680; all inherited 24 paths match
+parent a025. Complete final 28-path roster and supplier hashes are attached.
+No supplier ancestry imported. Typography9ab and TextEditorf1ee are absent.
+Original host/resources/theme/serial hooks, locks, budgets and all340 PNGs
+remain unchanged. FSUSUI_UPDATE_VISUAL_ARTIFACTS was not enabled. a025 and9ab
+are untouched. No held Markdown root helpers or denied audit routes invoked.
+
+Actual toolchain: SDK10.0.401, runtime10.0.12, MSBuild18.9.11, Debian13 Linux,
+/workspace/.setup/dotnet/dotnet. Actual main's .401-compatible locked graph is
+preserved. No .108 combination or dependency repair8840 was used in this run.
+NuGetAudit=true/all/low, locked restore, no audit/signature override or scratch
+lock. Headless original-project locked restore and Release build PASS; build
+also builds its Demo reference. Zero errors, one pre-existing xUnit2013 warning.
+Six singular bundled font items remain exact: shared4 + dedicatedTable2.
+All resource metadata equal to a025 after normalization of only checkout-root
+prefixes in physical-path fields; raw diagnostic comparisons are preserved.
+An initial resource-probe project path typo failed before restore; corrected
+original-project probe and all subsequent inputs are retained, not hidden.
+
+Desktop ordinary positive allowlist: five original methods/seven cases.
+Both GSANS modes were admitted by exact discovery/cardinality before execution.
+Original test class has no class/collection fixtures or BeforeAfter hooks;
+original assembly host and serial behavior preserved; no capture method ran.
+PASS GSANS0: seven passed, zero failed/skipped.
+FAIL GSANS1: six passed, one failed, zero skipped.
+Failed method: DocumentTabsSupportCloseDragReorderOverflowContextAndPlatformCycling
+(headerWidth: 120). Could not create glyphTypeface for Font family $Default,
+Style Normal, Weight Normal, Stretch Normal, during queued TextBlock measure
+at Dispatcher.UIThread.RunJobs, test line312. Width220 passes.
+A justified fresh-process GSANS1 run of only that original method discovered
+exactly two cases and reproduced one pass/one fail at the same width and line.
+Initial red and isolated red are both retained. Sixteen total executions,
+fourteen passes and two failures of the same condition; not sixteen distinct
+cases. No baseline, assertion, threshold, selector or test-host workaround.
+Root cause is unresolved: the exception identifies glyph-typeface resolution,
+but does not prove a production regression or environment cause. The other
+five selected cases are not a prerequisite to this isolated reproduction.
+Font/Desktop ownership coordination is needed before any preserved host edit.
+
+Tree real native p95: UNRUN. Original Demo entry/filter preflight resolves
+exactly one tree-expand-scroll scenario. Original quick inputs preserved:
+warmups1, measured samples21, long-scroll iterations256, backendauto; original
+window/theme/Tree factory and policy thresholds. DISPLAY/WAYLAND_DISPLAY and
+X11 sockets absent, and standard /usr/bin/xvfb-run unavailable. No alternative
+harness, budget-test substitute, fabricated summary/raw/disposal artifacts or
+relative-performance acceptance. A display-backed environment is required.
+
+Root reported independent a025 review total142 executions (137 ordinary plus
+four Table PNG cases and one original PDF matrix). These remain qualifications
+of a025; they are not executions of82. Inherited Table/PDF source and host blobs
+are unchanged. Per Root's deduplication, no Table/PDF tests ran here. Original
+PDF deterministic backend does not qualify actual OS WebView export or CI.
+Windows/macOS, full gates and independent visual acceptance remain UNRUN.
+
+Exact commands, source/input hashes, discovery, raw test logs and TRX attached.
+See PR-DRAFT.md for complete WIP body, remaining dependencies and next commands.
+Rollback successor: revert82ba61bd (the four Desktop paths), retaining a025.
+Do not merge while the Desktop failure and required native measurement remain.
