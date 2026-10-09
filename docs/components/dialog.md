@@ -31,6 +31,18 @@ Customize the heading region with the `header` slot; its slot scope includes `ti
 
 When dialogs are nested, the inner dialog must set `append-to-body="true"`.
 
+## Focus restoration
+
+Dialog delegates focus entry, trapping, and restoration to the shared focus
+trap. Closing returns focus to the connected opener, including pointer
+activation that does not focus a button. Escape and external `v-model` closure
+use the same owner. Closing a nested dialog restores its opener in the parent;
+a paused parent must not take focus from a dialog above it. Consumers must not
+add a second focus-restoration handler.
+The opener is captured when an opening is requested, including `open-delay`,
+first mounting through `v-if`, and focusable triggers with `tabindex="-1"`.
+Cancelling `v-model` before an opening delay expires keeps the dialog closed.
+
 ## Draggable
 
 Set `draggable` to allow dragging; `overflow` allows the dialog to move beyond the viewport.

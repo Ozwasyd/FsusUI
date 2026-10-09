@@ -1,0 +1,20 @@
+{
+  "extends": "../../tsconfig.web.json",
+  "compilerOptions": {
+    "paths": {
+      "vue": ["../../../node_modules/vue/dist/vue.d.ts"],
+      "@vue/*": ["../../../node_modules/@vue/*"],
+      "@ozwasyd/element-plus": ["../../packages/element-plus/index.ts"],
+      "@element-plus/icons-vue": ["../../packages/icons-vue/src/index.ts"],
+      "@element-plus/icons-vue/*": ["../../packages/icons-vue/src/*"],
+      "@element-plus/*": ["../../packages/*"]
+    }
+  },
+  "include": [
+    "main.ts",
+    "App.vue",
+    "env.d.ts",
+    "../../typings/env.d.ts",
+    "../../typings/vite-worker.d.ts"
+  ]
+}
