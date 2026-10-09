@@ -1,8 +1,8 @@
-const assert = require('node:assert/strict')
-const fs = require('node:fs')
-const path = require('node:path')
-const { createRequire } = require('node:module')
-const { execFileSync } = require('node:child_process')
+import assert from 'node:assert/strict'
+import * as fs from 'node:fs'
+import path from 'node:path'
+import { createRequire } from 'node:module'
+import { execFileSync } from 'node:child_process'
 const root = process.cwd()
 const evidence = process.env.SLIDER_EVIDENCE_DIR
 assert.ok(
@@ -44,7 +44,7 @@ Project.prototype.getPreEmitDiagnostics = function (...args) {
     file: d
       .getSourceFile()
       ?.getFilePath()
-      .replace(root + '/', '')
+      .replace(`${root}/`, '')
       .replace(/\.vue\.ts$/, '.vue'),
     start: d.getStart(),
     message: ts.flattenDiagnosticMessageText(
@@ -57,11 +57,10 @@ Project.prototype.getPreEmitDiagnostics = function (...args) {
       root,
       'vue/packages/components/slider/src/composables/original-slide.ts',
     ),
-    originalText(owned).replace(
+    `${originalText(owned).replace(
       'export const useSlide =',
       'export const originalUseSlide =',
-    ) +
-      '\nimport { useSlide as repairedUseSlide } from "./use-slide"\ntype Equal<A, B> = (<T>() => T extends A ? 1 : 2) extends (<T>() => T extends B ? 1 : 2) ? true : false\ntype Assert<T extends true> = T\ntype ExactParameters = Assert<Equal<Parameters<typeof repairedUseSlide>, Parameters<typeof originalUseSlide>>>\ntype ExactReturn = Assert<Equal<ReturnType<typeof repairedUseSlide>, ReturnType<typeof originalUseSlide>>>\n',
+    )}\nimport { useSlide as repairedUseSlide } from "./use-slide"\ntype Equal<A, B> = (<T>() => T extends A ? 1 : 2) extends (<T>() => T extends B ? 1 : 2) ? true : false\ntype Assert<T extends true> = T\ntype ExactParameters = Assert<Equal<Parameters<typeof repairedUseSlide>, Parameters<typeof originalUseSlide>>>\ntype ExactReturn = Assert<Equal<ReturnType<typeof repairedUseSlide>, ReturnType<typeof originalUseSlide>>>\n`,
   )
   const program = this.getProgram().compilerObject
   const checker = program.getTypeChecker()
@@ -135,7 +134,7 @@ Project.prototype.getPreEmitDiagnostics = function (...args) {
   }
   fs.writeFileSync(
     path.join(evidence, 'producer.json'),
-    JSON.stringify(report, null, 2) + '\n',
+    `${JSON.stringify(report, null, 2)}\n`,
   )
   assert.deepEqual(
     pairDiagnostics,
@@ -188,8 +187,8 @@ generateTypesDefinitions((error) => {
         `real canonical output ${file}`,
       )
     }
-    console.log(
-      'PASS: canonical slider output, exact inferred contracts, unchanged runtime scripts',
+    process.stdout.write(
+      'PASS: canonical slider output, exact inferred contracts, unchanged runtime scripts\n',
     )
   } catch (error) {
     console.error(error)

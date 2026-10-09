@@ -32,7 +32,7 @@ test(
         'node',
         '--require',
         'tsx/cjs',
-        path.join(fixtures, 'observe-producer.cjs'),
+        path.join(fixtures, 'observe-producer.mjs'),
       ],
       {
         cwd: root,
@@ -54,6 +54,14 @@ test('actual installed tarball checks strict slider positive and negative contro
   assert.ok(
     consumer,
     'Set SLIDER_CONSUMER_ROOT to a fresh frozen install of the real candidate tarball',
+  )
+  const installManifest = JSON.parse(
+    readFileSync(path.join(consumer, 'package.json'), 'utf8'),
+  )
+  assert.match(
+    installManifest.dependencies['@ozwasyd/element-plus'],
+    /^file:.*\.tgz$/,
+    'consumer must install an actual tarball',
   )
   const req = createRequire(path.join(consumer, 'package.json'))
   const ts = req('typescript')
@@ -101,7 +109,7 @@ test('actual installed tarball checks strict slider positive and negative contro
     report[phase] = rows
     writeFileSync(
       path.join(evidence, 'packed-strict.json'),
-      JSON.stringify(report, null, 2) + '\n',
+      `${JSON.stringify(report, null, 2)}\n`,
     )
     const local = rows.filter((d) => d.file === `slider-${phase}.ts`)
     const external = rows.filter((d) => d.file !== `slider-${phase}.ts`)
@@ -113,7 +121,9 @@ test('actual installed tarball checks strict slider positive and negative contro
           [2307, 2339].includes(d.code) &&
           (d.code === 2307
             ? /'\.\/(cascader|select|time-select)'/.test(d.message)
-            : /Property '(ElCascader|ElOption|ElOptionGroup|ElSelect|ElTimeSelect)'/.test(d.message)) &&
+            : /Property '(ElCascader|ElOption|ElOptionGroup|ElSelect|ElTimeSelect)'/.test(
+                d.message,
+              )) &&
           !/slider/i.test(d.message),
       ),
       'only original unrelated installed-package failures remain',
@@ -132,8 +142,8 @@ test('actual installed tarball checks strict slider positive and negative contro
       )
     }
   }
-  console.log(
-    'PASS: strict packed slider controls; full-library strict check remains FAIL with 8 unrelated diagnostics',
+  process.stdout.write(
+    'PASS: strict packed slider controls; full-library strict check remains FAIL with 8 unrelated diagnostics\n',
   )
   assert.equal(options.skipLibCheck, false)
   assert.equal(options.strict, true)
