@@ -1,6 +1,5 @@
-import Cascader, {
-  ElCascader,
-} from '@ozwasyd/element-plus/es/components/cascader'
+import { ElCascader } from '@ozwasyd/element-plus/es/components/cascader'
+import type Cascader from '@ozwasyd/element-plus/es/components/cascader'
 import type { CascaderInstance } from '@ozwasyd/element-plus/es/components/cascader'
 import type {
   CascaderNode,
@@ -15,24 +14,24 @@ type Same<A, B> =
     : false
 type Assert<T extends true> = T
 type IsUntyped<T> = 0 extends 1 & T ? true : false
-type InstanceIsTyped = Assert<Same<IsUntyped<CascaderInstance>, false>>
-type DefaultAndNamed = Assert<Same<typeof Cascader, typeof ElCascader>>
-type ParametersPreserved = Assert<
+export type InstanceIsTyped = Assert<Same<IsUntyped<CascaderInstance>, false>>
+export type DefaultAndNamed = Assert<Same<typeof Cascader, typeof ElCascader>>
+export type ParametersPreserved = Assert<
   Same<Parameters<CascaderInstance['getCheckedNodes']>, [leafOnly: boolean]>
 >
-type ReturnPreserved = Assert<
+export type ReturnPreserved = Assert<
   Same<
     ReturnType<CascaderInstance['getCheckedNodes']>,
     CascaderNode[] | undefined
   >
 >
-type ToggleParameters = Assert<
+export type ToggleParameters = Assert<
   Same<Parameters<CascaderInstance['togglePopperVisible']>, [visible?: boolean]>
 >
-type ToggleReturn = Assert<
+export type ToggleReturn = Assert<
   Same<ReturnType<CascaderInstance['togglePopperVisible']>, void>
 >
-type ContentRef = Assert<
+export type ContentRef = Assert<
   Same<CascaderInstance['contentRef'], HTMLElement | undefined>
 >
 

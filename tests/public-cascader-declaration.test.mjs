@@ -93,7 +93,7 @@ test('type-only repair preserves compiled script, template, barrel and pinned in
   }
   writeFileSync(
     path.join(evidence, 'runtime-parity.json'),
-    JSON.stringify(
+    `${JSON.stringify(
       {
         script: 'PASS',
         template: 'PASS',
@@ -105,7 +105,7 @@ test('type-only repair preserves compiled script, template, barrel and pinned in
       },
       null,
       2,
-    ) + '\n',
+    )}\n`,
   )
 })
 
@@ -115,7 +115,7 @@ test('real canonical producer emits cascader and retains the complete original i
     [
       '--require',
       'tsx/cjs',
-      path.join(fixture, 'producer.cjs'),
+      path.join(fixture, 'producer.mjs'),
       path.join(evidence, 'producer.json'),
     ],
     'producer',
@@ -179,7 +179,7 @@ test('actual installed tarball retains strict cascader controls and isolates rem
     cpSync(path.join(fixture, `${name}.ts`), path.join(consumer, `${name}.ts`))
   writeFileSync(
     path.join(consumer, 'package.json'),
-    JSON.stringify(
+    `${JSON.stringify(
       {
         private: true,
         type: 'module',
@@ -195,7 +195,7 @@ test('actual installed tarball retains strict cascader controls and isolates rem
       },
       null,
       2,
-    ) + '\n',
+    )}\n`,
   )
   assert.equal(run('pnpm', ['--version'], 'pnpm-version').trim(), '10.33.0')
   run(
@@ -211,7 +211,7 @@ test('actual installed tarball retains strict cascader controls and isolates rem
   )
   run(
     process.execPath,
-    [path.join(fixture, 'installed.cjs'), consumer],
+    [path.join(fixture, 'installed.mjs'), consumer],
     'installed-diagnostics',
   )
   const results = JSON.parse(
@@ -312,7 +312,7 @@ test('actual installed tarball retains strict cascader controls and isolates rem
   remainingPackageErrors(results.library)
   writeFileSync(
     path.join(evidence, 'installed-summary.json'),
-    JSON.stringify(
+    `${JSON.stringify(
       {
         positiveStrict: results.positive.length ? 'FAIL' : 'PASS',
         positiveContract: 'PASS',
@@ -328,6 +328,6 @@ test('actual installed tarball retains strict cascader controls and isolates rem
       },
       null,
       2,
-    ) + '\n',
+    )}\n`,
   )
 })

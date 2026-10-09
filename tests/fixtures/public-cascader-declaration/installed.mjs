@@ -1,12 +1,12 @@
-const fs = require('node:fs')
-const path = require('node:path')
-const { createRequire } = require('node:module')
+import fs from 'node:fs'
+import path from 'node:path'
+import { createRequire } from 'node:module'
 const root = process.argv[2]
 const requireConsumer = createRequire(path.join(root, 'package.json'))
 const ts = requireConsumer('typescript')
 const results = {}
 for (const name of ['positive', 'negative', 'aggregate', 'library']) {
-  const file = path.join(root, name + '.ts')
+  const file = path.join(root, `${name}.ts`)
   const program = ts.createProgram([file], {
     target: ts.ScriptTarget.ES2022,
     module: ts.ModuleKind.ESNext,
@@ -32,6 +32,6 @@ results.vue = requireConsumer('vue/package.json').version
 results.package = requireConsumer.resolve('@ozwasyd/element-plus')
 fs.writeFileSync(
   path.join(root, 'diagnostics.json'),
-  JSON.stringify(results, null, 2) + '\n',
+  `${JSON.stringify(results, null, 2)}\n`,
 )
-console.log(JSON.stringify(results, null, 2))
+process.stdout.write(`${JSON.stringify(results, null, 2)}\n`)
