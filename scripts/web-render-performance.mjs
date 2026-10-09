@@ -98,9 +98,9 @@ const profileMatrix = scenarioFilter
         ...dimensions[index % dimensions.length],
       ])
 
-if (caseFilter === undefined)
+if (has('--case') && !caseFilter)
   throw new Error('--case requires a full case ID')
-if (caseFilter && scenarioFilter)
+if (has('--case') && has('--scenario'))
   throw new Error('--case cannot be combined with --scenario')
 const matrix = caseFilter
   ? profileMatrix.filter(
