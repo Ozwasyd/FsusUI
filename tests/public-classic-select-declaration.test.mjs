@@ -101,11 +101,17 @@ test('canonical producer emits Select and its downstream contracts with exact in
     original(`${selectDir}/index.ts`).replace("from './src/select.vue'", "from './src/select.original'"),
   )
   const probeText = await readFile(path.join(root, 'tests/fixtures/public-classic-select-declaration/inferred-contract.ts'), 'utf8')
-  const probe = capturedProject.createSourceFile(path.join(root, 'classic-select-inferred-contract.ts'), probeText)
+  const probe = capturedProject.createSourceFile(path.join(root, 'vue/classic-select-inferred-contract.ts'), probeText)
   const program = capturedProject.getProgram().compilerObject
   const probeDiagnostics = ts.getPreEmitDiagnostics(program, program.getSourceFile(probe.getFilePath()))
-  assert.deepEqual(probeDiagnostics.map((row) => ts.flattenDiagnosticMessageText(row.messageText, '\n')), [])
-  const negative = capturedProject.createSourceFile(path.join(root, 'classic-select-inferred-negative.ts'),
+  const contractDiagnostics = probeDiagnostics.map((row) => ({
+    code: row.code,
+    line: row.file && row.start != null ? row.file.getLineAndCharacterOfPosition(row.start).line + 1 : null,
+    message: ts.flattenDiagnosticMessageText(row.messageText, '\n'),
+  }))
+  await writeFile(path.join(evidenceDir, 'inferred-contract-diagnostics.json'), JSON.stringify(contractDiagnostics, null, 2) + '\n')
+  assert.deepEqual(contractDiagnostics, [])
+  const negative = capturedProject.createSourceFile(path.join(root, 'vue/classic-select-inferred-negative.ts'),
     probeText + '\ntype BrokenReturn = Omit<ReturnType<typeof RepairedUseSelect>, "tooltipRef"> & { tooltipRef: null };\ntype RejectBrokenReturn = Assert<Both<BrokenReturn, ReturnType<typeof OriginalUseSelect>>>;\n',
   )
   const negativeProgram = capturedProject.getProgram().compilerObject
