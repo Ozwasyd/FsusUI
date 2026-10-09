@@ -48,6 +48,46 @@ export function rewriteNodeDeclaration(
   const printer = ts.createPrinter({ newLine: ts.NewLineKind.LineFeed })
   const importModes = new Map<string, boolean>()
   const commonJsSpecifiers = new Map<string, string>()
+  const externalModules = new Map<
+    string,
+    { checker: ts.TypeChecker; exports: readonly ts.Symbol[] }
+  >()
+  const names = new Set<string>()
+  const collectNames = (node: ts.Node) => {
+    if (ts.isIdentifier(node)) names.add(node.text)
+    ts.forEachChild(node, collectNames)
+  }
+  collectNames(source)
+  const exportedValues = new Set<string>()
+  for (const statement of source.statements) {
+    if (
+      ts.isExportDeclaration(statement) &&
+      !statement.moduleSpecifier &&
+      !statement.isTypeOnly &&
+      statement.exportClause &&
+      ts.isNamedExports(statement.exportClause)
+    ) {
+      for (const element of statement.exportClause.elements) {
+        if (!element.isTypeOnly) {
+          exportedValues.add((element.propertyName || element.name).text)
+        }
+      }
+    } else if (ts.isExportAssignment(statement)) {
+      const collectExportedValues = (node: ts.Node) => {
+        if (ts.isIdentifier(node)) exportedValues.add(node.text)
+        ts.forEachChild(node, collectExportedValues)
+      }
+      collectExportedValues(statement.expression)
+    }
+  }
+  let nextName = 0
+  const privateName = () => {
+    let name: string
+    do name = `__fsusNodeImport${nextName++}`
+    while (names.has(name))
+    names.add(name)
+    return ts.factory.createIdentifier(name)
+  }
   const resolveCommonJs = (specifier: string) =>
     ts.resolveModuleName(
       specifier,
@@ -77,6 +117,191 @@ export function rewriteNodeDeclaration(
       ) === ts.ModuleKind.ESNext
     importModes.set(specifier, isEsm)
     return isEsm
+  }
+  const externalModule = (specifier: string) => {
+    const cached = externalModules.get(specifier)
+    if (cached) return cached
+    const resolved = resolveCommonJs(specifier)
+    if (!resolved) {
+      throw new Error(
+        `Cannot resolve declaration import ${specifier} in ${filename}`,
+      )
+    }
+    const program = ts.createProgram(
+      [resolved.resolvedFileName],
+      compilerOptions,
+    )
+    const checker = program.getTypeChecker()
+    const file = program.getSourceFile(resolved.resolvedFileName)
+    const symbol = file && checker.getSymbolAtLocation(file)
+    if (!symbol) {
+      throw new Error(
+        `Cannot inspect declaration exports ${specifier} in ${filename}`,
+      )
+    }
+    const entry = { checker, exports: checker.getExportsOfModule(symbol) }
+    externalModules.set(specifier, entry)
+    return entry
+  }
+  const targetSymbol = (checker: ts.TypeChecker, symbol: ts.Symbol) =>
+    symbol.flags & ts.SymbolFlags.Alias
+      ? checker.getAliasedSymbol(symbol)
+      : symbol
+  const importedSymbol = (specifier: string, name: string) => {
+    const { checker, exports } = externalModule(specifier)
+    const symbol = exports.find((entry) => entry.name === name)
+    if (!symbol) {
+      throw new Error(
+        `Cannot resolve declaration export ${name} from ${specifier} in ${filename}`,
+      )
+    }
+    return targetSymbol(checker, symbol)
+  }
+  const importedType = (
+    specifier: string,
+    name?: ts.EntityName,
+    arguments_?: readonly ts.TypeNode[],
+    value = false,
+  ) =>
+    ts.factory.createImportTypeNode(
+      ts.factory.createLiteralTypeNode(
+        ts.factory.createStringLiteral(specifier),
+      ),
+      importAttributes(),
+      name,
+      arguments_,
+      value,
+    )
+  const typeParameters = (specifier: string, symbol: ts.Symbol) => {
+    const declaration = symbol.declarations?.find(
+      (node) =>
+        ts.isClassDeclaration(node) ||
+        ts.isInterfaceDeclaration(node) ||
+        ts.isTypeAliasDeclaration(node),
+    ) as
+      | ts.ClassDeclaration
+      | ts.InterfaceDeclaration
+      | ts.TypeAliasDeclaration
+      | undefined
+    if (!declaration?.typeParameters) return undefined
+    const { checker, exports } = externalModule(specifier)
+    const qualifyType = (type: ts.TypeNode) => {
+      const result = ts.transform(type, [
+        (context) => {
+          const qualify: ts.Visitor = (node) => {
+            if (ts.isTypeReferenceNode(node) || ts.isTypeQueryNode(node)) {
+              const reference = ts.isTypeReferenceNode(node)
+                ? node.typeName
+                : node.exprName
+              const referenced = checker.getSymbolAtLocation(reference)
+              const owner =
+                referenced &&
+                exports.find(
+                  (entry) =>
+                    targetSymbol(checker, entry) ===
+                    targetSymbol(checker, referenced),
+                )
+              if (owner) {
+                return importedType(
+                  specifier,
+                  ts.factory.createIdentifier(owner.name),
+                  node.typeArguments?.map(
+                    (argument) =>
+                      ts.visitNode(argument, qualify) as ts.TypeNode,
+                  ),
+                  ts.isTypeQueryNode(node),
+                )
+              }
+            }
+            return ts.visitEachChild(node, qualify, context)
+          }
+          return (node) => ts.visitNode(node, qualify) as ts.TypeNode
+        },
+      ])
+      try {
+        return result.transformed[0]
+      } finally {
+        result.dispose()
+      }
+    }
+    return declaration.typeParameters.map((parameter) =>
+      ts.factory.createTypeParameterDeclaration(
+        parameter.modifiers,
+        parameter.name.text,
+        parameter.constraint && qualifyType(parameter.constraint),
+        parameter.default && qualifyType(parameter.default),
+      ),
+    )
+  }
+  const valueBinding = (
+    specifier: string,
+    imported: ts.ModuleExportName,
+    local: ts.Identifier,
+  ) => {
+    const symbol = importedSymbol(specifier, imported.text)
+    const binding = privateName()
+    const statements: ts.Statement[] = [
+      ts.factory.createImportDeclaration(
+        undefined,
+        ts.factory.createImportClause(
+          true,
+          undefined,
+          ts.factory.createNamedImports([
+            ts.factory.createImportSpecifier(
+              false,
+              ts.isIdentifier(imported)
+                ? ts.factory.createIdentifier(imported.text)
+                : ts.factory.createStringLiteral(imported.text),
+              binding,
+            ),
+          ]),
+        ),
+        ts.factory.createStringLiteral(specifier),
+        importAttributes(),
+      ),
+    ]
+    // A type-only import can describe both sides of a class without serving as
+    // its value export. Merge a local type alias with the exact constructor or
+    // callable type, then export that one local symbol (including as default).
+    if (symbol.flags & ts.SymbolFlags.Type) {
+      const parameters = typeParameters(specifier, symbol)
+      statements.push(
+        ts.factory.createTypeAliasDeclaration(
+          undefined,
+          local,
+          parameters,
+          ts.factory.createTypeReferenceNode(
+            binding,
+            parameters?.map((parameter) =>
+              ts.factory.createTypeReferenceNode(parameter.name, undefined),
+            ),
+          ),
+        ),
+      )
+    }
+    if (symbol.flags & ts.SymbolFlags.Value) {
+      statements.push(
+        ts.factory.createVariableStatement(
+          [ts.factory.createModifier(ts.SyntaxKind.DeclareKeyword)],
+          ts.factory.createVariableDeclarationList(
+            [
+              ts.factory.createVariableDeclaration(
+                local,
+                undefined,
+                ts.factory.createTypeQueryNode(binding),
+              ),
+            ],
+            ts.NodeFlags.Const,
+          ),
+        ),
+      )
+    }
+    if (statements.length === 1) {
+      throw new Error(
+        `Unsupported declaration export ${imported.text} from ${specifier} in ${filename}`,
+      )
+    }
+    return statements
   }
   const rewriteSpecifier = (specifier: string) => {
     if (format === 'cjs') {
@@ -151,6 +376,75 @@ export function rewriteNodeDeclaration(
             (!ts.isImportDeclaration(node) || !!node.importClause) &&
             needsImportMode(specifier)
           if (ts.isImportDeclaration(node)) {
+            if (
+              useImportMode &&
+              node.importClause &&
+              !node.importClause.isTypeOnly &&
+              (!node.importClause.namedBindings ||
+                ts.isNamedImports(node.importClause.namedBindings))
+            ) {
+              const clause = node.importClause
+              const statements: ts.Statement[] = []
+              if (clause.name) {
+                if (exportedValues.has(clause.name.text)) {
+                  statements.push(
+                    ...valueBinding(
+                      specifier,
+                      ts.factory.createIdentifier('default'),
+                      clause.name,
+                    ),
+                  )
+                } else {
+                  statements.push(
+                    ts.factory.createImportDeclaration(
+                      node.modifiers,
+                      ts.factory.createImportClause(
+                        true,
+                        clause.name,
+                        undefined,
+                      ),
+                      ts.factory.createStringLiteral(specifier),
+                      importAttributes(),
+                    ),
+                  )
+                }
+              }
+              if (
+                clause.namedBindings &&
+                ts.isNamedImports(clause.namedBindings)
+              ) {
+                for (const element of clause.namedBindings.elements) {
+                  const imported = element.propertyName || element.name
+                  if (
+                    element.isTypeOnly ||
+                    !exportedValues.has(element.name.text)
+                  ) {
+                    statements.push(
+                      ts.factory.createImportDeclaration(
+                        node.modifiers,
+                        ts.factory.createImportClause(
+                          true,
+                          undefined,
+                          ts.factory.createNamedImports([
+                            ts.factory.createImportSpecifier(
+                              false,
+                              element.propertyName,
+                              element.name,
+                            ),
+                          ]),
+                        ),
+                        ts.factory.createStringLiteral(specifier),
+                        importAttributes(),
+                      ),
+                    )
+                  } else
+                    statements.push(
+                      ...valueBinding(specifier, imported, element.name),
+                    )
+                }
+              }
+              return statements
+            }
             return ts.factory.updateImportDeclaration(
               node,
               node.modifiers,
@@ -174,48 +468,45 @@ export function rewriteNodeDeclaration(
             }
             // A declaration value re-export is non-emitting. Keep the exact
             // imported callable/value type while explicitly selecting its ESM types.
-            return node.exportClause.elements.map((element) => {
-              if (element.isTypeOnly) {
-                return ts.factory.createExportDeclaration(
-                  node.modifiers,
-                  true,
-                  ts.factory.createNamedExports([element]),
-                  ts.factory.createStringLiteral(specifier),
-                  importAttributes(),
-                )
-              }
-              if (!ts.isIdentifier(element.name)) {
-                throw new Error(`Unsupported CJS export name in ${filename}`)
-              }
-              const importedName = element.propertyName || element.name
-              if (!ts.isIdentifier(importedName)) {
-                throw new Error(`Unsupported CJS import name in ${filename}`)
-              }
-              return ts.factory.createVariableStatement(
-                [
-                  ts.factory.createModifier(ts.SyntaxKind.ExportKeyword),
-                  ts.factory.createModifier(ts.SyntaxKind.DeclareKeyword),
-                ],
-                ts.factory.createVariableDeclarationList(
-                  [
-                    ts.factory.createVariableDeclaration(
-                      element.name,
-                      undefined,
-                      ts.factory.createImportTypeNode(
-                        ts.factory.createLiteralTypeNode(
-                          ts.factory.createStringLiteral(specifier),
-                        ),
-                        importAttributes(),
-                        importedName,
-                        undefined,
-                        true,
+            return node.exportClause.elements
+              .map((element) => {
+                const importedName = element.propertyName || element.name
+                const symbol = importedSymbol(specifier, importedName.text)
+                if (
+                  element.isTypeOnly ||
+                  !(symbol.flags & ts.SymbolFlags.Value)
+                ) {
+                  return ts.factory.createExportDeclaration(
+                    node.modifiers,
+                    true,
+                    ts.factory.createNamedExports([
+                      ts.factory.createExportSpecifier(
+                        false,
+                        element.propertyName,
+                        element.name,
                       ),
-                    ),
-                  ],
-                  ts.NodeFlags.Const,
-                ),
-              )
-            })
+                    ]),
+                    ts.factory.createStringLiteral(specifier),
+                    importAttributes(),
+                  )
+                }
+                const local = privateName()
+                return [
+                  ...valueBinding(specifier, importedName, local),
+                  ts.factory.createExportDeclaration(
+                    node.modifiers,
+                    false,
+                    ts.factory.createNamedExports([
+                      ts.factory.createExportSpecifier(
+                        false,
+                        local,
+                        element.name,
+                      ),
+                    ]),
+                  ),
+                ]
+              })
+              .flat()
           }
           return ts.factory.updateExportDeclaration(
             node,
