@@ -1,0 +1,112 @@
+{
+  "groups": [
+    {
+      "id": "generated-vue-component-constraints",
+      "count": 145,
+      "codes": [
+        "TS2344"
+      ],
+      "confirmed": "Emitted concrete GlobalComponents type argument does not satisfy Vue 3.5.32 LC extends Record<string, Component>. Both producer and consumer Vue are 3.5.32; this is not version drift.",
+      "example": "es/components/inbox-primitives/index.d.ts:207:26",
+      "ownerFiles": [
+        "vue/internal/build/src/tasks/types-definitions.ts",
+        "vue/typings/env.d.ts"
+      ],
+      "inference": "Expanded inferred component declarations materialize the ambient interface in a constrained generic slot; a canonical producer/source typing correction must preserve public component types."
+    },
+    {
+      "id": "duplicate-generated-emitter-parameter",
+      "count": 34,
+      "codes": [
+        "TS2300"
+      ],
+      "confirmed": "Emitter signatures contain (event: \"blur\", event: FocusEvent) and (event: \"select\", event: MouseEvent). The same signature may appear in component index and Vue source declarations; 34 diagnostics are not 34 independent source errors.",
+      "example": "es/components/color-picker/index.d.ts:101:124",
+      "ownerFiles": [
+        "vue/internal/build/src/tasks/types-definitions.ts",
+        "vue/packages/components/color-picker/src/color-picker.ts",
+        "vue/packages/components/inbox-primitives/src/shared.ts"
+      ]
+    },
+    {
+      "id": "unavailable-declaration-dependency",
+      "count": 68,
+      "codes": [
+        "TS2307"
+      ],
+      "confirmed": "67 vue-router references; vue-router is only a published devDependency and absent in this consumer. One type-fest reference; absent from published dependencies/peers and absent in consumer.",
+      "ownerFiles": [
+        "vue/packages/element-plus/package.json",
+        "vue/packages/utils/objects.ts",
+        "vue/packages/components/menu",
+        "vue/packages/components/breadcrumb"
+      ]
+    },
+    {
+      "id": "omitted-component-declaration-entry",
+      "count": 10,
+      "codes": [
+        "TS2307",
+        "TS2339"
+      ],
+      "confirmed": "Four component index.d.ts entries are absent in packed and installed bytes although their runtime index.mjs and source index.ts exist. Four unresolved declaration barrel imports cause six GlobalComponents exports to be unavailable: Cascader, Select/Option/OptionGroup, Slider, TimeSelect.",
+      "missingEntries": [
+        "es/components/cascader/index.d.ts",
+        "es/components/select/index.d.ts",
+        "es/components/slider/index.d.ts",
+        "es/components/time-select/index.d.ts"
+      ],
+      "ownerFiles": [
+        "vue/internal/build/src/tasks/types-definitions.ts",
+        "vue/packages/components/cascader/index.ts",
+        "vue/packages/components/select/index.ts",
+        "vue/packages/components/slider/index.ts",
+        "vue/packages/components/time-select/index.ts"
+      ],
+      "unproven": "Existing producer filters TS7056, a candidate mechanism for omitted inferred declarations; no rerun was performed to prove the individual emit cause."
+    },
+    {
+      "id": "blocked-internal-wasm-declaration-reference",
+      "count": 3,
+      "codes": [
+        "TS2307"
+      ],
+      "confirmed": "Files markdown-syntax-identity.d.ts and markdown-syntax-consumers.d.ts exist, but package exports explicitly maps ./es/wasm/* to null. Emitted declaration import expressions use those blocked self-package specifiers.",
+      "ownerFiles": [
+        "vue/internal/build/src/utils/pkg.ts",
+        "vue/packages/element-plus/package.json",
+        "vue/packages/components/markdown-editor"
+      ]
+    },
+    {
+      "id": "motion-gsap-type-scope",
+      "count": 24,
+      "codes": [
+        "TS2503",
+        "TS7016",
+        "TS7017"
+      ],
+      "confirmed": "20 missing gsap namespaces, two missing ScrollTrigger namespaces, one unresolved GSAP plugin declaration, one globalThis.gsap member error. GSAP 3.15.0 is installed. Generated composables lack a type import loading its ambient declarations; getGsap emits typeof globalThis.gsap without retaining the source gsap import. gsap/ScrollTrigger export maps its types pattern to non-existing types/ScrollTrigger.d.ts while bundled declaration is types/scroll-trigger.d.ts.",
+      "ownerFiles": [
+        "vue/packages/motion/gsap/register.ts",
+        "vue/packages/motion/composables/use-gsap-context.ts",
+        "vue/packages/motion/composables/use-scroll-reveal.ts",
+        "vue/packages/motion/composables/use-scroll-timeline.ts",
+        "vue/packages/motion/composables/use-timeline.ts"
+      ]
+    },
+    {
+      "id": "producer-only-jsx-ambient",
+      "count": 2,
+      "codes": [
+        "TS2503"
+      ],
+      "confirmed": "Two table-v2 declarations use global JSX.IntrinsicAttributes. The producer env.d.ts supplies that ambient namespace; the consumer package declaration closure does not.",
+      "ownerFiles": [
+        "vue/packages/components/table-v2/src/components/sort-icon.tsx",
+        "vue/packages/components/table-v2/src/types.ts",
+        "vue/typings/env.d.ts"
+      ]
+    }
+  ]
+}

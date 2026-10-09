@@ -1,0 +1,80 @@
+{
+  "sourceHead": "c8df89dd2b2b0e563572732e3b310c237f428181",
+  "files": [
+    {
+      "path": "candidate-manifest.json",
+      "bytes": 1418,
+      "sha256": "434759c977c95abd59a1aea920a03903f455228fcbf876873415b49aa19131ae"
+    },
+    {
+      "path": "consumer-pnpm-lock.yaml",
+      "bytes": 72343,
+      "sha256": "06fb1a88bed0599c89dcdea51aa178716e80889420d32bf10f645c37ff3695fc"
+    },
+    {
+      "path": "dependency-anchors.json",
+      "bytes": 13823,
+      "sha256": "601b5d428cb078d7b7a0ceb92a6db0638f49e70b6e2dc503022433a7814934c5"
+    },
+    {
+      "path": "diagnostics.json",
+      "bytes": 392765,
+      "sha256": "a3703dda84f8498d3303fe17d000366d6aed066652cf53f42c897dc96357a1e2"
+    },
+    {
+      "path": "export-strict286.py",
+      "bytes": 12220,
+      "sha256": "0e0cea5ef4d0d8297d59f4571c0cee07d8f4fbc479eba22855f42adf5da8bd2e"
+    },
+    {
+      "path": "installed-package.json",
+      "bytes": 9744,
+      "sha256": "018aaf5e7dca2b6cd6489e2656f25f420e6a471bad2bfd4de5b74216a700069a"
+    },
+    {
+      "path": "provenance.json",
+      "bytes": 12304,
+      "sha256": "9eb30f31420943f8f8e23f95de8e7c4a75c37b0feca1a8014aa6db0c2b634957"
+    },
+    {
+      "path": "root-causes.json",
+      "bytes": 5130,
+      "sha256": "e63fe5e070868d9c3b99456c6a12f73c0bce9498ada975b8a05477c3643468fb"
+    },
+    {
+      "path": "source-anchors.json",
+      "bytes": 60801,
+      "sha256": "234737e06079fe1b727aec13ae1470d833f3dab524cc08ef32afb23bab11c58b"
+    },
+    {
+      "path": "strict-package.log",
+      "bytes": 82716,
+      "sha256": "6f812728e5e1796ee8e61f544ad03a09cc49bde52918a7fa3825f3f8e835302c"
+    },
+    {
+      "path": "strict-probe/env.d.ts",
+      "bytes": 38,
+      "sha256": "65996936fbb042915f7b74a200fcdde7e410f32a669b1ab9597cfaa4b0faddb5"
+    },
+    {
+      "path": "strict-probe/src/App.vue",
+      "bytes": 581,
+      "sha256": "d98b04b20e07aa1a64051b9a918782ce6d4ec6bae7b960e6f5771a3ba95e78a6"
+    },
+    {
+      "path": "strict-probe/src/main.ts",
+      "bytes": 3848,
+      "sha256": "943e76e177c3283fc27d1a285690684201deba9725eece4bf7a6333dfd497aac"
+    },
+    {
+      "path": "strict-probe/src/markdown-safe-html.ts",
+      "bytes": 1144,
+      "sha256": "eb90a57bd8655a242bc7a798e72aef1def701ba59a850a95fb2272fb7096d073"
+    },
+    {
+      "path": "strict-probe/tsconfig.json",
+      "bytes": 504,
+      "sha256": "12338d1d9f439973033d931b1acba24f55ed328fc3700017d12701b0b9397b3f"
+    }
+  ]
+}

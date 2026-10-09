@@ -1,0 +1,177 @@
+{
+  "files": [
+    {
+      "installedRelativePath": "@vue/runtime-core/dist/runtime-core.d.ts",
+      "sha256": "3e74c6f34a28b7c948bfdaf19172000d589093660b3605f8c21c1b30173c729b",
+      "text": null,
+      "matchedLines": [
+        {
+          "line": 499,
+          "text": "export type CreateComponentPublicInstanceWithMixins<P = {}, B = {}, D = {}, C extends ComputedOptions = {}, M extends MethodOptions = {}, Mixin extends ComponentOptionsMixin = ComponentOptionsMixin, Extends extends ComponentOptionsMixin = ComponentOptionsMixin, E extends EmitsOptions = {}, PublicProps = P, Defaults = {}, MakeDefaultsOptional extends boolean = false, I extends ComponentInjectOptions = {}, S extends SlotsType = {}, LC extends Record<string, Component> = {}, Directives extends Record<string, Directive> = {}, Exposed extends string = string, TypeRefs extends Data = {}, TypeEl extends Element = any, Provide extends ComponentProvideOptions = ComponentProvideOptions, PublicMixin = IntersectionMixin<Mixin> & IntersectionMixin<Extends>, PublicP = UnwrapMixinsType<PublicMixin, 'P'> & EnsureNonVoid<P>, PublicB = UnwrapMixinsType<PublicMixin, 'B'> & EnsureNonVoid<B>, PublicD = UnwrapMixinsType<PublicMixin, 'D'> & EnsureNonVoid<D>, PublicC extends ComputedOptions = UnwrapMixinsType<PublicMixin, 'C'> & EnsureNonVoid<C>, PublicM extends MethodOptions = UnwrapMixinsType<PublicMixin, 'M'> & EnsureNonVoid<M>, PublicDefaults = UnwrapMixinsType<PublicMixin, 'Defaults'> & EnsureNonVoid<Defaults>> = ComponentPublicInstance<PublicP, PublicB, PublicD, PublicC, PublicM, E, PublicProps, PublicDefaults, MakeDefaultsOptional, ComponentOptionsBase<P, B, D, C, M, Mixin, Extends, E, string, Defaults, {}, string, S, LC, Directives, Exposed, Provide>, I, S, Exposed, TypeRefs, TypeEl>;"
+        },
+        {
+          "line": 830,
+          "text": "export interface ComponentOptionsBase<Props, RawBindings, D, C extends ComputedOptions, M extends MethodOptions, Mixin extends ComponentOptionsMixin, Extends extends ComponentOptionsMixin, E extends EmitsOptions, EE extends string = string, Defaults = {}, I extends ComponentInjectOptions = {}, II extends string = string, S extends SlotsType = {}, LC extends Record<string, Component> = {}, Directives extends Record<string, Directive> = {}, Exposed extends string = string, Provide extends ComponentProvideOptions = ComponentProvideOptions> extends LegacyOptions<Props, D, C, M, Mixin, Extends, I, II, Provide>, ComponentInternalOptions, ComponentCustomOptions {"
+        },
+        {
+          "line": 858,
+          "text": "export type ComponentOptions<Props = {}, RawBindings = any, D = any, C extends ComputedOptions = any, M extends MethodOptions = any, Mixin extends ComponentOptionsMixin = any, Extends extends ComponentOptionsMixin = any, E extends EmitsOptions = any, EE extends string = string, Defaults = {}, I extends ComponentInjectOptions = {}, II extends string = string, S extends SlotsType = {}, LC extends Record<string, Component> = {}, Directives extends Record<string, Directive> = {}, Exposed extends string = string, Provide extends ComponentProvideOptions = ComponentProvideOptions> = ComponentOptionsBase<Props, RawBindings, D, C, M, Mixin, Extends, E, EE, Defaults, I, II, S, LC, Directives, Exposed, Provide> & ThisType<CreateComponentPublicInstanceWithMixins<{}, RawBindings, D, C, M, Mixin, Extends, E, Readonly<Props>, Defaults, false, I, S, LC, Directives>>;"
+        },
+        {
+          "line": 963,
+          "text": "export type ComponentOptionsWithoutProps<Props = {}, RawBindings = {}, D = {}, C extends ComputedOptions = {}, M extends MethodOptions = {}, Mixin extends ComponentOptionsMixin = ComponentOptionsMixin, Extends extends ComponentOptionsMixin = ComponentOptionsMixin, E extends EmitsOptions = {}, EE extends string = string, I extends ComponentInjectOptions = {}, II extends string = string, S extends SlotsType = {}, LC extends Record<string, Component> = {}, Directives extends Record<string, Directive> = {}, Exposed extends string = string, Provide extends ComponentProvideOptions = ComponentProvideOptions, TE extends ComponentTypeEmits = {}, ResolvedEmits extends EmitsOptions = {} extends E ? TypeEmitsToOptions<TE> : E, PE = Props & EmitsToProps<ResolvedEmits>> = ComponentOptionsBase<PE, RawBindings, D, C, M, Mixin, Extends, E, EE, {}, I, II, S, LC, Directives, Exposed, Provide> & {"
+        },
+        {
+          "line": 977,
+          "text": "export type ComponentOptionsWithArrayProps<PropNames extends string = string, RawBindings = {}, D = {}, C extends ComputedOptions = {}, M extends MethodOptions = {}, Mixin extends ComponentOptionsMixin = ComponentOptionsMixin, Extends extends ComponentOptionsMixin = ComponentOptionsMixin, E extends EmitsOptions = EmitsOptions, EE extends string = string, I extends ComponentInjectOptions = {}, II extends string = string, S extends SlotsType = {}, LC extends Record<string, Component> = {}, Directives extends Record<string, Directive> = {}, Exposed extends string = string, Provide extends ComponentProvideOptions = ComponentProvideOptions, Props = Prettify<Readonly<{"
+        },
+        {
+          "line": 985,
+          "text": "export type ComponentOptionsWithObjectProps<PropsOptions = ComponentObjectPropsOptions, RawBindings = {}, D = {}, C extends ComputedOptions = {}, M extends MethodOptions = {}, Mixin extends ComponentOptionsMixin = ComponentOptionsMixin, Extends extends ComponentOptionsMixin = ComponentOptionsMixin, E extends EmitsOptions = EmitsOptions, EE extends string = string, I extends ComponentInjectOptions = {}, II extends string = string, S extends SlotsType = {}, LC extends Record<string, Component> = {}, Directives extends Record<string, Directive> = {}, Exposed extends string = string, Provide extends ComponentProvideOptions = ComponentProvideOptions, Props = Prettify<Readonly<ExtractPropTypes<PropsOptions>> & Readonly<EmitsToProps<E>>>, Defaults = ExtractDefaultPropTypes<PropsOptions>> = ComponentOptionsBase<Props, RawBindings, D, C, M, Mixin, Extends, E, EE, Defaults, I, II, S, LC, Directives, Exposed, Provide> & {"
+        },
+        {
+          "line": 1005,
+          "text": "export type DefineComponent<PropsOrPropOptions = {}, RawBindings = {}, D = {}, C extends ComputedOptions = ComputedOptions, M extends MethodOptions = MethodOptions, Mixin extends ComponentOptionsMixin = ComponentOptionsMixin, Extends extends ComponentOptionsMixin = ComponentOptionsMixin, E extends EmitsOptions = {}, EE extends string = string, PP = PublicProps, Props = ResolveProps<PropsOrPropOptions, E>, Defaults = ExtractDefaultPropTypes<PropsOrPropOptions>, S extends SlotsType = {}, LC extends Record<string, Component> = {}, Directives extends Record<string, Directive> = {}, Exposed extends string = string, Provide extends ComponentProvideOptions = ComponentProvideOptions, MakeDefaultsOptional extends boolean = true, TypeRefs extends Record<string, unknown> = {}, TypeEl extends Element = any> = ComponentPublicInstanceConstructor<CreateComponentPublicInstanceWithMixins<Props, RawBindings, D, C, M, Mixin, Extends, E, PP, Defaults, MakeDefaultsOptional, {}, S, LC & GlobalComponents, Directives & GlobalDirectives, Exposed, TypeRefs, TypeEl>> & ComponentOptionsBase<Props, RawBindings, D, C, M, Mixin, Extends, E, EE, Defaults, {}, string, S, LC & GlobalComponents, Directives & GlobalDirectives, Exposed, Provide> & PP;"
+        },
+        {
+          "line": 1391,
+          "text": "export interface GlobalComponents {"
+        },
+        {
+          "line": 1840,
+          "text": "  export interface GlobalComponents {"
+        }
+      ]
+    },
+    {
+      "installedRelativePath": "gsap/package.json",
+      "sha256": "85cc13e31f7a3cd124b587a40f545f265f47d0dfb9a556bb122d70fc0fca3459",
+      "text": "{\n    \"name\": \"gsap\",\n    \"version\": \"3.15.0\",\n    \"description\": \"GSAP is a framework-agnostic JavaScript animation library that turns developers into animation superheroes. Build high-performance animations that work in **every** major browser. Animate CSS, SVG, canvas, React, Vue, WebGL, colors, strings, motion paths, generic objects...anything JavaScript can touch! The ScrollTrigger plugin lets you create jaw-dropping scroll-based animations with minimal code. No other library delivers such advanced sequencing, reliability, and tight control while solving real-world problems on millions of sites. GSAP works around countless browser inconsistencies; your animations **just work**. At its core, GSAP is a high-speed property manipulator, updating values over time with extreme accuracy.\",\n    \"homepage\": \"https://gsap.com\",\n    \"module\": \"index.js\",\n    \"main\": \"dist/gsap.js\",\n    \"types\": \"types/index.d.ts\",\n    \"sideEffects\": false,\n    \"exports\": {\n        \".\": {\n            \"import\": \"./index.js\",\n            \"require\": \"./dist/gsap.js\",\n            \"types\": \"./types/index.d.ts\",\n            \"default\": \"./index.js\"\n        },\n        \"./dist/*.js\": \"./dist/*.js\",\n        \"./dist/*\": \"./dist/*.js\",\n        \"./*.js\": {\n            \"import\": \"./*.js\",\n            \"require\": \"./dist/*.js\",\n            \"types\": \"./types/*.d.ts\",\n            \"default\": \"./*.js\"\n        },\n        \"./*\": {\n            \"import\": \"./*.js\",\n            \"require\": \"./dist/*.js\",\n            \"types\": \"./types/*.d.ts\",\n            \"default\": \"./*.js\"\n        },\n        \"./types/*\": \"./types/*\",\n        \"./package.json\": \"./package.json\"\n    },\n    \"keywords\": [\n        \"GSAP\",\n        \"GreenSock\",\n        \"animation\",\n        \"MotionPathPlugin\",\n        \"motion\",\n        \"motionPath\",\n        \"matchMedia\",\n        \"easing\",\n        \"ScrollTrigger\",\n        \"ScrollSmoother\",\n        \"Observer\",\n        \"JavaScript\",\n        \"PixiPlugin\",\n        \"CustomEase\",\n        \"Flip\",\n        \"SVG\",\n        \"3D\",\n        \"2D\",\n        \"transform\",\n        \"morph\",\n        \"morphing\",\n        \"tweening\",\n        \"Webflow\"\n    ],\n    \"maintainers\": [\n        {\n            \"name\": \"Jack Doyle\",\n            \"email\": \"jack@greensock.com\",\n            \"web\": \"https://gsap.com\"\n        }\n    ],\n    \"license\": \"Standard 'no charge' license: https://gsap.com/standard-license.\",\n    \"bugs\": {\n        \"url\": \"https://gsap.com/community/\"\n    },\n    \"repository\": {\n        \"type\": \"git\",\n        \"url\": \"git+https://github.com/greensock/GSAP.git\"\n    }\n}\n",
+      "matchedLines": []
+    },
+    {
+      "installedRelativePath": "gsap/types/index.d.ts",
+      "sha256": "baace3d380a208ebd640bdfdb70748ca60fbaead011b4a92900abf334188f6cd",
+      "text": null,
+      "matchedLines": [
+        {
+          "line": 33,
+          "text": "/// <reference path=\"scroll-trigger.d.ts\"/>"
+        },
+        {
+          "line": 60,
+          "text": "declare module \"gsap\" {"
+        },
+        {
+          "line": 65,
+          "text": "declare module \"gsap/src\" {"
+        },
+        {
+          "line": 70,
+          "text": "declare module \"gsap/src/index\" {"
+        },
+        {
+          "line": 75,
+          "text": "declare module \"gsap/dist\" {"
+        },
+        {
+          "line": 80,
+          "text": "declare module \"gsap/dist/gsap\" {"
+        },
+        {
+          "line": 85,
+          "text": "declare module \"gsap/all\" {"
+        },
+        {
+          "line": 90,
+          "text": "declare module \"gsap/src/all\" {"
+        },
+        {
+          "line": 95,
+          "text": "declare module \"gsap-trial\" {"
+        },
+        {
+          "line": 100,
+          "text": "declare module \"gsap-trial/src\" {"
+        },
+        {
+          "line": 105,
+          "text": "declare module \"gsap-trial/src/index\" {"
+        },
+        {
+          "line": 110,
+          "text": "declare module \"gsap-trial/dist\" {"
+        },
+        {
+          "line": 115,
+          "text": "declare module \"gsap-trial/dist/gsap\" {"
+        },
+        {
+          "line": 120,
+          "text": "declare module \"gsap-trial/all\" {"
+        },
+        {
+          "line": 125,
+          "text": "declare module \"gsap-trial/src/all\" {"
+        }
+      ]
+    },
+    {
+      "installedRelativePath": "gsap/types/scroll-trigger.d.ts",
+      "sha256": "f4f9f2b412304f6a4664dd395380965e704a66d10490ac990c398691e7c69823",
+      "text": null,
+      "matchedLines": [
+        {
+          "line": 1,
+          "text": "declare namespace gsap {"
+        },
+        {
+          "line": 821,
+          "text": "declare namespace gsap.plugins {"
+        },
+        {
+          "line": 884,
+          "text": "declare module \"gsap/ScrollTrigger\" {"
+        },
+        {
+          "line": 892,
+          "text": "declare module \"gsap/dist/ScrollTrigger\" {"
+        },
+        {
+          "line": 897,
+          "text": "declare module \"gsap/src/ScrollTrigger\" {"
+        },
+        {
+          "line": 902,
+          "text": "declare module \"gsap/all\" {"
+        },
+        {
+          "line": 906,
+          "text": "declare module \"gsap-trial/ScrollTrigger\" {"
+        },
+        {
+          "line": 911,
+          "text": "declare module \"gsap-trial/dist/ScrollTrigger\" {"
+        },
+        {
+          "line": 916,
+          "text": "declare module \"gsap-trial/src/ScrollTrigger\" {"
+        },
+        {
+          "line": 921,
+          "text": "declare module \"gsap-trial/all\" {"
+        }
+      ]
+    }
+  ],
+  "missingConsumerDependencies": {
+    "vue-router": true,
+    "type-fest": true
+  },
+  "buildVueVersion": "3.5.32",
+  "consumerVueVersion": "3.5.32",
+  "gsapTypeCase": {
+    "ScrollTrigger_d_ts": false,
+    "scroll_trigger_d_ts": true
+  }
+}

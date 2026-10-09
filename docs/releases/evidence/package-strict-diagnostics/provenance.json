@@ -1,0 +1,266 @@
+{
+  "role": "Point-in-time package declaration failure record",
+  "status": "WIP; strict package check failed; read-only export; no new qualification",
+  "generator": "export-strict286.py (included); parses existing log and reads existing package/source bytes; never invokes compiler, install or build",
+  "sourceHead": "c8df89dd2b2b0e563572732e3b310c237f428181",
+  "sourceTree": "815be97fe10b48d87dbb1760f5669b81ed039940",
+  "sourceWorktree": "/workspace/input-renderer-prerequisite",
+  "tarball": {
+    "path": "/workspace/scratch/input-resize-csp/renderer-prerequisite-2210/local-package/fsusui-npm-candidate.tgz",
+    "sha256": "4e9333ed6252469a0be8b1d51fc802d5fc0c7597c1baba4bd76ea93e1eb7b0f5",
+    "manifest": "candidate-manifest.json",
+    "published": false
+  },
+  "installedPackage": {
+    "path": "/tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus",
+    "realpath": "/tmp/fsusui-consumer-Au9zsI/fixture/node_modules/@ozwasyd/element-plus",
+    "name": "@ozwasyd/element-plus",
+    "version": "1.5.1",
+    "installationProfile": "pnpm-latest",
+    "matchingDeclarationBytes": [
+      {
+        "packageRelativePath": "es/components/breadcrumb/src/breadcrumb-item.d.ts",
+        "sha256": "a7dfc23b3613b7d648f2009ee41cee90d591c1515585ed4fed6fac33e5365a23",
+        "bytes": 1804,
+        "matchesPackedBytes": true
+      },
+      {
+        "packageRelativePath": "es/components/color-picker/index.d.ts",
+        "sha256": "68eb18ec71e73d45433cabf6387d0a5f8549bef3c455498544535514abc12ba4",
+        "bytes": 1190524,
+        "matchesPackedBytes": true
+      },
+      {
+        "packageRelativePath": "es/components/color-picker/src/color-picker.vue.d.ts",
+        "sha256": "912f1f4f00c6d0a09e81fe65ffb51c58dd54d0675109299de7cd7b604c9b4245",
+        "bytes": 1189812,
+        "matchesPackedBytes": true
+      },
+      {
+        "packageRelativePath": "es/components/inbox-primitives/index.d.ts",
+        "sha256": "d45c3494bef864073925096cae31bce98175d895f2bcfbeaf72203e5c77fb9de",
+        "bytes": 335313,
+        "matchesPackedBytes": true
+      },
+      {
+        "packageRelativePath": "es/components/inbox-primitives/src/conversation-list-item.vue.d.ts",
+        "sha256": "b9bde260ea236e5c1820a34edcc0a9bb0eeebf4e19770e45a6b3d51dd6164aa5",
+        "bytes": 7372,
+        "matchesPackedBytes": true
+      },
+      {
+        "packageRelativePath": "es/components/index.d.ts",
+        "sha256": "8bd6b27eb037d2fb8208401b7927d0313678abd54bb59f45a53758b4eb92cfb5",
+        "bytes": 2701,
+        "matchesPackedBytes": true
+      },
+      {
+        "packageRelativePath": "es/components/markdown-editor/index.d.ts",
+        "sha256": "2157020c030d03f5f78171092f0a3c735972662be9b44f1a26218e8c945cf10c",
+        "bytes": 216389,
+        "matchesPackedBytes": true
+      },
+      {
+        "packageRelativePath": "es/components/markdown-editor/src/markdown-editor-link-image.d.ts",
+        "sha256": "18974b5541397701b2622df2cdd59f10a64ef1d9ef6aa006249e22feeb0debcc",
+        "bytes": 7779,
+        "matchesPackedBytes": true
+      },
+      {
+        "packageRelativePath": "es/components/markdown-editor/src/markdown-editor-table-structure.d.ts",
+        "sha256": "91206f722269a1a9e476c22f1bb5f4eb2033931445be7170b181f25800cc1078",
+        "bytes": 6099,
+        "matchesPackedBytes": true
+      },
+      {
+        "packageRelativePath": "es/components/markdown-editor/src/markdown-editor.vue.d.ts",
+        "sha256": "c86ab4179e6c2b73b4759d63461ee29dd98d20564a94b71cb7b4053d88f88c92",
+        "bytes": 209188,
+        "matchesPackedBytes": true
+      },
+      {
+        "packageRelativePath": "es/components/menu/index.d.ts",
+        "sha256": "ad38908f4e82777321b70dab5297f01396127082dad35b97913b1e0c04953d93",
+        "bytes": 517599,
+        "matchesPackedBytes": true
+      },
+      {
+        "packageRelativePath": "es/components/menu/src/menu-item.d.ts",
+        "sha256": "00712ad56ed04b941ea9342f71a0c530879b3dd77e1c85c73a8c6c908dbcbdfc",
+        "bytes": 1621,
+        "matchesPackedBytes": true
+      },
+      {
+        "packageRelativePath": "es/components/menu/src/menu-item.vue.d.ts",
+        "sha256": "6230ff3d10c875844c48d24c9ff942b00dd2695bb0a883490b91bf33e11999ae",
+        "bytes": 235813,
+        "matchesPackedBytes": true
+      },
+      {
+        "packageRelativePath": "es/components/menu/src/menu.d.ts",
+        "sha256": "82960fcf2da6c6e4b5d7360f0fde4d167d0da5b774985c188dadaf25ddf0ae7e",
+        "bytes": 10477,
+        "matchesPackedBytes": true
+      },
+      {
+        "packageRelativePath": "es/components/menu/src/types.d.ts",
+        "sha256": "bd88ef18037d28b1f6b73ff2c9656cda9b85662b0a9e713a0531d28edd82ce1b",
+        "bytes": 1282,
+        "matchesPackedBytes": true
+      },
+      {
+        "packageRelativePath": "es/components/metric-primitives/index.d.ts",
+        "sha256": "3ae0c8dcf03dc62cbed37b43f5fd646941986c54ec38578d9fdc4642c81ceda4",
+        "bytes": 391970,
+        "matchesPackedBytes": true
+      },
+      {
+        "packageRelativePath": "es/components/settings-primitives/index.d.ts",
+        "sha256": "6c541dce48740ac72b626bdf2949a074eac10e4a398832bdd9bc5b8b7b0b3a3e",
+        "bytes": 419131,
+        "matchesPackedBytes": true
+      },
+      {
+        "packageRelativePath": "es/components/table-v2/src/components/sort-icon.d.ts",
+        "sha256": "666b4e537e45a0a60d7432f32baa9f56f359195d71c685def6ffa2b88ee41140",
+        "bytes": 280,
+        "matchesPackedBytes": true
+      },
+      {
+        "packageRelativePath": "es/components/table-v2/src/types.d.ts",
+        "sha256": "7990dfb28032575536fab4e6492a82a3183c775324a31130a0044c420bdfe100",
+        "bytes": 2949,
+        "matchesPackedBytes": true
+      },
+      {
+        "packageRelativePath": "es/components/table/src/util.d.ts",
+        "sha256": "b333b69867ed99402df31bfae6a8e3d9bfd3d9dba36707bba7130b325cd6cbe2",
+        "bytes": 6986,
+        "matchesPackedBytes": true
+      },
+      {
+        "packageRelativePath": "es/components/tree-v2/index.d.ts",
+        "sha256": "1c961fc414f8740dd78448c9552f03b185943502ad6ca2293c2f6039396dcd68",
+        "bytes": 93721,
+        "matchesPackedBytes": true
+      },
+      {
+        "packageRelativePath": "es/motion/composables/use-gsap-context.d.ts",
+        "sha256": "21039d9da5adf8f7f2c50e81a8f8f644c79c41b72009ab22e4ca5bf66d65efc8",
+        "bytes": 479,
+        "matchesPackedBytes": true
+      },
+      {
+        "packageRelativePath": "es/motion/composables/use-scroll-reveal.d.ts",
+        "sha256": "f44d57c369c6feae6210cfc5f00501242e73bb4d497aae880c615181104a0585",
+        "bytes": 852,
+        "matchesPackedBytes": true
+      },
+      {
+        "packageRelativePath": "es/motion/composables/use-scroll-timeline.d.ts",
+        "sha256": "6887bc7d524d4068000376c387eb9e4510769a3474f104628e0a164af541e1ac",
+        "bytes": 1047,
+        "matchesPackedBytes": true
+      },
+      {
+        "packageRelativePath": "es/motion/composables/use-timeline.d.ts",
+        "sha256": "ca4e5217ed6c9a0fcd44968287daf00f5ba5cf8870c73118aafa8c8f6df384ce",
+        "bytes": 904,
+        "matchesPackedBytes": true
+      },
+      {
+        "packageRelativePath": "es/motion/gsap/register.d.ts",
+        "sha256": "3a8222113c5b9a2ba445d66cc625d0e8800079af0fe695a838ed1c47262f42ca",
+        "bytes": 374,
+        "matchesPackedBytes": true
+      },
+      {
+        "packageRelativePath": "es/utils/objects.d.ts",
+        "sha256": "db4eed5e89750932426dc216ad2d2e18f17c249846df3ec2f3291677acf77640",
+        "bytes": 398,
+        "matchesPackedBytes": true
+      },
+      {
+        "packageRelativePath": "global.d.ts",
+        "sha256": "e6f699b46b6aaeeb60470b29ce248453e2686426f6ffff1d151def809d32e6a0",
+        "bytes": 14959,
+        "matchesPackedBytes": true
+      },
+      {
+        "packageRelativePath": "package.json",
+        "sha256": "018aaf5e7dca2b6cd6489e2656f25f420e6a471bad2bfd4de5b74216a700069a",
+        "bytes": 9744,
+        "matchesPackedBytes": true
+      }
+    ]
+  },
+  "toolchain": {
+    "node": "24.19.0",
+    "vue": "3.5.32",
+    "vite": "7.3.1",
+    "typescript": "6.0.2",
+    "vueTsc": "3.2.6"
+  },
+  "pnpm": "10.33.0",
+  "sourcePnpmLockSha256": "9160eda59f2ebd9e27701d9df9718ccb7b327ceb83d418310ef542b1651451d7",
+  "consumerLock": {
+    "originalPath": "/tmp/fsusui-consumer-Au9zsI/fixture/pnpm-lock.yaml",
+    "portableFile": "consumer-pnpm-lock.yaml",
+    "sha256": "06fb1a88bed0599c89dcdea51aa178716e80889420d32bf10f645c37ff3695fc"
+  },
+  "commands": [
+    {
+      "command": "source /workspace/.setup/activate.sh && NPM_CONFIG_CACHE=/workspace/scratch/input-resize-csp/current-main-closure/npm-cache pnpm package:candidate:build",
+      "cwd": "/workspace/input-renderer-prerequisite",
+      "exitCode": 0,
+      "scope": "Own full canonical producers; no borrowed TGZ",
+      "log": "/workspace/scratch/input-resize-csp/renderer-prerequisite-2210/package-build.log",
+      "sha256": "69f945980faf0c1bc950a9f5a0be0efe05caf6379e7dfa7dbdb9e8b6c22584b8"
+    },
+    {
+      "command": "source /workspace/.setup/activate.sh && NPM_CONFIG_CACHE=/workspace/scratch/input-resize-csp/current-main-closure/npm-cache pnpm package:candidate:verify -- --tarball dist/npm-candidate/fsusui-npm-candidate.tgz --commit c8df89dd2b2b0e563572732e3b310c237f428181",
+      "cwd": "/workspace/input-renderer-prerequisite",
+      "exitCode": 0,
+      "scope": "Own head/profile/hash verified",
+      "log": "/workspace/scratch/input-resize-csp/renderer-prerequisite-2210/package-verify.log",
+      "sha256": "48f43f550dd1ceadf52b144cdc8687b2fd1f6370b97db1953a0a1bf1bac6f1fb"
+    },
+    {
+      "command": "source /workspace/.setup/activate.sh && pnpm exec vue-tsc --noEmit",
+      "cwd": "/workspace/scratch/input-resize-csp/renderer-prerequisite-2210/strict-probe",
+      "exitCode": 0,
+      "scope": "Unchanged sole827negativepublicmotiontypedprobe against own actualpnpm installedpackage",
+      "log": "/workspace/scratch/input-resize-csp/renderer-prerequisite-2210/public-type-probe.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": "source /workspace/.setup/activate.sh && pnpm exec vue-tsc --noEmit --skipLibCheck false",
+      "cwd": "/workspace/scratch/input-resize-csp/renderer-prerequisite-2210/strict-probe",
+      "exitCode": 2,
+      "scope": "286diagnostics unchanged;0TS2303/TS2578; notfullstrictacceptance",
+      "log": "/workspace/scratch/input-resize-csp/renderer-prerequisite-2210/strict-package.log",
+      "sha256": "6f812728e5e1796ee8e61f544ad03a09cc49bde52918a7fa3825f3f8e835302c"
+    },
+    {
+      "command": "source /workspace/.setup/activate.sh && NPM_CONFIG_CACHE=/workspace/scratch/input-resize-csp/current-main-closure/npm-cache npm_config_store_dir=/workspace/.setup/pnpm-store PLAYWRIGHT_BROWSERS_PATH=/workspace/scratch/input-resize-csp/renderer-prerequisite-2210/playwright-browsers FSUS_KEEP_CONSUMER_FIXTURE=1 FSUS_CONSUMER_RESULT=/workspace/scratch/input-resize-csp/renderer-prerequisite-2210/consumer-pnpm-latest.json pnpm run test:consumer-install -- --candidate dist/npm-candidate/fsusui-npm-candidate.tgz --profile pnpm-latest",
+      "cwd": "/workspace/input-renderer-prerequisite",
+      "exitCode": 0,
+      "scope": "Actual ownTGZ original profile/limits; pnpm additionallydefaultpackedheavyframe runtimepassed",
+      "log": "/workspace/scratch/input-resize-csp/renderer-prerequisite-2210/consumer-pnpm-latest.log",
+      "sha256": "297e8b8e75a4a32ad3970890ceb797b36f8e4116ee811ab26f440cd37a8d11ec"
+    }
+  ],
+  "originalLog": {
+    "file": "strict-package.log",
+    "sha256": "6f812728e5e1796ee8e61f544ad03a09cc49bde52918a7fa3825f3f8e835302c"
+  },
+  "cliSkipLibCheck": false,
+  "tsconfigSkipLibCheck": true,
+  "limitations": [
+    "Historical c8df bytes only; no new main qualification.",
+    "No compiler/build/install/browser command was rerun for this export.",
+    "No fix is implemented; no package is published; no screen-reader or real-device acceptance is claimed.",
+    "Producer diagnostic 7056 is filtered in existing source; whether it caused each omitted component entry has not been re-emitted or independently proven.",
+    "The TS2344 declarations and the actual Vue constraint are proven; the smallest safe producer fix remains the declaration owner responsibility."
+  ]
+}
