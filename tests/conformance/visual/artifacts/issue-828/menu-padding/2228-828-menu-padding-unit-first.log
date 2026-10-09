@@ -1,0 +1,9 @@
+
+ RUN  v4.1.5 /workspace/FsusUI-828-native-end-buffer
+
+
+ Test Files  1 passed (1)
+      Tests  27 passed (27)
+   Start at  05:59:56
+   Duration  9.59s (transform 3.61s, setup 219ms, import 5.13s, tests 1.74s, environment 2.18s)
+

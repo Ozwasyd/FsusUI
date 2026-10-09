@@ -1,0 +1,5 @@
+Restore the default PublicShell compact Search trigger's 12px padding by scoping the 8px rule to explicit inline navigation in full and critical SCSS. Preserve native focus, original text, 44px minima and accepted inline end behavior; add a regression for both modes and update the nearest doc/patch changeset.
+
+Exact tested source:543879f08ca17959e2c2116bcc057d26f6545f86. Before:24 default-menu failures/24 inline passes; after:48 new regression plus42 original browser tests pass,27 focused units/four type projects/API/doc/design gates pass,576 strict native checks pass. Full profile on this source is not run; e307's656/51 failure and the math/runtime/iOS/package gates remain unwaived. Complete first-failure/pass traces, screenshots, command logs and custody are in `tests/conformance/visual/artifacts/issue-828/menu-padding`.
+
+WIP #828, same independent reviewer01a11b52-ec77-7602-9d9e-3f040157403f. This body is prepared only:GitHub content API writes are embargoed. No package publishing, merge or deployment; later review/merge remains separate.

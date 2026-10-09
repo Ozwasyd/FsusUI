@@ -1,0 +1,385 @@
+{
+  "schema": "issue-828.menu-padding-custody.v1",
+  "testedCandidate": "543879f08ca17959e2c2116bcc057d26f6545f86",
+  "qualificationEligible": false,
+  "independentUXReceipt": null,
+  "currentFullProfile": "not run",
+  "rawEntryCustody": "raw-entry-custody.json",
+  "entries": [
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/menu-padding/2228-828-menu-padding-after-contract-first-preview.log",
+      "bytes": 39,
+      "sha256": "816128dfebc7d312b89d41f9069566c9304762be8ffd5a37966b16cb05aee603"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/menu-padding/2228-828-menu-padding-after-contract-first-result.json",
+      "bytes": 662,
+      "sha256": "0e447c71c5e595d9ae7adab103d5f396110784473545e96df7ea1ec18246ebb0"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/menu-padding/2228-828-menu-padding-after-contract-first.log",
+      "bytes": 15027,
+      "sha256": "38a19a07d88a3cc6858d45347173c8a3e6b51cf69c9c2eaf0210099b3ffd3e12"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/menu-padding/2228-828-menu-padding-after-native-labels-check-first-result.json",
+      "bytes": 271,
+      "sha256": "50f0706e0b759386dd00410def9d758d3f3da79d72f5c223fec4e3f2a2ca1172"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/menu-padding/2228-828-menu-padding-after-native-labels-check-first.log",
+      "bytes": 240,
+      "sha256": "8b8e0566b9d7df0ecd80a19dd14faee692615cc265ba4730f4c47b2ba6f2b410"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/menu-padding/2228-828-menu-padding-after-native-labels-first-result.json",
+      "bytes": 263,
+      "sha256": "095765d1fd16258f0fafb1025f6d2dee2a9938bfefc212f425ee29c17df10bdc"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/menu-padding/2228-828-menu-padding-after-native-labels-first.log",
+      "bytes": 1459,
+      "sha256": "1dd4770cabcbf86d09bda8590cd6be4c938a62edf1c657e0af0296dcb8a3d617"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/menu-padding/2228-828-menu-padding-after-native-locales-check-first-result.json",
+      "bytes": 273,
+      "sha256": "a4ac70b15687e9b552e7cf7b32380fc7f051a799abba8e8c427423b083982610"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/menu-padding/2228-828-menu-padding-after-native-locales-check-first.log",
+      "bytes": 242,
+      "sha256": "9ea673372fc720e361fbcf39b9b11de039bdf45875af1dbf6107eef50e0c2136"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/menu-padding/2228-828-menu-padding-after-native-locales-first-result.json",
+      "bytes": 266,
+      "sha256": "d02ce9c2792e614e7c1abb7d53ec51d7a5f72f8a8c7968ac85caaf10b5b141c9"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/menu-padding/2228-828-menu-padding-after-native-locales-first.log",
+      "bytes": 7085,
+      "sha256": "107c979ec4f0a7865d4d43abeb7bdaac39a8ce70968578523523e96fb32107b7"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/menu-padding/2228-828-menu-padding-api-baseline-first-result.json",
+      "bytes": 213,
+      "sha256": "69fb7888bb6185c24a64bd31aa574ed34708be0f05e5fc9d3437a31b592bfad4"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/menu-padding/2228-828-menu-padding-api-baseline-first.log",
+      "bytes": 197,
+      "sha256": "ce9645ceb00b4b48e547f2acc8f70de75a1370d82e8702cc040d0980201ccc0f"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/menu-padding/2228-828-menu-padding-before-contract-first-preview.log",
+      "bytes": 39,
+      "sha256": "816128dfebc7d312b89d41f9069566c9304762be8ffd5a37966b16cb05aee603"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/menu-padding/2228-828-menu-padding-before-contract-first-result.json",
+      "bytes": 549,
+      "sha256": "ef18f2417944b0b08b69d574d43b069c26fcac0ceb0566a284f514d7fb54df89"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/menu-padding/2228-828-menu-padding-before-contract-first.log",
+      "bytes": 74835,
+      "sha256": "e55d6b6cefdc50fbfb234cedbc9e5a50dbb490a206d650002b4be9c5b551936f"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/menu-padding/2228-828-menu-padding-before-first.log",
+      "bytes": 739,
+      "sha256": "24b6c8eeb45ad561e7239e71dc66448ffde111ff9031dcd90ec88ec63b6dd3a5"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/menu-padding/2228-828-menu-padding-before-preview-first.log",
+      "bytes": 39,
+      "sha256": "816128dfebc7d312b89d41f9069566c9304762be8ffd5a37966b16cb05aee603"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/menu-padding/2228-828-menu-padding-before-result.json",
+      "bytes": 536,
+      "sha256": "2636333a38569e96e3072384f2105a2313f493f1a237863b613cdeab1aacf8ff"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/menu-padding/2228-828-menu-padding-blog-canonical-final-first-result.json",
+      "bytes": 328,
+      "sha256": "53ecdf4d7606255789b6f77ce82ca035e022cbd6b03099e78bdd5a0d776dc5f7"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/menu-padding/2228-828-menu-padding-blog-canonical-final-first.log",
+      "bytes": 205,
+      "sha256": "2828e2d69087d9d34f9a12b9ff83f6ab06f9efefe17f31621c4cbc6fc0c07d37"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/menu-padding/2228-828-menu-padding-blog-canonical-first.log",
+      "bytes": 205,
+      "sha256": "2828e2d69087d9d34f9a12b9ff83f6ab06f9efefe17f31621c4cbc6fc0c07d37"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/menu-padding/2228-828-menu-padding-blog-fetch-final.log",
+      "bytes": 144,
+      "sha256": "49b54ed37054ba9f2f1f23a9b57843d5f2ca770b09d37ccea637e152c8846b9b"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/menu-padding/2228-828-menu-padding-blog-final-identity.json",
+      "bytes": 266,
+      "sha256": "3a2e6bf59f2a1183883e52f2f8f769849632d70f38298b1c03440f0580342e02"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/menu-padding/2228-828-menu-padding-budget-preview.log",
+      "bytes": 39,
+      "sha256": "6f332aad6148dde5c5ae1f8d0eecfa06e5999fc2caaac841d42ae16d3c05aabc"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/menu-padding/2228-828-menu-padding-budget-run.py",
+      "bytes": 1341,
+      "sha256": "84336ca1127292187fbf40e10ae318b5e818b4245ddedef01e510c6ea421d179"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/menu-padding/2228-828-menu-padding-classification-first.log",
+      "bytes": 292,
+      "sha256": "ba5dd6dfbeab67f9bacf0a6b458bbfe204c9416599e0084ead20b90896385d16"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/menu-padding/2228-828-menu-padding-current-budget-first-result.json",
+      "bytes": 225,
+      "sha256": "f97d03bc9575b7141b2e1305e23f2c9a465a315e40aaa987df5558deee5f1981"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/menu-padding/2228-828-menu-padding-current-budget-first.log",
+      "bytes": 790,
+      "sha256": "a7726b0b5e7b63ab456fbddfcf865b13c33b3fa32477b1d8785f7fb8f731e199"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/menu-padding/2228-828-menu-padding-design-first-result.json",
+      "bytes": 215,
+      "sha256": "5eee2dfed7a4df0ec2f5f92471a216d9b263753780c4c376033e03f516f3d877"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/menu-padding/2228-828-menu-padding-design-first.log",
+      "bytes": 4873,
+      "sha256": "a563f7310e1aca526f9d73a309adf764bc5a5cef71fd7138ccfd61cf205222e2"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/menu-padding/2228-828-menu-padding-docs-first-result.json",
+      "bytes": 214,
+      "sha256": "2eaaa8e78ad1379bd88c44b9c1e92b365b9df519333b623239651f3b9cb5cf87"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/menu-padding/2228-828-menu-padding-docs-first.log",
+      "bytes": 401,
+      "sha256": "95608a388723215c809dac9590fe6d9bec8697c2caaa3b5281819b17d56e11f8"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/menu-padding/2228-828-menu-padding-format-first.log",
+      "bytes": 68,
+      "sha256": "99b19dd47a53525c56efe8ccb254b6e73c96ac81d37df9cb71c29daa87ad8f2f"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/menu-padding/2228-828-menu-padding-native-preview.log",
+      "bytes": 39,
+      "sha256": "6f332aad6148dde5c5ae1f8d0eecfa06e5999fc2caaac841d42ae16d3c05aabc"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/menu-padding/2228-828-menu-padding-native-probes.py",
+      "bytes": 1793,
+      "sha256": "8762c43143b78d72cd1eab438bb1de2f97ec64311334ab93811930af88171455"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/menu-padding/2228-828-menu-padding-run-preview.py",
+      "bytes": 1557,
+      "sha256": "cae3f9b3253e9efd5385825feaac5ab1369ccf99dcf4724d8f40d500bef96654"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/menu-padding/2228-828-menu-padding-runtime-check-first-result.json",
+      "bytes": 229,
+      "sha256": "9d513683b179fcba590d4696944cb3acba91fed663926fc119859cdb51fe7256"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/menu-padding/2228-828-menu-padding-runtime-check-first.log",
+      "bytes": 145,
+      "sha256": "6598fb11be0dee342ffcd46bf9578a3709adbe23e7cbc2c6fa66c22c9350b3aa"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/menu-padding/2228-828-menu-padding-runtime-prepare-first-result.json",
+      "bytes": 216,
+      "sha256": "941ef9801a35545d4b6849b34e2923bb60a081fc9148cbe357795f008f0e4ca9"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/menu-padding/2228-828-menu-padding-runtime-prepare-first.log",
+      "bytes": 84904,
+      "sha256": "359df52a5d8e750d0b5321f6d4d620216569577fabd2acdfba9424e859a96c61"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/menu-padding/2228-828-menu-padding-seal.py",
+      "bytes": 3440,
+      "sha256": "bd8772b0dbfe920220407fb946d83da435fe01b62a2330551246e1fad1f60561"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/menu-padding/2228-828-menu-padding-theme-build-first-result.json",
+      "bytes": 200,
+      "sha256": "71e27224d0590ecc136c1ba83504099b7dd00f0f393a9ccc6df1cc62ab8b685e"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/menu-padding/2228-828-menu-padding-theme-build-first.log",
+      "bytes": 6028,
+      "sha256": "8ae239809e2e12f58e9e12fed753c3ab0796f87272cac2abba07601e2f8adfd1"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/menu-padding/2228-828-menu-padding-typecheck-first-result.json",
+      "bytes": 205,
+      "sha256": "7349fe3836ac61e400573fbc4d04c78cbdf48a900b8cb9b7f7bcb37b93e55790"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/menu-padding/2228-828-menu-padding-typecheck-first.log",
+      "bytes": 1576,
+      "sha256": "d29097aa8a3fff28875b2de5105daee7df27aae350237a26909b832aaf63ccba"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/menu-padding/2228-828-menu-padding-ui-fetch-final.log",
+      "bytes": 87,
+      "sha256": "cfbb2b4108958f48956dd5674676e71e5a86704264786fb95342d7cb1e05baf7"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/menu-padding/2228-828-menu-padding-ui-final-identity.json",
+      "bytes": 315,
+      "sha256": "387aecb8cdc2e2e42c71c5f82b664ebf07a2ce05657b9e01b2cbf6a44d8e44c0"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/menu-padding/2228-828-menu-padding-unit-first-result.json",
+      "bytes": 342,
+      "sha256": "547d7e1948256ec2d2d55539292ea7edc3d99eeb3c6316996c64f2640499742b"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/menu-padding/2228-828-menu-padding-unit-first.log",
+      "bytes": 229,
+      "sha256": "24936e70dc3be809e9f92806a8b9669a093f17590a9341036e4fe205e31e78ab"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/menu-padding/README.md",
+      "bytes": 7297,
+      "sha256": "4aa7f59995631933d5dd8e06b5bd19ace909fcffb2f5b783d8b07784411bfdc1"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/menu-padding/after-contract-first-raw.zip",
+      "bytes": 54596713,
+      "sha256": "b928ba74ef29e24332453ab1801b59af9cf79d8f717092fafd8efa1f3ee1fe28"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/menu-padding/after-native-labels-labels.json",
+      "bytes": 152653,
+      "sha256": "2cb9b5b330c4dab189cb62b0d835f9bf120aad55dd176aaa07974f6c9caea237"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/menu-padding/after-native-labels-native-target-result.json",
+      "bytes": 282,
+      "sha256": "066836dcb0c843ef664318d26571c2f270db88c58c54176bf5c82827587480c7"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/menu-padding/after-native-locales-labels.json",
+      "bytes": 459179,
+      "sha256": "57a6297b2659f9fbccf357d18b7955215026d579f2ded3c73b840fbb7901a047"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/menu-padding/after-native-locales-native-target-result.json",
+      "bytes": 284,
+      "sha256": "898e055f9eb130ac7e295e02e4ab6548986bf6e41f081ddf1f54d9ae251fd671"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/menu-padding/before-contract-first-raw.zip",
+      "bytes": 24910390,
+      "sha256": "a239187840948b2c05d6e616a6b30c26e1400f91d32d709596fa0e607dbd6ac8"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/menu-padding/current-budget-observations.json",
+      "bytes": 1230,
+      "sha256": "d7d03a61c1cfdbcca921e64b8b68f16e71759c22d1f52217f9331ff66e476dd6"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/menu-padding/current-issue-FsusBlog-1789-comments.json",
+      "bytes": 43952,
+      "sha256": "a47977be75fdadb1ebd466861c16f09ee77b13c9a7179af335de179679f05bcb"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/menu-padding/current-issue-FsusBlog-1789.json",
+      "bytes": 13714,
+      "sha256": "e3e112534cd412ef629b31da2edc55b3d50ae9d24d5d0056b63bc1e3e6301720"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/menu-padding/current-issue-FsusBlog-2228-comments.json",
+      "bytes": 60628,
+      "sha256": "41a608bd10951888ac5cdf8161784b06b63528d899ce0f1fcbcf150ebbcc78b6"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/menu-padding/current-issue-FsusBlog-2228.json",
+      "bytes": 8623,
+      "sha256": "c4602e46e5272089c07bdd78b15fbcdd4484f3146157e706d74858d8a46e5c21"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/menu-padding/current-issue-FsusBlog-2229-comments.json",
+      "bytes": 42783,
+      "sha256": "769d0d49b7082d1f7b43e1bbcc535aba52c95eca83d39faa6df47de19461e279"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/menu-padding/current-issue-FsusBlog-2229.json",
+      "bytes": 9448,
+      "sha256": "ad4e07540f2d5a9551ce997bf5712608548928cd3313d43d07855a740965a218"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/menu-padding/current-issue-FsusBlog-3477-comments.json",
+      "bytes": 4906,
+      "sha256": "f54011cab321db976ef823bf814c7bf4b5d911738893ecaf88442773523fb9b2"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/menu-padding/current-issue-FsusBlog-3477.json",
+      "bytes": 4551,
+      "sha256": "0b571cf08d32ba88f1ee35b079331fc939e1d31e7ccddb8af47549a16efb385a"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/menu-padding/current-issue-FsusUI-828-comments.json",
+      "bytes": 54294,
+      "sha256": "c52d4723793c2733c4ae865f585183bae78caaa24f383cc8468d787f61ec22c8"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/menu-padding/current-issue-FsusUI-828.json",
+      "bytes": 3885,
+      "sha256": "d8029805ae0ff8c14e632596e704126dd4ab3e499b523050420b49ff09349d4d"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/menu-padding/current-runtime-manifest.json",
+      "bytes": 1314,
+      "sha256": "7fbb832300e581b9dab24a0fbe89a49281149fe0abb3ce557d91d13ea0f3131e"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/menu-padding/label-preimplementation-classification-evidence.json",
+      "bytes": 1012,
+      "sha256": "90bd8d6fc323b0d84447652bc83023a9367ceef760a1b20c7b37c651ffa7b591"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/menu-padding/label-preimplementation-classification-receipt.json",
+      "bytes": 3773,
+      "sha256": "e06015be16e82ed0711156618eb193ab802fdb526b3b455bbe2d1d4a22f2cd12"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/menu-padding/native-readonly-first-raw.zip",
+      "bytes": 5460190,
+      "sha256": "8f81f92894c03ec8a6f6cb830055a94505960a98b7537de559f70b5ea6bd45ad"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/menu-padding/prepared-draft-pr-body.md",
+      "bytes": 1058,
+      "sha256": "5a2cad40ca165c76c97ef57f94f4dca24c44b7a72b3f2c24326c76fa12792758"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/menu-padding/raw-entry-custody.json",
+      "bytes": 183940,
+      "sha256": "1ef001fe95280e828d19b46f83767adfc1cf5ee98154d72a821106bd4ba08d15"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/menu-padding/result-summary.json",
+      "bytes": 3252,
+      "sha256": "50271b597c5ccbfc404d8bc1ee4497e956746eeeca3390c7622db8668ef90d51"
+    }
+  ]
+}

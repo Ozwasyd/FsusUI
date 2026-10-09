@@ -1,0 +1,20 @@
+{
+  "candidate": "543879f08ca17959e2c2116bcc057d26f6545f86",
+  "command": [
+    "pnpm",
+    "exec",
+    "playwright",
+    "test",
+    "--config=vue/playwright.config.ts",
+    "vue/tests/visual/public-shell-landscape-search-padding.spec.ts",
+    "vue/tests/visual/public-shell-mobile-nav.spec.ts",
+    "vue/tests/visual/public-shell-desktop-search.spec.ts",
+    "--workers=1",
+    "--trace=on",
+    "--output=/tmp/2228-828-menu-padding-after-contract-first"
+  ],
+  "exitCode": 0,
+  "log": "/tmp/2228-828-menu-padding-after-contract-first.log",
+  "previewLog": "/tmp/2228-828-menu-padding-after-contract-first-preview.log",
+  "CI": "unset; zero original retries"
+}

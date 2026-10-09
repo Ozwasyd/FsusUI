@@ -1,0 +1,16 @@
+ReferenceError: require is not defined in ES module scope, you can use import instead
+
+   at public-shell-landscape-search-padding.spec.ts:3
+
+  1 | import { readFile } from 'node:fs/promises'
+  2 | import { expect, test } from '@playwright/test'
+> 3 | import { buildVisualUrl } from '../../../scripts/visual-variant.mjs'
+    |                 ^
+  4 |
+  5 | const modes = [
+  6 |   { name: 'default menu', navMode: undefined, mode: 'menu', padding: '12px' },
+    at /workspace/FsusUI-828-native-end-buffer/vue/tests/visual/public-shell-landscape-search-padding.spec.ts:3:17
+Error: No tests found.
+Make sure that arguments are regular expressions matching test files.
+You may need to escape symbols like "$" or "*" and quote the arguments.
+

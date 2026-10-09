@@ -1,0 +1,17 @@
+{
+  "candidate": "f83e502385c21d11507d1408d22f91caff0dbad3",
+  "productBaseline": "16e98a88d50b66ed3615eb906538394972d6825b; product e307 unchanged by regression/classification commit",
+  "command": [
+    "pnpm",
+    "exec",
+    "playwright",
+    "test",
+    "--config=vue/playwright.config.ts",
+    "vue/tests/visual/public-shell-landscape-search-padding.spec.ts",
+    "--workers=1",
+    "--trace=on",
+    "--output=/tmp/2228-828-menu-padding-before-first"
+  ],
+  "exitCode": 1,
+  "log": "/tmp/2228-828-menu-padding-before-first.log"
+}

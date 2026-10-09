@@ -1,0 +1,93 @@
+{
+  "testedCandidate": "543879f08ca17959e2c2116bcc057d26f6545f86",
+  "baselineProductCandidate": "e30778563d2271acd924f65ded814bfb0c972076",
+  "classificationCommit": "f83e502385c21d11507d1408d22f91caff0dbad3",
+  "beforeCandidate": "eeb4a9778bb59e13b9582c713d53ea6de5e68817",
+  "qualificationEligible": false,
+  "independentReviewerThread": "01a11b52-ec77-7602-9d9e-3f040157403f",
+  "newFullProfile": "not run",
+  "retainedOldFullProfile": {
+    "candidate": "e30778563d2271acd924f65ded814bfb0c972076",
+    "exitCode": 1,
+    "passed": 656,
+    "failed": 51,
+    "waived": false
+  },
+  "newRegression": {
+    "before": {
+      "passed": 24,
+      "failed": 24,
+      "exitCode": 1
+    },
+    "after": {
+      "passed": 48,
+      "failed": 0,
+      "exitCode": 0
+    }
+  },
+  "originalBrowserTests": {
+    "passed": 42,
+    "failed": 0,
+    "exitCode": 0
+  },
+  "native": {
+    "default": 144,
+    "locale": 432,
+    "failures": 0,
+    "minVisibleLogicalWidth": 44,
+    "minHeight": 44,
+    "epsilon": false
+  },
+  "unit": {
+    "passed": 27,
+    "exitCode": 0
+  },
+  "fullCssSHA256": "11d465120b5c083b6b46cbcdea58cea0f5790538f71699af03dbcaaf1ca749b8",
+  "criticalCssSHA256": "0dca8776e2e3b044e1dda75bf73542bdfdaa901b36d16dca1ede97c0b50706f6",
+  "runtimeSourceFingerprint": "b738ad0d1b5495a3df116720a4c645e4b8c87fd26ec86e6ad83754558cb0f347",
+  "frozenManifests": [
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/explicit-modes/artifact-custody-manifest.json",
+      "sha256": "603bd03c3c69b6b5cf98e5a8369ff7ae0266f0bb3126c486faf822e63edad344",
+      "diskMatchesFrozenGit": true
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/native-end-buffer/artifact-custody-manifest.json",
+      "sha256": "1410af971aa8fded9e0b5cda92349ab402518f42044f859ed0bae461e856d520",
+      "diskMatchesFrozenGit": true
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/geometry/artifact-manifest.json",
+      "sha256": "decb72347624ede29c15840c84a9f6e43a92ec7206e1b712bc0a11a26cb1c98f",
+      "diskMatchesFrozenGit": true
+    },
+    {
+      "path": "/workspace/FsusUI-828-label-visibility/tests/conformance/visual/artifacts/issue-828/label-visibility/artifact-custody-manifest.json",
+      "sha256": "e637b1a2b5445274ca6e440a8ba344b81a008570829797d0584d25e0a08e332b",
+      "diskMatchesFrozenGit": true
+    }
+  ],
+  "originalTestsUnchanged": true,
+  "beforeBindings": [
+    {
+      "path": "vue/packages/theme-chalk/src/public-shell.scss",
+      "productBeforeMatchesBaseline": true,
+      "sha256": "f8ef981cfef8d907d3d0b88644a07acad3d0ebac1f7118ecd77302ccb3eb9339"
+    },
+    {
+      "path": "vue/packages/theme-chalk/src/public-shell-critical.scss",
+      "productBeforeMatchesBaseline": true,
+      "sha256": "22c97f85a11d1fdb685156bc806aa8261996917aa581a00659a92045a4fc7f5d"
+    },
+    {
+      "path": "vue/tests/visual/public-shell-mobile-nav.spec.ts",
+      "productBeforeMatchesBaseline": true,
+      "sha256": "39ddb78933674e9a63c5f641766726233cae3f32e3ea2f929ba01d113f5ec3d0"
+    },
+    {
+      "path": "vue/tests/visual/public-shell-desktop-search.spec.ts",
+      "productBeforeMatchesBaseline": true,
+      "sha256": "29318e1ffb31fd7e606df0a0ce3e9891bb46b998565180136bb21f5208a20fd9"
+    }
+  ]
+}

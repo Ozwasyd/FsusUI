@@ -1,0 +1,799 @@
+
+Running 48 tests using 1 worker
+
+  ✘   1 [desktop-light] › vue/tests/visual/public-shell-landscape-search-padding.spec.ts:19:11 › default menu retains search padding in full landscape at 1 zoom (519ms)
+  ✘   2 [desktop-light] › vue/tests/visual/public-shell-landscape-search-padding.spec.ts:19:11 › default menu retains search padding in full landscape at 1.5 zoom (520ms)
+  ✘   3 [desktop-light] › vue/tests/visual/public-shell-landscape-search-padding.spec.ts:19:11 › default menu retains search padding in full landscape at 2 zoom (505ms)
+  ✘   4 [desktop-light] › vue/tests/visual/public-shell-landscape-search-padding.spec.ts:19:11 › default menu retains search padding in critical-only landscape at 1 zoom (515ms)
+  ✘   5 [desktop-light] › vue/tests/visual/public-shell-landscape-search-padding.spec.ts:19:11 › default menu retains search padding in critical-only landscape at 1.5 zoom (563ms)
+  ✘   6 [desktop-light] › vue/tests/visual/public-shell-landscape-search-padding.spec.ts:19:11 › default menu retains search padding in critical-only landscape at 2 zoom (526ms)
+  ✓   7 [desktop-light] › vue/tests/visual/public-shell-landscape-search-padding.spec.ts:19:11 › explicit inline retains search padding in full landscape at 1 zoom (529ms)
+  ✓   8 [desktop-light] › vue/tests/visual/public-shell-landscape-search-padding.spec.ts:19:11 › explicit inline retains search padding in full landscape at 1.5 zoom (531ms)
+  ✓   9 [desktop-light] › vue/tests/visual/public-shell-landscape-search-padding.spec.ts:19:11 › explicit inline retains search padding in full landscape at 2 zoom (528ms)
+  ✓  10 [desktop-light] › vue/tests/visual/public-shell-landscape-search-padding.spec.ts:19:11 › explicit inline retains search padding in critical-only landscape at 1 zoom (507ms)
+  ✓  11 [desktop-light] › vue/tests/visual/public-shell-landscape-search-padding.spec.ts:19:11 › explicit inline retains search padding in critical-only landscape at 1.5 zoom (485ms)
+  ✓  12 [desktop-light] › vue/tests/visual/public-shell-landscape-search-padding.spec.ts:19:11 › explicit inline retains search padding in critical-only landscape at 2 zoom (489ms)
+  ✘  13 [mobile-light] › vue/tests/visual/public-shell-landscape-search-padding.spec.ts:19:11 › default menu retains search padding in full landscape at 1 zoom (568ms)
+  ✘  14 [mobile-light] › vue/tests/visual/public-shell-landscape-search-padding.spec.ts:19:11 › default menu retains search padding in full landscape at 1.5 zoom (574ms)
+  ✘  15 [mobile-light] › vue/tests/visual/public-shell-landscape-search-padding.spec.ts:19:11 › default menu retains search padding in full landscape at 2 zoom (590ms)
+  ✘  16 [mobile-light] › vue/tests/visual/public-shell-landscape-search-padding.spec.ts:19:11 › default menu retains search padding in critical-only landscape at 1 zoom (560ms)
+  ✘  17 [mobile-light] › vue/tests/visual/public-shell-landscape-search-padding.spec.ts:19:11 › default menu retains search padding in critical-only landscape at 1.5 zoom (593ms)
+  ✘  18 [mobile-light] › vue/tests/visual/public-shell-landscape-search-padding.spec.ts:19:11 › default menu retains search padding in critical-only landscape at 2 zoom (572ms)
+  ✓  19 [mobile-light] › vue/tests/visual/public-shell-landscape-search-padding.spec.ts:19:11 › explicit inline retains search padding in full landscape at 1 zoom (602ms)
+  ✓  20 [mobile-light] › vue/tests/visual/public-shell-landscape-search-padding.spec.ts:19:11 › explicit inline retains search padding in full landscape at 1.5 zoom (552ms)
+  ✓  21 [mobile-light] › vue/tests/visual/public-shell-landscape-search-padding.spec.ts:19:11 › explicit inline retains search padding in full landscape at 2 zoom (528ms)
+  ✓  22 [mobile-light] › vue/tests/visual/public-shell-landscape-search-padding.spec.ts:19:11 › explicit inline retains search padding in critical-only landscape at 1 zoom (560ms)
+  ✓  23 [mobile-light] › vue/tests/visual/public-shell-landscape-search-padding.spec.ts:19:11 › explicit inline retains search padding in critical-only landscape at 1.5 zoom (604ms)
+  ✓  24 [mobile-light] › vue/tests/visual/public-shell-landscape-search-padding.spec.ts:19:11 › explicit inline retains search padding in critical-only landscape at 2 zoom (519ms)
+  ✘  25 [desktop-dark] › vue/tests/visual/public-shell-landscape-search-padding.spec.ts:19:11 › default menu retains search padding in full landscape at 1 zoom (519ms)
+  ✘  26 [desktop-dark] › vue/tests/visual/public-shell-landscape-search-padding.spec.ts:19:11 › default menu retains search padding in full landscape at 1.5 zoom (526ms)
+  ✘  27 [desktop-dark] › vue/tests/visual/public-shell-landscape-search-padding.spec.ts:19:11 › default menu retains search padding in full landscape at 2 zoom (532ms)
+  ✘  28 [desktop-dark] › vue/tests/visual/public-shell-landscape-search-padding.spec.ts:19:11 › default menu retains search padding in critical-only landscape at 1 zoom (535ms)
+  ✘  29 [desktop-dark] › vue/tests/visual/public-shell-landscape-search-padding.spec.ts:19:11 › default menu retains search padding in critical-only landscape at 1.5 zoom (520ms)
+  ✘  30 [desktop-dark] › vue/tests/visual/public-shell-landscape-search-padding.spec.ts:19:11 › default menu retains search padding in critical-only landscape at 2 zoom (553ms)
+  ✓  31 [desktop-dark] › vue/tests/visual/public-shell-landscape-search-padding.spec.ts:19:11 › explicit inline retains search padding in full landscape at 1 zoom (571ms)
+  ✓  32 [desktop-dark] › vue/tests/visual/public-shell-landscape-search-padding.spec.ts:19:11 › explicit inline retains search padding in full landscape at 1.5 zoom (511ms)
+  ✓  33 [desktop-dark] › vue/tests/visual/public-shell-landscape-search-padding.spec.ts:19:11 › explicit inline retains search padding in full landscape at 2 zoom (475ms)
+  ✓  34 [desktop-dark] › vue/tests/visual/public-shell-landscape-search-padding.spec.ts:19:11 › explicit inline retains search padding in critical-only landscape at 1 zoom (473ms)
+  ✓  35 [desktop-dark] › vue/tests/visual/public-shell-landscape-search-padding.spec.ts:19:11 › explicit inline retains search padding in critical-only landscape at 1.5 zoom (496ms)
+  ✓  36 [desktop-dark] › vue/tests/visual/public-shell-landscape-search-padding.spec.ts:19:11 › explicit inline retains search padding in critical-only landscape at 2 zoom (519ms)
+  ✘  37 [mobile-dark] › vue/tests/visual/public-shell-landscape-search-padding.spec.ts:19:11 › default menu retains search padding in full landscape at 1 zoom (572ms)
+  ✘  38 [mobile-dark] › vue/tests/visual/public-shell-landscape-search-padding.spec.ts:19:11 › default menu retains search padding in full landscape at 1.5 zoom (563ms)
+  ✘  39 [mobile-dark] › vue/tests/visual/public-shell-landscape-search-padding.spec.ts:19:11 › default menu retains search padding in full landscape at 2 zoom (555ms)
+  ✘  40 [mobile-dark] › vue/tests/visual/public-shell-landscape-search-padding.spec.ts:19:11 › default menu retains search padding in critical-only landscape at 1 zoom (569ms)
+  ✘  41 [mobile-dark] › vue/tests/visual/public-shell-landscape-search-padding.spec.ts:19:11 › default menu retains search padding in critical-only landscape at 1.5 zoom (568ms)
+  ✘  42 [mobile-dark] › vue/tests/visual/public-shell-landscape-search-padding.spec.ts:19:11 › default menu retains search padding in critical-only landscape at 2 zoom (566ms)
+  ✓  43 [mobile-dark] › vue/tests/visual/public-shell-landscape-search-padding.spec.ts:19:11 › explicit inline retains search padding in full landscape at 1 zoom (588ms)
+  ✓  44 [mobile-dark] › vue/tests/visual/public-shell-landscape-search-padding.spec.ts:19:11 › explicit inline retains search padding in full landscape at 1.5 zoom (538ms)
+  ✓  45 [mobile-dark] › vue/tests/visual/public-shell-landscape-search-padding.spec.ts:19:11 › explicit inline retains search padding in full landscape at 2 zoom (531ms)
+  ✓  46 [mobile-dark] › vue/tests/visual/public-shell-landscape-search-padding.spec.ts:19:11 › explicit inline retains search padding in critical-only landscape at 1 zoom (521ms)
+  ✓  47 [mobile-dark] › vue/tests/visual/public-shell-landscape-search-padding.spec.ts:19:11 › explicit inline retains search padding in critical-only landscape at 1.5 zoom (530ms)
+  ✓  48 [mobile-dark] › vue/tests/visual/public-shell-landscape-search-padding.spec.ts:19:11 › explicit inline retains search padding in critical-only landscape at 2 zoom (508ms)
+
+
+  1) [desktop-light] › vue/tests/visual/public-shell-landscape-search-padding.spec.ts:19:11 › default menu retains search padding in full landscape at 1 zoom 
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoBe[2m([22m[32mexpected[39m[2m) // Object.is equality[22m
+
+    Expected: [32m"[7m12[27mpx"[39m
+    Received: [31m"[7m8[27mpx"[39m
+
+      79 |             contentType: 'application/json',
+      80 |           })
+    > 81 |           expect(geometry.paddingStart).toBe(mode.padding)
+         |                                         ^
+      82 |           expect(geometry.paddingEnd).toBe(mode.padding)
+      83 |           expect(geometry.width / zoom).toBeGreaterThanOrEqual(44)
+      84 |           expect(geometry.height / zoom).toBeGreaterThanOrEqual(44)
+        at /workspace/FsusUI-828-native-end-buffer/vue/tests/visual/public-shell-landscape-search-padding.spec.ts:81:41
+
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../tmp/2228-828-menu-padding-before-contract-first/public-shell-landscape-sea-3a85b-in-full-landscape-at-1-zoom-desktop-light/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../tmp/2228-828-menu-padding-before-contract-first/public-shell-landscape-sea-3a85b-in-full-landscape-at-1-zoom-desktop-light/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../../tmp/2228-828-menu-padding-before-contract-first/public-shell-landscape-sea-3a85b-in-full-landscape-at-1-zoom-desktop-light/trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace ../../tmp/2228-828-menu-padding-before-contract-first/public-shell-landscape-sea-3a85b-in-full-landscape-at-1-zoom-desktop-light/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2) [desktop-light] › vue/tests/visual/public-shell-landscape-search-padding.spec.ts:19:11 › default menu retains search padding in full landscape at 1.5 zoom 
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoBe[2m([22m[32mexpected[39m[2m) // Object.is equality[22m
+
+    Expected: [32m"[7m12[27mpx"[39m
+    Received: [31m"[7m8[27mpx"[39m
+
+      79 |             contentType: 'application/json',
+      80 |           })
+    > 81 |           expect(geometry.paddingStart).toBe(mode.padding)
+         |                                         ^
+      82 |           expect(geometry.paddingEnd).toBe(mode.padding)
+      83 |           expect(geometry.width / zoom).toBeGreaterThanOrEqual(44)
+      84 |           expect(geometry.height / zoom).toBeGreaterThanOrEqual(44)
+        at /workspace/FsusUI-828-native-end-buffer/vue/tests/visual/public-shell-landscape-search-padding.spec.ts:81:41
+
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../tmp/2228-828-menu-padding-before-contract-first/public-shell-landscape-sea-ce454--full-landscape-at-1-5-zoom-desktop-light/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../tmp/2228-828-menu-padding-before-contract-first/public-shell-landscape-sea-ce454--full-landscape-at-1-5-zoom-desktop-light/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../../tmp/2228-828-menu-padding-before-contract-first/public-shell-landscape-sea-ce454--full-landscape-at-1-5-zoom-desktop-light/trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace ../../tmp/2228-828-menu-padding-before-contract-first/public-shell-landscape-sea-ce454--full-landscape-at-1-5-zoom-desktop-light/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  3) [desktop-light] › vue/tests/visual/public-shell-landscape-search-padding.spec.ts:19:11 › default menu retains search padding in full landscape at 2 zoom 
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoBe[2m([22m[32mexpected[39m[2m) // Object.is equality[22m
+
+    Expected: [32m"[7m12[27mpx"[39m
+    Received: [31m"[7m8[27mpx"[39m
+
+      79 |             contentType: 'application/json',
+      80 |           })
+    > 81 |           expect(geometry.paddingStart).toBe(mode.padding)
+         |                                         ^
+      82 |           expect(geometry.paddingEnd).toBe(mode.padding)
+      83 |           expect(geometry.width / zoom).toBeGreaterThanOrEqual(44)
+      84 |           expect(geometry.height / zoom).toBeGreaterThanOrEqual(44)
+        at /workspace/FsusUI-828-native-end-buffer/vue/tests/visual/public-shell-landscape-search-padding.spec.ts:81:41
+
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../tmp/2228-828-menu-padding-before-contract-first/public-shell-landscape-sea-5cb0f-in-full-landscape-at-2-zoom-desktop-light/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../tmp/2228-828-menu-padding-before-contract-first/public-shell-landscape-sea-5cb0f-in-full-landscape-at-2-zoom-desktop-light/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../../tmp/2228-828-menu-padding-before-contract-first/public-shell-landscape-sea-5cb0f-in-full-landscape-at-2-zoom-desktop-light/trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace ../../tmp/2228-828-menu-padding-before-contract-first/public-shell-landscape-sea-5cb0f-in-full-landscape-at-2-zoom-desktop-light/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  4) [desktop-light] › vue/tests/visual/public-shell-landscape-search-padding.spec.ts:19:11 › default menu retains search padding in critical-only landscape at 1 zoom 
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoBe[2m([22m[32mexpected[39m[2m) // Object.is equality[22m
+
+    Expected: [32m"[7m12[27mpx"[39m
+    Received: [31m"[7m8[27mpx"[39m
+
+      79 |             contentType: 'application/json',
+      80 |           })
+    > 81 |           expect(geometry.paddingStart).toBe(mode.padding)
+         |                                         ^
+      82 |           expect(geometry.paddingEnd).toBe(mode.padding)
+      83 |           expect(geometry.width / zoom).toBeGreaterThanOrEqual(44)
+      84 |           expect(geometry.height / zoom).toBeGreaterThanOrEqual(44)
+        at /workspace/FsusUI-828-native-end-buffer/vue/tests/visual/public-shell-landscape-search-padding.spec.ts:81:41
+
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../tmp/2228-828-menu-padding-before-contract-first/public-shell-landscape-sea-19227-al-only-landscape-at-1-zoom-desktop-light/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../tmp/2228-828-menu-padding-before-contract-first/public-shell-landscape-sea-19227-al-only-landscape-at-1-zoom-desktop-light/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../../tmp/2228-828-menu-padding-before-contract-first/public-shell-landscape-sea-19227-al-only-landscape-at-1-zoom-desktop-light/trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace ../../tmp/2228-828-menu-padding-before-contract-first/public-shell-landscape-sea-19227-al-only-landscape-at-1-zoom-desktop-light/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  5) [desktop-light] › vue/tests/visual/public-shell-landscape-search-padding.spec.ts:19:11 › default menu retains search padding in critical-only landscape at 1.5 zoom 
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoBe[2m([22m[32mexpected[39m[2m) // Object.is equality[22m
+
+    Expected: [32m"[7m12[27mpx"[39m
+    Received: [31m"[7m8[27mpx"[39m
+
+      79 |             contentType: 'application/json',
+      80 |           })
+    > 81 |           expect(geometry.paddingStart).toBe(mode.padding)
+         |                                         ^
+      82 |           expect(geometry.paddingEnd).toBe(mode.padding)
+      83 |           expect(geometry.width / zoom).toBeGreaterThanOrEqual(44)
+      84 |           expect(geometry.height / zoom).toBeGreaterThanOrEqual(44)
+        at /workspace/FsusUI-828-native-end-buffer/vue/tests/visual/public-shell-landscape-search-padding.spec.ts:81:41
+
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../tmp/2228-828-menu-padding-before-contract-first/public-shell-landscape-sea-fd158--only-landscape-at-1-5-zoom-desktop-light/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../tmp/2228-828-menu-padding-before-contract-first/public-shell-landscape-sea-fd158--only-landscape-at-1-5-zoom-desktop-light/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../../tmp/2228-828-menu-padding-before-contract-first/public-shell-landscape-sea-fd158--only-landscape-at-1-5-zoom-desktop-light/trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace ../../tmp/2228-828-menu-padding-before-contract-first/public-shell-landscape-sea-fd158--only-landscape-at-1-5-zoom-desktop-light/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  6) [desktop-light] › vue/tests/visual/public-shell-landscape-search-padding.spec.ts:19:11 › default menu retains search padding in critical-only landscape at 2 zoom 
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoBe[2m([22m[32mexpected[39m[2m) // Object.is equality[22m
+
+    Expected: [32m"[7m12[27mpx"[39m
+    Received: [31m"[7m8[27mpx"[39m
+
+      79 |             contentType: 'application/json',
+      80 |           })
+    > 81 |           expect(geometry.paddingStart).toBe(mode.padding)
+         |                                         ^
+      82 |           expect(geometry.paddingEnd).toBe(mode.padding)
+      83 |           expect(geometry.width / zoom).toBeGreaterThanOrEqual(44)
+      84 |           expect(geometry.height / zoom).toBeGreaterThanOrEqual(44)
+        at /workspace/FsusUI-828-native-end-buffer/vue/tests/visual/public-shell-landscape-search-padding.spec.ts:81:41
+
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../tmp/2228-828-menu-padding-before-contract-first/public-shell-landscape-sea-9be62-al-only-landscape-at-2-zoom-desktop-light/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../tmp/2228-828-menu-padding-before-contract-first/public-shell-landscape-sea-9be62-al-only-landscape-at-2-zoom-desktop-light/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../../tmp/2228-828-menu-padding-before-contract-first/public-shell-landscape-sea-9be62-al-only-landscape-at-2-zoom-desktop-light/trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace ../../tmp/2228-828-menu-padding-before-contract-first/public-shell-landscape-sea-9be62-al-only-landscape-at-2-zoom-desktop-light/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  7) [mobile-light] › vue/tests/visual/public-shell-landscape-search-padding.spec.ts:19:11 › default menu retains search padding in full landscape at 1 zoom 
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoBe[2m([22m[32mexpected[39m[2m) // Object.is equality[22m
+
+    Expected: [32m"[7m12[27mpx"[39m
+    Received: [31m"[7m8[27mpx"[39m
+
+      79 |             contentType: 'application/json',
+      80 |           })
+    > 81 |           expect(geometry.paddingStart).toBe(mode.padding)
+         |                                         ^
+      82 |           expect(geometry.paddingEnd).toBe(mode.padding)
+      83 |           expect(geometry.width / zoom).toBeGreaterThanOrEqual(44)
+      84 |           expect(geometry.height / zoom).toBeGreaterThanOrEqual(44)
+        at /workspace/FsusUI-828-native-end-buffer/vue/tests/visual/public-shell-landscape-search-padding.spec.ts:81:41
+
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../tmp/2228-828-menu-padding-before-contract-first/public-shell-landscape-sea-3a85b-in-full-landscape-at-1-zoom-mobile-light/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../tmp/2228-828-menu-padding-before-contract-first/public-shell-landscape-sea-3a85b-in-full-landscape-at-1-zoom-mobile-light/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../../tmp/2228-828-menu-padding-before-contract-first/public-shell-landscape-sea-3a85b-in-full-landscape-at-1-zoom-mobile-light/trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace ../../tmp/2228-828-menu-padding-before-contract-first/public-shell-landscape-sea-3a85b-in-full-landscape-at-1-zoom-mobile-light/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  8) [mobile-light] › vue/tests/visual/public-shell-landscape-search-padding.spec.ts:19:11 › default menu retains search padding in full landscape at 1.5 zoom 
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoBe[2m([22m[32mexpected[39m[2m) // Object.is equality[22m
+
+    Expected: [32m"[7m12[27mpx"[39m
+    Received: [31m"[7m8[27mpx"[39m
+
+      79 |             contentType: 'application/json',
+      80 |           })
+    > 81 |           expect(geometry.paddingStart).toBe(mode.padding)
+         |                                         ^
+      82 |           expect(geometry.paddingEnd).toBe(mode.padding)
+      83 |           expect(geometry.width / zoom).toBeGreaterThanOrEqual(44)
+      84 |           expect(geometry.height / zoom).toBeGreaterThanOrEqual(44)
+        at /workspace/FsusUI-828-native-end-buffer/vue/tests/visual/public-shell-landscape-search-padding.spec.ts:81:41
+
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../tmp/2228-828-menu-padding-before-contract-first/public-shell-landscape-sea-ce454--full-landscape-at-1-5-zoom-mobile-light/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../tmp/2228-828-menu-padding-before-contract-first/public-shell-landscape-sea-ce454--full-landscape-at-1-5-zoom-mobile-light/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../../tmp/2228-828-menu-padding-before-contract-first/public-shell-landscape-sea-ce454--full-landscape-at-1-5-zoom-mobile-light/trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace ../../tmp/2228-828-menu-padding-before-contract-first/public-shell-landscape-sea-ce454--full-landscape-at-1-5-zoom-mobile-light/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  9) [mobile-light] › vue/tests/visual/public-shell-landscape-search-padding.spec.ts:19:11 › default menu retains search padding in full landscape at 2 zoom 
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoBe[2m([22m[32mexpected[39m[2m) // Object.is equality[22m
+
+    Expected: [32m"[7m12[27mpx"[39m
+    Received: [31m"[7m8[27mpx"[39m
+
+      79 |             contentType: 'application/json',
+      80 |           })
+    > 81 |           expect(geometry.paddingStart).toBe(mode.padding)
+         |                                         ^
+      82 |           expect(geometry.paddingEnd).toBe(mode.padding)
+      83 |           expect(geometry.width / zoom).toBeGreaterThanOrEqual(44)
+      84 |           expect(geometry.height / zoom).toBeGreaterThanOrEqual(44)
+        at /workspace/FsusUI-828-native-end-buffer/vue/tests/visual/public-shell-landscape-search-padding.spec.ts:81:41
+
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../tmp/2228-828-menu-padding-before-contract-first/public-shell-landscape-sea-5cb0f-in-full-landscape-at-2-zoom-mobile-light/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../tmp/2228-828-menu-padding-before-contract-first/public-shell-landscape-sea-5cb0f-in-full-landscape-at-2-zoom-mobile-light/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../../tmp/2228-828-menu-padding-before-contract-first/public-shell-landscape-sea-5cb0f-in-full-landscape-at-2-zoom-mobile-light/trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace ../../tmp/2228-828-menu-padding-before-contract-first/public-shell-landscape-sea-5cb0f-in-full-landscape-at-2-zoom-mobile-light/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  10) [mobile-light] › vue/tests/visual/public-shell-landscape-search-padding.spec.ts:19:11 › default menu retains search padding in critical-only landscape at 1 zoom 
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoBe[2m([22m[32mexpected[39m[2m) // Object.is equality[22m
+
+    Expected: [32m"[7m12[27mpx"[39m
+    Received: [31m"[7m8[27mpx"[39m
+
+      79 |             contentType: 'application/json',
+      80 |           })
+    > 81 |           expect(geometry.paddingStart).toBe(mode.padding)
+         |                                         ^
+      82 |           expect(geometry.paddingEnd).toBe(mode.padding)
+      83 |           expect(geometry.width / zoom).toBeGreaterThanOrEqual(44)
+      84 |           expect(geometry.height / zoom).toBeGreaterThanOrEqual(44)
+        at /workspace/FsusUI-828-native-end-buffer/vue/tests/visual/public-shell-landscape-search-padding.spec.ts:81:41
+
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../tmp/2228-828-menu-padding-before-contract-first/public-shell-landscape-sea-19227-al-only-landscape-at-1-zoom-mobile-light/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../tmp/2228-828-menu-padding-before-contract-first/public-shell-landscape-sea-19227-al-only-landscape-at-1-zoom-mobile-light/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../../tmp/2228-828-menu-padding-before-contract-first/public-shell-landscape-sea-19227-al-only-landscape-at-1-zoom-mobile-light/trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace ../../tmp/2228-828-menu-padding-before-contract-first/public-shell-landscape-sea-19227-al-only-landscape-at-1-zoom-mobile-light/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  11) [mobile-light] › vue/tests/visual/public-shell-landscape-search-padding.spec.ts:19:11 › default menu retains search padding in critical-only landscape at 1.5 zoom 
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoBe[2m([22m[32mexpected[39m[2m) // Object.is equality[22m
+
+    Expected: [32m"[7m12[27mpx"[39m
+    Received: [31m"[7m8[27mpx"[39m
+
+      79 |             contentType: 'application/json',
+      80 |           })
+    > 81 |           expect(geometry.paddingStart).toBe(mode.padding)
+         |                                         ^
+      82 |           expect(geometry.paddingEnd).toBe(mode.padding)
+      83 |           expect(geometry.width / zoom).toBeGreaterThanOrEqual(44)
+      84 |           expect(geometry.height / zoom).toBeGreaterThanOrEqual(44)
+        at /workspace/FsusUI-828-native-end-buffer/vue/tests/visual/public-shell-landscape-search-padding.spec.ts:81:41
+
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../tmp/2228-828-menu-padding-before-contract-first/public-shell-landscape-sea-fd158--only-landscape-at-1-5-zoom-mobile-light/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../tmp/2228-828-menu-padding-before-contract-first/public-shell-landscape-sea-fd158--only-landscape-at-1-5-zoom-mobile-light/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../../tmp/2228-828-menu-padding-before-contract-first/public-shell-landscape-sea-fd158--only-landscape-at-1-5-zoom-mobile-light/trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace ../../tmp/2228-828-menu-padding-before-contract-first/public-shell-landscape-sea-fd158--only-landscape-at-1-5-zoom-mobile-light/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  12) [mobile-light] › vue/tests/visual/public-shell-landscape-search-padding.spec.ts:19:11 › default menu retains search padding in critical-only landscape at 2 zoom 
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoBe[2m([22m[32mexpected[39m[2m) // Object.is equality[22m
+
+    Expected: [32m"[7m12[27mpx"[39m
+    Received: [31m"[7m8[27mpx"[39m
+
+      79 |             contentType: 'application/json',
+      80 |           })
+    > 81 |           expect(geometry.paddingStart).toBe(mode.padding)
+         |                                         ^
+      82 |           expect(geometry.paddingEnd).toBe(mode.padding)
+      83 |           expect(geometry.width / zoom).toBeGreaterThanOrEqual(44)
+      84 |           expect(geometry.height / zoom).toBeGreaterThanOrEqual(44)
+        at /workspace/FsusUI-828-native-end-buffer/vue/tests/visual/public-shell-landscape-search-padding.spec.ts:81:41
+
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../tmp/2228-828-menu-padding-before-contract-first/public-shell-landscape-sea-9be62-al-only-landscape-at-2-zoom-mobile-light/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../tmp/2228-828-menu-padding-before-contract-first/public-shell-landscape-sea-9be62-al-only-landscape-at-2-zoom-mobile-light/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../../tmp/2228-828-menu-padding-before-contract-first/public-shell-landscape-sea-9be62-al-only-landscape-at-2-zoom-mobile-light/trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace ../../tmp/2228-828-menu-padding-before-contract-first/public-shell-landscape-sea-9be62-al-only-landscape-at-2-zoom-mobile-light/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  13) [desktop-dark] › vue/tests/visual/public-shell-landscape-search-padding.spec.ts:19:11 › default menu retains search padding in full landscape at 1 zoom 
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoBe[2m([22m[32mexpected[39m[2m) // Object.is equality[22m
+
+    Expected: [32m"[7m12[27mpx"[39m
+    Received: [31m"[7m8[27mpx"[39m
+
+      79 |             contentType: 'application/json',
+      80 |           })
+    > 81 |           expect(geometry.paddingStart).toBe(mode.padding)
+         |                                         ^
+      82 |           expect(geometry.paddingEnd).toBe(mode.padding)
+      83 |           expect(geometry.width / zoom).toBeGreaterThanOrEqual(44)
+      84 |           expect(geometry.height / zoom).toBeGreaterThanOrEqual(44)
+        at /workspace/FsusUI-828-native-end-buffer/vue/tests/visual/public-shell-landscape-search-padding.spec.ts:81:41
+
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../tmp/2228-828-menu-padding-before-contract-first/public-shell-landscape-sea-3a85b-in-full-landscape-at-1-zoom-desktop-dark/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../tmp/2228-828-menu-padding-before-contract-first/public-shell-landscape-sea-3a85b-in-full-landscape-at-1-zoom-desktop-dark/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../../tmp/2228-828-menu-padding-before-contract-first/public-shell-landscape-sea-3a85b-in-full-landscape-at-1-zoom-desktop-dark/trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace ../../tmp/2228-828-menu-padding-before-contract-first/public-shell-landscape-sea-3a85b-in-full-landscape-at-1-zoom-desktop-dark/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  14) [desktop-dark] › vue/tests/visual/public-shell-landscape-search-padding.spec.ts:19:11 › default menu retains search padding in full landscape at 1.5 zoom 
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoBe[2m([22m[32mexpected[39m[2m) // Object.is equality[22m
+
+    Expected: [32m"[7m12[27mpx"[39m
+    Received: [31m"[7m8[27mpx"[39m
+
+      79 |             contentType: 'application/json',
+      80 |           })
+    > 81 |           expect(geometry.paddingStart).toBe(mode.padding)
+         |                                         ^
+      82 |           expect(geometry.paddingEnd).toBe(mode.padding)
+      83 |           expect(geometry.width / zoom).toBeGreaterThanOrEqual(44)
+      84 |           expect(geometry.height / zoom).toBeGreaterThanOrEqual(44)
+        at /workspace/FsusUI-828-native-end-buffer/vue/tests/visual/public-shell-landscape-search-padding.spec.ts:81:41
+
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../tmp/2228-828-menu-padding-before-contract-first/public-shell-landscape-sea-ce454--full-landscape-at-1-5-zoom-desktop-dark/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../tmp/2228-828-menu-padding-before-contract-first/public-shell-landscape-sea-ce454--full-landscape-at-1-5-zoom-desktop-dark/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../../tmp/2228-828-menu-padding-before-contract-first/public-shell-landscape-sea-ce454--full-landscape-at-1-5-zoom-desktop-dark/trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace ../../tmp/2228-828-menu-padding-before-contract-first/public-shell-landscape-sea-ce454--full-landscape-at-1-5-zoom-desktop-dark/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  15) [desktop-dark] › vue/tests/visual/public-shell-landscape-search-padding.spec.ts:19:11 › default menu retains search padding in full landscape at 2 zoom 
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoBe[2m([22m[32mexpected[39m[2m) // Object.is equality[22m
+
+    Expected: [32m"[7m12[27mpx"[39m
+    Received: [31m"[7m8[27mpx"[39m
+
+      79 |             contentType: 'application/json',
+      80 |           })
+    > 81 |           expect(geometry.paddingStart).toBe(mode.padding)
+         |                                         ^
+      82 |           expect(geometry.paddingEnd).toBe(mode.padding)
+      83 |           expect(geometry.width / zoom).toBeGreaterThanOrEqual(44)
+      84 |           expect(geometry.height / zoom).toBeGreaterThanOrEqual(44)
+        at /workspace/FsusUI-828-native-end-buffer/vue/tests/visual/public-shell-landscape-search-padding.spec.ts:81:41
+
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../tmp/2228-828-menu-padding-before-contract-first/public-shell-landscape-sea-5cb0f-in-full-landscape-at-2-zoom-desktop-dark/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../tmp/2228-828-menu-padding-before-contract-first/public-shell-landscape-sea-5cb0f-in-full-landscape-at-2-zoom-desktop-dark/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../../tmp/2228-828-menu-padding-before-contract-first/public-shell-landscape-sea-5cb0f-in-full-landscape-at-2-zoom-desktop-dark/trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace ../../tmp/2228-828-menu-padding-before-contract-first/public-shell-landscape-sea-5cb0f-in-full-landscape-at-2-zoom-desktop-dark/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  16) [desktop-dark] › vue/tests/visual/public-shell-landscape-search-padding.spec.ts:19:11 › default menu retains search padding in critical-only landscape at 1 zoom 
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoBe[2m([22m[32mexpected[39m[2m) // Object.is equality[22m
+
+    Expected: [32m"[7m12[27mpx"[39m
+    Received: [31m"[7m8[27mpx"[39m
+
+      79 |             contentType: 'application/json',
+      80 |           })
+    > 81 |           expect(geometry.paddingStart).toBe(mode.padding)
+         |                                         ^
+      82 |           expect(geometry.paddingEnd).toBe(mode.padding)
+      83 |           expect(geometry.width / zoom).toBeGreaterThanOrEqual(44)
+      84 |           expect(geometry.height / zoom).toBeGreaterThanOrEqual(44)
+        at /workspace/FsusUI-828-native-end-buffer/vue/tests/visual/public-shell-landscape-search-padding.spec.ts:81:41
+
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../tmp/2228-828-menu-padding-before-contract-first/public-shell-landscape-sea-19227-al-only-landscape-at-1-zoom-desktop-dark/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../tmp/2228-828-menu-padding-before-contract-first/public-shell-landscape-sea-19227-al-only-landscape-at-1-zoom-desktop-dark/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../../tmp/2228-828-menu-padding-before-contract-first/public-shell-landscape-sea-19227-al-only-landscape-at-1-zoom-desktop-dark/trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace ../../tmp/2228-828-menu-padding-before-contract-first/public-shell-landscape-sea-19227-al-only-landscape-at-1-zoom-desktop-dark/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  17) [desktop-dark] › vue/tests/visual/public-shell-landscape-search-padding.spec.ts:19:11 › default menu retains search padding in critical-only landscape at 1.5 zoom 
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoBe[2m([22m[32mexpected[39m[2m) // Object.is equality[22m
+
+    Expected: [32m"[7m12[27mpx"[39m
+    Received: [31m"[7m8[27mpx"[39m
+
+      79 |             contentType: 'application/json',
+      80 |           })
+    > 81 |           expect(geometry.paddingStart).toBe(mode.padding)
+         |                                         ^
+      82 |           expect(geometry.paddingEnd).toBe(mode.padding)
+      83 |           expect(geometry.width / zoom).toBeGreaterThanOrEqual(44)
+      84 |           expect(geometry.height / zoom).toBeGreaterThanOrEqual(44)
+        at /workspace/FsusUI-828-native-end-buffer/vue/tests/visual/public-shell-landscape-search-padding.spec.ts:81:41
+
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../tmp/2228-828-menu-padding-before-contract-first/public-shell-landscape-sea-fd158--only-landscape-at-1-5-zoom-desktop-dark/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../tmp/2228-828-menu-padding-before-contract-first/public-shell-landscape-sea-fd158--only-landscape-at-1-5-zoom-desktop-dark/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../../tmp/2228-828-menu-padding-before-contract-first/public-shell-landscape-sea-fd158--only-landscape-at-1-5-zoom-desktop-dark/trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace ../../tmp/2228-828-menu-padding-before-contract-first/public-shell-landscape-sea-fd158--only-landscape-at-1-5-zoom-desktop-dark/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  18) [desktop-dark] › vue/tests/visual/public-shell-landscape-search-padding.spec.ts:19:11 › default menu retains search padding in critical-only landscape at 2 zoom 
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoBe[2m([22m[32mexpected[39m[2m) // Object.is equality[22m
+
+    Expected: [32m"[7m12[27mpx"[39m
+    Received: [31m"[7m8[27mpx"[39m
+
+      79 |             contentType: 'application/json',
+      80 |           })
+    > 81 |           expect(geometry.paddingStart).toBe(mode.padding)
+         |                                         ^
+      82 |           expect(geometry.paddingEnd).toBe(mode.padding)
+      83 |           expect(geometry.width / zoom).toBeGreaterThanOrEqual(44)
+      84 |           expect(geometry.height / zoom).toBeGreaterThanOrEqual(44)
+        at /workspace/FsusUI-828-native-end-buffer/vue/tests/visual/public-shell-landscape-search-padding.spec.ts:81:41
+
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../tmp/2228-828-menu-padding-before-contract-first/public-shell-landscape-sea-9be62-al-only-landscape-at-2-zoom-desktop-dark/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../tmp/2228-828-menu-padding-before-contract-first/public-shell-landscape-sea-9be62-al-only-landscape-at-2-zoom-desktop-dark/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../../tmp/2228-828-menu-padding-before-contract-first/public-shell-landscape-sea-9be62-al-only-landscape-at-2-zoom-desktop-dark/trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace ../../tmp/2228-828-menu-padding-before-contract-first/public-shell-landscape-sea-9be62-al-only-landscape-at-2-zoom-desktop-dark/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  19) [mobile-dark] › vue/tests/visual/public-shell-landscape-search-padding.spec.ts:19:11 › default menu retains search padding in full landscape at 1 zoom 
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoBe[2m([22m[32mexpected[39m[2m) // Object.is equality[22m
+
+    Expected: [32m"[7m12[27mpx"[39m
+    Received: [31m"[7m8[27mpx"[39m
+
+      79 |             contentType: 'application/json',
+      80 |           })
+    > 81 |           expect(geometry.paddingStart).toBe(mode.padding)
+         |                                         ^
+      82 |           expect(geometry.paddingEnd).toBe(mode.padding)
+      83 |           expect(geometry.width / zoom).toBeGreaterThanOrEqual(44)
+      84 |           expect(geometry.height / zoom).toBeGreaterThanOrEqual(44)
+        at /workspace/FsusUI-828-native-end-buffer/vue/tests/visual/public-shell-landscape-search-padding.spec.ts:81:41
+
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../tmp/2228-828-menu-padding-before-contract-first/public-shell-landscape-sea-3a85b-in-full-landscape-at-1-zoom-mobile-dark/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../tmp/2228-828-menu-padding-before-contract-first/public-shell-landscape-sea-3a85b-in-full-landscape-at-1-zoom-mobile-dark/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../../tmp/2228-828-menu-padding-before-contract-first/public-shell-landscape-sea-3a85b-in-full-landscape-at-1-zoom-mobile-dark/trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace ../../tmp/2228-828-menu-padding-before-contract-first/public-shell-landscape-sea-3a85b-in-full-landscape-at-1-zoom-mobile-dark/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  20) [mobile-dark] › vue/tests/visual/public-shell-landscape-search-padding.spec.ts:19:11 › default menu retains search padding in full landscape at 1.5 zoom 
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoBe[2m([22m[32mexpected[39m[2m) // Object.is equality[22m
+
+    Expected: [32m"[7m12[27mpx"[39m
+    Received: [31m"[7m8[27mpx"[39m
+
+      79 |             contentType: 'application/json',
+      80 |           })
+    > 81 |           expect(geometry.paddingStart).toBe(mode.padding)
+         |                                         ^
+      82 |           expect(geometry.paddingEnd).toBe(mode.padding)
+      83 |           expect(geometry.width / zoom).toBeGreaterThanOrEqual(44)
+      84 |           expect(geometry.height / zoom).toBeGreaterThanOrEqual(44)
+        at /workspace/FsusUI-828-native-end-buffer/vue/tests/visual/public-shell-landscape-search-padding.spec.ts:81:41
+
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../tmp/2228-828-menu-padding-before-contract-first/public-shell-landscape-sea-ce454--full-landscape-at-1-5-zoom-mobile-dark/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../tmp/2228-828-menu-padding-before-contract-first/public-shell-landscape-sea-ce454--full-landscape-at-1-5-zoom-mobile-dark/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../../tmp/2228-828-menu-padding-before-contract-first/public-shell-landscape-sea-ce454--full-landscape-at-1-5-zoom-mobile-dark/trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace ../../tmp/2228-828-menu-padding-before-contract-first/public-shell-landscape-sea-ce454--full-landscape-at-1-5-zoom-mobile-dark/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  21) [mobile-dark] › vue/tests/visual/public-shell-landscape-search-padding.spec.ts:19:11 › default menu retains search padding in full landscape at 2 zoom 
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoBe[2m([22m[32mexpected[39m[2m) // Object.is equality[22m
+
+    Expected: [32m"[7m12[27mpx"[39m
+    Received: [31m"[7m8[27mpx"[39m
+
+      79 |             contentType: 'application/json',
+      80 |           })
+    > 81 |           expect(geometry.paddingStart).toBe(mode.padding)
+         |                                         ^
+      82 |           expect(geometry.paddingEnd).toBe(mode.padding)
+      83 |           expect(geometry.width / zoom).toBeGreaterThanOrEqual(44)
+      84 |           expect(geometry.height / zoom).toBeGreaterThanOrEqual(44)
+        at /workspace/FsusUI-828-native-end-buffer/vue/tests/visual/public-shell-landscape-search-padding.spec.ts:81:41
+
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../tmp/2228-828-menu-padding-before-contract-first/public-shell-landscape-sea-5cb0f-in-full-landscape-at-2-zoom-mobile-dark/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../tmp/2228-828-menu-padding-before-contract-first/public-shell-landscape-sea-5cb0f-in-full-landscape-at-2-zoom-mobile-dark/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../../tmp/2228-828-menu-padding-before-contract-first/public-shell-landscape-sea-5cb0f-in-full-landscape-at-2-zoom-mobile-dark/trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace ../../tmp/2228-828-menu-padding-before-contract-first/public-shell-landscape-sea-5cb0f-in-full-landscape-at-2-zoom-mobile-dark/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  22) [mobile-dark] › vue/tests/visual/public-shell-landscape-search-padding.spec.ts:19:11 › default menu retains search padding in critical-only landscape at 1 zoom 
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoBe[2m([22m[32mexpected[39m[2m) // Object.is equality[22m
+
+    Expected: [32m"[7m12[27mpx"[39m
+    Received: [31m"[7m8[27mpx"[39m
+
+      79 |             contentType: 'application/json',
+      80 |           })
+    > 81 |           expect(geometry.paddingStart).toBe(mode.padding)
+         |                                         ^
+      82 |           expect(geometry.paddingEnd).toBe(mode.padding)
+      83 |           expect(geometry.width / zoom).toBeGreaterThanOrEqual(44)
+      84 |           expect(geometry.height / zoom).toBeGreaterThanOrEqual(44)
+        at /workspace/FsusUI-828-native-end-buffer/vue/tests/visual/public-shell-landscape-search-padding.spec.ts:81:41
+
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../tmp/2228-828-menu-padding-before-contract-first/public-shell-landscape-sea-19227-al-only-landscape-at-1-zoom-mobile-dark/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../tmp/2228-828-menu-padding-before-contract-first/public-shell-landscape-sea-19227-al-only-landscape-at-1-zoom-mobile-dark/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../../tmp/2228-828-menu-padding-before-contract-first/public-shell-landscape-sea-19227-al-only-landscape-at-1-zoom-mobile-dark/trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace ../../tmp/2228-828-menu-padding-before-contract-first/public-shell-landscape-sea-19227-al-only-landscape-at-1-zoom-mobile-dark/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  23) [mobile-dark] › vue/tests/visual/public-shell-landscape-search-padding.spec.ts:19:11 › default menu retains search padding in critical-only landscape at 1.5 zoom 
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoBe[2m([22m[32mexpected[39m[2m) // Object.is equality[22m
+
+    Expected: [32m"[7m12[27mpx"[39m
+    Received: [31m"[7m8[27mpx"[39m
+
+      79 |             contentType: 'application/json',
+      80 |           })
+    > 81 |           expect(geometry.paddingStart).toBe(mode.padding)
+         |                                         ^
+      82 |           expect(geometry.paddingEnd).toBe(mode.padding)
+      83 |           expect(geometry.width / zoom).toBeGreaterThanOrEqual(44)
+      84 |           expect(geometry.height / zoom).toBeGreaterThanOrEqual(44)
+        at /workspace/FsusUI-828-native-end-buffer/vue/tests/visual/public-shell-landscape-search-padding.spec.ts:81:41
+
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../tmp/2228-828-menu-padding-before-contract-first/public-shell-landscape-sea-fd158--only-landscape-at-1-5-zoom-mobile-dark/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../tmp/2228-828-menu-padding-before-contract-first/public-shell-landscape-sea-fd158--only-landscape-at-1-5-zoom-mobile-dark/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../../tmp/2228-828-menu-padding-before-contract-first/public-shell-landscape-sea-fd158--only-landscape-at-1-5-zoom-mobile-dark/trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace ../../tmp/2228-828-menu-padding-before-contract-first/public-shell-landscape-sea-fd158--only-landscape-at-1-5-zoom-mobile-dark/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  24) [mobile-dark] › vue/tests/visual/public-shell-landscape-search-padding.spec.ts:19:11 › default menu retains search padding in critical-only landscape at 2 zoom 
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoBe[2m([22m[32mexpected[39m[2m) // Object.is equality[22m
+
+    Expected: [32m"[7m12[27mpx"[39m
+    Received: [31m"[7m8[27mpx"[39m
+
+      79 |             contentType: 'application/json',
+      80 |           })
+    > 81 |           expect(geometry.paddingStart).toBe(mode.padding)
+         |                                         ^
+      82 |           expect(geometry.paddingEnd).toBe(mode.padding)
+      83 |           expect(geometry.width / zoom).toBeGreaterThanOrEqual(44)
+      84 |           expect(geometry.height / zoom).toBeGreaterThanOrEqual(44)
+        at /workspace/FsusUI-828-native-end-buffer/vue/tests/visual/public-shell-landscape-search-padding.spec.ts:81:41
+
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../tmp/2228-828-menu-padding-before-contract-first/public-shell-landscape-sea-9be62-al-only-landscape-at-2-zoom-mobile-dark/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../tmp/2228-828-menu-padding-before-contract-first/public-shell-landscape-sea-9be62-al-only-landscape-at-2-zoom-mobile-dark/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../../tmp/2228-828-menu-padding-before-contract-first/public-shell-landscape-sea-9be62-al-only-landscape-at-2-zoom-mobile-dark/trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace ../../tmp/2228-828-menu-padding-before-contract-first/public-shell-landscape-sea-9be62-al-only-landscape-at-2-zoom-mobile-dark/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  24 failed
+    [desktop-light] › vue/tests/visual/public-shell-landscape-search-padding.spec.ts:19:11 › default menu retains search padding in full landscape at 1 zoom 
+    [desktop-light] › vue/tests/visual/public-shell-landscape-search-padding.spec.ts:19:11 › default menu retains search padding in full landscape at 1.5 zoom 
+    [desktop-light] › vue/tests/visual/public-shell-landscape-search-padding.spec.ts:19:11 › default menu retains search padding in full landscape at 2 zoom 
+    [desktop-light] › vue/tests/visual/public-shell-landscape-search-padding.spec.ts:19:11 › default menu retains search padding in critical-only landscape at 1 zoom 
+    [desktop-light] › vue/tests/visual/public-shell-landscape-search-padding.spec.ts:19:11 › default menu retains search padding in critical-only landscape at 1.5 zoom 
+    [desktop-light] › vue/tests/visual/public-shell-landscape-search-padding.spec.ts:19:11 › default menu retains search padding in critical-only landscape at 2 zoom 
+    [mobile-light] › vue/tests/visual/public-shell-landscape-search-padding.spec.ts:19:11 › default menu retains search padding in full landscape at 1 zoom 
+    [mobile-light] › vue/tests/visual/public-shell-landscape-search-padding.spec.ts:19:11 › default menu retains search padding in full landscape at 1.5 zoom 
+    [mobile-light] › vue/tests/visual/public-shell-landscape-search-padding.spec.ts:19:11 › default menu retains search padding in full landscape at 2 zoom 
+    [mobile-light] › vue/tests/visual/public-shell-landscape-search-padding.spec.ts:19:11 › default menu retains search padding in critical-only landscape at 1 zoom 
+    [mobile-light] › vue/tests/visual/public-shell-landscape-search-padding.spec.ts:19:11 › default menu retains search padding in critical-only landscape at 1.5 zoom 
+    [mobile-light] › vue/tests/visual/public-shell-landscape-search-padding.spec.ts:19:11 › default menu retains search padding in critical-only landscape at 2 zoom 
+    [desktop-dark] › vue/tests/visual/public-shell-landscape-search-padding.spec.ts:19:11 › default menu retains search padding in full landscape at 1 zoom 
+    [desktop-dark] › vue/tests/visual/public-shell-landscape-search-padding.spec.ts:19:11 › default menu retains search padding in full landscape at 1.5 zoom 
+    [desktop-dark] › vue/tests/visual/public-shell-landscape-search-padding.spec.ts:19:11 › default menu retains search padding in full landscape at 2 zoom 
+    [desktop-dark] › vue/tests/visual/public-shell-landscape-search-padding.spec.ts:19:11 › default menu retains search padding in critical-only landscape at 1 zoom 
+    [desktop-dark] › vue/tests/visual/public-shell-landscape-search-padding.spec.ts:19:11 › default menu retains search padding in critical-only landscape at 1.5 zoom 
+    [desktop-dark] › vue/tests/visual/public-shell-landscape-search-padding.spec.ts:19:11 › default menu retains search padding in critical-only landscape at 2 zoom 
+    [mobile-dark] › vue/tests/visual/public-shell-landscape-search-padding.spec.ts:19:11 › default menu retains search padding in full landscape at 1 zoom 
+    [mobile-dark] › vue/tests/visual/public-shell-landscape-search-padding.spec.ts:19:11 › default menu retains search padding in full landscape at 1.5 zoom 
+    [mobile-dark] › vue/tests/visual/public-shell-landscape-search-padding.spec.ts:19:11 › default menu retains search padding in full landscape at 2 zoom 
+    [mobile-dark] › vue/tests/visual/public-shell-landscape-search-padding.spec.ts:19:11 › default menu retains search padding in critical-only landscape at 1 zoom 
+    [mobile-dark] › vue/tests/visual/public-shell-landscape-search-padding.spec.ts:19:11 › default menu retains search padding in critical-only landscape at 1.5 zoom 
+    [mobile-dark] › vue/tests/visual/public-shell-landscape-search-padding.spec.ts:19:11 › default menu retains search padding in critical-only landscape at 2 zoom 
+  24 passed (48.3s)

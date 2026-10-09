@@ -1,0 +1,15 @@
+{
+  "candidate": "543879f08ca17959e2c2116bcc057d26f6545f86",
+  "command": [
+    "pnpm",
+    "exec",
+    "vitest",
+    "run",
+    "--config",
+    "vue/vitest.config.ts",
+    "--maxWorkers=1",
+    "vue/packages/components/public-shell/__tests__/public-shell.test.tsx"
+  ],
+  "exitCode": 0,
+  "log": "/tmp/2228-828-menu-padding-unit-first.log"
+}
