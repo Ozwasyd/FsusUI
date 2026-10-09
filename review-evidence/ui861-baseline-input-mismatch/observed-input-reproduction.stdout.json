@@ -1,0 +1,14 @@
+{
+  "inputCount": 1600,
+  "matchedCount": 1599,
+  "mismatches": [
+    {
+      "path": "vue/packages/components/markdown-renderer/__tests__/markdown-renderer.test.tsx",
+      "expectedSha256": "8a6fea1a68c3dd9acaff8cc2ff972bf35c8d82d05dc2c0f35cabdc7f35ebbb44",
+      "actualSha256": "d1806866629113a2ebfcbb24fa1fe90e66956a183488284111f249ac0fa4f3e7",
+      "expectedBytes": 39755,
+      "actualBytes": 39710,
+      "match": false
+    }
+  ]
+}

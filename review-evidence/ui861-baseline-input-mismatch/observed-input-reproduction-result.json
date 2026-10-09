@@ -1,0 +1,11 @@
+{
+  "command": [
+    "python",
+    "/workspace/ui861-integration-evidence/review-evidence/ui861-baseline-input-mismatch/verify-observed-inputs.py",
+    "/workspace/ui861-renderer-lint-integration",
+    "/workspace/ui861-integration-evidence/review-evidence/ui861-baseline-input-mismatch/producer-generation-observation.json"
+  ],
+  "exitCode": 1,
+  "expectedMismatchCount": 1,
+  "producerExecuted": false
+}

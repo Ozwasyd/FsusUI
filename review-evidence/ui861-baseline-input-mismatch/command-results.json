@@ -1,0 +1,78 @@
+{
+  "sourceSha": "66d6b56fe6033b5bdca723346847f3deac7d5e40",
+  "freshDefaultSha": "8db0ac8f49749e3e5f28be5051bb3d3ed71ada71",
+  "checks": [
+    {
+      "name": "source-head",
+      "command": [
+        "git",
+        "rev-parse",
+        "HEAD"
+      ],
+      "exitCode": 0,
+      "stdout": "source-head.stdout.txt",
+      "stderr": "source-head.stderr.txt"
+    },
+    {
+      "name": "fresh-default-head",
+      "command": [
+        "git",
+        "rev-parse",
+        "origin/main"
+      ],
+      "exitCode": 0,
+      "stdout": "fresh-default-head.stdout.txt",
+      "stderr": "fresh-default-head.stderr.txt"
+    },
+    {
+      "name": "source-status",
+      "command": [
+        "git",
+        "status",
+        "--porcelain=v1"
+      ],
+      "exitCode": 0,
+      "stdout": "source-status.stdout.txt",
+      "stderr": "source-status.stderr.txt"
+    },
+    {
+      "name": "renderer-type-annotation-delta",
+      "command": [
+        "git",
+        "diff",
+        "3baff077297ad15a1d205eba8dc0bc525483ff88",
+        "66d6b56fe6033b5bdca723346847f3deac7d5e40",
+        "--",
+        "vue/packages/components/markdown-renderer/__tests__/markdown-renderer.test.tsx"
+      ],
+      "exitCode": 0,
+      "stdout": "renderer-type-annotation-delta.stdout.txt",
+      "stderr": "renderer-type-annotation-delta.stderr.txt"
+    },
+    {
+      "name": "producer-generated-delta",
+      "command": [
+        "git",
+        "diff",
+        "18b03e8e81a6787bea5b5bf09d8177227ce61f5d^",
+        "18b03e8e81a6787bea5b5bf09d8177227ce61f5d"
+      ],
+      "exitCode": 0,
+      "stdout": "producer-generated-delta.stdout.txt",
+      "stderr": "producer-generated-delta.stderr.txt"
+    },
+    {
+      "name": "fresh-default-conflict-check",
+      "command": [
+        "git",
+        "merge-tree",
+        "--write-tree",
+        "8db0ac8f49749e3e5f28be5051bb3d3ed71ada71",
+        "66d6b56fe6033b5bdca723346847f3deac7d5e40"
+      ],
+      "exitCode": 0,
+      "stdout": "fresh-default-conflict-check.stdout.txt",
+      "stderr": "fresh-default-conflict-check.stderr.txt"
+    }
+  ]
+}

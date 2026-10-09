@@ -1,0 +1,51 @@
+diff --git a/vue/packages/components/markdown-renderer/__tests__/markdown-renderer.test.tsx b/vue/packages/components/markdown-renderer/__tests__/markdown-renderer.test.tsx
+index ba38cd2f..483c146c 100644
+--- a/vue/packages/components/markdown-renderer/__tests__/markdown-renderer.test.tsx
++++ b/vue/packages/components/markdown-renderer/__tests__/markdown-renderer.test.tsx
+@@ -32,6 +32,8 @@ import type {
+ } from '@element-plus/wasm'
+ import type { FsusResult } from '@element-plus/utils'
+ import type { MarkdownRendererProps } from '../src/markdown-renderer'
++import type * as MarkdownWasm from '@element-plus/wasm'
++import type * as MarkdownRuntime from '../../../wasm/markdown-runtime'
+ import { getMarkdownXssSourceAttackFragment } from '../../../../tests/support/markdown-xss-corpus'
+ 
+ const rawScriptSource = getMarkdownXssSourceAttackFragment(
+@@ -47,12 +49,10 @@ const markdownAuthorityMocks = vi.hoisted(() => ({
+ 
+ vi.mock('@element-plus/wasm', async () => {
+   const actual =
+-    await vi.importActual<typeof import('@element-plus/wasm')>(
+-      '@element-plus/wasm',
+-    )
+-  const runtime = await vi.importActual<
+-    typeof import('../../../wasm/markdown-runtime')
+-  >('../../../wasm/markdown-runtime')
++    await vi.importActual<typeof MarkdownWasm>('@element-plus/wasm')
++  const runtime = await vi.importActual<typeof MarkdownRuntime>(
++    '../../../wasm/markdown-runtime',
++  )
+ 
+   return {
+     ...actual,
+@@ -71,16 +71,12 @@ vi.mock('@element-plus/wasm', async () => {
+ })
+ 
+ vi.mock('../../../wasm/markdown-heavy-feature-activation', async () => {
+-  const runtime = await vi.importActual<
+-    typeof import('../../../wasm/markdown-runtime')
+-  >('../../../wasm/markdown-runtime')
++  const runtime = await vi.importActual<typeof MarkdownRuntime>(
++    '../../../wasm/markdown-runtime',
++  )
+   return {
+     activateMarkdownHeavyFeatures: vi.fn(
+-      async (
+-        options: Parameters<
+-          typeof import('../../../wasm/markdown-heavy-feature-activation').activateMarkdownHeavyFeatures
+-        >[0],
+-      ) =>
++      async (options: Parameters<typeof activateMarkdownHeavyFeatures>[0]) =>
+         runtime.activateMarkdownFeatures({
+           ...options,
+           features: {
