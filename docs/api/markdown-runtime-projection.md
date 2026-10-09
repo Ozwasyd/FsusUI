@@ -73,6 +73,15 @@ current anchor id, anchor-local offset, raw source offset, and direction agree.
 An old epoch, deleted anchor, DOM path, or naked offset is not accepted as a
 visual anchor.
 
+## Node worker source host
+
+The repository-only `markdown-projection.worker-node.mjs` host loads the same
+canonical projection worker through the locked `tsx/esm/api` source loader.
+This compiles its TypeScript dependency graph on Node 22.16 without relying on
+native type stripping. The host keeps the existing worker-thread message
+contract and stale-result checks; it is not a second projection runtime or a
+public package export. Type checking remains a separate required gate.
+
 ## Projection node contract
 
 `MarkdownEditorSyntaxNode` is a read-only projection of the unique Markdown
