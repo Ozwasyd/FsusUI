@@ -7,6 +7,7 @@ import {
   writeFileSync,
 } from 'node:fs'
 import path from 'node:path'
+import { addComponentDirectoryExports } from './prepare-component-exports.mjs'
 import { fileURLToPath } from 'node:url'
 import { registryUrl, resolvePackageContract } from './npm-package-contract.mjs'
 import {
@@ -961,6 +962,9 @@ const rewrittenSelfReferences = rewritePublishedSelfReferences(
 const rewrittenBundledWorkspaceReferences =
   rewriteBundledWorkspaceDependencyReferences(distRoot, packageName)
 assertNoBundledWorkspaceDependencyReferences(packageJson, distRoot)
+const componentDirectoryExports = strict
+  ? addComponentDirectoryExports(packageJson, distRoot)
+  : 0
 
 writeFileSync(distPackagePath, `${JSON.stringify(packageJson, null, 2)}\n`)
 if (existsSync(distNpmrcPath)) {
@@ -972,5 +976,5 @@ if (strict) {
 }
 
 console.log(
-  `Prepared ${packageJson.name}@${packageJson.version} for npm public registry from ${repository.owner}/${repository.repo} with ${rewrittenSelfReferences.replacementCount} self-reference rewrites across ${rewrittenSelfReferences.updatedFiles} files, ${rewrittenBundledWorkspaceReferences.replacementCount} bundled workspace rewrites across ${rewrittenBundledWorkspaceReferences.updatedFiles} files, ${removedBundledWorkspaceDependencies} bundled workspace dependencies removed, ${rewrittenWorkerReferences} worker references rewritten, ${rewrittenWasmFallbackReferences} WASM fallback references rewritten, and ${prunedSourceMaps} source maps pruned.`,
+  `Prepared ${packageJson.name}@${packageJson.version} for npm public registry from ${repository.owner}/${repository.repo} with ${rewrittenSelfReferences.replacementCount} self-reference rewrites across ${rewrittenSelfReferences.updatedFiles} files, ${rewrittenBundledWorkspaceReferences.replacementCount} bundled workspace rewrites across ${rewrittenBundledWorkspaceReferences.updatedFiles} files, ${removedBundledWorkspaceDependencies} bundled workspace dependencies removed, ${rewrittenWorkerReferences} worker references rewritten, ${rewrittenWasmFallbackReferences} WASM fallback references rewritten, ${componentDirectoryExports} existing component directory aliases materialized, and ${prunedSourceMaps} source maps pruned.`,
 )
