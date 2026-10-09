@@ -52,6 +52,18 @@ Frozen positive and negative cases live in
 | #289 anchor     | `parseMarkdownAnchorMarker` / `collectMarkdownAnchorNodes`                                                             | `anchor` projection nodes                                            |
 | #291 import     | `importMarkdownClipboardSnapshot` / `convertMarkdownHtmlImportSnapshot`                                                | explicit clipboard snapshot → import tree → Markdown and loss report |
 
+Anchor candidate recognition retains malformed trailing `^id` tokens for
+`anchor-invalid-id` diagnostics, including underscores, non-ASCII IDs, and IDs
+longer than 64 characters. Validation still accepts exactly
+`[a-z][a-z0-9-]{0,63}`; raw ranges and `#id` fragments are unchanged.
+A line-end marker requires exactly one ASCII space after non-whitespace content;
+repeated whitespace or indentation returns `anchor-placement`. Paragraph markers
+must also occupy their owning paragraph’s final source line. Ownership is read
+from the canonical parser and mapped back to raw BOM/CRLF source ranges. Whitespace,
+backticks, and atomic literal regions keep ordinary source outside this marker
+boundary. This repairs the historical #446 contract; it does not renew #448
+aggregate acceptance.
+
 All entries reuse `stabilizeMarkdownEditorProjection` identities.
 `resolveMarkdownConsumerIdentity` reports `current`, `deleted`, or `invalid`.
 A deleted heading, table, fence, link, or image must not be retargeted.
@@ -108,7 +120,10 @@ ranges, parent/child ranges, diagnostics, presentation, and syntax coverage.
 
 Syntax ids are opaque and scoped to both the document id and document epoch. A
 new document or epoch never reuses an earlier document's ids, even when the
-source bytes match.
+source bytes match. Document ids may contain separators, including
+`document:N` or multiple colons. Direct and revived Worker projections use the
+same canonical resolver without changing the `syn:<document>:<epoch>:<kind>:<ordinal>`
+encoding; consumers must not split or rewrite these opaque ids.
 
 - Creation allocates a monotonically increasing ordinal for the syntax kind.
   Deleted ordinals remain consumed for the rest of the document epoch.

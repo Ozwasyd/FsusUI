@@ -62,7 +62,8 @@ export const planMarkdownAnchorInsert = (
     )
   }
 
-  const existing = currentMarkdownAnchors(source, options?.projection)
+  const stable = projectionForAnchors(source, options?.projection)
+  const existing = currentMarkdownAnchors(source, stable)
   if (existing.some((node) => node.id === id)) {
     throw new Error(`Duplicate anchor id "${id}" is not permitted`)
   }
@@ -70,9 +71,19 @@ export const planMarkdownAnchorInsert = (
   const newline = source.includes('\r\n') ? '\r\n' : '\n'
   const isFollowingLine = options?.placement === 'following-line'
   const insertText = isFollowingLine ? `${newline}^${id}` : ` ^${id}`
+  // A paragraph's full range includes its terminal newline. Keep line-end
+  // markers at the canonical raw content endpoint, before those source bytes.
+  const insertionOffset = isFollowingLine
+    ? offset
+    : stable.nodes.find(
+        (node) =>
+          node.kind === 'paragraph' &&
+          node.status === 'valid' &&
+          node.rawRange.end === offset,
+      )?.rawContentRanges.at(-1)?.end ?? offset
 
   return {
-    changes: [{ from: offset, to: offset, insert: insertText }],
+    changes: [{ from: insertionOffset, to: insertionOffset, insert: insertText }],
     history: 'separate',
     origin: 'command',
   }

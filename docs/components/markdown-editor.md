@@ -226,6 +226,24 @@ projection ID, duplicate/invalid ID, or stale revision rejects the transaction. 
 surfaces locate through the public anchor-map identity, so consumers need not pass a DOM
 selector/ref; source reveal, cancellation, and successful commit restore the same source selection/focus.
 
+Anchor form intent, target, document, and revision are captured before awaiting
+the command. A stale selection, revision, or cancelled surface refuses the
+pending open; an older attempt cannot replace or steal focus from a newer form.
+A selection-only
+transaction cannot convert creation into rename or retarget an existing anchor; apply,
+remove, and copy revalidate the original document, revision, and target. Cancellation
+discards that session, and reopening captures a fresh target and draft. Consumer-owned
+permission and current-impact admission remain required outside this native form.
+
+The package root `@ozwasyd/element-plus` exports `currentMarkdownAnchors`,
+`planMarkdownAnchorInsert`, `planMarkdownAnchorEdit`, and `planMarkdownAnchorRemove`.
+For line-end insertion at a canonical paragraph's `rawRange.end`, the planner
+uses its final raw content endpoint so the marker precedes the terminal LF or
+CRLF. The existing newline and separator bytes remain unchanged, and insertion
+still commits through `dispatchTransaction`.
+These existing planners return transactions for the editor transaction authority;
+consumers must not apply them with a separate source writer.
+
 Command pending/abort/stale state is managed by one editor command session. An asynchronous
 result commits only while the original document identity, epoch, and revision remain current;
 an external reset or component unmount aborts the pending session. `statusDensity="none"` hides
