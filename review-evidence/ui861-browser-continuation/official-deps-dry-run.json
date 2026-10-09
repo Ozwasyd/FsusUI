@@ -1,0 +1,18 @@
+{
+  "command": [
+    "pnpm",
+    "exec",
+    "playwright",
+    "install-deps",
+    "--dry-run",
+    "firefox",
+    "webkit"
+  ],
+  "cwd": "/workspace/ui861-approved-integration",
+  "sourceSha": "a58cae49d4cbbed48e62c877bab24a7c0041bef6",
+  "exitCode": 0,
+  "startedAt": "2026-10-09T06:59:18.272239+00:00",
+  "endedAt": "2026-10-09T06:59:19.162509+00:00",
+  "stdin": "closed; no credentials provided",
+  "sandbox": "existing default permissions"
+}

@@ -1,0 +1,22 @@
+{
+  "sourceSha": "a58cae49d4cbbed48e62c877bab24a7c0041bef6",
+  "files": {
+    "official-deps-dry-run.json": "5cf7913ba4452199e796f98c2010653680f6f6beeef071ab2dab42198755c682",
+    "host-user.log": "924734f21bac5059b74fc00d7bc690dd998347a52bfab79cba2ea0ff0ff08864",
+    "README.md": "196e38b8cbfe285711f547c40040116f97d88f449815cfbe929a61fdc8294e6f",
+    "official-deps-install.json": "94135b710acede22877929e3186477e54e4224033bf612540dcf9580357dd0af",
+    "host-library-cache.log": "98164f3da50cd6a5b27c3b83bab4a7b322950339edc1e8f79cbfbc363462e10a",
+    "official-deps-install.log": "7796ecac0c1d2de927d12b19b9eacd31ad1601ece504e92c292f26197009db9c",
+    "source-status.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "producer-source-reference.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "draft-pr-update-handoff.json": "cb91bb0e923d36a866be134d9f58c0a1edbbb99459b40d025e7fa6f0dd0cc99b",
+    "build-utils-existing-diagnostic.log": "a4d01779a974927c7ef303c2bf3054f26e3a64b4c25bc22523a058b578314584",
+    "official-deps-dry-run.log": "325a99f481eb113dbdaffaea2252123ba1681c376c8e8979ce69cd83926b521a",
+    "official-version.json": "abfc47ee4bf5ff644d5031492ac43af79a2d6b202e9798afd43835f4ee4650ac",
+    "official-version.log": "cd1544c3866e980faaf6351bb3f3d9f62709bf9d90b9ac6922074b1c12ddf265",
+    "host-os.log": "14c430da04c2d571793fc68a8f5e17fce3d7a746e316c3f23192590861b18bd7",
+    "browser-continuation-status.json": "661feed0dd4135287fca3ea0a5e7000a795a4cbdce7f176a5445e16d5263317e",
+    "original-launch-errors.json": "0606c18d1411a99fceb0b212644c1c3d122a3e4b4bedbf03a4bca0837cc4050d",
+    "official-platform.log": "0a7b67ccc4defde52aacd03f02ce304cc6fdf4858c3c0d3838920b625cfbae98"
+  }
+}

@@ -1,0 +1,111 @@
+{
+  "sourceSha": "a58cae49d4cbbed48e62c877bab24a7c0041bef6",
+  "checkedAt": "2026-10-09T07:00:42.559153+00:00",
+  "commands": {
+    "host-os": {
+      "command": [
+        "cat",
+        "/etc/os-release"
+      ],
+      "exitCode": 0,
+      "log": "host-os.log"
+    },
+    "host-user": {
+      "command": [
+        "id"
+      ],
+      "exitCode": 0,
+      "log": "host-user.log"
+    },
+    "official-platform": {
+      "command": [
+        "node",
+        "-e",
+        "const p=require('./node_modules/playwright-core/lib/server/utils/hostPlatform.js'); console.log(JSON.stringify({hostPlatform:p.hostPlatform,isOfficiallySupportedPlatform:p.isOfficiallySupportedPlatform}))"
+      ],
+      "exitCode": 0,
+      "log": "official-platform.log"
+    },
+    "host-library-cache": {
+      "command": [
+        "/sbin/ldconfig",
+        "-p"
+      ],
+      "exitCode": 0,
+      "log": "host-library-cache.log"
+    },
+    "producer-source-reference": {
+      "command": [
+        "git",
+        "diff",
+        "b17077f3afd4a80ff3bdc0fe81d5dfc353ffddf2",
+        "HEAD",
+        "--",
+        "vue/internal/build-utils"
+      ],
+      "exitCode": 0,
+      "log": "producer-source-reference.log"
+    },
+    "source-status": {
+      "command": [
+        "git",
+        "status",
+        "--short"
+      ],
+      "exitCode": 0,
+      "log": "source-status.log"
+    }
+  },
+  "officialInstall": {
+    "command": [
+      "pnpm",
+      "exec",
+      "playwright",
+      "install-deps",
+      "firefox",
+      "webkit"
+    ],
+    "cwd": "/workspace/ui861-approved-integration",
+    "sourceSha": "a58cae49d4cbbed48e62c877bab24a7c0041bef6",
+    "exitCode": 1,
+    "startedAt": "2026-10-09T06:59:19.163030+00:00",
+    "endedAt": "2026-10-09T06:59:20.799606+00:00",
+    "stdin": "closed; no credentials provided",
+    "sandbox": "existing default permissions"
+  },
+  "installResult": "FAILED exit 1: su authentication failure. Official installer was attempted once, without supplied credentials. No auto-review rejection occurred, no permissions changed, and no alternate route or denied-install retry was attempted.",
+  "hostMissingWebKitLibraries": [
+    "libgtk-4.so.1",
+    "libgraphene-1.0.so.0",
+    "libharfbuzz-icu.so.0",
+    "libmanette-0.2.so.0",
+    "libhyphen.so.0",
+    "libwoff2dec.so.1.0.2",
+    "libGLESv2.so.2"
+  ],
+  "currentFirefoxCell": "UNRUN: existing genuine original-cell failure retained; /proc/self/uid_map EROFS is a sandbox restriction. No sandbox disabling or launch assertion change allowed.",
+  "currentWebKitCell": "UNRUN: ordinary supported dependency setup attempted and refused root authentication; missing library list is freshly read from host linker cache.",
+  "aggregate": "Still FAIL from actual combined-head original verifier: Firefox/WebKit required receipts absent. Existing Chromium success retained.",
+  "existingProducerDiagnostic": {
+    "command": [
+      "pnpm",
+      "-C",
+      "vue/internal/build-utils",
+      "run",
+      "build"
+    ],
+    "sourceSha": "a58cae49d4cbbed48e62c877bab24a7c0041bef6",
+    "exitCode": 1,
+    "diagnostic": "Implicitly bundling \"@pnpm/types\"; Exiting with code (1).",
+    "logSha256": "a4d01779a974927c7ef303c2bf3054f26e3a64b4c25bc22523a058b578314584",
+    "publishedLog": "https://github.com/Ozwasyd/FsusUI/blob/374086720f5812f89f71489fa678201449c77486/review-evidence/ui861-approved-integration/build-utils-producer.log",
+    "sourcePaths": [
+      "vue/internal/build-utils/src/pkg.ts:5",
+      "vue/internal/build-utils/build.config.ts:6",
+      "vue/internal/build-utils/package.json"
+    ],
+    "sourceUnchangedFromMain": true,
+    "reexecuted": false,
+    "ownership": "Shared package build-utils producer; root should route to package-build owner (827) rather than MarkdownEditor or renderer changes. No fix made."
+  }
+}

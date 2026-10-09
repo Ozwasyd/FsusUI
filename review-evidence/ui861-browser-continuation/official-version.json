@@ -1,0 +1,15 @@
+{
+  "command": [
+    "pnpm",
+    "exec",
+    "playwright",
+    "--version"
+  ],
+  "cwd": "/workspace/ui861-approved-integration",
+  "sourceSha": "a58cae49d4cbbed48e62c877bab24a7c0041bef6",
+  "exitCode": 0,
+  "startedAt": "2026-10-09T06:59:17.470433+00:00",
+  "endedAt": "2026-10-09T06:59:18.271902+00:00",
+  "stdin": "closed; no credentials provided",
+  "sandbox": "existing default permissions"
+}

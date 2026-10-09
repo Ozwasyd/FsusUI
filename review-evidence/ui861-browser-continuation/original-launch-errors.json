@@ -1,0 +1,68 @@
+{
+  "firefox": {
+    "originalSourceSha": "80f6e96b8d5419942583711fb417492b1f0abb67",
+    "stats": {
+      "startTime": "2026-10-08T15:53:38.657Z",
+      "duration": 418420.505,
+      "expected": 0,
+      "skipped": 0,
+      "unexpected": 2,
+      "flaky": 0
+    },
+    "errors": [
+      {
+        "title": "mounts representative Vue components and traces real public interactions",
+        "status": "failed",
+        "errors": [
+          {
+            "message": "TimeoutError: browserType.launch: Timeout 180000ms exceeded.\nCall log:\n\u001b[2m  - <launching> /workspace/.setup/ms-playwright/firefox-1511/firefox/firefox -no-remote -headless -profile /tmp/playwright_firefoxdev_profile-PC5qhm -juggler-pipe -silent\u001b[22m\n\u001b[2m  - <launched> pid=421279\u001b[22m\n\u001b[2m  - [pid=421279][err] *** You are running in headless mode.\u001b[22m\n\u001b[2m  30 \u00d7 [pid=421279][err] Fontconfig error: No writable cache directories\u001b[22m\n\u001b[2m  - [pid=421279][err] [421317] Sandbox: writing /proc/self/uid_map: EROFS\u001b[22m\n\u001b[2m  4 \u00d7 [pid=421279][err] [Parent 421279, Main Thread] WARNING: unable to create directory '/home/agent/.cache/dconf': Read-only file system.  dconf will not work properly.: 'glib warning', file /home/pwuser/firefox/toolkit/xre/nsSigHandlers.cpp:201\u001b[22m\n\u001b[2m    - [pid=421279][err]\u001b[22m\n\u001b[2m    - [pid=421279][err] (firefox-default:421279): dconf-CRITICAL **: 15:55:36.205: unable to create directory '/home/agent/.cache/dconf': Read-only file system.  dconf will not work properly.\u001b[22m\n\u001b[2m  - [pid=421279][err] [Parent 421279, Unnamed thread 7f8b531fb160] WARNING: unable to create directory '/home/agent/.cache/dconf': Read-only file system.  dconf will not work properly.: 'glib warning', file /home/pwuser/firefox/toolkit/xre/nsSigHandlers.cpp:201\u001b[22m\n\u001b[2m  - [pid=421279][err]\u001b[22m\n\u001b[2m  - [pid=421279][err] (firefox-default:421279): dconf-CRITICAL **: 15:55:36.205: unable to create directory '/home/agent/.cache/dconf': Read-only file system.  dconf will not work properly.\u001b[22m\n\u001b[2m  2 \u00d7 [pid=421279][err] [Parent 421279, Main Thread] WARNING: unable to create directory '/home/agent/.cache/dconf': Read-only file system.  dconf will not work properly.: 'glib warning', file /home/pwuser/firefox/toolkit/xre/nsSigHandlers.cpp:201\u001b[22m\n\u001b[2m    - [pid=421279][err]\u001b[22m\n\u001b[2m    - [pid=421279][err] (firefox-default:421279): dconf-CRITICAL **: 15:56:42.275: unable to create directory '/home/agent/.cache/dconf': Read-only file system.  dconf will not work properly.\u001b[22m\n"
+          }
+        ],
+        "duration": 3
+      },
+      {
+        "title": "traces MarkdownEditor input, paste, drop, exposed methods, and public state",
+        "status": "failed",
+        "errors": [
+          {
+            "message": "TimeoutError: browserType.launch: Timeout 180000ms exceeded.\nCall log:\n\u001b[2m  - <launching> /workspace/.setup/ms-playwright/firefox-1511/firefox/firefox -no-remote -headless -profile /tmp/playwright_firefoxdev_profile-u65Iuw -juggler-pipe -silent\u001b[22m\n\u001b[2m  - <launched> pid=422924\u001b[22m\n\u001b[2m  - [pid=422924][err] *** You are running in headless mode.\u001b[22m\n\u001b[2m  30 \u00d7 [pid=422924][err] Fontconfig error: No writable cache directories\u001b[22m\n\u001b[2m  - [pid=422924][err] [422962] Sandbox: writing /proc/self/uid_map: EROFS\u001b[22m\n\u001b[2m  - [pid=422924][err] [Parent 422924, Main Thread] WARNING: unable to create directory '/home/agent/.cache/dconf': Read-only file system.  dconf will not work properly.: 'glib warning', file /home/pwuser/firefox/toolkit/xre/nsSigHandlers.cpp:201\u001b[22m\n\u001b[2m  - [pid=422924][err]\u001b[22m\n\u001b[2m  - [pid=422924][err] (firefox-default:422924): dconf-CRITICAL **: 15:58:38.214: unable to create directory '/home/agent/.cache/dconf': Read-only file system.  dconf will not work properly.\u001b[22m\n\u001b[2m  - [pid=422924][err] [Parent 422924, Main Thread] WARNING: unable to create directory '/home/agent/.cache/dconf': Read-only file system.  dconf will not work properly.: 'glib warning', file /home/pwuser/firefox/toolkit/xre/nsSigHandlers.cpp:201\u001b[22m\n\u001b[2m  - [pid=422924][err]\u001b[22m\n\u001b[2m  - [pid=422924][err] (firefox-default:422924): dconf-CRITICAL **: 15:58:38.215: unable to create directory '/home/agent/.cache/dconf': Read-only file system.  dconf will not work properly.\u001b[22m\n\u001b[2m  - [pid=422924][err] [Parent 422924, Unnamed thread 7fcef3311160] WARNING: unable to create directory '/home/agent/.cache/dconf': Read-only file system.  dconf will not work properly.: 'glib warning', file /home/pwuser/firefox/toolkit/xre/nsSigHandlers.cpp:201\u001b[22m\n\u001b[2m  - [pid=422924][err]\u001b[22m\n\u001b[2m  - [pid=422924][err] (firefox-default:422924): dconf-CRITICAL **: 15:58:38.215: unable to create directory '/home/agent/.cache/dconf': Read-only file system.  dconf will not work properly.\u001b[22m\n\u001b[2m  2 \u00d7 [pid=422924][err] [Parent 422924, Main Thread] WARNING: unable to create directory '/home/agent/.cache/dconf': Read-only file system.  dconf will not work properly.: 'glib warning', file /home/pwuser/firefox/toolkit/xre/nsSigHandlers.cpp:201\u001b[22m\n\u001b[2m    - [pid=422924][err]\u001b[22m\n\u001b[2m    - [pid=422924][err] (firefox-default:422924): dconf-CRITICAL **: 15:58:38.216: unable to create directory '/home/agent/.cache/dconf': Read-only file system.  dconf will not work properly.\u001b[22m\n\u001b[2m  - [pid=422924][err] [Parent 422924, Main Thread] WARNING: unable to create directory '/home/agent/.cache/dconf': Read-only file system.  dconf will not work properly.: 'glib warning', file /home/pwuser/firefox/toolkit/xre/nsSigHandlers.cpp:201\u001b[22m\n\u001b[2m  - [pid=422924][err]\u001b[22m\n\u001b[2m  - [pid=422924][err] (firefox-default:422924): dconf-CRITICAL **: 15:59:44.273: unable to create directory '/home/agent/.cache/dconf': Read-only file system.  dconf will not work properly.\u001b[22m\n\u001b[2m  - [pid=422924][err] [Parent 422924, Main Thread] WARNING: unable to create directory '/home/agent/.cache/dconf': Read-only file system.  dconf will not work properly.: 'glib warning', file /home/pwuser/firefox/toolkit/xre/nsSigHandlers.cpp:201\u001b[22m\n\u001b[2m  - [pid=422924][err]\u001b[22m\n\u001b[2m  - [pid=422924][err] (firefox-default:422924): dconf-CRITICAL **: 15:59:44.274: unable to create directory '/home/agent/.cache/dconf': Read-only file system.  dconf will not work properly.\u001b[22m\n"
+          }
+        ],
+        "duration": 2
+      }
+    ]
+  },
+  "webkit": {
+    "originalSourceSha": "80f6e96b8d5419942583711fb417492b1f0abb67",
+    "stats": {
+      "startTime": "2026-10-08T16:00:40.300Z",
+      "duration": 58457.38,
+      "expected": 0,
+      "skipped": 0,
+      "unexpected": 2,
+      "flaky": 0
+    },
+    "errors": [
+      {
+        "title": "mounts representative Vue components and traces real public interactions",
+        "status": "failed",
+        "errors": [
+          {
+            "message": "Error: browserType.launch: \n\u2554\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2557\n\u2551 Host system is missing dependencies to run browsers. \u2551\n\u2551 Missing libraries:                                   \u2551\n\u2551     libgtk-4.so.1                                    \u2551\n\u2551     libgraphene-1.0.so.0                             \u2551\n\u2551     libharfbuzz-icu.so.0                             \u2551\n\u2551     libmanette-0.2.so.0                              \u2551\n\u2551     libhyphen.so.0                                   \u2551\n\u2551     libwoff2dec.so.1.0.2                             \u2551\n\u2551     libGLESv2.so.2                                   \u2551\n\u255a\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u255d"
+          }
+        ],
+        "duration": 2
+      },
+      {
+        "title": "traces MarkdownEditor input, paste, drop, exposed methods, and public state",
+        "status": "failed",
+        "errors": [
+          {
+            "message": "Error: browserType.launch: \n\u2554\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2557\n\u2551 Host system is missing dependencies to run browsers. \u2551\n\u2551 Missing libraries:                                   \u2551\n\u2551     libgtk-4.so.1                                    \u2551\n\u2551     libgraphene-1.0.so.0                             \u2551\n\u2551     libharfbuzz-icu.so.0                             \u2551\n\u2551     libmanette-0.2.so.0                              \u2551\n\u2551     libhyphen.so.0                                   \u2551\n\u2551     libwoff2dec.so.1.0.2                             \u2551\n\u2551     libGLESv2.so.2                                   \u2551\n\u255a\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u255d"
+          }
+        ],
+        "duration": 3
+      }
+    ]
+  }
+}
