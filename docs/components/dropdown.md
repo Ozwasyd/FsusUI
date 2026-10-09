@@ -35,6 +35,79 @@ Set `split-button` to turn the trigger into a two-part button group.
 
 Use `handleOpen` / `handleClose` to control menu visibility manually.
 
+## Consumer-owned Single Selection
+
+Set `checked` on every selectable `DropdownItem` under a `role="menu"`
+Dropdown. Defined boolean values render `menuitemradio` with `aria-checked`;
+omitting `checked` preserves the ordinary `menuitem` command contract. The
+consumer supplies exactly one committed checked item in each selection group.
+Activation emits `command`; it never mutates `checked` itself.
+
+Use `hide-on-click="false"` for an asynchronous transaction. Keep `checked`
+bound to the last committed value while showing pending progress or a visible
+error/retry item in the menu. Update that value only after success, and close
+through the public `handleClose` method when the consumer decides the
+transaction is settled. Failed, interrupted, and superseded transactions remain
+consumer-owned. FsusUI does not store preferences, choose locale values, or
+perform resource requests.
+
+```vue
+<el-dropdown ref="dropdown" trigger="click" :hide-on-click="false">
+  <el-button>{{ committedLabel }}</el-button>
+  <template #dropdown>
+    <el-dropdown-menu>
+      <el-dropdown-item
+        v-for="item in items"
+        :key="item.id"
+        :command="item"
+        :checked="item.id === committedId"
+        :disabled="item.disabled"
+      >
+        {{ item.label }}
+        <span v-if="pendingId === item.id">{{ pendingLabel }}</span>
+      </el-dropdown-item>
+      <el-dropdown-item v-if="error" command="retry">
+        <span role="alert">{{ error }}</span>
+        {{ retryLabel }}
+      </el-dropdown-item>
+    </el-dropdown-menu>
+  </template>
+</el-dropdown>
+```
+
+Enter, Space, ArrowDown, and ArrowUp open a click-triggered dropdown. The
+existing roving focus model prefers a focusable checked item on keyboard
+entry, handles ArrowUp/Down/Home/End, skips disabled items, and restores focus
+to the trigger on Escape. A custom trigger, including compact content, remains
+in the default slot; public `visible-change` and `handleOpen` / `handleClose`
+provide an observable visibility contract. Changing `checked` does not move
+focus away from a user who is navigating pending or retry content.
+
+## URL and Command Activation Adapter
+
+The `command` event receives `(command, instance, event)`. Use a public
+consumer adapter to distinguish navigation records from async commands; do
+not query component-private DOM or add another keyboard handler. For example:
+
+```ts
+function activate(item, _instance, event) {
+  if (item.href) {
+    window.location.assign(item.href)
+    return
+  }
+  void requestResource(item.id)
+}
+```
+
+The adapter owns URL and transaction semantics. A nested anchor alone is not
+a keyboard activation adapter: Enter/Space on the menu item activate its
+public command rather than dispatching the nested anchor's native click.
+Choose and test one coherent URL/command adapter for the consumer.
+Keyboard activation intentionally prevents the browser's original key default
+before emitting `command`; its event can therefore have `defaultPrevented=true`
+while still representing a valid command. Do not discard a public keyboard
+command solely because that flag is set.
+
 ---
 
 ## Dropdown API
@@ -101,3 +174,4 @@ Use `handleOpen` / `handleClose` to control menu visibility manually.
 | disabled | 是否禁用 | `boolean` | `false` |
 | divided | 是否显示上方分割线 | `boolean` | `false` |
 | icon | 自定义图标 | `string \| Component` | — |
+| checked | Consumer-controlled single-selection state under a menu parent; omit for an ordinary command item | `boolean \| undefined` | `undefined` |
