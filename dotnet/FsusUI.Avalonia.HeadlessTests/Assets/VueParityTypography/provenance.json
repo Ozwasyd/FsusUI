@@ -1,0 +1,1106 @@
+{
+  "fontsourceReleaseCommit": "728f5ac019b578b42808c3672378dad2d327fe87",
+  "conversion": "fontTools.ttLib.TTFont; flavor=None; recalcTimestamp=False",
+  "fontTools": "4.61.1",
+  "brotli": "1.2.0",
+  "packages": [
+    {
+      "name": "@fontsource/google-sans",
+      "version": "5.2.1",
+      "fontRelease": "v67",
+      "registryUrl": "https://registry.npmjs.org/@fontsource/google-sans/-/google-sans-5.2.1.tgz",
+      "integrity": "sha512-FteXH18YS0288Bcrjefwyyp7hLwxd8yQBEcmjU/P0BED9c8n8kxwgna3gtMtYyFQx/wIkpyrzj8RaYQyl/4quw==",
+      "archiveSha256": "b8fb63765304b4f2b14c6ddbc379af470ccb7e033eeddfee7ccb841b122b9e7a",
+      "licenseSha256": "ee5ba219bfa2ce3cb1403d2a535383cd131c9154912560c286691781203fd02d",
+      "officialLicense": "https://github.com/fontsource/font-files/blob/728f5ac019b578b42808c3672378dad2d327fe87/fonts/google/google-sans/LICENSE"
+    },
+    {
+      "name": "@fontsource/noto-sans-sc",
+      "version": "5.2.9",
+      "fontRelease": "v40",
+      "registryUrl": "https://registry.npmjs.org/@fontsource/noto-sans-sc/-/noto-sans-sc-5.2.9.tgz",
+      "integrity": "sha512-bTUIWGBgJDpwi5qAr+x0/lcgv80IHTB9vl6s2f6EymZEa7qYV99yNRBZuKFT+SYDKVunZrjCEhWtpxqmbXWl5Q==",
+      "archiveSha256": "4b43cc1d86475924cf1d3a81a85b2c11bcbc3c24f05f3366f90edfd96a1a9000",
+      "licenseSha256": "18aabf190848725e2576eefb5c29ba06aac1029d02132252a7f312eac2e50cf3",
+      "officialLicense": "https://github.com/fontsource/font-files/blob/728f5ac019b578b42808c3672378dad2d327fe87/fonts/google/noto-sans-sc/LICENSE"
+    }
+  ],
+  "assets": [
+    {
+      "source": "files/google-sans-latin-400-normal.woff2",
+      "package": "@fontsource/google-sans@5.2.1",
+      "sourceSha256": "d2263711c4bed4e203c88ed278049c80d1d3b1fff690be0b3a516749cbb38c58",
+      "derived": "GoogleSans/Latin/400.ttf",
+      "derivedSha256": "07e3614ca9d730de33ae786556674999e73618361e32c26ae2159776493f121f",
+      "weight": 400,
+      "nativeFamily": "Google Sans 18pt",
+      "glyphCount": 534,
+      "cmapCount": 233,
+      "tables": {
+        "GDEF": {
+          "source": "eb7e834e1078bd16f33f95cc50b1a8bf1e5e0fc2ecfd13dcfb038a2545ab80f1",
+          "derived": "eb7e834e1078bd16f33f95cc50b1a8bf1e5e0fc2ecfd13dcfb038a2545ab80f1"
+        },
+        "GPOS": {
+          "source": "97c629e299d325ccb0594d4ab7b3bcd242fc53b27ab7fdc18413ba5cbfd65fd1",
+          "derived": "97c629e299d325ccb0594d4ab7b3bcd242fc53b27ab7fdc18413ba5cbfd65fd1"
+        },
+        "GSUB": {
+          "source": "8074307c6bc0b9cd5b4f865183638d9ab6b7c92635ff2ba0f572e9759050860a",
+          "derived": "8074307c6bc0b9cd5b4f865183638d9ab6b7c92635ff2ba0f572e9759050860a"
+        },
+        "OS/2": {
+          "source": "4ff9ea65c07012437e52c8e0cda1e644b627685433d8af9d1a86a23aa2535886",
+          "derived": "4ff9ea65c07012437e52c8e0cda1e644b627685433d8af9d1a86a23aa2535886"
+        },
+        "STAT": {
+          "source": "c79fe6280fe97023c8e0150de412afd34ecfa548607169aaf3dd333a0751aaeb",
+          "derived": "c79fe6280fe97023c8e0150de412afd34ecfa548607169aaf3dd333a0751aaeb"
+        },
+        "cmap": {
+          "source": "7ac08d3904a5f560b5886ba65c9fe3c7dff642ba8d6decb684b54c1a41ce99e4",
+          "derived": "7ac08d3904a5f560b5886ba65c9fe3c7dff642ba8d6decb684b54c1a41ce99e4"
+        },
+        "gasp": {
+          "source": "4ca731f86ad506ac0e320283dc9461926346de3c4d91d539ea7f6620d3826940",
+          "derived": "4ca731f86ad506ac0e320283dc9461926346de3c4d91d539ea7f6620d3826940"
+        },
+        "glyf": {
+          "source": "8c0c11c0a237c6f1a590e770d3a4582cd890db9b6191c581abd01e4fe10757d3",
+          "derived": "8c0c11c0a237c6f1a590e770d3a4582cd890db9b6191c581abd01e4fe10757d3"
+        },
+        "loca": {
+          "source": "a4f1ba065a613358919dd54dae5b4ec1385f55522f56f1ad24175a272b55bf8d",
+          "derived": "a4f1ba065a613358919dd54dae5b4ec1385f55522f56f1ad24175a272b55bf8d"
+        },
+        "head": {
+          "source": "5d1772caa1a5c3295c192999a45422be05e7179bb21ab9765bf47b7af7d2b5b7",
+          "derived": "bcbfce652849d477bbf07046b5526e5cf20acaac8fa37e607b87335b439f08af"
+        },
+        "hhea": {
+          "source": "f475eaef77fe46e366d3e19ae0caad1f2e8d18d4380ed43c57522ed82a87e69b",
+          "derived": "f475eaef77fe46e366d3e19ae0caad1f2e8d18d4380ed43c57522ed82a87e69b"
+        },
+        "hmtx": {
+          "source": "90027e3f40b5e7e44ee668fdba91df6e14e94d216ea87e3b3dc7f89de3a1951b",
+          "derived": "90027e3f40b5e7e44ee668fdba91df6e14e94d216ea87e3b3dc7f89de3a1951b"
+        },
+        "maxp": {
+          "source": "c3f65e1e656502be90565c582b72b3ec863f6fa11b0e23fa6d5cb92b8414d2e2",
+          "derived": "c3f65e1e656502be90565c582b72b3ec863f6fa11b0e23fa6d5cb92b8414d2e2"
+        },
+        "name": {
+          "source": "1d45180cdeda4575d91dafe613f91497a17cb4032cd9b0ed8cf1f0bca9aab196",
+          "derived": "1d45180cdeda4575d91dafe613f91497a17cb4032cd9b0ed8cf1f0bca9aab196"
+        },
+        "post": {
+          "source": "eb419d8154436cfb3ad6de8fb9176c2c43dddc4ba01a8152ca2bf6022f46f4b5",
+          "derived": "eb419d8154436cfb3ad6de8fb9176c2c43dddc4ba01a8152ca2bf6022f46f4b5"
+        },
+        "prep": {
+          "source": "907c4106ff9989c1805827d5581bdf107a253b098cb71eb374f5e47c35604452",
+          "derived": "907c4106ff9989c1805827d5581bdf107a253b098cb71eb374f5e47c35604452"
+        }
+      }
+    },
+    {
+      "source": "files/google-sans-latin-500-normal.woff2",
+      "package": "@fontsource/google-sans@5.2.1",
+      "sourceSha256": "bca46f6cc10442e731c60bca9fa36fe04c0afb6d67c946200fc5471fd6418ba9",
+      "derived": "GoogleSans/Latin/500.ttf",
+      "derivedSha256": "5c24a30a32aacd57365b19f63dc3418ef11f3d798c864e687c96cb5d5d983de8",
+      "weight": 500,
+      "nativeFamily": "Google Sans 18pt",
+      "glyphCount": 534,
+      "cmapCount": 233,
+      "tables": {
+        "GDEF": {
+          "source": "679ad6fe7a0ebab619f43468bfb70e156d99edd5e0d447b868d330fd373c7b27",
+          "derived": "679ad6fe7a0ebab619f43468bfb70e156d99edd5e0d447b868d330fd373c7b27"
+        },
+        "GPOS": {
+          "source": "e50c097636033742e7a6f4e7f7008bc45286a0087d3045bdca792fb27efb0d2c",
+          "derived": "e50c097636033742e7a6f4e7f7008bc45286a0087d3045bdca792fb27efb0d2c"
+        },
+        "GSUB": {
+          "source": "8074307c6bc0b9cd5b4f865183638d9ab6b7c92635ff2ba0f572e9759050860a",
+          "derived": "8074307c6bc0b9cd5b4f865183638d9ab6b7c92635ff2ba0f572e9759050860a"
+        },
+        "OS/2": {
+          "source": "5dd60f2d98b63e2f7aca9dafceaca06733111b8ca76040ac28dce1840da45d53",
+          "derived": "5dd60f2d98b63e2f7aca9dafceaca06733111b8ca76040ac28dce1840da45d53"
+        },
+        "STAT": {
+          "source": "49c0ea684d49028ef2907a42191b06488a6880ea06b3017b78fe3e3d14ebf2ee",
+          "derived": "49c0ea684d49028ef2907a42191b06488a6880ea06b3017b78fe3e3d14ebf2ee"
+        },
+        "cmap": {
+          "source": "7ac08d3904a5f560b5886ba65c9fe3c7dff642ba8d6decb684b54c1a41ce99e4",
+          "derived": "7ac08d3904a5f560b5886ba65c9fe3c7dff642ba8d6decb684b54c1a41ce99e4"
+        },
+        "gasp": {
+          "source": "4ca731f86ad506ac0e320283dc9461926346de3c4d91d539ea7f6620d3826940",
+          "derived": "4ca731f86ad506ac0e320283dc9461926346de3c4d91d539ea7f6620d3826940"
+        },
+        "glyf": {
+          "source": "f5595288daf336d43f08cd2d4c97e7499cbc44c1f3eaab02e34c51b41947686e",
+          "derived": "f5595288daf336d43f08cd2d4c97e7499cbc44c1f3eaab02e34c51b41947686e"
+        },
+        "loca": {
+          "source": "dc9b682cdfcb1bf5dc9701aa364d3b15c37afd13bbc453b73e27b37478932b53",
+          "derived": "dc9b682cdfcb1bf5dc9701aa364d3b15c37afd13bbc453b73e27b37478932b53"
+        },
+        "head": {
+          "source": "e9f07753094f3dd0eaa79e2708e12c8956f0cf997569a3ee3c80c324ea2b5cbc",
+          "derived": "6268a99f9a2122049950b6be161307a204617feb12f2aa4dbcb32bd6a5f061e5"
+        },
+        "hhea": {
+          "source": "39d0bb220a1947e73ef8ade5d9faea8bfc86024adab71c9e6a49a84afe82a007",
+          "derived": "39d0bb220a1947e73ef8ade5d9faea8bfc86024adab71c9e6a49a84afe82a007"
+        },
+        "hmtx": {
+          "source": "984cf6dff90ae69fb7afa3a43dbfaeedb7211e40507579b9c32a013105a4af2a",
+          "derived": "984cf6dff90ae69fb7afa3a43dbfaeedb7211e40507579b9c32a013105a4af2a"
+        },
+        "maxp": {
+          "source": "c3f65e1e656502be90565c582b72b3ec863f6fa11b0e23fa6d5cb92b8414d2e2",
+          "derived": "c3f65e1e656502be90565c582b72b3ec863f6fa11b0e23fa6d5cb92b8414d2e2"
+        },
+        "name": {
+          "source": "fe9256f231a70622d7c1759f91564ea8bdf0c00a8c7cad7cc5de12e444ffb728",
+          "derived": "fe9256f231a70622d7c1759f91564ea8bdf0c00a8c7cad7cc5de12e444ffb728"
+        },
+        "post": {
+          "source": "eb419d8154436cfb3ad6de8fb9176c2c43dddc4ba01a8152ca2bf6022f46f4b5",
+          "derived": "eb419d8154436cfb3ad6de8fb9176c2c43dddc4ba01a8152ca2bf6022f46f4b5"
+        },
+        "prep": {
+          "source": "907c4106ff9989c1805827d5581bdf107a253b098cb71eb374f5e47c35604452",
+          "derived": "907c4106ff9989c1805827d5581bdf107a253b098cb71eb374f5e47c35604452"
+        }
+      }
+    },
+    {
+      "source": "files/google-sans-latin-700-normal.woff2",
+      "package": "@fontsource/google-sans@5.2.1",
+      "sourceSha256": "c3e646e385b7f7fa06a4ff8d6a1c628b92948b58fec797f37c357257ed61e7c5",
+      "derived": "GoogleSans/Latin/700.ttf",
+      "derivedSha256": "c5cfeaed0487aa74e431e885486ebcbd32a1e110123915ab9fe324c828ae4199",
+      "weight": 700,
+      "nativeFamily": "Google Sans 18pt",
+      "glyphCount": 534,
+      "cmapCount": 233,
+      "tables": {
+        "GDEF": {
+          "source": "2d4fe93cbc82a20a4fdc8237dd7d0ee932fd37ec161090d9594d06e8e301ecdc",
+          "derived": "2d4fe93cbc82a20a4fdc8237dd7d0ee932fd37ec161090d9594d06e8e301ecdc"
+        },
+        "GPOS": {
+          "source": "e8a3219a906f87e8d0e1c570623d53a1496228c93b32f9a9e5352c656c7b0341",
+          "derived": "e8a3219a906f87e8d0e1c570623d53a1496228c93b32f9a9e5352c656c7b0341"
+        },
+        "GSUB": {
+          "source": "8074307c6bc0b9cd5b4f865183638d9ab6b7c92635ff2ba0f572e9759050860a",
+          "derived": "8074307c6bc0b9cd5b4f865183638d9ab6b7c92635ff2ba0f572e9759050860a"
+        },
+        "OS/2": {
+          "source": "4a44de70955d48b0411f5d42dc7cc50ac87aa9fbab0aed24c1afc2978e05a068",
+          "derived": "4a44de70955d48b0411f5d42dc7cc50ac87aa9fbab0aed24c1afc2978e05a068"
+        },
+        "STAT": {
+          "source": "0baf0fd6a8072fe94e334314ef39a7b0705d10b1d87bda3064b7a42b49409d87",
+          "derived": "0baf0fd6a8072fe94e334314ef39a7b0705d10b1d87bda3064b7a42b49409d87"
+        },
+        "cmap": {
+          "source": "7ac08d3904a5f560b5886ba65c9fe3c7dff642ba8d6decb684b54c1a41ce99e4",
+          "derived": "7ac08d3904a5f560b5886ba65c9fe3c7dff642ba8d6decb684b54c1a41ce99e4"
+        },
+        "gasp": {
+          "source": "4ca731f86ad506ac0e320283dc9461926346de3c4d91d539ea7f6620d3826940",
+          "derived": "4ca731f86ad506ac0e320283dc9461926346de3c4d91d539ea7f6620d3826940"
+        },
+        "glyf": {
+          "source": "0ded916bb4f6c214aa29df2c5c5a270e32416ec5f158d246086a811b59ca6a7c",
+          "derived": "0ded916bb4f6c214aa29df2c5c5a270e32416ec5f158d246086a811b59ca6a7c"
+        },
+        "loca": {
+          "source": "c41689fe1a2bd8608563eb8aa62b3cdf8e7abbf04e8002b10a1df3a31abb6a48",
+          "derived": "c41689fe1a2bd8608563eb8aa62b3cdf8e7abbf04e8002b10a1df3a31abb6a48"
+        },
+        "head": {
+          "source": "b449f4eeceae0842f4ef142128d29701b59ac00aeeba5758a71ed5c66a8a128a",
+          "derived": "47cf48fc5593f01d54750a2f09e3fa4cd1b5fd11c4cff83dbf206d5ace92174e"
+        },
+        "hhea": {
+          "source": "4f66911dbd0441eb859c33810f834b0941c4950386c67d1a315b1f2af3962fc6",
+          "derived": "4f66911dbd0441eb859c33810f834b0941c4950386c67d1a315b1f2af3962fc6"
+        },
+        "hmtx": {
+          "source": "f552c7788d1157f68596e60b4678b5985ba4371e2ac8b7acb8332b5eba802529",
+          "derived": "f552c7788d1157f68596e60b4678b5985ba4371e2ac8b7acb8332b5eba802529"
+        },
+        "maxp": {
+          "source": "c3f65e1e656502be90565c582b72b3ec863f6fa11b0e23fa6d5cb92b8414d2e2",
+          "derived": "c3f65e1e656502be90565c582b72b3ec863f6fa11b0e23fa6d5cb92b8414d2e2"
+        },
+        "name": {
+          "source": "2b15589c695b757523ea2bde426522c86ee1bfc7d9317ba06bcf8c8fbcfa007a",
+          "derived": "2b15589c695b757523ea2bde426522c86ee1bfc7d9317ba06bcf8c8fbcfa007a"
+        },
+        "post": {
+          "source": "eb419d8154436cfb3ad6de8fb9176c2c43dddc4ba01a8152ca2bf6022f46f4b5",
+          "derived": "eb419d8154436cfb3ad6de8fb9176c2c43dddc4ba01a8152ca2bf6022f46f4b5"
+        },
+        "prep": {
+          "source": "907c4106ff9989c1805827d5581bdf107a253b098cb71eb374f5e47c35604452",
+          "derived": "907c4106ff9989c1805827d5581bdf107a253b098cb71eb374f5e47c35604452"
+        }
+      }
+    },
+    {
+      "source": "files/google-sans-symbols-400-normal.woff2",
+      "package": "@fontsource/google-sans@5.2.1",
+      "sourceSha256": "526a20b87a99be8ce297243c7b00b12cace619b6137ebb923e5b7c20260e1dca",
+      "derived": "GoogleSans/Symbols/400.ttf",
+      "derivedSha256": "17bfa6201158fb58e9ef62702bf75b51328d64a457f7bb596dbe08ac523398b0",
+      "weight": 400,
+      "nativeFamily": "Google Sans 18pt",
+      "glyphCount": 240,
+      "cmapCount": 140,
+      "tables": {
+        "GDEF": {
+          "source": "1e11ab5e5402236ffdca3f1f9eddc2e0048c1d295cf8538b6a387dd84582430d",
+          "derived": "1e11ab5e5402236ffdca3f1f9eddc2e0048c1d295cf8538b6a387dd84582430d"
+        },
+        "GPOS": {
+          "source": "f9471eea50e1ce12a9be52cd6fc4d6bc4dcb819d9391464f36cb0c6d3c9f14dd",
+          "derived": "f9471eea50e1ce12a9be52cd6fc4d6bc4dcb819d9391464f36cb0c6d3c9f14dd"
+        },
+        "GSUB": {
+          "source": "75beeabe813e04663bcbbf40a3094d7896b81d09b1f16626048dbff0ef061610",
+          "derived": "75beeabe813e04663bcbbf40a3094d7896b81d09b1f16626048dbff0ef061610"
+        },
+        "OS/2": {
+          "source": "b0a8c221443c66c8745a270011d98c90516d5f3e63b17ed887604fbdb069c286",
+          "derived": "b0a8c221443c66c8745a270011d98c90516d5f3e63b17ed887604fbdb069c286"
+        },
+        "STAT": {
+          "source": "c79fe6280fe97023c8e0150de412afd34ecfa548607169aaf3dd333a0751aaeb",
+          "derived": "c79fe6280fe97023c8e0150de412afd34ecfa548607169aaf3dd333a0751aaeb"
+        },
+        "cmap": {
+          "source": "e445530caa1237d2e702bf57739e3f49dd12c4655232730dbf6911701628ba8f",
+          "derived": "e445530caa1237d2e702bf57739e3f49dd12c4655232730dbf6911701628ba8f"
+        },
+        "gasp": {
+          "source": "4ca731f86ad506ac0e320283dc9461926346de3c4d91d539ea7f6620d3826940",
+          "derived": "4ca731f86ad506ac0e320283dc9461926346de3c4d91d539ea7f6620d3826940"
+        },
+        "glyf": {
+          "source": "7564081383187bab86f006b0deb7e086d09750fb7a9ff455d36928153b74d2c1",
+          "derived": "7564081383187bab86f006b0deb7e086d09750fb7a9ff455d36928153b74d2c1"
+        },
+        "loca": {
+          "source": "cbc001afd66b334116168ffe70d99b376bad978a0649a906d6d745aa7eef7889",
+          "derived": "cbc001afd66b334116168ffe70d99b376bad978a0649a906d6d745aa7eef7889"
+        },
+        "head": {
+          "source": "e37002bba41bc4890c7f198adcf37e9b06ef24c2132ddb9f7dca5c08208b7356",
+          "derived": "2ed16537fa266be632778a0b4461705f2e9951e3f09f4358a2bbef24563092b6"
+        },
+        "hhea": {
+          "source": "4bd82cfa150323bb7b2f0e9aec94814fb9d748c8137894e79afd60635f3ef73e",
+          "derived": "4bd82cfa150323bb7b2f0e9aec94814fb9d748c8137894e79afd60635f3ef73e"
+        },
+        "hmtx": {
+          "source": "40c5b9df9739f2d9dd7a74009e9f2b59f7bc219a41a31698d57138834acc810d",
+          "derived": "40c5b9df9739f2d9dd7a74009e9f2b59f7bc219a41a31698d57138834acc810d"
+        },
+        "maxp": {
+          "source": "009adfc02e36647146140997856eb02fac90642eb33c61f2789966452c93e9d9",
+          "derived": "009adfc02e36647146140997856eb02fac90642eb33c61f2789966452c93e9d9"
+        },
+        "name": {
+          "source": "191769ebb84409e8c1d79a66586b4834a83ac866cf43e39b2f875c3933d40a9d",
+          "derived": "191769ebb84409e8c1d79a66586b4834a83ac866cf43e39b2f875c3933d40a9d"
+        },
+        "post": {
+          "source": "dcd913d505855b506c7f1baeb2d5ccc8b3d07293db0cda32df136aea770b8530",
+          "derived": "dcd913d505855b506c7f1baeb2d5ccc8b3d07293db0cda32df136aea770b8530"
+        },
+        "prep": {
+          "source": "907c4106ff9989c1805827d5581bdf107a253b098cb71eb374f5e47c35604452",
+          "derived": "907c4106ff9989c1805827d5581bdf107a253b098cb71eb374f5e47c35604452"
+        }
+      }
+    },
+    {
+      "source": "files/google-sans-symbols-500-normal.woff2",
+      "package": "@fontsource/google-sans@5.2.1",
+      "sourceSha256": "e56e1a465e6bcf660b07c9a6c15a3aedc774b344a8c8d917feb50e8731f4adac",
+      "derived": "GoogleSans/Symbols/500.ttf",
+      "derivedSha256": "0fc3c76fc8b171e3200194d28e0a1564211469b778a00b28956a6b9893b13a2d",
+      "weight": 500,
+      "nativeFamily": "Google Sans 18pt",
+      "glyphCount": 240,
+      "cmapCount": 140,
+      "tables": {
+        "GDEF": {
+          "source": "100509e055fc41861f9013991dad54a9c7e95dd9f2d909f0dd0b782f3ca030d8",
+          "derived": "100509e055fc41861f9013991dad54a9c7e95dd9f2d909f0dd0b782f3ca030d8"
+        },
+        "GPOS": {
+          "source": "7d3d60b88f0e290c78a64ca404927f0f00d0dc4bc94dcae0bac492db28a7fbcc",
+          "derived": "7d3d60b88f0e290c78a64ca404927f0f00d0dc4bc94dcae0bac492db28a7fbcc"
+        },
+        "GSUB": {
+          "source": "75beeabe813e04663bcbbf40a3094d7896b81d09b1f16626048dbff0ef061610",
+          "derived": "75beeabe813e04663bcbbf40a3094d7896b81d09b1f16626048dbff0ef061610"
+        },
+        "OS/2": {
+          "source": "92a24a36e8523e7f2b802237dd6647b31b931a07d27df4858912c38471e87fd0",
+          "derived": "92a24a36e8523e7f2b802237dd6647b31b931a07d27df4858912c38471e87fd0"
+        },
+        "STAT": {
+          "source": "49c0ea684d49028ef2907a42191b06488a6880ea06b3017b78fe3e3d14ebf2ee",
+          "derived": "49c0ea684d49028ef2907a42191b06488a6880ea06b3017b78fe3e3d14ebf2ee"
+        },
+        "cmap": {
+          "source": "e445530caa1237d2e702bf57739e3f49dd12c4655232730dbf6911701628ba8f",
+          "derived": "e445530caa1237d2e702bf57739e3f49dd12c4655232730dbf6911701628ba8f"
+        },
+        "gasp": {
+          "source": "4ca731f86ad506ac0e320283dc9461926346de3c4d91d539ea7f6620d3826940",
+          "derived": "4ca731f86ad506ac0e320283dc9461926346de3c4d91d539ea7f6620d3826940"
+        },
+        "glyf": {
+          "source": "c14985ddc204a7a6d8e6beaf5e3c597858f0fbc10f8c1c2b45de930f56f8da5c",
+          "derived": "c14985ddc204a7a6d8e6beaf5e3c597858f0fbc10f8c1c2b45de930f56f8da5c"
+        },
+        "loca": {
+          "source": "e902115a7bce824a046bb1c4a62b2a80ead2dd797db68ca05d85875cb1fc644f",
+          "derived": "e902115a7bce824a046bb1c4a62b2a80ead2dd797db68ca05d85875cb1fc644f"
+        },
+        "head": {
+          "source": "31cb56bf11127797bf1cc91da93f2b5f0b5742c3deddbea09d993247db765897",
+          "derived": "ca0298a003fe74e54da4d0c0d968d4f84799306e875f5cf77bda96498f8b4c9f"
+        },
+        "hhea": {
+          "source": "080a6cefde1e79b4861eaef6647a15775bf3d1c5e4134f9f1106d504c3d55eb9",
+          "derived": "080a6cefde1e79b4861eaef6647a15775bf3d1c5e4134f9f1106d504c3d55eb9"
+        },
+        "hmtx": {
+          "source": "7ed003751e7b04407ebf859b62e84291867351bf2973ac2f60b6ad297a1c6e8c",
+          "derived": "7ed003751e7b04407ebf859b62e84291867351bf2973ac2f60b6ad297a1c6e8c"
+        },
+        "maxp": {
+          "source": "009adfc02e36647146140997856eb02fac90642eb33c61f2789966452c93e9d9",
+          "derived": "009adfc02e36647146140997856eb02fac90642eb33c61f2789966452c93e9d9"
+        },
+        "name": {
+          "source": "1c0c598f5c006c7e7a8c36d842a5de21974bf1da012e83d8db79df1c30eebdde",
+          "derived": "1c0c598f5c006c7e7a8c36d842a5de21974bf1da012e83d8db79df1c30eebdde"
+        },
+        "post": {
+          "source": "dcd913d505855b506c7f1baeb2d5ccc8b3d07293db0cda32df136aea770b8530",
+          "derived": "dcd913d505855b506c7f1baeb2d5ccc8b3d07293db0cda32df136aea770b8530"
+        },
+        "prep": {
+          "source": "907c4106ff9989c1805827d5581bdf107a253b098cb71eb374f5e47c35604452",
+          "derived": "907c4106ff9989c1805827d5581bdf107a253b098cb71eb374f5e47c35604452"
+        }
+      }
+    },
+    {
+      "source": "files/google-sans-symbols-700-normal.woff2",
+      "package": "@fontsource/google-sans@5.2.1",
+      "sourceSha256": "b85b789e6973e229fdb08d5cbd9e0efe022e803f81bc2cae994d9c1c73e18473",
+      "derived": "GoogleSans/Symbols/700.ttf",
+      "derivedSha256": "65b876de497819eb3a1255040f6b44bd7a9f33a4e5b1e3dd5345bf0259481830",
+      "weight": 700,
+      "nativeFamily": "Google Sans 18pt",
+      "glyphCount": 240,
+      "cmapCount": 140,
+      "tables": {
+        "GDEF": {
+          "source": "91ec8d0aaed782c75e6cfb64002b9813df78f511a6702d96ee87dd5ab21122b2",
+          "derived": "91ec8d0aaed782c75e6cfb64002b9813df78f511a6702d96ee87dd5ab21122b2"
+        },
+        "GPOS": {
+          "source": "1cbbbfe934c22bed1e0f02f42ca07a3a89537e9b32f6b8e795891ccdf8c62c01",
+          "derived": "1cbbbfe934c22bed1e0f02f42ca07a3a89537e9b32f6b8e795891ccdf8c62c01"
+        },
+        "GSUB": {
+          "source": "75beeabe813e04663bcbbf40a3094d7896b81d09b1f16626048dbff0ef061610",
+          "derived": "75beeabe813e04663bcbbf40a3094d7896b81d09b1f16626048dbff0ef061610"
+        },
+        "OS/2": {
+          "source": "1a6f510ba5e6101f1101a7337d923df497e9b548b6a763722050240d88fd66dc",
+          "derived": "1a6f510ba5e6101f1101a7337d923df497e9b548b6a763722050240d88fd66dc"
+        },
+        "STAT": {
+          "source": "0baf0fd6a8072fe94e334314ef39a7b0705d10b1d87bda3064b7a42b49409d87",
+          "derived": "0baf0fd6a8072fe94e334314ef39a7b0705d10b1d87bda3064b7a42b49409d87"
+        },
+        "cmap": {
+          "source": "e445530caa1237d2e702bf57739e3f49dd12c4655232730dbf6911701628ba8f",
+          "derived": "e445530caa1237d2e702bf57739e3f49dd12c4655232730dbf6911701628ba8f"
+        },
+        "gasp": {
+          "source": "4ca731f86ad506ac0e320283dc9461926346de3c4d91d539ea7f6620d3826940",
+          "derived": "4ca731f86ad506ac0e320283dc9461926346de3c4d91d539ea7f6620d3826940"
+        },
+        "glyf": {
+          "source": "f7803947410d9bbb90fe334c54e9f795472906b2bdcec440d06d3e2b3774df76",
+          "derived": "f7803947410d9bbb90fe334c54e9f795472906b2bdcec440d06d3e2b3774df76"
+        },
+        "loca": {
+          "source": "433931c86d8f054ba27700c78d5da2311beda0763c43b094ce13fef10d9446c8",
+          "derived": "433931c86d8f054ba27700c78d5da2311beda0763c43b094ce13fef10d9446c8"
+        },
+        "head": {
+          "source": "4decef710ba00c7f3572533fdc040a3d6620994305763f098a3ac811eb08c1ac",
+          "derived": "8cee39a8ee21f3165bb6725279db18fc18b5db4a6be53406be8c12b1040ca95e"
+        },
+        "hhea": {
+          "source": "912e91dab973d29467f236ede8e4a92f82be780340b82f5d2be68eed203b9d9a",
+          "derived": "912e91dab973d29467f236ede8e4a92f82be780340b82f5d2be68eed203b9d9a"
+        },
+        "hmtx": {
+          "source": "7452e0a601a9411e3928461e53e602e7baee028c6f75d53fe82dd42a9c2ba5cc",
+          "derived": "7452e0a601a9411e3928461e53e602e7baee028c6f75d53fe82dd42a9c2ba5cc"
+        },
+        "maxp": {
+          "source": "009adfc02e36647146140997856eb02fac90642eb33c61f2789966452c93e9d9",
+          "derived": "009adfc02e36647146140997856eb02fac90642eb33c61f2789966452c93e9d9"
+        },
+        "name": {
+          "source": "c1307319d66174ac714738727a475be0611fa04805e2a1d99bfc83dd7fd18c95",
+          "derived": "c1307319d66174ac714738727a475be0611fa04805e2a1d99bfc83dd7fd18c95"
+        },
+        "post": {
+          "source": "dcd913d505855b506c7f1baeb2d5ccc8b3d07293db0cda32df136aea770b8530",
+          "derived": "dcd913d505855b506c7f1baeb2d5ccc8b3d07293db0cda32df136aea770b8530"
+        },
+        "prep": {
+          "source": "907c4106ff9989c1805827d5581bdf107a253b098cb71eb374f5e47c35604452",
+          "derived": "907c4106ff9989c1805827d5581bdf107a253b098cb71eb374f5e47c35604452"
+        }
+      }
+    },
+    {
+      "source": "files/noto-sans-sc-chinese-simplified-400-normal.woff2",
+      "package": "@fontsource/noto-sans-sc@5.2.9",
+      "sourceSha256": "95e3633b6a98f764ba3adfb54504a0cd4799328c009adf9081d6c1850f9c4c78",
+      "derived": "NotoSansSC/400.ttf",
+      "derivedSha256": "5ef4a671129ea40431330c1e4d3d6af36c1f9c7cb89027ad7877ea5f1e79b9e7",
+      "weight": 400,
+      "nativeFamily": "Noto Sans SC Thin",
+      "glyphCount": 8248,
+      "cmapCount": 7946,
+      "tables": {
+        "BASE": {
+          "source": "1f51c2d2026fc9a9405cac27d8641d1a52fefaf0cacc02a66a660332b54118be",
+          "derived": "1f51c2d2026fc9a9405cac27d8641d1a52fefaf0cacc02a66a660332b54118be"
+        },
+        "GDEF": {
+          "source": "3429fc0fa2004977447d4ea28371d47164b297bb6ea7d097c8c501f1a5fe6f6f",
+          "derived": "3429fc0fa2004977447d4ea28371d47164b297bb6ea7d097c8c501f1a5fe6f6f"
+        },
+        "GPOS": {
+          "source": "4256cbefe4b0e8bf100fc35187917d7fd14dbb6ff848e6edb18b8338c66aa4ca",
+          "derived": "4256cbefe4b0e8bf100fc35187917d7fd14dbb6ff848e6edb18b8338c66aa4ca"
+        },
+        "GSUB": {
+          "source": "41dbe384ba609c93fe99da0c8567969fee381e3678f56f836033d2105b9b457f",
+          "derived": "41dbe384ba609c93fe99da0c8567969fee381e3678f56f836033d2105b9b457f"
+        },
+        "OS/2": {
+          "source": "d38ae9c464caee499a315bbe078429a5190880414e882bfef28595e5b8b97612",
+          "derived": "d38ae9c464caee499a315bbe078429a5190880414e882bfef28595e5b8b97612"
+        },
+        "STAT": {
+          "source": "c344390a0895ba75ea01b8ce449ef9633301b10db58290f71c85c6952092bee6",
+          "derived": "c344390a0895ba75ea01b8ce449ef9633301b10db58290f71c85c6952092bee6"
+        },
+        "cmap": {
+          "source": "cc91e8176e45bda7a35500e532f4342fb758da90b5a03fa29e8c33d8fd111218",
+          "derived": "cc91e8176e45bda7a35500e532f4342fb758da90b5a03fa29e8c33d8fd111218"
+        },
+        "gasp": {
+          "source": "4ca731f86ad506ac0e320283dc9461926346de3c4d91d539ea7f6620d3826940",
+          "derived": "4ca731f86ad506ac0e320283dc9461926346de3c4d91d539ea7f6620d3826940"
+        },
+        "glyf": {
+          "source": "79d24bab44b8881d9961f1ad61069e5b6287590a5c2a97694950d23632310586",
+          "derived": "79d24bab44b8881d9961f1ad61069e5b6287590a5c2a97694950d23632310586"
+        },
+        "loca": {
+          "source": "ff4f01b1175a9678baf5ab7fdfda8d15e2cfca88c18380f2472728b1774b2a19",
+          "derived": "ff4f01b1175a9678baf5ab7fdfda8d15e2cfca88c18380f2472728b1774b2a19"
+        },
+        "head": {
+          "source": "b0a58a366a320e225bea72301e684da3e5a1e6d6bb0c29ad3a248dcfd7b54516",
+          "derived": "0b38ce4de472b42db2bc12de98aa99368aa088bb7ffae81b240f9cf0fc92feda"
+        },
+        "hhea": {
+          "source": "3d8a0bd91408a00876d1b1c65ae5bfd24e250888bc07541f030ce8ef1298f865",
+          "derived": "3d8a0bd91408a00876d1b1c65ae5bfd24e250888bc07541f030ce8ef1298f865"
+        },
+        "hmtx": {
+          "source": "771d06922161db673f97a0e4a146a75329400309ed897cd97954b1e341f387bb",
+          "derived": "771d06922161db673f97a0e4a146a75329400309ed897cd97954b1e341f387bb"
+        },
+        "maxp": {
+          "source": "0704f07471f509006a2d036cb40b9a729ce4c5b1cf97a721b70bf4388c2bcc91",
+          "derived": "0704f07471f509006a2d036cb40b9a729ce4c5b1cf97a721b70bf4388c2bcc91"
+        },
+        "name": {
+          "source": "c1f2633793a4019799087f02fb9f6eefca9540e949bc076722a1415e26cc75e9",
+          "derived": "c1f2633793a4019799087f02fb9f6eefca9540e949bc076722a1415e26cc75e9"
+        },
+        "post": {
+          "source": "22dd499f08932214bde96943f3882f3619324478217095c049b68a57c6c10693",
+          "derived": "22dd499f08932214bde96943f3882f3619324478217095c049b68a57c6c10693"
+        },
+        "prep": {
+          "source": "907c4106ff9989c1805827d5581bdf107a253b098cb71eb374f5e47c35604452",
+          "derived": "907c4106ff9989c1805827d5581bdf107a253b098cb71eb374f5e47c35604452"
+        },
+        "vhea": {
+          "source": "4237d6584b0ad3dd1093113885c3064635def92a27b167597d0a33f78ac44079",
+          "derived": "4237d6584b0ad3dd1093113885c3064635def92a27b167597d0a33f78ac44079"
+        },
+        "vmtx": {
+          "source": "196068d89cd24ad59624787da30780cd3c3ae4332e33ff14b1967a40ee9cac39",
+          "derived": "196068d89cd24ad59624787da30780cd3c3ae4332e33ff14b1967a40ee9cac39"
+        }
+      }
+    },
+    {
+      "source": "files/noto-sans-sc-chinese-simplified-500-normal.woff2",
+      "package": "@fontsource/noto-sans-sc@5.2.9",
+      "sourceSha256": "885f52ca6a25fddde7641eaf9cf6d6fd9e8f1a454f99f77f0f1be1be0c6470a5",
+      "derived": "NotoSansSC/500.ttf",
+      "derivedSha256": "60c232db0f3a36217af4fd6107743fd497482b8782f922c903c40a980d2c0030",
+      "weight": 500,
+      "nativeFamily": "Noto Sans SC Thin",
+      "glyphCount": 8248,
+      "cmapCount": 7946,
+      "tables": {
+        "BASE": {
+          "source": "bfbe43204ca6aaacc0cb774c6338d910634471e516ef9b1a8412b9a2b2a8422d",
+          "derived": "bfbe43204ca6aaacc0cb774c6338d910634471e516ef9b1a8412b9a2b2a8422d"
+        },
+        "GDEF": {
+          "source": "3429fc0fa2004977447d4ea28371d47164b297bb6ea7d097c8c501f1a5fe6f6f",
+          "derived": "3429fc0fa2004977447d4ea28371d47164b297bb6ea7d097c8c501f1a5fe6f6f"
+        },
+        "GPOS": {
+          "source": "22ac6fb954185a1c7b80fe07c53e96845ce62882fdb32bed08cf2000198e33fd",
+          "derived": "22ac6fb954185a1c7b80fe07c53e96845ce62882fdb32bed08cf2000198e33fd"
+        },
+        "GSUB": {
+          "source": "41dbe384ba609c93fe99da0c8567969fee381e3678f56f836033d2105b9b457f",
+          "derived": "41dbe384ba609c93fe99da0c8567969fee381e3678f56f836033d2105b9b457f"
+        },
+        "OS/2": {
+          "source": "5b43331faa2ab16020af3e6dd470b3279e95ad0f74c99f0fc008fef6549537a3",
+          "derived": "5b43331faa2ab16020af3e6dd470b3279e95ad0f74c99f0fc008fef6549537a3"
+        },
+        "STAT": {
+          "source": "6fce8afc4b74998407c50dd3b134c098020c16708910b92c9574fe32ca2c7a22",
+          "derived": "6fce8afc4b74998407c50dd3b134c098020c16708910b92c9574fe32ca2c7a22"
+        },
+        "cmap": {
+          "source": "cc91e8176e45bda7a35500e532f4342fb758da90b5a03fa29e8c33d8fd111218",
+          "derived": "cc91e8176e45bda7a35500e532f4342fb758da90b5a03fa29e8c33d8fd111218"
+        },
+        "gasp": {
+          "source": "4ca731f86ad506ac0e320283dc9461926346de3c4d91d539ea7f6620d3826940",
+          "derived": "4ca731f86ad506ac0e320283dc9461926346de3c4d91d539ea7f6620d3826940"
+        },
+        "glyf": {
+          "source": "f6dc3f8e9fa4c6b0439e40f5640691f3eacaa7a0c0f7298364bb04d85df25930",
+          "derived": "f6dc3f8e9fa4c6b0439e40f5640691f3eacaa7a0c0f7298364bb04d85df25930"
+        },
+        "loca": {
+          "source": "da2bd008d4fa59985b59f75245f446ddd78c220194bff80f4424073b5e1fe8c8",
+          "derived": "da2bd008d4fa59985b59f75245f446ddd78c220194bff80f4424073b5e1fe8c8"
+        },
+        "head": {
+          "source": "288125534ed563ffd9adf8b2f698e8ed68da3288e1a733d548635971ff80b1bc",
+          "derived": "761338b0e80db29875569c1e3e483e0df6a9813c3bab6a74086f2c038d67c2c9"
+        },
+        "hhea": {
+          "source": "b4eea20bf11cdd10d74d5ff728a5b1492e5fb55e01ab4b0932bb85351e807a23",
+          "derived": "b4eea20bf11cdd10d74d5ff728a5b1492e5fb55e01ab4b0932bb85351e807a23"
+        },
+        "hmtx": {
+          "source": "8e929b331f8fc64daa4f8d1e4b035585ec2dcffac813e7873f22653e6d57711d",
+          "derived": "8e929b331f8fc64daa4f8d1e4b035585ec2dcffac813e7873f22653e6d57711d"
+        },
+        "maxp": {
+          "source": "0704f07471f509006a2d036cb40b9a729ce4c5b1cf97a721b70bf4388c2bcc91",
+          "derived": "0704f07471f509006a2d036cb40b9a729ce4c5b1cf97a721b70bf4388c2bcc91"
+        },
+        "name": {
+          "source": "b018cf351b81aa4dc0027c4431b4c4bdac76c38117368bd5a9cd6ce494d4eb65",
+          "derived": "b018cf351b81aa4dc0027c4431b4c4bdac76c38117368bd5a9cd6ce494d4eb65"
+        },
+        "post": {
+          "source": "22dd499f08932214bde96943f3882f3619324478217095c049b68a57c6c10693",
+          "derived": "22dd499f08932214bde96943f3882f3619324478217095c049b68a57c6c10693"
+        },
+        "prep": {
+          "source": "907c4106ff9989c1805827d5581bdf107a253b098cb71eb374f5e47c35604452",
+          "derived": "907c4106ff9989c1805827d5581bdf107a253b098cb71eb374f5e47c35604452"
+        },
+        "vhea": {
+          "source": "b0fa8ac48281094b0b3f9eb444e4e4f8e91db6c4f841395e0cb14870e618169f",
+          "derived": "b0fa8ac48281094b0b3f9eb444e4e4f8e91db6c4f841395e0cb14870e618169f"
+        },
+        "vmtx": {
+          "source": "1a77a395eb4d0b371ab75ddd29511fc1193794e435548d72f2b1b1ee67a8090c",
+          "derived": "1a77a395eb4d0b371ab75ddd29511fc1193794e435548d72f2b1b1ee67a8090c"
+        }
+      }
+    },
+    {
+      "source": "files/noto-sans-sc-chinese-simplified-700-normal.woff2",
+      "package": "@fontsource/noto-sans-sc@5.2.9",
+      "sourceSha256": "e1df51edc00bce27b58044e829fb8ec6accc8a5daece475413de90d52818845c",
+      "derived": "NotoSansSC/700.ttf",
+      "derivedSha256": "bb0267a62c044b8a6c10db5678cde26ceedc5369196477b81e7a78fbaa9752d9",
+      "weight": 700,
+      "nativeFamily": "Noto Sans SC Thin",
+      "glyphCount": 8248,
+      "cmapCount": 7946,
+      "tables": {
+        "BASE": {
+          "source": "792c5e681566d19f062bc594fc35168fd9f5f71a0e2f046337557839f8ac1566",
+          "derived": "792c5e681566d19f062bc594fc35168fd9f5f71a0e2f046337557839f8ac1566"
+        },
+        "GDEF": {
+          "source": "3429fc0fa2004977447d4ea28371d47164b297bb6ea7d097c8c501f1a5fe6f6f",
+          "derived": "3429fc0fa2004977447d4ea28371d47164b297bb6ea7d097c8c501f1a5fe6f6f"
+        },
+        "GPOS": {
+          "source": "365fda25b2f0cd87bd9dbea390470fa38409903cb60dcec0e32a6433dc974b76",
+          "derived": "365fda25b2f0cd87bd9dbea390470fa38409903cb60dcec0e32a6433dc974b76"
+        },
+        "GSUB": {
+          "source": "41dbe384ba609c93fe99da0c8567969fee381e3678f56f836033d2105b9b457f",
+          "derived": "41dbe384ba609c93fe99da0c8567969fee381e3678f56f836033d2105b9b457f"
+        },
+        "OS/2": {
+          "source": "7c3abf63fdb3eda936558727084358e6563cc6eaec2d67bf390318a9844c015c",
+          "derived": "7c3abf63fdb3eda936558727084358e6563cc6eaec2d67bf390318a9844c015c"
+        },
+        "STAT": {
+          "source": "604ed61397b469bdab63533ed7fe1e124e888266e2bfe4a593a1f23e9d765dd1",
+          "derived": "604ed61397b469bdab63533ed7fe1e124e888266e2bfe4a593a1f23e9d765dd1"
+        },
+        "cmap": {
+          "source": "cc91e8176e45bda7a35500e532f4342fb758da90b5a03fa29e8c33d8fd111218",
+          "derived": "cc91e8176e45bda7a35500e532f4342fb758da90b5a03fa29e8c33d8fd111218"
+        },
+        "gasp": {
+          "source": "4ca731f86ad506ac0e320283dc9461926346de3c4d91d539ea7f6620d3826940",
+          "derived": "4ca731f86ad506ac0e320283dc9461926346de3c4d91d539ea7f6620d3826940"
+        },
+        "glyf": {
+          "source": "3fab061bbb518ff2b765106dfc110d46c34d46bff8d3f597f7d6e345b06422bb",
+          "derived": "3fab061bbb518ff2b765106dfc110d46c34d46bff8d3f597f7d6e345b06422bb"
+        },
+        "loca": {
+          "source": "97f191c89feb8c6d39aa56ffb25e6cbcfff7d0a06449946687a0d0af05a88008",
+          "derived": "97f191c89feb8c6d39aa56ffb25e6cbcfff7d0a06449946687a0d0af05a88008"
+        },
+        "head": {
+          "source": "6d0aaf04785cb37fde2ffb68438b99cdde8ea770050b4e237329f6901a6bf2a1",
+          "derived": "73c003740d062c39d52d39e095564b934d13dc5c02418167e97ea38629a5a46b"
+        },
+        "hhea": {
+          "source": "c6c68c23c67b9121723faa34ccc01276451d4bb34b573749eda4922f6a44c797",
+          "derived": "c6c68c23c67b9121723faa34ccc01276451d4bb34b573749eda4922f6a44c797"
+        },
+        "hmtx": {
+          "source": "c9273a57b8e23554895f30eb3b7c649a51a6d4446a54274dd6c01f3171d64f70",
+          "derived": "c9273a57b8e23554895f30eb3b7c649a51a6d4446a54274dd6c01f3171d64f70"
+        },
+        "maxp": {
+          "source": "0704f07471f509006a2d036cb40b9a729ce4c5b1cf97a721b70bf4388c2bcc91",
+          "derived": "0704f07471f509006a2d036cb40b9a729ce4c5b1cf97a721b70bf4388c2bcc91"
+        },
+        "name": {
+          "source": "123428d3ff482b00dc34629947a4a559ab511f8edb23fbf73746e334f0703fa6",
+          "derived": "123428d3ff482b00dc34629947a4a559ab511f8edb23fbf73746e334f0703fa6"
+        },
+        "post": {
+          "source": "22dd499f08932214bde96943f3882f3619324478217095c049b68a57c6c10693",
+          "derived": "22dd499f08932214bde96943f3882f3619324478217095c049b68a57c6c10693"
+        },
+        "prep": {
+          "source": "907c4106ff9989c1805827d5581bdf107a253b098cb71eb374f5e47c35604452",
+          "derived": "907c4106ff9989c1805827d5581bdf107a253b098cb71eb374f5e47c35604452"
+        },
+        "vhea": {
+          "source": "6e5abc8ab08d8c471c6860cd1ccdb4686403870a66de88fd009480e3fadf06b8",
+          "derived": "6e5abc8ab08d8c471c6860cd1ccdb4686403870a66de88fd009480e3fadf06b8"
+        },
+        "vmtx": {
+          "source": "18eedccfb1196b1f0aca5611802dd367e15edb1bc1fb68b872eae65af2b8e3f1",
+          "derived": "18eedccfb1196b1f0aca5611802dd367e15edb1bc1fb68b872eae65af2b8e3f1"
+        }
+      }
+    }
+  ],
+  "scope": "Batch3 Latin, symbols and Simplified Chinese; not the complete multilingual Web repertoire",
+  "chineseCodepoints": [
+    "U+4E0D",
+    "U+4E0E",
+    "U+4E3A",
+    "U+4F5C",
+    "U+4F7F",
+    "U+5185",
+    "U+533A",
+    "U+54CD",
+    "U+57FA",
+    "U+590D",
+    "U+5951",
+    "U+5B9A",
+    "U+5BB9",
+    "U+5BFC",
+    "U+5DE5",
+    "U+5E94",
+    "U+5F0F",
+    "U+5F85",
+    "U+5FAE",
+    "U+6392",
+    "U+6587",
+    "U+65E0",
+    "U+6682",
+    "U+6807",
+    "U+6838",
+    "U+7248",
+    "U+7387",
+    "U+7406",
+    "U+7528",
+    "U+7A33",
+    "U+7A3F",
+    "U+7A7A",
+    "U+7AE0",
+    "U+7BA1",
+    "U+7EA6",
+    "U+7EBF",
+    "U+80FD",
+    "U+822A",
+    "U+8349",
+    "U+8F6F",
+    "U+96C5",
+    "U+9875",
+    "U+9898",
+    "U+9996",
+    "U+9ED1"
+  ],
+  "webSubsetChecks": [
+    {
+      "source": "files/noto-sans-sc-107-400-normal.woff2",
+      "sourceSha256": "6d4a79aff3792b5dd83aad78768e050c9e5cad336c6db1a6932b33db15a06664",
+      "weight": 400,
+      "unicodeRange": "U+200b,U+2103,U+4e18,U+4e27-4e28,U+4e38,U+4e59,U+4e8f,U+4ead,U+4ec7,U+4fe9,U+503a,U+5085,U+5146,U+51af,U+51f8,U+52ab,U+5339,U+535c,U+5378,U+538c,U+5398,U+53f9,U+5415,U+5475,U+54aa,U+54ac,U+54b8,U+5582,U+5760,U+5764,U+57cb,U+5835,U+5885,U+5951,U+5983,U+59da,U+5a77,U+5b5d,U+5b5f,U+5bb5,U+5bc2,U+5be8,U+5bfa,U+5c2c,U+5c34,U+5c41,U+5c48,U+5c65,U+5cad,U+5e06,U+5e42,U+5ef7,U+5f17,U+5f25,U+5f6d,U+5f79,U+6028,U+6064,U+6068,U+606d,U+607c,U+6094,U+6109,U+6124,U+6247,U+626d,U+6291,U+629a,U+62ac,U+62b9,U+62fe,U+6324,U+6349,U+6367,U+6398,U+6495,U+64a4,U+64b0,U+64bc,U+64ce,U+658c,U+65ed,U+6602,U+6674,U+6691,U+66a8,U+674f,U+679a,U+67ef,U+67f4,U+680b,U+6876,U+68a8,U+6a59,U+6a61,U+6b20,U+6bc5,U+6d12,U+6d46,U+6d8c,U+6dc0,U+6e14,U+6e23,U+6f06,U+7164,U+716e,U+7199,U+71e5,U+72ac,U+742a,U+755c,U+75ab,U+75b2,U+75f4,U+7897,U+78b3,U+78c5,U+7978,U+79fd,U+7a74,U+7b4b,U+7b5b,U+7ece,U+7ed2,U+7ee3,U+7ef3,U+7f50,U+7f55,U+7f9e,U+7fe0,U+809d,U+8106,U+814a,U+8154,U+817b,U+818f,U+81c2,U+81ed,U+821f,U+82a6,U+82d1,U+8302,U+83c7,U+83ca,U+845b,U+848b,U+84c9,U+85e4,U+86ee,U+8700,U+8774,U+8881,U+8c1c,U+8c79,U+8d2a,U+8d3c,U+8eba,U+8f70,U+8fa9,U+8fb1,U+900a,U+9017,U+901d,U+9022,U+906e,U+946b,U+94dd,U+94ed,U+953b,U+95ef,U+95fa,U+95fd,U+96c0,U+971e,U+9753,U+9756,U+97e6,U+9881,U+9887,U+9b4f,U+9e2d,U+9f0e,U+e601-e602,U+e604-e605,U+ff5c",
+      "codepoints": [
+        "U+5951"
+      ],
+      "outlinesAndHorizontalVerticalMetrics": "identical"
+    },
+    {
+      "source": "files/noto-sans-sc-113-400-normal.woff2",
+      "sourceSha256": "f2fd94429f722da169fb4b0a3a132ef5bf92d0b0aa3ae3426006446d50994c36",
+      "weight": 400,
+      "unicodeRange": "U+26,U+3c,U+d7,U+4e4e,U+4e61,U+4e71,U+4ebf,U+4f26,U+5012,U+51ac,U+51b0,U+51b2,U+51b7,U+5218,U+521a,U+5220,U+5237,U+523b,U+526f,U+5385,U+53bf,U+53e5,U+53eb,U+53f3,U+53f6,U+5409,U+5438,U+54c8,U+54e5,U+552f,U+5584,U+5706,U+5723,U+5750,U+575a,U+5987-5988,U+59b9,U+59d0,U+59d4,U+5b88,U+5b9c,U+5bdf,U+5bfb,U+5c01,U+5c04,U+5c3e,U+5c4b,U+5c4f,U+5c9b,U+5cf0,U+5ddd,U+5de6,U+5de8,U+5e01,U+5e78,U+5e7b,U+5e9c,U+5ead,U+5ef6,U+5f39,U+5fd8,U+6000,U+6025,U+604b,U+6076,U+613f,U+6258,U+6263,U+6267,U+6298,U+62a2,U+62e5,U+62ec,U+6311,U+6377,U+6388-6389,U+63a2,U+63d2,U+641e,U+642d,U+654f,U+6551,U+6597,U+65cf,U+65d7,U+65e7,U+6682,U+66f2,U+671d,U+672b,U+6740,U+6751,U+6768,U+6811,U+6863,U+6982,U+6bd2,U+6cf0,U+6d0b,U+6d17,U+6d59,U+6dd8,U+6dfb,U+6e7e,U+6f6e,U+6fb3,U+706f,U+719f,U+72af,U+72d0,U+72d7,U+732b,U+732e,U+7389,U+73e0,U+7530,U+7687,U+76d6,U+76db,U+7840,U+786c,U+79cb,U+79d2,U+7a0e,U+7a33,U+7a3f,U+7a97,U+7ade-7adf,U+7b26,U+7e41,U+7ec3,U+7f3a,U+8089,U+80dc,U+811a,U+8131,U+8138,U+821e,U+8349,U+83dc,U+8457,U+867d,U+86cb,U+8a89,U+8ba8,U+8bad,U+8bef,U+8bfe,U+8c6a,U+8d1d,U+8d4f,U+8d62,U+8dd1,U+8df3,U+8f6e,U+8ff9,U+900f,U+9014,U+9057,U+9192,U+91ce,U+9488,U+94a2,U+9547,U+955c,U+95f2,U+9644,U+964d,U+96c4-96c5,U+96e8,U+96f6-96f7,U+9732,U+9759,U+9760,U+987a,U+989c,U+9910,U+996d-996e,U+9b54,U+9e21,U+9ebb,U+9f50",
+      "codepoints": [
+        "U+6682",
+        "U+7A33",
+        "U+7A3F",
+        "U+8349",
+        "U+96C5"
+      ],
+      "outlinesAndHorizontalVerticalMetrics": "identical"
+    },
+    {
+      "source": "files/noto-sans-sc-115-400-normal.woff2",
+      "sourceSha256": "d83b8291340e0024c8a573afe48b60ce22ed00d87619a7f3950b2193d19af6c9",
+      "weight": 400,
+      "unicodeRange": "U+25,U+4e14,U+4e1d,U+4e3d,U+4e49,U+4e60,U+4e9a,U+4eb2,U+4ec5,U+4efd,U+4f3c,U+4f4f,U+4f8b,U+4fbf,U+5019,U+5145,U+514b,U+516b,U+516d,U+5174,U+5178,U+517b,U+5199,U+519b,U+51b3,U+51b5,U+5207,U+5212,U+5219,U+521d,U+52bf,U+533b,U+5343,U+5347,U+534a,U+536b,U+5370,U+53e4,U+53f2,U+5403,U+542c,U+547d,U+54a8,U+54cd,U+54ea,U+552e,U+56f4,U+5747,U+575b,U+5883,U+589e,U+5931,U+5947,U+5956-5957,U+5a92,U+5b83,U+5ba4,U+5bb3,U+5bcc,U+5c14,U+5c1a,U+5c3d,U+5c40,U+5c45,U+5c5e,U+5df4,U+5e72,U+5e95,U+5f80,U+5f85,U+5fb7,U+5fd7,U+601d,U+626b,U+627f,U+62c9,U+62cd,U+6309,U+63a7,U+6545,U+65ad,U+65af,U+65c5,U+666e,U+667a,U+670b,U+671b,U+674e,U+677f,U+6781,U+6790,U+6797,U+6821,U+6838-6839,U+697c,U+6b27,U+6b62,U+6bb5,U+6c7d,U+6c99,U+6d4b,U+6d4e,U+6d6a,U+6e29,U+6e2f,U+6ee1,U+6f14,U+6f2b,U+72b6,U+72ec,U+7387,U+7533,U+753b,U+76ca,U+76d8,U+7701,U+773c,U+77ed,U+77f3,U+7814,U+793c,U+79bb,U+79c1,U+79d8,U+79ef,U+79fb,U+7a76,U+7b11,U+7b54,U+7b56,U+7b97,U+7bc7,U+7c73,U+7d20,U+7eaa,U+7ec8,U+7edd,U+7eed,U+7efc,U+7fa4,U+804c,U+8058,U+80cc,U+8111,U+817e,U+826f,U+8303,U+843d,U+89c9,U+89d2,U+8ba2,U+8bbf,U+8bc9,U+8bcd,U+8be6,U+8c22,U+8c61,U+8d22,U+8d26-8d27,U+8d8a,U+8f6f,U+8f7b,U+8f83,U+8f91,U+8fb9,U+8fd4,U+8fdc,U+9002,U+94b1,U+9519,U+95ed,U+961f,U+9632-9633,U+963f,U+968f-9690,U+96be,U+9876,U+9884,U+98de,U+9988,U+9999,U+9ec4,U+ff1b",
+      "codepoints": [
+        "U+54CD",
+        "U+5F85",
+        "U+6838",
+        "U+7387",
+        "U+8F6F"
+      ],
+      "outlinesAndHorizontalVerticalMetrics": "identical"
+    },
+    {
+      "source": "files/noto-sans-sc-116-400-normal.woff2",
+      "sourceSha256": "5744f8001a3e231990bd1fe87b080bdd4b4d0e658c84a3bcdb5555e57e32661a",
+      "weight": 400,
+      "unicodeRange": "U+2b,U+40,U+3000,U+300a-300b,U+4e16,U+4e66,U+4e70,U+4e91-4e92,U+4e94,U+4e9b,U+4ec0,U+4eca,U+4f01,U+4f17-4f18,U+4f46,U+4f4e,U+4f9b,U+4fee,U+503c,U+5065,U+50cf,U+513f,U+5148,U+518d,U+51c6,U+51e0,U+5217,U+529e-529f,U+5341,U+534f,U+5361,U+5386,U+53c2,U+53c8,U+53cc,U+53d7-53d8,U+53ea,U+5404,U+5411,U+5417,U+5427,U+5468,U+559c,U+5668,U+56e0,U+56e2,U+56ed,U+5740,U+57fa,U+58eb,U+5904,U+592a,U+59cb,U+5a31,U+5b58,U+5b9d,U+5bc6,U+5c71,U+5dde,U+5df1,U+5e08,U+5e26,U+5e2e,U+5e93,U+5e97,U+5eb7,U+5f15,U+5f20,U+5f3a,U+5f62,U+5f69,U+5f88,U+5f8b,U+5fc5,U+600e,U+620f,U+6218,U+623f,U+627e,U+628a,U+62a4,U+62db,U+62e9,U+6307,U+6362,U+636e,U+64ad,U+6539,U+653f,U+6548,U+6574,U+6613,U+6625,U+663e,U+666f,U+672a,U+6750,U+6784,U+6a21,U+6b3e,U+6b65,U+6bcf,U+6c11,U+6c5f,U+6df1,U+706b,U+7167,U+724c,U+738b,U+73a9,U+73af,U+7403,U+7537,U+754c,U+7559,U+767d,U+7740,U+786e,U+795e,U+798f,U+79f0,U+7aef,U+7b7e,U+7bb1,U+7ea2,U+7ea6,U+7ec4,U+7ec6,U+7ecd,U+7edc,U+7ef4,U+8003,U+80b2,U+81f3-81f4,U+822a,U+827a,U+82f1,U+83b7,U+8425,U+89c2,U+89c8,U+8ba9,U+8bb8,U+8bc6,U+8bd5,U+8be2,U+8be5,U+8bed,U+8c03,U+8d23,U+8d2d,U+8d34,U+8d70,U+8db3,U+8fbe,U+8fce,U+8fd1,U+8fde,U+9001,U+901f-9020,U+90a3,U+914d,U+91c7,U+94fe,U+9500,U+952e,U+9605,U+9645,U+9662,U+9664,U+9700,U+9752,U+975e,U+97f3,U+9879,U+9886,U+98df,U+9a6c,U+9a8c,U+9ed1,U+9f99",
+      "codepoints": [
+        "U+57FA",
+        "U+7EA6",
+        "U+822A",
+        "U+9ED1"
+      ],
+      "outlinesAndHorizontalVerticalMetrics": "identical"
+    },
+    {
+      "source": "files/noto-sans-sc-117-400-normal.woff2",
+      "sourceSha256": "bf7c1b4b8b0d1110c761720b977d237d350130d29db48aea0bc5189f572dad3d",
+      "weight": 400,
+      "unicodeRange": "U+4e,U+201c-201d,U+3010-3011,U+4e07,U+4e1c,U+4e24,U+4e3e,U+4e48,U+4e50,U+4e5f,U+4e8b-4e8c,U+4ea4,U+4eab-4eac,U+4ecb,U+4ece,U+4ed6,U+4ee3,U+4ef6-4ef7,U+4efb,U+4f20,U+4f55,U+4f7f,U+4fdd,U+505a,U+5143,U+5149,U+514d,U+5171,U+5177,U+518c,U+51fb,U+521b,U+5229,U+522b,U+52a9,U+5305,U+5317,U+534e,U+5355,U+5357,U+535a,U+5373,U+539f,U+53bb,U+53ca,U+53cd,U+53d6,U+53e3,U+53f0,U+5458,U+5546,U+56db,U+573a,U+578b,U+57ce,U+58f0,U+590d,U+5934,U+5973,U+5b57,U+5b8c,U+5b98,U+5bb9,U+5bfc,U+5c06,U+5c11,U+5c31,U+5c55,U+5df2,U+5e03,U+5e38,U+5e76,U+5e94,U+5efa,U+5f71,U+5f97,U+5feb,U+6001,U+603b,U+60f3,U+611f,U+6216,U+624d,U+6253,U+6295,U+6301,U+6392,U+641c,U+652f,U+653e,U+6559,U+6599,U+661f,U+671f,U+672f,U+6761,U+67e5,U+6807,U+6837,U+683c,U+6848,U+6b22,U+6b64,U+6bd4,U+6c14,U+6c34,U+6c42,U+6ca1,U+6d41,U+6d77,U+6d88,U+6e05,U+6e38,U+6e90,U+7136,U+7231,U+7531,U+767e,U+76ee,U+76f4,U+771f,U+7801,U+793a,U+79cd,U+7a0b,U+7a7a,U+7acb,U+7ae0,U+7b2c,U+7b80,U+7ba1,U+7cbe,U+7d22,U+7ea7,U+7ed3,U+7ed9,U+7edf,U+7f16,U+7f6e,U+8001,U+800c,U+8272,U+8282,U+82b1,U+8350,U+88ab,U+88c5,U+897f,U+89c1,U+89c4,U+89e3,U+8a00,U+8ba1,U+8ba4,U+8bae-8bb0,U+8bbe,U+8bc1,U+8bc4,U+8bfb,U+8d28,U+8d39,U+8d77,U+8d85,U+8def,U+8eab,U+8f66,U+8f6c,U+8f7d,U+8fd0,U+9009,U+90ae,U+90fd,U+91cc-91cd,U+91cf,U+95fb,U+9650,U+96c6,U+9891,U+98ce,U+ff1f",
+      "codepoints": [
+        "U+4F7F",
+        "U+590D",
+        "U+5BB9",
+        "U+5BFC",
+        "U+5E94",
+        "U+6392",
+        "U+6807",
+        "U+7A7A",
+        "U+7AE0",
+        "U+7BA1"
+      ],
+      "outlinesAndHorizontalVerticalMetrics": "identical"
+    },
+    {
+      "source": "files/noto-sans-sc-118-400-normal.woff2",
+      "sourceSha256": "b6be37866f0d950777a6ce2ab417aba11acc3c52786072b0d760da2a277cd248",
+      "weight": 400,
+      "unicodeRange": "U+d,U+3e,U+5f,U+7c,U+a0,U+a9,U+4e09-4e0b,U+4e0d-4e0e,U+4e13,U+4e1a,U+4e2a,U+4e3a-4e3b,U+4e4b,U+4e86,U+4e8e,U+4ea7,U+4eba,U+4ee4-4ee5,U+4eec,U+4f1a,U+4f4d,U+4f53,U+4f5c,U+4f60,U+4fe1,U+5165,U+5168,U+516c,U+5173,U+5176,U+5185,U+51fa,U+5206,U+5230,U+5236,U+524d,U+529b,U+52a0-52a1,U+52a8,U+5316,U+533a,U+53cb,U+53d1,U+53ef,U+53f7-53f8,U+5408,U+540c-540e,U+544a,U+548c,U+54c1,U+56de,U+56fd-56fe,U+5728,U+5730,U+5907,U+5916,U+591a,U+5927,U+5929,U+597d,U+5982,U+5b50,U+5b66,U+5b89,U+5b9a,U+5b9e,U+5ba2,U+5bb6,U+5bf9,U+5c0f,U+5de5,U+5e02,U+5e73-5e74,U+5e7f,U+5ea6,U+5f00,U+5f0f,U+5f53,U+5f55,U+5fae,U+5fc3,U+6027,U+606f,U+60a8,U+60c5,U+610f,U+6210-6211,U+6237,U+6240,U+624b,U+6280,U+62a5,U+63a5,U+63a8,U+63d0,U+6536,U+6570,U+6587,U+65b9,U+65e0,U+65f6,U+660e,U+662d,U+662f,U+66f4,U+6700,U+670d,U+672c,U+673a,U+6743,U+6765,U+679c,U+682a,U+6b21,U+6b63,U+6cbb,U+6cd5,U+6ce8,U+6d3b,U+70ed,U+7247-7248,U+7269,U+7279,U+73b0,U+7406,U+751f,U+7528,U+7535,U+767b,U+76f8,U+770b,U+77e5,U+793e,U+79d1,U+7ad9,U+7b49,U+7c7b,U+7cfb,U+7ebf,U+7ecf,U+7f8e,U+8005,U+8054,U+80fd,U+81ea,U+85cf,U+884c,U+8868,U+8981,U+89c6,U+8bba,U+8bdd,U+8bf4,U+8bf7,U+8d44,U+8fc7,U+8fd8-8fd9,U+8fdb,U+901a,U+9053,U+90e8,U+91d1,U+957f,U+95e8,U+95ee,U+95f4,U+9762,U+9875,U+9898,U+9996,U+9ad8,U+ff01,U+ff08-ff09",
+      "codepoints": [
+        "U+4E0D",
+        "U+4E0E",
+        "U+4E3A",
+        "U+4F5C",
+        "U+5185",
+        "U+533A",
+        "U+5B9A",
+        "U+5DE5",
+        "U+5F0F",
+        "U+5FAE",
+        "U+6587",
+        "U+65E0",
+        "U+7248",
+        "U+7406",
+        "U+7528",
+        "U+7EBF",
+        "U+80FD",
+        "U+9875",
+        "U+9898",
+        "U+9996"
+      ],
+      "outlinesAndHorizontalVerticalMetrics": "identical"
+    },
+    {
+      "source": "files/noto-sans-sc-107-500-normal.woff2",
+      "sourceSha256": "2c985bd138ca9af7217144fc59d0799015c26c28c0f6ac76c61f029859aeae40",
+      "weight": 500,
+      "unicodeRange": "U+200b,U+2103,U+4e18,U+4e27-4e28,U+4e38,U+4e59,U+4e8f,U+4ead,U+4ec7,U+4fe9,U+503a,U+5085,U+5146,U+51af,U+51f8,U+52ab,U+5339,U+535c,U+5378,U+538c,U+5398,U+53f9,U+5415,U+5475,U+54aa,U+54ac,U+54b8,U+5582,U+5760,U+5764,U+57cb,U+5835,U+5885,U+5951,U+5983,U+59da,U+5a77,U+5b5d,U+5b5f,U+5bb5,U+5bc2,U+5be8,U+5bfa,U+5c2c,U+5c34,U+5c41,U+5c48,U+5c65,U+5cad,U+5e06,U+5e42,U+5ef7,U+5f17,U+5f25,U+5f6d,U+5f79,U+6028,U+6064,U+6068,U+606d,U+607c,U+6094,U+6109,U+6124,U+6247,U+626d,U+6291,U+629a,U+62ac,U+62b9,U+62fe,U+6324,U+6349,U+6367,U+6398,U+6495,U+64a4,U+64b0,U+64bc,U+64ce,U+658c,U+65ed,U+6602,U+6674,U+6691,U+66a8,U+674f,U+679a,U+67ef,U+67f4,U+680b,U+6876,U+68a8,U+6a59,U+6a61,U+6b20,U+6bc5,U+6d12,U+6d46,U+6d8c,U+6dc0,U+6e14,U+6e23,U+6f06,U+7164,U+716e,U+7199,U+71e5,U+72ac,U+742a,U+755c,U+75ab,U+75b2,U+75f4,U+7897,U+78b3,U+78c5,U+7978,U+79fd,U+7a74,U+7b4b,U+7b5b,U+7ece,U+7ed2,U+7ee3,U+7ef3,U+7f50,U+7f55,U+7f9e,U+7fe0,U+809d,U+8106,U+814a,U+8154,U+817b,U+818f,U+81c2,U+81ed,U+821f,U+82a6,U+82d1,U+8302,U+83c7,U+83ca,U+845b,U+848b,U+84c9,U+85e4,U+86ee,U+8700,U+8774,U+8881,U+8c1c,U+8c79,U+8d2a,U+8d3c,U+8eba,U+8f70,U+8fa9,U+8fb1,U+900a,U+9017,U+901d,U+9022,U+906e,U+946b,U+94dd,U+94ed,U+953b,U+95ef,U+95fa,U+95fd,U+96c0,U+971e,U+9753,U+9756,U+97e6,U+9881,U+9887,U+9b4f,U+9e2d,U+9f0e,U+e601-e602,U+e604-e605,U+ff5c",
+      "codepoints": [
+        "U+5951"
+      ],
+      "outlinesAndHorizontalVerticalMetrics": "identical"
+    },
+    {
+      "source": "files/noto-sans-sc-113-500-normal.woff2",
+      "sourceSha256": "40038a3245e638b8ae68d5c22847a6be8a173436b3f744e9453d6f18b49d6f90",
+      "weight": 500,
+      "unicodeRange": "U+26,U+3c,U+d7,U+4e4e,U+4e61,U+4e71,U+4ebf,U+4f26,U+5012,U+51ac,U+51b0,U+51b2,U+51b7,U+5218,U+521a,U+5220,U+5237,U+523b,U+526f,U+5385,U+53bf,U+53e5,U+53eb,U+53f3,U+53f6,U+5409,U+5438,U+54c8,U+54e5,U+552f,U+5584,U+5706,U+5723,U+5750,U+575a,U+5987-5988,U+59b9,U+59d0,U+59d4,U+5b88,U+5b9c,U+5bdf,U+5bfb,U+5c01,U+5c04,U+5c3e,U+5c4b,U+5c4f,U+5c9b,U+5cf0,U+5ddd,U+5de6,U+5de8,U+5e01,U+5e78,U+5e7b,U+5e9c,U+5ead,U+5ef6,U+5f39,U+5fd8,U+6000,U+6025,U+604b,U+6076,U+613f,U+6258,U+6263,U+6267,U+6298,U+62a2,U+62e5,U+62ec,U+6311,U+6377,U+6388-6389,U+63a2,U+63d2,U+641e,U+642d,U+654f,U+6551,U+6597,U+65cf,U+65d7,U+65e7,U+6682,U+66f2,U+671d,U+672b,U+6740,U+6751,U+6768,U+6811,U+6863,U+6982,U+6bd2,U+6cf0,U+6d0b,U+6d17,U+6d59,U+6dd8,U+6dfb,U+6e7e,U+6f6e,U+6fb3,U+706f,U+719f,U+72af,U+72d0,U+72d7,U+732b,U+732e,U+7389,U+73e0,U+7530,U+7687,U+76d6,U+76db,U+7840,U+786c,U+79cb,U+79d2,U+7a0e,U+7a33,U+7a3f,U+7a97,U+7ade-7adf,U+7b26,U+7e41,U+7ec3,U+7f3a,U+8089,U+80dc,U+811a,U+8131,U+8138,U+821e,U+8349,U+83dc,U+8457,U+867d,U+86cb,U+8a89,U+8ba8,U+8bad,U+8bef,U+8bfe,U+8c6a,U+8d1d,U+8d4f,U+8d62,U+8dd1,U+8df3,U+8f6e,U+8ff9,U+900f,U+9014,U+9057,U+9192,U+91ce,U+9488,U+94a2,U+9547,U+955c,U+95f2,U+9644,U+964d,U+96c4-96c5,U+96e8,U+96f6-96f7,U+9732,U+9759,U+9760,U+987a,U+989c,U+9910,U+996d-996e,U+9b54,U+9e21,U+9ebb,U+9f50",
+      "codepoints": [
+        "U+6682",
+        "U+7A33",
+        "U+7A3F",
+        "U+8349",
+        "U+96C5"
+      ],
+      "outlinesAndHorizontalVerticalMetrics": "identical"
+    },
+    {
+      "source": "files/noto-sans-sc-115-500-normal.woff2",
+      "sourceSha256": "a8d57bfb349f7d0bb293a4b575c489a767110debc037ce753f0e99994eaae8de",
+      "weight": 500,
+      "unicodeRange": "U+25,U+4e14,U+4e1d,U+4e3d,U+4e49,U+4e60,U+4e9a,U+4eb2,U+4ec5,U+4efd,U+4f3c,U+4f4f,U+4f8b,U+4fbf,U+5019,U+5145,U+514b,U+516b,U+516d,U+5174,U+5178,U+517b,U+5199,U+519b,U+51b3,U+51b5,U+5207,U+5212,U+5219,U+521d,U+52bf,U+533b,U+5343,U+5347,U+534a,U+536b,U+5370,U+53e4,U+53f2,U+5403,U+542c,U+547d,U+54a8,U+54cd,U+54ea,U+552e,U+56f4,U+5747,U+575b,U+5883,U+589e,U+5931,U+5947,U+5956-5957,U+5a92,U+5b83,U+5ba4,U+5bb3,U+5bcc,U+5c14,U+5c1a,U+5c3d,U+5c40,U+5c45,U+5c5e,U+5df4,U+5e72,U+5e95,U+5f80,U+5f85,U+5fb7,U+5fd7,U+601d,U+626b,U+627f,U+62c9,U+62cd,U+6309,U+63a7,U+6545,U+65ad,U+65af,U+65c5,U+666e,U+667a,U+670b,U+671b,U+674e,U+677f,U+6781,U+6790,U+6797,U+6821,U+6838-6839,U+697c,U+6b27,U+6b62,U+6bb5,U+6c7d,U+6c99,U+6d4b,U+6d4e,U+6d6a,U+6e29,U+6e2f,U+6ee1,U+6f14,U+6f2b,U+72b6,U+72ec,U+7387,U+7533,U+753b,U+76ca,U+76d8,U+7701,U+773c,U+77ed,U+77f3,U+7814,U+793c,U+79bb,U+79c1,U+79d8,U+79ef,U+79fb,U+7a76,U+7b11,U+7b54,U+7b56,U+7b97,U+7bc7,U+7c73,U+7d20,U+7eaa,U+7ec8,U+7edd,U+7eed,U+7efc,U+7fa4,U+804c,U+8058,U+80cc,U+8111,U+817e,U+826f,U+8303,U+843d,U+89c9,U+89d2,U+8ba2,U+8bbf,U+8bc9,U+8bcd,U+8be6,U+8c22,U+8c61,U+8d22,U+8d26-8d27,U+8d8a,U+8f6f,U+8f7b,U+8f83,U+8f91,U+8fb9,U+8fd4,U+8fdc,U+9002,U+94b1,U+9519,U+95ed,U+961f,U+9632-9633,U+963f,U+968f-9690,U+96be,U+9876,U+9884,U+98de,U+9988,U+9999,U+9ec4,U+ff1b",
+      "codepoints": [
+        "U+54CD",
+        "U+5F85",
+        "U+6838",
+        "U+7387",
+        "U+8F6F"
+      ],
+      "outlinesAndHorizontalVerticalMetrics": "identical"
+    },
+    {
+      "source": "files/noto-sans-sc-116-500-normal.woff2",
+      "sourceSha256": "e77556aa6578a159a2e4743bbaae39c1ed7476aa84ded7e9769ab446de56d4bf",
+      "weight": 500,
+      "unicodeRange": "U+2b,U+40,U+3000,U+300a-300b,U+4e16,U+4e66,U+4e70,U+4e91-4e92,U+4e94,U+4e9b,U+4ec0,U+4eca,U+4f01,U+4f17-4f18,U+4f46,U+4f4e,U+4f9b,U+4fee,U+503c,U+5065,U+50cf,U+513f,U+5148,U+518d,U+51c6,U+51e0,U+5217,U+529e-529f,U+5341,U+534f,U+5361,U+5386,U+53c2,U+53c8,U+53cc,U+53d7-53d8,U+53ea,U+5404,U+5411,U+5417,U+5427,U+5468,U+559c,U+5668,U+56e0,U+56e2,U+56ed,U+5740,U+57fa,U+58eb,U+5904,U+592a,U+59cb,U+5a31,U+5b58,U+5b9d,U+5bc6,U+5c71,U+5dde,U+5df1,U+5e08,U+5e26,U+5e2e,U+5e93,U+5e97,U+5eb7,U+5f15,U+5f20,U+5f3a,U+5f62,U+5f69,U+5f88,U+5f8b,U+5fc5,U+600e,U+620f,U+6218,U+623f,U+627e,U+628a,U+62a4,U+62db,U+62e9,U+6307,U+6362,U+636e,U+64ad,U+6539,U+653f,U+6548,U+6574,U+6613,U+6625,U+663e,U+666f,U+672a,U+6750,U+6784,U+6a21,U+6b3e,U+6b65,U+6bcf,U+6c11,U+6c5f,U+6df1,U+706b,U+7167,U+724c,U+738b,U+73a9,U+73af,U+7403,U+7537,U+754c,U+7559,U+767d,U+7740,U+786e,U+795e,U+798f,U+79f0,U+7aef,U+7b7e,U+7bb1,U+7ea2,U+7ea6,U+7ec4,U+7ec6,U+7ecd,U+7edc,U+7ef4,U+8003,U+80b2,U+81f3-81f4,U+822a,U+827a,U+82f1,U+83b7,U+8425,U+89c2,U+89c8,U+8ba9,U+8bb8,U+8bc6,U+8bd5,U+8be2,U+8be5,U+8bed,U+8c03,U+8d23,U+8d2d,U+8d34,U+8d70,U+8db3,U+8fbe,U+8fce,U+8fd1,U+8fde,U+9001,U+901f-9020,U+90a3,U+914d,U+91c7,U+94fe,U+9500,U+952e,U+9605,U+9645,U+9662,U+9664,U+9700,U+9752,U+975e,U+97f3,U+9879,U+9886,U+98df,U+9a6c,U+9a8c,U+9ed1,U+9f99",
+      "codepoints": [
+        "U+57FA",
+        "U+7EA6",
+        "U+822A",
+        "U+9ED1"
+      ],
+      "outlinesAndHorizontalVerticalMetrics": "identical"
+    },
+    {
+      "source": "files/noto-sans-sc-117-500-normal.woff2",
+      "sourceSha256": "c465abc45fa5113986110fc11a06d7f8d0d68bd042e642bbfb102d8b0ab963e4",
+      "weight": 500,
+      "unicodeRange": "U+4e,U+201c-201d,U+3010-3011,U+4e07,U+4e1c,U+4e24,U+4e3e,U+4e48,U+4e50,U+4e5f,U+4e8b-4e8c,U+4ea4,U+4eab-4eac,U+4ecb,U+4ece,U+4ed6,U+4ee3,U+4ef6-4ef7,U+4efb,U+4f20,U+4f55,U+4f7f,U+4fdd,U+505a,U+5143,U+5149,U+514d,U+5171,U+5177,U+518c,U+51fb,U+521b,U+5229,U+522b,U+52a9,U+5305,U+5317,U+534e,U+5355,U+5357,U+535a,U+5373,U+539f,U+53bb,U+53ca,U+53cd,U+53d6,U+53e3,U+53f0,U+5458,U+5546,U+56db,U+573a,U+578b,U+57ce,U+58f0,U+590d,U+5934,U+5973,U+5b57,U+5b8c,U+5b98,U+5bb9,U+5bfc,U+5c06,U+5c11,U+5c31,U+5c55,U+5df2,U+5e03,U+5e38,U+5e76,U+5e94,U+5efa,U+5f71,U+5f97,U+5feb,U+6001,U+603b,U+60f3,U+611f,U+6216,U+624d,U+6253,U+6295,U+6301,U+6392,U+641c,U+652f,U+653e,U+6559,U+6599,U+661f,U+671f,U+672f,U+6761,U+67e5,U+6807,U+6837,U+683c,U+6848,U+6b22,U+6b64,U+6bd4,U+6c14,U+6c34,U+6c42,U+6ca1,U+6d41,U+6d77,U+6d88,U+6e05,U+6e38,U+6e90,U+7136,U+7231,U+7531,U+767e,U+76ee,U+76f4,U+771f,U+7801,U+793a,U+79cd,U+7a0b,U+7a7a,U+7acb,U+7ae0,U+7b2c,U+7b80,U+7ba1,U+7cbe,U+7d22,U+7ea7,U+7ed3,U+7ed9,U+7edf,U+7f16,U+7f6e,U+8001,U+800c,U+8272,U+8282,U+82b1,U+8350,U+88ab,U+88c5,U+897f,U+89c1,U+89c4,U+89e3,U+8a00,U+8ba1,U+8ba4,U+8bae-8bb0,U+8bbe,U+8bc1,U+8bc4,U+8bfb,U+8d28,U+8d39,U+8d77,U+8d85,U+8def,U+8eab,U+8f66,U+8f6c,U+8f7d,U+8fd0,U+9009,U+90ae,U+90fd,U+91cc-91cd,U+91cf,U+95fb,U+9650,U+96c6,U+9891,U+98ce,U+ff1f",
+      "codepoints": [
+        "U+4F7F",
+        "U+590D",
+        "U+5BB9",
+        "U+5BFC",
+        "U+5E94",
+        "U+6392",
+        "U+6807",
+        "U+7A7A",
+        "U+7AE0",
+        "U+7BA1"
+      ],
+      "outlinesAndHorizontalVerticalMetrics": "identical"
+    },
+    {
+      "source": "files/noto-sans-sc-118-500-normal.woff2",
+      "sourceSha256": "c3f0217452ea5284e3edce357b516d67c67a8ff61bceeb0494dd95abd3b60e55",
+      "weight": 500,
+      "unicodeRange": "U+d,U+3e,U+5f,U+7c,U+a0,U+a9,U+4e09-4e0b,U+4e0d-4e0e,U+4e13,U+4e1a,U+4e2a,U+4e3a-4e3b,U+4e4b,U+4e86,U+4e8e,U+4ea7,U+4eba,U+4ee4-4ee5,U+4eec,U+4f1a,U+4f4d,U+4f53,U+4f5c,U+4f60,U+4fe1,U+5165,U+5168,U+516c,U+5173,U+5176,U+5185,U+51fa,U+5206,U+5230,U+5236,U+524d,U+529b,U+52a0-52a1,U+52a8,U+5316,U+533a,U+53cb,U+53d1,U+53ef,U+53f7-53f8,U+5408,U+540c-540e,U+544a,U+548c,U+54c1,U+56de,U+56fd-56fe,U+5728,U+5730,U+5907,U+5916,U+591a,U+5927,U+5929,U+597d,U+5982,U+5b50,U+5b66,U+5b89,U+5b9a,U+5b9e,U+5ba2,U+5bb6,U+5bf9,U+5c0f,U+5de5,U+5e02,U+5e73-5e74,U+5e7f,U+5ea6,U+5f00,U+5f0f,U+5f53,U+5f55,U+5fae,U+5fc3,U+6027,U+606f,U+60a8,U+60c5,U+610f,U+6210-6211,U+6237,U+6240,U+624b,U+6280,U+62a5,U+63a5,U+63a8,U+63d0,U+6536,U+6570,U+6587,U+65b9,U+65e0,U+65f6,U+660e,U+662d,U+662f,U+66f4,U+6700,U+670d,U+672c,U+673a,U+6743,U+6765,U+679c,U+682a,U+6b21,U+6b63,U+6cbb,U+6cd5,U+6ce8,U+6d3b,U+70ed,U+7247-7248,U+7269,U+7279,U+73b0,U+7406,U+751f,U+7528,U+7535,U+767b,U+76f8,U+770b,U+77e5,U+793e,U+79d1,U+7ad9,U+7b49,U+7c7b,U+7cfb,U+7ebf,U+7ecf,U+7f8e,U+8005,U+8054,U+80fd,U+81ea,U+85cf,U+884c,U+8868,U+8981,U+89c6,U+8bba,U+8bdd,U+8bf4,U+8bf7,U+8d44,U+8fc7,U+8fd8-8fd9,U+8fdb,U+901a,U+9053,U+90e8,U+91d1,U+957f,U+95e8,U+95ee,U+95f4,U+9762,U+9875,U+9898,U+9996,U+9ad8,U+ff01,U+ff08-ff09",
+      "codepoints": [
+        "U+4E0D",
+        "U+4E0E",
+        "U+4E3A",
+        "U+4F5C",
+        "U+5185",
+        "U+533A",
+        "U+5B9A",
+        "U+5DE5",
+        "U+5F0F",
+        "U+5FAE",
+        "U+6587",
+        "U+65E0",
+        "U+7248",
+        "U+7406",
+        "U+7528",
+        "U+7EBF",
+        "U+80FD",
+        "U+9875",
+        "U+9898",
+        "U+9996"
+      ],
+      "outlinesAndHorizontalVerticalMetrics": "identical"
+    },
+    {
+      "source": "files/noto-sans-sc-107-700-normal.woff2",
+      "sourceSha256": "dcc191777656d5d938248a22622920e9cbd0e418a621d6a0f618aec192e6b974",
+      "weight": 700,
+      "unicodeRange": "U+200b,U+2103,U+4e18,U+4e27-4e28,U+4e38,U+4e59,U+4e8f,U+4ead,U+4ec7,U+4fe9,U+503a,U+5085,U+5146,U+51af,U+51f8,U+52ab,U+5339,U+535c,U+5378,U+538c,U+5398,U+53f9,U+5415,U+5475,U+54aa,U+54ac,U+54b8,U+5582,U+5760,U+5764,U+57cb,U+5835,U+5885,U+5951,U+5983,U+59da,U+5a77,U+5b5d,U+5b5f,U+5bb5,U+5bc2,U+5be8,U+5bfa,U+5c2c,U+5c34,U+5c41,U+5c48,U+5c65,U+5cad,U+5e06,U+5e42,U+5ef7,U+5f17,U+5f25,U+5f6d,U+5f79,U+6028,U+6064,U+6068,U+606d,U+607c,U+6094,U+6109,U+6124,U+6247,U+626d,U+6291,U+629a,U+62ac,U+62b9,U+62fe,U+6324,U+6349,U+6367,U+6398,U+6495,U+64a4,U+64b0,U+64bc,U+64ce,U+658c,U+65ed,U+6602,U+6674,U+6691,U+66a8,U+674f,U+679a,U+67ef,U+67f4,U+680b,U+6876,U+68a8,U+6a59,U+6a61,U+6b20,U+6bc5,U+6d12,U+6d46,U+6d8c,U+6dc0,U+6e14,U+6e23,U+6f06,U+7164,U+716e,U+7199,U+71e5,U+72ac,U+742a,U+755c,U+75ab,U+75b2,U+75f4,U+7897,U+78b3,U+78c5,U+7978,U+79fd,U+7a74,U+7b4b,U+7b5b,U+7ece,U+7ed2,U+7ee3,U+7ef3,U+7f50,U+7f55,U+7f9e,U+7fe0,U+809d,U+8106,U+814a,U+8154,U+817b,U+818f,U+81c2,U+81ed,U+821f,U+82a6,U+82d1,U+8302,U+83c7,U+83ca,U+845b,U+848b,U+84c9,U+85e4,U+86ee,U+8700,U+8774,U+8881,U+8c1c,U+8c79,U+8d2a,U+8d3c,U+8eba,U+8f70,U+8fa9,U+8fb1,U+900a,U+9017,U+901d,U+9022,U+906e,U+946b,U+94dd,U+94ed,U+953b,U+95ef,U+95fa,U+95fd,U+96c0,U+971e,U+9753,U+9756,U+97e6,U+9881,U+9887,U+9b4f,U+9e2d,U+9f0e,U+e601-e602,U+e604-e605,U+ff5c",
+      "codepoints": [
+        "U+5951"
+      ],
+      "outlinesAndHorizontalVerticalMetrics": "identical"
+    },
+    {
+      "source": "files/noto-sans-sc-113-700-normal.woff2",
+      "sourceSha256": "d05c452943f9bef9dcab321cc2927bd27e30a9fcb1dfc01b8ca7fc50fe6da532",
+      "weight": 700,
+      "unicodeRange": "U+26,U+3c,U+d7,U+4e4e,U+4e61,U+4e71,U+4ebf,U+4f26,U+5012,U+51ac,U+51b0,U+51b2,U+51b7,U+5218,U+521a,U+5220,U+5237,U+523b,U+526f,U+5385,U+53bf,U+53e5,U+53eb,U+53f3,U+53f6,U+5409,U+5438,U+54c8,U+54e5,U+552f,U+5584,U+5706,U+5723,U+5750,U+575a,U+5987-5988,U+59b9,U+59d0,U+59d4,U+5b88,U+5b9c,U+5bdf,U+5bfb,U+5c01,U+5c04,U+5c3e,U+5c4b,U+5c4f,U+5c9b,U+5cf0,U+5ddd,U+5de6,U+5de8,U+5e01,U+5e78,U+5e7b,U+5e9c,U+5ead,U+5ef6,U+5f39,U+5fd8,U+6000,U+6025,U+604b,U+6076,U+613f,U+6258,U+6263,U+6267,U+6298,U+62a2,U+62e5,U+62ec,U+6311,U+6377,U+6388-6389,U+63a2,U+63d2,U+641e,U+642d,U+654f,U+6551,U+6597,U+65cf,U+65d7,U+65e7,U+6682,U+66f2,U+671d,U+672b,U+6740,U+6751,U+6768,U+6811,U+6863,U+6982,U+6bd2,U+6cf0,U+6d0b,U+6d17,U+6d59,U+6dd8,U+6dfb,U+6e7e,U+6f6e,U+6fb3,U+706f,U+719f,U+72af,U+72d0,U+72d7,U+732b,U+732e,U+7389,U+73e0,U+7530,U+7687,U+76d6,U+76db,U+7840,U+786c,U+79cb,U+79d2,U+7a0e,U+7a33,U+7a3f,U+7a97,U+7ade-7adf,U+7b26,U+7e41,U+7ec3,U+7f3a,U+8089,U+80dc,U+811a,U+8131,U+8138,U+821e,U+8349,U+83dc,U+8457,U+867d,U+86cb,U+8a89,U+8ba8,U+8bad,U+8bef,U+8bfe,U+8c6a,U+8d1d,U+8d4f,U+8d62,U+8dd1,U+8df3,U+8f6e,U+8ff9,U+900f,U+9014,U+9057,U+9192,U+91ce,U+9488,U+94a2,U+9547,U+955c,U+95f2,U+9644,U+964d,U+96c4-96c5,U+96e8,U+96f6-96f7,U+9732,U+9759,U+9760,U+987a,U+989c,U+9910,U+996d-996e,U+9b54,U+9e21,U+9ebb,U+9f50",
+      "codepoints": [
+        "U+6682",
+        "U+7A33",
+        "U+7A3F",
+        "U+8349",
+        "U+96C5"
+      ],
+      "outlinesAndHorizontalVerticalMetrics": "identical"
+    },
+    {
+      "source": "files/noto-sans-sc-115-700-normal.woff2",
+      "sourceSha256": "2e498e21096855eb6e2f85eae95d8b051d9e143bf4e88baebaf5791d905e95a1",
+      "weight": 700,
+      "unicodeRange": "U+25,U+4e14,U+4e1d,U+4e3d,U+4e49,U+4e60,U+4e9a,U+4eb2,U+4ec5,U+4efd,U+4f3c,U+4f4f,U+4f8b,U+4fbf,U+5019,U+5145,U+514b,U+516b,U+516d,U+5174,U+5178,U+517b,U+5199,U+519b,U+51b3,U+51b5,U+5207,U+5212,U+5219,U+521d,U+52bf,U+533b,U+5343,U+5347,U+534a,U+536b,U+5370,U+53e4,U+53f2,U+5403,U+542c,U+547d,U+54a8,U+54cd,U+54ea,U+552e,U+56f4,U+5747,U+575b,U+5883,U+589e,U+5931,U+5947,U+5956-5957,U+5a92,U+5b83,U+5ba4,U+5bb3,U+5bcc,U+5c14,U+5c1a,U+5c3d,U+5c40,U+5c45,U+5c5e,U+5df4,U+5e72,U+5e95,U+5f80,U+5f85,U+5fb7,U+5fd7,U+601d,U+626b,U+627f,U+62c9,U+62cd,U+6309,U+63a7,U+6545,U+65ad,U+65af,U+65c5,U+666e,U+667a,U+670b,U+671b,U+674e,U+677f,U+6781,U+6790,U+6797,U+6821,U+6838-6839,U+697c,U+6b27,U+6b62,U+6bb5,U+6c7d,U+6c99,U+6d4b,U+6d4e,U+6d6a,U+6e29,U+6e2f,U+6ee1,U+6f14,U+6f2b,U+72b6,U+72ec,U+7387,U+7533,U+753b,U+76ca,U+76d8,U+7701,U+773c,U+77ed,U+77f3,U+7814,U+793c,U+79bb,U+79c1,U+79d8,U+79ef,U+79fb,U+7a76,U+7b11,U+7b54,U+7b56,U+7b97,U+7bc7,U+7c73,U+7d20,U+7eaa,U+7ec8,U+7edd,U+7eed,U+7efc,U+7fa4,U+804c,U+8058,U+80cc,U+8111,U+817e,U+826f,U+8303,U+843d,U+89c9,U+89d2,U+8ba2,U+8bbf,U+8bc9,U+8bcd,U+8be6,U+8c22,U+8c61,U+8d22,U+8d26-8d27,U+8d8a,U+8f6f,U+8f7b,U+8f83,U+8f91,U+8fb9,U+8fd4,U+8fdc,U+9002,U+94b1,U+9519,U+95ed,U+961f,U+9632-9633,U+963f,U+968f-9690,U+96be,U+9876,U+9884,U+98de,U+9988,U+9999,U+9ec4,U+ff1b",
+      "codepoints": [
+        "U+54CD",
+        "U+5F85",
+        "U+6838",
+        "U+7387",
+        "U+8F6F"
+      ],
+      "outlinesAndHorizontalVerticalMetrics": "identical"
+    },
+    {
+      "source": "files/noto-sans-sc-116-700-normal.woff2",
+      "sourceSha256": "53693ca200ea4f78a272fa006d044aaa6e401fd2b78353b68fe9909d743d3a30",
+      "weight": 700,
+      "unicodeRange": "U+2b,U+40,U+3000,U+300a-300b,U+4e16,U+4e66,U+4e70,U+4e91-4e92,U+4e94,U+4e9b,U+4ec0,U+4eca,U+4f01,U+4f17-4f18,U+4f46,U+4f4e,U+4f9b,U+4fee,U+503c,U+5065,U+50cf,U+513f,U+5148,U+518d,U+51c6,U+51e0,U+5217,U+529e-529f,U+5341,U+534f,U+5361,U+5386,U+53c2,U+53c8,U+53cc,U+53d7-53d8,U+53ea,U+5404,U+5411,U+5417,U+5427,U+5468,U+559c,U+5668,U+56e0,U+56e2,U+56ed,U+5740,U+57fa,U+58eb,U+5904,U+592a,U+59cb,U+5a31,U+5b58,U+5b9d,U+5bc6,U+5c71,U+5dde,U+5df1,U+5e08,U+5e26,U+5e2e,U+5e93,U+5e97,U+5eb7,U+5f15,U+5f20,U+5f3a,U+5f62,U+5f69,U+5f88,U+5f8b,U+5fc5,U+600e,U+620f,U+6218,U+623f,U+627e,U+628a,U+62a4,U+62db,U+62e9,U+6307,U+6362,U+636e,U+64ad,U+6539,U+653f,U+6548,U+6574,U+6613,U+6625,U+663e,U+666f,U+672a,U+6750,U+6784,U+6a21,U+6b3e,U+6b65,U+6bcf,U+6c11,U+6c5f,U+6df1,U+706b,U+7167,U+724c,U+738b,U+73a9,U+73af,U+7403,U+7537,U+754c,U+7559,U+767d,U+7740,U+786e,U+795e,U+798f,U+79f0,U+7aef,U+7b7e,U+7bb1,U+7ea2,U+7ea6,U+7ec4,U+7ec6,U+7ecd,U+7edc,U+7ef4,U+8003,U+80b2,U+81f3-81f4,U+822a,U+827a,U+82f1,U+83b7,U+8425,U+89c2,U+89c8,U+8ba9,U+8bb8,U+8bc6,U+8bd5,U+8be2,U+8be5,U+8bed,U+8c03,U+8d23,U+8d2d,U+8d34,U+8d70,U+8db3,U+8fbe,U+8fce,U+8fd1,U+8fde,U+9001,U+901f-9020,U+90a3,U+914d,U+91c7,U+94fe,U+9500,U+952e,U+9605,U+9645,U+9662,U+9664,U+9700,U+9752,U+975e,U+97f3,U+9879,U+9886,U+98df,U+9a6c,U+9a8c,U+9ed1,U+9f99",
+      "codepoints": [
+        "U+57FA",
+        "U+7EA6",
+        "U+822A",
+        "U+9ED1"
+      ],
+      "outlinesAndHorizontalVerticalMetrics": "identical"
+    },
+    {
+      "source": "files/noto-sans-sc-117-700-normal.woff2",
+      "sourceSha256": "ad542c31ec87058033e4aa48cadc62cab74afb2f403058f05c4440afc87944bc",
+      "weight": 700,
+      "unicodeRange": "U+4e,U+201c-201d,U+3010-3011,U+4e07,U+4e1c,U+4e24,U+4e3e,U+4e48,U+4e50,U+4e5f,U+4e8b-4e8c,U+4ea4,U+4eab-4eac,U+4ecb,U+4ece,U+4ed6,U+4ee3,U+4ef6-4ef7,U+4efb,U+4f20,U+4f55,U+4f7f,U+4fdd,U+505a,U+5143,U+5149,U+514d,U+5171,U+5177,U+518c,U+51fb,U+521b,U+5229,U+522b,U+52a9,U+5305,U+5317,U+534e,U+5355,U+5357,U+535a,U+5373,U+539f,U+53bb,U+53ca,U+53cd,U+53d6,U+53e3,U+53f0,U+5458,U+5546,U+56db,U+573a,U+578b,U+57ce,U+58f0,U+590d,U+5934,U+5973,U+5b57,U+5b8c,U+5b98,U+5bb9,U+5bfc,U+5c06,U+5c11,U+5c31,U+5c55,U+5df2,U+5e03,U+5e38,U+5e76,U+5e94,U+5efa,U+5f71,U+5f97,U+5feb,U+6001,U+603b,U+60f3,U+611f,U+6216,U+624d,U+6253,U+6295,U+6301,U+6392,U+641c,U+652f,U+653e,U+6559,U+6599,U+661f,U+671f,U+672f,U+6761,U+67e5,U+6807,U+6837,U+683c,U+6848,U+6b22,U+6b64,U+6bd4,U+6c14,U+6c34,U+6c42,U+6ca1,U+6d41,U+6d77,U+6d88,U+6e05,U+6e38,U+6e90,U+7136,U+7231,U+7531,U+767e,U+76ee,U+76f4,U+771f,U+7801,U+793a,U+79cd,U+7a0b,U+7a7a,U+7acb,U+7ae0,U+7b2c,U+7b80,U+7ba1,U+7cbe,U+7d22,U+7ea7,U+7ed3,U+7ed9,U+7edf,U+7f16,U+7f6e,U+8001,U+800c,U+8272,U+8282,U+82b1,U+8350,U+88ab,U+88c5,U+897f,U+89c1,U+89c4,U+89e3,U+8a00,U+8ba1,U+8ba4,U+8bae-8bb0,U+8bbe,U+8bc1,U+8bc4,U+8bfb,U+8d28,U+8d39,U+8d77,U+8d85,U+8def,U+8eab,U+8f66,U+8f6c,U+8f7d,U+8fd0,U+9009,U+90ae,U+90fd,U+91cc-91cd,U+91cf,U+95fb,U+9650,U+96c6,U+9891,U+98ce,U+ff1f",
+      "codepoints": [
+        "U+4F7F",
+        "U+590D",
+        "U+5BB9",
+        "U+5BFC",
+        "U+5E94",
+        "U+6392",
+        "U+6807",
+        "U+7A7A",
+        "U+7AE0",
+        "U+7BA1"
+      ],
+      "outlinesAndHorizontalVerticalMetrics": "identical"
+    },
+    {
+      "source": "files/noto-sans-sc-118-700-normal.woff2",
+      "sourceSha256": "41ac3ace8865ebe51c59063630e96456a5e3b64cb3a13b2086b1ae5197ded22f",
+      "weight": 700,
+      "unicodeRange": "U+d,U+3e,U+5f,U+7c,U+a0,U+a9,U+4e09-4e0b,U+4e0d-4e0e,U+4e13,U+4e1a,U+4e2a,U+4e3a-4e3b,U+4e4b,U+4e86,U+4e8e,U+4ea7,U+4eba,U+4ee4-4ee5,U+4eec,U+4f1a,U+4f4d,U+4f53,U+4f5c,U+4f60,U+4fe1,U+5165,U+5168,U+516c,U+5173,U+5176,U+5185,U+51fa,U+5206,U+5230,U+5236,U+524d,U+529b,U+52a0-52a1,U+52a8,U+5316,U+533a,U+53cb,U+53d1,U+53ef,U+53f7-53f8,U+5408,U+540c-540e,U+544a,U+548c,U+54c1,U+56de,U+56fd-56fe,U+5728,U+5730,U+5907,U+5916,U+591a,U+5927,U+5929,U+597d,U+5982,U+5b50,U+5b66,U+5b89,U+5b9a,U+5b9e,U+5ba2,U+5bb6,U+5bf9,U+5c0f,U+5de5,U+5e02,U+5e73-5e74,U+5e7f,U+5ea6,U+5f00,U+5f0f,U+5f53,U+5f55,U+5fae,U+5fc3,U+6027,U+606f,U+60a8,U+60c5,U+610f,U+6210-6211,U+6237,U+6240,U+624b,U+6280,U+62a5,U+63a5,U+63a8,U+63d0,U+6536,U+6570,U+6587,U+65b9,U+65e0,U+65f6,U+660e,U+662d,U+662f,U+66f4,U+6700,U+670d,U+672c,U+673a,U+6743,U+6765,U+679c,U+682a,U+6b21,U+6b63,U+6cbb,U+6cd5,U+6ce8,U+6d3b,U+70ed,U+7247-7248,U+7269,U+7279,U+73b0,U+7406,U+751f,U+7528,U+7535,U+767b,U+76f8,U+770b,U+77e5,U+793e,U+79d1,U+7ad9,U+7b49,U+7c7b,U+7cfb,U+7ebf,U+7ecf,U+7f8e,U+8005,U+8054,U+80fd,U+81ea,U+85cf,U+884c,U+8868,U+8981,U+89c6,U+8bba,U+8bdd,U+8bf4,U+8bf7,U+8d44,U+8fc7,U+8fd8-8fd9,U+8fdb,U+901a,U+9053,U+90e8,U+91d1,U+957f,U+95e8,U+95ee,U+95f4,U+9762,U+9875,U+9898,U+9996,U+9ad8,U+ff01,U+ff08-ff09",
+      "codepoints": [
+        "U+4E0D",
+        "U+4E0E",
+        "U+4E3A",
+        "U+4F5C",
+        "U+5185",
+        "U+533A",
+        "U+5B9A",
+        "U+5DE5",
+        "U+5F0F",
+        "U+5FAE",
+        "U+6587",
+        "U+65E0",
+        "U+7248",
+        "U+7406",
+        "U+7528",
+        "U+7EBF",
+        "U+80FD",
+        "U+9875",
+        "U+9898",
+        "U+9996"
+      ],
+      "outlinesAndHorizontalVerticalMetrics": "identical"
+    }
+  ]
+}
