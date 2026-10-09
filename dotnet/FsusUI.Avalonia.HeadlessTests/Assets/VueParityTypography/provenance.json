@@ -1,6 +1,11 @@
 {
   "fontsourceReleaseCommit": "728f5ac019b578b42808c3672378dad2d327fe87",
   "conversion": "fontTools.ttLib.TTFont; flavor=None; recalcTimestamp=False",
+  "tableSnapshot": "Untouched WOFF2Reader/SFNTReader bytes, before TTFont table access or compilation",
+  "allowedTableDifferences": [
+    "head.checkSumAdjustment",
+    "cmap serialization with independently identical subtable metadata, character maps and variation selectors"
+  ],
   "fontTools": "4.61.1",
   "brotli": "1.2.0",
   "packages": [
@@ -75,7 +80,8 @@
         },
         "head": {
           "source": "5d1772caa1a5c3295c192999a45422be05e7179bb21ab9765bf47b7af7d2b5b7",
-          "derived": "bcbfce652849d477bbf07046b5526e5cf20acaac8fa37e607b87335b439f08af"
+          "derived": "bcbfce652849d477bbf07046b5526e5cf20acaac8fa37e607b87335b439f08af",
+          "comparison": "head.checkSumAdjustment only"
         },
         "hhea": {
           "source": "f475eaef77fe46e366d3e19ae0caad1f2e8d18d4380ed43c57522ed82a87e69b",
@@ -152,7 +158,8 @@
         },
         "head": {
           "source": "e9f07753094f3dd0eaa79e2708e12c8956f0cf997569a3ee3c80c324ea2b5cbc",
-          "derived": "6268a99f9a2122049950b6be161307a204617feb12f2aa4dbcb32bd6a5f061e5"
+          "derived": "6268a99f9a2122049950b6be161307a204617feb12f2aa4dbcb32bd6a5f061e5",
+          "comparison": "head.checkSumAdjustment only"
         },
         "hhea": {
           "source": "39d0bb220a1947e73ef8ade5d9faea8bfc86024adab71c9e6a49a84afe82a007",
@@ -229,7 +236,8 @@
         },
         "head": {
           "source": "b449f4eeceae0842f4ef142128d29701b59ac00aeeba5758a71ed5c66a8a128a",
-          "derived": "47cf48fc5593f01d54750a2f09e3fa4cd1b5fd11c4cff83dbf206d5ace92174e"
+          "derived": "47cf48fc5593f01d54750a2f09e3fa4cd1b5fd11c4cff83dbf206d5ace92174e",
+          "comparison": "head.checkSumAdjustment only"
         },
         "hhea": {
           "source": "4f66911dbd0441eb859c33810f834b0941c4950386c67d1a315b1f2af3962fc6",
@@ -306,7 +314,8 @@
         },
         "head": {
           "source": "e37002bba41bc4890c7f198adcf37e9b06ef24c2132ddb9f7dca5c08208b7356",
-          "derived": "2ed16537fa266be632778a0b4461705f2e9951e3f09f4358a2bbef24563092b6"
+          "derived": "2ed16537fa266be632778a0b4461705f2e9951e3f09f4358a2bbef24563092b6",
+          "comparison": "head.checkSumAdjustment only"
         },
         "hhea": {
           "source": "4bd82cfa150323bb7b2f0e9aec94814fb9d748c8137894e79afd60635f3ef73e",
@@ -383,7 +392,8 @@
         },
         "head": {
           "source": "31cb56bf11127797bf1cc91da93f2b5f0b5742c3deddbea09d993247db765897",
-          "derived": "ca0298a003fe74e54da4d0c0d968d4f84799306e875f5cf77bda96498f8b4c9f"
+          "derived": "ca0298a003fe74e54da4d0c0d968d4f84799306e875f5cf77bda96498f8b4c9f",
+          "comparison": "head.checkSumAdjustment only"
         },
         "hhea": {
           "source": "080a6cefde1e79b4861eaef6647a15775bf3d1c5e4134f9f1106d504c3d55eb9",
@@ -460,7 +470,8 @@
         },
         "head": {
           "source": "4decef710ba00c7f3572533fdc040a3d6620994305763f098a3ac811eb08c1ac",
-          "derived": "8cee39a8ee21f3165bb6725279db18fc18b5db4a6be53406be8c12b1040ca95e"
+          "derived": "8cee39a8ee21f3165bb6725279db18fc18b5db4a6be53406be8c12b1040ca95e",
+          "comparison": "head.checkSumAdjustment only"
         },
         "hhea": {
           "source": "912e91dab973d29467f236ede8e4a92f82be780340b82f5d2be68eed203b9d9a",
@@ -524,8 +535,15 @@
           "derived": "c344390a0895ba75ea01b8ce449ef9633301b10db58290f71c85c6952092bee6"
         },
         "cmap": {
-          "source": "cc91e8176e45bda7a35500e532f4342fb758da90b5a03fa29e8c33d8fd111218",
-          "derived": "cc91e8176e45bda7a35500e532f4342fb758da90b5a03fa29e8c33d8fd111218"
+          "source": "e45bc35798d276268a8973d8fb052731c7366e9cc1ee50e6831b746e9199ab59",
+          "derived": "cc91e8176e45bda7a35500e532f4342fb758da90b5a03fa29e8c33d8fd111218",
+          "sourceBytes": 33328,
+          "derivedBytes": 33336,
+          "comparison": "semantic-neutral reserialization",
+          "sourceSemanticSha256": "674c3b92e421459ceadf4266f373a1b6766c3d454783f06146494a5f44226ed8",
+          "derivedSemanticSha256": "674c3b92e421459ceadf4266f373a1b6766c3d454783f06146494a5f44226ed8",
+          "subtables": 3,
+          "variationSelectors": 2
         },
         "gasp": {
           "source": "4ca731f86ad506ac0e320283dc9461926346de3c4d91d539ea7f6620d3826940",
@@ -541,7 +559,8 @@
         },
         "head": {
           "source": "b0a58a366a320e225bea72301e684da3e5a1e6d6bb0c29ad3a248dcfd7b54516",
-          "derived": "0b38ce4de472b42db2bc12de98aa99368aa088bb7ffae81b240f9cf0fc92feda"
+          "derived": "0b38ce4de472b42db2bc12de98aa99368aa088bb7ffae81b240f9cf0fc92feda",
+          "comparison": "head.checkSumAdjustment only"
         },
         "hhea": {
           "source": "3d8a0bd91408a00876d1b1c65ae5bfd24e250888bc07541f030ce8ef1298f865",
@@ -613,8 +632,15 @@
           "derived": "6fce8afc4b74998407c50dd3b134c098020c16708910b92c9574fe32ca2c7a22"
         },
         "cmap": {
-          "source": "cc91e8176e45bda7a35500e532f4342fb758da90b5a03fa29e8c33d8fd111218",
-          "derived": "cc91e8176e45bda7a35500e532f4342fb758da90b5a03fa29e8c33d8fd111218"
+          "source": "e45bc35798d276268a8973d8fb052731c7366e9cc1ee50e6831b746e9199ab59",
+          "derived": "cc91e8176e45bda7a35500e532f4342fb758da90b5a03fa29e8c33d8fd111218",
+          "sourceBytes": 33328,
+          "derivedBytes": 33336,
+          "comparison": "semantic-neutral reserialization",
+          "sourceSemanticSha256": "674c3b92e421459ceadf4266f373a1b6766c3d454783f06146494a5f44226ed8",
+          "derivedSemanticSha256": "674c3b92e421459ceadf4266f373a1b6766c3d454783f06146494a5f44226ed8",
+          "subtables": 3,
+          "variationSelectors": 2
         },
         "gasp": {
           "source": "4ca731f86ad506ac0e320283dc9461926346de3c4d91d539ea7f6620d3826940",
@@ -630,7 +656,8 @@
         },
         "head": {
           "source": "288125534ed563ffd9adf8b2f698e8ed68da3288e1a733d548635971ff80b1bc",
-          "derived": "761338b0e80db29875569c1e3e483e0df6a9813c3bab6a74086f2c038d67c2c9"
+          "derived": "761338b0e80db29875569c1e3e483e0df6a9813c3bab6a74086f2c038d67c2c9",
+          "comparison": "head.checkSumAdjustment only"
         },
         "hhea": {
           "source": "b4eea20bf11cdd10d74d5ff728a5b1492e5fb55e01ab4b0932bb85351e807a23",
@@ -702,8 +729,15 @@
           "derived": "604ed61397b469bdab63533ed7fe1e124e888266e2bfe4a593a1f23e9d765dd1"
         },
         "cmap": {
-          "source": "cc91e8176e45bda7a35500e532f4342fb758da90b5a03fa29e8c33d8fd111218",
-          "derived": "cc91e8176e45bda7a35500e532f4342fb758da90b5a03fa29e8c33d8fd111218"
+          "source": "e45bc35798d276268a8973d8fb052731c7366e9cc1ee50e6831b746e9199ab59",
+          "derived": "cc91e8176e45bda7a35500e532f4342fb758da90b5a03fa29e8c33d8fd111218",
+          "sourceBytes": 33328,
+          "derivedBytes": 33336,
+          "comparison": "semantic-neutral reserialization",
+          "sourceSemanticSha256": "674c3b92e421459ceadf4266f373a1b6766c3d454783f06146494a5f44226ed8",
+          "derivedSemanticSha256": "674c3b92e421459ceadf4266f373a1b6766c3d454783f06146494a5f44226ed8",
+          "subtables": 3,
+          "variationSelectors": 2
         },
         "gasp": {
           "source": "4ca731f86ad506ac0e320283dc9461926346de3c4d91d539ea7f6620d3826940",
@@ -719,7 +753,8 @@
         },
         "head": {
           "source": "6d0aaf04785cb37fde2ffb68438b99cdde8ea770050b4e237329f6901a6bf2a1",
-          "derived": "73c003740d062c39d52d39e095564b934d13dc5c02418167e97ea38629a5a46b"
+          "derived": "73c003740d062c39d52d39e095564b934d13dc5c02418167e97ea38629a5a46b",
+          "comparison": "head.checkSumAdjustment only"
         },
         "hhea": {
           "source": "c6c68c23c67b9121723faa34ccc01276451d4bb34b573749eda4922f6a44c797",

@@ -14,7 +14,7 @@ integrate that include and rerun the original route.
 | Check | Status | Actual evidence |
 | --- | --- | --- |
 | Exact archive integrity and official sources | PASS | Both complete locked SHA-512 archives; release license/metadata byte comparisons; package metadata comparison excluding packaging publishHash |
-| Derivation | PASS | 9 faces; all decoded tables preserved except head checksum; 45 CJK codepoints × 3 weights match Web shards' outlines and metrics |
+| Derivation | PASS, corrected comparison | 9 faces; untouched decoded tables identical except head checksum and 3 semantically identical Noto cmap reserializations; 45 CJK codepoints × 3 weights match Web shards' outlines and metrics; see CORRECTION.md |
 | Original-project locked restore | PASS | Selected SDK 10.0.401, .NET runtime 10.0.12, unchanged matching locks and audit/signature policy |
 | Original-project Release build | PASS | With and without staged resources; zero errors; one existing xUnit2013 warning in FsusMarkdownEditorPageAndHistoryHeadlessTests.cs:162 |
 | Resource preflight | PASS | Exactly 13 items: 9 TTFs, 2 LICENSEs, 2 COPYRIGHT.txt notices |
@@ -30,6 +30,16 @@ The glyph/layout tests explicitly choose the pinned resources in both process
 flag modes. GSANS=0 additionally proves the fixture's standalone stack
 selection; it does not prove installed system-family rendering on every host.
 Glyph/layout success does not establish screenshot parity or visual acceptance.
+
+The original checksum-only derivation claim was inaccurate: `getTableData()`
+compiled the already-loaded source cmap before hashing it. Its original
+reported PASS is retained as a historical result with that byte-preservation
+claim withdrawn. `CORRECTION.md` and `correction-results.json` record the
+reader-byte comparison, actual cmap differences, focused verifier regressions
+and prior failed native attempts. The original native source, nine binaries,
+licenses and notices are unchanged. The native results above remain the
+original supplier runs; no new native/committed-candidate run is claimed for
+this verifier correction, and no reviewer's pass is inherited.
 
 Early candidate tests exposed Avalonia's normalization of Noto's literal
 `Thin` family token, and empty typographic-name values for its 400/700 faces.

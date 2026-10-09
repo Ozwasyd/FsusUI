@@ -39,10 +39,22 @@ metrics, ascent/descent/line gap and units per em agree. This is source and
 glyph equivalence evidence, not rendered visual acceptance.
 
 The TTFs are decompressed WOFF2 containers. There is no merge, subset, rename,
-instancing, synthesis or glyph edit. Every decoded table is byte-identical,
-including name, cmap, outlines, metrics, OS/2, GSUB and GPOS. Only
-`head.checkSumAdjustment` changes for the SFNT container. `provenance.json`
-records original/derived asset SHA-256 hashes and every table's hashes.
+instancing, synthesis or glyph edit. Untouched decoded table bytes are
+identical, including name, outlines, metrics, OS/2, GSUB and GPOS, except for
+`head.checkSumAdjustment` and the three Noto cmap serializations. Each Noto
+source cmap is 33,328 bytes, SHA-256
+`e45bc35798d276268a8973d8fb052731c7366e9cc1ee50e6831b746e9199ab59`;
+its derived cmap is 33,336 bytes, SHA-256
+`cc91e8176e45bda7a35500e532f4342fb758da90b5a03fa29e8c33d8fd111218`.
+Independent parses of the original WOFF2 and derived TTF prove that all three
+subtables' metadata, character-to-glyph maps and both variation selectors
+remain semantically identical. This does not imply byte identity.
+`provenance.json` records original/derived asset and untouched table hashes,
+the differing cmap lengths, and semantic comparison digests. `derive.py`
+snapshots reader bytes before any compilation; `test_derive.py` catches the
+old false equality and rejects character-map, variation-selector, subtable
+metadata and unrelated-table changes. See `CORRECTION.md` for the superseded
+attestation and preserved historical results. Font binaries are unchanged.
 
 ## Copyright and licensing
 
