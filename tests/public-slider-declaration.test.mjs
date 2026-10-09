@@ -126,7 +126,7 @@ test('actual installed tarball checks strict slider positive and negative contro
             : /Property '(ElCascader|ElOption|ElOptionGroup|ElSelect|ElTimeSelect)'/.test(
                 d.message,
               )) &&
-          !/slider/i.test(d.message),
+          !/Property 'ElSlider'|'\.\/slider'/.test(d.message),
       ),
       'only original unrelated installed-package failures remain',
     )
