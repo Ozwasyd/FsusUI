@@ -11,8 +11,8 @@ import {
   sanitizeGsapVars,
 } from '../gsap/resolve'
 import { isMotionReducedOrDisabled } from '../runtime'
-import type { gsap } from 'gsap'
-import type { ScrollTrigger } from 'gsap/ScrollTrigger'
+import type { gsap as Gsap } from 'gsap'
+import type { ScrollTrigger as GsapScrollTrigger } from 'gsap/ScrollTrigger'
 import type { MotionTarget } from '../gsap/resolve'
 import type { MotionPresetInput, MotionPresetName } from '../types'
 
@@ -27,8 +27,8 @@ export type ScrollRevealOptions = {
   markers?: boolean
   scrub?: boolean | number
   scroller?: Element | Window | string
-  vars?: gsap.TweenVars
-  scrollTrigger?: ScrollTrigger.StaticVars
+  vars?: Gsap.TweenVars
+  scrollTrigger?: GsapScrollTrigger.StaticVars
 }
 
 export type ScrollRevealRunOptions = Omit<ScrollRevealOptions, 'target'>
@@ -37,8 +37,8 @@ const defaultScrollRevealPreset: MotionPresetName = 'paper-settle'
 
 const applyReducedState = (
   target: ReturnType<typeof resolveMotionTarget>,
-  vars: gsap.TweenVars,
-  fallback: (target: gsap.TweenTarget, vars: gsap.TweenVars) => void,
+  vars: Gsap.TweenVars,
+  fallback: (target: Gsap.TweenTarget, vars: Gsap.TweenVars) => void,
 ) => {
   if (target instanceof Element && 'style' in target) {
     const element = target as HTMLElement | SVGElement
@@ -49,12 +49,12 @@ const applyReducedState = (
     return
   }
 
-  fallback(target as gsap.TweenTarget, vars)
+  fallback(target as Gsap.TweenTarget, vars)
 }
 
 export const useScrollReveal = (defaults: ScrollRevealOptions = {}) => {
   const gsap = getGsap()
-  const tweens = new Set<gsap.core.Tween>()
+  const tweens = new Set<Gsap.core.Tween>()
 
   const reveal = (
     target: MotionTarget = defaults.target,
