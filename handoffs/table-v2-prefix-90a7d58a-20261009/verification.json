@@ -1,0 +1,424 @@
+{
+  "beforeSource": "24a7ba8c3feffbe4f040a5ccf6332af70f7a74d4",
+  "afterSource": "90a7d58aad585edbbeec8756fc6d6e5aa0a2c9a7",
+  "approvedDependency": "8840c3834f4d1cb67cdccd5238b1cbcc8558141a",
+  "qualification": "SDK 10.0.108 + exact approved lock patch diagnostic composition only; not plain-head, .401, Windows/macOS or full CI",
+  "sdk": "10.0.108",
+  "runtime": "10.0.8",
+  "Avalonia": "12.0.4",
+  "SkiaSharp": "3.119.4",
+  "ordinaryAllowlist": [
+    "FullyQualifiedName=FsusUI.Avalonia.HeadlessTests.FsusTableV2RenderedEvidenceTests.RendersPopulatedAndEmptyContentRegionsToPng",
+    "FullyQualifiedName=FsusUI.Avalonia.HeadlessTests.FsusTableV2RenderedEvidenceTests.RendersWholeHeaderAndOverlayContentRegionsToPng",
+    "FullyQualifiedName=FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests.AutoResizerAndTableV2VirtualizeRowsColumnsResizeAndBudget",
+    "FullyQualifiedName=FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests.TableV2BindsTypedRowsFixedColumnsAndRealKeyboardScroll",
+    "FullyQualifiedName=FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests.TableV2MeasuresDynamicRowsAndRaisesRealScrollCallbacks",
+    "FullyQualifiedName=FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests.TableV2UsesFixedDataGetterAndExpandedRowCallbacks",
+    "FullyQualifiedName=FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests.TableV2MapsViewportGeometryAndCacheToRealLayout",
+    "FullyQualifiedName=FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests.TableV2SortsTypedRowsAndReportsColumnSort",
+    "FullyQualifiedName=FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests.TableV2RendersBoundedContentRegions",
+    "FullyQualifiedName=FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests.TableV2ContentRegionsReceiveScopedPayloads",
+    "FullyQualifiedName=FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests.TableV2VirtualizesFrozenAxesNavigatesAndRejectsStaleBackgroundResults",
+    "FullyQualifiedName=FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests.VirtualizationThemeVisualAccessibilityPerformanceAndPlatformBaselinesCoverStable34"
+  ],
+  "runs": [
+    {
+      "stage": "before-normal",
+      "expectedCount": 12,
+      "results": [
+        {
+          "name": "FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests.TableV2BindsTypedRowsFixedColumnsAndRealKeyboardScroll",
+          "outcome": "Passed"
+        },
+        {
+          "name": "FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests.TableV2UsesFixedDataGetterAndExpandedRowCallbacks",
+          "outcome": "Passed"
+        },
+        {
+          "name": "FsusUI.Avalonia.HeadlessTests.FsusTableV2RenderedEvidenceTests.RendersPopulatedAndEmptyContentRegionsToPng",
+          "outcome": "Passed"
+        },
+        {
+          "name": "FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests.TableV2MeasuresDynamicRowsAndRaisesRealScrollCallbacks",
+          "outcome": "Passed"
+        },
+        {
+          "name": "FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests.TableV2ContentRegionsReceiveScopedPayloads",
+          "outcome": "Passed"
+        },
+        {
+          "name": "FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests.TableV2SortsTypedRowsAndReportsColumnSort",
+          "outcome": "Passed"
+        },
+        {
+          "name": "FsusUI.Avalonia.HeadlessTests.FsusTableV2RenderedEvidenceTests.RendersWholeHeaderAndOverlayContentRegionsToPng",
+          "outcome": "Passed"
+        },
+        {
+          "name": "FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests.VirtualizationThemeVisualAccessibilityPerformanceAndPlatformBaselinesCoverStable34",
+          "outcome": "Passed"
+        },
+        {
+          "name": "FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests.TableV2VirtualizesFrozenAxesNavigatesAndRejectsStaleBackgroundResults",
+          "outcome": "Passed"
+        },
+        {
+          "name": "FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests.TableV2MapsViewportGeometryAndCacheToRealLayout",
+          "outcome": "Passed"
+        },
+        {
+          "name": "FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests.AutoResizerAndTableV2VirtualizeRowsColumnsResizeAndBudget",
+          "outcome": "Passed"
+        },
+        {
+          "name": "FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests.TableV2RendersBoundedContentRegions",
+          "outcome": "Passed"
+        }
+      ],
+      "captures": [
+        {
+          "name": "table-v2-content-regions-light.png",
+          "dimensions": [
+            488,
+            540
+          ],
+          "bytes": 38293,
+          "sha256": "12c592158d6d33a79c5e97ef319e924e65a7b118071531683551c5d13e660bc8",
+          "equalFrozenBytes": true,
+          "differentPixels": 0
+        },
+        {
+          "name": "table-v2-whole-header-overlay-light.png",
+          "dimensions": [
+            488,
+            320
+          ],
+          "bytes": 17037,
+          "sha256": "3ddb0fef6bcf5080df423f22aa6ab289458032d3bc032a340f59157b3c77a16d",
+          "equalFrozenBytes": true,
+          "differentPixels": 0
+        }
+      ],
+      "membership": {
+        "gsans": null,
+        "registeredSharedCollections": [],
+        "collectionKey": "fonts:GoogleSans?family=Google%20Sans",
+        "count": 1,
+        "families": [
+          "Noto Sans"
+        ],
+        "sharedPrefixAssets": [
+          "avares://FsusUI.Avalonia.HeadlessTests/Assets/Fonts/TableV2/NotoSans-Bold.ttf",
+          "avares://FsusUI.Avalonia.HeadlessTests/Assets/Fonts/TableV2/NotoSans-Regular.ttf"
+        ],
+        "notoRegularAvailable": true,
+        "notoBoldAvailable": true,
+        "matchesLatinA": true,
+        "latinAFamily": "Noto Sans",
+        "latinAKey": "fonts:GoogleSans?family=Google Sans"
+      }
+    },
+    {
+      "stage": "before-gsans",
+      "expectedCount": 12,
+      "results": [
+        {
+          "name": "FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests.VirtualizationThemeVisualAccessibilityPerformanceAndPlatformBaselinesCoverStable34",
+          "outcome": "Passed"
+        },
+        {
+          "name": "FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests.TableV2UsesFixedDataGetterAndExpandedRowCallbacks",
+          "outcome": "Passed"
+        },
+        {
+          "name": "FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests.TableV2SortsTypedRowsAndReportsColumnSort",
+          "outcome": "Passed"
+        },
+        {
+          "name": "FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests.TableV2BindsTypedRowsFixedColumnsAndRealKeyboardScroll",
+          "outcome": "Passed"
+        },
+        {
+          "name": "FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests.TableV2RendersBoundedContentRegions",
+          "outcome": "Passed"
+        },
+        {
+          "name": "FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests.TableV2MeasuresDynamicRowsAndRaisesRealScrollCallbacks",
+          "outcome": "Passed"
+        },
+        {
+          "name": "FsusUI.Avalonia.HeadlessTests.FsusTableV2RenderedEvidenceTests.RendersWholeHeaderAndOverlayContentRegionsToPng",
+          "outcome": "Passed"
+        },
+        {
+          "name": "FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests.TableV2ContentRegionsReceiveScopedPayloads",
+          "outcome": "Passed"
+        },
+        {
+          "name": "FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests.TableV2VirtualizesFrozenAxesNavigatesAndRejectsStaleBackgroundResults",
+          "outcome": "Passed"
+        },
+        {
+          "name": "FsusUI.Avalonia.HeadlessTests.FsusTableV2RenderedEvidenceTests.RendersPopulatedAndEmptyContentRegionsToPng",
+          "outcome": "Passed"
+        },
+        {
+          "name": "FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests.AutoResizerAndTableV2VirtualizeRowsColumnsResizeAndBudget",
+          "outcome": "Passed"
+        },
+        {
+          "name": "FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests.TableV2MapsViewportGeometryAndCacheToRealLayout",
+          "outcome": "Passed"
+        }
+      ],
+      "captures": [
+        {
+          "name": "table-v2-content-regions-light.png",
+          "dimensions": [
+            488,
+            540
+          ],
+          "bytes": 38293,
+          "sha256": "12c592158d6d33a79c5e97ef319e924e65a7b118071531683551c5d13e660bc8",
+          "equalFrozenBytes": true,
+          "differentPixels": 0
+        },
+        {
+          "name": "table-v2-whole-header-overlay-light.png",
+          "dimensions": [
+            488,
+            320
+          ],
+          "bytes": 17037,
+          "sha256": "3ddb0fef6bcf5080df423f22aa6ab289458032d3bc032a340f59157b3c77a16d",
+          "equalFrozenBytes": true,
+          "differentPixels": 0
+        }
+      ],
+      "membership": {
+        "gsans": "1",
+        "registeredSharedCollections": [
+          {
+            "key": "fonts:GoogleSans?family=Google%20Sans",
+            "count": 1,
+            "families": [
+              "Noto Sans"
+            ]
+          }
+        ],
+        "collectionKey": "fonts:GoogleSans?family=Google%20Sans",
+        "count": 1,
+        "families": [
+          "Noto Sans"
+        ],
+        "sharedPrefixAssets": [
+          "avares://FsusUI.Avalonia.HeadlessTests/Assets/Fonts/TableV2/NotoSans-Bold.ttf",
+          "avares://FsusUI.Avalonia.HeadlessTests/Assets/Fonts/TableV2/NotoSans-Regular.ttf"
+        ],
+        "notoRegularAvailable": true,
+        "notoBoldAvailable": true,
+        "matchesLatinA": true,
+        "latinAFamily": "Noto Sans",
+        "latinAKey": "fonts:GoogleSans?family=Google Sans"
+      }
+    },
+    {
+      "stage": "after-normal",
+      "expectedCount": 12,
+      "results": [
+        {
+          "name": "FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests.TableV2RendersBoundedContentRegions",
+          "outcome": "Passed"
+        },
+        {
+          "name": "FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests.TableV2VirtualizesFrozenAxesNavigatesAndRejectsStaleBackgroundResults",
+          "outcome": "Passed"
+        },
+        {
+          "name": "FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests.TableV2SortsTypedRowsAndReportsColumnSort",
+          "outcome": "Passed"
+        },
+        {
+          "name": "FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests.VirtualizationThemeVisualAccessibilityPerformanceAndPlatformBaselinesCoverStable34",
+          "outcome": "Passed"
+        },
+        {
+          "name": "FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests.TableV2BindsTypedRowsFixedColumnsAndRealKeyboardScroll",
+          "outcome": "Passed"
+        },
+        {
+          "name": "FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests.TableV2MeasuresDynamicRowsAndRaisesRealScrollCallbacks",
+          "outcome": "Passed"
+        },
+        {
+          "name": "FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests.TableV2ContentRegionsReceiveScopedPayloads",
+          "outcome": "Passed"
+        },
+        {
+          "name": "FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests.TableV2UsesFixedDataGetterAndExpandedRowCallbacks",
+          "outcome": "Passed"
+        },
+        {
+          "name": "FsusUI.Avalonia.HeadlessTests.FsusTableV2RenderedEvidenceTests.RendersPopulatedAndEmptyContentRegionsToPng",
+          "outcome": "Passed"
+        },
+        {
+          "name": "FsusUI.Avalonia.HeadlessTests.FsusTableV2RenderedEvidenceTests.RendersWholeHeaderAndOverlayContentRegionsToPng",
+          "outcome": "Passed"
+        },
+        {
+          "name": "FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests.AutoResizerAndTableV2VirtualizeRowsColumnsResizeAndBudget",
+          "outcome": "Passed"
+        },
+        {
+          "name": "FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests.TableV2MapsViewportGeometryAndCacheToRealLayout",
+          "outcome": "Passed"
+        }
+      ],
+      "captures": [
+        {
+          "name": "table-v2-content-regions-light.png",
+          "dimensions": [
+            488,
+            540
+          ],
+          "bytes": 38293,
+          "sha256": "12c592158d6d33a79c5e97ef319e924e65a7b118071531683551c5d13e660bc8",
+          "equalFrozenBytes": true,
+          "differentPixels": 0
+        },
+        {
+          "name": "table-v2-whole-header-overlay-light.png",
+          "dimensions": [
+            488,
+            320
+          ],
+          "bytes": 17037,
+          "sha256": "3ddb0fef6bcf5080df423f22aa6ab289458032d3bc032a340f59157b3c77a16d",
+          "equalFrozenBytes": true,
+          "differentPixels": 0
+        }
+      ],
+      "membership": {
+        "gsans": null,
+        "registeredSharedCollections": [],
+        "collectionKey": "fonts:GoogleSans?family=Google%20Sans",
+        "count": 0,
+        "families": [],
+        "sharedPrefixAssets": [],
+        "notoRegularAvailable": false,
+        "notoBoldAvailable": false,
+        "matchesLatinA": false,
+        "latinAFamily": null,
+        "latinAKey": null
+      }
+    },
+    {
+      "stage": "after-gsans",
+      "expectedCount": 12,
+      "results": [
+        {
+          "name": "FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests.TableV2MeasuresDynamicRowsAndRaisesRealScrollCallbacks",
+          "outcome": "Passed"
+        },
+        {
+          "name": "FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests.AutoResizerAndTableV2VirtualizeRowsColumnsResizeAndBudget",
+          "outcome": "Passed"
+        },
+        {
+          "name": "FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests.TableV2BindsTypedRowsFixedColumnsAndRealKeyboardScroll",
+          "outcome": "Passed"
+        },
+        {
+          "name": "FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests.TableV2RendersBoundedContentRegions",
+          "outcome": "Passed"
+        },
+        {
+          "name": "FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests.TableV2UsesFixedDataGetterAndExpandedRowCallbacks",
+          "outcome": "Passed"
+        },
+        {
+          "name": "FsusUI.Avalonia.HeadlessTests.FsusTableV2RenderedEvidenceTests.RendersPopulatedAndEmptyContentRegionsToPng",
+          "outcome": "Passed"
+        },
+        {
+          "name": "FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests.TableV2MapsViewportGeometryAndCacheToRealLayout",
+          "outcome": "Passed"
+        },
+        {
+          "name": "FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests.TableV2VirtualizesFrozenAxesNavigatesAndRejectsStaleBackgroundResults",
+          "outcome": "Passed"
+        },
+        {
+          "name": "FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests.VirtualizationThemeVisualAccessibilityPerformanceAndPlatformBaselinesCoverStable34",
+          "outcome": "Passed"
+        },
+        {
+          "name": "FsusUI.Avalonia.HeadlessTests.FsusTableV2RenderedEvidenceTests.RendersWholeHeaderAndOverlayContentRegionsToPng",
+          "outcome": "Passed"
+        },
+        {
+          "name": "FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests.TableV2SortsTypedRowsAndReportsColumnSort",
+          "outcome": "Passed"
+        },
+        {
+          "name": "FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests.TableV2ContentRegionsReceiveScopedPayloads",
+          "outcome": "Passed"
+        }
+      ],
+      "captures": [
+        {
+          "name": "table-v2-content-regions-light.png",
+          "dimensions": [
+            488,
+            540
+          ],
+          "bytes": 38293,
+          "sha256": "12c592158d6d33a79c5e97ef319e924e65a7b118071531683551c5d13e660bc8",
+          "equalFrozenBytes": true,
+          "differentPixels": 0
+        },
+        {
+          "name": "table-v2-whole-header-overlay-light.png",
+          "dimensions": [
+            488,
+            320
+          ],
+          "bytes": 17037,
+          "sha256": "3ddb0fef6bcf5080df423f22aa6ab289458032d3bc032a340f59157b3c77a16d",
+          "equalFrozenBytes": true,
+          "differentPixels": 0
+        }
+      ],
+      "membership": {
+        "gsans": "1",
+        "registeredSharedCollections": [
+          {
+            "key": "fonts:GoogleSans?family=Google%20Sans",
+            "count": 0,
+            "families": []
+          }
+        ],
+        "collectionKey": "fonts:GoogleSans?family=Google%20Sans",
+        "count": 0,
+        "families": [],
+        "sharedPrefixAssets": [],
+        "notoRegularAvailable": false,
+        "notoBoldAvailable": false,
+        "matchesLatinA": false,
+        "latinAFamily": null,
+        "latinAKey": null
+      }
+    }
+  ],
+  "reviewerRuntimeStatus": "Prior reviewer runtime tests were UNRUN; this task performed the recorded runs",
+  "preserved": [
+    "Frozen PNGs",
+    "Every original assertion",
+    "Budgets",
+    "TestAppBuilder",
+    "Canonical Inter registration",
+    "RepositoryRoot scope"
+  ],
+  "limit": "After the move the shared GoogleSans collection is empty on this reviewed composition; no claim that separately owned shared GoogleSans/Inter setup is complete."
+}

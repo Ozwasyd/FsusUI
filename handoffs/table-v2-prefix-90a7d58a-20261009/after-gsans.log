@@ -1,0 +1,8 @@
+Test run for /workspace/tablev2-isolatedfonts/dotnet/FsusUI.Avalonia.HeadlessTests/bin/Release/net10.0/FsusUI.Avalonia.HeadlessTests.dll (.NETCoreApp,Version=v10.0)
+VSTest version 18.0.2 (x64)
+
+Starting test execution, please wait...
+A total of 1 test files matched the specified pattern.
+Results File: /workspace/tablev2-prefix-evidence/after-gsans-results/_d45ac3896e5a_2026-10-09_07_12_25.trx
+
+Passed!  - Failed:     0, Passed:    12, Skipped:     0, Total:    12, Duration: 1 s - FsusUI.Avalonia.HeadlessTests.dll (net10.0)

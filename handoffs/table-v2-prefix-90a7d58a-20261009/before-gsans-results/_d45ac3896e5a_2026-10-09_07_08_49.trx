@@ -1,0 +1,129 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TestRun id="c143d003-e31a-45fc-baf4-0583a5a0541a" name="@d45ac3896e5a 2026-10-09 07:08:49" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <Times creation="2026-10-09T07:08:50.0011370+00:00" queuing="2026-10-09T07:08:50.0011370+00:00" start="2026-10-09T07:08:47.0909821+00:00" finish="2026-10-09T07:08:50.6771451+00:00" />
+  <TestSettings name="default" id="d4393a68-4737-4cb1-a073-bbfc19bec729">
+    <Deployment runDeploymentRoot="_d45ac3896e5a_2026-10-09_07_08_49" />
+  </TestSettings>
+  <Results>
+    <UnitTestResult executionId="01697d63-49b3-4a92-9fb9-27aeb444ef56" testId="170707a6-26de-3fdf-c98a-4c7df40dd972" testName="FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests.VirtualizationThemeVisualAccessibilityPerformanceAndPlatformBaselinesCoverStable34" computerName="d45ac3896e5a" duration="00:00:00.0262222" startTime="2026-10-09T07:08:49.2388978+00:00" endTime="2026-10-09T07:08:49.2767183+00:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="01697d63-49b3-4a92-9fb9-27aeb444ef56" />
+    <UnitTestResult executionId="2a6be4a6-82d8-452b-8f3e-e51fffc313d0" testId="ad46e508-3e01-837f-3458-c9540a2ffc58" testName="FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests.TableV2UsesFixedDataGetterAndExpandedRowCallbacks" computerName="d45ac3896e5a" duration="00:00:00.0060375" startTime="2026-10-09T07:08:49.9643167+00:00" endTime="2026-10-09T07:08:49.9704354+00:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="2a6be4a6-82d8-452b-8f3e-e51fffc313d0" />
+    <UnitTestResult executionId="009e10b3-0136-463f-bac1-e82bed185ec2" testId="dc3a17d1-dfaf-3415-98b5-53231173b8e1" testName="FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests.TableV2SortsTypedRowsAndReportsColumnSort" computerName="d45ac3896e5a" duration="00:00:00.0182759" startTime="2026-10-09T07:08:49.4122552+00:00" endTime="2026-10-09T07:08:49.4306273+00:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="009e10b3-0136-463f-bac1-e82bed185ec2" />
+    <UnitTestResult executionId="cba2359f-bc47-47e7-b187-6a47f0c977f4" testId="8d7f8684-4ce6-a573-dbe2-9754f6d9b8b8" testName="FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests.TableV2BindsTypedRowsFixedColumnsAndRealKeyboardScroll" computerName="d45ac3896e5a" duration="00:00:00.0121494" startTime="2026-10-09T07:08:49.9027256+00:00" endTime="2026-10-09T07:08:49.9149659+00:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="cba2359f-bc47-47e7-b187-6a47f0c977f4" />
+    <UnitTestResult executionId="d8e69c41-143d-4587-839f-ea0ac2f3d69d" testId="7e68c023-133a-60dd-ccb2-b8757c595c64" testName="FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests.TableV2RendersBoundedContentRegions" computerName="d45ac3896e5a" duration="00:00:00.0018246" startTime="2026-10-09T07:08:49.9346541+00:00" endTime="2026-10-09T07:08:49.9365556+00:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="d8e69c41-143d-4587-839f-ea0ac2f3d69d" />
+    <UnitTestResult executionId="36c3293c-5f2e-4e5c-a571-d19940e5d2f6" testId="72d567ba-fc65-7827-f7f9-34bd0975ffee" testName="FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests.TableV2MeasuresDynamicRowsAndRaisesRealScrollCallbacks" computerName="d45ac3896e5a" duration="00:00:00.0086702" startTime="2026-10-09T07:08:49.9195277+00:00" endTime="2026-10-09T07:08:49.9283541+00:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="36c3293c-5f2e-4e5c-a571-d19940e5d2f6" />
+    <UnitTestResult executionId="ea619b99-bce4-4fd5-8320-97277df67906" testId="cfee3f40-5049-18a5-01bb-641741e23862" testName="FsusUI.Avalonia.HeadlessTests.FsusTableV2RenderedEvidenceTests.RendersWholeHeaderAndOverlayContentRegionsToPng" computerName="d45ac3896e5a" duration="00:00:00.0962292" startTime="2026-10-09T07:08:50.4849271+00:00" endTime="2026-10-09T07:08:50.5813084+00:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="ea619b99-bce4-4fd5-8320-97277df67906" />
+    <UnitTestResult executionId="036e69a3-f31d-4372-8632-a5042d53b186" testId="9390c533-82aa-2d28-1941-d380e48b7fa6" testName="FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests.TableV2ContentRegionsReceiveScopedPayloads" computerName="d45ac3896e5a" duration="00:00:00.4611941" startTime="2026-10-09T07:08:49.4354324+00:00" endTime="2026-10-09T07:08:49.8967189+00:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="036e69a3-f31d-4372-8632-a5042d53b186" />
+    <UnitTestResult executionId="e71dd045-c8b7-4b79-8c66-7eb954b9b8af" testId="6ac18243-b73f-188f-11cf-fe379c5dd1b4" testName="FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests.TableV2VirtualizesFrozenAxesNavigatesAndRejectsStaleBackgroundResults" computerName="d45ac3896e5a" duration="00:00:00.0182400" startTime="2026-10-09T07:08:49.9416499+00:00" endTime="2026-10-09T07:08:49.9599589+00:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="e71dd045-c8b7-4b79-8c66-7eb954b9b8af" />
+    <UnitTestResult executionId="1c7e18aa-a9b1-4c2e-bd5e-e7b8013cac32" testId="07c993c6-ead7-ea8e-f764-c0a6fcdf5109" testName="FsusUI.Avalonia.HeadlessTests.FsusTableV2RenderedEvidenceTests.RendersPopulatedAndEmptyContentRegionsToPng" computerName="d45ac3896e5a" duration="00:00:00.4599701" startTime="2026-10-09T07:08:50.0114566+00:00" endTime="2026-10-09T07:08:50.4715362+00:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="1c7e18aa-a9b1-4c2e-bd5e-e7b8013cac32" />
+    <UnitTestResult executionId="5501de8e-9b8e-4add-8d83-05fbc6e57a2c" testId="8bcde894-41dd-85e2-5e8b-21fae044786d" testName="FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests.AutoResizerAndTableV2VirtualizeRowsColumnsResizeAndBudget" computerName="d45ac3896e5a" duration="00:00:00.0206623" startTime="2026-10-09T07:08:49.9764489+00:00" endTime="2026-10-09T07:08:49.9971934+00:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="5501de8e-9b8e-4add-8d83-05fbc6e57a2c" />
+    <UnitTestResult executionId="281e931e-42d0-4b13-afd2-ccbac7008a6e" testId="bb225827-4f97-7c03-6407-e186b7cbc999" testName="FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests.TableV2MapsViewportGeometryAndCacheToRealLayout" computerName="d45ac3896e5a" duration="00:00:00.1056900" startTime="2026-10-09T07:08:49.3004419+00:00" endTime="2026-10-09T07:08:49.4063939+00:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="281e931e-42d0-4b13-afd2-ccbac7008a6e" />
+  </Results>
+  <TestDefinitions>
+    <UnitTest name="FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests.TableV2BindsTypedRowsFixedColumnsAndRealKeyboardScroll" storage="/workspace/tablev2-isolatedfonts/dotnet/fsusui.avalonia.headlesstests/bin/release/net10.0/fsusui.avalonia.headlesstests.dll" id="8d7f8684-4ce6-a573-dbe2-9754f6d9b8b8">
+      <Execution id="cba2359f-bc47-47e7-b187-6a47f0c977f4" />
+      <TestMethod codeBase="/workspace/tablev2-isolatedfonts/dotnet/FsusUI.Avalonia.HeadlessTests/bin/Release/net10.0/FsusUI.Avalonia.HeadlessTests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests" name="TableV2BindsTypedRowsFixedColumnsAndRealKeyboardScroll" />
+    </UnitTest>
+    <UnitTest name="FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests.TableV2ContentRegionsReceiveScopedPayloads" storage="/workspace/tablev2-isolatedfonts/dotnet/fsusui.avalonia.headlesstests/bin/release/net10.0/fsusui.avalonia.headlesstests.dll" id="9390c533-82aa-2d28-1941-d380e48b7fa6">
+      <Execution id="036e69a3-f31d-4372-8632-a5042d53b186" />
+      <TestMethod codeBase="/workspace/tablev2-isolatedfonts/dotnet/FsusUI.Avalonia.HeadlessTests/bin/Release/net10.0/FsusUI.Avalonia.HeadlessTests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests" name="TableV2ContentRegionsReceiveScopedPayloads" />
+    </UnitTest>
+    <UnitTest name="FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests.AutoResizerAndTableV2VirtualizeRowsColumnsResizeAndBudget" storage="/workspace/tablev2-isolatedfonts/dotnet/fsusui.avalonia.headlesstests/bin/release/net10.0/fsusui.avalonia.headlesstests.dll" id="8bcde894-41dd-85e2-5e8b-21fae044786d">
+      <Execution id="5501de8e-9b8e-4add-8d83-05fbc6e57a2c" />
+      <TestMethod codeBase="/workspace/tablev2-isolatedfonts/dotnet/FsusUI.Avalonia.HeadlessTests/bin/Release/net10.0/FsusUI.Avalonia.HeadlessTests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests" name="AutoResizerAndTableV2VirtualizeRowsColumnsResizeAndBudget" />
+    </UnitTest>
+    <UnitTest name="FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests.TableV2MapsViewportGeometryAndCacheToRealLayout" storage="/workspace/tablev2-isolatedfonts/dotnet/fsusui.avalonia.headlesstests/bin/release/net10.0/fsusui.avalonia.headlesstests.dll" id="bb225827-4f97-7c03-6407-e186b7cbc999">
+      <Execution id="281e931e-42d0-4b13-afd2-ccbac7008a6e" />
+      <TestMethod codeBase="/workspace/tablev2-isolatedfonts/dotnet/FsusUI.Avalonia.HeadlessTests/bin/Release/net10.0/FsusUI.Avalonia.HeadlessTests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests" name="TableV2MapsViewportGeometryAndCacheToRealLayout" />
+    </UnitTest>
+    <UnitTest name="FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests.TableV2SortsTypedRowsAndReportsColumnSort" storage="/workspace/tablev2-isolatedfonts/dotnet/fsusui.avalonia.headlesstests/bin/release/net10.0/fsusui.avalonia.headlesstests.dll" id="dc3a17d1-dfaf-3415-98b5-53231173b8e1">
+      <Execution id="009e10b3-0136-463f-bac1-e82bed185ec2" />
+      <TestMethod codeBase="/workspace/tablev2-isolatedfonts/dotnet/FsusUI.Avalonia.HeadlessTests/bin/Release/net10.0/FsusUI.Avalonia.HeadlessTests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests" name="TableV2SortsTypedRowsAndReportsColumnSort" />
+    </UnitTest>
+    <UnitTest name="FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests.TableV2UsesFixedDataGetterAndExpandedRowCallbacks" storage="/workspace/tablev2-isolatedfonts/dotnet/fsusui.avalonia.headlesstests/bin/release/net10.0/fsusui.avalonia.headlesstests.dll" id="ad46e508-3e01-837f-3458-c9540a2ffc58">
+      <Execution id="2a6be4a6-82d8-452b-8f3e-e51fffc313d0" />
+      <TestMethod codeBase="/workspace/tablev2-isolatedfonts/dotnet/FsusUI.Avalonia.HeadlessTests/bin/Release/net10.0/FsusUI.Avalonia.HeadlessTests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests" name="TableV2UsesFixedDataGetterAndExpandedRowCallbacks" />
+    </UnitTest>
+    <UnitTest name="FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests.VirtualizationThemeVisualAccessibilityPerformanceAndPlatformBaselinesCoverStable34" storage="/workspace/tablev2-isolatedfonts/dotnet/fsusui.avalonia.headlesstests/bin/release/net10.0/fsusui.avalonia.headlesstests.dll" id="170707a6-26de-3fdf-c98a-4c7df40dd972">
+      <Execution id="01697d63-49b3-4a92-9fb9-27aeb444ef56" />
+      <TestMethod codeBase="/workspace/tablev2-isolatedfonts/dotnet/FsusUI.Avalonia.HeadlessTests/bin/Release/net10.0/FsusUI.Avalonia.HeadlessTests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests" name="VirtualizationThemeVisualAccessibilityPerformanceAndPlatformBaselinesCoverStable34" />
+    </UnitTest>
+    <UnitTest name="FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests.TableV2VirtualizesFrozenAxesNavigatesAndRejectsStaleBackgroundResults" storage="/workspace/tablev2-isolatedfonts/dotnet/fsusui.avalonia.headlesstests/bin/release/net10.0/fsusui.avalonia.headlesstests.dll" id="6ac18243-b73f-188f-11cf-fe379c5dd1b4">
+      <Execution id="e71dd045-c8b7-4b79-8c66-7eb954b9b8af" />
+      <TestMethod codeBase="/workspace/tablev2-isolatedfonts/dotnet/FsusUI.Avalonia.HeadlessTests/bin/Release/net10.0/FsusUI.Avalonia.HeadlessTests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests" name="TableV2VirtualizesFrozenAxesNavigatesAndRejectsStaleBackgroundResults" />
+    </UnitTest>
+    <UnitTest name="FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests.TableV2RendersBoundedContentRegions" storage="/workspace/tablev2-isolatedfonts/dotnet/fsusui.avalonia.headlesstests/bin/release/net10.0/fsusui.avalonia.headlesstests.dll" id="7e68c023-133a-60dd-ccb2-b8757c595c64">
+      <Execution id="d8e69c41-143d-4587-839f-ea0ac2f3d69d" />
+      <TestMethod codeBase="/workspace/tablev2-isolatedfonts/dotnet/FsusUI.Avalonia.HeadlessTests/bin/Release/net10.0/FsusUI.Avalonia.HeadlessTests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests" name="TableV2RendersBoundedContentRegions" />
+    </UnitTest>
+    <UnitTest name="FsusUI.Avalonia.HeadlessTests.FsusTableV2RenderedEvidenceTests.RendersPopulatedAndEmptyContentRegionsToPng" storage="/workspace/tablev2-isolatedfonts/dotnet/fsusui.avalonia.headlesstests/bin/release/net10.0/fsusui.avalonia.headlesstests.dll" id="07c993c6-ead7-ea8e-f764-c0a6fcdf5109">
+      <Execution id="1c7e18aa-a9b1-4c2e-bd5e-e7b8013cac32" />
+      <TestMethod codeBase="/workspace/tablev2-isolatedfonts/dotnet/FsusUI.Avalonia.HeadlessTests/bin/Release/net10.0/FsusUI.Avalonia.HeadlessTests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="FsusUI.Avalonia.HeadlessTests.FsusTableV2RenderedEvidenceTests" name="RendersPopulatedAndEmptyContentRegionsToPng" />
+    </UnitTest>
+    <UnitTest name="FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests.TableV2MeasuresDynamicRowsAndRaisesRealScrollCallbacks" storage="/workspace/tablev2-isolatedfonts/dotnet/fsusui.avalonia.headlesstests/bin/release/net10.0/fsusui.avalonia.headlesstests.dll" id="72d567ba-fc65-7827-f7f9-34bd0975ffee">
+      <Execution id="36c3293c-5f2e-4e5c-a571-d19940e5d2f6" />
+      <TestMethod codeBase="/workspace/tablev2-isolatedfonts/dotnet/FsusUI.Avalonia.HeadlessTests/bin/Release/net10.0/FsusUI.Avalonia.HeadlessTests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests" name="TableV2MeasuresDynamicRowsAndRaisesRealScrollCallbacks" />
+    </UnitTest>
+    <UnitTest name="FsusUI.Avalonia.HeadlessTests.FsusTableV2RenderedEvidenceTests.RendersWholeHeaderAndOverlayContentRegionsToPng" storage="/workspace/tablev2-isolatedfonts/dotnet/fsusui.avalonia.headlesstests/bin/release/net10.0/fsusui.avalonia.headlesstests.dll" id="cfee3f40-5049-18a5-01bb-641741e23862">
+      <Execution id="ea619b99-bce4-4fd5-8320-97277df67906" />
+      <TestMethod codeBase="/workspace/tablev2-isolatedfonts/dotnet/FsusUI.Avalonia.HeadlessTests/bin/Release/net10.0/FsusUI.Avalonia.HeadlessTests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="FsusUI.Avalonia.HeadlessTests.FsusTableV2RenderedEvidenceTests" name="RendersWholeHeaderAndOverlayContentRegionsToPng" />
+    </UnitTest>
+  </TestDefinitions>
+  <TestEntries>
+    <TestEntry testId="170707a6-26de-3fdf-c98a-4c7df40dd972" executionId="01697d63-49b3-4a92-9fb9-27aeb444ef56" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="ad46e508-3e01-837f-3458-c9540a2ffc58" executionId="2a6be4a6-82d8-452b-8f3e-e51fffc313d0" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="dc3a17d1-dfaf-3415-98b5-53231173b8e1" executionId="009e10b3-0136-463f-bac1-e82bed185ec2" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="8d7f8684-4ce6-a573-dbe2-9754f6d9b8b8" executionId="cba2359f-bc47-47e7-b187-6a47f0c977f4" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="7e68c023-133a-60dd-ccb2-b8757c595c64" executionId="d8e69c41-143d-4587-839f-ea0ac2f3d69d" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="72d567ba-fc65-7827-f7f9-34bd0975ffee" executionId="36c3293c-5f2e-4e5c-a571-d19940e5d2f6" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="cfee3f40-5049-18a5-01bb-641741e23862" executionId="ea619b99-bce4-4fd5-8320-97277df67906" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="9390c533-82aa-2d28-1941-d380e48b7fa6" executionId="036e69a3-f31d-4372-8632-a5042d53b186" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="6ac18243-b73f-188f-11cf-fe379c5dd1b4" executionId="e71dd045-c8b7-4b79-8c66-7eb954b9b8af" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="07c993c6-ead7-ea8e-f764-c0a6fcdf5109" executionId="1c7e18aa-a9b1-4c2e-bd5e-e7b8013cac32" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="8bcde894-41dd-85e2-5e8b-21fae044786d" executionId="5501de8e-9b8e-4add-8d83-05fbc6e57a2c" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="bb225827-4f97-7c03-6407-e186b7cbc999" executionId="281e931e-42d0-4b13-afd2-ccbac7008a6e" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+  </TestEntries>
+  <TestLists>
+    <TestList name="Results Not in a List" id="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestList name="All Loaded Results" id="19431567-8539-422a-85d7-44ee4e166bda" />
+  </TestLists>
+  <ResultSummary outcome="Completed">
+    <Counters total="12" executed="12" passed="12" failed="0" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
+    <Output>
+      <StdOut>[xUnit.net 00:00:00.00] xUnit.net VSTest Adapter v3.1.4+50e68bbb8b (64-bit .NET 10.0.8)
+[xUnit.net 00:00:00.21]   Discovering: FsusUI.Avalonia.HeadlessTests
+[xUnit.net 00:00:00.65]   Discovered:  FsusUI.Avalonia.HeadlessTests
+[xUnit.net 00:00:00.89]   Starting:    FsusUI.Avalonia.HeadlessTests
+Fontconfig error: No writable cache directories
+Fontconfig error: No writable cache directories
+Fontconfig error: No writable cache directories
+Fontconfig error: No writable cache directories
+Fontconfig error: No writable cache directories
+Fontconfig error: No writable cache directories
+Fontconfig error: No writable cache directories
+Fontconfig error: No writable cache directories
+Fontconfig error: No writable cache directories
+Fontconfig error: No writable cache directories
+Fontconfig error: No writable cache directories
+Fontconfig error: No writable cache directories
+Fontconfig error: No writable cache directories
+Fontconfig error: No writable cache directories
+Fontconfig error: No writable cache directories
+Fontconfig error: No writable cache directories
+Fontconfig error: No writable cache directories
+Fontconfig error: No writable cache directories
+Fontconfig error: No writable cache directories
+Fontconfig error: No writable cache directories
+Fontconfig error: No writable cache directories
+Fontconfig error: No writable cache directories
+Fontconfig error: No writable cache directories
+Fontconfig error: No writable cache directories
+Fontconfig error: No writable cache directories
+Fontconfig error: No writable cache directories
+Fontconfig error: No writable cache directories
+Fontconfig error: No writable cache directories
+Fontconfig error: No writable cache directories
+[xUnit.net 00:00:03.01]   Finished:    FsusUI.Avalonia.HeadlessTests
+</StdOut>
+    </Output>
+  </ResultSummary>
+</TestRun>

@@ -1,0 +1,433 @@
+{
+  "status": "WIP: off-host, CI SDK and independent review pending",
+  "repository": "Ozwasyd/FsusUI",
+  "base": "b17077f3afd4a80ff3bdc0fe81d5dfc353ffddf2",
+  "failedHead": "83036006069be5cfcd09724273d5705d8f848ad0",
+  "head": "24a7ba8c3feffbe4f040a5ccf6332af70f7a74d4",
+  "branch": "fix/table-v2-rendered-output-20261009",
+  "diagnosticPrerequisite": {
+    "commit": "8840c3834f4d1cb67cdccd5238b1cbcc8558141a",
+    "mode": "Exact approved patch consumed temporarily, not committed or published in this branch",
+    "patchSha256": "dd8a462e76c4dff903b642059f89db2d713a0f0ac8247a5bc70a63a82bb31fec",
+    "lockInputs": [
+      {
+        "path": "dotnet/FsusUI.Avalonia.Icons/packages.lock.json",
+        "sha256": "64d63bd753fbe52a2661338563c868b25da6e0b54679f67eed9804737f489d35"
+      },
+      {
+        "path": "dotnet/FsusUI.Avalonia.Themes/packages.lock.json",
+        "sha256": "64d63bd753fbe52a2661338563c868b25da6e0b54679f67eed9804737f489d35"
+      },
+      {
+        "path": "dotnet/FsusUI.Avalonia/packages.lock.json",
+        "sha256": "eb94ae63f2336fcf4dde84e6bd548e1875f4e48a19b0bdae0b63f3fc27376d59"
+      }
+    ]
+  },
+  "toolchain": {
+    "sdk": "10.0.108",
+    "sdkCommit": "94ea82652c",
+    "runtime": "10.0.8",
+    "msbuild": "18.0.11+94ea82652",
+    "os": "Debian GNU/Linux 13",
+    "rid": "linux-x64",
+    "Avalonia": "12.0.4",
+    "SkiaSharp": "3.119.4",
+    "sdkOfficialUrl": "https://builds.dotnet.microsoft.com/dotnet/Sdk/10.0.108/dotnet-sdk-10.0.108-linux-x64.tar.gz",
+    "sdkOfficialSha512": "e32f76b768017718aa5a3a51fcac4b617ab4428c5f2d10b1b30f07dd7f1ea3dad4df917df48d855d78a347d635e48ce0ec309787899c53a32c4c10dd216b6b19",
+    "sdkArchiveSha512": "e32f76b768017718aa5a3a51fcac4b617ab4428c5f2d10b1b30f07dd7f1ea3dad4df917df48d855d78a347d635e48ce0ec309787899c53a32c4c10dd216b6b19"
+  },
+  "originalSource": {
+    "run": 37798728109,
+    "linuxJob": 113384931201,
+    "macosJob": 113384931043,
+    "originalSdk": "10.0.401",
+    "retrieval": "Official GitHub download_workflow_artifact and fetch_workflow_job_logs connector after direct storage redirect was blocked",
+    "artifacts": [
+      {
+        "platform": "linux",
+        "id": 11559887369,
+        "sha256": "827c49e687d6319bd115a19dfe445f8c93cd6d98339c45357dcc89ff14248c0d",
+        "publishedDigestMatches": true,
+        "contents": "Four TRX files; no failing PNG captures"
+      },
+      {
+        "platform": "macos",
+        "id": 11559428406,
+        "sha256": "cc5d401fdc3e87336331ae20f6ac5d3f37721c8663e47814336ad4360c0aab59",
+        "publishedDigestMatches": true,
+        "contents": "Four TRX files; no failing PNG captures"
+      }
+    ],
+    "limitation": "Original failure PNGs were never saved by the original helper. Exact original-CI decoded pixels cannot be recovered from the truncated Assert.Equal messages."
+  },
+  "findings": {
+    "productionRegression": "Not demonstrated; TableV2 production source and virtualization theme are byte-identical at golden generation, base and failed head. Local unchanged cases depend on an unresolved default font.",
+    "supportedRootCause": "Unspecified fixture font identity and metrics. Unmodified Noto Sans 2.004 embedded in fixture restores exact frozen bytes locally.",
+    "encoder": "RGBA 8-bit, 96 DPI render targets; identical IHDR/sBIT/IDAT/IEND chunks and bytes for final candidate. No text/time/profile metadata. Encoded-byte nondeterminism not demonstrated locally.",
+    "fontProbes": [
+      {
+        "font": "DejaVu Sans",
+        "changedPixels": [
+          42376,
+          17564
+        ]
+      },
+      {
+        "font": "embedded Inter",
+        "changedPixels": [
+          37928,
+          15191
+        ]
+      },
+      {
+        "font": "bundled Noto Sans 2.004",
+        "changedPixels": [
+          0,
+          0
+        ]
+      }
+    ]
+  },
+  "candidatePixelEvidence": [
+    {
+      "name": "table-v2-content-regions-light.png",
+      "expectedSize": [
+        488,
+        540
+      ],
+      "actualSize": [
+        488,
+        540
+      ],
+      "expectedBytes": 38293,
+      "actualBytes": 38293,
+      "expectedSha256": "12c592158d6d33a79c5e97ef319e924e65a7b118071531683551c5d13e660bc8",
+      "actualSha256": "12c592158d6d33a79c5e97ef319e924e65a7b118071531683551c5d13e660bc8",
+      "differentPixels": 0,
+      "pixels": 263520,
+      "differenceBounds": null,
+      "maxChannelDifference": 0,
+      "alphaDifferentPixels": 0,
+      "pixelsByYBand": [
+        [
+          0,
+          60,
+          0
+        ],
+        [
+          60,
+          78,
+          0
+        ],
+        [
+          78,
+          114,
+          0
+        ],
+        [
+          114,
+          220,
+          0
+        ],
+        [
+          220,
+          320,
+          0
+        ],
+        [
+          320,
+          420,
+          0
+        ],
+        [
+          420,
+          540,
+          0
+        ]
+      ],
+      "expectedChunks": [
+        [
+          "IHDR",
+          13
+        ],
+        [
+          "sBIT",
+          4
+        ],
+        [
+          "IDAT",
+          8192
+        ],
+        [
+          "IDAT",
+          8192
+        ],
+        [
+          "IDAT",
+          8192
+        ],
+        [
+          "IDAT",
+          8192
+        ],
+        [
+          "IDAT",
+          5404
+        ],
+        [
+          "IEND",
+          0
+        ]
+      ],
+      "actualChunks": [
+        [
+          "IHDR",
+          13
+        ],
+        [
+          "sBIT",
+          4
+        ],
+        [
+          "IDAT",
+          8192
+        ],
+        [
+          "IDAT",
+          8192
+        ],
+        [
+          "IDAT",
+          8192
+        ],
+        [
+          "IDAT",
+          8192
+        ],
+        [
+          "IDAT",
+          5404
+        ],
+        [
+          "IEND",
+          0
+        ]
+      ]
+    },
+    {
+      "name": "table-v2-whole-header-overlay-light.png",
+      "expectedSize": [
+        488,
+        320
+      ],
+      "actualSize": [
+        488,
+        320
+      ],
+      "expectedBytes": 17037,
+      "actualBytes": 17037,
+      "expectedSha256": "3ddb0fef6bcf5080df423f22aa6ab289458032d3bc032a340f59157b3c77a16d",
+      "actualSha256": "3ddb0fef6bcf5080df423f22aa6ab289458032d3bc032a340f59157b3c77a16d",
+      "differentPixels": 0,
+      "pixels": 156160,
+      "differenceBounds": null,
+      "maxChannelDifference": 0,
+      "alphaDifferentPixels": 0,
+      "pixelsByYBand": [
+        [
+          0,
+          60,
+          0
+        ],
+        [
+          60,
+          78,
+          0
+        ],
+        [
+          78,
+          114,
+          0
+        ],
+        [
+          114,
+          220,
+          0
+        ],
+        [
+          220,
+          320,
+          0
+        ]
+      ],
+      "expectedChunks": [
+        [
+          "IHDR",
+          13
+        ],
+        [
+          "sBIT",
+          4
+        ],
+        [
+          "IDAT",
+          8192
+        ],
+        [
+          "IDAT",
+          8192
+        ],
+        [
+          "IDAT",
+          556
+        ],
+        [
+          "IEND",
+          0
+        ]
+      ],
+      "actualChunks": [
+        [
+          "IHDR",
+          13
+        ],
+        [
+          "sBIT",
+          4
+        ],
+        [
+          "IDAT",
+          8192
+        ],
+        [
+          "IDAT",
+          8192
+        ],
+        [
+          "IDAT",
+          556
+        ],
+        [
+          "IEND",
+          0
+        ]
+      ]
+    }
+  ],
+  "scope": [
+    {
+      "path": "dotnet/FsusUI.Avalonia.HeadlessTests/Assets/Fonts/TableV2/NotoSans-Bold.ttf",
+      "sha256": "e83493c945848ecd4a9ad0f6d19164541a0d3e23a9c952304a00a46e00272ac5"
+    },
+    {
+      "path": "dotnet/FsusUI.Avalonia.HeadlessTests/Assets/Fonts/TableV2/NotoSans-Regular.ttf",
+      "sha256": "89c3c497f618fdaa0b2d1e98fef93582f28c71debd2c4a8cdf41f190ced2909d"
+    },
+    {
+      "path": "dotnet/FsusUI.Avalonia.HeadlessTests/Assets/Fonts/TableV2/OFL.txt",
+      "sha256": "0dab92d0544f7b233403f14b84a663bdbfa746982eda629e7f4f9ffe1b036feb"
+    },
+    {
+      "path": "dotnet/FsusUI.Avalonia.HeadlessTests/Assets/Fonts/TableV2/README.md",
+      "sha256": "ec4ebf1c188a22ba2d8c0ef141a91c19e623bc4bfd50f83a4d01a302ae8dd7b3"
+    },
+    {
+      "path": "dotnet/FsusUI.Avalonia.HeadlessTests/FsusTableV2RenderedEvidenceTests.cs",
+      "sha256": "4c03d225e2c3bf7866cd0f0307f0df04512444c16038231248113aac28aca8ff"
+    },
+    {
+      "path": "dotnet/FsusUI.Avalonia.HeadlessTests/FsusUI.Avalonia.HeadlessTests.csproj",
+      "sha256": "71afbc0e1ee223762d4254c8c2e4c5ab4d561111aff94c8f9c4d012078120e7e"
+    },
+    {
+      "path": "dotnet/FsusUI.Avalonia.HeadlessTests/FsusVirtualizationHeadlessTests.cs",
+      "sha256": "0dd121b452bb9822d8d4537171589fe8bbe5a576ef064244bbbc55ddf252d1ed"
+    }
+  ],
+  "allowlist": [
+    "FullyQualifiedName=FsusUI.Avalonia.HeadlessTests.FsusTableV2RenderedEvidenceTests.RendersPopulatedAndEmptyContentRegionsToPng",
+    "FullyQualifiedName=FsusUI.Avalonia.HeadlessTests.FsusTableV2RenderedEvidenceTests.RendersWholeHeaderAndOverlayContentRegionsToPng",
+    "FullyQualifiedName=FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests.AutoResizerAndTableV2VirtualizeRowsColumnsResizeAndBudget",
+    "FullyQualifiedName=FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests.TableV2BindsTypedRowsFixedColumnsAndRealKeyboardScroll",
+    "FullyQualifiedName=FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests.TableV2MeasuresDynamicRowsAndRaisesRealScrollCallbacks",
+    "FullyQualifiedName=FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests.TableV2UsesFixedDataGetterAndExpandedRowCallbacks",
+    "FullyQualifiedName=FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests.TableV2MapsViewportGeometryAndCacheToRealLayout",
+    "FullyQualifiedName=FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests.TableV2SortsTypedRowsAndReportsColumnSort",
+    "FullyQualifiedName=FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests.TableV2RendersBoundedContentRegions",
+    "FullyQualifiedName=FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests.TableV2ContentRegionsReceiveScopedPayloads",
+    "FullyQualifiedName=FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests.TableV2VirtualizesFrozenAxesNavigatesAndRejectsStaleBackgroundResults",
+    "FullyQualifiedName=FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests.VirtualizationThemeVisualAccessibilityPerformanceAndPlatformBaselinesCoverStable34"
+  ],
+  "expectedTestCount": 12,
+  "results": [
+    {
+      "name": "FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests.TableV2MapsViewportGeometryAndCacheToRealLayout",
+      "outcome": "Passed"
+    },
+    {
+      "name": "FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests.AutoResizerAndTableV2VirtualizeRowsColumnsResizeAndBudget",
+      "outcome": "Passed"
+    },
+    {
+      "name": "FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests.TableV2VirtualizesFrozenAxesNavigatesAndRejectsStaleBackgroundResults",
+      "outcome": "Passed"
+    },
+    {
+      "name": "FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests.TableV2ContentRegionsReceiveScopedPayloads",
+      "outcome": "Passed"
+    },
+    {
+      "name": "FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests.TableV2UsesFixedDataGetterAndExpandedRowCallbacks",
+      "outcome": "Passed"
+    },
+    {
+      "name": "FsusUI.Avalonia.HeadlessTests.FsusTableV2RenderedEvidenceTests.RendersPopulatedAndEmptyContentRegionsToPng",
+      "outcome": "Passed"
+    },
+    {
+      "name": "FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests.TableV2BindsTypedRowsFixedColumnsAndRealKeyboardScroll",
+      "outcome": "Passed"
+    },
+    {
+      "name": "FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests.TableV2RendersBoundedContentRegions",
+      "outcome": "Passed"
+    },
+    {
+      "name": "FsusUI.Avalonia.HeadlessTests.FsusTableV2RenderedEvidenceTests.RendersWholeHeaderAndOverlayContentRegionsToPng",
+      "outcome": "Passed"
+    },
+    {
+      "name": "FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests.TableV2SortsTypedRowsAndReportsColumnSort",
+      "outcome": "Passed"
+    },
+    {
+      "name": "FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests.TableV2MeasuresDynamicRowsAndRaisesRealScrollCallbacks",
+      "outcome": "Passed"
+    },
+    {
+      "name": "FsusUI.Avalonia.HeadlessTests.FsusVirtualizationHeadlessTests.VirtualizationThemeVisualAccessibilityPerformanceAndPlatformBaselinesCoverStable34",
+      "outcome": "Passed"
+    }
+  ],
+  "commands": {
+    "restore": "dotnet restore dotnet/FsusUI.Avalonia.HeadlessTests/FsusUI.Avalonia.HeadlessTests.csproj --locked-mode --disable-parallel --maxcpucount:1",
+    "test": "dotnet test dotnet/FsusUI.Avalonia.HeadlessTests/FsusUI.Avalonia.HeadlessTests.csproj --no-restore --configuration Release --filter \"$(cat /workspace/tablev2-delivery/allowlist.txt)\" --maxcpucount:1 --logger trx --results-directory /tmp/tablev2-final-results",
+    "pixelInspection": "python3 /workspace/tablev2-delivery/inspect-pixels.py /workspace/tablev2-delivery/candidate"
+  },
+  "preserved": [
+    "Frozen PNGs",
+    "Assert.Equal on full encoded bytes",
+    "Populated/empty/header/footer/overlay assertions",
+    "Theme, motion, accessibility and virtualization budget contracts",
+    "Shared dependency locks in delivered branch",
+    "Shared TestAppBuilder and CI configuration"
+  ],
+  "unrun": [
+    "Windows candidate execution",
+    "macOS candidate execution",
+    "CI SDK 10.0.401 with its separately owned ILLink 10.0.12 NU1004 prerequisite",
+    "Full Quality Gates",
+    "Independent UX acceptance; no acceptance or custody receipts created"
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "gsans": "1",
+  "registeredSharedCollections": [
+    {
+      "key": "fonts:GoogleSans?family=Google%20Sans",
+      "count": 1,
+      "families": [
+        "Noto Sans"
+      ]
+    }
+  ],
+  "collectionKey": "fonts:GoogleSans?family=Google%20Sans",
+  "count": 1,
+  "families": [
+    "Noto Sans"
+  ],
+  "sharedPrefixAssets": [
+    "avares://FsusUI.Avalonia.HeadlessTests/Assets/Fonts/TableV2/NotoSans-Bold.ttf",
+    "avares://FsusUI.Avalonia.HeadlessTests/Assets/Fonts/TableV2/NotoSans-Regular.ttf"
+  ],
+  "notoRegularAvailable": true,
+  "notoBoldAvailable": true,
+  "matchesLatinA": true,
+  "latinAFamily": "Noto Sans",
+  "latinAKey": "fonts:GoogleSans?family=Google Sans"
+}

@@ -1,0 +1,110 @@
+PORTABLE TABLEV2 EVIDENCE TRANSFER — NO TESTS OR REPORTS RERUN
+
+Frozen source-only candidate: 24a7ba8c3feffbe4f040a5ccf6332af70f7a74d4
+Source branch: fix/table-v2-rendered-output-20261009
+Base: b17077f3afd4a80ff3bdc0fe81d5dfc353ffddf2
+Original failed head: 83036006069be5cfcd09724273d5705d8f848ad0
+
+Qualification boundary:
+The published source-only candidate EXCLUDES prerequisite 8840c3834f4d1cb67cdccd5238b1cbcc8558141a. All diagnostic restore/test evidence used actual SDK 10.0.108 and the exact three approved lock-file changes applied temporarily on top of the candidate/base. The prerequisite was removed before source delivery. This is composition evidence, NOT plain-head qualification and NOT SDK 10.0.401 or full CI qualification. Windows/macOS candidate execution and full Quality Gates remain UNRUN. Independent review belongs to Root and its appointed reviewer. No duplicate PR/review was created.
+
+The existing delivery directory is copied byte-for-byte as unchanged-delivery/. It includes evidence.json, the exact 1605-byte ordinary allowlist.txt, candidate captures/pixel reports, final TRX/logs, original official archives/job logs, and the original PR template. retained-runs/ adds copies of existing red/green run logs/TRX and retained official SDK release metadata. No tests, screenshot generation, or report generation occurred for this transfer. Temporary font-probe source edits were diagnostic experiments; their complete source trees were not retained. Their PNGs/reports are labeled probes, not original CI images or final-candidate source snapshots.
+
+Exact allowlists and expected counts:
+Namespace prefix: FsusUI.Avalonia.HeadlessTests.
+Original rendered allowlist: 2 methods in FsusTableV2RenderedEvidenceTests:
+  RendersPopulatedAndEmptyContentRegionsToPng
+  RendersWholeHeaderAndOverlayContentRegionsToPng
+Supplemental allowlist: 10 methods in FsusVirtualizationHeadlessTests:
+  AutoResizerAndTableV2VirtualizeRowsColumnsResizeAndBudget
+  TableV2BindsTypedRowsFixedColumnsAndRealKeyboardScroll
+  TableV2MeasuresDynamicRowsAndRaisesRealScrollCallbacks
+  TableV2UsesFixedDataGetterAndExpandedRowCallbacks
+  TableV2MapsViewportGeometryAndCacheToRealLayout
+  TableV2SortsTypedRowsAndReportsColumnSort
+  TableV2RendersBoundedContentRegions
+  TableV2ContentRegionsReceiveScopedPayloads
+  TableV2VirtualizesFrozenAxesNavigatesAndRejectsStaleBackgroundResults
+  VirtualizationThemeVisualAccessibilityPerformanceAndPlatformBaselinesCoverStable34
+Final combined allowlist: exactly the above 12. Each filter uses FullyQualifiedName=, joined with |. The exact expanded filter is unchanged-delivery/allowlist.txt. Expected counts were confirmed with list-tests before execution. No broad suite followed by output filtering was used.
+
+Original execution environment and arguments (historical commands, not new runs):
+Working directory: /workspace/tablev2-fix
+  source /workspace/.setup/activate.sh
+  export PATH=/workspace/tablev2-sdk-10.0.108:$PATH
+  unset FSUSUI_UPDATE_VISUAL_ARTIFACTS FSUS_HEADLESS_GSANS
+The activation file selected DOTNET_CLI_HOME=/workspace/.setup/dotnet-home and NUGET_PACKAGES=/workspace/.setup/nuget.
+
+Locked restore:
+  dotnet restore dotnet/FsusUI.Avalonia.HeadlessTests/FsusUI.Avalonia.HeadlessTests.csproj --locked-mode --disable-parallel --maxcpucount:1
+  stdout/stderr: /tmp/tablev2-restore.log (copied in unchanged-delivery/)
+
+Original 2-method red run, using the unchanged base assembly already built by list-tests:
+  dotnet test dotnet/FsusUI.Avalonia.HeadlessTests/FsusUI.Avalonia.HeadlessTests.csproj --no-build --no-restore --configuration Release --filter '<the exact two FullyQualifiedName= rendered predicates joined with |>' --maxcpucount:1 --logger trx --results-directory /tmp/tablev2-baseline-results
+  stdout/stderr: /tmp/tablev2-baseline-test.log
+
+Original 10-method supplemental red run (9 passed/1 failed):
+  dotnet test dotnet/FsusUI.Avalonia.HeadlessTests/FsusUI.Avalonia.HeadlessTests.csproj --no-restore --no-build --configuration Release --filter "$(cat /tmp/tablev2-contract-filter.txt)" --maxcpucount:1 --logger trx --results-directory /tmp/tablev2-contract-results
+  stdout/stderr: /tmp/tablev2-contract-test.log
+The contract filter is the exact 10 supplemental predicates listed above.
+
+Final 12-method list-tests command:
+  dotnet test dotnet/FsusUI.Avalonia.HeadlessTests/FsusUI.Avalonia.HeadlessTests.csproj --no-restore --no-build --configuration Release --list-tests --filter "$(cat /tmp/tablev2-final-filter.txt)" --maxcpucount:1
+  stdout/stderr: /tmp/tablev2-final-list.log
+
+Final 12-method green command, rebuilt on candidate 24a7ba8c plus the approved prerequisite:
+  dotnet test dotnet/FsusUI.Avalonia.HeadlessTests/FsusUI.Avalonia.HeadlessTests.csproj --no-restore --configuration Release --filter "$(cat /tmp/tablev2-final-filter.txt)" --maxcpucount:1 --logger trx --results-directory /tmp/tablev2-final-results
+  stdout/stderr: /tmp/tablev2-final-test.log
+  final TRX: unchanged-delivery/results/_d45ac3896e5a_2026-10-09_06_29_06.trx
+The original /tmp/tablev2-final-filter.txt bytes were copied as unchanged-delivery/allowlist.txt. The existing evidence.json command uses the later delivery path as a reproduction convenience; the exact historical command read /tmp/tablev2-final-filter.txt. No semantic/filter difference.
+
+Actual tested toolchain:
+  SDK 10.0.108, SDK commit 94ea82652c, runtime 10.0.8
+  MSBuild 18.0.11+94ea82652; Debian GNU/Linux 13; linux-x64
+  Avalonia 12.0.4; SkiaSharp 3.119.4
+  Official SDK URL: https://builds.dotnet.microsoft.com/dotnet/Sdk/10.0.108/dotnet-sdk-10.0.108-linux-x64.tar.gz
+  Downloaded SHA-512 exactly matched official release metadata:
+  e32f76b768017718aa5a3a51fcac4b617ab4428c5f2d10b1b30f07dd7f1ea3dad4df917df48d855d78a347d635e48ce0ec309787899c53a32c4c10dd216b6b19
+  Retained release metadata: retained-runs/tablev2-dotnet-releases.json
+
+Exact tested lock identities (SHA-256):
+  Approved prerequisite 8840c383 supplies these complete files:
+  dotnet/FsusUI.Avalonia.Icons/packages.lock.json
+    64d63bd753fbe52a2661338563c868b25da6e0b54679f67eed9804737f489d35
+  dotnet/FsusUI.Avalonia.Themes/packages.lock.json
+    64d63bd753fbe52a2661338563c868b25da6e0b54679f67eed9804737f489d35
+  dotnet/FsusUI.Avalonia/packages.lock.json
+    eb94ae63f2336fcf4dde84e6bd548e1875f4e48a19b0bdae0b63f3fc27376d59
+  All three were checked byte-for-byte against that approved commit before the final run.
+  Unchanged candidate/base lock inputs for the other restored projects:
+  dotnet/FsusUI.Avalonia.HeadlessTests/packages.lock.json
+    9ceff33140e66773191d7bb7b85e0a4c4e50f17f16f3668842be072e647edecf
+  dotnet/FsusUI.Avalonia.Demo/packages.lock.json
+    fc6ff427dc1c36a8c73e955708bdfc98e534e0e7c07ea3b03bbc3d77ad93e385
+  dotnet/FsusUI.Avalonia.FormGenerator/packages.lock.json
+    b9c4438133868e312f2c1edfe34e914a22d40a609a318b6dc2a76a9f5d5295b6
+  The retained approved patch SHA-256 is dd8a462e76c4dff903b642059f89db2d713a0f0ac8247a5bc70a63a82bb31fec; file: unchanged-delivery/approved-dependency.patch.
+  NuGet configuration used by restore: /workspace/.setup/dotnet-home/.nuget/NuGet/NuGet.Config
+  SHA-256 a93e5528f06204b5e5afecd3fb2db8de0d48cc5e2b5f812728a6ad3f0c7bffc2; sole source name nuget.org; no credential element. Configuration was not changed.
+
+Retained red/green evidence:
+  RED original CI: run 37798728109, jobs Linux 113384931201 / macOS 113384931043, actual SDK 10.0.401. Both methods fail Assert.Equal in IDAT (positions 61/59). Official archives contain four TRX each, no failing PNG. Exact original-CI decoded pixel differences are unavailable.
+  Linux artifact 11559887369: unchanged-delivery/tablev2-linux.zip
+    SHA-256 827c49e687d6319bd115a19dfe445f8c93cd6d98339c45357dcc89ff14248c0d
+  macOS artifact 11559428406: unchanged-delivery/tablev2-macos.zip
+    SHA-256 cc5d401fdc3e87336331ae20f6ac5d3f37721c8663e47814336ad4360c0aab59
+  Official decoded logs/TRX: unchanged-delivery/original/{linux,macos}/
+  RED local unchanged base: retained-runs/tablev2-baseline-test.log and tablev2-baseline-results/*.trx, 0 passed/2 failed, unresolved inherited Inter DemiBold.
+  RED local probes: Inter 0/2 and DejaVu 0/2; captured images/pixel reports in unchanged-delivery/tablev2-inter-captures/ and tablev2-dejavu-captures/. They are not original CI captures.
+  GREEN system Noto probe: retained-runs/tablev2-noto-font-test.log and tablev2-noto-font-results/*.trx, 2/2.
+  RED initial bundled probe: retained-runs/tablev2-bundled-test.log and tablev2-bundled-results/*.trx, 0/2 before correcting the new resource item from plural AvaloniaResources to singular AvaloniaResource.
+  GREEN final bundled render run: retained-runs/tablev2-final-render-test.log and tablev2-final-render-results/*.trx, 2/2.
+  RED supplemental mounted payload: retained-runs/tablev2-contract-test.log and tablev2-contract-results/*.trx, 9/10; same unresolved Inter Normal.
+  GREEN corrected supplemental run: retained-runs/tablev2-final-contract-test.log and tablev2-final-contract-results/*.trx, 10/10.
+  GREEN final committed composition: unchanged-delivery/tablev2-final-test.log and results/*.trx, 12 passed/0 failed/0 skipped; candidate 24a7ba8c + exact approved locks + actual .108.
+  Final PNG captures: unchanged-delivery/candidate/
+  Populated/empty PNG SHA-256: 12c592158d6d33a79c5e97ef319e924e65a7b118071531683551c5d13e660bc8; 488x540; 38,293 bytes; zero different pixels.
+  Header/overlay PNG SHA-256: 3ddb0fef6bcf5080df423f22aa6ab289458032d3bc032a340f59157b3c77a16d; 488x320; 17,037 bytes; zero different pixels.
+  Full source/capture identities and existing pixel reports remain in unchanged-delivery/evidence.json and candidate/pixel-differences.json, unchanged.
+
+Frozen PNGs, assertions, budgets, source candidate, shared font setup, CI configuration and denied RepositoryRoot scope remain unchanged. No locks were authored or published as candidate changes. No held audit was retried. This branch is an evidence transfer only, not an acceptance receipt or qualification upgrade.

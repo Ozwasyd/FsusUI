@@ -1,0 +1,99 @@
+TABLEV2 FONT PREFIX P2 CORRECTION — PORTABLE REVIEW HANDOFF
+
+Frozen reviewed source: 24a7ba8c3feffbe4f040a5ccf6332af70f7a74d4
+Correction source: 90a7d58aad585edbbeec8756fc6d6e5aa0a2c9a7
+Correction branch: fix/table-v2-font-prefix-20261009
+Base main ancestry: b17077f3afd4a80ff3bdc0fe81d5dfc353ffddf2
+Reviewer: 01a11f71-07cd-7452-8eac-602c242c001c
+The review's prior runtime tests were UNRUN due SDK 10.0.401 lock mismatch/missing portable scope. Do not attribute a runtime failure reproduction to the reviewer. This task performed the recorded runtime checks.
+
+Qualification is ONLY the explicitly reviewed diagnostic composition:
+  before source 24a7ba8c + exact approved 8840c3834f4d1cb67cdccd5238b1cbcc8558141a lock patch + actual SDK 10.0.108
+  after source 90a7d58a + that same exact approved lock patch + that same actual SDK 10.0.108
+The source-only branches EXCLUDE the approved lock prerequisite. It was applied temporarily for checks, checked against the three full approved files, and removed before publication. Not plain-head, SDK 10.0.401, Windows/macOS, or full-CI qualification. All remain UNRUN. Complete prior SDK checksum and six restored-project lock identities appear unchanged in prior-transfer.txt and prior-composition-identities.json. Actual toolchain output is toolchain.txt.
+
+COMPLETE SOURCE DELTA (source-delta.patch contains the full git binary diff):
+Move four files from dotnet/FsusUI.Avalonia.HeadlessTests/Assets/Fonts/TableV2/ to dotnet/FsusUI.Avalonia.HeadlessTests/Assets/TableV2Fonts/:
+  NotoSans-Regular.ttf — byte-identical
+  NotoSans-Bold.ttf — byte-identical
+  OFL.txt — byte-identical
+  README.md — retain provenance; replace the isolation claim with an explicit explanation that Assets/TableV2Fonts/ is outside recursively enumerated Assets/Fonts/ and excluded when GSANS=1.
+Change the one owned AvaloniaResource include:
+  Assets/Fonts/TableV2/*.ttf -> Assets/TableV2Fonts/*.ttf
+Change only the fixture font URI in FsusTableV2RenderedEvidenceTests.cs and FsusVirtualizationHeadlessTests.cs:
+  avares://FsusUI.Avalonia.HeadlessTests/Assets/Fonts/TableV2#Noto Sans
+  -> avares://FsusUI.Avalonia.HeadlessTests/Assets/TableV2Fonts#Noto Sans
+Seven files, six text insertions/four deletions; four renames. Every original assertion is preserved. Frozen PNGs, budgets, production controls, TestAppBuilder, shared/canonical Inter setup, CI configuration and denied RepositoryRoot scope are unchanged. The original 24a7 branch remains frozen/clean. No duplicate PR/review or GitHub content API write was performed.
+
+ACTUAL COLLECTION MEMBERSHIP / CHARACTER LOOKUP:
+CollectionProbe.cs is an external read-only runtime diagnostic, compiled with the installed SDK Roslyn csc against the built assembly, without a new project/restore/lockfile. It starts the unchanged TestAppBuilder, reads the registered shared collections from FontManager's _fontCollections field, enumerates the exact recursive shared asset prefix, and constructs the same GoogleSansFontCollection to inspect membership and direct lookup. Normal mode's explicit diagnostic collection construction is NOT a registration.
+Before normal: registered shared collection absent; constructing it finds both Noto files and one family, Noto Sans.
+Before GSANS=1: registered shared collection contains one family, Noto Sans; both regular/bold lookup succeed; this collection's Latin-A lookup succeeds and resolves to Noto Sans under fonts:GoogleSans?family=Google Sans.
+After normal: registered shared collection remains absent; constructing it finds zero assets/families and no Noto lookup.
+After GSANS=1: registered shared collection remains present, but contains zero families/assets; regular/bold Noto and this collection's Latin-A lookup all return false.
+The empty shared collection is specific to the reviewed source composition. This does NOT qualify the separately owned shared GoogleSans/Inter setup or assert the application's total fallback behavior. It establishes that TableV2 faces no longer enter that collection.
+Raw outputs: before-normal-membership.json, before-gsans-membership.json, after-normal-membership.json, after-gsans-membership.json. Reflection source is retained in CollectionProbe.cs. Fontconfig emitted unwritable-cache warnings during probe initialization; captured stderr is retained. These did not prevent the recorded collection results or test passes; no cache/configuration change was made.
+
+ORDINARY ALLOWLIST: exact same 1605-byte allowlist.txt as the prior handoff.
+Expected 2 original rendered methods + 10 supplemental methods = 12 unique tests. Each run is this precise allowlist; no broad suite/filtering. Namespace prefix FsusUI.Avalonia.HeadlessTests.
+FsusTableV2RenderedEvidenceTests:
+  RendersPopulatedAndEmptyContentRegionsToPng
+  RendersWholeHeaderAndOverlayContentRegionsToPng
+FsusVirtualizationHeadlessTests:
+  AutoResizerAndTableV2VirtualizeRowsColumnsResizeAndBudget
+  TableV2BindsTypedRowsFixedColumnsAndRealKeyboardScroll
+  TableV2MeasuresDynamicRowsAndRaisesRealScrollCallbacks
+  TableV2UsesFixedDataGetterAndExpandedRowCallbacks
+  TableV2MapsViewportGeometryAndCacheToRealLayout
+  TableV2SortsTypedRowsAndReportsColumnSort
+  TableV2RendersBoundedContentRegions
+  TableV2ContentRegionsReceiveScopedPayloads
+  TableV2VirtualizesFrozenAxesNavigatesAndRejectsStaleBackgroundResults
+  VirtualizationThemeVisualAccessibilityPerformanceAndPlatformBaselinesCoverStable34
+Filter uses FullyQualifiedName= on each full name, joined by |. before-list.log and after-list.log retain the confirmed count before test execution.
+
+EXACT HISTORICAL COMMANDS (not commands executed during evidence transfer):
+Working directory: /workspace/tablev2-isolatedfonts
+Common setup:
+  source /workspace/.setup/activate.sh
+  export PATH=/workspace/tablev2-sdk-10.0.108:$PATH
+  unset FSUSUI_UPDATE_VISUAL_ARTIFACTS
+
+Locked restore, unchanged package graph:
+  dotnet restore dotnet/FsusUI.Avalonia.HeadlessTests/FsusUI.Avalonia.HeadlessTests.csproj --locked-mode --disable-parallel --maxcpucount:1
+  stdout/stderr: /workspace/tablev2-prefix-evidence/restore.log
+
+Before normal:
+  unset FSUS_HEADLESS_GSANS
+  dotnet test dotnet/FsusUI.Avalonia.HeadlessTests/FsusUI.Avalonia.HeadlessTests.csproj --no-restore --configuration Release --list-tests --filter "$(cat /workspace/tablev2-prefix-evidence/allowlist.txt)" --maxcpucount:1
+  dotnet test dotnet/FsusUI.Avalonia.HeadlessTests/FsusUI.Avalonia.HeadlessTests.csproj --no-restore --no-build --configuration Release --filter "$(cat /workspace/tablev2-prefix-evidence/allowlist.txt)" --maxcpucount:1 --logger trx --results-directory /workspace/tablev2-prefix-evidence/before-normal-results
+Before GSANS=1, separate fresh test process:
+  export FSUS_HEADLESS_GSANS=1
+  dotnet test dotnet/FsusUI.Avalonia.HeadlessTests/FsusUI.Avalonia.HeadlessTests.csproj --no-restore --no-build --configuration Release --filter "$(cat /workspace/tablev2-prefix-evidence/allowlist.txt)" --maxcpucount:1 --logger trx --results-directory /workspace/tablev2-prefix-evidence/before-gsans-results
+After normal:
+  unset FSUS_HEADLESS_GSANS
+  dotnet test dotnet/FsusUI.Avalonia.HeadlessTests/FsusUI.Avalonia.HeadlessTests.csproj --no-restore --configuration Release --list-tests --filter "$(cat /workspace/tablev2-prefix-evidence/allowlist.txt)" --maxcpucount:1
+  dotnet test dotnet/FsusUI.Avalonia.HeadlessTests/FsusUI.Avalonia.HeadlessTests.csproj --no-restore --configuration Release --filter "$(cat /workspace/tablev2-prefix-evidence/allowlist.txt)" --maxcpucount:1 --logger trx --results-directory /workspace/tablev2-prefix-evidence/after-normal-results
+The latter rebuild binds the final source head; after-assembly-info.cs records informational version +90a7d58aad585edbbeec8756fc6d6e5aa0a2c9a7.
+After GSANS=1, separate fresh test process using that committed-source assembly:
+  export FSUS_HEADLESS_GSANS=1
+  dotnet test dotnet/FsusUI.Avalonia.HeadlessTests/FsusUI.Avalonia.HeadlessTests.csproj --no-restore --no-build --configuration Release --filter "$(cat /workspace/tablev2-prefix-evidence/allowlist.txt)" --maxcpucount:1 --logger trx --results-directory /workspace/tablev2-prefix-evidence/after-gsans-results
+
+Probe compilation:
+  /workspace/tablev2-sdk-10.0.108/dotnet /workspace/tablev2-sdk-10.0.108/sdk/10.0.108/Roslyn/bincore/csc.dll @/workspace/tablev2-prefix-evidence/probe-csc.rsp
+probe-csc.rsp retains exact arguments/references. Output was the ignored test bin's TableV2CollectionProbe.dll.
+Probe execution for each source/mode after the matching build, with that mode's environment:
+  probe_root=/workspace/tablev2-isolatedfonts/dotnet/FsusUI.Avalonia.HeadlessTests/bin/Release/net10.0
+  dotnet exec --runtimeconfig "$probe_root/FsusUI.Avalonia.HeadlessTests.runtimeconfig.json" --depsfile "$probe_root/FsusUI.Avalonia.HeadlessTests.deps.json" "$probe_root/TableV2CollectionProbe.dll"
+stdout/stderr were saved separately to <stage>-membership.json / <stage>-probe.stderr.
+
+AFFECTED RENDERED BEHAVIOR:
+Each of before-normal, before-gsans, after-normal and after-gsans executed 12 tests: 12 passed, 0 failed, 0 skipped. These are four runs of 12 unique tests, not 48 distinct tests. Each mode has its own raw .log, results/ TRX and captures/ directory.
+Both frozen PNGs match complete encoded bytes and decoded RGBA pixels on every run. verification.json retains every test result, collection report and pixel count. No baseline switch enabled, no threshold changes.
+  populated/empty: 488x540, 38,293 bytes, zero changed pixels
+  SHA-256 12c592158d6d33a79c5e97ef319e924e65a7b118071531683551c5d13e660bc8
+  header/overlay: 488x320, 17,037 bytes, zero changed pixels
+  SHA-256 3ddb0fef6bcf5080df423f22aa6ab289458032d3bc032a340f59157b3c77a16d
+All captures are actual ordinary test outputs, not regenerated golden files. Font/license bytes remain unchanged.
+
+Results demonstrate the shared-collection exclusion correction while retaining TableV2 rendering on the tested composition. They do not demonstrate a prior TableV2 PNG runtime failure at 24a7, nor qualify other shared-font behavior, off-host rendering, actual .401 or full CI. Root owns review/PR metadata and merging. No held audit or denied RepositoryRoot action was performed.

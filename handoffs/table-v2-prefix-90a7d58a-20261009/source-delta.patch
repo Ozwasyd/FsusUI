@@ -1,0 +1,68 @@
+diff --git a/dotnet/FsusUI.Avalonia.HeadlessTests/Assets/Fonts/TableV2/NotoSans-Bold.ttf b/dotnet/FsusUI.Avalonia.HeadlessTests/Assets/TableV2Fonts/NotoSans-Bold.ttf
+similarity index 100%
+rename from dotnet/FsusUI.Avalonia.HeadlessTests/Assets/Fonts/TableV2/NotoSans-Bold.ttf
+rename to dotnet/FsusUI.Avalonia.HeadlessTests/Assets/TableV2Fonts/NotoSans-Bold.ttf
+diff --git a/dotnet/FsusUI.Avalonia.HeadlessTests/Assets/Fonts/TableV2/NotoSans-Regular.ttf b/dotnet/FsusUI.Avalonia.HeadlessTests/Assets/TableV2Fonts/NotoSans-Regular.ttf
+similarity index 100%
+rename from dotnet/FsusUI.Avalonia.HeadlessTests/Assets/Fonts/TableV2/NotoSans-Regular.ttf
+rename to dotnet/FsusUI.Avalonia.HeadlessTests/Assets/TableV2Fonts/NotoSans-Regular.ttf
+diff --git a/dotnet/FsusUI.Avalonia.HeadlessTests/Assets/Fonts/TableV2/OFL.txt b/dotnet/FsusUI.Avalonia.HeadlessTests/Assets/TableV2Fonts/OFL.txt
+similarity index 100%
+rename from dotnet/FsusUI.Avalonia.HeadlessTests/Assets/Fonts/TableV2/OFL.txt
+rename to dotnet/FsusUI.Avalonia.HeadlessTests/Assets/TableV2Fonts/OFL.txt
+diff --git a/dotnet/FsusUI.Avalonia.HeadlessTests/Assets/Fonts/TableV2/README.md b/dotnet/FsusUI.Avalonia.HeadlessTests/Assets/TableV2Fonts/README.md
+similarity index 84%
+rename from dotnet/FsusUI.Avalonia.HeadlessTests/Assets/Fonts/TableV2/README.md
+rename to dotnet/FsusUI.Avalonia.HeadlessTests/Assets/TableV2Fonts/README.md
+index 8e73a571..f604f224 100644
+--- a/dotnet/FsusUI.Avalonia.HeadlessTests/Assets/Fonts/TableV2/README.md
++++ b/dotnet/FsusUI.Avalonia.HeadlessTests/Assets/TableV2Fonts/README.md
+@@ -17,7 +17,9 @@ under `hinted/ttf/NotoSans/`. Their SHA-256 hashes are:
+ 
+ The upstream SIL Open Font License is included in `OFL.txt`. Font metadata
+ also identifies Copyright 2015 Google LLC and the same OFL 1.1 license.
+-Keep these faces isolated from the existing optional Google Sans collection.
++The dedicated `Assets/TableV2Fonts/` prefix is outside `Assets/Fonts/`, which
++is recursively enumerated by the optional shared Google Sans collection.
++This keeps the TableV2 faces out of that collection when `FSUS_HEADLESS_GSANS=1`.
+ 
+ Ordinary captures are retained in
+ `TestResults/visual-evidence/issue-285-table-v2/`, or the directory selected by
+diff --git a/dotnet/FsusUI.Avalonia.HeadlessTests/FsusTableV2RenderedEvidenceTests.cs b/dotnet/FsusUI.Avalonia.HeadlessTests/FsusTableV2RenderedEvidenceTests.cs
+index a61be259..a229e601 100644
+--- a/dotnet/FsusUI.Avalonia.HeadlessTests/FsusTableV2RenderedEvidenceTests.cs
++++ b/dotnet/FsusUI.Avalonia.HeadlessTests/FsusTableV2RenderedEvidenceTests.cs
+@@ -274,7 +274,7 @@ public class FsusTableV2RenderedEvidenceTests
+   {
+     // The sealed TableV2 images use Noto Sans 2.004, including its layout metrics.
+     window.FontFamily = new FontFamily(
+-      "avares://FsusUI.Avalonia.HeadlessTests/Assets/Fonts/TableV2#Noto Sans");
++      "avares://FsusUI.Avalonia.HeadlessTests/Assets/TableV2Fonts#Noto Sans");
+     var resources = new ResourceDictionary();
+     new FsusThemeManager().Apply(resources, new FsusThemeOptions
+     {
+diff --git a/dotnet/FsusUI.Avalonia.HeadlessTests/FsusUI.Avalonia.HeadlessTests.csproj b/dotnet/FsusUI.Avalonia.HeadlessTests/FsusUI.Avalonia.HeadlessTests.csproj
+index a83f86c3..99c144a4 100644
+--- a/dotnet/FsusUI.Avalonia.HeadlessTests/FsusUI.Avalonia.HeadlessTests.csproj
++++ b/dotnet/FsusUI.Avalonia.HeadlessTests/FsusUI.Avalonia.HeadlessTests.csproj
+@@ -27,6 +27,6 @@
+ 
+   <ItemGroup>
+     <AvaloniaResources Include="Assets/Fonts/*.ttf" />
+-    <AvaloniaResource Include="Assets/Fonts/TableV2/*.ttf" />
++    <AvaloniaResource Include="Assets/TableV2Fonts/*.ttf" />
+   </ItemGroup>
+ </Project>
+diff --git a/dotnet/FsusUI.Avalonia.HeadlessTests/FsusVirtualizationHeadlessTests.cs b/dotnet/FsusUI.Avalonia.HeadlessTests/FsusVirtualizationHeadlessTests.cs
+index 04cae4b1..c0b9e1c5 100644
+--- a/dotnet/FsusUI.Avalonia.HeadlessTests/FsusVirtualizationHeadlessTests.cs
++++ b/dotnet/FsusUI.Avalonia.HeadlessTests/FsusVirtualizationHeadlessTests.cs
+@@ -545,7 +545,7 @@ public class FsusVirtualizationHeadlessTests
+       Height = 160,
+       Content = table,
+       FontFamily = new FontFamily(
+-        "avares://FsusUI.Avalonia.HeadlessTests/Assets/Fonts/TableV2#Noto Sans"),
++        "avares://FsusUI.Avalonia.HeadlessTests/Assets/TableV2Fonts#Noto Sans"),
+     };
+     window.Show();
+     window.Measure(new Size(240, 160));
