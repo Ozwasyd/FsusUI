@@ -1,0 +1,12 @@
+
+> @ changeset /workspace/FsusUI-public-declaration-integration
+> node ./scripts/with-node-heap.mjs changeset status --since=origin/main --output=/workspace/.setup/public-declaration-closure/owner-integration-changeset-status.json
+
+🦋  error Error: Found changeset markdown-editor-emits-payload-names for package @ozwasyd/element-plus which is not in the workspace
+🦋  error     at mapGetOrThrow (/workspace/FsusUI-public-declaration-integration/node_modules/@changesets/assemble-release-plan/dist/changesets-assemble-release-plan.cjs.js:105:11)
+🦋  error     at getRelevantChangesets (/workspace/FsusUI-public-declaration-integration/node_modules/@changesets/assemble-release-plan/dist/changesets-assemble-release-plan.cjs.js:589:29)
+🦋  error     at Object.assembleReleasePlan [as default] (/workspace/FsusUI-public-declaration-integration/node_modules/@changesets/assemble-release-plan/dist/changesets-assemble-release-plan.cjs.js:513:30)
+🦋  error     at Object.getReleasePlan [as default] (/workspace/FsusUI-public-declaration-integration/node_modules/@changesets/get-release-plan/dist/changesets-get-release-plan.cjs.js:69:49)
+🦋  error     at async status (/workspace/FsusUI-public-declaration-integration/node_modules/@changesets/cli/dist/changesets-cli.cjs.js:1239:23)
+🦋  error     at async run (/workspace/FsusUI-public-declaration-integration/node_modules/@changesets/cli/dist/changesets-cli.cjs.js:1597:11)
+ ELIFECYCLE  Command failed with exit code 1.

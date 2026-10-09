@@ -1,0 +1,42 @@
+[
+  {
+    "config": "tsconfig.deep-context.json",
+    "exitCode": 0,
+    "result": "PASS"
+  },
+  {
+    "config": "tsconfig.deep-context-node16.json",
+    "exitCode": 0,
+    "result": "PASS"
+  },
+  {
+    "config": "tsconfig.deep-reveal.json",
+    "exitCode": 0,
+    "result": "PASS"
+  },
+  {
+    "config": "tsconfig.deep-reveal-node16.json",
+    "exitCode": 0,
+    "result": "PASS"
+  },
+  {
+    "config": "tsconfig.deep-scroll-timeline.json",
+    "exitCode": 0,
+    "result": "PASS"
+  },
+  {
+    "config": "tsconfig.deep-scroll-timeline-node16.json",
+    "exitCode": 0,
+    "result": "PASS"
+  },
+  {
+    "config": "tsconfig.deep.json",
+    "exitCode": 0,
+    "result": "PASS"
+  },
+  {
+    "config": "tsconfig.deep-node16.json",
+    "exitCode": 0,
+    "result": "PASS"
+  }
+]

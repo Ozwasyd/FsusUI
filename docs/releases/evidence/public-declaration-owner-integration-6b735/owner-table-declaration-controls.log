@@ -1,0 +1,2 @@
+{"preflight":"pass","names":["ordinary Table core Popper return > returns the real core instance with its original elements and options","ordinary Table core Popper return > keeps replacement and scroll cleanup tied to the core instance"],"calls":{"describe":1,"it":2,"beforeEach":1,"afterEach":1}}
+{"result":"pass","producerTypeScript":"5.9.2","beforeDeclarationErrors":1,"afterDeclarationErrors":0,"contractsPerPhase":2,"runtimeSha256":"d061ef5089fedd95db3f9c298fdcd46a99ee8f3e96e17aab0aebeee941239c8b"}

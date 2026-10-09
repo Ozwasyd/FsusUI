@@ -1,0 +1,82 @@
+[
+  {
+    "name": "MarkdownEditor emits payload names preserve the public contract > retains the complete event inventory and payload arity",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/markdown-editor/__tests__/markdown-editor-emits-payload-names.test.ts"
+  },
+  {
+    "name": "MarkdownEditor emits payload names preserve the public contract > preserves ordinary typed emit payloads, order and rejection controls",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/markdown-editor/__tests__/markdown-editor-emits-payload-names.test.ts"
+  },
+  {
+    "name": "MarkdownEditor emits payload names preserve the public contract > accepts an existing transaction payload with accepted=true",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/markdown-editor/__tests__/markdown-editor-emits-payload-names.test.ts"
+  },
+  {
+    "name": "MarkdownEditor emits payload names preserve the public contract > accepts an existing transaction payload with accepted=false",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/markdown-editor/__tests__/markdown-editor-emits-payload-names.test.ts"
+  },
+  {
+    "name": "MarkdownEditor emits payload names preserve the public contract > rejects an invalid transaction payload null",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/markdown-editor/__tests__/markdown-editor-emits-payload-names.test.ts"
+  },
+  {
+    "name": "MarkdownEditor emits payload names preserve the public contract > rejects an invalid transaction payload undefined",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/markdown-editor/__tests__/markdown-editor-emits-payload-names.test.ts"
+  },
+  {
+    "name": "MarkdownEditor emits payload names preserve the public contract > rejects an invalid transaction payload {}",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/markdown-editor/__tests__/markdown-editor-emits-payload-names.test.ts"
+  },
+  {
+    "name": "MarkdownEditor emits payload names preserve the public contract > rejects an invalid transaction payload {\"accepted\":\"true\",\"beforeRevision\":0,\"documentIdentity\":{\"id\":\"emits:文章\",\"epoch\":7},\"history\":{\"canRedo\":false,\"canUndo\":false,\"redoDepth\":0,\"retainedUnits\":0,\"undoDepth\":0},\"revision\":1,\"selection\":{\"start\":0,\"end\":3,\"direction\":\"backward\"},\"transaction\":{\"changes\":[],\"history\":\"skip\",\"origin\":\"command\"},\"value\":\"text\"}",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/markdown-editor/__tests__/markdown-editor-emits-payload-names.test.ts"
+  },
+  {
+    "name": "MarkdownEditor emits payload names preserve the public contract > rejects an invalid transaction payload {\"accepted\":true,\"beforeRevision\":0,\"documentIdentity\":{\"id\":\"emits:文章\",\"epoch\":7},\"history\":{\"canRedo\":false,\"canUndo\":false,\"redoDepth\":0,\"retainedUnits\":0,\"undoDepth\":0},\"revision\":\"1\",\"selection\":{\"start\":0,\"end\":3,\"direction\":\"backward\"},\"transaction\":{\"changes\":[],\"history\":\"skip\",\"origin\":\"command\"},\"value\":\"text\"}",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/markdown-editor/__tests__/markdown-editor-emits-payload-names.test.ts"
+  },
+  {
+    "name": "MarkdownEditor emits payload names preserve the public contract > rejects an invalid transaction payload {\"accepted\":true,\"beforeRevision\":0,\"documentIdentity\":{\"id\":\"emits:文章\",\"epoch\":7},\"history\":{\"canRedo\":false,\"canUndo\":false,\"redoDepth\":0,\"retainedUnits\":0,\"undoDepth\":0},\"revision\":1,\"selection\":{\"start\":0,\"end\":3,\"direction\":\"backward\"},\"transaction\":{\"changes\":[],\"history\":\"skip\",\"origin\":\"command\"},\"value\":1}",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/markdown-editor/__tests__/markdown-editor-emits-payload-names.test.ts"
+  },
+  {
+    "name": "MarkdownEditor emits payload names preserve the public contract > accepts the existing zero caret and backward selection payloads",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/markdown-editor/__tests__/markdown-editor-emits-payload-names.test.ts"
+  },
+  {
+    "name": "MarkdownEditor emits payload names preserve the public contract > rejects an invalid selection payload null",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/markdown-editor/__tests__/markdown-editor-emits-payload-names.test.ts"
+  },
+  {
+    "name": "MarkdownEditor emits payload names preserve the public contract > rejects an invalid selection payload undefined",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/markdown-editor/__tests__/markdown-editor-emits-payload-names.test.ts"
+  },
+  {
+    "name": "MarkdownEditor emits payload names preserve the public contract > rejects an invalid selection payload {}",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/markdown-editor/__tests__/markdown-editor-emits-payload-names.test.ts"
+  },
+  {
+    "name": "MarkdownEditor emits payload names preserve the public contract > rejects an invalid selection payload {\"revision\":\"1\",\"selection\":{\"start\":0,\"end\":3,\"direction\":\"backward\"}}",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/markdown-editor/__tests__/markdown-editor-emits-payload-names.test.ts"
+  },
+  {
+    "name": "MarkdownEditor emits payload names preserve the public contract > rejects an invalid selection payload {\"revision\":1,\"selection\":null}",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/markdown-editor/__tests__/markdown-editor-emits-payload-names.test.ts"
+  },
+  {
+    "name": "MarkdownEditor emits payload names preserve the public contract > rejects an invalid selection payload {\"revision\":1,\"selection\":{\"start\":\"0\",\"end\":3}}",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/markdown-editor/__tests__/markdown-editor-emits-payload-names.test.ts"
+  },
+  {
+    "name": "MarkdownEditor emits payload names preserve the public contract > rejects an invalid selection payload {\"revision\":1,\"selection\":{\"start\":0,\"end\":\"3\"}}",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/markdown-editor/__tests__/markdown-editor-emits-payload-names.test.ts"
+  },
+  {
+    "name": "MarkdownEditor emits payload names preserve the public contract > retains validator property-access order and short-circuiting",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/markdown-editor/__tests__/markdown-editor-emits-payload-names.test.ts"
+  },
+  {
+    "name": "MarkdownEditor emits payload names preserve the public contract > retains selection validator property-access order",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/markdown-editor/__tests__/markdown-editor-emits-payload-names.test.ts"
+  }
+]

@@ -1,0 +1,41 @@
+{
+  "sourceHead": "84449c6a64b83775f0c11d91f723dc34176bd2fe",
+  "pass": true,
+  "selections": [
+    {
+      "file": "vue/packages/components/table/__tests__/table-core-popper-return.test.ts",
+      "count": 2,
+      "names": [
+        "ordinary Table core Popper return > returns the real core instance with its original elements and options",
+        "ordinary Table core Popper return > keeps replacement and scroll cleanup tied to the core instance"
+      ]
+    },
+    {
+      "file": "vue/packages/components/markdown-editor/__tests__/markdown-editor-emits-payload-names.test.ts",
+      "count": 20,
+      "names": [
+        "MarkdownEditor emits payload names preserve the public contract > retains the complete event inventory and payload arity",
+        "MarkdownEditor emits payload names preserve the public contract > preserves ordinary typed emit payloads, order and rejection controls",
+        "MarkdownEditor emits payload names preserve the public contract > accepts an existing transaction payload with accepted=true",
+        "MarkdownEditor emits payload names preserve the public contract > accepts an existing transaction payload with accepted=false",
+        "MarkdownEditor emits payload names preserve the public contract > rejects an invalid transaction payload null",
+        "MarkdownEditor emits payload names preserve the public contract > rejects an invalid transaction payload undefined",
+        "MarkdownEditor emits payload names preserve the public contract > rejects an invalid transaction payload {}",
+        "MarkdownEditor emits payload names preserve the public contract > rejects an invalid transaction payload {\"accepted\":\"true\",\"beforeRevision\":0,\"documentIdentity\":{\"id\":\"emits:\u6587\u7ae0\",\"epoch\":7},\"history\":{\"canRedo\":false,\"canUndo\":false,\"redoDepth\":0,\"retainedUnits\":0,\"undoDepth\":0},\"revision\":1,\"selection\":{\"start\":0,\"end\":3,\"direction\":\"backward\"},\"transaction\":{\"changes\":[],\"history\":\"skip\",\"origin\":\"command\"},\"value\":\"text\"}",
+        "MarkdownEditor emits payload names preserve the public contract > rejects an invalid transaction payload {\"accepted\":true,\"beforeRevision\":0,\"documentIdentity\":{\"id\":\"emits:\u6587\u7ae0\",\"epoch\":7},\"history\":{\"canRedo\":false,\"canUndo\":false,\"redoDepth\":0,\"retainedUnits\":0,\"undoDepth\":0},\"revision\":\"1\",\"selection\":{\"start\":0,\"end\":3,\"direction\":\"backward\"},\"transaction\":{\"changes\":[],\"history\":\"skip\",\"origin\":\"command\"},\"value\":\"text\"}",
+        "MarkdownEditor emits payload names preserve the public contract > rejects an invalid transaction payload {\"accepted\":true,\"beforeRevision\":0,\"documentIdentity\":{\"id\":\"emits:\u6587\u7ae0\",\"epoch\":7},\"history\":{\"canRedo\":false,\"canUndo\":false,\"redoDepth\":0,\"retainedUnits\":0,\"undoDepth\":0},\"revision\":1,\"selection\":{\"start\":0,\"end\":3,\"direction\":\"backward\"},\"transaction\":{\"changes\":[],\"history\":\"skip\",\"origin\":\"command\"},\"value\":1}",
+        "MarkdownEditor emits payload names preserve the public contract > accepts the existing zero caret and backward selection payloads",
+        "MarkdownEditor emits payload names preserve the public contract > rejects an invalid selection payload null",
+        "MarkdownEditor emits payload names preserve the public contract > rejects an invalid selection payload undefined",
+        "MarkdownEditor emits payload names preserve the public contract > rejects an invalid selection payload {}",
+        "MarkdownEditor emits payload names preserve the public contract > rejects an invalid selection payload {\"revision\":\"1\",\"selection\":{\"start\":0,\"end\":3,\"direction\":\"backward\"}}",
+        "MarkdownEditor emits payload names preserve the public contract > rejects an invalid selection payload {\"revision\":1,\"selection\":null}",
+        "MarkdownEditor emits payload names preserve the public contract > rejects an invalid selection payload {\"revision\":1,\"selection\":{\"start\":\"0\",\"end\":3}}",
+        "MarkdownEditor emits payload names preserve the public contract > rejects an invalid selection payload {\"revision\":1,\"selection\":{\"start\":0,\"end\":\"3\"}}",
+        "MarkdownEditor emits payload names preserve the public contract > retains validator property-access order and short-circuiting",
+        "MarkdownEditor emits payload names preserve the public contract > retains selection validator property-access order"
+      ]
+    }
+  ],
+  "heldRoutesExcluded": true
+}

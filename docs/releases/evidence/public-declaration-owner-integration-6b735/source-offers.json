@@ -1,0 +1,40 @@
+{
+  "sourceSha": "6b735fa3be7b6500de49e79c0a0dfee7cef12b83",
+  "previousFrozenSource": "48ac5c2029a231e574a77a4aa537907f5bd447da",
+  "ownerOffers": [
+    {
+      "scope": "DOM emit payload parameter names",
+      "offeredSourceSha": "ed53d1c482b25bf6b3be00ccd67d66c0ab08c2f2",
+      "integrationSha": "d237cc3d0fe5d5c0d7a758c3e3e3c740d9ef6579"
+    },
+    {
+      "scope": "Markdown emit payload parameter names",
+      "offeredSourceSha": "9a3891d8dda56de2b3593b2ea2ba5b39e088a010",
+      "integrationSha": "7567dc4dab5843d11042d989006e8f487754800e"
+    },
+    {
+      "scope": "ElTable core Popper return",
+      "offeredSourceSha": "2b9e63af22c983c1a0be256f353b013400d359fe",
+      "integrationSha": "a3db21d4046b95333702f3b608d6e492a4dada13"
+    },
+    {
+      "scope": "Named public component aliases",
+      "offeredSourceSha": "9aa0d16fac57c95180f95ad48fd721686a686bbb",
+      "integrationSha": "84449c6a64b83775f0c11d91f723dc34176bd2fe"
+    },
+    {
+      "scope": "TableV2 public class attribute types",
+      "offeredSourceSha": "f8e3d55842572eccf396b1a67afa2e3d2dc6ee29",
+      "integrationSha": "6b735fa3be7b6500de49e79c0a0dfee7cef12b83"
+    }
+  ],
+  "ownMetadataRepairs": [
+    "4c35761a",
+    "28a77f0c"
+  ],
+  "notConsumed": [
+    "45f3f1d54a05b5e52484389765effb1c6fe19313",
+    "b7f5d1dfeb2cc8cc8b655a042b4fd14f3c155d2c"
+  ],
+  "noParallelComponentSourceEdits": true
+}

@@ -1,0 +1,57 @@
+{
+  "actualRuntimeControlSource": "84449c6a64b83775f0c11d91f723dc34176bd2fe",
+  "finalCandidateSource": "6b735fa3be7b6500de49e79c0a0dfee7cef12b83",
+  "relevantSourceTestConfigLockAndPackageBytesUnchanged": true,
+  "files": [
+    {
+      "path": "vue/packages/components/table/src/util.ts",
+      "sha256": "0df53f5cc5d9fd0345eb9fb118c756ee85d61d959e8e36a353df9b007b779a3b",
+      "bytesUnchanged": true
+    },
+    {
+      "path": "vue/packages/components/table/__tests__/table-core-popper-return.test.ts",
+      "sha256": "3a5316a01ade46d5cbf5894cf8d3154ddf889f98ef03d491c99d8370939dbabf",
+      "bytesUnchanged": true
+    },
+    {
+      "path": "vue/packages/components/table/__tests__/table-core-popper-return.test-d.ts",
+      "sha256": "241499d340307851954c6a04eb7ef26c3e780860ed8360a7c1225769aec6872e",
+      "bytesUnchanged": true
+    },
+    {
+      "path": "vue/packages/components/table/__tests__/table-core-popper-declaration-controls.mjs",
+      "sha256": "3450dfbf7d1108fe055da83aea47238cae2d6183532a9c49015d6cd3381eaa73",
+      "bytesUnchanged": true
+    },
+    {
+      "path": "vue/packages/components/markdown-editor/src/markdown-editor.ts",
+      "sha256": "db1490d474fdb2f7ecb09b582f5d3195cd71f9304503952ce1cb0e5327bb2d7e",
+      "bytesUnchanged": true
+    },
+    {
+      "path": "vue/packages/components/markdown-editor/__tests__/markdown-editor-emits-payload-names.test.ts",
+      "sha256": "4590e6797b9776f20722ac4e9336de21ce1646d7cc1897d447eba2667bf9a42d",
+      "bytesUnchanged": true
+    },
+    {
+      "path": "vue/vitest.config.ts",
+      "sha256": "5d1c92ec3090edb0dff1cba72cb655fdaf2d88d1ec004a9fe4a5a30e01cfb9d9",
+      "bytesUnchanged": true
+    },
+    {
+      "path": "vue/tsconfig.vitest.json",
+      "sha256": "47b74cf2b5dbbda12a674cdea7e278ab5b5af76778f43d98b32d4cb4b121bb02",
+      "bytesUnchanged": true
+    },
+    {
+      "path": "pnpm-lock.yaml",
+      "sha256": "c7d35e65a7f82bf145786f0d5697a8fcff2109b7f47a85146ed0acb22510ce94",
+      "bytesUnchanged": true
+    },
+    {
+      "path": "package.json",
+      "sha256": "4e6502bacf6c8edfe52fd20f7d59bd5df9a05f8f627546e62fb889f6e5c50ace",
+      "bytesUnchanged": true
+    }
+  ]
+}

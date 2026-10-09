@@ -1,0 +1,10 @@
+[
+  {
+    "name": "ordinary Table core Popper return > returns the real core instance with its original elements and options",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/table/__tests__/table-core-popper-return.test.ts"
+  },
+  {
+    "name": "ordinary Table core Popper return > keeps replacement and scroll cleanup tied to the core instance",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/table/__tests__/table-core-popper-return.test.ts"
+  }
+]

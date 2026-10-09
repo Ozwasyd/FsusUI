@@ -1,0 +1,10 @@
+Exact tracked changed TypeScript paths: ['vue/packages/components/color-picker/src/color-picker.ts', 'vue/packages/components/inbox-primitives/index.ts', 'vue/packages/components/inbox-primitives/src/shared.ts', 'vue/packages/components/markdown-editor/__tests__/markdown-editor-emits-payload-names.test.ts', 'vue/packages/components/markdown-editor/src/markdown-editor.ts', 'vue/packages/components/metric-primitives/index.ts', 'vue/packages/components/settings-primitives/index.ts', 'vue/packages/components/table-v2/src/components/sort-icon.tsx', 'vue/packages/components/table-v2/src/types.ts', 'vue/packages/components/table/__tests__/table-core-popper-return.test.ts', 'vue/packages/components/table/src/util.ts', 'vue/packages/components/tree-v2/src/virtual-tree.ts']
+
+/workspace/FsusUI-public-declaration-integration/vue/packages/components/markdown-editor/__tests__/markdown-editor-emits-payload-names.test.ts
+  0:0  warning  File ignored because of a matching ignore pattern. Use "--no-ignore" to disable file ignore settings or use "--no-warn-ignored" to suppress this warning
+
+/workspace/FsusUI-public-declaration-integration/vue/packages/components/table/__tests__/table-core-popper-return.test.ts
+  0:0  warning  File ignored because of a matching ignore pattern. Use "--no-ignore" to disable file ignore settings or use "--no-warn-ignored" to suppress this warning
+
+✖ 2 problems (0 errors, 2 warnings)
+

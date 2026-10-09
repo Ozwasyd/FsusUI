@@ -1,0 +1,4 @@
+
+> @ changeset /workspace/FsusUI-public-declaration-integration
+> node ./scripts/with-node-heap.mjs changeset status --since=origin/main --output=/workspace/.setup/public-declaration-closure/owner-final-changeset-status.json
+

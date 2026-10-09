@@ -1,0 +1,50 @@
+✔ Added source files
+{
+  "sourceHead": "48ac5c2029a231e574a77a4aa537907f5bd447da",
+  "producerTypeScript": "5.9.2",
+  "mode": "Diagnostic-only in-memory source experiment; not an implemented source offer or tarball qualification",
+  "trackedSourceChanged": false,
+  "before7056": [
+    "vue/packages/components/cascader/index.ts",
+    "vue/packages/components/cascader/src/cascader.vue.ts",
+    "vue/packages/components/date-picker/src/panel-utils.ts",
+    "vue/packages/components/pagination/src/components/sizes.vue.ts",
+    "vue/packages/components/select/index.ts",
+    "vue/packages/components/select/src/select.vue.ts",
+    "vue/packages/components/select/src/useSelect.ts",
+    "vue/packages/components/slider/index.ts",
+    "vue/packages/components/slider/src/composables/use-slide.ts",
+    "vue/packages/components/slider/src/slider.vue.ts",
+    "vue/packages/components/time-select/index.ts",
+    "vue/packages/components/time-select/src/time-select.vue.ts"
+  ],
+  "after7056": [
+    "vue/packages/components/cascader/index.ts",
+    "vue/packages/components/cascader/src/cascader.vue.ts",
+    "vue/packages/components/pagination/src/components/sizes.vue.ts",
+    "vue/packages/components/select/index.ts",
+    "vue/packages/components/select/src/select.vue.ts",
+    "vue/packages/components/select/src/useSelect.ts",
+    "vue/packages/components/slider/index.ts",
+    "vue/packages/components/slider/src/composables/use-slide.ts",
+    "vue/packages/components/slider/src/slider.vue.ts",
+    "vue/packages/components/time-select/index.ts",
+    "vue/packages/components/time-select/src/time-select.vue.ts"
+  ],
+  "targetBefore": [
+    {
+      "code": 7056,
+      "message": "The inferred type of this node exceeds the maximum length the compiler will serialize. An explicit type annotation is needed."
+    }
+  ],
+  "targetAfter": [],
+  "otherNewDiagnostics": [],
+  "emittedDeclarations": [
+    {
+      "path": "dist/types/packages/components/date-picker/src/panel-utils.d.ts",
+      "bytes": 411
+    }
+  ],
+  "proposedReturnAnnotation": "typeof DatePickPanel | typeof DateRangePickPanel | typeof MonthRangePickPanel"
+}
+PASS diagnostic-only parity/emit experiment; canonical task intentionally stopped before writing any generated artifacts

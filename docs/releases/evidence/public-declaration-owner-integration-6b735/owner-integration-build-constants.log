@@ -1,0 +1,16 @@
+
+> @element-plus/build-constants@0.0.1 build /workspace/FsusUI-public-declaration-integration/vue/internal/build-constants
+> node ../../../scripts/with-node-heap.mjs unbuild
+
+Browserslist: browsers data (caniuse-lite) is 7 months old. Please run:
+  npx update-browserslist-db@latest
+  Why you should do it regularly: https://github.com/browserslist/update-db#readme
+ℹ Building build-constants
+ℹ Cleaning dist directory: ./dist
+✔ Build succeeded for build-constants
+  dist/index.cjs (total size: 708 B, chunk size: 708 B, exports: PKG_BRAND_NAME, PKG_CAMELCASE_LOCAL_NAME, PKG_CAMELCASE_NAME, PKG_NAME, PKG_PREFIX, REPO_BRANCH, REPO_NAME, REPO_OWNER, REPO_PATH)
+
+  dist/index.mjs (total size: 492 B, chunk size: 492 B, exports: PKG_BRAND_NAME, PKG_CAMELCASE_LOCAL_NAME, PKG_CAMELCASE_NAME, PKG_NAME, PKG_PREFIX, REPO_BRANCH, REPO_NAME, REPO_OWNER, REPO_PATH)
+
+Σ Total dist size (byte size): 2.89 kB
+

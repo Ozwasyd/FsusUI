@@ -1,0 +1,16 @@
+
+> @element-plus/build-utils@0.0.1 build /workspace/FsusUI-public-declaration-integration/vue/internal/build-utils
+> node ../../../scripts/with-node-heap.mjs unbuild
+
+Browserslist: browsers data (caniuse-lite) is 7 months old. Please run:
+  npx update-browserslist-db@latest
+  Why you should do it regularly: https://github.com/browserslist/update-db#readme
+ℹ Building build-utils
+ℹ Cleaning dist directory: ./dist
+✔ Build succeeded for build-utils
+  dist/index.cjs (total size: 5.37 kB, chunk size: 5.37 kB, exports: buildOutput, buildRoot, compPackage, compRoot, directivePackage, directiveRoot, docPackage, docRoot, docsDirName, ensureDir, epOutput, epPackage, epRoot, errorAndExit, excludeFiles, getPackageDependencies, getPackageManifest, getWorkspaceNames, getWorkspacePackages, hookPackage, hookRoot, localePackage, localeRoot, pkgRoot, projPackage, projRoot, shouldExcludeFile, themePackage, themeRoot, utilPackage, utilRoot, vpRoot, vueRoot, writeJson)
+
+  dist/index.mjs (total size: 3.99 kB, chunk size: 3.99 kB, exports: buildOutput, buildRoot, compPackage, compRoot, directivePackage, directiveRoot, docPackage, docRoot, docsDirName, ensureDir, epOutput, epPackage, epRoot, errorAndExit, excludeFiles, getPackageDependencies, getPackageManifest, getWorkspaceNames, getWorkspacePackages, hookPackage, hookRoot, localePackage, localeRoot, pkgRoot, projPackage, projRoot, shouldExcludeFile, themePackage, themeRoot, utilPackage, utilRoot, vpRoot, vueRoot, writeJson)
+
+Σ Total dist size (byte size): 15.6 kB
+

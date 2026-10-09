@@ -1,0 +1,13 @@
+
+> @ test /workspace/FsusUI-public-declaration-integration
+> node ./scripts/with-node-heap.mjs vitest --config vue/vitest.config.ts run vue/packages/components/table/__tests__/table-core-popper-return.test.ts vue/packages/components/markdown-editor/__tests__/markdown-editor-emits-payload-names.test.ts
+
+
+ RUN  v4.1.5 /workspace/FsusUI-public-declaration-integration
+
+
+ Test Files  2 passed (2)
+      Tests  22 passed (22)
+   Start at  09:45:10
+   Duration  3.16s (transform 1.11s, setup 128ms, import 1.68s, tests 150ms, environment 986ms)
+

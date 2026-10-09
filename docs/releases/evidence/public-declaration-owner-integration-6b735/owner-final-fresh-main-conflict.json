@@ -1,0 +1,13 @@
+{
+  "sourceHead": "6b735fa3be7b6500de49e79c0a0dfee7cef12b83",
+  "freshMain": "8db0ac8f49749e3e5f28be5051bb3d3ed71ada71",
+  "exitCode": 0,
+  "conflicts": false,
+  "command": [
+    "git",
+    "merge-tree",
+    "--write-tree",
+    "6b735fa3be7b6500de49e79c0a0dfee7cef12b83",
+    "8db0ac8f49749e3e5f28be5051bb3d3ed71ada71"
+  ]
+}

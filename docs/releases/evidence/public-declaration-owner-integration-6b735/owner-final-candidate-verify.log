@@ -1,0 +1,17 @@
+
+> @ package:candidate:verify /workspace/FsusUI-public-declaration-integration
+> node ./scripts/with-node-heap.mjs node ./scripts/package-candidate.mjs verify -- --commit 6b735fa3be7b6500de49e79c0a0dfee7cef12b83
+
+file:///workspace/FsusUI-public-declaration-integration/scripts/npm-candidate-lib.mjs:365
+      throw new Error(`Candidate artifact is missing: ${requiredPath}`)
+            ^
+
+Error: Candidate artifact is missing: /workspace/FsusUI-public-declaration-integration/6b735fa3be7b6500de49e79c0a0dfee7cef12b83
+    at verifyCandidate (file:///workspace/FsusUI-public-declaration-integration/scripts/npm-candidate-lib.mjs:365:13)
+    at file:///workspace/FsusUI-public-declaration-integration/scripts/package-candidate.mjs:55:20
+    at ModuleJob.run (node:internal/modules/esm/module_job:439:25)
+    at async node:internal/modules/esm/loader:643:26
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5)
+
+Node.js v24.19.0
+ ELIFECYCLE  Command failed with exit code 1.

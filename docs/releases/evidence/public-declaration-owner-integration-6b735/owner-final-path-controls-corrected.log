@@ -1,0 +1,18 @@
+✔ esm motion facade declarations resolve the implementation index (1.304657ms)
+✔ esm preserves existing motion leaf and unrelated package mappings (0.166561ms)
+✔ esm keeps internal WASM declarations relative to components/markdown-editor/index.d.ts (0.251389ms)
+✔ esm keeps internal WASM declarations relative to components/markdown-editor/src/editor.d.ts (0.197128ms)
+✔ esm keeps internal WASM declarations relative to wasm/index.d.ts (0.089054ms)
+✔ cjs motion facade declarations resolve the implementation index (0.10606ms)
+✔ cjs preserves existing motion leaf and unrelated package mappings (0.09957ms)
+✔ cjs keeps internal WASM declarations relative to components/markdown-editor/index.d.ts (0.078929ms)
+✔ cjs keeps internal WASM declarations relative to components/markdown-editor/src/editor.d.ts (0.122805ms)
+✔ cjs keeps internal WASM declarations relative to wasm/index.d.ts (0.169556ms)
+ℹ tests 10
+ℹ suites 0
+ℹ pass 10
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 409.703133

@@ -1,0 +1,109 @@
+{
+  "changesets": [
+    {
+      "releases": [
+        {
+          "name": "element-plus",
+          "type": "patch"
+        }
+      ],
+      "summary": "Fix duplicate parameter names in generated ColorPicker focus/blur,\nConversationListItem select, and TreeV2 node-contextmenu declarations. Preserve\nevent names, payload types and order, validators, and runtime behavior.",
+      "id": "fix-emitted-payload-declarations"
+    },
+    {
+      "releases": [
+        {
+          "name": "element-plus",
+          "type": "patch"
+        }
+      ],
+      "summary": "Preserve the inbox, metric, and settings component alias contracts through named\npublic declaration types, avoiding expanded Vue instance generics in installed\npackages. Runtime component names, installation, props, emits, slots, and\ninstances remain unchanged.",
+      "id": "fix-public-component-alias-declarations"
+    },
+    {
+      "releases": [
+        {
+          "name": "element-plus",
+          "type": "patch"
+        }
+      ],
+      "summary": "Resolve internal WASM declaration references within the installed package while\nkeeping generated WASM subpaths outside the public exports contract.",
+      "id": "internal-wasm-declaration-paths"
+    },
+    {
+      "releases": [
+        {
+          "name": "element-plus",
+          "type": "patch"
+        }
+      ],
+      "summary": "Rename MarkdownEditor transaction and selection payload parameter labels so the\nofficial declaration producer does not repeat Vue's event-name parameter.\nPreserve event names, payload types and order, runtime validation and behavior.",
+      "id": "markdown-editor-emits-payload-names"
+    },
+    {
+      "releases": [
+        {
+          "name": "element-plus",
+          "type": "patch"
+        }
+      ],
+      "summary": "Resolve public motion declarations through the implementation index so `useScrollReveal` and its types remain usable from the compiled package.",
+      "id": "motion-declaration-owner"
+    },
+    {
+      "releases": [
+        {
+          "name": "element-plus",
+          "type": "patch"
+        }
+      ],
+      "summary": "Keep GSAP types in the emitted motion declarations so installed consumers can\nresolve scroll and timeline options and inferred controls without ambient setup.",
+      "id": "motion-gsap-declaration-scope"
+    },
+    {
+      "releases": [
+        {
+          "name": "element-plus",
+          "type": "patch"
+        }
+      ],
+      "summary": "Use the actual Popper core instance return type for ordinary Table overflow tooltips so generated declarations compile without expanding a Vue component instance. Preserve tooltip runtime behavior.",
+      "id": "ordinary-table-core-popper-return"
+    },
+    {
+      "releases": [
+        {
+          "name": "element-plus",
+          "type": "patch"
+        }
+      ],
+      "summary": "Include the existing pinned Vue Router and type-fest dependencies needed by the\npublished component and utility declarations.",
+      "id": "published-declaration-dependencies"
+    }
+  ],
+  "releases": [
+    {
+      "name": "element-plus",
+      "type": "patch",
+      "oldVersion": "1.5.1",
+      "changesets": [
+        "fix-emitted-payload-declarations",
+        "fix-public-component-alias-declarations",
+        "internal-wasm-declaration-paths",
+        "markdown-editor-emits-payload-names",
+        "motion-declaration-owner",
+        "motion-gsap-declaration-scope",
+        "ordinary-table-core-popper-return",
+        "published-declaration-dependencies"
+      ],
+      "newVersion": "1.5.2"
+    },
+    {
+      "name": "demo-app",
+      "type": "patch",
+      "oldVersion": "0.0.1",
+      "changesets": [],
+      "newVersion": "0.0.2"
+    }
+  ]
+}
