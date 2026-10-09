@@ -1,0 +1,11 @@
+{
+  "sourceSha": "ec2a5ee8b555556ff74c5b1b38371db032a8e798",
+  "command": [
+    "node",
+    "--test",
+    "tests/conformance-playwright-identity.test.mjs"
+  ],
+  "exitCode": 0,
+  "scratchParentAbsentBeforeRun": true,
+  "seconds": 3.703579496999737
+}

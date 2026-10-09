@@ -1,0 +1,12 @@
+{
+  "sourceSha": "ec2a5ee8b555556ff74c5b1b38371db032a8e798",
+  "command": [
+    "git",
+    "apply",
+    "--check",
+    "known-icons-increment.patch"
+  ],
+  "exitCode": 0,
+  "output": "",
+  "applied": false
+}

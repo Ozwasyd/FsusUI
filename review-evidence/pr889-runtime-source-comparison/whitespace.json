@@ -1,0 +1,12 @@
+{
+  "sourceSha": "ec2a5ee8b555556ff74c5b1b38371db032a8e798",
+  "freshMain": "8db0ac8f49749e3e5f28be5051bb3d3ed71ada71",
+  "command": [
+    "git",
+    "diff",
+    "--check",
+    "6b5bb2fcaf7d1eef066b5d8e3e867504d2e00b8f",
+    "ec2a5ee8b555556ff74c5b1b38371db032a8e798"
+  ],
+  "exitCode": 0
+}

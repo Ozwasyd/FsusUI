@@ -1,0 +1,25 @@
+{
+  "rootDelegatedScope": "Existing conformance/runtime integration ownership; ordinary unconsumed original runner correction only",
+  "ownedExactPaths": [
+    "scripts/conformance-playwright-owner-run.mjs",
+    "scripts/conformance-playwright-runner.mjs",
+    "scripts/markdown-playwright-runner.mjs",
+    "tests/conformance-playwright-identity.test.mjs"
+  ],
+  "actualTreePrChangedPaths": [
+    ".changeset/avalonia-tree-row-retention.md",
+    "dotnet/FsusUI.Avalonia.HeadlessTests/FsusTreeLayoutHeadlessTests.cs",
+    "dotnet/FsusUI.Avalonia.HeadlessTests/FsusTreeRowPresenterHeadlessTests.cs",
+    "dotnet/FsusUI.Avalonia.HeadlessTests/FsusTreeScrollingHeadlessTests.cs",
+    "dotnet/FsusUI.Avalonia.Tests/Controls/FsusTreeRowRetentionTests.cs",
+    "dotnet/FsusUI.Avalonia/Controls/FsusTreeControls.cs",
+    "scripts/run-render-performance-tree-diagnostic.test.mjs",
+    "scripts/run-render-performance.mjs"
+  ],
+  "overlap": [],
+  "localDestinationClean": true,
+  "sharedClaimRegistry": "No external live claim registry is exposed in this environment; no global actor roster claim is asserted. Continued canonical ownership is explicitly delegated by Root.",
+  "native827OwnersExcluded": true,
+  "sourcePreimagesVerifiedAgainstOriginalPublished80f6": true,
+  "proposedCorrectionApplyCheck": 0
+}

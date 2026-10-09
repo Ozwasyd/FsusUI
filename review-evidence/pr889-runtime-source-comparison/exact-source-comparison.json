@@ -1,0 +1,173 @@
+{
+  "runId": 37958456189,
+  "ciMerge": "de0b90b49697a40741220e5e8cce23f7dc460195",
+  "head": "6b5bb2fcaf7d1eef066b5d8e3e867504d2e00b8f",
+  "base": "8db0ac8f49749e3e5f28be5051bb3d3ed71ada71",
+  "integration": "ec2a5ee8b555556ff74c5b1b38371db032a8e798",
+  "mergeSourceTreeEqualsHead": true,
+  "groups": {
+    "identity": [
+      {
+        "path": "scripts/conformance-playwright-runner.mjs",
+        "baseBlob": "72e36d76867a3cd276d66b72a3c1bb5d49f33661",
+        "headBlob": "72e36d76867a3cd276d66b72a3c1bb5d49f33661",
+        "mergeBlob": "72e36d76867a3cd276d66b72a3c1bb5d49f33661",
+        "publishedBlob": "58cdccded73e4b5ac9993bfc2ce840430095f28c",
+        "originalPreimageBlob": "72e36d76867a3cd276d66b72a3c1bb5d49f33661",
+        "newIntegrationBlob": "58cdccded73e4b5ac9993bfc2ce840430095f28c"
+      },
+      {
+        "path": "scripts/conformance-playwright-owner-run.mjs",
+        "baseBlob": "72bcc775d33ea2478ff96c27da0889ba2b13c38d",
+        "headBlob": "72bcc775d33ea2478ff96c27da0889ba2b13c38d",
+        "mergeBlob": "72bcc775d33ea2478ff96c27da0889ba2b13c38d",
+        "publishedBlob": "931d08870638bf513e8765aacccbb321abcd9f3f",
+        "originalPreimageBlob": "72bcc775d33ea2478ff96c27da0889ba2b13c38d",
+        "newIntegrationBlob": "931d08870638bf513e8765aacccbb321abcd9f3f"
+      },
+      {
+        "path": "scripts/markdown-playwright-runner.mjs",
+        "baseBlob": "3d775c0d1a403253127fa1b94729ff342dfcd308",
+        "headBlob": "3d775c0d1a403253127fa1b94729ff342dfcd308",
+        "mergeBlob": "3d775c0d1a403253127fa1b94729ff342dfcd308",
+        "publishedBlob": "1a65c11a22438fef05aeb97bd4561350dae5fc24",
+        "originalPreimageBlob": "3d775c0d1a403253127fa1b94729ff342dfcd308",
+        "newIntegrationBlob": "1a65c11a22438fef05aeb97bd4561350dae5fc24"
+      },
+      {
+        "path": "tests/conformance-playwright-identity.test.mjs",
+        "baseBlob": null,
+        "headBlob": null,
+        "mergeBlob": null,
+        "publishedBlob": "21620c0fd47f0fc42e8dd52f9ddd8139af815851",
+        "originalPreimageBlob": null,
+        "newIntegrationBlob": "21620c0fd47f0fc42e8dd52f9ddd8139af815851"
+      }
+    ],
+    "layoutRuntime": [
+      {
+        "path": "scripts/layout-playwright-runner.mjs",
+        "baseBlob": "c65132e1c27ef66bb1e17c1e200302649fa6b830",
+        "headBlob": "c65132e1c27ef66bb1e17c1e200302649fa6b830",
+        "mergeBlob": "c65132e1c27ef66bb1e17c1e200302649fa6b830",
+        "publishedBlob": "c65132e1c27ef66bb1e17c1e200302649fa6b830",
+        "originalPreimageBlob": "c65132e1c27ef66bb1e17c1e200302649fa6b830",
+        "newIntegrationBlob": "c65132e1c27ef66bb1e17c1e200302649fa6b830"
+      },
+      {
+        "path": "scripts/layout-playwright-owner-run.mjs",
+        "baseBlob": "908b53e9a9de2980c75e9ae62e1952aebd319282",
+        "headBlob": "908b53e9a9de2980c75e9ae62e1952aebd319282",
+        "mergeBlob": "908b53e9a9de2980c75e9ae62e1952aebd319282",
+        "publishedBlob": "908b53e9a9de2980c75e9ae62e1952aebd319282",
+        "originalPreimageBlob": "908b53e9a9de2980c75e9ae62e1952aebd319282",
+        "newIntegrationBlob": "908b53e9a9de2980c75e9ae62e1952aebd319282"
+      },
+      {
+        "path": "scripts/prepare-visual-runtime.mjs",
+        "baseBlob": "44d40656d1402b8c7cd301a1a4c51f3a20087033",
+        "headBlob": "44d40656d1402b8c7cd301a1a4c51f3a20087033",
+        "mergeBlob": "44d40656d1402b8c7cd301a1a4c51f3a20087033",
+        "publishedBlob": "44d40656d1402b8c7cd301a1a4c51f3a20087033",
+        "originalPreimageBlob": "44d40656d1402b8c7cd301a1a4c51f3a20087033",
+        "newIntegrationBlob": "44d40656d1402b8c7cd301a1a4c51f3a20087033"
+      },
+      {
+        "path": "scripts/visual-runtime-core.mjs",
+        "baseBlob": "8eabd1c5404e05a71bbeb6c57bc2540653d47b74",
+        "headBlob": "8eabd1c5404e05a71bbeb6c57bc2540653d47b74",
+        "mergeBlob": "8eabd1c5404e05a71bbeb6c57bc2540653d47b74",
+        "publishedBlob": "8eabd1c5404e05a71bbeb6c57bc2540653d47b74",
+        "originalPreimageBlob": "8eabd1c5404e05a71bbeb6c57bc2540653d47b74",
+        "newIntegrationBlob": "8eabd1c5404e05a71bbeb6c57bc2540653d47b74"
+      },
+      {
+        "path": "scripts/serve-visual-runtime.mjs",
+        "baseBlob": "ae9ea2494eb1a0fb60f1ee2352ad90d03fd4d425",
+        "headBlob": "ae9ea2494eb1a0fb60f1ee2352ad90d03fd4d425",
+        "mergeBlob": "ae9ea2494eb1a0fb60f1ee2352ad90d03fd4d425",
+        "publishedBlob": "ae9ea2494eb1a0fb60f1ee2352ad90d03fd4d425",
+        "originalPreimageBlob": "ae9ea2494eb1a0fb60f1ee2352ad90d03fd4d425",
+        "newIntegrationBlob": "ae9ea2494eb1a0fb60f1ee2352ad90d03fd4d425"
+      }
+    ],
+    "icons": [
+      {
+        "path": "scripts/ensure-icons-artifacts.mjs",
+        "baseBlob": "242ba8304a65bf7a7e0e21d521e03075259250f1",
+        "headBlob": "242ba8304a65bf7a7e0e21d521e03075259250f1",
+        "mergeBlob": "242ba8304a65bf7a7e0e21d521e03075259250f1",
+        "publishedBlob": "6a6da885e998f07dea6e498475d18c553d072baa",
+        "originalPreimageBlob": "242ba8304a65bf7a7e0e21d521e03075259250f1",
+        "newIntegrationBlob": "242ba8304a65bf7a7e0e21d521e03075259250f1"
+      },
+      {
+        "path": "vue/packages/icons-vue/build/build.ts",
+        "baseBlob": "c93cffa0b7ec20fccd33cbef08defddc5e8cdc9a",
+        "headBlob": "c93cffa0b7ec20fccd33cbef08defddc5e8cdc9a",
+        "mergeBlob": "c93cffa0b7ec20fccd33cbef08defddc5e8cdc9a",
+        "publishedBlob": "d18b19785526305d4ee38bac3c764bae0534df71",
+        "originalPreimageBlob": "c93cffa0b7ec20fccd33cbef08defddc5e8cdc9a",
+        "newIntegrationBlob": "c93cffa0b7ec20fccd33cbef08defddc5e8cdc9a"
+      },
+      {
+        "path": "vue/packages/icons-vue/src/components/index.ts",
+        "baseBlob": "d11f17b83ed775420ee03a7c6193236a8a45203a",
+        "headBlob": "d11f17b83ed775420ee03a7c6193236a8a45203a",
+        "mergeBlob": "d11f17b83ed775420ee03a7c6193236a8a45203a",
+        "publishedBlob": "a9b48d07bda97064ea2f24c59988e16af4b5e963",
+        "originalPreimageBlob": "d11f17b83ed775420ee03a7c6193236a8a45203a",
+        "newIntegrationBlob": "d11f17b83ed775420ee03a7c6193236a8a45203a"
+      },
+      {
+        "path": "tests/ensure-icons-artifacts.test.mjs",
+        "baseBlob": null,
+        "headBlob": null,
+        "mergeBlob": null,
+        "publishedBlob": "83e9b9612e077a34327239323e0af8b89738a37c",
+        "originalPreimageBlob": null,
+        "newIntegrationBlob": null
+      }
+    ],
+    "metadata": [
+      {
+        "path": "docs/avalonia/vue-public-api-baseline.md",
+        "baseBlob": "bf983b703855b81f1df5f0e873f59261d9b125a8",
+        "headBlob": "bf983b703855b81f1df5f0e873f59261d9b125a8",
+        "mergeBlob": "bf983b703855b81f1df5f0e873f59261d9b125a8",
+        "publishedBlob": "4a54e9497ed9452a4956e9e6ca6a5cc7b3c03d1d",
+        "originalPreimageBlob": "9481c6bbcf185ec1e8e4c1d47346f64af2f61aac",
+        "newIntegrationBlob": "bf983b703855b81f1df5f0e873f59261d9b125a8"
+      },
+      {
+        "path": "spec/baselines/vue-current.json",
+        "baseBlob": "a91df304d52d6d6862590ba5a42a0455ffdbbb19",
+        "headBlob": "a91df304d52d6d6862590ba5a42a0455ffdbbb19",
+        "mergeBlob": "a91df304d52d6d6862590ba5a42a0455ffdbbb19",
+        "publishedBlob": "c285a5b8c64ca245e7dfc011bb3bd02d620bc02a",
+        "originalPreimageBlob": "a670a66764f216037d0ea35e2d382ed88222741b",
+        "newIntegrationBlob": "a91df304d52d6d6862590ba5a42a0455ffdbbb19"
+      },
+      {
+        "path": "spec/components/contracts/v1/vue-public-contracts.json",
+        "baseBlob": "1a827eaf703a52f7d12830f954e3dea84ede21ca",
+        "headBlob": "1a827eaf703a52f7d12830f954e3dea84ede21ca",
+        "mergeBlob": "1a827eaf703a52f7d12830f954e3dea84ede21ca",
+        "publishedBlob": "0f5c9552432339f657dcf3365d0b6354663423c7",
+        "originalPreimageBlob": "8ed5cfe21eba24b9ad0ff1fa12bacb620d463c3f",
+        "newIntegrationBlob": "1a827eaf703a52f7d12830f954e3dea84ede21ca"
+      },
+      {
+        "path": "spec/components/contracts/v2/contract-v2.json",
+        "baseBlob": "595c6f202cca326cafd38abdee97ff31118a9e6e",
+        "headBlob": "595c6f202cca326cafd38abdee97ff31118a9e6e",
+        "mergeBlob": "595c6f202cca326cafd38abdee97ff31118a9e6e",
+        "publishedBlob": "19edc41969ec5071cc88cfef453c7455ce6e5a65",
+        "originalPreimageBlob": "70e14e85bdd5765ee56650066b0d57ff61368844",
+        "newIntegrationBlob": "595c6f202cca326cafd38abdee97ff31118a9e6e"
+      }
+    ]
+  },
+  "metadataOfferBinding": "977b406 and a6 outputs bind actual66 source; all four preimages differ on Tree head, no blind metadata copying or producer requalification",
+  "ciFailureAttribution": "Source equality alone establishes no failure on base CI; exact-base relevant jobs not equivalent or skipped"
+}

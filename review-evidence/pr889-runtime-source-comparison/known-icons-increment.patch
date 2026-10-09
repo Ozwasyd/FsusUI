@@ -1,0 +1,295 @@
+diff --git a/scripts/ensure-icons-artifacts.mjs b/scripts/ensure-icons-artifacts.mjs
+index 242ba830..6a6da885 100644
+--- a/scripts/ensure-icons-artifacts.mjs
++++ b/scripts/ensure-icons-artifacts.mjs
+@@ -1,4 +1,6 @@
+ import { spawnSync } from 'node:child_process'
++import { rm } from 'node:fs/promises'
++import { resolve } from 'node:path'
+ import {
+   artifactGroups,
+   inspectArtifactGroup,
+@@ -11,7 +13,6 @@ const force =
+ const dryRun = process.argv.includes('--dry-run')
+ const group = artifactGroups.icons
+ const status = await inspectArtifactGroup(group)
+-const [fingerprint] = status.fingerprints
+ 
+ if (!force && status.fresh) {
+   console.log(
+@@ -47,14 +48,49 @@ console.log(
+   ].join('\n'),
+ )
+ 
+-const build = spawnSync('pnpm', ['run', '-C', 'vue/packages/icons-vue', 'build'], {
+-  cwd: root,
+-  stdio: 'inherit',
+-  shell: process.platform === 'win32',
+-})
++const runBuild = (script) => {
++  const build = spawnSync(
++    'pnpm',
++    ['run', '-C', 'vue/packages/icons-vue', script],
++    {
++      cwd: root,
++      stdio: 'inherit',
++      shell: process.platform === 'win32',
++    },
++  )
+ 
+-if (build.status !== 0) {
+-  process.exit(build.status ?? 1)
++  if (build.status !== 0) process.exit(build.status ?? 1)
+ }
+ 
+-await writeFingerprint(fingerprint.fingerprintPath, fingerprint.currentFingerprint)
++const [policy] = group.fingerprints
++await rm(resolve(root, policy.fingerprintPath), { force: true })
++
++// Generation can update tracked aliases; compilation must use that stable tree.
++runBuild('build:generate')
++const generated = await inspectArtifactGroup(group)
++runBuild('build')
++const built = await inspectArtifactGroup(group)
++const [fingerprint] = built.fingerprints
++
++if (built.sourceHash !== generated.sourceHash) {
++  throw new Error(
++    '[ensure-icons] inputs changed during build; fingerprint not written',
++  )
++}
++if (fingerprint.missingArtifacts.length > 0) {
++  throw new Error(
++    '[ensure-icons] build left required artifacts missing; fingerprint not written',
++  )
++}
++
++await writeFingerprint(
++  fingerprint.fingerprintPath,
++  fingerprint.currentFingerprint,
++)
++const ready = await inspectArtifactGroup(group)
++if (!ready.fresh) {
++  await rm(resolve(root, policy.fingerprintPath), { force: true })
++  throw new Error(
++    `[ensure-icons] artifacts are not ready: ${ready.staleReasons.join('; ')}`,
++  )
++}
+diff --git a/tests/ensure-icons-artifacts.test.mjs b/tests/ensure-icons-artifacts.test.mjs
+new file mode 100644
+index 00000000..83e9b961
+--- /dev/null
++++ b/tests/ensure-icons-artifacts.test.mjs
+@@ -0,0 +1,135 @@
++import assert from 'node:assert/strict'
++import { execFileSync, spawnSync } from 'node:child_process'
++import { existsSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
++import path from 'node:path'
++import test from 'node:test'
++import {
++  artifactGroups,
++  inspectArtifactGroup,
++  root,
++} from '../scripts/test-artifact-cache.mjs'
++
++const group = artifactGroups.icons
++const indexPath = path.join(
++  root,
++  'vue/packages/icons-vue/src/components/index.ts',
++)
++const markerPath = path.join(root, group.fingerprints[0].fingerprintPath)
++const declarationPath = path.join(
++  root,
++  'vue/packages/icons-vue/dist/types/index.d.ts',
++)
++const buildPath = path.join(root, 'vue/packages/icons-vue/build/build.ts')
++const run = (args) =>
++  execFileSync('pnpm', args, { cwd: root, encoding: 'utf8' })
++const ensure = () => run(['run', 'ensure:icons'])
++const build = (script) => run(['-C', 'vue/packages/icons-vue', 'run', script])
++
++test('certifies the actual generated alias tree and reaches a cache fixed point', async () => {
++  rmSync(indexPath)
++  try {
++    ensure()
++    const generated = readFileSync(indexPath, 'utf8')
++    for (const alias of [
++      'AddDocument',
++      'ApplicationMenu',
++      'RefreshReplace',
++      'Replace',
++      'SearchFilter',
++    ]) {
++      assert.ok(generated.includes(`as ${alias} }`), alias)
++    }
++    const status = await inspectArtifactGroup(group)
++    assert.equal(status.fresh, true)
++    assert.equal(
++      readFileSync(markerPath, 'utf8').trim(),
++      status.fingerprints[0].currentFingerprint,
++    )
++    const before = readFileSync(indexPath)
++    build('build:generate')
++    assert.deepEqual(readFileSync(indexPath), before)
++    assert.match(ensure(), /cache-hit/u)
++    assert.equal((await inspectArtifactGroup(group)).fresh, true)
++  } finally {
++    if (!existsSync(indexPath)) build('build:generate')
++  }
++})
++
++test('direct bundle builds preserve declarations but invalidate certification until ensure completes', async () => {
++  ensure()
++  const declarations = readFileSync(declarationPath)
++  build('build:build')
++  assert.deepEqual(readFileSync(declarationPath), declarations)
++  assert.equal(existsSync(markerPath), false)
++  assert.equal((await inspectArtifactGroup(group)).fresh, false)
++  build('build:types')
++  assert.equal(existsSync(markerPath), false)
++  assert.equal((await inspectArtifactGroup(group)).fresh, false)
++  ensure()
++  assert.equal((await inspectArtifactGroup(group)).fresh, true)
++})
++
++test('rejects changed build inputs, failed builds and missing outputs before recovering', async () => {
++  ensure()
++  const original = readFileSync(buildPath)
++  try {
++    writeFileSync(
++      buildPath,
++      Buffer.concat([
++        Buffer.from("throw new Error('icons producer failure control')\n"),
++        original,
++      ]),
++    )
++    assert.equal((await inspectArtifactGroup(group)).fresh, false)
++    const failed = spawnSync('pnpm', ['run', 'ensure:icons'], {
++      cwd: root,
++      encoding: 'utf8',
++    })
++    assert.notEqual(failed.status, 0)
++    assert.match(
++      failed.stdout + failed.stderr,
++      /icons producer failure control/u,
++    )
++    assert.equal(existsSync(markerPath), false)
++    assert.equal((await inspectArtifactGroup(group)).fresh, false)
++  } finally {
++    writeFileSync(buildPath, original)
++  }
++  ensure()
++  assert.equal((await inspectArtifactGroup(group)).fresh, true)
++  const bundlePath = path.join(root, 'vue/packages/icons-vue/dist/index.cjs')
++  rmSync(bundlePath)
++  const missing = await inspectArtifactGroup(group)
++  assert.equal(missing.fresh, false)
++  assert.ok(missing.fingerprints[0].missingArtifacts.includes(bundlePath))
++  ensure()
++  assert.equal((await inspectArtifactGroup(group)).fresh, true)
++})
++
++test('does not certify a successful build whose source changes during compilation', async () => {
++  ensure()
++  const original = readFileSync(buildPath)
++  try {
++    writeFileSync(
++      buildPath,
++      Buffer.concat([
++        original,
++        Buffer.from(
++          "\nawait import('node:fs/promises').then(({ appendFile }) => appendFile(__filename, '\\n// input drift control\\n'))\n",
++        ),
++      ]),
++    )
++    const failed = spawnSync('pnpm', ['run', 'ensure:icons'], {
++      cwd: root,
++      encoding: 'utf8',
++    })
++    assert.notEqual(failed.status, 0)
++    assert.match(failed.stdout + failed.stderr, /inputs changed during build/u)
++    assert.equal(existsSync(markerPath), false)
++    assert.equal((await inspectArtifactGroup(group)).fresh, false)
++  } finally {
++    writeFileSync(buildPath, original)
++  }
++  ensure()
++  assert.equal((await inspectArtifactGroup(group)).fresh, true)
++})
+diff --git a/vue/packages/icons-vue/build/build.ts b/vue/packages/icons-vue/build/build.ts
+index c93cffa0..d18b1978 100644
+--- a/vue/packages/icons-vue/build/build.ts
++++ b/vue/packages/icons-vue/build/build.ts
+@@ -10,14 +10,23 @@ const __dirname = path.dirname(__filename)
+ const packageRoot = path.resolve(__dirname, '..')
+ const distDir = path.join(packageRoot, 'dist')
+ 
+-await rm(distDir, { recursive: true, force: true })
++// Invalidate certification without deleting declarations built in parallel.
++await rm(path.join(distDir, '.artifact-fingerprint'), { force: true })
+ await mkdir(distDir, { recursive: true })
+ 
+ const entries = [
+   { entry: 'src/index.ts', outfile: 'dist/index.js', format: 'esm' as Format },
+   { entry: 'src/index.ts', outfile: 'dist/index.cjs', format: 'cjs' as Format },
+-  { entry: 'src/global.ts', outfile: 'dist/global.js', format: 'esm' as Format },
+-  { entry: 'src/global.ts', outfile: 'dist/global.cjs', format: 'cjs' as Format },
++  {
++    entry: 'src/global.ts',
++    outfile: 'dist/global.js',
++    format: 'esm' as Format,
++  },
++  {
++    entry: 'src/global.ts',
++    outfile: 'dist/global.cjs',
++    format: 'cjs' as Format,
++  },
+ ]
+ 
+ for (const item of entries) {
+@@ -33,7 +42,9 @@ for (const item of entries) {
+     external: ['vue'],
+     plugins: [Vue()],
+     define: {
+-      'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV ?? 'production'),
++      'process.env.NODE_ENV': JSON.stringify(
++        process.env.NODE_ENV ?? 'production',
++      ),
+     },
+   })
+ }
+diff --git a/vue/packages/icons-vue/src/components/index.ts b/vue/packages/icons-vue/src/components/index.ts
+index d11f17b8..a9b48d07 100644
+--- a/vue/packages/icons-vue/src/components/index.ts
++++ b/vue/packages/icons-vue/src/components/index.ts
+@@ -1,8 +1,10 @@
++export { default as AddDocument } from './document-add.vue'
+ export { default as AddLocation } from './add-location.vue'
+ export { default as Aim } from './aim.vue'
+ export { default as AlarmClock } from './alarm-clock.vue'
+ export { default as AlertTriangle } from './warning.vue'
+ export { default as Apple } from './apple.vue'
++export { default as ApplicationMenu } from './menu.vue'
+ export { default as ArrowDown } from './arrow-down.vue'
+ export { default as ArrowDownBold } from './arrow-down-bold.vue'
+ export { default as ArrowLeft } from './arrow-left.vue'
+@@ -231,16 +233,19 @@ export { default as Reading } from './reading.vue'
+ export { default as ReadingLamp } from './reading-lamp.vue'
+ export { default as Refresh } from './refresh.vue'
+ export { default as RefreshLeft } from './refresh-left.vue'
++export { default as RefreshReplace } from './refresh-right.vue'
+ export { default as RefreshRight } from './refresh-right.vue'
+ export { default as Refrigerator } from './refrigerator.vue'
+ export { default as Remove } from './remove.vue'
+ export { default as RemoveFilled } from './remove-filled.vue'
++export { default as Replace } from './refresh-right.vue'
+ export { default as Right } from './right.vue'
+ export { default as SaveAll } from './save-all.vue'
+ export { default as ScaleToOriginal } from './scale-to-original.vue'
+ export { default as School } from './school.vue'
+ export { default as Scissor } from './scissor.vue'
+ export { default as Search } from './search.vue'
++export { default as SearchFilter } from './filter.vue'
+ export { default as Select } from './select.vue'
+ export { default as Sell } from './sell.vue'
+ export { default as SemiSelect } from './semi-select.vue'

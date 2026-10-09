@@ -1,0 +1,12 @@
+{
+  "sourceSha": "ec2a5ee8b555556ff74c5b1b38371db032a8e798",
+  "freshMain": "8db0ac8f49749e3e5f28be5051bb3d3ed71ada71",
+  "command": [
+    "git",
+    "merge-tree",
+    "--write-tree",
+    "8db0ac8f49749e3e5f28be5051bb3d3ed71ada71",
+    "ec2a5ee8b555556ff74c5b1b38371db032a8e798"
+  ],
+  "exitCode": 0
+}

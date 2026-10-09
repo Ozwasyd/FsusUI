@@ -1,0 +1,51 @@
+{
+  "runId": 37958456189,
+  "actualCheckout": "de0b90b49697a40741220e5e8cce23f7dc460195",
+  "conformance": {
+    "jobId": 113915103242,
+    "availableOfficialLogs": true,
+    "rawReports": [
+      ".tmp/playwright-conformance/reports/web-interaction-conformance/chromium/report.json",
+      ".tmp/playwright-conformance/reports/web-interaction-conformance/firefox/report.json",
+      ".tmp/playwright-conformance/reports/web-interaction-conformance/webkit/report.json"
+    ],
+    "neededFields": [
+      "errors[]",
+      "stats",
+      "suites[].specs[] title/file/line/column",
+      "tests[].results[].errors",
+      "attachments"
+    ],
+    "impactReceipt": ".tmp/playwright-impact/receipt.json",
+    "artifactNameFromOfficialLog": "playwright-conformance-evidence-pr",
+    "artifactIdFromOfficialLog": 11630721282,
+    "underlyingCause": "unresolved without raw collection/test report; no missing identity fallback exception claimed as observed CI exception",
+    "oldRunnerStderr": "not saved by original runner; raw stderr input is unavailable in its current artifact lifecycle"
+  },
+  "layout": {
+    "jobId": 113915103029,
+    "availableOfficialLogs": true,
+    "actualArgvServerPort": [
+      "--server-port",
+      "4181"
+    ],
+    "actualCounts": {
+      "passed": 35,
+      "failed": 1,
+      "skipped": 0
+    },
+    "requiredReport": ".tmp/playwright-layout/reports/geometry-smoke/chromium/report.json",
+    "neededFields": [
+      "failed suites[].specs[] title/file/line/column",
+      "tests[].results[].errors[].message/stack/location",
+      "attachments"
+    ],
+    "artifactNameFromOfficialLog": "playwright-layout-evidence-pr",
+    "artifactIdFromOfficialLog": 11631211100,
+    "failedAssertionName": "UNAVAILABLE in captured official stdout",
+    "precedingManifestDigestLines": "not identified as failing assertion; no causal inference",
+    "prior82eeeResult": "Root reported 36/36; no exact prior report independently retrieved"
+  },
+  "accessBoundary": "No artifact calls/downloads, alternative denied route, browser install, CI dispatch or content writes were attempted",
+  "baseCI": "No claim of failure on exact base; skipped or differently routed jobs are not equivalent evidence"
+}

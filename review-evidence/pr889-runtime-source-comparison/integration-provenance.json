@@ -1,0 +1,26 @@
+{
+  "sourceSha": "ec2a5ee8b555556ff74c5b1b38371db032a8e798",
+  "treeHeadParent": "6b5bb2fcaf7d1eef066b5d8e3e867504d2e00b8f",
+  "canonicalSourceCommits": [
+    "80f6e96b8d5419942583711fb417492b1f0abb67",
+    "6583b7a59a0a871e13b97594a583ca58ca63027e",
+    "b7f143099ab8bbb6be69f49f6dbfd6c97831d902"
+  ],
+  "localCommitChain": [
+    "ec2a5ee8b555556ff74c5b1b38371db032a8e798",
+    "ec7d93fea364a1b8c82014a3250f55a7ef5658c4",
+    "ca797ee71b8033253d53efca2ebdc0c89a70555b"
+  ],
+  "onlyFourOwnedPaths": [
+    "scripts/conformance-playwright-owner-run.mjs",
+    "scripts/conformance-playwright-runner.mjs",
+    "scripts/markdown-playwright-runner.mjs",
+    "tests/conformance-playwright-identity.test.mjs"
+  ],
+  "status": "clean",
+  "sourceBlobsEqualPublishedA6": true,
+  "noNewBehaviorChanges": true,
+  "allRequiredBrowserCellsPreserved": true,
+  "runtimeAndMetadataOrIconsFilesNotConsumed": true,
+  "browserResults": "UNRUN on integration SHA; old a6/3b receipts preserved original identity"
+}
