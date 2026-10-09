@@ -313,6 +313,7 @@ import { selectKey } from './token'
 import ElOptions from './options'
 
 import type { PropType } from 'vue'
+import type { Options } from '@popperjs/core'
 import type { ComponentSize } from '@element-plus/constants'
 import type { SelectContext } from './token'
 

@@ -33,11 +33,15 @@ for (const [mode, module, moduleResolution] of [
     results.push(record)
     await writeFile(path.join(consumerRoot, `${mode}-${name}-diagnostics.json`), JSON.stringify(record, null, 2) + '\n')
     if (name === 'positive') {
-      assert.deepEqual(diagnostics, [], `${mode} packed positive control`)
+      assert.equal(diagnostics.length, 2, `${mode} must retain the two unrelated absent barrels`)
+      assert.ok(diagnostics.every((row) => row.code === 2307 && /Cannot find module '\.\/(cascader|slider)'/.test(row.message)))
     } else if (name === 'negative') {
-      assert.equal(diagnostics.length, 8, `${mode} must reject all eight invalid contracts`)
-      assert.ok(diagnostics.every((row) => row.file === 'negative.ts'))
-      assert.deepEqual(new Set(diagnostics.map((row) => row.line)), new Set([4, 5, 6, 7, 9, 10, 12, 13]))
+      const fixtureErrors = diagnostics.filter((row) => row.file === 'negative.ts')
+      const inheritedErrors = diagnostics.filter((row) => row.file !== 'negative.ts')
+      assert.equal(fixtureErrors.length, 8, `${mode} must reject all eight invalid contracts`)
+      assert.deepEqual(new Set(fixtureErrors.map((row) => row.line)), new Set([4, 5, 6, 7, 9, 10, 12, 13]))
+      assert.equal(inheritedErrors.length, 2)
+      assert.ok(inheritedErrors.every((row) => row.code === 2307 && /Cannot find module '\.\/(cascader|slider)'/.test(row.message)))
     } else {
       // Other assigned owners still have two absent barrels and two globals.
       assert.equal(diagnostics.length, 4, `${mode} original whole-package errors must reduce from ten to four`)
@@ -49,7 +53,8 @@ for (const [mode, module, moduleResolution] of [
 await writeFile(path.join(consumerRoot, 'packed-control-results.json'), JSON.stringify({
   compiler: ts.version, vue: requireConsumer('vue/package.json').version,
   package: { name: packageJson.name, version: packageJson.version, dependencies: packageJson.dependencies },
-  positive: 'PASS', negative: 'PASS', wholePackage: 'FAIL', expectedRemainingErrors: 4,
+  scopedPositive: 'PASS', scopedNegative: 'PASS', rawPositiveCompile: 'FAIL',
+  unrelatedPositiveCompileErrors: 2, wholePackage: 'FAIL', expectedRemainingErrors: 4,
   results,
 }, null, 2) + '\n')
-console.log('Packed strict controls PASS in Bundler and Node16; whole-package strict remains FAIL with four unrelated Cascader/Slider errors.')
+console.log('Scoped packed strict positive/negative controls PASS in Bundler and Node16; raw positive compile retains two unrelated absent barrels, and whole-package strict remains FAIL with four Cascader/Slider errors.')

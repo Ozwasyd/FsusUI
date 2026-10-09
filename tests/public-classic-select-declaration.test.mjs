@@ -93,10 +93,19 @@ test('canonical producer emits Select and its downstream contracts with exact in
   const originalUseSelect = path.join(root, selectDir, 'src/useSelect.original.ts')
   capturedProject.createSourceFile(originalUseSelect, original(`${selectDir}/src/useSelect.ts`))
   const originalSelect = path.join(root, selectDir, 'src/select.original.ts')
-  capturedProject.createSourceFile(originalSelect,
+  const originalSelectFile = capturedProject.createSourceFile(originalSelect,
     parse(original(`${selectDir}/src/select.vue`)).descriptor.script.content
       .replace("from './useSelect'", "from './useSelect.original'"),
   )
+  const unboundOptions = originalSelectFile.getDescendantsOfKind(ts.SyntaxKind.Identifier)
+    .filter((node) => node.getText() === 'Options')
+  assert.equal(unboundOptions.length, 2)
+  assert.ok(unboundOptions.every((node) => !node.getSymbol()), 'Original SFC has an unbound existing Popper Options annotation.')
+  // The original SFC never emitted a usable declaration for this free name.
+  // Bind its unchanged Partial<Options> annotation to the existing Popper owner
+  // before comparing the complete inferred SFC contract. Original useSelect
+  // parameters, return fields and ref types are compared without normalization.
+  originalSelectFile.insertText(0, "import type { Options } from '@popperjs/core'\n")
   capturedProject.createSourceFile(path.join(root, selectDir, 'index.original.ts'),
     original(`${selectDir}/index.ts`).replace("from './src/select.vue'", "from './src/select.original'"),
   )
@@ -119,6 +128,9 @@ test('canonical producer emits Select and its downstream contracts with exact in
   assert.ok(negativeDiagnostics.some((row) => row.code === 2344), 'The same checker must reject an altered ref return contract.')
   await writeFile(path.join(evidenceDir, 'inferred-contract-results.json'), JSON.stringify({
     originalSha, compiler: ts.version, positive: 'PASS', negative: 'PASS',
+    originalUseSelectComparedUnmodified: true,
+    originalSfcOptionsBinding: 'UNBOUND',
+    sfcComparisonNormalization: 'Bind only the original Partial<Options> free name to @popperjs/core Options; runtime, prop annotation and assertions unchanged.',
     negativeCodes: negativeDiagnostics.map((row) => row.code),
     checked: ['parameters', 'return keys and fields', 'ref getter/setter', 'props', 'emits', 'slots', 'instance', 'default/named exports', 'installer extras'],
   }, null, 2) + '\n')
