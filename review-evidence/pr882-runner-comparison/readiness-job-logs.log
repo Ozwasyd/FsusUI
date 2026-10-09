@@ -1,0 +1,374 @@
+﻿2026-10-09T08:08:30.1672304Z Current runner version: '2.337.0'
+2026-10-09T08:08:30.1690882Z ##[group]Runner Image Provisioner
+2026-10-09T08:08:30.1691558Z Hosted Compute Agent
+2026-10-09T08:08:30.1691954Z Version: 20261002.596
+2026-10-09T08:08:30.1692423Z Commit: c3d12f3313a95f25162a1503be624f3b0617f8c0
+2026-10-09T08:08:30.1692940Z Build Date: 2026-10-02T22:28:27Z
+2026-10-09T08:08:30.1693657Z Worker ID: {3eedfdb6-f637-4b8b-a8b3-dd6907f7979c}
+2026-10-09T08:08:30.1694168Z Region: centralus
+2026-10-09T08:08:30.1694542Z Cloud: Azure
+2026-10-09T08:08:30.1694890Z ##[endgroup]
+2026-10-09T08:08:30.1696057Z ##[group]Operating System
+2026-10-09T08:08:30.1696473Z Ubuntu
+2026-10-09T08:08:30.1696901Z 24.04.5
+2026-10-09T08:08:30.1697245Z LTS
+2026-10-09T08:08:30.1697577Z ##[endgroup]
+2026-10-09T08:08:30.1697991Z ##[group]Runner Image
+2026-10-09T08:08:30.1698398Z Image: ubuntu-24.04
+2026-10-09T08:08:30.1698784Z Version: 20261004.327.1
+2026-10-09T08:08:30.1699704Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20261004.327/images/ubuntu/Ubuntu2404-Readme.md
+2026-10-09T08:08:30.1700911Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20261004.327
+2026-10-09T08:08:30.1701566Z ##[endgroup]
+2026-10-09T08:08:30.1702394Z ##[group]GITHUB_TOKEN Permissions
+2026-10-09T08:08:30.1704422Z Contents: read
+2026-10-09T08:08:30.1704839Z Metadata: read
+2026-10-09T08:08:30.1705321Z Packages: read
+2026-10-09T08:08:30.1705678Z ##[endgroup]
+2026-10-09T08:08:30.1707191Z Secret source: Actions
+2026-10-09T08:08:30.1707790Z Cache mode: write
+2026-10-09T08:08:30.1708469Z Prepare workflow directory
+2026-10-09T08:08:30.2345951Z Prepare all required actions
+2026-10-09T08:08:30.2382761Z Getting action download info
+2026-10-09T08:08:30.4811071Z Download action repository 'actions/checkout@v4' (SHA:11d5960a326750d5838078e36cf38b85af677262)
+2026-10-09T08:08:30.8932512Z Download action repository 'pnpm/action-setup@v4' (SHA:b906affcce14559ad1aafd4ab0e942779e9f58b1)
+2026-10-09T08:08:31.7891629Z Download action repository 'actions/setup-node@v4' (SHA:49933ea5288caeca8642d1e84afbd3f7d6820020)
+2026-10-09T08:08:31.9412438Z Download action repository 'actions/download-artifact@v4' (SHA:d3f86a106a0bac45b974a628896c90dbdf5c8093)
+2026-10-09T08:08:32.4021212Z Download action repository 'actions/upload-artifact@v4' (SHA:ea165f8d65b6e75b540449e92b4886f43607fa02)
+2026-10-09T08:08:32.6323808Z Uses: Ozwasyd/FsusUI/.github/workflows/_quality-playwright.yml@refs/pull/882/merge (ba90d4df9b0b76e3c8cf7b4a57ceab08ded13990)
+2026-10-09T08:08:32.6328094Z ##[group] Inputs
+2026-10-09T08:08:32.6328748Z   group: pr
+2026-10-09T08:08:32.6329314Z ##[endgroup]
+2026-10-09T08:08:32.6330119Z Complete job name: premerge-playwright / playwright-pr-readiness
+2026-10-09T08:08:32.6984870Z ##[group]Run actions/checkout@v4
+2026-10-09T08:08:32.6985822Z with:
+2026-10-09T08:08:32.6986462Z   repository: Ozwasyd/FsusUI
+2026-10-09T08:08:32.6992618Z   token: ***
+2026-10-09T08:08:32.6993231Z   ssh-strict: true
+2026-10-09T08:08:32.6994055Z   ssh-user: git
+2026-10-09T08:08:32.6994714Z   persist-credentials: true
+2026-10-09T08:08:32.6995466Z   clean: true
+2026-10-09T08:08:32.6996129Z   sparse-checkout-cone-mode: true
+2026-10-09T08:08:32.6996870Z   fetch-depth: 1
+2026-10-09T08:08:32.6997524Z   fetch-tags: false
+2026-10-09T08:08:32.6998162Z   show-progress: true
+2026-10-09T08:08:32.6998851Z   lfs: false
+2026-10-09T08:08:32.6999461Z   submodules: false
+2026-10-09T08:08:32.7000107Z   set-safe-directory: true
+2026-10-09T08:08:32.7000849Z   allow-unsafe-pr-checkout: false
+2026-10-09T08:08:32.7001738Z ##[endgroup]
+2026-10-09T08:08:32.7806989Z Syncing repository: Ozwasyd/FsusUI
+2026-10-09T08:08:32.7809966Z ##[group]Getting Git version info
+2026-10-09T08:08:32.7811343Z Working directory is '/home/runner/work/FsusUI/FsusUI'
+2026-10-09T08:08:32.7813309Z [command]/usr/bin/git version
+2026-10-09T08:08:32.7832135Z git version 2.55.0
+2026-10-09T08:08:32.7855502Z ##[endgroup]
+2026-10-09T08:08:32.7864939Z Temporarily overriding HOME='/home/runner/work/_temp/4cfa13ab-e610-42ae-a1b6-7e499be016fc' before making global git config changes
+2026-10-09T08:08:32.7868888Z Adding repository directory to the temporary git global config as a safe directory
+2026-10-09T08:08:32.7870920Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/FsusUI/FsusUI
+2026-10-09T08:08:32.7907421Z Deleting the contents of '/home/runner/work/FsusUI/FsusUI'
+2026-10-09T08:08:32.7911509Z ##[group]Initializing the repository
+2026-10-09T08:08:32.7915006Z [command]/usr/bin/git init /home/runner/work/FsusUI/FsusUI
+2026-10-09T08:08:32.8017915Z hint: Using 'master' as the name for the initial branch. This default branch name
+2026-10-09T08:08:32.8020643Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+2026-10-09T08:08:32.8022296Z hint: to use in all of your new repositories, which will suppress this warning,
+2026-10-09T08:08:32.8023632Z hint: call:
+2026-10-09T08:08:32.8024569Z hint:
+2026-10-09T08:08:32.8025343Z hint: 	git config --global init.defaultBranch <name>
+2026-10-09T08:08:32.8026318Z hint:
+2026-10-09T08:08:32.8027152Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+2026-10-09T08:08:32.8028470Z hint: 'development'. The just-created branch can be renamed via this command:
+2026-10-09T08:08:32.8029513Z hint:
+2026-10-09T08:08:32.8030159Z hint: 	git branch -m <name>
+2026-10-09T08:08:32.8030930Z hint:
+2026-10-09T08:08:32.8031904Z hint: Disable this message with "git config set advice.defaultBranchName false"
+2026-10-09T08:08:32.8033218Z Initialized empty Git repository in /home/runner/work/FsusUI/FsusUI/.git/
+2026-10-09T08:08:32.8035796Z [command]/usr/bin/git remote add origin https://github.com/Ozwasyd/FsusUI
+2026-10-09T08:08:32.8073280Z ##[endgroup]
+2026-10-09T08:08:32.8074919Z ##[group]Disabling automatic garbage collection
+2026-10-09T08:08:32.8076879Z [command]/usr/bin/git config --local gc.auto 0
+2026-10-09T08:08:32.8139140Z ##[endgroup]
+2026-10-09T08:08:32.8140768Z ##[group]Setting up auth
+2026-10-09T08:08:32.8142774Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-10-09T08:08:32.8173611Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-10-09T08:08:32.8456273Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-10-09T08:08:32.8479612Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-10-09T08:08:32.8619732Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-10-09T08:08:32.8642524Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-10-09T08:08:32.8787427Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2026-10-09T08:08:32.8818198Z ##[endgroup]
+2026-10-09T08:08:32.8819373Z ##[group]Fetching the repository
+2026-10-09T08:08:32.8825998Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +ba90d4df9b0b76e3c8cf7b4a57ceab08ded13990:refs/remotes/pull/882/merge
+2026-10-09T08:08:34.5047893Z From https://github.com/Ozwasyd/FsusUI
+2026-10-09T08:08:34.5048964Z  * [new ref]         ba90d4df9b0b76e3c8cf7b4a57ceab08ded13990 -> pull/882/merge
+2026-10-09T08:08:34.5051737Z ##[endgroup]
+2026-10-09T08:08:34.5052507Z ##[group]Determining the checkout info
+2026-10-09T08:08:34.5053763Z ##[endgroup]
+2026-10-09T08:08:34.5070374Z [command]/usr/bin/git sparse-checkout disable
+2026-10-09T08:08:34.5126555Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+2026-10-09T08:08:34.5152826Z ##[group]Checking out the ref
+2026-10-09T08:08:34.5156091Z [command]/usr/bin/git checkout --progress --force refs/remotes/pull/882/merge
+2026-10-09T08:08:34.7918374Z Note: switching to 'refs/remotes/pull/882/merge'.
+2026-10-09T08:08:34.7919424Z 
+2026-10-09T08:08:34.7919795Z You are in 'detached HEAD' state. You can look around, make experimental
+2026-10-09T08:08:34.7920493Z changes and commit them, and you can discard any commits you make in this
+2026-10-09T08:08:34.7921183Z state without impacting any branches by switching back to a branch.
+2026-10-09T08:08:34.7921585Z 
+2026-10-09T08:08:34.7921853Z If you want to create a new branch to retain commits you create, you may
+2026-10-09T08:08:34.7922399Z do so (now or later) by using -c with the switch command. Example:
+2026-10-09T08:08:34.7922805Z 
+2026-10-09T08:08:34.7922964Z   git switch -c <new-branch-name>
+2026-10-09T08:08:34.7923233Z 
+2026-10-09T08:08:34.7923683Z Or undo this operation with:
+2026-10-09T08:08:34.7923912Z 
+2026-10-09T08:08:34.7924136Z   git switch -
+2026-10-09T08:08:34.7924395Z 
+2026-10-09T08:08:34.7924731Z Turn off this advice by setting config variable advice.detachedHead to false
+2026-10-09T08:08:34.7925134Z 
+2026-10-09T08:08:34.7925542Z HEAD is now at ba90d4d Merge 07386a74f507d9a6e28559e2f9bea90bab81a00d into 8db0ac8f49749e3e5f28be5051bb3d3ed71ada71
+2026-10-09T08:08:34.7928177Z ##[endgroup]
+2026-10-09T08:08:34.7973041Z [command]/usr/bin/git log -1 --format=%H
+2026-10-09T08:08:34.7994542Z ba90d4df9b0b76e3c8cf7b4a57ceab08ded13990
+2026-10-09T08:08:34.8204504Z ##[group]Run pnpm/action-setup@v4
+2026-10-09T08:08:34.8204850Z with:
+2026-10-09T08:08:34.8205131Z   version: 10.33.0
+2026-10-09T08:08:34.8205385Z   dest: ~/setup-pnpm
+2026-10-09T08:08:34.8205695Z   run_install: null
+2026-10-09T08:08:34.8205936Z   cache: false
+2026-10-09T08:08:34.8206202Z   cache_dependency_path: pnpm-lock.yaml
+2026-10-09T08:08:34.8206541Z   package_json_file: package.json
+2026-10-09T08:08:34.8206805Z   standalone: false
+2026-10-09T08:08:34.8207068Z ##[endgroup]
+2026-10-09T08:08:34.9349716Z ##[group]Running self-installer...
+2026-10-09T08:08:35.2506063Z (node:2120) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+2026-10-09T08:08:35.2507171Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-10-09T08:08:35.5049537Z Progress: resolved 1, reused 0, downloaded 0, added 0
+2026-10-09T08:08:35.8197662Z 
+2026-10-09T08:08:35.8198034Z dependencies:
+2026-10-09T08:08:35.8198444Z + pnpm 10.33.0
+2026-10-09T08:08:35.8198625Z 
+2026-10-09T08:08:35.8295079Z Packages: +1
+2026-10-09T08:08:35.8324451Z +
+2026-10-09T08:08:35.8690148Z Progress: resolved 1, reused 0, downloaded 1, added 1, done
+2026-10-09T08:08:35.9180976Z Done in 830ms
+2026-10-09T08:08:35.9284143Z ##[endgroup]
+2026-10-09T08:08:35.9284568Z Installation Completed!
+2026-10-09T08:08:35.9429496Z ##[group]Run actions/setup-node@v4
+2026-10-09T08:08:35.9429772Z with:
+2026-10-09T08:08:35.9430001Z   node-version: 22
+2026-10-09T08:08:35.9430207Z   cache: pnpm
+2026-10-09T08:08:35.9430414Z   cache-dependency-path: pnpm-lock.yaml
+2026-10-09T08:08:35.9430704Z   always-auth: false
+2026-10-09T08:08:35.9430953Z   check-latest: false
+2026-10-09T08:08:35.9433134Z   token: ***
+2026-10-09T08:08:35.9433367Z env:
+2026-10-09T08:08:35.9433865Z   PNPM_HOME: /home/runner/setup-pnpm/node_modules/.bin
+2026-10-09T08:08:35.9434171Z ##[endgroup]
+2026-10-09T08:08:36.0521159Z Found in cache @ /opt/hostedtoolcache/node/22.23.3/x64
+2026-10-09T08:08:36.0525273Z (node:2133) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-10-09T08:08:36.0525935Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-10-09T08:08:36.0527643Z ##[group]Environment details
+2026-10-09T08:08:36.3889404Z node: v22.23.3
+2026-10-09T08:08:36.3889964Z npm: 10.9.9
+2026-10-09T08:08:36.3890504Z yarn: 1.22.22
+2026-10-09T08:08:36.3891819Z ##[endgroup]
+2026-10-09T08:08:36.3909066Z [command]/home/runner/setup-pnpm/node_modules/.bin/pnpm store path --silent
+2026-10-09T08:08:36.6753873Z /home/runner/setup-pnpm/node_modules/.bin/store/v10
+2026-10-09T08:08:36.8500645Z Cache hit for: node-cache-Linux-x64-pnpm-6488f186c6e4d670f8d817ffdc3198dfda2e2a93c1c69fad45acdcee91a9fe09
+2026-10-09T08:08:36.8574642Z (node:2133) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+2026-10-09T08:08:38.0084594Z Received 134217728 of 222137478 (60.4%), 124.6 MBs/sec
+2026-10-09T08:08:38.5387842Z Received 222137478 of 222137478 (100.0%), 136.0 MBs/sec
+2026-10-09T08:08:38.5388909Z Cache Size: ~212 MB (222137478 B)
+2026-10-09T08:08:38.5501756Z [command]/usr/bin/tar -xf /home/runner/work/_temp/6d6fc1b7-3700-4061-b36b-49d657b6a621/cache.tzst -P -C /home/runner/work/FsusUI/FsusUI --use-compress-program unzstd
+2026-10-09T08:08:40.0625115Z Cache restored successfully
+2026-10-09T08:08:40.0704680Z Cache restored from key: node-cache-Linux-x64-pnpm-6488f186c6e4d670f8d817ffdc3198dfda2e2a93c1c69fad45acdcee91a9fe09
+2026-10-09T08:08:40.1194415Z ##[group]Run pnpm install --frozen-lockfile
+2026-10-09T08:08:40.1194829Z [36;1mpnpm install --frozen-lockfile[0m
+2026-10-09T08:08:40.1610598Z shell: /usr/bin/bash -e {0}
+2026-10-09T08:08:40.1610995Z env:
+2026-10-09T08:08:40.1611270Z   PNPM_HOME: /home/runner/setup-pnpm/node_modules/.bin
+2026-10-09T08:08:40.1611613Z ##[endgroup]
+2026-10-09T08:08:40.3829976Z Scope: all 20 workspace projects
+2026-10-09T08:08:40.4504739Z Lockfile is up to date, resolution step is skipped
+2026-10-09T08:08:40.6604993Z Packages: +1697
+2026-10-09T08:08:40.6605666Z ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+2026-10-09T08:08:40.6643125Z Progress: resolved 0, reused 1, downloaded 0, added 0
+2026-10-09T08:08:41.6640384Z Progress: resolved 0, reused 1547, downloaded 0, added 1382
+2026-10-09T08:08:42.1999669Z Progress: resolved 0, reused 1547, downloaded 0, added 1697, done
+2026-10-09T08:08:42.5085238Z 
+2026-10-09T08:08:42.5086154Z dependencies:
+2026-10-09T08:08:42.5087134Z + @element-plus/components 0.0.5 <- vue/packages/components
+2026-10-09T08:08:42.5087605Z + @element-plus/constants <- vue/packages/constants
+2026-10-09T08:08:42.5088090Z + @element-plus/directives 0.0.5 <- vue/packages/directives
+2026-10-09T08:08:42.5088540Z + @element-plus/hooks 0.0.5 <- vue/packages/hooks
+2026-10-09T08:08:42.5089014Z + @element-plus/icons-vue 2.3.2 <- vue/packages/icons-vue
+2026-10-09T08:08:42.5089445Z + @element-plus/locale 0.0.5 <- vue/packages/locale
+2026-10-09T08:08:42.5089874Z + @element-plus/test-utils 0.0.5 <- vue/packages/test-utils
+2026-10-09T08:08:42.5090336Z + @element-plus/theme-chalk 0.1.0 <- vue/packages/theme-chalk
+2026-10-09T08:08:42.5090763Z + @element-plus/utils <- vue/packages/utils
+2026-10-09T08:08:42.5091165Z + @element-plus/wasm 1.0.0 <- vue/packages/wasm
+2026-10-09T08:08:42.5091439Z 
+2026-10-09T08:08:42.5091580Z devDependencies:
+2026-10-09T08:08:42.5091914Z + @element-plus/build 0.0.1 <- vue/internal/build
+2026-10-09T08:08:42.5092428Z + @element-plus/build-utils 0.0.1 <- vue/internal/build-utils
+2026-10-09T08:08:42.5093010Z + @element-plus/eslint-config 0.0.1 <- vue/internal/eslint-config
+2026-10-09T08:08:42.5093856Z + @element-plus/icons-svg 2.3.2 <- vue/packages/icons-svg
+2026-10-09T08:08:42.5094119Z 
+2026-10-09T08:08:42.6680808Z . postinstall$ pnpm stub
+2026-10-09T08:08:42.8541649Z . postinstall: > @ stub /home/runner/work/FsusUI/FsusUI
+2026-10-09T08:08:42.8544274Z . postinstall: > node ./scripts/with-node-heap.mjs pnpm run -r --parallel stub
+2026-10-09T08:08:43.2095496Z . postinstall: Scope: 19 of 20 workspace projects
+2026-10-09T08:08:43.2150117Z . postinstall: vue/internal/build stub$ unbuild --stub
+2026-10-09T08:08:43.2158522Z . postinstall: vue/internal/build-constants stub$ node ../../../scripts/with-node-heap.mjs unbuild --stub
+2026-10-09T08:08:43.2165168Z . postinstall: vue/internal/build-utils stub$ node ../../../scripts/with-node-heap.mjs unbuild --stub
+2026-10-09T08:08:43.2168391Z . postinstall: vue/packages/wasm stub$ node ../../../scripts/with-node-heap.mjs unbuild --stub
+2026-10-09T08:08:44.0618335Z . postinstall: vue/internal/build stub: Browserslist: browsers data (caniuse-lite) is 7 months old. Please run:
+2026-10-09T08:08:44.0619455Z . postinstall: vue/internal/build stub:   npx update-browserslist-db@latest
+2026-10-09T08:08:44.0645101Z . postinstall: vue/internal/build stub:   Why you should do it regularly: https://github.com/browserslist/update-db#readme
+2026-10-09T08:08:44.1805296Z . postinstall: vue/internal/build-utils stub: Browserslist: browsers data (caniuse-lite) is 7 months old. Please run:
+2026-10-09T08:08:44.1824609Z . postinstall: vue/internal/build-utils stub:   npx update-browserslist-db@latest
+2026-10-09T08:08:44.1854859Z . postinstall: vue/internal/build-utils stub:   Why you should do it regularly: https://github.com/browserslist/update-db#readme
+2026-10-09T08:08:44.2179230Z . postinstall: vue/internal/build-constants stub: Browserslist: browsers data (caniuse-lite) is 7 months old. Please run:
+2026-10-09T08:08:44.2205043Z . postinstall: vue/internal/build-constants stub:   npx update-browserslist-db@latest
+2026-10-09T08:08:44.2234654Z . postinstall: vue/internal/build-constants stub:   Why you should do it regularly: https://github.com/browserslist/update-db#readme
+2026-10-09T08:08:44.2684636Z . postinstall: vue/packages/wasm stub: Browserslist: browsers data (caniuse-lite) is 7 months old. Please run:
+2026-10-09T08:08:44.2702370Z . postinstall: vue/packages/wasm stub:   npx update-browserslist-db@latest
+2026-10-09T08:08:44.2714467Z . postinstall: vue/packages/wasm stub:   Why you should do it regularly: https://github.com/browserslist/update-db#readme
+2026-10-09T08:08:44.4171408Z . postinstall: vue/internal/build stub: [info] [36mStubbing build[39m
+2026-10-09T08:08:44.4254780Z . postinstall: vue/internal/build stub: [info] Cleaning dist directory: `./dist`
+2026-10-09T08:08:44.5378305Z . postinstall: vue/internal/build stub: Done
+2026-10-09T08:08:44.5472363Z . postinstall: vue/internal/build-utils stub: [info] [36mStubbing build-utils[39m
+2026-10-09T08:08:44.5473685Z . postinstall: vue/internal/build-utils stub: [info] Cleaning dist directory: `./dist`
+2026-10-09T08:08:44.6067377Z . postinstall: vue/internal/build-utils stub: Done
+2026-10-09T08:08:44.6364869Z . postinstall: vue/internal/build-constants stub: [info] [36mStubbing build-constants[39m
+2026-10-09T08:08:44.6366354Z . postinstall: vue/internal/build-constants stub: [info] Cleaning dist directory: `./dist`
+2026-10-09T08:08:44.6561270Z . postinstall: vue/packages/wasm stub: [info] [36mStubbing wasm[39m
+2026-10-09T08:08:44.7041515Z . postinstall: vue/internal/build-constants stub: Done
+2026-10-09T08:08:44.7299472Z . postinstall: vue/packages/wasm stub: Done
+2026-10-09T08:08:44.7446742Z . postinstall: Done
+2026-10-09T08:08:44.7450101Z . prepare$ husky
+2026-10-09T08:08:44.7740042Z . prepare: Done
+2026-10-09T08:08:44.7763805Z ╭ Warning ─────────────────────────────────────────────────────────────────────╮
+2026-10-09T08:08:44.7764647Z │                                                                              │
+2026-10-09T08:08:44.7765287Z │   Ignored build scripts: @parcel/watcher@2.5.6, esbuild@0.18.20,             │
+2026-10-09T08:08:44.7766021Z │   esbuild@0.25.12, esbuild@0.27.7, esbuild@0.28.0.                           │
+2026-10-09T08:08:44.7766733Z │   Run "pnpm approve-builds" to pick which dependencies should be allowed     │
+2026-10-09T08:08:44.7767616Z │   to run scripts.                                                            │
+2026-10-09T08:08:44.7768153Z │                                                                              │
+2026-10-09T08:08:44.7768739Z ╰──────────────────────────────────────────────────────────────────────────────╯
+2026-10-09T08:08:44.7910561Z Done in 4.5s using pnpm v10.33.0
+2026-10-09T08:08:44.8112352Z ##[group]Run actions/download-artifact@v4
+2026-10-09T08:08:44.8112640Z with:
+2026-10-09T08:08:44.8112878Z   name: playwright-pr-impact-plan
+2026-10-09T08:08:44.8113194Z   path: .tmp/playwright-impact
+2026-10-09T08:08:44.8113778Z   merge-multiple: false
+2026-10-09T08:08:44.8114071Z   repository: Ozwasyd/FsusUI
+2026-10-09T08:08:44.8114324Z   run-id: 37899305543
+2026-10-09T08:08:44.8114588Z env:
+2026-10-09T08:08:44.8114843Z   PNPM_HOME: /home/runner/setup-pnpm/node_modules/.bin
+2026-10-09T08:08:44.8115122Z ##[endgroup]
+2026-10-09T08:08:44.9223106Z Downloading single artifact
+2026-10-09T08:08:44.9329315Z (node:2304) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-10-09T08:08:44.9330215Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-10-09T08:08:45.1053268Z Preparing to download the following artifacts:
+2026-10-09T08:08:45.1054452Z - playwright-pr-impact-plan (ID: 11602970728, Size: 1076, Expected Digest: sha256:5474ce495b00eeee52ff11ad3f8bd5e0154a66a9a3c9a33c7a71fa1db6ffb851)
+2026-10-09T08:08:45.3076438Z Redirecting to blob download url: https://productionresultssa11.blob.core.windows.net/actions-results/d026a2ad-cfca-8ce6-904a-b4b18006a410/workflow-job-run-3f0d7d00-250f-5aa8-b131-24bdfc6ad48d/artifacts/b161bee786190710a9616c30d4727b3450e9dec4fd4e02b7d20907e0b7b7afcf.zip
+2026-10-09T08:08:45.3077588Z Starting download of artifact to: /home/runner/work/FsusUI/FsusUI/.tmp/playwright-impact
+2026-10-09T08:08:45.4553613Z (node:2304) [DEP0005] DeprecationWarning: Buffer() is deprecated due to security and usability issues. Please use the Buffer.alloc(), Buffer.allocUnsafe(), or Buffer.from() methods instead.
+2026-10-09T08:08:45.4612832Z SHA256 digest of downloaded artifact is 5474ce495b00eeee52ff11ad3f8bd5e0154a66a9a3c9a33c7a71fa1db6ffb851
+2026-10-09T08:08:45.4613334Z Artifact download completed successfully.
+2026-10-09T08:08:45.4613878Z Total of 1 artifact(s) downloaded
+2026-10-09T08:08:45.4618468Z Download artifact has finished successfully
+2026-10-09T08:08:45.4740468Z ##[group]Run actions/download-artifact@v4
+2026-10-09T08:08:45.4740826Z with:
+2026-10-09T08:08:45.4741079Z   pattern: readiness-manifest-playwright-*
+2026-10-09T08:08:45.4741414Z   path: .readiness
+2026-10-09T08:08:45.4741657Z   merge-multiple: true
+2026-10-09T08:08:45.4741903Z   repository: Ozwasyd/FsusUI
+2026-10-09T08:08:45.4742243Z   run-id: 37899305543
+2026-10-09T08:08:45.4742469Z env:
+2026-10-09T08:08:45.4742759Z   PNPM_HOME: /home/runner/setup-pnpm/node_modules/.bin
+2026-10-09T08:08:45.4743048Z ##[endgroup]
+2026-10-09T08:08:45.5913062Z (node:2316) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-10-09T08:08:45.5913938Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-10-09T08:08:45.7443223Z Found 27 artifact(s)
+2026-10-09T08:08:45.7444313Z Filtering artifacts by pattern 'readiness-manifest-playwright-*'
+2026-10-09T08:08:45.7459921Z Preparing to download the following artifacts:
+2026-10-09T08:08:45.7461187Z - readiness-manifest-playwright-layout-single (ID: 11603125233, Size: 5767283, Expected Digest: sha256:889e451727a838abb647671d24519e2d1847185d8091ec2c5dfe30be1a116871)
+2026-10-09T08:08:45.7462772Z - readiness-manifest-playwright-conformance-single (ID: 11603110267, Size: 26871, Expected Digest: sha256:c148f366f6c95c39c0e259b39ffb149a1908dacedb7a1a5fed7358afb31a2f06)
+2026-10-09T08:08:45.7464299Z - readiness-manifest-playwright-motion-single (ID: 11601863836, Size: 83171, Expected Digest: sha256:a636881f664480a0a4158fa144cdb36ead81f09ae61630ae0e55bd13ea190136)
+2026-10-09T08:08:45.9181509Z Redirecting to blob download url: https://productionresultssa11.blob.core.windows.net/actions-results/d026a2ad-cfca-8ce6-904a-b4b18006a410/workflow-job-run-43e44c2a-46f7-57bd-bfdc-3c622ecd285c/artifacts/df3f821fac921eb7fa7c7db985f8771784078945e1123b7dc7d7c0c8e6a32214.zip
+2026-10-09T08:08:45.9182825Z Starting download of artifact to: /home/runner/work/FsusUI/FsusUI/.readiness
+2026-10-09T08:08:45.9815353Z Redirecting to blob download url: https://productionresultssa11.blob.core.windows.net/actions-results/d026a2ad-cfca-8ce6-904a-b4b18006a410/workflow-job-run-780c860c-9e33-5b92-9757-5430b3d6649a/artifacts/ffb4d24874786e45f1bc99ea0f1e46e32b77add83d1bd32c033fe32b45b1cd2f.zip
+2026-10-09T08:08:45.9874303Z Starting download of artifact to: /home/runner/work/FsusUI/FsusUI/.readiness
+2026-10-09T08:08:45.9886988Z Redirecting to blob download url: https://productionresultssa11.blob.core.windows.net/actions-results/d026a2ad-cfca-8ce6-904a-b4b18006a410/workflow-job-run-28e7552f-48f1-5c85-b9bd-fb18215a64cb/artifacts/2db9480f243deb714bd00b2748a636bbb75c72836d2f828f13146985ba28a7f3.zip
+2026-10-09T08:08:45.9888134Z Starting download of artifact to: /home/runner/work/FsusUI/FsusUI/.readiness
+2026-10-09T08:08:46.0963760Z (node:2316) [DEP0005] DeprecationWarning: Buffer() is deprecated due to security and usability issues. Please use the Buffer.alloc(), Buffer.allocUnsafe(), or Buffer.from() methods instead.
+2026-10-09T08:08:46.1188535Z SHA256 digest of downloaded artifact is c148f366f6c95c39c0e259b39ffb149a1908dacedb7a1a5fed7358afb31a2f06
+2026-10-09T08:08:46.1189092Z Artifact download completed successfully.
+2026-10-09T08:08:46.1771132Z SHA256 digest of downloaded artifact is a636881f664480a0a4158fa144cdb36ead81f09ae61630ae0e55bd13ea190136
+2026-10-09T08:08:46.1771732Z Artifact download completed successfully.
+2026-10-09T08:08:46.5738482Z SHA256 digest of downloaded artifact is 889e451727a838abb647671d24519e2d1847185d8091ec2c5dfe30be1a116871
+2026-10-09T08:08:46.5739454Z Artifact download completed successfully.
+2026-10-09T08:08:46.5740050Z Total of 3 artifact(s) downloaded
+2026-10-09T08:08:46.5744595Z Download artifact has finished successfully
+2026-10-09T08:08:46.5853773Z ##[group]Run actions/download-artifact@v4
+2026-10-09T08:08:46.5854203Z with:
+2026-10-09T08:08:46.5854565Z   pattern: readiness-manifest-visual-runtime-reuse-*
+2026-10-09T08:08:46.5854946Z   path: .readiness
+2026-10-09T08:08:46.5855250Z   merge-multiple: true
+2026-10-09T08:08:46.5855530Z   repository: Ozwasyd/FsusUI
+2026-10-09T08:08:46.5855838Z   run-id: 37899305543
+2026-10-09T08:08:46.5856091Z env:
+2026-10-09T08:08:46.5856395Z   PNPM_HOME: /home/runner/setup-pnpm/node_modules/.bin
+2026-10-09T08:08:46.5856747Z ##[endgroup]
+2026-10-09T08:08:46.7058179Z (node:2328) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-10-09T08:08:46.7059107Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-10-09T08:08:46.8749956Z Found 27 artifact(s)
+2026-10-09T08:08:46.8750858Z Filtering artifacts by pattern 'readiness-manifest-visual-runtime-reuse-*'
+2026-10-09T08:08:46.8765882Z Preparing to download the following artifacts:
+2026-10-09T08:08:46.8766684Z - readiness-manifest-visual-runtime-reuse-single (ID: 11603440803, Size: 3736, Expected Digest: sha256:41e1b357cf4e22c00a72e0413a4f5b21094bd7cd20634a9fe8cc32affdc02928)
+2026-10-09T08:08:47.0422687Z Redirecting to blob download url: https://productionresultssa11.blob.core.windows.net/actions-results/d026a2ad-cfca-8ce6-904a-b4b18006a410/workflow-job-run-4b7c834a-8b80-5144-b157-2c573748749d/artifacts/560e09cbdc94c9f3d532630950f5e8a06e40213222174e74210e2e8f08167f01.zip
+2026-10-09T08:08:47.0424535Z Starting download of artifact to: /home/runner/work/FsusUI/FsusUI/.readiness
+2026-10-09T08:08:47.1621988Z (node:2328) [DEP0005] DeprecationWarning: Buffer() is deprecated due to security and usability issues. Please use the Buffer.alloc(), Buffer.allocUnsafe(), or Buffer.from() methods instead.
+2026-10-09T08:08:47.1662094Z SHA256 digest of downloaded artifact is 41e1b357cf4e22c00a72e0413a4f5b21094bd7cd20634a9fe8cc32affdc02928
+2026-10-09T08:08:47.1662995Z Artifact download completed successfully.
+2026-10-09T08:08:47.1663776Z Total of 1 artifact(s) downloaded
+2026-10-09T08:08:47.1667324Z Download artifact has finished successfully
+2026-10-09T08:08:47.2480460Z ##[group]Run node scripts/ci-readiness.mjs check --profile pr-playwright --workflow-group pr --commit "$GITHUB_SHA" --run-id "$GITHUB_RUN_ID" --run-attempt "$GITHUB_RUN_ATTEMPT" --plan-receipt .tmp/playwright-impact/receipt.json --evidence .readiness/evidence/playwright-pr.json
+2026-10-09T08:08:47.2482015Z [36;1mnode scripts/ci-readiness.mjs check --profile pr-playwright --workflow-group pr --commit "$GITHUB_SHA" --run-id "$GITHUB_RUN_ID" --run-attempt "$GITHUB_RUN_ATTEMPT" --plan-receipt .tmp/playwright-impact/receipt.json --evidence .readiness/evidence/playwright-pr.json[0m
+2026-10-09T08:08:47.2518378Z shell: /usr/bin/bash -e {0}
+2026-10-09T08:08:47.2518787Z env:
+2026-10-09T08:08:47.2519094Z   PNPM_HOME: /home/runner/setup-pnpm/node_modules/.bin
+2026-10-09T08:08:47.2519494Z ##[endgroup]
+2026-10-09T08:08:47.3150797Z file:///home/runner/work/FsusUI/FsusUI/scripts/ci-readiness-contract.mjs:846
+2026-10-09T08:08:47.3151783Z     throw new Error(
+2026-10-09T08:08:47.3152478Z           ^
+2026-10-09T08:08:47.3152901Z 
+2026-10-09T08:08:47.3154914Z Error: PR playwright missing run cell(s): web-interaction-conformance/chromium, web-interaction-conformance/firefox, web-interaction-conformance/webkit, visual-runtime-reuse/desktop-light, visual-runtime-reuse/mobile-light, visual-runtime-reuse/desktop-dark, visual-runtime-reuse/mobile-dark.
+2026-10-09T08:08:47.3156238Z     at validatePlaywrightPrReadiness (file:///home/runner/work/FsusUI/FsusUI/scripts/ci-readiness-contract.mjs:846:11)
+2026-10-09T08:08:47.3156826Z     at file:///home/runner/work/FsusUI/FsusUI/scripts/ci-readiness.mjs:428:16
+2026-10-09T08:08:47.3157321Z     at ModuleJob.run (node:internal/modules/esm/module_job:343:25)
+2026-10-09T08:08:47.3157815Z     at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:681:26)
+2026-10-09T08:08:47.3158358Z     at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5)
+2026-10-09T08:08:47.3158644Z 
+2026-10-09T08:08:47.3158757Z Node.js v22.23.3
+2026-10-09T08:08:47.3184232Z ##[error]Process completed with exit code 1.
+2026-10-09T08:08:47.3374233Z Post job cleanup.
+2026-10-09T08:08:47.4382025Z Pruning is unnecessary.
+2026-10-09T08:08:47.4591843Z Post job cleanup.
+2026-10-09T08:08:47.5261809Z [command]/usr/bin/git version
+2026-10-09T08:08:47.5302348Z git version 2.55.0
+2026-10-09T08:08:47.5335710Z Temporarily overriding HOME='/home/runner/work/_temp/0a990f88-6dfb-42bd-8291-e9bb299f42e5' before making global git config changes
+2026-10-09T08:08:47.5337080Z Adding repository directory to the temporary git global config as a safe directory
+2026-10-09T08:08:47.5339961Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/FsusUI/FsusUI
+2026-10-09T08:08:47.5385329Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-10-09T08:08:47.5420887Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-10-09T08:08:47.5697571Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-10-09T08:08:47.5709067Z http.https://github.com/.extraheader
+2026-10-09T08:08:47.5710800Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+2026-10-09T08:08:47.5784469Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-10-09T08:08:47.5969863Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-10-09T08:08:47.5994629Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-10-09T08:08:47.6267039Z Cleaning up orphan processes
+2026-10-09T08:08:47.6468879Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/download-artifact@v4, actions/setup-node@v4, pnpm/action-setup@v4. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+

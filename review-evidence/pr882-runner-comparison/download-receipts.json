@@ -1,0 +1,26 @@
+[
+  {
+    "artifactId": 11602569153,
+    "status": "failed",
+    "errorType": "HTTPError",
+    "httpCode": 403
+  },
+  {
+    "artifactId": 11603110267,
+    "status": "failed",
+    "errorType": "HTTPError",
+    "httpCode": 403
+  },
+  {
+    "artifactId": 11603440803,
+    "status": "failed",
+    "errorType": "HTTPError",
+    "httpCode": 403
+  },
+  {
+    "artifactId": 11602970728,
+    "status": "failed",
+    "errorType": "HTTPError",
+    "httpCode": 403
+  }
+]

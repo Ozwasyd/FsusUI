@@ -1,0 +1,32 @@
+{
+  "sourceCompared": "07386a74f507d9a6e28559e2f9bea90bab81a00d",
+  "files": {
+    "conformance-playwright-runner.mjs.diff": "bdad9e1159aadd0081703bb8535546c23190d58f5fb26c940ce00442ce15e467",
+    ".github__workflows___quality-playwright.yml.txt": "e642417ef297542b9b5923b3c80a1b0bc9df962f323d2a0f39c3d206a1f0ef0e",
+    "compatibility-check.json": "91c9d7cee26e0857eb34c608b84e29ea90d68f02d443bf47b22ae47d03cb34d4",
+    "scripts__ci-readiness-contract.mjs.txt": "4179c9d8f70d92d7fb109867a71a3369ff89ef1bc7806e29fad3d8071fe6a568",
+    "download-receipts.json": "1037a03a010a387061af432bc8a1339f424cf5e70aea7a4fc8af935f0cfdcbd3",
+    "README.md": "961f44587a7e6730fd211a99b581a7612917282cb1c46aba0a46068da8f4cad4",
+    "root-source-handoff.json": "48ed4271c58b741f8ca90717a6e774b91212726000bf3899e1ddf90b28676f5b",
+    "vue__tests__markdown-editor__markdown-interaction-trace.spec.ts.txt": "84ec1959634de11bc13c0776c64bf5fce76044a5ca4ecc50a7e898d1d930b1bd",
+    "comparison-report.json": "3b14270b4e74c8dc1eb8ee8e6af2f03132b132cd0389fba3829dec2a0e3fe360",
+    "job113723498108.log": "fc2c7d2baf3450e8185b760de833020bc5e1acdbd69973366f2cd8b80fe9efcd",
+    "run.json": "bd5f25aa62e3daef5af8c7d37414725085d9ddaa1caa0c611c2d3550b6ab6b63",
+    "ci-merge-identity.log": "9d987008e873d6b088f3ca5ce2382ae3844ded12ac80a7816774af4ad10f0933",
+    "jobs.json": "cc1c04f0f4018cd97c833ad521bfc12210f307b12bc5acceb8143f3b77a39bd8",
+    "job113723498179.log": "c0c3b46b6f76fa43279a31a12b51d1d22ab5a0e0328e58d310f1542c0466d106",
+    "readiness-job-logs.stderr": "d4261727bbfa2f5caa2859e7ecfb8dbe5231e3c6f188a2264b940d4b4a98ecfa",
+    "pr-head-identity.log": "c6458a6245ca7699d4607a282af451ecab12961a575ac45cce208a197c6606ea",
+    ".github__actions__readiness-manifest__action.yml.txt": "edb46ecb344210dfa96e2795b9b461732aabf3b0f46aca4137d091e022db683e",
+    "pr882.json": "dd514659630bfbadfedae0703b2b51d28385fd56a1e595420175070bffbc6d66",
+    "artifacts.json": "83273827b18ee586b947023c654c83835c1912a6fb6f51d5f80ed43aefe4de3b",
+    "existing-minimal-source.patch": "edd7107cdec34dac86667a8b49ca3a5c35e8d0ad65eb40f4d4570746d1b15ce9",
+    "scripts__ci-readiness.mjs.txt": "59f5bae45098ba68708d639ac297cc8a69851568a623a924b450d84662a9c596",
+    "markdown-playwright-runner.mjs.diff": "f4943820cded2069f5e3ab3d62d9f64b2a68eec8cf252fb438c1a5351e6a37d4",
+    "ci-base-identity.log": "63da0b1bbc5a64c95de2b0775bfc7dc199d96f169477d16a2e1fdf1b2d374513",
+    "conformance-playwright-owner-run.mjs.diff": "a84c6fe73bf95430d2952be6c2c86ed992f1f2b4239f60be6a9b32e7973a6990",
+    "readiness-job.json": "9d36fd89f1f14929c5ad8cd0bce90d558050aed3d97802df01cc8c50dc1d81e8",
+    "exact-blobs.json": "7a70481bee2e3338237dea1b6629f0ec11b8418f6ceabe0082118e295993b174",
+    "readiness-job-logs.log": "0b48058b6a6c658476d77f0ac5f4b91ab22f5eab570c68a82ca7d8bfca169433"
+  }
+}

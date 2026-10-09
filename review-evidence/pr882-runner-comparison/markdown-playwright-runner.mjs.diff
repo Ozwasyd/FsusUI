@@ -1,0 +1,105 @@
+diff --git a/scripts/markdown-playwright-runner.mjs b/scripts/markdown-playwright-runner.mjs
+index 3d775c0d..1a65c11a 100644
+--- a/scripts/markdown-playwright-runner.mjs
++++ b/scripts/markdown-playwright-runner.mjs
+@@ -118,6 +118,47 @@ const testsFromStats = (stats) => {
+   }
+ }
+ 
++export function createMarkdownPlaywrightEnvironment(
++  identity,
++  env = process.env,
++) {
++  if (!identity) return { ...env, CI: 'true' }
++  for (const key of ['baseline', 'candidate']) {
++    if (!/^[a-f0-9]{40}$/u.test(identity[key] ?? '')) {
++      fail(`interaction ${key} must be an exact commit SHA`)
++    }
++  }
++  for (const [key, expected] of [
++    ['GITHUB_SHA', identity.candidate],
++    ['FSUS_INTERACTION_CANDIDATE', identity.candidate],
++    ['FSUS_INTERACTION_BASELINE', identity.baseline],
++  ]) {
++    if (env[key] !== undefined && env[key] !== expected) {
++      fail(`interaction ${key} does not match verified identity`)
++    }
++  }
++  return {
++    ...env,
++    CI: 'true',
++    FSUS_INTERACTION_BASELINE: identity.baseline,
++    FSUS_INTERACTION_CANDIDATE: identity.candidate,
++  }
++}
++
++export function assertMarkdownPlaywrightCollection(parsed, result) {
++  if (result.error) fail(`Playwright process failed: ${result.error.message}`)
++  if (!parsed) {
++    fail(
++      `Playwright JSON report unavailable: ${result.stderr?.trim() || `exit ${result.status}`}`,
++    )
++  }
++  if (parsed.errors?.length) {
++    fail(
++      `Playwright collection failed: ${parsed.errors.map((error) => error.message ?? error.stack).join('\n')}`,
++    )
++  }
++}
++
+ const MARKDOWN_FINGERPRINT_INPUTS = Object.freeze({
+   'markdown-editor-interaction': [
+     'vue/playwright.markdown-editor.config.ts',
+@@ -209,6 +250,8 @@ export async function runMarkdownCell(ownerId, cellId, group, options = {}) {
+   const startedAt = new Date().toISOString()
+   let failureReason = null
+   let runtime = null
++  let report = null
++  let tests = testsFromStats(null)
+ 
+   const reportRelative = `${evidenceDir}/reports/${cell.suiteId}/${cell.project}/report.json`
+   const reportPath = resolve(root, reportRelative)
+@@ -246,15 +289,21 @@ export async function runMarkdownCell(ownerId, cellId, group, options = {}) {
+       ],
+       {
+         cwd: root,
+-        env: { ...process.env, CI: 'true' },
++        env: createMarkdownPlaywrightEnvironment(options.interactionIdentity),
+         encoding: 'utf8',
+         maxBuffer: 256 * 1024 * 1024,
+       },
+     )
+     const stdout = result.stdout ?? ''
+     const parsed = parseJsonReporterOutput(stdout)
+-    const tests = testsFromStats(parsed?.stats)
++    tests = testsFromStats(parsed?.stats)
+     writeFileSync(reportPath, stdout.trim() ? stdout : '{}')
++    writeFileSync(
++      resolve(dirname(reportPath), 'stderr.log'),
++      result.stderr ?? '',
++    )
++    report = { path: reportRelative, sha256: sha256File(reportPath) }
++    assertMarkdownPlaywrightCollection(parsed, result)
+     const status = result.status === 0 ? 'success' : 'failure'
+ 
+     const playwrightVersion = spawnSync(
+@@ -319,7 +368,7 @@ export async function runMarkdownCell(ownerId, cellId, group, options = {}) {
+       },
+       config: { path: cell.config, sha256: cell.configSha256 },
+       tests,
+-      report: { path: reportRelative, sha256: sha256File(reportPath) },
++      report,
+       status,
+       failureReason: null,
+       startedAt,
+@@ -372,8 +421,8 @@ export async function runMarkdownCell(ownerId, cellId, group, options = {}) {
+         },
+         runtime,
+         config: { path: cell.config, sha256: cell.configSha256 },
+-        tests: { total: 0, passed: 0, failed: 0, skipped: 0, flaky: 0 },
+-        report: null,
++        tests,
++        report,
+         status: 'failure',
+         failureReason,
+         startedAt,

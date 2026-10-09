@@ -1,0 +1,25 @@
+{
+  "prHead": "07386a74f507d9a6e28559e2f9bea90bab81a00d",
+  "existingSource": "6583b7a59a0a871e13b97594a583ca58ca63027e",
+  "commits": [
+    "80f6e96b8d5419942583711fb417492b1f0abb67",
+    "6583b7a59a0a871e13b97594a583ca58ca63027e"
+  ],
+  "changedPaths": [
+    "scripts/conformance-playwright-owner-run.mjs",
+    "scripts/conformance-playwright-runner.mjs",
+    "scripts/markdown-playwright-runner.mjs",
+    "tests/conformance-playwright-identity.test.mjs"
+  ],
+  "command": [
+    "git",
+    "apply",
+    "--check",
+    "/workspace/shared/pr882-runner-comparison/existing-minimal-source.patch"
+  ],
+  "exitCode": 0,
+  "stdout": "",
+  "stderr": "",
+  "patchSha256": "edd7107cdec34dac86667a8b49ca3a5c35e8d0ad65eb40f4d4570746d1b15ce9",
+  "patchApplied": false
+}

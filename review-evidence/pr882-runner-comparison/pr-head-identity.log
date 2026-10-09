@@ -1,0 +1,7 @@
+commit 07386a74f507d9a6e28559e2f9bea90bab81a00d
+tree 5839c6f4d9fb5966dcbefabad6af62db5559e0eb
+parent b17077f3afd4a80ff3bdc0fe81d5dfc353ffddf2
+author djsms <lyuaoss@gmail.com> 1791528308 +0000
+committer djsms <lyuaoss@gmail.com> 1791528308 +0000
+
+    fix(table): defer resize layout beyond observer delivery

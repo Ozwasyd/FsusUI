@@ -1,0 +1,28 @@
+commit 8db0ac8f49749e3e5f28be5051bb3d3ed71ada71
+tree bd0efbd8b90c3e2fb19eb128a07f9df9d2fa5de7
+parent b17077f3afd4a80ff3bdc0fe81d5dfc353ffddf2
+author Ozwasyd <lyuaoss@gmail.com> 1791530235 +0800
+committer GitHub <noreply@github.com> 1791530235 +0800
+gpgsig -----BEGIN PGP SIGNATURE-----
+ 
+ wsFcBAABCAAQBQJqyJT7CRC1aQ7uu5UhlAAApnQQAA2XQRUtZbUOSrwb678+HnZC
+ fqSMUuCDxFpcezXNXJPego12EimXrufnj1Es6akm6Sk7zUhFZzpKzSe4om7gy6pd
+ 1ADZbgCcy+g0SMxuOEjfJKEAtYLEVaJNGpPTdg6D/SCp1NJh5gA6c5zLcD4V3lUT
+ 1jvln7X35GO+MT9DyeEZWKh8OgckG4QPbsx29yQ09u5gs85zXGfT8s9O0kKXAlU2
+ L6We3i0vOZydoQ97kfLI7vv33IqyW2XJ0c2Z0yTmpK9yt9I6cDuLnoUWtV2TZSEW
+ a5OH0S/dat47sI1ay96u/guQKJcs68fM/V+5FzeARmNfZDnhJYUPFJDTP7OfCU/n
+ dYsTnYpQZqdd8u452uVYeiXPXp2M7LwhZPrVq0tQvjnFnAEqUTbSrpBkfqdh4dyA
+ AGUiAKcMpsohQnSuNWlEoz2UNkwRHpk0ZW1k02uiKWPzm8R4QwftBV46it3TXy6F
+ QAWOGDjhThODf7x83iQ+RosnT6orTzKdrjwBHsZbHvvbI9PepqB5/gVShRrraqyx
+ TDepwrQvA9X2lT1qIHyvEuC6sD2tEYaV/qZtY6b+lQj3oOH/uayCUer7UPcDF0Nz
+ Vavv+teh8LAe0KbnCEchJC5C/of7vJvRas7zwSnXCjHmuAdhMiTfurg668MhhkXP
+ qEvgV6O/lyyLjxgwrpcK
+ =3na+
+ -----END PGP SIGNATURE-----
+ 
+
+    fix(dotnet): bind native verifiers to SDK policy and locked graph
+    
+    Integrate the independently reviewed seven-path SDK and locked dependency source increment. Full native, conformance and CI qualification remains WIP as recorded in PR #868. No package publication or issue closure.
+    
+    Refs: #861

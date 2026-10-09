@@ -1,0 +1,38 @@
+{
+  "scripts/conformance-playwright-owner-run.mjs": {
+    "07386a74f507d9a6e28559e2f9bea90bab81a00d": "72bcc775d33ea2478ff96c27da0889ba2b13c38d",
+    "6583b7a59a0a871e13b97594a583ca58ca63027e": "931d08870638bf513e8765aacccbb321abcd9f3f",
+    "a58cae49d4cbbed48e62c877bab24a7c0041bef6": "931d08870638bf513e8765aacccbb321abcd9f3f",
+    "ba90d4df9b0b76e3c8cf7b4a57ceab08ded13990": "72bcc775d33ea2478ff96c27da0889ba2b13c38d",
+    "b17077f3afd4a80ff3bdc0fe81d5dfc353ffddf2": "72bcc775d33ea2478ff96c27da0889ba2b13c38d"
+  },
+  "scripts/conformance-playwright-runner.mjs": {
+    "07386a74f507d9a6e28559e2f9bea90bab81a00d": "72e36d76867a3cd276d66b72a3c1bb5d49f33661",
+    "6583b7a59a0a871e13b97594a583ca58ca63027e": "58cdccded73e4b5ac9993bfc2ce840430095f28c",
+    "a58cae49d4cbbed48e62c877bab24a7c0041bef6": "58cdccded73e4b5ac9993bfc2ce840430095f28c",
+    "ba90d4df9b0b76e3c8cf7b4a57ceab08ded13990": "72e36d76867a3cd276d66b72a3c1bb5d49f33661",
+    "b17077f3afd4a80ff3bdc0fe81d5dfc353ffddf2": "72e36d76867a3cd276d66b72a3c1bb5d49f33661"
+  },
+  "scripts/markdown-playwright-runner.mjs": {
+    "07386a74f507d9a6e28559e2f9bea90bab81a00d": "3d775c0d1a403253127fa1b94729ff342dfcd308",
+    "6583b7a59a0a871e13b97594a583ca58ca63027e": "1a65c11a22438fef05aeb97bd4561350dae5fc24",
+    "a58cae49d4cbbed48e62c877bab24a7c0041bef6": "1a65c11a22438fef05aeb97bd4561350dae5fc24",
+    "ba90d4df9b0b76e3c8cf7b4a57ceab08ded13990": "3d775c0d1a403253127fa1b94729ff342dfcd308",
+    "b17077f3afd4a80ff3bdc0fe81d5dfc353ffddf2": "3d775c0d1a403253127fa1b94729ff342dfcd308"
+  },
+  "spec/ci/playwright-suites.json": {
+    "07386a74f507d9a6e28559e2f9bea90bab81a00d": "7298706e9d6fcb28633a4245d6c33a0ed3bc8efa",
+    "6583b7a59a0a871e13b97594a583ca58ca63027e": "7298706e9d6fcb28633a4245d6c33a0ed3bc8efa",
+    "a58cae49d4cbbed48e62c877bab24a7c0041bef6": "7298706e9d6fcb28633a4245d6c33a0ed3bc8efa"
+  },
+  "vue/tests/markdown-editor/markdown-interaction-trace.spec.ts": {
+    "07386a74f507d9a6e28559e2f9bea90bab81a00d": "bbb3a3b6b4ad0c0ef6c5019b8bc934b4f34fd734",
+    "6583b7a59a0a871e13b97594a583ca58ca63027e": "bbb3a3b6b4ad0c0ef6c5019b8bc934b4f34fd734",
+    "a58cae49d4cbbed48e62c877bab24a7c0041bef6": "bbb3a3b6b4ad0c0ef6c5019b8bc934b4f34fd734"
+  },
+  "scripts/ci-readiness-contract.mjs": {
+    "07386a74f507d9a6e28559e2f9bea90bab81a00d": "4119eb3b57ab4233d3361041fa4524fa6fce9ab5",
+    "6583b7a59a0a871e13b97594a583ca58ca63027e": "4119eb3b57ab4233d3361041fa4524fa6fce9ab5",
+    "a58cae49d4cbbed48e62c877bab24a7c0041bef6": "4119eb3b57ab4233d3361041fa4524fa6fce9ab5"
+  }
+}

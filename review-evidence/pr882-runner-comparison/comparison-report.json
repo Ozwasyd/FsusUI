@@ -1,0 +1,171 @@
+{
+  "schemaVersion": 1,
+  "checkedAt": "2026-10-09T08:38:06.682537+00:00",
+  "pr": 882,
+  "prHead": "07386a74f507d9a6e28559e2f9bea90bab81a00d",
+  "workflowRunId": 37899305543,
+  "runEvent": "pull_request",
+  "runMetadataStatusAtRead": "in_progress; the three compared jobs are completed failures",
+  "actualCiCheckout": "ba90d4df9b0b76e3c8cf7b4a57ceab08ded13990",
+  "actualCiBase": "8db0ac8f49749e3e5f28be5051bb3d3ed71ada71",
+  "readinessJobId": 113729147737,
+  "readinessStatus": "FAIL",
+  "observedReadinessError": "PR playwright missing run cell(s): web-interaction-conformance/chromium, web-interaction-conformance/firefox, web-interaction-conformance/webkit, visual-runtime-reuse/desktop-light, visual-runtime-reuse/mobile-light, visual-runtime-reuse/desktop-dark, visual-runtime-reuse/mobile-dark.",
+  "actualReadinessCause": "Both upstream producers genuinely ran and failed. emitPlaywright at scripts/ci-readiness.mjs:175 rejects failure receipts before emitting run-cell manifests; ci-readiness-contract.mjs:846 then detects seven missing accepted run cells. This is not an unrun workflow or missing producer execution.",
+  "conformanceProducerObservedCause": "All three original runner cells returned failure: produced no real interaction trace attachments. No real interaction attachment PASS exists for this run.",
+  "conformanceCollectionSourceFinding": {
+    "classification": "Published fix is unconsumed; no new reserved-path source defect established.",
+    "proof": "PR head and actual merge have the exact original b170 pre-fix runner blobs. Published6583 and combineda58 have identical corrected blobs. The workflow checks out only the depth-1 merge ref, and the old runner does not supply existing FSUS_INTERACTION_BASELINE/CANDIDATE or pass the impact-plan baseline to the child. Unchanged spec evaluates merge-base against origin/main at module collection if baseline is absent.",
+    "inference": "The shallow origin/main collection failure covered by the existing fix is the source-supported underlying cause. Its exact raw report exception and test counters on this new run could not be inspected because artifact ZIP reads returned HTTP403; do not label that report string as directly observed.",
+    "artifactEvidenceLimit": "Metadata and decoded producer/readiness logs successfully read. Connector artifact download created reusable references, but local ZIP retrieval returned HTTP403 for four artifacts. No signed URLs retained in public evidence.",
+    "browserInstallSeparate": "The earlier local install-deps su authentication refusal remains stopped. No install retry, permissions/security/certificate change or alternate installation executor was attempted in this task."
+  },
+  "exactBlobs": {
+    "scripts/conformance-playwright-owner-run.mjs": {
+      "07386a74f507d9a6e28559e2f9bea90bab81a00d": "72bcc775d33ea2478ff96c27da0889ba2b13c38d",
+      "6583b7a59a0a871e13b97594a583ca58ca63027e": "931d08870638bf513e8765aacccbb321abcd9f3f",
+      "a58cae49d4cbbed48e62c877bab24a7c0041bef6": "931d08870638bf513e8765aacccbb321abcd9f3f",
+      "ba90d4df9b0b76e3c8cf7b4a57ceab08ded13990": "72bcc775d33ea2478ff96c27da0889ba2b13c38d",
+      "b17077f3afd4a80ff3bdc0fe81d5dfc353ffddf2": "72bcc775d33ea2478ff96c27da0889ba2b13c38d"
+    },
+    "scripts/conformance-playwright-runner.mjs": {
+      "07386a74f507d9a6e28559e2f9bea90bab81a00d": "72e36d76867a3cd276d66b72a3c1bb5d49f33661",
+      "6583b7a59a0a871e13b97594a583ca58ca63027e": "58cdccded73e4b5ac9993bfc2ce840430095f28c",
+      "a58cae49d4cbbed48e62c877bab24a7c0041bef6": "58cdccded73e4b5ac9993bfc2ce840430095f28c",
+      "ba90d4df9b0b76e3c8cf7b4a57ceab08ded13990": "72e36d76867a3cd276d66b72a3c1bb5d49f33661",
+      "b17077f3afd4a80ff3bdc0fe81d5dfc353ffddf2": "72e36d76867a3cd276d66b72a3c1bb5d49f33661"
+    },
+    "scripts/markdown-playwright-runner.mjs": {
+      "07386a74f507d9a6e28559e2f9bea90bab81a00d": "3d775c0d1a403253127fa1b94729ff342dfcd308",
+      "6583b7a59a0a871e13b97594a583ca58ca63027e": "1a65c11a22438fef05aeb97bd4561350dae5fc24",
+      "a58cae49d4cbbed48e62c877bab24a7c0041bef6": "1a65c11a22438fef05aeb97bd4561350dae5fc24",
+      "ba90d4df9b0b76e3c8cf7b4a57ceab08ded13990": "3d775c0d1a403253127fa1b94729ff342dfcd308",
+      "b17077f3afd4a80ff3bdc0fe81d5dfc353ffddf2": "3d775c0d1a403253127fa1b94729ff342dfcd308"
+    },
+    "spec/ci/playwright-suites.json": {
+      "07386a74f507d9a6e28559e2f9bea90bab81a00d": "7298706e9d6fcb28633a4245d6c33a0ed3bc8efa",
+      "6583b7a59a0a871e13b97594a583ca58ca63027e": "7298706e9d6fcb28633a4245d6c33a0ed3bc8efa",
+      "a58cae49d4cbbed48e62c877bab24a7c0041bef6": "7298706e9d6fcb28633a4245d6c33a0ed3bc8efa"
+    },
+    "vue/tests/markdown-editor/markdown-interaction-trace.spec.ts": {
+      "07386a74f507d9a6e28559e2f9bea90bab81a00d": "bbb3a3b6b4ad0c0ef6c5019b8bc934b4f34fd734",
+      "6583b7a59a0a871e13b97594a583ca58ca63027e": "bbb3a3b6b4ad0c0ef6c5019b8bc934b4f34fd734",
+      "a58cae49d4cbbed48e62c877bab24a7c0041bef6": "bbb3a3b6b4ad0c0ef6c5019b8bc934b4f34fd734"
+    },
+    "scripts/ci-readiness-contract.mjs": {
+      "07386a74f507d9a6e28559e2f9bea90bab81a00d": "4119eb3b57ab4233d3361041fa4524fa6fce9ab5",
+      "6583b7a59a0a871e13b97594a583ca58ca63027e": "4119eb3b57ab4233d3361041fa4524fa6fce9ab5",
+      "a58cae49d4cbbed48e62c877bab24a7c0041bef6": "4119eb3b57ab4233d3361041fa4524fa6fce9ab5"
+    }
+  },
+  "minimalCompatibleSource": {
+    "sourceSha": "6583b7a59a0a871e13b97594a583ca58ca63027e",
+    "combinedEquivalentSha": "a58cae49d4cbbed48e62c877bab24a7c0041bef6",
+    "commits": [
+      "80f6e96b8d5419942583711fb417492b1f0abb67",
+      "6583b7a59a0a871e13b97594a583ca58ca63027e"
+    ],
+    "paths": [
+      "scripts/conformance-playwright-owner-run.mjs",
+      "scripts/conformance-playwright-runner.mjs",
+      "scripts/markdown-playwright-runner.mjs",
+      "tests/conformance-playwright-identity.test.mjs"
+    ],
+    "compatibility": {
+      "prHead": "07386a74f507d9a6e28559e2f9bea90bab81a00d",
+      "existingSource": "6583b7a59a0a871e13b97594a583ca58ca63027e",
+      "commits": [
+        "80f6e96b8d5419942583711fb417492b1f0abb67",
+        "6583b7a59a0a871e13b97594a583ca58ca63027e"
+      ],
+      "changedPaths": [
+        "scripts/conformance-playwright-owner-run.mjs",
+        "scripts/conformance-playwright-runner.mjs",
+        "scripts/markdown-playwright-runner.mjs",
+        "tests/conformance-playwright-identity.test.mjs"
+      ],
+      "command": [
+        "git",
+        "apply",
+        "--check",
+        "/workspace/shared/pr882-runner-comparison/existing-minimal-source.patch"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": "",
+      "patchSha256": "edd7107cdec34dac86667a8b49ca3a5c35e8d0ad65eb40f4d4570746d1b15ce9",
+      "patchApplied": false
+    },
+    "recommendation": "Consume the existing two approved trace commits (or their identical three runner blobs plus the dedicated18-regression test). Do not duplicate code or wholesale transplant combined SelectV2/metadata/migration changes for this narrow identity repair. Existing runner fix preserves required cells, original assertions, attachment validation, strict candidate/base checks and narrow child environment.",
+    "expectedProducerIdentityAfterConsumption": {
+      "baseline": "8db0ac8f49749e3e5f28be5051bb3d3ed71ada71",
+      "candidate": "ba90d4df9b0b76e3c8cf7b4a57ceab08ded13990",
+      "reason": "Use PR impact-plan exactbase and actual merge checkout, not PR source-head07386 or old default/mainb170. Exact first-parent baseline object may be fetched through the original bounded identity route when shallow checkout lacks it."
+    },
+    "qualification": "Clean patch application is a source compatibility check only; no claim of new-head browser/visual PASS. Existing component assertions and all four visual reuse failures require independent real execution/evidence."
+  },
+  "remainingCells": [
+    {
+      "cell": "web-interaction-conformance/chromium",
+      "producerStatus": "FAIL",
+      "observedReason": "produced no real interaction trace attachments",
+      "acceptedReadinessRunManifest": false,
+      "jobId": 113723498179
+    },
+    {
+      "cell": "web-interaction-conformance/firefox",
+      "producerStatus": "FAIL",
+      "observedReason": "produced no real interaction trace attachments",
+      "acceptedReadinessRunManifest": false,
+      "jobId": 113723498179
+    },
+    {
+      "cell": "web-interaction-conformance/webkit",
+      "producerStatus": "FAIL",
+      "observedReason": "produced no real interaction trace attachments",
+      "acceptedReadinessRunManifest": false,
+      "jobId": 113723498179
+    },
+    {
+      "cell": "visual-runtime-reuse/desktop-light",
+      "producerStatus": "FAIL",
+      "passed": 174,
+      "failed": 1,
+      "skipped": 0,
+      "acceptedReadinessRunManifest": false,
+      "jobId": 113723498108
+    },
+    {
+      "cell": "visual-runtime-reuse/mobile-light",
+      "producerStatus": "FAIL",
+      "passed": 155,
+      "failed": 13,
+      "skipped": 0,
+      "acceptedReadinessRunManifest": false,
+      "jobId": 113723498108
+    },
+    {
+      "cell": "visual-runtime-reuse/desktop-dark",
+      "producerStatus": "FAIL",
+      "passed": 171,
+      "failed": 2,
+      "skipped": 0,
+      "acceptedReadinessRunManifest": false,
+      "jobId": 113723498108
+    },
+    {
+      "cell": "visual-runtime-reuse/mobile-dark",
+      "producerStatus": "FAIL",
+      "passed": 158,
+      "failed": 12,
+      "skipped": 0,
+      "acceptedReadinessRunManifest": false,
+      "jobId": 113723498108
+    }
+  ],
+  "newRepairMade": false,
+  "newRuntimeTestsRun": false,
+  "sourceWorktreeClean": true,
+  "contentApiWrites": false,
+  "packagePublication": false
+}
