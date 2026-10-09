@@ -40,10 +40,10 @@ export function normalizedDiagnostics(rows) {
 
 export function assertInstalledDiagnostics(profile, mode, name, rows) {
   const bundler = profile.installedDiagnostics[`bundler-${name}`]
-  const expected = mode === 'bundler' ? bundler : mode === 'node16' && bundler && [
+  const expected = profile.installedDiagnostics[`${mode}-${name}`] ?? (mode === 'node16' && bundler && [
     ...bundler, ...authority.node16BoundaryDiagnostics,
     ...(name === 'positive' ? authority.node16PositiveDiagnostics : []),
-  ]
+  ])
   assert.ok(expected, `No authority for ${profile.name}/${mode}/${name}`)
   assert.deepEqual(normalizedDiagnostics(rows), normalizedDiagnostics(expected), `Every diagnostic must match ${profile.name}/${mode}/${name}; unknown diagnostics fail.`)
 }
