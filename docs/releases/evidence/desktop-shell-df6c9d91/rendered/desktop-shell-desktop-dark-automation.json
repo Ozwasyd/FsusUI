@@ -1,0 +1,82 @@
+{
+  "titleBar": {
+    "name": "Markdown workspace title bar",
+    "status": "Architecture notes.md, linux, normal"
+  },
+  "activityRail": {
+    "name": "Editor workspace navigation",
+    "status": "search, pane expanded, 280 pixels",
+    "selectedCount": 1,
+    "sections": [
+      {
+        "key": "explorer",
+        "name": "Explorer",
+        "status": "available"
+      },
+      {
+        "key": "search",
+        "name": "Search",
+        "status": "selected, pane expanded"
+      },
+      {
+        "key": "outline",
+        "name": "Document outline",
+        "status": "available"
+      }
+    ]
+  },
+  "documents": {
+    "status": "active architecture, 8 documents",
+    "selectedCount": 1,
+    "items": [
+      {
+        "key": "architecture",
+        "name": "Architecture notes.md",
+        "status": "selected, saved, closable",
+        "closeName": "Close Architecture notes.md"
+      },
+      {
+        "key": "draft",
+        "name": "Release draft.md",
+        "status": "available, unsaved changes, closable",
+        "closeName": "Close Release draft.md"
+      },
+      {
+        "key": "release",
+        "name": "Release checklist.md",
+        "status": "available, unsaved changes, closable",
+        "closeName": "Close Release checklist.md"
+      },
+      {
+        "key": "tokens",
+        "name": "Theme token audit.md",
+        "status": "available, saved, closable",
+        "closeName": "Close Theme token audit.md"
+      },
+      {
+        "key": "accessibility",
+        "name": "Accessibility findings.md",
+        "status": "available, saved, closable",
+        "closeName": "Close Accessibility findings.md"
+      },
+      {
+        "key": "platform",
+        "name": "Platform differences.md",
+        "status": "available, saved, closable",
+        "closeName": "Close Platform differences.md"
+      },
+      {
+        "key": "runtime",
+        "name": "Runtime state boundaries.md",
+        "status": "available, saved, closable",
+        "closeName": "Close Runtime state boundaries.md"
+      },
+      {
+        "key": "verification",
+        "name": "Verification record.md",
+        "status": "available, saved, closable",
+        "closeName": "Close Verification record.md"
+      }
+    ]
+  }
+}

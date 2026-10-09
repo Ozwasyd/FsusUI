@@ -1,0 +1,103 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TestRun id="ff54e84e-e411-4300-919b-037636f80a7a" name="@845b6801dd61 2026-10-09 06:21:15" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <Times creation="2026-10-09T06:21:15.1101534+00:00" queuing="2026-10-09T06:21:15.1101535+00:00" start="2026-10-09T06:21:12.2147531+00:00" finish="2026-10-09T06:21:15.1163143+00:00" />
+  <TestSettings name="default" id="4a3358f4-4086-40a5-a26f-dccb26bf8288">
+    <Deployment runDeploymentRoot="_845b6801dd61_2026-10-09_06_21_15" />
+  </TestSettings>
+  <Results>
+    <UnitTestResult executionId="faf77c5b-6706-4426-9d0b-2b338cd12867" testId="6a8acd6e-ac8e-465f-d998-5c2e429b2f8e" testName="FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests.DocumentReorderPreservesFocusedHeaderDescendantWithoutTakingOtherFocus" computerName="845b6801dd61" duration="00:00:00.8889369" startTime="2026-10-09T06:21:14.0640753+00:00" endTime="2026-10-09T06:21:14.9787104+00:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="faf77c5b-6706-4426-9d0b-2b338cd12867">
+      <Output>
+        <ErrorInfo>
+          <Message>System.InvalidOperationException : Could not create glyphTypeface. Font family: $Default (key: ). Style: Normal. Weight: Normal. Stretch: Normal</Message>
+          <StackTrace>   at Avalonia.Media.Typeface.get_GlyphTypeface()
+   at Avalonia.Media.TextFormatting.TextRunProperties.get_CachedGlyphTypeface()
+   at Avalonia.Media.TextFormatting.TextLineImpl.CreateLineMetrics()
+   at Avalonia.Media.TextFormatting.TextLineImpl.FinalizeLine()
+   at Avalonia.Media.TextFormatting.TextFormatterImpl.FormatLine(ITextSource textSource, Int32 firstTextSourceIndex, Double paragraphWidth, TextParagraphProperties paragraphProperties, TextLineBreak previousLineBreak, TextRunCache textRunCache)
+   at Avalonia.Media.TextFormatting.TextLayout.CreateTextLines()
+   at Avalonia.Media.TextFormatting.TextLayout..ctor(ITextSource textSource, TextParagraphProperties paragraphProperties, TextTrimming textTrimming, Double maxWidth, Double maxHeight, Int32 maxLines, TextRunCache textRunCache)
+   at Avalonia.Controls.TextBlock.CreateTextLayout(String text)
+   at Avalonia.Controls.TextBlock.get_TextLayout()
+   at Avalonia.Controls.TextBlock.MeasureOverride(Size availableSize)
+   at Avalonia.Layout.Layoutable.MeasureCore(Size availableSize)
+   at Avalonia.Layout.Layoutable.Measure(Size availableSize)
+   at Avalonia.Layout.LayoutManager.Measure(Layoutable control)
+   at Avalonia.Layout.LayoutManager.ExecuteMeasurePass()
+   at Avalonia.Layout.LayoutManager.InnerLayoutPass()
+   at Avalonia.Layout.LayoutManager.ExecuteLayoutPass()
+   at Avalonia.Layout.LayoutManager.ExecuteQueuedLayoutPass()
+   at Avalonia.Media.MediaContext.FireInvokeOnRenderCallbacks()
+   at Avalonia.Media.MediaContext.RenderCore()
+   at Avalonia.Media.MediaContext.Render()
+   at Avalonia.Threading.DispatcherOperation.InvokeCore()
+   at Avalonia.Threading.DispatcherOperation.Execute()
+   at Avalonia.Threading.Dispatcher.ExecuteJob(DispatcherOperation job)
+   at Avalonia.Threading.Dispatcher.RunJobs(Nullable`1 priority, CancellationToken cancellationToken)
+   at Avalonia.Threading.Dispatcher.RunJobs(Nullable`1 priority)
+   at FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests.DocumentReorderPreservesFocusedHeaderDescendantWithoutTakingOtherFocus() in /workspace/FsusUI-desktop-tabs-diagnostic/dotnet/FsusUI.Avalonia.HeadlessTests/FsusDesktopShellHeadlessTests.cs:line 294
+   at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+   at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+  </Results>
+  <TestDefinitions>
+    <UnitTest name="FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests.DocumentReorderPreservesFocusedHeaderDescendantWithoutTakingOtherFocus" storage="/workspace/fsusui-desktop-tabs-diagnostic/dotnet/fsusui.avalonia.headlesstests/bin/release/net10.0/fsusui.avalonia.headlesstests.dll" id="6a8acd6e-ac8e-465f-d998-5c2e429b2f8e">
+      <Execution id="faf77c5b-6706-4426-9d0b-2b338cd12867" />
+      <TestMethod codeBase="/workspace/FsusUI-desktop-tabs-diagnostic/dotnet/FsusUI.Avalonia.HeadlessTests/bin/Release/net10.0/FsusUI.Avalonia.HeadlessTests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests" name="DocumentReorderPreservesFocusedHeaderDescendantWithoutTakingOtherFocus" />
+    </UnitTest>
+  </TestDefinitions>
+  <TestEntries>
+    <TestEntry testId="6a8acd6e-ac8e-465f-d998-5c2e429b2f8e" executionId="faf77c5b-6706-4426-9d0b-2b338cd12867" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+  </TestEntries>
+  <TestLists>
+    <TestList name="Results Not in a List" id="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestList name="All Loaded Results" id="19431567-8539-422a-85d7-44ee4e166bda" />
+  </TestLists>
+  <ResultSummary outcome="Failed">
+    <Counters total="1" executed="1" passed="0" failed="1" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
+    <Output>
+      <StdOut>[xUnit.net 00:00:00.00] xUnit.net VSTest Adapter v3.1.4+50e68bbb8b (64-bit .NET 10.0.8)
+[xUnit.net 00:00:00.29]   Discovering: FsusUI.Avalonia.HeadlessTests
+[xUnit.net 00:00:00.81]   Discovered:  FsusUI.Avalonia.HeadlessTests
+[xUnit.net 00:00:01.02]   Starting:    FsusUI.Avalonia.HeadlessTests
+[xUnit.net 00:00:02.21]       System.InvalidOperationException : Could not create glyphTypeface. Font family: $Default (key: ). Style: Normal. Weight: Normal. Stretch: Normal
+[xUnit.net 00:00:02.21]       Stack Trace:
+[xUnit.net 00:00:02.21]            at Avalonia.Media.Typeface.get_GlyphTypeface()
+[xUnit.net 00:00:02.21]            at Avalonia.Media.TextFormatting.TextRunProperties.get_CachedGlyphTypeface()
+[xUnit.net 00:00:02.21]            at Avalonia.Media.TextFormatting.TextLineImpl.CreateLineMetrics()
+[xUnit.net 00:00:02.21]            at Avalonia.Media.TextFormatting.TextLineImpl.FinalizeLine()
+[xUnit.net 00:00:02.21]            at Avalonia.Media.TextFormatting.TextFormatterImpl.FormatLine(ITextSource textSource, Int32 firstTextSourceIndex, Double paragraphWidth, TextParagraphProperties paragraphProperties, TextLineBreak previousLineBreak, TextRunCache textRunCache)
+[xUnit.net 00:00:02.21]            at Avalonia.Media.TextFormatting.TextLayout.CreateTextLines()
+[xUnit.net 00:00:02.21]            at Avalonia.Media.TextFormatting.TextLayout..ctor(ITextSource textSource, TextParagraphProperties paragraphProperties, TextTrimming textTrimming, Double maxWidth, Double maxHeight, Int32 maxLines, TextRunCache textRunCache)
+[xUnit.net 00:00:02.21]            at Avalonia.Controls.TextBlock.CreateTextLayout(String text)
+[xUnit.net 00:00:02.21]            at Avalonia.Controls.TextBlock.get_TextLayout()
+[xUnit.net 00:00:02.21]            at Avalonia.Controls.TextBlock.MeasureOverride(Size availableSize)
+[xUnit.net 00:00:02.21]            at Avalonia.Layout.Layoutable.MeasureCore(Size availableSize)
+[xUnit.net 00:00:02.21]            at Avalonia.Layout.Layoutable.Measure(Size availableSize)
+[xUnit.net 00:00:02.21]            at Avalonia.Layout.LayoutManager.Measure(Layoutable control)
+[xUnit.net 00:00:02.21]            at Avalonia.Layout.LayoutManager.ExecuteMeasurePass()
+[xUnit.net 00:00:02.21]            at Avalonia.Layout.LayoutManager.InnerLayoutPass()
+[xUnit.net 00:00:02.21]            at Avalonia.Layout.LayoutManager.ExecuteLayoutPass()
+[xUnit.net 00:00:02.21]            at Avalonia.Layout.LayoutManager.ExecuteQueuedLayoutPass()
+[xUnit.net 00:00:02.21]            at Avalonia.Media.MediaContext.FireInvokeOnRenderCallbacks()
+[xUnit.net 00:00:02.21]            at Avalonia.Media.MediaContext.RenderCore()
+[xUnit.net 00:00:02.22]            at Avalonia.Media.MediaContext.Render()
+[xUnit.net 00:00:02.22]            at Avalonia.Threading.DispatcherOperation.InvokeCore()
+[xUnit.net 00:00:02.22]            at Avalonia.Threading.DispatcherOperation.Execute()
+[xUnit.net 00:00:02.22]            at Avalonia.Threading.Dispatcher.ExecuteJob(DispatcherOperation job)
+[xUnit.net 00:00:02.22]            at Avalonia.Threading.Dispatcher.RunJobs(Nullable`1 priority, CancellationToken cancellationToken)
+[xUnit.net 00:00:02.22]            at Avalonia.Threading.Dispatcher.RunJobs(Nullable`1 priority)
+[xUnit.net 00:00:02.22]         /workspace/FsusUI-desktop-tabs-diagnostic/dotnet/FsusUI.Avalonia.HeadlessTests/FsusDesktopShellHeadlessTests.cs(294,0): at FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests.DocumentReorderPreservesFocusedHeaderDescendantWithoutTakingOtherFocus()
+[xUnit.net 00:00:02.22]            at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+[xUnit.net 00:00:02.22]            at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)
+[xUnit.net 00:00:02.24]   Finished:    FsusUI.Avalonia.HeadlessTests
+</StdOut>
+    </Output>
+    <RunInfos>
+      <RunInfo computerName="845b6801dd61" outcome="Error" timestamp="2026-10-09T06:21:14.9899942+00:00">
+        <Text>[xUnit.net 00:00:02.21]     FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests.DocumentReorderPreservesFocusedHeaderDescendantWithoutTakingOtherFocus [FAIL]</Text>
+      </RunInfo>
+    </RunInfos>
+  </ResultSummary>
+</TestRun>

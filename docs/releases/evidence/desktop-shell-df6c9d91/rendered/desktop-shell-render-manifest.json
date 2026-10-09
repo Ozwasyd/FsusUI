@@ -1,0 +1,67 @@
+{
+  "schemaVersion": 1,
+  "issue": 642,
+  "generatedBy": "FsusDesktopShellHeadlessTests.ProductionFixtureRendersDesktopLightDarkAndNarrowEvidence",
+  "fixtureClass": "production",
+  "renderer": {
+    "platform": "avalonia",
+    "runner": "headless-skia",
+    "drawingBackend": "Skia",
+    "avaloniaVersion": "12.0.4.0"
+  },
+  "simulation": "Local deterministic Headless Skia simulation on Linux; no physical Windows or macOS execution is represented.",
+  "motion": "reduced, terminal-state 1ms plans",
+  "captures": [
+    {
+      "file": "dotnet/FsusUI.Avalonia.HeadlessTests/TestResults/issue-642-desktop-shell/desktop-shell-desktop-light.png",
+      "sha256": "570aaa4a37a13dd93ac6c6b1890580b3af070763cffe6355a0bc3c06139caa7a",
+      "automationFile": "dotnet/FsusUI.Avalonia.HeadlessTests/TestResults/issue-642-desktop-shell/desktop-shell-desktop-light-automation.json",
+      "automationSha256": "2f342182d59112fd852713ccec92ebd0978920f44e100f086f6451cdca01ac5a",
+      "scenario": "desktop-light",
+      "theme": "Light",
+      "density": "Default",
+      "widthDip": 1280,
+      "heightDip": 720,
+      "activityKey": "explorer",
+      "documentKey": "architecture",
+      "paneWidth": 280,
+      "paneOpen": true,
+      "titleBarHeight": 45,
+      "leadingActionHeight": 44
+    },
+    {
+      "file": "dotnet/FsusUI.Avalonia.HeadlessTests/TestResults/issue-642-desktop-shell/desktop-shell-desktop-dark.png",
+      "sha256": "dfeb14b5e4a88e7efb8d2915d697a6ea4c9c6498e31d6761dc0b98cd19bfa2b8",
+      "automationFile": "dotnet/FsusUI.Avalonia.HeadlessTests/TestResults/issue-642-desktop-shell/desktop-shell-desktop-dark-automation.json",
+      "automationSha256": "5afb9a734d00c82280b7ae4dd8c6d919ed5942070672d60ea7e767a94ff76958",
+      "scenario": "desktop-dark",
+      "theme": "Dark",
+      "density": "Default",
+      "widthDip": 1280,
+      "heightDip": 720,
+      "activityKey": "search",
+      "documentKey": "architecture",
+      "paneWidth": 280,
+      "paneOpen": true,
+      "titleBarHeight": 45,
+      "leadingActionHeight": 44
+    },
+    {
+      "file": "dotnet/FsusUI.Avalonia.HeadlessTests/TestResults/issue-642-desktop-shell/desktop-shell-narrow-dark-compact.png",
+      "sha256": "853956d28e67c469a0d8ec1d2c87f6cf4c2d80ca75b83d6ea3816ea93e2ef46b",
+      "automationFile": "dotnet/FsusUI.Avalonia.HeadlessTests/TestResults/issue-642-desktop-shell/desktop-shell-narrow-dark-compact-automation.json",
+      "automationSha256": "cf269272865b7ab1f27db2c0c504be757d4e1993667f367e691af0b45645aab9",
+      "scenario": "narrow-dark-compact",
+      "theme": "Dark",
+      "density": "Compact",
+      "widthDip": 760,
+      "heightDip": 640,
+      "activityKey": "outline",
+      "documentKey": "release",
+      "paneWidth": 220,
+      "paneOpen": true,
+      "titleBarHeight": 41,
+      "leadingActionHeight": 40
+    }
+  ]
+}

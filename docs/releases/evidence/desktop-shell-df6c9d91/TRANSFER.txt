@@ -1,0 +1,61 @@
+Evidence transfer only; no tests rerun, reports regenerated, PNGs rewritten, source candidate changed, or acceptance receipts produced.
+
+Frozen source candidate df6c9d917104ca63327ff802382b1bcbe49d4ce9 is source-only. It excludes approved dependency repair 8840c3834f4d1cb67cdccd5238b1cbcc8558141a. This evidence branch adds only copied historical evidence and this transfer note, and is not the implementation PR head.
+
+Input composition: base b17077f3afd4a80ff3bdc0fe81d5dfc353ffddf2 + approved8840 cherry-pick (diagnostic HEAD 64c7e4b2669d4a12fae0733ae8f0572f8c0b91d9) + candidate production and ordinary-test files, byte-identical to df6c9d91 when green evidence was recorded. Prerequisite locks exist only in diagnostic composition, not source-only candidate or evidence branch lockfiles. SDK 10.0.108 / runtime10.0.8 / Debian13 linux-x64. Official checksum identity is retained in local/inputs.json. No .108 result qualifies plain-head restore, SDK10.0.401, full CI, Windows or macOS execution.
+
+Exact final allowed method prefix:
+FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests.
+
+DocumentTabsCancelClosePreserveDirtyStateReorderAndSelectAdjacentFallback: 1
+DocumentContextRequestReturnsTypedStableAnchorWithoutSelectingTarget: 1
+DocumentTabsSupportCloseDragReorderOverflowContextAndPlatformCycling: 2 (headerWidth120 and220)
+AutomationPeersExposeSelectionDirtyExpandedAndCloseSemantics: 1
+Final behavior expected/executed/passed5, failed0, skipped0; local/after.log and local/after.trx.
+ProductionFixtureRendersDesktopLightDarkAndNarrowEvidence: 1 separately selected; expected/executed/passed1, failed0, skipped0; local/render.log and local/render.trx; three copied production PNGs under rendered/.
+The literal final VSTest filter is local/final.filter. local/allowlist.txt is retained unchanged and includes earlier intermediate allowlists. Its final bounded count5 and separate renderer count1 are authoritative for final candidate evidence; earlier count6 and descendant method are superseded.
+
+Historical red evidence:
+local/before.log and before.trx: unchanged original failing method passes locally with natural Debian metrics, count1.
+local/wide-before.log and wide-before.trx: original method plus Width220 instrumentation, count1 fails original ArgumentOutOfRangeException; geometry.txt records center550,32 / bounds440,0,220,64 / viewport520 / offset0.
+local/identity-before.log and identity-before.trx: visible-target fixture revision (same method, two widths) before production focus fix, count2 both fail Assert.Same expected dragged FsusDocumentTab, actual null after dispatch. These are intermediate test-source revisions, not a claim of final candidate/plain-head red execution.
+local/descendant-before* and descendant-after*: abandoned intermediate descendant-focus fixture hit a local $Default glyphTypeface exception; method is absent from final candidate and final allowlist. They are retained unchanged as historical diagnostics, not final PASS or qualification evidence.
+geometry.log/trx are earlier passing instrumented natural-width execution; not final candidate qualification.
+Some local logs mention overwriting named TRX outputs during earlier iteration. The transferred after.trx is final count5 green; wide-before.trx is retained count1 red. No earlier overwritten report has been reconstructed.
+
+Original CI evidence: original head83036006069be5cfcd09724273d5705d8f848ad0 / baseb17077f3afd4a80ff3bdc0fe81d5dfc353ffddf2 / Quality Gates37798728109 / Linuxjob113384931201 / macOSjob113384931043. Logs record merge checkout e36ce62 and SDK10.0.401; both context failures occur at original line167. Original logs obtained via gh api repos/Ozwasyd/FsusUI/actions/runs/37798728109/logs. Separate job-log and artifact-TRX downloads returned HTTP403, not auto-review denial.
+
+Original local commands (cwd /workspace/FsusUI-desktop-tabs-diagnostic), no new execution requested by this transfer:
+export PATH=/tmp/desktop-tabs-sdk/sdk:$PATH
+export DOTNET_CLI_HOME=/tmp/desktop-tabs-dotnet-home
+export NUGET_PACKAGES=/workspace/.setup/nuget
+export DOTNET_CLI_TELEMETRY_OPTOUT=1
+unset FSUS_HEADLESS_GSANS
+project=dotnet/FsusUI.Avalonia.HeadlessTests/FsusUI.Avalonia.HeadlessTests.csproj
+
+dotnet restore "$project" --locked-mode --disable-parallel --maxcpucount:1
+(original output redirected to /tmp/desktop-tabs-evidence/restore.log)
+dotnet build "$project" --no-restore --configuration Release --maxcpucount:1
+(original output redirected to /tmp/desktop-tabs-evidence/build-before.log)
+
+dotnet test "$project" --no-build --no-restore --configuration Release --filter 'FullyQualifiedName=FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests.DocumentTabsSupportCloseDragReorderOverflowContextAndPlatformCycling' --logger 'trx;LogFileName=before.trx' --results-directory /tmp/desktop-tabs-evidence --maxcpucount:1
+
+dotnet test "$project" --no-restore --configuration Release --filter 'FullyQualifiedName=FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests.DocumentTabsSupportCloseDragReorderOverflowContextAndPlatformCycling' --logger 'trx;LogFileName=wide-before.trx' --results-directory /tmp/desktop-tabs-evidence --maxcpucount:1
+
+dotnet test "$project" --no-restore --configuration Release --filter 'FullyQualifiedName=FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests.DocumentTabsSupportCloseDragReorderOverflowContextAndPlatformCycling' --logger 'trx;LogFileName=identity-before.trx' --results-directory /tmp/desktop-tabs-evidence --maxcpucount:1
+
+Final green environment also sets XDG_CACHE_HOME=/tmp/desktop-tabs-font-cache:
+dotnet test "$project" --no-restore --configuration Release --filter "$(cat /tmp/desktop-tabs-evidence/final.filter)" --logger 'trx;LogFileName=after.trx' --results-directory /tmp/desktop-tabs-evidence --maxcpucount:1
+
+dotnet test "$project" --no-build --no-restore --configuration Release --filter 'FullyQualifiedName=FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests.ProductionFixtureRendersDesktopLightDarkAndNarrowEvidence' --logger 'trx;LogFileName=render.trx' --results-directory /tmp/desktop-tabs-evidence --maxcpucount:1
+
+Harness TestAssembly disables test parallelism. TestAppBuilder uses Skia, UseHeadlessDrawing=false, optional FSUS_HEADLESS_GSANS unset. No broad suite was run and filtered after execution. Configured .husky/_ launcher was absent in isolated source worktree; no hook/gate config changed. Root owns PR and reviewer metadata. Existing frozen PNGs, assertions, budgets and denied RepositoryRoot scope remain unchanged; copied rendered PNGs are generated evidence, not edited frozen baselines. No held receipt/cohort/Git-ref/race/custody/resource-root audits were run or recreated.
+
+Approved8840 exact tested dependency lock Git blob identities (all paths relative to repository):
+dotnet/FsusUI.Avalonia/packages.lock.json fc3eeee35caa4ec3e49e9a987e59625543d434e5
+dotnet/FsusUI.Avalonia.Icons/packages.lock.json 284a0ce4f7f7b13b942a6d6a870dddb38160332e
+dotnet/FsusUI.Avalonia.Themes/packages.lock.json 284a0ce4f7f7b13b942a6d6a870dddb38160332e
+dotnet/FsusUI.Avalonia.HeadlessTests/packages.lock.json 802a270312b3f47bc38f25999563888cd5ef8a94
+dotnet/FsusUI.Avalonia.Demo/packages.lock.json 23e03b0ff5b6d34419d4761c6e8c5bcf6777a77d
+dotnet/FsusUI.Avalonia.FormGenerator/packages.lock.json d69565e30ae7491fd052ed5c47f2dbc044fb5c82
+Only core/icons/themes contentHash fields differ in approved8840 vs source base; no lock edits were made by this implementation task. Signature verification is the independently approved prerequisite evidence supplied by Root, not a new verification claim from this transfer.

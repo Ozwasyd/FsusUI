@@ -1,0 +1,659 @@
+﻿2026-10-08T15:12:05.1450130Z Current runner version: '2.337.0'
+2026-10-08T15:12:05.1535870Z ##[group]Runner Image Provisioner
+2026-10-08T15:12:05.1536650Z Hosted Compute Agent
+2026-10-08T15:12:05.1537110Z Version: 20260828.587
+2026-10-08T15:12:05.1537800Z Commit: abac92662cab4cc7352de4f9f9d2e2419aad9c29
+2026-10-08T15:12:05.1538430Z Build Date: 2026-08-28T16:44:25Z
+2026-10-08T15:12:05.1539060Z Worker ID: {b3c7dbd9-1fa6-4aef-a9df-640ac79463ff}
+2026-10-08T15:12:05.1539690Z Azure Region: westus
+2026-10-08T15:12:05.1540740Z ##[endgroup]
+2026-10-08T15:12:05.1542480Z ##[group]Operating System
+2026-10-08T15:12:05.1543170Z macOS
+2026-10-08T15:12:05.1543660Z 26.6.2
+2026-10-08T15:12:05.1544010Z 25G83
+2026-10-08T15:12:05.1544450Z ##[endgroup]
+2026-10-08T15:12:05.1544940Z ##[group]Runner Image
+2026-10-08T15:12:05.1545420Z Image: macos-26-arm64
+2026-10-08T15:12:05.1545880Z Version: 20260907.0351.1
+2026-10-08T15:12:05.1547030Z Included Software: https://github.com/actions/runner-images/blob/macos-26-arm64/20260907.0351/images/macos/macos-26-arm64-Readme.md
+2026-10-08T15:12:05.1548400Z Image Release: https://github.com/actions/runner-images/releases/tag/macos-26-arm64%2F20260907.0351
+2026-10-08T15:12:05.1549320Z ##[endgroup]
+2026-10-08T15:12:05.1550370Z ##[group]GITHUB_TOKEN Permissions
+2026-10-08T15:12:05.1552460Z Contents: read
+2026-10-08T15:12:05.1553450Z Metadata: read
+2026-10-08T15:12:05.1553900Z Packages: read
+2026-10-08T15:12:05.1554470Z ##[endgroup]
+2026-10-08T15:12:05.1556860Z Secret source: Actions
+2026-10-08T15:12:05.1560040Z Cache mode: write
+2026-10-08T15:12:05.1560800Z Prepare workflow directory
+2026-10-08T15:12:05.1973620Z Prepare all required actions
+2026-10-08T15:12:05.2037450Z Getting action download info
+2026-10-08T15:12:05.7112530Z Download action repository 'actions/checkout@v4' (SHA:11d5960a326750d5838078e36cf38b85af677262)
+2026-10-08T15:12:06.1872260Z Download action repository 'actions/setup-dotnet@v4' (SHA:67a3573c9a986a3f9c594539f4ab511d57bb3ce9)
+2026-10-08T15:12:06.7410510Z Download action repository 'actions/cache@v4' (SHA:0057852bfaa89a56745cba8c7296529d2fc39830)
+2026-10-08T15:12:06.8788740Z Download action repository 'actions/upload-artifact@v4' (SHA:ea165f8d65b6e75b540449e92b4886f43607fa02)
+2026-10-08T15:12:07.2091300Z Uses: Ozwasyd/FsusUI/.github/workflows/_quality.yml@refs/pull/861/merge (e36ce622a4a99fa21ab0f85fa2170499c2d3bd70)
+2026-10-08T15:12:07.2095570Z ##[group] Inputs
+2026-10-08T15:12:07.2096160Z   group: main
+2026-10-08T15:12:07.2096840Z   release_tag: 
+2026-10-08T15:12:07.2097510Z ##[endgroup]
+2026-10-08T15:12:07.2098320Z Complete job name: premerge-main / dotnet-platform (macos, macos-latest)
+2026-10-08T15:12:07.3417350Z ##[group]Run actions/checkout@v4
+2026-10-08T15:12:07.3418800Z with:
+2026-10-08T15:12:07.3419380Z   repository: Ozwasyd/FsusUI
+2026-10-08T15:12:07.3426630Z   token: ***
+2026-10-08T15:12:07.3428540Z   ssh-strict: true
+2026-10-08T15:12:07.3429690Z   ssh-user: git
+2026-10-08T15:12:07.3430500Z   persist-credentials: true
+2026-10-08T15:12:07.3432610Z   clean: true
+2026-10-08T15:12:07.3434090Z   sparse-checkout-cone-mode: true
+2026-10-08T15:12:07.3437850Z   fetch-depth: 1
+2026-10-08T15:12:07.3439690Z   fetch-tags: false
+2026-10-08T15:12:07.3440770Z   show-progress: true
+2026-10-08T15:12:07.3442840Z   lfs: false
+2026-10-08T15:12:07.3443560Z   submodules: false
+2026-10-08T15:12:07.3446700Z   set-safe-directory: true
+2026-10-08T15:12:07.3447620Z   allow-unsafe-pr-checkout: false
+2026-10-08T15:12:07.3450240Z ##[endgroup]
+2026-10-08T15:12:08.1458530Z Syncing repository: Ozwasyd/FsusUI
+2026-10-08T15:12:08.1460380Z ##[group]Getting Git version info
+2026-10-08T15:12:08.1460980Z Working directory is '/Users/runner/work/FsusUI/FsusUI'
+2026-10-08T15:12:08.1461590Z [command]/opt/homebrew/bin/git version
+2026-10-08T15:12:08.2191650Z git version 2.55.0
+2026-10-08T15:12:08.2203290Z ##[endgroup]
+2026-10-08T15:12:08.2216210Z Copying '/Users/runner/.gitconfig' to '/Users/runner/work/_temp/eb7612b3-0d53-499f-be6f-988405d2a1e0/.gitconfig'
+2026-10-08T15:12:08.2218260Z Temporarily overriding HOME='/Users/runner/work/_temp/eb7612b3-0d53-499f-be6f-988405d2a1e0' before making global git config changes
+2026-10-08T15:12:08.2220050Z Adding repository directory to the temporary git global config as a safe directory
+2026-10-08T15:12:08.2222530Z [command]/opt/homebrew/bin/git config --global --add safe.directory /Users/runner/work/FsusUI/FsusUI
+2026-10-08T15:12:08.2460880Z Deleting the contents of '/Users/runner/work/FsusUI/FsusUI'
+2026-10-08T15:12:08.2467450Z ##[group]Initializing the repository
+2026-10-08T15:12:08.2470850Z [command]/opt/homebrew/bin/git init /Users/runner/work/FsusUI/FsusUI
+2026-10-08T15:12:08.3062250Z hint: Using 'master' as the name for the initial branch. This default branch name
+2026-10-08T15:12:08.3064850Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+2026-10-08T15:12:08.3065820Z hint: to use in all of your new repositories, which will suppress this warning,
+2026-10-08T15:12:08.3067610Z hint: call:
+2026-10-08T15:12:08.3068230Z hint:
+2026-10-08T15:12:08.3070580Z hint: 	git config --global init.defaultBranch <name>
+2026-10-08T15:12:08.3071710Z hint:
+2026-10-08T15:12:08.3072410Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+2026-10-08T15:12:08.3073460Z hint: 'development'. The just-created branch can be renamed via this command:
+2026-10-08T15:12:08.3074380Z hint:
+2026-10-08T15:12:08.3075040Z hint: 	git branch -m <name>
+2026-10-08T15:12:08.3077170Z hint:
+2026-10-08T15:12:08.3077820Z hint: Disable this message with "git config set advice.defaultBranchName false"
+2026-10-08T15:12:08.3078650Z Initialized empty Git repository in /Users/runner/work/FsusUI/FsusUI/.git/
+2026-10-08T15:12:08.3083790Z [command]/opt/homebrew/bin/git remote add origin https://github.com/Ozwasyd/FsusUI
+2026-10-08T15:12:08.3253020Z ##[endgroup]
+2026-10-08T15:12:08.3316300Z ##[group]Disabling automatic garbage collection
+2026-10-08T15:12:08.3317550Z [command]/opt/homebrew/bin/git config --local gc.auto 0
+2026-10-08T15:12:08.3363330Z ##[endgroup]
+2026-10-08T15:12:08.3364770Z ##[group]Setting up auth
+2026-10-08T15:12:08.3366790Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-10-08T15:12:08.3446340Z [command]/opt/homebrew/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-10-08T15:12:08.5169710Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-10-08T15:12:08.5248330Z [command]/opt/homebrew/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-10-08T15:12:08.7020540Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-10-08T15:12:08.7327380Z [command]/opt/homebrew/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-10-08T15:12:08.8876450Z [command]/opt/homebrew/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2026-10-08T15:12:08.8988450Z ##[endgroup]
+2026-10-08T15:12:08.8989240Z ##[group]Fetching the repository
+2026-10-08T15:12:08.8996320Z [command]/opt/homebrew/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +e36ce622a4a99fa21ab0f85fa2170499c2d3bd70:refs/remotes/pull/861/merge
+2026-10-08T15:12:11.3615350Z From https://github.com/Ozwasyd/FsusUI
+2026-10-08T15:12:11.3619750Z  * [new ref]         e36ce622a4a99fa21ab0f85fa2170499c2d3bd70 -> pull/861/merge
+2026-10-08T15:12:11.3628910Z ##[endgroup]
+2026-10-08T15:12:11.3629920Z ##[group]Determining the checkout info
+2026-10-08T15:12:11.3635330Z ##[endgroup]
+2026-10-08T15:12:11.3652000Z [command]/opt/homebrew/bin/git sparse-checkout disable
+2026-10-08T15:12:11.3855390Z [command]/opt/homebrew/bin/git config --local --unset-all extensions.worktreeConfig
+2026-10-08T15:12:11.3959850Z ##[group]Checking out the ref
+2026-10-08T15:12:11.3966310Z [command]/opt/homebrew/bin/git checkout --progress --force refs/remotes/pull/861/merge
+2026-10-08T15:12:12.4977620Z Updating files:  85% (4041/4713)
+2026-10-08T15:12:12.5105140Z Updating files:  86% (4054/4713)
+2026-10-08T15:12:12.5221270Z Updating files:  87% (4101/4713)
+2026-10-08T15:12:12.5273710Z Updating files:  88% (4148/4713)
+2026-10-08T15:12:12.5340030Z Updating files:  89% (4195/4713)
+2026-10-08T15:12:12.5412900Z Updating files:  90% (4242/4713)
+2026-10-08T15:12:12.5519160Z Updating files:  91% (4289/4713)
+2026-10-08T15:12:12.5581040Z Updating files:  92% (4336/4713)
+2026-10-08T15:12:12.5655340Z Updating files:  93% (4384/4713)
+2026-10-08T15:12:12.5752750Z Updating files:  94% (4431/4713)
+2026-10-08T15:12:12.5886810Z Updating files:  95% (4478/4713)
+2026-10-08T15:12:12.6082360Z Updating files:  96% (4525/4713)
+2026-10-08T15:12:12.6266960Z Updating files:  97% (4572/4713)
+2026-10-08T15:12:12.6589140Z Updating files:  98% (4619/4713)
+2026-10-08T15:12:12.6797750Z Updating files:  99% (4666/4713)
+2026-10-08T15:12:12.6831260Z Updating files: 100% (4713/4713)
+2026-10-08T15:12:12.6832180Z Updating files: 100% (4713/4713), done.
+2026-10-08T15:12:12.6960090Z HEAD is now at e36ce62 Merge 83036006069be5cfcd09724273d5705d8f848ad0 into b17077f3afd4a80ff3bdc0fe81d5dfc353ffddf2
+2026-10-08T15:12:12.7038870Z ##[endgroup]
+2026-10-08T15:12:12.7248820Z [command]/opt/homebrew/bin/git log -1 --format=%H
+2026-10-08T15:12:12.7349590Z e36ce622a4a99fa21ab0f85fa2170499c2d3bd70
+2026-10-08T15:12:12.8148910Z ##[group]Run actions/setup-dotnet@v4
+2026-10-08T15:12:12.8149240Z with:
+2026-10-08T15:12:12.8150170Z   global-json-file: dotnet/global.json
+2026-10-08T15:12:12.8150570Z   cache: false
+2026-10-08T15:12:12.8150870Z ##[endgroup]
+2026-10-08T15:12:13.2060960Z (node:1260) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-10-08T15:12:13.2062850Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-10-08T15:12:13.2081220Z [command]/Users/runner/work/_actions/actions/setup-dotnet/v4/externals/install-dotnet.sh --skip-non-versioned-files --runtime dotnet --channel LTS
+2026-10-08T15:12:13.7016530Z dotnet-install: Attempting to download using aka.ms link https://builds.dotnet.microsoft.com/dotnet/Runtime/10.0.12/dotnet-runtime-10.0.12-osx-arm64.tar.gz
+2026-10-08T15:12:14.2842980Z dotnet-install: Remote file https://builds.dotnet.microsoft.com/dotnet/Runtime/10.0.12/dotnet-runtime-10.0.12-osx-arm64.tar.gz size is 33249724 bytes.
+2026-10-08T15:12:14.2939850Z dotnet-install: Extracting archive from https://builds.dotnet.microsoft.com/dotnet/Runtime/10.0.12/dotnet-runtime-10.0.12-osx-arm64.tar.gz
+2026-10-08T15:12:15.0049600Z dotnet-install: Downloaded file size is 33249724 bytes.
+2026-10-08T15:12:15.0051120Z dotnet-install: The remote and local file sizes are equal.
+2026-10-08T15:12:15.0525810Z dotnet-install: Installed version is 10.0.12
+2026-10-08T15:12:15.0631420Z dotnet-install: Adding to current process PATH: `/Users/runner/.dotnet`. Note: This change will be visible only when sourcing script.
+2026-10-08T15:12:15.0634420Z dotnet-install: Note that the script does not resolve dependencies during installation.
+2026-10-08T15:12:15.0636690Z dotnet-install: To check the list of dependencies, go to https://learn.microsoft.com/dotnet/core/install, select your operating system and check the "Dependencies" section.
+2026-10-08T15:12:15.0638670Z dotnet-install: Installation finished successfully.
+2026-10-08T15:12:15.0677970Z [command]/Users/runner/work/_actions/actions/setup-dotnet/v4/externals/install-dotnet.sh --skip-non-versioned-files --channel 10.0
+2026-10-08T15:12:15.4914330Z dotnet-install: Attempting to download using aka.ms link https://builds.dotnet.microsoft.com/dotnet/Sdk/10.0.401/dotnet-sdk-10.0.401-osx-arm64.tar.gz
+2026-10-08T15:12:17.7751640Z dotnet-install: Remote file https://builds.dotnet.microsoft.com/dotnet/Sdk/10.0.401/dotnet-sdk-10.0.401-osx-arm64.tar.gz size is 230753980 bytes.
+2026-10-08T15:12:17.7770810Z dotnet-install: Extracting archive from https://builds.dotnet.microsoft.com/dotnet/Sdk/10.0.401/dotnet-sdk-10.0.401-osx-arm64.tar.gz
+2026-10-08T15:12:26.2063810Z dotnet-install: Downloaded file size is 230753980 bytes.
+2026-10-08T15:12:26.2077340Z dotnet-install: The remote and local file sizes are equal.
+2026-10-08T15:12:26.7270690Z dotnet-install: Installed version is 10.0.401
+2026-10-08T15:12:26.7573580Z dotnet-install: Adding to current process PATH: `/Users/runner/.dotnet`. Note: This change will be visible only when sourcing script.
+2026-10-08T15:12:26.7588970Z dotnet-install: Note that the script does not resolve dependencies during installation.
+2026-10-08T15:12:26.7691560Z dotnet-install: To check the list of dependencies, go to https://learn.microsoft.com/dotnet/core/install, select your operating system and check the "Dependencies" section.
+2026-10-08T15:12:26.7794370Z dotnet-install: Installation finished successfully.
+2026-10-08T15:12:27.6862070Z ##[group]Run actions/cache@v4
+2026-10-08T15:12:27.6862660Z with:
+2026-10-08T15:12:27.6863060Z   path: ~/.nuget/packages
+dotnet/**/obj
+
+2026-10-08T15:12:27.6864530Z   key: macOS-ARM64-fsusui-dotnet-sdk-d843ca74336cb92b4ac04630f110b46f1f34cb21d80580b54804b2124874b569-0a67c0c4c12530ca3cd0b06b64ab9f4d852357ddd26ffa110ddd39aa49c02219
+2026-10-08T15:12:27.6865590Z   restore-keys: macOS-ARM64-fsusui-dotnet-sdk-d843ca74336cb92b4ac04630f110b46f1f34cb21d80580b54804b2124874b569-
+
+2026-10-08T15:12:27.6866330Z   enableCrossOsArchive: false
+2026-10-08T15:12:27.6866590Z   fail-on-cache-miss: false
+2026-10-08T15:12:27.6866940Z   lookup-only: false
+2026-10-08T15:12:27.6867160Z   save-always: false
+2026-10-08T15:12:27.6867440Z env:
+2026-10-08T15:12:27.6867680Z   DOTNET_ROOT: /Users/runner/.dotnet
+2026-10-08T15:12:27.6868100Z ##[endgroup]
+2026-10-08T15:12:27.9501740Z (node:1873) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-10-08T15:12:27.9503120Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-10-08T15:12:28.2456090Z Cache not found for input keys: macOS-ARM64-fsusui-dotnet-sdk-d843ca74336cb92b4ac04630f110b46f1f34cb21d80580b54804b2124874b569-0a67c0c4c12530ca3cd0b06b64ab9f4d852357ddd26ffa110ddd39aa49c02219, macOS-ARM64-fsusui-dotnet-sdk-d843ca74336cb92b4ac04630f110b46f1f34cb21d80580b54804b2124874b569-
+2026-10-08T15:12:28.2542800Z ##[group]Run node scripts/dotnet-platform-verify.mjs --output dotnet/artifacts/platform/macos/manifest.json
+2026-10-08T15:12:28.2543690Z [36;1mnode scripts/dotnet-platform-verify.mjs --output dotnet/artifacts/platform/macos/manifest.json[0m
+2026-10-08T15:12:28.2601260Z shell: /bin/bash -e {0}
+2026-10-08T15:12:28.2601680Z env:
+2026-10-08T15:12:28.2601970Z   DOTNET_ROOT: /Users/runner/.dotnet
+2026-10-08T15:12:28.2602270Z ##[endgroup]
+2026-10-08T15:12:30.7361750Z   Determining projects to restore...
+2026-10-08T15:12:34.5777590Z   Restored /Users/runner/work/FsusUI/FsusUI/dotnet/FsusUI.Avalonia.FormGenerator.Tests/FsusUI.Avalonia.FormGenerator.Tests.csproj (in 3.2 sec).
+2026-10-08T15:12:44.6476330Z   Restored /Users/runner/work/FsusUI/FsusUI/dotnet/FsusUI.Avalonia.Demo/FsusUI.Avalonia.Demo.csproj (in 10.05 sec).
+2026-10-08T15:12:44.6585650Z   Restored /Users/runner/work/FsusUI/FsusUI/dotnet/FsusUI.Avalonia.ConsumerSample/FsusUI.Avalonia.ConsumerSample.csproj (in 8 ms).
+2026-10-08T15:12:44.6734530Z   Restored /Users/runner/work/FsusUI/FsusUI/dotnet/FsusUI.Avalonia.Themes.Smoke/FsusUI.Avalonia.Themes.Smoke.csproj (in 6 ms).
+2026-10-08T15:12:44.8038310Z   Restored /Users/runner/work/FsusUI/FsusUI/dotnet/FsusUI.Avalonia.Tests/FsusUI.Avalonia.Tests.csproj (in 125 ms).
+2026-10-08T15:12:44.8127350Z   Restored /Users/runner/work/FsusUI/FsusUI/dotnet/FsusUI.Avalonia.PerformanceTests/FsusUI.Avalonia.PerformanceTests.csproj (in 3 ms).
+2026-10-08T15:12:44.9287300Z   Restored /Users/runner/work/FsusUI/FsusUI/dotnet/FsusUI.Avalonia/FsusUI.Avalonia.csproj (in 107 ms).
+2026-10-08T15:12:44.9421120Z   Restored /Users/runner/work/FsusUI/FsusUI/dotnet/FsusUI.Avalonia.Themes/FsusUI.Avalonia.Themes.csproj (in 4 ms).
+2026-10-08T15:12:44.9518890Z   Restored /Users/runner/work/FsusUI/FsusUI/dotnet/FsusUI.Avalonia.Icons/FsusUI.Avalonia.Icons.csproj (in 4 ms).
+2026-10-08T15:12:46.5407890Z   Restored /Users/runner/work/FsusUI/FsusUI/dotnet/FsusUI.Avalonia.HeadlessTests/FsusUI.Avalonia.HeadlessTests.csproj (in 1.58 sec).
+2026-10-08T15:12:47.5215910Z   Restored /Users/runner/work/FsusUI/FsusUI/dotnet/FsusUI.Avalonia.FormGenerator/FsusUI.Avalonia.FormGenerator.csproj (in 974 ms).
+2026-10-08T15:12:50.3135450Z   FsusUI.Avalonia.FormGenerator -> /Users/runner/work/FsusUI/FsusUI/dotnet/FsusUI.Avalonia.FormGenerator/bin/Debug/netstandard2.0/FsusUI.Avalonia.FormGenerator.dll
+2026-10-08T15:13:05.3511540Z   FsusUI.Avalonia -> /Users/runner/work/FsusUI/FsusUI/dotnet/FsusUI.Avalonia/bin/Release/net10.0/FsusUI.Avalonia.dll
+2026-10-08T15:13:09.3746730Z   FsusUI.Avalonia.Themes -> /Users/runner/work/FsusUI/FsusUI/dotnet/FsusUI.Avalonia.Themes/bin/Release/net10.0/FsusUI.Avalonia.Themes.dll
+2026-10-08T15:13:10.4486870Z   FsusUI.Avalonia.Icons -> /Users/runner/work/FsusUI/FsusUI/dotnet/FsusUI.Avalonia.Icons/bin/Release/net10.0/FsusUI.Avalonia.Icons.dll
+2026-10-08T15:13:10.9944520Z   FsusUI.Avalonia.ConsumerSample -> /Users/runner/work/FsusUI/FsusUI/dotnet/FsusUI.Avalonia.ConsumerSample/bin/Release/net10.0/FsusUI.Avalonia.ConsumerSample.dll
+2026-10-08T15:13:13.1400000Z   FsusUI.Avalonia.Demo -> /Users/runner/work/FsusUI/FsusUI/dotnet/FsusUI.Avalonia.Demo/bin/Release/net10.0/FsusUI.Avalonia.Demo.dll
+2026-10-08T15:13:13.6323710Z   FsusUI.Avalonia.FormGenerator.Tests -> /Users/runner/work/FsusUI/FsusUI/dotnet/FsusUI.Avalonia.FormGenerator.Tests/bin/Release/net10.0/FsusUI.Avalonia.FormGenerator.Tests.dll
+2026-10-08T15:13:17.7471260Z ##[warning]/Users/runner/work/FsusUI/FsusUI/dotnet/FsusUI.Avalonia.HeadlessTests/FsusMarkdownEditorPageAndHistoryHeadlessTests.cs(162,5): warning xUnit2013: Do not use Assert.Equal() to check for collection size. Use Assert.Single instead. (https://xunit.net/xunit.analyzers/rules/xUnit2013) [/Users/runner/work/FsusUI/FsusUI/dotnet/FsusUI.Avalonia.HeadlessTests/FsusUI.Avalonia.HeadlessTests.csproj]
+2026-10-08T15:13:17.8085050Z   FsusUI.Avalonia.HeadlessTests -> /Users/runner/work/FsusUI/FsusUI/dotnet/FsusUI.Avalonia.HeadlessTests/bin/Release/net10.0/FsusUI.Avalonia.HeadlessTests.dll
+2026-10-08T15:13:18.4085820Z   FsusUI.Avalonia.PerformanceTests -> /Users/runner/work/FsusUI/FsusUI/dotnet/FsusUI.Avalonia.PerformanceTests/bin/Release/net10.0/FsusUI.Avalonia.PerformanceTests.dll
+2026-10-08T15:13:20.8145800Z   FsusUI.Avalonia.Tests -> /Users/runner/work/FsusUI/FsusUI/dotnet/FsusUI.Avalonia.Tests/bin/Release/net10.0/FsusUI.Avalonia.Tests.dll
+2026-10-08T15:13:21.6080820Z   FsusUI.Avalonia.Themes.Smoke -> /Users/runner/work/FsusUI/FsusUI/dotnet/FsusUI.Avalonia.Themes.Smoke/bin/Release/net10.0/FsusUI.Avalonia.Themes.Smoke.dll
+2026-10-08T15:13:21.6330830Z 
+2026-10-08T15:13:21.6340010Z Build succeeded.
+2026-10-08T15:13:21.6341840Z 
+2026-10-08T15:13:21.6351640Z ##[warning]/Users/runner/work/FsusUI/FsusUI/dotnet/FsusUI.Avalonia.HeadlessTests/FsusMarkdownEditorPageAndHistoryHeadlessTests.cs(162,5): warning xUnit2013: Do not use Assert.Equal() to check for collection size. Use Assert.Single instead. (https://xunit.net/xunit.analyzers/rules/xUnit2013) [/Users/runner/work/FsusUI/FsusUI/dotnet/FsusUI.Avalonia.HeadlessTests/FsusUI.Avalonia.HeadlessTests.csproj]
+2026-10-08T15:13:21.6386000Z     1 Warning(s)
+2026-10-08T15:13:21.6397780Z     0 Error(s)
+2026-10-08T15:13:21.6398280Z 
+2026-10-08T15:13:21.6411450Z Time Elapsed 00:00:33.63
+2026-10-08T15:13:22.5859650Z Test run for /Users/runner/work/FsusUI/FsusUI/dotnet/FsusUI.Avalonia.FormGenerator.Tests/bin/Release/net10.0/FsusUI.Avalonia.FormGenerator.Tests.dll (.NETCoreApp,Version=v10.0)
+2026-10-08T15:13:22.8777910Z A total of 1 test files matched the specified pattern.
+2026-10-08T15:13:24.2994260Z Results File: /Users/runner/work/FsusUI/FsusUI/dotnet/artifacts/platform/macos/test-results/_sjc20-cw713-02aa14c4-4535-401f-9e4d-91a3f370c6f5-BA228EA7E13D_2026-10-08_15_13_24_net10.0.trx
+2026-10-08T15:13:24.2998610Z 
+2026-10-08T15:13:24.3016260Z Passed!  - Failed:     0, Passed:     9, Skipped:     0, Total:     9, Duration: 812 ms - FsusUI.Avalonia.FormGenerator.Tests.dll (net10.0)
+2026-10-08T15:13:24.4477690Z Test run for /Users/runner/work/FsusUI/FsusUI/dotnet/FsusUI.Avalonia.HeadlessTests/bin/Release/net10.0/FsusUI.Avalonia.HeadlessTests.dll (.NETCoreApp,Version=v10.0)
+2026-10-08T15:13:24.7263950Z A total of 1 test files matched the specified pattern.
+2026-10-08T15:13:40.3654250Z [xUnit.net 00:00:15.20]     FsusUI.Avalonia.HeadlessTests.FsusNativeMenuTests.SameCommandModelUsableByCommandPaletteAndNativeMenu [FAIL]
+2026-10-08T15:13:40.4595780Z   Failed FsusUI.Avalonia.HeadlessTests.FsusNativeMenuTests.SameCommandModelUsableByCommandPaletteAndNativeMenu [5 ms]
+2026-10-08T15:13:40.4597100Z   Error Message:
+2026-10-08T15:13:40.4597720Z    Assert.Equal() Failure: Strings differ
+2026-10-08T15:13:40.4599800Z             ↓ (pos 1)
+2026-10-08T15:13:40.4600450Z Expected: "Ctrl+S"
+2026-10-08T15:13:40.4601290Z Actual:   "Command+S"
+2026-10-08T15:13:40.4601970Z             ↑ (pos 1)
+2026-10-08T15:13:40.4602440Z   Stack Trace:
+2026-10-08T15:13:40.4606000Z      at FsusUI.Avalonia.HeadlessTests.FsusNativeMenuTests.SameCommandModelUsableByCommandPaletteAndNativeMenu() in /_/dotnet/FsusUI.Avalonia.HeadlessTests/FsusNativeMenuTests.cs:line 57
+2026-10-08T15:13:40.4609180Z    at System.RuntimeMethodHandle.InvokeMethod(ObjectHandleOnStack target, Void** arguments, ObjectHandleOnStack sig, BOOL isConstructor, ObjectHandleOnStack result)
+2026-10-08T15:13:40.4610660Z    at System.RuntimeMethodHandle.InvokeMethod(ObjectHandleOnStack target, Void** arguments, ObjectHandleOnStack sig, BOOL isConstructor, ObjectHandleOnStack result)
+2026-10-08T15:13:40.4612000Z    at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+2026-10-08T15:13:40.4614590Z    at System.Reflection.RuntimeMethodInfo.Invoke(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)
+2026-10-08T15:13:42.4009570Z [xUnit.net 00:00:17.23]     FsusUI.Avalonia.HeadlessTests.FsusWebViewAdapterHeadlessTests.ProductionContextMenuFixtureRendersThemeViewportZoomAndAutomationMatrix [FAIL]
+2026-10-08T15:13:42.6263860Z   Failed FsusUI.Avalonia.HeadlessTests.FsusWebViewAdapterHeadlessTests.ProductionContextMenuFixtureRendersThemeViewportZoomAndAutomationMatrix [231 ms]
+2026-10-08T15:13:42.6264980Z   Error Message:
+2026-10-08T15:13:42.6265990Z    System.ComponentModel.Win32Exception : An error occurred trying to start process 'pdfinfo' with working directory '/Users/runner/work/FsusUI/FsusUI/dotnet/FsusUI.Avalonia.HeadlessTests/bin/Release/net10.0'. No such file or directory
+2026-10-08T15:13:42.6268350Z   Stack Trace:
+2026-10-08T15:13:42.6269710Z      at System.Diagnostics.Process.ForkAndExecProcess(ProcessStartInfo startInfo, String resolvedFilename, String[] argv, String[] envp, String cwd, Boolean setCredentials, UInt32 userId, UInt32 groupId, UInt32[] groups, Int32& stdinFd, Int32& stdoutFd, Int32& stderrFd, Boolean usesTerminal, Boolean throwOnNoExec)
+2026-10-08T15:13:42.6270880Z    at System.Diagnostics.Process.StartCore(ProcessStartInfo startInfo)
+2026-10-08T15:13:42.6272610Z    at System.Diagnostics.Process.Start(ProcessStartInfo startInfo)
+2026-10-08T15:13:42.6275290Z    at FsusUI.Avalonia.HeadlessTests.FsusWebViewAdapterHeadlessTests.RunTool(String fileName, String[] arguments) in /_/dotnet/FsusUI.Avalonia.HeadlessTests/FsusWebViewAdapterHeadlessTests.cs:line 416
+2026-10-08T15:13:42.6277180Z    at FsusUI.Avalonia.HeadlessTests.FsusWebViewAdapterHeadlessTests.ProductionContextMenuFixtureRendersThemeViewportZoomAndAutomationMatrix() in /_/dotnet/FsusUI.Avalonia.HeadlessTests/FsusWebViewAdapterHeadlessTests.cs:line 201
+2026-10-08T15:13:42.6278390Z --- End of stack trace from previous location ---
+2026-10-08T15:13:45.1709110Z [xUnit.net 00:00:20.00]     FsusUI.Avalonia.HeadlessTests.FsusNativeMenuHeadlessTests.CommandPaletteIntegratesWithSharedCommandsInHeadless [FAIL]
+2026-10-08T15:13:45.1897970Z   Failed FsusUI.Avalonia.HeadlessTests.FsusNativeMenuHeadlessTests.CommandPaletteIntegratesWithSharedCommandsInHeadless [< 1 ms]
+2026-10-08T15:13:45.1900390Z   Error Message:
+2026-10-08T15:13:45.1902190Z    Assert.Equal() Failure: Strings differ
+2026-10-08T15:13:45.1903620Z             ↓ (pos 1)
+2026-10-08T15:13:45.1904430Z Expected: "Ctrl+Z"
+2026-10-08T15:13:45.1905170Z Actual:   "Command+Z"
+2026-10-08T15:13:45.1907190Z             ↑ (pos 1)
+2026-10-08T15:13:45.1915860Z   Stack Trace:
+2026-10-08T15:13:45.1921180Z      at FsusUI.Avalonia.HeadlessTests.FsusNativeMenuHeadlessTests.CommandPaletteIntegratesWithSharedCommandsInHeadless() in /_/dotnet/FsusUI.Avalonia.HeadlessTests/FsusNativeMenuHeadlessTests.cs:line 180
+2026-10-08T15:13:45.1923160Z    at System.RuntimeMethodHandle.InvokeMethod(ObjectHandleOnStack target, Void** arguments, ObjectHandleOnStack sig, BOOL isConstructor, ObjectHandleOnStack result)
+2026-10-08T15:13:45.1926880Z    at System.RuntimeMethodHandle.InvokeMethod(ObjectHandleOnStack target, Void** arguments, ObjectHandleOnStack sig, BOOL isConstructor, ObjectHandleOnStack result)
+2026-10-08T15:13:45.1929400Z    at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+2026-10-08T15:13:45.1930900Z    at System.Reflection.RuntimeMethodInfo.Invoke(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)
+2026-10-08T15:13:45.4226240Z [xUnit.net 00:00:20.26]     FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests.DocumentTabsSupportCloseDragReorderOverflowContextAndPlatformCycling [FAIL]
+2026-10-08T15:13:45.4240900Z   Failed FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests.DocumentTabsSupportCloseDragReorderOverflowContextAndPlatformCycling [55 ms]
+2026-10-08T15:13:45.4243510Z   Error Message:
+2026-10-08T15:13:45.4244960Z    System.ArgumentOutOfRangeException : Index was out of range. Must be non-negative and less than the size of the collection. (Parameter 'index')
+2026-10-08T15:13:45.4248790Z   Stack Trace:
+2026-10-08T15:13:45.4249850Z      at System.Collections.Generic.List`1.get_Item(Int32 index)
+2026-10-08T15:13:45.4253900Z    at FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests.DocumentTabsSupportCloseDragReorderOverflowContextAndPlatformCycling() in /_/dotnet/FsusUI.Avalonia.HeadlessTests/FsusDesktopShellHeadlessTests.cs:line 167
+2026-10-08T15:13:45.4258500Z    at System.RuntimeMethodHandle.InvokeMethod(ObjectHandleOnStack target, Void** arguments, ObjectHandleOnStack sig, BOOL isConstructor, ObjectHandleOnStack result)
+2026-10-08T15:13:45.4261310Z    at System.RuntimeMethodHandle.InvokeMethod(ObjectHandleOnStack target, Void** arguments, ObjectHandleOnStack sig, BOOL isConstructor, ObjectHandleOnStack result)
+2026-10-08T15:13:45.4263810Z    at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+2026-10-08T15:13:45.4265840Z    at System.Reflection.RuntimeMethodInfo.Invoke(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)
+2026-10-08T15:13:47.2150080Z [xUnit.net 00:00:22.05]     FsusUI.Avalonia.HeadlessTests.FsusShortcutRecorderHeadlessTests.UserStartsRecordingAndPressesCtrlShiftPToCaptureOneShortcut [FAIL]
+2026-10-08T15:13:47.2359270Z [xUnit.net 00:00:22.07]     FsusUI.Avalonia.HeadlessTests.FsusShortcutRecorderHeadlessTests.ControlTemplateAppliesAcrossLightAndDarkThemes [FAIL]
+2026-10-08T15:13:47.2471420Z   Failed FsusUI.Avalonia.HeadlessTests.FsusShortcutRecorderHeadlessTests.UserStartsRecordingAndPressesCtrlShiftPToCaptureOneShortcut [6 ms]
+2026-10-08T15:13:47.2478340Z   Error Message:
+2026-10-08T15:13:47.2478970Z    Assert.Equal() Failure: Strings differ
+2026-10-08T15:13:47.2480120Z             ↓ (pos 1)
+2026-10-08T15:13:47.2480740Z Expected: "Ctrl+Shift+P"
+2026-10-08T15:13:47.2481320Z Actual:   "Command+Shift+P"
+2026-10-08T15:13:47.2488690Z             ↑ (pos 1)
+2026-10-08T15:13:47.2489300Z   Stack Trace:
+2026-10-08T15:13:47.2490490Z      at FsusUI.Avalonia.HeadlessTests.FsusShortcutRecorderHeadlessTests.UserStartsRecordingAndPressesCtrlShiftPToCaptureOneShortcut() in /_/dotnet/FsusUI.Avalonia.HeadlessTests/FsusShortcutRecorderHeadlessTests.cs:line 46
+2026-10-08T15:13:47.2492820Z    at System.RuntimeMethodHandle.InvokeMethod(ObjectHandleOnStack target, Void** arguments, ObjectHandleOnStack sig, BOOL isConstructor, ObjectHandleOnStack result)
+2026-10-08T15:13:47.2494120Z    at System.RuntimeMethodHandle.InvokeMethod(ObjectHandleOnStack target, Void** arguments, ObjectHandleOnStack sig, BOOL isConstructor, ObjectHandleOnStack result)
+2026-10-08T15:13:47.2495150Z    at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+2026-10-08T15:13:47.2496140Z    at System.Reflection.RuntimeMethodInfo.Invoke(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)
+2026-10-08T15:13:47.2500980Z   Failed FsusUI.Avalonia.HeadlessTests.FsusShortcutRecorderHeadlessTests.ControlTemplateAppliesAcrossLightAndDarkThemes [11 ms]
+2026-10-08T15:13:47.2502080Z   Error Message:
+2026-10-08T15:13:47.2502690Z    Assert.Equal() Failure: Strings differ
+2026-10-08T15:13:47.2505490Z             ↓ (pos 1)
+2026-10-08T15:13:47.2506150Z Expected: "Ctrl+F"
+2026-10-08T15:13:47.2506640Z Actual:   "Command+F"
+2026-10-08T15:13:47.2508700Z             ↑ (pos 1)
+2026-10-08T15:13:47.2509360Z   Stack Trace:
+2026-10-08T15:13:47.2510520Z      at FsusUI.Avalonia.HeadlessTests.FsusShortcutRecorderHeadlessTests.ControlTemplateAppliesAcrossLightAndDarkThemes() in /_/dotnet/FsusUI.Avalonia.HeadlessTests/FsusShortcutRecorderHeadlessTests.cs:line 149
+2026-10-08T15:13:47.2512030Z    at System.RuntimeMethodHandle.InvokeMethod(ObjectHandleOnStack target, Void** arguments, ObjectHandleOnStack sig, BOOL isConstructor, ObjectHandleOnStack result)
+2026-10-08T15:13:47.2513370Z    at System.RuntimeMethodHandle.InvokeMethod(ObjectHandleOnStack target, Void** arguments, ObjectHandleOnStack sig, BOOL isConstructor, ObjectHandleOnStack result)
+2026-10-08T15:13:47.2520360Z    at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+2026-10-08T15:13:47.2521570Z    at System.Reflection.RuntimeMethodInfo.Invoke(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)
+2026-10-08T15:13:47.2576190Z [xUnit.net 00:00:22.09]     FsusUI.Avalonia.HeadlessTests.FsusShortcutRecorderHeadlessTests.EscapeCancelsRecordingAndDoesNotChangeOriginalValue [FAIL]
+2026-10-08T15:13:47.3871670Z   Failed FsusUI.Avalonia.HeadlessTests.FsusShortcutRecorderHeadlessTests.EscapeCancelsRecordingAndDoesNotChangeOriginalValue [7 ms]
+2026-10-08T15:13:47.3893380Z   Error Message:
+2026-10-08T15:13:47.3896050Z    Assert.Equal() Failure: Strings differ
+2026-10-08T15:13:47.3898280Z             ↓ (pos 1)
+2026-10-08T15:13:47.3899950Z Expected: "Ctrl+S"
+2026-10-08T15:13:47.3901370Z Actual:   "Command+S"
+2026-10-08T15:13:47.3908490Z             ↑ (pos 1)
+2026-10-08T15:13:47.3909030Z   Stack Trace:
+2026-10-08T15:13:47.3910990Z      at FsusUI.Avalonia.HeadlessTests.FsusShortcutRecorderHeadlessTests.EscapeCancelsRecordingAndDoesNotChangeOriginalValue() in /_/dotnet/FsusUI.Avalonia.HeadlessTests/FsusShortcutRecorderHeadlessTests.cs:line 74
+2026-10-08T15:13:47.3912630Z    at System.RuntimeMethodHandle.InvokeMethod(ObjectHandleOnStack target, Void** arguments, ObjectHandleOnStack sig, BOOL isConstructor, ObjectHandleOnStack result)
+2026-10-08T15:13:47.3913970Z    at System.RuntimeMethodHandle.InvokeMethod(ObjectHandleOnStack target, Void** arguments, ObjectHandleOnStack sig, BOOL isConstructor, ObjectHandleOnStack result)
+2026-10-08T15:13:47.3915000Z    at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+2026-10-08T15:13:47.3916060Z    at System.Reflection.RuntimeMethodInfo.Invoke(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)
+2026-10-08T15:13:48.8204300Z [xUnit.net 00:00:23.65]     FsusUI.Avalonia.HeadlessTests.FsusTableV2RenderedEvidenceTests.RendersPopulatedAndEmptyContentRegionsToPng [FAIL]
+2026-10-08T15:13:48.8918170Z [xUnit.net 00:00:23.72]     FsusUI.Avalonia.HeadlessTests.FsusTableV2RenderedEvidenceTests.RendersWholeHeaderAndOverlayContentRegionsToPng [FAIL]
+2026-10-08T15:13:49.3175210Z   Failed FsusUI.Avalonia.HeadlessTests.FsusTableV2RenderedEvidenceTests.RendersPopulatedAndEmptyContentRegionsToPng [73 ms]
+2026-10-08T15:13:49.3276600Z   Error Message:
+2026-10-08T15:13:49.3281310Z    Assert.Equal() Failure: Collections differ
+2026-10-08T15:13:49.3298530Z                           ↓ (pos 61)
+2026-10-08T15:13:49.3300420Z Expected: [···, 236, 221, 123, 84, 84, ···]
+2026-10-08T15:13:49.3302580Z Actual:   [···, 236, 221, 119, 88, 20, ···]
+2026-10-08T15:13:49.3307670Z                           ↑ (pos 61)
+2026-10-08T15:13:49.3308770Z   Stack Trace:
+2026-10-08T15:13:49.3310480Z      at FsusUI.Avalonia.HeadlessTests.FsusTableV2RenderedEvidenceTests.SaveOrVerifyArtifact(RenderTargetBitmap bitmap, String outputPath) in /_/dotnet/FsusUI.Avalonia.HeadlessTests/FsusTableV2RenderedEvidenceTests.cs:line 331
+2026-10-08T15:13:49.3314660Z    at FsusUI.Avalonia.HeadlessTests.FsusTableV2RenderedEvidenceTests.RendersPopulatedAndEmptyContentRegionsToPng() in /_/dotnet/FsusUI.Avalonia.HeadlessTests/FsusTableV2RenderedEvidenceTests.cs:line 130
+2026-10-08T15:13:49.3317990Z    at System.RuntimeMethodHandle.InvokeMethod(ObjectHandleOnStack target, Void** arguments, ObjectHandleOnStack sig, BOOL isConstructor, ObjectHandleOnStack result)
+2026-10-08T15:13:49.3319840Z    at System.RuntimeMethodHandle.InvokeMethod(ObjectHandleOnStack target, Void** arguments, ObjectHandleOnStack sig, BOOL isConstructor, ObjectHandleOnStack result)
+2026-10-08T15:13:49.3332810Z    at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+2026-10-08T15:13:49.3336210Z    at System.Reflection.RuntimeMethodInfo.Invoke(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)
+2026-10-08T15:13:49.3339460Z   Failed FsusUI.Avalonia.HeadlessTests.FsusTableV2RenderedEvidenceTests.RendersWholeHeaderAndOverlayContentRegionsToPng [34 ms]
+2026-10-08T15:13:49.3341830Z   Error Message:
+2026-10-08T15:13:49.3342850Z    Assert.Equal() Failure: Collections differ
+2026-10-08T15:13:49.3344840Z                           ↓ (pos 59)
+2026-10-08T15:13:49.3346520Z Expected: [···, 120, 156, 236, 221, 123, ···]
+2026-10-08T15:13:49.3350080Z Actual:   [···, 120, 156, 237, 221, 121, ···]
+2026-10-08T15:13:49.3351390Z                           ↑ (pos 59)
+2026-10-08T15:13:49.3352550Z   Stack Trace:
+2026-10-08T15:13:49.3355370Z      at FsusUI.Avalonia.HeadlessTests.FsusTableV2RenderedEvidenceTests.SaveOrVerifyArtifact(RenderTargetBitmap bitmap, String outputPath) in /_/dotnet/FsusUI.Avalonia.HeadlessTests/FsusTableV2RenderedEvidenceTests.cs:line 331
+2026-10-08T15:13:49.3359780Z    at FsusUI.Avalonia.HeadlessTests.FsusTableV2RenderedEvidenceTests.RendersWholeHeaderAndOverlayContentRegionsToPng() in /_/dotnet/FsusUI.Avalonia.HeadlessTests/FsusTableV2RenderedEvidenceTests.cs:line 226
+2026-10-08T15:13:49.3367930Z    at System.RuntimeMethodHandle.InvokeMethod(ObjectHandleOnStack target, Void** arguments, ObjectHandleOnStack sig, BOOL isConstructor, ObjectHandleOnStack result)
+2026-10-08T15:13:49.3450890Z    at System.RuntimeMethodHandle.InvokeMethod(ObjectHandleOnStack target, Void** arguments, ObjectHandleOnStack sig, BOOL isConstructor, ObjectHandleOnStack result)
+2026-10-08T15:13:49.3452010Z    at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+2026-10-08T15:13:49.3453130Z    at System.Reflection.RuntimeMethodInfo.Invoke(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)
+2026-10-08T15:13:52.6629350Z [xUnit.net 00:00:27.49]     FsusUI.Avalonia.HeadlessTests.FsusMarkdownEditorAdjacentHeadlessTests.SearchOutlineAndFocusRenderThroughTheProductionProjectionSurface(variant: Light) [FAIL]
+2026-10-08T15:13:52.6792640Z [xUnit.net 00:00:27.51]     FsusUI.Avalonia.HeadlessTests.FsusMarkdownEditorAdjacentHeadlessTests.SearchOutlineAndFocusRenderThroughTheProductionProjectionSurface(variant: Dark) [FAIL]
+2026-10-08T15:13:52.8103520Z   Failed FsusUI.Avalonia.HeadlessTests.FsusMarkdownEditorAdjacentHeadlessTests.SearchOutlineAndFocusRenderThroughTheProductionProjectionSurface(variant: Light) [36 ms]
+2026-10-08T15:13:52.8106460Z   Error Message:
+2026-10-08T15:13:52.8107320Z    System.InvalidOperationException : Could not find repository root.
+2026-10-08T15:13:52.8108370Z   Stack Trace:
+2026-10-08T15:13:52.8110400Z      at FsusUI.Avalonia.HeadlessTests.FsusMarkdownEditorAdjacentHeadlessTests.FindRepositoryRoot(String sourceFile) in /_/dotnet/FsusUI.Avalonia.HeadlessTests/FsusMarkdownEditorAdjacentHeadlessTests.cs:line 196
+2026-10-08T15:13:52.8114820Z    at FsusUI.Avalonia.HeadlessTests.FsusMarkdownEditorAdjacentHeadlessTests.SearchOutlineAndFocusRenderThroughTheProductionProjectionSurface(FsusThemeVariant variant) in /_/dotnet/FsusUI.Avalonia.HeadlessTests/FsusMarkdownEditorAdjacentHeadlessTests.cs:line 131
+2026-10-08T15:13:52.8121370Z    at System.RuntimeMethodHandle.InvokeMethod(ObjectHandleOnStack target, Void** arguments, ObjectHandleOnStack sig, BOOL isConstructor, ObjectHandleOnStack result)
+2026-10-08T15:13:52.8123930Z    at System.RuntimeMethodHandle.InvokeMethod(ObjectHandleOnStack target, Void** arguments, ObjectHandleOnStack sig, BOOL isConstructor, ObjectHandleOnStack result)
+2026-10-08T15:13:52.8126000Z    at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+2026-10-08T15:13:52.8127880Z    at System.Reflection.MethodBaseInvoker.InvokeDirectByRefWithFewArgs(Object obj, Span`1 copyOfArgs, BindingFlags invokeAttr)
+2026-10-08T15:13:52.8130860Z   Failed FsusUI.Avalonia.HeadlessTests.FsusMarkdownEditorAdjacentHeadlessTests.SearchOutlineAndFocusRenderThroughTheProductionProjectionSurface(variant: Dark) [11 ms]
+2026-10-08T15:13:52.8133060Z   Error Message:
+2026-10-08T15:13:52.8133930Z    System.InvalidOperationException : Could not find repository root.
+2026-10-08T15:13:52.8134850Z   Stack Trace:
+2026-10-08T15:13:52.8137350Z      at FsusUI.Avalonia.HeadlessTests.FsusMarkdownEditorAdjacentHeadlessTests.FindRepositoryRoot(String sourceFile) in /_/dotnet/FsusUI.Avalonia.HeadlessTests/FsusMarkdownEditorAdjacentHeadlessTests.cs:line 196
+2026-10-08T15:13:52.8143960Z    at FsusUI.Avalonia.HeadlessTests.FsusMarkdownEditorAdjacentHeadlessTests.SearchOutlineAndFocusRenderThroughTheProductionProjectionSurface(FsusThemeVariant variant) in /_/dotnet/FsusUI.Avalonia.HeadlessTests/FsusMarkdownEditorAdjacentHeadlessTests.cs:line 131
+2026-10-08T15:13:52.8147360Z    at InvokeStub_FsusMarkdownEditorAdjacentHeadlessTests.SearchOutlineAndFocusRenderThroughTheProductionProjectionSurface(Object, Span`1)
+2026-10-08T15:13:52.8150750Z    at System.Reflection.MethodBaseInvoker.InvokeWithOneArg(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)
+2026-10-08T15:13:52.8852950Z Results File: /Users/runner/work/FsusUI/FsusUI/dotnet/artifacts/platform/macos/test-results/_sjc20-cw713-02aa14c4-4535-401f-9e4d-91a3f370c6f5-BA228EA7E13D_2026-10-08_15_13_29_net10.0.trx
+2026-10-08T15:13:52.8878960Z 
+2026-10-08T15:13:52.8949330Z Failed!  - Failed:    11, Passed:   268, Skipped:     0, Total:   279, Duration: 25 s - FsusUI.Avalonia.HeadlessTests.dll (net10.0)
+2026-10-08T15:13:53.0668440Z Test run for /Users/runner/work/FsusUI/FsusUI/dotnet/FsusUI.Avalonia.PerformanceTests/bin/Release/net10.0/FsusUI.Avalonia.PerformanceTests.dll (.NETCoreApp,Version=v10.0)
+2026-10-08T15:13:53.4192830Z A total of 1 test files matched the specified pattern.
+2026-10-08T15:13:55.7682530Z Results File: /Users/runner/work/FsusUI/FsusUI/dotnet/artifacts/platform/macos/test-results/_sjc20-cw713-02aa14c4-4535-401f-9e4d-91a3f370c6f5-BA228EA7E13D_2026-10-08_15_13_54_net10.0.trx
+2026-10-08T15:13:55.7685120Z 
+2026-10-08T15:13:55.7720520Z Passed!  - Failed:     0, Passed:    35, Skipped:     0, Total:    35, Duration: 1 s - FsusUI.Avalonia.PerformanceTests.dll (net10.0)
+2026-10-08T15:13:55.8404750Z Test run for /Users/runner/work/FsusUI/FsusUI/dotnet/FsusUI.Avalonia.Tests/bin/Release/net10.0/FsusUI.Avalonia.Tests.dll (.NETCoreApp,Version=v10.0)
+2026-10-08T15:13:56.0848010Z A total of 1 test files matched the specified pattern.
+2026-10-08T15:13:56.9038380Z [xUnit.net 00:00:00.40]     FsusUI.Avalonia.Tests.Controls.FsusMarkdownProjectionProducerContractTests.FrozenPositiveAndNegativeVectorsFailClosedWithExactReasons [FAIL]
+2026-10-08T15:13:56.9086930Z [xUnit.net 00:00:00.41]     FsusUI.Avalonia.Tests.Controls.FsusMarkdownProjectionProducerContractTests.MachineContractMatchesPublicVersionRuntimeAndVocabulary [FAIL]
+2026-10-08T15:13:57.0416080Z   Failed FsusUI.Avalonia.Tests.Controls.FsusMarkdownProjectionProducerContractTests.FrozenPositiveAndNegativeVectorsFailClosedWithExactReasons [< 1 ms]
+2026-10-08T15:13:57.0419210Z   Error Message:
+2026-10-08T15:13:57.0420020Z    System.IO.DirectoryNotFoundException : FsusUI repository root was not found.
+2026-10-08T15:13:57.0420610Z   Stack Trace:
+2026-10-08T15:13:57.0423270Z      at FsusUI.Avalonia.Tests.Controls.FsusMarkdownProjectionProducerContractTests.RepositoryRoot(String sourceFile) in /_/dotnet/FsusUI.Avalonia.Tests/Controls/FsusMarkdownProjectionProducerContractTests.cs:line 392
+2026-10-08T15:13:57.0428310Z    at FsusUI.Avalonia.Tests.Controls.FsusMarkdownProjectionProducerContractTests.FrozenPositiveAndNegativeVectorsFailClosedWithExactReasons() in /_/dotnet/FsusUI.Avalonia.Tests/Controls/FsusMarkdownProjectionProducerContractTests.cs:line 45
+2026-10-08T15:13:57.0430110Z    at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+2026-10-08T15:13:57.0430980Z    at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)
+2026-10-08T15:13:57.0432170Z   Failed FsusUI.Avalonia.Tests.Controls.FsusMarkdownProjectionProducerContractTests.MachineContractMatchesPublicVersionRuntimeAndVocabulary [< 1 ms]
+2026-10-08T15:13:57.0433170Z   Error Message:
+2026-10-08T15:13:57.0433600Z    System.IO.DirectoryNotFoundException : FsusUI repository root was not found.
+2026-10-08T15:13:57.0434260Z   Stack Trace:
+2026-10-08T15:13:57.0435290Z      at FsusUI.Avalonia.Tests.Controls.FsusMarkdownProjectionProducerContractTests.RepositoryRoot(String sourceFile) in /_/dotnet/FsusUI.Avalonia.Tests/Controls/FsusMarkdownProjectionProducerContractTests.cs:line 392
+2026-10-08T15:13:57.0437850Z    at FsusUI.Avalonia.Tests.Controls.FsusMarkdownProjectionProducerContractTests.MachineContractMatchesPublicVersionRuntimeAndVocabulary() in /_/dotnet/FsusUI.Avalonia.Tests/Controls/FsusMarkdownProjectionProducerContractTests.cs:line 12
+2026-10-08T15:13:57.0443740Z    at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+2026-10-08T15:13:57.0444750Z    at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)
+2026-10-08T15:13:57.1146340Z [xUnit.net 00:00:00.62]     FsusUI.Avalonia.Tests.Controls.FsusTextEditorPrimitiveTests.TextEditorHandlesTypingSelectionPasteUndoRedoAndPreviewSync [FAIL]
+2026-10-08T15:13:57.1998490Z   Failed FsusUI.Avalonia.Tests.Controls.FsusTextEditorPrimitiveTests.TextEditorHandlesTypingSelectionPasteUndoRedoAndPreviewSync [4 ms]
+2026-10-08T15:13:57.2000570Z   Error Message:
+2026-10-08T15:13:57.2001300Z    Assert.Equal() Failure: Strings differ
+2026-10-08T15:13:57.2003130Z            ↓ (pos 0)
+2026-10-08T15:13:57.2003820Z Expected: "ready, 30 chars, selection 30-30, preview"···
+2026-10-08T15:13:57.2004350Z Actual:   "30 chars, selection 30-30, preview synced"···
+2026-10-08T15:13:57.2005130Z            ↑ (pos 0)
+2026-10-08T15:13:57.2005510Z   Stack Trace:
+2026-10-08T15:13:57.2006490Z      at FsusUI.Avalonia.Tests.Controls.FsusTextEditorPrimitiveTests.TextEditorHandlesTypingSelectionPasteUndoRedoAndPreviewSync() in /_/dotnet/FsusUI.Avalonia.Tests/Controls/FsusTextEditorPrimitiveTests.cs:line 72
+2026-10-08T15:13:57.2007530Z --- End of stack trace from previous location ---
+2026-10-08T15:13:57.5787530Z [xUnit.net 00:00:01.08]     FsusUI.Avalonia.Tests.Controls.FsusMarkdownEditorPairInputVectorTests.TheFrozenPairInputVectorSetIsFullyCovered [FAIL]
+2026-10-08T15:13:57.5835110Z [xUnit.net 00:00:01.08]     FsusUI.Avalonia.Tests.Controls.FsusMarkdownEditorPairInputVectorTests.AvaloniaProducesTheFrozenWebPairInputVector [FAIL]
+2026-10-08T15:13:57.5836200Z   Failed FsusUI.Avalonia.Tests.Controls.FsusMarkdownEditorPairInputVectorTests.TheFrozenPairInputVectorSetIsFullyCovered [< 1 ms]
+2026-10-08T15:13:57.5837300Z   Error Message:
+2026-10-08T15:13:57.5837880Z    System.IO.DirectoryNotFoundException : FsusUI repository root was not found.
+2026-10-08T15:13:57.5838500Z   Stack Trace:
+2026-10-08T15:13:57.5839740Z      at FsusUI.Avalonia.Tests.Controls.FsusMarkdownEditorPairInputVectorTests.RepositoryRoot(String sourceFile) in /_/dotnet/FsusUI.Avalonia.Tests/Controls/FsusMarkdownEditorPairInputVectorTests.cs:line 125
+2026-10-08T15:13:57.5841200Z    at FsusUI.Avalonia.Tests.Controls.FsusMarkdownEditorPairInputVectorTests.LoadVectors() in /_/dotnet/FsusUI.Avalonia.Tests/Controls/FsusMarkdownEditorPairInputVectorTests.cs:line 103
+2026-10-08T15:13:57.5842680Z    at FsusUI.Avalonia.Tests.Controls.FsusMarkdownEditorPairInputVectorTests.TheFrozenPairInputVectorSetIsFullyCovered() in /_/dotnet/FsusUI.Avalonia.Tests/Controls/FsusMarkdownEditorPairInputVectorTests.cs:line 54
+2026-10-08T15:13:57.5843970Z    at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+2026-10-08T15:13:57.5847430Z    at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)
+2026-10-08T15:13:57.5880810Z   Failed FsusUI.Avalonia.Tests.Controls.FsusMarkdownEditorPairInputVectorTests.AvaloniaProducesTheFrozenWebPairInputVector [1 ms]
+2026-10-08T15:13:57.5883850Z   Error Message:
+2026-10-08T15:13:57.5884780Z    System.IO.DirectoryNotFoundException : FsusUI repository root was not found.
+2026-10-08T15:13:57.5885420Z   Stack Trace:
+2026-10-08T15:13:57.5886200Z      at FsusUI.Avalonia.Tests.Controls.FsusMarkdownEditorPairInputVectorTests.RepositoryRoot(String sourceFile) in /_/dotnet/FsusUI.Avalonia.Tests/Controls/FsusMarkdownEditorPairInputVectorTests.cs:line 125
+2026-10-08T15:13:57.5887660Z    at FsusUI.Avalonia.Tests.Controls.FsusMarkdownEditorPairInputVectorTests.LoadVectors() in /_/dotnet/FsusUI.Avalonia.Tests/Controls/FsusMarkdownEditorPairInputVectorTests.cs:line 103
+2026-10-08T15:13:57.5889680Z    at FsusUI.Avalonia.Tests.Controls.FsusMarkdownEditorPairInputVectorTests.FrozenPairVectorIds() in /_/dotnet/FsusUI.Avalonia.Tests/Controls/FsusMarkdownEditorPairInputVectorTests.cs:line 19
+2026-10-08T15:13:57.5890630Z    at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+2026-10-08T15:13:57.5891220Z    at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)
+2026-10-08T15:13:57.5926860Z [xUnit.net 00:00:01.09]     FsusUI.Avalonia.Tests.Controls.FsusShortcutRecorderTests.EscapeCancelsRecordingAndPreservesOriginalValue [FAIL]
+2026-10-08T15:13:57.5996850Z [xUnit.net 00:00:01.10]     FsusUI.Avalonia.Tests.Controls.FsusShortcutRecorderTests.RecorderCapturesSingleShortcutOnKeyCombination [FAIL]
+2026-10-08T15:13:57.6034600Z   Failed FsusUI.Avalonia.Tests.Controls.FsusShortcutRecorderTests.EscapeCancelsRecordingAndPreservesOriginalValue [8 ms]
+2026-10-08T15:13:57.6037570Z [xUnit.net 00:00:01.10]     FsusUI.Avalonia.Tests.Controls.FsusMarkdownNativeEventVectorTests.CoversEveryFrozenCompositionVector [FAIL]
+2026-10-08T15:13:57.6039840Z [xUnit.net 00:00:01.10]     FsusUI.Avalonia.Tests.Controls.FsusMarkdownNativeEventVectorTests.ProducesTheFrozenPlansAndTrace [FAIL]
+2026-10-08T15:13:57.6040510Z   Error Message:
+2026-10-08T15:13:57.6040730Z    Assert.Equal() Failure: Strings differ
+2026-10-08T15:13:57.6041210Z             ↓ (pos 1)
+2026-10-08T15:13:57.6041440Z Expected: "Ctrl+S"
+2026-10-08T15:13:57.6041710Z Actual:   "Command+S"
+2026-10-08T15:13:57.6041930Z             ↑ (pos 1)
+2026-10-08T15:13:57.6042190Z   Stack Trace:
+2026-10-08T15:13:57.6042940Z      at FsusUI.Avalonia.Tests.Controls.FsusShortcutRecorderTests.EscapeCancelsRecordingAndPreservesOriginalValue() in /_/dotnet/FsusUI.Avalonia.Tests/Controls/FsusShortcutRecorderTests.cs:line 183
+2026-10-08T15:13:57.6044590Z    at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+2026-10-08T15:13:57.6045350Z    at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)
+2026-10-08T15:13:57.6046090Z   Failed FsusUI.Avalonia.Tests.Controls.FsusShortcutRecorderTests.RecorderCapturesSingleShortcutOnKeyCombination [3 ms]
+2026-10-08T15:13:57.6046700Z   Error Message:
+2026-10-08T15:13:57.6046920Z    Assert.Equal() Failure: Strings differ
+2026-10-08T15:13:57.6047270Z             ↓ (pos 1)
+2026-10-08T15:13:57.6047490Z Expected: "Ctrl+Shift+P"
+2026-10-08T15:13:57.6047790Z Actual:   "Command+Shift+P"
+2026-10-08T15:13:57.6048030Z             ↑ (pos 1)
+2026-10-08T15:13:57.6048290Z   Stack Trace:
+2026-10-08T15:13:57.6049060Z      at FsusUI.Avalonia.Tests.Controls.FsusShortcutRecorderTests.RecorderCapturesSingleShortcutOnKeyCombination() in /_/dotnet/FsusUI.Avalonia.Tests/Controls/FsusShortcutRecorderTests.cs:line 169
+2026-10-08T15:13:57.6049990Z    at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+2026-10-08T15:13:57.6050660Z    at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)
+2026-10-08T15:13:57.6270520Z   Failed FsusUI.Avalonia.Tests.Controls.FsusMarkdownNativeEventVectorTests.CoversEveryFrozenCompositionVector [< 1 ms]
+2026-10-08T15:13:57.6292790Z   Error Message:
+2026-10-08T15:13:57.6300450Z    System.IO.DirectoryNotFoundException : FsusUI repository root was not found.
+2026-10-08T15:13:57.6328660Z   Stack Trace:
+2026-10-08T15:13:57.6329790Z      at FsusUI.Avalonia.Tests.Controls.FsusMarkdownNativeEventVectorTests.RepositoryRoot(String sourceFile) in /_/dotnet/FsusUI.Avalonia.Tests/Controls/FsusMarkdownNativeEventVectorTests.cs:line 213
+2026-10-08T15:13:57.6334530Z    at FsusUI.Avalonia.Tests.Controls.FsusMarkdownNativeEventVectorTests.LoadComposition() in /_/dotnet/FsusUI.Avalonia.Tests/Controls/FsusMarkdownNativeEventVectorTests.cs:line 68
+2026-10-08T15:13:57.6338300Z    at FsusUI.Avalonia.Tests.Controls.FsusMarkdownNativeEventVectorTests.CoversEveryFrozenCompositionVector() in /_/dotnet/FsusUI.Avalonia.Tests/Controls/FsusMarkdownNativeEventVectorTests.cs:line 53
+2026-10-08T15:13:57.6343910Z    at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+2026-10-08T15:13:57.6355040Z    at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)
+2026-10-08T15:13:57.6357680Z   Failed FsusUI.Avalonia.Tests.Controls.FsusMarkdownNativeEventVectorTests.ProducesTheFrozenPlansAndTrace [1 ms]
+2026-10-08T15:13:57.6361140Z   Error Message:
+2026-10-08T15:13:57.6363150Z    System.IO.DirectoryNotFoundException : FsusUI repository root was not found.
+2026-10-08T15:13:57.6365340Z   Stack Trace:
+2026-10-08T15:13:57.6368330Z      at FsusUI.Avalonia.Tests.Controls.FsusMarkdownNativeEventVectorTests.RepositoryRoot(String sourceFile) in /_/dotnet/FsusUI.Avalonia.Tests/Controls/FsusMarkdownNativeEventVectorTests.cs:line 213
+2026-10-08T15:13:57.6372230Z    at FsusUI.Avalonia.Tests.Controls.FsusMarkdownNativeEventVectorTests.LoadComposition() in /_/dotnet/FsusUI.Avalonia.Tests/Controls/FsusMarkdownNativeEventVectorTests.cs:line 68
+2026-10-08T15:13:57.6375830Z    at FsusUI.Avalonia.Tests.Controls.FsusMarkdownNativeEventVectorTests.CompositionVectors() in /_/dotnet/FsusUI.Avalonia.Tests/Controls/FsusMarkdownNativeEventVectorTests.cs:line 59
+2026-10-08T15:13:57.6383280Z    at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+2026-10-08T15:13:57.6385240Z    at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)
+2026-10-08T15:13:57.8400410Z [xUnit.net 00:00:01.34]     FsusUI.Avalonia.Tests.Controls.FsusMarkdownEditorSharedVectorTests.AvaloniaProducesTheFrozenWebSharedTraces [FAIL]
+2026-10-08T15:13:57.8402300Z [xUnit.net 00:00:01.34]     FsusUI.Avalonia.Tests.Controls.FsusMarkdownEditorSharedVectorTests.AvaloniaProducesTheFrozenWebSharedPositionMaps [FAIL]
+2026-10-08T15:13:57.8417710Z   Failed FsusUI.Avalonia.Tests.Controls.FsusMarkdownEditorSharedVectorTests.AvaloniaProducesTheFrozenWebSharedTraces [< 1 ms]
+2026-10-08T15:13:57.8418480Z   Error Message:
+2026-10-08T15:13:57.8418870Z    System.IO.DirectoryNotFoundException : FsusUI repository root was not found.
+2026-10-08T15:13:57.8419340Z   Stack Trace:
+2026-10-08T15:13:57.8420050Z      at FsusUI.Avalonia.Tests.Controls.FsusMarkdownEditorSharedVectorTests.RepositoryRoot(String sourceFile) in /_/dotnet/FsusUI.Avalonia.Tests/Controls/FsusMarkdownEditorSharedVectorTests.cs:line 292
+2026-10-08T15:13:57.8421300Z    at FsusUI.Avalonia.Tests.Controls.FsusMarkdownEditorSharedVectorTests.LoadVectors() in /_/dotnet/FsusUI.Avalonia.Tests/Controls/FsusMarkdownEditorSharedVectorTests.cs:line 270
+2026-10-08T15:13:57.8422620Z    at FsusUI.Avalonia.Tests.Controls.FsusMarkdownEditorSharedVectorTests.AvaloniaProducesTheFrozenWebSharedTraces() in /_/dotnet/FsusUI.Avalonia.Tests/Controls/FsusMarkdownEditorSharedVectorTests.cs:line 12
+2026-10-08T15:13:57.8423660Z    at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+2026-10-08T15:13:57.8424390Z    at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)
+2026-10-08T15:13:57.8425230Z   Failed FsusUI.Avalonia.Tests.Controls.FsusMarkdownEditorSharedVectorTests.AvaloniaProducesTheFrozenWebSharedPositionMaps [< 1 ms]
+2026-10-08T15:13:57.8425970Z   Error Message:
+2026-10-08T15:13:57.8426290Z    System.IO.DirectoryNotFoundException : FsusUI repository root was not found.
+2026-10-08T15:13:57.8426720Z   Stack Trace:
+2026-10-08T15:13:57.8427490Z      at FsusUI.Avalonia.Tests.Controls.FsusMarkdownEditorSharedVectorTests.RepositoryRoot(String sourceFile) in /_/dotnet/FsusUI.Avalonia.Tests/Controls/FsusMarkdownEditorSharedVectorTests.cs:line 292
+2026-10-08T15:13:57.8428950Z    at FsusUI.Avalonia.Tests.Controls.FsusMarkdownEditorSharedVectorTests.LoadVectors() in /_/dotnet/FsusUI.Avalonia.Tests/Controls/FsusMarkdownEditorSharedVectorTests.cs:line 270
+2026-10-08T15:13:57.8430300Z    at FsusUI.Avalonia.Tests.Controls.FsusMarkdownEditorSharedVectorTests.AvaloniaProducesTheFrozenWebSharedPositionMaps() in /_/dotnet/FsusUI.Avalonia.Tests/Controls/FsusMarkdownEditorSharedVectorTests.cs:line 63
+2026-10-08T15:13:57.8431980Z    at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+2026-10-08T15:13:57.8432660Z    at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)
+2026-10-08T15:13:57.8905330Z [xUnit.net 00:00:01.39]     FsusUI.Avalonia.Tests.Controls.FsusMarkdownEditorBlockInputVectorTests.AvaloniaProducesTheFrozenWebBlockInputPlans [FAIL]
+2026-10-08T15:13:57.9151670Z   Failed FsusUI.Avalonia.Tests.Controls.FsusMarkdownEditorBlockInputVectorTests.AvaloniaProducesTheFrozenWebBlockInputPlans [< 1 ms]
+2026-10-08T15:13:57.9153520Z   Error Message:
+2026-10-08T15:13:57.9154440Z    System.IO.DirectoryNotFoundException : FsusUI repository root was not found.
+2026-10-08T15:13:57.9155470Z   Stack Trace:
+2026-10-08T15:13:57.9157500Z      at FsusUI.Avalonia.Tests.Controls.FsusMarkdownEditorBlockInputVectorTests.RepositoryRoot(String sourceFile) in /_/dotnet/FsusUI.Avalonia.Tests/Controls/FsusMarkdownEditorBlockInputVectorTests.cs:line 114
+2026-10-08T15:13:57.9160930Z    at FsusUI.Avalonia.Tests.Controls.FsusMarkdownEditorBlockInputVectorTests.LoadVectors() in /_/dotnet/FsusUI.Avalonia.Tests/Controls/FsusMarkdownEditorBlockInputVectorTests.cs:line 91
+2026-10-08T15:13:57.9164520Z    at FsusUI.Avalonia.Tests.Controls.FsusMarkdownEditorBlockInputVectorTests.AvaloniaProducesTheFrozenWebBlockInputPlans() in /_/dotnet/FsusUI.Avalonia.Tests/Controls/FsusMarkdownEditorBlockInputVectorTests.cs:line 12
+2026-10-08T15:13:57.9167350Z    at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+2026-10-08T15:13:57.9168950Z    at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)
+2026-10-08T15:14:00.0464410Z [xUnit.net 00:00:03.54]     FsusUI.Avalonia.Tests.Controls.FsusMarkdownEditorClipboardVectorTests.FrozenClipboardVectorSuiteCoversThirteenVectors [FAIL]
+2026-10-08T15:14:00.0495110Z [xUnit.net 00:00:03.55]     FsusUI.Avalonia.Tests.Controls.FsusMarkdownEditorClipboardVectorTests.AvaloniaProducesTheFrozenWebClipboardPlans [FAIL]
+2026-10-08T15:14:00.1163420Z   Failed FsusUI.Avalonia.Tests.Controls.FsusMarkdownEditorClipboardVectorTests.FrozenClipboardVectorSuiteCoversThirteenVectors [< 1 ms]
+2026-10-08T15:14:00.1164260Z   Error Message:
+2026-10-08T15:14:00.1164590Z    System.IO.DirectoryNotFoundException : FsusUI repository root was not found.
+2026-10-08T15:14:00.1165050Z   Stack Trace:
+2026-10-08T15:14:00.1165780Z      at FsusUI.Avalonia.Tests.Controls.FsusMarkdownEditorClipboardVectorTests.RepositoryRoot(String sourceFile) in /_/dotnet/FsusUI.Avalonia.Tests/Controls/FsusMarkdownEditorClipboardVectorTests.cs:line 194
+2026-10-08T15:14:00.1167060Z    at FsusUI.Avalonia.Tests.Controls.FsusMarkdownEditorClipboardVectorTests.LoadClipboardVectors() in /_/dotnet/FsusUI.Avalonia.Tests/Controls/FsusMarkdownEditorClipboardVectorTests.cs:line 173
+2026-10-08T15:14:00.1168530Z    at FsusUI.Avalonia.Tests.Controls.FsusMarkdownEditorClipboardVectorTests.FrozenClipboardVectorSuiteCoversThirteenVectors() in /_/dotnet/FsusUI.Avalonia.Tests/Controls/FsusMarkdownEditorClipboardVectorTests.cs:line 37
+2026-10-08T15:14:00.1169560Z    at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+2026-10-08T15:14:00.1170190Z    at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)
+2026-10-08T15:14:00.1170960Z   Failed FsusUI.Avalonia.Tests.Controls.FsusMarkdownEditorClipboardVectorTests.AvaloniaProducesTheFrozenWebClipboardPlans [1 ms]
+2026-10-08T15:14:00.1171590Z   Error Message:
+2026-10-08T15:14:00.1171920Z    System.IO.DirectoryNotFoundException : FsusUI repository root was not found.
+2026-10-08T15:14:00.1172340Z   Stack Trace:
+2026-10-08T15:14:00.1173100Z      at FsusUI.Avalonia.Tests.Controls.FsusMarkdownEditorClipboardVectorTests.RepositoryRoot(String sourceFile) in /_/dotnet/FsusUI.Avalonia.Tests/Controls/FsusMarkdownEditorClipboardVectorTests.cs:line 194
+2026-10-08T15:14:00.1175190Z    at FsusUI.Avalonia.Tests.Controls.FsusMarkdownEditorClipboardVectorTests.LoadClipboardVectors() in /_/dotnet/FsusUI.Avalonia.Tests/Controls/FsusMarkdownEditorClipboardVectorTests.cs:line 173
+2026-10-08T15:14:00.1176660Z    at FsusUI.Avalonia.Tests.Controls.FsusMarkdownEditorClipboardVectorTests.ClipboardVectorIds() in /_/dotnet/FsusUI.Avalonia.Tests/Controls/FsusMarkdownEditorClipboardVectorTests.cs:line 12
+2026-10-08T15:14:00.1177680Z    at InvokeStub_FsusMarkdownEditorClipboardVectorTests.ClipboardVectorIds(Object, Object, IntPtr*)
+2026-10-08T15:14:00.1178470Z    at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)
+2026-10-08T15:14:00.1645180Z Results File: /Users/runner/work/FsusUI/FsusUI/dotnet/artifacts/platform/macos/test-results/_sjc20-cw713-02aa14c4-4535-401f-9e4d-91a3f370c6f5-BA228EA7E13D_2026-10-08_15_13_57_net10.0.trx
+2026-10-08T15:14:00.1667460Z 
+2026-10-08T15:14:00.1682000Z Failed!  - Failed:    14, Passed:   297, Skipped:     0, Total:   311, Duration: 3 s - FsusUI.Avalonia.Tests.dll (net10.0)
+2026-10-08T15:14:00.3200790Z node:internal/errors:986
+2026-10-08T15:14:00.3202180Z   const err = new Error(message);
+2026-10-08T15:14:00.3202570Z               ^
+2026-10-08T15:14:00.3202870Z 
+2026-10-08T15:14:00.3205360Z Error: Command failed: dotnet test dotnet/FsusUI.Avalonia.slnx --no-build --configuration Release --logger trx --results-directory /Users/runner/work/FsusUI/FsusUI/dotnet/artifacts/platform/macos/test-results --maxcpucount:1
+2026-10-08T15:14:00.3206310Z     at genericNodeError (node:internal/errors:986:15)
+2026-10-08T15:14:00.3206650Z     at wrappedFn (node:internal/errors:540:14)
+2026-10-08T15:14:00.3207020Z     at checkExecSyncError (node:child_process:942:11)
+2026-10-08T15:14:00.3207350Z     at execFileSync (node:child_process:978:15)
+2026-10-08T15:14:00.3208570Z     at run (file:///Users/runner/work/FsusUI/FsusUI/scripts/dotnet-platform-verify.mjs:37:3)
+2026-10-08T15:14:00.3209130Z     at file:///Users/runner/work/FsusUI/FsusUI/scripts/dotnet-platform-verify.mjs:82:1
+2026-10-08T15:14:00.3209670Z     at ModuleJob.run (node:internal/modules/esm/module_job:561:25)
+2026-10-08T15:14:00.3210100Z     at async node:internal/modules/esm/loader:647:26
+2026-10-08T15:14:00.3210720Z     at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5) {
+2026-10-08T15:14:00.3211150Z   status: 1,
+2026-10-08T15:14:00.3211350Z   signal: null,
+2026-10-08T15:14:00.3211600Z   output: [ null, null, null ],
+2026-10-08T15:14:00.3211830Z   pid: 2300,
+2026-10-08T15:14:00.3212110Z   stdout: null,
+2026-10-08T15:14:00.3212310Z   stderr: null
+2026-10-08T15:14:00.3212540Z }
+2026-10-08T15:14:00.3212660Z 
+2026-10-08T15:14:00.3212720Z Node.js v24.20.0
+2026-10-08T15:14:00.3291770Z ##[error]Process completed with exit code 1.
+2026-10-08T15:14:00.3490330Z ##[group]Run actions/upload-artifact@v4
+2026-10-08T15:14:00.3490560Z with:
+2026-10-08T15:14:00.3490710Z   name: dotnet-platform-macos
+2026-10-08T15:14:00.3490930Z   path: dotnet/artifacts/platform/macos
+2026-10-08T15:14:00.3491180Z   retention-days: 7
+2026-10-08T15:14:00.3491340Z   if-no-files-found: warn
+2026-10-08T15:14:00.3491550Z   compression-level: 6
+2026-10-08T15:14:00.3491740Z   overwrite: false
+2026-10-08T15:14:00.3491920Z   include-hidden-files: false
+2026-10-08T15:14:00.3492080Z env:
+2026-10-08T15:14:00.3492210Z   DOTNET_ROOT: /Users/runner/.dotnet
+2026-10-08T15:14:00.3492390Z ##[endgroup]
+2026-10-08T15:14:01.1333810Z (node:2874) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-10-08T15:14:01.1335860Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-10-08T15:14:01.1441810Z With the provided path, there will be 4 files uploaded
+2026-10-08T15:14:01.1446980Z Artifact name is valid!
+2026-10-08T15:14:01.1448420Z Root directory input is valid!
+2026-10-08T15:14:01.5806900Z Beginning upload of artifact content to blob storage
+2026-10-08T15:14:01.6348020Z (node:2874) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+2026-10-08T15:14:02.1058750Z Uploaded bytes 163582
+2026-10-08T15:14:02.1843330Z Finished uploading artifact content to blob storage!
+2026-10-08T15:14:02.1918020Z SHA256 digest of uploaded artifact zip is cc5d401fdc3e87336331ae20f6ac5d3f37721c8663e47814336ad4360c0aab59
+2026-10-08T15:14:02.1919550Z Finalizing artifact upload
+2026-10-08T15:14:02.4779890Z Artifact dotnet-platform-macos.zip successfully finalized. Artifact ID 11559428406
+2026-10-08T15:14:02.4781850Z Artifact dotnet-platform-macos has been successfully uploaded! Final size is 163582 bytes. Artifact ID is 11559428406
+2026-10-08T15:14:02.4791210Z Artifact download URL: https://github.com/Ozwasyd/FsusUI/actions/runs/37798728109/artifacts/11559428406
+2026-10-08T15:14:02.5101990Z Prepare all required actions
+2026-10-08T15:14:02.5102510Z Getting action download info
+2026-10-08T15:14:02.8880490Z ##[group]Run ./.github/actions/readiness-manifest
+2026-10-08T15:14:02.8880800Z with:
+2026-10-08T15:14:02.8880990Z   gate: dotnet-platform
+2026-10-08T15:14:02.8881200Z   group: main
+2026-10-08T15:14:02.8881860Z   status: failure
+2026-10-08T15:14:02.8882300Z   dimensions: platform=macos
+2026-10-08T15:14:02.8882550Z   artifacts: dotnet-platform=dotnet/artifacts/platform/macos
+2026-10-08T15:14:02.8882810Z   artifact-suffix: macos
+2026-10-08T15:14:02.8882980Z env:
+2026-10-08T15:14:02.8883140Z   DOTNET_ROOT: /Users/runner/.dotnet
+2026-10-08T15:14:02.8883380Z ##[endgroup]
+2026-10-08T15:14:02.8948060Z ##[start-action display=Emit structured leaf manifest;id=__self.__run]
+2026-10-08T15:14:02.8979390Z ##[group]Run args=(emit --gate "$READINESS_GATE" --group "$READINESS_GROUP" --status "$READINESS_STATUS")
+2026-10-08T15:14:02.8980280Z [36;1margs=(emit --gate "$READINESS_GATE" --group "$READINESS_GROUP" --status "$READINESS_STATUS")[0m
+2026-10-08T15:14:02.8980730Z [36;1mif [ -n "$READINESS_PLAYWRIGHT_RECEIPTS" ]; then[0m
+2026-10-08T15:14:02.8981080Z [36;1m  args+=(--playwright-receipts "$READINESS_PLAYWRIGHT_RECEIPTS")[0m
+2026-10-08T15:14:02.8981370Z [36;1mfi[0m
+2026-10-08T15:14:02.8981560Z [36;1mif [ -n "$READINESS_PLAYWRIGHT_PLAN" ]; then[0m
+2026-10-08T15:14:02.8981870Z [36;1m  args+=(--playwright-plan "$READINESS_PLAYWRIGHT_PLAN")[0m
+2026-10-08T15:14:02.8982140Z [36;1mfi[0m
+2026-10-08T15:14:02.8982380Z [36;1mIFS=',' read -ra dimensions <<< "$READINESS_DIMENSIONS"[0m
+2026-10-08T15:14:02.8982700Z [36;1mfor dimension in "${dimensions[@]}"; do[0m
+2026-10-08T15:14:02.8983000Z [36;1m  test -z "$dimension" || args+=(--dimension "$dimension")[0m
+2026-10-08T15:14:02.8983260Z [36;1mdone[0m
+2026-10-08T15:14:02.8983420Z [36;1mwhile IFS= read -r artifact; do[0m
+2026-10-08T15:14:02.8983690Z [36;1m  test -z "$artifact" || args+=(--artifact "$artifact")[0m
+2026-10-08T15:14:02.8983960Z [36;1mdone <<< "$READINESS_ARTIFACTS"[0m
+2026-10-08T15:14:02.8984240Z [36;1mnode scripts/ci-readiness.mjs "${args[@]}"[0m
+2026-10-08T15:14:02.9355880Z shell: /bin/bash --noprofile --norc -e -o pipefail {0}
+2026-10-08T15:14:02.9356330Z env:
+2026-10-08T15:14:02.9356520Z   DOTNET_ROOT: /Users/runner/.dotnet
+2026-10-08T15:14:02.9356760Z   READINESS_GATE: dotnet-platform
+2026-10-08T15:14:02.9356970Z   READINESS_GROUP: main
+2026-10-08T15:14:02.9357140Z   READINESS_STATUS: failure
+2026-10-08T15:14:02.9357330Z   READINESS_DIMENSIONS: platform=macos
+2026-10-08T15:14:02.9357780Z   READINESS_ARTIFACTS: dotnet-platform=dotnet/artifacts/platform/macos
+2026-10-08T15:14:02.9358140Z   READINESS_PLAYWRIGHT_RECEIPTS: 
+2026-10-08T15:14:02.9358340Z   READINESS_PLAYWRIGHT_PLAN: 
+2026-10-08T15:14:02.9358530Z ##[endgroup]
+2026-10-08T15:14:03.1220350Z [ci-readiness] emitted=.readiness/manifests/dotnet-platform-macos.json status=failure
+2026-10-08T15:14:03.1285260Z ##[end-action id=__self.__run;outcome=success;conclusion=success;duration_ms=233]
+2026-10-08T15:14:03.1287970Z ##[start-action display=Upload structured leaf manifest;id=__self.__actions_upload-artifact]
+2026-10-08T15:14:03.1361470Z ##[group]Run actions/upload-artifact@v4
+2026-10-08T15:14:03.1361770Z with:
+2026-10-08T15:14:03.1361970Z   name: readiness-manifest-dotnet-platform-macos
+2026-10-08T15:14:03.1362240Z   path: .readiness
+2026-10-08T15:14:03.1362400Z   include-hidden-files: true
+2026-10-08T15:14:03.1362640Z   if-no-files-found: warn
+2026-10-08T15:14:03.1362800Z   overwrite: true
+2026-10-08T15:14:03.1362970Z   retention-days: 7
+2026-10-08T15:14:03.1363130Z   compression-level: 6
+2026-10-08T15:14:03.1363320Z env:
+2026-10-08T15:14:03.1363490Z   DOTNET_ROOT: /Users/runner/.dotnet
+2026-10-08T15:14:03.1363700Z ##[endgroup]
+2026-10-08T15:14:03.3844960Z (node:2902) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-10-08T15:14:03.3950230Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-10-08T15:14:03.3955960Z With the provided path, there will be 2 files uploaded
+2026-10-08T15:14:03.7036850Z Artifact name is valid!
+2026-10-08T15:14:03.7050300Z Root directory input is valid!
+2026-10-08T15:14:03.9266250Z (node:2902) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+2026-10-08T15:14:03.9739170Z Beginning upload of artifact content to blob storage
+2026-10-08T15:14:04.1951590Z Uploaded bytes 934
+2026-10-08T15:14:04.3072150Z Finished uploading artifact content to blob storage!
+2026-10-08T15:14:04.3142990Z SHA256 digest of uploaded artifact zip is f12be787bc8099795865067aa4516a761764b1914f7811550fa57d9c36bbb217
+2026-10-08T15:14:04.3146300Z Finalizing artifact upload
+2026-10-08T15:14:04.5654420Z Artifact readiness-manifest-dotnet-platform-macos.zip successfully finalized. Artifact ID 11559323554
+2026-10-08T15:14:04.5659300Z Artifact readiness-manifest-dotnet-platform-macos has been successfully uploaded! Final size is 934 bytes. Artifact ID is 11559323554
+2026-10-08T15:14:04.5663990Z Artifact download URL: https://github.com/Ozwasyd/FsusUI/actions/runs/37798728109/artifacts/11559323554
+2026-10-08T15:14:04.5735300Z ##[end-action id=__self.__actions_upload-artifact;outcome=success;conclusion=success;duration_ms=1443]
+2026-10-08T15:14:04.5995210Z Post job cleanup.
+2026-10-08T15:14:04.7661280Z [command]/opt/homebrew/bin/git version
+2026-10-08T15:14:04.8000650Z git version 2.55.0
+2026-10-08T15:14:04.8039570Z Copying '/Users/runner/.gitconfig' to '/Users/runner/work/_temp/778a7d81-978c-4f5b-b5bc-c2bcaee98b20/.gitconfig'
+2026-10-08T15:14:04.8060070Z Temporarily overriding HOME='/Users/runner/work/_temp/778a7d81-978c-4f5b-b5bc-c2bcaee98b20' before making global git config changes
+2026-10-08T15:14:04.8062320Z Adding repository directory to the temporary git global config as a safe directory
+2026-10-08T15:14:04.8070900Z [command]/opt/homebrew/bin/git config --global --add safe.directory /Users/runner/work/FsusUI/FsusUI
+2026-10-08T15:14:04.8284220Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-10-08T15:14:04.8414110Z [command]/opt/homebrew/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-10-08T15:14:05.1642060Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-10-08T15:14:05.1721450Z http.https://github.com/.extraheader
+2026-10-08T15:14:05.1735420Z [command]/opt/homebrew/bin/git config --local --unset-all http.https://github.com/.extraheader
+2026-10-08T15:14:05.1843000Z [command]/opt/homebrew/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-10-08T15:14:05.3873560Z [command]/opt/homebrew/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-10-08T15:14:05.4103480Z [command]/opt/homebrew/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-10-08T15:14:05.5833590Z Cleaning up orphan processes
+2026-10-08T15:14:06.8107780Z Terminate orphan process: pid (2045) (VBCSCompiler)
+2026-10-08T15:14:07.2557380Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/cache@v4, actions/checkout@v4, actions/setup-dotnet@v4, actions/upload-artifact@v4. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/

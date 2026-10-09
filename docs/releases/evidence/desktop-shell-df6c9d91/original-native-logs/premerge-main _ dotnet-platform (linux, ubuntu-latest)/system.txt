@@ -1,0 +1,15 @@
+2026-10-08T15:11:51.4020000Z Evaluating premerge-main.if
+2026-10-08T15:11:51.4020000Z Evaluating: (success() && (((github.event_name == 'pull_request') || (github.event_name == 'merge_group'))))
+2026-10-08T15:11:51.4020000Z Expanded: (true && (('pull_request' == 'pull_request') || (github.event_name == 'merge_group')))
+2026-10-08T15:11:51.4020000Z Result: true
+2026-10-08T15:11:51.4020000Z Evaluating premerge-main.dotnet-platform.if
+2026-10-08T15:11:51.4020000Z Evaluating: success()
+2026-10-08T15:11:51.4020000Z Result: true
+2026-10-08T15:11:51.6590000Z Requested labels: ubuntu-latest
+2026-10-08T15:11:51.6590000Z Job defined at: Ozwasyd/FsusUI/.github/workflows/_quality.yml@refs/pull/861/merge
+2026-10-08T15:11:51.6590000Z Reusable workflow chain:
+2026-10-08T15:11:51.6590000Z Ozwasyd/FsusUI/.github/workflows/quality.yml@refs/pull/861/merge (e36ce622a4a99fa21ab0f85fa2170499c2d3bd70)
+2026-10-08T15:11:51.6590000Z -> Ozwasyd/FsusUI/.github/workflows/_quality.yml@refs/pull/861/merge (e36ce622a4a99fa21ab0f85fa2170499c2d3bd70)
+2026-10-08T15:11:51.6590000Z Waiting for a runner to pick up this job...
+2026-10-08T15:11:52.1100000Z Job is about to start running on the hosted runner: GitHub Actions 1000027164
+2026-10-08T15:11:52.1100000Z Job is waiting for a hosted runner to come online.
