@@ -1,0 +1,19 @@
+{
+  "sourceSha": "66d6b56fe6033b5bdca723346847f3deac7d5e40",
+  "command": [
+    "pnpm",
+    "exec",
+    "vitest",
+    "list",
+    "--config",
+    "vue/vitest.config.ts",
+    "vue/packages/components/markdown-renderer/__tests__/markdown-renderer.test.tsx",
+    "-t",
+    "^MarkdownRenderer\\.vue\\ invalidates\\ pending\\ heavy\\ activation\\ when\\ the\\ shared\\ theme\\ changes$",
+    "--json=/workspace/shared/ui861-renderer-lint-successor/pending-sync-cancel-list.json"
+  ],
+  "selectorFullName": "MarkdownRenderer.vue invalidates pending heavy activation when the shared theme changes",
+  "regex": "^MarkdownRenderer\\.vue\\ invalidates\\ pending\\ heavy\\ activation\\ when\\ the\\ shared\\ theme\\ changes$",
+  "exitCode": 0,
+  "jsonList": "pending-sync-cancel-list.json"
+}

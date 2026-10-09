@@ -1,0 +1,9 @@
+{
+  "sourceSha": "66d6b56fe6033b5bdca723346847f3deac7d5e40",
+  "command": [
+    "pnpm",
+    "exec",
+    "husky"
+  ],
+  "exitCode": 0
+}

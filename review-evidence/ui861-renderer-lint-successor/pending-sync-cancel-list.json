@@ -1,0 +1,6 @@
+[
+  {
+    "name": "MarkdownRenderer.vue > invalidates pending heavy activation when the shared theme changes",
+    "file": "/workspace/ui861-renderer-lint-integration/vue/packages/components/markdown-renderer/__tests__/markdown-renderer.test.tsx"
+  }
+]

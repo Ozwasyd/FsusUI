@@ -1,0 +1,216 @@
+{
+  "historicalSourceSha": "3baff077297ad15a1d205eba8dc0bc525483ff88",
+  "historicalEvidenceCommit": "93d625fca8ee4adc161ddde29bd8aaf7c0b41bda",
+  "all45PublishedFileHashesVerified": [
+    {
+      "path": "impact-plan.log",
+      "sha256": "c1ce7adc4fdd2acc43c3414334a40636e4004f9b8d9ab0fc761727e0a958d2bf"
+    },
+    {
+      "path": "chromium-original-cell.json",
+      "sha256": "c145ed9e1415e2c51b21615259539a887fef66a940d549f144665b4060ee1e36"
+    },
+    {
+      "path": "renderer-single-regression.json",
+      "sha256": "7c6c184c8b6e34719910bd2adfd8b3ad015432174cedc13fc280e1d4d506f372"
+    },
+    {
+      "path": "native-install.log",
+      "sha256": "619fe6fdee7ad66ae362d2207afe07276c5457b05de20fe37a44313949aa3cd0"
+    },
+    {
+      "path": "public-baseline.json",
+      "sha256": "b8e82de454d0b8db229ade1d91b77d681a46fb7de972771efccd142ba41d6026"
+    },
+    {
+      "path": "draft-pr-body.md",
+      "sha256": "1a439b9c0f8111e31358d770e0cb1e975ea40f46cb9476ef064ce9bd9416c925"
+    },
+    {
+      "path": "README.md",
+      "sha256": "41003aa6d3c1a9f2316e6dfef87214a719f270e01f931ac70b741f47a04055b5"
+    },
+    {
+      "path": "component-contracts.log",
+      "sha256": "000fc5bd38fcd84d5b21d1913f323edc2a347d6a7d20d6c746ba2a0a7bba9971"
+    },
+    {
+      "path": "contract-v2.log",
+      "sha256": "3f07ccab03afd1451e9e5c3b7357551ed02162289939c1497a7f0972c7333e55"
+    },
+    {
+      "path": "renderer-focused-lint.log",
+      "sha256": "623f3a8658c34c66431a670e352706343b4b738c4c4b21a05455c256f703bab6"
+    },
+    {
+      "path": "integration-status.json",
+      "sha256": "e4006c1c60df377bb7dac15c1260e8f57b65fd199a8fc6eb0477b8a3919dece3"
+    },
+    {
+      "path": "frozen-ownership.json",
+      "sha256": "ed0d12f98348b327df31e08f306e8bab51a89fd7a93513f684179fec1a70b349"
+    },
+    {
+      "path": "repo-hooks-setup.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "chromium-original-cell.log",
+      "sha256": "8b6fd5d5037d4569d6d6e77efa5012e102b6e06058146d4b4e7788f62ef052a4"
+    },
+    {
+      "path": "renderer-focused-lint.json",
+      "sha256": "e66e11f66e35ac7768aee3b9d03b20a1cb34a8357b3504c39ff7af7b01c269c7"
+    },
+    {
+      "path": "shared-metadata-gap.json",
+      "sha256": "ed455ea3101d7040ed571c5dccd81cde70443f68de4d02f1247915f4e35f5c9b"
+    },
+    {
+      "path": "public-baseline.log",
+      "sha256": "488cc59a7c6743cf1ab28dd482fd965163fbc836fa7f96132432bf8170943b97"
+    },
+    {
+      "path": "composition.json",
+      "sha256": "467599156c6f9d69d2f12cbd326b68e991583918d71b57ffa05ec7e19c24b98f"
+    },
+    {
+      "path": "update-surface.log",
+      "sha256": "59f7cde0816eab6a67548afec1916d7d78c86ecbf3e6352609f29dff3628161f"
+    },
+    {
+      "path": "impact-plan.json",
+      "sha256": "bbee1c16e822b03b9dab5f0a2f2cbafd270c76e6f784a7de0f1288ccb3101cd1"
+    },
+    {
+      "path": "source-whitespace.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "draft-pr-handoff.json",
+      "sha256": "7b3bd5889304066ea250ab65138d2ea43e01b28652ec13b4535d2d0ca79f04c3"
+    },
+    {
+      "path": "component-contracts.json",
+      "sha256": "5b4c954317dec997c280839d94122305ee2c1f246fe6d5c9fc1f9a3d1d27f871"
+    },
+    {
+      "path": "fresh-main-conflict.json",
+      "sha256": "12db2357dc7c2ea8326a038371861cef86f28bb0db0a19a0df1f5ed0ad60a2a0"
+    },
+    {
+      "path": "ensure-wasm.json",
+      "sha256": "266983593528cc3a2a5718be53bf6d1ef8dc86de48178339d0c59976c863c48e"
+    },
+    {
+      "path": "repo-hooks-setup.json",
+      "sha256": "099a740963a22de5168b3b6cf4baf12d766bc76f435bd85c2b3dec8aa42b25bd"
+    },
+    {
+      "path": "fresh-main-fetch.log",
+      "sha256": "cfbb2b4108958f48956dd5674676e71e5a86704264786fb95342d7cb1e05baf7"
+    },
+    {
+      "path": "runtime-artifact-reuse.json",
+      "sha256": "b6d5b9bf69dae68b548db30348bb03b98c812ad181edcc95ba444571cecfcbba"
+    },
+    {
+      "path": "native-install.json",
+      "sha256": "ea2ab3b1c73b81266cc18958c58e85ce46ab94777a5b5b8528a258d1ceb74e4a"
+    },
+    {
+      "path": "contract-v2.json",
+      "sha256": "54673af35d2f7b25dc65ce97f89a4446555bb9a8b163f4bd652fa8b28dfb8caa"
+    },
+    {
+      "path": "renderer-single-regression.log",
+      "sha256": "1f2b2d37d1b43dfef6dee6bab6c46fe3d595353ce460e3ad3e06a270abf12c5e"
+    },
+    {
+      "path": "update-surface.json",
+      "sha256": "f7271a1ca128309f61dd03a624796235873c085869a6699f9419df087c4bc3bd"
+    },
+    {
+      "path": "renderer-preimages.json",
+      "sha256": "8a19baf5cff407ac1ce1cc78cef39166c6362e1859045c52d25c0323fd3b1cbe"
+    },
+    {
+      "path": "impact-receipt.json",
+      "sha256": "813fe2dea1cae74ebb99cbd4b496da4b47fdf1b64a89f292cbc524e161db6e20"
+    },
+    {
+      "path": "renderer-lint-gap.json",
+      "sha256": "a76bfe6507094c5dd0c06f40510eec05a8bcf2fc093171283ce6299081aff289"
+    },
+    {
+      "path": "ensure-wasm.log",
+      "sha256": "d799da65dd1d5eea09e6d3fbf8661bf924e72e5574c0edc58cdbf9fdcadfda13"
+    },
+    {
+      "path": "chromium-summary.json",
+      "sha256": "758aa8cd409a39316ed2c47826f127cedaac683588a5d6f978853a2361b92a75"
+    },
+    {
+      "path": "source-whitespace.json",
+      "sha256": "f3098941e206eba1a5a1e67eb27f3b6794681d222c13b50f3a1c26d1832ff4f4"
+    },
+    {
+      "path": "chromium-runtime/receipt.json",
+      "sha256": "4a3a2872635a6a62cd2d6f0b21f1f14df7f849a5b2f18895ff163516a5038549"
+    },
+    {
+      "path": "chromium-runtime/runtime-manifests/web-interaction-conformance-chromium.json",
+      "sha256": "24a8378d9f32d65aaf594ebbcb8c6d1dba30bf2f224dcb9d8e52fa70f81d36c5"
+    },
+    {
+      "path": "chromium-runtime/traces/chromium/markdown-editor-chromium.interaction-trace.json",
+      "sha256": "a5bad585ea7c108bbb36d10f027e104522c480be0cc22f62703a1431440aa56b"
+    },
+    {
+      "path": "chromium-runtime/traces/chromium/representative-components-chromium.interaction-trace.json",
+      "sha256": "5792137c6032e66bb0df2936a613ac404f12a024ce692d7b746537e132d50a4f"
+    },
+    {
+      "path": "chromium-runtime/output/web-interaction-conformance/chromium/.last-run.json",
+      "sha256": "91d1c43004802cd49950d78eb11c8fa7d05da8ffffe219a8b13b2f561bc00903"
+    },
+    {
+      "path": "chromium-runtime/reports/web-interaction-conformance/chromium/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "chromium-runtime/reports/web-interaction-conformance/chromium/report.json",
+      "sha256": "48f579c27a85f3ed58af0902041bcde03c522e63da36151bb6160640f613ca60"
+    }
+  ],
+  "originalCommandReceipt": {
+    "command": [
+      "pnpm",
+      "exec",
+      "vitest",
+      "run",
+      "--config",
+      "vue/vitest.config.ts",
+      "vue/packages/components/markdown-renderer/__tests__/markdown-renderer.test.tsx",
+      "-t",
+      "invalidates pending heavy activation when the shared theme changes"
+    ],
+    "sourceSha": "3baff077297ad15a1d205eba8dc0bc525483ff88",
+    "exitCode": 0,
+    "selectedTestTitle": "invalidates pending heavy activation when the shared theme changes",
+    "selection": "original finite1 test; other36 are unselected, not aggregate coverage",
+    "endedAt": "2026-10-09T10:10:20.307478+00:00"
+  },
+  "originalLog": "\n RUN  v4.1.5 /workspace/ui861-renderer-sdk-integration\n\n\n Test Files  1 passed (1)\n      Tests  1 passed | 36 skipped (37)\n   Start at  10:10:12\n   Duration  7.85s (transform 4.31s, setup 154ms, import 5.34s, tests 256ms, environment 1.79s)\n\n",
+  "actualTestFullName": "MarkdownRenderer.vue invalidates pending heavy activation when the shared theme changes",
+  "actualCase": "added pending-activation / synchronous cancellation case",
+  "actualCounts": {
+    "selectedPassed": 1,
+    "unselected": 36,
+    "totalDeclared": 37
+  },
+  "CI637OriginalCaseFullName": "MarkdownRenderer.vue invalidates feature output on shared theme change and removes the listener on unmount",
+  "CI637ExecutedOn3bInThisReceipt": false,
+  "mistakenPriorWording": "renderer original single regression / original637 case",
+  "correction": "The3b receipt selected the added pending-activation case. Original637 evidence on published7087 is separate and must not be attributed to3b. The historical45 files and oral mislabel remain intact; this addendum corrects attribution."
+}

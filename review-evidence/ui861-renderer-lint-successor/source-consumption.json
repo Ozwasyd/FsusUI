@@ -1,0 +1,13 @@
+{
+  "sourceSha": "66d6b56fe6033b5bdca723346847f3deac7d5e40",
+  "parentSha": "3baff077297ad15a1d205eba8dc0bc525483ff88",
+  "consumedSource": "2bcaf5af7eb359dcdc316cb4acc85c27f10872b8",
+  "changedPaths": [
+    "vue/packages/components/markdown-renderer/__tests__/markdown-renderer.test.tsx"
+  ],
+  "authorBlob": "483c146c430a04424310cb60ba917acb446e40ec",
+  "successorBlob": "483c146c430a04424310cb60ba917acb446e40ec",
+  "trackedMetadataWrites": false,
+  "rendererRewritten": false,
+  "original3bReceiptsRebound": false
+}

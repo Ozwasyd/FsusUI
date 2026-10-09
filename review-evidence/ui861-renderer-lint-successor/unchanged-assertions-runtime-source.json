@@ -1,0 +1,9 @@
+{
+  "sourceSha": "66d6b56fe6033b5bdca723346847f3deac7d5e40",
+  "parentSha": "3baff077297ad15a1d205eba8dc0bc525483ff88",
+  "allTestDescribeBodiesByteIdentical": true,
+  "testBodiesSha256": "25c5fee784a92f6611376ee896367b591b0c348ae4c99eacec9b755c17b645a7",
+  "productionRendererGitBlob": "901d60d9f0eb68abb19bb8a48795c8ef9e34dc32",
+  "productionRendererUnchanged": true,
+  "fixKind": "Four actual type annotation corrections, not comment-only; consumed exact owner source2bcaf5af."
+}

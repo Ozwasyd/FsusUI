@@ -1,0 +1,11 @@
+{
+  "sourceSha": "66d6b56fe6033b5bdca723346847f3deac7d5e40",
+  "command": [
+    "git",
+    "diff",
+    "--check",
+    "3baff077297ad15a1d205eba8dc0bc525483ff88",
+    "HEAD"
+  ],
+  "exitCode": 0
+}

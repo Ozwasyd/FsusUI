@@ -1,0 +1,13 @@
+{
+  "sourceSha": "66d6b56fe6033b5bdca723346847f3deac7d5e40",
+  "command": [
+    "pnpm",
+    "install",
+    "--frozen-lockfile",
+    "--offline",
+    "--ignore-scripts",
+    "--store-dir",
+    "/workspace/.setup/pnpm-store"
+  ],
+  "exitCode": 0
+}

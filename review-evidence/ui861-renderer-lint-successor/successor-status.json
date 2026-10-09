@@ -1,0 +1,77 @@
+{
+  "sourceSha": "66d6b56fe6033b5bdca723346847f3deac7d5e40",
+  "parentSha": "3baff077297ad15a1d205eba8dc0bc525483ff88",
+  "branch": "integration/ui861-renderer-lint-20261009",
+  "consumedAuthorSource": "2bcaf5af7eb359dcdc316cb4acc85c27f10872b8",
+  "consumption": "Exact one published renderer test blob; four real type annotation corrections. No renderer rewrite or tracked shared metadata edit.",
+  "historicalCorrection": "At3b, the actual selected case was MarkdownRenderer.vue invalidates pending heavy activation when the shared theme changes. OriginalCI637 was not executed by that receipt. The prior45 public files and old oral mislabel remain preserved; all45 Git blob hashes reverified. Independent7087 originalCI637/sync-cancel evidence stays bound to7087, not attributed to3b.",
+  "actualNewUnitExecutions": [
+    {
+      "sourceSha": "66d6b56fe6033b5bdca723346847f3deac7d5e40",
+      "command": [
+        "pnpm",
+        "exec",
+        "vitest",
+        "run",
+        "--config",
+        "vue/vitest.config.ts",
+        "vue/packages/components/markdown-renderer/__tests__/markdown-renderer.test.tsx",
+        "-t",
+        "^MarkdownRenderer\\.vue\\ invalidates\\ feature\\ output\\ on\\ shared\\ theme\\ change\\ and\\ removes\\ the\\ listener\\ on\\ unmount$",
+        "--reporter=json",
+        "--outputFile=/workspace/shared/ui861-renderer-lint-successor/original-ci637-report.json"
+      ],
+      "expectedFullName": "MarkdownRenderer.vue invalidates feature output on shared theme change and removes the listener on unmount",
+      "exitCode": 0,
+      "startedAt": "2026-10-09T10:49:30.082232+00:00",
+      "endedAt": "2026-10-09T10:49:38.115707+00:00",
+      "actualPassedFullNames": [
+        "MarkdownRenderer.vue invalidates feature output on shared theme change and removes the listener on unmount"
+      ],
+      "numPassedTests": 1,
+      "numPendingTests": 36,
+      "numFailedTests": 0
+    },
+    {
+      "sourceSha": "66d6b56fe6033b5bdca723346847f3deac7d5e40",
+      "command": [
+        "pnpm",
+        "exec",
+        "vitest",
+        "run",
+        "--config",
+        "vue/vitest.config.ts",
+        "vue/packages/components/markdown-renderer/__tests__/markdown-renderer.test.tsx",
+        "-t",
+        "^MarkdownRenderer\\.vue\\ invalidates\\ pending\\ heavy\\ activation\\ when\\ the\\ shared\\ theme\\ changes$",
+        "--reporter=json",
+        "--outputFile=/workspace/shared/ui861-renderer-lint-successor/pending-sync-cancel-report.json"
+      ],
+      "expectedFullName": "MarkdownRenderer.vue invalidates pending heavy activation when the shared theme changes",
+      "exitCode": 0,
+      "startedAt": "2026-10-09T10:49:38.116608+00:00",
+      "endedAt": "2026-10-09T10:49:44.481710+00:00",
+      "actualPassedFullNames": [
+        "MarkdownRenderer.vue invalidates pending heavy activation when the shared theme changes"
+      ],
+      "numPassedTests": 1,
+      "numPendingTests": 36,
+      "numFailedTests": 0
+    }
+  ],
+  "lint": "PASS original focused pair command, zero errors/warnings after consumed author fix.",
+  "selectionPreflight": "Both anchored full names with space separators matched exactly1 collected test each. CLI list display includes >; selectors and execution JSON fullName use spaces. No zero/wrong list fallback, no substitute case.",
+  "assertionsRuntimeSource": "All37 test describe bodies are byte-identical to3b. Production renderer Git blob unchanged. Author2bc emitted-JS proof is separate; this worker verified exact author blob and unchanged bodies.",
+  "currentBrowserCells": {
+    "chromium": "UNRUN on66; real3b2tests/2traces14actions remain only3b evidence.",
+    "firefox": "UNRUN; denied installer remains stopped.",
+    "webkit": "UNRUN; denied installer remains stopped."
+  },
+  "currentBaseline": "Original827 official producer output not yet supplied/consumed; no parallel metadata write. Prior3b public-baseline stale check remains historical; no new66 baseline check claimed.",
+  "otherAcceptance": "Full37 suite, full CI, package/native/platform/visual/Blog manage-write remain OPEN/UNRUN on66.",
+  "newChromiumTracesCreated": false,
+  "oldChromiumTracesRebound": false,
+  "packageOrContentApiPublication": false,
+  "freshDefault": "8db0ac8f49749e3e5f28be5051bb3d3ed71ada71",
+  "frozenHeadsPreserved": true
+}

@@ -1,0 +1,19 @@
+{
+  "sourceSha": "66d6b56fe6033b5bdca723346847f3deac7d5e40",
+  "command": [
+    "pnpm",
+    "exec",
+    "vitest",
+    "list",
+    "--config",
+    "vue/vitest.config.ts",
+    "vue/packages/components/markdown-renderer/__tests__/markdown-renderer.test.tsx",
+    "-t",
+    "^MarkdownRenderer\\.vue\\ invalidates\\ feature\\ output\\ on\\ shared\\ theme\\ change\\ and\\ removes\\ the\\ listener\\ on\\ unmount$",
+    "--json=/workspace/shared/ui861-renderer-lint-successor/original-ci637-list.json"
+  ],
+  "selectorFullName": "MarkdownRenderer.vue invalidates feature output on shared theme change and removes the listener on unmount",
+  "regex": "^MarkdownRenderer\\.vue\\ invalidates\\ feature\\ output\\ on\\ shared\\ theme\\ change\\ and\\ removes\\ the\\ listener\\ on\\ unmount$",
+  "exitCode": 0,
+  "jsonList": "original-ci637-list.json"
+}

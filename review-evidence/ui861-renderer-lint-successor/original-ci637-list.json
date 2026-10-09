@@ -1,0 +1,6 @@
+[
+  {
+    "name": "MarkdownRenderer.vue > invalidates feature output on shared theme change and removes the listener on unmount",
+    "file": "/workspace/ui861-renderer-lint-integration/vue/packages/components/markdown-renderer/__tests__/markdown-renderer.test.tsx"
+  }
+]
