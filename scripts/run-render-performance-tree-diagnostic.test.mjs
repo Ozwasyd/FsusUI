@@ -3,6 +3,7 @@ import { EventEmitter } from 'node:events'
 import { readFile } from 'node:fs/promises'
 import path from 'node:path'
 import test from 'node:test'
+import { URL } from 'node:url'
 import vm from 'node:vm'
 
 const source = await readFile(
@@ -76,7 +77,7 @@ async function evaluate(summary, options = {}) {
             : args[0] === 'scripts/check-render-performance-results.mjs'
               ? (options.checkerExit ?? 0)
               : 0
-        queueMicrotask(() => child.emit('exit', exit, null))
+        globalThis.queueMicrotask(() => child.emit('exit', exit, null))
         return child
       },
     },
