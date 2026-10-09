@@ -112,8 +112,8 @@
     },
     {
       "path": "draft-pr-material.json",
-      "sha256": "d74ee795633f0151d5f44c6c789283ad4c3c06c93f3d800e4adc686f1aae2c0c",
-      "bytes": 2162
+      "sha256": "61cf4395355bb0ae012ee0da168d1330234a3a01cd92daf7978138e2f7227173",
+      "bytes": 2514
     },
     {
       "path": "focused-test-source-identity.json",
@@ -122,8 +122,8 @@
     },
     {
       "path": "outcome.md",
-      "sha256": "1c73baf6cd1c4cd24a78f645c7f50ef1487885e9e1d8eab329e6a1f37ca42b17",
-      "bytes": 7431
+      "sha256": "a313c8792bb0323e0222239aa4aa06f5c3741317649d6e876ab377cd005a88f8",
+      "bytes": 7890
     },
     {
       "path": "owner-final-build-utils-controls.log",
