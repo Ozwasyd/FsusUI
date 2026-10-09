@@ -672,7 +672,7 @@ const workerProbe = async (iteration: number) => {
       let checksum = 0
       for (let index = 0; index < data.length; index++) checksum = (checksum + data[index]) >>> 0
       const computed = performance.now()
-      self.postMessage({ received, computed, checksum })
+      self.postMessage({ timeOrigin: performance.timeOrigin, received, computed, checksum })
     }
   `
   const workerUrl = URL.createObjectURL(new Blob([source]))
@@ -688,10 +688,12 @@ const workerProbe = async (iteration: number) => {
     worker.onmessage = ({ data }) => {
       const completed = performance.now()
       worker.terminate()
+      // Translate Worker timestamps into the window's performance time origin.
+      const workerOffset = data.timeOrigin - performance.timeOrigin
       resolve({
-        queueWaitMs: data.received - queued,
+        queueWaitMs: workerOffset + data.received - queued,
         computeMs: data.computed - data.received,
-        transferMs: completed - data.computed,
+        transferMs: completed - (workerOffset + data.computed),
       })
     }
     worker.postMessage(payload)
