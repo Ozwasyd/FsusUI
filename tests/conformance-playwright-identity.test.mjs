@@ -366,6 +366,7 @@ test('original report-level collection error survives diagnostic handling', () =
 })
 
 test('failed collection retains the original JSON report and counters in its failure receipt', async () => {
+  mkdirSync(join(root, '.tmp'), { recursive: true })
   const scratch = mkdtempSync(join(root, '.tmp/identity-diagnostic-'))
   const bin = join(scratch, 'bin')
   mkdirSync(bin)
