@@ -42,7 +42,7 @@ test('classic Select keeps the original runtime JavaScript', async () => {
   }
 })
 
-test('canonical producer emits Select and its downstream contracts with exact inferred parity', async () => {
+test('canonical producer emits Select; preserves ref contracts and records Options typing compatibility', async () => {
   assert.equal(ts.version, '5.9.2')
   assert.equal(process.cwd(), root, 'Run from the repository root, as the canonical producer requires.')
   await mkdir(evidenceDir, { recursive: true })
@@ -101,6 +101,22 @@ test('canonical producer emits Select and its downstream contracts with exact in
     .filter((node) => node.getText() === 'Options')
   assert.equal(unboundOptions.length, 2)
   assert.ok(unboundOptions.every((node) => !node.getSymbol()?.getDeclarations().length), 'Original SFC has no declaration for its existing Popper Options annotation.')
+  capturedProject.createSourceFile(path.join(root, selectDir, 'src/select.raworiginal.ts'), originalSelectFile.getFullText())
+  const optionsProbeText = await readFile(path.join(root, 'tests/fixtures/public-classic-select-declaration/options-compatibility.ts'), 'utf8')
+  const optionsProbe = capturedProject.createSourceFile(path.join(root, 'vue/classic-select-options-compatibility.ts'), optionsProbeText)
+  const optionsProgram = capturedProject.getProgram().compilerObject
+  const optionsDiagnostics = ts.getPreEmitDiagnostics(optionsProgram, optionsProgram.getSourceFile(optionsProbe.getFilePath())).map((row) => ({
+    code: row.code,
+    line: row.file && row.start != null ? row.file.getLineAndCharacterOfPosition(row.start).line + 1 : null,
+    message: ts.flattenDiagnosticMessageText(row.messageText, '\n'),
+  }))
+  await writeFile(path.join(evidenceDir, 'raw-options-compatibility-diagnostics.json'), JSON.stringify(optionsDiagnostics, null, 2) + '\n')
+  const optionsLine = (name) => optionsProbeText.split('\n').findIndex((line) => line.includes(name)) + 1
+  assert.deepEqual(optionsDiagnostics.map(({ code, line }) => ({ code, line })), [
+    { code: 2322, line: optionsLine('const repairedInvalidPlacement') },
+    { code: 2322, line: optionsLine('const repairedInvalidStrategy') },
+    { code: 2344, line: optionsLine('type RawPropsEquality') },
+  ], 'Retain every raw diagnostic: original invalid values and both valid/omitted controls compile; repaired invalid values and raw equality fail.')
   // The original SFC never emitted a usable declaration for this free name.
   // Bind its unchanged Partial<Options> annotation to the existing Popper owner
   // before comparing the complete inferred SFC contract. Original useSelect
@@ -132,7 +148,10 @@ test('canonical producer emits Select and its downstream contracts with exact in
     originalSha, compiler: ts.version, positive: 'PASS', negative: 'PASS',
     originalUseSelectComparedUnmodified: true,
     originalSfcOptionsBinding: 'UNBOUND',
+    rawPropsEquality: 'FAIL: TS2344 retained; intentional public popperOptions narrowing',
+    rawOptionsCompatibility: { originalInvalidPlacement: 'ACCEPTED', originalInvalidStrategy: 'ACCEPTED', repairedInvalidPlacement: 'TS2322', repairedInvalidStrategy: 'TS2322', validCompletePartialOptions: 'ACCEPTED by both', omittedOptions: 'ACCEPTED by both', diagnostics: optionsDiagnostics },
     sfcComparisonNormalization: 'Bind only the original Partial<Options> free name to @popperjs/core Options; runtime, prop annotation and assertions unchanged.',
+    normalizedEqualityPurpose: 'Check the intended declared contract after fixing the original free Options name; not raw original public type parity.',
     negativeCodes: negativeDiagnostics.map((row) => row.code),
     checked: ['parameters', 'return keys and fields', 'ref getter/setter', 'props', 'emits', 'slots', 'instance', 'default/named exports', 'installer extras'],
   }, null, 2) + '\n')
