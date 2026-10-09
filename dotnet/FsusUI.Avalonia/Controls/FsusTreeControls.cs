@@ -313,6 +313,7 @@ public class FsusTree : ContentControl
   private int loadVersion;
   private int textCacheAttachmentVersion;
   private TopLevel? textCacheTopLevel;
+  private Dictionary<Typeface, GlyphTypeface>? layoutGlyphTypefaces;
 
   public FsusTree()
   {
@@ -321,6 +322,47 @@ public class FsusTree : ContentControl
     Content = rowsPanel;
     SyncState();
   }
+
+  protected override Size MeasureOverride(Size availableSize)
+  {
+    var previous = layoutGlyphTypefaces;
+    layoutGlyphTypefaces = [];
+    try
+    {
+      return base.MeasureOverride(availableSize);
+    }
+    finally
+    {
+      layoutGlyphTypefaces = previous;
+    }
+  }
+
+  protected override Size ArrangeOverride(Size finalSize)
+  {
+    var previous = layoutGlyphTypefaces;
+    layoutGlyphTypefaces = [];
+    try
+    {
+      return base.ArrangeOverride(finalSize);
+    }
+    finally
+    {
+      layoutGlyphTypefaces = previous;
+    }
+  }
+
+  internal GlyphTypeface ResolveLayoutGlyphTypeface(Typeface typeface)
+  {
+    // Sibling labels share effective fonts. Resolve once within this layout
+    // pass, then query the provider afresh on the next pass or standalone label.
+    if (layoutGlyphTypefaces is null)
+      return typeface.GlyphTypeface;
+    if (!layoutGlyphTypefaces.TryGetValue(typeface, out var glyphTypeface))
+      layoutGlyphTypefaces[typeface] = glyphTypeface = typeface.GlyphTypeface;
+    return glyphTypeface;
+  }
+
+  internal void InvalidateLayoutGlyphTypefaces() => layoutGlyphTypefaces?.Clear();
 
   public string? AccessibleName { get; set; }
   public Collection<FsusTreeNode> Nodes { get; } = [];
@@ -1516,9 +1558,11 @@ public class FsusTree : ContentControl
 // preview cache owns separate references to immutable shaped runs, not layouts.
 internal sealed class FsusTreeDefaultLabel : TextBlock
 {
+  private readonly FsusTree owner;
   private static readonly char[] ParagraphBreaks = ['\r', '\n', '\v', '\f', '\u0085', '\u2028', '\u2029'];
   private TextRunCache? shapingCache;
   private ShapingInputs? shapingInputs;
+  private GenericTextRunProperties? shapingProperties;
 
   private sealed record ShapingInputs(
     string? Text,
@@ -1538,6 +1582,7 @@ internal sealed class FsusTreeDefaultLabel : TextBlock
 
   internal FsusTreeDefaultLabel(FsusTree owner)
   {
+    this.owner = owner;
     AutomationProperties.SetClassNameOverride(this, nameof(TextBlock));
     ResourcesChanged += (_, _) =>
     {
@@ -1547,6 +1592,7 @@ internal sealed class FsusTreeDefaultLabel : TextBlock
           ((ILogical)owner).IsAttachedToLogicalTree && this.IsAttachedToVisualTree() &&
           ((ILogical)this).IsAttachedToLogicalTree)
       {
+        owner.InvalidateLayoutGlyphTypefaces();
         ReleaseShapingCache();
         InvalidateTextLayout();
       }
@@ -1562,6 +1608,7 @@ internal sealed class FsusTreeDefaultLabel : TextBlock
     shapingCache?.Dispose();
     shapingCache = null;
     shapingInputs = null;
+    shapingProperties = null;
   }
 
   protected override TextLayout CreateTextLayout(string? text)
@@ -1580,7 +1627,7 @@ internal sealed class FsusTreeDefaultLabel : TextBlock
 
     var typeface = new Typeface(FontFamily, FontStyle, FontWeight, FontStretch);
     var brush = Foreground as ISolidColorBrush;
-    var inputs = new ShapingInputs(text, typeface, typeface.GlyphTypeface,
+    var inputs = new ShapingInputs(text, typeface, owner.ResolveLayoutGlyphTypeface(typeface),
       FontSize, Foreground, brush?.Color, brush?.Opacity,
       brush?.Transform?.Value, brush?.TransformOrigin,
       FlowDirection, LetterSpacing, TopLevel.GetTopLevel(this)?.RenderScaling ?? 1,
@@ -1594,11 +1641,14 @@ internal sealed class FsusTreeDefaultLabel : TextBlock
       ReleaseShapingCache();
       shapingInputs = inputs;
       shapingCache = new TextRunCache();
+      // Line metrics resolve the glyph typeface through these properties.
+      // Keep their lazy resolution with the shaped runs across fresh layouts.
+      shapingProperties = new GenericTextRunProperties(typeface, FontSize,
+        TextDecorations, Foreground, fontFeatures: FontFeatures);
       ShapingBuildCount++;
     }
 
-    var properties = new GenericTextRunProperties(typeface, FontSize,
-      TextDecorations, Foreground, fontFeatures: FontFeatures);
+    var properties = shapingProperties!;
     var paragraph = new GenericTextParagraphProperties(FlowDirection,
       IsMeasureValid ? TextAlignment : TextAlignment.Left, true, false,
       properties, TextWrapping, LineHeight, 0, LetterSpacing);

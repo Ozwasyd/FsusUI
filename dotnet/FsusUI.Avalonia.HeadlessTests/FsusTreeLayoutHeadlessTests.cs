@@ -5,8 +5,12 @@ using Avalonia.Headless.XUnit;
 using Avalonia.Markup.Xaml.Styling;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
+using Avalonia.Media.Fonts;
 using Avalonia.Styling;
 using Avalonia.Threading;
+using System.Collections;
+using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using FsusUI.Avalonia.Controls;
 using Xunit;
 
@@ -14,6 +18,110 @@ namespace FsusUI.Avalonia.HeadlessTests;
 
 public class FsusTreeLayoutHeadlessTests(ITestOutputHelper output)
 {
+  [AvaloniaFact]
+  public void DefaultRowsResolveSharedFontsPerLayoutPassAndObserveProviderReplacement()
+  {
+    var manager = FontManager.Current;
+    var originalFace = new Typeface(manager.DefaultFontFamily).GlyphTypeface;
+    var replacementFace = new Typeface(manager.DefaultFontFamily, weight: FontWeight.Bold).GlyphTypeface;
+    Assert.NotSame(originalFace, replacementFace);
+    var collection = new CountingFontCollection(originalFace);
+    manager.AddFontCollection(collection);
+    var tree = new FsusTree();
+    for (var index = 0; index < 1000; index++)
+      tree.Nodes.Add(new FsusTreeNode($"p-{index}", $"Parent {index}"));
+    tree.RefreshView();
+    var host = new Grid { Width = 1120, Height = 700, Children = { tree } };
+    var window = new Window
+    {
+      Width = 1180, Height = 760, Content = host,
+      FontFamily = new FontFamily("fonts:fsus-tree-layout-test#Tree Layout"),
+    };
+    window.Show();
+    try
+    {
+      Dispatcher.UIThread.RunJobs();
+      var labels = Assert.IsType<StackPanel>(tree.Content).Children.Cast<Border>()
+        .Select(row => Assert.IsType<FsusTreeDefaultLabel>(row.Child)).ToArray();
+      Assert.Equal(1000, labels.Length);
+      var builds = labels.Select(label => label.ShapingBuildCount).ToArray();
+      var lookups = collection.Lookups;
+      host.Children.Remove(tree);
+      host.Children.Add(tree);
+      host.Measure(new Size(1120, 700));
+      host.Arrange(new Rect(0, 0, 1120, 700));
+      Dispatcher.UIThread.RunJobs();
+      var repeatedLookups = collection.Lookups - lookups;
+      output.WriteLine($"Shared font provider queries on unchanged remount: {repeatedLookups}");
+      Assert.InRange(repeatedLookups, 1, 8);
+      for (var index = 0; index < labels.Length; index++)
+        Assert.Equal(builds[index], labels[index].ShapingBuildCount);
+
+      var replacement = new CountingFontCollection(replacementFace);
+      manager.AddFontCollection(replacement);
+      Assert.True(collection.Disposed);
+      foreach (var label in labels)
+        label.InvalidateMeasure();
+      host.Measure(new Size(1120, 700));
+      host.Arrange(new Rect(0, 0, 1120, 700));
+      Dispatcher.UIThread.RunJobs();
+      Assert.True(replacement.Lookups > 0);
+      for (var index = 0; index < labels.Length; index++)
+        Assert.True(labels[index].ShapingBuildCount > builds[index]);
+
+      var standaloneBuilds = labels[0].ShapingBuildCount;
+      var standaloneProvider = new CountingFontCollection(originalFace);
+      manager.AddFontCollection(standaloneProvider);
+      labels[0].InvalidateMeasure();
+      labels[0].Measure(new Size(1120, 700));
+      Assert.True(standaloneProvider.Lookups > 0);
+      Assert.True(labels[0].ShapingBuildCount > standaloneBuilds);
+    }
+    finally
+    {
+      window.Close();
+      manager.RemoveFontCollection(collection.Key);
+    }
+  }
+
+  private sealed class CountingFontCollection(GlyphTypeface face) : IFontCollection
+  {
+    public Uri Key { get; } = new("fonts:fsus-tree-layout-test");
+    public int Lookups { get; private set; }
+    public bool Disposed { get; private set; }
+    public int Count => 1;
+    public FontFamily this[int index] => index == 0 ? new FontFamily("Tree Layout") : throw new IndexOutOfRangeException();
+    public IEnumerator<FontFamily> GetEnumerator() => new[] { this[0] }.AsEnumerable().GetEnumerator();
+    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+    public void Dispose() => Disposed = true;
+    public bool TryGetGlyphTypeface(string familyName, FontStyle style, FontWeight weight,
+      FontStretch stretch, [NotNullWhen(true)] out GlyphTypeface? glyphTypeface)
+    {
+      Lookups++;
+      glyphTypeface = face;
+      return true;
+    }
+    public bool TryGetNearestMatch(string familyName, FontStyle style, FontWeight weight,
+      FontStretch stretch, [NotNullWhen(true)] out GlyphTypeface? glyphTypeface) =>
+      TryGetGlyphTypeface(familyName, style, weight, stretch, out glyphTypeface);
+    public bool TryMatchCharacter(int codepoint, FontStyle fontStyle, FontWeight fontWeight,
+      FontStretch fontStretch, string? familyName, CultureInfo? culture, out Typeface typeface) =>
+      FontManager.Current.SystemFonts.TryMatchCharacter(codepoint, fontStyle, fontWeight, fontStretch,
+        null, culture, out typeface);
+    public bool TryGetFamilyTypefaces(string familyName,
+      [NotNullWhen(true)] out IReadOnlyList<Typeface>? familyTypefaces)
+    {
+      familyTypefaces = [new Typeface("Tree Layout")];
+      return true;
+    }
+    public bool TryCreateSyntheticGlyphTypeface(GlyphTypeface glyphTypeface, FontStyle style,
+      FontWeight weight, FontStretch stretch, [NotNullWhen(true)] out GlyphTypeface? syntheticGlyphTypeface)
+    {
+      syntheticGlyphTypeface = null;
+      return false;
+    }
+  }
+
   [AvaloniaFact]
   public void DefaultRowsKeepMeasurementsAcrossExpansionAndFocusAndInvalidateOnRemount()
   {
