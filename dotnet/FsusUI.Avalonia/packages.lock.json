@@ -15,9 +15,9 @@
       },
       "Microsoft.NET.ILLink.Tasks": {
         "type": "Direct",
-        "requested": "[10.0.8, )",
-        "resolved": "10.0.8",
-        "contentHash": "8xjelvAJif6q6j58ksrhAG0cstEih4hNxiUgFLOh3v6ZUgxW4CC6dYsvFwyCFv+WjARtSgi7yrDJd16Ig5M7DQ=="
+        "requested": "[10.0.12, )",
+        "resolved": "10.0.12",
+        "contentHash": "xi+BDjFpW+Sb+MHFHaH6Y/gV9I8BluFwRXc1QyCdoZbIK26eNiBeFuMTe/FMwc33G1wdHCyDg7CVTmb8OdQrMQ=="
       },
       "Avalonia.BuildServices": {
         "type": "Transitive",
