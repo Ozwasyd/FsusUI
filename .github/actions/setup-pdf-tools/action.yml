@@ -1,0 +1,87 @@
+name: Set up PDF inspection tools
+description: Install registry Poppler tools and require pdfinfo, pdftotext, and pdftoppm.
+runs:
+  using: composite
+  steps:
+    - name: Install Ubuntu Poppler utilities
+      if: runner.os == 'Linux'
+      shell: bash
+      run: |
+        set -euo pipefail
+        # Use the runner's signed Ubuntu repositories and freeze this install's candidate.
+        sudo apt-get update
+        apt-cache policy poppler-utils
+        version=$(apt-cache policy poppler-utils | awk '/Candidate:/ { print $2 }')
+        test -n "$version" && test "$version" != '(none)'
+        sudo apt-get install --yes --no-install-recommends "poppler-utils=$version"
+        test "$(dpkg-query -W -f='${Version}' poppler-utils)" = "$version"
+        for tool in pdfinfo pdftotext pdftoppm; do
+          test -x "/usr/bin/$tool"
+          dpkg-query -S "/usr/bin/$tool"
+          "/usr/bin/$tool" -v
+        done
+        echo /usr/bin >> "$GITHUB_PATH"
+
+    - name: Install Homebrew Poppler
+      if: runner.os == 'macOS'
+      shell: bash
+      env:
+        HOMEBREW_NO_AUTO_UPDATE: '1'
+      run: |
+        set -euo pipefail
+        # Homebrew verifies the source/bottle SHA-256 from its official core formula.
+        metadata="$RUNNER_TEMP/fsusui-poppler-homebrew.json"
+        brew info --json=v2 homebrew/core/poppler > "$metadata"
+        cat "$metadata"
+        version=$(node -e 'const f = require(process.argv[1]).formulae[0]; if (f.tap !== "homebrew/core" || !f.versions.stable) throw Error("Expected stable Homebrew core Poppler"); console.log(f.versions.stable)' "$metadata")
+        brew install homebrew/core/poppler
+        bin="$(brew --prefix homebrew/core/poppler)/bin"
+        for tool in pdfinfo pdftotext pdftoppm; do
+          test -x "$bin/$tool"
+          actual=$("$bin/$tool" -v 2>&1)
+          echo "$actual"
+          test "$(printf '%s\n' "$actual" | head -n 1)" = "$tool version $version"
+        done
+        echo "$bin" >> "$GITHUB_PATH"
+
+    - name: Install Chocolatey Poppler
+      if: runner.os == 'Windows'
+      shell: pwsh
+      run: |
+        $ErrorActionPreference = 'Stop'
+        # Registry provenance and bundled archive SHA-256:
+        # https://community.chocolatey.org/packages/poppler/26.9.0
+        # conda-forge binaries packaged by oschwartz10612/poppler-windows v26.09.0-0.
+        $downloadRoot = Join-Path $env:RUNNER_TEMP 'fsusui-poppler'
+        New-Item -ItemType Directory -Path $downloadRoot -Force | Out-Null
+        $archive = Join-Path $downloadRoot 'poppler.26.9.0.nupkg'
+        Invoke-WebRequest -Uri 'https://community.chocolatey.org/api/v2/package/poppler/26.9.0' -OutFile $archive
+        if ((Get-FileHash $archive -Algorithm SHA256).Hash -ne '08718647EC0C314D8A229D601CBE920255E75B6FECF84952D59FAAD04248E706') {
+          throw 'Poppler registry package SHA-256 mismatch'
+        }
+        choco install poppler --version=26.9.0 --source="$downloadRoot" --yes --no-progress --require-checksums
+        if ($LASTEXITCODE -ne 0) { throw "Chocolatey Poppler install failed: $LASTEXITCODE" }
+        $packageRoot = Join-Path $env:ChocolateyInstall 'lib/poppler'
+        [xml]$package = Get-Content (Join-Path $packageRoot 'poppler.nuspec')
+        if ($package.package.metadata.version -ne '26.9.0') { throw 'Expected Poppler package 26.9.0' }
+        $executables = @(Get-ChildItem (Join-Path $packageRoot 'tools') -Filter pdfinfo.exe -Recurse -File)
+        if ($executables.Count -ne 1) { throw 'Expected exactly one installed Poppler bin directory' }
+        $bin = $executables[0].DirectoryName
+        foreach ($tool in @('pdfinfo', 'pdftotext', 'pdftoppm')) {
+          $executable = Join-Path $bin "$tool.exe"
+          if (-not (Test-Path $executable -PathType Leaf)) { throw "Missing $executable" }
+          $actual = & $executable -v 2>&1
+          if ($LASTEXITCODE -ne 0) { throw "$tool version check failed: $LASTEXITCODE" }
+          $actual | ForEach-Object { Write-Host $_ }
+          if ($actual[0].ToString() -ne "$tool version 26.09.0") { throw "Unexpected $tool version" }
+        }
+        $bin | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+
+    - name: Require PDF tools on the test PATH
+      shell: bash
+      run: |
+        set -euo pipefail
+        for tool in pdfinfo pdftotext pdftoppm; do
+          command -v "$tool"
+          "$tool" -v
+        done
