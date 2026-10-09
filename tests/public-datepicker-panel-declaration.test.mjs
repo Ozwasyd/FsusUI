@@ -5,6 +5,8 @@ import {
   readFileSync,
   realpathSync,
   copyFileSync,
+  mkdirSync,
+  rmSync,
   writeFileSync,
 } from 'node:fs'
 import { createRequire } from 'node:module'
@@ -12,6 +14,7 @@ import os from 'node:os'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import test from 'node:test'
+import { extractCandidate } from '../scripts/npm-candidate-lib.mjs'
 import {
   authority,
   readArtifactAuthority,
@@ -259,4 +262,84 @@ test('actual installed tarball accepts the exact panel contract and rejects inva
     negative.map((diagnostic) => diagnostic.code).sort(),
     [2322, 2345, 2345, 2554],
   )
+})
+
+test('canonical panel candidates reject damaged payloads and unproven manifests', () => {
+  const consumer = process.env.PUBLIC_DATEPICKER_PANEL_CONSUMER
+  assert.ok(
+    consumer,
+    'set PUBLIC_DATEPICKER_PANEL_CONSUMER to the actual frozen installation',
+  )
+  const consumerManifest = readJson(path.join(consumer, 'package.json'))
+  const tarball = path.resolve(
+    consumer,
+    consumerManifest.dependencies['@ozwasyd/element-plus'].slice(5),
+  )
+  const packageRoot = path.join(consumer, 'node_modules/@ozwasyd/element-plus')
+  const baseline = readArtifactAuthority(root, consumer, packageRoot)
+  const temporary = mkdtempSync(
+    path.join(os.tmpdir(), 'datepicker-panel-refusals-'),
+  )
+  try {
+    const extracted = extractCandidate(tarball, path.join(temporary, 'payload'))
+    for (const [file] of baseline.installationAdditions) {
+      mkdirSync(path.dirname(path.join(extracted, file)), { recursive: true })
+      copyFileSync(path.join(packageRoot, file), path.join(extracted, file))
+    }
+    const runtime = path.join(
+      extracted,
+      'es/components/date-picker/src/panel-utils.mjs',
+    )
+    writeFileSync(
+      runtime,
+      `${readFileSync(runtime, 'utf8')}\n// damaged-payload-control\n`,
+    )
+    assert.throws(
+      () => readArtifactAuthority(root, consumer, extracted),
+      /installed package must contain the exact verified tarball bytes/,
+    )
+
+    const candidate = path.join(temporary, 'candidate')
+    mkdirSync(candidate)
+    const copiedTarball = path.join(candidate, 'fsusui-npm-candidate.tgz')
+    copyFileSync(tarball, copiedTarball)
+    copyFileSync(
+      path.join(path.dirname(tarball), 'fsusui-npm-candidate.sha256'),
+      path.join(candidate, 'fsusui-npm-candidate.sha256'),
+    )
+    const manifestPath = path.join(
+      candidate,
+      'fsusui-npm-candidate.manifest.json',
+    )
+    consumerManifest.dependencies['@ozwasyd/element-plus'] =
+      `file:${copiedTarball}`
+    writeFileSync(
+      path.join(temporary, 'package.json'),
+      `${JSON.stringify(consumerManifest)}\n`,
+    )
+    const manifest = structuredClone(baseline.manifest)
+    manifest.toolchain.pnpm = '0.0.0'
+    writeFileSync(manifestPath, `${JSON.stringify(manifest)}\n`)
+    assert.throws(
+      () => readArtifactAuthority(root, temporary, packageRoot),
+      /Expected values to be strictly deep-equal/,
+    )
+    manifest.toolchain.pnpm = baseline.manifest.toolchain.pnpm
+    manifest.commitSha = authority.baseline
+    writeFileSync(manifestPath, `${JSON.stringify(manifest)}\n`)
+    assert.throws(
+      () => readArtifactAuthority(root, temporary, packageRoot),
+      /recognized repaired source state/,
+    )
+    writeFileSync(manifestPath, `${JSON.stringify(baseline.manifest)}\n`)
+    const damaged = readFileSync(copiedTarball)
+    damaged[damaged.length - 1] ^= 1
+    writeFileSync(copiedTarball, damaged)
+    assert.throws(
+      () => readArtifactAuthority(root, temporary, packageRoot),
+      /checksum sidecar does not match/,
+    )
+  } finally {
+    rmSync(temporary, { recursive: true, force: true })
+  }
 })
