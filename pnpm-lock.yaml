@@ -6,7 +6,7 @@ settings:
 
 patchedDependencies:
   '@vue-macros/api@0.13.4':
-    hash: ff6f866749c59d4d1bb70fe16106290f474e9913a5de82eacb8afe84057220c7
+    hash: aed97dea4d00fa0806099b31a7ec0dc8e14fbc3f5f8df02968a5c0916076643b
     path: patches/@vue-macros__api@0.13.4.patch
 
 importers:
@@ -10682,7 +10682,7 @@ snapshots:
       path-browserify: 1.0.1
       vscode-uri: 3.1.0
 
-  '@vue-macros/api@0.13.4(patch_hash=ff6f866749c59d4d1bb70fe16106290f474e9913a5de82eacb8afe84057220c7)(vue@3.5.32(typescript@6.0.2))':
+  '@vue-macros/api@0.13.4(patch_hash=aed97dea4d00fa0806099b31a7ec0dc8e14fbc3f5f8df02968a5c0916076643b)(vue@3.5.32(typescript@6.0.2))':
     dependencies:
       '@vue-macros/common': 1.16.1(vue@3.5.32(typescript@6.0.2))
       oxc-resolver: 4.2.0
@@ -10691,7 +10691,7 @@ snapshots:
 
   '@vue-macros/better-define@1.11.4(vue@3.5.32(typescript@6.0.2))':
     dependencies:
-      '@vue-macros/api': 0.13.4(patch_hash=ff6f866749c59d4d1bb70fe16106290f474e9913a5de82eacb8afe84057220c7)(vue@3.5.32(typescript@6.0.2))
+      '@vue-macros/api': 0.13.4(patch_hash=aed97dea4d00fa0806099b31a7ec0dc8e14fbc3f5f8df02968a5c0916076643b)(vue@3.5.32(typescript@6.0.2))
       '@vue-macros/common': 1.16.1(vue@3.5.32(typescript@6.0.2))
       unplugin: 1.16.1
     transitivePeerDependencies:
@@ -10748,7 +10748,7 @@ snapshots:
 
   '@vue-macros/define-prop@0.6.5(vue@3.5.32(typescript@6.0.2))':
     dependencies:
-      '@vue-macros/api': 0.13.4(patch_hash=ff6f866749c59d4d1bb70fe16106290f474e9913a5de82eacb8afe84057220c7)(vue@3.5.32(typescript@6.0.2))
+      '@vue-macros/api': 0.13.4(patch_hash=aed97dea4d00fa0806099b31a7ec0dc8e14fbc3f5f8df02968a5c0916076643b)(vue@3.5.32(typescript@6.0.2))
       '@vue-macros/common': 1.16.1(vue@3.5.32(typescript@6.0.2))
       unplugin: 1.16.1
       vue: 3.5.32(typescript@6.0.2)
