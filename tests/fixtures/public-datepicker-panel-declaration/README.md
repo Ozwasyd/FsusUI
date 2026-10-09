@@ -40,10 +40,25 @@ Only these exact recognized inputs select the complete expected diagnostic rows:
 12 original, 11 independent, and zero in the real combination. Unknown inputs or
 any additional diagnostic fail. There is no caller-supplied expected-count option.
 
-The installed test identifies the actual tarball by SHA256, checks the recorded
-canonical manifest against current build inputs, and compares every installed
-package file with the extracted real tarball, plus the exact recorded pnpm KaTeX
-binary shim added during installation. Other additions or changed bytes fail.
+The installed test checks the actual canonical manifest and checksum with the
+unchanged repository candidate verifier. Its immutable source commit must match
+one of the complete measured source fingerprints; manifest fields, build inputs,
+package metadata, Node/pnpm/npm versions, and the lock remain exact. A new genuine
+candidate is accepted after its complete extracted file list and content digests
+match `dist/element-plus` from the actual same-source canonical build. No caller
+can supply an expected hash or count. The previously measured tarball hashes are
+retained as historical replay identities, rather than the only permitted builds.
+This test does not replace the already-tested publish candidate: the immutable
+publication and diagnostic comparison rules remain in
+`docs/releases/policy/npm-registry.md`.
+
+The test compares every installed
+package file with the extracted real tarball, plus the pnpm KaTeX binary shim
+added during installation. The launcher must match the recorded pinned pnpm
+template byte for byte after removing only its exact installation-derived
+`NODE_PATH` block. Its two binary targets must resolve to the actual pinned
+KaTeX 0.17.0 CLI. Its complete installed digest is then recorded; changed
+launcher commands, paths, payload bytes, or other additions fail.
 The known independent artifact must
 produce exactly its four recorded missing-barrel diagnostics; the real combination
 must produce none. Both must reject the same four negative calls at their precise

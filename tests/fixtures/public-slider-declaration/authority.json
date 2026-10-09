@@ -227,5 +227,28 @@
       "producerDiagnostics": [],
       "externalDiagnostics": []
     }
-  ]
+  ],
+  "candidateContract": {
+    "toolchain": {
+      "node": "v24.19.0",
+      "npm": "11.13.0",
+      "pnpm": "10.33.0"
+    },
+    "package": {
+      "distTag": "latest",
+      "name": "@ozwasyd/element-plus",
+      "packageJsonCanonicalSha256": "545e8aef06c99df84e361a4b4838f105f1513318cf3143678b27f529cd8b14e8",
+      "version": "1.5.1"
+    },
+    "thirdPartyLock": {
+      "packages": {
+        "count": 273,
+        "sha256": "cc235e5b3be7607e5f4d31ccb4dcbd3f8a21878b0e7f1ddd6b4e8d50cb9dc95d"
+      },
+      "snapshots": {
+        "count": 273,
+        "sha256": "36c3f3314e5c771bfc2f3f344a8f52ac8684dee791a25e083629f044e12623d5"
+      }
+    }
+  }
 }

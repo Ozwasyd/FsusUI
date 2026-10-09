@@ -25,10 +25,11 @@ specifically `slider-source-test/producer.json`,
 locations and codes agree between those two actual packed observations. Only
 installation-directory prefixes are normalized; no diagnostic is ignored.
 
-The installed test hashes the real tarball, checks every installed package file
+The historical `tarballSha256` fields identify the original observations; they are
+not an artifact admission list. The installed test hashes the real tarball, checks every installed package file
 against its archive bytes (excluding pnpm's added `node_modules` dependency links
 and bin shims), and preserves the original 36 Slider JS file hashes.
-Unknown source inputs, artifacts, changed diagnostics, additional diagnostics or
+Unknown source inputs, inconsistent artifacts, changed diagnostics, additional diagnostics or
 missing negative refusals fail. There is no environment override for expectations.
 The canonical observer still returns the original complete diagnostics unchanged,
 compares original inferred parameters and return (all 19 fields), and compares all
@@ -70,3 +71,55 @@ archive-scope assertion, small-heap OOM and generated-WASM-stub failure remain
 recorded. Only owned tests/setup reuse were corrected; no production contract,
 generator/config, dependency or frozen input was edited. Final documentation and
 evidence additions do not change the tested functional files or input fingerprints.
+
+## Diagnostic rebuild admission successor
+
+The original raw-tgz equality assertion at `37bfa80a` rejected the reviewer's
+actual same-source rebuilds before positive/negative compilation. Those failures
+remain recorded; the author hashes are retained as historical observations.
+
+The [immutable candidate policy](../../../docs/releases/policy/npm-registry.md)
+keeps the tested candidate as the publication input. This source fixture grants
+no publication authority. For a diagnostic rebuild it now invokes the unchanged
+repository `verifyCandidate` contract, with these additional controls:
+
+- Hash the real tarball and require its checksum/manifest to bind the same bytes.
+- Read the manifest's full commit from Git, hash all 2,004 actual committed input
+  blobs, and require the same pinned input graph as the current checkout. A
+  manifest label by itself cannot select an authority profile.
+- Require all six canonical build-input digests/fingerprint, Release profile,
+  prepared package identity and original Node/npm/pnpm identities to agree.
+- Bind the frozen install's SHA-512 to the actual tarball and compare all original
+  273 third-party package and snapshot blocks; consumer compiler versions stay
+  fixed at TypeScript 6.0.2, Vue 3.5.32 and vue-tsc 3.2.6.
+- Run the real canonical observer in this invocation even when only the installed
+  test is selected. Compare every emitted Slider declaration (16 in each of
+  `es` and `lib`) after the pinned publication self-reference rewrite; missing,
+  additional or modified Slider declarations fail. Both formats copy the same
+  declaration output in the canonical build.
+- Preserve complete archive/installed payload byte equality, the 36 original
+  Slider runtime hashes, parameter/19-field paired contracts and all 16 exact
+  strict negative refusals. Unknown diagnostics still fail.
+
+No caller-provided expected hash/count or new archive hash allowlist is accepted.
+The test checks this candidate's integrity and Slider declarations; complete
+runtime qualification remains separate. In particular, it neither compares nor
+waives Motion compiler variations: the four full-bundle byte differences and
+Node16 failures remain FAIL in their original evidence. The historical 35 runtime
+controls retain their original source identities.
+
+Actual successor validation at `946d6da410562f45445e46c4ac47adf68c35fdb6`:
+installed-only invocation PASS 1/1 (zero skipped), including a fresh real canonical
+run, all 7,240 installed/archive payload files, 32 Slider declarations, 36 original
+runtime files, all 16 strict negative diagnostics and candidate/declaration refusal
+controls. Whole-library strict remains FAIL with the original eight external
+errors. Actual f4 canonical/inventory controls PASS 2/2 (zero skipped), diagnostics
+zero, 19 paired fields and all 16 generated Slider declarations preserved.
+
+The reviewer's actual `14ecb9b2` candidate bytes are in its own environment; this
+environment has not executed the new composed installed phases. The same reviewer
+must run the command above with its real frozen consumer and adjacent original
+candidate sidecars. This is a pending actual run, not a user-permission request or
+an inferred shared path. [rebuild-results.json](./rebuild-results.json) records the
+actual commands, source/input/manifest/payload identities, results, refusal checks
+and remaining UNRUN checks. Previous result files and failed logs are retained.

@@ -1,0 +1,536 @@
+{
+  "testedFunctionalCommit": "946d6da410562f45445e46c4ac47adf68c35fdb6",
+  "authority": "Existing immutable candidate verifier plus committed/current source-input proof and fresh canonical Slider output; no new archive SHA allowlist",
+  "contractSources": [
+    "docs/releases/policy/npm-registry.md",
+    "scripts/npm-candidate-lib.mjs",
+    "vue/internal/build/gulpfile.ts",
+    "scripts/prepare-npm-package.mjs"
+  ],
+  "ownedDelta": [
+    "tests/public-slider-declaration.test.mjs",
+    "tests/fixtures/public-slider-declaration/authority.mjs",
+    "tests/fixtures/public-slider-declaration/authority.json",
+    "tests/fixtures/public-slider-declaration/observe-producer.mjs",
+    "tests/fixtures/public-slider-declaration/README.md",
+    "tests/fixtures/public-slider-declaration/rebuild-results.json"
+  ],
+  "inheritedSourceAndControls": "Original UseSlide implementation, original positive/negative fixture bytes and changeset remain identical to 4214f38b; original scripts/config/SDK/lock unchanged",
+  "preflight": {
+    "count": 35,
+    "status": "PASS",
+    "receipt": {
+      "file": "/tmp/slider-rebuild-reviewfix/original-selection.json",
+      "sha256": "aa2cb104a50042ec637b24dfb6cddbfc7b95316c51e80d7656ff77045e17f7c7",
+      "bytes": 5510
+    },
+    "historicalRuntime35": "retained under original identity; not rerun for test-only change"
+  },
+  "independentInstalled": {
+    "status": "PASS 1/1, zero skipped",
+    "command": "FSUS_NODE_HEAP_PROFILE=build SLIDER_EVIDENCE_DIR=/tmp/slider-rebuild-reviewfix/independent-installed SLIDER_CONSUMER_ROOT=/tmp/slider-evidence/after-consumer node scripts/with-node-heap.mjs node --test --test-name-pattern=\"actual installed tarball\" tests/public-slider-declaration.test.mjs",
+    "log": "PASS: strict packed slider controls (independent-slider); full-library strict FAIL with 8 diagnostics\n\u2714 actual installed tarball checks strict slider positive and negative controls (164794.156165ms)\n\u2139 tests 1\n\u2139 suites 0\n\u2139 pass 1\n\u2139 fail 0\n\u2139 cancelled 0\n\u2139 skipped 0\n\u2139 todo 0\n\u2139 duration_ms 165061.316994\n",
+    "identity": {
+      "sourceProfile": "independent-slider",
+      "frozenLock": {
+        "packages": {
+          "count": 273,
+          "sha256": "cc235e5b3be7607e5f4d31ccb4dcbd3f8a21878b0e7f1ddd6b4e8d50cb9dc95d"
+        },
+        "snapshots": {
+          "count": 273,
+          "sha256": "36c3f3314e5c771bfc2f3f344a8f52ac8684dee791a25e083629f044e12623d5"
+        }
+      },
+      "tarballSha256": "c3b064aa8cca53d7e1d78a3ba921171d47d4a1e02f9679bfa3d34e73eecb5fe7",
+      "candidateCommit": "ef1840ea47b975c276d3af1aa05fa96c8809d9f8",
+      "inputFingerprint": "930001f636bcc02ac70beadc57e5a979ba778aaf8e781174f386d1d047eaa4af",
+      "manifestSha256": "3728bd26e5395fc9a01aac5564aab0e8b8bb3356901d34d31f64ee60ed74b79d",
+      "installedPayloadFiles": 7240,
+      "installedPayloadSha256": "b3dc67cbae344061010242318f02feb7bd04ea5712925c21dc2b9a6257a39a76",
+      "canonicalSliderDeclarationFiles": 32,
+      "sliderRuntimeFiles": 36
+    },
+    "strictStatus": {
+      "sourceProfile": "independent-slider",
+      "fixtureControls": "PASS",
+      "wholeLibraryStrict": "FAIL",
+      "positiveDiagnostics": 8,
+      "negativeLocalDiagnostics": 16,
+      "externalDiagnostics": 8,
+      "wholeArtifactRuntimeParity": "UNRUN (separate retained FAIL evidence)"
+    },
+    "producer": {
+      "baseline": "2d05f240e5fb04ac0cd602b4ed638ffe00b1859b",
+      "sourceProfile": "independent-slider",
+      "sourceInputsSha256": "aada160779f8b093850f18346216b89b3895716bd37c92f95cb054b7e03061f8",
+      "head": "946d6da410562f45445e46c4ac47adf68c35fdb6",
+      "producerTypeScript": "5.9.2",
+      "originalDiagnosticReturnUnchanged": true,
+      "diagnostics": [
+        {
+          "code": 7056,
+          "file": "vue/packages/components/cascader/index.ts",
+          "start": 441,
+          "message": "The inferred type of this node exceeds the maximum length the compiler will serialize. An explicit type annotation is needed."
+        },
+        {
+          "code": 7056,
+          "file": "vue/packages/components/cascader/src/cascader.vue",
+          "start": 1642,
+          "message": "The inferred type of this node exceeds the maximum length the compiler will serialize. An explicit type annotation is needed."
+        },
+        {
+          "code": 7056,
+          "file": "vue/packages/components/date-picker/src/panel-utils.ts",
+          "start": 284,
+          "message": "The inferred type of this node exceeds the maximum length the compiler will serialize. An explicit type annotation is needed."
+        },
+        {
+          "code": 7056,
+          "file": "vue/packages/components/pagination/src/components/sizes.vue",
+          "start": 371,
+          "message": "The inferred type of this node exceeds the maximum length the compiler will serialize. An explicit type annotation is needed."
+        },
+        {
+          "code": 7056,
+          "file": "vue/packages/components/select/index.ts",
+          "start": 207,
+          "message": "The inferred type of this node exceeds the maximum length the compiler will serialize. An explicit type annotation is needed."
+        },
+        {
+          "code": 7056,
+          "file": "vue/packages/components/select/src/select.vue",
+          "start": 1314,
+          "message": "The inferred type of this node exceeds the maximum length the compiler will serialize. An explicit type annotation is needed."
+        },
+        {
+          "code": 7056,
+          "file": "vue/packages/components/select/src/useSelect.ts",
+          "start": 1693,
+          "message": "The inferred type of this node exceeds the maximum length the compiler will serialize. An explicit type annotation is needed."
+        },
+        {
+          "code": 7056,
+          "file": "vue/packages/components/time-select/index.ts",
+          "start": 463,
+          "message": "The inferred type of this node exceeds the maximum length the compiler will serialize. An explicit type annotation is needed."
+        },
+        {
+          "code": 7056,
+          "file": "vue/packages/components/time-select/src/time-select.vue",
+          "start": 539,
+          "message": "The inferred type of this node exceeds the maximum length the compiler will serialize. An explicit type annotation is needed."
+        }
+      ],
+      "pairDiagnostics": [],
+      "fields": [
+        {
+          "name": "elFormItem",
+          "beforeToAfter": true,
+          "afterToBefore": true
+        },
+        {
+          "name": "slider",
+          "beforeToAfter": true,
+          "afterToBefore": true
+        },
+        {
+          "name": "firstButton",
+          "beforeToAfter": true,
+          "afterToBefore": true
+        },
+        {
+          "name": "secondButton",
+          "beforeToAfter": true,
+          "afterToBefore": true
+        },
+        {
+          "name": "sliderDisabled",
+          "beforeToAfter": true,
+          "afterToBefore": true
+        },
+        {
+          "name": "minValue",
+          "beforeToAfter": true,
+          "afterToBefore": true
+        },
+        {
+          "name": "maxValue",
+          "beforeToAfter": true,
+          "afterToBefore": true
+        },
+        {
+          "name": "runwayStyle",
+          "beforeToAfter": true,
+          "afterToBefore": true
+        },
+        {
+          "name": "barStyle",
+          "beforeToAfter": true,
+          "afterToBefore": true
+        },
+        {
+          "name": "resetSize",
+          "beforeToAfter": true,
+          "afterToBefore": true
+        },
+        {
+          "name": "setPosition",
+          "beforeToAfter": true,
+          "afterToBefore": true
+        },
+        {
+          "name": "emitChange",
+          "beforeToAfter": true,
+          "afterToBefore": true
+        },
+        {
+          "name": "onSliderWrapperPrevent",
+          "beforeToAfter": true,
+          "afterToBefore": true
+        },
+        {
+          "name": "onSliderClick",
+          "beforeToAfter": true,
+          "afterToBefore": true
+        },
+        {
+          "name": "onSliderDown",
+          "beforeToAfter": true,
+          "afterToBefore": true
+        },
+        {
+          "name": "setFirstPosition",
+          "beforeToAfter": true,
+          "afterToBefore": true
+        },
+        {
+          "name": "setFirstValue",
+          "beforeToAfter": true,
+          "afterToBefore": true
+        },
+        {
+          "name": "setSecondPosition",
+          "beforeToAfter": true,
+          "afterToBefore": true
+        },
+        {
+          "name": "setSecondValue",
+          "beforeToAfter": true,
+          "afterToBefore": true
+        }
+      ],
+      "runtime": [
+        {
+          "file": "vue/packages/components/slider/index.ts",
+          "equal": true
+        },
+        {
+          "file": "vue/packages/components/slider/src/composables/use-slide.ts",
+          "equal": true
+        },
+        {
+          "file": "vue/packages/components/slider/src/slider.vue",
+          "equal": true
+        }
+      ],
+      "sliderDeclarations": [
+        [
+          "components/slider/index.d.ts",
+          "eefb2bdf7c7b659545140a930d590c9f4b3c50dafb9283055d4769b7e383a235"
+        ],
+        [
+          "components/slider/src/button.d.ts",
+          "54a2a98c07d9852307b60ca8457ebfd75ccbb594f974ca03235115499247d803"
+        ],
+        [
+          "components/slider/src/button.vue.d.ts",
+          "7c532914e99ac9d7a4a59ff6c744954c0c86eec781ce231e4b73c3eb6eb28a94"
+        ],
+        [
+          "components/slider/src/composables/index.d.ts",
+          "b830ba3af5dcf16d97aaa937697e111c3dfed6fe0eb1a8d950a40fc2a81fa161"
+        ],
+        [
+          "components/slider/src/composables/use-lifecycle.d.ts",
+          "845eece1064d7687e4455216df4b36fa2267f27492167958d167460e8012ed88"
+        ],
+        [
+          "components/slider/src/composables/use-marks.d.ts",
+          "490633c3eb0d1693c7d7c2aaf0760ceb60daaaf81133607b0b5e895e2a565f61"
+        ],
+        [
+          "components/slider/src/composables/use-slide.d.ts",
+          "bf8633396e9e566a9701fb35b54008054ca192f50e5dd16bad405a3c63ad46e9"
+        ],
+        [
+          "components/slider/src/composables/use-slider-button.d.ts",
+          "2f3b7d9b67da58d3fd5c3b0de2d2148a6de9e1d23f9a124208256f0ce26cff9e"
+        ],
+        [
+          "components/slider/src/composables/use-stops.d.ts",
+          "bd9309dab7e18d66a87d684d2bc7547e3cdbc72b1f945ce5e9494e72567e7f02"
+        ],
+        [
+          "components/slider/src/composables/use-watch.d.ts",
+          "ec434743db23cec09ff80ebf8155b1cdffe4ee9a641c795f18d04fd54ea53916"
+        ],
+        [
+          "components/slider/src/constants.d.ts",
+          "1fcb8ca474dbc351524462f6af0fc1ed460c6ce3a78e20c6eeac22cbb80399dc"
+        ],
+        [
+          "components/slider/src/marker.d.ts",
+          "677555dade27987dbf0eb37c52f1b6a26568f04cc97995f23ddec2a1ec03fb8b"
+        ],
+        [
+          "components/slider/src/slider.d.ts",
+          "db754023448cce89727a80cc03d220be6adc062f16b3ea8c24350db18631663e"
+        ],
+        [
+          "components/slider/src/slider.vue.d.ts",
+          "bb5fbe1ceba91fc9f9933cda7b568a1b9d4a25162da5f34fc5d0c39ae9a3d03f"
+        ],
+        [
+          "components/slider/style/css.d.ts",
+          "1def68be7aaaaf73809a5cb046eac894dfb9e0d09a82f9a73822446922a5c387"
+        ],
+        [
+          "components/slider/style/index.d.ts",
+          "eb7f20babd9f30ecd73e3ba3d958d9b5ad5a755f5631eaaaaf0c38c952e19c5a"
+        ]
+      ],
+      "canonicalCompleted": true
+    },
+    "refusals": "PASS: unknown committed source, changed manifest build-input digest, changed toolchain, bad checksum, changed/missing/additional Slider declarations; all 16 real strict negative diagnostics retained"
+  },
+  "composedCanonical": {
+    "status": "PASS 2/2, zero skipped",
+    "inputCommit": "f4a094f300384185918fc6d4be86e88d9ab9f097",
+    "command": "FSUS_NODE_HEAP_PROFILE=build SLIDER_EVIDENCE_DIR=/tmp/slider-rebuild-reviewfix/composed-source node scripts/with-node-heap.mjs node --test --test-name-pattern=\"pinned independent|real canonical\" tests/public-slider-declaration.test.mjs",
+    "log": "\u2714 pinned independent and composed inventories reject unknown diagnostics (5.858131ms)\n\u2714 real canonical declaration producer retains original slider contracts (110763.544007ms)\n\u2139 tests 2\n\u2139 suites 0\n\u2139 pass 2\n\u2139 fail 0\n\u2139 cancelled 0\n\u2139 skipped 0\n\u2139 todo 0\n\u2139 duration_ms 110844.990236\n",
+    "producer": {
+      "baseline": "2d05f240e5fb04ac0cd602b4ed638ffe00b1859b",
+      "sourceProfile": "four-component",
+      "sourceInputsSha256": "a10d8222fb1844856a4b52374afc37f48244fec59c70152251fb17034c0c81fa",
+      "head": "f4a094f300384185918fc6d4be86e88d9ab9f097",
+      "producerTypeScript": "5.9.2",
+      "originalDiagnosticReturnUnchanged": true,
+      "diagnostics": [],
+      "pairDiagnostics": [],
+      "fields": [
+        {
+          "name": "elFormItem",
+          "beforeToAfter": true,
+          "afterToBefore": true
+        },
+        {
+          "name": "slider",
+          "beforeToAfter": true,
+          "afterToBefore": true
+        },
+        {
+          "name": "firstButton",
+          "beforeToAfter": true,
+          "afterToBefore": true
+        },
+        {
+          "name": "secondButton",
+          "beforeToAfter": true,
+          "afterToBefore": true
+        },
+        {
+          "name": "sliderDisabled",
+          "beforeToAfter": true,
+          "afterToBefore": true
+        },
+        {
+          "name": "minValue",
+          "beforeToAfter": true,
+          "afterToBefore": true
+        },
+        {
+          "name": "maxValue",
+          "beforeToAfter": true,
+          "afterToBefore": true
+        },
+        {
+          "name": "runwayStyle",
+          "beforeToAfter": true,
+          "afterToBefore": true
+        },
+        {
+          "name": "barStyle",
+          "beforeToAfter": true,
+          "afterToBefore": true
+        },
+        {
+          "name": "resetSize",
+          "beforeToAfter": true,
+          "afterToBefore": true
+        },
+        {
+          "name": "setPosition",
+          "beforeToAfter": true,
+          "afterToBefore": true
+        },
+        {
+          "name": "emitChange",
+          "beforeToAfter": true,
+          "afterToBefore": true
+        },
+        {
+          "name": "onSliderWrapperPrevent",
+          "beforeToAfter": true,
+          "afterToBefore": true
+        },
+        {
+          "name": "onSliderClick",
+          "beforeToAfter": true,
+          "afterToBefore": true
+        },
+        {
+          "name": "onSliderDown",
+          "beforeToAfter": true,
+          "afterToBefore": true
+        },
+        {
+          "name": "setFirstPosition",
+          "beforeToAfter": true,
+          "afterToBefore": true
+        },
+        {
+          "name": "setFirstValue",
+          "beforeToAfter": true,
+          "afterToBefore": true
+        },
+        {
+          "name": "setSecondPosition",
+          "beforeToAfter": true,
+          "afterToBefore": true
+        },
+        {
+          "name": "setSecondValue",
+          "beforeToAfter": true,
+          "afterToBefore": true
+        }
+      ],
+      "runtime": [
+        {
+          "file": "vue/packages/components/slider/index.ts",
+          "equal": true
+        },
+        {
+          "file": "vue/packages/components/slider/src/composables/use-slide.ts",
+          "equal": true
+        },
+        {
+          "file": "vue/packages/components/slider/src/slider.vue",
+          "equal": true
+        }
+      ],
+      "sliderDeclarations": [
+        [
+          "components/slider/index.d.ts",
+          "eefb2bdf7c7b659545140a930d590c9f4b3c50dafb9283055d4769b7e383a235"
+        ],
+        [
+          "components/slider/src/button.d.ts",
+          "54a2a98c07d9852307b60ca8457ebfd75ccbb594f974ca03235115499247d803"
+        ],
+        [
+          "components/slider/src/button.vue.d.ts",
+          "7c532914e99ac9d7a4a59ff6c744954c0c86eec781ce231e4b73c3eb6eb28a94"
+        ],
+        [
+          "components/slider/src/composables/index.d.ts",
+          "b830ba3af5dcf16d97aaa937697e111c3dfed6fe0eb1a8d950a40fc2a81fa161"
+        ],
+        [
+          "components/slider/src/composables/use-lifecycle.d.ts",
+          "845eece1064d7687e4455216df4b36fa2267f27492167958d167460e8012ed88"
+        ],
+        [
+          "components/slider/src/composables/use-marks.d.ts",
+          "490633c3eb0d1693c7d7c2aaf0760ceb60daaaf81133607b0b5e895e2a565f61"
+        ],
+        [
+          "components/slider/src/composables/use-slide.d.ts",
+          "bf8633396e9e566a9701fb35b54008054ca192f50e5dd16bad405a3c63ad46e9"
+        ],
+        [
+          "components/slider/src/composables/use-slider-button.d.ts",
+          "2f3b7d9b67da58d3fd5c3b0de2d2148a6de9e1d23f9a124208256f0ce26cff9e"
+        ],
+        [
+          "components/slider/src/composables/use-stops.d.ts",
+          "bd9309dab7e18d66a87d684d2bc7547e3cdbc72b1f945ce5e9494e72567e7f02"
+        ],
+        [
+          "components/slider/src/composables/use-watch.d.ts",
+          "ec434743db23cec09ff80ebf8155b1cdffe4ee9a641c795f18d04fd54ea53916"
+        ],
+        [
+          "components/slider/src/constants.d.ts",
+          "1fcb8ca474dbc351524462f6af0fc1ed460c6ce3a78e20c6eeac22cbb80399dc"
+        ],
+        [
+          "components/slider/src/marker.d.ts",
+          "677555dade27987dbf0eb37c52f1b6a26568f04cc97995f23ddec2a1ec03fb8b"
+        ],
+        [
+          "components/slider/src/slider.d.ts",
+          "db754023448cce89727a80cc03d220be6adc062f16b3ea8c24350db18631663e"
+        ],
+        [
+          "components/slider/src/slider.vue.d.ts",
+          "bb5fbe1ceba91fc9f9933cda7b568a1b9d4a25162da5f34fc5d0c39ae9a3d03f"
+        ],
+        [
+          "components/slider/style/css.d.ts",
+          "1def68be7aaaaf73809a5cb046eac894dfb9e0d09a82f9a73822446922a5c387"
+        ],
+        [
+          "components/slider/style/index.d.ts",
+          "eb7f20babd9f30ecd73e3ba3d958d9b5ad5a755f5631eaaaaf0c38c952e19c5a"
+        ]
+      ],
+      "canonicalCompleted": true
+    }
+  },
+  "reviewerReportedPreviousRebuildFailure": {
+    "status": "FAIL retained",
+    "sourceFixture": "37bfa80ac8a5fbda6140a66c8ad035af048d770b",
+    "composedTarballSha256": "14ecb9b280c8fae8c3b428f6dcd964d8e664d93364507431404b84ace50b412e",
+    "installedFiles": 7258,
+    "reason": "Author raw tarball pin rejected reviewer rebuild before positive/negative compilation; no source/runtime defect reported",
+    "newInstalledRerun": "UNRUN in this environment: these reviewer artifact bytes are not present here; same reviewer must actually run the successor against its existing candidate and adjacent original sidecars"
+  },
+  "retainedFailures": [
+    "Original independent strict eight external errors",
+    "Motion four full-bundle parity FAIL under its original artifact identity",
+    "Node16 FAIL under its original consumer identity",
+    "Original composition residual-count and prior raw-hash failures",
+    "All earlier raw failed logs and reviewfix-results.json preserved"
+  ],
+  "thisRoundLintFailure": {
+    "status": "FAIL then exact rerun PASS",
+    "reason": "no-regex-spaces required explicit {2}; owned helper regex corrected without changed matching semantics",
+    "receipt": {
+      "file": "/tmp/slider-rebuild-reviewfix/lint.log",
+      "sha256": "efd22e0f95ed388cb37ba49b0d708d052d946aecd36235567cc590d2c50dee3c",
+      "bytes": 328
+    }
+  },
+  "unrun": [
+    "New composed actual installed positive/16-negative execution in this environment",
+    "Same reviewer acceptance of this successor",
+    "whole-repository tests",
+    "browser/device/native qualification",
+    "Node16 rerun",
+    "remote CI",
+    "publication"
+  ],
+  "publicationAuthorization": false
+}

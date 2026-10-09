@@ -3,7 +3,12 @@ import * as fs from 'node:fs'
 import path from 'node:path'
 import { createRequire } from 'node:module'
 import { execFileSync } from 'node:child_process'
-import { assertProducer, sourceProfile } from './authority.mjs'
+import { createHash } from 'node:crypto'
+import {
+  assertProducer,
+  publishedDeclaration,
+  sourceProfile,
+} from './authority.mjs'
 const root = process.cwd()
 const profile = sourceProfile(root)
 const evidence = process.env.SLIDER_EVIDENCE_DIR
@@ -37,6 +42,14 @@ for (const file of [
 }
 assert.equal(ts.version, '5.9.2', 'canonical producer embedded TypeScript')
 let observed = false
+let report
+let emitted = []
+const originalEmit = Project.prototype.emitToMemory
+Project.prototype.emitToMemory = function (...args) {
+  const result = originalEmit.apply(this, args)
+  emitted = result.getFiles().map((file) => file.filePath)
+  return result
+}
 const originalDiagnostics = Project.prototype.getPreEmitDiagnostics
 Project.prototype.getPreEmitDiagnostics = function (...args) {
   const rows = originalDiagnostics.apply(this, args)
@@ -121,7 +134,7 @@ Project.prototype.getPreEmitDiagnostics = function (...args) {
     const after = transpile(fs.readFileSync(path.join(root, file), 'utf8'))
     runtime.push({ file, equal: before === after })
   }
-  const report = {
+  report = {
     baseline,
     sourceProfile: profile.name,
     sourceInputsSha256: profile.sourceInputsSha256,
@@ -187,6 +200,26 @@ generateTypesDefinitions((error) => {
         `real canonical output ${file}`,
       )
     }
+    const outputRoot = path.join(root, 'dist/types/packages')
+    report.sliderDeclarations = emitted
+      .filter(
+        (file) =>
+          file.startsWith(`${outputRoot}/components/slider/`) &&
+          file.endsWith('.d.ts'),
+      )
+      .map((file) => [
+        path.relative(outputRoot, file),
+        createHash('sha256')
+          .update(publishedDeclaration(fs.readFileSync(file, 'utf8')))
+          .digest('hex'),
+      ])
+      .sort()
+    assert.equal(report.sliderDeclarations.length, 16)
+    report.canonicalCompleted = true
+    fs.writeFileSync(
+      path.join(evidence, 'producer.json'),
+      `${JSON.stringify(report, null, 2)}\n`,
+    )
     process.stdout.write(
       'PASS: canonical slider output, exact inferred contracts, unchanged runtime scripts\n',
     )
