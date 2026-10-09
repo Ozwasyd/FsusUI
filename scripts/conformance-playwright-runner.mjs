@@ -1,11 +1,13 @@
 #!/usr/bin/env node
 
 import { Buffer } from 'node:buffer'
+import { spawnSync } from 'node:child_process'
 import { createHash } from 'node:crypto'
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 import { loadConformanceOwnerPlan } from './conformance-playwright-plan.mjs'
+import { loadPlaywrightImpactPlan } from './playwright-impact-filter.mjs'
 import {
   readBrowserToolchain,
   runMarkdownCell,
@@ -13,6 +15,96 @@ import {
 } from './markdown-playwright-runner.mjs'
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..')
+
+export function resolveConformanceInteractionIdentity({
+  repositoryRoot = root,
+  group,
+  impactPlan,
+  env = process.env,
+}) {
+  const git = (args) =>
+    spawnSync('git', args, { cwd: repositoryRoot, encoding: 'utf8' })
+  const requireSha = (value, label) => {
+    if (typeof value !== 'string' || !/^[a-f0-9]{40}$/u.test(value)) {
+      throw new Error(`conformance ${label} must be an exact commit SHA`)
+    }
+    return value
+  }
+  const head = git(['rev-parse', '--verify', 'HEAD^{commit}'])
+  if (head.status !== 0)
+    throw new Error('conformance checkout commit unavailable')
+  const candidate = requireSha(head.stdout.trim(), 'candidate')
+  for (const key of ['GITHUB_SHA', 'FSUS_INTERACTION_CANDIDATE']) {
+    if (env[key] !== undefined && env[key] !== candidate) {
+      throw new Error(`conformance ${key} does not match checkout ${candidate}`)
+    }
+  }
+  let baseline
+  if (group === 'pr') {
+    baseline = requireSha(impactPlan?.baseRef, 'impact-plan baseRef')
+  } else if (env.FSUS_INTERACTION_BASELINE !== undefined) {
+    baseline = requireSha(env.FSUS_INTERACTION_BASELINE, 'baseline')
+  } else {
+    const mergeBase = git(['merge-base', candidate, 'origin/main'])
+    if (mergeBase.status !== 0) {
+      throw new Error(
+        `conformance baseline unavailable: ${mergeBase.stderr.trim()}`,
+      )
+    }
+    baseline = requireSha(mergeBase.stdout.trim(), 'baseline')
+  }
+  if (
+    env.FSUS_INTERACTION_BASELINE !== undefined &&
+    env.FSUS_INTERACTION_BASELINE !== baseline
+  ) {
+    throw new Error(
+      'conformance FSUS_INTERACTION_BASELINE does not match baseline',
+    )
+  }
+  const commit = git(['cat-file', 'commit', candidate])
+  if (commit.status !== 0)
+    throw new Error('conformance checkout object unavailable')
+  const parents =
+    commit.stdout.split('\n\n', 1)[0].match(/^parent ([a-f0-9]{40})$/gmu) ?? []
+  const directParent = parents.includes(`parent ${baseline}`)
+  if (
+    group === 'pr' &&
+    (/^refs\/pull\/\d+\/merge$/u.test(env.GITHUB_REF ?? '') ||
+      env.GITHUB_EVENT_NAME === 'merge_group') &&
+    parents[0] !== `parent ${baseline}`
+  ) {
+    throw new Error(
+      'conformance impact-plan baseRef does not match merge checkout base',
+    )
+  }
+  const hasBaseline = () => {
+    const object = git(['cat-file', '-t', baseline])
+    return object.status === 0 && object.stdout.trim() === 'commit'
+  }
+  if (!hasBaseline()) {
+    // A shallow merge retains parent identities, but not necessarily their objects.
+    if (group !== 'pr' || !directParent) {
+      throw new Error(
+        `conformance baseline ${baseline} is unavailable or unrelated`,
+      )
+    }
+    const fetched = git(['fetch', '--no-tags', '--depth=1', 'origin', baseline])
+    if (fetched.status !== 0 || !hasBaseline()) {
+      throw new Error(
+        `conformance baseline object acquisition failed: ${fetched.stderr.trim()}`,
+      )
+    }
+  }
+  if (
+    !directParent &&
+    git(['merge-base', '--is-ancestor', baseline, candidate]).status !== 0
+  ) {
+    throw new Error(
+      `conformance baseline ${baseline} is unrelated to ${candidate}`,
+    )
+  }
+  return { baseline, candidate }
+}
 
 export const CONFORMANCE_IDENTITY_SOURCES = Object.freeze({
   contract: 'spec/components/contracts/v2/contract-v2.json',
@@ -276,8 +368,13 @@ const receiptExtension = async ({ cell, parsedReport, evidenceDir }) => {
 }
 
 export async function runConformanceCell(ownerId, cellId, group, options = {}) {
+  const interactionIdentity = resolveConformanceInteractionIdentity({
+    group,
+    impactPlan: options.impactPlan,
+  })
   return runMarkdownCell(ownerId, cellId, group, {
     ...options,
+    interactionIdentity,
     planLoader: loadConformanceOwnerPlan,
     fingerprintInputsBySuite: CONFORMANCE_FINGERPRINT_INPUTS,
     logPrefix: 'playwright-conformance',
@@ -310,7 +407,13 @@ if (import.meta.url === pathToFileURL(process.argv[1] ?? '').href) {
     option(process.argv.slice(2), 'owner', 'playwright-conformance'),
     cellId,
     option(process.argv.slice(2), 'group', 'main'),
-    { evidenceDir: option(process.argv.slice(2), 'evidence-dir') },
+    {
+      evidenceDir: option(process.argv.slice(2), 'evidence-dir'),
+      impactPlan: loadPlaywrightImpactPlan(
+        root,
+        option(process.argv.slice(2), 'impact-plan'),
+      ),
+    },
   )
   if (!result.ok) process.exitCode = 1
 }
