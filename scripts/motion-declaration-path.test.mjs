@@ -28,4 +28,21 @@ for (const [format, directory] of [
       `export * from 'element-plus/${directory}/motion/types';\nexport * from 'element-plus/${directory}/motion-extra';\nexport * from 'element-plus/${directory}/components/button';\nimport 'element-plus/theme-chalk/src/base.scss';`,
     )
   })
+
+  for (const [owner, expected] of [
+    ['components/markdown-editor/index.d.ts', '../../wasm/markdown-syntax-identity'],
+    ['components/markdown-editor/src/editor.d.ts', '../../../wasm/markdown-syntax-identity'],
+    ['wasm/index.d.ts', './markdown-syntax-identity'],
+  ]) {
+    test(`${format} keeps internal WASM declarations relative to ${owner}`, () => {
+      const declaration =
+        `type Identity = import("@element-plus/wasm/markdown-syntax-identity").MarkdownDocumentIdentity;\n` +
+        `export * from '@element-plus/wasm';`
+      assert.equal(
+        pathRewriter(format, owner)(declaration),
+        `type Identity = import("${expected}").MarkdownDocumentIdentity;\n` +
+          `export * from 'element-plus/${directory}/wasm';`,
+      )
+    })
+  }
 }
