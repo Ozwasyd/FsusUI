@@ -1,0 +1,22 @@
+{
+  "head": "a05dad576b73008daa373b0e41d9240143095471",
+  "command": [
+    "dotnet",
+    "test",
+    "FsusUI.Avalonia.Tests/FsusUI.Avalonia.Tests.csproj",
+    "--no-build",
+    "--no-restore",
+    "-c",
+    "Release",
+    "--filter",
+    "FullyQualifiedName=FsusUI.Avalonia.Tests.Controls.FsusTextEditorPrimitiveTests.TextEditorAutomationValueRoundTripsDocumentAndStatusUsesLiveState|FullyQualifiedName=FsusUI.Avalonia.Tests.Controls.FsusTextEditorPrimitiveTests.TextEditorHandlesTypingSelectionPasteUndoRedoAndPreviewSync|FullyQualifiedName=FsusUI.Avalonia.Tests.Controls.FsusTextEditorPrimitiveTests.TextEditorCompositionCommitsAsSingleUndoUnitAndSupportsCancellation|FullyQualifiedName=FsusUI.Avalonia.Tests.Controls.FsusTextEditorPrimitiveTests.TextEditorScrollSyncDoesNotCreatePreviewFeedbackLoops",
+    "--list-tests"
+  ],
+  "expected": 4,
+  "names": [
+    "FsusUI.Avalonia.Tests.Controls.FsusTextEditorPrimitiveTests.TextEditorAutomationValueRoundTripsDocumentAndStatusUsesLiveState",
+    "FsusUI.Avalonia.Tests.Controls.FsusTextEditorPrimitiveTests.TextEditorHandlesTypingSelectionPasteUndoRedoAndPreviewSync",
+    "FsusUI.Avalonia.Tests.Controls.FsusTextEditorPrimitiveTests.TextEditorCompositionCommitsAsSingleUndoUnitAndSupportsCancellation",
+    "FsusUI.Avalonia.Tests.Controls.FsusTextEditorPrimitiveTests.TextEditorScrollSyncDoesNotCreatePreviewFeedbackLoops"
+  ]
+}

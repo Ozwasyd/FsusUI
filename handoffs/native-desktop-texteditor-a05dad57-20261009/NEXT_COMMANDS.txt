@@ -1,0 +1,26 @@
+Source identity: a05dad576b73008daa373b0e41d9240143095471
+source /workspace/.setup/activate.sh
+cd /workspace/native-desktop-texteditor-successor/dotnet
+dotnet restore FsusUI.Avalonia.Tests/FsusUI.Avalonia.Tests.csproj --locked-mode
+dotnet build FsusUI.Avalonia.Tests/FsusUI.Avalonia.Tests.csproj --no-restore -c Release
+
+Exact original four-method selection is in texteditor-filter.txt. If rerunning
+on a changed identity, require --list-tests to return those four methods exactly
+before execution with --no-build --no-restore -c Release. Do not admit fifth
+metadata method by broad class selector. This source already passed four cases;
+no same-input repeat or broad137/142 fallback is needed.
+
+After Font owner delivers a reviewed fix: coordinate its exact source scope,
+compose a new identity while preserving current locks/resources/PNG/budgets,
+then original Desktop exact seven-case discovery/run in GSANS0 and1. Do not
+relax acceptance or overwrite frozen82 red evidence.
+
+Tree requires a display-backed environment or standard installed Xvfb, supplied
+without privilege escalation or alternate package/harness routes. Current
+installation is permission-denied; do not retry escalation here. Once available,
+run the original Demo on the chosen exact new source with original inputs:
+dotnet run --project dotnet/FsusUI.Avalonia.Demo/FsusUI.Avalonia.Demo.csproj --no-build --no-restore -c Release -- --render-performance --profile quick --warmups 1 --samples 21 --long-scroll-iterations 256 --backend auto --scenario tree-expand-scroll --output <new-source-specific-evidence-root>/tree/avalonia/summary.json
+Set GITHUB_SHA to the actual source identity. Require display and exact scenario1
+preflight, normal Demo locked restore/build if its binaries are not already
+built for that identity, preserve thresholds and original summary/raw/disposal.
+A single current run does not qualify order-balanced relative regression gate.

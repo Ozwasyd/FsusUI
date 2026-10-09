@@ -1,0 +1,15 @@
+{
+  "desktopSource": "82ba61bda502230e4c1fcd1e9084ab2e6c006fda",
+  "desktopEvidence": "af3a9613ec98a50ecd7b7549a620e78a2cf996c5",
+  "desktopInitial": {
+    "GSANS0": "7PASS0FAIL",
+    "GSANS1": "6PASS1FAIL"
+  },
+  "desktopFreshIsolated": "1PASS1FAIL; width120 unresolved $Default glyphTypeface at line312",
+  "desktopStatus": "Relevant source/host/resources unchanged on a05; no new Desktop execution, red retained pending original Font owner01a11f5c",
+  "nativeSource": "a0253323cd2442184aa5a42e8ff84fca86a10118",
+  "nativeRootReportedTotal": 142,
+  "qualification": "Original source identities only; not a05 execution results",
+  "TextEditorSupplierRootReportedReview": "original four methods base3PASS1FAIL -> reviewed f1ee4PASS0FAIL; not reexecuted as base here",
+  "newActualExecutions": 4
+}

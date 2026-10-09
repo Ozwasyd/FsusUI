@@ -1,0 +1,1 @@
+Initial post-run input-hash probe referenced nonexistent FsusTextEditor.cs; read-only probe stopped. Correct existing production file FsusTextEditorControls.cs was hashed on retry. No source changes or test repetition.

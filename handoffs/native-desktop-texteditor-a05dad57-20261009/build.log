@@ -1,0 +1,11 @@
+  FsusUI.Avalonia.FormGenerator -> /workspace/native-desktop-texteditor-successor/dotnet/FsusUI.Avalonia.FormGenerator/bin/Release/netstandard2.0/FsusUI.Avalonia.FormGenerator.dll
+  FsusUI.Avalonia -> /workspace/native-desktop-texteditor-successor/dotnet/FsusUI.Avalonia/bin/Release/net10.0/FsusUI.Avalonia.dll
+  FsusUI.Avalonia.Icons -> /workspace/native-desktop-texteditor-successor/dotnet/FsusUI.Avalonia.Icons/bin/Release/net10.0/FsusUI.Avalonia.Icons.dll
+  FsusUI.Avalonia.Themes -> /workspace/native-desktop-texteditor-successor/dotnet/FsusUI.Avalonia.Themes/bin/Release/net10.0/FsusUI.Avalonia.Themes.dll
+  FsusUI.Avalonia.Tests -> /workspace/native-desktop-texteditor-successor/dotnet/FsusUI.Avalonia.Tests/bin/Release/net10.0/FsusUI.Avalonia.Tests.dll
+
+Build succeeded.
+    0 Warning(s)
+    0 Error(s)
+
+Time Elapsed 00:00:32.45

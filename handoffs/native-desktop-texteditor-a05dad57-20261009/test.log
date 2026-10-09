@@ -1,0 +1,5 @@
+Test run for /workspace/native-desktop-texteditor-successor/dotnet/FsusUI.Avalonia.Tests/bin/Release/net10.0/FsusUI.Avalonia.Tests.dll (.NETCoreApp,Version=v10.0)
+A total of 1 test files matched the specified pattern.
+Results File: /workspace/native-desktop-texteditor-evidence/test-results/texteditor.trx
+
+Passed!  - Failed:     0, Passed:     4, Skipped:     0, Total:     4, Duration: 150 ms - FsusUI.Avalonia.Tests.dll (net10.0)

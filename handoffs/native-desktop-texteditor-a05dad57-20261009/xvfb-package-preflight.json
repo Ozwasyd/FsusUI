@@ -1,0 +1,39 @@
+[
+  {
+    "command": [
+      "id"
+    ],
+    "exit": 0,
+    "stdout": "uid=1000(agent) gid=1000(agent) groups=1000(agent)\n",
+    "stderr": ""
+  },
+  {
+    "command": [
+      "dpkg-query",
+      "-W",
+      "xvfb"
+    ],
+    "exit": 1,
+    "stdout": "",
+    "stderr": "dpkg-query: no packages found matching xvfb\n"
+  },
+  {
+    "command": [
+      "/usr/bin/apt-cache",
+      "policy",
+      "xvfb"
+    ],
+    "exit": 0,
+    "stdout": "",
+    "stderr": "W: Unable to read /etc/apt/apt.conf.d/80-applied-apt-retries - open (13: Permission denied)\n"
+  },
+  {
+    "command": [
+      "cat",
+      "/etc/apt/sources.list.d/caas-snapshot.list"
+    ],
+    "exit": 0,
+    "stdout": "deb [signed-by=/usr/share/keyrings/debian-archive-keyring.gpg check-valid-until=no] https://snapshot.debian.org/archive/debian/20260828T000000Z/ trixie main\ndeb [signed-by=/usr/share/keyrings/debian-archive-keyring.gpg check-valid-until=no] https://snapshot.debian.org/archive/debian/20260828T000000Z/ trixie-updates main\ndeb [signed-by=/usr/share/keyrings/debian-archive-keyring.gpg check-valid-until=no] https://snapshot.debian.org/archive/debian-security/20260828T000000Z/ trixie-security main\n",
+    "stderr": ""
+  }
+]

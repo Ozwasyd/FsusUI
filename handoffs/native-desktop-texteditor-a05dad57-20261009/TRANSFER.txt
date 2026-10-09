@@ -1,0 +1,51 @@
+WIP Desktop + reviewed TextEditor successor
+
+Source a05dad576b73008daa373b0e41d9240143095471
+Branch fix/native-desktop-texteditor-successor-20261009
+Frozen parent82ba61bda502230e4c1fcd1e9084ab2e6c006fda
+Frozen native parenta0253323cd2442184aa5a42e8ff84fca86a10118
+Actual main8db0ac8f49749e3e5f28be5051bb3d3ed71ada71
+Root retains draft PR/metadata/ready/merge responsibilities.
+
+Only new source file: dotnet/FsusUI.Avalonia.Tests/Controls/
+FsusTextEditorPrimitiveTests.cs, exact reviewed f1ee05cdae8774bf82473c9e44a11c688d656391
+blob. No supplier ancestry imported. All28 inherited source blobs exact;29-path
+supplier/blob/SHA256 roster attached. TextEditor production blob unchanged.
+All13 locks, all340 PNGs, budgets, original host/theme/resources/serial hooks,
+shared project and dependency settings unchanged. No .108/8840 combination.
+Old82/a025 and parity9ab candidates/evidence remain frozen.
+
+Actual SDK10.0.401/runtime10.0.12, Debian13 Linux.
+PASS original unit-project locked restore and Release build: zero warnings/errors.
+NuGetAudit=true/all/low, RestorePackagesWithLockFile=true. No overrides/scratchlocks.
+PASS exact positive discovery4, then four ordinary TextEditor original methods:
+4passed,0failed,0skipped. This is the only new a05 test execution; no old142 rerun.
+Original assembly serial1 + AvaloniaDispatcherIsolation Before/After
+ResetForUnitTests hooks preserved. No class/collection fixtures added.
+Fifth metadata method is out of scope and UNRUN; it was not denied.
+Raw discovery/TRX/filter/command/source/toolchain/assembly hashes attached.
+
+Desktop known first red and fresh isolated red remain published on source82,
+evidenceaf3a9613ec98a50ecd7b7549a620e78a2cf996c5. GSANS0 7/7; GSANS1 6/7;
+isolated width method1/2, unresolved $Default GlyphTypeface width120 at line312.
+Relevant production/host/resources/test source identical on a05; no Desktop
+rerun or invented all-green claim. Root has assigned original Font owner01a11f5c
+to diagnosis in its font/host scope; any production Desktop claim needs coordination.
+No default-family workaround, PNG refresh or baseline/threshold relaxation.
+Root-reported a025142 executions also remain tied to a025, not a05.
+
+Tree original native p95 UNRUN. Original one scenario/profile quick/warmups1/
+samples21/iterations256/backendauto inputs unchanged. Display/X11 sockets and
+standard xvfb-run absent. Authorized original /usr/bin/apt-get install xvfb
+attempt stopped with exit100: agent uid1000 cannot open /var/lib/dpkg/lock-frontend
+(Permission denied); reading80-applied-apt-retries also denied. Configured source
+is signed official Debian snapshot. No escalation, sudo, permissions/security/
+credentials/config edits, alternate install location or alternate harness.
+No native summary/raw/disposal/p95 produced. Package preflight and actual
+installer output attached. The denial is the system installer, not an automatic
+approval-review rejection. Display-capable environment still required.
+
+No Table/PDF tests repeated. Windows/macOS/actual CI/full gates/independent visual
+acceptance UNRUN. No held Markdown helpers, denied task or audits invoked.
+Complete WIP PR body and next commands: PR-DRAFT.md and NEXT_COMMANDS.txt.
+Rollback onlya05 to recover frozen82; no supplier branch changes.

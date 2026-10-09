@@ -1,0 +1,56 @@
+{
+  "head": "a05dad576b73008daa373b0e41d9240143095471",
+  "command": [
+    "dotnet",
+    "test",
+    "FsusUI.Avalonia.Tests/FsusUI.Avalonia.Tests.csproj",
+    "--no-build",
+    "--no-restore",
+    "-c",
+    "Release",
+    "--filter",
+    "FullyQualifiedName=FsusUI.Avalonia.Tests.Controls.FsusTextEditorPrimitiveTests.TextEditorAutomationValueRoundTripsDocumentAndStatusUsesLiveState|FullyQualifiedName=FsusUI.Avalonia.Tests.Controls.FsusTextEditorPrimitiveTests.TextEditorHandlesTypingSelectionPasteUndoRedoAndPreviewSync|FullyQualifiedName=FsusUI.Avalonia.Tests.Controls.FsusTextEditorPrimitiveTests.TextEditorCompositionCommitsAsSingleUndoUnitAndSupportsCancellation|FullyQualifiedName=FsusUI.Avalonia.Tests.Controls.FsusTextEditorPrimitiveTests.TextEditorScrollSyncDoesNotCreatePreviewFeedbackLoops",
+    "--logger",
+    "trx;LogFileName=texteditor.trx",
+    "--results-directory",
+    "/workspace/native-desktop-texteditor-evidence/test-results"
+  ],
+  "exit": 0,
+  "counters": {
+    "total": "4",
+    "executed": "4",
+    "passed": "4",
+    "failed": "0",
+    "error": "0",
+    "timeout": "0",
+    "aborted": "0",
+    "inconclusive": "0",
+    "passedButRunAborted": "0",
+    "notRunnable": "0",
+    "notExecuted": "0",
+    "disconnected": "0",
+    "warning": "0",
+    "completed": "0",
+    "inProgress": "0",
+    "pending": "0"
+  },
+  "cases": [
+    {
+      "name": "FsusUI.Avalonia.Tests.Controls.FsusTextEditorPrimitiveTests.TextEditorScrollSyncDoesNotCreatePreviewFeedbackLoops",
+      "outcome": "Passed"
+    },
+    {
+      "name": "FsusUI.Avalonia.Tests.Controls.FsusTextEditorPrimitiveTests.TextEditorHandlesTypingSelectionPasteUndoRedoAndPreviewSync",
+      "outcome": "Passed"
+    },
+    {
+      "name": "FsusUI.Avalonia.Tests.Controls.FsusTextEditorPrimitiveTests.TextEditorCompositionCommitsAsSingleUndoUnitAndSupportsCancellation",
+      "outcome": "Passed"
+    },
+    {
+      "name": "FsusUI.Avalonia.Tests.Controls.FsusTextEditorPrimitiveTests.TextEditorAutomationValueRoundTripsDocumentAndStatusUsesLiveState",
+      "outcome": "Passed"
+    }
+  ],
+  "trxSha256": "510dcf8b51ecb10440b856a7e7322815328ae2eee97e584e295689dbd534059d"
+}

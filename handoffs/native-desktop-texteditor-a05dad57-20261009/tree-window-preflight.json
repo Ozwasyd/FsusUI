@@ -1,0 +1,37 @@
+{
+  "head": "a05dad576b73008daa373b0e41d9240143095471",
+  "entry": "original Demo --render-performance --scenario tree-expand-scroll",
+  "profile": "quick",
+  "warmups": 1,
+  "samples": 21,
+  "longScrollIterations": 256,
+  "backend": "auto (original default)",
+  "matchingScenarios": [
+    "tree-expand-scroll"
+  ],
+  "expectedScenarioCount": 1,
+  "policySha256": "0e237581c853080b060f010d5205e8dec1217cda532b89304406d9d8b31e670d",
+  "thresholds": {
+    "schemaVersion": 1,
+    "description": "Absolute limits only catch runaway measurements; same-runner relative comparison is the regression gate.",
+    "relativeRegressionLimit": 0.15,
+    "web": {
+      "maxP95InputToNextFrameMs": 1000,
+      "maxDroppedFrameRate": 1,
+      "maxLongTaskMs": 5000,
+      "maxDomNodes": 25000
+    },
+    "avalonia": {
+      "maxP95FrameMs": 2000,
+      "maxPeakAllocatedBytesPerSample": 268435456,
+      "maxRetainedVisuals": 25000
+    }
+  },
+  "DISPLAY": null,
+  "WAYLAND_DISPLAY": null,
+  "xvfbRun": null,
+  "X11Sockets": [],
+  "status": "UNRUN native scenario; standard Xvfb installation blocked by actual permissions",
+  "installAttempt": "original apt-get exit100 dpkg frontend lock permission denied; no escalation or configuration changes",
+  "unchangedScenarioInputsFrom82": true
+}

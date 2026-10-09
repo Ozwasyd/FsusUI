@@ -1,0 +1,17 @@
+{
+  "head": "a05dad576b73008daa373b0e41d9240143095471",
+  "supplier": "f1ee05cdae8774bf82473c9e44a11c688d656391",
+  "path": "dotnet/FsusUI.Avalonia.Tests/Controls/FsusTextEditorPrimitiveTests.cs",
+  "sourceBlob": "d6160ec3031199ca49488432b85902744f2bba59",
+  "sourceSha256": "5d9948be90636c988294b3b2d671faf6f3e1f10db18f17bee37ba5300f5724b1",
+  "methodCases": {
+    "FsusUI.Avalonia.Tests.Controls.FsusTextEditorPrimitiveTests.TextEditorAutomationValueRoundTripsDocumentAndStatusUsesLiveState": 1,
+    "FsusUI.Avalonia.Tests.Controls.FsusTextEditorPrimitiveTests.TextEditorHandlesTypingSelectionPasteUndoRedoAndPreviewSync": 1,
+    "FsusUI.Avalonia.Tests.Controls.FsusTextEditorPrimitiveTests.TextEditorCompositionCommitsAsSingleUndoUnitAndSupportsCancellation": 1,
+    "FsusUI.Avalonia.Tests.Controls.FsusTextEditorPrimitiveTests.TextEditorScrollSyncDoesNotCreatePreviewFeedbackLoops": 1
+  },
+  "expected": 4,
+  "fifthMethod": "TextEditorKeyboardDisabledReadonlyAndConformanceMetadataCoverStable37",
+  "fifthStatus": "out of scope; UNRUN, not denied",
+  "hooks": "original assembly serial1 and BeforeAfter AvaloniaDispatcherIsolation ResetForUnitTests preserved; no class fixtures"
+}

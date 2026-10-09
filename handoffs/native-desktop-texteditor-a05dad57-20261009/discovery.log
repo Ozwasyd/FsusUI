@@ -1,0 +1,6 @@
+Test run for /workspace/native-desktop-texteditor-successor/dotnet/FsusUI.Avalonia.Tests/bin/Release/net10.0/FsusUI.Avalonia.Tests.dll (.NETCoreApp,Version=v10.0)
+The following Tests are available:
+    FsusUI.Avalonia.Tests.Controls.FsusTextEditorPrimitiveTests.TextEditorAutomationValueRoundTripsDocumentAndStatusUsesLiveState
+    FsusUI.Avalonia.Tests.Controls.FsusTextEditorPrimitiveTests.TextEditorHandlesTypingSelectionPasteUndoRedoAndPreviewSync
+    FsusUI.Avalonia.Tests.Controls.FsusTextEditorPrimitiveTests.TextEditorCompositionCommitsAsSingleUndoUnitAndSupportsCancellation
+    FsusUI.Avalonia.Tests.Controls.FsusTextEditorPrimitiveTests.TextEditorScrollSyncDoesNotCreatePreviewFeedbackLoops

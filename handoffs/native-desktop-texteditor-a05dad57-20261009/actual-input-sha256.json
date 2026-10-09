@@ -1,0 +1,12 @@
+{
+  "dotnet/FsusUI.Avalonia.Tests/Controls/FsusTextEditorPrimitiveTests.cs": "5d9948be90636c988294b3b2d671faf6f3e1f10db18f17bee37ba5300f5724b1",
+  "dotnet/FsusUI.Avalonia.Tests/TestAssembly.cs": "f72c0b387e3729ded8549790e05b2de08f8524854bd8ac1168ab04143f0d2089",
+  "dotnet/FsusUI.Avalonia.Tests/AvaloniaDispatcherIsolationAttribute.cs": "49df5c2f97181ec305d9bf5247c5fa7ec7f617fae7532947c48f1567a1891622",
+  "dotnet/FsusUI.Avalonia.Tests/FsusUI.Avalonia.Tests.csproj": "73c82c2ada70e474a92205c4ed0253bf3327649a8647c3750f22c727d2fcea3f",
+  "dotnet/FsusUI.Avalonia.HeadlessTests/TestAppBuilder.cs": "2818a9fdca033be90518e7d507e66e1b195af2bba7da62355ce9b85c01cf9928",
+  "dotnet/FsusUI.Avalonia.HeadlessTests/TestAssembly.cs": "3f7edd72eac91614fcf49f709dd4e560c74ebef8da68a53a02947e5611cd1869",
+  "dotnet/FsusUI.Avalonia.HeadlessTests/FsusUI.Avalonia.HeadlessTests.csproj": "81b4ee86dffb69eacac1775c4da32ee22ea1da8154de0c707c2f552d820dbc79",
+  "dotnet/FsusUI.Avalonia/Controls/FsusTextEditorControls.cs": "8db1c09e50f82ed1e6984dfa47a501ebb1ba3179fecbc813c970b1adac260ff8",
+  "dotnet/FsusUI.Avalonia.Tests/bin/Release/net10.0/FsusUI.Avalonia.Tests.dll": "7d491eb837651f4acd807cd30e167f2a57f219c45962ee182f6cf9a8f639ced5",
+  "dotnet/FsusUI.Avalonia/bin/Release/net10.0/FsusUI.Avalonia.dll": "c5efbab1967441926afa79a9571745ca8d41d0a5bf8c8f4b092d59efe0d0ce69"
+}

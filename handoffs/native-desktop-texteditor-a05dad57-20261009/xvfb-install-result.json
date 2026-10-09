@@ -1,0 +1,15 @@
+{
+  "command": [
+    "/usr/bin/apt-get",
+    "-y",
+    "--no-install-recommends",
+    "install",
+    "xvfb"
+  ],
+  "exit": 100,
+  "uid": "1000(agent), groups1000(agent)",
+  "officialConfiguredSource": "snapshot.debian.org archive Debian20260828T000000Z trixie; Debian archive keyring signed-by; original config unchanged",
+  "wrapper": "/usr/local/bin/apt-get refreshes source config; used original /usr/bin/apt-get without changing config",
+  "status": "FAIL installation blocked; no privilege escalation or alternative route",
+  "attempts": 1
+}

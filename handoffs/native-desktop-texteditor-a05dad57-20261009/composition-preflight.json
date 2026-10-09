@@ -1,0 +1,13 @@
+{
+  "head": "a05dad576b73008daa373b0e41d9240143095471",
+  "parent": "82ba61bda502230e4c1fcd1e9084ab2e6c006fda",
+  "main": "8db0ac8f49749e3e5f28be5051bb3d3ed71ada71",
+  "supplier": "f1ee05cdae8774bf82473c9e44a11c688d656391",
+  "exactOneSupplierBlob": true,
+  "all28InheritedBlobsUnchanged": true,
+  "locksUnchanged": true,
+  "all340PngUnchanged": true,
+  "productionHostResourcesSettingsUnchanged": true,
+  "dependency": "actual main401 graph; no8840 or108 combination",
+  "affectedScope": "only four ordinary TextEditor cases; unchanged Desktop/Table/PDF/137 controls not repeated"
+}
