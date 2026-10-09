@@ -30,6 +30,10 @@ test('Node16 distinguishes ESM defaults and preserves CJS callable re-export typ
           require: { types: './lib/index.d.ts', default: './lib/index.js' },
         },
         './lib': { types: './lib/index.d.ts', require: './lib/index.js' },
+        './theme-chalk/fixture.css': {
+          types: './theme-chalk/fixture.css.d.ts',
+          default: './theme-chalk/fixture.css',
+        },
       },
     }),
   )
@@ -56,17 +60,20 @@ test('Node16 distinguishes ESM defaults and preserves CJS callable re-export typ
   )
   await put(
     'lib/index.d.ts',
-    "export { retain } from 'interop-dependency';\nexport type Item = import('interop-dependency').Item;\n",
+    "import 'element-plus/theme-chalk/fixture.css';\nexport { retain } from 'interop-dependency';\nexport type Item = import('interop-dependency').Item;\n",
   )
   await put('global.d.ts', 'export {};\n')
+  await put('theme-chalk/fixture.css', '.fixture {}\n')
+  await put('theme-chalk/fixture.css.d.ts', 'export {};\n')
   const esmProbe =
     'import create from "element-plus";\nconst value: string = create("ok").value;\n'
   await put(
     'positive.mts',
-    `${esmProbe 
-      }import { retain, type Item } from "element-plus/lib";\nconst item: Item = retain({ key: "ok" });\n`,
+    `${
+      esmProbe
+    }import { retain, type Item } from "element-plus/lib";\nconst item: Item = retain({ key: "ok" });\n`,
   )
-  await put('negative.mts', `${esmProbe  }create(42);\n`)
+  await put('negative.mts', `${esmProbe}create(42);\n`)
   const check = (file) => {
     const program = ts.createProgram([path.join(root, file)], {
       strict: true,
@@ -100,6 +107,7 @@ test('Node16 distinguishes ESM defaults and preserves CJS callable re-export typ
     'legacy ESM declarations stay intact',
   )
   const first = await readFile(path.join(root, 'lib/index.d.ts'), 'utf8')
+  assert.match(first, /import "element-plus\/theme-chalk\/fixture.css";/)
   await writeNodeDeclarationFormats(root)
   assert.equal(await readFile(path.join(root, 'lib/index.d.ts'), 'utf8'), first)
 })

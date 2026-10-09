@@ -46,10 +46,10 @@ export function rewriteNodeDeclaration(
     true,
   )
   const printer = ts.createPrinter({ newLine: ts.NewLineKind.LineFeed })
-  const needsImportMode = (specifier: string) => {
-    if (specifier === PKG_NAME) return global
-    if (specifier.startsWith('.')) return false
-    const resolved = ts.resolveModuleName(
+  const importModes = new Map<string, boolean>()
+  const commonJsSpecifiers = new Map<string, string>()
+  const resolveCommonJs = (specifier: string) =>
+    ts.resolveModuleName(
       specifier,
       filename,
       compilerOptions,
@@ -58,23 +58,42 @@ export function rewriteNodeDeclaration(
       undefined,
       ts.ModuleKind.CommonJS,
     ).resolvedModule
+  const needsImportMode = (specifier: string) => {
+    if (specifier === PKG_NAME) return global
+    if (specifier.startsWith('.')) return false
+    if (importModes.has(specifier)) return importModes.get(specifier)
+    const resolved = resolveCommonJs(specifier)
     if (!resolved) {
       throw new Error(
         `Cannot resolve declaration import ${specifier} in ${filename}`,
       )
     }
-    return (
+    const isEsm =
       ts.getImpliedNodeFormatForFile(
         resolved.resolvedFileName,
         undefined,
         ts.sys,
         compilerOptions,
       ) === ts.ModuleKind.ESNext
-    )
+    importModes.set(specifier, isEsm)
+    return isEsm
   }
   const rewriteSpecifier = (specifier: string) => {
     if (format === 'cjs') {
-      return specifier.replace(`${PKG_NAME}/es/`, `${PKG_NAME}/lib/`)
+      if (!specifier.startsWith(`${PKG_NAME}/es/`)) return specifier
+      const cached = commonJsSpecifiers.get(specifier)
+      if (cached) return cached
+      const candidate = specifier.replace(`${PKG_NAME}/es/`, `${PKG_NAME}/lib/`)
+      // Named public facades need not expose a separate /lib facade subpath.
+      // Resolve against the existing export contract rather than inventing one.
+      const facade = specifier.replace(`${PKG_NAME}/es/`, `${PKG_NAME}/`)
+      const rewritten = resolveCommonJs(candidate)
+        ? candidate
+        : resolveCommonJs(facade)
+          ? facade
+          : candidate
+      commonJsSpecifiers.set(specifier, rewritten)
+      return rewritten
     }
     if (!specifier.startsWith('.')) return specifier
     const absolute = path.resolve(path.dirname(filename), specifier)
@@ -121,7 +140,10 @@ export function rewriteNodeDeclaration(
           ts.isStringLiteral(node.moduleSpecifier)
         ) {
           const specifier = rewriteSpecifier(node.moduleSpecifier.text)
-          const useImportMode = format === 'cjs' && needsImportMode(specifier)
+          const useImportMode =
+            format === 'cjs' &&
+            (!ts.isImportDeclaration(node) || !!node.importClause) &&
+            needsImportMode(specifier)
           if (ts.isImportDeclaration(node)) {
             return ts.factory.updateImportDeclaration(
               node,
