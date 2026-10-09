@@ -1,0 +1,300 @@
+{
+  "candidate": "dc679b06feba8ffe3dfc3003cf29dc63f60d1120",
+  "branch": "fix/desktop-shell-reorder-template-refresh",
+  "base": "82ba61bda502230e4c1fcd1e9084ab2e6c006fda",
+  "baseParent": "a0253323cd2442184aa5a42e8ff84fca86a10118",
+  "actualMainFromPublishedHandoff": "8db0ac8f49749e3e5f28be5051bb3d3ed71ada71",
+  "frozenDesktopSupplier": "b680455bcb872864cebe8e8d0c60a69e6dec3065",
+  "originalFailureHead": "83036006069be5cfcd09724273d5705d8f848ad0",
+  "originalQualityGatesRun": 37798728109,
+  "sdk": "10.0.401",
+  "runtime": "10.0.12",
+  "msbuild": "18.9.11",
+  "avalonia": "12.0.4",
+  "rid": "linux-x64",
+  "os": "Debian13",
+  "sdkPath": "/workspace/.setup/dotnet/dotnet",
+  "sdkProvenance": "Configured official dotnet installer, setup log URL builds.dotnet.microsoft.com/dotnet/Sdk/10.0.401/dotnet-sdk-10.0.401-linux-x64.tar.gz. No new archive checksum/signature audit claimed.",
+  "dependencyInput": "Actual82 approved401-compatible graph unchanged. Original-project locked restore/Release build PASS. No108/8840 composition used.",
+  "environment": {
+    "DOTNET_CLI_HOME": "/workspace/.setup/dotnet-home",
+    "NUGET_PACKAGES": "/workspace/.setup/nuget",
+    "XDG_CACHE_HOME": "/tmp/desktop-tabs-refresh-font-cache",
+    "FSUS_HEADLESS_GSANS": "Explicit0 or1 per run",
+    "DOTNET_CLI_TELEMETRY_OPTOUT": "1"
+  },
+  "hooks": "Actual82 TestAppBuilder/assembly/project unchanged: nonparallel original Skia drawingfalse, WithInterFont/CreateFontManagerOptions, original GSANS registration and resource items. Table-owner project unchanged. Selected fixture/helper/setup/cleanup graph read. No captures/RepositoryRoot/held routes.",
+  "publicPriorEvidence": "af3a9613ec98a50ecd7b7549a620e78a2cf996c5/handoffs/native-desktop-82ba61bd-20261009",
+  "reportedFontDiagnostic": "Coordinator supplied: retired Architecture notes.md TextBlock Text empty, FontFamily$Default, no logicalparent/visualancestors, _measuringtrue; replacement header retains GoogleSans. Font original thread/container was not directly read. Original sporadic2/2 and final1/1 were reported, not recreated raw files or called stable green.",
+  "results": {
+    "before-original": {
+      "expected": 2,
+      "counters": {
+        "total": "2",
+        "executed": "2",
+        "passed": "1",
+        "failed": "1",
+        "error": "0",
+        "timeout": "0",
+        "aborted": "0",
+        "inconclusive": "0",
+        "passedButRunAborted": "0",
+        "notRunnable": "0",
+        "notExecuted": "0",
+        "disconnected": "0",
+        "warning": "0",
+        "completed": "0",
+        "inProgress": "0",
+        "pending": "0"
+      },
+      "testNames": [
+        "FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests.DocumentTabsSupportCloseDragReorderOverflowContextAndPlatformCycling(headerWidth: 220)",
+        "FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests.DocumentTabsSupportCloseDragReorderOverflowContextAndPlatformCycling(headerWidth: 120)"
+      ]
+    },
+    "before-added": {
+      "expected": 2,
+      "counters": {
+        "total": "2",
+        "executed": "2",
+        "passed": "1",
+        "failed": "1",
+        "error": "0",
+        "timeout": "0",
+        "aborted": "0",
+        "inconclusive": "0",
+        "passedButRunAborted": "0",
+        "notRunnable": "0",
+        "notExecuted": "0",
+        "disconnected": "0",
+        "warning": "0",
+        "completed": "0",
+        "inProgress": "0",
+        "pending": "0"
+      },
+      "testNames": [
+        "FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests.DocumentTabsSupportCloseDragReorderOverflowContextAndPlatformCycling(headerWidth: 120)",
+        "FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests.DocumentTabsSupportCloseDragReorderOverflowContextAndPlatformCycling(headerWidth: 220)"
+      ]
+    },
+    "failed-before-focus": {
+      "expected": 2,
+      "counters": {
+        "total": "2",
+        "executed": "2",
+        "passed": "1",
+        "failed": "1",
+        "error": "0",
+        "timeout": "0",
+        "aborted": "0",
+        "inconclusive": "0",
+        "passedButRunAborted": "0",
+        "notRunnable": "0",
+        "notExecuted": "0",
+        "disconnected": "0",
+        "warning": "0",
+        "completed": "0",
+        "inProgress": "0",
+        "pending": "0"
+      },
+      "testNames": [
+        "FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests.DocumentTabsSupportCloseDragReorderOverflowContextAndPlatformCycling(headerWidth: 120)",
+        "FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests.DocumentTabsSupportCloseDragReorderOverflowContextAndPlatformCycling(headerWidth: 220)"
+      ]
+    },
+    "failed-styling": {
+      "expected": 2,
+      "counters": {
+        "total": "2",
+        "executed": "2",
+        "passed": "1",
+        "failed": "1",
+        "error": "0",
+        "timeout": "0",
+        "aborted": "0",
+        "inconclusive": "0",
+        "passedButRunAborted": "0",
+        "notRunnable": "0",
+        "notExecuted": "0",
+        "disconnected": "0",
+        "warning": "0",
+        "completed": "0",
+        "inProgress": "0",
+        "pending": "0"
+      },
+      "testNames": [
+        "FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests.DocumentTabsSupportCloseDragReorderOverflowContextAndPlatformCycling(headerWidth: 120)",
+        "FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests.DocumentTabsSupportCloseDragReorderOverflowContextAndPlatformCycling(headerWidth: 220)"
+      ]
+    },
+    "after-presenter-interaction": {
+      "expected": 2,
+      "counters": {
+        "total": "2",
+        "executed": "2",
+        "passed": "2",
+        "failed": "0",
+        "error": "0",
+        "timeout": "0",
+        "aborted": "0",
+        "inconclusive": "0",
+        "passedButRunAborted": "0",
+        "notRunnable": "0",
+        "notExecuted": "0",
+        "disconnected": "0",
+        "warning": "0",
+        "completed": "0",
+        "inProgress": "0",
+        "pending": "0"
+      },
+      "testNames": [
+        "FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests.DocumentTabsSupportCloseDragReorderOverflowContextAndPlatformCycling(headerWidth: 120)",
+        "FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests.DocumentTabsSupportCloseDragReorderOverflowContextAndPlatformCycling(headerWidth: 220)"
+      ]
+    },
+    "final-red": {
+      "expected": 2,
+      "counters": {
+        "total": "2",
+        "executed": "2",
+        "passed": "0",
+        "failed": "2",
+        "error": "0",
+        "timeout": "0",
+        "aborted": "0",
+        "inconclusive": "0",
+        "passedButRunAborted": "0",
+        "notRunnable": "0",
+        "notExecuted": "0",
+        "disconnected": "0",
+        "warning": "0",
+        "completed": "0",
+        "inProgress": "0",
+        "pending": "0"
+      },
+      "testNames": [
+        "FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests.DocumentTabsSupportCloseDragReorderOverflowContextAndPlatformCycling(headerWidth: 120)",
+        "FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests.DocumentTabsSupportCloseDragReorderOverflowContextAndPlatformCycling(headerWidth: 220)"
+      ]
+    },
+    "gsans1-ordinary": {
+      "expected": 7,
+      "counters": {
+        "total": "7",
+        "executed": "7",
+        "passed": "7",
+        "failed": "0",
+        "error": "0",
+        "timeout": "0",
+        "aborted": "0",
+        "inconclusive": "0",
+        "passedButRunAborted": "0",
+        "notRunnable": "0",
+        "notExecuted": "0",
+        "disconnected": "0",
+        "warning": "0",
+        "completed": "0",
+        "inProgress": "0",
+        "pending": "0"
+      },
+      "testNames": [
+        "FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests.DocumentTabsCancelClosePreserveDirtyStateReorderAndSelectAdjacentFallback",
+        "FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests.DocumentContentKeepsSingleVisualParentAcrossThemeRemovalAndRemount(useRecyclingTemplate: False)",
+        "FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests.AutomationPeersExposeSelectionDirtyExpandedAndCloseSemantics",
+        "FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests.DocumentContextRequestReturnsTypedStableAnchorWithoutSelectingTarget",
+        "FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests.DocumentContentKeepsSingleVisualParentAcrossThemeRemovalAndRemount(useRecyclingTemplate: True)",
+        "FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests.DocumentTabsSupportCloseDragReorderOverflowContextAndPlatformCycling(headerWidth: 220)",
+        "FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests.DocumentTabsSupportCloseDragReorderOverflowContextAndPlatformCycling(headerWidth: 120)"
+      ]
+    },
+    "gsans0-ordinary": {
+      "expected": 7,
+      "counters": {
+        "total": "7",
+        "executed": "7",
+        "passed": "7",
+        "failed": "0",
+        "error": "0",
+        "timeout": "0",
+        "aborted": "0",
+        "inconclusive": "0",
+        "passedButRunAborted": "0",
+        "notRunnable": "0",
+        "notExecuted": "0",
+        "disconnected": "0",
+        "warning": "0",
+        "completed": "0",
+        "inProgress": "0",
+        "pending": "0"
+      },
+      "testNames": [
+        "FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests.DocumentContextRequestReturnsTypedStableAnchorWithoutSelectingTarget",
+        "FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests.DocumentContentKeepsSingleVisualParentAcrossThemeRemovalAndRemount(useRecyclingTemplate: True)",
+        "FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests.DocumentTabsSupportCloseDragReorderOverflowContextAndPlatformCycling(headerWidth: 220)",
+        "FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests.DocumentContentKeepsSingleVisualParentAcrossThemeRemovalAndRemount(useRecyclingTemplate: False)",
+        "FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests.DocumentTabsSupportCloseDragReorderOverflowContextAndPlatformCycling(headerWidth: 120)",
+        "FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests.AutomationPeersExposeSelectionDirtyExpandedAndCloseSemantics",
+        "FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests.DocumentTabsCancelClosePreserveDirtyStateReorderAndSelectAdjacentFallback"
+      ]
+    },
+    "gsans1-font": {
+      "expected": 2,
+      "counters": {
+        "total": "2",
+        "executed": "2",
+        "passed": "2",
+        "failed": "0",
+        "error": "0",
+        "timeout": "0",
+        "aborted": "0",
+        "inconclusive": "0",
+        "passedButRunAborted": "0",
+        "notRunnable": "0",
+        "notExecuted": "0",
+        "disconnected": "0",
+        "warning": "0",
+        "completed": "0",
+        "inProgress": "0",
+        "pending": "0"
+      },
+      "testNames": [
+        "FsusUI.Avalonia.HeadlessTests.FsusBundledInterFontRegistrationRegressionTests.DeclaredBodyStackResolvesTheRegisteredBundledFamily",
+        "FsusUI.Avalonia.HeadlessTests.FsusBundledInterFontRegistrationRegressionTests.BundledInterResolvesGlyphsAndLaysOutTextInAFluentWindow"
+      ]
+    },
+    "gsans0-font": {
+      "expected": 2,
+      "counters": {
+        "total": "2",
+        "executed": "2",
+        "passed": "2",
+        "failed": "0",
+        "error": "0",
+        "timeout": "0",
+        "aborted": "0",
+        "inconclusive": "0",
+        "passedButRunAborted": "0",
+        "notRunnable": "0",
+        "notExecuted": "0",
+        "disconnected": "0",
+        "warning": "0",
+        "completed": "0",
+        "inProgress": "0",
+        "pending": "0"
+      },
+      "testNames": [
+        "FsusUI.Avalonia.HeadlessTests.FsusBundledInterFontRegistrationRegressionTests.BundledInterResolvesGlyphsAndLaysOutTextInAFluentWindow",
+        "FsusUI.Avalonia.HeadlessTests.FsusBundledInterFontRegistrationRegressionTests.DeclaredBodyStackResolvesTheRegisteredBundledFamily"
+      ]
+    }
+  },
+  "unrun": [
+    "Windows/macOS execution",
+    "fullCI/gates",
+    "renderer/frozen visual qualification",
+    "independent UX acceptance",
+    "stability certification",
+    "unrelated Tree/PDF/other-owner tests"
+  ],
+  "ownership": "Four-path incremental delta only. Frozen b680/82 unchanged; no fonts, host, shared csproj, dependencies, locks, budgets, goldens, gates, queue resumption, GitHub content, publication or held audits."
+}

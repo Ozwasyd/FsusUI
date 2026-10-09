@@ -1,0 +1,8 @@
+{
+  "status": "PASS",
+  "filter": "FullyQualifiedName=FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests.DocumentTabsCancelClosePreserveDirtyStateReorderAndSelectAdjacentFallback|FullyQualifiedName=FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests.DocumentContextRequestReturnsTypedStableAnchorWithoutSelectingTarget|FullyQualifiedName=FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests.DocumentTabsSupportCloseDragReorderOverflowContextAndPlatformCycling|FullyQualifiedName=FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests.AutomationPeersExposeSelectionDirtyExpandedAndCloseSemantics|FullyQualifiedName=FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests.DocumentContentKeepsSingleVisualParentAcrossThemeRemovalAndRemount",
+  "expectedMethods": 5,
+  "expectedCases": 7,
+  "GSANS": 0,
+  "source": "Published dc679 source/tests and actual82 shared hooks byte-exact. All actual fixture/helpers reviewed, no held routes; previous7 count matched."
+}

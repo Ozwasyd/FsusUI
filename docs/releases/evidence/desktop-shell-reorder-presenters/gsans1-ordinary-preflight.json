@@ -1,0 +1,8 @@
+{
+  "status": "PASS",
+  "filter": "FullyQualifiedName=FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests.DocumentTabsCancelClosePreserveDirtyStateReorderAndSelectAdjacentFallback|FullyQualifiedName=FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests.DocumentContextRequestReturnsTypedStableAnchorWithoutSelectingTarget|FullyQualifiedName=FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests.DocumentTabsSupportCloseDragReorderOverflowContextAndPlatformCycling|FullyQualifiedName=FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests.AutomationPeersExposeSelectionDirtyExpandedAndCloseSemantics|FullyQualifiedName=FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests.DocumentContentKeepsSingleVisualParentAcrossThemeRemovalAndRemount",
+  "expectedMethods": 5,
+  "expectedCases": 7,
+  "GSANS": 1,
+  "source": "Published dc679 source/tests byte-exact; actual82 host/assembly/project unchanged. Original helper/fixture graph reviewed; no renderer/held route. Build PASS, previous2 count matched."
+}

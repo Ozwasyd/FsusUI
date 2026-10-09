@@ -1,0 +1,40 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TestRun id="82b6562f-c01e-41fd-982e-0696e4eecc80" name="@845b6801dd61 2026-10-09 10:56:13" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <Times creation="2026-10-09T10:56:13.1263858+00:00" queuing="2026-10-09T10:56:13.1263859+00:00" start="2026-10-09T10:56:10.4227650+00:00" finish="2026-10-09T10:56:13.1341630+00:00" />
+  <TestSettings name="default" id="5d90ca49-fef3-4a37-9ecb-1b6c853e74bd">
+    <Deployment runDeploymentRoot="_845b6801dd61_2026-10-09_10_56_13" />
+  </TestSettings>
+  <Results>
+    <UnitTestResult executionId="09fbb015-5d61-4794-9f8f-4dfc1707bf0c" testId="586767ad-3fe5-2859-1280-091786f406aa" testName="FsusUI.Avalonia.HeadlessTests.FsusBundledInterFontRegistrationRegressionTests.DeclaredBodyStackResolvesTheRegisteredBundledFamily" computerName="845b6801dd61" duration="00:00:00.0117331" startTime="2026-10-09T10:56:13.0089837+00:00" endTime="2026-10-09T10:56:13.0208655+00:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="09fbb015-5d61-4794-9f8f-4dfc1707bf0c" />
+    <UnitTestResult executionId="c511f33e-b2b0-4ebc-bd43-4e6c6b610194" testId="20d19f3b-5bc7-ab41-e4e2-f54c13c220bc" testName="FsusUI.Avalonia.HeadlessTests.FsusBundledInterFontRegistrationRegressionTests.BundledInterResolvesGlyphsAndLaysOutTextInAFluentWindow" computerName="845b6801dd61" duration="00:00:00.4251697" startTime="2026-10-09T10:56:12.5358206+00:00" endTime="2026-10-09T10:56:12.9704037+00:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="c511f33e-b2b0-4ebc-bd43-4e6c6b610194" />
+  </Results>
+  <TestDefinitions>
+    <UnitTest name="FsusUI.Avalonia.HeadlessTests.FsusBundledInterFontRegistrationRegressionTests.DeclaredBodyStackResolvesTheRegisteredBundledFamily" storage="/workspace/fsusui-desktop-tabs-template-refresh/dotnet/fsusui.avalonia.headlesstests/bin/release/net10.0/fsusui.avalonia.headlesstests.dll" id="586767ad-3fe5-2859-1280-091786f406aa">
+      <Execution id="09fbb015-5d61-4794-9f8f-4dfc1707bf0c" />
+      <TestMethod codeBase="/workspace/FsusUI-desktop-tabs-template-refresh/dotnet/FsusUI.Avalonia.HeadlessTests/bin/Release/net10.0/FsusUI.Avalonia.HeadlessTests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="FsusUI.Avalonia.HeadlessTests.FsusBundledInterFontRegistrationRegressionTests" name="DeclaredBodyStackResolvesTheRegisteredBundledFamily" />
+    </UnitTest>
+    <UnitTest name="FsusUI.Avalonia.HeadlessTests.FsusBundledInterFontRegistrationRegressionTests.BundledInterResolvesGlyphsAndLaysOutTextInAFluentWindow" storage="/workspace/fsusui-desktop-tabs-template-refresh/dotnet/fsusui.avalonia.headlesstests/bin/release/net10.0/fsusui.avalonia.headlesstests.dll" id="20d19f3b-5bc7-ab41-e4e2-f54c13c220bc">
+      <Execution id="c511f33e-b2b0-4ebc-bd43-4e6c6b610194" />
+      <TestMethod codeBase="/workspace/FsusUI-desktop-tabs-template-refresh/dotnet/FsusUI.Avalonia.HeadlessTests/bin/Release/net10.0/FsusUI.Avalonia.HeadlessTests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="FsusUI.Avalonia.HeadlessTests.FsusBundledInterFontRegistrationRegressionTests" name="BundledInterResolvesGlyphsAndLaysOutTextInAFluentWindow" />
+    </UnitTest>
+  </TestDefinitions>
+  <TestEntries>
+    <TestEntry testId="586767ad-3fe5-2859-1280-091786f406aa" executionId="09fbb015-5d61-4794-9f8f-4dfc1707bf0c" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="20d19f3b-5bc7-ab41-e4e2-f54c13c220bc" executionId="c511f33e-b2b0-4ebc-bd43-4e6c6b610194" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+  </TestEntries>
+  <TestLists>
+    <TestList name="Results Not in a List" id="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestList name="All Loaded Results" id="19431567-8539-422a-85d7-44ee4e166bda" />
+  </TestLists>
+  <ResultSummary outcome="Completed">
+    <Counters total="2" executed="2" passed="2" failed="0" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
+    <Output>
+      <StdOut>[xUnit.net 00:00:00.00] xUnit.net VSTest Adapter v3.1.4+50e68bbb8b (64-bit .NET 10.0.12)
+[xUnit.net 00:00:00.24]   Discovering: FsusUI.Avalonia.HeadlessTests
+[xUnit.net 00:00:00.90]   Discovered:  FsusUI.Avalonia.HeadlessTests
+[xUnit.net 00:00:01.26]   Starting:    FsusUI.Avalonia.HeadlessTests
+[xUnit.net 00:00:02.07]   Finished:    FsusUI.Avalonia.HeadlessTests
+</StdOut>
+    </Output>
+  </ResultSummary>
+</TestRun>

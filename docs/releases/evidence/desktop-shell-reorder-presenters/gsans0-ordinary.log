@@ -1,0 +1,5 @@
+Test run for /workspace/FsusUI-desktop-tabs-template-refresh/dotnet/FsusUI.Avalonia.HeadlessTests/bin/Release/net10.0/FsusUI.Avalonia.HeadlessTests.dll (.NETCoreApp,Version=v10.0)
+A total of 1 test files matched the specified pattern.
+Results File: /tmp/desktop-tabs-refresh-evidence/gsans0-ordinary.trx
+
+Passed!  - Failed:     0, Passed:     7, Skipped:     0, Total:     7, Duration: 3 s - FsusUI.Avalonia.HeadlessTests.dll (net10.0)

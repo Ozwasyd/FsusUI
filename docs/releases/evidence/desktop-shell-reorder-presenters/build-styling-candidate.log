@@ -1,0 +1,12 @@
+  FsusUI.Avalonia.FormGenerator -> /workspace/FsusUI-desktop-tabs-template-refresh/dotnet/FsusUI.Avalonia.FormGenerator/bin/Release/netstandard2.0/FsusUI.Avalonia.FormGenerator.dll
+  FsusUI.Avalonia -> /workspace/FsusUI-desktop-tabs-template-refresh/dotnet/FsusUI.Avalonia/bin/Release/net10.0/FsusUI.Avalonia.dll
+  FsusUI.Avalonia.Icons -> /workspace/FsusUI-desktop-tabs-template-refresh/dotnet/FsusUI.Avalonia.Icons/bin/Release/net10.0/FsusUI.Avalonia.Icons.dll
+  FsusUI.Avalonia.Themes -> /workspace/FsusUI-desktop-tabs-template-refresh/dotnet/FsusUI.Avalonia.Themes/bin/Release/net10.0/FsusUI.Avalonia.Themes.dll
+  FsusUI.Avalonia.Demo -> /workspace/FsusUI-desktop-tabs-template-refresh/dotnet/FsusUI.Avalonia.Demo/bin/Release/net10.0/FsusUI.Avalonia.Demo.dll
+  FsusUI.Avalonia.HeadlessTests -> /workspace/FsusUI-desktop-tabs-template-refresh/dotnet/FsusUI.Avalonia.HeadlessTests/bin/Release/net10.0/FsusUI.Avalonia.HeadlessTests.dll
+
+Build succeeded.
+    0 Warning(s)
+    0 Error(s)
+
+Time Elapsed 00:00:07.04

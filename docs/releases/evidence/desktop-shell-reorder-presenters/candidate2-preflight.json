@@ -1,0 +1,7 @@
+{
+  "status": "PASS",
+  "filter": "FullyQualifiedName=FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests.DocumentTabsSupportCloseDragReorderOverflowContextAndPlatformCycling",
+  "expectedCases": 2,
+  "GSANS": 1,
+  "source": "Same added test source; candidate applies template before focus. Original hooks/setup/cleanup unchanged. Previous red2 matched; original project Release-build preflight PASS."
+}

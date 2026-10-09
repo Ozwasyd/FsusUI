@@ -1,0 +1,7 @@
+{
+  "status": "PASS",
+  "filter": "FullyQualifiedName=FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests.DocumentTabsSupportCloseDragReorderOverflowContextAndPlatformCycling",
+  "expectedCases": 2,
+  "GSANS": 1,
+  "source": "Frozen82 production plus current-header assertions. Original hooks/setup/cleanup unchanged, no font assignment. Original count2 matched. New source Release-build preflight PASS; first compile error retained and generated no TRX/test execution. No missing filter/default suite."
+}

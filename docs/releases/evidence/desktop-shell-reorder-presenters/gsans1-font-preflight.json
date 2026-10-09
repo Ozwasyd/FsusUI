@@ -1,0 +1,8 @@
+{
+  "status": "PASS",
+  "filter": "FullyQualifiedName=FsusUI.Avalonia.HeadlessTests.FsusBundledInterFontRegistrationRegressionTests.DeclaredBodyStackResolvesTheRegisteredBundledFamily|FullyQualifiedName=FsusUI.Avalonia.HeadlessTests.FsusBundledInterFontRegistrationRegressionTests.BundledInterResolvesGlyphsAndLaysOutTextInAFluentWindow",
+  "expectedMethods": 2,
+  "expectedCases": 2,
+  "GSANS": 1,
+  "source": "Two explicitly authorized original Font positive controls, source byte-exact82, original host/assembly/project unchanged. Both fixture/setup/cleanup methods read; no class/collection/BeforeAfter hooks or held routes. Previous ordinary count7 matched."
+}

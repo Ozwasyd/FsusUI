@@ -1,0 +1,92 @@
+diff --git a/.changeset/avalonia-document-tab-reorder-focus.md b/.changeset/avalonia-document-tab-reorder-focus.md
+index 6e61ed3d..b9620c1c 100644
+--- a/.changeset/avalonia-document-tab-reorder-focus.md
++++ b/.changeset/avalonia-document-tab-reorder-focus.md
+@@ -5,3 +5,5 @@
+ Preserve focus and its original keyboard or pointer navigation origin on an Avalonia document-tab header when drag or programmatic reorder removes and reinserts it, keeping the keyboard focus ring visible and retaining the active document identity and focus indication on other controls.
+ 
+ Retire the outgoing document-body presenter's template before releasing its child during template replacement so removing and restoring a theme can mount the same active document content without a visual-parent conflict, including recycling templates that accept null content. Preserve the document's own Content and ContentTemplate for normal reuse on remount.
++
++Refresh generated Avalonia document-tab header children after reinsertion and before restoring focus, preventing queued layout from measuring retired header text.
+diff --git a/docs/avalonia/components/desktop-shell.md b/docs/avalonia/components/desktop-shell.md
+index aef53a02..9a450266 100644
+--- a/docs/avalonia/components/desktop-shell.md
++++ b/docs/avalonia/components/desktop-shell.md
+@@ -65,6 +65,8 @@ the old/new indexes and source. Reordering preserves the active document and
+ the focused document header, including its keyboard or pointer focus origin and
+ corresponding visible focus indication; moving another header does not take focus
+ or change that indication.
++A mounted reordered header refreshes its generated presenter children before
++focus restoration, so queued layout uses the current header after reinsertion.
+ The selected document body retains its `Content` identity across template or
+ theme replacement. The outgoing selected-content presenter retires its template
+ before releasing its visual child, including when the template can recycle a
+diff --git a/dotnet/FsusUI.Avalonia.HeadlessTests/FsusDesktopShellHeadlessTests.cs b/dotnet/FsusUI.Avalonia.HeadlessTests/FsusDesktopShellHeadlessTests.cs
+index fc2d3f70..d254690c 100644
+--- a/dotnet/FsusUI.Avalonia.HeadlessTests/FsusDesktopShellHeadlessTests.cs
++++ b/dotnet/FsusUI.Avalonia.HeadlessTests/FsusDesktopShellHeadlessTests.cs
+@@ -308,7 +308,11 @@ public class FsusDesktopShellHeadlessTests
+       Assert.Equal(focusVisible, dragTarget.Classes.Contains(":focus-visible"));
+ 
+       var index = tabs.Documents.ToList().IndexOf(dragTarget);
++      var previousHeader = AssertCurrentHeader(dragTarget);
+       Assert.True(tabs.ReorderDocument(dragTarget.Key, index == 0 ? 1 : 0));
++      Assert.NotSame(previousHeader, AssertCurrentHeader(dragTarget));
++      Assert.Null(previousHeader.Parent);
++      Assert.Null(previousHeader.GetVisualParent());
+       Dispatcher.UIThread.RunJobs();
+       Assert.Same(dragTarget, window.FocusManager.GetFocusedElement());
+       Assert.Equal(focusVisible, dragTarget.Classes.Contains(":focus-visible"));
+@@ -323,7 +327,11 @@ public class FsusDesktopShellHeadlessTests
+ 
+       otherIndex = tabs.Documents.ToList().IndexOf(other);
+       lastFocusOrigin = null;
++      previousHeader = AssertCurrentHeader(other);
+       Assert.True(tabs.ReorderDocument(other.Key, otherIndex == 0 ? 1 : 0));
++      Assert.NotSame(previousHeader, AssertCurrentHeader(other));
++      Assert.Null(previousHeader.Parent);
++      Assert.Null(previousHeader.GetVisualParent());
+       Dispatcher.UIThread.RunJobs();
+       Assert.Same(dragTarget, window.FocusManager.GetFocusedElement());
+       Assert.Equal(focusVisible, dragTarget.Classes.Contains(":focus-visible"));
+@@ -341,6 +349,19 @@ public class FsusDesktopShellHeadlessTests
+     }
+ 
+     window.Close();
++
++    TextBlock AssertCurrentHeader(FsusDocumentTab document)
++    {
++      var presenter = document.GetVisualDescendants()
++        .OfType<ContentPresenter>()
++        .Single(candidate => Equals(candidate.Content, document.Header));
++      Assert.Same(document, presenter.TemplatedParent);
++      var header = Assert.IsType<TextBlock>(presenter.Child);
++      Assert.Equal(document.Header, header.Text);
++      Assert.Equal(document.FontFamily, header.FontFamily);
++      Assert.Same(window, TopLevel.GetTopLevel(header));
++      return header;
++    }
+   }
+ 
+   [AvaloniaTheory]
+diff --git a/dotnet/FsusUI.Avalonia/Controls/FsusDocumentTabs.cs b/dotnet/FsusUI.Avalonia/Controls/FsusDocumentTabs.cs
+index f5cb38c4..21b4380e 100644
+--- a/dotnet/FsusUI.Avalonia/Controls/FsusDocumentTabs.cs
++++ b/dotnet/FsusUI.Avalonia/Controls/FsusDocumentTabs.cs
+@@ -457,6 +457,16 @@ public class FsusDocumentTabs : FsusTabs
+     {
+       SelectKey(selectedKey);
+     }
++    if (TopLevel.GetTopLevel(document) is not null)
++    {
++      // Reattached presenters recreate their generated children. Retire those children
++      // before queued layout can replace them while measuring an old header.
++      document.ApplyTemplate();
++      foreach (var presenter in document.GetVisualDescendants().OfType<ContentPresenter>().ToArray())
++      {
++        presenter.ApplyTemplate();
++      }
++    }
+     if (wasFocused)
+     {
+       document.Focus(focusNavigationMethod);

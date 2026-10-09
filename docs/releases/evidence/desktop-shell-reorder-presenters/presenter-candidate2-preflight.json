@@ -1,0 +1,7 @@
+{
+  "status": "PASS",
+  "filter": "FullyQualifiedName=FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests.DocumentTabsSupportCloseDragReorderOverflowContextAndPlatformCycling",
+  "expectedCases": 2,
+  "GSANS": 1,
+  "source": "Document and descendant ContentPresenter.ApplyTemplate before focus. New header generation/retirement oracles. Original hooks/setup/cleanup unchanged. Previous count2 matched; Release build PASS."
+}

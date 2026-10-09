@@ -1,0 +1,10 @@
+{
+  "status": "PASS",
+  "filter": "FullyQualifiedName=FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests.DocumentTabsSupportCloseDragReorderOverflowContextAndPlatformCycling",
+  "expectedMethods": 1,
+  "expectedCases": 2,
+  "GSANS": 1,
+  "sdk": "10.0.401",
+  "base": "82ba61bda502230e4c1fcd1e9084ab2e6c006fda",
+  "source": "Exact actual82 production/test/host/assembly/project; locked restore PASS; hooks reviewed unchanged: nonparallel, original Skia, original Inter/GoogleSans18 alias, original helper/theme/window cleanup. No class/collection/BeforeAfter hook; no renderer/RepositoryRoot or other held route."
+}

@@ -1,0 +1,7 @@
+{
+  "status": "PASS",
+  "filter": "FullyQualifiedName=FsusUI.Avalonia.HeadlessTests.FsusDesktopShellHeadlessTests.DocumentTabsSupportCloseDragReorderOverflowContextAndPlatformCycling",
+  "expectedCases": 2,
+  "GSANS": 1,
+  "source": "Detached actual82 production/hooks/project, only byte-exact final dc679 original test file added. Locked restore and Release build PASS. All actual hooks/setup/cleanup retained, no renderer/held route."
+}
