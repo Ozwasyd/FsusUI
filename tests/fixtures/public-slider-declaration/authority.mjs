@@ -140,6 +140,8 @@ export function installedArtifact(profile, tarball, packageRoot) {
   const visit = (dir, relative = '') => {
     for (const entry of readdirSync(dir, { withFileTypes: true })) {
       const file = `${relative}${entry.name}`
+      // pnpm adds dependency links/bin shims here; these are not archive files.
+      if (file === 'node_modules') continue
       if (entry.isDirectory()) visit(path.join(dir, entry.name), `${file}/`)
       else {
         assert.ok(entry.isFile(), `ordinary installed file ${file}`)

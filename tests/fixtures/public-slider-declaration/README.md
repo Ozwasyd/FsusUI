@@ -26,7 +26,8 @@ locations and codes agree between those two actual packed observations. Only
 installation-directory prefixes are normalized; no diagnostic is ignored.
 
 The installed test hashes the real tarball, checks every installed package file
-against its archive bytes, and preserves the original 36 Slider JS file hashes.
+against its archive bytes (excluding pnpm's added `node_modules` dependency links
+and bin shims), and preserves the original 36 Slider JS file hashes.
 Unknown source inputs, artifacts, changed diagnostics, additional diagnostics or
 missing negative refusals fail. There is no environment override for expectations.
 The canonical observer still returns the original complete diagnostics unchanged,
