@@ -545,7 +545,7 @@ public class FsusVirtualizationHeadlessTests
       Height = 160,
       Content = table,
       FontFamily = new FontFamily(
-        "avares://FsusUI.Avalonia.HeadlessTests/Assets/Fonts/TableV2#Noto Sans"),
+        "avares://FsusUI.Avalonia.HeadlessTests/Assets/TableV2Fonts#Noto Sans"),
     };
     window.Show();
     window.Measure(new Size(240, 160));

@@ -274,7 +274,7 @@ public class FsusTableV2RenderedEvidenceTests
   {
     // The sealed TableV2 images use Noto Sans 2.004, including its layout metrics.
     window.FontFamily = new FontFamily(
-      "avares://FsusUI.Avalonia.HeadlessTests/Assets/Fonts/TableV2#Noto Sans");
+      "avares://FsusUI.Avalonia.HeadlessTests/Assets/TableV2Fonts#Noto Sans");
     var resources = new ResourceDictionary();
     new FsusThemeManager().Apply(resources, new FsusThemeOptions
     {
