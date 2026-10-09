@@ -74,7 +74,7 @@ assert.deepEqual(
       ),
     )
     .map((node) => node.name.text),
-  ['OrdinaryTableCorePopperReturn', 'OrdinaryTableCorePopperNeverNull'],
+  ['OrdinaryTableCorePopperReturn', 'OrdinaryTableCorePopperNullability'],
 )
 console.log(JSON.stringify({ preflight: 'pass', names: expectedNames, calls }))
 
@@ -109,6 +109,36 @@ function checkDiagnostics(actual, count) {
   assert.equal(actual.length, count)
   assert.ok(actual.every(({ code }) => code === 2344))
 }
+function nullability(project, file) {
+  const program = project.getProgram().compilerObject
+  const checker = program.getTypeChecker()
+  const ast = program.getSourceFile(file.getFilePath())
+  const contract = ast.statements.find(
+    (node) =>
+      ts.isTypeAliasDeclaration(node) &&
+      node.name.text === 'OrdinaryTableCorePopperNullability',
+  )
+  assert.ok(contract)
+  const conditions = contract.type.typeArguments[0].typeArguments
+  assert.equal(conditions.length, 2)
+  assert.ok(conditions.every(ts.isConditionalTypeNode))
+  const acceptsNull = conditions.map((condition) =>
+    checker.isTypeAssignableTo(
+      checker.getNullType(),
+      checker.getTypeFromTypeNode(condition.extendsType),
+    ),
+  )
+  const options = project.getCompilerOptions()
+  return {
+    strictNullChecks: options.strictNullChecks ?? options.strict ?? false,
+    tableAcceptsNull: acceptsNull[0],
+    coreAcceptsNull: acceptsNull[1],
+  }
+}
+const vitestProjectOptions = {
+  tsConfigFilePath: path.join(root, 'vue/tsconfig.vitest.json'),
+  skipAddingFilesFromTsConfig: true,
+}
 
 const evidence = {
   preimageRef,
@@ -141,6 +171,30 @@ for (const [label, content] of [
   project.addSourceFileAtPath(path.join(root, 'vue/typings/env.d.ts'))
   const sourceControls = diagnostics(project, control)
   checkDiagnostics(sourceControls, label === 'before' ? 2 : 0)
+  const strictNullability = {
+    strictNullChecks: true,
+    tableAcceptsNull: label === 'before',
+    coreAcceptsNull: false,
+  }
+  const sourceNullability = nullability(project, control)
+  assert.deepEqual(sourceNullability, strictNullability)
+  // Use the original Vitest compiler options without changing its null-checking mode.
+  const vitestProject = new Project(vitestProjectOptions)
+  vitestProject.createSourceFile(source, content, { overwrite: true })
+  vitestProject.createSourceFile(
+    `${popper}.${descriptor.scriptSetup?.lang ?? descriptor.script?.lang ?? 'js'}`,
+    script,
+  )
+  const vitestControl = vitestProject.addSourceFileAtPath(contractFile)
+  vitestProject.addSourceFileAtPath(path.join(root, 'vue/typings/env.d.ts'))
+  const vitestSourceControls = diagnostics(vitestProject, vitestControl)
+  checkDiagnostics(vitestSourceControls, label === 'before' ? 1 : 0)
+  const vitestSourceNullability = nullability(vitestProject, vitestControl)
+  assert.deepEqual(vitestSourceNullability, {
+    strictNullChecks: false,
+    tableAcceptsNull: true,
+    coreAcceptsNull: true,
+  })
   const emitted = util
     .getEmitOutput()
     .getOutputFiles()
@@ -187,6 +241,8 @@ for (const [label, content] of [
   const declarationControls = diagnostics(generatedProject, generatedControl)
   checkDiagnostics(declarationDiagnostics, label === 'before' ? 1 : 0)
   checkDiagnostics(declarationControls, label === 'before' ? 2 : 0)
+  const declarationNullability = nullability(generatedProject, generatedControl)
+  assert.deepEqual(declarationNullability, strictNullability)
   if (label === 'before')
     assert.match(declarationDiagnostics[0].message, /GlobalComponents/u)
   const directory = path.join(outputDirectory, label)
@@ -194,8 +250,12 @@ for (const [label, content] of [
   writeFileSync(path.join(directory, 'util.d.ts'), declaration)
   evidence[label] = {
     sourceControls,
+    sourceNullability,
+    vitestSourceControls,
+    vitestSourceNullability,
     declarationDiagnostics,
     declarationControls,
+    declarationNullability,
     declarationSha256: sha256(declaration),
     returnType,
   }

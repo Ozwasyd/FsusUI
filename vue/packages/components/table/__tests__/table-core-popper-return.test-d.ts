@@ -12,6 +12,11 @@ export type OrdinaryTableCorePopperReturn = AssertTrue<
   Equal<ReturnType<typeof createTablePopper>, ReturnType<typeof createPopper>>
 >
 
-export type OrdinaryTableCorePopperNeverNull = AssertTrue<
-  Equal<null extends ReturnType<typeof createTablePopper> ? true : false, false>
+// Without strictNullChecks, null is assignable to both returns. The independent
+// strict source/declaration controls verify that neither return accepts null.
+export type OrdinaryTableCorePopperNullability = AssertTrue<
+  Equal<
+    null extends ReturnType<typeof createTablePopper> ? true : false,
+    null extends ReturnType<typeof createPopper> ? true : false
+  >
 >
