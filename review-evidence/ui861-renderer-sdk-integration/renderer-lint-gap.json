@@ -1,0 +1,27 @@
+{
+  "sourceSha": "3baff077297ad15a1d205eba8dc0bc525483ff88",
+  "publishedRendererSource": "7087a573feb1091791ae4445542b571679841214",
+  "originalPreimage": "ba90d4df9b0b76e3c8cf7b4a57ceab08ded13990",
+  "status": "FAIL four consistent-type-imports errors",
+  "file": "vue/packages/components/markdown-renderer/__tests__/markdown-renderer.test.tsx",
+  "rows": [
+    {
+      "line": 50,
+      "unchangedPreimage": "    await vi.importActual<typeof import('@element-plus/wasm')>("
+    },
+    {
+      "line": 54,
+      "unchangedPreimage": "    typeof import('../../../wasm/markdown-runtime')"
+    },
+    {
+      "line": 75,
+      "unchangedPreimage": "    typeof import('../../../wasm/markdown-runtime')"
+    },
+    {
+      "line": 81,
+      "unchangedPreimage": "          typeof import('../../../wasm/markdown-heavy-feature-activation').activateMarkdownHeavyFeatures"
+    }
+  ],
+  "rendererComponentLint": "No errors reported in markdown-renderer.vue",
+  "ownership": "Preexisting annotations retained exactly from original published renderer preimage; consumer does not rewrite renderer/test. Original renderer owner can provide a follow-up source."
+}

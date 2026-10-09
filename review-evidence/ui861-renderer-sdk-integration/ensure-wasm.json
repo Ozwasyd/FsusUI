@@ -1,0 +1,9 @@
+{
+  "command": [
+    "pnpm",
+    "run",
+    "ensure:wasm"
+  ],
+  "sourceSha": "3baff077297ad15a1d205eba8dc0bc525483ff88",
+  "exitCode": 0
+}

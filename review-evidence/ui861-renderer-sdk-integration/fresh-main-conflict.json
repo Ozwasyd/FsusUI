@@ -1,0 +1,15 @@
+{
+  "sourceSha": "3baff077297ad15a1d205eba8dc0bc525483ff88",
+  "freshDefaultSha": "8db0ac8f49749e3e5f28be5051bb3d3ed71ada71",
+  "command": [
+    "git",
+    "merge-tree",
+    "--write-tree",
+    "8db0ac8f49749e3e5f28be5051bb3d3ed71ada71",
+    "3baff077297ad15a1d205eba8dc0bc525483ff88"
+  ],
+  "exitCode": 0,
+  "stdout": "47a64974dea36676f56f8cdbb9a2d6a8921eca82\n",
+  "stderr": "",
+  "checkedAt": "2026-10-09T10:14:13.273291+00:00"
+}

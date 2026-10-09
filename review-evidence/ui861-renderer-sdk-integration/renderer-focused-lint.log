@@ -1,0 +1,9 @@
+
+/workspace/ui861-renderer-sdk-integration/vue/packages/components/markdown-renderer/__tests__/markdown-renderer.test.tsx
+  50:34  error  `import()` type annotations are forbidden  @typescript-eslint/consistent-type-imports
+  54:12  error  `import()` type annotations are forbidden  @typescript-eslint/consistent-type-imports
+  75:12  error  `import()` type annotations are forbidden  @typescript-eslint/consistent-type-imports
+  81:18  error  `import()` type annotations are forbidden  @typescript-eslint/consistent-type-imports
+
+✖ 4 problems (4 errors, 0 warnings)
+

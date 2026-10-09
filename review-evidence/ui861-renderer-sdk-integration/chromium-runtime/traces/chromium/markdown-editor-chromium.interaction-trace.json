@@ -1,0 +1,306 @@
+{
+  "schema": "fsusui.interaction.v2",
+  "scenario": "scenario.v2.el-markdown-editor.real-interaction-trace",
+  "contract": "spec/components/contracts/v2/contract-v2.json",
+  "contractRegistry": {
+    "source": "spec/components/contracts/v2/contract-v2.json",
+    "schemaVersion": 2,
+    "registryVersion": "2.0.0"
+  },
+  "baseline": "8db0ac8f49749e3e5f28be5051bb3d3ed71ada71",
+  "browser": "chromium",
+  "browserIdentity": {
+    "name": "chromium",
+    "project": "chromium",
+    "version": "147.0.7727.15"
+  },
+  "candidate": "3baff077297ad15a1d205eba8dc0bc525483ff88",
+  "runtime": {
+    "component": "ElMarkdownEditor",
+    "mount": "vue",
+    "realBrowser": true
+  },
+  "steps": [
+    {
+      "index": 0,
+      "action": "focus",
+      "target": "ElMarkdownEditor.source",
+      "scenario": "scenario.v2.el-markdown-editor.focus",
+      "contract": "component-v2.el-markdown-editor",
+      "baseline": "8db0ac8f49749e3e5f28be5051bb3d3ed71ada71",
+      "candidate": "3baff077297ad15a1d205eba8dc0bc525483ff88",
+      "browserIdentity": {
+        "name": "chromium",
+        "project": "chromium",
+        "version": "147.0.7727.15"
+      },
+      "expected": {
+        "focusTarget": "textarea",
+        "selection": {
+          "start": 0,
+          "end": 5,
+          "direction": "backward"
+        }
+      },
+      "actual": {
+        "focusTarget": "textarea",
+        "selection": {
+          "start": 0,
+          "end": 5,
+          "direction": "backward"
+        }
+      },
+      "passed": true,
+      "artifact": "markdown-editor-chromium.interaction-trace.json"
+    },
+    {
+      "index": 1,
+      "action": "keyboard",
+      "target": "ElMarkdownEditor.source",
+      "scenario": "scenario.v2.el-markdown-editor.keyboard",
+      "contract": "component-v2.el-markdown-editor",
+      "baseline": "8db0ac8f49749e3e5f28be5051bb3d3ed71ada71",
+      "candidate": "3baff077297ad15a1d205eba8dc0bc525483ff88",
+      "browserIdentity": {
+        "name": "chromium",
+        "project": "chromium",
+        "version": "147.0.7727.15"
+      },
+      "expected": {
+        "key": "End",
+        "selectionAtEnd": true
+      },
+      "actual": {
+        "key": "End",
+        "selectionEnd": 11,
+        "selectionStart": 11,
+        "selectionAtEnd": true,
+        "valueLength": 11
+      },
+      "passed": true,
+      "artifact": "markdown-editor-chromium.interaction-trace.json"
+    },
+    {
+      "index": 2,
+      "action": "input",
+      "target": "ElMarkdownEditor.modelValue",
+      "scenario": "scenario.v2.el-markdown-editor.output.transaction",
+      "contract": "component-v2.el-markdown-editor",
+      "baseline": "8db0ac8f49749e3e5f28be5051bb3d3ed71ada71",
+      "candidate": "3baff077297ad15a1d205eba8dc0bc525483ff88",
+      "browserIdentity": {
+        "name": "chromium",
+        "project": "chromium",
+        "version": "147.0.7727.15"
+      },
+      "expected": {
+        "value": "Trace body",
+        "emittedEvents": [
+          "markdown.update:modelValue",
+          "markdown.change",
+          "markdown.transaction"
+        ],
+        "revisionAtLeast": 1
+      },
+      "actual": {
+        "value": "Trace body",
+        "emittedEvents": [
+          "markdown.selection-change",
+          "markdown.selection-change",
+          "markdown.transaction",
+          "markdown.update:modelValue",
+          "markdown.change",
+          "markdown.selection-change",
+          "markdown.history-change"
+        ],
+        "revision": 1
+      },
+      "passed": true,
+      "artifact": "markdown-editor-chromium.interaction-trace.json"
+    },
+    {
+      "index": 3,
+      "action": "paste",
+      "target": "ElMarkdownEditor.clipboard",
+      "scenario": "scenario.v2.el-markdown-editor.output.transaction",
+      "contract": "component-v2.el-markdown-editor",
+      "baseline": "8db0ac8f49749e3e5f28be5051bb3d3ed71ada71",
+      "candidate": "3baff077297ad15a1d205eba8dc0bc525483ff88",
+      "browserIdentity": {
+        "name": "chromium",
+        "project": "chromium",
+        "version": "147.0.7727.15"
+      },
+      "expected": {
+        "valueSuffix": " pasted",
+        "operationResult": {
+          "origin": "paste"
+        }
+      },
+      "actual": {
+        "valueSuffix": true,
+        "operationResult": {
+          "accepted": true,
+          "origin": "paste"
+        }
+      },
+      "passed": true,
+      "artifact": "markdown-editor-chromium.interaction-trace.json"
+    },
+    {
+      "index": 4,
+      "action": "drop",
+      "target": "ElMarkdownEditor.clipboard",
+      "scenario": "scenario.v2.el-markdown-editor.output.transaction",
+      "contract": "component-v2.el-markdown-editor",
+      "baseline": "8db0ac8f49749e3e5f28be5051bb3d3ed71ada71",
+      "candidate": "3baff077297ad15a1d205eba8dc0bc525483ff88",
+      "browserIdentity": {
+        "name": "chromium",
+        "project": "chromium",
+        "version": "147.0.7727.15"
+      },
+      "expected": {
+        "valueSuffix": " dropped",
+        "operationResult": {
+          "origin": "drop"
+        }
+      },
+      "actual": {
+        "valueSuffix": true,
+        "operationResult": {
+          "accepted": true,
+          "origin": "drop"
+        }
+      },
+      "passed": true,
+      "artifact": "markdown-editor-chromium.interaction-trace.json"
+    },
+    {
+      "index": 5,
+      "action": "pointer",
+      "target": "ElMarkdownEditor.toolbar.bold",
+      "scenario": "scenario.v2.el-markdown-editor.output.command",
+      "contract": "component-v2.el-markdown-editor",
+      "baseline": "8db0ac8f49749e3e5f28be5051bb3d3ed71ada71",
+      "candidate": "3baff077297ad15a1d205eba8dc0bc525483ff88",
+      "browserIdentity": {
+        "name": "chromium",
+        "project": "chromium",
+        "version": "147.0.7727.15"
+      },
+      "expected": {
+        "wrappedSelection": "**Trace**",
+        "emittedEvents": [
+          "markdown.command"
+        ]
+      },
+      "actual": {
+        "wrappedSelection": "**Trace**",
+        "emittedEvents": [
+          "markdown.command"
+        ]
+      },
+      "passed": true,
+      "artifact": "markdown-editor-chromium.interaction-trace.json"
+    },
+    {
+      "index": 6,
+      "action": "exposed",
+      "target": "ElMarkdownEditor.dispatchTransaction",
+      "scenario": "scenario.v2.el-markdown-editor.operation.dispatch-transaction",
+      "contract": "component-v2.el-markdown-editor",
+      "baseline": "8db0ac8f49749e3e5f28be5051bb3d3ed71ada71",
+      "candidate": "3baff077297ad15a1d205eba8dc0bc525483ff88",
+      "browserIdentity": {
+        "name": "chromium",
+        "project": "chromium",
+        "version": "147.0.7727.15"
+      },
+      "expected": {
+        "operationResult": {
+          "accepted": true
+        },
+        "valueSuffix": " exposed",
+        "emittedEvents": [
+          "markdown.exposed.dispatchTransaction"
+        ]
+      },
+      "actual": {
+        "operationResult": {
+          "accepted": true,
+          "revision": 5
+        },
+        "valueSuffix": true,
+        "emittedEvents": [
+          "markdown.exposed.dispatchTransaction"
+        ]
+      },
+      "passed": true,
+      "artifact": "markdown-editor-chromium.interaction-trace.json"
+    },
+    {
+      "index": 7,
+      "action": "exposed",
+      "target": "ElMarkdownEditor.undo",
+      "scenario": "scenario.v2.el-markdown-editor.operation.undo",
+      "contract": "component-v2.el-markdown-editor",
+      "baseline": "8db0ac8f49749e3e5f28be5051bb3d3ed71ada71",
+      "candidate": "3baff077297ad15a1d205eba8dc0bc525483ff88",
+      "browserIdentity": {
+        "name": "chromium",
+        "project": "chromium",
+        "version": "147.0.7727.15"
+      },
+      "expected": {
+        "operationResult": {
+          "accepted": true
+        },
+        "history": {
+          "redoDepthAtLeast": 1
+        },
+        "emittedEvents": [
+          "markdown.exposed.undo"
+        ]
+      },
+      "actual": {
+        "operationResult": {
+          "accepted": true,
+          "revision": 6
+        },
+        "history": {
+          "canRedo": true,
+          "canUndo": true,
+          "redoDepth": 1,
+          "retainedUnits": 46,
+          "undoDepth": 4
+        },
+        "emittedEvents": [
+          "markdown.exposed.undo"
+        ]
+      },
+      "passed": true,
+      "artifact": "markdown-editor-chromium.interaction-trace.json"
+    }
+  ],
+  "nativeImeEvidence": {
+    "automated": false,
+    "issueRefs": [
+      "#319",
+      "#320"
+    ]
+  },
+  "markdown": {
+    "direction": "forward",
+    "revision": 6,
+    "history": {
+      "undoDepth": 4,
+      "redoDepth": 1
+    },
+    "documentIdentity": {
+      "id": "markdown-editor-interaction-trace",
+      "epoch": 348
+    },
+    "capability": "supported"
+  }
+}

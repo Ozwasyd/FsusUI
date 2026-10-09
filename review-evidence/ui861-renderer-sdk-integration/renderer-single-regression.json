@@ -1,0 +1,18 @@
+{
+  "command": [
+    "pnpm",
+    "exec",
+    "vitest",
+    "run",
+    "--config",
+    "vue/vitest.config.ts",
+    "vue/packages/components/markdown-renderer/__tests__/markdown-renderer.test.tsx",
+    "-t",
+    "invalidates pending heavy activation when the shared theme changes"
+  ],
+  "sourceSha": "3baff077297ad15a1d205eba8dc0bc525483ff88",
+  "exitCode": 0,
+  "selectedTestTitle": "invalidates pending heavy activation when the shared theme changes",
+  "selection": "original finite1 test; other36 are unselected, not aggregate coverage",
+  "endedAt": "2026-10-09T10:10:20.307478+00:00"
+}

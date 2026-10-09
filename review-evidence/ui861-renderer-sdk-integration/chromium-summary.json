@@ -1,0 +1,53 @@
+{
+  "sourceSha": "3baff077297ad15a1d205eba8dc0bc525483ff88",
+  "status": "success",
+  "tests": {
+    "total": 2,
+    "passed": 2,
+    "failed": 0,
+    "skipped": 0,
+    "flaky": 0
+  },
+  "conformance": {
+    "contractHash": "9a4800b0fd66fa8ce891808ed11748f9432563931e05c5a38f10fa9b1471eda4",
+    "vueBaselineHash": "b5bd07b742500a5295a7bd5770640243fdc00722b30c22dbb5402507ea5960b8",
+    "scenarioRegistryHash": "6bad383c9a08420e54e8d397d61b923fc0698754555553e586f6cfa2cadb1dc1",
+    "runnerHash": "84ec1959634de11bc13c0776c64bf5fce76044a5ca4ecc50a7e898d1d930b1bd",
+    "browserRevision": "chromium-1217",
+    "representativeComponents": [
+      "ElButton, ElInput, ElDialog",
+      "ElMarkdownEditor"
+    ],
+    "scenarioCount": 2,
+    "actionStepCount": 14,
+    "traceSchema": "fsusui.interaction.v2",
+    "traceVersion": 2,
+    "traceBrowsers": [
+      "chromium"
+    ],
+    "traceCandidates": [
+      "3baff077297ad15a1d205eba8dc0bc525483ff88"
+    ],
+    "traceDigest": "6a91f725130cc470b6e751208c94200b03a9f8b639f9d18aa68fa9ebba5d1407",
+    "traces": [
+      {
+        "path": ".tmp/ui861-renderer-sdk-conformance/traces/chromium/markdown-editor-chromium.interaction-trace.json",
+        "sha256": "a5bad585ea7c108bbb36d10f027e104522c480be0cc22f62703a1431440aa56b"
+      },
+      {
+        "path": ".tmp/ui861-renderer-sdk-conformance/traces/chromium/representative-components-chromium.interaction-trace.json",
+        "sha256": "5792137c6032e66bb0df2936a613ac404f12a024ce692d7b746537e132d50a4f"
+      }
+    ],
+    "nativeImeAutomated": false,
+    "nativeImeEvidenceReferences": [
+      "#319",
+      "#320"
+    ]
+  },
+  "requiredOtherBrowserCells": {
+    "firefox": "UNRUN",
+    "webkit": "UNRUN"
+  },
+  "aggregate": "UNRUN on this source; required receipts missing; no aggregate PASS claimed"
+}

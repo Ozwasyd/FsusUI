@@ -1,0 +1,15 @@
+{
+  "command": [
+    "pnpm",
+    "exec",
+    "eslint",
+    "--no-ignore",
+    "--config",
+    "vue/eslint.config.mjs",
+    "vue/packages/components/markdown-renderer/src/markdown-renderer.vue",
+    "vue/packages/components/markdown-renderer/__tests__/markdown-renderer.test.tsx"
+  ],
+  "sourceSha": "3baff077297ad15a1d205eba8dc0bc525483ff88",
+  "exitCode": 1,
+  "checkedAt": "2026-10-09T10:06:44.225460+00:00"
+}

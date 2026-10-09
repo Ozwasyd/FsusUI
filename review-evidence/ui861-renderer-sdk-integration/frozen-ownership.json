@@ -1,0 +1,31 @@
+{
+  "worktrees": [
+    {
+      "cwd": "/workspace/FsusUI",
+      "head": "2103366e4a3d79e0dc5ab0ac5445afc2f1f35216",
+      "status": ""
+    },
+    {
+      "cwd": "/workspace/ui861-identity-fresh-scratch",
+      "head": "b7f143099ab8bbb6be69f49f6dbfd6c97831d902",
+      "status": ""
+    },
+    {
+      "cwd": "/workspace/ui861-approved-integration",
+      "head": "a58cae49d4cbbed48e62c877bab24a7c0041bef6",
+      "status": ""
+    },
+    {
+      "cwd": "/workspace/issue825-conformance-identity",
+      "head": "6583b7a59a0a871e13b97594a583ca58ca63027e",
+      "status": ""
+    },
+    {
+      "cwd": "/workspace/FsusBlog",
+      "head": "6e287562b3f861d3eb81dcb23f93e6243205abd8",
+      "status": ""
+    }
+  ],
+  "BlogOwnedVueAliasTarget": "/workspace/FsusBlog/src/frontend/node_modules/vue",
+  "BlogManageWriteOwner": "original2228; no consumer alias repointed and no duplicate manage-write runtime run"
+}

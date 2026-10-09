@@ -1,0 +1,371 @@
+{
+  "sourceSha": "3baff077297ad15a1d205eba8dc0bc525483ff88",
+  "sourceBranch": "integration/ui861-renderer-sdk-20261009",
+  "baseSha": "8db0ac8f49749e3e5f28be5051bb3d3ed71ada71",
+  "exactConsumedPaths": [
+    ".changeset/markdown-pending-theme-invalidation.md",
+    ".changeset/select-v2-focus-accessibility.md",
+    "config/dependencies/migration-baseline.json",
+    "docs/avalonia/vue-public-api-baseline.md",
+    "docs/components/markdown-renderer.md",
+    "scripts/conformance-playwright-owner-run.mjs",
+    "scripts/conformance-playwright-runner.mjs",
+    "scripts/markdown-playwright-runner.mjs",
+    "spec/baselines/vue-current.json",
+    "spec/components/contracts/v1/vue-public-contracts.json",
+    "spec/components/contracts/v2/contract-v2.json",
+    "tests/conformance-playwright-identity.test.mjs",
+    "tests/contract-v2.test.mjs",
+    "vue/packages/components/markdown-renderer/__tests__/markdown-renderer.test.tsx",
+    "vue/packages/components/markdown-renderer/src/markdown-renderer.vue",
+    "vue/packages/components/select-v2/__tests__/select.test.ts",
+    "vue/packages/components/select-v2/src/option-item.vue",
+    "vue/packages/components/select-v2/src/select-dropdown.tsx",
+    "vue/packages/components/select-v2/src/select.vue",
+    "vue/packages/components/select-v2/src/useSelect.ts"
+  ],
+  "SDKContractConsumption": [
+    {
+      "path": "docs/releases/policy/nuget.md",
+      "mainBlob": "7b939672e044e3924dfa9ebf42d02241da3de7c8",
+      "combinedBlob": "7b939672e044e3924dfa9ebf42d02241da3de7c8"
+    },
+    {
+      "path": "dotnet/FsusUI.Avalonia.Icons/packages.lock.json",
+      "mainBlob": "964764435ee7a68666bb1c637cddf132fa00f840",
+      "combinedBlob": "964764435ee7a68666bb1c637cddf132fa00f840"
+    },
+    {
+      "path": "dotnet/FsusUI.Avalonia.Themes/packages.lock.json",
+      "mainBlob": "964764435ee7a68666bb1c637cddf132fa00f840",
+      "combinedBlob": "964764435ee7a68666bb1c637cddf132fa00f840"
+    },
+    {
+      "path": "dotnet/FsusUI.Avalonia/packages.lock.json",
+      "mainBlob": "c8a1a317c1d0db84f52c26db710af0041a2d01d1",
+      "combinedBlob": "c8a1a317c1d0db84f52c26db710af0041a2d01d1"
+    },
+    {
+      "path": "scripts/dotnet-package-verify.mjs",
+      "mainBlob": "de2d30fec5ef56d8bde9bb851aece023522694fd",
+      "combinedBlob": "de2d30fec5ef56d8bde9bb851aece023522694fd"
+    },
+    {
+      "path": "scripts/dotnet-platform-verify.mjs",
+      "mainBlob": "5aebc12952255766de7b7b3a5c082c17037c3cce",
+      "combinedBlob": "5aebc12952255766de7b7b3a5c082c17037c3cce"
+    },
+    {
+      "path": "scripts/dotnet-restore-all.mjs",
+      "mainBlob": "8b1cb111c806bd1059f0adb515549218c77d2331",
+      "combinedBlob": "8b1cb111c806bd1059f0adb515549218c77d2331"
+    }
+  ],
+  "newChecks": {
+    "chromium-original-cell": {
+      "command": [
+        "node",
+        "scripts/conformance-playwright-runner.mjs",
+        "--cell",
+        "web-interaction-conformance/chromium",
+        "--group",
+        "pr",
+        "--impact-plan",
+        ".tmp/ui861-renderer-sdk-impact.json",
+        "--evidence-dir",
+        ".tmp/ui861-renderer-sdk-conformance"
+      ],
+      "sourceSha": "3baff077297ad15a1d205eba8dc0bc525483ff88",
+      "exitCode": 0,
+      "startedAt": "2026-10-09T10:10:51.884082+00:00",
+      "endedAt": "2026-10-09T10:11:43.637913+00:00",
+      "environment": {
+        "CI": "true",
+        "PLAYWRIGHT_BROWSERS_PATH": "/workspace/.setup/ms-playwright",
+        "FSUS_CONFORMANCE_INTERACTION_PORT": "5314"
+      }
+    },
+    "renderer-single-regression": {
+      "command": [
+        "pnpm",
+        "exec",
+        "vitest",
+        "run",
+        "--config",
+        "vue/vitest.config.ts",
+        "vue/packages/components/markdown-renderer/__tests__/markdown-renderer.test.tsx",
+        "-t",
+        "invalidates pending heavy activation when the shared theme changes"
+      ],
+      "sourceSha": "3baff077297ad15a1d205eba8dc0bc525483ff88",
+      "exitCode": 0,
+      "selectedTestTitle": "invalidates pending heavy activation when the shared theme changes",
+      "selection": "original finite1 test; other36 are unselected, not aggregate coverage",
+      "endedAt": "2026-10-09T10:10:20.307478+00:00"
+    },
+    "public-baseline": {
+      "command": [
+        "node",
+        "scripts/avalonia-vue-public-api-baseline.mjs",
+        "--check"
+      ],
+      "sourceSha": "3baff077297ad15a1d205eba8dc0bc525483ff88",
+      "exitCode": 1,
+      "checkedAt": "2026-10-09T10:06:51.341271+00:00"
+    },
+    "renderer-focused-lint": {
+      "command": [
+        "pnpm",
+        "exec",
+        "eslint",
+        "--no-ignore",
+        "--config",
+        "vue/eslint.config.mjs",
+        "vue/packages/components/markdown-renderer/src/markdown-renderer.vue",
+        "vue/packages/components/markdown-renderer/__tests__/markdown-renderer.test.tsx"
+      ],
+      "sourceSha": "3baff077297ad15a1d205eba8dc0bc525483ff88",
+      "exitCode": 1,
+      "checkedAt": "2026-10-09T10:06:44.225460+00:00"
+    },
+    "impact-plan": {
+      "command": [
+        "node",
+        "scripts/playwright-impact-plan.mjs",
+        "--base",
+        "8db0ac8f49749e3e5f28be5051bb3d3ed71ada71",
+        "--head",
+        "3baff077297ad15a1d205eba8dc0bc525483ff88",
+        "--receipt",
+        ".tmp/ui861-renderer-sdk-impact.json",
+        "--group",
+        "pr"
+      ],
+      "sourceSha": "3baff077297ad15a1d205eba8dc0bc525483ff88",
+      "exitCode": 0,
+      "startedAt": "2026-10-09T10:10:51.600843+00:00",
+      "endedAt": "2026-10-09T10:10:51.881726+00:00",
+      "environment": {
+        "CI": "true",
+        "PLAYWRIGHT_BROWSERS_PATH": "/workspace/.setup/ms-playwright",
+        "FSUS_CONFORMANCE_INTERACTION_PORT": "5314"
+      }
+    },
+    "component-contracts": {
+      "command": [
+        "node",
+        "scripts/component-contract-registry.mjs",
+        "--check"
+      ],
+      "sourceSha": "3baff077297ad15a1d205eba8dc0bc525483ff88",
+      "exitCode": 0,
+      "checkedAt": "2026-10-09T10:06:40.400292+00:00"
+    },
+    "fresh-main-conflict": {
+      "sourceSha": "3baff077297ad15a1d205eba8dc0bc525483ff88",
+      "freshDefaultSha": "8db0ac8f49749e3e5f28be5051bb3d3ed71ada71",
+      "command": [
+        "git",
+        "merge-tree",
+        "--write-tree",
+        "8db0ac8f49749e3e5f28be5051bb3d3ed71ada71",
+        "3baff077297ad15a1d205eba8dc0bc525483ff88"
+      ],
+      "exitCode": 0,
+      "stdout": "47a64974dea36676f56f8cdbb9a2d6a8921eca82\n",
+      "stderr": "",
+      "checkedAt": "2026-10-09T10:14:13.273291+00:00"
+    },
+    "ensure-wasm": {
+      "command": [
+        "pnpm",
+        "run",
+        "ensure:wasm"
+      ],
+      "sourceSha": "3baff077297ad15a1d205eba8dc0bc525483ff88",
+      "exitCode": 0
+    },
+    "repo-hooks-setup": {
+      "command": [
+        "pnpm",
+        "exec",
+        "husky"
+      ],
+      "sourceSha": "3baff077297ad15a1d205eba8dc0bc525483ff88",
+      "exitCode": 0,
+      "preCommit": "pnpm exec lint-staged\n",
+      "lintStagedPolicy": {
+        "*.{vue,js,ts,jsx,tsx}": "eslint --fix --no-warn-ignored --config vue/eslint.config.mjs"
+      },
+      "validation": "Exact incoming Vue/TSX lint selection was run without autofix to preserve renderer owner source; its original type-import errors remain FAIL. No empty lint-staged run is counted as a source PASS."
+    },
+    "native-install": {
+      "command": [
+        "pnpm",
+        "install",
+        "--frozen-lockfile",
+        "--offline",
+        "--ignore-scripts",
+        "--store-dir",
+        "/workspace/.setup/pnpm-store"
+      ],
+      "exitCode": 0,
+      "sourceSha": "3baff077297ad15a1d205eba8dc0bc525483ff88",
+      "endedAt": "2026-10-09T10:05:39.616952+00:00"
+    },
+    "contract-v2": {
+      "command": [
+        "node",
+        "scripts/contract-v2.mjs",
+        "--check"
+      ],
+      "sourceSha": "3baff077297ad15a1d205eba8dc0bc525483ff88",
+      "exitCode": 0,
+      "checkedAt": "2026-10-09T10:06:40.540324+00:00"
+    },
+    "update-surface": {
+      "command": [
+        "node",
+        "scripts/check-update-surface.mjs"
+      ],
+      "sourceSha": "3baff077297ad15a1d205eba8dc0bc525483ff88",
+      "exitCode": 0,
+      "checkedAt": "2026-10-09T10:06:39.539455+00:00"
+    },
+    "source-whitespace": {
+      "sourceSha": "3baff077297ad15a1d205eba8dc0bc525483ff88",
+      "command": [
+        "git",
+        "diff",
+        "--check",
+        "8db0ac8f49749e3e5f28be5051bb3d3ed71ada71",
+        "3baff077297ad15a1d205eba8dc0bc525483ff88"
+      ],
+      "exitCode": 0
+    }
+  },
+  "chromium": {
+    "sourceSha": "3baff077297ad15a1d205eba8dc0bc525483ff88",
+    "status": "success",
+    "tests": {
+      "total": 2,
+      "passed": 2,
+      "failed": 0,
+      "skipped": 0,
+      "flaky": 0
+    },
+    "conformance": {
+      "contractHash": "9a4800b0fd66fa8ce891808ed11748f9432563931e05c5a38f10fa9b1471eda4",
+      "vueBaselineHash": "b5bd07b742500a5295a7bd5770640243fdc00722b30c22dbb5402507ea5960b8",
+      "scenarioRegistryHash": "6bad383c9a08420e54e8d397d61b923fc0698754555553e586f6cfa2cadb1dc1",
+      "runnerHash": "84ec1959634de11bc13c0776c64bf5fce76044a5ca4ecc50a7e898d1d930b1bd",
+      "browserRevision": "chromium-1217",
+      "representativeComponents": [
+        "ElButton, ElInput, ElDialog",
+        "ElMarkdownEditor"
+      ],
+      "scenarioCount": 2,
+      "actionStepCount": 14,
+      "traceSchema": "fsusui.interaction.v2",
+      "traceVersion": 2,
+      "traceBrowsers": [
+        "chromium"
+      ],
+      "traceCandidates": [
+        "3baff077297ad15a1d205eba8dc0bc525483ff88"
+      ],
+      "traceDigest": "6a91f725130cc470b6e751208c94200b03a9f8b639f9d18aa68fa9ebba5d1407",
+      "traces": [
+        {
+          "path": ".tmp/ui861-renderer-sdk-conformance/traces/chromium/markdown-editor-chromium.interaction-trace.json",
+          "sha256": "a5bad585ea7c108bbb36d10f027e104522c480be0cc22f62703a1431440aa56b"
+        },
+        {
+          "path": ".tmp/ui861-renderer-sdk-conformance/traces/chromium/representative-components-chromium.interaction-trace.json",
+          "sha256": "5792137c6032e66bb0df2936a613ac404f12a024ce692d7b746537e132d50a4f"
+        }
+      ],
+      "nativeImeAutomated": false,
+      "nativeImeEvidenceReferences": [
+        "#319",
+        "#320"
+      ]
+    },
+    "requiredOtherBrowserCells": {
+      "firefox": "UNRUN",
+      "webkit": "UNRUN"
+    },
+    "aggregate": "UNRUN on this source; required receipts missing; no aggregate PASS claimed"
+  },
+  "sharedMetadata": {
+    "sourceSha": "3baff077297ad15a1d205eba8dc0bc525483ff88",
+    "owner": "original827; consumer made no tracked projection writes",
+    "updateSurfaceCheck": "PASS, no gap",
+    "publicBaselineCheck": "FAIL; original readonly check is stale",
+    "originalProducer": "pnpm run avalonia:baseline",
+    "originalProducerSource": "scripts/avalonia-vue-public-api-baseline.mjs",
+    "inputPaths": [
+      "vue/packages/components/**/*.{ts,vue,json} excluding __tests__",
+      "vue/packages/hooks/**/*.ts excluding __tests__",
+      "vue/packages/constants/**/*.ts",
+      "spec/baselines/vue-public-api-classifications.json",
+      "spec/components/contracts/v2/semantic-member-bindings.json",
+      "vue/packages/element-plus/package.json",
+      "vue/packages/theme-chalk/src/generated/tokens.*",
+      "vue/packages/icons-vue/generated/icon-metadata.json",
+      "Vue/compiler/parser/TypeScript installed native versions"
+    ],
+    "sharedProjectionPaths": [
+      "spec/baselines/vue-current.json",
+      "docs/avalonia/vue-public-api-baseline.md"
+    ],
+    "readonlyDifferences": [
+      {
+        "field": "source.inputTreeHash",
+        "current": "48ec9dcd7a3e8672a76ea3956139ce06f94d2309ea94598f5d9afaa6daa53039",
+        "originalReadOnlyCheckComputed": "e81b8072c4718d11bc7571b92871d3805dd599102e21dae4aaad9fb2691134f1"
+      },
+      {
+        "field": "source.outputHash",
+        "current": "757074344098b100ae3318771994fa6f9a8c5a06afefaee1b2a81bfb42c01010",
+        "originalReadOnlyCheckComputed": "bb4b11ff0fa72769a8385f2fbde54606b7e6bd97a516bb386bb3cc4e5ccfe2e1"
+      }
+    ],
+    "expectedObjectWrittenToTrackedFiles": false,
+    "otherContractChecks": "Both original component-contracts and contract-v2 --check currently PASS on consumed metadata; original owner must check them after any officially produced baseline update."
+  },
+  "requiredOwnerInputs": [
+    {
+      "owner": "original827",
+      "input": "actual combined source 3baff077297ad15a1d205eba8dc0bc525483ff88",
+      "producer": "pnpm run avalonia:baseline",
+      "status": "Needed: original check reports only source.inputTreeHash/outputHash stale; no consumer tracked producer write. Use actual producer then original contracts checks.",
+      "sourceGapEvidence": "shared-metadata-gap.json"
+    },
+    {
+      "owner": "original renderer637",
+      "input": "published7087 unchanged renderer test preimage",
+      "status": "Needed: focused ESLint fails four consistent-type-imports annotations at50:34,54:12,75:12,81:18; exact baseline lines retained. Consumer must not rewrite source.",
+      "sourceGapEvidence": "renderer-lint-gap.json"
+    }
+  ],
+  "unchangedSuitesNotRepeated": {
+    "identity18": "UNRUN on new combo; source exactly matches independently reviewed b7 file blob21620c0fd47f0fc42e8dd52f9ddd8139af815851. Previous b7 PASS remains its own evidence.",
+    "SelectV2_83": "UNRUN on new combo; exact reviewed source blobs inherited, actual original Chromium representative interactions run.",
+    "rendererOther36": "UNSELECTED by original finite1-test selection, not claimed PASS."
+  },
+  "remainingAcceptance": {
+    "firefox": "UNRUN on new combo; denied installation route remains stopped.",
+    "webkit": "UNRUN on new combo; denied installation route remains stopped.",
+    "aggregate": "UNRUN on new combo; mandatory three-browser coverage remains OPEN.",
+    "visualRuntimeReuse4Cells": "UNRUN on new combo; original PR882 genuine failures remain separate and unresolved.",
+    "strictPackageProducer": "UNRUN here; original827 owns real producer and files. No package build-source edits, publication or borrowed candidate identity.",
+    "nativeAotPlatform": "UNRUN on new combo; real main SDK source preserved exactly, not native qualification.",
+    "BlogManageWriteBothThemes": "OPEN; original2228 owns shared actual alias runtime; alias not repointed.",
+    "fullCI": "UNRUN for new source, no all-green claim."
+  },
+  "githubContentQueue": "paused; no issue/PR/API writes. Ordinary isolated source/evidence git pushes only.",
+  "projectionWritesAfterConsumption": false,
+  "rendererRewrite": false,
+  "browserTraceRebinding": false
+}

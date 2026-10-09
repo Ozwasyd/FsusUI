@@ -1,0 +1,207 @@
+{
+  "sourceSha": "3baff077297ad15a1d205eba8dc0bc525483ff88",
+  "freshDefaultBase": "8db0ac8f49749e3e5f28be5051bb3d3ed71ada71",
+  "reviewedRunnerAndFreshScratchParent": "b7f143099ab8bbb6be69f49f6dbfd6c97831d902",
+  "frozenCombinedParent": "a58cae49d4cbbed48e62c877bab24a7c0041bef6",
+  "canonicalTraceSource": "6583b7a59a0a871e13b97594a583ca58ca63027e",
+  "canonicalMetadataSource": "73d763c9866b47333624545593af92ad7e38a53b",
+  "canonicalMigrationSource": "9657473c696570f06eddc946659d7640a04b9e36",
+  "rendererSource": "7087a573feb1091791ae4445542b571679841214",
+  "rendererOriginalBase": "ba90d4df9b0b76e3c8cf7b4a57ceab08ded13990",
+  "rendererConsumedCommits": [
+    "ab2c95d83a4a62e0efea417e33a2c8a2333d7a5c",
+    "7087a573feb1091791ae4445542b571679841214"
+  ],
+  "rendererOriginalProvenance": [
+    "9a482352ebb34b2c6fb079be5742626268cc34a7",
+    "397d1ce0226630fcd5b81be7dfb523e4fcd14037"
+  ],
+  "rendererLocalCommits": [
+    "f1826d7f6882a7735d214d01e6a035c2bb027ff4",
+    "3baff077297ad15a1d205eba8dc0bc525483ff88"
+  ],
+  "fullChangedPaths": [
+    ".changeset/markdown-pending-theme-invalidation.md",
+    ".changeset/select-v2-focus-accessibility.md",
+    "config/dependencies/migration-baseline.json",
+    "docs/avalonia/vue-public-api-baseline.md",
+    "docs/components/markdown-renderer.md",
+    "scripts/conformance-playwright-owner-run.mjs",
+    "scripts/conformance-playwright-runner.mjs",
+    "scripts/markdown-playwright-runner.mjs",
+    "spec/baselines/vue-current.json",
+    "spec/components/contracts/v1/vue-public-contracts.json",
+    "spec/components/contracts/v2/contract-v2.json",
+    "tests/conformance-playwright-identity.test.mjs",
+    "tests/contract-v2.test.mjs",
+    "vue/packages/components/markdown-renderer/__tests__/markdown-renderer.test.tsx",
+    "vue/packages/components/markdown-renderer/src/markdown-renderer.vue",
+    "vue/packages/components/select-v2/__tests__/select.test.ts",
+    "vue/packages/components/select-v2/src/option-item.vue",
+    "vue/packages/components/select-v2/src/select-dropdown.tsx",
+    "vue/packages/components/select-v2/src/select.vue",
+    "vue/packages/components/select-v2/src/useSelect.ts"
+  ],
+  "exactBlobMatches": [
+    {
+      "path": ".changeset/markdown-pending-theme-invalidation.md",
+      "approvedSource": "7087a573feb1091791ae4445542b571679841214",
+      "approvedBlob": "8049f01c907d73838d6a3aafe1de8e7704f176dc",
+      "combinedBlob": "8049f01c907d73838d6a3aafe1de8e7704f176dc"
+    },
+    {
+      "path": ".changeset/select-v2-focus-accessibility.md",
+      "approvedSource": "b7f143099ab8bbb6be69f49f6dbfd6c97831d902",
+      "approvedBlob": "6d177e3264bc89c6673d28369bf17d33a9857fdc",
+      "combinedBlob": "6d177e3264bc89c6673d28369bf17d33a9857fdc"
+    },
+    {
+      "path": "config/dependencies/migration-baseline.json",
+      "approvedSource": "b7f143099ab8bbb6be69f49f6dbfd6c97831d902",
+      "approvedBlob": "d8afcd7053110932f67c3b9b5dd04e5d659b984e",
+      "combinedBlob": "d8afcd7053110932f67c3b9b5dd04e5d659b984e"
+    },
+    {
+      "path": "docs/avalonia/vue-public-api-baseline.md",
+      "approvedSource": "b7f143099ab8bbb6be69f49f6dbfd6c97831d902",
+      "approvedBlob": "9481c6bbcf185ec1e8e4c1d47346f64af2f61aac",
+      "combinedBlob": "9481c6bbcf185ec1e8e4c1d47346f64af2f61aac"
+    },
+    {
+      "path": "docs/components/markdown-renderer.md",
+      "approvedSource": "7087a573feb1091791ae4445542b571679841214",
+      "approvedBlob": "65a28cb0a32cde683e8bdcd20aa2cd49ff9fd386",
+      "combinedBlob": "65a28cb0a32cde683e8bdcd20aa2cd49ff9fd386"
+    },
+    {
+      "path": "scripts/conformance-playwright-owner-run.mjs",
+      "approvedSource": "b7f143099ab8bbb6be69f49f6dbfd6c97831d902",
+      "approvedBlob": "931d08870638bf513e8765aacccbb321abcd9f3f",
+      "combinedBlob": "931d08870638bf513e8765aacccbb321abcd9f3f"
+    },
+    {
+      "path": "scripts/conformance-playwright-runner.mjs",
+      "approvedSource": "b7f143099ab8bbb6be69f49f6dbfd6c97831d902",
+      "approvedBlob": "58cdccded73e4b5ac9993bfc2ce840430095f28c",
+      "combinedBlob": "58cdccded73e4b5ac9993bfc2ce840430095f28c"
+    },
+    {
+      "path": "scripts/markdown-playwright-runner.mjs",
+      "approvedSource": "b7f143099ab8bbb6be69f49f6dbfd6c97831d902",
+      "approvedBlob": "1a65c11a22438fef05aeb97bd4561350dae5fc24",
+      "combinedBlob": "1a65c11a22438fef05aeb97bd4561350dae5fc24"
+    },
+    {
+      "path": "spec/baselines/vue-current.json",
+      "approvedSource": "b7f143099ab8bbb6be69f49f6dbfd6c97831d902",
+      "approvedBlob": "a670a66764f216037d0ea35e2d382ed88222741b",
+      "combinedBlob": "a670a66764f216037d0ea35e2d382ed88222741b"
+    },
+    {
+      "path": "spec/components/contracts/v1/vue-public-contracts.json",
+      "approvedSource": "b7f143099ab8bbb6be69f49f6dbfd6c97831d902",
+      "approvedBlob": "8ed5cfe21eba24b9ad0ff1fa12bacb620d463c3f",
+      "combinedBlob": "8ed5cfe21eba24b9ad0ff1fa12bacb620d463c3f"
+    },
+    {
+      "path": "spec/components/contracts/v2/contract-v2.json",
+      "approvedSource": "b7f143099ab8bbb6be69f49f6dbfd6c97831d902",
+      "approvedBlob": "70e14e85bdd5765ee56650066b0d57ff61368844",
+      "combinedBlob": "70e14e85bdd5765ee56650066b0d57ff61368844"
+    },
+    {
+      "path": "tests/conformance-playwright-identity.test.mjs",
+      "approvedSource": "b7f143099ab8bbb6be69f49f6dbfd6c97831d902",
+      "approvedBlob": "21620c0fd47f0fc42e8dd52f9ddd8139af815851",
+      "combinedBlob": "21620c0fd47f0fc42e8dd52f9ddd8139af815851"
+    },
+    {
+      "path": "tests/contract-v2.test.mjs",
+      "approvedSource": "b7f143099ab8bbb6be69f49f6dbfd6c97831d902",
+      "approvedBlob": "8f0ab4b37c47a160a0cd09e0f1f5f65ddaaeef9f",
+      "combinedBlob": "8f0ab4b37c47a160a0cd09e0f1f5f65ddaaeef9f"
+    },
+    {
+      "path": "vue/packages/components/markdown-renderer/__tests__/markdown-renderer.test.tsx",
+      "approvedSource": "7087a573feb1091791ae4445542b571679841214",
+      "approvedBlob": "ba38cd2fc8bdb3a3c6d6d365842f296f759763c9",
+      "combinedBlob": "ba38cd2fc8bdb3a3c6d6d365842f296f759763c9"
+    },
+    {
+      "path": "vue/packages/components/markdown-renderer/src/markdown-renderer.vue",
+      "approvedSource": "7087a573feb1091791ae4445542b571679841214",
+      "approvedBlob": "901d60d9f0eb68abb19bb8a48795c8ef9e34dc32",
+      "combinedBlob": "901d60d9f0eb68abb19bb8a48795c8ef9e34dc32"
+    },
+    {
+      "path": "vue/packages/components/select-v2/__tests__/select.test.ts",
+      "approvedSource": "b7f143099ab8bbb6be69f49f6dbfd6c97831d902",
+      "approvedBlob": "09110f563cb2838ad779d512cfcc2b9ab7896c87",
+      "combinedBlob": "09110f563cb2838ad779d512cfcc2b9ab7896c87"
+    },
+    {
+      "path": "vue/packages/components/select-v2/src/option-item.vue",
+      "approvedSource": "b7f143099ab8bbb6be69f49f6dbfd6c97831d902",
+      "approvedBlob": "a8de0e049800f42deb7902887cf889105bab1cf6",
+      "combinedBlob": "a8de0e049800f42deb7902887cf889105bab1cf6"
+    },
+    {
+      "path": "vue/packages/components/select-v2/src/select-dropdown.tsx",
+      "approvedSource": "b7f143099ab8bbb6be69f49f6dbfd6c97831d902",
+      "approvedBlob": "e9750f02eb27705c42b35d1854ccb00daabfbe5d",
+      "combinedBlob": "e9750f02eb27705c42b35d1854ccb00daabfbe5d"
+    },
+    {
+      "path": "vue/packages/components/select-v2/src/select.vue",
+      "approvedSource": "b7f143099ab8bbb6be69f49f6dbfd6c97831d902",
+      "approvedBlob": "ac583384d70740636b9a066a8b26e9671b871777",
+      "combinedBlob": "ac583384d70740636b9a066a8b26e9671b871777"
+    },
+    {
+      "path": "vue/packages/components/select-v2/src/useSelect.ts",
+      "approvedSource": "b7f143099ab8bbb6be69f49f6dbfd6c97831d902",
+      "approvedBlob": "5ea2ca8a2ba4705e039581cb2ba0a631feb472bd",
+      "combinedBlob": "5ea2ca8a2ba4705e039581cb2ba0a631feb472bd"
+    }
+  ],
+  "inheritedSdkContract7ExactBlobs": [
+    {
+      "path": "docs/releases/policy/nuget.md",
+      "mainBlob": "7b939672e044e3924dfa9ebf42d02241da3de7c8",
+      "combinedBlob": "7b939672e044e3924dfa9ebf42d02241da3de7c8"
+    },
+    {
+      "path": "dotnet/FsusUI.Avalonia.Icons/packages.lock.json",
+      "mainBlob": "964764435ee7a68666bb1c637cddf132fa00f840",
+      "combinedBlob": "964764435ee7a68666bb1c637cddf132fa00f840"
+    },
+    {
+      "path": "dotnet/FsusUI.Avalonia.Themes/packages.lock.json",
+      "mainBlob": "964764435ee7a68666bb1c637cddf132fa00f840",
+      "combinedBlob": "964764435ee7a68666bb1c637cddf132fa00f840"
+    },
+    {
+      "path": "dotnet/FsusUI.Avalonia/packages.lock.json",
+      "mainBlob": "c8a1a317c1d0db84f52c26db710af0041a2d01d1",
+      "combinedBlob": "c8a1a317c1d0db84f52c26db710af0041a2d01d1"
+    },
+    {
+      "path": "scripts/dotnet-package-verify.mjs",
+      "mainBlob": "de2d30fec5ef56d8bde9bb851aece023522694fd",
+      "combinedBlob": "de2d30fec5ef56d8bde9bb851aece023522694fd"
+    },
+    {
+      "path": "scripts/dotnet-platform-verify.mjs",
+      "mainBlob": "5aebc12952255766de7b7b3a5c082c17037c3cce",
+      "combinedBlob": "5aebc12952255766de7b7b3a5c082c17037c3cce"
+    },
+    {
+      "path": "scripts/dotnet-restore-all.mjs",
+      "mainBlob": "8b1cb111c806bd1059f0adb515549218c77d2331",
+      "combinedBlob": "8b1cb111c806bd1059f0adb515549218c77d2331"
+    }
+  ],
+  "preservedAncestorCommits": true,
+  "newSourceEditsBeyondConsumedReviewedBlobs": false,
+  "trackedProjectionWrites": false
+}

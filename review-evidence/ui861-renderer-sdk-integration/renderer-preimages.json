@@ -1,0 +1,31 @@
+{
+  "originalBase": "ba90d4df9b0b76e3c8cf7b4a57ceab08ded13990",
+  "publishedSource": "7087a573feb1091791ae4445542b571679841214",
+  "integrationBeforeConsumption": "43cca92a44a9c3eeb399960221b8b5b6f9023a7c",
+  "records": [
+    {
+      "path": ".changeset/markdown-pending-theme-invalidation.md",
+      "originalPreimage": null,
+      "combinedPreimage": null,
+      "match": true
+    },
+    {
+      "path": "docs/components/markdown-renderer.md",
+      "originalPreimage": "f74a484830d594ae25b33cc843b870a1cc648478",
+      "combinedPreimage": "f74a484830d594ae25b33cc843b870a1cc648478",
+      "match": true
+    },
+    {
+      "path": "vue/packages/components/markdown-renderer/__tests__/markdown-renderer.test.tsx",
+      "originalPreimage": "cda148df8bd7a966cb332a0a561a3beacec2f53c",
+      "combinedPreimage": "cda148df8bd7a966cb332a0a561a3beacec2f53c",
+      "match": true
+    },
+    {
+      "path": "vue/packages/components/markdown-renderer/src/markdown-renderer.vue",
+      "originalPreimage": "2f9239351789941252b3e90cdff01fe8c1b28e64",
+      "combinedPreimage": "2f9239351789941252b3e90cdff01fe8c1b28e64",
+      "match": true
+    }
+  ]
+}

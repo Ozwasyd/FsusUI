@@ -1,0 +1,10 @@
+{
+  "command": [
+    "node",
+    "scripts/component-contract-registry.mjs",
+    "--check"
+  ],
+  "sourceSha": "3baff077297ad15a1d205eba8dc0bc525483ff88",
+  "exitCode": 0,
+  "checkedAt": "2026-10-09T10:06:40.400292+00:00"
+}

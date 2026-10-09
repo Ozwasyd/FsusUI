@@ -1,0 +1,5 @@
+
+> @ ensure:wasm /workspace/ui861-renderer-sdk-integration
+> node ./scripts/with-node-heap.mjs node ./scripts/ensure-wasm-artifacts.mjs
+
+[ensure-wasm] cache-hit source-hash=743a7500a128f6e6; reusing vue/packages/wasm/dist artifacts.

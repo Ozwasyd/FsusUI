@@ -1,0 +1,10 @@
+{
+  "command": [
+    "node",
+    "scripts/avalonia-vue-public-api-baseline.mjs",
+    "--check"
+  ],
+  "sourceSha": "3baff077297ad15a1d205eba8dc0bc525483ff88",
+  "exitCode": 1,
+  "checkedAt": "2026-10-09T10:06:51.341271+00:00"
+}

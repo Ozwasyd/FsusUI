@@ -1,0 +1,3 @@
+Avalonia Vue public API baseline is stale:
+- spec/baselines/vue-current.json
+Run pnpm run avalonia:baseline and commit the result.

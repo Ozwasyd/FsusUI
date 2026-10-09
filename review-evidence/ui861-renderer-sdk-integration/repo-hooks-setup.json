@@ -1,0 +1,14 @@
+{
+  "command": [
+    "pnpm",
+    "exec",
+    "husky"
+  ],
+  "sourceSha": "3baff077297ad15a1d205eba8dc0bc525483ff88",
+  "exitCode": 0,
+  "preCommit": "pnpm exec lint-staged\n",
+  "lintStagedPolicy": {
+    "*.{vue,js,ts,jsx,tsx}": "eslint --fix --no-warn-ignored --config vue/eslint.config.mjs"
+  },
+  "validation": "Exact incoming Vue/TSX lint selection was run without autofix to preserve renderer owner source; its original type-import errors remain FAIL. No empty lint-staged run is counted as a source PASS."
+}

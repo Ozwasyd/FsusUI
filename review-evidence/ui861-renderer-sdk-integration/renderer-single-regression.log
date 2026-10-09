@@ -1,0 +1,9 @@
+
+ RUN  v4.1.5 /workspace/ui861-renderer-sdk-integration
+
+
+ Test Files  1 passed (1)
+      Tests  1 passed | 36 skipped (37)
+   Start at  10:10:12
+   Duration  7.85s (transform 4.31s, setup 154ms, import 5.34s, tests 256ms, environment 1.79s)
+

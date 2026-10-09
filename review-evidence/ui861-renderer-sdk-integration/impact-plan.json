@@ -1,0 +1,23 @@
+{
+  "command": [
+    "node",
+    "scripts/playwright-impact-plan.mjs",
+    "--base",
+    "8db0ac8f49749e3e5f28be5051bb3d3ed71ada71",
+    "--head",
+    "3baff077297ad15a1d205eba8dc0bc525483ff88",
+    "--receipt",
+    ".tmp/ui861-renderer-sdk-impact.json",
+    "--group",
+    "pr"
+  ],
+  "sourceSha": "3baff077297ad15a1d205eba8dc0bc525483ff88",
+  "exitCode": 0,
+  "startedAt": "2026-10-09T10:10:51.600843+00:00",
+  "endedAt": "2026-10-09T10:10:51.881726+00:00",
+  "environment": {
+    "CI": "true",
+    "PLAYWRIGHT_BROWSERS_PATH": "/workspace/.setup/ms-playwright",
+    "FSUS_CONFORMANCE_INTERACTION_PORT": "5314"
+  }
+}
