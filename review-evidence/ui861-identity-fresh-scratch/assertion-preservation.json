@@ -1,0 +1,12 @@
+{
+  "sourceSha": "b7f143099ab8bbb6be69f49f6dbfd6c97831d902",
+  "parentSha": "a58cae49d4cbbed48e62c877bab24a7c0041bef6",
+  "changedPaths": [
+    "tests/conformance-playwright-identity.test.mjs"
+  ],
+  "insertions": 1,
+  "deletions": 0,
+  "originalFilePlusOneExactMkdirLine": true,
+  "allAssertionsCleanupAnd18ControlsUnchanged": true,
+  "testFileGitBlob": "21620c0fd47f0fc42e8dd52f9ddd8139af815851"
+}

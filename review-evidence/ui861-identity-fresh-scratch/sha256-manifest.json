@@ -1,0 +1,30 @@
+{
+  "sourceSha": "b7f143099ab8bbb6be69f49f6dbfd6c97831d902",
+  "files": {
+    "prior-results-preserved.json": "64b322adeab7d7183837efd65a195a0d96aa838960f750ce0cdb0ef99dcbcfb9",
+    "exact-head-source-whitespace.json": "ea629d44df0407f1c92fb54d30aa8994a01c7b3ba0be1fa0adcfddb3476b4983",
+    "native-install.log": "4c9e0b9365c56a0a1353eeedade2b8595131df24c01228772ea72d503aefecaf",
+    "draft-pr-body.md": "520f66b9f7084bcb4a416e8d91a8cba315580152864ea4f9fce6d61c1fc36e43",
+    "source-correction-report.json": "0c884c01df6435a8e1cb7c3ccbc33de12dbaddedf9d8f3cd711b34c0d6eff4a4",
+    "README.md": "39d75dad9289bbc39764ee90587ed1847ac3d0e8c88ab166df838a7c9d0aeb57",
+    "frozen-ownership.json": "96ad8a69be40d309118224a5af524e10422fa0fd3c936e0252d02b2a12ba1bea",
+    "source-only-fix.patch": "99ba873e2cf937614104d55de6c166d3cdf37d00452f593a0f302de50712fe24",
+    "exact-head-source-whitespace.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "source-whitespace.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "focused-lint.json": "ec734700d898bacbdf2197aee778c4bc8cbbd9b1d76974e41f46009afbbc1492",
+    "draft-pr-handoff.json": "044829ab4be91ae9e70942cf5ea34a9cf45a35dd2f1c93fd10e6e5a73155e1b4",
+    "repo-hooks.json": "09df81f24af8c819c9b1846f70d08d042d9039b4d7c8a7169a43e6c7eae28091",
+    "native-install.json": "e426b97a4375c0b7c7e186f5af88f5fec8b458463580814906f8ede7ac3e9627",
+    "focused-lint.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "repo-hooks.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "exact-head-focused-lint.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "fresh-default-conflict.json": "59cdedd7ce8d8701779743c53ea05021ab5625d83d8259a0f778b5892fe6e0a0",
+    "fresh-original-node-tests.json": "5bfa4ab77954bec4a61ee5a1ddcc8e42adb237c1063a3a4cc4f597922f9c86ea",
+    "fresh-default-fetch.log": "21d270a42985bb2d4f652def2a782598b44330390fe5c8c2e21dd09522c2d814",
+    "source-whitespace.json": "3251bc914092af0beb51c011d480be5ca42849fb351eb5e00c7c863844ad91cf",
+    "assertion-preservation.json": "24a4d6b970cb2cf8e28036e126070c95704a574a44475503cf9a496ac3f17072",
+    "source-commit.log": "c6481a3a9bd792d2fb2250bdeb22f2519a562b4a52fa09d33b79796c6014f489",
+    "exact-head-focused-lint.json": "cbea1b4736d81a21e37327d7cdaef984dbcc61eb79d49b0fde681a8ad4d519ef",
+    "fresh-original-node-tests.log": "316e41ecaae87693f4090fd03be9cc932598fa6e571cb135da26d4f4cfbdf3d5"
+  }
+}

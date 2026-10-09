@@ -1,0 +1,15 @@
+{
+  "command": [
+    "pnpm",
+    "exec",
+    "eslint",
+    "--no-ignore",
+    "--config",
+    "vue/eslint.config.mjs",
+    "tests/conformance-playwright-identity.test.mjs"
+  ],
+  "sourceSha": "b7f143099ab8bbb6be69f49f6dbfd6c97831d902",
+  "testFileGitBlob": "21620c0fd47f0fc42e8dd52f9ddd8139af815851",
+  "exitCode": 0,
+  "checkedAt": "2026-10-09T08:46:01.527393+00:00"
+}

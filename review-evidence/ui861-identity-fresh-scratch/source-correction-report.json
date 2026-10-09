@@ -1,0 +1,94 @@
+{
+  "sourceSha": "b7f143099ab8bbb6be69f49f6dbfd6c97831d902",
+  "parentSha": "a58cae49d4cbbed48e62c877bab24a7c0041bef6",
+  "branch": "fix/ui861-identity-fresh-scratch-20261009",
+  "changedPathsRelativeToParent": [
+    "tests/conformance-playwright-identity.test.mjs"
+  ],
+  "sourceChange": "One added mkdirSync(join(root, .tmp), { recursive: true }) immediately before existing diagnostic mkdtempSync; existing import reused.",
+  "checks": {
+    "fresh-original-node-tests": {
+      "sourceSha": "b7f143099ab8bbb6be69f49f6dbfd6c97831d902",
+      "parentSha": "a58cae49d4cbbed48e62c877bab24a7c0041bef6",
+      "command": [
+        "node",
+        "--test",
+        "tests/conformance-playwright-identity.test.mjs"
+      ],
+      "cwd": "/workspace/ui861-identity-fresh-scratch",
+      "scratchParentExistedBeforeEntry": false,
+      "externalScratchPreparation": false,
+      "scratchParentExistsAfterEntry": true,
+      "scratchChildrenAfterEntry": [],
+      "exitCode": 0,
+      "startedAt": "2026-10-09T08:44:39.240623+00:00",
+      "endedAt": "2026-10-09T08:44:42.800262+00:00",
+      "testFileGitBlob": "21620c0fd47f0fc42e8dd52f9ddd8139af815851",
+      "worktreeStatusAfterTests": "",
+      "browserExecution": false
+    },
+    "exact-head-focused-lint": {
+      "command": [
+        "pnpm",
+        "exec",
+        "eslint",
+        "--no-ignore",
+        "--config",
+        "vue/eslint.config.mjs",
+        "tests/conformance-playwright-identity.test.mjs"
+      ],
+      "sourceSha": "b7f143099ab8bbb6be69f49f6dbfd6c97831d902",
+      "testFileGitBlob": "21620c0fd47f0fc42e8dd52f9ddd8139af815851",
+      "exitCode": 0,
+      "checkedAt": "2026-10-09T08:46:01.527393+00:00"
+    },
+    "exact-head-source-whitespace": {
+      "command": [
+        "git",
+        "diff",
+        "--check",
+        "a58cae49d4cbbed48e62c877bab24a7c0041bef6",
+        "HEAD"
+      ],
+      "sourceSha": "b7f143099ab8bbb6be69f49f6dbfd6c97831d902",
+      "testFileGitBlob": "21620c0fd47f0fc42e8dd52f9ddd8139af815851",
+      "exitCode": 0,
+      "checkedAt": "2026-10-09T08:46:01.536751+00:00"
+    },
+    "fresh-default-conflict": {
+      "head": "b7f143099ab8bbb6be69f49f6dbfd6c97831d902",
+      "freshDefault": "8db0ac8f49749e3e5f28be5051bb3d3ed71ada71",
+      "command": [
+        "git",
+        "merge-tree",
+        "--write-tree",
+        "8db0ac8f49749e3e5f28be5051bb3d3ed71ada71",
+        "b7f143099ab8bbb6be69f49f6dbfd6c97831d902"
+      ],
+      "exitCode": 0,
+      "stdout": "eb435a2b28dc901b99236bbfac324e09eeabc7b9\n",
+      "stderr": "",
+      "checkedAt": "2026-10-09T08:46:01.924541+00:00"
+    }
+  },
+  "freshCheckoutAcceptance": "PASS original18 controls, scratch parent absent immediately before entry; no external precreation, no alternate harness, no selection/filter changed.",
+  "browserCellsAtNewHead": {
+    "chromium": "UNRUN",
+    "firefox": "UNRUN",
+    "webkit": "UNRUN"
+  },
+  "fullBrowserAggregateAtNewHead": "UNRUN; historical a58 aggregate FAIL remains recorded. No new browser receipts or rebinding were created.",
+  "visualNativePlatformFullCi": "UNRUN on new head",
+  "deniedInstaller": "Stopped; prior install-deps su authentication failure unchanged. No installation retry or system/credential/permission/security change.",
+  "assertionsAndCleanup": "All original assertions, identity checks, cleanup and18 controls unchanged. Diagnostic scratch child removed by existing finally cleanup; parent remains task-owned .tmp.",
+  "priorResults": {
+    "originalUnpreparedFailure": "https://github.com/Ozwasyd/FsusUI/blob/374086720f5812f89f71489fa678201449c77486/review-evidence/ui861-approved-integration/identity-tests.log",
+    "originalPreparedPass": "https://github.com/Ozwasyd/FsusUI/blob/374086720f5812f89f71489fa678201449c77486/review-evidence/ui861-approved-integration/identity-tests-prepared.log",
+    "originalSource": "a58cae49d4cbbed48e62c877bab24a7c0041bef6",
+    "originalResults": "17/18 FAIL without .tmp, then18/18 PASS after external preparation; both remain historical unchanged evidence."
+  },
+  "noGithubContentWrites": true,
+  "noPackagePublication": true,
+  "mergePerformed": false,
+  "reviewerThreadId": "01a11be6-6368-757d-86b1-6bf51fafa038"
+}

@@ -1,0 +1,20 @@
+{
+  "sourceSha": "b7f143099ab8bbb6be69f49f6dbfd6c97831d902",
+  "parentSha": "a58cae49d4cbbed48e62c877bab24a7c0041bef6",
+  "command": [
+    "node",
+    "--test",
+    "tests/conformance-playwright-identity.test.mjs"
+  ],
+  "cwd": "/workspace/ui861-identity-fresh-scratch",
+  "scratchParentExistedBeforeEntry": false,
+  "externalScratchPreparation": false,
+  "scratchParentExistsAfterEntry": true,
+  "scratchChildrenAfterEntry": [],
+  "exitCode": 0,
+  "startedAt": "2026-10-09T08:44:39.240623+00:00",
+  "endedAt": "2026-10-09T08:44:42.800262+00:00",
+  "testFileGitBlob": "21620c0fd47f0fc42e8dd52f9ddd8139af815851",
+  "worktreeStatusAfterTests": "",
+  "browserExecution": false
+}

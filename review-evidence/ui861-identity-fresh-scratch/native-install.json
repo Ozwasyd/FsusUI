@@ -1,0 +1,14 @@
+{
+  "command": [
+    "pnpm",
+    "install",
+    "--frozen-lockfile",
+    "--offline",
+    "--ignore-scripts",
+    "--store-dir",
+    "/workspace/.setup/pnpm-store"
+  ],
+  "cwd": "/workspace/ui861-identity-fresh-scratch",
+  "exitCode": 0,
+  "checkedAt": "2026-10-09T08:44:02.900870+00:00"
+}

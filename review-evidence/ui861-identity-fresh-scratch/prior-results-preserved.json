@@ -1,0 +1,6 @@
+{
+  "originalUnpreparedFailure": "https://github.com/Ozwasyd/FsusUI/blob/374086720f5812f89f71489fa678201449c77486/review-evidence/ui861-approved-integration/identity-tests.log",
+  "originalPreparedPass": "https://github.com/Ozwasyd/FsusUI/blob/374086720f5812f89f71489fa678201449c77486/review-evidence/ui861-approved-integration/identity-tests-prepared.log",
+  "originalSource": "a58cae49d4cbbed48e62c877bab24a7c0041bef6",
+  "originalResults": "17/18 FAIL without .tmp, then18/18 PASS after external preparation; both remain historical unchanged evidence."
+}

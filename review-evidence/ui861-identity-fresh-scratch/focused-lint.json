@@ -1,0 +1,14 @@
+{
+  "command": [
+    "pnpm",
+    "exec",
+    "eslint",
+    "--no-ignore",
+    "--config",
+    "vue/eslint.config.mjs",
+    "tests/conformance-playwright-identity.test.mjs"
+  ],
+  "cwd": "/workspace/ui861-identity-fresh-scratch",
+  "exitCode": 0,
+  "checkedAt": "2026-10-09T08:44:06.136550+00:00"
+}
