@@ -89,6 +89,11 @@ public class FsusTreeRowPresenterHeadlessTests
         Assert.True(label.IsMeasureValid);
         Assert.True(label.Bounds.Height > 0);
         Assert.Equal(AutomationControlType.TreeItem, AutomationProperties.GetControlTypeOverride(row));
+        var peer = Assert.IsType<TextBlockAutomationPeer>(ControlAutomationPeer.CreatePeerForElement(label));
+        Assert.Equal("TextBlock", peer.GetClassName());
+        Assert.Equal(AutomationControlType.Text, peer.GetAutomationControlType());
+        Assert.Equal(label.Text, peer.GetName());
+        Assert.Same(peer, ControlAutomationPeer.CreatePeerForElement(label));
       });
 
       Assert.Equal(2, AutomationProperties.GetPositionInSet(FindRow(fixture.CustomTree, "notes")));

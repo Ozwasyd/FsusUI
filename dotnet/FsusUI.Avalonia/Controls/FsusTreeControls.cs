@@ -1538,6 +1538,7 @@ internal sealed class FsusTreeDefaultLabel : TextBlock
 
   internal FsusTreeDefaultLabel(FsusTree owner)
   {
+    AutomationProperties.SetClassNameOverride(this, nameof(TextBlock));
     ResourcesChanged += (_, _) =>
     {
       // Attachment notifications are covered by the effective input key.
