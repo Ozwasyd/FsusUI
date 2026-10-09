@@ -14,3 +14,5 @@ Retain private generic constraints and defaults through the original exported
 class types, and preserve const constructor inference with valid alias syntax.
 Keep exported namespace imports usable as values and types through a private
 declaration-only adapter, while retaining unexported import boundaries.
+Project dependent private constraints with their earlier generic arguments
+intact, retaining both the original constraint and any narrower default.

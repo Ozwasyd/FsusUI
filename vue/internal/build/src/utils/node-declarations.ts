@@ -235,19 +235,20 @@ export function rewriteNodeDeclaration(
                   )
               : undefined,
           )
-        : ts.isClassDeclaration(declaration)
-          ? ts.factory.createTypeReferenceNode('InstanceType', [
-              ts.factory.createTypeQueryNode(binding),
-            ])
-          : ts.factory.createKeywordTypeNode(ts.SyntaxKind.NeverKeyword)
+        : ts.factory.createKeywordTypeNode(ts.SyntaxKind.NeverKeyword)
       return ts.factory.createConditionalTypeNode(
         instance,
         ts.factory.createTypeReferenceNode(
           binding,
-          inferred.map((name) =>
-            ts.factory.createInferTypeNode(
-              ts.factory.createTypeParameterDeclaration(undefined, name),
-            ),
+          inferred.map((name, parameterIndex) =>
+            parameterIndex < index
+              ? ts.factory.createTypeReferenceNode(
+                  parameters[parameterIndex].name,
+                  undefined,
+                )
+              : ts.factory.createInferTypeNode(
+                  ts.factory.createTypeParameterDeclaration(undefined, name),
+                ),
           ),
         ),
         ts.factory.createTypeReferenceNode(inferred[index], undefined),
