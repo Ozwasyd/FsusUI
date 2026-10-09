@@ -48,6 +48,10 @@ const require = createRequire(import.meta.url)
 
 test('preflight binds the original toolchain, installed tarball and four source validators', () => {
   assert.equal(process.version, baseline.toolchain.node)
+  assert.equal(
+    execFileSync('pnpm', ['--version'], { encoding: 'utf8' }).trim(),
+    baseline.toolchain.pnpm,
+  )
   assert.equal(ts.version, baseline.toolchain.typescript)
   for (const [name, version] of [
     ['vue', baseline.toolchain.vue],
@@ -112,10 +116,19 @@ test('source and actual installed ESM/CJS/declarations preserve the baseline bey
   const actual = snapshot(root, packageRoot)
   assert.ok(Object.keys(actual).length > 9)
   assert.deepEqual(actual, baseline.canonicalHashes)
-  for (const relative of Object.keys(actual).filter(
+  const packedFiles = Object.keys(actual).filter(
     (file) => !file.startsWith('vue/'),
-  )) {
-    const packed = execFileSync('tar', ['-xOf', tarball, `package/${relative}`])
+  )
+  assert.ok(packedFiles.length > 0)
+  execFileSync('tar', [
+    '-xzf',
+    tarball,
+    '-C',
+    scratch,
+    ...packedFiles.map((relative) => `package/${relative}`),
+  ])
+  for (const relative of packedFiles) {
+    const packed = readFileSync(path.join(scratch, 'package', relative))
     assert.equal(
       hash(packed),
       hash(readFileSync(path.join(packageRoot, relative))),
@@ -331,15 +344,10 @@ test('original Vitest component emission controls select and pass exactly three 
     '^(Color-picker it will target the focus & blur|inbox primitives renders selectable conversation items with current state and unread label|Virtual Tree events context-menu)$'
   assert.ok(selector.length > 0)
   const common = ['--config', 'vue/vitest.config.ts', ...files, '-t', selector]
-  const pnpm = process.env.npm_execpath
-  assert.ok(
-    pnpm,
-    'Run this test through the pinned pnpm exec node --test command',
-  )
   const preflight = path.join(scratch, 'preflight.json')
   execFileSync(
-    process.execPath,
-    [pnpm, 'exec', 'vitest', 'list', ...common, '--json', preflight],
+    'pnpm',
+    ['exec', 'vitest', 'list', ...common, '--json', preflight],
     { cwd: root, stdio: 'pipe' },
   )
   const selected = readJson(preflight)
@@ -351,9 +359,8 @@ test('original Vitest component emission controls select and pass exactly three 
   )
   const report = path.join(scratch, 'vitest.json')
   execFileSync(
-    process.execPath,
+    'pnpm',
     [
-      pnpm,
       'exec',
       'vitest',
       'run',

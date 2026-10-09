@@ -25,8 +25,11 @@ const seedLock = path.resolve(seedLockArg)
 assert.equal(existsSync(consumer), false, 'Consumer directory must be new')
 const manifest = verifyCandidate({ repoRoot, tarballPath: candidate })
 assert.equal(manifest.toolchain.pnpm, '10.33.0')
-const pnpm = process.env.npm_execpath
-assert.ok(pnpm, 'Run through pinned pnpm exec node')
+assert.equal(
+  execFileSync('pnpm', ['--version'], { encoding: 'utf8' }).trim(),
+  manifest.toolchain.pnpm,
+  'Use the pinned pnpm executable',
+)
 const packageJson = JSON.parse(
   readFileSync(
     path.join(repoRoot, 'vue/tests/consumer-install/template/package.json'),
@@ -54,7 +57,7 @@ copyFileSync(seedLock, path.join(consumer, 'pnpm-lock.yaml'))
 const readLock = (file) => yaml.load(readFileSync(file, 'utf8'))
 const before = readLock(seedLock)
 const run = (args) =>
-  execFileSync(process.execPath, [pnpm, ...args], {
+  execFileSync('pnpm', args, {
     cwd: consumer,
     stdio: 'inherit',
   })
