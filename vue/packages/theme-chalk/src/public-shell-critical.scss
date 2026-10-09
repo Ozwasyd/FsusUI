@@ -767,11 +767,11 @@
       }
     }
 
-    @include e(mobile-search-trigger) {
-      padding-inline: var(--fsus-space-2, 8px);
-    }
-
     @include when(mobile-nav-inline) {
+      .#{$namespace}-public-shell__mobile-search-trigger {
+        padding-inline: var(--fsus-space-2, 8px);
+      }
+
       .#{$namespace}-public-shell__auth-link--mobile {
         padding-inline: 0;
         white-space: normal;
