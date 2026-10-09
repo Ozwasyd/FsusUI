@@ -12,3 +12,5 @@ require entry points. Preserve inferred component contracts, type and value
 exports, and explicitly resolve ESM dependency types in CommonJS declarations.
 Retain private generic constraints and defaults through the original exported
 class types, and preserve const constructor inference with valid alias syntax.
+Keep exported namespace imports usable as values and types through a private
+declaration-only adapter, while retaining unexported import boundaries.

@@ -1,5 +1,13 @@
 import assert from 'node:assert/strict'
-import { mkdtemp, mkdir, readFile, writeFile } from 'node:fs/promises'
+import {
+  mkdtemp,
+  mkdir,
+  readFile,
+  readdir,
+  symlink,
+  unlink,
+  writeFile,
+} from 'node:fs/promises'
 import { createRequire } from 'node:module'
 import os from 'node:os'
 import path from 'node:path'
@@ -27,6 +35,66 @@ export declare function overload(value: number): string;
 `
 
 const cases = {
+  namespaceValue: {
+    input: "import * as dep from 'dep'; export { dep };",
+    positive:
+      'import { dep } from ENTRY; const value: number = dep.keep(1); const retained: number = dep.default(1); const item: dep.Item = {key:"ok"}; const box: dep.GenericBox = new dep.GenericBox(item); const key: string = box.value.key;',
+    negative: 'import { dep } from ENTRY; const value: string = dep.keep(1);',
+    codes: [2322],
+  },
+  namespacePrivate: {
+    input: "import * as dep from 'dep'; export declare const use: typeof dep;",
+    positive: 'import { use } from ENTRY; const value: number = use.keep(1);',
+    negative: 'import { dep } from ENTRY;',
+    codes: [2459],
+  },
+  namespaceAlias: {
+    input: "import * as Local from 'dep'; export { Local as named };",
+    positive:
+      'import { named } from ENTRY; const value: number = named.keep(1); const item: named.Item = {key:"ok"};',
+    negative: 'import { Local } from ENTRY;',
+    codes: [2460],
+  },
+  namespaceStringExport: {
+    dependency:
+      'declare function keep<T>(x:T):T; export { keep as "keep-value" };',
+    input: "import * as dep from 'dep'; export { dep };",
+    positive:
+      'import { dep } from ENTRY; const value: number = dep["keep-value"](1);',
+    negative:
+      'import { dep } from ENTRY; const value: string = dep["keep-value"](1);',
+    codes: [2322],
+  },
+  namespaceDefaultClass: {
+    dependency:
+      'export default class DefaultBox<const T> { constructor(value:T); value:T; } export declare function keep<T>(x:T):T;',
+    input: "import * as dep from 'dep'; export { dep };",
+    positive:
+      'import { dep } from ENTRY; const box: dep.default<{readonly key:"ok"}> = new dep.default({key:"ok"}); const key: "ok" = box.value.key;',
+    negative:
+      'import { dep } from ENTRY; const box = new dep.default({key:"ok"}); box.value.key = "changed";',
+    codes: [2540],
+  },
+  namespaceNestedPrivateConstraint: {
+    dependency:
+      'interface Hidden {key:string} export declare namespace Nested { interface Opaque<T extends Hidden = Hidden> {value:T} class GenericBox<T extends Hidden = Hidden> {constructor(value:T); value:T;} function keep<T>(x:T):T; }',
+    input: "import * as dep from 'dep'; export { dep };",
+    positive:
+      'import { dep } from ENTRY; const opaque: dep.Nested.Opaque = {value:{key:"ok"}}; const box: dep.Nested.GenericBox = new dep.Nested.GenericBox(opaque.value); const value: number = dep.Nested.keep(1); const key: string = box.value.key;',
+    negative:
+      'import { dep } from ENTRY; type Invalid = dep.Nested.Opaque<number>;',
+    codes: [2344],
+  },
+  namespaceNestedNominalConstraint: {
+    dependency:
+      'declare class Hidden {private brand; key:string} export declare namespace Nested { interface Opaque<T extends Hidden = Hidden> {} }',
+    input: "import * as dep from 'dep'; export { dep };",
+    positive:
+      'import { dep } from ENTRY; import type {Nested as Original} from "dep" with {"resolution-mode":"import"}; declare const original: Original.Opaque; const opaque: dep.Nested.Opaque = original;',
+    negative:
+      'import { dep } from ENTRY; type Invalid = dep.Nested.Opaque<{key:string}>;',
+    codes: [2344],
+  },
   privateGenericNominalConstraint: {
     dependency:
       'declare class Hidden { private brand; key: string } export declare class GenericBox<T extends Hidden = Hidden> { constructor(value:T); value:T; } export {};',
@@ -305,5 +373,54 @@ for (const [name, fixture] of Object.entries(cases)) {
       )
     }
     assert.equal(await readFile(filename, 'utf8'), output)
+    if (name === 'namespaceValue') {
+      const adapters = (await readdir(root)).filter((file) =>
+        file.endsWith('.d.cts'),
+      )
+      assert.equal(adapters.length, 1, 'one declaration-only namespace adapter')
+      const adapter = path.join(root, adapters[0])
+      const contents = await readFile(adapter, 'utf8')
+      assert.equal(
+        rewriteNodeDeclaration(fixture.input, filename, 'cjs', new Set()),
+        output,
+      )
+      assert.equal(
+        await readFile(adapter, 'utf8'),
+        contents,
+        'adapter generation is idempotent',
+      )
+      assert.ok(
+        !(await readdir(root)).some((file) => file.endsWith('.cjs')),
+        'no runtime implementation is generated',
+      )
+      await writeFile(adapter, 'unmanaged declaration')
+      assert.throws(
+        () => rewriteNodeDeclaration(fixture.input, filename, 'cjs', new Set()),
+        /unmanaged namespace adapter/u,
+      )
+      assert.equal(await readFile(adapter, 'utf8'), 'unmanaged declaration')
+      await unlink(adapter)
+      const target = await put('owned-by-another-writer.d.cts', contents)
+      await symlink(target, adapter)
+      assert.throws(
+        () => rewriteNodeDeclaration(fixture.input, filename, 'cjs', new Set()),
+        /unmanaged namespace adapter/u,
+      )
+      assert.equal(
+        await readFile(target, 'utf8'),
+        contents,
+        'a symlink target is never overwritten',
+      )
+      await unlink(target)
+      assert.throws(
+        () => rewriteNodeDeclaration(fixture.input, filename, 'cjs', new Set()),
+        /unmanaged namespace adapter/u,
+      )
+      await assert.rejects(
+        readFile(target),
+        { code: 'ENOENT' },
+        'a dangling symlink target is never created',
+      )
+    }
   })
 }
