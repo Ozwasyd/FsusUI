@@ -4,6 +4,7 @@ import { createRequire } from 'node:module'
 import { mkdir, readFile, writeFile } from 'node:fs/promises'
 import path from 'node:path'
 import { test } from 'node:test'
+import { sourceAuthority, assertProducerDiagnostics } from './fixtures/public-classic-select-declaration/authority.mjs'
 
 const root = path.resolve(import.meta.dirname, '..')
 const require = createRequire(import.meta.url)
@@ -45,6 +46,7 @@ test('classic Select keeps the original runtime JavaScript', async () => {
 test('canonical producer emits Select; preserves ref contracts and records Options typing compatibility', async () => {
   assert.equal(ts.version, '5.9.2')
   assert.equal(process.cwd(), root, 'Run from the repository root, as the canonical producer requires.')
+  const authority = await sourceAuthority(root)
   await mkdir(evidenceDir, { recursive: true })
   const originalDiagnostics = Project.prototype.getPreEmitDiagnostics
   let capturedProject
@@ -69,10 +71,21 @@ test('canonical producer emits Select; preserves ref contracts and records Optio
     await writeFile(path.join(evidenceDir, 'producer-diagnostics.json'), JSON.stringify({
       sourceSha: execFileSync('git', ['rev-parse', 'HEAD'], { cwd: root, encoding: 'utf8' }).trim(),
       compiler: ts.version,
+      authority: authority.name,
       originalDiagnosticReturnUnchanged: true,
       diagnostics,
     }, null, 2) + '\n')
   }
+  assertProducerDiagnostics(authority, diagnostics)
+  const unknownProbe = capturedProject.createSourceFile(path.join(root, 'vue/classic-select-unknown-diagnostic.ts'), 'export const unrelatedValue: number = "unexpected";\n')
+  const unknownProgram = capturedProject.getProgram().compilerObject
+  const unknownDiagnostics = ts.getPreEmitDiagnostics(unknownProgram, unknownProgram.getSourceFile(unknownProbe.getFilePath())).map((row) => ({
+    code: row.code, file: path.relative(root, row.file.fileName), start: row.start,
+    message: ts.flattenDiagnosticMessageText(row.messageText, '\n'),
+  }))
+  assert.deepEqual(unknownDiagnostics.map((row) => row.code), [2322])
+  await writeFile(path.join(evidenceDir, 'unknown-diagnostic-refusal.json'), JSON.stringify({ diagnostics: [...diagnostics, ...unknownDiagnostics], expectedAuthorityResult: 'FAIL' }, null, 2) + '\n')
+  assert.throws(() => assertProducerDiagnostics(authority, [...diagnostics, ...unknownDiagnostics]), /Complete canonical diagnostics must match/)
   const affected = [
     `${selectDir}/index.ts`, `${selectDir}/src/select.vue.ts`, `${selectDir}/src/useSelect.ts`,
     'vue/packages/components/time-select/index.ts',

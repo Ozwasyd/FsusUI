@@ -2,12 +2,14 @@ import assert from 'node:assert/strict'
 import { readFile, writeFile } from 'node:fs/promises'
 import { createRequire } from 'node:module'
 import path from 'node:path'
+import { installedAuthority, assertInstalledDiagnostics } from './authority.mjs'
 
 const consumerRoot = path.resolve(process.argv[2])
 const requireConsumer = createRequire(path.join(consumerRoot, 'package.json'))
 const ts = requireConsumer('typescript')
 assert.equal(ts.version, '6.0.2')
 assert.equal(requireConsumer('vue/package.json').version, '3.5.32')
+const authority = await installedAuthority(path.join(consumerRoot, 'node_modules/@ozwasyd/element-plus'))
 const file = path.join(consumerRoot, 'packed-options-compatibility.ts')
 const source = await readFile(path.join(import.meta.dirname, 'packed-options-compatibility.ts'), 'utf8')
 await writeFile(file, source)
@@ -30,16 +32,15 @@ const props = sourceFile.statements.find((node) => ts.isTypeAliasDeclaration(nod
 const prop = checker.getTypeAtLocation(props).getProperty('popperOptions')
 const popperOptionsType = checker.typeToString(checker.getTypeOfSymbolAtLocation(prop, props))
 const record = {
-  artifactSourceSha: '6dd7dc60158ee4a9ffeea18612e1143c47f4b600',
+  authority: authority.name, declarationSourceSha: authority.sourceSha,
   compiler: ts.version, vue: requireConsumer('vue/package.json').version,
   mode: 'Bundler', strict: true, skipLibCheck: false,
   popperOptionsType, rawCompile: 'FAIL', diagnostics,
 }
 await writeFile(path.join(consumerRoot, 'packed-options-compatibility-diagnostics.json'), JSON.stringify(record, null, 2) + '\n')
 assert.equal(popperOptionsType, 'Partial<Options> | undefined')
-assert.equal(diagnostics.length, 4, 'Retain two inherited absent barrels and both invalid Options values.')
+assertInstalledDiagnostics(authority, 'bundler', 'options', diagnostics)
 assert.deepEqual(diagnostics.filter((row) => row.file === 'packed-options-compatibility.ts').map(({ code, line }) => ({ code, line })), [
   { code: 2322, line: 7 }, { code: 2322, line: 8 },
 ])
-assert.ok(diagnostics.filter((row) => row.file !== 'packed-options-compatibility.ts').every((row) => row.code === 2307 && /Cannot find module '\.\/(cascader|slider)'/.test(row.message)))
-console.log('Packed Options controls PASS: both invalid values rejected; complete legal Partial<Options>, omitted and undefined props accepted. Raw compile FAIL retains both inherited absent barrels.')
+console.log(`${authority.name}: packed Options controls PASS; invalid placement/strategy TS2322, complete legal Partial<Options>, omission and undefined accepted. Raw negative compilation FAIL; every inherited diagnostic also checked.`)
