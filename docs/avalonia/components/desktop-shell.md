@@ -62,7 +62,9 @@ that was the last document, the previous adjacent tab is selected.
 
 Pointer drag calls `ReorderDocument` and raises typed `Reordered` arguments with
 the old/new indexes and source. Reordering preserves the active document and
-the focused document header; moving another header does not take focus.
+the focused document header, including its keyboard or pointer focus origin and
+corresponding visible focus indication; moving another header does not take focus
+or change that indication.
 The horizontally scrollable header reveals the
 selected tab; `CanScrollBackward`, `CanScrollForward`, `ScrollHeaders`, and the
 header extent/viewport/offset properties expose overflow without product
