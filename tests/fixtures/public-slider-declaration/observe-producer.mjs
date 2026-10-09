@@ -3,7 +3,9 @@ import * as fs from 'node:fs'
 import path from 'node:path'
 import { createRequire } from 'node:module'
 import { execFileSync } from 'node:child_process'
+import { assertProducer, sourceProfile } from './authority.mjs'
 const root = process.cwd()
+const profile = sourceProfile(root)
 const evidence = process.env.SLIDER_EVIDENCE_DIR
 assert.ok(
   evidence,
@@ -121,6 +123,8 @@ Project.prototype.getPreEmitDiagnostics = function (...args) {
   }
   const report = {
     baseline,
+    sourceProfile: profile.name,
+    sourceInputsSha256: profile.sourceInputsSha256,
     head: execFileSync('git', ['rev-parse', 'HEAD'], {
       cwd: root,
       encoding: 'utf8',
@@ -150,11 +154,7 @@ Project.prototype.getPreEmitDiagnostics = function (...args) {
     runtime.every((p) => p.equal),
     'all three slider runtime scripts unchanged',
   )
-  assert.equal(
-    diagnostics.filter((d) => d.code === 7056).length,
-    9,
-    'only the three slider diagnostics removed',
-  )
+  assertProducer(profile, diagnostics)
   assert.deepEqual(
     diagnostics.filter((d) =>
       d.file?.startsWith('vue/packages/components/slider/'),
