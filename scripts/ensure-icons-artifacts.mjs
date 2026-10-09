@@ -1,4 +1,6 @@
 import { spawnSync } from 'node:child_process'
+import { rm } from 'node:fs/promises'
+import { resolve } from 'node:path'
 import {
   artifactGroups,
   inspectArtifactGroup,
@@ -11,7 +13,6 @@ const force =
 const dryRun = process.argv.includes('--dry-run')
 const group = artifactGroups.icons
 const status = await inspectArtifactGroup(group)
-const [fingerprint] = status.fingerprints
 
 if (!force && status.fresh) {
   console.log(
@@ -47,14 +48,49 @@ console.log(
   ].join('\n'),
 )
 
-const build = spawnSync('pnpm', ['run', '-C', 'vue/packages/icons-vue', 'build'], {
-  cwd: root,
-  stdio: 'inherit',
-  shell: process.platform === 'win32',
-})
+const runBuild = (script) => {
+  const build = spawnSync(
+    'pnpm',
+    ['run', '-C', 'vue/packages/icons-vue', script],
+    {
+      cwd: root,
+      stdio: 'inherit',
+      shell: process.platform === 'win32',
+    },
+  )
 
-if (build.status !== 0) {
-  process.exit(build.status ?? 1)
+  if (build.status !== 0) process.exit(build.status ?? 1)
 }
 
-await writeFingerprint(fingerprint.fingerprintPath, fingerprint.currentFingerprint)
+const [policy] = group.fingerprints
+await rm(resolve(root, policy.fingerprintPath), { force: true })
+
+// Generation can update tracked aliases; compilation must use that stable tree.
+runBuild('build:generate')
+const generated = await inspectArtifactGroup(group)
+runBuild('build')
+const built = await inspectArtifactGroup(group)
+const [fingerprint] = built.fingerprints
+
+if (built.sourceHash !== generated.sourceHash) {
+  throw new Error(
+    '[ensure-icons] inputs changed during build; fingerprint not written',
+  )
+}
+if (fingerprint.missingArtifacts.length > 0) {
+  throw new Error(
+    '[ensure-icons] build left required artifacts missing; fingerprint not written',
+  )
+}
+
+await writeFingerprint(
+  fingerprint.fingerprintPath,
+  fingerprint.currentFingerprint,
+)
+const ready = await inspectArtifactGroup(group)
+if (!ready.fresh) {
+  await rm(resolve(root, policy.fingerprintPath), { force: true })
+  throw new Error(
+    `[ensure-icons] artifacts are not ready: ${ready.staleReasons.join('; ')}`,
+  )
+}
