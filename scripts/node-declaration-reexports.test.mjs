@@ -35,6 +35,46 @@ export declare function overload(value: number): string;
 `
 
 const cases = {
+  privateGenericDependentConstraintWithDefault: {
+    dependency:
+      'interface Hidden<T> { key: T } export declare class Pair<T, U extends Hidden<T> = Hidden<T>> { constructor(first: T, value: U); first: T; value: U; } export {};',
+    input: "export { Pair } from 'dep';",
+    positive:
+      'import { Pair } from ENTRY; const pair: Pair<number> = new Pair(1,{key:1}); const first:number=pair.first; const key:number=pair.value.key;',
+    negative:
+      'import { Pair } from ENTRY; type Invalid = Pair<number,{key:string}>;',
+    codes: [2344],
+  },
+  privateGenericDependentConstraintWithoutDefault: {
+    dependency:
+      'interface Hidden<T> { key: T } export declare class Pair<T, U extends Hidden<T>> { constructor(first: T, value: U); first: T; value: U; } export {};',
+    input: "export { Pair } from 'dep';",
+    positive:
+      'import { Pair } from ENTRY; const pair: Pair<number,{key:number}> = new Pair(1,{key:1}); const first:number=pair.first; const key:number=pair.value.key;',
+    negative:
+      'import { Pair } from ENTRY; type Invalid = Pair<number,{key:string}>;',
+    codes: [2344],
+  },
+  privateGenericDependentNarrowDefault: {
+    dependency:
+      'interface Hidden<T> {key:T} interface Default<T> extends Hidden<T> {tag:"default"} export declare class Pair<T,U extends Hidden<T> = Default<T>> {constructor(first:T,value:U);first:T;value:U;} export {};',
+    input: "export { Pair } from 'dep';",
+    positive:
+      'import { Pair } from ENTRY; declare const original: Pair<number>; const tag:"default"=original.value.tag; const pair: Pair<number,{key:number}> = new Pair(1,{key:1}); const key:number=pair.value.key;',
+    negative:
+      'import { Pair } from ENTRY; type Invalid=Pair<number,{key:string}>;',
+    codes: [2344],
+  },
+  privateGenericDependentTwoEarlierParameters: {
+    dependency:
+      'interface Hidden<T,U> {first:T;second:U} export declare class Triple<T,U,V extends Hidden<T,U> = Hidden<T,U>> {constructor(first:T,second:U,value:V);first:T;second:U;value:V;} export {};',
+    input: "export { Triple } from 'dep';",
+    positive:
+      'import { Triple } from ENTRY; const triple:Triple<number,string>=new Triple(1,"ok",{first:1,second:"ok"}); const first:number=triple.value.first; const second:string=triple.value.second;',
+    negative:
+      'import { Triple } from ENTRY; type Invalid=Triple<number,string,{first:string;second:string}>;',
+    codes: [2344],
+  },
   namespaceValue: {
     input: "import * as dep from 'dep'; export { dep };",
     positive:
