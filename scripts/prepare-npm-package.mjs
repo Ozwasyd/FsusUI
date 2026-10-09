@@ -962,10 +962,9 @@ const rewrittenSelfReferences = rewritePublishedSelfReferences(
 const rewrittenBundledWorkspaceReferences =
   rewriteBundledWorkspaceDependencyReferences(distRoot, packageName)
 assertNoBundledWorkspaceDependencyReferences(packageJson, distRoot)
-const componentDirectoryExports = addComponentDirectoryExports(
-  packageJson,
-  distRoot,
-)
+const componentDirectoryExports = strict
+  ? addComponentDirectoryExports(packageJson, distRoot)
+  : 0
 
 writeFileSync(distPackagePath, `${JSON.stringify(packageJson, null, 2)}\n`)
 if (existsSync(distNpmrcPath)) {

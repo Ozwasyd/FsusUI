@@ -25,6 +25,7 @@ function prepare(files, { strict = false, dependencies = {} } = {}) {
   try {
     for (const relative of [
       'scripts/prepare-npm-package.mjs',
+      'scripts/prepare-component-exports.mjs',
       'scripts/npm-package-contract.mjs',
       'scripts/npm-authority-lib.mjs',
       'config/dependencies/npm-authority.json',
