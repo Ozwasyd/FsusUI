@@ -1,0 +1,12 @@
+{
+  "mode": "bundler",
+  "owner": "aggregate",
+  "phase": "positive",
+  "strict": true,
+  "skipLibCheck": false,
+  "status": "PASS",
+  "expectedLocalDiagnostics": 0,
+  "localDiagnostics": 0,
+  "externalDiagnostics": 0,
+  "diagnostics": []
+}

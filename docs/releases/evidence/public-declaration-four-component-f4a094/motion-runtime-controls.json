@@ -1,0 +1,136 @@
+{
+  "baselineSha": "2d05f240e5fb04ac0cd602b4ed638ffe00b1859b",
+  "sourceSha": "f4a094f300384185918fc6d4be86e88d9ab9f097",
+  "environment": "Node24/jsdom29/Vue3.5.32; not browser/device evidence",
+  "wholeRuntimeByteParity": "FAIL",
+  "metadataOwnPropertyParity": "FAIL",
+  "modeValueCastingValidationAndInitialRenderParity": "PASS",
+  "rows": [
+    {
+      "input": null,
+      "inputUndefined": true,
+      "observed": {
+        "html": "<transition-stub appear=\"false\" persisted=\"false\" css=\"false\">\n  <div class=\"motion-probe\">probe</div>\n</transition-stub>",
+        "warnings": [],
+        "shouldCast": false,
+        "shouldCastTrue": true,
+        "inNeedCastKeys": false
+      },
+      "parity": "PASS"
+    },
+    {
+      "input": null,
+      "inputUndefined": false,
+      "observed": {
+        "propsMode": null,
+        "html": "<transition-stub appear=\"false\" persisted=\"false\" css=\"false\">\n  <div class=\"motion-probe\">probe</div>\n</transition-stub>",
+        "warnings": [],
+        "shouldCast": false,
+        "shouldCastTrue": true,
+        "inNeedCastKeys": false
+      },
+      "parity": "PASS"
+    },
+    {
+      "input": "in-out",
+      "inputUndefined": false,
+      "observed": {
+        "propsMode": "in-out",
+        "html": "<transition-stub mode=\"in-out\" appear=\"false\" persisted=\"false\" css=\"false\">\n  <div class=\"motion-probe\">probe</div>\n</transition-stub>",
+        "warnings": [],
+        "shouldCast": false,
+        "shouldCastTrue": true,
+        "inNeedCastKeys": false
+      },
+      "parity": "PASS"
+    },
+    {
+      "input": "out-in",
+      "inputUndefined": false,
+      "observed": {
+        "propsMode": "out-in",
+        "html": "<transition-stub mode=\"out-in\" appear=\"false\" persisted=\"false\" css=\"false\">\n  <div class=\"motion-probe\">probe</div>\n</transition-stub>",
+        "warnings": [],
+        "shouldCast": false,
+        "shouldCastTrue": true,
+        "inNeedCastKeys": false
+      },
+      "parity": "PASS"
+    },
+    {
+      "input": "default",
+      "inputUndefined": false,
+      "observed": {
+        "propsMode": "default",
+        "html": "<transition-stub mode=\"default\" appear=\"false\" persisted=\"false\" css=\"false\">\n  <div class=\"motion-probe\">probe</div>\n</transition-stub>",
+        "warnings": [],
+        "shouldCast": false,
+        "shouldCastTrue": true,
+        "inNeedCastKeys": false
+      },
+      "parity": "PASS"
+    },
+    {
+      "input": "invalid-mode",
+      "inputUndefined": false,
+      "observed": {
+        "propsMode": "invalid-mode",
+        "html": "<transition-stub mode=\"invalid-mode\" appear=\"false\" persisted=\"false\" css=\"false\">\n  <div class=\"motion-probe\">probe</div>\n</transition-stub>",
+        "warnings": [],
+        "shouldCast": false,
+        "shouldCastTrue": true,
+        "inNeedCastKeys": false
+      },
+      "parity": "PASS"
+    },
+    {
+      "input": 42,
+      "inputUndefined": false,
+      "observed": {
+        "propsMode": 42,
+        "html": "<transition-stub mode=\"42\" appear=\"false\" persisted=\"false\" css=\"false\">\n  <div class=\"motion-probe\">probe</div>\n</transition-stub>",
+        "warnings": [
+          "Invalid prop: type check failed for prop \"mode\". Expected String with value \"42\", got Number with value 42."
+        ],
+        "shouldCast": false,
+        "shouldCastTrue": true,
+        "inNeedCastKeys": false
+      },
+      "parity": "PASS"
+    },
+    {
+      "input": false,
+      "inputUndefined": false,
+      "observed": {
+        "propsMode": false,
+        "html": "<transition-stub mode=\"false\" appear=\"false\" persisted=\"false\" css=\"false\">\n  <div class=\"motion-probe\">probe</div>\n</transition-stub>",
+        "warnings": [
+          "Invalid prop: type check failed for prop \"mode\". Expected String, got Boolean with value false."
+        ],
+        "shouldCast": false,
+        "shouldCastTrue": true,
+        "inNeedCastKeys": false
+      },
+      "parity": "PASS"
+    },
+    {
+      "input": {
+        "invalid": true
+      },
+      "inputUndefined": false,
+      "observed": {
+        "propsMode": {
+          "invalid": true
+        },
+        "html": "<transition-stub mode=\"[object Object]\" appear=\"false\" persisted=\"false\" css=\"false\">\n  <div class=\"motion-probe\">probe</div>\n</transition-stub>",
+        "warnings": [
+          "Invalid prop: type check failed for prop \"mode\". Expected String with value \"[object Object]\", got Object "
+        ],
+        "shouldCast": false,
+        "shouldCastTrue": true,
+        "inNeedCastKeys": false
+      },
+      "parity": "PASS"
+    }
+  ]
+}

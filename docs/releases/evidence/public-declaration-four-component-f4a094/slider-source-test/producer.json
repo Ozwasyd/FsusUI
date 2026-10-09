@@ -1,0 +1,119 @@
+{
+  "baseline": "2d05f240e5fb04ac0cd602b4ed638ffe00b1859b",
+  "head": "f4a094f300384185918fc6d4be86e88d9ab9f097",
+  "producerTypeScript": "5.9.2",
+  "originalDiagnosticReturnUnchanged": true,
+  "diagnostics": [],
+  "pairDiagnostics": [],
+  "fields": [
+    {
+      "name": "elFormItem",
+      "beforeToAfter": true,
+      "afterToBefore": true
+    },
+    {
+      "name": "slider",
+      "beforeToAfter": true,
+      "afterToBefore": true
+    },
+    {
+      "name": "firstButton",
+      "beforeToAfter": true,
+      "afterToBefore": true
+    },
+    {
+      "name": "secondButton",
+      "beforeToAfter": true,
+      "afterToBefore": true
+    },
+    {
+      "name": "sliderDisabled",
+      "beforeToAfter": true,
+      "afterToBefore": true
+    },
+    {
+      "name": "minValue",
+      "beforeToAfter": true,
+      "afterToBefore": true
+    },
+    {
+      "name": "maxValue",
+      "beforeToAfter": true,
+      "afterToBefore": true
+    },
+    {
+      "name": "runwayStyle",
+      "beforeToAfter": true,
+      "afterToBefore": true
+    },
+    {
+      "name": "barStyle",
+      "beforeToAfter": true,
+      "afterToBefore": true
+    },
+    {
+      "name": "resetSize",
+      "beforeToAfter": true,
+      "afterToBefore": true
+    },
+    {
+      "name": "setPosition",
+      "beforeToAfter": true,
+      "afterToBefore": true
+    },
+    {
+      "name": "emitChange",
+      "beforeToAfter": true,
+      "afterToBefore": true
+    },
+    {
+      "name": "onSliderWrapperPrevent",
+      "beforeToAfter": true,
+      "afterToBefore": true
+    },
+    {
+      "name": "onSliderClick",
+      "beforeToAfter": true,
+      "afterToBefore": true
+    },
+    {
+      "name": "onSliderDown",
+      "beforeToAfter": true,
+      "afterToBefore": true
+    },
+    {
+      "name": "setFirstPosition",
+      "beforeToAfter": true,
+      "afterToBefore": true
+    },
+    {
+      "name": "setFirstValue",
+      "beforeToAfter": true,
+      "afterToBefore": true
+    },
+    {
+      "name": "setSecondPosition",
+      "beforeToAfter": true,
+      "afterToBefore": true
+    },
+    {
+      "name": "setSecondValue",
+      "beforeToAfter": true,
+      "afterToBefore": true
+    }
+  ],
+  "runtime": [
+    {
+      "file": "vue/packages/components/slider/index.ts",
+      "equal": true
+    },
+    {
+      "file": "vue/packages/components/slider/src/composables/use-slide.ts",
+      "equal": true
+    },
+    {
+      "file": "vue/packages/components/slider/src/slider.vue",
+      "equal": true
+    }
+  ]
+}

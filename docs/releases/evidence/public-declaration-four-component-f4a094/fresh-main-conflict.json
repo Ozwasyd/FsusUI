@@ -1,0 +1,9 @@
+{
+  "freshUiMainSha": "8db0ac8f49749e3e5f28be5051bb3d3ed71ada71",
+  "sourceSha": "f4a094f300384185918fc6d4be86e88d9ab9f097",
+  "command": "git merge-tree --write-tree 8db0ac8f49749e3e5f28be5051bb3d3ed71ada71 f4a094f300384185918fc6d4be86e88d9ab9f097",
+  "exitCode": 0,
+  "stdout": "dd4a39aa61391005dca3375feba445053b2151a3\n",
+  "stderr": "",
+  "result": "PASS"
+}

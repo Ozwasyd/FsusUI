@@ -1,0 +1,14 @@
+{
+  "baseline": "2d05f240e5fb04ac0cd602b4ed638ffe00b1859b",
+  "source": "8dec1c2b8c4c317ca9b159f021d8ee6d6b497df4",
+  "runtimeEntriesBefore": 4432,
+  "runtimeEntriesAfter": 4432,
+  "added": [],
+  "removed": [],
+  "changed": [
+    "package/dist/index.full.js",
+    "package/dist/index.full.min.js",
+    "package/dist/index.full.min.mjs",
+    "package/dist/index.full.mjs"
+  ]
+}

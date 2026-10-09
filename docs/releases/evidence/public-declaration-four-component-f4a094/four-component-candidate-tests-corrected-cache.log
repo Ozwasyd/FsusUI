@@ -1,0 +1,36 @@
+
+> @ test:package-candidate /workspace/FsusUI-public-declaration-integration
+> node ./scripts/with-node-heap.mjs node ./scripts/test-npm-candidate.mjs && pnpm run test:markdown-heavy-feature-package
+
+[npm-candidate] 13 fixture scenarios passed
+✔ bundle license attribution is retained without resolving a workspace dependency (67.342242ms)
+✔ rewrites both quote styles in ESM, CommonJS, and declaration files (69.225185ms)
+✔ refuses an actual unrewritable @element-plus/icons-vue root reference in a full bundle (41.807678ms)
+✔ refuses a remaining quoted @element-plus/icons-vue subpath reference (45.287348ms)
+✔ refuses an actual unrewritable @element-plus/motion root reference in a full bundle (70.359902ms)
+✔ refuses a remaining quoted @element-plus/motion subpath reference (105.185403ms)
+✔ strict mode still refuses incomplete release artifacts (63.389563ms)
+✔ unresolved workspace dependency versions remain fatal (45.282065ms)
+✔ known bundled workspace dependencies are still removed from the manifest (64.154757ms)
+ℹ tests 9
+ℹ suites 0
+ℹ pass 9
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 4285.6951
+
+> @ test:markdown-heavy-feature-package /workspace/FsusUI-public-declaration-integration
+> node ./scripts/with-node-heap.mjs node --import tsx --test ./scripts/markdown-heavy-feature-frame-rollup.test.mjs
+
+✔ emits one self-contained asset and portable ESM, CJS, and UMD URLs (19094.465873ms)
+✔ does not take ownership of the same query from another importer (6.66676ms)
+ℹ tests 2
+ℹ suites 0
+ℹ pass 2
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 21666.420209

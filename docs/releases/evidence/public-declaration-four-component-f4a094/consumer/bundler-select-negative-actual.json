@@ -1,0 +1,61 @@
+{
+  "mode": "bundler",
+  "owner": "select",
+  "phase": "negative",
+  "strict": true,
+  "skipLibCheck": false,
+  "status": "PASS",
+  "expectedLocalDiagnostics": 8,
+  "localDiagnostics": 8,
+  "externalDiagnostics": 0,
+  "diagnostics": [
+    {
+      "code": 2322,
+      "file": "select-negative.ts",
+      "line": 4,
+      "message": "Type '\"giant\"' is not assignable to type '\"\" | \"small\" | \"default\" | \"large\" | undefined'."
+    },
+    {
+      "code": 2322,
+      "file": "select-negative.ts",
+      "line": 5,
+      "message": "Type 'string' is not assignable to type 'boolean | undefined'."
+    },
+    {
+      "code": 2322,
+      "file": "select-negative.ts",
+      "line": 6,
+      "message": "Type 'symbol' is not assignable to type 'string | number | boolean | Record<string, any>'."
+    },
+    {
+      "code": 2322,
+      "file": "select-negative.ts",
+      "line": 7,
+      "message": "Type 'number' is not assignable to type 'string'."
+    },
+    {
+      "code": 2554,
+      "file": "select-negative.ts",
+      "line": 9,
+      "message": "Expected 0 arguments, but got 1."
+    },
+    {
+      "code": 2554,
+      "file": "select-negative.ts",
+      "line": 10,
+      "message": "Expected 0 arguments, but got 1."
+    },
+    {
+      "code": 2322,
+      "file": "select-negative.ts",
+      "line": 12,
+      "message": "Type 'number' is not assignable to type 'CreateComponentPublicInstanceWithMixins<Readonly<ExtractPropTypes<{ showArrow: { readonly type: PropType<EpPropMergeType<BooleanConstructor, unknown, unknown>>; readonly required: false; readonly validator?: ((val: unknown) => boolean) | undefined; readonly default: boolean; __epPropKey: true; }; ... 49 more ...; ro...'.\n  Type 'number' is not assignable to type '{ $: ComponentInternalInstance; $data: {}; $props: Partial<{ content: string; motion: EpPropMergeType<(new (...args: any[]) => string | false) | (() => ComponentMotion) | ((new (...args: any[]) => string | false) | ... 1 more ... | null)[], unknown, unknown>; ... 28 more ...; showArrow: EpPropMergeType<...>; }> & Om...'."
+    },
+    {
+      "code": 2345,
+      "file": "select-negative.ts",
+      "line": 13,
+      "message": "Argument of type 'string' is not assignable to parameter of type 'FocusEvent'."
+    }
+  ]
+}

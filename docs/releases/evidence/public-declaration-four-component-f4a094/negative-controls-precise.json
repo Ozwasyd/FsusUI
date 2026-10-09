@@ -1,0 +1,62 @@
+{
+  "sourceSha": "f4a094f300384185918fc6d4be86e88d9ab9f097",
+  "verifiedActualDiagnostics": [
+    {
+      "mode": "bundler",
+      "owner": "datepicker",
+      "exactLinesAndCodes": "PASS",
+      "strictWholeCheck": "PASS",
+      "externalDiagnostics": 0
+    },
+    {
+      "mode": "bundler",
+      "owner": "slider",
+      "exactLinesAndCodes": "PASS",
+      "strictWholeCheck": "PASS",
+      "externalDiagnostics": 0
+    },
+    {
+      "mode": "bundler",
+      "owner": "cascader",
+      "exactLinesAndCodes": "PASS",
+      "strictWholeCheck": "PASS",
+      "externalDiagnostics": 0
+    },
+    {
+      "mode": "bundler",
+      "owner": "select",
+      "exactLinesAndCodes": "PASS",
+      "strictWholeCheck": "PASS",
+      "externalDiagnostics": 0
+    },
+    {
+      "mode": "node16",
+      "owner": "datepicker",
+      "exactLinesAndCodes": "PASS",
+      "strictWholeCheck": "FAIL",
+      "externalDiagnostics": 68
+    },
+    {
+      "mode": "node16",
+      "owner": "slider",
+      "exactLinesAndCodes": "PASS",
+      "strictWholeCheck": "FAIL",
+      "externalDiagnostics": 68
+    },
+    {
+      "mode": "node16",
+      "owner": "cascader",
+      "exactLinesAndCodes": "PASS",
+      "strictWholeCheck": "FAIL",
+      "externalDiagnostics": 68
+    },
+    {
+      "mode": "node16",
+      "owner": "select",
+      "exactLinesAndCodes": "PASS",
+      "strictWholeCheck": "FAIL",
+      "externalDiagnostics": 68
+    }
+  ],
+  "node16ExternalErrorsRemainFatal": true
+}

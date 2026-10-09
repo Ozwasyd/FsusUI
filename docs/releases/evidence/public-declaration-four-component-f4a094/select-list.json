@@ -1,0 +1,298 @@
+[
+  {
+    "name": "Select > create",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/select/__tests__/select.test.ts"
+  },
+  {
+    "name": "Select > options rendered correctly",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/select/__tests__/select.test.ts"
+  },
+  {
+    "name": "Select > custom dropdown class",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/select/__tests__/select.test.ts"
+  },
+  {
+    "name": "Select > default value",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/select/__tests__/select.test.ts"
+  },
+  {
+    "name": "Select > set default value to object",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/select/__tests__/select.test.ts"
+  },
+  {
+    "name": "Select > custom label",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/select/__tests__/select.test.ts"
+  },
+  {
+    "name": "Select > custom label with object",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/select/__tests__/select.test.ts"
+  },
+  {
+    "name": "Select > passes prefix slot directly to input prefix container",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/select/__tests__/select.test.ts"
+  },
+  {
+    "name": "Select > sync set value and options",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/select/__tests__/select.test.ts"
+  },
+  {
+    "name": "Select > single select",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/select/__tests__/select.test.ts"
+  },
+  {
+    "name": "Select > disabled option",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/select/__tests__/select.test.ts"
+  },
+  {
+    "name": "Select > disabled select",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/select/__tests__/select.test.ts"
+  },
+  {
+    "name": "Select > group disabled option",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/select/__tests__/select.test.ts"
+  },
+  {
+    "name": "Select > keyboard operations when option-group is disabled",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/select/__tests__/select.test.ts"
+  },
+  {
+    "name": "Select > visible event",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/select/__tests__/select.test.ts"
+  },
+  {
+    "name": "Select > keyboard operations",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/select/__tests__/select.test.ts"
+  },
+  {
+    "name": "Select > clearable",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/select/__tests__/select.test.ts"
+  },
+  {
+    "name": "Select > suffix icon",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/select/__tests__/select.test.ts"
+  },
+  {
+    "name": "Select > test remote show suffix",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/select/__tests__/select.test.ts"
+  },
+  {
+    "name": "Select > fitInputWidth",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/select/__tests__/select.test.ts"
+  },
+  {
+    "name": "Select > check default first option",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/select/__tests__/select.test.ts"
+  },
+  {
+    "name": "Select > check default first option when the very first option is disabled",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/select/__tests__/select.test.ts"
+  },
+  {
+    "name": "Select > allow create",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/select/__tests__/select.test.ts"
+  },
+  {
+    "name": "Select > allow create with default first option",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/select/__tests__/select.test.ts"
+  },
+  {
+    "name": "Select > allow create async option",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/select/__tests__/select.test.ts"
+  },
+  {
+    "name": "Select > multiple select",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/select/__tests__/select.test.ts"
+  },
+  {
+    "name": "Select > multiple select when content overflow",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/select/__tests__/select.test.ts"
+  },
+  {
+    "name": "Select > multiple select with collapseTags when content overflow",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/select/__tests__/select.test.ts"
+  },
+  {
+    "name": "Select > multiple select with collapseTagsTooltip",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/select/__tests__/select.test.ts"
+  },
+  {
+    "name": "Select > multiple select with maxCollapseTags",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/select/__tests__/select.test.ts"
+  },
+  {
+    "name": "Select > multiple remove-tag",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/select/__tests__/select.test.ts"
+  },
+  {
+    "name": "Select > multiple limit",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/select/__tests__/select.test.ts"
+  },
+  {
+    "name": "Select > event:focus & blur",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/select/__tests__/select.test.ts"
+  },
+  {
+    "name": "Select > event:focus & blur for clearable & filterable",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/select/__tests__/select.test.ts"
+  },
+  {
+    "name": "Select > event:focus & blur for multiple & filterable select",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/select/__tests__/select.test.ts"
+  },
+  {
+    "name": "Select > event:focus & blur for multiple tag close",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/select/__tests__/select.test.ts"
+  },
+  {
+    "name": "Select > should not open popper when automatic-dropdown not set",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/select/__tests__/select.test.ts"
+  },
+  {
+    "name": "Select > should open popper when automatic-dropdown is set",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/select/__tests__/select.test.ts"
+  },
+  {
+    "name": "Select > only emit change on user input",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/select/__tests__/select.test.ts"
+  },
+  {
+    "name": "Select > render slot `empty`",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/select/__tests__/select.test.ts"
+  },
+  {
+    "name": "Select > should set placeholder to label of selected option when filterable is true and multiple is false",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/select/__tests__/select.test.ts"
+  },
+  {
+    "name": "Select > default value is null or undefined",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/select/__tests__/select.test.ts"
+  },
+  {
+    "name": "Select > emptyText error show",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/select/__tests__/select.test.ts"
+  },
+  {
+    "name": "Select > multiple select with remote load",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/select/__tests__/select.test.ts"
+  },
+  {
+    "name": "Select > disabled group",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/select/__tests__/select.test.ts"
+  },
+  {
+    "name": "Select > tag of disabled option is not closable",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/select/__tests__/select.test.ts"
+  },
+  {
+    "name": "Select > tag type",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/select/__tests__/select.test.ts"
+  },
+  {
+    "name": "Select > modelValue replacement should update in multiple mode",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/select/__tests__/select.test.ts"
+  },
+  {
+    "name": "Select > should reset placeholder after clear when both multiple and filterable are true",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/select/__tests__/select.test.ts"
+  },
+  {
+    "name": "Select > should close popper when click icon twice",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/select/__tests__/select.test.ts"
+  },
+  {
+    "name": "Select > mouseenter click",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/select/__tests__/select.test.ts"
+  },
+  {
+    "name": "Select > should show all options when open select dropdown > both filterable and multiple are false",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/select/__tests__/select.test.ts"
+  },
+  {
+    "name": "Select > should show all options when open select dropdown > filterable is true and multiple is false",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/select/__tests__/select.test.ts"
+  },
+  {
+    "name": "Select > should show all options when open select dropdown > filterable is false and multiple is true",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/select/__tests__/select.test.ts"
+  },
+  {
+    "name": "Select > should show all options when open select dropdown > both filterable and multiple are true",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/select/__tests__/select.test.ts"
+  },
+  {
+    "name": "Select > should show all options when open select dropdown > filterable is true with grouping",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/select/__tests__/select.test.ts"
+  },
+  {
+    "name": "Select > after search > should call filter method",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/select/__tests__/select.test.ts"
+  },
+  {
+    "name": "Select > after search > should call filter method in multiple mode",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/select/__tests__/select.test.ts"
+  },
+  {
+    "name": "Select > after search > should call remote method",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/select/__tests__/select.test.ts"
+  },
+  {
+    "name": "Select > after search > should call remote method in multiple mode",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/select/__tests__/select.test.ts"
+  },
+  {
+    "name": "Select > teleported API > should mount on popper container",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/select/__tests__/select.test.ts"
+  },
+  {
+    "name": "Select > teleported API > should not mount on the popper container",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/select/__tests__/select.test.ts"
+  },
+  {
+    "name": "Select > multiple select has an initial value",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/select/__tests__/select.test.ts"
+  },
+  {
+    "name": "Select > should reset selectedLabel when toggle multiple",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/select/__tests__/select.test.ts"
+  },
+  {
+    "name": "Select > should modify size height change",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/select/__tests__/select.test.ts"
+  },
+  {
+    "name": "Select > form item accessibility integration > automatic id attachment",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/select/__tests__/select.test.ts"
+  },
+  {
+    "name": "Select > form item accessibility integration > specified id attachment",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/select/__tests__/select.test.ts"
+  },
+  {
+    "name": "Select > form item accessibility integration > form item role is group when multiple inputs",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/select/__tests__/select.test.ts"
+  },
+  {
+    "name": "Select > form item accessibility integration > When props are changed, label can be displayed correctly after selecting operation",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/select/__tests__/select.test.ts"
+  },
+  {
+    "name": "Select > form item accessibility integration > should update selected data when the options prop is changed and the select is focused",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/select/__tests__/select.test.ts"
+  },
+  {
+    "name": "Select > form item accessibility integration > backspace key should not delete disabled options",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/select/__tests__/select.test.ts"
+  },
+  {
+    "name": "Select > It should generate accessible attributes",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/select/__tests__/select.test.ts"
+  },
+  {
+    "name": "options > renders emit correct options",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/select/__tests__/options.test.tsx"
+  },
+  {
+    "name": "options > renders emit correct options with option group",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/select/__tests__/options.test.tsx"
+  }
+]

@@ -1,0 +1,15 @@
+✔ Added source files
+AssertionError [ERR_ASSERTION]: only the three slider diagnostics removed
+
+0 !== 9
+
+    at Project.getPreEmitDiagnostics (file:///workspace/FsusUI-public-declaration-integration/tests/fixtures/public-slider-declaration/observe-producer.mjs:153:10)
+    at typeCheck (/workspace/FsusUI-public-declaration-integration/vue/internal/build/src/tasks/types-definitions.ts:271:31)
+    at runGenerateTypesDefinitions (/workspace/FsusUI-public-declaration-integration/vue/internal/build/src/tasks/types-definitions.ts:144:3) {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: 0,
+  expected: 9,
+  operator: 'strictEqual',
+  diff: 'simple'
+}

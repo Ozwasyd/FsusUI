@@ -1,0 +1,10 @@
+{
+  "sourceHead": "8dec1c2b8c4c317ca9b159f021d8ee6d6b497df4",
+  "actualPositiveFileCountAndNamesPass": true,
+  "counts": {
+    "date-picker": 75,
+    "cascader": 22,
+    "slider": 35
+  },
+  "total": 132
+}

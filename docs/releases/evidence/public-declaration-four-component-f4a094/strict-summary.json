@@ -1,0 +1,146 @@
+[
+  {
+    "mode": "bundler",
+    "fixture": "aggregate",
+    "phase": "positive",
+    "result": "PASS",
+    "local": 0,
+    "external": 0
+  },
+  {
+    "mode": "bundler",
+    "fixture": "datepicker",
+    "phase": "positive",
+    "result": "PASS",
+    "local": 0,
+    "external": 0
+  },
+  {
+    "mode": "bundler",
+    "fixture": "datepicker",
+    "phase": "negative",
+    "result": "PASS",
+    "local": 4,
+    "external": 0
+  },
+  {
+    "mode": "bundler",
+    "fixture": "slider",
+    "phase": "positive",
+    "result": "PASS",
+    "local": 0,
+    "external": 0
+  },
+  {
+    "mode": "bundler",
+    "fixture": "slider",
+    "phase": "negative",
+    "result": "PASS",
+    "local": 16,
+    "external": 0
+  },
+  {
+    "mode": "bundler",
+    "fixture": "cascader",
+    "phase": "positive",
+    "result": "PASS",
+    "local": 0,
+    "external": 0
+  },
+  {
+    "mode": "bundler",
+    "fixture": "cascader",
+    "phase": "negative",
+    "result": "PASS",
+    "local": 20,
+    "external": 0
+  },
+  {
+    "mode": "bundler",
+    "fixture": "select",
+    "phase": "positive",
+    "result": "PASS",
+    "local": 0,
+    "external": 0
+  },
+  {
+    "mode": "bundler",
+    "fixture": "select",
+    "phase": "negative",
+    "result": "PASS",
+    "local": 8,
+    "external": 0
+  },
+  {
+    "mode": "node16",
+    "fixture": "aggregate",
+    "phase": "positive",
+    "result": "FAIL",
+    "local": 0,
+    "external": 68
+  },
+  {
+    "mode": "node16",
+    "fixture": "datepicker",
+    "phase": "positive",
+    "result": "FAIL",
+    "local": 1,
+    "external": 68
+  },
+  {
+    "mode": "node16",
+    "fixture": "datepicker",
+    "phase": "negative",
+    "result": "FAIL",
+    "local": 4,
+    "external": 68
+  },
+  {
+    "mode": "node16",
+    "fixture": "slider",
+    "phase": "positive",
+    "result": "FAIL",
+    "local": 3,
+    "external": 68
+  },
+  {
+    "mode": "node16",
+    "fixture": "slider",
+    "phase": "negative",
+    "result": "FAIL",
+    "local": 16,
+    "external": 68
+  },
+  {
+    "mode": "node16",
+    "fixture": "cascader",
+    "phase": "positive",
+    "result": "FAIL",
+    "local": 1,
+    "external": 68
+  },
+  {
+    "mode": "node16",
+    "fixture": "cascader",
+    "phase": "negative",
+    "result": "FAIL",
+    "local": 20,
+    "external": 68
+  },
+  {
+    "mode": "node16",
+    "fixture": "select",
+    "phase": "positive",
+    "result": "FAIL",
+    "local": 5,
+    "external": 68
+  },
+  {
+    "mode": "node16",
+    "fixture": "select",
+    "phase": "negative",
+    "result": "FAIL",
+    "local": 8,
+    "external": 68
+  }
+]

@@ -1,0 +1,44 @@
+✖ real canonical declaration producer retains original slider contracts (49531.533744ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 0
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 49588.945435
+
+✖ failing tests:
+
+test at tests/public-slider-declaration.test.mjs:24:1
+✖ real canonical declaration producer retains original slider contracts (49531.533744ms)
+  AssertionError [ERR_ASSERTION]: AssertionError [ERR_ASSERTION]: only the three slider diagnostics removed
+  
+  0 !== 9
+  
+      at Project.getPreEmitDiagnostics (file:///workspace/FsusUI-public-declaration-integration/tests/fixtures/public-slider-declaration/observe-producer.mjs:153:10)
+      at typeCheck (/workspace/FsusUI-public-declaration-integration/vue/internal/build/src/tasks/types-definitions.ts:271:31)
+      at runGenerateTypesDefinitions (/workspace/FsusUI-public-declaration-integration/vue/internal/build/src/tasks/types-definitions.ts:144:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 0,
+    expected: 9,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+  
+  
+  1 !== 0
+  
+      at TestContext.<anonymous> (file:///workspace/FsusUI-public-declaration-integration/tests/public-slider-declaration.test.mjs:48:12)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.start (node:internal/test_runner/test:1242:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:387:17) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 1,
+    expected: 0,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

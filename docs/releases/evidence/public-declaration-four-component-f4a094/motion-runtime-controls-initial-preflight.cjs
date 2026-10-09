@@ -1,0 +1,13 @@
+const {createRequire}=require('node:module'),fs=require('node:fs'),assert=require('node:assert/strict');
+const req=createRequire('/workspace/FsusUI-public-declaration-integration/package.json');
+const {JSDOM}=req('jsdom');const dom=new JSDOM('<html><body></body></html>',{url:'http://localhost'});
+for(const k of ['window','document','Element','HTMLElement','SVGElement','Node','MutationObserver'])globalThis[k]=dom.window[k];
+globalThis.requestAnimationFrame=f=>setTimeout(f,0);globalThis.cancelAnimationFrame=clearTimeout;
+const vue=req('vue'),{mount}=req('@vue/test-utils');
+const out='/workspace/.setup/public-declaration-component-offers';
+const load=dir=>{const module={exports:{}};new Function('module','exports','require',fs.readFileSync(out+'/'+dir+'/package/dist/index.full.js','utf8'))(module,module.exports,req);return module.exports.FsuTransition;};
+const before=load('motion-runtime-baseline'),after=load('motion-runtime-composed');
+assert.ok(before&&after);assert.equal(Object.hasOwn(before.props.mode,'type'),false);assert.equal(Object.hasOwn(after.props.mode,'type'),true);assert.equal(after.props.mode.type,null);
+const values=[undefined,null,'in-out','out-in','default','invalid-mode',42,false,{invalid:true}],rows=[];
+for(const value of values){const results=[];for(const component of [before,after]){const warnings=[];const wrapper=mount(component,{props:{mode:value,disabled:true},slots:{default:()=>vue.h('div',{class:'motion-probe'},'probe')},global:{config:{warnHandler:m=>warnings.push(m)}}});const instance=wrapper.vm.$;results.push({propsMode:instance.props.mode,html:wrapper.html(),warnings,shouldCast:instance.propsOptions[0].mode[0],shouldCastTrue:instance.propsOptions[0].mode[1],inNeedCastKeys:instance.propsOptions[1].includes('mode')});wrapper.unmount();}assert.deepEqual(results[1],results[0]);rows.push({input:value??null,inputUndefined:value===undefined,observed:results[1],parity:'PASS'});}
+fs.writeFileSync(out+'/motion-runtime-controls.json',JSON.stringify({baselineSha:'2d05f240e5fb04ac0cd602b4ed638ffe00b1859b',sourceSha:'f4a094f300384185918fc6d4be86e88d9ab9f097',environment:'Node24/jsdom29/Vue3.5.32; not browser/device evidence',wholeRuntimeByteParity:'FAIL',metadataOwnPropertyParity:'FAIL',modeValueCastingValidationAndInitialRenderParity:'PASS',rows},null,2)+'\n');console.log('PASS 9 actual full-bundle prop/render controls; own-property and byte parity remain FAIL');

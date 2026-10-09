@@ -1,0 +1,25 @@
+{
+  "producerTypeScript": "5.9.2",
+  "diagnostics": [],
+  "parityErrors": [],
+  "originalSfc7056": true,
+  "assertions": [
+    "entire inferred component",
+    "props",
+    "emits",
+    "slots",
+    "instance refs",
+    "actual inferred getCheckedNodes and togglePopperVisible parameters and returns"
+  ],
+  "originalDiagnosticReturnUnchanged": true,
+  "entries": [
+    {
+      "file": "index.d.ts",
+      "emitted": true
+    },
+    {
+      "file": "src/cascader.vue.d.ts",
+      "emitted": true
+    }
+  ]
+}

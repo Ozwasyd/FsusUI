@@ -1,0 +1,16 @@
+{
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@10.33.0",
+  "dependencies": {
+    "vue": "3.5.32",
+    "typescript": "6.0.2",
+    "@ozwasyd/element-plus": "file:/workspace/.setup/public-declaration-component-offers/four-component-candidate.tgz"
+  },
+  "pnpm": {
+    "overrides": {
+      "@vue/compiler-dom": "3.5.32",
+      "@vue/shared": "3.5.32"
+    }
+  }
+}

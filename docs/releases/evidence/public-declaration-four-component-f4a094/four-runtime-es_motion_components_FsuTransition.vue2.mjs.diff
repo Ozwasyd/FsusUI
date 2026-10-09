@@ -1,0 +1,11 @@
+--- 
++++ 
+@@ -14,7 +14,7 @@
+     easing: { type: String, required: false },
+     disabled: { type: Boolean, required: false },
+     appear: { type: Boolean, required: false, default: false },
+-    mode: { type: null, required: false },
++    mode: { required: false },
+     suppressAppearDuringHydration: { type: Boolean, required: false, default: false }
+   },
+   setup(__props) {

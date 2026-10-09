@@ -1,0 +1,33 @@
+{
+  "sourceHead": "f4a094f300384185918fc6d4be86e88d9ab9f097",
+  "producerTypeScript": "5.9.2",
+  "graphInventory": [
+    "node_modules/@vue/runtime-core/dist/runtime-core.d.ts",
+    "node_modules/@vue/runtime-dom/dist/runtime-dom.d.ts",
+    "node_modules/vue-router/dist/vue-router.d.mts",
+    "vue/typings/env.d.ts"
+  ],
+  "dependencyInventory": [],
+  "observationOnly": true,
+  "originalDiagnosticReturnUnchanged": true,
+  "diagnostics": [],
+  "entries": [
+    {
+      "component": "cascader",
+      "emitted": true
+    },
+    {
+      "component": "select",
+      "emitted": true
+    },
+    {
+      "component": "slider",
+      "emitted": true
+    },
+    {
+      "component": "time-select",
+      "emitted": true
+    }
+  ],
+  "error": null
+}

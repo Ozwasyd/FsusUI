@@ -1,0 +1,37 @@
+{
+  "mode": "bundler",
+  "owner": "datepicker",
+  "phase": "negative",
+  "strict": true,
+  "skipLibCheck": false,
+  "status": "PASS",
+  "expectedLocalDiagnostics": 4,
+  "localDiagnostics": 4,
+  "externalDiagnostics": 0,
+  "diagnostics": [
+    {
+      "code": 2345,
+      "file": "datepicker-negative.ts",
+      "line": 3,
+      "message": "Argument of type '42' is not assignable to parameter of type 'IDatePickerType'."
+    },
+    {
+      "code": 2345,
+      "file": "datepicker-negative.ts",
+      "line": 4,
+      "message": "Argument of type '\"not-a-date-picker-type\"' is not assignable to parameter of type 'IDatePickerType'."
+    },
+    {
+      "code": 2554,
+      "file": "datepicker-negative.ts",
+      "line": 5,
+      "message": "Expected 1 arguments, but got 0."
+    },
+    {
+      "code": 2322,
+      "file": "datepicker-negative.ts",
+      "line": 6,
+      "message": "Type 'DefineComponent<ExtractPropTypes<{ readonly parsedValue: { readonly type: PropType<EpPropMergeType<(new (...args: any[]) => Dayjs | Dayjs[]) | (() => Dayjs | Dayjs[]) | ((new (...args: any[]) => Dayjs | Dayjs[]) | (() => Dayjs | Dayjs[]) | null)[], unknown, unknown>>; readonly required: false; readonly validator?: (...' is not assignable to type 'number'.\n  Type 'DefineComponent<ExtractPropTypes<{ readonly parsedValue: { readonly type: PropType<EpPropMergeType<(new (...args: any[]) => Dayjs | Dayjs[]) | (() => Dayjs | Dayjs[]) | ((new (...args: any[]) => Dayjs | Dayjs[]) | (() => Dayjs | Dayjs[]) | null)[], unknown, unknown>>; readonly required: false; readonly validator?: (...' is not assignable to type 'number'."
+    }
+  ]
+}

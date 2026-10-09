@@ -1,0 +1,88 @@
+
+> @ test:package-candidate /workspace/FsusUI-public-declaration-integration
+> node ./scripts/with-node-heap.mjs node ./scripts/test-npm-candidate.mjs && pnpm run test:markdown-heavy-feature-package
+
+npm warn tarball tarball data for file:/tmp/fsusui-candidate-tests-fHDSBZ/valid-package (null) seems to be corrupted. Trying again.
+npm warn tarball tarball data for file:/tmp/fsusui-candidate-tests-fHDSBZ/valid-package (null) seems to be corrupted. Trying again.
+npm error code ENOENT
+npm error syscall mkdir
+npm error path /home/agent/.npm/_cacache
+npm error errno -2
+npm error enoent ENOENT: no such file or directory, mkdir '/home/agent/.npm/_cacache'
+npm error enoent This is related to npm not being able to find a file.
+npm error enoent
+npm error Log files were not written due to an error writing to the directory: /home/agent/.npm/_logs
+npm error You can rerun the command with `--loglevel=verbose` to see the logs in your terminal
+node:internal/test_runner/harness:124
+      throw err;
+      ^
+
+Error: Command failed: npm pack /tmp/fsusui-candidate-tests-fHDSBZ/valid-package --json --pack-destination /tmp/fsusui-npm-pack-rvigNR
+npm warn tarball tarball data for file:/tmp/fsusui-candidate-tests-fHDSBZ/valid-package (null) seems to be corrupted. Trying again.
+npm warn tarball tarball data for file:/tmp/fsusui-candidate-tests-fHDSBZ/valid-package (null) seems to be corrupted. Trying again.
+npm error code ENOENT
+npm error syscall mkdir
+npm error path /home/agent/.npm/_cacache
+npm error errno -2
+npm error enoent ENOENT: no such file or directory, mkdir '/home/agent/.npm/_cacache'
+npm error enoent This is related to npm not being able to find a file.
+npm error enoent
+npm error Log files were not written due to an error writing to the directory: /home/agent/.npm/_logs
+npm error You can rerun the command with `--loglevel=verbose` to see the logs in your terminal
+
+    at genericNodeError (node:internal/errors:985:15)
+    at wrappedFn (node:internal/errors:539:14)
+    at checkExecSyncError (node:child_process:942:11)
+    at execFileSync (node:child_process:978:15)
+    at packDirectory (file:///workspace/FsusUI-public-declaration-integration/scripts/npm-candidate-lib.mjs:229:20)
+    at createCandidate (file:///workspace/FsusUI-public-declaration-integration/scripts/npm-candidate-lib.mjs:257:23)
+    at createFixture (file:///workspace/FsusUI-public-declaration-integration/scripts/test-npm-candidate.mjs:83:3)
+    at file:///workspace/FsusUI-public-declaration-integration/scripts/test-npm-candidate.mjs:178:17
+    at ModuleJob.run (node:internal/modules/esm/module_job:439:25)
+    at async node:internal/modules/esm/loader:643:26 {
+  status: 254,
+  signal: null,
+  output: [
+    null,
+    '{\n' +
+      '  "error": {\n' +
+      '    "code": "ENOENT",\n' +
+      `    "summary": "ENOENT: no such file or directory, mkdir '/home/agent/.npm/_cacache'",\n` +
+      '    "detail": "This is related to npm not being able to find a file."\n' +
+      '  }\n' +
+      '}\n',
+    'npm warn tarball tarball data for file:/tmp/fsusui-candidate-tests-fHDSBZ/valid-package (null) seems to be corrupted. Trying again.\n' +
+      'npm warn tarball tarball data for file:/tmp/fsusui-candidate-tests-fHDSBZ/valid-package (null) seems to be corrupted. Trying again.\n' +
+      'npm error code ENOENT\n' +
+      'npm error syscall mkdir\n' +
+      'npm error path /home/agent/.npm/_cacache\n' +
+      'npm error errno -2\n' +
+      "npm error enoent ENOENT: no such file or directory, mkdir '/home/agent/.npm/_cacache'\n" +
+      'npm error enoent This is related to npm not being able to find a file.\n' +
+      'npm error enoent\n' +
+      'npm error Log files were not written due to an error writing to the directory: /home/agent/.npm/_logs\n' +
+      'npm error You can rerun the command with `--loglevel=verbose` to see the logs in your terminal\n'
+  ],
+  pid: 186111,
+  stdout: '{\n' +
+    '  "error": {\n' +
+    '    "code": "ENOENT",\n' +
+    `    "summary": "ENOENT: no such file or directory, mkdir '/home/agent/.npm/_cacache'",\n` +
+    '    "detail": "This is related to npm not being able to find a file."\n' +
+    '  }\n' +
+    '}\n',
+  stderr: 'npm warn tarball tarball data for file:/tmp/fsusui-candidate-tests-fHDSBZ/valid-package (null) seems to be corrupted. Trying again.\n' +
+    'npm warn tarball tarball data for file:/tmp/fsusui-candidate-tests-fHDSBZ/valid-package (null) seems to be corrupted. Trying again.\n' +
+    'npm error code ENOENT\n' +
+    'npm error syscall mkdir\n' +
+    'npm error path /home/agent/.npm/_cacache\n' +
+    'npm error errno -2\n' +
+    "npm error enoent ENOENT: no such file or directory, mkdir '/home/agent/.npm/_cacache'\n" +
+    'npm error enoent This is related to npm not being able to find a file.\n' +
+    'npm error enoent\n' +
+    'npm error Log files were not written due to an error writing to the directory: /home/agent/.npm/_logs\n' +
+    'npm error You can rerun the command with `--loglevel=verbose` to see the logs in your terminal\n'
+}
+
+Node.js v24.19.0
+ ELIFECYCLE  Command failed with exit code 7.

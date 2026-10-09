@@ -1,0 +1,15 @@
+{
+  "baselineSourceSha": "2d05f240e5fb04ac0cd602b4ed638ffe00b1859b",
+  "sourceSha": "f4a094f300384185918fc6d4be86e88d9ab9f097",
+  "baselineTarballSha256": "6da2fe1a5573a04768a4f8280899b45dabaa4f93ca72a278d48c50faca17649a",
+  "tarballSha256": "82724daaa96d47e22bf5ec17694224bfc40192d50ff3a1554b6e8a6775bec4d9",
+  "beforeCount": 4432,
+  "afterCount": 4432,
+  "added": [],
+  "removed": [],
+  "changed": [
+    "es/motion/components/FsuTransition.vue2.mjs",
+    "lib/motion/components/FsuTransition.vue2.js"
+  ],
+  "byteParity": "FAIL"
+}

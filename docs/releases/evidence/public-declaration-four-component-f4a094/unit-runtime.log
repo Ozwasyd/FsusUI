@@ -1,0 +1,13 @@
+
+> @ test /workspace/FsusUI-public-declaration-integration
+> node ./scripts/with-node-heap.mjs vitest --config vue/vitest.config.ts run vue/packages/components/date-picker/__tests__/date-picker.test.ts vue/packages/components/date-picker/__tests__/date-time-picker.test.tsx vue/packages/components/slider/__tests__/slider.test.tsx vue/packages/components/cascader/__tests__/cascader.test.tsx
+
+
+ RUN  v4.1.5 /workspace/FsusUI-public-declaration-integration
+
+
+ Test Files  4 passed (4)
+      Tests  132 passed (132)
+   Start at  11:09:01
+   Duration  18.82s (transform 2.84s, setup 237ms, import 4.42s, tests 11.58s, environment 2.07s)
+

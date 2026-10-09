@@ -1,0 +1,530 @@
+[
+  {
+    "name": "DatePicker > create & custom class & style",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/date-picker/__tests__/date-picker.test.ts"
+  },
+  {
+    "name": "DatePicker > select date",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/date-picker/__tests__/date-picker.test.ts"
+  },
+  {
+    "name": "DatePicker > uses keyed animated views for panel navigation",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/date-picker/__tests__/date-picker.test.ts"
+  },
+  {
+    "name": "DatePicker > defaultTime and clear value",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/date-picker/__tests__/date-picker.test.ts"
+  },
+  {
+    "name": "DatePicker > defaultValue",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/date-picker/__tests__/date-picker.test.ts"
+  },
+  {
+    "name": "DatePicker > event change, focus, blur, keydown",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/date-picker/__tests__/date-picker.test.ts"
+  },
+  {
+    "name": "DatePicker > emits focus on click when not currently focused",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/date-picker/__tests__/date-picker.test.ts"
+  },
+  {
+    "name": "DatePicker > opens popper on click when input is focused",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/date-picker/__tests__/date-picker.test.ts"
+  },
+  {
+    "name": "DatePicker > shortcuts",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/date-picker/__tests__/date-picker.test.ts"
+  },
+  {
+    "name": "DatePicker > disabledDate",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/date-picker/__tests__/date-picker.test.ts"
+  },
+  {
+    "name": "DatePicker > should work when using disabledDate prop and daterange type",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/date-picker/__tests__/date-picker.test.ts"
+  },
+  {
+    "name": "DatePicker > ref focus",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/date-picker/__tests__/date-picker.test.ts"
+  },
+  {
+    "name": "DatePicker > ref handleOpen",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/date-picker/__tests__/date-picker.test.ts"
+  },
+  {
+    "name": "DatePicker > ref handleClose",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/date-picker/__tests__/date-picker.test.ts"
+  },
+  {
+    "name": "DatePicker > custom content",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/date-picker/__tests__/date-picker.test.ts"
+  },
+  {
+    "name": "DatePicker > custom content comment",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/date-picker/__tests__/date-picker.test.ts"
+  },
+  {
+    "name": "DatePicker > custom content value validate",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/date-picker/__tests__/date-picker.test.ts"
+  },
+  {
+    "name": "DatePicker > custom content bail out slot compoent",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/date-picker/__tests__/date-picker.test.ts"
+  },
+  {
+    "name": "DatePicker > value-format > with literal string",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/date-picker/__tests__/date-picker.test.ts"
+  },
+  {
+    "name": "DatePicker > value-format > with \"x\"",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/date-picker/__tests__/date-picker.test.ts"
+  },
+  {
+    "name": "DatePicker Navigation > month, year",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/date-picker/__tests__/date-picker.test.ts"
+  },
+  {
+    "name": "DatePicker Navigation > month with fewer dates",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/date-picker/__tests__/date-picker.test.ts"
+  },
+  {
+    "name": "DatePicker Navigation > year with fewer February dates",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/date-picker/__tests__/date-picker.test.ts"
+  },
+  {
+    "name": "DatePicker Navigation > month label with fewer dates",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/date-picker/__tests__/date-picker.test.ts"
+  },
+  {
+    "name": "DatePicker Navigation > panel change event",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/date-picker/__tests__/date-picker.test.ts"
+  },
+  {
+    "name": "MonthPicker > basic",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/date-picker/__tests__/date-picker.test.ts"
+  },
+  {
+    "name": "MonthPicker > value-format",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/date-picker/__tests__/date-picker.test.ts"
+  },
+  {
+    "name": "YearPicker > basic",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/date-picker/__tests__/date-picker.test.ts"
+  },
+  {
+    "name": "YearPicker > value-format",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/date-picker/__tests__/date-picker.test.ts"
+  },
+  {
+    "name": "WeekPicker > create",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/date-picker/__tests__/date-picker.test.ts"
+  },
+  {
+    "name": "WeekPicker > emit first day of the week, en locale, Sunday",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/date-picker/__tests__/date-picker.test.ts"
+  },
+  {
+    "name": "WeekPicker > emit first day of the week, zh-cn locale, Monday",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/date-picker/__tests__/date-picker.test.ts"
+  },
+  {
+    "name": "DatePicker dates > create",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/date-picker/__tests__/date-picker.test.ts"
+  },
+  {
+    "name": "DatePicker keyboard events > enter",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/date-picker/__tests__/date-picker.test.ts"
+  },
+  {
+    "name": "DatePicker keyboard events > numpadEnter",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/date-picker/__tests__/date-picker.test.ts"
+  },
+  {
+    "name": "DateRangePicker > create & custom class & style",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/date-picker/__tests__/date-picker.test.ts"
+  },
+  {
+    "name": "DateRangePicker > reverse selection",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/date-picker/__tests__/date-picker.test.ts"
+  },
+  {
+    "name": "DateRangePicker > reset selection",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/date-picker/__tests__/date-picker.test.ts"
+  },
+  {
+    "name": "DateRangePicker > range, start-date and end-date",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/date-picker/__tests__/date-picker.test.ts"
+  },
+  {
+    "name": "DateRangePicker > unlink:true",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/date-picker/__tests__/date-picker.test.ts"
+  },
+  {
+    "name": "DateRangePicker > daylight saving time highlight",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/date-picker/__tests__/date-picker.test.ts"
+  },
+  {
+    "name": "DateRangePicker > value-format",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/date-picker/__tests__/date-picker.test.ts"
+  },
+  {
+    "name": "DateRangePicker > panel change event",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/date-picker/__tests__/date-picker.test.ts"
+  },
+  {
+    "name": "DateRangePicker > display value",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/date-picker/__tests__/date-picker.test.ts"
+  },
+  {
+    "name": "MonthRange > works",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/date-picker/__tests__/date-picker.test.ts"
+  },
+  {
+    "name": "MonthRange > range, start-date and end-date",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/date-picker/__tests__/date-picker.test.ts"
+  },
+  {
+    "name": "MonthRange > type:monthrange unlink:true",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/date-picker/__tests__/date-picker.test.ts"
+  },
+  {
+    "name": "MonthRange > daylight saving time highlight",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/date-picker/__tests__/date-picker.test.ts"
+  },
+  {
+    "name": "MonthRange > should accept popper options and pass down",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/date-picker/__tests__/date-picker.test.ts"
+  },
+  {
+    "name": "MonthRange > form item accessibility integration > automatic id attachment",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/date-picker/__tests__/date-picker.test.ts"
+  },
+  {
+    "name": "MonthRange > form item accessibility integration > specified id attachment",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/date-picker/__tests__/date-picker.test.ts"
+  },
+  {
+    "name": "MonthRange > form item accessibility integration > form item role is group when multiple inputs",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/date-picker/__tests__/date-picker.test.ts"
+  },
+  {
+    "name": "MonthRange > The year which is disabled should not be selectable",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/date-picker/__tests__/date-picker.test.ts"
+  },
+  {
+    "name": "MonthRange > prop defaultTime should not confilt with prop shortcuts",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/date-picker/__tests__/date-picker.test.ts"
+  },
+  {
+    "name": "Datetime Picker > both picker show correct formated value (extract date-format and time-format from format property",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/date-picker/__tests__/date-time-picker.test.tsx"
+  },
+  {
+    "name": "Datetime Picker > both picker show correct value",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/date-picker/__tests__/date-time-picker.test.tsx"
+  },
+  {
+    "name": "Datetime Picker > click now button",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/date-picker/__tests__/date-time-picker.test.tsx"
+  },
+  {
+    "name": "Datetime Picker > time-picker select && input time && input date",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/date-picker/__tests__/date-time-picker.test.tsx"
+  },
+  {
+    "name": "Datetime Picker > now button: can not choose disabled date",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/date-picker/__tests__/date-time-picker.test.tsx"
+  },
+  {
+    "name": "Datetime Picker > now button: should be disabled when current date is disabled",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/date-picker/__tests__/date-time-picker.test.tsx"
+  },
+  {
+    "name": "Datetime Picker > confirm button honors picked date",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/date-picker/__tests__/date-time-picker.test.tsx"
+  },
+  {
+    "name": "Datetime Picker > selectableRange",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/date-picker/__tests__/date-time-picker.test.tsx"
+  },
+  {
+    "name": "Datetime Picker > defaultTime takes effect when the type is datetime",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/date-picker/__tests__/date-time-picker.test.tsx"
+  },
+  {
+    "name": "Datetime Picker > defaultTime only takes effect when time is not selected",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/date-picker/__tests__/date-time-picker.test.tsx"
+  },
+  {
+    "name": "Datetimerange > select daterange and default Time and input format",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/date-picker/__tests__/date-time-picker.test.tsx"
+  },
+  {
+    "name": "Datetimerange > input date",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/date-picker/__tests__/date-time-picker.test.tsx"
+  },
+  {
+    "name": "Datetimerange > select time",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/date-picker/__tests__/date-time-picker.test.tsx"
+  },
+  {
+    "name": "Datetimerange > confirm honors disabledDate",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/date-picker/__tests__/date-time-picker.test.tsx"
+  },
+  {
+    "name": "Datetimerange > selectableRange",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/date-picker/__tests__/date-time-picker.test.tsx"
+  },
+  {
+    "name": "Datetimerange > select same date, different time",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/date-picker/__tests__/date-time-picker.test.tsx"
+  },
+  {
+    "name": "Datetimerange > form item accessibility integration > automatic id attachment",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/date-picker/__tests__/date-time-picker.test.tsx"
+  },
+  {
+    "name": "Datetimerange > form item accessibility integration > specified id attachment",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/date-picker/__tests__/date-time-picker.test.tsx"
+  },
+  {
+    "name": "Datetimerange > form item accessibility integration > form item role is group when multiple inputs",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/date-picker/__tests__/date-time-picker.test.tsx"
+  },
+  {
+    "name": "Datetimerange > display value",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/date-picker/__tests__/date-time-picker.test.tsx"
+  },
+  {
+    "name": "Datetimerange > prop defaultTime should not confilt with prop shortcuts",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/date-picker/__tests__/date-time-picker.test.tsx"
+  },
+  {
+    "name": "Cascader.vue > toggle popper visible",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/cascader/__tests__/cascader.test.tsx"
+  },
+  {
+    "name": "Cascader.vue > expand and check",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/cascader/__tests__/cascader.test.tsx"
+  },
+  {
+    "name": "Cascader.vue > with default value",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/cascader/__tests__/cascader.test.tsx"
+  },
+  {
+    "name": "Cascader.vue > options change",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/cascader/__tests__/cascader.test.tsx"
+  },
+  {
+    "name": "Cascader.vue > disabled",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/cascader/__tests__/cascader.test.tsx"
+  },
+  {
+    "name": "Cascader.vue > custom placeholder",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/cascader/__tests__/cascader.test.tsx"
+  },
+  {
+    "name": "Cascader.vue > clearable",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/cascader/__tests__/cascader.test.tsx"
+  },
+  {
+    "name": "Cascader.vue > show last level label",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/cascader/__tests__/cascader.test.tsx"
+  },
+  {
+    "name": "Cascader.vue > multiple mode",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/cascader/__tests__/cascader.test.tsx"
+  },
+  {
+    "name": "Cascader.vue > collapse tags",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/cascader/__tests__/cascader.test.tsx"
+  },
+  {
+    "name": "Cascader.vue > collapse tags tooltip",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/cascader/__tests__/cascader.test.tsx"
+  },
+  {
+    "name": "Cascader.vue > max collapse tags",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/cascader/__tests__/cascader.test.tsx"
+  },
+  {
+    "name": "Cascader.vue > tag type",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/cascader/__tests__/cascader.test.tsx"
+  },
+  {
+    "name": "Cascader.vue > filterable",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/cascader/__tests__/cascader.test.tsx"
+  },
+  {
+    "name": "Cascader.vue > filterable in multiple mode",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/cascader/__tests__/cascader.test.tsx"
+  },
+  {
+    "name": "Cascader.vue > filter method",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/cascader/__tests__/cascader.test.tsx"
+  },
+  {
+    "name": "Cascader.vue > filterable keyboard selection",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/cascader/__tests__/cascader.test.tsx"
+  },
+  {
+    "name": "Cascader.vue > teleported API > should mount on popper container",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/cascader/__tests__/cascader.test.tsx"
+  },
+  {
+    "name": "Cascader.vue > teleported API > should not mount on the popper container",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/cascader/__tests__/cascader.test.tsx"
+  },
+  {
+    "name": "Cascader.vue > placeholder disappear when resetForm",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/cascader/__tests__/cascader.test.tsx"
+  },
+  {
+    "name": "Cascader.vue > should be able to trigger togglePopperVisible outside the component",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/cascader/__tests__/cascader.test.tsx"
+  },
+  {
+    "name": "Cascader.vue > height should be changed by size when multiple",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/cascader/__tests__/cascader.test.tsx"
+  },
+  {
+    "name": "Slider > create",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/slider/__tests__/slider.test.tsx"
+  },
+  {
+    "name": "Slider > should not exceed min and max",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/slider/__tests__/slider.test.tsx"
+  },
+  {
+    "name": "Slider > sizes",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/slider/__tests__/slider.test.tsx"
+  },
+  {
+    "name": "Slider > show tooltip",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/slider/__tests__/slider.test.tsx"
+  },
+  {
+    "name": "Slider > hide tooltip",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/slider/__tests__/slider.test.tsx"
+  },
+  {
+    "name": "Slider > format tooltip",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/slider/__tests__/slider.test.tsx"
+  },
+  {
+    "name": "Slider > placement",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/slider/__tests__/slider.test.tsx"
+  },
+  {
+    "name": "Slider > drag > horizontal",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/slider/__tests__/slider.test.tsx"
+  },
+  {
+    "name": "Slider > drag > vertical",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/slider/__tests__/slider.test.tsx"
+  },
+  {
+    "name": "Slider > drag > coalesces drag movement into animation frames",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/slider/__tests__/slider.test.tsx"
+  },
+  {
+    "name": "Slider > drag > keeps the handle and bar aligned during fast overdrag",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/slider/__tests__/slider.test.tsx"
+  },
+  {
+    "name": "Slider > accessibility > left/right arrows",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/slider/__tests__/slider.test.tsx"
+  },
+  {
+    "name": "Slider > accessibility > up/down arrows",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/slider/__tests__/slider.test.tsx"
+  },
+  {
+    "name": "Slider > accessibility > page up/down keys",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/slider/__tests__/slider.test.tsx"
+  },
+  {
+    "name": "Slider > accessibility > home/end keys",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/slider/__tests__/slider.test.tsx"
+  },
+  {
+    "name": "Slider > step",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/slider/__tests__/slider.test.tsx"
+  },
+  {
+    "name": "Slider > click",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/slider/__tests__/slider.test.tsx"
+  },
+  {
+    "name": "Slider > change event",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/slider/__tests__/slider.test.tsx"
+  },
+  {
+    "name": "Slider > input event",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/slider/__tests__/slider.test.tsx"
+  },
+  {
+    "name": "Slider > disabled",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/slider/__tests__/slider.test.tsx"
+  },
+  {
+    "name": "Slider > show input",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/slider/__tests__/slider.test.tsx"
+  },
+  {
+    "name": "Slider > show stops",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/slider/__tests__/slider.test.tsx"
+  },
+  {
+    "name": "Slider > vertical mode",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/slider/__tests__/slider.test.tsx"
+  },
+  {
+    "name": "Slider > rerender with min and show-input",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/slider/__tests__/slider.test.tsx"
+  },
+  {
+    "name": "Slider > range > basic ranged slider",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/slider/__tests__/slider.test.tsx"
+  },
+  {
+    "name": "Slider > range > should not exceed min and max",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/slider/__tests__/slider.test.tsx"
+  },
+  {
+    "name": "Slider > range > click",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/slider/__tests__/slider.test.tsx"
+  },
+  {
+    "name": "Slider > range > responsive to dynamic min and max",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/slider/__tests__/slider.test.tsx"
+  },
+  {
+    "name": "Slider > range > show stops",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/slider/__tests__/slider.test.tsx"
+  },
+  {
+    "name": "Slider > range > marks",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/slider/__tests__/slider.test.tsx"
+  },
+  {
+    "name": "Slider > form item accessibility integration > automatic id attachment",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/slider/__tests__/slider.test.tsx"
+  },
+  {
+    "name": "Slider > form item accessibility integration > range with automatic id attachment",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/slider/__tests__/slider.test.tsx"
+  },
+  {
+    "name": "Slider > form item accessibility integration > specified id attachment",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/slider/__tests__/slider.test.tsx"
+  },
+  {
+    "name": "Slider > form item accessibility integration > range with specified id attachment",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/slider/__tests__/slider.test.tsx"
+  },
+  {
+    "name": "Slider > form item accessibility integration > form item role is group when multiple inputs",
+    "file": "/workspace/FsusUI-public-declaration-integration/vue/packages/components/slider/__tests__/slider.test.tsx"
+  }
+]

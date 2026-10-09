@@ -1,0 +1,15 @@
+{
+  "reference": "/workspace/.setup/public-declaration-closure/authority-final-consumer/pnpm-lock.yaml",
+  "resolution": "Actual candidate metadata and pnpm lock resolver; subsequent frozen offline installation",
+  "specifierOnlyPackageChange": true,
+  "graph": {
+    "packages": {
+      "thirdPartyEntries": 273,
+      "identical": true
+    },
+    "snapshots": {
+      "thirdPartyEntries": 273,
+      "identical": true
+    }
+  }
+}

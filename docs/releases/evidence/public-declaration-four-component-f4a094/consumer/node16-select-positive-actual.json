@@ -1,0 +1,451 @@
+{
+  "mode": "node16",
+  "owner": "select",
+  "phase": "positive",
+  "strict": true,
+  "skipLibCheck": false,
+  "status": "FAIL",
+  "expectedLocalDiagnostics": 0,
+  "localDiagnostics": 5,
+  "externalDiagnostics": 68,
+  "diagnostics": [
+    {
+      "code": 1541,
+      "file": "node_modules/.pnpm/@ozwasyd+element-plus@file+..+four-component-candidate.tgz_vue@3.5.32_typescript@6.0.2_/node_modules/@ozwasyd/element-plus/es/components/breadcrumb/src/breadcrumb-item.d.ts",
+      "line": 2,
+      "message": "Type-only import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "code": 1542,
+      "file": "node_modules/.pnpm/@ozwasyd+element-plus@file+..+four-component-candidate.tgz_vue@3.5.32_typescript@6.0.2_/node_modules/@ozwasyd/element-plus/es/components/breadcrumb/src/breadcrumb-item.d.ts",
+      "line": 9,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "code": 1542,
+      "file": "node_modules/.pnpm/@ozwasyd+element-plus@file+..+four-component-candidate.tgz_vue@3.5.32_typescript@6.0.2_/node_modules/@ozwasyd/element-plus/es/components/breadcrumb/src/breadcrumb-item.d.ts",
+      "line": 9,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "code": 1542,
+      "file": "node_modules/.pnpm/@ozwasyd+element-plus@file+..+four-component-candidate.tgz_vue@3.5.32_typescript@6.0.2_/node_modules/@ozwasyd/element-plus/es/components/breadcrumb/src/breadcrumb-item.d.ts",
+      "line": 9,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "code": 1542,
+      "file": "node_modules/.pnpm/@ozwasyd+element-plus@file+..+four-component-candidate.tgz_vue@3.5.32_typescript@6.0.2_/node_modules/@ozwasyd/element-plus/es/components/breadcrumb/src/breadcrumb-item.d.ts",
+      "line": 9,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "code": 1542,
+      "file": "node_modules/.pnpm/@ozwasyd+element-plus@file+..+four-component-candidate.tgz_vue@3.5.32_typescript@6.0.2_/node_modules/@ozwasyd/element-plus/es/components/breadcrumb/src/breadcrumb-item.d.ts",
+      "line": 9,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "code": 1542,
+      "file": "node_modules/.pnpm/@ozwasyd+element-plus@file+..+four-component-candidate.tgz_vue@3.5.32_typescript@6.0.2_/node_modules/@ozwasyd/element-plus/es/components/breadcrumb/src/breadcrumb-item.d.ts",
+      "line": 9,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "code": 1542,
+      "file": "node_modules/.pnpm/@ozwasyd+element-plus@file+..+four-component-candidate.tgz_vue@3.5.32_typescript@6.0.2_/node_modules/@ozwasyd/element-plus/es/components/breadcrumb/src/breadcrumb-item.d.ts",
+      "line": 9,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "code": 1542,
+      "file": "node_modules/.pnpm/@ozwasyd+element-plus@file+..+four-component-candidate.tgz_vue@3.5.32_typescript@6.0.2_/node_modules/@ozwasyd/element-plus/es/components/breadcrumb/src/breadcrumb-item.d.ts",
+      "line": 9,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "code": 1542,
+      "file": "node_modules/.pnpm/@ozwasyd+element-plus@file+..+four-component-candidate.tgz_vue@3.5.32_typescript@6.0.2_/node_modules/@ozwasyd/element-plus/es/components/menu/index.d.ts",
+      "line": 160,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "code": 1542,
+      "file": "node_modules/.pnpm/@ozwasyd+element-plus@file+..+four-component-candidate.tgz_vue@3.5.32_typescript@6.0.2_/node_modules/@ozwasyd/element-plus/es/components/menu/index.d.ts",
+      "line": 160,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "code": 1542,
+      "file": "node_modules/.pnpm/@ozwasyd+element-plus@file+..+four-component-candidate.tgz_vue@3.5.32_typescript@6.0.2_/node_modules/@ozwasyd/element-plus/es/components/menu/index.d.ts",
+      "line": 160,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "code": 1542,
+      "file": "node_modules/.pnpm/@ozwasyd+element-plus@file+..+four-component-candidate.tgz_vue@3.5.32_typescript@6.0.2_/node_modules/@ozwasyd/element-plus/es/components/menu/index.d.ts",
+      "line": 160,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "code": 1542,
+      "file": "node_modules/.pnpm/@ozwasyd+element-plus@file+..+four-component-candidate.tgz_vue@3.5.32_typescript@6.0.2_/node_modules/@ozwasyd/element-plus/es/components/menu/index.d.ts",
+      "line": 160,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "code": 1542,
+      "file": "node_modules/.pnpm/@ozwasyd+element-plus@file+..+four-component-candidate.tgz_vue@3.5.32_typescript@6.0.2_/node_modules/@ozwasyd/element-plus/es/components/menu/index.d.ts",
+      "line": 160,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "code": 1542,
+      "file": "node_modules/.pnpm/@ozwasyd+element-plus@file+..+four-component-candidate.tgz_vue@3.5.32_typescript@6.0.2_/node_modules/@ozwasyd/element-plus/es/components/menu/index.d.ts",
+      "line": 160,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "code": 1542,
+      "file": "node_modules/.pnpm/@ozwasyd+element-plus@file+..+four-component-candidate.tgz_vue@3.5.32_typescript@6.0.2_/node_modules/@ozwasyd/element-plus/es/components/menu/index.d.ts",
+      "line": 160,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "code": 1542,
+      "file": "node_modules/.pnpm/@ozwasyd+element-plus@file+..+four-component-candidate.tgz_vue@3.5.32_typescript@6.0.2_/node_modules/@ozwasyd/element-plus/es/components/menu/index.d.ts",
+      "line": 218,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "code": 1542,
+      "file": "node_modules/.pnpm/@ozwasyd+element-plus@file+..+four-component-candidate.tgz_vue@3.5.32_typescript@6.0.2_/node_modules/@ozwasyd/element-plus/es/components/menu/index.d.ts",
+      "line": 218,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "code": 1542,
+      "file": "node_modules/.pnpm/@ozwasyd+element-plus@file+..+four-component-candidate.tgz_vue@3.5.32_typescript@6.0.2_/node_modules/@ozwasyd/element-plus/es/components/menu/index.d.ts",
+      "line": 218,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "code": 1542,
+      "file": "node_modules/.pnpm/@ozwasyd+element-plus@file+..+four-component-candidate.tgz_vue@3.5.32_typescript@6.0.2_/node_modules/@ozwasyd/element-plus/es/components/menu/index.d.ts",
+      "line": 218,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "code": 1542,
+      "file": "node_modules/.pnpm/@ozwasyd+element-plus@file+..+four-component-candidate.tgz_vue@3.5.32_typescript@6.0.2_/node_modules/@ozwasyd/element-plus/es/components/menu/index.d.ts",
+      "line": 218,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "code": 1542,
+      "file": "node_modules/.pnpm/@ozwasyd+element-plus@file+..+four-component-candidate.tgz_vue@3.5.32_typescript@6.0.2_/node_modules/@ozwasyd/element-plus/es/components/menu/index.d.ts",
+      "line": 218,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "code": 1542,
+      "file": "node_modules/.pnpm/@ozwasyd+element-plus@file+..+four-component-candidate.tgz_vue@3.5.32_typescript@6.0.2_/node_modules/@ozwasyd/element-plus/es/components/menu/index.d.ts",
+      "line": 218,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "code": 1542,
+      "file": "node_modules/.pnpm/@ozwasyd+element-plus@file+..+four-component-candidate.tgz_vue@3.5.32_typescript@6.0.2_/node_modules/@ozwasyd/element-plus/es/components/menu/index.d.ts",
+      "line": 218,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "code": 1542,
+      "file": "node_modules/.pnpm/@ozwasyd+element-plus@file+..+four-component-candidate.tgz_vue@3.5.32_typescript@6.0.2_/node_modules/@ozwasyd/element-plus/es/components/menu/index.d.ts",
+      "line": 4873,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "code": 1542,
+      "file": "node_modules/.pnpm/@ozwasyd+element-plus@file+..+four-component-candidate.tgz_vue@3.5.32_typescript@6.0.2_/node_modules/@ozwasyd/element-plus/es/components/menu/index.d.ts",
+      "line": 4873,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "code": 1542,
+      "file": "node_modules/.pnpm/@ozwasyd+element-plus@file+..+four-component-candidate.tgz_vue@3.5.32_typescript@6.0.2_/node_modules/@ozwasyd/element-plus/es/components/menu/index.d.ts",
+      "line": 4873,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "code": 1542,
+      "file": "node_modules/.pnpm/@ozwasyd+element-plus@file+..+four-component-candidate.tgz_vue@3.5.32_typescript@6.0.2_/node_modules/@ozwasyd/element-plus/es/components/menu/index.d.ts",
+      "line": 4873,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "code": 1542,
+      "file": "node_modules/.pnpm/@ozwasyd+element-plus@file+..+four-component-candidate.tgz_vue@3.5.32_typescript@6.0.2_/node_modules/@ozwasyd/element-plus/es/components/menu/index.d.ts",
+      "line": 4873,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "code": 1542,
+      "file": "node_modules/.pnpm/@ozwasyd+element-plus@file+..+four-component-candidate.tgz_vue@3.5.32_typescript@6.0.2_/node_modules/@ozwasyd/element-plus/es/components/menu/index.d.ts",
+      "line": 4873,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "code": 1542,
+      "file": "node_modules/.pnpm/@ozwasyd+element-plus@file+..+four-component-candidate.tgz_vue@3.5.32_typescript@6.0.2_/node_modules/@ozwasyd/element-plus/es/components/menu/index.d.ts",
+      "line": 4873,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "code": 1542,
+      "file": "node_modules/.pnpm/@ozwasyd+element-plus@file+..+four-component-candidate.tgz_vue@3.5.32_typescript@6.0.2_/node_modules/@ozwasyd/element-plus/es/components/menu/index.d.ts",
+      "line": 4873,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "code": 1542,
+      "file": "node_modules/.pnpm/@ozwasyd+element-plus@file+..+four-component-candidate.tgz_vue@3.5.32_typescript@6.0.2_/node_modules/@ozwasyd/element-plus/es/components/menu/index.d.ts",
+      "line": 4931,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "code": 1542,
+      "file": "node_modules/.pnpm/@ozwasyd+element-plus@file+..+four-component-candidate.tgz_vue@3.5.32_typescript@6.0.2_/node_modules/@ozwasyd/element-plus/es/components/menu/index.d.ts",
+      "line": 4931,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "code": 1542,
+      "file": "node_modules/.pnpm/@ozwasyd+element-plus@file+..+four-component-candidate.tgz_vue@3.5.32_typescript@6.0.2_/node_modules/@ozwasyd/element-plus/es/components/menu/index.d.ts",
+      "line": 4931,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "code": 1542,
+      "file": "node_modules/.pnpm/@ozwasyd+element-plus@file+..+four-component-candidate.tgz_vue@3.5.32_typescript@6.0.2_/node_modules/@ozwasyd/element-plus/es/components/menu/index.d.ts",
+      "line": 4931,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "code": 1542,
+      "file": "node_modules/.pnpm/@ozwasyd+element-plus@file+..+four-component-candidate.tgz_vue@3.5.32_typescript@6.0.2_/node_modules/@ozwasyd/element-plus/es/components/menu/index.d.ts",
+      "line": 4931,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "code": 1542,
+      "file": "node_modules/.pnpm/@ozwasyd+element-plus@file+..+four-component-candidate.tgz_vue@3.5.32_typescript@6.0.2_/node_modules/@ozwasyd/element-plus/es/components/menu/index.d.ts",
+      "line": 4931,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "code": 1542,
+      "file": "node_modules/.pnpm/@ozwasyd+element-plus@file+..+four-component-candidate.tgz_vue@3.5.32_typescript@6.0.2_/node_modules/@ozwasyd/element-plus/es/components/menu/index.d.ts",
+      "line": 4931,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "code": 1542,
+      "file": "node_modules/.pnpm/@ozwasyd+element-plus@file+..+four-component-candidate.tgz_vue@3.5.32_typescript@6.0.2_/node_modules/@ozwasyd/element-plus/es/components/menu/index.d.ts",
+      "line": 4931,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "code": 1542,
+      "file": "node_modules/.pnpm/@ozwasyd+element-plus@file+..+four-component-candidate.tgz_vue@3.5.32_typescript@6.0.2_/node_modules/@ozwasyd/element-plus/es/components/menu/src/menu-item.d.ts",
+      "line": 12,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "code": 1542,
+      "file": "node_modules/.pnpm/@ozwasyd+element-plus@file+..+four-component-candidate.tgz_vue@3.5.32_typescript@6.0.2_/node_modules/@ozwasyd/element-plus/es/components/menu/src/menu-item.d.ts",
+      "line": 12,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "code": 1542,
+      "file": "node_modules/.pnpm/@ozwasyd+element-plus@file+..+four-component-candidate.tgz_vue@3.5.32_typescript@6.0.2_/node_modules/@ozwasyd/element-plus/es/components/menu/src/menu-item.d.ts",
+      "line": 12,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "code": 1542,
+      "file": "node_modules/.pnpm/@ozwasyd+element-plus@file+..+four-component-candidate.tgz_vue@3.5.32_typescript@6.0.2_/node_modules/@ozwasyd/element-plus/es/components/menu/src/menu-item.d.ts",
+      "line": 12,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "code": 1542,
+      "file": "node_modules/.pnpm/@ozwasyd+element-plus@file+..+four-component-candidate.tgz_vue@3.5.32_typescript@6.0.2_/node_modules/@ozwasyd/element-plus/es/components/menu/src/menu-item.d.ts",
+      "line": 12,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "code": 1542,
+      "file": "node_modules/.pnpm/@ozwasyd+element-plus@file+..+four-component-candidate.tgz_vue@3.5.32_typescript@6.0.2_/node_modules/@ozwasyd/element-plus/es/components/menu/src/menu-item.d.ts",
+      "line": 12,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "code": 1542,
+      "file": "node_modules/.pnpm/@ozwasyd+element-plus@file+..+four-component-candidate.tgz_vue@3.5.32_typescript@6.0.2_/node_modules/@ozwasyd/element-plus/es/components/menu/src/menu-item.d.ts",
+      "line": 12,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "code": 1542,
+      "file": "node_modules/.pnpm/@ozwasyd+element-plus@file+..+four-component-candidate.tgz_vue@3.5.32_typescript@6.0.2_/node_modules/@ozwasyd/element-plus/es/components/menu/src/menu-item.d.ts",
+      "line": 12,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "code": 1542,
+      "file": "node_modules/.pnpm/@ozwasyd+element-plus@file+..+four-component-candidate.tgz_vue@3.5.32_typescript@6.0.2_/node_modules/@ozwasyd/element-plus/es/components/menu/src/menu-item.vue.d.ts",
+      "line": 11,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "code": 1542,
+      "file": "node_modules/.pnpm/@ozwasyd+element-plus@file+..+four-component-candidate.tgz_vue@3.5.32_typescript@6.0.2_/node_modules/@ozwasyd/element-plus/es/components/menu/src/menu-item.vue.d.ts",
+      "line": 11,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "code": 1542,
+      "file": "node_modules/.pnpm/@ozwasyd+element-plus@file+..+four-component-candidate.tgz_vue@3.5.32_typescript@6.0.2_/node_modules/@ozwasyd/element-plus/es/components/menu/src/menu-item.vue.d.ts",
+      "line": 11,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "code": 1542,
+      "file": "node_modules/.pnpm/@ozwasyd+element-plus@file+..+four-component-candidate.tgz_vue@3.5.32_typescript@6.0.2_/node_modules/@ozwasyd/element-plus/es/components/menu/src/menu-item.vue.d.ts",
+      "line": 11,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "code": 1542,
+      "file": "node_modules/.pnpm/@ozwasyd+element-plus@file+..+four-component-candidate.tgz_vue@3.5.32_typescript@6.0.2_/node_modules/@ozwasyd/element-plus/es/components/menu/src/menu-item.vue.d.ts",
+      "line": 11,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "code": 1542,
+      "file": "node_modules/.pnpm/@ozwasyd+element-plus@file+..+four-component-candidate.tgz_vue@3.5.32_typescript@6.0.2_/node_modules/@ozwasyd/element-plus/es/components/menu/src/menu-item.vue.d.ts",
+      "line": 11,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "code": 1542,
+      "file": "node_modules/.pnpm/@ozwasyd+element-plus@file+..+four-component-candidate.tgz_vue@3.5.32_typescript@6.0.2_/node_modules/@ozwasyd/element-plus/es/components/menu/src/menu-item.vue.d.ts",
+      "line": 11,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "code": 1542,
+      "file": "node_modules/.pnpm/@ozwasyd+element-plus@file+..+four-component-candidate.tgz_vue@3.5.32_typescript@6.0.2_/node_modules/@ozwasyd/element-plus/es/components/menu/src/menu-item.vue.d.ts",
+      "line": 11,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "code": 1542,
+      "file": "node_modules/.pnpm/@ozwasyd+element-plus@file+..+four-component-candidate.tgz_vue@3.5.32_typescript@6.0.2_/node_modules/@ozwasyd/element-plus/es/components/menu/src/menu-item.vue.d.ts",
+      "line": 69,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "code": 1542,
+      "file": "node_modules/.pnpm/@ozwasyd+element-plus@file+..+four-component-candidate.tgz_vue@3.5.32_typescript@6.0.2_/node_modules/@ozwasyd/element-plus/es/components/menu/src/menu-item.vue.d.ts",
+      "line": 69,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "code": 1542,
+      "file": "node_modules/.pnpm/@ozwasyd+element-plus@file+..+four-component-candidate.tgz_vue@3.5.32_typescript@6.0.2_/node_modules/@ozwasyd/element-plus/es/components/menu/src/menu-item.vue.d.ts",
+      "line": 69,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "code": 1542,
+      "file": "node_modules/.pnpm/@ozwasyd+element-plus@file+..+four-component-candidate.tgz_vue@3.5.32_typescript@6.0.2_/node_modules/@ozwasyd/element-plus/es/components/menu/src/menu-item.vue.d.ts",
+      "line": 69,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "code": 1542,
+      "file": "node_modules/.pnpm/@ozwasyd+element-plus@file+..+four-component-candidate.tgz_vue@3.5.32_typescript@6.0.2_/node_modules/@ozwasyd/element-plus/es/components/menu/src/menu-item.vue.d.ts",
+      "line": 69,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "code": 1542,
+      "file": "node_modules/.pnpm/@ozwasyd+element-plus@file+..+four-component-candidate.tgz_vue@3.5.32_typescript@6.0.2_/node_modules/@ozwasyd/element-plus/es/components/menu/src/menu-item.vue.d.ts",
+      "line": 69,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "code": 1542,
+      "file": "node_modules/.pnpm/@ozwasyd+element-plus@file+..+four-component-candidate.tgz_vue@3.5.32_typescript@6.0.2_/node_modules/@ozwasyd/element-plus/es/components/menu/src/menu-item.vue.d.ts",
+      "line": 69,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "code": 1542,
+      "file": "node_modules/.pnpm/@ozwasyd+element-plus@file+..+four-component-candidate.tgz_vue@3.5.32_typescript@6.0.2_/node_modules/@ozwasyd/element-plus/es/components/menu/src/menu-item.vue.d.ts",
+      "line": 69,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "code": 1541,
+      "file": "node_modules/.pnpm/@ozwasyd+element-plus@file+..+four-component-candidate.tgz_vue@3.5.32_typescript@6.0.2_/node_modules/@ozwasyd/element-plus/es/components/menu/src/menu.d.ts",
+      "line": 2,
+      "message": "Type-only import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "code": 1541,
+      "file": "node_modules/.pnpm/@ozwasyd+element-plus@file+..+four-component-candidate.tgz_vue@3.5.32_typescript@6.0.2_/node_modules/@ozwasyd/element-plus/es/components/menu/src/types.d.ts",
+      "line": 2,
+      "message": "Type-only import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "code": 1479,
+      "file": "node_modules/.pnpm/@ozwasyd+element-plus@file+..+four-component-candidate.tgz_vue@3.5.32_typescript@6.0.2_/node_modules/@ozwasyd/element-plus/es/utils/arrays.d.ts",
+      "line": 5,
+      "message": "The current file is a CommonJS module whose imports will produce 'require' calls; however, the referenced file is an ECMAScript module and cannot be imported with 'require'. Consider writing a dynamic 'import(\"lodash-unified\")' call instead."
+    },
+    {
+      "code": 2339,
+      "file": "select-positive.ts",
+      "line": 7,
+      "message": "Property 'install' does not exist on type 'typeof import(\"/workspace/.setup/public-declaration-component-offers/four-component-consumer/node_modules/.pnpm/@ozwasyd+element-plus@file+..+four-component-candidate.tgz_vue@3.5.32_typescript@6.0.2_/node_modules/@ozwasyd/element-plus/es/components/select/index\")'."
+    },
+    {
+      "code": 2322,
+      "file": "select-positive.ts",
+      "line": 10,
+      "message": "Type 'typeof import(\"/workspace/.setup/public-declaration-component-offers/four-component-consumer/node_modules/.pnpm/@ozwasyd+element-plus@file+..+four-component-candidate.tgz_vue@3.5.32_typescript@6.0.2_/node_modules/@ozwasyd/element-plus/es/components/select/index\")' is not assignable to type 'SFCWithInstall<DefineComponent<ExtractPropTypes<{ name: StringConstructor; id: StringConstructor; modelValue: { type: (ObjectConstructor | StringConstructor | BooleanConstructor | NumberConstructor | ArrayConstructor)[]; default: undefined; }; ... 36 more ...; ariaLabel: { ...; }; }>, ... 18 more ..., any>> & { ...; }'.\n  Type 'typeof import(\"/workspace/.setup/public-declaration-component-offers/four-component-consumer/node_modules/.pnpm/@ozwasyd+element-plus@file+..+four-component-candidate.tgz_vue@3.5.32_typescript@6.0.2_/node_modules/@ozwasyd/element-plus/es/components/select/index\")' is not assignable to type 'ComponentPublicInstanceConstructor<CreateComponentPublicInstanceWithMixins<Readonly<ExtractPropTypes<{ name: StringConstructor; id: StringConstructor; modelValue: { type: (ObjectConstructor | StringConstructor | BooleanConstructor | NumberConstructor | ArrayConstructor)[]; default: undefined; }; ... 36 more ...; ari...'.\n    Type 'typeof import(\"/workspace/.setup/public-declaration-component-offers/four-component-consumer/node_modules/.pnpm/@ozwasyd+element-plus@file+..+four-component-candidate.tgz_vue@3.5.32_typescript@6.0.2_/node_modules/@ozwasyd/element-plus/es/components/select/index\")' is not assignable to type 'ComponentPublicInstanceConstructor<CreateComponentPublicInstanceWithMixins<Readonly<ExtractPropTypes<{ name: StringConstructor; id: StringConstructor; modelValue: { type: (ObjectConstructor | StringConstructor | BooleanConstructor | NumberConstructor | ArrayConstructor)[]; default: undefined; }; ... 36 more ...; ari...'.\n      Type 'typeof import(\"/workspace/.setup/public-declaration-component-offers/four-component-consumer/node_modules/.pnpm/@ozwasyd+element-plus@file+..+four-component-candidate.tgz_vue@3.5.32_typescript@6.0.2_/node_modules/@ozwasyd/element-plus/es/components/select/index\")' provides no match for the signature 'new (...args: any[]): CreateComponentPublicInstanceWithMixins<Readonly<ExtractPropTypes<{ name: StringConstructor; id: StringConstructor; modelValue: { type: (ObjectConstructor | StringConstructor | BooleanConstructor | NumberConstructor | ArrayConstructor)[]; default: undefined; }; ... 36 more ...; ariaLabel: { ...; }; }>> & Readonly<...>, ... 24 more ..., { ...; }>'."
+    },
+    {
+      "code": 2322,
+      "file": "select-positive.ts",
+      "line": 11,
+      "message": "Type 'typeof import(\"/workspace/.setup/public-declaration-component-offers/four-component-consumer/node_modules/.pnpm/@ozwasyd+element-plus@file+..+four-component-candidate.tgz_vue@3.5.32_typescript@6.0.2_/node_modules/@ozwasyd/element-plus/lib/components/select/index\")' is not assignable to type 'SFCWithInstall<DefineComponent<ExtractPropTypes<{ name: StringConstructor; id: StringConstructor; modelValue: { type: (ObjectConstructor | StringConstructor | BooleanConstructor | NumberConstructor | ArrayConstructor)[]; default: undefined; }; ... 36 more ...; ariaLabel: { ...; }; }>, ... 18 more ..., any>> & { ...; }'.\n  Type 'typeof import(\"/workspace/.setup/public-declaration-component-offers/four-component-consumer/node_modules/.pnpm/@ozwasyd+element-plus@file+..+four-component-candidate.tgz_vue@3.5.32_typescript@6.0.2_/node_modules/@ozwasyd/element-plus/lib/components/select/index\")' is not assignable to type 'ComponentPublicInstanceConstructor<CreateComponentPublicInstanceWithMixins<Readonly<ExtractPropTypes<{ name: StringConstructor; id: StringConstructor; modelValue: { type: (ObjectConstructor | StringConstructor | BooleanConstructor | NumberConstructor | ArrayConstructor)[]; default: undefined; }; ... 36 more ...; ari...'.\n    Type 'typeof import(\"/workspace/.setup/public-declaration-component-offers/four-component-consumer/node_modules/.pnpm/@ozwasyd+element-plus@file+..+four-component-candidate.tgz_vue@3.5.32_typescript@6.0.2_/node_modules/@ozwasyd/element-plus/lib/components/select/index\")' is not assignable to type 'ComponentPublicInstanceConstructor<CreateComponentPublicInstanceWithMixins<Readonly<ExtractPropTypes<{ name: StringConstructor; id: StringConstructor; modelValue: { type: (ObjectConstructor | StringConstructor | BooleanConstructor | NumberConstructor | ArrayConstructor)[]; default: undefined; }; ... 36 more ...; ari...'.\n      Type 'typeof import(\"/workspace/.setup/public-declaration-component-offers/four-component-consumer/node_modules/.pnpm/@ozwasyd+element-plus@file+..+four-component-candidate.tgz_vue@3.5.32_typescript@6.0.2_/node_modules/@ozwasyd/element-plus/lib/components/select/index\")' provides no match for the signature 'new (...args: any[]): CreateComponentPublicInstanceWithMixins<Readonly<ExtractPropTypes<{ name: StringConstructor; id: StringConstructor; modelValue: { type: (ObjectConstructor | StringConstructor | BooleanConstructor | NumberConstructor | ArrayConstructor)[]; default: undefined; }; ... 36 more ...; ariaLabel: { ...; }; }>> & Readonly<...>, ... 24 more ..., { ...; }>'."
+    },
+    {
+      "code": 2344,
+      "file": "select-positive.ts",
+      "line": 16,
+      "message": "Type 'typeof import(\"/workspace/.setup/public-declaration-component-offers/four-component-consumer/node_modules/.pnpm/@ozwasyd+element-plus@file+..+four-component-candidate.tgz_vue@3.5.32_typescript@6.0.2_/node_modules/@ozwasyd/element-plus/es/components/select/index\")' does not satisfy the constraint 'abstract new (...args: any) => any'.\n  Type 'typeof import(\"/workspace/.setup/public-declaration-component-offers/four-component-consumer/node_modules/.pnpm/@ozwasyd+element-plus@file+..+four-component-candidate.tgz_vue@3.5.32_typescript@6.0.2_/node_modules/@ozwasyd/element-plus/es/components/select/index\")' provides no match for the signature 'new (...args: any): any'."
+    },
+    {
+      "code": 2344,
+      "file": "select-positive.ts",
+      "line": 23,
+      "message": "Type 'typeof import(\"/workspace/.setup/public-declaration-component-offers/four-component-consumer/node_modules/.pnpm/@ozwasyd+element-plus@file+..+four-component-candidate.tgz_vue@3.5.32_typescript@6.0.2_/node_modules/@ozwasyd/element-plus/es/components/select/index\")' does not satisfy the constraint 'abstract new (...args: any) => any'.\n  Type 'typeof import(\"/workspace/.setup/public-declaration-component-offers/four-component-consumer/node_modules/.pnpm/@ozwasyd+element-plus@file+..+four-component-candidate.tgz_vue@3.5.32_typescript@6.0.2_/node_modules/@ozwasyd/element-plus/es/components/select/index\")' provides no match for the signature 'new (...args: any): any'."
+    }
+  ]
+}

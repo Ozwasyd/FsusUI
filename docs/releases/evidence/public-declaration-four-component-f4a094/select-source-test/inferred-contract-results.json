@@ -1,0 +1,23 @@
+{
+  "originalSha": "2d05f240e5fb04ac0cd602b4ed638ffe00b1859b",
+  "compiler": "5.9.2",
+  "positive": "PASS",
+  "negative": "PASS",
+  "originalUseSelectComparedUnmodified": true,
+  "originalSfcOptionsBinding": "UNBOUND",
+  "sfcComparisonNormalization": "Bind only the original Partial<Options> free name to @popperjs/core Options; runtime, prop annotation and assertions unchanged.",
+  "negativeCodes": [
+    2344
+  ],
+  "checked": [
+    "parameters",
+    "return keys and fields",
+    "ref getter/setter",
+    "props",
+    "emits",
+    "slots",
+    "instance",
+    "default/named exports",
+    "installer extras"
+  ]
+}

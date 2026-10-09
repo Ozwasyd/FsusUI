@@ -1,0 +1,64 @@
+{
+  "sourceHead": "f4a094f300384185918fc6d4be86e88d9ab9f097",
+  "predecessor": "a5e839e4160ec64dafabb162c6168851de54b1b1",
+  "offers": [
+    {
+      "offeredHead": "20d905921f9494917320d32f05becaf602da2826",
+      "exactOfferedBlobsConsumed": [
+        ".changeset/fix-datepicker-panel-declaration.md",
+        "tests/fixtures/public-datepicker-panel-declaration/README.md",
+        "tests/fixtures/public-datepicker-panel-declaration/negative.ts",
+        "tests/fixtures/public-datepicker-panel-declaration/observe-producer.cjs",
+        "tests/fixtures/public-datepicker-panel-declaration/positive.ts",
+        "tests/fixtures/public-datepicker-panel-declaration/tsconfig.json",
+        "tests/public-datepicker-panel-declaration.test.mjs",
+        "vue/packages/components/date-picker/src/panel-utils.ts"
+      ]
+    },
+    {
+      "offeredHead": "4214f38b38c8d891c3b25b0e2e56d5e28839edee",
+      "exactOfferedBlobsConsumed": [
+        ".changeset/fix-slider-public-declaration.md",
+        "tests/fixtures/public-slider-declaration/negative.ts",
+        "tests/fixtures/public-slider-declaration/observe-producer.mjs",
+        "tests/fixtures/public-slider-declaration/positive.ts",
+        "tests/public-slider-declaration.test.mjs",
+        "vue/packages/components/slider/src/composables/use-slide.ts"
+      ]
+    },
+    {
+      "offeredHead": "dbfaee7b9a4c4e0f9b72d1e9168bc0f80b62b912",
+      "exactOfferedBlobsConsumed": [
+        ".changeset/fix-cascader-public-declaration.md",
+        "tests/fixtures/public-cascader-declaration/README.md",
+        "tests/fixtures/public-cascader-declaration/aggregate.ts",
+        "tests/fixtures/public-cascader-declaration/installed.cjs",
+        "tests/fixtures/public-cascader-declaration/library.ts",
+        "tests/fixtures/public-cascader-declaration/negative.ts",
+        "tests/fixtures/public-cascader-declaration/positive.ts",
+        "tests/fixtures/public-cascader-declaration/producer.cjs",
+        "tests/fixtures/public-cascader-declaration/validation.json",
+        "tests/public-cascader-declaration.test.mjs",
+        "vue/packages/components/cascader/index.ts",
+        "vue/packages/components/cascader/src/cascader.vue"
+      ]
+    },
+    {
+      "offeredHead": "6dd7dc60158ee4a9ffeea18612e1143c47f4b600",
+      "exactOfferedBlobsConsumed": [
+        ".changeset/fix-classic-select-public-declaration.md",
+        "tests/fixtures/public-classic-select-declaration/inferred-contract.ts",
+        "tests/fixtures/public-classic-select-declaration/negative.ts",
+        "tests/fixtures/public-classic-select-declaration/package.json",
+        "tests/fixtures/public-classic-select-declaration/packed-controls.mjs",
+        "tests/fixtures/public-classic-select-declaration/positive.ts",
+        "tests/fixtures/public-classic-select-declaration/whole-package.ts",
+        "tests/public-classic-select-declaration.test.mjs",
+        "vue/packages/components/select/index.ts",
+        "vue/packages/components/select/src/select.vue",
+        "vue/packages/components/select/src/useSelect.ts"
+      ]
+    }
+  ],
+  "threeComponentSourceSha": "8dec1c2b8c4c317ca9b159f021d8ee6d6b497df4"
+}
