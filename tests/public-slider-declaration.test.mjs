@@ -69,9 +69,11 @@ test('actual installed tarball checks strict slider positive and negative contro
   assert.equal(req('vue/package.json').version, '3.5.32')
   assert.equal(req('vue-tsc/package.json').version, '3.2.6')
   const packageRoot = path.dirname(
-    req.resolve('@ozwasyd/element-plus/package.json'),
+    path.dirname(req.resolve('@ozwasyd/element-plus')),
   )
-  const manifest = req('@ozwasyd/element-plus/package.json')
+  const manifest = JSON.parse(
+    readFileSync(path.join(packageRoot, 'package.json'), 'utf8'),
+  )
   assert.equal(manifest.name, '@ozwasyd/element-plus')
   assert.equal(manifest.version, '1.5.1')
   for (const module of ['es', 'lib'])
