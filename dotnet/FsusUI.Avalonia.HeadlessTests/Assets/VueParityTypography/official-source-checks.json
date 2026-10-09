@@ -1,0 +1,50 @@
+[
+  {
+    "package": "google-sans",
+    "file": "LICENSE",
+    "url": "https://raw.githubusercontent.com/fontsource/font-files/728f5ac019b578b42808c3672378dad2d327fe87/fonts/google/google-sans/LICENSE",
+    "officialSha256": "ee5ba219bfa2ce3cb1403d2a535383cd131c9154912560c286691781203fd02d",
+    "lockedPackageSha256": "ee5ba219bfa2ce3cb1403d2a535383cd131c9154912560c286691781203fd02d",
+    "comparison": "identical bytes"
+  },
+  {
+    "package": "google-sans",
+    "file": "metadata.json",
+    "url": "https://raw.githubusercontent.com/fontsource/font-files/728f5ac019b578b42808c3672378dad2d327fe87/fonts/google/google-sans/metadata.json",
+    "officialSha256": "e898721e69d3df12f29f3ad155313d60eb4ffaf1664db462935513489c964e7f",
+    "lockedPackageSha256": "e898721e69d3df12f29f3ad155313d60eb4ffaf1664db462935513489c964e7f",
+    "comparison": "identical bytes"
+  },
+  {
+    "package": "google-sans",
+    "file": "package.json",
+    "url": "https://raw.githubusercontent.com/fontsource/font-files/728f5ac019b578b42808c3672378dad2d327fe87/fonts/google/google-sans/package.json",
+    "officialSha256": "1ee545b2972227dc695c35245dff45e146d61dd50a4667c10823ecfc659e9bb3",
+    "lockedPackageSha256": "4ada6bd983dd184ff0971cdfc0a5cbf9f38f415432d0d5e5b25ef1772302ee67",
+    "comparison": "identical JSON except packaging publishHash"
+  },
+  {
+    "package": "noto-sans-sc",
+    "file": "LICENSE",
+    "url": "https://raw.githubusercontent.com/fontsource/font-files/728f5ac019b578b42808c3672378dad2d327fe87/fonts/google/noto-sans-sc/LICENSE",
+    "officialSha256": "18aabf190848725e2576eefb5c29ba06aac1029d02132252a7f312eac2e50cf3",
+    "lockedPackageSha256": "18aabf190848725e2576eefb5c29ba06aac1029d02132252a7f312eac2e50cf3",
+    "comparison": "identical bytes"
+  },
+  {
+    "package": "noto-sans-sc",
+    "file": "metadata.json",
+    "url": "https://raw.githubusercontent.com/fontsource/font-files/728f5ac019b578b42808c3672378dad2d327fe87/fonts/google/noto-sans-sc/metadata.json",
+    "officialSha256": "893dbc7ecfa9a8a469457b521507bb090a7fb46299264165b156c2e2883147a9",
+    "lockedPackageSha256": "893dbc7ecfa9a8a469457b521507bb090a7fb46299264165b156c2e2883147a9",
+    "comparison": "identical bytes"
+  },
+  {
+    "package": "noto-sans-sc",
+    "file": "package.json",
+    "url": "https://raw.githubusercontent.com/fontsource/font-files/728f5ac019b578b42808c3672378dad2d327fe87/fonts/google/noto-sans-sc/package.json",
+    "officialSha256": "e45378b6ee80180d0284686213ee00c3def56009e366d00af38aaef340cbff45",
+    "lockedPackageSha256": "9564b2b5ea6ac458be32eb9b936e6d27adeb427cc48e5d2e56612a272373e36c",
+    "comparison": "identical JSON except packaging publishHash"
+  }
+]
