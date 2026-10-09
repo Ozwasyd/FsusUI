@@ -5,6 +5,7 @@ using Avalonia.Automation.Provider;
 using Avalonia.Controls;
 using Avalonia.Controls.Presenters;
 using Avalonia.Controls.Primitives;
+using Avalonia.Controls.Templates;
 using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
 using Avalonia.Input;
@@ -342,8 +343,10 @@ public class FsusDesktopShellHeadlessTests
     window.Close();
   }
 
-  [AvaloniaFact]
-  public void DocumentContentKeepsSingleVisualParentAcrossThemeRemovalAndRemount()
+  [AvaloniaTheory]
+  [InlineData(false)]
+  [InlineData(true)]
+  public void DocumentContentKeepsSingleVisualParentAcrossThemeRemovalAndRemount(bool useRecyclingTemplate)
   {
     var application = Assert.IsType<HeadlessTestApplication>(Application.Current);
     var theme = new StyleInclude(new Uri("avares://FsusUI.Avalonia.HeadlessTests"))
@@ -354,12 +357,21 @@ public class FsusDesktopShellHeadlessTests
     {
       Children = { new Border { Background = Brushes.Blue, Width = 160, Height = 80 } },
     };
+    var templateBuildCount = 0;
+    var contentTemplate = useRecyclingTemplate
+      ? new FuncDataTemplate(content => content is Grid or null, (_, _) =>
+      {
+        templateBuildCount++;
+        return body;
+      }, supportsRecycling: true)
+      : null;
     var document = new FsusDocumentTab
     {
       Key = "document",
       Header = new Border { Background = Brushes.Gray, Width = 80, Height = 16 },
       IsClosable = false,
       Content = body,
+      ContentTemplate = contentTemplate,
     };
     var tabs = new FsusDocumentTabs();
     tabs.AddDocument(document);
@@ -371,16 +383,25 @@ public class FsusDesktopShellHeadlessTests
       Dispatcher.UIThread.RunJobs();
       AssertDocumentBodyParent();
 
+      var outgoingHost = Assert.IsType<ContentPresenter>(body.GetVisualParent());
+
+      tabs.Template = null;
+      AssertRetiredPresenter(outgoingHost);
+      Dispatcher.UIThread.RunJobs();
+      tabs.ClearValue(TemplatedControl.TemplateProperty);
+      Dispatcher.UIThread.RunJobs();
+      AssertDocumentBodyParent();
+
+      outgoingHost = Assert.IsType<ContentPresenter>(body.GetVisualParent());
+
       Assert.True(application.Styles.Remove(theme));
       Dispatcher.UIThread.RunJobs();
-      Assert.Same(body, document.Content);
-      Assert.Same(body, tabs.SelectedContent);
-      Assert.Null(body.GetVisualParent());
-      Assert.DoesNotContain(document.GetVisualDescendants(), visual => ReferenceEquals(visual, body));
+      AssertRetiredPresenter(outgoingHost);
 
       application.Styles.Add(theme);
       Dispatcher.UIThread.RunJobs();
       AssertDocumentBodyParent();
+      Assert.True(!useRecyclingTemplate || templateBuildCount >= 3);
 
       window.Content = null;
       Dispatcher.UIThread.RunJobs();
@@ -394,6 +415,18 @@ public class FsusDesktopShellHeadlessTests
       application.Styles.Remove(theme);
     }
 
+    void AssertRetiredPresenter(ContentPresenter outgoingHost)
+    {
+      Assert.Same(body, document.Content);
+      Assert.Same(body, tabs.SelectedContent);
+      Assert.Same(contentTemplate, document.ContentTemplate);
+      Assert.Null(outgoingHost.Content);
+      Assert.Null(body.GetVisualParent());
+      Assert.Null(outgoingHost.Child);
+      Assert.Null(outgoingHost.ContentTemplate);
+      Assert.DoesNotContain(document.GetVisualDescendants(), visual => ReferenceEquals(visual, body));
+    }
+
     void AssertDocumentBodyParent()
     {
       var contentHost = tabs.GetVisualDescendants()
@@ -401,6 +434,10 @@ public class FsusDesktopShellHeadlessTests
         .Single(presenter => presenter.Name == "PART_SelectedContentHost");
       Assert.Same(body, document.Content);
       Assert.Same(body, tabs.SelectedContent);
+      Assert.Same(contentTemplate, document.ContentTemplate);
+      Assert.Same(contentTemplate, tabs.SelectedContentTemplate);
+      Assert.Same(contentTemplate, contentHost.ContentTemplate);
+      Assert.Same(body, contentHost.Child);
       Assert.Same(document, tabs.SelectedItem);
       Assert.Same(contentHost, body.GetVisualParent());
       Assert.Single(tabs.GetVisualDescendants(), visual => ReferenceEquals(visual, body));

@@ -571,6 +571,8 @@ public class FsusDocumentTabs : FsusTabs
     {
       // A detached presenter can still own the document body after retemplating.
       // Release that visual child without changing the document's Content.
+      // Retire its template first so null content cannot rebuild or recycle a child.
+      selectedContentHost.ContentTemplate = null;
       selectedContentHost.Content = null;
       selectedContentHost.UpdateChild();
       selectedContentHost = null;
