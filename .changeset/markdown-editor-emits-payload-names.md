@@ -1,5 +1,5 @@
 ---
-'@ozwasyd/element-plus': patch
+'element-plus': patch
 ---
 
 Rename MarkdownEditor transaction and selection payload parameter labels so the
