@@ -14,6 +14,8 @@ import os from 'node:os'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import './prepare-npm-package.test.mjs'
+import './prepare-component-exports.test.mjs'
+import './prepare-component-exports-review.test.mjs'
 import {
   candidateManifestName,
   candidateTarballName,
