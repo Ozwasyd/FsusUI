@@ -1,0 +1,14 @@
+{
+  "docsSuccessorSha": "dc3030f4e5ec410c5f09969cc664f9f4caab1a07",
+  "artifactSourceSha": "f4a094f300384185918fc6d4be86e88d9ab9f097",
+  "offeredDocsSha": "83788c0f4e2444ab044bd1280209c6f54f75773c",
+  "changedPaths": [
+    "tests/fixtures/public-cascader-declaration/README.md"
+  ],
+  "exactOfferedReadmeBlobConsumed": true,
+  "packageNotRebuiltOrRelabeled": true,
+  "newHeadRuntimeAndPackageChecks": "UNRUN (README only)",
+  "freshUiMainSha": "8db0ac8f49749e3e5f28be5051bb3d3ed71ada71",
+  "mergeTreeExitCode": 0,
+  "mergeTree": "004af5afacf5b2262099fd1b7d1a6d00bafc9ef8\n"
+}

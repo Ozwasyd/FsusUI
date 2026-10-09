@@ -1,0 +1,8 @@
+{
+  "repository": "Ozwasyd/FsusUI",
+  "base": "main",
+  "head": "integration/public-declaration-four-component-docs-20261009",
+  "draft": true,
+  "title": "fix(types): compose the approved component declaration source offers",
+  "body": "Consume exact approved DatePicker, Slider, Cascader and classic Select source offers above the frozen declaration/package fixes. Actual canonical producer emits all missing barrels; strict Bundler installed-package aggregate and four positive/48 precise negative controls pass.\n\nValidation at f4a094f3: actual candidate build/verifier and fresh pinned frozen install PASS; 206 runtime tests, source web/Vitest typechecks and changed-source lint PASS. Node16 FAIL (68 external aggregate diagnostics and extra positive contract errors); whole runtime byte parity FAIL in two unchanged-source Motion modules. Their compiler load-order variation is reproduced and nine bounded jsdom mode/render checks pass, without claiming browser/device behavior.\n\nOriginal isolated DatePicker/Slider/Select residual-count fixtures FAIL after composition and need their original owners to update those assumptions. Drawer issue #827 acceptance and unavailable published/browser/native/GitHub CI evidence remain OPEN. No publication or merge is authorized here.\n\nTarball SHA-256: 82724daaa96d47e22bf5ec17694224bfc40192d50ff3a1554b6e8a6775bec4d9. Fresh UI-main merge-tree PASS. Evidence: docs/releases/evidence/public-declaration-four-component-f4a094/outcome.md on the separate review evidence branch.\n\nPR head dc3030f4 is a README-only successor of built/tested f4a094f3. It consumes Cascader author 83788c0f; artifact and test receipts remain bound to f4. No new package build or runtime check is claimed for the documentation-only head."
+}
