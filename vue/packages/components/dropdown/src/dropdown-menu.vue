@@ -9,6 +9,7 @@
     @blur="onBlur"
     @focus="onFocus"
     @keydown="handleKeydown"
+    @keydown.capture="onMenuKeydown"
     @mousedown.self="onMousedown"
   >
     <slot />
@@ -80,7 +81,7 @@ export default defineComponent({
       undefined
     )!
 
-    const { contentRef, role, triggerId } = inject(
+    const { contentRef, role, triggerId, onMenuKeydown } = inject(
       DROPDOWN_INJECTION_KEY,
       undefined
     )!
@@ -243,6 +244,7 @@ export default defineComponent({
       triggerId,
       dropdownListWrapperRef,
       handleKeydown,
+      onMenuKeydown,
       onBlur,
       onFocus,
       onMousedown,
