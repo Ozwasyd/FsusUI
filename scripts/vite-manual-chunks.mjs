@@ -231,7 +231,9 @@ export const resolveFsusViteManualChunk = (
   }
 
   if (
-    /\/components\/markdown-renderer\/src\/markdown-renderer-heavy-projection\.(?:mjs|ts)$/u.test(id)
+    /\/components\/markdown-renderer\/src\/markdown-renderer-heavy-projection\.(?:mjs|ts)$/u.test(
+      id,
+    )
   ) {
     return 'fsus-markdown-heavy-projection-cache'
   }
