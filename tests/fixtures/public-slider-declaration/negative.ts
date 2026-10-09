@@ -1,6 +1,7 @@
 import { type ElSlider } from '@ozwasyd/element-plus'
 import type { SliderInstance } from '@ozwasyd/element-plus'
 import type { useSlide } from '@ozwasyd/element-plus/es/components/slider/src/composables/use-slide'
+import '@ozwasyd/element-plus/global'
 declare const instance: SliderInstance
 declare const slide: ReturnType<typeof useSlide>
 const invalidValue: InstanceType<typeof ElSlider>['$props'] = {
