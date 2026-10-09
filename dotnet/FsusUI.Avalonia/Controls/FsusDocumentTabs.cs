@@ -457,6 +457,16 @@ public class FsusDocumentTabs : FsusTabs
     {
       SelectKey(selectedKey);
     }
+    if (TopLevel.GetTopLevel(document) is not null)
+    {
+      // Reattached presenters recreate their generated children. Retire those children
+      // before queued layout can replace them while measuring an old header.
+      document.ApplyTemplate();
+      foreach (var presenter in document.GetVisualDescendants().OfType<ContentPresenter>().ToArray())
+      {
+        presenter.ApplyTemplate();
+      }
+    }
     if (wasFocused)
     {
       document.Focus(focusNavigationMethod);

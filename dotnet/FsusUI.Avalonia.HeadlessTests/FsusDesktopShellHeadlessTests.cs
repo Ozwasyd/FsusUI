@@ -308,7 +308,11 @@ public class FsusDesktopShellHeadlessTests
       Assert.Equal(focusVisible, dragTarget.Classes.Contains(":focus-visible"));
 
       var index = tabs.Documents.ToList().IndexOf(dragTarget);
+      var previousHeader = AssertCurrentHeader(dragTarget);
       Assert.True(tabs.ReorderDocument(dragTarget.Key, index == 0 ? 1 : 0));
+      Assert.NotSame(previousHeader, AssertCurrentHeader(dragTarget));
+      Assert.Null(previousHeader.Parent);
+      Assert.Null(previousHeader.GetVisualParent());
       Dispatcher.UIThread.RunJobs();
       Assert.Same(dragTarget, window.FocusManager.GetFocusedElement());
       Assert.Equal(focusVisible, dragTarget.Classes.Contains(":focus-visible"));
@@ -323,7 +327,11 @@ public class FsusDesktopShellHeadlessTests
 
       otherIndex = tabs.Documents.ToList().IndexOf(other);
       lastFocusOrigin = null;
+      previousHeader = AssertCurrentHeader(other);
       Assert.True(tabs.ReorderDocument(other.Key, otherIndex == 0 ? 1 : 0));
+      Assert.NotSame(previousHeader, AssertCurrentHeader(other));
+      Assert.Null(previousHeader.Parent);
+      Assert.Null(previousHeader.GetVisualParent());
       Dispatcher.UIThread.RunJobs();
       Assert.Same(dragTarget, window.FocusManager.GetFocusedElement());
       Assert.Equal(focusVisible, dragTarget.Classes.Contains(":focus-visible"));
@@ -341,6 +349,19 @@ public class FsusDesktopShellHeadlessTests
     }
 
     window.Close();
+
+    TextBlock AssertCurrentHeader(FsusDocumentTab document)
+    {
+      var presenter = document.GetVisualDescendants()
+        .OfType<ContentPresenter>()
+        .Single(candidate => Equals(candidate.Content, document.Header));
+      Assert.Same(document, presenter.TemplatedParent);
+      var header = Assert.IsType<TextBlock>(presenter.Child);
+      Assert.Equal(document.Header, header.Text);
+      Assert.Equal(document.FontFamily, header.FontFamily);
+      Assert.Same(window, TopLevel.GetTopLevel(header));
+      return header;
+    }
   }
 
   [AvaloniaTheory]

@@ -65,6 +65,8 @@ the old/new indexes and source. Reordering preserves the active document and
 the focused document header, including its keyboard or pointer focus origin and
 corresponding visible focus indication; moving another header does not take focus
 or change that indication.
+A mounted reordered header refreshes its generated presenter children before
+focus restoration, so queued layout uses the current header after reinsertion.
 The selected document body retains its `Content` identity across template or
 theme replacement. The outgoing selected-content presenter retires its template
 before releasing its visual child, including when the template can recycle a
