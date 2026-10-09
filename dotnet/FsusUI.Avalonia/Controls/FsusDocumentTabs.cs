@@ -3,6 +3,7 @@ using Avalonia.Automation;
 using Avalonia.Automation.Peers;
 using Avalonia.Automation.Provider;
 using Avalonia.Controls;
+using Avalonia.Controls.Presenters;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Interactivity;
@@ -320,6 +321,7 @@ public class FsusDocumentTabs : FsusTabs
     AvaloniaProperty.Register<FsusDocumentTabs, double>(nameof(HeaderScrollStep), 120d);
 
   private ScrollViewer? headerScrollViewer;
+  private ContentPresenter? selectedContentHost;
   private bool isReordering;
   private string requestedSelectedKey = string.Empty;
 
@@ -540,6 +542,7 @@ public class FsusDocumentTabs : FsusTabs
       headerScrollViewer.ScrollChanged -= OnHeaderScrollChanged;
     }
     base.OnApplyTemplate(e);
+    selectedContentHost = e.NameScope.Find<ContentPresenter>("PART_SelectedContentHost");
     headerScrollViewer = e.NameScope.Find<ScrollViewer>("PART_HeaderScrollViewer");
     if (headerScrollViewer is not null)
     {
@@ -559,6 +562,19 @@ public class FsusDocumentTabs : FsusTabs
     }
     SyncOverflowState();
     RevealActiveDocument();
+  }
+
+  protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
+  {
+    base.OnPropertyChanged(change);
+    if (change.Property == TemplateProperty && selectedContentHost is not null)
+    {
+      // A detached presenter can still own the document body after retemplating.
+      // Release that visual child without changing the document's Content.
+      selectedContentHost.Content = null;
+      selectedContentHost.UpdateChild();
+      selectedContentHost = null;
+    }
   }
 
   protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
