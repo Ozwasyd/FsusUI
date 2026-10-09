@@ -16,6 +16,7 @@ const valueOf = (name, fallback) => {
 const has = (name) => argv.includes(name)
 const profile = valueOf('--profile', 'quick')
 const scenarioFilter = valueOf('--scenario', '')
+const caseFilter = valueOf('--case', '')
 const output = path.resolve(root, valueOf('--output', '.tmp/performance/web'))
 const baselinePath = valueOf('--baseline', '')
 const port = Number(valueOf('--port', '5188'))
@@ -83,7 +84,7 @@ const dimensions = profile === 'full' ? fullDimensions : quickDimensions
 const scenarioDefinitions = (
   profile === 'full' ? definitions : quickDefinitions
 ).filter(([scenario]) => !scenarioFilter || scenario.startsWith(scenarioFilter))
-const matrix = scenarioFilter
+const profileMatrix = scenarioFilter
   ? scenarioDefinitions.map((definition) => [
       ...definition,
       ...quickDimensions[0],
@@ -96,6 +97,19 @@ const matrix = scenarioFilter
         ...definition,
         ...dimensions[index % dimensions.length],
       ])
+
+if (caseFilter && scenarioFilter)
+  throw new Error('--case cannot be combined with --scenario')
+const matrix = caseFilter
+  ? profileMatrix.filter(
+      ([scenario, size, refreshHz, dpr, motion]) =>
+        `${scenario}-${size}-${refreshHz}hz-dpr${dpr}-${motion}` === caseFilter,
+    )
+  : profileMatrix
+if (matrix.length === 0)
+  throw new Error('Performance selection contains no cases')
+if (caseFilter && matrix.length !== 1)
+  throw new Error('Exact performance selection must resolve one case')
 
 const percentile = (values, p) => {
   if (values.length === 0) return 0
