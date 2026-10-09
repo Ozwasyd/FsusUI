@@ -6,8 +6,23 @@
     :style="{ backgroundColor: color }"
     @click="handleClick"
   >
-    <slot />
-    <el-icon v-if="closable" :class="ns.e('close')" v-on="closeIconEvents">
+    <span v-if="multiline" :id="contentId" :class="ns.e('content')">
+      <slot />
+    </span>
+    <slot v-else />
+    <button
+      v-if="closable && multiline"
+      type="button"
+      :class="ns.e('close')"
+      :aria-label="t('el.messagebox.close')"
+      :aria-describedby="contentId"
+      v-on="closeIconEvents"
+    >
+      <span aria-hidden="true"
+        ><el-icon><Close /></el-icon
+      ></span>
+    </button>
+    <el-icon v-else-if="closable" :class="ns.e('close')" v-on="closeIconEvents">
       <Close />
     </el-icon>
   </span>
@@ -18,8 +33,27 @@
       :style="{ backgroundColor: color }"
       @click="handleClick"
     >
-      <slot />
-      <el-icon v-if="closable" :class="ns.e('close')" v-on="closeIconEvents">
+      <span v-if="multiline" :id="contentId" :class="ns.e('content')">
+        <slot />
+      </span>
+      <slot v-else />
+      <button
+        v-if="closable && multiline"
+        type="button"
+        :class="ns.e('close')"
+        :aria-label="t('el.messagebox.close')"
+        :aria-describedby="contentId"
+        v-on="closeIconEvents"
+      >
+        <span aria-hidden="true"
+          ><el-icon><Close /></el-icon
+        ></span>
+      </button>
+      <el-icon
+        v-else-if="closable"
+        :class="ns.e('close')"
+        v-on="closeIconEvents"
+      >
         <Close />
       </el-icon>
     </span>
@@ -27,10 +61,10 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, toRef } from 'vue'
+import { computed, toRef, useId } from 'vue'
 import ElIcon from '@element-plus/components/icon'
 import { Close } from '@element-plus/icons-vue'
-import { useNamespace } from '@element-plus/hooks'
+import { useLocale, useNamespace } from '@element-plus/hooks'
 import { useFormSize } from '@element-plus/components/form'
 import { useComponentMotionAttrs } from '@element-plus/components/motion'
 
@@ -44,6 +78,8 @@ const emit = defineEmits(tagEmits)
 
 const tagSize = useFormSize()
 const ns = useNamespace('tag')
+const contentId = useId()
+const { t } = useLocale()
 const componentMotionAttrs = useComponentMotionAttrs(toRef(props, 'motion'))
 const containerKls = computed(() => {
   const { type, hit, effect, closable, round } = props
@@ -55,6 +91,7 @@ const containerKls = computed(() => {
     ns.m(effect),
     ns.is('hit', hit),
     ns.is('round', round),
+    ns.is('multiline', props.multiline),
   ]
 })
 
