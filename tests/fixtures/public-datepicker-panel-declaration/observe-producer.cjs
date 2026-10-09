@@ -120,9 +120,13 @@ type ParameterMutationRejected = Assert<Same<Parameters<typeof getPanel>, [numbe
 type ReturnMutationRejected = Assert<Same<ReturnType<typeof getPanel>, typeof DatePickPanel>>
 `)
     try {
-      const controls = diagnosticRows(
-        originalDiagnostics.apply(this, args),
-      ).filter((row) => row.file === target)
+      const paired = diagnosticRows(originalDiagnostics.apply(this, args))
+      const controls = paired.filter((row) => row.file === target)
+      assert.deepEqual(
+        paired.filter((row) => row.file !== target),
+        rows,
+        'in-memory controls must retain every other producer diagnostic',
+      )
       assert.equal(
         controls.length,
         2,
