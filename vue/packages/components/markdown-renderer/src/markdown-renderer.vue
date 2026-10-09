@@ -1044,6 +1044,8 @@ const activateRenderedFeatures = async (
   const activationStartedAt = readPerformanceNow()
   const features = resolveMarkdownFeatureOptions()
   const heavyFeaturesEnabled = hasEnabledHeavyFeature(result, features)
+  // Theme changes must invalidate pending imports and activation too.
+  if (heavyFeaturesEnabled) ensureHeavyFeatureThemeListener()
   const resolveHeavyFeatureIdentity = heavyFeaturesEnabled
     ? await createHeavyFeatureIdentityResolver(result)
     : () => null

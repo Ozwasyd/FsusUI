@@ -46,7 +46,7 @@ test('normal mode keeps only failure evidence while evidence mode is explicit', 
     evidence: true,
     preserveOutput: 'always',
     screenshot: 'on',
-    trace: 'on',
+    trace: 'retain-on-failure',
   })
 })
 

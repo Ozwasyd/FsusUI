@@ -7,6 +7,7 @@ export type ElDropdownInjectionContext = {
   isUsingKeyboard: Ref<boolean>
   onItemLeave: (e: PointerEvent) => void
   onItemEnter: (e: PointerEvent) => void
+  onMenuKeydown: (e: KeyboardEvent) => void
 }
 
 export const DROPDOWN_INJECTION_KEY: InjectionKey<ElDropdownInjectionContext> =
