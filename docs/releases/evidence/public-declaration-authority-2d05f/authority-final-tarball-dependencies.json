@@ -1,0 +1,28 @@
+{
+  "sourceSha": "2d05f240e5fb04ac0cd602b4ed638ffe00b1859b",
+  "artifactSha256": "6da2fe1a5573a04768a4f8280899b45dabaa4f93ca72a278d48c50faca17649a",
+  "publishedDependencies": {
+    "@ctrl/tinycolor": "^3.4.1",
+    "@floating-ui/dom": "^1.0.1",
+    "@popperjs/core": "npm:@sxzz/popperjs-es@^2.11.7",
+    "@types/lodash": "^4.14.182",
+    "@types/lodash-es": "^4.17.6",
+    "async-validator": "^4.2.5",
+    "dayjs": "^1.11.3",
+    "escape-html": "^1.0.3",
+    "gsap": "^3.15.0",
+    "katex": "^0.17.0",
+    "lodash": "^4.17.21",
+    "lodash-es": "^4.17.21",
+    "lodash-unified": "^1.0.2",
+    "memoize-one": "^6.0.0",
+    "mermaid": "^11.15.0",
+    "motion-dom": "^12.40.0",
+    "normalize-wheel-es": "^1.2.0",
+    "shiki": "^4.2.0",
+    "type-fest": "4.41.0",
+    "vue-router": "4.6.4"
+  },
+  "authoritySha256": "09ff97e13767b2226ea9ac49256136c9c1c3a9e14fbc40d9f7d7f7906f5cbf34",
+  "sourceLockSha256": "c7d35e65a7f82bf145786f0d5697a8fcff2109b7f47a85146ed0acb22510ce94"
+}

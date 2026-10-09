@@ -1,0 +1,17 @@
+✔ bundle license attribution is retained without resolving a workspace dependency (81.648857ms)
+✔ rewrites both quote styles in ESM, CommonJS, and declaration files (57.113145ms)
+✔ refuses an actual unrewritable @element-plus/icons-vue root reference in a full bundle (45.440806ms)
+✔ refuses a remaining quoted @element-plus/icons-vue subpath reference (49.158034ms)
+✔ refuses an actual unrewritable @element-plus/motion root reference in a full bundle (52.450092ms)
+✔ refuses a remaining quoted @element-plus/motion subpath reference (56.155072ms)
+✔ strict mode still refuses incomplete release artifacts (52.192828ms)
+✔ unresolved workspace dependency versions remain fatal (51.909517ms)
+✔ known bundled workspace dependencies are still removed from the manifest (61.2506ms)
+ℹ tests 9
+ℹ suites 0
+ℹ pass 9
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 651.45062

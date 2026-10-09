@@ -1,0 +1,79 @@
+{
+  "count": 10,
+  "codes": {
+    "2307": 4,
+    "2339": 6
+  },
+  "diagnostics": [
+    {
+      "file": "node_modules/.pnpm/@ozwasyd+element-plus@file+..+authority-final-candidate.tgz_vue@3.5.32_typescript@6.0.2_/node_modules/@ozwasyd/element-plus/es/components/index.d.ts",
+      "line": 12,
+      "column": 15,
+      "code": 2307,
+      "message": "Cannot find module './cascader' or its corresponding type declarations."
+    },
+    {
+      "file": "node_modules/.pnpm/@ozwasyd+element-plus@file+..+authority-final-candidate.tgz_vue@3.5.32_typescript@6.0.2_/node_modules/@ozwasyd/element-plus/es/components/index.d.ts",
+      "line": 56,
+      "column": 15,
+      "code": 2307,
+      "message": "Cannot find module './select' or its corresponding type declarations."
+    },
+    {
+      "file": "node_modules/.pnpm/@ozwasyd+element-plus@file+..+authority-final-candidate.tgz_vue@3.5.32_typescript@6.0.2_/node_modules/@ozwasyd/element-plus/es/components/index.d.ts",
+      "line": 61,
+      "column": 15,
+      "code": 2307,
+      "message": "Cannot find module './slider' or its corresponding type declarations."
+    },
+    {
+      "file": "node_modules/.pnpm/@ozwasyd+element-plus@file+..+authority-final-candidate.tgz_vue@3.5.32_typescript@6.0.2_/node_modules/@ozwasyd/element-plus/es/components/index.d.ts",
+      "line": 74,
+      "column": 15,
+      "code": 2307,
+      "message": "Cannot find module './time-select' or its corresponding type declarations."
+    },
+    {
+      "file": "node_modules/.pnpm/@ozwasyd+element-plus@file+..+authority-final-candidate.tgz_vue@3.5.32_typescript@6.0.2_/node_modules/@ozwasyd/element-plus/global.d.ts",
+      "line": 19,
+      "column": 58,
+      "code": 2339,
+      "message": "Property 'ElCascader' does not exist on type 'typeof import(\"/workspace/.setup/public-declaration-closure/authority-final-consumer/node_modules/.pnpm/@ozwasyd+element-plus@file+..+authority-final-candidate.tgz_vue@3.5.32_typescript@6.0.2_/node_modules/@ozwasyd/element-plus/es/index\")'."
+    },
+    {
+      "file": "node_modules/.pnpm/@ozwasyd+element-plus@file+..+authority-final-candidate.tgz_vue@3.5.32_typescript@6.0.2_/node_modules/@ozwasyd/element-plus/global.d.ts",
+      "line": 108,
+      "column": 56,
+      "code": 2339,
+      "message": "Property 'ElOption' does not exist on type 'typeof import(\"/workspace/.setup/public-declaration-closure/authority-final-consumer/node_modules/.pnpm/@ozwasyd+element-plus@file+..+authority-final-candidate.tgz_vue@3.5.32_typescript@6.0.2_/node_modules/@ozwasyd/element-plus/es/index\")'."
+    },
+    {
+      "file": "node_modules/.pnpm/@ozwasyd+element-plus@file+..+authority-final-candidate.tgz_vue@3.5.32_typescript@6.0.2_/node_modules/@ozwasyd/element-plus/global.d.ts",
+      "line": 109,
+      "column": 61,
+      "code": 2339,
+      "message": "Property 'ElOptionGroup' does not exist on type 'typeof import(\"/workspace/.setup/public-declaration-closure/authority-final-consumer/node_modules/.pnpm/@ozwasyd+element-plus@file+..+authority-final-candidate.tgz_vue@3.5.32_typescript@6.0.2_/node_modules/@ozwasyd/element-plus/es/index\")'."
+    },
+    {
+      "file": "node_modules/.pnpm/@ozwasyd+element-plus@file+..+authority-final-candidate.tgz_vue@3.5.32_typescript@6.0.2_/node_modules/@ozwasyd/element-plus/global.d.ts",
+      "line": 136,
+      "column": 56,
+      "code": 2339,
+      "message": "Property 'ElSelect' does not exist on type 'typeof import(\"/workspace/.setup/public-declaration-closure/authority-final-consumer/node_modules/.pnpm/@ozwasyd+element-plus@file+..+authority-final-candidate.tgz_vue@3.5.32_typescript@6.0.2_/node_modules/@ozwasyd/element-plus/es/index\")'."
+    },
+    {
+      "file": "node_modules/.pnpm/@ozwasyd+element-plus@file+..+authority-final-candidate.tgz_vue@3.5.32_typescript@6.0.2_/node_modules/@ozwasyd/element-plus/global.d.ts",
+      "line": 141,
+      "column": 56,
+      "code": 2339,
+      "message": "Property 'ElSlider' does not exist on type 'typeof import(\"/workspace/.setup/public-declaration-closure/authority-final-consumer/node_modules/.pnpm/@ozwasyd+element-plus@file+..+authority-final-candidate.tgz_vue@3.5.32_typescript@6.0.2_/node_modules/@ozwasyd/element-plus/es/index\")'."
+    },
+    {
+      "file": "node_modules/.pnpm/@ozwasyd+element-plus@file+..+authority-final-candidate.tgz_vue@3.5.32_typescript@6.0.2_/node_modules/@ozwasyd/element-plus/global.d.ts",
+      "line": 157,
+      "column": 60,
+      "code": 2339,
+      "message": "Property 'ElTimeSelect' does not exist on type 'typeof import(\"/workspace/.setup/public-declaration-closure/authority-final-consumer/node_modules/.pnpm/@ozwasyd+element-plus@file+..+authority-final-candidate.tgz_vue@3.5.32_typescript@6.0.2_/node_modules/@ozwasyd/element-plus/es/index\")'."
+    }
+  ]
+}

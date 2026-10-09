@@ -1,0 +1,5 @@
+
+> @ deps:check /workspace/FsusUI-public-declaration-integration
+> node ./scripts/deps-check.mjs
+
+[deps:check] ok authority=config/dependencies/npm-authority.json packages=94 drifts=0

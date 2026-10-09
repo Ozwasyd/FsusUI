@@ -1,0 +1,8 @@
+{
+  "sourceSha": "2d05f240e5fb04ac0cd602b4ed638ffe00b1859b",
+  "predecessor": "6b735fa3be7b6500de49e79c0a0dfee7cef12b83",
+  "changedPaths": [
+    "config/dependencies/npm-authority.json"
+  ],
+  "allComponentTestConfigPackageLockAndProducerScriptBytesUnchanged": true
+}

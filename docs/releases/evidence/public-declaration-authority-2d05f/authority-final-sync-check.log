@@ -1,0 +1,13 @@
+
+> @ test:deps-sync /workspace/FsusUI-public-declaration-integration
+> node ./scripts/test-deps-sync.mjs
+
+[test-deps-sync] ok: no script-local versions / registry latest
+[test-deps-sync] ok: projection reads authority (mutation kills hardcoded pin)
+[test-deps-sync] ok: deterministic dependency key order
+[test-deps-sync] ok: published-source projection (ranges + workspace + exact dev)
+[test-deps-sync] ok: missed consumer fixture fails
+[test-deps-sync] ok: idempotent projection (second pass zero diff)
+[test-deps-sync] ok: controlled manifest coverage
+[test-deps-sync] ok: sortObjectKeys
+[test-deps-sync] all mutation tests passed

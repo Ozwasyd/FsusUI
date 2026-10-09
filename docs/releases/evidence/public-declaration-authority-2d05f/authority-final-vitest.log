@@ -1,0 +1,7 @@
+
+> @ typecheck:vitest:no-cache /workspace/FsusUI-public-declaration-integration
+> node ./scripts/with-node-heap.mjs node ./scripts/run-typecheck.mjs vitest --no-cache
+
+[typecheck:vitest] no-cache project=vue/tsconfig.vitest.json
+vue/packages/components/table/__tests__/table-core-popper-return.test-d.ts(16,3): error TS2344: Type 'false' does not satisfy the constraint 'true'.
+ ELIFECYCLE  Command failed with exit code 2.

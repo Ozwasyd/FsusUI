@@ -1,0 +1,73 @@
+{
+  "sourceSha": "2d05f240e5fb04ac0cd602b4ed638ffe00b1859b",
+  "strict": true,
+  "skipLibCheck": false,
+  "checks": [
+    {
+      "config": "tsconfig.all.json",
+      "result": "FAIL",
+      "exitCode": 2,
+      "count": 10,
+      "codes": {
+        "2307": 4,
+        "2339": 6
+      }
+    },
+    {
+      "config": "tsconfig.deep-context.json",
+      "result": "PASS",
+      "exitCode": 0,
+      "count": 0,
+      "codes": {}
+    },
+    {
+      "config": "tsconfig.deep-context-node16.json",
+      "result": "PASS",
+      "exitCode": 0,
+      "count": 0,
+      "codes": {}
+    },
+    {
+      "config": "tsconfig.deep-reveal.json",
+      "result": "PASS",
+      "exitCode": 0,
+      "count": 0,
+      "codes": {}
+    },
+    {
+      "config": "tsconfig.deep-reveal-node16.json",
+      "result": "PASS",
+      "exitCode": 0,
+      "count": 0,
+      "codes": {}
+    },
+    {
+      "config": "tsconfig.deep-scroll-timeline.json",
+      "result": "PASS",
+      "exitCode": 0,
+      "count": 0,
+      "codes": {}
+    },
+    {
+      "config": "tsconfig.deep-scroll-timeline-node16.json",
+      "result": "PASS",
+      "exitCode": 0,
+      "count": 0,
+      "codes": {}
+    },
+    {
+      "config": "tsconfig.deep.json",
+      "result": "PASS",
+      "exitCode": 0,
+      "count": 0,
+      "codes": {}
+    },
+    {
+      "config": "tsconfig.deep-node16.json",
+      "result": "PASS",
+      "exitCode": 0,
+      "count": 0,
+      "codes": {}
+    }
+  ]
+}

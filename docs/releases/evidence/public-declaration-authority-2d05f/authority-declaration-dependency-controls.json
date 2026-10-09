@@ -1,0 +1,56 @@
+{
+  "sourceSha": "2d05f240e5fb04ac0cd602b4ed638ffe00b1859b",
+  "officialCheckerUnchanged": true,
+  "sourceManifestAndInstallPinsUnchanged": true,
+  "cases": [
+    {
+      "control": "published projection preserves existing source declaration dependency",
+      "id": "type-fest",
+      "result": "PASS"
+    },
+    {
+      "control": "removing only the published authority entry fails official source drift checker",
+      "id": "type-fest",
+      "result": "PASS"
+    },
+    {
+      "control": "published projection preserves existing source declaration dependency",
+      "id": "vue-router",
+      "result": "PASS"
+    },
+    {
+      "control": "removing only the published authority entry fails official source drift checker",
+      "id": "vue-router",
+      "result": "PASS"
+    },
+    {
+      "control": "actual canonical artifact checked by official published dependency checker",
+      "phase": "before",
+      "result": "PASS",
+      "expectedDiagnostics": 2,
+      "actualDiagnostics": [
+        {
+          "file": "vue/packages/element-plus/package.json",
+          "field": "dependencies.type-fest",
+          "expected": "4.41.0",
+          "actual": "<absent>",
+          "code": "candidate-source-drift"
+        },
+        {
+          "file": "vue/packages/element-plus/package.json",
+          "field": "dependencies.vue-router",
+          "expected": "4.6.4",
+          "actual": "<absent>",
+          "code": "candidate-source-drift"
+        }
+      ]
+    },
+    {
+      "control": "actual canonical artifact checked by official published dependency checker",
+      "phase": "after",
+      "result": "PASS",
+      "expectedDiagnostics": 0,
+      "actualDiagnostics": []
+    }
+  ]
+}

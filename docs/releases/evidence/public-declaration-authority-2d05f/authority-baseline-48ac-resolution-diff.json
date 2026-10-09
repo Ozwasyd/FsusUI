@@ -1,0 +1,20 @@
+{
+  "packages": {
+    "added": [],
+    "removed": [
+      "@vue/devtools-api@6.6.4",
+      "type-fest@4.41.0",
+      "vue-router@4.6.4"
+    ],
+    "changed": []
+  },
+  "snapshots": {
+    "added": [],
+    "removed": [
+      "@vue/devtools-api@6.6.4",
+      "type-fest@4.41.0",
+      "vue-router@4.6.4(vue@3.5.32(typescript@6.0.2))"
+    ],
+    "changed": []
+  }
+}

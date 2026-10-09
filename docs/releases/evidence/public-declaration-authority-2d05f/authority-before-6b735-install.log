@@ -1,0 +1,17 @@
+Lockfile is up to date, resolution step is skipped
+Progress: resolved 1, reused 0, downloaded 0, added 0
+Packages: +221
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+Progress: resolved 221, reused 221, downloaded 0, added 221, done
+
+dependencies:
++ @ozwasyd/element-plus 1.5.1
++ vue 3.5.32
+
+devDependencies:
++ @vitejs/plugin-vue 6.0.5
++ typescript 6.0.2
++ vite 7.3.1
++ vue-tsc 3.2.6
+
+Done in 863ms using pnpm v10.33.0

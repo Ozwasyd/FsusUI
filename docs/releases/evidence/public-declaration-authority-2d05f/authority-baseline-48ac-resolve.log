@@ -1,0 +1,5 @@
+Progress: resolved 1, reused 0, downloaded 0, added 0
+Progress: resolved 5, reused 0, downloaded 0, added 0
+ ERR_PNPM_NO_OFFLINE_META  Failed to resolve @ctrl/tinycolor@>=3.4.1 <4.0.0-0 in package mirror /workspace/.setup/pnpm-cache/pnpm/metadata-v1.3/registry.npmjs.org/@ctrl/tinycolor.json
+
+This error happened while installing the dependencies of @ozwasyd/element-plus@1.5.1

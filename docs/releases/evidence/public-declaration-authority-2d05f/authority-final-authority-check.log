@@ -1,0 +1,5 @@
+
+> @ deps:authority:check /workspace/FsusUI-public-declaration-integration
+> node ./scripts/check-npm-authority.mjs
+
+[npm-authority] check ok packages=94
