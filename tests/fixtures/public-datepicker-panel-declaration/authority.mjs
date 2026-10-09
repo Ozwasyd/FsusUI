@@ -9,8 +9,10 @@ import {
   readFileSync,
   readdirSync,
   readlinkSync,
+  realpathSync,
   rmSync,
 } from 'node:fs'
+import { createRequire } from 'node:module'
 import os from 'node:os'
 import path from 'node:path'
 import { URL } from 'node:url'
@@ -111,6 +113,47 @@ function packageTree(root, directory = root) {
     })
 }
 
+function installationAdditions(consumer, packageRoot, reference) {
+  const installedRoot = realpathSync(
+    path.join(consumer, 'node_modules/@ozwasyd/element-plus'),
+  )
+  const requireInstalled = createRequire(
+    path.join(installedRoot, 'package.json'),
+  )
+  const katexManifestPath = requireInstalled.resolve('katex/package.json')
+  const katex = JSON.parse(readFileSync(katexManifestPath, 'utf8'))
+  assert.equal(katex.version, '0.17.0')
+  assert.equal(katex.bin, 'cli.js')
+  const katexRoot = path.dirname(katexManifestPath)
+  const target = path.relative(
+    path.join(installedRoot, 'node_modules/.bin'),
+    path.join(katexRoot, katex.bin),
+  )
+  const nodePath = [
+    path.join(katexRoot, 'node_modules'),
+    path.dirname(katexRoot),
+    path.join(realpathSync(consumer), 'node_modules/.pnpm/node_modules'),
+  ].join(path.delimiter)
+  const nodePathBlock = `if [ -z "$NODE_PATH" ]; then
+  export NODE_PATH="${nodePath}"
+else
+  export NODE_PATH="${nodePath}:$NODE_PATH"
+fi
+`
+  return reference.installationAdditions.map(([file, recordedDigest]) => {
+    assert.equal(file, 'node_modules/.bin/katex')
+    const shim = readFileSync(path.join(packageRoot, file), 'utf8')
+    const normalized = shim.replace(nodePathBlock, '')
+    assert.equal(
+      digest(normalized),
+      recordedDigest,
+      'the installed launcher must match the pinned pnpm template and exact dependency paths',
+    )
+    assert.equal(normalized.split(`"$basedir/${target}"`).length - 1, 2)
+    return [file, digest(shim)]
+  })
+}
+
 export function readArtifactAuthority(root, consumer, packageRoot) {
   const consumerManifest = JSON.parse(
     readFileSync(path.join(consumer, 'package.json'), 'utf8'),
@@ -208,6 +251,11 @@ export function readArtifactAuthority(root, consumer, packageRoot) {
         'a rebuild must match every file of the actual same-source canonical package build',
       )
     }
+    artifact.installationAdditions = installationAdditions(
+      consumer,
+      packageRoot,
+      reference,
+    )
     assert.deepEqual(
       Object.fromEntries(packageTree(packageRoot)),
       {

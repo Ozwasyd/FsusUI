@@ -298,6 +298,19 @@ test('canonical panel candidates reject damaged payloads and unproven manifests'
       () => readArtifactAuthority(root, consumer, extracted),
       /installed package must contain the exact verified tarball bytes/,
     )
+    copyFileSync(
+      path.join(packageRoot, 'es/components/date-picker/src/panel-utils.mjs'),
+      runtime,
+    )
+    const launcher = path.join(extracted, 'node_modules/.bin/katex')
+    writeFileSync(
+      launcher,
+      `${readFileSync(launcher, 'utf8')}\n# damaged-launcher-control\n`,
+    )
+    assert.throws(
+      () => readArtifactAuthority(root, consumer, extracted),
+      /installed launcher must match the pinned pnpm template and exact dependency paths/,
+    )
 
     const candidate = path.join(temporary, 'candidate')
     mkdirSync(candidate)

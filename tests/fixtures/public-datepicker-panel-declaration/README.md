@@ -53,8 +53,12 @@ publication and diagnostic comparison rules remain in
 `docs/releases/policy/npm-registry.md`.
 
 The test compares every installed
-package file with the extracted real tarball, plus the exact recorded pnpm KaTeX
-binary shim added during installation. Other additions or changed bytes fail.
+package file with the extracted real tarball, plus the pnpm KaTeX binary shim
+added during installation. The launcher must match the recorded pinned pnpm
+template byte for byte after removing only its exact installation-derived
+`NODE_PATH` block. Its two binary targets must resolve to the actual pinned
+KaTeX 0.17.0 CLI. Its complete installed digest is then recorded; changed
+launcher commands, paths, payload bytes, or other additions fail.
 The known independent artifact must
 produce exactly its four recorded missing-barrel diagnostics; the real combination
 must produce none. Both must reject the same four negative calls at their precise
