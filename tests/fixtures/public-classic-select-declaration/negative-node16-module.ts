@@ -1,4 +1,4 @@
-import CjsSelectModule, { ElSelect } from '@ozwasyd/element-plus/lib/components/select'
+import CjsSelectModule, { type ElSelect } from '@ozwasyd/element-plus/lib/components/select'
 import type { App } from 'vue'
 
 declare const app: App

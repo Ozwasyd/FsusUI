@@ -1,8 +1,8 @@
-import { ElSelect } from '@ozwasyd/element-plus/es/components/select'
+import { type ElSelect } from '@ozwasyd/element-plus/es/components/select'
 
 type Props = InstanceType<typeof ElSelect>['$props']
 type Assert<T extends true> = T
-type OptionalPopperOptions = Assert<undefined extends Props['popperOptions'] ? true : false>
+export type OptionalPopperOptions = Assert<undefined extends Props['popperOptions'] ? true : false>
 
 const invalidPlacement: Props = { popperOptions: { placement: 123 } }
 const invalidStrategy: Props = { popperOptions: { strategy: 'invalid' } }

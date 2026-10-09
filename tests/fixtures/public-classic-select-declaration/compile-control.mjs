@@ -18,8 +18,8 @@ const program = ts.createProgram(files.map((file) => path.join(root, file)), {
   moduleResolution: mode === 'node16' ? ts.ModuleResolutionKind.Node16 : ts.ModuleResolutionKind.Bundler,
   lib: ['lib.es2022.d.ts', 'lib.dom.d.ts', 'lib.dom.iterable.d.ts'], types: [], esModuleInterop: true,
 })
-console.log(JSON.stringify(ts.getPreEmitDiagnostics(program).map((row) => ({
+process.stdout.write(`${JSON.stringify(ts.getPreEmitDiagnostics(program).map((row) => ({
   file: row.file && path.relative(root, row.file.fileName),
   line: row.file && row.start != null ? row.file.getLineAndCharacterOfPosition(row.start).line + 1 : null,
   code: row.code, message: ts.flattenDiagnosticMessageText(row.messageText, '\n'),
-}))))
+})))}\n`)

@@ -3,6 +3,7 @@ import { createHash } from 'node:crypto'
 import { execFileSync } from 'node:child_process'
 import { readFile } from 'node:fs/promises'
 import path from 'node:path'
+import { URL } from 'node:url'
 
 const authority = JSON.parse(await readFile(new URL('./authority.json', import.meta.url), 'utf8'))
 const hash = (value) => createHash('sha256').update(value).digest('hex')

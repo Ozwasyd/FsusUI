@@ -1,4 +1,4 @@
-import { ElSelect, ElOption, ElOptionGroup } from '@ozwasyd/element-plus/es/components/select'
+import { type ElSelect, type ElOption, type ElOptionGroup } from '@ozwasyd/element-plus/es/components/select'
 import type { SelectTooltipRef } from '@ozwasyd/element-plus/es/components/select/src/useSelect'
 
 const invalidSize: InstanceType<typeof ElSelect>['$props'] = { size: 'giant' }

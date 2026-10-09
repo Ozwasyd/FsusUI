@@ -1,6 +1,6 @@
 import Select, { ElSelect, ElOption, ElOptionGroup } from '@ozwasyd/element-plus/es/components/select'
-import CjsSelect, { ElSelect as CjsNamedSelect } from '@ozwasyd/element-plus/lib/components/select'
-import { useSelect, type SelectTooltipRef } from '@ozwasyd/element-plus/es/components/select/src/useSelect'
+import CjsSelect, { type ElSelect as CjsNamedSelect } from '@ozwasyd/element-plus/lib/components/select'
+import { type useSelect, type SelectTooltipRef } from '@ozwasyd/element-plus/es/components/select/src/useSelect'
 import type { App } from 'vue'
 
 declare const app: App

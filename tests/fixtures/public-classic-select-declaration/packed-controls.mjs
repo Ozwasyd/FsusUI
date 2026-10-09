@@ -34,7 +34,7 @@ for (const mode of ['bundler', 'node16']) {
     const diagnostics = compile(mode, filename)
     const record = { authority: authority.name, mode, name, filename, strict: true, skipLibCheck: false, rawCompile: diagnostics.length ? 'FAIL' : 'PASS', diagnostics }
     results.push(record)
-    await writeFile(path.join(consumerRoot, `${mode}-${name}-diagnostics.json`), JSON.stringify(record, null, 2) + '\n')
+    await writeFile(path.join(consumerRoot, `${mode}-${name}-diagnostics.json`), `${JSON.stringify(record, null, 2)}\n`)
     assertInstalledDiagnostics(authority, mode, name, diagnostics)
     if (name === 'negative') {
       const fixtureErrors = diagnostics.filter((row) => row.file === 'negative.ts')
@@ -46,11 +46,11 @@ for (const mode of ['bundler', 'node16']) {
 const unexpected = path.join(consumerRoot, 'unexpected-diagnostic.ts')
 await writeFile(unexpected, 'export const unrelatedValue: number = "unexpected";\n')
 const refusalDiagnostics = compile('bundler', 'positive.ts', 'unexpected-diagnostic.ts')
-await writeFile(path.join(consumerRoot, 'unknown-diagnostic-refusal.json'), JSON.stringify({ diagnostics: refusalDiagnostics, expectedAuthorityResult: 'FAIL' }, null, 2) + '\n')
+await writeFile(path.join(consumerRoot, 'unknown-diagnostic-refusal.json'), `${JSON.stringify({ diagnostics: refusalDiagnostics, expectedAuthorityResult: 'FAIL' }, null, 2)}\n`)
 assert.equal(refusalDiagnostics.filter((row) => row.file === 'unexpected-diagnostic.ts' && row.code === 2322).length, 1)
 assert.throws(() => assertInstalledDiagnostics(authority, 'bundler', 'positive', refusalDiagnostics), /Every diagnostic must match/)
 const runtimeDefaults = authority.node16ModuleObject ? JSON.parse(execFileSync(process.execPath, [path.join(import.meta.dirname, 'runtime-default-controls.mjs'), consumerRoot], { encoding: 'utf8' }).trim()) : { result: 'UNRUN: legacy declaration/exports boundary; original failures retained' }
-await writeFile(path.join(consumerRoot, 'packed-control-results.json'), JSON.stringify({
+await writeFile(path.join(consumerRoot, 'packed-control-results.json'), `${JSON.stringify({
   authority: authority.name,
   compiler: ts.version, vue: requireConsumer('vue/package.json').version,
   package: { name: packageJson.name, version: packageJson.version, dependencies: packageJson.dependencies },
@@ -59,5 +59,5 @@ await writeFile(path.join(consumerRoot, 'packed-control-results.json'), JSON.str
   runtimeDefaults,
   packageQualification: Object.fromEntries(['bundler', 'node16'].map((mode) => [mode, results.find((row) => row.mode === mode && row.name === 'whole-package').rawCompile])),
   results,
-}, null, 2) + '\n')
-console.log(`${authority.name}: exact diagnostic controls PASS; all original eight negatives rejected in both modes. Whole-package Bundler ${results.find((row) => row.mode === 'bundler' && row.name === 'whole-package').rawCompile}; whole-package Node16 ${results.find((row) => row.mode === 'node16' && row.name === 'whole-package').rawCompile}. Every raw result is retained separately from expectation controls.`)
+}, null, 2)}\n`)
+process.stdout.write(`${authority.name}: exact diagnostic controls PASS; all original eight negatives rejected in both modes. Whole-package Bundler ${results.find((row) => row.mode === 'bundler' && row.name === 'whole-package').rawCompile}; whole-package Node16 ${results.find((row) => row.mode === 'node16' && row.name === 'whole-package').rawCompile}. Every raw result is retained separately from expectation controls.\n`)

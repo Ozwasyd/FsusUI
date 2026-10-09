@@ -43,5 +43,5 @@ await build(buildOptions(resolvedEntry))
 const { evidence } = await import(pathToFileURL(path.join(outDir, 'defaults.mjs')))
 assert.deepEqual(evidence, { cjsDefaultIsNamed: true, optionExtra: true, groupExtra: true, installer: true })
 const result = { authority: authority.name, nativeNode: process.version, vite: '7.3.1', native: nativeEvidence, bundler: evidence, packageBundlerImport, loaderContractControls: 'PASS on the actual require-resolved CJS file', publicImportQualification: nativeEvidence.nativePackageImport.status === 'PASS' && packageBundlerImport.status === 'PASS' ? 'PASS' : 'FAIL' }
-await writeFile(path.join(consumer, 'runtime-default-results.json'), JSON.stringify(result, null, 2) + '\n')
-console.log(JSON.stringify(result))
+await writeFile(path.join(consumer, 'runtime-default-results.json'), `${JSON.stringify(result, null, 2)}\n`)
+process.stdout.write(`${JSON.stringify(result)}\n`)
