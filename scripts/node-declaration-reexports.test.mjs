@@ -27,6 +27,64 @@ export declare function overload(value: number): string;
 `
 
 const cases = {
+  privateGenericNominalConstraint: {
+    dependency:
+      'declare class Hidden { private brand; key: string } export declare class GenericBox<T extends Hidden = Hidden> { constructor(value:T); value:T; } export {};',
+    input: "export { GenericBox } from 'dep';",
+    positive:
+      'import { GenericBox } from ENTRY; import type {GenericBox as Original} from "dep" with {"resolution-mode":"import"}; declare const original: Original; const box: GenericBox = original;',
+    negative:
+      'import { GenericBox } from ENTRY; type Invalid = GenericBox<{key:string}>;',
+    codes: [2344],
+  },
+  privateGenericDefaultAfterRequiredParameter: {
+    dependency:
+      'interface Hidden { key: string } export declare class Pair<T, U extends Hidden = Hidden> { constructor(first:T,value:U); first:T; value:U; } export {};',
+    input: "export { Pair } from 'dep';",
+    positive:
+      'import { Pair } from ENTRY; const pair: Pair<number> = new Pair(1,{key:"ok"}); const first: number = pair.first; const key: string = pair.value.key;',
+    negative: 'import { Pair } from ENTRY; type Invalid = Pair<number,number>;',
+    codes: [2344],
+  },
+  privateGenericConstraintAndDefault: {
+    dependency:
+      'interface Hidden { key: string } export declare class GenericBox<T extends Hidden = Hidden> { constructor(value:T); value:T; } export {};',
+    input: "export { GenericBox } from 'dep';",
+    positive:
+      'import { GenericBox } from ENTRY; const box: GenericBox = new GenericBox({key:"ok"}); const key: string = box.value.key;',
+    negative:
+      'import { GenericBox } from ENTRY; type Invalid = GenericBox<number>;',
+    codes: [2344],
+  },
+  privateGenericNarrowDefault: {
+    dependency:
+      'interface Hidden { key: string } interface Default extends Hidden { tag: "default" } export declare class GenericBox<T extends Hidden = Default> { constructor(value:T); value:T; } export {};',
+    input: "export { GenericBox } from 'dep';",
+    positive:
+      'import { GenericBox } from ENTRY; declare const box: GenericBox; const tag: "default" = box.value.tag; const inferred = new GenericBox({key:"ok"}); const key: string = inferred.value.key;',
+    negative:
+      'import { GenericBox } from ENTRY; type Invalid = GenericBox<number>;',
+    codes: [2344],
+  },
+  privateGenericOwnerRemainsPrivate: {
+    dependency:
+      'interface Hidden { key: string } export declare class GenericBox<T extends Hidden = Hidden> { constructor(value:T); value:T; } export {};',
+    input: "export { GenericBox } from 'dep';",
+    positive:
+      'import { GenericBox } from ENTRY; const box: GenericBox = new GenericBox({key:"ok"});',
+    negative: 'import { Hidden } from ENTRY;',
+    codes: [2305],
+  },
+  constGenericClass: {
+    dependency:
+      'export declare class ConstBox<const T> { constructor(value:T); value:T; } export {};',
+    input: "export { ConstBox } from 'dep';",
+    positive:
+      'import { ConstBox } from ENTRY; const box: ConstBox<{readonly key:"ok"}> = new ConstBox({key:"ok"}); const key: "ok" = box.value.key;',
+    negative:
+      'import { ConstBox } from ENTRY; const box = new ConstBox({key:"ok"}); box.value.key = "changed";',
+    codes: [2540],
+  },
   mixed: {
     input: "export { keep, type Item } from 'dep';",
     positive:
@@ -179,11 +237,14 @@ for (const [name, fixture] of Object.entries(cases)) {
       }),
     )
     assert.deepEqual(
-      ts.createSourceFile('dep.d.mts', dependency, ts.ScriptTarget.Latest)
-        .parseDiagnostics,
+      ts.createSourceFile(
+        'dep.d.mts',
+        fixture.dependency ?? dependency,
+        ts.ScriptTarget.Latest,
+      ).parseDiagnostics,
       [],
     )
-    await put('node_modules/dep/index.d.mts', dependency)
+    await put('node_modules/dep/index.d.mts', fixture.dependency ?? dependency)
     await put('original.d.mts', fixture.input)
     const filename = path.join(root, 'rewritten.d.ts')
     const output = rewriteNodeDeclaration(
