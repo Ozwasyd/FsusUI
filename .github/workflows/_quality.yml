@@ -132,7 +132,11 @@ jobs:
           key: ${{ runner.os }}-${{ runner.arch }}-fsusui-dotnet-sdk-${{ hashFiles('dotnet/global.json') }}-${{ hashFiles('dotnet/**/*.csproj', 'dotnet/**/*.props', 'dotnet/**/*.targets', 'dotnet/**/*.slnx', 'dotnet/**/packages.lock.json', 'NuGet.config') }}
           restore-keys: |
             ${{ runner.os }}-${{ runner.arch }}-fsusui-dotnet-sdk-${{ hashFiles('dotnet/global.json') }}-
+      - name: Set up PDF inspection tools
+        uses: ./.github/actions/setup-pdf-tools
       - name: Run platform-owned restore, build, tests, and smoke
+        env:
+          FSUS_WEBVIEW_CANDIDATE_SHA: ${{ github.sha }}
         run: node scripts/dotnet-platform-verify.mjs --output dotnet/artifacts/platform/${{ matrix.platform }}/manifest.json
       - uses: actions/upload-artifact@v4
         if: always()
