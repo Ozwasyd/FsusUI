@@ -135,7 +135,7 @@ test('actual installed tarball checks strict slider positive and negative contro
     else {
       assert.deepEqual(
         local.map((d) => d.line).sort((a, b) => a - b),
-        [7, 9, 10, 12, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 27],
+        [8, 10, 11, 13, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 28],
         JSON.stringify(local, null, 2),
       )
       assert.ok(
