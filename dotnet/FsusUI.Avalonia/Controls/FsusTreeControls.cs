@@ -964,7 +964,10 @@ public class FsusTree : ContentControl
         continue;
       }
 
-      rowsPanel.Children.Remove(row);
+      if (ReferenceEquals(row.Parent, rowsPanel))
+      {
+        rowsPanel.Children.Remove(row);
+      }
       rowsPanel.Children.Insert(index, row);
     }
     renderedPresenter = RowPresenter;

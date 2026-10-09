@@ -25,12 +25,6 @@ public class FsusTreeRowRetentionTests
     var panel = Assert.IsType<StackPanel>(tree.Content);
     var originalRows = panel.Children.Cast<Border>().ToArray();
     var originalLabels = originalRows.Select(row => row.Child).ToArray();
-    var detachments = 0;
-    foreach (var row in originalRows)
-    {
-      row.DetachedFromLogicalTree += (_, _) => detachments++;
-    }
-
     Assert.True(tree.Expand("p-500"));
     Assert.True(tree.FocusNode("p-501"));
     Assert.Equal(1010, panel.Children.Count);
@@ -48,7 +42,6 @@ public class FsusTreeRowRetentionTests
     Assert.Equal(originalRows, panel.Children.Cast<Border>());
     Assert.All(children, child => Assert.Null(child.Parent));
     Assert.StartsWith("▸", Assert.IsType<TextBlock>(originalRows[500].Child).Text);
-    Assert.Equal(0, detachments);
   }
 
   [Fact]
@@ -73,15 +66,22 @@ public class FsusTreeRowRetentionTests
     Assert.Equal(1, AutomationProperties.GetPositionInSet(secondRow));
     Assert.Equal(2, AutomationProperties.GetPositionInSet(firstRow));
 
-    tree.Nodes[1] = new FsusTreeNode("first", "Replacement") { IsDisabled = true };
+    var replacementNode = new FsusTreeNode("first", "Replacement") { IsDisabled = true };
+    tree.Nodes[1] = replacementNode;
     tree.RefreshView();
     var replacement = Assert.IsType<Border>(panel.Children[1]);
     Assert.NotSame(firstRow, replacement);
     Assert.Null(firstRow.Parent);
     Assert.Equal("Replacement", AutomationProperties.GetName(replacement));
     Assert.False(replacement.IsEnabled);
+    // A stale subscription would rebuild the current row with this reused key.
+    var replacementContent = replacement.Child;
     first.Label = "Obsolete";
+    Assert.Same(replacementContent, replacement.Child);
     Assert.Equal("Replacement", AutomationProperties.GetName(replacement));
+    replacementNode.Label = "Replacement updated";
+    Assert.NotSame(replacementContent, replacement.Child);
+    Assert.Equal("Replacement updated", AutomationProperties.GetName(replacement));
 
     tree.Nodes.RemoveAt(1);
     tree.RefreshView();
@@ -89,6 +89,18 @@ public class FsusTreeRowRetentionTests
     Assert.Equal(1, AutomationProperties.GetSizeOfSet(secondRow));
     Assert.False(tree.RefreshNodePresentation("first"));
     Assert.Null(replacement.Parent);
+
+    var readdedNode = new FsusTreeNode("first", "Readded");
+    tree.Nodes.Add(readdedNode);
+    tree.RefreshView();
+    var readdedRow = Assert.IsType<Border>(panel.Children[1]);
+    var readdedContent = readdedRow.Child;
+    replacementNode.Label = "Removed replacement";
+    Assert.Same(readdedContent, readdedRow.Child);
+    Assert.Equal("Readded", AutomationProperties.GetName(readdedRow));
+    readdedNode.Label = "Readded updated";
+    Assert.NotSame(readdedContent, readdedRow.Child);
+    Assert.Equal("Readded updated", AutomationProperties.GetName(readdedRow));
   }
 
   [Fact]
@@ -142,7 +154,7 @@ public class FsusTreeRowRetentionTests
     Assert.Equal(30, row.MinHeight);
     Assert.Equal(new Thickness(6, 0), row.Padding);
     Assert.Contains("fsus-selected", row.Classes);
-    Assert.Contains("selected", AutomationProperties.GetItemStatus(row));
+    Assert.Equal("selected, leaf, idle, level 1", AutomationProperties.GetItemStatus(row));
 
     node.Label = "Renamed";
     Assert.Equal("  Renamed", Assert.IsType<TextBlock>(row.Child).Text);
@@ -154,7 +166,7 @@ public class FsusTreeRowRetentionTests
     tree.RefreshView();
     Assert.Same(row, Assert.Single(panel.Children));
     Assert.StartsWith("▸", Assert.IsType<TextBlock>(row.Child).Text);
-    Assert.Contains("collapsed", AutomationProperties.GetItemStatus(row));
+    Assert.Equal("selected, collapsed, idle, level 1", AutomationProperties.GetItemStatus(row));
   }
 
   [Fact]

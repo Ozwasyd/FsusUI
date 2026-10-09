@@ -5,6 +5,7 @@ using Avalonia.Controls.Primitives;
 using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
 using Avalonia.Input;
+using Avalonia.LogicalTree;
 using Avalonia.Markup.Xaml.Styling;
 using Avalonia.Threading;
 using FsusUI.Avalonia.Controls;
@@ -40,6 +41,13 @@ public class FsusTreeScrollingHeadlessTests
     {
       Dispatcher.UIThread.RunJobs();
       var panel = Assert.IsType<StackPanel>(tree.Content);
+      var originalRows = panel.Children.Cast<Border>().ToArray();
+      var detachments = originalRows.ToDictionary(original => original, _ => 0);
+      foreach (var original in originalRows)
+      {
+        Assert.True(((ILogical)original).IsAttachedToLogicalTree);
+        original.DetachedFromLogicalTree += (_, _) => detachments[original]++;
+      }
       var row = Assert.IsType<Border>(panel.Children[30]);
       scroll.Offset = new Vector(0, 900);
       Dispatcher.UIThread.RunJobs();
@@ -80,6 +88,16 @@ public class FsusTreeScrollingHeadlessTests
       Dispatcher.UIThread.RunJobs();
       Assert.Equal(offset, scroll.Offset);
       Assert.Same(row, panel.Children[30]);
+      Assert.All(originalRows, original => Assert.Equal(0, detachments[original]));
+
+      // Prove each event observer is live by detaching the mounted root content.
+      window.Content = null;
+      Dispatcher.UIThread.RunJobs();
+      Assert.All(originalRows, original =>
+      {
+        Assert.Equal(1, detachments[original]);
+        Assert.False(((ILogical)original).IsAttachedToLogicalTree);
+      });
     }
     finally
     {
