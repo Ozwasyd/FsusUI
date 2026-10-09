@@ -1,8 +1,8 @@
 diff --git a/dist/index.cjs b/dist/index.cjs
-index 47629a02152a7d2a090c63bd4b3ccc1739b78476..6001aa6ebf51b3256b07c0c9ea329599f9e25fe0 100644
+index 47629a02152a7d2a090c63bd4b3ccc1739b78476..1ade82c6ee5c12efd5d608776486561eeeadc5c4 100644
 --- a/dist/index.cjs
 +++ b/dist/index.cjs
-@@ -558,12 +558,126 @@ async function resolveTSReferencedType(ref, stacks = []) {
+@@ -558,12 +558,142 @@ async function resolveTSReferencedType(ref, stacks = []) {
  }
  
  // src/ts/namespace.ts
@@ -15,6 +15,7 @@ index 47629a02152a7d2a090c63bd4b3ccc1739b78476..6001aa6ebf51b3256b07c0c9ea329599
 +// entire dependency graph to complete, including failures discovered later.
 +var namespaceResolutions = new WeakMap();
 +var namespacePending = new Set();
++var namespaceBindings = new WeakMap();
 +var namespaceContext = new AsyncLocalStorage();
 +function namespaceWaitsFor(scope, target, seen = new Set()) {
 +  if (scope === target) return true;
@@ -48,8 +49,11 @@ index 47629a02152a7d2a090c63bd4b3ccc1739b78476..6001aa6ebf51b3256b07c0c9ea329599
 +      for (const source of state.exportAll || []) {
 +        for (const name of Object.keys(source)) {
 +          if (state.explicitExports.has(name)) continue;
-+          if (!Object.hasOwn(scope.exports, name)) changed = true;
-+          namespaceBinding(scope.exports, name, source, name);
++          const owner = namespaceBindingOwner(source, name);
++          if (owner) {
++            if (!Object.hasOwn(scope.exports, name)) changed = true;
++            namespaceBinding(scope.exports, name, owner.source, owner.name);
++          }
 +        }
 +      }
 +    }
@@ -119,7 +123,19 @@ index 47629a02152a7d2a090c63bd4b3ccc1739b78476..6001aa6ebf51b3256b07c0c9ea329599
 +    callerState?.waitingOn.delete(scope);
 +  }
 +}
++function namespaceBindingOwner(source, name, seen = new WeakMap()) {
++  let names = seen.get(source);
++  if (names?.has(name)) return;
++  if (!names) seen.set(source, names = new Set());
++  names.add(name);
++  const binding = namespaceBindings.get(source)?.get(name);
++  if (binding) return namespaceBindingOwner(binding.source, binding.name, seen);
++  if (Object.hasOwn(source, name)) return { source, name };
++}
 +function namespaceBinding(target, name, source, sourceName) {
++  let bindings = namespaceBindings.get(target);
++  if (!bindings) namespaceBindings.set(target, bindings = new Map());
++  bindings.set(name, { source, name: sourceName });
 +  Object.defineProperty(target, name, {
 +    configurable: true,
 +    enumerable: true,
@@ -130,7 +146,7 @@ index 47629a02152a7d2a090c63bd4b3ccc1739b78476..6001aa6ebf51b3256b07c0c9ea329599
    const exports2 = {
      [namespaceSymbol]: true
    };
-@@ -574,6 +688,40 @@ async function resolveTSNamespace(scope) {
+@@ -574,6 +704,40 @@ async function resolveTSNamespace(scope) {
    };
    scope.declarations = declarations;
    const { body, file } = resolveTSScope(scope);
@@ -171,7 +187,7 @@ index 47629a02152a7d2a090c63bd4b3ccc1739b78476..6001aa6ebf51b3256b07c0c9ea329599
    for (const stmt of body || []) {
      if (stmt.type === "ExportDefaultDeclaration" && isTSDeclaration(stmt.declaration)) {
        exports2.default = await resolveTSReferencedType({
-@@ -585,7 +733,8 @@ async function resolveTSNamespace(scope) {
+@@ -585,7 +749,8 @@ async function resolveTSNamespace(scope) {
        if (!resolved) continue;
        const sourceScope = await getTSFile(resolved);
        await resolveTSNamespace(sourceScope);
@@ -181,7 +197,7 @@ index 47629a02152a7d2a090c63bd4b3ccc1739b78476..6001aa6ebf51b3256b07c0c9ea329599
      } else if (stmt.type === "ExportNamedDeclaration") {
        let sourceExports;
        if (stmt.source) {
-@@ -609,13 +758,17 @@ async function resolveTSNamespace(scope) {
+@@ -609,13 +774,17 @@ async function resolveTSNamespace(scope) {
            throw new Error(`Unknown export type: ${specifier.type}`);
          }
          const name = specifier.exported.type === "Identifier" ? specifier.exported.name : specifier.exported.value;
@@ -201,7 +217,7 @@ index 47629a02152a7d2a090c63bd4b3ccc1739b78476..6001aa6ebf51b3256b07c0c9ea329599
              scope,
              type: decl
            });
-@@ -646,7 +799,12 @@ async function resolveTSNamespace(scope) {
+@@ -646,7 +815,12 @@ async function resolveTSNamespace(scope) {
          } else {
            throw new Error(`Unknown import type: ${specifier.type}`);
          }
@@ -216,7 +232,7 @@ index 47629a02152a7d2a090c63bd4b3ccc1739b78476..6001aa6ebf51b3256b07c0c9ea329599
      }
    }
 diff --git a/dist/index.js b/dist/index.js
-index ce125685cbf3e602a87155b73a4c72bc12843e7e..ba436e1ff200a94273cf7cdb8a51e61ce37fc745 100644
+index ce125685cbf3e602a87155b73a4c72bc12843e7e..7dbbf40f996bae384ead98883f7109de54df5e1f 100644
 --- a/dist/index.js
 +++ b/dist/index.js
 @@ -1,3 +1,4 @@
@@ -224,7 +240,7 @@ index ce125685cbf3e602a87155b73a4c72bc12843e7e..ba436e1ff200a94273cf7cdb8a51e61c
  // src/index.ts
  export * from "@vue-macros/common";
  
-@@ -518,8 +519,121 @@ var namespaceSymbol = Symbol("namespace");
+@@ -518,8 +519,137 @@ var namespaceSymbol = Symbol("namespace");
  function isTSNamespace(val) {
    return !!val && typeof val === "object" && namespaceSymbol in val;
  }
@@ -232,6 +248,7 @@ index ce125685cbf3e602a87155b73a4c72bc12843e7e..ba436e1ff200a94273cf7cdb8a51e61c
 +// entire dependency graph to complete, including failures discovered later.
 +var namespaceResolutions = new WeakMap();
 +var namespacePending = new Set();
++var namespaceBindings = new WeakMap();
 +var namespaceContext = new AsyncLocalStorage();
 +function namespaceWaitsFor(scope, target, seen = new Set()) {
 +  if (scope === target) return true;
@@ -265,8 +282,11 @@ index ce125685cbf3e602a87155b73a4c72bc12843e7e..ba436e1ff200a94273cf7cdb8a51e61c
 +      for (const source of state.exportAll || []) {
 +        for (const name of Object.keys(source)) {
 +          if (state.explicitExports.has(name)) continue;
-+          if (!Object.hasOwn(scope.exports, name)) changed = true;
-+          namespaceBinding(scope.exports, name, source, name);
++          const owner = namespaceBindingOwner(source, name);
++          if (owner) {
++            if (!Object.hasOwn(scope.exports, name)) changed = true;
++            namespaceBinding(scope.exports, name, owner.source, owner.name);
++          }
 +        }
 +      }
 +    }
@@ -336,7 +356,19 @@ index ce125685cbf3e602a87155b73a4c72bc12843e7e..ba436e1ff200a94273cf7cdb8a51e61c
 +    callerState?.waitingOn.delete(scope);
 +  }
 +}
++function namespaceBindingOwner(source, name, seen = new WeakMap()) {
++  let names = seen.get(source);
++  if (names?.has(name)) return;
++  if (!names) seen.set(source, names = new Set());
++  names.add(name);
++  const binding = namespaceBindings.get(source)?.get(name);
++  if (binding) return namespaceBindingOwner(binding.source, binding.name, seen);
++  if (Object.hasOwn(source, name)) return { source, name };
++}
 +function namespaceBinding(target, name, source, sourceName) {
++  let bindings = namespaceBindings.get(target);
++  if (!bindings) namespaceBindings.set(target, bindings = new Map());
++  bindings.set(name, { source, name: sourceName });
 +  Object.defineProperty(target, name, {
 +    configurable: true,
 +    enumerable: true,
@@ -347,7 +379,7 @@ index ce125685cbf3e602a87155b73a4c72bc12843e7e..ba436e1ff200a94273cf7cdb8a51e61c
    const exports = {
      [namespaceSymbol]: true
    };
-@@ -530,6 +644,40 @@ async function resolveTSNamespace(scope) {
+@@ -530,6 +660,40 @@ async function resolveTSNamespace(scope) {
    };
    scope.declarations = declarations;
    const { body, file } = resolveTSScope(scope);
@@ -388,7 +420,7 @@ index ce125685cbf3e602a87155b73a4c72bc12843e7e..ba436e1ff200a94273cf7cdb8a51e61c
    for (const stmt of body || []) {
      if (stmt.type === "ExportDefaultDeclaration" && isTSDeclaration(stmt.declaration)) {
        exports.default = await resolveTSReferencedType({
-@@ -541,7 +689,8 @@ async function resolveTSNamespace(scope) {
+@@ -541,7 +705,8 @@ async function resolveTSNamespace(scope) {
        if (!resolved) continue;
        const sourceScope = await getTSFile(resolved);
        await resolveTSNamespace(sourceScope);
@@ -398,7 +430,7 @@ index ce125685cbf3e602a87155b73a4c72bc12843e7e..ba436e1ff200a94273cf7cdb8a51e61c
      } else if (stmt.type === "ExportNamedDeclaration") {
        let sourceExports;
        if (stmt.source) {
-@@ -565,13 +714,17 @@ async function resolveTSNamespace(scope) {
+@@ -565,13 +730,17 @@ async function resolveTSNamespace(scope) {
            throw new Error(`Unknown export type: ${specifier.type}`);
          }
          const name = specifier.exported.type === "Identifier" ? specifier.exported.name : specifier.exported.value;
@@ -418,7 +450,7 @@ index ce125685cbf3e602a87155b73a4c72bc12843e7e..ba436e1ff200a94273cf7cdb8a51e61c
              scope,
              type: decl
            });
-@@ -602,7 +755,12 @@ async function resolveTSNamespace(scope) {
+@@ -602,7 +771,12 @@ async function resolveTSNamespace(scope) {
          } else {
            throw new Error(`Unknown import type: ${specifier.type}`);
          }

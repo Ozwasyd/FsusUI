@@ -10,6 +10,7 @@ const require = createRequire(import.meta.url)
 const macroRequire = createRequire(
   require.resolve('unplugin-vue-macros/rollup'),
 )
+const ts = require('typescript')
 const cjs = macroRequire('@vue-macros/api')
 const esm = await import(
   pathToFileURL(
@@ -36,6 +37,51 @@ for (const [format, api] of [
     } finally {
       await rm(root, { recursive: true, force: true })
     }
+  }
+  for (const [order, a] of [
+    ['direct then recursive', "export * from './c'; export * from './b';"],
+    ['recursive then direct', "export * from './b'; export * from './c';"],
+  ]) {
+    test(
+      `${format}: ${order} star exports retain the direct owner through a cycle`,
+      { timeout: 10_000 },
+      () =>
+        fixture(
+          {
+            'a.d.ts': a,
+            'b.d.ts': "export * from './a';",
+            'c.d.ts': 'export interface C { value:string }',
+          },
+          async (root) => {
+            const files = ['a.d.ts', 'b.d.ts', 'c.d.ts'].map((file) =>
+              path.join(root, file),
+            )
+            const program = ts.createProgram(files, {
+              strict: true,
+              skipLibCheck: false,
+              noEmit: true,
+              types: [],
+              target: ts.ScriptTarget.ES2022,
+              module: ts.ModuleKind.Node16,
+              moduleResolution: ts.ModuleResolutionKind.Node16,
+            })
+            assert.deepEqual(
+              ts.getPreEmitDiagnostics(program),
+              [],
+              'the original declaration graph is legal',
+            )
+            const [a, b, c] = await Promise.all(
+              files.map((file) => api.getTSFile(file)),
+            )
+            await api.resolveTSNamespace(a)
+            assert.equal(a.exports.C.type.id.name, 'C')
+            assert.equal(a.exports.C, c.exports.C)
+            assert.equal(b.exports.C, c.exports.C)
+            await api.resolveTSNamespace(b)
+            assert.equal(a.exports.C, b.exports.C)
+          },
+        ),
+    )
   }
   for (const [name, a, b, exported] of [
     [
