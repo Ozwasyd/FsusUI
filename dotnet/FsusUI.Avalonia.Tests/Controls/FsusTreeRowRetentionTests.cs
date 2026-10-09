@@ -34,14 +34,14 @@ public class FsusTreeRowRetentionTests
       Assert.Same(originalRows[index], panel.Children[index + offset]);
       Assert.Same(originalLabels[index], originalRows[index].Child);
     }
-    Assert.StartsWith("▾", Assert.IsType<TextBlock>(originalRows[500].Child).Text);
+    Assert.StartsWith("▾", AssertDefaultLabel(originalRows[500].Child).Text);
     Assert.Contains("fsus-focused", originalRows[501].Classes);
     var children = panel.Children.Skip(501).Take(10).ToArray();
 
     Assert.True(tree.Collapse("p-500"));
     Assert.Equal(originalRows, panel.Children.Cast<Border>());
     Assert.All(children, child => Assert.Null(child.Parent));
-    Assert.StartsWith("▸", Assert.IsType<TextBlock>(originalRows[500].Child).Text);
+    Assert.StartsWith("▸", AssertDefaultLabel(originalRows[500].Child).Text);
   }
 
   [Fact]
@@ -131,7 +131,7 @@ public class FsusTreeRowRetentionTests
     Assert.True(contexts[^1].IsSelected);
 
     tree.RowPresenter = null;
-    var defaultLabel = Assert.IsType<TextBlock>(row.Child);
+    var defaultLabel = AssertDefaultLabel(row.Child);
     Assert.Equal("  File", defaultLabel.Text);
     Assert.Equal(VerticalAlignment.Center, defaultLabel.VerticalAlignment);
     tree.FocusNode(node.Key);
@@ -157,7 +157,7 @@ public class FsusTreeRowRetentionTests
     Assert.Equal("selected, leaf, idle, level 1", AutomationProperties.GetItemStatus(row));
 
     node.Label = "Renamed";
-    Assert.Equal("  Renamed", Assert.IsType<TextBlock>(row.Child).Text);
+    Assert.Equal("  Renamed", AssertDefaultLabel(row.Child).Text);
     Assert.Equal("Renamed", AutomationProperties.GetName(row));
     node.IsDisabled = true;
     Assert.False(row.IsEnabled);
@@ -165,7 +165,7 @@ public class FsusTreeRowRetentionTests
     node.HasLazyChildren = true;
     tree.RefreshView();
     Assert.Same(row, Assert.Single(panel.Children));
-    Assert.StartsWith("▸", Assert.IsType<TextBlock>(row.Child).Text);
+    Assert.StartsWith("▸", AssertDefaultLabel(row.Child).Text);
     Assert.Equal("selected, collapsed, idle, level 1", AutomationProperties.GetItemStatus(row));
   }
 
@@ -186,7 +186,7 @@ public class FsusTreeRowRetentionTests
     Assert.Same(editor, row.Child);
     Assert.True(tree.CancelInlineEdit());
     Assert.Same(row, Assert.Single(panel.Children));
-    Assert.Equal("  File", Assert.IsType<TextBlock>(row.Child).Text);
+    Assert.Equal("  File", AssertDefaultLabel(row.Child).Text);
 
     Assert.True(tree.StartCreate("draft"));
     var transient = panel.Children[1];
@@ -194,5 +194,13 @@ public class FsusTreeRowRetentionTests
     Assert.Same(row, Assert.Single(panel.Children));
     Assert.Null(transient.Parent);
     Assert.False(tree.RefreshNodePresentation("draft"));
+  }
+
+  private static TextBlock AssertDefaultLabel(Control? content)
+  {
+    var expected = typeof(FsusTree).Assembly.GetType(
+      "FsusUI.Avalonia.Controls.FsusTreeDefaultLabel", throwOnError: true)!;
+    Assert.IsType(expected, content);
+    return Assert.IsAssignableFrom<TextBlock>(content);
   }
 }
