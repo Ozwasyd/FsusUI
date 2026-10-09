@@ -31,6 +31,27 @@ public class FsusShortcutRecorderTests
   }
 
   [Fact]
+  public void RawKeyGestureInteropPreservesLiteralPhysicalControl()
+  {
+    var physicalControl = new KeyGesture(Key.S, KeyModifiers.Control);
+    var neutral = FsusShortcutGesture.FromKeyGesture(physicalControl);
+    var raw = neutral.ToKeyGesture();
+
+    Assert.Equal(physicalControl, raw);
+    Assert.True(raw.Matches(new KeyEventArgs
+    {
+      Key = Key.S,
+      KeyModifiers = KeyModifiers.Control,
+    }));
+    Assert.False(raw.Matches(new KeyEventArgs
+    {
+      Key = Key.S,
+      KeyModifiers = KeyModifiers.Meta,
+    }));
+    Assert.Equal("Ctrl+S", neutral.SerializedText);
+  }
+
+  [Fact]
   public void ShortcutGestureDisplaysCommandOptionOnMacAndCtrlAltOnWindowsLinux()
   {
     var gesture = new FsusShortcutGesture(Key.P, KeyModifiers.Control | KeyModifiers.Alt | KeyModifiers.Shift);
