@@ -56,6 +56,31 @@ public class FsusDesktopShellHeadlessTests
     Assert.Equal("notes", tabs.SelectedKey);
     Assert.True(tabs.CycleDocuments(reverse: true));
     Assert.Equal("draft", tabs.SelectedKey);
+
+    tabs.AddDocument(new FsusDocumentTab { Key = "disabled", IsEnabled = false });
+    Assert.True(tabs.CycleDocuments());
+    Assert.Equal("notes", tabs.SelectedKey);
+    Assert.True(tabs.CycleDocuments(reverse: true));
+    Assert.Equal("draft", tabs.SelectedKey);
+    var notes = tabs.Documents.Single((document) => document.Key == "notes");
+    notes.IsEnabled = false;
+    var draft = tabs.Documents.Single((document) => document.Key == "draft");
+    draft.IsClosable = false;
+    var closeCount = closeReasons.Count;
+    Assert.False(tabs.RequestClose("missing"));
+    Assert.False(tabs.RequestClose("notes"));
+    Assert.False(tabs.RequestClose("draft"));
+    Assert.Equal(closeCount, closeReasons.Count);
+    Assert.False(tabs.ReorderDocument("missing", 0));
+    Assert.False(tabs.ReorderDocument("draft", 1));
+    Assert.Single(reorderEvents);
+    Assert.False(tabs.RequestDocumentContext("missing", FsusTreeInteractionSource.Keyboard));
+    Assert.False(tabs.RequestDocumentContext("notes", FsusTreeInteractionSource.Keyboard));
+    Assert.False(tabs.CycleDocuments());
+    Assert.False(tabs.CycleDocuments(reverse: true));
+    tabs.SelectKey("notes");
+    Assert.Equal("draft", tabs.SelectedKey);
+    Assert.Equal("draft", tabs.FocusedKey);
   }
 
   [AvaloniaFact]
@@ -124,10 +149,16 @@ public class FsusDesktopShellHeadlessTests
     window.Close();
   }
 
-  [AvaloniaFact]
-  public void DocumentTabsSupportCloseDragReorderOverflowContextAndPlatformCycling()
+  [AvaloniaTheory]
+  [InlineData(120d)]
+  [InlineData(220d)]
+  public void DocumentTabsSupportCloseDragReorderOverflowContextAndPlatformCycling(double headerWidth)
   {
     var tabs = BuildDocumentTabs(9);
+    foreach (var document in tabs.Documents)
+    {
+      document.Width = headerWidth;
+    }
     var closeRequests = new List<FsusDocumentTabCloseRequestedEventArgs>();
     var reorderRequests = new List<FsusDocumentTabReorderedEventArgs>();
     var contextRequests = new List<FsusDocumentTabContextRequestedEventArgs>();
@@ -161,25 +192,57 @@ public class FsusDesktopShellHeadlessTests
       PhysicalKey.Tab,
       "\t");
     Assert.Equal(firstKey, tabs.SelectedKey);
+    Assert.Equal(firstKey, tabs.FocusedKey);
+    Assert.Same(tabs.Documents[0], window.FocusManager!.GetFocusedElement());
+    window.KeyPress(Key.Tab, RawInputModifiers.Meta, PhysicalKey.Tab, "\t");
+    Assert.Equal(tabs.Documents[1].Key, tabs.SelectedKey);
+    Assert.Equal(tabs.SelectedKey, tabs.FocusedKey);
+    Assert.Same(tabs.Documents[1], window.FocusManager.GetFocusedElement());
+    window.KeyPress(
+      Key.Tab,
+      RawInputModifiers.Meta | RawInputModifiers.Shift,
+      PhysicalKey.Tab,
+      "\t");
+    Assert.Equal(firstKey, tabs.SelectedKey);
+    Assert.Equal(firstKey, tabs.FocusedKey);
 
     var contextTarget = tabs.Documents[2];
+    ScrollHeaderIntoView(window, tabs, contextTarget);
     Click(window, contextTarget, MouseButton.Right);
+    Assert.Single(contextRequests);
     Assert.Equal(contextTarget.Key, contextRequests[^1].Key);
     Assert.True(contextRequests[^1].AnchorBounds.Width > 0);
+    Assert.Equal(firstKey, tabs.SelectedKey);
+    Assert.Equal(firstKey, tabs.FocusedKey);
+    Assert.Same(contextTarget, contextRequests[^1].Anchor);
+    Assert.Equal(FsusTreeInteractionSource.Pointer, contextRequests[^1].InteractionSource);
+    Assert.True(contextTarget.Focus(NavigationMethod.Tab));
+    window.KeyPress(Key.F10, RawInputModifiers.Shift, PhysicalKey.F10, string.Empty);
+    Assert.Equal(contextTarget.Key, contextRequests[^1].Key);
+    Assert.Equal(FsusTreeInteractionSource.Keyboard, contextRequests[^1].InteractionSource);
+    Assert.Equal(firstKey, tabs.SelectedKey);
+    window.KeyPress(Key.Apps, RawInputModifiers.None, PhysicalKey.ContextMenu, string.Empty);
+    Assert.Equal(contextTarget.Key, contextRequests[^1].Key);
+    Assert.Equal(FsusTreeInteractionSource.Keyboard, contextRequests[^1].InteractionSource);
     Assert.Equal(firstKey, tabs.SelectedKey);
 
     var cleanTarget = tabs.Documents[3];
     var cleanKey = cleanTarget.Key;
     tabs.SelectKey(cleanKey);
     Dispatcher.UIThread.RunJobs();
+    ScrollHeaderIntoView(window, tabs, cleanTarget);
     Click(window, cleanTarget, MouseButton.Middle);
     Assert.DoesNotContain(tabs.Documents, (document) => document.Key == cleanKey);
     Assert.Equal(FsusDocumentTabCloseReason.MiddleClick, closeRequests[^1].Reason);
+    Assert.Equal("accessibility", tabs.SelectedKey);
+    Assert.Equal(tabs.SelectedKey, tabs.FocusedKey);
+    Assert.Same(tabs.Documents[3], window.FocusManager!.GetFocusedElement());
 
     var dirty = tabs.Documents.Single((document) => document.Key == "draft");
     var closeButton = dirty.GetVisualDescendants()
       .OfType<Button>()
       .Single((button) => button.Name == "PART_CloseButton");
+    ScrollHeaderIntoView(window, tabs, closeButton);
     Click(window, closeButton, MouseButton.Left);
     Assert.Contains(tabs.Documents, (document) => document.Key == "draft");
     Assert.True(closeRequests[^1].Cancel);
@@ -198,6 +261,21 @@ public class FsusDesktopShellHeadlessTests
     Assert.NotEmpty(reorderRequests);
     Assert.Equal(FsusDocumentTabReorderSource.Pointer, reorderRequests[^1].Source);
     Assert.NotEqual(oldIndex, tabs.Documents.ToList().IndexOf(dragTarget));
+    Dispatcher.UIThread.RunJobs();
+    Assert.Equal(dragTarget.Key, tabs.SelectedKey);
+    Assert.Equal(dragTarget.Key, tabs.FocusedKey);
+    Assert.Same(dragTarget, tabs.SelectedItem);
+    Assert.Same(dragTarget, window.FocusManager!.GetFocusedElement());
+    Assert.Single(tabs.Documents, (document) => document.IsSelected);
+
+    var other = tabs.Documents.First((document) => document != dragTarget);
+    var otherIndex = tabs.Documents.ToList().IndexOf(other);
+    Assert.True(tabs.ReorderDocument(other.Key, otherIndex == 0 ? 1 : 0));
+    Dispatcher.UIThread.RunJobs();
+    Assert.Equal(dragTarget.Key, tabs.SelectedKey);
+    Assert.Equal(dragTarget.Key, tabs.FocusedKey);
+    Assert.Same(dragTarget, tabs.SelectedItem);
+    Assert.Same(dragTarget, window.FocusManager.GetFocusedElement());
 
     window.Close();
   }
@@ -642,6 +720,30 @@ public class FsusDesktopShellHeadlessTests
       Content = "Notes",
     });
     return tabs;
+  }
+
+  private static void ScrollHeaderIntoView(
+    Window window,
+    FsusDocumentTabs tabs,
+    Control target)
+  {
+    Dispatcher.UIThread.RunJobs();
+    var scrollViewer = tabs.GetVisualDescendants()
+      .OfType<ScrollViewer>()
+      .Single((viewer) => viewer.Name == "PART_HeaderScrollViewer");
+    var origin = Assert.NotNull(scrollViewer.TranslatePoint(default, window));
+    var viewport = new Rect(origin, scrollViewer.Viewport);
+    for (var attempt = 0; attempt < tabs.Documents.Count * 2; attempt++)
+    {
+      var point = CenterIn(window, target);
+      if (viewport.Contains(point))
+      {
+        return;
+      }
+      Assert.True(tabs.ScrollHeaders(forward: point.X >= viewport.Right));
+      Dispatcher.UIThread.RunJobs();
+    }
+    Assert.True(viewport.Contains(CenterIn(window, target)), "Pointer target must be visible in the header viewport.");
   }
 
   private static void Click(Window window, Control control, MouseButton button)
