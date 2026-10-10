@@ -1,0 +1,693 @@
+{
+  "schemaVersion": 1,
+  "testedFunctionalCommit": "0072d36808da7ad3eefa185d091534bface1e39b",
+  "branch": "fix/slider-public-declaration-2d05f",
+  "previousOwnedCommit": "f5cf4fe0ac7f9d79559305ab5b85870af8b8f6ec",
+  "originalPublishedSource": "2d05f240e5fb04ac0cd602b4ed638ffe00b1859b",
+  "frozenInput": "31fe270f524cdd09ea43949077f4826196ebc550",
+  "sourceScope": {
+    "ownedThisIncrement": [
+      "tests/public-slider-declaration.test.mjs",
+      "tests/fixtures/public-slider-declaration/authority.mjs",
+      "tests/fixtures/public-slider-declaration/authority.json",
+      "tests/fixtures/public-slider-declaration/observe-producer.mjs",
+      "tests/fixtures/public-slider-declaration/README.md",
+      "tests/fixtures/public-slider-declaration/frozen-31fe-results.json"
+    ],
+    "inheritedOwnedScope": [
+      "vue/packages/components/slider/src/composables/use-slide.ts",
+      ".changeset/fix-slider-public-declaration.md",
+      "tests/fixtures/public-slider-declaration/positive.ts",
+      "tests/fixtures/public-slider-declaration/negative.ts",
+      "tests/fixtures/public-slider-declaration/reviewfix-results.json",
+      "tests/fixtures/public-slider-declaration/rebuild-results.json"
+    ],
+    "existingBarrelAndSfc": "unchanged from original published source",
+    "sharedProductionFiles": "read-only; not inherited into the independent source branch"
+  },
+  "libraryTransfer": {
+    "route": "current resolved-reference prepare_materialize then current library_file_transfer.py materialize in this executor",
+    "libraryFileId": "libfile_9ffb624a1b648191aa537b4a4619631a",
+    "fileId": "file_00000000b3d081fd9198c570c165a14c",
+    "version": 0,
+    "metadataVerified": true,
+    "supportedAttempts": 1,
+    "bundle": {
+      "path": "/workspace/slider-library-31fe/input/fsusui-31fe270-verification-bundle.tar.gz",
+      "bytes": 19673866,
+      "sha256": "e5e4e193987b34ecb3dfc358c3a81ee1f9fba39928d2fdc9cee9ac2ca7396ae4"
+    },
+    "candidate": {
+      "path": "/workspace/slider-library-31fe/extracted/canonical-artifact/fsusui-npm-candidate.tgz",
+      "bytes": 20237040,
+      "sha256": "462360d7342f8f17e40f19eaae6f1246ba5de2909d9bd1b0072e2884798ec215"
+    },
+    "allBundleReceiptsVerified": true
+  },
+  "sourceClosure": {
+    "status": "PASS",
+    "sourceInputFilter": "unchanged",
+    "inputCount": 2012,
+    "inputSha256": "5c27c212d0232caa8175e41ab519aa5f9eaaba0145b72270b831f636ed70375f",
+    "completeDeltaFiles": 23,
+    "macroPatch": "exact registered patch bytes checked independently of source filter",
+    "originalSdkRecords": "all original package records and snapshots unchanged except three exact patch qualifiers",
+    "offeredFormatterAndRenderer": "exact inspected offer postimages; no broader acceptance",
+    "originalAuthorityPreservation": "both earlier profiles, all complete diagnostics and runtime authority unchanged; original positive/negative fixtures, source repair and changeset byte-identical"
+  },
+  "checks": {
+    "canonicalAndPacked": "PASS 3/3; zero skipped",
+    "producerDiagnostics": 0,
+    "exactInferredParametersAndReturn": "PASS",
+    "bidirectionalReturnFields": 19,
+    "sourceRuntimeScripts": 3,
+    "freshCanonicalRawDeclarations": 16,
+    "actualDeclarationFormatsCompared": 48,
+    "installedArchivePayloadFiles": 8519,
+    "originalPackedSliderRuntimeFiles": 36,
+    "strictPositiveDiagnostics": 0,
+    "strictNegativeDiagnostics": 16,
+    "strictExternalDiagnostics": 0,
+    "mutationRefusals": "PASS: original diagnostic inventory mutations; changed source delta/patch/source; candidate commit/build input/toolchain/package metadata/checksum; changed/extra declaration and missing raw/ESM/CJS barrel",
+    "runtimeOriginalSelection": "PASS 35/35, existing configuration and setup/hooks",
+    "lint": "PASS",
+    "publication": "HOLD"
+  },
+  "heap": {
+    "originalFailedMiB": 3072,
+    "requestedOverrideMiB": 6144,
+    "policyAppliedMiB": 4736,
+    "policyBypassed": false,
+    "compilerOptionsOrAssertionsChanged": false
+  },
+  "commands": {
+    "sourceInstall": "PATH=/workspace/.setup/tools/node_modules/.bin:$PATH pnpm install --frozen-lockfile --store-dir /workspace/slider-library-31fe/pnpm-store",
+    "consumerInstall": "PATH=/workspace/.setup/tools/node_modules/.bin:$PATH pnpm --dir /workspace/slider-library-31fe/consumer install --frozen-lockfile --store-dir /workspace/slider-library-31fe/pnpm-store",
+    "canonicalAndInstalled": "PATH=/workspace/.setup/tools/node_modules/.bin:$PATH FSUS_NODE_HEAP_MB=6144 FSUS_NODE_HEAP_PROFILE=build SLIDER_EVIDENCE_DIR=/workspace/slider-library-31fe/qualified-6144 SLIDER_CONSUMER_ROOT=/workspace/slider-library-31fe/consumer node scripts/with-node-heap.mjs node --test tests/public-slider-declaration.test.mjs",
+    "preflight": "PATH=/workspace/.setup/tools/node_modules/.bin:$PATH pnpm exec vitest list --config vue/vitest.config.ts vue/packages/components/slider/__tests__/slider.test.tsx --json=/workspace/slider-library-31fe/selection.json",
+    "runtime": "PATH=/workspace/.setup/tools/node_modules/.bin:$PWD/node_modules/.bin:$PATH FSUS_NODE_HEAP_PROFILE=build node scripts/with-node-heap.mjs vitest run --config vue/vitest.config.ts vue/packages/components/slider/__tests__/slider.test.tsx",
+    "lint": "PATH=/workspace/.setup/tools/node_modules/.bin:$PATH pnpm exec eslint tests/public-slider-declaration.test.mjs tests/fixtures/public-slider-declaration/authority.mjs tests/fixtures/public-slider-declaration/observe-producer.mjs --config vue/eslint.config.mjs --max-warnings 0"
+  },
+  "producer": {
+    "baseline": "2d05f240e5fb04ac0cd602b4ed638ffe00b1859b",
+    "sourceProfile": "frozen-31fe",
+    "sourceInputsSha256": "5c27c212d0232caa8175e41ab519aa5f9eaaba0145b72270b831f636ed70375f",
+    "head": "31fe270f524cdd09ea43949077f4826196ebc550",
+    "producerTypeScript": "5.9.2",
+    "originalDiagnosticReturnUnchanged": true,
+    "diagnostics": [],
+    "pairDiagnostics": [],
+    "fields": [
+      {
+        "name": "elFormItem",
+        "beforeToAfter": true,
+        "afterToBefore": true
+      },
+      {
+        "name": "slider",
+        "beforeToAfter": true,
+        "afterToBefore": true
+      },
+      {
+        "name": "firstButton",
+        "beforeToAfter": true,
+        "afterToBefore": true
+      },
+      {
+        "name": "secondButton",
+        "beforeToAfter": true,
+        "afterToBefore": true
+      },
+      {
+        "name": "sliderDisabled",
+        "beforeToAfter": true,
+        "afterToBefore": true
+      },
+      {
+        "name": "minValue",
+        "beforeToAfter": true,
+        "afterToBefore": true
+      },
+      {
+        "name": "maxValue",
+        "beforeToAfter": true,
+        "afterToBefore": true
+      },
+      {
+        "name": "runwayStyle",
+        "beforeToAfter": true,
+        "afterToBefore": true
+      },
+      {
+        "name": "barStyle",
+        "beforeToAfter": true,
+        "afterToBefore": true
+      },
+      {
+        "name": "resetSize",
+        "beforeToAfter": true,
+        "afterToBefore": true
+      },
+      {
+        "name": "setPosition",
+        "beforeToAfter": true,
+        "afterToBefore": true
+      },
+      {
+        "name": "emitChange",
+        "beforeToAfter": true,
+        "afterToBefore": true
+      },
+      {
+        "name": "onSliderWrapperPrevent",
+        "beforeToAfter": true,
+        "afterToBefore": true
+      },
+      {
+        "name": "onSliderClick",
+        "beforeToAfter": true,
+        "afterToBefore": true
+      },
+      {
+        "name": "onSliderDown",
+        "beforeToAfter": true,
+        "afterToBefore": true
+      },
+      {
+        "name": "setFirstPosition",
+        "beforeToAfter": true,
+        "afterToBefore": true
+      },
+      {
+        "name": "setFirstValue",
+        "beforeToAfter": true,
+        "afterToBefore": true
+      },
+      {
+        "name": "setSecondPosition",
+        "beforeToAfter": true,
+        "afterToBefore": true
+      },
+      {
+        "name": "setSecondValue",
+        "beforeToAfter": true,
+        "afterToBefore": true
+      }
+    ],
+    "runtime": [
+      {
+        "file": "vue/packages/components/slider/index.ts",
+        "equal": true
+      },
+      {
+        "file": "vue/packages/components/slider/src/composables/use-slide.ts",
+        "equal": true
+      },
+      {
+        "file": "vue/packages/components/slider/src/slider.vue",
+        "equal": true
+      }
+    ],
+    "sliderDeclarations": [
+      [
+        "components/slider/index.d.ts",
+        "eefb2bdf7c7b659545140a930d590c9f4b3c50dafb9283055d4769b7e383a235"
+      ],
+      [
+        "components/slider/src/button.d.ts",
+        "54a2a98c07d9852307b60ca8457ebfd75ccbb594f974ca03235115499247d803"
+      ],
+      [
+        "components/slider/src/button.vue.d.ts",
+        "7c532914e99ac9d7a4a59ff6c744954c0c86eec781ce231e4b73c3eb6eb28a94"
+      ],
+      [
+        "components/slider/src/composables/index.d.ts",
+        "b830ba3af5dcf16d97aaa937697e111c3dfed6fe0eb1a8d950a40fc2a81fa161"
+      ],
+      [
+        "components/slider/src/composables/use-lifecycle.d.ts",
+        "845eece1064d7687e4455216df4b36fa2267f27492167958d167460e8012ed88"
+      ],
+      [
+        "components/slider/src/composables/use-marks.d.ts",
+        "490633c3eb0d1693c7d7c2aaf0760ceb60daaaf81133607b0b5e895e2a565f61"
+      ],
+      [
+        "components/slider/src/composables/use-slide.d.ts",
+        "bf8633396e9e566a9701fb35b54008054ca192f50e5dd16bad405a3c63ad46e9"
+      ],
+      [
+        "components/slider/src/composables/use-slider-button.d.ts",
+        "2f3b7d9b67da58d3fd5c3b0de2d2148a6de9e1d23f9a124208256f0ce26cff9e"
+      ],
+      [
+        "components/slider/src/composables/use-stops.d.ts",
+        "bd9309dab7e18d66a87d684d2bc7547e3cdbc72b1f945ce5e9494e72567e7f02"
+      ],
+      [
+        "components/slider/src/composables/use-watch.d.ts",
+        "ec434743db23cec09ff80ebf8155b1cdffe4ee9a641c795f18d04fd54ea53916"
+      ],
+      [
+        "components/slider/src/constants.d.ts",
+        "1fcb8ca474dbc351524462f6af0fc1ed460c6ce3a78e20c6eeac22cbb80399dc"
+      ],
+      [
+        "components/slider/src/marker.d.ts",
+        "677555dade27987dbf0eb37c52f1b6a26568f04cc97995f23ddec2a1ec03fb8b"
+      ],
+      [
+        "components/slider/src/slider.d.ts",
+        "db754023448cce89727a80cc03d220be6adc062f16b3ea8c24350db18631663e"
+      ],
+      [
+        "components/slider/src/slider.vue.d.ts",
+        "bb5fbe1ceba91fc9f9933cda7b568a1b9d4a25162da5f34fc5d0c39ae9a3d03f"
+      ],
+      [
+        "components/slider/style/css.d.ts",
+        "1def68be7aaaaf73809a5cb046eac894dfb9e0d09a82f9a73822446922a5c387"
+      ],
+      [
+        "components/slider/style/index.d.ts",
+        "eb7f20babd9f30ecd73e3ba3d958d9b5ad5a755f5631eaaaaf0c38c952e19c5a"
+      ]
+    ],
+    "sliderFormattedDeclarations": [
+      [
+        "es/components/slider/index.d.mts",
+        "5bb6c6b623671c703ff76e1c71cf64725cbf7670b380abbab6ce6793595abecf"
+      ],
+      [
+        "es/components/slider/index.d.ts",
+        "eefb2bdf7c7b659545140a930d590c9f4b3c50dafb9283055d4769b7e383a235"
+      ],
+      [
+        "es/components/slider/src/button.d.mts",
+        "f4a9fc8dc70ff5a51d5e8673017283ef992db670913d0c764f71253966710ff9"
+      ],
+      [
+        "es/components/slider/src/button.d.ts",
+        "54a2a98c07d9852307b60ca8457ebfd75ccbb594f974ca03235115499247d803"
+      ],
+      [
+        "es/components/slider/src/button.vue.d.mts",
+        "abbf91c48b90846677c1a5cb6a387017e5e85b541d8ae1fe27f0fab4aea555f1"
+      ],
+      [
+        "es/components/slider/src/button.vue.d.ts",
+        "7c532914e99ac9d7a4a59ff6c744954c0c86eec781ce231e4b73c3eb6eb28a94"
+      ],
+      [
+        "es/components/slider/src/composables/index.d.mts",
+        "36f035581924534c0b094837d69749983d2db1df17816a6cec29db77c5543da3"
+      ],
+      [
+        "es/components/slider/src/composables/index.d.ts",
+        "b830ba3af5dcf16d97aaa937697e111c3dfed6fe0eb1a8d950a40fc2a81fa161"
+      ],
+      [
+        "es/components/slider/src/composables/use-lifecycle.d.mts",
+        "8e6d4af8cf48eb7ab3c5406a600bcaa3a12522e89b7d9097f6b27b06ca35eea0"
+      ],
+      [
+        "es/components/slider/src/composables/use-lifecycle.d.ts",
+        "845eece1064d7687e4455216df4b36fa2267f27492167958d167460e8012ed88"
+      ],
+      [
+        "es/components/slider/src/composables/use-marks.d.mts",
+        "897927571b2928405dcefcca08305030d256f898dfb04bae01a4b404674b706b"
+      ],
+      [
+        "es/components/slider/src/composables/use-marks.d.ts",
+        "490633c3eb0d1693c7d7c2aaf0760ceb60daaaf81133607b0b5e895e2a565f61"
+      ],
+      [
+        "es/components/slider/src/composables/use-slide.d.mts",
+        "9dc561353d147bf32caaf8dfca4f37cdbe31de0bc5686fdd4752f40cf59aa96b"
+      ],
+      [
+        "es/components/slider/src/composables/use-slide.d.ts",
+        "bf8633396e9e566a9701fb35b54008054ca192f50e5dd16bad405a3c63ad46e9"
+      ],
+      [
+        "es/components/slider/src/composables/use-slider-button.d.mts",
+        "17c417b7bb02521de042e53af0e69397cc5ccb3f1b92c29aa01fc1eac82d1bb2"
+      ],
+      [
+        "es/components/slider/src/composables/use-slider-button.d.ts",
+        "2f3b7d9b67da58d3fd5c3b0de2d2148a6de9e1d23f9a124208256f0ce26cff9e"
+      ],
+      [
+        "es/components/slider/src/composables/use-stops.d.mts",
+        "b245f776e4c4b0bbf99d2cb140ed6d4812ed76df4729c9cc409f5026a97bb791"
+      ],
+      [
+        "es/components/slider/src/composables/use-stops.d.ts",
+        "bd9309dab7e18d66a87d684d2bc7547e3cdbc72b1f945ce5e9494e72567e7f02"
+      ],
+      [
+        "es/components/slider/src/composables/use-watch.d.mts",
+        "d1a9349fe9cdf12e2909cf3bceb3b3bb572213b3aecb39fe05bee3f2841547c3"
+      ],
+      [
+        "es/components/slider/src/composables/use-watch.d.ts",
+        "ec434743db23cec09ff80ebf8155b1cdffe4ee9a641c795f18d04fd54ea53916"
+      ],
+      [
+        "es/components/slider/src/constants.d.mts",
+        "c95e75ed49bc25d7fa467031397b5f1fea2e0f812b0167f9f9b051361408a6d1"
+      ],
+      [
+        "es/components/slider/src/constants.d.ts",
+        "1fcb8ca474dbc351524462f6af0fc1ed460c6ce3a78e20c6eeac22cbb80399dc"
+      ],
+      [
+        "es/components/slider/src/marker.d.mts",
+        "8a2ba614bc7d78c7e450a77de59648f84b5a637d398debb1a07fbf19e2b5670e"
+      ],
+      [
+        "es/components/slider/src/marker.d.ts",
+        "677555dade27987dbf0eb37c52f1b6a26568f04cc97995f23ddec2a1ec03fb8b"
+      ],
+      [
+        "es/components/slider/src/slider.d.mts",
+        "8efabfc82dd8a0367ccca7888afe3eb28a7f1479c0aacdc820f36f202d4c0cc2"
+      ],
+      [
+        "es/components/slider/src/slider.d.ts",
+        "db754023448cce89727a80cc03d220be6adc062f16b3ea8c24350db18631663e"
+      ],
+      [
+        "es/components/slider/src/slider.vue.d.mts",
+        "d652029b532b11eabae07c2cc189ac8301fffcb60836de1b304d3d2e90d4e184"
+      ],
+      [
+        "es/components/slider/src/slider.vue.d.ts",
+        "bb5fbe1ceba91fc9f9933cda7b568a1b9d4a25162da5f34fc5d0c39ae9a3d03f"
+      ],
+      [
+        "es/components/slider/style/css.d.mts",
+        "3f0b50bf3d17af145ab0094ca5ca5fd3f51b6692f95201ba211dc3841ced4849"
+      ],
+      [
+        "es/components/slider/style/css.d.ts",
+        "1def68be7aaaaf73809a5cb046eac894dfb9e0d09a82f9a73822446922a5c387"
+      ],
+      [
+        "es/components/slider/style/index.d.mts",
+        "f99aa338f5ab6c5e888efef2605cb7de217ac8c4eb137b3aa1d2ef2439df79de"
+      ],
+      [
+        "es/components/slider/style/index.d.ts",
+        "eb7f20babd9f30ecd73e3ba3d958d9b5ad5a755f5631eaaaaf0c38c952e19c5a"
+      ],
+      [
+        "lib/components/slider/index.d.ts",
+        "3973ae4d6f44da0fe3d6001016ab17d72c94df34e2fc3e6ab688e3181b062dd6"
+      ],
+      [
+        "lib/components/slider/src/button.d.ts",
+        "7627c4648c2254d8f30fc44498e15c33dd22dd0ebe23c2b3ad23bca43c2e3405"
+      ],
+      [
+        "lib/components/slider/src/button.vue.d.ts",
+        "96546f559c0c516ce3424a4dc81a72e1823ab158a4328b2e160222e4fddda131"
+      ],
+      [
+        "lib/components/slider/src/composables/index.d.ts",
+        "da65bbd101ce658a8ace6066376819d104e94adda3ba28541336ea37149510a8"
+      ],
+      [
+        "lib/components/slider/src/composables/use-lifecycle.d.ts",
+        "c0c7830736ddbcf3b7cb4071f64a21329618e5c03b7faeac23ebbd7e95c77cc9"
+      ],
+      [
+        "lib/components/slider/src/composables/use-marks.d.ts",
+        "48f262021bc03581a6b9e00601ce460d9c273fae9effbd36c51a38ebea1c9f78"
+      ],
+      [
+        "lib/components/slider/src/composables/use-slide.d.ts",
+        "cddfdda12c331e82954e89c0b365f504f59e181abbf1d4617597733b1e37ded9"
+      ],
+      [
+        "lib/components/slider/src/composables/use-slider-button.d.ts",
+        "be2eda8e81f1532425bba3f2c0e673d77c5645ee57c31f1ce5aff42e813df05f"
+      ],
+      [
+        "lib/components/slider/src/composables/use-stops.d.ts",
+        "2cf4a08114021c33024871bda5c46359153947d57855d17c8c2786891726a993"
+      ],
+      [
+        "lib/components/slider/src/composables/use-watch.d.ts",
+        "df503761c5583660e898ea360019b0fb214023fea7a197b14f5250738b3609bb"
+      ],
+      [
+        "lib/components/slider/src/constants.d.ts",
+        "a6a349b25dc6b9518f07a78093c0ae942dfc98548b88f327b179669aa213bfc1"
+      ],
+      [
+        "lib/components/slider/src/marker.d.ts",
+        "4d41370603c49c705013db810280acc54640092461db4abb11f8abcc00245a53"
+      ],
+      [
+        "lib/components/slider/src/slider.d.ts",
+        "c3c8d6df30672cf025628387a210add39b6de2f647fe652b3fa13f0c737080c3"
+      ],
+      [
+        "lib/components/slider/src/slider.vue.d.ts",
+        "4143ba46cf00b0ec10230e3b353e6aa352b0894907414f44061097840bfe4e52"
+      ],
+      [
+        "lib/components/slider/style/css.d.ts",
+        "8931238c5ffa2ca25310f8c416e88e768ac6e5535d735d360922a79702935640"
+      ],
+      [
+        "lib/components/slider/style/index.d.ts",
+        "ae1680e32c569981322f95f13144fd8e9517512312aa4c8f4093da116529f06f"
+      ]
+    ],
+    "canonicalCompleted": true
+  },
+  "installedIdentity": {
+    "sourceProfile": "frozen-31fe",
+    "frozenLock": {
+      "packages": {
+        "count": 273,
+        "sha256": "cc235e5b3be7607e5f4d31ccb4dcbd3f8a21878b0e7f1ddd6b4e8d50cb9dc95d"
+      },
+      "snapshots": {
+        "count": 273,
+        "sha256": "36c3f3314e5c771bfc2f3f344a8f52ac8684dee791a25e083629f044e12623d5"
+      }
+    },
+    "tarballSha256": "462360d7342f8f17e40f19eaae6f1246ba5de2909d9bd1b0072e2884798ec215",
+    "candidateCommit": "31fe270f524cdd09ea43949077f4826196ebc550",
+    "inputFingerprint": "1f81a70fffde6d37aa8db989ab315eb4c9ab0f76e3abd509a0e1c392df2ddb88",
+    "manifestSha256": "d5a9b111699d05f451abe2a7593cc9bdc7856424f467ae3ba49097fbf3fe0fde",
+    "installedPayloadFiles": 8519,
+    "installedPayloadSha256": "db66a0c3e0bcef86838a5ca78237c8bb10ff058140ecfe33bcb380d77335627d",
+    "canonicalSliderDeclarationFiles": 48,
+    "sliderRuntimeFiles": 36
+  },
+  "strictDiagnostics": {
+    "positive": [],
+    "negative": [
+      {
+        "file": "slider-negative.ts",
+        "line": 8,
+        "code": 2322,
+        "message": "Type 'string' is not assignable to type 'EpPropMergeType<(new (...args: any[]) => number | number[]) | (() => Arrayable<number>) | ((new (...args: any[]) => number | number[]) | (() => Arrayable<number>) | null)[], unknown, unknown> | undefined'."
+      },
+      {
+        "file": "slider-negative.ts",
+        "line": 10,
+        "code": 2322,
+        "message": "Type '\"huge\"' is not assignable to type 'EpPropMergeType<StringConstructor, \"\" | \"small\" | \"default\" | \"large\", never> | undefined'."
+      },
+      {
+        "file": "slider-negative.ts",
+        "line": 11,
+        "code": 2322,
+        "message": "Type '\"middle\"' is not assignable to type 'EpPropMergeType<StringConstructor, Placement, unknown> | undefined'."
+      },
+      {
+        "file": "slider-negative.ts",
+        "line": 13,
+        "code": 2322,
+        "message": "Type '(value: string) => string' is not assignable to type '(val: number) => string'.\n  Types of parameters 'value' and 'val' are incompatible.\n    Type 'number' is not assignable to type 'string'."
+      },
+      {
+        "file": "slider-negative.ts",
+        "line": 15,
+        "code": 2345,
+        "message": "Argument of type 'KeyboardEvent' is not assignable to parameter of type 'MouseEvent | TouchEvent'.\n  Type 'KeyboardEvent' is missing the following properties from type 'MouseEvent': button, buttons, clientX, clientY, and 14 more."
+      },
+      {
+        "file": "slider-negative.ts",
+        "line": 16,
+        "code": 2769,
+        "message": "No overload matches this call.\n  Overload 1 of 3, '(event: \"input\", value: Arrayable<number>): void', gave the following error.\n    Argument of type '\"change\"' is not assignable to parameter of type '\"input\"'.\n  Overload 2 of 3, '(event: \"change\", value: Arrayable<number>): void', gave the following error.\n    Argument of type 'string' is not assignable to parameter of type 'Arrayable<number>'.\n  Overload 3 of 3, '(event: \"update:modelValue\", value: Arrayable<number>): void', gave the following error.\n    Argument of type '\"change\"' is not assignable to parameter of type '\"update:modelValue\"'."
+      },
+      {
+        "file": "slider-negative.ts",
+        "line": 17,
+        "code": 2769,
+        "message": "No overload matches this call.\n  Overload 1 of 3, '(event: \"input\", value: Arrayable<number>): void', gave the following error.\n    Argument of type '\"not-a-slider-event\"' is not assignable to parameter of type '\"input\"'.\n  Overload 2 of 3, '(event: \"change\", value: Arrayable<number>): void', gave the following error.\n    Argument of type '\"not-a-slider-event\"' is not assignable to parameter of type '\"change\"'.\n  Overload 3 of 3, '(event: \"update:modelValue\", value: Arrayable<number>): void', gave the following error.\n    Argument of type '\"not-a-slider-event\"' is not assignable to parameter of type '\"update:modelValue\"'."
+      },
+      {
+        "file": "slider-negative.ts",
+        "line": 18,
+        "code": 2322,
+        "message": "Type 'number' is not assignable to type 'CreateComponentPublicInstanceWithMixins<Readonly<ExtractPropTypes<{ readonly modelValue: { readonly type: PropType<number>; readonly required: false; readonly validator?: ((val: unknown) => boolean) | undefined; readonly default: 0; __epPropKey: true; }; readonly vertical: BooleanConstructor; readonly tooltipClass: ...'.\n  Type 'number' is not assignable to type '{ $: ComponentInternalInstance; $data: {}; $props: Partial<{ readonly vertical: boolean; readonly modelValue: number; readonly placement: EpPropMergeType<StringConstructor, Placement, unknown>; }> & Omit<...>; ... 11 more ...; $watch<T extends string | ((...args: any) => any)>(source: T, cb: T extends (...args: any)...'."
+      },
+      {
+        "file": "slider-negative.ts",
+        "line": 19,
+        "code": 2345,
+        "message": "Argument of type 'string' is not assignable to parameter of type 'number'."
+      },
+      {
+        "file": "slider-negative.ts",
+        "line": 20,
+        "code": 2345,
+        "message": "Argument of type 'MouseEvent' is not assignable to parameter of type 'KeyboardEvent'.\n  Type 'MouseEvent' is missing the following properties from type 'KeyboardEvent': charCode, code, isComposing, key, and 8 more."
+      },
+      {
+        "file": "slider-negative.ts",
+        "line": 21,
+        "code": 2345,
+        "message": "Argument of type 'undefined' is not assignable to parameter of type 'number'."
+      },
+      {
+        "file": "slider-negative.ts",
+        "line": 22,
+        "code": 2345,
+        "message": "Argument of type 'string' is not assignable to parameter of type 'number'."
+      },
+      {
+        "file": "slider-negative.ts",
+        "line": 23,
+        "code": 2345,
+        "message": "Argument of type 'MouseEvent' is not assignable to parameter of type 'TouchEvent'.\n  Type 'MouseEvent' is missing the following properties from type 'TouchEvent': changedTouches, targetTouches, touches"
+      },
+      {
+        "file": "slider-negative.ts",
+        "line": 24,
+        "code": 2322,
+        "message": "Type 'Promise<void>' is not assignable to type 'number'."
+      },
+      {
+        "file": "slider-negative.ts",
+        "line": 25,
+        "code": 2322,
+        "message": "Type 'void' is not assignable to type 'Promise<void>'."
+      },
+      {
+        "file": "slider-negative.ts",
+        "line": 28,
+        "code": 2322,
+        "message": "Type 'boolean | undefined' is not assignable to type 'string | undefined'.\n  Type 'boolean' is not assignable to type 'string'."
+      }
+    ]
+  },
+  "strictStatus": {
+    "sourceProfile": "frozen-31fe",
+    "fixtureControls": "PASS",
+    "wholeLibraryStrict": "PASS",
+    "positiveDiagnostics": 0,
+    "negativeLocalDiagnostics": 16,
+    "externalDiagnostics": 0,
+    "wholeArtifactRuntimeParity": "UNRUN (separate retained FAIL evidence)"
+  },
+  "selection": {
+    "count": 35,
+    "exactOriginalTestBlob": true,
+    "receipt": {
+      "path": "/workspace/slider-library-31fe/selection.json",
+      "bytes": 5895,
+      "sha256": "711dc27f442ac7e023b20f6a425d139c7483686a1a84cbaa9849fb7ecc607af1"
+    }
+  },
+  "retainedFailures": [
+    {
+      "outcome": "FAIL: default pnpm store mkdir ENOENT; supported workspace store rerun PASS",
+      "path": "/workspace/slider-library-31fe/source-install.log",
+      "bytes": 789,
+      "sha256": "3b0c7eb597e050a74d1f11422a23c90fc81f635fe11416d026ef062fec9d622d"
+    },
+    {
+      "outcome": "EXPECTED REFUSAL: original guard rejects 2012-input frozen 31fe source",
+      "path": "/workspace/slider-library-31fe/old-guard.log",
+      "bytes": 2138,
+      "sha256": "83e1cc002a526182c0bbe03ade0a96546665306c9dbb5c93dde1d86dc90de31b"
+    },
+    {
+      "outcome": "FAIL: first format comparison omitted canonical package context; both attempted producer phases retained",
+      "path": "/workspace/slider-library-31fe/qualified.log",
+      "bytes": 7818,
+      "sha256": "a64466c93105760cb98060a0361c26340e1d9c17f2fd70c3fa9a2110352e7e70"
+    },
+    {
+      "outcome": "FAIL: Cannot resolve element-plus/lib/utils without temporary canonical manifest",
+      "path": "/workspace/slider-library-31fe/qualified-first-producer.log",
+      "bytes": 110594,
+      "sha256": "87f85212e3c9989067809985a5deca10c8a8b4529acf5dbb8fd0e1dd94fa2d0d"
+    },
+    {
+      "outcome": "FAIL: wrapper could not find vitest on PATH; exact selection rerun with local bin PASS",
+      "path": "/workspace/slider-library-31fe/runtime-35.log",
+      "bytes": 494,
+      "sha256": "11b1347aed16c8fe905abe26b80b324161c260478e006c1a415e51dd446c47a2"
+    },
+    {
+      "outcome": "FAIL: configured 3072 MiB heap exhausted during negative phase; positive [] retained; exact rerun with existing policy override PASS",
+      "path": "/workspace/slider-library-31fe/qualified-rerun.log",
+      "bytes": 1747,
+      "sha256": "6ec1776155079c86e193a8a4ef8083ea725ecfe04ca55b23ff009f9b6364a8ae"
+    }
+  ],
+  "currentPassReceipts": [
+    {
+      "path": "/workspace/slider-library-31fe/source-install-workspace-store.log",
+      "bytes": 6393,
+      "sha256": "7cf8140057951cd85fc019453f6e6094950ffd3a6d8413388b0efc2196f178ff"
+    },
+    {
+      "path": "/workspace/slider-library-31fe/consumer-install.log",
+      "bytes": 1177,
+      "sha256": "75ccfb7714ffb576b3afca4531644fdb8ef3a1ced93dc384d25ca197d9860628"
+    },
+    {
+      "path": "/workspace/slider-library-31fe/runtime-35-rerun.log",
+      "bytes": 225,
+      "sha256": "bf27e2030d98ac90265fb90dd7a14b16605d722d12b0d0961b0bc24d244d3fbd"
+    },
+    {
+      "path": "/workspace/slider-library-31fe/lint-rerun.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/workspace/slider-library-31fe/original-inventories.log",
+      "bytes": 202,
+      "sha256": "b278877e53e8f3e3380e6a0e3fc2955f5d8fbf2bbc855593e85bb4e550e931ce"
+    },
+    {
+      "path": "/workspace/slider-library-31fe/qualified-6144.log",
+      "bytes": 573,
+      "sha256": "f52ebc3b5dfc81c2f044ff36f342227553e1ed01fe1d732b66b979a94d421c38"
+    }
+  ],
+  "unrunOrHeld": [
+    "Node16 installed matrix at 31fe (historical Node16 FAIL retained)",
+    "whole-artifact JS/runtime parity at 31fe (historical aggregate Motion bundle FAIL retained)",
+    "shared formatter/renderer broader independent acceptance",
+    "browser/device/hydration profiles, broad CI/runtime QA",
+    "later resolver/default-leakage successor input",
+    "GitHub content and npm publication"
+  ],
+  "remainingBoundedBlockers": [],
+  "rollback": "Revert only the owned fixture increment to f5cf4fe0; original production repair remains intact"
+}

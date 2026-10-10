@@ -123,3 +123,55 @@ candidate sidecars. This is a pending actual run, not a user-permission request 
 an inferred shared path. [rebuild-results.json](./rebuild-results.json) records the
 actual commands, source/input/manifest/payload identities, results, refusal checks
 and remaining UNRUN checks. Previous result files and failed logs are retained.
+
+## Frozen `31fe` verification
+
+The immutable successor under review is
+`31fe270f524cdd09ea43949077f4826196ebc550`. The resolved Library version 0 input is
+`libfile_9ffb624a1b648191aa537b4a4619631a`, backed by
+`file_00000000b3d081fd9198c570c165a14c`. Its readable bundle SHA-256 is
+`e5e4e193987b34ecb3dfc358c3a81ee1f9fba39928d2fdc9cee9ac2ca7396ae4`; the actual
+candidate SHA-256 is
+`462360d7342f8f17e40f19eaae6f1246ba5de2909d9bd1b0072e2884798ec215`. These identify
+the inspected evidence, rather than acting as an archive admission list.
+
+The original refusal of the new 2,012-input fingerprint is retained. The fixture
+now proves the complete 23-file source delta from the accepted `f4` composition
+using committed preimage and postimage bytes. It separately verifies the macro
+patch omitted by the unchanged original source filter, its exact lock registration,
+all original dependency records and snapshots, the offered formatter/renderer
+postimages, and the inherited three Slider source files. Earlier independent and
+`f4` profiles, diagnostic arrays, and all sixteen original negative messages remain
+unchanged. Source metadata changes are restricted to the inspected format exports;
+the candidate still goes through the real repository verifier and build inputs.
+
+A successful canonical observer supplies sixteen fresh raw Slider declarations.
+The unchanged actual formatter runs against those bytes with the complete fresh
+declaration tree and canonical package metadata needed for self-import resolution.
+All 48 actual raw ES, ESM and CommonJS Slider declarations must match. Installed
+archive byte equality, all 36 original Slider JS hashes, the original 273-package
+consumer graph and exact strict positive/negative diagnostics remain mandatory.
+Mutation controls reject changed source deltas/patches, manifest inputs/metadata,
+checksums, damaged or extra declarations, and a missing barrel in each format.
+
+This is bounded Slider fixture verification. It does not qualify the entire shared
+formatter, renderer, browser/device/hydration behavior, or a later source successor.
+The whole-artifact runtime mismatch and historical Node16 failures remain retained;
+no GitHub content or package publication is authorized. This fixture-only increment
+needs no additional changeset; the original public repair changeset is unchanged.
+
+Run the same original three fixture tests with the repository heap wrapper:
+
+```sh
+FSUS_NODE_HEAP_MB=6144 FSUS_NODE_HEAP_PROFILE=build \
+SLIDER_EVIDENCE_DIR=/absolute/evidence/path \
+SLIDER_CONSUMER_ROOT=/absolute/frozen-consumer/path \
+node scripts/with-node-heap.mjs node --test tests/public-slider-declaration.test.mjs
+```
+
+The manual heap request remains subject to the existing capacity policy. A retained
+3,072 MiB run passed the strict positive control before exhausting its heap during
+the negative phase; it does not count as a completed negative-control run.
+
+See `frozen-31fe-results.json` for actual final results, commands and retained
+first-failure receipts.
