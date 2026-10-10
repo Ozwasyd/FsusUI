@@ -1,5 +1,5 @@
 diff --git a/dist/index.cjs b/dist/index.cjs
-index 47629a02152a7d2a090c63bd4b3ccc1739b78476..1ade82c6ee5c12efd5d608776486561eeeadc5c4 100644
+index 47629a02152a7d2a090c63bd4b3ccc1739b78476..0e6130532ae46001d2a8551507399c221791373b 100644
 --- a/dist/index.cjs
 +++ b/dist/index.cjs
 @@ -558,12 +558,142 @@ async function resolveTSReferencedType(ref, stacks = []) {
@@ -48,7 +48,7 @@ index 47629a02152a7d2a090c63bd4b3ccc1739b78476..1ade82c6ee5c12efd5d608776486561e
 +      const state = namespaceResolutions.get(scope);
 +      for (const source of state.exportAll || []) {
 +        for (const name of Object.keys(source)) {
-+          if (state.explicitExports.has(name)) continue;
++          if (name === "default" || state.explicitExports.has(name)) continue;
 +          const owner = namespaceBindingOwner(source, name);
 +          if (owner) {
 +            if (!Object.hasOwn(scope.exports, name)) changed = true;
@@ -232,7 +232,7 @@ index 47629a02152a7d2a090c63bd4b3ccc1739b78476..1ade82c6ee5c12efd5d608776486561e
      }
    }
 diff --git a/dist/index.js b/dist/index.js
-index ce125685cbf3e602a87155b73a4c72bc12843e7e..7dbbf40f996bae384ead98883f7109de54df5e1f 100644
+index ce125685cbf3e602a87155b73a4c72bc12843e7e..adc5498567d5d1f2324d05d601c6a6a2d13d1b99 100644
 --- a/dist/index.js
 +++ b/dist/index.js
 @@ -1,3 +1,4 @@
@@ -281,7 +281,7 @@ index ce125685cbf3e602a87155b73a4c72bc12843e7e..7dbbf40f996bae384ead98883f7109de
 +      const state = namespaceResolutions.get(scope);
 +      for (const source of state.exportAll || []) {
 +        for (const name of Object.keys(source)) {
-+          if (state.explicitExports.has(name)) continue;
++          if (name === "default" || state.explicitExports.has(name)) continue;
 +          const owner = namespaceBindingOwner(source, name);
 +          if (owner) {
 +            if (!Object.hasOwn(scope.exports, name)) changed = true;
