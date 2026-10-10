@@ -1623,18 +1623,109 @@ test('real mapped inputs use compiler-known metadata and keep unknown values par
     semanticMemberBindings,
     gate,
   })
-  const mappedInputs = registry.contracts.flatMap((contract) =>
-    contract.inputs.filter((input) => input.avalonia != null),
+  const mappedMembers = registry.contracts.flatMap((contract) =>
+    contract.inputs
+      .filter((input) => input.avalonia != null)
+      .map((input) => ({ component: contract.component.name, input })),
   )
-  assert.equal(mappedInputs.length, 184)
+  const isActiveIndex = ({ component, input }) =>
+    component === 'ElImageViewer' && input.name === 'activeIndex'
+  const originalMembers = mappedMembers.filter(
+    (member) => !isActiveIndex(member),
+  )
+  const canonical = (value) =>
+    Array.isArray(value)
+      ? value.map(canonical)
+      : value !== null && typeof value === 'object'
+        ? Object.fromEntries(
+            Object.keys(value)
+              .sort()
+              .map((key) => [key, canonical(value[key])]),
+          )
+        : value
+  // Immutable 333b0439: all original 184 identities, metadata and statuses.
+  assert.equal(originalMembers.length, 184)
   assert.equal(
-    mappedInputs.filter((input) => input.status === 'aligned-candidate').length,
+    crypto
+      .createHash('sha256')
+      .update(JSON.stringify(canonical(originalMembers)))
+      .digest('hex'),
+    'f86077bfba38a28056b41e7d044cd80b9ffb960402c5c3787d5dd15e2fad6761',
+  )
+  const originalInputs = originalMembers.map(({ input }) => input)
+  assert.equal(
+    originalInputs.filter((input) => input.status === 'aligned-candidate')
+      .length,
     14,
   )
   assert.equal(
-    mappedInputs.filter((input) => input.status === 'partial').length,
+    originalInputs.filter((input) => input.status === 'partial').length,
     170,
   )
+  assert.deepEqual(mappedMembers.filter(isActiveIndex), [
+    {
+      component: 'ElImageViewer',
+      input: {
+        name: 'activeIndex',
+        kind: 'input',
+        web: {
+          member: 'activeIndex',
+          baseline: 'spec/baselines/vue-current.json',
+          categories: ['number'],
+          runtimeType: 'Number',
+          semanticType: null,
+          nullable: false,
+          default: {
+            kind: 'missing',
+          },
+          values: null,
+          valuesKnown: false,
+          required: false,
+          readonly: false,
+          deprecated: false,
+          deprecationMessage: null,
+        },
+        avalonia: {
+          member: 'ActiveIndex',
+          categories: ['number'],
+          type: 'System.Int32',
+          nullable: false,
+          propertyKind: 'clr',
+          defaultKnown: false,
+          defaultValue: null,
+          required: false,
+          canRead: true,
+          canWrite: true,
+          isStatic: false,
+          enumValuesKnown: false,
+          enumMembers: undefined,
+          deprecated: false,
+          deprecationMessage: null,
+        },
+        status: 'partial',
+        drift: {
+          type: null,
+          default: 'avalonia default metadata unavailable',
+          required: null,
+          readWrite: null,
+          nullability: null,
+          eventPayload: null,
+          operationSignature: null,
+          contentRegion: null,
+          enumValues: null,
+          deprecated: null,
+        },
+        scenarioIds: ['scenario.v2.el-image-viewer.input.active-index'],
+        governance: {
+          reason:
+            'Real member exists on both sides but semantic drift was detected.',
+          owner: 'FsusUI Core',
+          testPolicy: 'contract',
+          reviewPolicy: 'pr-review',
+        },
+      },
+    },
+  ])
   const max = registry.contracts
     .find((contract) => contract.component.name === 'ElBadge')
     .inputs.find((input) => input.name === 'max')
