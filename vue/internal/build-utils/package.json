@@ -18,6 +18,7 @@
   "dependencies": {
     "@pnpm/find-workspace-packages": "4.0.43",
     "@pnpm/logger": "4.0.0",
+    "@pnpm/types": "8.10.0",
     "consola": "3.4.2"
   },
   "devDependencies": {

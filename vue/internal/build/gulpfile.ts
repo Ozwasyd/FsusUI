@@ -25,6 +25,7 @@ import {
   generateTypesDefinitions,
   run,
   withTaskName,
+  writeNodeDeclarationFormats,
 } from './src'
 import type { TaskFunction } from 'gulp'
 import type { Module } from './src'
@@ -403,6 +404,9 @@ const buildPackage: TaskFunction = series(
   ),
 
   parallel(copyTypesDefinitions, copyFiles, copyWasmRuntimeAssets),
+  withTaskName('writeNodeDeclarationFormats', () =>
+    writeNodeDeclarationFormats(epOutput),
+  ),
 )
 
 export default buildPackage

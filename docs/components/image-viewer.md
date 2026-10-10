@@ -70,3 +70,59 @@ const images = [
 | close  | 关闭预览器时触发 | `() => void`              |
 | switch | 切换图片时触发   | `(index: number) => void` |
 | rotate | 旋转图片时触发   | `(deg: number) => void`   |
+
+## Modal composition and SSR
+
+ImageViewer owns dialog semantics, focus entry/trapping/return, background inert
+state and the shared body scroll lock. Background isolation follows the
+canonical focus layer: opening an appended Dialog suspends the viewer's inert
+writes, and closing that Dialog restores viewer isolation before focus return.
+`visible` defaults to true for existing
+`v-if` consumers; `v-model:visible` also supports reusing a mounted instance.
+`initial-index` initializes an uncontrolled viewer only. Use `active-index` (or
+`v-model:active-index`) for reactive changes, or the exposed `setActiveItem(index)`
+method. `switch` and `update:activeIndex` report a changed index. `previous` and
+`next` report the resulting index and preserve navigation intent even in a
+circular two-image list. A finite boundary and a single-image list emit no
+navigation event. An empty list remains dismissible.
+
+Use `alt-list` aligned with `url-list`, `aria-label` for the dialog name and
+`labels` to override close, previous, next, zoomOut, zoomIn, toggleMode,
+rotateLeft and rotateRight accessible names. Defaults use the configured locale;
+new action translations fall back to English until that locale supplies them.
+The optional `caption` slot receives `{ index, url, alt }` and is associated with
+the dialog using `aria-describedby`. Long captions scroll with native wheel
+input without zooming the image. Original-size mode removes contain limits;
+switching back restores viewport fitting, including with `csp-safe`.
+The existing default slot remains supported. Standard non-prop attributes are forwarded to the dialog root.
+`show-toolbar="false"` disables zoom, rotation, size switching and dragging,
+while preserving close and previous/next keyboard and touch navigation.
+
+When `teleported` is true, `append-to` selects the target (default `body`). For an
+initially open SSR viewer, provide a dedicated host outside the application
+mount root and insert that target's `SSRContext.teleports` output into the host
+before hydrating. Vue body Teleport hydration is not supported for a body that
+also contains the application. The target must exist on both server and client.
+A client-only initially closed viewer may use the default body target.
+
+`csp-safe` omits SSR style attributes, uses a class for inactive images and
+applies dynamic z-index/transform values through CSSOM after mount. Use this
+under `style-src-attr 'none'`; it does not require weakening the consumer CSP.
+The shared modal hooks retain responsibility for cleanup on close/unmount.
+
+| Additional attribute | Type                         | Default                 |
+| -------------------- | ---------------------------- | ----------------------- |
+| visible              | `boolean`                    | `true`                  |
+| active-index         | `number`                     | —                       |
+| alt-list             | `string[]`                   | `[]`                    |
+| aria-label           | `string`                     | localized preview label |
+| labels               | `Partial<ImageViewerLabels>` | localized names         |
+| show-toolbar         | `boolean`                    | `true`                  |
+| append-to            | `string`                     | `body`                  |
+| csp-safe             | `boolean`                    | `false`                 |
+
+| Additional event   | Payload                  |
+| ------------------ | ------------------------ |
+| update:visible     | `boolean`                |
+| update:activeIndex | `number`                 |
+| previous / next    | resulting `number` index |

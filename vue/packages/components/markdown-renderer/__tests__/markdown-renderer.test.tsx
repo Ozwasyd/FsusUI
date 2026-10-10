@@ -32,6 +32,8 @@ import type {
 } from '@element-plus/wasm'
 import type { FsusResult } from '@element-plus/utils'
 import type { MarkdownRendererProps } from '../src/markdown-renderer'
+import type * as MarkdownWasm from '@element-plus/wasm'
+import type * as MarkdownRuntime from '../../../wasm/markdown-runtime'
 import { getMarkdownXssSourceAttackFragment } from '../../../../tests/support/markdown-xss-corpus'
 
 const rawScriptSource = getMarkdownXssSourceAttackFragment(
@@ -47,12 +49,10 @@ const markdownAuthorityMocks = vi.hoisted(() => ({
 
 vi.mock('@element-plus/wasm', async () => {
   const actual =
-    await vi.importActual<typeof import('@element-plus/wasm')>(
-      '@element-plus/wasm',
-    )
-  const runtime = await vi.importActual<
-    typeof import('../../../wasm/markdown-runtime')
-  >('../../../wasm/markdown-runtime')
+    await vi.importActual<typeof MarkdownWasm>('@element-plus/wasm')
+  const runtime = await vi.importActual<typeof MarkdownRuntime>(
+    '../../../wasm/markdown-runtime',
+  )
 
   return {
     ...actual,
@@ -71,16 +71,12 @@ vi.mock('@element-plus/wasm', async () => {
 })
 
 vi.mock('../../../wasm/markdown-heavy-feature-activation', async () => {
-  const runtime = await vi.importActual<
-    typeof import('../../../wasm/markdown-runtime')
-  >('../../../wasm/markdown-runtime')
+  const runtime = await vi.importActual<typeof MarkdownRuntime>(
+    '../../../wasm/markdown-runtime',
+  )
   return {
     activateMarkdownHeavyFeatures: vi.fn(
-      async (
-        options: Parameters<
-          typeof import('../../../wasm/markdown-heavy-feature-activation').activateMarkdownHeavyFeatures
-        >[0],
-      ) =>
+      async (options: Parameters<typeof activateMarkdownHeavyFeatures>[0]) =>
         runtime.activateMarkdownFeatures({
           ...options,
           features: {
@@ -644,6 +640,48 @@ describe('MarkdownRenderer.vue', () => {
     )
     await flushRenderer()
     expect(renderMarkdownResult).toHaveBeenCalledTimes(initialCalls + 1)
+  })
+
+  test('invalidates pending heavy activation when the shared theme changes', async () => {
+    const source = '```mermaid\ngraph LR\nA-->B\n```'
+    const html =
+      '<figure class="markdown-renderer__mermaid" data-mermaid-placeholder="true"><code>graph LR\nA--&gt;B</code></figure>'
+    renderMarkdownResult.mockResolvedValue(fsusOk(makeResult(source, html)))
+    let settleActivation:
+      | ((
+          value: Awaited<ReturnType<typeof activateMarkdownHeavyFeatures>>,
+        ) => void)
+      | undefined
+    activateFeatures.mockImplementationOnce(
+      () =>
+        new Promise((resolve) => {
+          settleActivation = resolve
+        }),
+    )
+    const wrapper = mount(MarkdownRenderer, { props: { content: source } })
+    try {
+      await flushRenderer()
+      await vi.dynamicImportSettled()
+      await flushRenderer()
+      expect(settleActivation).toBeTypeOf('function')
+      const pendingSignal = activateFeatures.mock.calls[0][0].signal
+      expect(pendingSignal?.aborted).toBe(false)
+      const initialCalls = renderMarkdownResult.mock.calls.length
+
+      document.documentElement.dispatchEvent(
+        new CustomEvent('fsus:theme-change', {
+          detail: { mode: 'dark', resolved: 'dark' },
+        }),
+      )
+      expect(pendingSignal?.aborted).toBe(true)
+      await flushRenderer()
+      expect(renderMarkdownResult).toHaveBeenCalledTimes(initialCalls + 1)
+      expect(pendingSignal?.aborted).toBe(true)
+    } finally {
+      wrapper.unmount()
+      settleActivation?.({ activated: [], errors: [] })
+      await flushRenderer()
+    }
   })
 
   test('keeps the scroll anchor when the full result changes html', async () => {

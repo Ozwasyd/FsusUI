@@ -5,16 +5,41 @@ import {
   UPDATE_MODEL_EVENT,
 } from '@element-plus/constants'
 import { useFormItem } from '@element-plus/components/form'
-import type { CSSProperties, Ref, SetupContext } from 'vue'
+import type { ComputedRef, CSSProperties, Ref, SetupContext, ShallowRef } from 'vue'
 import type { Arrayable } from '@element-plus/utils'
+import type { FormItemContext } from '@element-plus/components/form'
 import type { SliderEmits, SliderInitData, SliderProps } from '../slider'
 import type { ButtonRefs, SliderButtonInstance } from '../button'
+
+export type SliderButtonRef = Ref<SliderButtonInstance | undefined>
+
+export interface UseSlideReturn {
+  elFormItem: FormItemContext | undefined
+  slider: ShallowRef<HTMLElement | undefined>
+  firstButton: SliderButtonRef
+  secondButton: SliderButtonRef
+  sliderDisabled: ComputedRef<boolean>
+  minValue: ComputedRef<number>
+  maxValue: ComputedRef<number>
+  runwayStyle: ComputedRef<CSSProperties>
+  barStyle: ComputedRef<CSSProperties>
+  resetSize: () => void
+  setPosition: (percent: number) => SliderButtonRef
+  emitChange: () => Promise<void>
+  onSliderWrapperPrevent: (event: TouchEvent) => void
+  onSliderClick: (event: MouseEvent | TouchEvent) => void
+  onSliderDown: (event: MouseEvent | TouchEvent) => Promise<void>
+  setFirstPosition: (percent: number) => void
+  setFirstValue: (firstValue: number | undefined) => void
+  setSecondPosition: (percent: number) => void
+  setSecondValue: (secondValue: number) => void
+}
 
 export const useSlide = (
   props: SliderProps,
   initData: SliderInitData,
   emit: SetupContext<SliderEmits>['emit']
-) => {
+): UseSlideReturn => {
   const { form: elForm, formItem: elFormItem } = useFormItem()
 
   const slider = shallowRef<HTMLElement>()

@@ -56,6 +56,20 @@ The published package name is currently `@ozwasyd/element-plus`.
 
 ## Component Package Groups
 
+Node module resolution uses separate declarations for ESM `import` and CommonJS
+`require` entry points. ESM declarations use `.d.mts` with explicit relative
+module extensions; CommonJS declarations retain `.d.ts` and explicitly select
+ESM dependency types where needed. The runtime entry points are unchanged.
+Under native Node ESM interoperability, a default import from CommonJS represents
+`module.exports`; it does not automatically unwrap its `default` property.
+Bundler interoperability can differ. This distinction is not a new component API.
+
+The generated CommonJS and global declarations use stable `resolution-mode`
+import attributes, whose syntax requires TypeScript 5.3 or newer. Consumers on
+older compilers must upgrade before adopting this declaration format. The
+strict installed-package checks use the repository-pinned TypeScript 6.0.2;
+this syntax requirement does not establish validation for other versions.
+
 Preview component APIs include Vue props, emits, slots, and exposed methods
 documented under `docs/components/`. Element Plus compatibility is best-effort
 unless covered by a local test or explicit FsusUI doc page.
