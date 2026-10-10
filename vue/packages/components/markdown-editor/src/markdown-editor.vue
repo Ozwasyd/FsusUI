@@ -1156,6 +1156,9 @@ import {
   createMarkdownAttachmentAtomicPresentation,
   createMarkdownAttachmentCaptureSession,
   type MarkdownAttachmentBatchIntent,
+  type MarkdownAttachmentCaptureObservation,
+  type MarkdownAttachmentFileConsumer,
+  type MarkdownAttachmentItemIntent,
   type MarkdownAttachmentProviderResult,
   type MarkdownAttachmentSourceKind,
 } from './markdown-editor-attachment'
@@ -1211,6 +1214,7 @@ import type {
   MarkdownEditorSelection,
   MarkdownEditorTransaction,
   MarkdownEditorTransactionRejection,
+  MarkdownEditorTransactionEvent,
 } from './markdown-editor-transaction'
 import {
   resolveMarkdownBlockInputIntent,
@@ -1605,7 +1609,80 @@ const editorAnchorMap = computed(() => {
 })
 const attachmentCaptureSession = createMarkdownAttachmentCaptureSession()
 const attachmentJobs = ref<MarkdownAttachmentJob[]>([])
-const attachmentBatches = new Map<string, MarkdownAttachmentBatchIntent>()
+const attachmentBatches = new Map<
+  string,
+  {
+    readonly batch: MarkdownAttachmentBatchIntent
+    capture?: MarkdownAttachmentCaptureObservation
+    readonly controller: AbortController
+    readonly files: Map<
+      MarkdownAttachmentItemIntent,
+      { readonly file: File; readonly controller: AbortController }
+    >
+  }
+>()
+const revokeAttachmentFile = (itemId: string) => {
+  const item = attachmentItems.get(itemId)
+  if (!item) return
+  for (const record of attachmentBatches.values()) {
+    const loan = record.files.get(item)
+    if (!loan) continue
+    record.files.delete(item)
+    loan.controller.abort()
+    if (!record.files.size) {
+      record.capture = undefined
+      record.controller.abort()
+    }
+    return
+  }
+}
+const releaseAttachmentFiles = () => {
+  const records = [...attachmentBatches.values()]
+  attachmentBatches.clear()
+  attachmentItems.clear()
+  attachmentJobs.value = []
+  attachmentCaptureSession.clear()
+  for (const record of records) {
+    const loans = [...record.files.values()]
+    record.files.clear()
+    record.capture = undefined
+    for (const loan of loans) loan.controller.abort()
+    record.controller.abort()
+  }
+}
+const withAttachmentFile = (
+  batch: MarkdownAttachmentBatchIntent,
+  item: MarkdownAttachmentItemIntent,
+  consume: MarkdownAttachmentFileConsumer,
+): boolean => {
+  const record = attachmentBatches.get(batch.batchId)
+  const loan = record?.files.get(item)
+  const job = attachmentJobs.value.find(
+    (candidate) => candidate.itemId === item.itemId,
+  )
+  if (
+    !record ||
+    record.batch !== batch ||
+    !loan ||
+    !record.capture ||
+    batch.items[item.order] !== item ||
+    attachmentItems.get(item.itemId) !== item ||
+    batch.signal.aborted ||
+    item.signal.aborted ||
+    batch.documentIdentity.id !== documentIdentity.id ||
+    batch.documentIdentity.epoch !== documentIdentity.epoch ||
+    batch.documentIdentity.id !==
+      (props.documentIdentity?.id ?? commandTrayId) ||
+    batch.documentIdentity.epoch !== (props.documentIdentity?.epoch ?? 0) ||
+    !job ||
+    job.revision !== batch.revision ||
+    job.attempt !== 1 ||
+    (job.phase !== 'pending' && job.phase !== 'progress')
+  )
+    return false
+  consume(loan.file, record.capture)
+  return true
+}
 const attachmentItems = new Map<
   string,
   MarkdownAttachmentBatchIntent['items'][number]
@@ -2253,6 +2330,9 @@ type EditorOperation =
       readonly mergeDirection?: MarkdownEditorInputMergeDirection
       readonly restoreSelection?: boolean
       readonly transaction: MarkdownEditorTransaction
+      readonly observeTransaction?: (
+        event: MarkdownEditorTransactionEvent,
+      ) => void
     }
   | {
       readonly kind: 'undo' | 'redo'
@@ -2416,9 +2496,15 @@ const dispatchEditorOperation = (
     contextualSurface.value = null
     contextualError.value = ''
   }
-  emit('transaction', toMarkdownEditorTransactionEvent(transaction, result))
+  const transactionEvent = toMarkdownEditorTransactionEvent(transaction, result)
+  if (operation.kind === 'transaction')
+    operation.observeTransaction?.(transactionEvent)
 
-  if (result.accepted && result.value !== previousValue) {
+  if (
+    result.accepted &&
+    (result.value !== previousValue ||
+      (operation.kind === 'transaction' && operation.transaction.changes.length > 0))
+  ) {
     const appliedChanges =
       operation.kind === 'transaction'
         ? operation.transaction.changes
@@ -2435,10 +2521,16 @@ const dispatchEditorOperation = (
         : undefined
     for (const job of attachmentJobs.value) {
       if (job.itemId === ownedItemId || job.phase === 'deleted') continue
-      rebaseMarkdownAttachmentJob(job, appliedChanges, previousValue)
+      const rebasedJob = rebaseMarkdownAttachmentJob(
+        job,
+        appliedChanges,
+        previousValue,
+      )
+      if (rebasedJob.phase === 'deleted') revokeAttachmentFile(job.itemId ?? job.id)
     }
     triggerRef(attachmentJobs)
   }
+  emit('transaction', transactionEvent)
 
   if (
     result.accepted &&
@@ -2569,12 +2661,16 @@ const captureAttachmentFiles = (
   eventFingerprint?: string,
   nodeId: string | null = null,
 ) => {
+  const controller = new AbortController()
+  const fileControllers = files.map(() => new AbortController())
   const captured = captureMarkdownAttachmentInput({
     sourceKind,
-    documentIdentity,
+    documentIdentity: Object.freeze({ ...documentIdentity }),
+    signal: controller.signal,
     revision: transactionStore.revision,
     anchor: { range: selection, nodeId },
-    files: files.map((file) => ({
+    files: files.map((file, index) => ({
+      signal: fileControllers[index]!.signal,
       name: file.name,
       mimeType: file.type,
       byteLength: file.size,
@@ -2597,14 +2693,63 @@ const captureAttachmentFiles = (
     captured.batch,
     localeText.value.attachments.uploading,
   )
-  const dispatched = dispatchTransaction(planned.transaction)
-  if (!dispatched.accepted) return captured
+  let transactionEvent: MarkdownEditorTransactionEvent | undefined
+  const dispatched = dispatchTransaction(
+    {
+      ...planned.transaction,
+      documentIdentity: captured.batch.documentIdentity,
+      expectedRevision: captured.batch.revision,
+    },
+    (event) => {
+      transactionEvent = event
+    },
+  )
+  if (
+    !dispatched.accepted ||
+    !transactionEvent ||
+    transactionStore.revision !== dispatched.revision ||
+    documentIdentity.id !== captured.batch.documentIdentity.id ||
+    documentIdentity.epoch !== captured.batch.documentIdentity.epoch ||
+    captured.batch.documentIdentity.id !==
+      (props.documentIdentity?.id ?? commandTrayId) ||
+    captured.batch.documentIdentity.epoch !==
+      (props.documentIdentity?.epoch ?? 0)
+  ) {
+    controller.abort()
+    for (const itemController of fileControllers) itemController.abort()
+    return captured
+  }
 
-  attachmentBatches.set(captured.batch.batchId, captured.batch)
+  const capture = Object.freeze({
+    batch: captured.batch,
+    transaction: transactionEvent,
+    plan: planned,
+    placements: Object.freeze(planned.jobs.map((job, index) => Object.freeze({
+      item: captured.batch.items[index]!,
+      range: Object.freeze(job.range!),
+    }))),
+  })
+  attachmentBatches.set(captured.batch.batchId, {
+    batch: captured.batch,
+    capture,
+    controller,
+    files: new Map(
+      captured.batch.items.map((item, index) => [
+        item,
+        {
+          file: files[index]!,
+          controller: fileControllers[index]!,
+        },
+      ]),
+    ),
+  })
   for (const item of captured.batch.items)
     attachmentItems.set(item.itemId, item)
-  attachmentJobs.value = [...attachmentJobs.value, ...planned.jobs]
-  emit('upload-image', captured.batch)
+  attachmentJobs.value = [
+    ...attachmentJobs.value,
+    ...planned.jobs,
+  ]
+  emit('upload-image', captured.batch, capture)
   return captured
 }
 
@@ -3476,6 +3621,7 @@ watch(
     atomicSession.value = null
     liveAtomic.value = null
 
+    releaseAttachmentFiles()
     documentIdentity.id = nextId
     documentIdentity.epoch = nextEpoch
     commandRevisionMaps.clear()
@@ -3615,9 +3761,7 @@ onMounted(() => {
 onBeforeUnmount(() => {
   languageToolsController = null
   abortPendingCommands()
-  attachmentCaptureSession.clear()
-  attachmentBatches.clear()
-  attachmentItems.clear()
+  releaseAttachmentFiles()
   if (layoutGestureTimer) clearTimeout(layoutGestureTimer)
   if (typewriterLayoutFrame !== undefined) {
     cancelAnimationFrame(typewriterLayoutFrame)
@@ -4738,7 +4882,9 @@ const handleAttachmentPickerChange = (event: Event) => {
 
 const applyAttachmentResult = (result: MarkdownAttachmentProviderResult) => {
   const job = attachmentJobs.value.find(
-    (candidate) => candidate.itemId === result.itemId,
+    (candidate) =>
+      candidate.itemId === result.itemId &&
+      candidate.batchId === result.batchId,
   )
   if (!job) return false
   if (result.status === 'progress') {
@@ -4753,6 +4899,8 @@ const applyAttachmentResult = (result: MarkdownAttachmentProviderResult) => {
     job,
     result,
   )
+  if (job.phase !== 'pending' && job.phase !== 'progress')
+    revokeAttachmentFile(job.itemId ?? job.id)
   triggerRef(attachmentJobs)
   if (!planned.transaction) return planned.accepted
   return dispatchTransaction({
@@ -4769,11 +4917,14 @@ const runAttachmentAction = (
     (candidate) => candidate.itemId === itemId,
   )
   if (!job) return
+  const batch = job.batchId
+    ? attachmentBatches.get(job.batchId)?.batch
+    : undefined
+  revokeAttachmentFile(itemId)
   if (action === 'cancel') {
     cancelMarkdownAttachmentJob(job)
   } else if (action === 'retry') {
     retryMarkdownAttachmentJob(job)
-    const batch = job.batchId ? attachmentBatches.get(job.batchId) : undefined
     const item = attachmentItems.get(itemId)
     if (batch && item) {
       emit(
@@ -5651,10 +5802,14 @@ const handleKeydown = (event: KeyboardEvent) => {
   }
 }
 
-const dispatchTransaction = (transaction: MarkdownEditorTransaction) => {
+const dispatchTransaction = (
+  transaction: MarkdownEditorTransaction,
+  observeTransaction?: (event: MarkdownEditorTransactionEvent) => void,
+) => {
   const result = dispatchEditorOperation({
     kind: 'transaction',
     transaction,
+    observeTransaction,
   })
   selectionTick.value += 1
   return result
@@ -5977,7 +6132,9 @@ defineExpose({
   closeSearch,
   closeCommandPalette,
   applyAttachmentResult,
-  dispatchTransaction,
+  withAttachmentFile,
+  dispatchTransaction: (transaction: MarkdownEditorTransaction) =>
+    dispatchTransaction(transaction),
   insertMarkdownAtCursor,
   openSearch,
   openCommandPalette,

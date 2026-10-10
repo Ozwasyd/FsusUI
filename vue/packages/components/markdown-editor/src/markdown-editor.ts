@@ -36,7 +36,10 @@ import type { MarkdownFeatureActivationFeatureOptions } from '@element-plus/wasm
 import type { MarkdownEmbedProvider } from '../../../wasm/markdown-embed-provider'
 import type { MarkdownStableProjection } from '@element-plus/wasm'
 import type MarkdownEditor from './markdown-editor.vue'
-import type { MarkdownAttachmentBatchIntent } from './markdown-editor-attachment'
+import type {
+  MarkdownAttachmentBatchIntent,
+  MarkdownAttachmentCaptureObservation,
+} from './markdown-editor-attachment'
 import type { MarkdownEditorMetricsOptions } from './markdown-editor-metrics'
 export {
   captureMarkdownAttachmentInput,
@@ -58,6 +61,8 @@ export {
   type MarkdownAttachmentAtomicAction,
   type MarkdownAttachmentAtomicPresentation,
   type MarkdownAttachmentBatchIntent,
+  type MarkdownAttachmentCaptureObservation,
+  type MarkdownAttachmentFileConsumer,
   type MarkdownAttachmentCaptureContext,
   type MarkdownAttachmentCaptureInput,
   type MarkdownAttachmentCaptureRejection,
@@ -1850,7 +1855,10 @@ export const markdownEditorEmits = {
     mode === 'preview',
   save: (value: string) => typeof value === 'string',
   submit: (value: string) => typeof value === 'string',
-  'upload-image': (_batch: MarkdownAttachmentBatchIntent) => true,
+  'upload-image': (
+    _batch: MarkdownAttachmentBatchIntent,
+    _capture: MarkdownAttachmentCaptureObservation | undefined = undefined,
+  ) => true,
   'render-complete': (..._args: unknown[]) => true,
   'render-error': (..._args: unknown[]) => true,
   'features-activated': (..._args: unknown[]) => true,
