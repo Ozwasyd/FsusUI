@@ -6,8 +6,8 @@ import path from 'node:path'
 import { test } from 'node:test'
 import { sourceAuthority, assertProducerDiagnostics } from './fixtures/public-classic-select-declaration/authority.mjs'
 
-const root = path.resolve(import.meta.dirname, '..')
-const require = createRequire(import.meta.url)
+const root = path.resolve(process.env.CLASSIC_SELECT_SOURCE_ROOT || path.resolve(import.meta.dirname, '..'))
+const require = createRequire(path.join(root, 'package.json'))
 require('tsx/cjs')
 const { Project, ts } = require('ts-morph')
 const { parse } = require('vue/compiler-sfc')
@@ -63,7 +63,7 @@ test('canonical producer emits Select; preserves ref contracts and records Optio
     return rows
   }
   try {
-    const { generateTypesDefinitions } = require('../vue/internal/build/src/tasks/types-definitions.ts')
+    const { generateTypesDefinitions } = require(path.join(root, 'vue/internal/build/src/tasks/types-definitions.ts'))
     assert.equal(typeof generateTypesDefinitions, 'function')
     await new Promise((resolve, reject) => generateTypesDefinitions((error) => error ? reject(error) : resolve()))
   } finally {

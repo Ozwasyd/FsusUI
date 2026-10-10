@@ -100,3 +100,32 @@ The `packageQualification` field in packed controls records only strict
 TypeScript whole-package compilation. It does not accept the shared declaration
 producer's outstanding AST review items or public runtime export conditions;
 those remain owned by the shared producer/package writer.
+
+## Frozen 31fe composition intake
+
+The separately recorded `shared-node16-31fe270` source profile follows actual
+published-source inspection and the immutable Library verification bundle, not
+a reported fingerprint alone. Its five changed original-filter inputs and all
+23 exact reviewed Select-owned blobs are recorded with the complete verified
+manifest, actual archive identity, producer observation and payload comparison.
+All historical source profiles and complete failures remain unchanged.
+
+The transferred archive is `462360d7342f8f17e40f19eaae6f1246ba5de2909d9bd1b0072e2884798ec215`.
+The independently rebuilt archive has a different digest: only the position of
+the same readonly `interval: number` property differs in six Carousel declaration
+files. All 30 original Select declaration boundaries and complete package
+metadata are byte-identical to the already inspected 2b artifact. The unchanged
+installed guard therefore reports the existing 2b declaration identity for this
+archive; that identity does not equate the two complete archives.
+
+`CLASSIC_SELECT_SOURCE_ROOT` selects an actual source checkout for the existing
+source tests. Run with that checkout as the working directory. Dependencies,
+compiler and canonical producer resolve from the selected root; the unchanged
+full source-fingerprint guard still rejects every unknown graph. This permits
+qualification from the independent test branch while keeping the frozen 31fe
+checkout and candidate untouched. The same source tests, original assertions,
+producer hooks, inferred contracts and negative/refusal controls execute.
+
+This profile does not close the shared resolver's default-through-export-star
+P2, qualify public lib-directory ESM/Vite export conditions, or pre-approve the
+333b successor. Every production or lock successor requires separate intake.
