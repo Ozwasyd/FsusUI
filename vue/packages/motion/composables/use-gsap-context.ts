@@ -1,3 +1,4 @@
+/// <reference types="gsap" preserve="true" />
 import { getCurrentScope, onScopeDispose, unref } from 'vue'
 import { getGsap } from '../gsap/register'
 import type { Ref } from 'vue'

@@ -1,0 +1,93 @@
+{
+  "source": {
+    "name": "composition-31fe",
+    "sourceSha": "31fe270f524cdd09ea43949077f4826196ebc550",
+    "identitySourceSha": "31fe270f524cdd09ea43949077f4826196ebc550",
+    "sourceInputCount": 2453,
+    "sourceInputFingerprint": "fbad28a3423d44aabdd59d9f5adc8c4358d76e1cf6a8376f4ccf5592ff4db000",
+    "producerDiagnostics": [],
+    "extraInputDigests": {
+      "patches/@vue-macros__api@0.13.4.patch": "aed97dea4d00fa0806099b31a7ec0dc8e14fbc3f5f8df02968a5c0916076643b"
+    },
+    "producerDependency": {
+      "name": "@vue-macros/api",
+      "version": "0.13.4",
+      "files": [
+        {
+          "path": "dist/index.cjs",
+          "sha256": "2037b0cc753cb43626ebfbe441b04b3233c5926abad3188fbf4671bc61ed4e2c"
+        },
+        {
+          "path": "dist/index.js",
+          "sha256": "0ce732a1f85c65718847618972cf370c78cf323035eea2aa550d6ddf743a1529"
+        }
+      ]
+    }
+  },
+  "artifact": {
+    "name": "composition-31fe",
+    "sourceSha": "31fe270f524cdd09ea43949077f4826196ebc550",
+    "sha256": "462360d7342f8f17e40f19eaae6f1246ba5de2909d9bd1b0072e2884798ec215",
+    "manifest": {
+      "artifact": {
+        "filename": "fsusui-npm-candidate.tgz",
+        "sha256": "462360d7342f8f17e40f19eaae6f1246ba5de2909d9bd1b0072e2884798ec215"
+      },
+      "build": {
+        "command": "pnpm run build:npm-package",
+        "inputFingerprint": "1f81a70fffde6d37aa8db989ab315eb4c9ab0f76e3abd509a0e1c392df2ddb88",
+        "inputs": {
+          "package.json": "4e6502bacf6c8edfe52fd20f7d59bd5df9a05f8f627546e62fb889f6e5c50ace",
+          "pnpm-lock.yaml": "37272929247ae0ab5cbd430747b6872ed5f1a5fa811db28f70951819a59b9244",
+          "scripts/npm-candidate-lib.mjs": "192e73da5a535bde4b265a1e5827a7d839d44c3ee32646ef3ff1c1f001371cb0",
+          "scripts/package-candidate.mjs": "3eaa9761f4728e155531bf8eba34186596106730eff24561ceb8cf09a30c33b9",
+          "scripts/prepare-component-exports.mjs": "980c5be4b60e634e349299ddfcb855e7138d37bbfffe35677cc84764a0d1eab7",
+          "scripts/prepare-npm-package.mjs": "59ee48a333fb3ad5d19e624bac31d6423d15945a391a07c418dacb9fa9c5cc8b",
+          "vue/packages/element-plus/package.json": "679ac1bf633b28d2f40fcc6e43937f23808480f681a405e56bca94a5ad69be66"
+        },
+        "lockfileSha256": "37272929247ae0ab5cbd430747b6872ed5f1a5fa811db28f70951819a59b9244",
+        "scriptVersion": 1
+      },
+      "commitSha": "31fe270f524cdd09ea43949077f4826196ebc550",
+      "metadata": {
+        "provenanceEligible": true,
+        "publicAccess": true,
+        "publishConfigPresent": true,
+        "registry": "https://registry.npmjs.org/"
+      },
+      "package": {
+        "distTag": "latest",
+        "name": "@ozwasyd/element-plus",
+        "packageJsonCanonicalSha256": "4705f1f494c485e673b58ed280dae1a1feb233b8aed837402eb704206f47c73d",
+        "version": "1.5.1"
+      },
+      "schemaVersion": 1,
+      "sourceProfile": "Release",
+      "toolchain": {
+        "node": "v24.19.0",
+        "npm": "11.13.0",
+        "pnpm": "10.33.0"
+      }
+    },
+    "libraryDiagnostics": [],
+    "installationAdditions": [
+      [
+        "node_modules/.bin/katex",
+        "b9553539f21fe3af00140c41a282144116a8ed643d5ce062e74880b6cbcd4597"
+      ]
+    ],
+    "completePayloadDigest": "d54a91492da55414cb285b38b762f3eb56db8cda54ca0c4fb3c180dc32b69bca",
+    "completePayloadFiles": 8519
+  },
+  "qualificationEvidence": {
+    "library_file_id": "libfile_9ffb624a1b648191aa537b4a4619631a",
+    "file_id": "file_00000000b3d081fd9198c570c165a14c",
+    "version": 0,
+    "bundleSha256": "e5e4e193987b34ecb3dfc358c3a81ee1f9fba39928d2fdc9cee9ac2ca7396ae4",
+    "actualCanonicalVerifier": "PASS",
+    "actualCanonicalProducer": "PASS complete zero diagnostic rows, original inferred parameter/return equality, two rejected mutations, 411-byte declaration, identical runtime JS",
+    "canonicalDatePickerDeclarations": "PASS selector and all3 panel declaration bytes equal previous actually qualified canonical artifact",
+    "completeSourceFilter": "unchanged",
+    "installedQualification": "Required by unchanged strict positive/negative, runtime and refusal assertions on every installed test run; fixture is not a blanket package acceptance"
+  }
+}
