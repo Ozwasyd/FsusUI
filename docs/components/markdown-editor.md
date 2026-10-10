@@ -119,6 +119,130 @@ editor type. `defaultMarkdownEditorCommands` and consumer commands merge into on
 there is no compatibility dispatcher or per-surface command list. New code uses the stable
 command context through `runMarkdownEditorCommand` and passes its result to the dispatcher.
 
+## Native attachment File bridge
+
+Native pick, paste, and drop retain their actual `File` objects only for active
+attachment jobs in the owning editor. The `upload-image` event still receives the
+metadata-only `MarkdownAttachmentBatchIntent` first; it never gains a `files`
+property. Native accepted captures add an optional second argument,
+`MarkdownAttachmentCaptureObservation`:
+
+```ts
+interface MarkdownAttachmentCaptureObservation {
+  readonly batch: MarkdownAttachmentBatchIntent
+  readonly transaction: MarkdownEditorTransactionEvent
+  readonly plan: Readonly<{
+    transaction: MarkdownEditorTransaction
+    jobs: readonly Readonly<MarkdownAttachmentJob>[]
+  }>
+  readonly placements: readonly Readonly<{
+    item: MarkdownAttachmentItemIntent
+    range: MarkdownAttachmentRange
+  }>[]
+}
+
+type MarkdownAttachmentFileConsumer = (
+  file: File,
+  capture: MarkdownAttachmentCaptureObservation,
+) => void
+
+const accepted = editor.value?.withAttachmentFile(batch, item, (file, capture) => {
+  // Bind the consumer's original capture to this accepted placeholder transaction,
+  // then lend this exact File and item.signal to its genuine pending upload handle.
+})
+```
+
+These types are exported by the existing MarkdownEditor public type boundary.
+`withAttachmentFile(batch, item, consume): boolean` calls the consumer synchronously
+with the identical original native File and genuine capture observation, or returns
+`false` without calling it. It requires the original batch and item objects from this
+editor, the exact item order, capture revision, document id/epoch, first attempt, and
+active batch/item signals. Equal metadata, object spreads, reconstructed IDs,
+serialized observations, another editor's objects, and metadata-only captures do
+not grant a File association. The observation itself contains no Files.
+
+The observation's `transaction` is the exact read-only object emitted by the
+existing `transaction` event for the accepted placeholder insertion. Its
+`beforeRevision === batch.revision` and its
+`transaction.expectedRevision === batch.revision`. Its post `revision` increments
+once when content changes; replacing a placeholder with identical bytes is an
+accepted no-op with the same before/post revision, following the existing kernel.
+The replacement still revokes the previous File, even for equal metadata. Native
+event fingerprints distinguish new batch/item IDs at an unchanged revision;
+fingerprints and IDs alone never grant File access. All ordered placeholders
+enter that one change/dispatch. `upload-image` runs after dispatch and job registration;
+the File loan performs no capture or dispatch. `plan` is the actual original
+planner result, including the original transaction and job objects; its jobs stay
+owned by the existing lifecycle and can subsequently rebase. `placements` retains
+the original frozen range objects from those jobs, paired with the original ordered
+items. Use these ranges and the actual accepted transaction/result/position map to
+verify the localized placeholders; do not replan or derive offsets from filenames.
+Consumers connect their original capture to genuine pending handles by admitting
+that existing transaction in their own context. A consumer `commitCreated` that
+dispatches its own placeholder requires a consumer-owned admission change first;
+receiving this event must not insert placeholders again. An observer that changes
+the document/revision during dispatch prevents the old capture from granting Files.
+The original accepted jobs enter the existing attachment lifecycle before public
+dispatch callbacks run; File associations are registered only after those jobs
+remain current. A callback that deletes or replaces an original placement prevents
+admission even when it inserts identical bytes and the revision stays unchanged.
+Selection-only callbacks and non-deleting edits at the same revision preserve the
+association. Refusal retires only that capture's original jobs/items before aborting
+its signals; it does not recreate a placement or grant from matching source bytes.
+Public transaction metadata cannot exempt an attachment from mapping. Completion
+and removal keep their existing exemption through their actual private owning job,
+without granting authority to a copied item ID.
+
+Each item has its own `AbortSignal`. Cancellation, retry, rejection, completion,
+removal, replacement, or deletion revoke that item's loan and release the retained
+File. Other pending items remain independent. Ordinary edits keep surviving jobs
+current through the existing range rebasing. A document id/epoch change or unmount
+revokes every loan before abort listeners run. The batch signal aborts when its last
+loan is revoked. Metadata retry events keep their existing first-argument contract
+but have no native capture observation and cannot remint a released File: obtaining
+another File requires a new native capture.
+
+Accepted edits rebase every affected attachment job and remove all deleted File
+associations before invoking any item abort listener. A deleted sibling cannot be
+borrowed during another item's abort callback; surviving rebased siblings remain
+usable. Abort signals still run their normal synchronous listeners.
+
+Completion plans retain the actual placeholder range until the existing dispatcher
+accepts the replacement. After File revocation and its callbacks, the editor verifies
+the original item/batch/job binding, attempt, range, source, current document id/epoch
+(including props awaiting a switch), and current revision. The completion transaction
+carries that document identity and `expectedRevision`; the resolved range is published
+with the actual accepted result/position map before outward transaction observers.
+A callback that edits, replaces, deletes, switches, or releases this context causes
+coherent refusal and preserves the current source. Equal numeric revisions alone
+cannot authorize a completion: an equal-byte replacement map can delete its anchor.
+A stale completion cannot be revived by later progress/resolved callbacks. Recover
+through a fresh native replacement and its new original File association. Ordinary
+current completions and surviving independent items continue through
+`applyAttachmentResult()`.
+
+Accepted transaction events retain their original result/map as historical evidence,
+even if a synchronous listener commits a newer transaction. Model/change notifications
+and saved selection/history effects require the result's document id/epoch, current
+source and revision to remain current. The editor checks again after each outward
+callback, including the model notification; a nested edit cannot be followed by an
+older model/change value. A selection-only callback can keep the content result current
+while superseding its selection. Queued selection restoration checks the actual document,
+source, revision and selection again after the next tick and after focus listeners.
+Release/unmount also suppresses saved effects. Native capture checks the released state
+before capture and again after the accepted dispatch, before registering any job or
+File association. If a transaction listener unmounts the editor, the fresh unregistered
+batch/item controllers abort and no association is recreated after cleanup. File loans
+also require a live editor. The editor preserves callbacks and the accepted historical
+transaction; it does not replay or remint the superseded operation.
+
+Applications own their pending handles, upload IO, callbacks, and cleanup of any
+references they retain from the synchronous loan; observe `item.signal` when lending
+into an upload. Continue returning results through `applyAttachmentResult()`.
+File access and transaction observations confer no asset/reference/cleanup
+authority. Descriptor-only upload events remain metadata-only and omit the second
+argument. This bridge does not qualify a browser/device or consumer integration.
+
 ## Chrome variants
 
 `chrome` controls only the editor's surrounding regions. It does not change mode, Markdown

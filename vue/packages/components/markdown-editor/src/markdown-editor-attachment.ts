@@ -1,4 +1,9 @@
 import type { MarkdownDocumentIdentity } from '../../../wasm/markdown-runtime'
+import type {
+  MarkdownEditorTransaction,
+  MarkdownEditorTransactionEvent,
+} from './markdown-editor-transaction'
+import type { MarkdownAttachmentJob } from './markdown-editor-attachment-lifecycle'
 
 export type MarkdownAttachmentSourceKind = 'pick' | 'paste' | 'drop'
 
@@ -57,6 +62,26 @@ export interface MarkdownAttachmentBatchIntent {
   readonly items: readonly MarkdownAttachmentItemIntent[]
   readonly signal: AbortSignal
 }
+
+/** Observation of the original accepted native capture and placeholder dispatch. */
+export interface MarkdownAttachmentCaptureObservation {
+  readonly batch: MarkdownAttachmentBatchIntent
+  readonly transaction: MarkdownEditorTransactionEvent
+  readonly plan: Readonly<{
+    transaction: MarkdownEditorTransaction
+    jobs: readonly Readonly<MarkdownAttachmentJob>[]
+  }>
+  readonly placements: readonly Readonly<{
+    item: MarkdownAttachmentItemIntent
+    range: MarkdownAttachmentRange
+  }>[]
+}
+
+/** Synchronous loan of the original File; the item's signal bounds its lifetime. */
+export type MarkdownAttachmentFileConsumer = (
+  file: File,
+  capture: MarkdownAttachmentCaptureObservation,
+) => void
 
 export interface MarkdownAttachmentResolvedPayload {
   readonly markdownKind: MarkdownAttachmentMarkdownKind
@@ -138,6 +163,7 @@ export const createMarkdownAttachmentBatch = (input: {
     readonly signal?: AbortSignal
   }[]
   readonly signal?: AbortSignal
+  readonly eventFingerprint?: string
 }): MarkdownAttachmentBatchIntent => {
   const signal = input.signal ?? new AbortController().signal
   const batchId = [
@@ -147,6 +173,7 @@ export const createMarkdownAttachmentBatch = (input: {
     input.nodeId ?? 'doc',
     input.sourceKind,
     String(input.items.length),
+    ...(input.eventFingerprint ? [input.eventFingerprint] : []),
   ].join(':')
   const items = input.items.map((item, order) =>
     Object.freeze({
@@ -470,6 +497,7 @@ export interface MarkdownAttachmentCaptureInput {
     readonly nodeId?: string | null
   }
   readonly files: readonly MarkdownAttachmentInputFile[]
+  readonly signal?: AbortSignal
   readonly context?: MarkdownAttachmentCaptureContext
   readonly eventFingerprint?: string
   readonly session?: MarkdownAttachmentCaptureSession
@@ -616,6 +644,8 @@ export const captureMarkdownAttachmentInput = (
     nodeId: input.anchor.nodeId,
     range: input.anchor.range,
     items: normalizedItems,
+    eventFingerprint: input.eventFingerprint,
+    signal: input.signal,
   })
 
   return Object.freeze({
