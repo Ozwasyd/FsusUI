@@ -1,0 +1,124 @@
+--- a/vue/packages/components/markdown-editor/src/markdown-editor.vue
++++ b/vue/packages/components/markdown-editor/src/markdown-editor.vue
+@@ -564,7 +564,18 @@
+               segment.plan.statusText
+             }}</span>
+           </header>
+-          <p v-if="segment.plan.excerpt" class="el-markdown-embed__body">
++          <el-markdown-renderer
++            v-if="segment.plan.markdown !== undefined"
++            :base-url="previewBaseUrl"
++            :content="segment.plan.markdown"
++            :csp-nonce="previewCspNonce"
++            :features="previewFeatures"
++            mode="editor"
++            @features-activated="emitRenderEvent('features-activated', $event)"
++            @render-complete="handleRendererComplete($event)"
++            @render-error="emitRenderEvent('render-error', $event)"
++          />
++          <p v-else-if="segment.plan.excerpt" class="el-markdown-embed__body">
+             {{ segment.plan.excerpt }}
+           </p>
+           <div class="el-markdown-embed__actions">
+@@ -630,7 +641,18 @@
+                 segment.plan.statusText
+               }}</span>
+             </header>
+-            <p v-if="segment.plan.excerpt" class="el-markdown-embed__body">
++            <el-markdown-renderer
++              v-if="segment.plan.markdown !== undefined"
++              :base-url="previewBaseUrl"
++              :content="segment.plan.markdown"
++              :csp-nonce="previewCspNonce"
++              :features="previewFeatures"
++              mode="editor"
++              @features-activated="emitRenderEvent('features-activated', $event)"
++              @render-complete="handleRendererComplete($event)"
++              @render-error="emitRenderEvent('render-error', $event)"
++            />
++            <p v-else-if="segment.plan.excerpt" class="el-markdown-embed__body">
+               {{ segment.plan.excerpt }}
+             </p>
+             <div class="el-markdown-embed__actions">
+@@ -1350,8 +1372,11 @@
+ } from './markdown-editor-embed'
+ import {
+   commitMarkdownEmbedResult,
++  cancelMarkdownEmbedRequest,
++  createMarkdownEmbedProjectionRequest,
+   createMarkdownEmbedRequest,
+   forgetMarkdownEmbedRequest,
++  type MarkdownEmbedRequest,
+   type MarkdownEmbedResult,
+ } from '../../../wasm/markdown-embed-provider'
+ 
+@@ -3626,7 +3651,10 @@
+   cssHighlightRegistry()?.delete('markdown-search-match')
+   cssHighlightRegistry()?.delete('markdown-search-current')
+   embedResolutionGeneration += 1
+-  for (const requestId of pendingEmbedRequests) forgetMarkdownEmbedRequest(requestId)
++  for (const requestId of pendingEmbedRequests) {
++    cancelMarkdownEmbedRequest(requestId)
++    forgetMarkdownEmbedRequest(requestId)
++  }
+   pendingEmbedRequests.clear()
+   if (typeof window === 'undefined') return
+ 
+@@ -4969,14 +4997,29 @@
+   const nodeId = embedNodeId(node)
+   const version = (embedRequestVersions.get(nodeId) ?? 0) + 1
+   embedRequestVersions.set(nodeId, version)
+-  const request = createMarkdownEmbedRequest({
++  const requestInput = {
+     documentIdentity,
+     mode: node.mode,
+     nodeId,
+     revision: transactionStore.revision,
+     target: node.target,
+     version,
+-  })
++  }
++  let request: MarkdownEmbedRequest
++  try {
++    request = await createMarkdownEmbedProjectionRequest(requestInput)
++  } catch {
++    if (generation !== embedResolutionGeneration) return
++    const unavailable = createMarkdownEmbedRequest(requestInput)
++    embedResults.value = new Map(embedResults.value).set(nodeId,
++      Object.freeze({ ...unavailable, status: 'unsupported' as const }))
++    forgetMarkdownEmbedRequest(unavailable.requestId)
++    return
++  }
++  if (generation !== embedResolutionGeneration) {
++    cancelMarkdownEmbedRequest(request)
++    return
++  }
+   pendingEmbedRequests.add(request.requestId)
+   const pending: MarkdownEmbedResult = Object.freeze({
+     ...request,
+@@ -4999,6 +5042,8 @@
+ 
+ const refreshEmbedPresentations = () => {
+   const generation = ++embedResolutionGeneration
++  for (const requestId of pendingEmbedRequests) cancelMarkdownEmbedRequest(requestId)
++  pendingEmbedRequests.clear()
+   const activeIds = new Set(embedNodes.value.map(embedNodeId))
+   embedResults.value = new Map(
+     [...embedResults.value].filter(([nodeId]) => activeIds.has(nodeId)),
+@@ -5028,6 +5073,16 @@
+           node,
+           result,
+           localeText.value.embeds,
++          result ? {
++            requestId: result.requestId,
++            requestDigest: result.requestDigest,
++            documentIdentity,
++            revision: transactionStore.revision,
++            nodeId: embedNodeId(node),
++            target: node.target,
++            mode: node.mode,
++            version: embedRequestVersions.get(embedNodeId(node)) ?? 0,
++          } : undefined,
+         ),
+         result,
+       })

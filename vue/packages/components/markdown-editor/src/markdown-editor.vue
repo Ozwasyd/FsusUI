@@ -357,6 +357,7 @@
         @pointerup="handleSelectionDragEnd"
         @scroll="handleLayoutScroll"
         @select="handleSelectionMove"
+        @selectionchange="handleSelectionMove"
         @touchmove="handleLayoutTouch"
         @wheel="handleLayoutWheel"
       />
@@ -564,7 +565,18 @@
               segment.plan.statusText
             }}</span>
           </header>
-          <p v-if="segment.plan.excerpt" class="el-markdown-embed__body">
+          <el-markdown-renderer
+            v-if="segment.plan.markdown !== undefined"
+            :base-url="previewBaseUrl"
+            :content="segment.plan.markdown"
+            :csp-nonce="previewCspNonce"
+            :features="previewFeatures"
+            mode="editor"
+            @features-activated="emitRenderEvent('features-activated', $event)"
+            @render-complete="handleRendererComplete($event)"
+            @render-error="emitRenderEvent('render-error', $event)"
+          />
+          <p v-else-if="segment.plan.excerpt" class="el-markdown-embed__body">
             {{ segment.plan.excerpt }}
           </p>
           <div class="el-markdown-embed__actions">
@@ -630,7 +642,18 @@
                 segment.plan.statusText
               }}</span>
             </header>
-            <p v-if="segment.plan.excerpt" class="el-markdown-embed__body">
+            <el-markdown-renderer
+              v-if="segment.plan.markdown !== undefined"
+              :base-url="previewBaseUrl"
+              :content="segment.plan.markdown"
+              :csp-nonce="previewCspNonce"
+              :features="previewFeatures"
+              mode="editor"
+              @features-activated="emitRenderEvent('features-activated', $event)"
+              @render-complete="handleRendererComplete($event)"
+              @render-error="emitRenderEvent('render-error', $event)"
+            />
+            <p v-else-if="segment.plan.excerpt" class="el-markdown-embed__body">
               {{ segment.plan.excerpt }}
             </p>
             <div class="el-markdown-embed__actions">
@@ -957,7 +980,7 @@
             "
             @keydown.down.prevent="selectNextPaletteItem"
             @keydown.up.prevent="selectPreviousPaletteItem"
-            @keydown.enter.prevent="executeActivePaletteItem"
+            @keydown.enter="executeActivePaletteItem"
           />
           <div :id="paletteListId" :class="ns.e('palette-list')" role="listbox">
             <div
@@ -1350,8 +1373,11 @@ import {
 } from './markdown-editor-embed'
 import {
   commitMarkdownEmbedResult,
+  cancelMarkdownEmbedRequest,
+  createMarkdownEmbedProjectionRequest,
   createMarkdownEmbedRequest,
   forgetMarkdownEmbedRequest,
+  type MarkdownEmbedRequest,
   type MarkdownEmbedResult,
 } from '../../../wasm/markdown-embed-provider'
 
@@ -2463,6 +2489,7 @@ const dispatchEditorOperation = (
     emit(
       'selection-change',
       Object.freeze({
+        documentIdentity: result.documentIdentity,
         revision: result.revision,
         selection: result.selection,
       }),
@@ -2514,6 +2541,7 @@ const captureSelection = (breakMerge = true) => {
     emit(
       'selection-change',
       Object.freeze({
+        documentIdentity: transactionStore.documentIdentity,
         revision: transactionStore.revision,
         selection,
       }),
@@ -3192,7 +3220,9 @@ const movePaletteIndex = (direction: 1 | -1) => {
 }
 const selectNextPaletteItem = () => movePaletteIndex(1)
 const selectPreviousPaletteItem = () => movePaletteIndex(-1)
-const executeActivePaletteItem = () => {
+const executeActivePaletteItem = (event: KeyboardEvent) => {
+  if (event.isComposing || event.keyCode === 229 || isComposing.value) return
+  event.preventDefault()
   const command = paletteCommands.value[activePaletteIndex.value]
   if (command && !isCommandDisabled(command)) {
     executePaletteCommand(command)
@@ -3626,7 +3656,12 @@ onBeforeUnmount(() => {
   cssHighlightRegistry()?.delete('markdown-search-match')
   cssHighlightRegistry()?.delete('markdown-search-current')
   embedResolutionGeneration += 1
-  for (const requestId of pendingEmbedRequests) forgetMarkdownEmbedRequest(requestId)
+  for (const controller of pendingEmbedControllers) controller.abort()
+  pendingEmbedControllers.clear()
+  for (const requestId of pendingEmbedRequests) {
+    cancelMarkdownEmbedRequest(requestId)
+    forgetMarkdownEmbedRequest(requestId)
+  }
   pendingEmbedRequests.clear()
   if (typeof window === 'undefined') return
 
@@ -4951,6 +4986,7 @@ type MarkdownEmbedRenderSegment =
 const embedResults = ref<ReadonlyMap<string, MarkdownEmbedResult>>(new Map())
 let embedResolutionGeneration = 0
 const pendingEmbedRequests = new Set<string>()
+const pendingEmbedControllers = new Set<AbortController>()
 const embedRequestVersions = new Map<string, number>()
 const embedNodeId = (node: MarkdownEmbedValidNode) =>
   `embed:${node.ranges.full.start}:${node.target}:${node.mode}`
@@ -4969,14 +5005,41 @@ const resolveEmbedNode = async (
   const nodeId = embedNodeId(node)
   const version = (embedRequestVersions.get(nodeId) ?? 0) + 1
   embedRequestVersions.set(nodeId, version)
-  const request = createMarkdownEmbedRequest({
-    documentIdentity,
+  const requestInput = {
+    documentIdentity: Object.freeze({ ...transactionStore.documentIdentity }),
     mode: node.mode,
     nodeId,
     revision: transactionStore.revision,
     target: node.target,
     version,
-  })
+  }
+  const controller = new AbortController()
+  pendingEmbedControllers.add(controller)
+  let request: MarkdownEmbedRequest
+  try {
+    request = globalThis.crypto?.subtle
+      ? await createMarkdownEmbedProjectionRequest({
+          ...requestInput,
+          signal: controller.signal,
+        })
+      : createMarkdownEmbedRequest({
+          ...requestInput,
+          signal: controller.signal,
+        })
+  } catch {
+    request = createMarkdownEmbedRequest({
+      ...requestInput,
+      signal: controller.signal,
+    })
+  }
+  if (
+    generation !== embedResolutionGeneration ||
+    embedRequestVersions.get(nodeId) !== version
+  ) {
+    cancelMarkdownEmbedRequest(request)
+    pendingEmbedControllers.delete(controller)
+    return
+  }
   pendingEmbedRequests.add(request.requestId)
   const pending: MarkdownEmbedResult = Object.freeze({
     ...request,
@@ -4989,16 +5052,25 @@ const resolveEmbedNode = async (
   } catch {
     result = Object.freeze({ ...request, status: 'rejected' as const })
   } finally {
+    pendingEmbedControllers.delete(controller)
     pendingEmbedRequests.delete(request.requestId)
     forgetMarkdownEmbedRequest(request.requestId)
   }
-  if (generation !== embedResolutionGeneration) return
+  if (
+    generation !== embedResolutionGeneration ||
+    embedRequestVersions.get(nodeId) !== version
+  )
+    return
   const committed = commitMarkdownEmbedResult(request, result)
   embedResults.value = new Map(embedResults.value).set(nodeId, committed)
 }
 
 const refreshEmbedPresentations = () => {
   const generation = ++embedResolutionGeneration
+  for (const controller of pendingEmbedControllers) controller.abort()
+  pendingEmbedControllers.clear()
+  for (const requestId of pendingEmbedRequests) cancelMarkdownEmbedRequest(requestId)
+  pendingEmbedRequests.clear()
   const activeIds = new Set(embedNodes.value.map(embedNodeId))
   embedResults.value = new Map(
     [...embedResults.value].filter(([nodeId]) => activeIds.has(nodeId)),
@@ -5028,6 +5100,16 @@ const embedRenderSegments = computed<readonly MarkdownEmbedRenderSegment[]>(
           node,
           result,
           localeText.value.embeds,
+          result ? {
+            requestId: result.requestId,
+            requestDigest: result.requestDigest,
+            documentIdentity,
+            revision: transactionStore.revision,
+            nodeId: embedNodeId(node),
+            target: node.target,
+            mode: node.mode,
+            version: embedRequestVersions.get(embedNodeId(node)) ?? 0,
+          } : undefined,
         ),
         result,
       })
@@ -5342,7 +5424,13 @@ const searchReplaceAll = () => {
 }
 
 watch(
-  [editorValue, editorRevision, () => props.embedProvider],
+  [
+    editorValue,
+    editorRevision,
+    () => documentIdentity.id,
+    () => documentIdentity.epoch,
+    () => props.embedProvider,
+  ],
   refreshEmbedPresentations,
   { immediate: true },
 )
@@ -5482,7 +5570,10 @@ const handleKeydown = (event: KeyboardEvent) => {
                 : event.key === 'PageDown'
                   ? 'page-down'
                   : null
-    if (motionKey) {
+    const nativeDocumentNavigation =
+      (event.ctrlKey || event.metaKey) &&
+      (event.key === 'Home' || event.key === 'End')
+    if (motionKey && !nativeDocumentNavigation) {
       event.preventDefault()
       applyLiveSelectionMotion(motionKey, { shift: event.shiftKey })
       return

@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="markdown-embed-projection-blog-fixture.cs" />
+    <Compile Include="$(BlogEmbedContractRoot)/ArticleEmbedContracts.cs" />
+    <Compile Include="$(BlogEmbedContractRoot)/ArticleEmbedContractDigest.cs" />
+  </ItemGroup>
+  <Target Name="RequireExactBlogSource" BeforeTargets="BeforeBuild">
+    <Error Condition="'$(BlogEmbedContractRoot)' == ''" Text="Pass BlogEmbedContractRoot from the exact 1194ee45037862aa30803650ec2a622700631224 checkout." />
+    <GetFileHash Files="$(BlogEmbedContractRoot)/ArticleEmbedContracts.cs" Algorithm="SHA256">
+      <Output TaskParameter="Items" ItemName="ContractSourceHash" />
+    </GetFileHash>
+    <Error Condition="'%(ContractSourceHash.FileHash)' != '6224A1C8E198621AB8F7D7FAAA23778DAB0C5FF7BA5224AD8D99ED4785A67358'" Text="ArticleEmbedContracts.cs differs from the frozen Blog 1194ee contract source." />
+    <GetFileHash Files="$(BlogEmbedContractRoot)/ArticleEmbedContractDigest.cs" Algorithm="SHA256">
+      <Output TaskParameter="Items" ItemName="DigestSourceHash" />
+    </GetFileHash>
+    <Error Condition="'%(DigestSourceHash.FileHash)' != '9CDE417E07B3597B90B3181294C44EF884674B348CC2B79B7C7062A55EE52AD0'" Text="ArticleEmbedContractDigest.cs differs from the frozen Blog 1194ee contract source." />
+  </Target>
+</Project>

@@ -1,0 +1,24 @@
+{
+  "upstreamRevision": "1194ee45037862aa30803650ec2a622700631224",
+  "coordinate": {
+    "schema": "fsusblog.article-embed-dependency-coordinate.v1",
+    "schemaVersion": 1,
+    "target": {
+      "portableArticleIdentity": "article:01991e72-9a2c-7b60-8f47-b339f58e4a11",
+      "kind": 1,
+      "headingIdentity": null,
+      "blockAnchor": null
+    },
+    "resolvedRevision": 17,
+    "targetVersionIdentity": "article-version:17",
+    "projectionIdentity": "projection:article-body:17",
+    "projectionDigest": "16b1fa1455f26fbd7ccef9d5f31e5f6c029a3cf662a8e93e33e89bc55e7790b4",
+    "dependencyDigest": "3309563573617cd1fcc16c7171882c87947516f8857d244e940773c48e53e2f6"
+  },
+  "projection": {
+    "kind": 1,
+    "projectionIdentity": "projection:article-body:17",
+    "contentDigest": "16b1fa1455f26fbd7ccef9d5f31e5f6c029a3cf662a8e93e33e89bc55e7790b4"
+  },
+  "source": "A **controlled** body.\n"
+}
