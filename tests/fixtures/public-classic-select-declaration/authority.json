@@ -930,7 +930,7 @@
       "sourceFingerprint": "97d4773518d110c93ff95881dbd6d41c9ce0cc3a9fb529f3b1dacf94595dc445",
       "installedFingerprint": "ff1f346d671f841cb1e12da52a722d864be8ef732f501fbccab35f3d9c55f53a",
       "node16ModuleObject": true,
-      "verifiedLocalArtifactSha256": "94e19b4259e170cab73b428dccecc6f0729c955525db0e5a29e2e976fdb43c9b",
+      "verifiedLocalArtifactSha256": "462360d7342f8f17e40f19eaae6f1246ba5de2909d9bd1b0072e2884798ec215",
       "sourceManifest": {
         "artifact": {
           "filename": "fsusui-npm-candidate.tgz",
