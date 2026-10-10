@@ -13,8 +13,8 @@
   },
   "allowlist": [],
   "generated": {
-    "producer": "scripts/generate-component-surface-semantic-registry.mjs",
-    "sourceRevision": "c463db9f2fbaa08baa249d5a792d128104087053",
+    "producer": "scripts/check-component-surface-semantic-registry.mjs",
+    "sourceRevision": "106b418bcef0902b7a5af6f779f786b07bdfb889",
     "digestAlgorithm": "sha256"
   },
   "sourceDigests": {
@@ -28,37 +28,37 @@
       "path": "spec/tokens/tokens.json",
       "kind": "authority",
       "algorithm": "sha256",
-      "digest": "5ddb82979d0ef3a574f653ac185e57fa162a11624b5fd58ec2ce3ce48e5fe5c2"
+      "digest": "c97d4b2f3ffcf311fb060b21e12e13367763fb4ca9ba9c8fa4cacf6f72d381d1"
     },
     "component-contracts": {
       "path": "spec/components/contracts/v1/vue-public-contracts.json",
       "kind": "authority",
       "algorithm": "sha256",
-      "digest": "6c411943d52e2b9c39a55016348c4a5841507e48226b096efc52b7c76456efc3"
+      "digest": "ac2c609aa79ea86bdbb1ec55d7e85bea35f763a3a2cff1b2230802140c75b615"
     },
     "component-select": {
       "path": "docs/components/select.md",
       "kind": "authority",
       "algorithm": "sha256",
-      "digest": "bd479b23ad1cc09a9ffb7f07f8032219d219dd196ce6a06738f58d349db24ec1"
+      "digest": "0e395da3fb2d3cbd662cac6629c7c4b3c5ac9056be87217a6a956986893cd762"
     },
     "component-tree": {
       "path": "docs/components/tree.md",
       "kind": "authority",
       "algorithm": "sha256",
-      "digest": "9f3a5803834cdd945caffdc89fcf0cf73669a4a59768a1e4f79e3f1df641b96d"
+      "digest": "aea57e74d5bdd3242f69d909d0675027bd5ac6ec5632e6ec491c335f99e0ac14"
     },
     "component-date-picker": {
       "path": "docs/components/date-picker.md",
       "kind": "authority",
       "algorithm": "sha256",
-      "digest": "86b063de35038b3d1336ff120d71973189f2b8158ee12459c3aa7c761764cc28"
+      "digest": "dd4bbed5882501b6c107a1e981877d380af2aeb69a30b37e68c84e51f4ebad2a"
     },
     "component-dialog": {
       "path": "docs/components/dialog.md",
       "kind": "authority",
       "algorithm": "sha256",
-      "digest": "cd8c8e405f9f6510a0428a44a2ee7d7bd4a243a98504345e0a1c56197f7c7024"
+      "digest": "d9cde57b7c2e1c3641adabeac60f519f3a0f70f8abfe6d40e52c4dace1b7b37d"
     },
     "implementation-select": {
       "path": "vue/packages/theme-chalk/src/select-dropdown.scss",

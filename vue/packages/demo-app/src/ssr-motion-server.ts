@@ -1,4 +1,4 @@
-import { renderToString } from '@vue/server-renderer'
+import { renderToString } from 'vue/server-renderer'
 import { createSsrMotionApp } from './ssr-motion-app'
 
 export const render = async () => {

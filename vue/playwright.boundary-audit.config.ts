@@ -7,7 +7,9 @@ import {
 delete process.env.NO_COLOR
 
 const boundaryAuditPort = resolveTestPort('FSUS_BOUNDARY_AUDIT_PORT', 5175)
-const boundaryAuditBaseUrl = `http://127.0.0.1:${boundaryAuditPort}`
+const externalServer = process.env.FSUS_PLAYWRIGHT_EXTERNAL_SERVER
+const boundaryAuditBaseUrl =
+  externalServer ?? `http://127.0.0.1:${boundaryAuditPort}`
 
 export default defineConfig({
   testDir: './tests/visual-boundary',
@@ -102,11 +104,14 @@ export default defineConfig({
       },
     },
   ],
-  webServer: {
-    command:
-      `pnpm -C .. run ensure:wasm && pnpm -C packages/demo-app exec vite --host 127.0.0.1 --port ${boundaryAuditPort} --strictPort`,
-    url: boundaryAuditBaseUrl,
-    reuseExistingServer: !process.env.CI,
-    timeout: 120_000,
-  },
+  ...(externalServer
+    ? {}
+    : {
+        webServer: {
+          command: `pnpm -C .. run ensure:wasm && pnpm -C packages/demo-app exec vite --host 127.0.0.1 --port ${boundaryAuditPort} --strictPort`,
+          url: boundaryAuditBaseUrl,
+          reuseExistingServer: !process.env.CI,
+          timeout: 120_000,
+        },
+      }),
 })

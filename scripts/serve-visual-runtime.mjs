@@ -180,6 +180,12 @@ if (suite === 'dev') {
     }
   })
   server.listen(port, host, () => {
+    process.send?.({
+      type: 'visual-runtime-ready',
+      host,
+      port,
+      fingerprint: inspection.sourceFingerprint,
+    })
     console.info(
       `[visual-runtime] Preview ready http://${host}:${port} dist=${relative(repositoryRoot, demoRoot)} fingerprint=${inspection.sourceFingerprint}`,
     )
