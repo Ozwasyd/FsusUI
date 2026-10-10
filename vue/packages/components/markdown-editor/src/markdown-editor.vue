@@ -357,6 +357,7 @@
         @pointerup="handleSelectionDragEnd"
         @scroll="handleLayoutScroll"
         @select="handleSelectionMove"
+        @selectionchange="handleSelectionMove"
         @touchmove="handleLayoutTouch"
         @wheel="handleLayoutWheel"
       />
@@ -957,7 +958,7 @@
             "
             @keydown.down.prevent="selectNextPaletteItem"
             @keydown.up.prevent="selectPreviousPaletteItem"
-            @keydown.enter.prevent="executeActivePaletteItem"
+            @keydown.enter="executeActivePaletteItem"
           />
           <div :id="paletteListId" :class="ns.e('palette-list')" role="listbox">
             <div
@@ -2310,10 +2311,11 @@ const operationTransaction = (
 const restoreTextareaSelection = async (
   selection: MarkdownEditorSelection,
   focus = true,
+  shouldRestore?: () => boolean,
 ) => {
-  if (isComposing.value) return
+  if (isComposing.value || shouldRestore?.() === false) return
   await nextTick()
-  if (isComposing.value) return
+  if (isComposing.value || shouldRestore?.() === false) return
   const textarea = textareaRef.value
   if (!textarea) return
 
@@ -2463,6 +2465,7 @@ const dispatchEditorOperation = (
     emit(
       'selection-change',
       Object.freeze({
+        documentIdentity: result.documentIdentity,
         revision: result.revision,
         selection: result.selection,
       }),
@@ -2514,6 +2517,7 @@ const captureSelection = (breakMerge = true) => {
     emit(
       'selection-change',
       Object.freeze({
+        documentIdentity: transactionStore.documentIdentity,
         revision: transactionStore.revision,
         selection,
       }),
@@ -3166,13 +3170,33 @@ const openCommandPalette = () => {
   void nextTick(() => commandPaletteInputRef.value?.focus())
 }
 const closeCommandPalette = () => {
+  if (!commandPaletteOpen.value) return
+  const focusOwner = document.activeElement
+  const paletteOwnsFocus =
+    commandPaletteInputRef.value?.parentElement?.contains(focusOwner) ?? false
   commandPaletteOpen.value = false
   const selection = paletteRestoreSelection.value
   paletteRestoreSelection.value = null
+  if (!paletteOwnsFocus) return
+
+  const textarea = textareaRef.value
+  const { id, epoch } = documentIdentity
+  const revision = editorRevision.value
+  const shouldRestore = () =>
+    !commandPaletteOpen.value &&
+    textareaRef.value === textarea &&
+    !!textarea?.isConnected &&
+    documentIdentity.id === id &&
+    documentIdentity.epoch === epoch &&
+    editorRevision.value === revision &&
+    (document.activeElement === focusOwner ||
+      document.activeElement === document.body)
   if (selection) {
-    void restoreTextareaSelection(selection)
+    void restoreTextareaSelection(selection, true, shouldRestore)
   } else {
-    textareaRef.value?.focus()
+    void nextTick(() => {
+      if (shouldRestore()) textarea?.focus()
+    })
   }
 }
 const movePaletteIndex = (direction: 1 | -1) => {
@@ -3192,7 +3216,9 @@ const movePaletteIndex = (direction: 1 | -1) => {
 }
 const selectNextPaletteItem = () => movePaletteIndex(1)
 const selectPreviousPaletteItem = () => movePaletteIndex(-1)
-const executeActivePaletteItem = () => {
+const executeActivePaletteItem = (event: KeyboardEvent) => {
+  if (event.isComposing || event.keyCode === 229 || isComposing.value) return
+  event.preventDefault()
   const command = paletteCommands.value[activePaletteIndex.value]
   if (command && !isCommandDisabled(command)) {
     executePaletteCommand(command)
@@ -3204,6 +3230,25 @@ const executePaletteCommand = (command: MarkdownEditorCommand) => {
   activateCommand(command)
 }
 const handleCommandPaletteKeydown = (event: KeyboardEvent) => {
+  if (
+    commandPaletteOpen.value &&
+    surfaceOptions.value.commandPalette &&
+    !editingBlocked.value &&
+    !event.defaultPrevented &&
+    !event.isComposing &&
+    event.keyCode !== 229 &&
+    !isComposing.value &&
+    !event.altKey &&
+    !event.shiftKey &&
+    event.ctrlKey !== event.metaKey &&
+    event.key.toLowerCase() === 'p' &&
+    event.currentTarget instanceof HTMLElement &&
+    event.currentTarget.contains(commandPaletteInputRef.value)
+  ) {
+    event.preventDefault()
+    event.stopPropagation()
+    return
+  }
   if (event.key === 'Escape') {
     event.preventDefault()
     event.stopPropagation()
@@ -5482,7 +5527,10 @@ const handleKeydown = (event: KeyboardEvent) => {
                 : event.key === 'PageDown'
                   ? 'page-down'
                   : null
-    if (motionKey) {
+    const nativeDocumentNavigation =
+      (event.ctrlKey || event.metaKey) &&
+      (event.key === 'Home' || event.key === 'End')
+    if (motionKey && !nativeDocumentNavigation) {
       event.preventDefault()
       applyLiveSelectionMotion(motionKey, { shift: event.shiftKey })
       return
