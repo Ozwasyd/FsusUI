@@ -1,0 +1,74 @@
+[
+  {
+    "name": "metric primitives > renders metric lists with stable label, value, secondary, and meta hierarchy",
+    "file": "vue/packages/components/metric-primitives/__tests__/metric-primitives.test.tsx"
+  },
+  {
+    "name": "metric primitives > renders distribution rows with visual-only proportional bars",
+    "file": "vue/packages/components/metric-primitives/__tests__/metric-primitives.test.tsx"
+  },
+  {
+    "name": "metric primitives > renders KPI groups and key value items without domain assumptions",
+    "file": "vue/packages/components/metric-primitives/__tests__/metric-primitives.test.tsx"
+  },
+  {
+    "name": "metric primitives > keeps punctuation opt-in through the existing badge slot",
+    "file": "vue/packages/components/metric-primitives/__tests__/metric-primitives.test.tsx"
+  },
+  {
+    "name": "metric primitives > renders status and diagnostics items with collapsible detail",
+    "file": "vue/packages/components/metric-primitives/__tests__/metric-primitives.test.tsx"
+  },
+  {
+    "name": "metric primitives > copyable detail exposes an accessible copy button and emits copy events",
+    "file": "vue/packages/components/metric-primitives/__tests__/metric-primitives.test.tsx"
+  },
+  {
+    "name": "metric primitives > copyable detail preserves native disabled semantics and does not copy",
+    "file": "vue/packages/components/metric-primitives/__tests__/metric-primitives.test.tsx"
+  },
+  {
+    "name": "inbox primitives > renders split and inbox panes with accessible labels and mobile state",
+    "file": "vue/packages/components/inbox-primitives/__tests__/inbox-primitives.test.tsx"
+  },
+  {
+    "name": "inbox primitives > renders selectable conversation items with current state and unread label",
+    "file": "vue/packages/components/inbox-primitives/__tests__/inbox-primitives.test.tsx"
+  },
+  {
+    "name": "inbox primitives > renders thread panel slots with a labelled heading and scroll region",
+    "file": "vue/packages/components/inbox-primitives/__tests__/inbox-primitives.test.tsx"
+  },
+  {
+    "name": "inbox primitives > renders message timeline and copy-agnostic bubble variants",
+    "file": "vue/packages/components/inbox-primitives/__tests__/inbox-primitives.test.tsx"
+  },
+  {
+    "name": "inbox primitives > renders context bar, composer shell, and empty states without business copy",
+    "file": "vue/packages/components/inbox-primitives/__tests__/inbox-primitives.test.tsx"
+  },
+  {
+    "name": "inbox primitives > disabled composer keeps readable title and reason copy without shell opacity",
+    "file": "vue/packages/components/inbox-primitives/__tests__/inbox-primitives.test.tsx"
+  },
+  {
+    "name": "settings primitives > renders generic section nav with accessible current and disabled states",
+    "file": "vue/packages/components/settings-primitives/__tests__/settings-primitives.test.tsx"
+  },
+  {
+    "name": "settings primitives > renders settings, form, and standalone section headers with slot-first actions",
+    "file": "vue/packages/components/settings-primitives/__tests__/settings-primitives.test.tsx"
+  },
+  {
+    "name": "settings primitives > renders resource list, metadata row, and inline actions without domain semantics",
+    "file": "vue/packages/components/settings-primitives/__tests__/settings-primitives.test.tsx"
+  },
+  {
+    "name": "settings primitives > renders danger primitives with copy supplied by the caller",
+    "file": "vue/packages/components/settings-primitives/__tests__/settings-primitives.test.tsx"
+  },
+  {
+    "name": "settings primitives > typed confirm field exposes phrase and validates exact input accessibly",
+    "file": "vue/packages/components/settings-primitives/__tests__/settings-primitives.test.tsx"
+  }
+]

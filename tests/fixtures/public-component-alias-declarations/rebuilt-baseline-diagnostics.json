@@ -1,0 +1,35 @@
+{
+  "summary": {
+    "total": 259,
+    "byCode": {
+      "TS2307": 72,
+      "TS2300": 34,
+      "TS2344": 145,
+      "TS2503": 2,
+      "TS2339": 6
+    },
+    "byFile": {
+      "es/components/breadcrumb/src/breadcrumb-item.d.ts": 9,
+      "es/components/color-picker/index.d.ts": 4,
+      "es/components/color-picker/src/color-picker.vue.d.ts": 4,
+      "es/components/inbox-primitives/index.d.ts": 58,
+      "es/components/inbox-primitives/src/conversation-list-item.vue.d.ts": 2,
+      "es/components/index.d.ts": 4,
+      "es/components/markdown-editor/index.d.ts": 4,
+      "es/components/markdown-editor/src/markdown-editor.vue.d.ts": 4,
+      "es/components/menu/index.d.ts": 32,
+      "es/components/menu/src/menu-item.d.ts": 8,
+      "es/components/menu/src/menu-item.vue.d.ts": 16,
+      "es/components/menu/src/menu.d.ts": 1,
+      "es/components/menu/src/types.d.ts": 1,
+      "es/components/metric-primitives/index.d.ts": 44,
+      "es/components/settings-primitives/index.d.ts": 56,
+      "es/components/table-v2/src/components/sort-icon.d.ts": 1,
+      "es/components/table-v2/src/types.d.ts": 1,
+      "es/components/table/src/util.d.ts": 1,
+      "es/components/tree-v2/index.d.ts": 2,
+      "es/utils/objects.d.ts": 1,
+      "global.d.ts": 6
+    }
+  }
+}
