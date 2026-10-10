@@ -211,6 +211,21 @@ through a fresh native replacement and its new original File association. Ordina
 current completions and surviving independent items continue through
 `applyAttachmentResult()`.
 
+Accepted transaction events retain their original result/map as historical evidence,
+even if a synchronous listener commits a newer transaction. Model/change notifications
+and saved selection/history effects require the result's document id/epoch, current
+source and revision to remain current. The editor checks again after each outward
+callback, including the model notification; a nested edit cannot be followed by an
+older model/change value. A selection-only callback can keep the content result current
+while superseding its selection. Queued selection restoration checks the actual document,
+source, revision and selection again after the next tick and after focus listeners.
+Release/unmount also suppresses saved effects. Native capture checks the released state
+before capture and again after the accepted dispatch, before registering any job or
+File association. If a transaction listener unmounts the editor, the fresh unregistered
+batch/item controllers abort and no association is recreated after cleanup. File loans
+also require a live editor. The editor preserves callbacks and the accepted historical
+transaction; it does not replay or remint the superseded operation.
+
 Applications own their pending handles, upload IO, callbacks, and cleanup of any
 references they retain from the synchronous loan; observe `item.signal` when lending
 into an upload. Continue returning results through `applyAttachmentResult()`.

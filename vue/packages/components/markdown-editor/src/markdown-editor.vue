@@ -1669,6 +1669,7 @@ const withAttachmentFile = (
     (candidate) => candidate.itemId === item.itemId,
   )
   if (
+    editorReleased ||
     !record ||
     record.batch !== batch ||
     !loan ||
@@ -2395,26 +2396,60 @@ const operationTransaction = (
   })
 }
 
+let editorReleased = false
+const isEditorDocumentCurrent = (
+  identity: MarkdownEditorDispatchResult['documentIdentity'],
+) =>
+  !editorReleased &&
+  documentIdentity.id === identity.id &&
+  documentIdentity.epoch === identity.epoch &&
+  transactionStore.documentIdentity.id === identity.id &&
+  transactionStore.documentIdentity.epoch === identity.epoch &&
+  (props.documentIdentity?.id ?? commandTrayId) === identity.id &&
+  (props.documentIdentity?.epoch ?? 0) === identity.epoch
+
 const restoreTextareaSelection = async (
   selection: MarkdownEditorSelection,
   focus = true,
+  isCurrent: () => boolean = () => true,
 ) => {
-  if (isComposing.value) return
+  const identity = transactionStore.documentIdentity
+  const revision = transactionStore.revision
+  const value = transactionStore.value
+  const retainedSelection = transactionStore.selection
+  const current = () => {
+    const actualSelection = transactionStore.selection
+    return (
+      isEditorDocumentCurrent(identity) &&
+      transactionStore.revision === revision &&
+      transactionStore.value === value &&
+      actualSelection.start === retainedSelection.start &&
+      actualSelection.end === retainedSelection.end &&
+      actualSelection.direction === retainedSelection.direction &&
+      isCurrent()
+    )
+  }
+  if (isComposing.value || !current()) return
   await nextTick()
-  if (isComposing.value) return
+  if (isComposing.value || !current()) return
   const textarea = textareaRef.value
   if (!textarea) return
 
   restoringSelection = true
-  if (focus) textarea.focus()
-  textarea.setSelectionRange(
-    selection.start,
-    selection.end,
-    selection.direction,
-  )
-  queueMicrotask(() => {
-    restoringSelection = false
-  })
+  try {
+    if (focus) textarea.focus()
+    // Focus listeners can synchronously edit or move selection as well.
+    if (!current()) return
+    textarea.setSelectionRange(
+      selection.start,
+      selection.end,
+      selection.direction,
+    )
+  } finally {
+    queueMicrotask(() => {
+      restoringSelection = false
+    })
+  }
 }
 
 let pendingMetricsChange: MarkdownEditorMetricsChange | undefined
@@ -2461,6 +2496,23 @@ const dispatchEditorOperation = (
       : operation.kind === 'undo'
         ? transactionStore.undo()
         : transactionStore.redo()
+  const isCurrentResult = () =>
+    result.accepted &&
+    isEditorDocumentCurrent(result.documentIdentity) &&
+    transactionStore.revision === result.revision &&
+    transactionStore.value === result.value
+  const isCurrentSelection = () => {
+    const selection = transactionStore.selection
+    return (
+      isCurrentResult() &&
+      selection.start === result.selection.start &&
+      selection.end === result.selection.end &&
+      selection.direction === result.selection.direction
+    )
+  }
+  const isCurrentHistory = () =>
+    isCurrentResult() &&
+    historiesEqual(transactionStore.history, result.history)
 
   if (result.accepted && result.value !== previousValue) {
     pendingMetricsChange =
@@ -2511,7 +2563,8 @@ const dispatchEditorOperation = (
   if (
     result.accepted &&
     (result.value !== previousValue ||
-      (operation.kind === 'transaction' && operation.transaction.changes.length > 0))
+      (operation.kind === 'transaction' &&
+        operation.transaction.changes.length > 0))
   ) {
     const appliedChanges =
       operation.kind === 'transaction'
@@ -2535,29 +2588,33 @@ const dispatchEditorOperation = (
         appliedChanges,
         previousValue,
       )
-      if (rebasedJob.phase === 'deleted') deletedItemIds.push(job.itemId ?? job.id)
+      if (rebasedJob.phase === 'deleted')
+        deletedItemIds.push(job.itemId ?? job.id)
     }
     revokeAttachmentFiles(deletedItemIds)
     triggerRef(attachmentJobs)
   }
+  // Keep the accepted transaction as historical evidence even after reentry.
   emit('transaction', transactionEvent)
 
+  // Every outward callback can supersede this result, including selection-only
+  // dispatches that retain its content revision. Check the relevant current state
+  // again before each saved-value/selection/history effect.
   if (
-    result.accepted &&
+    isCurrentResult() &&
     result.value !== previousValue &&
     (operation.kind !== 'transaction' || operation.emitValue !== false)
   ) {
     emit(UPDATE_MODEL_EVENT, result.value)
-    emit(CHANGE_EVENT, result.value)
-    refreshLiveWindow('input')
+    if (isCurrentResult()) emit(CHANGE_EVENT, result.value)
+    if (isCurrentResult()) refreshLiveWindow('input')
   }
-  if (result.accepted) {
-    refreshWritingAidsDocument()
-    if (result.value !== previousValue) applyTypewriterScroll()
-  }
-  if (result.accepted) syncLanguageToolsState()
+  if (isCurrentResult()) refreshWritingAidsDocument()
+  if (isCurrentResult() && result.value !== previousValue)
+    applyTypewriterScroll()
+  if (isCurrentResult()) syncLanguageToolsState()
   if (
-    result.accepted &&
+    isCurrentSelection() &&
     (result.selection.start !== previousSelection.start ||
       result.selection.end !== previousSelection.end ||
       result.selection.direction !== previousSelection.direction)
@@ -2570,21 +2627,11 @@ const dispatchEditorOperation = (
       }),
     )
   }
-  if (result.accepted && !historiesEqual(previousHistory, result.history)) {
+  if (isCurrentHistory() && !historiesEqual(previousHistory, result.history)) {
     emit('history-change', result.history)
   }
-  if (
-    result.accepted &&
-    operation.restoreSelection !== false &&
-    operation.kind !== 'transaction'
-  ) {
-    void restoreTextareaSelection(result.selection)
-  } else if (
-    result.accepted &&
-    operation.kind === 'transaction' &&
-    operation.restoreSelection !== false
-  ) {
-    void restoreTextareaSelection(result.selection)
+  if (isCurrentSelection() && operation.restoreSelection !== false) {
+    void restoreTextareaSelection(result.selection, true, isCurrentSelection)
   }
   return result
 }
@@ -2671,6 +2718,7 @@ const captureAttachmentFiles = (
   eventFingerprint?: string,
   nodeId: string | null = null,
 ) => {
+  if (editorReleased) return
   const controller = new AbortController()
   const fileControllers = files.map(() => new AbortController())
   const captured = captureMarkdownAttachmentInput({
@@ -2715,6 +2763,7 @@ const captureAttachmentFiles = (
     },
   )
   if (
+    editorReleased ||
     !dispatched.accepted ||
     !transactionEvent ||
     transactionStore.revision !== dispatched.revision ||
@@ -3769,6 +3818,7 @@ onMounted(() => {
 })
 
 onBeforeUnmount(() => {
+  editorReleased = true
   languageToolsController = null
   abortPendingCommands()
   releaseAttachmentFiles()

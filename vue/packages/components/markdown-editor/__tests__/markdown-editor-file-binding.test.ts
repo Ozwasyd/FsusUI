@@ -1,5 +1,5 @@
 import { mount } from '@vue/test-utils'
-import { nextTick, reactive } from 'vue'
+import { defineComponent, h, nextTick, reactive, ref } from 'vue'
 import { afterEach, describe, expect, expectTypeOf, it, vi } from 'vitest'
 import MarkdownEditor from '../src/markdown-editor.vue'
 import type {
@@ -13,7 +13,10 @@ import type {
 } from '../src/markdown-editor'
 import { captureMarkdownAttachmentInput } from '../src/markdown-editor'
 
-type Editor = ReturnType<typeof mount<typeof MarkdownEditor>>
+type Editor = Pick<
+  ReturnType<typeof mount<typeof MarkdownEditor>>,
+  'vm' | 'get' | 'findAll' | 'emitted'
+>
 const file = (name = 'same.png') =>
   new File(['same'], name, { type: 'image/png', lastModified: 1 })
 const mountEditor = (mode: MarkdownEditorMode = 'source') =>
@@ -789,5 +792,513 @@ describe('MarkdownEditor attachment completion reentry', () => {
     )
     expect(batch.items.every((item) => item.signal.aborted)).toBe(true)
     expect(lend(editor, batch, 1).accepted).toBe(false)
+  })
+})
+
+describe('MarkdownEditor current outward effects', () => {
+  const mountControlled = (
+    callbacks: Record<string, (...args: unknown[]) => void> = {},
+    attach = false,
+  ) => {
+    const model = ref('ab')
+    const identity = reactive({ id: 'doc', epoch: 2 })
+    const updates: string[] = []
+    const host = mount(
+      defineComponent({
+        setup: () => () =>
+          h(MarkdownEditor, {
+            ...callbacks,
+            modelValue: model.value,
+            documentIdentity: identity,
+            'onUpdate:modelValue': (value: string) => {
+              updates.push(value)
+              model.value = value
+              callbacks['onUpdate:modelValue']?.(value)
+            },
+          }),
+      }),
+      attach ? { attachTo: document.body } : {},
+    )
+    return {
+      host,
+      model,
+      updates,
+      identity,
+      editor: host.getComponent(MarkdownEditor),
+    }
+  }
+
+  it('preserves the public controlled model after a deleted item abort listener inserts prefix', async () => {
+    const { editor, model, updates } = mountControlled()
+    const originals = [file(), file()]
+    const { batch, observation } = await capture(editor, originals)
+    expect(lend(editor, batch).consumer).toHaveBeenCalledExactlyOnceWith(
+      originals[0],
+      observation,
+    )
+    expect(lend(editor, batch, 1).consumer).toHaveBeenCalledExactlyOnceWith(
+      originals[1],
+      observation,
+    )
+    let nested: MarkdownEditorTransactionEvent | undefined
+    const initialSelectionEvents = editor.emitted('selection-change')!.length
+    batch.items[0]!.signal.addEventListener(
+      'abort',
+      () => {
+        expect(lend(editor, batch, 1).accepted).toBe(false)
+        editor.vm.dispatchTransaction({
+          changes: [{ from: 0, to: 0, insert: 'prefix' }],
+          history: 'separate',
+          origin: 'programmatic',
+        })
+        nested = editor
+          .emitted('transaction')!
+          .at(-1)![0] as MarkdownEditorTransactionEvent
+      },
+      { once: true },
+    )
+    const outer = editor.vm.dispatchTransaction({
+      changes: [
+        {
+          from: observation.placements[0]!.range.start,
+          to: observation.placements[1]!.range.end,
+          insert: '',
+        },
+      ],
+      history: 'separate',
+      origin: 'programmatic',
+    })
+    expect(outer).toMatchObject({ accepted: true, value: 'ab' })
+    expect(nested).toMatchObject({
+      accepted: true,
+      value: 'prefixab',
+      beforeRevision: outer.revision,
+      revision: outer.revision + 1,
+    })
+    expect(editor.emitted('transaction')!.at(-1)![0]).toMatchObject(outer)
+    expect(batch.items.every((item) => item.signal.aborted)).toBe(true)
+    await nextTick()
+    expect({
+      model: model.value,
+      updates,
+      display: editor.get<HTMLTextAreaElement>('textarea').element.value,
+    }).toEqual({
+      model: 'prefixab',
+      updates: [observation.transaction.value, 'prefixab'],
+      display: 'prefixab',
+    })
+    expect(editor.emitted('change')!.at(-1)![0]).toBe('prefixab')
+    expect(
+      editor.emitted('selection-change')!.slice(initialSelectionEvents),
+    ).toEqual([])
+    const textarea = editor.get<HTMLTextAreaElement>('textarea').element
+    expect([
+      textarea.selectionStart,
+      textarea.selectionEnd,
+      textarea.selectionDirection,
+    ]).toEqual([
+      nested!.selection.start,
+      nested!.selection.end,
+      nested!.selection.direction,
+    ])
+    expect(editor.emitted('history-change')!.at(-1)![0]).toEqual(
+      nested!.history,
+    )
+  })
+
+  it('publishes the current model and retains a selection-only abort listener selection', async () => {
+    const { editor, model, updates } = mountControlled()
+    const { batch, observation } = await capture(editor, [file(), file()])
+    let nested: MarkdownEditorTransactionEvent | undefined
+    const selectionEvents = editor.emitted('selection-change')!.length
+    batch.items[0]!.signal.addEventListener(
+      'abort',
+      () => {
+        editor.vm.dispatchTransaction({
+          changes: [],
+          selection: { start: 0, end: 0, direction: 'backward' },
+          history: 'skip',
+          origin: 'programmatic',
+        })
+        nested = editor
+          .emitted('transaction')!
+          .at(-1)![0] as MarkdownEditorTransactionEvent
+      },
+      { once: true },
+    )
+    const outer = editor.vm.dispatchTransaction({
+      changes: [
+        {
+          from: observation.placements[0]!.range.start,
+          to: observation.placements[1]!.range.end,
+          insert: '',
+        },
+      ],
+      history: 'separate',
+      origin: 'programmatic',
+    })
+    expect(outer.accepted).toBe(true)
+    expect(nested).toMatchObject({
+      accepted: true,
+      value: 'ab',
+      revision: outer.revision,
+    })
+    await nextTick()
+    expect(model.value).toBe('ab')
+    expect(updates).toEqual([observation.transaction.value, 'ab'])
+    expect(editor.emitted('selection-change')!.slice(selectionEvents)).toEqual([
+      [
+        {
+          revision: outer.revision,
+          selection: nested!.selection,
+        },
+      ],
+    ])
+    const textarea = editor.get<HTMLTextAreaElement>('textarea').element
+    expect([
+      textarea.selectionStart,
+      textarea.selectionEnd,
+      textarea.selectionDirection,
+    ]).toEqual([0, 0, 'backward'])
+    expect(batch.items.every((item) => item.signal.aborted)).toBe(true)
+  })
+
+  it.each([
+    'onTransaction',
+    'onUpdate:modelValue',
+    'onChange',
+    'onSelectionChange',
+    'onHistoryChange',
+  ])(
+    'keeps newer source, selection and history after the %s callback dispatches',
+    async (callback) => {
+      let ready = false
+      let nested:
+        | ReturnType<MarkdownEditorInstance['dispatchTransaction']>
+        | undefined
+      const state = mountControlled({
+        [callback]: () => {
+          if (!ready) return
+          ready = false
+          nested = state.editor.vm.dispatchTransaction({
+            changes: [{ from: 0, to: 0, insert: 'y' }],
+            selection: { start: 3, end: 3, direction: 'forward' },
+            history: 'separate',
+            origin: 'programmatic',
+          })
+        },
+      })
+      ready = true
+      const outer = state.editor.vm.dispatchTransaction({
+        changes: [{ from: 0, to: 0, insert: 'x' }],
+        selection: { start: 2, end: 2, direction: 'backward' },
+        history: 'separate',
+        origin: 'programmatic',
+      })
+      expect(outer).toMatchObject({ accepted: true, value: 'xab' })
+      expect(nested).toMatchObject({
+        accepted: true,
+        value: 'yxab',
+        beforeRevision: outer.revision,
+        revision: outer.revision + 1,
+      })
+      await nextTick()
+      const textarea = state.editor.get<HTMLTextAreaElement>('textarea').element
+      expect({
+        model: state.model.value,
+        display: textarea.value,
+        selection: [
+          textarea.selectionStart,
+          textarea.selectionEnd,
+          textarea.selectionDirection,
+        ],
+      }).toEqual({
+        model: 'yxab',
+        display: 'yxab',
+        selection: [3, 3, 'forward'],
+      })
+      expect(state.updates.at(-1)).toBe('yxab')
+      expect(state.editor.emitted('change')!.at(-1)![0]).toBe('yxab')
+      expect(
+        state.editor.emitted('selection-change')!.at(-1)![0],
+      ).toMatchObject({
+        revision: nested!.revision,
+        selection: nested!.selection,
+      })
+      expect(state.editor.emitted('history-change')!.at(-1)![0]).toEqual(
+        nested!.history,
+      )
+      expect(
+        state.editor
+          .emitted('transaction')!
+          .map(([event]) => (event as MarkdownEditorTransactionEvent).revision)
+          .sort(),
+      ).toEqual([outer.revision, nested!.revision])
+      if (callback === 'onTransaction') expect(state.updates).toEqual(['yxab'])
+    },
+  )
+
+  it('checks a queued selection-only dispatch again before restoring selection', async () => {
+    let ready = false
+    const state = mountControlled({
+      onTransaction: () => {
+        if (!ready) return
+        ready = false
+        queueMicrotask(() =>
+          state.editor.vm.dispatchTransaction({
+            changes: [],
+            selection: { start: 0, end: 0, direction: 'forward' },
+            history: 'skip',
+            origin: 'programmatic',
+          }),
+        )
+      },
+    })
+    ready = true
+    const outer = state.editor.vm.dispatchTransaction({
+      changes: [{ from: 0, to: 0, insert: 'x' }],
+      selection: { start: 2, end: 2, direction: 'backward' },
+      history: 'separate',
+      origin: 'programmatic',
+    })
+    expect(outer.accepted).toBe(true)
+    await nextTick()
+    await nextTick()
+    const textarea = state.editor.get<HTMLTextAreaElement>('textarea').element
+    expect(state.model.value).toBe('xab')
+    expect([
+      textarea.selectionStart,
+      textarea.selectionEnd,
+      textarea.selectionDirection,
+    ]).toEqual([0, 0, 'forward'])
+    expect(state.editor.emitted('transaction')!.at(-1)![0]).toMatchObject({
+      accepted: true,
+      revision: outer.revision,
+      selection: { start: 0, end: 0, direction: 'forward' },
+    })
+  })
+
+  it.each([
+    { id: 'other', epoch: 2 },
+    { id: 'doc', epoch: 3 },
+  ])(
+    'does not publish old document bytes when the transaction callback changes to $id/$epoch',
+    async (identity) => {
+      const events: MarkdownEditorTransactionEvent[] = []
+      let ready = false
+      const state = mountControlled({
+        onTransaction: (value) => {
+          events.push(value as MarkdownEditorTransactionEvent)
+          if (!ready) return
+          ready = false
+          Object.assign(state.identity, identity)
+        },
+      })
+      ready = true
+      const result = state.editor.vm.dispatchTransaction({
+        changes: [{ from: 0, to: 0, insert: 'x' }],
+        history: 'separate',
+        origin: 'programmatic',
+      })
+      expect(result).toMatchObject({
+        accepted: true,
+        value: 'xab',
+        documentIdentity: { id: 'doc', epoch: 2 },
+      })
+      expect(events[0]).toMatchObject(result)
+      expect(state.updates).toEqual([])
+      await nextTick()
+      expect(state.model.value).toBe('ab')
+      expect(
+        state.editor.get<HTMLTextAreaElement>('textarea').element.value,
+      ).toBe('ab')
+      expect(state.editor.emitted('change')).toBeUndefined()
+    },
+  )
+
+  it('does not publish model bytes after its transaction callback releases the editor', async () => {
+    const events: MarkdownEditorTransactionEvent[] = []
+    let ready = false
+    const state = mountControlled({
+      onTransaction: (value) => {
+        events.push(value as MarkdownEditorTransactionEvent)
+        if (!ready) return
+        ready = false
+        state.host.unmount()
+      },
+    })
+    ready = true
+    const result = state.editor.vm.dispatchTransaction({
+      changes: [{ from: 0, to: 0, insert: 'x' }],
+      history: 'separate',
+      origin: 'programmatic',
+    })
+    expect(result).toMatchObject({ accepted: true, value: 'xab' })
+    expect(events[0]).toMatchObject(result)
+    await nextTick()
+    expect(state.model.value).toBe('ab')
+    expect(state.updates).toEqual([])
+  })
+
+  it('rechecks the actual result after a native focus listener dispatches during queued restoration', async () => {
+    const state = mountControlled({}, true)
+    const textarea = state.editor.get<HTMLTextAreaElement>('textarea').element
+    let nested:
+      | ReturnType<MarkdownEditorInstance['dispatchTransaction']>
+      | undefined
+    textarea.addEventListener(
+      'focus',
+      () => {
+        nested = state.editor.vm.dispatchTransaction({
+          changes: [{ from: 0, to: 0, insert: 'y' }],
+          selection: { start: 3, end: 3, direction: 'forward' },
+          history: 'separate',
+          origin: 'programmatic',
+        })
+      },
+      { once: true },
+    )
+    const outer = state.editor.vm.dispatchTransaction({
+      changes: [{ from: 0, to: 0, insert: 'x' }],
+      selection: { start: 2, end: 2, direction: 'backward' },
+      history: 'separate',
+      origin: 'programmatic',
+    })
+    expect(outer.accepted).toBe(true)
+    await nextTick()
+    await nextTick()
+    expect(nested).toMatchObject({ accepted: true, value: 'yxab' })
+    expect(state.model.value).toBe('yxab')
+    expect([
+      textarea.value,
+      textarea.selectionStart,
+      textarea.selectionEnd,
+      textarea.selectionDirection,
+    ]).toEqual(['yxab', 3, 3, 'forward'])
+    expect(document.activeElement).toBe(textarea)
+  })
+})
+
+describe('MarkdownEditor native capture disposal', () => {
+  const resources = (
+    editor: ReturnType<typeof mount<typeof MarkdownEditor>>,
+  ) => {
+    const setup = Reflect.get(editor.vm.$, 'setupState') as Record<
+      string,
+      unknown
+    >
+    const batches = setup.attachmentBatches as Map<
+      string,
+      {
+        batch: MarkdownAttachmentBatchIntent
+        capture: MarkdownAttachmentCaptureObservation
+        files: Map<
+          MarkdownAttachmentBatchIntent['items'][number],
+          { file: File }
+        >
+      }
+    >
+    const items = setup.attachmentItems as Map<string, unknown>
+    expect(batches).toBeInstanceOf(Map)
+    expect(items).toBeInstanceOf(Map)
+    return { setup, batches, items }
+  }
+
+  it('does not recreate File associations after the placeholder transaction listener unmounts', async () => {
+    const transactions: MarkdownEditorTransactionEvent[] = []
+    const upload = vi.fn()
+    const editor = mount(MarkdownEditor, {
+      props: {
+        modelValue: 'ab',
+        documentIdentity: { id: 'doc', epoch: 2 },
+        onTransaction: (event: MarkdownEditorTransactionEvent) => {
+          transactions.push(event)
+          editor.unmount()
+        },
+        onUploadImage: upload,
+      },
+    })
+    const vm = editor.vm
+    const { setup, batches, items } = resources(editor)
+    const originals = [file(), file()]
+    const aborted = vi.spyOn(AbortController.prototype, 'abort')
+    try {
+      await capture(editor, originals)
+      expect(transactions).toHaveLength(1)
+      expect(transactions[0]).toMatchObject({
+        accepted: true,
+        beforeRevision: 0,
+        revision: 1,
+      })
+      const record = [...batches.values()][0]
+      const consumer = vi.fn<MarkdownAttachmentFileConsumer>()
+      const admitted = record
+        ? vm.withAttachmentFile(record.batch, record.batch.items[0]!, consumer)
+        : false
+      expect({
+        batchCount: batches.size,
+        itemCount: items.size,
+        jobCount: (setup.attachmentJobs as unknown[]).length,
+        admitted,
+        uploadCount: upload.mock.calls.length,
+        abortCount: aborted.mock.contexts.length,
+        retainedSignalsActive:
+          !!record &&
+          !record.batch.signal.aborted &&
+          record.batch.items.every((item) => !item.signal.aborted),
+        allAborted: aborted.mock.contexts.every(
+          (controller) =>
+            controller instanceof AbortController && controller.signal.aborted,
+        ),
+        originalFileRecreated:
+          record?.files.get(record.batch.items[0]!)?.file === originals[0],
+      }).toEqual({
+        batchCount: 0,
+        itemCount: 0,
+        jobCount: 0,
+        admitted: false,
+        uploadCount: 0,
+        abortCount: 3,
+        retainedSignalsActive: false,
+        allAborted: true,
+        originalFileRecreated: false,
+      })
+      expect(consumer).not.toHaveBeenCalled()
+    } finally {
+      aborted.mockRestore()
+    }
+  })
+
+  it('registers the live original capture once and clears all resources on later unmount', async () => {
+    const editor = mountEditor()
+    const { setup, batches, items } = resources(editor)
+    const originals = [file(), file()]
+    const { batch, observation } = await capture(editor, originals)
+    expect(editor.emitted('transaction')).toHaveLength(1)
+    expect(editor.emitted('upload-image')).toHaveLength(1)
+    expect(batches.size).toBe(1)
+    expect(items.size).toBe(2)
+    expect((setup.attachmentJobs as unknown[]).length).toBe(2)
+    const record = batches.get(batch.batchId)!
+    expect(record.batch).toBe(batch)
+    expect(record.capture).toBe(observation)
+    expect([...record.files.values()].map((loan) => loan.file)).toEqual(
+      originals,
+    )
+    for (const [index, original] of originals.entries()) {
+      expect(
+        lend(editor, batch, index).consumer,
+      ).toHaveBeenCalledExactlyOnceWith(original, observation)
+    }
+    expect(batch.signal.aborted).toBe(false)
+    expect(batch.items.every((item) => !item.signal.aborted)).toBe(true)
+    editor.unmount()
+    expect(batches.size).toBe(0)
+    expect(items.size).toBe(0)
+    expect((setup.attachmentJobs as unknown[]).length).toBe(0)
+    expect(record.files.size).toBe(0)
+    expect(batch.signal.aborted).toBe(true)
+    expect(batch.items.every((item) => item.signal.aborted)).toBe(true)
+    expect(lend(editor, batch).accepted).toBe(false)
   })
 })
