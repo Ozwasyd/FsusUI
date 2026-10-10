@@ -1,5 +1,5 @@
 import { mount } from '@vue/test-utils'
-import { nextTick } from 'vue'
+import { nextTick, reactive } from 'vue'
 import { afterEach, describe, expect, expectTypeOf, it, vi } from 'vitest'
 import MarkdownEditor from '../src/markdown-editor.vue'
 import type {
@@ -469,5 +469,325 @@ describe('MarkdownEditor native File bridge', () => {
     expect(editor.emitted('update:modelValue')!.at(-1)![0]).toBe(
       'a![ok](https://cdn.example/ok.png)b',
     )
+  })
+})
+
+describe('MarkdownEditor attachment completion reentry', () => {
+  it.each(['reentry-long-native-file-name.png', 'same.png'])(
+    'refuses a saved completion range after its item abort listener inserts text for %s',
+    async (name) => {
+      const editor = mountEditor()
+      const { batch, observation } = await capture(editor, [file(name)])
+      const before = observation.transaction.value
+      let afterAbort = ''
+      batch.items[0]!.signal.addEventListener('abort', () => {
+        expect(lend(editor, batch).accepted).toBe(false)
+        expect(observation.plan.jobs[0]!.range).toBe(
+          observation.placements[0]!.range,
+        )
+        expect(
+          editor.vm.dispatchTransaction({
+            changes: [{ from: 0, to: 0, insert: 'PREFIX ' }],
+            history: 'separate',
+            origin: 'programmatic',
+          }).accepted,
+        ).toBe(true)
+        afterAbort = editor.emitted('update:modelValue')!.at(-1)![0] as string
+      })
+      const accepted = editor.vm.applyAttachmentResult(resolved(batch))
+      const after = editor.emitted('update:modelValue')!.at(-1)![0] as string
+      expect({ before, afterAbort, accepted, after }).toEqual({
+        before: `a![正在上传 ${name}…]()b`,
+        afterAbort: `PREFIX ${before}`,
+        accepted: false,
+        after: `PREFIX ${before}`,
+      })
+      expect(editor.emitted('transaction')).toHaveLength(2)
+      expect(observation.plan.jobs[0]!.phase).toBe('stale')
+      expect(batch.items[0]!.signal.aborted).toBe(true)
+      expect(lend(editor, batch).accepted).toBe(false)
+      expect(editor.vm.applyAttachmentResult(resolved(batch))).toBe(false)
+      expect(
+        editor.vm.applyAttachmentResult({
+          status: 'progress',
+          batchId: batch.batchId,
+          itemId: batch.items[0]!.itemId,
+          ratio: 0.5,
+        }),
+      ).toBe(false)
+    },
+  )
+
+  it('revokes both deleted native Files before the first item abort listener can borrow its sibling', async () => {
+    const editor = mountEditor()
+    const { batch, observation } = await capture(editor, [
+      file('a.png'),
+      file('b.png'),
+    ])
+    const consumer = vi.fn<MarkdownAttachmentFileConsumer>()
+    let siblingLoan: boolean | undefined
+    let phases: string[] = []
+    batch.items[0]!.signal.addEventListener('abort', () => {
+      phases = observation.plan.jobs.map((job) => job.phase)
+      siblingLoan = editor.vm.withAttachmentFile(
+        batch,
+        batch.items[1]!,
+        consumer,
+      )
+    })
+    const removed = editor.vm.dispatchTransaction({
+      changes: [
+        { from: 1, to: observation.transaction.value.length - 1, insert: '' },
+      ],
+      history: 'separate',
+      origin: 'programmatic',
+    })
+    expect(removed.accepted).toBe(true)
+    expect(removed.value).toBe('ab')
+    expect({ siblingLoan, phases }).toEqual({
+      siblingLoan: false,
+      phases: ['deleted', 'deleted'],
+    })
+    expect(consumer).not.toHaveBeenCalled()
+    expect(batch.items.every((item) => item.signal.aborted)).toBe(true)
+    expect(batch.signal.aborted).toBe(true)
+  })
+
+  it('keeps a surviving rebased sibling File usable during the deleted item abort listener', async () => {
+    const editor = mountEditor()
+    const files = [file('a.png'), file('b.png')]
+    const { batch, observation } = await capture(editor, files)
+    const consumer = vi.fn<MarkdownAttachmentFileConsumer>()
+    let siblingLoan: boolean | undefined
+    batch.items[0]!.signal.addEventListener('abort', () => {
+      expect(observation.plan.jobs.map((job) => job.phase)).toEqual([
+        'deleted',
+        'pending',
+      ])
+      siblingLoan = editor.vm.withAttachmentFile(
+        batch,
+        batch.items[1]!,
+        consumer,
+      )
+    })
+    const range = observation.placements[0]!.range
+    const removed = editor.vm.dispatchTransaction({
+      changes: [{ from: range.start, to: range.end, insert: '' }],
+      history: 'separate',
+      origin: 'programmatic',
+    })
+    expect(removed.accepted).toBe(true)
+    expect(siblingLoan).toBe(true)
+    expect(consumer).toHaveBeenCalledExactlyOnceWith(files[1], observation)
+    expect(batch.items[0]!.signal.aborted).toBe(true)
+    expect(batch.items[1]!.signal.aborted).toBe(false)
+    expect(batch.signal.aborted).toBe(false)
+    expect(editor.vm.applyAttachmentResult(resolved(batch, 1))).toBe(true)
+    expect(batch.items[1]!.signal.aborted).toBe(true)
+    expect(batch.signal.aborted).toBe(true)
+  })
+
+  it('commits a current positive completion with its actual result/map after a selection-only abort callback', async () => {
+    const editor = mountEditor()
+    const { batch, observation } = await capture(editor, [file()])
+    const placeholderRange = observation.placements[0]!.range
+    let listenerRevision: number | undefined
+    batch.items[0]!.signal.addEventListener('abort', () => {
+      expect(lend(editor, batch).accepted).toBe(false)
+      expect(observation.plan.jobs[0]!.range).toBe(placeholderRange)
+      const selected = editor.vm.dispatchTransaction({
+        changes: [],
+        selection: { start: 0, end: 0 },
+        history: 'skip',
+        origin: 'programmatic',
+      })
+      expect(selected.accepted).toBe(true)
+      listenerRevision = selected.revision
+    })
+    expect(editor.vm.applyAttachmentResult(resolved(batch))).toBe(true)
+    const completion = editor
+      .emitted('transaction')!
+      .at(-1)![0] as MarkdownEditorTransactionEvent
+    expect(completion).toMatchObject({
+      accepted: true,
+      documentIdentity: batch.documentIdentity,
+      beforeRevision: listenerRevision,
+      revision: listenerRevision! + 1,
+      value: 'a![ok](https://cdn.example/ok.png)b',
+    })
+    expect(completion.transaction.expectedRevision).toBe(listenerRevision)
+    expect(completion.transaction.documentIdentity).toEqual(
+      batch.documentIdentity,
+    )
+    expect(completion.transaction.changes[0]).toMatchObject({
+      from: placeholderRange.start,
+      to: placeholderRange.end,
+    })
+    expect(completion.positionMap).toBeDefined()
+    expect(observation.plan.jobs[0]!.range!.end).toBe(
+      1 + '![ok](https://cdn.example/ok.png)'.length,
+    )
+    expect(observation.placements[0]!.range).toBe(placeholderRange)
+    expect(lend(editor, batch).accepted).toBe(false)
+    expect(editor.vm.applyAttachmentResult(resolved(batch))).toBe(false)
+  })
+
+  it('refuses an equal-byte replacement map even when before and post revisions match', async () => {
+    const editor = mountEditor()
+    const { batch, observation } = await capture(editor, [file()])
+    let replacement: MarkdownEditorTransactionEvent | undefined
+    batch.items[0]!.signal.addEventListener('abort', () => {
+      editor.vm.dispatchTransaction({
+        changes: [
+          {
+            from: 0,
+            to: observation.transaction.value.length,
+            insert: observation.transaction.value,
+          },
+        ],
+        history: 'separate',
+        origin: 'programmatic',
+      })
+      replacement = editor
+        .emitted('transaction')!
+        .at(-1)![0] as MarkdownEditorTransactionEvent
+    })
+    expect(editor.vm.applyAttachmentResult(resolved(batch))).toBe(false)
+    expect(replacement).toMatchObject({
+      accepted: true,
+      beforeRevision: observation.transaction.revision,
+      revision: observation.transaction.revision,
+      value: observation.transaction.value,
+    })
+    expect(
+      replacement!.positionMap!.mapRange(observation.placements[0]!.range)
+        .deleted,
+    ).toBe(true)
+    expect(observation.plan.jobs[0]!.phase).toBe('deleted')
+    expect(editor.emitted('transaction')).toHaveLength(2)
+    expect(editor.emitted('update:modelValue')!.at(-1)![0]).toBe(
+      observation.transaction.value,
+    )
+    expect(lend(editor, batch).accepted).toBe(false)
+  })
+
+  it.each([
+    { id: 'other', epoch: 2 },
+    { id: 'doc', epoch: 3 },
+  ])(
+    'refuses an abort-listener document switch to $id/$epoch before the watcher resets the store',
+    async (nextIdentity) => {
+      const identity = reactive({ id: 'doc', epoch: 2 })
+      const editor = mount(MarkdownEditor, {
+        props: { modelValue: 'ab', documentIdentity: identity },
+      })
+      const { batch, observation } = await capture(editor, [file()])
+      await editor.setProps({ modelValue: observation.transaction.value })
+      batch.items[0]!.signal.addEventListener('abort', () => {
+        identity.id = nextIdentity.id
+        identity.epoch = nextIdentity.epoch
+      })
+      expect(editor.vm.applyAttachmentResult(resolved(batch))).toBe(false)
+      expect(editor.emitted('transaction')).toHaveLength(1)
+      await nextTick()
+      expect(editor.get<HTMLTextAreaElement>('textarea').element.value).toBe(
+        observation.transaction.value,
+      )
+      expect(lend(editor, batch).accepted).toBe(false)
+      expect(editor.vm.applyAttachmentResult(resolved(batch))).toBe(false)
+      editor.vm.dispatchTransaction({
+        changes: [],
+        selection: { start: 2, end: 2 },
+        history: 'skip',
+        origin: 'programmatic',
+      })
+      await nextTick()
+      await editor
+        .findAll('button')
+        .find((button) => button.text() === '替换')!
+        .trigger('click')
+      const original = file('recovered.png')
+      const recovered = await capture(editor, [original])
+      expect(recovered.batch.documentIdentity).toEqual(nextIdentity)
+      expect(
+        lend(editor, recovered.batch).consumer,
+      ).toHaveBeenCalledExactlyOnceWith(original, recovered.observation)
+      expect(editor.vm.applyAttachmentResult(resolved(recovered.batch))).toBe(
+        true,
+      )
+      expect(editor.emitted('update:modelValue')!.at(-1)![0]).toBe(
+        'a![ok](https://cdn.example/ok.png)b',
+      )
+    },
+  )
+
+  it('recovers through a fresh native replacement after stale completion and keeps its sibling independent', async () => {
+    const editor = mountEditor()
+    const { batch, observation } = await capture(editor, [
+      file('a.png'),
+      file('b.png'),
+    ])
+    batch.items[0]!.signal.addEventListener('abort', () => {
+      editor.vm.dispatchTransaction({
+        changes: [{ from: 0, to: 0, insert: 'PREFIX ' }],
+        history: 'separate',
+        origin: 'programmatic',
+      })
+    })
+    expect(editor.vm.applyAttachmentResult(resolved(batch))).toBe(false)
+    expect(lend(editor, batch).accepted).toBe(false)
+    expect(lend(editor, batch, 1).accepted).toBe(true)
+    expect(batch.items[1]!.signal.aborted).toBe(false)
+    expect(editor.vm.applyAttachmentResult(resolved(batch, 1))).toBe(true)
+    expect(observation.plan.jobs[0]!.phase).toBe('stale')
+    editor.vm.dispatchTransaction({
+      changes: [],
+      selection: { start: 9, end: 9 },
+      history: 'skip',
+      origin: 'programmatic',
+    })
+    await nextTick()
+    await editor
+      .findAll('button')
+      .find((button) => button.text() === '替换')!
+      .trigger('click')
+    const original = file('recovered.png')
+    const recovered = await capture(editor, [original])
+    expect(
+      lend(editor, recovered.batch).consumer,
+    ).toHaveBeenCalledExactlyOnceWith(original, recovered.observation)
+    expect(lend(editor, batch).accepted).toBe(false)
+    expect(editor.vm.applyAttachmentResult(resolved(batch))).toBe(false)
+    expect(editor.vm.applyAttachmentResult(resolved(recovered.batch))).toBe(
+      true,
+    )
+    expect(editor.emitted('update:modelValue')!.at(-1)![0]).toBe(
+      'PREFIX a![ok](https://cdn.example/ok.png)\n![ok](https://cdn.example/ok.png)b',
+    )
+  })
+
+  it('refuses completion when its item abort listener releases the editor', async () => {
+    const transactions = vi.fn()
+    const updates = vi.fn()
+    const editor = mount(MarkdownEditor, {
+      props: {
+        modelValue: 'ab',
+        documentIdentity: { id: 'doc', epoch: 2 },
+        onTransaction: transactions,
+        'onUpdate:modelValue': updates,
+      },
+    })
+    const { batch, observation } = await capture(editor, [
+      file(),
+      file('b.png'),
+    ])
+    batch.items[0]!.signal.addEventListener('abort', () => editor.unmount())
+    expect(editor.vm.applyAttachmentResult(resolved(batch))).toBe(false)
+    expect(transactions).toHaveBeenCalledTimes(1)
+    expect(updates).toHaveBeenCalledExactlyOnceWith(
+      observation.transaction.value,
+    )
+    expect(batch.items.every((item) => item.signal.aborted)).toBe(true)
+    expect(lend(editor, batch, 1).accepted).toBe(false)
   })
 })

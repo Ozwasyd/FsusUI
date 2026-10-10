@@ -1621,21 +1621,29 @@ const attachmentBatches = new Map<
     >
   }
 >()
-const revokeAttachmentFile = (itemId: string) => {
-  const item = attachmentItems.get(itemId)
-  if (!item) return
-  for (const record of attachmentBatches.values()) {
-    const loan = record.files.get(item)
-    if (!loan) continue
-    record.files.delete(item)
-    loan.controller.abort()
-    if (!record.files.size) {
-      record.capture = undefined
-      record.controller.abort()
+const revokeAttachmentFiles = (itemIds: readonly string[]) => {
+  const itemControllers: AbortController[] = []
+  const batchControllers: AbortController[] = []
+  for (const itemId of itemIds) {
+    const item = attachmentItems.get(itemId)
+    if (!item) continue
+    for (const record of attachmentBatches.values()) {
+      const loan = record.files.get(item)
+      if (!loan) continue
+      record.files.delete(item)
+      itemControllers.push(loan.controller)
+      if (!record.files.size) {
+        record.capture = undefined
+        batchControllers.push(record.controller)
+      }
+      break
     }
-    return
   }
+  for (const controller of itemControllers) controller.abort()
+  for (const controller of batchControllers) controller.abort()
 }
+const revokeAttachmentFile = (itemId: string) => revokeAttachmentFiles([itemId])
+
 const releaseAttachmentFiles = () => {
   const records = [...attachmentBatches.values()]
   attachmentBatches.clear()
@@ -2519,6 +2527,7 @@ const dispatchEditorOperation = (
       operation.kind === 'transaction'
         ? operation.transaction.metadata?.attachmentItemId
         : undefined
+    const deletedItemIds: string[] = []
     for (const job of attachmentJobs.value) {
       if (job.itemId === ownedItemId || job.phase === 'deleted') continue
       const rebasedJob = rebaseMarkdownAttachmentJob(
@@ -2526,8 +2535,9 @@ const dispatchEditorOperation = (
         appliedChanges,
         previousValue,
       )
-      if (rebasedJob.phase === 'deleted') revokeAttachmentFile(job.itemId ?? job.id)
+      if (rebasedJob.phase === 'deleted') deletedItemIds.push(job.itemId ?? job.id)
     }
+    revokeAttachmentFiles(deletedItemIds)
     triggerRef(attachmentJobs)
   }
   emit('transaction', transactionEvent)
@@ -4888,25 +4898,94 @@ const applyAttachmentResult = (result: MarkdownAttachmentProviderResult) => {
   )
   if (!job) return false
   if (result.status === 'progress') {
+    if (job.phase !== 'pending' && job.phase !== 'progress') return false
     const ratio = result.ratio ?? 0
     progressMarkdownAttachmentJob(job, ratio <= 1 ? ratio * 100 : ratio)
     triggerRef(attachmentJobs)
     return true
   }
-
-  const planned = planMarkdownAttachmentResolve(
-    transactionStore.value,
-    job,
-    result,
+  if (
+    result.status === 'resolved' &&
+    job.phase !== 'pending' &&
+    job.phase !== 'progress'
   )
+    return false
+
+  const source = transactionStore.value
+  const revision = transactionStore.revision
+  const identity = transactionStore.documentIdentity
+  const range = job.range
+  const attempt = job.attempt
+  const progress = job.progress
+  const item = attachmentItems.get(job.itemId ?? job.id)
+  const batch = job.batchId ? attachmentBatches.get(job.batchId) : undefined
+  const planned = planMarkdownAttachmentResolve(source, job, result)
+  const resolvedRange = job.range
+  // Until acceptance, abort callbacks must rebase the actual placeholder range.
+  if (planned.transaction) job.range = range
   if (job.phase !== 'pending' && job.phase !== 'progress')
     revokeAttachmentFile(job.itemId ?? job.id)
   triggerRef(attachmentJobs)
   if (!planned.transaction) return planned.accepted
-  return dispatchTransaction({
-    ...planned.transaction,
-    metadata: Object.freeze({ attachmentItemId: job.itemId }),
-  }).accepted
+
+  const current =
+    attachmentJobs.value.includes(job) &&
+    item &&
+    batch &&
+    range &&
+    resolvedRange &&
+    attachmentItems.get(item.itemId) === item &&
+    attachmentBatches.get(batch.batch.batchId) === batch &&
+    job.itemId === item.itemId &&
+    job.batchId === batch.batch.batchId &&
+    job.documentIdentity === batch.batch.documentIdentity &&
+    job.revision === batch.batch.revision &&
+    job.attempt === attempt &&
+    job.phase === 'resolved' &&
+    job.range === range &&
+    planned.transaction.changes.length === 1 &&
+    planned.transaction.changes[0]?.from === range.start &&
+    planned.transaction.changes[0]?.to === range.end &&
+    planned.transaction.changes[0]?.insert === planned.markdown &&
+    documentIdentity.id === identity.id &&
+    documentIdentity.epoch === identity.epoch &&
+    (props.documentIdentity?.id ?? commandTrayId) === identity.id &&
+    (props.documentIdentity?.epoch ?? 0) === identity.epoch &&
+    transactionStore.revision === revision &&
+    transactionStore.value === source
+  const refuseCompletion = () => {
+    if (
+      attachmentJobs.value.includes(job) &&
+      job.attempt === attempt &&
+      job.phase !== 'cancelled' &&
+      job.phase !== 'deleted' &&
+      job.phase !== 'document-abort'
+    ) {
+      job.phase = 'stale'
+      job.progress = progress
+      job.code = 'stale-completion'
+      triggerRef(attachmentJobs)
+    }
+    return false
+  }
+  if (!current) return refuseCompletion()
+
+  const dispatched = dispatchTransaction(
+    {
+      ...planned.transaction,
+      documentIdentity: identity,
+      expectedRevision: revision,
+      metadata: Object.freeze({ attachmentItemId: job.itemId }),
+    },
+    (event) => {
+      // Publish the resolved range with the actual accepted result/map, before observers.
+      if (event.accepted) {
+        job.range = resolvedRange
+        triggerRef(attachmentJobs)
+      }
+    },
+  )
+  return dispatched.accepted || refuseCompletion()
 }
 
 const runAttachmentAction = (

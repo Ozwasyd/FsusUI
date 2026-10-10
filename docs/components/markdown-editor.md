@@ -192,6 +192,25 @@ loan is revoked. Metadata retry events keep their existing first-argument contra
 but have no native capture observation and cannot remint a released File: obtaining
 another File requires a new native capture.
 
+Accepted edits rebase every affected attachment job and remove all deleted File
+associations before invoking any item abort listener. A deleted sibling cannot be
+borrowed during another item's abort callback; surviving rebased siblings remain
+usable. Abort signals still run their normal synchronous listeners.
+
+Completion plans retain the actual placeholder range until the existing dispatcher
+accepts the replacement. After File revocation and its callbacks, the editor verifies
+the original item/batch/job binding, attempt, range, source, current document id/epoch
+(including props awaiting a switch), and current revision. The completion transaction
+carries that document identity and `expectedRevision`; the resolved range is published
+with the actual accepted result/position map before outward transaction observers.
+A callback that edits, replaces, deletes, switches, or releases this context causes
+coherent refusal and preserves the current source. Equal numeric revisions alone
+cannot authorize a completion: an equal-byte replacement map can delete its anchor.
+A stale completion cannot be revived by later progress/resolved callbacks. Recover
+through a fresh native replacement and its new original File association. Ordinary
+current completions and surviving independent items continue through
+`applyAttachmentResult()`.
+
 Applications own their pending handles, upload IO, callbacks, and cleanup of any
 references they retain from the synchronous loan; observe `item.signal` when lending
 into an upload. Continue returning results through `applyAttachmentResult()`.
