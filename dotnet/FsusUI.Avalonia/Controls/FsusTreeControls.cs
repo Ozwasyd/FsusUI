@@ -4,6 +4,9 @@ using Avalonia.Automation.Peers;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
+using Avalonia.LogicalTree;
+using Avalonia.Media;
+using Avalonia.Media.TextFormatting;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 using FsusUI.Avalonia.Overlay;
@@ -295,16 +298,22 @@ public class FsusTree : ContentControl
   private readonly HashSet<string> selectedKeys = new(StringComparer.Ordinal);
   private readonly HashSet<string> checkedKeys = new(StringComparer.Ordinal);
   private readonly HashSet<FsusTreeNode> presentationSubscriptions = [];
-  private readonly Dictionary<string, Border> renderedRows = new(StringComparer.Ordinal);
+  private sealed record RenderedTreeRow(FsusTreeNode? Node, Border Row);
+
+  private readonly Dictionary<string, RenderedTreeRow> renderedRows = new(StringComparer.Ordinal);
   private readonly Dictionary<string, FsusTreeLazyLoadState> lazyLoadStates = new(StringComparer.Ordinal);
   private readonly StackPanel rowsPanel = new();
   private CancellationTokenSource? loadCancellation;
   private TextBox? inlineEditor;
   private TopLevel? inlineEditTopLevel;
   private FsusTreeRowPresenter? rowPresenter;
+  private FsusTreeRowPresenter? renderedPresenter;
   private double? rowMinHeight;
   private Thickness? rowPadding;
   private int loadVersion;
+  private int textCacheAttachmentVersion;
+  private TopLevel? textCacheTopLevel;
+  private Dictionary<Typeface, GlyphTypeface>? layoutGlyphTypefaces;
 
   public FsusTree()
   {
@@ -313,6 +322,47 @@ public class FsusTree : ContentControl
     Content = rowsPanel;
     SyncState();
   }
+
+  protected override Size MeasureOverride(Size availableSize)
+  {
+    var previous = layoutGlyphTypefaces;
+    layoutGlyphTypefaces = [];
+    try
+    {
+      return base.MeasureOverride(availableSize);
+    }
+    finally
+    {
+      layoutGlyphTypefaces = previous;
+    }
+  }
+
+  protected override Size ArrangeOverride(Size finalSize)
+  {
+    var previous = layoutGlyphTypefaces;
+    layoutGlyphTypefaces = [];
+    try
+    {
+      return base.ArrangeOverride(finalSize);
+    }
+    finally
+    {
+      layoutGlyphTypefaces = previous;
+    }
+  }
+
+  internal GlyphTypeface ResolveLayoutGlyphTypeface(Typeface typeface)
+  {
+    // Sibling labels share effective fonts. Resolve once within this layout
+    // pass, then query the provider afresh on the next pass or standalone label.
+    if (layoutGlyphTypefaces is null)
+      return typeface.GlyphTypeface;
+    if (!layoutGlyphTypefaces.TryGetValue(typeface, out var glyphTypeface))
+      layoutGlyphTypefaces[typeface] = glyphTypeface = typeface.GlyphTypeface;
+    return glyphTypeface;
+  }
+
+  internal void InvalidateLayoutGlyphTypefaces() => layoutGlyphTypefaces?.Clear();
 
   public string? AccessibleName { get; set; }
   public Collection<FsusTreeNode> Nodes { get; } = [];
@@ -425,7 +475,7 @@ public class FsusTree : ContentControl
   public bool RefreshNodePresentation(string key)
   {
     var view = flattenedNodes.FirstOrDefault(candidate => candidate.Node.Key == key);
-    if (view is null || !renderedRows.TryGetValue(key, out var row))
+    if (view is null || !renderedRows.TryGetValue(key, out var rendered))
     {
       return false;
     }
@@ -441,7 +491,9 @@ public class FsusTree : ContentControl
     }
 
     var context = CreateRowContext(view);
+    var row = rendered.Row;
     ApplyRowState(row, context);
+    ReleaseRowTextCache(row);
     row.Child = BuildNodeContent(view, context);
     return true;
   }
@@ -832,6 +884,16 @@ public class FsusTree : ContentControl
   protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
   {
     base.OnAttachedToVisualTree(e);
+    textCacheAttachmentVersion++;
+    var topLevel = TopLevel.GetTopLevel(this);
+    if (!ReferenceEquals(textCacheTopLevel, topLevel))
+    {
+      if (textCacheTopLevel is not null)
+        textCacheTopLevel.Closed -= OnTextCacheTopLevelClosed;
+      textCacheTopLevel = topLevel;
+      if (textCacheTopLevel is not null)
+        textCacheTopLevel.Closed += OnTextCacheTopLevelClosed;
+    }
     AttachInlineEditPointerGuard();
   }
 
@@ -839,12 +901,37 @@ public class FsusTree : ContentControl
   {
     DetachInlineEditPointerGuard();
     base.OnDetachedFromVisualTree(e);
+    var version = ++textCacheAttachmentVersion;
+    // A synchronous reparent can reuse shaped text. A real unload releases it
+    // at the end of this UI turn, or immediately when the owning window closes.
+    Dispatcher.UIThread.Post(() =>
+    {
+      if (version == textCacheAttachmentVersion && !this.IsAttachedToVisualTree())
+        ReleaseTextCaches();
+    }, DispatcherPriority.Normal);
+  }
+
+  private void OnTextCacheTopLevelClosed(object? sender, EventArgs e) => ReleaseTextCaches();
+
+  private void ReleaseTextCaches()
+  {
+    foreach (var rendered in renderedRows.Values)
+      ReleaseRowTextCache(rendered.Row);
+    if (textCacheTopLevel is not null)
+      textCacheTopLevel.Closed -= OnTextCacheTopLevelClosed;
+    textCacheTopLevel = null;
+  }
+
+  private static void ReleaseRowTextCache(Border row)
+  {
+    if (row.Child is FsusTreeDefaultLabel label)
+      label.ReleaseShapingCache();
   }
 
   private Rect ResolveNodeAnchorBounds(string key) =>
     NodeAnchorBoundsResolver?.Invoke(key) ??
-    (renderedRows.TryGetValue(key, out var row)
-      ? new Rect(row.TranslatePoint(default, this) ?? default, row.Bounds.Size)
+    (renderedRows.TryGetValue(key, out var rendered)
+      ? new Rect(rendered.Row.TranslatePoint(default, this) ?? default, rendered.Row.Bounds.Size)
       : new Rect(0, 0, 0, 0));
 
   private bool GestureExpand(string key, FsusTreeInteractionSource source)
@@ -891,32 +978,48 @@ public class FsusTree : ContentControl
 
   private void RefreshRows()
   {
+    var previousRows = new Dictionary<string, RenderedTreeRow>(renderedRows, StringComparer.Ordinal);
+    var desiredRows = new List<Control>();
     renderedRows.Clear();
-    rowsPanel.Children.Clear();
     foreach (var view in flattenedNodes)
     {
       var node = view.Node;
       var context = CreateRowContext(view);
-      var label = BuildNodeContent(view, context);
-      var row = new Border
+      Border row;
+      if (previousRows.Remove(node.Key, out var previous) && ReferenceEquals(previous.Node, node))
       {
-        Child = label,
-        MinHeight = ResolveRowMinHeight(),
-        Padding = RowPadding ?? global::FsusUI.Avalonia.FsusTokens.Space2Thickness,
-        Margin = new Thickness(
-          Math.Max(0, view.Level - 1) *
-          global::FsusUI.Avalonia.FsusTokens.Space5Thickness.Left,
-          0,
-          0,
-          0),
-        Focusable = false,
-        IsEnabled = !node.IsDisabled,
-      };
-      FsusComponentClasses.SetBaseClasses(row, "fsus-tree-row");
+        row = previous.Row;
+      }
+      else
+      {
+        if (previous is not null)
+          ReleaseRowTextCache(previous.Row);
+        row = new Border { Focusable = false };
+        FsusComponentClasses.SetBaseClasses(row, "fsus-tree-row");
+        row.PointerPressed += (_, e) => HandleRowPointerPressed(node, row, e);
+      }
+
+      // Keep unchanged text layouts and attached rows through expansion/focus
+      // updates. Custom presenters and editors still rebuild their content.
+      if (RowPresenter is null && renderedPresenter is null &&
+          ActiveInlineEdit?.Key != node.Key && row.Child is TextBlock label)
+      {
+        label.Text = GetDefaultNodeText(context);
+      }
+      else
+      {
+        ReleaseRowTextCache(row);
+        row.Child = BuildNodeContent(view, context);
+      }
+      row.Margin = new Thickness(
+        Math.Max(0, view.Level - 1) *
+        global::FsusUI.Avalonia.FsusTokens.Space5Thickness.Left,
+        0,
+        0,
+        0);
       ApplyRowState(row, context);
-      row.PointerPressed += (_, e) => HandleRowPointerPressed(view, row, e);
-      renderedRows[node.Key] = row;
-      rowsPanel.Children.Add(row);
+      renderedRows[node.Key] = new RenderedTreeRow(node, row);
+      desiredRows.Add(row);
 
       if (
         ActiveInlineEdit is
@@ -925,14 +1028,37 @@ public class FsusTree : ContentControl
           ParentKey: var parentKey,
         } && parentKey == node.Key)
       {
-        rowsPanel.Children.Add(BuildTransientInlineEditRow(view.Level + 1));
+        desiredRows.Add(BuildTransientInlineEditRow(view.Level + 1));
       }
     }
 
     if (ActiveInlineEdit is { Kind: FsusTreeInlineEditKind.Create, ParentKey: null })
     {
-      rowsPanel.Children.Add(BuildTransientInlineEditRow(1));
+      desiredRows.Add(BuildTransientInlineEditRow(1));
     }
+
+    var retained = new HashSet<Control>(desiredRows);
+    foreach (var removed in previousRows.Values)
+      ReleaseRowTextCache(removed.Row);
+    foreach (var removed in rowsPanel.Children.Where(child => !retained.Contains(child)).ToArray())
+    {
+      rowsPanel.Children.Remove(removed);
+    }
+    for (var index = 0; index < desiredRows.Count; index++)
+    {
+      var row = desiredRows[index];
+      if (index < rowsPanel.Children.Count && ReferenceEquals(rowsPanel.Children[index], row))
+      {
+        continue;
+      }
+
+      if (ReferenceEquals(row.Parent, rowsPanel))
+      {
+        rowsPanel.Children.Remove(row);
+      }
+      rowsPanel.Children.Insert(index, row);
+    }
+    renderedPresenter = RowPresenter;
   }
 
   private Control BuildNodeContent(FsusTreeNodeView view, FsusTreeRowContext context)
@@ -952,15 +1078,20 @@ public class FsusTree : ContentControl
       return RowPresenter(context);
     }
 
-    var statePrefix = context.IsExpandable
-      ? context.IsExpanded ? "▾" : "▸"
-      : " ";
-    return new TextBlock
+    return new FsusTreeDefaultLabel(this)
     {
-      Text = $"{statePrefix} {view.Node.Label}",
+      Text = GetDefaultNodeText(context),
       VerticalAlignment = global::Avalonia.Layout.VerticalAlignment.Center,
       TextTrimming = global::Avalonia.Media.TextTrimming.CharacterEllipsis,
     };
+  }
+
+  private static string GetDefaultNodeText(FsusTreeRowContext context)
+  {
+    var statePrefix = context.IsExpandable
+      ? context.IsExpanded ? "▾" : "▸"
+      : " ";
+    return $"{statePrefix} {context.Node.Label}";
   }
 
   private FsusTreeRowContext CreateRowContext(FsusTreeNodeView view)
@@ -1042,7 +1173,7 @@ public class FsusTree : ContentControl
       string.IsNullOrWhiteSpace(edit.ValidationError)
         ? $"editing create, level {level.ToString(CultureInfo.InvariantCulture)}"
         : $"editing create, invalid, level {level.ToString(CultureInfo.InvariantCulture)}");
-    renderedRows[edit.Key] = row;
+    renderedRows[edit.Key] = new RenderedTreeRow(null, row);
     return row;
   }
 
@@ -1234,11 +1365,11 @@ public class FsusTree : ContentControl
   }
 
   private void HandleRowPointerPressed(
-    FsusTreeNodeView view,
+    FsusTreeNode node,
     Border row,
     PointerPressedEventArgs e)
   {
-    if (e.Handled || view.Node.IsDisabled)
+    if (e.Handled || node.IsDisabled)
     {
       return;
     }
@@ -1246,7 +1377,7 @@ public class FsusTree : ContentControl
     var point = e.GetCurrentPoint(row);
     if (point.Properties.IsRightButtonPressed)
     {
-      var rowAnchor = ResolveNodeAnchorBounds(view.Node.Key);
+      var rowAnchor = ResolveNodeAnchorBounds(node.Key);
       var pointerAnchor = new Rect(
         rowAnchor.X + point.Position.X,
         rowAnchor.Y + point.Position.Y,
@@ -1254,7 +1385,7 @@ public class FsusTree : ContentControl
         1);
       Focus();
       if (RequestNodeContext(
-        view.Node.Key,
+        node.Key,
         FsusTreeInteractionSource.Pointer,
         pointerAnchor))
       {
@@ -1269,22 +1400,22 @@ public class FsusTree : ContentControl
     }
 
     Focus();
-    var expandable = IsExpandable(view.Node);
+    var expandable = IsExpandable(node);
     if (
       expandable &&
       point.Position.X <= global::FsusUI.Avalonia.FsusTokens.Space6Thickness.Left)
     {
       e.Handled = GestureToggleExpansion(
-        view.Node.Key,
+        node.Key,
         FsusTreeInteractionSource.Pointer);
       return;
     }
 
-    if (!selectedKeys.Contains(view.Node.Key))
+    if (!selectedKeys.Contains(node.Key))
     {
-      ToggleSelection(view.Node.Key);
+      ToggleSelection(node.Key);
     }
-    e.Handled = Activate(view.Node.Key, FsusTreeInteractionSource.Pointer);
+    e.Handled = Activate(node.Key, FsusTreeInteractionSource.Pointer);
   }
 
   private void RaiseSelectionChanged(IReadOnlyList<string> added, IReadOnlyList<string> removed)
@@ -1420,6 +1551,111 @@ public class FsusTree : ContentControl
     AutomationProperties.SetItemStatus(
       this,
       $"{flattenedNodes.Count.ToString(CultureInfo.InvariantCulture)} nodes, {selectedKeys.Count.ToString(CultureInfo.InvariantCulture)} selected");
+  }
+}
+
+// TextBlock owns and disposes every returned layout. This pinned Avalonia
+// preview cache owns separate references to immutable shaped runs, not layouts.
+internal sealed class FsusTreeDefaultLabel : TextBlock
+{
+  private readonly FsusTree owner;
+  private static readonly char[] ParagraphBreaks = ['\r', '\n', '\v', '\f', '\u0085', '\u2028', '\u2029'];
+  private TextRunCache? shapingCache;
+  private ShapingInputs? shapingInputs;
+  private GenericTextRunProperties? shapingProperties;
+
+  private sealed record ShapingInputs(
+    string? Text,
+    Typeface Typeface,
+    GlyphTypeface GlyphTypeface,
+    double FontSize,
+    IBrush? Foreground,
+    Color? Color,
+    double? Opacity,
+    Matrix? BrushTransform,
+    RelativePoint? BrushTransformOrigin,
+    FlowDirection FlowDirection,
+    double LetterSpacing,
+    double Scaling,
+    TopLevel? ResourceRoot,
+    object Theme);
+
+  internal FsusTreeDefaultLabel(FsusTree owner)
+  {
+    this.owner = owner;
+    AutomationProperties.SetClassNameOverride(this, nameof(TextBlock));
+    ResourcesChanged += (_, _) =>
+    {
+      // Attachment notifications are covered by the effective input key.
+      // Actual resource changes in a live tree require fresh shaped data.
+      if (owner.Parent is not null && owner.IsAttachedToVisualTree() &&
+          ((ILogical)owner).IsAttachedToLogicalTree && this.IsAttachedToVisualTree() &&
+          ((ILogical)this).IsAttachedToLogicalTree)
+      {
+        owner.InvalidateLayoutGlyphTypefaces();
+        ReleaseShapingCache();
+        InvalidateTextLayout();
+      }
+    };
+  }
+
+  internal long ShapingBuildCount { get; private set; }
+  internal bool HoldsShapingCache => shapingCache is not null;
+  protected override Type StyleKeyOverride => typeof(TextBlock);
+
+  internal void ReleaseShapingCache()
+  {
+    shapingCache?.Dispose();
+    shapingCache = null;
+    shapingInputs = null;
+    shapingProperties = null;
+  }
+
+  protected override TextLayout CreateTextLayout(string? text)
+  {
+    // Mutable rich formatting and multi-paragraph content retain the complete
+    // base behavior. The default plain label keeps only one shaping entry.
+    if (Inlines is { Count: > 0 } || TextDecorations is not null ||
+        FontFeatures is not null || TextWrapping != TextWrapping.NoWrap || LineSpacing != 0 ||
+        TextAlignment == TextAlignment.Justify ||
+        text?.IndexOfAny(ParagraphBreaks) >= 0 ||
+        Foreground is not null and not ISolidColorBrush)
+    {
+      ReleaseShapingCache();
+      return base.CreateTextLayout(text);
+    }
+
+    var typeface = new Typeface(FontFamily, FontStyle, FontWeight, FontStretch);
+    var brush = Foreground as ISolidColorBrush;
+    var inputs = new ShapingInputs(text, typeface, owner.ResolveLayoutGlyphTypeface(typeface),
+      FontSize, Foreground, brush?.Color, brush?.Opacity,
+      brush?.Transform?.Value, brush?.TransformOrigin,
+      FlowDirection, LetterSpacing, TopLevel.GetTopLevel(this)?.RenderScaling ?? 1,
+      TopLevel.GetTopLevel(this),
+      ActualThemeVariant);
+    if (inputs != shapingInputs ||
+        !ReferenceEquals(inputs.Foreground, shapingInputs?.Foreground) ||
+        !ReferenceEquals(inputs.GlyphTypeface, shapingInputs?.GlyphTypeface) ||
+        !ReferenceEquals(inputs.ResourceRoot, shapingInputs?.ResourceRoot))
+    {
+      ReleaseShapingCache();
+      shapingInputs = inputs;
+      shapingCache = new TextRunCache();
+      // Line metrics resolve the glyph typeface through these properties.
+      // Keep their lazy resolution with the shaped runs across fresh layouts.
+      shapingProperties = new GenericTextRunProperties(typeface, FontSize,
+        TextDecorations, Foreground, fontFeatures: FontFeatures);
+      ShapingBuildCount++;
+    }
+
+    var properties = shapingProperties!;
+    var paragraph = new GenericTextParagraphProperties(FlowDirection,
+      IsMeasureValid ? TextAlignment : TextAlignment.Left, true, false,
+      properties, TextWrapping, LineHeight, 0, LetterSpacing);
+    var constraint = GetMaxSizeFromConstraint();
+    return new TextLayout(new SimpleTextSource(text ?? string.Empty, properties),
+      paragraph, TextTrimming, constraint.Width, constraint.Height, MaxLines,
+      shapingCache);
   }
 }
 
