@@ -65,6 +65,15 @@ executes while disabled. `FsusNativeMenuMetadata.GetRole`
 and `GetCommandId` preserve platform role and command identity independently
 of localized labels.
 
+Shared command gestures use the platform-neutral primary-modifier semantics
+described in [shortcut input](input.md#supported-platform-differences). Native
+menu construction and gesture updates translate the serialized `Ctrl` primary
+modifier to Avalonia `Meta` (Command) on macOS and retain `Control` on Windows
+and Linux; `Auto` selects the host platform. Dock-menu construction uses the
+same translation. This does not change gesture serialization or raw
+`FsusShortcutGesture.ToKeyGesture()` interop, which preserves the stored
+modifier flags rather than selecting a platform accelerator.
+
 macOS application menus use explicit About, Preferences, Services, Hide,
 Hide Others, Show All, Quit, and Window roles. Windows and Linux omit
 macOS-only roles and order top-level menus as File, Edit, View, Window, Help.
