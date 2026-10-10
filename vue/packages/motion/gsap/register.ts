@@ -3,7 +3,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger'
 
 let scrollTriggerRegistered = false
 
-export const getGsap = () => gsap
+export const getGsap = (): typeof gsap => gsap
 
 const ensureMatchMedia = () => {
   if (
