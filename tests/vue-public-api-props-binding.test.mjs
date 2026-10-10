@@ -4,6 +4,7 @@ import os from 'node:os'
 import path from 'node:path'
 import test from 'node:test'
 import { fileURLToPath, pathToFileURL } from 'node:url'
+import { defineComponent } from 'vue'
 
 const repository = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
@@ -59,6 +60,218 @@ const assertProps = (files, expected) =>
   })
 const decoy =
   'export const fixtureOptionsWidgetSiblingProps = { intruder: String }'
+
+const assertOrderedOptions = ({
+  declarations,
+  options,
+  expected,
+  runtime,
+  runtimeExpected = expected,
+  files = {},
+}) => {
+  assert.deepEqual(
+    Object.keys(defineComponent(runtime).props ?? {}).sort(),
+    [...runtimeExpected].sort(),
+  )
+  assertProps(
+    {
+      [sfcPath]: `<template><div /></template><script lang="ts">
+import { defineComponent } from 'vue'
+${declarations}
+export default defineComponent({ name: 'ElFixtureOptionsWidget', ${options} })
+</script>`,
+      [propsPath]: decoy,
+      ...files,
+    },
+    expected,
+  )
+}
+
+test('known trailing Options spread replaces props in actual JavaScript order', () => {
+  const owned = { disabled: Boolean }
+  const later = { props: { replacement: String } }
+  assertOrderedOptions({
+    declarations:
+      'const owned = { disabled: Boolean }; const later = { props: { replacement: String } };',
+    options: 'props: owned, ...later',
+    expected: ['replacement'],
+    runtime: { props: owned, ...later },
+  })
+})
+
+test('unresolved trailing Options spread cannot certify earlier props', () => {
+  const owned = { disabled: Boolean }
+  const later = (() => ({ props: { replacement: String } }))()
+  assertOrderedOptions({
+    declarations:
+      'const owned = { disabled: Boolean }; const later = (() => ({ props: { replacement: String } }))();',
+    options: 'props: owned, ...later',
+    expected: [],
+    runtimeExpected: ['replacement'],
+    runtime: { props: owned, ...later },
+  })
+})
+
+test('unresolved later computed key can replace selected props', () => {
+  const owned = { disabled: Boolean }
+  const key = (() => 'props')()
+  assertOrderedOptions({
+    declarations:
+      'const owned = { disabled: Boolean }; const key = (() => "props")();',
+    options: 'props: owned, [key]: { replacement: String }',
+    expected: [],
+    runtimeExpected: ['replacement'],
+    runtime: { props: owned, [key]: { replacement: String } },
+  })
+})
+
+test('component props member respects a trailing Options spread', () => {
+  const Other = defineComponent({
+    props: { disabled: Boolean },
+    ...{ props: { replacement: String } },
+  })
+  assertOrderedOptions({
+    declarations:
+      'const Other = defineComponent({ props: { disabled: Boolean }, ...{ props: { replacement: String } } });',
+    options: 'props: { ...Other.props, own: Boolean }',
+    expected: ['own', 'replacement'],
+    runtime: { props: { ...Other.props, own: Boolean } },
+  })
+})
+
+test('earlier resolved Options spread yields to later explicit props', () => {
+  const earlier = { props: { replacement: String } }
+  const owned = { disabled: Boolean }
+  assertOrderedOptions({
+    declarations:
+      'const earlier = { props: { replacement: String } }; const owned = { disabled: Boolean };',
+    options: '...earlier, props: owned',
+    expected: ['disabled'],
+    runtime: { ...earlier, props: owned },
+  })
+})
+
+test('later explicit props settles an earlier unknown Options spread', () => {
+  const earlier = (() => ({ props: { replacement: String } }))()
+  const owned = { disabled: Boolean }
+  assertOrderedOptions({
+    declarations:
+      'const earlier = (() => ({ props: { replacement: String } }))(); const owned = { disabled: Boolean };',
+    options: '...earlier, props: owned',
+    expected: ['disabled'],
+    runtime: { ...earlier, props: owned },
+  })
+})
+
+test('later resolved Options spread wins through nested owned spreads', () => {
+  const first = { props: { disabled: Boolean } }
+  const last = { ...{ props: { replacement: String } } }
+  assertOrderedOptions({
+    declarations:
+      'const first = { props: { disabled: Boolean } }; const last = { ...{ props: { replacement: String } } };',
+    options: '...first, ...last',
+    expected: ['replacement'],
+    runtime: { ...first, ...last },
+  })
+})
+
+test('known Options spread without props preserves the earlier binding', () => {
+  const owned = { disabled: Boolean }
+  const later = { inheritAttrs: false }
+  assertOrderedOptions({
+    declarations:
+      'const owned = { disabled: Boolean }; const later = { inheritAttrs: false };',
+    options: 'props: owned, ...later',
+    expected: ['disabled'],
+    runtime: { props: owned, ...later },
+  })
+})
+
+test('known computed key alias overrides props through its actual binding', () => {
+  const key = 'props'
+  assertOrderedOptions({
+    declarations: 'const key = "props";',
+    options: 'props: { disabled: Boolean }, [key]: { replacement: String }',
+    expected: ['replacement'],
+    runtime: { props: { disabled: Boolean }, [key]: { replacement: String } },
+  })
+})
+
+test('later explicit props settles an earlier unresolved computed key', () => {
+  const key = (() => 'props')()
+  assertOrderedOptions({
+    declarations: 'const key = (() => "props")();',
+    options: '[key]: { replacement: String }, props: { disabled: Boolean }',
+    expected: ['disabled'],
+    runtime: { [key]: { replacement: String }, props: { disabled: Boolean } },
+  })
+})
+
+test('unknown computed key cannot be assumed unrelated to props', () => {
+  const key = (() => 'inheritAttrs')()
+  assertOrderedOptions({
+    declarations: 'const key = (() => "inheritAttrs")();',
+    options: 'props: { disabled: Boolean }, [key]: false',
+    expected: [],
+    runtimeExpected: ['disabled'],
+    runtime: { props: { disabled: Boolean }, [key]: false },
+  })
+})
+
+test('imported Options spread and computed key retain their genuine owner', () => {
+  const later = { props: { replacement: String } }
+  const key = 'props'
+  assertOrderedOptions({
+    declarations: "import { later as selected, key } from './owner'",
+    options:
+      'props: { disabled: Boolean }, ...selected, [key]: { final: Boolean }',
+    expected: ['final'],
+    runtime: {
+      props: { disabled: Boolean },
+      ...later,
+      [key]: { final: Boolean },
+    },
+    files: {
+      [`${modulePath}/src/owner.ts`]:
+        'export const later = { props: { replacement: String } }; export const key = "props";',
+    },
+  })
+})
+
+test('component props member cannot certify an unresolved Options override', () => {
+  const later = (() => ({ props: { replacement: String } }))()
+  const Other = defineComponent({ props: { disabled: Boolean }, ...later })
+  assertOrderedOptions({
+    declarations:
+      'const later = (() => ({ props: { replacement: String } }))(); const Other = defineComponent({ props: { disabled: Boolean }, ...later });',
+    options: 'props: { ...Other.props, own: Boolean }',
+    expected: [],
+    runtimeExpected: ['own', 'replacement'],
+    runtime: { props: { ...Other.props, own: Boolean } },
+  })
+})
+
+test('component props member settles earlier uncertainty with explicit props', () => {
+  const earlier = (() => ({ props: { replacement: String } }))()
+  const Other = defineComponent({ ...earlier, props: { disabled: Boolean } })
+  assertOrderedOptions({
+    declarations:
+      'const earlier = (() => ({ props: { replacement: String } }))(); const Other = defineComponent({ ...earlier, props: { disabled: Boolean } });',
+    options: 'props: { ...Other.props, own: Boolean }',
+    expected: ['disabled', 'own'],
+    runtime: { props: { ...Other.props, own: Boolean } },
+  })
+})
+
+test('resolved-empty later Options override excludes earlier names', () => {
+  const later = { props: {} }
+  assertOrderedOptions({
+    declarations: 'const later = { props: {} };',
+    options: 'props: { disabled: Boolean }, ...later',
+    expected: [],
+    runtime: { props: { disabled: Boolean }, ...later },
+  })
+})
 
 test('original macro props, emits, slots, exposed and deprecated controls remain positive', () => {
   withFixture({}, (baseline) => {

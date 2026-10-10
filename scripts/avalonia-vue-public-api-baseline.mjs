@@ -798,16 +798,43 @@ const selectedOptionsProps = (
         name === 'props' ? 'options' : mode,
       )
       if (owner?.node.type !== 'ObjectExpression') return null
-      const property = owner.node.properties.findLast(
-        (item) =>
-          item.type === 'ObjectProperty' &&
-          propertyName(item, owner.module, owner.active) === name,
+      const property = selectedProperty(
+        owner,
+        name,
+        name === 'props' ? 'options' : mode,
+        mode,
       )
-      return property
-        ? value(property.value, owner.module, owner.active, mode)
-        : null
+      return property.state === 'resolved' ? property.value : null
     }
     return { node, module, active }
+  }
+  const selectedProperty = (owner, name, ownerMode, valueMode) => {
+    if (owner?.node.type !== 'ObjectExpression') return { state: 'unresolved' }
+    let selected = { state: 'absent' }
+    for (const property of owner.node.properties) {
+      if (property.type === 'SpreadElement') {
+        const spread = selectedProperty(
+          value(property.argument, owner.module, owner.active, ownerMode),
+          name,
+          ownerMode,
+          valueMode,
+        )
+        if (spread.state !== 'absent') selected = spread
+        continue
+      }
+      const key = propertyName(property, owner.module, owner.active)
+      if (key === null) {
+        selected = { state: 'unresolved' }
+      } else if (key === name) {
+        const resolved =
+          property.type === 'ObjectProperty' &&
+          value(property.value, owner.module, owner.active, valueMode)
+        selected = resolved
+          ? { state: 'resolved', value: resolved }
+          : { state: 'unresolved' }
+      }
+    }
+    return selected
   }
   const names = (resolved) => {
     if (!resolved) return null
@@ -845,15 +872,10 @@ const selectedOptionsProps = (
   if (!module) return unresolved
   const options = exportValue(exportName, module, new Set(), 'options')
   if (options?.node.type !== 'ObjectExpression') return unresolved
-  const props = options.node.properties.findLast(
-    (property) =>
-      property.type !== 'SpreadElement' &&
-      propertyName(property, options.module, options.active) === 'props',
-  )
-  if (!props) return { ...absent, selected: true }
-  const result = names(
-    value(props.value, options.module, options.active, 'props'),
-  )
+  const props = selectedProperty(options, 'props', 'options', 'props')
+  if (props.state === 'absent') return { ...absent, selected: true }
+  if (props.state === 'unresolved') return unresolved
+  const result = names(props.value)
   return result === null
     ? unresolved
     : { state: 'resolved', selected: true, props: uniqueSorted(result) }
@@ -1155,7 +1177,7 @@ export const buildArtifacts = (root, options = {}) => {
       packageVersion: packageJson.version,
       tokenHash: hashFiles(root, tokenFiles),
       iconHash: hashFiles(root, iconFiles),
-      toolVersion: `avalonia-vue-public-api-baseline@1.4.1+vue-semantic-baseline@${semanticVersion}`,
+      toolVersion: `avalonia-vue-public-api-baseline@1.4.2+vue-semantic-baseline@${semanticVersion}`,
       inputTreeHash,
       compilerOptionsHash,
       dependencyVersionHash,
