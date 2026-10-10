@@ -1302,3 +1302,447 @@ describe('MarkdownEditor native capture disposal', () => {
     expect(lend(editor, batch).accepted).toBe(false)
   })
 })
+
+describe('MarkdownEditor capture admission lineage', () => {
+  it.each(['equal-byte-replacement', 'selection-only'] as const)(
+    'checks original capture admission after an observer performs %s',
+    async (kind) => {
+      let armed = true
+      let nested:
+        | ReturnType<MarkdownEditorInstance['dispatchTransaction']>
+        | undefined
+      const editor = mount(MarkdownEditor, {
+        props: {
+          modelValue: 'ab',
+          defaultMode: 'source',
+          documentIdentity: { id: 'doc', epoch: 2 },
+          onTransaction: (event: MarkdownEditorTransactionEvent) => {
+            if (!armed) return
+            armed = false
+            nested = editor.vm.dispatchTransaction({
+              changes:
+                kind === 'equal-byte-replacement'
+                  ? [{ from: 0, to: event.value.length, insert: event.value }]
+                  : [],
+              selection: { start: 0, end: 0 },
+              history: 'skip',
+              origin: 'programmatic',
+            })
+          },
+        },
+      })
+      const original = file()
+      const { batch, observation } = await capture(editor, [original])
+      expect(nested!.accepted).toBe(true)
+      const events = editor
+        .emitted('transaction')!
+        .map(([event]) => event as MarkdownEditorTransactionEvent)
+      expect(events).toHaveLength(2)
+      expect(events[0]!.revision).toBe(events[1]!.revision)
+      const consumer = vi.fn<MarkdownAttachmentFileConsumer>()
+      const admitted = batch
+        ? editor.vm.withAttachmentFile(batch, batch.items[0]!, consumer)
+        : false
+      if (kind === 'selection-only') {
+        expect(admitted).toBe(true)
+        expect(consumer).toHaveBeenCalledExactlyOnceWith(original, observation)
+        expect(consumer.mock.calls[0]![0]).toBe(original)
+        expect(observation.transaction).toBe(events[0])
+        expect(batch.items[0]!.signal.aborted).toBe(false)
+        expect(observation.plan.jobs[0]!.phase).toBe('pending')
+        expect(
+          events[1]!.positionMap!.mapRange(observation.placements[0]!.range)
+            .deleted,
+        ).toBe(false)
+        expect(editor.vm.applyAttachmentResult(resolved(batch))).toBe(true)
+      } else {
+        expect(
+          events[1]!.positionMap!.mapRange({ start: 1, end: 20 }).deleted,
+        ).toBe(true)
+        expect(admitted).toBe(false)
+        expect(consumer).not.toHaveBeenCalled()
+        expect(editor.emitted('upload-image')).toBeUndefined()
+        const setup = Reflect.get(editor.vm.$, 'setupState') as Record<
+          string,
+          unknown
+        >
+        expect((setup.attachmentBatches as Map<string, unknown>).size).toBe(0)
+        expect((setup.attachmentItems as Map<string, unknown>).size).toBe(0)
+        expect(setup.attachmentJobs).toEqual([])
+      }
+    },
+  )
+})
+
+describe('MarkdownEditor capture admission callback boundaries', () => {
+  const resources = (editor: Editor) => {
+    const setup = Reflect.get(editor.vm.$, 'setupState') as Record<
+      string,
+      unknown
+    >
+    return {
+      setup,
+      batches: setup.attachmentBatches as Map<string, unknown>,
+      items: setup.attachmentItems as Map<
+        string,
+        MarkdownAttachmentBatchIntent['items'][number]
+      >,
+    }
+  }
+
+  it.each([
+    'onUpdate:modelValue',
+    'onChange',
+    'onSelectionChange',
+    'onHistoryChange',
+  ] as const)(
+    'refuses an equal-byte deletion from %s before registering Files',
+    async (callback) => {
+      let originalEvent: MarkdownEditorTransactionEvent | undefined
+      let armed = true
+      let nested:
+        | ReturnType<MarkdownEditorInstance['dispatchTransaction']>
+        | undefined
+      const abortStates: boolean[] = []
+      const editor = mount(MarkdownEditor, {
+        props: {
+          modelValue: 'ab',
+          defaultMode: 'source',
+          documentIdentity: { id: 'doc', epoch: 2 },
+          onTransaction: (event: MarkdownEditorTransactionEvent) => {
+            if (originalEvent) return
+            originalEvent = event
+            const { items, batches, setup } = resources(editor)
+            expect(batches.size).toBe(0)
+            expect((setup.attachmentJobs as unknown[]).length).toBe(1)
+            for (const item of items.values())
+              item.signal.addEventListener('abort', () => {
+                const current = resources(editor)
+                abortStates.push(
+                  current.batches.size === 0 &&
+                    current.items.size === 0 &&
+                    (current.setup.attachmentJobs as unknown[]).length === 0,
+                )
+              })
+            if (callback === 'onSelectionChange') {
+              // This insertion retains its caret. A real accepted selection
+              // dispatch reaches the same public callback before registration.
+              editor.vm.dispatchTransaction({
+                changes: [],
+                selection: { start: 0, end: 0 },
+                history: 'skip',
+                origin: 'programmatic',
+              })
+            }
+          },
+          [callback]: () => {
+            if (!armed || !originalEvent) return
+            armed = false
+            nested = editor.vm.dispatchTransaction({
+              changes: [
+                {
+                  from: 0,
+                  to: originalEvent.value.length,
+                  insert: originalEvent.value,
+                },
+              ],
+              history: 'skip',
+              origin: 'programmatic',
+            })
+          },
+        },
+      })
+      const abort = vi.spyOn(AbortController.prototype, 'abort')
+      try {
+        await capture(editor, [file()])
+        expect(nested).toMatchObject({
+          accepted: true,
+          revision: originalEvent!.revision,
+          value: originalEvent!.value,
+        })
+        const events = editor
+          .emitted('transaction')!
+          .map(([event]) => event as MarkdownEditorTransactionEvent)
+        expect(events).toHaveLength(callback === 'onSelectionChange' ? 3 : 2)
+        expect(
+          events.at(-1)!.positionMap!.mapRange({ start: 1, end: 20 }).deleted,
+        ).toBe(true)
+        expect(editor.emitted('upload-image')).toBeUndefined()
+        const { batches, items, setup } = resources(editor)
+        expect([
+          batches.size,
+          items.size,
+          (setup.attachmentJobs as unknown[]).length,
+        ]).toEqual([0, 0, 0])
+        expect(abortStates).toEqual([true])
+        expect(abort.mock.contexts).toHaveLength(2)
+        expect(
+          abort.mock.contexts.every(
+            (controller) =>
+              controller instanceof AbortController &&
+              controller.signal.aborted,
+          ),
+        ).toBe(true)
+      } finally {
+        abort.mockRestore()
+        editor.unmount()
+      }
+    },
+  )
+
+  it.each([
+    'prefix-equal-byte',
+    'empty-insertion',
+    'placement-equal-byte',
+    'revision-drift',
+  ] as const)('follows the original accepted map for %s', async (kind) => {
+    let armed = true
+    const editor = mount(MarkdownEditor, {
+      props: {
+        modelValue: 'ab',
+        defaultMode: 'source',
+        documentIdentity: { id: 'doc', epoch: 2 },
+        onTransaction: (event: MarkdownEditorTransactionEvent) => {
+          if (!armed) return
+          armed = false
+          editor.vm.dispatchTransaction({
+            changes: [
+              kind === 'prefix-equal-byte'
+                ? { from: 0, to: 1, insert: 'a' }
+                : kind === 'empty-insertion'
+                  ? { from: 0, to: 0, insert: '' }
+                  : kind === 'placement-equal-byte'
+                    ? { from: 1, to: 20, insert: event.value.slice(1, 20) }
+                    : { from: 0, to: 0, insert: 'prefix' },
+            ],
+            history: 'skip',
+            origin: 'programmatic',
+          })
+        },
+      },
+    })
+    const original = file()
+    const { batch, observation } = await capture(editor, [original])
+    const events = editor
+      .emitted('transaction')!
+      .map(([event]) => event as MarkdownEditorTransactionEvent)
+    expect(events).toHaveLength(2)
+    const mapped = events[1]!.positionMap!.mapRange({ start: 1, end: 20 })
+    expect(mapped.deleted).toBe(kind === 'placement-equal-byte')
+    expect(events[1]!.revision).toBe(
+      events[0]!.revision + (kind === 'revision-drift' ? 1 : 0),
+    )
+    if (kind === 'placement-equal-byte' || kind === 'revision-drift') {
+      expect(batch).toBeUndefined()
+      const { batches, items, setup } = resources(editor)
+      expect([
+        batches.size,
+        items.size,
+        (setup.attachmentJobs as unknown[]).length,
+      ]).toEqual([0, 0, 0])
+    } else {
+      const loan = lend(editor, batch)
+      expect(loan.accepted).toBe(true)
+      expect(loan.consumer.mock.calls[0]).toEqual([original, observation])
+      expect(loan.consumer.mock.calls[0]![0]).toBe(original)
+      expect(observation.transaction).toBe(events[0])
+      expect(observation.placements[0]!.range).toEqual({ start: 1, end: 20 })
+      expect(observation.placements[0]!.range).not.toBe(
+        observation.plan.jobs[0]!.range,
+      )
+      // Keep the existing lifecycle's boundary affinity. The event map reports
+      // anchor deletion and need not choose the job's boundary affinity.
+      expect(observation.plan.jobs[0]!.range).toEqual({ start: 1, end: 20 })
+      expect(editor.vm.applyAttachmentResult(resolved(batch))).toBe(true)
+    }
+    editor.unmount()
+  })
+
+  it.each(['pick', 'paste', 'drop'] as const)(
+    'retires all original jobs and signals after a multifile %s placement deletion',
+    async (source) => {
+      let armed = true
+      const originals = [file(), file()]
+      const retiredItems: MarkdownAttachmentBatchIntent['items'][number][] = []
+      const editor = mount(MarkdownEditor, {
+        props: {
+          modelValue: 'ab',
+          defaultMode: 'source',
+          documentIdentity: { id: 'doc', epoch: 2 },
+          onTransaction: (event: MarkdownEditorTransactionEvent) => {
+            if (!armed) return
+            armed = false
+            retiredItems.push(...resources(editor).items.values())
+            editor.vm.dispatchTransaction({
+              changes: [{ from: 1, to: 20, insert: event.value.slice(1, 20) }],
+              history: 'skip',
+              origin: 'programmatic',
+            })
+          },
+        },
+      })
+      const abort = vi.spyOn(AbortController.prototype, 'abort')
+      try {
+        await capture(editor, originals, source)
+        expect(editor.emitted('transaction')).toHaveLength(2)
+        expect(editor.emitted('upload-image')).toBeUndefined()
+        expect(retiredItems).toHaveLength(2)
+        expect(retiredItems.every((item) => item.signal.aborted)).toBe(true)
+        expect(abort.mock.contexts).toHaveLength(3)
+        expect(
+          abort.mock.contexts.every(
+            (controller) =>
+              controller instanceof AbortController &&
+              controller.signal.aborted,
+          ),
+        ).toBe(true)
+        const { batches, items, setup } = resources(editor)
+        expect([
+          batches.size,
+          items.size,
+          (setup.attachmentJobs as unknown[]).length,
+        ]).toEqual([0, 0, 0])
+      } finally {
+        abort.mockRestore()
+        editor.unmount()
+      }
+    },
+  )
+
+  it('retires only the refused capture and preserves an earlier File and completion', async () => {
+    let replace = false
+    let secondStart = 0
+    const editor = mount(MarkdownEditor, {
+      props: {
+        modelValue: 'ab',
+        defaultMode: 'source',
+        documentIdentity: { id: 'doc', epoch: 2 },
+        onTransaction: (event: MarkdownEditorTransactionEvent) => {
+          if (!replace) return
+          replace = false
+          editor.vm.dispatchTransaction({
+            changes: [
+              {
+                from: secondStart,
+                to: event.value.length,
+                insert: event.value.slice(secondStart),
+              },
+            ],
+            history: 'skip',
+            origin: 'programmatic',
+          })
+        },
+      },
+    })
+    const original = file('first.png')
+    const { batch } = await capture(editor, [original])
+    const textarea = editor.get<HTMLTextAreaElement>('textarea').element
+    secondStart = textarea.value.length
+    textarea.setSelectionRange(secondStart, secondStart)
+    const picker = editor.get<HTMLInputElement>('input[type="file"]')
+    Object.defineProperty(picker.element, 'files', {
+      configurable: true,
+      value: [file('second.png')],
+    })
+    replace = true
+    await picker.trigger('change')
+    expect(editor.emitted('upload-image')).toHaveLength(1)
+    const { batches, items, setup } = resources(editor)
+    expect([
+      batches.size,
+      items.size,
+      (setup.attachmentJobs as unknown[]).length,
+    ]).toEqual([1, 1, 1])
+    const loan = lend(editor, batch)
+    expect(loan.accepted).toBe(true)
+    expect(loan.consumer.mock.calls[0]![0]).toBe(original)
+    expect(batch.signal.aborted).toBe(false)
+    expect(batch.items[0]!.signal.aborted).toBe(false)
+    expect(editor.vm.applyAttachmentResult(resolved(batch))).toBe(true)
+    editor.unmount()
+  })
+})
+
+describe('MarkdownEditor attachment mapping ownership', () => {
+  it('does not let public transaction metadata skip an admitted original job', async () => {
+    const editor = mountEditor()
+    const original = file()
+    const { batch, observation } = await capture(editor, [original])
+    const value = observation.transaction.value
+    const replaced = editor.vm.dispatchTransaction({
+      changes: [{ from: 0, to: value.length, insert: value }],
+      metadata: { attachmentItemId: batch.items[0]!.itemId },
+      history: 'skip',
+      origin: 'programmatic',
+    })
+    expect(replaced).toMatchObject({
+      accepted: true,
+      revision: observation.transaction.revision,
+      value,
+    })
+    expect(
+      replaced.positionMap!.mapRange(observation.placements[0]!.range).deleted,
+    ).toBe(true)
+    expect(lend(editor, batch).accepted).toBe(false)
+    expect(batch.signal.aborted).toBe(true)
+    expect(batch.items[0]!.signal.aborted).toBe(true)
+    expect(observation.plan.jobs[0]!.phase).toBe('deleted')
+    expect(editor.vm.applyAttachmentResult(resolved(batch))).toBe(false)
+    editor.unmount()
+  })
+
+  it('does not let a public metadata claim skip a staged original placement', async () => {
+    let armed = true
+    const editor = mount(MarkdownEditor, {
+      props: {
+        modelValue: 'ab',
+        defaultMode: 'source',
+        documentIdentity: { id: 'doc', epoch: 2 },
+        onTransaction: (event: MarkdownEditorTransactionEvent) => {
+          if (!armed) return
+          armed = false
+          // Read the genuine staged item only to test the strongest ID claim.
+          // This setup-state access is not a public consumer API.
+          const setup = Reflect.get(editor.vm.$, 'setupState') as Record<
+            string,
+            unknown
+          >
+          const items = setup.attachmentItems as Map<
+            string,
+            MarkdownAttachmentBatchIntent['items'][number]
+          >
+          const item = [...items.values()][0]!
+          editor.vm.dispatchTransaction({
+            changes: [{ from: 0, to: event.value.length, insert: event.value }],
+            metadata: { attachmentItemId: item.itemId },
+            history: 'skip',
+            origin: 'programmatic',
+          })
+        },
+      },
+    })
+    const abort = vi.spyOn(AbortController.prototype, 'abort')
+    try {
+      await capture(editor, [file()])
+      expect(editor.emitted('transaction')).toHaveLength(2)
+      expect(editor.emitted('upload-image')).toBeUndefined()
+      const setup = Reflect.get(editor.vm.$, 'setupState') as Record<
+        string,
+        unknown
+      >
+      expect((setup.attachmentBatches as Map<string, unknown>).size).toBe(0)
+      expect((setup.attachmentItems as Map<string, unknown>).size).toBe(0)
+      expect(setup.attachmentJobs).toEqual([])
+      expect(abort.mock.contexts).toHaveLength(2)
+      expect(
+        abort.mock.contexts.every(
+          (controller) =>
+            controller instanceof AbortController && controller.signal.aborted,
+        ),
+      ).toBe(true)
+    } finally {
+      abort.mockRestore()
+      editor.unmount()
+    }
+  })
+})

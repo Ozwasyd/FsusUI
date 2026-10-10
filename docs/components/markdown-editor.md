@@ -182,6 +182,16 @@ that existing transaction in their own context. A consumer `commitCreated` that
 dispatches its own placeholder requires a consumer-owned admission change first;
 receiving this event must not insert placeholders again. An observer that changes
 the document/revision during dispatch prevents the old capture from granting Files.
+The original accepted jobs enter the existing attachment lifecycle before public
+dispatch callbacks run; File associations are registered only after those jobs
+remain current. A callback that deletes or replaces an original placement prevents
+admission even when it inserts identical bytes and the revision stays unchanged.
+Selection-only callbacks and non-deleting edits at the same revision preserve the
+association. Refusal retires only that capture's original jobs/items before aborting
+its signals; it does not recreate a placement or grant from matching source bytes.
+Public transaction metadata cannot exempt an attachment from mapping. Completion
+and removal keep their existing exemption through their actual private owning job,
+without granting authority to a copied item ID.
 
 Each item has its own `AbortSignal`. Cancellation, retry, rejection, completion,
 removal, replacement, or deletion revoke that item's loan and release the retained
