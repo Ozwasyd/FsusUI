@@ -81,7 +81,9 @@ const writeWasmDeclarationOwner = async () => {
     allowWorkspaceSpecifier: true,
   })
 
-  const publishedDeclaration = pathRewriter('esm')(sourceDeclaration)
+  const publishedDeclaration = pathRewriter('esm', 'wasm/index.d.ts')(
+    sourceDeclaration,
+  )
   assertWasmDeclarationOwner(publishedDeclaration, 'WASM published declaration')
 
   await mkdir(path.dirname(wasmPublishedTypesEntry), {
@@ -167,7 +169,12 @@ const runGenerateTypesDefinitions = async () => {
         recursive: true,
       })
 
-      await writeFile(filepath, pathRewriter('esm')(declaration), 'utf8')
+      const declarationPath = path.relative(path.join(outDir, 'packages'), filepath)
+      await writeFile(
+        filepath,
+        pathRewriter('esm', declarationPath)(declaration),
+        'utf8',
+      )
 
       consola.success(
         chalk.green(
