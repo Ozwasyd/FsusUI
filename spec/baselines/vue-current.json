@@ -1,18 +1,18 @@
 {
   "schemaVersion": 1,
   "source": {
-    "commitSha": "5b0333a402cb848f6c612eb804c0f2fcfacd4d16",
+    "commitSha": "333b0439dcf7fd46b4bdbed39c34a36d35e54a03",
     "packageName": "element-plus",
     "packageVersion": "1.5.1",
     "tokenHash": "f40182721e8a812c248cb0bc43de556cd7568c5a9de1bc8b2c099df9b78e47b0",
     "iconHash": "6ae868b15cefc99ebec9d8a78c7602da1fb07b46ec172c43f6a3662af54be167",
     "toolVersion": "avalonia-vue-public-api-baseline@1.4.0+vue-semantic-baseline@1.4.0",
-    "inputTreeHash": "8f3772cc51d36040782dd8da602bba89f96d4aee7ee55757e37cfdc521096198",
+    "inputTreeHash": "14966648ff80a68698ba2264a61079b7d91d008f285492b3d7b4f3477be6237b",
     "compilerOptionsHash": "919b1f4f85e411ccb762efdc5a2d646f412fd73928c05ad302bbfdda0ab731e4",
     "dependencyVersionHash": "79ca1004d5204ee4ddc2de6b1d63f0946d36a42283d113ce8ad01ac4adaa7d27",
     "structuredOutputSelectionHash": "b4b7c00db1f817b08a1e7bec8a6af03a505f605d2dcf16fb2e52febbf830388f",
     "contractSchemaVersion": "2.0.0",
-    "outputHash": "195e70c3b81a0fbd788cdef26f843619a47afc9b5a5b3c1d8f34687d6fa42393"
+    "outputHash": "7835f0d151adb4288419914051ffa175d0900bb6cf1e0dee9167311330b07195"
   },
   "summary": {
     "componentModules": 93,
@@ -21,7 +21,7 @@
     "directives": 3,
     "services": 4,
     "plugins": 7,
-    "cssVariables": 495,
+    "cssVariables": 496,
     "deprecatedApis": 21,
     "componentCountByClassification": {
       "portable": 126,
@@ -6301,7 +6301,7 @@
             "name": "blur",
             "payload": [
               {
-                "name": "event",
+                "name": "payload",
                 "type": "FocusEvent",
                 "optional": false,
                 "rest": false
@@ -6323,7 +6323,7 @@
             "name": "focus",
             "payload": [
               {
-                "name": "event",
+                "name": "payload",
                 "type": "FocusEvent",
                 "optional": false,
                 "rest": false
@@ -6944,7 +6944,7 @@
             "name": "select",
             "payload": [
               {
-                "name": "event",
+                "name": "payload",
                 "type": "MouseEvent",
                 "optional": false,
                 "rest": false
@@ -9491,6 +9491,7 @@
       "props": [
         "...componentMotionProps",
         "buttonProps",
+        "checked",
         "command",
         "disabled",
         "divided",
@@ -9501,6 +9502,7 @@
         "id",
         "loop",
         "maxHeight",
+        "multiline",
         "onKeydown",
         "placement",
         "popperClass",
@@ -9513,7 +9515,8 @@
         "teleported",
         "textValue",
         "trigger",
-        "type"
+        "type",
+        "viewportBounded"
       ],
       "emits": [],
       "slots": [
@@ -9573,11 +9576,33 @@
       "module": "dropdown",
       "classification": "native-adapter",
       "source": "vue/packages/components/dropdown/src/dropdown-item.vue",
-      "props": ["command", "disabled", "divided", "icon", "textValue"],
+      "props": [
+        "checked",
+        "command",
+        "disabled",
+        "divided",
+        "icon",
+        "multiline",
+        "textValue"
+      ],
       "emits": [],
       "slots": [
         {
           "name": "default",
+          "nameKnown": true,
+          "scoped": false,
+          "payload": [],
+          "payloadComplete": true
+        },
+        {
+          "name": "description",
+          "nameKnown": true,
+          "scoped": false,
+          "payload": [],
+          "payloadComplete": true
+        },
+        {
+          "name": "suffix",
           "nameKnown": true,
           "scoped": false,
           "payload": [],
@@ -9605,6 +9630,20 @@
         "slots": [
           {
             "name": "default",
+            "nameKnown": true,
+            "scoped": false,
+            "payload": [],
+            "payloadComplete": true
+          },
+          {
+            "name": "description",
+            "nameKnown": true,
+            "scoped": false,
+            "payload": [],
+            "payloadComplete": true
+          },
+          {
+            "name": "suffix",
             "nameKnown": true,
             "scoped": false,
             "payload": [],
@@ -11608,19 +11647,58 @@
       "classification": "platform-override",
       "source": "vue/packages/components/image-viewer/src/image-viewer.vue",
       "props": [
+        "activeIndex",
+        "altList",
+        "appendTo",
+        "ariaLabel",
         "closeOnPressEscape",
+        "cspSafe",
         "hideOnClickModal",
         "infinite",
         "initialIndex",
+        "labels",
         "maxScale",
         "minScale",
+        "showToolbar",
         "teleported",
         "urlList",
+        "visible",
         "zIndex",
         "zoomRate"
       ],
-      "emits": ["close", "rotate", "switch"],
+      "emits": [
+        "close",
+        "next",
+        "previous",
+        "rotate",
+        "switch",
+        "update:activeIndex",
+        "update:visible"
+      ],
       "slots": [
+        {
+          "name": "caption",
+          "nameKnown": true,
+          "scoped": true,
+          "payload": [
+            {
+              "name": "alt",
+              "expression": "altList[activeIndex] || ''",
+              "type": null
+            },
+            {
+              "name": "index",
+              "expression": "activeIndex",
+              "type": null
+            },
+            {
+              "name": "url",
+              "expression": "currentImg",
+              "type": null
+            }
+          ],
+          "payloadComplete": true
+        },
         {
           "name": "default",
           "nameKnown": true,
@@ -11633,6 +11711,69 @@
       "semantic": {
         "props": [
           {
+            "name": "activeIndex",
+            "runtimeType": "Number",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "valuesKnown": false,
+            "default": {
+              "kind": "missing"
+            },
+            "required": false,
+            "readonly": false,
+            "deprecated": false,
+            "deprecationMessage": null
+          },
+          {
+            "name": "altList",
+            "runtimeType": "Array",
+            "semanticType": "string[]",
+            "nullable": false,
+            "values": null,
+            "valuesKnown": false,
+            "default": {
+              "kind": "function",
+              "sourceHash": "a4a348b6f4e91da9c77bf69cf56383647597fdf2b7a64d71ae214a0261892537"
+            },
+            "required": false,
+            "readonly": false,
+            "deprecated": false,
+            "deprecationMessage": null
+          },
+          {
+            "name": "appendTo",
+            "runtimeType": "String",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "valuesKnown": false,
+            "default": {
+              "kind": "literal",
+              "value": "body"
+            },
+            "required": false,
+            "readonly": false,
+            "deprecated": false,
+            "deprecationMessage": null
+          },
+          {
+            "name": "ariaLabel",
+            "runtimeType": "String",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "valuesKnown": false,
+            "default": {
+              "kind": "literal",
+              "value": ""
+            },
+            "required": false,
+            "readonly": false,
+            "deprecated": false,
+            "deprecationMessage": null
+          },
+          {
             "name": "closeOnPressEscape",
             "runtimeType": "Boolean",
             "semanticType": null,
@@ -11642,6 +11783,21 @@
             "default": {
               "kind": "literal",
               "value": true
+            },
+            "required": false,
+            "readonly": false,
+            "deprecated": false,
+            "deprecationMessage": null
+          },
+          {
+            "name": "cspSafe",
+            "runtimeType": "Boolean",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "valuesKnown": false,
+            "default": {
+              "kind": "missing"
             },
             "required": false,
             "readonly": false,
@@ -11696,6 +11852,22 @@
             "deprecationMessage": null
           },
           {
+            "name": "labels",
+            "runtimeType": "Object",
+            "semanticType": "Partial<ImageViewerLabels>",
+            "nullable": false,
+            "values": null,
+            "valuesKnown": false,
+            "default": {
+              "kind": "function",
+              "sourceHash": "d3a63129b65aed00ae18632b426020bfea8d9a107477eacaad812cad7d5d804d"
+            },
+            "required": false,
+            "readonly": false,
+            "deprecated": false,
+            "deprecationMessage": null
+          },
+          {
             "name": "maxScale",
             "runtimeType": "Number",
             "semanticType": null,
@@ -11728,6 +11900,22 @@
             "deprecationMessage": null
           },
           {
+            "name": "showToolbar",
+            "runtimeType": "Boolean",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "valuesKnown": false,
+            "default": {
+              "kind": "literal",
+              "value": true
+            },
+            "required": false,
+            "readonly": false,
+            "deprecated": false,
+            "deprecationMessage": null
+          },
+          {
             "name": "teleported",
             "runtimeType": "Boolean",
             "semanticType": null,
@@ -11752,6 +11940,22 @@
             "default": {
               "kind": "function",
               "sourceHash": "325c9e4a41b67f3fb810b33fbc9700ec433ba5e813a9aa8c207693373cafa08e"
+            },
+            "required": false,
+            "readonly": false,
+            "deprecated": false,
+            "deprecationMessage": null
+          },
+          {
+            "name": "visible",
+            "runtimeType": "Boolean",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "valuesKnown": false,
+            "default": {
+              "kind": "literal",
+              "value": true
             },
             "required": false,
             "readonly": false,
@@ -11796,6 +12000,28 @@
             "payload": []
           },
           {
+            "name": "next",
+            "payload": [
+              {
+                "name": "index",
+                "type": "number",
+                "optional": false,
+                "rest": false
+              }
+            ]
+          },
+          {
+            "name": "previous",
+            "payload": [
+              {
+                "name": "index",
+                "type": "number",
+                "optional": false,
+                "rest": false
+              }
+            ]
+          },
+          {
             "name": "rotate",
             "payload": [
               {
@@ -11812,6 +12038,28 @@
               {
                 "name": "index",
                 "type": "number",
+                "optional": false,
+                "rest": false
+              }
+            ]
+          },
+          {
+            "name": "update:activeIndex",
+            "payload": [
+              {
+                "name": "index",
+                "type": "number",
+                "optional": false,
+                "rest": false
+              }
+            ]
+          },
+          {
+            "name": "update:visible",
+            "payload": [
+              {
+                "name": "visible",
+                "type": "boolean",
                 "optional": false,
                 "rest": false
               }
@@ -11833,6 +12081,29 @@
           }
         ],
         "slots": [
+          {
+            "name": "caption",
+            "nameKnown": true,
+            "scoped": true,
+            "payload": [
+              {
+                "name": "alt",
+                "expression": "altList[activeIndex] || ''",
+                "type": null
+              },
+              {
+                "name": "index",
+                "expression": "activeIndex",
+                "type": null
+              },
+              {
+                "name": "url",
+                "expression": "currentImg",
+                "type": null
+              }
+            ],
+            "payloadComplete": true
+          },
           {
             "name": "default",
             "nameKnown": true,
@@ -14688,7 +14959,7 @@
             "name": "selection-change",
             "payload": [
               {
-                "name": "event",
+                "name": "selectionEvent",
                 "type": "MarkdownEditorSelectionEvent",
                 "optional": false,
                 "rest": false,
@@ -14731,7 +15002,7 @@
             "name": "transaction",
             "payload": [
               {
-                "name": "event",
+                "name": "transactionEvent",
                 "type": "MarkdownEditorTransactionEvent",
                 "optional": false,
                 "rest": false,
@@ -32202,7 +32473,7 @@
             "name": "node-contextmenu",
             "payload": [
               {
-                "name": "event",
+                "name": "payload",
                 "type": "Event",
                 "optional": false,
                 "rest": false
@@ -33692,7 +33963,7 @@
             "name": "select",
             "payload": [
               {
-                "name": "event",
+                "name": "payload",
                 "type": "MouseEvent",
                 "optional": false,
                 "rest": false
@@ -42145,6 +42416,11 @@
       "classification": "portable"
     },
     {
+      "name": "--el-dropdown-viewport-width",
+      "files": ["vue/packages/theme-chalk/src/dropdown.scss"],
+      "classification": "portable"
+    },
+    {
       "name": "--el-empty-state-action-gap",
       "files": ["vue/packages/theme-chalk/src/empty-state.scss"],
       "classification": "portable"
@@ -43797,6 +44073,7 @@
       "files": [
         "vue/packages/theme-chalk/src/collection-primitives.scss",
         "vue/packages/theme-chalk/src/common/fsus-tokens.scss",
+        "vue/packages/theme-chalk/src/dropdown.scss",
         "vue/packages/theme-chalk/src/fsus-theme.scss",
         "vue/packages/theme-chalk/src/generated/tokens.css",
         "vue/packages/theme-chalk/src/generated/tokens.scss",
@@ -44992,6 +45269,7 @@
         "vue/packages/theme-chalk/src/date-picker/date-table.scss",
         "vue/packages/theme-chalk/src/date-picker/picker-panel.scss",
         "vue/packages/theme-chalk/src/date-picker/time-picker.scss",
+        "vue/packages/theme-chalk/src/dropdown.scss",
         "vue/packages/theme-chalk/src/fsus-theme.scss",
         "vue/packages/theme-chalk/src/generated/tokens.css",
         "vue/packages/theme-chalk/src/generated/tokens.scss",
@@ -45048,6 +45326,7 @@
         "vue/packages/theme-chalk/src/cascader.scss",
         "vue/packages/theme-chalk/src/common/fsus-tokens.scss",
         "vue/packages/theme-chalk/src/common/var.scss",
+        "vue/packages/theme-chalk/src/dropdown.scss",
         "vue/packages/theme-chalk/src/generated/tokens.css",
         "vue/packages/theme-chalk/src/generated/tokens.scss",
         "vue/packages/theme-chalk/src/mixins/overlay-option-row-primitive.scss"
