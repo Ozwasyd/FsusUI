@@ -30,7 +30,8 @@ padding without moving that edge:
 - `btt`: bottom / left / right
 
 The absolutely positioned close button does not move with header padding, so it
-also consumes the top (and `rtl` right) inset through `fsus-inset-safe-area`.
+also consumes the top and, for `rtl`, `ttb`, and `btt`, right inset through
+`fsus-inset-safe-area`.
 
 The overlay scrim still covers the full viewport. Do not patch Drawer geometry
 from a consumer; use the shared [viewport and safe-area contract](../theme/tokens.md#viewport-and-safe-area-contract).
