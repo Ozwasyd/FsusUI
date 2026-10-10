@@ -23,8 +23,16 @@
     background: getCssVar('fill-color', 'lighter');
   }
 
+  @include e(command-group) {
+    display: flex;
+    gap: 4px;
+    min-width: 0;
+    align-items: center;
+  }
+
   @include e(commands) {
     display: flex;
+    flex: 0 1 auto;
     flex-wrap: nowrap;
     gap: 4px;
     min-width: 0;
@@ -197,12 +205,10 @@
 
   @include e(command-more) {
     display: inline-flex;
-    position: sticky;
-    z-index: 1;
-    inset-inline-end: 0;
     align-items: center;
     gap: 6px;
     flex: 0 0 auto;
+    max-inline-size: 50%;
     min-height: 2.25rem;
 
     @include when(expanded) {
@@ -217,8 +223,15 @@
     }
   }
 
+  @include e(command-more-label) {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
   @include e(command-more-count) {
     display: inline-grid;
+    flex-shrink: 0;
     min-width: 1.25rem;
     height: 1.25rem;
     place-items: center;
@@ -310,7 +323,7 @@
       padding: 10px;
     }
 
-    @include e(commands) {
+    @include e((command-group, commands)) {
       gap: 8px;
     }
 
@@ -653,8 +666,11 @@
       gap: 8px;
     }
 
-    @include e(commands) {
+    @include e(command-group) {
       grid-column: 1 / -1;
+    }
+
+    @include e((command-group, commands)) {
       gap: 8px;
     }
 
@@ -736,7 +752,7 @@
         padding: 10px;
       }
 
-      @include e(commands) {
+      @include e((command-group, commands)) {
         gap: 8px;
       }
 
