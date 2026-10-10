@@ -281,6 +281,46 @@ test('canonical panel candidates reject damaged payloads and unproven manifests'
     path.join(os.tmpdir(), 'datepicker-panel-refusals-'),
   )
   try {
+    const sourceRoot = path.join(temporary, 'source')
+    const sourceArchive = path.join(temporary, 'source-preimage.tar')
+    mkdirSync(sourceRoot)
+    execFileSync(
+      'git',
+      ['archive', '--format=tar', '--output', sourceArchive, 'HEAD'],
+      { cwd: root },
+    )
+    execFileSync('tar', ['-xf', sourceArchive, '-C', sourceRoot])
+    execFileSync('git', ['init', '--quiet'], { cwd: sourceRoot })
+    execFileSync('git', ['add', '--force', '--all'], { cwd: sourceRoot })
+    const originalSourceState = readSourceAuthority(sourceRoot)
+    assert.deepEqual(originalSourceState, readSourceAuthority(root))
+    const selectorSource = path.join(
+      sourceRoot,
+      'vue/packages/components/date-picker/src/panel-utils.ts',
+    )
+    const selectorPreimage = readFileSync(selectorSource, 'utf8')
+    writeFileSync(
+      selectorSource,
+      `${selectorPreimage}\n// unknown-source-control\n`,
+    )
+    assert.throws(
+      () => readSourceAuthority(sourceRoot),
+      /unrecognized declaration source inputs/,
+    )
+    writeFileSync(selectorSource, selectorPreimage)
+    for (const file of Object.keys(
+      originalSourceState.extraInputDigests ?? {},
+    )) {
+      const supplementary = path.join(sourceRoot, file)
+      const preimage = readFileSync(supplementary, 'utf8')
+      writeFileSync(supplementary, `${preimage}\n# unknown-patch-control\n`)
+      assert.throws(
+        () => readSourceAuthority(sourceRoot),
+        /composition must retain its exact supplementary input bytes/,
+      )
+      writeFileSync(supplementary, preimage)
+    }
+
     const extracted = extractCandidate(tarball, path.join(temporary, 'payload'))
     for (const [file] of baseline.installationAdditions) {
       mkdirSync(path.dirname(path.join(extracted, file)), { recursive: true })

@@ -23,9 +23,17 @@ import {
   verifyCandidate,
 } from '../../../scripts/npm-candidate-lib.mjs'
 
-export const authority = JSON.parse(
+const historicalAuthority = JSON.parse(
   readFileSync(new URL('./authority.json', import.meta.url), 'utf8'),
 )
+const composition = JSON.parse(
+  readFileSync(new URL('./composition-31fe.json', import.meta.url), 'utf8'),
+)
+export const authority = {
+  ...historicalAuthority,
+  sourceStates: [...historicalAuthority.sourceStates, composition.source],
+  artifacts: [...historicalAuthority.artifacts, composition.artifact],
+}
 const digest = (contents) => createHash('sha256').update(contents).digest('hex')
 
 export function isSourceInput(file) {
@@ -75,7 +83,17 @@ export function readSourceAuthority(root) {
       .digest('hex')
     return [file, blob]
   })
-  return matchSourceAuthority(inputs)
+  const state = matchSourceAuthority(inputs)
+  for (const [file, expected] of Object.entries(
+    state.extraInputDigests ?? {},
+  )) {
+    assert.equal(
+      digest(readFileSync(path.join(root, file))),
+      expected,
+      'the composition must retain its exact supplementary input bytes',
+    )
+  }
+  return state
 }
 
 function readCommitAuthority(root, commit) {
@@ -92,7 +110,45 @@ function readCommitAuthority(root, commit) {
     })
     .filter(([file]) => isSourceInput(file))
     .sort(([left], [right]) => (left < right ? -1 : left > right ? 1 : 0))
-  return matchSourceAuthority(inputs)
+  const state = matchSourceAuthority(inputs)
+  for (const [file, expected] of Object.entries(
+    state.extraInputDigests ?? {},
+  )) {
+    assert.equal(
+      digest(execFileSync('git', ['show', `${commit}:${file}`], { cwd: root })),
+      expected,
+      'the committed composition must retain its supplementary input bytes',
+    )
+  }
+  return state
+}
+
+export function verifyProducerDependency(root, state) {
+  if (!state.producerDependency) return
+  const requireRoot = createRequire(path.join(root, 'package.json'))
+  const requireMacros = createRequire(
+    requireRoot.resolve('unplugin-vue-macros'),
+  )
+  const requireBetterDefine = createRequire(
+    requireMacros.resolve('@vue-macros/better-define'),
+  )
+  const dependencyRoot = path.dirname(
+    path.dirname(
+      realpathSync(requireBetterDefine.resolve(state.producerDependency.name)),
+    ),
+  )
+  assert.equal(
+    JSON.parse(readFileSync(path.join(dependencyRoot, 'package.json'), 'utf8'))
+      .version,
+    state.producerDependency.version,
+  )
+  for (const file of state.producerDependency.files) {
+    assert.equal(
+      digest(readFileSync(path.join(dependencyRoot, file.path))),
+      file.sha256,
+      'the producer must use the actual qualified patched dependency bytes',
+    )
+  }
 }
 
 function packageTree(root, directory = root) {
@@ -243,6 +299,15 @@ export function readArtifactAuthority(root, consumer, packageRoot) {
   )
   try {
     const extracted = extractCandidate(tarballPath, temporary)
+    if (reference.completePayloadDigest) {
+      const tree = packageTree(extracted)
+      assert.equal(tree.length, reference.completePayloadFiles)
+      assert.equal(
+        canonicalJsonDigest(Object.fromEntries(tree)),
+        reference.completePayloadDigest,
+        'every candidate payload file must match the qualified composition',
+      )
+    }
     if (!recorded) {
       assert.equal(readSourceAuthority(root).name, source.name)
       assert.deepEqual(

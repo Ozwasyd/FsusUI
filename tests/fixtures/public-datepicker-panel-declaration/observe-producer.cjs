@@ -11,7 +11,8 @@ const { execFileSync } = requireSource('node:child_process')
 const { createHash } = requireSource('node:crypto')
 const { Buffer } = requireSource('node:buffer')
 const { Project, ts } = requireSource('ts-morph')
-const { readSourceAuthority } = requireSource('./authority.mjs')
+const { readSourceAuthority, verifyProducerDependency } =
+  requireSource('./authority.mjs')
 
 const root = path.resolve(path.dirname(filename), '../../..')
 const sourceAuthority = readSourceAuthority(root)
@@ -42,6 +43,8 @@ assert.equal(
 assert.equal(ts.version, '5.9.2')
 assert.equal(requireSource('ts-morph/package.json').version, '27.0.2')
 assert.equal(requireSource('vue/package.json').version, '3.5.32')
+verifyProducerDependency(root, sourceAuthority)
+const identitySource = sourceAuthority.identitySourceSha ?? baseline
 for (const file of [
   'package.json',
   'pnpm-lock.yaml',
@@ -55,7 +58,7 @@ for (const file of [
 ]) {
   assert.equal(
     fs.readFileSync(path.join(root, file), 'utf8'),
-    execFileSync('git', ['show', `${baseline}:${file}`], {
+    execFileSync('git', ['show', `${identitySource}:${file}`], {
       cwd: root,
       encoding: 'utf8',
     }),

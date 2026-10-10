@@ -66,3 +66,19 @@ source lines. The diagnostic expectation control is recorded separately from the
 original strict positive assertion, which remains `positive === []`. Consequently
 the independent artifact still records strict FAIL, while the real combination
 can pass. The package's aggregate strict qualification remains a separate check.
+
+`composition-31fe.json` is a separate measured profile for frozen source
+`31fe270f524cdd09ea43949077f4826196ebc550`. The original authority file is retained
+byte for byte. Its Library version-0 verification bundle was materialized locally,
+all receipts and the canonical candidate verifier passed, and the actual bounded
+producer returned zero complete diagnostic rows while preserving the original
+inferred contract, rejecting both mutations, and emitting the same 411-byte
+selector declaration. All three canonical panel declarations match the previously
+qualified real artifact exactly.
+
+This profile binds all 2,453 inputs under the unchanged filter, the exact new
+producer/lock/workspace/package identities, supplementary patch bytes outside
+that filter, and both actually installed patched resolver implementations. The
+artifact check also binds every one of its 8,519 payload files. Original strict
+positive/negative, runtime parity, manifest, toolchain and refusal controls remain
+mandatory. This record grants no applicability to a successor source or patch.
