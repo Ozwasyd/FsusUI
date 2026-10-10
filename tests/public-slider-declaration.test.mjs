@@ -18,6 +18,7 @@ import {
   assertConsumerLock,
   assertProducer,
   assertSliderDeclarations,
+  assertSourceClosure,
   authority,
   candidateIdentity,
   installedArtifact,
@@ -150,6 +151,18 @@ test(
     )
     const frozenLock = assertConsumerLock(consumer, tarball)
     const generated = runCanonical()
+    if (profile.sourceDelta) {
+      const changedDelta = structuredClone(profile)
+      changedDelta.sourceDelta.rows[0].after = 'unknown'
+      assert.throws(() => assertSourceClosure(root, changedDelta))
+      const changedPatch = structuredClone(profile)
+      changedPatch.extraInputs[Object.keys(changedPatch.extraInputs)[0]] =
+        'unknown'
+      assert.throws(() => assertSourceClosure(root, changedPatch))
+      const changedSource = structuredClone(profile)
+      changedSource.sourceCommit = authority.baseline
+      assert.throws(() => assertSourceClosure(root, changedSource))
+    }
     const artifact = installedArtifact(
       root,
       profile,
@@ -184,6 +197,9 @@ test(
         (m) => {
           m.toolchain.pnpm = 'unknown'
         },
+        (m) => {
+          m.package.packageJsonCanonicalSha256 = 'unknown'
+        },
       ]) {
         const altered = JSON.parse(original)
         corrupt(altered)
@@ -200,20 +216,46 @@ test(
       rmSync(refusalRoot, { recursive: true, force: true })
     }
     const declarations = new Map(
-      generated.sliderDeclarations.flatMap(([file, hash]) =>
-        ['es', 'lib'].map((module) => [`${module}/${file}`, hash]),
-      ),
+      generated.sliderFormattedDeclarations ??
+        generated.sliderDeclarations.flatMap(([file, hash]) =>
+          ['es', 'lib'].map((module) => [`${module}/${file}`, hash]),
+        ),
     )
     const damaged = new Map(declarations)
     damaged.set(declarations.keys().next().value, 'damaged')
     assert.throws(() =>
-      assertSliderDeclarations(damaged, generated.sliderDeclarations),
+      assertSliderDeclarations(
+        damaged,
+        generated.sliderDeclarations,
+        generated.sliderFormattedDeclarations,
+      ),
     )
     const additional = new Map(declarations)
     additional.set('es/components/slider/unknown.d.ts', 'unknown')
     assert.throws(() =>
-      assertSliderDeclarations(additional, generated.sliderDeclarations),
+      assertSliderDeclarations(
+        additional,
+        generated.sliderDeclarations,
+        generated.sliderFormattedDeclarations,
+      ),
     )
+    if (generated.sliderFormattedDeclarations) {
+      for (const prefix of [
+        'es/components/slider/index.d.ts',
+        'es/components/slider/index.d.mts',
+        'lib/components/slider/index.d.ts',
+      ]) {
+        const missing = new Map(declarations)
+        missing.delete(prefix)
+        assert.throws(() =>
+          assertSliderDeclarations(
+            missing,
+            generated.sliderDeclarations,
+            generated.sliderFormattedDeclarations,
+          ),
+        )
+      }
+    }
     writeFileSync(
       path.join(evidence, 'packed-identity.json'),
       `${JSON.stringify({ sourceProfile: profile.name, frozenLock, ...artifact }, null, 2)}\n`,

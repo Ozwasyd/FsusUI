@@ -35,12 +35,27 @@ for (const file of [
   'vue/internal/build/src/tasks/types-definitions.ts',
 ]) {
   assert.equal(
-    fs.readFileSync(path.join(root, file), 'utf8'),
-    originalText(file),
+    createHash('sha256')
+      .update(fs.readFileSync(path.join(root, file)))
+      .digest('hex'),
+    profile.protectedInputs?.[file] ??
+      createHash('sha256').update(originalText(file)).digest('hex'),
     `${file} identity`,
   )
 }
 assert.equal(ts.version, '5.9.2', 'canonical producer embedded TypeScript')
+assert.equal(req('ts-morph/package.json').version, '27.0.2')
+assert.equal(req('typescript').version, '6.0.2')
+assert.equal(req('vue/package.json').version, '3.5.32')
+assert.equal(process.version, 'v24.19.0')
+assert.equal(
+  execFileSync('pnpm', ['--version'], { encoding: 'utf8' }).trim(),
+  '10.33.0',
+)
+assert.equal(
+  execFileSync('npm', ['--version'], { encoding: 'utf8' }).trim(),
+  '11.13.0',
+)
 let observed = false
 let report
 let emitted = []
@@ -185,7 +200,7 @@ assert.equal(
   'function',
   'real canonical task preflight',
 )
-generateTypesDefinitions((error) => {
+generateTypesDefinitions(async (error) => {
   try {
     if (error) throw error
     assert.ok(observed, 'canonical project was observed')
@@ -215,6 +230,68 @@ generateTypesDefinitions((error) => {
       ])
       .sort()
     assert.equal(report.sliderDeclarations.length, 16)
+    if (profile.declarationFormats === 'node16') {
+      // Use the real formatter with fresh complete canonical declarations for
+      // resolution. Only Slider output is inspected; no generated file is fixed.
+      const formatRoot = fs.mkdtempSync(path.join(root, 'dist/slider-format-'))
+      try {
+        const packageJson = JSON.parse(
+          fs.readFileSync(
+            path.join(root, 'vue/packages/element-plus/package.json'),
+            'utf8',
+          ),
+        )
+        // Identical metadata preparation to the canonical gulp copyFiles task.
+        delete packageJson.dependencies?.['@element-plus/motion']
+        delete packageJson.dependencies?.['@element-plus/icons-vue']
+        fs.writeFileSync(
+          path.join(formatRoot, 'package.json'),
+          `${JSON.stringify(packageJson, null, 2)}\n`,
+        )
+        for (const module of ['es', 'lib'])
+          fs.cpSync(outputRoot, path.join(formatRoot, module), {
+            recursive: true,
+          })
+        const declarations = new Set()
+        const collect = (directory) => {
+          for (const entry of fs.readdirSync(directory, {
+            withFileTypes: true,
+          })) {
+            const file = path.join(directory, entry.name)
+            if (entry.isDirectory()) collect(file)
+            else if (file.endsWith('.d.ts')) declarations.add(file)
+          }
+        }
+        collect(path.join(formatRoot, 'es'))
+        const { rewriteNodeDeclaration } = req(
+          path.join(root, 'vue/internal/build/src/utils/node-declarations.ts'),
+        )
+        report.sliderFormattedDeclarations = []
+        for (const [file] of report.sliderDeclarations) {
+          const raw = fs.readFileSync(path.join(outputRoot, file), 'utf8')
+          for (const [module, format, suffix] of [
+            ['es', null, '.d.ts'],
+            ['es', 'esm', '.d.mts'],
+            ['lib', 'cjs', '.d.ts'],
+          ]) {
+            const filename = path.join(formatRoot, module, file)
+            const text = format
+              ? rewriteNodeDeclaration(raw, filename, format, declarations)
+              : raw
+            report.sliderFormattedDeclarations.push([
+              `${module}/${file.replace(/\.d\.ts$/, suffix)}`,
+              createHash('sha256')
+                .update(publishedDeclaration(text))
+                .digest('hex'),
+            ])
+          }
+        }
+        report.sliderFormattedDeclarations.sort()
+        assert.equal(report.sliderFormattedDeclarations.length, 48)
+      } finally {
+        fs.rmSync(formatRoot, { recursive: true, force: true })
+      }
+    }
     report.canonicalCompleted = true
     fs.writeFileSync(
       path.join(evidence, 'producer.json'),

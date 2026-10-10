@@ -226,6 +226,163 @@
       "tarballSha256": "82724daaa96d47e22bf5ec17694224bfc40192d50ff3a1554b6e8a6775bec4d9",
       "producerDiagnostics": [],
       "externalDiagnostics": []
+    },
+    {
+      "name": "frozen-31fe",
+      "sourceCommit": "31fe270f524cdd09ea43949077f4826196ebc550",
+      "sourceInputsSha256": "5c27c212d0232caa8175e41ab519aa5f9eaaba0145b72270b831f636ed70375f",
+      "sourceInputCount": 2012,
+      "producerDiagnostics": [],
+      "externalDiagnostics": [],
+      "declarationFormats": "node16",
+      "protectedInputs": {
+        "package.json": "4e6502bacf6c8edfe52fd20f7d59bd5df9a05f8f627546e62fb889f6e5c50ace",
+        "pnpm-lock.yaml": "37272929247ae0ab5cbd430747b6872ed5f1a5fa811db28f70951819a59b9244",
+        "config/dependencies/npm-authority.json": "09ff97e13767b2226ea9ac49256136c9c1c3a9e14fbc40d9f7d7f7906f5cbf34",
+        "vue/packages/element-plus/package.json": "679ac1bf633b28d2f40fcc6e43937f23808480f681a405e56bca94a5ad69be66",
+        "vue/internal/build/src/tasks/types-definitions.ts": "b3b27df848754a69506b298b9f9a9888fdd9b27dbc729639b575b007b139773c"
+      },
+      "package": {
+        "distTag": "latest",
+        "name": "@ozwasyd/element-plus",
+        "packageJsonCanonicalSha256": "4705f1f494c485e673b58ed280dae1a1feb233b8aed837402eb704206f47c73d",
+        "version": "1.5.1"
+      },
+      "sourceDelta": {
+        "before": "f4a094f300384185918fc6d4be86e88d9ab9f097",
+        "rows": [
+          {
+            "file": "config/dependencies/update-surface.json",
+            "before": "e63be16ef3990178dadb673e5bc9504041e0100d3f8f86d82de3b1ab46dccb9f",
+            "after": "b5ffe83b3dcb4bf404ff5a3eec56261f5ea1a9c74cbafa218adce31d5596b2a7"
+          },
+          {
+            "file": "pnpm-lock.yaml",
+            "before": "c7d35e65a7f82bf145786f0d5697a8fcff2109b7f47a85146ed0acb22510ce94",
+            "after": "37272929247ae0ab5cbd430747b6872ed5f1a5fa811db28f70951819a59b9244"
+          },
+          {
+            "file": "pnpm-workspace.yaml",
+            "before": "9311d93c8943e4dc689cd9da0d991ac774af81cae8dbf910c5e630186d51e0db",
+            "after": "871f2a6e43e8f4b3530c71178d5e625d1a1841d69050be2c6663d040326867d3"
+          },
+          {
+            "file": "scripts/ensure-icons-artifacts.mjs",
+            "before": "cf93a71bc50dcbb63cc4c47bb55f221f1641fe1e2d10cb2c2133a78b8e82d9ec",
+            "after": "669ae8c21714aaff9f36600abb3a1006498ec8c8e6f29532f9b90f36c95e666d"
+          },
+          {
+            "file": "scripts/node-declaration-formats.test.mjs",
+            "before": null,
+            "after": "4c18578ff67d05f2fddb2f4c81e65b1a0d9849158520cfeb892081c0395839d9"
+          },
+          {
+            "file": "scripts/node-declaration-reexports.test.mjs",
+            "before": null,
+            "after": "d35319b6ae8ac5b4219fa2cfa4103c6bde11f133a74be5470423350bbaf6cd86"
+          },
+          {
+            "file": "scripts/npm-candidate-lib.mjs",
+            "before": "b2015f52ba6652a4deb714b85fddbc11bc8463826d9767353b97278053e35d3e",
+            "after": "192e73da5a535bde4b265a1e5827a7d839d44c3ee32646ef3ff1c1f001371cb0"
+          },
+          {
+            "file": "scripts/prepare-component-exports-review.test.mjs",
+            "before": null,
+            "after": "073c5e15de79429e0969d5bd33919cb0a6da017e74ac5a32357827297da5606b"
+          },
+          {
+            "file": "scripts/prepare-component-exports.mjs",
+            "before": null,
+            "after": "980c5be4b60e634e349299ddfcb855e7138d37bbfffe35677cc84764a0d1eab7"
+          },
+          {
+            "file": "scripts/prepare-component-exports.test.mjs",
+            "before": null,
+            "after": "3bed1787086cde0c0556e6919bc783c34cf0478fa734aacc2320fc86d8114dea"
+          },
+          {
+            "file": "scripts/prepare-npm-package.mjs",
+            "before": "4c155a30de334fc3e34a5d9ebf659b7d779d3a8f8e0b1d51bebd314b0a465ecc",
+            "after": "59ee48a333fb3ad5d19e624bac31d6423d15945a391a07c418dacb9fa9c5cc8b"
+          },
+          {
+            "file": "scripts/prepare-npm-package.test.mjs",
+            "before": "f997480c67c07b47aa2f0d799c679769b8da8207048395f7b9d9e0c2fcc5af28",
+            "after": "881c5145907ce14defe096b53c124fd373f2f637364272e014a1f7e864e989f6"
+          },
+          {
+            "file": "scripts/sfc-type-props.test.mjs",
+            "before": null,
+            "after": "fc7b79536b95107906ffc9302bf6834b6282d18a2af89073a5fe9f64b669cb26"
+          },
+          {
+            "file": "scripts/test-npm-candidate.mjs",
+            "before": "3dfb297852e58927bc25b6e199e5cb05aa47824401065853474a3dcf7d0c9726",
+            "after": "e7d68964e348ea9d961907a30d57087a13571d497941f1d36b5cabd317a89d9b"
+          },
+          {
+            "file": "vue/internal/build/gulpfile.ts",
+            "before": "f720a4de34dd79df1e1d883cb73beb755b82b78f3c13512ae98c9ca3f42da5ee",
+            "after": "879834da955993069333880cf9836da6bdeea6785ea6729b14560fbc4c7e3e1e"
+          },
+          {
+            "file": "vue/internal/build/src/tasks/types-definitions.ts",
+            "before": "e3a5bdc2789da788c05bae5df5b7770076663c2856a8c5d955bbb3b82f0a49cd",
+            "after": "b3b27df848754a69506b298b9f9a9888fdd9b27dbc729639b575b007b139773c"
+          },
+          {
+            "file": "vue/internal/build/src/utils/index.ts",
+            "before": "15bf39027ab388187d173aec37a61174a24c5b15445b07af8dc5329a9eed8941",
+            "after": "eff9ad593d886f2dc9648bd5c5ffd419971d37ca1e0e852626b8ad1f2fbe4187"
+          },
+          {
+            "file": "vue/internal/build/src/utils/node-declarations.ts",
+            "before": null,
+            "after": "3919cb4f971cec8e6cb56e57f98454b219099014f6158a8281b2580d5887f960"
+          },
+          {
+            "file": "vue/internal/build/src/utils/sfc-type-props.ts",
+            "before": null,
+            "after": "334ca438b2956b436bed00dc19888879d0417c822cd18062b58a05832ded05d1"
+          },
+          {
+            "file": "vue/packages/components/markdown-renderer/src/markdown-renderer.vue",
+            "before": "d38ff8c94a6e7f0bc8d17050dbe3bf0c88c6b5946311b4ae304a4627b522fbe0",
+            "after": "1ceac41dc3e8e60b29689baf3a8019f9839d4ac034d0ae58620b093ed8c20332"
+          },
+          {
+            "file": "vue/packages/element-plus/package.json",
+            "before": "7bbb40ed812927e56a198d439023224fe750ab4ad368e372b5775bf57d6b910b",
+            "after": "679ac1bf633b28d2f40fcc6e43937f23808480f681a405e56bca94a5ad69be66"
+          },
+          {
+            "file": "vue/packages/icons-vue/build/build.ts",
+            "before": "9b78f84f4bd7c535be1d9fcd93ad3a62a70facb0587a277d7e946f6ee5c04dad",
+            "after": "a437ae6a68c811b6f401a281c8dcbb4d2c9798407f779032bd9e3ef224e42e4d"
+          },
+          {
+            "file": "vue/packages/icons-vue/src/components/index.ts",
+            "before": "f989cc015742b7c8153efc43acfa8a7692e208c3790c5d52ce61a5efc871c330",
+            "after": "a1d167e6c8a47fc01774cbc35d160afca7451fc674e1ab9041d0630a7f3a7b64"
+          }
+        ]
+      },
+      "extraInputs": {
+        "patches/@vue-macros__api@0.13.4.patch": "aed97dea4d00fa0806099b31a7ec0dc8e14fbc3f5f8df02968a5c0916076643b"
+      },
+      "sourceOffers": {
+        "formatter": "492cb3662eb3c24f0b7f241830efad1a88f7b903",
+        "renderer": "3a70b01235ba2708159c1924cbacb546359354d7"
+      },
+      "verificationBundle": {
+        "libraryFileId": "libfile_9ffb624a1b648191aa537b4a4619631a",
+        "fileId": "file_00000000b3d081fd9198c570c165a14c",
+        "version": 0,
+        "sha256": "e5e4e193987b34ecb3dfc358c3a81ee1f9fba39928d2fdc9cee9ac2ca7396ae4",
+        "candidateSha256": "462360d7342f8f17e40f19eaae6f1246ba5de2909d9bd1b0072e2884798ec215",
+        "historicalIdentityOnly": true
+      }
     }
   ],
   "candidateContract": {

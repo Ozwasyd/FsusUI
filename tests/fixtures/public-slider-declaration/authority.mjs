@@ -67,7 +67,123 @@ export function sourceProfile(root) {
     profile,
     `Unrecognized declaration source inputs: ${hash} (${unique.length})`,
   )
+  assertSourceClosure(root, profile)
   return profile
+}
+
+// The format successor is a complete inspected source delta, not a hash-only
+// exception. The original source filter and both earlier profiles stay intact.
+export function assertSourceClosure(root, profile) {
+  if (!profile.sourceDelta) return
+  const before = committedInputs(root, profile.sourceDelta.before)
+  const after = committedInputs(root, profile.sourceCommit)
+  const names = [
+    ...new Set([...before.rows.keys(), ...after.rows.keys()]),
+  ].sort()
+  const rows = names.flatMap((file) => {
+    const previous = before.rows.get(file) ?? null
+    const next = after.rows.get(file) ?? null
+    return previous === next ? [] : [{ file, before: previous, after: next }]
+  })
+  assert.deepEqual(
+    rows,
+    profile.sourceDelta.rows,
+    'complete inspected source delta',
+  )
+  for (const [file, hash] of Object.entries(profile.extraInputs)) {
+    assert.equal(sha256(readFileSync(path.join(root, file))), hash, file)
+    assert.equal(
+      sha256(
+        execFileSync('git', ['show', `${profile.sourceCommit}:${file}`], {
+          cwd: root,
+        }),
+      ),
+      hash,
+      `committed ${file}`,
+    )
+  }
+  const originalLock = execFileSync(
+    'git',
+    ['show', `${authority.baseline}:pnpm-lock.yaml`],
+    { cwd: root, encoding: 'utf8' },
+  )
+  const currentLock = readFileSync(path.join(root, 'pnpm-lock.yaml'), 'utf8')
+  const section = (lock, name) =>
+    lock.split(`\n${name}:\n`)[1].split(/\n\S[^\n]*:\n/)[0]
+  assert.equal(
+    section(currentLock, 'packages'),
+    section(originalLock, 'packages'),
+    'all original resolved dependency records',
+  )
+  const patch = Object.entries(profile.extraInputs)[0]
+  const patchQualifier = `(patch_hash=${patch[1]})`
+  assert.equal(
+    section(currentLock, 'snapshots').split(patchQualifier).length - 1,
+    3,
+    'only the three inspected macro patch references',
+  )
+  const withoutPatch = (text) => text.replaceAll(patchQualifier, '')
+  assert.equal(
+    withoutPatch(section(currentLock, 'snapshots')),
+    section(originalLock, 'snapshots'),
+    'all original snapshots except the registered macro patch',
+  )
+  assert.ok(
+    currentLock.includes(`hash: ${patch[1]}\n    path: ${patch[0]}`),
+    'lock registers the exact inspected patch',
+  )
+  const packageFile = 'vue/packages/element-plus/package.json'
+  const originalPackage = JSON.parse(
+    execFileSync('git', ['show', `${authority.baseline}:${packageFile}`], {
+      cwd: root,
+      encoding: 'utf8',
+    }),
+  )
+  const currentPackage = JSON.parse(
+    readFileSync(path.join(root, packageFile), 'utf8'),
+  )
+  delete originalPackage.exports
+  delete currentPackage.exports
+  assert.deepEqual(
+    currentPackage,
+    originalPackage,
+    'source metadata unchanged outside the inspected format exports',
+  )
+  for (const [file, offer] of [
+    [
+      'vue/internal/build/src/utils/node-declarations.ts',
+      profile.sourceOffers.formatter,
+    ],
+    [
+      'scripts/node-declaration-reexports.test.mjs',
+      profile.sourceOffers.formatter,
+    ],
+    [
+      'vue/packages/components/markdown-renderer/src/markdown-renderer.vue',
+      profile.sourceOffers.renderer,
+    ],
+  ])
+    assert.equal(
+      sha256(readFileSync(path.join(root, file))),
+      sha256(execFileSync('git', ['show', `${offer}:${file}`], { cwd: root })),
+      `exact offered ${file}`,
+    )
+  for (const file of [
+    'vue/packages/components/slider/index.ts',
+    'vue/packages/components/slider/src/slider.vue',
+    'vue/packages/components/slider/src/composables/use-slide.ts',
+  ])
+    assert.equal(
+      sha256(readFileSync(path.join(root, file))),
+      sha256(
+        execFileSync(
+          'git',
+          ['show', `4214f38b38c8d891c3b25b0e2e56d5e28839edee:${file}`],
+          { cwd: root },
+        ),
+      ),
+      `inherited Slider source ${file}`,
+    )
 }
 
 // Read committed blob bytes, not a manifest's claim that it names known source.
@@ -102,7 +218,7 @@ function committedInputs(root, commit) {
     offset = end + 1 + size + 1
     return [file, sha256(bytes)]
   })
-  return { hash: inventoryHash(rows), count: rows.length }
+  return { hash: inventoryHash(rows), count: rows.length, rows: new Map(rows) }
 }
 
 export function candidateIdentity(root, profile, tarball) {
@@ -120,6 +236,16 @@ export function candidateIdentity(root, profile, tarball) {
     'candidate committed source inputs',
   )
   assert.equal(committed.count, profile.sourceInputCount)
+  for (const [file, hash] of Object.entries(profile.extraInputs ?? {}))
+    assert.equal(
+      sha256(
+        execFileSync('git', ['show', `${sidecar.commitSha}:${file}`], {
+          cwd: root,
+        }),
+      ),
+      hash,
+      `candidate committed ${file}`,
+    )
   const manifest = verifyCandidate({
     repoRoot: root,
     tarballPath: tarball,
@@ -143,7 +269,7 @@ export function candidateIdentity(root, profile, tarball) {
   )
   assert.deepEqual(
     manifest.package,
-    authority.candidateContract.package,
+    profile.package ?? authority.candidateContract.package,
     'exact prepared package identity',
   )
   return manifest
@@ -198,12 +324,26 @@ export function publishedDeclaration(text) {
   return text
 }
 
-export function assertSliderDeclarations(actual, generated) {
+export function assertSliderDeclarations(actual, generated, formatted) {
   assert.equal(
     generated.length,
     16,
     'complete actual canonical Slider declaration inventory',
   )
+  if (formatted) {
+    assert.equal(formatted.length, 48, 'all three canonical Slider formats')
+    const rows = [...actual]
+      .filter(([file]) =>
+        /^(es|lib)\/components\/slider\/.*\.d\.(?:ts|mts|cts)$/.test(file),
+      )
+      .sort()
+    assert.deepEqual(
+      rows,
+      [...formatted].sort(),
+      'all raw/ESM/CJS Slider declarations match actual producer and formatter',
+    )
+    return
+  }
   for (const module of ['es', 'lib']) {
     const rows = [...actual]
       .filter(
@@ -324,7 +464,11 @@ export function installedArtifact(
     'successful actual producer in this invocation',
   )
   assert.equal(canonical.sourceInputsSha256, profile.sourceInputsSha256)
-  assertSliderDeclarations(actual, canonical.sliderDeclarations)
+  assertSliderDeclarations(
+    actual,
+    canonical.sliderDeclarations,
+    canonical.sliderFormattedDeclarations,
+  )
   const slider = [...actual].filter(([file]) =>
     /^(es|lib)\/components\/slider\/.*\.(mjs|js)$/.test(file),
   )
@@ -343,7 +487,9 @@ export function installedArtifact(
     ),
     installedPayloadFiles: actual.size,
     installedPayloadSha256: inventoryHash([...actual]),
-    canonicalSliderDeclarationFiles: canonical.sliderDeclarations.length * 2,
+    canonicalSliderDeclarationFiles:
+      canonical.sliderFormattedDeclarations?.length ??
+      canonical.sliderDeclarations.length * 2,
     sliderRuntimeFiles: slider.length,
   }
 }
