@@ -1326,6 +1326,8 @@ import {
 } from './markdown-editor-outline'
 import { planMarkdownOutlineReveal } from './markdown-editor-outline-active'
 import { createMarkdownEditorSessionBinding } from './markdown-editor-session'
+import { freezeMarkdownEditorSessionPanelState, markdownEditorSessionPanelMemoryUnits } from './markdown-editor-session-panels'
+import { captureMarkdownEditorSessionAttachmentState } from './markdown-editor-session-attachment-state'
 import { createMarkdownAttachmentEmbedResourceOwner } from './markdown-editor-attachment-embed-owner'
 import { createMarkdownEditorSessionCommandResources, isMarkdownEditorSessionOwnedCommand } from './markdown-editor-session-command-resources'
 import type { MarkdownRendererLastValidRender, createMarkdownRendererSessionResourceOwner } from '../../markdown-renderer/src/markdown-renderer-session-resources'
@@ -6581,7 +6583,8 @@ const surfaceResourceParticipant: MarkdownEditorSessionResourceParticipant = {
         timers: layoutGestureTimer === undefined ? 0 : 1,
         backgroundTasks: 0,
         networkRequests: 0,
-        memoryUnits: Math.ceil((transactionStore.value.length + transactionStore.retainedSessionUnits) * 2 / 65536),
+        memoryUnits: Math.ceil((transactionStore.value.length + transactionStore.retainedSessionUnits) * 2 / 65536) +
+          sessionBinding.inspectRetainedPanelMemoryUnits(),
       },
     }
   },
@@ -6727,6 +6730,118 @@ const sessionBinding = createMarkdownEditorSessionBinding({
     if (previewRendererRef.value !== renderer || embedRenderSegments.value.length > 1)
       return blocked('editor-session-renderer-owner-replaced')
     return proof
+  },
+  capturePanelState: () => {
+    const projection = editorProjection.value
+    if (!projection || isComposing.value || sessionDisposed) return null
+    const textarea = textareaRef.value
+    const preview = previewElement()
+    const mode = currentMode.value
+    if ((mode !== 'preview' && !textarea) || (mode !== 'source' && !preview)) return null
+    const identity = transactionStore.documentIdentity
+    const revision = transactionStore.revision
+    const liveAnchor = liveLayout.value.anchor
+    if (liveAnchor && (liveAnchor.documentIdentity.id !== identity.id ||
+        liveAnchor.documentIdentity.epoch !== identity.epoch || liveAnchor.revision !== revision)) return null
+    if (searchMatches.value.some((match) => match.documentId !== identity.id ||
+        match.documentEpoch !== identity.epoch || match.revision !== revision)) return null
+    if (atomicSession.value && !projection.nodes.some((node) => node.id === atomicSession.value!.nodeId)) return null
+    const originalAtomic = liveAtomic.value
+    const requireQuiescent = () => {
+      const frames = frameScheduler.resourceState()
+      if (frames.runningPhase || frames.pendingFrames || frames.pendingAuxiliaryFrames || frames.runningAuxiliaryFrames ||
+          sessionLayoutResources.participant.inspect().usage.backgroundTasks ||
+          languageSearchParticipant?.inspect().usage.backgroundTasks) {
+        throw new Error('editor-session-panel-continuation-active')
+      }
+    }
+    try { requireQuiescent() } catch { return null }
+    const attachment = captureMarkdownEditorSessionAttachmentState(() => attachmentJobs.value, () => {
+      assertAttachmentFileControlIdle()
+      if (attachmentJobs.value.some((job) => job.documentIdentity?.id !== identity.id ||
+          job.documentIdentity.epoch !== identity.epoch || job.revision === undefined || job.revision > revision))
+        throw new Error('editor-session-attachment-document-custody-unavailable')
+      const usage = attachmentResourceParticipant.inspect().usage
+      if (attachmentBatches.size || attachmentItems.size || usage.backgroundTasks || usage.networkRequests)
+        throw new Error('editor-session-attachment-state-unsettled')
+    })
+    const outline = currentOutlineContext()
+    const state = freezeMarkdownEditorSessionPanelState({
+      mode,
+      activeNode: {
+        selection: transactionStore.selection,
+        syntaxNodeId: currentSyntaxNode.value?.id ?? null,
+        syntaxKind: currentSyntaxNode.value?.kind ?? null,
+        linkNodeId: activeLinkNodeId.value,
+        anchorNodeId: activeAnchorNodeId.value,
+        atomicSession: atomicSession.value,
+        contextualSurface: contextualSurface.value,
+        contextualEpoch: contextualSurfaceEpoch.value,
+        contextualRevision: contextualSurfaceRevision.value,
+        contextualError: contextualError.value,
+        linkLabel: linkLabelDraft.value, linkDestination: linkDestinationDraft.value,
+        linkTitle: linkTitleDraft.value, anchorId: anchorIdDraft.value,
+      },
+      scrollAnchor: {
+        anchor: liveAnchor,
+        textareaTop: textarea?.scrollTop ?? null, textareaLeft: textarea?.scrollLeft ?? null,
+        previewTop: preview?.scrollTop ?? null, previewLeft: preview?.scrollLeft ?? null,
+        retainedPreviewLeft: retainedPreviewScrollLeft.value,
+      },
+      outline: outline.model.items,
+      search: { ui: searchUiState.value, query: searchQuery.value, replaceText: searchReplaceText.value,
+        matches: searchMatches.value, currentIndex: searchCurrentIndex.value, mode: searchMode.value },
+      attachment: attachment?.state ?? null,
+    })
+    const isCurrent = () => {
+      if (sessionDisposed || isComposing.value || editorProjection.value !== projection ||
+          transactionStore.documentIdentity.id !== identity.id || transactionStore.documentIdentity.epoch !== identity.epoch ||
+          transactionStore.revision !== revision || textareaRef.value !== textarea || previewElement() !== preview) return false
+      try { requireQuiescent() } catch { return false }
+      return attachment === null || attachment.isCurrent()
+    }
+    return Object.freeze({
+      state, missingOwners: Object.freeze(attachment ? [] : ['attachment-original-settled-state-custody']),
+      memoryUnits: markdownEditorSessionPanelMemoryUnits(state) + Number(textarea !== null) + Number(preview !== null) +
+        (attachment?.state.length ?? 0) + 2,
+      isCurrent,
+      restore() {
+        if (!isCurrent()) throw new Error('editor-session-panel-owner-stale')
+        // Same original projection backs immutable outline; original jobs/proofs must remain exact.
+        currentMode.value = state.mode
+        contextualSurface.value = state.activeNode.contextualSurface
+        contextualSurfaceEpoch.value = state.activeNode.contextualEpoch
+        contextualSurfaceRevision.value = state.activeNode.contextualRevision
+        contextualError.value = state.activeNode.contextualError
+        linkLabelDraft.value = state.activeNode.linkLabel
+        linkDestinationDraft.value = state.activeNode.linkDestination
+        linkTitleDraft.value = state.activeNode.linkTitle
+        anchorIdDraft.value = state.activeNode.anchorId
+        atomicSession.value = state.activeNode.atomicSession
+        liveAtomic.value = originalAtomic
+        searchUiState.value = state.search.ui
+        searchQuery.value = state.search.query
+        searchReplaceText.value = state.search.replaceText
+        searchMatches.value = state.search.matches
+        searchCurrentIndex.value = state.search.currentIndex
+        searchMode.value = state.search.mode
+        editorSelection.value = transactionStore.selection
+        if (textarea) {
+          const selection = transactionStore.selection
+          textarea.setSelectionRange(selection.start, selection.end, selection.direction)
+        }
+        liveLayout.value = Object.freeze({ ...liveLayout.value, anchor: state.scrollAnchor.anchor })
+        retainedPreviewScrollLeft.value = state.scrollAnchor.retainedPreviewLeft
+        if (textarea && state.scrollAnchor.textareaTop !== null && state.scrollAnchor.textareaLeft !== null) {
+          textarea.scrollTop = state.scrollAnchor.textareaTop
+          textarea.scrollLeft = state.scrollAnchor.textareaLeft
+        }
+        if (preview && state.scrollAnchor.previewTop !== null && state.scrollAnchor.previewLeft !== null) {
+          preview.scrollTop = state.scrollAnchor.previewTop
+          preview.scrollLeft = state.scrollAnchor.previewLeft
+        }
+      },
+    })
   },
   captureViewState: () => ({
     mode: currentMode.value,

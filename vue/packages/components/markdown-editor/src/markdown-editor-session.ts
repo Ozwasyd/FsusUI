@@ -1,4 +1,5 @@
 import { createMarkdownEditorSessionResourceCoordinator } from './markdown-editor-session-resources'
+import type { MarkdownEditorSessionPanelCapture, MarkdownEditorSessionPanelRefs, MarkdownEditorSessionPanelState } from './markdown-editor-session-panels'
 import type { MarkdownEditorSessionResourceCensus, MarkdownEditorSessionResourceParticipant } from './markdown-editor-session-resources'
 import type {
   MarkdownEditorDocumentIdentity,
@@ -39,6 +40,7 @@ export interface MarkdownEditorSessionSnapshot {
   readonly historyRef: string
   readonly viewStateRef: string
   readonly lastValidRender: MarkdownEditorSessionLastValidRender | null
+  readonly panelRefs: MarkdownEditorSessionPanelRefs | null
 }
 
 export interface MarkdownEditorSessionCapabilities {
@@ -119,6 +121,8 @@ export interface MarkdownEditorSession {
     readonly documentIdentity: MarkdownEditorDocumentIdentity
     readonly revision: number
   }): boolean
+  /** Resolve only the original current bounded panel custody; foreign/string-only/stale refs refuse. */
+  readPanelState(snapshot: MarkdownEditorSessionSnapshot): MarkdownEditorSessionPanelState | null
   restoreSnapshot(
     snapshot: MarkdownEditorSessionSnapshot,
     expected: { readonly documentIdentity: MarkdownEditorDocumentIdentity; readonly revision: number; readonly assertAdmission?: () => void },
@@ -140,6 +144,7 @@ export interface MarkdownEditorSessionOwner<ViewState> {
   readonly isDisposed: () => boolean
   readonly captureViewState: () => ViewState
   readonly restoreViewState: (state: ViewState) => void
+  readonly capturePanelState?: () => MarkdownEditorSessionPanelCapture | null
   readonly resourceParticipants: () => readonly MarkdownEditorSessionResourceParticipant[]
   readonly captureLastValidRender: () => MarkdownEditorSessionLastValidRender | null
   readonly inspectRendererResourceSource?: () => MarkdownEditorSessionRendererResourceSource | null
@@ -164,13 +169,14 @@ const capabilities: MarkdownEditorSessionCapabilities = Object.freeze({
 
 export const createMarkdownEditorSessionBinding = <ViewState>(
   owner: MarkdownEditorSessionOwner<ViewState>,
-): MarkdownEditorSessionExpose => {
+): MarkdownEditorSessionExpose & { inspectRetainedPanelMemoryUnits(): number } => {
   const resources = createMarkdownEditorSessionResourceCoordinator(owner.resourceParticipants)
   let session: MarkdownEditorSession | undefined
   let retained: {
     readonly snapshot: MarkdownEditorSessionSnapshot
     readonly transaction: MarkdownEditorRetainedTransactionSnapshot
     readonly view: ViewState
+    readonly panels: MarkdownEditorSessionPanelCapture | null
   } | undefined
   let sequence = 0
   let capturing = false
@@ -203,6 +209,7 @@ export const createMarkdownEditorSessionBinding = <ViewState>(
   }
 
   return Object.freeze({
+    inspectRetainedPanelMemoryUnits: () => retained?.panels?.memoryUnits ?? 0,
     getSession(editorSessionRef: string) {
       assertAvailable()
       if (!/^[a-zA-Z0-9][a-zA-Z0-9._:-]{2,127}$/u.test(editorSessionRef)) {
@@ -315,7 +322,15 @@ export const createMarkdownEditorSessionBinding = <ViewState>(
             }
             const lastValidRender = captureLastValidRender()
             const view = owner.captureViewState()
+            const panels = owner.capturePanelState?.() ?? null
             // Actual consumer admission follows the last owner callback, before custody replacement.
+            assertAdmission?.()
+            assertAvailable()
+            if (store.revision !== revision || store.value !== source ||
+                store.documentIdentity.id !== identity.id || store.documentIdentity.epoch !== identity.epoch) {
+              throw new Error('editor-session-snapshot-stale')
+            }
+            if (panels && !panels.isCurrent()) throw new Error('editor-session-panel-owner-stale')
             assertAdmission?.()
             assertAvailable()
             if (store.revision !== revision || store.value !== source ||
@@ -337,12 +352,29 @@ export const createMarkdownEditorSessionBinding = <ViewState>(
               historyRef: `${snapshotRef}:history`,
               viewStateRef: `${snapshotRef}:view`,
               lastValidRender,
+              panelRefs: panels ? Object.freeze({
+                activeNodeRef: `${snapshotRef}:active-node`,
+                scrollAnchorRef: `${snapshotRef}:scroll-anchor`,
+                outlineRef: `${snapshotRef}:outline`,
+                searchRef: `${snapshotRef}:search`,
+                attachmentStateRef: panels.state.attachment === null ? null : `${snapshotRef}:attachment`,
+              }) : null,
             })
-            retained = { snapshot, transaction, view }
+            retained = { snapshot, transaction, view, panels }
             return snapshot
           } finally {
             capturing = false
           }
+        },
+        readPanelState(snapshot: MarkdownEditorSessionSnapshot): MarkdownEditorSessionPanelState | null {
+          assertAvailable()
+          const custody = retained
+          if (capturing || !custody || snapshot !== custody.snapshot || !custody.panels ||
+              !owner.transactionStore.validateRetainedSnapshot(custody.transaction)) return null
+          if (!custody.panels.isCurrent()) return null
+          assertAvailable()
+          return retained === custody && owner.transactionStore.validateRetainedSnapshot(custody.transaction)
+            ? custody.panels.state : null
         },
         validateRetainedSnapshot(snapshot: MarkdownEditorSessionSnapshot, expected: {
           readonly documentIdentity: MarkdownEditorDocumentIdentity
@@ -391,6 +423,7 @@ export const createMarkdownEditorSessionBinding = <ViewState>(
               return blocked('editor-session-render-checkpoint-custody-invalid')
             }
           }
+          if (custody.panels && !custody.panels.isCurrent()) return blocked('editor-session-panel-owner-stale')
           // Final actual admission after renderer callbacks and before history/selection mutation.
           assertAdmission?.()
           assertAvailable()
@@ -398,7 +431,8 @@ export const createMarkdownEditorSessionBinding = <ViewState>(
           if (!store.restoreRetainedSnapshot(custody.transaction)) {
             return blocked('editor-session-history-checkpoint-invalid')
           }
-          owner.restoreViewState(custody.view)
+          if (custody.panels) custody.panels.restore()
+          else owner.restoreViewState(custody.view)
           return Object.freeze({ status: 'restored', snapshotRef: snapshot.snapshotRef, reason: null })
         },
         inspectResources: () => { assertAvailable(); return resources.inspectResources() },

@@ -553,6 +553,34 @@ transaction retain/restore, with native availability/context checks preserved.
 A thrown guard preserves prior custody/selection/history. The consuming factory
 supplies its real owner/reference/admission guard; no success or receipt is issued.
 
+The original native owner now optionally captures immutable panel metadata into
+that SAME bounded checkpoint. `snapshot.panelRefs` contains independent backed
+`activeNodeRef`, `scrollAnchorRef`, `outlineRef`, `searchRef` and nullable
+`attachmentStateRef`; these are not aliases of the partial `viewStateRef`.
+`session.readPanelState(originalSnapshot)` resolves only current original native
+token/projection/DOM/job custody. Foreign/copied/superseded/epoch/revision/ABA or
+replaced owners refuse. Missing projection/required native DOM or queued original
+frame/layout/search continuations keep panel capture unavailable.
+
+Active state uses original syntax/selection/link/anchor/contextual/atomic state.
+Scroll metadata retains actual original live anchor and native textarea/preview
+offsets, without recomputing geometry. Outline is derived by the existing original
+projection/outline owner; search UI/matches are deeply frozen metadata copies.
+Restore writes the original native refs and DOM targets and preserves the same
+original projection and attachment jobs. No parser, body, history or job/controller
+is cloned/replaced. Actual retained metadata/reference memory is counted by the
+original native surface's measured usage; it does not qualify complete resources.
+
+Attachment refs require real completed dispatch settlement, same original weak
+job/controller identities and dispatch proof, exact metadata and cleared original
+batch/item/File custody. Pending/progress/legacy unknown/unwind/cleanup cases yield
+null attachment ref. Terminal cleanup, removal, retry, signal or phase/attempt/range
+changes invalidate it. State restoration preserves verified original settled jobs;
+it cannot revive a File loan/controller/request or rewind a terminal operation.
+Weak identity witnesses retain no additional File/controller ownership. This is
+same-owner/same-revision state source only; full factory/draft/renderer/resource and
+native/worker/kernel/geometry/privacy acceptance remain blocked/UNRUN.
+
 `restoreSnapshot(snapshot, expected)` accepts only the exact retained snapshot
 object, on the same mounted owner, document identity/epoch and source revision.
 It restores the transaction owner's history and selection plus retained mode,

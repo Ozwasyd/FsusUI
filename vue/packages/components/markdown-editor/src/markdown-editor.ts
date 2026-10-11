@@ -1902,6 +1902,11 @@ export type {
   MarkdownEditorSessionRenderRestoreProof,
   MarkdownEditorSessionSnapshot,
 } from './markdown-editor-session'
+export type {
+  MarkdownEditorSessionPanelState,
+  MarkdownEditorSessionPanelRefs,
+  MarkdownEditorSessionAttachmentState,
+} from './markdown-editor-session-panels'
 
 export type {
   MarkdownEditorSessionResourceCensus,
