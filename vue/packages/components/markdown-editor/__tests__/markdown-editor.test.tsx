@@ -26,6 +26,72 @@ import type {
 import { getMarkdownXssSourceUrl } from '../../../../tests/support/markdown-xss-corpus'
 
 describe('MarkdownEditor', () => {
+  it('checks actual consumer admission after view capture and before replacing or restoring original custody', () => {
+    const identity = { id: 'admission-document', epoch: 1 }
+    const store = new MarkdownEditorTransactionStore('source', undefined, identity)
+    let active = true
+    let retireDuringView = false
+    let viewRestores = 0
+    const session = createMarkdownEditorSessionBinding({
+      transactionStore: store,
+      isComposing: () => false,
+      isDisposed: () => false,
+      captureViewState: () => { if (retireDuringView) active = false; return null },
+      restoreViewState: () => { viewRestores += 1 },
+      resourceParticipants: () => [],
+      captureLastValidRender: () => null,
+    }).getSession('session:admission')
+    const assertAdmission = () => { if (!active) throw new Error('actual-consumer-retired') }
+    const expected = { documentIdentity: identity, revision: 0, assertAdmission }
+    const original = session.captureSnapshot(() => 'a'.repeat(64), expected)
+    retireDuringView = true
+    expect(() => session.captureSnapshot(() => 'b'.repeat(64), expected)).toThrow('actual-consumer-retired')
+    expect(session.validateRetainedSnapshot(original, expected)).toBe(true)
+    store.setSelection({ start: 1, end: 1, direction: 'none' })
+    const before = { history: store.history, selection: store.selection, source: store.value }
+    expect(() => session.restoreSnapshot(original, expected)).toThrow('actual-consumer-retired')
+    expect({ history: store.history, selection: store.selection, source: store.value }).toEqual(before)
+    expect(viewRestores).toBe(0)
+    active = true
+    retireDuringView = false
+    expect(session.restoreSnapshot(original, {
+      ...expected,
+      assertAdmission: () => { session.captureSnapshot(() => 'c'.repeat(64)) },
+    }).reason).toBe('editor-session-snapshot-custody-invalid')
+    expect({ history: store.history, selection: store.selection, source: store.value }).toEqual(before)
+    expect(viewRestores).toBe(0)
+  })
+
+  it('rejects old outer custody after the original transaction store switches away and back to identical coordinates', () => {
+    const identity = { id: 'aba-document', epoch: 1 }
+    const store = new MarkdownEditorTransactionStore('same source', undefined, identity)
+    const binding = createMarkdownEditorSessionBinding({
+      transactionStore: store,
+      isComposing: () => false,
+      isDisposed: () => false,
+      captureViewState: () => null,
+      restoreViewState: () => {},
+      resourceParticipants: () => [],
+      captureLastValidRender: () => null,
+    })
+    const session = binding.getSession('session:aba')
+    const snapshot = session.captureSnapshot(() => 'a'.repeat(64))
+    const expected = { documentIdentity: identity, revision: 0 }
+    expect(session.validateRetainedSnapshot(snapshot, expected)).toBe(true)
+    store.switchDocument({ id: 'other-document', epoch: 2 }, 'other source')
+    store.switchDocument(identity, 'same source')
+    expect(session.inspectDocumentState()).toEqual({ documentIdentity: identity, revision: 0 })
+    const before = { history: store.history, selection: store.selection, source: store.value }
+    expect(session.validateRetainedSnapshot(snapshot, expected)).toBe(false)
+    expect({ history: store.history, selection: store.selection, source: store.value }).toEqual(before)
+    expect(session.restoreSnapshot(snapshot, expected).reason).toBe('editor-session-history-checkpoint-invalid')
+    const originalToken = store.retainSnapshot()
+    expect(store.validateRetainedSnapshot(originalToken)).toBe(true)
+    expect(store.validateRetainedSnapshot({ ...originalToken })).toBe(false)
+    store.releaseRetainedSnapshot()
+    expect(store.validateRetainedSnapshot(originalToken)).toBe(false)
+  })
+
   it.each(['renderer', 'attachment'] as const)('rejects %s source observation after same-source document epoch drift', (sourceOwner) => {
     const store = new MarkdownEditorTransactionStore('same source', undefined, { id: 'source-document', epoch: 1 })
     const binding = createMarkdownEditorSessionBinding({
@@ -64,10 +130,27 @@ describe('MarkdownEditor', () => {
     expect(session.captureLastValidRender()).toBeNull()
     expect(snapshot).not.toHaveProperty('value')
     const expected = { documentIdentity: snapshot.documentIdentity, revision: snapshot.revision }
+    expect(session.validateRetainedSnapshot(snapshot, expected)).toBe(true)
+    expect(session.validateRetainedSnapshot({ ...snapshot }, expected)).toBe(false)
+    const foreign = mount(MarkdownEditor, { props: { modelValue: 'first', documentIdentity: snapshot.documentIdentity } })
+    foreign.vm.dispatchTransaction({
+      changes: [{ from: 5, to: 5, insert: ' second' }], history: 'separate', origin: 'programmatic',
+    })
+    const foreignSession = foreign.vm.getSession(session.editorSessionRef)
+    const foreignSnapshot = foreignSession.captureSnapshot(() => 'a'.repeat(64))
+    expect(foreignSnapshot.snapshotRef).toBe(snapshot.snapshotRef)
+    expect(foreignSnapshot.revision).toBe(snapshot.revision)
+    expect(session.validateRetainedSnapshot(foreignSnapshot, expected)).toBe(false)
+    expect(session.validateRetainedSnapshot(snapshot, { ...expected, revision: snapshot.revision + 1 })).toBe(false)
+    expect(session.validateRetainedSnapshot(snapshot, {
+      ...expected, documentIdentity: { ...snapshot.documentIdentity, epoch: snapshot.documentIdentity.epoch + 1 },
+    })).toBe(false)
+    foreign.unmount()
     expect(session.restoreSnapshot({ ...snapshot }, expected).status).toBe('blocked')
     expect(session.restoreSnapshot(snapshot, expected).status).toBe('restored')
     expect(editor.undo().value).toBe('first')
     expect(session.restoreSnapshot(snapshot, expected).reason).toBe('editor-session-revision-mismatch')
+    expect(session.validateRetainedSnapshot(snapshot, expected)).toBe(false)
     wrapper.unmount()
   })
 

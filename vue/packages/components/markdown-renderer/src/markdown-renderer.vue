@@ -99,7 +99,11 @@ import {
   markdownRendererProps,
   resolveMarkdownWorkerScriptUrl,
 } from './markdown-renderer'
-import { createMarkdownRendererSessionResourceOwner } from './markdown-renderer-session-resources'
+import {
+  createMarkdownRendererSessionResourceOwner,
+  hasUnavailableMarkdownRendererWorkerListenerRegistration,
+  inspectMarkdownRendererWorkerCleanupResidue,
+} from './markdown-renderer-session-resources'
 import type { MarkdownRendererRestoreProof } from './markdown-renderer-session-resources'
 import type { FsusRenderPipelineAdapter } from '@element-plus/hooks'
 import type {
@@ -1428,6 +1432,16 @@ const restoreLastValidRender = async (
     )
   if (pipeline.workerCallbackFailure)
     return blocked('markdown-renderer-worker-callback-failure')
+  if (hasUnavailableMarkdownRendererWorkerListenerRegistration(pipeline))
+    return blocked('markdown-renderer-worker-listener-registration-unavailable')
+  const workerCleanupResidue =
+    inspectMarkdownRendererWorkerCleanupResidue(pipeline)
+  if (
+    workerCleanupResidue.ownedScopes.length > 0 ||
+    workerCleanupResidue.poolContext.length > 0
+  ) {
+    return blocked('markdown-renderer-disposed-worker-resource-residue')
+  }
   if (
     heavy.admission !== 'open' ||
     heavy.usage.tasks > 0 ||

@@ -43,12 +43,67 @@ export interface MarkdownRendererRenderGeneration extends MarkdownRendererDocume
   readonly generation: number
 }
 
+// Observe actual retained resources after disposal, without inferring the
+// failure cause, successful termination or attribution of shared pool totals.
+export const inspectMarkdownRendererWorkerCleanupResidue = (
+  pipeline: FsusRenderPipelineRuntimeResourceInspection,
+) =>
+  Object.freeze({
+    ownedScopes: Object.freeze(
+      pipeline.workerResources.scopes
+        .filter(
+          ({ inspection }) =>
+            inspection.disposed &&
+            (inspection.slots.length > 0 ||
+              inspection.tasks.length > 0 ||
+              inspection.queueDepth > 0),
+        )
+        .map(({ inspection }) => inspection),
+    ),
+    poolContext: Object.freeze(
+      pipeline.workerResources.pools.filter(
+        ({ disposed, pool, shared }) =>
+          disposed &&
+          (pool.workerCount > 0 ||
+            pool.pendingCount > 0 ||
+            pool.queueDepth > 0 ||
+            pool.retainCount > 0 ||
+            shared.backgroundTimerActive ||
+            shared.idleTerminateTimerActive ||
+            shared.visibilityListenerCount > 0),
+      ),
+    ),
+  })
+
+// Optional registration fields describe native knowledge, not handle counts.
+// A missing legacy field is unavailable, never evidence of no registration.
+export const hasUnavailableMarkdownRendererWorkerListenerRegistration = (
+  pipeline: FsusRenderPipelineRuntimeResourceInspection,
+) => {
+  const unavailable = (
+    registration: 'none' | 'registered' | 'unknown' | undefined,
+  ) => registration !== 'none' && registration !== 'registered'
+  return (
+    pipeline.workerResources.scopes.some(({ inspection }) =>
+      inspection.tasks.some((task) =>
+        unavailable(task.abortListenerRegistration),
+      ),
+    ) ||
+    pipeline.workerResources.pools.some(({ shared }) =>
+      unavailable(shared.visibilityListenerRegistration),
+    )
+  )
+}
+
 // Preserve the remaining real source gaps; available hook counts are exposed
 // separately and never turn opaque adapter/worker/platform state into zero.
 export const markdownRendererSessionSourceDependencies = Object.freeze([
   'markdown-runtime:activation-and-gateway-loader-import-network-census',
   'renderer:validated-snapshot-restoration-after-disposal',
   'heavy-feature-runtime:timer-and-network-cancellation-authority',
+  // Quarantine is source-reviewed; the worker-owner synchronous lifecycle
+  // repairs are composed, but independent review/qualification remains pending.
+  'render-pipeline-worker:reentrant-enqueue-disposal-cleanup',
 ] as const)
 
 export const createMarkdownRendererSessionResourceOwner = (options: {
@@ -228,12 +283,27 @@ export const createMarkdownRendererSessionResourceOwner = (options: {
     const pipeline = options.readPipelineResources()
     const viewport = options.readVirtualWindowResources()
     const heavy = options.readHeavyResources()
+    const workerCleanupResidue =
+      inspectMarkdownRendererWorkerCleanupResidue(pipeline)
     const workerScopes = pipeline.workerResources.scopes.map(
       ({ inspection }) => inspection,
     )
     const missingSourceDependencies: string[] = [
       ...markdownRendererSessionSourceDependencies,
     ]
+    if (hasUnavailableMarkdownRendererWorkerListenerRegistration(pipeline)) {
+      missingSourceDependencies.push(
+        'render-pipeline-worker:listener-native-registration-unknown-or-unavailable',
+      )
+    }
+    if (
+      workerCleanupResidue.ownedScopes.length > 0 ||
+      workerCleanupResidue.poolContext.length > 0
+    ) {
+      missingSourceDependencies.push(
+        'render-pipeline-worker:disposed-resource-cleanup',
+      )
+    }
     if (pipeline.pendingWorkerCallbackFailureNotification) {
       missingSourceDependencies.push(
         'render-pipeline-runtime:worker-callback-failure-notification-settlement',
@@ -302,6 +372,7 @@ export const createMarkdownRendererSessionResourceOwner = (options: {
         heavyFeatures: heavy,
       }),
       diagnostics: Object.freeze({
+        workerCleanupResidue,
         // Preserve the actual retained failure; its cumulative count is not
         // an active task count or evidence that cleanup/recovery succeeded.
         workerCallbackFailure: pipeline.workerCallbackFailure,
@@ -321,6 +392,17 @@ export const createMarkdownRendererSessionResourceOwner = (options: {
         poolAttribution: Object.freeze(
           pipeline.workerResources.pools.map(
             ({ shared }) => shared.attribution,
+          ),
+        ),
+        // Preserve unknown and absent optional fields verbatim, not as zero.
+        workerAbortListenerRegistration: Object.freeze(
+          workerScopes.flatMap((scope) =>
+            scope.tasks.map((task) => task.abortListenerRegistration),
+          ),
+        ),
+        workerVisibilityListenerRegistration: Object.freeze(
+          pipeline.workerResources.pools.map(
+            ({ shared }) => shared.visibilityListenerRegistration,
           ),
         ),
       }),
@@ -374,7 +456,12 @@ export const createMarkdownRendererSessionResourceOwner = (options: {
             viewport.pendingMeasurements +
             heavy.usage.tasks +
             workerScopes.reduce(
-              (count, scope) => count + scope.tasks.length,
+              (count, scope) =>
+                count +
+                scope.tasks.filter(
+                  (task) =>
+                    task.promiseState === 'pending' || task.workerId !== null,
+                ).length,
               0,
             ),
           // Direct component requests only. The measured heavy count is exposed
@@ -405,7 +492,8 @@ export const createMarkdownRendererSessionResourceOwner = (options: {
             heavy.usage.pendingImports +
             heavy.usage.scheduledContinuations +
             workerScopes.reduce(
-              (count, scope) => count + scope.resources.taskRetainCount,
+              (count, scope) =>
+                count + scope.resources.taskRetainCount + scope.slots.length,
               0,
             ),
         }),

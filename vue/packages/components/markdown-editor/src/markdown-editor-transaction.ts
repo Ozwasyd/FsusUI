@@ -708,6 +708,15 @@ export class MarkdownEditorTransactionStore {
     return snapshot
   }
 
+  /** Read only this store's actual bounded token/history custody; never restore or retain. */
+  validateRetainedSnapshot(snapshot: MarkdownEditorRetainedTransactionSnapshot): boolean {
+    return snapshot === this.#retainedSnapshot &&
+      snapshot.documentIdentity.id === this.#documentIdentity.id &&
+      snapshot.documentIdentity.epoch === this.#documentIdentity.epoch &&
+      snapshot.revision === this.#revision &&
+      this.#retainedHistory !== undefined && this.#retainedRedo !== undefined
+  }
+
   restoreRetainedSnapshot(snapshot: MarkdownEditorRetainedTransactionSnapshot) {
     if (
       snapshot !== this.#retainedSnapshot ||

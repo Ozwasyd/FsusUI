@@ -264,7 +264,14 @@ cross-instance hydration or crash recovery. A retained pipeline
 `markdown-renderer-worker-callback-failure`; this operation cannot clear or recover
 that failure. A real pending failure-notification snapshot also blocks restoration
 with `markdown-renderer-worker-callback-failure-notification-pending`, even if a
-newer failure replaced the original publication snapshot.
+newer failure replaced the original publication snapshot. Observed disposed
+worker scopes with retained slots/tasks/queue entries, or disposed pool context
+with retained workers/tasks/queues/retains/timers/listeners, also block restore with
+`markdown-renderer-disposed-worker-resource-residue`. These observations do not
+infer why cleanup failed or prove workers stopped.
+Unknown or absent optional native listener registration also blocks restoration
+with `markdown-renderer-worker-listener-registration-unavailable`; it is never
+interpreted as no listener.
 
 `getSessionResourceSourceOffer()` returns:
 
@@ -279,10 +286,11 @@ newer failure replaced the original publication snapshot.
     heavyFeatures: object // Actual active and retired handle inspection.
   }
   diagnostics: {
+    workerCleanupResidue: { ownedScopes: readonly object[]; poolContext: readonly object[] }
     workerCallbackFailure: object | null // Actual pipeline failure record.
     pendingWorkerCallbackFailureNotification: object | null // Actual pending snapshot.
   }
-  unknownUsage: object // Original timer/network/worker/pool unknown values.
+  unknownUsage: object // Original timer/network/worker/pool and native registration values.
   knownNetworkRequests: number | null // null preserves an unknown heavy count.
   inspection: {
     ownerRef: 'renderer-projection'
@@ -335,6 +343,48 @@ pending snapshot, not an inferred publication status. A distinct pending snapsho
 adds one logical retained record; it is never counted as a worker job. A null
 pending snapshot does not establish successful delivery or recovery, and the
 retained failure continues to block restoration.
+
+`diagnostics.workerCleanupResidue` exposes actual disposed owned-scope
+inspections and separately identified pool context. Failed native termination can
+retain a real slot and task identity even after its promise settled. Existing
+worker/task/listener/deadline census remains intact; logical retained units also
+include actual scoped slot entries. Pool totals remain unattributed context and
+never enter renderer usage. Diagnostic views do not invent jobs or cleanup acks.
+The residue view also preserves a disposed inspection whose actual `queueDepth`
+is positive, even when pending tasks and slots are empty. A queue-only pool stays
+unattributed context. Queue entries do not establish pending promises or active
+worker jobs, and this guard adds no usage counts. Such observed residue blocks
+restore through the same cleanup-residue check.
+The direct worker cleanup API may rethrow observer errors after continuing its
+batch; its explicit disposal retry is terminal cleanup, not resume or recovery.
+The composed worker candidate sets quarantine before teardown and prevents
+dispatch to that retained slot, including when native termination throws. Its
+actual scoped slot inspections expose `quarantined` and `dispatchable` unchanged
+through the pipeline source. These booleans are never added to worker/job counts.
+The worker owner's optional `abortListenerRegistration` and
+`visibilityListenerRegistration` distinguish `none`, `registered` and `unknown`.
+The raw fields stay under `sources`; `unknownUsage.workerAbortListenerRegistration`
+and `unknownUsage.workerVisibilityListenerRegistration` preserve their values,
+including an absent field as `undefined` (unavailable). Unknown or unavailable
+registration adds an explicit source dependency and blocks restore. Actual abort
+listener counts describe unresolved owned cleanup hooks, including hooks whose
+native registration is unknown. Shared visibility counts remain pool context.
+No registration state is converted into a native listener count or an aggregate
+zero. Settled tasks without a retained worker identity do not contribute to
+background tasks merely because their cleanup hook remains; their actual retained
+task entry and hook stay in memory/listener census. Pending promises and retained
+worker identities continue to contribute actual work entries.
+Alive does not establish dispatchability, and quarantine does not prove cleanup
+or recovery. Independent review source-closes the handlerless-slot dispatch
+finding. The worker owner's composed admission repair rechecks actual pending
+membership and disposal after cancellation/preemption callbacks, generation and
+queue capacity before enqueue, and live task membership before crash retry.
+The composed source also rechecks admission after request getters and preserves
+actual native cleanup knowledge across synchronous registration/retention/cleanup
+windows. Independent review of these increments and the queue-only consumer guard
+remains pending. The source offer preserves the cleanup dependency and continues to
+refuse complete participant operations. This conditional consumer guard does not
+establish that the renderer had a reproducible restore bypass.
 
 This source offer is deliberately partial. Adapter internals, worker internals,
 shared pool attribution, platform observer callbacks, heavy-runtime timer/network

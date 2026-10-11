@@ -16,3 +16,13 @@ session while keeping complete:false, unknown fields and all missing-owner guard
 
 Expose readonly scalar observations from the original attachment/embed owner;
 preserve unknown legacy settlement failures and incomplete consumer resource totals.
+
+Expose a read-only retained snapshot custody check against the same original
+native token, document and revision. It never restores or replaces the checkpoint
+and does not certify renderer restoration, resources or complete host snapshots.
+
+Validate the original transaction store's actual retained token/history custody
+as well, rejecting document-coordinate ABA after release without changing restore.
+
+Run a supplied actual consumer admission callback immediately before original
+native retain/restore, after renderer/view callbacks. Preserve custody on refusal.

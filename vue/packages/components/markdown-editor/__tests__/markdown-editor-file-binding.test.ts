@@ -1796,6 +1796,44 @@ describe('native File bridge with the original #2295 session owner', () => {
     expect(inspected).toBe(true)
     expect(lend(editor, batch).accepted).toBe(false)
     expect(lend(editor, batch, 1).accepted).toBe(true)
+    expect(() => session.inspectAttachmentResourceSource()).toThrow('editor-session-attachment-settlement-owner-unavailable')
+    editor.unmount()
+  })
+
+  it('measures real unsettled service futures after File cleanup unwinds', async () => {
+    const requests: Parameters<MarkdownEditorAttachmentDispatch>[0][] = []
+    const finishes: ((result: MarkdownAttachmentProviderResult) => void)[] = []
+    const dispatch: MarkdownEditorAttachmentDispatch = (input) => {
+      requests.push(input)
+      return new Promise<MarkdownAttachmentProviderResult>((resolve) => { finishes.push(resolve) })
+    }
+    const editor = mount(MarkdownEditor, {
+      props: { modelValue: 'ab', documentIdentity: { id: 'doc', epoch: 2 }, attachmentDispatch: dispatch },
+    })
+    const originals = [file(), file('sibling.png')]
+    await capture(editor, originals)
+    expect(requests).toHaveLength(2)
+    expect(requests.map((request) => request.file)).toEqual(originals)
+    expect(editor.emitted('upload-image')).toBeUndefined()
+    const batch = requests[0]!.batch
+    expect(requests[1]!.batch).toBe(batch)
+    const session = editor.vm.getSession('session:file-future-cleanup')
+    let inspected = false
+    batch.items[0]!.signal.addEventListener('abort', () => {
+      inspected = true
+      expect(() => session.inspectAttachmentResourceSource()).toThrow('editor-session-attachment-file-cleanup-in-progress')
+      expect(lend(editor, batch, 1).accepted).toBe(true)
+    })
+    await action(editor, 0, '取消')
+    expect(inspected).toBe(true)
+    expect(lend(editor, batch).accepted).toBe(false)
+    expect(lend(editor, batch, 1).accepted).toBe(true)
+    expect(session.inspectAttachmentResourceSource()?.complete).toBe(false)
+    // Only the original service futures settle the actual owner ledger.
+    finishes[0]!(resolved(batch))
+    finishes[1]!(resolved(batch, 1))
+    await flushPromises()
+    expect(lend(editor, batch, 1).accepted).toBe(false)
     expect(session.inspectAttachmentResourceSource()?.complete).toBe(false)
     editor.unmount()
   })

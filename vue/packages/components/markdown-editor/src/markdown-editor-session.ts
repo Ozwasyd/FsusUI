@@ -112,10 +112,16 @@ export interface MarkdownEditorSession {
   captureSnapshot(digestSource: (source: string) => string, expected?: {
     readonly documentIdentity: MarkdownEditorDocumentIdentity
     readonly revision: number
+    readonly assertAdmission?: () => void
   }): MarkdownEditorSessionSnapshot
+  /** Read-only original token/document custody check; does not restore, capture or certify resources. */
+  validateRetainedSnapshot(snapshot: MarkdownEditorSessionSnapshot, expected: {
+    readonly documentIdentity: MarkdownEditorDocumentIdentity
+    readonly revision: number
+  }): boolean
   restoreSnapshot(
     snapshot: MarkdownEditorSessionSnapshot,
-    expected: { readonly documentIdentity: MarkdownEditorDocumentIdentity; readonly revision: number },
+    expected: { readonly documentIdentity: MarkdownEditorDocumentIdentity; readonly revision: number; readonly assertAdmission?: () => void },
   ): MarkdownEditorSessionRestoreProof
   inspectResources(): MarkdownEditorSessionResourceUsage
   pauseResources(): MarkdownEditorSessionResourceUsage
@@ -279,11 +285,15 @@ export const createMarkdownEditorSessionBinding = <ViewState>(
         captureSnapshot(digestSource: (source: string) => string, expected?: {
           readonly documentIdentity: MarkdownEditorDocumentIdentity
           readonly revision: number
+          readonly assertAdmission?: () => void
         }) {
           assertAvailable()
           if (capturing) throw new Error('editor-session-snapshot-reentrant')
           capturing = true
           try {
+            const assertAdmission = expected?.assertAdmission
+            assertAdmission?.()
+            assertAvailable()
             const store = owner.transactionStore
             const identity = store.documentIdentity
             const revision = store.revision
@@ -305,6 +315,13 @@ export const createMarkdownEditorSessionBinding = <ViewState>(
             }
             const lastValidRender = captureLastValidRender()
             const view = owner.captureViewState()
+            // Actual consumer admission follows the last owner callback, before custody replacement.
+            assertAdmission?.()
+            assertAvailable()
+            if (store.revision !== revision || store.value !== source ||
+                store.documentIdentity.id !== identity.id || store.documentIdentity.epoch !== identity.epoch) {
+              throw new Error('editor-session-snapshot-stale')
+            }
             const transaction = store.retainSnapshot()
             const snapshotRef = `${editorSessionRef}:snapshot:${++sequence}`
             const snapshot: MarkdownEditorSessionSnapshot = Object.freeze({
@@ -327,17 +344,36 @@ export const createMarkdownEditorSessionBinding = <ViewState>(
             capturing = false
           }
         },
+        validateRetainedSnapshot(snapshot: MarkdownEditorSessionSnapshot, expected: {
+          readonly documentIdentity: MarkdownEditorDocumentIdentity
+          readonly revision: number
+        }): boolean {
+          const expectedId = expected.documentIdentity.id
+          const expectedEpoch = expected.documentIdentity.epoch
+          const expectedRevision = expected.revision
+          assertAvailable()
+          if (capturing || !retained || snapshot !== retained.snapshot) return false
+          const store = owner.transactionStore
+          const identity = store.documentIdentity
+          return identity.id === expectedId && identity.epoch === expectedEpoch &&
+            identity.id === snapshot.documentIdentity.id && identity.epoch === snapshot.documentIdentity.epoch &&
+            store.revision === expectedRevision && store.revision === snapshot.revision &&
+            store.validateRetainedSnapshot(retained.transaction)
+        },
         restoreSnapshot(snapshot: MarkdownEditorSessionSnapshot, expected: {
           readonly documentIdentity: MarkdownEditorDocumentIdentity
           readonly revision: number
+          readonly assertAdmission?: () => void
         }): MarkdownEditorSessionRestoreProof {
+          const assertAdmission = expected.assertAdmission
           assertAvailable()
           const store = owner.transactionStore
           const identity = store.documentIdentity
           const blocked = (reason: string): MarkdownEditorSessionRestoreProof =>
             Object.freeze({ status: 'blocked', snapshotRef: snapshot.snapshotRef, reason })
           if (capturing) return blocked('editor-session-snapshot-reentrant')
-          if (!retained || snapshot !== retained.snapshot) {
+          const custody = retained
+          if (!custody || snapshot !== custody.snapshot) {
             return blocked('editor-session-snapshot-custody-invalid')
           }
           if (
@@ -355,10 +391,14 @@ export const createMarkdownEditorSessionBinding = <ViewState>(
               return blocked('editor-session-render-checkpoint-custody-invalid')
             }
           }
-          if (!store.restoreRetainedSnapshot(retained.transaction)) {
+          // Final actual admission after renderer callbacks and before history/selection mutation.
+          assertAdmission?.()
+          assertAvailable()
+          if (retained !== custody) return blocked('editor-session-snapshot-custody-invalid')
+          if (!store.restoreRetainedSnapshot(custody.transaction)) {
             return blocked('editor-session-history-checkpoint-invalid')
           }
-          owner.restoreViewState(retained.view)
+          owner.restoreViewState(custody.view)
           return Object.freeze({ status: 'restored', snapshotRef: snapshot.snapshotRef, reason: null })
         },
         inspectResources: () => { assertAvailable(); return resources.inspectResources() },
