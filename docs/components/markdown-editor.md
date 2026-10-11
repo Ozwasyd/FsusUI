@@ -696,3 +696,9 @@ replacement, abort or Promise settlement does not prove opaque resource release.
 The original default command implementation functions are validated as well as
 object identity. Deferred selection restoration rechecks its owner after focus.
 All incoming source cases and owning session cases remain UNRUN here.
+
+Document switches explicitly cancel the old typewriter owner's actual layout and
+scroll-cleanup frame handles and reset its scroll suppression flags. Old geometry
+callbacks keep their document-epoch guard; cleanup never executes stale geometry.
+This minimal source fix addresses the independent reviewer P2 on the original
+`9f600e0c` checkpoint. Runtime geometry/scroll/IME acceptance remains UNRUN.

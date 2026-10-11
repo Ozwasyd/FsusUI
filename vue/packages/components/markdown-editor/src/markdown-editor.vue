@@ -1887,6 +1887,27 @@ let typewriterScrollTarget: number | null = null
 let typewriterScrollSmooth = false
 let typewriterLayoutAdjustment = false
 let typewriterLayoutFrame: number | undefined
+const typewriterScrollFrames = new Set<number>()
+const requestTypewriterScrollFrame = (run: () => void) => {
+  const handle = sessionLayoutResources.requestFrame(() => {
+    if (handle !== undefined) typewriterScrollFrames.delete(handle)
+    run()
+  })
+  if (handle !== undefined) typewriterScrollFrames.add(handle)
+  return handle
+}
+const cancelOwnedTypewriterFrames = () => {
+  if (typewriterLayoutFrame !== undefined) {
+    sessionLayoutResources.cancelFrame(typewriterLayoutFrame)
+    typewriterLayoutFrame = undefined
+  }
+  for (const handle of typewriterScrollFrames) sessionLayoutResources.cancelFrame(handle)
+  typewriterScrollFrames.clear()
+  restoringTypewriter = false
+  typewriterLayoutAdjustment = false
+  typewriterScrollTarget = null
+  typewriterScrollSmooth = false
+}
 let textareaLayoutHeight = 0
 let textareaLayoutWidth = 0
 let viewportRestoreCurrentScrollTop = 0
@@ -2159,7 +2180,7 @@ const applyTypewriterScroll = (
         trigger === 'async-layout' ? 'auto' : target.smooth ? 'smooth' : 'auto',
       top: scrollTop,
     })
-    sessionLayoutResources.requestFrame(() => {
+    requestTypewriterScrollFrame(() => {
       syncFocusLayerScroll(textarea.scrollTop)
     })
   } else {
@@ -2168,8 +2189,8 @@ const applyTypewriterScroll = (
     textarea.scrollTop = target.scrollTop
     syncFocusLayerScroll(target.scrollTop)
   }
-  sessionLayoutResources.requestFrame(() => {
-    sessionLayoutResources.requestFrame(() => {
+  requestTypewriterScrollFrame(() => {
+    requestTypewriterScrollFrame(() => {
       restoringTypewriter = false
     })
   })
@@ -3523,6 +3544,9 @@ watch(
     if (nextId === previousId && nextEpoch === previousEpoch) return
 
     const previousHistory = transactionStore.history
+    // Old geometry continuations remain guarded; release their owned handles
+    // and transient flags explicitly instead of executing stale layout work.
+    cancelOwnedTypewriterFrames()
     languageToolsController?.cancelSearch()
     clearSearchViewAliases()
     abortPendingCommands()
@@ -3735,9 +3759,7 @@ onBeforeUnmount(() => {
   attachmentBatches.clear()
   attachmentItems.clear()
   if (layoutGestureTimer) clearTimeout(layoutGestureTimer)
-  if (typewriterLayoutFrame !== undefined) {
-    sessionLayoutResources.cancelFrame(typewriterLayoutFrame)
-  }
+  cancelOwnedTypewriterFrames()
   typewriterResizeObserver?.disconnect()
   cssHighlightRegistry()?.delete('markdown-search-match')
   cssHighlightRegistry()?.delete('markdown-search-current')
@@ -6130,19 +6152,13 @@ const surfaceResourceParticipant: MarkdownEditorSessionResourceParticipant = {
     sessionSurfacePaused.value = true
     restoringSelection = false
     restoringViewport = false
-    restoringTypewriter = false
-    typewriterLayoutAdjustment = false
-    typewriterScrollTarget = null
+    cancelOwnedTypewriterFrames()
     detachViewportListeners()
     typewriterResizeObserver?.disconnect()
     typewriterResizeObserver = undefined
     if (layoutGestureTimer !== undefined) {
       clearTimeout(layoutGestureTimer)
       layoutGestureTimer = undefined
-    }
-    if (typewriterLayoutFrame !== undefined) {
-      sessionLayoutResources.cancelFrame(typewriterLayoutFrame)
-      typewriterLayoutFrame = undefined
     }
     return this.inspect()
   },
