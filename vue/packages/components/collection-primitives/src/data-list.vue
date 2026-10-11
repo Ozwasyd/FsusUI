@@ -145,10 +145,11 @@ const handleRowClick = (
   index: number,
   event: MouseEvent,
 ): void => {
-  if (isDisabled(row, index) || rowTag(row, index) === 'div') {
+  if (isDisabled(row, index)) {
     event.preventDefault()
     return
   }
+  if (rowTag(row, index) === 'div') return
   const key = getRowKey(row, index)
   emit(CHANGE_EVENT, row, key, event)
   emit('row-click', row, key, event)

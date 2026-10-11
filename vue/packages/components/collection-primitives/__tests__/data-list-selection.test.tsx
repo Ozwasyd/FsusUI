@@ -129,4 +129,26 @@ describe('DataList controlled activation', () => {
     expect(wrapper.emitted('row-click')).toBeUndefined()
     wrapper.unmount()
   })
+
+  test('preserves cell-slot link default behavior in enabled passive rows while blocking disabled rows', async () => {
+    const wrapper = mount(DataList, {
+      props: { rows, columns, interactive: false, activeKey: 'first' },
+      slots: { cell: () => <a href="#cell-slot-target">Read record</a> },
+    })
+    try {
+      const link = wrapper.get('a')
+      expect(link.attributes('href')).toBe('#cell-slot-target')
+      for (const disabled of [false, true, false]) {
+        await wrapper.setProps({ disabled })
+        const event = new MouseEvent('click', { bubbles: true, cancelable: true })
+        expect(link.element.dispatchEvent(event)).toBe(!disabled)
+        expect(event.defaultPrevented).toBe(disabled)
+        expect(wrapper.emitted('change')).toBeUndefined()
+        expect(wrapper.emitted('row-click')).toBeUndefined()
+        expect(wrapper.find('[aria-current="true"]').exists()).toBe(true)
+      }
+    } finally {
+      wrapper.unmount()
+    }
+  })
 })
