@@ -84,6 +84,9 @@ describe('public Markdown embed entry identity', () => {
         const [node] = consumer.collectMarkdownEmbedNodes(
           `::embed[target="${target}" mode="article"]`,
         )
+        if (!node || node.ok !== true) {
+          throw new Error('Expected a valid embed directive')
+        }
         expect(
           consumer.resolveMarkdownEmbedPresentation(
             { kind: 'valid', node, result, request },
