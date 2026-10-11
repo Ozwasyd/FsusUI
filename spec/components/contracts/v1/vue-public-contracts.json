@@ -5,7 +5,7 @@
   "owner": "FsusUI Core",
   "baseline": {
     "path": "spec/baselines/vue-current.json",
-    "hash": "5daf49c16a0582b2df6d3ce563b46e778f76669e5af99a135f6920c16fc438fd",
+    "hash": "8bbfcf5fddea3ca613d030b41e0ed1df6f65f0ed321b88ad80b1d1cb0eec32be",
     "packageVersion": "1.5.1",
     "tokenHash": "f40182721e8a812c248cb0bc43de556cd7568c5a9de1bc8b2c099df9b78e47b0",
     "iconHash": "6ae868b15cefc99ebec9d8a78c7602da1fb07b46ec172c43f6a3662af54be167"
@@ -4991,6 +4991,18 @@
           "required": false
         },
         {
+          "name": "disabled",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "disabledKeys",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
           "name": "href",
           "type": "vue-source",
           "default": "vue-baseline",
@@ -5003,7 +5015,19 @@
           "required": false
         },
         {
+          "name": "loading",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
           "name": "loadingKey",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "responsive",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
@@ -23991,6 +24015,18 @@
           "required": false
         },
         {
+          "name": "disabled",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "disabledKeys",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
           "name": "href",
           "type": "vue-source",
           "default": "vue-baseline",
@@ -24003,7 +24039,19 @@
           "required": false
         },
         {
+          "name": "loading",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
           "name": "loadingKey",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "responsive",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
