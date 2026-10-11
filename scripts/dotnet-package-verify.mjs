@@ -11,10 +11,21 @@ import {
 } from './avalonia-stable-readiness-lib.mjs'
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
+const dotnetRoot = path.join(root, 'dotnet')
+const solution = path.join(dotnetRoot, 'FsusUI.Avalonia.slnx')
 const nugetRoot = path.join(root, 'dotnet/artifacts/nuget')
 const manifestPath = path.join(root, 'dotnet/artifacts/package/manifest.json')
 const run = (command, args) =>
-  execFileSync(command, args, { cwd: root, stdio: 'inherit' })
+  execFileSync(command, args, {
+    cwd: command === 'dotnet' ? dotnetRoot : root,
+    stdio: 'inherit',
+  })
+
+const dotnetSdk = execFileSync('dotnet', ['--version'], {
+  cwd: dotnetRoot,
+  encoding: 'utf8',
+}).trim()
+console.log(`[dotnet-package] sdk=${dotnetSdk} global-json=dotnet/global.json`)
 
 fs.rmSync(nugetRoot, { recursive: true, force: true })
 fs.rmSync(path.dirname(manifestPath), { recursive: true, force: true })
@@ -27,22 +38,16 @@ const alignmentArtifact = fs.readFileSync(
   path.join(root, '.tmp/conformance-v2/alignment.json'),
 )
 
-run('dotnet', ['restore', 'dotnet/FsusUI.Avalonia.slnx'])
-run('dotnet', [
-  'build',
-  'dotnet/FsusUI.Avalonia.slnx',
-  '--no-restore',
-  '--configuration',
-  'Release',
-])
+run('dotnet', ['restore', solution, '--locked-mode'])
+run('dotnet', ['build', solution, '--no-restore', '--configuration', 'Release'])
 run('dotnet', [
   'pack',
-  'dotnet/FsusUI.Avalonia.slnx',
+  solution,
   '--no-build',
   '--configuration',
   'Release',
   '-o',
-  'dotnet/artifacts/nuget',
+  nugetRoot,
 ])
 run(process.execPath, ['scripts/check-nuget-metadata.mjs'])
 run(process.execPath, ['scripts/check-avalonia-aot-remediation-contract.mjs'])
@@ -73,6 +78,7 @@ const manifest = {
   schemaVersion: 1,
   kind: 'dotnet-package-candidate',
   canonicalPlatform: 'linux',
+  dotnetSdk,
   commitSha:
     process.env.GITHUB_SHA ??
     execFileSync('git', ['rev-parse', 'HEAD'], {

@@ -29,18 +29,28 @@ function projects(directory, output = []) {
 }
 
 const projectPaths = projects(dotnetRoot).sort()
+const sdk = spawnSync('dotnet', ['--version'], {
+  cwd: dotnetRoot,
+  encoding: 'utf8',
+})
+if (sdk.error || sdk.status !== 0) {
+  console.error(sdk.error?.message ?? sdk.stderr)
+  process.exit(sdk.status || 1)
+}
+console.log(
+  `[dotnet:restore] sdk=${sdk.stdout.trim()} global-json=dotnet/global.json`,
+)
 for (const project of projectPaths) {
-  const relative = path.relative(root, project).split(path.sep).join('/')
-  const args = ['restore', relative]
+  const args = ['restore', project]
   if (mode === '--locked-mode') args.push('--locked-mode')
   console.log(`[dotnet:restore] ${args.join(' ')}`)
   const result = spawnSync('dotnet', args, {
-    cwd: root,
+    cwd: dotnetRoot,
     encoding: 'utf8',
     stdio: 'inherit',
   })
   if (result.error) {
-    console.error(`[dotnet:restore] ${relative}: ${result.error.message}`)
+    console.error(`[dotnet:restore] ${project}: ${result.error.message}`)
     process.exit(1)
   }
   if (result.status !== 0) process.exit(result.status ?? 1)

@@ -8,6 +8,8 @@ import { fileURLToPath } from 'node:url'
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const solution = 'dotnet/FsusUI.Avalonia.slnx'
+const dotnetRoot = path.join(root, 'dotnet')
+const solutionPath = path.join(root, solution)
 const platformNames = { linux: 'linux', win32: 'windows', darwin: 'macos' }
 const platform = platformNames[process.platform]
 if (!platform)
@@ -35,7 +37,7 @@ const resultsRoot = path.join(path.dirname(output), 'test-results')
 
 const run = (args, capture = false) =>
   execFileSync('dotnet', args, {
-    cwd: root,
+    cwd: dotnetRoot,
     encoding: capture ? 'utf8' : undefined,
     stdio: capture ? ['ignore', 'pipe', 'pipe'] : 'inherit',
   })
@@ -67,13 +69,22 @@ for (const file of fingerprintInputs) {
   fingerprint.update('\0')
 }
 
+const dotnetSdk = run(['--version'], true).trim()
+console.log(`[dotnet-platform] sdk=${dotnetSdk} global-json=dotnet/global.json`)
+
 fs.rmSync(path.dirname(output), { recursive: true, force: true })
 fs.mkdirSync(resultsRoot, { recursive: true })
 
-run(['restore', solution, '--disable-parallel', maxCpuCountArgument])
+run([
+  'restore',
+  solutionPath,
+  '--locked-mode',
+  '--disable-parallel',
+  maxCpuCountArgument,
+])
 run([
   'build',
-  solution,
+  solutionPath,
   '--no-restore',
   '--configuration',
   'Release',
@@ -81,7 +92,7 @@ run([
 ])
 run([
   'test',
-  solution,
+  solutionPath,
   '--no-build',
   '--configuration',
   'Release',
@@ -94,7 +105,7 @@ run([
 run([
   'run',
   '--project',
-  'dotnet/FsusUI.Avalonia.Demo/FsusUI.Avalonia.Demo.csproj',
+  path.join(dotnetRoot, 'FsusUI.Avalonia.Demo/FsusUI.Avalonia.Demo.csproj'),
   '--no-build',
   '--configuration',
   'Release',
@@ -142,7 +153,7 @@ const manifest = {
   platform,
   os: `${os.type()} ${os.release()}`,
   architecture: process.arch,
-  dotnetSdk: run(['--version'], true).trim(),
+  dotnetSdk,
   dotnetRuntimes: runtimes,
   commitSha: gitSha,
   solution,
