@@ -1882,6 +1882,7 @@ export type {
   MarkdownEditorSessionLastValidRender,
   MarkdownEditorSessionResourceUsage,
   MarkdownEditorSessionRestoreProof,
+  MarkdownEditorSessionRenderRestoreProof,
   MarkdownEditorSessionSnapshot,
 } from './markdown-editor-session'
 

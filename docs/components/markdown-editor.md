@@ -675,3 +675,24 @@ Consumers may pass expected original document identity/epoch/revision as the sec
 checkpoint mutation; stale mounted binding therefore preserves the prior snapshot.
 This supplements the post-digest actual-owner checks, without trusting registry
 identity as a substitute for reading the mounted original editor.
+
+
+The public `restoreLastValidRender(capture, expected)` delegates to the existing
+full-document mounted renderer's real retained projection restoration. It checks
+the original document epoch/revision and renderer instance across the await.
+Segmented/embed projections and replaced/busy owners fail closed. This operation
+does not restore the complete workspace snapshot or prove resource quiescence.
+The exact upstream renderer offer is UI916 `21c9e8769c005ffbc1fbd0a09a7ccc463211984e`;
+its measured source census remains `complete:false` and its participant remains
+excluded. Its A/B/C source review and all runtime qualification are still held.
+
+Language/search now consumes the reviewed UI917 final offer
+`e37960672df85705793d6534ed4c7c076b4a0f86`, including real runner buffer custody
+and cancellation checks. Its participant remains non-recoverable. The attachment
+participant is excluded pending original owner settlement/admission repairs.
+An `upload-image` event has no service future and cannot prove settlement.
+External command observation is monotonic for this instance: command prop
+replacement, abort or Promise settlement does not prove opaque resource release.
+The original default command implementation functions are validated as well as
+object identity. Deferred selection restoration rechecks its owner after focus.
+All incoming source cases and owning session cases remain UNRUN here.

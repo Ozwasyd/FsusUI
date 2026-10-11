@@ -55,11 +55,21 @@ export interface MarkdownEditorSessionRestoreProof {
   readonly reason: string | null
 }
 
+export interface MarkdownEditorSessionRenderRestoreProof {
+  readonly ref: string
+  readonly status: 'restored' | 'blocked'
+  readonly reason: string | null
+}
+
 export interface MarkdownEditorSession {
   readonly editorSessionRef: string
   inspectCapabilities(): MarkdownEditorSessionCapabilities
   inspectResourceParticipants(): MarkdownEditorSessionResourceCensus
   captureLastValidRender(): MarkdownEditorSessionLastValidRender | null
+  restoreLastValidRender(render: MarkdownEditorSessionLastValidRender, expected: {
+    readonly documentIdentity: MarkdownEditorDocumentIdentity
+    readonly revision: number
+  }): Promise<MarkdownEditorSessionRenderRestoreProof>
   captureSnapshot(digestSource: (source: string) => string, expected?: {
     readonly documentIdentity: MarkdownEditorDocumentIdentity
     readonly revision: number
@@ -87,6 +97,7 @@ export interface MarkdownEditorSessionOwner<ViewState> {
   readonly restoreViewState: (state: ViewState) => void
   readonly resourceParticipants: () => readonly MarkdownEditorSessionResourceParticipant[]
   readonly captureLastValidRender: () => MarkdownEditorSessionLastValidRender | null
+  readonly restoreLastValidRender?: (ref: string) => Promise<MarkdownEditorSessionRenderRestoreProof>
 }
 
 const capabilities: MarkdownEditorSessionCapabilities = Object.freeze({
@@ -161,6 +172,37 @@ export const createMarkdownEditorSessionBinding = <ViewState>(
         inspectCapabilities,
         inspectResourceParticipants: () => { assertAvailable(); return resources.inspectParticipants() },
         captureLastValidRender,
+        async restoreLastValidRender(render: MarkdownEditorSessionLastValidRender, expected: {
+          readonly documentIdentity: MarkdownEditorDocumentIdentity
+          readonly revision: number
+        }): Promise<MarkdownEditorSessionRenderRestoreProof> {
+          assertAvailable()
+          const renderRef = render.ref
+          const renderContext = Object.freeze({ id: render.documentIdentity.id, epoch: render.documentIdentity.epoch, revision: render.revision })
+          const expectedContext = Object.freeze({ id: expected.documentIdentity.id, epoch: expected.documentIdentity.epoch, revision: expected.revision })
+          const blocked = (reason: string): MarkdownEditorSessionRenderRestoreProof =>
+            Object.freeze({ ref: renderRef, status: 'blocked', reason })
+          const isCurrent = () => {
+            const store = owner.transactionStore
+            return store.documentIdentity.id === expectedContext.id &&
+              store.documentIdentity.epoch === expectedContext.epoch &&
+              store.revision === expectedContext.revision &&
+              renderContext.id === expectedContext.id &&
+              renderContext.epoch === expectedContext.epoch &&
+              renderContext.revision === expectedContext.revision
+          }
+          if (capturing || !isCurrent()) return blocked('editor-session-render-context-mismatch')
+          const current = captureLastValidRender()
+          if (!current || current.ref !== renderRef)
+            return blocked('editor-session-render-checkpoint-custody-invalid')
+          if (!owner.restoreLastValidRender)
+            return blocked('editor-session-render-restoration-owner-unavailable')
+          const proof = await owner.restoreLastValidRender(renderRef)
+          assertAvailable()
+          if (!isCurrent() || proof.ref !== renderRef)
+            return blocked('editor-session-render-restore-stale')
+          return proof
+        },
         captureSnapshot(digestSource: (source: string) => string, expected?: {
           readonly documentIdentity: MarkdownEditorDocumentIdentity
           readonly revision: number

@@ -4948,6 +4948,7 @@ const searchReplaceInputRef = ref<HTMLInputElement | null>(null)
 const previewRendererRef = ref<HTMLElement | {
   $el?: HTMLElement
   captureLastValidRender?: () => MarkdownRendererLastValidRender | null
+  restoreLastValidRender?: (ref: string) => Promise<{ readonly ref: string; readonly status: 'restored' | 'blocked'; readonly reason: string | null }>
 } | null>(null)
 
 const searchHighlights = computed(() =>
@@ -6188,6 +6189,18 @@ const sessionBinding = createMarkdownEditorSessionBinding({
       }),
       revision: capture.revision,
     })
+  },
+  restoreLastValidRender: async (ref) => {
+    const renderer = previewRendererRef.value
+    const blocked = (reason: string) => Object.freeze({ ref, status: 'blocked' as const, reason })
+    if (embedRenderSegments.value.length > 1 || !renderer ||
+      !('restoreLastValidRender' in renderer) ||
+      typeof renderer.restoreLastValidRender !== 'function')
+      return blocked('editor-session-full-renderer-restoration-owner-unavailable')
+    const proof = await renderer.restoreLastValidRender(ref)
+    if (previewRendererRef.value !== renderer || embedRenderSegments.value.length > 1)
+      return blocked('editor-session-renderer-owner-replaced')
+    return proof
   },
   captureViewState: () => ({
     mode: currentMode.value,
