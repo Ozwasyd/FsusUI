@@ -1,6 +1,24 @@
 @use 'mixins/mixins' as *;
 @use 'common/var' as *;
 
+// One owner for the existing prose metrics and opt-in typography baseline.
+@mixin markdown-editor-prose-typography($system-only: false) {
+  width: min(100%, 74ch);
+  @if $system-only {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  } @else {
+    font-family:
+      getCssVar('font-family'),
+      -apple-system,
+      BlinkMacSystemFont,
+      'Segoe UI',
+      sans-serif;
+  }
+  font-size: 18px;
+  line-height: 1.84;
+  letter-spacing: 0;
+}
+
 @include b(markdown-editor) {
   position: relative;
   display: grid;
@@ -546,8 +564,8 @@
     }
 
     @include e(textarea) {
+      @include markdown-editor-prose-typography;
       justify-self: center;
-      width: min(100%, 74ch);
       min-height: clamp(
         30rem,
         calc(var(--el-markdown-editor-visual-viewport-height, 100vh) - 18rem),
@@ -556,15 +574,6 @@
       padding: clamp(1.35rem, 3vw, 2.75rem) clamp(1.1rem, 4vw, 3rem);
       resize: vertical;
       background: getCssVar('fill-color', 'blank');
-      font-family:
-        getCssVar('font-family'),
-        -apple-system,
-        BlinkMacSystemFont,
-        'Segoe UI',
-        sans-serif;
-      font-size: 18px;
-      line-height: 1.84;
-      letter-spacing: 0;
       caret-color: var(--fsus-state-focus-border);
       transition:
         background-color getCssVar('transition-duration-fast') ease,
@@ -584,8 +593,8 @@
     }
 
     @include e(focus-layer) {
+      @include markdown-editor-prose-typography;
       justify-self: center;
-      width: min(100%, 74ch);
       min-height: clamp(
         30rem,
         calc(var(--el-markdown-editor-visual-viewport-height, 100vh) - 18rem),
@@ -593,15 +602,6 @@
       );
       padding: clamp(1.35rem, 3vw, 2.75rem) clamp(1.1rem, 4vw, 3rem);
       background: getCssVar('fill-color', 'blank');
-      font-family:
-        getCssVar('font-family'),
-        -apple-system,
-        BlinkMacSystemFont,
-        'Segoe UI',
-        sans-serif;
-      font-size: 18px;
-      line-height: 1.84;
-      letter-spacing: 0;
     }
 
     @include e(preview) {
@@ -612,6 +612,23 @@
     @include e(status) {
       gap: 8px 14px;
       background: getCssVar('bg-color');
+    }
+  }
+
+  @include when(typography-baseline) {
+    @include e(textarea) {
+      @include markdown-editor-prose-typography(true);
+      justify-self: center;
+    }
+
+    @include e(focus-layer) {
+      @include markdown-editor-prose-typography(true);
+      justify-self: center;
+    }
+
+    @include e(preview) {
+      @include markdown-editor-prose-typography(true);
+      justify-self: center;
     }
   }
 

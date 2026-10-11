@@ -461,6 +461,11 @@ focus, scroll, or history.
 The Focus layer is an `aria-hidden` presentation; the textarea remains the sole owner of input,
 selection, clipboard, focus, and IME. Neither writing aid modifies Markdown source or history.
 
+The optional [public typography catalog and apply/reflow API](../api/markdown-editor-typography.md)
+uses a closed profile and identity/revision-bound request in this same editor.
+The `applyTypography` Promise and `typography-result` event distinguish actual
+settle from refusal/interruption; they do not store preferences or issue receipts.
+
 ## Attributes
 
 | 属性名            | 说明                                        | 类型                                      | 默认值   |
@@ -474,6 +479,7 @@ selection, clipboard, focus, and IME. Neither writing aid modifies Markdown sour
 | writing-aids      | prose focus 与 typewriter opt-in             | `MarkdownEditorWritingAidsOptions`        | —        |
 | focus-exemptions  | Focus mode 中保持清晰的 source node 状态     | `MarkdownEditorFocusExemptions`          | —        |
 | editor-profile    | markdown 或 prose 写作表面                   | `'markdown' \| 'prose'`                  | markdown |
+| typography        | guarded authoring typography request         | `MarkdownEditorTypographyRequest`         | —        |
 | readonly          | Read-only; blocks input and mutation methods     | `boolean`                                 | `false`  |
 | disabled          | 禁用输入与全部 mutation method              | `boolean`                                 | `false`  |
 | loading           | 标记 busy 并冻结输入与全部 mutation method  | `boolean`                                 | `false`  |

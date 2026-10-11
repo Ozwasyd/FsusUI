@@ -40,6 +40,11 @@ frame N
 
 ## Boundaries
 
+- [Typography apply/reflow](./markdown-editor-typography.md) submits its bounded
+  capture, class commit, native anchor measurement, original viewport restore
+  and later-frame readback to this same scheduler. The public Promise does not
+  expose scheduler handles or mistake a layout plan for an acknowledgement.
+
 - Projection/render pipeline work (parser, WASM projection, worker commits)
   and the generic shared virtual-window hook keep their existing render
   scheduling; they do not join the frame scheduler and are not forced into

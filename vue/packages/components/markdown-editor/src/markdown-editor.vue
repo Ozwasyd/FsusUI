@@ -13,6 +13,7 @@
       ns.is('commands-expanded', commandsExpanded),
       ns.is('focus-mode', writingAidsFocusState.enabled),
       ns.is('typewriter-mode', resolvedWritingAids.typewriter),
+      ns.is('typography-baseline', activeTypography !== null),
     ]"
     role="region"
     tabindex="-1"
@@ -1321,6 +1322,9 @@ import {
 } from './markdown-editor-outline'
 import { planMarkdownOutlineReveal } from './markdown-editor-outline-active'
 import {
+  captureMarkdownLiveLayoutAnchor,
+  createMarkdownLiveLayoutTextMeasurement,
+  measureMarkdownLiveLayoutTextMetrics,
   resolveMarkdownLiveLayoutStability,
   resolveMarkdownLiveVirtualWindow,
   type MarkdownLiveLayoutGesture,
@@ -1328,6 +1332,16 @@ import {
   type MarkdownLiveLayoutTrigger,
   type MarkdownLiveVirtualWindow,
 } from './markdown-editor-live-layout'
+import {
+  MARKDOWN_EDITOR_TYPOGRAPHY_CATALOG,
+  readMarkdownEditorTypographyRequest,
+  resolveMarkdownEditorTypography,
+  type MarkdownEditorTypographyEffective,
+  type MarkdownEditorTypographyProfile,
+  type MarkdownEditorTypographyRejection,
+  type MarkdownEditorTypographyRequest,
+  type MarkdownEditorTypographyResult,
+} from './markdown-editor-typography'
 import {
   planMarkdownTableAlignColumn,
   planMarkdownTableDeleteColumn,
@@ -1856,6 +1870,19 @@ const atomicActionNodes = computed(() => {
     .map((plan) => ({ id: plan.nodeId, kind: plan.kind }))
 })
 const layoutGesture = ref<MarkdownLiveLayoutGesture | null>(null)
+const activeTypography = ref<MarkdownEditorTypographyProfile | null>(null)
+let typographyDisposed = false
+let pendingTypography: {
+  cancel: (reason: MarkdownEditorTypographyRejection) => void
+} | null = null
+const typographyMeasurements = new Set<HTMLElement>()
+const clearTypographyMeasurements = () => {
+  for (const element of typographyMeasurements) element.remove()
+  typographyMeasurements.clear()
+}
+const cancelTypography = (reason: MarkdownEditorTypographyRejection) => {
+  pendingTypography?.cancel(reason)
+}
 const liveWindow = ref<MarkdownLiveVirtualWindow | null>(null)
 const liveLayout = ref<MarkdownLiveLayoutPlan>(
   resolveMarkdownLiveLayoutStability({
@@ -1883,7 +1910,16 @@ const liveDecorations = computed(() => {
   const mounted = new Set(liveWindow.value.mountedNodeIds)
   return decorations.filter((decoration) => mounted.has(decoration.nodeId))
 })
-const restoreTextareaViewport = (plan: MarkdownLiveLayoutPlan) => {
+const restoreTextareaViewport = (
+  plan: MarkdownLiveLayoutPlan,
+  continuity?: {
+    readonly viewportOffset: number
+    readonly anchorY: () => number | null
+    readonly guard: () => boolean
+    readonly settled: () => void
+    readonly unavailable: () => void
+  },
+) => {
   const textarea = textareaRef.value
   if (!textarea || plan.action !== 'restore' || !plan.anchor) return
   const anchor = plan.anchor
@@ -1892,12 +1928,27 @@ const restoreTextareaViewport = (plan: MarkdownLiveLayoutPlan) => {
   frameScheduler.schedule({
     // Same-frame supersede: a newer layout plan (or a user gesture yield)
     // replaces or cancels this restore before the frame commits it.
-    guard: () => liveLayout.value === plan,
+    guard: () =>
+      liveLayout.value === plan && (!continuity || continuity.guard()),
     key: 'viewport-restore',
     measure: () => {
       const target = textareaRef.value
       if (!target) {
         viewportRestoreNextScrollTop = null
+        return
+      }
+      if (continuity) {
+        const y = continuity.anchorY()
+        if (y === null) {
+          viewportRestoreNextScrollTop = null
+          continuity.unavailable()
+          return
+        }
+        viewportRestoreNextScrollTop = Math.min(
+          Math.max(0, y - continuity.viewportOffset),
+          Math.max(0, target.scrollHeight - target.clientHeight),
+        )
+        viewportRestoreCurrentScrollTop = target.scrollTop
         return
       }
       const lineHeight =
@@ -1927,7 +1978,309 @@ const restoreTextareaViewport = (plan: MarkdownLiveLayoutPlan) => {
         restoringViewport = false
       })
     },
+    postPaint: continuity?.settled,
   })
+}
+
+/** One bounded reflow submitted to the editor's existing scheduler/anchor owner. */
+const applyTypography = (
+  input: MarkdownEditorTypographyRequest,
+): Promise<MarkdownEditorTypographyResult> => {
+  const request = readMarkdownEditorTypographyRequest(input)
+  const rejected = (
+    reason: MarkdownEditorTypographyRejection,
+  ): MarkdownEditorTypographyResult => {
+    const result = Object.freeze({
+      status: 'rejected' as const,
+      requestId: request?.requestId ?? null,
+      reason,
+      visualCommitted: false,
+      settle: 'not-applied' as const,
+      effective: null,
+    })
+    emit('typography-result', result)
+    return result
+  }
+  if (!request) return Promise.resolve(rejected('invalid-request'))
+  const resolution = resolveMarkdownEditorTypography(request.profile)
+  if (resolution.status !== 'supported')
+    return Promise.resolve(rejected('unsupported-profile'))
+  if (typographyDisposed) return Promise.resolve(rejected('disposed'))
+  if (
+    request.expectedDocumentIdentity.id !==
+      transactionStore.documentIdentity.id ||
+    request.expectedDocumentIdentity.epoch !==
+      transactionStore.documentIdentity.epoch
+  )
+    return Promise.resolve(rejected('stale-document'))
+  if (request.expectedRevision !== transactionStore.revision)
+    return Promise.resolve(rejected('stale-revision'))
+  if (isComposing.value) return Promise.resolve(rejected('composition-active'))
+  if (
+    layoutGesture.value ||
+    writingAidsState.value === 'selection-drag-suspended'
+  )
+    return Promise.resolve(rejected('user-scroll'))
+  const textarea = textareaRef.value
+  if (
+    !textarea ||
+    currentMode.value === 'preview' ||
+    !textarea.isConnected ||
+    textarea.ownerDocument.visibilityState === 'hidden'
+  )
+    return Promise.resolve(rejected('surface-unavailable'))
+  if (textarea.ownerDocument.fonts?.status === 'loading')
+    return Promise.resolve(rejected('font-loading'))
+
+  cancelTypography('superseded')
+  const identity = Object.freeze({ ...transactionStore.documentIdentity })
+  const revision = transactionStore.revision
+  const source = transactionStore.value
+  const selection = Object.freeze({ ...transactionStore.selection })
+  const history = transactionStore.history
+  const mode = currentMode.value
+  const anchor = captureMarkdownLiveLayoutAnchor({
+    documentIdentity: identity,
+    projection: editorProjection.value,
+    revision,
+    selection,
+    source,
+  })
+  const plan = resolveMarkdownLiveLayoutStability({
+    documentIdentity: identity,
+    currentIdentity: transactionStore.documentIdentity,
+    expectedRevision: revision,
+    revision,
+    selection,
+    source,
+    previousAnchor: anchor,
+    projection: editorProjection.value,
+    reducedMotion: reducedMotionRequested(),
+    trigger: 'typography',
+  })
+  const keys = [
+    'typography-capture',
+    'typography-apply',
+    'typography-metrics',
+    'typography-verify',
+  ] as const
+  let committed = false
+  let done = false
+  let viewportOffset = 0
+  let effective: MarkdownEditorTypographyEffective | null = null
+  let measurement: ReturnType<
+    typeof createMarkdownLiveLayoutTextMeasurement
+  > | null = null
+  let metrics: ReturnType<typeof measureMarkdownLiveLayoutTextMetrics> = null
+  let resolveResult:
+    | ((result: MarkdownEditorTypographyResult) => void)
+    | undefined
+  const promise = new Promise<MarkdownEditorTypographyResult>((resolve) => {
+    resolveResult = resolve
+  })
+  const operation = {
+    cancel: (reason: MarkdownEditorTypographyRejection) =>
+      finish(
+        Object.freeze({
+          status: committed ? 'interrupted' : 'rejected',
+          requestId: request.requestId,
+          reason,
+          visualCommitted: committed,
+          settle: committed ? 'incomplete' : 'not-applied',
+          effective,
+        }),
+      ),
+  }
+  const finish = (result: MarkdownEditorTypographyResult) => {
+    if (done) return
+    done = true
+    for (const key of keys) frameScheduler.cancel(key)
+    if (liveLayout.value === plan) frameScheduler.cancel('viewport-restore')
+    if (pendingTypography === operation) pendingTypography = null
+    frameScheduler.scheduleMutate(
+      'typography-cleanup',
+      clearTypographyMeasurements,
+    )
+    resolveResult?.(result)
+    emit('typography-result', result)
+  }
+  const guard = () => {
+    if (done) return false
+    const reason: MarkdownEditorTypographyRejection | null = typographyDisposed
+      ? 'disposed'
+      : transactionStore.documentIdentity.id !== identity.id ||
+          transactionStore.documentIdentity.epoch !== identity.epoch
+        ? 'stale-document'
+        : transactionStore.revision !== revision ||
+            transactionStore.value !== source ||
+            !historiesEqual(transactionStore.history, history)
+          ? 'stale-revision'
+          : transactionStore.selection.start !== selection.start ||
+              transactionStore.selection.end !== selection.end ||
+              transactionStore.selection.direction !== selection.direction
+            ? 'selection-changed'
+            : textarea.value !== source
+              ? 'stale-revision'
+              : isComposing.value
+                ? 'composition-active'
+                : textarea.ownerDocument.fonts?.status === 'loading'
+                  ? 'font-loading'
+                  : layoutGesture.value ||
+                      writingAidsState.value === 'selection-drag-suspended'
+                    ? 'user-scroll'
+                    : textareaRef.value !== textarea ||
+                        !textarea.isConnected ||
+                        currentMode.value !== mode ||
+                        textarea.ownerDocument.visibilityState === 'hidden'
+                      ? 'surface-unavailable'
+                      : committed && liveLayout.value !== plan
+                        ? 'layout-superseded'
+                        : null
+    if (reason) operation.cancel(reason)
+    return reason === null
+  }
+  pendingTypography = operation
+  // Each next measure is requested from the previous post-paint phase, so
+  // mirror creation, Vue class commits and scroll writes paint before readback.
+  const schedule = (
+    task: Omit<Parameters<typeof frameScheduler.schedule>[0], 'guard'>,
+  ) => {
+    if (!frameScheduler.schedule({ ...task, guard }))
+      operation.cancel('surface-unavailable')
+  }
+  schedule({
+    key: keys[0],
+    measure: () => {
+      metrics = measureMarkdownLiveLayoutTextMetrics(textarea)
+      if (!metrics) operation.cancel('geometry-unavailable')
+    },
+    mutate: () => {
+      if (!metrics) return
+      measurement = createMarkdownLiveLayoutTextMeasurement(
+        textarea.ownerDocument,
+        source,
+        metrics,
+      )
+      typographyMeasurements.add(measurement.element)
+    },
+    postPaint: () =>
+      schedule({
+        key: keys[1],
+        measure: () => {
+          const y = measurement?.anchorY(anchor)
+          if (y == null) {
+            operation.cancel('geometry-unavailable')
+            return
+          }
+          viewportOffset = y - textarea.scrollTop
+        },
+        mutate: () => {
+          measurement?.element.remove()
+          if (measurement) typographyMeasurements.delete(measurement.element)
+          measurement = null
+          liveLayout.value = plan
+          // Supersede older automatic positioning before changing this same surface.
+          frameScheduler.cancel('viewport-restore')
+          activeTypography.value = resolution.profile
+          committed = true
+        },
+        postPaint: () =>
+          schedule({
+            key: keys[2],
+            measure: () => {
+              metrics = measureMarkdownLiveLayoutTextMetrics(textarea)
+              const style =
+                textarea.ownerDocument.defaultView?.getComputedStyle(textarea)
+              const fontSizePx = Number.parseFloat(style?.fontSize ?? '')
+              const lineHeightPx = Number.parseFloat(style?.lineHeight ?? '')
+              const family = style?.fontFamily
+                .replace(/["']/g, '')
+                .replace(/\s+/g, ' ')
+                .toLowerCase()
+              if (
+                !metrics ||
+                !style ||
+                style.writingMode !== 'horizontal-tb' ||
+                !Number.isFinite(fontSizePx) ||
+                fontSizePx <= 0 ||
+                !Number.isFinite(lineHeightPx) ||
+                lineHeightPx <= 0 ||
+                family !==
+                  '-apple-system, blinkmacsystemfont, segoe ui, sans-serif'
+              ) {
+                operation.cancel('geometry-unavailable')
+                return
+              }
+              effective = Object.freeze({
+                mappingVersion:
+                  MARKDOWN_EDITOR_TYPOGRAPHY_CATALOG.mappingVersion,
+                profile: resolution.profile,
+                contractId: resolution.contractId,
+                fontSizePx,
+                lineHeightPx,
+                canvasWidthPx: textarea.clientWidth,
+                paragraphSpacing: 'source-blank-lines',
+                font: Object.freeze({
+                  identity: 'system-sans.v1',
+                  kind: 'system',
+                  state: 'current',
+                  computedFamily: style.fontFamily,
+                  faceEvidence: 'not-collected',
+                  networkPolicy: 'no-font-loader',
+                }),
+              })
+            },
+            mutate: () => {
+              if (!metrics) return
+              measurement = createMarkdownLiveLayoutTextMeasurement(
+                textarea.ownerDocument,
+                source,
+                metrics,
+              )
+              typographyMeasurements.add(measurement.element)
+            },
+            postPaint: () => {
+              restoreTextareaViewport(plan, {
+                anchorY: () => measurement?.anchorY(anchor) ?? null,
+                guard,
+                viewportOffset,
+                unavailable: () => operation.cancel('geometry-unavailable'),
+                settled: () =>
+                  schedule({
+                    key: keys[3],
+                    measure: () => {
+                      const y = measurement?.anchorY(anchor)
+                      const offset = y == null ? null : y - textarea.scrollTop
+                      if (
+                        offset === null ||
+                        Math.abs(offset - viewportOffset) > 1 ||
+                        !effective
+                      ) {
+                        operation.cancel('geometry-unavailable')
+                        return
+                      }
+                      finish(
+                        Object.freeze({
+                          status: 'applied',
+                          requestId: request.requestId,
+                          documentIdentity: identity,
+                          revision,
+                          selection,
+                          anchor,
+                          effective,
+                          settle: 'restored-after-frame',
+                          viewportOffsetBefore: viewportOffset,
+                          viewportOffsetAfter: offset,
+                        }),
+                      )
+                    },
+                  }),
+              })
+            },
+          }),
+      }),
+  })
+  return promise
 }
 const applyLiveLayout = (
   trigger: MarkdownLiveLayoutTrigger,
@@ -1936,6 +2289,7 @@ const applyLiveLayout = (
     readonly reducedMotion?: boolean
   } = {},
 ) => {
+  if (trigger !== 'typography') cancelTypography('layout-superseded')
   const plan = resolveMarkdownLiveLayoutStability({
     composing: isComposing.value,
     documentIdentity,
@@ -1976,6 +2330,7 @@ const refreshLiveWindow = (
   })
 }
 const markLayoutGesture = (gesture: MarkdownLiveLayoutGesture) => {
+  cancelTypography('user-scroll')
   layoutGesture.value = gesture
   applyLiveLayout('block-height-change', { gesture })
   if (layoutGestureTimer) clearTimeout(layoutGestureTimer)
@@ -1989,6 +2344,7 @@ const suspendTypewriterForUserScroll = () => {
   writingAidsState.value = writingAidsController.state
 }
 const settleTypewriterLayout = () => {
+  if (pendingTypography) return
   if (typewriterLayoutFrame !== undefined) {
     cancelAnimationFrame(typewriterLayoutFrame)
   }
@@ -2096,7 +2452,12 @@ const sourceAnchorY = (textarea: HTMLTextAreaElement, lineHeight: number) => {
 const applyTypewriterScroll = (
   trigger: 'input' | 'explicit-navigation' | 'async-layout' = 'input',
 ) => {
-  if (!resolvedWritingAids.value.typewriter || isComposing.value) return
+  if (
+    !resolvedWritingAids.value.typewriter ||
+    isComposing.value ||
+    pendingTypography
+  )
+    return
   const textarea = textareaRef.value
   if (!textarea) return
   const response =
@@ -2699,6 +3060,7 @@ const dispatchReplacement = (
 watch(
   [() => props.mode, () => props.defaultMode, () => props.mobileLayout],
   ([mode, defaultMode]) => {
+    cancelTypography('surface-unavailable')
     transactionStore.breakMergeGroup()
     currentMode.value = normalizeModeForLayout(mode ?? defaultMode)
     refreshWritingAidsDocument()
@@ -2716,6 +3078,7 @@ watch(
   (value) => {
     if (value === transactionStore.value) return
 
+    cancelTypography('stale-revision')
     abortPendingCommands()
     // Document switch: pending frame tasks from the previous document must
     // not commit geometry into the new document (#640 stale cancellation).
@@ -3491,6 +3854,7 @@ watch(
     if (nextId === previousId && nextEpoch === previousEpoch) return
 
     const previousHistory = transactionStore.history
+    cancelTypography('stale-document')
     abortPendingCommands()
     commandPaletteOpen.value = false
     contextualSurface.value = null
@@ -3640,9 +4004,14 @@ onMounted(() => {
   window.visualViewport?.addEventListener('resize', updateVisualViewportHeight)
   window.visualViewport?.addEventListener('scroll', updateVisualViewportHeight)
   window.addEventListener('resize', updateVisualViewportHeight)
+  document.addEventListener('visibilitychange', handleTypographyVisibility)
+  if (props.typography) void applyTypography(props.typography)
 })
 
 onBeforeUnmount(() => {
+  typographyDisposed = true
+  cancelTypography('disposed')
+  clearTypographyMeasurements()
   languageToolsController = null
   abortPendingCommands()
   attachmentCaptureSession.clear()
@@ -3674,7 +4043,21 @@ onBeforeUnmount(() => {
     updateVisualViewportHeight,
   )
   window.removeEventListener('resize', updateVisualViewportHeight)
+  document.removeEventListener('visibilitychange', handleTypographyVisibility)
 })
+
+const handleTypographyVisibility = () => {
+  if (document.visibilityState === 'hidden')
+    cancelTypography('surface-unavailable')
+}
+watch(
+  () => props.typography,
+  (request) => {
+    if (request) void applyTypography(request)
+    else cancelTypography('superseded')
+  },
+  { flush: 'post' },
+)
 
 watch(
   () => props.writingAids?.typewriter,
@@ -3794,6 +4177,7 @@ const handleInput = (event: Event) => {
 }
 
 const handleCompositionStart = (event: CompositionEvent) => {
+  cancelTypography('composition-active')
   const target = event.target
   nativeCompositionValue.value =
     target instanceof HTMLTextAreaElement ? target.value : transactionStore.value
@@ -4101,6 +4485,7 @@ const handleSelectionMove = () => {
 
 const handleSelectionDragStart = () => {
   if (isComposing.value) return
+  cancelTypography('user-scroll')
   typewriterScrollTarget = null
   writingAidsController.handleSelectionDragStart()
   writingAidsState.value = writingAidsController.state
@@ -6065,6 +6450,7 @@ const revealSourceRange = (
 }
 
 defineExpose({
+  applyTypography,
   closeSearch,
   closeCommandPalette,
   applyAttachmentResult,
