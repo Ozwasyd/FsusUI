@@ -391,7 +391,11 @@ The composed producer also preserves actual preparation authority, settles
 registered tasks when admission raises an exception, retains late/failed handler
 cleanup ownership and closes admission before disposal callbacks. Independent
 review of these source repairs and the consumer association correction remains
-pending. The source offer preserves the cleanup dependencies and
+pending. The composed shared-pump repair keeps task-owned exceptions with the
+actual failing request and reports pool failures without attributing them to a
+different editor's caller. Retained cleanup and error reporting do not establish
+successful settlement delivery, recovery or complete qualification. Independent
+review of this increment remains pending. The source offer preserves the cleanup dependencies and
 continues to refuse complete participant operations. This conditional consumer
 guard does not establish that the renderer had a reproducible restore bypass.
 
