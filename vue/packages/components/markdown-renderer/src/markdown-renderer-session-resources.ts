@@ -75,14 +75,34 @@ export const inspectMarkdownRendererWorkerCleanupResidue = (
     ),
   })
 
+// Optional registration fields describe native knowledge, not handle counts.
+// A missing legacy field is unavailable, never evidence of no registration.
+export const hasUnavailableMarkdownRendererWorkerListenerRegistration = (
+  pipeline: FsusRenderPipelineRuntimeResourceInspection,
+) => {
+  const unavailable = (
+    registration: 'none' | 'registered' | 'unknown' | undefined,
+  ) => registration !== 'none' && registration !== 'registered'
+  return (
+    pipeline.workerResources.scopes.some(({ inspection }) =>
+      inspection.tasks.some((task) =>
+        unavailable(task.abortListenerRegistration),
+      ),
+    ) ||
+    pipeline.workerResources.pools.some(({ shared }) =>
+      unavailable(shared.visibilityListenerRegistration),
+    )
+  )
+}
+
 // Preserve the remaining real source gaps; available hook counts are exposed
 // separately and never turn opaque adapter/worker/platform state into zero.
 export const markdownRendererSessionSourceDependencies = Object.freeze([
   'markdown-runtime:activation-and-gateway-loader-import-network-census',
   'renderer:validated-snapshot-restoration-after-disposal',
   'heavy-feature-runtime:timer-and-network-cancellation-authority',
-  // Quarantine is source-reviewed; the worker-owner reentrant admission repair
-  // is composed, but its independent review/qualification remains pending.
+  // Quarantine is source-reviewed; the worker-owner synchronous lifecycle
+  // repairs are composed, but independent review/qualification remains pending.
   'render-pipeline-worker:reentrant-enqueue-disposal-cleanup',
 ] as const)
 
@@ -271,6 +291,11 @@ export const createMarkdownRendererSessionResourceOwner = (options: {
     const missingSourceDependencies: string[] = [
       ...markdownRendererSessionSourceDependencies,
     ]
+    if (hasUnavailableMarkdownRendererWorkerListenerRegistration(pipeline)) {
+      missingSourceDependencies.push(
+        'render-pipeline-worker:listener-native-registration-unknown-or-unavailable',
+      )
+    }
     if (
       workerCleanupResidue.ownedScopes.length > 0 ||
       workerCleanupResidue.poolContext.length > 0
@@ -369,6 +394,17 @@ export const createMarkdownRendererSessionResourceOwner = (options: {
             ({ shared }) => shared.attribution,
           ),
         ),
+        // Preserve unknown and absent optional fields verbatim, not as zero.
+        workerAbortListenerRegistration: Object.freeze(
+          workerScopes.flatMap((scope) =>
+            scope.tasks.map((task) => task.abortListenerRegistration),
+          ),
+        ),
+        workerVisibilityListenerRegistration: Object.freeze(
+          pipeline.workerResources.pools.map(
+            ({ shared }) => shared.visibilityListenerRegistration,
+          ),
+        ),
       }),
       // No aggregate-shaped network zero is emitted when this field is unknown.
       knownNetworkRequests,
@@ -420,7 +456,12 @@ export const createMarkdownRendererSessionResourceOwner = (options: {
             viewport.pendingMeasurements +
             heavy.usage.tasks +
             workerScopes.reduce(
-              (count, scope) => count + scope.tasks.length,
+              (count, scope) =>
+                count +
+                scope.tasks.filter(
+                  (task) =>
+                    task.promiseState === 'pending' || task.workerId !== null,
+                ).length,
               0,
             ),
           // Direct component requests only. The measured heavy count is exposed
