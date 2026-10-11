@@ -5182,6 +5182,11 @@ const attachmentEmbedOwner = createMarkdownAttachmentEmbedResourceOwner({
   attachmentCaptureSession,
   publishEmbedResults: (results) => { embedResults.value = results },
 })
+attachmentEmbedOwner.bindAttachmentInputs({
+  documentIdentity,
+  revision: editorRevision,
+  jobs: attachmentJobs,
+})
 const attachmentResourceParticipant: MarkdownEditorSessionResourceParticipant = {
   ownerRef: 'attachment-embed',
   inspect: () => attachmentEmbedOwner.participant.inspect(),

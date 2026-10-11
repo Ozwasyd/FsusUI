@@ -805,3 +805,23 @@ checkpoint issuer. Search and attachment original owners do not currently expose
 full immutable checkpoint/validation/restore refs. Those original producers must
 supply actual #2294/#2295 panel state before a complete factory refset can exist;
 ref aliases or reconstructed parallel panel state are not used here.
+
+The current attachment source is UI915
+`b1693bdb302714c11a974994246d11e4ca48d8b5`, consumed as an independent upstream
+increment. The sole setup-owned attachmentEmbedOwner now receives exactly one
+bindAttachmentInputs call using the existing reactive documentIdentity, original
+editorRevision ref and original deep attachmentJobs ref. Existing stable batch/item
+Maps remain the owner callbacks. No consumer watcher, copied job queue or second
+attachment owner is introduced. The original abort on unmount stops owner watcher
+lifetimes; original pause/resume delegates remain the sole lifecycle controls.
+
+Actual future dispatch/onProgress/frozen awaited-final provenance and original
+legacy content compatibility remain unchanged. Prior context/proxy/transition P1s
+are root-reported source CLOSED; combined session wiring is still unqualified.
+Failed native watcher stops remain actually owned/counted. Sequential request
+cancellation can stop early on a throwing cleanup while references remain; it is
+not release proof. Reviewed flag stays false and aggregate roster remains excluded
+until genuine consumer resource controls and acceptance exist. The separate public
+attachment892 FileConsumer/capture offer is not fabricated or replaced here; the
+original upload-image event is not renamed. Runtime/list/discovery/mount/native,
+consumer/native heap and eviction qualification all remain UNRUN.
