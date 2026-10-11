@@ -25,12 +25,36 @@ export const validateMarkdownHeavyFeatureFrameContinueMessage = (
 }
 
 export interface MarkdownHeavyFeatureAdapterResources {
+  // Directly owned handles; these counts do not census third-party realms.
   readonly listeners: number
+  readonly networkRequests?: MarkdownHeavyFeatureResourceCount
   readonly observers: number
+  readonly pendingImports?: number
   readonly runtimes: number
+  readonly scheduledContinuations?: number
+  readonly scope?: 'owned-handles'
   readonly subscribe?: (listener: () => void) => () => void
   readonly tasks: number
+  readonly timers?: MarkdownHeavyFeatureResourceCount
 }
+
+export type MarkdownHeavyFeatureResourceCount =
+  | number
+  | 'unknown'
+  | 'unavailable'
+
+export const hasMarkdownHeavyFeatureOwnedResources = (
+  resources: MarkdownHeavyFeatureAdapterResources,
+) =>
+  resources.listeners > 0 ||
+  resources.observers > 0 ||
+  resources.runtimes > 0 ||
+  resources.tasks > 0 ||
+  (resources.pendingImports ?? 0) > 0 ||
+  (resources.scheduledContinuations ?? 0) > 0 ||
+  (typeof resources.timers === 'number' && resources.timers > 0) ||
+  (typeof resources.networkRequests === 'number' &&
+    resources.networkRequests > 0)
 
 export interface MarkdownHeavyFeatureIsolatedRenderRequest {
   readonly cspNonce?: string | null
@@ -169,8 +193,13 @@ export const createMarkdownHeavyFeatureAdapterResourceBridgeInternal = (
   startFeatureLocalWork?.()
   const adapterController = new AbortController()
   let removeLifecycleAbort: (() => void) | null = null
+  let removeAdapterAbort: (() => void) | null = null
+  let removeIsolatedResourceChange: (() => void) | null = null
   let listenerAttached = false
-  let taskActive = false
+  let directTaskPending = false
+  let directRenderStarted = false
+  let runStarted = false
+  let isolatedTeardownCalled = false
   let isolatedHandle: MarkdownHeavyFeatureIsolatedRenderHandle<unknown> | null =
     null
   const resourceChangeListeners = new Set<() => void>()
@@ -187,8 +216,27 @@ export const createMarkdownHeavyFeatureAdapterResourceBridgeInternal = (
   const teardown = () => {
     removeListener()
     adapterController.abort()
-    isolatedHandle?.teardown()
-    isolatedHandle = null
+    removeAdapterAbort?.()
+    removeAdapterAbort = null
+    if (isolatedHandle && !isolatedTeardownCalled) {
+      isolatedTeardownCalled = true
+      isolatedHandle.teardown()
+    }
+    notifyResourceChange()
+  }
+
+  const onIsolatedResourceChange = () => {
+    // Keep the provider reachable after wrapper rejection until its real work
+    // settles (notably an uncancellable dynamic import).
+    if (
+      isolatedTeardownCalled &&
+      isolatedHandle &&
+      !hasMarkdownHeavyFeatureOwnedResources(isolatedHandle.resources())
+    ) {
+      removeIsolatedResourceChange?.()
+      removeIsolatedResourceChange = null
+    }
+    notifyResourceChange()
   }
 
   const run = async <T>(
@@ -196,54 +244,85 @@ export const createMarkdownHeavyFeatureAdapterResourceBridgeInternal = (
     render: (adapterSignal: AbortSignal) => Promise<T>,
     isolatedRequest?: MarkdownHeavyFeatureIsolatedRenderRequest,
   ): Promise<T> => {
-    if (taskActive || adapterController.signal.aborted) throw abortError()
-    taskActive = true
-    const forwardAbort = () => adapterController.abort()
+    if (runStarted || adapterController.signal.aborted) throw abortError()
+    runStarted = true
+    const forwardAbort = teardown
     lifecycleSignal.addEventListener('abort', forwardAbort, { once: true })
     removeLifecycleAbort = () =>
       lifecycleSignal.removeEventListener('abort', forwardAbort)
     listenerAttached = true
     notifyResourceChange()
     if (lifecycleSignal.aborted) forwardAbort()
-    if (adapterController.signal.aborted) {
-      removeListener()
-      taskActive = false
-      throw abortError()
-    }
-
     try {
+      if (adapterController.signal.aborted) throw abortError()
       if (isolatedRequest && renderFactory) {
         const handle = renderFactory<T>(isolatedRequest)
         isolatedHandle =
           handle as MarkdownHeavyFeatureIsolatedRenderHandle<unknown>
+        removeIsolatedResourceChange =
+          handle.resources().subscribe?.(onIsolatedResourceChange) ?? null
         notifyResourceChange()
-        if (adapterController.signal.aborted) handle.teardown()
+        if (adapterController.signal.aborted) teardown()
         return await handle.promise
       }
+      directTaskPending = true
+      notifyResourceChange()
       return await new Promise((resolve, reject) => {
         const rejectAbort = () => reject(abortError())
         adapterController.signal.addEventListener('abort', rejectAbort, {
           once: true,
         })
+        removeAdapterAbort = () =>
+          adapterController.signal.removeEventListener('abort', rejectAbort)
         Promise.resolve()
-          .then(() => render(adapterController.signal))
-          .then(resolve, reject)
-          .finally(() =>
-            adapterController.signal.removeEventListener('abort', rejectAbort),
+          .then(() => {
+            if (adapterController.signal.aborted) throw abortError()
+            directRenderStarted = true
+            notifyResourceChange()
+            return render(adapterController.signal)
+          })
+          .then(
+            (value) => {
+              directTaskPending = false
+              removeAdapterAbort?.()
+              removeAdapterAbort = null
+              notifyResourceChange()
+              resolve(value)
+            },
+            (error: unknown) => {
+              directTaskPending = false
+              removeAdapterAbort?.()
+              removeAdapterAbort = null
+              notifyResourceChange()
+              reject(error)
+            },
           )
       })
     } finally {
       removeListener()
-      taskActive = false
-      isolatedHandle?.teardown()
-      isolatedHandle = null
-      notifyResourceChange()
+      if (isolatedHandle && !isolatedTeardownCalled) {
+        isolatedTeardownCalled = true
+        isolatedHandle.teardown()
+      }
+      onIsolatedResourceChange()
     }
   }
 
   const resources: MarkdownHeavyFeatureAdapterResources = Object.freeze({
+    scope: 'owned-handles',
     get listeners() {
-      return taskActive ? 1 + (isolatedHandle?.resources().listeners ?? 1) : 0
+      return (
+        (listenerAttached ? 1 : 0) +
+        (removeAdapterAbort ? 1 : 0) +
+        (isolatedHandle?.resources().listeners ?? 0)
+      )
+    },
+    get networkRequests() {
+      return directRenderStarted
+        ? 'unknown'
+        : isolatedHandle
+          ? (isolatedHandle.resources().networkRequests ?? 'unknown')
+          : 0
     },
     get observers() {
       return isolatedHandle?.resources().observers ?? 0
@@ -251,12 +330,27 @@ export const createMarkdownHeavyFeatureAdapterResourceBridgeInternal = (
     get runtimes() {
       return isolatedHandle?.resources().runtimes ?? 0
     },
+    get pendingImports() {
+      return isolatedHandle?.resources().pendingImports ?? 0
+    },
+    get scheduledContinuations() {
+      return isolatedHandle?.resources().scheduledContinuations ?? 0
+    },
     subscribe(listener: () => void) {
       resourceChangeListeners.add(listener)
       return () => resourceChangeListeners.delete(listener)
     },
     get tasks() {
-      return taskActive ? 1 : 0
+      return (
+        (directTaskPending ? 1 : 0) + (isolatedHandle?.resources().tasks ?? 0)
+      )
+    },
+    get timers() {
+      return directRenderStarted
+        ? 'unknown'
+        : isolatedHandle
+          ? (isolatedHandle.resources().timers ?? 'unknown')
+          : 0
     },
   })
 
@@ -267,7 +361,7 @@ export const createMarkdownHeavyFeatureAdapterResourceBridgeInternal = (
       Object.freeze({
         aborted: adapterController.signal.aborted,
         listenerAttached,
-        taskActive,
+        taskActive: resources.tasks > 0,
       }),
     teardown,
   })
@@ -288,10 +382,12 @@ export const assertMarkdownHeavyFeatureAdapterResourceBridge = (
     typeof bridge.run !== 'function' ||
     typeof bridge.teardown !== 'function' ||
     !bridge.resources ||
-    !Number.isFinite(bridge.resources.listeners) ||
-    !Number.isFinite(bridge.resources.tasks) ||
-    !Number.isFinite(bridge.resources.observers) ||
-    !Number.isFinite(bridge.resources.runtimes)
+    [
+      bridge.resources.listeners,
+      bridge.resources.tasks,
+      bridge.resources.observers,
+      bridge.resources.runtimes,
+    ].some((count) => !Number.isSafeInteger(count) || count < 0)
   ) {
     throw new Error('markdown_heavy_feature_adapter_resource_invalid')
   }
