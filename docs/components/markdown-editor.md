@@ -545,8 +545,8 @@ IME composition or after unmount is rejected. This is in-memory same-instance
 restoration, not cross-instance hydration, serialization or crash recovery.
 
 `inspectCapabilities()` reports the exact current limitation. The renderer lacks
-a public last-valid-render checkpoint; renderer/projection, frame/observer/viewport,
-language/search and attachment/embed providers lack a complete public resource
+a public last-valid-render checkpoint; renderer/projection,
+language/search, attachment/embed and external command providers lack a complete resource
 census and reversible pause/resume contract. `inspectResources`, `pauseResources`,
 `resumeResources` and `disposeAfterSnapshot` therefore throw before any resource
 release. A valid snapshot is preserved after disposal refusal. Cancelling known
@@ -564,19 +564,39 @@ reported as paused, failed resumes and unrecoverable disposal are refusals.
 `inspectResourceParticipants()` exposes the partial census and explicit missing
 owners; it does not claim that a partial census is total resource usage.
 
-The actual shared frame scheduler now reports pending queue entries/handles and
-running phase, cancels its real queue/handle on pause, rejects scheduling while
-paused and permits current-state reflow after resume. It refuses pause inside an
-executing phase or resume after disposal. The editor-surface participant controls
-the actual named gesture timer, named typewriter frame, ResizeObserver and owned
-viewport listeners, gating recreations while paused. Retained transaction memory
-units include the union of live and checkpoint history entries; they are logical
-64 KiB source/history payload units, not physical heap measurements.
+The actual shared frame scheduler reports pending phase entries/handles, auxiliary
+frame handles and executing callbacks through a separate `resourceState()`; its
+original metrics field contract is unchanged. Pause cancels the actual handles
+and queue, rejects scheduling while paused and refuses cancellation inside an
+executing callback. Auxiliary continuations preserve their existing RAF timing;
+this increment does not qualify phase ordering or typography behavior.
 
-These two implemented participants do not close the roster. Existing unnamed
-RAF/nextTick callbacks remain `editor-layout-callbacks`; renderer/projection,
-language/search, attachment/embed and asynchronous command participants are still
-missing. Full public pause/resume/inspect/dispose therefore continue to refuse
-before any transition. The renderer last-valid checkpoint and recoverable
-cross-instance disposal are also unimplemented. This keeps the same shared frame
-scheduler available to typography reflow without creating a second frame owner.
+The editor-surface participant controls the actual gesture timer, ResizeObserver
+and owned viewport listeners, gating recreations while paused. The layout owner
+tracks every existing nextTick/microtask continuation until it actually settles;
+its document identity, revision and lifecycle leases suppress stale effects.
+Pending microtasks cannot be removed physically and prevent a paused acknowledgment
+until settlement. Existing unnamed frames now go through the same scheduler.
+Retained transaction memory units count the union of live and checkpoint history
+entries as logical 64 KiB payload units, not physical heap measurements.
+
+The asynchronous command resource ledger retains the original attempt objects
+until their original `finally`, including aborted, concurrent and superseded
+attempts. It aborts the actual signals on pause and suppresses late commits and
+failure UI after lifecycle/document changes. It does not replace the command-key
+registry or recreate a command on resume. The async-command participant registers
+only when all configured and pending commands are the original editor-owned pure
+commands. Arbitrary public `run()` providers lack a resource census/control API;
+AbortSignal alone cannot establish request cancellation or zero network usage.
+Changing command props does not hide an outstanding external attempt. Blog's
+command adapters currently include such external providers, so this dependency
+remains explicit there.
+
+These implemented owners do not close the roster. Renderer/projection,
+language/search and attachment/embed await their actual owner implementations;
+external-command census, renderer last-valid checkpoint and recoverable disposal
+remain dependencies. Full public pause/resume/inspect/dispose refuse before a
+transition when any owner is absent. Integration with the concurrent typography
+increment additionally needs its visibility listener, deferred callbacks,
+measurement DOM and pending reflow promise in the actual resource census; the
+session-only patch does not modify that owner's source.

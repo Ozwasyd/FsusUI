@@ -1129,7 +1129,6 @@
 <script lang="ts" setup>
 import {
   computed,
-  nextTick,
   onBeforeUnmount,
   onMounted,
   reactive,
@@ -1154,6 +1153,7 @@ import {
   stabilizeMarkdownEditorProjection,
 } from '../../../wasm/markdown-runtime'
 import {
+  defaultMarkdownEditorCommands,
   isMarkdownEditorCommandEnabled,
   isMarkdownEditorCommandVisible,
   markdownEditorEmits,
@@ -1321,6 +1321,8 @@ import {
 } from './markdown-editor-outline'
 import { planMarkdownOutlineReveal } from './markdown-editor-outline-active'
 import { createMarkdownEditorSessionBinding } from './markdown-editor-session'
+import { createMarkdownEditorSessionCommandResources } from './markdown-editor-session-command-resources'
+import { createMarkdownEditorSessionLayoutResources } from './markdown-editor-session-layout'
 import { createMarkdownEditorFrameResourceParticipant } from './markdown-editor-session-resources'
 import type { MarkdownEditorSessionResourceParticipant } from './markdown-editor-session-resources'
 import {
@@ -1396,6 +1398,7 @@ const ns = useNamespace('markdown-editor')
 const attrs = useAttrs()
 const rootElementRef = ref<HTMLElement | null>(null)
 const sessionSurfacePaused = ref(false)
+let sessionDisposed = false
 const frameScheduler = useMarkdownEditorFrameScheduler({
   onFrameEnd: (metrics) => {
     const target = rootElementRef.value
@@ -1493,6 +1496,11 @@ const transactionStore = new MarkdownEditorTransactionStore(
   initialSelection,
   documentIdentity,
 )
+const sessionLayoutResources = createMarkdownEditorSessionLayoutResources(frameScheduler, () => ({
+  documentIdentity: transactionStore.documentIdentity,
+  revision: transactionStore.revision,
+  disposed: sessionDisposed,
+}))
 provideMarkdownHeavyFeatureDocumentContext({
   documentEpoch: () => transactionStore.documentIdentity.epoch,
   documentKey: () => transactionStore.documentIdentity.id,
@@ -1927,7 +1935,7 @@ const restoreTextareaViewport = (plan: MarkdownLiveLayoutPlan) => {
       restoringViewport = true
       target.scrollTop = viewportRestoreNextScrollTop
       viewportRestoreNextScrollTop = null
-      queueMicrotask(() => {
+      sessionLayoutResources.microtask(() => {
         restoringViewport = false
       })
     },
@@ -1997,7 +2005,7 @@ const suspendTypewriterForUserScroll = () => {
 const settleTypewriterLayout = () => {
   if (sessionSurfacePaused.value) return
   if (typewriterLayoutFrame !== undefined) {
-    cancelAnimationFrame(typewriterLayoutFrame)
+    sessionLayoutResources.cancelFrame(typewriterLayoutFrame)
   }
   typewriterLayoutAdjustment = true
   let remainingFrames = 3
@@ -2013,13 +2021,13 @@ const settleTypewriterLayout = () => {
     applyTypewriterScroll('async-layout')
     remainingFrames -= 1
     if (remainingFrames > 0) {
-      typewriterLayoutFrame = requestAnimationFrame(settle)
+      typewriterLayoutFrame = sessionLayoutResources.requestFrame(settle)
       return
     }
     typewriterLayoutAdjustment = false
     typewriterLayoutFrame = undefined
   }
-  typewriterLayoutFrame = requestAnimationFrame(settle)
+  typewriterLayoutFrame = sessionLayoutResources.requestFrame(settle)
 }
 const handleLayoutWheel = () => {
   suspendTypewriterForUserScroll()
@@ -2063,7 +2071,7 @@ const handlePreviewScroll = () => {
   retainedPreviewScrollLeft.value = previewElement()?.scrollLeft ?? 0
 }
 const restorePreviewScroll = () => {
-  void nextTick(() => {
+  void sessionLayoutResources.afterTick(() => {
     const preview = previewElement()
     if (preview) preview.scrollLeft = retainedPreviewScrollLeft.value
   })
@@ -2149,7 +2157,7 @@ const applyTypewriterScroll = (
         trigger === 'async-layout' ? 'auto' : target.smooth ? 'smooth' : 'auto',
       top: scrollTop,
     })
-    requestAnimationFrame(() => {
+    sessionLayoutResources.requestFrame(() => {
       syncFocusLayerScroll(textarea.scrollTop)
     })
   } else {
@@ -2158,8 +2166,8 @@ const applyTypewriterScroll = (
     textarea.scrollTop = target.scrollTop
     syncFocusLayerScroll(target.scrollTop)
   }
-  requestAnimationFrame(() => {
-    requestAnimationFrame(() => {
+  sessionLayoutResources.requestFrame(() => {
+    sessionLayoutResources.requestFrame(() => {
       restoringTypewriter = false
     })
   })
@@ -2240,6 +2248,11 @@ const applyAtomicIntent = (
   return plan
 }
 const commandSessions = new Map<string, MarkdownEditorCommandSession>()
+const commandResources = createMarkdownEditorSessionCommandResources(() => ({
+  documentIdentity: transactionStore.documentIdentity,
+  disposed: sessionDisposed,
+  commands: props.commands,
+}), (command) => defaultMarkdownEditorCommands.includes(command))
 const commandRuntimeStates = ref(
   new Map<string, MarkdownEditorCommandRuntimeState>(),
 )
@@ -2266,6 +2279,7 @@ const invokeAtomicNodeAction = (
 const commandContextSignal = new AbortController().signal
 
 const abortPendingCommands = () => {
+  commandResources.abortPending('editor-reset')
   for (const session of commandSessions.values()) {
     session.abort.abort('editor-reset')
     commandRuntimeStates.value.set(session.key, {
@@ -2345,20 +2359,21 @@ const restoreTextareaSelection = async (
   focus = true,
 ) => {
   if (isComposing.value) return
-  await nextTick()
-  if (isComposing.value) return
-  const textarea = textareaRef.value
-  if (!textarea) return
+  await sessionLayoutResources.afterTick(() => {
+    if (isComposing.value) return
+    const textarea = textareaRef.value
+    if (!textarea) return
 
-  restoringSelection = true
-  if (focus) textarea.focus()
-  textarea.setSelectionRange(
-    selection.start,
-    selection.end,
-    selection.direction,
-  )
-  queueMicrotask(() => {
-    restoringSelection = false
+    restoringSelection = true
+    if (focus) textarea.focus()
+    textarea.setSelectionRange(
+      selection.start,
+      selection.end,
+      selection.direction,
+    )
+    sessionLayoutResources.microtask(() => {
+      restoringSelection = false
+    })
   })
 }
 
@@ -2931,8 +2946,9 @@ const openContextualSurface = async (
     anchorIdDraft.value = activeAnchor.value?.id ?? ''
   }
   contextualSurface.value = surface
-  await nextTick()
-  contextualSurfaceRef.value?.querySelector<HTMLInputElement>('input')?.focus()
+  await sessionLayoutResources.afterTick(() => {
+    contextualSurfaceRef.value?.querySelector<HTMLInputElement>('input')?.focus()
+  })
 }
 const contextualSurfaceRef = ref<HTMLElement | null>(null)
 const contextualSurfaceIsCurrent = () =>
@@ -3198,7 +3214,7 @@ const openCommandPalette = () => {
     0,
     paletteCommands.value.findIndex((command) => !isCommandDisabled(command)),
   )
-  void nextTick(() => commandPaletteInputRef.value?.focus())
+  void sessionLayoutResources.afterTick(() => commandPaletteInputRef.value?.focus())
 }
 const closeCommandPalette = () => {
   commandPaletteOpen.value = false
@@ -3667,7 +3683,6 @@ onMounted(() => {
   attachViewportListeners()
 })
 
-let sessionDisposed = false
 onBeforeUnmount(() => {
   sessionDisposed = true
   transactionStore.releaseRetainedSnapshot()
@@ -3678,7 +3693,7 @@ onBeforeUnmount(() => {
   attachmentItems.clear()
   if (layoutGestureTimer) clearTimeout(layoutGestureTimer)
   if (typewriterLayoutFrame !== undefined) {
-    cancelAnimationFrame(typewriterLayoutFrame)
+    sessionLayoutResources.cancelFrame(typewriterLayoutFrame)
   }
   typewriterResizeObserver?.disconnect()
   cssHighlightRegistry()?.delete('markdown-search-match')
@@ -4151,7 +4166,7 @@ const handleTableContextMenu = (event: MouseEvent) => {
   event.preventDefault()
   tableAnnouncement.value = `Table row ${cell.row + 1}, column ${cell.column + 1}`
   tableMenuOpen.value = true
-  void nextTick(() =>
+  void sessionLayoutResources.afterTick(() =>
     tableMenuRef.value?.querySelector<HTMLButtonElement>('[role="menuitem"]')?.focus(),
   )
 }
@@ -4167,14 +4182,14 @@ const focusTableMenuItem = (index: number) => {
 const closeTableMenu = (restoreTrigger = false) => {
   tableMenuOpen.value = false
   if (restoreTrigger) {
-    void nextTick(() => tableMenuTriggerRef.value?.focus())
+    void sessionLayoutResources.afterTick(() => tableMenuTriggerRef.value?.focus())
   }
 }
 
 const toggleTableMenu = () => {
   tableMenuOpen.value = !tableMenuOpen.value
   if (tableMenuOpen.value) {
-    void nextTick(() => focusTableMenuItem(0))
+    void sessionLayoutResources.afterTick(() => focusTableMenuItem(0))
   }
 }
 
@@ -4435,8 +4450,7 @@ const openPasteAsMarkdownSurface = async () => {
       return
     }
     pasteAsMarkdownSession.value = opened.session
-    await nextTick()
-    pasteAsMarkdownPrimaryActionRef.value?.focus()
+    await sessionLayoutResources.afterTick(() => pasteAsMarkdownPrimaryActionRef.value?.focus())
   } catch (error) {
     pasteAsMarkdownError.value =
       error instanceof MarkdownClipboardUnavailableError
@@ -4573,7 +4587,7 @@ const runCommand = async (
   command: MarkdownEditorCommand,
   slashRange?: Readonly<{ start: number; end: number }>,
 ) => {
-  if (editingBlocked.value || nativeMachine.freezeSmartInput) return
+  if (editingBlocked.value || nativeMachine.freezeSmartInput || commandResources.paused) return
   const activeSession = commandSessions.get(command.key)
   if (activeSession?.state === 'pending' && !command.concurrent) return
 
@@ -4598,12 +4612,21 @@ const runCommand = async (
       concurrent: command.concurrent,
     },
   )
+  commandResources.begin(session, command)
   commandSessions.set(command.key, session)
   commandRuntimeStates.value.set(command.key, { state: 'pending' })
   triggerRef(commandRuntimeStates)
   try {
     const context = {
       ...initialContext,
+      dispatch: {
+        dispatch: (transaction: MarkdownEditorTransaction) => {
+          if (!commandResources.isCurrent(session)) {
+            throw new Error('editor-session-command-attempt-stale')
+          }
+          return initialContext.dispatch.dispatch(transaction)
+        },
+      },
       signal: session.abort.signal,
     }
     if (
@@ -4612,7 +4635,7 @@ const runCommand = async (
     )
       return
     const result = await runMarkdownEditorCommand(command, context)
-    if (commandSessions.get(command.key) !== session) return
+    if (!commandResources.isCurrent(session) || commandSessions.get(command.key) !== session) return
     const currentContext = commandContext.value
     const positionMap = positionMapFromRevision(
       session.revision,
@@ -4676,6 +4699,7 @@ const runCommand = async (
       await restoreTextareaSelection(selection)
     }
   } catch (error) {
+    if (!commandResources.isCurrent(session)) return
     const state = resolveMarkdownEditorCommandSession(
       session,
       commandContext.value,
@@ -4686,6 +4710,7 @@ const runCommand = async (
     triggerRef(commandRuntimeStates)
     await restoreTextareaSelection(selection)
   } finally {
+    commandResources.finish(session)
     if (commandSessions.get(command.key) === session) {
       commandSessions.delete(command.key)
     }
@@ -4711,17 +4736,18 @@ const runOverflowAction = (action: MarkdownEditorActionItem) => {
 
 const closeCommandOverflow = (restoreFocus = false) => {
   commandsExpanded.value = false
-  if (restoreFocus) void nextTick(() => commandOverflowRef.value?.focus())
+  if (restoreFocus) void sessionLayoutResources.afterTick(() => commandOverflowRef.value?.focus())
 }
 
 const toggleCommands = async () => {
   if (editingBlocked.value || isComposing.value) return
   commandsExpanded.value = !commandsExpanded.value
   if (!commandsExpanded.value) return
-  await nextTick()
-  commandTrayRef.value
-    ?.querySelector<HTMLButtonElement>('button:not(:disabled)')
-    ?.focus()
+  await sessionLayoutResources.afterTick(() => {
+    commandTrayRef.value
+      ?.querySelector<HTMLButtonElement>('button:not(:disabled)')
+      ?.focus()
+  })
 }
 
 const setMode = (mode: MarkdownEditorMode) => {
@@ -4865,12 +4891,12 @@ const emitRenderEvent = (
 const handlePreviewRenderComplete = (payload: unknown) => {
   emitRenderEvent('render-complete', payload)
   restorePreviewScroll()
-  void nextTick(syncRenderedSearchHighlights)
+  void sessionLayoutResources.afterTick(syncRenderedSearchHighlights)
 }
 
 const handleRendererComplete = (payload: unknown) => {
   emitRenderEvent('render-complete', payload)
-  void nextTick(syncRenderedSearchHighlights)
+  void sessionLayoutResources.afterTick(syncRenderedSearchHighlights)
 }
 
 const searchUiState = ref<MarkdownSearchUiState>(resolveMarkdownSearchUi(false, '', 0))
@@ -5261,7 +5287,7 @@ const openSearch = (replace = false) => {
   if (searchQuery.value) {
     runSearch()
   }
-  nextTick(() => {
+  sessionLayoutResources.afterTick(() => {
     if (replace && searchReplaceInputRef.value) {
       searchReplaceInputRef.value.focus()
     } else if (searchQueryInputRef.value) {
@@ -5338,7 +5364,7 @@ const searchNavigate = (direction: 'next' | 'previous') => {
         start: result.match.range.start,
       })
     }
-    void nextTick(syncRenderedSearchHighlights)
+    void sessionLayoutResources.afterTick(syncRenderedSearchHighlights)
     return reveal.status
   }
   return 'not-found' as const
@@ -5462,7 +5488,7 @@ watch(
 
 watch(
   [searchMatches, searchCurrentIndex, () => searchUiState.value.open, currentMode],
-  () => void nextTick(syncRenderedSearchHighlights),
+  () => void sessionLayoutResources.afterTick(syncRenderedSearchHighlights),
   { flush: 'post' },
 )
 
@@ -5993,7 +6019,7 @@ const commitRevealSelection = async (
       Math.max(0, textarea.scrollHeight - textarea.clientHeight),
     )
     textarea.scrollTo({ behavior: smooth ? 'smooth' : 'auto', top: scrollTop })
-    requestAnimationFrame(() => {
+    sessionLayoutResources.requestFrame(() => {
       syncFocusLayerScroll(textarea.scrollTop)
     })
   } else {
@@ -6096,7 +6122,7 @@ const surfaceResourceParticipant: MarkdownEditorSessionResourceParticipant = {
         renderers: 0,
         observers: typewriterResizeObserver ? 1 : 0,
         timers: layoutGestureTimer === undefined ? 0 : 1,
-        backgroundTasks: typewriterLayoutFrame === undefined ? 0 : 1,
+        backgroundTasks: 0,
         networkRequests: 0,
         memoryUnits: Math.ceil((transactionStore.value.length + transactionStore.retainedSessionUnits) * 2 / 65536),
       },
@@ -6107,6 +6133,11 @@ const surfaceResourceParticipant: MarkdownEditorSessionResourceParticipant = {
       throw new Error('editor-session-surface-pause-unavailable')
     }
     sessionSurfacePaused.value = true
+    restoringSelection = false
+    restoringViewport = false
+    restoringTypewriter = false
+    typewriterLayoutAdjustment = false
+    typewriterScrollTarget = null
     detachViewportListeners()
     typewriterResizeObserver?.disconnect()
     typewriterResizeObserver = undefined
@@ -6115,7 +6146,7 @@ const surfaceResourceParticipant: MarkdownEditorSessionResourceParticipant = {
       layoutGestureTimer = undefined
     }
     if (typewriterLayoutFrame !== undefined) {
-      cancelAnimationFrame(typewriterLayoutFrame)
+      sessionLayoutResources.cancelFrame(typewriterLayoutFrame)
       typewriterLayoutFrame = undefined
     }
     return this.inspect()
@@ -6137,7 +6168,10 @@ const surfaceResourceParticipant: MarkdownEditorSessionResourceParticipant = {
 // This binding closes over the existing owner; it never creates another editor.
 const sessionBinding = createMarkdownEditorSessionBinding({
   transactionStore,
-  resourceParticipants: () => [frameResourceParticipant, surfaceResourceParticipant],
+  resourceParticipants: () => [
+    frameResourceParticipant, surfaceResourceParticipant, sessionLayoutResources.participant,
+    ...(commandResources.canInspect() ? [commandResources.participant] : []),
+  ],
   isComposing: () => isComposing.value || nativeMachine.composing,
   isDisposed: () => sessionDisposed,
   captureViewState: () => ({
