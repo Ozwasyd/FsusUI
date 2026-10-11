@@ -67,6 +67,9 @@ export const createLazyMarkdownHeavyFeatureIsolatedRender = <T>(
         trustedScriptUrlFactory,
         scheduleContinue,
       ) as MarkdownHeavyFeatureIsolatedRenderHandle<T>
+      // Consume rejection even if subscription/teardown reenters cancellation
+      // before the active branch can return the original promise.
+      void handle.promise.catch(() => undefined)
       innerHandle = handle
       removeInnerResourceChange =
         handle.resources().subscribe?.(onInnerResourceChange) ?? null

@@ -133,6 +133,7 @@ interface NodeRecord {
   resourceRecord: ResourceRecord
   state: Exclude<MarkdownHeavyFeatureState, 'unmounted'>
   teardown?: () => void
+  tornDown: boolean
 }
 
 interface ResourceRecord {
@@ -312,13 +313,23 @@ export const createMarkdownHeavyFeatureLifecycle = (
   }
 
   const teardownRecord = (record: NodeRecord) => {
-    if (record.controller && !record.controller.signal.aborted) {
-      record.controller.abort()
-      aborts += 1
-    }
+    if (record.tornDown) return
+    record.tornDown = true
+    const controller = record.controller
     record.controller = null
+    if (controller && !controller.signal.aborted) {
+      aborts += 1
+      controller.abort()
+    }
     releaseActiveResource(record)
     teardowns += 1
+  }
+
+  const removeIfCurrent = (key: string, record: NodeRecord) => {
+    if (nodes.get(key) !== record) return false
+    // Detach before abort/teardown callbacks can install a newer generation.
+    nodes.delete(key)
+    return true
   }
 
   const evict = () => {
@@ -345,9 +356,10 @@ export const createMarkdownHeavyFeatureLifecycle = (
     const identityKey = cacheKeyOf(input.identity)
     const previous = nodes.get(nodeKey)
     if (previous) {
+      removeIfCurrent(nodeKey, previous)
       teardownRecord(previous)
-      nodes.delete(nodeKey)
     }
+    if (disposed || paused || nodes.has(nodeKey)) return false
 
     const controller = new AbortController()
     const resourceRecord: ResourceRecord = {
@@ -365,25 +377,30 @@ export const createMarkdownHeavyFeatureLifecycle = (
       resourceRecord,
       state: 'active-work',
       teardown: input.teardown,
+      tornDown: false,
     }
     nodes.set(nodeKey, record)
     resourceRecords.add(resourceRecord)
-    resourceRecord.removeResourceChange = resources.subscribe?.(() => {
-      pruneReleasedResource(resourceRecord)
-      notifyMetricsChange()
-    })
-    notifyMetricsChange()
     const discardIfCurrent = () => {
-      if (nodes.get(nodeKey) !== record) return
+      const removed = removeIfCurrent(nodeKey, record)
+      // A stale completion still owns its own cleanup, never the new record.
       teardownRecord(record)
-      nodes.delete(nodeKey)
+      if (!removed) return
       unmountedNodes += 1
       notifyMetricsChange()
     }
+    const canStartWork = () =>
+      !disposed &&
+      !paused &&
+      !controller.signal.aborted &&
+      !resourceRecord.released &&
+      nodes.get(nodeKey) === record
     const awaitTask = async <U>(run: () => U | Promise<U>): Promise<U> => {
+      if (!canStartWork()) throw new DOMException('Aborted', 'AbortError')
       resourceRecord.awaitPending = true
-      notifyMetricsChange()
       try {
+        notifyMetricsChange()
+        if (!canStartWork()) throw new DOMException('Aborted', 'AbortError')
         return await run()
       } finally {
         resourceRecord.awaitPending = false
@@ -404,6 +421,17 @@ export const createMarkdownHeavyFeatureLifecycle = (
     }
 
     try {
+      resourceRecord.removeResourceChange = resources.subscribe?.(() => {
+        pruneReleasedResource(resourceRecord)
+        notifyMetricsChange()
+      })
+      // subscribe may synchronously cancel before returning its remover.
+      pruneReleasedResource(resourceRecord)
+      notifyMetricsChange()
+      if (!canStartWork()) {
+        discardIfCurrent()
+        return false
+      }
       const cached = cache.get(identityKey)
       if (cached) {
         cached.used = ++clock
@@ -417,6 +445,11 @@ export const createMarkdownHeavyFeatureLifecycle = (
         }
         if (committed) record.element = committed
         releaseActiveResource(record)
+        if (controller.signal.aborted || nodes.get(nodeKey) !== record) {
+          discardIfCurrent()
+          staleCommits += 1
+          return false
+        }
         record.controller = null
         record.state = 'static-mounted'
         reuses += 1
@@ -424,9 +457,11 @@ export const createMarkdownHeavyFeatureLifecycle = (
         return false
       }
 
-      activations += 1
-      resourceRecord.unobservedWork = !input.resources
-      const value = await awaitTask(() => input.render(controller.signal))
+      const value = await awaitTask(() => {
+        activations += 1
+        resourceRecord.unobservedWork = !input.resources
+        return input.render(controller.signal)
+      })
       const current = nodes.get(nodeKey)
       if (
         controller.signal.aborted ||
@@ -452,9 +487,19 @@ export const createMarkdownHeavyFeatureLifecycle = (
       }
       if (committed) current.element = committed
       releaseActiveResource(current)
+      if (controller.signal.aborted || nodes.get(nodeKey) !== record) {
+        discardIfCurrent()
+        staleCommits += 1
+        return false
+      }
       current.controller = null
       current.state = 'static-mounted'
       const estimate = input.estimateBytes(value)
+      if (disposed || paused || nodes.get(nodeKey) !== record) {
+        discardIfCurrent()
+        staleCommits += 1
+        return false
+      }
       const bytes =
         Number.isFinite(estimate) && estimate >= 0
           ? Math.floor(estimate)
@@ -491,12 +536,14 @@ export const createMarkdownHeavyFeatureLifecycle = (
   const unmountRoot = (root: ParentNode) => {
     const rootNode = root as Node
     let changed = false
-    for (const [key, record] of nodes) {
+    for (const [key, record] of [...nodes]) {
       if (rootNode === record.element || rootNode.contains(record.element)) {
+        const removed = removeIfCurrent(key, record)
         teardownRecord(record)
-        nodes.delete(key)
-        unmountedNodes += 1
-        changed = true
+        if (removed) {
+          unmountedNodes += 1
+          changed = true
+        }
       }
     }
     if (changed) notifyMetricsChange()
@@ -506,7 +553,11 @@ export const createMarkdownHeavyFeatureLifecycle = (
     if (disposed || !validIdentity(input.identity)) return false
     const nodeKey = nodeKeyOf(input.identity)
     const previous = nodes.get(nodeKey)
-    if (previous) teardownRecord(previous)
+    if (previous) {
+      removeIfCurrent(nodeKey, previous)
+      teardownRecord(previous)
+    }
+    if (disposed || nodes.has(nodeKey)) return false
     nodes.set(nodeKey, {
       controller: null,
       documentEpoch: input.identity.documentEpoch,
@@ -520,6 +571,7 @@ export const createMarkdownHeavyFeatureLifecycle = (
         unobservedWork: false,
       },
       state: 'static-mounted',
+      tornDown: false,
     })
     notifyMetricsChange()
     return true
@@ -530,15 +582,17 @@ export const createMarkdownHeavyFeatureLifecycle = (
     documentEpoch: number | string,
   ) => {
     let changed = false
-    for (const [key, record] of nodes) {
+    for (const [key, record] of [...nodes]) {
       if (
         record.documentKey !== documentKey ||
         record.documentEpoch !== documentEpoch
       ) {
+        const removed = removeIfCurrent(key, record)
         teardownRecord(record)
-        nodes.delete(key)
-        unmountedNodes += 1
-        changed = true
+        if (removed) {
+          unmountedNodes += 1
+          changed = true
+        }
       }
     }
     if (changed) notifyMetricsChange()
@@ -628,11 +682,11 @@ export const createMarkdownHeavyFeatureLifecycle = (
   const pause = () => {
     if (disposed || paused) return
     paused = true
-    for (const [key, record] of nodes) {
+    for (const [key, record] of [...nodes]) {
       if (record.state !== 'active-work') continue
+      const removed = removeIfCurrent(key, record)
       teardownRecord(record)
-      nodes.delete(key)
-      unmountedNodes += 1
+      if (removed) unmountedNodes += 1
     }
     notifyMetricsChange()
   }
@@ -645,9 +699,12 @@ export const createMarkdownHeavyFeatureLifecycle = (
   }
 
   const dispose = () => {
+    if (disposed) return
     disposed = true
-    for (const record of nodes.values()) teardownRecord(record)
-    nodes.clear()
+    for (const [key, record] of [...nodes]) {
+      removeIfCurrent(key, record)
+      teardownRecord(record)
+    }
     cache.clear()
     cacheBytes = 0
     notifyMetricsChange()
