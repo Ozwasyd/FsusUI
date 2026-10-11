@@ -48,8 +48,7 @@ export interface MarkdownRendererRenderGeneration extends MarkdownRendererDocume
 export const markdownRendererSessionSourceDependencies = Object.freeze([
   'markdown-runtime:activation-and-gateway-loader-import-network-census',
   'renderer:validated-snapshot-restoration-after-disposal',
-  'heavy-feature-runtime:reentrant-admission-teardown-and-pending-settlement',
-  'heavy-feature-runtime:loader-cancellation-and-instance-scheduler-isolation',
+  'heavy-feature-runtime:timer-and-network-cancellation-authority',
 ] as const)
 
 export const createMarkdownRendererSessionResourceOwner = (options: {
@@ -345,6 +344,8 @@ export const createMarkdownRendererSessionResourceOwner = (options: {
             scheduledFrames.size +
             projection.backgroundTasks +
             pipeline.pendingRenders +
+            pipeline.pendingRenderAdmissions +
+            pipeline.pendingControlTransitions +
             pipeline.pendingAdapterJobs +
             pipeline.rafHandles +
             pipeline.idleHandles +
@@ -375,6 +376,8 @@ export const createMarkdownRendererSessionResourceOwner = (options: {
             viewport.measuredSizes +
             viewport.pendingMeasurements +
             pipeline.retainedSharedOwners +
+            pipeline.pendingRenderAdmissions +
+            pipeline.pendingControlTransitions +
             heavy.usage.pendingImports +
             heavy.usage.scheduledContinuations +
             workerScopes.reduce(

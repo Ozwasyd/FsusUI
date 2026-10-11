@@ -248,7 +248,9 @@ ref through this renderer's sole private retained slot and checks the current
 document ID, epoch, revision, request identity and render authority before
 mutation. Unknown, superseded, switched, source-modified or busy refs are blocked.
 Disposed or paused underlying owners, closed heavy-feature admission, pending
-pipeline renders/adapter jobs and retained heavy imports/continuations/tasks
+pipeline renders/adapter jobs, retained pipeline admission intent, active control
+transitions, and heavy
+imports/continuations/tasks
 also block restoration. The operation reuses the actual retained HTML/chunk
 projection and strategy, waits for Vue/viewport work and feature activation, and
 rechecks generation and identity before reporting a restored result. A stale or
@@ -294,18 +296,22 @@ cross-instance hydration or crash recovery.
 The measured subtotals describe directly held component timers, RAF handles,
 owned scheduled frame descriptors, live asynchronous jobs, abort/theme listeners
 and activation observers. Actual runtime/hardware/viewport inspections contribute
-measured handles, listeners, promises, observers and collection entries. Worker
+measured handles, listeners, promises, observers and collection entries. The
+pipeline owner's real pending render admission and active control-transition Set
+entries contribute to background tasks and logical retained units. Both block
+restoration until the actual intent is cleared or the transition finally settles. Worker
 counts come only from the runtime's exact owned task scopes; shared pool totals
 remain context and are never attributed to this renderer. The original
 inspections remain exposed under `sources`.
 
 The renderer requests heavy-feature admission closure when a document/render
 generation changes and reopening for a fresh render through the real owner.
-The inherited owner still has unresolved reentrant admission/teardown and loader
-cancellation gaps. This renderer namespaces continuation frame keys by its own
-instance identity; other scheduler consumers remain with their respective owners.
-These calls do not establish safe resource
-suspension, revive disposed runtime instances or establish a fully paused renderer. The heavy
+The inherited owner now guards admission again after callbacks and preserves
+retired pending work through real settlement. Continuation keys include the
+actual bridge capability, and this renderer additionally namespaces them by its
+instance identity. Timer/network cancellation remains unavailable, and source
+fixes do not establish safe resource suspension, revive disposed runtimes or
+establish a fully paused renderer. The heavy
 inspection retains retired provider tasks, imports, continuations and handles
 until their actual settlement, including work that outlives realm removal or
 unmount. Component jobs leave the census only in their actual `finally` blocks.

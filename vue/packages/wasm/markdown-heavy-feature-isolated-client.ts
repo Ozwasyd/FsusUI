@@ -197,7 +197,7 @@ export const createMarkdownHeavyFeatureIsolatedRender = <
             notifyResourceChange()
             try {
               const cancel = scheduleContinue(
-                `markdown-heavy-frame-continue:${validatedRequest.lifecycleKey ?? capability}`,
+                `markdown-heavy-frame-continue:${validatedRequest.lifecycleKey ?? 'node'}:${capability}`,
                 () => {
                   if (scheduledContinue !== continuation) return
                   scheduledContinue = null

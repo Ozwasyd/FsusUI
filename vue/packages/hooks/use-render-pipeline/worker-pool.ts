@@ -347,7 +347,9 @@ type WorkerSlot = {
     lane: FsusWorkerTaskLane
   } | null
   alive: boolean
+  errorHandler: Worker['onerror']
   id: number
+  messageHandler: Worker['onmessage']
   worker: Worker
 }
 
@@ -476,6 +478,14 @@ export const createFsusWorkerExecutor = <TRequest, TResponse>(
       canceledSlotTimers.delete(slot.activeTaskId)
       canceledIds.delete(slot.activeTaskId)
     }
+    if (slot.worker.onmessage === slot.messageHandler) {
+      slot.worker.onmessage = null
+    }
+    if (slot.worker.onerror === slot.errorHandler) {
+      slot.worker.onerror = null
+    }
+    slot.messageHandler = null
+    slot.errorHandler = null
     slot.worker.terminate()
     slot.activeTaskId = null
     slot.activeTaskIdentity = null
@@ -729,12 +739,15 @@ export const createFsusWorkerExecutor = <TRequest, TResponse>(
       activeTaskId: null,
       activeTaskIdentity: null,
       alive: true,
+      errorHandler: null,
       id: ++workerId,
+      messageHandler: null,
       worker: createWorker(),
     }
-    slot.worker.onmessage = (event) => handleWorkerMessage(slot, event)
-    slot.worker.onerror = (event) =>
-      handleWorkerCrash(slot, event as ErrorEvent)
+    slot.messageHandler = (event) => handleWorkerMessage(slot, event)
+    slot.errorHandler = (event) => handleWorkerCrash(slot, event as ErrorEvent)
+    slot.worker.onmessage = slot.messageHandler
+    slot.worker.onerror = slot.errorHandler
     slots.push(slot)
     emit('worker-created', { workerId: slot.id })
     return slot
@@ -814,6 +827,28 @@ export const createFsusWorkerExecutor = <TRequest, TResponse>(
       queueWaitDurationMs: task.startedAt - task.queuedAt,
       workerId: slot.id,
     })
+    // request-start listeners can synchronously cancel, supersede or dispose.
+    if (
+      disposed ||
+      !slot.alive ||
+      !slots.includes(slot) ||
+      pending.get(task.id) !== task ||
+      canceledIds.has(task.id) ||
+      task.slotId !== slot.id ||
+      slot.activeTaskId !== task.id ||
+      slot.activeTaskIdentity?.id !== task.id ||
+      slot.activeTaskIdentity.key !== task.key ||
+      slot.activeTaskIdentity.generation !== task.generation
+    ) {
+      return
+    }
+    if (
+      task.key &&
+      (latestGenerations.get(task.key) ?? task.generation) > task.generation
+    ) {
+      cancelTask(task, 'request-cancel', 'fsus_worker_generation_superseded')
+      return
+    }
     const message: FsusWorkerRunMessage<TRequest> = {
       generation: task.generation,
       id: task.id,

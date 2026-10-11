@@ -279,6 +279,7 @@ export const createMarkdownHeavyFeatureAdapterResourceBridgeInternal = (
             if (adapterController.signal.aborted) throw abortError()
             directRenderStarted = true
             notifyResourceChange()
+            if (adapterController.signal.aborted) throw abortError()
             return render(adapterController.signal)
           })
           .then(
