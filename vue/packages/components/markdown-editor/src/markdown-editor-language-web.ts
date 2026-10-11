@@ -3,6 +3,10 @@ import type {
   MarkdownStableProjection,
   MarkdownVisualPoint,
 } from '../../../wasm/markdown-runtime'
+import { createMarkdownLanguageSearchResources } from './markdown-editor-language-search-resources'
+import type { MarkdownEditorSessionResourceParticipant } from './markdown-editor-session-resources'
+import type { MarkdownSearchTask } from '../../../wasm/markdown-search-worker'
+import type { executeMarkdownSearchSession } from './markdown-editor-search-ui'
 import type { MarkdownEditorMode } from './markdown-editor-live-contract'
 import type {
   MarkdownEditorDocumentIdentity,
@@ -60,6 +64,18 @@ export interface MarkdownWebLanguageBeforeInput {
 }
 
 export interface MarkdownWebLanguageController {
+  /** Transfer the existing task and route all subsequent searches through this owner. */
+  adoptSearchTask(
+    task: MarkdownSearchTask | null,
+  ): MarkdownEditorSessionResourceParticipant
+  cancelSearch(): void
+  executeSearch(
+    input: Omit<
+      Parameters<typeof executeMarkdownSearchSession>[0],
+      'previousTask' | 'onTaskCreated'
+    >,
+  ): ReturnType<typeof executeMarkdownSearchSession>
+
   readonly autocorrect: boolean
   readonly capability: MarkdownLanguageToolCapability
   readonly dictation: boolean
@@ -194,22 +210,43 @@ export const bindMarkdownWebLanguageTools = (
     : undefined
   let currentCapability = resolveMarkdownLanguageToolCapability(currentConfig)
   let currentSession: MarkdownLanguageToolSession | null = null
+  let nativeSessionRequired = false
+  let composing = false
+  const resources = createMarkdownLanguageSearchResources({
+    invalidateLanguageSession() {
+      currentSession = null
+      // A late native event has no lifecycle epoch. Require explicit re-arming
+      // after a pause instead of guessing that its target belongs to the resume.
+      nativeSessionRequired = true
+    },
+    isComposing: () => composing,
+    languageMemoryUnits: () =>
+      1 +
+      Math.ceil((currentSource.length * 2) / 65_536) +
+      Number(currentSession !== null) +
+      Number(currentConfig !== undefined) +
+      Number(currentAnchorMap !== undefined) +
+      Number(currentProjection !== undefined),
+    setPausedAttributes: () => applyAttributes(),
+  })
 
   const baseCapability = () =>
     resolveMarkdownLanguageToolCapability(currentConfig)
 
   const applyAttributes = () => {
     const base = baseCapability()
-    textarea.spellcheck = base.spellcheck
+    textarea.spellcheck = !resources.paused && base.spellcheck
     textarea.lang = base.lang ?? ''
     textarea.autocapitalize = 'sentences'
     textarea.autocomplete = 'off'
-    const autocorrect = base.autocorrect ? 'on' : 'off'
+    const autocorrect = !resources.paused && base.autocorrect ? 'on' : 'off'
     if (textarea.setAttribute) {
       textarea.setAttribute('autocorrect', autocorrect)
       textarea.setAttribute(
         'writingsuggestions',
-        base.nativeWritingTools === 'disabled' ? 'false' : 'true',
+        resources.paused || base.nativeWritingTools === 'disabled'
+          ? 'false'
+          : 'true',
       )
     } else {
       textarea.autocorrect = autocorrect
@@ -242,18 +279,22 @@ export const bindMarkdownWebLanguageTools = (
     kind: MarkdownLanguageToolSessionKind = 'spellcheck',
     selection = selectionFrom(textarea),
   ) => {
+    if (resources.paused)
+      throw new Error('editor-session-language-search-paused')
     currentSession = createMarkdownLanguageToolSession({
       documentIdentity,
       kind,
       revision: currentRevision,
       selection,
     })
+    nativeSessionRequired = false
     return currentSession
   }
 
   const unavailableReasonFor = (
     kind: MarkdownLanguageToolSessionKind,
   ): MarkdownLanguageToolCommitResult['reason'] | undefined => {
+    if (resources.paused) return 'disabled'
     if (
       currentCapability.status !== 'supported' ||
       currentCapability.reason !== undefined
@@ -348,6 +389,33 @@ export const bindMarkdownWebLanguageTools = (
     },
 
     createSession,
+    adoptSearchTask: resources.adoptSearchTask,
+    cancelSearch: resources.cancelSearch,
+    executeSearch(
+      input: Omit<
+        Parameters<typeof executeMarkdownSearchSession>[0],
+        'previousTask' | 'onTaskCreated'
+      >,
+    ) {
+      if (
+        input.documentId !== documentIdentity.id ||
+        input.documentEpoch !== documentIdentity.epoch ||
+        input.revision !== currentRevision ||
+        input.source !== currentSource
+      )
+        throw new Error('editor-session-language-search-stale-document')
+      const result = resources.executeSearch(input)
+      if (
+        input.documentId !== documentIdentity.id ||
+        input.documentEpoch !== documentIdentity.epoch ||
+        input.revision !== currentRevision ||
+        input.source !== currentSource
+      ) {
+        resources.cancelSearch()
+        throw new Error('editor-session-language-search-stale-document')
+      }
+      return result
+    },
 
     applyReplacement(
       from: number,
@@ -379,6 +447,7 @@ export const bindMarkdownWebLanguageTools = (
       readonly revision: number
       readonly source: string
     }) {
+      resources.cancelSearch()
       currentRevision = input.revision
       currentSource = input.source
       currentConfig = input.config ?? currentConfig
@@ -401,9 +470,10 @@ export const bindMarkdownWebLanguageTools = (
       readonly readonly?: boolean
       readonly selection?: MarkdownEditorSelection
     }) {
+      composing = input.isComposing ?? false
       currentCapability = localCapability(input)
       // Context suppression remains local; do not disable the textarea globally.
-      textarea.spellcheck = baseCapability().spellcheck
+      textarea.spellcheck = !resources.paused && baseCapability().spellcheck
       return currentCapability
     },
 
@@ -434,6 +504,9 @@ export const bindMarkdownWebLanguageTools = (
 
       const currentSelection = selectionFrom(textarea)
       const targetSelection = event.rawTargetRange ?? currentSelection
+      if (!currentSession && nativeSessionRequired) {
+        return Object.freeze({ handled: true, reason: 'session-required' })
+      }
       if (!currentSession) createSession(kind, targetSelection)
       const result = commit(
         targetSelection.start,

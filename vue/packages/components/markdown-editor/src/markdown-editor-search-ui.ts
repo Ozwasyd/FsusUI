@@ -352,6 +352,8 @@ export const executeMarkdownSearchSession = (input: {
   readonly documentEpoch: number
   readonly revision: number
   readonly previousTask?: MarkdownSearchTask
+  /** Private custody hook; called before the original synchronous runner starts. */
+  readonly onTaskCreated?: (task: MarkdownSearchTask) => void
   readonly budget?: MarkdownSearchBudget
   readonly requestId?: string
 }): { readonly execution: MarkdownSearchExecution; readonly task: MarkdownSearchTask } => {
@@ -362,6 +364,7 @@ export const executeMarkdownSearchSession = (input: {
     `task-${Date.now()}`,
     input.queryText,
   )
+  input.onTaskCreated?.(task)
   const query: MarkdownSearchQuery = {
     mode: input.mode ?? 'plain',
     queryVersion: 1,
