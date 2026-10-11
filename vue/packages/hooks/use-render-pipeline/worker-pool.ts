@@ -133,8 +133,13 @@ export type FsusWorkerResourceInspection = {
   }
   slots: Array<{
     activeTaskId: number | null
+    /** Retained handle state, not an admission guarantee. */
     alive: boolean
+    /** Idle, not quarantined, and still has both installed handlers. */
+    dispatchable: boolean
     id: number
+    /** Teardown began; reuse remains blocked even when termination throws. */
+    quarantined: boolean
     workerErrorHandlerActive: boolean
     workerMessageHandlerActive: boolean
   }>
@@ -351,6 +356,7 @@ type WorkerSlot = {
   errorHandler: Worker['onerror']
   id: number
   messageHandler: Worker['onmessage']
+  quarantined: boolean
   worker: Worker
 }
 
@@ -437,6 +443,14 @@ export const createFsusWorkerExecutor = <TRequest, TResponse>(
   const activeCount = () =>
     slots.filter((slot) => slot.activeTaskId !== null).length
 
+  const isSlotUsable = (slot: WorkerSlot) =>
+    slot.alive &&
+    !slot.quarantined &&
+    slot.messageHandler !== null &&
+    slot.errorHandler !== null &&
+    slot.worker.onmessage === slot.messageHandler &&
+    slot.worker.onerror === slot.errorHandler
+
   const emit = (
     type: FsusWorkerExecutorEventType,
     event: Partial<
@@ -487,6 +501,8 @@ export const createFsusWorkerExecutor = <TRequest, TResponse>(
     error?: FsusErrorDetail,
   ) => {
     if (!slot.alive) return
+    // Retained resources still count, but teardown must stop new dispatch first.
+    slot.quarantined = true
     if (slot.worker.onmessage === slot.messageHandler) {
       slot.worker.onmessage = null
     }
@@ -776,6 +792,7 @@ export const createFsusWorkerExecutor = <TRequest, TResponse>(
       errorHandler: null,
       id: ++workerId,
       messageHandler: null,
+      quarantined: false,
       worker: createWorker(),
     }
     slot.messageHandler = (event) => handleWorkerMessage(slot, event)
@@ -843,6 +860,11 @@ export const createFsusWorkerExecutor = <TRequest, TResponse>(
     slot: WorkerSlot,
     task: WorkerTask<TRequest, TResponse>,
   ) => {
+    if (pending.get(task.id) !== task) return
+    if (disposed || !isSlotUsable(slot) || slot.activeTaskId !== null) {
+      queues[task.lane].unshift(task)
+      return
+    }
     slot.activeTaskId = task.id
     slot.activeTaskIdentity = {
       generation: task.generation,
@@ -864,7 +886,7 @@ export const createFsusWorkerExecutor = <TRequest, TResponse>(
     // request-start listeners can synchronously cancel, supersede or dispose.
     if (
       disposed ||
-      !slot.alive ||
+      !isSlotUsable(slot) ||
       !slots.includes(slot) ||
       pending.get(task.id) !== task ||
       canceledIds.has(task.id) ||
@@ -907,8 +929,10 @@ export const createFsusWorkerExecutor = <TRequest, TResponse>(
     if (disposed) return
     clearIdleTimer()
     while (lanes.some((lane) => queues[lane].some((task) => !task.suspended))) {
+      if (disposed) return
       let slot = slots.find(
-        (candidate) => candidate.alive && candidate.activeTaskId === null,
+        (candidate) =>
+          isSlotUsable(candidate) && candidate.activeTaskId === null,
       )
       if (!slot && slots.length < maxWorkers) {
         try {
@@ -987,8 +1011,9 @@ export const createFsusWorkerExecutor = <TRequest, TResponse>(
     retainCount += 1
     clearIdleTimer()
     try {
-      if (slots.length === 0) createSlot()
-      else emit('worker-reused', { workerId: slots[0]?.id })
+      const reusableSlot = slots.find(isSlotUsable)
+      if (reusableSlot) emit('worker-reused', { workerId: reusableSlot.id })
+      else if (slots.length < maxWorkers) createSlot()
     } catch (error) {
       releaseRetain()
       throw error
@@ -1297,7 +1322,9 @@ export const createFsusWorkerExecutor = <TRequest, TResponse>(
       slots: selectedSlots.map((slot) => ({
         activeTaskId: slot.activeTaskId,
         alive: slot.alive,
+        dispatchable: isSlotUsable(slot) && slot.activeTaskId === null,
         id: slot.id,
+        quarantined: slot.quarantined,
         workerErrorHandlerActive: slot.worker.onerror !== null,
         workerMessageHandlerActive: slot.worker.onmessage !== null,
       })),
