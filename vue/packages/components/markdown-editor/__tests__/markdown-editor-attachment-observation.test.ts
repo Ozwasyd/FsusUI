@@ -1,4 +1,12 @@
-import { isProxy, reactive, ref, toRaw } from 'vue'
+import {
+  effectScope,
+  isProxy,
+  nextTick,
+  onWatcherCleanup,
+  reactive,
+  ref,
+  toRaw,
+} from 'vue'
 import { describe, expect, it } from 'vitest'
 import { createMarkdownAttachmentEmbedResourceOwner } from '../src/markdown-editor-attachment-embed-owner'
 import { createMarkdownAttachmentCaptureSession } from '../src/markdown-editor-attachment'
@@ -135,5 +143,58 @@ describe('attachment result native observation boundary', () => {
     expect(called).toBe(false)
     expect(() => state.owner.participant.inspect()).toThrow('input-unavailable')
     state.owner.abort()
+  })
+
+  it('rejects cleanup-to-resume before mutation and stops the original scoped attachment watcher', async () => {
+    const scope = effectScope()
+    // Inspect actual Vue scope retention, not only the owner's reported census.
+    const nativeScope = scope as unknown as {
+      readonly effects: readonly unknown[]
+    }
+    const state = scope.run(() => fixture())!
+    const source = ref(0)
+    const cleanupErrors: unknown[] = []
+    let registerCleanup = false
+    state.jobs.value = []
+    try {
+      state.owner.bindEmbedInputs([source], () => {
+        if (registerCleanup)
+          onWatcherCleanup(() => {
+            try {
+              state.owner.participant.resume()
+            } catch (error) {
+              cleanupErrors.push(error)
+            }
+            expect(nativeScope.effects).toHaveLength(1)
+          })
+        return []
+      })
+      // Register in the actual embed watch callback, not the setup/manual read.
+      registerCleanup = true
+      source.value += 1
+      await nextTick()
+      expect(nativeScope.effects).toHaveLength(1)
+      expect(state.owner.participant.inspect().usage.observers).toBe(2)
+      expect(state.owner.participant.pause()).toMatchObject({
+        paused: true,
+        recoverable: true,
+        usage: { observers: 0 },
+      })
+      expect(cleanupErrors).toHaveLength(1)
+      expect(cleanupErrors[0]).toMatchObject({
+        message: 'editor-session-attachment-embed-lifecycle-transition',
+      })
+      // The pre-fix leak leaves attachment watcher A in this original scope.
+      expect(nativeScope.effects).toHaveLength(0)
+      state.documentIdentity.epoch += 1
+      source.value += 1
+      await nextTick()
+      expect(nativeScope.effects).toHaveLength(0)
+      expect(state.owner.participant.pause().usage.observers).toBe(0)
+      state.owner.participant.dispose('snapshot:actual-empty')
+      expect(nativeScope.effects).toHaveLength(0)
+    } finally {
+      scope.stop()
+    }
   })
 })

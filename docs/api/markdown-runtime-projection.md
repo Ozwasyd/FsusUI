@@ -220,6 +220,13 @@ mutation, including a reactive mutate-and-restore, rejects that check. After tho
 callbacks, only immutable native-state snapshots and private invocation evidence
 are used. This internal setup contract does not supply a legacy event-path upload
 future or relax final-result provenance.
+Lifecycle start/stop/bind/pause/resume/dispose operations share an exclusive
+synchronous transition boundary. Reentrant cleanup cannot change phase or create
+a replacement watcher. Both watcher handles are detached before either cleanup
+runs and remain owned until their actual stop succeeds. Throwing cleanup or
+construction without a returned stop capability blocks census; an idempotent
+retry is not evidence that the original cleanup completed. Other known handles
+and requests can still be cancelled without granting a paused/recoverable result.
 
 The mounted editor's session contract remains documented in
 [`MarkdownEditor`](../components/markdown-editor.md#retained-public-editor-session-source-wip).

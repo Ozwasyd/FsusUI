@@ -187,6 +187,65 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
     (boundaryRef = next)
   let watcherTransitions = 0
   let requestTransitions = 0
+  let lifecycleTransition: object | undefined
+  const ownedWatchers = new Set<WatchStopHandle>()
+  const failedWatcherStops = new Map<WatchStopHandle, unknown>()
+  let watcherConstructionFailure: { readonly error: unknown } | undefined
+  const assertLifecycleIdle = (cleanupOnly = false) => {
+    if (
+      lifecycleTransition ||
+      watcherTransitions !== 0 ||
+      requestTransitions !== 0
+    )
+      throw new Error('editor-session-attachment-embed-lifecycle-transition')
+    if (!cleanupOnly && (failedWatcherStops.size || watcherConstructionFailure))
+      throw new Error('editor-session-attachment-embed-watcher-unavailable')
+  }
+  const withLifecycleTransition = <T>(
+    action: (transition: object) => T,
+    cleanupOnly = false,
+  ): T => {
+    // Reject before boundary/generation/phase or any native handle changes.
+    assertLifecycleIdle(cleanupOnly)
+    const transition = Object.freeze({})
+    lifecycleTransition = transition
+    try {
+      return action(transition)
+    } finally {
+      lifecycleTransition = undefined
+    }
+  }
+  const assertLifecycleTransition = (transition: object) => {
+    if (lifecycleTransition !== transition)
+      throw new Error('editor-session-attachment-embed-lifecycle-transition')
+  }
+  const createOwnedWatcher = (create: () => WatchStopHandle) => {
+    watcherTransitions += 1
+    try {
+      const watcher = create()
+      ownedWatchers.add(watcher)
+      return watcher
+    } catch (error) {
+      // Native construction did not return a cleanup capability. Never infer zero.
+      watcherConstructionFailure = Object.freeze({ error })
+      throw error
+    } finally {
+      watcherTransitions -= 1
+    }
+  }
+  const stopOwnedWatcher = (watcher: WatchStopHandle) => {
+    watcherTransitions += 1
+    try {
+      watcher()
+      ownedWatchers.delete(watcher)
+    } catch (error) {
+      // A later idempotent stop cannot prove a throwing cleanup completed.
+      failedWatcherStops.set(watcher, error)
+      throw error
+    } finally {
+      watcherTransitions -= 1
+    }
+  }
   const createOwnedEmbedRequest = (
     input: Parameters<typeof createMarkdownEmbedRequest>[0],
   ) => {
@@ -244,39 +303,27 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
       jobs,
     })
   }
-  const stopAttachmentWatching = () => {
-    invalidateAttachmentObservation()
-    const previous = stopAttachmentWatcher
-    stopAttachmentWatcher = undefined
-    if (!previous) return
-    watcherTransitions += 1
-    try {
-      previous()
-    } finally {
-      watcherTransitions -= 1
-    }
-  }
-  const startAttachmentWatching = () => {
+  const startAttachmentWatching = (transition: object) => {
+    assertLifecycleTransition(transition)
     if (!attachmentInputs || pauseRequested || disposed) return
+    if (stopAttachmentWatcher)
+      throw new Error('editor-session-attachment-watch-already-running')
     const inputs = attachmentInputs
     const boundary = boundaryRef
     readAttachmentFrame()
     invalidateAttachmentObservation()
-    watcherTransitions += 1
-    try {
-      const watcher = watch(
+    const watcher = createOwnedWatcher(() =>
+      watch(
         [inputs.documentIdentity, inputs.revision, inputs.jobs],
         invalidateAttachmentObservation,
         { flush: 'sync', deep: true },
-      )
-      if (boundaryRef !== boundary || pauseRequested || disposed) {
-        watcher()
-        return
-      }
-      stopAttachmentWatcher = watcher
-    } finally {
-      watcherTransitions -= 1
+      ),
+    )
+    if (boundaryRef !== boundary || pauseRequested || disposed) {
+      stopOwnedWatcher(watcher)
+      return
     }
+    stopAttachmentWatcher = watcher
   }
   const readDocumentContext = () => {
     const document = readDocument()
@@ -297,6 +344,9 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
     if (
       !stopAttachmentWatcher ||
       watcherTransitions !== 0 ||
+      lifecycleTransition !== undefined ||
+      failedWatcherStops.size !== 0 ||
+      watcherConstructionFailure !== undefined ||
       pauseRequested ||
       disposed
     )
@@ -340,24 +390,39 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
     right: ReturnType<typeof readEmbedContext>,
   ) => left.provider === right.provider && sameDocumentContext(left, right)
 
-  const stopWatching = () => {
-    const previous = stopWatcher
+  const stopAllWatching = (transition: object) => {
+    assertLifecycleTransition(transition)
+    invalidateAttachmentObservation()
+    // Detach both handles before either native stop can invoke consumer cleanup.
+    // The owned set retains them until each actual stop returns successfully.
+    const previous = [stopWatcher, stopAttachmentWatcher]
     stopWatcher = undefined
-    if (previous) {
-      watcherTransitions += 1
+    stopAttachmentWatcher = undefined
+    const failures: unknown[] = []
+    for (const watcher of previous) {
+      if (!watcher) continue
       try {
-        previous()
-      } finally {
-        watcherTransitions -= 1
+        stopOwnedWatcher(watcher)
+      } catch (error) {
+        failures.push(error)
       }
     }
+    if (failures.length)
+      throw new AggregateError(
+        failures,
+        'editor-session-attachment-embed-watcher-stop-failed',
+      )
   }
-  const startWatching = () => {
+  const startWatching = (transition: object) => {
+    assertLifecycleTransition(transition)
     if (!watchInputs || pauseRequested || disposed) return
+    if (stopWatcher)
+      throw new Error('editor-session-embed-watch-already-running')
     const inputs = watchInputs
     const boundary = boundaryRef
     let watcher: WatchStopHandle | undefined
-    const refreshFromInputs = () => {
+    const refreshFromInputs = (admission?: object) => {
+      if (lifecycleTransition && lifecycleTransition !== admission) return
       if (stopWatcher !== watcher || pauseRequested || disposed) return
       const boundary = boundaryRef
       const context = readEmbedContext()
@@ -372,18 +437,15 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
       )
         refreshEmbeds(nextNodes)
     }
-    watcherTransitions += 1
-    try {
-      watcher = watch([...inputs.sources], refreshFromInputs)
-      if (boundaryRef !== boundary || pauseRequested || disposed) {
-        watcher()
-        return
-      }
-      stopWatcher = watcher
-    } finally {
-      watcherTransitions -= 1
+    watcher = createOwnedWatcher(() =>
+      watch([...inputs.sources], () => refreshFromInputs()),
+    )
+    if (boundaryRef !== boundary || pauseRequested || disposed) {
+      stopOwnedWatcher(watcher)
+      return
     }
-    refreshFromInputs()
+    stopWatcher = watcher
+    refreshFromInputs(transition)
   }
 
   const collectDraining = () => {
@@ -410,7 +472,13 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
     for (const request of retired) cancelMarkdownEmbedRequest(request)
     return epoch
   }
-  const inspect = (): MarkdownEditorSessionResourceInspection => {
+  const inspectState = (
+    transition?: object,
+  ): MarkdownEditorSessionResourceInspection => {
+    if (lifecycleTransition && lifecycleTransition !== transition)
+      throw new Error('editor-session-attachment-embed-lifecycle-transition')
+    if (failedWatcherStops.size || watcherConstructionFailure)
+      throw new Error('editor-session-attachment-embed-watcher-unavailable')
     if (watcherTransitions !== 0)
       throw new Error('editor-session-attachment-embed-watcher-transition')
     if (requestTransitions !== 0)
@@ -470,6 +538,7 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
         pauseRequested &&
         stopWatcher === undefined &&
         stopAttachmentWatcher === undefined &&
+        ownedWatchers.size === 0 &&
         backgroundTasks === 0 &&
         timers === 0 &&
         retainedListeners === 0,
@@ -490,7 +559,7 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
       usage: Object.freeze({
         editorInstances: 0,
         renderers: 0,
-        observers: (stopWatcher ? 1 : 0) + (stopAttachmentWatcher ? 1 : 0),
+        observers: ownedWatchers.size,
         timers,
         backgroundTasks,
         // This library performs no network I/O. Opaque consumer work blocks pause
@@ -509,11 +578,11 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
           embedAttempts.size +
           versions.size +
           nodes.length +
-          (stopWatcher ? 1 : 0) +
-          (stopAttachmentWatcher ? 1 : 0),
+          ownedWatchers.size,
       }),
     })
   }
+  const inspect = () => inspectState()
   const publish = () =>
     Reflect.apply(publishEmbedResultsBinding, bindings, [new Map(results)])
   const resolveEmbedAttempt = async (
@@ -655,8 +724,10 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
       } else controller.abort()
     }
   }
-  const resolveEmbedNode = (node: MarkdownEmbedValidNode) =>
-    resolveEmbedAttempt(node, Object.freeze({}))
+  const resolveEmbedNode = (node: MarkdownEmbedValidNode) => {
+    assertLifecycleIdle()
+    return resolveEmbedAttempt(node, Object.freeze({}))
+  }
   const refreshEmbeds = (nextNodes: readonly MarkdownEmbedValidNode[]) => {
     if (disposed) throw new Error('editor-session-attachment-embed-disposed')
     if (pauseRequested)
@@ -690,40 +761,64 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
       void resolveEmbedAttempt(node, expectedBoundary)
     }
   }
+  const pauseLifecycle = (transition: object) => {
+    assertLifecycleTransition(transition)
+    const boundary = beginBoundary()
+    attachmentGeneration += 1
+    pauseRequested = true
+    const failures: unknown[] = []
+    try {
+      stopAllWatching(transition)
+    } catch (error) {
+      failures.push(error)
+    }
+    try {
+      if (boundaryRef === boundary) cancel()
+    } catch (error) {
+      failures.push(error)
+    }
+    if (failures.length)
+      throw new AggregateError(
+        failures,
+        'editor-session-attachment-embed-pause-failed',
+      )
+  }
   const participant: MarkdownEditorSessionResourceParticipant = Object.freeze({
     ownerRef: 'attachment-embed',
     inspect,
     pause() {
-      const boundary = beginBoundary()
-      attachmentGeneration += 1
-      pauseRequested = true
-      stopWatching()
-      stopAttachmentWatching()
-      if (boundaryRef === boundary) cancel()
-      return inspect()
+      return withLifecycleTransition((transition) => {
+        pauseLifecycle(transition)
+        return inspectState(transition)
+      }, true)
     },
     resume() {
-      if (disposed) throw new Error('editor-session-attachment-embed-disposed')
-      beginBoundary()
-      const wasPaused = pauseRequested
-      pauseRequested = false
-      if (wasPaused) {
-        startAttachmentWatching()
-        if (watchInputs) startWatching()
-        else refreshEmbeds(nodes)
-      }
-      return inspect()
+      return withLifecycleTransition((transition) => {
+        if (disposed)
+          throw new Error('editor-session-attachment-embed-disposed')
+        beginBoundary()
+        const wasPaused = pauseRequested
+        pauseRequested = false
+        if (wasPaused) {
+          startAttachmentWatching(transition)
+          if (watchInputs) startWatching(transition)
+          else refreshEmbeds(nodes)
+        }
+        return inspectState(transition)
+      })
     },
     dispose(snapshotRef: string) {
-      const state = inspect()
-      if (!snapshotRef || !state.paused || !state.recoverable)
-        throw new Error(
-          'editor-session-attachment-embed-checkpoint-not-recoverable',
-        )
-      beginBoundary()
-      disposed = true
-      attachmentGeneration += 1
-      cancel()
+      return withLifecycleTransition((transition) => {
+        const state = inspectState(transition)
+        if (!snapshotRef || !state.paused || !state.recoverable)
+          throw new Error(
+            'editor-session-attachment-embed-checkpoint-not-recoverable',
+          )
+        beginBoundary()
+        disposed = true
+        attachmentGeneration += 1
+        cancel()
+      })
     },
   })
   const acceptsAttachmentResult = (
@@ -783,6 +878,7 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
         admitProgress: (result: MarkdownAttachmentProviderResult) => boolean,
       ) => PromiseLike<MarkdownAttachmentProviderResult>,
     ): Promise<MarkdownAttachmentProviderResult> {
+      assertLifecycleIdle()
       if (disposed || pauseRequested)
         throw new Error('editor-session-attachment-dispatch-admission-blocked')
       const boundary = beginBoundary()
@@ -892,64 +988,73 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
       }
     },
     bindAttachmentInputs(inputs: MarkdownAttachmentEmbedInputs) {
-      if (disposed || attachmentInputs)
-        throw new Error(
-          'editor-session-attachment-input-already-bound-or-disposed',
+      return withLifecycleTransition((transition) => {
+        if (disposed || attachmentInputs)
+          throw new Error(
+            'editor-session-attachment-input-already-bound-or-disposed',
+          )
+        const boundary = beginBoundary()
+        const captured = Object.freeze({
+          documentIdentity: inputs.documentIdentity,
+          revision: inputs.revision,
+          jobs: inputs.jobs,
+        })
+        if (
+          !isReactive(captured.documentIdentity) ||
+          isReadonly(captured.documentIdentity) ||
+          toRaw(captured.documentIdentity) === captured.documentIdentity ||
+          boundary !== boundaryRef ||
+          disposed ||
+          attachmentInputs
         )
-      const boundary = beginBoundary()
-      const captured = Object.freeze({
-        documentIdentity: inputs.documentIdentity,
-        revision: inputs.revision,
-        jobs: inputs.jobs,
+          throw new Error('editor-session-attachment-input-unavailable')
+        attachmentInputs = captured
+        try {
+          readAttachmentFrame()
+          startAttachmentWatching(transition)
+        } catch (error) {
+          // A constructed/failed handle remains owned; no silent rollback to zero.
+          if (
+            !stopAttachmentWatcher &&
+            !watcherConstructionFailure &&
+            !failedWatcherStops.size
+          )
+            attachmentInputs = undefined
+          throw error
+        }
       })
-      if (
-        !isReactive(captured.documentIdentity) ||
-        isReadonly(captured.documentIdentity) ||
-        toRaw(captured.documentIdentity) === captured.documentIdentity ||
-        boundary !== boundaryRef ||
-        disposed ||
-        attachmentInputs
-      )
-        throw new Error('editor-session-attachment-input-unavailable')
-      attachmentInputs = captured
-      try {
-        readAttachmentFrame()
-        startAttachmentWatching()
-      } catch (error) {
-        stopAttachmentWatching()
-        attachmentInputs = undefined
-        throw error
-      }
     },
     bindEmbedInputs(
       sources: readonly WatchSource[],
       readNodes: () => readonly MarkdownEmbedValidNode[],
     ) {
-      if (disposed || watchInputs)
-        throw new Error(
-          'editor-session-attachment-embed-watch-already-bound-or-disposed',
-        )
-      const boundary = beginBoundary()
-      const inputs = { sources: [...sources], readNodes }
-      if (boundaryRef !== boundary || disposed || watchInputs)
-        throw new Error('editor-session-attachment-embed-watch-bind-reentered')
-      watchInputs = inputs
-      startWatching()
+      return withLifecycleTransition((transition) => {
+        if (disposed || watchInputs)
+          throw new Error(
+            'editor-session-attachment-embed-watch-already-bound-or-disposed',
+          )
+        const boundary = beginBoundary()
+        const inputs = { sources: [...sources], readNodes }
+        if (boundaryRef !== boundary || disposed || watchInputs)
+          throw new Error(
+            'editor-session-attachment-embed-watch-bind-reentered',
+          )
+        watchInputs = inputs
+        startWatching(transition)
+      })
     },
     resolveEmbedNode,
-    refreshEmbeds,
+    refreshEmbeds(nextNodes: readonly MarkdownEmbedValidNode[]) {
+      assertLifecycleIdle()
+      return refreshEmbeds(nextNodes)
+    },
     readEmbedResults: () =>
       new Map(results) as ReadonlyMap<string, MarkdownEmbedResult>,
     readEmbedRequestVersions: () =>
       new Map(versions) as ReadonlyMap<string, number>,
     acceptsAttachmentResult,
     abort() {
-      const boundary = beginBoundary()
-      attachmentGeneration += 1
-      pauseRequested = true
-      stopWatching()
-      stopAttachmentWatching()
-      if (boundaryRef === boundary) cancel()
+      return withLifecycleTransition(pauseLifecycle, true)
     },
   })
 }
