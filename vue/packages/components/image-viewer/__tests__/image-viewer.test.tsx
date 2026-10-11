@@ -95,7 +95,6 @@ describe('<image-viewer /> keyboard and pointer scope', () => {
     await doubleWait()
     const viewer = wrapper.find('.el-image-viewer__wrapper')
     const vm = wrapper.vm as any
-    vm.loading = false
 
     document.dispatchEvent(new KeyboardEvent('keydown', { code: 'ArrowRight' }))
     await doubleWait()
@@ -104,6 +103,14 @@ describe('<image-viewer /> keyboard and pointer scope', () => {
     await viewer.trigger('keydown', { code: 'ArrowRight' })
     await doubleWait()
     expect(vm.activeIndex).toBe(1)
+
+    const currentImage = wrapper.findAll('img')[vm.activeIndex]
+    Object.defineProperty(currentImage.element, 'complete', {
+      configurable: true,
+      value: true,
+    })
+    await currentImage.trigger('load')
+    await doubleWait()
 
     const scaleBeforeWrapperZoom = vm.transform.scale
     document.dispatchEvent(new KeyboardEvent('keydown', { code: 'ArrowUp' }))
