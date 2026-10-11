@@ -38,6 +38,8 @@ import type { MarkdownStableProjection } from '@element-plus/wasm'
 import type MarkdownEditor from './markdown-editor.vue'
 import type { MarkdownAttachmentBatchIntent } from './markdown-editor-attachment'
 import type { MarkdownEditorMetricsOptions } from './markdown-editor-metrics'
+import type { MarkdownEditorAttachmentDispatch } from './markdown-editor-session-attachment-dispatch'
+export type { MarkdownEditorAttachmentDispatch } from './markdown-editor-session-attachment-dispatch'
 export {
   captureMarkdownAttachmentInput,
   createMarkdownAttachmentCaptureSession,
@@ -1814,6 +1816,10 @@ export const markdownEditorProps = buildProps({
   },
   previewFeatures: {
     type: Object as PropType<MarkdownFeatureActivationFeatureOptions>,
+    default: undefined,
+  },
+  attachmentDispatch: {
+    type: definePropType<MarkdownEditorAttachmentDispatch>(Function),
     default: undefined,
   },
   embedProvider: {

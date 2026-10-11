@@ -702,3 +702,29 @@ scroll-cleanup frame handles and reset its scroll suppression flags. Old geometr
 callbacks keep their document-epoch guard; cleanup never executes stale geometry.
 This minimal source fix addresses the independent reviewer P2 on the original
 `9f600e0c` checkpoint. Runtime geometry/scroll/IME acceptance remains UNRUN.
+
+
+`attachmentDispatch({ batch, item, file, onProgress })` is an optional per-item
+consumer hook returning the **actual service Promise/thenable**, not a synchronous
+result. Native file capture retains the original File in the existing item custody
+for that attempt/retry. When configured, capture/retry invokes this hook through
+the original attachment owner's real dispatch ledger and does not also emit
+`upload-image` for that attempt. `onProgress` enters only its progress admission
+gate; terminal content receives the owner's immutable settled proof after the real
+future resolves. Rejection settles that ledger and updates only a still-current
+original job. No Promise is manufactured from an event or terminal label.
+
+Without the hook, the existing void `upload-image` event remains. Its settlement is
+unknown, so an unknown or still-running legacy attempt cannot be retried as a
+settled attempt. The original paste-as-Markdown event producer has no registered
+attachment job/service future and retains its legacy event/unknown custody. No
+second upload is started. The existing MarkdownTextEditor Blog upload permission
+and callback path is unchanged; it supplies no real service future here.
+
+The immutable UI915 `90cc75bb5afce355430d414ee2e1b421ea265804` fixes are consumed
+as separate upstream commits. They separate embed refresh from attachment
+admission generations and progress from awaited terminal provenance, and control
+capacity refusal. Root source review remains held. Attachment total-roster
+registration remains disabled; arbitrary consumer network/timer resources and
+retained File physical-heap qualification are not inferred from promise settlement.
+All runtime/native/worker/network/IME/receipt qualifications remain UNRUN here.

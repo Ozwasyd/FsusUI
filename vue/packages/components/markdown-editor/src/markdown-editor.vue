@@ -1183,6 +1183,7 @@ import {
 } from './markdown-editor-attachment'
 import {
   cancelMarkdownAttachmentJob,
+  inspectMarkdownAttachmentDispatch,
   planMarkdownAttachmentInsert,
   planMarkdownAttachmentRemove,
   planMarkdownAttachmentResolve,
@@ -1640,28 +1641,35 @@ const attachmentPauseRequested = ref(false)
 // A public consumer callback has no network/timer census. Remember that it was
 // bound/invoked; replacing props or completing a job cannot prove it released
 // resources. Only a real consumer resource owner may lift this limitation.
-const opaqueAttachmentResourcesObserved = ref(Boolean(props.embedProvider))
-watch(() => props.embedProvider, (provider) => {
-  if (provider) opaqueAttachmentResourcesObserved.value = true
+const opaqueAttachmentResourcesObserved = ref(Boolean(props.embedProvider || props.attachmentDispatch))
+watch([() => props.embedProvider, () => props.attachmentDispatch], (providers) => {
+  if (providers.some(Boolean)) opaqueAttachmentResourcesObserved.value = true
 }, { flush: 'sync' })
 const attachmentJobs = ref<MarkdownAttachmentJob[]>([])
 const attachmentBatches = new Map<string, MarkdownAttachmentBatchIntent>()
 const attachmentItems = new Map<
   string,
-  MarkdownAttachmentBatchIntent['items'][number]
+  MarkdownAttachmentBatchIntent['items'][number] & { readonly sourceFile: File | null }
 >()
 const attachmentPresentations = computed(() =>
   attachmentJobs.value
     .filter((job) => job.phase !== 'deleted')
     .map((job) => {
       const item = attachmentItems.get(job.itemId ?? job.id)
-      return createMarkdownAttachmentAtomicPresentation({
+      const presentation = createMarkdownAttachmentAtomicPresentation({
         itemId: job.itemId ?? job.id,
         name: item?.name ?? localeText.value.attachments.unnamed,
         kind: item?.kind,
         status: job.phase === 'idle' ? 'pending' : job.phase,
         progress: job.progress,
         copy: localeText.value.attachments,
+      })
+      const settlement = inspectMarkdownAttachmentDispatch(job)
+      return Object.freeze({
+        ...presentation,
+        actions: Object.freeze(presentation.actions.map((action) => action.key === 'retry'
+          ? Object.freeze({ ...action, disabled: action.disabled || !settlement?.settled || settlement.attempt !== job.attempt })
+          : action)),
       })
     }),
 )
@@ -2681,10 +2689,9 @@ const captureAttachmentFiles = (
 
   attachmentBatches.set(captured.batch.batchId, captured.batch)
   for (const item of captured.batch.items)
-    attachmentItems.set(item.itemId, item)
+    attachmentItems.set(item.itemId, Object.freeze({ ...item, sourceFile: files[item.order] ?? null }))
   attachmentJobs.value = [...attachmentJobs.value, ...planned.jobs]
-  opaqueAttachmentResourcesObserved.value = true
-  emit('upload-image', captured.batch)
+  dispatchAttachmentBatch(captured.batch)
   return captured
 }
 
@@ -4559,6 +4566,9 @@ const confirmPasteAsMarkdownChoice = (
     return
   }
   if (confirmed.attachmentBatch) {
+    // This original producer supplies no owned job/service future. Preserve
+    // its legacy event and keep its consumer resources explicitly unknown.
+    opaqueAttachmentResourcesObserved.value = true
     emit('upload-image', confirmed.attachmentBatch)
   }
   closePasteAsMarkdownSurface(result.selection)
@@ -4899,6 +4909,45 @@ const applyAttachmentResult = (result: MarkdownAttachmentProviderResult) => {
   }).accepted
 }
 
+const dispatchAttachmentBatch = (batch: MarkdownAttachmentBatchIntent) => {
+  opaqueAttachmentResourcesObserved.value = true
+  const dispatch = props.attachmentDispatch
+  if (!dispatch) {
+    // A void event is compatible notification, never a settlement future.
+    emit('upload-image', batch)
+    return
+  }
+  for (const item of batch.items) {
+    const job = attachmentJobs.value.find((candidate) => candidate.itemId === item.itemId && candidate.batchId === batch.batchId)
+    if (!job) continue
+    const attempt = job.attempt
+    const identity = Object.freeze({ ...transactionStore.documentIdentity })
+    const file = attachmentItems.get(item.itemId)?.sourceFile ?? null
+    void attachmentEmbedOwner.runAttachmentDispatch(job, (admitProgress) => dispatch(Object.freeze({
+      batch,
+      item,
+      file,
+      onProgress: (progress: MarkdownAttachmentProviderResult) => admitProgress(progress) && applyAttachmentResult(progress),
+    }))).then((settled) => {
+      // Only the real owner's awaited terminal proof reaches content commit.
+      applyAttachmentResult(settled)
+    }).catch(() => {
+      const settled = inspectMarkdownAttachmentDispatch(job)
+      if (!settled?.settled || settled.attempt !== attempt || job.attempt !== attempt ||
+        sessionDisposed || attachmentPauseRequested.value ||
+        transactionStore.documentIdentity.id !== identity.id || transactionStore.documentIdentity.epoch !== identity.epoch ||
+        (job.phase !== 'pending' && job.phase !== 'progress')) return
+      // A rejected actual future is settled independently of its UI phase.
+      // Missing/throwing dispatch without a future remains unknown and pending.
+      job.phase = 'rejected'
+      job.code = 'attachment-dispatch-rejected'
+    }).finally(() => {
+      // Refresh retry eligibility from real settlement even for cancelled jobs.
+      triggerRef(attachmentJobs)
+    })
+  }
+}
+
 const runAttachmentAction = (
   itemId: string,
   action: 'cancel' | 'retry' | 'remove',
@@ -4911,14 +4960,14 @@ const runAttachmentAction = (
     cancelMarkdownAttachmentJob(job)
   } else if (action === 'retry') {
     if (attachmentPauseRequested.value) return
-    retryMarkdownAttachmentJob(job)
+    try { retryMarkdownAttachmentJob(job) } catch {
+      // Unknown legacy settlement or a still-running attempt cannot be retried.
+      return
+    }
     const batch = job.batchId ? attachmentBatches.get(job.batchId) : undefined
-    const item = attachmentItems.get(itemId)
+    const item = batch?.items.find((candidate) => candidate.itemId === itemId)
     if (batch && item) {
-      emit(
-        'upload-image',
-        Object.freeze({ ...batch, items: Object.freeze([item]) }),
-      )
+      dispatchAttachmentBatch(Object.freeze({ ...batch, items: Object.freeze([item]) }))
     }
   } else {
     const planned = planMarkdownAttachmentRemove(transactionStore.value, job)
