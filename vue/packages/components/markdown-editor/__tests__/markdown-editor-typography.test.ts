@@ -15,7 +15,7 @@ const standard: MarkdownEditorTypographyProfile = {
 }
 
 describe('public MarkdownEditor closed typography catalog', () => {
-  it('parses all 243 closed combinations but supports only the registered baseline', () => {
+  it('parses all 243 closed combinations but supports only 27 declared engineering mappings', () => {
     const choices = MARKDOWN_EDITOR_TYPOGRAPHY_CATALOG.choices
     let parsed = 0
     let supported = 0
@@ -39,7 +39,7 @@ describe('public MarkdownEditor closed typography catalog', () => {
                 expect(result.unsupportedDimensions.length).toBeGreaterThan(0)
             }
     expect(parsed).toBe(243)
-    expect(supported).toBe(1)
+    expect(supported).toBe(27)
   })
 
   it('rejects extra fields, symbols, missing dimensions and future schema', () => {

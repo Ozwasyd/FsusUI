@@ -30,20 +30,45 @@ const dimensions = Object.freeze(
 /** Capability facts, not a persisted preference or a consumer default policy. */
 export const MARKDOWN_EDITOR_TYPOGRAPHY_CATALOG = Object.freeze({
   schemaVersion: 1 as const,
-  mappingVersion: 'markdown-editor-typography.v1' as const,
+  mappingVersion: 'markdown-editor-typography.v2' as const,
   choices,
   supported: Object.freeze({
     fontFamily: Object.freeze(['system-sans'] as const),
-    fontSize: Object.freeze(['standard'] as const),
-    lineHeight: Object.freeze(['standard'] as const),
-    canvasWidth: Object.freeze(['standard'] as const),
+    fontSize: choices.fontSize,
+    lineHeight: choices.lineHeight,
+    canvasWidth: choices.canvasWidth,
     paragraphSpacing: Object.freeze(['standard'] as const),
+  }),
+  /** New engineering choices; numeric/style authority remains the owning SCSS. */
+  mapping: Object.freeze({
+    fontFamily: Object.freeze({
+      'system-sans': 'typography.family.body:system-ui+sans-serif',
+    }),
+    fontSize: Object.freeze({
+      compact: '--el-font-size-medium',
+      standard: 'existing-prose-font-size',
+      large: '--el-font-size-extra-large',
+    }),
+    lineHeight: Object.freeze({
+      compact: 'existing-markdown-source-line-height',
+      standard: 'existing-prose-line-height',
+      relaxed: 'prose-line-height-plus-space.1',
+    }),
+    canvasWidth: Object.freeze({
+      narrow: 'prose-width-minus-two-space.8',
+      standard: 'existing-prose-width',
+      wide: 'prose-width-plus-two-space.8',
+    }),
+    unsupported: Object.freeze({
+      fontFamily: 'no-registered-pinned-font-asset-contract',
+      paragraphSpacing: 'native-textarea-has-no-independent-paragraph-gap',
+    }),
   }),
   baseline: Object.freeze({
     contractId: 'markdown-editor.prose.source-lines.v1' as const,
     styleAuthority:
       'theme-chalk/markdown-editor.scss: prose typography' as const,
-    fontIdentity: 'system-sans.v1' as const,
+    fontIdentity: 'system-sans.v2' as const,
     fontKind: 'system' as const,
     networkPolicy: 'no-font-loader' as const,
     paragraphSpacing: 'source-blank-lines' as const,
@@ -182,7 +207,7 @@ export interface MarkdownEditorTypographyEffective {
   readonly canvasWidthPx: number
   readonly paragraphSpacing: 'source-blank-lines'
   readonly font: Readonly<{
-    identity: 'system-sans.v1'
+    identity: typeof MARKDOWN_EDITOR_TYPOGRAPHY_CATALOG.baseline.fontIdentity
     kind: 'system'
     state: 'current'
     computedFamily: string

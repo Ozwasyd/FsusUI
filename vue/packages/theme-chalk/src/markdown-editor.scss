@@ -1,11 +1,15 @@
 @use 'mixins/mixins' as *;
 @use 'common/var' as *;
 
+$markdown-editor-prose-width: 74ch;
+$markdown-editor-prose-line-height: 1.84;
+$markdown-editor-source-line-height: 1.6;
+
 // One owner for the existing prose metrics and opt-in typography baseline.
 @mixin markdown-editor-prose-typography($system-only: false) {
-  width: min(100%, 74ch);
+  width: min(100%, $markdown-editor-prose-width);
   @if $system-only {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-family: system-ui, sans-serif;
   } @else {
     font-family:
       getCssVar('font-family'),
@@ -15,7 +19,7 @@
       sans-serif;
   }
   font-size: 18px;
-  line-height: 1.84;
+  line-height: $markdown-editor-prose-line-height;
   letter-spacing: 0;
 }
 
@@ -629,6 +633,39 @@
     @include e(preview) {
       @include markdown-editor-prose-typography(true);
       justify-self: center;
+    }
+  }
+
+  // Engineering mapping v2: closed discrete steps, never consumer CSS/numeric input.
+  @each $size, $token in (compact: medium, large: extra-large) {
+    @include m(typography-size-#{$size}) {
+      @include e((textarea, focus-layer, preview)) {
+        font-size: getCssVar('font-size', $token);
+      }
+    }
+  }
+
+  @include m(typography-line-height-compact) {
+    @include e((textarea, focus-layer, preview)) {
+      line-height: $markdown-editor-source-line-height;
+    }
+  }
+
+  @include m(typography-line-height-relaxed) {
+    @include e((textarea, focus-layer, preview)) {
+      line-height: calc(#{$markdown-editor-prose-line-height}em + var(--fsus-space-1, 4px));
+    }
+  }
+
+  @include m(typography-width-narrow) {
+    @include e((textarea, focus-layer, preview)) {
+      width: min(100%, calc(#{$markdown-editor-prose-width} - 2 * var(--fsus-space-8, 32px)));
+    }
+  }
+
+  @include m(typography-width-wide) {
+    @include e((textarea, focus-layer, preview)) {
+      width: min(100%, calc(#{$markdown-editor-prose-width} + 2 * var(--fsus-space-8, 32px)));
     }
   }
 

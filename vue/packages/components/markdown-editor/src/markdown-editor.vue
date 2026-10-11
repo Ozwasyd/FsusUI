@@ -14,6 +14,11 @@
       ns.is('focus-mode', writingAidsFocusState.enabled),
       ns.is('typewriter-mode', resolvedWritingAids.typewriter),
       ns.is('typography-baseline', activeTypography !== null),
+      activeTypography && ns.m(`typography-size-${activeTypography.fontSize}`),
+      activeTypography &&
+        ns.m(`typography-line-height-${activeTypography.lineHeight}`),
+      activeTypography &&
+        ns.m(`typography-width-${activeTypography.canvasWidth}`),
     ]"
     role="region"
     tabindex="-1"
@@ -1974,9 +1979,10 @@ const restoreTextareaViewport = (
       restoringViewport = true
       target.scrollTop = viewportRestoreNextScrollTop
       viewportRestoreNextScrollTop = null
-      queueMicrotask(() => {
-        restoringViewport = false
-      })
+      if (!continuity)
+        queueMicrotask(() => {
+          restoringViewport = false
+        })
     },
     postPaint: continuity?.settled,
   })
@@ -1998,7 +2004,9 @@ const applyTypography = (
       settle: 'not-applied' as const,
       effective: null,
     })
-    emit('typography-result', result)
+    queueMicrotask(() => {
+      if (!typographyDisposed) emit('typography-result', result)
+    })
     return result
   }
   if (!request) return Promise.resolve(rejected('invalid-request'))
@@ -2039,9 +2047,10 @@ const applyTypography = (
   const selection = Object.freeze({ ...transactionStore.selection })
   const history = transactionStore.history
   const mode = currentMode.value
+  const projection = editorProjection.value
   const anchor = captureMarkdownLiveLayoutAnchor({
     documentIdentity: identity,
-    projection: editorProjection.value,
+    projection,
     revision,
     selection,
     source,
@@ -2054,7 +2063,7 @@ const applyTypography = (
     selection,
     source,
     previousAnchor: anchor,
-    projection: editorProjection.value,
+    projection,
     reducedMotion: reducedMotionRequested(),
     trigger: 'typography',
   })
@@ -2095,47 +2104,62 @@ const applyTypography = (
     if (done) return
     done = true
     for (const key of keys) frameScheduler.cancel(key)
-    if (liveLayout.value === plan) frameScheduler.cancel('viewport-restore')
+    if (liveLayout.value === plan) {
+      frameScheduler.cancel('viewport-restore')
+      restoringViewport = false
+    }
     if (pendingTypography === operation) pendingTypography = null
     frameScheduler.scheduleMutate(
       'typography-cleanup',
       clearTypographyMeasurements,
     )
     resolveResult?.(result)
-    emit('typography-result', result)
+    queueMicrotask(() => {
+      if (!typographyDisposed) emit('typography-result', result)
+    })
   }
   const guard = () => {
     if (done) return false
-    const reason: MarkdownEditorTypographyRejection | null = typographyDisposed
-      ? 'disposed'
-      : transactionStore.documentIdentity.id !== identity.id ||
-          transactionStore.documentIdentity.epoch !== identity.epoch
-        ? 'stale-document'
-        : transactionStore.revision !== revision ||
-            transactionStore.value !== source ||
-            !historiesEqual(transactionStore.history, history)
-          ? 'stale-revision'
-          : transactionStore.selection.start !== selection.start ||
-              transactionStore.selection.end !== selection.end ||
-              transactionStore.selection.direction !== selection.direction
-            ? 'selection-changed'
-            : textarea.value !== source
-              ? 'stale-revision'
-              : isComposing.value
-                ? 'composition-active'
-                : textarea.ownerDocument.fonts?.status === 'loading'
-                  ? 'font-loading'
-                  : layoutGesture.value ||
-                      writingAidsState.value === 'selection-drag-suspended'
-                    ? 'user-scroll'
-                    : textareaRef.value !== textarea ||
-                        !textarea.isConnected ||
-                        currentMode.value !== mode ||
-                        textarea.ownerDocument.visibilityState === 'hidden'
-                      ? 'surface-unavailable'
-                      : committed && liveLayout.value !== plan
-                        ? 'layout-superseded'
-                        : null
+    let reason: MarkdownEditorTypographyRejection | null = null
+    if (typographyDisposed) reason = 'disposed'
+    else if (
+      transactionStore.documentIdentity.id !== identity.id ||
+      transactionStore.documentIdentity.epoch !== identity.epoch
+    )
+      reason = 'stale-document'
+    else if (
+      transactionStore.revision !== revision ||
+      transactionStore.value !== source ||
+      textarea.value !== source ||
+      !historiesEqual(transactionStore.history, history)
+    )
+      reason = 'stale-revision'
+    else if (
+      transactionStore.selection.start !== selection.start ||
+      transactionStore.selection.end !== selection.end ||
+      transactionStore.selection.direction !== selection.direction ||
+      textarea.selectionStart !== selection.start ||
+      textarea.selectionEnd !== selection.end ||
+      textarea.selectionDirection !== selection.direction
+    )
+      reason = 'selection-changed'
+    else if (isComposing.value) reason = 'composition-active'
+    else if (textarea.ownerDocument.fonts?.status === 'loading')
+      reason = 'font-loading'
+    else if (
+      layoutGesture.value ||
+      writingAidsState.value === 'selection-drag-suspended'
+    )
+      reason = 'user-scroll'
+    else if (
+      textareaRef.value !== textarea ||
+      !textarea.isConnected ||
+      currentMode.value !== mode ||
+      textarea.ownerDocument.visibilityState === 'hidden'
+    )
+      reason = 'surface-unavailable'
+    else if (editorProjection.value !== projection || (committed && liveLayout.value !== plan))
+      reason = 'layout-superseded'
     if (reason) operation.cancel(reason)
     return reason === null
   }
@@ -2145,10 +2169,12 @@ const applyTypography = (
   const schedule = (
     task: Omit<Parameters<typeof frameScheduler.schedule>[0], 'guard'>,
   ) => {
+    if (done) return
     if (!frameScheduler.schedule({ ...task, guard }))
       operation.cancel('surface-unavailable')
   }
-  schedule({
+  // Entry from a consumer result callback must wait for that frame to finish.
+  queueMicrotask(() => schedule({
     key: keys[0],
     measure: () => {
       metrics = measureMarkdownLiveLayoutTextMetrics(textarea)
@@ -2202,11 +2228,10 @@ const applyTypography = (
                 !style ||
                 style.writingMode !== 'horizontal-tb' ||
                 !Number.isFinite(fontSizePx) ||
-                fontSizePx <= 0 ||
+                fontSizePx < 14 ||
                 !Number.isFinite(lineHeightPx) ||
                 lineHeightPx <= 0 ||
-                family !==
-                  '-apple-system, blinkmacsystemfont, segoe ui, sans-serif'
+                family !== 'system-ui, sans-serif'
               ) {
                 operation.cancel('geometry-unavailable')
                 return
@@ -2221,7 +2246,8 @@ const applyTypography = (
                 canvasWidthPx: textarea.clientWidth,
                 paragraphSpacing: 'source-blank-lines',
                 font: Object.freeze({
-                  identity: 'system-sans.v1',
+                  identity:
+                    MARKDOWN_EDITOR_TYPOGRAPHY_CATALOG.baseline.fontIdentity,
                   kind: 'system',
                   state: 'current',
                   computedFamily: style.fontFamily,
@@ -2279,7 +2305,7 @@ const applyTypography = (
             },
           }),
       }),
-  })
+  }))
   return promise
 }
 const applyLiveLayout = (
