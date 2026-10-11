@@ -87,6 +87,31 @@ export interface MarkdownStableProjection {
   }
 }
 
+export const createMarkdownSyntaxIdentityResolver = (
+  documentIdentity: MarkdownDocumentIdentity,
+  nodes: readonly MarkdownStableSyntaxNode[],
+): MarkdownStableProjection['resolve'] => {
+  const byId = new Map(nodes.map((node) => [node.id, node]))
+  return (id: string) => {
+    if (!id.startsWith('syn:')) return { status: 'invalid' as const }
+    const parts = id.split(':')
+    // Only the final epoch/kind/ordinal fields have fixed positions. The
+    // document ID is opaque and may itself contain any number of separators.
+    if (
+      parts.length < 5 ||
+      parts.slice(1, -3).join(':') !== documentIdentity.id
+    ) {
+      return { status: 'invalid' as const }
+    }
+    if (Number(parts[parts.length - 3]) !== documentIdentity.epoch) {
+      return { status: 'deleted' as const }
+    }
+    const node = byId.get(id)
+    if (!node) return { status: 'deleted' as const }
+    return { status: 'current' as const, node }
+  }
+}
+
 const identityFor = (
   documentIdentity: MarkdownDocumentIdentity,
   kind: string,
@@ -566,8 +591,6 @@ export const stabilizeMarkdownEditorProjection = (
     }),
   )
 
-  const byId = new Map(nodes.map((node) => [node.id, node]))
-
   return Object.freeze({
     documentIdentity: Object.freeze({
       id: documentIdentity.id,
@@ -576,22 +599,6 @@ export const stabilizeMarkdownEditorProjection = (
     identityState,
     normalizedSource: projection.identity.normalizedSource,
     nodes: Object.freeze(nodes),
-    resolve(id: string) {
-      if (!id.startsWith('syn:')) {
-        return { status: 'invalid' as const }
-      }
-      const parts = id.split(':')
-      if (parts.length < 5 || parts[1] !== documentIdentity.id) {
-        return { status: 'invalid' as const }
-      }
-      if (Number(parts[2]) !== documentIdentity.epoch) {
-        return { status: 'deleted' as const }
-      }
-      const node = byId.get(id)
-      if (!node) {
-        return { status: 'deleted' as const }
-      }
-      return { status: 'current' as const, node }
-    },
+    resolve: createMarkdownSyntaxIdentityResolver(documentIdentity, nodes),
   })
 }

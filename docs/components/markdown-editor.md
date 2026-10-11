@@ -372,8 +372,11 @@ identity.
 `embed-provider` is the consumer-owned resolution boundary for valid
 `::embed[...]` projection nodes. The editor supplies an identity-, revision-,
 node-, target-, mode-, and version-bound request. It commits only a matching
-result and treats late or mismatched results as stale. Provider excerpts are
-rendered as escaped text, never `innerHTML`; the directive remains the only host
+result and treats late or mismatched results as stale. Prepared Markdown projections
+use the existing read-only renderer and host base URL, CSP and feature settings;
+the consumer supplies authorized bytes and the current target version through
+[`prepareMarkdownEmbedResult`](../api/markdown-runtime-projection.md).
+Metadata-only provider excerpts are rendered as escaped text; the directive remains the only host
 source/history authority. Source mode displays the exact directive. Live keeps
 the textarea as its only input surface and places the controlled read-only embed
 regions below it; Split and Preview interleave those regions with the normal
@@ -422,7 +425,7 @@ an independent acceptance lane and is not replaced by these simulations.
 | update:modelValue  | 已接受的公开内容更新                                         |
 | change             | 与 `update:modelValue` 相同的公开内容更新                    |
 | transaction        | 每次 accepted/rejected dispatch 的只读 result 与 transaction |
-| selection-change   | revision 与 grapheme-safe、direction-preserving selection    |
+| selection-change   | producer 捕获的只读 documentIdentity、revision 与 grapheme-safe、direction-preserving selection |
 | history-change     | `canUndo/canRedo`、depth 与 retained UTF-16 units            |
 | command            | toolbar command 已通过 dispatcher 执行                       |
 | mode-change        | 编辑模式切换                                                 |
@@ -516,3 +519,38 @@ The transaction implementation is complete, but its tracking acceptance remains
 separate: native CJK IME commit, cancel, and undo require direct evidence from real
 browser/OS/input-method combinations. Synthetic composition events validate only the
 component state machine and are not native-IME acceptance evidence.
+
+### Retained public editor session (source WIP)
+
+`getSession(editorSessionRef)` binds one stable consumer session ref to the mounted
+editor and returns the same `MarkdownEditorSession` on repeat calls. A different ref
+on that instance is rejected. Types are exported from `@ozwasyd/element-plus`;
+the internal session binding factory is not a public entry point.
+
+`captureSnapshot(digestSource)` synchronously hashes the actual transaction-owner
+source with the consumer's content digest function. The callback must return a
+lowercase 64-character SHA-256 digest and must not retain the source. Snapshots
+expose only opaque refs, document identity/epoch, transaction revision, selection,
+history counts and the digest. The sole transaction store retains one bounded
+checkpoint of its immutable history entries. A subsequent successful capture
+supersedes the previous checkpoint; failed captures retain the previous checkpoint.
+No source or undo/redo entries are copied to the consuming application.
+
+`restoreSnapshot(snapshot, expected)` accepts only the exact retained snapshot
+object, on the same mounted owner, document identity/epoch and source revision.
+It restores the transaction owner's history and selection plus retained mode,
+search and textarea scroll state without taking focus. Foreign, cloned, superseded,
+document-switched or source-modified snapshots are rejected. Capture/restore during
+IME composition or after unmount is rejected. This is in-memory same-instance
+restoration, not cross-instance hydration, serialization or crash recovery.
+
+`inspectCapabilities()` reports the exact current limitation. The renderer lacks
+a public last-valid-render checkpoint; renderer/projection, frame/observer/viewport,
+language/search and attachment/embed providers lack a complete public resource
+census and reversible pause/resume contract. `inspectResources`, `pauseResources`,
+`resumeResources` and `disposeAfterSnapshot` therefore throw before any resource
+release. A valid snapshot is preserved after disposal refusal. Cancelling known
+frames or disconnecting one observer would not prove that all session work stopped.
+Draft and crash journal refs remain the consuming application's responsibility.
+Applications must reject workspace lifecycle admission until these owners exist;
+this API must not be used to mint an immediate-ready receipt.
