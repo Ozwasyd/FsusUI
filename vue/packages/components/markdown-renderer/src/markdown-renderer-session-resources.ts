@@ -16,6 +16,7 @@ import type {
   MarkdownEditorFrameScheduler,
   MarkdownEditorFrameTask,
 } from '../../../hooks/use-markdown-editor-frame-scheduler'
+import type { WatchHandle } from 'vue'
 
 export interface MarkdownRendererDocumentState {
   readonly documentIdentity: Readonly<{ id: string; epoch: number | string }>
@@ -135,6 +136,12 @@ export const createMarkdownRendererSessionResourceOwner = (options: {
   let generation = 0
   let disposed = false
   let sequence = 0
+  let renderWatchHandle: WatchHandle | null = null
+  let stoppingRenderWatch = false
+  let renderWatchCleanupFailure: Readonly<{
+    phase: 'render-watch-stop'
+    error: unknown
+  }> | null = null
   let retained: {
     readonly capture: MarkdownRendererLastValidRender
     readonly result: MarkdownSafeRenderResult
@@ -154,6 +161,34 @@ export const createMarkdownRendererSessionResourceOwner = (options: {
       documentIdentity: Object.freeze({ ...state.documentIdentity }),
       revision: state.revision,
     })
+  }
+  const stopRenderWatch = () => {
+    const handle = renderWatchHandle
+    if (!handle || stoppingRenderWatch) return
+    stoppingRenderWatch = true
+    try {
+      handle.stop()
+      // Release only the actual owned handle after its own stop returns.
+      if (renderWatchHandle === handle) {
+        renderWatchHandle = null
+        renderWatchCleanupFailure = null
+      }
+    } catch (error) {
+      renderWatchCleanupFailure = Object.freeze({
+        phase: 'render-watch-stop',
+        error,
+      })
+      throw error
+    } finally {
+      stoppingRenderWatch = false
+    }
+  }
+  const bindRenderWatchHandle = (handle: WatchHandle) => {
+    if (renderWatchHandle && renderWatchHandle !== handle)
+      throw new Error('markdown-renderer-render-watch-already-owned')
+    renderWatchHandle = handle
+    // Immediate watch setup may have reentered ordinary unmount before binding.
+    if (disposed) stopRenderWatch()
   }
   const beginRender = (): MarkdownRendererRenderGeneration =>
     Object.freeze({ ...readDocumentState(), generation: ++generation })
@@ -295,6 +330,9 @@ export const createMarkdownRendererSessionResourceOwner = (options: {
     const missingSourceDependencies: string[] = [
       ...markdownRendererSessionSourceDependencies,
     ]
+    if (renderWatchCleanupFailure) {
+      missingSourceDependencies.push('renderer:native-watch-cleanup-settlement')
+    }
     if (hasUnavailableMarkdownRendererWorkerListenerRegistration(pipeline)) {
       missingSourceDependencies.push(
         'render-pipeline-worker:listener-native-registration-unknown-or-unavailable',
@@ -371,11 +409,19 @@ export const createMarkdownRendererSessionResourceOwner = (options: {
       measuredUsageOnly: true as const,
       missingSourceDependencies: Object.freeze(missingSourceDependencies),
       sources: Object.freeze({
+        rendererNative: Object.freeze({
+          renderWatchHandleRetained: renderWatchHandle !== null,
+          stoppingRenderWatch,
+          // One retained WatchHandle is not the native component effect/queue.
+          effectCensus: 'unknown' as const,
+          flushJobCensus: 'unknown' as const,
+        }),
         renderPipeline: pipeline,
         virtualWindow: viewport,
         heavyFeatures: heavy,
       }),
       diagnostics: Object.freeze({
+        renderWatchCleanupFailure,
         workerCleanupResidue,
         // Preserve the actual retained failure; its cumulative count is not
         // an active task count or evidence that cleanup/recovery succeeded.
@@ -384,6 +430,8 @@ export const createMarkdownRendererSessionResourceOwner = (options: {
           pipeline.pendingWorkerCallbackFailureNotification,
       }),
       unknownUsage: Object.freeze({
+        vueEffects: 'unknown' as const,
+        vueFlushJobs: 'unknown' as const,
         timers:
           typeof heavy.usage.timers === 'number' ? null : heavy.usage.timers,
         networkRequests:
@@ -443,6 +491,7 @@ export const createMarkdownRendererSessionResourceOwner = (options: {
           timers: knownTimers,
           backgroundTasks:
             jobs.size +
+            (stoppingRenderWatch ? 1 : 0) +
             frames.size +
             scheduledFrames.size +
             projection.backgroundTasks +
@@ -479,6 +528,8 @@ export const createMarkdownRendererSessionResourceOwner = (options: {
           networkRequests: 0,
           memoryUnits:
             projection.memoryUnits +
+            (renderWatchHandle ? 1 : 0) +
+            (renderWatchCleanupFailure ? 1 : 0) +
             (retained ? 1 : 0) +
             timers.size +
             frames.size +
@@ -533,11 +584,13 @@ export const createMarkdownRendererSessionResourceOwner = (options: {
     timers.clear()
     cancelFrames()
     for (const remove of listeners) remove()
+    stopRenderWatch()
     retained = null
     // Promises remain in the census until their real finally blocks settle.
   }
   return Object.freeze({
     afterFrame,
+    bindRenderWatchHandle,
     beginRender,
     captureLastValidRender,
     clearTimer,

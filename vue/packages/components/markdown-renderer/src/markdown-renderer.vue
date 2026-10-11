@@ -1544,7 +1544,7 @@ if (validInitialRender) {
   )
 }
 
-watch(
+const renderWatchHandle = watch(
   () => [
     props.content,
     props.contentVersion,
@@ -1574,6 +1574,7 @@ watch(
   },
   { immediate: true, flush: 'sync' },
 )
+rendererResourceOwner.bindRenderWatchHandle(renderWatchHandle)
 
 onBeforeUnmount(() => {
   rendererResourceOwner.disposeOnUnmount()

@@ -281,11 +281,18 @@ interpreted as no listener.
   measuredUsageOnly: true
   missingSourceDependencies: readonly string[]
   sources: {
+    rendererNative: {
+      renderWatchHandleRetained: boolean
+      stoppingRenderWatch: boolean
+      effectCensus: 'unknown'
+      flushJobCensus: 'unknown'
+    }
     renderPipeline: object // Actual runtime/hardware inspection.
     virtualWindow: object // Actual viewport inspection.
     heavyFeatures: object // Actual active and retired handle inspection.
   }
   diagnostics: {
+    renderWatchCleanupFailure: { phase: 'render-watch-stop'; error: unknown } | null
     workerCleanupResidue: { ownedScopes: readonly object[]; poolContext: readonly object[] }
     workerCallbackFailure: object | null // Actual pipeline failure record.
     pendingWorkerCallbackFailureNotification: object | null // Actual pending snapshot.
@@ -395,8 +402,10 @@ pending. The composed shared-pump repair keeps task-owned exceptions with the
 actual failing request and reports pool failures without attributing them to a
 different editor's caller. Retained cleanup and error reporting do not establish
 successful settlement delivery, recovery or complete qualification. Independent
-review source-closes the shared-pump resource-isolation finding. Remaining
-producer reporting gaps do not establish resource or recovery qualification.
+review source-closes the shared-pump resource-isolation finding. The composed
+reporting repair retains original factory/dequeue/settlement causes and uses one
+actual callback snapshot with its original receiver. Independent review remains
+pending; reporting does not establish resource or recovery qualification.
 The source offer preserves the cleanup dependencies and
 continues to refuse complete participant operations. This conditional consumer
 guard does not establish that the renderer had a reproducible restore bypass.
@@ -440,7 +449,7 @@ remain retained; neither a snapshot nor an abort authorizes clearing them.
 
 | Actual source capability                                                                              | Current boundary                                                                                                                                                                                                                                |
 | ----------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| The installed Vue 3.5.32 `WatchHandle` has `pause`, `resume`, and `stop`.                             | The renderer does not retain its own `watch()` return handle. A watcher pause is not a census or pause of the component render effect, Vue flush queue, hook watchers, or an already running asynchronous job.                                  |
+| The installed Vue 3.5.32 `WatchHandle` has `pause`, `resume`, and `stop`.                             | The renderer now binds its actual `watch()` return handle into the existing owner. A watcher pause is not a census or pause of the component render effect, Vue flush queue, hook watchers, or an already running asynchronous job.             |
 | The existing owner tracks exact timer, RAF, keyed scheduler, abort-cleanup and unsettled-job records. | Timer records do not retain their callback/deadline; cancellation settles frame waits and drops keyed callbacks. They cannot be reconstructed from numeric handles. Failed native cleanup must retain its original record and error.            |
 | Runtime and viewport hooks expose actual `inspectResources`, `pause`, and `resume`.                   | Both explicitly report `recoverable:false`. Viewport platform callbacks remain unknown; resume reconnects current state rather than restores a disposed checkpoint.                                                                             |
 | Heavy lifecycle exposes real admission pause/resume and retired work census.                          | Timer/network cancellation is unavailable. Admission closure or an aborted signal does not prove native work settled or stopped.                                                                                                                |
@@ -448,7 +457,7 @@ remain retained; neither a snapshot nor an abort authorizes clearing them.
 | Native clipboard, upload, embed and command operations live in the editor/provider consumers.         | Clipboard promises have no supplied cancellation signal; upload cancellation changes job phase and requests abort; embed/command signals guard identity but do not establish transport/native stop. These are outside the renderer's ownership. |
 
 The minimum independent renderer change stays in its existing SFC/private owner:
-retain the real render-watch handle; gate renderer admission and each commit with
+the real render-watch handle is now retained; next, gate renderer admission and each commit with
 the existing epoch/generation authority; retain sufficient original owned callback
 descriptors for current-state recreation; and record cleanup failures while
 attempting the selected owned cleanup batch. Preserve the original authorized
@@ -456,8 +465,19 @@ projection/checkpoint pin and every unresolved listener/job record. These can
 prepare reversible control of directly owned work. They cannot by themselves
 produce a complete paused inspection, full native checkpoint or recoverable
 disposal. This source offer now explicitly names the missing Vue effect/flush,
-owned event-registration and callback-checkpoint capabilities without adding
-usage counts or executing those transitions.
+owned event-registration and callback-checkpoint capabilities. Those dependency
+entries themselves add no usage counts or execute control transitions.
+
+The watcher binding is a real owned handle, not a new resource participant.
+Ordinary unmount calls its native `stop()` and releases that exact reference only
+after the call returns. If it throws, the handle and actual error remain under
+`sources.rendererNative` and `diagnostics.renderWatchCleanupFailure`; an immediate
+watch setup that reentered unmount also uses this same owner cleanup path. A
+retained handle/failure each contributes one actual logical memory record, and an
+in-progress owned stop contributes one running control entry. These describe
+owned records/calls only. `unknownUsage.vueEffects` and `unknownUsage.vueFlushJobs`
+stay `unknown`; a null failure means no observed stop failure, not successful
+global Vue cleanup. Full renderer controls and recoverable disposal still refuse.
 
 For these requirements, `authority` means the actual current
 `{documentIdentity:{id,epoch},revision}`; `checkpointRef` means an opaque ref held
