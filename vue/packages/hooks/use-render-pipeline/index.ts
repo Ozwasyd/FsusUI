@@ -395,6 +395,13 @@ export type FsusRenderPipelineRuntimeResourceInspection = {
   readonly pendingControlTransitions: number
   readonly pendingAdapterJobs: number
   readonly adapterResources: 'unknown'
+  readonly workerCallbackFailure: {
+    readonly count: number
+    readonly error: FsusErrorDetail
+    readonly eventType: FsusWorkerExecutorEvent['type'] | 'unknown'
+    readonly phase: 'adapter-event' | 'runtime-event' | 'error-notification'
+    readonly workerId: number | null
+  } | null
   readonly workerResources: {
     readonly status: 'available' | 'not-created'
     readonly scopes: readonly {
@@ -2670,6 +2677,76 @@ export const useFsusRenderPipelineRuntime = <TSource, TUnit>(
   const renders = new Set<symbol>()
   const adapterJobs = new Set<symbol>()
   const workerTaskKey = `render-runtime-${++renderPipelineRuntimeId}`
+  let workerCallbackFailure: FsusRenderPipelineRuntimeResourceInspection['workerCallbackFailure'] =
+    null
+  let publishedWorkerCallbackFailureCount = 0
+  let publishingWorkerCallbackFailure = false
+  const recordWorkerCallbackFailure = (
+    event: {
+      type: FsusWorkerExecutorEvent['type'] | 'unknown'
+      workerId?: number
+    },
+    cause: unknown,
+    phase: NonNullable<
+      FsusRenderPipelineRuntimeResourceInspection['workerCallbackFailure']
+    >['phase'],
+  ) => {
+    // Plain owned state: reporting must not invoke another callback mid-cleanup.
+    workerCallbackFailure = Object.freeze({
+      count: (workerCallbackFailure?.count ?? 0) + 1,
+      error: createFsusError(
+        'infra',
+        'fsus_render_pipeline_worker_callback_failed',
+        {
+          cause,
+        },
+      ),
+      eventType: event.type,
+      phase,
+      workerId: event.workerId ?? null,
+    })
+  }
+  const invokeWorkerCallback = (
+    callback: ((event: FsusWorkerExecutorEvent) => void) | undefined,
+    event: FsusWorkerExecutorEvent,
+    phase: 'adapter-event' | 'runtime-event',
+  ) => {
+    let identity: {
+      type: FsusWorkerExecutorEvent['type'] | 'unknown'
+      workerId?: number
+    } = { type: 'unknown' }
+    try {
+      // Capture metadata before user code can mutate the shared event object.
+      identity = { type: event.type, workerId: event.workerId }
+      callback?.(event)
+    } catch (cause) {
+      // Let the original executor finish all slot/task cleanup and settlement.
+      recordWorkerCallbackFailure(identity, cause, phase)
+    }
+  }
+  const publishWorkerCallbackFailure = () => {
+    const failure = workerCallbackFailure
+    if (
+      !failure ||
+      publishingWorkerCallbackFailure ||
+      failure.count <= publishedWorkerCallbackFailureCount
+    )
+      return
+    publishingWorkerCallbackFailure = true
+    try {
+      error.value = failure.error
+    } catch (cause) {
+      recordWorkerCallbackFailure(
+        { type: failure.eventType, workerId: failure.workerId ?? undefined },
+        cause,
+        'error-notification',
+      )
+    } finally {
+      // A failing error watcher is reported in inspection without a retry loop.
+      publishedWorkerCallbackFailureCount = workerCallbackFailure?.count ?? 0
+      publishingWorkerCallbackFailure = false
+    }
+  }
   let controller: AbortController | null = null
   type RuntimeWorkerExecutor = ReturnType<
     typeof createFsusWorkerExecutor<
@@ -3002,6 +3079,7 @@ export const useFsusRenderPipelineRuntime = <TSource, TUnit>(
       // A thrown callback does not prove cleanup completed.
       if (completed) retiringExecutors.delete(retired)
     }
+    publishWorkerCallbackFailure()
   }
 
   const getWorkerExecutor = (
@@ -3089,10 +3167,12 @@ export const useFsusRenderPipelineRuntime = <TSource, TUnit>(
         FsusRenderPipelineDocument<TUnit> | null
       >({
         createWorker: workerOptions.createWorker,
-        listener: workerEventListener,
+        listener: (event) =>
+          invokeWorkerCallback(workerEventListener, event, 'runtime-event'),
         options: {
           ...executorOptions,
-          onEvent: workerOptions.onEvent,
+          onEvent: (event) =>
+            invokeWorkerCallback(workerOptions.onEvent, event, 'adapter-event'),
         },
         poolKey:
           workerOptions.poolKey ?? workerOptions.name ?? activeAdapter.id,
@@ -3114,8 +3194,8 @@ export const useFsusRenderPipelineRuntime = <TSource, TUnit>(
     >(workerOptions.createWorker, {
       ...executorOptions,
       onEvent: (event) => {
-        workerOptions.onEvent?.(event)
-        workerEventListener(event)
+        invokeWorkerCallback(workerOptions.onEvent, event, 'adapter-event')
+        invokeWorkerCallback(workerEventListener, event, 'runtime-event')
       },
     })
     workerExecutorShared = false
@@ -3220,6 +3300,7 @@ export const useFsusRenderPipelineRuntime = <TSource, TUnit>(
           if (executor.inspectResources(record.scope).tasks.length === 0)
             workerScopes.delete(record)
         }
+        publishWorkerCallbackFailure()
         if (workerDocument.ok && workerDocument.value) {
           if (isCurrentPreparation()) renderedStrategy.value = 'chunked-worker'
           return fsusOk(workerDocument.value)
@@ -3434,7 +3515,8 @@ export const useFsusRenderPipelineRuntime = <TSource, TUnit>(
           : 0) +
         [...retiringExecutors].filter(
           (entry) =>
-            entry.inspectSubscription?.().listenerActive ?? entry.listenerActive,
+            entry.inspectSubscription?.().listenerActive ??
+            entry.listenerActive,
         ).length,
       retainedSharedOwners:
         ((workerExecutorInspectSubscription?.().retainedOwner ??
@@ -3450,6 +3532,7 @@ export const useFsusRenderPipelineRuntime = <TSource, TUnit>(
       pendingControlTransitions: controlTransitions.size,
       pendingAdapterJobs: adapterJobs.size,
       adapterResources: 'unknown',
+      workerCallbackFailure,
       workerResources: inspectWorkerResources(),
       hardware: hardwareRuntime.inspectResources(),
       recoverable: false,
@@ -3466,6 +3549,7 @@ export const useFsusRenderPipelineRuntime = <TSource, TUnit>(
     } finally {
       controlTransitions.delete(transition)
     }
+    publishWorkerCallbackFailure()
     return inspectResources()
   }
   const pause = () => {
