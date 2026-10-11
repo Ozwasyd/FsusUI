@@ -1321,6 +1321,8 @@ import {
 } from './markdown-editor-outline'
 import { planMarkdownOutlineReveal } from './markdown-editor-outline-active'
 import { createMarkdownEditorSessionBinding } from './markdown-editor-session'
+import { createMarkdownEditorFrameResourceParticipant } from './markdown-editor-session-resources'
+import type { MarkdownEditorSessionResourceParticipant } from './markdown-editor-session-resources'
 import {
   resolveMarkdownLiveLayoutStability,
   resolveMarkdownLiveVirtualWindow,
@@ -1393,6 +1395,7 @@ const emit = defineEmits(markdownEditorEmits)
 const ns = useNamespace('markdown-editor')
 const attrs = useAttrs()
 const rootElementRef = ref<HTMLElement | null>(null)
+const sessionSurfacePaused = ref(false)
 const frameScheduler = useMarkdownEditorFrameScheduler({
   onFrameEnd: (metrics) => {
     const target = rootElementRef.value
@@ -1446,7 +1449,7 @@ const retainedPreviewScrollLeft = ref(0)
 const visualViewportHeight = ref(0)
 const visualViewportOffsetTop = ref(0)
 const toolbarRef = ref<HTMLElement | null>(null)
-const inputDisabled = computed(() => props.disabled || props.loading)
+const inputDisabled = computed(() => props.disabled || props.loading || sessionSurfacePaused.value)
 const editingBlocked = computed(() => props.readonly || inputDisabled.value)
 const surfaceOptions = computed<Required<MarkdownEditorSurfaceOptions>>(() => ({
   commandPalette: props.surfaces.commandPalette ?? false,
@@ -1977,10 +1980,12 @@ const refreshLiveWindow = (
   })
 }
 const markLayoutGesture = (gesture: MarkdownLiveLayoutGesture) => {
+  if (sessionSurfacePaused.value) return
   layoutGesture.value = gesture
   applyLiveLayout('block-height-change', { gesture })
   if (layoutGestureTimer) clearTimeout(layoutGestureTimer)
   layoutGestureTimer = setTimeout(() => {
+    layoutGestureTimer = undefined
     layoutGesture.value = null
   }, 200)
 }
@@ -1990,6 +1995,7 @@ const suspendTypewriterForUserScroll = () => {
   writingAidsState.value = writingAidsController.state
 }
 const settleTypewriterLayout = () => {
+  if (sessionSurfacePaused.value) return
   if (typewriterLayoutFrame !== undefined) {
     cancelAnimationFrame(typewriterLayoutFrame)
   }
@@ -2097,7 +2103,7 @@ const sourceAnchorY = (textarea: HTMLTextAreaElement, lineHeight: number) => {
 const applyTypewriterScroll = (
   trigger: 'input' | 'explicit-navigation' | 'async-layout' = 'input',
 ) => {
-  if (!resolvedWritingAids.value.typewriter || isComposing.value) return
+  if (sessionSurfacePaused.value || !resolvedWritingAids.value.typewriter || isComposing.value) return
   const textarea = textareaRef.value
   if (!textarea) return
   const response =
@@ -3556,7 +3562,7 @@ const wordCount = computed(() => editorMetrics.value.wordCount)
 let viewportHeightNext: number | null = null
 let viewportTrigger: MarkdownLiveLayoutTrigger | null = null
 const updateVisualViewportHeight = () => {
-  if (typeof window === 'undefined') return
+  if (sessionSurfacePaused.value || typeof window === 'undefined') return
 
   const previous = visualViewportHeight.value
   visualViewportHeight.value =
@@ -3576,6 +3582,7 @@ const refreshTypewriterResizeObserver = () => {
   typewriterResizeObserver = undefined
   const textarea = textareaRef.value
   if (
+    sessionSurfacePaused.value ||
     props.writingAids?.typewriter !== true ||
     !textarea ||
     typeof ResizeObserver === 'undefined'
@@ -3616,6 +3623,25 @@ const refreshTypewriterResizeObserver = () => {
   })
 }
 
+let viewportListenersAttached = false
+let ownedVisualViewport: VisualViewport | null = null
+const attachViewportListeners = () => {
+  if (viewportListenersAttached || sessionSurfacePaused.value || typeof window === 'undefined') return
+  ownedVisualViewport = window.visualViewport
+  ownedVisualViewport?.addEventListener('resize', updateVisualViewportHeight)
+  ownedVisualViewport?.addEventListener('scroll', updateVisualViewportHeight)
+  window.addEventListener('resize', updateVisualViewportHeight)
+  viewportListenersAttached = true
+}
+const detachViewportListeners = () => {
+  if (!viewportListenersAttached || typeof window === 'undefined') return
+  ownedVisualViewport?.removeEventListener('resize', updateVisualViewportHeight)
+  ownedVisualViewport?.removeEventListener('scroll', updateVisualViewportHeight)
+  window.removeEventListener('resize', updateVisualViewportHeight)
+  ownedVisualViewport = null
+  viewportListenersAttached = false
+}
+
 onMounted(() => {
   const textarea = textareaRef.value
   if (textarea) {
@@ -3638,9 +3664,7 @@ onMounted(() => {
   refreshWritingAidsDocument()
   updateVisualViewportHeight()
   refreshTypewriterResizeObserver()
-  window.visualViewport?.addEventListener('resize', updateVisualViewportHeight)
-  window.visualViewport?.addEventListener('scroll', updateVisualViewportHeight)
-  window.addEventListener('resize', updateVisualViewportHeight)
+  attachViewportListeners()
 })
 
 let sessionDisposed = false
@@ -3667,17 +3691,7 @@ onBeforeUnmount(() => {
     forgetMarkdownEmbedRequest(requestId)
   }
   pendingEmbedRequests.clear()
-  if (typeof window === 'undefined') return
-
-  window.visualViewport?.removeEventListener(
-    'resize',
-    updateVisualViewportHeight,
-  )
-  window.visualViewport?.removeEventListener(
-    'scroll',
-    updateVisualViewportHeight,
-  )
-  window.removeEventListener('resize', updateVisualViewportHeight)
+  detachViewportListeners()
 })
 
 watch(
@@ -6068,9 +6082,62 @@ const revealSourceRange = (
   return 'success'
 }
 
+const frameResourceParticipant = createMarkdownEditorFrameResourceParticipant(frameScheduler)
+const surfaceResourceParticipant: MarkdownEditorSessionResourceParticipant = {
+  ownerRef: 'editor-surface',
+  inspect() {
+    return {
+      ownerRef: 'editor-surface',
+      paused: sessionSurfacePaused.value,
+      recoverable: false,
+      retainedListeners: viewportListenersAttached ? (ownedVisualViewport ? 3 : 1) : 0,
+      usage: {
+        editorInstances: sessionDisposed ? 0 : 1,
+        renderers: 0,
+        observers: typewriterResizeObserver ? 1 : 0,
+        timers: layoutGestureTimer === undefined ? 0 : 1,
+        backgroundTasks: typewriterLayoutFrame === undefined ? 0 : 1,
+        networkRequests: 0,
+        memoryUnits: Math.ceil((transactionStore.value.length + transactionStore.retainedSessionUnits) * 2 / 65536),
+      },
+    }
+  },
+  pause() {
+    if (sessionDisposed || isComposing.value || nativeMachine.composing) {
+      throw new Error('editor-session-surface-pause-unavailable')
+    }
+    sessionSurfacePaused.value = true
+    detachViewportListeners()
+    typewriterResizeObserver?.disconnect()
+    typewriterResizeObserver = undefined
+    if (layoutGestureTimer !== undefined) {
+      clearTimeout(layoutGestureTimer)
+      layoutGestureTimer = undefined
+    }
+    if (typewriterLayoutFrame !== undefined) {
+      cancelAnimationFrame(typewriterLayoutFrame)
+      typewriterLayoutFrame = undefined
+    }
+    return this.inspect()
+  },
+  resume() {
+    if (sessionDisposed) throw new Error('editor-session-disposed')
+    sessionSurfacePaused.value = false
+    attachViewportListeners()
+    refreshTypewriterResizeObserver()
+    updateVisualViewportHeight()
+    refreshLiveWindow('initial')
+    return this.inspect()
+  },
+  dispose() {
+    throw new Error('editor-session-surface-checkpoint-not-recoverable')
+  },
+}
+
 // This binding closes over the existing owner; it never creates another editor.
 const sessionBinding = createMarkdownEditorSessionBinding({
   transactionStore,
+  resourceParticipants: () => [frameResourceParticipant, surfaceResourceParticipant],
   isComposing: () => isComposing.value || nativeMachine.composing,
   isDisposed: () => sessionDisposed,
   captureViewState: () => ({

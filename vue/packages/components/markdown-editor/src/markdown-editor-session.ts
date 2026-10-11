@@ -1,3 +1,5 @@
+import { createMarkdownEditorSessionResourceCoordinator } from './markdown-editor-session-resources'
+import type { MarkdownEditorSessionResourceCensus, MarkdownEditorSessionResourceParticipant } from './markdown-editor-session-resources'
 import type {
   MarkdownEditorDocumentIdentity,
   MarkdownEditorHistoryState,
@@ -34,7 +36,7 @@ export interface MarkdownEditorSessionSnapshot {
 export interface MarkdownEditorSessionCapabilities {
   readonly snapshot: 'retained'
   readonly restoration: 'same-owner-same-revision'
-  readonly resources: 'unavailable'
+  readonly resources: 'available' | 'unavailable'
   readonly eviction: 'unavailable'
   readonly missingOwners: readonly string[]
 }
@@ -48,6 +50,7 @@ export interface MarkdownEditorSessionRestoreProof {
 export interface MarkdownEditorSession {
   readonly editorSessionRef: string
   inspectCapabilities(): MarkdownEditorSessionCapabilities
+  inspectResourceParticipants(): MarkdownEditorSessionResourceCensus
   captureSnapshot(digestSource: (source: string) => string): MarkdownEditorSessionSnapshot
   restoreSnapshot(
     snapshot: MarkdownEditorSessionSnapshot,
@@ -70,6 +73,7 @@ export interface MarkdownEditorSessionOwner<ViewState> {
   readonly isDisposed: () => boolean
   readonly captureViewState: () => ViewState
   readonly restoreViewState: (state: ViewState) => void
+  readonly resourceParticipants: () => readonly MarkdownEditorSessionResourceParticipant[]
 }
 
 const capabilities: MarkdownEditorSessionCapabilities = Object.freeze({
@@ -90,6 +94,7 @@ const capabilities: MarkdownEditorSessionCapabilities = Object.freeze({
 export const createMarkdownEditorSessionBinding = <ViewState>(
   owner: MarkdownEditorSessionOwner<ViewState>,
 ): MarkdownEditorSessionExpose => {
+  const resources = createMarkdownEditorSessionResourceCoordinator(owner.resourceParticipants)
   let session: MarkdownEditorSession | undefined
   let retained: {
     readonly snapshot: MarkdownEditorSessionSnapshot
@@ -103,11 +108,17 @@ export const createMarkdownEditorSessionBinding = <ViewState>(
     if (owner.isDisposed()) throw new Error('editor-session-disposed')
     if (owner.isComposing()) throw new Error('editor-session-composition-active')
   }
-  const unavailableResources = (): never => {
-    assertAvailable()
-    // Cancelling only known frames is not evidence that the renderer/providers
-    // have stopped. Refuse before any resource or history mutation.
-    throw new Error(`editor-session-resource-owner-unavailable:${capabilities.missingOwners.join(',')}`)
+  const inspectCapabilities = (): MarkdownEditorSessionCapabilities => {
+    const census = resources.inspectParticipants()
+    return Object.freeze({
+      ...capabilities,
+      resources: census.complete ? 'available' : 'unavailable',
+      missingOwners: Object.freeze([
+        ...census.missingOwners,
+        'renderer-last-valid-render-checkpoint',
+        'recoverable-disposal-owner',
+      ]),
+    })
   }
 
   return Object.freeze({
@@ -124,7 +135,8 @@ export const createMarkdownEditorSessionBinding = <ViewState>(
       }
       session = Object.freeze({
         editorSessionRef,
-        inspectCapabilities: () => capabilities,
+        inspectCapabilities,
+        inspectResourceParticipants: () => { assertAvailable(); return resources.inspectParticipants() },
         captureSnapshot(digestSource: (source: string) => string) {
           assertAvailable()
           if (capturing) throw new Error('editor-session-snapshot-reentrant')
@@ -194,9 +206,9 @@ export const createMarkdownEditorSessionBinding = <ViewState>(
           owner.restoreViewState(retained.view)
           return Object.freeze({ status: 'restored', snapshotRef: snapshot.snapshotRef, reason: null })
         },
-        inspectResources: unavailableResources,
-        pauseResources: unavailableResources,
-        resumeResources: unavailableResources,
+        inspectResources: () => { assertAvailable(); return resources.inspectResources() },
+        pauseResources: () => { assertAvailable(); return resources.pauseResources() },
+        resumeResources: () => { assertAvailable(); return resources.resumeResources() },
         disposeAfterSnapshot(snapshotRef: string) {
           assertAvailable()
           if (!retained || retained.snapshot.snapshotRef !== snapshotRef) {
@@ -204,7 +216,7 @@ export const createMarkdownEditorSessionBinding = <ViewState>(
           }
           // No irreversible release until a recoverable renderer/provider
           // checkpoint and disposal owner exist. Preserve snapshot on failure.
-          unavailableResources()
+          resources.disposeAfterSnapshot(snapshotRef)
         },
       })
       return session

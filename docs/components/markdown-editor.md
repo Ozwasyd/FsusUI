@@ -554,3 +554,29 @@ frames or disconnecting one observer would not prove that all session work stopp
 Draft and crash journal refs remain the consuming application's responsibility.
 Applications must reject workspace lifecycle admission until these owners exist;
 this API must not be used to mint an immediate-ready receipt.
+
+The resource participant contract is now exported as types from the root API:
+`MarkdownEditorSessionResourceParticipant` has one closed `ownerRef` and real
+`inspect`, `pause`, `resume` and recoverable `dispose` operations. The coordinator
+requires the entire owner roster before returning aggregate usage or beginning a
+transition. Duplicate/unknown owners, invalid counts, nonzero running resources
+reported as paused, failed resumes and unrecoverable disposal are refusals.
+`inspectResourceParticipants()` exposes the partial census and explicit missing
+owners; it does not claim that a partial census is total resource usage.
+
+The actual shared frame scheduler now reports pending queue entries/handles and
+running phase, cancels its real queue/handle on pause, rejects scheduling while
+paused and permits current-state reflow after resume. It refuses pause inside an
+executing phase or resume after disposal. The editor-surface participant controls
+the actual named gesture timer, named typewriter frame, ResizeObserver and owned
+viewport listeners, gating recreations while paused. Retained transaction memory
+units include the union of live and checkpoint history entries; they are logical
+64 KiB source/history payload units, not physical heap measurements.
+
+These two implemented participants do not close the roster. Existing unnamed
+RAF/nextTick callbacks remain `editor-layout-callbacks`; renderer/projection,
+language/search, attachment/embed and asynchronous command participants are still
+missing. Full public pause/resume/inspect/dispose therefore continue to refuse
+before any transition. The renderer last-valid checkpoint and recoverable
+cross-instance disposal are also unimplemented. This keeps the same shared frame
+scheduler available to typography reflow without creating a second frame owner.

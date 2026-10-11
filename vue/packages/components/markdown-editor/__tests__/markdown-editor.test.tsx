@@ -22,6 +22,61 @@ import type {
 import { getMarkdownXssSourceUrl } from '../../../../tests/support/markdown-xss-corpus'
 
 describe('MarkdownEditor', () => {
+  it('retains the actual public session and sole-owner history and rejects snapshot copies', () => {
+    const wrapper = mount(MarkdownEditor, { props: {
+      modelValue: 'first', documentIdentity: { id: 'session-document', epoch: 1 },
+    } })
+    const editor = wrapper.vm as MarkdownEditorInstance
+    editor.dispatchTransaction({
+      changes: [{ from: 5, to: 5, insert: ' second' }], history: 'separate', origin: 'programmatic',
+    })
+    const session = editor.getSession('session:article:one')
+    expect(editor.getSession('session:article:one')).toBe(session)
+    expect(() => editor.getSession('session:article:two')).toThrow('editor-session-owner-already-bound')
+    const snapshot = session.captureSnapshot(() => 'a'.repeat(64))
+    expect(snapshot.history.undoDepth).toBe(1)
+    expect(snapshot).not.toHaveProperty('value')
+    const expected = { documentIdentity: snapshot.documentIdentity, revision: snapshot.revision }
+    expect(session.restoreSnapshot({ ...snapshot }, expected).status).toBe('blocked')
+    expect(session.restoreSnapshot(snapshot, expected).status).toBe('restored')
+    expect(editor.undo().value).toBe('first')
+    expect(session.restoreSnapshot(snapshot, expected).reason).toBe('editor-session-revision-mismatch')
+    wrapper.unmount()
+  })
+
+  it('keeps the retained snapshot after failed capture and missing resource disposal', () => {
+    const wrapper = mount(MarkdownEditor, { props: {
+      modelValue: 'retained', documentIdentity: { id: 'retained-document', epoch: 1 },
+    } })
+    const session = (wrapper.vm as MarkdownEditorInstance).getSession('session:retained')
+    const snapshot = session.captureSnapshot(() => 'a'.repeat(64))
+    expect(() => session.captureSnapshot(() => 'invalid')).toThrow('editor-session-content-digest-invalid')
+    const census = session.inspectResourceParticipants()
+    expect(census.complete).toBe(false)
+    expect(census.missingOwners).toContain('renderer-projection')
+    expect(census.missingOwners).toContain('editor-layout-callbacks')
+    expect(() => session.pauseResources()).toThrow('editor-session-resource-owner-unavailable')
+    expect(session.inspectResourceParticipants().participants.every((owner) => !owner.paused)).toBe(true)
+    expect(() => session.disposeAfterSnapshot(snapshot.snapshotRef)).toThrow('editor-session-resource-owner-unavailable')
+    expect(session.restoreSnapshot(snapshot, { documentIdentity: snapshot.documentIdentity, revision: snapshot.revision }).status).toBe('restored')
+    wrapper.unmount()
+    expect(() => session.captureSnapshot(() => 'a'.repeat(64))).toThrow('editor-session-disposed')
+  })
+
+  it('rejects public session capture during IME and snapshots from an old document epoch', async () => {
+    const wrapper = mount(MarkdownEditor, { props: {
+      modelValue: 'same source', documentIdentity: { id: 'article-one', epoch: 1 },
+    } })
+    const session = (wrapper.vm as MarkdownEditorInstance).getSession('session:epoch')
+    const snapshot = session.captureSnapshot(() => 'a'.repeat(64))
+    await wrapper.find('textarea').trigger('compositionstart')
+    expect(() => session.captureSnapshot(() => 'a'.repeat(64))).toThrow('editor-session-composition-active')
+    await wrapper.find('textarea').trigger('compositionend')
+    await wrapper.setProps({ documentIdentity: { id: 'article-two', epoch: 2 } })
+    expect(session.restoreSnapshot(snapshot, { documentIdentity: { id: 'article-two', epoch: 2 }, revision: 0 }).status).toBe('blocked')
+    wrapper.unmount()
+  })
+
   // Synthetic composition events in this suite are not native-IME evidence.
   afterEach(() => {
     vi.useRealTimers()

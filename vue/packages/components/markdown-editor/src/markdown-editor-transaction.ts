@@ -639,7 +639,6 @@ export class MarkdownEditorTransactionStore {
       id: 'anonymous',
     },
   ) {
-    this.releaseRetainedSnapshot()
     this.#documentIdentity = Object.freeze({ ...documentIdentity })
     this.#value = value
     this.#selection = normalizeMarkdownEditorSelection(
@@ -680,6 +679,14 @@ export class MarkdownEditorTransactionStore {
       ),
       undoDepth: this.#undo.length,
     })
+  }
+
+  get retainedSessionUnits() {
+    const entries = new Set([
+      ...this.#undo, ...this.#redo,
+      ...(this.#retainedHistory ?? []), ...(this.#retainedRedo ?? []),
+    ])
+    return [...entries].reduce((total, entry) => total + entry.retainedUnits, 0)
   }
 
   get documentIdentity() {

@@ -1883,3 +1883,10 @@ export type {
   MarkdownEditorSessionRestoreProof,
   MarkdownEditorSessionSnapshot,
 } from './markdown-editor-session'
+
+export type {
+  MarkdownEditorSessionResourceCensus,
+  MarkdownEditorSessionResourceInspection,
+  MarkdownEditorSessionResourceOwner,
+  MarkdownEditorSessionResourceParticipant,
+} from './markdown-editor-session-resources'
