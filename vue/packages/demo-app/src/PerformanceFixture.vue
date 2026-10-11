@@ -448,6 +448,13 @@ const markdownHeavyLifecycleAbortProbe: PerformanceFixtureApi['markdownHeavyLife
     })
   }
 
+const workerPoolBurstCancels = new Set<() => void>()
+let workerPoolBurstDisposed = false
+onBeforeUnmount(() => {
+  workerPoolBurstDisposed = true
+  for (const cancel of workerPoolBurstCancels) cancel()
+})
+
 const createBurstWorker = () => {
   const source = `
     self.onmessage = ({ data }) => {
@@ -467,59 +474,117 @@ const createBurstWorker = () => {
     }
   `
   const workerUrl = URL.createObjectURL(new Blob([source]))
-  const worker = new Worker(workerUrl)
-  URL.revokeObjectURL(workerUrl)
-  return worker
+  try {
+    return new Worker(workerUrl)
+  } finally {
+    URL.revokeObjectURL(workerUrl)
+  }
 }
 
 const workerPoolBurstProbe = async () => {
+  if (workerPoolBurstDisposed)
+    throw new Error('worker_pool_burst_fixture_unmounted')
   const burst = 12
   const iterations = props.scenario.startsWith('markdown') ? 1_500_000 : 500_000
-  const legacyWorker = createBurstWorker()
-  const legacyStarted = performance.now()
-  const legacyInputMs = await new Promise<number>((resolve) => {
-    legacyWorker.onmessage = ({ data }) => {
-      if (data.id === burst) resolve(performance.now() - legacyStarted)
-    }
-    for (let index = 1; index <= burst; index += 1) {
-      legacyWorker.postMessage({
-        id: index,
-        request: { iterations, seed: index },
-        type: 'run',
-      })
-    }
+  let legacyWorker: Worker | undefined
+  let executor: { dispose: () => void } | undefined
+  let rejectCancellation: (error: Error) => void
+  const cancellation = new Promise<never>((_resolve, reject) => {
+    rejectCancellation = reject
   })
-  legacyWorker.terminate()
+  const releaseLegacy = () => {
+    if (!legacyWorker) return
+    const worker = legacyWorker
+    legacyWorker = undefined
+    worker.onmessage = null
+    worker.onerror = null
+    worker.onmessageerror = null
+    worker.terminate()
+  }
+  const cleanup = () => {
+    workerPoolBurstCancels.delete(cancel)
+    releaseLegacy()
+    const pool = executor
+    executor = undefined
+    pool?.dispose()
+  }
+  const cancel = () => {
+    rejectCancellation(new Error('worker_pool_burst_fixture_unmounted'))
+    cleanup()
+  }
+  workerPoolBurstCancels.add(cancel)
+  try {
+    legacyWorker = createBurstWorker()
+    const worker = legacyWorker
+    const legacyStarted = performance.now()
+    const legacyInputMs = await Promise.race([
+      cancellation,
+      new Promise<number>((resolve, reject) => {
+        let settled = false
+        const fail = (error: Error) => {
+          if (settled || legacyWorker !== worker) return
+          settled = true
+          reject(error)
+        }
+        worker.onerror = (event) => {
+          event.preventDefault()
+          fail(new Error(event.message || 'worker_pool_burst_error'))
+        }
+        worker.onmessageerror = () =>
+          fail(new Error('worker_pool_burst_message_error'))
+        worker.onmessage = ({ data }) => {
+          if (settled || legacyWorker !== worker || data.id !== burst) return
+          settled = true
+          resolve(performance.now() - legacyStarted)
+        }
+        for (let index = 1; index <= burst; index += 1) {
+          worker.postMessage({
+            id: index,
+            request: { iterations, seed: index },
+            type: 'run',
+          })
+        }
+      }),
+    ])
+    releaseLegacy()
+    if (workerPoolBurstDisposed)
+      throw new Error('worker_pool_burst_fixture_unmounted')
 
-  let latestCompletions = 0
-  let maxQueueDepth = 0
-  const executor = createFsusWorkerExecutor<
-    { iterations: number; seed: number },
-    number
-  >(createBurstWorker, {
-    maxQueue: burst,
-    maxWorkers: 4,
-    onEvent: (event) => {
-      maxQueueDepth = Math.max(maxQueueDepth, event.queueDepth ?? 0)
-      if (event.type === 'request-resolve') latestCompletions += 1
-    },
-  })
-  const poolStarted = performance.now()
-  const requests = Array.from({ length: burst }, (_, index) =>
-    executor.run(
-      { iterations, seed: index + 1 },
-      {
-        generation: index + 1,
-        key: `continuous-${props.scenario}`,
-        lane: 'latency',
+    let latestCompletions = 0
+    let maxQueueDepth = 0
+    const pool = createFsusWorkerExecutor<
+      { iterations: number; seed: number },
+      number
+    >(createBurstWorker, {
+      maxQueue: burst,
+      maxWorkers: 4,
+      onEvent: (event) => {
+        maxQueueDepth = Math.max(maxQueueDepth, event.queueDepth ?? 0)
+        if (event.type === 'request-resolve') latestCompletions += 1
       },
-    ),
-  )
-  await Promise.all(requests)
-  const poolInputMs = performance.now() - poolStarted
-  executor.dispose()
+    })
+    executor = pool
+    const poolStarted = performance.now()
+    const requests = Array.from({ length: burst }, (_, index) => {
+      const request = pool.run(
+        { iterations, seed: index + 1 },
+        {
+          generation: index + 1,
+          key: `continuous-${props.scenario}`,
+          lane: 'latency',
+        },
+      )
+      // A later synchronous run failure must not leave earlier rejections unobserved.
+      void request.catch(() => undefined)
+      return request
+    })
+    await Promise.race([Promise.all(requests), cancellation])
+    const poolInputMs = performance.now() - poolStarted
 
-  return { latestCompletions, legacyInputMs, maxQueueDepth, poolInputMs }
+    return { latestCompletions, legacyInputMs, maxQueueDepth, poolInputMs }
+  } finally {
+    cleanup()
+  }
 }
 
 declare global {
