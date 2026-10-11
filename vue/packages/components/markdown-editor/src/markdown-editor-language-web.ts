@@ -72,7 +72,7 @@ export interface MarkdownWebLanguageController {
   executeSearch(
     input: Omit<
       Parameters<typeof executeMarkdownSearchSession>[0],
-      'previousTask' | 'onTaskCreated'
+      'previousTask' | 'onTaskCreated' | 'onRetainedMatches'
     >,
   ): ReturnType<typeof executeMarkdownSearchSession>
 
@@ -395,7 +395,7 @@ export const bindMarkdownWebLanguageTools = (
     executeSearch(
       input: Omit<
         Parameters<typeof executeMarkdownSearchSession>[0],
-        'previousTask' | 'onTaskCreated'
+        'previousTask' | 'onTaskCreated' | 'onRetainedMatches'
       >,
     ) {
       const expected = Object.freeze({
