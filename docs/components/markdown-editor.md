@@ -536,6 +536,14 @@ checkpoint of its immutable history entries. A subsequent successful capture
 supersedes the previous checkpoint; failed captures retain the previous checkpoint.
 No source or undo/redo entries are copied to the consuming application.
 
+`validateRetainedSnapshot(snapshot, expected)` is a read-only check of that
+original retained token object and the actual current document id/epoch/revision.
+Matching strings from another native instance, copied or superseded tokens and
+stale expected context return false; IME/disposed owner refusal is preserved.
+It does not recapture or restore state and does not certify view/renderer restore
+or resource readiness. Application composition uses it to reject foreign native
+custody and replacement during asynchronous original journal reads.
+
 `restoreSnapshot(snapshot, expected)` accepts only the exact retained snapshot
 object, on the same mounted owner, document identity/epoch and source revision.
 It restores the transaction owner's history and selection plus retained mode,

@@ -113,6 +113,11 @@ export interface MarkdownEditorSession {
     readonly documentIdentity: MarkdownEditorDocumentIdentity
     readonly revision: number
   }): MarkdownEditorSessionSnapshot
+  /** Read-only original token/document custody check; does not restore, capture or certify resources. */
+  validateRetainedSnapshot(snapshot: MarkdownEditorSessionSnapshot, expected: {
+    readonly documentIdentity: MarkdownEditorDocumentIdentity
+    readonly revision: number
+  }): boolean
   restoreSnapshot(
     snapshot: MarkdownEditorSessionSnapshot,
     expected: { readonly documentIdentity: MarkdownEditorDocumentIdentity; readonly revision: number },
@@ -326,6 +331,21 @@ export const createMarkdownEditorSessionBinding = <ViewState>(
           } finally {
             capturing = false
           }
+        },
+        validateRetainedSnapshot(snapshot: MarkdownEditorSessionSnapshot, expected: {
+          readonly documentIdentity: MarkdownEditorDocumentIdentity
+          readonly revision: number
+        }): boolean {
+          const expectedId = expected.documentIdentity.id
+          const expectedEpoch = expected.documentIdentity.epoch
+          const expectedRevision = expected.revision
+          assertAvailable()
+          if (capturing || !retained || snapshot !== retained.snapshot) return false
+          const store = owner.transactionStore
+          const identity = store.documentIdentity
+          return identity.id === expectedId && identity.epoch === expectedEpoch &&
+            identity.id === snapshot.documentIdentity.id && identity.epoch === snapshot.documentIdentity.epoch &&
+            store.revision === expectedRevision && store.revision === snapshot.revision
         },
         restoreSnapshot(snapshot: MarkdownEditorSessionSnapshot, expected: {
           readonly documentIdentity: MarkdownEditorDocumentIdentity

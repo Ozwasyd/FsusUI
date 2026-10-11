@@ -64,10 +64,27 @@ describe('MarkdownEditor', () => {
     expect(session.captureLastValidRender()).toBeNull()
     expect(snapshot).not.toHaveProperty('value')
     const expected = { documentIdentity: snapshot.documentIdentity, revision: snapshot.revision }
+    expect(session.validateRetainedSnapshot(snapshot, expected)).toBe(true)
+    expect(session.validateRetainedSnapshot({ ...snapshot }, expected)).toBe(false)
+    const foreign = mount(MarkdownEditor, { props: { modelValue: 'first', documentIdentity: snapshot.documentIdentity } })
+    foreign.vm.dispatchTransaction({
+      changes: [{ from: 5, to: 5, insert: ' second' }], history: 'separate', origin: 'programmatic',
+    })
+    const foreignSession = foreign.vm.getSession(session.editorSessionRef)
+    const foreignSnapshot = foreignSession.captureSnapshot(() => 'a'.repeat(64))
+    expect(foreignSnapshot.snapshotRef).toBe(snapshot.snapshotRef)
+    expect(foreignSnapshot.revision).toBe(snapshot.revision)
+    expect(session.validateRetainedSnapshot(foreignSnapshot, expected)).toBe(false)
+    expect(session.validateRetainedSnapshot(snapshot, { ...expected, revision: snapshot.revision + 1 })).toBe(false)
+    expect(session.validateRetainedSnapshot(snapshot, {
+      ...expected, documentIdentity: { ...snapshot.documentIdentity, epoch: snapshot.documentIdentity.epoch + 1 },
+    })).toBe(false)
+    foreign.unmount()
     expect(session.restoreSnapshot({ ...snapshot }, expected).status).toBe('blocked')
     expect(session.restoreSnapshot(snapshot, expected).status).toBe('restored')
     expect(editor.undo().value).toBe('first')
     expect(session.restoreSnapshot(snapshot, expected).reason).toBe('editor-session-revision-mismatch')
+    expect(session.validateRetainedSnapshot(snapshot, expected)).toBe(false)
     wrapper.unmount()
   })
 
