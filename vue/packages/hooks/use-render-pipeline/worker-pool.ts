@@ -361,6 +361,7 @@ type WorkerSlot = {
   errorHandler: Worker['onerror']
   id: number
   messageHandler: Worker['onmessage']
+  installingHandlers: boolean
   quarantined: boolean
   terminating: boolean
   worker: Worker
@@ -465,13 +466,20 @@ export const createFsusWorkerExecutor = <TRequest, TResponse>(
   const isSlotUsable = (slot: WorkerSlot) => {
     const messageHandler = slot.messageHandler
     const errorHandler = slot.errorHandler
-    if (!slot.alive || slot.quarantined || !messageHandler || !errorHandler)
+    if (
+      !slot.alive ||
+      slot.quarantined ||
+      slot.installingHandlers ||
+      !messageHandler ||
+      !errorHandler
+    )
       return false
     const actualMessageHandler = slot.worker.onmessage
     const actualErrorHandler = slot.worker.onerror
     return (
       slot.alive &&
       !slot.quarantined &&
+      !slot.installingHandlers &&
       slots.includes(slot) &&
       slot.messageHandler === messageHandler &&
       slot.errorHandler === errorHandler &&
@@ -529,35 +537,66 @@ export const createFsusWorkerExecutor = <TRequest, TResponse>(
     type: FsusWorkerExecutorEventType = 'worker-disposed',
     error?: FsusErrorDetail,
   ) => {
-    if (!slot.alive || slot.terminating) return
+    if (slot.terminating) return
     // Retained resources still count, but teardown must stop new dispatch first.
     slot.quarantined = true
     slot.terminating = true
     try {
-      if (slot.worker.onmessage === slot.messageHandler) {
-        slot.worker.onmessage = null
-      }
-      if (slot.worker.onerror === slot.errorHandler) {
-        slot.worker.onerror = null
-      }
-      slot.messageHandler = null
-      slot.errorHandler = null
-      slot.worker.terminate()
+      runCleanup([
+        () => {
+          const handler = slot.messageHandler
+          if (!handler) return
+          if (slot.worker.onmessage === handler) slot.worker.onmessage = null
+          if (!slot.installingHandlers) {
+            if (slot.worker.onmessage === handler)
+              throw new Error('fsus_worker_message_detach_unavailable')
+            slot.messageHandler = null
+          }
+        },
+        () => {
+          const handler = slot.errorHandler
+          if (!handler) return
+          if (slot.worker.onerror === handler) slot.worker.onerror = null
+          if (!slot.installingHandlers) {
+            if (slot.worker.onerror === handler)
+              throw new Error('fsus_worker_error_detach_unavailable')
+            slot.errorHandler = null
+          }
+        },
+        () => {
+          if (!slot.alive) return
+          slot.worker.terminate()
+          slot.alive = false
+          if (slot.activeTaskId !== null) {
+            const id = slot.activeTaskId
+            const cancelTimer = canceledSlotTimers.get(id)
+            if (cancelTimer) clearTimeout(cancelTimer)
+            canceledSlotTimers.delete(id)
+            canceledIds.delete(id)
+            const task = pending.get(id)
+            if (task?.slotId === slot.id) task.slotId = null
+          }
+          slot.activeTaskId = null
+          slot.activeTaskIdentity = null
+        },
+        () => {
+          // Late installation and failed detachment keep the real handle owned.
+          if (
+            slot.alive ||
+            slot.installingHandlers ||
+            slot.messageHandler ||
+            slot.errorHandler
+          )
+            return
+          const index = slots.indexOf(slot)
+          if (index < 0) return
+          slots.splice(index, 1)
+          emit(type, { error, workerId: slot.id })
+        },
+      ])
     } finally {
       slot.terminating = false
     }
-    slot.alive = false
-    if (slot.activeTaskId !== null) {
-      const cancelTimer = canceledSlotTimers.get(slot.activeTaskId)
-      if (cancelTimer) clearTimeout(cancelTimer)
-      canceledSlotTimers.delete(slot.activeTaskId)
-      canceledIds.delete(slot.activeTaskId)
-    }
-    slot.activeTaskId = null
-    slot.activeTaskIdentity = null
-    const index = slots.indexOf(slot)
-    if (index >= 0) slots.splice(index, 1)
-    emit(type, { error, workerId: slot.id })
   }
 
   const terminateIdleSlots = () => {
@@ -943,6 +982,7 @@ export const createFsusWorkerExecutor = <TRequest, TResponse>(
       errorHandler: null,
       id: ++workerId,
       messageHandler: null,
+      installingHandlers: false,
       quarantined: false,
       terminating: false,
       worker,
@@ -959,12 +999,17 @@ export const createFsusWorkerExecutor = <TRequest, TResponse>(
         throw new Error('fsus_worker_capacity_changed')
       slot.messageHandler = messageHandler
       slot.errorHandler = errorHandler
-      slot.worker.onmessage = messageHandler
-      if (disposed || !slot.alive)
-        throw new Error('fsus_worker_executor_disposed')
-      slot.worker.onerror = errorHandler
-      if (disposed || !slot.alive)
-        throw new Error('fsus_worker_executor_disposed')
+      slot.installingHandlers = true
+      try {
+        slot.worker.onmessage = messageHandler
+        if (disposed || !slot.alive)
+          throw new Error('fsus_worker_executor_disposed')
+        slot.worker.onerror = errorHandler
+        if (disposed || !slot.alive)
+          throw new Error('fsus_worker_executor_disposed')
+      } finally {
+        slot.installingHandlers = false
+      }
       emit('worker-created', { workerId: slot.id })
       if (disposed) throw new Error('fsus_worker_executor_disposed')
       return slot
@@ -972,11 +1017,6 @@ export const createFsusWorkerExecutor = <TRequest, TResponse>(
       runCleanup([
         () => {
           throw error
-        },
-        () => {
-          if (slot.worker.onmessage === messageHandler)
-            slot.worker.onmessage = null
-          if (slot.worker.onerror === errorHandler) slot.worker.onerror = null
         },
         () => terminateSlot(slot),
       ])
