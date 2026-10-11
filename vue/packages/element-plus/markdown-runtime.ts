@@ -116,7 +116,7 @@ export {
   renderMarkdownResultWithRuntime,
   renderMarkdownSummaryWithRuntime,
   renderMarkdownWithRuntime,
-} from '@element-plus/wasm'
+} from '../wasm/index'
 
 export type {
   MarkdownDocumentIdentity,
@@ -261,4 +261,4 @@ export type {
   MarkdownSourceOffset,
   MarkdownSourceRange,
   MarkdownSourceUtf8Offset,
-} from '@element-plus/wasm'
+} from '../wasm/index'

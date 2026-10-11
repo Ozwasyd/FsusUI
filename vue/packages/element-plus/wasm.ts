@@ -1,1 +1,1 @@
-export * from '@element-plus/wasm'
+export * from '../wasm/index'

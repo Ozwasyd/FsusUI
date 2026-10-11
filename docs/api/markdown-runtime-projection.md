@@ -195,6 +195,12 @@ drift and target-coordinate changes prevent old content from being displayed.
 The existing size, time, concurrency and node budgets bound work and retained
 requests; a timed-out resolver cannot admit a late payload.
 
+The public `/markdown-runtime` and `/wasm` entries share the editor's provider
+module, including its private preparation receipts and cancellation state.
+Use these public entries together; a cloned payload never inherits a receipt.
+The source entries and package build resolve the same runtime graph without
+substituting a separately built workspace provider for one side of the handoff.
+
 For projected presentation, pass the current host request as `input.request`.
 `content.markdown` is non-null only for a verified current payload. Render that
 string once through the existing `ElMarkdownRenderer`, with the host's normal
