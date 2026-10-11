@@ -248,7 +248,8 @@ ref through this renderer's sole private retained slot and checks the current
 document ID, epoch, revision, request identity and render authority before
 mutation. Unknown, superseded, switched, source-modified or busy refs are blocked.
 Disposed or paused underlying owners, closed heavy-feature admission, pending
-pipeline renders/adapter jobs and retained heavy imports/continuations/tasks
+pipeline renders/adapter jobs, retained pipeline admission intent, and heavy
+imports/continuations/tasks
 also block restoration. The operation reuses the actual retained HTML/chunk
 projection and strategy, waits for Vue/viewport work and feature activation, and
 rechecks generation and identity before reporting a restored result. A stale or
@@ -294,7 +295,9 @@ cross-instance hydration or crash recovery.
 The measured subtotals describe directly held component timers, RAF handles,
 owned scheduled frame descriptors, live asynchronous jobs, abort/theme listeners
 and activation observers. Actual runtime/hardware/viewport inspections contribute
-measured handles, listeners, promises, observers and collection entries. Worker
+measured handles, listeners, promises, observers and collection entries. The
+pipeline owner's real pending render admission is included in background tasks
+and logical retained units and blocks restoration until admitted or cleared. Worker
 counts come only from the runtime's exact owned task scopes; shared pool totals
 remain context and are never attributed to this renderer. The original
 inspections remain exposed under `sources`.

@@ -1432,6 +1432,7 @@ const restoreLastValidRender = async (
     pipeline.paused ||
     viewport.paused ||
     pipeline.pendingRenders > 0 ||
+    pipeline.pendingRenderAdmissions > 0 ||
     pipeline.pendingAdapterJobs > 0 ||
     frameScheduler.resourceState().paused
   ) {
