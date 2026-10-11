@@ -142,9 +142,11 @@ export const rebaseMarkdownAttachmentJob = (
     for (const change of [...changes].sort(
       (left, right) => left.from - right.from || left.to - right.to,
     )) {
-      minimumLength +=
-        change.insert.length - (change.to - change.from)
-      syntheticSource = ''.padStart(Math.max(minimumLength, change.to + 1), '\u0000')
+      minimumLength += change.insert.length - (change.to - change.from)
+      syntheticSource = ''.padStart(
+        Math.max(minimumLength, change.to + 1),
+        '\u0000',
+      )
     }
   }
   const rebased = createMarkdownEditorPositionMap(changes, {
@@ -191,6 +193,15 @@ export const planMarkdownAttachmentResolve = (
 
   if (job.phase === 'cancelled') {
     return Object.freeze({ accepted: false, status: 'cancelled' as const })
+  }
+
+  if (
+    job.phase === 'document-abort' ||
+    job.phase === 'stale' ||
+    job.phase === 'resolved' ||
+    job.phase === 'rejected'
+  ) {
+    return Object.freeze({ accepted: false, status: job.phase })
   }
 
   if (result.status !== 'resolved') {
@@ -276,7 +287,7 @@ export const progressMarkdownAttachmentJob = (
   job: MarkdownAttachmentJob,
   progress: number,
 ) => {
-  if (job.phase === 'cancelled' || job.phase === 'deleted') return job
+  if (job.phase !== 'pending' && job.phase !== 'progress') return job
   job.phase = 'progress'
   job.progress = Math.min(100, Math.max(0, progress))
   return job
