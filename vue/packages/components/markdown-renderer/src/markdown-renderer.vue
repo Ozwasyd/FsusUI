@@ -439,15 +439,15 @@ const scheduleHeavyFeatureCommit = (input: {
   })
 
 const settleRenderViewport = (key: string) =>
-  new Promise<void>((resolve) => {
+  new Promise<boolean>((resolve) => {
     rendererResourceOwner.scheduleFrame(
       frameScheduler,
       {
         key,
         measure: () => virtualWindow.readViewport(),
-        postPaint: resolve,
+        postPaint: () => resolve(true),
       },
-      resolve,
+      () => resolve(false),
     )
   })
 
@@ -1422,7 +1422,8 @@ const restoreLastValidRender = async (
     pipeline.paused ||
     viewport.paused ||
     pipeline.pendingRenders > 0 ||
-    pipeline.pendingAdapterJobs > 0
+    pipeline.pendingAdapterJobs > 0 ||
+    frameScheduler.resourceState().paused
   ) {
     return blocked('markdown-renderer-source-owner-unavailable-or-busy')
   }
@@ -1462,7 +1463,9 @@ const restoreLastValidRender = async (
       if (!isCurrent()) return blocked('markdown-renderer-restore-stale')
       await restoreRenderAnchor(anchor)
       if (!isCurrent()) return blocked('markdown-renderer-restore-stale')
-      await settleRenderViewport('markdown-render-restore-retained')
+      if (!(await settleRenderViewport('markdown-render-restore-retained'))) {
+        return blocked('markdown-renderer-restore-scheduler-unavailable')
+      }
       if (!isCurrent()) return blocked('markdown-renderer-restore-stale')
       await activateMountedChunkFeatures(activeChunkResult, renderSignal)
       if (!isCurrent()) return blocked('markdown-renderer-restore-stale')
@@ -1471,6 +1474,10 @@ const restoreLastValidRender = async (
       if (projection.html === null)
         return blocked('markdown-renderer-retained-projection-invalid')
       await commitRenderedContent(projection.html, true)
+      if (!isCurrent()) return blocked('markdown-renderer-restore-stale')
+      if (!(await settleRenderViewport('markdown-render-restore-retained'))) {
+        return blocked('markdown-renderer-restore-scheduler-unavailable')
+      }
       if (!isCurrent()) return blocked('markdown-renderer-restore-stale')
       await activateRenderedFeatures(
         retained.result,
