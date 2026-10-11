@@ -170,6 +170,7 @@ import {
   ref,
   shallowRef,
   watch,
+  watchPostEffect,
 } from 'vue'
 import { useEventListener } from '@element-plus/hooks/use-runtime'
 import { throttle } from 'lodash-unified'
@@ -376,12 +377,14 @@ function unregisterEventListener() {
   scopeEventListener.stop()
 }
 
-function handleImgLoad() {
-  loading.value = false
+function handleImgLoad(e: Event) {
+  if (e.target === imgRefs.value[activeIndex.value]) {
+    loading.value = false
+  }
 }
 
 function handleImgError(e: Event) {
-  loading.value = false
+  handleImgLoad(e)
   const image = e.target as HTMLImageElement
   if (!image.alt) image.alt = t('el.image.error')
 }
@@ -517,13 +520,8 @@ function handleActions(action: ImageViewerAction, options = {}) {
   transform.value.enableTransition = enableTransition
 }
 
-watch(currentImg, () => {
-  nextTick(() => {
-    const $img = imgRefs.value[activeIndex.value]
-    if (!$img?.complete) {
-      loading.value = true
-    }
-  })
+watchPostEffect(() => {
+  loading.value = !imgRefs.value[activeIndex.value]?.complete
 })
 
 watch(activeIndex, (val) => {
