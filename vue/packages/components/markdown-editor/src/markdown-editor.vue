@@ -3083,6 +3083,7 @@ watch(
     // Document switch: pending frame tasks from the previous document must
     // not commit geometry into the new document (#640 stale cancellation).
     frameScheduler.cancelAll()
+    frameScheduler.scheduleMutate('typography-cleanup', clearTypographyMeasurements)
     // One settle frame samples the scheduler so evidence can observe that no
     // stale task survived the document switch.
     frameScheduler.schedulePostPaint('frame-metrics-settle', () => undefined)
