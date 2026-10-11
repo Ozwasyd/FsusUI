@@ -360,11 +360,13 @@ actual scoped slot inspections expose `quarantined` and `dispatchable` unchanged
 through the pipeline source. These booleans are never added to worker/job counts.
 Alive does not establish dispatchability, and quarantine does not prove cleanup
 or recovery. Independent review source-closes the handlerless-slot dispatch
-finding. A separate inherited reentrant-enqueue defect can still retain a settled
-queue entry after disposal; its original worker owner is repairing it. The source
-offer preserves that cleanup dependency and continues to refuse complete
-participant operations. This conditional consumer guard does not establish that
-the renderer had a reproducible restore bypass.
+finding. The worker owner's composed admission repair rechecks actual pending
+membership and disposal after cancellation/preemption callbacks, generation and
+queue capacity before enqueue, and live task membership before crash retry.
+Independent review of this increment and the queue-only consumer guard remains
+pending. The source offer preserves the cleanup dependency and continues to
+refuse complete participant operations. This conditional consumer guard does not
+establish that the renderer had a reproducible restore bypass.
 
 This source offer is deliberately partial. Adapter internals, worker internals,
 shared pool attribution, platform observer callbacks, heavy-runtime timer/network

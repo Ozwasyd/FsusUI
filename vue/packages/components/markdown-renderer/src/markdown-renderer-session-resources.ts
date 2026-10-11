@@ -81,8 +81,8 @@ export const markdownRendererSessionSourceDependencies = Object.freeze([
   'markdown-runtime:activation-and-gateway-loader-import-network-census',
   'renderer:validated-snapshot-restoration-after-disposal',
   'heavy-feature-runtime:timer-and-network-cancellation-authority',
-  // Quarantine is source-reviewed; reentrant enqueue can still retain an
-  // actual settled queue entry after disposal. Its repair belongs to the worker.
+  // Quarantine is source-reviewed; the worker-owner reentrant admission repair
+  // is composed, but its independent review/qualification remains pending.
   'render-pipeline-worker:reentrant-enqueue-disposal-cleanup',
 ] as const)
 
