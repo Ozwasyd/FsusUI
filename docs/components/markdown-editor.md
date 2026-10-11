@@ -783,3 +783,25 @@ and measured values without exposing failure causes/control handles or creating
 notification-delivery acknowledgment. Complete/unqualified and runtime holds remain.
 Attachment311ffe5d stays unconsumed; final-jobs callback context and raw/proxy job
 findings are under original-owner repair. Legacy settlement stays unknown.
+
+The current renderer combination is UI916
+`f3be19325c00e933c0590a988843d502ddec5f81`, consuming A928
+`f99529d944c604b0c2a0f518b95eb3403bf07d9f`. Root reports the notification-watermark
+P2 source CLOSED; the prior unconditional review-gap tag is removed. Actual pending
+notification still adds the original conditional settlement dependency and retained
+logical diagnostic unit, and blocks projection restore. A cleared pending snapshot
+means a notification attempt only; the original retained failure/recovery gap and
+all complete:false/unqualified/resource qualification holds remain.
+
+Attachment7d771a96 still has an original watcher lifecycle/unique-handle P1 under
+repair. Its actual bindAttachmentInputs contract was inspected: original reactive
+documentIdentity, editorRevision ref and deep attachmentJobs ref are the exact
+inputs; one prepared `.vue` hunk stays unapplied until source review. Existing
+attachmentEmbedOwner.abort owns watcher cleanup; no consumer watcher is added.
+
+Original editor panel captureViewState retains partial mode/search/caret scroll.
+Outline methods are model/reveal planners, not an active-node/scroll-anchor retained
+checkpoint issuer. Search and attachment original owners do not currently expose
+full immutable checkpoint/validation/restore refs. Those original producers must
+supply actual #2294/#2295 panel state before a complete factory refset can exist;
+ref aliases or reconstructed parallel panel state are not used here.

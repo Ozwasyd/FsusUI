@@ -6326,7 +6326,6 @@ const sessionBinding = createMarkdownEditorSessionBinding({
       sourceReview: 'unqualified' as const,
       missingSourceDependencies: Object.freeze([
         ...offer.missingSourceDependencies,
-        'render-pipeline-runtime:failure-notification-watermark-review',
       ]),
       measuredUsage: Object.freeze({
         editorInstances: usage.editorInstances,
