@@ -364,6 +364,14 @@ interface HistoryEntry {
   readonly timestamp: number
 }
 
+/** Opaque checkpoint retained by the sole transaction/history owner. */
+export interface MarkdownEditorRetainedTransactionSnapshot {
+  readonly documentIdentity: MarkdownEditorDocumentIdentity
+  readonly history: MarkdownEditorHistoryState
+  readonly revision: number
+  readonly selection: MarkdownEditorResolvedSelection
+}
+
 interface MarkdownEditorStoreMutation extends MarkdownEditorDispatchResult {
   readonly historyChanged: boolean
   readonly selectionChanged: boolean
@@ -613,6 +621,9 @@ const freezeTransaction = (
 
 export class MarkdownEditorTransactionStore {
   #documentIdentity: MarkdownEditorDocumentIdentity
+  #retainedSnapshot: MarkdownEditorRetainedTransactionSnapshot | undefined
+  #retainedHistory: readonly HistoryEntry[] | undefined
+  #retainedRedo: readonly HistoryEntry[] | undefined
   #mergeBlocked = false
   #redo: HistoryEntry[] = []
   #revision = 0
@@ -628,6 +639,7 @@ export class MarkdownEditorTransactionStore {
       id: 'anonymous',
     },
   ) {
+    this.releaseRetainedSnapshot()
     this.#documentIdentity = Object.freeze({ ...documentIdentity })
     this.#value = value
     this.#selection = normalizeMarkdownEditorSelection(
@@ -674,11 +686,52 @@ export class MarkdownEditorTransactionStore {
     return Object.freeze({ ...this.#documentIdentity })
   }
 
+  retainSnapshot(): MarkdownEditorRetainedTransactionSnapshot {
+    const snapshot = Object.freeze({
+      documentIdentity: this.documentIdentity,
+      history: this.history,
+      revision: this.#revision,
+      selection: this.selection,
+    })
+    // History entries are immutable. Only this store retains and restores them;
+    // consumers receive neither the source nor the undo/redo entries.
+    this.#retainedSnapshot = snapshot
+    this.#retainedHistory = this.#undo.slice()
+    this.#retainedRedo = this.#redo.slice()
+    return snapshot
+  }
+
+  restoreRetainedSnapshot(snapshot: MarkdownEditorRetainedTransactionSnapshot) {
+    if (
+      snapshot !== this.#retainedSnapshot ||
+      snapshot.documentIdentity.id !== this.#documentIdentity.id ||
+      snapshot.documentIdentity.epoch !== this.#documentIdentity.epoch ||
+      snapshot.revision !== this.#revision ||
+      !this.#retainedHistory ||
+      !this.#retainedRedo
+    ) {
+      return false
+    }
+    this.#undo = [...this.#retainedHistory]
+    this.#redo = [...this.#retainedRedo]
+    this.#selection = snapshot.selection
+    // A resumed session must never merge into input preceding suspension.
+    this.breakMergeGroup()
+    return true
+  }
+
+  releaseRetainedSnapshot() {
+    this.#retainedSnapshot = undefined
+    this.#retainedHistory = undefined
+    this.#retainedRedo = undefined
+  }
+
   switchDocument(
     documentIdentity: MarkdownEditorDocumentIdentity,
     value: string,
     selection?: MarkdownEditorSelection,
   ) {
+    this.releaseRetainedSnapshot()
     this.#documentIdentity = Object.freeze({ ...documentIdentity })
     this.#value = value
     this.#selection = normalizeMarkdownEditorSelection(

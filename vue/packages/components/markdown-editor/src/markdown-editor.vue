@@ -1320,6 +1320,7 @@ import {
   revealSourceRange as revealSourceRangeOutline,
 } from './markdown-editor-outline'
 import { planMarkdownOutlineReveal } from './markdown-editor-outline-active'
+import { createMarkdownEditorSessionBinding } from './markdown-editor-session'
 import {
   resolveMarkdownLiveLayoutStability,
   resolveMarkdownLiveVirtualWindow,
@@ -3642,7 +3643,10 @@ onMounted(() => {
   window.addEventListener('resize', updateVisualViewportHeight)
 })
 
+let sessionDisposed = false
 onBeforeUnmount(() => {
+  sessionDisposed = true
+  transactionStore.releaseRetainedSnapshot()
   languageToolsController = null
   abortPendingCommands()
   attachmentCaptureSession.clear()
@@ -6064,7 +6068,48 @@ const revealSourceRange = (
   return 'success'
 }
 
+// This binding closes over the existing owner; it never creates another editor.
+const sessionBinding = createMarkdownEditorSessionBinding({
+  transactionStore,
+  isComposing: () => isComposing.value || nativeMachine.composing,
+  isDisposed: () => sessionDisposed,
+  captureViewState: () => ({
+    mode: currentMode.value,
+    search: {
+      ui: searchUiState.value,
+      query: searchQuery.value,
+      replaceText: searchReplaceText.value,
+      matches: searchMatches.value,
+      currentIndex: searchCurrentIndex.value,
+      mode: searchMode.value,
+    },
+    textarea: textareaRef.value,
+    textareaScrollTop: textareaRef.value?.scrollTop ?? null,
+    textareaScrollLeft: textareaRef.value?.scrollLeft ?? null,
+    previewScrollLeft: retainedPreviewScrollLeft.value,
+  }),
+  restoreViewState: (state) => {
+    currentMode.value = state.mode
+    searchUiState.value = state.search.ui
+    searchQuery.value = state.search.query
+    searchReplaceText.value = state.search.replaceText
+    searchMatches.value = state.search.matches
+    searchCurrentIndex.value = state.search.currentIndex
+    searchMode.value = state.search.mode
+    editorSelection.value = transactionStore.selection
+    const textarea = textareaRef.value
+    if (textarea && textarea === state.textarea) {
+      const selection = transactionStore.selection
+      textarea.setSelectionRange(selection.start, selection.end, selection.direction)
+      if (state.textareaScrollTop !== null) textarea.scrollTop = state.textareaScrollTop
+      if (state.textareaScrollLeft !== null) textarea.scrollLeft = state.textareaScrollLeft
+    }
+    retainedPreviewScrollLeft.value = state.previewScrollLeft
+  },
+})
+
 defineExpose({
+  getSession: sessionBinding.getSession,
   closeSearch,
   closeCommandPalette,
   applyAttachmentResult,

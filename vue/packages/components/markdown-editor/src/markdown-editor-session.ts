@@ -1,0 +1,213 @@
+import type {
+  MarkdownEditorDocumentIdentity,
+  MarkdownEditorHistoryState,
+  MarkdownEditorResolvedSelection,
+  MarkdownEditorRetainedTransactionSnapshot,
+  MarkdownEditorTransactionStore,
+} from './markdown-editor-transaction'
+
+export interface MarkdownEditorSessionResourceUsage {
+  readonly editorInstances: number
+  readonly renderers: number
+  readonly observers: number
+  readonly timers: number
+  readonly backgroundTasks: number
+  readonly networkRequests: number
+  readonly memoryUnits: number
+}
+
+/** Retained in the mounted editor; not a serializable eviction checkpoint. */
+export interface MarkdownEditorSessionSnapshot {
+  readonly schema: 'fsusui.markdown-editor-retained-session.v1'
+  readonly snapshotRef: string
+  readonly editorSessionRef: string
+  readonly documentIdentity: MarkdownEditorDocumentIdentity
+  readonly revision: number
+  readonly history: MarkdownEditorHistoryState
+  readonly selection: MarkdownEditorResolvedSelection
+  readonly editorContentDigest: string
+  readonly selectionRef: string
+  readonly historyRef: string
+  readonly viewStateRef: string
+}
+
+export interface MarkdownEditorSessionCapabilities {
+  readonly snapshot: 'retained'
+  readonly restoration: 'same-owner-same-revision'
+  readonly resources: 'unavailable'
+  readonly eviction: 'unavailable'
+  readonly missingOwners: readonly string[]
+}
+
+export interface MarkdownEditorSessionRestoreProof {
+  readonly status: 'restored' | 'blocked'
+  readonly snapshotRef: string
+  readonly reason: string | null
+}
+
+export interface MarkdownEditorSession {
+  readonly editorSessionRef: string
+  inspectCapabilities(): MarkdownEditorSessionCapabilities
+  captureSnapshot(digestSource: (source: string) => string): MarkdownEditorSessionSnapshot
+  restoreSnapshot(
+    snapshot: MarkdownEditorSessionSnapshot,
+    expected: { readonly documentIdentity: MarkdownEditorDocumentIdentity; readonly revision: number },
+  ): MarkdownEditorSessionRestoreProof
+  inspectResources(): MarkdownEditorSessionResourceUsage
+  pauseResources(): MarkdownEditorSessionResourceUsage
+  resumeResources(): MarkdownEditorSessionResourceUsage
+  disposeAfterSnapshot(snapshotRef: string): void
+}
+
+export interface MarkdownEditorSessionExpose {
+  getSession(editorSessionRef: string): MarkdownEditorSession
+}
+
+/** Internal binding, created once by the real MarkdownEditor setup. */
+export interface MarkdownEditorSessionOwner<ViewState> {
+  readonly transactionStore: MarkdownEditorTransactionStore
+  readonly isComposing: () => boolean
+  readonly isDisposed: () => boolean
+  readonly captureViewState: () => ViewState
+  readonly restoreViewState: (state: ViewState) => void
+}
+
+const capabilities: MarkdownEditorSessionCapabilities = Object.freeze({
+  snapshot: 'retained',
+  restoration: 'same-owner-same-revision',
+  resources: 'unavailable',
+  eviction: 'unavailable',
+  missingOwners: Object.freeze([
+    'renderer-projection-resource-census-and-pause-resume',
+    'renderer-last-valid-render-checkpoint',
+    'language-search-provider-resource-census-and-pause-resume',
+    'attachment-embed-provider-resource-census-and-pause-resume',
+    'frame-observer-viewport-resource-census-and-pause-resume',
+    'recoverable-disposal-owner',
+  ]),
+})
+
+export const createMarkdownEditorSessionBinding = <ViewState>(
+  owner: MarkdownEditorSessionOwner<ViewState>,
+): MarkdownEditorSessionExpose => {
+  let session: MarkdownEditorSession | undefined
+  let retained: {
+    readonly snapshot: MarkdownEditorSessionSnapshot
+    readonly transaction: MarkdownEditorRetainedTransactionSnapshot
+    readonly view: ViewState
+  } | undefined
+  let sequence = 0
+  let capturing = false
+
+  const assertAvailable = () => {
+    if (owner.isDisposed()) throw new Error('editor-session-disposed')
+    if (owner.isComposing()) throw new Error('editor-session-composition-active')
+  }
+  const unavailableResources = (): never => {
+    assertAvailable()
+    // Cancelling only known frames is not evidence that the renderer/providers
+    // have stopped. Refuse before any resource or history mutation.
+    throw new Error(`editor-session-resource-owner-unavailable:${capabilities.missingOwners.join(',')}`)
+  }
+
+  return Object.freeze({
+    getSession(editorSessionRef: string) {
+      assertAvailable()
+      if (!/^[a-zA-Z0-9][a-zA-Z0-9._:-]{2,127}$/u.test(editorSessionRef)) {
+        throw new Error('editor-session-ref-invalid')
+      }
+      if (session) {
+        if (session.editorSessionRef !== editorSessionRef) {
+          throw new Error('editor-session-owner-already-bound')
+        }
+        return session
+      }
+      session = Object.freeze({
+        editorSessionRef,
+        inspectCapabilities: () => capabilities,
+        captureSnapshot(digestSource: (source: string) => string) {
+          assertAvailable()
+          if (capturing) throw new Error('editor-session-snapshot-reentrant')
+          capturing = true
+          try {
+            const store = owner.transactionStore
+            const identity = store.documentIdentity
+            const revision = store.revision
+            const source = store.value
+            const digest = digestSource(source)
+            assertAvailable()
+            if (
+              store.revision !== revision || store.value !== source ||
+              store.documentIdentity.id !== identity.id ||
+              store.documentIdentity.epoch !== identity.epoch
+            ) throw new Error('editor-session-snapshot-stale')
+            if (!/^[a-f0-9]{64}$/u.test(digest)) {
+              throw new Error('editor-session-content-digest-invalid')
+            }
+            const view = owner.captureViewState()
+            const transaction = store.retainSnapshot()
+            const snapshotRef = `${editorSessionRef}:snapshot:${++sequence}`
+            const snapshot: MarkdownEditorSessionSnapshot = Object.freeze({
+              schema: 'fsusui.markdown-editor-retained-session.v1',
+              snapshotRef,
+              editorSessionRef,
+              documentIdentity: transaction.documentIdentity,
+              revision: transaction.revision,
+              history: transaction.history,
+              selection: transaction.selection,
+              editorContentDigest: digest,
+              selectionRef: `${snapshotRef}:selection`,
+              historyRef: `${snapshotRef}:history`,
+              viewStateRef: `${snapshotRef}:view`,
+            })
+            retained = { snapshot, transaction, view }
+            return snapshot
+          } finally {
+            capturing = false
+          }
+        },
+        restoreSnapshot(snapshot: MarkdownEditorSessionSnapshot, expected: {
+          readonly documentIdentity: MarkdownEditorDocumentIdentity
+          readonly revision: number
+        }): MarkdownEditorSessionRestoreProof {
+          assertAvailable()
+          const store = owner.transactionStore
+          const identity = store.documentIdentity
+          const blocked = (reason: string): MarkdownEditorSessionRestoreProof =>
+            Object.freeze({ status: 'blocked', snapshotRef: snapshot.snapshotRef, reason })
+          if (capturing) return blocked('editor-session-snapshot-reentrant')
+          if (!retained || snapshot !== retained.snapshot) {
+            return blocked('editor-session-snapshot-custody-invalid')
+          }
+          if (
+            identity.id !== expected.documentIdentity.id ||
+            identity.epoch !== expected.documentIdentity.epoch ||
+            identity.id !== snapshot.documentIdentity.id ||
+            identity.epoch !== snapshot.documentIdentity.epoch
+          ) return blocked('editor-session-document-mismatch')
+          if (store.revision !== expected.revision || store.revision !== snapshot.revision) {
+            return blocked('editor-session-revision-mismatch')
+          }
+          if (!store.restoreRetainedSnapshot(retained.transaction)) {
+            return blocked('editor-session-history-checkpoint-invalid')
+          }
+          owner.restoreViewState(retained.view)
+          return Object.freeze({ status: 'restored', snapshotRef: snapshot.snapshotRef, reason: null })
+        },
+        inspectResources: unavailableResources,
+        pauseResources: unavailableResources,
+        resumeResources: unavailableResources,
+        disposeAfterSnapshot(snapshotRef: string) {
+          assertAvailable()
+          if (!retained || retained.snapshot.snapshotRef !== snapshotRef) {
+            throw new Error('editor-session-snapshot-custody-invalid')
+          }
+          // No irreversible release until a recoverable renderer/provider
+          // checkpoint and disposal owner exist. Preserve snapshot on failure.
+          unavailableResources()
+        },
+      })
+      return session
+    },
+  })
+}

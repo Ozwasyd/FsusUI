@@ -1874,3 +1874,12 @@ export const markdownEditorEmits = {
 export type MarkdownEditorProps = ExtractPropTypes<typeof markdownEditorProps>
 export type MarkdownEditorEmits = typeof markdownEditorEmits
 export type MarkdownEditorInstance = InstanceType<typeof MarkdownEditor>
+
+export type {
+  MarkdownEditorSession,
+  MarkdownEditorSessionCapabilities,
+  MarkdownEditorSessionExpose,
+  MarkdownEditorSessionResourceUsage,
+  MarkdownEditorSessionRestoreProof,
+  MarkdownEditorSessionSnapshot,
+} from './markdown-editor-session'
