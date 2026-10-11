@@ -714,8 +714,13 @@ gate; terminal content receives the owner's immutable settled proof after the re
 future resolves. Rejection settles that ledger and updates only a still-current
 original job. No Promise is manufactured from an event or terminal label.
 
-Without the hook, the existing void `upload-image` event remains. Its settlement is
-unknown, so an unknown or still-running legacy attempt cannot be retried as a
+Without the hook, the existing void `upload-image` event and legal
+`applyAttachmentResult` progress/Markdown completion remain compatible. Content
+admission is recorded on the original item before the event and still checks the
+original document/epoch, batch/item, revision, range and terminal state. This is
+content permission only: no service future, settlement proof or recoverability is
+issued. Started service-future attempts still need their exclusive owner proof even
+if the dispatch prop is later removed. Legacy resource settlement remains unknown, so an unknown or still-running legacy attempt cannot be retried as a
 settled attempt. The original paste-as-Markdown event producer has no registered
 attachment job/service future and retains its legacy event/unknown custody. No
 second upload is started. The existing MarkdownTextEditor Blog upload permission

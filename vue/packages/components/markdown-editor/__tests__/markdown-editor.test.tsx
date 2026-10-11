@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
-import { mount } from '@vue/test-utils'
+import { flushPromises, mount } from '@vue/test-utils'
 import { nextTick } from 'vue'
 import { afterEach, describe, expect, expectTypeOf, it, vi } from 'vitest'
 import MarkdownEditor from '../src/markdown-editor.vue'
@@ -13,6 +13,8 @@ import {
   runMarkdownEditorCommand,
 } from '../src/markdown-editor'
 import type {
+  MarkdownAttachmentProviderResult,
+  MarkdownEditorAttachmentDispatch,
   MarkdownEditorCommand,
   MarkdownEditorInstance,
   MarkdownEditorProps,
@@ -440,6 +442,18 @@ describe('MarkdownEditor', () => {
       revision: number
     }
     const itemId = batch.items[0]!.itemId
+    const session = wrapper.vm.getSession('session:legacy-upload')
+    expect(session.inspectResourceParticipants().missingOwners).toContain('attachment-embed')
+    expect(wrapper.vm.applyAttachmentResult({
+      status: 'progress', batchId: `${batch.batchId}:foreign`, itemId, ratio: 0.9,
+    })).toBe(false)
+    expect(wrapper.vm.applyAttachmentResult({
+      status: 'progress', batchId: batch.batchId, itemId, ratio: 0.9,
+      documentIdentity: { ...batch.documentIdentity, epoch: batch.documentIdentity.epoch + 1 },
+    })).toBe(false)
+    expect(wrapper.vm.applyAttachmentResult({
+      status: 'rejected', batchId: batch.batchId, itemId, revision: batch.revision + 1,
+    })).toBe(false)
     expect(wrapper.find('.el-markdown-editor__attachment').text()).toContain(
       'report.pdf',
     )
@@ -479,6 +493,75 @@ describe('MarkdownEditor', () => {
     expect(wrapper.find('.el-markdown-editor__attachment-status').text()).toBe(
       'report.pdf 上传完成',
     )
+    // Legal legacy content did not create a service future or lift resource admission.
+    expect(session.inspectResourceParticipants().missingOwners).toContain('attachment-embed')
+    expect(() => session.inspectResources()).toThrow('editor-session-resource-owner-unavailable')
+    expect(wrapper.vm.applyAttachmentResult({
+      status: 'progress', batchId: batch.batchId, itemId, ratio: 0.9,
+    })).toBe(false)
+
+    Object.defineProperty(picker.element, 'files', {
+      configurable: true,
+      value: [new File(['second'], 'second.pdf', { type: 'application/pdf' })],
+    })
+    await picker.trigger('change')
+    const pending = wrapper.emitted('upload-image')?.at(-1)?.[0] as typeof batch
+    const sameSource = wrapper.emitted('update:modelValue')?.at(-1)?.[0] as string
+    await wrapper.setProps({
+      documentIdentity: { ...pending.documentIdentity, epoch: pending.documentIdentity.epoch + 1 },
+      modelValue: sameSource,
+    })
+    const beforeLateReply = wrapper.emitted('update:modelValue')?.length
+    // Same bytes/range and a still-pending job do not authorize the old epoch.
+    expect(wrapper.vm.applyAttachmentResult({
+      status: 'progress', batchId: pending.batchId, itemId: pending.items[0]!.itemId, ratio: 0.9,
+    })).toBe(false)
+    expect(wrapper.vm.applyAttachmentResult({
+      status: 'resolved', batchId: pending.batchId, itemId: pending.items[0]!.itemId,
+      documentIdentity: pending.documentIdentity, revision: pending.revision,
+      payload: { markdownKind: 'file', href: 'https://cdn.example/second.pdf', mimeType: 'application/pdf', name: 'second.pdf' },
+    })).toBe(false)
+    expect(wrapper.emitted('update:modelValue')?.length).toBe(beforeLateReply)
+  })
+
+  it('keeps a started service future behind its proof gate after the dispatch prop is removed', async () => {
+    let request: Parameters<MarkdownEditorAttachmentDispatch>[0] | undefined
+    let finish!: (result: MarkdownAttachmentProviderResult) => void
+    const future = new Promise<MarkdownAttachmentProviderResult>((resolve) => { finish = resolve })
+    const attachmentDispatch: MarkdownEditorAttachmentDispatch = (input) => {
+      request = input
+      return future
+    }
+    const wrapper = mount(MarkdownEditor, {
+      props: { modelValue: 'Draft: ', attachmentDispatch },
+    })
+    const textarea = wrapper.find('textarea').element as HTMLTextAreaElement
+    textarea.setSelectionRange(7, 7)
+    const picker = wrapper.find<HTMLInputElement>('.el-markdown-editor__attachment-picker')
+    Object.defineProperty(picker.element, 'files', {
+      configurable: true,
+      value: [new File(['report'], 'report.pdf', { type: 'application/pdf' })],
+    })
+    await picker.trigger('change')
+    expect(wrapper.emitted('upload-image')).toBeUndefined()
+    const started = request!
+    await wrapper.setProps({ attachmentDispatch: undefined })
+    const result: MarkdownAttachmentProviderResult = {
+      status: 'resolved', batchId: started.batch.batchId, itemId: started.item.itemId,
+      documentIdentity: started.batch.documentIdentity, revision: started.batch.revision,
+      payload: { markdownKind: 'file', href: 'https://cdn.example/report.pdf', mimeType: 'application/pdf', name: 'report.pdf' },
+    }
+    expect(wrapper.vm.applyAttachmentResult(result)).toBe(false)
+    expect(wrapper.vm.applyAttachmentResult({
+      status: 'progress', batchId: started.batch.batchId, itemId: started.item.itemId, ratio: 0.51,
+    })).toBe(false)
+    expect(started.onProgress({
+      status: 'progress', batchId: started.batch.batchId, itemId: started.item.itemId, ratio: 0.51,
+    })).toBe(true)
+    finish(result)
+    await flushPromises()
+    expect(wrapper.emitted('update:modelValue')?.at(-1)?.[0]).toBe('Draft: [report.pdf](https://cdn.example/report.pdf)')
+    expect(wrapper.vm.getSession('session:future-upload').inspectResourceParticipants().missingOwners).toContain('attachment-embed')
   })
 
   it('edits active image and caption subranges through the compact property surface', async () => {

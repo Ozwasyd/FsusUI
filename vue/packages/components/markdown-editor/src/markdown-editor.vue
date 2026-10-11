@@ -1649,7 +1649,7 @@ const attachmentJobs = ref<MarkdownAttachmentJob[]>([])
 const attachmentBatches = new Map<string, MarkdownAttachmentBatchIntent>()
 const attachmentItems = new Map<
   string,
-  MarkdownAttachmentBatchIntent['items'][number] & { readonly sourceFile: File | null }
+  MarkdownAttachmentBatchIntent['items'][number] & { readonly sourceFile: File | null; readonly legacyContentAttempt: number | null }
 >()
 const attachmentPresentations = computed(() =>
   attachmentJobs.value
@@ -2689,7 +2689,7 @@ const captureAttachmentFiles = (
 
   attachmentBatches.set(captured.batch.batchId, captured.batch)
   for (const item of captured.batch.items)
-    attachmentItems.set(item.itemId, Object.freeze({ ...item, sourceFile: files[item.order] ?? null }))
+    attachmentItems.set(item.itemId, Object.freeze({ ...item, sourceFile: files[item.order] ?? null, legacyContentAttempt: null }))
   attachmentJobs.value = [...attachmentJobs.value, ...planned.jobs]
   dispatchAttachmentBatch(captured.batch)
   return captured
@@ -4884,11 +4884,24 @@ const handleAttachmentPickerChange = (event: Event) => {
 }
 
 const applyAttachmentResult = (result: MarkdownAttachmentProviderResult) => {
-  if (!attachmentEmbedOwner.acceptsAttachmentResult(result)) return false
   const job = attachmentJobs.value.find(
-    (candidate) => candidate.itemId === result.itemId,
+    (candidate) => candidate.itemId === result.itemId && candidate.batchId === result.batchId,
   )
-  if (!job) return false
+  if (!job || !job.itemId || sessionDisposed || attachmentPauseRequested.value ||
+    (job.phase !== 'pending' && job.phase !== 'progress') ||
+    job.documentIdentity?.id !== transactionStore.documentIdentity.id ||
+    job.documentIdentity.epoch !== transactionStore.documentIdentity.epoch ||
+    (result.documentIdentity && (result.documentIdentity.id !== job.documentIdentity.id ||
+      result.documentIdentity.epoch !== job.documentIdentity.epoch)) ||
+    (result.revision !== undefined && result.revision !== job.revision) ||
+    !job.range || !Number.isSafeInteger(job.range.start) || !Number.isSafeInteger(job.range.end) ||
+    job.range.start < 0 || job.range.start >= job.range.end || job.range.end > transactionStore.value.length) return false
+  // Legacy content admission is independent of resource settlement. Only an
+  // actual void-event attempt can use it; a future attempt always needs proof,
+  // even if its dispatch prop was removed after starting.
+  const legacyContentAttempt = attachmentItems.get(job.itemId)?.legacyContentAttempt
+  const isLegacyContent = legacyContentAttempt === job.attempt && inspectMarkdownAttachmentDispatch(job) === null
+  if (!isLegacyContent && !attachmentEmbedOwner.acceptsAttachmentResult(result)) return false
   if (result.status === 'progress') {
     const ratio = result.ratio ?? 0
     progressMarkdownAttachmentJob(job, ratio <= 1 ? ratio * 100 : ratio)
@@ -4913,7 +4926,15 @@ const dispatchAttachmentBatch = (batch: MarkdownAttachmentBatchIntent) => {
   opaqueAttachmentResourcesObserved.value = true
   const dispatch = props.attachmentDispatch
   if (!dispatch) {
-    // A void event is compatible notification, never a settlement future.
+    // Mark the content channel before emitting: synchronous legacy consumers
+    // may reply here. This metadata does not issue any settlement/resource proof.
+    for (const item of batch.items) {
+      const job = attachmentJobs.value.find((candidate) => candidate.itemId === item.itemId && candidate.batchId === batch.batchId)
+      const retainedItem = attachmentItems.get(item.itemId)
+      if (job && retainedItem && !inspectMarkdownAttachmentDispatch(job)) {
+        attachmentItems.set(item.itemId, Object.freeze({ ...retainedItem, legacyContentAttempt: job.attempt }))
+      }
+    }
     emit('upload-image', batch)
     return
   }

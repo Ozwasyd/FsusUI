@@ -7,3 +7,6 @@ Expose the mounted MarkdownEditor's retained session snapshot and same-owner res
 Expose the existing mounted renderer's real retained projection restore and an
 optional per-item actual-future attachment dispatch hook. Preserve all incomplete
 resource, recoverable-disposal and full workspace snapshot admission guards.
+
+Preserve legacy upload-image content callbacks independently of unknown resource
+settlement; keep service-future content behind its original exclusive proof gate.
