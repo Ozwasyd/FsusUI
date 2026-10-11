@@ -91,7 +91,7 @@ export type FsusWorkerTaskInspection = {
   lane: FsusWorkerTaskLane
   promiseState: 'pending' | 'settled'
   requestTimeoutActive: boolean
-  state: 'queued' | 'suspended' | 'running' | 'canceling'
+  state: 'queued' | 'suspended' | 'running' | 'canceling' | 'settling'
   workerId: number | null
 }
 
@@ -1123,11 +1123,14 @@ export const createFsusWorkerExecutor = <TRequest, TResponse>(
       requestTimeoutActive: task.timeoutId !== null,
       state:
         task.slotId !== null
-          ? 'running'
+          ? selectedSlots.some((slot) => slot.id === task.slotId)
+            ? 'running'
+            : 'settling'
           : task.suspended
             ? 'suspended'
             : 'queued',
-      workerId: task.slotId,
+      workerId:
+        selectedSlots.find((slot) => slot.id === task.slotId)?.id ?? null,
     }))
     for (const slot of selectedSlots) {
       const identity = slot.activeTaskIdentity
@@ -1252,7 +1255,12 @@ export const createFsusWorkerExecutor = <TRequest, TResponse>(
     const before = inspectResources(scope)
     const affectedTaskIds: number[] = []
     const unavailableTaskIds = before.tasks
-      .filter((task) => task.state === 'running' || task.state === 'canceling')
+      .filter(
+        (task) =>
+          task.state === 'running' ||
+          task.state === 'canceling' ||
+          task.state === 'settling',
+      )
       .map((task) => task.id)
     for (const task of [...pending.values()]) {
       if (!matchesScope(task, scope) || task.slotId !== null) continue
