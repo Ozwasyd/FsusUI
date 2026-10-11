@@ -223,6 +223,7 @@
         'eslint-plugin-unicorn',
         'eslint-plugin-vue',
         'expect-type',
+        'happy-dom',
         'husky',
         'jsdom',
         'lint-staged',
