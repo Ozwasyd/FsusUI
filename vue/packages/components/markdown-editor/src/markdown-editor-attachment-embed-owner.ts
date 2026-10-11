@@ -133,7 +133,11 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
     const attachmentRunning = new Set(attachmentTasks.keys())
     for (const job of observedAttachmentJobs) {
       const state = inspectMarkdownAttachmentDispatch(job)
-      if (!state || state.attempt !== job.attempt) {
+      if (
+        !state ||
+        state.attempt !== job.attempt ||
+        (!state.settlementAvailable && !state.dispatching)
+      ) {
         throw new Error(
           'editor-session-attachment-settlement-owner-unavailable',
         )
@@ -380,9 +384,7 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
       job: MarkdownAttachmentJob,
       dispatch: (
         admitProgress: (result: MarkdownAttachmentProviderResult) => boolean,
-      ) =>
-        | MarkdownAttachmentProviderResult
-        | PromiseLike<MarkdownAttachmentProviderResult>,
+      ) => PromiseLike<MarkdownAttachmentProviderResult>,
     ): Promise<MarkdownAttachmentProviderResult> {
       if (disposed || pauseRequested)
         throw new Error('editor-session-attachment-dispatch-admission-blocked')
@@ -397,7 +399,7 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
       observedAttachmentJobs.add(ownedJob)
       let dispatchRef: object | undefined
       try {
-        return await runMarkdownAttachmentDispatch(ownedJob, async () => {
+        return await runMarkdownAttachmentDispatch(ownedJob, () => {
           const state = inspectMarkdownAttachmentDispatch(ownedJob)!
           dispatchRef = state.dispatchRef
           attachmentTasks.set(dispatchRef, ownedJob)
@@ -412,7 +414,7 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
             })
             return acceptsAttachmentResult(result)
           }
-          const result = await dispatch((progress) => {
+          const work = dispatch((progress) => {
             const current = inspectMarkdownAttachmentDispatch(ownedJob)
             if (
               progress.status !== 'progress' ||
@@ -422,10 +424,17 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
               return false
             return bindResult(progress)
           })
-          // Admission may refuse the content during pause. The actual promise
-          // still returns/rejects and settles independently of this boolean.
-          bindResult(result)
-          return result
+          // An event emission or terminal label is not a settlement future.
+          if (!work || typeof work.then !== 'function') {
+            throw new Error(
+              'editor-session-attachment-dispatch-settlement-unavailable',
+            )
+          }
+          return Promise.resolve(work).then((result) => {
+            // Refused content still leaves the real future free to settle.
+            bindResult(result)
+            return result
+          })
         })
       } finally {
         if (dispatchRef) attachmentTasks.delete(dispatchRef)
