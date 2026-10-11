@@ -534,11 +534,99 @@ export const estimateFsusRenderRefreshProfile = (
   }
 }
 
+// Own only callbacks requested here. Opaque platform work remains unknown.
+const createRenderPipelineCallbackResources = () => {
+  type Entry = {
+    kind: 'raf' | 'idle' | 'timeout'
+    cancelled: boolean
+    cancel: (() => void) | null
+  }
+  const entries = new Set<Entry>()
+  const schedule = (
+    kind: Entry['kind'],
+    request: (run: () => void) => (() => void) | null,
+    run: () => void,
+  ) => {
+    const entry: Entry = { kind, cancelled: false, cancel: null }
+    entries.add(entry)
+    try {
+      entry.cancel = request(() => {
+        entries.delete(entry)
+        if (!entry.cancelled) run()
+      })
+    } catch (error) {
+      entries.delete(entry)
+      throw error
+    }
+    return () => {
+      if (!entries.has(entry)) return
+      entry.cancelled = true
+      if (entry.cancel) {
+        entry.cancel()
+        entries.delete(entry)
+      }
+    }
+  }
+  const frame = (run: () => void) => {
+    const cancel =
+      typeof cancelAnimationFrame === 'function' ? cancelAnimationFrame : null
+    return schedule(
+      'raf',
+      (callback) => {
+        const handle = requestAnimationFrame(callback)
+        return cancel ? () => cancel(handle) : null
+      },
+      run,
+    )
+  }
+  const idle = (run: () => void) => {
+    const cancel =
+      typeof cancelIdleCallback === 'function' ? cancelIdleCallback : null
+    return schedule(
+      'idle',
+      (callback) => {
+        const handle = requestIdleCallback(callback, { timeout: 50 })
+        return cancel ? () => cancel(handle) : null
+      },
+      run,
+    )
+  }
+  const timeout = (run: () => void) =>
+    schedule(
+      'timeout',
+      (callback) => {
+        const handle = setTimeout(callback, 0)
+        return () => clearTimeout(handle)
+      },
+      run,
+    )
+  const cancelAll = () => {
+    for (const entry of entries) {
+      entry.cancelled = true
+      if (entry.cancel) {
+        entry.cancel()
+        entries.delete(entry)
+      }
+    }
+  }
+  const inspect = () =>
+    Object.freeze({
+      rafHandles: [...entries].filter((entry) => entry.kind === 'raf').length,
+      idleHandles: [...entries].filter((entry) => entry.kind === 'idle').length,
+      timers: [...entries].filter((entry) => entry.kind === 'timeout').length,
+      uncancellableCallbacks: [...entries].filter((entry) => !entry.cancel)
+        .length,
+    })
+  return { cancelAll, frame, idle, inspect, timeout }
+}
+
 export const createFsusRafRefreshSampler = ({
   onSample,
   requestFrame = (callback: FrameRequestCallback) =>
     requestAnimationFrame(callback),
-  cancelFrame = (handle: number) => cancelAnimationFrame(handle),
+  cancelFrame = typeof cancelAnimationFrame === 'function'
+    ? (handle: number) => cancelAnimationFrame(handle)
+    : undefined,
   sampleSize = 24,
 }: {
   onSample: (profile: FsusRenderRefreshProfile) => void
@@ -548,24 +636,36 @@ export const createFsusRafRefreshSampler = ({
 }) => {
   const deltas: number[] = []
   let previous: number | null = null
-  let handle = 0
+  let handle: number | null = null
   let stopped = false
   const sample = (timestamp: number) => {
+    handle = null
     if (stopped) return
     if (previous !== null) deltas.push(timestamp - previous)
     previous = timestamp
     if (deltas.length >= Math.max(4, sampleSize)) {
-      onSample(estimateFsusRenderRefreshProfile(deltas))
       stopped = true
+      onSample(estimateFsusRenderRefreshProfile(deltas))
       return
     }
     handle = requestFrame(sample)
   }
   handle = requestFrame(sample)
-  return () => {
+  const stop = () => {
     stopped = true
-    cancelFrame(handle)
+    if (handle !== null && cancelFrame) {
+      cancelFrame(handle)
+      handle = null
+    }
   }
+  return Object.assign(stop, {
+    inspectResources: () =>
+      Object.freeze({
+        rafHandles: handle === null ? 0 : 1,
+        uncancellableCallbacks: handle !== null && !cancelFrame ? 1 : 0,
+        stopped,
+      }),
+  })
 }
 
 export const createFsusRenderStageHistory = (limit = 32, alpha = 0.25) => {
@@ -947,31 +1047,52 @@ export const resolveFsusRenderPipelineUnitAttrs = ({
 export const useFsusRenderPipelineHardwareProfile = (
   config?: MaybeRef<FsusRenderPipelineConfig | null | undefined>,
 ) => {
-  const refreshProfile = shallowRef(
-    estimateFsusRenderRefreshProfile(
-      Array.from({ length: 12 }, () => 1000 / 60),
-    ),
-  )
+  const refreshProfile = shallowRef(estimateFsusRenderRefreshProfile([]))
   const visibilityVersion = ref(0)
   const lowPower = ref(renderPipelineLowPower)
-  let stopSampler: (() => void) | null = null
+  let mounted = false
+  let paused = false
+  let disposed = false
+  let generation = 0
+  let visibilityListener = false
+  const batteryJobs = new Set<symbol>()
+  const samplers = new Set<ReturnType<typeof createFsusRafRefreshSampler>>()
+  const stopSamplers = () => {
+    for (const stop of samplers) {
+      stop()
+      if (stop.inspectResources().rafHandles === 0) samplers.delete(stop)
+    }
+  }
   const startSampler = () => {
-    stopSampler?.()
-    if (typeof requestAnimationFrame !== 'function') return
-    stopSampler = createFsusRafRefreshSampler({
+    stopSamplers()
+    if (
+      !mounted ||
+      paused ||
+      disposed ||
+      typeof requestAnimationFrame !== 'function'
+    )
+      return
+    const sampleGeneration = generation
+    const stop = createFsusRafRefreshSampler({
       onSample: (sample) => {
-        refreshProfile.value = sample
+        if (!paused && !disposed && sampleGeneration === generation) {
+          refreshProfile.value = sample
+        }
       },
     })
+    samplers.add(stop)
   }
   const onVisibilityChange = () => {
+    if (paused || disposed) return
     visibilityVersion.value += 1
     startSampler()
   }
-  onMounted(() => {
+  const connect = () => {
+    if (!mounted || paused || disposed) return
     startSampler()
-    if (typeof document !== 'undefined') {
+    if (!visibilityListener && typeof document !== 'undefined') {
       document.addEventListener('visibilitychange', onVisibilityChange)
+      visibilityListener = true
     }
     if (typeof navigator !== 'undefined') {
       const getBattery = (
@@ -980,21 +1101,84 @@ export const useFsusRenderPipelineHardwareProfile = (
         }
       ).getBattery
       if (typeof getBattery === 'function') {
-        void getBattery
-          .call(navigator)
+        const batteryGeneration = generation
+        const job = Symbol('battery-query')
+        batteryJobs.add(job)
+        void Promise.resolve()
+          .then(() => {
+            if (paused || disposed || batteryGeneration !== generation)
+              return null
+            return getBattery.call(navigator)
+          })
           .then((battery) => {
+            if (
+              !battery ||
+              paused ||
+              disposed ||
+              batteryGeneration !== generation
+            )
+              return
             renderPipelineLowPower = !battery.charging && battery.level <= 0.2
             lowPower.value = renderPipelineLowPower
           })
           .catch(() => undefined)
+          .finally(() => batteryJobs.delete(job))
       }
     }
+  }
+  const inspectResources = () => {
+    let rafHandles = 0
+    let uncancellableCallbacks = 0
+    for (const stop of samplers) {
+      const inspection = stop.inspectResources()
+      rafHandles += inspection.rafHandles
+      uncancellableCallbacks += inspection.uncancellableCallbacks
+      if (inspection.rafHandles === 0) samplers.delete(stop)
+    }
+    return Object.freeze({
+      paused,
+      disposed,
+      rafHandles,
+      uncancellableCallbacks,
+      retainedListeners: visibilityListener ? 1 : 0,
+      pendingBatteryQueries: batteryJobs.size,
+      batteryCancellation: batteryJobs.size
+        ? ('unavailable' as const)
+        : ('idle' as const),
+      // Resumption here does not restore a disposed renderer snapshot.
+      recoverable: false as const,
+    })
+  }
+  const pause = () => {
+    if (!paused) {
+      paused = true
+      generation += 1
+      stopSamplers()
+      if (visibilityListener && typeof document !== 'undefined') {
+        document.removeEventListener('visibilitychange', onVisibilityChange)
+        visibilityListener = false
+      }
+    }
+    return inspectResources()
+  }
+  const resume = () => {
+    if (disposed) throw new Error('fsus_render_pipeline_hardware_disposed')
+    if (paused) {
+      paused = false
+      generation += 1
+      visibilityVersion.value += 1
+      connect()
+    }
+    return inspectResources()
+  }
+  onMounted(() => {
+    mounted = true
+    connect()
   })
   onBeforeUnmount(() => {
-    stopSampler?.()
-    if (typeof document !== 'undefined') {
-      document.removeEventListener('visibilitychange', onVisibilityChange)
-    }
+    pause()
+    disposed = true
+    mounted = false
   })
   const capabilityProfile = computed(() => {
     visibilityVersion.value
@@ -1052,6 +1236,9 @@ export const useFsusRenderPipelineHardwareProfile = (
   )
 
   return {
+    inspectResources,
+    pause,
+    resume,
     attrs,
     capabilityProfile,
     compositor,
@@ -1783,9 +1970,26 @@ export const useFsusVirtualWindow = <TUnit>(options: {
   }
 
   const variableState = fixedItemSize > 0 ? null : createVariableState()
-  let measurementFrame = 0
-  let scrollFrame = 0
+  const callbacks = createRenderPipelineCallbackResources()
+  let measurementFrame: (() => void) | null = null
+  let scrollFrame: (() => void) | null = null
+  let paused = false
+  let disposed = false
+  let generation = 0
+  let listenerViewport: FsusViewport | null = null
+  let resizeTarget: Window | null = null
+  let observerGeneration = 0
+  const viewportJobs = new Set<symbol>()
+  const afterViewportTick = (run: () => void) => {
+    const job = Symbol('viewport-tick')
+    const tickGeneration = generation
+    viewportJobs.add(job)
+    void nextTick(() => {
+      if (!paused && !disposed && tickGeneration === generation) run()
+    }).finally(() => viewportJobs.delete(job))
+  }
   let resizeObserver: ResizeObserver | null = null
+  const observedTargets = new Set<Element>()
   let viewport: FsusViewport | null = null
 
   const totalSize = computed(() => {
@@ -1874,26 +2078,32 @@ export const useFsusVirtualWindow = <TUnit>(options: {
   }
 
   const readViewport = () => {
-    viewport = options.getViewport()
+    if (paused || disposed) return
+    const nextViewport = options.getViewport()
+    if (listenerViewport && listenerViewport !== nextViewport) {
+      disconnect()
+      attachListeners(nextViewport)
+    }
+    viewport = nextViewport
     scrollOffset.value = getViewportScrollTop(viewport)
     viewportSize.value = getViewportHeight(viewport)
   }
 
   const scheduleViewportRead = () => {
-    if (scrollFrame) return
+    if (paused || disposed || scrollFrame) return
     if (typeof requestAnimationFrame !== 'function') {
       readViewport()
       return
     }
-    scrollFrame = requestAnimationFrame(() => {
-      scrollFrame = 0
+    scrollFrame = callbacks.frame(() => {
+      scrollFrame = null
       readViewport()
     })
   }
 
   const flushMeasurements = () => {
-    measurementFrame = 0
-    if (!variableState?.pendingMeasurements.size) return
+    measurementFrame = null
+    if (paused || disposed || !variableState?.pendingMeasurements.size) return
 
     const batchSize = Math.max(
       1,
@@ -1960,7 +2170,7 @@ export const useFsusVirtualWindow = <TUnit>(options: {
 
     if (variableState.pendingMeasurements.size) {
       if (typeof requestAnimationFrame === 'function') {
-        measurementFrame = requestAnimationFrame(flushMeasurements)
+        measurementFrame = callbacks.frame(flushMeasurements)
       } else {
         flushMeasurements()
       }
@@ -1968,43 +2178,47 @@ export const useFsusVirtualWindow = <TUnit>(options: {
   }
 
   const queueMeasurement = (key: string, size: number) => {
-    if (!variableState) return
+    if (
+      paused ||
+      disposed ||
+      !variableState ||
+      !variableState.keyToIndex.has(key)
+    )
+      return
     variableState.pendingMeasurements.set(key, size)
     if (!measurementFrame) {
       if (typeof requestAnimationFrame === 'function') {
-        measurementFrame = requestAnimationFrame(flushMeasurements)
+        measurementFrame = callbacks.frame(flushMeasurements)
       } else {
         flushMeasurements()
       }
     }
   }
 
-  const setUnitRef = (key: string, element: Element | null) => {
-    if (!variableState) return
-    const previousElement = variableState.observedElements.get(key)
-    if (previousElement === element) return
-    if (previousElement) {
-      resizeObserver?.unobserve(previousElement)
-      variableState.elementKeys.delete(previousElement)
-      variableState.observedElements.delete(key)
-    }
-
-    if (!(element instanceof HTMLElement)) return
-    if (!variableState.keyToIndex.has(key)) return
-    const previousKey = variableState.elementKeys.get(element)
-    if (previousKey && previousKey !== key) {
-      variableState.observedElements.delete(previousKey)
-      variableState.pendingMeasurements.delete(previousKey)
-    }
-    variableState.observedElements.set(key, element)
-    variableState.elementKeys.set(element, key)
-    queueMeasurement(key, element.offsetHeight)
-
-    if (typeof ResizeObserver !== 'undefined') {
-      resizeObserver ??= new ResizeObserver((entries) => {
+  const observeElement = (element: HTMLElement) => {
+    if (
+      paused ||
+      disposed ||
+      !variableState ||
+      typeof ResizeObserver === 'undefined'
+    )
+      return
+    if (!resizeObserver) {
+      const currentObserverGeneration = ++observerGeneration
+      resizeObserver = new ResizeObserver((entries) => {
+        if (
+          paused ||
+          disposed ||
+          currentObserverGeneration !== observerGeneration
+        )
+          return
         for (const entry of entries) {
           const entryKey = variableState.elementKeys.get(entry.target)
-          if (!entryKey) continue
+          if (
+            !entryKey ||
+            variableState.observedElements.get(entryKey) !== entry.target
+          )
+            continue
           const blockSize =
             entry.borderBoxSize?.[0]?.blockSize ??
             entry.contentRect.height ??
@@ -2014,8 +2228,34 @@ export const useFsusVirtualWindow = <TUnit>(options: {
           queueMeasurement(entryKey, blockSize)
         }
       })
-      resizeObserver.observe(element)
     }
+    resizeObserver.observe(element)
+    observedTargets.add(element)
+  }
+
+  const setUnitRef = (key: string, element: Element | null) => {
+    if (disposed || !variableState) return
+    const previousElement = variableState.observedElements.get(key)
+    if (previousElement === element) return
+    // Removal also drops a queued size for an element that is no longer mounted.
+    variableState.pendingMeasurements.delete(key)
+    if (previousElement) {
+      resizeObserver?.unobserve(previousElement)
+      observedTargets.delete(previousElement)
+      variableState.elementKeys.delete(previousElement)
+      variableState.observedElements.delete(key)
+    }
+    if (!(element instanceof HTMLElement) || !variableState.keyToIndex.has(key))
+      return
+    const previousKey = variableState.elementKeys.get(element)
+    if (previousKey && previousKey !== key) {
+      variableState.observedElements.delete(previousKey)
+      variableState.pendingMeasurements.delete(previousKey)
+    }
+    variableState.observedElements.set(key, element)
+    variableState.elementKeys.set(element, key)
+    queueMeasurement(key, element.offsetHeight)
+    observeElement(element)
   }
 
   const syncUnits = (nextUnits: readonly TUnit[]) => {
@@ -2089,6 +2329,7 @@ export const useFsusVirtualWindow = <TUnit>(options: {
         const element = variableState.observedElements.get(key)
         if (element) {
           resizeObserver?.unobserve(element)
+          observedTargets.delete(element)
           variableState.elementKeys.delete(element)
         }
         variableState.observedElements.delete(key)
@@ -2103,6 +2344,7 @@ export const useFsusVirtualWindow = <TUnit>(options: {
       for (const [key, element] of variableState.observedElements) {
         if (seen.has(key)) continue
         resizeObserver?.unobserve(element)
+        observedTargets.delete(element)
         variableState.elementKeys.delete(element)
         variableState.observedElements.delete(key)
         variableState.pendingMeasurements.delete(key)
@@ -2147,51 +2389,100 @@ export const useFsusVirtualWindow = <TUnit>(options: {
         }
       }
     }
-    void nextTick(readViewport)
+    afterViewportTick(readViewport)
   }
 
-  const connect = () => {
-    readViewport()
-    viewport?.addEventListener('scroll', scheduleViewportRead, {
-      passive: true,
-    })
-    if (viewport && isWindowViewport(viewport)) {
-      viewport.addEventListener('resize', scheduleViewportRead)
-    } else if (typeof window !== 'undefined') {
-      window.addEventListener('resize', scheduleViewportRead)
-    }
+  const attachListeners = (target: FsusViewport | null) => {
+    listenerViewport = target
+    target?.addEventListener('scroll', scheduleViewportRead, { passive: true })
+    resizeTarget =
+      target && isWindowViewport(target)
+        ? target
+        : typeof window !== 'undefined'
+          ? window
+          : null
+    resizeTarget?.addEventListener('resize', scheduleViewportRead)
   }
-
   const disconnect = () => {
-    viewport?.removeEventListener('scroll', scheduleViewportRead)
-    if (viewport && isWindowViewport(viewport)) {
-      viewport.removeEventListener('resize', scheduleViewportRead)
-    } else if (typeof window !== 'undefined') {
-      window.removeEventListener('resize', scheduleViewportRead)
-    }
+    listenerViewport?.removeEventListener('scroll', scheduleViewportRead)
+    resizeTarget?.removeEventListener('resize', scheduleViewportRead)
+    listenerViewport = null
+    resizeTarget = null
     viewport = null
   }
-
+  const connect = () => {
+    if (paused || disposed) return
+    disconnect()
+    viewport = options.getViewport()
+    attachListeners(viewport)
+    readViewport()
+  }
+  const inspectResources = () =>
+    Object.freeze({
+      paused,
+      disposed,
+      ...callbacks.inspect(),
+      scrollFrame: scrollFrame !== null,
+      measurementFrame: measurementFrame !== null,
+      observers: resizeObserver ? 1 : 0,
+      observedElements: observedTargets.size,
+      retainedElements: variableState?.observedElements.size ?? 0,
+      pendingMeasurements: variableState?.pendingMeasurements.size ?? 0,
+      measuredSizes: variableState?.measuredSizes.size ?? 0,
+      pendingViewportTicks: viewportJobs.size,
+      retainedListeners: (listenerViewport ? 1 : 0) + (resizeTarget ? 1 : 0),
+      // ResizeObserver's platform-internal queue is not exposed by this source.
+      observerInternalCallbacks: 'unknown' as const,
+      recoverable: false as const,
+    })
+  const pause = () => {
+    if (!paused) {
+      paused = true
+      generation += 1
+      disconnect()
+      callbacks.cancelAll()
+      scrollFrame = null
+      measurementFrame = null
+      observerGeneration += 1
+      resizeObserver?.disconnect()
+      resizeObserver = null
+      observedTargets.clear()
+      variableState?.pendingMeasurements.clear()
+    }
+    return inspectResources()
+  }
+  const resume = () => {
+    if (disposed) throw new Error('fsus_virtual_window_disposed')
+    if (paused) {
+      paused = false
+      generation += 1
+      connect()
+      for (const [key, element] of variableState?.observedElements ?? []) {
+        queueMeasurement(key, element.offsetHeight)
+        observeElement(element)
+      }
+    }
+    return inspectResources()
+  }
   onMounted(() => {
-    void nextTick(connect)
+    afterViewportTick(connect)
   })
 
   watch(options.units, syncUnits, { flush: 'sync' })
 
   onBeforeUnmount(() => {
-    disconnect()
-    if (typeof cancelAnimationFrame === 'function') {
-      if (scrollFrame) cancelAnimationFrame(scrollFrame)
-      if (measurementFrame) cancelAnimationFrame(measurementFrame)
-    }
-    resizeObserver?.disconnect()
-    resizeObserver = null
+    pause()
+    disposed = true
     variableState?.observedElements.clear()
-    variableState?.pendingMeasurements.clear()
+    if (variableState)
+      variableState.elementKeys = new WeakMap<Element, string>()
     variableState?.measuredSizes.clear()
   })
 
   return {
+    inspectResources,
+    pause,
+    resume,
     bottomSpacer,
     connect,
     readViewport,
