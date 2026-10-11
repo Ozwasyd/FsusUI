@@ -1,5 +1,5 @@
-import { watch, toRaw } from 'vue'
-import type { WatchSource, WatchStopHandle } from 'vue'
+import { isReactive, isReadonly, ref, watch, toRaw } from 'vue'
+import type { Ref, WatchSource, WatchStopHandle } from 'vue'
 import type {
   MarkdownDocumentIdentity,
   MarkdownEmbedValidNode,
@@ -55,6 +55,36 @@ export interface MarkdownAttachmentEmbedOwnerBindings {
   ) => void
 }
 
+/** Bind the existing editor stores, not computed/custom refs or callback counters. */
+export interface MarkdownAttachmentEmbedInputs {
+  readonly documentIdentity: MarkdownDocumentIdentity
+  readonly revision: Ref<number>
+  readonly jobs: Ref<MarkdownAttachmentJob[]>
+}
+
+const snapshotJobs = (value: readonly MarkdownAttachmentJob[]) => {
+  const raw = toRaw(value)
+  if (!Array.isArray(raw) || Object.getPrototypeOf(raw) !== Array.prototype)
+    return
+  const slots = Object.getOwnPropertyDescriptors(raw)
+  if (Reflect.ownKeys(slots).length !== raw.length + 1) return
+  const jobs: MarkdownAttachmentJob[] = []
+  for (let index = 0; index < raw.length; index += 1) {
+    const slot = slots[String(index)]
+    if (!slot || !('value' in slot) || !slot.value) return
+    const job = toRaw(slot.value) as MarkdownAttachmentJob
+    if (!isPassiveRecord(job)) return
+    jobs.push(job)
+  }
+  return Object.freeze(jobs)
+}
+const sameJobs = (
+  left: readonly MarkdownAttachmentJob[],
+  right: readonly MarkdownAttachmentJob[],
+) =>
+  left.length === right.length &&
+  left.every((job, index) => job === right[index])
+
 const nodeId = (node: MarkdownEmbedValidNode) =>
   `embed:${node.ranges.full.start}:${node.target}:${node.mode}`
 const unfinished = (job: MarkdownAttachmentJob) =>
@@ -92,8 +122,8 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
   const readDocumentBinding = bindings.readDocument
   const readEmbedProviderBinding = bindings.readEmbedProvider
   const readAttachmentJobsBinding = bindings.readAttachmentJobs
-  const readAttachmentBatchesBinding = bindings.readAttachmentBatches
-  const readAttachmentItemsBinding = bindings.readAttachmentItems
+  const attachmentBatches = toRaw(bindings.readAttachmentBatches())
+  const attachmentItems = toRaw(bindings.readAttachmentItems())
   const publishEmbedResultsBinding = bindings.publishEmbedResults
   const attachmentCaptureSession = bindings.attachmentCaptureSession
   const readDocument: MarkdownAttachmentEmbedOwnerBindings['readDocument'] =
@@ -102,10 +132,27 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
     () => Reflect.apply(readEmbedProviderBinding, bindings, [])
   const readAttachmentJobs: MarkdownAttachmentEmbedOwnerBindings['readAttachmentJobs'] =
     () => Reflect.apply(readAttachmentJobsBinding, bindings, [])
-  const readAttachmentBatches: MarkdownAttachmentEmbedOwnerBindings['readAttachmentBatches'] =
-    () => Reflect.apply(readAttachmentBatchesBinding, bindings, [])
-  const readAttachmentItems: MarkdownAttachmentEmbedOwnerBindings['readAttachmentItems'] =
-    () => Reflect.apply(readAttachmentItemsBinding, bindings, [])
+  const mapSize = Object.getOwnPropertyDescriptor(Map.prototype, 'size')!.get!
+  const readContainerSize = (container: ReadonlyMap<string, unknown>) => {
+    if (Object.getPrototypeOf(container) !== Map.prototype)
+      throw new Error('editor-session-attachment-container-unavailable')
+    return Reflect.apply(mapSize, container, []) as number
+  }
+  // Capture the native getter from this Vue instance; custom/computed ref getters
+  // are not an observation contract and cannot grant result admission.
+  const nativeRefPrototype = Object.getPrototypeOf(ref())
+  const nativeRefGetter = Object.getOwnPropertyDescriptor(
+    nativeRefPrototype,
+    'value',
+  )!.get!
+  const readNativeRef = <T>(source: Ref<T>): T => {
+    if (
+      Object.getPrototypeOf(source) !== nativeRefPrototype ||
+      Object.hasOwn(source, 'value')
+    )
+      throw new Error('editor-session-attachment-input-unavailable')
+    return Reflect.apply(nativeRefGetter, source, []) as T
+  }
   const active = new Set<{
     controller: AbortController
     request: MarkdownEmbedRequest
@@ -157,6 +204,72 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
       }
     | undefined
   let stopWatcher: WatchStopHandle | undefined
+  let attachmentInputs: MarkdownAttachmentEmbedInputs | undefined
+  let stopAttachmentWatcher: WatchStopHandle | undefined
+  let attachmentObservationRef: object = Object.freeze({})
+  const invalidateAttachmentObservation = () => {
+    attachmentObservationRef = Object.freeze({})
+  }
+  const readAttachmentFrame = () => {
+    const inputs = attachmentInputs
+    const version = attachmentObservationRef
+    if (!inputs) throw new Error('editor-session-attachment-input-unavailable')
+    const identity = snapshotPassiveRecord(toRaw(inputs.documentIdentity))
+    const revision = readNativeRef(inputs.revision)
+    const jobs = snapshotJobs(readNativeRef(inputs.jobs))
+    if (
+      !identity ||
+      typeof identity.id !== 'string' ||
+      !Number.isSafeInteger(identity.epoch) ||
+      !Number.isSafeInteger(revision) ||
+      !jobs ||
+      version !== attachmentObservationRef
+    )
+      throw new Error('editor-session-attachment-input-unavailable')
+    return Object.freeze({
+      version,
+      context: Object.freeze({
+        id: identity.id,
+        epoch: identity.epoch,
+        revision,
+      }),
+      jobs,
+    })
+  }
+  const stopAttachmentWatching = () => {
+    invalidateAttachmentObservation()
+    const previous = stopAttachmentWatcher
+    stopAttachmentWatcher = undefined
+    if (!previous) return
+    watcherTransitions += 1
+    try {
+      previous()
+    } finally {
+      watcherTransitions -= 1
+    }
+  }
+  const startAttachmentWatching = () => {
+    if (!attachmentInputs || pauseRequested || disposed) return
+    const inputs = attachmentInputs
+    const boundary = boundaryRef
+    readAttachmentFrame()
+    invalidateAttachmentObservation()
+    watcherTransitions += 1
+    try {
+      const watcher = watch(
+        [inputs.documentIdentity, inputs.revision, inputs.jobs],
+        invalidateAttachmentObservation,
+        { flush: 'sync', deep: true },
+      )
+      if (boundaryRef !== boundary || pauseRequested || disposed) {
+        watcher()
+        return
+      }
+      stopAttachmentWatcher = watcher
+    } finally {
+      watcherTransitions -= 1
+    }
+  }
   const readDocumentContext = () => {
     const document = readDocument()
     return {
@@ -172,6 +285,44 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
     left.revision === right.revision &&
     left.id === right.id &&
     left.epoch === right.epoch
+  const readAttachmentObservation = () => {
+    if (
+      !stopAttachmentWatcher ||
+      watcherTransitions !== 0 ||
+      pauseRequested ||
+      disposed
+    )
+      throw new Error('editor-session-attachment-observation-unavailable')
+    const before = readAttachmentFrame()
+    // All supplied callbacks execute inside the real synchronous Vue fence.
+    const suppliedDocument = snapshotPassiveRecord(readDocument())
+    const suppliedIdentity =
+      suppliedDocument &&
+      snapshotPassiveRecord(toRaw(suppliedDocument.documentIdentity))
+    const suppliedJobs = snapshotJobs(readAttachmentJobs())
+    const after = readAttachmentFrame()
+    if (
+      !suppliedDocument ||
+      !suppliedIdentity ||
+      !suppliedJobs ||
+      before.version !== attachmentObservationRef ||
+      before.version !== after.version ||
+      !sameDocumentContext(before.context, after.context) ||
+      !sameDocumentContext(before.context, {
+        id: suppliedIdentity.id,
+        epoch: suppliedIdentity.epoch,
+        revision: suppliedDocument.revision,
+      }) ||
+      !sameJobs(before.jobs, after.jobs) ||
+      !sameJobs(suppliedJobs, after.jobs) ||
+      !stopAttachmentWatcher ||
+      pauseRequested ||
+      disposed
+    )
+      throw new Error('editor-session-attachment-observation-invalidated')
+    // No consumer read callback follows this immutable observation.
+    return after
+  }
   const readEmbedContext = () => {
     const provider = readEmbedProvider()
     return { ...readDocumentContext(), provider }
@@ -258,8 +409,9 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
       throw new Error('editor-session-attachment-embed-request-transition')
     const boundary = boundaryRef
     collectDraining()
-    const jobs = readAttachmentJobs()
-    const currentJobs = new Set(jobs.map((job) => toRaw(job)))
+    const frame = readAttachmentFrame()
+    const jobs = frame.jobs
+    const currentJobs = new Set(jobs)
     for (const job of currentJobs) observedAttachmentJobs.add(job)
     const attachmentRunning = new Set(attachmentTasks.keys())
     for (const job of observedAttachmentJobs) {
@@ -283,15 +435,13 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
         observedAttachmentJobs.delete(job)
       }
     }
-    const batches = readAttachmentBatches()
-    const items = readAttachmentItems()
     const capture = inspectMarkdownAttachmentCaptureResources(
       attachmentCaptureSession,
     )
     const jobCount = jobs.length
-    const batchCount = batches.size
-    const itemCount = items.size
-    if (boundaryRef !== boundary)
+    const batchCount = readContainerSize(attachmentBatches)
+    const itemCount = readContainerSize(attachmentItems)
+    if (boundaryRef !== boundary || frame.version !== attachmentObservationRef)
       throw new Error('editor-session-attachment-embed-inspection-reentered')
     const requests = new Set([...active].map((operation) => operation.request))
     for (const request of draining) requests.add(request)
@@ -311,6 +461,7 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
       paused:
         pauseRequested &&
         stopWatcher === undefined &&
+        stopAttachmentWatcher === undefined &&
         backgroundTasks === 0 &&
         timers === 0 &&
         retainedListeners === 0,
@@ -331,7 +482,7 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
       usage: Object.freeze({
         editorInstances: 0,
         renderers: 0,
-        observers: stopWatcher ? 1 : 0,
+        observers: (stopWatcher ? 1 : 0) + (stopAttachmentWatcher ? 1 : 0),
         timers,
         backgroundTasks,
         // This library performs no network I/O. Opaque consumer work blocks pause
@@ -350,7 +501,8 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
           embedAttempts.size +
           versions.size +
           nodes.length +
-          (stopWatcher ? 1 : 0),
+          (stopWatcher ? 1 : 0) +
+          (stopAttachmentWatcher ? 1 : 0),
       }),
     })
   }
@@ -538,6 +690,7 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
       attachmentGeneration += 1
       pauseRequested = true
       stopWatching()
+      stopAttachmentWatching()
       if (boundaryRef === boundary) cancel()
       return inspect()
     },
@@ -547,6 +700,7 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
       const wasPaused = pauseRequested
       pauseRequested = false
       if (wasPaused) {
+        startAttachmentWatching()
         if (watchInputs) startWatching()
         else refreshEmbeds(nodes)
       }
@@ -571,15 +725,14 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
     const proof = attachmentResults.get(result)
     if (!proof) return false
     const boundary = boundaryRef
-    const context = readDocumentContext()
-    const now = readDocumentContext()
-    const jobs = toRaw(readAttachmentJobs())
-    // No consumer callback follows these raw data snapshots. A callback may
-    // retry/remove the job without changing the document or dispatch ledger.
-    const slots = Object.getOwnPropertyDescriptors(jobs)
-    const ownsJob = Object.values(slots).some(
-      (slot) => 'value' in slot && slot.value === proof.job,
-    )
+    let observation: ReturnType<typeof readAttachmentObservation>
+    try {
+      observation = readAttachmentObservation()
+    } catch {
+      return false
+    }
+    const context = observation.context
+    const ownsJob = observation.jobs.includes(proof.job)
     const job = snapshotPassiveRecord(proof.job)
     const delivered = snapshotPassiveRecord(result)
     if (!ownsJob || !job || !delivered) return false
@@ -602,7 +755,7 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
     return (
       matches &&
       boundaryRef === boundary &&
-      sameDocumentContext(context, now) &&
+      observation.version === attachmentObservationRef &&
       !pauseRequested &&
       !disposed &&
       dispatch?.dispatchRef === proof.dispatchRef &&
@@ -626,22 +779,20 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
         throw new Error('editor-session-attachment-dispatch-admission-blocked')
       const boundary = beginBoundary()
       const epoch = attachmentGeneration
-      const context = readDocumentContext()
+      const observation = readAttachmentObservation()
+      const context = observation.context
       const ownedJob = toRaw(job)
-      if (!isPassiveRecord(ownedJob))
+      const jobSnapshot = snapshotPassiveRecord(ownedJob)
+      const jobIdentity =
+        jobSnapshot?.documentIdentity &&
+        snapshotPassiveRecord(toRaw(jobSnapshot.documentIdentity))
+      if (!jobSnapshot || !observation.jobs.includes(ownedJob))
         throw new Error('editor-session-attachment-dispatch-job-unavailable')
-      if (
-        !readAttachmentJobs().some((candidate) => toRaw(candidate) === ownedJob)
-      ) {
-        throw new Error('editor-session-attachment-dispatch-job-unavailable')
-      }
-      const jobIdentity = ownedJob.documentIdentity
       const ownsDocument =
         jobIdentity?.id === context.id && jobIdentity.epoch === context.epoch
-      const currentDocument = readDocumentContext()
       if (
         !ownsDocument ||
-        !sameDocumentContext(context, currentDocument) ||
+        observation.version !== attachmentObservationRef ||
         boundaryRef !== boundary ||
         attachmentGeneration !== epoch ||
         disposed ||
@@ -732,6 +883,36 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
         if (dispatchRef) attachmentTasks.delete(dispatchRef)
       }
     },
+    bindAttachmentInputs(inputs: MarkdownAttachmentEmbedInputs) {
+      if (disposed || attachmentInputs)
+        throw new Error(
+          'editor-session-attachment-input-already-bound-or-disposed',
+        )
+      const boundary = beginBoundary()
+      const captured = Object.freeze({
+        documentIdentity: inputs.documentIdentity,
+        revision: inputs.revision,
+        jobs: inputs.jobs,
+      })
+      if (
+        !isReactive(captured.documentIdentity) ||
+        isReadonly(captured.documentIdentity) ||
+        toRaw(captured.documentIdentity) === captured.documentIdentity ||
+        boundary !== boundaryRef ||
+        disposed ||
+        attachmentInputs
+      )
+        throw new Error('editor-session-attachment-input-unavailable')
+      attachmentInputs = captured
+      try {
+        readAttachmentFrame()
+        startAttachmentWatching()
+      } catch (error) {
+        stopAttachmentWatching()
+        attachmentInputs = undefined
+        throw error
+      }
+    },
     bindEmbedInputs(
       sources: readonly WatchSource[],
       readNodes: () => readonly MarkdownEmbedValidNode[],
@@ -759,6 +940,7 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
       attachmentGeneration += 1
       pauseRequested = true
       stopWatching()
+      stopAttachmentWatching()
       if (boundaryRef === boundary) cancel()
     },
   })
