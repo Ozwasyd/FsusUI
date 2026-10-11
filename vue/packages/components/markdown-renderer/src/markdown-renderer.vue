@@ -101,6 +101,7 @@ import {
 } from './markdown-renderer'
 import {
   createMarkdownRendererSessionResourceOwner,
+  hasUnavailableMarkdownRendererWorkerListenerRegistration,
   inspectMarkdownRendererWorkerCleanupResidue,
 } from './markdown-renderer-session-resources'
 import type { MarkdownRendererRestoreProof } from './markdown-renderer-session-resources'
@@ -1431,6 +1432,8 @@ const restoreLastValidRender = async (
     )
   if (pipeline.workerCallbackFailure)
     return blocked('markdown-renderer-worker-callback-failure')
+  if (hasUnavailableMarkdownRendererWorkerListenerRegistration(pipeline))
+    return blocked('markdown-renderer-worker-listener-registration-unavailable')
   const workerCleanupResidue =
     inspectMarkdownRendererWorkerCleanupResidue(pipeline)
   if (
