@@ -44,6 +44,8 @@ interface MarkdownAttachmentDispatchState {
   readonly dispatchRef: object
   readonly attempt: number
   settled: boolean
+  dispatching: boolean
+  settlementAvailable: boolean
 }
 const attachmentDispatches = new WeakMap<
   MarkdownAttachmentJob,
@@ -61,9 +63,7 @@ export const inspectMarkdownAttachmentDispatch = (
 /** Only completion/rejection of this invocation can settle its resource record. */
 export const runMarkdownAttachmentDispatch = async (
   job: MarkdownAttachmentJob,
-  dispatch: () =>
-    | MarkdownAttachmentProviderResult
-    | PromiseLike<MarkdownAttachmentProviderResult>,
+  dispatch: () => PromiseLike<MarkdownAttachmentProviderResult>,
 ): Promise<MarkdownAttachmentProviderResult> => {
   const ownedJob = toRaw(job)
   const previous = attachmentDispatches.get(ownedJob)
@@ -77,12 +77,24 @@ export const runMarkdownAttachmentDispatch = async (
     dispatchRef: Object.freeze({}),
     attempt: ownedJob.attempt,
     settled: false,
+    dispatching: true,
+    settlementAvailable: false,
   }
   attachmentDispatches.set(ownedJob, state)
   try {
-    return await dispatch()
+    const work = dispatch()
+    state.dispatching = false
+    if (!work || typeof work.then !== 'function') {
+      throw new Error('markdown-attachment-dispatch-settlement-unavailable')
+    }
+    state.settlementAvailable = true
+    try {
+      return await work
+    } finally {
+      state.settled = true
+    }
   } finally {
-    state.settled = true
+    state.dispatching = false
   }
 }
 
@@ -352,7 +364,11 @@ export const cancelMarkdownAttachmentJob = (job: MarkdownAttachmentJob) => {
 
 export const retryMarkdownAttachmentJob = (job: MarkdownAttachmentJob) => {
   const dispatch = inspectMarkdownAttachmentDispatch(job)
-  if (!dispatch || dispatch.attempt !== job.attempt)
+  if (
+    !dispatch ||
+    dispatch.attempt !== job.attempt ||
+    (!dispatch.settlementAvailable && !dispatch.dispatching)
+  )
     throw new Error('markdown-attachment-retry-settlement-unavailable')
   if (!dispatch.settled)
     throw new Error('markdown-attachment-retry-dispatch-still-running')
