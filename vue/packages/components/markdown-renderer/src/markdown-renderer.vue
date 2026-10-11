@@ -100,6 +100,7 @@ import {
   resolveMarkdownWorkerScriptUrl,
 } from './markdown-renderer'
 import { createMarkdownRendererSessionResourceOwner } from './markdown-renderer-session-resources'
+import type { MarkdownRendererRestoreProof } from './markdown-renderer-session-resources'
 import type { FsusRenderPipelineAdapter } from '@element-plus/hooks'
 import type {
   MarkdownHeavyFeatureIdentity,
@@ -361,6 +362,13 @@ const rendererResourceOwner = createMarkdownRendererSessionResourceOwner({
       props.contentVersion ??
       resolveMarkdownSourceIdentity(markdownRenderRequest.value),
   }),
+  readProjection: () => ({
+    html: renderedContent.value,
+    units: chunkUnits.value,
+    strategy: renderStrategy.value,
+  }),
+  readPipelineResources: () => renderPipelineRuntime.inspectResources(),
+  readVirtualWindowResources: () => virtualWindow.inspectResources(),
   readProjectionResources: () => {
     const heavy = heavyLifecycle.metrics()
     return {
@@ -1398,6 +1406,97 @@ const performRender = async () => {
   }
 }
 
+const restoreLastValidRender = async (
+  ref: string,
+): Promise<MarkdownRendererRestoreProof> => {
+  const blocked = (reason: string): MarkdownRendererRestoreProof =>
+    Object.freeze({ ref, status: 'blocked', reason })
+  const retained = rendererResourceOwner.readRetainedRender(ref)
+  if (!retained)
+    return blocked('markdown-renderer-retained-result-unavailable-or-busy')
+  const pipeline = renderPipelineRuntime.inspectResources()
+  const viewport = virtualWindow.inspectResources()
+  if (
+    pipeline.disposed ||
+    viewport.disposed ||
+    pipeline.paused ||
+    viewport.paused ||
+    pipeline.pendingRenders > 0 ||
+    pipeline.pendingAdapterJobs > 0
+  ) {
+    return blocked('markdown-renderer-source-owner-unavailable-or-busy')
+  }
+  const request = markdownRenderRequest.value
+  if (
+    !hasMarkdownCommitAuthority(retained.result) ||
+    !matchesMarkdownRenderRequest(request, retained.result)
+  ) {
+    return blocked('markdown-renderer-retained-result-identity-mismatch')
+  }
+  // Same mounted owner only: replay its actual retained projection, never
+  // synthesize a checkpoint or treat disposal as reversible suspension.
+  currentTaskId += 1
+  rendererResourceOwner.invalidate()
+  if (debounceTimer !== null) {
+    rendererResourceOwner.clearTimer(debounceTimer)
+    debounceTimer = null
+  }
+  resetFeatureActivation()
+  const renderSignal = activationController?.signal
+  const generation = rendererResourceOwner.beginRender()
+  const taskId = currentTaskId
+  const isCurrent = () =>
+    taskId === currentTaskId && rendererResourceOwner.isCurrent(generation)
+  const finishJob = rendererResourceOwner.trackJob()
+  isRendering.value = true
+  try {
+    const projection = retained.projection
+    if (projection.units.length) {
+      const anchor = captureRenderAnchor()
+      renderedContent.value = projection.html
+      chunkUnits.value = projection.units
+      renderStrategy.value = projection.strategy
+      // Chunk projections were retained only after authorized full commits.
+      activeChunkResult = retained.result as MarkdownRuntimeChunkResult
+      await nextTick()
+      if (!isCurrent()) return blocked('markdown-renderer-restore-stale')
+      await restoreRenderAnchor(anchor)
+      if (!isCurrent()) return blocked('markdown-renderer-restore-stale')
+      await settleRenderViewport('markdown-render-restore-retained')
+      if (!isCurrent()) return blocked('markdown-renderer-restore-stale')
+      await activateMountedChunkFeatures(activeChunkResult, renderSignal)
+      if (!isCurrent()) return blocked('markdown-renderer-restore-stale')
+      observeMountedChunksForActivation()
+    } else {
+      if (projection.html === null)
+        return blocked('markdown-renderer-retained-projection-invalid')
+      await commitRenderedContent(projection.html, true)
+      if (!isCurrent()) return blocked('markdown-renderer-restore-stale')
+      await activateRenderedFeatures(
+        retained.result,
+        rootEl.value,
+        renderSignal,
+      )
+    }
+    if (!isCurrent()) return blocked('markdown-renderer-restore-stale')
+    emit('render-complete', retained.result)
+    if (!isCurrent()) return blocked('markdown-renderer-restore-stale')
+    // The result identity is preserved. This proof covers the real projection
+    // commit only; it does not qualify resource quiescence or session readiness.
+    return Object.freeze({ ref, status: 'restored', reason: null })
+  } catch (error) {
+    if (isCurrent())
+      emit(
+        'render-error',
+        toFsusError(error, 'markdown_renderer_restore_failed', 'infra'),
+      )
+    return blocked('markdown-renderer-restore-failed')
+  } finally {
+    finishJob()
+    if (isCurrent()) isRendering.value = false
+  }
+}
+
 if (validInitialRender) {
   rendererResourceOwner.retainLastValidRender(
     rendererResourceOwner.beginRender(),
@@ -1460,6 +1559,7 @@ onBeforeUnmount(() => {
 defineExpose({
   rootEl,
   captureLastValidRender: rendererResourceOwner.captureLastValidRender,
+  restoreLastValidRender,
   getSessionResourceParticipant: () => rendererResourceOwner.participant,
   getSessionResourceSourceOffer: () =>
     rendererResourceOwner.inspectOwnedResources(),

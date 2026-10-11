@@ -192,12 +192,13 @@ Large documents prefer the Render Pipeline adapter's shared Worker pool. Each po
 
 ### Exposes
 
-| Name                          | Description                                                                                          |
-| ----------------------------- | ---------------------------------------------------------------------------------------------------- |
-| rootEl                        | Render container element.                                                                            |
-| captureLastValidRender        | Return the retained render ref, document identity/epoch and revision, or `null`.                     |
-| getSessionResourceSourceOffer | Return the explicitly incomplete census of resources directly held by this renderer.                 |
-| getSessionResourceParticipant | Return the stable renderer resource participant; its complete lifecycle operations currently refuse. |
+| Name                          | Description                                                                                                          |
+| ----------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| rootEl                        | Render container element.                                                                                            |
+| captureLastValidRender        | Return the retained render ref, document identity/epoch and revision, or `null`.                                     |
+| restoreLastValidRender        | Recommit the actual retained projection on the same mounted owner and matching revision, or report a blocked result. |
+| getSessionResourceSourceOffer | Return the explicitly incomplete census of resources directly held by this renderer.                                 |
+| getSessionResourceParticipant | Return the stable renderer resource participant; its complete lifecycle operations currently refuse.                 |
 
 ### Retained renderer projection and resource source offer
 
@@ -237,10 +238,25 @@ the retained result even when the Markdown bytes are identical. Before any valid
 result, and after unmount, capture returns `null`.
 
 The ref contains no HTML, Markdown source, history or serializable render payload.
-It is an in-memory identity reference, not a disposal checkpoint. There is no
-public restoration operation for this ref, cross-instance hydration or crash
-recovery. Rejected resource/disposal operations preserve the retained result;
-ordinary component unmount releases it.
+It is an in-memory identity reference, not a disposal checkpoint. Rejected
+resource/disposal operations preserve the retained result; ordinary component
+unmount releases it.
+
+`restoreLastValidRender(ref)` returns a promise of
+`{ ref, status: 'restored' | 'blocked', reason: string | null }`. It resolves the
+ref through this renderer's sole private retained slot and checks the current
+document ID, epoch, revision, request identity and render authority before
+mutation. Unknown, superseded, switched, source-modified or busy refs are blocked.
+Disposed or paused underlying owners and pending pipeline renders/adapter jobs
+also block restoration. The operation reuses the actual retained HTML/chunk
+projection and strategy, waits for Vue/viewport work and feature activation, and
+rechecks generation and identity before reporting a restored result. A stale or
+failed operation reports blocked; it does not mint a newer retained identity.
+
+Restoration recreates the mounted projection only. Its result does not establish
+that all resources stopped, that a session is ready, or that browser/native
+rendering qualification passed. There is no restoration after disposal,
+cross-instance hydration or crash recovery.
 
 `getSessionResourceSourceOffer()` returns:
 
@@ -248,6 +264,10 @@ ordinary component unmount releases it.
 {
   complete: false
   missingSourceDependencies: readonly string[]
+  sources: {
+    renderPipeline: object // Actual runtime/hardware inspection.
+    virtualWindow: object // Actual viewport inspection.
+  }
   inspection: {
     ownerRef: 'renderer-projection'
     paused: false
@@ -268,17 +288,21 @@ ordinary component unmount releases it.
 
 The counts describe directly held component timers, RAF handles, owned scheduled
 frame descriptors, live asynchronous jobs, abort/theme listeners, activation
-observers and the heavy-feature lifecycle's reported resources. Async jobs leave
+observers and the heavy-feature lifecycle's reported resources. Available
+render-pipeline/hardware and virtual-window inspections contribute their actual
+handles, listeners, promises, observers and retained collection entries; the
+original inspections are also exposed under `sources`. Async jobs leave
 the census only when their actual `finally` blocks settle; cancelling a handle
 does not erase an unsettled promise. Memory units count retained logical resources
 and collection entries, not physical heap bytes. The zero direct network count
 does not describe networking inside hidden runtimes.
 
-This source offer is deliberately partial. It excludes private shared worker-pool
-handles and the hidden render-pipeline, hardware-profile, virtual-window and
-heavy-runtime timer/network resources that lack complete census and reversible
-lifecycle APIs. Its `inspection` must never be submitted as total session usage
-or as a successful paused acknowledgment.
+This source offer is deliberately partial. Adapter internals, worker resources
+not yet available through the runtime owner, shared pool attribution, platform
+observer callbacks and heavy-runtime timer/network resources remain explicit
+unknowns or unavailable dependencies. Available sampler/viewport handles do not
+turn those unknowns into zeros. Its `inspection` must never be submitted as total
+session usage or as a successful paused acknowledgment.
 
 `getSessionResourceParticipant()` returns the same `renderer-projection`
 participant object on repeat calls. `inspect()`, `pause()` and `resume()` currently

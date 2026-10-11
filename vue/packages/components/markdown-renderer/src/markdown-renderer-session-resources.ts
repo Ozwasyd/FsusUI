@@ -2,7 +2,15 @@ import type {
   MarkdownEditorSessionResourceInspection,
   MarkdownEditorSessionResourceParticipant,
 } from '../../markdown-editor/src/markdown-editor-session-resources'
-import type { MarkdownSafeRenderResult } from '@element-plus/wasm'
+import type {
+  MarkdownRenderChunk,
+  MarkdownSafeHtml,
+  MarkdownSafeRenderResult,
+} from '@element-plus/wasm'
+import type {
+  FsusRenderPipelineRuntimeResourceInspection,
+  useFsusVirtualWindow,
+} from '../../../hooks/use-render-pipeline'
 import type {
   MarkdownEditorFrameScheduler,
   MarkdownEditorFrameTask,
@@ -18,16 +26,25 @@ export interface MarkdownRendererLastValidRender extends MarkdownRendererDocumen
   readonly ref: string
 }
 
+export interface MarkdownRendererRetainedProjection {
+  readonly html: MarkdownSafeHtml | null
+  readonly units: readonly MarkdownRenderChunk[]
+  readonly strategy: 'sync' | 'chunked-main' | 'chunked-worker'
+}
+
+export interface MarkdownRendererRestoreProof {
+  readonly ref: string
+  readonly status: 'restored' | 'blocked'
+  readonly reason: string | null
+}
+
 export interface MarkdownRendererRenderGeneration extends MarkdownRendererDocumentState {
   readonly generation: number
 }
 
-// These owners currently release resources only on component unmount. Their
-// private handles cannot be inferred from diagnostics, loading flags or DOM.
+// Preserve the remaining real source gaps; available hook counts are exposed
+// separately and never turn opaque adapter/worker/platform state into zero.
 export const markdownRendererSessionSourceDependencies = Object.freeze([
-  'render-pipeline-runtime:worker-pool-and-job-census-and-reversible-pause',
-  'render-pipeline-hardware-profile:raf-sampler-and-listener-census-and-reversible-pause',
-  'virtual-window:observer-frame-and-listener-census-and-reversible-pause',
   'heavy-feature-runtime:timer-and-network-census-and-reversible-pause',
   'renderer:validated-snapshot-restoration-after-disposal',
 ] as const)
@@ -35,6 +52,11 @@ export const markdownRendererSessionSourceDependencies = Object.freeze([
 export const createMarkdownRendererSessionResourceOwner = (options: {
   readonly ownerKey: string
   readonly readDocumentState: () => MarkdownRendererDocumentState
+  readonly readProjection: () => MarkdownRendererRetainedProjection
+  readonly readPipelineResources: () => FsusRenderPipelineRuntimeResourceInspection
+  readonly readVirtualWindowResources: () => ReturnType<
+    ReturnType<typeof useFsusVirtualWindow>['inspectResources']
+  >
   readonly readProjectionResources: () => {
     readonly renderers: number
     readonly observers: number
@@ -54,6 +76,7 @@ export const createMarkdownRendererSessionResourceOwner = (options: {
   let retained: {
     readonly capture: MarkdownRendererLastValidRender
     readonly result: MarkdownSafeRenderResult
+    readonly projection: MarkdownRendererRetainedProjection
   } | null = null
 
   const sameDocument = (
@@ -104,8 +127,20 @@ export const createMarkdownRendererSessionResourceOwner = (options: {
         ref: `${options.ownerKey}:render:${++sequence}`,
       }),
       result,
+      projection: Object.freeze({ ...options.readProjection() }),
     })
     return true
+  }
+  const readRetainedRender = (ref: string) => {
+    const capture = captureLastValidRender()
+    if (
+      !capture ||
+      capture.ref !== ref ||
+      jobs.size > 0 ||
+      capture.revision !== options.readDocumentState().revision
+    )
+      return null
+    return retained
   }
   const trackJob = () => {
     const job = Symbol('renderer-job')
@@ -187,26 +222,65 @@ export const createMarkdownRendererSessionResourceOwner = (options: {
   }
   const inspectOwnedResources = () => {
     const projection = options.readProjectionResources()
+    const pipeline = options.readPipelineResources()
+    const viewport = options.readVirtualWindowResources()
+    const missingSourceDependencies: string[] = [
+      ...markdownRendererSessionSourceDependencies,
+    ]
+    if (pipeline.adapterResources === 'unknown') {
+      missingSourceDependencies.push(
+        'markdown-runtime:adapter-internal-resource-census',
+      )
+    }
+    if (pipeline.workerResources === 'unavailable') {
+      missingSourceDependencies.push(
+        'render-pipeline-runtime:owner-scoped-worker-census-and-pause',
+      )
+    }
+    if (viewport.observerInternalCallbacks === 'unknown') {
+      missingSourceDependencies.push(
+        'virtual-window:platform-observer-callback-qualification',
+      )
+    }
     return Object.freeze({
       complete: false as const,
-      missingSourceDependencies: markdownRendererSessionSourceDependencies,
+      missingSourceDependencies: Object.freeze(missingSourceDependencies),
+      sources: Object.freeze({
+        renderPipeline: pipeline,
+        virtualWindow: viewport,
+      }),
       // Partial, directly held component resources. Never submit this as the
       // renderer-projection participant's aggregate inspection.
       inspection: Object.freeze({
         ownerRef: 'renderer-projection',
         paused: false,
         recoverable: false,
-        retainedListeners: listeners.size + projection.retainedListeners,
+        retainedListeners:
+          listeners.size +
+          projection.retainedListeners +
+          pipeline.retainedListeners +
+          pipeline.hardware.retainedListeners +
+          viewport.retainedListeners,
         usage: Object.freeze({
           editorInstances: 0,
           renderers: (disposed ? 0 : 1) + projection.renderers,
-          observers: projection.observers,
-          timers: timers.size,
+          observers: projection.observers + viewport.observers,
+          timers: timers.size + pipeline.timers + viewport.timers,
           backgroundTasks:
             jobs.size +
             frames.size +
             scheduledFrames.size +
-            projection.backgroundTasks,
+            projection.backgroundTasks +
+            pipeline.pendingRenders +
+            pipeline.pendingAdapterJobs +
+            pipeline.rafHandles +
+            pipeline.idleHandles +
+            pipeline.hardware.rafHandles +
+            pipeline.hardware.pendingBatteryQueries +
+            viewport.rafHandles +
+            viewport.idleHandles +
+            viewport.pendingViewportTicks +
+            viewport.pendingMeasurements,
           networkRequests: 0,
           // Logical retained units, not physical heap bytes.
           memoryUnits:
@@ -216,14 +290,18 @@ export const createMarkdownRendererSessionResourceOwner = (options: {
             frames.size +
             scheduledFrames.size +
             jobs.size +
-            listeners.size,
+            listeners.size +
+            viewport.indexedUnits +
+            viewport.retainedElements +
+            viewport.measuredSizes +
+            viewport.pendingMeasurements,
         }),
       } satisfies MarkdownEditorSessionResourceInspection),
     })
   }
   const requireSourceCensus = (): never => {
     throw new Error(
-      `markdown-renderer-session-resource-source-unavailable:${markdownRendererSessionSourceDependencies.join(',')}`,
+      `markdown-renderer-session-resource-source-unavailable:${inspectOwnedResources().missingSourceDependencies.join(',')}`,
     )
   }
   const participant: MarkdownEditorSessionResourceParticipant = Object.freeze({
@@ -262,6 +340,7 @@ export const createMarkdownRendererSessionResourceOwner = (options: {
     isCurrent,
     listenForAbort,
     participant,
+    readRetainedRender,
     retainLastValidRender,
     scheduleFrame,
     setTimer,
