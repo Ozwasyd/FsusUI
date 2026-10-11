@@ -59,6 +59,15 @@ const nodeId = (node: MarkdownEmbedValidNode) =>
   `embed:${node.ranges.full.start}:${node.target}:${node.mode}`
 const unfinished = (job: MarkdownAttachmentJob) =>
   job.phase === 'pending' || job.phase === 'progress'
+const isPassiveRecord = (value: object) => {
+  const prototype = Object.getPrototypeOf(value)
+  return (
+    (prototype === Object.prototype || prototype === null) &&
+    Object.values(Object.getOwnPropertyDescriptors(value)).every(
+      (descriptor) => 'value' in descriptor,
+    )
+  )
+}
 
 /** One setup-owned lifecycle. Vue supplies reactive reads/writes, never another queue. */
 export const createMarkdownAttachmentEmbedResourceOwner = (
@@ -92,6 +101,22 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
   let attachmentGeneration = 0
   let pauseRequested = false
   let disposed = false
+  // Detect synchronous owner reentry while consuming external snapshots.
+  let boundaryRef: object = Object.freeze({})
+  const beginBoundary = (next: object = Object.freeze({})) =>
+    (boundaryRef = next)
+  let watcherTransitions = 0
+  let requestTransitions = 0
+  const createOwnedEmbedRequest = (
+    input: Parameters<typeof createMarkdownEmbedRequest>[0],
+  ) => {
+    requestTransitions += 1
+    try {
+      return createMarkdownEmbedRequest(input)
+    } finally {
+      requestTransitions -= 1
+    }
+  }
   let watchInputs:
     | {
         sources: readonly WatchSource[]
@@ -99,17 +124,74 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
       }
     | undefined
   let stopWatcher: WatchStopHandle | undefined
+  const readDocumentContext = () => {
+    const document = bindings.readDocument()
+    return {
+      revision: document.revision,
+      id: document.documentIdentity.id,
+      epoch: document.documentIdentity.epoch,
+    }
+  }
+  const sameDocumentContext = (
+    left: ReturnType<typeof readDocumentContext>,
+    right: ReturnType<typeof readDocumentContext>,
+  ) =>
+    left.revision === right.revision &&
+    left.id === right.id &&
+    left.epoch === right.epoch
+  const readEmbedContext = () => {
+    const provider = bindings.readEmbedProvider()
+    return { ...readDocumentContext(), provider }
+  }
+  const sameEmbedContext = (
+    left: ReturnType<typeof readEmbedContext>,
+    right: ReturnType<typeof readEmbedContext>,
+  ) => left.provider === right.provider && sameDocumentContext(left, right)
 
   const stopWatching = () => {
-    stopWatcher?.()
+    const previous = stopWatcher
     stopWatcher = undefined
+    if (previous) {
+      watcherTransitions += 1
+      try {
+        previous()
+      } finally {
+        watcherTransitions -= 1
+      }
+    }
   }
   const startWatching = () => {
     if (!watchInputs || pauseRequested || disposed) return
-    stopWatcher = watch([...watchInputs.sources], () =>
-      refreshEmbeds(watchInputs!.readNodes()),
-    )
-    refreshEmbeds(watchInputs.readNodes())
+    const inputs = watchInputs
+    const boundary = boundaryRef
+    let watcher: WatchStopHandle | undefined
+    const refreshFromInputs = () => {
+      if (stopWatcher !== watcher || pauseRequested || disposed) return
+      const boundary = boundaryRef
+      const context = readEmbedContext()
+      const nextNodes = inputs.readNodes()
+      const now = readEmbedContext()
+      if (
+        sameEmbedContext(context, now) &&
+        boundaryRef === boundary &&
+        stopWatcher === watcher &&
+        !pauseRequested &&
+        !disposed
+      )
+        refreshEmbeds(nextNodes)
+    }
+    watcherTransitions += 1
+    try {
+      watcher = watch([...inputs.sources], refreshFromInputs)
+      if (boundaryRef !== boundary || pauseRequested || disposed) {
+        watcher()
+        return
+      }
+      stopWatcher = watcher
+    } finally {
+      watcherTransitions -= 1
+    }
+    refreshFromInputs()
   }
 
   const collectDraining = () => {
@@ -126,18 +208,27 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
   const cancel = () => {
     embedGeneration += 1
     embedAttempts.clear()
-    for (const operation of active) {
+    const epoch = embedGeneration
+    for (const operation of [...active]) {
       operation.controller.abort()
       cancelMarkdownEmbedRequest(operation.request)
     }
+    return epoch
   }
   const inspect = (): MarkdownEditorSessionResourceInspection => {
+    if (watcherTransitions !== 0)
+      throw new Error('editor-session-attachment-embed-watcher-transition')
+    if (requestTransitions !== 0)
+      throw new Error('editor-session-attachment-embed-request-transition')
+    const boundary = boundaryRef
     collectDraining()
     const jobs = bindings.readAttachmentJobs()
     const currentJobs = new Set(jobs.map((job) => toRaw(job)))
     for (const job of currentJobs) observedAttachmentJobs.add(job)
     const attachmentRunning = new Set(attachmentTasks.keys())
     for (const job of observedAttachmentJobs) {
+      if (!isPassiveRecord(job))
+        throw new Error('editor-session-attachment-job-state-unavailable')
       const state = inspectMarkdownAttachmentDispatch(job)
       if (
         !state ||
@@ -161,6 +252,11 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
     const capture = inspectMarkdownAttachmentCaptureResources(
       bindings.attachmentCaptureSession,
     )
+    const jobCount = jobs.length
+    const batchCount = batches.size
+    const itemCount = items.size
+    if (boundaryRef !== boundary)
+      throw new Error('editor-session-attachment-embed-inspection-reentered')
     const requests = new Set([...active].map((operation) => operation.request))
     for (const request of draining) requests.add(request)
     let timers = 0
@@ -186,10 +282,10 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
       // Only an empty lifecycle can be reconstructed without inventing restoration proof.
       recoverable:
         backgroundTasks === 0 &&
-        jobs.length === 0 &&
+        jobCount === 0 &&
         observedAttachmentJobs.size === 0 &&
-        batches.size === 0 &&
-        items.size === 0 &&
+        batchCount === 0 &&
+        itemCount === 0 &&
         capture.memoryUnits === 0 &&
         results.size === 0 &&
         embedAttempts.size === 0 &&
@@ -208,11 +304,11 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
         memoryUnits:
           active.size +
           draining.size +
-          jobs.length +
+          jobCount +
           observedAttachmentJobs.size +
           attachmentTasks.size +
-          batches.size +
-          items.size +
+          batchCount +
+          itemCount +
           capture.memoryUnits +
           results.size +
           embedAttempts.size +
@@ -223,19 +319,34 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
     })
   }
   const publish = () => bindings.publishEmbedResults(new Map(results))
-  const resolveEmbedNode = async (
+  const resolveEmbedAttempt = async (
     node: MarkdownEmbedValidNode,
+    admission: object,
   ): Promise<void> => {
     if (pauseRequested || disposed) return
+    const boundary = beginBoundary(admission)
+    const context = readEmbedContext()
     const id = nodeId(node)
-    const provider = bindings.readEmbedProvider()
+    const target = node.target
+    const mode = node.mode
+    const now = readEmbedContext()
+    if (
+      !sameEmbedContext(context, now) ||
+      boundaryRef !== boundary ||
+      pauseRequested ||
+      disposed
+    )
+      return
+    const provider = context.provider
+    const documentIdentity = Object.freeze({
+      id: context.id,
+      epoch: context.epoch,
+    })
+    const revision = context.revision
     if (!provider) {
       embedAttempts.delete(id)
       return
     }
-    const identity = bindings.readDocument()
-    const documentIdentity = Object.freeze({ ...identity.documentIdentity })
-    const revision = identity.revision
     const attemptRef = Object.freeze({})
     embedAttempts.set(id, attemptRef)
     const version = (versions.get(id) ?? 0) + 1
@@ -246,7 +357,7 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
       | { controller: AbortController; request: MarkdownEmbedRequest }
       | undefined
     const current = (checkSignal = true) => {
-      const now = bindings.readDocument()
+      const now = readEmbedContext()
       return (
         !disposed &&
         !pauseRequested &&
@@ -254,28 +365,27 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
         (!checkSignal || !operation?.request.signal?.aborted) &&
         embedGeneration === epoch &&
         embedAttempts.get(id) === attemptRef &&
-        bindings.readEmbedProvider() === provider &&
-        now.revision === revision &&
-        now.documentIdentity.id === documentIdentity.id &&
-        now.documentIdentity.epoch === documentIdentity.epoch
+        sameEmbedContext(context, now)
       )
     }
     try {
       // Admission can refuse capacity before any request handle exists.
       operation = {
         controller,
-        request: createMarkdownEmbedRequest({
+        request: createOwnedEmbedRequest({
           documentIdentity,
           revision,
           nodeId: id,
-          target: node.target,
-          mode: node.mode,
+          target,
+          mode,
           version,
           signal: controller.signal,
         }),
       }
       active.add(operation)
-      if (globalThis.crypto?.subtle) {
+      const subtle = globalThis.crypto?.subtle
+      if (!current()) return
+      if (subtle) {
         try {
           operation.request = await bindMarkdownEmbedRequestDigest(
             operation.request,
@@ -283,12 +393,12 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
         } catch {
           // Preserve the existing metadata fallback, but never restart cancelled work.
           if (!current(false)) return
-          operation.request = createMarkdownEmbedRequest({
+          operation.request = createOwnedEmbedRequest({
             documentIdentity,
             revision,
             nodeId: id,
-            target: node.target,
-            mode: node.mode,
+            target,
+            mode,
             version,
             signal: controller.signal,
           })
@@ -311,7 +421,9 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
         })
       }
       if (!current()) return
-      results.set(id, commitMarkdownEmbedResult(operation.request, result))
+      const committed = commitMarkdownEmbedResult(operation.request, result)
+      if (!current()) return
+      results.set(id, committed)
       publish()
     } catch (error) {
       if (
@@ -331,42 +443,70 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
       if (embedAttempts.get(id) === attemptRef) embedAttempts.delete(id)
       if (operation) {
         active.delete(operation)
-        if (controller.signal.aborted)
-          cancelMarkdownEmbedRequest(operation.request)
-        else
-          forgetMarkdownEmbedRequest(
-            operation.request.requestId,
-            operation.request,
-          )
         draining.add(operation.request)
+        try {
+          if (controller.signal.aborted)
+            cancelMarkdownEmbedRequest(operation.request)
+          else
+            forgetMarkdownEmbedRequest(
+              operation.request.requestId,
+              operation.request,
+            )
+        } finally {
+          collectDraining()
+        }
       } else controller.abort()
-      collectDraining()
     }
   }
+  const resolveEmbedNode = (node: MarkdownEmbedValidNode) =>
+    resolveEmbedAttempt(node, Object.freeze({}))
   const refreshEmbeds = (nextNodes: readonly MarkdownEmbedValidNode[]) => {
     if (disposed) throw new Error('editor-session-attachment-embed-disposed')
     if (pauseRequested)
       throw new Error('editor-session-attachment-embed-paused')
-    cancel()
-    nodes = [...nextNodes]
-    const ids = new Set(nodes.map(nodeId))
+    const boundary = beginBoundary()
+    const context = readEmbedContext()
+    if (boundaryRef !== boundary || pauseRequested || disposed) return
+    const epoch = cancel()
+    const next = [...nextNodes]
+    const ids = new Set(next.map(nodeId))
+    const currentRefresh = (expected: object = boundary) => {
+      const now = readEmbedContext()
+      return (
+        sameEmbedContext(context, now) &&
+        boundaryRef === expected &&
+        embedGeneration === epoch &&
+        !pauseRequested &&
+        !disposed
+      )
+    }
+    if (!currentRefresh()) return
+    nodes = next
     results = new Map([...results].filter(([id]) => ids.has(id)))
     for (const id of versions.keys()) if (!ids.has(id)) versions.delete(id)
     publish()
-    for (const node of nodes) void resolveEmbedNode(node)
+    if (!currentRefresh()) return
+    let expectedBoundary = boundary
+    for (const node of next) {
+      if (!currentRefresh(expectedBoundary)) return
+      expectedBoundary = Object.freeze({})
+      void resolveEmbedAttempt(node, expectedBoundary)
+    }
   }
   const participant: MarkdownEditorSessionResourceParticipant = Object.freeze({
     ownerRef: 'attachment-embed',
     inspect,
     pause() {
+      const boundary = beginBoundary()
       attachmentGeneration += 1
       pauseRequested = true
       stopWatching()
-      cancel()
+      if (boundaryRef === boundary) cancel()
       return inspect()
     },
     resume() {
       if (disposed) throw new Error('editor-session-attachment-embed-disposed')
+      beginBoundary()
       const wasPaused = pauseRequested
       pauseRequested = false
       if (wasPaused) {
@@ -381,6 +521,7 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
         throw new Error(
           'editor-session-attachment-embed-checkpoint-not-recoverable',
         )
+      beginBoundary()
       disposed = true
       attachmentGeneration += 1
       cancel()
@@ -392,29 +533,37 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
     if (pauseRequested || disposed || !result.itemId) return false
     const proof = attachmentResults.get(result)
     if (!proof) return false
+    const context = readDocumentContext()
     const job = bindings
       .readAttachmentJobs()
       .find((candidate) => toRaw(candidate) === proof.job)
     if (!job) return false
-    const dispatch = inspectMarkdownAttachmentDispatch(job)
-    const identity = bindings.readDocument().documentIdentity
-    return (
-      dispatch?.dispatchRef === proof.dispatchRef &&
-      attachmentGeneration === proof.generation &&
-      dispatch.attempt === proof.attempt &&
-      job.attempt === proof.attempt &&
-      (proof.kind === 'progress'
-        ? result.status === 'progress' && !dispatch.settled
-        : result.status !== 'progress' && dispatch.settled) &&
+    const matches =
       job.itemId === result.itemId &&
       job.batchId === result.batchId &&
       unfinished(job) &&
-      job.documentIdentity?.id === identity.id &&
-      job.documentIdentity.epoch === identity.epoch &&
+      job.documentIdentity?.id === context.id &&
+      job.documentIdentity.epoch === context.epoch &&
       (!result.documentIdentity ||
-        (result.documentIdentity.id === identity.id &&
-          result.documentIdentity.epoch === identity.epoch)) &&
+        (result.documentIdentity.id === context.id &&
+          result.documentIdentity.epoch === context.epoch)) &&
       (result.revision === undefined || result.revision === job.revision)
+    const status = result.status
+    const attempt = job.attempt
+    const now = readDocumentContext()
+    const dispatch = inspectMarkdownAttachmentDispatch(job)
+    return (
+      matches &&
+      sameDocumentContext(context, now) &&
+      !pauseRequested &&
+      !disposed &&
+      dispatch?.dispatchRef === proof.dispatchRef &&
+      attachmentGeneration === proof.generation &&
+      dispatch.attempt === proof.attempt &&
+      attempt === proof.attempt &&
+      (proof.kind === 'progress'
+        ? status === 'progress' && !dispatch.settled
+        : status !== 'progress' && dispatch.settled)
     )
   }
   return Object.freeze({
@@ -427,7 +576,12 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
     ): Promise<MarkdownAttachmentProviderResult> {
       if (disposed || pauseRequested)
         throw new Error('editor-session-attachment-dispatch-admission-blocked')
+      const boundary = beginBoundary()
+      const epoch = attachmentGeneration
+      const context = readDocumentContext()
       const ownedJob = toRaw(job)
+      if (!isPassiveRecord(ownedJob))
+        throw new Error('editor-session-attachment-dispatch-job-unavailable')
       if (
         !bindings
           .readAttachmentJobs()
@@ -435,8 +589,16 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
       ) {
         throw new Error('editor-session-attachment-dispatch-job-unavailable')
       }
+      const currentDocument = readDocumentContext()
+      if (
+        !sameDocumentContext(context, currentDocument) ||
+        boundaryRef !== boundary ||
+        attachmentGeneration !== epoch ||
+        disposed ||
+        pauseRequested
+      )
+        throw new Error('editor-session-attachment-dispatch-admission-blocked')
       observedAttachmentJobs.add(ownedJob)
-      const epoch = attachmentGeneration
       let dispatchRef: object | undefined
       let bindSettlement:
         | ((
@@ -470,17 +632,18 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
           }
           bindSettlement = (result) => {
             // Snapshot actual settled data; no caller can upgrade a progress object.
+            const snapshot = { ...result }
             const settled = Object.freeze({
-              ...result,
-              ...(result.documentIdentity
+              ...snapshot,
+              ...(snapshot.documentIdentity
                 ? {
                     documentIdentity: Object.freeze({
-                      ...result.documentIdentity,
+                      ...snapshot.documentIdentity,
                     }),
                   }
                 : {}),
-              ...(result.status === 'resolved'
-                ? { payload: Object.freeze({ ...result.payload }) }
+              ...(snapshot.status === 'resolved'
+                ? { payload: Object.freeze({ ...snapshot.payload }) }
                 : {}),
             }) as MarkdownAttachmentProviderResult
             bindResult(settled, 'settlement')
@@ -491,7 +654,10 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
             if (
               progress.status !== 'progress' ||
               current?.dispatchRef !== state.dispatchRef ||
-              current.settled
+              current.settled ||
+              !isPassiveRecord(progress) ||
+              (progress.documentIdentity &&
+                !isPassiveRecord(progress.documentIdentity))
             )
               return false
             if (progress.documentIdentity)
@@ -521,7 +687,11 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
         throw new Error(
           'editor-session-attachment-embed-watch-already-bound-or-disposed',
         )
-      watchInputs = { sources: [...sources], readNodes }
+      const boundary = beginBoundary()
+      const inputs = { sources: [...sources], readNodes }
+      if (boundaryRef !== boundary || disposed || watchInputs)
+        throw new Error('editor-session-attachment-embed-watch-bind-reentered')
+      watchInputs = inputs
       startWatching()
     },
     resolveEmbedNode,
@@ -532,10 +702,11 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
       new Map(versions) as ReadonlyMap<string, number>,
     acceptsAttachmentResult,
     abort() {
+      const boundary = beginBoundary()
       attachmentGeneration += 1
       pauseRequested = true
       stopWatching()
-      cancel()
+      if (boundaryRef === boundary) cancel()
     },
   })
 }

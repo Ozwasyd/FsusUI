@@ -94,6 +94,7 @@ export interface MarkdownEmbedProjectionAuthority {
 const requests = new Map<string, MarkdownEmbedRequest>()
 const controllers = new WeakMap<object, AbortController>()
 const externalLinks = new WeakMap<object, () => void>()
+const failedExternalCleanup = new WeakSet<object>()
 interface EmbedProjectionWork {
   timer: ReturnType<typeof setTimeout> | undefined
   listeners: number
@@ -109,11 +110,21 @@ export const forgetMarkdownEmbedRequest = (
 ) => {
   const request = requests.get(requestId)
   if (expected && request?.signal !== expected.signal) return
-  if (request?.signal) {
-    externalLinks.get(request.signal)?.()
-    externalLinks.delete(request.signal)
-  }
+  // Detach this registration before invoking external cleanup: a callback may
+  // admit another instance at the same id, which this cleanup must not remove.
   requests.delete(requestId)
+  if (request?.signal) {
+    const unlink = externalLinks.get(request.signal)
+    externalLinks.delete(request.signal)
+    try {
+      unlink?.()
+      failedExternalCleanup.delete(request.signal)
+    } catch (error) {
+      if (unlink) externalLinks.set(request.signal, unlink)
+      failedExternalCleanup.add(request.signal)
+      throw error
+    }
+  }
 }
 
 export const cancelMarkdownEmbedRequest = (
@@ -128,6 +139,8 @@ export const cancelMarkdownEmbedRequest = (
 export const inspectMarkdownEmbedRequestResources = (
   request: MarkdownEmbedRequest,
 ) => {
+  if (request.signal && failedExternalCleanup.has(request.signal))
+    throw new Error('markdown-embed-listener-cleanup-unavailable')
   const work = [...(projectionWork.get(request.signal ?? request) ?? [])]
   return Object.freeze({
     registered: requests.get(request.requestId)?.signal === request.signal,
@@ -148,11 +161,27 @@ export const createMarkdownEmbedRequest = (
     readonly requestId?: string
   },
 ): MarkdownEmbedRequest => {
+  // Snapshot executable input properties before deciding registry admission.
+  const snapshot = {
+    requestId: input.requestId,
+    documentIdentity: Object.freeze({ ...input.documentIdentity }),
+    revision: input.revision,
+    nodeId: input.nodeId,
+    target: input.target,
+    mode: input.mode,
+    version: input.version,
+    requestDigest: input.requestDigest,
+    signal: input.signal,
+  }
+  const parentSignal = snapshot.signal
+  const addListener = parentSignal?.addEventListener
+  const removeListener = parentSignal?.removeEventListener
+  const parentAborted = parentSignal?.aborted
   // The registry spans editors. Capacity pressure must not cancel another owner.
   if (requests.size >= MARKDOWN_EMBED_BUDGET.maxNodes) {
     throw new Error('markdown-embed-request-capacity-exceeded')
   }
-  let requestId = input.requestId
+  let requestId = snapshot.requestId
   if (requestId === undefined) {
     do {
       requestId = `embed-request:${++requestSequence}`
@@ -162,31 +191,57 @@ export const createMarkdownEmbedRequest = (
     throw new Error('markdown-embed-request-id-in-use')
   }
   const controller = new AbortController()
-  if (input.signal?.aborted) controller.abort()
-  else if (input.signal) {
+  if (parentAborted) controller.abort()
+  else if (parentSignal) {
     const abort = () => controller.abort()
-    input.signal.addEventListener('abort', abort, {
-      once: true,
-      signal: controller.signal,
-    })
-    externalLinks.set(controller.signal, () =>
-      input.signal?.removeEventListener('abort', abort),
-    )
+    const unlink = () => removeListener?.call(parentSignal, 'abort', abort)
+    try {
+      addListener!.call(parentSignal, 'abort', abort, {
+        once: true,
+        signal: controller.signal,
+      })
+      externalLinks.set(controller.signal, unlink)
+      if (parentSignal.aborted) controller.abort()
+    } catch (error) {
+      try {
+        unlink()
+      } finally {
+        controller.abort()
+      }
+      throw error
+    }
   }
   controllers.set(controller.signal, controller)
   const request = Object.freeze({
     requestId,
-    documentIdentity: Object.freeze({ ...input.documentIdentity }),
-    revision: input.revision,
-    nodeId: input.nodeId,
-    target: input.target,
-    mode: input.mode,
-    version: input.version,
-    ...(input.requestDigest !== undefined
-      ? { requestDigest: input.requestDigest }
+    documentIdentity: snapshot.documentIdentity,
+    revision: snapshot.revision,
+    nodeId: snapshot.nodeId,
+    target: snapshot.target,
+    mode: snapshot.mode,
+    version: snapshot.version,
+    ...(snapshot.requestDigest !== undefined
+      ? { requestDigest: snapshot.requestDigest }
       : {}),
     signal: controller.signal,
   })
+  // Listener registration may reenter another request admission.
+  if (
+    requests.size >= MARKDOWN_EMBED_BUDGET.maxNodes ||
+    requests.has(requestId)
+  ) {
+    const reason = requests.has(requestId)
+      ? 'markdown-embed-request-id-in-use'
+      : 'markdown-embed-request-capacity-exceeded'
+    const unlink = externalLinks.get(controller.signal)
+    externalLinks.delete(controller.signal)
+    try {
+      unlink?.()
+    } finally {
+      controller.abort()
+    }
+    throw new Error(reason)
+  }
   requests.set(request.requestId, request)
   return request
 }
@@ -329,7 +384,8 @@ export const isMarkdownEmbedResultCurrent = (
   result.nodeId === request.nodeId &&
   result.target === request.target &&
   result.mode === request.mode &&
-  result.version === request.version
+  result.version === request.version &&
+  !request.signal?.aborted
 
 interface ProjectionProof {
   readonly request: MarkdownEmbedRequest
@@ -342,10 +398,12 @@ const projections = new WeakMap<object, ProjectionProof>()
 const proofIsCurrent = (proof: ProjectionProof) => {
   if (proof.request.signal?.aborted) return false
   try {
-    return sameTargetVersion(
-      proof.targetVersion,
-      proof.authority.readTargetVersion(proof.request),
-    )
+    const readTargetVersion = proof.authority.readTargetVersion
+    if (proof.request.signal?.aborted) return false
+    const targetVersion = readTargetVersion.call(proof.authority, proof.request)
+    const matches = sameTargetVersion(proof.targetVersion, targetVersion)
+    // Both method lookup and invocation may synchronously revoke authority.
+    return matches && !proof.request.signal?.aborted
   } catch {
     return false
   }
@@ -378,6 +436,10 @@ export const commitMarkdownEmbedResult = (
     if (!proof) return failure(request, 'rejected', 'projection-unverified')
     if (!proofIsCurrent(proof)) return failure(request, 'stale')
   }
+  Object.freeze(result.documentIdentity)
+  Object.freeze(result)
+  if (!isMarkdownEmbedResultCurrent(request, result))
+    return failure(request, 'stale')
   return result
 }
 
@@ -489,18 +551,25 @@ export const prepareMarkdownEmbedResult = async (
     const verify = async (): Promise<MarkdownEmbedResult> => {
       if (!proofIsCurrent(proof) || localController.signal.aborted)
         return failure(request, 'stale')
-      const source =
-        reference.kind === 'markdown'
-          ? reference.source
-          : await authority.resolveMarkdown?.(
-              reference,
-              Object.freeze({
-                ...request,
-                signal: localController.signal,
-              }),
-            )
+      let source: string | undefined
+      if (reference.kind === 'markdown') source = reference.source
+      else {
+        const resolveMarkdown = authority.resolveMarkdown
+        const resolverRequest = Object.freeze({
+          ...request,
+          signal: localController.signal,
+        })
+        if (!proofIsCurrent(proof) || localController.signal.aborted)
+          return failure(request, 'stale')
+        source = await resolveMarkdown?.call(
+          authority,
+          reference,
+          resolverRequest,
+        )
+      }
       if (timedOut) return expired
-      if (!proofIsCurrent(proof)) return failure(request, 'stale')
+      if (!proofIsCurrent(proof) || localController.signal.aborted)
+        return failure(request, 'stale')
       if (typeof source !== 'string')
         return failure(request, 'rejected', 'projection-unavailable')
       // Bound UTF-16 allocation before encoding, then enforce the existing UTF-8 budget.
@@ -512,7 +581,8 @@ export const prepareMarkdownEmbedResult = async (
       if ((await sha256(bytes)) !== reference.contentDigest)
         return failure(request, 'rejected', 'projection-digest-mismatch')
       if (timedOut) return expired
-      if (!proofIsCurrent(proof)) return failure(request, 'stale')
+      if (!proofIsCurrent(proof) || localController.signal.aborted)
+        return failure(request, 'stale')
       const prepared = Object.freeze({
         ...snapshot,
         documentIdentity: Object.freeze({ ...request.documentIdentity }),
@@ -524,6 +594,8 @@ export const prepareMarkdownEmbedResult = async (
           source,
         }),
       })
+      if (!proofIsCurrent(proof) || localController.signal.aborted)
+        return failure(request, 'stale')
       projections.set(prepared, { ...proof, source })
       return prepared
     }
