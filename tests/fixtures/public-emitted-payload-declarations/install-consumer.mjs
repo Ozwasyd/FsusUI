@@ -79,6 +79,6 @@ for (const section of ['packages', 'snapshots']) {
   )
 }
 run(['install', '--frozen-lockfile', '--ignore-scripts'])
-console.log(
-  `Installed verified candidate ${manifest.artifact.sha256}; third-party resolutions preserved.`,
+process.stdout.write(
+  `Installed verified candidate ${manifest.artifact.sha256}; third-party resolutions preserved.\n`,
 )

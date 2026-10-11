@@ -138,6 +138,7 @@ test('source and actual installed ESM/CJS/declarations preserve the baseline bey
 })
 
 const dom = new JSDOM('')
+const { FocusEvent, MouseEvent, Event } = dom.window
 for (const name of ['FocusEvent', 'MouseEvent', 'Event'])
   globalThis[name] = dom.window[name]
 const unregister = register({

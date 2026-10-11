@@ -10,4 +10,4 @@ tween.nonexistentMotionMethod()
 useScrollReveal({ disabled: 'true' })
 // @ts-expect-error ScrollTrigger markers must preserve their original type
 useScrollReveal({ scrollTrigger: { markers: 'true' } })
-void [tweenIsTyped, duration]
+void [reveal, tweenIsTyped, duration]
