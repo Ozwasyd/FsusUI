@@ -101,6 +101,9 @@ export const markdownRendererSessionSourceDependencies = Object.freeze([
   'markdown-runtime:activation-and-gateway-loader-import-network-census',
   'renderer:validated-snapshot-restoration-after-disposal',
   'heavy-feature-runtime:timer-and-network-cancellation-authority',
+  'native-vue:renderer-effect-and-flush-resource-census',
+  'renderer:owned-event-registration-and-reversible-control',
+  'renderer:callback-queue-checkpoint-and-epoch-safe-recreation',
   // Quarantine is source-reviewed; the worker-owner synchronous lifecycle
   // repairs are composed, but independent review/qualification remains pending.
   'render-pipeline-worker:reentrant-enqueue-disposal-cleanup',
