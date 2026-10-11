@@ -10,3 +10,6 @@ resource, recoverable-disposal and full workspace snapshot admission guards.
 
 Preserve legacy upload-image content callbacks independently of unknown resource
 settlement; keep service-future content behind its original exclusive proof gate.
+
+Expose readonly measured renderer source observations through the same real
+session while keeping complete:false, unknown fields and all missing-owner guards.

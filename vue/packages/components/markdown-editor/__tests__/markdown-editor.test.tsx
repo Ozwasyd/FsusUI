@@ -5,6 +5,8 @@ import { nextTick } from 'vue'
 import { afterEach, describe, expect, expectTypeOf, it, vi } from 'vitest'
 import MarkdownEditor from '../src/markdown-editor.vue'
 import { createMarkdownOutlineModel } from '../src/markdown-editor-outline'
+import { createMarkdownEditorSessionBinding } from '../src/markdown-editor-session'
+import { MarkdownEditorTransactionStore } from '../src/markdown-editor-transaction'
 import {
   defaultMarkdownEditorCommands,
   markdownEditorEmits,
@@ -24,6 +26,27 @@ import type {
 import { getMarkdownXssSourceUrl } from '../../../../tests/support/markdown-xss-corpus'
 
 describe('MarkdownEditor', () => {
+  it('rejects renderer source observation after same-source document epoch drift', () => {
+    const store = new MarkdownEditorTransactionStore('same source', undefined, { id: 'source-document', epoch: 1 })
+    const binding = createMarkdownEditorSessionBinding({
+      transactionStore: store,
+      isComposing: () => false,
+      isDisposed: () => false,
+      captureViewState: () => null,
+      restoreViewState: () => {},
+      resourceParticipants: () => [],
+      captureLastValidRender: () => null,
+      inspectRendererResourceSource: () => {
+        store.switchDocument({ id: 'source-document', epoch: 2 }, 'same source')
+        return null
+      },
+    })
+    const session = binding.getSession('session:resource-source')
+    expect(() => session.inspectRendererResourceSource()).toThrow('editor-session-renderer-resource-source-stale')
+    expect(session.inspectDocumentState().documentIdentity.epoch).toBe(2)
+    expect(() => session.inspectResources()).toThrow('editor-session-resource-owner-unavailable')
+  })
+
   it('retains the actual public session and sole-owner history and rejects snapshot copies', () => {
     const wrapper = mount(MarkdownEditor, { props: {
       modelValue: 'first', documentIdentity: { id: 'session-document', epoch: 1 },

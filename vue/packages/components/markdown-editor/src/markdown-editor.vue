@@ -1323,7 +1323,7 @@ import { planMarkdownOutlineReveal } from './markdown-editor-outline-active'
 import { createMarkdownEditorSessionBinding } from './markdown-editor-session'
 import { createMarkdownAttachmentEmbedResourceOwner } from './markdown-editor-attachment-embed-owner'
 import { createMarkdownEditorSessionCommandResources, isMarkdownEditorSessionOwnedCommand } from './markdown-editor-session-command-resources'
-import type { MarkdownRendererLastValidRender } from '../../markdown-renderer/src/markdown-renderer-session-resources'
+import type { MarkdownRendererLastValidRender, createMarkdownRendererSessionResourceOwner } from '../../markdown-renderer/src/markdown-renderer-session-resources'
 import { createMarkdownEditorSessionLayoutResources } from './markdown-editor-session-layout'
 import { createMarkdownEditorFrameResourceParticipant } from './markdown-editor-session-resources'
 import type { MarkdownEditorSessionResourceParticipant } from './markdown-editor-session-resources'
@@ -5040,6 +5040,7 @@ const searchReplaceInputRef = ref<HTMLInputElement | null>(null)
 const previewRendererRef = ref<HTMLElement | {
   $el?: HTMLElement
   captureLastValidRender?: () => MarkdownRendererLastValidRender | null
+  getSessionResourceSourceOffer?: () => ReturnType<ReturnType<typeof createMarkdownRendererSessionResourceOwner>['inspectOwnedResources']>
   restoreLastValidRender?: (ref: string) => Promise<{ readonly ref: string; readonly status: 'restored' | 'blocked'; readonly reason: string | null }>
 } | null>(null)
 
@@ -6274,6 +6275,42 @@ const sessionBinding = createMarkdownEditorSessionBinding({
         id: capture.documentIdentity.id, epoch: capture.documentIdentity.epoch,
       }),
       revision: capture.revision,
+    })
+  },
+  inspectRendererResourceSource: () => {
+    // Use the original mounted full-document owner. A fragment/DOM fallback
+    // cannot prove whole-editor ownership, and missing source is not zero usage.
+    if (embedRenderSegments.value.length > 1) return null
+    const renderer = previewRendererRef.value
+    if (!renderer || !('getSessionResourceSourceOffer' in renderer) ||
+      typeof renderer.getSessionResourceSourceOffer !== 'function') return null
+    const offer = renderer.getSessionResourceSourceOffer()
+    if (previewRendererRef.value !== renderer || embedRenderSegments.value.length > 1)
+      throw new Error('editor-session-renderer-resource-owner-replaced')
+    const usage = offer.inspection.usage
+    return Object.freeze({
+      complete: offer.complete,
+      measuredUsageOnly: offer.measuredUsageOnly,
+      sourceReview: 'unqualified' as const,
+      missingSourceDependencies: Object.freeze([
+        ...offer.missingSourceDependencies,
+        'render-pipeline-runtime:exception-safe-owner-cleanup-review',
+      ]),
+      measuredUsage: Object.freeze({
+        editorInstances: usage.editorInstances,
+        renderers: usage.renderers,
+        observers: usage.observers,
+        timers: usage.timers,
+        backgroundTasks: usage.backgroundTasks,
+        memoryUnits: usage.memoryUnits,
+      }),
+      // Forward the original nullable measurement; never present its direct
+      // component zero as the complete renderer/network resource total.
+      measuredNetworkRequests: offer.knownNetworkRequests,
+      retainedListeners: offer.inspection.retainedListeners,
+      pendingRenderAdmissions: offer.sources.renderPipeline.pendingRenderAdmissions,
+      pendingControlTransitions: offer.sources.renderPipeline.pendingControlTransitions,
+      unknownUsage: offer.unknownUsage,
     })
   },
   restoreLastValidRender: async (ref) => {

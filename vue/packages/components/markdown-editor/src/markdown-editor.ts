@@ -1888,6 +1888,7 @@ export type {
   MarkdownEditorSessionExpose,
   MarkdownEditorSessionLastValidRender,
   MarkdownEditorSessionResourceUsage,
+  MarkdownEditorSessionRendererResourceSource,
   MarkdownEditorSessionRestoreProof,
   MarkdownEditorSessionRenderRestoreProof,
   MarkdownEditorSessionSnapshot,

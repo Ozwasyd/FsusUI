@@ -739,3 +739,23 @@ the original transaction owner without digesting, capturing or replacing a
 checkpoint. It gives the existing Writer mount resolver a real editor binding
 before first edit/render, independent of adapter event caches. No body, history
 copy, route identity fallback or second mounted-session registry is introduced.
+
+
+`inspectRendererResourceSource()` reads scalar observations from the existing
+full-document mounted renderer, with the original editor document/epoch/revision
+and renderer-instance checks around the read. Missing, source-only or segmented
+renderer ownership returns null, never synthetic zero usage. The result keeps
+`complete:false`, `measuredUsageOnly:true`, `sourceReview:'unqualified'`, the actual
+nullable network measurement and original unknown timer/network/worker/pool tags.
+`pendingRenderAdmissions` and `pendingControlTransitions` read the underlying
+owner's actual counters. No scope capabilities, handles or mutation methods are
+exposed by this scalar projection; it does not enter the complete resource roster.
+
+This wiring consumes immutable renderer UI916
+`439ad560207b6cde1a6641c41d35c73714b45ad8` (A227/B54/C210 source) as a separate
+upstream offer. Its A cleanup-exception P1 remains under original-owner repair and
+is retained explicitly as a missing source-review dependency. Language UI917 final
+`e37960672df85705793d6534ed4c7c076b4a0f86` remains the actual registered controller
+participant, recoverable=false. Attachment review stays closed to registration;
+UI9155be7dcee904c4ea90db6835abf97a1e7319bd6a4 attempt-cache/unlink repairs are not consumed or accepted here. Readonly
+source inspection does not issue ready, paused, recovery or eviction proofs.

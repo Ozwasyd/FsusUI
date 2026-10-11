@@ -66,11 +66,31 @@ export interface MarkdownEditorSessionDocumentState {
   readonly revision: number
 }
 
+/** Scalar observations only; unknown owners never become aggregate resource usage. */
+export interface MarkdownEditorSessionRendererResourceSource {
+  readonly complete: false
+  readonly measuredUsageOnly: true
+  readonly sourceReview: 'unqualified'
+  readonly missingSourceDependencies: readonly string[]
+  readonly measuredUsage: Omit<MarkdownEditorSessionResourceUsage, 'networkRequests'>
+  readonly measuredNetworkRequests: number | null
+  readonly retainedListeners: number
+  readonly pendingRenderAdmissions: number
+  readonly pendingControlTransitions: number
+  readonly unknownUsage: {
+    readonly timers: string | null
+    readonly networkRequests: string | null
+    readonly workerInternals: readonly string[]
+    readonly poolAttribution: readonly string[]
+  }
+}
+
 export interface MarkdownEditorSession {
   readonly editorSessionRef: string
   inspectCapabilities(): MarkdownEditorSessionCapabilities
   inspectDocumentState(): MarkdownEditorSessionDocumentState
   inspectResourceParticipants(): MarkdownEditorSessionResourceCensus
+  inspectRendererResourceSource(): MarkdownEditorSessionRendererResourceSource | null
   captureLastValidRender(): MarkdownEditorSessionLastValidRender | null
   restoreLastValidRender(render: MarkdownEditorSessionLastValidRender, expected: {
     readonly documentIdentity: MarkdownEditorDocumentIdentity
@@ -103,6 +123,7 @@ export interface MarkdownEditorSessionOwner<ViewState> {
   readonly restoreViewState: (state: ViewState) => void
   readonly resourceParticipants: () => readonly MarkdownEditorSessionResourceParticipant[]
   readonly captureLastValidRender: () => MarkdownEditorSessionLastValidRender | null
+  readonly inspectRendererResourceSource?: () => MarkdownEditorSessionRendererResourceSource | null
   readonly restoreLastValidRender?: (ref: string) => Promise<MarkdownEditorSessionRenderRestoreProof>
 }
 
@@ -185,6 +206,18 @@ export const createMarkdownEditorSessionBinding = <ViewState>(
           })
         },
         inspectResourceParticipants: () => { assertAvailable(); return resources.inspectParticipants() },
+        inspectRendererResourceSource() {
+          assertAvailable()
+          const store = owner.transactionStore
+          const id = store.documentIdentity.id
+          const epoch = store.documentIdentity.epoch
+          const revision = store.revision
+          const source = owner.inspectRendererResourceSource?.() ?? null
+          assertAvailable()
+          if (store.documentIdentity.id !== id || store.documentIdentity.epoch !== epoch || store.revision !== revision)
+            throw new Error('editor-session-renderer-resource-source-stale')
+          return source
+        },
         captureLastValidRender,
         async restoreLastValidRender(render: MarkdownEditorSessionLastValidRender, expected: {
           readonly documentIdentity: MarkdownEditorDocumentIdentity
