@@ -547,6 +547,11 @@ The check also delegates to the original transaction store's read-only retained
 token/history custody check. A switch away and back to identical id/epoch/revision
 does not revive a released transaction checkpoint. Original mutating restore and
 its history-checkpoint refusal remain unchanged; no metadata-only ABA acceptance.
+Capture/restore expected context may include `assertAdmission`. This actual
+consumer callback runs after the final renderer/view read and before original
+transaction retain/restore, with native availability/context checks preserved.
+A thrown guard preserves prior custody/selection/history. The consuming factory
+supplies its real owner/reference/admission guard; no success or receipt is issued.
 
 `restoreSnapshot(snapshot, expected)` accepts only the exact retained snapshot
 object, on the same mounted owner, document identity/epoch and source revision.

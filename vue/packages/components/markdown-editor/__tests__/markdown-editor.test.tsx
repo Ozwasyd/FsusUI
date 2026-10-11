@@ -26,6 +26,42 @@ import type {
 import { getMarkdownXssSourceUrl } from '../../../../tests/support/markdown-xss-corpus'
 
 describe('MarkdownEditor', () => {
+  it('checks actual consumer admission after view capture and before replacing or restoring original custody', () => {
+    const identity = { id: 'admission-document', epoch: 1 }
+    const store = new MarkdownEditorTransactionStore('source', undefined, identity)
+    let active = true
+    let retireDuringView = false
+    let viewRestores = 0
+    const session = createMarkdownEditorSessionBinding({
+      transactionStore: store,
+      isComposing: () => false,
+      isDisposed: () => false,
+      captureViewState: () => { if (retireDuringView) active = false; return null },
+      restoreViewState: () => { viewRestores += 1 },
+      resourceParticipants: () => [],
+      captureLastValidRender: () => null,
+    }).getSession('session:admission')
+    const assertAdmission = () => { if (!active) throw new Error('actual-consumer-retired') }
+    const expected = { documentIdentity: identity, revision: 0, assertAdmission }
+    const original = session.captureSnapshot(() => 'a'.repeat(64), expected)
+    retireDuringView = true
+    expect(() => session.captureSnapshot(() => 'b'.repeat(64), expected)).toThrow('actual-consumer-retired')
+    expect(session.validateRetainedSnapshot(original, expected)).toBe(true)
+    store.setSelection({ start: 1, end: 1, direction: 'none' })
+    const before = { history: store.history, selection: store.selection, source: store.value }
+    expect(() => session.restoreSnapshot(original, expected)).toThrow('actual-consumer-retired')
+    expect({ history: store.history, selection: store.selection, source: store.value }).toEqual(before)
+    expect(viewRestores).toBe(0)
+    active = true
+    retireDuringView = false
+    expect(session.restoreSnapshot(original, {
+      ...expected,
+      assertAdmission: () => { session.captureSnapshot(() => 'c'.repeat(64)) },
+    }).reason).toBe('editor-session-snapshot-custody-invalid')
+    expect({ history: store.history, selection: store.selection, source: store.value }).toEqual(before)
+    expect(viewRestores).toBe(0)
+  })
+
   it('rejects old outer custody after the original transaction store switches away and back to identical coordinates', () => {
     const identity = { id: 'aba-document', epoch: 1 }
     const store = new MarkdownEditorTransactionStore('same source', undefined, identity)

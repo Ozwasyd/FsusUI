@@ -23,3 +23,6 @@ and does not certify renderer restoration, resources or complete host snapshots.
 
 Validate the original transaction store's actual retained token/history custody
 as well, rejecting document-coordinate ABA after release without changing restore.
+
+Run a supplied actual consumer admission callback immediately before original
+native retain/restore, after renderer/view callbacks. Preserve custody on refusal.
