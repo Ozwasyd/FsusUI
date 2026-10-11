@@ -852,6 +852,61 @@ export const createFsusWorkerExecutor = <TRequest, TResponse>(
     ])
   }
 
+  const reportSharedException = (
+    error: unknown,
+    task?: WorkerTask<TRequest, TResponse>,
+  ) => {
+    const context = task
+      ? {
+          generation: task.generation,
+          id: task.id,
+          key: task.key,
+          lane: task.lane,
+        }
+      : {}
+    const detail = createFsusError('infra', 'fsus_worker_callback_failed', {
+      cause: error,
+      details: task
+        ? 'task-owned callback failure'
+        : 'unattributable shared pool failure',
+    })
+    // Error reporting is a notification, not admission into the caller's task.
+    const fallback = (reportError?: unknown) => {
+      try {
+        console.error('fsus_worker_callback_failed', {
+          name,
+          ...context,
+          error,
+          reportError,
+        })
+      } catch {
+        // A failed task still rejects its own Promise even if both reporters fail.
+      }
+    }
+    try {
+      if (options.onEvent) emit('worker-error', { ...context, error: detail })
+      else fallback()
+    } catch (reportError) {
+      fallback(reportError)
+    }
+  }
+
+  const handleTaskException = (
+    task: WorkerTask<TRequest, TResponse>,
+    error: unknown,
+  ) => {
+    let reportedError = error
+    try {
+      rejectTaskOnException(task, error)
+    } catch (cleanupError) {
+      reportedError = new AggregateError(
+        [error, cleanupError],
+        'fsus_worker_task_cleanup_failed',
+      )
+    }
+    reportSharedException(reportedError, task)
+  }
+
   const handleWorkerMessage = (slot: WorkerSlot, event: MessageEvent) => {
     const payload = event.data as FsusWorkerResponse<TResponse>
     const task = pending.get(payload?.id)
@@ -1199,45 +1254,56 @@ export const createFsusWorkerExecutor = <TRequest, TResponse>(
         ])
       }
     } catch (error) {
-      runCleanup([
-        () => rejectTaskOnException(task, error),
-        () => {
-          throw error
-        },
-      ])
+      handleTaskException(task, error)
     }
   }
 
   pump = () => {
-    if (disposed) return
-    clearIdleTimer()
-    while (lanes.some((lane) => queues[lane].some((task) => !task.suspended))) {
+    try {
       if (disposed) return
-      let slot = slots.find(
-        (candidate) =>
-          isSlotUsable(candidate) && candidate.activeTaskId === null,
-      )
-      if (disposed) return
-      if (!slot && slots.length < maxWorkers) {
-        try {
-          slot = createSlot()
-        } catch (error) {
-          const task = dequeue()
-          if (!task) return
-          let detail = createFsusError('infra', 'fsus_worker_create_failed')
-          runCleanup([
-            () => {
-              detail = toFsusError(error, 'fsus_worker_create_failed', 'infra')
-            },
-            () => settleTask(task, fsusErr(detail), 'request-reject', detail),
-          ])
-          continue
+      clearIdleTimer()
+      while (
+        lanes.some((lane) => queues[lane].some((task) => !task.suspended))
+      ) {
+        if (disposed) return
+        let slot = slots.find(
+          (candidate) =>
+            isSlotUsable(candidate) && candidate.activeTaskId === null,
+        )
+        if (disposed) return
+        if (!slot && slots.length < maxWorkers) {
+          try {
+            slot = createSlot()
+          } catch (error) {
+            const task = dequeue()
+            if (!task) return
+            let detail = createFsusError('infra', 'fsus_worker_create_failed')
+            try {
+              runCleanup([
+                () => {
+                  detail = toFsusError(
+                    error,
+                    'fsus_worker_create_failed',
+                    'infra',
+                  )
+                },
+                () =>
+                  settleTask(task, fsusErr(detail), 'request-reject', detail),
+              ])
+            } catch (error) {
+              handleTaskException(task, error)
+            }
+            continue
+          }
         }
+        if (!slot) return
+        const task = dequeue()
+        if (!task) return
+        dispatch(slot, task)
       }
-      if (!slot) return
-      const task = dequeue()
-      if (!task) return
-      dispatch(slot, task)
+    } catch (error) {
+      // Selection/factory/scheduling failures have no selected request owner.
+      reportSharedException(error)
     }
   }
 
@@ -1286,11 +1352,15 @@ export const createFsusWorkerExecutor = <TRequest, TResponse>(
           previous.id !== task.id &&
           previous.generation <= task.generation
         ) {
-          cancelTask(
-            previous,
-            'request-cancel',
-            'fsus_worker_generation_superseded',
-          )
+          try {
+            cancelTask(
+              previous,
+              'request-cancel',
+              'fsus_worker_generation_superseded',
+            )
+          } catch (error) {
+            handleTaskException(previous, error)
+          }
           if (!isCurrent()) return
         }
       }
@@ -1311,7 +1381,11 @@ export const createFsusWorkerExecutor = <TRequest, TResponse>(
         dropTask(task, 'fsus_worker_queue_full')
         return
       }
-      dropTask(victim, 'fsus_worker_queue_preempted')
+      try {
+        dropTask(victim, 'fsus_worker_queue_preempted')
+      } catch (error) {
+        handleTaskException(victim, error)
+      }
     }
     // Cancellation and preemption observers may settle this task or refill lanes.
     if (!isCurrent()) return
