@@ -192,6 +192,143 @@ Large documents prefer the Render Pipeline adapter's shared Worker pool. Each po
 
 ### Exposes
 
-| 名称   | 说明         |
-| ------ | ------------ |
-| rootEl | 渲染容器元素 |
+| Name                          | Description                                                                                                          |
+| ----------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| rootEl                        | Render container element.                                                                                            |
+| captureLastValidRender        | Return the retained render ref, document identity/epoch and revision, or `null`.                                     |
+| restoreLastValidRender        | Recommit the actual retained projection on the same mounted owner and matching revision, or report a blocked result. |
+| getSessionResourceSourceOffer | Return the explicitly incomplete census of resources directly held by this renderer.                                 |
+| getSessionResourceParticipant | Return the stable renderer resource participant; its complete lifecycle operations currently refuse.                 |
+
+### Retained renderer projection and resource source offer
+
+These experimental methods are available on the mounted `ElMarkdownRenderer`
+instance. Use the documented component ref; the private owner factory and worker
+implementation are not public imports. The renderer remains the sole owner of
+its retained result and component handles. Shared editor session registration
+belongs to [MarkdownEditor](markdown-editor.md#retained-public-editor-session-source-wip).
+
+`captureLastValidRender()` returns a frozen object with this shape:
+
+```ts
+{
+  ref: string
+  documentIdentity: { id: string; epoch: number | string }
+  revision: number | string
+} | null
+```
+
+The opaque ref identifies one actual authorized result retained in this mounted
+renderer. A matching runtime-authorized `initialRender`, a completed sync or
+chunked render, an authorized worker result, or a safe fallback can establish
+that result. It is never reconstructed from HTML or a content digest. The
+result's source, renderer version and authority must match the render request;
+generation, document identity/epoch and revision are checked at commit boundaries.
+The existing feature output gateway remains the authority for feature DOM.
+
+The editor's injected document identity and revision are used unchanged. A
+standalone renderer uses its own document key and epoch and uses `contentVersion`
+or its request source identity as the revision. An opaque source identity is not
+converted into an invented numeric revision. Repeated captures of the same
+retained result return the same object; a successful later render supersedes it.
+While a newer revision is pending, the last valid result can belong to an earlier
+revision of the same document epoch. Consumers must compare the returned revision
+before treating it as the current projection. A document key/epoch change clears
+the retained result even when the Markdown bytes are identical. Before any valid
+result, and after unmount, capture returns `null`.
+
+The ref contains no HTML, Markdown source, history or serializable render payload.
+It is an in-memory identity reference, not a disposal checkpoint. Rejected
+resource/disposal operations preserve the retained result; ordinary component
+unmount releases it.
+
+`restoreLastValidRender(ref)` returns a promise of
+`{ ref, status: 'restored' | 'blocked', reason: string | null }`. It resolves the
+ref through this renderer's sole private retained slot and checks the current
+document ID, epoch, revision, request identity and render authority before
+mutation. Unknown, superseded, switched, source-modified or busy refs are blocked.
+Disposed or paused underlying owners, closed heavy-feature admission, pending
+pipeline renders/adapter jobs and retained heavy imports/continuations/tasks
+also block restoration. The operation reuses the actual retained HTML/chunk
+projection and strategy, waits for Vue/viewport work and feature activation, and
+rechecks generation and identity before reporting a restored result. A stale or
+failed operation reports blocked; it does not mint a newer retained identity.
+
+Restoration recreates the mounted projection only. Its result does not establish
+that all resources stopped, that a session is ready, or that browser/native
+rendering qualification passed. There is no restoration after disposal,
+cross-instance hydration or crash recovery.
+
+`getSessionResourceSourceOffer()` returns:
+
+```ts
+{
+  complete: false
+  measuredUsageOnly: true
+  missingSourceDependencies: readonly string[]
+  sources: {
+    renderPipeline: object // Actual runtime/hardware inspection.
+    virtualWindow: object // Actual viewport inspection.
+    heavyFeatures: object // Actual active and retired handle inspection.
+  }
+  unknownUsage: object // Original timer/network/worker/pool unknown values.
+  knownNetworkRequests: number | null // null preserves an unknown heavy count.
+  inspection: {
+    ownerRef: 'renderer-projection'
+    paused: false
+    recoverable: false
+    retainedListeners: number
+    usage: {
+      editorInstances: number
+      renderers: number
+      observers: number
+      timers: number
+      backgroundTasks: number
+      networkRequests: number
+      memoryUnits: number
+    }
+  }
+}
+```
+
+The measured subtotals describe directly held component timers, RAF handles,
+owned scheduled frame descriptors, live asynchronous jobs, abort/theme listeners
+and activation observers. Actual runtime/hardware/viewport inspections contribute
+measured handles, listeners, promises, observers and collection entries. Worker
+counts come only from the runtime's exact owned task scopes; shared pool totals
+remain context and are never attributed to this renderer. The original
+inspections remain exposed under `sources`.
+
+The renderer requests heavy-feature admission closure when a document/render
+generation changes and reopening for a fresh render through the real owner.
+The inherited owner still has unresolved reentrant admission/teardown and loader
+cancellation gaps. This renderer namespaces continuation frame keys by its own
+instance identity; other scheduler consumers remain with their respective owners.
+These calls do not establish safe resource
+suspension, revive disposed runtime instances or establish a fully paused renderer. The heavy
+inspection retains retired provider tasks, imports, continuations and handles
+until their actual settlement, including work that outlives realm removal or
+unmount. Component jobs leave the census only in their actual `finally` blocks.
+Cancelling a handle does not erase an unsettled promise. Memory units count
+retained logical resources and collection entries, not physical heap bytes.
+
+This source offer is deliberately partial. Adapter internals, worker internals,
+shared pool attribution, platform observer callbacks, heavy-runtime timer/network
+resources, and activation/gateway loader imports remain explicit gaps.
+`unknownUsage` preserves the original unknown/unavailable values; a nullable
+`knownNetworkRequests` preserves an unmeasured heavy network count. The integer
+`inspection.usage.networkRequests` counts direct component requests only. Other
+integer fields are measured subtotals, never complete totals. Neither an unknown
+nor a shared pool is converted to an attributed zero. The `inspection` must never
+be submitted as total session usage or a successful paused acknowledgment.
+
+`getSessionResourceParticipant()` returns the same `renderer-projection`
+participant object on repeat calls. `inspect()`, `pause()` and `resume()` currently
+throw `markdown-renderer-session-resource-source-unavailable` with the missing
+source dependencies before mutation. `dispose(snapshotRef)` throws
+`markdown-renderer-session-checkpoint-not-recoverable` and preserves the retained
+result. Do not register this participant as an available session owner while
+these refusals remain. Full renderer census and epoch-safe pause/resume require
+the real underlying resource owners; recoverable disposal additionally requires
+validated renderer restoration. Completing this renderer alone cannot establish
+the fixed editor session roster or permit session eviction.

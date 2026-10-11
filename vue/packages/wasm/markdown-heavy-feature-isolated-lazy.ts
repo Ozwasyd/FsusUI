@@ -3,6 +3,7 @@ import type {
   MarkdownHeavyFeatureIsolatedRenderHandle,
   MarkdownHeavyFeatureIsolatedRenderRequest,
 } from './markdown-heavy-feature-resource'
+import { hasMarkdownHeavyFeatureOwnedResources } from './markdown-heavy-feature-resource'
 import type {
   MarkdownHeavyFeatureFrameContinueScheduler,
   MarkdownHeavyFeatureTrustedScriptUrlFactory,
@@ -29,7 +30,7 @@ export const createLazyMarkdownHeavyFeatureIsolatedRender = <T>(
     import('./markdown-heavy-feature-isolated-client'),
 ): MarkdownHeavyFeatureIsolatedRenderHandle<T> => {
   let active = true
-  let taskActive = true
+  let importPending = true
   let innerHandle: MarkdownHeavyFeatureIsolatedRenderHandle<T> | null = null
   let removeInnerResourceChange: (() => void) | null = null
   let rejectAbort!: (reason: unknown) => void
@@ -40,31 +41,49 @@ export const createLazyMarkdownHeavyFeatureIsolatedRender = <T>(
   const abortPromise = new Promise<T>((_resolve, reject) => {
     rejectAbort = reject
   })
-  const loadPromise = loadClient()
+  const onInnerResourceChange = () => {
+    if (
+      !active &&
+      innerHandle &&
+      !hasMarkdownHeavyFeatureOwnedResources(innerHandle.resources())
+    ) {
+      removeInnerResourceChange?.()
+      removeInnerResourceChange = null
+    }
+    notifyResourceChange()
+  }
+  let clientPromise: Promise<MarkdownHeavyFeatureIsolatedClient>
+  try {
+    clientPromise = loadClient()
+  } catch (error) {
+    clientPromise = Promise.reject(error)
+  }
+  const loadPromise = clientPromise
     .then((client) => {
+      importPending = false
       if (!active) throw abortError()
       const handle = client.createMarkdownHeavyFeatureIsolatedRender(
         request,
         trustedScriptUrlFactory,
         scheduleContinue,
       ) as MarkdownHeavyFeatureIsolatedRenderHandle<T>
+      innerHandle = handle
+      removeInnerResourceChange =
+        handle.resources().subscribe?.(onInnerResourceChange) ?? null
       if (!active) {
         handle.teardown()
+        onInnerResourceChange()
         throw abortError()
       }
-      innerHandle = handle
-      taskActive = false
-      removeInnerResourceChange = handle.resources().subscribe?.(
-        notifyResourceChange,
-      ) ?? null
       notifyResourceChange()
       return handle.promise
     })
     .finally(() => {
-      taskActive = false
+      importPending = false
       notifyResourceChange()
     })
   const resources: MarkdownHeavyFeatureAdapterResources = Object.freeze({
+    scope: 'owned-handles',
     get listeners() {
       return innerHandle?.resources().listeners ?? 0
     },
@@ -72,26 +91,38 @@ export const createLazyMarkdownHeavyFeatureIsolatedRender = <T>(
       return innerHandle?.resources().observers ?? 0
     },
     get runtimes() {
-      return taskActive ? 1 : (innerHandle?.resources().runtimes ?? 0)
+      return innerHandle?.resources().runtimes ?? 0
+    },
+    get networkRequests() {
+      // Dynamic imports expose settlement, not an abortable network handle.
+      return 'unknown' as const
+    },
+    get pendingImports() {
+      return (
+        (importPending ? 1 : 0) + (innerHandle?.resources().pendingImports ?? 0)
+      )
+    },
+    get scheduledContinuations() {
+      return innerHandle?.resources().scheduledContinuations ?? 0
     },
     subscribe(listener: () => void) {
       resourceChangeListeners.add(listener)
       return () => resourceChangeListeners.delete(listener)
     },
     get tasks() {
-      return taskActive ? 1 : (innerHandle?.resources().tasks ?? 0)
+      return (importPending ? 1 : 0) + (innerHandle?.resources().tasks ?? 0)
+    },
+    get timers() {
+      // A loader callback/import graph is not a timer ownership boundary.
+      return 'unknown' as const
     },
   })
   const teardown = () => {
     if (!active) return
     active = false
-    taskActive = false
-    removeInnerResourceChange?.()
-    removeInnerResourceChange = null
     innerHandle?.teardown()
-    innerHandle = null
     rejectAbort(abortError())
-    notifyResourceChange()
+    onInnerResourceChange()
   }
 
   return Object.freeze({
