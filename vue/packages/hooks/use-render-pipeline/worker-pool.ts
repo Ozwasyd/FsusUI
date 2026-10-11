@@ -1137,6 +1137,19 @@ export const createFsusWorkerExecutor = <TRequest, TResponse>(
     const cloneBytes =
       runOptions.cloneBytes ??
       estimateStructuredCloneBytes(request, cloneLimit, transferredBuffers)
+    const preparationAborted = runOptions.signal?.aborted
+    if (disposed || preparationAborted) {
+      if (
+        runOptions.key &&
+        latestGenerations.get(runOptions.key) === generation &&
+        ![...pending.values()].some((task) => task.key === runOptions.key)
+      )
+        latestGenerations.delete(runOptions.key)
+      const error = disposed
+        ? createFsusError('infra', 'fsus_worker_executor_disposed')
+        : createAbortErrorDetail('fsus_worker_request_aborted')
+      return Promise.resolve(fsusErr<TResponse>(error))
+    }
     if (cloneBytes > cloneLimit) {
       const error = createFsusError(
         'protocol',
@@ -1195,6 +1208,19 @@ export const createFsusWorkerExecutor = <TRequest, TResponse>(
           runOptions.signal?.removeEventListener('abort', abort)
       }
       pending.set(id, task)
+      const admissionAborted = runOptions.signal?.aborted
+      if (disposed || admissionAborted) {
+        const error = disposed
+          ? createFsusError('infra', 'fsus_worker_disposed')
+          : createAbortErrorDetail('fsus_worker_request_aborted')
+        settleTask(
+          task,
+          fsusErr(error),
+          disposed ? 'request-reject' : 'request-abort',
+          error,
+        )
+        return
+      }
       enqueue(task)
     })
   }
