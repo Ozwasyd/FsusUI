@@ -147,6 +147,15 @@ export const runMarkdownSearchTask = (input: {
   if (matches !== found.matches) {
     input.onRetainedMatches?.(Object.freeze(matches))
   }
+  if (input.task?.cancelled) {
+    return Object.freeze({
+      requestId: input.requestId,
+      status: 'aborted',
+      matches: Object.freeze([]),
+      total: null,
+      truncated: false,
+    })
+  }
   return Object.freeze({
     requestId: input.requestId,
     status: truncated ? 'truncated' : 'complete',
