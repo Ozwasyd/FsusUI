@@ -362,6 +362,7 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
       dispatch?.dispatchRef === proof.dispatchRef &&
       dispatch.attempt === proof.attempt &&
       job.attempt === proof.attempt &&
+      (result.status !== 'progress' || !dispatch.settled) &&
       job.itemId === result.itemId &&
       job.batchId === result.batchId &&
       unfinished(job) &&
@@ -377,7 +378,9 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
     participant,
     async runAttachmentDispatch(
       job: MarkdownAttachmentJob,
-      dispatch: () =>
+      dispatch: (
+        admitProgress: (result: MarkdownAttachmentProviderResult) => boolean,
+      ) =>
         | MarkdownAttachmentProviderResult
         | PromiseLike<MarkdownAttachmentProviderResult>,
     ): Promise<MarkdownAttachmentProviderResult> {
@@ -398,15 +401,30 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
           const state = inspectMarkdownAttachmentDispatch(ownedJob)!
           dispatchRef = state.dispatchRef
           attachmentTasks.set(dispatchRef, ownedJob)
-          const result = await dispatch()
-          const previous = attachmentResults.get(result)
-          if (!previous || previous.dispatchRef === state.dispatchRef) {
+          const bindResult = (result: MarkdownAttachmentProviderResult) => {
+            const previous = attachmentResults.get(result)
+            if (previous && previous.dispatchRef !== state.dispatchRef)
+              return false
             attachmentResults.set(result, {
               job: ownedJob,
               dispatchRef: state.dispatchRef,
               attempt: state.attempt,
             })
+            return acceptsAttachmentResult(result)
           }
+          const result = await dispatch((progress) => {
+            const current = inspectMarkdownAttachmentDispatch(ownedJob)
+            if (
+              progress.status !== 'progress' ||
+              current?.dispatchRef !== state.dispatchRef ||
+              current.settled
+            )
+              return false
+            return bindResult(progress)
+          })
+          // Admission may refuse the content during pause. The actual promise
+          // still returns/rejects and settles independently of this boolean.
+          bindResult(result)
           return result
         })
       } finally {
