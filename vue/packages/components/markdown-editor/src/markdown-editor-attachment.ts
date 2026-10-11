@@ -480,11 +480,26 @@ export interface MarkdownAttachmentCaptureSession {
   clear(): void
 }
 
+const captureFingerprints = new WeakMap<
+  MarkdownAttachmentCaptureSession,
+  Set<string>
+>()
+
+/** Internal census; a foreign implementation cannot prove this owner's memory. */
+export const inspectMarkdownAttachmentCaptureResources = (
+  session: MarkdownAttachmentCaptureSession,
+) => {
+  const fingerprints = captureFingerprints.get(session)
+  if (!fingerprints)
+    throw new Error('editor-session-attachment-capture-owner-unavailable')
+  return Object.freeze({ memoryUnits: fingerprints.size })
+}
+
 export const createMarkdownAttachmentCaptureSession = (
   maxFingerprints = 64,
 ): MarkdownAttachmentCaptureSession => {
   const fingerprints = new Set<string>()
-  return Object.freeze({
+  const session: MarkdownAttachmentCaptureSession = Object.freeze({
     claim(eventFingerprint: string) {
       if (fingerprints.has(eventFingerprint)) return false
       fingerprints.add(eventFingerprint)
@@ -499,6 +514,8 @@ export const createMarkdownAttachmentCaptureSession = (
       fingerprints.clear()
     },
   })
+  captureFingerprints.set(session, fingerprints)
+  return session
 }
 
 export type MarkdownAttachmentCaptureRejection =
