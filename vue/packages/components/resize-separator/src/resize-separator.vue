@@ -75,9 +75,17 @@ const controlledValue = computed(() => bound(props.value))
 const quantize = (value: number) => {
   const bounded = bound(value)
   if (bounded === props.min || bounded === props.max) return bounded
-  const steps = Math.round((bounded - props.min) / props.step)
+  const stepCount = (bounded - props.min) / props.step
   // An extremely small step must not turn a finite input into Infinity.
-  if (!Number.isFinite(steps)) return bounded
+  if (!Number.isFinite(stepCount)) return bounded
+  const halfStep = Math.floor(stepCount) + 0.5
+  const roundoff = Number.EPSILON * Math.max(1, Math.abs(stepCount))
+  // Correct quotient-scale roundoff only at the half-step decision boundary.
+  // If numeric precision spans half a step, retain ordinary rounding.
+  const steps =
+    roundoff < 0.5 && stepCount < halfStep && halfStep - stepCount <= roundoff
+      ? Math.ceil(stepCount)
+      : Math.round(stepCount)
   return bound(Number((props.min + steps * props.step).toPrecision(15)))
 }
 
@@ -199,6 +207,7 @@ const onLostPointerCapture = (event: PointerEvent) => {
 const onKeydown = (event: KeyboardEvent) => {
   if (event.key === 'Escape' && active) {
     event.preventDefault()
+    event.stopPropagation()
     cancel('escape')
     return
   }

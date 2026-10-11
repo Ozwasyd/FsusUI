@@ -173,6 +173,75 @@ describe('ResizeSeparator public component', () => {
     ])
   })
 
+  test.each([
+    [0, 1, 0.5, 0.1, 350, 0.4],
+    [0, 1, 0.5, 0.1, 349.999999, 0.3],
+    [0, 1, 0.5, 0.1, 350.000001, 0.4],
+    [1, 2, 1.5, 0.1, 350, 1.4],
+    [-1, 0, -0.5, 0.1, 350, -0.6],
+    [0, 1e-6, 5e-7, 1e-7, 350, 4e-7],
+    [0, 1e6, 5e5, 1e5, 350, 4e5],
+  ])(
+    'rounds pointer half-steps upward without promoting below-ties: min=%s max=%s value=%s step=%s x=%s',
+    (min, max, value, step, clientX, expected) => {
+      const wrapper = render({
+        min,
+        max,
+        value,
+        step,
+        coordinateRange: { start: 0, end: 1000 },
+      })
+      capture(wrapper)
+      pointer(wrapper, 'pointerdown', { clientX: 500 })
+      pointer(wrapper, 'pointerup', { clientX })
+      expect(proposals(wrapper)).toEqual([
+        { value: expected, source: 'pointer', pointerId: 7 },
+      ])
+    },
+  )
+
+  test('keyboard proposals apply the same upward half-step rule', async () => {
+    const wrapper = render({ min: 0, max: 1, value: 0.25, step: 0.1 })
+    await wrapper.trigger('keydown', { key: 'ArrowRight' })
+    expect(proposals(wrapper)).toEqual([
+      { value: 0.4, source: 'keyboard', pointerId: null },
+    ])
+  })
+
+  test('active Escape cancels without reaching an outer dismiss handler; idle Escape still bubbles', () => {
+    const wrapper = render()
+    const mocks = capture(wrapper)
+    const outerDismiss = vi.fn()
+    document.addEventListener('keydown', outerDismiss)
+    try {
+      pointer(wrapper, 'pointerdown')
+      const activeEscape = new KeyboardEvent('keydown', {
+        key: 'Escape',
+        bubbles: true,
+        cancelable: true,
+      })
+      wrapper.element.dispatchEvent(activeEscape)
+      expect(activeEscape.defaultPrevented).toBe(true)
+      expect(outerDismiss).not.toHaveBeenCalled()
+      expect(wrapper.emitted('cancel')).toEqual([
+        [{ value: 0.5, source: 'pointer', pointerId: 7, reason: 'escape' }],
+      ])
+      expect(mocks.release).toHaveBeenCalledExactlyOnceWith(7)
+
+      const idleEscape = new KeyboardEvent('keydown', {
+        key: 'Escape',
+        bubbles: true,
+        cancelable: true,
+      })
+      wrapper.element.dispatchEvent(idleEscape)
+      expect(idleEscape.defaultPrevented).toBe(false)
+      expect(outerDismiss).toHaveBeenCalledExactlyOnceWith(idleEscape)
+      expect(wrapper.emitted('cancel')).toHaveLength(1)
+    } finally {
+      document.removeEventListener('keydown', outerDismiss)
+    }
+  })
+
   test.each(['pointercancel', 'lostpointercapture'] as const)(
     '%s cancels once and permits a fresh pointer',
     (reason) => {
