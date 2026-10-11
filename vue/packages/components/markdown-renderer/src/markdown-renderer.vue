@@ -1083,7 +1083,7 @@ const createHeavyFeatureIsolatedRenderFactory =
         (key, run, drop) =>
           scheduleMarkdownHeavyFeatureFrameContinue(
             frameScheduler,
-            key,
+            `${localDocumentKey}:${key}`,
             run,
             drop,
           ),
@@ -1240,17 +1240,19 @@ const performRender = async () => {
   const taskId = ++currentTaskId
   const isCurrent = () =>
     taskId === currentTaskId && rendererResourceOwner.isCurrent(generation)
-  resetFeatureActivation()
-  const renderSignal = activationController?.signal
-  commitDurationMs = 0
-  rootEl.value?.removeAttribute('data-fsus-markdown-commit-ms')
   const source = normalizeMarkdownSource(props.content)
   const request = createMarkdownRenderRequest(source)
   isRendering.value = source.length > 0
 
   try {
+    resetFeatureActivation()
+    const renderSignal = activationController?.signal
+    commitDurationMs = 0
+    rootEl.value?.removeAttribute('data-fsus-markdown-commit-ms')
+    if (!isCurrent()) return
     if (!heavyLifecycle.resume())
       throw new Error('markdown-renderer-heavy-owner-disposed')
+    if (!isCurrent()) return
     const strategy = renderPipelineRuntime.strategy.value
 
     if (strategy === 'chunked-main' || strategy === 'chunked-worker') {
@@ -1449,8 +1451,6 @@ const restoreLastValidRender = async (
     rendererResourceOwner.clearTimer(debounceTimer)
     debounceTimer = null
   }
-  resetFeatureActivation()
-  const renderSignal = activationController?.signal
   const generation = rendererResourceOwner.beginRender()
   const taskId = currentTaskId
   const isCurrent = () =>
@@ -1458,6 +1458,9 @@ const restoreLastValidRender = async (
   const finishJob = rendererResourceOwner.trackJob()
   isRendering.value = true
   try {
+    resetFeatureActivation()
+    const renderSignal = activationController?.signal
+    if (!isCurrent()) return blocked('markdown-renderer-restore-stale')
     const projection = retained.projection
     if (projection.units.length) {
       const anchor = captureRenderAnchor()

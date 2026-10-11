@@ -48,6 +48,8 @@ export interface MarkdownRendererRenderGeneration extends MarkdownRendererDocume
 export const markdownRendererSessionSourceDependencies = Object.freeze([
   'markdown-runtime:activation-and-gateway-loader-import-network-census',
   'renderer:validated-snapshot-restoration-after-disposal',
+  'heavy-feature-runtime:reentrant-admission-teardown-and-pending-settlement',
+  'heavy-feature-runtime:loader-cancellation-and-instance-scheduler-isolation',
 ] as const)
 
 export const createMarkdownRendererSessionResourceOwner = (options: {
