@@ -69,6 +69,10 @@ export const runMarkdownAttachmentDispatch = async (
   const previous = attachmentDispatches.get(ownedJob)
   if (previous && !previous.settled)
     throw new Error('markdown-attachment-dispatch-still-running')
+  if (ownedJob.phase !== 'pending')
+    throw new Error('markdown-attachment-dispatch-phase-unavailable')
+  if (previous?.attempt === ownedJob.attempt)
+    throw new Error('markdown-attachment-attempt-already-dispatched')
   const state: MarkdownAttachmentDispatchState = {
     dispatchRef: Object.freeze({}),
     attempt: ownedJob.attempt,
@@ -347,6 +351,11 @@ export const cancelMarkdownAttachmentJob = (job: MarkdownAttachmentJob) => {
 }
 
 export const retryMarkdownAttachmentJob = (job: MarkdownAttachmentJob) => {
+  const dispatch = inspectMarkdownAttachmentDispatch(job)
+  if (!dispatch || dispatch.attempt !== job.attempt)
+    throw new Error('markdown-attachment-retry-settlement-unavailable')
+  if (!dispatch.settled)
+    throw new Error('markdown-attachment-retry-dispatch-still-running')
   job.phase = 'pending'
   job.progress = 0
   job.attempt += 1
