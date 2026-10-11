@@ -668,3 +668,10 @@ are excluded from this task's acceptance. Their command is not adopted as a
 preflight or executed here. This task performs source parsing/lint/compilation
 only; native/worker/network exposure of that external run is unresolved under
 the root audit and supplies no zero-resource or qualification evidence.
+
+
+Consumers may pass expected original document identity/epoch/revision as the second
+`captureSnapshot` argument. The transaction owner validates it before hashing or
+checkpoint mutation; stale mounted binding therefore preserves the prior snapshot.
+This supplements the post-digest actual-owner checks, without trusting registry
+identity as a substitute for reading the mounted original editor.

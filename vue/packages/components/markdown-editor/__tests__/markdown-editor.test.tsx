@@ -53,6 +53,15 @@ describe('MarkdownEditor', () => {
     const session = (wrapper.vm as MarkdownEditorInstance).getSession('session:retained')
     const snapshot = session.captureSnapshot(() => 'a'.repeat(64))
     expect(() => session.captureSnapshot(() => 'invalid')).toThrow('editor-session-content-digest-invalid')
+    const digest = vi.fn(() => 'a'.repeat(64))
+    expect(() => session.captureSnapshot(digest, {
+      documentIdentity: { id: 'other-document', epoch: 1 }, revision: snapshot.revision,
+    })).toThrow('editor-session-snapshot-context-mismatch')
+    expect(digest).not.toHaveBeenCalled()
+    expect(() => session.captureSnapshot(digest, {
+      documentIdentity: snapshot.documentIdentity, revision: snapshot.revision + 1,
+    })).toThrow('editor-session-snapshot-context-mismatch')
+    expect(digest).not.toHaveBeenCalled()
     const census = session.inspectResourceParticipants()
     expect(census.complete).toBe(false)
     expect(census.missingOwners).toContain('renderer-projection')

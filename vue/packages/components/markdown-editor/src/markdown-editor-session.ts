@@ -60,7 +60,10 @@ export interface MarkdownEditorSession {
   inspectCapabilities(): MarkdownEditorSessionCapabilities
   inspectResourceParticipants(): MarkdownEditorSessionResourceCensus
   captureLastValidRender(): MarkdownEditorSessionLastValidRender | null
-  captureSnapshot(digestSource: (source: string) => string): MarkdownEditorSessionSnapshot
+  captureSnapshot(digestSource: (source: string) => string, expected?: {
+    readonly documentIdentity: MarkdownEditorDocumentIdentity
+    readonly revision: number
+  }): MarkdownEditorSessionSnapshot
   restoreSnapshot(
     snapshot: MarkdownEditorSessionSnapshot,
     expected: { readonly documentIdentity: MarkdownEditorDocumentIdentity; readonly revision: number },
@@ -158,7 +161,10 @@ export const createMarkdownEditorSessionBinding = <ViewState>(
         inspectCapabilities,
         inspectResourceParticipants: () => { assertAvailable(); return resources.inspectParticipants() },
         captureLastValidRender,
-        captureSnapshot(digestSource: (source: string) => string) {
+        captureSnapshot(digestSource: (source: string) => string, expected?: {
+          readonly documentIdentity: MarkdownEditorDocumentIdentity
+          readonly revision: number
+        }) {
           assertAvailable()
           if (capturing) throw new Error('editor-session-snapshot-reentrant')
           capturing = true
@@ -167,6 +173,11 @@ export const createMarkdownEditorSessionBinding = <ViewState>(
             const identity = store.documentIdentity
             const revision = store.revision
             const source = store.value
+            if (expected && (
+              identity.id !== expected.documentIdentity.id ||
+              identity.epoch !== expected.documentIdentity.epoch ||
+              revision !== expected.revision
+            )) throw new Error('editor-session-snapshot-context-mismatch')
             const digest = digestSource(source)
             assertAvailable()
             if (
