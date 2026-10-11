@@ -1304,8 +1304,18 @@ export const createFsusWorkerExecutor = <TRequest, TResponse>(
                     'infra',
                   )
                 },
-                () =>
-                  settleTask(task, fsusErr(detail), 'request-reject', detail),
+                () => {
+                  // Error getters may have settled the selected request.
+                  if (
+                    pending.get(task.id) !== task ||
+                    task.settled ||
+                    task.settling
+                  ) {
+                    reportSharedException(factoryError, task)
+                    return
+                  }
+                  settleTask(task, fsusErr(detail), 'request-reject', detail)
+                },
               ])
             } catch (taskError) {
               handleTaskException(
