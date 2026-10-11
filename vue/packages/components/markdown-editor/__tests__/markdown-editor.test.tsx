@@ -54,6 +54,7 @@ describe('MarkdownEditor', () => {
     const census = session.inspectResourceParticipants()
     expect(census.complete).toBe(false)
     expect(census.missingOwners).toContain('renderer-projection')
+    expect(census.missingOwners).toContain('editor-surface')
     expect(census.participants.some((owner) => owner.ownerRef === 'editor-layout-callbacks')).toBe(true)
     expect(() => session.pauseResources()).toThrow('editor-session-resource-owner-unavailable')
     expect(session.inspectResourceParticipants().participants.every((owner) => !owner.paused)).toBe(true)

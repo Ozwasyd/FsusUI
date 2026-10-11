@@ -6109,6 +6109,10 @@ const revealSourceRange = (
 }
 
 const frameResourceParticipant = createMarkdownEditorFrameResourceParticipant(frameScheduler)
+// This controls imperative resources only. Vue's template/v-model DOM bindings
+// have no reversible subscription owner yet; disabled/readonly does not detach
+// them. Keep this partial owner out of the complete resource roster.
+const surfaceResourceOwnerComplete = false
 const surfaceResourceParticipant: MarkdownEditorSessionResourceParticipant = {
   ownerRef: 'editor-surface',
   inspect() {
@@ -6129,6 +6133,9 @@ const surfaceResourceParticipant: MarkdownEditorSessionResourceParticipant = {
     }
   },
   pause() {
+    if (!surfaceResourceOwnerComplete) {
+      throw new Error('editor-session-native-surface-resource-owner-unavailable')
+    }
     if (sessionDisposed || isComposing.value || nativeMachine.composing) {
       throw new Error('editor-session-surface-pause-unavailable')
     }
@@ -6169,7 +6176,8 @@ const surfaceResourceParticipant: MarkdownEditorSessionResourceParticipant = {
 const sessionBinding = createMarkdownEditorSessionBinding({
   transactionStore,
   resourceParticipants: () => [
-    frameResourceParticipant, surfaceResourceParticipant, sessionLayoutResources.participant,
+    frameResourceParticipant, sessionLayoutResources.participant,
+    ...(surfaceResourceOwnerComplete ? [surfaceResourceParticipant] : []),
     ...(commandResources.canInspect() ? [commandResources.participant] : []),
   ],
   isComposing: () => isComposing.value || nativeMachine.composing,

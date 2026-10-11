@@ -571,8 +571,11 @@ and queue, rejects scheduling while paused and refuses cancellation inside an
 executing callback. Auxiliary continuations preserve their existing RAF timing;
 this increment does not qualify phase ordering or typography behavior.
 
-The editor-surface participant controls the actual gesture timer, ResizeObserver
-and owned viewport listeners, gating recreations while paused. The layout owner
+The partial editor-surface owner controls the actual gesture timer, ResizeObserver
+and owned viewport listeners. It remains excluded from the complete roster: Vue
+template/v-model DOM subscriptions lack a reversible detach/drain/rebind owner.
+Disabled/readonly does not prove subscription release; no full surface paused
+acknowledgment is available from these imperative controls alone. The layout owner
 tracks every existing nextTick/microtask continuation until it actually settles;
 its document identity, revision and lifecycle leases suppress stale effects.
 Pending microtasks cannot be removed physically and prevent a paused acknowledgment
