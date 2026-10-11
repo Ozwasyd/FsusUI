@@ -77,6 +77,7 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
       readonly job: MarkdownAttachmentJob
       readonly dispatchRef: object
       readonly attempt: number
+      readonly generation: number
     }
   >()
   // Aborting a preparation can return before its consumer resolver has settled.
@@ -196,7 +197,7 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
         timers,
         backgroundTasks,
         // This library performs no network I/O. Opaque consumer work blocks pause
-        // through unfinished jobs/provider tasks; it is never reported as cancelled.
+        // through actual dispatch/provider futures; it is never reported as cancelled.
         networkRequests: 0,
         memoryUnits:
           active.size +
@@ -364,6 +365,7 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
     const identity = bindings.readDocument().documentIdentity
     return (
       dispatch?.dispatchRef === proof.dispatchRef &&
+      generation === proof.generation &&
       dispatch.attempt === proof.attempt &&
       job.attempt === proof.attempt &&
       (result.status !== 'progress' || !dispatch.settled) &&
@@ -397,6 +399,7 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
         throw new Error('editor-session-attachment-dispatch-job-unavailable')
       }
       observedAttachmentJobs.add(ownedJob)
+      const epoch = generation
       let dispatchRef: object | undefined
       try {
         return await runMarkdownAttachmentDispatch(ownedJob, () => {
@@ -411,6 +414,7 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
               job: ownedJob,
               dispatchRef: state.dispatchRef,
               attempt: state.attempt,
+              generation: epoch,
             })
             return acceptsAttachmentResult(result)
           }
