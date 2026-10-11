@@ -78,6 +78,7 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
       readonly dispatchRef: object
       readonly attempt: number
       readonly generation: number
+      readonly kind: 'progress' | 'settlement'
     }
   >()
   // Aborting a preparation can return before its consumer resolver has settled.
@@ -371,7 +372,9 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
       attachmentGeneration === proof.generation &&
       dispatch.attempt === proof.attempt &&
       job.attempt === proof.attempt &&
-      (result.status !== 'progress' || !dispatch.settled) &&
+      (proof.kind === 'progress'
+        ? result.status === 'progress' && !dispatch.settled
+        : result.status !== 'progress' && dispatch.settled) &&
       job.itemId === result.itemId &&
       job.batchId === result.batchId &&
       unfinished(job) &&
@@ -404,22 +407,53 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
       observedAttachmentJobs.add(ownedJob)
       const epoch = attachmentGeneration
       let dispatchRef: object | undefined
+      let bindSettlement:
+        | ((
+            result: MarkdownAttachmentProviderResult,
+          ) => MarkdownAttachmentProviderResult)
+        | undefined
       try {
-        return await runMarkdownAttachmentDispatch(ownedJob, () => {
+        const result = await runMarkdownAttachmentDispatch(ownedJob, () => {
           const state = inspectMarkdownAttachmentDispatch(ownedJob)!
           dispatchRef = state.dispatchRef
           attachmentTasks.set(dispatchRef, ownedJob)
-          const bindResult = (result: MarkdownAttachmentProviderResult) => {
+          const bindResult = (
+            result: MarkdownAttachmentProviderResult,
+            kind: 'progress' | 'settlement',
+          ) => {
             const previous = attachmentResults.get(result)
-            if (previous && previous.dispatchRef !== state.dispatchRef)
+            if (
+              previous &&
+              (previous.dispatchRef !== state.dispatchRef ||
+                previous.kind !== kind)
+            )
               return false
             attachmentResults.set(result, {
               job: ownedJob,
               dispatchRef: state.dispatchRef,
               attempt: state.attempt,
               generation: epoch,
+              kind,
             })
             return acceptsAttachmentResult(result)
+          }
+          bindSettlement = (result) => {
+            // Snapshot actual settled data; no caller can upgrade a progress object.
+            const settled = Object.freeze({
+              ...result,
+              ...(result.documentIdentity
+                ? {
+                    documentIdentity: Object.freeze({
+                      ...result.documentIdentity,
+                    }),
+                  }
+                : {}),
+              ...(result.status === 'resolved'
+                ? { payload: Object.freeze({ ...result.payload }) }
+                : {}),
+            }) as MarkdownAttachmentProviderResult
+            bindResult(settled, 'settlement')
+            return settled
           }
           const work = dispatch((progress) => {
             const current = inspectMarkdownAttachmentDispatch(ownedJob)
@@ -429,7 +463,10 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
               current.settled
             )
               return false
-            return bindResult(progress)
+            if (progress.documentIdentity)
+              Object.freeze(progress.documentIdentity)
+            Object.freeze(progress)
+            return bindResult(progress, 'progress')
           })
           // An event emission or terminal label is not a settlement future.
           if (!work || typeof work.then !== 'function') {
@@ -437,12 +474,10 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
               'editor-session-attachment-dispatch-settlement-unavailable',
             )
           }
-          return Promise.resolve(work).then((result) => {
-            // Refused content still leaves the real future free to settle.
-            bindResult(result)
-            return result
-          })
+          return work
         })
+        // Ledger settlement happens before final provenance is issued.
+        return bindSettlement!(result)
       } finally {
         if (dispatchRef) attachmentTasks.delete(dispatchRef)
       }
