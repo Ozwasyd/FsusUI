@@ -19,6 +19,7 @@ export const createMarkdownLanguageSearchResources = (language: {
   readonly invalidateLanguageSession: () => void
   readonly isComposing: () => boolean
   readonly languageMemoryUnits: () => number
+  readonly retainsSource: (source: string) => boolean
   readonly setPausedAttributes: () => void
 }) => {
   let ownsSearch = false
@@ -28,6 +29,7 @@ export const createMarkdownLanguageSearchResources = (language: {
   let running = false
   let task: MarkdownSearchTask | null = null
   let result: SearchResult | null = null
+  let unsettledRequest: SearchInput | null = null
 
   const requireOwnership = () => {
     if (!ownsSearch)
@@ -36,7 +38,9 @@ export const createMarkdownLanguageSearchResources = (language: {
   const cancelSearch = () => {
     epoch += 1
     if (task) cancelMarkdownSearchTask(task)
-    task = null
+    // The synchronous runner still retains this task/query until it returns.
+    // Cancellation is immediate; releasing its census custody waits for finally.
+    if (!running) task = null
     result = null
   }
   const inspect = (): MarkdownEditorSessionResourceInspection => {
@@ -61,7 +65,14 @@ export const createMarkdownLanguageSearchResources = (language: {
           language.languageMemoryUnits() +
           Number(task !== null) +
           (task ? Math.ceil((task.query.length * 2) / 65_536) : 0) +
-          (result ? 1 + result.execution.matches.length : 0),
+          (result ? 1 + result.execution.matches.length : 0) +
+          (unsettledRequest
+            ? 1 +
+              Number(unsettledRequest.budget !== undefined) +
+              (language.retainsSource(unsettledRequest.source)
+                ? 0
+                : Math.ceil((unsettledRequest.source.length * 2) / 65_536))
+            : 0),
       }),
     })
   }
@@ -114,10 +125,17 @@ export const createMarkdownLanguageSearchResources = (language: {
       if (running) throw new Error('editor-session-language-search-reentrant')
       cancelSearch()
       const requestEpoch = epoch
+      unsettledRequest = input
       running = true
       try {
         const next = executeMarkdownSearchSession({
-          ...input,
+          budget: input.budget,
+          documentId: input.documentId,
+          documentEpoch: input.documentEpoch,
+          mode: input.mode,
+          queryText: input.queryText,
+          revision: input.revision,
+          source: input.source,
           onTaskCreated(created) {
             task = created
             if (paused || epoch !== requestEpoch)
@@ -138,6 +156,8 @@ export const createMarkdownLanguageSearchResources = (language: {
         throw error
       } finally {
         running = false
+        unsettledRequest = null
+        if (epoch !== requestEpoch || task?.cancelled) task = null
       }
     },
   })
