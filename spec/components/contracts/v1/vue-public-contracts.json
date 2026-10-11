@@ -5,7 +5,7 @@
   "owner": "FsusUI Core",
   "baseline": {
     "path": "spec/baselines/vue-current.json",
-    "hash": "428698c59043e6db11e30a9ce7090a15c7b13bbba992ce21994b0011eef3ef42",
+    "hash": "d7b1a581db57207dffb2bc5271e0569d890f15bdfde2fea3fadce5a920ac23c2",
     "packageVersion": "1.5.1",
     "tokenHash": "f40182721e8a812c248cb0bc43de556cd7568c5a9de1bc8b2c099df9b78e47b0",
     "iconHash": "6ae868b15cefc99ebec9d8a78c7602da1fb07b46ec172c43f6a3662af54be167"
@@ -10184,6 +10184,12 @@
           "required": false
         },
         {
+          "name": "typography",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
           "name": "writingAids",
           "type": "vue-source",
           "default": "vue-baseline",
@@ -10254,6 +10260,10 @@
           "payload": "vue-source"
         },
         {
+          "name": "typography-result",
+          "payload": "vue-source"
+        },
+        {
           "name": "upload-image",
           "payload": "vue-source"
         }
@@ -10268,6 +10278,10 @@
       "exposed": [
         {
           "name": "applyAttachmentResult",
+          "signature": "vue-source"
+        },
+        {
+          "name": "applyTypography",
           "signature": "vue-source"
         },
         {

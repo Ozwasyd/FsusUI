@@ -10,7 +10,7 @@
   "baselines": {
     "web": {
       "path": "spec/baselines/vue-current.json",
-      "hash": "6950445c03f0db4106922d668af8ece56900788a32c02d079475af7841b01d5d",
+      "hash": "5dd8a600fc85a8e00211f12e265c60cd52703c8bf6985aaed869bd1814622174",
       "packageVersion": "1.5.1"
     },
     "avalonia": {
@@ -63684,6 +63684,52 @@
           }
         },
         {
+          "name": "typography",
+          "kind": "input",
+          "web": {
+            "member": "typography",
+            "baseline": "spec/baselines/vue-current.json",
+            "categories": [
+              "object"
+            ],
+            "runtimeType": "Object",
+            "semanticType": "MarkdownEditorTypographyRequest",
+            "nullable": false,
+            "default": {
+              "kind": "undefined"
+            },
+            "values": null,
+            "valuesKnown": false,
+            "required": false,
+            "readonly": false,
+            "deprecated": false,
+            "deprecationMessage": null
+          },
+          "avalonia": null,
+          "status": "missing",
+          "drift": {
+            "type": null,
+            "default": null,
+            "required": null,
+            "readWrite": null,
+            "nullability": null,
+            "eventPayload": null,
+            "operationSignature": null,
+            "contentRegion": null,
+            "enumValues": null,
+            "deprecated": null
+          },
+          "scenarioIds": [
+            "scenario.v2.el-markdown-editor.input.typography"
+          ],
+          "governance": {
+            "reason": "No matching real Avalonia public member in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
           "name": "writingAids",
           "kind": "input",
           "web": {
@@ -64631,6 +64677,40 @@
           }
         },
         {
+          "name": "typography-result",
+          "kind": "output",
+          "web": {
+            "member": "typography-result",
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
+          },
+          "avalonia": null,
+          "status": "missing",
+          "drift": {
+            "type": null,
+            "default": null,
+            "required": null,
+            "readWrite": null,
+            "nullability": null,
+            "eventPayload": null,
+            "operationSignature": null,
+            "contentRegion": null,
+            "enumValues": null,
+            "deprecated": null
+          },
+          "scenarioIds": [
+            "scenario.v2.el-markdown-editor.output.typography-result"
+          ],
+          "governance": {
+            "reason": "No matching real Avalonia public event in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
           "name": "update:modelValue",
           "kind": "output",
           "web": {
@@ -64738,6 +64818,50 @@
           },
           "scenarioIds": [
             "scenario.v2.el-markdown-editor.operation.apply-attachment-result"
+          ],
+          "governance": {
+            "reason": "No matching real Avalonia public method in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
+          "name": "applyTypography",
+          "kind": "operation",
+          "web": {
+            "member": "applyTypography",
+            "baseline": "spec/baselines/vue-current.json",
+            "signature": {
+              "status": "syntax-only",
+              "reason": null,
+              "returnType": "Promise<MarkdownEditorTypographyResult>",
+              "parameters": [
+                {
+                  "name": "input",
+                  "type": "MarkdownEditorTypographyRequest",
+                  "optional": false,
+                  "rest": false
+                }
+              ]
+            }
+          },
+          "avalonia": null,
+          "status": "missing",
+          "drift": {
+            "type": null,
+            "default": null,
+            "required": null,
+            "readWrite": null,
+            "nullability": null,
+            "eventPayload": null,
+            "operationSignature": null,
+            "contentRegion": null,
+            "enumValues": null,
+            "deprecated": null
+          },
+          "scenarioIds": [
+            "scenario.v2.el-markdown-editor.operation.apply-typography"
           ],
           "governance": {
             "reason": "No matching real Avalonia public method in the semantic baseline.",
@@ -66055,6 +66179,17 @@
           }
         },
         {
+          "member": "typography",
+          "kind": "input",
+          "status": "missing",
+          "governance": {
+            "reason": "No matching real Avalonia public member in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
           "member": "writingAids",
           "kind": "input",
           "status": "missing",
@@ -66220,6 +66355,17 @@
           }
         },
         {
+          "member": "typography-result",
+          "kind": "output",
+          "status": "missing",
+          "governance": {
+            "reason": "No matching real Avalonia public event in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
           "member": "update:modelValue",
           "kind": "output",
           "status": "web-only",
@@ -66243,6 +66389,17 @@
         },
         {
           "member": "applyAttachmentResult",
+          "kind": "operation",
+          "status": "missing",
+          "governance": {
+            "reason": "No matching real Avalonia public method in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
+          "member": "applyTypography",
           "kind": "operation",
           "status": "missing",
           "governance": {
@@ -67072,6 +67229,7 @@
         "scenario.v2.el-markdown-editor.input.textarea-id",
         "scenario.v2.el-markdown-editor.input.textarea-name",
         "scenario.v2.el-markdown-editor.input.toolbar-density",
+        "scenario.v2.el-markdown-editor.input.typography",
         "scenario.v2.el-markdown-editor.input.writing-aids",
         "scenario.v2.el-markdown-editor.input.writing-placeholder",
         "scenario.v2.el-markdown-editor.output.change",
@@ -67087,9 +67245,11 @@
         "scenario.v2.el-markdown-editor.output.selection-change",
         "scenario.v2.el-markdown-editor.output.submit",
         "scenario.v2.el-markdown-editor.output.transaction",
+        "scenario.v2.el-markdown-editor.output.typography-result",
         "scenario.v2.el-markdown-editor.output.update-model-value",
         "scenario.v2.el-markdown-editor.output.upload-image",
         "scenario.v2.el-markdown-editor.operation.apply-attachment-result",
+        "scenario.v2.el-markdown-editor.operation.apply-typography",
         "scenario.v2.el-markdown-editor.operation.close-command-palette",
         "scenario.v2.el-markdown-editor.operation.close-search",
         "scenario.v2.el-markdown-editor.operation.dispatch-transaction",
@@ -67125,12 +67285,12 @@
         "scenario.v2.el-markdown-editor.perf"
       ],
       "coverage": {
-        "total": 74,
+        "total": 77,
         "alignedCandidate": 0,
         "partial": 17,
-        "missing": 41,
+        "missing": 44,
         "webOnly": 16,
-        "mappedPercent": 23
+        "mappedPercent": 22.1
       },
       "markdownEditor": {
         "modes": [
@@ -189259,9 +189419,9 @@
   "coverage": {
     "aligned-candidate": 17,
     "partial": 191,
-    "missing": 2185,
+    "missing": 2188,
     "web-only": 62,
-    "total": 2455,
+    "total": 2458,
     "mappedPercent": 8.5
   }
 }
