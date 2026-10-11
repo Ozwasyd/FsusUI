@@ -68,6 +68,9 @@ export interface MarkdownEditorFrameSchedulerMetrics {
   readonly readAfterWriteViolations: number
   readonly overflowDroppedTasks: number
   readonly idle: boolean
+}
+
+export interface MarkdownEditorFrameSchedulerResourceState {
   readonly paused: boolean
   readonly pendingFrames: number
   readonly frameRequestKind: 'animation-frame' | 'timer' | 'custom'
@@ -96,6 +99,7 @@ export interface MarkdownEditorFrameScheduler {
   pause: () => void
   resume: () => void
   metrics: () => MarkdownEditorFrameSchedulerMetrics
+  resourceState: () => MarkdownEditorFrameSchedulerResourceState
   dispose: () => void
 }
 
@@ -183,6 +187,10 @@ export const createMarkdownEditorFrameScheduler = (
       readAfterWriteViolations,
       overflowDroppedTasks,
       idle: entries.size === 0 && frameHandle === 0 && runningPhase === null,
+    })
+
+  const resourceState = (): MarkdownEditorFrameSchedulerResourceState =>
+    Object.freeze({
       paused,
       pendingFrames: frameHandle === 0 ? 0 : 1,
       frameRequestKind,
@@ -337,6 +345,7 @@ export const createMarkdownEditorFrameScheduler = (
     pause,
     resume,
     metrics,
+    resourceState,
     dispose,
   })
 }

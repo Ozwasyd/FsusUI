@@ -37,10 +37,11 @@ describe('createMarkdownEditorFrameScheduler', () => {
     let newCommits = 0
     scheduler.scheduleMutate('old-epoch', () => { oldCommits += 1 })
     expect(frames.pendingFrames()).toBe(1)
-    expect(scheduler.metrics().pendingFrames).toBe(1)
+    expect(scheduler.resourceState().pendingFrames).toBe(1)
     scheduler.pause()
     expect(frames.pendingFrames()).toBe(0)
-    expect(scheduler.metrics()).toMatchObject({ paused: true, pendingTasks: 0, pendingFrames: 0 })
+    expect(scheduler.metrics().pendingTasks).toBe(0)
+    expect(scheduler.resourceState()).toMatchObject({ paused: true, pendingFrames: 0 })
     expect(scheduler.scheduleMutate('while-paused', () => { oldCommits += 1 })).toBe(false)
     frames.runFrame()
     expect(oldCommits).toBe(0)
@@ -61,7 +62,7 @@ describe('createMarkdownEditorFrameScheduler', () => {
     })
     scheduler.scheduleMutate('executing', () => {
       expect(() => scheduler.pause()).toThrow('markdown-frame-scheduler-phase-active')
-      expect(scheduler.metrics().paused).toBe(false)
+      expect(scheduler.resourceState().paused).toBe(false)
     })
     frames.runFrame()
     expect(scheduler.metrics().idle).toBe(true)

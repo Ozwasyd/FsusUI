@@ -145,18 +145,19 @@ export const createMarkdownEditorFrameResourceParticipant = (
 ): MarkdownEditorSessionResourceParticipant => {
   const inspect = (): MarkdownEditorSessionResourceInspection => {
     const metrics = scheduler.metrics()
-    if (metrics.frameRequestKind === 'custom') {
+    const state = scheduler.resourceState()
+    if (state.frameRequestKind === 'custom') {
       throw new Error('editor-session-custom-frame-resource-owner-unavailable')
     }
     return Object.freeze({
       ownerRef: 'frame-scheduler',
-      paused: metrics.paused,
+      paused: state.paused,
       recoverable: false,
       retainedListeners: 0,
       usage: Object.freeze({
         editorInstances: 0, renderers: 0, observers: 0,
-        timers: metrics.frameRequestKind === 'timer' ? metrics.pendingFrames : 0,
-        backgroundTasks: metrics.pendingTasks + metrics.pendingFrames + (metrics.runningPhase === null ? 0 : 1),
+        timers: state.frameRequestKind === 'timer' ? state.pendingFrames : 0,
+        backgroundTasks: metrics.pendingTasks + state.pendingFrames + (state.runningPhase === null ? 0 : 1),
         networkRequests: 0,
         // Logical bounded resource units, not claimed physical heap bytes.
         memoryUnits: metrics.pendingTasks,
