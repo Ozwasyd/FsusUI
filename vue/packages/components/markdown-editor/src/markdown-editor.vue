@@ -1134,6 +1134,7 @@ import {
   reactive,
   ref,
   triggerRef,
+  toRaw,
   useAttrs,
   useId,
   watch,
@@ -1178,6 +1179,9 @@ import {
   createMarkdownAttachmentAtomicPresentation,
   createMarkdownAttachmentCaptureSession,
   type MarkdownAttachmentBatchIntent,
+  type MarkdownAttachmentCaptureObservation,
+  type MarkdownAttachmentFileConsumer,
+  type MarkdownAttachmentItemIntent,
   type MarkdownAttachmentProviderResult,
   type MarkdownAttachmentSourceKind,
 } from './markdown-editor-attachment'
@@ -1234,6 +1238,7 @@ import type {
   MarkdownEditorSelection,
   MarkdownEditorTransaction,
   MarkdownEditorTransactionRejection,
+  MarkdownEditorTransactionEvent,
 } from './markdown-editor-transaction'
 import {
   resolveMarkdownBlockInputIntent,
@@ -1646,10 +1651,116 @@ watch([() => props.embedProvider, () => props.attachmentDispatch], (providers) =
   if (providers.some(Boolean)) opaqueAttachmentResourcesObserved.value = true
 }, { flush: 'sync' })
 const attachmentJobs = ref<MarkdownAttachmentJob[]>([])
-const attachmentBatches = new Map<string, MarkdownAttachmentBatchIntent>()
+const attachmentBatches = new Map<
+  string,
+  {
+    readonly batch: MarkdownAttachmentBatchIntent
+    capture?: MarkdownAttachmentCaptureObservation
+    readonly controller: AbortController
+    readonly files: Map<
+      MarkdownAttachmentItemIntent,
+      { readonly file: File; readonly controller: AbortController }
+    >
+  }
+>()
+let attachmentFileCleanupDepth = 0
+const assertAttachmentFileControlIdle = () => {
+  if (attachmentFileCleanupDepth !== 0)
+    throw new Error('editor-session-attachment-file-cleanup-in-progress')
+}
+const revokeAttachmentFiles = (itemIds: readonly string[]) => {
+  attachmentFileCleanupDepth += 1
+  try {
+    const itemControllers: AbortController[] = []
+    const batchControllers: AbortController[] = []
+    for (const itemId of itemIds) {
+      const item = attachmentItems.get(itemId)
+      if (!item) continue
+      for (const record of attachmentBatches.values()) {
+        const loan = record.files.get(item)
+        if (!loan) continue
+        record.files.delete(item)
+        itemControllers.push(loan.controller)
+        if (!record.files.size) {
+          record.capture = undefined
+          batchControllers.push(record.controller)
+        }
+        break
+      }
+    }
+    for (const controller of itemControllers) controller.abort()
+    for (const controller of batchControllers) controller.abort()
+  } finally {
+    attachmentFileCleanupDepth -= 1
+  }
+}
+const revokeAttachmentFile = (itemId: string) => revokeAttachmentFiles([itemId])
+
+const releaseAttachmentFiles = () => {
+  attachmentFileCleanupDepth += 1
+  try {
+    const records = [...attachmentBatches.values()]
+    attachmentBatches.clear()
+    attachmentItems.clear()
+    attachmentJobs.value = []
+    attachmentCaptureSession.clear()
+    for (const record of records) {
+      const loans = [...record.files.values()]
+      record.files.clear()
+      record.capture = undefined
+      for (const loan of loans) loan.controller.abort()
+      record.controller.abort()
+    }
+  } finally {
+    attachmentFileCleanupDepth -= 1
+  }
+}
+const legacyAttachmentAttempts = new WeakMap<MarkdownAttachmentItemIntent, number>()
+const attachmentJobBindings = new WeakMap<MarkdownAttachmentJob, {
+  readonly batch: MarkdownAttachmentBatchIntent
+  readonly item: MarkdownAttachmentItemIntent
+}>()
+const withAttachmentFile = (
+  batch: MarkdownAttachmentBatchIntent,
+  item: MarkdownAttachmentItemIntent,
+  consume: MarkdownAttachmentFileConsumer,
+): boolean => {
+  const record = attachmentBatches.get(batch.batchId)
+  const loan = record?.files.get(item)
+  const job = attachmentJobs.value.find(
+    (candidate) => candidate.itemId === item.itemId,
+  )
+  if (
+    editorReleased || sessionDisposed || attachmentPauseRequested.value ||
+    !record ||
+    record.batch !== batch ||
+    !loan ||
+    !record.capture ||
+    batch.items[item.order] !== item ||
+    attachmentItems.get(item.itemId) !== item ||
+    batch.signal.aborted ||
+    item.signal.aborted ||
+    batch.documentIdentity.id !== documentIdentity.id ||
+    batch.documentIdentity.epoch !== documentIdentity.epoch ||
+    batch.documentIdentity.id !==
+      (props.documentIdentity?.id ?? commandTrayId) ||
+    batch.documentIdentity.epoch !== (props.documentIdentity?.epoch ?? 0) ||
+    !job ||
+    attachmentJobBindings.get(toRaw(job))?.batch !== batch ||
+    attachmentJobBindings.get(toRaw(job))?.item !== item ||
+    job.documentIdentity?.id !== batch.documentIdentity.id ||
+    job.documentIdentity?.epoch !== batch.documentIdentity.epoch ||
+    job.revision !== batch.revision ||
+    job.attempt !== 1 ||
+    (job.phase !== 'pending' && job.phase !== 'progress')
+  )
+    return false
+  consume(loan.file, record.capture)
+  return true
+}
 const attachmentItems = new Map<
   string,
-  MarkdownAttachmentBatchIntent['items'][number] & { readonly sourceFile: File | null; readonly legacyContentAttempt: number | null }
+  MarkdownAttachmentBatchIntent['items'][number]
 >()
 const attachmentPresentations = computed(() =>
   attachmentJobs.value
@@ -2329,6 +2440,8 @@ type EditorOperation =
       readonly emitValue?: boolean
       readonly internalPropReset?: boolean
       readonly kind: 'transaction'
+      readonly attachmentJob?: MarkdownAttachmentJob
+      readonly observeTransaction?: (event: MarkdownEditorTransactionEvent) => void
       readonly mergeDirection?: MarkdownEditorInputMergeDirection
       readonly restoreSelection?: boolean
       readonly transaction: MarkdownEditorTransaction
@@ -2386,30 +2499,48 @@ const operationTransaction = (
   })
 }
 
+let editorReleased = false
+const isEditorDocumentCurrent = (
+  identity: MarkdownEditorDispatchResult['documentIdentity'],
+) =>
+  !editorReleased && !sessionDisposed &&
+  documentIdentity.id === identity.id &&
+  documentIdentity.epoch === identity.epoch &&
+  transactionStore.documentIdentity.id === identity.id &&
+  transactionStore.documentIdentity.epoch === identity.epoch &&
+  (props.documentIdentity?.id ?? commandTrayId) === identity.id &&
+  (props.documentIdentity?.epoch ?? 0) === identity.epoch
+
 const restoreTextareaSelection = async (
   selection: MarkdownEditorSelection,
   focus = true,
+  isCurrentResult: () => boolean = () => true,
 ) => {
-  if (isComposing.value) return
+  const identity = transactionStore.documentIdentity
+  const revision = transactionStore.revision
+  const value = transactionStore.value
+  const retainedSelection = transactionStore.selection
+  const current = () => {
+    const actualSelection = transactionStore.selection
+    return isEditorDocumentCurrent(identity) &&
+      transactionStore.revision === revision && transactionStore.value === value &&
+      actualSelection.start === retainedSelection.start &&
+      actualSelection.end === retainedSelection.end &&
+      actualSelection.direction === retainedSelection.direction && isCurrentResult()
+  }
+  if (isComposing.value || !current()) return
   await sessionLayoutResources.afterTick((isCurrent) => {
-    if (isComposing.value) return
+    if (!isCurrent() || isComposing.value || !current()) return
     const textarea = textareaRef.value
     if (!textarea) return
-
     restoringSelection = true
-    if (focus) textarea.focus()
-    if (!isCurrent() || isComposing.value || textareaRef.value !== textarea) {
-      restoringSelection = false
-      return
+    try {
+      if (focus) textarea.focus()
+      if (!isCurrent() || !current() || isComposing.value || textareaRef.value !== textarea) return
+      textarea.setSelectionRange(selection.start, selection.end, selection.direction)
+    } finally {
+      sessionLayoutResources.microtask(() => { restoringSelection = false })
     }
-    textarea.setSelectionRange(
-      selection.start,
-      selection.end,
-      selection.direction,
-    )
-    sessionLayoutResources.microtask(() => {
-      restoringSelection = false
-    })
   })
 }
 
@@ -2430,10 +2561,11 @@ const dispatchEditorOperation = (
         }
       : operation,
   )
-  const blocked =
+  const blocked = editorReleased || sessionDisposed || (
     operation.kind === 'transaction'
       ? !operation.allowBlocked && editingBlocked.value
       : editingBlocked.value
+  )
   const compositionBlocked =
     isComposing.value &&
     !(operation.kind === 'transaction' && operation.internalPropReset)
@@ -2457,6 +2589,23 @@ const dispatchEditorOperation = (
       : operation.kind === 'undo'
         ? transactionStore.undo()
         : transactionStore.redo()
+  const isCurrentResult = () =>
+    result.accepted &&
+    isEditorDocumentCurrent(result.documentIdentity) &&
+    transactionStore.revision === result.revision &&
+    transactionStore.value === result.value
+  const isCurrentSelection = () => {
+    const selection = transactionStore.selection
+    return (
+      isCurrentResult() &&
+      selection.start === result.selection.start &&
+      selection.end === result.selection.end &&
+      selection.direction === result.selection.direction
+    )
+  }
+  const isCurrentHistory = () =>
+    isCurrentResult() &&
+    historiesEqual(transactionStore.history, result.history)
 
   if (result.accepted && result.value !== previousValue) {
     pendingMetricsChange =
@@ -2500,12 +2649,16 @@ const dispatchEditorOperation = (
     contextualSurface.value = null
     contextualError.value = ''
   }
-  emit('transaction', toMarkdownEditorTransactionEvent(transaction, result))
-
-  if (result.accepted && result.value !== previousValue) {
+  const transactionEvent = toMarkdownEditorTransactionEvent(transaction, result)
+  const deletedItemIds: string[] = []
+  const rebaseAttachments =
+    result.accepted &&
+    (result.value !== previousValue ||
+      (operation.kind === 'transaction' && transaction.changes.length > 0))
+  if (rebaseAttachments) {
     const appliedChanges =
       operation.kind === 'transaction'
-        ? operation.transaction.changes
+        ? transaction.changes
         : (() => {
             const change = deriveMarkdownEditorChange(
               previousValue,
@@ -2513,33 +2666,52 @@ const dispatchEditorOperation = (
             )
             return change ? [change] : []
           })()
-    const ownedItemId =
-      operation.kind === 'transaction'
-        ? operation.transaction.metadata?.attachmentItemId
-        : undefined
+    const ownedJob =
+      operation.kind === 'transaction' ? operation.attachmentJob : undefined
     for (const job of attachmentJobs.value) {
-      if (job.itemId === ownedItemId || job.phase === 'deleted') continue
-      rebaseMarkdownAttachmentJob(job, appliedChanges, previousValue)
+      if (
+        (ownedJob && toRaw(job) === toRaw(ownedJob)) ||
+        job.phase === 'deleted'
+      )
+        continue
+      const rebasedJob = rebaseMarkdownAttachmentJob(
+        job,
+        appliedChanges,
+        previousValue,
+      )
+      if (rebasedJob.phase === 'deleted')
+        deletedItemIds.push(job.itemId ?? job.id)
     }
+  }
+  // The private accepted observer installs this operation's jobs after its own
+  // map, but before any abort listener or public callback can dispatch again.
+  if (operation.kind === 'transaction')
+    operation.observeTransaction?.(transactionEvent)
+  if (rebaseAttachments) {
+    revokeAttachmentFiles(deletedItemIds)
     triggerRef(attachmentJobs)
   }
+  // Keep the accepted transaction as historical evidence even after reentry.
+  emit('transaction', transactionEvent)
 
+  // Every outward callback can supersede this result, including selection-only
+  // dispatches that retain its content revision. Check the relevant current state
+  // again before each saved-value/selection/history effect.
   if (
-    result.accepted &&
+    isCurrentResult() &&
     result.value !== previousValue &&
     (operation.kind !== 'transaction' || operation.emitValue !== false)
   ) {
     emit(UPDATE_MODEL_EVENT, result.value)
-    emit(CHANGE_EVENT, result.value)
-    refreshLiveWindow('input')
+    if (isCurrentResult()) emit(CHANGE_EVENT, result.value)
+    if (isCurrentResult()) refreshLiveWindow('input')
   }
-  if (result.accepted) {
-    refreshWritingAidsDocument()
-    if (result.value !== previousValue) applyTypewriterScroll()
-  }
-  if (result.accepted) syncLanguageToolsState()
+  if (isCurrentResult()) refreshWritingAidsDocument()
+  if (isCurrentResult() && result.value !== previousValue)
+    applyTypewriterScroll()
+  if (isCurrentResult()) syncLanguageToolsState()
   if (
-    result.accepted &&
+    isCurrentSelection() &&
     (result.selection.start !== previousSelection.start ||
       result.selection.end !== previousSelection.end ||
       result.selection.direction !== previousSelection.direction)
@@ -2553,21 +2725,11 @@ const dispatchEditorOperation = (
       }),
     )
   }
-  if (result.accepted && !historiesEqual(previousHistory, result.history)) {
+  if (isCurrentHistory() && !historiesEqual(previousHistory, result.history)) {
     emit('history-change', result.history)
   }
-  if (
-    result.accepted &&
-    operation.restoreSelection !== false &&
-    operation.kind !== 'transaction'
-  ) {
-    void restoreTextareaSelection(result.selection)
-  } else if (
-    result.accepted &&
-    operation.kind === 'transaction' &&
-    operation.restoreSelection !== false
-  ) {
-    void restoreTextareaSelection(result.selection)
+  if (isCurrentSelection() && operation.restoreSelection !== false) {
+    void restoreTextareaSelection(result.selection, true, isCurrentSelection)
   }
   return result
 }
@@ -2655,13 +2817,18 @@ const captureAttachmentFiles = (
   eventFingerprint?: string,
   nodeId: string | null = null,
 ) => {
-  if (attachmentPauseRequested.value) return
+  if (attachmentPauseRequested.value || sessionDisposed || editorReleased ||
+    !isEditorDocumentCurrent(transactionStore.documentIdentity)) return
+  const controller = new AbortController()
+  const fileControllers = files.map(() => new AbortController())
   const captured = captureMarkdownAttachmentInput({
     sourceKind,
-    documentIdentity,
+    documentIdentity: Object.freeze({ ...documentIdentity }),
+    signal: controller.signal,
     revision: transactionStore.revision,
     anchor: { range: selection, nodeId },
-    files: files.map((file) => ({
+    files: files.map((file, index) => ({
+      signal: fileControllers[index]!.signal,
       name: file.name,
       mimeType: file.type,
       byteLength: file.size,
@@ -2684,14 +2851,112 @@ const captureAttachmentFiles = (
     captured.batch,
     localeText.value.attachments.uploading,
   )
-  const dispatched = dispatchTransaction(planned.transaction)
-  if (!dispatched.accepted) return captured
+  const placements = Object.freeze(
+    planned.jobs.map((job, index) =>
+      Object.freeze({
+        item: captured.batch.items[index]!,
+        range: Object.freeze(job.range!),
+      }),
+    ),
+  )
+  let transactionEvent: MarkdownEditorTransactionEvent | undefined
+  const dispatched = dispatchTransaction(
+    {
+      ...planned.transaction,
+      documentIdentity: captured.batch.documentIdentity,
+      expectedRevision: captured.batch.revision,
+    },
+    (event) => {
+      transactionEvent = event
+      if (!event.accepted) return
+      // Reentrant edits must map the actual original accepted jobs. Files remain
+      // unregistered until those jobs survive all synchronous dispatch callbacks.
+      for (const item of captured.batch.items)
+        attachmentItems.set(item.itemId, item)
+      for (const [index, job] of planned.jobs.entries()) {
+        attachmentJobBindings.set(toRaw(job), Object.freeze({
+          batch: captured.batch, item: captured.batch.items[index]!,
+        }))
+      }
+      attachmentJobs.value = [...attachmentJobs.value, ...planned.jobs]
+    },
+  )
+  const placementsCurrent = planned.jobs.every((job, index) => {
+    const item = captured.batch.items[index]!
+    const placement = placements[index]!
+    const range = job.range
+    return (
+      attachmentJobs.value.some((candidate) => toRaw(candidate) === job) &&
+      attachmentItems.get(item.itemId) === item &&
+      job.itemId === item.itemId &&
+      job.batchId === captured.batch.batchId &&
+      attachmentJobBindings.get(toRaw(job))?.batch === captured.batch &&
+      attachmentJobBindings.get(toRaw(job))?.item === item &&
+      job.documentIdentity?.id === captured.batch.documentIdentity.id &&
+      job.documentIdentity?.epoch === captured.batch.documentIdentity.epoch &&
+      job.revision === captured.batch.revision &&
+      job.attempt === 1 &&
+      (job.phase === 'pending' || job.phase === 'progress') &&
+      !captured.batch.signal.aborted &&
+      !item.signal.aborted &&
+      range &&
+      range.start >= 0 &&
+      range.start < range.end &&
+      range.end <= transactionStore.value.length &&
+      transactionStore.value.slice(range.start, range.end) ===
+        transactionEvent?.value.slice(
+          placement.range.start,
+          placement.range.end,
+        )
+    )
+  })
+  if (
+    editorReleased ||
+    !dispatched.accepted ||
+    !transactionEvent ||
+    !placementsCurrent ||
+    transactionStore.revision !== dispatched.revision ||
+    documentIdentity.id !== captured.batch.documentIdentity.id ||
+    documentIdentity.epoch !== captured.batch.documentIdentity.epoch ||
+    captured.batch.documentIdentity.id !==
+      (props.documentIdentity?.id ?? commandTrayId) ||
+    captured.batch.documentIdentity.epoch !==
+      (props.documentIdentity?.epoch ?? 0)
+  ) {
+    // Retire only this original capture before its signals invoke more listeners.
+    attachmentJobs.value = attachmentJobs.value.filter(
+      (job) => !planned.jobs.includes(toRaw(job)),
+    )
+    for (const item of captured.batch.items) {
+      if (attachmentItems.get(item.itemId) === item)
+        attachmentItems.delete(item.itemId)
+    }
+    controller.abort()
+    for (const itemController of fileControllers) itemController.abort()
+    return captured
+  }
 
-  attachmentBatches.set(captured.batch.batchId, captured.batch)
-  for (const item of captured.batch.items)
-    attachmentItems.set(item.itemId, Object.freeze({ ...item, sourceFile: files[item.order] ?? null, legacyContentAttempt: null }))
-  attachmentJobs.value = [...attachmentJobs.value, ...planned.jobs]
-  dispatchAttachmentBatch(captured.batch)
+  const capture = Object.freeze({
+    batch: captured.batch,
+    transaction: transactionEvent,
+    plan: planned,
+    placements,
+  })
+  attachmentBatches.set(captured.batch.batchId, {
+    batch: captured.batch,
+    capture,
+    controller,
+    files: new Map(
+      captured.batch.items.map((item, index) => [
+        item,
+        {
+          file: files[index]!,
+          controller: fileControllers[index]!,
+        },
+      ]),
+    ),
+  })
+  dispatchAttachmentBatch(captured.batch, capture)
   return captured
 }
 
@@ -3570,6 +3835,7 @@ watch(
     pendingInputOrigin = undefined
     atomicSession.value = null
     liveAtomic.value = null
+    releaseAttachmentFiles()
 
     documentIdentity.id = nextId
     documentIdentity.epoch = nextEpoch
@@ -3755,16 +4021,15 @@ onMounted(() => {
 })
 
 onBeforeUnmount(() => {
+  editorReleased = true
   sessionDisposed = true
+  releaseAttachmentFiles()
   transactionStore.releaseRetainedSnapshot()
   languageToolsController?.cancelSearch()
   clearSearchViewAliases()
   languageSearchParticipant = null
   languageToolsController = null
   abortPendingCommands()
-  attachmentCaptureSession.clear()
-  attachmentBatches.clear()
-  attachmentItems.clear()
   if (layoutGestureTimer) clearTimeout(layoutGestureTimer)
   cancelOwnedTypewriterFrames()
   typewriterResizeObserver?.disconnect()
@@ -4885,7 +5150,9 @@ const handleAttachmentPickerChange = (event: Event) => {
 
 const applyAttachmentResult = (result: MarkdownAttachmentProviderResult) => {
   const job = attachmentJobs.value.find(
-    (candidate) => candidate.itemId === result.itemId && candidate.batchId === result.batchId,
+    (candidate) =>
+      candidate.itemId === result.itemId &&
+      candidate.batchId === result.batchId,
   )
   if (!job || !job.itemId || sessionDisposed || attachmentPauseRequested.value ||
     (job.phase !== 'pending' && job.phase !== 'progress') ||
@@ -4899,30 +5166,110 @@ const applyAttachmentResult = (result: MarkdownAttachmentProviderResult) => {
   // Legacy content admission is independent of resource settlement. Only an
   // actual void-event attempt can use it; a future attempt always needs proof,
   // even if its dispatch prop was removed after starting.
-  const legacyContentAttempt = attachmentItems.get(job.itemId)?.legacyContentAttempt
+  const legacyItem = attachmentItems.get(job.itemId)
+  const legacyContentAttempt = legacyItem ? legacyAttachmentAttempts.get(legacyItem) : undefined
   const isLegacyContent = legacyContentAttempt === job.attempt && inspectMarkdownAttachmentDispatch(job) === null
   if (!isLegacyContent && !attachmentEmbedOwner.acceptsAttachmentResult(result)) return false
   if (result.status === 'progress') {
+    if (job.phase !== 'pending' && job.phase !== 'progress') return false
     const ratio = result.ratio ?? 0
     progressMarkdownAttachmentJob(job, ratio <= 1 ? ratio * 100 : ratio)
     triggerRef(attachmentJobs)
     return true
   }
-
-  const planned = planMarkdownAttachmentResolve(
-    transactionStore.value,
-    job,
-    result,
+  if (
+    result.status === 'resolved' &&
+    job.phase !== 'pending' &&
+    job.phase !== 'progress'
   )
+    return false
+
+  const source = transactionStore.value
+  const revision = transactionStore.revision
+  const identity = transactionStore.documentIdentity
+  const range = job.range
+  const attempt = job.attempt
+  const progress = job.progress
+  const item = attachmentItems.get(job.itemId ?? job.id)
+  const batch = job.batchId ? attachmentBatches.get(job.batchId) : undefined
+  const planned = planMarkdownAttachmentResolve(source, job, result)
+  const resolvedRange = job.range
+  // Until acceptance, abort callbacks must rebase the actual placeholder range.
+  if (planned.transaction) job.range = range
+  if (job.phase !== 'pending' && job.phase !== 'progress')
+    revokeAttachmentFile(job.itemId ?? job.id)
   triggerRef(attachmentJobs)
   if (!planned.transaction) return planned.accepted
-  return dispatchTransaction({
-    ...planned.transaction,
-    metadata: Object.freeze({ attachmentItemId: job.itemId }),
-  }).accepted
+
+  const current =
+    !sessionDisposed && !attachmentPauseRequested.value && !editorReleased &&
+    attachmentJobs.value.includes(job) &&
+    item &&
+    batch &&
+    range &&
+    resolvedRange &&
+    attachmentItems.get(item.itemId) === item &&
+    attachmentBatches.get(batch.batch.batchId) === batch &&
+    job.itemId === item.itemId &&
+    job.batchId === batch.batch.batchId &&
+    attachmentJobBindings.get(toRaw(job))?.batch === batch.batch &&
+    attachmentJobBindings.get(toRaw(job))?.item === item &&
+    job.documentIdentity?.id === batch.batch.documentIdentity.id &&
+    job.documentIdentity?.epoch === batch.batch.documentIdentity.epoch &&
+    job.revision === batch.batch.revision &&
+    job.attempt === attempt &&
+    toRaw(job).phase === 'resolved' &&
+    job.range === range &&
+    planned.transaction.changes.length === 1 &&
+    planned.transaction.changes[0]?.from === range.start &&
+    planned.transaction.changes[0]?.to === range.end &&
+    planned.transaction.changes[0]?.insert === planned.markdown &&
+    documentIdentity.id === identity.id &&
+    documentIdentity.epoch === identity.epoch &&
+    (props.documentIdentity?.id ?? commandTrayId) === identity.id &&
+    (props.documentIdentity?.epoch ?? 0) === identity.epoch &&
+    transactionStore.revision === revision &&
+    transactionStore.value === source
+  const refuseCompletion = () => {
+    if (
+      attachmentJobs.value.includes(job) &&
+      job.attempt === attempt &&
+      job.phase !== 'cancelled' &&
+      job.phase !== 'deleted' &&
+      job.phase !== 'document-abort'
+    ) {
+      job.phase = 'stale'
+      job.progress = progress
+      job.code = 'stale-completion'
+      triggerRef(attachmentJobs)
+    }
+    return false
+  }
+  if (!current) return refuseCompletion()
+
+  const dispatched = dispatchTransaction(
+    {
+      ...planned.transaction,
+      documentIdentity: identity,
+      expectedRevision: revision,
+      metadata: Object.freeze({ attachmentItemId: job.itemId }),
+    },
+    (event) => {
+      // Publish the resolved range with the actual accepted result/map, before observers.
+      if (event.accepted) {
+        job.range = resolvedRange
+        triggerRef(attachmentJobs)
+      }
+    },
+    job,
+  )
+  return dispatched.accepted || refuseCompletion()
 }
 
-const dispatchAttachmentBatch = (batch: MarkdownAttachmentBatchIntent) => {
+const dispatchAttachmentBatch = (
+  batch: MarkdownAttachmentBatchIntent,
+  capture?: MarkdownAttachmentCaptureObservation,
+) => {
   opaqueAttachmentResourcesObserved.value = true
   const dispatch = props.attachmentDispatch
   if (!dispatch) {
@@ -4932,10 +5279,12 @@ const dispatchAttachmentBatch = (batch: MarkdownAttachmentBatchIntent) => {
       const job = attachmentJobs.value.find((candidate) => candidate.itemId === item.itemId && candidate.batchId === batch.batchId)
       const retainedItem = attachmentItems.get(item.itemId)
       if (job && retainedItem && !inspectMarkdownAttachmentDispatch(job)) {
-        attachmentItems.set(item.itemId, Object.freeze({ ...retainedItem, legacyContentAttempt: job.attempt }))
+        legacyAttachmentAttempts.set(retainedItem, job.attempt)
       }
     }
-    emit('upload-image', batch)
+    const record = attachmentBatches.get(batch.batchId)
+    const observation = record?.batch === batch && record.capture === capture ? capture : undefined
+    emit('upload-image', batch, observation)
     return
   }
   for (const item of batch.items) {
@@ -4943,7 +5292,12 @@ const dispatchAttachmentBatch = (batch: MarkdownAttachmentBatchIntent) => {
     if (!job) continue
     const attempt = job.attempt
     const identity = Object.freeze({ ...transactionStore.documentIdentity })
-    const file = attachmentItems.get(item.itemId)?.sourceFile ?? null
+    const record = attachmentBatches.get(batch.batchId)
+    const original = record?.batch.items[item.order]
+    const file = original === item && attachmentItems.get(item.itemId) === item &&
+      attachmentJobBindings.get(toRaw(job))?.batch === record?.batch &&
+      attachmentJobBindings.get(toRaw(job))?.item === item
+      ? record?.files.get(item)?.file ?? null : null
     void attachmentEmbedOwner.runAttachmentDispatch(job, (admitProgress) => dispatch(Object.freeze({
       batch,
       item,
@@ -4962,6 +5316,7 @@ const dispatchAttachmentBatch = (batch: MarkdownAttachmentBatchIntent) => {
       // Missing/throwing dispatch without a future remains unknown and pending.
       job.phase = 'rejected'
       job.code = 'attachment-dispatch-rejected'
+      revokeAttachmentFile(item.itemId)
     }).finally(() => {
       // Refresh retry eligibility from real settlement even for cancelled jobs.
       triggerRef(attachmentJobs)
@@ -4976,7 +5331,8 @@ const runAttachmentAction = (
   const job = attachmentJobs.value.find(
     (candidate) => candidate.itemId === itemId,
   )
-  if (!job) return
+  if (!job || sessionDisposed || editorReleased || attachmentPauseRequested.value) return
+  revokeAttachmentFile(itemId)
   if (action === 'cancel') {
     cancelMarkdownAttachmentJob(job)
   } else if (action === 'retry') {
@@ -4985,7 +5341,7 @@ const runAttachmentAction = (
       // Unknown legacy settlement or a still-running attempt cannot be retried.
       return
     }
-    const batch = job.batchId ? attachmentBatches.get(job.batchId) : undefined
+    const batch = job.batchId ? attachmentBatches.get(job.batchId)?.batch : undefined
     const item = batch?.items.find((candidate) => candidate.itemId === itemId)
     if (batch && item) {
       dispatchAttachmentBatch(Object.freeze({ ...batch, items: Object.freeze([item]) }))
@@ -4995,7 +5351,7 @@ const runAttachmentAction = (
     dispatchTransaction({
       ...planned.transaction,
       metadata: Object.freeze({ attachmentItemId: job.itemId }),
-    })
+    }, undefined, job)
   }
   triggerRef(attachmentJobs)
   applyLiveLayout('block-height-change')
@@ -5189,8 +5545,12 @@ attachmentEmbedOwner.bindAttachmentInputs({
 })
 const attachmentResourceParticipant: MarkdownEditorSessionResourceParticipant = {
   ownerRef: 'attachment-embed',
-  inspect: () => attachmentEmbedOwner.participant.inspect(),
+  inspect: () => {
+    assertAttachmentFileControlIdle()
+    return attachmentEmbedOwner.participant.inspect()
+  },
   pause() {
+    assertAttachmentFileControlIdle()
     // Never freeze the result gate while a consumer upload still needs to
     // deliver its terminal response. No cancellation acknowledgment exists.
     if (attachmentJobs.value.some((job) => job.phase === 'pending' || job.phase === 'progress')) {
@@ -5200,6 +5560,7 @@ const attachmentResourceParticipant: MarkdownEditorSessionResourceParticipant = 
     return attachmentEmbedOwner.participant.pause()
   },
   resume() {
+    assertAttachmentFileControlIdle()
     const state = attachmentEmbedOwner.participant.resume()
     attachmentPauseRequested.value = false
     return state
@@ -5872,10 +6233,16 @@ const handleKeydown = (event: KeyboardEvent) => {
   }
 }
 
-const dispatchTransaction = (transaction: MarkdownEditorTransaction) => {
+const dispatchTransaction = (
+  transaction: MarkdownEditorTransaction,
+  observeTransaction?: (event: MarkdownEditorTransactionEvent) => void,
+  attachmentJob?: MarkdownAttachmentJob,
+) => {
   const result = dispatchEditorOperation({
     kind: 'transaction',
     transaction,
+    observeTransaction,
+    attachmentJob,
   })
   selectionTick.value += 1
   return result
@@ -6285,7 +6652,7 @@ const sessionBinding = createMarkdownEditorSessionBinding({
   inspectAttachmentResourceSource: () => {
     // Read the original single pipeline. Unknown legacy settlement still throws;
     // measured source custody never proves consumer resources or complete pause.
-    const inspection = attachmentEmbedOwner.participant.inspect()
+    const inspection = attachmentResourceParticipant.inspect()
     const usage = inspection.usage
     return Object.freeze({
       complete: false as const,
@@ -6401,7 +6768,8 @@ defineExpose({
   closeSearch,
   closeCommandPalette,
   applyAttachmentResult,
-  dispatchTransaction,
+  withAttachmentFile,
+  dispatchTransaction: (transaction: MarkdownEditorTransaction) => dispatchTransaction(transaction),
   insertMarkdownAtCursor,
   openSearch,
   openCommandPalette,

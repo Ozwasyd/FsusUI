@@ -28,6 +28,7 @@ import type {
   MarkdownAttachmentCaptureSession,
   MarkdownAttachmentBatchIntent,
   MarkdownAttachmentItemIntent,
+  MarkdownAttachmentCaptureObservation,
 } from './markdown-editor-attachment'
 import type {
   MarkdownEditorSessionResourceInspection,
@@ -43,7 +44,14 @@ export interface MarkdownAttachmentEmbedOwnerBindings {
   readonly readAttachmentJobs: () => readonly MarkdownAttachmentJob[]
   readonly readAttachmentBatches: () => ReadonlyMap<
     string,
-    MarkdownAttachmentBatchIntent
+    MarkdownAttachmentBatchIntent | {
+      readonly batch: MarkdownAttachmentBatchIntent
+      readonly capture?: MarkdownAttachmentCaptureObservation
+      readonly files: ReadonlyMap<MarkdownAttachmentItemIntent, {
+        readonly file: File
+        readonly controller: AbortController
+      }>
+    }
   >
   readonly readAttachmentItems: () => ReadonlyMap<
     string,
@@ -133,7 +141,10 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
   const readAttachmentJobs: MarkdownAttachmentEmbedOwnerBindings['readAttachmentJobs'] =
     () => Reflect.apply(readAttachmentJobsBinding, bindings, [])
   const mapSize = Object.getOwnPropertyDescriptor(Map.prototype, 'size')!.get!
-  const readContainerSize = (container: ReadonlyMap<string, unknown>) => {
+  const mapValues = Map.prototype.values
+  const readContainerValues = <T>(container: ReadonlyMap<unknown, T>): IterableIterator<T> =>
+    Reflect.apply(mapValues, container, [])
+  const readContainerSize = (container: ReadonlyMap<unknown, unknown>) => {
     if (Object.getPrototypeOf(container) !== Map.prototype)
       throw new Error('editor-session-attachment-container-unavailable')
     return Reflect.apply(mapSize, container, []) as number
@@ -542,6 +553,18 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
     const jobCount = jobs.length
     const batchCount = readContainerSize(attachmentBatches)
     const itemCount = readContainerSize(attachmentItems)
+    // Read the actual revocable records from the same original batch Map.
+    // Metadata-only owners have no File loans; native records retain their own
+    // File/controller entries and accepted capture placements until revocation.
+    let fileMemoryUnits = 0
+    for (const value of readContainerValues(attachmentBatches)) {
+      const record = snapshotPassiveRecord(value)
+      if (!record) throw new Error('editor-session-attachment-file-record-unavailable')
+      if ('files' in record) {
+        fileMemoryUnits += 1 + readContainerSize(record.files) * 2
+        if (record.capture) fileMemoryUnits += 1 + record.capture.placements.length
+      }
+    }
     if (boundaryRef !== boundary || frame.version !== attachmentObservationRef)
       throw new Error('editor-session-attachment-embed-inspection-reentered')
     const requests = new Set([...active].map((operation) => operation.request))
@@ -598,6 +621,7 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
           attachmentTasks.size +
           batchCount +
           itemCount +
+          fileMemoryUnits +
           capture.memoryUnits +
           results.size +
           embedAttempts.size +
