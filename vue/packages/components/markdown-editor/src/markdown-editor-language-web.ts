@@ -227,6 +227,7 @@ export const bindMarkdownWebLanguageTools = (
       Number(currentConfig !== undefined) +
       Number(currentAnchorMap !== undefined) +
       Number(currentProjection !== undefined),
+    retainsSource: (source) => currentSource === source,
     setPausedAttributes: () => applyAttributes(),
   })
 
@@ -397,20 +398,39 @@ export const bindMarkdownWebLanguageTools = (
         'previousTask' | 'onTaskCreated'
       >,
     ) {
+      const expected = Object.freeze({
+        documentId: documentIdentity.id,
+        documentEpoch: documentIdentity.epoch,
+        revision: currentRevision,
+        source: currentSource,
+      })
+      // Read each declared caller field once. Accessors may change the editor;
+      // they must not rewrite the identity expected by this invocation.
+      const request = Object.freeze({
+        budget: input.budget,
+        documentId: input.documentId,
+        documentEpoch: input.documentEpoch,
+        mode: input.mode,
+        queryText: input.queryText,
+        requestId: input.requestId,
+        revision: input.revision,
+        source: input.source,
+      })
+      const isCurrent = () =>
+        expected.documentId === documentIdentity.id &&
+        expected.documentEpoch === documentIdentity.epoch &&
+        expected.revision === currentRevision &&
+        expected.source === currentSource
       if (
-        input.documentId !== documentIdentity.id ||
-        input.documentEpoch !== documentIdentity.epoch ||
-        input.revision !== currentRevision ||
-        input.source !== currentSource
+        !isCurrent() ||
+        request.documentId !== expected.documentId ||
+        request.documentEpoch !== expected.documentEpoch ||
+        request.revision !== expected.revision ||
+        request.source !== expected.source
       )
         throw new Error('editor-session-language-search-stale-document')
-      const result = resources.executeSearch(input)
-      if (
-        input.documentId !== documentIdentity.id ||
-        input.documentEpoch !== documentIdentity.epoch ||
-        input.revision !== currentRevision ||
-        input.source !== currentSource
-      ) {
+      const result = resources.executeSearch(request)
+      if (!isCurrent()) {
         resources.cancelSearch()
         throw new Error('editor-session-language-search-stale-document')
       }
