@@ -1453,6 +1453,6 @@ describe('Markdown editor session command resource ownership', () => {
     expect(resources.canInspect()).toBe(false)
     expect(() => resources.participant.inspect()).toThrow('editor-session-external-command-resource-owner-unavailable')
     resources.finish(attempt)
-    expect(resources.canInspect()).toBe(true)
+    expect(resources.canInspect()).toBe(false)
   })
 })

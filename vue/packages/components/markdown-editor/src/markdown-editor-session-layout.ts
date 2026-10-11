@@ -29,13 +29,13 @@ export const createMarkdownEditorSessionLayoutResources = (
         (!sameRevision || current.revision === context.revision)
     }
   }
-  const afterTick = (run: () => void): Promise<void> => {
+  const afterTick = (run: (isCurrent: () => boolean) => void): Promise<void> => {
     if (pauseRequested || readContext().disposed) return Promise.resolve()
     const token = {}
     const isCurrent = lease()
     pending.add(token)
     return nextTick(() => {
-      try { if (isCurrent()) run() } finally { pending.delete(token) }
+      try { if (isCurrent()) run(isCurrent) } finally { pending.delete(token) }
     })
   }
   const microtask = (run: () => void) => {

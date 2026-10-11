@@ -1153,7 +1153,6 @@ import {
   stabilizeMarkdownEditorProjection,
 } from '../../../wasm/markdown-runtime'
 import {
-  defaultMarkdownEditorCommands,
   isMarkdownEditorCommandEnabled,
   isMarkdownEditorCommandVisible,
   markdownEditorEmits,
@@ -1322,7 +1321,7 @@ import {
 import { planMarkdownOutlineReveal } from './markdown-editor-outline-active'
 import { createMarkdownEditorSessionBinding } from './markdown-editor-session'
 import { createMarkdownAttachmentEmbedResourceOwner } from './markdown-editor-attachment-embed-owner'
-import { createMarkdownEditorSessionCommandResources } from './markdown-editor-session-command-resources'
+import { createMarkdownEditorSessionCommandResources, isMarkdownEditorSessionOwnedCommand } from './markdown-editor-session-command-resources'
 import type { MarkdownRendererLastValidRender } from '../../markdown-renderer/src/markdown-renderer-session-resources'
 import { createMarkdownEditorSessionLayoutResources } from './markdown-editor-session-layout'
 import { createMarkdownEditorFrameResourceParticipant } from './markdown-editor-session-resources'
@@ -2255,7 +2254,8 @@ const commandResources = createMarkdownEditorSessionCommandResources(() => ({
   documentIdentity: transactionStore.documentIdentity,
   disposed: sessionDisposed,
   commands: props.commands,
-}), (command) => defaultMarkdownEditorCommands.includes(command))
+}), isMarkdownEditorSessionOwnedCommand)
+watch(() => props.commands, commandResources.observeConfiguredCommands, { flush: 'sync' })
 const commandRuntimeStates = ref(
   new Map<string, MarkdownEditorCommandRuntimeState>(),
 )
@@ -2362,13 +2362,17 @@ const restoreTextareaSelection = async (
   focus = true,
 ) => {
   if (isComposing.value) return
-  await sessionLayoutResources.afterTick(() => {
+  await sessionLayoutResources.afterTick((isCurrent) => {
     if (isComposing.value) return
     const textarea = textareaRef.value
     if (!textarea) return
 
     restoringSelection = true
     if (focus) textarea.focus()
+    if (!isCurrent() || isComposing.value || textareaRef.value !== textarea) {
+      restoringSelection = false
+      return
+    }
     textarea.setSelectionRange(
       selection.start,
       selection.end,

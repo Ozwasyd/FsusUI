@@ -1,7 +1,22 @@
+import { defaultMarkdownEditorCommands } from './markdown-editor'
 import type { MarkdownEditorCommand } from './markdown-editor'
 import type { MarkdownEditorCommandSession } from './markdown-editor-command-async'
 import type { MarkdownEditorDocumentIdentity } from './markdown-editor-transaction'
 import type { MarkdownEditorSessionResourceParticipant } from './markdown-editor-session-resources'
+
+// Trust the original implementation functions, not mutable public object identity.
+const originalCommandFunctions = new WeakMap(defaultMarkdownEditorCommands.map((command) => [
+  command, Object.freeze({ run: command.run, when: command.when, enabled: command.enabled }),
+]))
+export const isMarkdownEditorSessionOwnedCommand = (command: MarkdownEditorCommand) => {
+  const original = originalCommandFunctions.get(command)
+  if (!original) return false
+  const descriptors = Object.getOwnPropertyDescriptors(command)
+  return (['run', 'when', 'enabled'] as const).every((key) => {
+    const descriptor = descriptors[key]
+    return descriptor ? 'value' in descriptor && descriptor.value === original[key] : original[key] === undefined
+  })
+}
 
 /** Resource accounting only; command state remains on the original attempt. */
 export const createMarkdownEditorSessionCommandResources = (
@@ -19,8 +34,15 @@ export const createMarkdownEditorSessionCommandResources = (
   let lifecycleEpoch = 0
   let pauseRequested = false
 
-  const canInspect = () => readContext().commands.every(isEditorOwned) &&
-    [...pending.values()].every((attempt) => attempt.editorOwned)
+  let opaqueResourcesObserved = false
+  const observeConfiguredCommands = () => {
+    if (!readContext().commands.every(isEditorOwned)) opaqueResourcesObserved = true
+  }
+  observeConfiguredCommands()
+  const canInspect = () => {
+    observeConfiguredCommands()
+    return !opaqueResourcesObserved && [...pending.values()].every((attempt) => attempt.editorOwned)
+  }
   const isCurrent = (session: MarkdownEditorCommandSession) => {
     const attempt = pending.get(session)
     const context = readContext()
@@ -74,12 +96,15 @@ export const createMarkdownEditorSessionCommandResources = (
   return Object.freeze({
     participant,
     canInspect,
+    observeConfiguredCommands,
     isCurrent,
     abortPending,
     get paused() { return pauseRequested },
     begin(session: MarkdownEditorCommandSession, command: MarkdownEditorCommand) {
       if (pauseRequested || readContext().disposed) throw new Error('editor-session-command-owner-paused-or-disposed')
-      pending.set(session, { lifecycleEpoch, editorOwned: isEditorOwned(command) })
+      const editorOwned = isEditorOwned(command)
+      if (!editorOwned) opaqueResourcesObserved = true
+      pending.set(session, { lifecycleEpoch, editorOwned })
     },
     finish(session: MarkdownEditorCommandSession) { pending.delete(session) },
   })
