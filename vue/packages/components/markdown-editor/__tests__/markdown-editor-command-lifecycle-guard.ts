@@ -21,6 +21,132 @@ const path = (node?: ts.Node): string | undefined => {
   }
   return undefined
 }
+const samePath = (node: ts.Node | undefined, expected: string | undefined) =>
+  !!expected && path(node) === expected
+const root = (node?: ts.Node): string | undefined => {
+  if (!node) return undefined
+  if (ts.isIdentifier(node)) return node.text
+  if (
+    ts.isPropertyAccessExpression(node) ||
+    ts.isElementAccessExpression(node) ||
+    ts.isParenthesizedExpression(node) ||
+    ts.isAsExpression(node) ||
+    ts.isNonNullExpression(node)
+  )
+    return root(node.expression)
+  return undefined
+}
+const writes = (node: ts.Node, bindings: Set<string>) => {
+  const owned = (target: ts.Node | undefined) =>
+    bindings.has(root(target) ?? '')
+  return descendants(node).some((entry) => {
+    if (
+      ts.isBinaryExpression(entry) &&
+      entry.operatorToken.kind >= ts.SyntaxKind.FirstAssignment &&
+      entry.operatorToken.kind <= ts.SyntaxKind.LastAssignment
+    )
+      return descendants(entry.left).some(owned)
+    if (ts.isDeleteExpression(entry)) return owned(entry.expression)
+    if (ts.isPrefixUnaryExpression(entry) || ts.isPostfixUnaryExpression(entry))
+      return (
+        (entry.operator === ts.SyntaxKind.PlusPlusToken ||
+          entry.operator === ts.SyntaxKind.MinusMinusToken) &&
+        owned(entry.operand)
+      )
+    return (
+      ts.isCallExpression(entry) &&
+      [
+        'Object.assign',
+        'Object.defineProperty',
+        'Object.defineProperties',
+        'Reflect.set',
+        'Reflect.deleteProperty',
+        'Reflect.defineProperty',
+      ].includes(path(entry.expression) ?? '') &&
+      owned(entry.arguments[0])
+    )
+  })
+}
+const aliases = (nodes: ts.Node[], original: string[]) => {
+  const bindings = new Set(original)
+  let previousSize = -1
+  while (previousSize !== bindings.size) {
+    previousSize = bindings.size
+    for (const entry of nodes) {
+      const target = ts.isVariableDeclaration(entry)
+        ? identifier(entry.name)
+        : ts.isBinaryExpression(entry) &&
+            entry.operatorToken.kind === ts.SyntaxKind.EqualsToken
+          ? identifier(entry.left)
+          : undefined
+      const value = ts.isVariableDeclaration(entry)
+        ? entry.initializer
+        : ts.isBinaryExpression(entry)
+          ? entry.right
+          : undefined
+      if (target && bindings.has(root(value) ?? '')) bindings.add(target)
+    }
+  }
+  return bindings
+}
+const truth = (node: ts.Expression): boolean | undefined => {
+  if (node.kind === ts.SyntaxKind.TrueKeyword) return true
+  if (node.kind === ts.SyntaxKind.FalseKeyword) return false
+  if (ts.isParenthesizedExpression(node)) return truth(node.expression)
+  if (
+    ts.isPrefixUnaryExpression(node) &&
+    node.operator === ts.SyntaxKind.ExclamationToken
+  ) {
+    const value = truth(node.operand)
+    return value === undefined ? undefined : !value
+  }
+  return undefined
+}
+// Bounded source reachability: unknown conditions retain both paths; a definite
+// exit, constant branch, or unbounded loop cannot lend dead cancellation calls.
+const canContinue = (statement: ts.Statement): boolean => {
+  if (ts.isReturnStatement(statement) || ts.isThrowStatement(statement))
+    return false
+  if (ts.isBlock(statement)) return statement.statements.every(canContinue)
+  if (ts.isIfStatement(statement)) {
+    const condition = truth(statement.expression)
+    const thenContinues = canContinue(statement.thenStatement)
+    const elseContinues =
+      !statement.elseStatement || canContinue(statement.elseStatement)
+    return condition === true
+      ? thenContinues
+      : condition === false
+        ? elseContinues
+        : thenContinues || elseContinues
+  }
+  if (ts.isWhileStatement(statement) || ts.isDoStatement(statement))
+    return (
+      truth(statement.expression) !== true &&
+      (!ts.isDoStatement(statement) || canContinue(statement.statement))
+    )
+  if (ts.isForStatement(statement))
+    return !!statement.condition && truth(statement.condition) !== true
+  if (ts.isForOfStatement(statement) || ts.isForInStatement(statement))
+    return canContinue(statement.statement)
+  // These require a separate control-flow proof rather than presence matching.
+  if (
+    ts.isTryStatement(statement) ||
+    ts.isSwitchStatement(statement) ||
+    ts.isLabeledStatement(statement) ||
+    ts.isBreakStatement(statement) ||
+    ts.isContinueStatement(statement)
+  )
+    return false
+  return true
+}
+const reachable = (
+  block: ts.Block | undefined,
+  statement: ts.Statement | undefined,
+) => {
+  if (!block || !statement) return false
+  const index = block.statements.indexOf(statement)
+  return index >= 0 && block.statements.slice(0, index).every(canContinue)
+}
 const calls = (node?: ts.Node) => descendants(node).filter(ts.isCallExpression)
 const variables = (node?: ts.Node) =>
   descendants(node).filter(ts.isVariableDeclaration)
@@ -61,7 +187,7 @@ export const commandLifecycleViolations = (component: string): string[] => {
   const check = (condition: unknown, rule: string) => {
     if (!condition) violations.push(rule)
   }
-  const imported = (exported: string, module: string) => {
+  const imported = (exported: string, module: string, typeOnly = false) => {
     for (const statement of source.statements) {
       if (
         !ts.isImportDeclaration(statement) ||
@@ -74,7 +200,10 @@ export const commandLifecycleViolations = (component: string): string[] => {
         (candidate) =>
           (candidate.propertyName ?? candidate.name).text === exported,
       )
-      if (entry && !entry.isTypeOnly && !statement.importClause?.isTypeOnly)
+      if (
+        entry &&
+        (typeOnly || (!entry.isTypeOnly && !statement.importClause?.isTypeOnly))
+      )
         return entry.name.text
     }
     return undefined
@@ -151,6 +280,22 @@ export const commandLifecycleViolations = (component: string): string[] => {
     return violations
   const session = identifier(sessionDeclaration.name)
   const key = path(creation.arguments[0])
+  const owner = run.parent
+  const parameter = ts.isArrowFunction(owner) ? owner.parameters[0] : undefined
+  const command = identifier(parameter?.name)
+  check(
+    command &&
+      parameter?.type &&
+      ts.isTypeReferenceNode(parameter.type) &&
+      samePath(
+        parameter.type.typeName,
+        imported('MarkdownEditorCommand', './markdown-editor', true),
+      ) &&
+      !shadowed(command) &&
+      samePath(creation.arguments[0], `${command}.key`) &&
+      !writes(run, aliases(descendants(run), [command])),
+    'original-command-key',
+  )
   const registry = identifier(property(creation.arguments[2], 'activeSessions'))
   const registryDeclaration = topVariables.find(
     (entry) => identifier(entry.name) === registry,
@@ -174,7 +319,7 @@ export const commandLifecycleViolations = (component: string): string[] => {
     )
       return false
     return (
-      path(statement.expression.arguments[0]) === key &&
+      samePath(statement.expression.arguments[0], key) &&
       identifier(statement.expression.arguments[1]) === session
     )
   })
@@ -190,7 +335,7 @@ export const commandLifecycleViolations = (component: string): string[] => {
         calls(statement).some(
           (call) =>
             path(call.expression) === 'commandRuntimeStates.value.set' &&
-            path(call.arguments[0]) === key &&
+            samePath(call.arguments[0], key) &&
             isLiteral(property(call.arguments[1], 'state'), 'pending'),
         ) && statement.pos < attempt.pos,
     ),
@@ -216,11 +361,32 @@ export const commandLifecycleViolations = (component: string): string[] => {
     (entry) =>
       identifier(entry.name) === identifier(executionCall?.arguments[1]),
   )
+  const supplied = identifier(context?.name)
+  // Track local aliases as well as the direct context/controller binding. A
+  // write through either alias changes the object supplied to the executor.
+  const beforeExecution = descendants(run).filter(
+    (entry) =>
+      entry.getStart(source) >= sessionDeclaration.end &&
+      entry.end <= (executionCall?.getStart(source) ?? -1),
+  )
+  const bindings = aliases(
+    beforeExecution,
+    [supplied, session].filter((name): name is string => !!name),
+  )
+  check(
+    samePath(executionCall?.arguments[0], command),
+    'execute-original-command',
+  )
   check(
     context &&
       path(property(context.initializer, 'signal')) ===
         `${session}.abort.signal` &&
-      context.pos < (awaited?.pos ?? -1),
+      context.pos < (awaited?.pos ?? -1) &&
+      ts.isObjectLiteralExpression(context.initializer!) &&
+      context.initializer.properties.at(-1) &&
+      ts.isPropertyAssignment(context.initializer.properties.at(-1)!) &&
+      identifier(context.initializer.properties.at(-1)!.name) === 'signal' &&
+      !beforeExecution.some((entry) => writes(entry, bindings)),
     'original-session-signal',
   )
   const awaitedIndex = attempt.tryBlock.statements.findIndex((statement) =>
@@ -242,7 +408,7 @@ export const commandLifecycleViolations = (component: string): string[] => {
       condition.operatorToken.kind === operator &&
       isCall(condition.left, `${registry}.get`) &&
       ts.isCallExpression(condition.left) &&
-      path(condition.left.arguments[0]) === key &&
+      samePath(condition.left.arguments[0], key) &&
       identifier(condition.right) === session
     )
   }
@@ -328,7 +494,7 @@ export const commandLifecycleViolations = (component: string): string[] => {
         calls(statement.thenStatement).some(
           (call) =>
             path(call.expression) === `${registry}.delete` &&
-            path(call.arguments[0]) === key,
+            samePath(call.arguments[0], key),
         ),
     ),
     'retire-original-session',
@@ -347,15 +513,16 @@ export const commandLifecycleViolations = (component: string): string[] => {
   const clear = cancellation?.statements.find((statement) =>
     directCall(statement, `${registry}.clear`),
   )
-  check(
+  const sharedCancellation =
     !shadowed(abort, cancellation) &&
-      !shadowed(registry, cancellation) &&
-      cancelExpression &&
-      isCall(cancelExpression.arguments[0], `${registry}.values`) &&
-      clear &&
-      cancelExpression.end < clear.getStart(source),
-    'abort-shared-sessions',
-  )
+    !shadowed(registry, cancellation) &&
+    cancelExpression &&
+    isCall(cancelExpression.arguments[0], `${registry}.values`) &&
+    clear &&
+    cancelExpression.end < clear.getStart(source) &&
+    reachable(cancellation, cancelCall) &&
+    reachable(cancellation, clear)
+  check(sharedCancellation, 'abort-shared-sessions')
   check(
     cancellation?.statements.some((statement) => {
       if (
@@ -365,9 +532,16 @@ export const commandLifecycleViolations = (component: string): string[] => {
       )
         return false
       const owned = identifier(statement.initializer.declarations[0]?.name)
-      return calls(statement.statement).some(
-        (call) => path(call.expression) === `${owned}.abort.abort`,
+      if (
+        !owned ||
+        !ts.isBlock(statement.statement) ||
+        !reachable(cancellation, statement)
       )
+        return false
+      const abortStatement = statement.statement.statements.find((entry) =>
+        directCall(entry, `${owned}.abort.abort`),
+      )
+      return reachable(statement.statement, abortStatement)
     }),
     'abort-original-controllers',
   )
@@ -379,12 +553,15 @@ export const commandLifecycleViolations = (component: string): string[] => {
     .map((statement) => statement.expression)
     .filter(ts.isCallExpression)
   const cancels = (callback?: ts.Node) =>
+    !!sharedCancellation &&
     !!callback &&
     ts.isArrowFunction(callback) &&
     ts.isBlock(callback.body) &&
     !shadowed('abortPendingCommands', callback.body) &&
-    callback.body.statements.some((statement) =>
-      directCall(statement, 'abortPendingCommands'),
+    callback.body.statements.some(
+      (statement) =>
+        directCall(statement, 'abortPendingCommands') &&
+        reachable(callback.body as ts.Block, statement),
     )
   const watches = hooks.filter((call) => isCall(call, watch))
   check(

@@ -572,3 +572,102 @@ describe('Markdown editor command lifecycle source guard controls', () => {
     expect(commandLifecycleViolations(extended)).toEqual([])
   })
 })
+
+describe('Command lifecycle guard execution-boundary regressions', () => {
+  const component = readEditorSource('markdown-editor.vue')
+  const replace = (from: string, to: string) => {
+    expect(component.split(from)).toHaveLength(2)
+    return component.replace(from, to)
+  }
+  const execute = '    const result = await runMarkdownEditorCommand(command, context)'
+
+  it.each([
+    ['an aliased context signal write', 'const loan = context\n    loan.signal = commandContextSignal'],
+    ['a reassigned context alias', 'let loan\n    loan = context\n    loan.signal = commandContextSignal'],
+    ['an element-access signal write', "context['signal'] = commandContextSignal"],
+    ['a context replacement', 'context = { ...context, signal: commandContextSignal }'],
+    ['a destructured signal write', '[context.signal] = [commandContextSignal]'],
+    ['a deleted signal', 'delete context.signal'],
+    ['an Object.assign signal write', 'Object.assign(context, { signal: commandContextSignal })'],
+    ['an aliased Object.assign write', 'const loan = context\n    Object.assign(loan, { signal: commandContextSignal })'],
+    ['a Reflect.set signal write', "Reflect.set(context, 'signal', commandContextSignal)"],
+    ['an Object.defineProperty signal write', "Object.defineProperty(context, 'signal', { value: commandContextSignal })"],
+    ['an aliased controller replacement', 'const loan = session\n    loan.abort = foreignAbort'],
+  ] as const)('rejects %s before the real executor', (_name, write) => {
+    expect(commandLifecycleViolations(replace(execute, `    ${write}\n${execute}`))).toContain('original-session-signal')
+  })
+
+  it.each([
+    ['a block return', '{ return }'],
+    ['a throw', "throw new Error('cancelled')"],
+    ['a constant true exit', 'if (true) return'],
+    ['a negated constant exit', 'if (!false) return'],
+    ['two exiting branches', 'if (commandContextSignal.aborted) return; else return'],
+    ['an infinite while loop', 'while (true) {}'],
+    ['an infinite for loop', 'for (;;) {}'],
+  ] as const)('rejects %s before the cancellation owner', (_name, exit) => {
+    expect(commandLifecycleViolations(replace('const abortPendingCommands = () => {', `const abortPendingCommands = () => {\n  ${exit}`))).toContain('abort-shared-sessions')
+  })
+
+  it('rejects unreachable cleanup after the genuine abort helper', () => {
+    expect(commandLifecycleViolations(replace('commandSessions.clear()', 'return\n  commandSessions.clear()'))).toContain('abort-shared-sessions')
+  })
+
+  it('rejects a replaced original controller before the context is created', () => {
+    expect(commandLifecycleViolations(replace('  try {\n    const context = {', '  try {\n    session.abort = foreignAbort\n    const context = {'))).toContain('original-session-signal')
+  })
+
+  it('rejects an initializer spread that can replace its genuine signal', () => {
+    expect(commandLifecycleViolations(replace('signal: session.abort.signal,', 'signal: session.abort.signal,\n      ...initialContext,'))).toContain('original-session-signal')
+  })
+
+  it('rejects unreachable original controller aborts inside the registry loop', () => {
+    expect(commandLifecycleViolations(replace("session.abort.abort('editor-reset')", "return\n    session.abort.abort('editor-reset')"))).toContain('abort-original-controllers')
+  })
+
+  it.each([
+    ['model reset', '    abortPendingCommands()\n    // Document switch:', 'cancel-model-reset'],
+    ['document reset', 'const previousHistory = transactionStore.history\n    abortPendingCommands()', 'cancel-document-reset'],
+    ['unmount', 'languageToolsController = null\n  abortPendingCommands()', 'cancel-unmount'],
+  ] as const)('rejects an unreachable %s hook call', (_name, from, rule) => {
+    const offset = from.lastIndexOf('abortPendingCommands()')
+    const to = `${from.slice(0, offset)}return\n  abortPendingCommands()${from.slice(offset + 'abortPendingCommands()'.length)}`
+    expect(commandLifecycleViolations(replace(from, to))).toContain(rule)
+  })
+
+  it('rejects a key taken from another defined parameter path', () => {
+    const start = component.indexOf('const runCommand = async (')
+    const end = component.indexOf('const runAction = (', start)
+    expect(end).toBeGreaterThan(start)
+    const original = component.slice(start, end)
+    expect(commandLifecycleViolations(replace(original, original.replaceAll('command.key', 'foreign.key')))).toContain('original-command-key')
+  })
+
+  it('rejects a rewritten legitimate parameter key', () => {
+    expect(commandLifecycleViolations(replace('const session = createMarkdownEditorCommandSession(', "command.key = 'foreign'\n  const session = createMarkdownEditorCommandSession("))).toContain('original-command-key')
+  })
+
+  it('rejects a command key rewritten through a local alias', () => {
+    expect(commandLifecycleViolations(replace('const session = createMarkdownEditorCommandSession(', "const loan = command\n  loan.key = 'foreign'\n  const session = createMarkdownEditorCommandSession("))).toContain('original-command-key')
+  })
+
+  it('rejects execution of a different command than the registered parameter', () => {
+    expect(commandLifecycleViolations(replace(execute, execute.replace('(command, context)', '(foreign, context)')))).toContain('execute-original-command')
+  })
+
+  it('accepts a renamed real command parameter', () => {
+    const start = component.indexOf('const runCommand = async (')
+    const end = component.indexOf('const runAction = (', start)
+    expect(end).toBeGreaterThan(start)
+    const original = component.slice(start, end)
+    expect(commandLifecycleViolations(replace(original, original.replace(/\bcommand\b/gu, 'operation')))).toEqual([])
+  })
+
+  it('accepts readonly context aliases before execution', () => {
+    expect(commandLifecycleViolations(replace(execute, `    const loan = context\n    void loan.signal\n${execute}`))).toEqual([])
+  })
+
+  it('accepts a definitely bypassed cancellation exit', () => {
+    expect(commandLifecycleViolations(replace('const abortPendingCommands = () => {', 'const abortPendingCommands = () => {\n  if (false) return'))).toEqual([])
+  })
+})
