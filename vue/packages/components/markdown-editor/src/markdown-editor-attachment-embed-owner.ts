@@ -83,6 +83,8 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
   >()
   // Aborting a preparation can return before its consumer resolver has settled.
   const draining = new Set<MarkdownEmbedRequest>()
+  // Completion authority is per invocation, never a presentation version.
+  const embedAttempts = new Map<string, object>()
   const versions = new Map<string, number>()
   let results = new Map<string, MarkdownEmbedResult>()
   let nodes: readonly MarkdownEmbedValidNode[] = []
@@ -123,6 +125,7 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
   }
   const cancel = () => {
     embedGeneration += 1
+    embedAttempts.clear()
     for (const operation of active) {
       operation.controller.abort()
       cancelMarkdownEmbedRequest(operation.request)
@@ -189,6 +192,7 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
         items.size === 0 &&
         capture.memoryUnits === 0 &&
         results.size === 0 &&
+        embedAttempts.size === 0 &&
         nodes.length === 0 &&
         versions.size === 0,
       retainedListeners,
@@ -211,6 +215,7 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
           items.size +
           capture.memoryUnits +
           results.size +
+          embedAttempts.size +
           versions.size +
           nodes.length +
           (stopWatcher ? 1 : 0),
@@ -222,12 +227,17 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
     node: MarkdownEmbedValidNode,
   ): Promise<void> => {
     if (pauseRequested || disposed) return
+    const id = nodeId(node)
     const provider = bindings.readEmbedProvider()
-    if (!provider) return
+    if (!provider) {
+      embedAttempts.delete(id)
+      return
+    }
     const identity = bindings.readDocument()
     const documentIdentity = Object.freeze({ ...identity.documentIdentity })
     const revision = identity.revision
-    const id = nodeId(node)
+    const attemptRef = Object.freeze({})
+    embedAttempts.set(id, attemptRef)
     const version = (versions.get(id) ?? 0) + 1
     versions.set(id, version)
     const epoch = embedGeneration
@@ -243,7 +253,7 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
         !controller.signal.aborted &&
         (!checkSignal || !operation?.request.signal?.aborted) &&
         embedGeneration === epoch &&
-        versions.get(id) === version &&
+        embedAttempts.get(id) === attemptRef &&
         bindings.readEmbedProvider() === provider &&
         now.revision === revision &&
         now.documentIdentity.id === documentIdentity.id &&
@@ -318,6 +328,7 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
         publish()
       }
     } finally {
+      if (embedAttempts.get(id) === attemptRef) embedAttempts.delete(id)
       if (operation) {
         active.delete(operation)
         if (controller.signal.aborted)
