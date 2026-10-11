@@ -366,11 +366,14 @@ type WorkerSlot = {
   worker: Worker
 }
 
+type GenerationAuthority = { generation: number; preparing: boolean }
+
 type WorkerTask<TRequest, TResponse> = {
   abortCleanup: (() => void) | null
   abortListenerRegistration: 'none' | 'registered' | 'unknown'
   cloneBytes: number
   generation: number
+  generationAuthority: GenerationAuthority
   hardCancel: boolean
   installingAbortListener: boolean
   id: number
@@ -438,13 +441,14 @@ export const createFsusWorkerExecutor = <TRequest, TResponse>(
   const slots: WorkerSlot[] = []
   const canceledIds = new Set<number>()
   const canceledSlotTimers = new Map<number, ReturnType<typeof setTimeout>>()
-  const latestGenerations = new Map<string, number>()
+  const latestGenerations = new Map<string, GenerationAuthority>()
   let taskId = 0
   let workerId = 0
   let retainCount = 0
   let latencyServedBeforeBackground = 0
   let throughputServedBeforeBackground = 0
   let disposed = false
+  let disposing = false
   let idleTerminateTimer: ReturnType<typeof setTimeout> | null = null
   let backgroundTimer: ReturnType<typeof setTimeout> | null = null
   let visibilityListenerActive = false
@@ -619,6 +623,7 @@ export const createFsusWorkerExecutor = <TRequest, TResponse>(
       slot.activeTaskId = null
       slot.activeTaskIdentity = null
     }
+    if (!slot || slot.activeTaskId !== task.id) task.slotId = null
 
     try {
       runCleanup([
@@ -672,6 +677,7 @@ export const createFsusWorkerExecutor = <TRequest, TResponse>(
         () => {
           if (
             task.key &&
+            !latestGenerations.get(task.key)?.preparing &&
             ![...pending.values()].some((item) => item.key === task.key)
           ) {
             latestGenerations.delete(task.key)
@@ -834,7 +840,8 @@ export const createFsusWorkerExecutor = <TRequest, TResponse>(
     if (
       payload.status === 'aborted' ||
       (task.key &&
-        (latestGenerations.get(task.key) ?? task.generation) > task.generation)
+        (latestGenerations.get(task.key)?.generation ?? task.generation) >
+          task.generation)
     ) {
       const error = createAbortErrorDetail('fsus_worker_generation_superseded')
       settleTask(task, fsusErr(error), 'request-cancel', error)
@@ -1084,7 +1091,8 @@ export const createFsusWorkerExecutor = <TRequest, TResponse>(
     }
     if (
       task.key &&
-      (latestGenerations.get(task.key) ?? task.generation) > task.generation
+      (latestGenerations.get(task.key)?.generation ?? task.generation) >
+        task.generation
     ) {
       cancelTask(task, 'request-cancel', 'fsus_worker_generation_superseded')
       return
@@ -1223,7 +1231,8 @@ export const createFsusWorkerExecutor = <TRequest, TResponse>(
     if (!isCurrent()) return
     if (
       task.key &&
-      (latestGenerations.get(task.key) ?? task.generation) > task.generation
+      (latestGenerations.get(task.key)?.generation ?? task.generation) >
+        task.generation
     ) {
       cancelTask(task, 'request-cancel', 'fsus_worker_generation_superseded')
       return
@@ -1270,12 +1279,12 @@ export const createFsusWorkerExecutor = <TRequest, TResponse>(
   }
 
   const dispose = () => {
-    if (disposed && pending.size === 0 && slots.length === 0) return
     disposed = true
     clearIdleTimer()
     clearBackgroundTimer()
     for (const timer of canceledSlotTimers.values()) clearTimeout(timer)
     canceledSlotTimers.clear()
+    if (pending.size === 0 && slots.length === 0) return
     const error = createFsusError('infra', 'fsus_worker_disposed')
     runCleanup([
       ...[...pending.values()].map((task) => () => {
@@ -1292,6 +1301,7 @@ export const createFsusWorkerExecutor = <TRequest, TResponse>(
         } finally {
           if (
             task.key &&
+            !latestGenerations.get(task.key)?.preparing &&
             ![...pending.values()].some((item) => item.key === task.key)
           ) {
             latestGenerations.delete(task.key)
@@ -1318,11 +1328,12 @@ export const createFsusWorkerExecutor = <TRequest, TResponse>(
     const lane = runOptions.lane ?? 'throughput'
     const generation = runOptions.key
       ? (runOptions.generation ??
-        (latestGenerations.get(runOptions.key) ?? 0) + 1)
+        (latestGenerations.get(runOptions.key)?.generation ?? 0) + 1)
       : (runOptions.generation ?? 0)
     if (
       runOptions.key &&
-      generation < (latestGenerations.get(runOptions.key) ?? generation)
+      generation <
+        (latestGenerations.get(runOptions.key)?.generation ?? generation)
     ) {
       const error = createAbortErrorDetail('fsus_worker_generation_stale')
       emit('request-drop', {
@@ -1334,18 +1345,25 @@ export const createFsusWorkerExecutor = <TRequest, TResponse>(
       })
       return Promise.resolve(fsusErr<TResponse>(error))
     }
-    const previousGeneration = runOptions.key
+    const previousAuthority = runOptions.key
       ? latestGenerations.get(runOptions.key)
       : undefined
-    if (runOptions.key) latestGenerations.set(runOptions.key, generation)
+    const generationAuthority = { generation, preparing: true }
+    if (runOptions.key)
+      latestGenerations.set(runOptions.key, generationAuthority)
     const releasePreparation = () => {
       if (
         !runOptions.key ||
-        latestGenerations.get(runOptions.key) !== generation
+        latestGenerations.get(runOptions.key) !== generationAuthority
       )
         return
-      if (!disposed && previousGeneration !== undefined) {
-        latestGenerations.set(runOptions.key, previousGeneration)
+      if (
+        !disposed &&
+        previousAuthority &&
+        (previousAuthority.preparing ||
+          [...pending.values()].some((task) => task.key === runOptions.key))
+      ) {
+        latestGenerations.set(runOptions.key, previousAuthority)
       } else {
         latestGenerations.delete(runOptions.key)
       }
@@ -1376,7 +1394,8 @@ export const createFsusWorkerExecutor = <TRequest, TResponse>(
     }
     if (
       runOptions.key &&
-      generation < (latestGenerations.get(runOptions.key) ?? generation)
+      generation <
+        (latestGenerations.get(runOptions.key)?.generation ?? generation)
     ) {
       const error = createAbortErrorDetail('fsus_worker_generation_stale')
       releasePreparation()
@@ -1411,6 +1430,7 @@ export const createFsusWorkerExecutor = <TRequest, TResponse>(
         abortListenerRegistration: 'none',
         cloneBytes,
         generation,
+        generationAuthority,
         hardCancel: runOptions.hardCancel ?? false,
         installingAbortListener: false,
         id,
@@ -1436,6 +1456,7 @@ export const createFsusWorkerExecutor = <TRequest, TResponse>(
         transfer,
       }
       pending.set(id, task)
+      generationAuthority.preparing = false
       task.timeoutId = setTimeout(() => {
         const error = createFsusError('timeout', 'fsus_worker_request_timeout')
         const slot = slots.find((candidate) => candidate.id === task.slotId)
@@ -1593,7 +1614,9 @@ export const createFsusWorkerExecutor = <TRequest, TResponse>(
               ? 'suspended'
               : 'queued',
       workerId:
-        selectedSlots.find((slot) => slot.id === task.slotId)?.id ?? null,
+        selectedSlots.find(
+          (slot) => slot.id === task.slotId && slot.activeTaskId === task.id,
+        )?.id ?? null,
     }))
     for (const slot of selectedSlots) {
       const identity = slot.activeTaskIdentity
@@ -1801,29 +1824,37 @@ export const createFsusWorkerExecutor = <TRequest, TResponse>(
 
   return {
     dispose: () => {
-      runCleanup([
-        () => {
-          if (
-            !visibilityDocument ||
-            !visibilityListenerActive ||
-            removingVisibilityListener
-          )
-            return
-          removingVisibilityListener = true
-          visibilityListenerRegistration = 'unknown'
-          try {
-            visibilityDocument.removeEventListener(
-              'visibilitychange',
-              visibilityHandler,
+      // Close admission before any externally supplied cleanup method runs.
+      disposed = true
+      if (disposing) return
+      disposing = true
+      try {
+        runCleanup([
+          () => {
+            if (
+              !visibilityDocument ||
+              !visibilityListenerActive ||
+              removingVisibilityListener
             )
-            visibilityListenerActive = false
-            visibilityListenerRegistration = 'none'
-          } finally {
-            removingVisibilityListener = false
-          }
-        },
-        () => dispose(),
-      ])
+              return
+            removingVisibilityListener = true
+            visibilityListenerRegistration = 'unknown'
+            try {
+              visibilityDocument.removeEventListener(
+                'visibilitychange',
+                visibilityHandler,
+              )
+              visibilityListenerActive = false
+              visibilityListenerRegistration = 'none'
+            } finally {
+              removingVisibilityListener = false
+            }
+          },
+          () => dispose(),
+        ])
+      } finally {
+        disposing = false
+      }
     },
     getActiveCount: activeCount,
     getPendingCount: () => pending.size,
