@@ -391,6 +391,7 @@ export type FsusRenderPipelineRuntimeResourceInspection = {
   readonly uncancellableCallbacks: number
   readonly retainedListeners: number
   readonly pendingRenders: number
+  readonly pendingRenderAdmissions: number
   readonly pendingAdapterJobs: number
   readonly adapterResources: 'unknown'
   readonly workerResources: {
@@ -2612,6 +2613,7 @@ export const useFsusRenderPipelineRuntime = <TSource, TUnit>(
   let disposed = false
   let workerUsed = false
   let preservedWorkerTask = false
+  let renderRequestedWhilePaused = false
   const callbacks = createRenderPipelineCallbackResources()
   const waits = new Set<() => void>()
   const renders = new Set<symbol>()
@@ -3060,7 +3062,9 @@ export const useFsusRenderPipelineRuntime = <TSource, TUnit>(
     signal: AbortSignal,
     generation: number,
   ): Promise<FsusResult<FsusRenderPipelineDocument<TUnit>>> => {
-    if (paused || disposed || signal.aborted) {
+    const isCurrentPreparation = () =>
+      generation === taskId && !paused && !disposed && !signal.aborted
+    if (!isCurrentPreparation()) {
       return fsusErr(
         createFsusError('infra', 'fsus_render_pipeline_prepare_paused'),
       )
@@ -3069,6 +3073,11 @@ export const useFsusRenderPipelineRuntime = <TSource, TUnit>(
       const executor = getWorkerExecutor(activeAdapter)
 
       if (executor) {
+        if (!isCurrentPreparation()) {
+          return fsusErr(
+            createFsusError('infra', 'fsus_render_pipeline_prepare_paused'),
+          )
+        }
         const record: WorkerScopeRecord = {
           executor,
           scope: { generation, key: `${workerTaskKey}:${activeAdapter.id}` },
@@ -3091,8 +3100,7 @@ export const useFsusRenderPipelineRuntime = <TSource, TUnit>(
             workerScopes.delete(record)
         }
         if (workerDocument.ok && workerDocument.value) {
-          if (!signal.aborted && !paused && !disposed && generation === taskId)
-            renderedStrategy.value = 'chunked-worker'
+          if (isCurrentPreparation()) renderedStrategy.value = 'chunked-worker'
           return fsusOk(workerDocument.value)
         }
 
@@ -3102,7 +3110,7 @@ export const useFsusRenderPipelineRuntime = <TSource, TUnit>(
               'fsus_render_pipeline_worker_empty_result',
             )
           : workerDocument.error
-        if (!signal.aborted && !paused && !disposed) {
+        if (isCurrentPreparation()) {
           recordDiagnostic({
             error: workerError,
             fallbackReason: workerError.message,
@@ -3111,7 +3119,7 @@ export const useFsusRenderPipelineRuntime = <TSource, TUnit>(
             type: 'worker-fallback',
           })
           await waitForWorkerFallbackBudget(signal)
-          if (signal.aborted || paused || disposed) return fsusErr(workerError)
+          if (!isCurrentPreparation()) return fsusErr(workerError)
           const fallbackDocument = await prepareAdapter(
             activeAdapter,
             input,
@@ -3119,8 +3127,7 @@ export const useFsusRenderPipelineRuntime = <TSource, TUnit>(
             'chunked-main',
           )
           if (isFsusErr(fallbackDocument)) return fallbackDocument
-          if (!signal.aborted && !paused && !disposed && generation === taskId)
-            renderedStrategy.value = 'chunked-main'
+          if (isCurrentPreparation()) renderedStrategy.value = 'chunked-main'
           return fallbackDocument
         }
 
@@ -3135,18 +3142,25 @@ export const useFsusRenderPipelineRuntime = <TSource, TUnit>(
       activeStrategy,
     )
     if (isFsusErr(preparedDocument)) return preparedDocument
-    if (!signal.aborted && !paused && !disposed && generation === taskId)
-      renderedStrategy.value = activeStrategy
+    if (isCurrentPreparation()) renderedStrategy.value = activeStrategy
     return preparedDocument
   }
 
   const renderOnce = async () => {
     if (paused || disposed) return
     const currentTaskId = ++taskId
-    controller?.abort()
+    const previousController = controller
     const renderController = new AbortController()
     controller = renderController
     const signal = renderController.signal
+    const isCurrentRender = () =>
+      currentTaskId === taskId &&
+      controller === renderController &&
+      !signal.aborted &&
+      !paused &&
+      !disposed
+    previousController?.abort()
+    if (!isCurrentRender()) return
     const input = sourceRef.value
     const activeAdapter = adapter.value
     const activeStrategy = strategy.value
@@ -3157,6 +3171,8 @@ export const useFsusRenderPipelineRuntime = <TSource, TUnit>(
     )
     const startedAt = now()
     const queuedAt = startedAt
+
+    if (!isCurrentRender()) return
 
     loading.value = true
     error.value = null
@@ -3171,7 +3187,9 @@ export const useFsusRenderPipelineRuntime = <TSource, TUnit>(
       strategy: activeStrategy,
       type: 'render-start',
     })
+    if (!isCurrentRender()) return
     recordStage('queue-wait', Math.max(0, now() - queuedAt), activeStrategy)
+    if (!isCurrentRender()) return
 
     if (!activeAdapter) {
       const missingAdapterError = createFsusError(
@@ -3198,35 +3216,37 @@ export const useFsusRenderPipelineRuntime = <TSource, TUnit>(
       signal,
       currentTaskId,
     )
-    if (currentTaskId !== taskId || signal.aborted || paused || disposed) {
+    if (!isCurrentRender()) {
       if (currentTaskId === taskId) loading.value = false
       return
     }
 
     recordStage('prepare', now() - prepareStartedAt, renderedStrategy.value)
+    if (!isCurrentRender()) return
     if (isFsusOk(nextDocument)) {
       const commitStartedAt = now()
       documentRef.value = nextDocument.value
       await nextTick()
-      if (currentTaskId !== taskId || signal.aborted || paused || disposed)
-        return
+      if (!isCurrentRender()) return
       recordStage('vue-commit', now() - commitStartedAt, renderedStrategy.value)
+      if (!isCurrentRender()) return
       const layoutStartedAt = now()
       await waitForBoundary(signal, false)
-      if (currentTaskId !== taskId || signal.aborted || paused || disposed)
-        return
+      if (!isCurrentRender()) return
       recordStage(
         'style-layout',
         now() - layoutStartedAt,
         renderedStrategy.value,
       )
+      if (!isCurrentRender()) return
       const paintStartedAt = now()
       await waitForBoundary(signal, false)
-      if (currentTaskId !== taskId || signal.aborted || paused || disposed)
-        return
+      if (!isCurrentRender()) return
       recordStage('next-paint', now() - paintStartedAt, renderedStrategy.value)
+      if (!isCurrentRender()) return
       const durationMs = now() - startedAt
       recordStage('total', durationMs, renderedStrategy.value)
+      if (!isCurrentRender()) return
       setCachedStrategy(activeStrategyCacheKey, {
         durationMs,
         profileVersion: capabilityProfile.value.version,
@@ -3237,6 +3257,7 @@ export const useFsusRenderPipelineRuntime = <TSource, TUnit>(
         queueDepth: ownedQueueDepth(),
         renderDurationMs: durationMs,
       }
+      if (!isCurrentRender()) return
       recordDiagnostic({
         durationMs,
         phase: 'commit',
@@ -3246,12 +3267,15 @@ export const useFsusRenderPipelineRuntime = <TSource, TUnit>(
     } else {
       const durationMs = now() - startedAt
       error.value = nextDocument.error
+      if (!isCurrentRender()) return
       documentRef.value = null
+      if (!isCurrentRender()) return
       adaptiveSignals.value = {
         ...adaptiveSignals.value,
         queueDepth: ownedQueueDepth(),
         renderDurationMs: durationMs,
       }
+      if (!isCurrentRender()) return
       recordDiagnostic({
         durationMs,
         error: nextDocument.error,
@@ -3261,7 +3285,7 @@ export const useFsusRenderPipelineRuntime = <TSource, TUnit>(
       })
     }
 
-    if (currentTaskId === taskId) {
+    if (isCurrentRender()) {
       loading.value = false
     }
   }
@@ -3275,6 +3299,7 @@ export const useFsusRenderPipelineRuntime = <TSource, TUnit>(
       retainedListeners: waits.size + (workerExecutorListenerActive ? 1 : 0),
       retainedSharedOwners: workerExecutorSharedCleanup ? 1 : 0,
       pendingRenders: renders.size,
+      pendingRenderAdmissions: renderRequestedWhilePaused ? 1 : 0,
       pendingAdapterJobs: adapterJobs.size,
       adapterResources: 'unknown',
       workerResources: inspectWorkerResources(),
@@ -3323,14 +3348,25 @@ export const useFsusRenderPipelineRuntime = <TSource, TUnit>(
   const resume = () => {
     if (disposed) throw new Error('fsus_render_pipeline_runtime_disposed')
     if (paused) {
+      const resumeTaskId = taskId
       workerExecutorResumeListener?.()
       workerExecutorListenerActive = !!workerExecutorSharedCleanup
       paused = false
       hardwareRuntime.resume()
-      loading.value = preservedWorkerTask && renders.size > 0
+      if (paused || disposed) return inspectResources()
+      if (renderRequestedWhilePaused) {
+        preservedWorkerTask = false
+        void render()
+        return inspectResources()
+      }
+      if (taskId === resumeTaskId) {
+        loading.value = preservedWorkerTask && renders.size > 0
+      }
       preservedWorkerTask = false
       for (const record of workerScopes) {
+        if (paused || disposed) break
         if (
+          record.scope.generation === taskId &&
           record.executor.inspectResources(record.scope).resources
             .suspendedTaskCount > 0
         ) {
@@ -3341,7 +3377,19 @@ export const useFsusRenderPipelineRuntime = <TSource, TUnit>(
     return inspectResources()
   }
   const render = async () => {
-    if (paused || disposed) return
+    if (disposed) return
+    if (paused) {
+      // Coalesce intent, invalidate the suspended input, and admit latest source
+      // only after resume. Its real cancellation resources remain in the census.
+      renderRequestedWhilePaused = true
+      preservedWorkerTask = false
+      taskId += 1
+      const previousController = controller
+      controller = null
+      previousController?.abort()
+      return
+    }
+    renderRequestedWhilePaused = false
     const job = Symbol('render')
     const renderTaskId = taskId + 1
     renders.add(job)
@@ -3355,6 +3403,7 @@ export const useFsusRenderPipelineRuntime = <TSource, TUnit>(
   onBeforeUnmount(() => {
     pause()
     disposed = true
+    renderRequestedWhilePaused = false
     taskId += 1
     controller?.abort()
     controller = null
