@@ -43,12 +43,44 @@ export interface MarkdownRendererRenderGeneration extends MarkdownRendererDocume
   readonly generation: number
 }
 
+// Observe actual retained resources after disposal, without inferring the
+// failure cause, successful termination or attribution of shared pool totals.
+export const inspectMarkdownRendererWorkerCleanupResidue = (
+  pipeline: FsusRenderPipelineRuntimeResourceInspection,
+) =>
+  Object.freeze({
+    ownedScopes: Object.freeze(
+      pipeline.workerResources.scopes
+        .filter(
+          ({ inspection }) =>
+            inspection.disposed &&
+            (inspection.slots.length > 0 || inspection.tasks.length > 0),
+        )
+        .map(({ inspection }) => inspection),
+    ),
+    poolContext: Object.freeze(
+      pipeline.workerResources.pools.filter(
+        ({ disposed, pool, shared }) =>
+          disposed &&
+          (pool.workerCount > 0 ||
+            pool.pendingCount > 0 ||
+            pool.retainCount > 0 ||
+            shared.backgroundTimerActive ||
+            shared.idleTerminateTimerActive ||
+            shared.visibilityListenerCount > 0),
+      ),
+    ),
+  })
+
 // Preserve the remaining real source gaps; available hook counts are exposed
 // separately and never turn opaque adapter/worker/platform state into zero.
 export const markdownRendererSessionSourceDependencies = Object.freeze([
   'markdown-runtime:activation-and-gateway-loader-import-network-census',
   'renderer:validated-snapshot-restoration-after-disposal',
   'heavy-feature-runtime:timer-and-network-cancellation-authority',
+  // Original worker-owner quarantine source is composed; its independent
+  // review/qualification is still pending, so do not clear this hold here.
+  'render-pipeline-worker:retained-slot-dispatch-quarantine',
 ] as const)
 
 export const createMarkdownRendererSessionResourceOwner = (options: {
@@ -228,12 +260,22 @@ export const createMarkdownRendererSessionResourceOwner = (options: {
     const pipeline = options.readPipelineResources()
     const viewport = options.readVirtualWindowResources()
     const heavy = options.readHeavyResources()
+    const workerCleanupResidue =
+      inspectMarkdownRendererWorkerCleanupResidue(pipeline)
     const workerScopes = pipeline.workerResources.scopes.map(
       ({ inspection }) => inspection,
     )
     const missingSourceDependencies: string[] = [
       ...markdownRendererSessionSourceDependencies,
     ]
+    if (
+      workerCleanupResidue.ownedScopes.length > 0 ||
+      workerCleanupResidue.poolContext.length > 0
+    ) {
+      missingSourceDependencies.push(
+        'render-pipeline-worker:disposed-resource-cleanup',
+      )
+    }
     if (pipeline.pendingWorkerCallbackFailureNotification) {
       missingSourceDependencies.push(
         'render-pipeline-runtime:worker-callback-failure-notification-settlement',
@@ -302,6 +344,7 @@ export const createMarkdownRendererSessionResourceOwner = (options: {
         heavyFeatures: heavy,
       }),
       diagnostics: Object.freeze({
+        workerCleanupResidue,
         // Preserve the actual retained failure; its cumulative count is not
         // an active task count or evidence that cleanup/recovery succeeded.
         workerCallbackFailure: pipeline.workerCallbackFailure,
@@ -405,7 +448,8 @@ export const createMarkdownRendererSessionResourceOwner = (options: {
             heavy.usage.pendingImports +
             heavy.usage.scheduledContinuations +
             workerScopes.reduce(
-              (count, scope) => count + scope.resources.taskRetainCount,
+              (count, scope) =>
+                count + scope.resources.taskRetainCount + scope.slots.length,
               0,
             ),
         }),

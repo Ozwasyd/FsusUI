@@ -57,6 +57,7 @@ export type FsusWorkerExecutorOptions = {
   maxQueue?: number
   maxWorkers?: number
   name?: string
+  /** Cleanup attempts remaining owned work before rethrowing observer errors. */
   onEvent?: (event: FsusWorkerExecutorEvent) => void
   requireGenerationEcho?: boolean
   requestTimeoutMs?: number
@@ -132,8 +133,13 @@ export type FsusWorkerResourceInspection = {
   }
   slots: Array<{
     activeTaskId: number | null
+    /** Retained handle state, not an admission guarantee. */
     alive: boolean
+    /** Idle, not quarantined, and still has both installed handlers. */
+    dispatchable: boolean
     id: number
+    /** Teardown began; reuse remains blocked even when termination throws. */
+    quarantined: boolean
     workerErrorHandlerActive: boolean
     workerMessageHandlerActive: boolean
   }>
@@ -350,6 +356,7 @@ type WorkerSlot = {
   errorHandler: Worker['onerror']
   id: number
   messageHandler: Worker['onmessage']
+  quarantined: boolean
   worker: Worker
 }
 
@@ -436,6 +443,14 @@ export const createFsusWorkerExecutor = <TRequest, TResponse>(
   const activeCount = () =>
     slots.filter((slot) => slot.activeTaskId !== null).length
 
+  const isSlotUsable = (slot: WorkerSlot) =>
+    slot.alive &&
+    !slot.quarantined &&
+    slot.messageHandler !== null &&
+    slot.errorHandler !== null &&
+    slot.worker.onmessage === slot.messageHandler &&
+    slot.worker.onerror === slot.errorHandler
+
   const emit = (
     type: FsusWorkerExecutorEventType,
     event: Partial<
@@ -465,19 +480,29 @@ export const createFsusWorkerExecutor = <TRequest, TResponse>(
     backgroundTimer = null
   }
 
+  const runCleanup = (actions: Array<() => void>) => {
+    const errors: unknown[] = []
+    for (const action of actions) {
+      try {
+        action()
+      } catch (error) {
+        errors.push(error)
+      }
+    }
+    if (errors.length === 1) throw errors[0]
+    if (errors.length > 1) {
+      throw new AggregateError(errors, 'fsus_worker_cleanup_failed')
+    }
+  }
+
   const terminateSlot = (
     slot: WorkerSlot,
     type: FsusWorkerExecutorEventType = 'worker-disposed',
     error?: FsusErrorDetail,
   ) => {
     if (!slot.alive) return
-    slot.alive = false
-    if (slot.activeTaskId !== null) {
-      const cancelTimer = canceledSlotTimers.get(slot.activeTaskId)
-      if (cancelTimer) clearTimeout(cancelTimer)
-      canceledSlotTimers.delete(slot.activeTaskId)
-      canceledIds.delete(slot.activeTaskId)
-    }
+    // Retained resources still count, but teardown must stop new dispatch first.
+    slot.quarantined = true
     if (slot.worker.onmessage === slot.messageHandler) {
       slot.worker.onmessage = null
     }
@@ -487,11 +512,39 @@ export const createFsusWorkerExecutor = <TRequest, TResponse>(
     slot.messageHandler = null
     slot.errorHandler = null
     slot.worker.terminate()
+    slot.alive = false
+    if (slot.activeTaskId !== null) {
+      const cancelTimer = canceledSlotTimers.get(slot.activeTaskId)
+      if (cancelTimer) clearTimeout(cancelTimer)
+      canceledSlotTimers.delete(slot.activeTaskId)
+      canceledIds.delete(slot.activeTaskId)
+    }
     slot.activeTaskId = null
     slot.activeTaskIdentity = null
     const index = slots.indexOf(slot)
     if (index >= 0) slots.splice(index, 1)
     emit(type, { error, workerId: slot.id })
+  }
+
+  const terminateIdleSlots = () => {
+    const selectedSlots = slots.map((slot) => ({
+      activeTaskId: slot.activeTaskId,
+      slot,
+    }))
+    runCleanup([
+      ...selectedSlots.map(({ slot, activeTaskId }) => () => {
+        if (
+          pending.size === 0 &&
+          retainCount === 0 &&
+          slot.activeTaskId === activeTaskId
+        ) {
+          terminateSlot(slot, 'worker-idle-terminate')
+        }
+      }),
+      () => {
+        if (slots.length === 0) emit('pool-idle-terminate')
+      },
+    ])
   }
 
   const scheduleIdleTerminate = () => {
@@ -501,10 +554,7 @@ export const createFsusWorkerExecutor = <TRequest, TResponse>(
     idleTerminateTimer = setTimeout(() => {
       idleTerminateTimer = null
       if (retainCount > 0 || pending.size > 0) return
-      for (const slot of [...slots]) {
-        terminateSlot(slot, 'worker-idle-terminate')
-      }
-      emit('pool-idle-terminate')
+      terminateIdleSlots()
     }, idleTerminateMs)
   }
 
@@ -742,6 +792,7 @@ export const createFsusWorkerExecutor = <TRequest, TResponse>(
       errorHandler: null,
       id: ++workerId,
       messageHandler: null,
+      quarantined: false,
       worker: createWorker(),
     }
     slot.messageHandler = (event) => handleWorkerMessage(slot, event)
@@ -809,6 +860,11 @@ export const createFsusWorkerExecutor = <TRequest, TResponse>(
     slot: WorkerSlot,
     task: WorkerTask<TRequest, TResponse>,
   ) => {
+    if (pending.get(task.id) !== task) return
+    if (disposed || !isSlotUsable(slot) || slot.activeTaskId !== null) {
+      queues[task.lane].unshift(task)
+      return
+    }
     slot.activeTaskId = task.id
     slot.activeTaskIdentity = {
       generation: task.generation,
@@ -830,7 +886,7 @@ export const createFsusWorkerExecutor = <TRequest, TResponse>(
     // request-start listeners can synchronously cancel, supersede or dispose.
     if (
       disposed ||
-      !slot.alive ||
+      !isSlotUsable(slot) ||
       !slots.includes(slot) ||
       pending.get(task.id) !== task ||
       canceledIds.has(task.id) ||
@@ -873,8 +929,10 @@ export const createFsusWorkerExecutor = <TRequest, TResponse>(
     if (disposed) return
     clearIdleTimer()
     while (lanes.some((lane) => queues[lane].some((task) => !task.suspended))) {
+      if (disposed) return
       let slot = slots.find(
-        (candidate) => candidate.alive && candidate.activeTaskId === null,
+        (candidate) =>
+          isSlotUsable(candidate) && candidate.activeTaskId === null,
       )
       if (!slot && slots.length < maxWorkers) {
         try {
@@ -953,8 +1011,9 @@ export const createFsusWorkerExecutor = <TRequest, TResponse>(
     retainCount += 1
     clearIdleTimer()
     try {
-      if (slots.length === 0) createSlot()
-      else emit('worker-reused', { workerId: slots[0]?.id })
+      const reusableSlot = slots.find(isSlotUsable)
+      if (reusableSlot) emit('worker-reused', { workerId: reusableSlot.id })
+      else if (slots.length < maxWorkers) createSlot()
     } catch (error) {
       releaseRetain()
       throw error
@@ -968,17 +1027,36 @@ export const createFsusWorkerExecutor = <TRequest, TResponse>(
   }
 
   const dispose = () => {
-    if (disposed) return
+    if (disposed && pending.size === 0 && slots.length === 0) return
     disposed = true
     clearIdleTimer()
     clearBackgroundTimer()
     for (const timer of canceledSlotTimers.values()) clearTimeout(timer)
     canceledSlotTimers.clear()
     const error = createFsusError('infra', 'fsus_worker_disposed')
-    for (const task of [...pending.values()]) {
-      settleTask(task, fsusErr(error), 'request-reject', error)
-    }
-    for (const slot of [...slots]) terminateSlot(slot)
+    runCleanup([
+      ...[...pending.values()].map((task) => () => {
+        try {
+          // Retain the active identity until its worker actually terminates.
+          settleTask(
+            task,
+            fsusErr(error),
+            'request-reject',
+            error,
+            undefined,
+            false,
+          )
+        } finally {
+          if (
+            task.key &&
+            ![...pending.values()].some((item) => item.key === task.key)
+          ) {
+            latestGenerations.delete(task.key)
+          }
+        }
+      }),
+      ...[...slots].map((slot) => () => terminateSlot(slot)),
+    ])
   }
 
   const run = (
@@ -1103,10 +1181,7 @@ export const createFsusWorkerExecutor = <TRequest, TResponse>(
       pending.size === 0 &&
       retainCount === 0
     ) {
-      for (const slot of [...slots]) {
-        terminateSlot(slot, 'worker-idle-terminate')
-      }
-      emit('pool-idle-terminate')
+      terminateIdleSlots()
     }
   }
   if (typeof document !== 'undefined') {
@@ -1247,7 +1322,9 @@ export const createFsusWorkerExecutor = <TRequest, TResponse>(
       slots: selectedSlots.map((slot) => ({
         activeTaskId: slot.activeTaskId,
         alive: slot.alive,
+        dispatchable: isSlotUsable(slot) && slot.activeTaskId === null,
         id: slot.id,
+        quarantined: slot.quarantined,
         workerErrorHandlerActive: slot.worker.onerror !== null,
         workerMessageHandlerActive: slot.worker.onmessage !== null,
       })),
