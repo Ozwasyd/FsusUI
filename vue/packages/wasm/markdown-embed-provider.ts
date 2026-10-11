@@ -148,6 +148,10 @@ export const createMarkdownEmbedRequest = (
     readonly requestId?: string
   },
 ): MarkdownEmbedRequest => {
+  // The registry spans editors. Capacity pressure must not cancel another owner.
+  if (requests.size >= MARKDOWN_EMBED_BUDGET.maxNodes) {
+    throw new Error('markdown-embed-request-capacity-exceeded')
+  }
   const controller = new AbortController()
   if (input.signal?.aborted) controller.abort()
   else if (input.signal) {
@@ -176,9 +180,6 @@ export const createMarkdownEmbedRequest = (
   })
   const previous = requests.get(request.requestId)
   if (previous) cancelMarkdownEmbedRequest(previous)
-  while (requests.size >= MARKDOWN_EMBED_BUDGET.maxNodes) {
-    cancelMarkdownEmbedRequest(requests.keys().next().value!)
-  }
   requests.set(request.requestId, request)
   return request
 }
