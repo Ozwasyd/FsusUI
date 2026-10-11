@@ -152,6 +152,15 @@ export const createMarkdownEmbedRequest = (
   if (requests.size >= MARKDOWN_EMBED_BUDGET.maxNodes) {
     throw new Error('markdown-embed-request-capacity-exceeded')
   }
+  let requestId = input.requestId
+  if (requestId === undefined) {
+    do {
+      requestId = `embed-request:${++requestSequence}`
+    } while (requests.has(requestId))
+  } else if (requests.has(requestId)) {
+    // A request id carries no authority to replace another live instance.
+    throw new Error('markdown-embed-request-id-in-use')
+  }
   const controller = new AbortController()
   if (input.signal?.aborted) controller.abort()
   else if (input.signal) {
@@ -166,7 +175,7 @@ export const createMarkdownEmbedRequest = (
   }
   controllers.set(controller.signal, controller)
   const request = Object.freeze({
-    requestId: input.requestId ?? `embed-request:${++requestSequence}`,
+    requestId,
     documentIdentity: Object.freeze({ ...input.documentIdentity }),
     revision: input.revision,
     nodeId: input.nodeId,
@@ -178,8 +187,6 @@ export const createMarkdownEmbedRequest = (
       : {}),
     signal: controller.signal,
   })
-  const previous = requests.get(request.requestId)
-  if (previous) cancelMarkdownEmbedRequest(previous)
   requests.set(request.requestId, request)
   return request
 }
