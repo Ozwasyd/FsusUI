@@ -18,6 +18,13 @@ export interface MarkdownEditorSessionResourceUsage {
   readonly memoryUnits: number
 }
 
+/** Ref into the actual mounted full-document renderer, never synthesized. */
+export interface MarkdownEditorSessionLastValidRender {
+  readonly ref: string
+  readonly documentIdentity: MarkdownEditorDocumentIdentity
+  readonly revision: number
+}
+
 /** Retained in the mounted editor; not a serializable eviction checkpoint. */
 export interface MarkdownEditorSessionSnapshot {
   readonly schema: 'fsusui.markdown-editor-retained-session.v1'
@@ -31,6 +38,7 @@ export interface MarkdownEditorSessionSnapshot {
   readonly selectionRef: string
   readonly historyRef: string
   readonly viewStateRef: string
+  readonly lastValidRender: MarkdownEditorSessionLastValidRender | null
 }
 
 export interface MarkdownEditorSessionCapabilities {
@@ -51,6 +59,7 @@ export interface MarkdownEditorSession {
   readonly editorSessionRef: string
   inspectCapabilities(): MarkdownEditorSessionCapabilities
   inspectResourceParticipants(): MarkdownEditorSessionResourceCensus
+  captureLastValidRender(): MarkdownEditorSessionLastValidRender | null
   captureSnapshot(digestSource: (source: string) => string): MarkdownEditorSessionSnapshot
   restoreSnapshot(
     snapshot: MarkdownEditorSessionSnapshot,
@@ -74,6 +83,7 @@ export interface MarkdownEditorSessionOwner<ViewState> {
   readonly captureViewState: () => ViewState
   readonly restoreViewState: (state: ViewState) => void
   readonly resourceParticipants: () => readonly MarkdownEditorSessionResourceParticipant[]
+  readonly captureLastValidRender: () => MarkdownEditorSessionLastValidRender | null
 }
 
 const capabilities: MarkdownEditorSessionCapabilities = Object.freeze({
@@ -108,6 +118,16 @@ export const createMarkdownEditorSessionBinding = <ViewState>(
     if (owner.isDisposed()) throw new Error('editor-session-disposed')
     if (owner.isComposing()) throw new Error('editor-session-composition-active')
   }
+  const captureLastValidRender = () => {
+    assertAvailable()
+    const render = owner.captureLastValidRender()
+    const store = owner.transactionStore
+    if (!render || !render.ref ||
+      render.documentIdentity.id !== store.documentIdentity.id ||
+      render.documentIdentity.epoch !== store.documentIdentity.epoch ||
+      render.revision !== store.revision) return null
+    return render
+  }
   const inspectCapabilities = (): MarkdownEditorSessionCapabilities => {
     const census = resources.inspectParticipants()
     return Object.freeze({
@@ -115,7 +135,7 @@ export const createMarkdownEditorSessionBinding = <ViewState>(
       resources: census.complete ? 'available' : 'unavailable',
       missingOwners: Object.freeze([
         ...census.missingOwners,
-        'renderer-last-valid-render-checkpoint',
+        ...(captureLastValidRender() ? [] : ['renderer-last-valid-render-checkpoint']),
         'recoverable-disposal-owner',
       ]),
     })
@@ -137,6 +157,7 @@ export const createMarkdownEditorSessionBinding = <ViewState>(
         editorSessionRef,
         inspectCapabilities,
         inspectResourceParticipants: () => { assertAvailable(); return resources.inspectParticipants() },
+        captureLastValidRender,
         captureSnapshot(digestSource: (source: string) => string) {
           assertAvailable()
           if (capturing) throw new Error('editor-session-snapshot-reentrant')
@@ -156,6 +177,7 @@ export const createMarkdownEditorSessionBinding = <ViewState>(
             if (!/^[a-f0-9]{64}$/u.test(digest)) {
               throw new Error('editor-session-content-digest-invalid')
             }
+            const lastValidRender = captureLastValidRender()
             const view = owner.captureViewState()
             const transaction = store.retainSnapshot()
             const snapshotRef = `${editorSessionRef}:snapshot:${++sequence}`
@@ -171,6 +193,7 @@ export const createMarkdownEditorSessionBinding = <ViewState>(
               selectionRef: `${snapshotRef}:selection`,
               historyRef: `${snapshotRef}:history`,
               viewStateRef: `${snapshotRef}:view`,
+              lastValidRender,
             })
             retained = { snapshot, transaction, view }
             return snapshot
@@ -199,6 +222,12 @@ export const createMarkdownEditorSessionBinding = <ViewState>(
           ) return blocked('editor-session-document-mismatch')
           if (store.revision !== expected.revision || store.revision !== snapshot.revision) {
             return blocked('editor-session-revision-mismatch')
+          }
+          if (snapshot.lastValidRender) {
+            const currentRender = captureLastValidRender()
+            if (!currentRender || currentRender.ref !== snapshot.lastValidRender.ref) {
+              return blocked('editor-session-render-checkpoint-custody-invalid')
+            }
           }
           if (!store.restoreRetainedSnapshot(retained.transaction)) {
             return blocked('editor-session-history-checkpoint-invalid')

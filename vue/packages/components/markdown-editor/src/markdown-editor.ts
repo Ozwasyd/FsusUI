@@ -1879,6 +1879,7 @@ export type {
   MarkdownEditorSession,
   MarkdownEditorSessionCapabilities,
   MarkdownEditorSessionExpose,
+  MarkdownEditorSessionLastValidRender,
   MarkdownEditorSessionResourceUsage,
   MarkdownEditorSessionRestoreProof,
   MarkdownEditorSessionSnapshot,

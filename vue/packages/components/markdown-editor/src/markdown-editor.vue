@@ -1322,6 +1322,7 @@ import {
 import { planMarkdownOutlineReveal } from './markdown-editor-outline-active'
 import { createMarkdownEditorSessionBinding } from './markdown-editor-session'
 import { createMarkdownEditorSessionCommandResources } from './markdown-editor-session-command-resources'
+import type { MarkdownRendererLastValidRender } from '../../markdown-renderer/src/markdown-renderer-session-resources'
 import { createMarkdownEditorSessionLayoutResources } from './markdown-editor-session-layout'
 import { createMarkdownEditorFrameResourceParticipant } from './markdown-editor-session-resources'
 import type { MarkdownEditorSessionResourceParticipant } from './markdown-editor-session-resources'
@@ -4941,7 +4942,10 @@ const searchCurrentIndex = ref<number | null>(null)
 const searchMode = ref<MarkdownSearchMode>('plain')
 const searchQueryInputRef = ref<HTMLInputElement | null>(null)
 const searchReplaceInputRef = ref<HTMLInputElement | null>(null)
-const previewRendererRef = ref<HTMLElement | { $el?: HTMLElement } | null>(null)
+const previewRendererRef = ref<HTMLElement | {
+  $el?: HTMLElement
+  captureLastValidRender?: () => MarkdownRendererLastValidRender | null
+} | null>(null)
 
 const searchHighlights = computed(() =>
   resolveMarkdownSearchHighlights({
@@ -6223,6 +6227,24 @@ const sessionBinding = createMarkdownEditorSessionBinding({
   ],
   isComposing: () => isComposing.value || nativeMachine.composing,
   isDisposed: () => sessionDisposed,
+  captureLastValidRender: () => {
+    // Segmented/embed renderers prove their own fragments, not the full article.
+    // Only this existing full-document mounted renderer can supply this ref.
+    if (embedRenderSegments.value.length > 1) return null
+    const renderer = previewRendererRef.value
+    if (!renderer || !('captureLastValidRender' in renderer) ||
+      typeof renderer.captureLastValidRender !== 'function') return null
+    const capture = renderer.captureLastValidRender()
+    if (!capture || typeof capture.documentIdentity.epoch !== 'number' ||
+      typeof capture.revision !== 'number') return null
+    return Object.freeze({
+      ref: capture.ref,
+      documentIdentity: Object.freeze({
+        id: capture.documentIdentity.id, epoch: capture.documentIdentity.epoch,
+      }),
+      revision: capture.revision,
+    })
+  },
   captureViewState: () => ({
     mode: currentMode.value,
     search: {

@@ -621,3 +621,20 @@ This source consumes language owner offer `6b9eb126984973438bba02c89316bdd8a85ba
 as an isolated increment. Its six original-suite cases remain UNRUN. No runtime,
 native language-tool, IME, privacy, cross-session CSS-highlight or recovery
 qualification is supplied by this wiring.
+
+
+`captureLastValidRender()` reads the actual existing full-document renderer's
+opaque authorized result, checking the sole transaction owner's current document
+identity/epoch/revision. It returns null for absent, fragment/embed or stale renders;
+no hidden renderer or synthetic ref is created. `captureSnapshot` retains that
+nullable proof. A snapshot with a render proof cannot restore if the original
+renderer has lost/replaced that exact ref. This is same-owner custody checking,
+not serialized renderer hydration or recoverable disposal. The new snapshot field
+has no content/HTML payload and does not qualify a complete host snapshot.
+
+Renderer source offer `53d83a1c1f4c020597c6e807c8582f8c04309454` is consumed as its
+own isolated increment. Its partial resource source offer remains complete:false;
+the renderer-projection participant is not admitted. Real worker-pool/pipeline,
+hardware sampler, virtual-window and heavy-runtime control APIs and validated
+restoration remain upstream dependencies. Existing security/privacy/render/race/
+backuprestore/native/IME holds continue unchanged.

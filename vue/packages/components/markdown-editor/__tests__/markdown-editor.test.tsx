@@ -35,6 +35,8 @@ describe('MarkdownEditor', () => {
     expect(() => editor.getSession('session:article:two')).toThrow('editor-session-owner-already-bound')
     const snapshot = session.captureSnapshot(() => 'a'.repeat(64))
     expect(snapshot.history.undoDepth).toBe(1)
+    expect(snapshot.lastValidRender).toBeNull()
+    expect(session.captureLastValidRender()).toBeNull()
     expect(snapshot).not.toHaveProperty('value')
     const expected = { documentIdentity: snapshot.documentIdentity, revision: snapshot.revision }
     expect(session.restoreSnapshot({ ...snapshot }, expected).status).toBe('blocked')
