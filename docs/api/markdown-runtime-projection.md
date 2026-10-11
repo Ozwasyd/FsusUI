@@ -200,11 +200,34 @@ digest work and unresolved preparation work until they settle. Its request censu
 reads the actual preparation timer and abort listeners; cancellation removes
 listeners and invalidates commit eligibility, but does not claim that an opaque
 consumer resolver has stopped. A consumer upload remains outside library network
-ownership. Pending/progress attachment jobs block pause because the existing
-attachment intent/result protocol has no reversible pause acknowledgement.
+ownership. Unknown attachment dispatch settlement blocks census. An observed
+consumer invocation blocks pause until its actual future settles; changing a job's
+UI phase or removing it does not settle that invocation. The existing attachment
+intent/result protocol supplies no reversible upload pause acknowledgement.
 Only an empty lifecycle with no jobs, nodes, versions, results or unresolved work
 is recoverable without a provider checkpoint. This source owner is not yet wired
 into the editor's session roster and does not authorize whole-session eviction.
+Before registration or attachment dispatch, the setup adapter must bind the
+existing reactive document identity, native revision ref and deep jobs ref through
+`bindAttachmentInputs({ documentIdentity, revision: editorRevision, jobs: attachmentJobs })`.
+The same owner watches these stores with synchronous invalidation and counts that
+real observer. It stops the observer on pause and recreates it on resume. Missing,
+computed/custom, shallow or non-reactive job observations cannot grant dispatch or
+census admission. Result checks normalize both job membership and private proof
+to the same raw job identity, including proxies retained by array spread. Supplied
+read callbacks execute inside the synchronous observation fence; document/job
+mutation, including a reactive mutate-and-restore, rejects that check. After those
+callbacks, only immutable native-state snapshots and private invocation evidence
+are used. This internal setup contract does not supply a legacy event-path upload
+future or relax final-result provenance.
+Lifecycle start/stop/bind/pause/resume/dispose operations share an exclusive
+synchronous transition boundary. Reentrant cleanup cannot change phase or create
+a replacement watcher. Both watcher handles are detached before either cleanup
+runs and remain owned until their actual stop succeeds. Throwing cleanup or
+construction without a returned stop capability blocks census; an idempotent
+retry is not evidence that the original cleanup completed. Other known handles
+and requests can still be cancelled without granting a paused/recoverable result.
+
 The mounted editor's session contract remains documented in
 [`MarkdownEditor`](../components/markdown-editor.md#retained-public-editor-session-source-wip).
 
