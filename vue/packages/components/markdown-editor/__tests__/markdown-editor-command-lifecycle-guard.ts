@@ -19,6 +19,19 @@ const path = (node?: ts.Node): string | undefined => {
     const owner = path(node.expression)
     return owner ? `${owner}.${node.name.text}` : undefined
   }
+  if (
+    ts.isElementAccessExpression(node) &&
+    ts.isStringLiteral(node.argumentExpression)
+  ) {
+    const owner = path(node.expression)
+    return owner ? `${owner}.${node.argumentExpression.text}` : undefined
+  }
+  if (
+    ts.isParenthesizedExpression(node) ||
+    ts.isAsExpression(node) ||
+    ts.isNonNullExpression(node)
+  )
+    return path(node.expression)
   return undefined
 }
 const samePath = (node: ts.Node | undefined, expected: string | undefined) =>
@@ -36,7 +49,85 @@ const root = (node?: ts.Node): string | undefined => {
     return root(node.expression)
   return undefined
 }
-const writes = (node: ts.Node, bindings: Set<string>) => {
+const mutationMethods = new Set([
+  'Object.assign',
+  'Object.defineProperty',
+  'Object.defineProperties',
+  'Object.setPrototypeOf',
+  'Reflect.set',
+  'Reflect.deleteProperty',
+  'Reflect.defineProperty',
+  'Reflect.setPrototypeOf',
+])
+const references = (nodes: ts.Node[]) => {
+  const names = new Map<string, string>()
+  let version = 0
+  const rank = (value: string) =>
+    mutationMethods.has(value)
+      ? 2
+      : value === 'Object' || value === 'Reflect'
+        ? 1
+        : 0
+  const reference = (node?: ts.Node): string | undefined => {
+    const value = path(node)
+    if (!value) return undefined
+    const [first, ...rest] = value.replace(/^globalThis\./u, '').split('.')
+    return [names.get(first!) ?? first, ...rest].join('.')
+  }
+  const bind = (
+    target: ts.BindingName,
+    value: ts.Expression | undefined,
+    origin = reference(value),
+  ) => {
+    if (ts.isIdentifier(target)) {
+      const previous = names.get(target.text)
+      // A mutable local alias cannot erase a possible mutator provenance. Each
+      // binding advances only through these finite ranks, including cycles.
+      if (origin && (!previous || rank(origin) > rank(previous))) {
+        names.set(target.text, origin)
+        version += 1
+      }
+      return
+    }
+    for (const [index, element] of target.elements.entries()) {
+      if (!ts.isBindingElement(element) || element.dotDotDotToken) continue
+      const key = element.propertyName ?? element.name
+      const propertyName =
+        ts.isIdentifier(key) || ts.isStringLiteral(key) ? key.text : undefined
+      const child =
+        value && ts.isArrayLiteralExpression(value)
+          ? value.elements[index]
+          : undefined
+      bind(
+        element.name,
+        child,
+        ts.isArrayBindingPattern(target)
+          ? reference(child)
+          : origin && propertyName
+            ? `${origin}.${propertyName}`
+            : undefined,
+      )
+    }
+  }
+  let previousVersion = -1
+  while (previousVersion !== version) {
+    previousVersion = version
+    for (const node of nodes)
+      if (ts.isVariableDeclaration(node)) bind(node.name, node.initializer)
+      else if (
+        ts.isBinaryExpression(node) &&
+        node.operatorToken.kind === ts.SyntaxKind.EqualsToken &&
+        ts.isIdentifier(node.left)
+      )
+        bind(node.left, node.right)
+  }
+  return reference
+}
+const writes = (
+  node: ts.Node,
+  bindings: Set<string>,
+  reference = references(descendants(node)),
+) => {
   const owned = (target: ts.Node | undefined) =>
     bindings.has(root(target) ?? '')
   return descendants(node).some((entry) => {
@@ -53,38 +144,80 @@ const writes = (node: ts.Node, bindings: Set<string>) => {
           entry.operator === ts.SyntaxKind.MinusMinusToken) &&
         owned(entry.operand)
       )
-    return (
-      ts.isCallExpression(entry) &&
-      [
-        'Object.assign',
-        'Object.defineProperty',
-        'Object.defineProperties',
-        'Reflect.set',
-        'Reflect.deleteProperty',
-        'Reflect.defineProperty',
-      ].includes(path(entry.expression) ?? '') &&
-      owned(entry.arguments[0])
-    )
+    if (!ts.isCallExpression(entry)) return false
+    const callee = reference(entry.expression) ?? ''
+    if (mutationMethods.has(callee)) return owned(entry.arguments[0])
+    const indirect = callee.replace(/\.(?:call|apply)$/u, '')
+    if (mutationMethods.has(indirect)) {
+      if (callee.endsWith('.call')) return owned(entry.arguments[1])
+      const args = entry.arguments[1]
+      return args && ts.isArrayLiteralExpression(args)
+        ? owned(args.elements[0])
+        : owned(args)
+    }
+    if (
+      callee === 'Reflect.apply' &&
+      mutationMethods.has(reference(entry.arguments[0]) ?? '')
+    ) {
+      const args = entry.arguments[2]
+      return args && ts.isArrayLiteralExpression(args)
+        ? owned(args.elements[0])
+        : owned(args)
+    }
+    return false
   })
 }
 const aliases = (nodes: ts.Node[], original: string[]) => {
   const bindings = new Set(original)
+  const containsOwned = (value?: ts.Node): boolean => {
+    if (!value) return false
+    if (bindings.has(root(value) ?? '')) return true
+    if (ts.isArrayLiteralExpression(value))
+      return value.elements.some(containsOwned)
+    if (ts.isObjectLiteralExpression(value))
+      return value.properties.some((entry) =>
+        ts.isPropertyAssignment(entry)
+          ? containsOwned(entry.initializer)
+          : ts.isShorthandPropertyAssignment(entry)
+            ? bindings.has(entry.name.text)
+            : ts.isSpreadAssignment(entry) && containsOwned(entry.expression),
+      )
+    if (ts.isSpreadElement(value)) return containsOwned(value.expression)
+    if (ts.isConditionalExpression(value))
+      return containsOwned(value.whenTrue) || containsOwned(value.whenFalse)
+    return false
+  }
+  const bind = (target: ts.Node) => {
+    if (ts.isIdentifier(target)) bindings.add(target.text)
+    else if (
+      ts.isObjectBindingPattern(target) ||
+      ts.isArrayBindingPattern(target)
+    ) {
+      for (const element of target.elements)
+        if (ts.isBindingElement(element)) bind(element.name)
+    } else if (ts.isObjectLiteralExpression(target)) {
+      for (const element of target.properties)
+        if (ts.isPropertyAssignment(element)) bind(element.initializer)
+        else if (ts.isShorthandPropertyAssignment(element)) bind(element.name)
+    } else if (ts.isArrayLiteralExpression(target))
+      target.elements.forEach(bind)
+  }
   let previousSize = -1
   while (previousSize !== bindings.size) {
     previousSize = bindings.size
     for (const entry of nodes) {
       const target = ts.isVariableDeclaration(entry)
-        ? identifier(entry.name)
+        ? entry.name
         : ts.isBinaryExpression(entry) &&
             entry.operatorToken.kind === ts.SyntaxKind.EqualsToken
-          ? identifier(entry.left)
+          ? entry.left
           : undefined
       const value = ts.isVariableDeclaration(entry)
         ? entry.initializer
         : ts.isBinaryExpression(entry)
           ? entry.right
           : undefined
-      if (target && bindings.has(root(value) ?? '')) bindings.add(target)
+      if (target && containsOwned(value)) bind(target)
     }
   }
   return bindings
@@ -187,6 +320,7 @@ export const commandLifecycleViolations = (component: string): string[] => {
   const check = (condition: unknown, rule: string) => {
     if (!condition) violations.push(rule)
   }
+  const reference = references(descendants(source))
   const imported = (exported: string, module: string, typeOnly = false) => {
     for (const statement of source.statements) {
       if (
@@ -293,15 +427,21 @@ export const commandLifecycleViolations = (component: string): string[] => {
       ) &&
       !shadowed(command) &&
       samePath(creation.arguments[0], `${command}.key`) &&
-      !writes(run, aliases(descendants(run), [command])),
+      !writes(run, aliases(descendants(run), [command]), reference),
     'original-command-key',
   )
   const registry = identifier(property(creation.arguments[2], 'activeSessions'))
   const registryDeclaration = topVariables.find(
     (entry) => identifier(entry.name) === registry,
   )
+  // Entry operations are legitimate; rebinding this Map, its methods, or a
+  // destructured/container alias invalidates the iterator/controller provenance.
+  const registryIntact =
+    !!registry &&
+    !writes(source, aliases(descendants(source), [registry, 'Map']), reference)
   check(
     registry &&
+      registryIntact &&
       !shadowed(registry) &&
       registryDeclaration?.initializer &&
       ts.isNewExpression(registryDeclaration.initializer) &&
@@ -386,7 +526,7 @@ export const commandLifecycleViolations = (component: string): string[] => {
       context.initializer.properties.at(-1) &&
       ts.isPropertyAssignment(context.initializer.properties.at(-1)!) &&
       identifier(context.initializer.properties.at(-1)!.name) === 'signal' &&
-      !beforeExecution.some((entry) => writes(entry, bindings)),
+      !beforeExecution.some((entry) => writes(entry, bindings, reference)),
     'original-session-signal',
   )
   const awaitedIndex = attempt.tryBlock.statements.findIndex((statement) =>
@@ -514,6 +654,7 @@ export const commandLifecycleViolations = (component: string): string[] => {
     directCall(statement, `${registry}.clear`),
   )
   const sharedCancellation =
+    registryIntact &&
     !shadowed(abort, cancellation) &&
     !shadowed(registry, cancellation) &&
     cancelExpression &&

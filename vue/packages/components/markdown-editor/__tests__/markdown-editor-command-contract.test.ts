@@ -671,3 +671,171 @@ describe('Command lifecycle guard execution-boundary regressions', () => {
     expect(commandLifecycleViolations(replace('const abortPendingCommands = () => {', 'const abortPendingCommands = () => {\n  if (false) return'))).toEqual([])
   })
 })
+
+describe("Command lifecycle guard alias and registry provenance", () => {
+  const component = readEditorSource("markdown-editor.vue");
+  const replace = (from: string, to: string) => {
+    expect(component.split(from)).toHaveLength(2);
+    return component.replace(from, to);
+  };
+  const beforeContext = (statements: string) =>
+    replace(
+      "  try {\n    const context = {",
+      `  try {\n    ${statements}\n    const context = {`,
+    );
+  const beforeCancel = (statements: string) =>
+    replace(
+      "const abortPendingCommands = () => {",
+      `const abortPendingCommands = () => {\n  ${statements}`,
+    );
+
+  it.each([
+    [
+      "array controller aliases",
+      "const [loan] = [session.abort]; loan.signal = commandContextSignal",
+    ],
+    [
+      "nested object controller aliases",
+      "const { owner: { abort: loan } } = { owner: session }; Reflect.defineProperty(loan, 'signal', { value: commandContextSignal })",
+    ],
+    [
+      "transitive destructured aliases",
+      "const { abort: loan } = session; const borrowed = loan; Object.assign(borrowed, { signal: commandContextSignal })",
+    ],
+    [
+      "computed reflection methods",
+      "Object['defineProperty'](session.abort, 'signal', { value: commandContextSignal })",
+    ],
+    [
+      "aliased reflection functions",
+      "const replace = Object.defineProperty; const { abort: loan } = session; replace(loan, 'signal', { value: commandContextSignal })",
+    ],
+    [
+      "destructured reflection functions",
+      "const { defineProperty: replace } = Object; replace(session.abort, 'signal', { value: commandContextSignal })",
+    ],
+    [
+      "array reflection functions",
+      "const [replace] = [Object.defineProperty]; replace(session.abort, 'signal', { value: commandContextSignal })",
+    ],
+    [
+      "reflection namespace aliases",
+      "const reflection = Reflect; reflection.set(session.abort, 'signal', commandContextSignal)",
+    ],
+    [
+      "mutable reflection functions",
+      "let replace = Object.keys; replace = Object.defineProperty; replace(session.abort, 'signal', { value: commandContextSignal })",
+    ],
+    [
+      "reflection call invocations",
+      "Object.defineProperty.call(Object, session.abort, 'signal', { value: commandContextSignal })",
+    ],
+    [
+      "reflection apply invocations",
+      "Object.defineProperty.apply(Object, [session.abort, 'signal', { value: commandContextSignal }])",
+    ],
+    [
+      "Reflect.apply invocations",
+      "Reflect.apply(Object.defineProperty, Object, [session.abort, 'signal', { value: commandContextSignal }])",
+    ],
+    [
+      "controller prototype replacement",
+      "Reflect.setPrototypeOf(session.abort, { signal: commandContextSignal })",
+    ],
+  ] as const)("rejects signal mutations through %s", (_name, statements) => {
+    expect(commandLifecycleViolations(beforeContext(statements))).toContain(
+      "original-session-signal",
+    );
+  });
+
+  it.each([
+    [
+      "a simple registry alias",
+      "const registry = commandSessions; registry.values = () => new Map().values()",
+    ],
+    [
+      "a nested registry alias",
+      "const { owner: { registry } } = { owner: { registry: commandSessions } }; Object.defineProperty(registry, 'values', { value: () => new Map().values() })",
+    ],
+    [
+      "an array registry alias",
+      "const [registry] = [commandSessions]; Reflect.set(registry, 'values', () => new Map().values())",
+    ],
+    [
+      "a computed registry method",
+      "commandSessions['values'] = () => new Map().values()",
+    ],
+    ["registry method deletion", "delete commandSessions.values"],
+    ["registry clear replacement", "commandSessions.clear = () => undefined"],
+    ["registry get replacement", "commandSessions.get = () => undefined"],
+    ["registry rebinding", "commandSessions = new Map()"],
+    [
+      "an aliased registry mutator",
+      "const { defineProperty: replace } = Object; replace(commandSessions, 'values', { value: () => new Map().values() })",
+    ],
+    [
+      "registry prototype replacement",
+      "Object.setPrototypeOf(commandSessions, { values: () => new Map().values() })",
+    ],
+    [
+      "shared Map prototype replacement",
+      "Map.prototype.values = () => new Map().entries()",
+    ],
+  ] as const)("rejects cancellation through %s", (_name, statements) => {
+    expect(commandLifecycleViolations(beforeCancel(statements))).toContain(
+      "abort-shared-sessions",
+    );
+  });
+
+  it("rejects registry method mutation on the model-reset hook path", () => {
+    const source = replace(
+      "    abortPendingCommands()\n    // Document switch:",
+      "    commandSessions.values = () => new Map().values()\n    abortPendingCommands()\n    // Document switch:",
+    );
+    expect(commandLifecycleViolations(source)).toContain("cancel-model-reset");
+  });
+
+  it("rejects registry method mutation before the command factory", () => {
+    const source = replace(
+      "const session = createMarkdownEditorCommandSession(",
+      "commandSessions.get = () => undefined\n  const session = createMarkdownEditorCommandSession(",
+    );
+    expect(commandLifecycleViolations(source)).toContain(
+      "shared-session-registry",
+    );
+  });
+
+  it.each([
+    [
+      "readonly array controller aliases",
+      "const [loan] = [session.abort]; void loan.signal",
+    ],
+    [
+      "readonly nested controller aliases",
+      "const { owner: { abort: loan } } = { owner: session }; void loan.signal",
+    ],
+    [
+      "readonly reflection on the original controller",
+      "const { abort: loan } = session; Object.keys(loan)",
+    ],
+  ] as const)("accepts %s", (_name, statements) => {
+    expect(commandLifecycleViolations(beforeContext(statements))).toEqual([]);
+  });
+
+  it.each([
+    [
+      "normal entry operations through a shared registry alias",
+      'const registry = commandSessions; const extra = registry.get("extra"); if (extra) { registry.set("extra", extra); registry.delete("extra") }',
+    ],
+    [
+      "method replacement on an unrelated registry",
+      "const foreign = new Map(); foreign.values = () => [].values()",
+    ],
+    [
+      "method replacement on a copied registry",
+      "const snapshot = new Map(commandSessions); snapshot.values = () => [].values()",
+    ],
+  ] as const)("accepts %s", (_name, statements) => {
+    expect(commandLifecycleViolations(beforeCancel(statements))).toEqual([]);
+  });
+});
