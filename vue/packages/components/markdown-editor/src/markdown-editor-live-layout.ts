@@ -237,6 +237,7 @@ export const createMarkdownLiveLayoutTextMeasurement = (
   owner: Document,
   source: string,
   metrics: MarkdownLiveLayoutTextMetrics,
+  typographyReference?: Readonly<{ parent: HTMLElement; className: string }>,
 ) => {
   const element = owner.createElement('div')
   element.setAttribute('aria-hidden', 'true')
@@ -249,8 +250,24 @@ export const createMarkdownLiveLayoutTextMeasurement = (
   const text = owner.createTextNode(`${source}\u200b`)
   element.append(text)
   owner.body.append(element)
+  // The same owning SCSS resolves the requested typography in the textarea's
+  // actual grid cell. This empty reference is measurement, never an input surface.
+  const reference = typographyReference ? owner.createElement('div') : null
+  if (reference && typographyReference) {
+    reference.className = typographyReference.className
+    reference.setAttribute('aria-hidden', 'true')
+    Object.assign(reference.style, {
+      position: 'absolute', gridArea: '1 / 1', height: '0', minHeight: '0',
+      minWidth: '0', maxWidth: '100%', boxSizing: 'border-box', margin: '0',
+      border: '0', padding: '0', visibility: 'hidden', pointerEvents: 'none',
+    })
+    for (const property of ['font-weight', 'font-style', 'font-stretch', 'font-feature-settings', 'font-variation-settings'])
+      reference.style.setProperty(property, metrics.properties[property] ?? '')
+    typographyReference.parent.append(reference)
+  }
   return Object.freeze({
     element,
+    reference,
     /** Native UTF-16 rect read in measure; the sentinel covers an empty/final line. */
     anchorY: (anchor: MarkdownLiveLayoutAnchor): number | null => {
       if (!element.isConnected || anchor.sourceOffset < 0 || anchor.sourceOffset > source.length) return null

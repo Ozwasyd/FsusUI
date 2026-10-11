@@ -1879,6 +1879,7 @@ const activeTypography = ref<MarkdownEditorTypographyProfile | null>(null)
 let typographyDisposed = false
 let pendingTypography: {
   cancel: (reason: MarkdownEditorTypographyRejection) => void
+  acceptRestoreScroll: () => boolean
 } | null = null
 const typographyMeasurements = new Set<HTMLElement>()
 const clearTypographyMeasurements = () => {
@@ -1923,6 +1924,7 @@ const restoreTextareaViewport = (
     readonly guard: () => boolean
     readonly settled: () => void
     readonly unavailable: () => void
+    readonly beforeScrollWrite: (scrollTop: number) => void
   },
 ) => {
   const textarea = textareaRef.value
@@ -1977,6 +1979,7 @@ const restoreTextareaViewport = (
         return
       }
       restoringViewport = true
+      continuity?.beforeScrollWrite(viewportRestoreNextScrollTop)
       target.scrollTop = viewportRestoreNextScrollTop
       viewportRestoreNextScrollTop = null
       if (!continuity)
@@ -2076,6 +2079,9 @@ const applyTypography = (
   let committed = false
   let done = false
   let viewportOffset = 0
+  let permittedScrollTop = textarea.scrollTop
+  const permittedScrollLeft = textarea.scrollLeft
+  let expectedRestoreScroll: number | null = null
   let effective: MarkdownEditorTypographyEffective | null = null
   let measurement: ReturnType<
     typeof createMarkdownLiveLayoutTextMeasurement
@@ -2088,6 +2094,15 @@ const applyTypography = (
     resolveResult = resolve
   })
   const operation = {
+    acceptRestoreScroll: () => {
+      const expected = expectedRestoreScroll
+      expectedRestoreScroll = null
+      return (
+        expected !== null &&
+        Math.abs(textarea.scrollTop - expected) <= 1 &&
+        textarea.scrollLeft === permittedScrollLeft
+      )
+    },
     cancel: (reason: MarkdownEditorTypographyRejection) =>
       finish(
         Object.freeze({
@@ -2158,25 +2173,108 @@ const applyTypography = (
       textarea.ownerDocument.visibilityState === 'hidden'
     )
       reason = 'surface-unavailable'
-    else if (editorProjection.value !== projection || (committed && liveLayout.value !== plan))
+    else if (
+      editorProjection.value !== projection ||
+      (committed && liveLayout.value !== plan)
+    )
       reason = 'layout-superseded'
     if (reason) operation.cancel(reason)
     return reason === null
   }
+  const checkViewport = () => {
+    if (
+      Math.abs(textarea.scrollTop - permittedScrollTop) <= 1 &&
+      textarea.scrollLeft === permittedScrollLeft
+    )
+      return true
+    operation.cancel('user-scroll')
+    return false
+  }
+  const readEffectiveTypography =
+    (): MarkdownEditorTypographyEffective | null => {
+      const reference = measurement?.reference
+      const view = textarea.ownerDocument.defaultView
+      if (!reference?.isConnected || !view || !metrics) return null
+      const style = view.getComputedStyle(textarea)
+      const expected = view.getComputedStyle(reference)
+      const marker = (name: string) =>
+        expected
+          .getPropertyValue(`--el-markdown-editor-typography-${name}`)
+          .trim()
+      const fontSizePx = Number.parseFloat(style.fontSize)
+      const lineHeightPx = Number.parseFloat(style.lineHeight)
+      const expectedFontSize = Number.parseFloat(expected.fontSize)
+      const expectedLineHeight = Number.parseFloat(expected.lineHeight)
+      const actualWidth = textarea.getBoundingClientRect().width
+      const expectedWidth = reference.getBoundingClientRect().width
+      const family = style.fontFamily
+        .replace(/["']/g, '')
+        .replace(/\s+/g, ' ')
+        .toLowerCase()
+      if (
+        marker('mapping') !==
+          MARKDOWN_EDITOR_TYPOGRAPHY_CATALOG.mappingVersion ||
+        marker('size') !== resolution.profile.fontSize ||
+        marker('line-height') !== resolution.profile.lineHeight ||
+        marker('width') !== resolution.profile.canvasWidth ||
+        style.writingMode !== 'horizontal-tb' ||
+        family !== 'system-ui, sans-serif' ||
+        !Number.isFinite(fontSizePx) ||
+        fontSizePx < 14 ||
+        !Number.isFinite(lineHeightPx) ||
+        lineHeightPx <= 0 ||
+        !Number.isFinite(expectedFontSize) ||
+        !Number.isFinite(expectedLineHeight) ||
+        Math.abs(fontSizePx - expectedFontSize) > 0.01 ||
+        Math.abs(lineHeightPx - expectedLineHeight) > 0.01 ||
+        Math.abs(
+          fontSizePx - Number.parseFloat(metrics.properties['font-size'] ?? ''),
+        ) > 0.01 ||
+        Math.abs(
+          lineHeightPx -
+            Number.parseFloat(metrics.properties['line-height'] ?? ''),
+        ) > 0.01 ||
+        actualWidth <= 0 ||
+        expectedWidth <= 0 ||
+        Math.abs(actualWidth - expectedWidth) > 1 ||
+        Math.abs(textarea.clientWidth - metrics.inlineSize) > 1
+      )
+        return null
+      return Object.freeze({
+        mappingVersion: MARKDOWN_EDITOR_TYPOGRAPHY_CATALOG.mappingVersion,
+        profile: resolution.profile,
+        contractId: resolution.contractId,
+        fontSizePx,
+        lineHeightPx,
+        canvasWidthPx: textarea.clientWidth,
+        paragraphSpacing: 'source-blank-lines',
+        font: Object.freeze({
+          identity: MARKDOWN_EDITOR_TYPOGRAPHY_CATALOG.baseline.fontIdentity,
+          kind: 'system',
+          state: 'current',
+          computedFamily: style.fontFamily,
+          faceEvidence: 'not-collected',
+          networkPolicy: 'no-font-loader',
+        }),
+      })
+    }
   pendingTypography = operation
-  // Each next measure is requested from the previous post-paint phase, so
-  // mirror creation, Vue class commits and scroll writes paint before readback.
+  // Submit only after the current scheduler frame ends. A measure submitted
+  // directly during post-paint is still a read-after-write contract violation.
   const schedule = (
     task: Omit<Parameters<typeof frameScheduler.schedule>[0], 'guard'>,
   ) => {
-    if (done) return
-    if (!frameScheduler.schedule({ ...task, guard }))
-      operation.cancel('surface-unavailable')
+    queueMicrotask(() => {
+      if (done) return
+      if (!frameScheduler.schedule({ ...task, guard }))
+        operation.cancel('surface-unavailable')
+    })
   }
   // Entry from a consumer result callback must wait for that frame to finish.
-  queueMicrotask(() => schedule({
+  schedule({
     key: keys[0],
     measure: () => {
+      if (!checkViewport()) return
       metrics = measureMarkdownLiveLayoutTextMetrics(textarea)
       if (!metrics) operation.cancel('geometry-unavailable')
     },
@@ -2193,6 +2291,7 @@ const applyTypography = (
       schedule({
         key: keys[1],
         measure: () => {
+          if (!checkViewport()) return
           const y = measurement?.anchorY(anchor)
           if (y == null) {
             operation.cancel('geometry-unavailable')
@@ -2214,98 +2313,82 @@ const applyTypography = (
           schedule({
             key: keys[2],
             measure: () => {
+              if (!checkViewport()) return
               metrics = measureMarkdownLiveLayoutTextMetrics(textarea)
-              const style =
-                textarea.ownerDocument.defaultView?.getComputedStyle(textarea)
-              const fontSizePx = Number.parseFloat(style?.fontSize ?? '')
-              const lineHeightPx = Number.parseFloat(style?.lineHeight ?? '')
-              const family = style?.fontFamily
-                .replace(/["']/g, '')
-                .replace(/\s+/g, ' ')
-                .toLowerCase()
-              if (
-                !metrics ||
-                !style ||
-                style.writingMode !== 'horizontal-tb' ||
-                !Number.isFinite(fontSizePx) ||
-                fontSizePx < 14 ||
-                !Number.isFinite(lineHeightPx) ||
-                lineHeightPx <= 0 ||
-                family !== 'system-ui, sans-serif'
-              ) {
+              if (!metrics || !textarea.parentElement)
                 operation.cancel('geometry-unavailable')
-                return
-              }
-              effective = Object.freeze({
-                mappingVersion:
-                  MARKDOWN_EDITOR_TYPOGRAPHY_CATALOG.mappingVersion,
-                profile: resolution.profile,
-                contractId: resolution.contractId,
-                fontSizePx,
-                lineHeightPx,
-                canvasWidthPx: textarea.clientWidth,
-                paragraphSpacing: 'source-blank-lines',
-                font: Object.freeze({
-                  identity:
-                    MARKDOWN_EDITOR_TYPOGRAPHY_CATALOG.baseline.fontIdentity,
-                  kind: 'system',
-                  state: 'current',
-                  computedFamily: style.fontFamily,
-                  faceEvidence: 'not-collected',
-                  networkPolicy: 'no-font-loader',
-                }),
-              })
             },
             mutate: () => {
-              if (!metrics) return
+              if (!metrics || !textarea.parentElement) return
               measurement = createMarkdownLiveLayoutTextMeasurement(
                 textarea.ownerDocument,
                 source,
                 metrics,
+                {
+                  parent: textarea.parentElement,
+                  className: ns.e('typography-measurement'),
+                },
               )
               typographyMeasurements.add(measurement.element)
+              if (measurement.reference)
+                typographyMeasurements.add(measurement.reference)
             },
             postPaint: () => {
-              restoreTextareaViewport(plan, {
-                anchorY: () => measurement?.anchorY(anchor) ?? null,
-                guard,
-                viewportOffset,
-                unavailable: () => operation.cancel('geometry-unavailable'),
-                settled: () =>
-                  schedule({
-                    key: keys[3],
-                    measure: () => {
-                      const y = measurement?.anchorY(anchor)
-                      const offset = y == null ? null : y - textarea.scrollTop
-                      if (
-                        offset === null ||
-                        Math.abs(offset - viewportOffset) > 1 ||
-                        !effective
-                      ) {
-                        operation.cancel('geometry-unavailable')
-                        return
-                      }
-                      finish(
-                        Object.freeze({
-                          status: 'applied',
-                          requestId: request.requestId,
-                          documentIdentity: identity,
-                          revision,
-                          selection,
-                          anchor,
-                          effective,
-                          settle: 'restored-after-frame',
-                          viewportOffsetBefore: viewportOffset,
-                          viewportOffsetAfter: offset,
-                        }),
-                      )
-                    },
-                  }),
+              queueMicrotask(() => {
+                if (!guard()) return
+                restoreTextareaViewport(plan, {
+                  anchorY: () => {
+                    if (!checkViewport()) return null
+                    effective = readEffectiveTypography()
+                    return effective
+                      ? (measurement?.anchorY(anchor) ?? null)
+                      : null
+                  },
+                  guard,
+                  viewportOffset,
+                  beforeScrollWrite: (scrollTop) => {
+                    permittedScrollTop = scrollTop
+                    expectedRestoreScroll = scrollTop
+                  },
+                  unavailable: () => operation.cancel('geometry-unavailable'),
+                  settled: () =>
+                    schedule({
+                      key: keys[3],
+                      measure: () => {
+                        if (!checkViewport()) return
+                        const y = measurement?.anchorY(anchor)
+                        const offset = y == null ? null : y - textarea.scrollTop
+                        const verified = readEffectiveTypography()
+                        if (
+                          offset === null ||
+                          Math.abs(offset - viewportOffset) > 1 ||
+                          !verified
+                        ) {
+                          operation.cancel('geometry-unavailable')
+                          return
+                        }
+                        finish(
+                          Object.freeze({
+                            status: 'applied',
+                            requestId: request.requestId,
+                            documentIdentity: identity,
+                            revision,
+                            selection,
+                            anchor,
+                            effective: verified,
+                            settle: 'restored-after-frame',
+                            viewportOffsetBefore: viewportOffset,
+                            viewportOffsetAfter: offset,
+                          }),
+                        )
+                      },
+                    }),
+                })
               })
             },
           }),
       }),
-  }))
+  })
   return promise
 }
 const applyLiveLayout = (
@@ -2407,6 +2490,13 @@ const handleLayoutTouch = () => {
 const handleLayoutScroll = () => {
   const textarea = textareaRef.value
   if (textarea) syncFocusLayerScroll(textarea.scrollTop)
+  if (pendingTypography) {
+    if (!pendingTypography.acceptRestoreScroll()) {
+      suspendTypewriterForUserScroll()
+      markLayoutGesture('scrollbar')
+    }
+    return
+  }
   if (restoringSelection || restoringViewport || restoringTypewriter) return
   if (textarea && typewriterScrollTarget !== null) {
     const reachedTarget =

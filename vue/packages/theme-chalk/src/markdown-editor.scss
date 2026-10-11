@@ -10,6 +10,10 @@ $markdown-editor-source-line-height: 1.6;
   width: min(100%, $markdown-editor-prose-width);
   @if $system-only {
     font-family: system-ui, sans-serif;
+    --el-markdown-editor-typography-mapping: markdown-editor-typography.v2;
+    --el-markdown-editor-typography-size: standard;
+    --el-markdown-editor-typography-line-height: standard;
+    --el-markdown-editor-typography-width: standard;
   } @else {
     font-family:
       getCssVar('font-family'),
@@ -620,6 +624,10 @@ $markdown-editor-source-line-height: 1.6;
   }
 
   @include when(typography-baseline) {
+    @include e(typography-measurement) {
+      @include markdown-editor-prose-typography(true);
+    }
+
     @include e(textarea) {
       @include markdown-editor-prose-typography(true);
       justify-self: center;
@@ -639,33 +647,38 @@ $markdown-editor-source-line-height: 1.6;
   // Engineering mapping v2: closed discrete steps, never consumer CSS/numeric input.
   @each $size, $token in (compact: medium, large: extra-large) {
     @include m(typography-size-#{$size}) {
-      @include e((textarea, focus-layer, preview)) {
+      @include e((textarea, focus-layer, preview, typography-measurement)) {
         font-size: getCssVar('font-size', $token);
+        --el-markdown-editor-typography-size: #{$size};
       }
     }
   }
 
   @include m(typography-line-height-compact) {
-    @include e((textarea, focus-layer, preview)) {
+    @include e((textarea, focus-layer, preview, typography-measurement)) {
       line-height: $markdown-editor-source-line-height;
+      --el-markdown-editor-typography-line-height: compact;
     }
   }
 
   @include m(typography-line-height-relaxed) {
-    @include e((textarea, focus-layer, preview)) {
+    @include e((textarea, focus-layer, preview, typography-measurement)) {
       line-height: calc(#{$markdown-editor-prose-line-height}em + var(--fsus-space-1, 4px));
+      --el-markdown-editor-typography-line-height: relaxed;
     }
   }
 
   @include m(typography-width-narrow) {
-    @include e((textarea, focus-layer, preview)) {
+    @include e((textarea, focus-layer, preview, typography-measurement)) {
       width: min(100%, calc(#{$markdown-editor-prose-width} - 2 * var(--fsus-space-8, 32px)));
+      --el-markdown-editor-typography-width: narrow;
     }
   }
 
   @include m(typography-width-wide) {
-    @include e((textarea, focus-layer, preview)) {
+    @include e((textarea, focus-layer, preview, typography-measurement)) {
       width: min(100%, calc(#{$markdown-editor-prose-width} + 2 * var(--fsus-space-8, 32px)));
+      --el-markdown-editor-typography-width: wide;
     }
   }
 

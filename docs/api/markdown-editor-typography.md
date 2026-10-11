@@ -122,6 +122,21 @@ pixel. Effective size/line-height/canvas width and font family are observed DOM
 values. Missing geometry, hidden/unmounted surfaces or a currently loading
 document font set fail closed. A layout plan alone is never completion.
 
+Each later measure is submitted through a microtask after the current scheduler
+frame finishes, including the original viewport restore. Post-paint callbacks
+do not directly submit a measure while the scheduler is still in its write phase.
+Native scroll cancels the pending operation before selection/typewriter/resize
+early returns. Only the one expected scroll at the editor's own restore target
+is exempt; every measure also checks that the viewport has not moved independently.
+
+Completion compares actual computed font size, line height and border-box width
+with an empty hidden reference in the same grid cell. The reference uses the same
+owning SCSS rules and private mapping markers as the requested profile, so theme
+token customization and container clamps resolve through CSS rather than a second
+numeric mapping in JavaScript. The later readback repeats the comparison. Missing
+current mapping markers, overridden actual metrics or unavailable reference/native
+geometry interrupt completion. Neither node is an editor or an input surface.
+
 - `applied`: captured identity/revision/selection/anchor, actual effective
   profile and `settle: 'restored-after-frame'` with before/after pixel offsets.
 - `rejected`: no visual commit, reason and `settle: 'not-applied'`.
