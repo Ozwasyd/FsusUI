@@ -68,6 +68,20 @@ const isPassiveRecord = (value: object) => {
     )
   )
 }
+const snapshotPassiveRecord = <T extends object>(
+  value: T,
+): Readonly<T> | undefined => {
+  const prototype = Object.getPrototypeOf(value)
+  if (prototype !== Object.prototype && prototype !== null) return
+  const descriptors = Object.getOwnPropertyDescriptors(value)
+  const entries: [PropertyKey, unknown][] = []
+  for (const key of Reflect.ownKeys(descriptors)) {
+    const descriptor = descriptors[key as keyof typeof descriptors]
+    if (!('value' in descriptor)) return
+    entries.push([key, descriptor.value])
+  }
+  return Object.freeze(Object.fromEntries(entries)) as Readonly<T>
+}
 
 /** One setup-owned lifecycle. Vue supplies reactive reads/writes, never another queue. */
 export const createMarkdownAttachmentEmbedResourceOwner = (
@@ -228,10 +242,13 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
     embedGeneration += 1
     embedAttempts.clear()
     const epoch = embedGeneration
-    for (const operation of [...active]) {
+    const operations = [...active]
+    const retired = [...draining]
+    for (const operation of operations) {
       operation.controller.abort()
       cancelMarkdownEmbedRequest(operation.request)
     }
+    for (const request of retired) cancelMarkdownEmbedRequest(request)
     return epoch
   }
   const inspect = (): MarkdownEditorSessionResourceInspection => {
@@ -553,37 +570,48 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
     if (pauseRequested || disposed || !result.itemId) return false
     const proof = attachmentResults.get(result)
     if (!proof) return false
+    const boundary = boundaryRef
     const context = readDocumentContext()
-    const job = readAttachmentJobs().find(
-      (candidate) => toRaw(candidate) === proof.job,
-    )
-    if (!job) return false
-    const matches =
-      job.itemId === result.itemId &&
-      job.batchId === result.batchId &&
-      unfinished(job) &&
-      job.documentIdentity?.id === context.id &&
-      job.documentIdentity.epoch === context.epoch &&
-      (!result.documentIdentity ||
-        (result.documentIdentity.id === context.id &&
-          result.documentIdentity.epoch === context.epoch)) &&
-      (result.revision === undefined || result.revision === job.revision)
-    const status = result.status
-    const attempt = job.attempt
     const now = readDocumentContext()
-    const dispatch = inspectMarkdownAttachmentDispatch(job)
+    const jobs = toRaw(readAttachmentJobs())
+    // No consumer callback follows these raw data snapshots. A callback may
+    // retry/remove the job without changing the document or dispatch ledger.
+    const slots = Object.getOwnPropertyDescriptors(jobs)
+    const ownsJob = Object.values(slots).some(
+      (slot) => 'value' in slot && slot.value === proof.job,
+    )
+    const job = snapshotPassiveRecord(proof.job)
+    const delivered = snapshotPassiveRecord(result)
+    if (!ownsJob || !job || !delivered) return false
+    const jobIdentity =
+      job.documentIdentity && snapshotPassiveRecord(job.documentIdentity)
+    const resultIdentity =
+      delivered.documentIdentity &&
+      snapshotPassiveRecord(delivered.documentIdentity)
+    const matches =
+      job.itemId === delivered.itemId &&
+      job.batchId === delivered.batchId &&
+      unfinished(job) &&
+      jobIdentity?.id === context.id &&
+      jobIdentity.epoch === context.epoch &&
+      (!delivered.documentIdentity ||
+        (resultIdentity?.id === context.id &&
+          resultIdentity.epoch === context.epoch)) &&
+      (delivered.revision === undefined || delivered.revision === job.revision)
+    const dispatch = inspectMarkdownAttachmentDispatch(proof.job)
     return (
       matches &&
+      boundaryRef === boundary &&
       sameDocumentContext(context, now) &&
       !pauseRequested &&
       !disposed &&
       dispatch?.dispatchRef === proof.dispatchRef &&
       attachmentGeneration === proof.generation &&
       dispatch.attempt === proof.attempt &&
-      attempt === proof.attempt &&
+      job.attempt === proof.attempt &&
       (proof.kind === 'progress'
-        ? status === 'progress' && !dispatch.settled
-        : status !== 'progress' && dispatch.settled)
+        ? delivered.status === 'progress' && !dispatch.settled
+        : delivered.status !== 'progress' && dispatch.settled)
     )
   }
   return Object.freeze({
@@ -643,13 +671,16 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
                 previous.kind !== kind)
             )
               return false
-            attachmentResults.set(result, {
-              job: ownedJob,
-              dispatchRef: state.dispatchRef,
-              attempt: state.attempt,
-              generation: epoch,
-              kind,
-            })
+            attachmentResults.set(
+              result,
+              Object.freeze({
+                job: ownedJob,
+                dispatchRef: state.dispatchRef,
+                attempt: state.attempt,
+                generation: epoch,
+                kind,
+              }),
+            )
             return acceptsAttachmentResult(result)
           }
           bindSettlement = (result) => {

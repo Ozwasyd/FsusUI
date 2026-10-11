@@ -95,6 +95,7 @@ const requests = new Map<string, MarkdownEmbedRequest>()
 const controllers = new WeakMap<object, AbortController>()
 const externalLinks = new WeakMap<object, () => void>()
 const failedExternalCleanup = new WeakSet<object>()
+const externalCleanupInProgress = new WeakSet<object>()
 interface EmbedProjectionWork {
   timer: ReturnType<typeof setTimeout> | undefined
   listeners: number
@@ -108,13 +109,19 @@ export const forgetMarkdownEmbedRequest = (
   requestId: string,
   expected?: MarkdownEmbedRequest,
 ) => {
-  const request = requests.get(requestId)
-  if (expected && request?.signal !== expected.signal) return
+  const registered = requests.get(requestId)
+  const request = expected ?? registered
+  if (!request || request.requestId !== requestId) return
   // Detach this registration before invoking external cleanup: a callback may
   // admit another instance at the same id, which this cleanup must not remove.
-  requests.delete(requestId)
+  if (registered && registered.signal === request.signal)
+    requests.delete(requestId)
   if (request?.signal) {
+    // The original signal is still a cleanup capability after its registration
+    // was detached. It never authorizes removal of a fresh same-id instance.
+    if (externalCleanupInProgress.has(request.signal)) return
     const unlink = externalLinks.get(request.signal)
+    externalCleanupInProgress.add(request.signal)
     externalLinks.delete(request.signal)
     try {
       unlink?.()
@@ -123,6 +130,8 @@ export const forgetMarkdownEmbedRequest = (
       if (unlink) externalLinks.set(request.signal, unlink)
       failedExternalCleanup.add(request.signal)
       throw error
+    } finally {
+      externalCleanupInProgress.delete(request.signal)
     }
   }
 }
@@ -139,6 +148,8 @@ export const cancelMarkdownEmbedRequest = (
 export const inspectMarkdownEmbedRequestResources = (
   request: MarkdownEmbedRequest,
 ) => {
+  if (request.signal && externalCleanupInProgress.has(request.signal))
+    throw new Error('markdown-embed-listener-cleanup-in-progress')
   if (request.signal && failedExternalCleanup.has(request.signal))
     throw new Error('markdown-embed-listener-cleanup-unavailable')
   const work = [...(projectionWork.get(request.signal ?? request) ?? [])]
