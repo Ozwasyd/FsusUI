@@ -1,4 +1,4 @@
-import { watch } from 'vue'
+import { watch, toRaw } from 'vue'
 import type { WatchSource, WatchStopHandle } from 'vue'
 import type {
   MarkdownDocumentIdentity,
@@ -18,6 +18,10 @@ import type {
   MarkdownEmbedResult,
 } from '../../../wasm/markdown-embed-provider'
 import type { MarkdownAttachmentJob } from './markdown-editor-attachment-lifecycle'
+import {
+  inspectMarkdownAttachmentDispatch,
+  runMarkdownAttachmentDispatch,
+} from './markdown-editor-attachment-lifecycle'
 import { inspectMarkdownAttachmentCaptureResources } from './markdown-editor-attachment'
 import type {
   MarkdownAttachmentProviderResult,
@@ -64,6 +68,9 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
     controller: AbortController
     request: MarkdownEmbedRequest
   }>()
+  const attachmentTasks = new Map<object, MarkdownAttachmentJob>()
+  // An unobserved consumer dispatch cannot be cleared by phase changes/removal.
+  const observedAttachmentJobs = new Set<MarkdownAttachmentJob>()
   // Aborting a preparation can return before its consumer resolver has settled.
   const draining = new Set<MarkdownEmbedRequest>()
   const versions = new Map<string, number>()
@@ -113,12 +120,29 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
   const inspect = (): MarkdownEditorSessionResourceInspection => {
     collectDraining()
     const jobs = bindings.readAttachmentJobs()
+    const currentJobs = new Set(jobs.map((job) => toRaw(job)))
+    for (const job of currentJobs) observedAttachmentJobs.add(job)
+    const attachmentRunning = new Set(attachmentTasks.keys())
+    for (const job of observedAttachmentJobs) {
+      const state = inspectMarkdownAttachmentDispatch(job)
+      if (!state || state.attempt !== job.attempt) {
+        throw new Error(
+          'editor-session-attachment-settlement-owner-unavailable',
+        )
+      }
+      if (!state.settled) attachmentRunning.add(state.dispatchRef)
+      else if (
+        !currentJobs.has(job) &&
+        !attachmentTasks.has(state.dispatchRef)
+      ) {
+        observedAttachmentJobs.delete(job)
+      }
+    }
     const batches = bindings.readAttachmentBatches()
     const items = bindings.readAttachmentItems()
     const capture = inspectMarkdownAttachmentCaptureResources(
       bindings.attachmentCaptureSession,
     )
-    const unfinishedJobs = jobs.filter(unfinished).length
     const requests = new Set([...active].map((operation) => operation.request))
     for (const request of draining) requests.add(request)
     let timers = 0
@@ -130,7 +154,8 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
       retainedListeners += resources.retainedListeners
       preparationTasks += resources.backgroundTasks
     }
-    const backgroundTasks = active.size + preparationTasks + unfinishedJobs
+    const backgroundTasks =
+      active.size + preparationTasks + attachmentRunning.size
     return Object.freeze({
       ownerRef: 'attachment-embed',
       paused:
@@ -144,6 +169,7 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
       recoverable:
         backgroundTasks === 0 &&
         jobs.length === 0 &&
+        observedAttachmentJobs.size === 0 &&
         batches.size === 0 &&
         items.size === 0 &&
         capture.memoryUnits === 0 &&
@@ -164,6 +190,8 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
           active.size +
           draining.size +
           jobs.length +
+          observedAttachmentJobs.size +
+          attachmentTasks.size +
           batches.size +
           items.size +
           capture.memoryUnits +
@@ -271,7 +299,8 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
   }
   const refreshEmbeds = (nextNodes: readonly MarkdownEmbedValidNode[]) => {
     if (disposed) throw new Error('editor-session-attachment-embed-disposed')
-    if (pauseRequested) throw new Error('editor-session-attachment-embed-paused')
+    if (pauseRequested)
+      throw new Error('editor-session-attachment-embed-paused')
     cancel()
     nodes = [...nextNodes]
     const ids = new Set(nodes.map(nodeId))
@@ -311,6 +340,35 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
   })
   return Object.freeze({
     participant,
+    async runAttachmentDispatch(
+      job: MarkdownAttachmentJob,
+      dispatch: () =>
+        | MarkdownAttachmentProviderResult
+        | PromiseLike<MarkdownAttachmentProviderResult>,
+    ): Promise<MarkdownAttachmentProviderResult> {
+      if (disposed || pauseRequested)
+        throw new Error('editor-session-attachment-dispatch-admission-blocked')
+      const ownedJob = toRaw(job)
+      if (
+        !bindings
+          .readAttachmentJobs()
+          .some((candidate) => toRaw(candidate) === ownedJob)
+      ) {
+        throw new Error('editor-session-attachment-dispatch-job-unavailable')
+      }
+      observedAttachmentJobs.add(ownedJob)
+      let dispatchRef: object | undefined
+      try {
+        return await runMarkdownAttachmentDispatch(ownedJob, () => {
+          const state = inspectMarkdownAttachmentDispatch(ownedJob)!
+          dispatchRef = state.dispatchRef
+          attachmentTasks.set(dispatchRef, ownedJob)
+          return dispatch()
+        })
+      } finally {
+        if (dispatchRef) attachmentTasks.delete(dispatchRef)
+      }
+    },
     bindEmbedInputs(
       sources: readonly WatchSource[],
       readNodes: () => readonly MarkdownEmbedValidNode[],

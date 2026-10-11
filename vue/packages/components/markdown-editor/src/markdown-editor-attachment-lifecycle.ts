@@ -1,3 +1,4 @@
+import { toRaw } from 'vue'
 import type { MarkdownDocumentIdentity } from '../../../wasm/markdown-runtime'
 import type {
   MarkdownAttachmentAnchor,
@@ -37,6 +38,48 @@ export interface MarkdownAttachmentJob {
   message?: string
   range?: MarkdownAttachmentRange
   readonly signalController?: AbortController
+}
+
+interface MarkdownAttachmentDispatchState {
+  readonly dispatchRef: object
+  readonly attempt: number
+  settled: boolean
+}
+const attachmentDispatches = new WeakMap<
+  MarkdownAttachmentJob,
+  MarkdownAttachmentDispatchState
+>()
+
+/** Internal evidence from the actual invocation, independent of UI job phase. */
+export const inspectMarkdownAttachmentDispatch = (
+  job: MarkdownAttachmentJob,
+) => {
+  const state = attachmentDispatches.get(toRaw(job))
+  return state ? Object.freeze({ ...state }) : null
+}
+
+/** Only completion/rejection of this invocation can settle its resource record. */
+export const runMarkdownAttachmentDispatch = async (
+  job: MarkdownAttachmentJob,
+  dispatch: () =>
+    | MarkdownAttachmentProviderResult
+    | PromiseLike<MarkdownAttachmentProviderResult>,
+): Promise<MarkdownAttachmentProviderResult> => {
+  const ownedJob = toRaw(job)
+  const previous = attachmentDispatches.get(ownedJob)
+  if (previous && !previous.settled)
+    throw new Error('markdown-attachment-dispatch-still-running')
+  const state: MarkdownAttachmentDispatchState = {
+    dispatchRef: Object.freeze({}),
+    attempt: ownedJob.attempt,
+    settled: false,
+  }
+  attachmentDispatches.set(ownedJob, state)
+  try {
+    return await dispatch()
+  } finally {
+    state.settled = true
+  }
 }
 
 export const createMarkdownAttachmentJob = (
