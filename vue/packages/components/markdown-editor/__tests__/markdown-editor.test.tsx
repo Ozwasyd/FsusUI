@@ -68,6 +68,7 @@ describe('MarkdownEditor', () => {
     expect(census.missingOwners).toContain('editor-surface')
     expect(census.participants.some((owner) => owner.ownerRef === 'editor-layout-callbacks')).toBe(true)
     expect(census.participants.some((owner) => owner.ownerRef === 'language-search')).toBe(true)
+    expect(census.missingOwners).toContain('attachment-embed')
     expect(() => session.pauseResources()).toThrow('editor-session-resource-owner-unavailable')
     expect(session.inspectResourceParticipants().participants.every((owner) => !owner.paused)).toBe(true)
     expect(() => session.disposeAfterSnapshot(snapshot.snapshotRef)).toThrow('editor-session-resource-owner-unavailable')

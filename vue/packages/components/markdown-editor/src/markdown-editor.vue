@@ -5103,6 +5103,9 @@ const attachmentResourceParticipant: MarkdownEditorSessionResourceParticipant = 
   },
   dispose: (snapshotRef) => attachmentEmbedOwner.participant.dispose(snapshotRef),
 }
+// Root review retains upload-settlement/attempt/reentrancy/capacity blockers.
+// Do not admit this source offer as a trusted complete resource participant.
+const attachmentResourceOwnerReviewed = false
 
 const embedRenderSegments = computed<readonly MarkdownEmbedRenderSegment[]>(
   () => {
@@ -6159,7 +6162,7 @@ const sessionBinding = createMarkdownEditorSessionBinding({
     frameResourceParticipant, sessionLayoutResources.participant,
     ...(surfaceResourceOwnerComplete ? [surfaceResourceParticipant] : []),
     ...(languageSearchParticipant ? [languageSearchParticipant] : []),
-    ...(opaqueAttachmentResourcesObserved.value ? [] : [attachmentResourceParticipant]),
+    ...(attachmentResourceOwnerReviewed && !opaqueAttachmentResourcesObserved.value ? [attachmentResourceParticipant] : []),
     ...(commandResources.canInspect() ? [commandResources.participant] : []),
   ],
   isComposing: () => isComposing.value || nativeMachine.composing,
