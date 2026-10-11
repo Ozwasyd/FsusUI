@@ -345,6 +345,7 @@ export const createMarkdownRendererSessionResourceOwner = (options: {
             projection.backgroundTasks +
             pipeline.pendingRenders +
             pipeline.pendingRenderAdmissions +
+            pipeline.pendingControlTransitions +
             pipeline.pendingAdapterJobs +
             pipeline.rafHandles +
             pipeline.idleHandles +
@@ -376,6 +377,7 @@ export const createMarkdownRendererSessionResourceOwner = (options: {
             viewport.pendingMeasurements +
             pipeline.retainedSharedOwners +
             pipeline.pendingRenderAdmissions +
+            pipeline.pendingControlTransitions +
             heavy.usage.pendingImports +
             heavy.usage.scheduledContinuations +
             workerScopes.reduce(
