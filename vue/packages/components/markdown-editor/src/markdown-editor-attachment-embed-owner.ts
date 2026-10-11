@@ -71,6 +71,14 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
   const attachmentTasks = new Map<object, MarkdownAttachmentJob>()
   // An unobserved consumer dispatch cannot be cleared by phase changes/removal.
   const observedAttachmentJobs = new Set<MarkdownAttachmentJob>()
+  const attachmentResults = new WeakMap<
+    MarkdownAttachmentProviderResult,
+    {
+      readonly job: MarkdownAttachmentJob
+      readonly dispatchRef: object
+      readonly attempt: number
+    }
+  >()
   // Aborting a preparation can return before its consumer resolver has settled.
   const draining = new Set<MarkdownEmbedRequest>()
   const versions = new Map<string, number>()
@@ -338,6 +346,33 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
       cancel()
     },
   })
+  const acceptsAttachmentResult = (
+    result: MarkdownAttachmentProviderResult,
+  ) => {
+    if (pauseRequested || disposed || !result.itemId) return false
+    const proof = attachmentResults.get(result)
+    if (!proof) return false
+    const job = bindings
+      .readAttachmentJobs()
+      .find((candidate) => toRaw(candidate) === proof.job)
+    if (!job) return false
+    const dispatch = inspectMarkdownAttachmentDispatch(job)
+    const identity = bindings.readDocument().documentIdentity
+    return (
+      dispatch?.dispatchRef === proof.dispatchRef &&
+      dispatch.attempt === proof.attempt &&
+      job.attempt === proof.attempt &&
+      job.itemId === result.itemId &&
+      job.batchId === result.batchId &&
+      unfinished(job) &&
+      job.documentIdentity?.id === identity.id &&
+      job.documentIdentity.epoch === identity.epoch &&
+      (!result.documentIdentity ||
+        (result.documentIdentity.id === identity.id &&
+          result.documentIdentity.epoch === identity.epoch)) &&
+      (result.revision === undefined || result.revision === job.revision)
+    )
+  }
   return Object.freeze({
     participant,
     async runAttachmentDispatch(
@@ -359,11 +394,20 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
       observedAttachmentJobs.add(ownedJob)
       let dispatchRef: object | undefined
       try {
-        return await runMarkdownAttachmentDispatch(ownedJob, () => {
+        return await runMarkdownAttachmentDispatch(ownedJob, async () => {
           const state = inspectMarkdownAttachmentDispatch(ownedJob)!
           dispatchRef = state.dispatchRef
           attachmentTasks.set(dispatchRef, ownedJob)
-          return dispatch()
+          const result = await dispatch()
+          const previous = attachmentResults.get(result)
+          if (!previous || previous.dispatchRef === state.dispatchRef) {
+            attachmentResults.set(result, {
+              job: ownedJob,
+              dispatchRef: state.dispatchRef,
+              attempt: state.attempt,
+            })
+          }
+          return result
         })
       } finally {
         if (dispatchRef) attachmentTasks.delete(dispatchRef)
@@ -386,24 +430,7 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
       new Map(results) as ReadonlyMap<string, MarkdownEmbedResult>,
     readEmbedRequestVersions: () =>
       new Map(versions) as ReadonlyMap<string, number>,
-    acceptsAttachmentResult(result: MarkdownAttachmentProviderResult) {
-      if (pauseRequested || disposed || !result.itemId) return false
-      const job = bindings
-        .readAttachmentJobs()
-        .find((candidate) => candidate.itemId === result.itemId)
-      const identity = bindings.readDocument().documentIdentity
-      return (
-        !!job &&
-        job.batchId === result.batchId &&
-        unfinished(job) &&
-        job.documentIdentity?.id === identity.id &&
-        job.documentIdentity.epoch === identity.epoch &&
-        (!result.documentIdentity ||
-          (result.documentIdentity.id === identity.id &&
-            result.documentIdentity.epoch === identity.epoch)) &&
-        (result.revision === undefined || result.revision === job.revision)
-      )
-    },
+    acceptsAttachmentResult,
     abort() {
       pauseRequested = true
       stopWatching()
