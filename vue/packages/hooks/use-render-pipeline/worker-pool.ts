@@ -764,7 +764,12 @@ export const createFsusWorkerExecutor = <TRequest, TResponse>(
       slot.activeTaskId === null ? undefined : pending.get(slot.activeTaskId)
     terminateSlot(slot, 'worker-crash', error)
     emit('worker-error', { error, workerId: slot.id })
-    if (task?.retryOnCrash && task.retryCount < 1) {
+    if (
+      task?.retryOnCrash &&
+      task.retryCount < 1 &&
+      !disposed &&
+      pending.get(task.id) === task
+    ) {
       task.retryCount += 1
       task.slotId = null
       task.startedAt = null
@@ -962,6 +967,8 @@ export const createFsusWorkerExecutor = <TRequest, TResponse>(
   }
 
   const enqueue = (task: WorkerTask<TRequest, TResponse>) => {
+    const isCurrent = () => !disposed && pending.get(task.id) === task
+    if (!isCurrent()) return
     if (task.key) {
       for (const previous of [...pending.values()]) {
         if (
@@ -974,6 +981,7 @@ export const createFsusWorkerExecutor = <TRequest, TResponse>(
             'request-cancel',
             'fsus_worker_generation_superseded',
           )
+          if (!isCurrent()) return
         }
       }
     }
@@ -994,6 +1002,23 @@ export const createFsusWorkerExecutor = <TRequest, TResponse>(
         return
       }
       dropTask(victim, 'fsus_worker_queue_preempted')
+    }
+    // Cancellation and preemption observers may settle this task or refill lanes.
+    if (!isCurrent()) return
+    if (
+      task.key &&
+      (latestGenerations.get(task.key) ?? task.generation) > task.generation
+    ) {
+      cancelTask(task, 'request-cancel', 'fsus_worker_generation_superseded')
+      return
+    }
+    if (queues[task.lane].length >= laneLimits[task.lane]) {
+      dropTask(task, 'fsus_worker_lane_queue_full')
+      return
+    }
+    if (queueDepth() >= maxQueue) {
+      dropTask(task, 'fsus_worker_queue_full')
+      return
     }
     queues[task.lane].push(task)
     emit('request-queue', {
