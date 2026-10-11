@@ -301,11 +301,12 @@ inspections remain exposed under `sources`.
 
 The renderer requests heavy-feature admission closure when a document/render
 generation changes and reopening for a fresh render through the real owner.
-The inherited owner still has unresolved reentrant admission/teardown and loader
-cancellation gaps. This renderer namespaces continuation frame keys by its own
-instance identity; other scheduler consumers remain with their respective owners.
-These calls do not establish safe resource
-suspension, revive disposed runtime instances or establish a fully paused renderer. The heavy
+The inherited owner now guards admission again after callbacks and preserves
+retired pending work through real settlement. Continuation keys include the
+actual bridge capability, and this renderer additionally namespaces them by its
+instance identity. Timer/network cancellation remains unavailable, and source
+fixes do not establish safe resource suspension, revive disposed runtimes or
+establish a fully paused renderer. The heavy
 inspection retains retired provider tasks, imports, continuations and handles
 until their actual settlement, including work that outlives realm removal or
 unmount. Component jobs leave the census only in their actual `finally` blocks.
