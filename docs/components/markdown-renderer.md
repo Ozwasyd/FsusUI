@@ -247,7 +247,8 @@ unmount releases it.
 ref through this renderer's sole private retained slot and checks the current
 document ID, epoch, revision, request identity and render authority before
 mutation. Unknown, superseded, switched, source-modified or busy refs are blocked.
-Disposed or paused underlying owners and pending pipeline renders/adapter jobs
+Disposed or paused underlying owners, closed heavy-feature admission, pending
+pipeline renders/adapter jobs and retained heavy imports/continuations/tasks
 also block restoration. The operation reuses the actual retained HTML/chunk
 projection and strategy, waits for Vue/viewport work and feature activation, and
 rechecks generation and identity before reporting a restored result. A stale or
@@ -263,11 +264,15 @@ cross-instance hydration or crash recovery.
 ```ts
 {
   complete: false
+  measuredUsageOnly: true
   missingSourceDependencies: readonly string[]
   sources: {
     renderPipeline: object // Actual runtime/hardware inspection.
     virtualWindow: object // Actual viewport inspection.
+    heavyFeatures: object // Actual active and retired handle inspection.
   }
+  unknownUsage: object // Original timer/network/worker/pool unknown values.
+  knownNetworkRequests: number | null // null preserves an unknown heavy count.
   inspection: {
     ownerRef: 'renderer-projection'
     paused: false
@@ -286,23 +291,32 @@ cross-instance hydration or crash recovery.
 }
 ```
 
-The counts describe directly held component timers, RAF handles, owned scheduled
-frame descriptors, live asynchronous jobs, abort/theme listeners, activation
-observers and the heavy-feature lifecycle's reported resources. Available
-render-pipeline/hardware and virtual-window inspections contribute their actual
-handles, listeners, promises, observers and retained collection entries; the
-original inspections are also exposed under `sources`. Async jobs leave
-the census only when their actual `finally` blocks settle; cancelling a handle
-does not erase an unsettled promise. Memory units count retained logical resources
-and collection entries, not physical heap bytes. The zero direct network count
-does not describe networking inside hidden runtimes.
+The measured subtotals describe directly held component timers, RAF handles,
+owned scheduled frame descriptors, live asynchronous jobs, abort/theme listeners
+and activation observers. Actual runtime/hardware/viewport inspections contribute
+measured handles, listeners, promises, observers and collection entries. Worker
+counts come only from the runtime's exact owned task scopes; shared pool totals
+remain context and are never attributed to this renderer. The original
+inspections remain exposed under `sources`.
 
-This source offer is deliberately partial. Adapter internals, worker resources
-not yet available through the runtime owner, shared pool attribution, platform
-observer callbacks and heavy-runtime timer/network resources remain explicit
-unknowns or unavailable dependencies. Available sampler/viewport handles do not
-turn those unknowns into zeros. Its `inspection` must never be submitted as total
-session usage or as a successful paused acknowledgment.
+Heavy-feature admission closes when a document/render generation changes and
+reopens for a fresh render through the real lifecycle owner. This does not revive
+disposed runtime instances or establish a fully paused renderer. The heavy
+inspection retains retired provider tasks, imports, continuations and handles
+until their actual settlement, including work that outlives realm removal or
+unmount. Component jobs leave the census only in their actual `finally` blocks.
+Cancelling a handle does not erase an unsettled promise. Memory units count
+retained logical resources and collection entries, not physical heap bytes.
+
+This source offer is deliberately partial. Adapter internals, worker internals,
+shared pool attribution, platform observer callbacks, heavy-runtime timer/network
+resources, and activation/gateway loader imports remain explicit gaps.
+`unknownUsage` preserves the original unknown/unavailable values; a nullable
+`knownNetworkRequests` preserves an unmeasured heavy network count. The integer
+`inspection.usage.networkRequests` counts direct component requests only. Other
+integer fields are measured subtotals, never complete totals. Neither an unknown
+nor a shared pool is converted to an attributed zero. The `inspection` must never
+be submitted as total session usage or a successful paused acknowledgment.
 
 `getSessionResourceParticipant()` returns the same `renderer-projection`
 participant object on repeat calls. `inspect()`, `pause()` and `resume()` currently

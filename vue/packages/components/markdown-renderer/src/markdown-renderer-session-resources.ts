@@ -11,6 +11,7 @@ import type {
   FsusRenderPipelineRuntimeResourceInspection,
   useFsusVirtualWindow,
 } from '../../../hooks/use-render-pipeline'
+import type { MarkdownHeavyFeatureResourceInspection } from '../../../hooks/use-markdown-heavy-feature-lifecycle'
 import type {
   MarkdownEditorFrameScheduler,
   MarkdownEditorFrameTask,
@@ -45,7 +46,7 @@ export interface MarkdownRendererRenderGeneration extends MarkdownRendererDocume
 // Preserve the remaining real source gaps; available hook counts are exposed
 // separately and never turn opaque adapter/worker/platform state into zero.
 export const markdownRendererSessionSourceDependencies = Object.freeze([
-  'heavy-feature-runtime:timer-and-network-census-and-reversible-pause',
+  'markdown-runtime:activation-and-gateway-loader-import-network-census',
   'renderer:validated-snapshot-restoration-after-disposal',
 ] as const)
 
@@ -54,6 +55,7 @@ export const createMarkdownRendererSessionResourceOwner = (options: {
   readonly readDocumentState: () => MarkdownRendererDocumentState
   readonly readProjection: () => MarkdownRendererRetainedProjection
   readonly readPipelineResources: () => FsusRenderPipelineRuntimeResourceInspection
+  readonly readHeavyResources: () => MarkdownHeavyFeatureResourceInspection
   readonly readVirtualWindowResources: () => ReturnType<
     ReturnType<typeof useFsusVirtualWindow>['inspectResources']
   >
@@ -224,6 +226,10 @@ export const createMarkdownRendererSessionResourceOwner = (options: {
     const projection = options.readProjectionResources()
     const pipeline = options.readPipelineResources()
     const viewport = options.readVirtualWindowResources()
+    const heavy = options.readHeavyResources()
+    const workerScopes = pipeline.workerResources.scopes.map(
+      ({ inspection }) => inspection,
+    )
     const missingSourceDependencies: string[] = [
       ...markdownRendererSessionSourceDependencies,
     ]
@@ -232,9 +238,20 @@ export const createMarkdownRendererSessionResourceOwner = (options: {
         'markdown-runtime:adapter-internal-resource-census',
       )
     }
-    if (pipeline.workerResources === 'unavailable') {
+    if (
+      workerScopes.some((scope) => scope.workerInternalResources === 'unknown')
+    ) {
       missingSourceDependencies.push(
-        'render-pipeline-runtime:owner-scoped-worker-census-and-pause',
+        'render-pipeline-worker:internal-resource-census',
+      )
+    }
+    if (
+      pipeline.workerResources.pools.some(
+        ({ shared }) => shared.attribution === 'unattributable',
+      )
+    ) {
+      missingSourceDependencies.push(
+        'render-pipeline-worker:pool-context-attribution',
       )
     }
     if (viewport.observerInternalCallbacks === 'unknown') {
@@ -242,15 +259,55 @@ export const createMarkdownRendererSessionResourceOwner = (options: {
         'virtual-window:platform-observer-callback-qualification',
       )
     }
+    if (typeof heavy.usage.timers !== 'number') {
+      missingSourceDependencies.push(
+        `heavy-feature-runtime:timers-${heavy.usage.timers}`,
+      )
+    }
+    if (typeof heavy.usage.networkRequests !== 'number') {
+      missingSourceDependencies.push(
+        `heavy-feature-runtime:network-${heavy.usage.networkRequests}`,
+      )
+    }
+    // Count measurable handles only. Unknown fields remain verbatim under
+    // sources/unknownUsage; this subtotal is never a participant inspection.
+    let knownTimers = timers.size + pipeline.timers + viewport.timers
+    let knownNetworkRequests: number | null = null
+    if (typeof heavy.usage.timers === 'number')
+      knownTimers += heavy.usage.timers
+    if (typeof heavy.usage.networkRequests === 'number')
+      knownNetworkRequests = heavy.usage.networkRequests
+    for (const scope of workerScopes) {
+      knownTimers +=
+        scope.resources.requestTimeoutCount + scope.resources.cancelTimeoutCount
+    }
     return Object.freeze({
       complete: false as const,
+      measuredUsageOnly: true as const,
       missingSourceDependencies: Object.freeze(missingSourceDependencies),
       sources: Object.freeze({
         renderPipeline: pipeline,
         virtualWindow: viewport,
+        heavyFeatures: heavy,
       }),
-      // Partial, directly held component resources. Never submit this as the
-      // renderer-projection participant's aggregate inspection.
+      unknownUsage: Object.freeze({
+        timers:
+          typeof heavy.usage.timers === 'number' ? null : heavy.usage.timers,
+        networkRequests:
+          typeof heavy.usage.networkRequests === 'number'
+            ? null
+            : heavy.usage.networkRequests,
+        workerInternals: Object.freeze(
+          workerScopes.map((scope) => scope.workerInternalResources),
+        ),
+        poolAttribution: Object.freeze(
+          pipeline.workerResources.pools.map(
+            ({ shared }) => shared.attribution,
+          ),
+        ),
+      }),
+      // No aggregate-shaped network zero is emitted when this field is unknown.
+      knownNetworkRequests,
       inspection: Object.freeze({
         ownerRef: 'renderer-projection',
         paused: false,
@@ -260,12 +317,26 @@ export const createMarkdownRendererSessionResourceOwner = (options: {
           projection.retainedListeners +
           pipeline.retainedListeners +
           pipeline.hardware.retainedListeners +
-          viewport.retainedListeners,
+          viewport.retainedListeners +
+          heavy.usage.listeners +
+          workerScopes.reduce(
+            (count, scope) =>
+              count +
+              scope.resources.abortListenerCount +
+              scope.resources.workerErrorHandlerCount +
+              scope.resources.workerMessageHandlerCount,
+            0,
+          ),
         usage: Object.freeze({
           editorInstances: 0,
-          renderers: (disposed ? 0 : 1) + projection.renderers,
-          observers: projection.observers + viewport.observers,
-          timers: timers.size + pipeline.timers + viewport.timers,
+          renderers:
+            (disposed ? 0 : 1) +
+            projection.renderers +
+            heavy.usage.runtimes +
+            workerScopes.reduce((count, scope) => count + scope.workerCount, 0),
+          observers:
+            projection.observers + viewport.observers + heavy.usage.observers,
+          timers: knownTimers,
           backgroundTasks:
             jobs.size +
             frames.size +
@@ -280,9 +351,15 @@ export const createMarkdownRendererSessionResourceOwner = (options: {
             viewport.rafHandles +
             viewport.idleHandles +
             viewport.pendingViewportTicks +
-            viewport.pendingMeasurements,
+            viewport.pendingMeasurements +
+            heavy.usage.tasks +
+            workerScopes.reduce(
+              (count, scope) => count + scope.tasks.length,
+              0,
+            ),
+          // Direct component requests only. The measured heavy count is exposed
+          // separately; an unknown heavy count is never coerced into this zero.
           networkRequests: 0,
-          // Logical retained units, not physical heap bytes.
           memoryUnits:
             projection.memoryUnits +
             (retained ? 1 : 0) +
@@ -294,7 +371,14 @@ export const createMarkdownRendererSessionResourceOwner = (options: {
             viewport.indexedUnits +
             viewport.retainedElements +
             viewport.measuredSizes +
-            viewport.pendingMeasurements,
+            viewport.pendingMeasurements +
+            pipeline.retainedSharedOwners +
+            heavy.usage.pendingImports +
+            heavy.usage.scheduledContinuations +
+            workerScopes.reduce(
+              (count, scope) => count + scope.resources.taskRetainCount,
+              0,
+            ),
         }),
       } satisfies MarkdownEditorSessionResourceInspection),
     })

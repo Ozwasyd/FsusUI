@@ -368,15 +368,15 @@ const rendererResourceOwner = createMarkdownRendererSessionResourceOwner({
     strategy: renderStrategy.value,
   }),
   readPipelineResources: () => renderPipelineRuntime.inspectResources(),
+  readHeavyResources: () => heavyLifecycle.inspectResources(),
   readVirtualWindowResources: () => virtualWindow.inspectResources(),
   readProjectionResources: () => {
     const heavy = heavyLifecycle.metrics()
     return {
-      renderers: heavy.retainedRuntimes,
-      observers: (activationObserver ? 1 : 0) + heavy.retainedObservers,
-      backgroundTasks: heavy.retainedTasks,
-      retainedListeners:
-        (heavyThemeListenerInstalled ? 1 : 0) + heavy.retainedListeners,
+      renderers: 0,
+      observers: activationObserver ? 1 : 0,
+      backgroundTasks: 0,
+      retainedListeners: heavyThemeListenerInstalled ? 1 : 0,
       memoryUnits:
         chunkUnits.value.length +
         chunkActivationElements.size +
@@ -1249,6 +1249,8 @@ const performRender = async () => {
   isRendering.value = source.length > 0
 
   try {
+    if (!heavyLifecycle.resume())
+      throw new Error('markdown-renderer-heavy-owner-disposed')
     const strategy = renderPipelineRuntime.strategy.value
 
     if (strategy === 'chunked-main' || strategy === 'chunked-worker') {
@@ -1416,7 +1418,12 @@ const restoreLastValidRender = async (
     return blocked('markdown-renderer-retained-result-unavailable-or-busy')
   const pipeline = renderPipelineRuntime.inspectResources()
   const viewport = virtualWindow.inspectResources()
+  const heavy = heavyLifecycle.inspectResources()
   if (
+    heavy.admission !== 'open' ||
+    heavy.usage.tasks > 0 ||
+    heavy.usage.pendingImports > 0 ||
+    heavy.usage.scheduledContinuations > 0 ||
     pipeline.disposed ||
     viewport.disposed ||
     pipeline.paused ||
@@ -1529,6 +1536,7 @@ watch(
   () => {
     currentTaskId += 1
     rendererResourceOwner.invalidate()
+    heavyLifecycle.pause()
     activationController?.abort()
     if (debounceTimer !== null) {
       rendererResourceOwner.clearTimer(debounceTimer)
