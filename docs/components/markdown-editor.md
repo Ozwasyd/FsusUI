@@ -771,3 +771,15 @@ admit the attachment participant into the aggregate roster. Actual document epoc
 and revision are checked before/after this read, including same-source replacement.
 Candidate UI915311ffe5d remains under independent review and is not consumed by this
 owning scalar observation increment; the legacy content compatibility fix remains.
+
+The current renderer source combination is UI916
+`26d94443350bfbe91e0862640f7b8eacd17b5471`, consuming corrected A927
+`ef17179f8788a4bf69f0998e8635191460ad1db1`. Independent review closes the original
+worker cleanup callback exception P1 in source; the notification-watermark P2
+remains an explicit scalar source dependency. The actual renderer retains its
+callback failure, counts its diagnostic record and refuses projection restore
+while it remains. This session forwards the original missing recovery dependency
+and measured values without exposing failure causes/control handles or creating
+notification-delivery acknowledgment. Complete/unqualified and runtime holds remain.
+Attachment311ffe5d stays unconsumed; final-jobs callback context and raw/proxy job
+findings are under original-owner repair. Legacy settlement stays unknown.
