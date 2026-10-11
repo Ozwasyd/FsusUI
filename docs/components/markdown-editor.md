@@ -783,3 +783,188 @@ and measured values without exposing failure causes/control handles or creating
 notification-delivery acknowledgment. Complete/unqualified and runtime holds remain.
 Attachment311ffe5d stays unconsumed; final-jobs callback context and raw/proxy job
 findings are under original-owner repair. Legacy settlement stays unknown.
+
+The current renderer combination is UI916
+`f3be19325c00e933c0590a988843d502ddec5f81`, consuming A928
+`f99529d944c604b0c2a0f518b95eb3403bf07d9f`. Root reports the notification-watermark
+P2 source CLOSED; the prior unconditional review-gap tag is removed. Actual pending
+notification still adds the original conditional settlement dependency and retained
+logical diagnostic unit, and blocks projection restore. A cleared pending snapshot
+means a notification attempt only; the original retained failure/recovery gap and
+all complete:false/unqualified/resource qualification holds remain.
+
+Attachment7d771a96 still has an original watcher lifecycle/unique-handle P1 under
+repair. Its actual bindAttachmentInputs contract was inspected: original reactive
+documentIdentity, editorRevision ref and deep attachmentJobs ref are the exact
+inputs; one prepared `.vue` hunk stays unapplied until source review. Existing
+attachmentEmbedOwner.abort owns watcher cleanup; no consumer watcher is added.
+
+Original editor panel captureViewState retains partial mode/search/caret scroll.
+Outline methods are model/reveal planners, not an active-node/scroll-anchor retained
+checkpoint issuer. Search and attachment original owners do not currently expose
+full immutable checkpoint/validation/restore refs. Those original producers must
+supply actual #2294/#2295 panel state before a complete factory refset can exist;
+ref aliases or reconstructed parallel panel state are not used here.
+
+The current attachment source is UI915
+`b1693bdb302714c11a974994246d11e4ca48d8b5`, consumed as an independent upstream
+increment. The sole setup-owned attachmentEmbedOwner now receives exactly one
+bindAttachmentInputs call using the existing reactive documentIdentity, original
+editorRevision ref and original deep attachmentJobs ref. Existing stable batch/item
+Maps remain the owner callbacks. No consumer watcher, copied job queue or second
+attachment owner is introduced. The original abort on unmount stops owner watcher
+lifetimes; original pause/resume delegates remain the sole lifecycle controls.
+
+Actual future dispatch/onProgress/frozen awaited-final provenance and original
+legacy content compatibility remain unchanged. Prior context/proxy/transition P1s
+are root-reported source CLOSED; combined session wiring is still unqualified.
+Failed native watcher stops remain actually owned/counted. Sequential request
+cancellation can stop early on a throwing cleanup while references remain; it is
+not release proof. Reviewed flag stays false and aggregate roster remains excluded
+until genuine consumer resource controls and acceptance exist. The separate public
+attachment892 FileConsumer/capture offer is not fabricated or replaced here; the
+original upload-image event is not renamed. Runtime/list/discovery/mount/native,
+consumer/native heap and eviction qualification all remain UNRUN.
+
+
+## Native attachment File bridge
+
+Native pick, paste, and drop retain their actual `File` objects only for active
+attachment jobs in the owning editor. The `upload-image` event still receives the
+metadata-only `MarkdownAttachmentBatchIntent` first; it never gains a `files`
+property. Native accepted captures add an optional second argument,
+`MarkdownAttachmentCaptureObservation`:
+
+```ts
+interface MarkdownAttachmentCaptureObservation {
+  readonly batch: MarkdownAttachmentBatchIntent
+  readonly transaction: MarkdownEditorTransactionEvent
+  readonly plan: Readonly<{
+    transaction: MarkdownEditorTransaction
+    jobs: readonly Readonly<MarkdownAttachmentJob>[]
+  }>
+  readonly placements: readonly Readonly<{
+    item: MarkdownAttachmentItemIntent
+    range: MarkdownAttachmentRange
+  }>[]
+}
+
+type MarkdownAttachmentFileConsumer = (
+  file: File,
+  capture: MarkdownAttachmentCaptureObservation,
+) => void
+
+const accepted = editor.value?.withAttachmentFile(batch, item, (file, capture) => {
+  // Bind the consumer's original capture to this accepted placeholder transaction,
+  // then lend this exact File and item.signal to its genuine pending upload handle.
+})
+```
+
+These types are exported by the existing MarkdownEditor public type boundary.
+`withAttachmentFile(batch, item, consume): boolean` calls the consumer synchronously
+with the identical original native File and genuine capture observation, or returns
+`false` without calling it. It requires the original batch and item objects from this
+editor, the exact item order, capture revision, document id/epoch, first attempt, and
+active batch/item signals. Equal metadata, object spreads, reconstructed IDs,
+serialized observations, another editor's objects, and metadata-only captures do
+not grant a File association. The observation itself contains no Files.
+
+The observation's `transaction` is the exact read-only object emitted by the
+existing `transaction` event for the accepted placeholder insertion. Its
+`beforeRevision === batch.revision` and its
+`transaction.expectedRevision === batch.revision`. Its post `revision` increments
+once when content changes; replacing a placeholder with identical bytes is an
+accepted no-op with the same before/post revision, following the existing kernel.
+The replacement still revokes the previous File, even for equal metadata. Native
+event fingerprints distinguish new batch/item IDs at an unchanged revision;
+fingerprints and IDs alone never grant File access. All ordered placeholders
+enter that one change/dispatch. `upload-image` runs after dispatch and job registration;
+the File loan performs no capture or dispatch. `plan` is the actual original
+planner result, including the original transaction and job objects; its jobs stay
+owned by the existing lifecycle and can subsequently rebase. `placements` retains
+the original frozen range objects from those jobs, paired with the original ordered
+items. Use these ranges and the actual accepted transaction/result/position map to
+verify the localized placeholders; do not replan or derive offsets from filenames.
+Consumers connect their original capture to genuine pending handles by admitting
+that existing transaction in their own context. A consumer `commitCreated` that
+dispatches its own placeholder requires a consumer-owned admission change first;
+receiving this event must not insert placeholders again. An observer that changes
+the document/revision during dispatch prevents the old capture from granting Files.
+The original accepted jobs enter the existing attachment lifecycle before public
+dispatch callbacks run; File associations are registered only after those jobs
+remain current. A callback that deletes or replaces an original placement prevents
+admission even when it inserts identical bytes and the revision stays unchanged.
+Selection-only callbacks and non-deleting edits at the same revision preserve the
+association. Refusal retires only that capture's original jobs/items before aborting
+its signals; it does not recreate a placement or grant from matching source bytes.
+Public transaction metadata cannot exempt an attachment from mapping. Completion
+and removal keep their existing exemption through their actual private owning job,
+without granting authority to a copied item ID.
+
+Each item has its own `AbortSignal`. Cancellation, retry, rejection, completion,
+removal, replacement, or deletion revoke that item's loan and release the retained
+File. Other pending items remain independent. Ordinary edits keep surviving jobs
+current through the existing range rebasing. A document id/epoch change or unmount
+revokes every loan before abort listeners run. The batch signal aborts when its last
+loan is revoked. Metadata retry events keep their existing first-argument contract
+but have no native capture observation and cannot remint a released File: obtaining
+another File requires a new native capture.
+
+Accepted edits rebase every affected attachment job and remove all deleted File
+associations before invoking any item abort listener. A deleted sibling cannot be
+borrowed during another item's abort callback; surviving rebased siblings remain
+usable. Abort signals still run their normal synchronous listeners.
+
+Completion plans retain the actual placeholder range until the existing dispatcher
+accepts the replacement. After File revocation and its callbacks, the editor verifies
+the original item/batch/job binding, attempt, range, source, current document id/epoch
+(including props awaiting a switch), and current revision. The completion transaction
+carries that document identity and `expectedRevision`; the resolved range is published
+with the actual accepted result/position map before outward transaction observers.
+A callback that edits, replaces, deletes, switches, or releases this context causes
+coherent refusal and preserves the current source. Equal numeric revisions alone
+cannot authorize a completion: an equal-byte replacement map can delete its anchor.
+A stale completion cannot be revived by later progress/resolved callbacks. Recover
+through a fresh native replacement and its new original File association. Ordinary
+current completions and surviving independent items continue through
+`applyAttachmentResult()`.
+
+Accepted transaction events retain their original result/map as historical evidence,
+even if a synchronous listener commits a newer transaction. Model/change notifications
+and saved selection/history effects require the result's document id/epoch, current
+source and revision to remain current. The editor checks again after each outward
+callback, including the model notification; a nested edit cannot be followed by an
+older model/change value. A selection-only callback can keep the content result current
+while superseding its selection. Queued selection restoration checks the actual document,
+source, revision and selection again after the next tick and after focus listeners.
+Release/unmount also suppresses saved effects. Native capture checks the released state
+before capture and again after the accepted dispatch, before registering any job or
+File association. If a transaction listener unmounts the editor, the fresh unregistered
+batch/item controllers abort and no association is recreated after cleanup. File loans
+also require a live editor. The editor preserves callbacks and the accepted historical
+transaction; it does not replay or remint the superseded operation.
+
+Applications own their pending handles, upload IO, callbacks, and cleanup of any
+references they retain from the synchronous loan; observe `item.signal` when lending
+into an upload. Continue returning results through `applyAttachmentResult()`.
+File access and transaction observations confer no asset/reference/cleanup
+authority. Descriptor-only upload events remain metadata-only and omit the second
+argument. This bridge does not qualify a browser/device or consumer integration.
+
+The #2295 integration keeps `getSession`, capture fingerprint census and all
+existing real future/attempt result gates. Legacy content-attempt bookkeeping
+uses the original item object without replacing it or retaining another File.
+Copied job document identity is checked together with private raw-job/original
+batch/item proof. The original batch Map now owns revocable records; its actual
+resource census includes File/controller entries and accepted capture placements.
+Opaque consumer resources and post-future continuations remain unqualified;
+`attachmentResourceOwnerReviewed` stays false and complete pause/disposal is
+unavailable. Selection restoration keeps the existing tracked layout scheduler
+and rechecks current native state after focus. These are source capabilities,
+not runtime, resource-release, recovery or eviction qualification.
+
+During actual synchronous File revocation, public attachment resource inspection
+and participant control refuse while cleanup callbacks are still executing.
+Detached records/controllers can remain on that cleanup stack; an empty Map
+alone is not a release acknowledgment. Surviving File loans still follow their
+original per-item admission. The guard ends when the actual cleanup frame exits.

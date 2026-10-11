@@ -262,7 +262,9 @@ rendering qualification passed. There is no restoration after disposal,
 cross-instance hydration or crash recovery. A retained pipeline
 `workerCallbackFailure` blocks restoration with
 `markdown-renderer-worker-callback-failure`; this operation cannot clear or recover
-that failure.
+that failure. A real pending failure-notification snapshot also blocks restoration
+with `markdown-renderer-worker-callback-failure-notification-pending`, even if a
+newer failure replaced the original publication snapshot.
 
 `getSessionResourceSourceOffer()` returns:
 
@@ -278,6 +280,7 @@ that failure.
   }
   diagnostics: {
     workerCallbackFailure: object | null // Actual pipeline failure record.
+    pendingWorkerCallbackFailureNotification: object | null // Actual pending snapshot.
   }
   unknownUsage: object // Original timer/network/worker/pool unknown values.
   knownNetworkRequests: number | null // null preserves an unknown heavy count.
@@ -327,6 +330,11 @@ retained logical resources and collection entries, not physical heap bytes.
 error, phase, event type and worker identity. Its cumulative failure count is not
 an active-job count. A retained failure contributes one logical diagnostic record
 and adds an explicit missing recovery dependency; it never becomes a success ack.
+`diagnostics.pendingWorkerCallbackFailureNotification` preserves the actual
+pending snapshot, not an inferred publication status. A distinct pending snapshot
+adds one logical retained record; it is never counted as a worker job. A null
+pending snapshot does not establish successful delivery or recovery, and the
+retained failure continues to block restoration.
 
 This source offer is deliberately partial. Adapter internals, worker internals,
 shared pool attribution, platform observer callbacks, heavy-runtime timer/network
