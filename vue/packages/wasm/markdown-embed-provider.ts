@@ -541,13 +541,13 @@ export const prepareMarkdownEmbedResult = async (
   } finally {
     if (handles.timer !== undefined) clearTimeout(handles.timer)
     handles.timer = undefined
-    if (request.signal && requestLinked) {
-      request.signal.removeEventListener('abort', abort)
+    request.signal?.removeEventListener('abort', abort)
+    if (requestLinked) {
       requestLinked = false
       handles.listeners -= 1
     }
+    localController.signal.removeEventListener('abort', onLocalAbort)
     if (cancelLinked) {
-      localController.signal.removeEventListener('abort', onLocalAbort)
       cancelLinked = false
       handles.listeners -= 1
     }
