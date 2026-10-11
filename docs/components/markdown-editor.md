@@ -603,3 +603,21 @@ transition when any owner is absent. Integration with the concurrent typography
 increment additionally needs its visibility listener, deferred callbacks,
 measurement DOM and pending reflow promise in the actual resource census; the
 session-only patch does not modify that owner's source.
+
+
+The actual Web language controller now exclusively owns search creation/run/cancel.
+On mount it takes search custody before the first search; the editor no longer
+retains a second task alias or calls the runner independently. Search refreshes
+original source/revision/config/context before execution. Its actual language-search
+participant is registered only after controller binding. Pause first checks actual
+composition, cancels the real task/session, gates native attributes and clears
+existing match/highlight view aliases; document switches and unmount cancel through
+the same controller. Resume permits only fresh work, without replaying cancelled
+searches or automatically re-arming delayed native replacements. Controller memory
+and existing renderer/layout/native aliases retain their separate actual custody.
+`recoverable:false` and disposal refusal remain unchanged.
+
+This source consumes language owner offer `6b9eb126984973438bba02c89316bdd8a85bad73`
+as an isolated increment. Its six original-suite cases remain UNRUN. No runtime,
+native language-tool, IME, privacy, cross-session CSS-highlight or recovery
+qualification is supplied by this wiring.

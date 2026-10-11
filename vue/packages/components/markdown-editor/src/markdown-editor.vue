@@ -338,7 +338,7 @@
         :rows="minRows"
         :tabindex="liveSurface.inputVisible ? undefined : -1"
         :value="isComposing ? nativeCompositionValue : editorValue"
-        :spellcheck="languageCapability.spellcheck"
+        :spellcheck="!languageSearchPaused && languageCapability.spellcheck"
         :lang="languageCapability.lang || undefined"
         @beforeinput="handleBeforeInput"
         @blur="handleBlur"
@@ -1355,7 +1355,6 @@ import { resolveMarkdownTableContextActions } from './markdown-editor-table-acce
 import type { MarkdownHtmlImportSnapshot } from '../../../wasm/markdown-html-import'
 import {
   dispatchMarkdownSearchKeydown,
-  executeMarkdownSearchSession,
   resolveMarkdownSearchNavigation,
   resolveMarkdownSearchUi,
   revealMarkdownSearchMatch,
@@ -1367,7 +1366,6 @@ import {
   planMarkdownReplaceCurrentInSet,
 } from '../../../wasm/markdown-replace'
 import type { MarkdownSearchMatch, MarkdownSearchMode } from '../../../wasm/markdown-search-model'
-import type { MarkdownSearchTask } from '../../../wasm/markdown-search-worker'
 import {
   collectMarkdownEmbedNodes,
   planMarkdownEmbedPresentation,
@@ -1426,6 +1424,8 @@ const commandPaletteInputRef = ref<HTMLInputElement | null>(null)
 const paletteListId = `${useId()}-command-palette-list`
 const slashMenuId = `${useId()}-slash-menu`
 let languageToolsController: MarkdownWebLanguageController | null = null
+let languageSearchParticipant: MarkdownEditorSessionResourceParticipant | null = null
+const languageSearchPaused = ref(false)
 let languageToolsRevision = -1
 let languageToolsSource = ''
 let languageToolsConfigKey = ''
@@ -3514,6 +3514,8 @@ watch(
     if (nextId === previousId && nextEpoch === previousEpoch) return
 
     const previousHistory = transactionStore.history
+    languageToolsController?.cancelSearch()
+    clearSearchViewAliases()
     abortPendingCommands()
     commandPaletteOpen.value = false
     contextualSurface.value = null
@@ -3675,6 +3677,35 @@ onMounted(() => {
     languageToolsSource = transactionStore.value
     languageToolsConfigKey = JSON.stringify(languageToolsConfig())
     syncLanguageToolsState()
+    // No parallel search path is retained: adoption happens before the first
+    // component search and the real controller owns every subsequent task.
+    const searchOwner = languageToolsController.adoptSearchTask(null)
+    languageSearchParticipant = {
+      ownerRef: 'language-search',
+      inspect: () => searchOwner.inspect(),
+      pause() {
+        if (isComposing.value || nativeMachine.composing) {
+          throw new Error('editor-session-language-search-running')
+        }
+        syncLanguageToolsState()
+        const inspection = searchOwner.pause()
+        languageSearchPaused.value = inspection.paused
+        clearSearchViewAliases()
+        return inspection
+      },
+      resume() {
+        if (isComposing.value || nativeMachine.composing) {
+          throw new Error('editor-session-language-search-running')
+        }
+        syncLanguageToolsState()
+        const inspection = searchOwner.resume()
+        languageSearchPaused.value = inspection.paused
+        // Only a fresh current-document search is permitted; cancelled native
+        // sessions and retained matches are never replayed on resume.
+        return inspection
+      },
+      dispose: (snapshotRef) => searchOwner.dispose(snapshotRef),
+    }
   }
   refreshLiveWindow('initial')
   refreshWritingAidsDocument()
@@ -3686,6 +3717,9 @@ onMounted(() => {
 onBeforeUnmount(() => {
   sessionDisposed = true
   transactionStore.releaseRetainedSnapshot()
+  languageToolsController?.cancelSearch()
+  clearSearchViewAliases()
+  languageSearchParticipant = null
   languageToolsController = null
   abortPendingCommands()
   attachmentCaptureSession.clear()
@@ -4905,7 +4939,6 @@ const searchReplaceText = ref('')
 const searchMatches = ref<readonly MarkdownSearchMatch[]>([])
 const searchCurrentIndex = ref<number | null>(null)
 const searchMode = ref<MarkdownSearchMode>('plain')
-const searchTask = ref<MarkdownSearchTask | null>(null)
 const searchQueryInputRef = ref<HTMLInputElement | null>(null)
 const searchReplaceInputRef = ref<HTMLInputElement | null>(null)
 const previewRendererRef = ref<HTMLElement | { $el?: HTMLElement } | null>(null)
@@ -4996,7 +5029,7 @@ const syncRenderedSearchHighlights = () => {
   if (!registry) return
   registry.delete('markdown-search-match')
   registry.delete('markdown-search-current')
-  if (!searchUiState.value.open || !searchMatches.value.length) return
+  if (languageSearchPaused.value || !searchUiState.value.open || !searchMatches.value.length) return
   const candidate = previewRendererRef.value
   const root = candidate instanceof HTMLElement ? candidate : candidate?.$el
   if (!(root instanceof HTMLElement)) return
@@ -5249,23 +5282,30 @@ const updateSearchState = () => {
   )
 }
 
+const clearSearchViewAliases = () => {
+  searchMatches.value = []
+  searchCurrentIndex.value = null
+  cssHighlightRegistry()?.delete('markdown-search-match')
+  cssHighlightRegistry()?.delete('markdown-search-current')
+  updateSearchState()
+}
+
 const runSearch = () => {
-  if (!searchQuery.value) {
-    searchMatches.value = []
-    searchCurrentIndex.value = null
-    updateSearchState()
+  const controller = languageToolsController
+  if (languageSearchPaused.value || !controller || !searchQuery.value) {
+    controller?.cancelSearch()
+    clearSearchViewAliases()
     return
   }
-  const session = executeMarkdownSearchSession({
+  syncLanguageToolsState()
+  const session = controller.executeSearch({
     documentEpoch: documentIdentity.epoch,
     documentId: documentIdentity.id,
     mode: searchMode.value,
-    previousTask: searchTask.value ?? undefined,
     queryText: searchQuery.value,
     revision: transactionStore.revision,
     source: transactionStore.value,
   })
-  searchTask.value = session.task
   searchMatches.value = session.execution.matches
   searchCurrentIndex.value = session.execution.matches.length > 0 ? 0 : null
   updateSearchState()
@@ -6178,6 +6218,7 @@ const sessionBinding = createMarkdownEditorSessionBinding({
   resourceParticipants: () => [
     frameResourceParticipant, sessionLayoutResources.participant,
     ...(surfaceResourceOwnerComplete ? [surfaceResourceParticipant] : []),
+    ...(languageSearchParticipant ? [languageSearchParticipant] : []),
     ...(commandResources.canInspect() ? [commandResources.participant] : []),
   ],
   isComposing: () => isComposing.value || nativeMachine.composing,
