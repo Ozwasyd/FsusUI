@@ -257,7 +257,7 @@ export const createMarkdownLiveLayoutTextMeasurement = (
     reference.className = typographyReference.className
     reference.setAttribute('aria-hidden', 'true')
     Object.assign(reference.style, {
-      position: 'absolute', gridArea: '1 / 1', height: '0', minHeight: '0',
+      position: 'absolute', gridArea: '1 / 1 / 2 / 2', height: '0', minHeight: '0',
       minWidth: '0', maxWidth: '100%', boxSizing: 'border-box', margin: '0',
       border: '0', padding: '0', visibility: 'hidden', pointerEvents: 'none',
     })
