@@ -1422,6 +1422,8 @@ const restoreLastValidRender = async (
   const pipeline = renderPipelineRuntime.inspectResources()
   const viewport = virtualWindow.inspectResources()
   const heavy = heavyLifecycle.inspectResources()
+  if (pipeline.workerCallbackFailure)
+    return blocked('markdown-renderer-worker-callback-failure')
   if (
     heavy.admission !== 'open' ||
     heavy.usage.tasks > 0 ||

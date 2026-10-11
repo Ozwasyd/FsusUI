@@ -259,7 +259,10 @@ failed operation reports blocked; it does not mint a newer retained identity.
 Restoration recreates the mounted projection only. Its result does not establish
 that all resources stopped, that a session is ready, or that browser/native
 rendering qualification passed. There is no restoration after disposal,
-cross-instance hydration or crash recovery.
+cross-instance hydration or crash recovery. A retained pipeline
+`workerCallbackFailure` blocks restoration with
+`markdown-renderer-worker-callback-failure`; this operation cannot clear or recover
+that failure.
 
 `getSessionResourceSourceOffer()` returns:
 
@@ -272,6 +275,9 @@ cross-instance hydration or crash recovery.
     renderPipeline: object // Actual runtime/hardware inspection.
     virtualWindow: object // Actual viewport inspection.
     heavyFeatures: object // Actual active and retired handle inspection.
+  }
+  diagnostics: {
+    workerCallbackFailure: object | null // Actual pipeline failure record.
   }
   unknownUsage: object // Original timer/network/worker/pool unknown values.
   knownNetworkRequests: number | null // null preserves an unknown heavy count.
@@ -317,6 +323,10 @@ until their actual settlement, including work that outlives realm removal or
 unmount. Component jobs leave the census only in their actual `finally` blocks.
 Cancelling a handle does not erase an unsettled promise. Memory units count
 retained logical resources and collection entries, not physical heap bytes.
+`diagnostics.workerCallbackFailure` preserves the actual pipeline failure count,
+error, phase, event type and worker identity. Its cumulative failure count is not
+an active-job count. A retained failure contributes one logical diagnostic record
+and adds an explicit missing recovery dependency; it never becomes a success ack.
 
 This source offer is deliberately partial. Adapter internals, worker internals,
 shared pool attribution, platform observer callbacks, heavy-runtime timer/network
