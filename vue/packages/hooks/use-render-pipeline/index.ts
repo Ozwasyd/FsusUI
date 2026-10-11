@@ -368,9 +368,31 @@ export type FsusRenderPipelineRuntimeState<TSource, TUnit> =
     hardwareAttrs: ComputedRef<Record<string, string>>
     hardwareProfile: ComputedRef<FsusRenderHardwareProfile>
     policy: ComputedRef<FsusResolvedRenderPipelineComponentPolicy | null>
+    inspectResources: () => FsusRenderPipelineRuntimeResourceInspection
+    pause: () => FsusRenderPipelineRuntimeResourceInspection
+    resume: () => FsusRenderPipelineRuntimeResourceInspection
     render: () => Promise<void>
     renderedStrategy: Ref<FsusRenderPipelineStrategy>
   }
+
+export type FsusRenderPipelineRuntimeResourceInspection = {
+  readonly ownerKey: string
+  readonly paused: boolean
+  readonly disposed: boolean
+  readonly rafHandles: number
+  readonly idleHandles: number
+  readonly timers: number
+  readonly uncancellableCallbacks: number
+  readonly retainedListeners: number
+  readonly pendingRenders: number
+  readonly pendingAdapterJobs: number
+  readonly adapterResources: 'unknown'
+  readonly workerResources: 'unavailable' | 'not-created'
+  readonly hardware: ReturnType<
+    ReturnType<typeof useFsusRenderPipelineHardwareProfile>['inspectResources']
+  >
+  readonly recoverable: false
+}
 
 const defaultRenderPipelineConfig: FsusResolvedRenderPipelineConfig = {
   adaptive: 'auto',
@@ -625,7 +647,7 @@ export const createFsusRafRefreshSampler = ({
   requestFrame = (callback: FrameRequestCallback) =>
     requestAnimationFrame(callback),
   cancelFrame = typeof cancelAnimationFrame === 'function'
-    ? (handle: number) => cancelAnimationFrame(handle)
+    ? cancelAnimationFrame
     : undefined,
   sampleSize = 24,
 }: {
@@ -1976,6 +1998,7 @@ export const useFsusVirtualWindow = <TUnit>(options: {
   let paused = false
   let disposed = false
   let generation = 0
+  let connected = false
   let listenerViewport: FsusViewport | null = null
   let resizeTarget: Window | null = null
   let observerGeneration = 0
@@ -2080,7 +2103,7 @@ export const useFsusVirtualWindow = <TUnit>(options: {
   const readViewport = () => {
     if (paused || disposed) return
     const nextViewport = options.getViewport()
-    if (listenerViewport && listenerViewport !== nextViewport) {
+    if (connected && listenerViewport !== nextViewport) {
       disconnect()
       attachListeners(nextViewport)
     }
@@ -2259,7 +2282,7 @@ export const useFsusVirtualWindow = <TUnit>(options: {
   }
 
   const syncUnits = (nextUnits: readonly TUnit[]) => {
-    if (!variableState) return
+    if (disposed || !variableState) return
     const previousStart = range.value.start
     const anchorKey = variableState.keys[previousStart]
     const anchorDelta = scrollOffset.value - offsetForIndex(previousStart)
@@ -2389,10 +2412,11 @@ export const useFsusVirtualWindow = <TUnit>(options: {
         }
       }
     }
-    afterViewportTick(readViewport)
+    if (!paused && !disposed) afterViewportTick(readViewport)
   }
 
   const attachListeners = (target: FsusViewport | null) => {
+    connected = true
     listenerViewport = target
     target?.addEventListener('scroll', scheduleViewportRead, { passive: true })
     resizeTarget =
@@ -2406,6 +2430,7 @@ export const useFsusVirtualWindow = <TUnit>(options: {
   const disconnect = () => {
     listenerViewport?.removeEventListener('scroll', scheduleViewportRead)
     resizeTarget?.removeEventListener('resize', scheduleViewportRead)
+    connected = false
     listenerViewport = null
     resizeTarget = null
     viewport = null
@@ -2429,6 +2454,7 @@ export const useFsusVirtualWindow = <TUnit>(options: {
       retainedElements: variableState?.observedElements.size ?? 0,
       pendingMeasurements: variableState?.pendingMeasurements.size ?? 0,
       measuredSizes: variableState?.measuredSizes.size ?? 0,
+      indexedUnits: variableState?.keys.length ?? 0,
       pendingViewportTicks: viewportJobs.size,
       retainedListeners: (listenerViewport ? 1 : 0) + (resizeTarget ? 1 : 0),
       // ResizeObserver's platform-internal queue is not exposed by this source.
@@ -2509,6 +2535,13 @@ export const useFsusRenderPipelineRuntime = <TSource, TUnit>(
   const loading = ref(false)
   const renderedStrategy = shallowRef<FsusRenderPipelineStrategy>('sync')
   let taskId = 0
+  let paused = false
+  let disposed = false
+  let workerUsed = false
+  const callbacks = createRenderPipelineCallbackResources()
+  const waits = new Set<() => void>()
+  const renders = new Set<symbol>()
+  const adapterJobs = new Set<symbol>()
   const workerTaskKey = `render-runtime-${++renderPipelineRuntimeId}`
   let controller: AbortController | null = null
   let workerExecutor: ReturnType<
@@ -2696,6 +2729,7 @@ export const useFsusRenderPipelineRuntime = <TSource, TUnit>(
   ) => {
     const workerOptions = activeAdapter.worker
     if (!workerOptions) return null
+    workerUsed = true
 
     if (workerExecutor && workerExecutorAdapter === activeAdapter) {
       return workerExecutor
@@ -2704,6 +2738,13 @@ export const useFsusRenderPipelineRuntime = <TSource, TUnit>(
     clearWorkerExecutor()
     workerExecutorAdapter = activeAdapter
     const workerEventListener = (event: FsusWorkerExecutorEvent) => {
+      if (
+        paused ||
+        disposed ||
+        event.key !== `${workerTaskKey}:${activeAdapter.id}` ||
+        event.generation !== taskId
+      )
+        return
       recordDiagnostic({
         cloneBytes: event.cloneBytes,
         durationMs: event.durationMs,
@@ -2711,8 +2752,10 @@ export const useFsusRenderPipelineRuntime = <TSource, TUnit>(
         generation: event.generation,
         key: event.key,
         lane: event.lane,
-        pendingCount: event.pendingCount,
-        queueDepth: event.queueDepth ?? event.pendingCount,
+        pendingCount: workerExecutorShared ? undefined : event.pendingCount,
+        queueDepth: workerExecutorShared
+          ? undefined
+          : (event.queueDepth ?? event.pendingCount),
         queueWaitDurationMs: event.queueWaitDurationMs,
         retryCount: event.retryCount,
         strategy: renderedStrategy.value,
@@ -2722,7 +2765,7 @@ export const useFsusRenderPipelineRuntime = <TSource, TUnit>(
       })
       adaptiveSignals.value = {
         ...adaptiveSignals.value,
-        queueDepth: event.pendingCount,
+        queueDepth: workerExecutorShared ? undefined : event.pendingCount,
       }
       if (event.type === 'request-resolve') {
         if (event.computeDurationMs !== undefined) {
@@ -2791,28 +2834,58 @@ export const useFsusRenderPipelineRuntime = <TSource, TUnit>(
     return workerExecutor
   }
 
-  const waitForWorkerFallbackBudget = (signal: AbortSignal) =>
+  const waitForBoundary = (signal: AbortSignal, fallback: boolean) =>
     new Promise<void>((resolve) => {
-      if (signal.aborted) {
+      if (signal.aborted || paused || disposed) {
         resolve()
         return
       }
       let settled = false
+      let cancel: (() => void) | null = null
       const complete = () => {
         if (settled) return
         settled = true
+        cancel?.()
         signal.removeEventListener('abort', complete)
+        waits.delete(complete)
         resolve()
       }
+      waits.add(complete)
       signal.addEventListener('abort', complete, { once: true })
-      if (typeof requestIdleCallback === 'function') {
-        requestIdleCallback(complete, { timeout: 50 })
-      } else if (typeof requestAnimationFrame === 'function') {
-        requestAnimationFrame(() => setTimeout(complete, 0))
-      } else {
-        setTimeout(complete, 0)
+      try {
+        if (fallback && typeof requestIdleCallback === 'function') {
+          cancel = callbacks.idle(complete)
+        } else if (typeof requestAnimationFrame === 'function') {
+          cancel = callbacks.frame(() => {
+            cancel = null
+            if (fallback) cancel = callbacks.timeout(complete)
+            else complete()
+          })
+        } else if (fallback) {
+          cancel = callbacks.timeout(complete)
+        } else complete()
+      } catch (error) {
+        complete()
+        throw error
       }
     })
+  const waitForWorkerFallbackBudget = (signal: AbortSignal) =>
+    waitForBoundary(signal, true)
+
+  const prepareAdapter = (
+    activeAdapter: FsusRenderPipelineAdapter<TSource, TUnit>,
+    input: TSource,
+    signal: AbortSignal,
+    activeStrategy: FsusRenderPipelineStrategy,
+  ) => {
+    const job = Symbol('adapter-prepare')
+    adapterJobs.add(job)
+    return fsusTryAsync(
+      () => activeAdapter.prepare(input, signal, activeStrategy),
+      'fsus_render_pipeline_prepare_failed',
+      'infra',
+    ).finally(() => adapterJobs.delete(job))
+  }
 
   const prepareDocument = async (
     activeAdapter: FsusRenderPipelineAdapter<TSource, TUnit>,
@@ -2832,7 +2905,8 @@ export const useFsusRenderPipelineRuntime = <TSource, TUnit>(
           signal,
         })
         if (workerDocument.ok && workerDocument.value) {
-          renderedStrategy.value = 'chunked-worker'
+          if (!signal.aborted && generation === taskId)
+            renderedStrategy.value = 'chunked-worker'
           return fsusOk(workerDocument.value)
         }
 
@@ -2852,13 +2926,15 @@ export const useFsusRenderPipelineRuntime = <TSource, TUnit>(
           })
           await waitForWorkerFallbackBudget(signal)
           if (signal.aborted) return fsusErr(workerError)
-          const fallbackDocument = await fsusTryAsync(
-            () => activeAdapter.prepare(input, signal, 'chunked-main'),
-            'fsus_render_pipeline_prepare_failed',
-            'infra',
+          const fallbackDocument = await prepareAdapter(
+            activeAdapter,
+            input,
+            signal,
+            'chunked-main',
           )
           if (isFsusErr(fallbackDocument)) return fallbackDocument
-          renderedStrategy.value = 'chunked-main'
+          if (!signal.aborted && generation === taskId)
+            renderedStrategy.value = 'chunked-main'
           return fallbackDocument
         }
 
@@ -2866,20 +2942,25 @@ export const useFsusRenderPipelineRuntime = <TSource, TUnit>(
       }
     }
 
-    const preparedDocument = await fsusTryAsync(
-      () => activeAdapter.prepare(input, signal, activeStrategy),
-      'fsus_render_pipeline_prepare_failed',
-      'infra',
+    const preparedDocument = await prepareAdapter(
+      activeAdapter,
+      input,
+      signal,
+      activeStrategy,
     )
     if (isFsusErr(preparedDocument)) return preparedDocument
-    renderedStrategy.value = activeStrategy
+    if (!signal.aborted && generation === taskId)
+      renderedStrategy.value = activeStrategy
     return preparedDocument
   }
 
-  const render = async () => {
+  const renderOnce = async () => {
+    if (paused || disposed) return
     const currentTaskId = ++taskId
     controller?.abort()
-    controller = new AbortController()
+    const renderController = new AbortController()
+    controller = renderController
+    const signal = renderController.signal
     const input = sourceRef.value
     const activeAdapter = adapter.value
     const activeStrategy = strategy.value
@@ -2928,41 +3009,32 @@ export const useFsusRenderPipelineRuntime = <TSource, TUnit>(
       activeAdapter,
       input,
       activeStrategy,
-      controller.signal,
+      signal,
       currentTaskId,
     )
-    recordStage('prepare', now() - prepareStartedAt, renderedStrategy.value)
-
-    if (currentTaskId !== taskId || controller.signal.aborted) {
-      loading.value = false
+    if (currentTaskId !== taskId || signal.aborted) {
+      if (currentTaskId === taskId) loading.value = false
       return
     }
 
+    recordStage('prepare', now() - prepareStartedAt, renderedStrategy.value)
     if (isFsusOk(nextDocument)) {
       const commitStartedAt = now()
       documentRef.value = nextDocument.value
       await nextTick()
-      if (currentTaskId !== taskId || controller.signal.aborted) return
+      if (currentTaskId !== taskId || signal.aborted) return
       recordStage('vue-commit', now() - commitStartedAt, renderedStrategy.value)
       const layoutStartedAt = now()
-      await new Promise<void>((resolve) => {
-        if (typeof requestAnimationFrame === 'function') {
-          requestAnimationFrame(() => resolve())
-        } else resolve()
-      })
-      if (currentTaskId !== taskId || controller.signal.aborted) return
+      await waitForBoundary(signal, false)
+      if (currentTaskId !== taskId || signal.aborted) return
       recordStage(
         'style-layout',
         now() - layoutStartedAt,
         renderedStrategy.value,
       )
       const paintStartedAt = now()
-      await new Promise<void>((resolve) => {
-        if (typeof requestAnimationFrame === 'function') {
-          requestAnimationFrame(() => resolve())
-        } else resolve()
-      })
-      if (currentTaskId !== taskId || controller.signal.aborted) return
+      await waitForBoundary(signal, false)
+      if (currentTaskId !== taskId || signal.aborted) return
       recordStage('next-paint', now() - paintStartedAt, renderedStrategy.value)
       const durationMs = now() - startedAt
       recordStage('total', durationMs, renderedStrategy.value)
@@ -2973,7 +3045,9 @@ export const useFsusRenderPipelineRuntime = <TSource, TUnit>(
       })
       adaptiveSignals.value = {
         ...adaptiveSignals.value,
-        queueDepth: workerExecutor?.getPendingCount() ?? 0,
+        queueDepth: workerExecutorShared
+          ? undefined
+          : workerExecutor?.getPendingCount(),
         renderDurationMs: durationMs,
       }
       recordDiagnostic({
@@ -2988,7 +3062,9 @@ export const useFsusRenderPipelineRuntime = <TSource, TUnit>(
       documentRef.value = null
       adaptiveSignals.value = {
         ...adaptiveSignals.value,
-        queueDepth: workerExecutor?.getPendingCount() ?? 0,
+        queueDepth: workerExecutorShared
+          ? undefined
+          : workerExecutor?.getPendingCount(),
         renderDurationMs: durationMs,
       }
       recordDiagnostic({
@@ -3005,13 +3081,65 @@ export const useFsusRenderPipelineRuntime = <TSource, TUnit>(
     }
   }
 
+  const inspectResources = (): FsusRenderPipelineRuntimeResourceInspection =>
+    Object.freeze({
+      ownerKey: workerTaskKey,
+      paused,
+      disposed,
+      ...callbacks.inspect(),
+      retainedListeners: waits.size + (workerExecutorSharedCleanup ? 1 : 0),
+      pendingRenders: renders.size,
+      pendingAdapterJobs: adapterJobs.size,
+      adapterResources: 'unknown',
+      workerResources: workerUsed ? 'unavailable' : 'not-created',
+      hardware: hardwareRuntime.inspectResources(),
+      recoverable: false,
+    })
+  const pause = () => {
+    if (!paused) {
+      paused = true
+      taskId += 1
+      controller?.abort()
+      controller = null
+      for (const settle of waits) settle()
+      callbacks.cancelAll()
+      loading.value = false
+      hardwareRuntime.pause()
+      // Owner-key Worker suspension is supplied by the worker-pool owner.
+      // Abort settles this caller; it cannot prove Worker cancellation ack.
+    }
+    return inspectResources()
+  }
+  const resume = () => {
+    if (disposed) throw new Error('fsus_render_pipeline_runtime_disposed')
+    if (paused) {
+      paused = false
+      hardwareRuntime.resume()
+    }
+    return inspectResources()
+  }
+  const render = async () => {
+    if (paused || disposed) return
+    const job = Symbol('render')
+    const renderTaskId = taskId + 1
+    renders.add(job)
+    try {
+      await renderOnce()
+    } finally {
+      renders.delete(job)
+      if (taskId === renderTaskId) loading.value = false
+    }
+  }
   onBeforeUnmount(() => {
-    taskId += 1
-    controller?.abort()
+    pause()
+    disposed = true
     clearWorkerExecutor()
   })
 
   return {
+    inspectResources,
+    pause,
+    resume,
     adapter,
     canUseWorker,
     capabilityProfile,
