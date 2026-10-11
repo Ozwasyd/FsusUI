@@ -1321,6 +1321,7 @@ import {
 } from './markdown-editor-outline'
 import { planMarkdownOutlineReveal } from './markdown-editor-outline-active'
 import { createMarkdownEditorSessionBinding } from './markdown-editor-session'
+import { createMarkdownAttachmentEmbedResourceOwner } from './markdown-editor-attachment-embed-owner'
 import { createMarkdownEditorSessionCommandResources } from './markdown-editor-session-command-resources'
 import type { MarkdownRendererLastValidRender } from '../../markdown-renderer/src/markdown-renderer-session-resources'
 import { createMarkdownEditorSessionLayoutResources } from './markdown-editor-session-layout'
@@ -1367,6 +1368,7 @@ import {
   planMarkdownReplaceCurrentInSet,
 } from '../../../wasm/markdown-replace'
 import type { MarkdownSearchMatch, MarkdownSearchMode } from '../../../wasm/markdown-search-model'
+import type { MarkdownEmbedResult } from '../../../wasm/markdown-embed-provider'
 import {
   collectMarkdownEmbedNodes,
   planMarkdownEmbedPresentation,
@@ -1375,15 +1377,7 @@ import {
   type MarkdownEmbedPresentationPlan,
   type MarkdownEmbedValidNode,
 } from './markdown-editor-embed'
-import {
-  commitMarkdownEmbedResult,
-  cancelMarkdownEmbedRequest,
-  createMarkdownEmbedProjectionRequest,
-  createMarkdownEmbedRequest,
-  forgetMarkdownEmbedRequest,
-  type MarkdownEmbedRequest,
-  type MarkdownEmbedResult,
-} from '../../../wasm/markdown-embed-provider'
+
 
 
 defineOptions({
@@ -1643,6 +1637,14 @@ const editorAnchorMap = computed(() => {
   }
 })
 const attachmentCaptureSession = createMarkdownAttachmentCaptureSession()
+const attachmentPauseRequested = ref(false)
+// A public consumer callback has no network/timer census. Remember that it was
+// bound/invoked; replacing props or completing a job cannot prove it released
+// resources. Only a real consumer resource owner may lift this limitation.
+const opaqueAttachmentResourcesObserved = ref(Boolean(props.embedProvider))
+watch(() => props.embedProvider, (provider) => {
+  if (provider) opaqueAttachmentResourcesObserved.value = true
+}, { flush: 'sync' })
 const attachmentJobs = ref<MarkdownAttachmentJob[]>([])
 const attachmentBatches = new Map<string, MarkdownAttachmentBatchIntent>()
 const attachmentItems = new Map<
@@ -2620,6 +2622,7 @@ const captureAttachmentFiles = (
   eventFingerprint?: string,
   nodeId: string | null = null,
 ) => {
+  if (attachmentPauseRequested.value) return
   const captured = captureMarkdownAttachmentInput({
     sourceKind,
     documentIdentity,
@@ -2655,6 +2658,7 @@ const captureAttachmentFiles = (
   for (const item of captured.batch.items)
     attachmentItems.set(item.itemId, item)
   attachmentJobs.value = [...attachmentJobs.value, ...planned.jobs]
+  opaqueAttachmentResourcesObserved.value = true
   emit('upload-image', captured.batch)
   return captured
 }
@@ -3733,14 +3737,7 @@ onBeforeUnmount(() => {
   typewriterResizeObserver?.disconnect()
   cssHighlightRegistry()?.delete('markdown-search-match')
   cssHighlightRegistry()?.delete('markdown-search-current')
-  embedResolutionGeneration += 1
-  for (const controller of pendingEmbedControllers) controller.abort()
-  pendingEmbedControllers.clear()
-  for (const requestId of pendingEmbedRequests) {
-    cancelMarkdownEmbedRequest(requestId)
-    forgetMarkdownEmbedRequest(requestId)
-  }
-  pendingEmbedRequests.clear()
+  attachmentEmbedOwner.abort()
   detachViewportListeners()
 })
 
@@ -4851,6 +4848,7 @@ const handleAttachmentPickerChange = (event: Event) => {
 }
 
 const applyAttachmentResult = (result: MarkdownAttachmentProviderResult) => {
+  if (!attachmentEmbedOwner.acceptsAttachmentResult(result)) return false
   const job = attachmentJobs.value.find(
     (candidate) => candidate.itemId === result.itemId,
   )
@@ -4886,6 +4884,7 @@ const runAttachmentAction = (
   if (action === 'cancel') {
     cancelMarkdownAttachmentJob(job)
   } else if (action === 'retry') {
+    if (attachmentPauseRequested.value) return
     retryMarkdownAttachmentJob(job)
     const batch = job.batchId ? attachmentBatches.get(job.batchId) : undefined
     const item = attachmentItems.get(itemId)
@@ -5065,10 +5064,6 @@ type MarkdownEmbedRenderSegment =
     }
 
 const embedResults = ref<ReadonlyMap<string, MarkdownEmbedResult>>(new Map())
-let embedResolutionGeneration = 0
-const pendingEmbedRequests = new Set<string>()
-const pendingEmbedControllers = new Set<AbortController>()
-const embedRequestVersions = new Map<string, number>()
 const embedNodeId = (node: MarkdownEmbedValidNode) =>
   `embed:${node.ranges.full.start}:${node.target}:${node.mode}`
 const embedNodes = computed(() =>
@@ -5077,89 +5072,36 @@ const embedNodes = computed(() =>
   ),
 )
 
-const resolveEmbedNode = async (
-  node: MarkdownEmbedValidNode,
-  generation: number,
-) => {
-  const provider = props.embedProvider
-  if (!provider) return
-  const nodeId = embedNodeId(node)
-  const version = (embedRequestVersions.get(nodeId) ?? 0) + 1
-  embedRequestVersions.set(nodeId, version)
-  const requestInput = {
-    documentIdentity: Object.freeze({ ...transactionStore.documentIdentity }),
-    mode: node.mode,
-    nodeId,
+const attachmentEmbedOwner = createMarkdownAttachmentEmbedResourceOwner({
+  readDocument: () => ({
+    documentIdentity: transactionStore.documentIdentity,
     revision: transactionStore.revision,
-    target: node.target,
-    version,
-  }
-  const controller = new AbortController()
-  pendingEmbedControllers.add(controller)
-  let request: MarkdownEmbedRequest
-  try {
-    request = globalThis.crypto?.subtle
-      ? await createMarkdownEmbedProjectionRequest({
-          ...requestInput,
-          signal: controller.signal,
-        })
-      : createMarkdownEmbedRequest({
-          ...requestInput,
-          signal: controller.signal,
-        })
-  } catch {
-    request = createMarkdownEmbedRequest({
-      ...requestInput,
-      signal: controller.signal,
-    })
-  }
-  if (
-    generation !== embedResolutionGeneration ||
-    embedRequestVersions.get(nodeId) !== version
-  ) {
-    cancelMarkdownEmbedRequest(request)
-    pendingEmbedControllers.delete(controller)
-    return
-  }
-  pendingEmbedRequests.add(request.requestId)
-  const pending: MarkdownEmbedResult = Object.freeze({
-    ...request,
-    status: 'pending' as const,
-  })
-  embedResults.value = new Map(embedResults.value).set(nodeId, pending)
-  let result: MarkdownEmbedResult
-  try {
-    result = await provider(request)
-  } catch {
-    result = Object.freeze({ ...request, status: 'rejected' as const })
-  } finally {
-    pendingEmbedControllers.delete(controller)
-    pendingEmbedRequests.delete(request.requestId)
-    forgetMarkdownEmbedRequest(request.requestId)
-  }
-  if (
-    generation !== embedResolutionGeneration ||
-    embedRequestVersions.get(nodeId) !== version
-  )
-    return
-  const committed = commitMarkdownEmbedResult(request, result)
-  embedResults.value = new Map(embedResults.value).set(nodeId, committed)
-}
-
-const refreshEmbedPresentations = () => {
-  const generation = ++embedResolutionGeneration
-  for (const controller of pendingEmbedControllers) controller.abort()
-  pendingEmbedControllers.clear()
-  for (const requestId of pendingEmbedRequests) cancelMarkdownEmbedRequest(requestId)
-  pendingEmbedRequests.clear()
-  const activeIds = new Set(embedNodes.value.map(embedNodeId))
-  embedResults.value = new Map(
-    [...embedResults.value].filter(([nodeId]) => activeIds.has(nodeId)),
-  )
-  for (const nodeId of embedRequestVersions.keys()) {
-    if (!activeIds.has(nodeId)) embedRequestVersions.delete(nodeId)
-  }
-  for (const node of embedNodes.value) void resolveEmbedNode(node, generation)
+  }),
+  readEmbedProvider: () => props.embedProvider,
+  readAttachmentJobs: () => attachmentJobs.value,
+  readAttachmentBatches: () => attachmentBatches,
+  readAttachmentItems: () => attachmentItems,
+  attachmentCaptureSession,
+  publishEmbedResults: (results) => { embedResults.value = results },
+})
+const attachmentResourceParticipant: MarkdownEditorSessionResourceParticipant = {
+  ownerRef: 'attachment-embed',
+  inspect: () => attachmentEmbedOwner.participant.inspect(),
+  pause() {
+    // Never freeze the result gate while a consumer upload still needs to
+    // deliver its terminal response. No cancellation acknowledgment exists.
+    if (attachmentJobs.value.some((job) => job.phase === 'pending' || job.phase === 'progress')) {
+      throw new Error('editor-session-attachment-upload-resource-owner-unavailable')
+    }
+    attachmentPauseRequested.value = true
+    return attachmentEmbedOwner.participant.pause()
+  },
+  resume() {
+    const state = attachmentEmbedOwner.participant.resume()
+    attachmentPauseRequested.value = false
+    return state
+  },
+  dispose: (snapshotRef) => attachmentEmbedOwner.participant.dispose(snapshotRef),
 }
 
 const embedRenderSegments = computed<readonly MarkdownEmbedRenderSegment[]>(
@@ -5189,7 +5131,7 @@ const embedRenderSegments = computed<readonly MarkdownEmbedRenderSegment[]>(
             nodeId: embedNodeId(node),
             target: node.target,
             mode: node.mode,
-            version: embedRequestVersions.get(embedNodeId(node)) ?? 0,
+            version: attachmentEmbedOwner.readEmbedRequestVersions().get(embedNodeId(node)) ?? 0,
           } : undefined,
         ),
         result,
@@ -5265,7 +5207,7 @@ const handleEmbedAction = async (
   }
   if (result.action === 'retry') {
     emit('embed-retry', result.target, result.mode)
-    void resolveEmbedNode(segment.node, embedResolutionGeneration)
+    void attachmentEmbedOwner.resolveEmbedNode(segment.node)
     return
   }
   emit('embed-open-source', result.target, result.mode)
@@ -5511,16 +5453,10 @@ const searchReplaceAll = () => {
   }
 }
 
-watch(
-  [
-    editorValue,
-    editorRevision,
-    () => documentIdentity.id,
-    () => documentIdentity.epoch,
-    () => props.embedProvider,
-  ],
-  refreshEmbedPresentations,
-  { immediate: true },
+attachmentEmbedOwner.bindEmbedInputs(
+  [editorValue, editorRevision, () => documentIdentity.id,
+    () => documentIdentity.epoch, () => props.embedProvider],
+  () => embedNodes.value,
 )
 
 watch(
@@ -6223,6 +6159,7 @@ const sessionBinding = createMarkdownEditorSessionBinding({
     frameResourceParticipant, sessionLayoutResources.participant,
     ...(surfaceResourceOwnerComplete ? [surfaceResourceParticipant] : []),
     ...(languageSearchParticipant ? [languageSearchParticipant] : []),
+    ...(opaqueAttachmentResourcesObserved.value ? [] : [attachmentResourceParticipant]),
     ...(commandResources.canInspect() ? [commandResources.participant] : []),
   ],
   isComposing: () => isComposing.value || nativeMachine.composing,

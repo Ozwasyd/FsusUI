@@ -595,8 +595,8 @@ Changing command props does not hide an outstanding external attempt. Blog's
 command adapters currently include such external providers, so this dependency
 remains explicit there.
 
-These implemented owners do not close the roster. Renderer/projection,
-language/search and attachment/embed await their actual owner implementations;
+These implemented owners do not close the roster. Renderer/projection awaits complete underlying controls;
+native/template surface and external provider custody remain incomplete;
 external-command census, renderer last-valid checkpoint and recoverable disposal
 remain dependencies. Full public pause/resume/inspect/dispose refuse before a
 transition when any owner is absent. Integration with the concurrent typography
@@ -638,3 +638,32 @@ the renderer-projection participant is not admitted. Real worker-pool/pipeline,
 hardware sampler, virtual-window and heavy-runtime control APIs and validated
 restoration remain upstream dependencies. Existing security/privacy/render/race/
 backuprestore/native/IME holds continue unchanged.
+
+
+The original editor now uses `createMarkdownAttachmentEmbedResourceOwner` as its
+single embed watcher/request/generation/version/results lifecycle. The previous
+component maps/Sets and async runner are removed rather than run in parallel.
+Retry, presentation versions, unmount abort and attachment-result eligibility
+all go through the actual owner. Cancelled provider promises and preparation
+work remain counted until their real settlement. Creation identity on original
+attachment jobs is retained; old-document and terminal progress cannot commit.
+
+The integrating participant refuses pause before any change when an upload is
+unfinished, preserving its original terminal-result path. Capture/retry use the
+actual pause gate. Opaque consumer networking has no inspect/control interface:
+once an embed provider is bound or an upload is invoked, this participant is
+excluded from the complete session roster until a real consumer owner exists.
+Replacing props or receiving a terminal response does not prove the producer
+released independent resources. Its library-only zero network count is never
+presented as whole-session usage for those consumers. The empty, never-external
+lifecycle can report its actual watcher/record census; disposal remains restricted
+to the source owner's verified empty paused state. No other owner's
+`recoverable:false` is promoted.
+
+Attachment offers `a4a25d2c` and
+`b4baa7d5b2ef43e9c0133584cf58f1922e23c2db` are preserved as separate source
+increments. The author's 51 runtime cases lacked coordinating-root approval and
+are excluded from this task's acceptance. Their command is not adopted as a
+preflight or executed here. This task performs source parsing/lint/compilation
+only; native/worker/network exposure of that external run is unresolved under
+the root audit and supplies no zero-resource or qualification evidence.
