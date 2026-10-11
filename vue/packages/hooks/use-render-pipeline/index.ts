@@ -31,6 +31,9 @@ import {
   type FsusWorkerExecutorEventType,
   type FsusWorkerExecutorOptions,
   type FsusWorkerTaskLane,
+  type FsusWorkerResourceInspection,
+  type FsusWorkerTaskScope,
+  type FsusWorkerTaskControlResult,
 } from './worker-pool'
 
 export { FsusVirtualSizeIndex } from './virtual-window-index'
@@ -48,6 +51,9 @@ export type {
   FsusWorkerRunMessage,
   FsusWorkerRunOptions,
   FsusWorkerTaskLane,
+  FsusWorkerResourceInspection,
+  FsusWorkerTaskScope,
+  FsusWorkerTaskControlResult,
 } from './worker-pool'
 
 export {
@@ -387,7 +393,27 @@ export type FsusRenderPipelineRuntimeResourceInspection = {
   readonly pendingRenders: number
   readonly pendingAdapterJobs: number
   readonly adapterResources: 'unknown'
-  readonly workerResources: 'unavailable' | 'not-created'
+  readonly workerResources: {
+    readonly status: 'available' | 'not-created'
+    readonly scopes: readonly {
+      readonly inspection: Omit<FsusWorkerResourceInspection, 'pool' | 'shared'>
+      readonly lastControl: {
+        readonly operation: 'suspend' | 'cancel' | 'resume'
+        readonly status: FsusWorkerTaskControlResult['status']
+        readonly affectedTaskIds: readonly number[]
+        readonly unavailableTaskIds: readonly number[]
+      } | null
+    }[]
+    // Pool/shared fields are context only, never single-renderer usage.
+    readonly pools: readonly {
+      readonly mode: FsusRenderPipelineWorkerPoolMode
+      readonly pool: FsusWorkerResourceInspection['pool']
+      readonly shared: FsusWorkerResourceInspection['shared']
+      readonly disposed: boolean
+      readonly registry: FsusSharedWorkerRegistryInspection | null
+    }[]
+  }
+  readonly retainedSharedOwners: number
   readonly hardware: ReturnType<
     ReturnType<typeof useFsusRenderPipelineHardwareProfile>['inspectResources']
   >
@@ -1848,9 +1874,19 @@ type AnyFsusWorkerExecutor = ReturnType<
   typeof createFsusWorkerExecutor<unknown, unknown>
 >
 
+type FsusSharedWorkerRegistryInspection = {
+  readonly owners: number
+  readonly listeners: number
+  readonly pendingCleanupMicrotasks: number
+  readonly attribution: 'unattributable'
+}
+
 type FsusSharedWorkerExecutorEntry = {
   executor: AnyFsusWorkerExecutor
   listeners: Set<(event: FsusWorkerExecutorEvent) => void>
+  owners: Set<symbol>
+  cleanupChecks: { pending: number }
+  disposeIfUnused: () => void
 }
 
 const sharedWorkerExecutors = new Map<string, FsusSharedWorkerExecutorEntry>()
@@ -1869,16 +1905,29 @@ const getSharedWorkerExecutor = <TRequest, TResponse>({
   let entry = sharedWorkerExecutors.get(poolKey)
   if (!entry) {
     const listeners = new Set<(event: FsusWorkerExecutorEvent) => void>()
+    const owners = new Set<symbol>()
+    const cleanupChecks = { pending: 0 }
     const disposeIfUnused = () => {
       const activeEntry = sharedWorkerExecutors.get(poolKey)
       if (
-        activeEntry &&
-        activeEntry.listeners.size === 0 &&
-        activeEntry.executor.getPendingCount() === 0
-      ) {
-        sharedWorkerExecutors.delete(poolKey)
-        activeEntry.executor.dispose()
-      }
+        !activeEntry ||
+        activeEntry !== entry ||
+        activeEntry.owners.size > 0 ||
+        activeEntry.listeners.size > 0 ||
+        activeEntry.cleanupChecks.pending > 0
+      )
+        return
+      const inspection = activeEntry.executor.inspectResources()
+      if (
+        inspection.pendingCount !== 0 ||
+        inspection.activeCount !== 0 ||
+        inspection.tasks.length !== 0 ||
+        inspection.resources.cancelTimeoutCount !== 0 ||
+        inspection.pool.retainCount !== 0
+      )
+        return
+      sharedWorkerExecutors.delete(poolKey)
+      activeEntry.executor.dispose()
     }
     entry = {
       executor: createFsusWorkerExecutor<unknown, unknown>(createWorker, {
@@ -1889,27 +1938,51 @@ const getSharedWorkerExecutor = <TRequest, TResponse>({
           for (const activeListener of Array.from(listeners)) {
             activeListener(event)
           }
-          if (listeners.size === 0) queueMicrotask(disposeIfUnused)
+          if (owners.size === 0 && listeners.size === 0) {
+            cleanupChecks.pending += 1
+            queueMicrotask(() => {
+              cleanupChecks.pending -= 1
+              disposeIfUnused()
+            })
+          }
         },
       }),
       listeners,
+      owners,
+      cleanupChecks,
+      disposeIfUnused,
     }
     sharedWorkerExecutors.set(poolKey, entry)
   }
 
-  entry.listeners.add(listener)
+  const owner = Symbol('shared-worker-owner')
+  const ownedEntry = entry
+  let released = false
+  ownedEntry.owners.add(owner)
+  ownedEntry.listeners.add(listener)
   return {
-    cleanup: () => {
-      entry?.listeners.delete(listener)
-      if (
-        entry?.listeners.size === 0 &&
-        entry.executor.getPendingCount() === 0
-      ) {
-        sharedWorkerExecutors.delete(poolKey)
-        entry.executor.dispose()
+    inspectRegistry: (): FsusSharedWorkerRegistryInspection =>
+      Object.freeze({
+        owners: ownedEntry.owners.size,
+        listeners: ownedEntry.listeners.size,
+        pendingCleanupMicrotasks: ownedEntry.cleanupChecks.pending,
+        attribution: 'unattributable',
+      }),
+    pauseListener: () => ownedEntry.listeners.delete(listener),
+    resumeListener: () => {
+      if (released || ownedEntry.executor.inspectResources().disposed) {
+        throw new Error('fsus_shared_worker_subscription_unavailable')
       }
+      ownedEntry.listeners.add(listener)
     },
-    executor: entry.executor as ReturnType<
+    cleanup: () => {
+      if (released) return
+      released = true
+      ownedEntry.listeners.delete(listener)
+      ownedEntry.owners.delete(owner)
+      ownedEntry.disposeIfUnused()
+    },
+    executor: ownedEntry.executor as ReturnType<
       typeof createFsusWorkerExecutor<TRequest, TResponse>
     >,
   }
@@ -2538,22 +2611,109 @@ export const useFsusRenderPipelineRuntime = <TSource, TUnit>(
   let paused = false
   let disposed = false
   let workerUsed = false
+  let preservedWorkerTask = false
   const callbacks = createRenderPipelineCallbackResources()
   const waits = new Set<() => void>()
   const renders = new Set<symbol>()
   const adapterJobs = new Set<symbol>()
   const workerTaskKey = `render-runtime-${++renderPipelineRuntimeId}`
   let controller: AbortController | null = null
-  let workerExecutor: ReturnType<
+  type RuntimeWorkerExecutor = ReturnType<
     typeof createFsusWorkerExecutor<
       TSource,
       FsusRenderPipelineDocument<TUnit> | null
     >
-  > | null = null
+  >
+  let workerExecutor: RuntimeWorkerExecutor | null = null
   let workerExecutorAdapter: FsusRenderPipelineAdapter<TSource, TUnit> | null =
     null
   let workerExecutorShared = false
   let workerExecutorSharedCleanup: (() => void) | null = null
+  let workerExecutorPauseListener: (() => void) | null = null
+  let workerExecutorResumeListener: (() => void) | null = null
+  let workerExecutorListenerActive = false
+  let workerExecutorInspectRegistry:
+    | (() => FsusSharedWorkerRegistryInspection)
+    | null = null
+  type WorkerScopeRecord = {
+    executor: RuntimeWorkerExecutor
+    scope: FsusWorkerTaskScope
+    inspectRegistry: (() => FsusSharedWorkerRegistryInspection) | null
+    sharedPool: boolean
+    settled: boolean
+    lastControl: FsusRenderPipelineRuntimeResourceInspection['workerResources']['scopes'][number]['lastControl']
+  }
+  const workerScopes = new Set<WorkerScopeRecord>()
+  const controlWorkerScope = (
+    record: WorkerScopeRecord,
+    operation: 'suspend' | 'cancel' | 'resume',
+  ) => {
+    const result =
+      operation === 'suspend'
+        ? record.executor.suspendTasks(record.scope)
+        : operation === 'resume'
+          ? record.executor.resumeTasks(record.scope)
+          : record.executor.cancelTasks(record.scope, { hardCancel: false })
+    record.lastControl = Object.freeze({
+      operation,
+      status: result.status,
+      affectedTaskIds: Object.freeze([...result.affectedTaskIds]),
+      unavailableTaskIds: Object.freeze([...result.unavailableTaskIds]),
+    })
+    return result.inspection
+  }
+  const inspectWorkerResources =
+    (): FsusRenderPipelineRuntimeResourceInspection['workerResources'] => {
+      const scopes: FsusRenderPipelineRuntimeResourceInspection['workerResources']['scopes'][number][] =
+        []
+      const pools = new Map<
+        RuntimeWorkerExecutor,
+        FsusRenderPipelineRuntimeResourceInspection['workerResources']['pools'][number]
+      >()
+      for (const record of workerScopes) {
+        const { pool, shared, ...inspection } =
+          record.executor.inspectResources(record.scope)
+        pools.set(record.executor, {
+          mode: record.sharedPool ? 'shared' : 'runtime',
+          pool,
+          shared,
+          disposed: inspection.disposed,
+          registry: record.inspectRegistry?.() ?? null,
+        })
+        if (record.settled && inspection.tasks.length === 0) {
+          workerScopes.delete(record)
+          continue
+        }
+        scopes.push(
+          Object.freeze({ inspection, lastControl: record.lastControl }),
+        )
+      }
+      if (workerExecutor && !pools.has(workerExecutor)) {
+        const inspection = workerExecutor.inspectResources()
+        pools.set(workerExecutor, {
+          mode: workerExecutorShared ? 'shared' : 'runtime',
+          pool: inspection.pool,
+          shared: inspection.shared,
+          disposed: inspection.disposed,
+          registry: workerExecutorInspectRegistry?.() ?? null,
+        })
+      }
+      return Object.freeze({
+        status: workerUsed ? 'available' : 'not-created',
+        scopes: Object.freeze(scopes),
+        pools: Object.freeze([...pools.values()]),
+      })
+    }
+  const ownedQueueDepth = () => {
+    let depth = 0
+    for (const record of workerScopes) {
+      const inspection = record.executor.inspectResources(record.scope)
+      depth += inspection.queueDepth
+      if (record.settled && inspection.tasks.length === 0)
+        workerScopes.delete(record)
+    }
+    return depth
+  }
   const adaptiveSignals = shallowRef<FsusRenderPipelineAdaptiveSignals>({})
   const stageHistory = createFsusRenderStageHistory()
 
@@ -2716,6 +2876,10 @@ export const useFsusRenderPipelineRuntime = <TSource, TUnit>(
   const clearWorkerExecutor = () => {
     workerExecutorSharedCleanup?.()
     workerExecutorSharedCleanup = null
+    workerExecutorPauseListener = null
+    workerExecutorResumeListener = null
+    workerExecutorListenerActive = false
+    workerExecutorInspectRegistry = null
     if (workerExecutor && !workerExecutorShared) {
       workerExecutor.dispose()
     }
@@ -2752,20 +2916,18 @@ export const useFsusRenderPipelineRuntime = <TSource, TUnit>(
         generation: event.generation,
         key: event.key,
         lane: event.lane,
-        pendingCount: workerExecutorShared ? undefined : event.pendingCount,
-        queueDepth: workerExecutorShared
-          ? undefined
-          : (event.queueDepth ?? event.pendingCount),
+        queueDepth: ownedQueueDepth(),
         queueWaitDurationMs: event.queueWaitDurationMs,
         retryCount: event.retryCount,
         strategy: renderedStrategy.value,
         type: event.type,
-        workerCount: event.workerCount,
+        // Shared slot counts cannot describe this renderer.
+        workerCount: workerExecutorShared ? undefined : event.workerCount,
         workerId: event.workerId,
       })
       adaptiveSignals.value = {
         ...adaptiveSignals.value,
-        queueDepth: workerExecutorShared ? undefined : event.pendingCount,
+        queueDepth: ownedQueueDepth(),
       }
       if (event.type === 'request-resolve') {
         if (event.computeDurationMs !== undefined) {
@@ -2816,6 +2978,10 @@ export const useFsusRenderPipelineRuntime = <TSource, TUnit>(
       workerExecutor = shared.executor
       workerExecutorShared = true
       workerExecutorSharedCleanup = shared.cleanup
+      workerExecutorPauseListener = shared.pauseListener
+      workerExecutorResumeListener = shared.resumeListener
+      workerExecutorListenerActive = true
+      workerExecutorInspectRegistry = shared.inspectRegistry
       return workerExecutor
     }
 
@@ -2894,18 +3060,38 @@ export const useFsusRenderPipelineRuntime = <TSource, TUnit>(
     signal: AbortSignal,
     generation: number,
   ): Promise<FsusResult<FsusRenderPipelineDocument<TUnit>>> => {
+    if (paused || disposed || signal.aborted) {
+      return fsusErr(
+        createFsusError('infra', 'fsus_render_pipeline_prepare_paused'),
+      )
+    }
     if (activeStrategy === 'chunked-worker') {
       const executor = getWorkerExecutor(activeAdapter)
 
       if (executor) {
-        const workerDocument = await executor.run(input, {
-          generation,
-          key: `${workerTaskKey}:${activeAdapter.id}`,
-          lane: 'throughput',
-          signal,
-        })
+        const record: WorkerScopeRecord = {
+          executor,
+          scope: { generation, key: `${workerTaskKey}:${activeAdapter.id}` },
+          inspectRegistry: workerExecutorInspectRegistry,
+          sharedPool: workerExecutorShared,
+          settled: false,
+          lastControl: null,
+        }
+        workerScopes.add(record)
+        let workerDocument: Awaited<ReturnType<typeof executor.run>>
+        try {
+          workerDocument = await executor.run(input, {
+            ...record.scope,
+            lane: 'throughput',
+            signal,
+          })
+        } finally {
+          record.settled = true
+          if (executor.inspectResources(record.scope).tasks.length === 0)
+            workerScopes.delete(record)
+        }
         if (workerDocument.ok && workerDocument.value) {
-          if (!signal.aborted && generation === taskId)
+          if (!signal.aborted && !paused && !disposed && generation === taskId)
             renderedStrategy.value = 'chunked-worker'
           return fsusOk(workerDocument.value)
         }
@@ -2916,7 +3102,7 @@ export const useFsusRenderPipelineRuntime = <TSource, TUnit>(
               'fsus_render_pipeline_worker_empty_result',
             )
           : workerDocument.error
-        if (!signal.aborted) {
+        if (!signal.aborted && !paused && !disposed) {
           recordDiagnostic({
             error: workerError,
             fallbackReason: workerError.message,
@@ -2925,7 +3111,7 @@ export const useFsusRenderPipelineRuntime = <TSource, TUnit>(
             type: 'worker-fallback',
           })
           await waitForWorkerFallbackBudget(signal)
-          if (signal.aborted) return fsusErr(workerError)
+          if (signal.aborted || paused || disposed) return fsusErr(workerError)
           const fallbackDocument = await prepareAdapter(
             activeAdapter,
             input,
@@ -2933,7 +3119,7 @@ export const useFsusRenderPipelineRuntime = <TSource, TUnit>(
             'chunked-main',
           )
           if (isFsusErr(fallbackDocument)) return fallbackDocument
-          if (!signal.aborted && generation === taskId)
+          if (!signal.aborted && !paused && !disposed && generation === taskId)
             renderedStrategy.value = 'chunked-main'
           return fallbackDocument
         }
@@ -2949,7 +3135,7 @@ export const useFsusRenderPipelineRuntime = <TSource, TUnit>(
       activeStrategy,
     )
     if (isFsusErr(preparedDocument)) return preparedDocument
-    if (!signal.aborted && generation === taskId)
+    if (!signal.aborted && !paused && !disposed && generation === taskId)
       renderedStrategy.value = activeStrategy
     return preparedDocument
   }
@@ -3012,7 +3198,7 @@ export const useFsusRenderPipelineRuntime = <TSource, TUnit>(
       signal,
       currentTaskId,
     )
-    if (currentTaskId !== taskId || signal.aborted) {
+    if (currentTaskId !== taskId || signal.aborted || paused || disposed) {
       if (currentTaskId === taskId) loading.value = false
       return
     }
@@ -3022,11 +3208,13 @@ export const useFsusRenderPipelineRuntime = <TSource, TUnit>(
       const commitStartedAt = now()
       documentRef.value = nextDocument.value
       await nextTick()
-      if (currentTaskId !== taskId || signal.aborted) return
+      if (currentTaskId !== taskId || signal.aborted || paused || disposed)
+        return
       recordStage('vue-commit', now() - commitStartedAt, renderedStrategy.value)
       const layoutStartedAt = now()
       await waitForBoundary(signal, false)
-      if (currentTaskId !== taskId || signal.aborted) return
+      if (currentTaskId !== taskId || signal.aborted || paused || disposed)
+        return
       recordStage(
         'style-layout',
         now() - layoutStartedAt,
@@ -3034,7 +3222,8 @@ export const useFsusRenderPipelineRuntime = <TSource, TUnit>(
       )
       const paintStartedAt = now()
       await waitForBoundary(signal, false)
-      if (currentTaskId !== taskId || signal.aborted) return
+      if (currentTaskId !== taskId || signal.aborted || paused || disposed)
+        return
       recordStage('next-paint', now() - paintStartedAt, renderedStrategy.value)
       const durationMs = now() - startedAt
       recordStage('total', durationMs, renderedStrategy.value)
@@ -3045,9 +3234,7 @@ export const useFsusRenderPipelineRuntime = <TSource, TUnit>(
       })
       adaptiveSignals.value = {
         ...adaptiveSignals.value,
-        queueDepth: workerExecutorShared
-          ? undefined
-          : workerExecutor?.getPendingCount(),
+        queueDepth: ownedQueueDepth(),
         renderDurationMs: durationMs,
       }
       recordDiagnostic({
@@ -3062,9 +3249,7 @@ export const useFsusRenderPipelineRuntime = <TSource, TUnit>(
       documentRef.value = null
       adaptiveSignals.value = {
         ...adaptiveSignals.value,
-        queueDepth: workerExecutorShared
-          ? undefined
-          : workerExecutor?.getPendingCount(),
+        queueDepth: ownedQueueDepth(),
         renderDurationMs: durationMs,
       }
       recordDiagnostic({
@@ -3087,34 +3272,71 @@ export const useFsusRenderPipelineRuntime = <TSource, TUnit>(
       paused,
       disposed,
       ...callbacks.inspect(),
-      retainedListeners: waits.size + (workerExecutorSharedCleanup ? 1 : 0),
+      retainedListeners: waits.size + (workerExecutorListenerActive ? 1 : 0),
+      retainedSharedOwners: workerExecutorSharedCleanup ? 1 : 0,
       pendingRenders: renders.size,
       pendingAdapterJobs: adapterJobs.size,
       adapterResources: 'unknown',
-      workerResources: workerUsed ? 'unavailable' : 'not-created',
+      workerResources: inspectWorkerResources(),
       hardware: hardwareRuntime.inspectResources(),
       recoverable: false,
     })
   const pause = () => {
     if (!paused) {
       paused = true
-      taskId += 1
-      controller?.abort()
-      controller = null
+      preservedWorkerTask = false
+      // Suspend the original queued identities; running slots cannot be paused.
+      for (const record of workerScopes) {
+        const inspection = controlWorkerScope(record, 'suspend')
+        if (
+          record.scope.generation === taskId &&
+          inspection.tasks.some(
+            (task) =>
+              task.state === 'suspended' && task.promiseState === 'pending',
+          )
+        )
+          preservedWorkerTask = true
+        if (
+          inspection.tasks.some(
+            (task) =>
+              task.state === 'running' ||
+              task.state === 'canceling' ||
+              task.state === 'settling',
+          )
+        )
+          controlWorkerScope(record, 'cancel')
+      }
+      if (!preservedWorkerTask) {
+        taskId += 1
+        controller?.abort()
+        controller = null
+      }
       for (const settle of waits) settle()
       callbacks.cancelAll()
       loading.value = false
       hardwareRuntime.pause()
-      // Owner-key Worker suspension is supplied by the worker-pool owner.
-      // Abort settles this caller; it cannot prove Worker cancellation ack.
+      workerExecutorPauseListener?.()
+      workerExecutorListenerActive = false
     }
     return inspectResources()
   }
   const resume = () => {
     if (disposed) throw new Error('fsus_render_pipeline_runtime_disposed')
     if (paused) {
+      workerExecutorResumeListener?.()
+      workerExecutorListenerActive = !!workerExecutorSharedCleanup
       paused = false
       hardwareRuntime.resume()
+      loading.value = preservedWorkerTask && renders.size > 0
+      preservedWorkerTask = false
+      for (const record of workerScopes) {
+        if (
+          record.executor.inspectResources(record.scope).resources
+            .suspendedTaskCount > 0
+        ) {
+          controlWorkerScope(record, 'resume')
+        }
+      }
     }
     return inspectResources()
   }
@@ -3133,6 +3355,10 @@ export const useFsusRenderPipelineRuntime = <TSource, TUnit>(
   onBeforeUnmount(() => {
     pause()
     disposed = true
+    taskId += 1
+    controller?.abort()
+    controller = null
+    for (const record of workerScopes) controlWorkerScope(record, 'cancel')
     clearWorkerExecutor()
   })
 
