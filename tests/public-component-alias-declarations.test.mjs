@@ -153,22 +153,22 @@ test('original Vue compiler accepts every source contract and rejects nine negat
   ])
   assert.deepEqual(diagnostics(positive), [])
   const name = `.negative-${process.pid}`
-  const file = path.join(fixture, name + '.ts')
-  const config = path.join(fixture, name + '.json')
+  const file = path.join(fixture, `${name}.ts`)
+  const config = path.join(fixture, `${name}.json`)
   try {
     writeFileSync(file, contracts.replace(/^.*@ts-expect-error.*$/gm, ''))
     writeFileSync(
       config,
       JSON.stringify({
         extends: './tsconfig.source.json',
-        include: [name + '.ts', ...sourceConfig.include.slice(1)],
+        include: [`${name}.ts`, ...sourceConfig.include.slice(1)],
       }),
     )
     const negative = diagnostics(
       run([compiler, '--noEmit', '--pretty', 'false', '-p', config]),
     )
     assert.equal(negative.length, 9)
-    assert.ok(negative.every((error) => error.file.endsWith(name + '.ts')))
+    assert.ok(negative.every((error) => error.file.endsWith(`${name}.ts`)))
   } finally {
     rmSync(file, { force: true })
     rmSync(config, { force: true })
@@ -190,7 +190,7 @@ test('exact 18 source runtime cases pass through the original Vitest configurati
     ...files,
     '--config',
     'vue/vitest.config.ts',
-    '--json=' + listed,
+    `--json=${listed}`,
   ])
   assert.equal(preflight.status, 0, preflight.stdout + preflight.stderr)
   const actual = JSON.parse(readFileSync(listed, 'utf8'))
@@ -200,11 +200,9 @@ test('exact 18 source runtime cases pass through the original Vitest configurati
   )
   const escape = (name) => name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
   const pattern =
-    '^(?:' +
-    selectors
+    `^(?:${selectors
       .map((item) => escape(item.name.replaceAll(' > ', ' ')))
-      .join('|') +
-    ')$'
+      .join('|')})$`
   const output = path.join(temporary, 'source-results.json')
   const result = run([
     path.join(repository, 'scripts/with-node-heap.mjs'),
@@ -217,7 +215,7 @@ test('exact 18 source runtime cases pass through the original Vitest configurati
     '--testNamePattern',
     pattern,
     '--reporter=json',
-    '--outputFile=' + output,
+    `--outputFile=${output}`,
   ])
   assert.equal(result.status, 0, result.stdout + result.stderr)
   const report = JSON.parse(readFileSync(output, 'utf8'))
@@ -279,7 +277,7 @@ test('strict installed package removes all 144 owned constraints with no added d
   for (const error of beforeErrors)
     remaining.set(key(error), (remaining.get(key(error)) ?? 0) + 1)
   for (const error of afterErrors) {
-    assert.ok(remaining.get(key(error)) > 0, 'Added diagnostic: ' + key(error))
+    assert.ok(remaining.get(key(error)) > 0, `Added diagnostic: ${key(error)}`)
     remaining.set(key(error), remaining.get(key(error)) - 1)
   }
   assert.deepEqual(

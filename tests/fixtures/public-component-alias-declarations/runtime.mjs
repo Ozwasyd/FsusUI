@@ -1,11 +1,12 @@
 import assert from 'node:assert/strict'
 import { createRequire } from 'node:module'
 import { readFileSync } from 'node:fs'
+import { URL } from 'node:url'
 
 // Run from the installed consumer. The DOM provider comes from the original
 // repository toolchain; Vue and every component come from the real install.
 const requireTools = createRequire(
-  process.env.FSUS_ALIAS_REPOSITORY + '/package.json',
+  `${process.env.FSUS_ALIAS_REPOSITORY}/package.json`,
 )
 const { JSDOM } = requireTools('jsdom')
 const dom = new JSDOM('<!doctype html><html><body></body></html>')
@@ -35,18 +36,18 @@ let aliases = 0
 for (const exports of [esm, cjs]) {
   for (const names of Object.values(groups)) {
     for (const name of names) {
-      const base = exports['El' + name]
-      const alias = exports['Fsus' + name]
-      assert.equal(alias.name, 'Fsus' + name)
+      const base = exports[`El${name}`]
+      const alias = exports[`Fsus${name}`]
+      assert.equal(alias.name, `Fsus${name}`)
       assert.notEqual(base, alias)
-      assert.equal(base['Fsus' + name], alias)
+      assert.equal(base[`Fsus${name}`], alias)
       for (const key of ['setup', 'render', 'props', 'emits']) {
-        assert.equal(alias[key], base[key], name + ':' + key)
+        assert.equal(alias[key], base[key], `${name}:${key}`)
       }
       const app = vue.createApp({})
       app.use(base)
-      assert.equal(app.component('El' + name), base)
-      assert.equal(app.component('Fsus' + name), alias)
+      assert.equal(app.component(`El${name}`), base)
+      assert.equal(app.component(`Fsus${name}`), alias)
       aliases++
     }
   }
@@ -83,7 +84,7 @@ const inbox = mount(
 assert.match(inbox.target.textContent, /Thread.*Inbox slot/s)
 inbox.target.querySelector('button').click()
 await vue.nextTick()
-assert.ok(selected instanceof MouseEvent)
+assert.ok(selected instanceof dom.window.MouseEvent)
 inbox.close()
 
 let copied
@@ -137,10 +138,12 @@ const settings = mount(
 assert.match(settings.target.textContent, /Settings slot/)
 const input = settings.target.querySelector('input')
 input.value = 'CONFIRM'
-input.dispatchEvent(new Event('input', { bubbles: true }))
+input.dispatchEvent(new dom.window.Event('input', { bubbles: true }))
 await vue.nextTick()
 assert.equal(updated, 'CONFIRM')
-assert.ok(settings.instance.$el instanceof Element)
+assert.ok(settings.instance.$el instanceof dom.window.Element)
 settings.close()
 dom.window.close()
-console.log(JSON.stringify({ aliases, mountedControls: 4, passed: true }))
+process.stdout.write(
+  `${JSON.stringify({ aliases, mountedControls: 4, passed: true })}\n`,
+)
