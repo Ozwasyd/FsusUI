@@ -494,8 +494,9 @@ export const createFsusWorkerExecutor = <TRequest, TResponse>(
     event: Partial<
       Omit<FsusWorkerExecutorEvent, 'name' | 'pendingCount' | 'type'>
     > = {},
+    callback = options.onEvent,
   ) => {
-    options.onEvent?.({
+    callback?.call(options, {
       activeCount: activeCount(),
       name,
       pendingCount: pending.size,
@@ -884,7 +885,9 @@ export const createFsusWorkerExecutor = <TRequest, TResponse>(
       }
     }
     try {
-      if (options.onEvent) emit('worker-error', { ...context, error: detail })
+      const callback = options.onEvent
+      if (callback)
+        emit('worker-error', { ...context, error: detail }, callback)
       else fallback()
     } catch (reportError) {
       fallback(reportError)
@@ -1274,15 +1277,29 @@ export const createFsusWorkerExecutor = <TRequest, TResponse>(
         if (!slot && slots.length < maxWorkers) {
           try {
             slot = createSlot()
-          } catch (error) {
-            const task = dequeue()
-            if (!task) return
+          } catch (factoryError) {
+            let task: WorkerTask<TRequest, TResponse> | undefined
+            try {
+              task = dequeue()
+            } catch (dequeueError) {
+              reportSharedException(
+                new AggregateError(
+                  [factoryError, dequeueError],
+                  'fsus_worker_create_and_dequeue_failed',
+                ),
+              )
+              return
+            }
+            if (!task) {
+              reportSharedException(factoryError)
+              return
+            }
             let detail = createFsusError('infra', 'fsus_worker_create_failed')
             try {
               runCleanup([
                 () => {
                   detail = toFsusError(
-                    error,
+                    factoryError,
                     'fsus_worker_create_failed',
                     'infra',
                   )
@@ -1290,8 +1307,14 @@ export const createFsusWorkerExecutor = <TRequest, TResponse>(
                 () =>
                   settleTask(task, fsusErr(detail), 'request-reject', detail),
               ])
-            } catch (error) {
-              handleTaskException(task, error)
+            } catch (taskError) {
+              handleTaskException(
+                task,
+                new AggregateError(
+                  [factoryError, taskError],
+                  'fsus_worker_create_and_settlement_failed',
+                ),
+              )
             }
             continue
           }
