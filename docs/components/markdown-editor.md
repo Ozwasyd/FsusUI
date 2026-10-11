@@ -544,16 +544,17 @@ document-switched or source-modified snapshots are rejected. Capture/restore dur
 IME composition or after unmount is rejected. This is in-memory same-instance
 restoration, not cross-instance hydration, serialization or crash recovery.
 
-`inspectCapabilities()` reports the exact current limitation. The renderer lacks
-a public last-valid-render checkpoint; renderer/projection,
-language/search, attachment/embed and external command providers lack a complete resource
-census and reversible pause/resume contract. `inspectResources`, `pauseResources`,
-`resumeResources` and `disposeAfterSnapshot` therefore throw before any resource
-release. A valid snapshot is preserved after disposal refusal. Cancelling known
-frames or disconnecting one observer would not prove that all session work stopped.
-Draft and crash journal refs remain the consuming application's responsibility.
-Applications must reject workspace lifecycle admission until these owners exist;
-this API must not be used to mint an immediate-ready receipt.
+`inspectCapabilities()` reports the actual current roster and renderer proof
+availability on this instance. A real authorized last-valid-render ref is available
+only from an existing full-document renderer at the exact current identity/epoch/
+revision. That retained ref does not supply renderer hydration after disposal.
+Native/template surface subscriptions, complete renderer pipeline controls and
+external command/embed/upload resource owners remain absent. Aggregate inspect,
+pause and resume refuse before a partial transition when any roster owner is
+missing; disposal also requires every original owner to be paused and recoverable.
+A valid snapshot is preserved after refusal. Application panel/draft/crash-journal
+refs remain original-owner dependencies. This source must not mint an immediate
+ready receipt or admit workspace eviction.
 
 The resource participant contract is now exported as types from the root API:
 `MarkdownEditorSessionResourceParticipant` has one closed `ownerRef` and real
