@@ -179,6 +179,13 @@ describe('ResizeSeparator public component', () => {
     [0, 1, 0.5, 0.1, 350.000001, 0.4],
     [1, 2, 1.5, 0.1, 350, 1.4],
     [-1, 0, -0.5, 0.1, 350, -0.6],
+    [100, 101, 100.5, 0.1, 350, 100.4],
+    [100, 101, 100.5, 0.1, 349.999999, 100.3],
+    [100, 101, 100.5, 0.1, 350.000001, 100.4],
+    [-100, -99, -99.5, 0.1, 350, -99.6],
+    [-100, -99, -99.5, 0.1, 349.999999, -99.7],
+    [-100, -99, -99.5, 0.1, 350.000001, -99.6],
+    [1e15, 1e15 + 1, 1e15 + 0.5, 0.25, 125, 1e15 + 0.25],
     [0, 1e-6, 5e-7, 1e-7, 350, 4e-7],
     [0, 1e6, 5e5, 1e5, 350, 4e5],
   ])(
@@ -207,6 +214,20 @@ describe('ResizeSeparator public component', () => {
       { value: 0.4, source: 'keyboard', pointerId: null },
     ])
   })
+
+  test.each([
+    [100, 101, 100.25, 100.4],
+    [-100, -99, -99.75, -99.6],
+  ])(
+    'keyboard half-step decisions survive translation: min=%s',
+    async (min, max, value, expected) => {
+      const wrapper = render({ min, max, value, step: 0.1 })
+      await wrapper.trigger('keydown', { key: 'ArrowRight' })
+      expect(proposals(wrapper)).toEqual([
+        { value: expected, source: 'keyboard', pointerId: null },
+      ])
+    },
+  )
 
   test('active Escape cancels without reaching an outer dismiss handler; idle Escape still bubbles', () => {
     const wrapper = render()
@@ -326,6 +347,10 @@ describe('ResizeSeparator public component', () => {
     { step: 0 },
     { step: Infinity },
     { value: Infinity },
+    { min: 1e15, max: 1e15 + 1, value: 1e15 + 0.5, step: 0.1 },
+    { min: 1e15, max: 1e15 + 1, value: 1e15 + 0.5, step: 0.125 },
+    { min: -1e15 - 1, max: -1e15, value: -1e15 - 0.5, step: 0.1 },
+    { min: 0, max: 1, step: Number.MIN_VALUE },
     { label: ' ' },
     { primaryRegionId: '' },
     { coordinateRange: { start: 1, end: 1 } },

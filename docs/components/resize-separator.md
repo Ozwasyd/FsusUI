@@ -56,6 +56,10 @@ Invalid numeric bounds, value, step, coordinate mapping, or required naming
 disable input and remove the handle from tab order. Coordinates must be finite
 and distinct, with a finite nonzero value-per-pixel scale. Invalid value/bounds/
 step omit numeric ARIA attributes rather than expose invalid numbers.
+To fail closed when large offsets obscure small increments, `step / 2` must
+be at least one binary ULP at the largest absolute bound. A step whose grid
+or half-step boundary is not distinguishable disables input; consumers do
+not compensate this limitation themselves.
 
 ## Coordinate mapping and proposals
 
@@ -86,9 +90,13 @@ candidate = initialValue
 
 Each proposal clamps to `[min, max]`, then rounds to the nearest step anchored
 at `min` (positive half-step ties round upward). Both endpoints are reachable
-even when the span is not divisible by step. Floating-point results use up to
-15 significant digits; if an extremely small step overflows the step count,
-the bounded candidate is retained. Repeated identical pointer proposals are
+even when the span is not divisible by step. Each finite Number operand is
+normalized to its shortest round-trippable decimal (`Number.toString()`).
+Coordinate differences, mapping, keyboard increments and the min-anchored
+rounding decision use exact integer/rational arithmetic on those decimals;
+only the final bounded proposal is converted back to Number. This preserves
+half-step decisions after positive or negative translation without widening
+an epsilon threshold or truncating results to a fixed digit count. Repeated identical pointer proposals are
 suppressed. The exact initial coordinate retains the initial accepted value,
 including an off-step value; a stationary gesture does not snap it. Pointerup
 samples its final coordinate before `end`.

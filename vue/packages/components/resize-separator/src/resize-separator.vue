@@ -26,6 +26,11 @@
 import { computed, onBeforeUnmount, ref, watch } from 'vue'
 import { useNamespace } from '@element-plus/hooks'
 import { resizeSeparatorEmits, resizeSeparatorProps } from './resize-separator'
+import {
+  getResizeKeyboardProposal,
+  getResizePointerProposal,
+  hasResolvableResizeStep,
+} from './resize-separator-math'
 
 import type {
   ResizeSeparatorCancelReason,
@@ -46,7 +51,8 @@ const validDomain = computed(
     Number.isFinite(props.max - props.min) &&
     props.max > props.min &&
     Number.isFinite(props.step) &&
-    props.step > 0,
+    props.step > 0 &&
+    hasResolvableResizeStep(props),
 )
 const validCoordinates = computed(() => {
   const range = props.coordinateRange
@@ -72,23 +78,6 @@ const regionIds = computed(() =>
 )
 const bound = (value: number) => Math.min(props.max, Math.max(props.min, value))
 const controlledValue = computed(() => bound(props.value))
-const quantize = (value: number) => {
-  const bounded = bound(value)
-  if (bounded === props.min || bounded === props.max) return bounded
-  const stepCount = (bounded - props.min) / props.step
-  // An extremely small step must not turn a finite input into Infinity.
-  if (!Number.isFinite(stepCount)) return bounded
-  const halfStep = Math.floor(stepCount) + 0.5
-  const roundoff = Number.EPSILON * Math.max(1, Math.abs(stepCount))
-  // Correct quotient-scale roundoff only at the half-step decision boundary.
-  // If numeric precision spans half a step, retain ordinary rounding.
-  const steps =
-    roundoff < 0.5 && stepCount < halfStep && halfStep - stepCount <= roundoff
-      ? Math.ceil(stepCount)
-      : Math.round(stepCount)
-  return bound(Number((props.min + steps * props.step).toPrecision(15)))
-}
-
 type PointerInteraction = {
   source: 'pointer'
   target: HTMLElement
@@ -96,7 +85,7 @@ type PointerInteraction = {
   coordinate: number
   initialValue: number
   lastValue: number
-  scale: number
+  coordinateRange: Readonly<{ start: number; end: number }>
 }
 type KeyboardInteraction = {
   source: 'keyboard'
@@ -155,9 +144,7 @@ const onPointerDown = (event: PointerEvent) => {
     coordinate: coordinate(event),
     initialValue: controlledValue.value,
     lastValue: controlledValue.value,
-    scale:
-      (props.max - props.min) /
-      (props.coordinateRange.end - props.coordinateRange.start),
+    coordinateRange: { ...props.coordinateRange },
   }
   active = interaction
   event.preventDefault()
@@ -176,9 +163,12 @@ const onPointerMove = (event: PointerEvent) => {
   const value =
     axis === interaction.coordinate
       ? interaction.initialValue
-      : quantize(
-          interaction.initialValue +
-            (axis - interaction.coordinate) * interaction.scale,
+      : getResizePointerProposal(
+          props,
+          interaction.initialValue,
+          interaction.coordinate,
+          axis,
+          interaction.coordinateRange,
         )
   event.preventDefault()
   if (value === interaction.lastValue) return
@@ -224,19 +214,21 @@ const onKeydown = (event: KeyboardEvent) => {
     props.orientation === 'vertical'
       ? ['ArrowLeft', 'ArrowRight']
       : ['ArrowUp', 'ArrowDown']
-  const direction = Math.sign(
-    props.coordinateRange.end - props.coordinateRange.start,
-  )
+  const direction =
+    props.coordinateRange.end > props.coordinateRange.start ? 1 : -1
   let next: number
   if (event.key === 'Home') next = props.min
   else if (event.key === 'End') next = props.max
   else if (event.key === keys[0])
-    next = controlledValue.value - direction * props.step
+    next = getResizeKeyboardProposal(
+      props,
+      controlledValue.value,
+      direction === 1 ? -1 : 1,
+    )
   else if (event.key === keys[1])
-    next = controlledValue.value + direction * props.step
+    next = getResizeKeyboardProposal(props, controlledValue.value, direction)
   else return
   event.preventDefault()
-  next = quantize(next)
   if (next === controlledValue.value) return
   const interaction: KeyboardInteraction = {
     lastValue: controlledValue.value,
