@@ -589,8 +589,12 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
       ) {
         throw new Error('editor-session-attachment-dispatch-job-unavailable')
       }
+      const jobIdentity = ownedJob.documentIdentity
+      const ownsDocument =
+        jobIdentity?.id === context.id && jobIdentity.epoch === context.epoch
       const currentDocument = readDocumentContext()
       if (
+        !ownsDocument ||
         !sameDocumentContext(context, currentDocument) ||
         boundaryRef !== boundary ||
         attachmentGeneration !== epoch ||
