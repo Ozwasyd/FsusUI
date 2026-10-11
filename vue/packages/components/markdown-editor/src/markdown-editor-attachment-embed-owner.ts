@@ -463,13 +463,38 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
     embedGeneration += 1
     embedAttempts.clear()
     const epoch = embedGeneration
-    const operations = [...active]
+    const operations = [...active].map(({ controller, request }) => ({
+      controller,
+      request,
+    }))
     const retired = [...draining]
+    const failures: unknown[] = []
     for (const operation of operations) {
-      operation.controller.abort()
-      cancelMarkdownEmbedRequest(operation.request)
+      try {
+        operation.controller.abort()
+      } catch (error) {
+        failures.push(error)
+      }
+      // Abort failure must not skip this request's original cleanup capability.
+      try {
+        cancelMarkdownEmbedRequest(operation.request)
+      } catch (error) {
+        failures.push(error)
+      }
     }
-    for (const request of retired) cancelMarkdownEmbedRequest(request)
+    for (const request of retired) {
+      try {
+        cancelMarkdownEmbedRequest(request)
+      } catch (error) {
+        failures.push(error)
+      }
+    }
+    // References and async ownership remain until their actual settlement/cleanup.
+    if (failures.length)
+      throw new AggregateError(
+        failures,
+        'editor-session-attachment-embed-cancel-failed',
+      )
     return epoch
   }
   const inspectState = (

@@ -227,6 +227,9 @@ runs and remain owned until their actual stop succeeds. Throwing cleanup or
 construction without a returned stop capability blocks census; an idempotent
 retry is not evidence that the original cleanup completed. Other known handles
 and requests can still be cancelled without granting a paused/recoverable result.
+Request cancellation attempts every captured original request even if an earlier
+abort or cleanup throws, then propagates all failures together. This does not
+settle opaque futures, release their ownership or target a later same-id request.
 
 The mounted editor's session contract remains documented in
 [`MarkdownEditor`](../components/markdown-editor.md#retained-public-editor-session-source-wip).
