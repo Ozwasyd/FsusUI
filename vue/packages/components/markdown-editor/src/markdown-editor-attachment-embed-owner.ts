@@ -1,3 +1,5 @@
+import { watch } from 'vue'
+import type { WatchSource, WatchStopHandle } from 'vue'
 import type {
   MarkdownDocumentIdentity,
   MarkdownEmbedValidNode,
@@ -16,7 +18,13 @@ import type {
   MarkdownEmbedResult,
 } from '../../../wasm/markdown-embed-provider'
 import type { MarkdownAttachmentJob } from './markdown-editor-attachment-lifecycle'
-import type { MarkdownAttachmentProviderResult } from './markdown-editor-attachment'
+import { inspectMarkdownAttachmentCaptureResources } from './markdown-editor-attachment'
+import type {
+  MarkdownAttachmentProviderResult,
+  MarkdownAttachmentCaptureSession,
+  MarkdownAttachmentBatchIntent,
+  MarkdownAttachmentItemIntent,
+} from './markdown-editor-attachment'
 import type {
   MarkdownEditorSessionResourceInspection,
   MarkdownEditorSessionResourceParticipant,
@@ -29,6 +37,15 @@ export interface MarkdownAttachmentEmbedOwnerBindings {
   }
   readonly readEmbedProvider: () => MarkdownEmbedProvider | undefined
   readonly readAttachmentJobs: () => readonly MarkdownAttachmentJob[]
+  readonly readAttachmentBatches: () => ReadonlyMap<
+    string,
+    MarkdownAttachmentBatchIntent
+  >
+  readonly readAttachmentItems: () => ReadonlyMap<
+    string,
+    MarkdownAttachmentItemIntent
+  >
+  readonly attachmentCaptureSession: MarkdownAttachmentCaptureSession
   readonly publishEmbedResults: (
     results: ReadonlyMap<string, MarkdownEmbedResult>,
   ) => void
@@ -55,6 +72,25 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
   let generation = 0
   let pauseRequested = false
   let disposed = false
+  let watchInputs:
+    | {
+        sources: readonly WatchSource[]
+        readNodes: () => readonly MarkdownEmbedValidNode[]
+      }
+    | undefined
+  let stopWatcher: WatchStopHandle | undefined
+
+  const stopWatching = () => {
+    stopWatcher?.()
+    stopWatcher = undefined
+  }
+  const startWatching = () => {
+    if (!watchInputs || pauseRequested || disposed) return
+    stopWatcher = watch([...watchInputs.sources], () =>
+      refreshEmbeds(watchInputs!.readNodes()),
+    )
+    refreshEmbeds(watchInputs.readNodes())
+  }
 
   const collectDraining = () => {
     for (const request of draining) {
@@ -77,6 +113,11 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
   const inspect = (): MarkdownEditorSessionResourceInspection => {
     collectDraining()
     const jobs = bindings.readAttachmentJobs()
+    const batches = bindings.readAttachmentBatches()
+    const items = bindings.readAttachmentItems()
+    const capture = inspectMarkdownAttachmentCaptureResources(
+      bindings.attachmentCaptureSession,
+    )
     const unfinishedJobs = jobs.filter(unfinished).length
     const requests = new Set([...active].map((operation) => operation.request))
     for (const request of draining) requests.add(request)
@@ -94,6 +135,7 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
       ownerRef: 'attachment-embed',
       paused:
         pauseRequested &&
+        stopWatcher === undefined &&
         backgroundTasks === 0 &&
         timers === 0 &&
         retainedListeners === 0,
@@ -102,6 +144,9 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
       recoverable:
         backgroundTasks === 0 &&
         jobs.length === 0 &&
+        batches.size === 0 &&
+        items.size === 0 &&
+        capture.memoryUnits === 0 &&
         results.size === 0 &&
         nodes.length === 0 &&
         versions.size === 0,
@@ -109,7 +154,7 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
       usage: Object.freeze({
         editorInstances: 0,
         renderers: 0,
-        observers: 0,
+        observers: stopWatcher ? 1 : 0,
         timers,
         backgroundTasks,
         // This library performs no network I/O. Opaque consumer work blocks pause
@@ -119,9 +164,13 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
           active.size +
           draining.size +
           jobs.length +
+          batches.size +
+          items.size +
+          capture.memoryUnits +
           results.size +
           versions.size +
-          nodes.length,
+          nodes.length +
+          (stopWatcher ? 1 : 0),
       }),
     })
   }
@@ -236,6 +285,7 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
     inspect,
     pause() {
       pauseRequested = true
+      stopWatching()
       cancel()
       return inspect()
     },
@@ -243,10 +293,13 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
       if (disposed) throw new Error('editor-session-attachment-embed-disposed')
       const wasPaused = pauseRequested
       pauseRequested = false
-      if (wasPaused) refreshEmbeds(nodes)
+      if (wasPaused) {
+        if (watchInputs) startWatching()
+        else refreshEmbeds(nodes)
+      }
       return inspect()
     },
-    dispose(snapshotRef) {
+    dispose(snapshotRef: string) {
       const state = inspect()
       if (!snapshotRef || !state.paused || !state.recoverable)
         throw new Error(
@@ -258,6 +311,17 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
   })
   return Object.freeze({
     participant,
+    bindEmbedInputs(
+      sources: readonly WatchSource[],
+      readNodes: () => readonly MarkdownEmbedValidNode[],
+    ) {
+      if (disposed || watchInputs)
+        throw new Error(
+          'editor-session-attachment-embed-watch-already-bound-or-disposed',
+        )
+      watchInputs = { sources: [...sources], readNodes }
+      startWatching()
+    },
     resolveEmbedNode,
     refreshEmbeds,
     readEmbedResults: () =>
@@ -284,6 +348,7 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
     },
     abort() {
       pauseRequested = true
+      stopWatching()
       cancel()
     },
   })

@@ -54,7 +54,9 @@ export const createMarkdownAttachmentJob = (
   id,
   batchId: options?.batchId,
   itemId: options?.itemId ?? id,
-  documentIdentity: options?.documentIdentity,
+  documentIdentity: options?.documentIdentity
+    ? Object.freeze({ ...options.documentIdentity })
+    : undefined,
   revision: options?.revision,
   attempt: options?.attempt ?? 1,
   phase: 'pending',

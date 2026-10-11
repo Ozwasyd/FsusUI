@@ -195,6 +195,19 @@ drift and target-coordinate changes prevent old content from being displayed.
 The existing size, time, concurrency and node budgets bound work and retained
 requests; a timed-out resolver cannot admit a late payload.
 
+The internal attachment/embed resource owner retains in-flight provider calls,
+digest work and unresolved preparation work until they settle. Its request census
+reads the actual preparation timer and abort listeners; cancellation removes
+listeners and invalidates commit eligibility, but does not claim that an opaque
+consumer resolver has stopped. A consumer upload remains outside library network
+ownership. Pending/progress attachment jobs block pause because the existing
+attachment intent/result protocol has no reversible pause acknowledgement.
+Only an empty lifecycle with no jobs, nodes, versions, results or unresolved work
+is recoverable without a provider checkpoint. This source owner is not yet wired
+into the editor's session roster and does not authorize whole-session eviction.
+The mounted editor's session contract remains documented in
+[`MarkdownEditor`](../components/markdown-editor.md#retained-public-editor-session-source-wip).
+
 The public `/markdown-runtime` and `/wasm` entries share the editor's provider
 module, including its private preparation receipts and cancellation state.
 Use these public entries together; a cloned payload never inherits a receipt.

@@ -429,7 +429,14 @@ export const prepareMarkdownEmbedResult = async (
   if (resolvingProjections >= MARKDOWN_EMBED_BUDGET.maxConcurrent)
     return failure(request, 'rejected')
   const localController = new AbortController()
-  const abort = () => localController.abort()
+  let requestLinked = false
+  const abort = () => {
+    if (requestLinked) {
+      requestLinked = false
+      handles.listeners -= 1
+    }
+    localController.abort()
+  }
   const handles: EmbedProjectionWork = {
     timer: undefined,
     listeners: 0,
@@ -442,6 +449,7 @@ export const prepareMarkdownEmbedResult = async (
   if (request.signal) {
     projectionWork.set(request.signal, workSet)
     request.signal.addEventListener('abort', abort, { once: true })
+    requestLinked = true
     handles.listeners += 1
   }
   workSet.add(handles)
@@ -518,8 +526,9 @@ export const prepareMarkdownEmbedResult = async (
   } finally {
     if (handles.timer !== undefined) clearTimeout(handles.timer)
     handles.timer = undefined
-    if (request.signal) {
+    if (request.signal && requestLinked) {
       request.signal.removeEventListener('abort', abort)
+      requestLinked = false
       handles.listeners -= 1
     }
     localController.abort()
