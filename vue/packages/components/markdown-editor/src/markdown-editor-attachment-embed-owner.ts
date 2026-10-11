@@ -85,7 +85,8 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
   const versions = new Map<string, number>()
   let results = new Map<string, MarkdownEmbedResult>()
   let nodes: readonly MarkdownEmbedValidNode[] = []
-  let generation = 0
+  let embedGeneration = 0
+  let attachmentGeneration = 0
   let pauseRequested = false
   let disposed = false
   let watchInputs:
@@ -120,7 +121,7 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
     }
   }
   const cancel = () => {
-    generation += 1
+    embedGeneration += 1
     for (const operation of active) {
       operation.controller.abort()
       cancelMarkdownEmbedRequest(operation.request)
@@ -228,7 +229,7 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
     const id = nodeId(node)
     const version = (versions.get(id) ?? 0) + 1
     versions.set(id, version)
-    const epoch = generation
+    const epoch = embedGeneration
     const controller = new AbortController()
     const operation = {
       controller,
@@ -250,7 +251,7 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
         !pauseRequested &&
         !controller.signal.aborted &&
         (!checkSignal || !operation.request.signal?.aborted) &&
-        generation === epoch &&
+        embedGeneration === epoch &&
         versions.get(id) === version &&
         bindings.readEmbedProvider() === provider &&
         now.revision === revision &&
@@ -326,6 +327,7 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
     ownerRef: 'attachment-embed',
     inspect,
     pause() {
+      attachmentGeneration += 1
       pauseRequested = true
       stopWatching()
       cancel()
@@ -348,6 +350,7 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
           'editor-session-attachment-embed-checkpoint-not-recoverable',
         )
       disposed = true
+      attachmentGeneration += 1
       cancel()
     },
   })
@@ -365,7 +368,7 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
     const identity = bindings.readDocument().documentIdentity
     return (
       dispatch?.dispatchRef === proof.dispatchRef &&
-      generation === proof.generation &&
+      attachmentGeneration === proof.generation &&
       dispatch.attempt === proof.attempt &&
       job.attempt === proof.attempt &&
       (result.status !== 'progress' || !dispatch.settled) &&
@@ -399,7 +402,7 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
         throw new Error('editor-session-attachment-dispatch-job-unavailable')
       }
       observedAttachmentJobs.add(ownedJob)
-      const epoch = generation
+      const epoch = attachmentGeneration
       let dispatchRef: object | undefined
       try {
         return await runMarkdownAttachmentDispatch(ownedJob, () => {
@@ -463,6 +466,7 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
       new Map(versions) as ReadonlyMap<string, number>,
     acceptsAttachmentResult,
     abort() {
+      attachmentGeneration += 1
       pauseRequested = true
       stopWatching()
       cancel()
