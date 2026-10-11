@@ -402,6 +402,7 @@ export type FsusRenderPipelineRuntimeResourceInspection = {
     readonly phase: 'adapter-event' | 'runtime-event' | 'error-notification'
     readonly workerId: number | null
   } | null
+  readonly pendingWorkerCallbackFailureNotification: FsusRenderPipelineRuntimeResourceInspection['workerCallbackFailure']
   readonly workerResources: {
     readonly status: 'available' | 'not-created'
     readonly scopes: readonly {
@@ -2679,6 +2680,8 @@ export const useFsusRenderPipelineRuntime = <TSource, TUnit>(
   const workerTaskKey = `render-runtime-${++renderPipelineRuntimeId}`
   let workerCallbackFailure: FsusRenderPipelineRuntimeResourceInspection['workerCallbackFailure'] =
     null
+  let pendingWorkerCallbackFailureNotification: FsusRenderPipelineRuntimeResourceInspection['workerCallbackFailure'] =
+    null
   let publishedWorkerCallbackFailureCount = 0
   let publishingWorkerCallbackFailure = false
   const recordWorkerCallbackFailure = (
@@ -2705,6 +2708,9 @@ export const useFsusRenderPipelineRuntime = <TSource, TUnit>(
       phase,
       workerId: event.workerId ?? null,
     })
+    // Notification failures stay diagnostic; only source failures need delivery.
+    if (phase !== 'error-notification')
+      pendingWorkerCallbackFailureNotification = workerCallbackFailure
   }
   const invokeWorkerCallback = (
     callback: ((event: FsusWorkerExecutorEvent) => void) | undefined,
@@ -2725,7 +2731,7 @@ export const useFsusRenderPipelineRuntime = <TSource, TUnit>(
     }
   }
   const publishWorkerCallbackFailure = () => {
-    const failure = workerCallbackFailure
+    const failure = pendingWorkerCallbackFailureNotification
     if (
       !failure ||
       publishingWorkerCallbackFailure ||
@@ -2742,8 +2748,10 @@ export const useFsusRenderPipelineRuntime = <TSource, TUnit>(
         'error-notification',
       )
     } finally {
-      // A failing error watcher is reported in inspection without a retry loop.
-      publishedWorkerCallbackFailureCount = workerCallbackFailure?.count ?? 0
+      // Mark only the attempted snapshot; reentrant source failures stay pending.
+      publishedWorkerCallbackFailureCount = failure.count
+      if (pendingWorkerCallbackFailureNotification === failure)
+        pendingWorkerCallbackFailureNotification = null
       publishingWorkerCallbackFailure = false
     }
   }
@@ -3533,6 +3541,7 @@ export const useFsusRenderPipelineRuntime = <TSource, TUnit>(
       pendingAdapterJobs: adapterJobs.size,
       adapterResources: 'unknown',
       workerCallbackFailure,
+      pendingWorkerCallbackFailureNotification,
       workerResources: inspectWorkerResources(),
       hardware: hardwareRuntime.inspectResources(),
       recoverable: false,
