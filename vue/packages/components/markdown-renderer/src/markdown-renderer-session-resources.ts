@@ -104,6 +104,7 @@ export const markdownRendererSessionSourceDependencies = Object.freeze([
   // Quarantine is source-reviewed; the worker-owner synchronous lifecycle
   // repairs are composed, but independent review/qualification remains pending.
   'render-pipeline-worker:reentrant-enqueue-disposal-cleanup',
+  'render-pipeline-worker:retained-task-slot-association',
 ] as const)
 
 export const createMarkdownRendererSessionResourceOwner = (options: {
@@ -460,7 +461,13 @@ export const createMarkdownRendererSessionResourceOwner = (options: {
                 count +
                 scope.tasks.filter(
                   (task) =>
-                    task.promiseState === 'pending' || task.workerId !== null,
+                    task.promiseState === 'pending' ||
+                    scope.slots.some(
+                      (slot) =>
+                        slot.alive &&
+                        slot.id === task.workerId &&
+                        slot.activeTaskId === task.id,
+                    ),
                 ).length,
               0,
             ),

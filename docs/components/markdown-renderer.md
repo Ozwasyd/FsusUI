@@ -370,10 +370,13 @@ registration adds an explicit source dependency and blocks restore. Actual abort
 listener counts describe unresolved owned cleanup hooks, including hooks whose
 native registration is unknown. Shared visibility counts remain pool context.
 No registration state is converted into a native listener count or an aggregate
-zero. Settled tasks without a retained worker identity do not contribute to
-background tasks merely because their cleanup hook remains; their actual retained
-task entry and hook stay in memory/listener census. Pending promises and retained
-worker identities continue to contribute actual work entries.
+zero. A settled task contributes background work only when the same inspection
+still contains a live slot whose id matches its `workerId` and whose
+`activeTaskId` matches the task id. A non-null worker id or a slot now executing
+another task does not establish that association. Cleanup-only retained task
+entries and hooks stay in memory/listener census; pending promises continue to
+contribute actual work entries. The producer's old task-to-slot association repair
+remains with the worker owner, and the source offer preserves that dependency.
 Alive does not establish dispatchability, and quarantine does not prove cleanup
 or recovery. Independent review source-closes the handlerless-slot dispatch
 finding. The worker owner's composed admission repair rechecks actual pending
@@ -381,10 +384,12 @@ membership and disposal after cancellation/preemption callbacks, generation and
 queue capacity before enqueue, and live task membership before crash retry.
 The composed source also rechecks admission after request getters and preserves
 actual native cleanup knowledge across synchronous registration/retention/cleanup
-windows. Independent review of these increments and the queue-only consumer guard
-remains pending. The source offer preserves the cleanup dependency and continues to
-refuse complete participant operations. This conditional consumer guard does not
-establish that the renderer had a reproducible restore bypass.
+windows. Independent review confirms unknown/absent registration refusal and
+preservation of the queue-only guard, and source-closes the earlier getter finding.
+Further producer findings and the consumer task/slot association correction
+remain under review. The source offer preserves the cleanup dependencies and
+continues to refuse complete participant operations. This conditional consumer
+guard does not establish that the renderer had a reproducible restore bypass.
 
 This source offer is deliberately partial. Adapter internals, worker internals,
 shared pool attribution, platform observer callbacks, heavy-runtime timer/network
