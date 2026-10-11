@@ -20,3 +20,6 @@ preserve unknown legacy settlement failures and incomplete consumer resource tot
 Expose a read-only retained snapshot custody check against the same original
 native token, document and revision. It never restores or replaces the checkpoint
 and does not certify renderer restoration, resources or complete host snapshots.
+
+Validate the original transaction store's actual retained token/history custody
+as well, rejecting document-coordinate ABA after release without changing restore.

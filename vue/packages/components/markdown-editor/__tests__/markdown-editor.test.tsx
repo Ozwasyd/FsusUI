@@ -26,6 +26,36 @@ import type {
 import { getMarkdownXssSourceUrl } from '../../../../tests/support/markdown-xss-corpus'
 
 describe('MarkdownEditor', () => {
+  it('rejects old outer custody after the original transaction store switches away and back to identical coordinates', () => {
+    const identity = { id: 'aba-document', epoch: 1 }
+    const store = new MarkdownEditorTransactionStore('same source', undefined, identity)
+    const binding = createMarkdownEditorSessionBinding({
+      transactionStore: store,
+      isComposing: () => false,
+      isDisposed: () => false,
+      captureViewState: () => null,
+      restoreViewState: () => {},
+      resourceParticipants: () => [],
+      captureLastValidRender: () => null,
+    })
+    const session = binding.getSession('session:aba')
+    const snapshot = session.captureSnapshot(() => 'a'.repeat(64))
+    const expected = { documentIdentity: identity, revision: 0 }
+    expect(session.validateRetainedSnapshot(snapshot, expected)).toBe(true)
+    store.switchDocument({ id: 'other-document', epoch: 2 }, 'other source')
+    store.switchDocument(identity, 'same source')
+    expect(session.inspectDocumentState()).toEqual({ documentIdentity: identity, revision: 0 })
+    const before = { history: store.history, selection: store.selection, source: store.value }
+    expect(session.validateRetainedSnapshot(snapshot, expected)).toBe(false)
+    expect({ history: store.history, selection: store.selection, source: store.value }).toEqual(before)
+    expect(session.restoreSnapshot(snapshot, expected).reason).toBe('editor-session-history-checkpoint-invalid')
+    const originalToken = store.retainSnapshot()
+    expect(store.validateRetainedSnapshot(originalToken)).toBe(true)
+    expect(store.validateRetainedSnapshot({ ...originalToken })).toBe(false)
+    store.releaseRetainedSnapshot()
+    expect(store.validateRetainedSnapshot(originalToken)).toBe(false)
+  })
+
   it.each(['renderer', 'attachment'] as const)('rejects %s source observation after same-source document epoch drift', (sourceOwner) => {
     const store = new MarkdownEditorTransactionStore('same source', undefined, { id: 'source-document', epoch: 1 })
     const binding = createMarkdownEditorSessionBinding({

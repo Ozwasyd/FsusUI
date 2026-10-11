@@ -543,6 +543,10 @@ stale expected context return false; IME/disposed owner refusal is preserved.
 It does not recapture or restore state and does not certify view/renderer restore
 or resource readiness. Application composition uses it to reject foreign native
 custody and replacement during asynchronous original journal reads.
+The check also delegates to the original transaction store's read-only retained
+token/history custody check. A switch away and back to identical id/epoch/revision
+does not revive a released transaction checkpoint. Original mutating restore and
+its history-checkpoint refusal remain unchanged; no metadata-only ABA acceptance.
 
 `restoreSnapshot(snapshot, expected)` accepts only the exact retained snapshot
 object, on the same mounted owner, document identity/epoch and source revision.

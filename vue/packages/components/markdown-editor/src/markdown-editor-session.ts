@@ -345,7 +345,8 @@ export const createMarkdownEditorSessionBinding = <ViewState>(
           const identity = store.documentIdentity
           return identity.id === expectedId && identity.epoch === expectedEpoch &&
             identity.id === snapshot.documentIdentity.id && identity.epoch === snapshot.documentIdentity.epoch &&
-            store.revision === expectedRevision && store.revision === snapshot.revision
+            store.revision === expectedRevision && store.revision === snapshot.revision &&
+            store.validateRetainedSnapshot(retained.transaction)
         },
         restoreSnapshot(snapshot: MarkdownEditorSessionSnapshot, expected: {
           readonly documentIdentity: MarkdownEditorDocumentIdentity
