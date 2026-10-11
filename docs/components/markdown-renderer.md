@@ -375,8 +375,9 @@ still contains a live slot whose id matches its `workerId` and whose
 `activeTaskId` matches the task id. A non-null worker id or a slot now executing
 another task does not establish that association. Cleanup-only retained task
 entries and hooks stay in memory/listener census; pending promises continue to
-contribute actual work entries. The producer's old task-to-slot association repair
-remains with the worker owner, and the source offer preserves that dependency.
+contribute actual work entries. The composed producer repair also clears stale
+task-to-slot links and matches the active task when exposing a worker id. Its
+independent review remains pending, and the source offer preserves that dependency.
 Alive does not establish dispatchability, and quarantine does not prove cleanup
 or recovery. Independent review source-closes the handlerless-slot dispatch
 finding. The worker owner's composed admission repair rechecks actual pending
@@ -386,8 +387,11 @@ The composed source also rechecks admission after request getters and preserves
 actual native cleanup knowledge across synchronous registration/retention/cleanup
 windows. Independent review confirms unknown/absent registration refusal and
 preservation of the queue-only guard, and source-closes the earlier getter finding.
-Further producer findings and the consumer task/slot association correction
-remain under review. The source offer preserves the cleanup dependencies and
+The composed producer also preserves actual preparation authority, settles
+registered tasks when admission raises an exception, retains late/failed handler
+cleanup ownership and closes admission before disposal callbacks. Independent
+review of these source repairs and the consumer association correction remains
+pending. The source offer preserves the cleanup dependencies and
 continues to refuse complete participant operations. This conditional consumer
 guard does not establish that the renderer had a reproducible restore bypass.
 
