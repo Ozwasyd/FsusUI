@@ -54,7 +54,9 @@ export const inspectMarkdownRendererWorkerCleanupResidue = (
         .filter(
           ({ inspection }) =>
             inspection.disposed &&
-            (inspection.slots.length > 0 || inspection.tasks.length > 0),
+            (inspection.slots.length > 0 ||
+              inspection.tasks.length > 0 ||
+              inspection.queueDepth > 0),
         )
         .map(({ inspection }) => inspection),
     ),
@@ -64,6 +66,7 @@ export const inspectMarkdownRendererWorkerCleanupResidue = (
           disposed &&
           (pool.workerCount > 0 ||
             pool.pendingCount > 0 ||
+            pool.queueDepth > 0 ||
             pool.retainCount > 0 ||
             shared.backgroundTimerActive ||
             shared.idleTerminateTimerActive ||
@@ -78,9 +81,9 @@ export const markdownRendererSessionSourceDependencies = Object.freeze([
   'markdown-runtime:activation-and-gateway-loader-import-network-census',
   'renderer:validated-snapshot-restoration-after-disposal',
   'heavy-feature-runtime:timer-and-network-cancellation-authority',
-  // Original worker-owner quarantine source is composed; its independent
-  // review/qualification is still pending, so do not clear this hold here.
-  'render-pipeline-worker:retained-slot-dispatch-quarantine',
+  // Quarantine is source-reviewed; reentrant enqueue can still retain an
+  // actual settled queue entry after disposal. Its repair belongs to the worker.
+  'render-pipeline-worker:reentrant-enqueue-disposal-cleanup',
 ] as const)
 
 export const createMarkdownRendererSessionResourceOwner = (options: {
