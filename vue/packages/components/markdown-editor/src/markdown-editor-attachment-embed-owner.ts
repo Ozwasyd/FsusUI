@@ -73,6 +73,25 @@ const isPassiveRecord = (value: object) => {
 export const createMarkdownAttachmentEmbedResourceOwner = (
   bindings: MarkdownAttachmentEmbedOwnerBindings,
 ) => {
+  // Readonly setup capabilities are captured before this owner is exposed.
+  // Later method-property getters cannot revoke admission between check/call.
+  const readDocumentBinding = bindings.readDocument
+  const readEmbedProviderBinding = bindings.readEmbedProvider
+  const readAttachmentJobsBinding = bindings.readAttachmentJobs
+  const readAttachmentBatchesBinding = bindings.readAttachmentBatches
+  const readAttachmentItemsBinding = bindings.readAttachmentItems
+  const publishEmbedResultsBinding = bindings.publishEmbedResults
+  const attachmentCaptureSession = bindings.attachmentCaptureSession
+  const readDocument: MarkdownAttachmentEmbedOwnerBindings['readDocument'] =
+    () => Reflect.apply(readDocumentBinding, bindings, [])
+  const readEmbedProvider: MarkdownAttachmentEmbedOwnerBindings['readEmbedProvider'] =
+    () => Reflect.apply(readEmbedProviderBinding, bindings, [])
+  const readAttachmentJobs: MarkdownAttachmentEmbedOwnerBindings['readAttachmentJobs'] =
+    () => Reflect.apply(readAttachmentJobsBinding, bindings, [])
+  const readAttachmentBatches: MarkdownAttachmentEmbedOwnerBindings['readAttachmentBatches'] =
+    () => Reflect.apply(readAttachmentBatchesBinding, bindings, [])
+  const readAttachmentItems: MarkdownAttachmentEmbedOwnerBindings['readAttachmentItems'] =
+    () => Reflect.apply(readAttachmentItemsBinding, bindings, [])
   const active = new Set<{
     controller: AbortController
     request: MarkdownEmbedRequest
@@ -125,7 +144,7 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
     | undefined
   let stopWatcher: WatchStopHandle | undefined
   const readDocumentContext = () => {
-    const document = bindings.readDocument()
+    const document = readDocument()
     return {
       revision: document.revision,
       id: document.documentIdentity.id,
@@ -140,7 +159,7 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
     left.id === right.id &&
     left.epoch === right.epoch
   const readEmbedContext = () => {
-    const provider = bindings.readEmbedProvider()
+    const provider = readEmbedProvider()
     return { ...readDocumentContext(), provider }
   }
   const sameEmbedContext = (
@@ -222,7 +241,7 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
       throw new Error('editor-session-attachment-embed-request-transition')
     const boundary = boundaryRef
     collectDraining()
-    const jobs = bindings.readAttachmentJobs()
+    const jobs = readAttachmentJobs()
     const currentJobs = new Set(jobs.map((job) => toRaw(job)))
     for (const job of currentJobs) observedAttachmentJobs.add(job)
     const attachmentRunning = new Set(attachmentTasks.keys())
@@ -247,10 +266,10 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
         observedAttachmentJobs.delete(job)
       }
     }
-    const batches = bindings.readAttachmentBatches()
-    const items = bindings.readAttachmentItems()
+    const batches = readAttachmentBatches()
+    const items = readAttachmentItems()
     const capture = inspectMarkdownAttachmentCaptureResources(
-      bindings.attachmentCaptureSession,
+      attachmentCaptureSession,
     )
     const jobCount = jobs.length
     const batchCount = batches.size
@@ -318,7 +337,8 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
       }),
     })
   }
-  const publish = () => bindings.publishEmbedResults(new Map(results))
+  const publish = () =>
+    Reflect.apply(publishEmbedResultsBinding, bindings, [new Map(results)])
   const resolveEmbedAttempt = async (
     node: MarkdownEmbedValidNode,
     admission: object,
@@ -534,9 +554,9 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
     const proof = attachmentResults.get(result)
     if (!proof) return false
     const context = readDocumentContext()
-    const job = bindings
-      .readAttachmentJobs()
-      .find((candidate) => toRaw(candidate) === proof.job)
+    const job = readAttachmentJobs().find(
+      (candidate) => toRaw(candidate) === proof.job,
+    )
     if (!job) return false
     const matches =
       job.itemId === result.itemId &&
@@ -583,9 +603,7 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
       if (!isPassiveRecord(ownedJob))
         throw new Error('editor-session-attachment-dispatch-job-unavailable')
       if (
-        !bindings
-          .readAttachmentJobs()
-          .some((candidate) => toRaw(candidate) === ownedJob)
+        !readAttachmentJobs().some((candidate) => toRaw(candidate) === ownedJob)
       ) {
         throw new Error('editor-session-attachment-dispatch-job-unavailable')
       }
