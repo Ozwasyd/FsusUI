@@ -271,12 +271,12 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
   }
   const refreshEmbeds = (nextNodes: readonly MarkdownEmbedValidNode[]) => {
     if (disposed) throw new Error('editor-session-attachment-embed-disposed')
+    if (pauseRequested) throw new Error('editor-session-attachment-embed-paused')
     cancel()
     nodes = [...nextNodes]
     const ids = new Set(nodes.map(nodeId))
     results = new Map([...results].filter(([id]) => ids.has(id)))
     for (const id of versions.keys()) if (!ids.has(id)) versions.delete(id)
-    if (pauseRequested) return
     publish()
     for (const node of nodes) void resolveEmbedNode(node)
   }
