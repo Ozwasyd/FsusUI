@@ -264,7 +264,11 @@ cross-instance hydration or crash recovery. A retained pipeline
 `markdown-renderer-worker-callback-failure`; this operation cannot clear or recover
 that failure. A real pending failure-notification snapshot also blocks restoration
 with `markdown-renderer-worker-callback-failure-notification-pending`, even if a
-newer failure replaced the original publication snapshot.
+newer failure replaced the original publication snapshot. Observed disposed
+worker scopes with retained slots/tasks, or disposed pool context with retained
+workers/tasks/retains/timers/listeners, also block restore with
+`markdown-renderer-disposed-worker-resource-residue`. These observations do not
+infer why cleanup failed or prove workers stopped.
 
 `getSessionResourceSourceOffer()` returns:
 
@@ -279,6 +283,7 @@ newer failure replaced the original publication snapshot.
     heavyFeatures: object // Actual active and retired handle inspection.
   }
   diagnostics: {
+    workerCleanupResidue: { ownedScopes: readonly object[]; poolContext: readonly object[] }
     workerCallbackFailure: object | null // Actual pipeline failure record.
     pendingWorkerCallbackFailureNotification: object | null // Actual pending snapshot.
   }
@@ -335,6 +340,19 @@ pending snapshot, not an inferred publication status. A distinct pending snapsho
 adds one logical retained record; it is never counted as a worker job. A null
 pending snapshot does not establish successful delivery or recovery, and the
 retained failure continues to block restoration.
+
+`diagnostics.workerCleanupResidue` exposes actual disposed owned-scope
+inspections and separately identified pool context. Failed native termination can
+retain a real slot and task identity even after its promise settled. Existing
+worker/task/listener/deadline census remains intact; logical retained units also
+include actual scoped slot entries. Pool totals remain unattributed context and
+never enter renderer usage. Diagnostic views do not invent jobs or cleanup acks.
+The direct worker cleanup API may rethrow observer errors after continuing its
+batch; its explicit disposal retry is terminal cleanup, not resume or recovery.
+The current worker candidate still has an independently identified retained-slot
+dispatch quarantine gap: an alive retained idle slot with detached handlers may
+be reused. Its original owner is repairing this. Alive does not establish
+dispatchability, and the source offer retains this explicit dependency.
 
 This source offer is deliberately partial. Adapter internals, worker internals,
 shared pool attribution, platform observer callbacks, heavy-runtime timer/network
