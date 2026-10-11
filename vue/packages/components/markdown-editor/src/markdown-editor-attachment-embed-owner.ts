@@ -232,26 +232,16 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
     versions.set(id, version)
     const epoch = embedGeneration
     const controller = new AbortController()
-    const operation = {
-      controller,
-      request: createMarkdownEmbedRequest({
-        documentIdentity,
-        revision,
-        nodeId: id,
-        target: node.target,
-        mode: node.mode,
-        version,
-        signal: controller.signal,
-      }),
-    }
-    active.add(operation)
+    let operation:
+      | { controller: AbortController; request: MarkdownEmbedRequest }
+      | undefined
     const current = (checkSignal = true) => {
       const now = bindings.readDocument()
       return (
         !disposed &&
         !pauseRequested &&
         !controller.signal.aborted &&
-        (!checkSignal || !operation.request.signal?.aborted) &&
+        (!checkSignal || !operation?.request.signal?.aborted) &&
         embedGeneration === epoch &&
         versions.get(id) === version &&
         bindings.readEmbedProvider() === provider &&
@@ -261,6 +251,20 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
       )
     }
     try {
+      // Admission can refuse capacity before any request handle exists.
+      operation = {
+        controller,
+        request: createMarkdownEmbedRequest({
+          documentIdentity,
+          revision,
+          nodeId: id,
+          target: node.target,
+          mode: node.mode,
+          version,
+          signal: controller.signal,
+        }),
+      }
+      active.add(operation)
       if (globalThis.crypto?.subtle) {
         try {
           operation.request = await bindMarkdownEmbedRequestDigest(
@@ -299,16 +303,32 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
       if (!current()) return
       results.set(id, commitMarkdownEmbedResult(operation.request, result))
       publish()
+    } catch (error) {
+      if (
+        !(error instanceof Error) ||
+        (error.message !== 'markdown-embed-request-capacity-exceeded' &&
+          error.message !== 'markdown-embed-request-id-in-use')
+      )
+        throw error
+      // Refusal is not a provider result or a completed request. Release only
+      // this attempt's presentation bookkeeping, including fallback refusal.
+      if (current(false)) {
+        results.delete(id)
+        versions.delete(id)
+        publish()
+      }
     } finally {
-      active.delete(operation)
-      if (controller.signal.aborted)
-        cancelMarkdownEmbedRequest(operation.request)
-      else
-        forgetMarkdownEmbedRequest(
-          operation.request.requestId,
-          operation.request,
-        )
-      draining.add(operation.request)
+      if (operation) {
+        active.delete(operation)
+        if (controller.signal.aborted)
+          cancelMarkdownEmbedRequest(operation.request)
+        else
+          forgetMarkdownEmbedRequest(
+            operation.request.requestId,
+            operation.request,
+          )
+        draining.add(operation.request)
+      } else controller.abort()
       collectDraining()
     }
   }
