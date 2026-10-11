@@ -2,6 +2,7 @@ import {
   cancelMarkdownSearchTask,
   type MarkdownSearchTask,
 } from '../../../wasm/markdown-search-worker'
+import type { MarkdownSearchMatch } from '../../../wasm/markdown-search-model'
 import { executeMarkdownSearchSession } from './markdown-editor-search-ui'
 import type {
   MarkdownEditorSessionResourceInspection,
@@ -10,7 +11,7 @@ import type {
 
 type SearchInput = Omit<
   Parameters<typeof executeMarkdownSearchSession>[0],
-  'previousTask' | 'onTaskCreated'
+  'previousTask' | 'onTaskCreated' | 'onRetainedMatches'
 >
 type SearchResult = ReturnType<typeof executeMarkdownSearchSession>
 
@@ -30,6 +31,7 @@ export const createMarkdownLanguageSearchResources = (language: {
   let task: MarkdownSearchTask | null = null
   let result: SearchResult | null = null
   let unsettledRequest: SearchInput | null = null
+  const unsettledMatches = new Set<readonly MarkdownSearchMatch[]>()
 
   const requireOwnership = () => {
     if (!ownsSearch)
@@ -40,11 +42,25 @@ export const createMarkdownLanguageSearchResources = (language: {
     if (task) cancelMarkdownSearchTask(task)
     // The synchronous runner still retains this task/query until it returns.
     // Cancellation is immediate; releasing its census custody waits for finally.
-    if (!running) task = null
+    if (!running) {
+      task = null
+      unsettledMatches.clear()
+    }
     result = null
   }
   const inspect = (): MarkdownEditorSessionResourceInspection => {
     requireOwnership()
+    const retainedMatches = new Set<MarkdownSearchMatch>()
+    let matchBuffers = 0
+    for (const buffer of unsettledMatches) {
+      // Full and sliced buffers share match objects. Count that union once;
+      // the retained result already accounts for its own output buffer.
+      if (buffer !== result?.execution.matches) matchBuffers += 1
+      for (const match of buffer) retainedMatches.add(match)
+    }
+    if (result) {
+      for (const match of result.execution.matches) retainedMatches.add(match)
+    }
     return Object.freeze({
       ownerRef: 'language-search',
       paused,
@@ -65,7 +81,9 @@ export const createMarkdownLanguageSearchResources = (language: {
           language.languageMemoryUnits() +
           Number(task !== null) +
           (task ? Math.ceil((task.query.length * 2) / 65_536) : 0) +
-          (result ? 1 + result.execution.matches.length : 0) +
+          Number(result !== null) +
+          matchBuffers +
+          retainedMatches.size +
           (unsettledRequest
             ? 1 +
               Number(unsettledRequest.budget !== undefined) +
@@ -136,6 +154,10 @@ export const createMarkdownLanguageSearchResources = (language: {
           queryText: input.queryText,
           revision: input.revision,
           source: input.source,
+          onRetainedMatches(matches) {
+            // Cancellation cannot drop buffers still held by the real runner.
+            unsettledMatches.add(matches)
+          },
           onTaskCreated(created) {
             task = created
             if (paused || epoch !== requestEpoch)
@@ -157,6 +179,7 @@ export const createMarkdownLanguageSearchResources = (language: {
       } finally {
         running = false
         unsettledRequest = null
+        unsettledMatches.clear()
         if (epoch !== requestEpoch || task?.cancelled) task = null
       }
     },

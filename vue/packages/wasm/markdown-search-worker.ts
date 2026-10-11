@@ -74,6 +74,8 @@ export const runMarkdownSearchTask = (input: {
   readonly task?: MarkdownSearchTask
   readonly budget?: MarkdownSearchBudget
   readonly now?: () => number
+  /** Actual allocated buffers; custody lasts until this synchronous call unwinds. */
+  readonly onRetainedMatches?: (matches: readonly MarkdownSearchMatch[]) => void
 }): MarkdownSearchExecution => {
   const budget = input.budget ?? MARKDOWN_SEARCH_BUDGET
   const started = (input.now ?? Date.now)()
@@ -116,6 +118,7 @@ export const runMarkdownSearchTask = (input: {
     documentEpoch: input.documentEpoch,
     revision: input.revision,
   })
+  if (found.ok) input.onRetainedMatches?.(found.matches)
   if (input.task?.cancelled) {
     return Object.freeze({
       requestId: input.requestId,
@@ -141,6 +144,9 @@ export const runMarkdownSearchTask = (input: {
   const matches = truncated
     ? found.matches.slice(0, budget.maxMatches)
     : found.matches
+  if (matches !== found.matches) {
+    input.onRetainedMatches?.(Object.freeze(matches))
+  }
   return Object.freeze({
     requestId: input.requestId,
     status: truncated ? 'truncated' : 'complete',
