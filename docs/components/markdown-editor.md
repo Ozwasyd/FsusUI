@@ -759,3 +759,15 @@ is retained explicitly as a missing source-review dependency. Language UI917 fin
 participant, recoverable=false. Attachment review stays closed to registration;
 UI9155be7dcee904c4ea90db6835abf97a1e7319bd6a4 attempt-cache/unlink repairs are not consumed or accepted here. Readonly
 source inspection does not issue ready, paused, recovery or eviction proofs.
+
+`inspectAttachmentResourceSource()` reads the sole setup-owned attachment/embed
+participant's actual scalar counters through the same public session. The original
+inspection may refuse unknown legacy settlement or owner transitions; those
+exceptions remain visible. The result always keeps complete:false and unqualified
+source review, excludes opaque consumer network totals (`null`) and records missing
+consumer controls, dispatch continuation custody and recoverable checkpoint owners.
+It exposes no paused/recoverable acknowledgment or control capability and does not
+admit the attachment participant into the aggregate roster. Actual document epoch
+and revision are checked before/after this read, including same-source replacement.
+Candidate UI915311ffe5d remains under independent review and is not consumed by this
+owning scalar observation increment; the legacy content compatibility fix remains.

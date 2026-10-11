@@ -85,12 +85,25 @@ export interface MarkdownEditorSessionRendererResourceSource {
   }
 }
 
+/** The sole attachment/embed owner's observations, excluding opaque consumer resources. */
+export interface MarkdownEditorSessionAttachmentResourceSource {
+  readonly complete: false
+  readonly measuredUsageOnly: true
+  readonly sourceReview: 'unqualified'
+  readonly missingSourceDependencies: readonly string[]
+  readonly measuredUsage: Omit<MarkdownEditorSessionResourceUsage, 'networkRequests'>
+  readonly measuredNetworkRequests: null
+  readonly retainedListeners: number
+  readonly unknownUsage: readonly string[]
+}
+
 export interface MarkdownEditorSession {
   readonly editorSessionRef: string
   inspectCapabilities(): MarkdownEditorSessionCapabilities
   inspectDocumentState(): MarkdownEditorSessionDocumentState
   inspectResourceParticipants(): MarkdownEditorSessionResourceCensus
   inspectRendererResourceSource(): MarkdownEditorSessionRendererResourceSource | null
+  inspectAttachmentResourceSource(): MarkdownEditorSessionAttachmentResourceSource | null
   captureLastValidRender(): MarkdownEditorSessionLastValidRender | null
   restoreLastValidRender(render: MarkdownEditorSessionLastValidRender, expected: {
     readonly documentIdentity: MarkdownEditorDocumentIdentity
@@ -124,6 +137,7 @@ export interface MarkdownEditorSessionOwner<ViewState> {
   readonly resourceParticipants: () => readonly MarkdownEditorSessionResourceParticipant[]
   readonly captureLastValidRender: () => MarkdownEditorSessionLastValidRender | null
   readonly inspectRendererResourceSource?: () => MarkdownEditorSessionRendererResourceSource | null
+  readonly inspectAttachmentResourceSource?: () => MarkdownEditorSessionAttachmentResourceSource | null
   readonly restoreLastValidRender?: (ref: string) => Promise<MarkdownEditorSessionRenderRestoreProof>
 }
 
@@ -216,6 +230,18 @@ export const createMarkdownEditorSessionBinding = <ViewState>(
           assertAvailable()
           if (store.documentIdentity.id !== id || store.documentIdentity.epoch !== epoch || store.revision !== revision)
             throw new Error('editor-session-renderer-resource-source-stale')
+          return source
+        },
+        inspectAttachmentResourceSource() {
+          assertAvailable()
+          const store = owner.transactionStore
+          const id = store.documentIdentity.id
+          const epoch = store.documentIdentity.epoch
+          const revision = store.revision
+          const source = owner.inspectAttachmentResourceSource?.() ?? null
+          assertAvailable()
+          if (store.documentIdentity.id !== id || store.documentIdentity.epoch !== epoch || store.revision !== revision)
+            throw new Error('editor-session-attachment-resource-source-stale')
           return source
         },
         captureLastValidRender,

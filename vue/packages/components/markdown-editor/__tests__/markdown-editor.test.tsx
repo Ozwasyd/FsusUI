@@ -26,7 +26,7 @@ import type {
 import { getMarkdownXssSourceUrl } from '../../../../tests/support/markdown-xss-corpus'
 
 describe('MarkdownEditor', () => {
-  it('rejects renderer source observation after same-source document epoch drift', () => {
+  it.each(['renderer', 'attachment'] as const)('rejects %s source observation after same-source document epoch drift', (sourceOwner) => {
     const store = new MarkdownEditorTransactionStore('same source', undefined, { id: 'source-document', epoch: 1 })
     const binding = createMarkdownEditorSessionBinding({
       transactionStore: store,
@@ -36,13 +36,13 @@ describe('MarkdownEditor', () => {
       restoreViewState: () => {},
       resourceParticipants: () => [],
       captureLastValidRender: () => null,
-      inspectRendererResourceSource: () => {
+      [sourceOwner === 'renderer' ? 'inspectRendererResourceSource' : 'inspectAttachmentResourceSource']: () => {
         store.switchDocument({ id: 'source-document', epoch: 2 }, 'same source')
         return null
       },
     })
     const session = binding.getSession('session:resource-source')
-    expect(() => session.inspectRendererResourceSource()).toThrow('editor-session-renderer-resource-source-stale')
+    expect(() => sourceOwner === 'renderer' ? session.inspectRendererResourceSource() : session.inspectAttachmentResourceSource()).toThrow(`editor-session-${sourceOwner}-resource-source-stale`)
     expect(session.inspectDocumentState().documentIdentity.epoch).toBe(2)
     expect(() => session.inspectResources()).toThrow('editor-session-resource-owner-unavailable')
   })

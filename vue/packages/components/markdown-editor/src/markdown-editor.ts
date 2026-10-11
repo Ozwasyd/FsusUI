@@ -1884,6 +1884,7 @@ export type MarkdownEditorInstance = InstanceType<typeof MarkdownEditor>
 export type {
   MarkdownEditorSession,
   MarkdownEditorSessionCapabilities,
+  MarkdownEditorSessionAttachmentResourceSource,
   MarkdownEditorSessionDocumentState,
   MarkdownEditorSessionExpose,
   MarkdownEditorSessionLastValidRender,

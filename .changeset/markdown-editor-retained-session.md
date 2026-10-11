@@ -13,3 +13,6 @@ settlement; keep service-future content behind its original exclusive proof gate
 
 Expose readonly measured renderer source observations through the same real
 session while keeping complete:false, unknown fields and all missing-owner guards.
+
+Expose readonly scalar observations from the original attachment/embed owner;
+preserve unknown legacy settlement failures and incomplete consumer resource totals.

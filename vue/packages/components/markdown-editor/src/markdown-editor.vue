@@ -6277,6 +6277,38 @@ const sessionBinding = createMarkdownEditorSessionBinding({
       revision: capture.revision,
     })
   },
+  inspectAttachmentResourceSource: () => {
+    // Read the original single pipeline. Unknown legacy settlement still throws;
+    // measured source custody never proves consumer resources or complete pause.
+    const inspection = attachmentEmbedOwner.participant.inspect()
+    const usage = inspection.usage
+    return Object.freeze({
+      complete: false as const,
+      measuredUsageOnly: true as const,
+      sourceReview: 'unqualified' as const,
+      missingSourceDependencies: Object.freeze([
+        'attachment-embed:independent-source-review',
+        'attachment-embed:consumer-resource-controls',
+        'attachment-embed:component-dispatch-continuation-custody',
+        'attachment-embed:recoverable-checkpoint-owner',
+      ]),
+      measuredUsage: Object.freeze({
+        editorInstances: usage.editorInstances,
+        renderers: usage.renderers,
+        observers: usage.observers,
+        timers: usage.timers,
+        backgroundTasks: usage.backgroundTasks,
+        memoryUnits: usage.memoryUnits,
+      }),
+      measuredNetworkRequests: null,
+      retainedListeners: inspection.retainedListeners,
+      unknownUsage: Object.freeze([
+        'consumer-network-requests',
+        'consumer-timers-and-subscriptions',
+        ...(opaqueAttachmentResourcesObserved.value ? ['observed-opaque-consumer-resources'] : []),
+      ]),
+    })
+  },
   inspectRendererResourceSource: () => {
     // Use the original mounted full-document owner. A fragment/DOM fallback
     // cannot prove whole-editor ownership, and missing source is not zero usage.
