@@ -1243,10 +1243,11 @@ const performRender = async () => {
   const source = normalizeMarkdownSource(props.content)
   const request = createMarkdownRenderRequest(source)
   isRendering.value = source.length > 0
+  let renderSignal: AbortSignal | undefined
 
   try {
     resetFeatureActivation()
-    const renderSignal = activationController?.signal
+    renderSignal = activationController?.signal
     commitDurationMs = 0
     rootEl.value?.removeAttribute('data-fsus-markdown-commit-ms')
     if (!isCurrent()) return
