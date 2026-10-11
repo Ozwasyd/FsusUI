@@ -839,3 +839,130 @@ describe("Command lifecycle guard alias and registry provenance", () => {
     expect(commandLifecycleViolations(beforeCancel(statements))).toEqual([]);
   });
 });
+
+describe('Command guard invocation provenance transitions', () => {
+  const component = readEditorSource('markdown-editor.vue')
+  const insert = (scope: 'signal' | 'registry', statements: string) => {
+    const from =
+      scope === 'signal'
+        ? '  try {\n    const context = {'
+        : 'const abortPendingCommands = () => {'
+    expect(component.split(from)).toHaveLength(2)
+    const to =
+      scope === 'signal'
+        ? `  try {\n    ${statements}\n    const context = {`
+        : `${from}\n  ${statements}`
+    return component.replace(from, to)
+  }
+  const forms = [
+    [
+      'transitive changed aliases',
+      (args: string) =>
+        `let invoke: any = Object.defineProperty; invoke = Reflect.apply; const borrowed = invoke; borrowed(${args})`,
+    ],
+    [
+      'object-destructured changed aliases',
+      (args: string) =>
+        `let invoke: any = Object.defineProperty; invoke = Reflect.apply; const { borrowed } = { borrowed: invoke }; borrowed(${args})`,
+    ],
+    [
+      'array-destructured changed aliases',
+      (args: string) =>
+        `let invoke: any = Object.defineProperty; invoke = Reflect.apply; const [borrowed] = [invoke]; borrowed(${args})`,
+    ],
+    [
+      'call-wrapped changed invokers',
+      (args: string) =>
+        `let invoke: any = Object.defineProperty; invoke = Reflect.apply; invoke.call(Reflect, ${args})`,
+    ],
+    [
+      'apply-wrapped changed invokers',
+      (args: string) =>
+        `let invoke: any = Object.defineProperty; invoke = Reflect.apply; invoke.apply(Reflect, [${args}])`,
+    ],
+    [
+      'reverse invoker-to-mutator transitions',
+      (_args: string, target: string, field: string, value: string) =>
+        `let invoke: any = Reflect.apply; invoke = Object.defineProperty; invoke(${target}, '${field}', { value: ${value} })`,
+    ],
+    [
+      'conditional invocation forms',
+      (args: string) =>
+        `let invoke: any = Object.keys; invoke = commandContextSignal.aborted ? Object.defineProperty : Reflect.apply; invoke(${args})`,
+    ],
+    [
+      'changed reflection namespaces',
+      (args: string) =>
+        `let namespace: any = Object; namespace = Reflect; const invoke = namespace.apply; invoke(${args})`,
+    ],
+    [
+      'unproven assigned origins',
+      (args: string) =>
+        `let invoke: any = Object.defineProperty; invoke = (globalThis as any).unrecognizedInvoker; invoke(${args})`,
+    ],
+    [
+      'opaque returned invokers',
+      (args: string) =>
+        `const getInvoker = () => Reflect.apply; let invoke: any = Object.defineProperty; invoke = getInvoker(); invoke(${args})`,
+    ],
+    [
+      'parenthesized unproven aliases',
+      (args: string) =>
+        `let invoke: any = Object.defineProperty; invoke = (globalThis as any).unrecognizedInvoker; (invoke)(${args})`,
+    ],
+    [
+      'cyclic unresolved aliases',
+      (_args: string, target: string) =>
+        `const first = second; const second = first; first(${target})`,
+    ],
+  ] as const
+  const controls = forms.flatMap(([name, form]) =>
+    (['signal', 'registry'] as const).map((scope) => {
+      const target = scope === 'signal' ? 'session.abort' : 'commandSessions'
+      const field = scope === 'signal' ? 'signal' : 'values'
+      const value =
+        scope === 'signal' ? 'commandContextSignal' : '() => new Map().values()'
+      const args = `Object.defineProperty, Object, [${target}, '${field}', { value: ${value} }]`
+      return { name, scope, statements: form(args, target, field, value) }
+    }),
+  )
+  it.each(controls)(
+    'rejects $name for $scope ownership',
+    ({ scope, statements }) => {
+      expect(commandLifecycleViolations(insert(scope, statements))).toContain(
+        scope === 'signal'
+          ? 'original-session-signal'
+          : 'abort-shared-sessions',
+      )
+    },
+  )
+
+  it.each([
+    [
+      'readonly reassigned invokers',
+      'let inspect: any = Reflect.apply; inspect = Reflect.apply; inspect(Object.keys, Object, [session.abort])',
+    ],
+    [
+      'readonly call-wrapped invokers',
+      'let inspect: any = Reflect.apply; inspect = Reflect.apply; inspect.call(Reflect, Object.keys, Object, [session.abort])',
+    ],
+    [
+      'readonly apply-wrapped invokers',
+      'let inspect: any = Reflect.apply; inspect = Reflect.apply; inspect.apply(Reflect, [Object.keys, Object, [session.abort]])',
+    ],
+    [
+      'readonly method transitions',
+      'let inspect: any = Object.keys; inspect = Object.values; inspect(session.abort)',
+    ],
+    [
+      'readonly namespace method transitions',
+      'let inspect: any = Object.keys; inspect = Reflect.ownKeys; inspect(session.abort)',
+    ],
+    [
+      'changed invokers mutating a foreign object',
+      "let invoke: any = Object.defineProperty; invoke = Reflect.apply; const foreign = { signal: commandContextSignal }; invoke(Object.defineProperty, Object, [foreign, 'signal', { value: commandContextSignal }])",
+    ],
+  ] as const)('accepts %s', (_name, statements) => {
+    expect(commandLifecycleViolations(insert('signal', statements))).toEqual([])
+  })
+})

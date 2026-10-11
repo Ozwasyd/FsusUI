@@ -59,69 +59,134 @@ const mutationMethods = new Set([
   'Reflect.defineProperty',
   'Reflect.setPrototypeOf',
 ])
+const unknownReference = '<unknown>'
+const readonlyMethods = new Set([
+  'Object.keys',
+  'Object.values',
+  'Object.entries',
+  'Reflect.get',
+  'Reflect.has',
+  'Reflect.ownKeys',
+])
 const references = (nodes: ts.Node[]) => {
-  const names = new Map<string, string>()
-  let version = 0
-  const rank = (value: string) =>
-    mutationMethods.has(value)
-      ? 2
-      : value === 'Object' || value === 'Reflect'
-        ? 1
-        : 0
-  const reference = (node?: ts.Node): string | undefined => {
-    const value = path(node)
-    if (!value) return undefined
-    const [first, ...rest] = value.replace(/^globalThis\./u, '').split('.')
-    return [names.get(first!) ?? first, ...rest].join('.')
-  }
+  const definitions = new Map<
+    string,
+    Array<{ value?: ts.Expression; suffix: string[] }>
+  >()
+  const assigned = new Set<string>()
   const bind = (
     target: ts.BindingName,
-    value: ts.Expression | undefined,
-    origin = reference(value),
+    value?: ts.Expression,
+    suffix: string[] = [],
   ) => {
     if (ts.isIdentifier(target)) {
-      const previous = names.get(target.text)
-      // A mutable local alias cannot erase a possible mutator provenance. Each
-      // binding advances only through these finite ranks, including cycles.
-      if (origin && (!previous || rank(origin) > rank(previous))) {
-        names.set(target.text, origin)
-        version += 1
-      }
+      const entries = definitions.get(target.text) ?? []
+      entries.push({ value, suffix })
+      definitions.set(target.text, entries)
       return
     }
     for (const [index, element] of target.elements.entries()) {
-      if (!ts.isBindingElement(element) || element.dotDotDotToken) continue
+      if (!ts.isBindingElement(element)) continue
       const key = element.propertyName ?? element.name
-      const propertyName =
+      const name =
         ts.isIdentifier(key) || ts.isStringLiteral(key) ? key.text : undefined
-      const child =
-        value && ts.isArrayLiteralExpression(value)
-          ? value.elements[index]
-          : undefined
-      bind(
-        element.name,
-        child,
+      bind(element.name, value, [
+        ...suffix,
         ts.isArrayBindingPattern(target)
-          ? reference(child)
-          : origin && propertyName
-            ? `${origin}.${propertyName}`
-            : undefined,
-      )
+          ? String(index)
+          : (name ?? unknownReference),
+      ])
+      if (element.initializer) bind(element.name, element.initializer)
     }
   }
-  let previousVersion = -1
-  while (previousVersion !== version) {
-    previousVersion = version
-    for (const node of nodes)
-      if (ts.isVariableDeclaration(node)) bind(node.name, node.initializer)
-      else if (
-        ts.isBinaryExpression(node) &&
-        node.operatorToken.kind === ts.SyntaxKind.EqualsToken &&
-        ts.isIdentifier(node.left)
-      )
-        bind(node.left, node.right)
+  for (const node of nodes) {
+    if (ts.isVariableDeclaration(node)) bind(node.name, node.initializer)
+    else if (
+      ts.isBinaryExpression(node) &&
+      node.operatorToken.kind === ts.SyntaxKind.EqualsToken &&
+      ts.isIdentifier(node.left)
+    ) {
+      assigned.add(node.left.text)
+      bind(node.left, node.right)
+    }
   }
-  return reference
+  const merge = (sets: Set<string>[]) =>
+    new Set(sets.flatMap((set) => [...set]))
+  const resolve = (
+    node: ts.Node | undefined,
+    suffix: string[],
+    seen: Set<string>,
+  ): Set<string> => {
+    if (!node) return new Set([unknownReference])
+    if (
+      ts.isParenthesizedExpression(node) ||
+      ts.isAsExpression(node) ||
+      ts.isNonNullExpression(node)
+    )
+      return resolve(node.expression, suffix, seen)
+    if (ts.isConditionalExpression(node))
+      return merge([
+        resolve(node.whenTrue, suffix, seen),
+        resolve(node.whenFalse, suffix, seen),
+      ])
+    if (ts.isArrayLiteralExpression(node))
+      return resolve(node.elements[Number(suffix[0])], suffix.slice(1), seen)
+    if (ts.isObjectLiteralExpression(node)) {
+      const key = suffix[0]
+      const entry = node.properties.find((candidate) => {
+        if (
+          !ts.isPropertyAssignment(candidate) &&
+          !ts.isShorthandPropertyAssignment(candidate)
+        )
+          return false
+        return (
+          identifier(candidate.name) === key ||
+          (ts.isStringLiteral(candidate.name) && candidate.name.text === key)
+        )
+      })
+      return resolve(
+        entry &&
+          (ts.isPropertyAssignment(entry) ? entry.initializer : entry.name),
+        suffix.slice(1),
+        seen,
+      )
+    }
+    const value = path(node)
+    if (!value) return new Set([unknownReference])
+    const [first, ...rest] = value.replace(/^globalThis\./u, '').split('.')
+    if (!first || seen.has(first)) return new Set([unknownReference])
+    const origins = definitions.get(first)
+    if (!origins) return new Set([[first, ...rest, ...suffix].join('.')])
+    // Resolve the finite definition graph with a visited binding set. Retain
+    // every assignment origin; never rank away a different invocation form.
+    return merge(
+      origins.map((origin) =>
+        resolve(
+          origin.value,
+          [...origin.suffix, ...rest, ...suffix],
+          new Set([...seen, first]),
+        ),
+      ),
+    )
+  }
+  const uncertain = (
+    node: ts.Node | undefined,
+    seen = new Set<string>(),
+  ): boolean => {
+    const first = path(node)?.split('.')[0]
+    if (!first) return false
+    if (assigned.has(first) || seen.has(first)) return true
+    return (
+      definitions
+        .get(first)
+        ?.some((definition) =>
+          uncertain(definition.value, new Set([...seen, first])),
+        ) ?? false
+    )
+  }
+  return Object.assign((node?: ts.Node) => resolve(node, [], new Set()), {
+    uncertain,
+  })
 }
 const writes = (
   node: ts.Node,
@@ -130,6 +195,51 @@ const writes = (
 ) => {
   const owned = (target: ts.Node | undefined) =>
     bindings.has(root(target) ?? '')
+  const containsOwned = (target: ts.Node | undefined): boolean => {
+    if (!target) return false
+    if (owned(target)) return true
+    if (ts.isArrayLiteralExpression(target))
+      return target.elements.some(containsOwned)
+    if (ts.isObjectLiteralExpression(target))
+      return target.properties.some((entry) =>
+        ts.isPropertyAssignment(entry)
+          ? containsOwned(entry.initializer)
+          : ts.isShorthandPropertyAssignment(entry)
+            ? owned(entry.name)
+            : ts.isSpreadAssignment(entry) && containsOwned(entry.expression),
+      )
+    return false
+  }
+  const recognized = (callee: string): boolean =>
+    mutationMethods.has(callee) ||
+    callee === 'Reflect.apply' ||
+    (/\.(?:call|apply)$/u.test(callee) &&
+      recognized(callee.replace(/\.(?:call|apply)$/u, '')))
+  const invokesMutation = (
+    callee: string,
+    args: readonly ts.Expression[],
+  ): boolean => {
+    if (mutationMethods.has(callee)) return owned(args[0])
+    if (callee.endsWith('.call'))
+      return invokesMutation(callee.slice(0, -5), args.slice(1))
+    if (callee.endsWith('.apply') && callee !== 'Reflect.apply') {
+      const actualArgs = args[1]
+      return actualArgs && ts.isArrayLiteralExpression(actualArgs)
+        ? invokesMutation(callee.slice(0, -6), actualArgs.elements)
+        : recognized(callee.slice(0, -6)) && containsOwned(actualArgs)
+    }
+    if (callee === 'Reflect.apply') {
+      const functions = reference(args[0])
+      const actualArgs = args[2]
+      return [...functions].some((target) => {
+        if (target === unknownReference) return containsOwned(actualArgs)
+        if (actualArgs && ts.isArrayLiteralExpression(actualArgs))
+          return invokesMutation(target, actualArgs.elements)
+        return recognized(target) && containsOwned(actualArgs)
+      })
+    }
+    return false
+  }
   return descendants(node).some((entry) => {
     if (
       ts.isBinaryExpression(entry) &&
@@ -145,26 +255,26 @@ const writes = (
         owned(entry.operand)
       )
     if (!ts.isCallExpression(entry)) return false
-    const callee = reference(entry.expression) ?? ''
-    if (mutationMethods.has(callee)) return owned(entry.arguments[0])
-    const indirect = callee.replace(/\.(?:call|apply)$/u, '')
-    if (mutationMethods.has(indirect)) {
-      if (callee.endsWith('.call')) return owned(entry.arguments[1])
-      const args = entry.arguments[1]
-      return args && ts.isArrayLiteralExpression(args)
-        ? owned(args.elements[0])
-        : owned(args)
-    }
-    if (
-      callee === 'Reflect.apply' &&
-      mutationMethods.has(reference(entry.arguments[0]) ?? '')
-    ) {
-      const args = entry.arguments[2]
-      return args && ts.isArrayLiteralExpression(args)
-        ? owned(args.elements[0])
-        : owned(args)
-    }
-    return false
+    const callees = reference(entry.expression)
+    if ([...callees].some((callee) => invokesMutation(callee, entry.arguments)))
+      return true
+    // Bare mutable aliases with unknown/conflicting origins cannot establish
+    // a readonly call. Ordinary opaque receiver methods retain the existing
+    // bounded policy, including genuine Map entry operations.
+    const calleePath = path(entry.expression)
+    const bare =
+      !!calleePath &&
+      (!calleePath.includes('.') || /\.(?:call|apply)$/u.test(calleePath))
+    return (
+      bare &&
+      entry.arguments.some(containsOwned) &&
+      ((callees.has(unknownReference) &&
+        reference.uncertain(entry.expression)) ||
+        (callees.size > 1 &&
+          [...callees].some(
+            (callee) => !recognized(callee) && !readonlyMethods.has(callee),
+          )))
+    )
   })
 }
 const aliases = (nodes: ts.Node[], original: string[]) => {
