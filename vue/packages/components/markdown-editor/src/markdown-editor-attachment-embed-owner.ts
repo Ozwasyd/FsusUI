@@ -1,4 +1,4 @@
-import { isReactive, isReadonly, ref, watch, toRaw } from 'vue'
+import { isReactive, isReadonly, isShallow, ref, watch, toRaw } from 'vue'
 import type { Ref, WatchSource, WatchStopHandle } from 'vue'
 import type {
   MarkdownDocumentIdentity,
@@ -216,13 +216,21 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
     if (!inputs) throw new Error('editor-session-attachment-input-unavailable')
     const identity = snapshotPassiveRecord(toRaw(inputs.documentIdentity))
     const revision = readNativeRef(inputs.revision)
-    const jobs = snapshotJobs(readNativeRef(inputs.jobs))
+    const liveJobs = readNativeRef(inputs.jobs)
+    const jobs = snapshotJobs(liveJobs)
+    // The existing deep ref must really proxy every mutable job. A shallow or
+    // markRaw replacement cannot provide synchronous mutation invalidation.
+    const reactiveJobs =
+      isReactive(liveJobs) &&
+      !isShallow(inputs.jobs) &&
+      jobs?.every((_, index) => isReactive(liveJobs[index]))
     if (
       !identity ||
       typeof identity.id !== 'string' ||
       !Number.isSafeInteger(identity.epoch) ||
       !Number.isSafeInteger(revision) ||
       !jobs ||
+      !reactiveJobs ||
       version !== attachmentObservationRef
     )
       throw new Error('editor-session-attachment-input-unavailable')
