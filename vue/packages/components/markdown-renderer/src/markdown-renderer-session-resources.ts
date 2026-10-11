@@ -234,6 +234,11 @@ export const createMarkdownRendererSessionResourceOwner = (options: {
     const missingSourceDependencies: string[] = [
       ...markdownRendererSessionSourceDependencies,
     ]
+    if (pipeline.workerCallbackFailure) {
+      missingSourceDependencies.push(
+        'render-pipeline-runtime:worker-callback-failure-recovery',
+      )
+    }
     if (pipeline.adapterResources === 'unknown') {
       missingSourceDependencies.push(
         'markdown-runtime:adapter-internal-resource-census',
@@ -290,6 +295,11 @@ export const createMarkdownRendererSessionResourceOwner = (options: {
         renderPipeline: pipeline,
         virtualWindow: viewport,
         heavyFeatures: heavy,
+      }),
+      diagnostics: Object.freeze({
+        // Preserve the actual retained failure; its cumulative count is not
+        // an active task count or evidence that cleanup/recovery succeeded.
+        workerCallbackFailure: pipeline.workerCallbackFailure,
       }),
       unknownUsage: Object.freeze({
         timers:
@@ -376,6 +386,7 @@ export const createMarkdownRendererSessionResourceOwner = (options: {
             viewport.measuredSizes +
             viewport.pendingMeasurements +
             pipeline.retainedSharedOwners +
+            (pipeline.workerCallbackFailure ? 1 : 0) +
             pipeline.pendingRenderAdmissions +
             pipeline.pendingControlTransitions +
             heavy.usage.pendingImports +
