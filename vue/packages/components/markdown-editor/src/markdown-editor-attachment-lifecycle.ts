@@ -179,16 +179,6 @@ export const planMarkdownAttachmentResolve = (
   readonly transaction?: MarkdownEditorTransaction
   readonly markdown?: string
 } => {
-  if (
-    result.documentIdentity &&
-    job.documentIdentity &&
-    (result.documentIdentity.id !== job.documentIdentity.id ||
-      result.documentIdentity.epoch !== job.documentIdentity.epoch)
-  ) {
-    job.phase = 'document-abort'
-    return Object.freeze({ accepted: false, status: 'document-abort' as const })
-  }
-
   if (job.phase === 'deleted') {
     return Object.freeze({ accepted: false, status: 'deleted' as const })
   }
@@ -204,6 +194,16 @@ export const planMarkdownAttachmentResolve = (
     job.phase === 'rejected'
   ) {
     return Object.freeze({ accepted: false, status: job.phase })
+  }
+
+  if (
+    result.documentIdentity &&
+    job.documentIdentity &&
+    (result.documentIdentity.id !== job.documentIdentity.id ||
+      result.documentIdentity.epoch !== job.documentIdentity.epoch)
+  ) {
+    job.phase = 'document-abort'
+    return Object.freeze({ accepted: false, status: 'document-abort' as const })
   }
 
   if (result.status !== 'resolved') {
