@@ -349,10 +349,13 @@ include actual scoped slot entries. Pool totals remain unattributed context and
 never enter renderer usage. Diagnostic views do not invent jobs or cleanup acks.
 The direct worker cleanup API may rethrow observer errors after continuing its
 batch; its explicit disposal retry is terminal cleanup, not resume or recovery.
-The current worker candidate still has an independently identified retained-slot
-dispatch quarantine gap: an alive retained idle slot with detached handlers may
-be reused. Its original owner is repairing this. Alive does not establish
-dispatchability, and the source offer retains this explicit dependency.
+The composed worker candidate sets quarantine before teardown and prevents
+dispatch to that retained slot, including when native termination throws. Its
+actual scoped slot inspections expose `quarantined` and `dispatchable` unchanged
+through the pipeline source. These booleans are never added to worker/job counts.
+Alive does not establish dispatchability, and quarantine does not prove cleanup
+or recovery. Independent review of this original-owner source increment remains
+pending; the source offer retains the explicit quarantine dependency.
 
 This source offer is deliberately partial. Adapter internals, worker internals,
 shared pool attribution, platform observer callbacks, heavy-runtime timer/network

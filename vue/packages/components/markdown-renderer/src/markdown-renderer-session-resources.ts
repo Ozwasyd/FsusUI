@@ -78,6 +78,8 @@ export const markdownRendererSessionSourceDependencies = Object.freeze([
   'markdown-runtime:activation-and-gateway-loader-import-network-census',
   'renderer:validated-snapshot-restoration-after-disposal',
   'heavy-feature-runtime:timer-and-network-cancellation-authority',
+  // Original worker-owner quarantine source is composed; its independent
+  // review/qualification is still pending, so do not clear this hold here.
   'render-pipeline-worker:retained-slot-dispatch-quarantine',
 ] as const)
 
