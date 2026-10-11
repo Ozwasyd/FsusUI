@@ -128,9 +128,7 @@ export const cancelMarkdownEmbedRequest = (
 export const inspectMarkdownEmbedRequestResources = (
   request: MarkdownEmbedRequest,
 ) => {
-  const work = request.signal
-    ? [...(projectionWork.get(request.signal) ?? [])]
-    : []
+  const work = [...(projectionWork.get(request.signal ?? request) ?? [])]
   return Object.freeze({
     registered: requests.get(request.requestId)?.signal === request.signal,
     backgroundTasks: work.length,
@@ -425,11 +423,37 @@ export const prepareMarkdownEmbedResult = async (
     targetVersion,
     source: '',
   }
-  if (!proofIsCurrent(proof)) return failure(request, 'stale')
+  if (!proofIsCurrent(proof) || request.signal?.aborted)
+    return failure(request, 'stale')
   if (resolvingProjections >= MARKDOWN_EMBED_BUDGET.maxConcurrent)
     return failure(request, 'rejected')
   const localController = new AbortController()
   let requestLinked = false
+  let cancelLinked = false
+  let workStarted = false
+  let timedOut = false
+  const expired = failure(request, 'time-exceeded')
+  const handles: EmbedProjectionWork = {
+    timer: undefined,
+    listeners: 0,
+    settled: false,
+    finished: false,
+  }
+  const workKey = request.signal ?? request
+  const workSet = projectionWork.get(workKey) ?? new Set<EmbedProjectionWork>()
+  projectionWork.set(workKey, workSet)
+  workSet.add(handles)
+  let resolveCancelled!: (result: MarkdownEmbedResult) => void
+  const cancelled = new Promise<MarkdownEmbedResult>((resolve) => {
+    resolveCancelled = resolve
+  })
+  const onLocalAbort = () => {
+    if (cancelLinked) {
+      cancelLinked = false
+      handles.listeners -= 1
+    }
+    resolveCancelled(timedOut ? expired : failure(request, 'stale'))
+  }
   const abort = () => {
     if (requestLinked) {
       requestLinked = false
@@ -437,27 +461,26 @@ export const prepareMarkdownEmbedResult = async (
     }
     localController.abort()
   }
-  const handles: EmbedProjectionWork = {
-    timer: undefined,
-    listeners: 0,
-    settled: false,
-    finished: false,
-  }
-  const workSet = request.signal
-    ? (projectionWork.get(request.signal) ?? new Set<EmbedProjectionWork>())
-    : new Set<EmbedProjectionWork>()
-  if (request.signal) {
-    projectionWork.set(request.signal, workSet)
-    request.signal.addEventListener('abort', abort, { once: true })
-    requestLinked = true
-    handles.listeners += 1
-  }
-  workSet.add(handles)
-  resolvingProjections += 1
-  let timedOut = false
-  const expired = failure(request, 'time-exceeded')
   try {
+    // Install cancellation authority before invoking any consumer callback.
+    localController.signal.addEventListener('abort', onLocalAbort, {
+      once: true,
+    })
+    cancelLinked = true
+    handles.listeners += 1
+    if (request.signal) {
+      if (request.signal.aborted) localController.abort()
+      else {
+        request.signal.addEventListener('abort', abort, { once: true })
+        requestLinked = true
+        handles.listeners += 1
+        if (request.signal.aborted) abort()
+      }
+    }
+    if (localController.signal.aborted) return await cancelled
     const verify = async (): Promise<MarkdownEmbedResult> => {
+      if (!proofIsCurrent(proof) || localController.signal.aborted)
+        return failure(request, 'stale')
       const source =
         reference.kind === 'markdown'
           ? reference.source
@@ -504,21 +527,12 @@ export const prepareMarkdownEmbedResult = async (
         resolve(expired)
       }, MARKDOWN_EMBED_BUDGET.maxMs)
     })
+    workStarted = true
+    resolvingProjections += 1
     const work = verify().finally(() => {
       resolvingProjections -= 1
       handles.settled = true
       if (handles.finished) workSet.delete(handles)
-    })
-    const cancelled = new Promise<MarkdownEmbedResult>((resolve) => {
-      handles.listeners += 1
-      localController.signal.addEventListener(
-        'abort',
-        () => {
-          handles.listeners -= 1
-          resolve(timedOut ? expired : failure(request, 'stale'))
-        },
-        { once: true },
-      )
     })
     return await Promise.race([work, timeout, cancelled])
   } catch {
@@ -531,7 +545,13 @@ export const prepareMarkdownEmbedResult = async (
       requestLinked = false
       handles.listeners -= 1
     }
+    if (cancelLinked) {
+      localController.signal.removeEventListener('abort', onLocalAbort)
+      cancelLinked = false
+      handles.listeners -= 1
+    }
     localController.abort()
+    if (!workStarted) handles.settled = true
     handles.finished = true
     if (handles.settled) workSet.delete(handles)
   }
