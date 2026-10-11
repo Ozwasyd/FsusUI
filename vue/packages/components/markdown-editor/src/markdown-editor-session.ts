@@ -61,9 +61,15 @@ export interface MarkdownEditorSessionRenderRestoreProof {
   readonly reason: string | null
 }
 
+export interface MarkdownEditorSessionDocumentState {
+  readonly documentIdentity: MarkdownEditorDocumentIdentity
+  readonly revision: number
+}
+
 export interface MarkdownEditorSession {
   readonly editorSessionRef: string
   inspectCapabilities(): MarkdownEditorSessionCapabilities
+  inspectDocumentState(): MarkdownEditorSessionDocumentState
   inspectResourceParticipants(): MarkdownEditorSessionResourceCensus
   captureLastValidRender(): MarkdownEditorSessionLastValidRender | null
   restoreLastValidRender(render: MarkdownEditorSessionLastValidRender, expected: {
@@ -170,6 +176,14 @@ export const createMarkdownEditorSessionBinding = <ViewState>(
       session = Object.freeze({
         editorSessionRef,
         inspectCapabilities,
+        inspectDocumentState() {
+          assertAvailable()
+          const store = owner.transactionStore
+          return Object.freeze({
+            documentIdentity: Object.freeze({ ...store.documentIdentity }),
+            revision: store.revision,
+          })
+        },
         inspectResourceParticipants: () => { assertAvailable(); return resources.inspectParticipants() },
         captureLastValidRender,
         async restoreLastValidRender(render: MarkdownEditorSessionLastValidRender, expected: {

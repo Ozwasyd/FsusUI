@@ -728,3 +728,9 @@ capacity refusal. Root source review remains held. Attachment total-roster
 registration remains disabled; arbitrary consumer network/timer resources and
 retained File physical-heap qualification are not inferred from promise settlement.
 All runtime/native/worker/network/IME/receipt qualifications remain UNRUN here.
+
+The public `inspectDocumentState()` reads identity/epoch/revision directly from
+the original transaction owner without digesting, capturing or replacing a
+checkpoint. It gives the existing Writer mount resolver a real editor binding
+before first edit/render, independent of adapter event caches. No body, history
+copy, route identity fallback or second mounted-session registry is introduced.
