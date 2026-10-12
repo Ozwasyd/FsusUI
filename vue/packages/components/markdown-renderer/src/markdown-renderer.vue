@@ -2028,7 +2028,10 @@ const restoreLastValidRender = async (
         return blocked('markdown-renderer-restore-scheduler-unavailable')
       }
       if (!isCurrent()) return blocked('markdown-renderer-restore-stale')
-      await activateMountedChunkFeatures(activeChunkResult, renderSignal)
+      const chunkResult = activeChunkResult
+      if (!chunkResult)
+        return blocked('markdown-renderer-retained-projection-invalid')
+      await activateMountedChunkFeatures(chunkResult, renderSignal)
       if (!isCurrent()) return blocked('markdown-renderer-restore-stale')
       observeMountedChunksForActivation()
     } else {
