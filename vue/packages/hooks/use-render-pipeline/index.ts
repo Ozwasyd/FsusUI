@@ -359,6 +359,9 @@ export type FsusRenderPipelineRuntimeOptions<TSource, TUnit> = {
   >
   adapterId?: MaybeRef<string | null | undefined>
   componentName?: MaybeRef<string | null | undefined>
+  // Original producers for the exact source and adapter supplied below.
+  sourceAuthority?: FsusRenderPipelineAuthority
+  adapterAuthority?: FsusRenderPipelineAuthority
   config?: MaybeRef<FsusRenderPipelineConfig | null | undefined>
   estimate?: MaybeRef<FsusRenderPipelineEstimate | null | undefined>
   onDiagnostic?: (event: FsusRenderPipelineDiagnosticEvent) => void
@@ -379,12 +382,34 @@ export type FsusRenderPipelineRuntimeState<TSource, TUnit> =
     hardwareProfile: ComputedRef<FsusRenderHardwareProfile>
     policy: ComputedRef<FsusResolvedRenderPipelineComponentPolicy | null>
     authority: FsusRenderPipelineAuthority
+    adapterResourceProvider: FsusRenderPipelineAdapterResourceProvider
     inspectResources: () => FsusRenderPipelineRuntimeResourceInspection
     pause: () => FsusRenderPipelineRuntimeResourceInspection
     resume: () => FsusRenderPipelineRuntimeResourceInspection
     render: () => Promise<void>
     renderedStrategy: Ref<FsusRenderPipelineStrategy>
   }
+
+export type FsusRenderPipelineAdapterInvocationResourceInspection = Readonly<{
+  ownerKey: string
+  scope: 'runtime-owned-adapter-invocations'
+  pendingInvocations: number
+  invocationIds: readonly symbol[]
+  admission: 'active' | 'paused' | 'disposed'
+  cancellationCapability: 'cooperative-abort-signal-only'
+  internalCancellationCompletion: 'unsupported'
+  settlement: 'original-prepare-finally'
+  internalResources: 'unsupported'
+}>
+
+export type FsusRenderPipelineAdapterResourceProvider = Readonly<{
+  ownerKey: string
+  authority: FsusRenderPipelineAuthority
+  inspectResources: () => FsusRenderPipelineAdapterInvocationResourceInspection
+  // These are real runtime controls, not control over arbitrary adapter internals.
+  pause: () => FsusRenderPipelineRuntimeResourceInspection
+  resume: () => FsusRenderPipelineRuntimeResourceInspection
+}>
 
 export type FsusRenderPipelineRuntimeResourceInspection = {
   readonly ownerKey: string
@@ -403,6 +428,7 @@ export type FsusRenderPipelineRuntimeResourceInspection = {
   readonly pendingControlTransitions: number
   readonly pendingAdapterJobs: number
   readonly adapterResources: 'unknown'
+  readonly adapterInvocationResources: FsusRenderPipelineAdapterInvocationResourceInspection
   readonly workerCallbackFailure: {
     readonly count: number
     readonly error: FsusErrorDetail
@@ -609,6 +635,13 @@ export type FsusRenderPipelineAuthority = Readonly<{
 
 const authorityNativePromise = Promise
 const authorityNativePromisePrototype = Promise.prototype
+const authorityNativePromiseThen = Function.prototype.call.bind(
+  Promise.prototype.then,
+)
+const authorityNativePromiseSpecies = Object.getOwnPropertyDescriptor(
+  Promise,
+  Symbol.species,
+)
 
 const createRenderPipelineProducerAuthority = (missingFeeds: string[] = []) => {
   let ticket: object | null = null
@@ -627,6 +660,7 @@ const createRenderPipelineProducerAuthority = (missingFeeds: string[] = []) => {
     listener: () => void
     subscriptionId: symbol
     state: 'pending' | 'unavailable'
+    continuation: object | null
   }>()
   const observeAsyncFeed = (
     source: object,
@@ -637,6 +671,7 @@ const createRenderPipelineProducerAuthority = (missingFeeds: string[] = []) => {
       listener: subscription.listener,
       subscriptionId: subscription.id,
       state: 'pending' as 'pending' | 'unavailable',
+      continuation: null as object | null,
     }
     asyncFeedObservers.add(record)
     try {
@@ -649,8 +684,14 @@ const createRenderPipelineProducerAuthority = (missingFeeds: string[] = []) => {
         authorityNativePromisePrototype,
         'constructor',
       )
-      // Native await uses PerformPromiseThen without a species-derived result.
-      // Foreign/subclass/thenable chains have no safe producer observation port.
+      const species = Object.getOwnPropertyDescriptor(
+        authorityNativePromise,
+        Symbol.species,
+      )
+      // Prototype/constructor are eligibility checks, not Promise brand proof.
+      // The original intrinsic validates the brand without consulting .then.
+      // Accept only the captured native species; callbacks touch private data only,
+      // so the actual native continuation fulfills rather than rejecting unhandled.
       if (
         prototype !== authorityNativePromisePrototype ||
         (ownConstructor &&
@@ -658,29 +699,35 @@ const createRenderPipelineProducerAuthority = (missingFeeds: string[] = []) => {
             ownConstructor.value !== authorityNativePromise)) ||
         !prototypeConstructor ||
         !('value' in prototypeConstructor) ||
-        prototypeConstructor.value !== authorityNativePromise
+        prototypeConstructor.value !== authorityNativePromise ||
+        !authorityNativePromiseSpecies?.get ||
+        !species ||
+        species.get !== authorityNativePromiseSpecies.get ||
+        species.set !== undefined ||
+        'value' in species
       ) {
         record.state = 'unavailable'
         return
       }
-      void (async () => {
-        try {
-          await source
-        } catch (cause) {
-          change(() =>
-            feedFailures.push(
-              Object.freeze({
-                cause,
-                listener: record.listener,
-                subscriptionId: record.subscriptionId,
-                phase: 'async-feed-rejection',
-              }),
-            ),
+      record.continuation = authorityNativePromiseThen(
+        source,
+        () => {
+          asyncFeedObservers.delete(record)
+        },
+        (cause: unknown) => {
+          // Feed already permanently broken/quarantined. No external callback or
+          // unverified await/then is invoked from either intrinsic reaction.
+          feedFailures.push(
+            Object.freeze({
+              cause,
+              listener: record.listener,
+              subscriptionId: record.subscriptionId,
+              phase: 'async-feed-rejection',
+            }),
           )
-        } finally {
-          change(() => asyncFeedObservers.delete(record))
-        }
-      })()
+          asyncFeedObservers.delete(record)
+        },
+      )
     } catch (cause) {
       record.state = 'unavailable'
       feedFailures.push(
@@ -724,16 +771,15 @@ const createRenderPipelineProducerAuthority = (missingFeeds: string[] = []) => {
         const result: unknown = subscription.listener()
         if (
           result !== null &&
-          (typeof result === 'object' || typeof result === 'function') &&
-          typeof (result as { then?: unknown }).then === 'function'
+          (typeof result === 'object' || typeof result === 'function')
         ) {
           brokenFeed = true
           subscription.quarantined = true
           feedFailures.push({
             cause: new TypeError(
-              'fsus_pipeline_authority_feed_not_synchronous',
+              'fsus_pipeline_authority_feed_return_unavailable',
             ),
-            message: 'fsus_pipeline_authority_feed_not_synchronous',
+            message: 'fsus_pipeline_authority_feed_return_unavailable',
             listener: subscription.listener,
             subscriptionId: subscription.id,
           })
@@ -751,7 +797,7 @@ const createRenderPipelineProducerAuthority = (missingFeeds: string[] = []) => {
       }
     }
   }
-  const change = <T>(action: () => T): T => {
+  const change = <T>(action: () => T, enter?: () => void): T => {
     depth += 1
     ticket = null
     snapshots = []
@@ -770,6 +816,7 @@ const createRenderPipelineProducerAuthority = (missingFeeds: string[] = []) => {
         drainClosedDependencies()
     }
     try {
+      enter?.()
       if (depth === 1) notifyListeners()
       const result = action()
       // Keep async producer continuations inside the same revoked interval.
@@ -865,6 +912,7 @@ const createRenderPipelineProducerAuthority = (missingFeeds: string[] = []) => {
     source: unknown,
     missingName: string,
     canRelease: () => boolean = () => true,
+    onRevoked?: () => void,
   ) =>
     change(() => {
       if (closed) throw new Error('fsus_pipeline_authority_closed')
@@ -907,7 +955,7 @@ const createRenderPipelineProducerAuthority = (missingFeeds: string[] = []) => {
       // Publish the actual in-progress registration before foreign subscribe.
       dependencies.set(source, dependency)
       try {
-        const unsubscribe = subscribe(() => change(() => undefined))
+        const unsubscribe = subscribe(() => change(() => onRevoked?.()))
         if (typeof unsubscribe !== 'function') {
           missing.add(missingName)
           brokenFeed = true
@@ -1005,8 +1053,14 @@ const createRenderPipelineProducerAuthority = (missingFeeds: string[] = []) => {
     change(() => {
       closed = true
     })
+  const recordFailure = (cause: unknown, phase: string, resource: unknown) =>
+    change(() => {
+      brokenFeed = true
+      feedFailures.push(Object.freeze({ cause, phase, resource }))
+    })
   return {
     authority,
+    recordFailure,
     boundary,
     change,
     retainDependency,
@@ -1085,6 +1139,24 @@ const retainRenderPipelineConfigAuthority = (
 
 const renderPipelineModuleAuthority = createRenderPipelineProducerAuthority()
 
+const attemptRenderPipelineCleanup = (
+  producerAuthority: ReturnType<typeof createRenderPipelineProducerAuthority>,
+  actions: Array<{ resource: unknown; action: () => void }>,
+) => {
+  let failed = false
+  let firstCause: unknown
+  for (const { resource, action } of actions) {
+    try {
+      action()
+    } catch (cause) {
+      producerAuthority.recordFailure(cause, 'resource-cleanup', resource)
+      if (!failed) firstCause = cause
+      failed = true
+    }
+  }
+  if (failed) throw firstCause
+}
+
 // Own only callbacks requested here. Opaque platform work remains unknown.
 const createRenderPipelineCallbackResources = (
   producerAuthority: ReturnType<typeof createRenderPipelineProducerAuthority>,
@@ -1093,6 +1165,8 @@ const createRenderPipelineCallbackResources = (
     kind: 'raf' | 'idle' | 'timeout'
     cancelled: boolean
     cancel: (() => void) | null
+    allocation: 'pending' | 'registered' | 'unavailable'
+    cancelRequest?: () => void
   }
   const entries = new Set<Entry>()
   const schedule = (
@@ -1100,7 +1174,12 @@ const createRenderPipelineCallbackResources = (
     request: (run: () => void) => (() => void) | null,
     run: () => void,
   ) => {
-    const entry: Entry = { kind, cancelled: false, cancel: null }
+    const entry: Entry = {
+      kind,
+      cancelled: false,
+      cancel: null,
+      allocation: 'pending',
+    }
     entries.add(entry)
     try {
       entry.cancel = request(
@@ -1109,18 +1188,28 @@ const createRenderPipelineCallbackResources = (
           if (!entry.cancelled) run()
         }),
       )
+      entry.allocation = 'registered'
     } catch (error) {
-      entries.delete(entry)
+      // A throwing allocator does not prove that no callback was registered.
+      entry.allocation = 'unavailable'
+      producerAuthority.recordFailure(error, 'callback-allocation', entry)
       throw error
     }
-    return producerAuthority.boundary(() => {
+    const cancelRequest = producerAuthority.boundary(() => {
       if (!entries.has(entry)) return
       entry.cancelled = true
       if (entry.cancel) {
-        entry.cancel()
-        entries.delete(entry)
+        try {
+          entry.cancel()
+          entries.delete(entry)
+        } catch (cause) {
+          producerAuthority.recordFailure(cause, 'callback-cancel', entry)
+          throw cause
+        }
       }
     })
+    entry.cancelRequest = cancelRequest
+    return cancelRequest
   }
   const frame = (run: () => void) => {
     const cancel =
@@ -1156,25 +1245,54 @@ const createRenderPipelineCallbackResources = (
       run,
     )
   const cancelAll = (isCurrent: () => boolean = () => true) => {
-    for (const entry of [...entries]) {
-      if (!isCurrent()) break
-      entry.cancelled = true
-      if (entry.cancel) {
-        entry.cancel()
-        entries.delete(entry)
-      }
-    }
+    const actions = [...entries].map((entry) => ({
+      resource: entry,
+      action: () => {
+        if (!isCurrent() || !entries.has(entry)) return
+        entry.cancelled = true
+        if (entry.cancel) {
+          entry.cancel()
+          entries.delete(entry)
+        }
+      },
+    }))
+    attemptRenderPipelineCleanup(producerAuthority, actions)
   }
   const inspect = () =>
     Object.freeze({
-      rafHandles: [...entries].filter((entry) => entry.kind === 'raf').length,
-      idleHandles: [...entries].filter((entry) => entry.kind === 'idle').length,
-      timers: [...entries].filter((entry) => entry.kind === 'timeout').length,
-      uncancellableCallbacks: [...entries].filter((entry) => !entry.cancel)
-        .length,
+      rafHandles: [...entries].filter(
+        (entry) => entry.kind === 'raf' && entry.allocation === 'registered',
+      ).length,
+      idleHandles: [...entries].filter(
+        (entry) => entry.kind === 'idle' && entry.allocation === 'registered',
+      ).length,
+      timers: [...entries].filter(
+        (entry) =>
+          entry.kind === 'timeout' && entry.allocation === 'registered',
+      ).length,
+      callbackRegistrationObligations: Object.freeze(
+        [...entries]
+          .filter((entry) => entry.allocation !== 'registered')
+          .map((entry) =>
+            Object.freeze({
+              kind: entry.kind,
+              allocation: entry.allocation,
+              cancelled: entry.cancelled,
+            }),
+          ),
+      ),
+      uncancellableCallbacks: [...entries].filter(
+        (entry) => entry.allocation === 'registered' && !entry.cancel,
+      ).length,
     })
   return {
     cancelAll: producerAuthority.boundary(cancelAll),
+    isPending: (cancel: () => void) =>
+      [...entries].some((entry) => entry.cancelRequest === cancel),
+    isCancelled: (cancel: () => void) =>
+      [...entries].some(
+        (entry) => entry.cancelRequest === cancel && entry.cancelled,
+      ),
     frame: producerAuthority.boundary(frame),
     idle: producerAuthority.boundary(idle),
     inspect: producerAuthority.boundary(inspect),
@@ -1212,17 +1330,31 @@ export const createFsusRafRefreshSampler = ({
     previous = timestamp
     if (deltas.length >= Math.max(4, sampleSize)) {
       stopped = true
-      onSample(estimateFsusRenderRefreshProfile(deltas))
+      try {
+        onSample(estimateFsusRenderRefreshProfile(deltas))
+      } catch (cause) {
+        producerAuthority.recordFailure(cause, 'sampler-publication', onSample)
+        throw cause
+      } finally {
+        producerAuthority.close()
+      }
       return
     }
     handle = requestFrame(sample)
   })
-  handle = requestFrame(sample)
+  producerAuthority.change(() => {
+    handle = requestFrame(sample)
+  })
   const stop = producerAuthority.boundary(() => {
     stopped = true
     if (handle !== null && cancelFrame) {
-      cancelFrame(handle)
-      handle = null
+      try {
+        cancelFrame(handle)
+        handle = null
+      } catch (cause) {
+        producerAuthority.recordFailure(cause, 'sampler-cancel', handle)
+        throw cause
+      }
     }
     if (handle === null) producerAuthority.close()
   })
@@ -1455,18 +1587,21 @@ const isReducedMotionPreferred = () =>
 let renderPipelineLowPower = false
 let calibratedMainOpsPerMs: number | null = null
 
-export const calibrateFsusMainThreadThroughput = () => {
-  if (calibratedMainOpsPerMs !== null) return calibratedMainOpsPerMs
-  const operations = 50_000
-  const startedAt = readRenderPipelineNow()
-  let checksum = 0
-  for (let index = 0; index < operations; index++) {
-    checksum = (checksum * 33 + index) >>> 0
-  }
-  const elapsedMs = Math.max(0.1, readRenderPipelineNow() - startedAt)
-  calibratedMainOpsPerMs = Math.round((operations + (checksum & 1)) / elapsedMs)
-  return calibratedMainOpsPerMs
-}
+export const calibrateFsusMainThreadThroughput =
+  renderPipelineModuleAuthority.boundary(() => {
+    if (calibratedMainOpsPerMs !== null) return calibratedMainOpsPerMs
+    const operations = 50_000
+    const startedAt = readRenderPipelineNow()
+    let checksum = 0
+    for (let index = 0; index < operations; index++) {
+      checksum = (checksum * 33 + index) >>> 0
+    }
+    const elapsedMs = Math.max(0.1, readRenderPipelineNow() - startedAt)
+    calibratedMainOpsPerMs = Math.round(
+      (operations + (checksum & 1)) / elapsedMs,
+    )
+    return calibratedMainOpsPerMs
+  })
 
 const resolveAutoHardwareProfile = (): FsusRenderHardwareProfile => {
   if (typeof window === 'undefined' || typeof document === 'undefined') {
@@ -1633,9 +1768,11 @@ export const resolveFsusRenderPipelineUnitAttrs = ({
 export const useFsusRenderPipelineHardwareProfile = (
   config?: MaybeRef<FsusRenderPipelineConfig | null | undefined>,
 ) => {
-  const producerAuthority = createRenderPipelineProducerAuthority([
-    'hardware-platform-state',
-  ])
+  const producerAuthority = createRenderPipelineProducerAuthority()
+  producerAuthority.retainDependency(
+    renderPipelineModuleAuthority.authority,
+    'module-hardware-authority',
+  )
   retainRenderPipelineConfigAuthority(producerAuthority, config)
 
   const refreshProfile = shallowRef(estimateFsusRenderRefreshProfile([]))
@@ -1645,17 +1782,44 @@ export const useFsusRenderPipelineHardwareProfile = (
   let paused = false
   let disposed = false
   let generation = 0
-  let visibilityListener = false
+  type VisibilityBinding = {
+    target: Document
+    listener: () => void
+    registering: boolean
+    releasing: boolean
+    installed: boolean
+    retired: boolean
+  }
+  let visibilityBinding: VisibilityBinding | null = null
+  const visibilityBindings = new Set<VisibilityBinding>()
+  const releaseVisibilityBinding = (binding: VisibilityBinding) => {
+    binding.retired = true
+    if (binding.registering || binding.releasing) return
+    binding.releasing = true
+    try {
+      binding.target.removeEventListener('visibilitychange', binding.listener)
+      visibilityBindings.delete(binding)
+      if (visibilityBinding === binding) visibilityBinding = null
+    } finally {
+      binding.releasing = false
+    }
+  }
   const batteryJobs = new Set<symbol>()
   const samplers = new Set<ReturnType<typeof createFsusRafRefreshSampler>>()
   const stopSamplers = () => {
-    for (const stop of [...samplers]) {
-      stop()
-      if (stop.inspectResources().rafHandles === 0) {
-        samplers.delete(stop)
-        producerAuthority.releaseDependency(stop.authority)
-      }
-    }
+    attemptRenderPipelineCleanup(
+      producerAuthority,
+      [...samplers].map((stop) => ({
+        resource: stop,
+        action: () => {
+          stop()
+          if (stop.inspectResources().rafHandles === 0) {
+            samplers.delete(stop)
+            producerAuthority.releaseDependency(stop.authority)
+          }
+        },
+      })),
+    )
   }
   const startSampler = () => {
     stopSamplers()
@@ -1680,6 +1844,9 @@ export const useFsusRenderPipelineHardwareProfile = (
       () => stop.inspectResources().rafHandles === 0,
     )
     samplers.add(stop)
+    // Keep the real binding until its actual RAF settles; natural completion
+    // then drains it through the existing source progress notification.
+    producerAuthority.releaseDependency(stop.authority)
   }
   const onVisibilityChange = producerAuthority.boundary(() => {
     if (paused || disposed) return
@@ -1689,17 +1856,85 @@ export const useFsusRenderPipelineHardwareProfile = (
   })
   const connect = () => {
     if (!mounted || paused || disposed) return
+    const connectGeneration = generation
     startSampler()
-    if (!visibilityListener && typeof document !== 'undefined') {
-      document.addEventListener('visibilitychange', onVisibilityChange)
-      visibilityListener = true
+    if (paused || disposed || connectGeneration !== generation) return
+    if (
+      (!visibilityBinding || visibilityBinding.retired) &&
+      typeof document !== 'undefined'
+    ) {
+      const binding: VisibilityBinding = {
+        target: document,
+        registering: true,
+        releasing: false,
+        installed: false,
+        retired: false,
+        listener: producerAuthority.boundary(() => {
+          if (
+            !binding.retired &&
+            binding === visibilityBinding &&
+            connectGeneration === generation
+          )
+            onVisibilityChange()
+        }),
+      }
+      visibilityBinding = binding
+      visibilityBindings.add(binding)
+      let failed = false
+      let firstCause: unknown
+      try {
+        const add = binding.target.addEventListener
+        if (
+          !paused &&
+          !disposed &&
+          connectGeneration === generation &&
+          !binding.retired &&
+          visibilityBinding === binding
+        ) {
+          add.call(binding.target, 'visibilitychange', binding.listener)
+          binding.installed = true
+        } else binding.retired = true
+      } catch (cause) {
+        producerAuthority.recordFailure(
+          cause,
+          'visibility-registration',
+          binding.target,
+        )
+        failed = true
+        firstCause = cause
+        binding.retired = true
+      } finally {
+        binding.registering = false
+      }
+      if (
+        binding.retired ||
+        paused ||
+        disposed ||
+        connectGeneration !== generation ||
+        visibilityBinding !== binding
+      ) {
+        try {
+          releaseVisibilityBinding(binding)
+        } catch (cause) {
+          producerAuthority.recordFailure(
+            cause,
+            'visibility-late-release',
+            binding.target,
+          )
+          if (!failed) firstCause = cause
+          failed = true
+        }
+      }
+      if (failed) throw firstCause
     }
+    if (paused || disposed || connectGeneration !== generation) return
     if (typeof navigator !== 'undefined') {
       const getBattery = (
         navigator as Navigator & {
           getBattery?: () => Promise<{ charging: boolean; level: number }>
         }
       ).getBattery
+      if (paused || disposed || connectGeneration !== generation) return
       if (typeof getBattery === 'function') {
         const batteryGeneration = generation
         const job = Symbol('battery-query')
@@ -1721,11 +1956,21 @@ export const useFsusRenderPipelineHardwareProfile = (
                 batteryGeneration !== generation
               )
                 return
-              renderPipelineLowPower = !battery.charging && battery.level <= 0.2
-              lowPower.value = renderPipelineLowPower
+              const nextLowPower = !battery.charging && battery.level <= 0.2
+              const current = () =>
+                !paused && !disposed && batteryGeneration === generation
+              if (!current()) return
+              renderPipelineModuleAuthority.change(() => {
+                if (current()) renderPipelineLowPower = nextLowPower
+              })
+              if (current()) lowPower.value = nextLowPower
             }),
           )
-          .catch(producerAuthority.boundary(() => undefined))
+          .catch(
+            producerAuthority.boundary((cause) => {
+              producerAuthority.recordFailure(cause, 'battery-query', job)
+            }),
+          )
           .finally(producerAuthority.boundary(() => batteryJobs.delete(job)))
       }
     }
@@ -1748,7 +1993,19 @@ export const useFsusRenderPipelineHardwareProfile = (
       authorityFeed: producerAuthority.inspect(),
       rafHandles,
       uncancellableCallbacks,
-      retainedListeners: visibilityListener ? 1 : 0,
+      retainedListeners: visibilityBindings.size,
+      visibilityRegistrations: Object.freeze(
+        [...visibilityBindings].map((binding) =>
+          Object.freeze({
+            target: binding.target,
+            registering: binding.registering,
+            releasing: binding.releasing,
+            installed: binding.installed,
+            retired: binding.retired,
+          }),
+        ),
+      ),
+      nativePlatformState: 'unknown' as const,
       pendingBatteryQueries: batteryJobs.size,
       batteryCancellation: batteryJobs.size
         ? ('unavailable' as const)
@@ -1761,17 +2018,23 @@ export const useFsusRenderPipelineHardwareProfile = (
     if (!paused) {
       paused = true
       generation += 1
-      stopSamplers()
-      if (visibilityListener && typeof document !== 'undefined') {
-        document.removeEventListener('visibilitychange', onVisibilityChange)
-        visibilityListener = false
-      }
     }
+    const bindings = [...visibilityBindings]
+    for (const binding of bindings) binding.retired = true
+    attemptRenderPipelineCleanup(producerAuthority, [
+      { resource: Object.freeze([...samplers]), action: stopSamplers },
+      ...bindings.map((binding) => ({
+        resource: binding.target,
+        action: () => releaseVisibilityBinding(binding),
+      })),
+    ])
     return inspectResources()
   }
   const resume = () => {
     if (disposed) throw new Error('fsus_render_pipeline_hardware_disposed')
     if (paused) {
+      pause()
+      if (disposed || !paused) return inspectResources()
       paused = false
       const resumeGeneration = ++generation
       visibilityVersion.value += 1
@@ -1885,6 +2148,11 @@ const renderPipelineAdapters = new Map<
   FsusRenderPipelineAdapter<unknown, unknown>
 >()
 
+const adapterRegistrations = new WeakMap<
+  FsusRenderPipelineAdapter<unknown, unknown>,
+  { active: boolean; previous?: FsusRenderPipelineAdapter<unknown, unknown> }
+>()
+
 const normalizeAdapterId = (adapterId: string) => adapterId.trim()
 
 export const registerFsusRenderPipelineAdapter =
@@ -1895,19 +2163,36 @@ export const registerFsusRenderPipelineAdapter =
         throw new Error('fsus_render_pipeline_adapter_id_required')
       }
 
-      const normalizedAdapter = {
-        ...adapter,
+      const descriptor = { ...adapter }
+      const worker = descriptor.worker ? { ...descriptor.worker } : undefined
+      const normalizedAdapter = Object.freeze({
+        ...descriptor,
         id: adapterId,
-      } as FsusRenderPipelineAdapter<unknown, unknown>
-      const previous = renderPipelineAdapters.get(adapterId)
+        worker: worker
+          ? Object.freeze({
+              ...worker,
+              laneQueueLimits: worker.laneQueueLimits
+                ? Object.freeze({ ...worker.laneQueueLimits })
+                : undefined,
+            })
+          : undefined,
+      }) as FsusRenderPipelineAdapter<unknown, unknown>
+      const registration = {
+        active: true,
+        previous: renderPipelineAdapters.get(adapterId),
+      }
+      adapterRegistrations.set(normalizedAdapter, registration)
       renderPipelineAdapters.set(adapterId, normalizedAdapter)
 
       return renderPipelineModuleAuthority.boundary(() => {
-        if (previous) {
-          renderPipelineAdapters.set(adapterId, previous)
-        } else {
-          renderPipelineAdapters.delete(adapterId)
-        }
+        if (!registration.active) return
+        registration.active = false
+        if (renderPipelineAdapters.get(adapterId) !== normalizedAdapter) return
+        let previous = registration.previous
+        while (previous && !adapterRegistrations.get(previous)?.active)
+          previous = adapterRegistrations.get(previous)?.previous
+        if (previous) renderPipelineAdapters.set(adapterId, previous)
+        else renderPipelineAdapters.delete(adapterId)
       })
     },
   )
@@ -2665,48 +2950,105 @@ export const useFsusVirtualWindow = <TUnit>(options: {
   minVisibleItems?: MaybeRef<number | undefined>
   onDiagnostic?: (event: FsusVirtualWindowDiagnosticEvent) => void
   overscanPx?: MaybeRef<number | undefined>
-  units: Ref<readonly TUnit[]>
+  units: Readonly<Ref<readonly TUnit[]>>
+  // Exact original units/key/estimate, viewport/ref and parameter publications.
+  unitsAuthority?: FsusRenderPipelineAuthority
+  viewportAuthority?: FsusRenderPipelineAuthority
+  configAuthority?: FsusRenderPipelineAuthority
 }) => {
-  const producerAuthority = createRenderPipelineProducerAuthority([
-    'viewport-units-platform',
-  ])
-
+  const producerAuthority = createRenderPipelineProducerAuthority()
+  let inputGeneration = 0
+  let unitsGeneration = 0
+  const revokeInput = () => {
+    inputGeneration += 1
+  }
   const scrollOffset = ref(0)
   const viewportSize = ref(0)
   const indexVersion = ref(0)
-  const fixedItemSize = positive(unref(options.itemSize), 0)
+  const initialize = () => {
+    try {
+      producerAuthority.change(() => {
+        producerAuthority.retainDependency(
+          options.unitsAuthority,
+          'external-units-authority',
+          () => true,
+          revokeInput,
+        )
+        producerAuthority.retainDependency(
+          options.viewportAuthority,
+          'external-viewport-authority',
+          () => true,
+          revokeInput,
+        )
+        producerAuthority.retainDependency(
+          options.configAuthority,
+          'external-virtual-config-authority',
+          () => true,
+          revokeInput,
+        )
+      })
 
-  const createVariableState = () => {
-    const keys: string[] = []
-    const keyToIndex = new Map<string, number>()
-    const estimatedSizes: number[] = []
-    const values: number[] = []
-
-    options.units.value.forEach((unit, index) => {
-      const key = options.getKey(unit, index)
-      if (keyToIndex.has(key)) {
-        throw new Error(`useFsusVirtualWindow requires unique keys: ${key}`)
+      const initializationGeneration = inputGeneration
+      const initialUnits = options.units.value
+      const assertInitializationCurrent = () => {
+        if (
+          initializationGeneration !== inputGeneration ||
+          options.units.value !== initialUnits ||
+          initializationGeneration !== inputGeneration
+        )
+          throw new Error('fsus_virtual_window_initialization_superseded')
       }
-      const estimate = positive(options.estimateSize(unit, index), 1)
-      keys.push(key)
-      keyToIndex.set(key, index)
-      estimatedSizes.push(estimate)
-      values.push(estimate)
-    })
+      assertInitializationCurrent()
+      const fixedItemSize = producerAuthority.change(() =>
+        positive(unref(options.itemSize), 0),
+      )
 
-    return {
-      elementKeys: new WeakMap<Element, string>(),
-      estimatedSizes,
-      index: new FsusVirtualSizeIndex(values),
-      keys,
-      keyToIndex,
-      measuredSizes: new Map<string, number>(),
-      observedElements: new Map<string, HTMLElement>(),
-      pendingMeasurements: new Map<string, number>(),
+      const createVariableState = () => {
+        const keys: string[] = []
+        const keyToIndex = new Map<string, number>()
+        const estimatedSizes: number[] = []
+        const values: number[] = []
+
+        initialUnits.forEach((unit, index) => {
+          const key = options.getKey(unit, index)
+          assertInitializationCurrent()
+          if (keyToIndex.has(key)) {
+            throw new Error(`useFsusVirtualWindow requires unique keys: ${key}`)
+          }
+          const estimate = positive(options.estimateSize(unit, index), 1)
+          assertInitializationCurrent()
+          keys.push(key)
+          keyToIndex.set(key, index)
+          estimatedSizes.push(estimate)
+          values.push(estimate)
+        })
+
+        assertInitializationCurrent()
+        return {
+          elementKeys: new WeakMap<Element, string>(),
+          estimatedSizes,
+          index: new FsusVirtualSizeIndex(values),
+          keys,
+          keyToIndex,
+          measuredSizes: new Map<string, number>(),
+          observedElements: new Map<string, HTMLElement>(),
+          pendingMeasurements: new Map<string, number>(),
+        }
+      }
+
+      const variableState = producerAuthority.change(() =>
+        fixedItemSize > 0 ? null : createVariableState(),
+      )
+      assertInitializationCurrent()
+      return { fixedItemSize, variableState, assertInitializationCurrent }
+    } catch (cause) {
+      producerAuthority.recordFailure(cause, 'virtual-initialization', options)
+      producerAuthority.close()
+      throw cause
     }
   }
-
-  const variableState = fixedItemSize > 0 ? null : createVariableState()
+  const { fixedItemSize, variableState, assertInitializationCurrent } =
+    initialize()
   const callbacks = createRenderPipelineCallbackResources(producerAuthority)
   let measurementFrame: (() => void) | null = null
   let scrollFrame: (() => void) | null = null
@@ -2717,6 +3059,16 @@ export const useFsusVirtualWindow = <TUnit>(options: {
   let connectionGeneration = 0
   let listenerViewport: FsusViewport | null = null
   let resizeTarget: Window | null = null
+  let stopUnitsWatch: (() => void) | null = null
+  type ViewportBinding = {
+    target: FsusViewport
+    type: 'scroll' | 'resize'
+    listener: () => void
+    installed: boolean
+    registering: boolean
+    retired: boolean
+  }
+  const viewportBindings = new Set<ViewportBinding>()
   let observerGeneration = 0
   const viewportJobs = new Set<symbol>()
   const afterViewportTick = (run: () => void) => {
@@ -2730,7 +3082,47 @@ export const useFsusVirtualWindow = <TUnit>(options: {
     ).finally(producerAuthority.boundary(() => viewportJobs.delete(job)))
   }
   let resizeObserver: ResizeObserver | null = null
+  type RefToken = { key: string; elements: Set<Element>; inFlight: number }
+  const refGenerations = new Map<string, RefToken>()
+  const refTokens = new Set<RefToken>()
+  type ResizeTarget = {
+    element: Element
+    observing: number
+    releasing: boolean
+    retired: boolean
+    deferredObserve: boolean
+  }
+  type ResizeBinding = {
+    observer: ResizeObserver | null
+    constructionTarget: Element | null
+    targets: Set<Element>
+    targetStates: Map<Element, ResizeTarget>
+    registering: boolean
+    constructorStarted: boolean
+    operations: number
+    releasing: boolean
+    retired: boolean
+    drainingTargets: boolean
+  }
+  let resizeBinding: ResizeBinding | null = null
+  const resizeBindings = new Set<ResizeBinding>()
   const observedTargets = new Set<Element>()
+  const observerCallbacks = new Set<symbol>()
+  const trackObserverCallback =
+    <TArgs extends unknown[]>(run: (...args: TArgs) => void) =>
+    (...args: TArgs) => {
+      const callback = Symbol('virtual-observer-callback')
+      try {
+        producerAuthority.change(
+          () => run(...args),
+          () => {
+            observerCallbacks.add(callback)
+          },
+        )
+      } finally {
+        producerAuthority.change(() => observerCallbacks.delete(callback))
+      }
+    }
   let viewport: FsusViewport | null = null
 
   const totalSize = computed(
@@ -2781,6 +3173,8 @@ export const useFsusVirtualWindow = <TUnit>(options: {
   const visibleItems: ComputedRef<FsusVirtualWindowItem<TUnit>[]> = computed(
     producerAuthority.boundary(() => {
       indexVersion.value
+      const visibleGeneration = inputGeneration
+      const visibleUnits = unitsGeneration
       const units = options.units.value
       const currentRange = range.value
       const items: FsusVirtualWindowItem<TUnit>[] = []
@@ -2796,9 +3190,16 @@ export const useFsusVirtualWindow = <TUnit>(options: {
           fixedItemSize > 0
             ? fixedItemSize
             : (variableState?.index.get(index) ?? 0)
+        const key = options.getKey(unit, index)
+        if (
+          disposed ||
+          visibleGeneration !== inputGeneration ||
+          visibleUnits !== unitsGeneration
+        )
+          return []
         items.push({
           index,
-          key: options.getKey(unit, index),
+          key,
           offset,
           size,
           unit,
@@ -2830,12 +3231,14 @@ export const useFsusVirtualWindow = <TUnit>(options: {
   const readViewport = () => {
     if (paused || disposed) return
     const readGeneration = generation
+    const readInputGeneration = inputGeneration
     const connection = connectionGeneration
     const nextViewport = options.getViewport()
     if (
       paused ||
       disposed ||
       readGeneration !== generation ||
+      readInputGeneration !== inputGeneration ||
       connection !== connectionGeneration
     )
       return
@@ -2845,19 +3248,45 @@ export const useFsusVirtualWindow = <TUnit>(options: {
     }
     viewport = nextViewport
     const activeConnection = connectionGeneration
-    scrollOffset.value = getViewportScrollTop(viewport)
+    const nextScrollOffset = getViewportScrollTop(viewport)
     if (
       paused ||
       disposed ||
       readGeneration !== generation ||
+      readInputGeneration !== inputGeneration ||
       activeConnection !== connectionGeneration
     )
       return
-    viewportSize.value = getViewportHeight(viewport)
+    scrollOffset.value = nextScrollOffset
+    if (
+      paused ||
+      disposed ||
+      readGeneration !== generation ||
+      readInputGeneration !== inputGeneration ||
+      activeConnection !== connectionGeneration
+    )
+      return
+    const nextHeight = getViewportHeight(viewport)
+    if (
+      paused ||
+      disposed ||
+      readGeneration !== generation ||
+      readInputGeneration !== inputGeneration ||
+      activeConnection !== connectionGeneration
+    )
+      return
+    viewportSize.value = nextHeight
   }
 
   const scheduleViewportRead = producerAuthority.boundary(() => {
-    if (paused || disposed || scrollFrame) return
+    if (
+      paused ||
+      disposed ||
+      (scrollFrame &&
+        callbacks.isPending(scrollFrame) &&
+        !callbacks.isCancelled(scrollFrame))
+    )
+      return
     if (typeof requestAnimationFrame !== 'function') {
       readViewport()
       return
@@ -2872,13 +3301,20 @@ export const useFsusVirtualWindow = <TUnit>(options: {
     measurementFrame = null
     if (paused || disposed || !variableState?.pendingMeasurements.size) return
     const measurementGeneration = generation
+    const measurementInput = inputGeneration
+    const measurementUnits = unitsGeneration
     const isCurrent = () =>
-      !paused && !disposed && measurementGeneration === generation
+      !paused &&
+      !disposed &&
+      measurementGeneration === generation &&
+      measurementInput === inputGeneration &&
+      measurementUnits === unitsGeneration
 
     const batchSize = Math.max(
       1,
       Math.floor(positive(unref(options.measureBatch), 32)),
     )
+    if (!isCurrent()) return
     const entries: Array<[string, number]> = []
     for (const entry of variableState.pendingMeasurements) {
       entries.push(entry)
@@ -2887,6 +3323,7 @@ export const useFsusVirtualWindow = <TUnit>(options: {
     }
 
     const anchorIndex = range.value.start
+    if (!isCurrent()) return
     let scrollCorrection = 0
     let changed = false
 
@@ -2907,6 +3344,7 @@ export const useFsusVirtualWindow = <TUnit>(options: {
       1,
       Math.floor(positive(unref(options.measurementCacheLimit), 2048)),
     )
+    if (!isCurrent()) return
     for (const [key] of variableState.measuredSizes) {
       if (variableState.measuredSizes.size <= cacheLimit) break
       if (variableState.observedElements.has(key)) continue
@@ -2931,7 +3369,9 @@ export const useFsusVirtualWindow = <TUnit>(options: {
 
     if (Math.abs(scrollCorrection) > 0.5) {
       const nextOffset = getViewportScrollTop(viewport) + scrollCorrection
+      if (!isCurrent()) return
       setViewportScrollTop(viewport, nextOffset)
+      if (!isCurrent()) return
       scrollOffset.value = nextOffset
       if (!isCurrent()) return
       emitDiagnostic({
@@ -2962,7 +3402,11 @@ export const useFsusVirtualWindow = <TUnit>(options: {
     )
       return
     variableState.pendingMeasurements.set(key, size)
-    if (!measurementFrame) {
+    if (
+      !measurementFrame ||
+      !callbacks.isPending(measurementFrame) ||
+      callbacks.isCancelled(measurementFrame)
+    ) {
       if (typeof requestAnimationFrame === 'function') {
         measurementFrame = callbacks.frame(flushMeasurements)
       } else {
@@ -2971,74 +3415,506 @@ export const useFsusVirtualWindow = <TUnit>(options: {
     }
   }
 
-  const observeElement = (element: HTMLElement) => {
+  const pruneRefTokens = () => {
+    // Native calls can reenter before their late cleanup finishes. Retain those
+    // actual obligations; only quiescent, identity-matched records are removed.
     if (
-      paused ||
-      disposed ||
-      !variableState ||
-      typeof ResizeObserver === 'undefined'
+      [...resizeBindings].some(
+        (binding) =>
+          binding.registering || binding.operations > 0 || binding.releasing,
+      )
     )
       return
-    if (!resizeObserver) {
-      const currentObserverGeneration = ++observerGeneration
-      resizeObserver = new ResizeObserver(
-        producerAuthority.boundary((entries) => {
-          if (
-            paused ||
-            disposed ||
-            currentObserverGeneration !== observerGeneration
+    const obligated = (element: Element) =>
+      [...resizeBindings].some((binding) => {
+        if (binding.retired && binding.constructionTarget === element)
+          return true
+        const target = binding.targetStates.get(element)
+        return (
+          !!target &&
+          (binding.retired ||
+            target.retired ||
+            target.observing > 0 ||
+            target.releasing ||
+            target.deferredObserve)
+        )
+      })
+    for (const token of [...refTokens]) {
+      if (token.inFlight > 0) continue
+      const current = refGenerations.get(token.key) === token
+      const desired = current
+        ? variableState?.observedElements.get(token.key)
+        : undefined
+      for (const element of token.elements)
+        if (element !== desired && !obligated(element))
+          token.elements.delete(element)
+      if (desired || [...token.elements].some(obligated)) continue
+      if (refGenerations.get(token.key) === token)
+        refGenerations.delete(token.key)
+      refTokens.delete(token)
+    }
+  }
+  const reconcileObservedTargets = () => {
+    observedTargets.clear()
+    for (const binding of resizeBindings)
+      for (const target of binding.targets) observedTargets.add(target)
+  }
+  const releaseResizeBinding = (binding: ResizeBinding) => {
+    binding.retired = true
+    if (
+      binding.registering ||
+      binding.operations > 0 ||
+      binding.releasing ||
+      !binding.observer
+    )
+      return
+    binding.releasing = true
+    try {
+      binding.observer.disconnect()
+      resizeBindings.delete(binding)
+      binding.targets.clear()
+      binding.targetStates.clear()
+      if (resizeBinding === binding) {
+        resizeBinding = null
+        resizeObserver = null
+      }
+      reconcileObservedTargets()
+    } finally {
+      binding.releasing = false
+      pruneRefTokens()
+    }
+  }
+  const releaseResizeTarget = (
+    binding: ResizeBinding,
+    target: ResizeTarget,
+  ) => {
+    if (
+      !target.retired ||
+      target.observing > 0 ||
+      target.releasing ||
+      binding.registering ||
+      !binding.observer
+    )
+      return
+    target.releasing = true
+    binding.operations += 1
+    try {
+      const observer = binding.observer
+      const unobserve = observer.unobserve
+      if (target.retired && binding.observer === observer) {
+        unobserve.call(observer, target.element)
+        if (
+          target.retired &&
+          binding.targetStates.get(target.element) === target
+        ) {
+          binding.targetStates.delete(target.element)
+          binding.targets.delete(target.element)
+          reconcileObservedTargets()
+        }
+      }
+    } finally {
+      binding.operations -= 1
+      target.releasing = false
+      pruneRefTokens()
+    }
+    // A genuine replacement observe during unobserve waits until the old call
+    // returns; it cannot be erased by that late unobserve's native side effect.
+    if (
+      target.deferredObserve &&
+      !target.retired &&
+      !binding.retired &&
+      resizeBinding === binding
+    ) {
+      target.deferredObserve = false
+      if (target.element instanceof HTMLElement) observeElement(target.element)
+    }
+  }
+  const operateResizeBinding = (binding: ResizeBinding, action: () => void) => {
+    binding.operations += 1
+    let failed = false
+    let firstCause: unknown
+    try {
+      action()
+    } catch (cause) {
+      producerAuthority.recordFailure(
+        cause,
+        'resize-operation',
+        binding.observer,
+      )
+      failed = true
+      firstCause = cause
+    } finally {
+      binding.operations -= 1
+    }
+    if (!binding.retired && resizeBinding === binding && !disposed) {
+      for (const target of [...binding.targetStates.values()]) {
+        if (!target.retired) continue
+        try {
+          releaseResizeTarget(binding, target)
+        } catch (cause) {
+          producerAuthority.recordFailure(
+            cause,
+            'resize-target-late-release',
+            target.element,
           )
-            return
-          for (const entry of entries) {
-            const entryKey = variableState.elementKeys.get(entry.target)
-            if (
-              !entryKey ||
-              variableState.observedElements.get(entryKey) !== entry.target
-            )
-              continue
-            const blockSize =
-              entry.borderBoxSize?.[0]?.blockSize ??
-              entry.contentRect.height ??
-              (entry.target instanceof HTMLElement
-                ? entry.target.offsetHeight
-                : 0)
-            queueMeasurement(entryKey, blockSize)
-          }
-        }),
+          if (!failed) firstCause = cause
+          failed = true
+        }
+      }
+    }
+    if (binding.retired || resizeBinding !== binding || disposed) {
+      try {
+        releaseResizeBinding(binding)
+      } catch (cause) {
+        producerAuthority.recordFailure(
+          cause,
+          'resize-late-release',
+          binding.observer,
+        )
+        if (!failed) firstCause = cause
+        failed = true
+      }
+    }
+    pruneRefTokens()
+    if (failed) throw firstCause
+  }
+  const unobserveElement = (element: Element, current: () => boolean) => {
+    const bindings = [...resizeBindings].filter((binding) =>
+      binding.targets.has(element),
+    )
+    attemptRenderPipelineCleanup(
+      producerAuthority,
+      bindings.map((binding) => ({
+        resource: binding.observer,
+        action: () =>
+          operateResizeBinding(binding, () => {
+            if (!current()) return
+            const target = binding.targetStates.get(element)
+            if (!target) return
+            target.retired = true
+            releaseResizeTarget(binding, target)
+          }),
+      })),
+    )
+  }
+  const drainDeferredResizeTargets = (binding: ResizeBinding) => {
+    if (
+      binding.drainingTargets ||
+      binding.registering ||
+      !binding.observer ||
+      binding.retired ||
+      binding !== resizeBinding ||
+      paused ||
+      disposed
+    )
+      return
+    binding.drainingTargets = true
+    try {
+      attemptRenderPipelineCleanup(
+        producerAuthority,
+        [...binding.targetStates.values()]
+          .filter(
+            (target) =>
+              target.deferredObserve && !target.retired && !target.releasing,
+          )
+          .map((target) => ({
+            resource: target.element,
+            action: () => {
+              if (target.element instanceof HTMLElement)
+                observeElement(target.element)
+            },
+          })),
+      )
+    } finally {
+      binding.drainingTargets = false
+    }
+  }
+  const observeElement = (element: HTMLElement) => {
+    if (paused || disposed || !variableState) return
+    const control = generation
+    const key = variableState.elementKeys.get(element)
+    if (key === undefined) return
+    const refs = refGenerations.get(key)
+    const desired = () => {
+      return (
+        key !== undefined && variableState.observedElements.get(key) === element
       )
     }
-    resizeObserver.observe(element)
-    observedTargets.add(element)
+    const current = () =>
+      !paused &&
+      !disposed &&
+      control === generation &&
+      refs === refGenerations.get(key) &&
+      desired()
+    if (!current()) return
+    if (!resizeBinding || resizeBinding.retired) {
+      const observerEpoch = ++observerGeneration
+      const binding: ResizeBinding = {
+        observer: null,
+        constructionTarget: element,
+        targets: new Set(),
+        targetStates: new Map(),
+        registering: true,
+        constructorStarted: false,
+        operations: 0,
+        releasing: false,
+        retired: false,
+        drainingTargets: false,
+      }
+      resizeBinding = binding
+      resizeBindings.add(binding)
+      const bindingCurrent = () =>
+        !paused &&
+        !disposed &&
+        control === generation &&
+        binding === resizeBinding &&
+        !binding.retired
+      let failed = false
+      let firstCause: unknown
+      try {
+        const Observer = globalThis.ResizeObserver
+        if (!bindingCurrent()) binding.retired = true
+        else if (typeof Observer !== 'function') {
+          resizeBindings.delete(binding)
+          if (resizeBinding === binding) resizeBinding = null
+        } else {
+          binding.constructorStarted = true
+          binding.observer = new Observer(
+            trackObserverCallback(
+              producerAuthority.boundary(
+                (
+                  entries: ResizeObserverEntry[],
+                  reportedObserver: ResizeObserver,
+                ) => {
+                  // Retain a real callback-reported handle if construction threw or
+                  // is still returning; no synthetic observer is manufactured.
+                  if (
+                    !binding.observer &&
+                    binding.constructorStarted &&
+                    reportedObserver
+                  )
+                    binding.observer = reportedObserver
+                  if (
+                    binding.retired ||
+                    disposed ||
+                    resizeBinding !== binding
+                  ) {
+                    try {
+                      releaseResizeBinding(binding)
+                    } catch (cause) {
+                      producerAuthority.recordFailure(
+                        cause,
+                        'resize-callback-late-release',
+                        binding.observer,
+                      )
+                    }
+                    return
+                  }
+                  if (
+                    binding.retired ||
+                    binding.registering ||
+                    binding !== resizeBinding ||
+                    !binding.observer ||
+                    paused ||
+                    disposed ||
+                    observerEpoch !== observerGeneration
+                  )
+                    return
+                  const callbackControl = generation,
+                    callbackInput = inputGeneration,
+                    callbackUnits = unitsGeneration
+                  const callbackCurrent = () =>
+                    !paused &&
+                    !disposed &&
+                    !binding.retired &&
+                    binding === resizeBinding &&
+                    observerEpoch === observerGeneration &&
+                    callbackControl === generation &&
+                    callbackInput === inputGeneration &&
+                    callbackUnits === unitsGeneration
+                  for (const entry of entries) {
+                    if (!callbackCurrent()) return
+                    const target = entry.target
+                    if (!callbackCurrent()) return
+                    const key = variableState.elementKeys.get(target)
+                    if (
+                      !key ||
+                      variableState.observedElements.get(key) !== target
+                    )
+                      continue
+                    const refs = refGenerations.get(key)
+                    const size =
+                      entry.borderBoxSize?.[0]?.blockSize ??
+                      entry.contentRect.height ??
+                      (target instanceof HTMLElement ? target.offsetHeight : 0)
+                    if (
+                      !callbackCurrent() ||
+                      variableState.observedElements.get(key) !== target ||
+                      refs !== refGenerations.get(key)
+                    )
+                      continue
+                    queueMeasurement(key, size)
+                  }
+                },
+              ),
+            ),
+          )
+        }
+      } catch (cause) {
+        producerAuthority.recordFailure(cause, 'resize-constructor', element)
+        failed = true
+        firstCause = cause
+        binding.retired = true
+      } finally {
+        binding.registering = false
+      }
+      if (!binding.constructorStarted) {
+        resizeBindings.delete(binding)
+        if (resizeBinding === binding) resizeBinding = null
+      }
+      if (!bindingCurrent()) {
+        try {
+          releaseResizeBinding(binding)
+        } catch (cause) {
+          producerAuthority.recordFailure(
+            cause,
+            'resize-constructor-late-release',
+            binding.observer,
+          )
+          if (!failed) firstCause = cause
+          failed = true
+        }
+      } else if (binding.observer) {
+        resizeObserver = binding.observer
+        binding.constructionTarget = null
+      }
+      if (failed) throw firstCause
+    }
+    const binding = resizeBinding
+    if (!binding || binding.retired) return
+    if (!current()) {
+      drainDeferredResizeTargets(binding)
+      return
+    }
+    let target = binding.targetStates.get(element)
+    if (!target) {
+      target = {
+        element,
+        observing: 0,
+        releasing: false,
+        retired: false,
+        deferredObserve: false,
+      }
+      binding.targetStates.set(element, target)
+    }
+    target.retired = false
+    binding.targets.add(element)
+    reconcileObservedTargets()
+    if (target.releasing || binding.registering || !binding.observer) {
+      target.deferredObserve = true
+      return
+    }
+    target.deferredObserve = false
+    const ownedTarget = target
+    try {
+      operateResizeBinding(binding, () => {
+        ownedTarget.observing += 1
+        try {
+          const observer = binding.observer!
+          const observe = observer.observe
+          if (
+            !current() ||
+            binding !== resizeBinding ||
+            binding.retired ||
+            ownedTarget.retired ||
+            resizeObserver !== observer
+          )
+            return
+          observe.call(observer, element)
+          if (
+            !current() ||
+            binding !== resizeBinding ||
+            binding.retired ||
+            resizeObserver !== observer
+          )
+            return
+        } finally {
+          ownedTarget.observing -= 1
+        }
+      })
+    } finally {
+      drainDeferredResizeTargets(binding)
+    }
   }
 
   const setUnitRef = (key: string, element: Element | null) => {
     if (disposed || !variableState) return
     const previousElement = variableState.observedElements.get(key)
-    if (previousElement === element) return
-    // Removal also drops a queued size for an element that is no longer mounted.
-    variableState.pendingMeasurements.delete(key)
-    if (previousElement) {
-      resizeObserver?.unobserve(previousElement)
-      observedTargets.delete(previousElement)
-      variableState.elementKeys.delete(previousElement)
-      variableState.observedElements.delete(key)
-    }
-    if (!(element instanceof HTMLElement) || !variableState.keyToIndex.has(key))
+    if (previousElement === element || (!previousElement && element === null))
       return
-    const previousKey = variableState.elementKeys.get(element)
-    if (previousKey && previousKey !== key) {
-      variableState.observedElements.delete(previousKey)
-      variableState.pendingMeasurements.delete(previousKey)
+    const refs: RefToken = { key, elements: new Set<Element>(), inFlight: 1 }
+    if (previousElement) refs.elements.add(previousElement)
+    if (element) refs.elements.add(element)
+    refTokens.add(refs)
+    refGenerations.set(key, refs)
+    try {
+      const control = generation,
+        input = inputGeneration,
+        units = unitsGeneration
+      const current = () =>
+        !disposed && refs === refGenerations.get(key) && control === generation
+      variableState.pendingMeasurements.delete(key)
+      if (previousElement) {
+        unobserveElement(previousElement, current)
+        if (
+          !current() ||
+          variableState.observedElements.get(key) !== previousElement
+        )
+          return
+        variableState.elementKeys.delete(previousElement)
+        variableState.observedElements.delete(key)
+      }
+      if (
+        !current() ||
+        !(element instanceof HTMLElement) ||
+        !variableState.keyToIndex.has(key)
+      )
+        return
+      const previousKey = variableState.elementKeys.get(element)
+      if (previousKey && previousKey !== key) {
+        variableState.observedElements.delete(previousKey)
+        variableState.pendingMeasurements.delete(previousKey)
+      }
+      variableState.observedElements.set(key, element)
+      variableState.elementKeys.set(element, key)
+      const height = element.offsetHeight
+      if (!current() || variableState.observedElements.get(key) !== element)
+        return
+      if (input === inputGeneration && units === unitsGeneration)
+        queueMeasurement(key, height)
+      if (!current() || variableState.observedElements.get(key) !== element)
+        return
+      observeElement(element)
+      if (!current() || variableState.observedElements.get(key) !== element)
+        return
+    } finally {
+      refs.inFlight -= 1
+      pruneRefTokens()
     }
-    variableState.observedElements.set(key, element)
-    variableState.elementKeys.set(element, key)
-    queueMeasurement(key, element.offsetHeight)
-    observeElement(element)
   }
 
   const syncUnits = (nextUnits: readonly TUnit[]) => {
     if (disposed || !variableState) return
+    const syncGeneration = ++unitsGeneration
+    const syncInput = inputGeneration
+    const syncControl = generation
+    const current = () =>
+      !disposed &&
+      syncGeneration === unitsGeneration &&
+      syncInput === inputGeneration &&
+      syncControl === generation
     const previousStart = range.value.start
+    if (!current()) return
     const anchorKey = variableState.keys[previousStart]
     const anchorDelta = scrollOffset.value - offsetForIndex(previousStart)
     const nextKeys: string[] = []
@@ -3047,6 +3923,7 @@ export const useFsusVirtualWindow = <TUnit>(options: {
       const unit = nextUnits[index]
       if (unit === undefined) continue
       const key = options.getKey(unit, index)
+      if (!current()) return
       if (seen.has(key)) {
         throw new Error(`useFsusVirtualWindow requires unique keys: ${key}`)
       }
@@ -3068,6 +3945,7 @@ export const useFsusVirtualWindow = <TUnit>(options: {
         const unit = nextUnits[index]
         if (unit === undefined) continue
         const estimate = positive(options.estimateSize(unit, index), 1)
+        if (!current()) return
         variableState.estimatedSizes[index] = estimate
         if (!variableState.measuredSizes.has(nextKeys[index] ?? '')) {
           variableState.index.update(index, estimate)
@@ -3082,6 +3960,7 @@ export const useFsusVirtualWindow = <TUnit>(options: {
         const key = nextKeys[index]
         if (unit === undefined || key === undefined) continue
         const estimate = positive(options.estimateSize(unit, index), 1)
+        if (!current()) return
         variableState.keys.push(key)
         variableState.keyToIndex.set(key, index)
         variableState.estimatedSizes.push(estimate)
@@ -3092,6 +3971,7 @@ export const useFsusVirtualWindow = <TUnit>(options: {
         const unit = nextUnits[index]
         if (unit === undefined) continue
         const estimate = positive(options.estimateSize(unit, index), 1)
+        if (!current()) return
         variableState.estimatedSizes[index] = estimate
         if (!variableState.measuredSizes.has(nextKeys[index] ?? '')) {
           variableState.index.update(index, estimate)
@@ -3106,7 +3986,16 @@ export const useFsusVirtualWindow = <TUnit>(options: {
         if (!key) continue
         const element = variableState.observedElements.get(key)
         if (element) {
-          resizeObserver?.unobserve(element)
+          const observer = resizeObserver
+          const refs = refGenerations.get(key)
+          unobserveElement(element, current)
+          if (
+            !current() ||
+            resizeObserver !== observer ||
+            refs !== refGenerations.get(key) ||
+            variableState.observedElements.get(key) !== element
+          )
+            return
           observedTargets.delete(element)
           variableState.elementKeys.delete(element)
         }
@@ -3114,6 +4003,7 @@ export const useFsusVirtualWindow = <TUnit>(options: {
         variableState.pendingMeasurements.delete(key)
         variableState.measuredSizes.delete(key)
         variableState.keyToIndex.delete(key)
+        pruneRefTokens()
       }
       variableState.keys.length = nextKeys.length
       variableState.estimatedSizes.length = nextKeys.length
@@ -3121,11 +4011,21 @@ export const useFsusVirtualWindow = <TUnit>(options: {
     } else {
       for (const [key, element] of variableState.observedElements) {
         if (seen.has(key)) continue
-        resizeObserver?.unobserve(element)
+        const observer = resizeObserver
+        const refs = refGenerations.get(key)
+        unobserveElement(element, current)
+        if (
+          !current() ||
+          resizeObserver !== observer ||
+          refs !== refGenerations.get(key) ||
+          variableState.observedElements.get(key) !== element
+        )
+          return
         observedTargets.delete(element)
         variableState.elementKeys.delete(element)
         variableState.observedElements.delete(key)
         variableState.pendingMeasurements.delete(key)
+        pruneRefTokens()
       }
       for (const key of variableState.measuredSizes.keys()) {
         if (!seen.has(key)) variableState.measuredSizes.delete(key)
@@ -3139,6 +4039,7 @@ export const useFsusVirtualWindow = <TUnit>(options: {
         const key = nextKeys[index]
         if (unit === undefined || key === undefined) continue
         const estimate = positive(options.estimateSize(unit, index), 1)
+        if (!current()) return
         estimates.push(estimate)
         values.push(variableState.measuredSizes.get(key) ?? estimate)
         keyToIndex.set(key, index)
@@ -3148,9 +4049,12 @@ export const useFsusVirtualWindow = <TUnit>(options: {
       variableState.estimatedSizes = estimates
       variableState.index.rebuild(values)
       emitDiagnostic({ reason: 'insert-or-reorder', type: 'index-rebuild' })
+      if (!current()) return
     }
 
+    if (!current()) return
     indexVersion.value += 1
+    if (!current()) return
     if (anchorKey) {
       const nextAnchorIndex = variableState.keyToIndex.get(anchorKey)
       if (nextAnchorIndex !== undefined) {
@@ -3158,6 +4062,7 @@ export const useFsusVirtualWindow = <TUnit>(options: {
         const correction = nextOffset - scrollOffset.value
         if (Math.abs(correction) > 0.5) {
           setViewportScrollTop(viewport, nextOffset)
+          if (!current()) return
           scrollOffset.value = nextOffset
           emitDiagnostic({
             correction,
@@ -3167,42 +4072,120 @@ export const useFsusVirtualWindow = <TUnit>(options: {
         }
       }
     }
-    if (!paused && !disposed) afterViewportTick(readViewport)
+    if (current() && !paused) afterViewportTick(readViewport)
   }
 
   const attachListeners = (target: FsusViewport | null) => {
     connected = true
     listenerViewport = target
-    target?.addEventListener('scroll', scheduleViewportRead, {
-      passive: true,
-    })
     resizeTarget =
       target && isWindowViewport(target)
         ? target
         : typeof window !== 'undefined'
           ? window
           : null
-    resizeTarget?.addEventListener('resize', scheduleViewportRead)
+    const connection = connectionGeneration
+    const bind = (
+      bindingTarget: FsusViewport | null,
+      type: ViewportBinding['type'],
+    ) => {
+      if (
+        !bindingTarget ||
+        paused ||
+        disposed ||
+        connection !== connectionGeneration
+      )
+        return
+      const binding: ViewportBinding = {
+        target: bindingTarget,
+        type,
+        installed: false,
+        registering: true,
+        retired: false,
+        listener: producerAuthority.boundary(() => {
+          if (!binding.retired && connection === connectionGeneration)
+            scheduleViewportRead()
+        }),
+      }
+      viewportBindings.add(binding)
+      let registrationFailed = false
+      let firstRegistrationCause: unknown
+      try {
+        bindingTarget.addEventListener(
+          type,
+          binding.listener,
+          type === 'scroll' ? { passive: true } : undefined,
+        )
+        binding.installed = true
+      } catch (cause) {
+        producerAuthority.recordFailure(
+          cause,
+          'viewport-listener-registration',
+          binding.target,
+        )
+        registrationFailed = true
+        firstRegistrationCause = cause
+      } finally {
+        binding.registering = false
+      }
+      // Reentrant retirement cannot drop a registration whose add was in-flight.
+      if (binding.retired || connection !== connectionGeneration) {
+        binding.retired = true
+        try {
+          binding.target.removeEventListener(binding.type, binding.listener)
+          viewportBindings.delete(binding)
+        } catch (cause) {
+          producerAuthority.recordFailure(
+            cause,
+            'viewport-listener-release',
+            binding.target,
+          )
+          if (!registrationFailed) firstRegistrationCause = cause
+          registrationFailed = true
+        }
+      }
+      if (registrationFailed) throw firstRegistrationCause
+    }
+    bind(target, 'scroll')
+    bind(resizeTarget, 'resize')
   }
   const disconnect = () => {
-    connectionGeneration += 1
-    listenerViewport?.removeEventListener('scroll', scheduleViewportRead)
-    resizeTarget?.removeEventListener('resize', scheduleViewportRead)
+    const connection = ++connectionGeneration
     connected = false
-    listenerViewport = null
-    resizeTarget = null
-    viewport = null
+    const bindings = [...viewportBindings]
+    for (const binding of bindings) binding.retired = true
+    try {
+      attemptRenderPipelineCleanup(
+        producerAuthority,
+        bindings.map((binding) => ({
+          resource: binding.target,
+          action: () => {
+            if (binding.registering) return
+            binding.target.removeEventListener(binding.type, binding.listener)
+            viewportBindings.delete(binding)
+          },
+        })),
+      )
+    } finally {
+      if (connection === connectionGeneration) {
+        listenerViewport = null
+        resizeTarget = null
+        viewport = null
+      }
+    }
   }
   const connect = () => {
     if (paused || disposed) return
     disconnect()
     const connectGeneration = generation
+    const connectInput = inputGeneration
     const connection = connectionGeneration
     const nextViewport = options.getViewport()
     if (
       paused ||
       disposed ||
       connectGeneration !== generation ||
+      connectInput !== inputGeneration ||
       connection !== connectionGeneration
     )
       return
@@ -3216,73 +4199,253 @@ export const useFsusVirtualWindow = <TUnit>(options: {
       disposed,
       authorityFeed: producerAuthority.inspect(),
       ...callbacks.inspect(),
-      scrollFrame: scrollFrame !== null,
-      measurementFrame: measurementFrame !== null,
-      observers: resizeObserver ? 1 : 0,
+      scrollFrame: scrollFrame !== null && callbacks.isPending(scrollFrame),
+      measurementFrame:
+        measurementFrame !== null && callbacks.isPending(measurementFrame),
+      observers: new Set(
+        [...resizeBindings].flatMap((binding) =>
+          binding.observer ? [binding.observer] : [],
+        ),
+      ).size,
+      observerRegistrations: Object.freeze(
+        [...resizeBindings].map((binding) =>
+          Object.freeze({
+            hasHandle: binding.observer !== null,
+            registering: binding.registering,
+            constructorStarted: binding.constructorStarted,
+            operations: binding.operations,
+            releasing: binding.releasing,
+            retired: binding.retired,
+            retainedTargets: binding.targets.size,
+            targetRegistrations: Object.freeze(
+              [...binding.targetStates.values()].map((target) =>
+                Object.freeze({
+                  element: target.element,
+                  observing: target.observing,
+                  releasing: target.releasing,
+                  retired: target.retired,
+                  deferredObserve: target.deferredObserve,
+                }),
+              ),
+            ),
+          }),
+        ),
+      ),
+      unknownObserverRegistrations: [...resizeBindings].filter(
+        (binding) => !binding.observer,
+      ).length,
       observedElements: observedTargets.size,
       retainedElements: variableState?.observedElements.size ?? 0,
       pendingMeasurements: variableState?.pendingMeasurements.size ?? 0,
       measuredSizes: variableState?.measuredSizes.size ?? 0,
       indexedUnits: variableState?.keys.length ?? 0,
       pendingViewportTicks: viewportJobs.size,
-      retainedListeners: (listenerViewport ? 1 : 0) + (resizeTarget ? 1 : 0),
+      retainedListeners: viewportBindings.size,
+      listenerRegistrations: Object.freeze(
+        [...viewportBindings].map((binding) =>
+          Object.freeze({
+            target: binding.target,
+            type: binding.type,
+            installed: binding.installed,
+            registering: binding.registering,
+            retired: binding.retired,
+          }),
+        ),
+      ),
+      retainedUnitWatchers: stopUnitsWatch ? 1 : 0,
+      retainedRefTokens: refTokens.size,
+      currentRefKeys: refGenerations.size,
+      inFlightRefOperations: [...refTokens].reduce(
+        (count, token) => count + token.inFlight,
+        0,
+      ),
+      refTokenRecords: Object.freeze(
+        [...refTokens].map((token) =>
+          Object.freeze({
+            key: token.key,
+            current: refGenerations.get(token.key) === token,
+            inFlight: token.inFlight,
+            retainedElements: token.elements.size,
+          }),
+        ),
+      ),
       // ResizeObserver's platform-internal queue is not exposed by this source.
       observerInternalCallbacks: 'unknown' as const,
+      observerCallbackResources: Object.freeze({
+        scope: 'virtual-source-delivered-callbacks' as const,
+        activeCallbacks: observerCallbacks.size,
+        callbackIds: Object.freeze([...observerCallbacks]),
+        settlement: 'source-callback-finally' as const,
+        futurePlatformDelivery: 'unsupported-until-source-entry' as const,
+        internalQueueControl: 'unsupported' as const,
+      }),
       recoverable: false as const,
     })
   const pause = () => {
     if (!paused) {
       paused = true
       generation += 1
-      disconnect()
-      callbacks.cancelAll()
-      scrollFrame = null
-      measurementFrame = null
-      observerGeneration += 1
-      resizeObserver?.disconnect()
-      resizeObserver = null
-      observedTargets.clear()
-      variableState?.pendingMeasurements.clear()
     }
+    observerGeneration += 1
+    const pauseGeneration = generation
+    const current = () => disposed || (paused && pauseGeneration === generation)
+    const observers = [...resizeBindings]
+    for (const binding of observers) binding.retired = true
+    const watchStop = stopUnitsWatch
+    attemptRenderPipelineCleanup(producerAuthority, [
+      {
+        resource: Object.freeze(
+          [...viewportBindings].map((binding) => binding.target),
+        ),
+        action: () => {
+          if (current()) disconnect()
+        },
+      },
+      {
+        resource: callbacks,
+        action: () => {
+          callbacks.cancelAll(current)
+          if (current()) {
+            if (scrollFrame && !callbacks.isPending(scrollFrame))
+              scrollFrame = null
+            if (measurementFrame && !callbacks.isPending(measurementFrame))
+              measurementFrame = null
+          }
+        },
+      },
+      ...observers.map((binding) => ({
+        resource: binding.observer,
+        action: () => {
+          if (current()) releaseResizeBinding(binding)
+        },
+      })),
+      {
+        resource: watchStop,
+        action: () => {
+          if (disposed && watchStop) {
+            watchStop()
+            if (stopUnitsWatch === watchStop) stopUnitsWatch = null
+          }
+        },
+      },
+      {
+        resource: variableState,
+        action: () => {
+          if (!current()) return
+          variableState?.pendingMeasurements.clear()
+          if (disposed && resizeBindings.size === 0 && variableState) {
+            variableState.observedElements.clear()
+            variableState.elementKeys = new WeakMap<Element, string>()
+            variableState.measuredSizes.clear()
+            pruneRefTokens()
+          }
+        },
+      },
+    ])
     return inspectResources()
   }
   const resume = () => {
     if (disposed) throw new Error('fsus_virtual_window_disposed')
     if (paused) {
+      pause()
+      if (disposed || !paused) return inspectResources()
       paused = false
       const resumeGeneration = ++generation
       connect()
       for (const [key, element] of variableState?.observedElements ?? []) {
         if (paused || disposed || resumeGeneration !== generation) break
-        queueMeasurement(key, element.offsetHeight)
-        if (paused || disposed || resumeGeneration !== generation) break
+        const input = inputGeneration,
+          units = unitsGeneration,
+          refs = refGenerations.get(key)
+        const height = element.offsetHeight
+        if (
+          paused ||
+          disposed ||
+          resumeGeneration !== generation ||
+          input !== inputGeneration ||
+          units !== unitsGeneration
+        )
+          break
+        if (
+          refs !== refGenerations.get(key) ||
+          variableState?.observedElements.get(key) !== element
+        )
+          continue
+        queueMeasurement(key, height)
+        if (
+          paused ||
+          disposed ||
+          resumeGeneration !== generation ||
+          input !== inputGeneration ||
+          units !== unitsGeneration
+        )
+          break
+        if (
+          refs !== refGenerations.get(key) ||
+          variableState?.observedElements.get(key) !== element
+        )
+          continue
         observeElement(element)
       }
     }
     return inspectResources()
   }
-  onMounted(
-    producerAuthority.boundary(() => {
-      afterViewportTick(connect)
-    }),
-  )
+  try {
+    onMounted(
+      producerAuthority.boundary(() => {
+        afterViewportTick(connect)
+      }),
+    )
 
-  watch(options.units, producerAuthority.boundary(syncUnits), { flush: 'sync' })
+    stopUnitsWatch = watch(
+      options.units,
+      producerAuthority.boundary(syncUnits),
+      {
+        flush: 'sync',
+      },
+    )
+    assertInitializationCurrent()
+  } catch (cause) {
+    disposed = true
+    try {
+      pause()
+    } catch (cleanupCause) {
+      producerAuthority.recordFailure(
+        cleanupCause,
+        'virtual-setup-cleanup',
+        options,
+      )
+    }
+    producerAuthority.recordFailure(cause, 'virtual-setup', options)
+    producerAuthority.close()
+    throw cause
+  }
 
   onBeforeUnmount(
     producerAuthority.boundary(() => {
       disposed = true
-      pause()
-      variableState?.observedElements.clear()
-      if (variableState)
-        variableState.elementKeys = new WeakMap<Element, string>()
-      variableState?.measuredSizes.clear()
-      producerAuthority.close()
+      try {
+        pause()
+      } finally {
+        producerAuthority.close()
+      }
     }),
   )
 
+  const observerResourceProvider = Object.freeze({
+    scope: 'virtual-local-observer-resources' as const,
+    authority: producerAuthority.authority,
+    inspectResources: producerAuthority.boundary(inspectResources),
+    pause: producerAuthority.boundary(pause),
+    resume: producerAuthority.boundary(resume),
+    unsupported: Object.freeze([
+      'platform-internal-observer-queue',
+      'future-callback-delivery-before-source-entry',
+    ] as const),
+  })
   return {
     authority: producerAuthority.authority,
+    observerResourceProvider,
     inspectResources: producerAuthority.boundary(inspectResources),
     pause: producerAuthority.boundary(pause),
     resume: producerAuthority.boundary(resume),
@@ -3304,9 +4467,17 @@ let renderPipelineRuntimeId = 0
 export const useFsusRenderPipelineRuntime = <TSource, TUnit>(
   options: FsusRenderPipelineRuntimeOptions<TSource, TUnit>,
 ): FsusRenderPipelineRuntimeState<TSource, TUnit> => {
-  const producerAuthority = createRenderPipelineProducerAuthority([
-    'external-source-config-adapter',
-  ])
+  const producerAuthority = createRenderPipelineProducerAuthority()
+  producerAuthority.change(() => {
+    producerAuthority.retainDependency(
+      options.sourceAuthority,
+      'external-source-authority',
+    )
+    producerAuthority.retainDependency(
+      options.adapterAuthority,
+      'external-adapter-authority',
+    )
+  })
   producerAuthority.retainDependency(
     renderPipelineModuleAuthority.authority,
     'module-registry-authority',
@@ -4255,6 +5426,19 @@ export const useFsusRenderPipelineRuntime = <TSource, TUnit>(
     }
   }
 
+  const inspectAdapterResources =
+    (): FsusRenderPipelineAdapterInvocationResourceInspection =>
+      Object.freeze({
+        ownerKey: workerTaskKey,
+        scope: 'runtime-owned-adapter-invocations',
+        pendingInvocations: adapterJobs.size,
+        invocationIds: Object.freeze([...adapterJobs]),
+        admission: disposed ? 'disposed' : paused ? 'paused' : 'active',
+        cancellationCapability: 'cooperative-abort-signal-only',
+        internalCancellationCompletion: 'unsupported',
+        settlement: 'original-prepare-finally',
+        internalResources: 'unsupported',
+      })
   const inspectResources = (): FsusRenderPipelineRuntimeResourceInspection =>
     Object.freeze({
       ownerKey: workerTaskKey,
@@ -4287,6 +5471,7 @@ export const useFsusRenderPipelineRuntime = <TSource, TUnit>(
       pendingControlTransitions: controlTransitions.size,
       pendingAdapterJobs: adapterJobs.size,
       adapterResources: 'unknown',
+      adapterInvocationResources: inspectAdapterResources(),
       workerCallbackFailure,
       pendingWorkerCallbackFailureNotification,
       workerResources: inspectWorkerResources(),
@@ -4453,8 +5638,17 @@ export const useFsusRenderPipelineRuntime = <TSource, TUnit>(
     }),
   )
 
+  const adapterResourceProvider: FsusRenderPipelineAdapterResourceProvider =
+    Object.freeze({
+      ownerKey: workerTaskKey,
+      authority: producerAuthority.authority,
+      inspectResources: producerAuthority.boundary(inspectAdapterResources),
+      pause: producerAuthority.boundary(pause),
+      resume: producerAuthority.boundary(resume),
+    })
   return {
     authority: producerAuthority.authority,
+    adapterResourceProvider,
     inspectResources: producerAuthority.boundary(inspectResources),
     pause: producerAuthority.boundary(pause),
     resume: producerAuthority.boundary(resume),
