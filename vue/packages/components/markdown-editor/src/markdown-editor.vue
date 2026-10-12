@@ -389,9 +389,9 @@
         :aria-haspopup="activeSlashTrigger ? 'menu' : undefined"
         :aria-busy="loading || undefined"
         :aria-disabled="editingBlocked"
-        :aria-readonly="props.readonly || nativeTargetStaging || undefined"
+        :aria-readonly="props.readonly || undefined"
         :disabled="inputDisabled"
-        :readonly="props.readonly || nativeTargetStaging"
+        :readonly="props.readonly"
         :hidden="!liveSurface.inputVisible || undefined"
         :name="textareaName"
         :placeholder="effectivePlaceholder"
@@ -1534,23 +1534,19 @@ const attrs = useAttrs()
 const rootElementRef = ref<HTMLElement | null>(null)
 const sessionSurfacePaused = ref(false)
 const nativeHandoverReceiving = ref(false)
-const nativeTargetStaging = ref(false)
-let invalidateNativeTargetLifetime: ((permanent?: boolean) => void) | undefined = undefined
+let invalidateNativeTargetLifetime: (() => void) | undefined = undefined
 let nativeHandoverViewRestoring = false
 let invalidateNativeSurfacePublication: (() => void) | undefined = undefined
 let sessionDisposed = false
 let retireSnapshotPublicationAuthority: (() => void) | undefined = undefined
 let sessionUnmountFailed = false
 let sessionUnmountFirstCause: unknown
-// Install before the original prop/document watchers can begin their effects.
-watch([
-  () => props.modelValue, () => props.documentIdentity?.id, () => props.documentIdentity?.epoch,
-  () => props.disabled, () => props.readonly, () => props.loading, () => props.mode,
-  rootElementRef, sessionSurfacePaused,
-], () => invalidateNativeTargetLifetime?.(), { flush: 'sync' })
+// Initial ref attachment establishes the birth; replacement/withdrawal retires it.
+watch(rootElementRef, (_root, previous) => { if (previous) invalidateNativeTargetLifetime?.() }, { flush: 'sync' })
+watch(sessionSurfacePaused, (paused) => { if (paused) invalidateNativeTargetLifetime?.() }, { flush: 'sync' })
 // Retire before the original scheduler registers its cleanup callbacks.
 onBeforeUnmount(() => {
-  try { invalidateNativeTargetLifetime?.(true) } catch (cause) {
+  try { invalidateNativeTargetLifetime?.() } catch (cause) {
     if (!sessionUnmountFailed) sessionUnmountFirstCause = cause
     sessionUnmountFailed = true
   }
@@ -1583,6 +1579,7 @@ const modes: MarkdownEditorMode[] = ['source', 'live', 'split', 'preview']
 const commandTrayId = `${useId()}-command-tray`
 const commandTrayRef = ref<HTMLElement | null>(null)
 const textareaRef = ref<HTMLTextAreaElement | null>(null)
+watch(textareaRef, (_textarea, previous) => { if (previous) invalidateNativeTargetLifetime?.() }, { flush: 'sync' })
 const commandOverflowRef = ref<HTMLButtonElement | null>(null)
 const commandPaletteInputRef = ref<HTMLInputElement | null>(null)
 const paletteListId = `${useId()}-command-palette-list`
@@ -1617,7 +1614,7 @@ const visualViewportHeight = ref(0)
 const visualViewportOffsetTop = ref(0)
 const toolbarRef = ref<HTMLElement | null>(null)
 const inputDisabled = computed(() => props.disabled || props.loading || sessionSurfacePaused.value)
-const editingBlocked = computed(() => props.readonly || inputDisabled.value || nativeHandoverReceiving.value || nativeTargetStaging.value)
+const editingBlocked = computed(() => props.readonly || inputDisabled.value || nativeHandoverReceiving.value)
 const surfaceOptions = computed<Required<MarkdownEditorSurfaceOptions>>(() => ({
   commandPalette: props.surfaces.commandPalette ?? false,
   selectionToolbar: props.surfaces.selectionToolbar ?? false,
@@ -2286,7 +2283,6 @@ const syncLanguageToolsState = () => {
   })
 }
 const isComposing = ref(false)
-watch([textareaRef, currentMode, isComposing], () => invalidateNativeTargetLifetime?.(), { flush: 'sync' })
 const pasteAsMarkdownGate = computed<
   'composition' | 'readonly' | 'disabled' | 'loading' | 'previewOnly' | null
 >(() => {
@@ -7063,43 +7059,28 @@ const surfaceResourceParticipant: MarkdownEditorSessionResourceParticipant = {
   },
 }
 
-// This lifetime belongs to this actual SFC birth, independently of a document ticket
-// intentionally retired by the original receiving transaction.
+// Independent physical birth custody for this actual SFC; no staging resource owner.
+const hasPristineNativeTarget = MarkdownEditorTransactionStore.prototype.hasPristineNativeHandoverTarget.bind(transactionStore)
 const nativeTargetOwner = createMarkdownEditorNativeTargetOwner({
-  captureMountedTarget: () => {
+  captureMountedBirth: () => {
+    if (!hasPristineNativeTarget() || sessionDisposed || sessionSurfacePaused.value) return null
     const root = rootElementRef.value
     const textarea = textareaRef.value
     const document = root?.ownerDocument
-    const identity = transactionStore.documentIdentity
-    const source = props.modelValue
-    const mode = currentMode.value
+    const sameOwner = () => !sessionDisposed && !sessionSurfacePaused.value &&
+      rootElementRef.value === root && textareaRef.value === textarea && hasPristineNativeTarget()
     const assertMounted = () => {
-      const unavailable = sessionDisposed || sessionSurfacePaused.value || isComposing.value || nativeMachine.composing ||
-        props.readonly || props.disabled || props.loading || props.modelValue !== source || currentMode.value !== mode
-      const sameOwner = () => rootElementRef.value === root && textareaRef.value === textarea &&
-        transactionStore.documentIdentity.id === identity.id && transactionStore.documentIdentity.epoch === identity.epoch
-      if (unavailable || !sameOwner() || !root || !textarea || !document || !root.isConnected || !textarea.isConnected ||
+      if (!sameOwner() || !root || !textarea || !document || !root.isConnected || !textarea.isConnected ||
         root.ownerDocument !== document || textarea.ownerDocument !== document || !root.contains(textarea) || !sameOwner())
-        throw new Error('editor-native-target-mounted-owner-unavailable')
+        throw new Error('editor-native-target-mounted-birth-unavailable')
     }
     assertMounted()
-    return Object.freeze({
-      assertMounted,
-      setStagingBlocked: (blocked: boolean) => {
-        nativeTargetStaging.value = blocked
-        if (!textarea) throw new Error('editor-native-target-textarea-owner-unavailable')
-        // Mutate and verify the exact original native element synchronously;
-        // a queued Vue patch alone cannot establish a staging barrier.
-        const readonly = blocked || props.readonly
-        textarea.readOnly = readonly
-        if (textarea.readOnly !== readonly || nativeTargetStaging.value !== blocked)
-          throw new Error('editor-native-target-input-barrier-unconfirmed')
-      },
-    })
+    return assertMounted
   },
 })
 invalidateNativeTargetLifetime = nativeTargetOwner.invalidate
-if (sessionDisposed) nativeTargetOwner.invalidate(true)
+if (sessionDisposed) nativeTargetOwner.invalidate()
+
 // This binding closes over the existing owner; it never creates another editor.
 const sessionBinding = createMarkdownEditorSessionBinding({
   transactionStore,

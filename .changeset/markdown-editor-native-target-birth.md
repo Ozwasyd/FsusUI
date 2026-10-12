@@ -2,9 +2,9 @@
 'element-plus': minor
 ---
 
-Expose original mounted native target birth custody for handover staging. Reserve
-the exact SFC/transaction birth and synchronously control its original textarea
-input barrier, withdraw before owned lifetime effects, and retain failed receiver
-and barrier cleanup for real retry. Physical mount, document/history authority,
-complete resources, restoration and eviction remain with their original owners;
-runtime qualification remains held and no package is published.
+Expose the original mounted native target birth lifetime independently of the
+document ticket retired by native transfer. Issue an exact same-SFC birth pointer,
+withdraw before physical replacement/pause/permanent effects and retain actual
+failed notification custody. Use original native adoption/cancel/receiving cleanup
+and physical Root ownership; no additional staging barrier or cleanup API. Full
+resources, restoration, eviction and runtime qualification remain unavailable.

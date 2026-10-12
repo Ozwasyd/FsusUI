@@ -1931,7 +1931,7 @@ export type {
   MarkdownEditorNativeHandoverProof,
 } from './markdown-editor-native-handover'
 export type {
-  MarkdownEditorNativeTargetReservation,
+  MarkdownEditorNativeTargetBirth,
   MarkdownEditorNativeTargetSubscription,
-  MarkdownEditorNativeTargetCleanup,
+  MarkdownEditorNativeTargetLifetimeHandle,
 } from './markdown-editor-native-target'

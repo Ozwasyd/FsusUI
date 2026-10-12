@@ -1,11 +1,6 @@
-/** Native input staging only; physical mount and complete resources stay with their original owners. */
-export interface MarkdownEditorNativeTargetCleanup {
-  readonly scope: 'native-target-staging-admission'
-  readonly pending: boolean
-  readonly receiving: boolean
-  readonly failed: boolean
-  readonly firstCause: unknown
-  readonly latestCause: unknown
+/** Exact original SFC birth; independent of the document ticket retired by native transfer. */
+export interface MarkdownEditorNativeTargetBirth {
+  readonly scope: 'original-mounted-native-target-birth'
 }
 
 export interface MarkdownEditorNativeTargetSubscription {
@@ -14,203 +9,125 @@ export interface MarkdownEditorNativeTargetSubscription {
   failureCause(): unknown
 }
 
-export interface MarkdownEditorNativeTargetReservation {
-  readonly scope: 'native-target-birth-staging'
-  /** Original owner-observed lifetime only; no DOM, source or document-ticket reader. */
-  hasCustody(): boolean
+export interface MarkdownEditorNativeTargetLifetimeHandle {
+  captureBirth(): MarkdownEditorNativeTargetBirth | null
+  /** Original private observed lifetime only; no DOM/source/document-ticket reads. */
+  hasCustody(birth: MarkdownEditorNativeTargetBirth): boolean
   subscribeBeforeInvalidation(receiver: () => void): MarkdownEditorNativeTargetSubscription
-  /** Withdraw first, then release the actual staging input barrier; never unmount or certify resources. */
-  cancel(): boolean
-  retryCleanup(): boolean
-  inspectCleanup(): MarkdownEditorNativeTargetCleanup
 }
 
 interface Receiver {
   readonly callback: () => void
-  pending: boolean
   registered: boolean
+  notified: boolean
+  releasing: boolean
   failed: boolean
   cause: unknown
 }
 
-interface NativeTargetRecord {
-    readonly reservation: MarkdownEditorNativeTargetReservation
-    assertMounted: (() => void) | undefined
-    setStagingBlocked: ((blocked: boolean) => void) | undefined
-    readonly receivers: Set<Receiver>
-    eligible: boolean
-    withdrawn: boolean
-    receiving: boolean
-    releasing: boolean
-    notifying: boolean
-    barrierHeld: boolean
-    failed: boolean
-    firstCause: unknown
-    latestCause: unknown
-  }
-
-/** Created once in the actual SFC setup, alongside its original transaction/session owner. */
+/** One actual SFC owner. Native adoption/cancel/cleanup remain in the original handover owner. */
 export const createMarkdownEditorNativeTargetOwner = (owner: {
-  readonly captureMountedTarget: () => {
-    readonly assertMounted: () => void
-    readonly setStagingBlocked: (blocked: boolean) => void
-  }
+  readonly captureMountedBirth: () => (() => void) | null
 }) => {
-  let spent = false
-  let unavailable = false
-  let generation = 0
-  let current: NativeTargetRecord | undefined
-  const failure = (record: NativeTargetRecord, cause: unknown) => {
-    if (!record.failed) record.firstCause = cause
-    record.failed = true
-    record.latestCause = cause
+  let birth: MarkdownEditorNativeTargetBirth | undefined
+  let capturing = false
+  let retired = false
+  let notifying = false
+  let activeReceiver: Receiver | undefined
+  const receivers = new Set<Receiver>()
+  const fail = (record: Receiver, cause: unknown) => { record.failed = true; record.cause = cause }
+  const hasCustody = (candidate: MarkdownEditorNativeTargetBirth): boolean =>
+    birth !== undefined && birth === candidate && !retired && !capturing && !notifying
+  const call = (record: Receiver) => {
+    record.failed = false
+    const previous = activeReceiver
+    activeReceiver = record
+    try { record.callback() } catch (cause) { fail(record, cause); throw cause }
+    finally { activeReceiver = previous }
+    // A caught unsubscribe reentry does not make the notification successful.
+    if (record.failed) throw record.cause
+    record.notified = true
   }
-  const inspect = (): MarkdownEditorNativeTargetCleanup => Object.freeze({
-    scope: 'native-target-staging-admission',
-    pending: !!current && current.withdrawn && (current.receiving || current.barrierHeld || current.receivers.size > 0),
-    receiving: current?.receiving ?? false,
-    failed: current?.failed ?? false,
-    firstCause: current?.firstCause,
-    latestCause: current?.latestCause,
-  })
-  const clean = (record: NativeTargetRecord): boolean => {
-    if (record.releasing || record.notifying || record.eligible) return false
-    record.releasing = true
-    let failed = false
-    let first: unknown
-    const attempt = (action: () => void) => {
-      try { action() } catch (cause) {
-        if (!failed) first = cause
-        failed = true
-        failure(record, cause)
-      }
-    }
-    try {
-      record.notifying = true
+  const handle: MarkdownEditorNativeTargetLifetimeHandle = Object.freeze({
+    hasCustody,
+    captureBirth() {
+      if (retired || capturing || notifying) return null
+      if (birth) return hasCustody(birth) ? birth : null
+      capturing = true
       try {
-        for (const receiver of [...record.receivers]) {
-          if (!receiver.pending) continue
-          attempt(() => {
-            receiver.cause = undefined
-            receiver.failed = false
-            try { receiver.callback() } catch (cause) { receiver.failed = true; receiver.cause = cause; throw cause }
-            // A caught unsubscribe reentry still retains its original failure.
-            if (receiver.failed) throw receiver.cause
-            receiver.pending = false
-            receiver.registered = false
-            record.receivers.delete(receiver)
-          })
-        }
-      } finally { record.notifying = false }
-      // Never unlock native input in the middle of the original async transfer.
-      if (!record.receiving && record.barrierHeld) attempt(() => {
-        if (!record.setStagingBlocked) throw new Error('editor-native-target-barrier-owner-unavailable')
-        record.setStagingBlocked(false)
-        record.barrierHeld = false
-      })
-      if (failed) throw first
-      const complete = !record.receiving && !record.barrierHeld && record.receivers.size === 0
-      if (complete) { record.assertMounted = undefined; record.setStagingBlocked = undefined }
-      return complete
-    } finally { record.releasing = false }
-  }
-  const withdraw = (record: NativeTargetRecord): boolean => {
-    record.withdrawn = true
-    if (record.eligible) {
-      record.eligible = false
-      for (const receiver of record.receivers) receiver.pending = true
-    }
-    return clean(record)
-  }
-  return Object.freeze({
-    reserve(assertPristine: () => void): MarkdownEditorNativeTargetReservation {
-      if (spent || unavailable || current) throw new Error('editor-native-target-birth-unavailable')
-      const birthGeneration = generation
-      assertPristine()
-      const mounted = owner.captureMountedTarget()
-      const assertMounted = mounted.assertMounted
-      const setStagingBlocked = mounted.setStagingBlocked
-      assertPristine()
-      if (spent || unavailable || current || generation !== birthGeneration) throw new Error('editor-native-target-birth-reentrant')
-      const reservation: MarkdownEditorNativeTargetReservation = Object.freeze({
-        scope: 'native-target-birth-staging',
-        hasCustody: () => current === record && record.eligible && !unavailable && !record.releasing && !record.notifying,
-        subscribeBeforeInvalidation(receiver: () => void) {
-          if (typeof receiver !== 'function') throw new TypeError('editor-native-target-receiver-invalid')
-          if (!reservation.hasCustody()) throw new Error('editor-native-target-subscription-unavailable')
-          const registration: Receiver = { callback: receiver, pending: false, registered: true, failed: false, cause: undefined }
-          const handle = Object.freeze({
-            hasCustody: () => registration.registered,
-            failureCause: () => registration.cause,
-            unsubscribe() {
-              if (record.notifying) {
-                const cause = new Error('editor-native-target-unsubscribe-reentrant')
-                registration.cause = cause
-                registration.failed = true
-                failure(record, cause)
-                throw cause
-              }
-              if (!registration.registered) return false
-              if (registration.pending) {
-                if (registration.failed) throw registration.cause
-                throw new Error('editor-native-target-notification-pending')
-              }
-              registration.registered = false
-              record.receivers.delete(registration)
-              return true
-            },
-          })
-          if (!reservation.hasCustody()) throw new Error('editor-native-target-subscription-revoked')
-          record.receivers.add(registration)
-          return handle
-        },
-        cancel: () => withdraw(record),
-        retryCleanup: () => clean(record),
-        inspectCleanup: inspect,
-      })
-      const record: NativeTargetRecord = { reservation, assertMounted, setStagingBlocked, receivers: new Set(), eligible: false, withdrawn: false, receiving: false,
-        releasing: false, notifying: false, barrierHeld: true, failed: false, firstCause: undefined, latestCause: undefined }
-      // Allocate custody before the real reactive write, so a failed write cannot lose cleanup.
-      spent = true
-      current = record
-      try {
-        setStagingBlocked(true)
+        const assertMounted = owner.captureMountedBirth()
+        if (!assertMounted || retired || notifying) return null
+        const candidate: MarkdownEditorNativeTargetBirth = Object.freeze({ scope: 'original-mounted-native-target-birth' })
         assertMounted()
-        assertPristine()
-        if (unavailable || current !== record || record.withdrawn || generation !== birthGeneration) throw new Error('editor-native-target-birth-revoked')
-        record.eligible = true
-        return reservation
-      } catch (cause) {
-        failure(record, cause)
-        try { withdraw(record) } catch (cleanupCause) { failure(record, cleanupCause) }
+        if (retired || notifying || birth) return null
+        birth = candidate
+        return candidate
+      } finally { capturing = false }
+    },
+    subscribeBeforeInvalidation(receiver: () => void) {
+      if (typeof receiver !== 'function') throw new TypeError('editor-native-target-receiver-invalid')
+      if (retired || capturing || notifying || !birth) throw new Error('editor-native-target-subscription-unavailable')
+      const record: Receiver = { callback: receiver, registered: true, notified: false,
+        releasing: false, failed: false, cause: undefined }
+      const subscription: MarkdownEditorNativeTargetSubscription = Object.freeze({
+        hasCustody: () => record.registered,
+        failureCause: () => record.cause,
+        unsubscribe() {
+          if (!record.registered) return false
+          if (notifying || record.releasing) {
+            const cause = new Error('editor-native-target-unsubscribe-reentrant')
+            fail(record, cause)
+            if (activeReceiver) fail(activeReceiver, cause)
+            throw cause
+          }
+          record.releasing = true
+          try {
+            // Retry only this genuine failed notification before releasing it.
+            if (record.failed) call(record)
+            if (record.failed) throw record.cause
+            record.registered = false
+            receivers.delete(record)
+            return true
+          } catch (cause) { fail(record, cause); throw cause }
+          finally { record.releasing = false }
+        },
+      })
+      if (retired || capturing || notifying || !birth) throw new Error('editor-native-target-subscription-revoked')
+      receivers.add(record)
+      return subscription
+    },
+  })
+  return Object.freeze({
+    handle,
+    invalidate() {
+      // Withdraw before every original receiver and before the subsequent owner effect.
+      retired = true
+      if (notifying) {
+        const cause = new Error('editor-native-target-invalidation-reentrant')
+        if (activeReceiver) fail(activeReceiver, cause)
         throw cause
       }
-    },
-    invalidate(permanent = false) {
-      if (generation === Number.MAX_SAFE_INTEGER) unavailable = true
-      else generation += 1
-      if (permanent) unavailable = true
-      if (current) withdraw(current)
-    },
-    beginReceiving() {
-      const record = current
-      if (!record) return
-      if (!record.reservation.hasCustody() || record.receiving) throw new Error('editor-native-target-staging-revoked')
-      if (!record.assertMounted) throw new Error('editor-native-target-mounted-owner-released')
-      record.assertMounted()
-      if (!record.reservation.hasCustody()) throw new Error('editor-native-target-staging-revoked')
-      record.receiving = true
+      notifying = true
+      let failed = false
+      let firstCause: unknown
+      try {
+        for (const record of [...receivers]) {
+          if (!record.registered || (record.notified && !record.failed)) continue
+          try {
+            if (record.releasing) throw new Error('editor-native-target-release-active')
+            call(record)
+          } catch (cause) {
+            fail(record, cause)
+            if (!failed) firstCause = cause
+            failed = true
+          }
+        }
+      } finally { notifying = false }
+      if (failed) throw firstCause
     },
     assertReceiving() {
-      const record = current
-      if (!record) return
-      if (!record.receiving || !record.reservation.hasCustody()) throw new Error('editor-native-target-staging-revoked')
-      if (!record.assertMounted) throw new Error('editor-native-target-mounted-owner-released')
-      record.assertMounted()
-      if (!record.receiving || !record.reservation.hasCustody()) throw new Error('editor-native-target-staging-revoked')
+      if (retired || capturing || notifying || (birth && !hasCustody(birth)))
+        throw new Error('editor-native-target-lifetime-retired')
     },
-    endReceiving() { if (current) current.receiving = false },
-    inspectCleanup: inspect,
-    retryCleanup: () => current ? clean(current) : false,
   })
 }

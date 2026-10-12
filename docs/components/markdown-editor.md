@@ -1344,45 +1344,39 @@ reentry; owner identity, document membership and root containment are checked
 before and after the awaited original selection restoration. A connected node
 moved elsewhere cannot produce a successful native recreation proof.
 
-### Original native target birth and staging custody
+### Original physical native target birth lifetime
 
-`session.reserveNativeRecreationTarget()` reserves the one actual mounted SFC
-birth for native handover. Import `MarkdownEditorNativeTargetReservation`,
-`MarkdownEditorNativeTargetSubscription` and `MarkdownEditorNativeTargetCleanup`
-from `@ozwasyd/element-plus`. This is a native staging input barrier, not a new
-document issuer, physical mount owner or complete resource certificate.
+`session.getNativeTargetLifetimeHandle()` returns the same original SFC-owned
+`MarkdownEditorNativeTargetLifetimeHandle`, or `null` without that actual owner.
+Import it, `MarkdownEditorNativeTargetBirth` and
+`MarkdownEditorNativeTargetSubscription` from `@ozwasyd/element-plus`.
 
-Admission checks the original transaction's private initial write generation,
-pristine history/checkpoint state and actual connected root/textarea containment.
-The original SFC captures those exact elements, synchronously sets and verifies
-the original textarea's readonly field and its staging state, then repeats native
-and mounted-owner admission. Allocation precedes the real write: a throwing or
-reentrant setter retains its original cleanup holder and cause. No snapshot,
-revision-zero metadata or cloned editor can substitute for this actual birth.
-The instance cannot issue another birth reservation after cancellation/failure.
+`captureBirth()` checks the original transaction's private initial generation and
+pristine history/checkpoint state, and pins the actual connected root/textarea
+containment before final original admission. It issues one exact frozen birth
+pointer. The cached pointer is never recaptured, reconstructed from revision-zero
+metadata or refreshed after retirement. `hasCustody(birth)` reads only that exact
+private pointer and observed physical lifetime, without DOM, source, resource or
+document-ticket readers. Intentional document retirement during original native
+handover does not withdraw this independent physical lifetime.
 
-The same reservation provides callback-free `hasCustody()` over original private
-owner-observed state and `subscribeBeforeInvalidation(receiver)`. Early synchronous
-prop/document/root/textarea/composition/mode watchers, actual owned-registration
-pause and permanent unmount withdraw eligibility before notifications or subsequent
-owner effects. Ordinary document-ticket retirement during the original receiving
-transaction does not revoke this separate SFC lifetime. Actual handover admission
-checks the selected mounted elements before and after awaited restoration, while
-the original transaction retains all history transfer and rollback ownership.
+Initial native ref attachment establishes the actual birth; original root/textarea
+replacement or withdrawal, owned-registration pause, surface pause and permanent
+unmount withdraw the lifetime before notifications and subsequent owner effects.
+`subscribeBeforeInvalidation(receiver)` returns an original notification handle
+with `hasCustody()`, `unsubscribe()` and `failureCause()`. Every original receiver
+is attempted. Failed notifications, raw/undefined causes and caught unsubscribe
+reentry remain held; the same subscription retries its genuine failed callback
+before releasing its registration. No cleanup, resource or disposal receipt is
+created. The held lifetime handle remains readable after retirement.
 
-`cancel()` withdraws first and attempts every held receiver and the exact original
-textarea/staging barrier release. It never unlocks input during a pending native
-transfer. Failed callbacks (including caught unsubscribe reentry), unknown setter
-completion and raw first/latest causes remain held; `retryCleanup()` retries only
-the real unfinished cleanup. A completed release drops the captured element
-closures. `inspectNativeRecreationTargetCleanup()` and
-`retryNativeRecreationTargetCleanup()` remain callable on the held session after
-failed issuance or retirement. Their scope is `native-target-staging-admission`;
-success does not acknowledge physical unmount, disposal or full resource cleanup.
-
-Root owns actual Write mounting, its physical replacement/invalidation guards,
-principal/document custody and final readmission. This source does not qualify
-unobserved external DOM mutation, framework effects or platform queues. Full
-resource/restoration/eviction refusals and every runtime/native/IME/security/privacy/
-receipt/race/backup-restore hold remain HOLD/UNRUN. Local source alias only; no
-package publication.
+The existing accepted native handover owns adoption, cancellation, receiving
+cleanup/retry, history transfer/rollback and target containment. Its original
+final admission additionally checks this original physical lifetime. No separate
+staging barrier, cancel API or native cleanup/retry API is installed here. Root
+owns actual Write mounting, physical cancellation and final readmission, and must
+join the same borrowed birth with its actual view/document/principal custody.
+Unobserved external DOM mutation, framework effects and platform queues remain
+unqualified. Full resource/restoration/eviction refusals and all runtime/native/
+IME/security/privacy/receipt/race/backup-restore holds remain HOLD/UNRUN. Local
+source alias only; no package publication.
