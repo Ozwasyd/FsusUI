@@ -129,7 +129,7 @@ import type {
   MarkdownHeavyFeatureProjectionSnapshot,
   MarkdownHeavyFeatureProjectionTracker,
 } from '../../../wasm/markdown-heavy-feature-identity'
-import type { ComponentPublicInstance, ComputedRef } from 'vue'
+import type { ComponentPublicInstance, Ref } from 'vue'
 
 defineOptions({
   name: 'ElMarkdownRenderer',
@@ -540,7 +540,7 @@ rendererResourceOwner.bindDocumentAuthorityReceiver()
 const rendererChunkInput = rendererResourceOwner.createOwnedInputPublication<
   readonly MarkdownRenderChunk[]
 >('chunk-units', Object.freeze([]))
-const chunkUnits: ComputedRef<readonly MarkdownRenderChunk[]> =
+const chunkUnits: Readonly<Ref<readonly MarkdownRenderChunk[]>> =
   rendererChunkInput.input
 const rendererViewportInput = rendererResourceOwner.createOwnedInputPublication<
   Readonly<{ root: HTMLElement | null; scroller: HTMLElement | null }>
@@ -1180,7 +1180,7 @@ const rendererRequestInput = rendererResourceOwner.createOwnedInputPublication(
     () => createMarkdownRenderRequest(normalizeMarkdownSource(props.content)),
   ),
 )
-const markdownRenderRequest: ComputedRef<MarkdownRenderRequest> =
+const markdownRenderRequest: Readonly<Ref<MarkdownRenderRequest>> =
   rendererRequestInput.input
 const rendererAdapterInput = rendererResourceOwner.createOwnedInputPublication(
   'adapter-descriptor',

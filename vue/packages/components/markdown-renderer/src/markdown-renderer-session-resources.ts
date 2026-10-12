@@ -21,7 +21,7 @@ import type {
   MarkdownEditorFrameTask,
 } from '../../../hooks/use-markdown-editor-frame-scheduler'
 import type { WatchHandle } from 'vue'
-import { computed, shallowRef } from 'vue'
+import { shallowReadonly, shallowRef } from 'vue'
 
 /** Custody of a private input publication only, never of foreign mutable state. */
 export interface MarkdownRendererOwnedInputAuthority {
@@ -300,7 +300,9 @@ export const createMarkdownRendererSessionResourceOwner = <
     if (disposed || inputPublications.has(scope))
       throw new Error('markdown-renderer-input-publication-unavailable')
     const backing = shallowRef<T>(initial)
-    const input = computed(() => backing.value)
+    // Use the actual readonly ref, without a second computed value cache that
+    // could retain the previous input after the backing publication is cleared.
+    const input = shallowReadonly(backing)
     const registrations = new Set<{
       readonly listener: () => void
       quarantined: boolean
