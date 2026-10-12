@@ -29,6 +29,9 @@ import type {
   MarkdownHeavyFeatureAdapterResources,
   MarkdownHeavyFeatureCancellationRequest,
 } from '../../../wasm/markdown-heavy-feature-resource'
+import type * as MarkdownHeavyFeatureIdentityModule from '../../../wasm/markdown-heavy-feature-identity'
+import type * as MarkdownHeavyFeatureLazyModule from '../../../wasm/markdown-heavy-feature-isolated-lazy'
+import type * as MarkdownHeavyFeatureFrameSchedulerModule from '../../../wasm/markdown-heavy-feature-frame-scheduler'
 
 const rendererInputNativePromise = Promise
 const rendererInputNativePromisePrototype = Promise.prototype
@@ -50,13 +53,12 @@ const rendererSupportImportRealmOwner =
   createMarkdownHeavyFeatureAdapterResourceOwner()
 const rendererSupportImportAllocations = new Map<string, number>()
 let rendererProjectionIdentityModule: Promise<
-  typeof import('../../../wasm/markdown-heavy-feature-identity')
+  typeof MarkdownHeavyFeatureIdentityModule
 > | null = null
-let rendererLazyModule: Promise<
-  typeof import('../../../wasm/markdown-heavy-feature-isolated-lazy')
-> | null = null
+let rendererLazyModule: Promise<typeof MarkdownHeavyFeatureLazyModule> | null =
+  null
 let rendererFrameSchedulerModule: Promise<
-  typeof import('../../../wasm/markdown-heavy-feature-frame-scheduler')
+  typeof MarkdownHeavyFeatureFrameSchedulerModule
 > | null = null
 const allocateRendererProjectionIdentityModule = () =>
   (rendererProjectionIdentityModule ??=
