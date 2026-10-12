@@ -1920,3 +1920,7 @@ export type {
   MarkdownEditorSessionResourceOwner,
   MarkdownEditorSessionResourceParticipant,
 } from './markdown-editor-session-resources'
+export type {
+  MarkdownEditorNativeSurfaceInspection,
+  MarkdownEditorNativeSurfaceResourceHandle,
+} from './markdown-editor-native-surface-resources'

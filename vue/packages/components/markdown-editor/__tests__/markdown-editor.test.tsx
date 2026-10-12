@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { flushPromises, mount } from '@vue/test-utils'
-import { defineComponent, h, nextTick } from 'vue'
+import { defineComponent, h, nextTick, ref, watch } from 'vue'
 import { afterEach, describe, expect, expectTypeOf, it, vi } from 'vitest'
 import MarkdownEditor from '../src/markdown-editor.vue'
 import { useMarkdownHeavyFeatureDocumentContext } from '../../../hooks/use-markdown-heavy-feature-lifecycle'
@@ -10,6 +10,7 @@ import { createMarkdownEditorSessionBinding } from '../src/markdown-editor-sessi
 import { captureMarkdownEditorSessionAttachmentState } from '../src/markdown-editor-session-attachment-state'
 import { createMarkdownAttachmentJob, runMarkdownAttachmentDispatch } from '../src/markdown-editor-attachment-lifecycle'
 import { MarkdownEditorTransactionStore } from '../src/markdown-editor-transaction'
+import { createMarkdownEditorNativeSurfaceResources } from '../src/markdown-editor-native-surface-resources'
 import type {
   MarkdownEditorSessionDocumentAuthority,
   MarkdownEditorSessionDocumentAuthorityTicket,
@@ -34,6 +35,142 @@ import type {
 import { getMarkdownXssSourceUrl } from '../../../../tests/support/markdown-xss-corpus'
 
 describe('MarkdownEditor', () => {
+  const nativeSurfaceOwner = (store: MarkdownEditorTransactionStore, composing: () => boolean = () => false) =>
+    createMarkdownEditorNativeSurfaceResources({
+      documentAuthority: Object.freeze({
+        capture: MarkdownEditorTransactionStore.prototype.captureDocumentAuthority.bind(store),
+        hasCustody: MarkdownEditorTransactionStore.prototype.hasDocumentAuthorityCustody.bind(store),
+        subscribeRetirement: MarkdownEditorTransactionStore.prototype.subscribeDocumentAuthorityRetirement.bind(store),
+      }),
+      unavailable: () => false, composing, invalidatePublication: () => {},
+      pauseImperative: () => {}, resumeImperative: () => {},
+      inspectImperative: () => ({ resizeObservers: 0, layoutGestureTimers: 0 }),
+    })
+
+  it('detaches and rearms actual native listeners and original Vue watches without granting complete surface custody', async () => {
+    const store = new MarkdownEditorTransactionStore('source', undefined, { id: 'surface-owned', epoch: 1 })
+    const owner = nativeSurfaceOwner(store)
+    const element = document.createElement('textarea')
+    let calls = 0
+    const value = ref(0)
+    owner.bindTarget(element, { input: () => { calls += 1 } })
+    owner.ownWatch(watch(value, () => owner.runWatchCallback(() => { calls += 1 }), { flush: 'sync' }))
+    element.dispatchEvent(new Event('input'))
+    expect(calls).toBe(1)
+    expect(owner.handle.pauseOwnedRegistrations()).toMatchObject({
+      complete: false, fullSurfacePaused: false, ownedRegistrationsPaused: true,
+      attachedListeners: 0, retainedWatchHandles: 1, pausedWatchHandles: 1,
+    })
+    element.dispatchEvent(new Event('input'))
+    value.value += 1
+    expect(calls).toBe(1)
+    expect(owner.handle.resumeOwnedRegistrations()).toMatchObject({ ownedRegistrationsPaused: false, attachedListeners: 1 })
+    await nextTick()
+    expect(calls).toBe(2)
+    element.dispatchEvent(new Event('input'))
+    expect(calls).toBe(3)
+    expect(owner.handle.inspect().unsupported).toContain('vue-v-model-text-directive-input-composition-change-listeners')
+    owner.disposeRegistrations()
+  })
+
+  it('refuses native surface pause during composition and rearm after same-coordinate native write or node replacement', () => {
+    const store = new MarkdownEditorTransactionStore('source', undefined, { id: 'surface-fence', epoch: 1 })
+    let composing = true
+    const owner = nativeSurfaceOwner(store, () => composing)
+    const element = document.createElement('textarea')
+    owner.bindTarget(element, { input: () => {} })
+    expect(() => owner.handle.pauseOwnedRegistrations()).toThrow('editor-native-surface-transition-unavailable')
+    expect(owner.handle.inspect().attachedListeners).toBe(1)
+    composing = false
+    owner.handle.pauseOwnedRegistrations()
+    const revision = store.revision
+    store.setSelection(store.selection)
+    expect(store.revision).toBe(revision)
+    expect(() => owner.handle.resumeOwnedRegistrations()).toThrow('editor-native-surface-rearm-authority-stale')
+    expect(owner.handle.inspect().ownedRegistrationsPaused).toBe(true)
+    owner.disposeRegistrations()
+    const next = nativeSurfaceOwner(new MarkdownEditorTransactionStore('source'))
+    next.bindTarget(element, { input: () => {} })
+    next.handle.pauseOwnedRegistrations()
+    next.releaseTarget(element)
+    next.bindTarget(document.createElement('textarea'), { input: () => {} })
+    expect(() => next.handle.resumeOwnedRegistrations()).toThrow('editor-native-surface-rearm-authority-stale')
+    next.disposeRegistrations()
+  })
+
+  it('attempts every actual detach, preserves unknown native registration and original cause until genuine retry', () => {
+    const owner = nativeSurfaceOwner(new MarkdownEditorTransactionStore('source'))
+    const first = document.createElement('textarea')
+    const second = document.createElement('textarea')
+    owner.bindTarget(first, { input: () => {} })
+    owner.bindTarget(second, { input: () => {} })
+    const cause = { tag: 'original-native-detach-failure' }
+    const remove = first.removeEventListener.bind(first)
+    first.removeEventListener = ((type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions) => {
+      remove(type, listener, options); throw cause
+    }) as typeof first.removeEventListener
+    let caught: unknown
+    try { owner.handle.pauseOwnedRegistrations() } catch (error) { caught = error }
+    expect(caught).toBe(cause)
+    expect(owner.handle.inspect()).toMatchObject({ attachedListeners: null, unknownListenerRegistrations: 1,
+      failedRegistrations: 1, ownedRegistrationsPaused: false, firstCause: cause, latestCause: cause })
+    first.removeEventListener = remove
+    expect(owner.handle.retryOwnedCleanup()).toMatchObject({ attachedListeners: 0,
+      unknownListenerRegistrations: 0, failedRegistrations: 0, ownedRegistrationsPaused: true })
+    owner.disposeRegistrations()
+  })
+
+  it('retains the original rearm failure and removes actual partial native installations before refusing acknowledgement', () => {
+    const owner = nativeSurfaceOwner(new MarkdownEditorTransactionStore('source'))
+    const element = document.createElement('textarea')
+    owner.bindTarget(element, { input: () => {} })
+    owner.handle.pauseOwnedRegistrations()
+    const add = element.addEventListener.bind(element)
+    const cause = { tag: 'original-native-rearm-failure' }
+    element.addEventListener = ((type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions) => {
+      add(type, listener, options); throw cause
+    }) as typeof element.addEventListener
+    let caught: unknown
+    try { owner.handle.resumeOwnedRegistrations() } catch (error) { caught = error }
+    expect(caught).toBe(cause)
+    expect(owner.handle.inspect()).toMatchObject({ attachedListeners: 0, unknownListenerRegistrations: 0,
+      ownedRegistrationsPaused: true, firstCause: cause })
+    element.addEventListener = add
+    owner.disposeRegistrations()
+  })
+
+  it('refuses native rearm after an already queued original Vue watch job is suppressed during pause', async () => {
+    const owner = nativeSurfaceOwner(new MarkdownEditorTransactionStore('source'))
+    const value = ref(0)
+    let calls = 0
+    owner.ownWatch(watch(value, () => owner.runWatchCallback(() => { calls += 1 })))
+    value.value = 1
+    owner.handle.pauseOwnedRegistrations()
+    await nextTick()
+    expect(calls).toBe(0)
+    expect(() => owner.handle.resumeOwnedRegistrations()).toThrow('editor-native-surface-rearm-authority-stale')
+    owner.disposeRegistrations()
+  })
+
+  it('refuses rearm at the original synchronous context guard before a paused prop watcher can replace native document pins', () => {
+    const store = new MarkdownEditorTransactionStore('source', undefined, { id: 'surface-source-fence', epoch: 1 })
+    const retained = store.retainSnapshot()
+    const owner = nativeSurfaceOwner(store)
+    const epoch = ref(1)
+    const guard = watch(epoch, () => owner.invalidateAdmission(), { flush: 'sync' })
+    owner.ownWatch(watch(epoch, (value) => owner.runWatchCallback(() => {
+      store.switchDocument({ id: 'surface-source-fence', epoch: value }, 'new source')
+    })))
+    owner.handle.pauseOwnedRegistrations()
+    epoch.value = 2
+    expect(store.hasRetainedSnapshotCustody(retained)).toBe(true)
+    expect(() => owner.handle.resumeOwnedRegistrations()).toThrow('editor-native-surface-rearm-authority-stale')
+    expect(store.documentIdentity).toEqual({ id: 'surface-source-fence', epoch: 1 })
+    expect(store.hasRetainedSnapshotCustody(retained)).toBe(true)
+    guard.stop()
+    owner.disposeRegistrations()
+  })
+
   it('completes actual mounted undo model synchronization without a nested retirement callback', async () => {
     let authority: NonNullable<ReturnType<typeof useMarkdownHeavyFeatureDocumentContext>>['documentAuthority']
     const Probe = defineComponent({ setup() {

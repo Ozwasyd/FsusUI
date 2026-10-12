@@ -1246,3 +1246,46 @@ Renderer, DOM, clock, resource or source readers, and never captures or reacquir
 The admission-oriented `validateRetainedSnapshot(snapshot, expected)` remains
 separate and unchanged. The new query introduces no history/body store or ticket
 issuer and grants no resource, full-host recovery or eviction qualification.
+
+### Original native surface registration controls
+
+`getSession(editorSessionRef).getNativeSurfaceResourceHandle()` returns the same
+actual mounted SFC-owned handle, or null for an owner without this capability.
+Import its public `MarkdownEditorNativeSurfaceResourceHandle` and
+`MarkdownEditorNativeSurfaceInspection` types from `@ozwasyd/element-plus`.
+This source is scoped to `native-surface-owned-registrations`.
+
+The original SFC now binds its explicit native template events through a local
+Vue directive that owns each actual node, event name, callback and registration.
+Keyboard/event modifiers and the original Vue component error routing remain.
+Viewport registrations use the same owner. `pauseOwnedRegistrations()` removes
+these actual listeners, pauses the original WatchHandles, disconnects the owned
+ResizeObserver and cancels the original gesture timer/typewriter work. It refuses
+composition or an active callback. `resumeOwnedRegistrations()` rearms these
+actual registrations using the original native authority ticket retained during
+pause; it never reacquires after a native write/retirement or a changed node
+structure. Observer/timer continuations retain original node/generation guards.
+The native snapshot invalidation watch stays active.
+
+Inspection reports actual listener/watch/callback records, observer/timer
+counts, failures and original first/latest causes. A throwing native registration
+operation retains an unknown record: `attachedListeners` becomes null rather
+than zero. Cleanup attempts every owned record, and only a genuine successful
+retry clears that record.
+`retryOwnedCleanup()` remains available on the held original handle after
+retirement, and retries actual cleanup without native capture or rearm authority.
+Rearm failure attempts to detach partial installations
+and re-pause watches before propagating the original cause. An original Vue watch
+job already queued before pause is suppressed; its callback arguments are not
+saved/replayed, and that skipped job closes rearm admission.
+
+`complete:false` and `fullSurfacePaused:false` are fixed. Only
+`ownedRegistrationsPaused` can describe this exact bounded owner. Vue's component
+render effect/scheduler, v-model's internal input/composition/change listeners,
+paused watch dependency subscriptions and queued/async work, the active authority
+guard watch, fallthrough native attrs, child emitters and other directive/Teleport
+lifecycle registrations have no complete reversible port here. They remain
+explicit unsupported boundaries; disabled/readonly is not their detachment.
+The complete session roster still omits `editor-surface`, and full resource,
+disposed restoration and eviction refusals remain. Source controls are UNRUN
+under the existing runtime/native/IME qualification hold.

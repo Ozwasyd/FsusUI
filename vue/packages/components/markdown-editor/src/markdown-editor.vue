@@ -35,13 +35,15 @@
         <input
           ref="searchQueryInputRef"
           v-model="searchQuery"
+          v-session-native-events="{
+          input: handleSearchQueryInput,
+          keydown: handleSearchInputKeydown
+        }"
           type="text"
           :class="ns.e('search-input')"
           :placeholder="localeText.search.find"
           :aria-label="searchUiState.aria.queryAriaLabel"
           data-testid="markdown-search-query"
-          @input="handleSearchQueryInput"
-          @keydown="handleSearchInputKeydown"
         />
         <span
           :class="ns.e('search-count')"
@@ -52,6 +54,9 @@
           {{ searchUiState.statusText }}
         </span>
         <button
+          v-session-native-events="{
+          click: () => (toggleSearchMode('plain-case'))
+        }"
           type="button"
           :class="[
             ns.e('search-toggle'),
@@ -59,11 +64,13 @@
           ]"
           :aria-label="localeText.search.matchCase"
           :title="localeText.search.matchCase"
-          @click="toggleSearchMode('plain-case')"
         >
           Aa
         </button>
         <button
+          v-session-native-events="{
+          click: () => (toggleSearchMode('whole-word'))
+        }"
           type="button"
           :class="[
             ns.e('search-toggle'),
@@ -71,11 +78,13 @@
           ]"
           :aria-label="localeText.search.wholeWord"
           :title="localeText.search.wholeWord"
-          @click="toggleSearchMode('whole-word')"
         >
           &#92;b
         </button>
         <button
+          v-session-native-events="{
+          click: () => (toggleSearchMode('regex'))
+        }"
           type="button"
           :class="[
             ns.e('search-toggle'),
@@ -83,33 +92,39 @@
           ]"
           :aria-label="localeText.search.useRegex"
           :title="localeText.search.useRegex"
-          @click="toggleSearchMode('regex')"
         >
           .*
         </button>
         <button
+          v-session-native-events="{
+          click: () => (searchNavigate('previous'))
+        }"
           type="button"
           :class="ns.e('search-nav')"
           :disabled="!searchMatches.length"
           :aria-label="localeText.search.previousMatch"
           :title="localeText.search.previousMatch"
           data-testid="markdown-search-prev"
-          @click="searchNavigate('previous')"
         >
           ↑
         </button>
         <button
+          v-session-native-events="{
+          click: () => (searchNavigate('next'))
+        }"
           type="button"
           :class="ns.e('search-nav')"
           :disabled="!searchMatches.length"
           :aria-label="localeText.search.nextMatch"
           :title="localeText.search.nextMatch"
           data-testid="markdown-search-next"
-          @click="searchNavigate('next')"
         >
           ↓
         </button>
         <button
+          v-session-native-events="{
+          click: toggleSearchReplace
+        }"
           type="button"
           :class="[
             ns.e('search-toggle'),
@@ -117,17 +132,18 @@
           ]"
           :aria-label="localeText.search.toggleReplace"
           :title="localeText.search.toggleReplace"
-          @click="toggleSearchReplace"
         >
           ⇄
         </button>
         <button
+          v-session-native-events="{
+          click: closeSearch
+        }"
           type="button"
           :class="ns.e('search-close')"
           :aria-label="localeText.search.close"
           :title="localeText.search.close"
           data-testid="markdown-search-close"
-          @click="closeSearch"
         >
           ×
         </button>
@@ -136,28 +152,34 @@
         <input
           ref="searchReplaceInputRef"
           v-model="searchReplaceText"
+          v-session-native-events="{
+          keydown: handleSearchReplaceKeydown
+        }"
           type="text"
           :class="ns.e('search-input')"
           :placeholder="localeText.search.replace"
           :aria-label="searchUiState.aria.replaceAriaLabel"
           data-testid="markdown-search-replace"
-          @keydown="handleSearchReplaceKeydown"
         />
         <button
+          v-session-native-events="{
+          click: searchReplaceCurrent
+        }"
           type="button"
           :class="ns.e('search-action')"
           :disabled="!searchMatches.length || editingBlocked"
           data-testid="markdown-search-replace-current"
-          @click="searchReplaceCurrent"
         >
           {{ localeText.search.replace }}
         </button>
         <button
+          v-session-native-events="{
+          click: searchReplaceAll
+        }"
           type="button"
           :class="ns.e('search-action')"
           :disabled="!searchMatches.length || editingBlocked"
           data-testid="markdown-search-replace-all"
-          @click="searchReplaceAll"
         >
           {{ localeText.search.replaceAll }}
         </button>
@@ -172,13 +194,15 @@
         <button
           v-for="command in primaryCommands"
           :key="command.key"
+          v-session-native-events="{
+          click: () => (activateCommand(command))
+        }"
           type="button"
           :class="ns.e('command')"
           :disabled="isCommandDisabled(command)"
           :aria-describedby="commandDescriptionId(command)"
           :aria-label="commandName(command)"
           :title="commandName(command)"
-          @click="activateCommand(command)"
         >
           {{ commandName(command) }}
         </button>
@@ -196,6 +220,9 @@
         <button
           v-if="overflowItemCount"
           ref="commandOverflowRef"
+          v-session-native-events="{
+          click: toggleCommands
+        }"
           type="button"
           :class="[ns.e('command-more'), ns.is('expanded', commandsExpanded)]"
           :aria-expanded="commandsExpanded"
@@ -203,7 +230,6 @@
           :aria-label="commandOverflowAriaLabel"
           aria-haspopup="true"
           :disabled="editingBlocked"
-          @click="toggleCommands"
         >
           <span>{{ resolvedCommandOverflowLabel }}</span>
           <span :class="ns.e('command-more-count')">{{
@@ -221,6 +247,9 @@
         <button
           v-for="mode in visibleModes"
           :key="mode"
+          v-session-native-events="{
+          click: () => (setMode(mode))
+        }"
           type="button"
           role="tab"
           :aria-selected="currentMode === mode"
@@ -230,7 +259,6 @@
             ns.is('active', currentMode === mode),
           ]"
           :disabled="editingBlocked"
-          @click="setMode(mode)"
         >
           {{ modeLabel(mode) }}
         </button>
@@ -240,10 +268,12 @@
         <button
           v-for="action in primaryActions"
           :key="action.key"
+          v-session-native-events="{
+          click: () => (runAction(action))
+        }"
           type="button"
           :class="ns.e('action')"
           :disabled="editingBlocked"
-          @click="runAction(action)"
         >
           {{ action.label }}
         </button>
@@ -253,29 +283,35 @@
         v-if="overflowItemCount && commandsExpanded"
         :id="commandTrayId"
         ref="commandTrayRef"
+        v-session-native-events="{
+          keydown: withKeys(withModifiers(() => (closeCommandOverflow(true)), ['prevent','stop']), ['esc'])
+        }"
         :class="ns.e('command-tray')"
-        @keydown.esc.prevent.stop="closeCommandOverflow(true)"
       >
         <button
           v-for="command in overflowCommands"
           :key="command.key"
+          v-session-native-events="{
+          click: () => (activateOverflowCommand(command))
+        }"
           type="button"
           :class="ns.e('command')"
           :disabled="isCommandDisabled(command)"
           :aria-describedby="commandDescriptionId(command)"
           :aria-label="commandName(command)"
           :title="commandName(command)"
-          @click="activateOverflowCommand(command)"
         >
           {{ commandName(command) }}
         </button>
         <button
           v-for="action in overflowActions"
           :key="action.key"
+          v-session-native-events="{
+          click: () => (runOverflowAction(action))
+        }"
           type="button"
           :class="[ns.e('command'), ns.e('command-tray-action')]"
           :disabled="editingBlocked"
-          @click="runOverflowAction(action)"
         >
           {{ action.label }}
         </button>
@@ -290,6 +326,9 @@
     </header>
 
     <div
+      v-session-native-events="{
+          scroll: handlePreviewScroll
+        }"
       :class="ns.e('body')"
       data-markdown-scroll-container="body"
       :data-markdown-reveal-state="liveReveal.state"
@@ -298,7 +337,6 @@
       :data-markdown-atomic-status="liveAtomic?.state || undefined"
       :data-markdown-layout-action="liveLayout.action"
       :data-markdown-layout-smooth="liveLayout.smooth ? 'true' : 'false'"
-      @scroll="handlePreviewScroll"
     >
       <pre
         v-if="writingAidsFocusState.enabled"
@@ -317,6 +355,28 @@
       <textarea
         :id="textareaId"
         ref="textareaRef"
+        v-session-native-events="{
+          beforeinput: handleBeforeInput,
+          blur: handleBlur,
+          click: handlePointerReveal,
+          compositionend: handleCompositionEnd,
+          compositionstart: handleCompositionStart,
+          contextmenu: handleTableContextMenu,
+          copy: handleCopy,
+          cut: handleCut,
+          dragover: withModifiers(() => {}, ['prevent']),
+          drop: handleDrop,
+          input: handleInput,
+          keydown: handleKeydown,
+          paste: handlePaste,
+          pointerdown: handleSelectionDragStart,
+          pointerup: handleSelectionDragEnd,
+          scroll: handleLayoutScroll,
+          select: handleSelectionMove,
+          selectionchange: handleSelectionMove,
+          touchmove: handleLayoutTouch,
+          wheel: handleLayoutWheel
+        }"
         :class="ns.e('textarea')"
         :aria-hidden="liveSurface.inputVisible ? undefined : 'true'"
         :aria-label="textareaAriaLabel"
@@ -340,36 +400,18 @@
         :value="isComposing ? nativeCompositionValue : editorValue"
         :spellcheck="!languageSearchPaused && languageCapability.spellcheck"
         :lang="languageCapability.lang || undefined"
-        @beforeinput="handleBeforeInput"
-        @blur="handleBlur"
-        @click="handlePointerReveal"
-        @compositionend="handleCompositionEnd"
-        @compositionstart="handleCompositionStart"
-        @contextmenu="handleTableContextMenu"
-        @copy="handleCopy"
-        @cut="handleCut"
-        @dragover.prevent
-        @drop="handleDrop"
-        @input="handleInput"
-        @keydown="handleKeydown"
-        @paste="handlePaste"
-        @pointerdown="handleSelectionDragStart"
-        @pointerup="handleSelectionDragEnd"
-        @scroll="handleLayoutScroll"
-        @select="handleSelectionMove"
-        @selectionchange="handleSelectionMove"
-        @touchmove="handleLayoutTouch"
-        @wheel="handleLayoutWheel"
       />
 
       <input
         ref="attachmentInputRef"
+        v-session-native-events="{
+          change: handleAttachmentPickerChange
+        }"
         type="file"
         multiple
         :class="ns.e('attachment-picker')"
         tabindex="-1"
         aria-hidden="true"
-        @change="handleAttachmentPickerChange"
       />
 
       <ul
@@ -393,9 +435,11 @@
             <button
               v-for="action in attachment.actions"
               :key="action.key"
+              v-session-native-events="{
+          click: () => (runAttachmentAction(attachment.itemId, action.key))
+        }"
               type="button"
               :disabled="action.disabled"
-              @click="runAttachmentAction(attachment.itemId, action.key)"
             >
               {{ action.label }}
             </button>
@@ -405,9 +449,11 @@
 
       <form
         v-if="activeImage"
+        v-session-native-events="{
+          submit: withModifiers(applyImageProperties, ['prevent'])
+        }"
         :class="ns.e('media-properties')"
         :aria-label="localeText.imageProperties.region"
-        @submit.prevent="applyImageProperties"
       >
         <label>
           <span>{{ localeText.imageProperties.alt }}</span>
@@ -437,48 +483,63 @@
             {{ localeText.imageProperties.apply }}
           </button>
           <button
+            v-session-native-events="{
+          click: revealActiveImageSource
+        }"
             type="button"
             :disabled="editingBlocked"
-            @click="revealActiveImageSource"
           >
             {{ localeText.imageProperties.source }}
           </button>
           <button
+            v-session-native-events="{
+          click: openActiveImage
+        }"
             type="button"
             :disabled="!activeImageOpenAllowed"
-            @click="openActiveImage"
           >
             {{ localeText.imageProperties.open }}
           </button>
-          <button type="button" @click="copyActiveFigure('exact')">
+          <button
+v-session-native-events="{
+          click: () => (copyActiveFigure('exact'))
+        }" type="button">
             {{ localeText.imageProperties.copySource }}
           </button>
           <button
             v-if="activeImage.figure"
+            v-session-native-events="{
+          click: () => (copyActiveFigure('visible'))
+        }"
             type="button"
-            @click="copyActiveFigure('visible')"
           >
             {{ localeText.imageProperties.copyVisible }}
           </button>
           <button
+            v-session-native-events="{
+          click: openActiveImageReplacement
+        }"
             type="button"
             :disabled="editingBlocked"
-            @click="openActiveImageReplacement"
           >
             {{ localeText.imageProperties.replace }}
           </button>
           <button
             v-if="activeImage.figure"
+            v-session-native-events="{
+          click: removeActiveCaption
+        }"
             type="button"
             :disabled="editingBlocked"
-            @click="removeActiveCaption"
           >
             {{ localeText.imageProperties.removeCaption }}
           </button>
           <button
+            v-session-native-events="{
+          click: removeActiveImage
+        }"
             type="button"
             :disabled="editingBlocked"
-            @click="removeActiveImage"
           >
             {{ localeText.imageProperties.removeImage }}
           </button>
@@ -491,13 +552,15 @@
       >
         <button
           ref="tableMenuTriggerRef"
+          v-session-native-events="{
+          click: toggleTableMenu
+        }"
           type="button"
           :class="ns.e('table-menu-trigger')"
           aria-haspopup="menu"
           :aria-controls="tableMenuId"
           :aria-expanded="tableMenuOpen"
           aria-label="表格操作"
-          @click="toggleTableMenu"
         >
           表格操作
         </button>
@@ -505,19 +568,23 @@
           v-if="tableMenuOpen"
           :id="tableMenuId"
           ref="tableMenuRef"
+          v-session-native-events="{
+          keydown: handleTableMenuKeydown
+        }"
           :class="ns.e('table-menu')"
           role="menu"
           aria-label="表格操作"
-          @keydown="handleTableMenuKeydown"
         >
           <button
             v-for="action in tableContextActions"
             :key="action.key"
+            v-session-native-events="{
+          click: () => (runTableContextAction(action.key))
+        }"
             type="button"
             role="menuitem"
             :title="action.title"
             :aria-label="action.title"
-            @click="runTableContextAction(action.key)"
           >
             {{ action.label }}
           </button>
@@ -583,9 +650,11 @@
             <button
               v-for="action in segment.plan.allowedActions"
               :key="action"
+              v-session-native-events="{
+          click: () => (handleEmbedAction(segment, action))
+        }"
               type="button"
               class="el-markdown-embed__action"
-              @click="handleEmbedAction(segment, action)"
             >
               {{ embedActionLabel(action) }}
             </button>
@@ -660,9 +729,11 @@
               <button
                 v-for="action in segment.plan.allowedActions"
                 :key="action"
+                v-session-native-events="{
+          click: () => (handleEmbedAction(segment, action))
+        }"
                 type="button"
                 class="el-markdown-embed__action"
-                @click="handleEmbedAction(segment, action)"
               >
                 {{ embedActionLabel(action) }}
               </button>
@@ -681,26 +752,32 @@
           v-bind="{ 'data-markdown-atomic-actions': '' }"
         >
           <button
+            v-session-native-events="{
+          click: () => (invokeAtomicNodeAction(atomicNode.id, 'caret-before'))
+        }"
             type="button"
             tabindex="-1"
             :aria-label="localeText.atomic.enterBefore(atomicNode.kind)"
-            @click="invokeAtomicNodeAction(atomicNode.id, 'caret-before')"
           >
             {{ localeText.atomic.enterBefore(atomicNode.kind) }}
           </button>
           <button
+            v-session-native-events="{
+          click: () => (invokeAtomicNodeAction(atomicNode.id, 'caret-after'))
+        }"
             type="button"
             tabindex="-1"
             :aria-label="localeText.atomic.enterAfter(atomicNode.kind)"
-            @click="invokeAtomicNodeAction(atomicNode.id, 'caret-after')"
           >
             {{ localeText.atomic.enterAfter(atomicNode.kind) }}
           </button>
           <button
+            v-session-native-events="{
+          click: () => (invokeAtomicNodeAction(atomicNode.id, 'enter-source'))
+        }"
             type="button"
             tabindex="-1"
             :aria-label="localeText.atomic.editSource(atomicNode.kind)"
-            @click="invokeAtomicNodeAction(atomicNode.id, 'enter-source')"
           >
             {{ localeText.atomic.editSource(atomicNode.kind) }}
           </button>
@@ -797,6 +874,9 @@
         selectionToolbarVisible &&
         selectionToolbarCommands.length
       "
+      v-session-native-events="{
+          keydown: withKeys(withModifiers(closeSelectionToolbar, ['prevent','stop']), ['esc'])
+        }"
       :class="ns.e('selection-toolbar')"
       role="toolbar"
       :aria-label="localeText.surfaces.selectionToolbar"
@@ -807,18 +887,19 @@
       :data-markdown-anchor-projection="
         selectionToolbarPlacement.reveal?.reveal.anchorId
       "
-      @keydown.esc.prevent.stop="closeSelectionToolbar"
     >
       <button
         v-for="command in selectionToolbarCommands"
         :key="command.key"
+        v-session-native-events="{
+          click: () => (activateCommand(command))
+        }"
         type="button"
         :class="ns.e('command')"
         :disabled="isCommandDisabled(command)"
         :aria-describedby="commandDescriptionId(command)"
         :aria-label="commandName(command)"
         :title="commandName(command)"
-        @click="activateCommand(command)"
       >
         {{ commandName(command) }}
       </button>
@@ -829,23 +910,27 @@
         surfaceOptions.slashMenu && activeSlashTrigger && slashCommands.length
       "
       :id="slashMenuId"
+      v-session-native-events="{
+          keydown: withKeys(withModifiers(closeSlashMenu, ['prevent','stop']), ['esc'])
+        }"
       :class="ns.e('slash-menu')"
       role="menu"
       :aria-label="localeText.surfaces.slashMenu"
-      @keydown.esc.prevent.stop="closeSlashMenu"
     >
       <button
         v-for="(command, idx) in slashCommands"
         :id="slashItemId(command.key)"
         :key="command.key"
+        v-session-native-events="{
+          click: () => (executeSlashCommand(command)),
+          mouseenter: () => (activeSlashIndex = idx)
+        }"
         type="button"
         role="menuitem"
         :class="[ns.e('command'), ns.is('active', idx === activeSlashIndex)]"
         :disabled="isCommandDisabled(command)"
         :aria-describedby="commandDescriptionId(command)"
         :aria-label="commandName(command)"
-        @click="executeSlashCommand(command)"
-        @mouseenter="activeSlashIndex = idx"
       >
         {{ commandName(command) }}
       </button>
@@ -854,13 +939,15 @@
     <form
       v-if="contextualSurface === 'link-properties' && activeLink"
       ref="contextualSurfaceRef"
+      v-session-native-events="{
+          submit: withModifiers(applyLinkProperties, ['prevent']),
+          keydown: withKeys(withModifiers(() => (closeContextualSurface()), ['prevent','stop']), ['esc'])
+        }"
       :class="ns.e('property-surface')"
       role="dialog"
       :aria-label="localeText.contextual.editLink"
       :data-markdown-anchor-id="activeLinkNodeId"
       :data-markdown-anchor-epoch="documentIdentity.epoch"
-      @submit.prevent="applyLinkProperties"
-      @keydown.esc.prevent.stop="closeContextualSurface()"
     >
       <label :class="ns.e('property-field')">
         <span>{{ localeText.contextual.label }}</span>
@@ -883,19 +970,34 @@
       <p v-if="contextualError" role="alert">{{ contextualError }}</p>
       <footer :class="ns.e('property-actions')">
         <button type="submit">{{ localeText.contextual.apply }}</button>
-        <button v-if="activeLink.url" type="button" @click="openActiveLink">
+        <button
+v-if="activeLink.url" v-session-native-events="{
+          click: openActiveLink
+        }" type="button">
           {{ localeText.contextual.open }}
         </button>
-        <button type="button" @click="copyActiveLink">
+        <button
+v-session-native-events="{
+          click: copyActiveLink
+        }" type="button">
           {{ localeText.contextual.copy }}
         </button>
-        <button type="button" @click="revealActiveLink">
+        <button
+v-session-native-events="{
+          click: revealActiveLink
+        }" type="button">
           {{ localeText.contextual.sourceReveal }}
         </button>
-        <button type="button" @click="removeActiveLink">
+        <button
+v-session-native-events="{
+          click: removeActiveLink
+        }" type="button">
           {{ localeText.contextual.removeLink }}
         </button>
-        <button type="button" @click="closeContextualSurface()">
+        <button
+v-session-native-events="{
+          click: () => (closeContextualSurface())
+        }" type="button">
           {{ localeText.contextual.cancel }}
         </button>
       </footer>
@@ -904,6 +1006,10 @@
     <form
       v-else-if="contextualSurface === 'anchor-properties'"
       ref="contextualSurfaceRef"
+      v-session-native-events="{
+          submit: withModifiers(applyAnchorProperties, ['prevent']),
+          keydown: withKeys(withModifiers(() => (closeContextualSurface()), ['prevent','stop']), ['esc'])
+        }"
       :class="ns.e('property-surface')"
       role="dialog"
       :aria-label="
@@ -913,8 +1019,6 @@
       "
       :data-markdown-anchor-id="activeAnchorNodeId"
       :data-markdown-anchor-epoch="documentIdentity.epoch"
-      @submit.prevent="applyAnchorProperties"
-      @keydown.esc.prevent.stop="closeContextualSurface()"
     >
       <label :class="ns.e('property-field')">
         <span>{{ localeText.contextual.anchorId }}</span>
@@ -929,13 +1033,22 @@
       <p v-if="contextualError" role="alert">{{ contextualError }}</p>
       <footer :class="ns.e('property-actions')">
         <button type="submit">{{ localeText.contextual.apply }}</button>
-        <button v-if="activeAnchor" type="button" @click="copyActiveAnchor">
+        <button
+v-if="activeAnchor" v-session-native-events="{
+          click: copyActiveAnchor
+        }" type="button">
           {{ localeText.contextual.copy }}
         </button>
-        <button v-if="activeAnchor" type="button" @click="removeActiveAnchor">
+        <button
+v-if="activeAnchor" v-session-native-events="{
+          click: removeActiveAnchor
+        }" type="button">
           {{ localeText.contextual.removeAnchor }}
         </button>
-        <button type="button" @click="closeContextualSurface()">
+        <button
+v-session-native-events="{
+          click: () => (closeContextualSurface())
+        }" type="button">
           {{ localeText.contextual.cancel }}
         </button>
       </footer>
@@ -944,16 +1057,20 @@
     <Teleport to="body">
       <div
         v-if="surfaceOptions.commandPalette && commandPaletteOpen"
+        v-session-native-events="{
+          mousedown: withModifiers(closeCommandPalette, ['self','prevent'])
+        }"
         :class="ns.e('palette-backdrop')"
         :dir="commandPaletteDirection"
-        @mousedown.self.prevent="closeCommandPalette"
       >
         <section
+          v-session-native-events="{
+          keydown: handleCommandPaletteKeydown
+        }"
           :class="ns.e('palette-dialog')"
           role="dialog"
           aria-modal="true"
           :aria-label="localeText.commandPalette.title"
-          @keydown="handleCommandPaletteKeydown"
         >
           <label
             :for="`${paletteListId}-search`"
@@ -965,6 +1082,9 @@
             :id="`${paletteListId}-search`"
             ref="commandPaletteInputRef"
             v-model="paletteQuery"
+            v-session-native-events="{
+          keydown: [withKeys(withModifiers(selectNextPaletteItem, ['prevent']), ['down']), withKeys(withModifiers(selectPreviousPaletteItem, ['prevent']), ['up']), withKeys(executeActivePaletteItem, ['enter'])]
+        }"
             type="text"
             :class="ns.e('palette-input')"
             :aria-label="localeText.commandPalette.searchPlaceholder"
@@ -978,9 +1098,6 @@
                 ? paletteItemId(activePaletteCommand.key)
                 : undefined
             "
-            @keydown.down.prevent="selectNextPaletteItem"
-            @keydown.up.prevent="selectPreviousPaletteItem"
-            @keydown.enter="executeActivePaletteItem"
           />
           <div :id="paletteListId" :class="ns.e('palette-list')" role="listbox">
             <div
@@ -997,6 +1114,9 @@
                 v-for="item in group.commands"
                 :id="paletteItemId(item.key)"
                 :key="item.key"
+                v-session-native-events="{
+          click: () => (executePaletteCommand(item.command))
+        }"
                 type="button"
                 :class="[
                   ns.e('palette-item'),
@@ -1011,7 +1131,6 @@
                 "
                 :aria-describedby="commandDescriptionId(item.command)"
                 :disabled="isCommandDisabled(item.command)"
-                @click="executePaletteCommand(item.command)"
               >
                 <span>{{ commandName(item.command) }}</span>
                 <kbd v-if="item.shortcut">{{ item.shortcut }}</kbd>
@@ -1029,17 +1148,21 @@
 
       <div
         v-if="pasteAsMarkdownSession"
+        v-session-native-events="{
+          mousedown: withModifiers(() => {}, ['self','prevent'])
+        }"
         :class="ns.e('paste-backdrop')"
-        @mousedown.self.prevent
       >
         <section
           ref="pasteAsMarkdownDialogRef"
+          v-session-native-events="{
+          keydown: handlePasteAsMarkdownDialogKeydown
+        }"
           :class="ns.e('paste-dialog')"
           role="dialog"
           aria-modal="true"
           :aria-labelledby="pasteAsMarkdownTitleId"
           :aria-describedby="pasteAsMarkdownHelpId"
-          @keydown="handlePasteAsMarkdownDialogKeydown"
         >
           <header :class="ns.e('paste-header')">
             <h2 :id="pasteAsMarkdownTitleId">
@@ -1104,19 +1227,26 @@
 
           <footer :class="ns.e('paste-actions')">
             <button
+              v-session-native-events="{
+          click: () => (confirmPasteAsMarkdownChoice('plain-text'))
+        }"
               type="button"
-              @click="confirmPasteAsMarkdownChoice('plain-text')"
             >
               {{ localeText.pasteAsMarkdown.pastePlainText }}
             </button>
             <button
               ref="pasteAsMarkdownPrimaryActionRef"
+              v-session-native-events="{
+          click: () => (confirmPasteAsMarkdownChoice('markdown-import'))
+        }"
               type="button"
-              @click="confirmPasteAsMarkdownChoice('markdown-import')"
             >
               {{ localeText.pasteAsMarkdown.importMarkdown }}
             </button>
-            <button type="button" @click="cancelPasteAsMarkdownSurface">
+            <button
+v-session-native-events="{
+          click: cancelPasteAsMarkdownSurface
+        }" type="button">
               {{ localeText.pasteAsMarkdown.cancel }}
             </button>
           </footer>
@@ -1138,6 +1268,8 @@ import {
   useAttrs,
   useId,
   watch,
+  withKeys,
+  withModifiers,
 } from 'vue'
 import { ElMarkdownRenderer } from '@element-plus/components/markdown-renderer'
 import { CHANGE_EVENT, UPDATE_MODEL_EVENT } from '@element-plus/constants'
@@ -1333,6 +1465,7 @@ import { createMarkdownAttachmentEmbedResourceOwner } from './markdown-editor-at
 import { createMarkdownEditorSessionCommandResources, isMarkdownEditorSessionOwnedCommand } from './markdown-editor-session-command-resources'
 import type { MarkdownRendererCheckpointHandle, MarkdownRendererLastValidRender, createMarkdownRendererSessionResourceOwner } from '../../markdown-renderer/src/markdown-renderer-session-resources'
 import { createMarkdownEditorSessionLayoutResources } from './markdown-editor-session-layout'
+import { createMarkdownEditorNativeSurfaceResources } from './markdown-editor-native-surface-resources'
 import { createMarkdownEditorFrameResourceParticipant } from './markdown-editor-session-resources'
 import type { MarkdownEditorSessionResourceParticipant } from './markdown-editor-session-resources'
 import {
@@ -1399,6 +1532,7 @@ const ns = useNamespace('markdown-editor')
 const attrs = useAttrs()
 const rootElementRef = ref<HTMLElement | null>(null)
 const sessionSurfacePaused = ref(false)
+let invalidateNativeSurfacePublication: (() => void) | undefined = undefined
 let sessionDisposed = false
 let retireSnapshotPublicationAuthority: (() => void) | undefined = undefined
 let sessionUnmountFailed = false
@@ -1530,6 +1664,17 @@ provideMarkdownHeavyFeatureDocumentContext(Object.freeze({
   revision: () => transactionStore.revision,
   documentAuthority,
 }))
+const nativeSurfaceResources = createMarkdownEditorNativeSurfaceResources({
+  documentAuthority, unavailable: () => sessionDisposed || !rootElementRef.value?.isConnected,
+  composing: () => isComposing.value || nativeMachine.composing,
+  invalidatePublication: () => invalidateNativeSurfacePublication?.(),
+  pauseImperative: () => pauseNativeSurfaceImperative(),
+  resumeImperative: () => resumeNativeSurfaceImperative(),
+  inspectImperative: () => ({ resizeObservers: typewriterObserverUnknown ? null : Number(typewriterResizeObserver !== undefined),
+    layoutGestureTimers: Number(layoutGestureTimer !== undefined) }),
+})
+const vSessionNativeEvents = nativeSurfaceResources.directive
+
 const editorRevision = ref(transactionStore.revision)
 const editorSelection = ref(transactionStore.selection)
 const editorValue = ref(transactionStore.value)
@@ -1671,9 +1816,11 @@ const attachmentPauseRequested = ref(false)
 // bound/invoked; replacing props or completing a job cannot prove it released
 // resources. Only a real consumer resource owner may lift this limitation.
 const opaqueAttachmentResourcesObserved = ref(Boolean(props.embedProvider || props.attachmentDispatch))
-watch([() => props.embedProvider, () => props.attachmentDispatch], (providers) => {
+nativeSurfaceResources.ownWatch(watch([() => props.embedProvider, () => props.attachmentDispatch],
+  (providers) => nativeSurfaceResources.runWatchCallback(() => {
   if (providers.some(Boolean)) opaqueAttachmentResourcesObserved.value = true
-}, { flush: 'sync' })
+}),
+  { flush: 'sync' }))
 const attachmentJobs = ref<MarkdownAttachmentJob[]>([])
 const attachmentBatches = new Map<
   string,
@@ -2001,8 +2148,7 @@ const imageDestinationDraft = ref('')
 const imageTitleDraft = ref('')
 const imageCaptionDraft = ref('')
 const imagePropertyError = ref('')
-watch(
-  () => {
+nativeSurfaceResources.ownWatch(watch(() => {
     const active = activeImage.value
     if (!active) return null
     return [
@@ -2013,16 +2159,15 @@ watch(
       active.figure?.text ?? '',
     ].join('\u0000')
   },
-  () => {
+  () => nativeSurfaceResources.runWatchCallback(() => {
     const active = activeImage.value
     imageAltDraft.value = active?.image.alt.value ?? ''
     imageDestinationDraft.value = active?.image.destination.value ?? ''
     imageTitleDraft.value = active?.image.title?.value ?? ''
     imageCaptionDraft.value = active?.figure?.text ?? ''
     imagePropertyError.value = ''
-  },
-  { immediate: true },
-)
+  }),
+  { immediate: true }))
 const activeImageUrlValidation = computed(() => {
   const active = activeImage.value
   if (!active) return null
@@ -2308,10 +2453,14 @@ const markLayoutGesture = (gesture: MarkdownLiveLayoutGesture) => {
   layoutGesture.value = gesture
   applyLiveLayout('block-height-change', { gesture })
   if (layoutGestureTimer) clearTimeout(layoutGestureTimer)
-  layoutGestureTimer = setTimeout(() => {
+  const generation = nativeSurfaceImperativeGeneration
+  const timer: ReturnType<typeof setTimeout> = setTimeout(() => {
+    if (sessionDisposed || sessionSurfacePaused.value || generation !== nativeSurfaceImperativeGeneration ||
+      layoutGestureTimer !== timer) return
     layoutGestureTimer = undefined
-    layoutGesture.value = null
+    nativeSurfaceResources.runImperativeCallback(() => { layoutGesture.value = null })
   }, 200)
+  layoutGestureTimer = timer
 }
 const suspendTypewriterForUserScroll = () => {
   typewriterScrollTarget = null
@@ -2569,7 +2718,9 @@ const commandResources = createMarkdownEditorSessionCommandResources(() => ({
   disposed: sessionDisposed,
   commands: props.commands,
 }), isMarkdownEditorSessionOwnedCommand)
-watch(() => props.commands, commandResources.observeConfiguredCommands, { flush: 'sync' })
+nativeSurfaceResources.ownWatch(watch(() => props.commands,
+  () => nativeSurfaceResources.runWatchCallback(() => commandResources.observeConfiguredCommands()),
+  { flush: 'sync' }))
 const commandRuntimeStates = ref(
   new Map<string, MarkdownEditorCommandRuntimeState>(),
 )
@@ -3217,24 +3368,19 @@ const dispatchReplacement = (
   })
 }
 
-watch(
-  [() => props.mode, () => props.defaultMode, () => props.mobileLayout],
-  ([mode, defaultMode]) => {
+nativeSurfaceResources.ownWatch(watch([() => props.mode, () => props.defaultMode, () => props.mobileLayout],
+  ([mode, defaultMode]) => nativeSurfaceResources.runWatchCallback(() => {
     transactionStore.breakMergeGroup()
     currentMode.value = normalizeModeForLayout(mode ?? defaultMode)
     refreshWritingAidsDocument()
     syncLanguageToolsState()
-  },
-)
+  })))
 
-watch(
-  [() => props.lang, () => props.nativeWritingTools, () => props.spellcheck],
-  () => syncLanguageToolsState(),
-)
+nativeSurfaceResources.ownWatch(watch([() => props.lang, () => props.nativeWritingTools, () => props.spellcheck],
+  () => nativeSurfaceResources.runWatchCallback(() => syncLanguageToolsState())))
 
-watch(
-  () => props.modelValue,
-  (value) => {
+nativeSurfaceResources.ownWatch(watch(() => props.modelValue,
+  (value) => nativeSurfaceResources.runWatchCallback(() => {
     if (value === transactionStore.value) return
 
     abortPendingCommands()
@@ -3283,20 +3429,17 @@ watch(
       currentTableCell.value = null
       tableMenuOpen.value = false
     }
-  },
-)
+  })))
 
-watch(
-  [
+nativeSurfaceResources.ownWatch(watch([
     () => props.writingAids,
     () => props.editorProfile,
     () => props.focusExemptions,
     () => props.readonly,
     () => props.disabled,
   ],
-  () => refreshWritingAidsDocument(),
-  { deep: true },
-)
+  () => nativeSurfaceResources.runWatchCallback(() => refreshWritingAidsDocument()),
+  { deep: true }))
 
 const metricsSession = createMarkdownEditorMetricsSession(props.metrics)
 let metricsSource = editorValue.value
@@ -3307,14 +3450,13 @@ const editorMetrics = ref(
     selection: editorSelection.value,
   }),
 )
-watch(
-  [
+nativeSurfaceResources.ownWatch(watch([
     editorValue,
     editorSelection,
     () => props.metrics,
     () => props.statusDensity,
   ],
-  ([value, selection, options, density]) => {
+  ([value, selection, options, density]) => nativeSurfaceResources.runWatchCallback(() => {
     const change =
       pendingMetricsChange ??
       deriveMarkdownEditorChange(metricsSource, value) ?? {
@@ -3330,9 +3472,8 @@ watch(
       includeBytes: density === 'detailed',
       selection,
     })
-  },
-  { deep: true },
-)
+  }),
+  { deep: true }))
 
 const liveCapabilities = computed(() => [
   liveSurface.value.capability.capability,
@@ -3891,7 +4032,8 @@ const isCommandDisabled = (command: MarkdownEditorCommand) => {
       (Boolean(pasteAsMarkdownGate.value) || pasteAsMarkdownBusy.value))
   )
 }
-watch(slashCommands, (commands) => {
+nativeSurfaceResources.ownWatch(watch(slashCommands,
+  (commands) => nativeSurfaceResources.runWatchCallback(() => {
   if (!commands.length) {
     activeSlashIndex.value = 0
     return
@@ -3903,8 +4045,9 @@ watch(slashCommands, (commands) => {
     activeSlashIndex.value = 0
     if (isCommandDisabled(commands[0]!)) moveSlashIndex(1)
   }
-})
-watch(paletteCommands, (commands) => {
+})))
+nativeSurfaceResources.ownWatch(watch(paletteCommands,
+  (commands) => nativeSurfaceResources.runWatchCallback(() => {
   if (!commands.length) {
     activePaletteIndex.value = 0
     return
@@ -3916,7 +4059,7 @@ watch(paletteCommands, (commands) => {
     activePaletteIndex.value = 0
     if (isCommandDisabled(commands[0]!)) movePaletteIndex(1)
   }
-})
+})))
 const commandStateId = (key: string) =>
   `${commandTrayId}-command-state-${key.replace(/[^a-zA-Z0-9_-]/gu, '-')}`
 const commandStateText = (item: MarkdownEditorCommandSnapshotItem) => {
@@ -3987,7 +4130,8 @@ const overflowActions = computed(() =>
 const overflowItemCount = computed(
   () => overflowCommands.value.length + overflowActions.value.length,
 )
-watch([editingBlocked, overflowItemCount], ([blocked, itemCount]) => {
+nativeSurfaceResources.ownWatch(watch([editingBlocked, overflowItemCount],
+  ([blocked, itemCount]) => nativeSurfaceResources.runWatchCallback(() => {
   if (blocked || !itemCount) commandsExpanded.value = false
   if (!blocked) return
 
@@ -4004,10 +4148,9 @@ watch([editingBlocked, overflowItemCount], ([blocked, itemCount]) => {
     pendingInputOrigin = undefined
     triggerRef(editorValue)
   }
-})
-watch(
-  [() => props.documentIdentity?.id, () => props.documentIdentity?.epoch],
-  ([id, epoch], [previousId, previousEpoch]) => {
+})))
+nativeSurfaceResources.ownWatch(watch([() => props.documentIdentity?.id, () => props.documentIdentity?.epoch],
+  ([id, epoch], [previousId, previousEpoch]) => nativeSurfaceResources.runWatchCallback(() => {
     const nextId = id ?? commandTrayId
     const nextEpoch = epoch ?? 0
     if (nextId === previousId && nextEpoch === previousEpoch) return
@@ -4063,8 +4206,7 @@ watch(
     if (!historiesEqual(previousHistory, result.history)) {
       emit('history-change', result.history)
     }
-  },
-)
+  })))
 const resolvedCommandOverflowLabel = computed(
   () => props.commandOverflowLabel ?? localeText.value.overflow,
 )
@@ -4098,9 +4240,17 @@ const updateVisualViewportHeight = () => {
 }
 
 let typewriterResizeObserver: ResizeObserver | undefined
-const refreshTypewriterResizeObserver = () => {
-  typewriterResizeObserver?.disconnect()
+let typewriterObserverUnknown = false
+let nativeSurfaceImperativeGeneration = 0
+const disconnectTypewriterObserver = () => {
+  if (!typewriterResizeObserver) return
+  typewriterObserverUnknown = true
+  typewriterResizeObserver.disconnect()
   typewriterResizeObserver = undefined
+  typewriterObserverUnknown = false
+}
+const refreshTypewriterResizeObserver = () => {
+  disconnectTypewriterObserver()
   const textarea = textareaRef.value
   if (
     sessionSurfacePaused.value ||
@@ -4111,13 +4261,20 @@ const refreshTypewriterResizeObserver = () => {
     return
   textareaLayoutHeight = textarea.clientHeight
   textareaLayoutWidth = textarea.clientWidth
+  const generation = nativeSurfaceImperativeGeneration
   typewriterResizeObserver = new ResizeObserver(() => {
-    textareaLayoutHeight = textarea.clientHeight
-    textareaLayoutWidth = textarea.clientWidth
-    applyTypewriterScroll('async-layout')
-    settleTypewriterLayout()
+    if (sessionDisposed || sessionSurfacePaused.value || generation !== nativeSurfaceImperativeGeneration ||
+      textareaRef.value !== textarea) return
+    nativeSurfaceResources.runImperativeCallback(() => {
+      textareaLayoutHeight = textarea.clientHeight
+      textareaLayoutWidth = textarea.clientWidth
+      applyTypewriterScroll('async-layout')
+      settleTypewriterLayout()
+    })
   })
+  typewriterObserverUnknown = true
   typewriterResizeObserver.observe(textarea)
+  typewriterObserverUnknown = false
 
   frameScheduler.schedule({
     key: 'visual-viewport-read',
@@ -4146,20 +4303,26 @@ const refreshTypewriterResizeObserver = () => {
 
 let viewportListenersAttached = false
 let ownedVisualViewport: VisualViewport | null = null
+let ownedViewportWindow: Window | null = null
 const attachViewportListeners = () => {
   if (viewportListenersAttached || sessionSurfacePaused.value || typeof window === 'undefined') return
   ownedVisualViewport = window.visualViewport
-  ownedVisualViewport?.addEventListener('resize', updateVisualViewportHeight)
-  ownedVisualViewport?.addEventListener('scroll', updateVisualViewportHeight)
-  window.addEventListener('resize', updateVisualViewportHeight)
+  ownedViewportWindow = window
+  if (ownedVisualViewport) nativeSurfaceResources.bindTarget(ownedVisualViewport,
+    { resize: updateVisualViewportHeight, scroll: updateVisualViewportHeight }, false)
+  nativeSurfaceResources.bindTarget(ownedViewportWindow, { resize: updateVisualViewportHeight }, false)
   viewportListenersAttached = true
 }
 const detachViewportListeners = () => {
-  if (!viewportListenersAttached || typeof window === 'undefined') return
-  ownedVisualViewport?.removeEventListener('resize', updateVisualViewportHeight)
-  ownedVisualViewport?.removeEventListener('scroll', updateVisualViewportHeight)
-  window.removeEventListener('resize', updateVisualViewportHeight)
+  let failed = false
+  let firstCause: unknown
+  for (const target of [ownedVisualViewport, ownedViewportWindow]) {
+    try { if (target) nativeSurfaceResources.releaseTarget(target, false) }
+    catch (cause) { if (!failed) firstCause = cause; failed = true }
+  }
+  if (failed) throw firstCause
   ownedVisualViewport = null
+  ownedViewportWindow = null
   viewportListenersAttached = false
 }
 
@@ -4227,6 +4390,7 @@ onBeforeUnmount(() => {
       return false
     }
   }
+  attempt(() => nativeSurfaceResources.disposeRegistrations())
   attempt(releaseAttachmentFiles)
   attempt(() => transactionStore.releaseRetainedSnapshot())
   const searchCancelled = attempt(() => languageToolsController?.cancelSearch())
@@ -4243,10 +4407,7 @@ onBeforeUnmount(() => {
     }
   })
   attempt(cancelOwnedTypewriterFrames)
-  attempt(() => {
-    typewriterResizeObserver?.disconnect()
-    typewriterResizeObserver = undefined
-  })
+  attempt(disconnectTypewriterObserver)
   attempt(() => { cssHighlightRegistry()?.delete('markdown-search-match') })
   attempt(() => { cssHighlightRegistry()?.delete('markdown-search-current') })
   attempt(() => attachmentEmbedOwner.abort())
@@ -4254,10 +4415,8 @@ onBeforeUnmount(() => {
   if (sessionUnmountFailed) throw sessionUnmountFirstCause
 })
 
-watch(
-  () => props.writingAids?.typewriter,
-  () => refreshTypewriterResizeObserver(),
-)
+nativeSurfaceResources.ownWatch(watch(() => props.writingAids?.typewriter,
+  () => nativeSurfaceResources.runWatchCallback(() => refreshTypewriterResizeObserver())))
 
 const handleBeforeInput = (event: InputEvent) => {
   syncLanguageToolsState()
@@ -6170,18 +6329,14 @@ attachmentEmbedOwner.bindEmbedInputs(
   () => embedNodes.value,
 )
 
-watch(
-  [editorValue, editorRevision, currentMode],
-  () => {
+nativeSurfaceResources.ownWatch(watch([editorValue, editorRevision, currentMode],
+  () => nativeSurfaceResources.runWatchCallback(() => {
     if (searchUiState.value.open && searchQuery.value) runSearch()
-  },
-)
+  })))
 
-watch(
-  [searchMatches, searchCurrentIndex, () => searchUiState.value.open, currentMode],
-  () => void sessionLayoutResources.afterTick(syncRenderedSearchHighlights),
-  { flush: 'post' },
-)
+nativeSurfaceResources.ownWatch(watch([searchMatches, searchCurrentIndex, () => searchUiState.value.open, currentMode],
+  () => nativeSurfaceResources.runWatchCallback(() => void sessionLayoutResources.afterTick(syncRenderedSearchHighlights)),
+  { flush: 'post' }))
 
 const handleKeydown = (event: KeyboardEvent) => {
   if (event.key === 'Escape' && searchUiState.value.open) {
@@ -6806,9 +6961,35 @@ const revealSourceRange = (
 }
 
 const frameResourceParticipant = createMarkdownEditorFrameResourceParticipant(frameScheduler)
-// This controls imperative resources only. Vue's template/v-model DOM bindings
-// have no reversible subscription owner yet; disabled/readonly does not detach
-// them. Keep this partial owner out of the complete resource roster.
+const pauseNativeSurfaceImperative = () => {
+  nativeSurfaceImperativeGeneration += 1
+  sessionSurfacePaused.value = true
+  restoringSelection = false
+  restoringViewport = false
+  let failed = false
+  let firstCause: unknown
+  const cleanup = [cancelOwnedTypewriterFrames, detachViewportListeners, disconnectTypewriterObserver, () => {
+    if (layoutGestureTimer !== undefined) {
+      clearTimeout(layoutGestureTimer)
+      layoutGestureTimer = undefined
+    }
+  }]
+  for (const run of cleanup) {
+    try { run() } catch (cause) { if (!failed) firstCause = cause; failed = true }
+  }
+  if (failed) throw firstCause
+}
+const resumeNativeSurfaceImperative = () => {
+  nativeSurfaceImperativeGeneration += 1
+  sessionSurfacePaused.value = false
+  attachViewportListeners()
+  refreshTypewriterResizeObserver()
+  updateVisualViewportHeight()
+  refreshLiveWindow('initial')
+}
+// The native handle owns explicit template/viewport registrations and original
+// watch controls. Vue render/v-model/attrs registrations remain unsupported;
+// its real scoped controls do not qualify this complete resource participant.
 const surfaceResourceOwnerComplete = false
 const surfaceResourceParticipant: MarkdownEditorSessionResourceParticipant = {
   ownerRef: 'editor-surface',
@@ -6868,6 +7049,7 @@ const surfaceResourceParticipant: MarkdownEditorSessionResourceParticipant = {
 const sessionBinding = createMarkdownEditorSessionBinding({
   transactionStore,
   documentAuthority,
+  nativeSurfaceResourceHandle: nativeSurfaceResources.handle,
   resourceParticipants: () => [
     frameResourceParticipant, sessionLayoutResources.participant,
     ...(surfaceResourceOwnerComplete ? [surfaceResourceParticipant] : []),
@@ -7156,6 +7338,8 @@ const sessionBinding = createMarkdownEditorSessionBinding({
 })
 
 
+invalidateNativeSurfacePublication = sessionBinding.invalidatePublicationAuthority
+
 retireSnapshotPublicationAuthority = () => {
   let failed = false
   let firstCause: unknown
@@ -7175,7 +7359,10 @@ watch([
   searchReplaceText, searchMatches, searchCurrentIndex, searchMode,
   atomicSession, liveAtomic, contextualSurface, contextualSurfaceEpoch, contextualSurfaceRevision,
   contextualError, linkLabelDraft, linkDestinationDraft, linkTitleDraft, anchorIdDraft,
-], sessionBinding.invalidatePublicationAuthority, { flush: 'sync' })
+], () => {
+  nativeSurfaceResources.invalidateAdmission()
+  sessionBinding.invalidatePublicationAuthority()
+}, { flush: 'sync' })
 
 defineExpose({
   getSession: sessionBinding.getSession,

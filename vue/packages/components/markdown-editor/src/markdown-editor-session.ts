@@ -3,6 +3,7 @@ import { MarkdownEditorTransactionStore } from './markdown-editor-transaction'
 import type { MarkdownEditorSessionPanelCapture, MarkdownEditorSessionPanelRefs, MarkdownEditorSessionPanelState } from './markdown-editor-session-panels'
 import type { MarkdownEditorSessionResourceCensus, MarkdownEditorSessionResourceParticipant } from './markdown-editor-session-resources'
 import type { MarkdownRendererCheckpointHandle } from '../../markdown-renderer/src/markdown-renderer-session-resources'
+import type { MarkdownEditorNativeSurfaceResourceHandle } from './markdown-editor-native-surface-resources'
 import type {
   MarkdownHeavyFeatureDocumentAuthority,
   MarkdownHeavyFeatureDocumentAuthorityTicket,
@@ -142,6 +143,7 @@ export interface MarkdownEditorSession {
   inspectRendererResourceSource(): MarkdownEditorSessionRendererResourceSource | null
   /** Exact original renderer methods/tokens; an unassembled owner returns null. */
   getRendererCheckpointHandle(): MarkdownRendererCheckpointHandle | null
+  getNativeSurfaceResourceHandle(): MarkdownEditorNativeSurfaceResourceHandle | null
   inspectAttachmentResourceSource(): MarkdownEditorSessionAttachmentResourceSource | null
   captureLastValidRender(): MarkdownEditorSessionLastValidRender | null
   restoreLastValidRender(render: MarkdownEditorSessionLastValidRender, expected: {
@@ -201,6 +203,7 @@ export interface MarkdownEditorSessionOwner<ViewState> {
   readonly captureLastValidRender: () => MarkdownEditorSessionLastValidRender | null
   readonly inspectRendererResourceSource?: () => MarkdownEditorSessionRendererResourceSource | null
   readonly getRendererCheckpointHandle?: () => MarkdownRendererCheckpointHandle | null
+  readonly nativeSurfaceResourceHandle?: MarkdownEditorNativeSurfaceResourceHandle
   readonly inspectAttachmentResourceSource?: () => MarkdownEditorSessionAttachmentResourceSource | null
   readonly restoreLastValidRender?: (ref: string) => Promise<MarkdownEditorSessionRenderRestoreProof>
 }
@@ -230,6 +233,7 @@ export const createMarkdownEditorSessionBinding = <ViewState>(
   const transactionStore = owner.transactionStore
   const documentAuthority = owner.documentAuthority ?? null
   const readRendererCheckpointHandle = owner.getRendererCheckpointHandle?.bind(owner)
+  const nativeSurfaceResourceHandle = owner.nativeSurfaceResourceHandle ?? null
   // Pin the original producer implementation, not replaceable consumer methods.
   const validatePreparedTransaction = MarkdownEditorTransactionStore.prototype.validatePreparedRetainedSnapshot.bind(transactionStore)
   const publishPreparedTransaction = MarkdownEditorTransactionStore.prototype.commitPreparedRetainedSnapshot.bind(transactionStore)
@@ -359,6 +363,7 @@ export const createMarkdownEditorSessionBinding = <ViewState>(
           }
         },
         inspectResourceParticipants: () => { assertAvailable(); return resources.inspectParticipants() },
+        getNativeSurfaceResourceHandle() { assertAvailable(); return nativeSurfaceResourceHandle },
         getRendererCheckpointHandle() {
           assertAvailable()
           const id = transactionStore.documentIdentity.id
