@@ -3,7 +3,11 @@ import type {
   MarkdownHeavyFeatureIsolatedRenderHandle,
   MarkdownHeavyFeatureIsolatedRenderRequest,
 } from './markdown-heavy-feature-resource'
-import { hasMarkdownHeavyFeatureOwnedResources } from './markdown-heavy-feature-resource'
+import {
+  createMarkdownHeavyFeatureAdapterResourceOwner,
+  hasMarkdownHeavyFeatureOwnedResources,
+  requestMarkdownHeavyFeatureResourceCancellation,
+} from './markdown-heavy-feature-resource'
 import type {
   MarkdownHeavyFeatureFrameContinueScheduler,
   MarkdownHeavyFeatureTrustedScriptUrlFactory,
@@ -30,7 +34,7 @@ export const createLazyMarkdownHeavyFeatureIsolatedRender = <T>(
     import('./markdown-heavy-feature-isolated-client'),
 ): MarkdownHeavyFeatureIsolatedRenderHandle<T> => {
   let active = true
-  let importPending = true
+  const importOwner = createMarkdownHeavyFeatureAdapterResourceOwner()
   let innerHandle: MarkdownHeavyFeatureIsolatedRenderHandle<T> | null = null
   let removeInnerResourceChange: (() => void) | null = null
   let rejectAbort!: (reason: unknown) => void
@@ -38,6 +42,7 @@ export const createLazyMarkdownHeavyFeatureIsolatedRender = <T>(
   const notifyResourceChange = () => {
     for (const listener of resourceChangeListeners) listener()
   }
+  importOwner.resources.subscribe?.(notifyResourceChange)
   const abortPromise = new Promise<T>((_resolve, reject) => {
     rejectAbort = reject
   })
@@ -52,15 +57,9 @@ export const createLazyMarkdownHeavyFeatureIsolatedRender = <T>(
     }
     notifyResourceChange()
   }
-  let clientPromise: Promise<MarkdownHeavyFeatureIsolatedClient>
-  try {
-    clientPromise = loadClient()
-  } catch (error) {
-    clientPromise = Promise.reject(error)
-  }
+  const clientPromise = importOwner.loadImport(loadClient)
   const loadPromise = clientPromise
     .then((client) => {
-      importPending = false
       if (!active) throw abortError()
       const handle = client.createMarkdownHeavyFeatureIsolatedRender(
         request,
@@ -82,13 +81,15 @@ export const createLazyMarkdownHeavyFeatureIsolatedRender = <T>(
       return handle.promise
     })
     .finally(() => {
-      importPending = false
       notifyResourceChange()
     })
   const resources: MarkdownHeavyFeatureAdapterResources = Object.freeze({
     scope: 'owned-handles',
     get listeners() {
-      return innerHandle?.resources().listeners ?? 0
+      return (
+        importOwner.resources.listeners +
+        (innerHandle?.resources().listeners ?? 0)
+      )
     },
     get observers() {
       return innerHandle?.resources().observers ?? 0
@@ -98,11 +99,12 @@ export const createLazyMarkdownHeavyFeatureIsolatedRender = <T>(
     },
     get networkRequests() {
       // Dynamic imports expose settlement, not an abortable network handle.
-      return 'unknown' as const
+      return importOwner.resources.networkRequests ?? 'unknown'
     },
     get pendingImports() {
       return (
-        (importPending ? 1 : 0) + (innerHandle?.resources().pendingImports ?? 0)
+        (importOwner.resources.pendingImports ?? 0) +
+        (innerHandle?.resources().pendingImports ?? 0)
       )
     },
     get scheduledContinuations() {
@@ -113,16 +115,71 @@ export const createLazyMarkdownHeavyFeatureIsolatedRender = <T>(
       return () => resourceChangeListeners.delete(listener)
     },
     get tasks() {
-      return (importPending ? 1 : 0) + (innerHandle?.resources().tasks ?? 0)
+      return importOwner.resources.tasks + (innerHandle?.resources().tasks ?? 0)
     },
     get timers() {
       // A loader callback/import graph is not a timer ownership boundary.
-      return 'unknown' as const
+      return importOwner.resources.timers ?? 'unknown'
     },
+    get ownedTimers() {
+      return (
+        (importOwner.resources.ownedTimers ?? 0) +
+        (innerHandle?.resources().ownedTimers ?? 0)
+      )
+    },
+    get ownedRequests() {
+      return (
+        (importOwner.resources.ownedRequests ?? 0) +
+        (innerHandle?.resources().ownedRequests ?? 0)
+      )
+    },
+    get pendingRequests() {
+      return (
+        (importOwner.resources.pendingRequests ?? 0) +
+        (innerHandle?.resources().pendingRequests ?? 0)
+      )
+    },
+    get pendingInstallations() {
+      return (
+        (importOwner.resources.pendingInstallations ?? 0) +
+        (innerHandle?.resources().pendingInstallations ?? 0)
+      )
+    },
+    get failures() {
+      return Object.freeze([
+        ...(importOwner.resources.failures ?? []),
+        ...(innerHandle?.resources().failures ?? []),
+      ])
+    },
+    cancelTimers: () =>
+      requestMarkdownHeavyFeatureResourceCancellation(
+        [
+          importOwner.resources,
+          ...(innerHandle ? [innerHandle.resources()] : []),
+        ],
+        'timers',
+      ),
+    cancelRequests: () =>
+      requestMarkdownHeavyFeatureResourceCancellation(
+        [
+          importOwner.resources,
+          ...(innerHandle ? [innerHandle.resources()] : []),
+        ],
+        'requests',
+      ),
+    cancelContinuations: () =>
+      requestMarkdownHeavyFeatureResourceCancellation(
+        [
+          importOwner.resources,
+          ...(innerHandle ? [innerHandle.resources()] : []),
+        ],
+        'continuations',
+      ),
   })
   const teardown = () => {
     if (!active) return
     active = false
+    importOwner.requestCancellation()
     innerHandle?.teardown()
     rejectAbort(abortError())
     onInnerResourceChange()
