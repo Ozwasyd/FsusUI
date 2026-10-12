@@ -544,3 +544,35 @@ Full checkpoint capture must fail while any required owner is absent or cannot
 capture its actual state; a failed capture/release must preserve the last valid
 checkpoint and failure residue. Source/static preparation does not lift runtime,
 native, security, receipt, renderer/restore or fixed-roster qualification holds.
+
+### Selected ordinary-unmount cleanup batch
+
+The existing renderer owner snapshots real timer/frame/abort/watch cleanup and
+the SFC supplies its exact theme/controller/observer/heavy references. Every
+selected action is attempted despite earlier exceptions. The batch rethrows the
+original single error or an AggregateError containing all caught errors after
+completion. Failed handles and original distinct causes remain under
+`diagnostics.cleanupFailures`; they are retained proof/memory, never active job
+counters or native cleanup success receipts.
+
+Timer/RAF records are removed only after native cancellation returns. Keyed-frame
+cancellation and its finalizer are attempted separately; a failed queued handle
+or finalizer stays available for retry. Abort cleanup is owned before registration
+and late installation is cleaned after return. Theme removal uses the original
+retained target, with installation/removal reentry guards. Controller/observer
+fields clear only after their own native call returns. Watch failure cannot skip
+later theme/abort/observer/heavy cleanup. Underlying heavy retired work and unknown
+native state remain exposed.
+
+Disposal closes admission before callbacks. Reentrant disposal cannot recursively
+execute the same batch, and repeated calls select remaining actual resources.
+View reference release is a separate attempt-all phase after selected native
+cleanup returns and known owned residue is empty. Failure preserves original
+projection/checkpoint pins and unresolved jobs. Original errors are retained
+through retry; no failed reference is cleared merely to report zero. A nested
+skip, native call return or heavy-owner disposed flag is not complete cleanup,
+recovery, renderer acceptance or an eviction acknowledgment.
+
+These throw/reentry/retry branches were inspected as source only. Original test
+entry/import/hook and exact-case review are required before fault-injection runs;
+all runtime/test/list/browser/native/worker qualifications remain held.

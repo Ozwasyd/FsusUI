@@ -141,24 +141,58 @@ const heavyLifecycle = createMarkdownHeavyFeatureLifecycle({
 })
 const heavyThemeRevision = ref(0)
 let heavyThemeListenerInstalled = false
+let heavyThemeListenerTarget: HTMLElement | null = null
+let installingHeavyThemeListener = false
+let removingHeavyThemeListener = false
 const handleHeavyFeatureThemeChange = () => {
+  if (rendererResourceOwner.isDisposed()) return
   heavyThemeRevision.value += 1
 }
 const ensureHeavyFeatureThemeListener = () => {
-  if (heavyThemeListenerInstalled) return
-  document.documentElement.addEventListener(
-    'fsus:theme-change',
-    handleHeavyFeatureThemeChange,
-  )
+  if (heavyThemeListenerInstalled || rendererResourceOwner.isDisposed()) return
+  const target = document.documentElement
+  heavyThemeListenerTarget = target
   heavyThemeListenerInstalled = true
+  installingHeavyThemeListener = true
+  let failed = false
+  let failure: unknown
+  try {
+    target.addEventListener('fsus:theme-change', handleHeavyFeatureThemeChange)
+  } catch (error) {
+    failed = true
+    failure = error
+  } finally {
+    installingHeavyThemeListener = false
+  }
+  if (failed || rendererResourceOwner.isDisposed()) {
+    const errors: unknown[] = failed ? [failure] : []
+    try {
+      removeHeavyFeatureThemeListener()
+    } catch (error) {
+      errors.push(error)
+    }
+    if (errors.length === 1) throw errors[0]
+    if (errors.length > 1)
+      throw new AggregateError(errors, 'markdown-renderer-theme-cleanup-failed')
+  }
 }
 const removeHeavyFeatureThemeListener = () => {
-  if (!heavyThemeListenerInstalled) return
-  document.documentElement.removeEventListener(
-    'fsus:theme-change',
-    handleHeavyFeatureThemeChange,
-  )
-  heavyThemeListenerInstalled = false
+  const target = heavyThemeListenerTarget
+  if (!heavyThemeListenerInstalled || !target || removingHeavyThemeListener)
+    return
+  removingHeavyThemeListener = true
+  try {
+    target.removeEventListener(
+      'fsus:theme-change',
+      handleHeavyFeatureThemeChange,
+    )
+    if (!installingHeavyThemeListener && heavyThemeListenerTarget === target) {
+      heavyThemeListenerInstalled = false
+      heavyThemeListenerTarget = null
+    }
+  } finally {
+    removingHeavyThemeListener = false
+  }
 }
 const emit = defineEmits<{
   (event: 'render-complete', result: MarkdownSafeRenderResult): void
@@ -1013,6 +1047,8 @@ const hasEnabledHeavyFeature = (
   (features.mermaid && result.features.includes('mermaid'))
 
 const resetFeatureActivation = () => {
+  if (rendererResourceOwner.isDisposed())
+    throw new Error('markdown-renderer-resource-owner-disposed')
   removeHeavyFeatureThemeListener()
   activationController?.abort()
   activationController = new AbortController()
@@ -1228,6 +1264,7 @@ async function activateChunkFeatures(
   taskId: number,
 ) {
   if (
+    rendererResourceOwner.isDisposed() ||
     taskId !== currentTaskId ||
     activatedChunkKeys.has(key) ||
     !activeChunkResult ||
@@ -1244,6 +1281,7 @@ async function activateChunkFeatures(
 }
 
 function observeChunkForActivation(key: string, element: HTMLElement) {
+  if (rendererResourceOwner.isDisposed()) return
   const taskId = currentTaskId
   if (typeof IntersectionObserver === 'undefined') {
     void activateChunkFeatures(key, element, taskId)
@@ -1616,6 +1654,7 @@ const renderWatchHandle = watch(
     heavyDocumentContext?.revision(),
   ],
   () => {
+    if (rendererResourceOwner.isDisposed()) return
     currentTaskId += 1
     rendererResourceOwner.invalidate()
     heavyLifecycle.pause()
@@ -1633,25 +1672,95 @@ const renderWatchHandle = watch(
 rendererResourceOwner.bindRenderWatchHandle(renderWatchHandle)
 
 onBeforeUnmount(() => {
-  rendererResourceOwner.disposeOnUnmount()
-  removeHeavyFeatureThemeListener()
-  if (debounceTimer !== null) {
-    rendererResourceOwner.clearTimer(debounceTimer)
-    debounceTimer = null
-  }
-  activationController?.abort()
-  activationController = null
-  activationObserver?.disconnect()
-  activationObserver = null
-  activeChunkResult = null
-  renderedContent.value = null
-  chunkUnits.value = []
-  heavyProjectionTrackerPromise = null
-  activatedChunkKeys.clear()
-  chunkActivationElements.clear()
+  const controller = activationController
+  const observer = activationObserver
+  const themeTarget = heavyThemeListenerTarget
+  const timer = debounceTimer
   currentTaskId += 1
-  isRendering.value = false
-  heavyLifecycle.dispose()
+  rendererResourceOwner.disposeOnUnmount(
+    [
+      {
+        phase: 'theme-listener-remove',
+        resource: themeTarget,
+        run: removeHeavyFeatureThemeListener,
+      },
+      {
+        phase: 'activation-controller-abort',
+        resource: controller,
+        run: () => {
+          controller?.abort()
+          if (activationController === controller) activationController = null
+        },
+      },
+      {
+        phase: 'activation-observer-disconnect',
+        resource: observer,
+        run: () => {
+          observer?.disconnect()
+          if (activationObserver === observer) activationObserver = null
+        },
+      },
+      {
+        phase: 'heavy-lifecycle-dispose',
+        resource: heavyLifecycle,
+        run: () => heavyLifecycle.dispose(),
+      },
+    ],
+    [
+      {
+        phase: 'debounce-reference-release',
+        resource: timer,
+        run: () => {
+          if (debounceTimer === timer) debounceTimer = null
+        },
+      },
+      {
+        phase: 'chunk-result-release',
+        resource: activeChunkResult,
+        run: () => {
+          activeChunkResult = null
+        },
+      },
+      {
+        phase: 'rendered-content-release',
+        resource: renderedContent,
+        run: () => {
+          renderedContent.value = null
+        },
+      },
+      {
+        phase: 'chunk-unit-release',
+        resource: chunkUnits,
+        run: () => {
+          chunkUnits.value = []
+        },
+      },
+      {
+        phase: 'tracker-reference-release',
+        resource: heavyProjectionTrackerPromise,
+        run: () => {
+          heavyProjectionTrackerPromise = null
+        },
+      },
+      {
+        phase: 'activated-key-release',
+        resource: activatedChunkKeys,
+        run: () => activatedChunkKeys.clear(),
+      },
+      {
+        phase: 'chunk-element-release',
+        resource: chunkActivationElements,
+        run: () => chunkActivationElements.clear(),
+      },
+      {
+        phase: 'rendering-state-release',
+        resource: isRendering,
+        run: () => {
+          isRendering.value = false
+        },
+      },
+    ],
+  )
 })
 
 defineExpose({

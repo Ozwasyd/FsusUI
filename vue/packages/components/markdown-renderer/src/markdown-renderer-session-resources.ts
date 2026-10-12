@@ -48,6 +48,12 @@ type MarkdownRendererRetainedRender = Readonly<{
   projection: MarkdownRendererRetainedProjection
 }>
 
+export interface MarkdownRendererCleanupAction {
+  readonly phase: string
+  readonly resource: unknown
+  readonly run: () => void
+}
+
 export interface MarkdownRendererRestoreProof {
   readonly ref: string
   readonly status: 'restored' | 'blocked'
@@ -153,6 +159,11 @@ export const createMarkdownRendererSessionResourceOwner = <
   const scheduledFrames = new Map<string, () => void>()
   const jobs = new Set<symbol>()
   const listeners = new Set<() => void>()
+  const installingListeners = new Set<() => void>()
+  const pendingFrameFinalizers = new Map<() => void, () => void>()
+  const cleanupFailures = new Map<string, Map<unknown, Set<unknown>>>()
+  const runningCleanups = new Map<string, Set<unknown>>()
+  let disposingOnUnmount = false
   let generation = 0
   let disposed = false
   let sequence = 0
@@ -171,6 +182,43 @@ export const createMarkdownRendererSessionResourceOwner = <
     readonly state: Readonly<State>
     readonly retainedCollectionEntries: number
   } | null = null
+
+  const runCleanupBatch = (
+    actions: readonly MarkdownRendererCleanupAction[],
+  ) => {
+    const errors: unknown[] = []
+    for (const { phase, resource, run } of actions) {
+      let running = runningCleanups.get(phase)
+      if (running?.has(resource)) continue
+      if (!running) {
+        running = new Set()
+        runningCleanups.set(phase, running)
+      }
+      running.add(resource)
+      try {
+        run()
+      } catch (error) {
+        errors.push(error)
+        let resources = cleanupFailures.get(phase)
+        if (!resources) {
+          resources = new Map()
+          cleanupFailures.set(phase, resources)
+        }
+        let causes = resources.get(resource)
+        if (!causes) {
+          causes = new Set()
+          resources.set(resource, causes)
+        }
+        causes.add(error)
+      } finally {
+        running.delete(resource)
+        if (running.size === 0) runningCleanups.delete(phase)
+      }
+    }
+    if (errors.length === 1) throw errors[0]
+    if (errors.length > 1)
+      throw new AggregateError(errors, 'markdown-renderer-cleanup-batch-failed')
+  }
 
   const sameDocument = (
     a: MarkdownRendererDocumentState,
@@ -272,7 +320,8 @@ export const createMarkdownRendererSessionResourceOwner = <
         jobs.size > 0 ||
         timers.size > 0 ||
         frames.size > 0 ||
-        scheduledFrames.size > 0
+        scheduledFrames.size > 0 ||
+        pendingFrameFinalizers.size > 0
       )
         return null
       const checkpointGeneration = generation
@@ -301,6 +350,7 @@ export const createMarkdownRendererSessionResourceOwner = <
           timers.size > 0 ||
           frames.size > 0 ||
           scheduledFrames.size > 0 ||
+          pendingFrameFinalizers.size > 0 ||
           !sameDocument(capture, current) ||
           capture.revision !== current.revision ||
           projection.html !== render.projection.html ||
@@ -329,19 +379,30 @@ export const createMarkdownRendererSessionResourceOwner = <
       }
     }
   const trackJob = () => {
+    if (disposed) throw new Error('markdown-renderer-resource-owner-disposed')
     const job = Symbol('renderer-job')
     jobs.add(job)
     return () => jobs.delete(job)
   }
   const setTimer = (run: () => void, delay: number) => {
+    if (disposed) throw new Error('markdown-renderer-resource-owner-disposed')
     const handle = setTimeout(() => {
       timers.delete(handle)
       if (!disposed) run()
     }, delay)
     timers.add(handle)
+    if (disposed)
+      runCleanupBatch([
+        {
+          phase: 'late-timer-clear',
+          resource: handle,
+          run: () => clearTimer(handle),
+        },
+      ])
     return handle
   }
   const clearTimer = (handle: ReturnType<typeof setTimeout>) => {
+    if (!timers.has(handle)) return
     clearTimeout(handle)
     timers.delete(handle)
   }
@@ -356,6 +417,7 @@ export const createMarkdownRendererSessionResourceOwner = <
         resolve()
       })
       frames.set(handle, resolve)
+      if (disposed) cancelFrames()
     })
   const scheduleFrame = (
     scheduler: MarkdownEditorFrameScheduler,
@@ -369,41 +431,112 @@ export const createMarkdownRendererSessionResourceOwner = <
     const key = `${options.ownerKey}:${task.key}`
     scheduledFrames.get(key)?.()
     const cancel = () => {
-      scheduler.cancel(key)
-      scheduledFrames.delete(key)
-      onCancel()
+      pendingFrameFinalizers.set(cancel, onCancel)
+      runCleanupBatch([
+        {
+          phase: 'keyed-frame-cancel',
+          resource: cancel,
+          run: () => {
+            scheduler.cancel(key)
+            if (scheduledFrames.get(key) === cancel) scheduledFrames.delete(key)
+          },
+        },
+        {
+          phase: 'keyed-frame-finalize',
+          resource: cancel,
+          run: () => {
+            onCancel()
+            if (pendingFrameFinalizers.get(cancel) === onCancel)
+              pendingFrameFinalizers.delete(cancel)
+          },
+        },
+      ])
     }
     const accepted = scheduler.schedule({
       ...task,
       key,
       postPaint: () => {
-        scheduledFrames.delete(key)
+        if (scheduledFrames.get(key) === cancel) scheduledFrames.delete(key)
         task.postPaint?.()
       },
     })
-    if (accepted) scheduledFrames.set(key, cancel)
-    else onCancel()
+    if (accepted) {
+      scheduledFrames.set(key, cancel)
+      if (disposed) cancel()
+    } else onCancel()
     return accepted
   }
   const cancelFrames = () => {
-    for (const cancel of scheduledFrames.values()) cancel()
-    for (const [handle, resolve] of frames) {
-      cancelAnimationFrame(handle)
-      resolve()
-    }
-    frames.clear()
+    runCleanupBatch([
+      ...[...scheduledFrames.values()].map((cancel) => ({
+        phase: 'owned-keyed-frame',
+        resource: cancel,
+        run: cancel,
+      })),
+      ...[...pendingFrameFinalizers].map(([key, finalize]) => ({
+        phase: 'keyed-frame-finalize',
+        resource: key,
+        run: () => {
+          if (pendingFrameFinalizers.get(key) !== finalize) return
+          finalize()
+          if (pendingFrameFinalizers.get(key) === finalize)
+            pendingFrameFinalizers.delete(key)
+        },
+      })),
+      ...[...frames].map(([handle, resolve]) => ({
+        phase: 'animation-frame-cancel',
+        resource: handle,
+        run: () => {
+          if (frames.get(handle) !== resolve) return
+          cancelAnimationFrame(handle)
+          if (frames.get(handle) === resolve) frames.delete(handle)
+          resolve()
+        },
+      })),
+    ])
   }
   const listenForAbort = (signal: AbortSignal, run: () => void) => {
+    if (disposed) throw new Error('markdown-renderer-resource-owner-disposed')
+    let removing = false
     const remove = () => {
-      signal.removeEventListener('abort', abort)
-      listeners.delete(remove)
+      if (removing || !listeners.has(remove)) return
+      removing = true
+      try {
+        signal.removeEventListener('abort', abort)
+        if (!installingListeners.has(remove)) listeners.delete(remove)
+      } finally {
+        removing = false
+      }
     }
     const abort = () => {
-      remove()
-      run()
+      runCleanupBatch([
+        { phase: 'abort-listener-remove', resource: remove, run: remove },
+        { phase: 'abort-listener-callback', resource: remove, run },
+      ])
     }
-    signal.addEventListener('abort', abort, { once: true })
     listeners.add(remove)
+    installingListeners.add(remove)
+    let setupFailed = false
+    let setupError: unknown
+    try {
+      signal.addEventListener('abort', abort, { once: true })
+    } catch (error) {
+      setupFailed = true
+      setupError = error
+    } finally {
+      installingListeners.delete(remove)
+    }
+    if (disposed || setupFailed)
+      runCleanupBatch([
+        {
+          phase: 'abort-listener-install',
+          resource: remove,
+          run: () => {
+            if (setupFailed) throw setupError
+          },
+        },
+        { phase: 'late-abort-listener-remove', resource: remove, run: remove },
+      ])
     return remove
   }
   const inspectOwnedResources = () => {
@@ -422,6 +555,8 @@ export const createMarkdownRendererSessionResourceOwner = <
     if (renderWatchCleanupFailure) {
       missingSourceDependencies.push('renderer:native-watch-cleanup-settlement')
     }
+    if (cleanupFailures.size > 0)
+      missingSourceDependencies.push('renderer:failed-native-cleanup-proof')
     if (hasUnavailableMarkdownRendererWorkerListenerRegistration(pipeline)) {
       missingSourceDependencies.push(
         'render-pipeline-worker:listener-native-registration-unknown-or-unavailable',
@@ -503,6 +638,9 @@ export const createMarkdownRendererSessionResourceOwner = <
           renderWatchHandleRetained: renderWatchHandle !== null,
           stoppingRenderWatch,
           capturingOwnedCheckpoint: capturingCheckpoint,
+          disposingOnUnmount,
+          installingAbortListeners: installingListeners.size,
+          pendingFrameFinalizers: pendingFrameFinalizers.size,
           // One retained WatchHandle is not the native component effect/queue.
           effectCensus: 'unknown' as const,
           flushJobCensus: 'unknown' as const,
@@ -512,6 +650,13 @@ export const createMarkdownRendererSessionResourceOwner = <
         heavyFeatures: heavy,
       }),
       diagnostics: Object.freeze({
+        cleanupFailures: Object.freeze(
+          [...cleanupFailures].flatMap(([phase, resources]) =>
+            [...resources.values()].map((causes) =>
+              Object.freeze({ phase, causes: Object.freeze([...causes]) }),
+            ),
+          ),
+        ),
         renderWatchCleanupFailure,
         workerCleanupResidue,
         // Preserve the actual retained failure; its cumulative count is not
@@ -584,6 +729,11 @@ export const createMarkdownRendererSessionResourceOwner = <
             jobs.size +
             (stoppingRenderWatch ? 1 : 0) +
             (capturingCheckpoint ? 1 : 0) +
+            [...runningCleanups.values()].reduce(
+              (sum, values) => sum + values.size,
+              0,
+            ) +
+            pendingFrameFinalizers.size +
             frames.size +
             scheduledFrames.size +
             projection.backgroundTasks +
@@ -620,6 +770,17 @@ export const createMarkdownRendererSessionResourceOwner = <
           networkRequests: 0,
           memoryUnits:
             projection.memoryUnits +
+            pendingFrameFinalizers.size +
+            [...cleanupFailures.values()].reduce(
+              (sum, resources) =>
+                sum +
+                resources.size +
+                [...resources.values()].reduce(
+                  (count, causes) => count + causes.size,
+                  0,
+                ),
+              0,
+            ) +
             (renderWatchHandle ? 1 : 0) +
             (renderWatchCleanupFailure ? 1 : 0) +
             (retained ? 1 : 0) +
@@ -670,15 +831,50 @@ export const createMarkdownRendererSessionResourceOwner = <
       throw new Error('markdown-renderer-session-checkpoint-not-recoverable')
     },
   })
-  const disposeOnUnmount = () => {
+  const disposeOnUnmount = (
+    componentActions: readonly MarkdownRendererCleanupAction[] = [],
+    releaseActions: readonly MarkdownRendererCleanupAction[] = [],
+  ) => {
     disposed = true
+    if (disposingOnUnmount) return
+    disposingOnUnmount = true
     generation += 1
-    for (const timer of timers) clearTimeout(timer)
-    timers.clear()
-    cancelFrames()
-    for (const remove of listeners) remove()
-    stopRenderWatch()
-    retained = null
+    try {
+      runCleanupBatch([
+        ...[...timers].map((timer) => ({
+          phase: 'timer-clear',
+          resource: timer,
+          run: () => clearTimer(timer),
+        })),
+        { phase: 'owned-frames', resource: frames, run: cancelFrames },
+        ...[...listeners].map((remove) => ({
+          phase: 'abort-listener-remove',
+          resource: remove,
+          run: remove,
+        })),
+        {
+          phase: 'render-watch-stop',
+          resource: renderWatchHandle,
+          run: stopRenderWatch,
+        },
+        ...componentActions,
+      ])
+      // Release view references only after every selected native cleanup returned.
+      if (
+        timers.size > 0 ||
+        frames.size > 0 ||
+        scheduledFrames.size > 0 ||
+        pendingFrameFinalizers.size > 0 ||
+        listeners.size > 0 ||
+        installingListeners.size > 0 ||
+        renderWatchHandle !== null
+      )
+        throw new Error('markdown-renderer-unmount-cleanup-pending')
+      runCleanupBatch(releaseActions)
+      retained = null
+    } finally {
+      disposingOnUnmount = false
+    }
     // Promises remain in the census until their real finally blocks settle.
   }
   return Object.freeze({
@@ -690,6 +886,7 @@ export const createMarkdownRendererSessionResourceOwner = <
     clearTimer,
     disposeOnUnmount,
     inspectOwnedResources,
+    isDisposed: () => disposed,
     invalidate: () => {
       generation += 1
       cancelFrames()
