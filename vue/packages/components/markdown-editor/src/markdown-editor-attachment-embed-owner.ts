@@ -264,6 +264,7 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
     )
       return
     consumerRequests.add(returned)
+    const records: ConsumerEntry['unknownFields'] = []
     for (const field of ['result', 'settled'] as const) {
       let work: unknown
       let property: PropertyDescriptor | undefined
@@ -299,12 +300,20 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
         ...(accessFailed ? { cause: accessCause } : {}),
       }
       entry.unknownFields.push(record)
+      records.push(record)
+    }
+    // Register all captured references before any thenable can run observation code.
+    for (const { work, reason } of records) {
       if (reason) continue
       if (
         (typeof work === 'object' && work !== null) ||
         typeof work === 'function'
       )
         consumerFutures.add(work as object)
+    }
+    for (const record of records) {
+      if (record.reason) continue
+      const work = record.work
       try {
         if (!consumerControl(() => consumerFuture(work))) {
           record.reason = 'consumer-field-future-unavailable'
