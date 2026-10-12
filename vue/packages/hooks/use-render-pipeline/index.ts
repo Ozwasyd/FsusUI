@@ -3058,7 +3058,9 @@ export const useFsusVirtualWindow = <TUnit>(options: {
     ).finally(producerAuthority.boundary(() => viewportJobs.delete(job)))
   }
   let resizeObserver: ResizeObserver | null = null
-  const refGenerations = new Map<string, object>()
+  type RefToken = { key: string; elements: Set<Element>; inFlight: number }
+  const refGenerations = new Map<string, RefToken>()
+  const refTokens = new Set<RefToken>()
   type ResizeTarget = {
     element: Element
     observing: number
@@ -3068,6 +3070,7 @@ export const useFsusVirtualWindow = <TUnit>(options: {
   }
   type ResizeBinding = {
     observer: ResizeObserver | null
+    constructionTarget: Element | null
     targets: Set<Element>
     targetStates: Map<Element, ResizeTarget>
     registering: boolean
@@ -3372,6 +3375,45 @@ export const useFsusVirtualWindow = <TUnit>(options: {
     }
   }
 
+  const pruneRefTokens = () => {
+    // Native calls can reenter before their late cleanup finishes. Retain those
+    // actual obligations; only quiescent, identity-matched records are removed.
+    if (
+      [...resizeBindings].some(
+        (binding) =>
+          binding.registering || binding.operations > 0 || binding.releasing,
+      )
+    )
+      return
+    const obligated = (element: Element) =>
+      [...resizeBindings].some((binding) => {
+        if (binding.retired && binding.constructionTarget === element)
+          return true
+        const target = binding.targetStates.get(element)
+        return (
+          !!target &&
+          (binding.retired ||
+            target.retired ||
+            target.observing > 0 ||
+            target.releasing ||
+            target.deferredObserve)
+        )
+      })
+    for (const token of [...refTokens]) {
+      if (token.inFlight > 0) continue
+      const current = refGenerations.get(token.key) === token
+      const desired = current
+        ? variableState?.observedElements.get(token.key)
+        : undefined
+      for (const element of token.elements)
+        if (element !== desired && !obligated(element))
+          token.elements.delete(element)
+      if (desired || [...token.elements].some(obligated)) continue
+      if (refGenerations.get(token.key) === token)
+        refGenerations.delete(token.key)
+      refTokens.delete(token)
+    }
+  }
   const reconcileObservedTargets = () => {
     observedTargets.clear()
     for (const binding of resizeBindings)
@@ -3399,6 +3441,7 @@ export const useFsusVirtualWindow = <TUnit>(options: {
       reconcileObservedTargets()
     } finally {
       binding.releasing = false
+      pruneRefTokens()
     }
   }
   const releaseResizeTarget = (
@@ -3432,6 +3475,7 @@ export const useFsusVirtualWindow = <TUnit>(options: {
     } finally {
       binding.operations -= 1
       target.releasing = false
+      pruneRefTokens()
     }
     // A genuine replacement observe during unobserve waits until the old call
     // returns; it cannot be erased by that late unobserve's native side effect.
@@ -3491,6 +3535,7 @@ export const useFsusVirtualWindow = <TUnit>(options: {
         failed = true
       }
     }
+    pruneRefTokens()
     if (failed) throw firstCause
   }
   const unobserveElement = (element: Element, current: () => boolean) => {
@@ -3566,6 +3611,7 @@ export const useFsusVirtualWindow = <TUnit>(options: {
       const observerEpoch = ++observerGeneration
       const binding: ResizeBinding = {
         observer: null,
+        constructionTarget: element,
         targets: new Set(),
         targetStates: new Map(),
         registering: true,
@@ -3684,7 +3730,10 @@ export const useFsusVirtualWindow = <TUnit>(options: {
           if (!failed) firstCause = cause
           failed = true
         }
-      } else if (binding.observer) resizeObserver = binding.observer
+      } else if (binding.observer) {
+        resizeObserver = binding.observer
+        binding.constructionTarget = null
+      }
       if (failed) throw firstCause
     }
     const binding = resizeBinding
@@ -3749,47 +3798,55 @@ export const useFsusVirtualWindow = <TUnit>(options: {
     const previousElement = variableState.observedElements.get(key)
     if (previousElement === element || (!previousElement && element === null))
       return
-    const refs = {}
+    const refs: RefToken = { key, elements: new Set<Element>(), inFlight: 1 }
+    if (previousElement) refs.elements.add(previousElement)
+    if (element) refs.elements.add(element)
+    refTokens.add(refs)
     refGenerations.set(key, refs)
-    const control = generation,
-      input = inputGeneration,
-      units = unitsGeneration
-    const current = () =>
-      !disposed && refs === refGenerations.get(key) && control === generation
-    variableState.pendingMeasurements.delete(key)
-    if (previousElement) {
-      unobserveElement(previousElement, current)
+    try {
+      const control = generation,
+        input = inputGeneration,
+        units = unitsGeneration
+      const current = () =>
+        !disposed && refs === refGenerations.get(key) && control === generation
+      variableState.pendingMeasurements.delete(key)
+      if (previousElement) {
+        unobserveElement(previousElement, current)
+        if (
+          !current() ||
+          variableState.observedElements.get(key) !== previousElement
+        )
+          return
+        variableState.elementKeys.delete(previousElement)
+        variableState.observedElements.delete(key)
+      }
       if (
         !current() ||
-        variableState.observedElements.get(key) !== previousElement
+        !(element instanceof HTMLElement) ||
+        !variableState.keyToIndex.has(key)
       )
         return
-      variableState.elementKeys.delete(previousElement)
-      variableState.observedElements.delete(key)
+      const previousKey = variableState.elementKeys.get(element)
+      if (previousKey && previousKey !== key) {
+        variableState.observedElements.delete(previousKey)
+        variableState.pendingMeasurements.delete(previousKey)
+      }
+      variableState.observedElements.set(key, element)
+      variableState.elementKeys.set(element, key)
+      const height = element.offsetHeight
+      if (!current() || variableState.observedElements.get(key) !== element)
+        return
+      if (input === inputGeneration && units === unitsGeneration)
+        queueMeasurement(key, height)
+      if (!current() || variableState.observedElements.get(key) !== element)
+        return
+      observeElement(element)
+      if (!current() || variableState.observedElements.get(key) !== element)
+        return
+    } finally {
+      refs.inFlight -= 1
+      pruneRefTokens()
     }
-    if (
-      !current() ||
-      !(element instanceof HTMLElement) ||
-      !variableState.keyToIndex.has(key)
-    )
-      return
-    const previousKey = variableState.elementKeys.get(element)
-    if (previousKey && previousKey !== key) {
-      variableState.observedElements.delete(previousKey)
-      variableState.pendingMeasurements.delete(previousKey)
-    }
-    variableState.observedElements.set(key, element)
-    variableState.elementKeys.set(element, key)
-    const height = element.offsetHeight
-    if (!current() || variableState.observedElements.get(key) !== element)
-      return
-    if (input === inputGeneration && units === unitsGeneration)
-      queueMeasurement(key, height)
-    if (!current() || variableState.observedElements.get(key) !== element)
-      return
-    observeElement(element)
-    if (!current() || variableState.observedElements.get(key) !== element)
-      return
   }
 
   const syncUnits = (nextUnits: readonly TUnit[]) => {
@@ -3892,6 +3949,7 @@ export const useFsusVirtualWindow = <TUnit>(options: {
         variableState.pendingMeasurements.delete(key)
         variableState.measuredSizes.delete(key)
         variableState.keyToIndex.delete(key)
+        pruneRefTokens()
       }
       variableState.keys.length = nextKeys.length
       variableState.estimatedSizes.length = nextKeys.length
@@ -3913,6 +3971,7 @@ export const useFsusVirtualWindow = <TUnit>(options: {
         variableState.elementKeys.delete(element)
         variableState.observedElements.delete(key)
         variableState.pendingMeasurements.delete(key)
+        pruneRefTokens()
       }
       for (const key of variableState.measuredSizes.keys()) {
         if (!seen.has(key)) variableState.measuredSizes.delete(key)
@@ -4140,6 +4199,22 @@ export const useFsusVirtualWindow = <TUnit>(options: {
         ),
       ),
       retainedUnitWatchers: stopUnitsWatch ? 1 : 0,
+      retainedRefTokens: refTokens.size,
+      currentRefKeys: refGenerations.size,
+      inFlightRefOperations: [...refTokens].reduce(
+        (count, token) => count + token.inFlight,
+        0,
+      ),
+      refTokenRecords: Object.freeze(
+        [...refTokens].map((token) =>
+          Object.freeze({
+            key: token.key,
+            current: refGenerations.get(token.key) === token,
+            inFlight: token.inFlight,
+            retainedElements: token.elements.size,
+          }),
+        ),
+      ),
       // ResizeObserver's platform-internal queue is not exposed by this source.
       observerInternalCallbacks: 'unknown' as const,
       recoverable: false as const,
@@ -4200,7 +4275,7 @@ export const useFsusVirtualWindow = <TUnit>(options: {
             variableState.observedElements.clear()
             variableState.elementKeys = new WeakMap<Element, string>()
             variableState.measuredSizes.clear()
-            refGenerations.clear()
+            pruneRefTokens()
           }
         },
       },
