@@ -3274,6 +3274,7 @@ export const createMarkdownRendererSessionResourceOwner = <
       // Release view references only after every selected native cleanup returned.
       if (
         timers.size > 0 ||
+        timerRecords.size > 0 ||
         frames.size > 0 ||
         scheduledFrames.size > 0 ||
         pendingFrameFinalizers.size > 0 ||
