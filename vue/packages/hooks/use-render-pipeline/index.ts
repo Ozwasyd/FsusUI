@@ -359,6 +359,9 @@ export type FsusRenderPipelineRuntimeOptions<TSource, TUnit> = {
   >
   adapterId?: MaybeRef<string | null | undefined>
   componentName?: MaybeRef<string | null | undefined>
+  // Original producers for the exact source and adapter supplied below.
+  sourceAuthority?: FsusRenderPipelineAuthority
+  adapterAuthority?: FsusRenderPipelineAuthority
   config?: MaybeRef<FsusRenderPipelineConfig | null | undefined>
   estimate?: MaybeRef<FsusRenderPipelineEstimate | null | undefined>
   onDiagnostic?: (event: FsusRenderPipelineDiagnosticEvent) => void
@@ -2666,10 +2669,26 @@ export const useFsusVirtualWindow = <TUnit>(options: {
   onDiagnostic?: (event: FsusVirtualWindowDiagnosticEvent) => void
   overscanPx?: MaybeRef<number | undefined>
   units: Ref<readonly TUnit[]>
+  // Exact original units/key/estimate, viewport/ref and parameter publications.
+  unitsAuthority?: FsusRenderPipelineAuthority
+  viewportAuthority?: FsusRenderPipelineAuthority
+  configAuthority?: FsusRenderPipelineAuthority
 }) => {
-  const producerAuthority = createRenderPipelineProducerAuthority([
-    'viewport-units-platform',
-  ])
+  const producerAuthority = createRenderPipelineProducerAuthority()
+  producerAuthority.change(() => {
+    producerAuthority.retainDependency(
+      options.unitsAuthority,
+      'external-units-authority',
+    )
+    producerAuthority.retainDependency(
+      options.viewportAuthority,
+      'external-viewport-authority',
+    )
+    producerAuthority.retainDependency(
+      options.configAuthority,
+      'external-virtual-config-authority',
+    )
+  })
 
   const scrollOffset = ref(0)
   const viewportSize = ref(0)
@@ -3304,9 +3323,17 @@ let renderPipelineRuntimeId = 0
 export const useFsusRenderPipelineRuntime = <TSource, TUnit>(
   options: FsusRenderPipelineRuntimeOptions<TSource, TUnit>,
 ): FsusRenderPipelineRuntimeState<TSource, TUnit> => {
-  const producerAuthority = createRenderPipelineProducerAuthority([
-    'external-source-config-adapter',
-  ])
+  const producerAuthority = createRenderPipelineProducerAuthority()
+  producerAuthority.change(() => {
+    producerAuthority.retainDependency(
+      options.sourceAuthority,
+      'external-source-authority',
+    )
+    producerAuthority.retainDependency(
+      options.adapterAuthority,
+      'external-adapter-authority',
+    )
+  })
   producerAuthority.retainDependency(
     renderPipelineModuleAuthority.authority,
     'module-registry-authority',
