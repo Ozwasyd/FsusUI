@@ -1213,10 +1213,25 @@ const virtualWindow = useFsusVirtualWindow<MarkdownRenderChunk>({
   units: chunkUnits,
 })
 
-rendererResourceOwner.bindCheckpointSealSources({
-  pipeline: renderPipelineRuntime.authority,
-  viewport: virtualWindow.authority,
-})
+onBeforeUnmount(disposeRendererResources)
+try {
+  rendererResourceOwner.bindCheckpointSealSources({
+    pipeline: renderPipelineRuntime.authority,
+    viewport: virtualWindow.authority,
+  })
+} catch (cause) {
+  try {
+    rendererResourceOwner.runCheckpointAuthorityCallback(
+      'setup-failure-cleanup',
+      disposeRendererResources,
+      rendererResourceOwner,
+    )
+  } catch {
+    // The owner retains actual cleanup failures and unresolved registrations.
+    // Preserve the original binding cause instead of acknowledging cleanup.
+  }
+  throw cause
+}
 
 const scheduleMeasurementWarmup = () => {
   // The viewport warmup read joins the shared frame scheduler's measure
@@ -1253,22 +1268,26 @@ function requireRendererAdmission() {
     throw new Error('markdown-renderer-resource-owner-disposed')
 }
 
-const controllerCleanup = (controller: AbortController | null) => ({
-  phase: 'activation-controller-abort',
-  resource: controller,
-  run: () => {
-    controller?.abort()
-    if (activationController === controller) activationController = null
-  },
-})
-const observerCleanup = (observer: IntersectionObserver | null) => ({
-  phase: 'activation-observer-disconnect',
-  resource: observer,
-  run: () => {
-    observer?.disconnect()
-    if (activationObserver === observer) activationObserver = null
-  },
-})
+function controllerCleanup(controller: AbortController | null) {
+  return {
+    phase: 'activation-controller-abort',
+    resource: controller,
+    run: () => {
+      controller?.abort()
+      if (activationController === controller) activationController = null
+    },
+  }
+}
+function observerCleanup(observer: IntersectionObserver | null) {
+  return {
+    phase: 'activation-observer-disconnect',
+    resource: observer,
+    run: () => {
+      observer?.disconnect()
+      if (activationObserver === observer) activationObserver = null
+    },
+  }
+}
 
 const resetFeatureActivation = () => {
   rendererResourceOwner.retireCheckpointAuthority('activation-reset')
@@ -2245,7 +2264,7 @@ rendererResourceOwner.bindRenderWatchHandle(renderWatchHandle)
 onActivated(() => rendererResourceOwner.onCheckpointActivated())
 onDeactivated(() => rendererResourceOwner.onCheckpointDeactivated())
 
-onBeforeUnmount(() => {
+function disposeRendererResources() {
   rendererResourceOwner.retireCheckpointAuthority('unmount-entry')
   const controller = activationController
   const observer = activationObserver
@@ -2360,7 +2379,7 @@ onBeforeUnmount(() => {
       },
     ],
   )
-})
+}
 
 defineExpose({
   rootEl,
