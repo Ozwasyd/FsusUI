@@ -107,6 +107,7 @@ export const createMarkdownHeavyFeatureAdapterResourceOwner =
       {
         handle?: ReturnType<typeof setTimeout>
         installing: boolean
+        entered: boolean
         fired: boolean
         cancelRequested: boolean
       }
@@ -123,7 +124,6 @@ export const createMarkdownHeavyFeatureAdapterResourceOwner =
     const continuations = new Set<{
       cancel: (() => void) | null
       installing: boolean
-      entered: boolean
       cancelRequested: boolean
     }>()
     const listeners = new Map<object, () => void>()
