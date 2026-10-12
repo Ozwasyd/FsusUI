@@ -427,7 +427,8 @@ export type FsusRenderPipelineRuntimeResourceInspection = {
   readonly pendingRenderAdmissions: number
   readonly pendingControlTransitions: number
   readonly pendingAdapterJobs: number
-  readonly adapterResources: FsusRenderPipelineAdapterInvocationResourceInspection
+  readonly adapterResources: 'unknown'
+  readonly adapterInvocationResources: FsusRenderPipelineAdapterInvocationResourceInspection
   readonly workerCallbackFailure: {
     readonly count: number
     readonly error: FsusErrorDetail
@@ -5469,7 +5470,8 @@ export const useFsusRenderPipelineRuntime = <TSource, TUnit>(
       pendingRenderAdmissions: renderRequestedWhilePaused ? 1 : 0,
       pendingControlTransitions: controlTransitions.size,
       pendingAdapterJobs: adapterJobs.size,
-      adapterResources: inspectAdapterResources(),
+      adapterResources: 'unknown',
+      adapterInvocationResources: inspectAdapterResources(),
       workerCallbackFailure,
       pendingWorkerCallbackFailureNotification,
       workerResources: inspectWorkerResources(),
