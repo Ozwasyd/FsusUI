@@ -1228,3 +1228,15 @@ handle still permits original pending-candidate cancellation after the getter
 refuses a retired/replaced mount. This scoped capability preserves all original
 resource/restoration/native holds and `complete:false`/`recoverable:false`; it
 grants no full-host ready, disposed recovery or eviction.
+
+### Published native snapshot custody
+
+`MarkdownEditorSession.hasRetainedSnapshotCustody(snapshot)` checks only the
+exact original published native pointer, retained transaction custody and same
+private publication generation. It returns false before publication, for foreign
+or superseded snapshots, while capture runs, or after original generation
+invalidation/retirement. It never calls owner availability, composition, panel,
+Renderer, DOM, clock, resource or source readers, and never captures or reacquires.
+The admission-oriented `validateRetainedSnapshot(snapshot, expected)` remains
+separate and unchanged. The new query introduces no history/body store or ticket
+issuer and grants no resource, full-host recovery or eviction qualification.

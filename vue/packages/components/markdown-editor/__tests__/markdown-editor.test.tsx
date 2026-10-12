@@ -230,6 +230,62 @@ describe('MarkdownEditor', () => {
     expect(session.discardPreparedSnapshot(preparation)).toBe(false)
   })
 
+  it('keeps published snapshot custody pure without availability reads or foreign pointer admission', () => {
+    const identity = { id: 'published-custody-document', epoch: 1 }
+    const store = new MarkdownEditorTransactionStore('source', undefined, identity)
+    let reads = 0
+    let failReaders = false
+    const available = () => {
+      reads += 1
+      if (failReaders) throw new Error('availability-reader-must-not-run')
+      return false
+    }
+    const binding = createMarkdownEditorSessionBinding({
+      transactionStore: store, isComposing: available, isDisposed: available,
+      captureViewState: () => null, restoreViewState: () => {},
+      resourceParticipants: () => [], captureLastValidRender: () => null,
+    })
+    const session = binding.getSession('session:published-custody')
+    const prepared = session.prepareSnapshot(() => 'a'.repeat(64))
+    expect(session.hasRetainedSnapshotCustody(prepared.snapshot)).toBe(false)
+    const publication = session.sealPreparedSnapshot(prepared)
+    const published = session.publishSealedSnapshot(publication)
+    expect(published).toBe(prepared.snapshot)
+    const before = reads
+    failReaders = true
+    expect(session.hasRetainedSnapshotCustody(prepared.snapshot)).toBe(true)
+    expect(session.hasRetainedSnapshotCustody({ ...prepared.snapshot })).toBe(false)
+    expect(reads).toBe(before)
+    failReaders = false
+    const cancelled = session.prepareSnapshot(() => 'b'.repeat(64))
+    expect(session.hasRetainedSnapshotCustody(prepared.snapshot)).toBe(true)
+    expect(session.discardPreparedSnapshot(cancelled)).toBe(true)
+    expect(session.hasRetainedSnapshotCustody(prepared.snapshot)).toBe(true)
+    const next = session.captureSnapshot(() => 'c'.repeat(64))
+    expect(session.hasRetainedSnapshotCustody(prepared.snapshot)).toBe(false)
+    expect(session.hasRetainedSnapshotCustody(next)).toBe(true)
+  })
+
+  it('refuses published custody after private generation, real transaction and retirement changes', () => {
+    const store = new MarkdownEditorTransactionStore('source', undefined, { id: 'published-retirement-document', epoch: 1 })
+    const binding = createMarkdownEditorSessionBinding({
+      transactionStore: store, isComposing: () => false, isDisposed: () => false,
+      captureViewState: () => null, restoreViewState: () => {},
+      resourceParticipants: () => [], captureLastValidRender: () => null,
+    })
+    const session = binding.getSession('session:published-retirement')
+    const original = session.captureSnapshot(() => 'a'.repeat(64))
+    expect(session.hasRetainedSnapshotCustody(original)).toBe(true)
+    binding.invalidatePublicationAuthority()
+    expect(session.hasRetainedSnapshotCustody(original)).toBe(false)
+    const changed = session.captureSnapshot(() => 'b'.repeat(64))
+    store.dispatch({ changes: [{ from: 0, to: 0, insert: 'changed ' }], history: 'separate', origin: 'programmatic' })
+    expect(session.hasRetainedSnapshotCustody(changed)).toBe(false)
+    const retired = session.captureSnapshot(() => 'c'.repeat(64))
+    binding.retirePublicationAuthority()
+    expect(session.hasRetainedSnapshotCustody(retired)).toBe(false)
+  })
+
   it('preserves actual prior native token through preparation callback failure, commit admission failure and cancellation', () => {
     const identity = { id: 'prepared-failure-document', epoch: 1 }
     const store = new MarkdownEditorTransactionStore('source', undefined, identity)
