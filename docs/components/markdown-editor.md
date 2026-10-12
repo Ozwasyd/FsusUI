@@ -1173,6 +1173,27 @@ Renderer must register its original retirement function and retain failed
 handles; its projection/pipeline/cleanup and all qualification remain its original
 owner's work. New ordinary source controls remain UNRUN/HOLD.
 
+The public `getSession(editorSessionRef).documentAuthority` readonly field now
+borrows the exact same frozen authority object supplied to that mounted editor's
+heavy-feature context. Its original `capture`, `hasCustody` and
+`subscribeRetirement` functions remain pinned to that one transaction store;
+the session does not wrap them, copy a ticket, create a second realm, or replace
+the returned retirement handle. Internal bindings whose owner supplies no authority
+return `null`, never a fabricated source. The actual mounted editor supplies it.
+
+Public type imports from `@ozwasyd/element-plus` are
+`MarkdownEditorSessionDocumentAuthority`,
+`MarkdownEditorSessionDocumentAuthorityTicket`, and
+`MarkdownEditorSessionDocumentAuthorityRetirementHandle`. These alias the existing
+producer types. A retained public authority still obeys original write/unmount
+retirement: capture returns null and private custody refuses when retired; new
+registration refuses. Existing handles remain available for real cleanup retry.
+Unsubscribe failures keep the same registration/cause and throw the same original
+error object; consumers must retain that handle until actual unlink succeeds.
+The public bridge does not acknowledge resource release or qualify Main/Renderer
+joint publication, restoration, complete host readiness, or eviction. The mounted
+same-object, failure-custody and missing-source controls remain source-only UNRUN.
+
 
 Receiver notification occurs only once at the outermost actual transaction write
 entry. Internal nested merge-boundary/retained operations remain inside that

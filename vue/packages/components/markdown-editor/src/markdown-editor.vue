@@ -1519,15 +1519,16 @@ const sessionLayoutResources = createMarkdownEditorSessionLayoutResources(frameS
   revision: transactionStore.revision,
   disposed: sessionDisposed,
 }))
+const documentAuthority = Object.freeze({
+  capture: MarkdownEditorTransactionStore.prototype.captureDocumentAuthority.bind(transactionStore),
+  hasCustody: MarkdownEditorTransactionStore.prototype.hasDocumentAuthorityCustody.bind(transactionStore),
+  subscribeRetirement: MarkdownEditorTransactionStore.prototype.subscribeDocumentAuthorityRetirement.bind(transactionStore),
+})
 provideMarkdownHeavyFeatureDocumentContext(Object.freeze({
   documentEpoch: () => transactionStore.documentIdentity.epoch,
   documentKey: () => transactionStore.documentIdentity.id,
   revision: () => transactionStore.revision,
-  documentAuthority: Object.freeze({
-    capture: MarkdownEditorTransactionStore.prototype.captureDocumentAuthority.bind(transactionStore),
-    hasCustody: MarkdownEditorTransactionStore.prototype.hasDocumentAuthorityCustody.bind(transactionStore),
-    subscribeRetirement: MarkdownEditorTransactionStore.prototype.subscribeDocumentAuthorityRetirement.bind(transactionStore),
-  }),
+  documentAuthority,
 }))
 const editorRevision = ref(transactionStore.revision)
 const editorSelection = ref(transactionStore.selection)
@@ -6865,6 +6866,7 @@ const surfaceResourceParticipant: MarkdownEditorSessionResourceParticipant = {
 // This binding closes over the existing owner; it never creates another editor.
 const sessionBinding = createMarkdownEditorSessionBinding({
   transactionStore,
+  documentAuthority,
   resourceParticipants: () => [
     frameResourceParticipant, sessionLayoutResources.participant,
     ...(surfaceResourceOwnerComplete ? [surfaceResourceParticipant] : []),

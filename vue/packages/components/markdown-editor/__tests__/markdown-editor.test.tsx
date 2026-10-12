@@ -10,6 +10,11 @@ import { createMarkdownEditorSessionBinding } from '../src/markdown-editor-sessi
 import { captureMarkdownEditorSessionAttachmentState } from '../src/markdown-editor-session-attachment-state'
 import { createMarkdownAttachmentJob, runMarkdownAttachmentDispatch } from '../src/markdown-editor-attachment-lifecycle'
 import { MarkdownEditorTransactionStore } from '../src/markdown-editor-transaction'
+import type {
+  MarkdownEditorSessionDocumentAuthority,
+  MarkdownEditorSessionDocumentAuthorityTicket,
+  MarkdownEditorSessionDocumentAuthorityRetirementHandle,
+} from '@element-plus/element-plus'
 import {
   defaultMarkdownEditorCommands,
   markdownEditorEmits,
@@ -40,11 +45,17 @@ describe('MarkdownEditor', () => {
     }, slots: { status: () => h(Probe) } })
     await flushPromises()
     const vm = wrapper.vm as MarkdownEditorInstance
+    const session = vm.getSession('session:public-document-authority')
+    expectTypeOf(session.documentAuthority).toEqualTypeOf<MarkdownEditorSessionDocumentAuthority | null>()
+    expectTypeOf(session.documentAuthority!.capture()).toEqualTypeOf<MarkdownEditorSessionDocumentAuthorityTicket | null>()
+    expect(session.documentAuthority).toBe(authority)
+    expect(session.documentAuthority!.capture()).toBe(authority!.capture())
     expect(vm.dispatchTransaction({ changes: [{ from: 0, to: 0, insert: 'seed ' }], history: 'separate', origin: 'programmatic' }).accepted).toBe(true)
     await nextTick()
     let calls = 0
     const cause = { tag: 'nested-notification-must-not-run' }
-    const handle = authority!.subscribeRetirement(() => { if (++calls === 2) throw cause })
+    const handle = session.documentAuthority!.subscribeRetirement(() => { if (++calls === 2) throw cause })
+    expectTypeOf(handle).toEqualTypeOf<MarkdownEditorSessionDocumentAuthorityRetirementHandle>()
     expect(vm.undo().accepted).toBe(true)
     expect(calls).toBe(1)
     expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual(['source'])
@@ -69,9 +80,11 @@ describe('MarkdownEditor', () => {
       modelValue: 'source', mode: 'source', statusDensity: 'minimal', documentIdentity: { id: 'cleanup-after-retirement-failure', epoch: 1 },
     }, slots: { status: () => h(Probe) }, global: { config: { errorHandler: error => { errors.push(error) } } } })
     await flushPromises()
+    const publicAuthority = (wrapper.vm as MarkdownEditorInstance).getSession('session:public-unmount-authority').documentAuthority
+    expect(publicAuthority).toBe(authority)
     const cause = { tag: 'original-retirement-failure' }
     let fail = true
-    const handle = authority!.subscribeRetirement(() => { if (fail) throw cause })
+    const handle = publicAuthority!.subscribeRetirement(() => { if (fail) throw cause })
     const removals = vi.spyOn(window, 'removeEventListener')
     const release = vi.spyOn(MarkdownEditorTransactionStore.prototype, 'releaseRetainedSnapshot')
     try {
@@ -81,11 +94,11 @@ describe('MarkdownEditor', () => {
       expect(removals.mock.calls.some(([event]) => event === 'resize')).toBe(true)
       expect(handle.hasCustody()).toBe(true)
       expect(handle.failureCause()).toBe(cause)
-      expect(authority!.capture()).toBeNull()
+      expect(publicAuthority!.capture()).toBeNull()
       fail = false
       expect(handle.unsubscribe()).toBe(true)
       expect(handle.hasCustody()).toBe(false)
-      expect(authority!.capture()).toBeNull()
+      expect(publicAuthority!.capture()).toBeNull()
     } finally {
       removals.mockRestore()
       release.mockRestore()
@@ -103,6 +116,7 @@ describe('MarkdownEditor', () => {
       resourceParticipants: () => [], captureLastValidRender: () => { read(); return null },
     })
     const session = binding.getSession('session:sealed-native')
+    expect(session.documentAuthority).toBeNull()
     const expected = { documentIdentity: identity, revision: 0 }
     const original = session.captureSnapshot(() => 'a'.repeat(64), expected)
     const preparation = session.prepareSnapshot(() => 'b'.repeat(64), expected)

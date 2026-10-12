@@ -3,6 +3,11 @@ import { MarkdownEditorTransactionStore } from './markdown-editor-transaction'
 import type { MarkdownEditorSessionPanelCapture, MarkdownEditorSessionPanelRefs, MarkdownEditorSessionPanelState } from './markdown-editor-session-panels'
 import type { MarkdownEditorSessionResourceCensus, MarkdownEditorSessionResourceParticipant } from './markdown-editor-session-resources'
 import type {
+  MarkdownHeavyFeatureDocumentAuthority,
+  MarkdownHeavyFeatureDocumentAuthorityTicket,
+  MarkdownHeavyFeatureDocumentAuthorityRetirementHandle,
+} from '../../../hooks/use-markdown-heavy-feature-lifecycle'
+import type {
   MarkdownEditorDocumentIdentity,
   MarkdownEditorHistoryState,
   MarkdownEditorResolvedSelection,
@@ -115,8 +120,15 @@ export interface MarkdownEditorSessionAttachmentResourceSource {
   readonly unknownUsage: readonly string[]
 }
 
+/** The original native producer types; no alternate ticket or retirement realm. */
+export type MarkdownEditorSessionDocumentAuthority = MarkdownHeavyFeatureDocumentAuthority
+export type MarkdownEditorSessionDocumentAuthorityTicket = MarkdownHeavyFeatureDocumentAuthorityTicket
+export type MarkdownEditorSessionDocumentAuthorityRetirementHandle = MarkdownHeavyFeatureDocumentAuthorityRetirementHandle
+
 export interface MarkdownEditorSession {
   readonly editorSessionRef: string
+  /** Exact original heavy-feature authority; absent owners refuse with null. */
+  readonly documentAuthority: MarkdownEditorSessionDocumentAuthority | null
   inspectCapabilities(): MarkdownEditorSessionCapabilities
   inspectDocumentState(): MarkdownEditorSessionDocumentState
   /** Read the original body only inside the digest callback; no checkpoint/history mutation. */
@@ -174,6 +186,7 @@ export interface MarkdownEditorSessionExpose {
 /** Internal binding, created once by the real MarkdownEditor setup. */
 export interface MarkdownEditorSessionOwner<ViewState> {
   readonly transactionStore: MarkdownEditorTransactionStore
+  readonly documentAuthority?: MarkdownEditorSessionDocumentAuthority
   readonly isComposing: () => boolean
   readonly isDisposed: () => boolean
   readonly captureViewState: () => ViewState
@@ -209,6 +222,7 @@ export const createMarkdownEditorSessionBinding = <ViewState>(
   retirePublicationAuthority(): void
 } => {
   const transactionStore = owner.transactionStore
+  const documentAuthority = owner.documentAuthority ?? null
   // Pin the original producer implementation, not replaceable consumer methods.
   const validatePreparedTransaction = MarkdownEditorTransactionStore.prototype.validatePreparedRetainedSnapshot.bind(transactionStore)
   const publishPreparedTransaction = MarkdownEditorTransactionStore.prototype.commitPreparedRetainedSnapshot.bind(transactionStore)
@@ -295,6 +309,7 @@ export const createMarkdownEditorSessionBinding = <ViewState>(
       }
       session = Object.freeze({
         editorSessionRef,
+        documentAuthority,
         inspectCapabilities,
         inspectDocumentState() {
           assertAvailable()
