@@ -2,6 +2,8 @@
 'element-plus': minor
 ---
 
+Add original-owner staged renderer checkpoint custody with non-invalidating preparation, exact-token private validation, callback-free local pointer publication and cancellation. Keep captured-only authority, complete:false, recoverable:false, nativeRecovery unavailable and full-host publication/restoration refusals explicit.
+
 Preserve cancellation selected during keyed-frame creation even while mounted: a late native accepted return cleans the exact original request instead of reviving it, and failed cleanup retains its real obligation without repeating a completed finalizer.
 
 Reject reentrant frame installation during the same key's native schedule/cancel call. Fence activation controller/observer creation and observation before external calls, recheck admission after synchronous callbacks, and retain late cleanup failures under the existing renderer owner.

@@ -612,3 +612,46 @@ recovery, renderer acceptance or an eviction acknowledgment.
 These throw/reentry/retry branches were inspected as source only. Original test
 entry/import/hook and exact-case review are required before fault-injection runs;
 all runtime/test/list/browser/native/worker qualifications remain held.
+
+### Staged renderer checkpoint custody
+
+The existing mounted owner additionally exposes these producer methods. They
+publish only actual retained renderer-state custody; they are not full-host,
+current live-authority, paused-resource or recovery receipts.
+
+| Method                                                 | Actual operation and refusal                                                                                                                                                                                                                                                                                                                                                                                              |
+| ------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `prepareRendererOwnedCheckpoint()`                     | Copy the same real authorized render/state into one pending pin. Return an exact frozen preparation token with `checkpoint`, the actual `baseCheckpointRef`, `scope:'renderer-custody-only'`, `complete:false`, and `recoverable:false`. The published checkpoint stays intact. Busy, disposed, stale, reentrant or already-prepared owners return null; actual read errors propagate without replacing the previous pin. |
+| `validatePreparedRendererOwnedCheckpoint(preparation)` | Compare the exact original token and only private generation/render/base-pin/control records. Return the preallocated publication token with `authority:'captured-renderer-only'`, or null. Cloned/foreign/cancelled tokens fail. No injected source reader or caller token getter is called.                                                                                                                             |
+| `publishPreparedRendererOwnedCheckpoint(publication)`  | Require the exact validated publication token and repeat private custody checks, then replace only the local checkpoint pointer. No allocation, source callback, reactive/native write, event, cleanup or other owner store is involved. A failed check returns null and preserves the published pin and actual resource obligations.                                                                                     |
+| `cancelPreparedRendererOwnedCheckpoint(preparation)`   | Release only the exact pending pin/token records, including after unmount; leave the published checkpoint and every actual timer/listener/job/failed-cleanup record untouched. Foreign, consumed and repeated cancellation returns false. Publication consumes the preparation; cancel is not rollback after publication.                                                                                                 |
+
+The existing `captureRendererOwnedCheckpoint()` performs this sequence in the
+same owner and releases any unsuccessful preparation. An outstanding preparation
+blocks another capture/prepare rather than invalidating its caller's token.
+Actual pending custody adds one backing pin, two token records and the copied
+collection entries to logical memory; it invents no background task or native
+usage. `sources.rendererCheckpointCustody` reports the actual pending token and
+private validation state. The existing published source ref remains unchanged
+until successful local publication.
+
+The injected document context currently exposes callback getters rather than a
+callback-free authoritative identity/epoch/revision ledger. Private custody
+validation therefore does not attest that external live authority remained fixed
+after preparation. The record retains its actual captured identity/epoch/revision;
+it does not establish cross-identity/epoch recovery. An original full-host
+assembler must refuse while this live-authority capability, full native renderer
+checkpoint/restoration and the other original producer join ports are absent.
+`fullHostRefset:'unavailable'`, `liveAuthority:'unavailable'`, `complete:false`,
+`recoverable:false`, and the checkpoint's `nativeRecovery:'unavailable'` remain
+explicit. No writer, journal, native or shared session store is acquired or changed.
+These ports alone do not implement atomic publication of multiple owner stores;
+the original host must supply that contract before claiming complete publication.
+
+Prepare/cancel/private validation/local publication were inspected as source only.
+Original renderer test entry/import/hooks were read; executable custody cases do
+not yet exist in that entry. Foreign/cloned token, stale generation, competing
+prepare, busy/native residue, callback throw/reentry, cancel, repeated publication,
+dispose, old-ref preservation and incomplete-host refusal cases are UNRUN. Static
+compilation does not lift runtime/test/list/native/security/receipt/authority or
+fixed-roster eviction holds.

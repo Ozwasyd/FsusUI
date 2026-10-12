@@ -1931,6 +1931,14 @@ defineExpose({
   captureLastValidRender: rendererResourceOwner.captureLastValidRender,
   captureRendererOwnedCheckpoint:
     rendererResourceOwner.captureRendererOwnedCheckpoint,
+  prepareRendererOwnedCheckpoint:
+    rendererResourceOwner.prepareRendererOwnedCheckpoint,
+  validatePreparedRendererOwnedCheckpoint:
+    rendererResourceOwner.validatePreparedRendererOwnedCheckpoint,
+  publishPreparedRendererOwnedCheckpoint:
+    rendererResourceOwner.publishPreparedRendererOwnedCheckpoint,
+  cancelPreparedRendererOwnedCheckpoint:
+    rendererResourceOwner.cancelPreparedRendererOwnedCheckpoint,
   restoreLastValidRender,
   getSessionResourceParticipant: () => rendererResourceOwner.participant,
   getSessionResourceSourceOffer: () =>
