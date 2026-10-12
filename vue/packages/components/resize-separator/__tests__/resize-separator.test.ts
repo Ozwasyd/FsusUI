@@ -58,6 +58,10 @@ const capture = (wrapper: VueWrapper) => {
 }
 const proposals = (wrapper: VueWrapper) =>
   wrapper.emitted('proposal')?.map(([payload]) => payload)
+const keydown = (wrapper: VueWrapper, key: string) =>
+  wrapper.element.dispatchEvent(
+    new KeyboardEvent('keydown', { key, bubbles: true, cancelable: true }),
+  )
 
 describe('ResizeSeparator public component', () => {
   test('exports and installs typed aliases with controlled separator ARIA', async () => {
@@ -246,9 +250,16 @@ describe('ResizeSeparator public component', () => {
     },
   )
 
-  test.each(['consumer', 'unmount', 'throw'] as const)(
-    'snapshot getter %s invalidates admission without capture or start',
-    (action) => {
+  test.each([
+    ['pointer', 'consumer'],
+    ['pointer', 'unmount'],
+    ['pointer', 'throw'],
+    ['keyboard', 'consumer'],
+    ['keyboard', 'unmount'],
+    ['keyboard', 'throw'],
+  ] as const)(
+    '%s snapshot getter %s invalidates admission without capture or start',
+    (source, action) => {
       let wrapper: VueWrapper
       let armed = false
       const cause = new Error('Snapshot getter failure')
@@ -270,21 +281,181 @@ describe('ResizeSeparator public component', () => {
       wrapper.vm.$.appContext.config.errorHandler = (error) =>
         errors.push(error)
       const mocks = capture(wrapper)
+      const trigger = () =>
+        source === 'pointer'
+          ? pointer(wrapper, 'pointerdown')
+          : keydown(wrapper, 'ArrowRight')
       armed = true
-      pointer(wrapper, 'pointerdown')
+      trigger()
       expect(mocks.set).not.toHaveBeenCalled()
       expect(mocks.captured.size).toBe(0)
       for (const event of ['start', 'proposal', 'end', 'cancel'])
         expect(wrapper.emitted(event)).toBeUndefined()
       expect(errors).toEqual(action === 'throw' ? [cause] : [])
       if (action !== 'unmount') {
-        pointer(wrapper, 'pointerdown')
-        pointer(wrapper, 'pointerup')
-        expect(mocks.set).toHaveBeenCalledExactlyOnceWith(7)
+        trigger()
+        if (source === 'pointer') {
+          pointer(wrapper, 'pointerup')
+          expect(mocks.set).toHaveBeenCalledExactlyOnceWith(7)
+        } else expect(mocks.set).not.toHaveBeenCalled()
         expect(wrapper.emitted('start')).toHaveLength(1)
         expect(wrapper.emitted('end')).toHaveLength(1)
         expect(mocks.captured.size).toBe(0)
       }
+    },
+  )
+
+  test.each(['pointer', 'keyboard'] as const)(
+    'keyboard endpoint getter cannot admit reentrant %s input',
+    (source) => {
+      let wrapper: VueWrapper
+      let armed = false
+      const range = {
+        start: props.coordinateRange.start,
+        get end() {
+          if (armed) {
+            armed = false
+            if (source === 'pointer')
+              pointer(wrapper, 'pointerdown', { pointerId: 8 })
+            else keydown(wrapper, 'ArrowLeft')
+          }
+          return props.coordinateRange.end
+        },
+      }
+      wrapper = render({ coordinateRange: range })
+      const mocks = capture(wrapper)
+      armed = true
+      keydown(wrapper, 'ArrowRight')
+      expect(mocks.set).not.toHaveBeenCalled()
+      expect(wrapper.emitted('start')).toEqual([
+        [{ value: 0.5, source: 'keyboard', pointerId: null }],
+      ])
+      expect(proposals(wrapper)).toEqual([
+        { value: 0.55, source: 'keyboard', pointerId: null },
+      ])
+      expect(wrapper.emitted('end')).toHaveLength(1)
+      expect(wrapper.emitted('cancel')).toBeUndefined()
+      pointer(wrapper, 'pointerdown')
+      pointer(wrapper, 'pointerup')
+      expect(mocks.set).toHaveBeenCalledExactlyOnceWith(7)
+      expect(wrapper.emitted('start')).toHaveLength(2)
+      expect(wrapper.emitted('end')).toHaveLength(2)
+      expect(mocks.captured.size).toBe(0)
+    },
+  )
+
+  test.each([
+    ['pointer', 'start'],
+    ['pointer', 'proposal'],
+    ['keyboard', 'start'],
+    ['keyboard', 'proposal'],
+  ] as const)(
+    '%s %s listener may cancel and replace without stale proposal or terminal',
+    (source, phase) => {
+      let wrapper: VueWrapper
+      let armed = true
+      const replace = () => {
+        if (!armed) return
+        armed = false
+        const instance = wrapper.vm as ResizeSeparatorInstance
+        instance.cancel()
+        pointer(wrapper, 'pointerdown', { pointerId: 8 })
+      }
+      wrapper = mount(ElResizeSeparator, {
+        props: {
+          ...props,
+          ...(phase === 'start'
+            ? { onStart: replace }
+            : { onProposal: replace }),
+        },
+        attachTo: document.body,
+      })
+      const mocks = capture(wrapper)
+      if (source === 'pointer') {
+        pointer(wrapper, 'pointerdown')
+        if (phase === 'proposal')
+          pointer(wrapper, 'pointerup', { clientX: 600 })
+      } else keydown(wrapper, 'ArrowRight')
+      expect(wrapper.emitted('start')).toHaveLength(2)
+      expect(wrapper.emitted('cancel')).toHaveLength(1)
+      expect(wrapper.emitted('end')).toBeUndefined()
+      expect(proposals(wrapper)?.length ?? 0).toBe(phase === 'start' ? 0 : 1)
+      expect(mocks.captured).toEqual(new Set([8]))
+      pointer(wrapper, 'pointerup', { pointerId: 8 })
+      expect(wrapper.emitted('end')).toEqual([
+        [{ value: 0.5, source: 'pointer', pointerId: 8 }],
+      ])
+      expect(mocks.captured.size).toBe(0)
+    },
+  )
+
+  test.each(['pointermove', 'pointerup'] as const)(
+    '%s axis getter replacement preserves the new capture without a stale proposal',
+    (type) => {
+      const wrapper = render()
+      const instance = wrapper.vm as ResizeSeparatorInstance
+      const mocks = capture(wrapper)
+      pointer(wrapper, 'pointerdown')
+      const event = new Event(type, { bubbles: true, cancelable: true })
+      Object.assign(event, { pointerId: 7 })
+      Object.defineProperty(event, 'clientX', {
+        get() {
+          instance.cancel()
+          pointer(wrapper, 'pointerdown', { pointerId: 8 })
+          return 600
+        },
+      })
+      wrapper.element.dispatchEvent(event)
+      expect(proposals(wrapper)).toBeUndefined()
+      expect(wrapper.emitted('start')).toHaveLength(2)
+      expect(wrapper.emitted('cancel')).toHaveLength(1)
+      expect(wrapper.emitted('end')).toBeUndefined()
+      expect(mocks.captured).toEqual(new Set([8]))
+      pointer(wrapper, 'pointerup', { pointerId: 8 })
+      expect(wrapper.emitted('end')).toEqual([
+        [{ value: 0.5, source: 'pointer', pointerId: 8 }],
+      ])
+      expect(mocks.captured.size).toBe(0)
+    },
+  )
+
+  test.each(['end', 'consumer'] as const)(
+    '%s release blocks reentry until the terminal listener may admit a new pointer',
+    (reason) => {
+      let wrapper: VueWrapper
+      let armed = true
+      const restart = () => {
+        if (!armed) return
+        armed = false
+        pointer(wrapper, 'pointerdown', { pointerId: 9 })
+      }
+      wrapper = mount(ElResizeSeparator, {
+        props: {
+          ...props,
+          ...(reason === 'end' ? { onEnd: restart } : { onCancel: restart }),
+        },
+        attachTo: document.body,
+      })
+      const mocks = capture(wrapper)
+      mocks.release.mockImplementation((id: number) => {
+        mocks.captured.delete(id)
+        pointer(wrapper, 'pointerdown', { pointerId: 8 })
+        keydown(wrapper, 'ArrowRight')
+        pointer(wrapper, 'lostpointercapture', { pointerId: id })
+      })
+      pointer(wrapper, 'pointerdown')
+      if (reason === 'end') pointer(wrapper, 'pointerup')
+      else (wrapper.vm as ResizeSeparatorInstance).cancel()
+      expect(mocks.set.mock.calls).toEqual([[7], [9]])
+      expect(wrapper.emitted('start')).toHaveLength(2)
+      expect(mocks.captured).toEqual(new Set([9]))
+      pointer(wrapper, 'pointerup', { pointerId: 9 })
+      expect(wrapper.emitted('end')).toHaveLength(reason === 'end' ? 2 : 1)
+      expect(wrapper.emitted('cancel')?.length ?? 0).toBe(
+        reason === 'end' ? 0 : 1,
+      )
+      expect(mocks.release.mock.calls).toEqual([[7], [9]])
+      expect(mocks.captured.size).toBe(0)
     },
   )
 

@@ -93,9 +93,25 @@ type KeyboardInteraction = {
   lastValue: number
 }
 type Interaction = PointerInteraction | KeyboardInteraction
+type Admission = { invalidated: boolean }
 let active: Interaction | undefined
-let pendingAdmission: { invalidated: boolean } | undefined
+let pendingAdmission: Admission | undefined
+let releasingCapture = 0
 let unmounting = false
+const reserveAdmission = () => {
+  if (unmounting || active || pendingAdmission || releasingCapture) return
+  const admission = { invalidated: false }
+  pendingAdmission = admission
+  return admission
+}
+const ownsAdmission = (admission: Admission) =>
+  !admission.invalidated &&
+  pendingAdmission === admission &&
+  !unmounting &&
+  !active
+const leaveAdmission = (admission: Admission) => {
+  if (pendingAdmission === admission) pendingAdmission = undefined
+}
 const payload = (interaction: Interaction): ResizeSeparatorPayload => ({
   value: interaction.lastValue,
   source: interaction.source,
@@ -103,30 +119,39 @@ const payload = (interaction: Interaction): ResizeSeparatorPayload => ({
 })
 const release = (interaction: Interaction) => {
   if (interaction.source !== 'pointer') return
+  releasingCapture++
   try {
     if (interaction.target.hasPointerCapture(interaction.pointerId)) {
       interaction.target.releasePointerCapture(interaction.pointerId)
     }
   } catch {
     // Capture may already have been released by the user agent.
+  } finally {
+    releasingCapture--
   }
+}
+const finish = (
+  interaction: Interaction,
+  reason?: ResizeSeparatorCancelReason,
+) => {
+  if (active !== interaction) return
+  active = undefined
+  const terminal = payload(interaction)
+  release(interaction)
+  if (reason) emit('cancel', { ...terminal, reason })
+  else emit('end', terminal)
 }
 const cancel = (reason: ResizeSeparatorCancelReason) => {
   if (pendingAdmission) pendingAdmission.invalidated = true
-  if (!active) return
-  const interaction = active
-  active = undefined
-  release(interaction)
-  emit('cancel', { ...payload(interaction), reason })
+  if (active) finish(active, reason)
 }
 const coordinate = (event: PointerEvent) =>
   props.orientation === 'vertical' ? event.clientX : event.clientY
 
 const onPointerDown = (event: PointerEvent) => {
-  if (unmounting || active || pendingAdmission) return
   // Reserve admission before consumer getters can reenter either input path.
-  const admission = { invalidated: false }
-  pendingAdmission = admission
+  const admission = reserveAdmission()
+  if (!admission) return
   try {
     if (
       !enabled.value ||
@@ -148,14 +173,7 @@ const onPointerDown = (event: PointerEvent) => {
       lastValue: value,
       coordinateRange: { start: range.start, end: range.end },
     }
-    if (
-      !enabled.value ||
-      admission.invalidated ||
-      pendingAdmission !== admission ||
-      unmounting ||
-      active ||
-      handle.value !== target
-    )
+    if (!enabled.value || !ownsAdmission(admission) || handle.value !== target)
       return
     // Finish external reads before capture; register its cleanup immediately.
     try {
@@ -169,23 +187,25 @@ const onPointerDown = (event: PointerEvent) => {
       release(interaction)
       return
     }
-    pendingAdmission = undefined
+    leaveAdmission(admission)
     event.preventDefault()
+    if (active !== interaction) return
     emit('start', payload(interaction))
     if (active === interaction) target.focus({ preventScroll: true })
   } finally {
-    if (pendingAdmission === admission) pendingAdmission = undefined
+    leaveAdmission(admission)
   }
 }
 const onPointerMove = (event: PointerEvent) => {
   const interaction = active
   if (
     interaction?.source !== 'pointer' ||
-    event.pointerId !== interaction.pointerId
+    event.pointerId !== interaction.pointerId ||
+    active !== interaction
   )
     return
   const axis = coordinate(event)
-  if (!Number.isFinite(axis)) return
+  if (active !== interaction || !Number.isFinite(axis)) return
   const value =
     axis === interaction.coordinate
       ? interaction.initialValue
@@ -196,8 +216,9 @@ const onPointerMove = (event: PointerEvent) => {
           axis,
           interaction.coordinateRange,
         )
+  if (active !== interaction) return
   event.preventDefault()
-  if (value === interaction.lastValue) return
+  if (active !== interaction || value === interaction.lastValue) return
   interaction.lastValue = value
   emit('proposal', payload(interaction))
 }
@@ -205,71 +226,85 @@ const onPointerUp = (event: PointerEvent) => {
   const interaction = active
   if (
     interaction?.source !== 'pointer' ||
-    event.pointerId !== interaction.pointerId
+    event.pointerId !== interaction.pointerId ||
+    active !== interaction
   )
     return
   onPointerMove(event)
-  if (active !== interaction) return
-  active = undefined
-  release(interaction)
-  emit('end', payload(interaction))
+  finish(interaction)
 }
 const onPointerCancel = (event: PointerEvent) => {
-  if (event.pointerId === active?.pointerId) cancel('pointercancel')
+  const interaction = active
+  if (
+    interaction &&
+    event.pointerId === interaction.pointerId &&
+    active === interaction
+  )
+    cancel('pointercancel')
 }
 const onLostPointerCapture = (event: PointerEvent) => {
-  if (event.pointerId === active?.pointerId) cancel('lostpointercapture')
+  const interaction = active
+  if (
+    interaction &&
+    event.pointerId === interaction.pointerId &&
+    active === interaction
+  )
+    cancel('lostpointercapture')
 }
 const onKeydown = (event: KeyboardEvent) => {
-  if (event.key === 'Escape' && active) {
+  const interaction = active
+  const key = event.key
+  if (key === 'Escape' && interaction) {
     event.preventDefault()
     event.stopPropagation()
-    cancel('escape')
+    if (active === interaction) cancel('escape')
     return
   }
-  if (
-    unmounting ||
-    pendingAdmission ||
-    active ||
-    !enabled.value ||
-    event.altKey ||
-    event.ctrlKey ||
-    event.metaKey
-  )
-    return
-  const keys =
-    props.orientation === 'vertical'
-      ? ['ArrowLeft', 'ArrowRight']
-      : ['ArrowUp', 'ArrowDown']
-  const direction =
-    props.coordinateRange.end > props.coordinateRange.start ? 1 : -1
-  let next: number
-  if (event.key === 'Home') next = props.min
-  else if (event.key === 'End') next = props.max
-  else if (event.key === keys[0])
-    next = getResizeKeyboardProposal(
-      props,
-      controlledValue.value,
-      direction === 1 ? -1 : 1,
+  const admission = reserveAdmission()
+  if (!admission) return
+  try {
+    if (!enabled.value || event.altKey || event.ctrlKey || event.metaKey) return
+    const target = handle.value
+    if (!target) return
+    const keys =
+      props.orientation === 'vertical'
+        ? ['ArrowLeft', 'ArrowRight']
+        : ['ArrowUp', 'ArrowDown']
+    const direction =
+      props.coordinateRange.end > props.coordinateRange.start ? 1 : -1
+    const value = controlledValue.value
+    if (!enabled.value || !ownsAdmission(admission)) return
+    let next: number
+    if (key === 'Home') next = props.min
+    else if (key === 'End') next = props.max
+    else if (key === keys[0])
+      next = getResizeKeyboardProposal(props, value, direction === 1 ? -1 : 1)
+    else if (key === keys[1])
+      next = getResizeKeyboardProposal(props, value, direction)
+    else return
+    event.preventDefault()
+    if (
+      !enabled.value ||
+      !ownsAdmission(admission) ||
+      handle.value !== target ||
+      next === value
     )
-  else if (event.key === keys[1])
-    next = getResizeKeyboardProposal(props, controlledValue.value, direction)
-  else return
-  event.preventDefault()
-  if (next === controlledValue.value) return
-  const interaction: KeyboardInteraction = {
-    lastValue: controlledValue.value,
-    source: 'keyboard',
-    pointerId: null,
+      return
+    const interaction: KeyboardInteraction = {
+      lastValue: value,
+      source: 'keyboard',
+      pointerId: null,
+    }
+    active = interaction
+    leaveAdmission(admission)
+    emit('start', payload(interaction))
+    if (active !== interaction) return
+    interaction.lastValue = next
+    emit('proposal', payload(interaction))
+    finish(interaction)
+  } finally {
+    leaveAdmission(admission)
   }
-  active = interaction
-  emit('start', payload(interaction))
-  if (active !== interaction) return
-  interaction.lastValue = next
-  emit('proposal', payload(interaction))
-  if (active !== interaction) return
-  active = undefined
-  emit('end', payload(interaction))
 }
 
 watch(
