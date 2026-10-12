@@ -2418,6 +2418,8 @@ defineExpose({
       ]),
     }),
   captureLastValidRender: rendererResourceOwner.captureLastValidRender,
+  getRendererCheckpointHandle:
+    rendererResourceOwner.getRendererCheckpointHandle,
   captureRendererOwnedCheckpoint:
     rendererResourceOwner.captureRendererOwnedCheckpoint,
   prepareRendererOwnedCheckpoint:

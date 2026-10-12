@@ -8,6 +8,14 @@ import type {
   MarkdownSafeRenderResult,
 } from '@element-plus/wasm'
 
+export type {
+  MarkdownRendererCheckpointHandle,
+  MarkdownRendererCheckpointPreparation,
+  MarkdownRendererCheckpointPublication,
+  MarkdownRendererSealedCheckpointPublication,
+  MarkdownRendererOwnedCheckpoint,
+} from './markdown-renderer-session-resources'
+
 export type MarkdownTrustedHtml = object
 export type MarkdownTrustedHtmlFactory = (
   safeHtml: MarkdownSafeHtml,

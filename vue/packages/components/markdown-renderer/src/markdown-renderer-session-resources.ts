@@ -87,6 +87,23 @@ export interface MarkdownRendererSealedCheckpointPublication extends MarkdownRen
   }>
 }
 
+/** Exact methods of one original renderer; tokens remain identity-checked. */
+export interface MarkdownRendererCheckpointHandle {
+  readonly prepareRendererOwnedCheckpoint: () => MarkdownRendererCheckpointPreparation | null
+  readonly sealPreparedRendererOwnedCheckpoint: (
+    preparation: MarkdownRendererCheckpointPreparation,
+  ) => MarkdownRendererSealedCheckpointPublication | null
+  readonly hasSealedRendererOwnedCheckpointCustody: (
+    publication: MarkdownRendererSealedCheckpointPublication,
+  ) => boolean
+  readonly publishSealedRendererOwnedCheckpoint: (
+    publication: MarkdownRendererSealedCheckpointPublication,
+  ) => MarkdownRendererOwnedCheckpoint | null
+  readonly cancelPreparedRendererOwnedCheckpoint: (
+    preparation: MarkdownRendererCheckpointPreparation,
+  ) => boolean
+}
+
 export interface MarkdownRendererRetainedProjection {
   readonly html: MarkdownSafeHtml | null
   readonly units: readonly MarkdownRenderChunk[]
@@ -2364,6 +2381,7 @@ export const createMarkdownRendererSessionResourceOwner = <
           // separately; an unknown heavy count is never coerced into this zero.
           networkRequests: 0,
           memoryUnits:
+            (checkpointHandle ? 1 : 0) +
             sealSourceRecords.length +
             retainedSealSourceListeners +
             (preparedCheckpointSeal ? 1 : 0) +
@@ -2530,8 +2548,41 @@ export const createMarkdownRendererSessionResourceOwner = <
     }
     // Promises remain in the census until their real finally blocks settle.
   }
+  const checkpointHandle: MarkdownRendererCheckpointHandle = Object.freeze({
+    prepareRendererOwnedCheckpoint,
+    sealPreparedRendererOwnedCheckpoint,
+    hasSealedRendererOwnedCheckpointCustody,
+    publishSealedRendererOwnedCheckpoint,
+    cancelPreparedRendererOwnedCheckpoint,
+  })
+  const getRendererCheckpointHandle =
+    (): MarkdownRendererCheckpointHandle | null => {
+      const pipeline = checkpointSealSources.get('pipeline')
+      const viewport = checkpointSealSources.get('viewport')
+      if (
+        disposed ||
+        bindingDocumentRetirement ||
+        documentRetirementUnknown ||
+        documentRetirement === null ||
+        checkpointAuthorityCallbackDepth > 0 ||
+        bindingCheckpointSealSources ||
+        !pipeline ||
+        pipeline.registering ||
+        typeof pipeline.unsubscribe !== 'function' ||
+        pipeline.releasing ||
+        pipeline.released ||
+        !viewport ||
+        viewport.registering ||
+        typeof viewport.unsubscribe !== 'function' ||
+        viewport.releasing ||
+        viewport.released
+      )
+        return null
+      return checkpointHandle
+    }
   return Object.freeze({
     afterFrame,
+    getRendererCheckpointHandle,
     bindDocumentAuthorityReceiver,
     bindCheckpointSealSources,
     bindRenderWatchHandle,
