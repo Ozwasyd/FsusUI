@@ -1,9 +1,10 @@
 import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { flushPromises, mount } from '@vue/test-utils'
-import { nextTick } from 'vue'
+import { defineComponent, h, nextTick } from 'vue'
 import { afterEach, describe, expect, expectTypeOf, it, vi } from 'vitest'
 import MarkdownEditor from '../src/markdown-editor.vue'
+import { useMarkdownHeavyFeatureDocumentContext } from '../../../hooks/use-markdown-heavy-feature-lifecycle'
 import { createMarkdownOutlineModel } from '../src/markdown-editor-outline'
 import { createMarkdownEditorSessionBinding } from '../src/markdown-editor-session'
 import { captureMarkdownEditorSessionAttachmentState } from '../src/markdown-editor-session-attachment-state'
@@ -28,6 +29,69 @@ import type {
 import { getMarkdownXssSourceUrl } from '../../../../tests/support/markdown-xss-corpus'
 
 describe('MarkdownEditor', () => {
+  it('completes actual mounted undo model synchronization without a nested retirement callback', async () => {
+    let authority: NonNullable<ReturnType<typeof useMarkdownHeavyFeatureDocumentContext>>['documentAuthority']
+    const Probe = defineComponent({ setup() {
+      authority = useMarkdownHeavyFeatureDocumentContext()?.documentAuthority
+      return () => null
+    } })
+    const wrapper = mount(MarkdownEditor, { props: {
+      modelValue: 'source', mode: 'source', statusDensity: 'minimal', documentIdentity: { id: 'nested-notification', epoch: 1 },
+    }, slots: { status: () => h(Probe) } })
+    await flushPromises()
+    const vm = wrapper.vm as MarkdownEditorInstance
+    expect(vm.dispatchTransaction({ changes: [{ from: 0, to: 0, insert: 'seed ' }], history: 'separate', origin: 'programmatic' }).accepted).toBe(true)
+    await nextTick()
+    let calls = 0
+    const cause = { tag: 'nested-notification-must-not-run' }
+    const handle = authority!.subscribeRetirement(() => { if (++calls === 2) throw cause })
+    expect(vm.undo().accepted).toBe(true)
+    expect(calls).toBe(1)
+    expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual(['source'])
+    expect(handle.hasCustody()).toBe(true)
+    // Remove this ordinary control before actual unmount can trigger its next legitimate outer notification.
+    let caught: unknown
+    try { handle.unsubscribe() } catch (error) { caught = error }
+    expect(caught).toBe(cause)
+    expect(handle.hasCustody()).toBe(true)
+    handle.unsubscribe()
+    wrapper.unmount()
+  })
+
+  it('attempts original late unmount cleanup after receiver failure and retains its original cause/custody', async () => {
+    let authority: NonNullable<ReturnType<typeof useMarkdownHeavyFeatureDocumentContext>>['documentAuthority']
+    const Probe = defineComponent({ setup() {
+      authority = useMarkdownHeavyFeatureDocumentContext()?.documentAuthority
+      return () => null
+    } })
+    const errors: unknown[] = []
+    const wrapper = mount(MarkdownEditor, { props: {
+      modelValue: 'source', mode: 'source', statusDensity: 'minimal', documentIdentity: { id: 'cleanup-after-retirement-failure', epoch: 1 },
+    }, slots: { status: () => h(Probe) }, global: { config: { errorHandler: error => { errors.push(error) } } } })
+    await flushPromises()
+    const cause = { tag: 'original-retirement-failure' }
+    let fail = true
+    const handle = authority!.subscribeRetirement(() => { if (fail) throw cause })
+    const removals = vi.spyOn(window, 'removeEventListener')
+    const release = vi.spyOn(MarkdownEditorTransactionStore.prototype, 'releaseRetainedSnapshot')
+    try {
+      wrapper.unmount()
+      expect(errors).toContain(cause)
+      expect(release).toHaveBeenCalled()
+      expect(removals.mock.calls.some(([event]) => event === 'resize')).toBe(true)
+      expect(handle.hasCustody()).toBe(true)
+      expect(handle.failureCause()).toBe(cause)
+      expect(authority!.capture()).toBeNull()
+      fail = false
+      expect(handle.unsubscribe()).toBe(true)
+      expect(handle.hasCustody()).toBe(false)
+      expect(authority!.capture()).toBeNull()
+    } finally {
+      removals.mockRestore()
+      release.mockRestore()
+    }
+  })
+
   it('seals original native publication and checks/publishes without any external owner reader', () => {
     const identity = { id: 'sealed-native-document', epoch: 1 }
     const store = new MarkdownEditorTransactionStore('source', undefined, identity)

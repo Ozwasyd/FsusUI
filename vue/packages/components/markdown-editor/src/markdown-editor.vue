@@ -1401,10 +1401,16 @@ const rootElementRef = ref<HTMLElement | null>(null)
 const sessionSurfacePaused = ref(false)
 let sessionDisposed = false
 let retireSnapshotPublicationAuthority: (() => void) | undefined = undefined
+let sessionUnmountFailed = false
+let sessionUnmountFirstCause: unknown
 // Retire before the original scheduler registers its cleanup callbacks.
 onBeforeUnmount(() => {
   sessionDisposed = true
-  retireSnapshotPublicationAuthority?.()
+  try { retireSnapshotPublicationAuthority?.() } catch (cause) {
+    if (!sessionUnmountFailed) sessionUnmountFirstCause = cause
+    sessionUnmountFailed = true
+    throw cause
+  }
 })
 const frameScheduler = useMarkdownEditorFrameScheduler({
   onFrameEnd: (metrics) => {
@@ -4213,20 +4219,38 @@ onMounted(() => {
 onBeforeUnmount(() => {
   editorReleased = true
   sessionDisposed = true
-  releaseAttachmentFiles()
-  transactionStore.releaseRetainedSnapshot()
-  languageToolsController?.cancelSearch()
-  clearSearchViewAliases()
-  languageSearchParticipant = null
-  languageToolsController = null
-  abortPendingCommands()
-  if (layoutGestureTimer) clearTimeout(layoutGestureTimer)
-  cancelOwnedTypewriterFrames()
-  typewriterResizeObserver?.disconnect()
-  cssHighlightRegistry()?.delete('markdown-search-match')
-  cssHighlightRegistry()?.delete('markdown-search-current')
-  attachmentEmbedOwner.abort()
-  detachViewportListeners()
+  const attempt = (cleanup: () => void): boolean => {
+    try { cleanup(); return true } catch (cause) {
+      if (!sessionUnmountFailed) sessionUnmountFirstCause = cause
+      sessionUnmountFailed = true
+      return false
+    }
+  }
+  attempt(releaseAttachmentFiles)
+  attempt(() => transactionStore.releaseRetainedSnapshot())
+  const searchCancelled = attempt(() => languageToolsController?.cancelSearch())
+  const searchAliasesCleared = attempt(clearSearchViewAliases)
+  if (searchCancelled && searchAliasesCleared) {
+    languageSearchParticipant = null
+    languageToolsController = null
+  }
+  attempt(abortPendingCommands)
+  attempt(() => {
+    if (layoutGestureTimer !== undefined) {
+      clearTimeout(layoutGestureTimer)
+      layoutGestureTimer = undefined
+    }
+  })
+  attempt(cancelOwnedTypewriterFrames)
+  attempt(() => {
+    typewriterResizeObserver?.disconnect()
+    typewriterResizeObserver = undefined
+  })
+  attempt(() => { cssHighlightRegistry()?.delete('markdown-search-match') })
+  attempt(() => { cssHighlightRegistry()?.delete('markdown-search-current') })
+  attempt(() => attachmentEmbedOwner.abort())
+  attempt(detachViewportListeners)
+  if (sessionUnmountFailed) throw sessionUnmountFirstCause
 })
 
 watch(

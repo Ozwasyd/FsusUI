@@ -830,11 +830,17 @@ export class MarkdownEditorTransactionStore {
   }
 
   #beginDocumentWrite(): void {
+    if (this.#notifyingRetirement || this.#releasingRetirement)
+      throw new Error('editor-document-retirement-notification-active')
+    const outermost = this.#documentWriteDepth === 0
     // Close authority before touching caller arguments, getters, arrays or callback-bearing work.
-    this.#documentAuthority = undefined
-    if (this.#documentAuthorityGeneration === Number.MAX_SAFE_INTEGER) this.#documentAuthorityRetired = true
-    else this.#documentAuthorityGeneration += 1
+    if (outermost) {
+      this.#documentAuthority = undefined
+      if (this.#documentAuthorityGeneration === Number.MAX_SAFE_INTEGER) this.#documentAuthorityRetired = true
+      else this.#documentAuthorityGeneration += 1
+    }
     this.#documentWriteDepth += 1
+    if (!outermost) return
     try {
       this.#notifyDocumentAuthorityRetirement()
     } catch (cause) {

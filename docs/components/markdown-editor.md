@@ -1172,3 +1172,20 @@ second generation/producer/history or synthetic resource-zero receipt exists.
 Renderer must register its original retirement function and retain failed
 handles; its projection/pipeline/cleanup and all qualification remain its original
 owner's work. New ordinary source controls remain UNRUN/HOLD.
+
+
+Receiver notification occurs only once at the outermost actual transaction write
+entry. Internal nested merge-boundary/retained operations remain inside that
+already revoked generation and introduce no second receiver callback after value,
+selection/history mutation. Notification/release-time reentrant writes still
+refuse. A next outer notification failure remains before its mutation.
+
+Early unmount stores its first original retirement failure. The original late
+cleanup hook attempts each attachment/retained/search/command/timer/frame/observer/
+highlight/embed/viewport cleanup independently and rethrows that first cause only
+after all attempts. Failed search cancellation retains controller/participant;
+timer/observer references clear only after successful original cancellation.
+No resource completeness/disposal/zero-usage receipt is issued. Source controls
+for second-call failure, actual SFC model synchronization and failure-followed
+viewport cleanup are added only/UNRUN. The earlier3de receiver source had one P1
+and one P2 and is not an accepted implementation; this repair needs new review.

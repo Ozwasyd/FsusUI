@@ -50,6 +50,34 @@ const seededRandom = (seed: number) => {
 }
 
 describe('MarkdownEditor transaction properties', () => {
+  it.each(['undo', 'redo', 'reset', 'selection', 'restore', 'dispatch', 'switch'] as const)(
+    'notifies only before the outer %s mutation and refuses the next failure before any new state changes', (operation) => {
+      const store = new MarkdownEditorTransactionStore('source', selection(0), { id: 'document', epoch: 1 })
+      store.dispatch(transaction([{ from: 0, to: 0, insert: 'seed ' }], selection(0)))
+      if (operation === 'redo') store.undo()
+      const retained = store.retainSnapshot()
+      const cause = { tag: 'second-outer-notification' }
+      let calls = 0
+      const handle = store.subscribeDocumentAuthorityRetirement(() => { if (++calls === 2) throw cause })
+      if (operation === 'undo') expect(store.undo().accepted).toBe(true)
+      else if (operation === 'redo') expect(store.redo().accepted).toBe(true)
+      else if (operation === 'reset') store.reset('reset', selection(0))
+      else if (operation === 'selection') store.setSelection(selection(1))
+      else if (operation === 'restore') expect(store.restoreRetainedSnapshot(retained)).toBe(true)
+      else if (operation === 'dispatch') expect(store.dispatch(transaction([{ from: 0, to: 0, insert: 'next ' }], selection(0), { history: 'skip' })).accepted).toBe(true)
+      else store.switchDocument({ id: 'next', epoch: 2 }, 'next', selection(0))
+      expect(calls).toBe(1)
+      const after = { value: store.value, revision: store.revision, selection: store.selection, history: store.history, identity: store.documentIdentity }
+      let caught: unknown
+      try { store.reset('must not apply') } catch (error) { caught = error }
+      expect(caught).toBe(cause)
+      expect({ value: store.value, revision: store.revision, selection: store.selection, history: store.history, identity: store.documentIdentity }).toEqual(after)
+      expect(handle.hasCustody()).toBe(true)
+      expect(handle.failureCause()).toBe(cause)
+      expect(store.captureDocumentAuthority()).toBeNull()
+    },
+  )
+
   it('delivers original synchronous retirement before writer getters and releases only actual registrations', () => {
     const store = new MarkdownEditorTransactionStore('source', selection(0), { id: 'document', epoch: 1 })
     const ticket = store.captureDocumentAuthority()!
