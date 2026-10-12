@@ -1001,3 +1001,41 @@ owner/SFC catch sites were checked for the same current-owner lookup: async
 observers use fixed source/registration arguments; selected cleanup and watch,
 frame, timer, observer and installation failures use captured resources/tokens.
 No additional instance of that attribution pattern was found.
+
+### Public session checkpoint handle
+
+`ElMarkdownRenderer.getRendererCheckpointHandle()` returns one frozen handle
+containing the existing owner's exact `prepareRendererOwnedCheckpoint`,
+`sealPreparedRendererOwnedCheckpoint`, `hasSealedRendererOwnedCheckpointCustody`,
+`publishSealedRendererOwnedCheckpoint`, and
+`cancelPreparedRendererOwnedCheckpoint` functions. It returns `null` while the
+original Native or either pipeline/viewport retirement registration is absent,
+unknown, being installed/released, or after renderer disposal. Reading the handle
+does not capture or issue a ticket, inspect a source, or change custody.
+
+The public `MarkdownEditorSession.getRendererCheckpointHandle()` forwards that
+same handle through its optional original-owner binding. The session binding
+pins the actual getter with its original `this`, checks editor availability and
+document identity/epoch/revision around the read, and returns the handle without
+cloning its methods or tokens. An unassembled binding returns `null`; fragment
+selection and installation of the full-document renderer port belong to the
+original editor owner. This addition does not install a port in another owner's
+`MarkdownEditor` setup or create another renderer.
+
+Import `MarkdownRendererCheckpointHandle`,
+`MarkdownRendererCheckpointPreparation`, `MarkdownRendererCheckpointPublication`,
+`MarkdownRendererSealedCheckpointPublication`, and
+`MarkdownRendererOwnedCheckpoint` from `@ozwasyd/element-plus`. These are the
+original types: metadata or a cloned object cannot replace the exact producer-held
+preparation/publication identity. Hold the same handle across prepare/seal/has/
+publish/cancel. Its pure has function performs only the existing original custody
+checks, without capture, reacquisition, callbacks or allocation. Holding a handle
+after retirement/disposal preserves the original cancellation path for its exact
+pending preparation; cancellation never releases a published pin, failed Native
+registration, unknown installation or cleanup cause.
+
+The actual retained handle contributes one logical memory entry and creates no
+extra listener, timer, worker or job. It certifies no complete resource census,
+restoration, recovery, full-host readiness or eviction: `complete:false`,
+`recoverable:false`, `nativeRecovery:'unavailable'`, unknown resource contracts,
+and runtime/native qualification holds remain.

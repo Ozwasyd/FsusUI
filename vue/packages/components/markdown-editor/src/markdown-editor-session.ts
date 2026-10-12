@@ -2,6 +2,7 @@ import { createMarkdownEditorSessionResourceCoordinator } from './markdown-edito
 import { MarkdownEditorTransactionStore } from './markdown-editor-transaction'
 import type { MarkdownEditorSessionPanelCapture, MarkdownEditorSessionPanelRefs, MarkdownEditorSessionPanelState } from './markdown-editor-session-panels'
 import type { MarkdownEditorSessionResourceCensus, MarkdownEditorSessionResourceParticipant } from './markdown-editor-session-resources'
+import type { MarkdownRendererCheckpointHandle } from '../../markdown-renderer/src/markdown-renderer-session-resources'
 import type {
   MarkdownEditorDocumentIdentity,
   MarkdownEditorHistoryState,
@@ -127,6 +128,8 @@ export interface MarkdownEditorSession {
   }): MarkdownEditorSessionContentDigest
   inspectResourceParticipants(): MarkdownEditorSessionResourceCensus
   inspectRendererResourceSource(): MarkdownEditorSessionRendererResourceSource | null
+  /** Exact original renderer methods/tokens; an unassembled owner returns null. */
+  getRendererCheckpointHandle(): MarkdownRendererCheckpointHandle | null
   inspectAttachmentResourceSource(): MarkdownEditorSessionAttachmentResourceSource | null
   captureLastValidRender(): MarkdownEditorSessionLastValidRender | null
   restoreLastValidRender(render: MarkdownEditorSessionLastValidRender, expected: {
@@ -182,6 +185,7 @@ export interface MarkdownEditorSessionOwner<ViewState> {
   readonly resourceParticipants: () => readonly MarkdownEditorSessionResourceParticipant[]
   readonly captureLastValidRender: () => MarkdownEditorSessionLastValidRender | null
   readonly inspectRendererResourceSource?: () => MarkdownEditorSessionRendererResourceSource | null
+  readonly getRendererCheckpointHandle?: () => MarkdownRendererCheckpointHandle | null
   readonly inspectAttachmentResourceSource?: () => MarkdownEditorSessionAttachmentResourceSource | null
   readonly restoreLastValidRender?: (ref: string) => Promise<MarkdownEditorSessionRenderRestoreProof>
 }
@@ -209,6 +213,7 @@ export const createMarkdownEditorSessionBinding = <ViewState>(
   retirePublicationAuthority(): void
 } => {
   const transactionStore = owner.transactionStore
+  const readRendererCheckpointHandle = owner.getRendererCheckpointHandle?.bind(owner)
   // Pin the original producer implementation, not replaceable consumer methods.
   const validatePreparedTransaction = MarkdownEditorTransactionStore.prototype.validatePreparedRetainedSnapshot.bind(transactionStore)
   const publishPreparedTransaction = MarkdownEditorTransactionStore.prototype.commitPreparedRetainedSnapshot.bind(transactionStore)
@@ -335,6 +340,18 @@ export const createMarkdownEditorSessionBinding = <ViewState>(
           }
         },
         inspectResourceParticipants: () => { assertAvailable(); return resources.inspectParticipants() },
+        getRendererCheckpointHandle() {
+          assertAvailable()
+          const id = transactionStore.documentIdentity.id
+          const epoch = transactionStore.documentIdentity.epoch
+          const revision = transactionStore.revision
+          const handle = readRendererCheckpointHandle?.() ?? null
+          assertAvailable()
+          if (transactionStore.documentIdentity.id !== id || transactionStore.documentIdentity.epoch !== epoch ||
+              transactionStore.revision !== revision)
+            throw new Error('editor-session-renderer-checkpoint-handle-stale')
+          return handle
+        },
         inspectRendererResourceSource() {
           assertAvailable()
           const store = owner.transactionStore
