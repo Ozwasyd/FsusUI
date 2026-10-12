@@ -1331,7 +1331,7 @@ import { freezeMarkdownEditorSessionPanelState, markdownEditorSessionPanelMemory
 import { captureMarkdownEditorSessionAttachmentState } from './markdown-editor-session-attachment-state'
 import { createMarkdownAttachmentEmbedResourceOwner } from './markdown-editor-attachment-embed-owner'
 import { createMarkdownEditorSessionCommandResources, isMarkdownEditorSessionOwnedCommand } from './markdown-editor-session-command-resources'
-import type { MarkdownRendererLastValidRender, createMarkdownRendererSessionResourceOwner } from '../../markdown-renderer/src/markdown-renderer-session-resources'
+import type { MarkdownRendererCheckpointHandle, MarkdownRendererLastValidRender, createMarkdownRendererSessionResourceOwner } from '../../markdown-renderer/src/markdown-renderer-session-resources'
 import { createMarkdownEditorSessionLayoutResources } from './markdown-editor-session-layout'
 import { createMarkdownEditorFrameResourceParticipant } from './markdown-editor-session-resources'
 import type { MarkdownEditorSessionResourceParticipant } from './markdown-editor-session-resources'
@@ -5639,6 +5639,7 @@ const searchReplaceInputRef = ref<HTMLInputElement | null>(null)
 const previewRendererRef = ref<HTMLElement | {
   $el?: HTMLElement
   captureLastValidRender?: () => MarkdownRendererLastValidRender | null
+  getRendererCheckpointHandle?: () => MarkdownRendererCheckpointHandle | null
   getSessionResourceSourceOffer?: () => ReturnType<ReturnType<typeof createMarkdownRendererSessionResourceOwner>['inspectOwnedResources']>
   restoreLastValidRender?: (ref: string) => Promise<{ readonly ref: string; readonly status: 'restored' | 'blocked'; readonly reason: string | null }>
 } | null>(null)
@@ -6876,6 +6877,31 @@ const sessionBinding = createMarkdownEditorSessionBinding({
   ],
   isComposing: () => isComposing.value || nativeMachine.composing,
   isDisposed: () => sessionDisposed,
+  getRendererCheckpointHandle: () => {
+    const segments = embedRenderSegments.value
+    const renderer = previewRendererRef.value
+    if (segments.length > 1 || !liveSurface.value.rendererVisible || !renderer ||
+      renderer instanceof HTMLElement || !('getRendererCheckpointHandle' in renderer)) return null
+    const getter = renderer.getRendererCheckpointHandle
+    const element = renderer.$el
+    if (typeof getter !== 'function' || !(element instanceof HTMLElement) || !element.isConnected) return null
+    const assertRenderer = () => {
+      // Finish property/computed reads before the final selected-instance checks.
+      const currentGetter = renderer.getRendererCheckpointHandle
+      const currentElement = renderer.$el
+      const visible = liveSurface.value.rendererVisible
+      const currentSegments = embedRenderSegments.value
+      if (currentGetter !== getter || currentElement !== element || !element.isConnected || !visible ||
+        currentSegments !== segments || currentSegments.length > 1 || previewRendererRef.value !== renderer)
+        throw new Error('editor-session-full-renderer-checkpoint-owner-replaced')
+    }
+    assertRenderer()
+    const handle = getter.call(renderer)
+    assertRenderer()
+    // Forward the SAME original frozen handle. Cancellation remains on that held handle
+    // even if this mounted/full-document getter subsequently refuses admission.
+    return handle
+  },
   captureLastValidRender: () => {
     // Segmented/embed renderers prove their own fragments, not the full article.
     // Only this existing full-document mounted renderer can supply this ref.

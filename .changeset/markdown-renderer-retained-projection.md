@@ -2,6 +2,8 @@
 'element-plus': minor
 ---
 
+Install the original MarkdownEditor full-document checkpoint getter. Forward the same frozen Renderer handle with pinned getter/this and mounted selection guards; preserve null fragment/DOM fallback and failed/retired cancellation custody without granting full-host recovery or eviction.
+
 Forward the original renderer's checkpoint handle through an optional public session binding and export its original opaque token types. Preserve exact method/token identity and getter this, return null for unassembled owners, and keep cancellation/failure custody and complete recovery/eviction holds unchanged.
 
 Attribute Native input capture/allocation failures to the original source fixed before the call, preserving real source identity after reentrant teardown rather than reading a cleared current binding.

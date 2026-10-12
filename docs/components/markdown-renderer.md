@@ -1028,8 +1028,9 @@ pins the actual getter with its original `this`, checks editor availability and
 document identity/epoch/revision around the read, and returns the handle without
 cloning its methods or tokens. An unassembled binding returns `null`; fragment
 selection and installation of the full-document renderer port belong to the
-original editor owner. This addition does not install a port in another owner's
-`MarkdownEditor` setup or create another renderer.
+original editor owner. The original `MarkdownEditor` session owner now installs its optional getter
+from the same mounted full-document preview Renderer, with selected-instance,
+getter, root and full-document guards. It creates no additional Renderer.
 
 Import `MarkdownRendererCheckpointHandle`,
 `MarkdownRendererCheckpointPreparation`, `MarkdownRendererCheckpointPublication`,

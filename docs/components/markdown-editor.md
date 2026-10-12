@@ -1210,3 +1210,21 @@ No resource completeness/disposal/zero-usage receipt is issued. Source controls
 for second-call failure, actual SFC model synchronization and failure-followed
 viewport cleanup are added only/UNRUN. The earlier3de receiver source had one P1
 and one P2 and is not an accepted implementation; this repair needs new review.
+
+### Full-document Renderer checkpoint handle
+
+The original session owner installs `getRendererCheckpointHandle()` from the
+same mounted full-document preview Renderer. Segmented/embed rendering, DOM
+fallback, hidden/unmounted preview, a missing getter or an unassembled Renderer
+returns `null`. The owner pins the selected Renderer, original getter and `this`,
+then checks the same instance/root/full-document selection around the getter call.
+The public session additionally checks native document identity/epoch/revision.
+Reader errors and replacement refusal propagate; no other Renderer is discovered.
+
+The returned handle and its opaque preparation/publication must be held across
+prepare/seal/has/publish/cancel. The getter forwards the actual original handle
+without cloning or issuing tickets; pure has never reacquires or inspects. A held
+handle still permits original pending-candidate cancellation after the getter
+refuses a retired/replaced mount. This scoped capability preserves all original
+resource/restoration/native holds and `complete:false`/`recoverable:false`; it
+grants no full-host ready, disposed recovery or eviction.
