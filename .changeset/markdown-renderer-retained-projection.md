@@ -2,6 +2,8 @@
 'element-plus': minor
 ---
 
+Attribute Native input capture/allocation failures to the original source fixed before the call, preserving real source identity after reentrant teardown rather than reading a cleared current binding.
+
 Join scoped renderer input custody to the original f253 Native document ticket and real registration custody. Capture the original ticket before final guarded publication, use only its original pure custody checks, and preserve absent/stale/unmounted refusals without issuing a duplicate Native ticket or claiming full checkpoint recovery.
 
 Retain actual unsubscribe reentry failure/cause even when a receiver catches the exception and returns normally. Refuse removal until a separate real retry succeeds without reentry, preserving registration, history and view-release obligations.

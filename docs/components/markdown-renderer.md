@@ -992,3 +992,12 @@ the newer 2ad7af9 repair candidate, and its four P2 groups are not accepted here
 Neither a scoped Native input ticket nor static compilation qualifies pause,
 full/live seal, restoration or session eviction. Independent source review and
 all original counterexample/runtime/list/native/qualification holds remain.
+
+Native input issuance fixes its original binding/source before capture and candidate
+allocation. Capture, custody or allocation failure is attributed to that same
+source even if reentrant teardown has already released the current binding. The
+original cause and pure custody/refusal behavior remain unchanged. The remaining
+owner/SFC catch sites were checked for the same current-owner lookup: async
+observers use fixed source/registration arguments; selected cleanup and watch,
+frame, timer, observer and installation failures use captured resources/tokens.
+No additional instance of that attribution pattern was found.

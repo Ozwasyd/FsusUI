@@ -651,10 +651,11 @@ export const createMarkdownRendererSessionResourceOwner = <
         if (!ticket || ticketGeneration !== checkpointAuthorityGeneration) {
           const capturedGeneration = checkpointAuthorityGeneration
           const capturedValue = currentValue
+          const capturedBinding = documentRetirement
+          const capturedSource = capturedBinding?.source
           allocatingTicket = true
           try {
-            const capturedBinding = documentRetirement
-            const capturedNative = capturedBinding?.source.capture() ?? null
+            const capturedNative = capturedSource?.capture() ?? null
             if (capturedBinding && capturedNative === null) return null
             const candidate = Object.freeze({
               scope,
@@ -682,7 +683,7 @@ export const createMarkdownRendererSessionResourceOwner = <
             recordFailure(
               cause,
               null,
-              documentRetirement?.source,
+              capturedSource,
               'native-document-ticket-capture',
             )
             throw cause
