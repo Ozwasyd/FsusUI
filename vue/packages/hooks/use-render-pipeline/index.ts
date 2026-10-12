@@ -612,6 +612,13 @@ export type FsusRenderPipelineAuthority = Readonly<{
 
 const authorityNativePromise = Promise
 const authorityNativePromisePrototype = Promise.prototype
+const authorityNativePromiseThen = Function.prototype.call.bind(
+  Promise.prototype.then,
+)
+const authorityNativePromiseSpecies = Object.getOwnPropertyDescriptor(
+  Promise,
+  Symbol.species,
+)
 
 const createRenderPipelineProducerAuthority = (missingFeeds: string[] = []) => {
   let ticket: object | null = null
@@ -630,6 +637,7 @@ const createRenderPipelineProducerAuthority = (missingFeeds: string[] = []) => {
     listener: () => void
     subscriptionId: symbol
     state: 'pending' | 'unavailable'
+    continuation: object | null
   }>()
   const observeAsyncFeed = (
     source: object,
@@ -640,6 +648,7 @@ const createRenderPipelineProducerAuthority = (missingFeeds: string[] = []) => {
       listener: subscription.listener,
       subscriptionId: subscription.id,
       state: 'pending' as 'pending' | 'unavailable',
+      continuation: null as object | null,
     }
     asyncFeedObservers.add(record)
     try {
@@ -652,8 +661,14 @@ const createRenderPipelineProducerAuthority = (missingFeeds: string[] = []) => {
         authorityNativePromisePrototype,
         'constructor',
       )
-      // Native await uses PerformPromiseThen without a species-derived result.
-      // Foreign/subclass/thenable chains have no safe producer observation port.
+      const species = Object.getOwnPropertyDescriptor(
+        authorityNativePromise,
+        Symbol.species,
+      )
+      // Prototype/constructor are eligibility checks, not Promise brand proof.
+      // The original intrinsic validates the brand without consulting .then.
+      // Accept only the captured native species; callbacks touch private data only,
+      // so the actual native continuation fulfills rather than rejecting unhandled.
       if (
         prototype !== authorityNativePromisePrototype ||
         (ownConstructor &&
@@ -661,29 +676,35 @@ const createRenderPipelineProducerAuthority = (missingFeeds: string[] = []) => {
             ownConstructor.value !== authorityNativePromise)) ||
         !prototypeConstructor ||
         !('value' in prototypeConstructor) ||
-        prototypeConstructor.value !== authorityNativePromise
+        prototypeConstructor.value !== authorityNativePromise ||
+        !authorityNativePromiseSpecies?.get ||
+        !species ||
+        species.get !== authorityNativePromiseSpecies.get ||
+        species.set !== undefined ||
+        'value' in species
       ) {
         record.state = 'unavailable'
         return
       }
-      void (async () => {
-        try {
-          await source
-        } catch (cause) {
-          change(() =>
-            feedFailures.push(
-              Object.freeze({
-                cause,
-                listener: record.listener,
-                subscriptionId: record.subscriptionId,
-                phase: 'async-feed-rejection',
-              }),
-            ),
+      record.continuation = authorityNativePromiseThen(
+        source,
+        () => {
+          asyncFeedObservers.delete(record)
+        },
+        (cause: unknown) => {
+          // Feed already permanently broken/quarantined. No external callback or
+          // unverified await/then is invoked from either intrinsic reaction.
+          feedFailures.push(
+            Object.freeze({
+              cause,
+              listener: record.listener,
+              subscriptionId: record.subscriptionId,
+              phase: 'async-feed-rejection',
+            }),
           )
-        } finally {
-          change(() => asyncFeedObservers.delete(record))
-        }
-      })()
+          asyncFeedObservers.delete(record)
+        },
+      )
     } catch (cause) {
       record.state = 'unavailable'
       feedFailures.push(
@@ -727,16 +748,15 @@ const createRenderPipelineProducerAuthority = (missingFeeds: string[] = []) => {
         const result: unknown = subscription.listener()
         if (
           result !== null &&
-          (typeof result === 'object' || typeof result === 'function') &&
-          typeof (result as { then?: unknown }).then === 'function'
+          (typeof result === 'object' || typeof result === 'function')
         ) {
           brokenFeed = true
           subscription.quarantined = true
           feedFailures.push({
             cause: new TypeError(
-              'fsus_pipeline_authority_feed_not_synchronous',
+              'fsus_pipeline_authority_feed_return_unavailable',
             ),
-            message: 'fsus_pipeline_authority_feed_not_synchronous',
+            message: 'fsus_pipeline_authority_feed_return_unavailable',
             listener: subscription.listener,
             subscriptionId: subscription.id,
           })
