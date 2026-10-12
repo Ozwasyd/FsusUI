@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import {
+  bindMarkdownAttachmentConsumerRequest,
   captureMarkdownAttachmentInput,
   commitMarkdownAttachmentResult,
   createMarkdownAttachmentAtomicPresentation,
@@ -15,6 +16,9 @@ import {
   markdownFromAttachmentPayload,
   queryMarkdownAttachmentUnfinishedCount,
   validateMarkdownAttachmentPrepublish,
+  type MarkdownAttachmentConsumerRequest,
+  type MarkdownAttachmentConsumerRequestBinding,
+  type MarkdownAttachmentProviderResult,
 } from '../src/markdown-editor-attachment'
 import {
   cancelMarkdownAttachmentJob,
@@ -598,5 +602,385 @@ describe('attachment capture signal binding', () => {
     expect(result.batch.items[1]!.signal.aborted).toBe(false)
     expect(result.batch.signal.aborted).toBe(false)
     expect('files' in result.batch).toBe(false)
+  })
+})
+
+describe('original attachment consumer request capabilities', () => {
+  const resources = () => ({
+    backgroundTasks: 1,
+    timers: 0,
+    observers: 0,
+    retainedListeners: 0,
+    networkRequests: 1,
+    memoryUnits: 1,
+  })
+  const request = (): MarkdownAttachmentConsumerRequest => ({
+    result: new Promise<MarkdownAttachmentProviderResult>(() => {}),
+    settled: new Promise<void>(() => {}),
+    cancelLocal() {},
+    inspectLocalResources: resources,
+  })
+  const bind = (
+    original: unknown,
+  ): MarkdownAttachmentConsumerRequestBinding => {
+    const admission = bindMarkdownAttachmentConsumerRequest(original)
+    expect(admission.supported).toBe(true)
+    if (admission.supported === false) throw new Error(admission.reason)
+    return admission.value
+  }
+
+  it('preserves unknown void, bare futures and incomplete original handles', () => {
+    const original = request()
+    for (const value of [
+      undefined,
+      null,
+      original.result,
+      { result: original.result },
+    ]) {
+      const admission = bindMarkdownAttachmentConsumerRequest(value)
+      expect(admission.supported).toBe(false)
+      expect(admission.value).toBe(value)
+    }
+  })
+
+  it('retains the identical request and both futures without subscribing', () => {
+    let subscriptions = 0
+    const original = {
+      result: {
+        then() {
+          subscriptions += 1
+        },
+      },
+      settled: {
+        then() {
+          subscriptions += 1
+        },
+      },
+      cancelLocal() {},
+      inspectLocalResources: resources,
+    }
+    const bound = bind(original)
+    expect(bound.request).toBe(original)
+    expect(bound.result).toBe(original.result)
+    expect(bound.settled).toBe(original.settled)
+    expect(subscriptions).toBe(0)
+    expect(
+      bindMarkdownAttachmentConsumerRequest({
+        ...original,
+        settled: original.result,
+      }).supported,
+    ).toBe(false)
+  })
+
+  it('forwards original local cancellation without acknowledging settlement', async () => {
+    let finish!: () => void
+    let completed = false
+    let receiver: unknown
+    let reason: unknown
+    const original = {
+      ...request(),
+      settled: new Promise<void>((resolve) => {
+        finish = resolve
+      }),
+      cancelLocal(this: unknown, value?: string) {
+        receiver = this
+        reason = value
+      },
+    }
+    void original.settled.then(() => {
+      completed = true
+    })
+    const bound = bind(original)
+    bound.cancelLocal('local-pause')
+    expect(receiver).toBe(original)
+    expect(reason).toBe('local-pause')
+    expect(completed).toBe(false)
+    expect(bound.inspectLocalResources()).toEqual({
+      supported: true,
+      value: resources(),
+    })
+    finish()
+    await bound.settled
+    expect(completed).toBe(true)
+  })
+
+  it('refuses accessor capabilities without evaluating them', () => {
+    let reads = 0
+    const original = request()
+    Object.defineProperty(original, 'cancelLocal', {
+      get() {
+        reads += 1
+        return () => {}
+      },
+    })
+    expect(bindMarkdownAttachmentConsumerRequest(original).supported).toBe(
+      false,
+    )
+    expect(reads).toBe(0)
+  })
+
+  it('never converts missing or unknown census into zero', () => {
+    for (const returned of [
+      undefined,
+      {},
+      { ...resources(), networkRequests: null },
+      { ...resources(), timers: -1 },
+    ]) {
+      const bound = bind({
+        ...request(),
+        inspectLocalResources: () => returned,
+      })
+      expect(bound.inspectLocalResources().supported).toBe(false)
+    }
+    let reads = 0
+    const returned = resources()
+    Object.defineProperty(returned, 'memoryUnits', {
+      get() {
+        reads += 1
+        return 0
+      },
+    })
+    expect(
+      bind({
+        ...request(),
+        inspectLocalResources: () => returned,
+      }).inspectLocalResources().supported,
+    ).toBe(false)
+    expect(reads).toBe(0)
+  })
+
+  it('keeps an observed stale port stale and retains original cleanup', () => {
+    let originalCancelled = 0
+    let replacementCancelled = 0
+    const original = {
+      ...request(),
+      cancelLocal() {
+        originalCancelled += 1
+      },
+    }
+    const pinned = original.cancelLocal
+    const bound = bind(original)
+    original.cancelLocal = () => {
+      replacementCancelled += 1
+    }
+    expect(bound.inspectLocalResources().supported).toBe(false)
+    original.cancelLocal = pinned
+    expect(bound.inspectLocalResources().supported).toBe(false)
+    bound.cancelLocal()
+    expect([originalCancelled, replacementCancelled]).toEqual([1, 0])
+  })
+
+  it('refuses callback reentry before invoking nested cancellation', () => {
+    let cancellations = 0
+    let bound!: MarkdownAttachmentConsumerRequestBinding
+    bound = bind({
+      ...request(),
+      cancelLocal() {
+        cancellations += 1
+      },
+      inspectLocalResources() {
+        expect(() => bound.cancelLocal()).toThrow(
+          'attachment-consumer-request-reentry',
+        )
+        return resources()
+      },
+    })
+    expect(bound.inspectLocalResources().supported).toBe(true)
+    expect(cancellations).toBe(0)
+  })
+
+  it('refuses absent, incomplete and null checkpoints', () => {
+    for (const checkpoint of [
+      undefined,
+      { capture: () => ({}) },
+      { capture: () => null, recreate: () => request(), release() {} },
+    ]) {
+      const bound = bind({ ...request(), checkpoint })
+      expect(bound.captureCheckpoint().supported).toBe(false)
+    }
+  })
+
+  it('recreates only the original opaque pointer with the original port receiver', () => {
+    let bodyReads = 0
+    const opaque = Object.defineProperty({}, 'body', {
+      get() {
+        bodyReads += 1
+        return 'body'
+      },
+    })
+    const next = request()
+    const calls: unknown[][] = []
+    const port = {
+      capture() {
+        return opaque
+      },
+      recreate(this: unknown, checkpoint: object) {
+        calls.push([this, checkpoint])
+        return next
+      },
+      release(this: unknown, checkpoint: object) {
+        calls.push([this, checkpoint])
+      },
+    }
+    const bound = bind({ ...request(), checkpoint: port })
+    expect(bound.captureCheckpoint()).toEqual({
+      supported: true,
+      value: opaque,
+    })
+    expect(bound.recreateCheckpoint({}).supported).toBe(false)
+    expect(calls).toHaveLength(0)
+    const recreated = bound.recreateCheckpoint(opaque)
+    expect(recreated.supported).toBe(true)
+    if (recreated.supported === false) throw new Error(recreated.reason)
+    expect(recreated.value.request).toBe(next)
+    expect(bound.recreateCheckpoint(opaque).supported).toBe(false)
+    bound.releaseCheckpoint(opaque)
+    expect(calls).toEqual([
+      [port, opaque],
+      [port, opaque],
+    ])
+    expect(bodyReads).toBe(0)
+  })
+
+  it('consumes a failed recreation without discarding its unknown child', () => {
+    const opaque = {}
+    const unknownChild = { pending: true }
+    let invoked = 0
+    const bound = bind({
+      ...request(),
+      checkpoint: {
+        capture: () => opaque,
+        recreate() {
+          invoked += 1
+          return unknownChild
+        },
+        release() {},
+      },
+    })
+    bound.captureCheckpoint()
+    const failed = bound.recreateCheckpoint(opaque)
+    expect(failed.supported).toBe(false)
+    expect(failed.value).toBe(unknownChild)
+    expect(bound.recreateCheckpoint(opaque).supported).toBe(false)
+    expect(invoked).toBe(1)
+  })
+
+  it('retains a failed original checkpoint release for actual retry', () => {
+    const opaque = {}
+    let releases = 0
+    let retained = true
+    const bound = bind({
+      ...request(),
+      inspectLocalResources: () => ({
+        ...resources(),
+        memoryUnits: retained ? 1 : 0,
+      }),
+      checkpoint: {
+        capture: () => opaque,
+        recreate: () => request(),
+        release(checkpoint: object) {
+          expect(checkpoint).toBe(opaque)
+          releases += 1
+          if (releases === 1) throw new Error('native-release-failed')
+          retained = false
+        },
+      },
+    })
+    bound.captureCheckpoint()
+    expect(() => bound.releaseCheckpoint(opaque)).toThrow(
+      'native-release-failed',
+    )
+    expect(bound.inspectLocalResources()).toEqual({
+      supported: true,
+      value: { ...resources(), memoryUnits: 1 },
+    })
+    bound.releaseCheckpoint(opaque)
+    expect(releases).toBe(2)
+    expect(() => bound.releaseCheckpoint(opaque)).toThrow(
+      'attachment-consumer-checkpoint-foreign',
+    )
+  })
+
+  it('does not remint a released checkpoint returned again by its original port', () => {
+    const opaque = {}
+    const bound = bind({
+      ...request(),
+      checkpoint: {
+        capture: () => opaque,
+        recreate: () => request(),
+        release() {},
+      },
+    })
+    expect(bound.captureCheckpoint().supported).toBe(true)
+    bound.releaseCheckpoint(opaque)
+    expect(bound.captureCheckpoint().supported).toBe(false)
+    expect(bound.recreateCheckpoint(opaque).supported).toBe(false)
+    bound.releaseCheckpoint(opaque)
+  })
+
+  it('retires recreation while retaining original census, futures and cleanup', () => {
+    const opaque = {}
+    let cleaned = 0
+    const original = {
+      ...request(),
+      cancelLocal() {
+        cleaned += 1
+      },
+      checkpoint: {
+        capture: () => opaque,
+        recreate: () => request(),
+        release() {
+          cleaned += 1
+        },
+      },
+    }
+    const bound = bind(original)
+    bound.captureCheckpoint()
+    bound.retire()
+    expect(bound.captureCheckpoint().supported).toBe(false)
+    expect(bound.recreateCheckpoint(opaque).supported).toBe(false)
+    expect(bound.inspectLocalResources().supported).toBe(true)
+    expect(bound.settled).toBe(original.settled)
+    bound.cancelLocal()
+    bound.releaseCheckpoint(opaque)
+    expect(cleaned).toBe(2)
+  })
+
+  it('does not revive observed stale checkpoint methods after property restoration', () => {
+    const opaque = {}
+    const port = {
+      capture: () => opaque,
+      recreate: () => request(),
+      release() {},
+    }
+    const pinned = port.recreate
+    const bound = bind({ ...request(), checkpoint: port })
+    bound.captureCheckpoint()
+    port.recreate = () => request()
+    expect(bound.recreateCheckpoint(opaque).supported).toBe(false)
+    port.recreate = pinned
+    expect(bound.recreateCheckpoint(opaque).supported).toBe(false)
+    bound.releaseCheckpoint(opaque)
+  })
+
+  it('preserves cancellation failure without granting recreation or settlement', () => {
+    const opaque = {}
+    const original = {
+      ...request(),
+      cancelLocal() {
+        throw new Error('native-cancel-failed')
+      },
+      checkpoint: {
+        capture: () => opaque,
+        recreate: () => request(),
+        release() {},
+      },
+    }
+    const bound = bind(original)
+    bound.captureCheckpoint()
+    expect(() => bound.cancelLocal()).toThrow('native-cancel-failed')
+    expect(bound.recreateCheckpoint(opaque).supported).toBe(false)
+    expect(bound.settled).toBe(original.settled)
+    bound.releaseCheckpoint(opaque)
   })
 })
