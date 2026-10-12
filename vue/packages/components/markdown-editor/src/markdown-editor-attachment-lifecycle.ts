@@ -49,6 +49,8 @@ interface MarkdownAttachmentDispatchState {
   settled: boolean
   dispatching: boolean
   settlementAvailable: boolean
+  localSettlement?: 'pending' | 'fulfilled' | 'unknown'
+  localSettlementCause?: unknown
 }
 const attachmentDispatches = new WeakMap<
   MarkdownAttachmentJob,
@@ -63,10 +65,18 @@ export const inspectMarkdownAttachmentDispatch = (
   return state ? Object.freeze({ ...state }) : null
 }
 
-/** Only completion/rejection of this invocation can settle its resource record. */
+/** Only the original result and full-local future can settle a richer invocation. */
+export interface MarkdownAttachmentDispatchCompletion {
+  readonly result: PromiseLike<MarkdownAttachmentProviderResult>
+  readonly settled: PromiseLike<void>
+}
+
+/** Legacy result futures do not assert ownership of opaque consumer resources. */
 export const runMarkdownAttachmentDispatch = async (
   job: MarkdownAttachmentJob,
-  dispatch: () => PromiseLike<MarkdownAttachmentProviderResult>,
+  dispatch: () =>
+    | PromiseLike<MarkdownAttachmentProviderResult>
+    | MarkdownAttachmentDispatchCompletion,
 ): Promise<MarkdownAttachmentProviderResult> => {
   const ownedJob = toRaw(job)
   const previous = attachmentDispatches.get(ownedJob)
@@ -87,9 +97,54 @@ export const runMarkdownAttachmentDispatch = async (
   try {
     const work = dispatch()
     state.dispatching = false
-    if (!work || typeof work.then !== 'function') {
-      throw new Error('markdown-attachment-dispatch-settlement-unavailable')
+    if (work && 'result' in work && 'settled' in work) {
+      const resultWork = work.result
+      const localWork = work.settled
+      if (
+        !resultWork ||
+        !localWork ||
+        resultWork === (localWork as unknown) ||
+        typeof resultWork.then !== 'function' ||
+        typeof localWork.then !== 'function'
+      )
+        throw new Error('markdown-attachment-dispatch-settlement-unavailable')
+      state.settlementAvailable = true
+      state.localSettlement = 'pending'
+      let value: MarkdownAttachmentProviderResult | undefined
+      let resultFailed = false
+      let resultCause: unknown
+      await Promise.all([
+        (async () => {
+          try {
+            value = await resultWork
+          } catch (cause) {
+            resultFailed = true
+            resultCause = cause
+          }
+        })(),
+        (async () => {
+          try {
+            await localWork
+            state.localSettlement = 'fulfilled'
+          } catch (cause) {
+            state.localSettlement = 'unknown'
+            state.localSettlementCause = cause
+          }
+        })(),
+      ])
+      if (state.localSettlement !== 'fulfilled')
+        throw new AggregateError(
+          resultFailed
+            ? [resultCause, state.localSettlementCause]
+            : [state.localSettlementCause],
+          'markdown-attachment-local-settlement-unavailable',
+        )
+      state.settled = true
+      if (resultFailed) throw resultCause
+      return value!
     }
+    if (!work || !('then' in work) || typeof work.then !== 'function')
+      throw new Error('markdown-attachment-dispatch-settlement-unavailable')
     state.settlementAvailable = true
     try {
       return await work
