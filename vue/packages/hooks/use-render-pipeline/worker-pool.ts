@@ -494,8 +494,9 @@ export const createFsusWorkerExecutor = <TRequest, TResponse>(
     event: Partial<
       Omit<FsusWorkerExecutorEvent, 'name' | 'pendingCount' | 'type'>
     > = {},
+    callback = options.onEvent,
   ) => {
-    options.onEvent?.({
+    callback?.call(options, {
       activeCount: activeCount(),
       name,
       pendingCount: pending.size,
@@ -884,7 +885,9 @@ export const createFsusWorkerExecutor = <TRequest, TResponse>(
       }
     }
     try {
-      if (options.onEvent) emit('worker-error', { ...context, error: detail })
+      const callback = options.onEvent
+      if (callback)
+        emit('worker-error', { ...context, error: detail }, callback)
       else fallback()
     } catch (reportError) {
       fallback(reportError)
@@ -1274,25 +1277,56 @@ export const createFsusWorkerExecutor = <TRequest, TResponse>(
         if (!slot && slots.length < maxWorkers) {
           try {
             slot = createSlot()
-          } catch (error) {
-            const task = dequeue()
-            if (!task) return
-            let detail = createFsusError('infra', 'fsus_worker_create_failed')
+          } catch (factoryError) {
+            const causes: unknown[] = [factoryError]
+            let task: WorkerTask<TRequest, TResponse> | undefined
+            let delivered = false
             try {
-              runCleanup([
-                () => {
-                  detail = toFsusError(
-                    error,
-                    'fsus_worker_create_failed',
-                    'infra',
-                  )
-                },
-                () =>
-                  settleTask(task, fsusErr(detail), 'request-reject', detail),
-              ])
-            } catch (error) {
-              handleTaskException(task, error)
+              task = dequeue()
+            } catch (dequeueError) {
+              causes.push(dequeueError)
             }
+            if (task) {
+              let detail = createFsusError(
+                'infra',
+                'fsus_worker_create_failed',
+                { cause: factoryError },
+              )
+              try {
+                detail = toFsusError(
+                  factoryError,
+                  'fsus_worker_create_failed',
+                  'infra',
+                )
+              } catch (normalizationError) {
+                causes.push(normalizationError)
+              }
+              // Finish the batch before reporting: getters may settle the task.
+              if (
+                pending.get(task.id) === task &&
+                !task.settled &&
+                !task.settling
+              ) {
+                try {
+                  settleTask(task, fsusErr(detail), 'request-reject', detail)
+                } catch (settlementError) {
+                  causes.push(settlementError)
+                }
+                delivered = task.settled
+              }
+            }
+            if (!delivered || causes.length > 1) {
+              reportSharedException(
+                causes.length === 1
+                  ? factoryError
+                  : new AggregateError(
+                      causes,
+                      'fsus_worker_factory_attempt_failed',
+                    ),
+                task,
+              )
+            }
+            if (!task) return
             continue
           }
         }
