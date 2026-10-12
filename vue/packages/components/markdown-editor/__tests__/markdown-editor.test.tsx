@@ -6,6 +6,8 @@ import { afterEach, describe, expect, expectTypeOf, it, vi } from 'vitest'
 import MarkdownEditor from '../src/markdown-editor.vue'
 import { createMarkdownOutlineModel } from '../src/markdown-editor-outline'
 import { createMarkdownEditorSessionBinding } from '../src/markdown-editor-session'
+import { captureMarkdownEditorSessionAttachmentState } from '../src/markdown-editor-session-attachment-state'
+import { createMarkdownAttachmentJob, runMarkdownAttachmentDispatch } from '../src/markdown-editor-attachment-lifecycle'
 import { MarkdownEditorTransactionStore } from '../src/markdown-editor-transaction'
 import {
   defaultMarkdownEditorCommands,
@@ -26,6 +28,37 @@ import type {
 import { getMarkdownXssSourceUrl } from '../../../../tests/support/markdown-xss-corpus'
 
 describe('MarkdownEditor', () => {
+  it('retains only original settled attachment state and invalidates phase, signal and removal changes', async () => {
+    const controller = new AbortController()
+    const job = createMarkdownAttachmentJob('panel-item', {
+      documentIdentity: { id: 'panel-document', epoch: 1 }, revision: 0, signalController: controller,
+    })
+    let jobs = [job]
+    let finish!: (result: MarkdownAttachmentProviderResult) => void
+    const future = new Promise<MarkdownAttachmentProviderResult>((resolve) => { finish = resolve })
+    const pending = runMarkdownAttachmentDispatch(job, () => future)
+    expect(captureMarkdownEditorSessionAttachmentState(() => jobs, () => {})).toBeNull()
+    finish({ status: 'cancelled', batchId: 'panel-batch', itemId: 'panel-item',
+      documentIdentity: { id: 'panel-document', epoch: 1 }, revision: 0 })
+    await pending
+    job.phase = 'cancelled'
+    const captured = captureMarkdownEditorSessionAttachmentState(() => jobs, () => {})!
+    expect(captured.isCurrent()).toBe(true)
+    expect(Object.isFrozen(captured.state)).toBe(true)
+    expect(Object.isFrozen(captured.state[0])).toBe(true)
+    job.progress = 1
+    expect(captured.state[0]!.progress).toBe(0)
+    expect(captured.isCurrent()).toBe(false)
+    job.progress = 0
+    controller.abort()
+    expect(captured.isCurrent()).toBe(false)
+    jobs = []
+    expect(captured.isCurrent()).toBe(false)
+    const legacy = createMarkdownAttachmentJob('legacy', { documentIdentity: { id: 'panel-document', epoch: 1 }, revision: 0 })
+    legacy.phase = 'cancelled'
+    expect(captureMarkdownEditorSessionAttachmentState(() => [legacy], () => {})).toBeNull()
+  })
+
   it('refuses final admission openSearch continuations before native panel retain or restore', async () => {
     const wrapper = mount(MarkdownEditor, { props: {
       mode: 'source', modelValue: '# Original panel', documentIdentity: { id: 'panel-admission-document', epoch: 1 },
@@ -37,7 +70,7 @@ describe('MarkdownEditor', () => {
     const snapshot = session.captureSnapshot(() => 'a'.repeat(64))
     expect(snapshot.panelRefs).not.toBeNull()
     const expected = { documentIdentity: snapshot.documentIdentity, revision: snapshot.revision }
-    editor.dispatchTransaction({ changes: [], selection: { start: 0, end: 0, direction: 'none' }, origin: 'programmatic' })
+    editor.dispatchTransaction({ changes: [], selection: { start: 0, end: 0, direction: 'none' }, history: 'skip', origin: 'programmatic' })
     await nextTick()
     await flushPromises()
     const textarea = wrapper.find('textarea').element as HTMLTextAreaElement
@@ -45,7 +78,7 @@ describe('MarkdownEditor', () => {
     const proof = session.restoreSnapshot(snapshot, { ...expected, assertAdmission: () => editor.openSearch() })
     expect(proof.reason).toBe('editor-session-panel-owner-stale')
     expect({ start: textarea.selectionStart, end: textarea.selectionEnd, direction: textarea.selectionDirection }).toEqual(selection)
-    expect(editor.dispatchTransaction({ changes: [], origin: 'programmatic' }).selection).toEqual({ start: 0, end: 0, direction: 'none' })
+    expect(editor.dispatchTransaction({ changes: [], history: 'skip', origin: 'programmatic' }).selection).toEqual({ start: 0, end: 0, direction: 'none' })
     expect(session.validateRetainedSnapshot(snapshot, expected)).toBe(true)
     await nextTick()
     await flushPromises()

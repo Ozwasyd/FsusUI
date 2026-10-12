@@ -6735,6 +6735,7 @@ const sessionBinding = createMarkdownEditorSessionBinding({
     const projection = editorProjection.value
     if (!projection || isComposing.value || sessionDisposed) return null
     const textarea = textareaRef.value
+    const renderer = previewRendererRef.value
     const preview = previewElement()
     const mode = currentMode.value
     if ((mode !== 'preview' && !textarea) || (mode !== 'source' && !preview)) return null
@@ -6804,7 +6805,8 @@ const sessionBinding = createMarkdownEditorSessionBinding({
       const currentPreview = previewElement()
       if (sessionDisposed || isComposing.value || editorProjection.value !== projection ||
           transactionStore.documentIdentity.id !== identity.id || transactionStore.documentIdentity.epoch !== identity.epoch ||
-          transactionStore.revision !== revision || textareaRef.value !== textarea || currentPreview !== preview) return false
+          transactionStore.revision !== revision || textareaRef.value !== textarea ||
+          previewRendererRef.value !== renderer || currentPreview !== preview) return false
       return true
     }
     return Object.freeze({
