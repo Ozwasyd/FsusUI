@@ -54,6 +54,12 @@ export interface MarkdownRendererCleanupAction {
   readonly run: () => void
 }
 
+type MarkdownRendererFrameFinalizer = {
+  readonly run: () => void
+  state: 'pending' | 'running' | 'completed'
+  selected: boolean
+}
+
 export interface MarkdownRendererRestoreProof {
   readonly ref: string
   readonly status: 'restored' | 'blocked'
@@ -153,6 +159,7 @@ export const createMarkdownRendererSessionResourceOwner = <
     readonly memoryUnits: number
     readonly retainedListeners: number
   }
+  readonly readComponentCleanupPending: () => number
 }) => {
   const timers = new Set<ReturnType<typeof setTimeout>>()
   const frames = new Map<number, () => void>()
@@ -160,7 +167,15 @@ export const createMarkdownRendererSessionResourceOwner = <
   const jobs = new Set<symbol>()
   const listeners = new Set<() => void>()
   const installingListeners = new Set<() => void>()
-  const pendingFrameFinalizers = new Map<() => void, () => void>()
+  const pendingFrameFinalizers = new Map<
+    () => void,
+    MarkdownRendererFrameFinalizer
+  >()
+  const installations = new Map<
+    object,
+    { phase: string; state: 'installing' | 'unknown'; error?: unknown }
+  >()
+  const pendingComponentCleanups = new Map<string, Map<unknown, () => void>>()
   const cleanupFailures = new Map<string, Map<unknown, Set<unknown>>>()
   const runningCleanups = new Map<string, Set<unknown>>()
   let disposingOnUnmount = false
@@ -182,6 +197,35 @@ export const createMarkdownRendererSessionResourceOwner = <
     readonly state: Readonly<State>
     readonly retainedCollectionEntries: number
   } | null = null
+
+  const beginInstallation = (phase: string) => {
+    if (disposed) throw new Error('markdown-renderer-resource-owner-disposed')
+    const token = {}
+    installations.set(token, { phase, state: 'installing' })
+    return Object.freeze({
+      complete: () => installations.delete(token),
+      fail: (error: unknown) =>
+        installations.set(token, { phase, state: 'unknown', error }),
+    })
+  }
+  const finalizeFrame = (
+    key: () => void,
+    finalizer: MarkdownRendererFrameFinalizer,
+  ) => {
+    if (finalizer.state !== 'pending') return
+    finalizer.selected = true
+    finalizer.state = 'running'
+    pendingFrameFinalizers.set(key, finalizer)
+    try {
+      finalizer.run()
+      finalizer.state = 'completed'
+      if (pendingFrameFinalizers.get(key) === finalizer)
+        pendingFrameFinalizers.delete(key)
+    } catch (error) {
+      finalizer.state = 'pending'
+      throw error
+    }
+  }
 
   const runCleanupBatch = (
     actions: readonly MarkdownRendererCleanupAction[],
@@ -321,7 +365,9 @@ export const createMarkdownRendererSessionResourceOwner = <
         timers.size > 0 ||
         frames.size > 0 ||
         scheduledFrames.size > 0 ||
-        pendingFrameFinalizers.size > 0
+        pendingFrameFinalizers.size > 0 ||
+        installations.size > 0 ||
+        pendingComponentCleanups.size > 0
       )
         return null
       const checkpointGeneration = generation
@@ -351,6 +397,8 @@ export const createMarkdownRendererSessionResourceOwner = <
           frames.size > 0 ||
           scheduledFrames.size > 0 ||
           pendingFrameFinalizers.size > 0 ||
+          installations.size > 0 ||
+          pendingComponentCleanups.size > 0 ||
           !sameDocument(capture, current) ||
           capture.revision !== current.revision ||
           projection.html !== render.projection.html ||
@@ -385,20 +433,33 @@ export const createMarkdownRendererSessionResourceOwner = <
     return () => jobs.delete(job)
   }
   const setTimer = (run: () => void, delay: number) => {
-    if (disposed) throw new Error('markdown-renderer-resource-owner-disposed')
-    const handle = setTimeout(() => {
-      timers.delete(handle)
-      if (!disposed) run()
-    }, delay)
-    timers.add(handle)
-    if (disposed)
-      runCleanupBatch([
-        {
-          phase: 'late-timer-clear',
-          resource: handle,
-          run: () => clearTimer(handle),
-        },
-      ])
+    const installation = beginInstallation('timer')
+    let handle: ReturnType<typeof setTimeout> | undefined
+    let fired = false
+    try {
+      handle = setTimeout(() => {
+        fired = true
+        if (handle !== undefined) timers.delete(handle)
+        if (!disposed) run()
+      }, delay)
+    } catch (error) {
+      installation.fail(error)
+      throw error
+    }
+    const ownedHandle = handle
+    if (!fired) timers.add(ownedHandle)
+    try {
+      if (disposed)
+        runCleanupBatch([
+          {
+            phase: 'late-timer-clear',
+            resource: ownedHandle,
+            run: () => clearTimer(ownedHandle),
+          },
+        ])
+    } finally {
+      installation.complete()
+    }
     return handle
   }
   const clearTimer = (handle: ReturnType<typeof setTimeout>) => {
@@ -412,31 +473,45 @@ export const createMarkdownRendererSessionResourceOwner = <
         resolve()
         return
       }
-      const handle = requestAnimationFrame(() => {
-        frames.delete(handle)
-        resolve()
-      })
-      frames.set(handle, resolve)
-      if (disposed) cancelFrames()
+      const installation = beginInstallation('animation-frame')
+      let handle: number | undefined
+      let fired = false
+      try {
+        handle = requestAnimationFrame(() => {
+          fired = true
+          if (handle !== undefined) frames.delete(handle)
+          resolve()
+        })
+      } catch (error) {
+        installation.fail(error)
+        throw error
+      }
+      if (!fired) frames.set(handle, resolve)
+      try {
+        if (disposed) cancelFrames()
+      } finally {
+        installation.complete()
+      }
     })
   const scheduleFrame = (
     scheduler: MarkdownEditorFrameScheduler,
     task: MarkdownEditorFrameTask,
     onCancel: () => void = () => undefined,
   ) => {
-    if (disposed) {
-      onCancel()
-      return false
+    const finalizer: MarkdownRendererFrameFinalizer = {
+      run: onCancel,
+      state: 'pending',
+      selected: false,
     }
-    const key = `${options.ownerKey}:${task.key}`
-    scheduledFrames.get(key)?.()
-    const cancel = () => {
-      pendingFrameFinalizers.set(cancel, onCancel)
+    let key = ''
+    let postPaintCompleted = false
+    const cancel = () =>
       runCleanupBatch([
         {
           phase: 'keyed-frame-cancel',
           resource: cancel,
           run: () => {
+            if (scheduledFrames.get(key) !== cancel) return
             scheduler.cancel(key)
             if (scheduledFrames.get(key) === cancel) scheduledFrames.delete(key)
           },
@@ -444,26 +519,72 @@ export const createMarkdownRendererSessionResourceOwner = <
         {
           phase: 'keyed-frame-finalize',
           resource: cancel,
-          run: () => {
-            onCancel()
-            if (pendingFrameFinalizers.get(cancel) === onCancel)
-              pendingFrameFinalizers.delete(cancel)
-          },
+          run: () => finalizeFrame(cancel, finalizer),
         },
       ])
+    const finish = () =>
+      runCleanupBatch([
+        {
+          phase: 'keyed-frame-finalize',
+          resource: cancel,
+          run: () => finalizeFrame(cancel, finalizer),
+        },
+      ])
+    if (disposed) {
+      finish()
+      return false
     }
-    const accepted = scheduler.schedule({
-      ...task,
-      key,
-      postPaint: () => {
-        if (scheduledFrames.get(key) === cancel) scheduledFrames.delete(key)
-        task.postPaint?.()
-      },
-    })
-    if (accepted) {
+    const installation = beginInstallation('keyed-frame')
+    let accepted: boolean
+    try {
+      key = `${options.ownerKey}:${task.key}`
+      scheduledFrames.get(key)?.()
+      if (disposed) {
+        finish()
+        installation.complete()
+        return false
+      }
       scheduledFrames.set(key, cancel)
-      if (disposed) cancel()
-    } else onCancel()
+      accepted = scheduler.schedule({
+        ...task,
+        key,
+        postPaint: () => {
+          if (scheduledFrames.get(key) === cancel) scheduledFrames.delete(key)
+          task.postPaint?.()
+          postPaintCompleted = true
+          if (!finalizer.selected) finalizer.state = 'completed'
+          if (
+            finalizer.state === 'completed' &&
+            pendingFrameFinalizers.get(cancel) === finalizer
+          )
+            pendingFrameFinalizers.delete(cancel)
+        },
+      })
+    } catch (error) {
+      installation.fail(error)
+      runCleanupBatch([
+        {
+          phase: 'keyed-frame-install',
+          resource: cancel,
+          run: () => {
+            throw error
+          },
+        },
+        { phase: 'late-keyed-frame-cleanup', resource: cancel, run: cancel },
+      ])
+      return false
+    }
+    try {
+      if (accepted && !postPaintCompleted) {
+        scheduledFrames.set(key, cancel)
+        if (disposed) cancel()
+      } else {
+        if (scheduledFrames.get(key) === cancel) scheduledFrames.delete(key)
+        if (!postPaintCompleted) finish()
+      }
+    } finally {
+      installation.complete()
+    }
     return accepted
   }
   const cancelFrames = () => {
@@ -478,9 +599,7 @@ export const createMarkdownRendererSessionResourceOwner = <
         resource: key,
         run: () => {
           if (pendingFrameFinalizers.get(key) !== finalize) return
-          finalize()
-          if (pendingFrameFinalizers.get(key) === finalize)
-            pendingFrameFinalizers.delete(key)
+          finalizeFrame(key, finalize)
         },
       })),
       ...[...frames].map(([handle, resolve]) => ({
@@ -641,6 +760,14 @@ export const createMarkdownRendererSessionResourceOwner = <
           disposingOnUnmount,
           installingAbortListeners: installingListeners.size,
           pendingFrameFinalizers: pendingFrameFinalizers.size,
+          resourceInstallations: Object.freeze(
+            [...installations.values()].map((record) =>
+              Object.freeze({ ...record }),
+            ),
+          ),
+          pendingComponentCleanups: [
+            ...pendingComponentCleanups.values(),
+          ].reduce((sum, records) => sum + records.size, 0),
           // One retained WatchHandle is not the native component effect/queue.
           effectCensus: 'unknown' as const,
           flushJobCensus: 'unknown' as const,
@@ -734,6 +861,9 @@ export const createMarkdownRendererSessionResourceOwner = <
               0,
             ) +
             pendingFrameFinalizers.size +
+            [...installations.values()].filter(
+              (record) => record.state === 'installing',
+            ).length +
             frames.size +
             scheduledFrames.size +
             projection.backgroundTasks +
@@ -771,6 +901,11 @@ export const createMarkdownRendererSessionResourceOwner = <
           memoryUnits:
             projection.memoryUnits +
             pendingFrameFinalizers.size +
+            installations.size +
+            [...pendingComponentCleanups.values()].reduce(
+              (sum, records) => sum + records.size,
+              0,
+            ) +
             [...cleanupFailures.values()].reduce(
               (sum, resources) =>
                 sum +
@@ -840,6 +975,14 @@ export const createMarkdownRendererSessionResourceOwner = <
     disposingOnUnmount = true
     generation += 1
     try {
+      for (const { phase, resource, run } of componentActions) {
+        let records = pendingComponentCleanups.get(phase)
+        if (!records) {
+          records = new Map()
+          pendingComponentCleanups.set(phase, records)
+        }
+        records.set(resource, run)
+      }
       runCleanupBatch([
         ...[...timers].map((timer) => ({
           phase: 'timer-clear',
@@ -857,7 +1000,17 @@ export const createMarkdownRendererSessionResourceOwner = <
           resource: renderWatchHandle,
           run: stopRenderWatch,
         },
-        ...componentActions,
+        ...[...pendingComponentCleanups].flatMap(([phase, records]) =>
+          [...records].map(([resource, run]) => ({
+            phase,
+            resource,
+            run: () => {
+              run()
+              if (records.get(resource) === run) records.delete(resource)
+              if (records.size === 0) pendingComponentCleanups.delete(phase)
+            },
+          })),
+        ),
       ])
       // Release view references only after every selected native cleanup returned.
       if (
@@ -867,6 +1020,9 @@ export const createMarkdownRendererSessionResourceOwner = <
         pendingFrameFinalizers.size > 0 ||
         listeners.size > 0 ||
         installingListeners.size > 0 ||
+        installations.size > 0 ||
+        pendingComponentCleanups.size > 0 ||
+        options.readComponentCleanupPending() > 0 ||
         renderWatchHandle !== null
       )
         throw new Error('markdown-renderer-unmount-cleanup-pending')
@@ -880,6 +1036,7 @@ export const createMarkdownRendererSessionResourceOwner = <
   return Object.freeze({
     afterFrame,
     bindRenderWatchHandle,
+    beginInstallation,
     beginRender,
     captureLastValidRender,
     captureRendererOwnedCheckpoint,

@@ -150,7 +150,14 @@ const handleHeavyFeatureThemeChange = () => {
 }
 const ensureHeavyFeatureThemeListener = () => {
   if (heavyThemeListenerInstalled || rendererResourceOwner.isDisposed()) return
-  const target = document.documentElement
+  const installation = rendererResourceOwner.beginInstallation('theme-listener')
+  let target: HTMLElement
+  try {
+    target = document.documentElement
+  } catch (error) {
+    installation.fail(error)
+    throw error
+  }
   heavyThemeListenerTarget = target
   heavyThemeListenerInstalled = true
   installingHeavyThemeListener = true
@@ -164,16 +171,23 @@ const ensureHeavyFeatureThemeListener = () => {
   } finally {
     installingHeavyThemeListener = false
   }
-  if (failed || rendererResourceOwner.isDisposed()) {
-    const errors: unknown[] = failed ? [failure] : []
-    try {
-      removeHeavyFeatureThemeListener()
-    } catch (error) {
-      errors.push(error)
+  try {
+    if (failed || rendererResourceOwner.isDisposed()) {
+      const errors: unknown[] = failed ? [failure] : []
+      try {
+        removeHeavyFeatureThemeListener()
+      } catch (error) {
+        errors.push(error)
+      }
+      if (errors.length === 1) throw errors[0]
+      if (errors.length > 1)
+        throw new AggregateError(
+          errors,
+          'markdown-renderer-theme-cleanup-failed',
+        )
     }
-    if (errors.length === 1) throw errors[0]
-    if (errors.length > 1)
-      throw new AggregateError(errors, 'markdown-renderer-theme-cleanup-failed')
+  } finally {
+    installation.complete()
   }
 }
 const removeHeavyFeatureThemeListener = () => {
@@ -464,6 +478,12 @@ const rendererResourceOwner = createMarkdownRendererSessionResourceOwner({
   readPipelineResources: () => renderPipelineRuntime.inspectResources(),
   readHeavyResources: () => heavyLifecycle.inspectResources(),
   readVirtualWindowResources: () => virtualWindow.inspectResources(),
+  readComponentCleanupPending: () =>
+    (installingHeavyThemeListener ? 1 : 0) +
+    (removingHeavyThemeListener ? 1 : 0) +
+    (heavyThemeListenerTarget ? 1 : 0) +
+    (activationController ? 1 : 0) +
+    (activationObserver ? 1 : 0),
   readProjectionResources: () => {
     const heavy = heavyLifecycle.metrics()
     return {

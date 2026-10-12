@@ -564,6 +564,19 @@ fields clear only after their own native call returns. Watch failure cannot skip
 later theme/abort/observer/heavy cleanup. Underlying heavy retired work and unknown
 native state remain exposed.
 
+Each keyed frame retains one shared finalizer state across cancellation, pending
+retry and reentry. A running or completed finalizer is not called again; failure
+retains the pending obligation and original cause. Successful post-paint completion
+does not erase a previously selected, failed cancellation finalizer.
+
+Timer, RAF, keyed-frame and theme creation enter the owner's installation census
+before external calls. A reentrant unmount cannot release view references while
+creation is unresolved. Late native handles remain owned until cancellation
+returns; uncertain creation errors retain their original cause and block release.
+Component cleanup obligations persist across retries, and remaining theme,
+controller or observer references also block release. Unknown installation records
+and retained cleanup obligations count as retained memory, not invented active jobs.
+
 Disposal closes admission before callbacks. Reentrant disposal cannot recursively
 execute the same batch, and repeated calls select remaining actual resources.
 View reference release is a separate attempt-all phase after selected native
