@@ -681,7 +681,7 @@ future ticket-provider stubs. `sources.rendererCheckpointCustody.seal` remains
 | --------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | Document/source authority ticket with synchronous revocation before identity, epoch, revision or source mutation and external callbacks | `MarkdownHeavyFeatureDocumentContext` exposes callback getters only. The renderer's Vue source watch covers reactive notifications, not arbitrary getter-owned mutations. There is no original private ticket or revocation subscription to acquire.                                                                                             |
 | Pipeline authority ticket with complete synchronous admission/control/worker/callback/cleanup revocation                                | The original runtime returns reactive views, `inspectResources`, pause and resume. Its `onDiagnostic` callback covers selected current diagnostics and can be suppressed; it is not a complete mutation/revocation feed. Worker/resource/control state also lives in non-reactive records. Reading its real census once cannot seal later state. |
-| Complete renderer projection/lifecycle/failed-cleanup ticket revocation                                                                 | Existing render/invalidate/unmount generation controls and exact cleanup proofs remain real. Projection writes, deactivation and every producer failure are not connected to a single authoritative seal lifecycle. There is no current deactivation hook or original live ticket issuer. Partial hooks cannot certify complete coverage.        |
+| Complete renderer projection/lifecycle/failed-cleanup ticket revocation                                                                 | The original renderer now retires its private prepared authority around owned writes/callbacks, lifecycle and observed failures, including real activation/deactivation hooks. Original document/pipeline tickets are still absent, and joining their complete revocation streams remains required before any live ticket can be issued.         |
 
 The original document and pipeline owners must supply their real private tickets
 and synchronous revocation channels before this renderer can bind them together
@@ -697,3 +697,57 @@ host join must stop at this refusal; local custody publication is not a substitu
 No usage counter, paused/recoverable/full-host/native qualification is expanded.
 Refusal/token/getter/old-ref/cleanup preservation cases are source-inspected only;
 all runtime/test/list/native/security/receipt/authority/eviction cases stay UNRUN.
+
+### Original renderer retirement and upstream producer requests
+
+The existing renderer owner now keeps a private retirement generation separate
+from its render request generation. This is a real producer version, changed only
+by owned execution paths; it does not identify a document or certify another
+owner. Prepare captures it before source readers and rejects an observed retirement
+during capture. Seal preflight rejects a stale owned version, deactivated owner,
+observed failure residue or generation overflow before the upstream-source refusal.
+Overflow permanently holds sealing rather than allowing a wrapped version.
+
+Owned projection/chunk/state writes and external event/frame callbacks execute
+through the same owner's retirement boundary. It retires before the callback,
+tracks the real synchronous callback depth, retains original caught causes under
+`checkpoint-callback:*`, and retires again before leaving. A callback cannot capture
+or seal a transitional owned state. The current running callback entries contribute
+their actual control/memory subtotal; pending asynchronous work stays with its
+existing real jobs and underlying owners. No promise is declared settled by this
+synchronous boundary.
+
+Resource admission/settlement, render admission, invalidation, watch binding/stop,
+selected cleanup and its failures likewise retire before external calls. Cleanup
+still attempts the full original batch, retains failed handles/causes and rethrows.
+The SFC's actual source watch, activation reset, chunk refs, metrics callbacks and
+unmount entry use this same owner; actual Vue `onDeactivated` retires and closes
+seal eligibility, while `onActivated` retires again and never revives the old
+prepared version. Neither lifecycle hook claims native work stopped or recovered.
+Published checkpoint refs and actual cleanup custody remain held.
+
+The following inspected files belong to the original upstream owners and are not
+modified here. Blob identities refer to the current Renderer checkout, so newer
+original-owner source offers must provide their own exact commit/blob.
+
+| Original owner                  | Exact file/blob and current method                                                                                                                                                                                                                                                    | Minimum source request                                                                                                                                                                                                                                                                     |
+| ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Native Editor/transaction owner | `vue/packages/components/markdown-editor/src/markdown-editor.vue`, blob `c4651fccc5ce35ff7308db9993e34e5bebbfdc82`, `provideMarkdownHeavyFeatureDocumentContext`; `markdown-editor-transaction.ts`, blob `c05f57306200758536eb40cd61f680312d4ede8e`, `MarkdownEditorTransactionStore` | Supply a document/source authority ticket from the existing private transaction/native authority, with synchronous retirement before actual identity/epoch/revision/source mutation or external notifications. Bind it into the existing provided context; do not add a replacement store. |
+| Original context contract owner | `vue/packages/hooks/use-markdown-heavy-feature-lifecycle/index.ts`, C210 blob `c267bcfd52d42f28e811e68301ff06baaf63a96f`, `MarkdownHeavyFeatureDocumentContext`                                                                                                                       | Extend the real context with the original document-ticket acquisition/retirement channel supplied by that owner. Getter callbacks alone do not implement it.                                                                                                                               |
+| Original pipeline owner         | `vue/packages/hooks/use-render-pipeline/index.ts`, A928 blob `7a826df165df9ce9a3910d6f4ae8c64a0e15d27f`, `useFsusRenderPipelineRuntime`, `render`, `transitionControl`, worker callback/failure and cleanup paths                                                                     | Supply an original pipeline authority ticket whose complete synchronous retirement covers render admission, pause/resume/dispose, actual worker/callback/resource mutations and failures before external calls. `onDiagnostic` is not the acquisition/retirement channel.                  |
+
+For both suppliers, the minimum acquisition shape is an original opaque ticket
+plus a real synchronous retirement registration and owned release handle. Acquisition
+and original validation occur during renderer seal, before its final private guard;
+retirement must call this renderer's existing internal retirement receiver before
+producer mutation/observers. The renderer then uses only private version/custody
+in final has/publish, never an external callback or ticket getter. Registration and
+failed release must remain in their actual listener/resource census. These are
+requests to original suppliers, not callable APIs added by this task.
+
+This independent renderer portion is executable source, not a new eligibility
+option, timer, actor or metadata authority. Positive live seal and the full host
+join remain unavailable until the original suppliers are actually connected and
+reviewed. All runtime/qualification/authority/eviction holds remain. The new
+owned-version, callback reentry, failure, deactivate/reactivate and stale-prepare
+matrix is source-inspected only; executable cases remain UNRUN.

@@ -2,6 +2,8 @@
 'element-plus': minor
 ---
 
+Retire the original renderer's prepared authority synchronously around owned projection/chunk writes, external callbacks, resource transitions, cleanup failures and activation/deactivation/unmount. Bind pending capture to the real private retirement generation, guard callback reentry and retain actual callback causes. Original document/pipeline tickets remain required before any live seal can be issued.
+
 Expose fail-closed renderer seal join ports with exact missing original document/pipeline revocation sources. Do not issue a live seal from captured-only custody; pure has/publish refuse and preserve old refs, pending custody and cleanup obligations.
 
 Add original-owner staged renderer checkpoint custody with non-invalidating preparation, exact-token private validation, callback-free local pointer publication and cancellation. Keep captured-only authority, complete:false, recoverable:false, nativeRecovery unavailable and full-host publication/restoration refusals explicit.

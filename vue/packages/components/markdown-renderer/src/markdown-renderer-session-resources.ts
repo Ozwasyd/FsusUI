@@ -202,6 +202,46 @@ export const createMarkdownRendererSessionResourceOwner = <
   const runningCleanups = new Map<string, Set<unknown>>()
   let disposingOnUnmount = false
   let generation = 0
+  let checkpointAuthorityGeneration = 0
+  let checkpointAuthorityOverflowed = false
+  let checkpointDeactivated = false
+  let checkpointAuthorityCallbackDepth = 0
+  let lastCheckpointAuthorityRetirement: string | null = null
+  const retireCheckpointAuthority = (reason: string) => {
+    // Same producer's private retirement version, not a document/pipeline ticket.
+    if (checkpointAuthorityGeneration === Number.MAX_SAFE_INTEGER)
+      checkpointAuthorityOverflowed = true
+    else checkpointAuthorityGeneration += 1
+    lastCheckpointAuthorityRetirement = reason
+  }
+  const runCheckpointAuthorityCallback = <T>(
+    reason: string,
+    run: () => T,
+  ): T => {
+    retireCheckpointAuthority(reason)
+    checkpointAuthorityCallbackDepth += 1
+    try {
+      return run()
+    } catch (error) {
+      retireCheckpointAuthority('callback-failure')
+      const phase = `checkpoint-callback:${reason}`
+      let resources = cleanupFailures.get(phase)
+      if (!resources) {
+        resources = new Map()
+        cleanupFailures.set(phase, resources)
+      }
+      let causes = resources.get(run)
+      if (!causes) {
+        causes = new Set()
+        resources.set(run, causes)
+      }
+      causes.add(error)
+      throw error
+    } finally {
+      retireCheckpointAuthority('callback-completion')
+      checkpointAuthorityCallbackDepth -= 1
+    }
+  }
   let disposed = false
   let sequence = 0
   let checkpointSequence = 0
@@ -224,6 +264,7 @@ export const createMarkdownRendererSessionResourceOwner = <
     readonly record: CheckpointRecord
     readonly base: CheckpointRecord | null
     readonly generation: number
+    readonly authorityGeneration: number
     readonly preparation: MarkdownRendererCheckpointPreparation
     readonly publication: MarkdownRendererCheckpointPublication
     validated: boolean
@@ -231,12 +272,19 @@ export const createMarkdownRendererSessionResourceOwner = <
 
   const beginInstallation = (phase: string) => {
     if (disposed) throw new Error('markdown-renderer-resource-owner-disposed')
+    retireCheckpointAuthority('resource-admission')
     const token = {}
     installations.set(token, { phase, state: 'installing' })
     return Object.freeze({
-      complete: () => installations.delete(token),
-      fail: (error: unknown) =>
-        installations.set(token, { phase, state: 'unknown', error }),
+      complete: () => {
+        if (installations.has(token))
+          retireCheckpointAuthority('resource-settlement')
+        return installations.delete(token)
+      },
+      fail: (error: unknown) => {
+        retireCheckpointAuthority('cleanup-failure')
+        installations.set(token, { phase, state: 'unknown', error })
+      },
     })
   }
   const finalizeFrame = (
@@ -270,9 +318,11 @@ export const createMarkdownRendererSessionResourceOwner = <
         runningCleanups.set(phase, running)
       }
       running.add(resource)
+      retireCheckpointAuthority('cleanup-selected')
       try {
         run()
       } catch (error) {
+        retireCheckpointAuthority('cleanup-failure')
         errors.push(error)
         let resources = cleanupFailures.get(phase)
         if (!resources) {
@@ -344,6 +394,7 @@ export const createMarkdownRendererSessionResourceOwner = <
     const handle = renderWatchHandle
     if (!handle || stoppingRenderWatch) return
     stoppingRenderWatch = true
+    retireCheckpointAuthority('watch-stop')
     try {
       handle.stop()
       // Release only the actual owned handle after its own stop returns.
@@ -352,6 +403,7 @@ export const createMarkdownRendererSessionResourceOwner = <
         renderWatchCleanupFailure = null
       }
     } catch (error) {
+      retireCheckpointAuthority('cleanup-failure')
       renderWatchCleanupFailure = Object.freeze({
         phase: 'render-watch-stop',
         error,
@@ -364,12 +416,15 @@ export const createMarkdownRendererSessionResourceOwner = <
   const bindRenderWatchHandle = (handle: WatchHandle) => {
     if (renderWatchHandle && renderWatchHandle !== handle)
       throw new Error('markdown-renderer-render-watch-already-owned')
+    retireCheckpointAuthority('watch-binding')
     renderWatchHandle = handle
     // Immediate watch setup may have reentered ordinary unmount before binding.
     if (disposed) stopRenderWatch()
   }
-  const beginRender = (): MarkdownRendererRenderGeneration =>
-    Object.freeze({ ...readDocumentState(), generation: ++generation })
+  const beginRender = (): MarkdownRendererRenderGeneration => {
+    retireCheckpointAuthority('render-admission')
+    return Object.freeze({ ...readDocumentState(), generation: ++generation })
+  }
   const isCurrent = (token: MarkdownRendererRenderGeneration) => {
     const current = options.readDocumentState()
     return (
@@ -382,6 +437,7 @@ export const createMarkdownRendererSessionResourceOwner = <
   const captureLastValidRender = (): MarkdownRendererLastValidRender | null => {
     if (disposed || !retained) return null
     if (!sameDocument(retained.capture, options.readDocumentState())) {
+      retireCheckpointAuthority('document-mismatch')
       retained = null
       return null
     }
@@ -392,6 +448,7 @@ export const createMarkdownRendererSessionResourceOwner = <
     result: MarkdownSafeRenderResult,
   ) => {
     if (!isCurrent(token)) return false
+    retireCheckpointAuthority('retained-projection')
     // The component calls this only at an authorized, identity-matched commit.
     // Keep the actual immutable result in the sole owner, never reconstruct it
     // from HTML, a source digest or a fabricated success receipt.
@@ -422,6 +479,7 @@ export const createMarkdownRendererSessionResourceOwner = <
       if (
         disposed ||
         capturingCheckpoint ||
+        checkpointAuthorityCallbackDepth > 0 ||
         preparedCheckpoint !== null ||
         stoppingRenderWatch ||
         jobs.size > 0 ||
@@ -434,6 +492,7 @@ export const createMarkdownRendererSessionResourceOwner = <
       )
         return null
       const checkpointGeneration = generation
+      const authorityGeneration = checkpointAuthorityGeneration
       const base = checkpoint
       capturingCheckpoint = true
       try {
@@ -455,6 +514,8 @@ export const createMarkdownRendererSessionResourceOwner = <
         if (
           disposed ||
           generation !== checkpointGeneration ||
+          checkpointAuthorityCallbackDepth > 0 ||
+          checkpointAuthorityGeneration !== authorityGeneration ||
           retained !== render ||
           jobs.size > 0 ||
           timers.size > 0 ||
@@ -496,6 +557,7 @@ export const createMarkdownRendererSessionResourceOwner = <
           record,
           base,
           generation: checkpointGeneration,
+          authorityGeneration,
           preparation,
           publication: Object.freeze({
             ...preparation,
@@ -514,6 +576,7 @@ export const createMarkdownRendererSessionResourceOwner = <
       candidate !== null &&
       !disposed &&
       !capturingCheckpoint &&
+      checkpointAuthorityCallbackDepth === 0 &&
       !stoppingRenderWatch &&
       generation === candidate.generation &&
       retained === candidate.record.render &&
@@ -587,7 +650,12 @@ export const createMarkdownRendererSessionResourceOwner = <
     if (
       !candidate ||
       candidate.preparation !== preparation ||
-      !hasCurrentCheckpointCustody()
+      !hasCurrentCheckpointCustody() ||
+      checkpointDeactivated ||
+      checkpointAuthorityOverflowed ||
+      cleanupFailures.size > 0 ||
+      renderWatchCleanupFailure !== null ||
+      candidate.authorityGeneration !== checkpointAuthorityGeneration
     )
       return null
     // The original context has getters, and pipeline diagnostics omit control
@@ -607,9 +675,13 @@ export const createMarkdownRendererSessionResourceOwner = <
   ): MarkdownRendererOwnedCheckpoint | null => null
   const trackJob = () => {
     if (disposed) throw new Error('markdown-renderer-resource-owner-disposed')
+    retireCheckpointAuthority('job-admission')
     const job = Symbol('renderer-job')
     jobs.add(job)
-    return () => jobs.delete(job)
+    return () => {
+      if (jobs.has(job)) retireCheckpointAuthority('job-settlement')
+      return jobs.delete(job)
+    }
   }
   const setTimer = (run: () => void, delay: number) => {
     const installation = beginInstallation('timer')
@@ -617,6 +689,7 @@ export const createMarkdownRendererSessionResourceOwner = <
     let fired = false
     try {
       handle = setTimeout(() => {
+        retireCheckpointAuthority('timer-callback')
         fired = true
         if (handle !== undefined) timers.delete(handle)
         if (!disposed) run()
@@ -643,7 +716,13 @@ export const createMarkdownRendererSessionResourceOwner = <
   }
   const clearTimer = (handle: ReturnType<typeof setTimeout>) => {
     if (!timers.has(handle)) return
-    clearTimeout(handle)
+    retireCheckpointAuthority('timer-clear')
+    try {
+      clearTimeout(handle)
+    } catch (error) {
+      retireCheckpointAuthority('cleanup-failure')
+      throw error
+    }
     timers.delete(handle)
   }
   const afterFrame = () =>
@@ -657,6 +736,7 @@ export const createMarkdownRendererSessionResourceOwner = <
       let fired = false
       try {
         handle = requestAnimationFrame(() => {
+          retireCheckpointAuthority('frame-callback')
           fired = true
           if (handle !== undefined) frames.delete(handle)
           resolve()
@@ -745,18 +825,33 @@ export const createMarkdownRendererSessionResourceOwner = <
       const queuedTask = {
         ...task,
         key,
-        postPaint: () => {
-          if (scheduledFrames.get(key) === cancel) scheduledFrames.delete(key)
-          task.postPaint?.()
-          postPaintCompleted = true
-          if (!finalizer.selected) finalizer.state = 'completed'
-          if (
-            finalizer.state === 'completed' &&
-            pendingFrameFinalizers.get(cancel) === finalizer
-          )
-            pendingFrameFinalizers.delete(cancel)
-        },
+        postPaint: () =>
+          runCheckpointAuthorityCallback('frame-postpaint', () => {
+            if (scheduledFrames.get(key) === cancel) scheduledFrames.delete(key)
+            task.postPaint?.()
+            postPaintCompleted = true
+            if (!finalizer.selected) finalizer.state = 'completed'
+            if (
+              finalizer.state === 'completed' &&
+              pendingFrameFinalizers.get(cancel) === finalizer
+            )
+              pendingFrameFinalizers.delete(cancel)
+          }),
       }
+      for (const phase of ['measure', 'mutate'] as const) {
+        const run = queuedTask[phase]
+        if (run)
+          queuedTask[phase] = () =>
+            runCheckpointAuthorityCallback(`frame-${phase}`, () =>
+              run.call(queuedTask),
+            )
+      }
+      const guard = queuedTask.guard
+      if (guard)
+        queuedTask.guard = () =>
+          runCheckpointAuthorityCallback('frame-guard', () =>
+            guard.call(queuedTask),
+          )
       if (disposed) {
         if (scheduledFrames.get(key) === cancel) scheduledFrames.delete(key)
         finish()
@@ -832,6 +927,7 @@ export const createMarkdownRendererSessionResourceOwner = <
   }
   const listenForAbort = (signal: AbortSignal, run: () => void) => {
     if (disposed) throw new Error('markdown-renderer-resource-owner-disposed')
+    retireCheckpointAuthority('abort-listener-admission')
     let removing = false
     const remove = () => {
       if (removing || !listeners.has(remove)) return
@@ -978,6 +1074,14 @@ export const createMarkdownRendererSessionResourceOwner = <
           seal: 'unavailable' as const,
           missingSealSourceDependencies:
             markdownRendererCheckpointSealSourceDependencies,
+          ownedAuthorityRetirement: Object.freeze({
+            generation: checkpointAuthorityGeneration,
+            overflowed: checkpointAuthorityOverflowed,
+            deactivated: checkpointDeactivated,
+            lastReason: lastCheckpointAuthorityRetirement,
+            runningCallbacks: checkpointAuthorityCallbackDepth,
+            scope: 'renderer-owned-only' as const,
+          }),
         }),
         rendererNative: Object.freeze({
           renderWatchHandleRetained: renderWatchHandle !== null,
@@ -1081,6 +1185,7 @@ export const createMarkdownRendererSessionResourceOwner = <
           timers: knownTimers,
           backgroundTasks:
             jobs.size +
+            checkpointAuthorityCallbackDepth +
             (stoppingRenderWatch ? 1 : 0) +
             (capturingCheckpoint ? 1 : 0) +
             [...runningCleanups.values()].reduce(
@@ -1127,6 +1232,7 @@ export const createMarkdownRendererSessionResourceOwner = <
           networkRequests: 0,
           memoryUnits:
             projection.memoryUnits +
+            checkpointAuthorityCallbackDepth +
             controlledFrameKeys.size +
             pendingFrameFinalizers.size +
             installations.size +
@@ -1201,6 +1307,7 @@ export const createMarkdownRendererSessionResourceOwner = <
     componentActions: readonly MarkdownRendererCleanupAction[] = [],
     releaseActions: readonly MarkdownRendererCleanupAction[] = [],
   ) => {
+    retireCheckpointAuthority('unmount')
     disposed = true
     if (disposingOnUnmount) return
     disposingOnUnmount = true
@@ -1259,6 +1366,16 @@ export const createMarkdownRendererSessionResourceOwner = <
     validatePreparedRendererOwnedCheckpoint,
     publishPreparedRendererOwnedCheckpoint,
     cancelPreparedRendererOwnedCheckpoint,
+    retireCheckpointAuthority,
+    runCheckpointAuthorityCallback,
+    onCheckpointActivated: () => {
+      retireCheckpointAuthority('activation')
+      checkpointDeactivated = false
+    },
+    onCheckpointDeactivated: () => {
+      retireCheckpointAuthority('deactivation')
+      checkpointDeactivated = true
+    },
     sealPreparedRendererOwnedCheckpoint,
     hasSealedRendererOwnedCheckpointCustody,
     publishSealedRendererOwnedCheckpoint,
@@ -1268,6 +1385,7 @@ export const createMarkdownRendererSessionResourceOwner = <
     inspectOwnedResources,
     isDisposed: () => disposed,
     invalidate: () => {
+      retireCheckpointAuthority('source-invalidation')
       generation += 1
       cancelFrames()
       captureLastValidRender()

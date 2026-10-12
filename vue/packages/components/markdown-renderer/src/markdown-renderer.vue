@@ -64,7 +64,9 @@
 import {
   computed,
   nextTick,
+  onActivated,
   onBeforeUnmount,
+  onDeactivated,
   ref,
   shallowRef,
   toRaw,
@@ -146,7 +148,12 @@ let installingHeavyThemeListener = false
 let removingHeavyThemeListener = false
 const handleHeavyFeatureThemeChange = () => {
   if (rendererResourceOwner.isDisposed()) return
-  heavyThemeRevision.value += 1
+  rendererResourceOwner.runCheckpointAuthorityCallback(
+    'projection-write',
+    () => {
+      heavyThemeRevision.value += 1
+    },
+  )
 }
 const ensureHeavyFeatureThemeListener = () => {
   if (
@@ -178,6 +185,7 @@ const ensureHeavyFeatureThemeListener = () => {
   try {
     target.addEventListener('fsus:theme-change', handleHeavyFeatureThemeChange)
   } catch (error) {
+    rendererResourceOwner.retireCheckpointAuthority('cleanup-failure')
     failed = true
     failure = error
   } finally {
@@ -355,14 +363,18 @@ let heavyLifecycleProjectionNodeIds: Partial<
 let heavyProjectionTrackerPromise: Promise<MarkdownHeavyFeatureProjectionTracker> | null =
   null
 
-const loadHeavyProjectionTracker = () =>
-  (heavyProjectionTrackerPromise ??=
+const loadHeavyProjectionTracker = () => {
+  if (!heavyProjectionTrackerPromise)
+    rendererResourceOwner.retireCheckpointAuthority('projection-tracker')
+  return (heavyProjectionTrackerPromise ??=
     import('../../../wasm/markdown-heavy-feature-identity').then(
       ({ createMarkdownHeavyFeatureProjectionTracker }) =>
         createMarkdownHeavyFeatureProjectionTracker(),
     ))
+}
 
 function recordHeavyLifecycleMetrics() {
+  rendererResourceOwner.retireCheckpointAuthority('heavy-metrics-callback')
   const target = rootEl.value
   if (!target) return
   const metrics = heavyLifecycle.metrics()
@@ -585,7 +597,12 @@ const readPerformanceNow = () =>
   typeof performance === 'undefined' ? Date.now() : performance.now()
 
 const recordCommitDuration = (startedAt: number) => {
-  commitDurationMs += readPerformanceNow() - startedAt
+  rendererResourceOwner.runCheckpointAuthorityCallback(
+    'projection-write',
+    () => {
+      commitDurationMs += readPerformanceNow() - startedAt
+    },
+  )
   rootEl.value?.setAttribute(
     'data-fsus-markdown-commit-ms',
     commitDurationMs.toFixed(3),
@@ -747,9 +764,24 @@ const commitRenderedContent = async (
 
   const startedAt = readPerformanceNow()
   const anchor = preserveAnchor ? captureRenderAnchor() : null
-  chunkUnits.value = []
-  renderStrategy.value = 'sync'
-  renderedContent.value = html
+  rendererResourceOwner.runCheckpointAuthorityCallback(
+    'projection-write',
+    () => {
+      chunkUnits.value = []
+    },
+  )
+  rendererResourceOwner.runCheckpointAuthorityCallback(
+    'projection-write',
+    () => {
+      renderStrategy.value = 'sync'
+    },
+  )
+  rendererResourceOwner.runCheckpointAuthorityCallback(
+    'projection-write',
+    () => {
+      renderedContent.value = html
+    },
+  )
   await restoreRenderAnchor(anchor)
   recordCommitDuration(startedAt)
   return true
@@ -770,17 +802,33 @@ const virtualWindow = useFsusVirtualWindow<MarkdownRenderChunk>({
 })
 
 const setChunkUnitRef = (key: string, element: Element | null) => {
+  rendererResourceOwner.retireCheckpointAuthority('chunk-reference')
   virtualWindow.setUnitRef(key, element)
   const previous = chunkActivationElements.get(key)
   if (previous && previous !== element) {
     activationObserver?.unobserve(previous)
     heavyLifecycle.unmountRoot(previous)
-    activatedChunkKeys.delete(key)
-    chunkActivationElements.delete(key)
+    rendererResourceOwner.runCheckpointAuthorityCallback(
+      'projection-write',
+      () => {
+        activatedChunkKeys.delete(key)
+      },
+    )
+    rendererResourceOwner.runCheckpointAuthorityCallback(
+      'projection-write',
+      () => {
+        chunkActivationElements.delete(key)
+      },
+    )
     recordHeavyLifecycleMetrics()
   }
   if (!(element instanceof HTMLElement)) return
-  chunkActivationElements.set(key, element)
+  rendererResourceOwner.runCheckpointAuthorityCallback(
+    'projection-write',
+    () => {
+      chunkActivationElements.set(key, element)
+    },
+  )
   observeChunkForActivation(key, element)
 }
 
@@ -793,11 +841,22 @@ const setChunkUnitTemplateRef = (
 
 const vMarkdownHeavyLifecycleUnmount = {
   beforeUnmount(element: HTMLElement) {
+    rendererResourceOwner.retireCheckpointAuthority('chunk-unmount')
     const key = element.dataset.fsusRenderUnitKey
     activationObserver?.unobserve(element)
     if (key) {
-      activatedChunkKeys.delete(key)
-      chunkActivationElements.delete(key)
+      rendererResourceOwner.runCheckpointAuthorityCallback(
+        'projection-write',
+        () => {
+          activatedChunkKeys.delete(key)
+        },
+      )
+      rendererResourceOwner.runCheckpointAuthorityCallback(
+        'projection-write',
+        () => {
+          chunkActivationElements.delete(key)
+        },
+      )
     }
     heavyLifecycle.unmountRoot(element)
     recordHeavyLifecycleMetrics()
@@ -1121,6 +1180,7 @@ const observerCleanup = (observer: IntersectionObserver | null) => ({
 })
 
 const resetFeatureActivation = () => {
+  rendererResourceOwner.retireCheckpointAuthority('activation-reset')
   requireRendererAdmission()
   if (resettingFeatureActivation || installingActivationObserver)
     throw new Error('markdown-renderer-activation-control-pending')
@@ -1144,6 +1204,7 @@ const resetFeatureActivation = () => {
     try {
       controller = new AbortController()
     } catch (error) {
+      rendererResourceOwner.retireCheckpointAuthority('cleanup-failure')
       installation.fail(error)
       throw error
     }
@@ -1157,16 +1218,56 @@ const resetFeatureActivation = () => {
       installation.complete()
     }
     requireRendererAdmission()
-    activeChunkResult = null
-    activationDurationMs = 0
+    rendererResourceOwner.runCheckpointAuthorityCallback(
+      'projection-write',
+      () => {
+        activeChunkResult = null
+      },
+    )
+    rendererResourceOwner.runCheckpointAuthorityCallback(
+      'projection-write',
+      () => {
+        activationDurationMs = 0
+      },
+    )
     rootEl.value?.removeAttribute('data-fsus-markdown-activation-ms')
     requireRendererAdmission()
-    activatedChunkKeys.clear()
-    chunkActivationElements.clear()
-    lastHeavyLifecycleIdentityContext = null
-    heavyLifecycleIdentityContexts = {}
-    heavyLifecycleIdentitySequences = {}
-    heavyLifecycleProjectionNodeIds = {}
+    rendererResourceOwner.runCheckpointAuthorityCallback(
+      'projection-write',
+      () => {
+        activatedChunkKeys.clear()
+      },
+    )
+    rendererResourceOwner.runCheckpointAuthorityCallback(
+      'projection-write',
+      () => {
+        chunkActivationElements.clear()
+      },
+    )
+    rendererResourceOwner.runCheckpointAuthorityCallback(
+      'projection-write',
+      () => {
+        lastHeavyLifecycleIdentityContext = null
+      },
+    )
+    rendererResourceOwner.runCheckpointAuthorityCallback(
+      'projection-write',
+      () => {
+        heavyLifecycleIdentityContexts = {}
+      },
+    )
+    rendererResourceOwner.runCheckpointAuthorityCallback(
+      'projection-write',
+      () => {
+        heavyLifecycleIdentitySequences = {}
+      },
+    )
+    rendererResourceOwner.runCheckpointAuthorityCallback(
+      'projection-write',
+      () => {
+        heavyLifecycleProjectionNodeIds = {}
+      },
+    )
     if (rootEl.value) heavyLifecycle.unmountRoot(rootEl.value)
     requireRendererAdmission()
     recordHeavyLifecycleMetrics()
@@ -1198,7 +1299,12 @@ const createHeavyFeatureIdentityResolver = async (
       ? (result.chunks as readonly MarkdownRenderChunk[])
       : []
   const nodeIds = projection?.nodeIds
-  heavyLifecycleProjectionNodeIds = nodeIds ?? {}
+  rendererResourceOwner.runCheckpointAuthorityCallback(
+    'projection-write',
+    () => {
+      heavyLifecycleProjectionNodeIds = nodeIds ?? {}
+    },
+  )
   const cursors: Record<MarkdownHeavyFeatureKind, number> = {
     'code-highlight': 0,
     latex: 0,
@@ -1242,18 +1348,33 @@ const createHeavyFeatureIdentityResolver = async (
       revision,
       theme,
     })
-    lastHeavyLifecycleIdentityContext = context
-    heavyLifecycleIdentityContexts = {
-      ...heavyLifecycleIdentityContexts,
-      [input.kind]: context,
-    }
-    heavyLifecycleIdentitySequences = {
-      ...heavyLifecycleIdentitySequences,
-      [input.kind]: [
-        ...(heavyLifecycleIdentitySequences[input.kind] ?? []),
-        context,
-      ],
-    }
+    rendererResourceOwner.runCheckpointAuthorityCallback(
+      'projection-write',
+      () => {
+        lastHeavyLifecycleIdentityContext = context
+      },
+    )
+    rendererResourceOwner.runCheckpointAuthorityCallback(
+      'projection-write',
+      () => {
+        heavyLifecycleIdentityContexts = {
+          ...heavyLifecycleIdentityContexts,
+          [input.kind]: context,
+        }
+      },
+    )
+    rendererResourceOwner.runCheckpointAuthorityCallback(
+      'projection-write',
+      () => {
+        heavyLifecycleIdentitySequences = {
+          ...heavyLifecycleIdentitySequences,
+          [input.kind]: [
+            ...(heavyLifecycleIdentitySequences[input.kind] ?? []),
+            context,
+          ],
+        }
+      },
+    )
     return Object.freeze({
       config,
       documentEpoch,
@@ -1346,12 +1467,22 @@ const activateRenderedFeatures = async (
       recordHeavyLifecycleMetrics()
     }
     if (signal?.aborted) return
-    activationDurationMs += readPerformanceNow() - activationStartedAt
+    rendererResourceOwner.runCheckpointAuthorityCallback(
+      'projection-write',
+      () => {
+        activationDurationMs += readPerformanceNow() - activationStartedAt
+      },
+    )
     rootEl.value?.setAttribute(
       'data-fsus-markdown-activation-ms',
       activationDurationMs.toFixed(3),
     )
-    emit('features-activated', activation, result)
+    rendererResourceOwner.runCheckpointAuthorityCallback(
+      'external-event',
+      () => {
+        emit('features-activated', activation, result)
+      },
+    )
     recordHeavyLifecycleMetrics()
     if (
       heavyLifecycle.metrics().staticNodes > 0 ||
@@ -1381,7 +1512,13 @@ async function activateChunkFeatures(
   ) {
     return
   }
-  activatedChunkKeys.add(key)
+  rendererResourceOwner.retireCheckpointAuthority('chunk-activation')
+  rendererResourceOwner.runCheckpointAuthorityCallback(
+    'projection-write',
+    () => {
+      activatedChunkKeys.add(key)
+    },
+  )
   await activateRenderedFeatures(
     activeChunkResult,
     element,
@@ -1451,6 +1588,7 @@ function observeChunkForActivation(key: string, element: HTMLElement) {
           { root: observerRoot, rootMargin: '384px 0px' },
         )
       } catch (error) {
+        rendererResourceOwner.retireCheckpointAuthority('cleanup-failure')
         creationUnknown = true
         installation.fail(error)
         throw error
@@ -1461,6 +1599,7 @@ function observeChunkForActivation(key: string, element: HTMLElement) {
       try {
         observer.observe(element)
       } catch (error) {
+        rendererResourceOwner.retireCheckpointAuthority('cleanup-failure')
         rendererResourceOwner.cleanupComponentResources([
           {
             phase: 'activation-observer-observe',
@@ -1501,7 +1640,15 @@ const activateMountedChunkFeatures = async (
     '[data-fsus-render-unit-key]',
   )) {
     const key = element.dataset.fsusRenderUnitKey
-    if (key) activatedChunkKeys.add(key)
+    if (key) {
+      rendererResourceOwner.retireCheckpointAuthority('chunk-activation')
+      rendererResourceOwner.runCheckpointAuthorityCallback(
+        'projection-write',
+        () => {
+          activatedChunkKeys.add(key)
+        },
+      )
+    }
   }
   await activateRenderedFeatures(result, root, signal)
 }
@@ -1514,13 +1661,23 @@ const performRender = async () => {
     taskId === currentTaskId && rendererResourceOwner.isCurrent(generation)
   const source = normalizeMarkdownSource(props.content)
   const request = createMarkdownRenderRequest(source)
-  isRendering.value = source.length > 0
+  rendererResourceOwner.runCheckpointAuthorityCallback(
+    'projection-write',
+    () => {
+      isRendering.value = source.length > 0
+    },
+  )
   let renderSignal: AbortSignal | undefined
 
   try {
     resetFeatureActivation()
     renderSignal = activationController?.signal
-    commitDurationMs = 0
+    rendererResourceOwner.runCheckpointAuthorityCallback(
+      'projection-write',
+      () => {
+        commitDurationMs = 0
+      },
+    )
     rootEl.value?.removeAttribute('data-fsus-markdown-commit-ms')
     if (!isCurrent()) return
     if (!heavyLifecycle.resume())
@@ -1569,20 +1726,53 @@ const performRender = async () => {
       const initialCount = resolveInitialChunkCount(resolvedUnits)
 
       const commitStartedAt = readPerformanceNow()
-      renderedContent.value = null
-      activeChunkResult = resolvedResult
-      chunkUnits.value = resolvedUnits.slice(0, initialCount)
-      renderStrategy.value = renderPipelineRuntime.renderedStrategy.value as
-        | 'chunked-main'
-        | 'chunked-worker'
-      emit('render-profile', {
-        engine: resolvedResult.engine,
-        phase: 'chunks',
-        rendererVersion: resolvedResult.rendererVersion,
-        timings: resolvedResult.timings,
-      })
+      rendererResourceOwner.runCheckpointAuthorityCallback(
+        'projection-write',
+        () => {
+          renderedContent.value = null
+        },
+      )
+      rendererResourceOwner.runCheckpointAuthorityCallback(
+        'projection-write',
+        () => {
+          activeChunkResult = resolvedResult
+        },
+      )
+      rendererResourceOwner.runCheckpointAuthorityCallback(
+        'projection-write',
+        () => {
+          chunkUnits.value = resolvedUnits.slice(0, initialCount)
+        },
+      )
+      rendererResourceOwner.runCheckpointAuthorityCallback(
+        'projection-write',
+        () => {
+          renderStrategy.value = renderPipelineRuntime.renderedStrategy
+            .value as 'chunked-main' | 'chunked-worker'
+        },
+      )
+      rendererResourceOwner.runCheckpointAuthorityCallback(
+        'external-event',
+        () => {
+          emit('render-profile', {
+            engine: resolvedResult.engine,
+            phase: 'chunks',
+            rendererVersion: resolvedResult.rendererVersion,
+            timings: resolvedResult.timings,
+          })
+        },
+      )
       if (!isCurrent()) return
-      emit('placeholders-ready', resolvedResult.placeholders, resolvedResult)
+      rendererResourceOwner.runCheckpointAuthorityCallback(
+        'external-event',
+        () => {
+          emit(
+            'placeholders-ready',
+            resolvedResult.placeholders,
+            resolvedResult,
+          )
+        },
+      )
       await nextTick()
       if (!isCurrent()) return
       await settleRenderViewport('markdown-render-settle-initial')
@@ -1593,7 +1783,12 @@ const performRender = async () => {
         if (!isCurrent()) return
         await afterFrame()
         if (!isCurrent()) return
-        chunkUnits.value = resolvedUnits
+        rendererResourceOwner.runCheckpointAuthorityCallback(
+          'projection-write',
+          () => {
+            chunkUnits.value = resolvedUnits
+          },
+        )
         await nextTick()
         if (!isCurrent()) return
         await settleRenderViewport('markdown-render-settle-full')
@@ -1608,7 +1803,12 @@ const performRender = async () => {
       if (!isCurrent()) return
       recordCommitDuration(commitStartedAt)
       rendererResourceOwner.retainLastValidRender(generation, resolvedResult)
-      emit('render-complete', resolvedResult)
+      rendererResourceOwner.runCheckpointAuthorityCallback(
+        'external-event',
+        () => {
+          emit('render-complete', resolvedResult)
+        },
+      )
       scheduleMeasurementWarmup()
       return
     }
@@ -1637,18 +1837,33 @@ const performRender = async () => {
 
     await commitRenderedContent(resolvedResult.html, true)
     if (!isCurrent()) return
-    emit('placeholders-ready', resolvedResult.placeholders, resolvedResult)
+    rendererResourceOwner.runCheckpointAuthorityCallback(
+      'external-event',
+      () => {
+        emit('placeholders-ready', resolvedResult.placeholders, resolvedResult)
+      },
+    )
     await activateRenderedFeatures(resolvedResult, rootEl.value, renderSignal)
     if (!isCurrent()) return
-    emit('render-profile', {
-      engine: resolvedResult.engine,
-      phase: 'full-result',
-      rendererVersion: resolvedResult.rendererVersion,
-      timings: resolvedResult.timings,
-    })
+    rendererResourceOwner.runCheckpointAuthorityCallback(
+      'external-event',
+      () => {
+        emit('render-profile', {
+          engine: resolvedResult.engine,
+          phase: 'full-result',
+          rendererVersion: resolvedResult.rendererVersion,
+          timings: resolvedResult.timings,
+        })
+      },
+    )
     if (!isCurrent()) return
     rendererResourceOwner.retainLastValidRender(generation, resolvedResult)
-    emit('render-complete', resolvedResult)
+    rendererResourceOwner.runCheckpointAuthorityCallback(
+      'external-event',
+      () => {
+        emit('render-complete', resolvedResult)
+      },
+    )
   } catch (error) {
     if (!isCurrent()) {
       return
@@ -1665,20 +1880,40 @@ const performRender = async () => {
     }
     await commitRenderedContent(fallback.html, true)
     if (!isCurrent()) return
-    emit('placeholders-ready', fallback.placeholders, fallback)
+    rendererResourceOwner.runCheckpointAuthorityCallback(
+      'external-event',
+      () => {
+        emit('placeholders-ready', fallback.placeholders, fallback)
+      },
+    )
     await activateRenderedFeatures(fallback, rootEl.value, renderSignal)
     if (!isCurrent()) return
-    emit(
-      'render-error',
-      toFsusError(error, 'markdown_renderer_render_failed', 'infra'),
+    rendererResourceOwner.runCheckpointAuthorityCallback(
+      'external-event',
+      () => {
+        emit(
+          'render-error',
+          toFsusError(error, 'markdown_renderer_render_failed', 'infra'),
+        )
+      },
     )
     if (!isCurrent()) return
     rendererResourceOwner.retainLastValidRender(generation, fallback)
-    emit('render-complete', fallback)
+    rendererResourceOwner.runCheckpointAuthorityCallback(
+      'external-event',
+      () => {
+        emit('render-complete', fallback)
+      },
+    )
   } finally {
     finishJob()
     if (isCurrent()) {
-      isRendering.value = false
+      rendererResourceOwner.runCheckpointAuthorityCallback(
+        'projection-write',
+        () => {
+          isRendering.value = false
+        },
+      )
     }
   }
 }
@@ -1747,7 +1982,12 @@ const restoreLastValidRender = async (
   const isCurrent = () =>
     taskId === currentTaskId && rendererResourceOwner.isCurrent(generation)
   const finishJob = rendererResourceOwner.trackJob()
-  isRendering.value = true
+  rendererResourceOwner.runCheckpointAuthorityCallback(
+    'projection-write',
+    () => {
+      isRendering.value = true
+    },
+  )
   try {
     resetFeatureActivation()
     const renderSignal = activationController?.signal
@@ -1755,11 +1995,31 @@ const restoreLastValidRender = async (
     const projection = retained.projection
     if (projection.units.length) {
       const anchor = captureRenderAnchor()
-      renderedContent.value = projection.html
-      chunkUnits.value = projection.units
-      renderStrategy.value = projection.strategy
+      rendererResourceOwner.runCheckpointAuthorityCallback(
+        'projection-write',
+        () => {
+          renderedContent.value = projection.html
+        },
+      )
+      rendererResourceOwner.runCheckpointAuthorityCallback(
+        'projection-write',
+        () => {
+          chunkUnits.value = projection.units
+        },
+      )
+      rendererResourceOwner.runCheckpointAuthorityCallback(
+        'projection-write',
+        () => {
+          renderStrategy.value = projection.strategy
+        },
+      )
       // Chunk projections were retained only after authorized full commits.
-      activeChunkResult = retained.result as MarkdownRuntimeChunkResult
+      rendererResourceOwner.runCheckpointAuthorityCallback(
+        'projection-write',
+        () => {
+          activeChunkResult = retained.result as MarkdownRuntimeChunkResult
+        },
+      )
       await nextTick()
       if (!isCurrent()) return blocked('markdown-renderer-restore-stale')
       await restoreRenderAnchor(anchor)
@@ -1787,21 +2047,38 @@ const restoreLastValidRender = async (
       )
     }
     if (!isCurrent()) return blocked('markdown-renderer-restore-stale')
-    emit('render-complete', retained.result)
+    rendererResourceOwner.runCheckpointAuthorityCallback(
+      'external-event',
+      () => {
+        emit('render-complete', retained.result)
+      },
+    )
     if (!isCurrent()) return blocked('markdown-renderer-restore-stale')
     // The result identity is preserved. This proof covers the real projection
     // commit only; it does not qualify resource quiescence or session readiness.
     return Object.freeze({ ref, status: 'restored', reason: null })
   } catch (error) {
     if (isCurrent())
-      emit(
-        'render-error',
-        toFsusError(error, 'markdown_renderer_restore_failed', 'infra'),
+      rendererResourceOwner.runCheckpointAuthorityCallback(
+        'external-event',
+        () => {
+          emit(
+            'render-error',
+            toFsusError(error, 'markdown_renderer_restore_failed', 'infra'),
+          )
+        },
       )
     return blocked('markdown-renderer-restore-failed')
   } finally {
     finishJob()
-    if (isCurrent()) isRendering.value = false
+    if (isCurrent()) {
+      rendererResourceOwner.runCheckpointAuthorityCallback(
+        'projection-write',
+        () => {
+          isRendering.value = false
+        },
+      )
+    }
   }
 }
 
@@ -1828,6 +2105,7 @@ const renderWatchHandle = watch(
     heavyDocumentContext?.revision(),
   ],
   () => {
+    rendererResourceOwner.retireCheckpointAuthority('source-watch')
     if (rendererResourceOwner.isDisposed()) return
     currentTaskId += 1
     rendererResourceOwner.invalidate()
@@ -1848,7 +2126,11 @@ const renderWatchHandle = watch(
 )
 rendererResourceOwner.bindRenderWatchHandle(renderWatchHandle)
 
+onActivated(() => rendererResourceOwner.onCheckpointActivated())
+onDeactivated(() => rendererResourceOwner.onCheckpointDeactivated())
+
 onBeforeUnmount(() => {
+  rendererResourceOwner.retireCheckpointAuthority('unmount-entry')
   const controller = activationController
   const observer = activationObserver
   const themeTarget = heavyThemeListenerTarget
@@ -1881,28 +2163,48 @@ onBeforeUnmount(() => {
         phase: 'chunk-result-release',
         resource: activeChunkResult,
         run: () => {
-          activeChunkResult = null
+          rendererResourceOwner.runCheckpointAuthorityCallback(
+            'projection-write',
+            () => {
+              activeChunkResult = null
+            },
+          )
         },
       },
       {
         phase: 'rendered-content-release',
         resource: renderedContent,
         run: () => {
-          renderedContent.value = null
+          rendererResourceOwner.runCheckpointAuthorityCallback(
+            'projection-write',
+            () => {
+              renderedContent.value = null
+            },
+          )
         },
       },
       {
         phase: 'chunk-unit-release',
         resource: chunkUnits,
         run: () => {
-          chunkUnits.value = []
+          rendererResourceOwner.runCheckpointAuthorityCallback(
+            'projection-write',
+            () => {
+              chunkUnits.value = []
+            },
+          )
         },
       },
       {
         phase: 'tracker-reference-release',
         resource: heavyProjectionTrackerPromise,
         run: () => {
-          heavyProjectionTrackerPromise = null
+          rendererResourceOwner.runCheckpointAuthorityCallback(
+            'projection-write',
+            () => {
+              heavyProjectionTrackerPromise = null
+            },
+          )
         },
       },
       {
@@ -1919,7 +2221,12 @@ onBeforeUnmount(() => {
         phase: 'rendering-state-release',
         resource: isRendering,
         run: () => {
-          isRendering.value = false
+          rendererResourceOwner.runCheckpointAuthorityCallback(
+            'projection-write',
+            () => {
+              isRendering.value = false
+            },
+          )
         },
       },
     ],
