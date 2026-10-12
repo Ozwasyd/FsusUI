@@ -204,6 +204,106 @@ describe('ResizeSeparator public component', () => {
     },
   )
 
+  test.each(['pointer', 'keyboard'] as const)(
+    'snapshot getter cannot admit reentrant %s input',
+    (source) => {
+      let wrapper: VueWrapper
+      let armed = false
+      const range = {
+        get start() {
+          if (armed) {
+            armed = false
+            if (source === 'pointer')
+              pointer(wrapper, 'pointerdown', { pointerId: 8 })
+            else
+              wrapper.element.dispatchEvent(
+                new KeyboardEvent('keydown', {
+                  key: 'ArrowRight',
+                  bubbles: true,
+                  cancelable: true,
+                }),
+              )
+          }
+          return props.coordinateRange.start
+        },
+        end: props.coordinateRange.end,
+      }
+      wrapper = render({ coordinateRange: range })
+      const mocks = capture(wrapper)
+      armed = true
+      pointer(wrapper, 'pointerdown')
+      expect(mocks.set).toHaveBeenCalledExactlyOnceWith(7)
+      expect(wrapper.emitted('start')).toEqual([
+        [{ value: 0.5, source: 'pointer', pointerId: 7 }],
+      ])
+      pointer(wrapper, 'pointerup')
+      expect(wrapper.emitted('end')).toEqual([
+        [{ value: 0.5, source: 'pointer', pointerId: 7 }],
+      ])
+      expect(wrapper.emitted('cancel')).toBeUndefined()
+      expect(mocks.release).toHaveBeenCalledExactlyOnceWith(7)
+      expect(mocks.captured.size).toBe(0)
+    },
+  )
+
+  test.each(['consumer', 'unmount', 'throw'] as const)(
+    'snapshot getter %s invalidates admission without capture or start',
+    (action) => {
+      let wrapper: VueWrapper
+      let armed = false
+      const cause = new Error('Snapshot getter failure')
+      const errors: unknown[] = []
+      const range = {
+        get start() {
+          if (armed) {
+            armed = false
+            if (action === 'throw') throw cause
+            if (action === 'consumer')
+              (wrapper.vm as ResizeSeparatorInstance).cancel()
+            else wrapper.unmount()
+          }
+          return props.coordinateRange.start
+        },
+        end: props.coordinateRange.end,
+      }
+      wrapper = render({ coordinateRange: range })
+      wrapper.vm.$.appContext.config.errorHandler = (error) =>
+        errors.push(error)
+      const mocks = capture(wrapper)
+      armed = true
+      pointer(wrapper, 'pointerdown')
+      expect(mocks.set).not.toHaveBeenCalled()
+      expect(mocks.captured.size).toBe(0)
+      for (const event of ['start', 'proposal', 'end', 'cancel'])
+        expect(wrapper.emitted(event)).toBeUndefined()
+      expect(errors).toEqual(action === 'throw' ? [cause] : [])
+      if (action !== 'unmount') {
+        pointer(wrapper, 'pointerdown')
+        pointer(wrapper, 'pointerup')
+        expect(mocks.set).toHaveBeenCalledExactlyOnceWith(7)
+        expect(wrapper.emitted('start')).toHaveLength(1)
+        expect(wrapper.emitted('end')).toHaveLength(1)
+        expect(mocks.captured.size).toBe(0)
+      }
+    },
+  )
+
+  test('capture-time cancellation retains cleanup without starting an invalidated admission', () => {
+    const wrapper = render()
+    const mocks = capture(wrapper)
+    const instance = wrapper.vm as ResizeSeparatorInstance
+    mocks.set.mockImplementation((id: number) => {
+      mocks.captured.add(id)
+      instance.cancel()
+      return mocks.captured
+    })
+    pointer(wrapper, 'pointerdown')
+    expect(mocks.release).toHaveBeenCalledExactlyOnceWith(7)
+    expect(mocks.captured.size).toBe(0)
+    for (const event of ['start', 'proposal', 'end', 'cancel'])
+      expect(wrapper.emitted(event)).toBeUndefined()
+  })
+
   test('a stationary pointer gesture preserves an accepted off-step value', () => {
     const wrapper = render({ value: 0.53 })
     capture(wrapper)

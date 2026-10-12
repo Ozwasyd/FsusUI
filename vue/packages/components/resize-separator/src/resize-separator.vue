@@ -94,6 +94,7 @@ type KeyboardInteraction = {
 }
 type Interaction = PointerInteraction | KeyboardInteraction
 let active: Interaction | undefined
+let pendingAdmission: { invalidated: boolean } | undefined
 let unmounting = false
 const payload = (interaction: Interaction): ResizeSeparatorPayload => ({
   value: interaction.lastValue,
@@ -111,6 +112,7 @@ const release = (interaction: Interaction) => {
   }
 }
 const cancel = (reason: ResizeSeparatorCancelReason) => {
+  if (pendingAdmission) pendingAdmission.invalidated = true
   if (!active) return
   const interaction = active
   active = undefined
@@ -121,38 +123,59 @@ const coordinate = (event: PointerEvent) =>
   props.orientation === 'vertical' ? event.clientX : event.clientY
 
 const onPointerDown = (event: PointerEvent) => {
-  if (
-    unmounting ||
-    !enabled.value ||
-    active ||
-    event.button !== 0 ||
-    !event.isPrimary ||
-    !Number.isFinite(coordinate(event))
-  )
-    return
-  const target = handle.value
-  if (!target) return
-  const range = props.coordinateRange
-  const value = controlledValue.value
-  const interaction: PointerInteraction = {
-    source: 'pointer',
-    target,
-    pointerId: event.pointerId,
-    coordinate: coordinate(event),
-    initialValue: value,
-    lastValue: value,
-    coordinateRange: { start: range.start, end: range.end },
-  }
-  // Finish external reads before capture; register its cleanup immediately.
+  if (unmounting || active || pendingAdmission) return
+  // Reserve admission before consumer getters can reenter either input path.
+  const admission = { invalidated: false }
+  pendingAdmission = admission
   try {
-    target.setPointerCapture(interaction.pointerId)
-  } catch {
-    return
+    if (
+      !enabled.value ||
+      event.button !== 0 ||
+      !event.isPrimary ||
+      !Number.isFinite(coordinate(event))
+    )
+      return
+    const target = handle.value
+    if (!target) return
+    const range = props.coordinateRange
+    const value = controlledValue.value
+    const interaction: PointerInteraction = {
+      source: 'pointer',
+      target,
+      pointerId: event.pointerId,
+      coordinate: coordinate(event),
+      initialValue: value,
+      lastValue: value,
+      coordinateRange: { start: range.start, end: range.end },
+    }
+    if (
+      !enabled.value ||
+      admission.invalidated ||
+      pendingAdmission !== admission ||
+      unmounting ||
+      active ||
+      handle.value !== target
+    )
+      return
+    // Finish external reads before capture; register its cleanup immediately.
+    try {
+      target.setPointerCapture(interaction.pointerId)
+    } catch {
+      return
+    }
+    active = interaction
+    if (admission.invalidated || pendingAdmission !== admission || unmounting) {
+      active = undefined
+      release(interaction)
+      return
+    }
+    pendingAdmission = undefined
+    event.preventDefault()
+    emit('start', payload(interaction))
+    if (active === interaction) target.focus({ preventScroll: true })
+  } finally {
+    if (pendingAdmission === admission) pendingAdmission = undefined
   }
-  active = interaction
-  event.preventDefault()
-  emit('start', payload(interaction))
-  if (active === interaction) target.focus({ preventScroll: true })
 }
 const onPointerMove = (event: PointerEvent) => {
   const interaction = active
@@ -206,8 +229,9 @@ const onKeydown = (event: KeyboardEvent) => {
   }
   if (
     unmounting ||
-    !enabled.value ||
+    pendingAdmission ||
     active ||
+    !enabled.value ||
     event.altKey ||
     event.ctrlKey ||
     event.metaKey
