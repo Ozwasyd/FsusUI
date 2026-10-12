@@ -156,8 +156,8 @@ export const createMarkdownEditorFrameResourceParticipant = (
       retainedListeners: 0,
       usage: Object.freeze({
         editorInstances: 0, renderers: 0, observers: 0,
-        timers: state.frameRequestKind === 'timer' ? state.pendingFrames : 0,
-        backgroundTasks: metrics.pendingTasks + state.pendingFrames + (state.runningPhase === null ? 0 : 1),
+        timers: state.frameRequestKind === 'timer' ? state.pendingFrames + state.pendingAuxiliaryFrames : 0,
+        backgroundTasks: metrics.pendingTasks + state.pendingFrames + state.pendingAuxiliaryFrames + state.runningAuxiliaryFrames + (state.runningPhase === null ? 0 : 1),
         networkRequests: 0,
         // Logical bounded resource units, not claimed physical heap bytes.
         memoryUnits: metrics.pendingTasks,
