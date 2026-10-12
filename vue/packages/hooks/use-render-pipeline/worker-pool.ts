@@ -2143,7 +2143,18 @@ export const createFsusWorkerExecutor = <TRequest, TResponse>(
         )
       } finally {
         disposing = false
-        authorityListeners.clear()
+        // Retiring executors still own their feed until real teardown finishes.
+        // A failed native cleanup is not evidence that the resources vanished.
+        if (
+          !visibilityListenerActive &&
+          pending.size === 0 &&
+          slots.length === 0 &&
+          retainCount === 0 &&
+          idleTerminateTimer === null &&
+          backgroundTimer === null &&
+          canceledSlotTimers.size === 0
+        )
+          authorityListeners.clear()
       }
     },
     getActiveCount: activeCount,
