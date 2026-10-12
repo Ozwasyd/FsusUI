@@ -9,6 +9,7 @@ import type {
 } from '@element-plus/wasm'
 import type {
   FsusRenderPipelineRuntimeResourceInspection,
+  FsusRenderPipelineAuthority,
   useFsusVirtualWindow,
 } from '../../../hooks/use-render-pipeline'
 import type {
@@ -70,6 +71,20 @@ export interface MarkdownRendererCheckpointPreparation {
 
 export interface MarkdownRendererCheckpointPublication extends MarkdownRendererCheckpointPreparation {
   readonly authority: 'captured-renderer-only'
+}
+
+/** Original issuers, supplied by the owning renderer after both hooks exist. */
+export interface MarkdownRendererCheckpointSealSources {
+  readonly pipeline: FsusRenderPipelineAuthority
+  readonly viewport: FsusRenderPipelineAuthority
+}
+
+/** Source continuity on the exact owned checkpoint; never full-host readiness. */
+export interface MarkdownRendererSealedCheckpointPublication extends MarkdownRendererCheckpointPublication {
+  readonly seal: Readonly<{
+    scope: 'renderer-checkpoint-source-custody'
+    checkpointRef: string
+  }>
 }
 
 export interface MarkdownRendererRetainedProjection {
@@ -237,6 +252,22 @@ export const createMarkdownRendererSessionResourceOwner = <
   } | null = null
   let documentRetirementUnknown = false
   let bindingDocumentRetirement = false
+  type SealSourceRegistration = {
+    readonly role: 'pipeline' | 'viewport'
+    readonly source: FsusRenderPipelineAuthority
+    unsubscribe: (() => void) | null
+    registering: boolean
+    releasing: boolean
+    releaseReentered: boolean
+    releaseCause: unknown
+    released: boolean
+  }
+  const checkpointSealSources = new Map<
+    'pipeline' | 'viewport',
+    SealSourceRegistration
+  >()
+  let bindingCheckpointSealSources = false
+  let sealingCheckpoint = false
   const inputPublications = new Map<
     string,
     {
@@ -854,6 +885,19 @@ export const createMarkdownRendererSessionResourceOwner = <
     readonly publication: MarkdownRendererCheckpointPublication
     validated: boolean
   } | null = null
+  type CheckpointSeal = {
+    readonly candidate: NonNullable<typeof preparedCheckpoint>
+    readonly publication: MarkdownRendererSealedCheckpointPublication
+    readonly nativeBinding: NonNullable<typeof documentRetirement>
+    readonly nativeTicket: MarkdownHeavyFeatureDocumentAuthorityTicket
+    readonly pipelineBinding: SealSourceRegistration
+    readonly pipelineTicket: object
+    readonly viewportBinding: SealSourceRegistration
+    readonly viewportTicket: object
+    readonly authorityGeneration: number
+  }
+  let preparedCheckpointSeal: CheckpointSeal | null = null
+  let publishedCheckpointSeal: CheckpointSeal | null = null
 
   const beginInstallation = (phase: string) => {
     if (disposed) throw new Error('markdown-renderer-resource-owner-disposed')
@@ -960,6 +1004,99 @@ export const createMarkdownRendererSessionResourceOwner = <
     registerComponentCleanups(actions)
     runCleanupBatch(componentCleanupActions())
   }
+  const releaseCheckpointSealSource = (record: SealSourceRegistration) => {
+    if (record.released) return
+    if (record.releasing) {
+      const cause = new Error(
+        'markdown-renderer-seal-source-release-in-progress',
+      )
+      record.releaseReentered = true
+      record.releaseCause = cause
+      throw cause
+    }
+    record.releasing = true
+    record.releaseReentered = false
+    try {
+      runCheckpointAuthorityCallback(
+        'checkpoint-source-release',
+        () => {
+          if (record.registering || !record.unsubscribe)
+            throw new Error('markdown-renderer-seal-source-release-unavailable')
+          record.unsubscribe()
+          if (record.releaseReentered) throw record.releaseCause
+          record.released = true
+          if (checkpointSealSources.get(record.role) === record)
+            checkpointSealSources.delete(record.role)
+        },
+        record,
+        'checkpoint-seal-source-release',
+      )
+    } finally {
+      record.releasing = false
+    }
+  }
+  const bindCheckpointSealSources = (
+    sources: MarkdownRendererCheckpointSealSources,
+  ) =>
+    runCheckpointAuthorityCallback('checkpoint-source-bind', () => {
+      if (disposed || bindingCheckpointSealSources)
+        throw new Error('markdown-renderer-seal-source-binding-unavailable')
+      bindingCheckpointSealSources = true
+      try {
+        for (const role of ['pipeline', 'viewport'] as const) {
+          const source = sources[role]
+          const existing = checkpointSealSources.get(role)
+          if (existing) {
+            if (
+              existing.source !== source ||
+              existing.registering ||
+              !existing.unsubscribe ||
+              existing.released
+            )
+              throw new Error(
+                `markdown-renderer-seal-source-binding-retained:${role}`,
+              )
+            continue
+          }
+          const installation = beginInstallation(
+            `checkpoint-${role}-retirement-registration`,
+          )
+          const record: SealSourceRegistration = {
+            role,
+            source,
+            unsubscribe: null,
+            registering: true,
+            releasing: false,
+            releaseReentered: false,
+            releaseCause: undefined,
+            released: false,
+          }
+          checkpointSealSources.set(role, record)
+          let known = false
+          try {
+            record.unsubscribe = source.subscribe(() =>
+              retireCheckpointAuthority(`checkpoint-${role}-source-retirement`),
+            )
+            if (typeof record.unsubscribe !== 'function')
+              throw new TypeError(
+                `markdown-renderer-seal-source-release-handle-invalid:${role}`,
+              )
+            known = true
+            record.registering = false
+            if (disposed) releaseCheckpointSealSource(record)
+          } catch (cause) {
+            record.releaseCause = cause
+            if (!known) installation.fail(cause)
+            throw cause
+          } finally {
+            record.registering = false
+            if (known) installation.complete()
+          }
+        }
+      } finally {
+        bindingCheckpointSealSources = false
+      }
+    })
   const releaseDocumentRetirement = () => {
     const record = documentRetirement
     if (!record) return
@@ -1144,6 +1281,8 @@ export const createMarkdownRendererSessionResourceOwner = <
       if (
         disposed ||
         capturingCheckpoint ||
+        sealingCheckpoint ||
+        bindingCheckpointSealSources ||
         notifyingInputRetirement ||
         checkpointAuthorityCallbackDepth > 0 ||
         runningCleanups.size > 0 ||
@@ -1244,6 +1383,8 @@ export const createMarkdownRendererSessionResourceOwner = <
       candidate !== null &&
       !disposed &&
       !capturingCheckpoint &&
+      !sealingCheckpoint &&
+      !bindingCheckpointSealSources &&
       !notifyingInputRetirement &&
       checkpointAuthorityCallbackDepth === 0 &&
       runningCleanups.size === 0 &&
@@ -1289,6 +1430,8 @@ export const createMarkdownRendererSessionResourceOwner = <
     // Pure local custody publication: no producer callbacks, reactive/native
     // writes, allocation, cleanup, or claims about live external authority.
     checkpoint = candidate.record
+    preparedCheckpointSeal = null
+    publishedCheckpointSeal = null
     preparedCheckpoint = null
     return checkpoint.capture
   }
@@ -1297,6 +1440,8 @@ export const createMarkdownRendererSessionResourceOwner = <
   ) => {
     const candidate = preparedCheckpoint
     if (!candidate || candidate.preparation !== preparation) return false
+    if (preparedCheckpointSeal?.candidate === candidate)
+      preparedCheckpointSeal = null
     preparedCheckpoint = null
     // Only the pending pin is released. Native handles/jobs/failure proofs remain.
     return true
@@ -1313,13 +1458,66 @@ export const createMarkdownRendererSessionResourceOwner = <
       cancelPreparedRendererOwnedCheckpoint(preparation)
     }
   }
+  const hasPrivateCheckpointSealCustody = (
+    seal: CheckpointSeal,
+    duringSeal = false,
+  ) => {
+    const candidate = seal.candidate
+    return (
+      !disposed &&
+      !capturingCheckpoint &&
+      (!sealingCheckpoint || duringSeal) &&
+      !bindingCheckpointSealSources &&
+      !bindingDocumentRetirement &&
+      !documentRetirementUnknown &&
+      !notifyingInputRetirement &&
+      checkpointAuthorityCallbackDepth === 0 &&
+      !checkpointDeactivated &&
+      !checkpointAuthorityOverflowed &&
+      cleanupFailures.size === 0 &&
+      renderWatchCleanupFailure === null &&
+      !stoppingRenderWatch &&
+      runningCleanups.size === 0 &&
+      generation === candidate.generation &&
+      checkpointAuthorityGeneration === seal.authorityGeneration &&
+      retained === candidate.record.render &&
+      jobs.size === 0 &&
+      timers.size === 0 &&
+      frames.size === 0 &&
+      scheduledFrames.size === 0 &&
+      pendingFrameFinalizers.size === 0 &&
+      controlledFrameKeys.size === 0 &&
+      installations.size === 0 &&
+      pendingComponentCleanups.size === 0 &&
+      documentRetirement === seal.nativeBinding &&
+      checkpointSealSources.get('pipeline') === seal.pipelineBinding &&
+      checkpointSealSources.get('viewport') === seal.viewportBinding &&
+      !seal.pipelineBinding.registering &&
+      !seal.pipelineBinding.releasing &&
+      !seal.pipelineBinding.released &&
+      seal.pipelineBinding.unsubscribe !== null &&
+      !seal.viewportBinding.registering &&
+      !seal.viewportBinding.releasing &&
+      !seal.viewportBinding.released &&
+      seal.viewportBinding.unsubscribe !== null &&
+      ((preparedCheckpoint === candidate && checkpoint === candidate.base) ||
+        (publishedCheckpointSeal === seal && checkpoint === candidate.record))
+    )
+  }
+  const hasOriginalCheckpointSealCustody = (seal: CheckpointSeal) =>
+    seal.nativeBinding.handle.hasCustody() &&
+    seal.nativeBinding.source.hasCustody(seal.nativeTicket) &&
+    seal.pipelineBinding.source.isCurrent(seal.pipelineTicket) &&
+    seal.viewportBinding.source.isCurrent(seal.viewportTicket)
   const sealPreparedRendererOwnedCheckpoint = (
     preparation: MarkdownRendererCheckpointPreparation,
-  ): MarkdownRendererCheckpointPublication | null => {
+  ): MarkdownRendererSealedCheckpointPublication | null => {
     const candidate = preparedCheckpoint
     if (
       !candidate ||
       candidate.preparation !== preparation ||
+      sealingCheckpoint ||
+      bindingCheckpointSealSources ||
       !hasCurrentCheckpointCustody() ||
       checkpointDeactivated ||
       checkpointAuthorityOverflowed ||
@@ -1328,21 +1526,157 @@ export const createMarkdownRendererSessionResourceOwner = <
       candidate.authorityGeneration !== checkpointAuthorityGeneration
     )
       return null
-    // The original context has getters, and pipeline diagnostics omit control
-    // and resource transitions. Neither supplies a synchronous revocation ticket.
-    // Refuse before changing validation, published custody, or real resources.
-    throw new Error(
-      `markdown-renderer-checkpoint-seal-source-unavailable:${markdownRendererCheckpointSealSourceDependencies.join(',')}`,
+    const nativeBinding = documentRetirement
+    const pipelineBinding = checkpointSealSources.get('pipeline')
+    const viewportBinding = checkpointSealSources.get('viewport')
+    if (
+      !nativeBinding ||
+      documentRetirementUnknown ||
+      bindingDocumentRetirement
+    )
+      throw new Error(
+        'markdown-renderer-checkpoint-seal-source-unavailable:native-document-retirement-registration',
+      )
+    if (
+      !pipelineBinding ||
+      pipelineBinding.registering ||
+      !pipelineBinding.unsubscribe ||
+      pipelineBinding.released
+    )
+      throw new Error(
+        'markdown-renderer-checkpoint-seal-source-unavailable:bindCheckpointSealSources.pipeline',
+      )
+    if (
+      !viewportBinding ||
+      viewportBinding.registering ||
+      !viewportBinding.unsubscribe ||
+      viewportBinding.released
+    )
+      throw new Error(
+        'markdown-renderer-checkpoint-seal-source-unavailable:bindCheckpointSealSources.viewport',
+      )
+    if (
+      preparedCheckpointSeal?.candidate === candidate &&
+      hasSealedRendererOwnedCheckpointCustody(
+        preparedCheckpointSeal.publication,
+      )
+    )
+      return preparedCheckpointSeal.publication
+    const attempt = {
+      candidate,
+      nativeBinding,
+      pipelineBinding,
+      viewportBinding,
+      nativeTicket: null as MarkdownHeavyFeatureDocumentAuthorityTicket | null,
+      pipelineTicket: null as object | null,
+      viewportTicket: null as object | null,
+    }
+    let source: unknown = nativeBinding.source
+    sealingCheckpoint = true
+    try {
+      const nativeTicket = (attempt.nativeTicket =
+        nativeBinding.source.capture())
+      if (!nativeTicket) return null
+      // The original immutable Native ticket must describe this exact captured
+      // checkpoint document, rather than a newer unrelated document/revision.
+      const capture = candidate.record.capture
+      if (
+        nativeTicket.documentKey !== capture.documentIdentity.id ||
+        nativeTicket.documentEpoch !== capture.documentIdentity.epoch ||
+        nativeTicket.revision !== capture.revision
+      )
+        return null
+      source = pipelineBinding.source
+      const pipelineTicket = (attempt.pipelineTicket =
+        pipelineBinding.source.issueTicket())
+      if (!pipelineTicket) return null
+      source = viewportBinding.source
+      const viewportTicket = (attempt.viewportTicket =
+        viewportBinding.source.issueTicket())
+      if (!viewportTicket) return null
+      source = candidate.record
+      const publication: MarkdownRendererSealedCheckpointPublication =
+        Object.freeze({
+          ...candidate.publication,
+          seal: Object.freeze({
+            scope: 'renderer-checkpoint-source-custody',
+            checkpointRef: capture.ref,
+          }),
+        })
+      const seal: CheckpointSeal = {
+        candidate,
+        publication,
+        nativeBinding,
+        nativeTicket,
+        pipelineBinding,
+        pipelineTicket,
+        viewportBinding,
+        viewportTicket,
+        authorityGeneration: candidate.authorityGeneration,
+      }
+      const originalCurrent = hasOriginalCheckpointSealCustody(seal)
+      // All issuer calls and allocations precede this last joint private guard.
+      if (
+        !originalCurrent ||
+        !hasPrivateCheckpointSealCustody(seal, true) ||
+        preparedCheckpoint !== candidate
+      )
+        return null
+      preparedCheckpointSeal = seal
+      return publication
+    } catch (cause) {
+      // The exact attempted source/refs survive cancellation or late teardown.
+      runCleanupBatch([
+        {
+          phase: 'checkpoint-seal-capture',
+          resource: { attempt, source },
+          run: () => {
+            throw cause
+          },
+        },
+      ])
+      throw cause
+    } finally {
+      sealingCheckpoint = false
+    }
+  }
+  const hasSealedRendererOwnedCheckpointCustody = (
+    publication: MarkdownRendererCheckpointPublication,
+  ): boolean => {
+    const seal =
+      preparedCheckpointSeal?.publication === publication
+        ? preparedCheckpointSeal
+        : publishedCheckpointSeal?.publication === publication
+          ? publishedCheckpointSeal
+          : null
+    // Compare private token identity only. Known original pure checks never
+    // acquire tickets, inspect resources, refresh, invoke caller getters or write.
+    return (
+      seal !== null &&
+      hasPrivateCheckpointSealCustody(seal) &&
+      hasOriginalCheckpointSealCustody(seal) &&
+      hasPrivateCheckpointSealCustody(seal)
     )
   }
-  // No original issuer can currently create a live ticket. These pure refusal
-  // ports cannot promote a captured-only publication to sealed live authority.
-  const hasSealedRendererOwnedCheckpointCustody = (
-    _publication: MarkdownRendererCheckpointPublication,
-  ): boolean => false
   const publishSealedRendererOwnedCheckpoint = (
-    _publication: MarkdownRendererCheckpointPublication,
-  ): MarkdownRendererOwnedCheckpoint | null => null
+    publication: MarkdownRendererCheckpointPublication,
+  ): MarkdownRendererOwnedCheckpoint | null => {
+    const seal = preparedCheckpointSeal
+    if (
+      !seal ||
+      seal.publication !== publication ||
+      !hasSealedRendererOwnedCheckpointCustody(publication) ||
+      preparedCheckpoint !== seal.candidate
+    )
+      return null
+    // Original publication contract: one private pointer commit, no allocation,
+    // callbacks/reactive/native writes, cleanup, readiness or recovery receipt.
+    checkpoint = seal.candidate.record
+    publishedCheckpointSeal = seal
+    preparedCheckpointSeal = null
+    preparedCheckpoint = null
+    return checkpoint.capture
+  }
   const trackJob = () => {
     if (disposed) throw new Error('markdown-renderer-resource-owner-disposed')
     retireCheckpointAuthority('job-admission')
@@ -1684,6 +2018,10 @@ export const createMarkdownRendererSessionResourceOwner = <
     return remove
   }
   const inspectOwnedResources = () => {
+    const sealSourceRecords = [...checkpointSealSources.values()]
+    const retainedSealSourceListeners = sealSourceRecords.filter(
+      (record) => record.unsubscribe !== null && !record.released,
+    ).length
     const ownedInputs = [...inputPublications.values()].map((record) =>
       record.inspect(),
     )
@@ -1803,15 +2141,43 @@ export const createMarkdownRendererSessionResourceOwner = <
       measuredUsageOnly: true as const,
       missingSourceDependencies: Object.freeze(missingSourceDependencies),
       sources: Object.freeze({
+        checkpointSealSources: Object.freeze(
+          sealSourceRecords.map((record) =>
+            Object.freeze({
+              role: record.role,
+              source: record.source,
+              retainedReleaseHandle:
+                record.unsubscribe !== null && !record.released,
+              registering: record.registering,
+              unknownRegistration:
+                record.unsubscribe === null && !record.released,
+              releasing: record.releasing,
+              releaseReentered: record.releaseReentered,
+              failureCause: record.releaseCause,
+            }),
+          ),
+        ),
         rendererOwnedInputs: Object.freeze(ownedInputs),
         rendererOwnedCheckpoint: checkpoint?.capture ?? null,
         rendererCheckpointCustody: Object.freeze({
           prepared: preparedCheckpoint?.preparation ?? null,
           validated: preparedCheckpoint?.validated ?? false,
           publication: 'renderer-custody-only' as const,
-          liveAuthority: 'unavailable' as const,
+          liveAuthority: 'renderer-checkpoint-source-custody-only' as const,
           fullHostRefset: 'unavailable' as const,
-          seal: 'unavailable' as const,
+          seal:
+            preparedCheckpointSeal || publishedCheckpointSeal
+              ? ('checkpoint-bound-source-custody' as const)
+              : ('not-sealed' as const),
+          preparedSeal: preparedCheckpointSeal?.publication ?? null,
+          publishedSeal: publishedCheckpointSeal?.publication ?? null,
+          sealingCheckpoint,
+          missingBindings: Object.freeze(
+            ['pipeline', 'viewport'].filter(
+              (role) =>
+                !checkpointSealSources.has(role as 'pipeline' | 'viewport'),
+            ),
+          ),
           missingSealSourceDependencies:
             markdownRendererCheckpointSealSourceDependencies,
           ownedAuthorityRetirement: Object.freeze({
@@ -1915,6 +2281,7 @@ export const createMarkdownRendererSessionResourceOwner = <
         paused: false,
         recoverable: false,
         retainedListeners:
+          retainedSealSourceListeners +
           inputListeners +
           documentListeners +
           listeners.size +
@@ -1942,6 +2309,8 @@ export const createMarkdownRendererSessionResourceOwner = <
             projection.observers + viewport.observers + heavy.usage.observers,
           timers: knownTimers,
           backgroundTasks:
+            (sealingCheckpoint ? 1 : 0) +
+            (bindingCheckpointSealSources ? 1 : 0) +
             ownedInputs.reduce(
               (sum, input) => sum + input.pendingAsyncObservers,
               0,
@@ -1993,6 +2362,10 @@ export const createMarkdownRendererSessionResourceOwner = <
           // separately; an unknown heavy count is never coerced into this zero.
           networkRequests: 0,
           memoryUnits:
+            sealSourceRecords.length +
+            retainedSealSourceListeners +
+            (preparedCheckpointSeal ? 1 : 0) +
+            (publishedCheckpointSeal ? 1 : 0) +
             ownedInputs.reduce(
               (sum, record) =>
                 sum +
@@ -2094,6 +2467,11 @@ export const createMarkdownRendererSessionResourceOwner = <
       for (const publication of inputPublications.values()) publication.close()
       registerComponentCleanups(componentActions)
       runCleanupBatch([
+        ...[...checkpointSealSources.values()].map((record) => ({
+          phase: 'checkpoint-seal-source-release',
+          resource: record,
+          run: () => releaseCheckpointSealSource(record),
+        })),
         ...[...inputPublications.values()].map((publication) => ({
           phase: 'renderer-input-subscriptions-release',
           resource: publication,
@@ -2135,6 +2513,7 @@ export const createMarkdownRendererSessionResourceOwner = <
         pendingComponentCleanups.size > 0 ||
         documentRetirement !== null ||
         documentRetirementUnknown ||
+        checkpointSealSources.size > 0 ||
         [...inputPublications.values()].some((record) =>
           record.hasReleaseObligations(),
         ) ||
@@ -2152,6 +2531,7 @@ export const createMarkdownRendererSessionResourceOwner = <
   return Object.freeze({
     afterFrame,
     bindDocumentAuthorityReceiver,
+    bindCheckpointSealSources,
     bindRenderWatchHandle,
     beginInstallation,
     beginRender,
