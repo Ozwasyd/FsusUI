@@ -246,10 +246,11 @@ export const createMarkdownRendererSessionResourceOwner = <
   let checkpointDeactivated = false
   let checkpointAuthorityCallbackDepth = 0
   let lastCheckpointAuthorityRetirement: string | null = null
-  let documentRetirement: {
+  type DocumentRetirementBinding = {
     readonly source: MarkdownHeavyFeatureDocumentAuthority
     readonly handle: MarkdownHeavyFeatureDocumentAuthorityRetirementHandle
-  } | null = null
+  }
+  let documentRetirement: DocumentRetirementBinding | null = null
   let documentRetirementUnknown = false
   let bindingDocumentRetirement = false
   type SealSourceRegistration = {
@@ -876,7 +877,7 @@ export const createMarkdownRendererSessionResourceOwner = <
     readonly retainedCollectionEntries: number
   }
   let checkpoint: CheckpointRecord | null = null
-  let preparedCheckpoint: {
+  type PreparedCheckpointRecord = {
     readonly record: CheckpointRecord
     readonly base: CheckpointRecord | null
     readonly generation: number
@@ -884,11 +885,12 @@ export const createMarkdownRendererSessionResourceOwner = <
     readonly preparation: MarkdownRendererCheckpointPreparation
     readonly publication: MarkdownRendererCheckpointPublication
     validated: boolean
-  } | null = null
+  }
+  let preparedCheckpoint: PreparedCheckpointRecord | null = null
   type CheckpointSeal = {
-    readonly candidate: NonNullable<typeof preparedCheckpoint>
+    readonly candidate: PreparedCheckpointRecord
     readonly publication: MarkdownRendererSealedCheckpointPublication
-    readonly nativeBinding: NonNullable<typeof documentRetirement>
+    readonly nativeBinding: DocumentRetirementBinding
     readonly nativeTicket: MarkdownHeavyFeatureDocumentAuthorityTicket
     readonly pipelineBinding: SealSourceRegistration
     readonly pipelineTicket: object
