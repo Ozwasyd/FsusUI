@@ -1105,3 +1105,26 @@ leaving native coordinates unchanged. The final guards therefore follow both
 allocations; store commit then performs only private checks/assignments, followed
 by the session's private assignment. Allocation success is never an admission
 proof. The exact normal-return allocation reentry control is source-only UNRUN.
+
+
+The same session also supplies `sealPreparedSnapshot(preparation, assertAdmission?)`,
+`hasSealedSnapshotCustody(publication)` and `publishSealedSnapshot(publication)`.
+Seal finishes reservation allocation, original retained-array allocation and all
+external admission/render/panel/lifetime reads before issuing one exact private
+publication ticket. Ticket construction failure cancels only the candidate.
+The last custody check and publisher use pinned original transaction producer
+methods and private session pointers; they perform no external callback, await,
+allocation, model write or history restore. The ticket has scope
+`native-owner-custody`; copied, cancelled, retired or already published tickets
+return false/null. Original native input, selection/projection, IME/mode, panel
+and mounted-ref transitions synchronously invalidate that ticket. The original
+unmount hook retires publication authority before cleanup/release, including
+setup-time retirement. Changed authority cannot reseal an older candidate.
+
+This finite native ticket does not attest Renderer live document/projection,
+Journal disk/TTL, application principal or complete multi-owner lifetime. Those
+original producers must supply their own synchronous invalidation/private
+reservation protocols before a joint final guard and callback-free same-identity
+publication can be installed. Sequential native/Renderer/Writer/Journal publishes
+are not a complete atomic refset. All runtime and full-host qualification remains
+UNRUN; resource completeness, restoration and eviction holds stay in force.

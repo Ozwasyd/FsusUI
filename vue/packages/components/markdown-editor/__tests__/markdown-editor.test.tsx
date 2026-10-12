@@ -28,6 +28,90 @@ import type {
 import { getMarkdownXssSourceUrl } from '../../../../tests/support/markdown-xss-corpus'
 
 describe('MarkdownEditor', () => {
+  it('seals original native publication and checks/publishes without any external owner reader', () => {
+    const identity = { id: 'sealed-native-document', epoch: 1 }
+    const store = new MarkdownEditorTransactionStore('source', undefined, identity)
+    let forbidReaders = false
+    const read = () => { if (forbidReaders) throw new Error('publication-called-external-owner'); return false }
+    const binding = createMarkdownEditorSessionBinding({
+      transactionStore: store, isComposing: read, isDisposed: read,
+      captureViewState: () => null, restoreViewState: () => {},
+      resourceParticipants: () => [], captureLastValidRender: () => { read(); return null },
+    })
+    const session = binding.getSession('session:sealed-native')
+    const expected = { documentIdentity: identity, revision: 0 }
+    const original = session.captureSnapshot(() => 'a'.repeat(64), expected)
+    const preparation = session.prepareSnapshot(() => 'b'.repeat(64), expected)
+    const publication = session.sealPreparedSnapshot(preparation)
+    expect(() => session.sealPreparedSnapshot(preparation)).toThrow('editor-session-snapshot-already-sealed')
+    expect(session.hasSealedSnapshotCustody({ ...publication })).toBe(false)
+    forbidReaders = true
+    expect(session.hasSealedSnapshotCustody(publication)).toBe(true)
+    expect(session.publishSealedSnapshot(publication)).toBe(preparation.snapshot)
+    expect(session.hasSealedSnapshotCustody(publication)).toBe(false)
+    expect(session.publishSealedSnapshot(publication)).toBeNull()
+    forbidReaders = false
+    expect(session.validateRetainedSnapshot(original, expected)).toBe(false)
+    expect(session.validateRetainedSnapshot(preparation.snapshot, expected)).toBe(true)
+  })
+
+  it('retires a sealed native ticket on genuine private invalidation/cancel/lifetime events and preserves old refs', () => {
+    const identity = { id: 'sealed-retirement-document', epoch: 1 }
+    const store = new MarkdownEditorTransactionStore('source', undefined, identity)
+    const binding = createMarkdownEditorSessionBinding({
+      transactionStore: store, isComposing: () => false, isDisposed: () => false,
+      captureViewState: () => null, restoreViewState: () => {},
+      resourceParticipants: () => [], captureLastValidRender: () => null,
+    })
+    const session = binding.getSession('session:sealed-retirement')
+    const expected = { documentIdentity: identity, revision: 0 }
+    const original = session.captureSnapshot(() => 'a'.repeat(64), expected)
+    const preparation = session.prepareSnapshot(() => 'b'.repeat(64), expected)
+    const publication = session.sealPreparedSnapshot(preparation)
+    binding.invalidatePublicationAuthority()
+    expect(session.hasSealedSnapshotCustody(publication)).toBe(false)
+    expect(session.publishSealedSnapshot(publication)).toBeNull()
+    expect(session.validateRetainedSnapshot(original, expected)).toBe(true)
+    expect(() => session.sealPreparedSnapshot(preparation)).toThrow('editor-session-publication-authority-retired')
+    const cancelled = session.prepareSnapshot(() => 'c'.repeat(64), expected)
+    const cancelledPublication = session.sealPreparedSnapshot(cancelled)
+    expect(session.discardPreparedSnapshot(cancelled)).toBe(true)
+    expect(session.publishSealedSnapshot(cancelledPublication)).toBeNull()
+    expect(session.validateRetainedSnapshot(original, expected)).toBe(true)
+    const retired = session.prepareSnapshot(() => 'd'.repeat(64), expected)
+    const retiredPublication = session.sealPreparedSnapshot(retired)
+    binding.retirePublicationAuthority()
+    expect(session.hasSealedSnapshotCustody(retiredPublication)).toBe(false)
+    expect(session.publishSealedSnapshot(retiredPublication)).toBeNull()
+    expect(session.discardPreparedSnapshot(retired)).toBe(true)
+    expect(() => session.inspectDocumentState()).toThrow('editor-session-disposed')
+  })
+
+  it('invalidates actual mounted native publication synchronously on readonly transition and original unmount', async () => {
+    const wrapper = mount(MarkdownEditor, { props: {
+      mode: 'source', modelValue: '# Sealed original', documentIdentity: { id: 'sealed-mounted-document', epoch: 1 },
+    } })
+    await flushPromises()
+    await nextTick()
+    const session = (wrapper.vm as MarkdownEditorInstance).getSession('session:sealed-mounted')
+    const original = session.captureSnapshot(() => 'a'.repeat(64))
+    const expected = { documentIdentity: original.documentIdentity, revision: original.revision }
+    const preparation = session.prepareSnapshot(() => 'b'.repeat(64), expected)
+    const publication = session.sealPreparedSnapshot(preparation)
+    await wrapper.setProps({ readonly: true })
+    expect(session.hasSealedSnapshotCustody(publication)).toBe(false)
+    expect(session.publishSealedSnapshot(publication)).toBeNull()
+    expect(session.validateRetainedSnapshot(original, expected)).toBe(true)
+    expect(session.discardPreparedSnapshot(preparation)).toBe(true)
+    await flushPromises()
+    const closing = session.prepareSnapshot(() => 'c'.repeat(64), expected)
+    const closingPublication = session.sealPreparedSnapshot(closing)
+    wrapper.unmount()
+    expect(session.hasSealedSnapshotCustody(closingPublication)).toBe(false)
+    expect(session.publishSealedSnapshot(closingPublication)).toBeNull()
+    expect(session.discardPreparedSnapshot(closing)).toBe(false)
+  })
+
   it('prepares and atomically commits actual native refs without replacing the previous token during preparation', () => {
     const identity = { id: 'prepared-native-document', epoch: 1 }
     const store = new MarkdownEditorTransactionStore('original source', undefined, identity)

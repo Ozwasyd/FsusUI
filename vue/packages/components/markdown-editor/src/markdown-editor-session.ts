@@ -1,4 +1,5 @@
 import { createMarkdownEditorSessionResourceCoordinator } from './markdown-editor-session-resources'
+import { MarkdownEditorTransactionStore } from './markdown-editor-transaction'
 import type { MarkdownEditorSessionPanelCapture, MarkdownEditorSessionPanelRefs, MarkdownEditorSessionPanelState } from './markdown-editor-session-panels'
 import type { MarkdownEditorSessionResourceCensus, MarkdownEditorSessionResourceParticipant } from './markdown-editor-session-resources'
 import type {
@@ -7,7 +8,6 @@ import type {
   MarkdownEditorResolvedSelection,
   MarkdownEditorRetainedTransactionSnapshot,
   MarkdownEditorRetainedTransactionPreparation,
-  MarkdownEditorTransactionStore,
 } from './markdown-editor-transaction'
 
 export interface MarkdownEditorSessionResourceUsage {
@@ -47,6 +47,12 @@ export interface MarkdownEditorSessionSnapshot {
 /** One original owner's uncommitted candidate; metadata alone cannot publish it. */
 export interface MarkdownEditorSessionPreparedSnapshot {
   readonly snapshot: MarkdownEditorSessionSnapshot
+}
+
+/** Original native candidate sealed after allocation/admission; not a full-host authority token. */
+export interface MarkdownEditorSessionSnapshotPublication {
+  readonly snapshot: MarkdownEditorSessionSnapshot
+  readonly scope: 'native-owner-custody'
 }
 
 export interface MarkdownEditorSessionCapabilities {
@@ -138,6 +144,10 @@ export interface MarkdownEditorSession {
     readonly assertAdmission?: () => void
   }): MarkdownEditorSessionPreparedSnapshot
   commitPreparedSnapshot(preparation: MarkdownEditorSessionPreparedSnapshot, assertAdmission?: () => void): MarkdownEditorSessionSnapshot
+  sealPreparedSnapshot(preparation: MarkdownEditorSessionPreparedSnapshot, assertAdmission?: () => void): MarkdownEditorSessionSnapshotPublication
+  /** Private original native continuity only; no external owner/source/lifetime callbacks. */
+  hasSealedSnapshotCustody(publication: MarkdownEditorSessionSnapshotPublication): boolean
+  publishSealedSnapshot(publication: MarkdownEditorSessionSnapshotPublication): MarkdownEditorSessionSnapshot | null
   /** Cancels only this exact candidate, including after owner retirement; never releases the old snapshot. */
   discardPreparedSnapshot(preparation: MarkdownEditorSessionPreparedSnapshot): boolean
   /** Read-only original token/document custody check; does not restore, capture or certify resources. */
@@ -193,7 +203,15 @@ const capabilities: MarkdownEditorSessionCapabilities = Object.freeze({
 
 export const createMarkdownEditorSessionBinding = <ViewState>(
   owner: MarkdownEditorSessionOwner<ViewState>,
-): MarkdownEditorSessionExpose & { inspectRetainedPanelMemoryUnits(): number } => {
+): MarkdownEditorSessionExpose & {
+  inspectRetainedPanelMemoryUnits(): number
+  invalidatePublicationAuthority(): void
+  retirePublicationAuthority(): void
+} => {
+  const transactionStore = owner.transactionStore
+  // Pin the original producer implementation, not replaceable consumer methods.
+  const validatePreparedTransaction = MarkdownEditorTransactionStore.prototype.validatePreparedRetainedSnapshot.bind(transactionStore)
+  const publishPreparedTransaction = MarkdownEditorTransactionStore.prototype.commitPreparedRetainedSnapshot.bind(transactionStore)
   const resources = createMarkdownEditorSessionResourceCoordinator(owner.resourceParticipants)
   let session: MarkdownEditorSession | undefined
   let retained: {
@@ -209,12 +227,32 @@ export const createMarkdownEditorSessionBinding = <ViewState>(
     readonly next: NonNullable<typeof retained>
     readonly previous: typeof retained
     readonly assertAdmission: (() => void) | undefined
+    readonly authorityGeneration: number
   } | undefined
   let sequence = 0
   let capturing = false
+  let authorityGeneration = 0
+  let authorityRetired = false
+  let sealed: {
+    readonly publication: MarkdownEditorSessionSnapshotPublication
+    readonly candidate: NonNullable<typeof prepared>
+    readonly generation: number
+  } | undefined
+
+  const invalidatePublicationAuthority = () => {
+    sealed = undefined
+    if (authorityGeneration === Number.MAX_SAFE_INTEGER) authorityRetired = true
+    else authorityGeneration += 1
+  }
+  const hasSealedSnapshotCustody = (publication: MarkdownEditorSessionSnapshotPublication): boolean => {
+    const custody = sealed
+    return custody !== undefined && custody.publication === publication && !authorityRetired && !capturing &&
+      custody.generation === authorityGeneration && prepared === custody.candidate &&
+      retained === custody.candidate.previous && validatePreparedTransaction(custody.candidate.transaction)
+  }
 
   const assertAvailable = () => {
-    if (owner.isDisposed()) throw new Error('editor-session-disposed')
+    if (authorityRetired || owner.isDisposed()) throw new Error('editor-session-disposed')
     if (owner.isComposing()) throw new Error('editor-session-composition-active')
   }
   const captureLastValidRender = () => {
@@ -241,6 +279,8 @@ export const createMarkdownEditorSessionBinding = <ViewState>(
   }
 
   return Object.freeze({
+    invalidatePublicationAuthority,
+    retirePublicationAuthority: () => { authorityRetired = true; invalidatePublicationAuthority() },
     inspectRetainedPanelMemoryUnits: () => (retained?.panels?.memoryUnits ?? 0) + (prepared?.next.panels?.memoryUnits ?? 0),
     getSession(editorSessionRef: string) {
       assertAvailable()
@@ -444,7 +484,7 @@ export const createMarkdownEditorSessionBinding = <ViewState>(
             })
             const preparation = Object.freeze({ snapshot })
             prepared = { preparation, transaction: transactionPreparation, store,
-              next: { snapshot, transaction, view, panels }, previous, assertAdmission }
+              next: { snapshot, transaction, view, panels }, previous, assertAdmission, authorityGeneration }
             return preparation
           } catch (error) {
             if (transactionPreparation) store.discardPreparedRetainedSnapshot(transactionPreparation)
@@ -454,11 +494,25 @@ export const createMarkdownEditorSessionBinding = <ViewState>(
           }
         },
         commitPreparedSnapshot(preparation: MarkdownEditorSessionPreparedSnapshot, assertAdmission?: () => void) {
+          const publication = session!.sealPreparedSnapshot(preparation, assertAdmission)
+          const snapshot = session!.publishSealedSnapshot(publication)
+          if (!snapshot) {
+            session!.discardPreparedSnapshot(preparation)
+            throw new Error('editor-session-snapshot-publication-stale')
+          }
+          return snapshot
+        },
+        sealPreparedSnapshot(preparation: MarkdownEditorSessionPreparedSnapshot, assertAdmission?: () => void) {
           if (capturing) throw new Error('editor-session-snapshot-reentrant')
           const custody = prepared
           if (!custody || preparation !== custody.preparation) throw new Error('editor-session-snapshot-preparation-invalid')
+          if (sealed) throw new Error('editor-session-snapshot-already-sealed')
+          let admitted = false
           capturing = true
           try {
+            const publication: MarkdownEditorSessionSnapshotPublication = Object.freeze({ snapshot: custody.next.snapshot, scope: 'native-owner-custody' })
+            // Allocate reservation metadata before any final native or consumer guard.
+            const reservation = { publication, candidate: custody, generation: custody.authorityGeneration }
             // Native array allocation can reenter application admission without
             // changing the native revision. Finish it before EVERY final owner guard.
             if (!custody.store.allocatePreparedRetainedSnapshot(custody.transaction))
@@ -486,25 +540,38 @@ export const createMarkdownEditorSessionBinding = <ViewState>(
             if (prepared !== custody || retained !== custody.previous || owner.transactionStore !== custody.store ||
                 !custody.store.validatePreparedRetainedSnapshot(custody.transaction))
               throw new Error('editor-session-snapshot-preparation-stale')
-            const transaction = custody.store.commitPreparedRetainedSnapshot(custody.transaction)
-            if (transaction !== custody.next.transaction) throw new Error('editor-session-history-checkpoint-invalid')
-            // No callback, await, allocation or fallible owner operation after native publication.
-            retained = custody.next
-            prepared = undefined
-            return snapshot
+            if (authorityRetired || authorityGeneration !== reservation.generation)
+              throw new Error('editor-session-publication-authority-retired')
+            sealed = reservation
+            admitted = true
+            return publication
           } finally {
-            if (prepared === custody) {
+            if (!admitted && prepared === custody) {
               custody.store.discardPreparedRetainedSnapshot(custody.transaction)
               prepared = undefined
             }
             capturing = false
           }
         },
+        hasSealedSnapshotCustody,
+        publishSealedSnapshot(publication: MarkdownEditorSessionSnapshotPublication): MarkdownEditorSessionSnapshot | null {
+          if (!hasSealedSnapshotCustody(publication)) return null
+          const custody = sealed!
+          const next = custody.candidate.next
+          const transaction = publishPreparedTransaction(custody.candidate.transaction)
+          if (transaction !== next.transaction) return null
+          // Only genuine preallocated original-owner pointers are published.
+          retained = next
+          prepared = undefined
+          sealed = undefined
+          return publication.snapshot
+        },
         discardPreparedSnapshot(preparation: MarkdownEditorSessionPreparedSnapshot): boolean {
           const custody = prepared
           if (!custody || preparation !== custody.preparation) return false
           const discarded = custody.store.discardPreparedRetainedSnapshot(custody.transaction)
           prepared = undefined
+          sealed = undefined
           return discarded
         },
         readPanelState(snapshot: MarkdownEditorSessionSnapshot): MarkdownEditorSessionPanelState | null {

@@ -1400,6 +1400,7 @@ const attrs = useAttrs()
 const rootElementRef = ref<HTMLElement | null>(null)
 const sessionSurfacePaused = ref(false)
 let sessionDisposed = false
+let retireSnapshotPublicationAuthority: (() => void) | undefined = undefined
 const frameScheduler = useMarkdownEditorFrameScheduler({
   onFrameEnd: (metrics) => {
     const target = rootElementRef.value
@@ -4197,6 +4198,7 @@ onMounted(() => {
 })
 
 onBeforeUnmount(() => {
+  retireSnapshotPublicationAuthority?.()
   editorReleased = true
   sessionDisposed = true
   releaseAttachmentFiles()
@@ -7088,6 +7090,22 @@ const sessionBinding = createMarkdownEditorSessionBinding({
     retainedPreviewScrollLeft.value = state.previewScrollLeft
   },
 })
+
+
+retireSnapshotPublicationAuthority = sessionBinding.retirePublicationAuthority
+if (sessionDisposed) retireSnapshotPublicationAuthority()
+
+// Invalidate the private native publication reservation at actual synchronous
+// owner input transitions, before queued Vue/render/layout work can run.
+watch([
+  () => props.modelValue, () => props.documentIdentity?.id, () => props.documentIdentity?.epoch,
+  () => props.disabled, () => props.readonly, () => props.mode,
+  currentMode, isComposing, editorValue, editorRevision, editorSelection,
+  editorProjection, textareaRef, previewRendererRef, searchUiState, searchQuery,
+  searchReplaceText, searchMatches, searchCurrentIndex, searchMode,
+  atomicSession, liveAtomic, contextualSurface, contextualSurfaceEpoch, contextualSurfaceRevision,
+  contextualError, linkLabelDraft, linkDestinationDraft, linkTitleDraft, anchorIdDraft,
+], sessionBinding.invalidatePublicationAuthority, { flush: 'sync' })
 
 defineExpose({
   getSession: sessionBinding.getSession,
