@@ -2,6 +2,8 @@
 'element-plus': minor
 ---
 
+Fence the whole render/restore synchronous finalization before releasing the last real job, retaining live-reader/flag failures while attempting all owned final actions. Bind activity-flag cleanup to the original task, and fence current reads, invalidation's post-frame read and RAF resolution without creating replacement work or authority.
+
 Fence the original document read, selected cleanup, timer and IntersectionObserver callbacks with complete depth/catch/finally retirement. Preserve actual phase/resource/cause on failure, including clearTimer's retained handle, and refuse reentrant checkpoint capture during running cleanup without skipping the attempt-all batch.
 
 Retire the original renderer's prepared authority synchronously around owned projection/chunk writes, external callbacks, resource transitions, cleanup failures and activation/deactivation/unmount. Bind pending capture to the real private retirement generation, guard callback reentry and retain actual callback causes. Original document/pipeline tickets remain required before any live seal can be issued.

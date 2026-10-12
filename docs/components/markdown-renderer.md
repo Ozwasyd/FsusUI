@@ -764,3 +764,16 @@ its caught native cause is retained even for direct calls outside unmount.
 Selected cleanup still attempts the remaining actions after error, preserving
 the original single error or AggregateError and all original causes. These new
 counterexamples remain source-only/UNRUN; no positive live seal is issued.
+
+Render and restore now enter one actual finalization boundary before releasing
+their last owned job. The existing attempt-all batch settles that real job, checks
+the current document and performs owned activity-flag cleanup even if a prior
+action throws. Flag cleanup uses only the original task id, so it does not clear a
+newer request's flag or claim live document authority. Single/Aggregate errors and
+each real phase/resource/cause stay retained. `isCurrent` itself fences the actual
+document callback; invalidation fences its post-frame-cancellation document read;
+RAF fences handle release and resolution. The remaining activation finally has
+no following external read, and listener/keyed/cleanup releases already have their
+full controlled boundaries. Reentrant preparation stays refused after the last
+resource disappears until the whole synchronous phase actually exits. These
+final-reader/flag/throw/reentry cases remain source-only/UNRUN with all holds.

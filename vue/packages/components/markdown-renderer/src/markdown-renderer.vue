@@ -1915,15 +1915,17 @@ const performRender = async () => {
       },
     )
   } finally {
-    finishJob()
-    if (isCurrent()) {
+    rendererResourceOwner.finalizeRenderJob(finishJob, isCurrent, () => {
+      // Clean only this task's actual activity flag, not a newer request's flag.
+      if (taskId !== currentTaskId) return
       rendererResourceOwner.runCheckpointAuthorityCallback(
         'projection-write',
         () => {
           isRendering.value = false
         },
+        isRendering,
       )
-    }
+    })
   }
 }
 
@@ -2082,15 +2084,17 @@ const restoreLastValidRender = async (
       )
     return blocked('markdown-renderer-restore-failed')
   } finally {
-    finishJob()
-    if (isCurrent()) {
+    rendererResourceOwner.finalizeRenderJob(finishJob, isCurrent, () => {
+      // Clean only this task's actual activity flag, not a newer request's flag.
+      if (taskId !== currentTaskId) return
       rendererResourceOwner.runCheckpointAuthorityCallback(
         'projection-write',
         () => {
           isRendering.value = false
         },
+        isRendering,
       )
-    }
+    })
   }
 }
 

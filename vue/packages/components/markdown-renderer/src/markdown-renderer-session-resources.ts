@@ -428,15 +428,20 @@ export const createMarkdownRendererSessionResourceOwner = <
       () => Object.freeze({ ...readDocumentState(), generation: ++generation }),
       readDocumentState,
     )
-  const isCurrent = (token: MarkdownRendererRenderGeneration) => {
-    const current = options.readDocumentState()
-    return (
-      !disposed &&
-      token.generation === generation &&
-      sameDocument(token, current) &&
-      token.revision === current.revision
+  const isCurrent = (token: MarkdownRendererRenderGeneration) =>
+    runCheckpointAuthorityCallback(
+      'current-document-read',
+      () => {
+        const current = options.readDocumentState()
+        return (
+          !disposed &&
+          token.generation === generation &&
+          sameDocument(token, current) &&
+          token.revision === current.revision
+        )
+      },
+      readDocumentState,
     )
-  }
   const captureLastValidRender = (): MarkdownRendererLastValidRender | null => {
     if (disposed || !retained) return null
     if (!sameDocument(retained.capture, options.readDocumentState())) {
@@ -689,6 +694,36 @@ export const createMarkdownRendererSessionResourceOwner = <
       return jobs.delete(job)
     }
   }
+  const finalizeRenderJob = (
+    finishJob: () => void,
+    readCurrent: () => boolean,
+    finishOwnedFlag: () => void,
+  ) =>
+    runCheckpointAuthorityCallback(
+      'render-finalization',
+      () => {
+        // Enter before the final job is released; every remaining action is tried
+        // even when a live getter or owned flag setter throws.
+        runCleanupBatch([
+          {
+            phase: 'render-job-settlement',
+            resource: finishJob,
+            run: finishJob,
+          },
+          {
+            phase: 'render-final-current-read',
+            resource: readCurrent,
+            run: readCurrent,
+          },
+          {
+            phase: 'render-final-owned-flag',
+            resource: finishOwnedFlag,
+            run: finishOwnedFlag,
+          },
+        ])
+      },
+      finishJob,
+    )
   const setTimer = (run: () => void, delay: number) => {
     const installation = beginInstallation('timer')
     let handle: ReturnType<typeof setTimeout> | undefined
@@ -749,12 +784,17 @@ export const createMarkdownRendererSessionResourceOwner = <
       let handle: number | undefined
       let fired = false
       try {
-        handle = requestAnimationFrame(() => {
-          retireCheckpointAuthority('frame-callback')
-          fired = true
-          if (handle !== undefined) frames.delete(handle)
-          resolve()
-        })
+        handle = requestAnimationFrame(() =>
+          runCheckpointAuthorityCallback(
+            'frame-callback',
+            () => {
+              fired = true
+              if (handle !== undefined) frames.delete(handle)
+              resolve()
+            },
+            handle ?? resolve,
+          ),
+        )
       } catch (error) {
         installation.fail(error)
         throw error
@@ -1398,12 +1438,13 @@ export const createMarkdownRendererSessionResourceOwner = <
     disposeOnUnmount,
     inspectOwnedResources,
     isDisposed: () => disposed,
-    invalidate: () => {
-      retireCheckpointAuthority('source-invalidation')
-      generation += 1
-      cancelFrames()
-      captureLastValidRender()
-    },
+    invalidate: () =>
+      runCheckpointAuthorityCallback('source-invalidation', () => {
+        retireCheckpointAuthority('source-invalidation')
+        generation += 1
+        cancelFrames()
+        captureLastValidRender()
+      }),
     isCurrent,
     listenForAbort,
     participant,
@@ -1412,5 +1453,6 @@ export const createMarkdownRendererSessionResourceOwner = <
     scheduleFrame,
     setTimer,
     trackJob,
+    finalizeRenderJob,
   })
 }
