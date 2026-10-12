@@ -301,6 +301,8 @@ export const createMarkdownRendererSessionResourceOwner = <
   readonly pauseRelatedResources?: () => readonly MarkdownRendererCleanupAction[]
   readonly resumeRelatedResources?: () => readonly MarkdownRendererCleanupAction[]
   readonly recreateCurrentFrames?: () => void
+  readonly resumeWatchActivity?: () => void
+  readonly commitRelatedResourceResume?: () => void
 }) => {
   const timers = new Set<ReturnType<typeof setTimeout>>()
   type TimerActivation = {
@@ -1445,7 +1447,12 @@ export const createMarkdownRendererSessionResourceOwner = <
           installRenderWatch(false)
           if (disposed || renderWatchSource !== source || !hasSource())
             throw new Error('markdown-renderer-watch-resume-source-stale')
+          renderWatchPaused = false
+          options.resumeWatchActivity?.()
+          if (disposed || !hasSource())
+            throw new Error('markdown-renderer-watch-resume-source-stale')
         } catch (cause) {
+          renderWatchPaused = true
           runCleanupBatch([
             {
               phase: 'render-watch-resume-failure',
@@ -1948,6 +1955,8 @@ export const createMarkdownRendererSessionResourceOwner = <
     if (renderWatchPaused)
       throw new Error('markdown-renderer-resource-admission-paused')
     retireCheckpointAuthority('job-admission')
+    if (disposed || renderWatchPaused)
+      throw new Error('markdown-renderer-resource-admission-paused')
     const job = Symbol('renderer-job')
     let resolve: (() => void) | null = null
     const promise = new rendererInputNativePromise<void>((settle) => {
@@ -2628,6 +2637,7 @@ export const createMarkdownRendererSessionResourceOwner = <
             options.recreateCurrentFrames?.()
             if (disposed || !hasSource())
               throw new Error('markdown-renderer-owned-resume-source-stale')
+            options.commitRelatedResourceResume?.()
             pausedRenderWatchSource = null
             pausedRenderWatchDocument = null
           } catch (cause) {
