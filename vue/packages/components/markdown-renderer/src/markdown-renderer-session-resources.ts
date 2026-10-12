@@ -527,7 +527,8 @@ export const createMarkdownRendererSessionResourceOwner = <
     const candidate = preparedCheckpoint
     // Compare producer identity only; never read caller token properties/getters.
     if (
-      candidate?.preparation !== preparation ||
+      !candidate ||
+      candidate.preparation !== preparation ||
       !hasCurrentCheckpointCustody()
     )
       return null
@@ -539,7 +540,8 @@ export const createMarkdownRendererSessionResourceOwner = <
   ): MarkdownRendererOwnedCheckpoint | null => {
     const candidate = preparedCheckpoint
     if (
-      candidate?.publication !== publication ||
+      !candidate ||
+      candidate.publication !== publication ||
       !candidate.validated ||
       !hasCurrentCheckpointCustody()
     )
@@ -553,7 +555,8 @@ export const createMarkdownRendererSessionResourceOwner = <
   const cancelPreparedRendererOwnedCheckpoint = (
     preparation: MarkdownRendererCheckpointPreparation,
   ) => {
-    if (preparedCheckpoint?.preparation !== preparation) return false
+    const candidate = preparedCheckpoint
+    if (!candidate || candidate.preparation !== preparation) return false
     preparedCheckpoint = null
     // Only the pending pin is released. Native handles/jobs/failure proofs remain.
     return true
