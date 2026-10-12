@@ -2,6 +2,8 @@
 'element-plus': minor
 ---
 
+Fence the original document read, selected cleanup, timer and IntersectionObserver callbacks with complete depth/catch/finally retirement. Preserve actual phase/resource/cause on failure, including clearTimer's retained handle, and refuse reentrant checkpoint capture during running cleanup without skipping the attempt-all batch.
+
 Retire the original renderer's prepared authority synchronously around owned projection/chunk writes, external callbacks, resource transitions, cleanup failures and activation/deactivation/unmount. Bind pending capture to the real private retirement generation, guard callback reentry and retain actual callback causes. Original document/pipeline tickets remain required before any live seal can be issued.
 
 Expose fail-closed renderer seal join ports with exact missing original document/pipeline revocation sources. Do not issue a live seal from captured-only custody; pure has/publish refuse and preserve old refs, pending custody and cleanup obligations.

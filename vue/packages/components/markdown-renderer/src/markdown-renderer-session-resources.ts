@@ -217,6 +217,8 @@ export const createMarkdownRendererSessionResourceOwner = <
   const runCheckpointAuthorityCallback = <T>(
     reason: string,
     run: () => T,
+    resource: unknown = run,
+    failurePhase = `checkpoint-callback:${reason}`,
   ): T => {
     retireCheckpointAuthority(reason)
     checkpointAuthorityCallbackDepth += 1
@@ -224,16 +226,15 @@ export const createMarkdownRendererSessionResourceOwner = <
       return run()
     } catch (error) {
       retireCheckpointAuthority('callback-failure')
-      const phase = `checkpoint-callback:${reason}`
-      let resources = cleanupFailures.get(phase)
+      let resources = cleanupFailures.get(failurePhase)
       if (!resources) {
         resources = new Map()
-        cleanupFailures.set(phase, resources)
+        cleanupFailures.set(failurePhase, resources)
       }
-      let causes = resources.get(run)
+      let causes = resources.get(resource)
       if (!causes) {
         causes = new Set()
-        resources.set(run, causes)
+        resources.set(resource, causes)
       }
       causes.add(error)
       throw error
@@ -320,7 +321,7 @@ export const createMarkdownRendererSessionResourceOwner = <
       running.add(resource)
       retireCheckpointAuthority('cleanup-selected')
       try {
-        run()
+        runCheckpointAuthorityCallback(phase, run, resource, phase)
       } catch (error) {
         retireCheckpointAuthority('cleanup-failure')
         errors.push(error)
@@ -421,10 +422,12 @@ export const createMarkdownRendererSessionResourceOwner = <
     // Immediate watch setup may have reentered ordinary unmount before binding.
     if (disposed) stopRenderWatch()
   }
-  const beginRender = (): MarkdownRendererRenderGeneration => {
-    retireCheckpointAuthority('render-admission')
-    return Object.freeze({ ...readDocumentState(), generation: ++generation })
-  }
+  const beginRender = (): MarkdownRendererRenderGeneration =>
+    runCheckpointAuthorityCallback(
+      'render-admission',
+      () => Object.freeze({ ...readDocumentState(), generation: ++generation }),
+      readDocumentState,
+    )
   const isCurrent = (token: MarkdownRendererRenderGeneration) => {
     const current = options.readDocumentState()
     return (
@@ -480,6 +483,7 @@ export const createMarkdownRendererSessionResourceOwner = <
         disposed ||
         capturingCheckpoint ||
         checkpointAuthorityCallbackDepth > 0 ||
+        runningCleanups.size > 0 ||
         preparedCheckpoint !== null ||
         stoppingRenderWatch ||
         jobs.size > 0 ||
@@ -515,6 +519,7 @@ export const createMarkdownRendererSessionResourceOwner = <
           disposed ||
           generation !== checkpointGeneration ||
           checkpointAuthorityCallbackDepth > 0 ||
+          runningCleanups.size > 0 ||
           checkpointAuthorityGeneration !== authorityGeneration ||
           retained !== render ||
           jobs.size > 0 ||
@@ -577,6 +582,7 @@ export const createMarkdownRendererSessionResourceOwner = <
       !disposed &&
       !capturingCheckpoint &&
       checkpointAuthorityCallbackDepth === 0 &&
+      runningCleanups.size === 0 &&
       !stoppingRenderWatch &&
       generation === candidate.generation &&
       retained === candidate.record.render &&
@@ -688,12 +694,19 @@ export const createMarkdownRendererSessionResourceOwner = <
     let handle: ReturnType<typeof setTimeout> | undefined
     let fired = false
     try {
-      handle = setTimeout(() => {
-        retireCheckpointAuthority('timer-callback')
-        fired = true
-        if (handle !== undefined) timers.delete(handle)
-        if (!disposed) run()
-      }, delay)
+      handle = setTimeout(
+        () =>
+          runCheckpointAuthorityCallback(
+            'timer-callback',
+            () => {
+              fired = true
+              if (handle !== undefined) timers.delete(handle)
+              if (!disposed) run()
+            },
+            handle ?? run,
+          ),
+        delay,
+      )
     } catch (error) {
       installation.fail(error)
       throw error
@@ -716,14 +729,15 @@ export const createMarkdownRendererSessionResourceOwner = <
   }
   const clearTimer = (handle: ReturnType<typeof setTimeout>) => {
     if (!timers.has(handle)) return
-    retireCheckpointAuthority('timer-clear')
-    try {
-      clearTimeout(handle)
-    } catch (error) {
-      retireCheckpointAuthority('cleanup-failure')
-      throw error
-    }
-    timers.delete(handle)
+    runCheckpointAuthorityCallback(
+      'timer-clear',
+      () => {
+        clearTimeout(handle)
+        timers.delete(handle)
+      },
+      handle,
+      'timer-clear',
+    )
   }
   const afterFrame = () =>
     new Promise<void>((resolve) => {

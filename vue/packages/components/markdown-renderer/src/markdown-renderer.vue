@@ -1555,36 +1555,45 @@ function observeChunkForActivation(key: string, element: HTMLElement) {
       if (rendererResourceOwner.isDisposed()) return
       try {
         observer = new IntersectionObserver(
-          (entries) => {
-            if (
-              rendererResourceOwner.isDisposed() ||
-              installingActivationObserver ||
-              !observer ||
-              activationObserver !== observer
-            )
-              return
-            for (const entry of entries) {
-              if (
-                rendererResourceOwner.isDisposed() ||
-                activationObserver !== observer
-              )
-                return
-              if (
-                !entry.isIntersecting ||
-                !(entry.target instanceof HTMLElement)
-              )
-                continue
-              const unitKey = entry.target.dataset.fsusRenderUnitKey
-              if (!unitKey) continue
-              observer.unobserve(entry.target)
-              if (
-                rendererResourceOwner.isDisposed() ||
-                activationObserver !== observer
-              )
-                return
-              void activateChunkFeatures(unitKey, entry.target, currentTaskId)
-            }
-          },
+          (entries) =>
+            rendererResourceOwner.runCheckpointAuthorityCallback(
+              'activation-observer-callback',
+              () => {
+                if (
+                  rendererResourceOwner.isDisposed() ||
+                  installingActivationObserver ||
+                  !observer ||
+                  activationObserver !== observer
+                )
+                  return
+                for (const entry of entries) {
+                  if (
+                    rendererResourceOwner.isDisposed() ||
+                    activationObserver !== observer
+                  )
+                    return
+                  if (
+                    !entry.isIntersecting ||
+                    !(entry.target instanceof HTMLElement)
+                  )
+                    continue
+                  const unitKey = entry.target.dataset.fsusRenderUnitKey
+                  if (!unitKey) continue
+                  observer.unobserve(entry.target)
+                  if (
+                    rendererResourceOwner.isDisposed() ||
+                    activationObserver !== observer
+                  )
+                    return
+                  void activateChunkFeatures(
+                    unitKey,
+                    entry.target,
+                    currentTaskId,
+                  )
+                }
+              },
+              observer ?? entries,
+            ),
           { root: observerRoot, rootMargin: '384px 0px' },
         )
       } catch (error) {

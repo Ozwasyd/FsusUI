@@ -751,3 +751,16 @@ join remain unavailable until the original suppliers are actually connected and
 reviewed. All runtime/qualification/authority/eviction holds remain. The new
 owned-version, callback reentry, failure, deactivate/reactivate and stale-prepare
 matrix is source-inspected only; executable cases remain UNRUN.
+
+The original document read inside `beginRender`, every selected cleanup action,
+the full timer callback and the full IntersectionObserver callback now enter the
+same depth/catch/finally boundary. Observer entry/iterator/dataset reads and native
+unobserve happen inside that boundary; later chunk activation alone is not the
+fence. Reentrant preparation rejects both actual callback depth and selected
+running cleanup records before source readers and at the final private guard.
+Failures retain the real reader/cleanup/handle/observer resource and original
+phase/cause. `clearTimer` deletes its actual handle only after native clear returns;
+its caught native cause is retained even for direct calls outside unmount.
+Selected cleanup still attempts the remaining actions after error, preserving
+the original single error or AggregateError and all original causes. These new
+counterexamples remain source-only/UNRUN; no positive live seal is issued.
