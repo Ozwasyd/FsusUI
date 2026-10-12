@@ -577,6 +577,22 @@ Component cleanup obligations persist across retries, and remaining theme,
 controller or observer references also block release. Unknown installation records
 and retained cleanup obligations count as retained memory, not invented active jobs.
 
+The same key cannot install another owned frame during its native schedule or
+cancel call. An accepted outer task rechecks the exact registration identity
+before retaining a late record; it never overwrites a later owned registration.
+Finalizer ownership remains separate from the scheduler key.
+
+Activation reset and observer installation are fenced before external callbacks.
+Reset rechecks admission after abort/disconnect and before constructing a new
+controller. Controller/observer constructors and native observation retain actual
+in-flight installation records; returned late handles are cleaned through the
+same owner, with failed handles and causes retained. Observer callbacks require the
+exact current handle. Theme target lookup also enters its reentry gate before any
+external read. Worker factory admission is checked before native creation; its
+actual returned Worker is still handed to the original worker-pool owner, whose
+existing source retains it before handler setters and handles late disposed slots.
+No second Worker owner or native stop acknowledgment is added.
+
 Disposal closes admission before callbacks. Reentrant disposal cannot recursively
 execute the same batch, and repeated calls select remaining actual resources.
 View reference release is a separate attempt-all phase after selected native

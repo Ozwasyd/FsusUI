@@ -149,14 +149,26 @@ const handleHeavyFeatureThemeChange = () => {
   heavyThemeRevision.value += 1
 }
 const ensureHeavyFeatureThemeListener = () => {
-  if (heavyThemeListenerInstalled || rendererResourceOwner.isDisposed()) return
+  if (
+    heavyThemeListenerInstalled ||
+    installingHeavyThemeListener ||
+    rendererResourceOwner.isDisposed()
+  )
+    return
   const installation = rendererResourceOwner.beginInstallation('theme-listener')
+  installingHeavyThemeListener = true
   let target: HTMLElement
   try {
     target = document.documentElement
   } catch (error) {
+    installingHeavyThemeListener = false
     installation.fail(error)
     throw error
+  }
+  if (rendererResourceOwner.isDisposed()) {
+    installingHeavyThemeListener = false
+    installation.complete()
+    return
   }
   heavyThemeListenerTarget = target
   heavyThemeListenerInstalled = true
@@ -313,6 +325,8 @@ let currentTaskId = 0
 let debounceTimer: ReturnType<typeof setTimeout> | null = null
 let activationController: AbortController | null = null
 let activationObserver: IntersectionObserver | null = null
+let resettingFeatureActivation = false
+let installingActivationObserver = false
 let activeChunkResult: MarkdownRuntimeChunkResult | null = null
 let activationDurationMs = 0
 let commitDurationMs = 0
@@ -481,6 +495,8 @@ const rendererResourceOwner = createMarkdownRendererSessionResourceOwner({
   readComponentCleanupPending: () =>
     (installingHeavyThemeListener ? 1 : 0) +
     (removingHeavyThemeListener ? 1 : 0) +
+    (resettingFeatureActivation ? 1 : 0) +
+    (installingActivationObserver ? 1 : 0) +
     (heavyThemeListenerTarget ? 1 : 0) +
     (activationController ? 1 : 0) +
     (activationObserver ? 1 : 0),
@@ -972,14 +988,30 @@ const canUseMarkdownWorker = () =>
   typeof Worker !== 'undefined' && typeof URL !== 'undefined'
 
 const createMarkdownRendererWorker = () => {
-  const moduleUrl = new URL('./markdown-renderer.worker.ts', import.meta.url)
-  const trustedModuleUrl = resolveMarkdownWorkerScriptUrl(
-    moduleUrl,
-    props.trustedScriptUrlFactory,
-  )
-  return new Worker(trustedModuleUrl as string | URL, {
-    type: 'module',
-  })
+  const installation = rendererResourceOwner.beginInstallation('worker-factory')
+  let constructing = false
+  let creationUnknown = false
+  try {
+    const moduleUrl = new URL('./markdown-renderer.worker.ts', import.meta.url)
+    requireRendererAdmission()
+    const trustedModuleUrl = resolveMarkdownWorkerScriptUrl(
+      moduleUrl,
+      props.trustedScriptUrlFactory,
+    )
+    requireRendererAdmission()
+    constructing = true
+    // Return the actual handle to the original worker-pool owner, which retains
+    // it before handler setters and performs late disposed-slot cleanup.
+    return new Worker(trustedModuleUrl as string | URL, { type: 'module' })
+  } catch (error) {
+    if (constructing) {
+      creationUnknown = true
+      installation.fail(error)
+    }
+    throw error
+  } finally {
+    if (!creationUnknown) installation.complete()
+  }
 }
 
 const markdownRenderPipelineAdapter: FsusRenderPipelineAdapter<
@@ -1066,25 +1098,82 @@ const hasEnabledHeavyFeature = (
   (features.latex && result.features.includes('latex')) ||
   (features.mermaid && result.features.includes('mermaid'))
 
-const resetFeatureActivation = () => {
+function requireRendererAdmission() {
   if (rendererResourceOwner.isDisposed())
     throw new Error('markdown-renderer-resource-owner-disposed')
-  removeHeavyFeatureThemeListener()
-  activationController?.abort()
-  activationController = new AbortController()
-  activationObserver?.disconnect()
-  activationObserver = null
-  activeChunkResult = null
-  activationDurationMs = 0
-  rootEl.value?.removeAttribute('data-fsus-markdown-activation-ms')
-  activatedChunkKeys.clear()
-  chunkActivationElements.clear()
-  lastHeavyLifecycleIdentityContext = null
-  heavyLifecycleIdentityContexts = {}
-  heavyLifecycleIdentitySequences = {}
-  heavyLifecycleProjectionNodeIds = {}
-  if (rootEl.value) heavyLifecycle.unmountRoot(rootEl.value)
-  recordHeavyLifecycleMetrics()
+}
+
+const controllerCleanup = (controller: AbortController | null) => ({
+  phase: 'activation-controller-abort',
+  resource: controller,
+  run: () => {
+    controller?.abort()
+    if (activationController === controller) activationController = null
+  },
+})
+const observerCleanup = (observer: IntersectionObserver | null) => ({
+  phase: 'activation-observer-disconnect',
+  resource: observer,
+  run: () => {
+    observer?.disconnect()
+    if (activationObserver === observer) activationObserver = null
+  },
+})
+
+const resetFeatureActivation = () => {
+  requireRendererAdmission()
+  if (resettingFeatureActivation || installingActivationObserver)
+    throw new Error('markdown-renderer-activation-control-pending')
+  const reset = rendererResourceOwner.beginInstallation('activation-reset')
+  resettingFeatureActivation = true
+  try {
+    rendererResourceOwner.cleanupComponentResources([
+      {
+        phase: 'theme-listener-remove',
+        resource: heavyThemeListenerTarget,
+        run: removeHeavyFeatureThemeListener,
+      },
+      controllerCleanup(activationController),
+      observerCleanup(activationObserver),
+    ])
+    requireRendererAdmission()
+    const installation = rendererResourceOwner.beginInstallation(
+      'activation-controller',
+    )
+    let controller: AbortController
+    try {
+      controller = new AbortController()
+    } catch (error) {
+      installation.fail(error)
+      throw error
+    }
+    activationController = controller
+    try {
+      if (rendererResourceOwner.isDisposed())
+        rendererResourceOwner.cleanupComponentResources([
+          controllerCleanup(controller),
+        ])
+    } finally {
+      installation.complete()
+    }
+    requireRendererAdmission()
+    activeChunkResult = null
+    activationDurationMs = 0
+    rootEl.value?.removeAttribute('data-fsus-markdown-activation-ms')
+    requireRendererAdmission()
+    activatedChunkKeys.clear()
+    chunkActivationElements.clear()
+    lastHeavyLifecycleIdentityContext = null
+    heavyLifecycleIdentityContexts = {}
+    heavyLifecycleIdentitySequences = {}
+    heavyLifecycleProjectionNodeIds = {}
+    if (rootEl.value) heavyLifecycle.unmountRoot(rootEl.value)
+    requireRendererAdmission()
+    recordHeavyLifecycleMetrics()
+  } finally {
+    resettingFeatureActivation = false
+    reset.complete()
+  }
 }
 
 const createHeavyFeatureIdentityResolver = async (
@@ -1301,34 +1390,99 @@ async function activateChunkFeatures(
 }
 
 function observeChunkForActivation(key: string, element: HTMLElement) {
-  if (rendererResourceOwner.isDisposed()) return
+  if (
+    rendererResourceOwner.isDisposed() ||
+    resettingFeatureActivation ||
+    installingActivationObserver
+  )
+    return
   const taskId = currentTaskId
   if (typeof IntersectionObserver === 'undefined') {
+    if (rendererResourceOwner.isDisposed()) return
     void activateChunkFeatures(key, element, taskId)
     return
   }
-  if (!activationObserver) {
-    const viewport = findScrollContainer(rootEl.value)
-    const observerRoot =
-      viewport === document.documentElement || viewport === document.body
-        ? null
-        : viewport
-    activationObserver = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          if (!entry.isIntersecting || !(entry.target instanceof HTMLElement)) {
-            continue
-          }
-          const unitKey = entry.target.dataset.fsusRenderUnitKey
-          if (!unitKey) continue
-          activationObserver?.unobserve(entry.target)
-          void activateChunkFeatures(unitKey, entry.target, currentTaskId)
-        }
-      },
-      { root: observerRoot, rootMargin: '384px 0px' },
-    )
+  const installation = rendererResourceOwner.beginInstallation(
+    'activation-observer',
+  )
+  installingActivationObserver = true
+  let creationUnknown = false
+  try {
+    let observer = activationObserver
+    if (!observer) {
+      const viewport = findScrollContainer(rootEl.value)
+      const observerRoot =
+        viewport === document.documentElement || viewport === document.body
+          ? null
+          : viewport
+      if (rendererResourceOwner.isDisposed()) return
+      try {
+        observer = new IntersectionObserver(
+          (entries) => {
+            if (
+              rendererResourceOwner.isDisposed() ||
+              installingActivationObserver ||
+              !observer ||
+              activationObserver !== observer
+            )
+              return
+            for (const entry of entries) {
+              if (
+                rendererResourceOwner.isDisposed() ||
+                activationObserver !== observer
+              )
+                return
+              if (
+                !entry.isIntersecting ||
+                !(entry.target instanceof HTMLElement)
+              )
+                continue
+              const unitKey = entry.target.dataset.fsusRenderUnitKey
+              if (!unitKey) continue
+              observer.unobserve(entry.target)
+              if (
+                rendererResourceOwner.isDisposed() ||
+                activationObserver !== observer
+              )
+                return
+              void activateChunkFeatures(unitKey, entry.target, currentTaskId)
+            }
+          },
+          { root: observerRoot, rootMargin: '384px 0px' },
+        )
+      } catch (error) {
+        creationUnknown = true
+        installation.fail(error)
+        throw error
+      }
+      activationObserver = observer
+    }
+    if (!rendererResourceOwner.isDisposed()) {
+      try {
+        observer.observe(element)
+      } catch (error) {
+        rendererResourceOwner.cleanupComponentResources([
+          {
+            phase: 'activation-observer-observe',
+            resource: observer,
+            run: () => {
+              throw error
+            },
+          },
+          observerCleanup(observer),
+        ])
+      }
+    }
+    if (rendererResourceOwner.isDisposed()) {
+      if (!activationObserver) activationObserver = observer
+      rendererResourceOwner.cleanupComponentResources([
+        observerCleanup(observer),
+      ])
+    }
+  } finally {
+    installingActivationObserver = false
+    if (!creationUnknown) installation.complete()
   }
-  activationObserver.observe(element)
 }
 
 const observeMountedChunksForActivation = () => {
@@ -1677,8 +1831,11 @@ const renderWatchHandle = watch(
     if (rendererResourceOwner.isDisposed()) return
     currentTaskId += 1
     rendererResourceOwner.invalidate()
+    if (rendererResourceOwner.isDisposed()) return
     heavyLifecycle.pause()
+    if (rendererResourceOwner.isDisposed()) return
     activationController?.abort()
+    if (rendererResourceOwner.isDisposed()) return
     if (debounceTimer !== null) {
       rendererResourceOwner.clearTimer(debounceTimer)
     }
@@ -1704,22 +1861,8 @@ onBeforeUnmount(() => {
         resource: themeTarget,
         run: removeHeavyFeatureThemeListener,
       },
-      {
-        phase: 'activation-controller-abort',
-        resource: controller,
-        run: () => {
-          controller?.abort()
-          if (activationController === controller) activationController = null
-        },
-      },
-      {
-        phase: 'activation-observer-disconnect',
-        resource: observer,
-        run: () => {
-          observer?.disconnect()
-          if (activationObserver === observer) activationObserver = null
-        },
-      },
+      controllerCleanup(controller),
+      observerCleanup(observer),
       {
         phase: 'heavy-lifecycle-dispose',
         resource: heavyLifecycle,
