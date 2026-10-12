@@ -1505,16 +1505,23 @@ const transactionStore = new MarkdownEditorTransactionStore(
   initialSelection,
   documentIdentity,
 )
+const retireStoreDocumentAuthority = MarkdownEditorTransactionStore.prototype.retireDocumentAuthority.bind(transactionStore)
+retireSnapshotPublicationAuthority = retireStoreDocumentAuthority
+if (sessionDisposed) retireStoreDocumentAuthority()
 const sessionLayoutResources = createMarkdownEditorSessionLayoutResources(frameScheduler, () => ({
   documentIdentity: transactionStore.documentIdentity,
   revision: transactionStore.revision,
   disposed: sessionDisposed,
 }))
-provideMarkdownHeavyFeatureDocumentContext({
+provideMarkdownHeavyFeatureDocumentContext(Object.freeze({
   documentEpoch: () => transactionStore.documentIdentity.epoch,
   documentKey: () => transactionStore.documentIdentity.id,
   revision: () => transactionStore.revision,
-})
+  documentAuthority: Object.freeze({
+    capture: MarkdownEditorTransactionStore.prototype.captureDocumentAuthority.bind(transactionStore),
+    hasCustody: MarkdownEditorTransactionStore.prototype.hasDocumentAuthorityCustody.bind(transactionStore),
+  }),
+}))
 const editorRevision = ref(transactionStore.revision)
 const editorSelection = ref(transactionStore.selection)
 const editorValue = ref(transactionStore.value)
@@ -7096,7 +7103,10 @@ const sessionBinding = createMarkdownEditorSessionBinding({
 })
 
 
-retireSnapshotPublicationAuthority = sessionBinding.retirePublicationAuthority
+retireSnapshotPublicationAuthority = () => {
+  retireStoreDocumentAuthority()
+  sessionBinding.retirePublicationAuthority()
+}
 if (sessionDisposed) retireSnapshotPublicationAuthority()
 
 // Invalidate the private native publication reservation at actual synchronous

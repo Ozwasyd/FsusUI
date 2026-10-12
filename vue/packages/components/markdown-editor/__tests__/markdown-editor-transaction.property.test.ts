@@ -9,6 +9,7 @@ import {
 import type {
   MarkdownEditorChange,
   MarkdownEditorSelection,
+  MarkdownEditorRetainedTransactionSnapshot,
   MarkdownEditorTransaction,
 } from '../src/markdown-editor-transaction'
 
@@ -49,6 +50,77 @@ const seededRandom = (seed: number) => {
 }
 
 describe('MarkdownEditor transaction properties', () => {
+  it.each([
+    ['switchDocument', (store: MarkdownEditorTransactionStore, _snapshot: MarkdownEditorRetainedTransactionSnapshot) => store.switchDocument({ id: 'document', epoch: 2 }, 'source')],
+    ['reset', (store: MarkdownEditorTransactionStore, _snapshot: MarkdownEditorRetainedTransactionSnapshot) => store.reset('reset')],
+    ['setSelection', (store: MarkdownEditorTransactionStore, _snapshot: MarkdownEditorRetainedTransactionSnapshot) => store.setSelection(selection(0))],
+    ['dispatch', (store: MarkdownEditorTransactionStore, _snapshot: MarkdownEditorRetainedTransactionSnapshot) => store.dispatch(transaction([{ from: 0, to: 0, insert: 'next ' }], selection(0)))],
+    ['undo', (store: MarkdownEditorTransactionStore, _snapshot: MarkdownEditorRetainedTransactionSnapshot) => store.undo()],
+    ['redo', (store: MarkdownEditorTransactionStore, _snapshot: MarkdownEditorRetainedTransactionSnapshot) => store.redo()],
+    ['breakMergeGroup', (store: MarkdownEditorTransactionStore, _snapshot: MarkdownEditorRetainedTransactionSnapshot) => store.breakMergeGroup()],
+    ['restoreRetainedSnapshot', (store: MarkdownEditorTransactionStore, snapshot: MarkdownEditorRetainedTransactionSnapshot) => store.restoreRetainedSnapshot(snapshot)],
+    ['releaseRetainedSnapshot', (store: MarkdownEditorTransactionStore, _snapshot: MarkdownEditorRetainedTransactionSnapshot) => store.releaseRetainedSnapshot()],
+  ] as const)('revokes original document authority at the genuine %s write entry', (_name, write) => {
+    const store = new MarkdownEditorTransactionStore('source', selection(0), { id: 'document', epoch: 1 })
+    store.dispatch(transaction([{ from: 0, to: 0, insert: 'seed ' }], selection(0)))
+    const snapshot = store.retainSnapshot()
+    const ticket = store.captureDocumentAuthority()!
+    expect(ticket).toEqual({ scope: 'native-transaction-document', documentKey: 'document', documentEpoch: 1, revision: store.revision })
+    expect(store.captureDocumentAuthority()).toBe(ticket)
+    expect(store.hasDocumentAuthorityCustody({ ...ticket })).toBe(false)
+    expect(new MarkdownEditorTransactionStore('source').hasDocumentAuthorityCustody(ticket)).toBe(false)
+    write(store, snapshot)
+    expect(store.hasDocumentAuthorityCustody(ticket)).toBe(false)
+    const next = store.captureDocumentAuthority()!
+    expect(store.hasDocumentAuthorityCustody(next)).toBe(true)
+    expect(next).not.toBe(ticket)
+  })
+
+  it('revokes before caller getters, refuses capture throughout failed writes, and fences same-coordinate native preparation', () => {
+    const store = new MarkdownEditorTransactionStore('source', selection(0), { id: 'document', epoch: 1 })
+    const retained = store.retainSnapshot()
+    const prepared = store.prepareRetainedSnapshot()
+    const ticket = store.captureDocumentAuthority()!
+    let read = false
+    expect(() => store.setSelection({
+      get start(): number {
+        read = true
+        expect(store.hasDocumentAuthorityCustody(ticket)).toBe(false)
+        expect(store.captureDocumentAuthority()).toBeNull()
+        expect(store.validatePreparedRetainedSnapshot(prepared)).toBe(false)
+        expect(() => store.prepareRetainedSnapshot()).toThrow('editor-history-document-authority-unavailable')
+        throw new Error('original-selection-getter-failed')
+      }, end: 0,
+    })).toThrow('original-selection-getter-failed')
+    expect(read).toBe(true)
+    expect(store.value).toBe('source')
+    expect(store.revision).toBe(0)
+    expect(store.validateRetainedSnapshot(retained)).toBe(true)
+    expect(store.validatePreparedRetainedSnapshot(prepared)).toBe(false)
+    expect(store.discardPreparedRetainedSnapshot(prepared)).toBe(true)
+    expect(store.hasDocumentAuthorityCustody(store.captureDocumentAuthority()!)).toBe(true)
+  })
+
+  it('keeps native pure publication on the same document ticket and rejects raw-store epoch ABA and retirement', () => {
+    const store = new MarkdownEditorTransactionStore('source', selection(0), { id: 'document', epoch: 1 })
+    const ticket = store.captureDocumentAuthority()!
+    const prepared = store.prepareRetainedSnapshot()
+    expect(store.allocatePreparedRetainedSnapshot(prepared)).toBe(true)
+    expect(store.commitPreparedRetainedSnapshot(prepared)).toBe(prepared.snapshot)
+    expect(store.hasDocumentAuthorityCustody(ticket)).toBe(true)
+    store.switchDocument({ id: 'document', epoch: 2 }, 'source', selection(0))
+    store.switchDocument({ id: 'document', epoch: 1 }, 'source', selection(0))
+    const current = store.captureDocumentAuthority()!
+    expect(current).toEqual(ticket)
+    expect(current).not.toBe(ticket)
+    expect(store.hasDocumentAuthorityCustody(ticket)).toBe(false)
+    store.retireDocumentAuthority()
+    expect(store.hasDocumentAuthorityCustody(current)).toBe(false)
+    expect(store.captureDocumentAuthority()).toBeNull()
+    store.reset('later source')
+    expect(store.captureDocumentAuthority()).toBeNull()
+  })
+
   // Unit and property coverage protects the transaction core; native browser
   // and operating-system IME evidence remains a separately-owned acceptance.
   it('round-trips arbitrary sorted non-overlapping UTF-16 changes through inverse changes', () => {

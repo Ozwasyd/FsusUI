@@ -723,10 +723,25 @@ export const createMarkdownHeavyFeatureLifecycle = (
   })
 }
 
+/** Borrowed exact ticket from the original native transaction producer; no source/history payload. */
+export interface MarkdownHeavyFeatureDocumentAuthorityTicket {
+  readonly scope: 'native-transaction-document'
+  readonly documentKey: string
+  readonly documentEpoch: number | string
+  readonly revision: number | string
+}
+
+export interface MarkdownHeavyFeatureDocumentAuthority {
+  capture(): MarkdownHeavyFeatureDocumentAuthorityTicket | null
+  /** Original private producer continuity only; no external read/callback/allocation. */
+  hasCustody(ticket: MarkdownHeavyFeatureDocumentAuthorityTicket): boolean
+}
+
 export interface MarkdownHeavyFeatureDocumentContext {
   readonly documentEpoch: () => number | string
   readonly documentKey: () => string
   readonly revision: () => number | string
+  readonly documentAuthority?: MarkdownHeavyFeatureDocumentAuthority
 }
 
 export const MARKDOWN_HEAVY_FEATURE_DOCUMENT_CONTEXT: InjectionKey<MarkdownHeavyFeatureDocumentContext> =

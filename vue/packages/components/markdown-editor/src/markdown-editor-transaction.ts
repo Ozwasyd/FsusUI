@@ -3,6 +3,7 @@ import {
   type MarkdownDocumentIdentity,
   type MarkdownStableProjection,
 } from '../../../wasm/markdown-runtime'
+import type { MarkdownHeavyFeatureDocumentAuthorityTicket } from '../../../hooks/use-markdown-heavy-feature-lifecycle'
 
 export type MarkdownEditorSelectionDirection = 'backward' | 'forward' | 'none'
 
@@ -626,6 +627,11 @@ const freezeTransaction = (
 
 export class MarkdownEditorTransactionStore {
   #documentIdentity: MarkdownEditorDocumentIdentity
+  #documentAuthorityGeneration = 0
+  #documentAuthorityRetired = false
+  #documentWriteDepth = 0
+  #capturingDocumentAuthority = false
+  #documentAuthority: MarkdownHeavyFeatureDocumentAuthorityTicket | undefined
   #preparedRetainedSnapshot: {
     readonly preparation: MarkdownEditorRetainedTransactionPreparation
     readonly identity: MarkdownEditorDocumentIdentity
@@ -635,6 +641,7 @@ export class MarkdownEditorTransactionStore {
     readonly redo: readonly HistoryEntry[]
     readonly previous: MarkdownEditorRetainedTransactionSnapshot | undefined
     readonly mergeBlocked: boolean
+    readonly authorityGeneration: number
     allocatedHistory: readonly HistoryEntry[] | undefined
     allocatedRedo: readonly HistoryEntry[] | undefined
   } | undefined
@@ -676,6 +683,50 @@ export class MarkdownEditorTransactionStore {
     return this.#revision
   }
 
+  /** Same original transaction owner; one immutable live ticket per actual write generation. */
+  captureDocumentAuthority(): MarkdownHeavyFeatureDocumentAuthorityTicket | null {
+    if (this.#documentAuthorityRetired || this.#documentWriteDepth || this.#capturingDocumentAuthority) return null
+    if (this.#documentAuthority) return this.#documentAuthority
+    const generation = this.#documentAuthorityGeneration
+    const identity = this.#documentIdentity
+    const revision = this.#revision
+    this.#capturingDocumentAuthority = true
+    try {
+      const ticket: MarkdownHeavyFeatureDocumentAuthorityTicket = Object.freeze({
+        scope: 'native-transaction-document', documentKey: identity.id, documentEpoch: identity.epoch, revision,
+      })
+      if (this.#documentAuthorityRetired || this.#documentWriteDepth || this.#documentAuthorityGeneration !== generation ||
+          this.#documentIdentity !== identity || this.#revision !== revision) return null
+      this.#documentAuthority = ticket
+      return ticket
+    } finally {
+      this.#capturingDocumentAuthority = false
+    }
+  }
+
+  hasDocumentAuthorityCustody(ticket: MarkdownHeavyFeatureDocumentAuthorityTicket): boolean {
+    return !this.#documentAuthorityRetired && this.#documentWriteDepth === 0 && !this.#capturingDocumentAuthority &&
+      this.#documentAuthority !== undefined && this.#documentAuthority === ticket
+  }
+
+  /** Actual original unmount retirement; no cleanup/disposal success assertion. */
+  retireDocumentAuthority(): void {
+    this.#documentAuthorityRetired = true
+    this.#documentAuthority = undefined
+  }
+
+  #beginDocumentWrite(): void {
+    // Close authority before touching caller arguments, getters, arrays or callback-bearing work.
+    this.#documentAuthority = undefined
+    if (this.#documentAuthorityGeneration === Number.MAX_SAFE_INTEGER) this.#documentAuthorityRetired = true
+    else this.#documentAuthorityGeneration += 1
+    this.#documentWriteDepth += 1
+  }
+
+  #endDocumentWrite(): void {
+    this.#documentWriteDepth -= 1
+  }
+
   get selection() {
     return cloneSelection(this.#selection)
   }
@@ -711,6 +762,7 @@ export class MarkdownEditorTransactionStore {
   }
 
   retainSnapshot(): MarkdownEditorRetainedTransactionSnapshot {
+    if (this.#documentAuthorityRetired || this.#documentWriteDepth) throw new Error('editor-history-document-authority-unavailable')
     if (this.#preparedRetainedSnapshot) throw new Error('editor-history-snapshot-preparation-pending')
     const snapshot = Object.freeze({
       documentIdentity: this.documentIdentity,
@@ -727,7 +779,9 @@ export class MarkdownEditorTransactionStore {
   }
 
   prepareRetainedSnapshot(): MarkdownEditorRetainedTransactionPreparation {
+    if (this.#documentAuthorityRetired || this.#documentWriteDepth) throw new Error('editor-history-document-authority-unavailable')
     if (this.#preparedRetainedSnapshot) throw new Error('editor-history-snapshot-preparation-pending')
+    const authorityGeneration = this.#documentAuthorityGeneration
     const snapshot = Object.freeze({
       documentIdentity: this.documentIdentity,
       history: this.history,
@@ -735,10 +789,13 @@ export class MarkdownEditorTransactionStore {
       selection: Object.freeze(this.selection),
     })
     const preparation = Object.freeze({ snapshot })
+    if (this.#documentAuthorityRetired || this.#documentWriteDepth || this.#documentAuthorityGeneration !== authorityGeneration)
+      throw new Error('editor-history-document-authority-changed')
     this.#preparedRetainedSnapshot = {
       preparation, identity: this.#documentIdentity, revision: this.#revision,
       selection: this.#selection, undo: this.#undo, redo: this.#redo,
       previous: this.#retainedSnapshot, mergeBlocked: this.#mergeBlocked,
+      authorityGeneration,
       allocatedHistory: undefined, allocatedRedo: undefined,
     }
     return preparation
@@ -752,6 +809,7 @@ export class MarkdownEditorTransactionStore {
   #isPreparedRetainedSnapshotCurrent(preparation: MarkdownEditorRetainedTransactionPreparation): boolean {
     const custody = this.#preparedRetainedSnapshot
     return custody !== undefined && custody.preparation === preparation && this.#documentIdentity === custody.identity &&
+      !this.#documentAuthorityRetired && this.#documentWriteDepth === 0 && this.#documentAuthorityGeneration === custody.authorityGeneration &&
       this.#revision === custody.revision && this.#selection === custody.selection &&
       this.#undo === custody.undo && this.#redo === custody.redo && this.#retainedSnapshot === custody.previous &&
       this.#mergeBlocked === custody.mergeBlocked
@@ -797,29 +855,39 @@ export class MarkdownEditorTransactionStore {
   }
 
   restoreRetainedSnapshot(snapshot: MarkdownEditorRetainedTransactionSnapshot) {
-    if (
-      snapshot !== this.#retainedSnapshot ||
-      snapshot.documentIdentity.id !== this.#documentIdentity.id ||
-      snapshot.documentIdentity.epoch !== this.#documentIdentity.epoch ||
-      snapshot.revision !== this.#revision ||
-      !this.#retainedHistory ||
-      !this.#retainedRedo
-    ) {
-      return false
+    this.#beginDocumentWrite()
+    try {
+      if (
+        snapshot !== this.#retainedSnapshot ||
+        snapshot.documentIdentity.id !== this.#documentIdentity.id ||
+        snapshot.documentIdentity.epoch !== this.#documentIdentity.epoch ||
+        snapshot.revision !== this.#revision ||
+        !this.#retainedHistory ||
+        !this.#retainedRedo
+      ) {
+        return false
+      }
+      this.#undo = [...this.#retainedHistory]
+      this.#redo = [...this.#retainedRedo]
+      this.#selection = snapshot.selection
+      // A resumed session must never merge into input preceding suspension.
+      this.breakMergeGroup()
+      return true
+    } finally {
+      this.#endDocumentWrite()
     }
-    this.#undo = [...this.#retainedHistory]
-    this.#redo = [...this.#retainedRedo]
-    this.#selection = snapshot.selection
-    // A resumed session must never merge into input preceding suspension.
-    this.breakMergeGroup()
-    return true
   }
 
   releaseRetainedSnapshot() {
-    this.#preparedRetainedSnapshot = undefined
-    this.#retainedSnapshot = undefined
-    this.#retainedHistory = undefined
-    this.#retainedRedo = undefined
+    this.#beginDocumentWrite()
+    try {
+      this.#preparedRetainedSnapshot = undefined
+      this.#retainedSnapshot = undefined
+      this.#retainedHistory = undefined
+      this.#retainedRedo = undefined
+    } finally {
+      this.#endDocumentWrite()
+    }
   }
 
   switchDocument(
@@ -827,275 +895,310 @@ export class MarkdownEditorTransactionStore {
     value: string,
     selection?: MarkdownEditorSelection,
   ) {
-    this.releaseRetainedSnapshot()
-    this.#documentIdentity = Object.freeze({ ...documentIdentity })
-    this.#value = value
-    this.#selection = normalizeMarkdownEditorSelection(
-      value,
-      selection ?? {
+    this.#beginDocumentWrite()
+    try {
+      this.releaseRetainedSnapshot()
+      this.#documentIdentity = Object.freeze({ ...documentIdentity })
+      this.#value = value
+      this.#selection = normalizeMarkdownEditorSelection(
+        value,
+        selection ?? {
+          direction: 'none',
+          end: value.length,
+          start: value.length,
+        },
+      ) ?? {
         direction: 'none',
         end: value.length,
         start: value.length,
-      },
-    ) ?? {
-      direction: 'none',
-      end: value.length,
-      start: value.length,
+      }
+      this.#revision = 0
+      this.#undo = []
+      this.#redo = []
+      this.#mergeBlocked = true
+    } finally {
+      this.#endDocumentWrite()
     }
-    this.#revision = 0
-    this.#undo = []
-    this.#redo = []
-    this.#mergeBlocked = true
   }
 
   breakMergeGroup() {
-    this.#mergeBlocked = true
+    this.#beginDocumentWrite()
+    try {
+      this.#mergeBlocked = true
+    } finally {
+      this.#endDocumentWrite()
+    }
   }
 
   reset(
     value: string,
     selection?: MarkdownEditorSelection,
   ): MarkdownEditorStoreMutation {
-    const beforeSelection = this.selection
-    const nextSelection = normalizeMarkdownEditorSelection(
-      value,
-      selection ?? {
-        direction: 'none',
+    this.#beginDocumentWrite()
+    try {
+      const beforeSelection = this.selection
+      const nextSelection = normalizeMarkdownEditorSelection(
+        value,
+        selection ?? {
+          direction: 'none',
+          end: value.length,
+          start: value.length,
+        },
+      ) ?? {
+        direction: 'none' as const,
         end: value.length,
         start: value.length,
-      },
-    ) ?? {
-      direction: 'none' as const,
-      end: value.length,
-      start: value.length,
+      }
+      const historyChanged = this.#undo.length > 0 || this.#redo.length > 0
+      const selectionChanged = !selectionsEqual(beforeSelection, nextSelection)
+      const valueChanged = this.#value !== value
+
+      this.#value = value
+      this.#selection = nextSelection
+      this.#undo = []
+      this.#redo = []
+      this.#revision += 1
+      this.breakMergeGroup()
+
+      return Object.freeze({
+        ...this.#result(true),
+        historyChanged,
+        selectionChanged,
+        valueChanged,
+      })
+    } finally {
+      this.#endDocumentWrite()
     }
-    const historyChanged = this.#undo.length > 0 || this.#redo.length > 0
-    const selectionChanged = !selectionsEqual(beforeSelection, nextSelection)
-    const valueChanged = this.#value !== value
-
-    this.#value = value
-    this.#selection = nextSelection
-    this.#undo = []
-    this.#redo = []
-    this.#revision += 1
-    this.breakMergeGroup()
-
-    return Object.freeze({
-      ...this.#result(true),
-      historyChanged,
-      selectionChanged,
-      valueChanged,
-    })
   }
 
   setSelection(selection: MarkdownEditorSelection, breakMerge = true) {
-    const normalized = normalizeMarkdownEditorSelection(this.#value, selection)
-    if (!normalized) return false
-    const changed = !selectionsEqual(this.#selection, normalized)
-    this.#selection = normalized
-    if (changed && breakMerge) this.breakMergeGroup()
-    return changed
+    this.#beginDocumentWrite()
+    try {
+      const normalized = normalizeMarkdownEditorSelection(this.#value, selection)
+      if (!normalized) return false
+      const changed = !selectionsEqual(this.#selection, normalized)
+      this.#selection = normalized
+      if (changed && breakMerge) this.breakMergeGroup()
+      return changed
+    } finally {
+      this.#endDocumentWrite()
+    }
   }
 
   dispatch(
     transaction: MarkdownEditorTransaction,
     context: MarkdownEditorDispatchContext = {},
   ): MarkdownEditorStoreMutation {
-    const frozenTransaction = freezeTransaction(transaction)
-    const beforeRevision = this.#revision
-    if (
-      frozenTransaction.documentIdentity &&
-      (frozenTransaction.documentIdentity.id !== this.#documentIdentity.id ||
-        frozenTransaction.documentIdentity.epoch !==
-          this.#documentIdentity.epoch)
-    ) {
-      return this.#result(false, 'document-mismatch', beforeRevision)
-    }
-    if (
-      frozenTransaction.expectedRevision !== undefined &&
-      frozenTransaction.expectedRevision !== this.#revision
-    ) {
-      return this.#result(false, 'stale-revision', beforeRevision)
-    }
-    if (
-      frozenTransaction.origin === 'external' &&
-      frozenTransaction.history !== 'skip'
-    ) {
-      return this.#result(false, 'invalid-external-update', beforeRevision)
-    }
-    const externalUpdate =
-      frozenTransaction.origin === 'external'
-        ? (frozenTransaction.externalUpdate ?? 'reset')
-        : undefined
-    if (
-      frozenTransaction.externalUpdate !== undefined &&
-      frozenTransaction.origin !== 'external'
-    ) {
-      return this.#result(false, 'invalid-external-update', beforeRevision)
-    }
+    this.#beginDocumentWrite()
+    try {
+      const frozenTransaction = freezeTransaction(transaction)
+      const beforeRevision = this.#revision
+      if (
+        frozenTransaction.documentIdentity &&
+        (frozenTransaction.documentIdentity.id !== this.#documentIdentity.id ||
+          frozenTransaction.documentIdentity.epoch !==
+            this.#documentIdentity.epoch)
+      ) {
+        return this.#result(false, 'document-mismatch', beforeRevision)
+      }
+      if (
+        frozenTransaction.expectedRevision !== undefined &&
+        frozenTransaction.expectedRevision !== this.#revision
+      ) {
+        return this.#result(false, 'stale-revision', beforeRevision)
+      }
+      if (
+        frozenTransaction.origin === 'external' &&
+        frozenTransaction.history !== 'skip'
+      ) {
+        return this.#result(false, 'invalid-external-update', beforeRevision)
+      }
+      const externalUpdate =
+        frozenTransaction.origin === 'external'
+          ? (frozenTransaction.externalUpdate ?? 'reset')
+          : undefined
+      if (
+        frozenTransaction.externalUpdate !== undefined &&
+        frozenTransaction.origin !== 'external'
+      ) {
+        return this.#result(false, 'invalid-external-update', beforeRevision)
+      }
 
-    const beforeSelection = this.selection
-    const applied = applyMarkdownEditorChanges(
-      this.#value,
-      frozenTransaction.changes,
-    )
-    if (!applied) return this.#result(false, 'invalid-change', beforeRevision)
-    const positionMap = createMarkdownEditorPositionMap(
-      frozenTransaction.changes,
-      {
-        documentIdentity: this.#documentIdentity,
-        source: this.#value,
-      },
-    )
-
-    const nextSelection = frozenTransaction.selection
-      ? normalizeMarkdownEditorSelection(
-          applied.value,
-          frozenTransaction.selection,
-        )
-      : externalUpdate === 'reset'
-        ? normalizeMarkdownEditorSelection(applied.value, {
-            direction: 'none',
-            end: applied.value.length,
-            start: applied.value.length,
-          })
-        : externalUpdate === 'rebase'
-          ? (() => {
-              const range = positionMap.mapRange(beforeSelection).range
-              return normalizeMarkdownEditorSelection(
-                applied.value,
-                range
-                  ? { ...range, direction: beforeSelection.direction }
-                  : {
-                      direction: beforeSelection.direction,
-                      end: applied.value.length,
-                      start: applied.value.length,
-                    },
-              )
-            })()
-          : normalizeMarkdownEditorSelection(applied.value, beforeSelection)
-    if (!nextSelection) {
-      return this.#result(false, 'invalid-selection', beforeRevision)
-    }
-
-    const valueChanged = applied.value !== this.#value
-    const selectionChanged = !selectionsEqual(beforeSelection, nextSelection)
-    if (
-      !valueChanged &&
-      !selectionChanged &&
-      frozenTransaction.origin !== 'external'
-    ) {
-      return this.#result(true, undefined, beforeRevision, positionMap)
-    }
-
-    this.#value = applied.value
-    this.#selection = nextSelection
-    if (valueChanged) this.#revision += 1
-
-    let historyChanged = false
-    if (frozenTransaction.origin === 'external') {
-      historyChanged = this.#undo.length > 0 || this.#redo.length > 0
-      this.#undo = []
-      this.#redo = []
-      this.breakMergeGroup()
-    } else if (valueChanged && frozenTransaction.history !== 'skip') {
-      historyChanged = true
-      this.#recordHistory(
-        frozenTransaction,
-        applied.inverse,
-        beforeSelection,
-        nextSelection,
-        context,
+      const beforeSelection = this.selection
+      const applied = applyMarkdownEditorChanges(
+        this.#value,
+        frozenTransaction.changes,
       )
-    } else if (valueChanged) {
-      if (this.#redo.length) historyChanged = true
-      this.#redo = []
-      this.breakMergeGroup()
-    }
+      if (!applied) return this.#result(false, 'invalid-change', beforeRevision)
+      const positionMap = createMarkdownEditorPositionMap(
+        frozenTransaction.changes,
+        {
+          documentIdentity: this.#documentIdentity,
+          source: this.#value,
+        },
+      )
 
-    return {
-      ...this.#result(true, undefined, beforeRevision, positionMap),
-      historyChanged,
-      selectionChanged,
-      valueChanged,
+      const nextSelection = frozenTransaction.selection
+        ? normalizeMarkdownEditorSelection(
+            applied.value,
+            frozenTransaction.selection,
+          )
+        : externalUpdate === 'reset'
+          ? normalizeMarkdownEditorSelection(applied.value, {
+              direction: 'none',
+              end: applied.value.length,
+              start: applied.value.length,
+            })
+          : externalUpdate === 'rebase'
+            ? (() => {
+                const range = positionMap.mapRange(beforeSelection).range
+                return normalizeMarkdownEditorSelection(
+                  applied.value,
+                  range
+                    ? { ...range, direction: beforeSelection.direction }
+                    : {
+                        direction: beforeSelection.direction,
+                        end: applied.value.length,
+                        start: applied.value.length,
+                      },
+                )
+              })()
+            : normalizeMarkdownEditorSelection(applied.value, beforeSelection)
+      if (!nextSelection) {
+        return this.#result(false, 'invalid-selection', beforeRevision)
+      }
+
+      const valueChanged = applied.value !== this.#value
+      const selectionChanged = !selectionsEqual(beforeSelection, nextSelection)
+      if (
+        !valueChanged &&
+        !selectionChanged &&
+        frozenTransaction.origin !== 'external'
+      ) {
+        return this.#result(true, undefined, beforeRevision, positionMap)
+      }
+
+      this.#value = applied.value
+      this.#selection = nextSelection
+      if (valueChanged) this.#revision += 1
+
+      let historyChanged = false
+      if (frozenTransaction.origin === 'external') {
+        historyChanged = this.#undo.length > 0 || this.#redo.length > 0
+        this.#undo = []
+        this.#redo = []
+        this.breakMergeGroup()
+      } else if (valueChanged && frozenTransaction.history !== 'skip') {
+        historyChanged = true
+        this.#recordHistory(
+          frozenTransaction,
+          applied.inverse,
+          beforeSelection,
+          nextSelection,
+          context,
+        )
+      } else if (valueChanged) {
+        if (this.#redo.length) historyChanged = true
+        this.#redo = []
+        this.breakMergeGroup()
+      }
+
+      return {
+        ...this.#result(true, undefined, beforeRevision, positionMap),
+        historyChanged,
+        selectionChanged,
+        valueChanged,
+      }
+    } finally {
+      this.#endDocumentWrite()
     }
   }
 
   undo(): MarkdownEditorStoreMutation {
-    const beforeRevision = this.#revision
-    const entry = this.#undo.pop()
-    if (!entry) return this.#result(false, 'no-history', beforeRevision)
+    this.#beginDocumentWrite()
+    try {
+      const beforeRevision = this.#revision
+      const entry = this.#undo.pop()
+      if (!entry) return this.#result(false, 'no-history', beforeRevision)
 
-    let nextValue = this.#value
-    const stages: MarkdownEditorChange[][] = []
-    for (const step of [...entry.steps].reverse()) {
-      const applied = applyMarkdownEditorChanges(nextValue, step.inverse)
-      if (!applied) {
-        this.#undo.push(entry)
-        return this.#result(false, 'invalid-change', beforeRevision)
+      let nextValue = this.#value
+      const stages: MarkdownEditorChange[][] = []
+      for (const step of [...entry.steps].reverse()) {
+        const applied = applyMarkdownEditorChanges(nextValue, step.inverse)
+        if (!applied) {
+          this.#undo.push(entry)
+          return this.#result(false, 'invalid-change', beforeRevision)
+        }
+        stages.push([...step.inverse])
+        nextValue = applied.value
       }
-      stages.push([...step.inverse])
-      nextValue = applied.value
-    }
 
-    const selectionChanged = !selectionsEqual(
-      this.#selection,
-      entry.beforeSelection,
-    )
-    this.#value = nextValue
-    this.#selection = entry.beforeSelection
-    this.#revision += 1
-    this.#redo.push(entry)
-    this.breakMergeGroup()
-    return {
-      ...this.#result(
-        true,
-        undefined,
-        beforeRevision,
-        composeMarkdownEditorPositionMaps(stages),
-      ),
-      historyChanged: true,
-      selectionChanged,
-      valueChanged: true,
+      const selectionChanged = !selectionsEqual(
+        this.#selection,
+        entry.beforeSelection,
+      )
+      this.#value = nextValue
+      this.#selection = entry.beforeSelection
+      this.#revision += 1
+      this.#redo.push(entry)
+      this.breakMergeGroup()
+      return {
+        ...this.#result(
+          true,
+          undefined,
+          beforeRevision,
+          composeMarkdownEditorPositionMaps(stages),
+        ),
+        historyChanged: true,
+        selectionChanged,
+        valueChanged: true,
+      }
+    } finally {
+      this.#endDocumentWrite()
     }
   }
 
   redo(): MarkdownEditorStoreMutation {
-    const beforeRevision = this.#revision
-    const entry = this.#redo.pop()
-    if (!entry) return this.#result(false, 'no-history', beforeRevision)
+    this.#beginDocumentWrite()
+    try {
+      const beforeRevision = this.#revision
+      const entry = this.#redo.pop()
+      if (!entry) return this.#result(false, 'no-history', beforeRevision)
 
-    let nextValue = this.#value
-    const stages: MarkdownEditorChange[][] = []
-    for (const step of entry.steps) {
-      const applied = applyMarkdownEditorChanges(nextValue, step.changes)
-      if (!applied) {
-        this.#redo.push(entry)
-        return this.#result(false, 'invalid-change', beforeRevision)
+      let nextValue = this.#value
+      const stages: MarkdownEditorChange[][] = []
+      for (const step of entry.steps) {
+        const applied = applyMarkdownEditorChanges(nextValue, step.changes)
+        if (!applied) {
+          this.#redo.push(entry)
+          return this.#result(false, 'invalid-change', beforeRevision)
+        }
+        stages.push([...step.changes])
+        nextValue = applied.value
       }
-      stages.push([...step.changes])
-      nextValue = applied.value
-    }
 
-    const selectionChanged = !selectionsEqual(
-      this.#selection,
-      entry.afterSelection,
-    )
-    this.#value = nextValue
-    this.#selection = entry.afterSelection
-    this.#revision += 1
-    this.#undo.push(entry)
-    this.breakMergeGroup()
-    return {
-      ...this.#result(
-        true,
-        undefined,
-        beforeRevision,
-        composeMarkdownEditorPositionMaps(stages),
-      ),
-      historyChanged: true,
-      selectionChanged,
-      valueChanged: true,
+      const selectionChanged = !selectionsEqual(
+        this.#selection,
+        entry.afterSelection,
+      )
+      this.#value = nextValue
+      this.#selection = entry.afterSelection
+      this.#revision += 1
+      this.#undo.push(entry)
+      this.breakMergeGroup()
+      return {
+        ...this.#result(
+          true,
+          undefined,
+          beforeRevision,
+          composeMarkdownEditorPositionMaps(stages),
+        ),
+        historyChanged: true,
+        selectionChanged,
+        valueChanged: true,
+      }
+    } finally {
+      this.#endDocumentWrite()
     }
   }
 

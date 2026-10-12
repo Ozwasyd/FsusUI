@@ -1128,3 +1128,26 @@ reservation protocols before a joint final guard and callback-free same-identity
 publication can be installed. Sequential native/Renderer/Writer/Journal publishes
 are not a complete atomic refset. All runtime and full-host qualification remains
 UNRUN; resource completeness, restoration and eviction holds stay in force.
+
+
+The original transaction store now supplies a document authority feed through the
+same heavy-feature document context. `documentAuthority.capture()` borrows one
+exact immutable ticket (`scope: native-transaction-document`, documentKey,
+documentEpoch, revision), and `hasCustody(ticket)` checks only original private
+store custody. Real switch/reset/dispatch/selection/undo/redo/history-merge,
+retained restore/release entry first invalidates authority before argument reads,
+allocation or callbacks. Capture refuses throughout nested writes and resumes
+only when original try/finally exits. Failed/no-op writes conservatively revoke
+older tickets without rolling back or replacing committed native history.
+Native pending preparation also pins this same private generation, so identical
+coordinates after raw-store write/ABA cannot qualify an older candidate. Pure
+native retained publication does not invalidate the live document ticket.
+
+The SFC forwards pinned original store methods in its frozen existing context
+and retires the store authority at the same early original unmount event, before
+scheduler/resource cleanup, with setup-time retirement compensation. The feed
+contains no source/history, owns no second editor/index and provides no Renderer
+projection/pipeline, application/principal or resource qualification. Renderer
+must consume this real producer together with its own original authorities;
+no complete live Renderer seal or fullready is installed here. All ordinary
+source controls and runtime qualification remain UNRUN/HOLD.
