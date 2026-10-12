@@ -2052,6 +2052,11 @@ const activateMarkdownFeatureWork = async (
           current.committed = committed
         }
       } catch (error) {
+        current.context.resourceOwner?.retainFailure(
+          'feature-producer-settlement',
+          current.element,
+          error,
+        )
         current.error = createActivationError(current.context.kind, error)
       } finally {
         current.complete()
