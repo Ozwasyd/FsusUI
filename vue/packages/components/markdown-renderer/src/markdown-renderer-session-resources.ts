@@ -9,14 +9,38 @@ import type {
 } from '@element-plus/wasm'
 import type {
   FsusRenderPipelineRuntimeResourceInspection,
+  FsusRenderPipelineAuthority,
   useFsusVirtualWindow,
 } from '../../../hooks/use-render-pipeline'
-import type { MarkdownHeavyFeatureResourceInspection } from '../../../hooks/use-markdown-heavy-feature-lifecycle'
+import type {
+  MarkdownHeavyFeatureResourceInspection,
+  MarkdownHeavyFeatureDocumentAuthority,
+  MarkdownHeavyFeatureDocumentAuthorityRetirementHandle,
+  MarkdownHeavyFeatureDocumentAuthorityTicket,
+} from '../../../hooks/use-markdown-heavy-feature-lifecycle'
 import type {
   MarkdownEditorFrameScheduler,
   MarkdownEditorFrameTask,
 } from '../../../hooks/use-markdown-editor-frame-scheduler'
 import type { WatchHandle } from 'vue'
+import { customRef } from 'vue'
+
+const rendererInputNativePromise = Promise
+const rendererInputNativePromisePrototype = Promise.prototype
+const rendererInputNativeThen = Promise.prototype.then
+const rendererInputNativeApply = Reflect.apply
+const rendererInputNativeSpecies = Object.getOwnPropertyDescriptor(
+  Promise,
+  Symbol.species,
+)?.get
+
+/** Custody of a private input publication only, never of foreign mutable state. */
+export interface MarkdownRendererOwnedInputAuthority {
+  issueTicket(): object | null
+  isCurrent(ticket: unknown): boolean
+  subscribe(listener: () => void): () => void
+  getFailures(): readonly unknown[]
+}
 
 export interface MarkdownRendererDocumentState {
   readonly documentIdentity: Readonly<{ id: string; epoch: number | string }>
@@ -47,6 +71,20 @@ export interface MarkdownRendererCheckpointPreparation {
 
 export interface MarkdownRendererCheckpointPublication extends MarkdownRendererCheckpointPreparation {
   readonly authority: 'captured-renderer-only'
+}
+
+/** Original issuers, supplied by the owning renderer after both hooks exist. */
+export interface MarkdownRendererCheckpointSealSources {
+  readonly pipeline: FsusRenderPipelineAuthority
+  readonly viewport: FsusRenderPipelineAuthority
+}
+
+/** Source continuity on the exact owned checkpoint; never full-host readiness. */
+export interface MarkdownRendererSealedCheckpointPublication extends MarkdownRendererCheckpointPublication {
+  readonly seal: Readonly<{
+    scope: 'renderer-checkpoint-source-custody'
+    checkpointRef: string
+  }>
 }
 
 export interface MarkdownRendererRetainedProjection {
@@ -137,6 +175,12 @@ export const hasUnavailableMarkdownRendererWorkerListenerRegistration = (
 
 // Preserve the remaining real source gaps; available hook counts are exposed
 // separately and never turn opaque adapter/worker/platform state into zero.
+export const markdownRendererCheckpointSealSourceDependencies = Object.freeze([
+  'renderer:document-source-synchronous-authority-ticket',
+  'render-pipeline:complete-synchronous-authority-revocation-ticket',
+  'renderer:projection-deactivation-cleanup-seal-revocation-coverage',
+] as const)
+
 export const markdownRendererSessionSourceDependencies = Object.freeze([
   'markdown-runtime:activation-and-gateway-loader-import-network-census',
   'renderer:validated-snapshot-restoration-after-disposal',
@@ -145,6 +189,7 @@ export const markdownRendererSessionSourceDependencies = Object.freeze([
   'renderer:owned-event-registration-and-reversible-control',
   'renderer:callback-queue-checkpoint-and-epoch-safe-recreation',
   'renderer:callback-free-live-authority-attestation-for-full-host-refset',
+  ...markdownRendererCheckpointSealSourceDependencies,
   // Quarantine is source-reviewed; the worker-owner synchronous lifecycle
   // repairs are composed, but independent review/qualification remains pending.
   'render-pipeline-worker:reentrant-enqueue-disposal-cleanup',
@@ -174,6 +219,7 @@ export const createMarkdownRendererSessionResourceOwner = <
     readonly retainedListeners: number
   }
   readonly readComponentCleanupPending: () => number
+  readonly readDocumentAuthority: () => MarkdownHeavyFeatureDocumentAuthority | null
 }) => {
   const timers = new Set<ReturnType<typeof setTimeout>>()
   const frames = new Map<number, () => void>()
@@ -195,7 +241,625 @@ export const createMarkdownRendererSessionResourceOwner = <
   const runningCleanups = new Map<string, Set<unknown>>()
   let disposingOnUnmount = false
   let generation = 0
+  let checkpointAuthorityGeneration = 0
+  let checkpointAuthorityOverflowed = false
+  let checkpointDeactivated = false
+  let checkpointAuthorityCallbackDepth = 0
+  let lastCheckpointAuthorityRetirement: string | null = null
+  type DocumentRetirementBinding = {
+    readonly source: MarkdownHeavyFeatureDocumentAuthority
+    readonly handle: MarkdownHeavyFeatureDocumentAuthorityRetirementHandle
+  }
+  let documentRetirement: DocumentRetirementBinding | null = null
+  let documentRetirementUnknown = false
+  let bindingDocumentRetirement = false
+  type SealSourceRegistration = {
+    readonly role: 'pipeline' | 'viewport'
+    readonly source: FsusRenderPipelineAuthority
+    unsubscribe: (() => void) | null
+    registering: boolean
+    releasing: boolean
+    releaseReentered: boolean
+    releaseCause: unknown
+    released: boolean
+  }
+  const checkpointSealSources = new Map<
+    'pipeline' | 'viewport',
+    SealSourceRegistration
+  >()
+  let bindingCheckpointSealSources = false
+  let sealingCheckpoint = false
+  const inputPublications = new Map<
+    string,
+    {
+      retire: () => void
+      inspect: () => {
+        readonly scope: string
+        readonly value: unknown
+        readonly published: boolean
+        readonly closed: boolean
+        readonly retainedListeners: number
+        readonly retainedTicket: boolean
+        readonly nativeDocumentTicket: MarkdownHeavyFeatureDocumentAuthorityTicket | null
+        readonly retainedSnapshotEntries: number
+        readonly failures: readonly unknown[]
+        readonly unavailableCallbackResults: readonly unknown[]
+        readonly releaseObligations: number
+        readonly pendingAsyncObservers: number
+        readonly asyncObservations: readonly unknown[]
+        readonly failureRecords: readonly unknown[]
+      }
+      close: () => void
+      releaseSubscriptions: () => void
+      hasReleaseObligations: () => boolean
+    }
+  >()
+  let notifyingInputRetirement = false
+  const retireCheckpointAuthority = (reason: string) => {
+    // Same producer's private retirement version, not a document/pipeline ticket.
+    if (checkpointAuthorityGeneration === Number.MAX_SAFE_INTEGER)
+      checkpointAuthorityOverflowed = true
+    else checkpointAuthorityGeneration += 1
+    lastCheckpointAuthorityRetirement = reason
+    // A dependent receiver can reenter this owner. Its nested retirement still
+    // changes the private version, but never recursively invokes the same feed.
+    if (!notifyingInputRetirement) {
+      notifyingInputRetirement = true
+      try {
+        for (const publication of inputPublications.values())
+          publication.retire()
+      } finally {
+        notifyingInputRetirement = false
+      }
+    }
+  }
+  const runCheckpointAuthorityCallback = <T>(
+    reason: string,
+    run: () => T,
+    resource: unknown = run,
+    failurePhase = `checkpoint-callback:${reason}`,
+  ): T => {
+    checkpointAuthorityCallbackDepth += 1
+    try {
+      // Input retirement invokes real foreign receivers. Include the pre-write
+      // notifications in the same depth/catch/finally boundary.
+      retireCheckpointAuthority(reason)
+      return run()
+    } catch (error) {
+      retireCheckpointAuthority('callback-failure')
+      let resources = cleanupFailures.get(failurePhase)
+      if (!resources) {
+        resources = new Map()
+        cleanupFailures.set(failurePhase, resources)
+      }
+      let causes = resources.get(resource)
+      if (!causes) {
+        causes = new Set()
+        resources.set(resource, causes)
+      }
+      causes.add(error)
+      throw error
+    } finally {
+      retireCheckpointAuthority('callback-completion')
+      checkpointAuthorityCallbackDepth -= 1
+    }
+  }
   let disposed = false
+  const createOwnedInputPublication = <T>(scope: string, initial: T) => {
+    if (disposed || inputPublications.has(scope))
+      throw new Error('markdown-renderer-input-publication-unavailable')
+    let currentValue = initial
+    let triggerInput!: () => void
+    const readInput = () => currentValue
+    const refuseInputWrite = () => {
+      throw new TypeError('markdown-renderer-owned-input-readonly')
+    }
+    let trackedReadInput = readInput
+    const input = customRef<T>((track, trigger) => {
+      triggerInput = trigger
+      trackedReadInput = () => {
+        track()
+        return currentValue
+      }
+      return { get: trackedReadInput, set: refuseInputWrite }
+    })
+    // The installed Vue customRef getter writes its public _value cache. Use
+    // the same factory getter as an own accessor before freezing the real ref.
+    // toRaw returns this sealed ref, never a writable backing ref or store.
+    Object.defineProperty(input, 'value', {
+      get: trackedReadInput,
+      set: refuseInputWrite,
+      enumerable: true,
+    })
+    Object.freeze(input)
+    type Registration = {
+      readonly id: symbol
+      readonly listener: () => void
+      quarantined: boolean
+      releasing: boolean
+      releaseReentered: boolean
+      releaseReentryCause: unknown
+      releaseRequested: boolean
+      failureCause: unknown
+      notificationFailed: boolean
+    }
+    type Observation = {
+      readonly source: object
+      readonly registration: Registration
+      state: 'pending' | 'fulfilled' | 'rejected' | 'unavailable'
+      rejected: boolean
+      cause: unknown
+      processingFailure: unknown
+      derived: Promise<unknown> | null
+      observerTask: Promise<void> | null
+      observerSettled: boolean
+    }
+    const registrations = new Set<Registration>()
+    const failures: unknown[] = []
+    const failureRecords: Array<{
+      readonly registration: Registration | null
+      readonly source: unknown
+      readonly phase: string
+      readonly cause: unknown
+    }> = []
+    const unavailableCallbackResults: unknown[] = []
+    const asyncObservations = new Set<Observation>()
+    let closed = false
+    let published = true
+    let ticket: object | null = null
+    let nativeDocumentTicket: MarkdownHeavyFeatureDocumentAuthorityTicket | null =
+      null
+    let nativeDocumentBinding: typeof documentRetirement = null
+    let ticketGeneration = -1
+    let allocatingTicket = false
+    const eligible = () =>
+      !closed &&
+      published &&
+      !disposed &&
+      !checkpointDeactivated &&
+      !checkpointAuthorityOverflowed &&
+      checkpointAuthorityCallbackDepth === 0 &&
+      !notifyingInputRetirement &&
+      failures.length === 0 &&
+      cleanupFailures.size === 0 &&
+      unavailableCallbackResults.length === 0 &&
+      asyncObservations.size === 0
+    const hasNativeDocumentCustody = (
+      binding: typeof documentRetirement,
+      captured: MarkdownHeavyFeatureDocumentAuthorityTicket | null,
+    ) => {
+      if (
+        documentRetirementUnknown ||
+        bindingDocumentRetirement ||
+        documentRetirement !== binding
+      )
+        return false
+      if (!binding) return captured === null
+      // Only the accepted original f253 pure methods are borrowed. No Native
+      // ticket is minted here and no handle failureCause becomes getFailures.
+      return (
+        captured !== null &&
+        binding.handle.hasCustody() &&
+        binding.source.hasCustody(captured)
+      )
+    }
+    const recordFailure = (
+      cause: unknown,
+      registration: Registration | null,
+      source: unknown,
+      phase: string,
+    ) => {
+      failures.push(cause)
+      failureRecords.push({ registration, source, phase, cause })
+      if (registration) registration.failureCause = cause
+    }
+    const observeCallbackResult = (
+      source: object,
+      registration: Registration,
+    ) => {
+      const observation: Observation = {
+        source,
+        registration,
+        state: 'unavailable',
+        rejected: false,
+        cause: undefined,
+        processingFailure: undefined,
+        derived: null,
+        observerTask: null,
+        observerSettled: false,
+      }
+      asyncObservations.add(observation)
+      try {
+        const ownConstructor = Object.getOwnPropertyDescriptor(
+          source,
+          'constructor',
+        )
+        const prototypeConstructor = Object.getOwnPropertyDescriptor(
+          rendererInputNativePromisePrototype,
+          'constructor',
+        )
+        const species = Object.getOwnPropertyDescriptor(
+          rendererInputNativePromise,
+          Symbol.species,
+        )
+        if (
+          Object.getPrototypeOf(source) !==
+            rendererInputNativePromisePrototype ||
+          (ownConstructor &&
+            (!('value' in ownConstructor) ||
+              ownConstructor.value !== rendererInputNativePromise)) ||
+          !prototypeConstructor ||
+          !('value' in prototypeConstructor) ||
+          prototypeConstructor.value !== rendererInputNativePromise ||
+          !rendererInputNativeSpecies ||
+          species?.get !== rendererInputNativeSpecies
+        ) {
+          unavailableCallbackResults.push(source)
+          return
+        }
+        // The captured intrinsic checks the actual Promise brand before any
+        // species allocation. Unsupported proxies/impostors cannot start a
+        // foreign then chain. Only the unchanged native species is permitted.
+        observation.state = 'pending'
+        observation.derived = rendererInputNativeApply(
+          rendererInputNativeThen,
+          source,
+          [
+            () => {
+              observation.state = 'fulfilled'
+            },
+            (cause: unknown) => {
+              observation.rejected = true
+              observation.cause = cause
+              observation.state = 'rejected'
+            },
+          ],
+        )
+        const derived = observation.derived
+        // This derived native Promise has real rejection handling too. The
+        // observer never starts a .catch/species chain or lets its own callback
+        // failure escape as another unobserved rejection.
+        observation.observerTask = (async () => {
+          let derivedRejected = false
+          let derivedCause: unknown
+          try {
+            await derived
+          } catch (cause) {
+            derivedRejected = true
+            derivedCause = cause
+          }
+          try {
+            runCheckpointAuthorityCallback(
+              'input-async-observation',
+              () => {
+                if (observation.rejected)
+                  recordFailure(
+                    observation.cause,
+                    registration,
+                    source,
+                    'async-receiver-rejection',
+                  )
+                if (derivedRejected)
+                  recordFailure(
+                    derivedCause,
+                    registration,
+                    derived,
+                    'async-observer-rejection',
+                  )
+              },
+              observation,
+            )
+          } catch (cause) {
+            // The original owner ledger already holds this processing cause.
+            observation.processingFailure = cause
+          } finally {
+            observation.observerSettled = true
+          }
+        })()
+      } catch (cause) {
+        observation.state = 'unavailable'
+        observation.processingFailure = cause
+        unavailableCallbackResults.push(source)
+        recordFailure(cause, registration, source, 'async-observation-install')
+      }
+    }
+    const notifyRegistration = (registration: Registration) => {
+      registration.notificationFailed = false
+      try {
+        const result: unknown = registration.listener()
+        if (
+          result !== null &&
+          (typeof result === 'object' || typeof result === 'function')
+        ) {
+          registration.quarantined = true
+          observeCallbackResult(result, registration)
+          return false
+        }
+        registration.quarantined = false
+        return true
+      } catch (cause) {
+        registration.notificationFailed = true
+        registration.quarantined = true
+        recordFailure(
+          cause,
+          registration,
+          registration.listener,
+          'receiver-notification',
+        )
+        return false
+      }
+    }
+    const hasPendingObservation = (registration: Registration) =>
+      [...asyncObservations].some(
+        (record) =>
+          record.registration === registration &&
+          (record.state === 'unavailable' || !record.observerSettled),
+      )
+    const releaseRegistration = (registration: Registration) => {
+      if (!registrations.has(registration)) return
+      if (registration.releasing) {
+        const cause = new Error('markdown-renderer-input-release-in-progress')
+        // The receiver may catch this exception. Keep the actual failed attempt
+        // independently of its eventual normal return so it cannot detach itself.
+        if (!registration.releaseReentered) {
+          registration.releaseReentered = true
+          registration.releaseReentryCause = cause
+        }
+        registration.quarantined = true
+        recordFailure(
+          cause,
+          registration,
+          registration.listener,
+          'receiver-release-reentry',
+        )
+        throw cause
+      }
+      registration.releaseReentered = false
+      registration.releaseReentryCause = undefined
+      registration.releasing = true
+      registration.releaseRequested = true
+      try {
+        runCheckpointAuthorityCallback(
+          'input-unsubscribe',
+          () => {
+            if (hasPendingObservation(registration))
+              throw new Error(
+                'markdown-renderer-input-observer-release-pending',
+              )
+            // This is an actual retry of the selected receiver, not deletion of
+            // its quarantine flag or a fabricated release acknowledgment.
+            const notified = notifyRegistration(registration)
+            if (registration.releaseReentered) {
+              registration.quarantined = true
+              throw registration.releaseReentryCause
+            }
+            if (!notified) {
+              if (registration.notificationFailed)
+                throw registration.failureCause
+              throw new Error(
+                'markdown-renderer-input-receiver-release-unavailable',
+              )
+            }
+            if (hasPendingObservation(registration))
+              throw new Error(
+                'markdown-renderer-input-observer-release-pending',
+              )
+            registrations.delete(registration)
+            registration.releaseRequested = false
+            // Clear only this real release obligation after the selected receiver
+            // returned synchronously and every supported observation settled.
+            // Failure history and unsupported result records remain retained.
+            const pending = cleanupFailures.get(
+              'renderer-input-listener-release',
+            )
+            pending?.delete(registration)
+            if (pending?.size === 0)
+              cleanupFailures.delete('renderer-input-listener-release')
+          },
+          registration,
+          'renderer-input-listener-release',
+        )
+      } finally {
+        registration.releasing = false
+      }
+    }
+    const retire = () => {
+      ticket = null
+      nativeDocumentTicket = null
+      nativeDocumentBinding = null
+      for (const registration of [...registrations]) {
+        if (
+          !registrations.has(registration) ||
+          registration.quarantined ||
+          registration.releasing
+        )
+          continue
+        notifyRegistration(registration)
+      }
+    }
+    const authority: MarkdownRendererOwnedInputAuthority = Object.freeze({
+      issueTicket: () => {
+        if (allocatingTicket || !eligible()) return null
+        if (!ticket || ticketGeneration !== checkpointAuthorityGeneration) {
+          const capturedGeneration = checkpointAuthorityGeneration
+          const capturedValue = currentValue
+          const capturedBinding = documentRetirement
+          const capturedSource = capturedBinding?.source
+          allocatingTicket = true
+          try {
+            const capturedNative = capturedSource?.capture() ?? null
+            if (capturedBinding && capturedNative === null) return null
+            const candidate = Object.freeze({
+              scope,
+              value: capturedValue,
+              nativeDocumentAuthority: capturedNative,
+            })
+            // Validate the actual original ticket after every allocation, then
+            // repeat private guards last in case the borrowed call reentered.
+            const nativeCurrent = hasNativeDocumentCustody(
+              capturedBinding,
+              capturedNative,
+            )
+            if (
+              !nativeCurrent ||
+              !eligible() ||
+              checkpointAuthorityGeneration !== capturedGeneration ||
+              currentValue !== capturedValue
+            )
+              return null
+            ticket = candidate
+            ticketGeneration = capturedGeneration
+            nativeDocumentTicket = capturedNative
+            nativeDocumentBinding = capturedBinding
+          } catch (cause) {
+            recordFailure(
+              cause,
+              null,
+              capturedSource,
+              'native-document-ticket-capture',
+            )
+            throw cause
+          } finally {
+            allocatingTicket = false
+          }
+        }
+        // A cached pin never reacquires Native custody. Loss returns null until
+        // a real owner retirement/replacement creates a new guarded candidate.
+        return hasNativeDocumentCustody(
+          nativeDocumentBinding,
+          nativeDocumentTicket,
+        )
+          ? ticket
+          : null
+      },
+      // Pure private guards and the original Native pure custody checks only;
+      // no Vue reads, capture/reacquisition, callback or publication.
+      isCurrent: (value: unknown) =>
+        eligible() &&
+        !allocatingTicket &&
+        ticket !== null &&
+        value === ticket &&
+        ticketGeneration === checkpointAuthorityGeneration &&
+        hasNativeDocumentCustody(nativeDocumentBinding, nativeDocumentTicket),
+      getFailures: () => Object.freeze([...failures]),
+      subscribe: (listener: () => void) =>
+        runCheckpointAuthorityCallback('input-subscribe', () => {
+          if (closed || disposed)
+            throw new Error('markdown-renderer-input-publication-closed')
+          if (typeof listener !== 'function')
+            throw new TypeError('markdown-renderer-input-listener-invalid')
+          const registration: Registration = {
+            id: Symbol('markdown-renderer-input-subscription'),
+            listener,
+            quarantined: false,
+            releasing: false,
+            releaseReentered: false,
+            releaseReentryCause: undefined,
+            releaseRequested: false,
+            failureCause: undefined,
+            notificationFailed: false,
+          }
+          if (closed || disposed)
+            throw new Error('markdown-renderer-input-publication-closed')
+          registrations.add(registration)
+          return () => releaseRegistration(registration)
+        }),
+    })
+    const replace = (value: T, isPublication = true) =>
+      runCheckpointAuthorityCallback(
+        'input-replacement',
+        () => {
+          if (isPublication && (closed || disposed))
+            throw new Error('markdown-renderer-input-publication-closed')
+          // Only these private closure cells are writable. Set publication
+          // state before notifying Vue so a nested clear cannot be undone.
+          currentValue = value
+          published = isPublication
+          try {
+            triggerInput()
+          } catch (cause) {
+            published = false
+            recordFailure(cause, null, input, 'input-trigger')
+            throw cause
+          }
+        },
+        input,
+      )
+    inputPublications.set(scope, {
+      retire,
+      releaseSubscriptions: () =>
+        runCleanupBatch(
+          [...registrations].map((registration) => ({
+            phase: 'renderer-input-listener-release',
+            resource: registration,
+            run: () => releaseRegistration(registration),
+          })),
+        ),
+      hasReleaseObligations: () =>
+        registrations.size > 0 ||
+        [...asyncObservations].some(
+          (record) => record.state === 'unavailable' || !record.observerSettled,
+        ),
+      close: () => {
+        closed = true
+        // Ordinary unmount already retired every receiver before this private
+        // terminal flag. Closing cannot recursively notify during disposal.
+        ticket = null
+        nativeDocumentTicket = null
+        nativeDocumentBinding = null
+      },
+      inspect: () =>
+        Object.freeze({
+          scope,
+          value: currentValue,
+          published,
+          closed,
+          retainedListeners: registrations.size,
+          retainedTicket: ticket !== null,
+          nativeDocumentTicket,
+          retainedSnapshotEntries:
+            typeof currentValue === 'object' && currentValue !== null
+              ? Object.keys(currentValue).length
+              : 0,
+          failures: Object.freeze([...failures]),
+          unavailableCallbackResults: Object.freeze([
+            ...unavailableCallbackResults,
+          ]),
+          releaseObligations: [...registrations].filter(
+            (record) => record.quarantined || record.releaseRequested,
+          ).length,
+          pendingAsyncObservers: [...asyncObservations].filter(
+            (record) => record.observerTask !== null && !record.observerSettled,
+          ).length,
+          asyncObservations: Object.freeze(
+            [...asyncObservations].map(({ registration, ...record }) =>
+              Object.freeze({
+                ...record,
+                subscriptionRef: registration.id,
+                listener: registration.listener,
+              }),
+            ),
+          ),
+          failureRecords: Object.freeze(
+            failureRecords.map(({ registration, ...record }) =>
+              Object.freeze({
+                ...record,
+                subscriptionRef: registration?.id ?? null,
+              }),
+            ),
+          ),
+        }),
+    })
+    return Object.freeze({
+      input,
+      authority,
+      replace,
+      // Clear the publication with the caller's actual empty input; the ref and
+      // any registration/failure records remain real retained resources.
+      clear: (empty: T) => replace(empty, false),
+      retire: () => retireCheckpointAuthority(`input-retirement:${scope}`),
+    })
+  }
   let sequence = 0
   let checkpointSequence = 0
   let capturingCheckpoint = false
@@ -213,23 +877,45 @@ export const createMarkdownRendererSessionResourceOwner = <
     readonly retainedCollectionEntries: number
   }
   let checkpoint: CheckpointRecord | null = null
-  let preparedCheckpoint: {
+  type PreparedCheckpointRecord = {
     readonly record: CheckpointRecord
     readonly base: CheckpointRecord | null
     readonly generation: number
+    readonly authorityGeneration: number
     readonly preparation: MarkdownRendererCheckpointPreparation
     readonly publication: MarkdownRendererCheckpointPublication
     validated: boolean
-  } | null = null
+  }
+  let preparedCheckpoint: PreparedCheckpointRecord | null = null
+  type CheckpointSeal = {
+    readonly candidate: PreparedCheckpointRecord
+    readonly publication: MarkdownRendererSealedCheckpointPublication
+    readonly nativeBinding: DocumentRetirementBinding
+    readonly nativeTicket: MarkdownHeavyFeatureDocumentAuthorityTicket
+    readonly pipelineBinding: SealSourceRegistration
+    readonly pipelineTicket: object
+    readonly viewportBinding: SealSourceRegistration
+    readonly viewportTicket: object
+    readonly authorityGeneration: number
+  }
+  let preparedCheckpointSeal: CheckpointSeal | null = null
+  let publishedCheckpointSeal: CheckpointSeal | null = null
 
   const beginInstallation = (phase: string) => {
     if (disposed) throw new Error('markdown-renderer-resource-owner-disposed')
+    retireCheckpointAuthority('resource-admission')
     const token = {}
     installations.set(token, { phase, state: 'installing' })
     return Object.freeze({
-      complete: () => installations.delete(token),
-      fail: (error: unknown) =>
-        installations.set(token, { phase, state: 'unknown', error }),
+      complete: () => {
+        if (installations.has(token))
+          retireCheckpointAuthority('resource-settlement')
+        return installations.delete(token)
+      },
+      fail: (error: unknown) => {
+        retireCheckpointAuthority('cleanup-failure')
+        installations.set(token, { phase, state: 'unknown', error })
+      },
     })
   }
   const finalizeFrame = (
@@ -263,9 +949,11 @@ export const createMarkdownRendererSessionResourceOwner = <
         runningCleanups.set(phase, running)
       }
       running.add(resource)
+      retireCheckpointAuthority('cleanup-selected')
       try {
-        run()
+        runCheckpointAuthorityCallback(phase, run, resource, phase)
       } catch (error) {
+        retireCheckpointAuthority('cleanup-failure')
         errors.push(error)
         let resources = cleanupFailures.get(phase)
         if (!resources) {
@@ -318,6 +1006,172 @@ export const createMarkdownRendererSessionResourceOwner = <
     registerComponentCleanups(actions)
     runCleanupBatch(componentCleanupActions())
   }
+  const releaseCheckpointSealSource = (record: SealSourceRegistration) => {
+    if (record.released) return
+    if (record.releasing) {
+      const cause = new Error(
+        'markdown-renderer-seal-source-release-in-progress',
+      )
+      record.releaseReentered = true
+      record.releaseCause = cause
+      throw cause
+    }
+    record.releasing = true
+    record.releaseReentered = false
+    try {
+      runCheckpointAuthorityCallback(
+        'checkpoint-source-release',
+        () => {
+          if (record.registering || !record.unsubscribe)
+            throw new Error('markdown-renderer-seal-source-release-unavailable')
+          record.unsubscribe()
+          if (record.releaseReentered) throw record.releaseCause
+          record.released = true
+          if (checkpointSealSources.get(record.role) === record)
+            checkpointSealSources.delete(record.role)
+        },
+        record,
+        'checkpoint-seal-source-release',
+      )
+    } finally {
+      record.releasing = false
+    }
+  }
+  const bindCheckpointSealSources = (
+    sources: MarkdownRendererCheckpointSealSources,
+  ) =>
+    runCheckpointAuthorityCallback('checkpoint-source-bind', () => {
+      if (disposed || bindingCheckpointSealSources)
+        throw new Error('markdown-renderer-seal-source-binding-unavailable')
+      bindingCheckpointSealSources = true
+      try {
+        for (const role of ['pipeline', 'viewport'] as const) {
+          const source = sources[role]
+          const existing = checkpointSealSources.get(role)
+          if (existing) {
+            if (
+              existing.source !== source ||
+              existing.registering ||
+              !existing.unsubscribe ||
+              existing.released
+            )
+              throw new Error(
+                `markdown-renderer-seal-source-binding-retained:${role}`,
+              )
+            continue
+          }
+          const installation = beginInstallation(
+            `checkpoint-${role}-retirement-registration`,
+          )
+          const record: SealSourceRegistration = {
+            role,
+            source,
+            unsubscribe: null,
+            registering: true,
+            releasing: false,
+            releaseReentered: false,
+            releaseCause: undefined,
+            released: false,
+          }
+          checkpointSealSources.set(role, record)
+          let known = false
+          try {
+            record.unsubscribe = source.subscribe(() =>
+              retireCheckpointAuthority(`checkpoint-${role}-source-retirement`),
+            )
+            if (typeof record.unsubscribe !== 'function')
+              throw new TypeError(
+                `markdown-renderer-seal-source-release-handle-invalid:${role}`,
+              )
+            known = true
+            record.registering = false
+            if (disposed) releaseCheckpointSealSource(record)
+          } catch (cause) {
+            record.releaseCause = cause
+            if (!known) installation.fail(cause)
+            throw cause
+          } finally {
+            record.registering = false
+            if (known) installation.complete()
+          }
+        }
+      } finally {
+        bindingCheckpointSealSources = false
+      }
+    })
+  const releaseDocumentRetirement = () => {
+    const record = documentRetirement
+    if (!record) return
+    runCheckpointAuthorityCallback(
+      'document-retirement-unsubscribe',
+      () => {
+        retireCheckpointAuthority('document-retirement-release')
+        // Native source calls this same receiver before removing registration.
+        record.handle.unsubscribe()
+        if (record.handle.hasCustody()) {
+          const cause = record.handle.failureCause()
+          if (cause !== undefined) throw cause
+          throw new Error(
+            'markdown-renderer-document-retirement-still-retained',
+          )
+        }
+        if (documentRetirement === record) documentRetirement = null
+      },
+      record.handle,
+      'document-retirement-unsubscribe',
+    )
+  }
+  const bindDocumentAuthorityReceiver = (): boolean =>
+    runCheckpointAuthorityCallback(
+      'document-retirement-bind',
+      () => {
+        if (bindingDocumentRetirement || documentRetirementUnknown)
+          throw new Error(
+            'markdown-renderer-document-retirement-registration-pending',
+          )
+        const installation = beginInstallation(
+          'document-retirement-registration',
+        )
+        bindingDocumentRetirement = true
+        let creationUnknown = false
+        try {
+          const source = options.readDocumentAuthority()
+          if (!source) return false
+          if (documentRetirement) {
+            if (documentRetirement.source !== source)
+              throw new Error(
+                'markdown-renderer-document-retirement-source-changed',
+              )
+            return documentRetirement.handle.hasCustody()
+          }
+          let handle: MarkdownHeavyFeatureDocumentAuthorityRetirementHandle
+          try {
+            handle = source.subscribeRetirement(() =>
+              retireCheckpointAuthority('document-source-retirement'),
+            )
+          } catch (cause) {
+            creationUnknown = true
+            documentRetirementUnknown = true
+            installation.fail(cause)
+            throw cause
+          }
+          documentRetirement = { source, handle }
+          if (disposed) {
+            releaseDocumentRetirement()
+            return false
+          }
+          if (!handle.hasCustody())
+            throw new Error(
+              'markdown-renderer-document-retirement-not-registered',
+            )
+          return true
+        } finally {
+          bindingDocumentRetirement = false
+          if (!creationUnknown) installation.complete()
+        }
+      },
+      bindDocumentAuthorityReceiver,
+    )
 
   const sameDocument = (
     a: MarkdownRendererDocumentState,
@@ -337,6 +1191,7 @@ export const createMarkdownRendererSessionResourceOwner = <
     const handle = renderWatchHandle
     if (!handle || stoppingRenderWatch) return
     stoppingRenderWatch = true
+    retireCheckpointAuthority('watch-stop')
     try {
       handle.stop()
       // Release only the actual owned handle after its own stop returns.
@@ -345,6 +1200,7 @@ export const createMarkdownRendererSessionResourceOwner = <
         renderWatchCleanupFailure = null
       }
     } catch (error) {
+      retireCheckpointAuthority('cleanup-failure')
       renderWatchCleanupFailure = Object.freeze({
         phase: 'render-watch-stop',
         error,
@@ -357,24 +1213,35 @@ export const createMarkdownRendererSessionResourceOwner = <
   const bindRenderWatchHandle = (handle: WatchHandle) => {
     if (renderWatchHandle && renderWatchHandle !== handle)
       throw new Error('markdown-renderer-render-watch-already-owned')
+    retireCheckpointAuthority('watch-binding')
     renderWatchHandle = handle
     // Immediate watch setup may have reentered ordinary unmount before binding.
     if (disposed) stopRenderWatch()
   }
   const beginRender = (): MarkdownRendererRenderGeneration =>
-    Object.freeze({ ...readDocumentState(), generation: ++generation })
-  const isCurrent = (token: MarkdownRendererRenderGeneration) => {
-    const current = options.readDocumentState()
-    return (
-      !disposed &&
-      token.generation === generation &&
-      sameDocument(token, current) &&
-      token.revision === current.revision
+    runCheckpointAuthorityCallback(
+      'render-admission',
+      () => Object.freeze({ ...readDocumentState(), generation: ++generation }),
+      readDocumentState,
     )
-  }
+  const isCurrent = (token: MarkdownRendererRenderGeneration) =>
+    runCheckpointAuthorityCallback(
+      'current-document-read',
+      () => {
+        const current = options.readDocumentState()
+        return (
+          !disposed &&
+          token.generation === generation &&
+          sameDocument(token, current) &&
+          token.revision === current.revision
+        )
+      },
+      readDocumentState,
+    )
   const captureLastValidRender = (): MarkdownRendererLastValidRender | null => {
     if (disposed || !retained) return null
     if (!sameDocument(retained.capture, options.readDocumentState())) {
+      retireCheckpointAuthority('document-mismatch')
       retained = null
       return null
     }
@@ -385,6 +1252,7 @@ export const createMarkdownRendererSessionResourceOwner = <
     result: MarkdownSafeRenderResult,
   ) => {
     if (!isCurrent(token)) return false
+    retireCheckpointAuthority('retained-projection')
     // The component calls this only at an authorized, identity-matched commit.
     // Keep the actual immutable result in the sole owner, never reconstruct it
     // from HTML, a source digest or a fabricated success receipt.
@@ -415,6 +1283,11 @@ export const createMarkdownRendererSessionResourceOwner = <
       if (
         disposed ||
         capturingCheckpoint ||
+        sealingCheckpoint ||
+        bindingCheckpointSealSources ||
+        notifyingInputRetirement ||
+        checkpointAuthorityCallbackDepth > 0 ||
+        runningCleanups.size > 0 ||
         preparedCheckpoint !== null ||
         stoppingRenderWatch ||
         jobs.size > 0 ||
@@ -427,6 +1300,7 @@ export const createMarkdownRendererSessionResourceOwner = <
       )
         return null
       const checkpointGeneration = generation
+      const authorityGeneration = checkpointAuthorityGeneration
       const base = checkpoint
       capturingCheckpoint = true
       try {
@@ -448,6 +1322,9 @@ export const createMarkdownRendererSessionResourceOwner = <
         if (
           disposed ||
           generation !== checkpointGeneration ||
+          checkpointAuthorityCallbackDepth > 0 ||
+          runningCleanups.size > 0 ||
+          checkpointAuthorityGeneration !== authorityGeneration ||
           retained !== render ||
           jobs.size > 0 ||
           timers.size > 0 ||
@@ -489,6 +1366,7 @@ export const createMarkdownRendererSessionResourceOwner = <
           record,
           base,
           generation: checkpointGeneration,
+          authorityGeneration,
           preparation,
           publication: Object.freeze({
             ...preparation,
@@ -507,6 +1385,11 @@ export const createMarkdownRendererSessionResourceOwner = <
       candidate !== null &&
       !disposed &&
       !capturingCheckpoint &&
+      !sealingCheckpoint &&
+      !bindingCheckpointSealSources &&
+      !notifyingInputRetirement &&
+      checkpointAuthorityCallbackDepth === 0 &&
+      runningCleanups.size === 0 &&
       !stoppingRenderWatch &&
       generation === candidate.generation &&
       retained === candidate.record.render &&
@@ -549,6 +1432,8 @@ export const createMarkdownRendererSessionResourceOwner = <
     // Pure local custody publication: no producer callbacks, reactive/native
     // writes, allocation, cleanup, or claims about live external authority.
     checkpoint = candidate.record
+    preparedCheckpointSeal = null
+    publishedCheckpointSeal = null
     preparedCheckpoint = null
     return checkpoint.capture
   }
@@ -557,6 +1442,8 @@ export const createMarkdownRendererSessionResourceOwner = <
   ) => {
     const candidate = preparedCheckpoint
     if (!candidate || candidate.preparation !== preparation) return false
+    if (preparedCheckpointSeal?.candidate === candidate)
+      preparedCheckpointSeal = null
     preparedCheckpoint = null
     // Only the pending pin is released. Native handles/jobs/failure proofs remain.
     return true
@@ -573,22 +1460,283 @@ export const createMarkdownRendererSessionResourceOwner = <
       cancelPreparedRendererOwnedCheckpoint(preparation)
     }
   }
+  const hasPrivateCheckpointSealCustody = (
+    seal: CheckpointSeal,
+    duringSeal = false,
+  ) => {
+    const candidate = seal.candidate
+    return (
+      !disposed &&
+      !capturingCheckpoint &&
+      (!sealingCheckpoint || duringSeal) &&
+      !bindingCheckpointSealSources &&
+      !bindingDocumentRetirement &&
+      !documentRetirementUnknown &&
+      !notifyingInputRetirement &&
+      checkpointAuthorityCallbackDepth === 0 &&
+      !checkpointDeactivated &&
+      !checkpointAuthorityOverflowed &&
+      cleanupFailures.size === 0 &&
+      renderWatchCleanupFailure === null &&
+      !stoppingRenderWatch &&
+      runningCleanups.size === 0 &&
+      generation === candidate.generation &&
+      checkpointAuthorityGeneration === seal.authorityGeneration &&
+      retained === candidate.record.render &&
+      jobs.size === 0 &&
+      timers.size === 0 &&
+      frames.size === 0 &&
+      scheduledFrames.size === 0 &&
+      pendingFrameFinalizers.size === 0 &&
+      controlledFrameKeys.size === 0 &&
+      installations.size === 0 &&
+      pendingComponentCleanups.size === 0 &&
+      documentRetirement === seal.nativeBinding &&
+      checkpointSealSources.get('pipeline') === seal.pipelineBinding &&
+      checkpointSealSources.get('viewport') === seal.viewportBinding &&
+      !seal.pipelineBinding.registering &&
+      !seal.pipelineBinding.releasing &&
+      !seal.pipelineBinding.released &&
+      seal.pipelineBinding.unsubscribe !== null &&
+      !seal.viewportBinding.registering &&
+      !seal.viewportBinding.releasing &&
+      !seal.viewportBinding.released &&
+      seal.viewportBinding.unsubscribe !== null &&
+      ((preparedCheckpoint === candidate && checkpoint === candidate.base) ||
+        (publishedCheckpointSeal === seal && checkpoint === candidate.record))
+    )
+  }
+  const hasOriginalCheckpointSealCustody = (seal: CheckpointSeal) =>
+    seal.nativeBinding.handle.hasCustody() &&
+    seal.nativeBinding.source.hasCustody(seal.nativeTicket) &&
+    seal.pipelineBinding.source.isCurrent(seal.pipelineTicket) &&
+    seal.viewportBinding.source.isCurrent(seal.viewportTicket)
+  const sealPreparedRendererOwnedCheckpoint = (
+    preparation: MarkdownRendererCheckpointPreparation,
+  ): MarkdownRendererSealedCheckpointPublication | null => {
+    const candidate = preparedCheckpoint
+    if (
+      !candidate ||
+      candidate.preparation !== preparation ||
+      sealingCheckpoint ||
+      bindingCheckpointSealSources ||
+      !hasCurrentCheckpointCustody() ||
+      checkpointDeactivated ||
+      checkpointAuthorityOverflowed ||
+      cleanupFailures.size > 0 ||
+      renderWatchCleanupFailure !== null ||
+      candidate.authorityGeneration !== checkpointAuthorityGeneration
+    )
+      return null
+    const nativeBinding = documentRetirement
+    const pipelineBinding = checkpointSealSources.get('pipeline')
+    const viewportBinding = checkpointSealSources.get('viewport')
+    if (
+      !nativeBinding ||
+      documentRetirementUnknown ||
+      bindingDocumentRetirement
+    )
+      throw new Error(
+        'markdown-renderer-checkpoint-seal-source-unavailable:native-document-retirement-registration',
+      )
+    if (
+      !pipelineBinding ||
+      pipelineBinding.registering ||
+      !pipelineBinding.unsubscribe ||
+      pipelineBinding.released
+    )
+      throw new Error(
+        'markdown-renderer-checkpoint-seal-source-unavailable:bindCheckpointSealSources.pipeline',
+      )
+    if (
+      !viewportBinding ||
+      viewportBinding.registering ||
+      !viewportBinding.unsubscribe ||
+      viewportBinding.released
+    )
+      throw new Error(
+        'markdown-renderer-checkpoint-seal-source-unavailable:bindCheckpointSealSources.viewport',
+      )
+    if (
+      preparedCheckpointSeal?.candidate === candidate &&
+      hasSealedRendererOwnedCheckpointCustody(
+        preparedCheckpointSeal.publication,
+      )
+    )
+      return preparedCheckpointSeal.publication
+    const attempt = {
+      candidate,
+      nativeBinding,
+      pipelineBinding,
+      viewportBinding,
+      nativeTicket: null as MarkdownHeavyFeatureDocumentAuthorityTicket | null,
+      pipelineTicket: null as object | null,
+      viewportTicket: null as object | null,
+    }
+    let source: unknown = nativeBinding.source
+    sealingCheckpoint = true
+    try {
+      const nativeTicket = (attempt.nativeTicket =
+        nativeBinding.source.capture())
+      if (!nativeTicket) return null
+      // The original immutable Native ticket must describe this exact captured
+      // checkpoint document, rather than a newer unrelated document/revision.
+      const capture = candidate.record.capture
+      if (
+        nativeTicket.documentKey !== capture.documentIdentity.id ||
+        nativeTicket.documentEpoch !== capture.documentIdentity.epoch ||
+        nativeTicket.revision !== capture.revision
+      )
+        return null
+      source = pipelineBinding.source
+      const pipelineTicket = (attempt.pipelineTicket =
+        pipelineBinding.source.issueTicket())
+      if (!pipelineTicket) return null
+      source = viewportBinding.source
+      const viewportTicket = (attempt.viewportTicket =
+        viewportBinding.source.issueTicket())
+      if (!viewportTicket) return null
+      source = candidate.record
+      const publication: MarkdownRendererSealedCheckpointPublication =
+        Object.freeze({
+          ...candidate.publication,
+          seal: Object.freeze({
+            scope: 'renderer-checkpoint-source-custody',
+            checkpointRef: capture.ref,
+          }),
+        })
+      const seal: CheckpointSeal = {
+        candidate,
+        publication,
+        nativeBinding,
+        nativeTicket,
+        pipelineBinding,
+        pipelineTicket,
+        viewportBinding,
+        viewportTicket,
+        authorityGeneration: candidate.authorityGeneration,
+      }
+      const originalCurrent = hasOriginalCheckpointSealCustody(seal)
+      // All issuer calls and allocations precede this last joint private guard.
+      if (
+        !originalCurrent ||
+        !hasPrivateCheckpointSealCustody(seal, true) ||
+        preparedCheckpoint !== candidate
+      )
+        return null
+      preparedCheckpointSeal = seal
+      return publication
+    } catch (cause) {
+      // The exact attempted source/refs survive cancellation or late teardown.
+      runCleanupBatch([
+        {
+          phase: 'checkpoint-seal-capture',
+          resource: { attempt, source },
+          run: () => {
+            throw cause
+          },
+        },
+      ])
+      throw cause
+    } finally {
+      sealingCheckpoint = false
+    }
+  }
+  const hasSealedRendererOwnedCheckpointCustody = (
+    publication: MarkdownRendererCheckpointPublication,
+  ): boolean => {
+    const seal =
+      preparedCheckpointSeal?.publication === publication
+        ? preparedCheckpointSeal
+        : publishedCheckpointSeal?.publication === publication
+          ? publishedCheckpointSeal
+          : null
+    // Compare private token identity only. Known original pure checks never
+    // acquire tickets, inspect resources, refresh, invoke caller getters or write.
+    return (
+      seal !== null &&
+      hasPrivateCheckpointSealCustody(seal) &&
+      hasOriginalCheckpointSealCustody(seal) &&
+      hasPrivateCheckpointSealCustody(seal)
+    )
+  }
+  const publishSealedRendererOwnedCheckpoint = (
+    publication: MarkdownRendererCheckpointPublication,
+  ): MarkdownRendererOwnedCheckpoint | null => {
+    const seal = preparedCheckpointSeal
+    if (
+      !seal ||
+      seal.publication !== publication ||
+      !hasSealedRendererOwnedCheckpointCustody(publication) ||
+      preparedCheckpoint !== seal.candidate
+    )
+      return null
+    // Original publication contract: one private pointer commit, no allocation,
+    // callbacks/reactive/native writes, cleanup, readiness or recovery receipt.
+    checkpoint = seal.candidate.record
+    publishedCheckpointSeal = seal
+    preparedCheckpointSeal = null
+    preparedCheckpoint = null
+    return checkpoint.capture
+  }
   const trackJob = () => {
     if (disposed) throw new Error('markdown-renderer-resource-owner-disposed')
+    retireCheckpointAuthority('job-admission')
     const job = Symbol('renderer-job')
     jobs.add(job)
-    return () => jobs.delete(job)
+    return () => {
+      if (jobs.has(job)) retireCheckpointAuthority('job-settlement')
+      return jobs.delete(job)
+    }
   }
+  const finalizeRenderJob = (
+    finishJob: () => void,
+    readCurrent: () => boolean,
+    finishOwnedFlag: () => void,
+  ) =>
+    runCheckpointAuthorityCallback(
+      'render-finalization',
+      () => {
+        // Enter before the final job is released; every remaining action is tried
+        // even when a live getter or owned flag setter throws.
+        runCleanupBatch([
+          {
+            phase: 'render-job-settlement',
+            resource: finishJob,
+            run: finishJob,
+          },
+          {
+            phase: 'render-final-current-read',
+            resource: readCurrent,
+            run: readCurrent,
+          },
+          {
+            phase: 'render-final-owned-flag',
+            resource: finishOwnedFlag,
+            run: finishOwnedFlag,
+          },
+        ])
+      },
+      finishJob,
+    )
   const setTimer = (run: () => void, delay: number) => {
     const installation = beginInstallation('timer')
     let handle: ReturnType<typeof setTimeout> | undefined
     let fired = false
     try {
-      handle = setTimeout(() => {
-        fired = true
-        if (handle !== undefined) timers.delete(handle)
-        if (!disposed) run()
-      }, delay)
+      handle = setTimeout(
+        () =>
+          runCheckpointAuthorityCallback(
+            'timer-callback',
+            () => {
+              fired = true
+              if (handle !== undefined) timers.delete(handle)
+              if (!disposed) run()
+            },
+            handle ?? run,
+          ),
+        delay,
+      )
     } catch (error) {
       installation.fail(error)
       throw error
@@ -611,8 +1759,15 @@ export const createMarkdownRendererSessionResourceOwner = <
   }
   const clearTimer = (handle: ReturnType<typeof setTimeout>) => {
     if (!timers.has(handle)) return
-    clearTimeout(handle)
-    timers.delete(handle)
+    runCheckpointAuthorityCallback(
+      'timer-clear',
+      () => {
+        clearTimeout(handle)
+        timers.delete(handle)
+      },
+      handle,
+      'timer-clear',
+    )
   }
   const afterFrame = () =>
     new Promise<void>((resolve) => {
@@ -624,11 +1779,17 @@ export const createMarkdownRendererSessionResourceOwner = <
       let handle: number | undefined
       let fired = false
       try {
-        handle = requestAnimationFrame(() => {
-          fired = true
-          if (handle !== undefined) frames.delete(handle)
-          resolve()
-        })
+        handle = requestAnimationFrame(() =>
+          runCheckpointAuthorityCallback(
+            'frame-callback',
+            () => {
+              fired = true
+              if (handle !== undefined) frames.delete(handle)
+              resolve()
+            },
+            handle ?? resolve,
+          ),
+        )
       } catch (error) {
         installation.fail(error)
         throw error
@@ -713,18 +1874,33 @@ export const createMarkdownRendererSessionResourceOwner = <
       const queuedTask = {
         ...task,
         key,
-        postPaint: () => {
-          if (scheduledFrames.get(key) === cancel) scheduledFrames.delete(key)
-          task.postPaint?.()
-          postPaintCompleted = true
-          if (!finalizer.selected) finalizer.state = 'completed'
-          if (
-            finalizer.state === 'completed' &&
-            pendingFrameFinalizers.get(cancel) === finalizer
-          )
-            pendingFrameFinalizers.delete(cancel)
-        },
+        postPaint: () =>
+          runCheckpointAuthorityCallback('frame-postpaint', () => {
+            if (scheduledFrames.get(key) === cancel) scheduledFrames.delete(key)
+            task.postPaint?.()
+            postPaintCompleted = true
+            if (!finalizer.selected) finalizer.state = 'completed'
+            if (
+              finalizer.state === 'completed' &&
+              pendingFrameFinalizers.get(cancel) === finalizer
+            )
+              pendingFrameFinalizers.delete(cancel)
+          }),
       }
+      for (const phase of ['measure', 'mutate'] as const) {
+        const run = queuedTask[phase]
+        if (run)
+          queuedTask[phase] = () =>
+            runCheckpointAuthorityCallback(`frame-${phase}`, () =>
+              run.call(queuedTask),
+            )
+      }
+      const guard = queuedTask.guard
+      if (guard)
+        queuedTask.guard = () =>
+          runCheckpointAuthorityCallback('frame-guard', () =>
+            guard.call(queuedTask),
+          )
       if (disposed) {
         if (scheduledFrames.get(key) === cancel) scheduledFrames.delete(key)
         finish()
@@ -800,6 +1976,7 @@ export const createMarkdownRendererSessionResourceOwner = <
   }
   const listenForAbort = (signal: AbortSignal, run: () => void) => {
     if (disposed) throw new Error('markdown-renderer-resource-owner-disposed')
+    retireCheckpointAuthority('abort-listener-admission')
     let removing = false
     const remove = () => {
       if (removing || !listeners.has(remove)) return
@@ -843,6 +2020,22 @@ export const createMarkdownRendererSessionResourceOwner = <
     return remove
   }
   const inspectOwnedResources = () => {
+    const sealSourceRecords = [...checkpointSealSources.values()]
+    const retainedSealSourceListeners = sealSourceRecords.filter(
+      (record) => record.unsubscribe !== null && !record.released,
+    ).length
+    const ownedInputs = [...inputPublications.values()].map((record) =>
+      record.inspect(),
+    )
+    const inputListeners = ownedInputs.reduce(
+      (sum, record) => sum + record.retainedListeners,
+      0,
+    )
+    const documentRegistration = documentRetirement
+      ? documentRetirement.handle.hasCustody()
+      : false
+    const documentFailure = documentRetirement?.handle.failureCause()
+    const documentListeners = documentRegistration ? 1 : 0
     const projection = options.readProjectionResources()
     const pipeline = options.readPipelineResources()
     const viewport = options.readVirtualWindowResources()
@@ -855,6 +2048,20 @@ export const createMarkdownRendererSessionResourceOwner = <
     const missingSourceDependencies: string[] = [
       ...markdownRendererSessionSourceDependencies,
     ]
+    if (ownedInputs.some((input) => input.releaseObligations > 0))
+      missingSourceDependencies.push(
+        'renderer-input:receiver-release-obligations',
+      )
+    if (ownedInputs.some((input) => input.pendingAsyncObservers > 0))
+      missingSourceDependencies.push(
+        'renderer-input:async-observation-settlement',
+      )
+    if (
+      ownedInputs.some((input) => input.unavailableCallbackResults.length > 0)
+    )
+      missingSourceDependencies.push(
+        'renderer-input:unsupported-callback-result-observation',
+      )
     if (renderWatchCleanupFailure) {
       missingSourceDependencies.push('renderer:native-watch-cleanup-settlement')
     }
@@ -936,13 +2143,66 @@ export const createMarkdownRendererSessionResourceOwner = <
       measuredUsageOnly: true as const,
       missingSourceDependencies: Object.freeze(missingSourceDependencies),
       sources: Object.freeze({
+        checkpointSealSources: Object.freeze(
+          sealSourceRecords.map((record) =>
+            Object.freeze({
+              role: record.role,
+              source: record.source,
+              retainedReleaseHandle:
+                record.unsubscribe !== null && !record.released,
+              registering: record.registering,
+              unknownRegistration:
+                record.unsubscribe === null && !record.released,
+              releasing: record.releasing,
+              releaseReentered: record.releaseReentered,
+              failureCause: record.releaseCause,
+            }),
+          ),
+        ),
+        rendererOwnedInputs: Object.freeze(ownedInputs),
         rendererOwnedCheckpoint: checkpoint?.capture ?? null,
         rendererCheckpointCustody: Object.freeze({
           prepared: preparedCheckpoint?.preparation ?? null,
           validated: preparedCheckpoint?.validated ?? false,
           publication: 'renderer-custody-only' as const,
-          liveAuthority: 'unavailable' as const,
+          liveAuthority: 'renderer-checkpoint-source-custody-only' as const,
           fullHostRefset: 'unavailable' as const,
+          seal:
+            preparedCheckpointSeal || publishedCheckpointSeal
+              ? ('checkpoint-bound-source-custody' as const)
+              : ('not-sealed' as const),
+          preparedSeal: preparedCheckpointSeal?.publication ?? null,
+          publishedSeal: publishedCheckpointSeal?.publication ?? null,
+          sealingCheckpoint,
+          missingBindings: Object.freeze(
+            ['pipeline', 'viewport'].filter(
+              (role) =>
+                !checkpointSealSources.has(role as 'pipeline' | 'viewport'),
+            ),
+          ),
+          missingSealSourceDependencies:
+            markdownRendererCheckpointSealSourceDependencies,
+          ownedAuthorityRetirement: Object.freeze({
+            generation: checkpointAuthorityGeneration,
+            overflowed: checkpointAuthorityOverflowed,
+            deactivated: checkpointDeactivated,
+            lastReason: lastCheckpointAuthorityRetirement,
+            runningCallbacks: checkpointAuthorityCallbackDepth,
+            notifyingInputRetirement,
+            scope: 'renderer-owned-only' as const,
+          }),
+        }),
+        documentAuthorityRetirement: Object.freeze({
+          source: documentRetirement?.source ?? null,
+          handle: documentRetirement?.handle ?? null,
+          registration: documentRetirementUnknown
+            ? ('unknown' as const)
+            : documentRegistration
+              ? ('registered' as const)
+              : ('not-retained' as const),
+          knownRetainedListeners: documentListeners,
+          unknownRegistrations: documentRetirementUnknown,
+          failureCause: documentFailure,
         }),
         rendererNative: Object.freeze({
           renderWatchHandleRetained: renderWatchHandle !== null,
@@ -985,6 +2245,9 @@ export const createMarkdownRendererSessionResourceOwner = <
           pipeline.pendingWorkerCallbackFailureNotification,
       }),
       unknownUsage: Object.freeze({
+        documentRetirementRegistrations: documentRetirementUnknown
+          ? ('unknown' as const)
+          : 0,
         vueEffects: 'unknown' as const,
         vueFlushJobs: 'unknown' as const,
         timers:
@@ -1020,6 +2283,9 @@ export const createMarkdownRendererSessionResourceOwner = <
         paused: false,
         recoverable: false,
         retainedListeners:
+          retainedSealSourceListeners +
+          inputListeners +
+          documentListeners +
           listeners.size +
           projection.retainedListeners +
           pipeline.retainedListeners +
@@ -1045,7 +2311,14 @@ export const createMarkdownRendererSessionResourceOwner = <
             projection.observers + viewport.observers + heavy.usage.observers,
           timers: knownTimers,
           backgroundTasks:
+            (sealingCheckpoint ? 1 : 0) +
+            (bindingCheckpointSealSources ? 1 : 0) +
+            ownedInputs.reduce(
+              (sum, input) => sum + input.pendingAsyncObservers,
+              0,
+            ) +
             jobs.size +
+            checkpointAuthorityCallbackDepth +
             (stoppingRenderWatch ? 1 : 0) +
             (capturingCheckpoint ? 1 : 0) +
             [...runningCleanups.values()].reduce(
@@ -1091,7 +2364,27 @@ export const createMarkdownRendererSessionResourceOwner = <
           // separately; an unknown heavy count is never coerced into this zero.
           networkRequests: 0,
           memoryUnits:
+            sealSourceRecords.length +
+            retainedSealSourceListeners +
+            (preparedCheckpointSeal ? 1 : 0) +
+            (publishedCheckpointSeal ? 1 : 0) +
+            ownedInputs.reduce(
+              (sum, record) =>
+                sum +
+                1 +
+                record.retainedListeners +
+                (record.retainedTicket ? 1 : 0) +
+                (record.nativeDocumentTicket ? 1 : 0) +
+                record.retainedSnapshotEntries +
+                record.failures.length +
+                record.unavailableCallbackResults.length +
+                record.asyncObservations.length +
+                record.failureRecords.length,
+              0,
+            ) +
+            (documentRetirement ? 1 : 0) +
             projection.memoryUnits +
+            checkpointAuthorityCallbackDepth +
             controlledFrameKeys.size +
             pendingFrameFinalizers.size +
             installations.size +
@@ -1166,13 +2459,31 @@ export const createMarkdownRendererSessionResourceOwner = <
     componentActions: readonly MarkdownRendererCleanupAction[] = [],
     releaseActions: readonly MarkdownRendererCleanupAction[] = [],
   ) => {
-    disposed = true
     if (disposingOnUnmount) return
+    disposed = true
     disposingOnUnmount = true
     generation += 1
     try {
+      // Lock disposal before retirement invokes a foreign input receiver.
+      retireCheckpointAuthority('unmount')
+      for (const publication of inputPublications.values()) publication.close()
       registerComponentCleanups(componentActions)
       runCleanupBatch([
+        ...[...checkpointSealSources.values()].map((record) => ({
+          phase: 'checkpoint-seal-source-release',
+          resource: record,
+          run: () => releaseCheckpointSealSource(record),
+        })),
+        ...[...inputPublications.values()].map((publication) => ({
+          phase: 'renderer-input-subscriptions-release',
+          resource: publication,
+          run: publication.releaseSubscriptions,
+        })),
+        {
+          phase: 'document-retirement-release',
+          resource: documentRetirement?.handle,
+          run: releaseDocumentRetirement,
+        },
         ...[...timers].map((timer) => ({
           phase: 'timer-clear',
           resource: timer,
@@ -1202,6 +2513,12 @@ export const createMarkdownRendererSessionResourceOwner = <
         installingListeners.size > 0 ||
         installations.size > 0 ||
         pendingComponentCleanups.size > 0 ||
+        documentRetirement !== null ||
+        documentRetirementUnknown ||
+        checkpointSealSources.size > 0 ||
+        [...inputPublications.values()].some((record) =>
+          record.hasReleaseObligations(),
+        ) ||
         options.readComponentCleanupPending() > 0 ||
         renderWatchHandle !== null
       )
@@ -1215,25 +2532,46 @@ export const createMarkdownRendererSessionResourceOwner = <
   }
   return Object.freeze({
     afterFrame,
+    bindDocumentAuthorityReceiver,
+    bindCheckpointSealSources,
     bindRenderWatchHandle,
     beginInstallation,
     beginRender,
     captureLastValidRender,
+    createOwnedInputPublication,
+    // Borrow the actual Native provider; its handle has failureCause, not an
+    // invented getFailures or a replacement document ticket issuer.
+    readNativeDocumentAuthority: () => documentRetirement?.source ?? null,
     captureRendererOwnedCheckpoint,
     prepareRendererOwnedCheckpoint,
     validatePreparedRendererOwnedCheckpoint,
     publishPreparedRendererOwnedCheckpoint,
     cancelPreparedRendererOwnedCheckpoint,
+    retireCheckpointAuthority,
+    runCheckpointAuthorityCallback,
+    onCheckpointActivated: () => {
+      retireCheckpointAuthority('activation')
+      checkpointDeactivated = false
+    },
+    onCheckpointDeactivated: () => {
+      retireCheckpointAuthority('deactivation')
+      checkpointDeactivated = true
+    },
+    sealPreparedRendererOwnedCheckpoint,
+    hasSealedRendererOwnedCheckpointCustody,
+    publishSealedRendererOwnedCheckpoint,
     clearTimer,
     cleanupComponentResources,
     disposeOnUnmount,
     inspectOwnedResources,
     isDisposed: () => disposed,
-    invalidate: () => {
-      generation += 1
-      cancelFrames()
-      captureLastValidRender()
-    },
+    invalidate: () =>
+      runCheckpointAuthorityCallback('source-invalidation', () => {
+        retireCheckpointAuthority('source-invalidation')
+        generation += 1
+        cancelFrames()
+        captureLastValidRender()
+      }),
     isCurrent,
     listenForAbort,
     participant,
@@ -1242,5 +2580,6 @@ export const createMarkdownRendererSessionResourceOwner = <
     scheduleFrame,
     setTimer,
     trackJob,
+    finalizeRenderJob,
   })
 }

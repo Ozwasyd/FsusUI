@@ -2,6 +2,28 @@
 'element-plus': minor
 ---
 
+Attribute Native input capture/allocation failures to the original source fixed before the call, preserving real source identity after reentrant teardown rather than reading a cleared current binding.
+
+Join scoped renderer input custody to the original f253 Native document ticket and real registration custody. Capture the original ticket before final guarded publication, use only its original pure custody checks, and preserve absent/stale/unmounted refusals without issuing a duplicate Native ticket or claiming full checkpoint recovery.
+
+Retain actual unsubscribe reentry failure/cause even when a receiver catches the exception and returns normally. Refuse removal until a separate real retry succeeds without reentry, preserving registration, history and view-release obligations.
+
+Wire the actual renderer request/adapter/unit/selected-viewport publications into the original pending pipeline caller-feed options. Keep viewport reads pure, publish observed selections in owned entries, and pass the original runtime/config authority without overrides. Record pending inherited dependency status and preserve all complete/native/live/recovery qualification refusals.
+
+Encapsulate renderer input values behind a frozen native customRef, reject stale ticket allocation after reentry, retry failed receiver releases through real cleanup, and safely observe supported native Promise callback rejections with original cause/attribution. Preserve unsupported results and pending cleanup obligations rather than releasing view references or claiming recovery.
+
+Publish actual renderer-owned immutable request/chunk inputs, frozen adapter descriptor identities and selected root/scroller identities through scoped same-owner retirement feeds. Expose exact readonly input refs, private custody checks, actual registrations/failures and the borrowed original Native provider; retain unowned external/platform state and all complete/native/live-seal qualification holds.
+
+Bind the original native document retirement receiver into the same renderer producer. Retain its actual release handle and failure cause, report known registration custody separately from unknown attempts, and attempt unsubscription with the original unmount batch while preserving failed records. Missing pipeline/policy/config feeds still refuse live/full seal.
+
+Fence the whole render/restore synchronous finalization before releasing the last real job, retaining live-reader/flag failures while attempting all owned final actions. Bind activity-flag cleanup to the original task, and fence current reads, invalidation's post-frame read and RAF resolution without creating replacement work or authority.
+
+Fence the original document read, selected cleanup, timer and IntersectionObserver callbacks with complete depth/catch/finally retirement. Preserve actual phase/resource/cause on failure, including clearTimer's retained handle, and refuse reentrant checkpoint capture during running cleanup without skipping the attempt-all batch.
+
+Retire the original renderer's prepared authority synchronously around owned projection/chunk writes, external callbacks, resource transitions, cleanup failures and activation/deactivation/unmount. Bind pending capture to the real private retirement generation, guard callback reentry and retain actual callback causes. Original document/pipeline tickets remain required before any live seal can be issued.
+
+Expose fail-closed renderer seal join ports with exact missing original document/pipeline revocation sources. Do not issue a live seal from captured-only custody; pure has/publish refuse and preserve old refs, pending custody and cleanup obligations.
+
 Add original-owner staged renderer checkpoint custody with non-invalidating preparation, exact-token private validation, callback-free local pointer publication and cancellation. Keep captured-only authority, complete:false, recoverable:false, nativeRecovery unavailable and full-host publication/restoration refusals explicit.
 
 Preserve cancellation selected during keyed-frame creation even while mounted: a late native accepted return cleans the exact original request instead of reviving it, and failed cleanup retains its real obligation without repeating a completed finalizer.

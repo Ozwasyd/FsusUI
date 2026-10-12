@@ -655,3 +655,358 @@ prepare, busy/native residue, callback throw/reentry, cancel, repeated publicati
 dispose, old-ref preservation and incomplete-host refusal cases are UNRUN. Static
 compilation does not lift runtime/test/list/native/security/receipt/authority or
 fixed-roster eviction holds.
+
+### Live seal join is unavailable
+
+The mounted owner exposes the requested seal join names as explicit refusal
+boundaries. It does not issue a live ticket from the existing captured-only pin.
+
+- `sealPreparedRendererOwnedCheckpoint(preparation)` compares the exact pending
+  token and private custody first. Invalid/stale/busy tokens return null. An
+  eligible local preparation throws
+  `markdown-renderer-checkpoint-seal-source-unavailable` with the original source
+  gaps below, before changing validation, pending/published refs or resources.
+- `hasSealedRendererOwnedCheckpointCustody(publication)` returns false: no
+  original live ticket issuer is available. It reads no caller object properties
+  or external state and cannot accept the old captured-only publication token.
+- `publishSealedRendererOwnedCheckpoint(publication)` returns null without any
+  callback, allocation, state/native write or fallback to local pin publication.
+  The old public ref, pending preparation and real cleanup custody remain intact.
+
+These are unsupported-source refusals, not successful seal implementations or
+future ticket-provider stubs. `sources.rendererCheckpointCustody.seal` remains
+`unavailable` and reports the same exact missing original producer sources.
+
+| Required original source                                                                                                                | Inspected current gap                                                                                                                                                                                                                                                                                                                            |
+| --------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Document/source authority ticket with synchronous revocation before identity, epoch, revision or source mutation and external callbacks | `MarkdownHeavyFeatureDocumentContext` exposes callback getters only. The renderer's Vue source watch covers reactive notifications, not arbitrary getter-owned mutations. There is no original private ticket or revocation subscription to acquire.                                                                                             |
+| Pipeline authority ticket with complete synchronous admission/control/worker/callback/cleanup revocation                                | The original runtime returns reactive views, `inspectResources`, pause and resume. Its `onDiagnostic` callback covers selected current diagnostics and can be suppressed; it is not a complete mutation/revocation feed. Worker/resource/control state also lives in non-reactive records. Reading its real census once cannot seal later state. |
+| Complete renderer projection/lifecycle/failed-cleanup ticket revocation                                                                 | The original renderer now retires its private prepared authority around owned writes/callbacks, lifecycle and observed failures, including real activation/deactivation hooks. Original document/pipeline tickets are still absent, and joining their complete revocation streams remains required before any live ticket can be issued.         |
+
+The original document and pipeline owners must supply their real private tickets
+and synchronous revocation channels before this renderer can bind them together
+with its owned projection/source/deactivation/unmount/cleanup-failure paths. Every
+external read, subscription and allocation must finish before its final private
+guard acquires the original ticket; final has/publish must consume only that ticket
+and private generation. This task does not add a second authority, caller-fed
+generation/eligibility option, diagnostic-watch substitute or metadata proof.
+Main/native/Writer/journal stores and all original A/B/C producers are unchanged.
+
+Existing 27313 custody methods retain their original limited behavior. A complete
+host join must stop at this refusal; local custody publication is not a substitute.
+No usage counter, paused/recoverable/full-host/native qualification is expanded.
+Refusal/token/getter/old-ref/cleanup preservation cases are source-inspected only;
+all runtime/test/list/native/security/receipt/authority/eviction cases stay UNRUN.
+
+### Original renderer retirement and upstream producer requests
+
+The existing renderer owner now keeps a private retirement generation separate
+from its render request generation. This is a real producer version, changed only
+by owned execution paths; it does not identify a document or certify another
+owner. Prepare captures it before source readers and rejects an observed retirement
+during capture. Seal preflight rejects a stale owned version, deactivated owner,
+observed failure residue or generation overflow before the upstream-source refusal.
+Overflow permanently holds sealing rather than allowing a wrapped version.
+
+Owned projection/chunk/state writes and external event/frame callbacks execute
+through the same owner's retirement boundary. It retires before the callback,
+tracks the real synchronous callback depth, retains original caught causes under
+`checkpoint-callback:*`, and retires again before leaving. A callback cannot capture
+or seal a transitional owned state. The current running callback entries contribute
+their actual control/memory subtotal; pending asynchronous work stays with its
+existing real jobs and underlying owners. No promise is declared settled by this
+synchronous boundary.
+
+Resource admission/settlement, render admission, invalidation, watch binding/stop,
+selected cleanup and its failures likewise retire before external calls. Cleanup
+still attempts the full original batch, retains failed handles/causes and rethrows.
+The SFC's actual source watch, activation reset, chunk refs, metrics callbacks and
+unmount entry use this same owner; actual Vue `onDeactivated` retires and closes
+seal eligibility, while `onActivated` retires again and never revives the old
+prepared version. Neither lifecycle hook claims native work stopped or recovered.
+Published checkpoint refs and actual cleanup custody remain held.
+
+The following inspected files belong to the original upstream owners and are not
+modified here. Blob identities refer to the current Renderer checkout, so newer
+original-owner source offers must provide their own exact commit/blob.
+
+| Original owner                  | Exact file/blob and current method                                                                                                                                                                                                                                                    | Minimum source request                                                                                                                                                                                                                                                                     |
+| ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Native Editor/transaction owner | `vue/packages/components/markdown-editor/src/markdown-editor.vue`, blob `c4651fccc5ce35ff7308db9993e34e5bebbfdc82`, `provideMarkdownHeavyFeatureDocumentContext`; `markdown-editor-transaction.ts`, blob `c05f57306200758536eb40cd61f680312d4ede8e`, `MarkdownEditorTransactionStore` | Supply a document/source authority ticket from the existing private transaction/native authority, with synchronous retirement before actual identity/epoch/revision/source mutation or external notifications. Bind it into the existing provided context; do not add a replacement store. |
+| Original context contract owner | `vue/packages/hooks/use-markdown-heavy-feature-lifecycle/index.ts`, C210 blob `c267bcfd52d42f28e811e68301ff06baaf63a96f`, `MarkdownHeavyFeatureDocumentContext`                                                                                                                       | Extend the real context with the original document-ticket acquisition/retirement channel supplied by that owner. Getter callbacks alone do not implement it.                                                                                                                               |
+| Original pipeline owner         | `vue/packages/hooks/use-render-pipeline/index.ts`, A928 blob `7a826df165df9ce9a3910d6f4ae8c64a0e15d27f`, `useFsusRenderPipelineRuntime`, `render`, `transitionControl`, worker callback/failure and cleanup paths                                                                     | Supply an original pipeline authority ticket whose complete synchronous retirement covers render admission, pause/resume/dispose, actual worker/callback/resource mutations and failures before external calls. `onDiagnostic` is not the acquisition/retirement channel.                  |
+
+For both suppliers, the minimum acquisition shape is an original opaque ticket
+plus a real synchronous retirement registration and owned release handle. Acquisition
+and original validation occur during renderer seal, before its final private guard;
+retirement must call this renderer's existing internal retirement receiver before
+producer mutation/observers. The renderer then uses only private version/custody
+in final has/publish, never an external callback or ticket getter. Registration and
+failed release must remain in their actual listener/resource census. These are
+requests to original suppliers, not callable APIs added by this task.
+
+This independent renderer portion is executable source, not a new eligibility
+option, timer, actor or metadata authority. Positive live seal and the full host
+join remain unavailable until the original suppliers are actually connected and
+reviewed. All runtime/qualification/authority/eviction holds remain. The new
+owned-version, callback reentry, failure, deactivate/reactivate and stale-prepare
+matrix is source-inspected only; executable cases remain UNRUN.
+
+The original document read inside `beginRender`, every selected cleanup action,
+the full timer callback and the full IntersectionObserver callback now enter the
+same depth/catch/finally boundary. Observer entry/iterator/dataset reads and native
+unobserve happen inside that boundary; later chunk activation alone is not the
+fence. Reentrant preparation rejects both actual callback depth and selected
+running cleanup records before source readers and at the final private guard.
+Failures retain the real reader/cleanup/handle/observer resource and original
+phase/cause. `clearTimer` deletes its actual handle only after native clear returns;
+its caught native cause is retained even for direct calls outside unmount.
+Selected cleanup still attempts the remaining actions after error, preserving
+the original single error or AggregateError and all original causes. These new
+counterexamples remain source-only/UNRUN; no positive live seal is issued.
+
+Render and restore now enter one actual finalization boundary before releasing
+their last owned job. The existing attempt-all batch settles that real job, checks
+the current document and performs owned activity-flag cleanup even if a prior
+action throws. Flag cleanup uses only the original task id, so it does not clear a
+newer request's flag or claim live document authority. Single/Aggregate errors and
+each real phase/resource/cause stay retained. `isCurrent` itself fences the actual
+document callback; invalidation fences its post-frame-cancellation document read;
+RAF fences handle release and resolution. The remaining activation finally has
+no following external read, and listener/keyed/cleanup releases already have their
+full controlled boundaries. Reentrant preparation stays refused after the last
+resource disappears until the whole synchronous phase actually exits. These
+final-reader/flag/throw/reentry cases remain source-only/UNRUN with all holds.
+
+### Original document retirement receiver consumption
+
+This composition inherits the complete necessary source/dependency postimages from
+Native offer `f2533351ddf729d797b372d8ee6eba85e2f4234b`, including its actual context
+provider, transaction implementation and session dependencies. These original
+files remain byte-exact; the renderer does not patch their generator or substitute
+the rejected `3de4` implementation. Bounded document/receiver source closure does
+not establish broader inherited-owner, runtime or complete roster qualification.
+
+The SFC passes its actual provided `documentAuthority` to the same renderer owner.
+At setup, the owner calls `subscribeRetirement` with its existing private
+`retireCheckpointAuthority` receiver. The original Native producer invokes this
+receiver synchronously before outermost writer external work. Nested writes stay
+under that same original producer; no second transaction/document authority is
+created. Receiver binding itself has a real installation/control fence and
+refuses reentrant binding, changed sources and unknown registration attempts.
+A returned late handle after unmount is released through the same original owner.
+
+The owner retains the real source and release handle. Its ordinary attempt-all
+unmount batch selects release separately from all other cleanup. Unsubscribe
+retires this renderer first; the handle is cleared only after original native
+unsubscribe returns and `hasCustody()` observes the actual registration gone.
+Throwing/retained release keeps the handle and exact cause in the original ledger;
+it cannot skip later cleanup or permit view reference release. No cleanup retries
+are represented as resource recovery. The original `failureCause()` remains
+visible independently from observed renderer causes.
+
+`sources.documentAuthorityRetirement` exposes the actual source/handle,
+registration knowledge, known retained listener subtotal and original failure
+cause. A confirmed retained registration contributes exactly one known retained
+listener; the actual held source/handle record contributes one logical memory
+unit. A failed registration without a returned handle remains an unknown attempt
+with its actual installation/error record and blocks release. Unknown attempts
+are preserved under `unknownUsage`, never submitted as complete attributed zero.
+Subscription alone is not a document ticket, live seal, paused state or full-host
+receipt. Existing pipeline, policy/config, native, resource and roster gaps still
+refuse live/full seal, with complete/recoverable unavailable.
+
+Binding/retirement/reentrant writer/late return/unsubscribe failure/retained cause/
+known and unknown census cases are inspected as source only. No runtime/test/list/
+native/security/receipt/authority/eviction qualification is executed or lifted.
+
+### Controlled renderer input publications
+
+`getPipelineInputSourceOffer()` exposes exact renderer-owned request, adapter
+descriptor, immutable chunk and selected viewport-reference input publications.
+Each entry contains its actual readonly Vue input ref and a scoped authority with
+`issueTicket`, `isCurrent`, `subscribe` and `getFailures`. These are publications
+in the existing renderer owner, not replacement pipeline or Native owners.
+
+A request is a frozen snapshot of the observed primitive render fields. The
+source watch publishes it after observing external props; it does not claim to
+retire before a parent prop write. Both the renderer job and pipeline read this
+same actual snapshot. Each chunk publication copies the original key, kind,
+authorized HTML, estimated size and HTML offsets into frozen records and a frozen
+array. Initial/full commits, reset, same-mounted restore and ordinary unmount
+replace or clear that exact private input. Adapter descriptor/worker policy
+identities are frozen; platform and callbacks' external dependencies remain
+unowned. Root ref callbacks and viewport selection publish the actual root and
+scroller identities, without certifying DOM/style/scroll/platform state or writes
+to an externally exposed ref.
+
+The existing retirement version invalidates private input tickets before
+publication replacement, clearing, lifecycle changes or external receiver calls.
+The private callback depth and notification guard prevent tickets during
+transitions or reentrant notification. Pure `isCurrent` reads only private
+identity/version/flags. Actual listener registrations, retained tickets, input
+record entries and original callback failures appear under
+`sources.rendererOwnedInputs`. Asynchronous callback results retain their actual value and attribution. Ordinary
+original native Promises are safely observed, including their original rejection
+cause; unsupported results keep observation unavailable. Both refuse input tickets
+rather than receiving a synthetic completion. Failed ref writes preserve their actual
+cause and refuse new tickets. Clearing supplies the actual empty input; it does
+not erase registrations, failed callbacks or their custody obligations.
+
+The offer borrows the actual same-context Native document provider directly. It
+retains the original `capture`, `hasCustody` and `subscribeRetirement` contract;
+Native handles supply `failureCause`, not an invented `getFailures` feed or a
+replacement document ticket. The original selected config ref is passed directly,
+without a computed override or replacement config publication.
+
+This source offer is `complete:false`. Pipeline caller-feed consumption remains
+with the original pipeline owner; absent consumer entries do not constitute a
+join. External props/nested mutable values, callback/platform behavior, Native
+failure history, DOM/scroll/resize state and uncontrolled config providers remain
+unowned. Live/full seal and complete pause/resume/recovery/eviction continue to
+refuse. Executable request/replace/clear/retire/reentry/failure/input identity cases
+require the original test-owner preflight; runtime/list/native/security/receipt
+and renderer/authority/eviction qualifications remain UNRUN/HOLD.
+
+### Input custody and receiver cleanup corrections
+
+The input is a frozen real Vue `customRef` with an own accessor that calls its
+original factory tracker. Its only value cell and trigger remain in the owner
+closure. The installed Vue customRef cache getter is shadowed before freezing;
+there is no public writable backing Ref or value cache. `toRaw(input)` returns
+that same protected ref, and its value setter refuses rather than mutating the
+publication. Request/chunk snapshots and the original Native provider are unchanged.
+
+Ticket issuance captures the private value and retirement generation before
+allocating a candidate. Allocation reentry cannot mint another ticket. A final
+private eligibility/value/generation guard runs before retaining the candidate; a
+replacement, clear, unmount or retirement during allocation returns null rather
+than attaching a stale value to a newer generation.
+
+A failed receiver remains registered and quarantined. Its release handle performs
+a real selected receiver retry; it never deletes quarantine as an acknowledgment.
+Pending or unsupported observation refuses release before retrying the callback.
+Only a synchronous successful retry with all supported observations actually
+settled removes the real registration and its matching release-ledger obligation.
+Original failure history stays retained. Ordinary unmount attempts every selected
+input subscription release in the existing cleanup batch, then uses private
+registration/observation custody to guard view release. It does not base release
+on an allocated public inspection snapshot.
+
+For an ordinary native Promise under the unchanged captured constructor/species,
+the captured intrinsic `then` checks the actual Promise brand before deriving a
+native observation Promise. Both original fulfillment/rejection handlers are
+installed synchronously. The actual derived Promise is awaited by an owned
+observer with rejection handling; observer processing failures cannot become
+unobserved derived rejections. Original rejection causes remain in `getFailures`
+and attributed failure/observation records. Unsupported subclass/foreign/callable
+thenable or constructor/species cases retain the original result and refuse
+without invoking a foreign then chain or allocating an unobserved derived Promise.
+
+`sources.rendererOwnedInputs` reports actual failed release obligations, pending
+owned observer tasks, original callback results, observer states and failure
+attribution. Public attribution uses subscription identities, without leaking
+mutable registration records. Settled and unsupported records remain retained;
+only real pending owned observers add known background tasks. No inferred
+transport/native cleanup or full pause/recovery acknowledgment is added.
+
+The previous a292 source review found two P1 and two P2 gaps despite static
+compilation passing. These corrections require independent source review and
+original counterexample authoring/preflight. Counterexamples, runtime/test/list,
+native/security/receipt/renderer/authority/eviction qualification remain UNRUN/HOLD.
+
+### Pending pipeline caller-feed integration
+
+The renderer WIP consumes the exact necessary index/policy/config dependency
+postimages of pipeline candidate `582035e658f2f53024c95b7bac757732750cf589`.
+This is a pending candidate composition, not acceptance of the original pipeline
+implementation or promotion of its qualification. Other owners' source is inherited
+without hand edits. The renderer supplies actual `sourceAuthority` and
+`adapterAuthority` alongside their exact owned request/adapter input refs.
+
+Virtual window creation follows runtime creation so its real `configAuthority`
+can be that runtime's original authority. This covers the renderer's budget
+projections through the original runtime/config/policy dependency relationship;
+the original selected config Ref is passed unchanged, without props overrides.
+The virtual options receive exact `unitsAuthority` and `viewportAuthority`
+from the same-owner publications. Its viewport getter only reads the already
+published `rendererViewportInput.input.value.scroller`; it does not retire, scan
+DOM or publish while the pipeline reads. Root ref callbacks, owned viewport settle
+and warmup measure entries perform the actual observed selection/publication.
+External DOM/style/topology mutation remains unowned.
+
+Original Native retirement still reaches that same owner through the actual f253
+subscription and invalidates its scoped publications. The separate source offer
+still borrows the actual original Native provider directly. No Native live ticket
+join or fabricated `getFailures` is added. Complete pause/recovery, positive
+live/full seal, fixed-roster completeness and session eviction remain refused.
+The changed hook initialization/unmount ordering and real caller subscriptions
+require original source review and exact case preflight; runtime/list/native/
+security/receipt/renderer/authority/eviction qualifications remain UNRUN/HOLD.
+
+### Caught release reentry remains an obligation
+
+A receiver that calls its own already-assigned unsubscribe while release is in
+progress can catch the rejection and return normally. The registration now keeps
+a sticky reentry flag and its original attempt cause before that rejection is
+thrown. The outer release checks this private attempt state after the actual
+receiver call, restores quarantine and throws that retained cause rather than
+removing the registration. The failure appears in the real history/attribution
+and matching cleanup ledger; listener/release custody and view-release holds stay.
+
+A later separate release attempt resets only the attempt flag, invokes the actual
+receiver again and still requires synchronous success, no new reentry and real
+observation settlement before removing the registration. Original failure history
+remains. Independent review closed the prior two P1 findings and ordinary native
+Promise P2, and found no added consumer issue in the five caller options/four
+exact pending pipeline postimages. This remaining synchronous-release correction
+requires its own source review; all counterexample/runtime/list/native/qualification
+holds stay UNRUN/HOLD. The upstream pipeline candidate's four P2 groups remain
+with its original owner and are not accepted by this consumer change.
+
+### Borrowed Native document custody on input tickets
+
+In the independent successor to the caught-release correction, a mounted renderer
+with the real f253 document provider captures that provider's original immutable
+ticket while issuing a scoped input ticket. The input candidate retains the exact
+original ticket; its document id/epoch/revision are never reconstructed or issued
+by the renderer. Allocation finishes before original registration/ticket custody
+is checked, followed by the renderer's final private value/generation guard.
+Null capture or changed/lost binding refuses issuance. Standalone input custody
+can have no Native ticket and does not claim Native document authority.
+
+Pure input `isCurrent` checks the held exact input token/version and the original
+f253 handle/ticket custody methods. It never captures or reacquires from that
+pure port. Cached issuance also refuses lost Native custody without refreshing
+an old pin. Real retirement and terminal close release the actual held ticket
+reference. `sources.rendererOwnedInputs.nativeDocumentTicket` exposes the actual
+borrowed ticket and adds one measured logical retained token reference while held.
+Observed capture failures retain their actual cause; no Native `getFailures`
+contract, duplicate document issuer or native cleanup/recovery acknowledgment is
+created. Original SourceOwner subscriptions and epoch-safe invalidation remain.
+
+This is a document-continuity join for scoped input custody only. Full checkpoint
+sealing still needs a checkpoint-bound complete pipeline/resource/native refset
+and qualified restoration/reversal. The local source composition now consumes the independently closed original
+Renderer `5b94aeb45d4759d819f5bc475f20a4af8c772c84`, including its exact accepted
+pipeline, policy, config and worker dependencies. Its original checkpoint-bound
+seal owner is wired to the real pipeline and selected viewport authorities in
+the same mounted SFC; failed setup attempts original owner disposal while
+preserving the primary setup failure and cleanup obligations. This is a bounded
+Renderer checkpoint/source join. Full-host authority/refsets and restoration
+after disposal remain unavailable; `complete` and `recoverable` stay false and
+this source does not authorize session eviction. The new local combination
+preserves the public native document bridge and ResizeSeparator source exactly
+and still requires independent composite review.
+Neither a scoped Native input ticket nor static compilation qualifies pause,
+full/live seal, restoration or session eviction. Independent source review and
+all original counterexample/runtime/list/native/qualification holds remain.
+
+Native input issuance fixes its original binding/source before capture and candidate
+allocation. Capture, custody or allocation failure is attributed to that same
+source even if reentrant teardown has already released the current binding. The
+original cause and pure custody/refusal behavior remain unchanged. The remaining
+owner/SFC catch sites were checked for the same current-owner lookup: async
+observers use fixed source/registration arguments; selected cleanup and watch,
+frame, timer, observer and installation failures use captured resources/tokens.
+No additional instance of that attribution pattern was found.
