@@ -1,9 +1,16 @@
 import { inject, provide } from 'vue'
+import {
+  hasMarkdownHeavyFeatureOwnedResources,
+  requestMarkdownHeavyFeatureResourceCancellation,
+} from '../../wasm/markdown-heavy-feature-resource'
 
 import type { InjectionKey } from 'vue'
 import type {
   MarkdownHeavyFeatureAdapterResources,
   MarkdownHeavyFeatureResourceCount,
+  MarkdownHeavyFeatureResourceFailure,
+  MarkdownHeavyFeatureCancellationRequest,
+  MarkdownHeavyFeatureFrameProviderObservation,
 } from '../../wasm/markdown-heavy-feature-resource'
 
 export const MARKDOWN_HEAVY_FEATURE_KINDS = Object.freeze([
@@ -53,6 +60,7 @@ export interface MarkdownHeavyFeatureLifecycleMetrics {
   readonly retainedResources: number
   readonly retainedRuntimes: number
   readonly retainedTasks: number
+  readonly retainedFrameProviders?: number
   readonly staleCommits: number
   readonly staticNodes: number
   readonly teardowns: number
@@ -62,16 +70,22 @@ export interface MarkdownHeavyFeatureLifecycleMetrics {
 export interface MarkdownHeavyFeatureResources extends MarkdownHeavyFeatureAdapterResources {}
 
 export interface MarkdownHeavyFeatureResourceInspection {
+  readonly frameProviders?: readonly MarkdownHeavyFeatureFrameProviderObservation[]
   readonly admission: 'open' | 'paused' | 'disposed'
-  readonly networkCancellation: 'unavailable'
+  readonly networkCancellation: 'available' | 'partial' | 'unavailable'
   readonly resumeAdmissionAvailable: boolean
   readonly scope: 'owned-handles'
-  readonly timerCancellation: 'unavailable'
+  readonly timerCancellation: 'available' | 'partial' | 'unavailable'
+  readonly failures: readonly MarkdownHeavyFeatureResourceFailure[]
   readonly usage: Readonly<{
     listeners: number
     networkRequests: MarkdownHeavyFeatureResourceCount
     observers: number
     pendingImports: number
+    pendingRequests: number
+    pendingInstallations: number
+    ownedTimers: number
+    ownedRequests: number
     runtimes: number
     scheduledContinuations: number
     tasks: number
@@ -96,6 +110,9 @@ export interface MarkdownHeavyFeatureActivation<T> {
 export interface MarkdownHeavyFeatureLifecycle {
   activate: <T>(input: MarkdownHeavyFeatureActivation<T>) => Promise<boolean>
   dispose: () => void
+  cancelOwnedTimers: () => MarkdownHeavyFeatureCancellationRequest
+  cancelOwnedRequests: () => MarkdownHeavyFeatureCancellationRequest
+  cancelOwnedContinuations: () => MarkdownHeavyFeatureCancellationRequest
   inspectResources: () => MarkdownHeavyFeatureResourceInspection
   metrics: () => MarkdownHeavyFeatureLifecycleMetrics
   mountStatic: (input: {
@@ -142,6 +159,9 @@ interface ResourceRecord {
   awaitPending: boolean
   resources: Partial<MarkdownHeavyFeatureResources>
   unobservedWork: boolean
+  failures: MarkdownHeavyFeatureResourceFailure[]
+  externalAbortAttached: boolean
+  externalAbortInstalling: boolean
 }
 
 const identityParts = (identity: MarkdownHeavyFeatureIdentity) => [
@@ -194,7 +214,10 @@ const normalizeResources = (
   scheduledContinuations: normalizeResourceCount(
     resources?.scheduledContinuations,
   ),
+  pendingRequests: normalizeResourceCount(resources?.pendingRequests),
+  pendingInstallations: normalizeResourceCount(resources?.pendingInstallations),
   tasks: normalizeResourceCount(resources?.tasks),
+  frameProvider: resources?.frameProvider,
 })
 
 const EMPTY_RESOURCES: MarkdownHeavyFeatureResources = Object.freeze({
@@ -240,6 +263,7 @@ export const createMarkdownHeavyFeatureLifecycle = (
   const cache = new Map<string, CacheEntry>()
   const nodes = new Map<string, NodeRecord>()
   const resourceRecords = new Set<ResourceRecord>()
+  const cancellationFailures: MarkdownHeavyFeatureResourceFailure[] = []
   // Once unobservable work has escaped an owner, settlement or disposal cannot
   // prove a zero timer/network census. Retain uncertainty without retaining DOM.
   let retiredTimers: MarkdownHeavyFeatureResourceCount = 0
@@ -280,7 +304,13 @@ export const createMarkdownHeavyFeatureLifecycle = (
     return a + b
   }
   const pruneReleasedResource = (record: ResourceRecord) => {
-    if (!record.released || record.awaitPending) return
+    if (
+      !record.released ||
+      record.awaitPending ||
+      record.externalAbortAttached ||
+      record.externalAbortInstalling
+    )
+      return
     const resources = normalizeResources(record.resources)
     if (
       resources.listeners ||
@@ -288,7 +318,13 @@ export const createMarkdownHeavyFeatureLifecycle = (
       resources.runtimes ||
       resources.tasks ||
       resources.pendingImports ||
-      resources.scheduledContinuations
+      resources.scheduledContinuations ||
+      resources.pendingRequests ||
+      resources.pendingInstallations ||
+      (resources.frameProvider &&
+        hasMarkdownHeavyFeatureOwnedResources(resources)) ||
+      record.failures.length ||
+      record.resources.failures?.length
     )
       return
     const timers = readUnobservableCount(record, 'timers')
@@ -302,13 +338,45 @@ export const createMarkdownHeavyFeatureLifecycle = (
     resourceRecords.delete(record)
   }
 
+  const removeExternalAbort = (record: NodeRecord) => {
+    if (
+      record.resourceRecord.externalAbortInstalling ||
+      !record.removeExternalAbort
+    )
+      return
+    const remove = record.removeExternalAbort
+    try {
+      remove()
+      if (record.removeExternalAbort === remove) {
+        record.removeExternalAbort = undefined
+        record.resourceRecord.externalAbortAttached = false
+      }
+    } catch (cause) {
+      record.resourceRecord.failures.push(
+        Object.freeze({
+          operation: 'external-abort-remove',
+          resource: remove,
+          cause,
+        }),
+      )
+    }
+  }
   const releaseActiveResource = (record: NodeRecord) => {
-    record.removeExternalAbort?.()
-    record.removeExternalAbort = undefined
+    removeExternalAbort(record)
     const teardown = record.teardown
     record.teardown = undefined
     record.resourceRecord.released = true
-    teardown?.()
+    try {
+      teardown?.()
+    } catch (cause) {
+      record.resourceRecord.failures.push(
+        Object.freeze({
+          operation: 'activation-teardown',
+          resource: record.resourceRecord,
+          cause,
+        }),
+      )
+    }
     pruneReleasedResource(record.resourceRecord)
   }
 
@@ -319,7 +387,17 @@ export const createMarkdownHeavyFeatureLifecycle = (
     record.controller = null
     if (controller && !controller.signal.aborted) {
       aborts += 1
-      controller.abort()
+      try {
+        controller.abort()
+      } catch (cause) {
+        record.resourceRecord.failures.push(
+          Object.freeze({
+            operation: 'lifecycle-abort',
+            resource: controller,
+            cause,
+          }),
+        )
+      }
     }
     releaseActiveResource(record)
     teardowns += 1
@@ -367,6 +445,9 @@ export const createMarkdownHeavyFeatureLifecycle = (
       awaitPending: false,
       resources,
       unobservedWork: false,
+      failures: [],
+      externalAbortAttached: false,
+      externalAbortInstalling: false,
     }
     const record: NodeRecord = {
       controller,
@@ -409,18 +490,35 @@ export const createMarkdownHeavyFeatureLifecycle = (
       }
     }
     const abort = () => discardIfCurrent()
-    input.signal?.addEventListener('abort', abort, { once: true })
     if (input.signal) {
       record.removeExternalAbort = () =>
         input.signal?.removeEventListener('abort', abort)
-    }
-    if (input.signal?.aborted) {
-      discardIfCurrent()
-      input.signal.removeEventListener('abort', abort)
-      return false
+      resourceRecord.externalAbortAttached = true
     }
 
     try {
+      if (input.signal) {
+        resourceRecord.externalAbortInstalling = true
+        try {
+          input.signal.addEventListener('abort', abort, { once: true })
+        } catch (cause) {
+          resourceRecord.failures.push(
+            Object.freeze({
+              operation: 'external-abort-install',
+              resource: input.signal,
+              cause,
+            }),
+          )
+          throw cause
+        } finally {
+          resourceRecord.externalAbortInstalling = false
+        }
+        if (resourceRecord.released) removeExternalAbort(record)
+        if (input.signal.aborted) {
+          discardIfCurrent()
+          return false
+        }
+      }
       resourceRecord.removeResourceChange = resources.subscribe?.(() => {
         pruneReleasedResource(resourceRecord)
         notifyMetricsChange()
@@ -527,8 +625,8 @@ export const createMarkdownHeavyFeatureLifecycle = (
       discardIfCurrent()
       throw error
     } finally {
-      record.removeExternalAbort?.()
-      record.removeExternalAbort = undefined
+      removeExternalAbort(record)
+      pruneReleasedResource(resourceRecord)
       if (record.controller === controller) record.controller = null
     }
   }
@@ -569,6 +667,9 @@ export const createMarkdownHeavyFeatureLifecycle = (
         awaitPending: false,
         resources: EMPTY_RESOURCES,
         unobservedWork: false,
+        failures: [],
+        externalAbortAttached: false,
+        externalAbortInstalling: false,
       },
       state: 'static-mounted',
       tornDown: false,
@@ -605,17 +706,19 @@ export const createMarkdownHeavyFeatureLifecycle = (
     let retainedObservers = 0
     let retainedRuntimes = 0
     let retainedTasks = 0
+    let retainedFrameProviders = 0
     for (const record of nodes.values()) {
       if (record.state === 'active-work') {
         activeNodes += 1
-        retainedListeners += record.removeExternalAbort ? 1 : 0
       } else staticNodes += 1
     }
     for (const record of resourceRecords) {
       const resources = normalizeResources(record.resources)
       retainedListeners += resources.listeners
+      retainedListeners += record.externalAbortAttached ? 1 : 0
       retainedObservers += resources.observers
       retainedRuntimes += resources.runtimes
+      if (resources.frameProvider) retainedFrameProviders += 1
       // The lifecycle await and adapter work are independently held tasks.
       retainedTasks += (record.awaitPending ? 1 : 0) + resources.tasks
     }
@@ -633,9 +736,11 @@ export const createMarkdownHeavyFeatureLifecycle = (
         retainedListeners +
         retainedObservers +
         retainedRuntimes +
-        retainedTasks,
+        retainedTasks +
+        retainedFrameProviders,
       retainedRuntimes,
       retainedTasks,
+      retainedFrameProviders,
       staleCommits,
       staticNodes,
       teardowns,
@@ -649,7 +754,21 @@ export const createMarkdownHeavyFeatureLifecycle = (
     let networkRequests = retiredNetworkRequests
     let pendingImports = 0
     let scheduledContinuations = 0
+    let pendingRequests = 0
+    let pendingInstallations = 0
+    let ownedTimers = 0
+    let ownedRequests = 0
+    const failures: MarkdownHeavyFeatureResourceFailure[] = [
+      ...cancellationFailures,
+    ]
+    const frameProviders: MarkdownHeavyFeatureFrameProviderObservation[] = []
+    let timerProviders = 0
+    let requestProviders = 0
+    let missingTimerProvider = retiredTimers !== 0
+    let missingRequestProvider = retiredNetworkRequests !== 0
     for (const record of resourceRecords) {
+      if (record.resources.frameProvider)
+        frameProviders.push(record.resources.frameProvider)
       timers = addCounts(timers, readUnobservableCount(record, 'timers'))
       networkRequests = addCounts(
         networkRequests,
@@ -659,23 +778,81 @@ export const createMarkdownHeavyFeatureLifecycle = (
       scheduledContinuations += normalizeResourceCount(
         record.resources.scheduledContinuations,
       )
+      pendingRequests += normalizeResourceCount(
+        record.resources.pendingRequests,
+      )
+      pendingInstallations += normalizeResourceCount(
+        record.resources.pendingInstallations,
+      )
+      pendingInstallations += record.externalAbortInstalling ? 1 : 0
+      ownedTimers += normalizeResourceCount(record.resources.ownedTimers)
+      ownedRequests += normalizeResourceCount(record.resources.ownedRequests)
+      failures.push(...record.failures, ...(record.resources.failures ?? []))
+      if (record.resources.cancelTimers) timerProviders += 1
+      else if (readUnobservableCount(record, 'timers') !== 0)
+        missingTimerProvider = true
+      if (record.resources.cancelRequests) requestProviders += 1
+      else if (readUnobservableCount(record, 'networkRequests') !== 0)
+        missingRequestProvider = true
     }
     return Object.freeze({
       admission: disposed ? 'disposed' : paused ? 'paused' : 'open',
-      networkCancellation: 'unavailable',
+      networkCancellation: requestProviders
+        ? typeof networkRequests === 'number' &&
+          !missingRequestProvider &&
+          failures.length === 0
+          ? 'available'
+          : 'partial'
+        : 'unavailable',
       resumeAdmissionAvailable: !disposed,
       scope: 'owned-handles',
-      timerCancellation: 'unavailable',
+      timerCancellation: timerProviders
+        ? typeof timers === 'number' &&
+          !missingTimerProvider &&
+          failures.length === 0
+          ? 'available'
+          : 'partial'
+        : 'unavailable',
+      failures: Object.freeze([...new Set(failures)]),
+      frameProviders: Object.freeze(frameProviders),
       usage: Object.freeze({
         listeners: local.retainedListeners,
         networkRequests,
         observers: local.retainedObservers,
         pendingImports,
+        pendingRequests,
+        pendingInstallations,
+        ownedTimers,
+        ownedRequests,
         runtimes: local.retainedRuntimes,
         scheduledContinuations,
         tasks: local.retainedTasks,
         timers,
       }),
+    })
+  }
+
+  const requestCancellation = (
+    kind: 'timers' | 'requests' | 'continuations',
+  ) => {
+    const snapshot = [...resourceRecords]
+    const result = requestMarkdownHeavyFeatureResourceCancellation(
+      snapshot.map((record) => record.resources),
+      kind,
+    )
+    cancellationFailures.push(...result.failures)
+    for (const record of snapshot) pruneReleasedResource(record)
+    notifyMetricsChange()
+    return Object.freeze({
+      ...result,
+      unavailable: Boolean(
+        result.unavailable ||
+        (kind === 'timers'
+          ? retiredTimers !== 0
+          : kind === 'requests'
+            ? retiredNetworkRequests !== 0
+            : false),
+      ),
     })
   }
 
@@ -713,6 +890,9 @@ export const createMarkdownHeavyFeatureLifecycle = (
   return Object.freeze({
     activate,
     dispose,
+    cancelOwnedTimers: () => requestCancellation('timers'),
+    cancelOwnedRequests: () => requestCancellation('requests'),
+    cancelOwnedContinuations: () => requestCancellation('continuations'),
     inspectResources,
     metrics,
     mountStatic,
@@ -743,7 +923,9 @@ export interface MarkdownHeavyFeatureDocumentAuthority {
   capture(): MarkdownHeavyFeatureDocumentAuthorityTicket | null
   /** Original private producer continuity only; no external read/callback/allocation. */
   hasCustody(ticket: MarkdownHeavyFeatureDocumentAuthorityTicket): boolean
-  subscribeRetirement(receiver: () => void): MarkdownHeavyFeatureDocumentAuthorityRetirementHandle
+  subscribeRetirement(
+    receiver: () => void,
+  ): MarkdownHeavyFeatureDocumentAuthorityRetirementHandle
 }
 
 export interface MarkdownHeavyFeatureDocumentContext {

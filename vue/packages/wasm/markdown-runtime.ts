@@ -31,6 +31,13 @@ import type {
 import type {
   MarkdownHeavyFeatureIsolatedRenderFactory,
   MarkdownHeavyFeatureIsolatedRenderRequest,
+  MarkdownHeavyFeatureAdapterResourceOwner,
+  MarkdownHeavyFeatureAdapterResources,
+} from './markdown-heavy-feature-resource'
+import {
+  assertMarkdownHeavyFeatureAdapterResourceBridge,
+  createMarkdownHeavyFeatureAdapterResourceBridge,
+  createMarkdownHeavyFeatureAdapterResourceOwner,
 } from './markdown-heavy-feature-resource'
 import type {
   FsusErrorCode,
@@ -639,6 +646,9 @@ interface MarkdownHeavyFeatureIdentity {
 }
 
 interface MarkdownHeavyFeatureLifecycle {
+  readonly inspectResources?: () => Readonly<{
+    admission: 'open' | 'paused' | 'disposed'
+  }>
   readonly activate: <T>(input: {
     readonly commit: (
       value: T,
@@ -681,6 +691,7 @@ export interface MarkdownFeatureThemeTokens {
 
 export interface MarkdownFeatureRenderContext {
   readonly signal?: AbortSignal
+  readonly resourceOwner?: MarkdownHeavyFeatureAdapterResourceOwner
   readonly theme: MarkdownFeatureActivationTheme
   readonly tokens: Readonly<MarkdownFeatureThemeTokens>
 }
@@ -692,6 +703,7 @@ export interface MarkdownFeatureActivationOptions {
   features?: MarkdownFeatureActivationFeatureOptions
   root: ParentNode
   signal?: AbortSignal
+  resourceOwner?: MarkdownHeavyFeatureAdapterResourceOwner
 }
 
 interface MarkdownHeavyFeatureActivationOptions extends MarkdownFeatureActivationOptions {
@@ -721,13 +733,93 @@ type MarkdownFeatureOutputGateway = Readonly<{
   ) => HTMLElement
 }>
 
+// These allocations belong to this runtime realm, not the requesting node.
+// Consumers borrow observations and never receive shared cancellation rights.
+const sharedLoaderOwner = createMarkdownHeavyFeatureAdapterResourceOwner()
+const loaderAllocations = new Map<string, number>()
+const loaderCacheHits = new Map<string, number>()
+const pendingLoaderWork = new Set<Promise<unknown>>()
+let externalMermaidObserved = false
+const requireFeatureAdmission = (
+  owner?: MarkdownHeavyFeatureAdapterResourceOwner,
+  signal?: AbortSignal,
+) => {
+  if (signal?.aborted || (owner && !owner.acceptsWork())) {
+    throw new DOMException('Aborted', 'AbortError')
+  }
+}
+const cacheHit = (key: string) =>
+  loaderCacheHits.set(key, (loaderCacheHits.get(key) ?? 0) + 1)
+const allocateLoader = <T>(key: string, load: () => Promise<T>) =>
+  sharedLoaderOwner.loadImport(() => {
+    loaderAllocations.set(key, (loaderAllocations.get(key) ?? 0) + 1)
+    return load()
+  })
+const trackLoaderWork = <T>(kind: string, promise: Promise<T>) => {
+  pendingLoaderWork.add(promise)
+  const settle = () => pendingLoaderWork.delete(promise)
+  void promise.then(settle, (cause) => {
+    sharedLoaderOwner.retainFailure(kind, promise, cause)
+    settle()
+  })
+  return promise
+}
+const borrowLoader = async <T>(
+  promise: Promise<T>,
+  owner?: MarkdownHeavyFeatureAdapterResourceOwner,
+  signal?: AbortSignal,
+) => {
+  requireFeatureAdmission(owner, signal)
+  const observed = owner ? owner.observeImport(promise) : promise
+  requireFeatureAdmission(owner, signal)
+  const value = await observed
+  requireFeatureAdmission(owner, signal)
+  return value
+}
+export const inspectMarkdownHeavyFeatureRuntimeLoaders = () => {
+  const resources = sharedLoaderOwner.resources
+  return Object.freeze({
+    scope: 'realm-shared-loaders' as const,
+    allocations: Object.freeze(Object.fromEntries(loaderAllocations)),
+    cacheHits: Object.freeze(Object.fromEntries(loaderCacheHits)),
+    pendingLoaderWork: pendingLoaderWork.size,
+    externalMermaidObserved,
+    // No cancel functions or shared owner are exposed to a consumer.
+    resources: Object.freeze({
+      scope: 'owned-handles' as const,
+      listeners: resources.listeners,
+      observers: resources.observers,
+      runtimes: resources.runtimes,
+      tasks: resources.tasks + pendingLoaderWork.size,
+      pendingImports: resources.pendingImports ?? 0,
+      pendingRequests: resources.pendingRequests ?? 0,
+      networkRequests: externalMermaidObserved
+        ? ('unknown' as const)
+        : (resources.networkRequests ?? 'unknown'),
+      timers: externalMermaidObserved
+        ? ('unknown' as const)
+        : (resources.timers ?? 'unknown'),
+      failures: resources.failures ?? [],
+      subscribe: resources.subscribe,
+    } satisfies MarkdownHeavyFeatureAdapterResources),
+  })
+}
+
 let markdownFeatureOutputGatewayPromise: Promise<MarkdownFeatureOutputGateway> | null =
   null
 
-const loadMarkdownFeatureOutputGateway = () => {
-  markdownFeatureOutputGatewayPromise ??=
-    import('./markdown-feature-output-gateway')
-  return markdownFeatureOutputGatewayPromise
+const loadMarkdownFeatureOutputGateway = (
+  owner?: MarkdownHeavyFeatureAdapterResourceOwner,
+  signal?: AbortSignal,
+) => {
+  requireFeatureAdmission(owner, signal)
+  if (markdownFeatureOutputGatewayPromise) cacheHit('gateway')
+  else
+    markdownFeatureOutputGatewayPromise = allocateLoader(
+      'gateway',
+      () => import('./markdown-feature-output-gateway'),
+    )
+  return borrowLoader(markdownFeatureOutputGatewayPromise, owner, signal)
 }
 
 const defaultMarkdownFeatureOptions: Required<MarkdownFeatureActivationFeatureOptions> =
@@ -1122,7 +1214,12 @@ type ShikiRuntime = {
     source: string,
     options: ShikiRenderOptions,
   ) => string | Promise<string>
-  ensureLoaded?: (language: string, theme: string) => Promise<void>
+  ensureLoaded?: (
+    language: string,
+    theme: string,
+    owner?: MarkdownHeavyFeatureAdapterResourceOwner,
+    signal?: AbortSignal,
+  ) => Promise<void>
 }
 
 type ShikiHighlighter = {
@@ -1156,27 +1253,45 @@ const resolveDefaultModule = <T>(module: T | { default?: T }) =>
 
 let mermaidRuntimePromise: Promise<MermaidRuntime> | null = null
 
-const loadMermaidRuntime = async () => {
+const loadMermaidRuntime = async (
+  owner?: MarkdownHeavyFeatureAdapterResourceOwner,
+  signal?: AbortSignal,
+) => {
+  requireFeatureAdmission(owner, signal)
   const globalMermaid = (globalThis as GlobalMermaidRuntime).mermaid
   if (globalMermaid) {
+    externalMermaidObserved = true
+    cacheHit('global-mermaid')
     return resolveDefaultModule<MermaidRuntime>(globalMermaid)
   }
 
-  mermaidRuntimePromise ??= import('mermaid').then((module) =>
-    resolveDefaultModule<MermaidRuntime>(
-      module as unknown as MermaidRuntime | { default?: MermaidRuntime },
-    ),
-  )
+  if (mermaidRuntimePromise) cacheHit('mermaid')
+  else
+    mermaidRuntimePromise = trackLoaderWork(
+      'mermaid-runtime',
+      allocateLoader('mermaid', () => import('mermaid')).then((module) =>
+        resolveDefaultModule<MermaidRuntime>(
+          module as unknown as MermaidRuntime | { default?: MermaidRuntime },
+        ),
+      ),
+    )
 
-  return mermaidRuntimePromise
+  return borrowLoader(mermaidRuntimePromise, owner, signal)
 }
 
-const loadKatexRuntime = async () =>
-  resolveDefaultModule<KatexRuntime>(
-    (await import('katex')) as unknown as
-      | KatexRuntime
-      | { default?: KatexRuntime },
+const loadKatexRuntime = async (
+  owner?: MarkdownHeavyFeatureAdapterResourceOwner,
+  signal?: AbortSignal,
+) => {
+  requireFeatureAdmission(owner, signal)
+  return resolveDefaultModule<KatexRuntime>(
+    (await borrowLoader(
+      allocateLoader('katex', () => import('katex')),
+      owner,
+      signal,
+    )) as unknown as KatexRuntime | { default?: KatexRuntime },
   )
+}
 
 const shikiLanguageLoaders: Record<string, () => Promise<unknown>> = {
   bash: () => import('shiki/dist/langs/bash.mjs'),
@@ -1190,85 +1305,113 @@ const shikiThemeLoaders: Record<string, () => Promise<unknown>> = {
 }
 let shikiRuntimePromise: Promise<ShikiRuntime> | null = null
 
-const loadShikiRuntime = async () => {
-  shikiRuntimePromise ??= (async () => {
-    const [coreModule, engineModule] = await Promise.all([
-      import('shiki/core'),
-      import('shiki/engine/javascript'),
-    ])
-    const { createHighlighterCore } = resolveDefaultModule<ShikiCoreModule>(
-      coreModule as ShikiCoreModule,
-    )
-    const { createJavaScriptRegexEngine } =
-      resolveDefaultModule<ShikiJavaScriptEngineModule>(
-        engineModule as ShikiJavaScriptEngineModule,
-      )
-    if (!createHighlighterCore || !createJavaScriptRegexEngine) {
-      throw createMarkdownRuntimeError('infra', 'shiki_runtime_unavailable')
-    }
-    const highlighter = await createHighlighterCore({
-      engine: createJavaScriptRegexEngine(),
-      langs: [],
-      themes: [],
-    })
-    const loadedLanguages = new Set<string>()
-    const loadedThemes = new Set<string>()
-    const pendingLanguages = new Map<string, Promise<void>>()
-    const pendingThemes = new Map<string, Promise<void>>()
-    const loadOne = async (
-      key: string,
-      loaders: Record<string, () => Promise<unknown>>,
-      loaded: Set<string>,
-      pending: Map<string, Promise<void>>,
-      apply: ((...values: unknown[]) => Promise<void>) | undefined,
-    ) => {
-      if (loaded.has(key) || !apply) return
-      const loader = loaders[key]
-      if (!loader) return
-      let promise = pending.get(key)
-      if (!promise) {
-        promise = loader()
-          .then((module) => {
-            const value = (module as { default?: unknown }).default ?? module
-            return apply(...(Array.isArray(value) ? value : [value]))
-          })
-          .then(() => {
-            loaded.add(key)
-            pending.delete(key)
-          })
-          .catch((error) => {
-            pending.delete(key)
-            throw error
-          })
-        pending.set(key, promise)
-      }
-      await promise
-    }
-
-    return {
-      codeToHtml: (source, options) => highlighter.codeToHtml(source, options),
-      ensureLoaded: async (language, theme) => {
-        await Promise.all([
-          loadOne(
-            language,
-            shikiLanguageLoaders,
-            loadedLanguages,
-            pendingLanguages,
-            highlighter.loadLanguage?.bind(highlighter),
-          ),
-          loadOne(
-            theme,
-            shikiThemeLoaders,
-            loadedThemes,
-            pendingThemes,
-            highlighter.loadTheme?.bind(highlighter),
+const loadShikiRuntime = async (
+  owner?: MarkdownHeavyFeatureAdapterResourceOwner,
+  signal?: AbortSignal,
+) => {
+  requireFeatureAdmission(owner, signal)
+  if (shikiRuntimePromise) cacheHit('shiki-runtime')
+  else
+    shikiRuntimePromise = trackLoaderWork(
+      'shiki-runtime-initialization',
+      (async () => {
+        const [coreModule, engineModule] = await Promise.all([
+          allocateLoader('shiki-core', () => import('shiki/core')),
+          allocateLoader(
+            'shiki-engine',
+            () => import('shiki/engine/javascript'),
           ),
         ])
-      },
-    }
-  })()
+        const { createHighlighterCore } = resolveDefaultModule<ShikiCoreModule>(
+          coreModule as ShikiCoreModule,
+        )
+        const { createJavaScriptRegexEngine } =
+          resolveDefaultModule<ShikiJavaScriptEngineModule>(
+            engineModule as ShikiJavaScriptEngineModule,
+          )
+        if (!createHighlighterCore || !createJavaScriptRegexEngine) {
+          throw createMarkdownRuntimeError('infra', 'shiki_runtime_unavailable')
+        }
+        const highlighter = await createHighlighterCore({
+          engine: createJavaScriptRegexEngine(),
+          langs: [],
+          themes: [],
+        })
+        const loadedLanguages = new Set<string>()
+        const loadedThemes = new Set<string>()
+        const pendingLanguages = new Map<string, Promise<void>>()
+        const pendingThemes = new Map<string, Promise<void>>()
+        const loadOne = async (
+          key: string,
+          loaders: Record<string, () => Promise<unknown>>,
+          loaded: Set<string>,
+          pending: Map<string, Promise<void>>,
+          apply: ((...values: unknown[]) => Promise<void>) | undefined,
+          consumer?: MarkdownHeavyFeatureAdapterResourceOwner,
+          consumerSignal?: AbortSignal,
+        ) => {
+          requireFeatureAdmission(consumer, consumerSignal)
+          if (loaded.has(key)) {
+            cacheHit(`shiki-loaded:${key}`)
+            return
+          }
+          if (!apply) return
+          const loader = loaders[key]
+          if (!loader) return
+          let promise = pending.get(key)
+          if (!promise) {
+            promise = trackLoaderWork(
+              `shiki-apply:${key}`,
+              allocateLoader(`shiki-module:${key}`, loader)
+                .then((module) => {
+                  const value =
+                    (module as { default?: unknown }).default ?? module
+                  return apply(...(Array.isArray(value) ? value : [value]))
+                })
+                .then(() => {
+                  loaded.add(key)
+                  if (pending.get(key) === promise) pending.delete(key)
+                })
+                .catch((error) => {
+                  if (pending.get(key) === promise) pending.delete(key)
+                  throw error
+                }),
+            )
+            pending.set(key, promise)
+          } else cacheHit(`shiki-pending:${key}`)
+          await borrowLoader(promise, consumer, consumerSignal)
+        }
 
-  return shikiRuntimePromise
+        return {
+          codeToHtml: (source, options) =>
+            highlighter.codeToHtml(source, options),
+          ensureLoaded: async (language, theme, consumer, consumerSignal) => {
+            await Promise.all([
+              loadOne(
+                language,
+                shikiLanguageLoaders,
+                loadedLanguages,
+                pendingLanguages,
+                highlighter.loadLanguage?.bind(highlighter),
+                consumer,
+                consumerSignal,
+              ),
+              loadOne(
+                theme,
+                shikiThemeLoaders,
+                loadedThemes,
+                pendingThemes,
+                highlighter.loadTheme?.bind(highlighter),
+                consumer,
+                consumerSignal,
+              ),
+            ])
+          },
+        } satisfies ShikiRuntime
+      })(),
+    )
+
+  return borrowLoader(shikiRuntimePromise, owner, signal)
 }
 
 let markdownMermaidRenderId = 0
@@ -1317,7 +1460,11 @@ const renderMermaidFeature = async (
   source: string,
   context: MarkdownFeatureRenderContext,
 ): Promise<FeatureRenderOutput> => {
-  const mermaid = await loadMermaidRuntime()
+  const mermaid = await loadMermaidRuntime(
+    context.resourceOwner,
+    context.signal,
+  )
+  requireFeatureAdmission(context.resourceOwner, context.signal)
   if (context.signal?.aborted) {
     throw createMarkdownRuntimeError('infra', 'mermaid_render_aborted')
   }
@@ -1345,7 +1492,9 @@ const renderMermaidFeature = async (
   })
 
   const renderId = `fsus-markdown-mermaid-${++markdownMermaidRenderId}`
+  requireFeatureAdmission(context.resourceOwner, context.signal)
   const rendered = await mermaid.render(renderId, source)
+  requireFeatureAdmission(context.resourceOwner, context.signal)
   if (context.signal?.aborted) {
     throw createMarkdownRuntimeError('infra', 'mermaid_render_aborted')
   }
@@ -1369,7 +1518,8 @@ const renderLatexFeature = async (
   context: MarkdownFeatureRenderContext,
   displayMode: boolean,
 ): Promise<FeatureRenderOutput> => {
-  const katex = await loadKatexRuntime()
+  const katex = await loadKatexRuntime(context.resourceOwner, context.signal)
+  requireFeatureAdmission(context.resourceOwner, context.signal)
   if (context.signal?.aborted) {
     throw createMarkdownRuntimeError('infra', 'katex_render_aborted')
   }
@@ -1384,6 +1534,7 @@ const renderLatexFeature = async (
     throwOnError: false,
     trust: false,
   })
+  requireFeatureAdmission(context.resourceOwner, context.signal)
   if (context.signal?.aborted) {
     throw createMarkdownRuntimeError('infra', 'katex_render_aborted')
   }
@@ -1452,15 +1603,23 @@ const renderShikiHtml = async (
   source: string,
   language: string,
   theme: string,
+  context: MarkdownFeatureRenderContext,
 ) => {
   if (typeof shiki.codeToHtml !== 'function') {
     throw createMarkdownRuntimeError('infra', 'shiki_code_to_html_unavailable')
   }
 
+  requireFeatureAdmission(context.resourceOwner, context.signal)
   try {
     return await shiki.codeToHtml(source, { lang: language, theme })
   } catch (error) {
     if (language === 'text') throw error
+    try {
+      requireFeatureAdmission(context.resourceOwner, context.signal)
+    } catch {
+      // Preserve the actual provider failure when cancellation bars fallback.
+      throw error
+    }
     return shiki.codeToHtml(source, { lang: 'text', theme })
   }
 }
@@ -1471,12 +1630,20 @@ const renderCodeHighlightFeature = async (
   context: MarkdownFeatureRenderContext,
 ): Promise<FeatureRenderOutput> => {
   const theme = context.theme === 'dark' ? 'github-dark' : 'github-light'
-  const shiki = await loadShikiRuntime()
-  await shiki.ensureLoaded?.(language, theme)
+  const shiki = await loadShikiRuntime(context.resourceOwner, context.signal)
+  requireFeatureAdmission(context.resourceOwner, context.signal)
+  await shiki.ensureLoaded?.(
+    language,
+    theme,
+    context.resourceOwner,
+    context.signal,
+  )
+  requireFeatureAdmission(context.resourceOwner, context.signal)
   if (context.signal?.aborted) {
     throw createMarkdownRuntimeError('infra', 'shiki_render_aborted')
   }
-  const payload = await renderShikiHtml(shiki, source, language, theme)
+  const payload = await renderShikiHtml(shiki, source, language, theme, context)
+  requireFeatureAdmission(context.resourceOwner, context.signal)
   if (context.signal?.aborted) {
     throw createMarkdownRuntimeError('infra', 'shiki_render_aborted')
   }
@@ -1508,6 +1675,7 @@ const toFeatureRenderContext = (
 ): MarkdownFeatureRenderContext =>
   Object.freeze({
     signal: context.signal,
+    resourceOwner: context.resourceOwner,
     theme: context.theme,
     tokens: context.resolveTokens(element),
   })
@@ -1517,15 +1685,25 @@ const estimateFeatureOutputBytes = (output: FeatureRenderOutput) =>
   (output.kind === 'mermaid' ? output.rootId.length * 2 : 0)
 
 const activateHeavyFeature = async (input: {
-  readonly commit: (output: FeatureRenderOutput) => HTMLElement | void
+  readonly commit: (
+    output: FeatureRenderOutput,
+    gateway: MarkdownFeatureOutputGateway,
+  ) => HTMLElement | void
   readonly context: MarkdownFeatureActivationContext
   readonly element: HTMLElement
   readonly render: (
     signal: AbortSignal | undefined,
+    owner?: MarkdownHeavyFeatureAdapterResourceOwner,
   ) => Promise<FeatureRenderOutput>
   readonly isolatedRequest: MarkdownHeavyFeatureIsolatedRenderRequest
   readonly source: string
 }) => {
+  if (
+    input.context.signal?.aborted ||
+    (input.context.heavyLifecycle?.inspectResources &&
+      input.context.heavyLifecycle.inspectResources().admission !== 'open')
+  )
+    return false
   const identity = input.context.resolveHeavyFeatureIdentity?.({
     element: input.element,
     kind: input.context.kind,
@@ -1534,9 +1712,18 @@ const activateHeavyFeature = async (input: {
     tokens: input.context.resolveTokens(input.element),
   })
   if (!input.context.heavyLifecycle) {
-    const output = await input.render(input.context.signal)
+    requireFeatureAdmission(input.context.resourceOwner, input.context.signal)
+    const output = await input.render(
+      input.context.signal,
+      input.context.resourceOwner,
+    )
+    const gateway = await loadMarkdownFeatureOutputGateway(
+      input.context.resourceOwner,
+      input.context.signal,
+    )
     if (input.context.signal?.aborted) return false
-    input.commit(output)
+    requireFeatureAdmission(input.context.resourceOwner, input.context.signal)
+    input.commit(output, gateway)
     return true
   }
   if (!identity) return false
@@ -1549,10 +1736,6 @@ const activateHeavyFeature = async (input: {
       identity.featureKind,
     ].join(':'),
   })
-  const {
-    assertMarkdownHeavyFeatureAdapterResourceBridge,
-    createMarkdownHeavyFeatureAdapterResourceBridge,
-  } = await import('./markdown-heavy-feature-resource')
   const resourceBridge = assertMarkdownHeavyFeatureAdapterResourceBridge(
     createMarkdownHeavyFeatureAdapterResourceBridge(
       input.context.isolatedRenderFactory,
@@ -1560,8 +1743,16 @@ const activateHeavyFeature = async (input: {
   )
   try {
     return await input.context.heavyLifecycle.activate({
-      commit: (output, signal) =>
-        input.context.scheduleHeavyFeatureCommit
+      commit: async (output, signal) => {
+        const owner = resourceBridge.resourceOwner
+        requireFeatureAdmission(owner, signal)
+        const gateway = await loadMarkdownFeatureOutputGateway(owner, signal)
+        requireFeatureAdmission(owner, signal)
+        const commit = () => {
+          requireFeatureAdmission(owner, signal)
+          return input.commit(output, gateway)
+        }
+        return input.context.scheduleHeavyFeatureCommit
           ? input.context.scheduleHeavyFeatureCommit({
               key: [
                 'markdown-heavy-feature',
@@ -1571,17 +1762,18 @@ const activateHeavyFeature = async (input: {
                 identity.nodeId,
                 identity.featureKind,
               ].join(':'),
-              run: () => input.commit(output),
+              run: commit,
               signal,
             })
-          : input.commit(output),
+          : commit()
+      },
       element: input.element,
       estimateBytes: estimateFeatureOutputBytes,
       identity,
       render: (signal) =>
         resourceBridge.run(
           signal,
-          (adapterSignal) => input.render(adapterSignal),
+          (adapterSignal, owner) => input.render(adapterSignal, owner),
           isolatedRequest,
         ),
       resources: resourceBridge.resources,
@@ -1630,7 +1822,6 @@ const activateBuiltInFeature = async (
     ]).trim()
     if (!source) return false
     try {
-      const gateway = await loadMarkdownFeatureOutputGateway()
       return await activateHeavyFeature({
         context,
         element,
@@ -1642,12 +1833,13 @@ const activateBuiltInFeature = async (
           theme: context.theme,
           tokens: context.resolveTokens(element),
         },
-        render: (signal) =>
+        render: (signal, resourceOwner) =>
           renderMermaidFeature(source, {
             ...toFeatureRenderContext(context, element),
             signal,
+            resourceOwner,
           }),
-        commit: (output) => {
+        commit: (output, gateway) => {
           const committed = gateway.commitMarkdownFeatureOutput(
             element,
             output,
@@ -1680,7 +1872,6 @@ const activateBuiltInFeature = async (
     ]).trim()
     if (!source) return false
     try {
-      const gateway = await loadMarkdownFeatureOutputGateway()
       return await activateHeavyFeature({
         context,
         element,
@@ -1693,13 +1884,17 @@ const activateBuiltInFeature = async (
           theme: context.theme,
           tokens: context.resolveTokens(element),
         },
-        render: (signal) =>
+        render: (signal, resourceOwner) =>
           renderLatexFeature(
             source,
-            { ...toFeatureRenderContext(context, element), signal },
+            {
+              ...toFeatureRenderContext(context, element),
+              signal,
+              resourceOwner,
+            },
             isBlockLatexElement(element),
           ),
-        commit: (output) => {
+        commit: (output, gateway) => {
           const committed = gateway.commitMarkdownFeatureOutput(
             element,
             output,
@@ -1739,7 +1934,6 @@ const activateBuiltInFeature = async (
       ? pre.dataset.markdownFeatureLanguage
       : extractCodeLanguage(code)
   try {
-    const gateway = await loadMarkdownFeatureOutputGateway()
     return await activateHeavyFeature({
       context,
       element: pre,
@@ -1752,12 +1946,13 @@ const activateBuiltInFeature = async (
         theme: context.theme,
         tokens: context.resolveTokens(element),
       },
-      render: (signal) =>
+      render: (signal, resourceOwner) =>
         renderCodeHighlightFeature(source, language, {
           ...toFeatureRenderContext(context, element),
           signal,
+          resourceOwner,
         }),
-      commit: (output) => {
+      commit: (output, gateway) => {
         const committed = gateway.commitMarkdownFeatureOutput(pre, output, {
           mode: 'replace-element',
           nonce: context.cspNonce,
@@ -1869,6 +2064,11 @@ const activateMarkdownFeatureWork = async (
           current.committed = committed
         }
       } catch (error) {
+        current.context.resourceOwner?.retainFailure(
+          'feature-producer-settlement',
+          current.element,
+          error,
+        )
         current.error = createActivationError(current.context.kind, error)
       } finally {
         current.complete()
@@ -1941,6 +2141,7 @@ export const activateMarkdownFeatures = async (
       resolveTokens,
       root: options.root,
       signal: options.signal,
+      resourceOwner: options.resourceOwner,
       theme,
     }
     const batch: MarkdownFeatureActivationBatch = {
