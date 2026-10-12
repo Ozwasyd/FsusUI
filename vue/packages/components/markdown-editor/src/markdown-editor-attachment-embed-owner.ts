@@ -206,6 +206,15 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
     readonly monitor?: Promise<void>
     done: boolean
   }
+  type ConsumerFutureObservation = {
+    readonly observationRef: object
+    readonly work: unknown
+    started: boolean
+    observation: 'pending' | 'fulfilled' | 'failed' | 'unavailable'
+    reason?: string
+    cause?: unknown
+    monitor?: Promise<void>
+  }
   type ConsumerEntry = {
     readonly dispatchRef: object
     readonly job: MarkdownAttachmentJob
@@ -218,19 +227,17 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
     cause?: unknown
     readonly cleanup: ConsumerCleanup[]
     unknownObserverWork?: Promise<void>
+    unknownReturned?: ConsumerFutureObservation
     readonly unknownFields: {
       readonly field: 'result' | 'settled'
-      readonly work: unknown
-      observation: 'pending' | 'fulfilled' | 'failed' | 'unavailable'
-      reason?: string
-      cause?: unknown
-      monitor?: Promise<void>
+      future: ConsumerFutureObservation
     }[]
   }
   const consumers = new Map<object, ConsumerEntry>()
   // Binding chains are not global ownership: this owner deduplicates originals.
   const consumerRequests = new WeakSet<object>()
   const consumerFutures = new WeakSet<object>()
+  const consumerObservations = new WeakMap<object, ConsumerFutureObservation>()
   let consumerControlDepth = 0
   const consumerControl = <T>(control: () => T): T => {
     consumerControlDepth += 1
@@ -256,6 +263,72 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
     }
     return false
   }
+  const claimConsumerObservation = (
+    work: unknown,
+    delegatedReason?: string,
+  ): ConsumerFutureObservation => {
+    const object =
+      (typeof work === 'object' && work !== null) || typeof work === 'function'
+        ? (work as object)
+        : undefined
+    const previous = object && consumerObservations.get(object)
+    if (previous) return previous
+    const reason =
+      delegatedReason ??
+      (object && consumerFutures.has(object)
+        ? 'consumer-future-already-owned'
+        : undefined)
+    const observation: ConsumerFutureObservation = {
+      observationRef: Object.freeze({}),
+      work,
+      started: Boolean(reason),
+      observation: 'unavailable',
+      reason,
+    }
+    if (object) {
+      // Publish custody before any descriptor, then access or callback can reenter.
+      consumerObservations.set(object, observation)
+      consumerFutures.add(object)
+    }
+    return observation
+  }
+  const observeUnknownFuture = (observation: ConsumerFutureObservation) => {
+    if (observation.started) return
+    observation.started = true
+    try {
+      if (!consumerControl(() => consumerFuture(observation.work))) {
+        observation.reason = 'consumer-field-future-unavailable'
+        return
+      }
+    } catch (cause) {
+      observation.reason = 'consumer-field-future-access-failed'
+      observation.cause = cause
+      return
+    }
+    observation.observation = 'pending'
+    // Initial await/then access runs under the same synchronous reentry fence.
+    // The shared record already exists even before this monitor is returned.
+    observation.monitor = consumerControl(() =>
+      (async () => {
+        try {
+          await observation.work
+          observation.observation = 'fulfilled'
+        } catch (cause) {
+          observation.observation = 'failed'
+          observation.cause = cause
+        }
+      })(),
+    )
+  }
+  const readConsumerObservation = (observation: ConsumerFutureObservation) =>
+    Object.freeze({
+      observationRef: observation.observationRef,
+      work: observation.work,
+      observation: observation.observation,
+      reason: observation.reason,
+      cause: observation.cause,
+      monitor: observation.monitor,
+    })
   const retainUnknownFields = (entry: ConsumerEntry) => {
     const returned = entry.returned
     if (
@@ -294,47 +367,25 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
       if (!property && !accessFailed) continue
       const record: ConsumerEntry['unknownFields'][number] = {
         field,
-        work,
-        observation: 'unavailable',
-        reason,
-        ...(accessFailed ? { cause: accessCause } : {}),
+        future: {
+          observationRef: Object.freeze({}),
+          work,
+          started: false,
+          observation: 'unavailable',
+          reason,
+          ...(accessFailed ? { cause: accessCause } : {}),
+        },
       }
       entry.unknownFields.push(record)
       records.push(record)
     }
     // Register all captured references before any thenable can run observation code.
-    for (const { work, reason } of records) {
-      if (reason) continue
-      if (
-        (typeof work === 'object' && work !== null) ||
-        typeof work === 'function'
-      )
-        consumerFutures.add(work as object)
+    for (const record of records) {
+      if (record.future.reason) continue
+      record.future = claimConsumerObservation(record.future.work)
     }
     for (const record of records) {
-      if (record.reason) continue
-      const work = record.work
-      try {
-        if (!consumerControl(() => consumerFuture(work))) {
-          record.reason = 'consumer-field-future-unavailable'
-          continue
-        }
-      } catch (cause) {
-        record.reason = 'consumer-field-future-access-failed'
-        record.cause = cause
-        continue
-      }
-      // Observe the actual field only. This monitor grants no result/settlement authority.
-      record.observation = 'pending'
-      record.monitor = (async () => {
-        try {
-          await work
-          record.observation = 'fulfilled'
-        } catch (cause) {
-          record.observation = 'failed'
-          record.cause = cause
-        }
-      })()
+      if (!record.future.reason) observeUnknownFuture(record.future)
     }
   }
   const retainCleanup = (entry: ConsumerEntry) => {
@@ -1426,8 +1477,14 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
             throw new Error(consumer.unknown)
           }
           consumerRequests.add(binding.request)
-          consumerFutures.add(binding.result as object)
-          consumerFutures.add(binding.settled as object)
+          claimConsumerObservation(
+            binding.result,
+            'consumer-future-observed-by-dispatch-ledger',
+          )
+          claimConsumerObservation(
+            binding.settled,
+            'consumer-future-observed-by-dispatch-ledger',
+          )
           consumer.binding = binding
           consumer.unknown = undefined
           // Forward the TWO actual original futures; never start another service.
@@ -1441,33 +1498,43 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
           ((typeof work === 'object' && work !== null) ||
             typeof work === 'function') &&
           consumerFutures.has(work as object)
-        retainUnknownFields(consumer)
         if (requireConsumer) {
-          if (consumerFuture(work)) {
-            consumerFutures.add(work as object)
-            // Observe actual unknown returned work without claiming all-work settlement.
-            consumer.unknownObserverWork = (async () => {
-              try {
-                await work
-              } catch (cause) {
-                consumer.cause = cause
-              }
-            })()
-          }
+          retainUnknownFields(consumer)
+          const observation = claimConsumerObservation(work)
+          consumer.unknownReturned = observation
+          observeUnknownFuture(observation)
+          consumer.unknownObserverWork = observation.monitor
           throw new Error(capability.reason)
+        }
+        if (returnedFutureOwned) {
+          retainUnknownFields(consumer)
+          consumer.unknownReturned = claimConsumerObservation(work)
+          consumer.unknown = 'consumer-request-or-future-reused'
+          throw new Error(consumer.unknown)
         }
         // Legacy content can consume its real result, but its opaque scope stays unknown.
         // An event emission or terminal label is not a settlement future.
-        if (!consumerFuture(work)) {
+        const observation = claimConsumerObservation(work)
+        consumer.unknownReturned = observation
+        observation.started = true
+        let legacyFuture: boolean
+        try {
+          legacyFuture = consumerControl(() => consumerFuture(work))
+        } catch (cause) {
+          observation.reason = 'consumer-field-future-access-failed'
+          observation.cause = cause
+          retainUnknownFields(consumer)
+          throw cause
+        }
+        if (!legacyFuture) {
+          observation.reason = 'consumer-field-future-unavailable'
+          retainUnknownFields(consumer)
           throw new Error(
             'editor-session-attachment-dispatch-settlement-unavailable',
           )
         }
-        if (returnedFutureOwned) {
-          consumer.unknown = 'consumer-request-or-future-reused'
-          throw new Error(consumer.unknown)
-        }
-        consumerFutures.add(work as object)
+        observation.reason = 'consumer-future-observed-by-dispatch-ledger'
+        retainUnknownFields(consumer)
         consumer.legacyResultOnly = true
         return work as unknown as PromiseLike<MarkdownAttachmentProviderResult>
       })
@@ -1521,8 +1588,16 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
               unknown: entry.unknown,
               cause: entry.cause,
               unknownObserverWork: entry.unknownObserverWork,
+              unknownReturned: entry.unknownReturned
+                ? readConsumerObservation(entry.unknownReturned)
+                : undefined,
               unknownFields: Object.freeze(
-                entry.unknownFields.map((record) => Object.freeze({ ...record })),
+                entry.unknownFields.map((record) =>
+                  Object.freeze({
+                    field: record.field,
+                    ...readConsumerObservation(record.future),
+                  }),
+                ),
               ),
               cleanup: Object.freeze(
                 entry.cleanup.map((record) =>
