@@ -846,9 +846,10 @@ The private callback depth and notification guard prevent tickets during
 transitions or reentrant notification. Pure `isCurrent` reads only private
 identity/version/flags. Actual listener registrations, retained tickets, input
 record entries and original callback failures appear under
-`sources.rendererOwnedInputs`. Foreign asynchronous callback results retain their
-actual value with settlement unavailable; they permanently refuse tickets rather
-than receiving a synthetic completion. Failed ref writes preserve their actual
+`sources.rendererOwnedInputs`. Asynchronous callback results retain their actual value and attribution. Ordinary
+original native Promises are safely observed, including their original rejection
+cause; unsupported results keep observation unavailable. Both refuse input tickets
+rather than receiving a synthetic completion. Failed ref writes preserve their actual
 cause and refuse new tickets. Clearing supplies the actual empty input; it does
 not erase registrations, failed callbacks or their custody obligations.
 
@@ -866,3 +867,50 @@ unowned. Live/full seal and complete pause/resume/recovery/eviction continue to
 refuse. Executable request/replace/clear/retire/reentry/failure/input identity cases
 require the original test-owner preflight; runtime/list/native/security/receipt
 and renderer/authority/eviction qualifications remain UNRUN/HOLD.
+
+### Input custody and receiver cleanup corrections
+
+The input is a frozen real Vue `customRef` with an own accessor that calls its
+original factory tracker. Its only value cell and trigger remain in the owner
+closure. The installed Vue customRef cache getter is shadowed before freezing;
+there is no public writable backing Ref or value cache. `toRaw(input)` returns
+that same protected ref, and its value setter refuses rather than mutating the
+publication. Request/chunk snapshots and the original Native provider are unchanged.
+
+Ticket issuance captures the private value and retirement generation before
+allocating a candidate. Allocation reentry cannot mint another ticket. A final
+private eligibility/value/generation guard runs before retaining the candidate; a
+replacement, clear, unmount or retirement during allocation returns null rather
+than attaching a stale value to a newer generation.
+
+A failed receiver remains registered and quarantined. Its release handle performs
+a real selected receiver retry; it never deletes quarantine as an acknowledgment.
+Pending or unsupported observation refuses release before retrying the callback.
+Only a synchronous successful retry with all supported observations actually
+settled removes the real registration and its matching release-ledger obligation.
+Original failure history stays retained. Ordinary unmount attempts every selected
+input subscription release in the existing cleanup batch, then uses private
+registration/observation custody to guard view release. It does not base release
+on an allocated public inspection snapshot.
+
+For an ordinary native Promise under the unchanged captured constructor/species,
+the captured intrinsic `then` checks the actual Promise brand before deriving a
+native observation Promise. Both original fulfillment/rejection handlers are
+installed synchronously. The actual derived Promise is awaited by an owned
+observer with rejection handling; observer processing failures cannot become
+unobserved derived rejections. Original rejection causes remain in `getFailures`
+and attributed failure/observation records. Unsupported subclass/foreign/callable
+thenable or constructor/species cases retain the original result and refuse
+without invoking a foreign then chain or allocating an unobserved derived Promise.
+
+`sources.rendererOwnedInputs` reports actual failed release obligations, pending
+owned observer tasks, original callback results, observer states and failure
+attribution. Public attribution uses subscription identities, without leaking
+mutable registration records. Settled and unsupported records remain retained;
+only real pending owned observers add known background tasks. No inferred
+transport/native cleanup or full pause/recovery acknowledgment is added.
+
+The previous a292 source review found two P1 and two P2 gaps despite static
+compilation passing. These corrections require independent source review and
+original counterexample authoring/preflight. Counterexamples, runtime/test/list,
+native/security/receipt/renderer/authority/eviction qualification remain UNRUN/HOLD.

@@ -21,7 +21,16 @@ import type {
   MarkdownEditorFrameTask,
 } from '../../../hooks/use-markdown-editor-frame-scheduler'
 import type { WatchHandle } from 'vue'
-import { shallowReadonly, shallowRef } from 'vue'
+import { customRef } from 'vue'
+
+const rendererInputNativePromise = Promise
+const rendererInputNativePromisePrototype = Promise.prototype
+const rendererInputNativeThen = Promise.prototype.then
+const rendererInputNativeApply = Reflect.apply
+const rendererInputNativeSpecies = Object.getOwnPropertyDescriptor(
+  Promise,
+  Symbol.species,
+)?.get
 
 /** Custody of a private input publication only, never of foreign mutable state. */
 export interface MarkdownRendererOwnedInputAuthority {
@@ -241,8 +250,14 @@ export const createMarkdownRendererSessionResourceOwner = <
         readonly retainedSnapshotEntries: number
         readonly failures: readonly unknown[]
         readonly unavailableCallbackResults: readonly unknown[]
+        readonly releaseObligations: number
+        readonly pendingAsyncObservers: number
+        readonly asyncObservations: readonly unknown[]
+        readonly failureRecords: readonly unknown[]
       }
       close: () => void
+      releaseSubscriptions: () => void
+      hasReleaseObligations: () => boolean
     }
   >()
   let notifyingInputRetirement = false
@@ -299,20 +314,65 @@ export const createMarkdownRendererSessionResourceOwner = <
   const createOwnedInputPublication = <T>(scope: string, initial: T) => {
     if (disposed || inputPublications.has(scope))
       throw new Error('markdown-renderer-input-publication-unavailable')
-    const backing = shallowRef<T>(initial)
-    // Use the actual readonly ref, without a second computed value cache that
-    // could retain the previous input after the backing publication is cleared.
-    const input = shallowReadonly(backing)
-    const registrations = new Set<{
+    let currentValue = initial
+    let triggerInput!: () => void
+    const readInput = () => currentValue
+    const refuseInputWrite = () => {
+      throw new TypeError('markdown-renderer-owned-input-readonly')
+    }
+    let trackedReadInput = readInput
+    const input = customRef<T>((track, trigger) => {
+      triggerInput = trigger
+      trackedReadInput = () => {
+        track()
+        return currentValue
+      }
+      return { get: trackedReadInput, set: refuseInputWrite }
+    })
+    // The installed Vue customRef getter writes its public _value cache. Use
+    // the same factory getter as an own accessor before freezing the real ref.
+    // toRaw returns this sealed ref, never a writable backing ref or store.
+    Object.defineProperty(input, 'value', {
+      get: trackedReadInput,
+      set: refuseInputWrite,
+      enumerable: true,
+    })
+    Object.freeze(input)
+    type Registration = {
+      readonly id: symbol
       readonly listener: () => void
       quarantined: boolean
-    }>()
+      releasing: boolean
+      releaseRequested: boolean
+      failureCause: unknown
+      notificationFailed: boolean
+    }
+    type Observation = {
+      readonly source: object
+      readonly registration: Registration
+      state: 'pending' | 'fulfilled' | 'rejected' | 'unavailable'
+      rejected: boolean
+      cause: unknown
+      processingFailure: unknown
+      derived: Promise<unknown> | null
+      observerTask: Promise<void> | null
+      observerSettled: boolean
+    }
+    const registrations = new Set<Registration>()
     const failures: unknown[] = []
+    const failureRecords: Array<{
+      readonly registration: Registration | null
+      readonly source: unknown
+      readonly phase: string
+      readonly cause: unknown
+    }> = []
     const unavailableCallbackResults: unknown[] = []
+    const asyncObservations = new Set<Observation>()
     let closed = false
     let published = true
     let ticket: object | null = null
     let ticketGeneration = -1
+    let allocatingTicket = false
     const eligible = () =>
       !closed &&
       published &&
@@ -323,42 +383,245 @@ export const createMarkdownRendererSessionResourceOwner = <
       !notifyingInputRetirement &&
       failures.length === 0 &&
       cleanupFailures.size === 0 &&
-      unavailableCallbackResults.length === 0
+      unavailableCallbackResults.length === 0 &&
+      asyncObservations.size === 0
+    const recordFailure = (
+      cause: unknown,
+      registration: Registration | null,
+      source: unknown,
+      phase: string,
+    ) => {
+      failures.push(cause)
+      failureRecords.push({ registration, source, phase, cause })
+      if (registration) registration.failureCause = cause
+    }
+    const observeCallbackResult = (
+      source: object,
+      registration: Registration,
+    ) => {
+      const observation: Observation = {
+        source,
+        registration,
+        state: 'unavailable',
+        rejected: false,
+        cause: undefined,
+        processingFailure: undefined,
+        derived: null,
+        observerTask: null,
+        observerSettled: false,
+      }
+      asyncObservations.add(observation)
+      try {
+        const ownConstructor = Object.getOwnPropertyDescriptor(
+          source,
+          'constructor',
+        )
+        const prototypeConstructor = Object.getOwnPropertyDescriptor(
+          rendererInputNativePromisePrototype,
+          'constructor',
+        )
+        const species = Object.getOwnPropertyDescriptor(
+          rendererInputNativePromise,
+          Symbol.species,
+        )
+        if (
+          Object.getPrototypeOf(source) !==
+            rendererInputNativePromisePrototype ||
+          (ownConstructor &&
+            (!('value' in ownConstructor) ||
+              ownConstructor.value !== rendererInputNativePromise)) ||
+          !prototypeConstructor ||
+          !('value' in prototypeConstructor) ||
+          prototypeConstructor.value !== rendererInputNativePromise ||
+          !rendererInputNativeSpecies ||
+          species?.get !== rendererInputNativeSpecies
+        ) {
+          unavailableCallbackResults.push(source)
+          return
+        }
+        // The captured intrinsic checks the actual Promise brand before any
+        // species allocation. Unsupported proxies/impostors cannot start a
+        // foreign then chain. Only the unchanged native species is permitted.
+        observation.state = 'pending'
+        observation.derived = rendererInputNativeApply(
+          rendererInputNativeThen,
+          source,
+          [
+            () => {
+              observation.state = 'fulfilled'
+            },
+            (cause: unknown) => {
+              observation.rejected = true
+              observation.cause = cause
+              observation.state = 'rejected'
+            },
+          ],
+        )
+        const derived = observation.derived
+        // This derived native Promise has real rejection handling too. The
+        // observer never starts a .catch/species chain or lets its own callback
+        // failure escape as another unobserved rejection.
+        observation.observerTask = (async () => {
+          let derivedRejected = false
+          let derivedCause: unknown
+          try {
+            await derived
+          } catch (cause) {
+            derivedRejected = true
+            derivedCause = cause
+          }
+          try {
+            runCheckpointAuthorityCallback(
+              'input-async-observation',
+              () => {
+                if (observation.rejected)
+                  recordFailure(
+                    observation.cause,
+                    registration,
+                    source,
+                    'async-receiver-rejection',
+                  )
+                if (derivedRejected)
+                  recordFailure(
+                    derivedCause,
+                    registration,
+                    derived,
+                    'async-observer-rejection',
+                  )
+              },
+              observation,
+            )
+          } catch (cause) {
+            // The original owner ledger already holds this processing cause.
+            observation.processingFailure = cause
+          } finally {
+            observation.observerSettled = true
+          }
+        })()
+      } catch (cause) {
+        observation.state = 'unavailable'
+        observation.processingFailure = cause
+        unavailableCallbackResults.push(source)
+        recordFailure(cause, registration, source, 'async-observation-install')
+      }
+    }
+    const notifyRegistration = (registration: Registration) => {
+      registration.notificationFailed = false
+      try {
+        const result: unknown = registration.listener()
+        if (
+          result !== null &&
+          (typeof result === 'object' || typeof result === 'function')
+        ) {
+          registration.quarantined = true
+          observeCallbackResult(result, registration)
+          return false
+        }
+        registration.quarantined = false
+        return true
+      } catch (cause) {
+        registration.notificationFailed = true
+        registration.quarantined = true
+        recordFailure(
+          cause,
+          registration,
+          registration.listener,
+          'receiver-notification',
+        )
+        return false
+      }
+    }
+    const hasPendingObservation = (registration: Registration) =>
+      [...asyncObservations].some(
+        (record) =>
+          record.registration === registration &&
+          (record.state === 'unavailable' || !record.observerSettled),
+      )
+    const releaseRegistration = (registration: Registration) => {
+      if (!registrations.has(registration)) return
+      if (registration.releasing)
+        throw new Error('markdown-renderer-input-release-in-progress')
+      registration.releasing = true
+      registration.releaseRequested = true
+      try {
+        runCheckpointAuthorityCallback(
+          'input-unsubscribe',
+          () => {
+            if (hasPendingObservation(registration))
+              throw new Error(
+                'markdown-renderer-input-observer-release-pending',
+              )
+            // This is an actual retry of the selected receiver, not deletion of
+            // its quarantine flag or a fabricated release acknowledgment.
+            if (!notifyRegistration(registration)) {
+              if (registration.notificationFailed)
+                throw registration.failureCause
+              throw new Error(
+                'markdown-renderer-input-receiver-release-unavailable',
+              )
+            }
+            if (hasPendingObservation(registration))
+              throw new Error(
+                'markdown-renderer-input-observer-release-pending',
+              )
+            registrations.delete(registration)
+            registration.releaseRequested = false
+            // Clear only this real release obligation after the selected receiver
+            // returned synchronously and every supported observation settled.
+            // Failure history and unsupported result records remain retained.
+            const pending = cleanupFailures.get(
+              'renderer-input-listener-release',
+            )
+            pending?.delete(registration)
+            if (pending?.size === 0)
+              cleanupFailures.delete('renderer-input-listener-release')
+          },
+          registration,
+          'renderer-input-listener-release',
+        )
+      } finally {
+        registration.releasing = false
+      }
+    }
     const retire = () => {
       ticket = null
       for (const registration of [...registrations]) {
-        if (!registrations.has(registration) || registration.quarantined)
+        if (
+          !registrations.has(registration) ||
+          registration.quarantined ||
+          registration.releasing
+        )
           continue
-        try {
-          const result: unknown = registration.listener()
-          if (
-            result !== null &&
-            (typeof result === 'object' || typeof result === 'function') &&
-            typeof (result as { then?: unknown }).then === 'function'
-          ) {
-            // No execution/settlement capability is supplied for this foreign
-            // result. Retain it verbatim and permanently refuse input tickets.
-            unavailableCallbackResults.push(result)
-            registration.quarantined = true
-          }
-        } catch (cause) {
-          failures.push(cause)
-          registration.quarantined = true
-        }
+        notifyRegistration(registration)
       }
     }
     const authority: MarkdownRendererOwnedInputAuthority = Object.freeze({
       issueTicket: () => {
-        if (!eligible()) return null
+        if (allocatingTicket || !eligible()) return null
         if (!ticket || ticketGeneration !== checkpointAuthorityGeneration) {
-          ticket = Object.freeze({ scope, value: backing.value })
-          ticketGeneration = checkpointAuthorityGeneration
+          const capturedGeneration = checkpointAuthorityGeneration
+          const capturedValue = currentValue
+          allocatingTicket = true
+          try {
+            const candidate = Object.freeze({ scope, value: capturedValue })
+            if (
+              !eligible() ||
+              checkpointAuthorityGeneration !== capturedGeneration ||
+              currentValue !== capturedValue
+            )
+              return null
+            ticket = candidate
+            ticketGeneration = capturedGeneration
+          } finally {
+            allocatingTicket = false
+          }
         }
         return ticket
       },
       // Pure private identity/version checks; no Vue reads or source callbacks.
       isCurrent: (value: unknown) =>
         eligible() &&
+        !allocatingTicket &&
         ticket !== null &&
         value === ticket &&
         ticketGeneration === checkpointAuthorityGeneration,
@@ -369,16 +632,19 @@ export const createMarkdownRendererSessionResourceOwner = <
             throw new Error('markdown-renderer-input-publication-closed')
           if (typeof listener !== 'function')
             throw new TypeError('markdown-renderer-input-listener-invalid')
-          const registration = { listener, quarantined: false }
+          const registration: Registration = {
+            id: Symbol('markdown-renderer-input-subscription'),
+            listener,
+            quarantined: false,
+            releasing: false,
+            releaseRequested: false,
+            failureCause: undefined,
+            notificationFailed: false,
+          }
+          if (closed || disposed)
+            throw new Error('markdown-renderer-input-publication-closed')
           registrations.add(registration)
-          return () =>
-            runCheckpointAuthorityCallback(
-              'input-unsubscribe',
-              () => {
-                registrations.delete(registration)
-              },
-              registration,
-            )
+          return () => releaseRegistration(registration)
         }),
     })
     const replace = (value: T, isPublication = true) =>
@@ -387,21 +653,35 @@ export const createMarkdownRendererSessionResourceOwner = <
         () => {
           if (isPublication && (closed || disposed))
             throw new Error('markdown-renderer-input-publication-closed')
-          // The actual private ref is written only after synchronous retirement.
-          // Assignment failures remain in the original owner callback ledger.
-          published = false
+          // Only these private closure cells are writable. Set publication
+          // state before notifying Vue so a nested clear cannot be undone.
+          currentValue = value
+          published = isPublication
           try {
-            backing.value = value
+            triggerInput()
           } catch (cause) {
-            failures.push(cause)
+            published = false
+            recordFailure(cause, null, input, 'input-trigger')
             throw cause
           }
-          published = isPublication
         },
         input,
       )
     inputPublications.set(scope, {
       retire,
+      releaseSubscriptions: () =>
+        runCleanupBatch(
+          [...registrations].map((registration) => ({
+            phase: 'renderer-input-listener-release',
+            resource: registration,
+            run: () => releaseRegistration(registration),
+          })),
+        ),
+      hasReleaseObligations: () =>
+        registrations.size > 0 ||
+        [...asyncObservations].some(
+          (record) => record.state === 'unavailable' || !record.observerSettled,
+        ),
       close: () => {
         closed = true
         // Ordinary unmount already retired every receiver before this private
@@ -411,19 +691,42 @@ export const createMarkdownRendererSessionResourceOwner = <
       inspect: () =>
         Object.freeze({
           scope,
-          value: backing.value,
+          value: currentValue,
           published,
           closed,
           retainedListeners: registrations.size,
           retainedTicket: ticket !== null,
           retainedSnapshotEntries:
-            typeof backing.value === 'object' && backing.value !== null
-              ? Object.keys(backing.value).length
+            typeof currentValue === 'object' && currentValue !== null
+              ? Object.keys(currentValue).length
               : 0,
           failures: Object.freeze([...failures]),
           unavailableCallbackResults: Object.freeze([
             ...unavailableCallbackResults,
           ]),
+          releaseObligations: [...registrations].filter(
+            (record) => record.quarantined || record.releaseRequested,
+          ).length,
+          pendingAsyncObservers: [...asyncObservations].filter(
+            (record) => record.observerTask !== null && !record.observerSettled,
+          ).length,
+          asyncObservations: Object.freeze(
+            [...asyncObservations].map(({ registration, ...record }) =>
+              Object.freeze({
+                ...record,
+                subscriptionRef: registration.id,
+                listener: registration.listener,
+              }),
+            ),
+          ),
+          failureRecords: Object.freeze(
+            failureRecords.map(({ registration, ...record }) =>
+              Object.freeze({
+                ...record,
+                subscriptionRef: registration?.id ?? null,
+              }),
+            ),
+          ),
         }),
     })
     return Object.freeze({
@@ -1316,6 +1619,20 @@ export const createMarkdownRendererSessionResourceOwner = <
     const missingSourceDependencies: string[] = [
       ...markdownRendererSessionSourceDependencies,
     ]
+    if (ownedInputs.some((input) => input.releaseObligations > 0))
+      missingSourceDependencies.push(
+        'renderer-input:receiver-release-obligations',
+      )
+    if (ownedInputs.some((input) => input.pendingAsyncObservers > 0))
+      missingSourceDependencies.push(
+        'renderer-input:async-observation-settlement',
+      )
+    if (
+      ownedInputs.some((input) => input.unavailableCallbackResults.length > 0)
+    )
+      missingSourceDependencies.push(
+        'renderer-input:unsupported-callback-result-observation',
+      )
     if (renderWatchCleanupFailure) {
       missingSourceDependencies.push('renderer:native-watch-cleanup-settlement')
     }
@@ -1536,6 +1853,10 @@ export const createMarkdownRendererSessionResourceOwner = <
             projection.observers + viewport.observers + heavy.usage.observers,
           timers: knownTimers,
           backgroundTasks:
+            ownedInputs.reduce(
+              (sum, input) => sum + input.pendingAsyncObservers,
+              0,
+            ) +
             jobs.size +
             checkpointAuthorityCallbackDepth +
             (stoppingRenderWatch ? 1 : 0) +
@@ -1591,7 +1912,9 @@ export const createMarkdownRendererSessionResourceOwner = <
                 (record.retainedTicket ? 1 : 0) +
                 record.retainedSnapshotEntries +
                 record.failures.length +
-                record.unavailableCallbackResults.length,
+                record.unavailableCallbackResults.length +
+                record.asyncObservations.length +
+                record.failureRecords.length,
               0,
             ) +
             (documentRetirement ? 1 : 0) +
@@ -1681,6 +2004,11 @@ export const createMarkdownRendererSessionResourceOwner = <
       for (const publication of inputPublications.values()) publication.close()
       registerComponentCleanups(componentActions)
       runCleanupBatch([
+        ...[...inputPublications.values()].map((publication) => ({
+          phase: 'renderer-input-subscriptions-release',
+          resource: publication,
+          run: publication.releaseSubscriptions,
+        })),
         {
           phase: 'document-retirement-release',
           resource: documentRetirement?.handle,
@@ -1717,13 +2045,9 @@ export const createMarkdownRendererSessionResourceOwner = <
         pendingComponentCleanups.size > 0 ||
         documentRetirement !== null ||
         documentRetirementUnknown ||
-        [...inputPublications.values()].some((record) => {
-          const input = record.inspect()
-          return (
-            input.retainedListeners > 0 ||
-            input.unavailableCallbackResults.length > 0
-          )
-        }) ||
+        [...inputPublications.values()].some((record) =>
+          record.hasReleaseObligations(),
+        ) ||
         options.readComponentCleanupPending() > 0 ||
         renderWatchHandle !== null
       )

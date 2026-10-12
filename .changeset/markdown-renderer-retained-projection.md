@@ -2,6 +2,8 @@
 'element-plus': minor
 ---
 
+Encapsulate renderer input values behind a frozen native customRef, reject stale ticket allocation after reentry, retry failed receiver releases through real cleanup, and safely observe supported native Promise callback rejections with original cause/attribution. Preserve unsupported results and pending cleanup obligations rather than releasing view references or claiming recovery.
+
 Publish actual renderer-owned immutable request/chunk inputs, frozen adapter descriptor identities and selected root/scroller identities through scoped same-owner retirement feeds. Expose exact readonly input refs, private custody checks, actual registrations/failures and the borrowed original Native provider; retain unowned external/platform state and all complete/native/live-seal qualification holds.
 
 Bind the original native document retirement receiver into the same renderer producer. Retain its actual release handle and failure cause, report known registration custody separately from unknown attempts, and attempt unsubscription with the original unmount batch while preserving failed records. Missing pipeline/policy/config feeds still refuse live/full seal.
