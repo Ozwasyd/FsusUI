@@ -52,6 +52,11 @@ const publications = new WeakMap<object, Publication>()
 const feeds = new WeakMap<object, GlobalConfigFeed<unknown>>()
 const producers = new WeakMap<object, Publication>()
 const providerOwners = new WeakMap<object, Publication>()
+const subscriptionOwners = new WeakMap<
+  () => void,
+  { listener: () => void; subscriptionId: object }
+>()
+const NativePromise = Promise
 
 const createPublication = (owned: boolean): Publication => ({
   identity: Object.freeze({}),
@@ -80,20 +85,89 @@ const publicationFailures = (publication: Publication): readonly unknown[] =>
     ...[...publication.sources].flatMap(publicationFailures),
   ])
 
+const recordCallbackFailure = (
+  publication: Publication,
+  owner: { listener: () => void; subscriptionId?: object; contextIdentity: object },
+  cause: unknown
+) => {
+  publication.failures = Object.freeze([
+    ...publication.failures,
+    Object.freeze({ ...owner, cause }),
+  ])
+  publication.valid = false
+}
+
+type CallbackThen = (
+  fulfilled: () => void,
+  rejected: (cause: unknown) => void
+) => unknown
+
+const observeCallbackResult = (
+  publication: Publication,
+  listener: () => void,
+  result: unknown,
+  then: CallbackThen
+) => {
+  // Preserve the identity at invocation even if the subscription is released
+  // or the fallback selects a different provider before rejection arrives.
+  const owner = {
+    listener,
+    ...subscriptionOwners.get(listener),
+    contextIdentity: publication.identity,
+  }
+  const rejected = (cause: unknown) =>
+    recordCallbackFailure(publication, owner, cause)
+  const drain = async (value: unknown) => {
+    try {
+      await value
+    } catch (cause) {
+      rejected(cause)
+    }
+  }
+  // Await installs the intrinsic reaction on a native Promise without calling
+  // its .then/.catch or creating a Symbol.species continuation.
+  if (result instanceof NativePromise && result.constructor === NativePromise) {
+    void drain(result)
+    return
+  }
+  try {
+    const continuation = then.call(result, () => undefined, rejected)
+    // A custom then/species can return a separately rejected continuation.
+    // Observe its outcome too, rather than discard it or record it as a cause.
+    if (continuation !== result) void drain(continuation)
+  } catch (cause) {
+    rejected(cause)
+  }
+}
+
 const notify = (publication: Publication, listeners: Set<() => void>) => {
   let failed = false
   let failure: unknown
   for (const listener of [...listeners]) {
+    const owner = {
+      listener,
+      ...subscriptionOwners.get(listener),
+      contextIdentity: publication.identity,
+    }
     try {
       const result: unknown = listener()
-      if (result && typeof (result as { then?: unknown }).then === 'function') {
+      const native = result instanceof NativePromise
+      const then = !native && result
+        ? (result as { then?: unknown }).then
+        : undefined
+      if (native || typeof then === 'function') {
+        observeCallbackResult(
+          publication,
+          listener,
+          result,
+          native ? NativePromise.prototype.then : (then as CallbackThen)
+        )
         throw new Error('Config custody callbacks must be synchronous')
       }
     } catch (error) {
       failed = true
       failure = error
-      publication.failures = Object.freeze([...publication.failures, error])
-      publication.valid = false
+      recordCallbackFailure(publication, owner, error)
     }
   }
   if (failed) throw failure
@@ -198,6 +272,7 @@ const createFeed = <T>(
       const subscription = () => {
         if (subscriptions.has(identity)) return listener()
       }
+      subscriptionOwners.set(subscription, { listener, subscriptionId: identity })
       subscriptions.add(identity)
       publication.revoke.add(subscription)
       const release = () => {
@@ -252,7 +327,9 @@ export const createGlobalConfigSnapshot = (
   return producer
 }
 
-export const releaseGlobalConfig = (context: Ref<ConfigProviderContext>) => {
+export const releaseGlobalConfig = (
+  context: Ref<ConfigProviderContext | undefined>
+) => {
   const publication = publications.get(context)
   if (!publication || publication === globalPublication) return false
   releasePublication(publication)
@@ -294,13 +371,13 @@ export function useGlobalConfig<
   key: K,
   defaultValue?: D
 ): Ref<Exclude<ConfigProviderContext[K], undefined> | D>
-export function useGlobalConfig(): Ref<ConfigProviderContext>
+export function useGlobalConfig(): Ref<ConfigProviderContext | undefined>
 export function useGlobalConfig(
   key?: keyof ConfigProviderContext,
   defaultValue = undefined
 ) {
   const config = getCurrentInstance()
-    ? inject(configProviderContextKey, globalConfig)
+    ? inject(configProviderContextKey, undefined) ?? globalConfig
     : globalConfig
   if (key) {
     const selected = computed(() => config.value?.[key] ?? defaultValue)
@@ -373,7 +450,8 @@ export const provideGlobalConfig = (
   if (producer && !producer.active) throw new Error('Config producer released')
   // An opt-in root owns its complete snapshot. A real injected parent is
   // inherited; the process fallback is a selection, not a root dependency.
-  const parent = producer && oldConfig === globalConfig ? undefined : oldConfig
+  const parent = producer && Object.is(oldConfig, globalConfig)
+    ? undefined : oldConfig
   const parentPublication = parent && publications.get(parent)
   const publication = createPublication(
     !!producer && (!parent || !!parentPublication?.owned)
