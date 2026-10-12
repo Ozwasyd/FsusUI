@@ -556,6 +556,7 @@ export const createMarkdownHeavyFeatureIsolatedRender = <
         const trustedModuleUrl = trustedScriptUrlFactory
           ? trustedScriptUrlFactory(moduleUrl)
           : moduleUrl
+        if (!active) return handle
         script.src = trustedModuleUrl as string
       } catch (cause) {
         frameOwner.retainFailure('frame-script-url', script ?? iframe, cause)

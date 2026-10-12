@@ -1492,7 +1492,9 @@ const renderMermaidFeature = async (
   })
 
   const renderId = `fsus-markdown-mermaid-${++markdownMermaidRenderId}`
+  requireFeatureAdmission(context.resourceOwner, context.signal)
   const rendered = await mermaid.render(renderId, source)
+  requireFeatureAdmission(context.resourceOwner, context.signal)
   if (context.signal?.aborted) {
     throw createMarkdownRuntimeError('infra', 'mermaid_render_aborted')
   }
@@ -1532,6 +1534,7 @@ const renderLatexFeature = async (
     throwOnError: false,
     trust: false,
   })
+  requireFeatureAdmission(context.resourceOwner, context.signal)
   if (context.signal?.aborted) {
     throw createMarkdownRuntimeError('infra', 'katex_render_aborted')
   }
@@ -1600,15 +1603,23 @@ const renderShikiHtml = async (
   source: string,
   language: string,
   theme: string,
+  context: MarkdownFeatureRenderContext,
 ) => {
   if (typeof shiki.codeToHtml !== 'function') {
     throw createMarkdownRuntimeError('infra', 'shiki_code_to_html_unavailable')
   }
 
+  requireFeatureAdmission(context.resourceOwner, context.signal)
   try {
     return await shiki.codeToHtml(source, { lang: language, theme })
   } catch (error) {
     if (language === 'text') throw error
+    try {
+      requireFeatureAdmission(context.resourceOwner, context.signal)
+    } catch {
+      // Preserve the actual provider failure when cancellation bars fallback.
+      throw error
+    }
     return shiki.codeToHtml(source, { lang: 'text', theme })
   }
 }
@@ -1631,7 +1642,8 @@ const renderCodeHighlightFeature = async (
   if (context.signal?.aborted) {
     throw createMarkdownRuntimeError('infra', 'shiki_render_aborted')
   }
-  const payload = await renderShikiHtml(shiki, source, language, theme)
+  const payload = await renderShikiHtml(shiki, source, language, theme, context)
+  requireFeatureAdmission(context.resourceOwner, context.signal)
   if (context.signal?.aborted) {
     throw createMarkdownRuntimeError('infra', 'shiki_render_aborted')
   }
