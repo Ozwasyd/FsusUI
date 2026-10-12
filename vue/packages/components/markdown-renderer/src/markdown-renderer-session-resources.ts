@@ -165,6 +165,24 @@ export interface MarkdownRendererOwnedTimer {
   readonly scope: 'renderer-owned-timer'
 }
 
+/** A partial measurement and real controls do not admit a complete participant. */
+export class MarkdownRendererResourceControlUnsupportedError extends Error {
+  readonly unsupported: readonly string[]
+  readonly measured: MarkdownRendererOwnedHandleInspection
+
+  constructor(
+    unsupported: readonly string[],
+    measured: MarkdownRendererOwnedHandleInspection,
+  ) {
+    super(
+      `markdown-renderer-resource-control-unsupported:${unsupported.join(',')}`,
+    )
+    this.name = 'MarkdownRendererResourceControlUnsupportedError'
+    this.unsupported = Object.freeze([...unsupported])
+    this.measured = measured
+  }
+}
+
 type MarkdownRendererFrameFinalizer = {
   readonly run: () => void
   state: 'pending' | 'running' | 'completed'
@@ -2801,6 +2819,11 @@ export const createMarkdownRendererSessionResourceOwner = <
       measuredUsageOnly: true as const,
       missingSourceDependencies: Object.freeze(missingSourceDependencies),
       sources: Object.freeze({
+        adapterInvocationResources: pipeline.adapterInvocationResources,
+        workerProviderResources: Object.freeze(
+          workerScopes.map((scope) => scope.provider),
+        ),
+        virtualObserverResources: viewport.observerCallbackResources,
         componentHandles: inspectComponentHandles(),
         ownedTimerRecords: Object.freeze(
           [...timerRecords.values()].map((record) =>
@@ -3139,20 +3162,66 @@ export const createMarkdownRendererSessionResourceOwner = <
       } satisfies MarkdownEditorSessionResourceInspection),
     })
   }
-  const requireSourceCensus = (): never => {
-    throw new Error(
-      `markdown-renderer-session-resource-source-unavailable:${inspectOwnedResources().missingSourceDependencies.join(',')}`,
-    )
-  }
+  const inspectParticipantResourceCensus =
+    (): MarkdownEditorSessionResourceInspection => {
+      const source = inspectOwnedResources()
+      const unsupported = [...source.missingSourceDependencies]
+      const adapter = source.sources.adapterInvocationResources
+      if (adapter.internalResources === 'unsupported')
+        unsupported.push('adapter:internal-resources-unsupported')
+      if (adapter.internalCancellationCompletion === 'unsupported')
+        unsupported.push('adapter:cancellation-completion-unsupported')
+      if (
+        source.sources.virtualObserverResources.internalQueueControl ===
+        'unsupported'
+      )
+        unsupported.push(
+          'virtual-window:undelivered-platform-observer-queue-unsupported',
+        )
+      for (const provider of source.sources.workerProviderResources) {
+        unsupported.push(...provider.unsupported)
+        if (provider.settlement.localResources !== 'released')
+          unsupported.push('worker:owned-provider-cleanup-retained-or-unknown')
+        if (provider.shared.attribution === 'unattributable')
+          unsupported.push(
+            'worker:shared-resources-not-attributed-to-this-renderer',
+          )
+      }
+      if (source.sources.rendererNative.effectCensus === 'unknown')
+        unsupported.push(
+          'renderer:original-component-effect-detach-rearm-source-unavailable',
+        )
+      // Never return the known-only subtotal as an admitted whole-owner report.
+      if (unsupported.length > 0)
+        throw new MarkdownRendererResourceControlUnsupportedError(
+          unsupported,
+          inspectComponentHandles(),
+        )
+      return source.inspection
+    }
   const participant: MarkdownEditorSessionResourceParticipant = Object.freeze({
     ownerRef: 'renderer-projection',
-    inspect: requireSourceCensus,
-    // Refuse before mutation: cancelling the known component handles alone
-    // cannot suspend the hidden hook resources, or justify a successful ack.
-    pause: requireSourceCensus,
-    resume: requireSourceCensus,
-    dispose(_snapshotRef: string) {
-      throw new Error('markdown-renderer-session-checkpoint-not-recoverable')
+    inspect: inspectParticipantResourceCensus,
+    pause() {
+      pauseOwnedHandles()
+      return inspectParticipantResourceCensus()
+    },
+    resume() {
+      resumeOwnedHandles()
+      return inspectParticipantResourceCensus()
+    },
+    dispose(snapshotRef: string) {
+      inspectParticipantResourceCensus()
+      const selected = checkpoint
+      if (!selected || selected.capture.ref !== snapshotRef)
+        throw new Error(
+          'markdown-renderer-original-snapshot-binding-unavailable',
+        )
+      // Terminal cleanup is implemented separately; no recoverable native
+      // checkpoint exists, so this full-session disposal cannot acknowledge it.
+      if (selected.capture.nativeRecovery === 'unavailable')
+        throw new Error('markdown-renderer-session-checkpoint-not-recoverable')
+      disposeOwnedHandles()
     },
   })
   const disposeOnUnmount = (
