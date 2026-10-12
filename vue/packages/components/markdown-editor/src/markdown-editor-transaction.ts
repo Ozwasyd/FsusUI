@@ -635,6 +635,8 @@ export class MarkdownEditorTransactionStore {
     readonly redo: readonly HistoryEntry[]
     readonly previous: MarkdownEditorRetainedTransactionSnapshot | undefined
     readonly mergeBlocked: boolean
+    allocatedHistory: readonly HistoryEntry[] | undefined
+    allocatedRedo: readonly HistoryEntry[] | undefined
   } | undefined
   #retainedSnapshot: MarkdownEditorRetainedTransactionSnapshot | undefined
   #retainedHistory: readonly HistoryEntry[] | undefined
@@ -737,6 +739,7 @@ export class MarkdownEditorTransactionStore {
       preparation, identity: this.#documentIdentity, revision: this.#revision,
       selection: this.#selection, undo: this.#undo, redo: this.#redo,
       previous: this.#retainedSnapshot, mergeBlocked: this.#mergeBlocked,
+      allocatedHistory: undefined, allocatedRedo: undefined,
     }
     return preparation
   }
@@ -754,17 +757,26 @@ export class MarkdownEditorTransactionStore {
       this.#mergeBlocked === custody.mergeBlocked
   }
 
+  allocatePreparedRetainedSnapshot(preparation: MarkdownEditorRetainedTransactionPreparation): boolean {
+    if (!this.#isPreparedRetainedSnapshotCurrent(preparation)) return false
+    const custody = this.#preparedRetainedSnapshot!
+    const history = custody.undo.slice()
+    const redo = custody.redo.slice()
+    if (!this.#isPreparedRetainedSnapshotCurrent(preparation)) return false
+    custody.allocatedHistory = history
+    custody.allocatedRedo = redo
+    return true
+  }
+
   commitPreparedRetainedSnapshot(preparation: MarkdownEditorRetainedTransactionPreparation): MarkdownEditorRetainedTransactionSnapshot | null {
     if (!this.#isPreparedRetainedSnapshotCurrent(preparation)) return null
     const custody = this.#preparedRetainedSnapshot!
-    // Allocate the original retained array containers before any publication.
-    // Preparation itself pins the live arrays and creates no second history.
-    const history = custody.undo.slice()
-    const redo = custody.redo.slice()
-    if (!this.#isPreparedRetainedSnapshotCurrent(preparation)) return null
+    if (!custody.allocatedHistory || !custody.allocatedRedo) return null
+    // Allocation and the session's final full owner guard are already complete.
+    // Only callback-free private checks and assignments follow this boundary.
     this.#retainedSnapshot = preparation.snapshot
-    this.#retainedHistory = history
-    this.#retainedRedo = redo
+    this.#retainedHistory = custody.allocatedHistory
+    this.#retainedRedo = custody.allocatedRedo
     this.#preparedRetainedSnapshot = undefined
     return preparation.snapshot
   }

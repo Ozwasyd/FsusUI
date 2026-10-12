@@ -459,6 +459,10 @@ export const createMarkdownEditorSessionBinding = <ViewState>(
           if (!custody || preparation !== custody.preparation) throw new Error('editor-session-snapshot-preparation-invalid')
           capturing = true
           try {
+            // Native array allocation can reenter application admission without
+            // changing the native revision. Finish it before EVERY final owner guard.
+            if (!custody.store.allocatePreparedRetainedSnapshot(custody.transaction))
+              throw new Error('editor-session-snapshot-preparation-stale')
             const admit = () => {
               custody.assertAdmission?.()
               if (assertAdmission !== custody.assertAdmission) assertAdmission?.()

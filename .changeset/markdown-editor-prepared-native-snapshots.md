@@ -11,3 +11,8 @@ CaptureSnapshot uses this actual protocol. Candidates expose no source/history
 entries and disposal can discard only their genuine private custody. Full host
 refsets, cross-identity/revision restoration, resource pause/disposal/eviction
 remain unavailable; no package publication or runtime qualification is included.
+
+Finish both retained-array allocations before the session's final complete
+admission/panel/lifetime checks; callback-free private publication follows them.
+A successful allocation that retires the original application owner cannot
+replace the old token. The new negative source control remains UNRUN.

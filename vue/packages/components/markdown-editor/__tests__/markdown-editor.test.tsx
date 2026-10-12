@@ -123,6 +123,45 @@ describe('MarkdownEditor', () => {
     expect(session.validateRetainedSnapshot(original, expected)).toBe(true)
   })
 
+  it('revalidates full native admission and lifetime after allocation reentry that returns real arrays', () => {
+    const identity = { id: 'prepared-allocation-admission-document', epoch: 1 }
+    const store = new MarkdownEditorTransactionStore('source', undefined, identity)
+    let admitted = true
+    let disposed = false
+    const session = createMarkdownEditorSessionBinding({
+      transactionStore: store, isComposing: () => false, isDisposed: () => disposed,
+      captureViewState: () => null, restoreViewState: () => {},
+      resourceParticipants: () => [], captureLastValidRender: () => null,
+    }).getSession('session:prepared-allocation-admission')
+    const expected = { documentIdentity: identity, revision: 0, assertAdmission: () => { if (!admitted) throw new Error('actual-allocation-retired') } }
+    const original = session.captureSnapshot(() => 'a'.repeat(64), expected)
+    const nativeBefore = { value: store.value, revision: store.revision, selection: store.selection, history: store.history }
+    const intrinsicSlice = Array.prototype.slice
+    const candidate = session.prepareSnapshot(() => 'b'.repeat(64), expected)
+    const retirement = vi.spyOn(Array.prototype, 'slice').mockImplementationOnce(function (this: unknown[]) {
+      admitted = false
+      return intrinsicSlice.call(this)
+    })
+    try {
+      expect(() => session.commitPreparedSnapshot(candidate)).toThrow('actual-allocation-retired')
+    } finally { retirement.mockRestore() }
+    expect({ value: store.value, revision: store.revision, selection: store.selection, history: store.history }).toEqual(nativeBefore)
+    expect(session.validateRetainedSnapshot(original, expected)).toBe(true)
+    admitted = true
+    const lifetime = session.prepareSnapshot(() => 'c'.repeat(64), expected)
+    const disposal = vi.spyOn(Array.prototype, 'slice').mockImplementationOnce(function (this: unknown[]) {
+      disposed = true
+      return intrinsicSlice.call(this)
+    })
+    try {
+      expect(() => session.commitPreparedSnapshot(lifetime)).toThrow('editor-session-disposed')
+    } finally { disposal.mockRestore() }
+    disposed = false
+    expect(session.validateRetainedSnapshot(original, expected)).toBe(true)
+    const next = session.prepareSnapshot(() => 'd'.repeat(64), expected)
+    expect(session.commitPreparedSnapshot(next)).toBe(next.snapshot)
+  })
+
   it('refuses changed original selection and released ABA history custody without restoring a staged token', () => {
     const identity = { id: 'prepared-stale-document', epoch: 1 }
     const store = new MarkdownEditorTransactionStore('source', undefined, identity)

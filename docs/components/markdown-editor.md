@@ -1096,3 +1096,12 @@ and callback-free publication/failure protocols for a complete application refse
 Existing native restore remains same-owner/same-identity/epoch/revision. Identity
 props reset history and cannot supply cross-body/epoch restoration. Resource
 completeness, pause/disposal/eviction and every runtime qualification remain held.
+
+
+Prepared publication's original store now allocates retained array containers in
+a separate staging step BEFORE the session's final admission/render/panel/
+lifetime guards. Allocation may synchronously retire application admission while
+leaving native coordinates unchanged. The final guards therefore follow both
+allocations; store commit then performs only private checks/assignments, followed
+by the session's private assignment. Allocation success is never an admission
+proof. The exact normal-return allocation reentry control is source-only UNRUN.
