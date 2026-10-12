@@ -1292,3 +1292,43 @@ explicit unsupported boundaries; disabled/readonly is not their detachment.
 The complete session roster still omits `editor-surface`, and full resource,
 disposed restoration and eviction refusals remain. Source controls are UNRUN
 under the existing runtime/native/IME qualification hold.
+
+### Bounded same-process native checkpoint recreation
+
+An original live session can call `prepareNativeHandover(snapshot, principal)`
+with its exact currently published snapshot and a borrowed original application
+custody object. That object's pinned `hasCustody()` must return exactly true for
+the same principal AND document/source context throughout admission. The SDK
+does not create authentication or document authority from strings. Main must
+provide the real original issuer; an old mounted/native token that dies during
+widget unmount cannot substitute for continuing application custody.
+
+The returned opaque `MarkdownEditorNativeHandover` is valid only in this process
+and SDK instance. Normal SFC retirement and `releaseRetainedSnapshot()` still run.
+Only an already-issued native pin can retain the original transaction checkpoint
+at that release boundary. Ordinary writes/context changes withdraw its eligibility;
+the old document issuer remains permanently retired. Without a pin, ordinary
+unmount release is unchanged. `cancel()` explicitly releases the pin, including
+genuine failed-retirement cleanup retry, without claiming complete disposal.
+
+A fresh actual mounted editor binds the same logical session reference and calls
+`adoptNativeHandover(offer, { documentIdentity, revision, principal })`. It requires
+the same original custody object, source/epoch, and a pristine matching target
+store. The producer moves the original live undo/redo and retained checkpoint
+array pointers, never creates a second history timeline or serializes the body to
+Pinia/storage. The target blocks native writes during reception and the original
+SFC restores and verifies the actual textarea value, selection and direction.
+Old transaction/history/session/document pins remain until that succeeds and all
+final admission checks pass. Failure restores original target store pointers and
+tries actual target view rollback, retains original source pins and first/latest
+causes, and permits genuine retry. No original issuer is revived. New session
+snapshot sequencing continues beyond the source sequence.
+
+The proof is `native-recreated` with `nativeHistoryTransferred:true`,
+`fullRefsRestored:false`, `resourcesValidated:false`. The old full session snapshot
+is not installed as a valid target snapshot; capture uses the actual new owner.
+This is bounded native checkpoint memory custody, not complete #2294 restoration,
+pause/dispose/eviction or cross-startup revival. Renderer checkpoint recreation,
+panel/provider state and Vue render/v-model/scheduler resource qualification remain
+separate source dependencies. Main factory/composition/host readiness guards and
+all runtime/native/IME/security/privacy/receipt qualifications remain held.

@@ -1924,3 +1924,9 @@ export type {
   MarkdownEditorNativeSurfaceInspection,
   MarkdownEditorNativeSurfaceResourceHandle,
 } from './markdown-editor-native-surface-resources'
+export type {
+  MarkdownEditorNativeHandover,
+  MarkdownEditorNativeHandoverPrincipal,
+  MarkdownEditorNativeHandoverInspection,
+  MarkdownEditorNativeHandoverProof,
+} from './markdown-editor-native-handover'

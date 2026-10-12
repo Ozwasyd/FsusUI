@@ -636,7 +636,25 @@ interface DocumentAuthorityRetirementRegistration {
   cause: unknown
 }
 
+interface NativeHandoverPin {
+  snapshot: MarkdownEditorRetainedTransactionSnapshot
+  value: string
+  identity: MarkdownEditorDocumentIdentity
+  revision: number
+  selection: MarkdownEditorResolvedSelection
+  undo: readonly HistoryEntry[]
+  redo: readonly HistoryEntry[]
+  liveUndo: HistoryEntry[]
+  liveRedo: HistoryEntry[]
+  eligible: boolean
+  released: boolean
+  receiving: boolean
+}
+
 export class MarkdownEditorTransactionStore {
+  #nativeHandover: NativeHandoverPin | undefined
+  #handoverReceiving = false
+  #nativeHandoverReleaseDepth = 0
   #documentIdentity: MarkdownEditorDocumentIdentity
   #documentAuthorityGeneration = 0
   #documentAuthorityRetired = false
@@ -701,7 +719,7 @@ export class MarkdownEditorTransactionStore {
 
   /** Same original transaction owner; one immutable live ticket per actual write generation. */
   captureDocumentAuthority(): MarkdownHeavyFeatureDocumentAuthorityTicket | null {
-    if (this.#documentAuthorityRetired || this.#documentWriteDepth || this.#capturingDocumentAuthority ||
+    if (this.#handoverReceiving || this.#documentAuthorityRetired || this.#documentWriteDepth || this.#capturingDocumentAuthority ||
         this.#notifyingRetirement || this.#registeringRetirement || this.#releasingRetirement) return null
     if (this.#documentAuthority) return this.#documentAuthority
     const generation = this.#documentAuthorityGeneration
@@ -831,11 +849,14 @@ export class MarkdownEditorTransactionStore {
   }
 
   #beginDocumentWrite(): void {
+    if (this.#handoverReceiving) throw new Error('editor-history-native-handover-receiving')
     if (this.#notifyingRetirement || this.#releasingRetirement)
       throw new Error('editor-document-retirement-notification-active')
     const outermost = this.#documentWriteDepth === 0
     // Close authority before touching caller arguments, getters, arrays or callback-bearing work.
     if (outermost) {
+      if (this.#nativeHandover && !(this.#nativeHandoverReleaseDepth > 0 && this.#documentAuthorityRetired))
+        this.#nativeHandover.eligible = false
       this.#documentAuthority = undefined
       if (this.#documentAuthorityGeneration === Number.MAX_SAFE_INTEGER) this.#documentAuthorityRetired = true
       else this.#documentAuthorityGeneration += 1
@@ -1019,16 +1040,165 @@ export class MarkdownEditorTransactionStore {
   }
 
   releaseRetainedSnapshot() {
-    this.#beginDocumentWrite()
+    this.#nativeHandoverReleaseDepth += 1
+    let entered = false
     try {
+      this.#beginDocumentWrite()
+      entered = true
+      const handover = this.#nativeHandover
+      if (handover && this.#documentAuthorityRetired && this.#matchesNativeHandover(handover)) handover.released = true
       this.#preparedRetainedSnapshot = undefined
       this.#retainedSnapshot = undefined
       this.#retainedAuthorityGeneration = undefined
       this.#retainedHistory = undefined
       this.#retainedRedo = undefined
     } finally {
-      this.#endDocumentWrite()
+      if (entered) this.#endDocumentWrite()
+      this.#nativeHandoverReleaseDepth -= 1
     }
+  }
+
+  #matchesNativeHandover(pin: NativeHandoverPin): boolean {
+    return this.#nativeHandover === pin && this.#value === pin.value && this.#documentIdentity === pin.identity &&
+      this.#revision === pin.revision && this.#selection === pin.selection &&
+      this.#undo === pin.liveUndo && this.#redo === pin.liveRedo
+  }
+
+  /** Exact original checkpoint arrays remain here until real target adoption succeeds. */
+  prepareNativeHandover(snapshot: MarkdownEditorRetainedTransactionSnapshot) {
+    if (this.#nativeHandover || !this.hasRetainedSnapshotCustody(snapshot))
+      throw new Error('editor-history-native-handover-checkpoint-unavailable')
+    const pin = { snapshot, value: this.#value, identity: this.#documentIdentity, revision: this.#revision,
+      selection: this.#selection, undo: this.#retainedHistory!, redo: this.#retainedRedo!,
+      liveUndo: this.#undo, liveRedo: this.#redo, eligible: true, released: false, receiving: false }
+    const emptyUndo: HistoryEntry[] = []
+    const emptyRedo: HistoryEntry[] = []
+    const emptySelection = Object.freeze({ start: 0, end: 0, direction: 'none' as const })
+    let state: 'reserved' | 'released' | 'receiving' | 'transferred' | 'cancelled' = 'reserved'
+    let failed = false
+    let firstCause: unknown
+    let latestCause: unknown
+    const recordFailure = (cause: unknown) => { if (!failed) firstCause = cause; failed = true; latestCause = cause }
+    const originalRetirementFailure = () => {
+      for (let record = this.#retirementReceivers; record; record = record.next)
+        if (record.failed) return { failed: true, cause: record.cause }
+      return { failed: false, cause: undefined }
+    }
+    const refuse = (reason: string): never => {
+      const original = originalRetirementFailure()
+      const cause = original.failed ? original.cause : new Error(reason)
+      recordFailure(cause)
+      throw cause
+    }
+    const eligible = () => pin.eligible && this.#matchesNativeHandover(pin)
+    const releaseMemory = () => {
+      if (this.#nativeHandover !== pin) return
+      this.#nativeHandover = undefined
+      if (pin.released) {
+        this.#undo = emptyUndo
+        this.#redo = emptyRedo
+        this.#value = ''
+        this.#selection = emptySelection
+      }
+      pin.value = ''
+      pin.undo = emptyUndo
+      pin.redo = emptyRedo
+      pin.liveUndo = emptyUndo
+      pin.liveRedo = emptyRedo
+    }
+    const handle = Object.freeze({
+      inspect: () => {
+        const retirement = originalRetirementFailure()
+        return Object.freeze({ scope: 'same-process-native-checkpoint-memory' as const,
+        complete: false as const, resourcesValidated: false as const,
+        state: state === 'reserved' && pin.released ? 'released' as const : state, eligible: eligible(),
+        retainedHistoryUnits: this.#nativeHandover === pin
+          ? [...new Set([...pin.undo, ...pin.redo])].reduce((sum, entry) => sum + entry.retainedUnits, 0) : 0,
+        failed: failed || retirement.failed,
+        firstCause: failed ? firstCause : retirement.cause,
+        latestCause: retirement.failed ? retirement.cause : latestCause })
+      },
+      invalidate: () => { pin.eligible = false },
+      cancel: () => {
+        if (pin.receiving || state === 'transferred' || state === 'cancelled') return false
+        if (this.#documentAuthorityRetired && !pin.released && this.#matchesNativeHandover(pin)) {
+          try { this.releaseRetainedSnapshot() }
+          catch (cause) { recordFailure(cause); throw cause }
+        }
+        releaseMemory()
+        state = 'cancelled'
+        return true
+      },
+      transfer: async (target: MarkdownEditorTransactionStore, restoreTarget: () => Promise<void>, assertAdmission: () => void) => {
+        if (target === this || pin.receiving || !pin.released || !this.#documentAuthorityRetired || !eligible())
+          refuse('editor-history-native-handover-source-unavailable')
+        const pristine = (depth = 0) => target.#documentWriteDepth === depth && !target.#capturingDocumentAuthority &&
+          !target.#notifyingRetirement && !target.#registeringRetirement && target.#releasingRetirement === 0 &&
+          !target.#documentAuthorityRetired && !target.#handoverReceiving &&
+          !target.#nativeHandover && !target.#preparedRetainedSnapshot && !target.#retainedSnapshot &&
+          target.#revision === 0 && target.#undo.length === 0 && target.#redo.length === 0 &&
+          target.#value === pin.value && target.#documentIdentity.id === pin.identity.id &&
+          target.#documentIdentity.epoch === pin.identity.epoch
+        try { assertAdmission() } catch (cause) { recordFailure(cause); throw cause }
+        if (!eligible() || !pristine()) refuse('editor-history-native-handover-target-unavailable')
+        // Backup original target pointers, never clone source/history entries or create a timeline.
+        const before = { identity: target.#documentIdentity, value: target.#value, revision: target.#revision,
+          selection: target.#selection, undo: target.#undo, redo: target.#redo, mergeBlocked: target.#mergeBlocked }
+        pin.receiving = true
+        state = 'receiving'
+        let entered = false
+        try {
+          target.#beginDocumentWrite()
+          entered = true
+          if (!eligible() || !pristine(1)) throw new Error('editor-history-native-handover-admission-revoked')
+          target.#handoverReceiving = true
+          target.#documentIdentity = pin.identity
+          target.#value = pin.value
+          target.#revision = pin.revision
+          target.#selection = pin.selection
+          target.#undo = pin.liveUndo
+          target.#redo = pin.liveRedo
+          target.#mergeBlocked = true
+          await restoreTarget()
+          assertAdmission()
+          if (!eligible() || target.#documentAuthorityRetired || target.#value !== pin.value ||
+            target.#documentIdentity !== pin.identity || target.#revision !== pin.revision ||
+            target.#selection !== pin.selection || target.#undo !== pin.liveUndo || target.#redo !== pin.liveRedo)
+            throw new Error('editor-history-native-handover-final-custody-revoked')
+          // Original pointers commit only after actual target view/admission success.
+          target.#retainedSnapshot = pin.snapshot
+          target.#retainedHistory = pin.undo
+          target.#retainedRedo = pin.redo
+          target.#retainedAuthorityGeneration = target.#documentAuthorityGeneration
+          releaseMemory()
+          state = 'transferred'
+        } catch (cause) {
+          recordFailure(cause)
+          if (entered) {
+            target.#documentIdentity = before.identity
+            target.#value = before.value
+            target.#revision = before.revision
+            target.#selection = before.selection
+            target.#undo = before.undo
+            target.#redo = before.redo
+            target.#mergeBlocked = before.mergeBlocked
+            try { await restoreTarget() } catch (cleanupCause) { recordFailure(cleanupCause) }
+          }
+          state = 'released'
+          throw cause
+        } finally {
+          target.#handoverReceiving = false
+          if (entered) target.#endDocumentWrite()
+          pin.receiving = false
+        }
+      },
+    })
+    if (this.#nativeHandover || !this.hasRetainedSnapshotCustody(snapshot) || this.#value !== pin.value ||
+      this.#documentIdentity !== pin.identity || this.#revision !== pin.revision ||
+      this.#selection !== pin.selection || this.#undo !== pin.liveUndo || this.#redo !== pin.liveRedo)
+      throw new Error('editor-history-native-handover-final-admission-revoked')
+    this.#nativeHandover = pin
+    return handle
   }
 
   switchDocument(

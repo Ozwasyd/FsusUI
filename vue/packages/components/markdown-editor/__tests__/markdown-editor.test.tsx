@@ -35,6 +35,153 @@ import type {
 import { getMarkdownXssSourceUrl } from '../../../../tests/support/markdown-xss-corpus'
 
 describe('MarkdownEditor', () => {
+  const handoverOwner = (store: MarkdownEditorTransactionStore, disposed: () => boolean,
+    restoreNativeHandoverState?: () => Promise<void>) => createMarkdownEditorSessionBinding({
+    transactionStore: store, isDisposed: disposed, isComposing: () => false,
+    documentAuthority: Object.freeze({
+      capture: MarkdownEditorTransactionStore.prototype.captureDocumentAuthority.bind(store),
+      hasCustody: MarkdownEditorTransactionStore.prototype.hasDocumentAuthorityCustody.bind(store),
+      subscribeRetirement: MarkdownEditorTransactionStore.prototype.subscribeDocumentAuthorityRetirement.bind(store),
+    }),
+    captureViewState: () => null, restoreViewState: () => {},
+    captureLastValidRender: () => null, resourceParticipants: () => [], restoreNativeHandoverState,
+  })
+
+  it('moves original native history through normal unmount release only after actual same-process target view restoration', async () => {
+    const identity = { id: 'native-handover', epoch: 1 }
+    const store = new MarkdownEditorTransactionStore('source', undefined, identity)
+    store.dispatch({ changes: [{ from: 6, to: 6, insert: '!' }], history: 'separate', origin: 'programmatic',
+      selection: { start: 1, end: 3, direction: 'backward' } })
+    let disposed = false
+    const binding = handoverOwner(store, () => disposed)
+    const session = binding.getSession('session:native-handover')
+    const snapshot = session.captureSnapshot(() => 'a'.repeat(64))
+    const principal = Object.freeze({ hasCustody: () => true })
+    const handover = session.prepareNativeHandover(snapshot, principal)
+    expect(() => session.captureSnapshot(() => 'b'.repeat(64))).toThrow('editor-session-native-handover-checkpoint-reserved')
+    store.retireDocumentAuthority()
+    binding.retirePublicationAuthority()
+    disposed = true
+    store.releaseRetainedSnapshot()
+    expect(store.history.canUndo).toBe(true)
+    expect(handover.inspect()).toMatchObject({ state: 'released', eligible: true, complete: false })
+    const target = new MarkdownEditorTransactionStore('source!', undefined, identity)
+    const textarea = document.createElement('textarea')
+    const receiver = handoverOwner(target, () => false, async () => {
+      expect(store.history.canUndo).toBe(true)
+      expect(() => target.reset('must not write')).toThrow('editor-history-native-handover-receiving')
+      textarea.value = target.value
+      const selection = target.selection
+      textarea.setSelectionRange(selection.start, selection.end, selection.direction)
+    }).getSession('session:native-handover')
+    const proof = await receiver.adoptNativeHandover(handover, { documentIdentity: identity, revision: snapshot.revision, principal })
+    expect(proof).toMatchObject({ status: 'native-recreated', nativeHistoryTransferred: true,
+      fullRefsRestored: false, resourcesValidated: false })
+    expect(target.selection).toEqual(snapshot.selection)
+    expect(textarea.selectionStart).toBe(1)
+    expect(textarea.selectionEnd).toBe(3)
+    expect(store.history.canUndo).toBe(false)
+    expect(store.value).toBe('')
+    expect(session.documentAuthority!.capture()).toBeNull()
+    expect(receiver.hasRetainedSnapshotCustody(snapshot)).toBe(false)
+    expect(handover.cancel()).toBe(false)
+    expect(target.undo().value).toBe('source')
+  })
+
+  it('preserves original native handover pins and raw view failure through rollback and genuine retry', async () => {
+    const identity = { id: 'native-handover-retry', epoch: 1 }
+    const source = new MarkdownEditorTransactionStore('source', undefined, identity)
+    source.dispatch({ changes: [{ from: 6, to: 6, insert: '!' }], history: 'separate', origin: 'programmatic' })
+    let disposed = false
+    const binding = handoverOwner(source, () => disposed)
+    const session = binding.getSession('session:native-handover-retry')
+    const snapshot = session.captureSnapshot(() => 'a'.repeat(64))
+    const principal = Object.freeze({ hasCustody: () => true })
+    const handover = session.prepareNativeHandover(snapshot, principal)
+    source.retireDocumentAuthority(); binding.retirePublicationAuthority(); disposed = true; source.releaseRetainedSnapshot()
+    const target = new MarkdownEditorTransactionStore('source!', undefined, identity)
+    const cause = { tag: 'original-native-view-failure' }
+    let fail = true
+    const receiver = handoverOwner(target, () => false, async () => { if (fail) throw cause }).getSession(snapshot.editorSessionRef)
+    await expect(receiver.adoptNativeHandover(handover, { documentIdentity: identity, revision: snapshot.revision, principal })).rejects.toBe(cause)
+    expect(source.history.canUndo).toBe(true)
+    expect(target.history.canUndo).toBe(false)
+    expect(handover.inspect()).toMatchObject({ state: 'released', failed: true, firstCause: cause, latestCause: cause })
+    fail = false
+    await receiver.adoptNativeHandover(handover, { documentIdentity: identity, revision: snapshot.revision, principal })
+    expect(target.undo().value).toBe('source')
+    expect(source.history.canUndo).toBe(false)
+  })
+
+  it('refuses native handover for foreign handles stale epoch source principal and pre-retirement writes without releasing originals', async () => {
+    const identity = { id: 'native-handover-refusal', epoch: 1 }
+    const source = new MarkdownEditorTransactionStore('source', undefined, identity)
+    let disposed = false
+    let principalLive = true
+    const binding = handoverOwner(source, () => disposed)
+    const session = binding.getSession('session:native-handover-refusal')
+    const snapshot = session.captureSnapshot(() => 'a'.repeat(64))
+    const principal = Object.freeze({ hasCustody: () => principalLive })
+    const handover = session.prepareNativeHandover(snapshot, principal)
+    source.retireDocumentAuthority(); binding.retirePublicationAuthority(); disposed = true; source.releaseRetainedSnapshot()
+    const target = handoverOwner(new MarkdownEditorTransactionStore('source', undefined, identity), () => false, async () => {}).getSession(snapshot.editorSessionRef)
+    const expected = { documentIdentity: identity, revision: snapshot.revision, principal }
+    await expect(target.adoptNativeHandover({ ...handover }, expected)).rejects.toThrow('editor-session-native-handover-target-unavailable')
+    await expect(target.adoptNativeHandover(handover, { ...expected, principal: { hasCustody: () => true } })).rejects.toThrow('editor-session-native-handover-owner-mismatch')
+    principalLive = false
+    await expect(target.adoptNativeHandover(handover, expected)).rejects.toThrow('editor-session-native-handover-principal-revoked')
+    principalLive = true
+    for (const [value, epoch] of [['wrong source', 1], ['source', 2]] as const) {
+      const wrong = handoverOwner(new MarkdownEditorTransactionStore(value, undefined, { ...identity, epoch }), () => false, async () => {}).getSession(snapshot.editorSessionRef)
+      await expect(wrong.adoptNativeHandover(handover, expected)).rejects.toThrow('editor-history-native-handover-target-unavailable')
+    }
+    expect(handover.inspect().state).toBe('released')
+    expect(handover.cancel()).toBe(true)
+    const live = new MarkdownEditorTransactionStore('source', undefined, identity)
+    const liveBinding = handoverOwner(live, () => false)
+    const liveSession = liveBinding.getSession('session:native-handover-write')
+    const next = liveSession.captureSnapshot(() => 'b'.repeat(64))
+    const stale = liveSession.prepareNativeHandover(next, principal)
+    live.breakMergeGroup()
+    expect(stale.inspect().eligible).toBe(false)
+    expect(stale.cancel()).toBe(true)
+  })
+
+  it('retains original retirement failure and native checkpoint custody until real cleanup retry or explicit cancellation', () => {
+    const source = new MarkdownEditorTransactionStore('source')
+    let disposed = false
+    const binding = handoverOwner(source, () => disposed)
+    const session = binding.getSession('session:native-handover-retirement')
+    const snapshot = session.captureSnapshot(() => 'a'.repeat(64))
+    const handover = session.prepareNativeHandover(snapshot, { hasCustody: () => true })
+    const cause = { tag: 'original-unmount-retirement-failure' }
+    let fail = true
+    const handle = source.subscribeDocumentAuthorityRetirement(() => { if (fail) throw cause })
+    let retired: unknown
+    try { source.retireDocumentAuthority() } catch (error) { retired = error }
+    expect(retired).toBe(cause)
+    binding.retirePublicationAuthority(); disposed = true
+    let released: unknown
+    try { source.releaseRetainedSnapshot() } catch (error) { released = error }
+    expect(released).toBe(cause)
+    expect(handover.inspect()).toMatchObject({ failed: true, firstCause: cause, state: 'reserved' })
+    let cancelled: unknown
+    try { handover.cancel() } catch (error) { cancelled = error }
+    expect(cancelled).toBe(cause)
+    fail = false
+    expect(handle.unsubscribe()).toBe(true)
+    source.releaseRetainedSnapshot()
+    expect(handover.cancel()).toBe(true)
+    expect(handover.inspect().state).toBe('cancelled')
+    expect(source.history.canUndo).toBe(false)
+    expect(source.value).toBe('')
+    expect(session.documentAuthority!.capture()).toBeNull()
+    const normal = new MarkdownEditorTransactionStore('normal')
+    const retained = normal.retainSnapshot()
+    normal.retireDocumentAuthority(); normal.releaseRetainedSnapshot()
+    expect(normal.validateRetainedSnapshot(retained)).toBe(false)
+  })
+
   const nativeSurfaceOwner = (store: MarkdownEditorTransactionStore, composing: () => boolean = () => false) =>
     createMarkdownEditorNativeSurfaceResources({
       documentAuthority: Object.freeze({

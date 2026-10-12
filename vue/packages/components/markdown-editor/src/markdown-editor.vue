@@ -1532,6 +1532,7 @@ const ns = useNamespace('markdown-editor')
 const attrs = useAttrs()
 const rootElementRef = ref<HTMLElement | null>(null)
 const sessionSurfacePaused = ref(false)
+const nativeHandoverReceiving = ref(false)
 let invalidateNativeSurfacePublication: (() => void) | undefined = undefined
 let sessionDisposed = false
 let retireSnapshotPublicationAuthority: (() => void) | undefined = undefined
@@ -1602,7 +1603,7 @@ const visualViewportHeight = ref(0)
 const visualViewportOffsetTop = ref(0)
 const toolbarRef = ref<HTMLElement | null>(null)
 const inputDisabled = computed(() => props.disabled || props.loading || sessionSurfacePaused.value)
-const editingBlocked = computed(() => props.readonly || inputDisabled.value)
+const editingBlocked = computed(() => props.readonly || inputDisabled.value || nativeHandoverReceiving.value)
 const surfaceOptions = computed<Required<MarkdownEditorSurfaceOptions>>(() => ({
   commandPalette: props.surfaces.commandPalette ?? false,
   selectionToolbar: props.surfaces.selectionToolbar ?? false,
@@ -4132,6 +4133,7 @@ const overflowItemCount = computed(
 )
 nativeSurfaceResources.ownWatch(watch([editingBlocked, overflowItemCount],
   ([blocked, itemCount]) => nativeSurfaceResources.runWatchCallback(() => {
+  if (nativeHandoverReceiving.value) return
   if (blocked || !itemCount) commandsExpanded.value = false
   if (!blocked) return
 
@@ -7050,6 +7052,26 @@ const sessionBinding = createMarkdownEditorSessionBinding({
   transactionStore,
   documentAuthority,
   nativeSurfaceResourceHandle: nativeSurfaceResources.handle,
+  setNativeHandoverReceiving: (receiving) => { nativeHandoverReceiving.value = receiving },
+  restoreNativeHandoverState: async () => {
+    const identity = transactionStore.documentIdentity
+    const textarea = textareaRef.value
+    const root = rootElementRef.value
+    const current = () => !sessionDisposed && !isComposing.value && !nativeMachine.composing &&
+      isEditorDocumentCurrent(identity) && textareaRef.value === textarea &&
+      rootElementRef.value === root && !!root?.isConnected && !!textarea?.isConnected
+    if (!current()) throw new Error('editor-native-handover-view-unavailable')
+    editorValue.value = transactionStore.value
+    editorRevision.value = transactionStore.revision
+    editorSelection.value = transactionStore.selection
+    nativeCompositionValue.value = transactionStore.value
+    const selection = transactionStore.selection
+    await restoreTextareaSelection(selection, false, current)
+    if (!current() || textarea!.value !== transactionStore.value ||
+      textarea!.selectionStart !== selection.start || textarea!.selectionEnd !== selection.end ||
+      textarea!.selectionDirection !== selection.direction)
+      throw new Error('editor-native-handover-view-restore-not-confirmed')
+  },
   resourceParticipants: () => [
     frameResourceParticipant, sessionLayoutResources.participant,
     ...(surfaceResourceOwnerComplete ? [surfaceResourceParticipant] : []),
