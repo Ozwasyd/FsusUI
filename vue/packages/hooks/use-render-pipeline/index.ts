@@ -3058,7 +3058,7 @@ export const useFsusVirtualWindow = <TUnit>(options: {
     ).finally(producerAuthority.boundary(() => viewportJobs.delete(job)))
   }
   let resizeObserver: ResizeObserver | null = null
-  let refGeneration = 0
+  const refGenerations = new Map<string, object>()
   type ResizeTarget = {
     element: Element
     observing: number
@@ -3075,6 +3075,7 @@ export const useFsusVirtualWindow = <TUnit>(options: {
     operations: number
     releasing: boolean
     retired: boolean
+    drainingTargets: boolean
   }
   let resizeBinding: ResizeBinding | null = null
   const resizeBindings = new Set<ResizeBinding>()
@@ -3511,14 +3512,45 @@ export const useFsusVirtualWindow = <TUnit>(options: {
       })),
     )
   }
+  const drainDeferredResizeTargets = (binding: ResizeBinding) => {
+    if (
+      binding.drainingTargets ||
+      binding.registering ||
+      !binding.observer ||
+      binding.retired ||
+      binding !== resizeBinding ||
+      paused ||
+      disposed
+    )
+      return
+    binding.drainingTargets = true
+    try {
+      attemptRenderPipelineCleanup(
+        producerAuthority,
+        [...binding.targetStates.values()]
+          .filter(
+            (target) =>
+              target.deferredObserve && !target.retired && !target.releasing,
+          )
+          .map((target) => ({
+            resource: target.element,
+            action: () => {
+              if (target.element instanceof HTMLElement)
+                observeElement(target.element)
+            },
+          })),
+      )
+    } finally {
+      binding.drainingTargets = false
+    }
+  }
   const observeElement = (element: HTMLElement) => {
     if (paused || disposed || !variableState) return
-    const control = generation,
-      input = inputGeneration,
-      units = unitsGeneration,
-      refs = refGeneration
+    const control = generation
+    const key = variableState.elementKeys.get(element)
+    if (key === undefined) return
+    const refs = refGenerations.get(key)
     const desired = () => {
-      const key = variableState.elementKeys.get(element)
       return (
         key !== undefined && variableState.observedElements.get(key) === element
       )
@@ -3527,9 +3559,7 @@ export const useFsusVirtualWindow = <TUnit>(options: {
       !paused &&
       !disposed &&
       control === generation &&
-      input === inputGeneration &&
-      units === unitsGeneration &&
-      refs === refGeneration &&
+      refs === refGenerations.get(key) &&
       desired()
     if (!current()) return
     if (!resizeBinding || resizeBinding.retired) {
@@ -3543,14 +3573,21 @@ export const useFsusVirtualWindow = <TUnit>(options: {
         operations: 0,
         releasing: false,
         retired: false,
+        drainingTargets: false,
       }
       resizeBinding = binding
       resizeBindings.add(binding)
+      const bindingCurrent = () =>
+        !paused &&
+        !disposed &&
+        control === generation &&
+        binding === resizeBinding &&
+        !binding.retired
       let failed = false
       let firstCause: unknown
       try {
         const Observer = globalThis.ResizeObserver
-        if (!current() || resizeBinding !== binding) binding.retired = true
+        if (!bindingCurrent()) binding.retired = true
         else if (typeof Observer !== 'function') {
           resizeBindings.delete(binding)
           if (resizeBinding === binding) resizeBinding = null
@@ -3590,8 +3627,7 @@ export const useFsusVirtualWindow = <TUnit>(options: {
                 return
               const callbackControl = generation,
                 callbackInput = inputGeneration,
-                callbackUnits = unitsGeneration,
-                callbackRefs = refGeneration
+                callbackUnits = unitsGeneration
               const callbackCurrent = () =>
                 !paused &&
                 !disposed &&
@@ -3600,8 +3636,7 @@ export const useFsusVirtualWindow = <TUnit>(options: {
                 observerEpoch === observerGeneration &&
                 callbackControl === generation &&
                 callbackInput === inputGeneration &&
-                callbackUnits === unitsGeneration &&
-                callbackRefs === refGeneration
+                callbackUnits === unitsGeneration
               for (const entry of entries) {
                 if (!callbackCurrent()) return
                 const target = entry.target
@@ -3609,15 +3644,17 @@ export const useFsusVirtualWindow = <TUnit>(options: {
                 const key = variableState.elementKeys.get(target)
                 if (!key || variableState.observedElements.get(key) !== target)
                   continue
+                const refs = refGenerations.get(key)
                 const size =
                   entry.borderBoxSize?.[0]?.blockSize ??
                   entry.contentRect.height ??
                   (target instanceof HTMLElement ? target.offsetHeight : 0)
                 if (
                   !callbackCurrent() ||
-                  variableState.observedElements.get(key) !== target
+                  variableState.observedElements.get(key) !== target ||
+                  refs !== refGenerations.get(key)
                 )
-                  return
+                  continue
                 queueMeasurement(key, size)
               }
             }),
@@ -3635,7 +3672,7 @@ export const useFsusVirtualWindow = <TUnit>(options: {
         resizeBindings.delete(binding)
         if (resizeBinding === binding) resizeBinding = null
       }
-      if (binding.retired || !current() || resizeBinding !== binding) {
+      if (!bindingCurrent()) {
         try {
           releaseResizeBinding(binding)
         } catch (cause) {
@@ -3651,7 +3688,11 @@ export const useFsusVirtualWindow = <TUnit>(options: {
       if (failed) throw firstCause
     }
     const binding = resizeBinding
-    if (!binding || !binding.observer || binding.retired || !current()) return
+    if (!binding || binding.retired) return
+    if (!current()) {
+      drainDeferredResizeTargets(binding)
+      return
+    }
     let target = binding.targetStates.get(element)
     if (!target) {
       target = {
@@ -3666,36 +3707,41 @@ export const useFsusVirtualWindow = <TUnit>(options: {
     target.retired = false
     binding.targets.add(element)
     reconcileObservedTargets()
-    if (target.releasing) {
+    if (target.releasing || binding.registering || !binding.observer) {
       target.deferredObserve = true
       return
     }
+    target.deferredObserve = false
     const ownedTarget = target
-    operateResizeBinding(binding, () => {
-      ownedTarget.observing += 1
-      try {
-        const observer = binding.observer!
-        const observe = observer.observe
-        if (
-          !current() ||
-          binding !== resizeBinding ||
-          binding.retired ||
-          ownedTarget.retired ||
-          resizeObserver !== observer
-        )
-          return
-        observe.call(observer, element)
-        if (
-          !current() ||
-          binding !== resizeBinding ||
-          binding.retired ||
-          resizeObserver !== observer
-        )
-          return
-      } finally {
-        ownedTarget.observing -= 1
-      }
-    })
+    try {
+      operateResizeBinding(binding, () => {
+        ownedTarget.observing += 1
+        try {
+          const observer = binding.observer!
+          const observe = observer.observe
+          if (
+            !current() ||
+            binding !== resizeBinding ||
+            binding.retired ||
+            ownedTarget.retired ||
+            resizeObserver !== observer
+          )
+            return
+          observe.call(observer, element)
+          if (
+            !current() ||
+            binding !== resizeBinding ||
+            binding.retired ||
+            resizeObserver !== observer
+          )
+            return
+        } finally {
+          ownedTarget.observing -= 1
+        }
+      })
+    } finally {
+      drainDeferredResizeTargets(binding)
+    }
   }
 
   const setUnitRef = (key: string, element: Element | null) => {
@@ -3703,16 +3749,13 @@ export const useFsusVirtualWindow = <TUnit>(options: {
     const previousElement = variableState.observedElements.get(key)
     if (previousElement === element || (!previousElement && element === null))
       return
-    const refs = ++refGeneration,
-      control = generation,
+    const refs = {}
+    refGenerations.set(key, refs)
+    const control = generation,
       input = inputGeneration,
       units = unitsGeneration
     const current = () =>
-      !disposed &&
-      refs === refGeneration &&
-      control === generation &&
-      input === inputGeneration &&
-      units === unitsGeneration
+      !disposed && refs === refGenerations.get(key) && control === generation
     variableState.pendingMeasurements.delete(key)
     if (previousElement) {
       unobserveElement(previousElement, current)
@@ -3740,7 +3783,8 @@ export const useFsusVirtualWindow = <TUnit>(options: {
     const height = element.offsetHeight
     if (!current() || variableState.observedElements.get(key) !== element)
       return
-    queueMeasurement(key, height)
+    if (input === inputGeneration && units === unitsGeneration)
+      queueMeasurement(key, height)
     if (!current() || variableState.observedElements.get(key) !== element)
       return
     observeElement(element)
@@ -3753,13 +3797,11 @@ export const useFsusVirtualWindow = <TUnit>(options: {
     const syncGeneration = ++unitsGeneration
     const syncInput = inputGeneration
     const syncControl = generation
-    const syncRefs = refGeneration
     const current = () =>
       !disposed &&
       syncGeneration === unitsGeneration &&
       syncInput === inputGeneration &&
-      syncControl === generation &&
-      syncRefs === refGeneration
+      syncControl === generation
     const previousStart = range.value.start
     if (!current()) return
     const anchorKey = variableState.keys[previousStart]
@@ -3834,10 +3876,12 @@ export const useFsusVirtualWindow = <TUnit>(options: {
         const element = variableState.observedElements.get(key)
         if (element) {
           const observer = resizeObserver
+          const refs = refGenerations.get(key)
           unobserveElement(element, current)
           if (
             !current() ||
             resizeObserver !== observer ||
+            refs !== refGenerations.get(key) ||
             variableState.observedElements.get(key) !== element
           )
             return
@@ -3856,10 +3900,12 @@ export const useFsusVirtualWindow = <TUnit>(options: {
       for (const [key, element] of variableState.observedElements) {
         if (seen.has(key)) continue
         const observer = resizeObserver
+        const refs = refGenerations.get(key)
         unobserveElement(element, current)
         if (
           !current() ||
           resizeObserver !== observer ||
+          refs !== refGenerations.get(key) ||
           variableState.observedElements.get(key) !== element
         )
           return
@@ -4154,6 +4200,7 @@ export const useFsusVirtualWindow = <TUnit>(options: {
             variableState.observedElements.clear()
             variableState.elementKeys = new WeakMap<Element, string>()
             variableState.measuredSizes.clear()
+            refGenerations.clear()
           }
         },
       },
@@ -4172,29 +4219,35 @@ export const useFsusVirtualWindow = <TUnit>(options: {
         if (paused || disposed || resumeGeneration !== generation) break
         const input = inputGeneration,
           units = unitsGeneration,
-          refs = refGeneration
+          refs = refGenerations.get(key)
         const height = element.offsetHeight
         if (
           paused ||
           disposed ||
           resumeGeneration !== generation ||
           input !== inputGeneration ||
-          units !== unitsGeneration ||
-          refs !== refGeneration ||
-          variableState?.observedElements.get(key) !== element
+          units !== unitsGeneration
         )
           break
+        if (
+          refs !== refGenerations.get(key) ||
+          variableState?.observedElements.get(key) !== element
+        )
+          continue
         queueMeasurement(key, height)
         if (
           paused ||
           disposed ||
           resumeGeneration !== generation ||
           input !== inputGeneration ||
-          units !== unitsGeneration ||
-          refs !== refGeneration ||
-          variableState?.observedElements.get(key) !== element
+          units !== unitsGeneration
         )
           break
+        if (
+          refs !== refGenerations.get(key) ||
+          variableState?.observedElements.get(key) !== element
+        )
+          continue
         observeElement(element)
       }
     }
