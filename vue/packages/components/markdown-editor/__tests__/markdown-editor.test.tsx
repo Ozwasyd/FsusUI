@@ -120,6 +120,57 @@ describe('MarkdownEditor', () => {
     owner.disposeRegistrations()
   })
 
+  it('releases original failed directive registration indexes on genuine cleanup retry and admits a later binding on the same DOM node', () => {
+    const owner = nativeSurfaceOwner(new MarkdownEditorTransactionStore('source'))
+    const element = document.createElement('textarea')
+    owner.bindTarget(element, { input: () => {} })
+    const cause = { tag: 'original-directive-release-failure' }
+    const remove = element.removeEventListener.bind(element)
+    element.removeEventListener = ((type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions) => {
+      remove(type, listener, options); throw cause
+    }) as typeof element.removeEventListener
+    let released: unknown
+    let paused: unknown
+    try { owner.releaseTarget(element) } catch (error) { released = error }
+    try { owner.handle.pauseOwnedRegistrations() } catch (error) { paused = error }
+    expect(released).toBe(cause)
+    expect(paused).toBe(cause)
+    expect(owner.handle.inspect()).toMatchObject({ registeredListeners: 1,
+      attachedListeners: null, unknownListenerRegistrations: 1, firstCause: cause })
+    element.removeEventListener = remove
+    expect(owner.handle.retryOwnedCleanup()).toMatchObject({ registeredListeners: 0,
+      attachedListeners: 0, unknownListenerRegistrations: 0 })
+    expect(() => owner.bindTarget(element, { input: () => {} })).not.toThrow()
+    expect(owner.handle.inspect().registeredListeners).toBe(1)
+    owner.disposeRegistrations()
+    expect(owner.handle.inspect().registeredListeners).toBe(0)
+  })
+
+  it('preserves a reentrant replacement registration and its target index when the old native detach completes', () => {
+    const owner = nativeSurfaceOwner(new MarkdownEditorTransactionStore('source'))
+    const element = document.createElement('textarea')
+    owner.bindTarget(element, { input: () => {} })
+    const remove = element.removeEventListener.bind(element)
+    let replace = true
+    let calls = 0
+    element.removeEventListener = ((type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions) => {
+      remove(type, listener, options)
+      if (replace) {
+        replace = false
+        owner.releaseTarget(element)
+        owner.bindTarget(element, { input: () => { calls += 1 } })
+      }
+    }) as typeof element.removeEventListener
+    owner.releaseTarget(element)
+    expect(owner.handle.inspect()).toMatchObject({ registeredListeners: 1, attachedListeners: 1 })
+    element.dispatchEvent(new Event('input'))
+    expect(calls).toBe(1)
+    owner.releaseTarget(element)
+    expect(owner.handle.inspect()).toMatchObject({ registeredListeners: 0, attachedListeners: 0 })
+    element.removeEventListener = remove
+    owner.disposeRegistrations()
+  })
+
   it('retains the original rearm failure and removes actual partial native installations before refusing acknowledgement', () => {
     const owner = nativeSurfaceOwner(new MarkdownEditorTransactionStore('source'))
     const element = document.createElement('textarea')

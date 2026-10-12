@@ -95,7 +95,14 @@ export const createMarkdownEditorNativeSurfaceResources = (owner: {
       record.uncertain = false
     }
     record.failed = false
-    if (!record.desired) listeners.delete(record)
+    if (!record.desired) {
+      listeners.delete(record)
+      const records = targets.get(record.target)
+      if (records?.get(record.name) === record) {
+        records.delete(record.name)
+        if (records.size === 0 && targets.get(record.target) === records) targets.delete(record.target)
+      }
+    }
   }
   const attach = (record: ListenerRecord) => {
     if (!record.attached && record.desired) {
@@ -228,10 +235,10 @@ export const createMarkdownEditorNativeSurfaceResources = (owner: {
     if (paused && structural) pauseStructureCurrent = false
     all([...records.values()].map((record) => () => {
       record.desired = false
-      try { detach(record); records.delete(record.name) }
+      try { detach(record) }
       catch (cause) { record.failed = true; throw cause }
     }))
-    if (records.size === 0) targets.delete(target)
+    if (records.size === 0 && targets.get(target) === records) targets.delete(target)
   }
   const bindTarget = (target: EventTarget, events: MarkdownEditorNativeSurfaceEvents, structural = true) => {
     if (disposed) throw new Error('editor-native-surface-disposed')
@@ -277,7 +284,7 @@ export const createMarkdownEditorNativeSurfaceResources = (owner: {
     all([...records.values()].filter((record) => !(record.name in events)).map((record) => () => {
       if (paused && structural) pauseStructureCurrent = false
       record.desired = false
-      try { detach(record); records!.delete(record.name) }
+      try { detach(record) }
       catch (cause) { record.failed = true; throw cause }
     }))
   }

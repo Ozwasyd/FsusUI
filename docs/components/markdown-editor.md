@@ -1272,6 +1272,9 @@ counts, failures and original first/latest causes. A throwing native registratio
 operation retains an unknown record: `attachedListeners` becomes null rather
 than zero. Cleanup attempts every owned record, and only a genuine successful
 retry clears that record.
+Successful release removes both the listener record and its target/name index
+only when that index still points to the same original record. An empty target
+bucket is removed only by identity; reentrant replacement registrations survive.
 `retryOwnedCleanup()` remains available on the held original handle after
 retirement, and retries actual cleanup without native capture or rearm authority.
 Rearm failure attempts to detach partial installations
