@@ -63,6 +63,7 @@
 <script lang="ts" setup>
 import {
   computed,
+  getCurrentScope,
   nextTick,
   onActivated,
   onBeforeUnmount,
@@ -2215,51 +2216,75 @@ if (validInitialRender) {
   )
 }
 
-const renderWatchHandle = watch(
-  () => [
-    props.content,
-    props.contentVersion,
-    props.allowLatex,
-    props.allowMermaid,
-    props.mode,
-    props.baseUrl,
-    props.cspNonce,
-    props.features,
-    heavyThemeRevision.value,
-    heavyDocumentContext?.documentKey(),
-    heavyDocumentContext?.documentEpoch(),
-    heavyDocumentContext?.revision(),
-  ],
-  () => {
-    rendererResourceOwner.retireCheckpointAuthority('source-watch')
-    if (rendererResourceOwner.isDisposed()) return
-    currentTaskId += 1
-    rendererResourceOwner.invalidate()
-    if (rendererResourceOwner.isDisposed()) return
-    rendererResourceOwner.runCheckpointAuthorityCallback(
-      'request-input-publication',
+const renderWatchScope = getCurrentScope()
+const readRenderWatchSource = () => [
+  props.content,
+  props.contentVersion,
+  props.allowLatex,
+  props.allowMermaid,
+  props.mode,
+  props.baseUrl,
+  props.cspNonce,
+  props.features,
+  heavyThemeRevision.value,
+  heavyDocumentContext?.documentKey(),
+  heavyDocumentContext?.documentEpoch(),
+  heavyDocumentContext?.revision(),
+]
+
+const createRenderWatch = (immediate: boolean) => {
+  if (!renderWatchScope?.active)
+    throw new Error('markdown-renderer-original-watch-scope-unavailable')
+  const handle = renderWatchScope.run(() =>
+    watch(
+      readRenderWatchSource,
       () => {
-        rendererRequestInput.replace(
-          createMarkdownRenderRequest(normalizeMarkdownSource(props.content)),
+        rendererResourceOwner.retireCheckpointAuthority('source-watch')
+        if (
+          rendererResourceOwner.isDisposed() ||
+          rendererResourceOwner.isRenderWatchPaused()
         )
+          return
+        currentTaskId += 1
+        rendererResourceOwner.invalidate()
+        if (rendererResourceOwner.isDisposed()) return
+        rendererResourceOwner.runCheckpointAuthorityCallback(
+          'request-input-publication',
+          () => {
+            rendererRequestInput.replace(
+              createMarkdownRenderRequest(
+                normalizeMarkdownSource(props.content),
+              ),
+            )
+          },
+        )
+        if (rendererResourceOwner.isDisposed()) return
+        heavyLifecycle.pause()
+        if (rendererResourceOwner.isDisposed()) return
+        activationController?.abort()
+        if (rendererResourceOwner.isDisposed()) return
+        if (debounceTimer !== null) {
+          rendererResourceOwner.clearTimer(debounceTimer)
+        }
+        debounceTimer = rendererResourceOwner.setTimer(() => {
+          debounceTimer = null
+          void performRender()
+        }, 16)
       },
-    )
-    if (rendererResourceOwner.isDisposed()) return
-    heavyLifecycle.pause()
-    if (rendererResourceOwner.isDisposed()) return
-    activationController?.abort()
-    if (rendererResourceOwner.isDisposed()) return
-    if (debounceTimer !== null) {
-      rendererResourceOwner.clearTimer(debounceTimer)
-    }
-    debounceTimer = rendererResourceOwner.setTimer(() => {
-      debounceTimer = null
-      void performRender()
-    }, 16)
-  },
-  { immediate: true, flush: 'sync' },
+      { immediate, flush: 'sync' },
+    ),
+  )
+  if (!handle)
+    throw new Error('markdown-renderer-original-watch-scope-unavailable')
+  return handle
+}
+rendererResourceOwner.bindRenderWatchSource(
+  Object.freeze({
+    readSource: readRenderWatchSource,
+    create: createRenderWatch,
+  }),
 )
-rendererResourceOwner.bindRenderWatchHandle(renderWatchHandle)
+rendererResourceOwner.installRenderWatch(true)
 
 onActivated(() => rendererResourceOwner.onCheckpointActivated())
 onDeactivated(() => rendererResourceOwner.onCheckpointDeactivated())
@@ -2437,6 +2462,7 @@ defineExpose({
   publishSealedRendererOwnedCheckpoint:
     rendererResourceOwner.publishSealedRendererOwnedCheckpoint,
   restoreLastValidRender,
+  getRendererOwnedHandleControl: rendererResourceOwner.getOwnedHandleControl,
   getSessionResourceParticipant: () => rendererResourceOwner.participant,
   getSessionResourceSourceOffer: () =>
     rendererResourceOwner.inspectOwnedResources(),
