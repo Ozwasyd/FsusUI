@@ -1049,3 +1049,32 @@ extra listener, timer, worker or job. It certifies no complete resource census,
 restoration, recovery, full-host readiness or eviction: `complete:false`,
 `recoverable:false`, `nativeRecovery:'unavailable'`, unknown resource contracts,
 and runtime/native qualification holds remain.
+
+### Accepted original resource-control source intake
+
+The local session composition consumes the four exact accepted original Renderer,
+pipeline and worker postimages from `7e8ed15d5bf0f5cf63cb63fc63d4218c271daf90`.
+It retains the current MarkdownEditor session, native handover and shared exports;
+the independent Heavy integration, attachment and Root staging candidates are
+not part of this intake. This is source integration, not runtime qualification.
+
+The existing Renderer resource participant now delegates pause and resume to its
+actual owned handles. Its census refuses unsupported original component effects,
+undelivered platform observer queues, adapter internals or cancellation completion,
+worker cleanup residues and unattributed shared resources. A known subtotal is
+never returned as an admitted complete census. Original failures and cleanup
+holders survive refusal and remain available for the original retry path.
+
+Chunk activation checks its original admission after retirement notification and
+unobserve callbacks. Deferred replacement advances only after the original work
+settles, with explicit same-target retry. Fulfilled producer errors remain actual
+errors rather than marking activation complete. Original timer, watch, theme,
+observer, pipeline invocation and worker resource transitions keep their existing
+owners, identities and document-generation guards.
+
+`complete:false`, `recoverable:false`, full resource suspension, full checkpoint
+restoration and session eviction refusals remain. Missing original effect and
+platform queue controls and the independently reviewed Heavy producer still block
+full admission. All runtime, native, IME, security, privacy, receipt, race and
+backup/restore qualification checks remain HOLD/UNRUN. The consumer uses only the
+local FsusUI source alias; this change does not publish a package.

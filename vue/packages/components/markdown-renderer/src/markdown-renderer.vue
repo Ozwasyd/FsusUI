@@ -63,6 +63,7 @@
 <script lang="ts" setup>
 import {
   computed,
+  getCurrentScope,
   nextTick,
   onActivated,
   onBeforeUnmount,
@@ -106,7 +107,10 @@ import {
   hasUnavailableMarkdownRendererWorkerListenerRegistration,
   inspectMarkdownRendererWorkerCleanupResidue,
 } from './markdown-renderer-session-resources'
-import type { MarkdownRendererRestoreProof } from './markdown-renderer-session-resources'
+import type {
+  MarkdownRendererRestoreProof,
+  MarkdownRendererOwnedTimer,
+} from './markdown-renderer-session-resources'
 import type { FsusRenderPipelineAdapter } from '@element-plus/hooks'
 import type {
   MarkdownHeavyFeatureIdentity,
@@ -155,7 +159,7 @@ const handleHeavyFeatureThemeChange = () => {
     },
   )
 }
-const ensureHeavyFeatureThemeListener = () => {
+const ensureHeavyFeatureThemeListener = (originalTarget?: HTMLElement) => {
   if (
     heavyThemeListenerInstalled ||
     installingHeavyThemeListener ||
@@ -166,7 +170,7 @@ const ensureHeavyFeatureThemeListener = () => {
   installingHeavyThemeListener = true
   let target: HTMLElement
   try {
-    target = document.documentElement
+    target = originalTarget ?? document.documentElement
   } catch (error) {
     installingHeavyThemeListener = false
     installation.fail(error)
@@ -329,7 +333,7 @@ const getChunkUnitAttrs = (
 }
 
 let currentTaskId = 0
-let debounceTimer: ReturnType<typeof setTimeout> | null = null
+let debounceTimer: MarkdownRendererOwnedTimer | null = null
 let activationController: AbortController | null = null
 let activationObserver: IntersectionObserver | null = null
 let resettingFeatureActivation = false
@@ -339,6 +343,13 @@ let activationDurationMs = 0
 let commitDurationMs = 0
 const activatedChunkKeys = new Set<string>()
 const chunkActivationElements = new Map<string, HTMLElement>()
+const deferredChunkActivations = new Map<
+  string,
+  { readonly element: HTMLElement; readonly taskId: number }
+>()
+const activatingChunkKeys = new Set<string>()
+let pausedHeavyThemeTarget: HTMLElement | null = null
+let pausedActivationControllerRequired = false
 type HeavyLifecycleIdentityContext = Readonly<{
   config: string
   documentEpoch: number | string
@@ -454,6 +465,12 @@ const rendererResourceOwner: ReturnType<
       ),
     )
     const contexts = Object.freeze({ ...heavyLifecycleIdentityContexts })
+    const deferred = Object.freeze(
+      [...deferredChunkActivations].map(([key, pending]) =>
+        Object.freeze({ key, ...pending }),
+      ),
+    )
+    const activating = Object.freeze([...activatingChunkKeys])
     const sequences = Object.freeze(
       Object.fromEntries(
         Object.entries(heavyLifecycleIdentitySequences).map(
@@ -479,6 +496,8 @@ const rendererResourceOwner: ReturnType<
         activeChunkResult,
         activatedChunkKeys: keys,
         chunkActivationElements: elements,
+        deferredChunkActivations: deferred,
+        activatingChunkKeys: activating,
         heavyLifecycleIdentityContexts: contexts,
         heavyLifecycleIdentitySequences: sequences,
         heavyLifecycleProjectionNodeIds: nodeIds,
@@ -491,6 +510,8 @@ const rendererResourceOwner: ReturnType<
       }),
       retainedCollectionEntries:
         keys.length +
+        deferred.length +
+        activating.length +
         elements.length +
         Object.keys(contexts).length +
         Object.keys(sequences).length +
@@ -514,6 +535,81 @@ const rendererResourceOwner: ReturnType<
     (activationController ? 1 : 0) +
     (activationObserver ? 1 : 0),
   readDocumentAuthority: () => heavyDocumentContext?.documentAuthority ?? null,
+  pauseRelatedResources: () => [
+    {
+      phase: 'component-activity-pause-custody',
+      resource: chunkActivationElements,
+      run: () => {
+        if (heavyThemeListenerInstalled && heavyThemeListenerTarget)
+          pausedHeavyThemeTarget = heavyThemeListenerTarget
+        pausedActivationControllerRequired ||= activationController !== null
+      },
+    },
+    {
+      phase: 'pipeline-resource-pause',
+      resource: renderPipelineRuntime,
+      run: () => {
+        renderPipelineRuntime.pause()
+      },
+    },
+    {
+      phase: 'virtual-resource-pause',
+      resource: virtualWindow,
+      run: () => {
+        virtualWindow.pause()
+      },
+    },
+    {
+      phase: 'heavy-resource-pause',
+      resource: heavyLifecycle,
+      run: () => heavyLifecycle.pause(),
+    },
+    {
+      phase: 'theme-listener-remove',
+      resource: heavyThemeListenerTarget,
+      run: removeHeavyFeatureThemeListener,
+    },
+    controllerCleanup(activationController),
+    observerCleanup(activationObserver),
+  ],
+  resumeRelatedResources: () => [
+    {
+      phase: 'pipeline-resource-resume',
+      resource: renderPipelineRuntime,
+      run: () => {
+        renderPipelineRuntime.resume()
+      },
+    },
+    {
+      phase: 'virtual-resource-resume',
+      resource: virtualWindow,
+      run: () => {
+        virtualWindow.resume()
+      },
+    },
+    {
+      phase: 'heavy-resource-resume',
+      resource: heavyLifecycle,
+      run: () => {
+        if (!heavyLifecycle.resume())
+          throw new Error('markdown-renderer-heavy-resource-resume-unavailable')
+      },
+    },
+    {
+      phase: 'component-activity-resume',
+      resource: chunkActivationElements,
+      run: resumeComponentActivity,
+    },
+  ],
+  recreateCurrentFrames: () => {
+    scheduleMeasurementWarmup()
+    resumeDeferredChunkActivations()
+  },
+  resumeWatchActivity: () => resumeDeferredChunkActivations(),
+  commitRelatedResourceResume: () => {
+    pausedHeavyThemeTarget = null
+    pausedActivationControllerRequired = false
+  },
   readProjectionResources: () => {
     const heavy = heavyLifecycle.metrics()
     return {
@@ -524,6 +620,9 @@ const rendererResourceOwner: ReturnType<
       memoryUnits:
         chunkUnits.value.length +
         chunkActivationElements.size +
+        deferredChunkActivations.size +
+        activatingChunkKeys.size +
+        (pausedHeavyThemeTarget ? 1 : 0) +
         activatedChunkKeys.size +
         (renderedContent.value === null ? 0 : 1) +
         (activeChunkResult ? 1 : 0) +
@@ -867,6 +966,7 @@ const setChunkUnitRef = (key: string, element: Element | null) => {
       'projection-write',
       () => {
         chunkActivationElements.delete(key)
+        deferredChunkActivations.delete(key)
       },
     )
     recordHeavyLifecycleMetrics()
@@ -904,6 +1004,7 @@ const vMarkdownHeavyLifecycleUnmount = {
         'projection-write',
         () => {
           chunkActivationElements.delete(key)
+          deferredChunkActivations.delete(key)
         },
       )
     }
@@ -1213,6 +1314,7 @@ const virtualWindow = useFsusVirtualWindow<MarkdownRenderChunk>({
   units: chunkUnits,
 })
 
+rendererResourceOwner.bindRendererDisposer(disposeRendererResources)
 onBeforeUnmount(disposeRendererResources)
 try {
   rendererResourceOwner.bindCheckpointSealSources({
@@ -1266,6 +1368,8 @@ const hasEnabledHeavyFeature = (
 function requireRendererAdmission() {
   if (rendererResourceOwner.isDisposed())
     throw new Error('markdown-renderer-resource-owner-disposed')
+  if (rendererResourceOwner.isRenderWatchPaused())
+    throw new Error('markdown-renderer-resource-admission-paused')
 }
 
 function controllerCleanup(controller: AbortController | null) {
@@ -1352,6 +1456,9 @@ const resetFeatureActivation = () => {
       'projection-write',
       () => {
         chunkActivationElements.clear()
+        deferredChunkActivations.clear()
+        pausedHeavyThemeTarget = null
+        pausedActivationControllerRequired = false
       },
     )
     rendererResourceOwner.runCheckpointAuthorityCallback(
@@ -1536,11 +1643,22 @@ const activateRenderedFeatures = async (
   activationRoot: ParentNode | null = rootEl.value,
   signal: AbortSignal | undefined = activationController?.signal,
 ) => {
+  if (
+    rendererResourceOwner.isDisposed() ||
+    rendererResourceOwner.isRenderWatchPaused() ||
+    signal?.aborted
+  )
+    return 'cancelled' as const
   const finishJob = rendererResourceOwner.trackJob()
   try {
     await nextTick()
 
-    if (!activationRoot || signal?.aborted) return
+    if (
+      !activationRoot ||
+      signal?.aborted ||
+      rendererResourceOwner.isRenderWatchPaused()
+    )
+      return 'cancelled' as const
 
     const activationStartedAt = readPerformanceNow()
     const features = resolveMarkdownFeatureOptions()
@@ -1548,11 +1666,13 @@ const activateRenderedFeatures = async (
     const resolveHeavyFeatureIdentity = heavyFeaturesEnabled
       ? await createHeavyFeatureIdentityResolver(result)
       : () => null
-    if (signal?.aborted) return
+    if (signal?.aborted || rendererResourceOwner.isRenderWatchPaused())
+      return 'cancelled' as const
     const isolatedRenderFactory = heavyFeaturesEnabled
       ? await createHeavyFeatureIsolatedRenderFactory()
       : undefined
-    if (signal?.aborted) return
+    if (signal?.aborted || rendererResourceOwner.isRenderWatchPaused())
+      return 'cancelled' as const
     const activationPromise = activateMarkdownHeavyFeatures({
       baseUrl: props.baseUrl,
       concurrency: 3,
@@ -1576,7 +1696,23 @@ const activateRenderedFeatures = async (
       // early return so diagnostics cannot retain the pre-teardown snapshot.
       recordHeavyLifecycleMetrics()
     }
-    if (signal?.aborted) return
+    const activationFailed = activation.errors.length > 0
+    for (const error of activation.errors) {
+      try {
+        rendererResourceOwner.runCheckpointAuthorityCallback(
+          'feature-activation-result-failure',
+          () => {
+            throw error
+          },
+          activation,
+          'feature-activation-result-failure',
+        )
+      } catch {
+        // Preserve the exact producer error record; fulfillment is not success.
+      }
+    }
+    if (signal?.aborted || rendererResourceOwner.isRenderWatchPaused())
+      return 'cancelled' as const
     rendererResourceOwner.runCheckpointAuthorityCallback(
       'projection-write',
       () => {
@@ -1603,9 +1739,56 @@ const activateRenderedFeatures = async (
     ) {
       ensureHeavyFeatureThemeListener()
     }
+    return activationFailed ? ('failed' as const) : ('activated' as const)
   } finally {
     finishJob()
   }
+}
+
+function retainDeferredChunkActivation(
+  key: string,
+  element: HTMLElement,
+  taskId: number,
+) {
+  if (
+    !rendererResourceOwner.isDisposed() &&
+    taskId === currentTaskId &&
+    chunkActivationElements.get(key) === element &&
+    !activatedChunkKeys.has(key)
+  )
+    deferredChunkActivations.set(key, { element, taskId })
+}
+
+function dispatchChunkActivation(
+  key: string,
+  element: HTMLElement,
+  taskId: number,
+) {
+  if (rendererResourceOwner.isRenderWatchPaused()) {
+    retainDeferredChunkActivation(key, element, taskId)
+    return
+  }
+  if (activatingChunkKeys.has(key)) {
+    retainDeferredChunkActivation(key, element, taskId)
+    return
+  }
+  const resource = { key, element, taskId }
+  void activateChunkFeatures(key, element, taskId).catch((cause: unknown) => {
+    retainDeferredChunkActivation(key, element, taskId)
+    try {
+      rendererResourceOwner.runCheckpointAuthorityCallback(
+        'chunk-activation-failure',
+        () => {
+          throw cause
+        },
+        resource,
+        'chunk-activation-failure',
+      )
+    } catch {
+      // The original owner retains this actual activation cause; the rejection
+      // observer itself must settle rather than create an unobserved rejection.
+    }
+  })
 }
 
 async function activateChunkFeatures(
@@ -1613,27 +1796,86 @@ async function activateChunkFeatures(
   element: HTMLElement,
   taskId: number,
 ) {
+  if (rendererResourceOwner.isRenderWatchPaused()) {
+    retainDeferredChunkActivation(key, element, taskId)
+    return
+  }
   if (
     rendererResourceOwner.isDisposed() ||
     taskId !== currentTaskId ||
     activatedChunkKeys.has(key) ||
+    activatingChunkKeys.has(key) ||
     !activeChunkResult ||
     activationController?.signal.aborted
-  ) {
+  )
     return
+  const result = activeChunkResult
+  const signal = activationController?.signal
+  const isCurrentActivation = () =>
+    !rendererResourceOwner.isDisposed() &&
+    !rendererResourceOwner.isRenderWatchPaused() &&
+    taskId === currentTaskId &&
+    result === activeChunkResult &&
+    chunkActivationElements.get(key) === element &&
+    element.isConnected &&
+    activationController?.signal === signal &&
+    !signal?.aborted
+  activatingChunkKeys.add(key)
+  try {
+    const outcome = await activateRenderedFeatures(result, element, signal)
+    if (outcome !== 'activated') {
+      retainDeferredChunkActivation(key, element, taskId)
+      return
+    }
+    if (!isCurrentActivation()) {
+      retainDeferredChunkActivation(key, element, taskId)
+      return
+    }
+    rendererResourceOwner.runCheckpointAuthorityCallback(
+      'projection-write',
+      () => {
+        // Original retirement receivers run before this callback. Revalidate the
+        // whole captured lifetime/identity both here and after native unobserve.
+        if (!isCurrentActivation()) {
+          retainDeferredChunkActivation(key, element, taskId)
+          return
+        }
+        activationObserver?.unobserve(element)
+        if (!isCurrentActivation()) {
+          retainDeferredChunkActivation(key, element, taskId)
+          return
+        }
+        activatedChunkKeys.add(key)
+        deferredChunkActivations.delete(key)
+      },
+    )
+  } finally {
+    activatingChunkKeys.delete(key)
+    advanceReplacementChunkActivation(key, element)
   }
-  rendererResourceOwner.retireCheckpointAuthority('chunk-activation')
-  rendererResourceOwner.runCheckpointAuthorityCallback(
-    'projection-write',
-    () => {
-      activatedChunkKeys.add(key)
-    },
+}
+
+function advanceReplacementChunkActivation(
+  key: string,
+  settledElement: HTMLElement,
+) {
+  const pending = deferredChunkActivations.get(key)
+  if (
+    !pending ||
+    pending.element === settledElement ||
+    activatingChunkKeys.has(key) ||
+    rendererResourceOwner.isDisposed() ||
+    rendererResourceOwner.isRenderWatchPaused() ||
+    pending.taskId !== currentTaskId ||
+    chunkActivationElements.get(key) !== pending.element ||
+    !pending.element.isConnected ||
+    activatedChunkKeys.has(key)
   )
-  await activateRenderedFeatures(
-    activeChunkResult,
-    element,
-    activationController?.signal,
-  )
+    return
+  // Only a different current target queued behind the settled attempt advances.
+  // A failure of this same target remains for explicit resume/re-observation,
+  // so a permanent producer failure cannot create an immediate retry loop.
+  dispatchChunkActivation(key, pending.element, pending.taskId)
 }
 
 function observeChunkForActivation(key: string, element: HTMLElement) {
@@ -1644,9 +1886,13 @@ function observeChunkForActivation(key: string, element: HTMLElement) {
   )
     return
   const taskId = currentTaskId
+  if (rendererResourceOwner.isRenderWatchPaused()) {
+    retainDeferredChunkActivation(key, element, taskId)
+    return
+  }
   if (typeof IntersectionObserver === 'undefined') {
     if (rendererResourceOwner.isDisposed()) return
-    void activateChunkFeatures(key, element, taskId)
+    dispatchChunkActivation(key, element, taskId)
     return
   }
   const installation = rendererResourceOwner.beginInstallation(
@@ -1689,17 +1935,20 @@ function observeChunkForActivation(key: string, element: HTMLElement) {
                     continue
                   const unitKey = entry.target.dataset.fsusRenderUnitKey
                   if (!unitKey) continue
-                  observer.unobserve(entry.target)
+                  if (rendererResourceOwner.isRenderWatchPaused()) {
+                    retainDeferredChunkActivation(
+                      unitKey,
+                      entry.target,
+                      currentTaskId,
+                    )
+                    continue
+                  }
                   if (
                     rendererResourceOwner.isDisposed() ||
                     activationObserver !== observer
                   )
                     return
-                  void activateChunkFeatures(
-                    unitKey,
-                    entry.target,
-                    currentTaskId,
-                  )
+                  dispatchChunkActivation(unitKey, entry.target, currentTaskId)
                 }
               },
               observer ?? entries,
@@ -1741,6 +1990,61 @@ function observeChunkForActivation(key: string, element: HTMLElement) {
     installingActivationObserver = false
     if (!creationUnknown) installation.complete()
   }
+}
+
+function resumeDeferredChunkActivations() {
+  if (
+    rendererResourceOwner.isDisposed() ||
+    rendererResourceOwner.isRenderWatchPaused()
+  )
+    return
+  for (const [key, pending] of deferredChunkActivations) {
+    if (
+      pending.taskId !== currentTaskId ||
+      chunkActivationElements.get(key) !== pending.element
+    ) {
+      deferredChunkActivations.delete(key)
+      continue
+    }
+    if (pending.element.isConnected) {
+      if (rendererResourceOwner.isRenderWatchPaused()) return
+      dispatchChunkActivation(key, pending.element, pending.taskId)
+    }
+  }
+}
+
+function resumeComponentActivity() {
+  requireRendererAdmission()
+  if (rendererResourceOwner.isRenderWatchPaused())
+    throw new Error('markdown-renderer-component-activity-admission-paused')
+  if (pausedHeavyThemeTarget)
+    ensureHeavyFeatureThemeListener(pausedHeavyThemeTarget)
+  if (pausedActivationControllerRequired && !activationController) {
+    const installation = rendererResourceOwner.beginInstallation(
+      'activation-controller-resume',
+    )
+    let known = false
+    try {
+      const controller = new AbortController()
+      activationController = controller
+      known = true
+      if (
+        rendererResourceOwner.isDisposed() ||
+        rendererResourceOwner.isRenderWatchPaused()
+      )
+        rendererResourceOwner.cleanupComponentResources([
+          controllerCleanup(controller),
+        ])
+    } catch (cause) {
+      if (!known) installation.fail(cause)
+      throw cause
+    } finally {
+      if (known) installation.complete()
+    }
+  }
+  observeMountedChunksForActivation()
+  // Retain these actual restoration obligations across any partial failure.
+  // A subsequent pause captures installed handles again before real removal.
 }
 
 const observeMountedChunksForActivation = () => {
@@ -2215,51 +2519,75 @@ if (validInitialRender) {
   )
 }
 
-const renderWatchHandle = watch(
-  () => [
-    props.content,
-    props.contentVersion,
-    props.allowLatex,
-    props.allowMermaid,
-    props.mode,
-    props.baseUrl,
-    props.cspNonce,
-    props.features,
-    heavyThemeRevision.value,
-    heavyDocumentContext?.documentKey(),
-    heavyDocumentContext?.documentEpoch(),
-    heavyDocumentContext?.revision(),
-  ],
-  () => {
-    rendererResourceOwner.retireCheckpointAuthority('source-watch')
-    if (rendererResourceOwner.isDisposed()) return
-    currentTaskId += 1
-    rendererResourceOwner.invalidate()
-    if (rendererResourceOwner.isDisposed()) return
-    rendererResourceOwner.runCheckpointAuthorityCallback(
-      'request-input-publication',
+const renderWatchScope = getCurrentScope()
+const readRenderWatchSource = () => [
+  props.content,
+  props.contentVersion,
+  props.allowLatex,
+  props.allowMermaid,
+  props.mode,
+  props.baseUrl,
+  props.cspNonce,
+  props.features,
+  heavyThemeRevision.value,
+  heavyDocumentContext?.documentKey(),
+  heavyDocumentContext?.documentEpoch(),
+  heavyDocumentContext?.revision(),
+]
+
+const createRenderWatch = (immediate: boolean) => {
+  if (!renderWatchScope?.active)
+    throw new Error('markdown-renderer-original-watch-scope-unavailable')
+  const handle = renderWatchScope.run(() =>
+    watch(
+      readRenderWatchSource,
       () => {
-        rendererRequestInput.replace(
-          createMarkdownRenderRequest(normalizeMarkdownSource(props.content)),
+        rendererResourceOwner.retireCheckpointAuthority('source-watch')
+        if (
+          rendererResourceOwner.isDisposed() ||
+          rendererResourceOwner.isRenderWatchPaused()
         )
+          return
+        currentTaskId += 1
+        rendererResourceOwner.invalidate()
+        if (rendererResourceOwner.isDisposed()) return
+        rendererResourceOwner.runCheckpointAuthorityCallback(
+          'request-input-publication',
+          () => {
+            rendererRequestInput.replace(
+              createMarkdownRenderRequest(
+                normalizeMarkdownSource(props.content),
+              ),
+            )
+          },
+        )
+        if (rendererResourceOwner.isDisposed()) return
+        heavyLifecycle.pause()
+        if (rendererResourceOwner.isDisposed()) return
+        activationController?.abort()
+        if (rendererResourceOwner.isDisposed()) return
+        if (debounceTimer !== null) {
+          rendererResourceOwner.clearTimer(debounceTimer)
+        }
+        debounceTimer = rendererResourceOwner.setTimer(() => {
+          debounceTimer = null
+          void performRender()
+        }, 16)
       },
-    )
-    if (rendererResourceOwner.isDisposed()) return
-    heavyLifecycle.pause()
-    if (rendererResourceOwner.isDisposed()) return
-    activationController?.abort()
-    if (rendererResourceOwner.isDisposed()) return
-    if (debounceTimer !== null) {
-      rendererResourceOwner.clearTimer(debounceTimer)
-    }
-    debounceTimer = rendererResourceOwner.setTimer(() => {
-      debounceTimer = null
-      void performRender()
-    }, 16)
-  },
-  { immediate: true, flush: 'sync' },
+      { immediate, flush: 'sync' },
+    ),
+  )
+  if (!handle)
+    throw new Error('markdown-renderer-original-watch-scope-unavailable')
+  return handle
+}
+rendererResourceOwner.bindRenderWatchSource(
+  Object.freeze({
+    readSource: readRenderWatchSource,
+    create: createRenderWatch,
+  }),
 )
-rendererResourceOwner.bindRenderWatchHandle(renderWatchHandle)
+rendererResourceOwner.installRenderWatch(true)
 
 onActivated(() => rendererResourceOwner.onCheckpointActivated())
 onDeactivated(() => rendererResourceOwner.onCheckpointDeactivated())
@@ -2363,7 +2691,10 @@ function disposeRendererResources() {
       {
         phase: 'chunk-element-release',
         resource: chunkActivationElements,
-        run: () => chunkActivationElements.clear(),
+        run: () => {
+          chunkActivationElements.clear()
+          deferredChunkActivations.clear()
+        },
       },
       {
         phase: 'rendering-state-release',
@@ -2437,6 +2768,7 @@ defineExpose({
   publishSealedRendererOwnedCheckpoint:
     rendererResourceOwner.publishSealedRendererOwnedCheckpoint,
   restoreLastValidRender,
+  getRendererOwnedHandleControl: rendererResourceOwner.getOwnedHandleControl,
   getSessionResourceParticipant: () => rendererResourceOwner.participant,
   getSessionResourceSourceOffer: () =>
     rendererResourceOwner.inspectOwnedResources(),
