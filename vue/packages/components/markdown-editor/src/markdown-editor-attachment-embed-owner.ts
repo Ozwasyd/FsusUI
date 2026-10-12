@@ -214,6 +214,7 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
     returned: unknown
     binding?: MarkdownAttachmentConsumerRequestBinding
     unknown?: string
+    legacyResultOnly?: boolean
     cause?: unknown
     readonly cleanup: ConsumerCleanup[]
     unknownObserverWork?: Promise<void>
@@ -343,7 +344,7 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
         'editor-session-attachment-consumer-cancel-failed',
       )
   }
-  const inspectConsumers = () => {
+  const inspectConsumers = (entries = [...consumers.values()]) => {
     const counts = {
       backgroundTasks: 0,
       timers: 0,
@@ -352,7 +353,7 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
       networkRequests: 0,
       memoryUnits: 0,
     }
-    for (const entry of [...consumers.values()]) {
+    for (const entry of entries) {
       if (!entry.binding || entry.unknown)
         throw new Error(
           entry.unknown ?? 'editor-session-attachment-consumer-unavailable',
@@ -1185,15 +1186,27 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
     assertLifecycleIdle()
     if (disposed || pauseRequested)
       throw new Error('editor-session-attachment-dispatch-admission-blocked')
+    const ownedJob = toRaw(job)
+    const previousConsumers = [...consumers.values()].filter(
+      (entry) => entry.job === ownedJob,
+    )
+    // Retire a real completed scope before reusing the job. Opaque legacy records
+    // stay retained, while the original dispatch ledger still gates content retries.
+    inspectConsumers(previousConsumers.filter((entry) => entry.binding))
+    if (
+      previousConsumers.some(
+        (entry) =>
+          consumers.has(entry.dispatchRef) &&
+          (requireConsumer || !entry.legacyResultOnly),
+      )
+    )
+      throw new Error(
+        'editor-session-attachment-consumer-previous-attempt-retained',
+      )
     const boundary = beginBoundary()
     const epoch = attachmentGeneration
     const observation = readAttachmentObservation()
     const context = observation.context
-    const ownedJob = toRaw(job)
-    if ([...consumers.values()].some((entry) => entry.job === ownedJob))
-      throw new Error(
-        'editor-session-attachment-consumer-previous-attempt-retained',
-      )
     const jobSnapshot = snapshotPassiveRecord(ownedJob)
     const jobIdentity =
       jobSnapshot?.documentIdentity &&
@@ -1353,7 +1366,12 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
             'editor-session-attachment-dispatch-settlement-unavailable',
           )
         }
+        if (consumerFutures.has(work as object)) {
+          consumer.unknown = 'consumer-request-or-future-reused'
+          throw new Error(consumer.unknown)
+        }
         consumerFutures.add(work as object)
+        consumer.legacyResultOnly = true
         return work as unknown as PromiseLike<MarkdownAttachmentProviderResult>
       })
       // Ledger settlement happens before final provenance is issued.
