@@ -1401,6 +1401,11 @@ const rootElementRef = ref<HTMLElement | null>(null)
 const sessionSurfacePaused = ref(false)
 let sessionDisposed = false
 let retireSnapshotPublicationAuthority: (() => void) | undefined = undefined
+// Retire before the original scheduler registers its cleanup callbacks.
+onBeforeUnmount(() => {
+  sessionDisposed = true
+  retireSnapshotPublicationAuthority?.()
+})
 const frameScheduler = useMarkdownEditorFrameScheduler({
   onFrameEnd: (metrics) => {
     const target = rootElementRef.value
@@ -4198,7 +4203,6 @@ onMounted(() => {
 })
 
 onBeforeUnmount(() => {
-  retireSnapshotPublicationAuthority?.()
   editorReleased = true
   sessionDisposed = true
   releaseAttachmentFiles()
