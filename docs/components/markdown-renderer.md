@@ -192,13 +192,14 @@ Large documents prefer the Render Pipeline adapter's shared Worker pool. Each po
 
 ### Exposes
 
-| Name                          | Description                                                                                                          |
-| ----------------------------- | -------------------------------------------------------------------------------------------------------------------- |
-| rootEl                        | Render container element.                                                                                            |
-| captureLastValidRender        | Return the retained render ref, document identity/epoch and revision, or `null`.                                     |
-| restoreLastValidRender        | Recommit the actual retained projection on the same mounted owner and matching revision, or report a blocked result. |
-| getSessionResourceSourceOffer | Return the explicitly incomplete census of resources directly held by this renderer.                                 |
-| getSessionResourceParticipant | Return the stable renderer resource participant; its complete lifecycle operations currently refuse.                 |
+| Name                           | Description                                                                                                                        |
+| ------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------- |
+| rootEl                         | Render container element.                                                                                                          |
+| captureRendererOwnedCheckpoint | Pin actual renderer-owned state and authorized projection on this instance, or return `null`; native recovery remains unavailable. |
+| captureLastValidRender         | Return the retained render ref, document identity/epoch and revision, or `null`.                                                   |
+| restoreLastValidRender         | Recommit the actual retained projection on the same mounted owner and matching revision, or report a blocked result.               |
+| getSessionResourceSourceOffer  | Return the explicitly incomplete census of resources directly held by this renderer.                                               |
+| getSessionResourceParticipant  | Return the stable renderer resource participant; its complete lifecycle operations currently refuse.                               |
 
 ### Retained renderer projection and resource source offer
 
@@ -242,6 +243,41 @@ It is an in-memory identity reference, not a disposal checkpoint. Rejected
 resource/disposal operations preserve the retained result; ordinary component
 unmount releases it.
 
+`captureRendererOwnedCheckpoint()` returns an opaque frozen metadata record:
+
+```ts
+{
+  ref: string
+  lastValidRenderRef: string
+  documentIdentity: {
+    id: string
+    epoch: number | string
+  }
+  revision: number | string
+  scope: 'renderer-owned-state'
+  nativeRecovery: 'unavailable'
+}
+```
+
+The same owner actually pins the authorized result/HTML/chunks/strategy together
+with copied activated keys, mounted-chunk references, heavy identity contexts,
+sequences/node ids and observed renderer state/metrics. It preserves actual
+chunk-result/tracker references rather than synthesizing a checkpoint from an id.
+Capture refuses known pending owned timers/frames/jobs, reentry, disposal,
+changed generation/identity/revision or a superseded/mismatched live projection.
+A failed capture leaves the previous pin intact. The pin remains bounded to one
+record and survives a failed release; its actual copied collection entries remain
+in logical memory census. After disposal it is historical retained state, not
+permission to restore an unmounted renderer.
+
+This covers renderer-owned stores only. It does not capture the Main native panel
+textarea, focus/selection/composition, transaction history, editor mode/search,
+clipboard/upload/embed/command effects, Vue flush state or provider resources.
+Native element references preserve identity, not a frozen DOM subtree. There is
+no native checkpoint restore or reversible disposal API yet; `restoreLastValidRender`
+keeps its existing same-mounted projection contract and is not an owned-checkpoint
+restore. All full checkpoint/recovery and session admission holds remain.
+
 `restoreLastValidRender(ref)` returns a promise of
 `{ ref, status: 'restored' | 'blocked', reason: string | null }`. It resolves the
 ref through this renderer's sole private retained slot and checks the current
@@ -281,11 +317,20 @@ interpreted as no listener.
   measuredUsageOnly: true
   missingSourceDependencies: readonly string[]
   sources: {
+    rendererNative: {
+      renderWatchHandleRetained: boolean
+      stoppingRenderWatch: boolean
+      capturingOwnedCheckpoint: boolean
+      effectCensus: 'unknown'
+      flushJobCensus: 'unknown'
+    }
+    rendererOwnedCheckpoint: object | null // Metadata of the actual pinned record.
     renderPipeline: object // Actual runtime/hardware inspection.
     virtualWindow: object // Actual viewport inspection.
     heavyFeatures: object // Actual active and retired handle inspection.
   }
   diagnostics: {
+    renderWatchCleanupFailure: { phase: 'render-watch-stop'; error: unknown } | null
     workerCleanupResidue: { ownedScopes: readonly object[]; poolContext: readonly object[] }
     workerCallbackFailure: object | null // Actual pipeline failure record.
     pendingWorkerCallbackFailureNotification: object | null // Actual pending snapshot.
@@ -370,10 +415,14 @@ registration adds an explicit source dependency and blocks restore. Actual abort
 listener counts describe unresolved owned cleanup hooks, including hooks whose
 native registration is unknown. Shared visibility counts remain pool context.
 No registration state is converted into a native listener count or an aggregate
-zero. Settled tasks without a retained worker identity do not contribute to
-background tasks merely because their cleanup hook remains; their actual retained
-task entry and hook stay in memory/listener census. Pending promises and retained
-worker identities continue to contribute actual work entries.
+zero. A settled task contributes background work only when the same inspection
+still contains a live slot whose id matches its `workerId` and whose
+`activeTaskId` matches the task id. A non-null worker id or a slot now executing
+another task does not establish that association. Cleanup-only retained task
+entries and hooks stay in memory/listener census; pending promises continue to
+contribute actual work entries. The composed producer repair also clears stale
+task-to-slot links and matches the active task when exposing a worker id. Its
+independent review remains pending, and the source offer preserves that dependency.
 Alive does not establish dispatchability, and quarantine does not prove cleanup
 or recovery. Independent review source-closes the handlerless-slot dispatch
 finding. The worker owner's composed admission repair rechecks actual pending
@@ -381,10 +430,23 @@ membership and disposal after cancellation/preemption callbacks, generation and
 queue capacity before enqueue, and live task membership before crash retry.
 The composed source also rechecks admission after request getters and preserves
 actual native cleanup knowledge across synchronous registration/retention/cleanup
-windows. Independent review of these increments and the queue-only consumer guard
-remains pending. The source offer preserves the cleanup dependency and continues to
-refuse complete participant operations. This conditional consumer guard does not
-establish that the renderer had a reproducible restore bypass.
+windows. Independent review confirms unknown/absent registration refusal and
+preservation of the queue-only guard, and source-closes the earlier getter finding.
+The composed producer also preserves actual preparation authority, settles
+registered tasks when admission raises an exception, retains late/failed handler
+cleanup ownership and closes admission before disposal callbacks. Independent
+review of these source repairs and the consumer association correction remains
+pending. The composed shared-pump repair keeps task-owned exceptions with the
+actual failing request and reports pool failures without attributing them to a
+different editor's caller. Retained cleanup and error reporting do not establish
+successful settlement delivery, recovery or complete qualification. Independent
+review source-closes the shared-pump resource-isolation finding. The composed
+reporting repair retains original factory/dequeue/settlement causes and uses one
+actual callback snapshot with its original receiver. Independent review remains
+pending; reporting does not establish resource or recovery qualification.
+The source offer preserves the cleanup dependencies and
+continues to refuse complete participant operations. This conditional consumer
+guard does not establish that the renderer had a reproducible restore bypass.
 
 This source offer is deliberately partial. Adapter internals, worker internals,
 shared pool attribution, platform observer callbacks, heavy-runtime timer/network
@@ -406,3 +468,147 @@ these refusals remain. Full renderer census and epoch-safe pause/resume require
 the real underlying resource owners; recoverable disposal additionally requires
 validated renderer restoration. Completing this renderer alone cannot establish
 the fixed editor session roster or permit session eviction.
+
+### Source boundary for full checkpoints and reversible control
+
+The following is a checked source boundary and the minimum next implementation
+scope. Required APIs below are requirements for the real owners, not implemented
+APIs, exported stubs or additional session participants.
+
+The current retained slot contains the actual authorized render result and its
+HTML/chunks/strategy with the original document id, epoch and revision. It does
+not contain a full renderer/native checkpoint. Activation controller/observer,
+mounted chunk elements, activated-key sets, heavy projection contexts, viewport
+measurements, queued callbacks and Vue effects have separate live storage.
+`resetFeatureActivation()` clears several of those stores. Ordinary unmount
+clears the projection and terminalizes hooks, so its disposal cannot be reversed
+by the retained render ref. Failed cleanup observations and unsettled jobs must
+remain retained; neither a snapshot nor an abort authorizes clearing them.
+
+| Actual source capability                                                                              | Current boundary                                                                                                                                                                                                                                |
+| ----------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| The installed Vue 3.5.32 `WatchHandle` has `pause`, `resume`, and `stop`.                             | The renderer now binds its actual `watch()` return handle into the existing owner. A watcher pause is not a census or pause of the component render effect, Vue flush queue, hook watchers, or an already running asynchronous job.             |
+| The existing owner tracks exact timer, RAF, keyed scheduler, abort-cleanup and unsettled-job records. | Timer records do not retain their callback/deadline; cancellation settles frame waits and drops keyed callbacks. They cannot be reconstructed from numeric handles. Failed native cleanup must retain its original record and error.            |
+| Runtime and viewport hooks expose actual `inspectResources`, `pause`, and `resume`.                   | Both explicitly report `recoverable:false`. Viewport platform callbacks remain unknown; resume reconnects current state rather than restores a disposed checkpoint.                                                                             |
+| Heavy lifecycle exposes real admission pause/resume and retired work census.                          | Timer/network cancellation is unavailable. Admission closure or an aborted signal does not prove native work settled or stopped.                                                                                                                |
+| The original shared frame scheduler owns its queue and handle.                                        | Pause cancels queue entries; resume permits newly recreated work. The renderer must not pause the shared scheduler globally or create a second scheduler owner.                                                                                 |
+| Native clipboard, upload, embed and command operations live in the editor/provider consumers.         | Clipboard promises have no supplied cancellation signal; upload cancellation changes job phase and requests abort; embed/command signals guard identity but do not establish transport/native stop. These are outside the renderer's ownership. |
+
+The minimum independent renderer change stays in its existing SFC/private owner:
+the real render-watch handle is now retained; next, gate renderer admission and each commit with
+the existing epoch/generation authority; retain sufficient original owned callback
+descriptors for current-state recreation; and record cleanup failures while
+attempting the selected owned cleanup batch. Preserve the original authorized
+projection/checkpoint pin and every unresolved listener/job record. These can
+prepare reversible control of directly owned work. They cannot by themselves
+produce a complete paused inspection, full native checkpoint or recoverable
+disposal. This source offer now explicitly names the missing Vue effect/flush,
+owned event-registration and callback-checkpoint capabilities. Those dependency
+entries themselves add no usage counts or execute control transitions.
+
+The watcher binding is a real owned handle, not a new resource participant.
+Ordinary unmount calls its native `stop()` and releases that exact reference only
+after the call returns. If it throws, the handle and actual error remain under
+`sources.rendererNative` and `diagnostics.renderWatchCleanupFailure`; an immediate
+watch setup that reentered unmount also uses this same owner cleanup path. A
+retained handle/failure each contributes one actual logical memory record, and an
+in-progress owned stop contributes one running control entry. These describe
+owned records/calls only. `unknownUsage.vueEffects` and `unknownUsage.vueFlushJobs`
+stay `unknown`; a null failure means no observed stop failure, not successful
+global Vue cleanup. Full renderer controls and recoverable disposal still refuse.
+An in-progress owned checkpoint capture likewise contributes its actual running
+control entry. Stored checkpoint memory counts the real pin plus its copied
+collection entries; it is not a physical heap estimate or a native recovery ack.
+
+For these requirements, `authority` means the actual current
+`{documentIdentity:{id,epoch},revision}`; `checkpointRef` means an opaque ref held
+by the original owner. `SourceInspection` must preserve actual pending/running
+work, native registration knowledge, failures and unknowns. An incomplete source
+inspection is never submitted as the session's seven integer totals. An operation
+that cannot stop or resume its real resources must retain the evidence and refuse.
+
+| Existing owner/consumer boundary                     | Required reversible APIs and behavior                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| ---------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Native Vue component/effect owner                    | `inspectNativeEffects(authority)`, `pauseNativeEffects(authority)`, `resumeNativeEffects(authority)` returning real source inspections; `captureNativeRendererCheckpoint(authority)` and `restoreNativeRendererCheckpoint(checkpointRef, authority)`. Cover the actual render effect, owned watchers, queued/running flush callbacks and mounted view state. One watch handle is insufficient. Restore must reject stale/unmounted identities and wait for the real accepted render/flush completion. |
+| Owned DOM/event registrations                        | `inspectOwnedEventRegistrations(authority)`, `detachOwnedEventRegistrations(authority)`, `reattachOwnedEventRegistrations(checkpointRef, authority)`. Retain the exact target, callback, options and native registration knowledge. A failed/uncertain detach keeps its cleanup record; reattach must not duplicate registrations or target a different document/realm.                                                                                                                               |
+| Original viewport/frame owners                       | `captureViewportCheckpoint(authority)`, `restoreViewportCheckpoint(checkpointRef, authority)` plus `captureOwnedFrameTasks(ownerKey, authority)`, `pauseOwnedFrameTasks(ownerKey, authority)`, `resumeOwnedFrameTasks(checkpointRef, authority)`. Preserve actual viewport/index/anchor state and owned callback descriptors; reject an active phase or unknown callback queue. Use the original scheduler and reconstruct guarded current-state work rather than replaying stale closures.           |
+| Native clipboard consumer                            | `closeClipboardAdmission(authority)`, `inspectClipboardOperations(authority)`, `resumeClipboardAdmission(authority)`. Keep each native read/write promise until its actual settlement. An in-flight noncancelable clipboard effect blocks a complete pause. Resume admission must not replay a read/write or claim to restore the operating-system clipboard.                                                                                                                                         |
+| Upload transport consumer under the attachment owner | `inspectUploadAttempt(attemptRef, authority)`, `pauseUploadAttempt(attemptRef, authority)`, `captureUploadCheckpoint(attemptRef, authority)`, `resumeUploadAttempt(checkpointRef, authority)`. Bind actual batch/item/attempt and transport identity, progress, pending promise and cleanup. If the transport has no true continuation/stop API, report that limitation and refuse reversible recovery; abort/retry with a new attempt is not resume.                                                 |
+| Embed provider under the attachment/embed owner      | `inspectEmbedRequest(requestId, authority)`, `pauseEmbedRequest(requestId, authority)`, `captureEmbedCheckpoint(requestId, authority)`, `resumeEmbedRequest(checkpointRef, authority)`. Preserve request/node identity, original authorized target version/projection and actual provider work. Do not re-resolve a potentially changed target and call it checkpoint restoration.                                                                                                                    |
+| Asynchronous command consumer                        | `inspectCommandAttempt(attemptRef, authority)`, `pauseCommandAttempt(attemptRef, authority)`, `captureCommandCheckpoint(attemptRef, authority)`, `resumeCommandAttempt(checkpointRef, authority)`. Preserve actual pending effects, attempt id, rebased anchor and committed outcome. Abort or a stale-result guard is not native cancellation; resume must not invoke an irreversible command twice.                                                                                                 |
+
+These source offers must bind into the existing closed owner roster through the
+original owners. The renderer does not acquire clipboard/upload/embed/command
+ownership, add a replacement participant, or edit the common editor contract.
+Full checkpoint capture must fail while any required owner is absent or cannot
+capture its actual state; a failed capture/release must preserve the last valid
+checkpoint and failure residue. Source/static preparation does not lift runtime,
+native, security, receipt, renderer/restore or fixed-roster qualification holds.
+
+### Selected ordinary-unmount cleanup batch
+
+The existing renderer owner snapshots real timer/frame/abort/watch cleanup and
+the SFC supplies its exact theme/controller/observer/heavy references. Every
+selected action is attempted despite earlier exceptions. The batch rethrows the
+original single error or an AggregateError containing all caught errors after
+completion. Failed handles and original distinct causes remain under
+`diagnostics.cleanupFailures`; they are retained proof/memory, never active job
+counters or native cleanup success receipts.
+
+Timer/RAF records are removed only after native cancellation returns. Keyed-frame
+cancellation and its finalizer are attempted separately; a failed queued handle
+or finalizer stays available for retry. Abort cleanup is owned before registration
+and late installation is cleaned after return. Theme removal uses the original
+retained target, with installation/removal reentry guards. Controller/observer
+fields clear only after their own native call returns. Watch failure cannot skip
+later theme/abort/observer/heavy cleanup. Underlying heavy retired work and unknown
+native state remain exposed.
+
+Each keyed frame retains one shared finalizer state across cancellation, pending
+retry and reentry. A running or completed finalizer is not called again; failure
+retains the pending obligation and original cause. Successful post-paint completion
+does not erase a previously selected, failed cancellation finalizer.
+
+Timer, RAF, keyed-frame and theme creation enter the owner's installation census
+before external calls. A reentrant unmount cannot release view references while
+creation is unresolved. Late native handles remain owned until cancellation
+returns; uncertain creation errors retain their original cause and block release.
+Component cleanup obligations persist across retries, and remaining theme,
+controller or observer references also block release. Unknown installation records
+and retained cleanup obligations count as retained memory, not invented active jobs.
+
+The same key cannot install another owned frame during its native schedule or
+cancel call. An accepted outer task rechecks the exact registration identity
+before retaining a late record; it never overwrites a later owned registration.
+Finalizer ownership remains separate from the scheduler key.
+
+Cancellation selected during native creation is terminal for that request even
+when the owner remains mounted. A later native accepted return triggers exact
+late cancellation, not task revival or a wait for a postPaint that cannot arrive.
+The binding remains only if that cleanup fails, with its original cause. The
+request returns false after selected cancellation; completed finalizers stay
+completed. Native false/throw results retain their original refusal/error handling.
+
+Activation reset and observer installation are fenced before external callbacks.
+Reset rechecks admission after abort/disconnect and before constructing a new
+controller. Controller/observer constructors and native observation retain actual
+in-flight installation records; returned late handles are cleaned through the
+same owner, with failed handles and causes retained. Observer callbacks require the
+exact current handle. Theme target lookup also enters its reentry gate before any
+external read. Worker factory admission is checked before native creation; its
+actual returned Worker is still handed to the original worker-pool owner, whose
+existing source retains it before handler setters and handles late disposed slots.
+No second Worker owner or native stop acknowledgment is added.
+
+Disposal closes admission before callbacks. Reentrant disposal cannot recursively
+execute the same batch, and repeated calls select remaining actual resources.
+View reference release is a separate attempt-all phase after selected native
+cleanup returns and known owned residue is empty. Failure preserves original
+projection/checkpoint pins and unresolved jobs. Original errors are retained
+through retry; no failed reference is cleared merely to report zero. A nested
+skip, native call return or heavy-owner disposed flag is not complete cleanup,
+recovery, renderer acceptance or an eviction acknowledgment.
+
+These throw/reentry/retry branches were inspected as source only. Original test
+entry/import/hook and exact-case review are required before fault-injection runs;
+all runtime/test/list/browser/native/worker qualifications remain held.
