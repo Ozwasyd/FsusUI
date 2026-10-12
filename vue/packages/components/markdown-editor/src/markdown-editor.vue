@@ -1520,6 +1520,7 @@ provideMarkdownHeavyFeatureDocumentContext(Object.freeze({
   documentAuthority: Object.freeze({
     capture: MarkdownEditorTransactionStore.prototype.captureDocumentAuthority.bind(transactionStore),
     hasCustody: MarkdownEditorTransactionStore.prototype.hasDocumentAuthorityCustody.bind(transactionStore),
+    subscribeRetirement: MarkdownEditorTransactionStore.prototype.subscribeDocumentAuthorityRetirement.bind(transactionStore),
   }),
 }))
 const editorRevision = ref(transactionStore.revision)
@@ -7104,8 +7105,11 @@ const sessionBinding = createMarkdownEditorSessionBinding({
 
 
 retireSnapshotPublicationAuthority = () => {
-  retireStoreDocumentAuthority()
-  sessionBinding.retirePublicationAuthority()
+  let failed = false
+  let firstCause: unknown
+  try { retireStoreDocumentAuthority() } catch (cause) { failed = true; firstCause = cause }
+  try { sessionBinding.retirePublicationAuthority() } catch (cause) { if (!failed) firstCause = cause; failed = true }
+  if (failed) throw firstCause
 }
 if (sessionDisposed) retireSnapshotPublicationAuthority()
 

@@ -731,10 +731,19 @@ export interface MarkdownHeavyFeatureDocumentAuthorityTicket {
   readonly revision: number | string
 }
 
+export interface MarkdownHeavyFeatureDocumentAuthorityRetirementHandle {
+  /** Retire the receiver before removing the actual registration; failure retains custody/cause. */
+  unsubscribe(): boolean
+  /** Actual retained registration only; not a live or resource-release acknowledgment. */
+  hasCustody(): boolean
+  failureCause(): unknown
+}
+
 export interface MarkdownHeavyFeatureDocumentAuthority {
   capture(): MarkdownHeavyFeatureDocumentAuthorityTicket | null
   /** Original private producer continuity only; no external read/callback/allocation. */
   hasCustody(ticket: MarkdownHeavyFeatureDocumentAuthorityTicket): boolean
+  subscribeRetirement(receiver: () => void): MarkdownHeavyFeatureDocumentAuthorityRetirementHandle
 }
 
 export interface MarkdownHeavyFeatureDocumentContext {

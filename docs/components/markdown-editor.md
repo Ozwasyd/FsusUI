@@ -1151,3 +1151,24 @@ projection/pipeline, application/principal or resource qualification. Renderer
 must consume this real producer together with its own original authorities;
 no complete live Renderer seal or fullready is installed here. All ordinary
 source controls and runtime qualification remain UNRUN/HOLD.
+
+
+`documentAuthority.subscribeRetirement(receiver)` now registers a synchronous
+retirement receiver in that SAME native store. It returns a frozen handle with
+`unsubscribe()`, pure `hasCustody()` and `failureCause()`. Each actual write first
+invalidates the existing generation/ticket, then attempt-all notifies original
+registered receivers before entering the original writer body or caller reads.
+A notification failure propagates the first original cause, retains failed
+registrations/causes and permanently closes ticket issuance. Busy notification
+rejects registration/unsubscribe/reentrant writes; actual native pending custody
+also refuses retirement operations. Permanent unmount retirement notifies the
+same receivers and attempts session retirement even when a receiver fails.
+
+Unsubscribe first retires its receiver; successful private unlink alone releases
+actual registration custody. Failure, including caught release reentry, keeps
+the receiver and original cause. A genuine successful retry may remove it but
+cannot reopen permanently retired document authority. No external listener Set,
+second generation/producer/history or synthetic resource-zero receipt exists.
+Renderer must register its original retirement function and retain failed
+handles; its projection/pipeline/cleanup and all qualification remain its original
+owner's work. New ordinary source controls remain UNRUN/HOLD.

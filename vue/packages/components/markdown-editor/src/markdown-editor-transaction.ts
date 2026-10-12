@@ -3,7 +3,7 @@ import {
   type MarkdownDocumentIdentity,
   type MarkdownStableProjection,
 } from '../../../wasm/markdown-runtime'
-import type { MarkdownHeavyFeatureDocumentAuthorityTicket } from '../../../hooks/use-markdown-heavy-feature-lifecycle'
+import type { MarkdownHeavyFeatureDocumentAuthorityRetirementHandle, MarkdownHeavyFeatureDocumentAuthorityTicket } from '../../../hooks/use-markdown-heavy-feature-lifecycle'
 
 export type MarkdownEditorSelectionDirection = 'backward' | 'forward' | 'none'
 
@@ -625,6 +625,17 @@ const freezeTransaction = (
       : undefined,
   })
 
+interface DocumentAuthorityRetirementRegistration {
+  receiver: (() => void) | undefined
+  previous: DocumentAuthorityRetirementRegistration | undefined
+  next: DocumentAuthorityRetirementRegistration | undefined
+  registered: boolean
+  releasing: boolean
+  releaseFailed: boolean
+  failed: boolean
+  cause: unknown
+}
+
 export class MarkdownEditorTransactionStore {
   #documentIdentity: MarkdownEditorDocumentIdentity
   #documentAuthorityGeneration = 0
@@ -632,6 +643,10 @@ export class MarkdownEditorTransactionStore {
   #documentWriteDepth = 0
   #capturingDocumentAuthority = false
   #documentAuthority: MarkdownHeavyFeatureDocumentAuthorityTicket | undefined
+  #retirementReceivers: DocumentAuthorityRetirementRegistration | undefined
+  #notifyingRetirement = false
+  #registeringRetirement = false
+  #releasingRetirement = 0
   #preparedRetainedSnapshot: {
     readonly preparation: MarkdownEditorRetainedTransactionPreparation
     readonly identity: MarkdownEditorDocumentIdentity
@@ -685,7 +700,8 @@ export class MarkdownEditorTransactionStore {
 
   /** Same original transaction owner; one immutable live ticket per actual write generation. */
   captureDocumentAuthority(): MarkdownHeavyFeatureDocumentAuthorityTicket | null {
-    if (this.#documentAuthorityRetired || this.#documentWriteDepth || this.#capturingDocumentAuthority) return null
+    if (this.#documentAuthorityRetired || this.#documentWriteDepth || this.#capturingDocumentAuthority ||
+        this.#notifyingRetirement || this.#registeringRetirement || this.#releasingRetirement) return null
     if (this.#documentAuthority) return this.#documentAuthority
     const generation = this.#documentAuthorityGeneration
     const identity = this.#documentIdentity
@@ -706,13 +722,111 @@ export class MarkdownEditorTransactionStore {
 
   hasDocumentAuthorityCustody(ticket: MarkdownHeavyFeatureDocumentAuthorityTicket): boolean {
     return !this.#documentAuthorityRetired && this.#documentWriteDepth === 0 && !this.#capturingDocumentAuthority &&
+      !this.#notifyingRetirement && !this.#registeringRetirement && this.#releasingRetirement === 0 &&
       this.#documentAuthority !== undefined && this.#documentAuthority === ticket
+  }
+
+  subscribeDocumentAuthorityRetirement(receiver: () => void): MarkdownHeavyFeatureDocumentAuthorityRetirementHandle {
+    if (typeof receiver !== 'function') throw new TypeError('editor-document-retirement-receiver-invalid')
+    if (this.#documentAuthorityRetired || this.#documentWriteDepth || this.#notifyingRetirement || this.#registeringRetirement || this.#releasingRetirement)
+      throw new Error('editor-document-retirement-registration-unavailable')
+    const generation = this.#documentAuthorityGeneration
+    this.#registeringRetirement = true
+    try {
+      const record: DocumentAuthorityRetirementRegistration = {
+        receiver, previous: undefined, next: undefined, registered: false, releasing: false, releaseFailed: false, failed: false, cause: undefined,
+      }
+      const handle: MarkdownHeavyFeatureDocumentAuthorityRetirementHandle = Object.freeze({
+        unsubscribe: () => this.#unsubscribeDocumentAuthorityRetirement(record),
+        hasCustody: () => record.registered,
+        failureCause: () => record.cause,
+      })
+      if (this.#documentAuthorityRetired || this.#documentWriteDepth || this.#notifyingRetirement ||
+          this.#documentAuthorityGeneration !== generation)
+        throw new Error('editor-document-retirement-registration-stale')
+      record.next = this.#retirementReceivers
+      if (record.next) record.next.previous = record
+      this.#retirementReceivers = record
+      record.registered = true
+      return handle
+    } finally {
+      this.#registeringRetirement = false
+    }
+  }
+
+  #failDocumentAuthorityRegistration(record: DocumentAuthorityRetirementRegistration, cause: unknown): void {
+    record.failed = true
+    record.cause = cause
+    if (record.releasing) record.releaseFailed = true
+    this.#documentAuthorityRetired = true
+    this.#documentAuthority = undefined
+  }
+
+  #unsubscribeDocumentAuthorityRetirement(record: DocumentAuthorityRetirementRegistration): boolean {
+    if (!record.registered) return false
+    if (this.#notifyingRetirement || record.releasing) {
+      const cause = new Error('editor-document-retirement-release-active')
+      this.#failDocumentAuthorityRegistration(record, cause)
+      throw cause
+    }
+    record.releaseFailed = false
+    record.releasing = true
+    this.#releasingRetirement += 1
+    try {
+      record.receiver!()
+      if (record.releaseFailed) throw record.cause
+      // Only original private pointer assignments follow successful receiver retirement.
+      if (record.previous) record.previous.next = record.next
+      else this.#retirementReceivers = record.next
+      if (record.next) record.next.previous = record.previous
+      record.registered = false
+      record.receiver = undefined
+      record.previous = undefined
+      record.next = undefined
+      record.failed = false
+      record.cause = undefined
+      return true
+    } catch (cause) {
+      this.#failDocumentAuthorityRegistration(record, cause)
+      throw cause
+    } finally {
+      this.#releasingRetirement -= 1
+      record.releasing = false
+    }
+  }
+
+  #notifyDocumentAuthorityRetirement(): void {
+    if (this.#notifyingRetirement) throw new Error('editor-document-retirement-notification-active')
+    this.#notifyingRetirement = true
+    let failed = false
+    let firstCause: unknown
+    try {
+      for (let record = this.#retirementReceivers; record; record = record.next) {
+        try {
+          if (record.releasing) throw new Error('editor-document-retirement-release-active')
+          record.receiver!()
+          // A receiver can catch its own failed unsubscribe; retain and propagate that real cause too.
+          if (record.failed) {
+            if (!failed) firstCause = record.cause
+            failed = true
+          }
+        } catch (cause) {
+          this.#failDocumentAuthorityRegistration(record, cause)
+          if (!failed) firstCause = cause
+          failed = true
+        }
+      }
+    } finally {
+      this.#notifyingRetirement = false
+    }
+    if (failed) throw firstCause
   }
 
   /** Actual original unmount retirement; no cleanup/disposal success assertion. */
   retireDocumentAuthority(): void {
     this.#documentAuthorityRetired = true
     this.#documentAuthority = undefined
+    this.#notifyDocumentAuthorityRetirement()
   }
 
   #beginDocumentWrite(): void {
@@ -721,6 +835,12 @@ export class MarkdownEditorTransactionStore {
     if (this.#documentAuthorityGeneration === Number.MAX_SAFE_INTEGER) this.#documentAuthorityRetired = true
     else this.#documentAuthorityGeneration += 1
     this.#documentWriteDepth += 1
+    try {
+      this.#notifyDocumentAuthorityRetirement()
+    } catch (cause) {
+      this.#documentWriteDepth -= 1
+      throw cause
+    }
   }
 
   #endDocumentWrite(): void {
@@ -810,6 +930,7 @@ export class MarkdownEditorTransactionStore {
     const custody = this.#preparedRetainedSnapshot
     return custody !== undefined && custody.preparation === preparation && this.#documentIdentity === custody.identity &&
       !this.#documentAuthorityRetired && this.#documentWriteDepth === 0 && this.#documentAuthorityGeneration === custody.authorityGeneration &&
+      !this.#notifyingRetirement && !this.#registeringRetirement && this.#releasingRetirement === 0 &&
       this.#revision === custody.revision && this.#selection === custody.selection &&
       this.#undo === custody.undo && this.#redo === custody.redo && this.#retainedSnapshot === custody.previous &&
       this.#mergeBlocked === custody.mergeBlocked

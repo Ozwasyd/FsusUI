@@ -50,6 +50,76 @@ const seededRandom = (seed: number) => {
 }
 
 describe('MarkdownEditor transaction properties', () => {
+  it('delivers original synchronous retirement before writer getters and releases only actual registrations', () => {
+    const store = new MarkdownEditorTransactionStore('source', selection(0), { id: 'document', epoch: 1 })
+    const ticket = store.captureDocumentAuthority()!
+    let retired = false
+    let calls = 0
+    const handle = store.subscribeDocumentAuthorityRetirement(() => {
+      retired = true
+      calls += 1
+      expect(store.captureDocumentAuthority()).toBeNull()
+      expect(store.hasDocumentAuthorityCustody(ticket)).toBe(false)
+    })
+    expect(handle.hasCustody()).toBe(true)
+    store.setSelection({ get start(): number { expect(retired).toBe(true); return 0 }, end: 0 })
+    expect(calls).toBe(1)
+    expect(handle.unsubscribe()).toBe(true)
+    expect(handle.hasCustody()).toBe(false)
+    expect(handle.unsubscribe()).toBe(false)
+    store.reset('next')
+    expect(calls).toBe(2)
+    expect(store.captureDocumentAuthority()).not.toBeNull()
+  })
+
+  it('attempts every original receiver, preserves first thrown cause/custody and permanently refuses resigning', () => {
+    const store = new MarkdownEditorTransactionStore('source', selection(0), { id: 'document', epoch: 1 })
+    const retained = store.retainSnapshot()
+    const firstCause = { tag: 'first-original-retirement-cause' }
+    const otherCause = { tag: 'other-original-retirement-cause' }
+    const calls: string[] = []
+    let fail = true
+    const other = store.subscribeDocumentAuthorityRetirement(() => { calls.push('other'); if (fail) throw otherCause })
+    const first = store.subscribeDocumentAuthorityRetirement(() => { calls.push('first'); if (fail) throw firstCause })
+    let caught: unknown
+    try { store.reset('must not apply') } catch (cause) { caught = cause }
+    expect(caught).toBe(firstCause)
+    expect(calls).toEqual(['first', 'other'])
+    expect(store.value).toBe('source')
+    expect(store.validateRetainedSnapshot(retained)).toBe(true)
+    expect(store.captureDocumentAuthority()).toBeNull()
+    expect(first.hasCustody()).toBe(true)
+    expect(other.hasCustody()).toBe(true)
+    expect(first.failureCause()).toBe(firstCause)
+    expect(other.failureCause()).toBe(otherCause)
+    fail = false
+    expect(first.unsubscribe()).toBe(true)
+    expect(other.unsubscribe()).toBe(true)
+    expect(store.captureDocumentAuthority()).toBeNull()
+  })
+
+  it('retains failed unsubscribe even if its receiver catches reentry, then cleans only after genuine retry', () => {
+    const store = new MarkdownEditorTransactionStore('source', selection(0), { id: 'document', epoch: 1 })
+    let reenter = true
+    let caught: unknown
+    const handle = store.subscribeDocumentAuthorityRetirement(() => {
+      if (reenter) {
+        try { handle.unsubscribe() } catch (cause) { caught = cause }
+      }
+    })
+    let outer: unknown
+    try { handle.unsubscribe() } catch (cause) { outer = cause }
+    expect(outer).toBe(caught)
+    expect(handle.failureCause()).toBe(caught)
+    expect(handle.hasCustody()).toBe(true)
+    expect(store.captureDocumentAuthority()).toBeNull()
+    reenter = false
+    expect(handle.unsubscribe()).toBe(true)
+    expect(handle.hasCustody()).toBe(false)
+    expect(handle.failureCause()).toBeUndefined()
+    expect(store.captureDocumentAuthority()).toBeNull()
+  })
+
   it.each([
     ['switchDocument', (store: MarkdownEditorTransactionStore, _snapshot: MarkdownEditorRetainedTransactionSnapshot) => store.switchDocument({ id: 'document', epoch: 2 }, 'source')],
     ['reset', (store: MarkdownEditorTransactionStore, _snapshot: MarkdownEditorRetainedTransactionSnapshot) => store.reset('reset')],
