@@ -1670,8 +1670,9 @@ let attachmentFileCleanupDepth = 0
 let attachmentPublicationDepth = 0
 let attachmentRetirementRequested = false
 let attachmentRetirementRunning = false
+let attachmentRetirementContinuation: { handle: number | null; cancelled: boolean } | null = null
 const assertAttachmentFileControlIdle = () => {
-  if (attachmentFileCleanupDepth !== 0 || attachmentPublicationDepth !== 0 || attachmentRetirementRunning || attachmentRetirementRequested)
+  if (attachmentFileCleanupDepth !== 0 || attachmentPublicationDepth !== 0 || attachmentRetirementRunning || attachmentRetirementRequested || attachmentRetirementContinuation)
     throw new Error('editor-session-attachment-file-cleanup-in-progress')
 }
 const revokeAttachmentFiles = (itemIds: readonly string[]) => {
@@ -1710,6 +1711,15 @@ const releaseAttachmentFiles = () => {
     attachmentBatches.clear()
     attachmentItems.clear()
     attachmentJobs.value = []
+    attachmentRetirementRequested = false
+    const continuation = attachmentRetirementContinuation
+    if (continuation) {
+      continuation.cancelled = true
+      if (continuation.handle !== null) {
+        frameScheduler.cancelAuxiliaryFrame(continuation.handle)
+        if (attachmentRetirementContinuation === continuation) attachmentRetirementContinuation = null
+      }
+    }
     attachmentCaptureSession.clear()
     for (const record of records) {
       const loans = [...record.files.values()]
@@ -1818,6 +1828,7 @@ const flushAttachmentRetirement = () => {
   if (!attachmentRetirementRequested || attachmentFileCleanupDepth !== 0 || attachmentPublicationDepth !== 0 || attachmentRetirementRunning) return
   attachmentRetirementRequested = false
   attachmentRetirementRunning = true
+  let completed = false
   try {
     for (const job of attachmentJobs.value) {
       const original = toRaw(job)
@@ -1826,6 +1837,7 @@ const flushAttachmentRetirement = () => {
           (original.phase === 'deleted' && binding.deletionAttempt === original.attempt)))
         retireSettledAttachmentRecords(original, binding.batch, binding.item, original.attempt)
     }
+    completed = true
   } catch (error) {
     // Preserve the actual outstanding sweep and propagate failure; never turn
     // failed retirement into an idle/paused acknowledgement.
@@ -1833,6 +1845,32 @@ const flushAttachmentRetirement = () => {
     throw error
   } finally {
     attachmentRetirementRunning = false
+    if (completed && attachmentRetirementRequested) scheduleAttachmentRetirement()
+  }
+}
+const scheduleAttachmentRetirement = () => {
+  if (!attachmentRetirementRequested || attachmentRetirementContinuation || sessionDisposed || editorReleased) return
+  // Reserve before the actual frame owner admission. Exactly one bounded sweep
+  // per real frame; reentry schedules another frame instead of recursive drains.
+  const continuation = { handle: null as number | null, cancelled: false }
+  attachmentRetirementContinuation = continuation
+  const handle = frameScheduler.requestAuxiliaryFrame(() => {
+    if (attachmentRetirementContinuation !== continuation) return
+    attachmentRetirementContinuation = null
+    if (!continuation.cancelled && !sessionDisposed && !editorReleased) {
+      flushAttachmentRetirement()
+      if (attachmentRetirementRequested) scheduleAttachmentRetirement()
+    }
+  })
+  if (handle === undefined) {
+    if (attachmentRetirementContinuation === continuation) attachmentRetirementContinuation = null
+    return // Real paused/disposed admission refused; outstanding request remains.
+  }
+  if (attachmentRetirementContinuation === continuation && !continuation.cancelled) continuation.handle = handle
+  else {
+    continuation.handle = handle
+    frameScheduler.cancelAuxiliaryFrame(handle)
+    if (attachmentRetirementContinuation === continuation) attachmentRetirementContinuation = null
   }
 }
 const withAttachmentFile = (
@@ -6745,10 +6783,10 @@ const surfaceResourceParticipant: MarkdownEditorSessionResourceParticipant = {
         renderers: 0,
         observers: typewriterResizeObserver ? 1 : 0,
         timers: layoutGestureTimer === undefined ? 0 : 1,
-        backgroundTasks: Number(attachmentFileCleanupDepth !== 0 || attachmentPublicationDepth !== 0 || attachmentRetirementRunning || attachmentRetirementRequested),
+        backgroundTasks: Number(attachmentFileCleanupDepth !== 0 || attachmentPublicationDepth !== 0 || attachmentRetirementRunning || attachmentRetirementRequested || attachmentRetirementContinuation),
         networkRequests: 0,
         memoryUnits: Math.ceil((transactionStore.value.length + transactionStore.retainedSessionUnits) * 2 / 65536) +
-          sessionBinding.inspectRetainedPanelMemoryUnits(),
+          sessionBinding.inspectRetainedPanelMemoryUnits() + Number(attachmentRetirementContinuation !== null),
       },
     }
   },

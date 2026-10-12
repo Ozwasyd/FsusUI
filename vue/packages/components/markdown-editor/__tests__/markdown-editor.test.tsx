@@ -53,6 +53,33 @@ describe('MarkdownEditor', () => {
     expect(session.validateRetainedSnapshot(snapshot, expected)).toBe(true)
   })
 
+  it('rejects non-string native digests and session refs without invoking conversion callbacks', () => {
+    const identity = { id: 'digest-conversion-document', epoch: 1 }
+    const store = new MarkdownEditorTransactionStore('original source', undefined, identity)
+    const binding = createMarkdownEditorSessionBinding({
+      transactionStore: store, isComposing: () => false, isDisposed: () => false,
+      captureViewState: () => null, restoreViewState: () => {},
+      resourceParticipants: () => [], captureLastValidRender: () => null,
+    })
+    const session = binding.getSession('session:digest-conversion')
+    const expected = { documentIdentity: identity, revision: 0 }
+    const snapshot = session.captureSnapshot(() => 'a'.repeat(64), expected)
+    let conversions = 0
+    const hostile = { toString() {
+      conversions += 1
+      store.dispatch({ changes: [{ from: 0, to: 0, insert: 'changed ' }], history: 'separate', origin: 'programmatic' })
+      return 'b'.repeat(64)
+    } }
+    const invalidDigest = (() => hostile) as unknown as (source: string) => string
+    expect(() => session.inspectContentDigest(invalidDigest, expected)).toThrow('editor-session-content-digest-invalid')
+    expect(() => session.captureSnapshot(invalidDigest, expected)).toThrow('editor-session-content-digest-invalid')
+    expect(() => binding.getSession(hostile as unknown as string)).toThrow('editor-session-ref-invalid')
+    expect(conversions).toBe(0)
+    expect(store.value).toBe('original source')
+    expect(store.revision).toBe(0)
+    expect(session.validateRetainedSnapshot(snapshot, expected)).toBe(true)
+  })
+
   it('retains only original settled attachment state and invalidates phase, signal and removal changes', async () => {
     const controller = new AbortController()
     const job = createMarkdownAttachmentJob('panel-item', {

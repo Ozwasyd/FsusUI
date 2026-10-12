@@ -572,6 +572,8 @@ revision/digest metadata. It reserves native inspection against reentrant retain
 capture/restore and checks actual admission and unchanged native context/body after
 the callback. It never retains/restores history or replaces a checkpoint. This is
 read-only source correlation, not complete snapshot/resource/readiness authority.
+Digest results and session refs must be primitive strings before validation;
+object conversion callbacks never run after the final native context fence.
 
 Active state uses original syntax/selection/link/anchor/contextual/atomic state.
 Scroll metadata retains actual original live anchor and native textarea/preview
@@ -613,6 +615,13 @@ inspection and is measured by the same native surface. Failure retains that
 outstanding work and propagates, with no idle/paused acknowledgement. Outer cancel/
 retry/remove rechecks original attempt/phase/range/binding/document/revision after
 abort callbacks and preserves the accepted reentrant result instead of overwriting it.
+If a retirement reader reenters with another accepted deletion after that job's
+turn, the original frame scheduler owns one reserved auxiliary continuation for a
+single later sweep. Further reentry gets another real frame, never a recursive
+synchronous drain. Pending/running/refused/failed admission keeps outstanding
+request state and refuses refs; actual handle cancellation or callback settlement
+releases the continuation record. Scope release marks an installing continuation
+cancelled and cancels its actual returned handle, without inventing settlement.
 This is same-owner/same-revision source only; full factory/draft/renderer/resource and
 native/worker/kernel/geometry/privacy acceptance remain blocked/UNRUN.
 

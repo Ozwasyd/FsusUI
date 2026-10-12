@@ -21,3 +21,6 @@ checks and no retained checkpoint/history mutation.
 Retry actual retirement after original File cleanup/publication unwind and preserve
 accepted reentrant deletion through the outer action; do not interrupt document
 notification or turn pending/failed cleanup into an idle resource acknowledgement.
+Reject non-string digests without conversion callbacks and use one actually owned
+auxiliary frame for bounded reentrant retirement retries, preserving pending and
+failure custody and cancellation state.

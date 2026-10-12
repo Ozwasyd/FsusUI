@@ -222,7 +222,7 @@ export const createMarkdownEditorSessionBinding = <ViewState>(
     inspectRetainedPanelMemoryUnits: () => retained?.panels?.memoryUnits ?? 0,
     getSession(editorSessionRef: string) {
       assertAvailable()
-      if (!/^[a-zA-Z0-9][a-zA-Z0-9._:-]{2,127}$/u.test(editorSessionRef)) {
+      if (typeof editorSessionRef !== 'string' || !/^[a-zA-Z0-9][a-zA-Z0-9._:-]{2,127}$/u.test(editorSessionRef)) {
         throw new Error('editor-session-ref-invalid')
       }
       if (session) {
@@ -261,6 +261,7 @@ export const createMarkdownEditorSessionBinding = <ViewState>(
             if (expected && (identity.id !== expected.documentIdentity.id || identity.epoch !== expected.documentIdentity.epoch ||
                 revision !== expected.revision)) throw new Error('editor-session-content-context-mismatch')
             const digest = digestSource(source)
+            if (typeof digest !== 'string') throw new Error('editor-session-content-digest-invalid')
             assertAdmission?.()
             assertAvailable()
             if (store.value !== source || store.revision !== revision || store.documentIdentity.id !== identity.id ||
@@ -350,6 +351,7 @@ export const createMarkdownEditorSessionBinding = <ViewState>(
               revision !== expected.revision
             )) throw new Error('editor-session-snapshot-context-mismatch')
             const digest = digestSource(source)
+            if (typeof digest !== 'string') throw new Error('editor-session-content-digest-invalid')
             assertAvailable()
             if (
               store.revision !== revision || store.value !== source ||
