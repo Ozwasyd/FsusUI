@@ -132,7 +132,10 @@ export const runMarkdownAttachmentDispatch = async (
           }
         })(),
       ])
-      if (state.localSettlement !== 'fulfilled')
+      if (
+        inspectMarkdownAttachmentDispatch(ownedJob)?.localSettlement !==
+        'fulfilled'
+      )
         throw new AggregateError(
           resultFailed
             ? [resultCause, state.localSettlementCause]

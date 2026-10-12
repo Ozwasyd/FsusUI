@@ -367,7 +367,7 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
           'editor-session-attachment-consumer-settlement-unavailable',
         )
       const resource = consumerControl(() => binding.inspectLocalResources())
-      if (!resource.supported) {
+      if (resource.supported === false) {
         entry.cause = resource
         throw new Error(resource.reason)
       }
@@ -1330,7 +1330,20 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
           })
         }
         consumer.unknown = capability.reason
-        if (requireConsumer) throw new Error(capability.reason)
+        if (requireConsumer) {
+          if (consumerFuture(work)) {
+            consumerFutures.add(work as object)
+            // Observe actual unknown returned work without claiming all-work settlement.
+            consumer.unknownObserverWork = (async () => {
+              try {
+                await work
+              } catch (cause) {
+                consumer.cause = cause
+              }
+            })()
+          }
+          throw new Error(capability.reason)
+        }
         // Legacy content can consume its real result, but its opaque scope stays unknown.
         // An event emission or terminal label is not a settlement future.
         if (!consumerFuture(work)) {
@@ -1338,6 +1351,7 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
             'editor-session-attachment-dispatch-settlement-unavailable',
           )
         }
+        consumerFutures.add(work as object)
         return work as unknown as PromiseLike<MarkdownAttachmentProviderResult>
       })
       // Ledger settlement happens before final provenance is issued.
