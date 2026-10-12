@@ -18,6 +18,9 @@ interface MarkdownHeavyFeatureIsolatedClient {
     request: MarkdownHeavyFeatureIsolatedRenderRequest,
     trustedScriptUrlFactory?: MarkdownHeavyFeatureTrustedScriptUrlFactory,
     scheduleContinue?: MarkdownHeavyFeatureFrameContinueScheduler,
+    onHandleCreated?: (
+      handle: MarkdownHeavyFeatureIsolatedRenderHandle<unknown>,
+    ) => void,
   ) => MarkdownHeavyFeatureIsolatedRenderHandle<unknown>
 }
 
@@ -36,6 +39,7 @@ export const createLazyMarkdownHeavyFeatureIsolatedRender = <T>(
   let active = true
   const importOwner = createMarkdownHeavyFeatureAdapterResourceOwner()
   let innerHandle: MarkdownHeavyFeatureIsolatedRenderHandle<T> | null = null
+  let clientInstalling = false
   let removeInnerResourceChange: (() => void) | null = null
   let rejectAbort!: (reason: unknown) => void
   const resourceChangeListeners = new Set<() => void>()
@@ -71,27 +75,48 @@ export const createLazyMarkdownHeavyFeatureIsolatedRender = <T>(
     notifyResourceChange()
   }
   const clientPromise = importOwner.loadImport(loadClient)
+  const receiveInnerHandle = (
+    handle: MarkdownHeavyFeatureIsolatedRenderHandle<unknown>,
+  ) => {
+    // Borrow the original handle, so teardown during setup reaches its owner.
+    const ownedHandle = handle as MarkdownHeavyFeatureIsolatedRenderHandle<T>
+    void ownedHandle.promise.catch(() => undefined)
+    innerHandle = ownedHandle
+    removeInnerResourceChange =
+      ownedHandle.resources().subscribe?.(onInnerResourceChange) ?? null
+    if (!active) {
+      ownedHandle.teardown()
+      onInnerResourceChange()
+    }
+  }
   const loadPromise = clientPromise
     .then((client) => {
       if (!active) throw abortError()
-      const handle = client.createMarkdownHeavyFeatureIsolatedRender(
-        request,
-        trustedScriptUrlFactory,
-        scheduleContinue,
-      ) as MarkdownHeavyFeatureIsolatedRenderHandle<T>
-      // Consume rejection even if subscription/teardown reenters cancellation
-      // before the active branch can return the original promise.
-      void handle.promise.catch(() => undefined)
-      innerHandle = handle
-      removeInnerResourceChange =
-        handle.resources().subscribe?.(onInnerResourceChange) ?? null
-      if (!active) {
-        handle.teardown()
-        onInnerResourceChange()
-        throw abortError()
+      clientInstalling = true
+      try {
+        notifyResourceChange()
+        if (!active) return Promise.reject(abortError())
+        const handle = client.createMarkdownHeavyFeatureIsolatedRender(
+          request,
+          trustedScriptUrlFactory,
+          scheduleContinue,
+          receiveInnerHandle,
+        ) as MarkdownHeavyFeatureIsolatedRenderHandle<T>
+        if (innerHandle !== handle) receiveInnerHandle(handle)
+        if (!active) {
+          handle.teardown()
+          onInnerResourceChange()
+          return handle.promise
+        }
+        notifyResourceChange()
+        return handle.promise
+      } catch (cause) {
+        importOwner.retainFailure('isolated-client-install', client, cause)
+        throw cause
+      } finally {
+        clientInstalling = false
+        notifyResourceChange()
       }
-      notifyResourceChange()
-      return handle.promise
     })
     .finally(() => {
       notifyResourceChange()
@@ -158,6 +183,7 @@ export const createLazyMarkdownHeavyFeatureIsolatedRender = <T>(
     get pendingInstallations() {
       return (
         (importOwner.resources.pendingInstallations ?? 0) +
+        (clientInstalling ? 1 : 0) +
         (innerHandle?.resources().pendingInstallations ?? 0)
       )
     },

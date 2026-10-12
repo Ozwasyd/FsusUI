@@ -5,6 +5,7 @@ import {
   registerMarkdownHeavyFeatureIsolatedRenderFactory,
   type MarkdownHeavyFeatureAdapterResources,
   type MarkdownHeavyFeatureFrameProviderObservation,
+  type MarkdownHeavyFeatureIsolatedRenderHandle,
   type MarkdownHeavyFeatureIsolatedRenderRequest,
   validateMarkdownHeavyFeatureIsolatedRenderOutput,
   validateMarkdownHeavyFeatureIsolatedRenderRequest,
@@ -61,6 +62,9 @@ export const createMarkdownHeavyFeatureIsolatedRender = <
   request: MarkdownHeavyFeatureIsolatedRenderRequest,
   trustedScriptUrlFactory?: MarkdownHeavyFeatureTrustedScriptUrlFactory,
   scheduleContinue?: MarkdownHeavyFeatureFrameContinueScheduler,
+  onHandleCreated?: (
+    handle: MarkdownHeavyFeatureIsolatedRenderHandle<T>,
+  ) => void,
 ) => {
   const validatedRequest =
     validateMarkdownHeavyFeatureIsolatedRenderRequest(request)
@@ -514,8 +518,12 @@ export const createMarkdownHeavyFeatureIsolatedRender = <
     teardown,
   })
 
-  let installPhase = 'frame-setup'
+  let installPhase = 'frame-handle-handoff'
   try {
+    // Publish this actual handle before setup can invoke any supplied callback.
+    onHandleCreated?.(handle)
+    if (!active) return handle
+    installPhase = 'frame-setup'
     iframe.setAttribute('aria-hidden', 'true')
     iframe.setAttribute('tabindex', '-1')
     iframe.dataset.fsusMarkdownHeavyPending = validatedRequest.kind
