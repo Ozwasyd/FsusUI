@@ -192,13 +192,14 @@ Large documents prefer the Render Pipeline adapter's shared Worker pool. Each po
 
 ### Exposes
 
-| Name                          | Description                                                                                                          |
-| ----------------------------- | -------------------------------------------------------------------------------------------------------------------- |
-| rootEl                        | Render container element.                                                                                            |
-| captureLastValidRender        | Return the retained render ref, document identity/epoch and revision, or `null`.                                     |
-| restoreLastValidRender        | Recommit the actual retained projection on the same mounted owner and matching revision, or report a blocked result. |
-| getSessionResourceSourceOffer | Return the explicitly incomplete census of resources directly held by this renderer.                                 |
-| getSessionResourceParticipant | Return the stable renderer resource participant; its complete lifecycle operations currently refuse.                 |
+| Name                           | Description                                                                                                                        |
+| ------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------- |
+| rootEl                         | Render container element.                                                                                                          |
+| captureRendererOwnedCheckpoint | Pin actual renderer-owned state and authorized projection on this instance, or return `null`; native recovery remains unavailable. |
+| captureLastValidRender         | Return the retained render ref, document identity/epoch and revision, or `null`.                                                   |
+| restoreLastValidRender         | Recommit the actual retained projection on the same mounted owner and matching revision, or report a blocked result.               |
+| getSessionResourceSourceOffer  | Return the explicitly incomplete census of resources directly held by this renderer.                                               |
+| getSessionResourceParticipant  | Return the stable renderer resource participant; its complete lifecycle operations currently refuse.                               |
 
 ### Retained renderer projection and resource source offer
 
@@ -242,6 +243,41 @@ It is an in-memory identity reference, not a disposal checkpoint. Rejected
 resource/disposal operations preserve the retained result; ordinary component
 unmount releases it.
 
+`captureRendererOwnedCheckpoint()` returns an opaque frozen metadata record:
+
+```ts
+{
+  ref: string
+  lastValidRenderRef: string
+  documentIdentity: {
+    id: string
+    epoch: number | string
+  }
+  revision: number | string
+  scope: 'renderer-owned-state'
+  nativeRecovery: 'unavailable'
+}
+```
+
+The same owner actually pins the authorized result/HTML/chunks/strategy together
+with copied activated keys, mounted-chunk references, heavy identity contexts,
+sequences/node ids and observed renderer state/metrics. It preserves actual
+chunk-result/tracker references rather than synthesizing a checkpoint from an id.
+Capture refuses known pending owned timers/frames/jobs, reentry, disposal,
+changed generation/identity/revision or a superseded/mismatched live projection.
+A failed capture leaves the previous pin intact. The pin remains bounded to one
+record and survives a failed release; its actual copied collection entries remain
+in logical memory census. After disposal it is historical retained state, not
+permission to restore an unmounted renderer.
+
+This covers renderer-owned stores only. It does not capture the Main native panel
+textarea, focus/selection/composition, transaction history, editor mode/search,
+clipboard/upload/embed/command effects, Vue flush state or provider resources.
+Native element references preserve identity, not a frozen DOM subtree. There is
+no native checkpoint restore or reversible disposal API yet; `restoreLastValidRender`
+keeps its existing same-mounted projection contract and is not an owned-checkpoint
+restore. All full checkpoint/recovery and session admission holds remain.
+
 `restoreLastValidRender(ref)` returns a promise of
 `{ ref, status: 'restored' | 'blocked', reason: string | null }`. It resolves the
 ref through this renderer's sole private retained slot and checks the current
@@ -284,9 +320,11 @@ interpreted as no listener.
     rendererNative: {
       renderWatchHandleRetained: boolean
       stoppingRenderWatch: boolean
+      capturingOwnedCheckpoint: boolean
       effectCensus: 'unknown'
       flushJobCensus: 'unknown'
     }
+    rendererOwnedCheckpoint: object | null // Metadata of the actual pinned record.
     renderPipeline: object // Actual runtime/hardware inspection.
     virtualWindow: object // Actual viewport inspection.
     heavyFeatures: object // Actual active and retired handle inspection.
@@ -478,6 +516,9 @@ in-progress owned stop contributes one running control entry. These describe
 owned records/calls only. `unknownUsage.vueEffects` and `unknownUsage.vueFlushJobs`
 stay `unknown`; a null failure means no observed stop failure, not successful
 global Vue cleanup. Full renderer controls and recoverable disposal still refuse.
+An in-progress owned checkpoint capture likewise contributes its actual running
+control entry. Stored checkpoint memory counts the real pin plus its copied
+collection entries; it is not a physical heap estimate or a native recovery ack.
 
 For these requirements, `authority` means the actual current
 `{documentIdentity:{id,epoch},revision}`; `checkpointRef` means an opaque ref held

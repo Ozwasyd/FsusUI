@@ -371,6 +371,62 @@ const rendererResourceOwner = createMarkdownRendererSessionResourceOwner({
     units: chunkUnits.value,
     strategy: renderStrategy.value,
   }),
+  readOwnedCheckpointState: () => {
+    const keys = Object.freeze([...activatedChunkKeys])
+    const elements = Object.freeze(
+      [...chunkActivationElements].map(([key, element]) =>
+        Object.freeze({ key, element }),
+      ),
+    )
+    const contexts = Object.freeze({ ...heavyLifecycleIdentityContexts })
+    const sequences = Object.freeze(
+      Object.fromEntries(
+        Object.entries(heavyLifecycleIdentitySequences).map(
+          ([kind, values]): [
+            string,
+            readonly HeavyLifecycleIdentityContext[],
+          ] => [kind, Object.freeze([...values])],
+        ),
+      ),
+    )
+    const nodeIds = Object.freeze(
+      Object.fromEntries(
+        Object.entries(heavyLifecycleProjectionNodeIds).map(
+          ([kind, values]): [string, readonly string[]] => [
+            kind,
+            Object.freeze([...values]),
+          ],
+        ),
+      ),
+    )
+    return Object.freeze({
+      state: Object.freeze({
+        activeChunkResult,
+        activatedChunkKeys: keys,
+        chunkActivationElements: elements,
+        heavyLifecycleIdentityContexts: contexts,
+        heavyLifecycleIdentitySequences: sequences,
+        heavyLifecycleProjectionNodeIds: nodeIds,
+        lastHeavyLifecycleIdentityContext,
+        heavyProjectionTrackerPromise,
+        heavyThemeRevision: heavyThemeRevision.value,
+        isRendering: isRendering.value,
+        activationDurationMs,
+        commitDurationMs,
+      }),
+      retainedCollectionEntries:
+        keys.length +
+        elements.length +
+        Object.keys(contexts).length +
+        Object.keys(sequences).length +
+        Object.keys(nodeIds).length +
+        Object.values(sequences).reduce(
+          (sum, values) => sum + values.length,
+          0,
+        ) +
+        Object.values(nodeIds).reduce((sum, values) => sum + values.length, 0),
+    })
+  },
   readPipelineResources: () => renderPipelineRuntime.inspectResources(),
   readHeavyResources: () => heavyLifecycle.inspectResources(),
   readVirtualWindowResources: () => virtualWindow.inspectResources(),
@@ -1601,6 +1657,8 @@ onBeforeUnmount(() => {
 defineExpose({
   rootEl,
   captureLastValidRender: rendererResourceOwner.captureLastValidRender,
+  captureRendererOwnedCheckpoint:
+    rendererResourceOwner.captureRendererOwnedCheckpoint,
   restoreLastValidRender,
   getSessionResourceParticipant: () => rendererResourceOwner.participant,
   getSessionResourceSourceOffer: () =>

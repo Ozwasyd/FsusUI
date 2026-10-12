@@ -28,11 +28,25 @@ export interface MarkdownRendererLastValidRender extends MarkdownRendererDocumen
   readonly ref: string
 }
 
+/** An actual pinned renderer-state record; native recovery remains unavailable. */
+export interface MarkdownRendererOwnedCheckpoint extends MarkdownRendererDocumentState {
+  readonly ref: string
+  readonly lastValidRenderRef: string
+  readonly scope: 'renderer-owned-state'
+  readonly nativeRecovery: 'unavailable'
+}
+
 export interface MarkdownRendererRetainedProjection {
   readonly html: MarkdownSafeHtml | null
   readonly units: readonly MarkdownRenderChunk[]
   readonly strategy: 'sync' | 'chunked-main' | 'chunked-worker'
 }
+
+type MarkdownRendererRetainedRender = Readonly<{
+  capture: MarkdownRendererLastValidRender
+  result: MarkdownSafeRenderResult
+  projection: MarkdownRendererRetainedProjection
+}>
 
 export interface MarkdownRendererRestoreProof {
   readonly ref: string
@@ -111,10 +125,16 @@ export const markdownRendererSessionSourceDependencies = Object.freeze([
   'render-pipeline-worker:retained-task-slot-association',
 ] as const)
 
-export const createMarkdownRendererSessionResourceOwner = (options: {
+export const createMarkdownRendererSessionResourceOwner = <
+  State extends object,
+>(options: {
   readonly ownerKey: string
   readonly readDocumentState: () => MarkdownRendererDocumentState
   readonly readProjection: () => MarkdownRendererRetainedProjection
+  readonly readOwnedCheckpointState: () => {
+    readonly state: Readonly<State>
+    readonly retainedCollectionEntries: number
+  }
   readonly readPipelineResources: () => FsusRenderPipelineRuntimeResourceInspection
   readonly readHeavyResources: () => MarkdownHeavyFeatureResourceInspection
   readonly readVirtualWindowResources: () => ReturnType<
@@ -136,16 +156,20 @@ export const createMarkdownRendererSessionResourceOwner = (options: {
   let generation = 0
   let disposed = false
   let sequence = 0
+  let checkpointSequence = 0
+  let capturingCheckpoint = false
   let renderWatchHandle: WatchHandle | null = null
   let stoppingRenderWatch = false
   let renderWatchCleanupFailure: Readonly<{
     phase: 'render-watch-stop'
     error: unknown
   }> | null = null
-  let retained: {
-    readonly capture: MarkdownRendererLastValidRender
-    readonly result: MarkdownSafeRenderResult
-    readonly projection: MarkdownRendererRetainedProjection
+  let retained: MarkdownRendererRetainedRender | null = null
+  let checkpoint: {
+    readonly capture: MarkdownRendererOwnedCheckpoint
+    readonly render: MarkdownRendererRetainedRender
+    readonly state: Readonly<State>
+    readonly retainedCollectionEntries: number
   } | null = null
 
   const sameDocument = (
@@ -239,6 +263,71 @@ export const createMarkdownRendererSessionResourceOwner = (options: {
       return null
     return retained
   }
+  const captureRendererOwnedCheckpoint =
+    (): MarkdownRendererOwnedCheckpoint | null => {
+      if (
+        disposed ||
+        capturingCheckpoint ||
+        stoppingRenderWatch ||
+        jobs.size > 0 ||
+        timers.size > 0 ||
+        frames.size > 0 ||
+        scheduledFrames.size > 0
+      )
+        return null
+      const checkpointGeneration = generation
+      capturingCheckpoint = true
+      try {
+        const capture = captureLastValidRender()
+        const render = capture ? readRetainedRender(capture.ref) : null
+        if (!capture || !render) return null
+        const owned = options.readOwnedCheckpointState()
+        const state = owned.state
+        const retainedCollectionEntries = owned.retainedCollectionEntries
+        if (
+          !Number.isSafeInteger(retainedCollectionEntries) ||
+          retainedCollectionEntries < 0
+        )
+          throw new Error(
+            'markdown-renderer-checkpoint-owned-entry-census-invalid',
+          )
+        const current = options.readDocumentState()
+        const projection = options.readProjection()
+        if (
+          disposed ||
+          generation !== checkpointGeneration ||
+          retained !== render ||
+          jobs.size > 0 ||
+          timers.size > 0 ||
+          frames.size > 0 ||
+          scheduledFrames.size > 0 ||
+          !sameDocument(capture, current) ||
+          capture.revision !== current.revision ||
+          projection.html !== render.projection.html ||
+          projection.units !== render.projection.units ||
+          projection.strategy !== render.projection.strategy
+        )
+          return null
+        const nextCapture: MarkdownRendererOwnedCheckpoint = Object.freeze({
+          ...capture,
+          ref: `${options.ownerKey}:checkpoint:${++checkpointSequence}`,
+          lastValidRenderRef: capture.ref,
+          scope: 'renderer-owned-state',
+          nativeRecovery: 'unavailable',
+        })
+        // Pin actual authorized result/projection and actual copied owned stores.
+        // Failed or reentrant capture never replaces the previous checkpoint.
+        checkpoint = Object.freeze({
+          capture: nextCapture,
+          render,
+          state,
+          retainedCollectionEntries,
+        })
+        return nextCapture
+      } finally {
+        capturingCheckpoint = false
+      }
+    }
   const trackJob = () => {
     const job = Symbol('renderer-job')
     jobs.add(job)
@@ -409,9 +498,11 @@ export const createMarkdownRendererSessionResourceOwner = (options: {
       measuredUsageOnly: true as const,
       missingSourceDependencies: Object.freeze(missingSourceDependencies),
       sources: Object.freeze({
+        rendererOwnedCheckpoint: checkpoint?.capture ?? null,
         rendererNative: Object.freeze({
           renderWatchHandleRetained: renderWatchHandle !== null,
           stoppingRenderWatch,
+          capturingOwnedCheckpoint: capturingCheckpoint,
           // One retained WatchHandle is not the native component effect/queue.
           effectCensus: 'unknown' as const,
           flushJobCensus: 'unknown' as const,
@@ -492,6 +583,7 @@ export const createMarkdownRendererSessionResourceOwner = (options: {
           backgroundTasks:
             jobs.size +
             (stoppingRenderWatch ? 1 : 0) +
+            (capturingCheckpoint ? 1 : 0) +
             frames.size +
             scheduledFrames.size +
             projection.backgroundTasks +
@@ -531,6 +623,7 @@ export const createMarkdownRendererSessionResourceOwner = (options: {
             (renderWatchHandle ? 1 : 0) +
             (renderWatchCleanupFailure ? 1 : 0) +
             (retained ? 1 : 0) +
+            (checkpoint ? 1 + checkpoint.retainedCollectionEntries : 0) +
             timers.size +
             frames.size +
             scheduledFrames.size +
@@ -593,6 +686,7 @@ export const createMarkdownRendererSessionResourceOwner = (options: {
     bindRenderWatchHandle,
     beginRender,
     captureLastValidRender,
+    captureRendererOwnedCheckpoint,
     clearTimer,
     disposeOnUnmount,
     inspectOwnedResources,
