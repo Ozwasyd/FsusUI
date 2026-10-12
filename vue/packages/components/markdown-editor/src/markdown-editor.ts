@@ -1930,3 +1930,8 @@ export type {
   MarkdownEditorNativeHandoverInspection,
   MarkdownEditorNativeHandoverProof,
 } from './markdown-editor-native-handover'
+export type {
+  MarkdownEditorNativeTargetReservation,
+  MarkdownEditorNativeTargetSubscription,
+  MarkdownEditorNativeTargetCleanup,
+} from './markdown-editor-native-target'

@@ -56,6 +56,7 @@ export const createMarkdownEditorNativeSurfaceResources = (owner: {
   readonly unavailable: () => boolean
   readonly composing: () => boolean
   readonly invalidatePublication: () => void
+  readonly beforePause?: () => void
   readonly pauseImperative: () => void
   readonly resumeImperative: () => void
   readonly inspectImperative: () => Readonly<{ resizeObservers: number | null; layoutGestureTimers: number }>
@@ -169,6 +170,8 @@ export const createMarkdownEditorNativeSurfaceResources = (owner: {
   const handle: MarkdownEditorNativeSurfaceResourceHandle = Object.freeze({
     inspect,
     pauseOwnedRegistrations() {
+      assertTransition()
+      owner.beforePause?.()
       assertTransition()
       // Capture only during admission. Rearm retains THIS original ticket;
       // a native write/retirement or structure change never reacquires it.

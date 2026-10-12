@@ -717,6 +717,14 @@ export class MarkdownEditorTransactionStore {
     return this.#revision
   }
 
+  /** Original private target admission only; this does not establish mounted-instance lifetime. */
+  hasPristineNativeHandoverTarget(): boolean {
+    return this.#documentAuthorityGeneration === 0 && !this.#documentWriteDepth && !this.#capturingDocumentAuthority && !this.#notifyingRetirement &&
+      !this.#registeringRetirement && this.#releasingRetirement === 0 && !this.#documentAuthorityRetired &&
+      !this.#handoverReceiving && !this.#nativeHandover && !this.#preparedRetainedSnapshot && !this.#retainedSnapshot &&
+      this.#revision === 0 && this.#undo.length === 0 && this.#redo.length === 0
+  }
+
   /** Same original transaction owner; one immutable live ticket per actual write generation. */
   captureDocumentAuthority(): MarkdownHeavyFeatureDocumentAuthorityTicket | null {
     if (this.#handoverReceiving || this.#documentAuthorityRetired || this.#documentWriteDepth || this.#capturingDocumentAuthority ||

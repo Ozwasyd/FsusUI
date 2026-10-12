@@ -5,6 +5,7 @@ import type { MarkdownEditorSessionResourceCensus, MarkdownEditorSessionResource
 import type { MarkdownRendererCheckpointHandle } from '../../markdown-renderer/src/markdown-renderer-session-resources'
 import type { MarkdownEditorNativeSurfaceResourceHandle } from './markdown-editor-native-surface-resources'
 import type { MarkdownEditorNativeHandover, MarkdownEditorNativeHandoverPrincipal, MarkdownEditorNativeHandoverProof } from './markdown-editor-native-handover'
+import type { createMarkdownEditorNativeTargetOwner, MarkdownEditorNativeTargetReservation, MarkdownEditorNativeTargetCleanup } from './markdown-editor-native-target'
 import type {
   MarkdownHeavyFeatureDocumentAuthority,
   MarkdownHeavyFeatureDocumentAuthorityTicket,
@@ -145,6 +146,9 @@ export interface MarkdownEditorSession {
   /** Exact original renderer methods/tokens; an unassembled owner returns null. */
   getRendererCheckpointHandle(): MarkdownRendererCheckpointHandle | null
   getNativeSurfaceResourceHandle(): MarkdownEditorNativeSurfaceResourceHandle | null
+  reserveNativeRecreationTarget(): MarkdownEditorNativeTargetReservation
+  inspectNativeRecreationTargetCleanup(): MarkdownEditorNativeTargetCleanup | null
+  retryNativeRecreationTargetCleanup(): boolean
   prepareNativeHandover(snapshot: MarkdownEditorSessionSnapshot, principal: MarkdownEditorNativeHandoverPrincipal): MarkdownEditorNativeHandover
   adoptNativeHandover(handover: MarkdownEditorNativeHandover, expected: {
     readonly documentIdentity: MarkdownEditorDocumentIdentity
@@ -213,6 +217,7 @@ export interface MarkdownEditorSessionOwner<ViewState> {
   readonly inspectRendererResourceSource?: () => MarkdownEditorSessionRendererResourceSource | null
   readonly getRendererCheckpointHandle?: () => MarkdownRendererCheckpointHandle | null
   readonly nativeSurfaceResourceHandle?: MarkdownEditorNativeSurfaceResourceHandle
+  readonly nativeTargetOwner?: ReturnType<typeof createMarkdownEditorNativeTargetOwner>
   readonly restoreNativeHandoverState?: () => Promise<void>
   readonly setNativeHandoverReceiving?: (receiving: boolean) => void
   readonly inspectAttachmentResourceSource?: () => MarkdownEditorSessionAttachmentResourceSource | null
@@ -253,6 +258,8 @@ export const createMarkdownEditorSessionBinding = <ViewState>(
   const documentAuthority = owner.documentAuthority ?? null
   const readRendererCheckpointHandle = owner.getRendererCheckpointHandle?.bind(owner)
   const nativeSurfaceResourceHandle = owner.nativeSurfaceResourceHandle ?? null
+  const nativeTargetOwner = owner.nativeTargetOwner
+  const hasPristineNativeTarget = MarkdownEditorTransactionStore.prototype.hasPristineNativeHandoverTarget.bind(transactionStore)
   const setNativeHandoverReceiving = owner.setNativeHandoverReceiving?.bind(owner)
   // Pin the original producer implementation, not replaceable consumer methods.
   const validatePreparedTransaction = MarkdownEditorTransactionStore.prototype.validatePreparedRetainedSnapshot.bind(transactionStore)
@@ -339,7 +346,10 @@ export const createMarkdownEditorSessionBinding = <ViewState>(
 
   return Object.freeze({
     invalidatePublicationAuthority,
-    retirePublicationAuthority: () => { authorityRetired = true; invalidatePublicationAuthority() },
+    retirePublicationAuthority: () => {
+      authorityRetired = true
+      try { nativeTargetOwner?.invalidate(true) } finally { invalidatePublicationAuthority() }
+    },
     inspectRetainedPanelMemoryUnits: () => (retained?.panels?.memoryUnits ?? 0) + (prepared?.next.panels?.memoryUnits ?? 0),
     getSession(editorSessionRef: string) {
       assertAvailable()
@@ -396,6 +406,17 @@ export const createMarkdownEditorSessionBinding = <ViewState>(
         },
         inspectResourceParticipants: () => { assertAvailable(); return resources.inspectParticipants() },
         getNativeSurfaceResourceHandle() { assertAvailable(); return nativeSurfaceResourceHandle },
+        reserveNativeRecreationTarget() {
+          assertAvailable()
+          if (!nativeTargetOwner) throw new Error('editor-session-native-target-owner-unavailable')
+          return nativeTargetOwner.reserve(() => {
+            assertAvailable()
+            if (capturing || prepared || retained || nativeHandover || !hasPristineNativeTarget())
+              throw new Error('editor-session-native-target-not-pristine')
+          })
+        },
+        inspectNativeRecreationTargetCleanup: () => nativeTargetOwner?.inspectCleanup() ?? null,
+        retryNativeRecreationTargetCleanup: () => nativeTargetOwner?.retryCleanup() ?? false,
         prepareNativeHandover(snapshot: MarkdownEditorSessionSnapshot, principal: MarkdownEditorNativeHandoverPrincipal) {
           assertAvailable()
           if (nativeHandover || prepared || capturing || retained?.snapshot !== snapshot ||
@@ -461,12 +482,14 @@ export const createMarkdownEditorSessionBinding = <ViewState>(
           const admit = () => {
             if (authorityRetired || owner.isDisposed() || owner.isComposing())
               throw new Error('editor-session-native-handover-target-retired')
+            nativeTargetOwner?.assertReceiving()
           }
           const proof: MarkdownEditorNativeHandoverProof = Object.freeze({ status: 'native-recreated',
             snapshotRef: handover.snapshotRef, editorSessionRef, nativeHistoryTransferred: true,
             fullRefsRestored: false, resourcesValidated: false })
           adoptingNativeHandover = true
           try {
+            nativeTargetOwner?.beginReceiving()
             setNativeHandoverReceiving?.(true)
             const originalSequence = await (handover as OriginalNativeHandover)[adoptNativeHandover](
               transactionStore, editorSessionRef, expected.principal, async () => {
@@ -482,7 +505,10 @@ export const createMarkdownEditorSessionBinding = <ViewState>(
                 latestCause: cleanupCause, running: false, cleanup: () => setNativeHandoverReceiving?.(false) }
             }
             throw cause
-          } finally { if (!nativeHandoverCleanup) adoptingNativeHandover = false }
+          } finally {
+            nativeTargetOwner?.endReceiving()
+            if (!nativeHandoverCleanup) adoptingNativeHandover = false
+          }
         },
         inspectNativeHandoverCleanup: () => Object.freeze({ pending: nativeHandoverCleanup !== undefined,
           running: nativeHandoverCleanup?.running ?? false, primaryCause: nativeHandoverCleanup?.primaryCause,
@@ -831,7 +857,7 @@ export const createMarkdownEditorSessionBinding = <ViewState>(
           return Object.freeze({ status: 'restored', snapshotRef: snapshot.snapshotRef, reason: null })
         },
         inspectResources: () => { assertAvailable(); return resources.inspectResources() },
-        pauseResources: () => { assertAvailable(); return resources.pauseResources() },
+        pauseResources: () => { assertAvailable(); nativeTargetOwner?.invalidate(); assertAvailable(); return resources.pauseResources() },
         resumeResources: () => { assertAvailable(); return resources.resumeResources() },
         disposeAfterSnapshot(snapshotRef: string) {
           assertAvailable()

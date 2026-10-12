@@ -389,9 +389,9 @@
         :aria-haspopup="activeSlashTrigger ? 'menu' : undefined"
         :aria-busy="loading || undefined"
         :aria-disabled="editingBlocked"
-        :aria-readonly="props.readonly || undefined"
+        :aria-readonly="props.readonly || nativeTargetStaging || undefined"
         :disabled="inputDisabled"
-        :readonly="props.readonly"
+        :readonly="props.readonly || nativeTargetStaging"
         :hidden="!liveSurface.inputVisible || undefined"
         :name="textareaName"
         :placeholder="effectivePlaceholder"
@@ -1459,6 +1459,7 @@ import {
 } from './markdown-editor-outline'
 import { planMarkdownOutlineReveal } from './markdown-editor-outline-active'
 import { createMarkdownEditorSessionBinding } from './markdown-editor-session'
+import { createMarkdownEditorNativeTargetOwner } from './markdown-editor-native-target'
 import { freezeMarkdownEditorSessionPanelState, markdownEditorSessionPanelMemoryUnits } from './markdown-editor-session-panels'
 import { captureMarkdownEditorSessionAttachmentState } from './markdown-editor-session-attachment-state'
 import { createMarkdownAttachmentEmbedResourceOwner } from './markdown-editor-attachment-embed-owner'
@@ -1533,14 +1534,26 @@ const attrs = useAttrs()
 const rootElementRef = ref<HTMLElement | null>(null)
 const sessionSurfacePaused = ref(false)
 const nativeHandoverReceiving = ref(false)
+const nativeTargetStaging = ref(false)
+let invalidateNativeTargetLifetime: ((permanent?: boolean) => void) | undefined = undefined
 let nativeHandoverViewRestoring = false
 let invalidateNativeSurfacePublication: (() => void) | undefined = undefined
 let sessionDisposed = false
 let retireSnapshotPublicationAuthority: (() => void) | undefined = undefined
 let sessionUnmountFailed = false
 let sessionUnmountFirstCause: unknown
+// Install before the original prop/document watchers can begin their effects.
+watch([
+  () => props.modelValue, () => props.documentIdentity?.id, () => props.documentIdentity?.epoch,
+  () => props.disabled, () => props.readonly, () => props.loading, () => props.mode,
+  rootElementRef, sessionSurfacePaused,
+], () => invalidateNativeTargetLifetime?.(), { flush: 'sync' })
 // Retire before the original scheduler registers its cleanup callbacks.
 onBeforeUnmount(() => {
+  try { invalidateNativeTargetLifetime?.(true) } catch (cause) {
+    if (!sessionUnmountFailed) sessionUnmountFirstCause = cause
+    sessionUnmountFailed = true
+  }
   sessionDisposed = true
   try { retireSnapshotPublicationAuthority?.() } catch (cause) {
     if (!sessionUnmountFailed) sessionUnmountFirstCause = cause
@@ -1604,7 +1617,7 @@ const visualViewportHeight = ref(0)
 const visualViewportOffsetTop = ref(0)
 const toolbarRef = ref<HTMLElement | null>(null)
 const inputDisabled = computed(() => props.disabled || props.loading || sessionSurfacePaused.value)
-const editingBlocked = computed(() => props.readonly || inputDisabled.value || nativeHandoverReceiving.value)
+const editingBlocked = computed(() => props.readonly || inputDisabled.value || nativeHandoverReceiving.value || nativeTargetStaging.value)
 const surfaceOptions = computed<Required<MarkdownEditorSurfaceOptions>>(() => ({
   commandPalette: props.surfaces.commandPalette ?? false,
   selectionToolbar: props.surfaces.selectionToolbar ?? false,
@@ -1670,6 +1683,7 @@ const nativeSurfaceResources = createMarkdownEditorNativeSurfaceResources({
   documentAuthority, unavailable: () => sessionDisposed || !rootElementRef.value?.isConnected,
   composing: () => isComposing.value || nativeMachine.composing,
   invalidatePublication: () => invalidateNativeSurfacePublication?.(),
+  beforePause: () => invalidateNativeTargetLifetime?.(),
   pauseImperative: () => pauseNativeSurfaceImperative(),
   resumeImperative: () => resumeNativeSurfaceImperative(),
   inspectImperative: () => ({ resizeObservers: typewriterObserverUnknown ? null : Number(typewriterResizeObserver !== undefined),
@@ -2272,6 +2286,7 @@ const syncLanguageToolsState = () => {
   })
 }
 const isComposing = ref(false)
+watch([textareaRef, currentMode, isComposing], () => invalidateNativeTargetLifetime?.(), { flush: 'sync' })
 const pasteAsMarkdownGate = computed<
   'composition' | 'readonly' | 'disabled' | 'loading' | 'previewOnly' | null
 >(() => {
@@ -7048,11 +7063,49 @@ const surfaceResourceParticipant: MarkdownEditorSessionResourceParticipant = {
   },
 }
 
+// This lifetime belongs to this actual SFC birth, independently of a document ticket
+// intentionally retired by the original receiving transaction.
+const nativeTargetOwner = createMarkdownEditorNativeTargetOwner({
+  captureMountedTarget: () => {
+    const root = rootElementRef.value
+    const textarea = textareaRef.value
+    const document = root?.ownerDocument
+    const identity = transactionStore.documentIdentity
+    const source = props.modelValue
+    const mode = currentMode.value
+    const assertMounted = () => {
+      const unavailable = sessionDisposed || sessionSurfacePaused.value || isComposing.value || nativeMachine.composing ||
+        props.readonly || props.disabled || props.loading || props.modelValue !== source || currentMode.value !== mode
+      const sameOwner = () => rootElementRef.value === root && textareaRef.value === textarea &&
+        transactionStore.documentIdentity.id === identity.id && transactionStore.documentIdentity.epoch === identity.epoch
+      if (unavailable || !sameOwner() || !root || !textarea || !document || !root.isConnected || !textarea.isConnected ||
+        root.ownerDocument !== document || textarea.ownerDocument !== document || !root.contains(textarea) || !sameOwner())
+        throw new Error('editor-native-target-mounted-owner-unavailable')
+    }
+    assertMounted()
+    return Object.freeze({
+      assertMounted,
+      setStagingBlocked: (blocked: boolean) => {
+        nativeTargetStaging.value = blocked
+        if (!textarea) throw new Error('editor-native-target-textarea-owner-unavailable')
+        // Mutate and verify the exact original native element synchronously;
+        // a queued Vue patch alone cannot establish a staging barrier.
+        const readonly = blocked || props.readonly
+        textarea.readOnly = readonly
+        if (textarea.readOnly !== readonly || nativeTargetStaging.value !== blocked)
+          throw new Error('editor-native-target-input-barrier-unconfirmed')
+      },
+    })
+  },
+})
+invalidateNativeTargetLifetime = nativeTargetOwner.invalidate
+if (sessionDisposed) nativeTargetOwner.invalidate(true)
 // This binding closes over the existing owner; it never creates another editor.
 const sessionBinding = createMarkdownEditorSessionBinding({
   transactionStore,
   documentAuthority,
   nativeSurfaceResourceHandle: nativeSurfaceResources.handle,
+  nativeTargetOwner,
   setNativeHandoverReceiving: (receiving) => { nativeHandoverReceiving.value = receiving },
   restoreNativeHandoverState: async () => {
     if (nativeHandoverViewRestoring) throw new Error('editor-native-handover-view-reentrant')

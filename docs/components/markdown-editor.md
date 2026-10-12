@@ -1343,3 +1343,46 @@ Actual SFC restoration also pins its original document/root/textarea and locks
 reentry; owner identity, document membership and root containment are checked
 before and after the awaited original selection restoration. A connected node
 moved elsewhere cannot produce a successful native recreation proof.
+
+### Original native target birth and staging custody
+
+`session.reserveNativeRecreationTarget()` reserves the one actual mounted SFC
+birth for native handover. Import `MarkdownEditorNativeTargetReservation`,
+`MarkdownEditorNativeTargetSubscription` and `MarkdownEditorNativeTargetCleanup`
+from `@ozwasyd/element-plus`. This is a native staging input barrier, not a new
+document issuer, physical mount owner or complete resource certificate.
+
+Admission checks the original transaction's private initial write generation,
+pristine history/checkpoint state and actual connected root/textarea containment.
+The original SFC captures those exact elements, synchronously sets and verifies
+the original textarea's readonly field and its staging state, then repeats native
+and mounted-owner admission. Allocation precedes the real write: a throwing or
+reentrant setter retains its original cleanup holder and cause. No snapshot,
+revision-zero metadata or cloned editor can substitute for this actual birth.
+The instance cannot issue another birth reservation after cancellation/failure.
+
+The same reservation provides callback-free `hasCustody()` over original private
+owner-observed state and `subscribeBeforeInvalidation(receiver)`. Early synchronous
+prop/document/root/textarea/composition/mode watchers, actual owned-registration
+pause and permanent unmount withdraw eligibility before notifications or subsequent
+owner effects. Ordinary document-ticket retirement during the original receiving
+transaction does not revoke this separate SFC lifetime. Actual handover admission
+checks the selected mounted elements before and after awaited restoration, while
+the original transaction retains all history transfer and rollback ownership.
+
+`cancel()` withdraws first and attempts every held receiver and the exact original
+textarea/staging barrier release. It never unlocks input during a pending native
+transfer. Failed callbacks (including caught unsubscribe reentry), unknown setter
+completion and raw first/latest causes remain held; `retryCleanup()` retries only
+the real unfinished cleanup. A completed release drops the captured element
+closures. `inspectNativeRecreationTargetCleanup()` and
+`retryNativeRecreationTargetCleanup()` remain callable on the held session after
+failed issuance or retirement. Their scope is `native-target-staging-admission`;
+success does not acknowledge physical unmount, disposal or full resource cleanup.
+
+Root owns actual Write mounting, its physical replacement/invalidation guards,
+principal/document custody and final readmission. This source does not qualify
+unobserved external DOM mutation, framework effects or platform queues. Full
+resource/restoration/eviction refusals and every runtime/native/IME/security/privacy/
+receipt/race/backup-restore hold remain HOLD/UNRUN. Local source alias only; no
+package publication.
