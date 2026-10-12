@@ -1213,6 +1213,11 @@ const virtualWindow = useFsusVirtualWindow<MarkdownRenderChunk>({
   units: chunkUnits,
 })
 
+rendererResourceOwner.bindCheckpointSealSources({
+  pipeline: renderPipelineRuntime.authority,
+  viewport: virtualWindow.authority,
+})
+
 const scheduleMeasurementWarmup = () => {
   // The viewport warmup read joins the shared frame scheduler's measure
   // phase; the scheduler key coalesces repeated warmups into one frame.
