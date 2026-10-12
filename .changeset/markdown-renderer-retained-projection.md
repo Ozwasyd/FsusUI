@@ -2,6 +2,8 @@
 'element-plus': minor
 ---
 
+Retain actual unsubscribe reentry failure/cause even when a receiver catches the exception and returns normally. Refuse removal until a separate real retry succeeds without reentry, preserving registration, history and view-release obligations.
+
 Wire the actual renderer request/adapter/unit/selected-viewport publications into the original pending pipeline caller-feed options. Keep viewport reads pure, publish observed selections in owned entries, and pass the original runtime/config authority without overrides. Record pending inherited dependency status and preserve all complete/native/live/recovery qualification refusals.
 
 Encapsulate renderer input values behind a frozen native customRef, reject stale ticket allocation after reentry, retry failed receiver releases through real cleanup, and safely observe supported native Promise callback rejections with original cause/attribution. Preserve unsupported results and pending cleanup obligations rather than releasing view references or claiming recovery.

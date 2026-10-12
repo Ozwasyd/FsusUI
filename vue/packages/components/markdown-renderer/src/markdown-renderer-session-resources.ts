@@ -343,6 +343,8 @@ export const createMarkdownRendererSessionResourceOwner = <
       readonly listener: () => void
       quarantined: boolean
       releasing: boolean
+      releaseReentered: boolean
+      releaseReentryCause: unknown
       releaseRequested: boolean
       failureCause: unknown
       notificationFailed: boolean
@@ -539,8 +541,25 @@ export const createMarkdownRendererSessionResourceOwner = <
       )
     const releaseRegistration = (registration: Registration) => {
       if (!registrations.has(registration)) return
-      if (registration.releasing)
-        throw new Error('markdown-renderer-input-release-in-progress')
+      if (registration.releasing) {
+        const cause = new Error('markdown-renderer-input-release-in-progress')
+        // The receiver may catch this exception. Keep the actual failed attempt
+        // independently of its eventual normal return so it cannot detach itself.
+        if (!registration.releaseReentered) {
+          registration.releaseReentered = true
+          registration.releaseReentryCause = cause
+        }
+        registration.quarantined = true
+        recordFailure(
+          cause,
+          registration,
+          registration.listener,
+          'receiver-release-reentry',
+        )
+        throw cause
+      }
+      registration.releaseReentered = false
+      registration.releaseReentryCause = undefined
       registration.releasing = true
       registration.releaseRequested = true
       try {
@@ -553,7 +572,12 @@ export const createMarkdownRendererSessionResourceOwner = <
               )
             // This is an actual retry of the selected receiver, not deletion of
             // its quarantine flag or a fabricated release acknowledgment.
-            if (!notifyRegistration(registration)) {
+            const notified = notifyRegistration(registration)
+            if (registration.releaseReentered) {
+              registration.quarantined = true
+              throw registration.releaseReentryCause
+            }
+            if (!notified) {
               if (registration.notificationFailed)
                 throw registration.failureCause
               throw new Error(
@@ -637,6 +661,8 @@ export const createMarkdownRendererSessionResourceOwner = <
             listener,
             quarantined: false,
             releasing: false,
+            releaseReentered: false,
+            releaseReentryCause: undefined,
             releaseRequested: false,
             failureCause: undefined,
             notificationFailed: false,

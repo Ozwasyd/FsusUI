@@ -943,3 +943,23 @@ live/full seal, fixed-roster completeness and session eviction remain refused.
 The changed hook initialization/unmount ordering and real caller subscriptions
 require original source review and exact case preflight; runtime/list/native/
 security/receipt/renderer/authority/eviction qualifications remain UNRUN/HOLD.
+
+### Caught release reentry remains an obligation
+
+A receiver that calls its own already-assigned unsubscribe while release is in
+progress can catch the rejection and return normally. The registration now keeps
+a sticky reentry flag and its original attempt cause before that rejection is
+thrown. The outer release checks this private attempt state after the actual
+receiver call, restores quarantine and throws that retained cause rather than
+removing the registration. The failure appears in the real history/attribution
+and matching cleanup ledger; listener/release custody and view-release holds stay.
+
+A later separate release attempt resets only the attempt flag, invokes the actual
+receiver again and still requires synchronous success, no new reentry and real
+observation settlement before removing the registration. Original failure history
+remains. Independent review closed the prior two P1 findings and ordinary native
+Promise P2, and found no added consumer issue in the five caller options/four
+exact pending pipeline postimages. This remaining synchronous-release correction
+requires its own source review; all counterexample/runtime/list/native/qualification
+holds stay UNRUN/HOLD. The upstream pipeline candidate's four P2 groups remain
+with its original owner and are not accepted by this consumer change.
