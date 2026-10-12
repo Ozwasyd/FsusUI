@@ -108,13 +108,19 @@ describe('MarkdownEditor transaction properties', () => {
     const calls: string[] = []
     let fail = true
     const other = store.subscribeDocumentAuthorityRetirement(() => { calls.push('other'); if (fail) throw otherCause })
-    const first = store.subscribeDocumentAuthorityRetirement(() => { calls.push('first'); if (fail) throw firstCause })
+    const first = store.subscribeDocumentAuthorityRetirement(() => {
+      calls.push('first')
+      expect(store.validateRetainedSnapshot(retained)).toBe(true)
+      expect(store.hasRetainedSnapshotCustody(retained)).toBe(false)
+      if (fail) throw firstCause
+    })
     let caught: unknown
     try { store.reset('must not apply') } catch (cause) { caught = cause }
     expect(caught).toBe(firstCause)
     expect(calls).toEqual(['first', 'other'])
     expect(store.value).toBe('source')
     expect(store.validateRetainedSnapshot(retained)).toBe(true)
+    expect(store.hasRetainedSnapshotCustody(retained)).toBe(false)
     expect(store.captureDocumentAuthority()).toBeNull()
     expect(first.hasCustody()).toBe(true)
     expect(other.hasCustody()).toBe(true)
@@ -123,6 +129,7 @@ describe('MarkdownEditor transaction properties', () => {
     fail = false
     expect(first.unsubscribe()).toBe(true)
     expect(other.unsubscribe()).toBe(true)
+    expect(store.hasRetainedSnapshotCustody(retained)).toBe(false)
     expect(store.captureDocumentAuthority()).toBeNull()
   })
 
@@ -162,12 +169,18 @@ describe('MarkdownEditor transaction properties', () => {
     const store = new MarkdownEditorTransactionStore('source', selection(0), { id: 'document', epoch: 1 })
     store.dispatch(transaction([{ from: 0, to: 0, insert: 'seed ' }], selection(0)))
     const snapshot = store.retainSnapshot()
+    expect(store.hasRetainedSnapshotCustody(snapshot)).toBe(true)
+    const retirement = store.subscribeDocumentAuthorityRetirement(() => {
+      expect(store.hasRetainedSnapshotCustody(snapshot)).toBe(false)
+    })
     const ticket = store.captureDocumentAuthority()!
     expect(ticket).toEqual({ scope: 'native-transaction-document', documentKey: 'document', documentEpoch: 1, revision: store.revision })
     expect(store.captureDocumentAuthority()).toBe(ticket)
     expect(store.hasDocumentAuthorityCustody({ ...ticket })).toBe(false)
     expect(new MarkdownEditorTransactionStore('source').hasDocumentAuthorityCustody(ticket)).toBe(false)
     write(store, snapshot)
+    expect(store.hasRetainedSnapshotCustody(snapshot)).toBe(false)
+    expect(retirement.unsubscribe()).toBe(true)
     expect(store.hasDocumentAuthorityCustody(ticket)).toBe(false)
     const next = store.captureDocumentAuthority()!
     expect(store.hasDocumentAuthorityCustody(next)).toBe(true)
@@ -186,6 +199,7 @@ describe('MarkdownEditor transaction properties', () => {
         expect(store.hasDocumentAuthorityCustody(ticket)).toBe(false)
         expect(store.captureDocumentAuthority()).toBeNull()
         expect(store.validatePreparedRetainedSnapshot(prepared)).toBe(false)
+        expect(store.hasRetainedSnapshotCustody(retained)).toBe(false)
         expect(() => store.prepareRetainedSnapshot()).toThrow('editor-history-document-authority-unavailable')
         throw new Error('original-selection-getter-failed')
       }, end: 0,
@@ -194,6 +208,7 @@ describe('MarkdownEditor transaction properties', () => {
     expect(store.value).toBe('source')
     expect(store.revision).toBe(0)
     expect(store.validateRetainedSnapshot(retained)).toBe(true)
+    expect(store.hasRetainedSnapshotCustody(retained)).toBe(false)
     expect(store.validatePreparedRetainedSnapshot(prepared)).toBe(false)
     expect(store.discardPreparedRetainedSnapshot(prepared)).toBe(true)
     expect(store.hasDocumentAuthorityCustody(store.captureDocumentAuthority()!)).toBe(true)
@@ -205,6 +220,7 @@ describe('MarkdownEditor transaction properties', () => {
     const prepared = store.prepareRetainedSnapshot()
     expect(store.allocatePreparedRetainedSnapshot(prepared)).toBe(true)
     expect(store.commitPreparedRetainedSnapshot(prepared)).toBe(prepared.snapshot)
+    expect(store.hasRetainedSnapshotCustody(prepared.snapshot)).toBe(true)
     expect(store.hasDocumentAuthorityCustody(ticket)).toBe(true)
     store.switchDocument({ id: 'document', epoch: 2 }, 'source', selection(0))
     store.switchDocument({ id: 'document', epoch: 1 }, 'source', selection(0))

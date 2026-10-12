@@ -1233,7 +1233,13 @@ grants no full-host ready, disposed recovery or eviction.
 
 `MarkdownEditorSession.hasRetainedSnapshotCustody(snapshot)` checks only the
 exact original published native pointer, retained transaction custody and same
-private publication generation. It returns false before publication, for foreign
+private publication generation and the original transaction's retained write
+generation. The transaction producer withdraws qualification before notifying
+any write/retirement receiver, including when the document/history/revision
+remain unchanged or a receiver throws. Notification failure keeps the original
+failure/registration custody and never revives the published generation. The
+query reads only original private slots; snapshot metadata is not authority.
+It returns false before publication, for foreign
 or superseded snapshots, while capture runs, or after original generation
 invalidation/retirement. It never calls owner availability, composition, panel,
 Renderer, DOM, clock, resource or source readers, and never captures or reacquires.

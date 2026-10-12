@@ -286,6 +286,39 @@ describe('MarkdownEditor', () => {
     expect(session.hasRetainedSnapshotCustody(retired)).toBe(false)
   })
 
+  it.each(['write', 'retire', 'unsubscribe', 'failed-write', 'failed-retire', 'failed-unsubscribe'] as const)(
+    'withdraws published session custody during original %s notification and after its failure', (operation) => {
+      const store = new MarkdownEditorTransactionStore('source', undefined, { id: 'published-notification', epoch: 1 })
+      const session = createMarkdownEditorSessionBinding({
+        transactionStore: store, isComposing: () => false, isDisposed: () => false,
+        captureViewState: () => null, restoreViewState: () => {},
+        resourceParticipants: () => [], captureLastValidRender: () => null,
+      }).getSession('session:published-notification')
+      const snapshot = session.captureSnapshot(() => 'a'.repeat(64))
+      const before = { value: store.value, revision: store.revision, history: store.history, selection: store.selection }
+      const cause = { tag: 'original-published-retirement-failure' }
+      let calls = 0
+      const handle = store.subscribeDocumentAuthorityRetirement(() => {
+        calls += 1
+        expect({ value: store.value, revision: store.revision, history: store.history, selection: store.selection }).toEqual(before)
+        expect(session.hasRetainedSnapshotCustody(snapshot)).toBe(false)
+        if (operation.startsWith('failed-')) throw cause
+      })
+      expect(session.hasRetainedSnapshotCustody(snapshot)).toBe(true)
+      let caught: unknown
+      try {
+        if (operation.endsWith('write')) store.setSelection(store.selection)
+        else if (operation.endsWith('retire')) store.retireDocumentAuthority()
+        else handle.unsubscribe()
+      } catch (error) { caught = error }
+      expect(calls).toBe(1)
+      expect(caught).toBe(operation.startsWith('failed-') ? cause : undefined)
+      // Successful registration release does not write the native document. Failed
+      // release permanently retires it; write/retire never revive the old generation.
+      expect(session.hasRetainedSnapshotCustody(snapshot)).toBe(operation === 'unsubscribe')
+    },
+  )
+
   it('preserves actual prior native token through preparation callback failure, commit admission failure and cancellation', () => {
     const identity = { id: 'prepared-failure-document', epoch: 1 }
     const store = new MarkdownEditorTransactionStore('source', undefined, identity)

@@ -661,6 +661,7 @@ export class MarkdownEditorTransactionStore {
     allocatedRedo: readonly HistoryEntry[] | undefined
   } | undefined
   #retainedSnapshot: MarkdownEditorRetainedTransactionSnapshot | undefined
+  #retainedAuthorityGeneration: number | undefined
   #retainedHistory: readonly HistoryEntry[] | undefined
   #retainedRedo: readonly HistoryEntry[] | undefined
   #mergeBlocked = false
@@ -890,6 +891,7 @@ export class MarkdownEditorTransactionStore {
   retainSnapshot(): MarkdownEditorRetainedTransactionSnapshot {
     if (this.#documentAuthorityRetired || this.#documentWriteDepth) throw new Error('editor-history-document-authority-unavailable')
     if (this.#preparedRetainedSnapshot) throw new Error('editor-history-snapshot-preparation-pending')
+    const authorityGeneration = this.#documentAuthorityGeneration
     const snapshot = Object.freeze({
       documentIdentity: this.documentIdentity,
       history: this.history,
@@ -899,6 +901,7 @@ export class MarkdownEditorTransactionStore {
     // History entries are immutable. Only this store retains and restores them;
     // consumers receive neither the source nor the undo/redo entries.
     this.#retainedSnapshot = snapshot
+    this.#retainedAuthorityGeneration = authorityGeneration
     this.#retainedHistory = this.#undo.slice()
     this.#retainedRedo = this.#redo.slice()
     return snapshot
@@ -960,6 +963,7 @@ export class MarkdownEditorTransactionStore {
     // Allocation and the session's final full owner guard are already complete.
     // Only callback-free private checks and assignments follow this boundary.
     this.#retainedSnapshot = preparation.snapshot
+    this.#retainedAuthorityGeneration = custody.authorityGeneration
     this.#retainedHistory = custody.allocatedHistory
     this.#retainedRedo = custody.allocatedRedo
     this.#preparedRetainedSnapshot = undefined
@@ -978,6 +982,15 @@ export class MarkdownEditorTransactionStore {
       snapshot.documentIdentity.id === this.#documentIdentity.id &&
       snapshot.documentIdentity.epoch === this.#documentIdentity.epoch &&
       snapshot.revision === this.#revision &&
+      this.#retainedHistory !== undefined && this.#retainedRedo !== undefined
+  }
+
+  /** Published qualification is withdrawn at write entry, before any retirement receiver. */
+  hasRetainedSnapshotCustody(snapshot: MarkdownEditorRetainedTransactionSnapshot): boolean {
+    return this.#retainedSnapshot !== undefined && snapshot === this.#retainedSnapshot &&
+      !this.#documentAuthorityRetired && this.#documentWriteDepth === 0 && !this.#capturingDocumentAuthority &&
+      !this.#notifyingRetirement && !this.#registeringRetirement && this.#releasingRetirement === 0 &&
+      this.#retainedAuthorityGeneration === this.#documentAuthorityGeneration &&
       this.#retainedHistory !== undefined && this.#retainedRedo !== undefined
   }
 
@@ -1010,6 +1023,7 @@ export class MarkdownEditorTransactionStore {
     try {
       this.#preparedRetainedSnapshot = undefined
       this.#retainedSnapshot = undefined
+      this.#retainedAuthorityGeneration = undefined
       this.#retainedHistory = undefined
       this.#retainedRedo = undefined
     } finally {

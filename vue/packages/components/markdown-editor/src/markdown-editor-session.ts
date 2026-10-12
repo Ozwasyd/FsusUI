@@ -233,7 +233,7 @@ export const createMarkdownEditorSessionBinding = <ViewState>(
   // Pin the original producer implementation, not replaceable consumer methods.
   const validatePreparedTransaction = MarkdownEditorTransactionStore.prototype.validatePreparedRetainedSnapshot.bind(transactionStore)
   const publishPreparedTransaction = MarkdownEditorTransactionStore.prototype.commitPreparedRetainedSnapshot.bind(transactionStore)
-  const validateRetainedTransaction = MarkdownEditorTransactionStore.prototype.validateRetainedSnapshot.bind(transactionStore)
+  const hasRetainedTransactionCustody = MarkdownEditorTransactionStore.prototype.hasRetainedSnapshotCustody.bind(transactionStore)
   const resources = createMarkdownEditorSessionResourceCoordinator(owner.resourceParticipants)
   let session: MarkdownEditorSession | undefined
   let retained: {
@@ -593,7 +593,7 @@ export const createMarkdownEditorSessionBinding = <ViewState>(
         hasRetainedSnapshotCustody(snapshot: MarkdownEditorSessionSnapshot): boolean {
           const custody = retained
           return custody !== undefined && custody.snapshot === snapshot && !authorityRetired && !capturing &&
-            retainedGeneration === authorityGeneration && validateRetainedTransaction(custody.transaction)
+            retainedGeneration === authorityGeneration && hasRetainedTransactionCustody(custody.transaction)
         },
         publishSealedSnapshot(publication: MarkdownEditorSessionSnapshotPublication): MarkdownEditorSessionSnapshot | null {
           if (!hasSealedSnapshotCustody(publication)) return null
