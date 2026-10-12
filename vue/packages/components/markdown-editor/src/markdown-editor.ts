@@ -1894,6 +1894,7 @@ export type {
   MarkdownEditorSessionCapabilities,
   MarkdownEditorSessionAttachmentResourceSource,
   MarkdownEditorSessionDocumentState,
+  MarkdownEditorSessionContentDigest,
   MarkdownEditorSessionExpose,
   MarkdownEditorSessionLastValidRender,
   MarkdownEditorSessionResourceUsage,

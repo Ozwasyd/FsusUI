@@ -28,6 +28,31 @@ import type {
 import { getMarkdownXssSourceUrl } from '../../../../tests/support/markdown-xss-corpus'
 
 describe('MarkdownEditor', () => {
+  it('reads actual native content digest without replacing retained history and fences admission and reentrant capture', () => {
+    const identity = { id: 'digest-source-document', epoch: 1 }
+    const store = new MarkdownEditorTransactionStore('original source', undefined, identity)
+    const session = createMarkdownEditorSessionBinding({
+      transactionStore: store, isComposing: () => false, isDisposed: () => false,
+      captureViewState: () => null, restoreViewState: () => {},
+      resourceParticipants: () => [], captureLastValidRender: () => null,
+    }).getSession('session:content-digest')
+    const expected = { documentIdentity: identity, revision: 0 }
+    const snapshot = session.captureSnapshot(() => 'a'.repeat(64), expected)
+    const before = { history: store.history, selection: store.selection, value: store.value }
+    expect(session.inspectContentDigest((source) => { expect(source).toBe('original source'); return 'b'.repeat(64) }, expected))
+      .toEqual({ documentIdentity: identity, revision: 0, editorContentDigest: 'b'.repeat(64) })
+    expect({ history: store.history, selection: store.selection, value: store.value }).toEqual(before)
+    expect(session.validateRetainedSnapshot(snapshot, expected)).toBe(true)
+    expect(() => session.inspectContentDigest(() => { session.captureSnapshot(() => 'c'.repeat(64)); return 'b'.repeat(64) }, expected))
+      .toThrow('editor-session-snapshot-reentrant')
+    expect(session.validateRetainedSnapshot(snapshot, expected)).toBe(true)
+    let admitted = true
+    expect(() => session.inspectContentDigest(() => { admitted = false; return 'b'.repeat(64) }, {
+      ...expected, assertAdmission: () => { if (!admitted) throw new Error('actual-owner-retired') },
+    })).toThrow('actual-owner-retired')
+    expect(session.validateRetainedSnapshot(snapshot, expected)).toBe(true)
+  })
+
   it('retains only original settled attachment state and invalidates phase, signal and removal changes', async () => {
     const controller = new AbortController()
     const job = createMarkdownAttachmentJob('panel-item', {

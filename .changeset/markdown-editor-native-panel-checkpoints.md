@@ -16,3 +16,5 @@ name/kind metadata and retryable/unknown custody without claiming paused resourc
 Retry retirement after actual accepted deletion of settled retryable jobs. Keep
 deletion provenance in the same original binding and refuse old/running/unknown
 attempts; native undo/redo cannot resurrect File custody.
+Expose read-only native content digest inspection with actual admission/context
+checks and no retained checkpoint/history mutation.

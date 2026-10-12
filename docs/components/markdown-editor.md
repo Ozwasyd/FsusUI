@@ -566,6 +566,13 @@ token/projection/DOM/job custody. Foreign/copied/superseded/epoch/revision/ABA o
 replaced owners refuse. Missing projection/required native DOM or queued original
 frame/layout/search continuations keep panel capture unavailable.
 
+`inspectContentDigest(digestSource, expected?)` passes the actual original body
+only to the synchronous digest callback and returns immutable native document/
+revision/digest metadata. It reserves native inspection against reentrant retained
+capture/restore and checks actual admission and unchanged native context/body after
+the callback. It never retains/restores history or replaces a checkpoint. This is
+read-only source correlation, not complete snapshot/resource/readiness authority.
+
 Active state uses original syntax/selection/link/anchor/contextual/atomic state.
 Scroll metadata retains actual original live anchor and native textarea/preview
 offsets, without recomputing geometry. Outline is derived by the existing original

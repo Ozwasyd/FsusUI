@@ -68,6 +68,10 @@ export interface MarkdownEditorSessionDocumentState {
   readonly revision: number
 }
 
+export interface MarkdownEditorSessionContentDigest extends MarkdownEditorSessionDocumentState {
+  readonly editorContentDigest: string
+}
+
 /** Scalar observations only; unknown owners never become aggregate resource usage. */
 export interface MarkdownEditorSessionRendererResourceSource {
   readonly complete: false
@@ -103,6 +107,12 @@ export interface MarkdownEditorSession {
   readonly editorSessionRef: string
   inspectCapabilities(): MarkdownEditorSessionCapabilities
   inspectDocumentState(): MarkdownEditorSessionDocumentState
+  /** Read the original body only inside the digest callback; no checkpoint/history mutation. */
+  inspectContentDigest(digestSource: (source: string) => string, expected?: {
+    readonly documentIdentity: MarkdownEditorDocumentIdentity
+    readonly revision: number
+    readonly assertAdmission?: () => void
+  }): MarkdownEditorSessionContentDigest
   inspectResourceParticipants(): MarkdownEditorSessionResourceCensus
   inspectRendererResourceSource(): MarkdownEditorSessionRendererResourceSource | null
   inspectAttachmentResourceSource(): MarkdownEditorSessionAttachmentResourceSource | null
@@ -231,6 +241,35 @@ export const createMarkdownEditorSessionBinding = <ViewState>(
             documentIdentity: Object.freeze({ ...store.documentIdentity }),
             revision: store.revision,
           })
+        },
+        inspectContentDigest(digestSource: (source: string) => string, expected?: {
+          readonly documentIdentity: MarkdownEditorDocumentIdentity
+          readonly revision: number
+          readonly assertAdmission?: () => void
+        }): MarkdownEditorSessionContentDigest {
+          assertAvailable()
+          if (capturing) throw new Error('editor-session-snapshot-reentrant')
+          capturing = true
+          try {
+            const assertAdmission = expected?.assertAdmission
+            assertAdmission?.()
+            assertAvailable()
+            const store = owner.transactionStore
+            const identity = store.documentIdentity
+            const revision = store.revision
+            const source = store.value
+            if (expected && (identity.id !== expected.documentIdentity.id || identity.epoch !== expected.documentIdentity.epoch ||
+                revision !== expected.revision)) throw new Error('editor-session-content-context-mismatch')
+            const digest = digestSource(source)
+            assertAdmission?.()
+            assertAvailable()
+            if (store.value !== source || store.revision !== revision || store.documentIdentity.id !== identity.id ||
+                store.documentIdentity.epoch !== identity.epoch) throw new Error('editor-session-content-digest-stale')
+            if (!/^[a-f0-9]{64}$/u.test(digest)) throw new Error('editor-session-content-digest-invalid')
+            return Object.freeze({ documentIdentity: identity, revision, editorContentDigest: digest })
+          } finally {
+            capturing = false
+          }
         },
         inspectResourceParticipants: () => { assertAvailable(); return resources.inspectParticipants() },
         inspectRendererResourceSource() {
