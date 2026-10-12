@@ -270,9 +270,11 @@ export const createMarkdownRendererSessionResourceOwner = <
     resource: unknown = run,
     failurePhase = `checkpoint-callback:${reason}`,
   ): T => {
-    retireCheckpointAuthority(reason)
     checkpointAuthorityCallbackDepth += 1
     try {
+      // Input retirement invokes real foreign receivers. Include the pre-write
+      // notifications in the same depth/catch/finally boundary.
+      retireCheckpointAuthority(reason)
       return run()
     } catch (error) {
       retireCheckpointAuthority('callback-failure')
@@ -748,6 +750,7 @@ export const createMarkdownRendererSessionResourceOwner = <
       if (
         disposed ||
         capturingCheckpoint ||
+        notifyingInputRetirement ||
         checkpointAuthorityCallbackDepth > 0 ||
         runningCleanups.size > 0 ||
         preparedCheckpoint !== null ||
@@ -847,6 +850,7 @@ export const createMarkdownRendererSessionResourceOwner = <
       candidate !== null &&
       !disposed &&
       !capturingCheckpoint &&
+      !notifyingInputRetirement &&
       checkpointAuthorityCallbackDepth === 0 &&
       runningCleanups.size === 0 &&
       !stoppingRenderWatch &&
@@ -1408,6 +1412,7 @@ export const createMarkdownRendererSessionResourceOwner = <
             deactivated: checkpointDeactivated,
             lastReason: lastCheckpointAuthorityRetirement,
             runningCallbacks: checkpointAuthorityCallbackDepth,
+            notifyingInputRetirement,
             scope: 'renderer-owned-only' as const,
           }),
         }),
@@ -1664,13 +1669,14 @@ export const createMarkdownRendererSessionResourceOwner = <
     componentActions: readonly MarkdownRendererCleanupAction[] = [],
     releaseActions: readonly MarkdownRendererCleanupAction[] = [],
   ) => {
-    retireCheckpointAuthority('unmount')
-    disposed = true
-    for (const publication of inputPublications.values()) publication.close()
     if (disposingOnUnmount) return
+    disposed = true
     disposingOnUnmount = true
     generation += 1
     try {
+      // Lock disposal before retirement invokes a foreign input receiver.
+      retireCheckpointAuthority('unmount')
+      for (const publication of inputPublications.values()) publication.close()
       registerComponentCleanups(componentActions)
       runCleanupBatch([
         {
