@@ -3059,9 +3059,17 @@ export const useFsusVirtualWindow = <TUnit>(options: {
   }
   let resizeObserver: ResizeObserver | null = null
   let refGeneration = 0
+  type ResizeTarget = {
+    element: Element
+    observing: number
+    releasing: boolean
+    retired: boolean
+    deferredObserve: boolean
+  }
   type ResizeBinding = {
     observer: ResizeObserver | null
     targets: Set<Element>
+    targetStates: Map<Element, ResizeTarget>
     registering: boolean
     constructorStarted: boolean
     operations: number
@@ -3382,6 +3390,7 @@ export const useFsusVirtualWindow = <TUnit>(options: {
       binding.observer.disconnect()
       resizeBindings.delete(binding)
       binding.targets.clear()
+      binding.targetStates.clear()
       if (resizeBinding === binding) {
         resizeBinding = null
         resizeObserver = null
@@ -3389,6 +3398,50 @@ export const useFsusVirtualWindow = <TUnit>(options: {
       reconcileObservedTargets()
     } finally {
       binding.releasing = false
+    }
+  }
+  const releaseResizeTarget = (
+    binding: ResizeBinding,
+    target: ResizeTarget,
+  ) => {
+    if (
+      !target.retired ||
+      target.observing > 0 ||
+      target.releasing ||
+      binding.registering ||
+      !binding.observer
+    )
+      return
+    target.releasing = true
+    binding.operations += 1
+    try {
+      const observer = binding.observer
+      const unobserve = observer.unobserve
+      if (target.retired && binding.observer === observer) {
+        unobserve.call(observer, target.element)
+        if (
+          target.retired &&
+          binding.targetStates.get(target.element) === target
+        ) {
+          binding.targetStates.delete(target.element)
+          binding.targets.delete(target.element)
+          reconcileObservedTargets()
+        }
+      }
+    } finally {
+      binding.operations -= 1
+      target.releasing = false
+    }
+    // A genuine replacement observe during unobserve waits until the old call
+    // returns; it cannot be erased by that late unobserve's native side effect.
+    if (
+      target.deferredObserve &&
+      !target.retired &&
+      !binding.retired &&
+      resizeBinding === binding
+    ) {
+      target.deferredObserve = false
+      if (target.element instanceof HTMLElement) observeElement(target.element)
     }
   }
   const operateResizeBinding = (binding: ResizeBinding, action: () => void) => {
@@ -3407,6 +3460,22 @@ export const useFsusVirtualWindow = <TUnit>(options: {
       firstCause = cause
     } finally {
       binding.operations -= 1
+    }
+    if (!binding.retired && resizeBinding === binding && !disposed) {
+      for (const target of [...binding.targetStates.values()]) {
+        if (!target.retired) continue
+        try {
+          releaseResizeTarget(binding, target)
+        } catch (cause) {
+          producerAuthority.recordFailure(
+            cause,
+            'resize-target-late-release',
+            target.element,
+          )
+          if (!failed) firstCause = cause
+          failed = true
+        }
+      }
     }
     if (binding.retired || resizeBinding !== binding || disposed) {
       try {
@@ -3433,14 +3502,11 @@ export const useFsusVirtualWindow = <TUnit>(options: {
         resource: binding.observer,
         action: () =>
           operateResizeBinding(binding, () => {
-            const observer = binding.observer
-            if (!observer || !current()) return
-            const unobserve = observer.unobserve
-            if (!current() || binding.observer !== observer) return
-            unobserve.call(observer, element)
-            if (!current() || binding.observer !== observer) return
-            binding.targets.delete(element)
-            reconcileObservedTargets()
+            if (!current()) return
+            const target = binding.targetStates.get(element)
+            if (!target) return
+            target.retired = true
+            releaseResizeTarget(binding, target)
           }),
       })),
     )
@@ -3471,6 +3537,7 @@ export const useFsusVirtualWindow = <TUnit>(options: {
       const binding: ResizeBinding = {
         observer: null,
         targets: new Set(),
+        targetStates: new Map(),
         registering: true,
         constructorStarted: false,
         operations: 0,
@@ -3585,31 +3652,57 @@ export const useFsusVirtualWindow = <TUnit>(options: {
     }
     const binding = resizeBinding
     if (!binding || !binding.observer || binding.retired || !current()) return
+    let target = binding.targetStates.get(element)
+    if (!target) {
+      target = {
+        element,
+        observing: 0,
+        releasing: false,
+        retired: false,
+        deferredObserve: false,
+      }
+      binding.targetStates.set(element, target)
+    }
+    target.retired = false
+    binding.targets.add(element)
+    reconcileObservedTargets()
+    if (target.releasing) {
+      target.deferredObserve = true
+      return
+    }
+    const ownedTarget = target
     operateResizeBinding(binding, () => {
-      const observer = binding.observer!
-      const observe = observer.observe
-      if (
-        !current() ||
-        binding !== resizeBinding ||
-        binding.retired ||
-        resizeObserver !== observer
-      )
-        return
-      binding.targets.add(element)
-      reconcileObservedTargets()
-      observe.call(observer, element)
-      if (
-        !current() ||
-        binding !== resizeBinding ||
-        binding.retired ||
-        resizeObserver !== observer
-      )
-        return
+      ownedTarget.observing += 1
+      try {
+        const observer = binding.observer!
+        const observe = observer.observe
+        if (
+          !current() ||
+          binding !== resizeBinding ||
+          binding.retired ||
+          ownedTarget.retired ||
+          resizeObserver !== observer
+        )
+          return
+        observe.call(observer, element)
+        if (
+          !current() ||
+          binding !== resizeBinding ||
+          binding.retired ||
+          resizeObserver !== observer
+        )
+          return
+      } finally {
+        ownedTarget.observing -= 1
+      }
     })
   }
 
   const setUnitRef = (key: string, element: Element | null) => {
     if (disposed || !variableState) return
+    const previousElement = variableState.observedElements.get(key)
+    if (previousElement === element || (!previousElement && element === null))
+      return
     const refs = ++refGeneration,
       control = generation,
       input = inputGeneration,
@@ -3620,8 +3713,6 @@ export const useFsusVirtualWindow = <TUnit>(options: {
       control === generation &&
       input === inputGeneration &&
       units === unitsGeneration
-    const previousElement = variableState.observedElements.get(key)
-    if (previousElement === element) return
     variableState.pendingMeasurements.delete(key)
     if (previousElement) {
       unobserveElement(previousElement, current)
@@ -3967,6 +4058,17 @@ export const useFsusVirtualWindow = <TUnit>(options: {
             releasing: binding.releasing,
             retired: binding.retired,
             retainedTargets: binding.targets.size,
+            targetRegistrations: Object.freeze(
+              [...binding.targetStates.values()].map((target) =>
+                Object.freeze({
+                  element: target.element,
+                  observing: target.observing,
+                  releasing: target.releasing,
+                  retired: target.retired,
+                  deferredObserve: target.deferredObserve,
+                }),
+              ),
+            ),
           }),
         ),
       ),
