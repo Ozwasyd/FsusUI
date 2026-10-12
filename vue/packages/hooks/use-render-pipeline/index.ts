@@ -2041,6 +2041,11 @@ const renderPipelineAdapters = new Map<
   FsusRenderPipelineAdapter<unknown, unknown>
 >()
 
+const adapterRegistrations = new WeakMap<
+  FsusRenderPipelineAdapter<unknown, unknown>,
+  { active: boolean; previous?: FsusRenderPipelineAdapter<unknown, unknown> }
+>()
+
 const normalizeAdapterId = (adapterId: string) => adapterId.trim()
 
 export const registerFsusRenderPipelineAdapter =
@@ -2051,19 +2056,30 @@ export const registerFsusRenderPipelineAdapter =
         throw new Error('fsus_render_pipeline_adapter_id_required')
       }
 
-      const normalizedAdapter = {
-        ...adapter,
+      const descriptor = { ...adapter }
+      const normalizedAdapter = Object.freeze({
+        ...descriptor,
         id: adapterId,
-      } as FsusRenderPipelineAdapter<unknown, unknown>
-      const previous = renderPipelineAdapters.get(adapterId)
+        worker: descriptor.worker
+          ? Object.freeze({ ...descriptor.worker })
+          : undefined,
+      }) as FsusRenderPipelineAdapter<unknown, unknown>
+      const registration = {
+        active: true,
+        previous: renderPipelineAdapters.get(adapterId),
+      }
+      adapterRegistrations.set(normalizedAdapter, registration)
       renderPipelineAdapters.set(adapterId, normalizedAdapter)
 
       return renderPipelineModuleAuthority.boundary(() => {
-        if (previous) {
-          renderPipelineAdapters.set(adapterId, previous)
-        } else {
-          renderPipelineAdapters.delete(adapterId)
-        }
+        if (!registration.active) return
+        registration.active = false
+        if (renderPipelineAdapters.get(adapterId) !== normalizedAdapter) return
+        let previous = registration.previous
+        while (previous && !adapterRegistrations.get(previous)?.active)
+          previous = adapterRegistrations.get(previous)?.previous
+        if (previous) renderPipelineAdapters.set(adapterId, previous)
+        else renderPipelineAdapters.delete(adapterId)
       })
     },
   )
