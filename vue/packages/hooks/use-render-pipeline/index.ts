@@ -603,6 +603,9 @@ export type FsusRenderPipelineAuthority = Readonly<{
   getFailures: () => readonly unknown[]
 }>
 
+const authorityNativePromise = Promise
+const authorityNativePromisePrototype = Promise.prototype
+
 const createRenderPipelineProducerAuthority = (missingFeeds: string[] = []) => {
   let ticket: object | null = null
   let snapshots: Array<{
@@ -611,57 +614,159 @@ const createRenderPipelineProducerAuthority = (missingFeeds: string[] = []) => {
   }> = []
   let depth = 0
   let brokenFeed = false
+  let closed = false
+  let draining = false
+  const archivedForeignFailures = new Set<unknown>()
   const feedFailures: unknown[] = []
+  const asyncFeedObservers = new Set<{
+    source: object
+    listener: () => void
+    subscriptionId: symbol
+    state: 'pending' | 'unavailable'
+  }>()
+  const observeAsyncFeed = (
+    source: object,
+    subscription: { id: symbol; listener: () => void },
+  ) => {
+    const record = {
+      source,
+      listener: subscription.listener,
+      subscriptionId: subscription.id,
+      state: 'pending' as 'pending' | 'unavailable',
+    }
+    asyncFeedObservers.add(record)
+    try {
+      const prototype = Object.getPrototypeOf(source)
+      const ownConstructor = Object.getOwnPropertyDescriptor(
+        source,
+        'constructor',
+      )
+      const prototypeConstructor = Object.getOwnPropertyDescriptor(
+        authorityNativePromisePrototype,
+        'constructor',
+      )
+      // Native await uses PerformPromiseThen without a species-derived result.
+      // Foreign/subclass/thenable chains have no safe producer observation port.
+      if (
+        prototype !== authorityNativePromisePrototype ||
+        (ownConstructor &&
+          (!('value' in ownConstructor) ||
+            ownConstructor.value !== authorityNativePromise)) ||
+        !prototypeConstructor ||
+        !('value' in prototypeConstructor) ||
+        prototypeConstructor.value !== authorityNativePromise
+      ) {
+        record.state = 'unavailable'
+        return
+      }
+      void (async () => {
+        try {
+          await source
+        } catch (cause) {
+          change(() =>
+            feedFailures.push(
+              Object.freeze({
+                cause,
+                listener: record.listener,
+                subscriptionId: record.subscriptionId,
+                phase: 'async-feed-rejection',
+              }),
+            ),
+          )
+        } finally {
+          change(() => asyncFeedObservers.delete(record))
+        }
+      })()
+    } catch (cause) {
+      record.state = 'unavailable'
+      feedFailures.push(
+        Object.freeze({
+          cause,
+          listener: record.listener,
+          subscriptionId: record.subscriptionId,
+          phase: 'async-feed-observation',
+        }),
+      )
+    }
+  }
   const missing = new Set(missingFeeds)
-  const listeners = new Set<{ id: symbol; listener: () => void }>()
+  const listeners = new Set<{
+    id: symbol
+    listener: () => void
+    quarantined: boolean
+  }>()
   const dependencies = new Map<
     object,
     {
       issue: () => object | null
       current: (value: unknown) => boolean
-      unsubscribe: () => void
+      unsubscribe: (() => void) | null
+      registering: boolean
       getFailures?: () => readonly unknown[]
       id: symbol
+      source: object
+      canRelease: () => boolean
+      unsubscribed: boolean
+      releaseRequested: boolean
     }
   >()
+  const retiringDependencies = new Set<
+    ReturnType<typeof dependencies.get> & {}
+  >()
+  const notifyListeners = () => {
+    for (const subscription of [...listeners]) {
+      if (!listeners.has(subscription) || subscription.quarantined) continue
+      try {
+        const result: unknown = subscription.listener()
+        if (
+          result !== null &&
+          typeof result === 'object' &&
+          typeof (result as { then?: unknown }).then === 'function'
+        ) {
+          brokenFeed = true
+          subscription.quarantined = true
+          feedFailures.push({
+            cause: new TypeError(
+              'fsus_pipeline_authority_feed_not_synchronous',
+            ),
+            message: 'fsus_pipeline_authority_feed_not_synchronous',
+            listener: subscription.listener,
+            subscriptionId: subscription.id,
+          })
+          observeAsyncFeed(result, subscription)
+        }
+      } catch (cause) {
+        brokenFeed = true
+        feedFailures.push(
+          Object.freeze({
+            cause,
+            listener: subscription.listener,
+            subscriptionId: subscription.id,
+          }),
+        )
+      }
+    }
+  }
   const change = <T>(action: () => T): T => {
     depth += 1
     ticket = null
     snapshots = []
     const finish = () => {
+      // Closed producers report actual post-action progress before leaving their
+      // revoked interval, so parents can release only now-settled dependencies.
+      if (closed && depth === 1) notifyListeners()
       depth -= 1
+      if (
+        depth === 0 &&
+        !draining &&
+        (closed ||
+          retiringDependencies.size > 0 ||
+          [...dependencies.values()].some((entry) => entry.releaseRequested))
+      )
+        drainClosedDependencies()
     }
     try {
-      if (depth === 1) {
-        for (const subscription of [...listeners]) {
-          if (!listeners.has(subscription)) continue
-          try {
-            const result: unknown = subscription.listener()
-            if (
-              result !== null &&
-              typeof result === 'object' &&
-              typeof (result as { then?: unknown }).then === 'function'
-            ) {
-              brokenFeed = true
-              feedFailures.push({
-                cause: result,
-                message: 'fsus_pipeline_authority_feed_not_synchronous',
-                listener: subscription.listener,
-                subscriptionId: subscription.id,
-              })
-            }
-          } catch (cause) {
-            brokenFeed = true
-            feedFailures.push(
-              Object.freeze({
-                cause,
-                listener: subscription.listener,
-                subscriptionId: subscription.id,
-              }),
-            )
-          }
-        }
-      }
+      if (depth === 1) notifyListeners()
       const result = action()
       // Keep async producer continuations inside the same revoked interval.
       if (result instanceof Promise) return result.finally(finish) as T
@@ -679,7 +784,10 @@ const createRenderPipelineProducerAuthority = (missingFeeds: string[] = []) => {
   const getFailures = () =>
     change(() => {
       const foreign: unknown[] = []
-      for (const dependency of dependencies.values()) {
+      for (const dependency of [
+        ...dependencies.values(),
+        ...retiringDependencies,
+      ]) {
         if (!dependency.getFailures) continue
         try {
           foreign.push(...dependency.getFailures())
@@ -690,12 +798,16 @@ const createRenderPipelineProducerAuthority = (missingFeeds: string[] = []) => {
           )
         }
       }
-      return Object.freeze([...feedFailures, ...foreign])
+      return Object.freeze([
+        ...feedFailures,
+        ...archivedForeignFailures,
+        ...foreign,
+      ])
     })
   const authority: FsusRenderPipelineAuthority = Object.freeze({
     getFailures,
     issueTicket: () => {
-      if (depth > 0 || brokenFeed || missing.size > 0) return null
+      if (closed || depth > 0 || brokenFeed || missing.size > 0) return null
       if (ticket) {
         if (snapshots.every((entry) => entry.current(entry.value)))
           return ticket
@@ -703,6 +815,7 @@ const createRenderPipelineProducerAuthority = (missingFeeds: string[] = []) => {
       }
       const next: typeof snapshots = []
       for (const dependency of dependencies.values()) {
+        if (dependency.registering || !dependency.unsubscribe) return null
         const value = dependency.issue()
         if (!value) return null
         next.push({ current: dependency.current, value })
@@ -714,6 +827,7 @@ const createRenderPipelineProducerAuthority = (missingFeeds: string[] = []) => {
     // Only private identity and captured pure dependency checks; no census reads.
     isCurrent: (value) => {
       if (
+        closed ||
         depth > 0 ||
         brokenFeed ||
         missing.size > 0 ||
@@ -729,11 +843,13 @@ const createRenderPipelineProducerAuthority = (missingFeeds: string[] = []) => {
     },
     subscribe: (listener) =>
       change(() => {
+        if (closed) throw new Error('fsus_pipeline_authority_closed')
         if (typeof listener !== 'function')
           throw new TypeError('fsus_pipeline_authority_listener_invalid')
         const subscription = {
           id: Symbol('fsus-pipeline-authority-subscription'),
           listener,
+          quarantined: false,
         }
         listeners.add(subscription)
         return boundary(() => {
@@ -741,14 +857,23 @@ const createRenderPipelineProducerAuthority = (missingFeeds: string[] = []) => {
         })
       }),
   })
-  const retainDependency = (source: unknown, missingName: string) =>
+  const retainDependency = (
+    source: unknown,
+    missingName: string,
+    canRelease: () => boolean = () => true,
+  ) =>
     change(() => {
+      if (closed) throw new Error('fsus_pipeline_authority_closed')
       if (source === authority) return
       if (!source || typeof source !== 'object') {
         missing.add(missingName)
         return
       }
-      if (dependencies.has(source)) return
+      const existing = dependencies.get(source)
+      if (existing) {
+        existing.releaseRequested = false
+        return
+      }
       const candidate = source as Partial<FsusRenderPipelineAuthority>
       const issue = candidate.issueTicket,
         current = candidate.isCurrent,
@@ -762,40 +887,167 @@ const createRenderPipelineProducerAuthority = (missingFeeds: string[] = []) => {
         missing.add(missingName)
         return
       }
+      const dependency = {
+        issue,
+        current,
+        unsubscribe: null as (() => void) | null,
+        registering: true,
+        getFailures:
+          typeof readFailures === 'function' ? readFailures : undefined,
+        id: Symbol('fsus-pipeline-authority-dependency'),
+        source,
+        canRelease,
+        unsubscribed: false,
+        releaseRequested: false,
+      }
+      // Publish the actual in-progress registration before foreign subscribe.
+      dependencies.set(source, dependency)
       try {
         const unsubscribe = subscribe(() => change(() => undefined))
         if (typeof unsubscribe !== 'function') {
           missing.add(missingName)
+          brokenFeed = true
           return
         }
+        dependency.unsubscribe = unsubscribe
         if (typeof readFailures !== 'function')
           missing.add(`${missingName}:failure-feed`)
-        dependencies.set(source, {
-          issue,
-          current,
-          unsubscribe,
-          getFailures:
-            typeof readFailures === 'function' ? readFailures : undefined,
-          id: Symbol('fsus-pipeline-authority-dependency'),
-        })
       } catch (cause) {
         missing.add(missingName)
         brokenFeed = true
-        feedFailures.push(Object.freeze({ cause, source: missingName }))
+        feedFailures.push(
+          Object.freeze({
+            cause,
+            source: missingName,
+            dependencyId: dependency.id,
+          }),
+        )
+      } finally {
+        dependency.registering = false
       }
+    })
+  const releaseRecord = (
+    dependency: ReturnType<typeof dependencies.get> & {},
+  ) => {
+    try {
+      if (
+        dependency.registering ||
+        !dependency.unsubscribe ||
+        !dependency.canRelease()
+      )
+        return false
+      // Detach before foreign code; a reentrant binding gets an independent record.
+      if (dependencies.get(dependency.source) === dependency)
+        dependencies.delete(dependency.source)
+      retiringDependencies.add(dependency)
+      if (dependency.getFailures)
+        for (const failure of dependency.getFailures())
+          archivedForeignFailures.add(failure)
+      if (!dependency.unsubscribed) {
+        dependency.unsubscribe()
+        dependency.unsubscribed = true
+      }
+      if (dependency.getFailures)
+        for (const failure of dependency.getFailures())
+          archivedForeignFailures.add(failure)
+      retiringDependencies.delete(dependency)
+      return true
+    } catch (cause) {
+      brokenFeed = true
+      feedFailures.push(
+        Object.freeze({
+          cause,
+          dependencyId: dependency.id,
+          phase: 'dependency-release',
+        }),
+      )
+      // Actual retained record is kept for another explicit/progress drain.
+      return false
+    }
+  }
+  const releaseDependency = (source: object) =>
+    change(() => {
+      const records = [...retiringDependencies].filter(
+        (entry) => entry.source === source,
+      )
+      const current = dependencies.get(source)
+      if (current) {
+        current.releaseRequested = true
+        records.push(current)
+      }
+      for (const record of records) releaseRecord(record)
+    })
+  const drainClosedDependencies = () => {
+    draining = true
+    try {
+      change(() => {
+        for (const dependency of [
+          ...retiringDependencies,
+          ...dependencies.values(),
+        ]) {
+          if (
+            closed ||
+            dependency.releaseRequested ||
+            retiringDependencies.has(dependency)
+          )
+            releaseRecord(dependency)
+        }
+      })
+    } finally {
+      draining = false
+    }
+  }
+  const close = () =>
+    change(() => {
+      closed = true
     })
   return {
     authority,
     boundary,
     change,
     retainDependency,
-    // Dependencies intentionally remain through retirement/unmount. A terminal
-    // or incomplete foreign producer cannot be promoted by dropping its feed.
+    releaseDependency,
+    close,
+    // Rejected/in-flight releases remain counted; terminal closure never mints.
     inspect: () =>
       Object.freeze({
         activeChangesAtRead: depth,
         subscriptions: listeners.size,
-        retainedDependencyRecords: dependencies.size,
+        quarantinedSubscriptions: [...listeners].filter(
+          (entry) => entry.quarantined,
+        ).length,
+        retainedDependencyRecords:
+          dependencies.size + retiringDependencies.size,
+        retainedOwnedSubscriptionHandles: [
+          ...dependencies.values(),
+          ...retiringDependencies,
+        ].filter((entry) => entry.unsubscribe !== null && !entry.unsubscribed)
+          .length,
+        pendingSubscriptionRegistrations: [
+          ...dependencies.values(),
+          ...retiringDependencies,
+        ].filter((entry) => entry.registering || entry.unsubscribe === null)
+          .length,
+        dependencyReleaseObligations: Object.freeze(
+          [...retiringDependencies].map((entry) =>
+            Object.freeze({
+              dependencyId: entry.id,
+              source: entry.source,
+              unsubscribe: entry.unsubscribe,
+              unsubscribed: entry.unsubscribed,
+            }),
+          ),
+        ),
+        retiringDependencyRecords: retiringDependencies.size,
+        closed,
+        pendingAsyncFeedObservers: [...asyncFeedObservers].filter(
+          (record) => record.state === 'pending',
+        ).length,
+        unavailableAsyncFeedObservations: Object.freeze(
+          [...asyncFeedObservers].filter(
+            (record) => record.state === 'unavailable',
+          ),
+        ),
         foreignSubscriptionActivity: 'unknown' as const,
         feedFailures: getFailures(),
         missingFeeds: Object.freeze([...missing]),
@@ -926,7 +1178,10 @@ export const createFsusRafRefreshSampler = ({
   let stopped = false
   const sample = producerAuthority.boundary((timestamp: number) => {
     handle = null
-    if (stopped) return
+    if (stopped) {
+      producerAuthority.close()
+      return
+    }
     if (previous !== null) deltas.push(timestamp - previous)
     previous = timestamp
     if (deltas.length >= Math.max(4, sampleSize)) {
@@ -943,6 +1198,7 @@ export const createFsusRafRefreshSampler = ({
       cancelFrame(handle)
       handle = null
     }
+    if (handle === null) producerAuthority.close()
   })
   return Object.assign(stop, {
     authority: producerAuthority.authority,
@@ -1118,9 +1374,9 @@ export const registerFsusRenderPipelineDiagnosticSink =
   renderPipelineModuleAuthority.boundary(
     (sink: FsusRenderPipelineDiagnosticSink) => {
       diagnosticSinks.add(sink)
-      return () => {
+      return renderPipelineModuleAuthority.boundary(() => {
         diagnosticSinks.delete(sink)
-      }
+      })
     },
   )
 
@@ -1368,7 +1624,10 @@ export const useFsusRenderPipelineHardwareProfile = (
   const stopSamplers = () => {
     for (const stop of [...samplers]) {
       stop()
-      if (stop.inspectResources().rafHandles === 0) samplers.delete(stop)
+      if (stop.inspectResources().rafHandles === 0) {
+        samplers.delete(stop)
+        producerAuthority.releaseDependency(stop.authority)
+      }
     }
   }
   const startSampler = () => {
@@ -1388,7 +1647,11 @@ export const useFsusRenderPipelineHardwareProfile = (
         }
       }),
     })
-    producerAuthority.retainDependency(stop.authority, 'sampler-authority')
+    producerAuthority.retainDependency(
+      stop.authority,
+      'sampler-authority',
+      () => stop.inspectResources().rafHandles === 0,
+    )
     samplers.add(stop)
   }
   const onVisibilityChange = producerAuthority.boundary(() => {
@@ -1447,7 +1710,10 @@ export const useFsusRenderPipelineHardwareProfile = (
       const inspection = stop.inspectResources()
       rafHandles += inspection.rafHandles
       uncancellableCallbacks += inspection.uncancellableCallbacks
-      if (inspection.rafHandles === 0) samplers.delete(stop)
+      if (inspection.rafHandles === 0) {
+        samplers.delete(stop)
+        producerAuthority.releaseDependency(stop.authority)
+      }
     }
     return Object.freeze({
       paused,
@@ -1496,7 +1762,11 @@ export const useFsusRenderPipelineHardwareProfile = (
     producerAuthority.boundary(() => {
       disposed = true
       mounted = false
-      pause()
+      try {
+        pause()
+      } finally {
+        producerAuthority.close()
+      }
     }),
   )
   const capabilityProfile = computed(
@@ -1605,13 +1875,13 @@ export const registerFsusRenderPipelineAdapter =
       const previous = renderPipelineAdapters.get(adapterId)
       renderPipelineAdapters.set(adapterId, normalizedAdapter)
 
-      return () => {
+      return renderPipelineModuleAuthority.boundary(() => {
         if (previous) {
           renderPipelineAdapters.set(adapterId, previous)
         } else {
           renderPipelineAdapters.delete(adapterId)
         }
-      }
+      })
     },
   )
 
@@ -1824,11 +2094,11 @@ export const registerFsusRenderPipelineStrategyResolver =
       strategyResolvers.add(entry)
       strategyResolverVersion += 1
       strategyCache.clear()
-      return () => {
+      return renderPipelineModuleAuthority.boundary(() => {
         strategyResolvers.delete(entry)
         strategyResolverVersion += 1
         strategyCache.clear()
-      }
+      })
     },
   )
 
@@ -2212,6 +2482,7 @@ const getSharedWorkerExecutor = <TRequest, TResponse>({
 
   let entry = sharedWorkerExecutors.get(poolKey)
   if (!entry) {
+    const registryAuthority = createRenderPipelineProducerAuthority()
     const listeners = new Set<(event: FsusWorkerExecutorEvent) => void>()
     const owners = new Set<symbol>()
     const cleanupChecks = { pending: 0 }
@@ -2241,7 +2512,7 @@ const getSharedWorkerExecutor = <TRequest, TResponse>({
       executor: createFsusWorkerExecutor<unknown, unknown>(createWorker, {
         ...options,
         name: options.name ?? poolKey,
-        onEvent: producerAuthority.boundary((event) => {
+        onEvent: registryAuthority.boundary((event) => {
           options.onEvent?.(event)
           for (const activeListener of Array.from(listeners)) {
             activeListener(event)
@@ -2249,7 +2520,7 @@ const getSharedWorkerExecutor = <TRequest, TResponse>({
           if (owners.size === 0 && listeners.size === 0) {
             cleanupChecks.pending += 1
             queueMicrotask(
-              producerAuthority.boundary(() => {
+              registryAuthority.boundary(() => {
                 cleanupChecks.pending -= 1
                 disposeIfUnused()
               }),
@@ -2260,7 +2531,7 @@ const getSharedWorkerExecutor = <TRequest, TResponse>({
       listeners,
       owners,
       cleanupChecks,
-      producerAuthority,
+      producerAuthority: registryAuthority,
       disposeIfUnused,
     }
     sharedWorkerExecutors.set(poolKey, entry)
@@ -2308,11 +2579,19 @@ const getSharedWorkerExecutor = <TRequest, TResponse>({
     cleanup: producerAuthority.boundary(() => {
       if (released) return
       released = true
-      ownedEntry.producerAuthority.change(() => {
-        ownedEntry.listeners.delete(listener)
-        ownedEntry.owners.delete(owner)
-        ownedEntry.disposeIfUnused()
-      })
+      try {
+        ownedEntry.producerAuthority.change(() => {
+          ownedEntry.listeners.delete(listener)
+          ownedEntry.owners.delete(owner)
+          ownedEntry.disposeIfUnused()
+        })
+      } finally {
+        if (
+          !ownedEntry.listeners.has(listener) &&
+          !ownedEntry.owners.has(owner)
+        )
+          producerAuthority.close()
+      }
     }),
     executor: ownedEntry.executor as ReturnType<
       typeof createFsusWorkerExecutor<TRequest, TResponse>
@@ -2971,6 +3250,7 @@ export const useFsusVirtualWindow = <TUnit>(options: {
       if (variableState)
         variableState.elementKeys = new WeakMap<Element, string>()
       variableState?.measuredSizes.clear()
+      producerAuthority.close()
     }),
   )
 
@@ -3142,6 +3422,26 @@ export const useFsusRenderPipelineRuntime = <TSource, TUnit>(
       | (() => { retainedOwner: boolean; listenerActive: boolean })
       | null
   }>()
+  const workerAuthorityCanRelease = (executor: RuntimeWorkerExecutor) => {
+    if (workerExecutor === executor) return false
+    if ([...retiringExecutors].some((entry) => entry.executor === executor))
+      return false
+    for (const record of workerScopes) {
+      if (record.executor !== executor) continue
+      if (!record.settled) return false
+      const resources = executor.inspectResources(record.scope)
+      if (
+        resources.tasks.length ||
+        resources.pendingCount ||
+        resources.activeCount ||
+        resources.resources.abortListenerCount ||
+        resources.resources.cancelTimeoutCount ||
+        resources.resources.requestTimeoutCount
+      )
+        return false
+    }
+    return true
+  }
   const controlWorkerScope = (
     record: WorkerScopeRecord,
     operation: 'suspend' | 'cancel' | 'resume',
@@ -3296,6 +3596,15 @@ export const useFsusRenderPipelineRuntime = <TSource, TUnit>(
   producerAuthority.retainDependency(
     hardwareRuntime.authority,
     'hardware-authority',
+    () => {
+      const resources = hardwareRuntime.inspectResources()
+      return (
+        resources.disposed &&
+        resources.pendingBatteryQueries === 0 &&
+        resources.rafHandles === 0 &&
+        resources.retainedListeners === 0
+      )
+    },
   )
   const capabilityProfile = hardwareRuntime.capabilityProfile
   watch(
@@ -3460,7 +3769,16 @@ export const useFsusRenderPipelineRuntime = <TSource, TUnit>(
       completed = true
     } finally {
       // A thrown callback does not prove cleanup completed.
-      if (completed) retiringExecutors.delete(retired)
+      if (completed) {
+        retiringExecutors.delete(retired)
+        if (
+          retired.executor &&
+          'authority' in retired.executor &&
+          retired.executor.authority &&
+          typeof retired.executor.authority === 'object'
+        )
+          producerAuthority.releaseDependency(retired.executor.authority)
+      }
     }
     publishWorkerCallbackFailure()
   }
@@ -3570,6 +3888,7 @@ export const useFsusRenderPipelineRuntime = <TSource, TUnit>(
       producerAuthority.retainDependency(
         'authority' in workerExecutor ? workerExecutor.authority : undefined,
         'worker-authority',
+        () => workerAuthorityCanRelease(shared.executor),
       )
       workerExecutorShared = true
       workerExecutorSharedCleanup = shared.cleanup
@@ -3594,6 +3913,10 @@ export const useFsusRenderPipelineRuntime = <TSource, TUnit>(
     producerAuthority.retainDependency(
       'authority' in workerExecutor ? workerExecutor.authority : undefined,
       'worker-authority',
+      (() => {
+        const executor = workerExecutor
+        return () => workerAuthorityCanRelease(executor)
+      })(),
     )
     workerExecutorShared = false
 
@@ -4064,31 +4387,35 @@ export const useFsusRenderPipelineRuntime = <TSource, TUnit>(
     producerAuthority.boundary(() => {
       // Terminalize before abort/worker events can reenter render or resume.
       disposed = true
-      transitionControl('dispose', (isCurrent) => {
-        paused = true
-        preservedWorkerTask = false
-        renderRequestedWhilePaused = false
-        taskId += 1
-        const previousController = controller
-        controller = null
-        previousController?.abort()
-        if (!isCurrent()) return
-        for (const record of [...workerScopes]) {
-          controlWorkerScope(record, 'cancel', isCurrent)
+      try {
+        transitionControl('dispose', (isCurrent) => {
+          paused = true
+          preservedWorkerTask = false
+          renderRequestedWhilePaused = false
+          taskId += 1
+          const previousController = controller
+          controller = null
+          previousController?.abort()
           if (!isCurrent()) return
-        }
-        for (const settle of [...waits]) {
-          settle()
+          for (const record of [...workerScopes]) {
+            controlWorkerScope(record, 'cancel', isCurrent)
+            if (!isCurrent()) return
+          }
+          for (const settle of [...waits]) {
+            settle()
+            if (!isCurrent()) return
+          }
+          callbacks.cancelAll(isCurrent)
           if (!isCurrent()) return
-        }
-        callbacks.cancelAll(isCurrent)
-        if (!isCurrent()) return
-        loading.value = false
-        if (!isCurrent()) return
-        hardwareRuntime.pause()
-        if (!isCurrent()) return
-        clearWorkerExecutor()
-      })
+          loading.value = false
+          if (!isCurrent()) return
+          hardwareRuntime.pause()
+          if (!isCurrent()) return
+          clearWorkerExecutor()
+        })
+      } finally {
+        producerAuthority.close()
+      }
     }),
   )
 
