@@ -646,6 +646,9 @@ interface MarkdownHeavyFeatureIdentity {
 }
 
 interface MarkdownHeavyFeatureLifecycle {
+  readonly inspectResources?: () => Readonly<{
+    admission: 'open' | 'paused' | 'disposed'
+  }>
   readonly activate: <T>(input: {
     readonly commit: (
       value: T,
@@ -1264,12 +1267,12 @@ const loadMermaidRuntime = async (
 
   if (mermaidRuntimePromise) cacheHit('mermaid')
   else
-    mermaidRuntimePromise = allocateLoader(
-      'mermaid',
-      () => import('mermaid'),
-    ).then((module) =>
-      resolveDefaultModule<MermaidRuntime>(
-        module as unknown as MermaidRuntime | { default?: MermaidRuntime },
+    mermaidRuntimePromise = trackLoaderWork(
+      'mermaid-runtime',
+      allocateLoader('mermaid', () => import('mermaid')).then((module) =>
+        resolveDefaultModule<MermaidRuntime>(
+          module as unknown as MermaidRuntime | { default?: MermaidRuntime },
+        ),
       ),
     )
 
@@ -1685,7 +1688,7 @@ const activateHeavyFeature = async (input: {
 }) => {
   if (
     input.context.signal?.aborted ||
-    (input.context.heavyLifecycle &&
+    (input.context.heavyLifecycle?.inspectResources &&
       input.context.heavyLifecycle.inspectResources().admission !== 'open')
   )
     return false
