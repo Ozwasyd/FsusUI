@@ -2,6 +2,8 @@
 'element-plus': minor
 ---
 
+Bind the original native document retirement receiver into the same renderer producer. Retain its actual release handle and failure cause, report known registration custody separately from unknown attempts, and attempt unsubscription with the original unmount batch while preserving failed records. Missing pipeline/policy/config feeds still refuse live/full seal.
+
 Fence the whole render/restore synchronous finalization before releasing the last real job, retaining live-reader/flag failures while attempting all owned final actions. Bind activity-flag cleanup to the original task, and fence current reads, invalidation's post-frame read and RAF resolution without creating replacement work or authority.
 
 Fence the original document read, selected cleanup, timer and IntersectionObserver callbacks with complete depth/catch/finally retirement. Preserve actual phase/resource/cause on failure, including clearTimer's retained handle, and refuse reentrant checkpoint capture during running cleanup without skipping the attempt-all batch.

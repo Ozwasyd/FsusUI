@@ -777,3 +777,45 @@ no following external read, and listener/keyed/cleanup releases already have the
 full controlled boundaries. Reentrant preparation stays refused after the last
 resource disappears until the whole synchronous phase actually exits. These
 final-reader/flag/throw/reentry cases remain source-only/UNRUN with all holds.
+
+### Original document retirement receiver consumption
+
+This composition inherits the complete necessary source/dependency postimages from
+Native offer `f2533351ddf729d797b372d8ee6eba85e2f4234b`, including its actual context
+provider, transaction implementation and session dependencies. These original
+files remain byte-exact; the renderer does not patch their generator or substitute
+the rejected `3de4` implementation. Bounded document/receiver source closure does
+not establish broader inherited-owner, runtime or complete roster qualification.
+
+The SFC passes its actual provided `documentAuthority` to the same renderer owner.
+At setup, the owner calls `subscribeRetirement` with its existing private
+`retireCheckpointAuthority` receiver. The original Native producer invokes this
+receiver synchronously before outermost writer external work. Nested writes stay
+under that same original producer; no second transaction/document authority is
+created. Receiver binding itself has a real installation/control fence and
+refuses reentrant binding, changed sources and unknown registration attempts.
+A returned late handle after unmount is released through the same original owner.
+
+The owner retains the real source and release handle. Its ordinary attempt-all
+unmount batch selects release separately from all other cleanup. Unsubscribe
+retires this renderer first; the handle is cleared only after original native
+unsubscribe returns and `hasCustody()` observes the actual registration gone.
+Throwing/retained release keeps the handle and exact cause in the original ledger;
+it cannot skip later cleanup or permit view reference release. No cleanup retries
+are represented as resource recovery. The original `failureCause()` remains
+visible independently from observed renderer causes.
+
+`sources.documentAuthorityRetirement` exposes the actual source/handle,
+registration knowledge, known retained listener subtotal and original failure
+cause. A confirmed retained registration contributes exactly one known retained
+listener; the actual held source/handle record contributes one logical memory
+unit. A failed registration without a returned handle remains an unknown attempt
+with its actual installation/error record and blocks release. Unknown attempts
+are preserved under `unknownUsage`, never submitted as complete attributed zero.
+Subscription alone is not a document ticket, live seal, paused state or full-host
+receipt. Existing pipeline, policy/config, native, resource and roster gaps still
+refuse live/full seal, with complete/recoverable unavailable.
+
+Binding/retirement/reentrant writer/late return/unsubscribe failure/retained cause/
+known and unknown census cases are inspected as source only. No runtime/test/list/
+native/security/receipt/authority/eviction qualification is executed or lifted.

@@ -11,7 +11,11 @@ import type {
   FsusRenderPipelineRuntimeResourceInspection,
   useFsusVirtualWindow,
 } from '../../../hooks/use-render-pipeline'
-import type { MarkdownHeavyFeatureResourceInspection } from '../../../hooks/use-markdown-heavy-feature-lifecycle'
+import type {
+  MarkdownHeavyFeatureResourceInspection,
+  MarkdownHeavyFeatureDocumentAuthority,
+  MarkdownHeavyFeatureDocumentAuthorityRetirementHandle,
+} from '../../../hooks/use-markdown-heavy-feature-lifecycle'
 import type {
   MarkdownEditorFrameScheduler,
   MarkdownEditorFrameTask,
@@ -181,6 +185,7 @@ export const createMarkdownRendererSessionResourceOwner = <
     readonly retainedListeners: number
   }
   readonly readComponentCleanupPending: () => number
+  readonly readDocumentAuthority: () => MarkdownHeavyFeatureDocumentAuthority | null
 }) => {
   const timers = new Set<ReturnType<typeof setTimeout>>()
   const frames = new Map<number, () => void>()
@@ -207,6 +212,12 @@ export const createMarkdownRendererSessionResourceOwner = <
   let checkpointDeactivated = false
   let checkpointAuthorityCallbackDepth = 0
   let lastCheckpointAuthorityRetirement: string | null = null
+  let documentRetirement: {
+    readonly source: MarkdownHeavyFeatureDocumentAuthority
+    readonly handle: MarkdownHeavyFeatureDocumentAuthorityRetirementHandle
+  } | null = null
+  let documentRetirementUnknown = false
+  let bindingDocumentRetirement = false
   const retireCheckpointAuthority = (reason: string) => {
     // Same producer's private retirement version, not a document/pipeline ticket.
     if (checkpointAuthorityGeneration === Number.MAX_SAFE_INTEGER)
@@ -376,6 +387,79 @@ export const createMarkdownRendererSessionResourceOwner = <
     registerComponentCleanups(actions)
     runCleanupBatch(componentCleanupActions())
   }
+  const releaseDocumentRetirement = () => {
+    const record = documentRetirement
+    if (!record) return
+    runCheckpointAuthorityCallback(
+      'document-retirement-unsubscribe',
+      () => {
+        retireCheckpointAuthority('document-retirement-release')
+        // Native source calls this same receiver before removing registration.
+        record.handle.unsubscribe()
+        if (record.handle.hasCustody()) {
+          const cause = record.handle.failureCause()
+          if (cause !== undefined) throw cause
+          throw new Error(
+            'markdown-renderer-document-retirement-still-retained',
+          )
+        }
+        if (documentRetirement === record) documentRetirement = null
+      },
+      record.handle,
+      'document-retirement-unsubscribe',
+    )
+  }
+  const bindDocumentAuthorityReceiver = (): boolean =>
+    runCheckpointAuthorityCallback(
+      'document-retirement-bind',
+      () => {
+        if (bindingDocumentRetirement || documentRetirementUnknown)
+          throw new Error(
+            'markdown-renderer-document-retirement-registration-pending',
+          )
+        const installation = beginInstallation(
+          'document-retirement-registration',
+        )
+        bindingDocumentRetirement = true
+        let creationUnknown = false
+        try {
+          const source = options.readDocumentAuthority()
+          if (!source) return false
+          if (documentRetirement) {
+            if (documentRetirement.source !== source)
+              throw new Error(
+                'markdown-renderer-document-retirement-source-changed',
+              )
+            return documentRetirement.handle.hasCustody()
+          }
+          let handle: MarkdownHeavyFeatureDocumentAuthorityRetirementHandle
+          try {
+            handle = source.subscribeRetirement(() =>
+              retireCheckpointAuthority('document-source-retirement'),
+            )
+          } catch (cause) {
+            creationUnknown = true
+            documentRetirementUnknown = true
+            installation.fail(cause)
+            throw cause
+          }
+          documentRetirement = { source, handle }
+          if (disposed) {
+            releaseDocumentRetirement()
+            return false
+          }
+          if (!handle.hasCustody())
+            throw new Error(
+              'markdown-renderer-document-retirement-not-registered',
+            )
+          return true
+        } finally {
+          bindingDocumentRetirement = false
+          if (!creationUnknown) installation.complete()
+        }
+      },
+      bindDocumentAuthorityReceiver,
+    )
 
   const sameDocument = (
     a: MarkdownRendererDocumentState,
@@ -1025,6 +1109,11 @@ export const createMarkdownRendererSessionResourceOwner = <
     return remove
   }
   const inspectOwnedResources = () => {
+    const documentRegistration = documentRetirement
+      ? documentRetirement.handle.hasCustody()
+      : false
+    const documentFailure = documentRetirement?.handle.failureCause()
+    const documentListeners = documentRegistration ? 1 : 0
     const projection = options.readProjectionResources()
     const pipeline = options.readPipelineResources()
     const viewport = options.readVirtualWindowResources()
@@ -1137,6 +1226,18 @@ export const createMarkdownRendererSessionResourceOwner = <
             scope: 'renderer-owned-only' as const,
           }),
         }),
+        documentAuthorityRetirement: Object.freeze({
+          source: documentRetirement?.source ?? null,
+          handle: documentRetirement?.handle ?? null,
+          registration: documentRetirementUnknown
+            ? ('unknown' as const)
+            : documentRegistration
+              ? ('registered' as const)
+              : ('not-retained' as const),
+          knownRetainedListeners: documentListeners,
+          unknownRegistrations: documentRetirementUnknown,
+          failureCause: documentFailure,
+        }),
         rendererNative: Object.freeze({
           renderWatchHandleRetained: renderWatchHandle !== null,
           stoppingRenderWatch,
@@ -1178,6 +1279,9 @@ export const createMarkdownRendererSessionResourceOwner = <
           pipeline.pendingWorkerCallbackFailureNotification,
       }),
       unknownUsage: Object.freeze({
+        documentRetirementRegistrations: documentRetirementUnknown
+          ? ('unknown' as const)
+          : 0,
         vueEffects: 'unknown' as const,
         vueFlushJobs: 'unknown' as const,
         timers:
@@ -1213,6 +1317,7 @@ export const createMarkdownRendererSessionResourceOwner = <
         paused: false,
         recoverable: false,
         retainedListeners:
+          documentListeners +
           listeners.size +
           projection.retainedListeners +
           pipeline.retainedListeners +
@@ -1285,6 +1390,7 @@ export const createMarkdownRendererSessionResourceOwner = <
           // separately; an unknown heavy count is never coerced into this zero.
           networkRequests: 0,
           memoryUnits:
+            (documentRetirement ? 1 : 0) +
             projection.memoryUnits +
             checkpointAuthorityCallbackDepth +
             controlledFrameKeys.size +
@@ -1369,6 +1475,11 @@ export const createMarkdownRendererSessionResourceOwner = <
     try {
       registerComponentCleanups(componentActions)
       runCleanupBatch([
+        {
+          phase: 'document-retirement-release',
+          resource: documentRetirement?.handle,
+          run: releaseDocumentRetirement,
+        },
         ...[...timers].map((timer) => ({
           phase: 'timer-clear',
           resource: timer,
@@ -1398,6 +1509,8 @@ export const createMarkdownRendererSessionResourceOwner = <
         installingListeners.size > 0 ||
         installations.size > 0 ||
         pendingComponentCleanups.size > 0 ||
+        documentRetirement !== null ||
+        documentRetirementUnknown ||
         options.readComponentCleanupPending() > 0 ||
         renderWatchHandle !== null
       )
@@ -1411,6 +1524,7 @@ export const createMarkdownRendererSessionResourceOwner = <
   }
   return Object.freeze({
     afterFrame,
+    bindDocumentAuthorityReceiver,
     bindRenderWatchHandle,
     beginInstallation,
     beginRender,

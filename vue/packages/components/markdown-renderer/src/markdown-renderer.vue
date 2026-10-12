@@ -512,6 +512,7 @@ const rendererResourceOwner = createMarkdownRendererSessionResourceOwner({
     (heavyThemeListenerTarget ? 1 : 0) +
     (activationController ? 1 : 0) +
     (activationObserver ? 1 : 0),
+  readDocumentAuthority: () => heavyDocumentContext?.documentAuthority ?? null,
   readProjectionResources: () => {
     const heavy = heavyLifecycle.metrics()
     return {
@@ -532,6 +533,8 @@ const rendererResourceOwner = createMarkdownRendererSessionResourceOwner({
     }
   },
 })
+
+rendererResourceOwner.bindDocumentAuthorityReceiver()
 
 const scheduleHeavyFeatureCommit = (input: {
   readonly key: string
