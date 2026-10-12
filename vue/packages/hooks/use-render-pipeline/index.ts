@@ -1142,6 +1142,7 @@ const createRenderPipelineCallbackResources = (
     cancelled: boolean
     cancel: (() => void) | null
     allocation: 'pending' | 'registered' | 'unavailable'
+    cancelRequest?: () => void
   }
   const entries = new Set<Entry>()
   const schedule = (
@@ -1170,7 +1171,7 @@ const createRenderPipelineCallbackResources = (
       producerAuthority.recordFailure(error, 'callback-allocation', entry)
       throw error
     }
-    return producerAuthority.boundary(() => {
+    const cancelRequest = producerAuthority.boundary(() => {
       if (!entries.has(entry)) return
       entry.cancelled = true
       if (entry.cancel) {
@@ -1183,6 +1184,8 @@ const createRenderPipelineCallbackResources = (
         }
       }
     })
+    entry.cancelRequest = cancelRequest
+    return cancelRequest
   }
   const frame = (run: () => void) => {
     const cancel =
@@ -1260,6 +1263,12 @@ const createRenderPipelineCallbackResources = (
     })
   return {
     cancelAll: producerAuthority.boundary(cancelAll),
+    isPending: (cancel: () => void) =>
+      [...entries].some((entry) => entry.cancelRequest === cancel),
+    isCancelled: (cancel: () => void) =>
+      [...entries].some(
+        (entry) => entry.cancelRequest === cancel && entry.cancelled,
+      ),
     frame: producerAuthority.boundary(frame),
     idle: producerAuthority.boundary(idle),
     inspect: producerAuthority.boundary(inspect),
@@ -2812,32 +2821,45 @@ export const useFsusVirtualWindow = <TUnit>(options: {
   minVisibleItems?: MaybeRef<number | undefined>
   onDiagnostic?: (event: FsusVirtualWindowDiagnosticEvent) => void
   overscanPx?: MaybeRef<number | undefined>
-  units: Ref<readonly TUnit[]>
+  units: Readonly<Ref<readonly TUnit[]>>
   // Exact original units/key/estimate, viewport/ref and parameter publications.
   unitsAuthority?: FsusRenderPipelineAuthority
   viewportAuthority?: FsusRenderPipelineAuthority
   configAuthority?: FsusRenderPipelineAuthority
 }) => {
   const producerAuthority = createRenderPipelineProducerAuthority()
+  let inputGeneration = 0
+  let unitsGeneration = 0
+  const revokeInput = () => {
+    inputGeneration += 1
+  }
   producerAuthority.change(() => {
     producerAuthority.retainDependency(
       options.unitsAuthority,
       'external-units-authority',
+      () => true,
+      revokeInput,
     )
     producerAuthority.retainDependency(
       options.viewportAuthority,
       'external-viewport-authority',
+      () => true,
+      revokeInput,
     )
     producerAuthority.retainDependency(
       options.configAuthority,
       'external-virtual-config-authority',
+      () => true,
+      revokeInput,
     )
   })
 
   const scrollOffset = ref(0)
   const viewportSize = ref(0)
   const indexVersion = ref(0)
-  const fixedItemSize = positive(unref(options.itemSize), 0)
+  const fixedItemSize = producerAuthority.change(() =>
+    positive(unref(options.itemSize), 0),
+  )
 
   const createVariableState = () => {
     const keys: string[] = []
@@ -2869,7 +2891,9 @@ export const useFsusVirtualWindow = <TUnit>(options: {
     }
   }
 
-  const variableState = fixedItemSize > 0 ? null : createVariableState()
+  const variableState = producerAuthority.change(() =>
+    fixedItemSize > 0 ? null : createVariableState(),
+  )
   const callbacks = createRenderPipelineCallbackResources(producerAuthority)
   let measurementFrame: (() => void) | null = null
   let scrollFrame: (() => void) | null = null
@@ -2880,6 +2904,16 @@ export const useFsusVirtualWindow = <TUnit>(options: {
   let connectionGeneration = 0
   let listenerViewport: FsusViewport | null = null
   let resizeTarget: Window | null = null
+  let stopUnitsWatch: (() => void) | null = null
+  type ViewportBinding = {
+    target: FsusViewport
+    type: 'scroll' | 'resize'
+    listener: () => void
+    installed: boolean
+    registering: boolean
+    retired: boolean
+  }
+  const viewportBindings = new Set<ViewportBinding>()
   let observerGeneration = 0
   const viewportJobs = new Set<symbol>()
   const afterViewportTick = (run: () => void) => {
@@ -2944,6 +2978,8 @@ export const useFsusVirtualWindow = <TUnit>(options: {
   const visibleItems: ComputedRef<FsusVirtualWindowItem<TUnit>[]> = computed(
     producerAuthority.boundary(() => {
       indexVersion.value
+      const visibleGeneration = inputGeneration
+      const visibleUnits = unitsGeneration
       const units = options.units.value
       const currentRange = range.value
       const items: FsusVirtualWindowItem<TUnit>[] = []
@@ -2959,9 +2995,16 @@ export const useFsusVirtualWindow = <TUnit>(options: {
           fixedItemSize > 0
             ? fixedItemSize
             : (variableState?.index.get(index) ?? 0)
+        const key = options.getKey(unit, index)
+        if (
+          disposed ||
+          visibleGeneration !== inputGeneration ||
+          visibleUnits !== unitsGeneration
+        )
+          return []
         items.push({
           index,
-          key: options.getKey(unit, index),
+          key,
           offset,
           size,
           unit,
@@ -2993,12 +3036,14 @@ export const useFsusVirtualWindow = <TUnit>(options: {
   const readViewport = () => {
     if (paused || disposed) return
     const readGeneration = generation
+    const readInputGeneration = inputGeneration
     const connection = connectionGeneration
     const nextViewport = options.getViewport()
     if (
       paused ||
       disposed ||
       readGeneration !== generation ||
+      readInputGeneration !== inputGeneration ||
       connection !== connectionGeneration
     )
       return
@@ -3008,19 +3053,45 @@ export const useFsusVirtualWindow = <TUnit>(options: {
     }
     viewport = nextViewport
     const activeConnection = connectionGeneration
-    scrollOffset.value = getViewportScrollTop(viewport)
+    const nextScrollOffset = getViewportScrollTop(viewport)
     if (
       paused ||
       disposed ||
       readGeneration !== generation ||
+      readInputGeneration !== inputGeneration ||
       activeConnection !== connectionGeneration
     )
       return
-    viewportSize.value = getViewportHeight(viewport)
+    scrollOffset.value = nextScrollOffset
+    if (
+      paused ||
+      disposed ||
+      readGeneration !== generation ||
+      readInputGeneration !== inputGeneration ||
+      activeConnection !== connectionGeneration
+    )
+      return
+    const nextHeight = getViewportHeight(viewport)
+    if (
+      paused ||
+      disposed ||
+      readGeneration !== generation ||
+      readInputGeneration !== inputGeneration ||
+      activeConnection !== connectionGeneration
+    )
+      return
+    viewportSize.value = nextHeight
   }
 
   const scheduleViewportRead = producerAuthority.boundary(() => {
-    if (paused || disposed || scrollFrame) return
+    if (
+      paused ||
+      disposed ||
+      (scrollFrame &&
+        callbacks.isPending(scrollFrame) &&
+        !callbacks.isCancelled(scrollFrame))
+    )
+      return
     if (typeof requestAnimationFrame !== 'function') {
       readViewport()
       return
@@ -3035,13 +3106,20 @@ export const useFsusVirtualWindow = <TUnit>(options: {
     measurementFrame = null
     if (paused || disposed || !variableState?.pendingMeasurements.size) return
     const measurementGeneration = generation
+    const measurementInput = inputGeneration
+    const measurementUnits = unitsGeneration
     const isCurrent = () =>
-      !paused && !disposed && measurementGeneration === generation
+      !paused &&
+      !disposed &&
+      measurementGeneration === generation &&
+      measurementInput === inputGeneration &&
+      measurementUnits === unitsGeneration
 
     const batchSize = Math.max(
       1,
       Math.floor(positive(unref(options.measureBatch), 32)),
     )
+    if (!isCurrent()) return
     const entries: Array<[string, number]> = []
     for (const entry of variableState.pendingMeasurements) {
       entries.push(entry)
@@ -3050,6 +3128,7 @@ export const useFsusVirtualWindow = <TUnit>(options: {
     }
 
     const anchorIndex = range.value.start
+    if (!isCurrent()) return
     let scrollCorrection = 0
     let changed = false
 
@@ -3070,6 +3149,7 @@ export const useFsusVirtualWindow = <TUnit>(options: {
       1,
       Math.floor(positive(unref(options.measurementCacheLimit), 2048)),
     )
+    if (!isCurrent()) return
     for (const [key] of variableState.measuredSizes) {
       if (variableState.measuredSizes.size <= cacheLimit) break
       if (variableState.observedElements.has(key)) continue
@@ -3094,7 +3174,9 @@ export const useFsusVirtualWindow = <TUnit>(options: {
 
     if (Math.abs(scrollCorrection) > 0.5) {
       const nextOffset = getViewportScrollTop(viewport) + scrollCorrection
+      if (!isCurrent()) return
       setViewportScrollTop(viewport, nextOffset)
+      if (!isCurrent()) return
       scrollOffset.value = nextOffset
       if (!isCurrent()) return
       emitDiagnostic({
@@ -3125,7 +3207,11 @@ export const useFsusVirtualWindow = <TUnit>(options: {
     )
       return
     variableState.pendingMeasurements.set(key, size)
-    if (!measurementFrame) {
+    if (
+      !measurementFrame ||
+      !callbacks.isPending(measurementFrame) ||
+      callbacks.isCancelled(measurementFrame)
+    ) {
       if (typeof requestAnimationFrame === 'function') {
         measurementFrame = callbacks.frame(flushMeasurements)
       } else {
@@ -3152,7 +3238,19 @@ export const useFsusVirtualWindow = <TUnit>(options: {
             currentObserverGeneration !== observerGeneration
           )
             return
+          const resizeGeneration = generation
+          const resizeInput = inputGeneration
+          const resizeUnits = unitsGeneration
           for (const entry of entries) {
+            if (
+              paused ||
+              disposed ||
+              currentObserverGeneration !== observerGeneration ||
+              resizeGeneration !== generation ||
+              resizeInput !== inputGeneration ||
+              resizeUnits !== unitsGeneration
+            )
+              return
             const entryKey = variableState.elementKeys.get(entry.target)
             if (
               !entryKey ||
@@ -3165,6 +3263,15 @@ export const useFsusVirtualWindow = <TUnit>(options: {
               (entry.target instanceof HTMLElement
                 ? entry.target.offsetHeight
                 : 0)
+            if (
+              paused ||
+              disposed ||
+              currentObserverGeneration !== observerGeneration ||
+              resizeGeneration !== generation ||
+              resizeInput !== inputGeneration ||
+              resizeUnits !== unitsGeneration
+            )
+              return
             queueMeasurement(entryKey, blockSize)
           }
         }),
@@ -3201,7 +3308,16 @@ export const useFsusVirtualWindow = <TUnit>(options: {
 
   const syncUnits = (nextUnits: readonly TUnit[]) => {
     if (disposed || !variableState) return
+    const syncGeneration = ++unitsGeneration
+    const syncInput = inputGeneration
+    const syncControl = generation
+    const current = () =>
+      !disposed &&
+      syncGeneration === unitsGeneration &&
+      syncInput === inputGeneration &&
+      syncControl === generation
     const previousStart = range.value.start
+    if (!current()) return
     const anchorKey = variableState.keys[previousStart]
     const anchorDelta = scrollOffset.value - offsetForIndex(previousStart)
     const nextKeys: string[] = []
@@ -3210,6 +3326,7 @@ export const useFsusVirtualWindow = <TUnit>(options: {
       const unit = nextUnits[index]
       if (unit === undefined) continue
       const key = options.getKey(unit, index)
+      if (!current()) return
       if (seen.has(key)) {
         throw new Error(`useFsusVirtualWindow requires unique keys: ${key}`)
       }
@@ -3231,6 +3348,7 @@ export const useFsusVirtualWindow = <TUnit>(options: {
         const unit = nextUnits[index]
         if (unit === undefined) continue
         const estimate = positive(options.estimateSize(unit, index), 1)
+        if (!current()) return
         variableState.estimatedSizes[index] = estimate
         if (!variableState.measuredSizes.has(nextKeys[index] ?? '')) {
           variableState.index.update(index, estimate)
@@ -3245,6 +3363,7 @@ export const useFsusVirtualWindow = <TUnit>(options: {
         const key = nextKeys[index]
         if (unit === undefined || key === undefined) continue
         const estimate = positive(options.estimateSize(unit, index), 1)
+        if (!current()) return
         variableState.keys.push(key)
         variableState.keyToIndex.set(key, index)
         variableState.estimatedSizes.push(estimate)
@@ -3255,6 +3374,7 @@ export const useFsusVirtualWindow = <TUnit>(options: {
         const unit = nextUnits[index]
         if (unit === undefined) continue
         const estimate = positive(options.estimateSize(unit, index), 1)
+        if (!current()) return
         variableState.estimatedSizes[index] = estimate
         if (!variableState.measuredSizes.has(nextKeys[index] ?? '')) {
           variableState.index.update(index, estimate)
@@ -3302,6 +3422,7 @@ export const useFsusVirtualWindow = <TUnit>(options: {
         const key = nextKeys[index]
         if (unit === undefined || key === undefined) continue
         const estimate = positive(options.estimateSize(unit, index), 1)
+        if (!current()) return
         estimates.push(estimate)
         values.push(variableState.measuredSizes.get(key) ?? estimate)
         keyToIndex.set(key, index)
@@ -3311,9 +3432,12 @@ export const useFsusVirtualWindow = <TUnit>(options: {
       variableState.estimatedSizes = estimates
       variableState.index.rebuild(values)
       emitDiagnostic({ reason: 'insert-or-reorder', type: 'index-rebuild' })
+      if (!current()) return
     }
 
+    if (!current()) return
     indexVersion.value += 1
+    if (!current()) return
     if (anchorKey) {
       const nextAnchorIndex = variableState.keyToIndex.get(anchorKey)
       if (nextAnchorIndex !== undefined) {
@@ -3321,6 +3445,7 @@ export const useFsusVirtualWindow = <TUnit>(options: {
         const correction = nextOffset - scrollOffset.value
         if (Math.abs(correction) > 0.5) {
           setViewportScrollTop(viewport, nextOffset)
+          if (!current()) return
           scrollOffset.value = nextOffset
           emitDiagnostic({
             correction,
@@ -3330,42 +3455,120 @@ export const useFsusVirtualWindow = <TUnit>(options: {
         }
       }
     }
-    if (!paused && !disposed) afterViewportTick(readViewport)
+    if (current() && !paused) afterViewportTick(readViewport)
   }
 
   const attachListeners = (target: FsusViewport | null) => {
     connected = true
     listenerViewport = target
-    target?.addEventListener('scroll', scheduleViewportRead, {
-      passive: true,
-    })
     resizeTarget =
       target && isWindowViewport(target)
         ? target
         : typeof window !== 'undefined'
           ? window
           : null
-    resizeTarget?.addEventListener('resize', scheduleViewportRead)
+    const connection = connectionGeneration
+    const bind = (
+      bindingTarget: FsusViewport | null,
+      type: ViewportBinding['type'],
+    ) => {
+      if (
+        !bindingTarget ||
+        paused ||
+        disposed ||
+        connection !== connectionGeneration
+      )
+        return
+      const binding: ViewportBinding = {
+        target: bindingTarget,
+        type,
+        installed: false,
+        registering: true,
+        retired: false,
+        listener: producerAuthority.boundary(() => {
+          if (!binding.retired && connection === connectionGeneration)
+            scheduleViewportRead()
+        }),
+      }
+      viewportBindings.add(binding)
+      let registrationFailed = false
+      let firstRegistrationCause: unknown
+      try {
+        bindingTarget.addEventListener(
+          type,
+          binding.listener,
+          type === 'scroll' ? { passive: true } : undefined,
+        )
+        binding.installed = true
+      } catch (cause) {
+        producerAuthority.recordFailure(
+          cause,
+          'viewport-listener-registration',
+          binding.target,
+        )
+        registrationFailed = true
+        firstRegistrationCause = cause
+      } finally {
+        binding.registering = false
+      }
+      // Reentrant retirement cannot drop a registration whose add was in-flight.
+      if (binding.retired || connection !== connectionGeneration) {
+        binding.retired = true
+        try {
+          binding.target.removeEventListener(binding.type, binding.listener)
+          viewportBindings.delete(binding)
+        } catch (cause) {
+          producerAuthority.recordFailure(
+            cause,
+            'viewport-listener-release',
+            binding.target,
+          )
+          if (!registrationFailed) firstRegistrationCause = cause
+          registrationFailed = true
+        }
+      }
+      if (registrationFailed) throw firstRegistrationCause
+    }
+    bind(target, 'scroll')
+    bind(resizeTarget, 'resize')
   }
   const disconnect = () => {
-    connectionGeneration += 1
-    listenerViewport?.removeEventListener('scroll', scheduleViewportRead)
-    resizeTarget?.removeEventListener('resize', scheduleViewportRead)
+    const connection = ++connectionGeneration
     connected = false
-    listenerViewport = null
-    resizeTarget = null
-    viewport = null
+    const bindings = [...viewportBindings]
+    for (const binding of bindings) binding.retired = true
+    try {
+      attemptRenderPipelineCleanup(
+        producerAuthority,
+        bindings.map((binding) => ({
+          resource: binding.target,
+          action: () => {
+            if (binding.registering) return
+            binding.target.removeEventListener(binding.type, binding.listener)
+            viewportBindings.delete(binding)
+          },
+        })),
+      )
+    } finally {
+      if (connection === connectionGeneration) {
+        listenerViewport = null
+        resizeTarget = null
+        viewport = null
+      }
+    }
   }
   const connect = () => {
     if (paused || disposed) return
     disconnect()
     const connectGeneration = generation
+    const connectInput = inputGeneration
     const connection = connectionGeneration
     const nextViewport = options.getViewport()
     if (
       paused ||
       disposed ||
       connectGeneration !== generation ||
+      connectInput !== inputGeneration ||
       connection !== connectionGeneration
     )
       return
@@ -3379,8 +3582,9 @@ export const useFsusVirtualWindow = <TUnit>(options: {
       disposed,
       authorityFeed: producerAuthority.inspect(),
       ...callbacks.inspect(),
-      scrollFrame: scrollFrame !== null,
-      measurementFrame: measurementFrame !== null,
+      scrollFrame: scrollFrame !== null && callbacks.isPending(scrollFrame),
+      measurementFrame:
+        measurementFrame !== null && callbacks.isPending(measurementFrame),
       observers: resizeObserver ? 1 : 0,
       observedElements: observedTargets.size,
       retainedElements: variableState?.observedElements.size ?? 0,
@@ -3388,7 +3592,19 @@ export const useFsusVirtualWindow = <TUnit>(options: {
       measuredSizes: variableState?.measuredSizes.size ?? 0,
       indexedUnits: variableState?.keys.length ?? 0,
       pendingViewportTicks: viewportJobs.size,
-      retainedListeners: (listenerViewport ? 1 : 0) + (resizeTarget ? 1 : 0),
+      retainedListeners: viewportBindings.size,
+      listenerRegistrations: Object.freeze(
+        [...viewportBindings].map((binding) =>
+          Object.freeze({
+            target: binding.target,
+            type: binding.type,
+            installed: binding.installed,
+            registering: binding.registering,
+            retired: binding.retired,
+          }),
+        ),
+      ),
+      retainedUnitWatchers: stopUnitsWatch ? 1 : 0,
       // ResizeObserver's platform-internal queue is not exposed by this source.
       observerInternalCallbacks: 'unknown' as const,
       recoverable: false as const,
@@ -3397,21 +3613,73 @@ export const useFsusVirtualWindow = <TUnit>(options: {
     if (!paused) {
       paused = true
       generation += 1
-      disconnect()
-      callbacks.cancelAll()
-      scrollFrame = null
-      measurementFrame = null
-      observerGeneration += 1
-      resizeObserver?.disconnect()
-      resizeObserver = null
-      observedTargets.clear()
-      variableState?.pendingMeasurements.clear()
     }
+    observerGeneration += 1
+    const pauseGeneration = generation
+    const current = () => disposed || (paused && pauseGeneration === generation)
+    const observer = resizeObserver
+    const watchStop = stopUnitsWatch
+    attemptRenderPipelineCleanup(producerAuthority, [
+      {
+        resource: Object.freeze(
+          [...viewportBindings].map((binding) => binding.target),
+        ),
+        action: () => {
+          if (current()) disconnect()
+        },
+      },
+      {
+        resource: callbacks,
+        action: () => {
+          callbacks.cancelAll(current)
+          if (current()) {
+            if (scrollFrame && !callbacks.isPending(scrollFrame))
+              scrollFrame = null
+            if (measurementFrame && !callbacks.isPending(measurementFrame))
+              measurementFrame = null
+          }
+        },
+      },
+      {
+        resource: observer,
+        action: () => {
+          if (!current() || !observer) return
+          observer.disconnect()
+          if (resizeObserver === observer) {
+            resizeObserver = null
+            observedTargets.clear()
+          }
+        },
+      },
+      {
+        resource: watchStop,
+        action: () => {
+          if (disposed && watchStop) {
+            watchStop()
+            if (stopUnitsWatch === watchStop) stopUnitsWatch = null
+          }
+        },
+      },
+      {
+        resource: variableState,
+        action: () => {
+          if (!current()) return
+          variableState?.pendingMeasurements.clear()
+          if (disposed && !resizeObserver && variableState) {
+            variableState.observedElements.clear()
+            variableState.elementKeys = new WeakMap<Element, string>()
+            variableState.measuredSizes.clear()
+          }
+        },
+      },
+    ])
     return inspectResources()
   }
   const resume = () => {
     if (disposed) throw new Error('fsus_virtual_window_disposed')
     if (paused) {
+      pause()
+      if (disposed || !paused) return inspectResources()
       paused = false
       const resumeGeneration = ++generation
       connect()
@@ -3430,17 +3698,18 @@ export const useFsusVirtualWindow = <TUnit>(options: {
     }),
   )
 
-  watch(options.units, producerAuthority.boundary(syncUnits), { flush: 'sync' })
+  stopUnitsWatch = watch(options.units, producerAuthority.boundary(syncUnits), {
+    flush: 'sync',
+  })
 
   onBeforeUnmount(
     producerAuthority.boundary(() => {
       disposed = true
-      pause()
-      variableState?.observedElements.clear()
-      if (variableState)
-        variableState.elementKeys = new WeakMap<Element, string>()
-      variableState?.measuredSizes.clear()
-      producerAuthority.close()
+      try {
+        pause()
+      } finally {
+        producerAuthority.close()
+      }
     }),
   )
 
