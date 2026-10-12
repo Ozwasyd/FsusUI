@@ -1186,7 +1186,10 @@ const rendererAdapterInput = rendererResourceOwner.createOwnedInputPublication(
   'adapter-descriptor',
   Object.freeze({
     ...markdownRenderPipelineAdapter,
-    worker: Object.freeze({ ...markdownRenderPipelineAdapter.worker }),
+    worker: Object.freeze({
+      ...markdownRenderPipelineAdapter.worker,
+      createWorker: createMarkdownRendererWorker,
+    }),
   }),
 )
 
