@@ -104,17 +104,11 @@ type CallbackThen = (
 
 const observeCallbackResult = (
   publication: Publication,
-  listener: () => void,
+  owner: { listener: () => void; subscriptionId?: object; contextIdentity: object },
   result: unknown,
   then: CallbackThen
 ) => {
-  // Preserve the identity at invocation even if the subscription is released
-  // or the fallback selects a different provider before rejection arrives.
-  const owner = {
-    listener,
-    ...subscriptionOwners.get(listener),
-    contextIdentity: publication.identity,
-  }
+  // Use notify's pre-invocation owner, including across synchronous reentry.
   const rejected = (cause: unknown) =>
     recordCallbackFailure(publication, owner, cause)
   const drain = async (value: unknown) => {
@@ -158,7 +152,7 @@ const notify = (publication: Publication, listeners: Set<() => void>) => {
       if (native || typeof then === 'function') {
         observeCallbackResult(
           publication,
-          listener,
+          owner,
           result,
           native ? NativePromise.prototype.then : (then as CallbackThen)
         )
