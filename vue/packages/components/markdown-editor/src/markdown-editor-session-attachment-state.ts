@@ -20,9 +20,11 @@ export const captureMarkdownEditorSessionAttachmentState = (
   // UI terminal phase/abort alone cannot prove the original invocation settled.
   if (jobs.some((job, index) => !job.documentIdentity || job.revision === undefined ||
     job.phase === 'pending' || job.phase === 'progress' ||
+    proofs[index]?.attempt !== job.attempt ||
     !proofs[index]?.settlementAvailable || !proofs[index]?.settled || proofs[index]?.dispatching)) return null
   const readState = (job: MarkdownAttachmentJob): MarkdownEditorSessionAttachmentState => Object.freeze({
-    id: job.id, batchId: job.batchId ?? null, itemId: job.itemId ?? null,
+    id: job.id, name: job.name ?? null, kind: job.kind ?? null,
+    batchId: job.batchId ?? null, itemId: job.itemId ?? null,
     documentIdentity: Object.freeze({ ...job.documentIdentity! }), revision: job.revision!,
     attempt: job.attempt, phase: job.phase, progress: job.progress,
     code: job.code ?? null, message: job.message ?? null,
@@ -40,7 +42,7 @@ export const captureMarkdownEditorSessionAttachmentState = (
         const proof = inspectMarkdownAttachmentDispatch(job)
         return job === jobReferences[index]!.deref() && job.signalController === (controllers[index]?.deref() ?? undefined) &&
           proof?.dispatchRef === proofs[index]?.dispatchRef &&
-          proof?.settled === true && proof.settlementAvailable && !proof.dispatching
+          proof?.attempt === job.attempt && proof?.settled === true && proof.settlementAvailable && !proof.dispatching
       }) && JSON.stringify(current.map(readState)) === serialized
     },
   })

@@ -581,13 +581,17 @@ batch/item/File custody. Pending/progress/legacy unknown/unwind/cleanup cases yi
 null attachment ref. Terminal cleanup, removal, retry, signal or phase/attempt/range
 changes invalidate it. State restoration preserves verified original settled jobs;
 it cannot revive a File loan/controller/request or rewind a terminal operation.
-Weak identity witnesses retain no additional File/controller ownership. This is
-not a completed nonempty production attachment checkpoint path: the current
-terminal owner retains batch/item records, and the original map cleanup also
-removes jobs. That missing original-owner transition keeps nonempty attachment
-refs unavailable; isolated helper settlement does not establish production custody.
-This is
-same-owner/same-revision state source only; full factory/draft/renderer/resource and
+Weak identity witnesses retain no additional File/controller ownership. After the
+actual original dispatch future settles and its terminal content handler finishes,
+resolved/deleted attempts can retire their original item/batch/File records while
+retaining the SAME original jobs and dispatch proofs. Original name/kind metadata
+stays on the original job; no replacement attachment job/controller or File index.
+This supplies a nonempty same-owner attachment state path when ALL original batch/
+item/File custody is truly cleared. Retryable rejected/cancelled state and unknown
+settlement retain their original custody and keep the attachment ref unavailable.
+Same attempt and actual settlement are required; signal abort/UI phase alone is
+insufficient. Pending or retryable sibling records keep the original batch alive.
+This is same-owner/same-revision source only; full factory/draft/renderer/resource and
 native/worker/kernel/geometry/privacy acceptance remain blocked/UNRUN.
 
 `restoreSnapshot(snapshot, expected)` accepts only the exact retained snapshot

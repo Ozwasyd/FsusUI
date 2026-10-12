@@ -4,6 +4,7 @@ import type {
   MarkdownAttachmentAnchor,
   MarkdownAttachmentBatchIntent,
   MarkdownAttachmentItemIntent,
+  MarkdownAttachmentItemKind,
   MarkdownAttachmentProviderResult,
   MarkdownAttachmentRange,
 } from './markdown-editor-attachment'
@@ -27,6 +28,8 @@ export type MarkdownAttachmentPhase =
 
 export interface MarkdownAttachmentJob {
   readonly id: string
+  readonly name?: string
+  readonly kind?: MarkdownAttachmentItemKind
   readonly batchId?: string
   readonly itemId?: string
   readonly documentIdentity?: MarkdownDocumentIdentity
@@ -101,6 +104,8 @@ export const runMarkdownAttachmentDispatch = async (
 export const createMarkdownAttachmentJob = (
   id: string,
   options?: {
+    readonly name?: string
+    readonly kind?: MarkdownAttachmentItemKind
     readonly batchId?: string
     readonly itemId?: string
     readonly documentIdentity?: MarkdownDocumentIdentity
@@ -111,6 +116,8 @@ export const createMarkdownAttachmentJob = (
   },
 ): MarkdownAttachmentJob => ({
   id,
+  name: options?.name,
+  kind: options?.kind,
   batchId: options?.batchId,
   itemId: options?.itemId ?? id,
   documentIdentity: options?.documentIdentity
@@ -162,6 +169,8 @@ export const planMarkdownAttachmentInsert = (
 
     jobs.push(
       createMarkdownAttachmentJob(item.itemId, {
+        name: item.name,
+        kind: item.kind,
         batchId: batch.batchId,
         itemId: item.itemId,
         documentIdentity: batch.documentIdentity,

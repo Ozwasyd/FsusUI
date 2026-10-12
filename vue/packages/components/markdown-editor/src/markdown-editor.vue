@@ -1722,6 +1722,43 @@ const attachmentJobBindings = new WeakMap<MarkdownAttachmentJob, {
   readonly batch: MarkdownAttachmentBatchIntent
   readonly item: MarkdownAttachmentItemIntent
 }>()
+// Only an actual settled non-retryable attempt can retire original File/item
+// custody. Keep the SAME job and dispatch proof as terminal checkpoint state.
+const retireSettledAttachmentRecords = (
+  job: MarkdownAttachmentJob,
+  batch: MarkdownAttachmentBatchIntent,
+  item: MarkdownAttachmentItemIntent,
+  attempt: number,
+) => {
+  assertAttachmentFileControlIdle()
+  const originalJob = toRaw(job)
+  const proof = inspectMarkdownAttachmentDispatch(originalJob)
+  const binding = attachmentJobBindings.get(originalJob)
+  const record = attachmentBatches.get(batch.batchId)
+  const identity = transactionStore.documentIdentity
+  if (sessionDisposed || editorReleased || attachmentPauseRequested.value ||
+      !proof?.settlementAvailable || !proof.settled || proof.dispatching ||
+      proof.attempt !== attempt || originalJob.attempt !== attempt ||
+      (originalJob.phase !== 'resolved' && originalJob.phase !== 'deleted') ||
+      !attachmentJobs.value.some((candidate) => toRaw(candidate) === originalJob) ||
+      binding?.batch !== batch || binding.item !== item || record?.batch !== batch ||
+      attachmentItems.get(item.itemId) !== item || record.files.has(item) ||
+      !item.signal.aborted || originalJob.itemId !== item.itemId || originalJob.batchId !== batch.batchId ||
+      originalJob.documentIdentity?.id !== identity.id || originalJob.documentIdentity.epoch !== identity.epoch ||
+      batch.documentIdentity.id !== identity.id || batch.documentIdentity.epoch !== identity.epoch ||
+      (props.documentIdentity?.id ?? commandTrayId) !== identity.id || (props.documentIdentity?.epoch ?? 0) !== identity.epoch)
+    return
+  attachmentFileCleanupDepth += 1
+  try {
+    attachmentItems.delete(item.itemId)
+    attachmentJobBindings.delete(originalJob)
+    if (!record.files.size && record.capture === undefined && record.controller.signal.aborted &&
+        batch.items.every((candidate) => attachmentItems.get(candidate.itemId) !== candidate))
+      attachmentBatches.delete(batch.batchId)
+  } finally {
+    attachmentFileCleanupDepth -= 1
+  }
+}
 const withAttachmentFile = (
   batch: MarkdownAttachmentBatchIntent,
   item: MarkdownAttachmentItemIntent,
@@ -1771,8 +1808,8 @@ const attachmentPresentations = computed(() =>
       const item = attachmentItems.get(job.itemId ?? job.id)
       const presentation = createMarkdownAttachmentAtomicPresentation({
         itemId: job.itemId ?? job.id,
-        name: item?.name ?? localeText.value.attachments.unnamed,
-        kind: item?.kind,
+        name: item?.name ?? job.name ?? localeText.value.attachments.unnamed,
+        kind: item?.kind ?? job.kind,
         status: job.phase === 'idle' ? 'pending' : job.phase,
         progress: job.progress,
         copy: localeText.value.attachments,
@@ -5320,6 +5357,7 @@ const dispatchAttachmentBatch = (
       job.code = 'attachment-dispatch-rejected'
       revokeAttachmentFile(item.itemId)
     }).finally(() => {
+      if (record) retireSettledAttachmentRecords(job, record.batch, item, attempt)
       // Refresh retry eligibility from real settlement even for cancelled jobs.
       triggerRef(attachmentJobs)
     })

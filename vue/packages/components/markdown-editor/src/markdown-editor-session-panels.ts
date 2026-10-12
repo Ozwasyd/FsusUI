@@ -1,4 +1,5 @@
 import type { MarkdownAtomicNodeSession } from './markdown-editor-live-selection'
+import type { MarkdownAttachmentItemKind } from './markdown-editor-attachment'
 import type { MarkdownEditorMode } from './markdown-editor-live-contract'
 import type { MarkdownLiveLayoutAnchor } from './markdown-editor-live-layout'
 import type { MarkdownEditorOutlineItem } from './markdown-editor-outline'
@@ -46,6 +47,8 @@ export interface MarkdownEditorSessionPanelState {
 
 export interface MarkdownEditorSessionAttachmentState {
   readonly id: string
+  readonly name: string | null
+  readonly kind: MarkdownAttachmentItemKind | null
   readonly batchId: string | null
   readonly itemId: string | null
   readonly documentIdentity: MarkdownEditorDocumentIdentity

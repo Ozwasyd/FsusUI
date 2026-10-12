@@ -50,6 +50,9 @@ describe('MarkdownEditor', () => {
     expect(captured.state[0]!.progress).toBe(0)
     expect(captured.isCurrent()).toBe(false)
     job.progress = 0
+    job.attempt += 1
+    expect(captureMarkdownEditorSessionAttachmentState(() => jobs, () => {})).toBeNull()
+    job.attempt -= 1
     controller.abort()
     expect(captured.isCurrent()).toBe(false)
     jobs = []
@@ -733,6 +736,56 @@ describe('MarkdownEditor', () => {
     await flushPromises()
     expect(wrapper.emitted('update:modelValue')?.at(-1)?.[0]).toBe('Draft: [report.pdf](https://cdn.example/report.pdf)')
     expect(wrapper.vm.getSession('session:future-upload').inspectResourceParticipants().missingOwners).toContain('attachment-embed')
+  })
+
+  it('retains nonempty original settled attachment state after terminal File custody release and keeps pending sibling custody', async () => {
+    vi.useFakeTimers()
+    const requests: Parameters<MarkdownEditorAttachmentDispatch>[0][] = []
+    const completions: ((result: MarkdownAttachmentProviderResult) => void)[] = []
+    const attachmentDispatch: MarkdownEditorAttachmentDispatch = (request) => {
+      requests.push(request)
+      return new Promise((resolve) => { completions.push(resolve) })
+    }
+    const wrapper = mount(MarkdownEditor, { props: {
+      mode: 'source', modelValue: '', attachmentDispatch,
+      documentIdentity: { id: 'settled-terminal-document', epoch: 1 },
+    } })
+    const editor = wrapper.vm as MarkdownEditorInstance
+    const picker = wrapper.find<HTMLInputElement>('.el-markdown-editor__attachment-picker')
+    Object.defineProperty(picker.element, 'files', { configurable: true, value: [
+      new File(['first'], 'first.pdf', { type: 'application/pdf' }),
+      new File(['second'], 'second.pdf', { type: 'application/pdf' }),
+    ] })
+    await picker.trigger('change')
+    expect(requests).toHaveLength(2)
+    const session = editor.getSession('session:settled-terminal')
+    const result = (index: number): MarkdownAttachmentProviderResult => ({
+      status: 'resolved', batchId: requests[index]!.batch.batchId, itemId: requests[index]!.item.itemId,
+      documentIdentity: requests[index]!.batch.documentIdentity, revision: requests[index]!.batch.revision,
+      payload: { markdownKind: 'file', href: `https://cdn.example/${index}.pdf`, mimeType: 'application/pdf', name: requests[index]!.item.name },
+    })
+    completions[0]!(result(0))
+    await flushPromises()
+    await vi.runAllTimersAsync()
+    expect(editor.withAttachmentFile(requests[0]!.batch, requests[0]!.item, () => {})).toBe(false)
+    expect(editor.withAttachmentFile(requests[1]!.batch, requests[1]!.item, () => {})).toBe(true)
+    expect(session.captureSnapshot(() => 'a'.repeat(64)).panelRefs?.attachmentStateRef ?? null).toBeNull()
+    completions[1]!(result(1))
+    await flushPromises()
+    await vi.runAllTimersAsync()
+    expect(editor.withAttachmentFile(requests[1]!.batch, requests[1]!.item, () => {})).toBe(false)
+    const snapshot = session.captureSnapshot(() => 'b'.repeat(64))
+    expect(snapshot.panelRefs?.attachmentStateRef).toBeTruthy()
+    const state = session.readPanelState(snapshot)!
+    expect(state.attachment).toHaveLength(2)
+    expect(state.attachment!.map((job) => [job.name, job.kind, job.phase])).toEqual([
+      ['first.pdf', 'file', 'resolved'], ['second.pdf', 'file', 'resolved'],
+    ])
+    expect(Object.isFrozen(state.attachment)).toBe(true)
+    expect(session.restoreSnapshot(snapshot, { documentIdentity: snapshot.documentIdentity, revision: snapshot.revision }).status).toBe('restored')
+    expect(() => session.pauseResources()).toThrow('editor-session-resource-owner-unavailable')
+    wrapper.unmount()
+    expect(() => session.readPanelState(snapshot)).toThrow('editor-session-disposed')
   })
 
   it('edits active image and caption subranges through the compact property surface', async () => {
