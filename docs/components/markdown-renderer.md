@@ -582,6 +582,13 @@ cancel call. An accepted outer task rechecks the exact registration identity
 before retaining a late record; it never overwrites a later owned registration.
 Finalizer ownership remains separate from the scheduler key.
 
+Cancellation selected during native creation is terminal for that request even
+when the owner remains mounted. A later native accepted return triggers exact
+late cancellation, not task revival or a wait for a postPaint that cannot arrive.
+The binding remains only if that cleanup fails, with its original cause. The
+request returns false after selected cancellation; completed finalizers stay
+completed. Native false/throw results retain their original refusal/error handling.
+
 Activation reset and observer installation are fenced before external callbacks.
 Reset rechecks admission after abort/disconnect and before constructing a new
 controller. Controller/observer constructors and native observation retain actual

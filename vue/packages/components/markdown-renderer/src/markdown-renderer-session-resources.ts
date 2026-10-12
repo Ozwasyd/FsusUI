@@ -537,7 +537,9 @@ export const createMarkdownRendererSessionResourceOwner = <
     }
     let key = ''
     let postPaintCompleted = false
-    const cancel = () =>
+    let cancellationSelected = false
+    const cancel = () => {
+      cancellationSelected = true
       runCleanupBatch([
         {
           phase: 'keyed-frame-cancel',
@@ -560,6 +562,7 @@ export const createMarkdownRendererSessionResourceOwner = <
           run: () => finalizeFrame(cancel, finalizer),
         },
       ])
+    }
     const finish = () =>
       runCleanupBatch([
         {
@@ -639,7 +642,10 @@ export const createMarkdownRendererSessionResourceOwner = <
         if (current && current !== cancel)
           throw new Error('markdown-renderer-frame-owner-superseded')
         scheduledFrames.set(key, cancel)
-        if (disposed) cancel()
+        // An accepted native return cannot revive an already cancelled creation.
+        // Keep this binding only until its real late cleanup returns; failure
+        // retains the exact obligation and never reruns a completed finalizer.
+        if (cancellationSelected || disposed) cancel()
       } else {
         if (scheduledFrames.get(key) === cancel) scheduledFrames.delete(key)
         if (!postPaintCompleted) finish()
@@ -648,7 +654,7 @@ export const createMarkdownRendererSessionResourceOwner = <
       if (controlsKey) controlledFrameKeys.delete(key)
       installation.complete()
     }
-    return accepted
+    return accepted && !cancellationSelected
   }
   const cancelFrames = () => {
     runCleanupBatch([

@@ -2,6 +2,8 @@
 'element-plus': minor
 ---
 
+Preserve cancellation selected during keyed-frame creation even while mounted: a late native accepted return cleans the exact original request instead of reviving it, and failed cleanup retains its real obligation without repeating a completed finalizer.
+
 Reject reentrant frame installation during the same key's native schedule/cancel call. Fence activation controller/observer creation and observation before external calls, recheck admission after synchronous callbacks, and retain late cleanup failures under the existing renderer owner.
 
 Share one actual frame-finalizer state across cancellation and retry, and hold view release until renderer-owned installations and component cleanup obligations have resolved. Preserve failed late handles and original errors without repeating completed finalizers or treating uncertain creation records as active jobs.
