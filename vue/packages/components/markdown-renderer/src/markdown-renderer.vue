@@ -1,6 +1,6 @@
 <template>
   <div
-    ref="rootEl"
+    :ref="bindRendererRoot"
     :class="[
       markdownSurfaceClasses.root,
       markdownSurfaceClasses.body,
@@ -269,7 +269,6 @@ const renderedContent = shallowRef<MarkdownSafeHtml | null>(
 )
 const resolveCommittedHtml = (html: MarkdownSafeHtml | null) =>
   html === null ? null : (props.trustedHtmlFactory?.(html) ?? html)
-const chunkUnits = shallowRef<readonly MarkdownRenderChunk[]>([])
 const MIN_INITIAL_MARKDOWN_CHUNKS = 3
 const MAX_INITIAL_MARKDOWN_CHUNKS = 12
 const renderPipelineConfig = useGlobalConfig('renderPipeline')
@@ -536,6 +535,34 @@ const rendererResourceOwner = createMarkdownRendererSessionResourceOwner({
 
 rendererResourceOwner.bindDocumentAuthorityReceiver()
 
+const rendererChunkInput = rendererResourceOwner.createOwnedInputPublication<
+  readonly MarkdownRenderChunk[]
+>('chunk-units', Object.freeze([]))
+const chunkUnits = rendererChunkInput.input
+const rendererViewportInput = rendererResourceOwner.createOwnedInputPublication<
+  Readonly<{ root: HTMLElement | null; scroller: HTMLElement | null }>
+>('viewport-reference', Object.freeze({ root: null, scroller: null }))
+const publishChunkUnits = (units: readonly MarkdownRenderChunk[]) =>
+  rendererResourceOwner.runCheckpointAuthorityCallback(
+    'chunk-input-snapshot',
+    () => {
+      const snapshot = Object.freeze(
+        units.map((unit) =>
+          Object.freeze({
+            key: unit.key,
+            kind: unit.kind,
+            html: unit.html,
+            estimatedSize: unit.estimatedSize,
+            htmlStartOffset: unit.htmlStartOffset,
+            htmlEndOffset: unit.htmlEndOffset,
+          }),
+        ),
+      )
+      if (rendererResourceOwner.isDisposed()) rendererChunkInput.clear(snapshot)
+      else rendererChunkInput.replace(snapshot)
+    },
+  )
+
 const scheduleHeavyFeatureCommit = (input: {
   readonly key: string
   readonly run: () => HTMLElement | void
@@ -628,6 +655,33 @@ const findScrollContainer = (element: HTMLElement | null) => {
     ? document.scrollingElement
     : document.documentElement
 }
+
+// Publish selected identities only. DOM/style/platform state and externally
+// written exposed refs are not owned by this input publication.
+const readRendererViewport = () =>
+  rendererResourceOwner.runCheckpointAuthorityCallback(
+    'viewport-input-read',
+    () => {
+      const root = rootEl.value
+      const scroller = root ? findScrollContainer(root) : null
+      const previous = rendererViewportInput.input.value
+      if (previous.root !== root || previous.scroller !== scroller) {
+        const next = Object.freeze({ root, scroller })
+        if (rendererResourceOwner.isDisposed())
+          rendererViewportInput.clear(next)
+        else rendererViewportInput.replace(next)
+      }
+      return scroller
+    },
+  )
+const bindRendererRoot = (element: unknown) =>
+  rendererResourceOwner.runCheckpointAuthorityCallback(
+    'root-reference-input',
+    () => {
+      rootEl.value = element instanceof HTMLElement ? element : null
+      readRendererViewport()
+    },
+  )
 
 const getElementPath = (root: HTMLElement, target: HTMLElement) => {
   const path: number[] = []
@@ -770,7 +824,7 @@ const commitRenderedContent = async (
   rendererResourceOwner.runCheckpointAuthorityCallback(
     'projection-write',
     () => {
-      chunkUnits.value = []
+      publishChunkUnits([])
     },
   )
   rendererResourceOwner.runCheckpointAuthorityCallback(
@@ -793,7 +847,7 @@ const commitRenderedContent = async (
 const virtualWindow = useFsusVirtualWindow<MarkdownRenderChunk>({
   estimateSize: (unit) => unit.estimatedSize,
   getKey: (unit) => unit.key,
-  getViewport: () => findScrollContainer(rootEl.value),
+  getViewport: readRendererViewport,
   measureBatch: computed(
     () => resolvedRenderPipelineConfig.value.budget.measureBatch,
   ),
@@ -886,16 +940,15 @@ const estimateMarkdownRender = (source: string) => ({
   nodes: Math.max(1, Math.ceil(source.length / 180)),
 })
 
-const createMarkdownRenderRequest = (
-  source: string,
-): MarkdownRenderRequest => ({
-  source,
-  baseUrl: props.baseUrl,
-  mode: props.mode,
-  allowLatex: props.allowLatex,
-  allowMermaid: props.allowMermaid,
-  contentVersion: props.contentVersion,
-})
+const createMarkdownRenderRequest = (source: string): MarkdownRenderRequest =>
+  Object.freeze({
+    source,
+    baseUrl: props.baseUrl,
+    mode: props.mode,
+    allowLatex: props.allowLatex,
+    allowMermaid: props.allowMermaid,
+    contentVersion: props.contentVersion,
+  })
 
 const sampleMarkdownSource = (source: string) => {
   let hash = 0x811c9dc5
@@ -1117,15 +1170,27 @@ const markdownRenderPipelineAdapter: FsusRenderPipelineAdapter<
   },
 }
 
-const markdownRenderRequest = computed(() =>
-  createMarkdownRenderRequest(normalizeMarkdownSource(props.content)),
+const rendererRequestInput = rendererResourceOwner.createOwnedInputPublication(
+  'request-snapshot',
+  rendererResourceOwner.runCheckpointAuthorityCallback(
+    'request-input-read',
+    () => createMarkdownRenderRequest(normalizeMarkdownSource(props.content)),
+  ),
+)
+const markdownRenderRequest = rendererRequestInput.input
+const rendererAdapterInput = rendererResourceOwner.createOwnedInputPublication(
+  'adapter-descriptor',
+  Object.freeze({
+    ...markdownRenderPipelineAdapter,
+    worker: Object.freeze({ ...markdownRenderPipelineAdapter.worker }),
+  }),
 )
 
 const renderPipelineRuntime = useFsusRenderPipelineRuntime<
   MarkdownRenderRequest,
   MarkdownRenderChunk
 >({
-  adapter: markdownRenderPipelineAdapter,
+  adapter: rendererAdapterInput.input,
   componentName: 'ElMarkdownRenderer',
   config: renderPipelineConfig,
   source: markdownRenderRequest,
@@ -1671,8 +1736,8 @@ const performRender = async () => {
   const taskId = ++currentTaskId
   const isCurrent = () =>
     taskId === currentTaskId && rendererResourceOwner.isCurrent(generation)
-  const source = normalizeMarkdownSource(props.content)
-  const request = createMarkdownRenderRequest(source)
+  const request = markdownRenderRequest.value
+  const source = request.source
   rendererResourceOwner.runCheckpointAuthorityCallback(
     'projection-write',
     () => {
@@ -1753,7 +1818,7 @@ const performRender = async () => {
       rendererResourceOwner.runCheckpointAuthorityCallback(
         'projection-write',
         () => {
-          chunkUnits.value = resolvedUnits.slice(0, initialCount)
+          publishChunkUnits(resolvedUnits.slice(0, initialCount))
         },
       )
       rendererResourceOwner.runCheckpointAuthorityCallback(
@@ -1798,7 +1863,7 @@ const performRender = async () => {
         rendererResourceOwner.runCheckpointAuthorityCallback(
           'projection-write',
           () => {
-            chunkUnits.value = resolvedUnits
+            publishChunkUnits(resolvedUnits)
           },
         )
         await nextTick()
@@ -2018,7 +2083,7 @@ const restoreLastValidRender = async (
       rendererResourceOwner.runCheckpointAuthorityCallback(
         'projection-write',
         () => {
-          chunkUnits.value = projection.units
+          publishChunkUnits(projection.units)
         },
       )
       rendererResourceOwner.runCheckpointAuthorityCallback(
@@ -2129,6 +2194,15 @@ const renderWatchHandle = watch(
     currentTaskId += 1
     rendererResourceOwner.invalidate()
     if (rendererResourceOwner.isDisposed()) return
+    rendererResourceOwner.runCheckpointAuthorityCallback(
+      'request-input-publication',
+      () => {
+        rendererRequestInput.replace(
+          createMarkdownRenderRequest(normalizeMarkdownSource(props.content)),
+        )
+      },
+    )
+    if (rendererResourceOwner.isDisposed()) return
     heavyLifecycle.pause()
     if (rendererResourceOwner.isDisposed()) return
     activationController?.abort()
@@ -2172,6 +2246,19 @@ onBeforeUnmount(() => {
     ],
     [
       {
+        phase: 'request-input-clear',
+        resource: rendererRequestInput.input,
+        run: () => rendererRequestInput.clear(Object.freeze({ source: '' })),
+      },
+      {
+        phase: 'viewport-input-clear',
+        resource: rendererViewportInput.input,
+        run: () =>
+          rendererViewportInput.clear(
+            Object.freeze({ root: null, scroller: null }),
+          ),
+      },
+      {
         phase: 'debounce-reference-release',
         resource: timer,
         run: () => {
@@ -2209,7 +2296,7 @@ onBeforeUnmount(() => {
           rendererResourceOwner.runCheckpointAuthorityCallback(
             'projection-write',
             () => {
-              chunkUnits.value = []
+              publishChunkUnits([])
             },
           )
         },
@@ -2254,6 +2341,40 @@ onBeforeUnmount(() => {
 
 defineExpose({
   rootEl,
+  getPipelineInputSourceOffer: () =>
+    Object.freeze({
+      complete: false as const,
+      request: Object.freeze({
+        input: rendererRequestInput.input,
+        authority: rendererRequestInput.authority,
+        scope: 'owned-request-snapshot' as const,
+      }),
+      adapter: Object.freeze({
+        input: rendererAdapterInput.input,
+        authority: rendererAdapterInput.authority,
+        scope: 'owned-adapter-descriptor' as const,
+      }),
+      units: Object.freeze({
+        input: chunkUnits,
+        authority: rendererChunkInput.authority,
+        scope: 'owned-immutable-chunks' as const,
+      }),
+      viewport: Object.freeze({
+        input: rendererViewportInput.input,
+        authority: rendererViewportInput.authority,
+        scope: 'owned-selected-reference-identities' as const,
+      }),
+      nativeDocumentAuthority:
+        rendererResourceOwner.readNativeDocumentAuthority(),
+      config: renderPipelineConfig,
+      unowned: Object.freeze([
+        'external-props-and-nested-mutable-values',
+        'adapter-callback-platform-and-runtime',
+        'native-document-failure-history',
+        'dom-style-scroll-resize-platform',
+        'uncontrolled-config-provider',
+      ]),
+    }),
   captureLastValidRender: rendererResourceOwner.captureLastValidRender,
   captureRendererOwnedCheckpoint:
     rendererResourceOwner.captureRendererOwnedCheckpoint,

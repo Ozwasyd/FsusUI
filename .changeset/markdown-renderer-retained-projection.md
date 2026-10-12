@@ -2,6 +2,8 @@
 'element-plus': minor
 ---
 
+Publish actual renderer-owned immutable request/chunk inputs, frozen adapter descriptor identities and selected root/scroller identities through scoped same-owner retirement feeds. Expose exact readonly input refs, private custody checks, actual registrations/failures and the borrowed original Native provider; retain unowned external/platform state and all complete/native/live-seal qualification holds.
+
 Bind the original native document retirement receiver into the same renderer producer. Retain its actual release handle and failure cause, report known registration custody separately from unknown attempts, and attempt unsubscription with the original unmount batch while preserving failed records. Missing pipeline/policy/config feeds still refuse live/full seal.
 
 Fence the whole render/restore synchronous finalization before releasing the last real job, retaining live-reader/flag failures while attempting all owned final actions. Bind activity-flag cleanup to the original task, and fence current reads, invalidation's post-frame read and RAF resolution without creating replacement work or authority.

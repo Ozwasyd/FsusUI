@@ -819,3 +819,50 @@ refuse live/full seal, with complete/recoverable unavailable.
 Binding/retirement/reentrant writer/late return/unsubscribe failure/retained cause/
 known and unknown census cases are inspected as source only. No runtime/test/list/
 native/security/receipt/authority/eviction qualification is executed or lifted.
+
+### Controlled renderer input publications
+
+`getPipelineInputSourceOffer()` exposes exact renderer-owned request, adapter
+descriptor, immutable chunk and selected viewport-reference input publications.
+Each entry contains its actual readonly Vue input ref and a scoped authority with
+`issueTicket`, `isCurrent`, `subscribe` and `getFailures`. These are publications
+in the existing renderer owner, not replacement pipeline or Native owners.
+
+A request is a frozen snapshot of the observed primitive render fields. The
+source watch publishes it after observing external props; it does not claim to
+retire before a parent prop write. Both the renderer job and pipeline read this
+same actual snapshot. Each chunk publication copies the original key, kind,
+authorized HTML, estimated size and HTML offsets into frozen records and a frozen
+array. Initial/full commits, reset, same-mounted restore and ordinary unmount
+replace or clear that exact private input. Adapter descriptor/worker policy
+identities are frozen; platform and callbacks' external dependencies remain
+unowned. Root ref callbacks and viewport selection publish the actual root and
+scroller identities, without certifying DOM/style/scroll/platform state or writes
+to an externally exposed ref.
+
+The existing retirement version invalidates private input tickets before
+publication replacement, clearing, lifecycle changes or external receiver calls.
+The private callback depth and notification guard prevent tickets during
+transitions or reentrant notification. Pure `isCurrent` reads only private
+identity/version/flags. Actual listener registrations, retained tickets, input
+record entries and original callback failures appear under
+`sources.rendererOwnedInputs`. Foreign asynchronous callback results retain their
+actual value with settlement unavailable; they permanently refuse tickets rather
+than receiving a synthetic completion. Failed ref writes preserve their actual
+cause and refuse new tickets. Clearing supplies the actual empty input; it does
+not erase registrations, failed callbacks or their custody obligations.
+
+The offer borrows the actual same-context Native document provider directly. It
+retains the original `capture`, `hasCustody` and `subscribeRetirement` contract;
+Native handles supply `failureCause`, not an invented `getFailures` feed or a
+replacement document ticket. The original selected config ref is passed directly,
+without a computed override or replacement config publication.
+
+This source offer is `complete:false`. Pipeline caller-feed consumption remains
+with the original pipeline owner; absent consumer entries do not constitute a
+join. External props/nested mutable values, callback/platform behavior, Native
+failure history, DOM/scroll/resize state and uncontrolled config providers remain
+unowned. Live/full seal and complete pause/resume/recovery/eviction continue to
+refuse. Executable request/replace/clear/retire/reentry/failure/input identity cases
+require the original test-owner preflight; runtime/list/native/security/receipt
+and renderer/authority/eviction qualifications remain UNRUN/HOLD.

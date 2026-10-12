@@ -21,6 +21,15 @@ import type {
   MarkdownEditorFrameTask,
 } from '../../../hooks/use-markdown-editor-frame-scheduler'
 import type { WatchHandle } from 'vue'
+import { computed, shallowRef } from 'vue'
+
+/** Custody of a private input publication only, never of foreign mutable state. */
+export interface MarkdownRendererOwnedInputAuthority {
+  issueTicket(): object | null
+  isCurrent(ticket: unknown): boolean
+  subscribe(listener: () => void): () => void
+  getFailures(): readonly unknown[]
+}
 
 export interface MarkdownRendererDocumentState {
   readonly documentIdentity: Readonly<{ id: string; epoch: number | string }>
@@ -218,12 +227,42 @@ export const createMarkdownRendererSessionResourceOwner = <
   } | null = null
   let documentRetirementUnknown = false
   let bindingDocumentRetirement = false
+  const inputPublications = new Map<
+    string,
+    {
+      retire: () => void
+      inspect: () => {
+        readonly scope: string
+        readonly value: unknown
+        readonly published: boolean
+        readonly closed: boolean
+        readonly retainedListeners: number
+        readonly retainedTicket: boolean
+        readonly retainedSnapshotEntries: number
+        readonly failures: readonly unknown[]
+        readonly unavailableCallbackResults: readonly unknown[]
+      }
+      close: () => void
+    }
+  >()
+  let notifyingInputRetirement = false
   const retireCheckpointAuthority = (reason: string) => {
     // Same producer's private retirement version, not a document/pipeline ticket.
     if (checkpointAuthorityGeneration === Number.MAX_SAFE_INTEGER)
       checkpointAuthorityOverflowed = true
     else checkpointAuthorityGeneration += 1
     lastCheckpointAuthorityRetirement = reason
+    // A dependent receiver can reenter this owner. Its nested retirement still
+    // changes the private version, but never recursively invokes the same feed.
+    if (!notifyingInputRetirement) {
+      notifyingInputRetirement = true
+      try {
+        for (const publication of inputPublications.values())
+          publication.retire()
+      } finally {
+        notifyingInputRetirement = false
+      }
+    }
   }
   const runCheckpointAuthorityCallback = <T>(
     reason: string,
@@ -255,6 +294,144 @@ export const createMarkdownRendererSessionResourceOwner = <
     }
   }
   let disposed = false
+  const createOwnedInputPublication = <T>(scope: string, initial: T) => {
+    if (disposed || inputPublications.has(scope))
+      throw new Error('markdown-renderer-input-publication-unavailable')
+    const backing = shallowRef<T>(initial)
+    const input = computed(() => backing.value)
+    const registrations = new Set<{
+      readonly listener: () => void
+      quarantined: boolean
+    }>()
+    const failures: unknown[] = []
+    const unavailableCallbackResults: unknown[] = []
+    let closed = false
+    let published = true
+    let ticket: object | null = null
+    let ticketGeneration = -1
+    const eligible = () =>
+      !closed &&
+      published &&
+      !disposed &&
+      !checkpointDeactivated &&
+      !checkpointAuthorityOverflowed &&
+      checkpointAuthorityCallbackDepth === 0 &&
+      !notifyingInputRetirement &&
+      failures.length === 0 &&
+      cleanupFailures.size === 0 &&
+      unavailableCallbackResults.length === 0
+    const retire = () => {
+      ticket = null
+      for (const registration of [...registrations]) {
+        if (!registrations.has(registration) || registration.quarantined)
+          continue
+        try {
+          const result: unknown = registration.listener()
+          if (
+            result !== null &&
+            (typeof result === 'object' || typeof result === 'function') &&
+            typeof (result as { then?: unknown }).then === 'function'
+          ) {
+            // No execution/settlement capability is supplied for this foreign
+            // result. Retain it verbatim and permanently refuse input tickets.
+            unavailableCallbackResults.push(result)
+            registration.quarantined = true
+          }
+        } catch (cause) {
+          failures.push(cause)
+          registration.quarantined = true
+        }
+      }
+    }
+    const authority: MarkdownRendererOwnedInputAuthority = Object.freeze({
+      issueTicket: () => {
+        if (!eligible()) return null
+        if (!ticket || ticketGeneration !== checkpointAuthorityGeneration) {
+          ticket = Object.freeze({ scope, value: backing.value })
+          ticketGeneration = checkpointAuthorityGeneration
+        }
+        return ticket
+      },
+      // Pure private identity/version checks; no Vue reads or source callbacks.
+      isCurrent: (value: unknown) =>
+        eligible() &&
+        ticket !== null &&
+        value === ticket &&
+        ticketGeneration === checkpointAuthorityGeneration,
+      getFailures: () => Object.freeze([...failures]),
+      subscribe: (listener: () => void) =>
+        runCheckpointAuthorityCallback('input-subscribe', () => {
+          if (closed || disposed)
+            throw new Error('markdown-renderer-input-publication-closed')
+          if (typeof listener !== 'function')
+            throw new TypeError('markdown-renderer-input-listener-invalid')
+          const registration = { listener, quarantined: false }
+          registrations.add(registration)
+          return () =>
+            runCheckpointAuthorityCallback(
+              'input-unsubscribe',
+              () => {
+                registrations.delete(registration)
+              },
+              registration,
+            )
+        }),
+    })
+    const replace = (value: T, isPublication = true) =>
+      runCheckpointAuthorityCallback(
+        'input-replacement',
+        () => {
+          if (isPublication && (closed || disposed))
+            throw new Error('markdown-renderer-input-publication-closed')
+          // The actual private ref is written only after synchronous retirement.
+          // Assignment failures remain in the original owner callback ledger.
+          published = false
+          try {
+            backing.value = value
+          } catch (cause) {
+            failures.push(cause)
+            throw cause
+          }
+          published = isPublication
+        },
+        input,
+      )
+    inputPublications.set(scope, {
+      retire,
+      close: () => {
+        closed = true
+        // Ordinary unmount already retired every receiver before this private
+        // terminal flag. Closing cannot recursively notify during disposal.
+        ticket = null
+      },
+      inspect: () =>
+        Object.freeze({
+          scope,
+          value: backing.value,
+          published,
+          closed,
+          retainedListeners: registrations.size,
+          retainedTicket: ticket !== null,
+          retainedSnapshotEntries:
+            typeof backing.value === 'object' && backing.value !== null
+              ? Object.keys(backing.value).length
+              : 0,
+          failures: Object.freeze([...failures]),
+          unavailableCallbackResults: Object.freeze([
+            ...unavailableCallbackResults,
+          ]),
+        }),
+    })
+    return Object.freeze({
+      input,
+      authority,
+      replace,
+      // Clear the publication with the caller's actual empty input; the ref and
+      // any registration/failure records remain real retained resources.
+      clear: (empty: T) => replace(empty, false),
+      retire: () => retireCheckpointAuthority(`input-retirement:${scope}`),
+    })
+  }
   let sequence = 0
   let checkpointSequence = 0
   let capturingCheckpoint = false
@@ -1109,6 +1286,13 @@ export const createMarkdownRendererSessionResourceOwner = <
     return remove
   }
   const inspectOwnedResources = () => {
+    const ownedInputs = [...inputPublications.values()].map((record) =>
+      record.inspect(),
+    )
+    const inputListeners = ownedInputs.reduce(
+      (sum, record) => sum + record.retainedListeners,
+      0,
+    )
     const documentRegistration = documentRetirement
       ? documentRetirement.handle.hasCustody()
       : false
@@ -1207,6 +1391,7 @@ export const createMarkdownRendererSessionResourceOwner = <
       measuredUsageOnly: true as const,
       missingSourceDependencies: Object.freeze(missingSourceDependencies),
       sources: Object.freeze({
+        rendererOwnedInputs: Object.freeze(ownedInputs),
         rendererOwnedCheckpoint: checkpoint?.capture ?? null,
         rendererCheckpointCustody: Object.freeze({
           prepared: preparedCheckpoint?.preparation ?? null,
@@ -1317,6 +1502,7 @@ export const createMarkdownRendererSessionResourceOwner = <
         paused: false,
         recoverable: false,
         retainedListeners:
+          inputListeners +
           documentListeners +
           listeners.size +
           projection.retainedListeners +
@@ -1390,6 +1576,17 @@ export const createMarkdownRendererSessionResourceOwner = <
           // separately; an unknown heavy count is never coerced into this zero.
           networkRequests: 0,
           memoryUnits:
+            ownedInputs.reduce(
+              (sum, record) =>
+                sum +
+                1 +
+                record.retainedListeners +
+                (record.retainedTicket ? 1 : 0) +
+                record.retainedSnapshotEntries +
+                record.failures.length +
+                record.unavailableCallbackResults.length,
+              0,
+            ) +
             (documentRetirement ? 1 : 0) +
             projection.memoryUnits +
             checkpointAuthorityCallbackDepth +
@@ -1469,6 +1666,7 @@ export const createMarkdownRendererSessionResourceOwner = <
   ) => {
     retireCheckpointAuthority('unmount')
     disposed = true
+    for (const publication of inputPublications.values()) publication.close()
     if (disposingOnUnmount) return
     disposingOnUnmount = true
     generation += 1
@@ -1511,6 +1709,13 @@ export const createMarkdownRendererSessionResourceOwner = <
         pendingComponentCleanups.size > 0 ||
         documentRetirement !== null ||
         documentRetirementUnknown ||
+        [...inputPublications.values()].some((record) => {
+          const input = record.inspect()
+          return (
+            input.retainedListeners > 0 ||
+            input.unavailableCallbackResults.length > 0
+          )
+        }) ||
         options.readComponentCleanupPending() > 0 ||
         renderWatchHandle !== null
       )
@@ -1529,6 +1734,10 @@ export const createMarkdownRendererSessionResourceOwner = <
     beginInstallation,
     beginRender,
     captureLastValidRender,
+    createOwnedInputPublication,
+    // Borrow the actual Native provider; its handle has failureCause, not an
+    // invented getFailures or a replacement document ticket issuer.
+    readNativeDocumentAuthority: () => documentRetirement?.source ?? null,
     captureRendererOwnedCheckpoint,
     prepareRendererOwnedCheckpoint,
     validatePreparedRendererOwnedCheckpoint,
