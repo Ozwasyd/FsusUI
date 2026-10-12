@@ -1758,8 +1758,28 @@ export const useFsusRenderPipelineHardwareProfile = (
   let paused = false
   let disposed = false
   let generation = 0
-  let visibilityListener = false
-  let visibilityTarget: Document | null = null
+  type VisibilityBinding = {
+    target: Document
+    listener: () => void
+    registering: boolean
+    releasing: boolean
+    installed: boolean
+    retired: boolean
+  }
+  let visibilityBinding: VisibilityBinding | null = null
+  const visibilityBindings = new Set<VisibilityBinding>()
+  const releaseVisibilityBinding = (binding: VisibilityBinding) => {
+    binding.retired = true
+    if (binding.registering || binding.releasing) return
+    binding.releasing = true
+    try {
+      binding.target.removeEventListener('visibilitychange', binding.listener)
+      visibilityBindings.delete(binding)
+      if (visibilityBinding === binding) visibilityBinding = null
+    } finally {
+      binding.releasing = false
+    }
+  }
   const batteryJobs = new Set<symbol>()
   const samplers = new Set<ReturnType<typeof createFsusRafRefreshSampler>>()
   const stopSamplers = () => {
@@ -1815,10 +1835,73 @@ export const useFsusRenderPipelineHardwareProfile = (
     const connectGeneration = generation
     startSampler()
     if (paused || disposed || connectGeneration !== generation) return
-    if (!visibilityTarget && typeof document !== 'undefined') {
-      visibilityTarget = document
-      visibilityTarget.addEventListener('visibilitychange', onVisibilityChange)
-      visibilityListener = true
+    if (
+      (!visibilityBinding || visibilityBinding.retired) &&
+      typeof document !== 'undefined'
+    ) {
+      const binding: VisibilityBinding = {
+        target: document,
+        registering: true,
+        releasing: false,
+        installed: false,
+        retired: false,
+        listener: producerAuthority.boundary(() => {
+          if (
+            !binding.retired &&
+            binding === visibilityBinding &&
+            connectGeneration === generation
+          )
+            onVisibilityChange()
+        }),
+      }
+      visibilityBinding = binding
+      visibilityBindings.add(binding)
+      let failed = false
+      let firstCause: unknown
+      try {
+        const add = binding.target.addEventListener
+        if (
+          !paused &&
+          !disposed &&
+          connectGeneration === generation &&
+          !binding.retired &&
+          visibilityBinding === binding
+        ) {
+          add.call(binding.target, 'visibilitychange', binding.listener)
+          binding.installed = true
+        } else binding.retired = true
+      } catch (cause) {
+        producerAuthority.recordFailure(
+          cause,
+          'visibility-registration',
+          binding.target,
+        )
+        failed = true
+        firstCause = cause
+        binding.retired = true
+      } finally {
+        binding.registering = false
+      }
+      if (
+        binding.retired ||
+        paused ||
+        disposed ||
+        connectGeneration !== generation ||
+        visibilityBinding !== binding
+      ) {
+        try {
+          releaseVisibilityBinding(binding)
+        } catch (cause) {
+          producerAuthority.recordFailure(
+            cause,
+            'visibility-late-release',
+            binding.target,
+          )
+          if (!failed) firstCause = cause
+          failed = true
+        }
+      }
+      if (failed) throw firstCause
     }
     if (paused || disposed || connectGeneration !== generation) return
     if (typeof navigator !== 'undefined') {
@@ -1886,12 +1969,18 @@ export const useFsusRenderPipelineHardwareProfile = (
       authorityFeed: producerAuthority.inspect(),
       rafHandles,
       uncancellableCallbacks,
-      retainedListeners: visibilityTarget ? 1 : 0,
-      visibilityRegistration: visibilityTarget
-        ? visibilityListener
-          ? ('installed' as const)
-          : ('unknown' as const)
-        : ('absent' as const),
+      retainedListeners: visibilityBindings.size,
+      visibilityRegistrations: Object.freeze(
+        [...visibilityBindings].map((binding) =>
+          Object.freeze({
+            target: binding.target,
+            registering: binding.registering,
+            releasing: binding.releasing,
+            installed: binding.installed,
+            retired: binding.retired,
+          }),
+        ),
+      ),
       nativePlatformState: 'unknown' as const,
       pendingBatteryQueries: batteryJobs.size,
       batteryCancellation: batteryJobs.size
@@ -1906,20 +1995,14 @@ export const useFsusRenderPipelineHardwareProfile = (
       paused = true
       generation += 1
     }
-    const target = visibilityTarget
+    const bindings = [...visibilityBindings]
+    for (const binding of bindings) binding.retired = true
     attemptRenderPipelineCleanup(producerAuthority, [
       { resource: Object.freeze([...samplers]), action: stopSamplers },
-      {
-        resource: target,
-        action: () => {
-          if (!target) return
-          target.removeEventListener('visibilitychange', onVisibilityChange)
-          if (visibilityTarget === target) {
-            visibilityTarget = null
-            visibilityListener = false
-          }
-        },
-      },
+      ...bindings.map((binding) => ({
+        resource: binding.target,
+        action: () => releaseVisibilityBinding(binding),
+      })),
     ])
     return inspectResources()
   }
