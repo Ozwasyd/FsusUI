@@ -2938,67 +2938,93 @@ export const useFsusVirtualWindow = <TUnit>(options: {
   const revokeInput = () => {
     inputGeneration += 1
   }
-  producerAuthority.change(() => {
-    producerAuthority.retainDependency(
-      options.unitsAuthority,
-      'external-units-authority',
-      () => true,
-      revokeInput,
-    )
-    producerAuthority.retainDependency(
-      options.viewportAuthority,
-      'external-viewport-authority',
-      () => true,
-      revokeInput,
-    )
-    producerAuthority.retainDependency(
-      options.configAuthority,
-      'external-virtual-config-authority',
-      () => true,
-      revokeInput,
-    )
-  })
-
   const scrollOffset = ref(0)
   const viewportSize = ref(0)
   const indexVersion = ref(0)
-  const fixedItemSize = producerAuthority.change(() =>
-    positive(unref(options.itemSize), 0),
-  )
+  const initialize = () => {
+    try {
+      producerAuthority.change(() => {
+        producerAuthority.retainDependency(
+          options.unitsAuthority,
+          'external-units-authority',
+          () => true,
+          revokeInput,
+        )
+        producerAuthority.retainDependency(
+          options.viewportAuthority,
+          'external-viewport-authority',
+          () => true,
+          revokeInput,
+        )
+        producerAuthority.retainDependency(
+          options.configAuthority,
+          'external-virtual-config-authority',
+          () => true,
+          revokeInput,
+        )
+      })
 
-  const createVariableState = () => {
-    const keys: string[] = []
-    const keyToIndex = new Map<string, number>()
-    const estimatedSizes: number[] = []
-    const values: number[] = []
-
-    options.units.value.forEach((unit, index) => {
-      const key = options.getKey(unit, index)
-      if (keyToIndex.has(key)) {
-        throw new Error(`useFsusVirtualWindow requires unique keys: ${key}`)
+      const initializationGeneration = inputGeneration
+      const initialUnits = options.units.value
+      const assertInitializationCurrent = () => {
+        if (
+          initializationGeneration !== inputGeneration ||
+          options.units.value !== initialUnits ||
+          initializationGeneration !== inputGeneration
+        )
+          throw new Error('fsus_virtual_window_initialization_superseded')
       }
-      const estimate = positive(options.estimateSize(unit, index), 1)
-      keys.push(key)
-      keyToIndex.set(key, index)
-      estimatedSizes.push(estimate)
-      values.push(estimate)
-    })
+      assertInitializationCurrent()
+      const fixedItemSize = producerAuthority.change(() =>
+        positive(unref(options.itemSize), 0),
+      )
 
-    return {
-      elementKeys: new WeakMap<Element, string>(),
-      estimatedSizes,
-      index: new FsusVirtualSizeIndex(values),
-      keys,
-      keyToIndex,
-      measuredSizes: new Map<string, number>(),
-      observedElements: new Map<string, HTMLElement>(),
-      pendingMeasurements: new Map<string, number>(),
+      const createVariableState = () => {
+        const keys: string[] = []
+        const keyToIndex = new Map<string, number>()
+        const estimatedSizes: number[] = []
+        const values: number[] = []
+
+        initialUnits.forEach((unit, index) => {
+          const key = options.getKey(unit, index)
+          assertInitializationCurrent()
+          if (keyToIndex.has(key)) {
+            throw new Error(`useFsusVirtualWindow requires unique keys: ${key}`)
+          }
+          const estimate = positive(options.estimateSize(unit, index), 1)
+          assertInitializationCurrent()
+          keys.push(key)
+          keyToIndex.set(key, index)
+          estimatedSizes.push(estimate)
+          values.push(estimate)
+        })
+
+        assertInitializationCurrent()
+        return {
+          elementKeys: new WeakMap<Element, string>(),
+          estimatedSizes,
+          index: new FsusVirtualSizeIndex(values),
+          keys,
+          keyToIndex,
+          measuredSizes: new Map<string, number>(),
+          observedElements: new Map<string, HTMLElement>(),
+          pendingMeasurements: new Map<string, number>(),
+        }
+      }
+
+      const variableState = producerAuthority.change(() =>
+        fixedItemSize > 0 ? null : createVariableState(),
+      )
+      assertInitializationCurrent()
+      return { fixedItemSize, variableState, assertInitializationCurrent }
+    } catch (cause) {
+      producerAuthority.recordFailure(cause, 'virtual-initialization', options)
+      producerAuthority.close()
+      throw cause
     }
   }
-
-  const variableState = producerAuthority.change(() =>
-    fixedItemSize > 0 ? null : createVariableState(),
-  )
+  const { fixedItemSize, variableState, assertInitializationCurrent } =
+    initialize()
   const callbacks = createRenderPipelineCallbackResources(producerAuthority)
   let measurementFrame: (() => void) | null = null
   let scrollFrame: (() => void) | null = null
@@ -3494,7 +3520,14 @@ export const useFsusVirtualWindow = <TUnit>(options: {
         if (!key) continue
         const element = variableState.observedElements.get(key)
         if (element) {
-          resizeObserver?.unobserve(element)
+          const observer = resizeObserver
+          observer?.unobserve(element)
+          if (
+            !current() ||
+            resizeObserver !== observer ||
+            variableState.observedElements.get(key) !== element
+          )
+            return
           observedTargets.delete(element)
           variableState.elementKeys.delete(element)
         }
@@ -3509,7 +3542,14 @@ export const useFsusVirtualWindow = <TUnit>(options: {
     } else {
       for (const [key, element] of variableState.observedElements) {
         if (seen.has(key)) continue
-        resizeObserver?.unobserve(element)
+        const observer = resizeObserver
+        observer?.unobserve(element)
+        if (
+          !current() ||
+          resizeObserver !== observer ||
+          variableState.observedElements.get(key) !== element
+        )
+          return
         observedTargets.delete(element)
         variableState.elementKeys.delete(element)
         variableState.observedElements.delete(key)
@@ -3797,15 +3837,36 @@ export const useFsusVirtualWindow = <TUnit>(options: {
     }
     return inspectResources()
   }
-  onMounted(
-    producerAuthority.boundary(() => {
-      afterViewportTick(connect)
-    }),
-  )
+  try {
+    onMounted(
+      producerAuthority.boundary(() => {
+        afterViewportTick(connect)
+      }),
+    )
 
-  stopUnitsWatch = watch(options.units, producerAuthority.boundary(syncUnits), {
-    flush: 'sync',
-  })
+    stopUnitsWatch = watch(
+      options.units,
+      producerAuthority.boundary(syncUnits),
+      {
+        flush: 'sync',
+      },
+    )
+    assertInitializationCurrent()
+  } catch (cause) {
+    disposed = true
+    try {
+      pause()
+    } catch (cleanupCause) {
+      producerAuthority.recordFailure(
+        cleanupCause,
+        'virtual-setup-cleanup',
+        options,
+      )
+    }
+    producerAuthority.recordFailure(cause, 'virtual-setup', options)
+    producerAuthority.close()
+    throw cause
+  }
 
   onBeforeUnmount(
     producerAuthority.boundary(() => {
