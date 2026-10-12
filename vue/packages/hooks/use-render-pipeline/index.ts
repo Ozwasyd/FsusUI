@@ -2140,11 +2140,17 @@ export const registerFsusRenderPipelineAdapter =
       }
 
       const descriptor = { ...adapter }
+      const worker = descriptor.worker ? { ...descriptor.worker } : undefined
       const normalizedAdapter = Object.freeze({
         ...descriptor,
         id: adapterId,
-        worker: descriptor.worker
-          ? Object.freeze({ ...descriptor.worker })
+        worker: worker
+          ? Object.freeze({
+              ...worker,
+              laneQueueLimits: worker.laneQueueLimits
+                ? Object.freeze({ ...worker.laneQueueLimits })
+                : undefined,
+            })
           : undefined,
       }) as FsusRenderPipelineAdapter<unknown, unknown>
       const registration = {
