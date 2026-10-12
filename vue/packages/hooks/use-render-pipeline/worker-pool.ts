@@ -124,6 +124,8 @@ export type FsusWorkerResourceInspection = {
   scope: FsusWorkerTaskScope | null
   shared: {
     attribution: 'unattributable'
+    /** Retained real feed failures, including their original callback/cause. */
+    authorityFailureCount: number
     /** Producer revocation subscriptions are shared, not task-owned. */
     authorityListenerCount: number
     backgroundTimerActive: boolean
@@ -464,7 +466,15 @@ export const createFsusWorkerExecutor = <TRequest, TResponse>(
   let authorityTicket: object | null = null
   let authorityDepth = 0
   let authorityFeedUnavailable = false
-  const authorityListeners = new Set<{ listener: () => void }>()
+  const authorityListeners = new Set<{ id: symbol; listener: () => void }>()
+  const authorityFeedFailures: Array<
+    Readonly<{
+      attribution: 'unattributable'
+      cause: unknown
+      listener: () => void
+      subscriptionId: symbol
+    }>
+  > = []
 
   // Revoke before external reads/callbacks, including native callback entry.
   // Nested calls cannot issue tickets, so one synchronous feed per outer entry
@@ -479,10 +489,18 @@ export const createFsusWorkerExecutor = <TRequest, TResponse>(
           try {
             const listener = subscription.listener
             listener()
-          } catch {
+          } catch (cause) {
             // A broken custody feed cannot safely issue another ticket. Keep
             // attempting the other feeds and actual resource cleanup.
             authorityFeedUnavailable = true
+            authorityFeedFailures.push(
+              Object.freeze({
+                attribution: 'unattributable' as const,
+                cause,
+                listener: subscription.listener,
+                subscriptionId: subscription.id,
+              }),
+            )
           }
         }
       }
@@ -500,6 +518,9 @@ export const createFsusWorkerExecutor = <TRequest, TResponse>(
   // This proves only producer-owned JS custody. It says nothing about native
   // worker internals, readiness, memory, or another owner's shared-pool work.
   const authority = Object.freeze({
+    // Keep original causes and subscription ownership even after unsubscribe
+    // or disposal; a later cleanup error must not erase an earlier feed error.
+    getFailures: () => [...authorityFeedFailures],
     issueTicket: (): object | null => {
       if (disposed || authorityDepth > 0 || authorityFeedUnavailable)
         return null
@@ -517,7 +538,10 @@ export const createFsusWorkerExecutor = <TRequest, TResponse>(
         if (disposed) throw new Error('fsus_worker_executor_disposed')
         if (typeof listener !== 'function')
           throw new TypeError('fsus_worker_authority_listener_invalid')
-        const subscription = { listener }
+        const subscription = {
+          id: Symbol('fsus-worker-authority-subscription'),
+          listener,
+        }
         authorityListeners.add(subscription)
         return () => {
           if (!authorityListeners.has(subscription)) return
@@ -1965,6 +1989,7 @@ export const createFsusWorkerExecutor = <TRequest, TResponse>(
       scope: scope === undefined ? null : { ...scope },
       shared: {
         attribution: 'unattributable',
+        authorityFailureCount: authorityFeedFailures.length,
         authorityListenerCount: authorityListeners.size,
         backgroundTimerActive: backgroundTimer !== null,
         canceledResponseIdCount: canceledIds.size,
