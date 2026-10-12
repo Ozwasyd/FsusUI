@@ -1074,7 +1074,26 @@ owners, identities and document-generation guards.
 
 `complete:false`, `recoverable:false`, full resource suspension, full checkpoint
 restoration and session eviction refusals remain. Missing original effect and
-platform queue controls and the independently reviewed Heavy producer still block
+platform queue controls and unsupported shared-import/graph control still block
 full admission. All runtime, native, IME, security, privacy, receipt, race and
 backup/restore qualification checks remain HOLD/UNRUN. The consumer uses only the
 local FsusUI source alias; this change does not publish a package.
+
+### Original Heavy resource producer intake
+
+The separate local source composition consumes the accepted original Heavy
+six-file intake `b6e4be2ce7b63e3721509251bdab86100da9d44f` and its accepted
+Renderer integration `485d8bfbc981805cf75a820383e63ef5500ffe28`. The eight
+production postimages are exact; current MarkdownEditor/native physical lifetime,
+document/history, pipeline/worker and attachment owning source remains unchanged.
+
+The real Renderer now observes original Heavy cancellation requests and support
+module import allocations/settlements. Module-realm allocations and instance
+observations remain distinct original owners; an issued cancellation request is
+not asynchronous release or settlement. Original failed resources and raw causes
+remain held through the original cleanup paths. Shared import cancellation and
+third-party graph census, original component effects and undelivered platform
+queues remain unsupported. Known owned counts do not certify complete resources,
+restoration, recovery or eviction. All runtime/native/security/privacy/receipt/
+race/backup-restore/IME/qualification holds remain HOLD/UNRUN; local source alias
+only, no package publication.

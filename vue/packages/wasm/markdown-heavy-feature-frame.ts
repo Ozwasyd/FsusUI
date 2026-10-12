@@ -1,7 +1,15 @@
-import { activateMarkdownFeatures } from './markdown-runtime'
+import {
+  activateMarkdownFeatures,
+  inspectMarkdownHeavyFeatureRuntimeLoaders,
+} from './markdown-runtime'
 import type { FeatureRenderOutput } from './markdown-runtime'
 import {
   MARKDOWN_HEAVY_FEATURE_FRAME_SCOPE,
+  createMarkdownHeavyFeatureAdapterResourceOwner,
+  validateMarkdownHeavyFeatureFrameCancelMessage,
+  type MarkdownHeavyFeatureAdapterResourceOwner,
+  type MarkdownHeavyFeatureFrameResourceSnapshot,
+  type MarkdownHeavyFeatureResourceCount,
   validateMarkdownHeavyFeatureFrameContinueMessage,
   validateMarkdownHeavyFeatureIsolatedRenderRequest,
   type MarkdownHeavyFeatureIsolatedRenderRequest,
@@ -93,7 +101,13 @@ const extractOutput = (
   })
 }
 
-const render = async (request: MarkdownHeavyFeatureIsolatedRenderRequest) => {
+const render = async (
+  request: MarkdownHeavyFeatureIsolatedRenderRequest,
+  resourceOwner: MarkdownHeavyFeatureAdapterResourceOwner,
+  signal: AbortSignal,
+) => {
+  if (signal.aborted || !resourceOwner.acceptsWork())
+    throw new DOMException('Aborted', 'AbortError')
   const root = document.createElement('main')
   root.dataset.themeResolved = request.theme
   applyTokens(root, request.tokens)
@@ -113,10 +127,14 @@ const render = async (request: MarkdownHeavyFeatureIsolatedRenderRequest) => {
       mermaid: request.kind === 'mermaid',
     },
     root,
+    resourceOwner,
+    signal,
   })
   if (result.errors.length > 0) {
     throw new Error(result.errors[0]?.message ?? 'isolated_render_failed')
   }
+  if (signal.aborted || !resourceOwner.acceptsWork())
+    throw new DOMException('Aborted', 'AbortError')
   return extractOutput(request, root)
 }
 
@@ -146,45 +164,168 @@ const receiveRenderRequest = (event: MessageEvent) => {
     port.close()
     return
   }
+  const owner = createMarkdownHeavyFeatureAdapterResourceOwner()
+  const controller = new AbortController()
+  let renderEntered = false
+  let pendingRender = false
+  let cancellationRequested = false
+  let terminal = false
+  let portHeld = true
+  let publishing = false
+  const send = (message: Record<string, unknown>) => {
+    try {
+      port.postMessage({
+        ...message,
+        capability,
+        scope: MARKDOWN_HEAVY_FEATURE_FRAME_SCOPE,
+      })
+    } catch (cause) {
+      owner.retainFailure('frame-provider-dispatch', port, cause)
+    }
+  }
+  const publishResources = () => {
+    if (publishing) return
+    publishing = true
+    try {
+      const owned = owner.resources
+      const shared = inspectMarkdownHeavyFeatureRuntimeLoaders()
+      const combine = (
+        a: MarkdownHeavyFeatureResourceCount | undefined,
+        b: MarkdownHeavyFeatureResourceCount | undefined,
+      ): MarkdownHeavyFeatureResourceCount => {
+        if (a === 'unavailable' || b === 'unavailable') return 'unavailable'
+        if (typeof a !== 'number' || typeof b !== 'number') return 'unknown'
+        return a + b
+      }
+      const snapshot: MarkdownHeavyFeatureFrameResourceSnapshot = {
+        admission: owner.acceptsWork() ? 'open' : 'closed',
+        cancellationRequested,
+        pendingRender,
+        listeners:
+          (port.onmessage ? 1 : 0) +
+          (port.onmessageerror ? 1 : 0) +
+          owned.listeners,
+        ports: portHeld ? 1 : 0,
+        ownedTasks: owned.tasks,
+        ownedImports: owned.pendingImports ?? 0,
+        ownedRequests: owned.pendingRequests ?? 0,
+        ownedTimers: owned.ownedTimers ?? 0,
+        sharedImports: shared.resources.pendingImports ?? 0,
+        sharedWork: shared.pendingLoaderWork,
+        failureCount:
+          (owned.failures?.length ?? 0) +
+          (shared.resources.failures?.length ?? 0),
+        // A third-party module graph cannot be censused or cancelled here.
+        timers: combine(owned.timers, shared.resources.timers),
+        networkRequests: combine(
+          owned.networkRequests,
+          shared.resources.networkRequests,
+        ),
+      }
+      send({ type: 'resources', snapshot })
+    } finally {
+      publishing = false
+    }
+  }
+  const unsubscribeOwned = owner.resources.subscribe?.(publishResources)
+  const unsubscribeShared =
+    inspectMarkdownHeavyFeatureRuntimeLoaders().resources.subscribe?.(
+      publishResources,
+    )
+  const requestCancellation = () => {
+    if (cancellationRequested) return
+    cancellationRequested = true
+    // Close producer admission before notifying abort listeners. Shared loader
+    // caches are borrowed observations and have no consumer cancellation path.
+    owner.requestCancellation()
+    try {
+      controller.abort()
+    } catch (cause) {
+      owner.retainFailure('frame-provider-abort', controller, cause)
+    }
+    publishResources()
+  }
+  const finish = (output?: FeatureRenderOutput, cause?: unknown) => {
+    if (terminal) return
+    terminal = true
+    if (!output) owner.retainFailure('frame-render-settlement', port, cause)
+    let message = 'isolated_render_failed'
+    if (!output) {
+      try {
+        message = cause instanceof Error ? cause.message : String(cause)
+      } catch (failure) {
+        owner.retainFailure('frame-render-cause-format', port, failure)
+      }
+    }
+    pendingRender = false
+    owner.requestCancellation()
+    try {
+      port.onmessage = null
+      port.onmessageerror = null
+    } catch (failure) {
+      owner.retainFailure('frame-provider-handlers-remove', port, failure)
+    }
+    unsubscribeOwned?.()
+    unsubscribeShared?.()
+    publishResources()
+    send(
+      output
+        ? { type: 'resolve', output }
+        : {
+            type: 'reject',
+            message,
+          },
+    )
+    try {
+      port.close()
+      portHeld = false
+    } catch (failure) {
+      owner.retainFailure('frame-provider-port-close', port, failure)
+      publishResources()
+    }
+    // Closing the transport cannot publish its own settlement acknowledgement.
+    // The parent keeps the last received snapshot as unavailable after teardown.
+  }
+  port.onmessageerror = (event) => {
+    owner.retainFailure('frame-provider-message-error', port, event)
+    requestCancellation()
+    // Loss of transport is not a render settlement.
+  }
   port.onmessage = (message) => {
     if (
+      validateMarkdownHeavyFeatureFrameCancelMessage(message.data, capability)
+    ) {
+      requestCancellation()
+      if (!renderEntered)
+        finish(undefined, new DOMException('Aborted', 'AbortError'))
+      return
+    }
+    if (
+      renderEntered ||
       !validateMarkdownHeavyFeatureFrameContinueMessage(
         message.data,
         capability,
       )
     ) {
-      port.postMessage({
-        capability,
-        message: 'markdown_heavy_feature_frame_continue_invalid',
-        scope: MARKDOWN_HEAVY_FEATURE_FRAME_SCOPE,
-        type: 'reject',
-      })
-      port.close()
+      const cause = new Error('markdown_heavy_feature_frame_continue_invalid')
+      owner.retainFailure('frame-provider-protocol', port, cause)
+      requestCancellation()
+      if (!renderEntered) finish(undefined, cause)
+      else send({ type: 'protocol-error', message: cause.message })
       return
     }
-    port.onmessage = null
-    void render(request).then(
-      (output) =>
-        port.postMessage({
-          capability,
-          scope: MARKDOWN_HEAVY_FEATURE_FRAME_SCOPE,
-          type: 'resolve',
-          output,
-        }),
-      (error: unknown) =>
-        port.postMessage({
-          capability,
-          message: error instanceof Error ? error.message : String(error),
-          scope: MARKDOWN_HEAVY_FEATURE_FRAME_SCOPE,
-          type: 'reject',
-        }),
+    renderEntered = true
+    pendingRender = true
+    publishResources()
+    // Observe this original producer promise until its actual terminal. Abort,
+    // wrapper rejection and port/realm teardown never settle it on our behalf.
+    void render(request, owner, controller.signal).then(
+      (output) => finish(output),
+      (cause: unknown) => finish(undefined, cause),
     )
   }
-  port.postMessage({
-    capability,
-    scope: MARKDOWN_HEAVY_FEATURE_FRAME_SCOPE,
-    type: 'started',
-  })
+  publishResources()
+  send({ type: 'started' })
 }
 
 frameWindow.addEventListener('message', receiveRenderRequest)
