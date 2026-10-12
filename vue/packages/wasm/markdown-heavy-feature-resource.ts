@@ -25,6 +25,78 @@ export const validateMarkdownHeavyFeatureFrameContinueMessage = (
   )
 }
 
+export const validateMarkdownHeavyFeatureFrameCancelMessage = (
+  value: unknown,
+  capability: string,
+) => {
+  if (!value || typeof value !== 'object') return false
+  const message = value as Record<string, unknown>
+  return (
+    Reflect.ownKeys(message).length === 3 &&
+    message.capability === capability &&
+    message.scope === MARKDOWN_HEAVY_FEATURE_FRAME_SCOPE &&
+    message.type === 'cancel'
+  )
+}
+
+/** Counts belong to the named frame owners, not the third-party module graph. */
+export interface MarkdownHeavyFeatureFrameResourceSnapshot {
+  readonly admission: 'open' | 'closed'
+  readonly cancellationRequested: boolean
+  readonly pendingRender: boolean
+  readonly listeners: number
+  readonly ports: number
+  readonly ownedTasks: number
+  readonly ownedImports: number
+  readonly ownedRequests: number
+  readonly ownedTimers: number
+  readonly sharedImports: number
+  readonly sharedWork: number
+  readonly failureCount: number
+  readonly timers: MarkdownHeavyFeatureResourceCount
+  readonly networkRequests: MarkdownHeavyFeatureResourceCount
+}
+
+export type MarkdownHeavyFeatureFrameProviderObservation = Readonly<{
+  observation: 'observed' | 'unknown' | 'unavailable'
+  snapshot?: MarkdownHeavyFeatureFrameResourceSnapshot
+}>
+
+export const validateMarkdownHeavyFeatureFrameResourceSnapshot = (
+  value: unknown,
+): MarkdownHeavyFeatureFrameResourceSnapshot | null => {
+  if (!value || typeof value !== 'object') return null
+  const input = value as Record<string, unknown>
+  const counts = [
+    'listeners',
+    'ports',
+    'ownedTasks',
+    'ownedImports',
+    'ownedRequests',
+    'ownedTimers',
+    'sharedImports',
+    'sharedWork',
+    'failureCount',
+  ] as const
+  const count = (value: unknown) =>
+    typeof value === 'number' && Number.isSafeInteger(value) && value >= 0
+  const resourceCount = (value: unknown) =>
+    count(value) || value === 'unknown' || value === 'unavailable'
+  if (
+    Reflect.ownKeys(input).length !== 14 ||
+    (input.admission !== 'open' && input.admission !== 'closed') ||
+    typeof input.cancellationRequested !== 'boolean' ||
+    typeof input.pendingRender !== 'boolean' ||
+    !counts.every((key) => count(input[key])) ||
+    !resourceCount(input.timers) ||
+    !resourceCount(input.networkRequests)
+  )
+    return null
+  return Object.freeze({
+    ...input,
+  }) as unknown as MarkdownHeavyFeatureFrameResourceSnapshot
+}
+
 export interface MarkdownHeavyFeatureAdapterResources {
   // Directly owned handles; these counts do not census third-party realms.
   readonly listeners: number
@@ -45,6 +117,7 @@ export interface MarkdownHeavyFeatureAdapterResources {
   readonly cancelTimers?: () => MarkdownHeavyFeatureCancellationRequest
   readonly cancelRequests?: () => MarkdownHeavyFeatureCancellationRequest
   readonly cancelContinuations?: () => MarkdownHeavyFeatureCancellationRequest
+  readonly frameProvider?: MarkdownHeavyFeatureFrameProviderObservation
 }
 
 export type MarkdownHeavyFeatureResourceCount =
@@ -719,6 +792,7 @@ export const requestMarkdownHeavyFeatureResourceCancellation = (
 export const hasMarkdownHeavyFeatureOwnedResources = (
   resources: MarkdownHeavyFeatureAdapterResources,
 ) =>
+  hasPendingFrameProvider(resources.frameProvider) ||
   resources.listeners > 0 ||
   resources.observers > 0 ||
   resources.runtimes > 0 ||
@@ -731,6 +805,26 @@ export const hasMarkdownHeavyFeatureOwnedResources = (
   (typeof resources.timers === 'number' && resources.timers > 0) ||
   (typeof resources.networkRequests === 'number' &&
     resources.networkRequests > 0)
+
+const hasPendingFrameProvider = (
+  provider?: MarkdownHeavyFeatureFrameProviderObservation,
+) => {
+  if (!provider) return false
+  const snapshot = provider.snapshot
+  if (!snapshot) return true
+  return (
+    snapshot.pendingRender ||
+    snapshot.listeners > 0 ||
+    snapshot.ports > 0 ||
+    snapshot.ownedTasks > 0 ||
+    snapshot.ownedImports > 0 ||
+    snapshot.ownedRequests > 0 ||
+    snapshot.ownedTimers > 0 ||
+    snapshot.sharedImports > 0 ||
+    snapshot.sharedWork > 0 ||
+    snapshot.failureCount > 0
+  )
+}
 
 export interface MarkdownHeavyFeatureIsolatedRenderRequest {
   readonly cspNonce?: string | null
@@ -1099,6 +1193,9 @@ export const createMarkdownHeavyFeatureAdapterResourceBridgeInternal = (
     },
     get observers() {
       return isolatedHandle?.resources().observers ?? 0
+    },
+    get frameProvider() {
+      return isolatedHandle?.resources().frameProvider
     },
     get runtimes() {
       return isolatedHandle?.resources().runtimes ?? 0

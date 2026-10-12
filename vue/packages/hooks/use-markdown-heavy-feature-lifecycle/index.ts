@@ -1,5 +1,8 @@
 import { inject, provide } from 'vue'
-import { requestMarkdownHeavyFeatureResourceCancellation } from '../../wasm/markdown-heavy-feature-resource'
+import {
+  hasMarkdownHeavyFeatureOwnedResources,
+  requestMarkdownHeavyFeatureResourceCancellation,
+} from '../../wasm/markdown-heavy-feature-resource'
 
 import type { InjectionKey } from 'vue'
 import type {
@@ -7,6 +10,7 @@ import type {
   MarkdownHeavyFeatureResourceCount,
   MarkdownHeavyFeatureResourceFailure,
   MarkdownHeavyFeatureCancellationRequest,
+  MarkdownHeavyFeatureFrameProviderObservation,
 } from '../../wasm/markdown-heavy-feature-resource'
 
 export const MARKDOWN_HEAVY_FEATURE_KINDS = Object.freeze([
@@ -56,6 +60,7 @@ export interface MarkdownHeavyFeatureLifecycleMetrics {
   readonly retainedResources: number
   readonly retainedRuntimes: number
   readonly retainedTasks: number
+  readonly retainedFrameProviders?: number
   readonly staleCommits: number
   readonly staticNodes: number
   readonly teardowns: number
@@ -65,6 +70,7 @@ export interface MarkdownHeavyFeatureLifecycleMetrics {
 export interface MarkdownHeavyFeatureResources extends MarkdownHeavyFeatureAdapterResources {}
 
 export interface MarkdownHeavyFeatureResourceInspection {
+  readonly frameProviders?: readonly MarkdownHeavyFeatureFrameProviderObservation[]
   readonly admission: 'open' | 'paused' | 'disposed'
   readonly networkCancellation: 'available' | 'partial' | 'unavailable'
   readonly resumeAdmissionAvailable: boolean
@@ -211,6 +217,7 @@ const normalizeResources = (
   pendingRequests: normalizeResourceCount(resources?.pendingRequests),
   pendingInstallations: normalizeResourceCount(resources?.pendingInstallations),
   tasks: normalizeResourceCount(resources?.tasks),
+  frameProvider: resources?.frameProvider,
 })
 
 const EMPTY_RESOURCES: MarkdownHeavyFeatureResources = Object.freeze({
@@ -314,6 +321,8 @@ export const createMarkdownHeavyFeatureLifecycle = (
       resources.scheduledContinuations ||
       resources.pendingRequests ||
       resources.pendingInstallations ||
+      (resources.frameProvider &&
+        hasMarkdownHeavyFeatureOwnedResources(resources)) ||
       record.failures.length ||
       record.resources.failures?.length
     )
@@ -697,6 +706,7 @@ export const createMarkdownHeavyFeatureLifecycle = (
     let retainedObservers = 0
     let retainedRuntimes = 0
     let retainedTasks = 0
+    let retainedFrameProviders = 0
     for (const record of nodes.values()) {
       if (record.state === 'active-work') {
         activeNodes += 1
@@ -708,6 +718,7 @@ export const createMarkdownHeavyFeatureLifecycle = (
       retainedListeners += record.externalAbortAttached ? 1 : 0
       retainedObservers += resources.observers
       retainedRuntimes += resources.runtimes
+      if (resources.frameProvider) retainedFrameProviders += 1
       // The lifecycle await and adapter work are independently held tasks.
       retainedTasks += (record.awaitPending ? 1 : 0) + resources.tasks
     }
@@ -725,9 +736,11 @@ export const createMarkdownHeavyFeatureLifecycle = (
         retainedListeners +
         retainedObservers +
         retainedRuntimes +
-        retainedTasks,
+        retainedTasks +
+        retainedFrameProviders,
       retainedRuntimes,
       retainedTasks,
+      retainedFrameProviders,
       staleCommits,
       staticNodes,
       teardowns,
@@ -748,11 +761,14 @@ export const createMarkdownHeavyFeatureLifecycle = (
     const failures: MarkdownHeavyFeatureResourceFailure[] = [
       ...cancellationFailures,
     ]
+    const frameProviders: MarkdownHeavyFeatureFrameProviderObservation[] = []
     let timerProviders = 0
     let requestProviders = 0
     let missingTimerProvider = retiredTimers !== 0
     let missingRequestProvider = retiredNetworkRequests !== 0
     for (const record of resourceRecords) {
+      if (record.resources.frameProvider)
+        frameProviders.push(record.resources.frameProvider)
       timers = addCounts(timers, readUnobservableCount(record, 'timers'))
       networkRequests = addCounts(
         networkRequests,
@@ -798,6 +814,7 @@ export const createMarkdownHeavyFeatureLifecycle = (
           : 'partial'
         : 'unavailable',
       failures: Object.freeze([...new Set(failures)]),
+      frameProviders: Object.freeze(frameProviders),
       usage: Object.freeze({
         listeners: local.retainedListeners,
         networkRequests,

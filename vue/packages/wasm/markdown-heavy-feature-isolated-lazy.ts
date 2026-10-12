@@ -39,8 +39,21 @@ export const createLazyMarkdownHeavyFeatureIsolatedRender = <T>(
   let removeInnerResourceChange: (() => void) | null = null
   let rejectAbort!: (reason: unknown) => void
   const resourceChangeListeners = new Set<() => void>()
+  let notifying = false
   const notifyResourceChange = () => {
-    for (const listener of resourceChangeListeners) listener()
+    if (notifying) return
+    notifying = true
+    try {
+      for (const listener of [...resourceChangeListeners]) {
+        try {
+          listener()
+        } catch (cause) {
+          importOwner.retainFailure('lazy-resource-observer', listener, cause)
+        }
+      }
+    } finally {
+      notifying = false
+    }
   }
   importOwner.resources.subscribe?.(notifyResourceChange)
   const abortPromise = new Promise<T>((_resolve, reject) => {
@@ -93,6 +106,9 @@ export const createLazyMarkdownHeavyFeatureIsolatedRender = <T>(
     },
     get observers() {
       return innerHandle?.resources().observers ?? 0
+    },
+    get frameProvider() {
+      return innerHandle?.resources().frameProvider
     },
     get runtimes() {
       return innerHandle?.resources().runtimes ?? 0

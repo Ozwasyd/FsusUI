@@ -4,9 +4,11 @@ import {
   createMarkdownHeavyFeatureAdapterResourceOwner,
   registerMarkdownHeavyFeatureIsolatedRenderFactory,
   type MarkdownHeavyFeatureAdapterResources,
+  type MarkdownHeavyFeatureFrameProviderObservation,
   type MarkdownHeavyFeatureIsolatedRenderRequest,
   validateMarkdownHeavyFeatureIsolatedRenderOutput,
   validateMarkdownHeavyFeatureIsolatedRenderRequest,
+  validateMarkdownHeavyFeatureFrameResourceSnapshot,
 } from './markdown-heavy-feature-resource'
 import type { FeatureRenderOutput } from './markdown-feature-output-gateway'
 import { toMarkdownFeatureParsingHtml } from './markdown-feature-output-gateway'
@@ -78,6 +80,8 @@ export const createMarkdownHeavyFeatureIsolatedRender = <
   let bootstrapIssued = false
   let requestPending = false
   let requestDispatchEntered = false
+  let requestTerminalObserved = false
+  let frameProvider: MarkdownHeavyFeatureFrameProviderObservation | undefined
   let started = false
   let scheduledContinue: { cancel: (() => void) | null } | null = null
   let port: MessagePort | null = null
@@ -151,6 +155,19 @@ export const createMarkdownHeavyFeatureIsolatedRender = <
     if (cleanupRunning) return
     cleanupRunning = true
     try {
+      if (port && requestDispatchEntered && !requestTerminalObserved)
+        nativeCleanup('frame-cancel-dispatch', port, () =>
+          port?.postMessage({
+            capability,
+            scope: MARKDOWN_HEAVY_FEATURE_FRAME_SCOPE,
+            type: 'cancel',
+          }),
+        )
+      if (frameProvider)
+        frameProvider = Object.freeze({
+          observation: 'unavailable',
+          snapshot: frameProvider.snapshot,
+        })
       const continuation = scheduledContinue
       scheduledContinue = null
       continuation?.cancel?.()
@@ -243,6 +260,30 @@ export const createMarkdownHeavyFeatureIsolatedRender = <
         teardown()
       }
       port.onmessage = (message) => {
+        if (
+          message.data?.scope === MARKDOWN_HEAVY_FEATURE_FRAME_SCOPE &&
+          message.data?.capability === capability &&
+          message.data?.type === 'resources'
+        ) {
+          const snapshot = validateMarkdownHeavyFeatureFrameResourceSnapshot(
+            message.data.snapshot,
+          )
+          if (Reflect.ownKeys(message.data).length !== 4 || !snapshot) {
+            frameOwner.retainFailure(
+              'frame-provider-snapshot-invalid',
+              port ?? iframe,
+              message.data,
+            )
+            teardown()
+            return
+          }
+          frameProvider = Object.freeze({
+            observation: active ? 'observed' : 'unavailable',
+            snapshot,
+          })
+          notifyResourceChange()
+          return
+        }
         if (!active) {
           // A late, authentic peer terminal message is observation only. It
           // never revives the realm, schedules continuation or commits output.
@@ -257,9 +298,12 @@ export const createMarkdownHeavyFeatureIsolatedRender = <
               message.data.output,
               validatedRequest.kind,
             )
-          )
+          ) {
+            requestTerminalObserved = true
             resolveRequest()
-          if (message.data.type === 'reject')
+          }
+          if (message.data.type === 'reject') {
+            requestTerminalObserved = true
             rejectRequest(
               new Error(
                 typeof message.data.message === 'string'
@@ -267,6 +311,7 @@ export const createMarkdownHeavyFeatureIsolatedRender = <
                   : 'markdown_heavy_feature_frame_failed',
               ),
             )
+          }
           return
         }
         if (
@@ -346,6 +391,7 @@ export const createMarkdownHeavyFeatureIsolatedRender = <
             return
           }
           active = false
+          requestTerminalObserved = true
           resolveRequest()
           cleanup()
           resolvePromise(output as T)
@@ -358,6 +404,7 @@ export const createMarkdownHeavyFeatureIsolatedRender = <
               : 'markdown_heavy_feature_frame_failed',
           )
           active = false
+          requestTerminalObserved = true
           rejectRequest(error)
           cleanup()
           rejectPromise(error)
@@ -374,6 +421,7 @@ export const createMarkdownHeavyFeatureIsolatedRender = <
         throw abortError()
       }
       requestDispatchEntered = true
+      frameProvider = Object.freeze({ observation: 'unknown' })
       iframe.contentWindow.postMessage(
         {
           capability,
@@ -452,6 +500,9 @@ export const createMarkdownHeavyFeatureIsolatedRender = <
     },
     get failures() {
       return frameOwner.resources.failures ?? []
+    },
+    get frameProvider() {
+      return frameProvider
     },
     cancelTimers: frameOwner.resources.cancelTimers,
     cancelRequests: frameOwner.resources.cancelRequests,
