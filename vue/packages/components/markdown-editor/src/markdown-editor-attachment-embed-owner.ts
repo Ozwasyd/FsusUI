@@ -17,7 +17,10 @@ import type {
   MarkdownEmbedRequest,
   MarkdownEmbedResult,
 } from '../../../wasm/markdown-embed-provider'
-import type { MarkdownAttachmentJob } from './markdown-editor-attachment-lifecycle'
+import type {
+  MarkdownAttachmentJob,
+  MarkdownAttachmentDispatchFutureObservation,
+} from './markdown-editor-attachment-lifecycle'
 import {
   inspectMarkdownAttachmentDispatch,
   runMarkdownAttachmentDispatch,
@@ -210,10 +213,12 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
     readonly observationRef: object
     readonly work: unknown
     started: boolean
+    reserved: boolean
     observation: 'pending' | 'fulfilled' | 'failed' | 'unavailable'
     reason?: string
     cause?: unknown
     monitor?: Promise<void>
+    ledger?: MarkdownAttachmentDispatchFutureObservation
   }
   type ConsumerEntry = {
     readonly dispatchRef: object
@@ -265,7 +270,7 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
   }
   const claimConsumerObservation = (
     work: unknown,
-    delegatedReason?: string,
+    reserved = false,
   ): ConsumerFutureObservation => {
     const object =
       (typeof work === 'object' && work !== null) || typeof work === 'function'
@@ -274,14 +279,15 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
     const previous = object && consumerObservations.get(object)
     if (previous) return previous
     const reason =
-      delegatedReason ??
+      reserved ? 'consumer-future-observation-reserved' :
       (object && consumerFutures.has(object)
         ? 'consumer-future-already-owned'
         : undefined)
     const observation: ConsumerFutureObservation = {
       observationRef: Object.freeze({}),
       work,
-      started: Boolean(reason),
+      started: !reserved && Boolean(reason),
+      reserved,
       observation: 'unavailable',
       reason,
     }
@@ -293,7 +299,7 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
     return observation
   }
   const observeUnknownFuture = (observation: ConsumerFutureObservation) => {
-    if (observation.started) return
+    if (observation.started || observation.reserved) return
     observation.started = true
     try {
       if (!consumerControl(() => consumerFuture(observation.work))) {
@@ -320,15 +326,20 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
       })(),
     )
   }
-  const readConsumerObservation = (observation: ConsumerFutureObservation) =>
-    Object.freeze({
+  const readConsumerObservation = (observation: ConsumerFutureObservation) => {
+    const ledger = observation.ledger?.inspect()
+    return Object.freeze({
       observationRef: observation.observationRef,
       work: observation.work,
-      observation: observation.observation,
-      reason: observation.reason,
-      cause: observation.cause,
+      observation: ledger ? (ledger.status === 'rejected' ? 'failed' : ledger.status) : observation.observation,
+      reason: ledger?.status === 'unavailable' ? 'consumer-future-observation-unavailable' : observation.reason,
+      cause: ledger ? ledger.cause : observation.cause,
+      primary: ledger?.primary,
+      observerWork: ledger?.observerWork,
+      observationCause: ledger?.observationCause,
       monitor: observation.monitor,
     })
+  }
   const retainUnknownFields = (entry: ConsumerEntry) => {
     const returned = entry.returned
     if (
@@ -371,6 +382,7 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
           observationRef: Object.freeze({}),
           work,
           started: false,
+          reserved: false,
           observation: 'unavailable',
           reason,
           ...(accessFailed ? { cause: accessCause } : {}),
@@ -504,7 +516,9 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
       if (
         local?.dispatchRef !== entry.dispatchRef ||
         local.attempt !== entry.attempt ||
-        local.localSettlement === 'unknown'
+        local.localSettlement === 'unknown' ||
+        local.resultSettlement === 'unknown' ||
+        local.observationNotificationCauses?.length
       )
         throw new Error(
           'editor-session-attachment-consumer-settlement-unavailable',
@@ -1479,11 +1493,11 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
           consumerRequests.add(binding.request)
           claimConsumerObservation(
             binding.result,
-            'consumer-future-observed-by-dispatch-ledger',
+            true,
           )
           claimConsumerObservation(
             binding.settled,
-            'consumer-future-observed-by-dispatch-ledger',
+            true,
           )
           consumer.binding = binding
           consumer.unknown = undefined
@@ -1514,29 +1528,56 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
         }
         // Legacy content can consume its real result, but its opaque scope stays unknown.
         // An event emission or terminal label is not a settlement future.
-        const observation = claimConsumerObservation(work)
+        const observation = claimConsumerObservation(work, true)
         consumer.unknownReturned = observation
-        observation.started = true
         let legacyFuture: boolean
         try {
           legacyFuture = consumerControl(() => consumerFuture(work))
         } catch (cause) {
+          observation.reserved = false
+          observation.started = true
           observation.reason = 'consumer-field-future-access-failed'
           observation.cause = cause
           retainUnknownFields(consumer)
           throw cause
         }
         if (!legacyFuture) {
+          observation.reserved = false
+          observation.started = true
           observation.reason = 'consumer-field-future-unavailable'
           retainUnknownFields(consumer)
           throw new Error(
             'editor-session-attachment-dispatch-settlement-unavailable',
           )
         }
-        observation.reason = 'consumer-future-observed-by-dispatch-ledger'
         retainUnknownFields(consumer)
         consumer.legacyResultOnly = true
         return work as unknown as PromiseLike<MarkdownAttachmentProviderResult>
+      }, {
+        within: consumerControl,
+        retain(kind, ledger) {
+          const entry = dispatchRef && consumers.get(dispatchRef)
+          const original = entry?.binding
+            ? (kind === 'result' ? entry.binding.result : entry.binding.settled)
+            : entry?.returned
+          if (!entry || ledger.work !== original)
+            throw new Error('editor-session-attachment-observation-custody-invalid')
+          const observation = claimConsumerObservation(original)
+          // BOTH real handlers/observer custody exist before lifecycle notifies us.
+          observation.ledger = ledger
+          observation.monitor = ledger.monitor
+          observation.reserved = false
+          observation.started = true
+          observation.reason = undefined
+          for (const work of [ledger.monitor, ledger.inspect().observerWork]) {
+            if ((typeof work !== 'object' || work === null) && typeof work !== 'function') continue
+            const owned = claimConsumerObservation(work)
+            if (owned.started || owned.reserved) continue
+            owned.started = true
+            owned.reason = 'consumer-future-observed-by-dispatch-ledger'
+            owned.monitor = ledger.monitor
+          }
+        },
       })
       // Ledger settlement happens before final provenance is issued.
       return bindSettlement!(result)
