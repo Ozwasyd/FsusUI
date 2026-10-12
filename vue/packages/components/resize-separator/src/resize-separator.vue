@@ -132,19 +132,22 @@ const onPointerDown = (event: PointerEvent) => {
     return
   const target = handle.value
   if (!target) return
-  try {
-    target.setPointerCapture(event.pointerId)
-  } catch {
-    return
-  }
+  const range = props.coordinateRange
+  const value = controlledValue.value
   const interaction: PointerInteraction = {
     source: 'pointer',
     target,
     pointerId: event.pointerId,
     coordinate: coordinate(event),
-    initialValue: controlledValue.value,
-    lastValue: controlledValue.value,
-    coordinateRange: { ...props.coordinateRange },
+    initialValue: value,
+    lastValue: value,
+    coordinateRange: { start: range.start, end: range.end },
+  }
+  // Finish external reads before capture; register its cleanup immediately.
+  try {
+    target.setPointerCapture(interaction.pointerId)
+  } catch {
+    return
   }
   active = interaction
   event.preventDefault()

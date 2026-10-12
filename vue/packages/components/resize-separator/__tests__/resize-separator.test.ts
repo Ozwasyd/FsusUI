@@ -162,6 +162,48 @@ describe('ResizeSeparator public component', () => {
     }
   })
 
+  test.each(['consumer', 'unmount'] as const)(
+    '%s retains capture cleanup without reading extra coordinate range getters',
+    (reason) => {
+      let mocks: ReturnType<typeof capture> | undefined
+      const extra = vi.fn(() => {
+        throw new Error('Extra coordinate range field must not be read')
+      })
+      const range = {
+        get start() {
+          if (mocks?.captured.size)
+            throw new Error('Snapshot start must be read before capture')
+          return props.coordinateRange.start
+        },
+        get end() {
+          if (mocks?.captured.size)
+            throw new Error('Snapshot end must be read before capture')
+          return props.coordinateRange.end
+        },
+        get extra() {
+          return extra()
+        },
+      }
+      const wrapper = render({ coordinateRange: range })
+      mocks = capture(wrapper)
+      pointer(wrapper, 'pointerdown')
+      expect(extra).not.toHaveBeenCalled()
+      expect(mocks.captured.has(7)).toBe(true)
+      expect(wrapper.emitted('start')).toEqual([
+        [{ value: 0.5, source: 'pointer', pointerId: 7 }],
+      ])
+      if (reason === 'consumer')
+        (wrapper.vm as ResizeSeparatorInstance).cancel()
+      else wrapper.unmount()
+      expect(mocks.release).toHaveBeenCalledExactlyOnceWith(7)
+      expect(mocks.captured.size).toBe(0)
+      expect(wrapper.emitted('cancel')).toEqual([
+        [{ value: 0.5, source: 'pointer', pointerId: 7, reason }],
+      ])
+      expect(extra).not.toHaveBeenCalled()
+    },
+  )
+
   test('a stationary pointer gesture preserves an accepted off-step value', () => {
     const wrapper = render({ value: 0.53 })
     capture(wrapper)
