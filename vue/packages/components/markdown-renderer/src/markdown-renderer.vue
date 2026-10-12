@@ -619,7 +619,10 @@ const settleRenderViewport = (key: string) =>
       frameScheduler,
       {
         key,
-        measure: () => virtualWindow.readViewport(),
+        measure: () => {
+          publishRendererViewport()
+          virtualWindow.readViewport()
+        },
         postPaint: () => resolve(true),
       },
       () => resolve(false),
@@ -661,7 +664,7 @@ const findScrollContainer = (element: HTMLElement | null) => {
 
 // Publish selected identities only. DOM/style/platform state and externally
 // written exposed refs are not owned by this input publication.
-const readRendererViewport = () =>
+const publishRendererViewport = () =>
   rendererResourceOwner.runCheckpointAuthorityCallback(
     'viewport-input-read',
     () => {
@@ -682,7 +685,7 @@ const bindRendererRoot = (element: unknown) =>
     'root-reference-input',
     () => {
       rootEl.value = element instanceof HTMLElement ? element : null
-      readRendererViewport()
+      publishRendererViewport()
     },
   )
 
@@ -846,20 +849,6 @@ const commitRenderedContent = async (
   recordCommitDuration(startedAt)
   return true
 }
-
-const virtualWindow = useFsusVirtualWindow<MarkdownRenderChunk>({
-  estimateSize: (unit) => unit.estimatedSize,
-  getKey: (unit) => unit.key,
-  getViewport: readRendererViewport,
-  measureBatch: computed(
-    () => resolvedRenderPipelineConfig.value.budget.measureBatch,
-  ),
-  minVisibleItems: initialVisibleChunkCount,
-  overscanPx: computed(
-    () => resolvedRenderPipelineConfig.value.budget.overscanPx,
-  ),
-  units: chunkUnits,
-})
 
 const setChunkUnitRef = (key: string, element: Element | null) => {
   rendererResourceOwner.retireCheckpointAuthority('chunk-reference')
@@ -1198,19 +1187,41 @@ const renderPipelineRuntime = useFsusRenderPipelineRuntime<
   MarkdownRenderChunk
 >({
   adapter: rendererAdapterInput.input,
+  adapterAuthority: rendererAdapterInput.authority,
   componentName: 'ElMarkdownRenderer',
   config: renderPipelineConfig,
   source: markdownRenderRequest,
+  sourceAuthority: rendererRequestInput.authority,
 })
 
 const resolvedRenderPipelineConfig = renderPipelineRuntime.config
+
+const virtualWindow = useFsusVirtualWindow<MarkdownRenderChunk>({
+  estimateSize: (unit) => unit.estimatedSize,
+  getKey: (unit) => unit.key,
+  getViewport: () => rendererViewportInput.input.value.scroller,
+  viewportAuthority: rendererViewportInput.authority,
+  unitsAuthority: rendererChunkInput.authority,
+  configAuthority: renderPipelineRuntime.authority,
+  measureBatch: computed(
+    () => resolvedRenderPipelineConfig.value.budget.measureBatch,
+  ),
+  minVisibleItems: initialVisibleChunkCount,
+  overscanPx: computed(
+    () => resolvedRenderPipelineConfig.value.budget.overscanPx,
+  ),
+  units: chunkUnits,
+})
 
 const scheduleMeasurementWarmup = () => {
   // The viewport warmup read joins the shared frame scheduler's measure
   // phase; the scheduler key coalesces repeated warmups into one frame.
   rendererResourceOwner.scheduleFrame(frameScheduler, {
     key: 'markdown-render-viewport-warmup',
-    measure: () => virtualWindow.readViewport(),
+    measure: () => {
+      publishRendererViewport()
+      virtualWindow.readViewport()
+    },
   })
 }
 

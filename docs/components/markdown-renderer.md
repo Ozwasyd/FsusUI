@@ -914,3 +914,32 @@ The previous a292 source review found two P1 and two P2 gaps despite static
 compilation passing. These corrections require independent source review and
 original counterexample authoring/preflight. Counterexamples, runtime/test/list,
 native/security/receipt/renderer/authority/eviction qualification remain UNRUN/HOLD.
+
+### Pending pipeline caller-feed integration
+
+The renderer WIP consumes the exact necessary index/policy/config dependency
+postimages of pipeline candidate `582035e658f2f53024c95b7bac757732750cf589`.
+This is a pending candidate composition, not acceptance of the original pipeline
+implementation or promotion of its qualification. Other owners' source is inherited
+without hand edits. The renderer supplies actual `sourceAuthority` and
+`adapterAuthority` alongside their exact owned request/adapter input refs.
+
+Virtual window creation follows runtime creation so its real `configAuthority`
+can be that runtime's original authority. This covers the renderer's budget
+projections through the original runtime/config/policy dependency relationship;
+the original selected config Ref is passed unchanged, without props overrides.
+The virtual options receive exact `unitsAuthority` and `viewportAuthority`
+from the same-owner publications. Its viewport getter only reads the already
+published `rendererViewportInput.input.value.scroller`; it does not retire, scan
+DOM or publish while the pipeline reads. Root ref callbacks, owned viewport settle
+and warmup measure entries perform the actual observed selection/publication.
+External DOM/style/topology mutation remains unowned.
+
+Original Native retirement still reaches that same owner through the actual f253
+subscription and invalidates its scoped publications. The separate source offer
+still borrows the actual original Native provider directly. No Native live ticket
+join or fabricated `getFailures` is added. Complete pause/recovery, positive
+live/full seal, fixed-roster completeness and session eviction remain refused.
+The changed hook initialization/unmount ordering and real caller subscriptions
+require original source review and exact case preflight; runtime/list/native/
+security/receipt/renderer/authority/eviction qualifications remain UNRUN/HOLD.
