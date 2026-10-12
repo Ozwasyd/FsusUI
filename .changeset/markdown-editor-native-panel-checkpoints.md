@@ -13,3 +13,6 @@ After actual settled resolved/deleted dispatch completion, retire the original
 non-retryable File/item/batch records while keeping original jobs and dispatch
 proofs as nonempty same-owner attachment checkpoint state. Retain original job
 name/kind metadata and retryable/unknown custody without claiming paused resources.
+Retry retirement after actual accepted deletion of settled retryable jobs. Keep
+deletion provenance in the same original binding and refuse old/running/unknown
+attempts; native undo/redo cannot resurrect File custody.

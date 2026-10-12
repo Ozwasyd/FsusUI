@@ -788,6 +788,130 @@ describe('MarkdownEditor', () => {
     expect(() => session.readPanelState(snapshot)).toThrow('editor-session-disposed')
   })
 
+  it.each([
+    ['rejected', 'button'], ['cancelled', 'button'], ['rejected', 'input'], ['cancelled', 'input'],
+  ] as const)('retires settled %s custody only after accepted %s deletion and preserves it through undo/redo', async (status, removal) => {
+    vi.useFakeTimers()
+    let request!: Parameters<MarkdownEditorAttachmentDispatch>[0]
+    let finish!: (result: MarkdownAttachmentProviderResult) => void
+    const work = new Promise<MarkdownAttachmentProviderResult>((resolve) => { finish = resolve })
+    const wrapper = mount(MarkdownEditor, { props: {
+      mode: 'source', modelValue: '', documentIdentity: { id: 'accepted-delete-document', epoch: 1 },
+      attachmentDispatch: (input: Parameters<MarkdownEditorAttachmentDispatch>[0]) => { request = input; return work },
+    } })
+    const editor = wrapper.vm as MarkdownEditorInstance
+    const picker = wrapper.find<HTMLInputElement>('.el-markdown-editor__attachment-picker')
+    Object.defineProperty(picker.element, 'files', { configurable: true, value: [new File(['source'], 'original.pdf', { type: 'application/pdf' })] })
+    await picker.trigger('change')
+    finish({ status, batchId: request.batch.batchId, itemId: request.item.itemId,
+      documentIdentity: request.batch.documentIdentity, revision: request.batch.revision })
+    await flushPromises()
+    await vi.runAllTimersAsync()
+    const session = editor.getSession('session:accepted-delete')
+    expect(session.captureSnapshot(() => 'a'.repeat(64)).panelRefs?.attachmentStateRef ?? null).toBeNull()
+    await wrapper.setProps({ readonly: true })
+    const rejectedButtons = wrapper.findAll('.el-markdown-editor__attachment-actions button')
+    await rejectedButtons[rejectedButtons.length - 1]!.trigger('click')
+    await flushPromises()
+    await vi.runAllTimersAsync()
+    expect(wrapper.find('.el-markdown-editor__attachment-status').exists()).toBe(true)
+    expect(session.captureSnapshot(() => 'a'.repeat(64)).panelRefs?.attachmentStateRef ?? null).toBeNull()
+    await wrapper.setProps({ readonly: false })
+    if (removal === 'button') {
+      const buttons = wrapper.findAll('.el-markdown-editor__attachment-actions button')
+      await buttons[buttons.length - 1]!.trigger('click')
+    } else {
+      const textarea = wrapper.find<HTMLTextAreaElement>('textarea')
+      textarea.element.value = ''
+      await textarea.trigger('input')
+    }
+    await flushPromises()
+    await vi.runAllTimersAsync()
+    expect(editor.withAttachmentFile(request.batch, request.item, () => {})).toBe(false)
+    const snapshot = session.captureSnapshot(() => 'b'.repeat(64))
+    expect(snapshot.panelRefs?.attachmentStateRef).toBeTruthy()
+    expect(session.readPanelState(snapshot)!.attachment!.map((job) => [job.name, job.phase])).toEqual([['original.pdf', 'deleted']])
+    expect(editor.undo().accepted).toBe(true)
+    expect(session.readPanelState(snapshot)).toBeNull()
+    expect(editor.withAttachmentFile(request.batch, request.item, () => {})).toBe(false)
+    expect(editor.redo().accepted).toBe(true)
+    await flushPromises()
+    await vi.runAllTimersAsync()
+    const after = session.captureSnapshot(() => 'c'.repeat(64))
+    expect(session.readPanelState(after)!.attachment![0]!.phase).toBe('deleted')
+    expect(() => session.pauseResources()).toThrow('editor-session-resource-owner-unavailable')
+    wrapper.unmount()
+  })
+
+  it.each(['future', 'legacy'] as const)('keeps accepted deletion behind original %s settlement', async (source) => {
+    vi.useFakeTimers()
+    let request!: Parameters<MarkdownEditorAttachmentDispatch>[0]
+    let finish!: (result: MarkdownAttachmentProviderResult) => void
+    const work = new Promise<MarkdownAttachmentProviderResult>((resolve) => { finish = resolve })
+    const wrapper = mount(MarkdownEditor, { props: {
+      mode: 'source', modelValue: '', documentIdentity: { id: 'delete-settlement-document', epoch: 1 },
+      attachmentDispatch: source === 'future' ? (input: Parameters<MarkdownEditorAttachmentDispatch>[0]) => { request = input; return work } : undefined,
+    } })
+    const editor = wrapper.vm as MarkdownEditorInstance
+    const picker = wrapper.find<HTMLInputElement>('.el-markdown-editor__attachment-picker')
+    Object.defineProperty(picker.element, 'files', { configurable: true, value: [new File(['source'], 'pending.pdf', { type: 'application/pdf' })] })
+    await picker.trigger('change')
+    const session = editor.getSession('session:delete-settlement')
+    const textarea = wrapper.find<HTMLTextAreaElement>('textarea')
+    textarea.element.value = ''
+    await textarea.trigger('input')
+    await flushPromises()
+    await vi.runAllTimersAsync()
+    expect(session.captureSnapshot(() => 'a'.repeat(64)).panelRefs?.attachmentStateRef ?? null).toBeNull()
+    if (source === 'future') {
+      finish({ status: 'cancelled', batchId: request.batch.batchId, itemId: request.item.itemId,
+        documentIdentity: request.batch.documentIdentity, revision: request.batch.revision })
+      await flushPromises()
+      await vi.runAllTimersAsync()
+      const snapshot = session.captureSnapshot(() => 'b'.repeat(64))
+      expect(snapshot.panelRefs?.attachmentStateRef).toBeTruthy()
+      expect(session.readPanelState(snapshot)!.attachment![0]!.phase).toBe('deleted')
+      expect(editor.withAttachmentFile(request.batch, request.item, () => {})).toBe(false)
+    } else {
+      expect(() => session.inspectResources()).toThrow('editor-session-resource-owner-unavailable')
+    }
+    wrapper.unmount()
+  })
+
+  it('keeps late old future retirement out of replacement document custody with the same document id', async () => {
+    vi.useFakeTimers()
+    const requests: Parameters<MarkdownEditorAttachmentDispatch>[0][] = []
+    const completions: ((result: MarkdownAttachmentProviderResult) => void)[] = []
+    const wrapper = mount(MarkdownEditor, { props: {
+      mode: 'source', modelValue: '', documentIdentity: { id: 'same-delete-document', epoch: 1 },
+      attachmentDispatch: (input: Parameters<MarkdownEditorAttachmentDispatch>[0]) => {
+        requests.push(input)
+        return new Promise<MarkdownAttachmentProviderResult>((resolve) => { completions.push(resolve) })
+      },
+    } })
+    const editor = wrapper.vm as MarkdownEditorInstance
+    const picker = wrapper.find<HTMLInputElement>('.el-markdown-editor__attachment-picker')
+    Object.defineProperty(picker.element, 'files', { configurable: true, value: [new File(['source'], 'same.pdf', { type: 'application/pdf' })] })
+    await picker.trigger('change')
+    await wrapper.setProps({ modelValue: '', documentIdentity: { id: 'same-delete-document', epoch: 2 } })
+    await picker.trigger('change')
+    completions[1]!({ status: 'resolved', batchId: requests[1]!.batch.batchId, itemId: requests[1]!.item.itemId,
+      documentIdentity: requests[1]!.batch.documentIdentity, revision: requests[1]!.batch.revision,
+      payload: { markdownKind: 'file', href: 'https://cdn.example/current.pdf', mimeType: 'application/pdf', name: 'same.pdf' } })
+    await flushPromises()
+    await vi.runAllTimersAsync()
+    completions[0]!({ status: 'cancelled', batchId: requests[0]!.batch.batchId, itemId: requests[0]!.item.itemId,
+      documentIdentity: requests[0]!.batch.documentIdentity, revision: requests[0]!.batch.revision })
+    await flushPromises()
+    await vi.runAllTimersAsync()
+    const session = editor.getSession('session:replacement-delete')
+    const snapshot = session.captureSnapshot(() => 'a'.repeat(64))
+    expect(snapshot.panelRefs?.attachmentStateRef).toBeTruthy()
+    expect(session.readPanelState(snapshot)!.attachment!.map((job) => [job.itemId, job.documentIdentity.epoch])).toEqual([[requests[1]!.item.itemId, 2]])
+    expect(editor.withAttachmentFile(requests[0]!.batch, requests[0]!.item, () => {})).toBe(false)
+    wrapper.unmount()
+  })
+
   it('edits active image and caption subranges through the compact property surface', async () => {
     const source =
       '![初始 alt](/old.png "old title")\n::caption[说明 😀 RTL אב]'

@@ -1231,6 +1231,7 @@ import type {
 } from './markdown-editor'
 import type {
   BeforeInputSnapshot,
+  MarkdownEditorDocumentIdentity,
   MarkdownEditorDispatchResult,
   MarkdownEditorHistoryState,
   MarkdownEditorInputMergeDirection,
@@ -1721,6 +1722,7 @@ const legacyAttachmentAttempts = new WeakMap<MarkdownAttachmentItemIntent, numbe
 const attachmentJobBindings = new WeakMap<MarkdownAttachmentJob, {
   readonly batch: MarkdownAttachmentBatchIntent
   readonly item: MarkdownAttachmentItemIntent
+  readonly deletionAttempt?: number
 }>()
 // Only an actual settled non-retryable attempt can retire original File/item
 // custody. Keep the SAME job and dispatch proof as terminal checkpoint state.
@@ -1741,6 +1743,7 @@ const retireSettledAttachmentRecords = (
       !proof?.settlementAvailable || !proof.settled || proof.dispatching ||
       proof.attempt !== attempt || originalJob.attempt !== attempt ||
       (originalJob.phase !== 'resolved' && originalJob.phase !== 'deleted') ||
+      (originalJob.phase === 'deleted' && binding?.deletionAttempt !== attempt) ||
       !attachmentJobs.value.some((candidate) => toRaw(candidate) === originalJob) ||
       binding?.batch !== batch || binding.item !== item || record?.batch !== batch ||
       attachmentItems.get(item.itemId) !== item || record.files.has(item) ||
@@ -1758,6 +1761,7 @@ const retireSettledAttachmentRecords = (
       finalProof?.dispatchRef !== proof.dispatchRef || finalProof.attempt !== attempt ||
       !finalProof.settlementAvailable || !finalProof.settled || finalProof.dispatching ||
       originalJob.attempt !== attempt || (originalJob.phase !== 'resolved' && originalJob.phase !== 'deleted') ||
+      (originalJob.phase === 'deleted' && binding.deletionAttempt !== attempt) ||
       !attachmentJobs.value.some((candidate) => toRaw(candidate) === originalJob) ||
       attachmentJobBindings.get(originalJob) !== binding || attachmentBatches.get(batch.batchId) !== record ||
       attachmentItems.get(item.itemId) !== item || record.files.has(item)) return
@@ -1771,6 +1775,24 @@ const retireSettledAttachmentRecords = (
   } finally {
     attachmentFileCleanupDepth -= 1
   }
+}
+const acceptAttachmentDeletion = (job: MarkdownAttachmentJob, identity: MarkdownEditorDocumentIdentity) => {
+  const original = toRaw(job)
+  const binding = attachmentJobBindings.get(original)
+  if (!binding || original.phase !== 'deleted' || original.documentIdentity?.id !== identity.id ||
+      original.documentIdentity.epoch !== identity.epoch ||
+      !attachmentJobs.value.some((candidate) => toRaw(candidate) === original) ||
+      attachmentItems.get(binding.item.itemId) !== binding.item ||
+      attachmentBatches.get(binding.batch.batchId)?.batch !== binding.batch) return
+  // Derived only from the actual accepted native deletion, in the SAME existing
+  // binding. No body/transaction copy, new index or settlement acknowledgement.
+  attachmentJobBindings.set(original, Object.freeze({ ...binding, deletionAttempt: original.attempt }))
+}
+const retireAcceptedAttachmentDeletion = (job: MarkdownAttachmentJob) => {
+  const original = toRaw(job)
+  const binding = attachmentJobBindings.get(original)
+  if (binding?.deletionAttempt === original.attempt)
+    retireSettledAttachmentRecords(original, binding.batch, binding.item, original.attempt)
 }
 const withAttachmentFile = (
   batch: MarkdownAttachmentBatchIntent,
@@ -2703,6 +2725,7 @@ const dispatchEditorOperation = (
   }
   const transactionEvent = toMarkdownEditorTransactionEvent(transaction, result)
   const deletedItemIds: string[] = []
+  const deletedJobs: MarkdownAttachmentJob[] = []
   const rebaseAttachments =
     result.accepted &&
     (result.value !== previousValue ||
@@ -2731,9 +2754,16 @@ const dispatchEditorOperation = (
         appliedChanges,
         previousValue,
       )
-      if (rebasedJob.phase === 'deleted')
+      if (rebasedJob.phase === 'deleted') {
         deletedItemIds.push(job.itemId ?? job.id)
+        deletedJobs.push(toRaw(job))
+      }
     }
+    if (ownedJob?.phase === 'deleted' && result.value !== previousValue) {
+      deletedItemIds.push(ownedJob.itemId ?? ownedJob.id)
+      deletedJobs.push(toRaw(ownedJob))
+    }
+    for (const job of deletedJobs) acceptAttachmentDeletion(job, result.documentIdentity)
   }
   // The private accepted observer installs this operation's jobs after its own
   // map, but before any abort listener or public callback can dispatch again.
@@ -2741,6 +2771,7 @@ const dispatchEditorOperation = (
     operation.observeTransaction?.(transactionEvent)
   if (rebaseAttachments) {
     revokeAttachmentFiles(deletedItemIds)
+    for (const job of deletedJobs) retireAcceptedAttachmentDeletion(job)
     triggerRef(attachmentJobs)
   }
   // Keep the accepted transaction as historical evidence even after reentry.
@@ -5400,11 +5431,26 @@ const runAttachmentAction = (
       dispatchAttachmentBatch(Object.freeze({ ...batch, items: Object.freeze([item]) }))
     }
   } else {
+    const originalPhase = job.phase
+    const originalRange = job.range
+    const originalAttempt = job.attempt
+    const originalBinding = attachmentJobBindings.get(toRaw(job))
+    const identity = transactionStore.documentIdentity
+    const revision = transactionStore.revision
     const planned = planMarkdownAttachmentRemove(transactionStore.value, job)
-    dispatchTransaction({
+    const plannedRange = job.range
+    const dispatched = dispatchTransaction({
       ...planned.transaction,
       metadata: Object.freeze({ attachmentItemId: job.itemId }),
     }, undefined, job)
+    const ownsRejectedRemoval = () => !dispatched.accepted &&
+      transactionStore.documentIdentity.id === identity.id && transactionStore.documentIdentity.epoch === identity.epoch &&
+      transactionStore.revision === revision && job.attempt === originalAttempt && job.range === plannedRange &&
+      attachmentJobBindings.get(toRaw(job)) === originalBinding && attachmentJobs.value.includes(job)
+    if (job.phase === 'deleted' && ownsRejectedRemoval()) {
+      job.phase = originalPhase
+      if (job.phase === originalPhase && ownsRejectedRemoval()) job.range = originalRange
+    }
   }
   triggerRef(attachmentJobs)
   applyLiveLayout('block-height-change')

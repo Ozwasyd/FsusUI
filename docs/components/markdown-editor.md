@@ -591,6 +591,13 @@ item/File custody is truly cleared. Retryable rejected/cancelled state and unkno
 settlement retain their original custody and keep the attachment ref unavailable.
 Same attempt and actual settlement are required; signal abort/UI phase alone is
 insufficient. Pending or retryable sibling records keep the original batch alive.
+Actual accepted button/ordinary editor deletion records the deletion attempt in
+the existing original job binding and retries terminal retirement with the same
+settlement/identity guards. A deleted phase alone cannot release retryable custody;
+running/legacy unknown futures refuse. An old-attempt marker cannot retire a later
+attempt. Undo/redo never resurrect released File/item/batch records or controllers.
+Rejected removal restores only unchanged original job metadata, with owner/range/
+attempt/revision checks between setters; it issues no deletion or settlement proof.
 This is same-owner/same-revision source only; full factory/draft/renderer/resource and
 native/worker/kernel/geometry/privacy acceptance remain blocked/UNRUN.
 
