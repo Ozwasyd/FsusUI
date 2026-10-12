@@ -125,6 +125,7 @@ export const createMarkdownHeavyFeatureAdapterResourceOwner =
       cancel: (() => void) | null
       installing: boolean
       cancelRequested: boolean
+      executing: boolean
     }>()
     const listeners = new Map<object, () => void>()
     const subscribers = new Set<() => void>()
@@ -237,13 +238,14 @@ export const createMarkdownHeavyFeatureAdapterResourceOwner =
       cancel: (() => void) | null
       installing: boolean
       cancelRequested: boolean
+      executing: boolean
     }) => {
       if (!continuations.has(record)) return
       record.cancelRequested = true
       if (record.installing || !record.cancel) return
       try {
         record.cancel()
-        continuations.delete(record)
+        if (!record.executing) continuations.delete(record)
       } catch (cause) {
         fail('continuation-cancel', record, cause)
       }
@@ -299,10 +301,7 @@ export const createMarkdownHeavyFeatureAdapterResourceOwner =
             if (closed || record.cancelRequested) return
             return run()
           })
-          void observe(promise, callbacks, callback).catch((cause) => {
-            fail('timer-callback', token, cause)
-            notify()
-          })
+          void observe(promise, callbacks, callback, 'timer-callback')
         }, delay)
         record.installing = false
         if (!record.fired && (closed || record.cancelRequested))
@@ -470,42 +469,75 @@ export const createMarkdownHeavyFeatureAdapterResourceOwner =
     }
     const scheduleContinue: MarkdownHeavyFeatureAdapterResourceOwner['scheduleContinue'] =
       (schedule, key, run, drop) => {
+        const invokeDrop = () => {
+          const token = Object.freeze({ ref: Symbol('markdown-heavy-drop') })
+          callbacks.add(token)
+          try {
+            void observe(
+              Promise.resolve(drop()),
+              callbacks,
+              token,
+              'continuation-drop',
+            )
+          } catch (cause) {
+            fail('continuation-drop', token, cause)
+            callbacks.delete(token)
+            notify()
+          }
+        }
         if (closed) {
-          drop()
+          invokeDrop()
           return null
         }
         const record = {
           cancel: null as (() => void) | null,
           installing: true,
           cancelRequested: false,
+          executing: false,
         }
         continuations.add(record)
         notify()
         if (closed || record.cancelRequested) {
           continuations.delete(record)
-          drop()
+          invokeDrop()
           notify()
           return null
         }
-        const finish = (callback: () => void) => {
-          if (!continuations.has(record)) return
-          continuations.delete(record)
-          notify()
-          if (!closed && !record.cancelRequested) callback()
+        const finish = (
+          callback: () => void,
+          phase: string,
+          forced = false,
+        ) => {
+          if (!continuations.has(record) || record.executing) return
+          record.executing = true
+          const settle = () => {
+            record.executing = false
+            continuations.delete(record)
+            notify()
+          }
+          try {
+            const result =
+              forced || (!closed && !record.cancelRequested)
+                ? callback()
+                : undefined
+            void Promise.resolve(result).then(settle, (cause) => {
+              fail(phase, record, cause)
+              settle()
+            })
+          } catch (cause) {
+            fail(phase, record, cause)
+            settle()
+          }
         }
         try {
           record.cancel = schedule(
             key,
-            () => finish(run),
-            () => {
-              continuations.delete(record)
-              notify()
-              drop()
-            },
+            () => finish(run, 'continuation-run'),
+            () => finish(drop, 'continuation-drop', true),
           )
           record.installing = false
           if (!record.cancel) {
-            continuations.delete(record)
+            if (!record.executing) continuations.delete(record)
             notify()
             return null
           }
@@ -854,8 +886,21 @@ export const createMarkdownHeavyFeatureAdapterResourceBridgeInternal = (
   let isolatedHandle: MarkdownHeavyFeatureIsolatedRenderHandle<unknown> | null =
     null
   const resourceChangeListeners = new Set<() => void>()
+  let notifying = false
   const notifyResourceChange = () => {
-    for (const listener of resourceChangeListeners) listener()
+    if (notifying) return
+    notifying = true
+    try {
+      for (const listener of [...resourceChangeListeners]) {
+        try {
+          listener()
+        } catch (cause) {
+          workOwner.retainFailure('bridge-resource-observer', listener, cause)
+        }
+      }
+    } finally {
+      notifying = false
+    }
   }
   workOwner.resources.subscribe?.(notifyResourceChange)
 
@@ -1009,6 +1054,12 @@ export const createMarkdownHeavyFeatureAdapterResourceBridgeInternal = (
               resolve(value)
             },
             (error: unknown) => {
+              if (directRenderStarted)
+                workOwner.retainFailure(
+                  'direct-render-settlement',
+                  render,
+                  error,
+                )
               directTaskPending = false
               removeAdapterListener()
               notifyResourceChange()

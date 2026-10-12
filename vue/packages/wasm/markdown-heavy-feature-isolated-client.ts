@@ -98,25 +98,24 @@ export const createMarkdownHeavyFeatureIsolatedRender = <
   })
   void requestSettlement.catch(() => undefined)
   const resourceChangeListeners = new Set<() => void>()
+  let notifying = false
   const notifyResourceChange = () => {
-    for (const listener of resourceChangeListeners) listener()
+    if (notifying) return
+    notifying = true
+    try {
+      for (const listener of [...resourceChangeListeners]) {
+        try {
+          listener()
+        } catch (cause) {
+          frameOwner.retainFailure('frame-resource-observer', listener, cause)
+        }
+      }
+    } finally {
+      notifying = false
+    }
   }
   frameOwner.resources.subscribe?.(notifyResourceChange)
   const iframe = document.createElement('iframe')
-  iframe.setAttribute('aria-hidden', 'true')
-  iframe.setAttribute('tabindex', '-1')
-  iframe.dataset.fsusMarkdownHeavyPending = validatedRequest.kind
-  if (validatedRequest.lifecycleKey) {
-    iframe.dataset.fsusMarkdownHeavyNode = validatedRequest.lifecycleKey
-  }
-  iframe.style.position = 'fixed'
-  iframe.style.inset = '-10000px auto auto -10000px'
-  iframe.style.width = '1024px'
-  iframe.style.height = '768px'
-  iframe.style.border = '0'
-  iframe.style.opacity = '0'
-  iframe.style.pointerEvents = 'none'
-  document.body.append(iframe)
 
   let resolvePromise!: (value: T) => void
   let rejectPromise!: (reason: unknown) => void
@@ -393,8 +392,6 @@ export const createMarkdownHeavyFeatureIsolatedRender = <
       rejectPromise(error)
     }
   }
-  window.addEventListener('message', ready)
-  readyAttached = true
 
   const resources: MarkdownHeavyFeatureAdapterResources = Object.freeze({
     scope: 'owned-handles',
@@ -466,7 +463,29 @@ export const createMarkdownHeavyFeatureIsolatedRender = <
     teardown,
   })
 
+  let installPhase = 'frame-setup'
   try {
+    iframe.setAttribute('aria-hidden', 'true')
+    iframe.setAttribute('tabindex', '-1')
+    iframe.dataset.fsusMarkdownHeavyPending = validatedRequest.kind
+    if (validatedRequest.lifecycleKey)
+      iframe.dataset.fsusMarkdownHeavyNode = validatedRequest.lifecycleKey
+    iframe.style.position = 'fixed'
+    iframe.style.inset = '-10000px auto auto -10000px'
+    iframe.style.width = '1024px'
+    iframe.style.height = '768px'
+    iframe.style.border = '0'
+    iframe.style.opacity = '0'
+    iframe.style.pointerEvents = 'none'
+    readyAttached = true
+    window.addEventListener('message', ready)
+    if (!active) return handle
+    document.body.append(iframe)
+    if (!active) {
+      cleanup()
+      return handle
+    }
+    installPhase = 'frame-script-install'
     const frameDocument = iframe.contentDocument
     if (!frameDocument) {
       teardown()
@@ -488,6 +507,7 @@ export const createMarkdownHeavyFeatureIsolatedRender = <
           : moduleUrl
         script.src = trustedModuleUrl as string
       } catch (cause) {
+        frameOwner.retainFailure('frame-script-url', script ?? iframe, cause)
         active = false
         cleanup()
         rejectPromise(
@@ -538,7 +558,7 @@ export const createMarkdownHeavyFeatureIsolatedRender = <
       frameDocument.head.append(script)
     }
   } catch (error) {
-    frameOwner.retainFailure('frame-script-install', script ?? iframe, error)
+    frameOwner.retainFailure(installPhase, script ?? iframe, error)
     active = false
     cleanup()
     rejectPromise(error)
