@@ -218,6 +218,14 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
     cause?: unknown
     readonly cleanup: ConsumerCleanup[]
     unknownObserverWork?: Promise<void>
+    readonly unknownFields: {
+      readonly field: 'result' | 'settled'
+      readonly work: unknown
+      observation: 'pending' | 'fulfilled' | 'failed' | 'unavailable'
+      reason?: string
+      cause?: unknown
+      monitor?: Promise<void>
+    }[]
   }
   const consumers = new Map<object, ConsumerEntry>()
   // Binding chains are not global ownership: this owner deduplicates originals.
@@ -247,6 +255,78 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
       value = Object.getPrototypeOf(value)
     }
     return false
+  }
+  const retainUnknownFields = (entry: ConsumerEntry) => {
+    const returned = entry.returned
+    if (
+      (typeof returned !== 'object' || returned === null) &&
+      typeof returned !== 'function'
+    )
+      return
+    consumerRequests.add(returned)
+    for (const field of ['result', 'settled'] as const) {
+      let work: unknown
+      let property: PropertyDescriptor | undefined
+      let reason: string | undefined
+      let accessFailed = false
+      let accessCause: unknown
+      try {
+        consumerControl(() => {
+          let value: object | null = returned
+          const visited = new Set<object>()
+          while (value && !visited.has(value)) {
+            visited.add(value)
+            property = Object.getOwnPropertyDescriptor(value, field)
+            if (property) break
+            value = Object.getPrototypeOf(value)
+          }
+          if (property) {
+            if ('value' in property) work = property.value
+            else reason = 'consumer-field-accessor-unavailable'
+          }
+        })
+      } catch (cause) {
+        accessFailed = true
+        accessCause = cause
+        reason = 'consumer-field-access-failed'
+      }
+      if (!property && !accessFailed) continue
+      const record: ConsumerEntry['unknownFields'][number] = {
+        field,
+        work,
+        observation: 'unavailable',
+        reason,
+        ...(accessFailed ? { cause: accessCause } : {}),
+      }
+      entry.unknownFields.push(record)
+      if (reason) continue
+      if (
+        (typeof work === 'object' && work !== null) ||
+        typeof work === 'function'
+      )
+        consumerFutures.add(work as object)
+      try {
+        if (!consumerControl(() => consumerFuture(work))) {
+          record.reason = 'consumer-field-future-unavailable'
+          continue
+        }
+      } catch (cause) {
+        record.reason = 'consumer-field-future-access-failed'
+        record.cause = cause
+        continue
+      }
+      // Observe the actual field only. This monitor grants no result/settlement authority.
+      record.observation = 'pending'
+      record.monitor = (async () => {
+        try {
+          await work
+          record.observation = 'fulfilled'
+        } catch (cause) {
+          record.observation = 'failed'
+          record.cause = cause
+        }
+      })()
+    }
   }
   const retainCleanup = (entry: ConsumerEntry) => {
     const binding = entry.binding
@@ -1286,6 +1366,7 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
           returned: undefined,
           unknown: 'consumer-dispatch-not-returned',
           cleanup: [],
+          unknownFields: [],
         }
         consumers.set(dispatchRef, consumer)
         let work: unknown
@@ -1320,6 +1401,7 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
         } catch (cause) {
           consumer.cause = cause
           consumer.unknown = 'consumer-binding-failed'
+          retainUnknownFields(consumer)
           throw cause
         }
         if (capability.supported) {
@@ -1331,6 +1413,7 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
             consumerFutures.has(binding.settled as object)
           ) {
             consumer.unknown = 'consumer-request-or-future-reused'
+            retainUnknownFields(consumer)
             throw new Error(consumer.unknown)
           }
           consumerRequests.add(binding.request)
@@ -1345,6 +1428,11 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
           })
         }
         consumer.unknown = capability.reason
+        const returnedFutureOwned =
+          ((typeof work === 'object' && work !== null) ||
+            typeof work === 'function') &&
+          consumerFutures.has(work as object)
+        retainUnknownFields(consumer)
         if (requireConsumer) {
           if (consumerFuture(work)) {
             consumerFutures.add(work as object)
@@ -1366,7 +1454,7 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
             'editor-session-attachment-dispatch-settlement-unavailable',
           )
         }
-        if (consumerFutures.has(work as object)) {
+        if (returnedFutureOwned) {
           consumer.unknown = 'consumer-request-or-future-reused'
           throw new Error(consumer.unknown)
         }
@@ -1424,6 +1512,9 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
               unknown: entry.unknown,
               cause: entry.cause,
               unknownObserverWork: entry.unknownObserverWork,
+              unknownFields: Object.freeze(
+                entry.unknownFields.map((record) => Object.freeze({ ...record })),
+              ),
               cleanup: Object.freeze(
                 entry.cleanup.map((record) =>
                   Object.freeze({
