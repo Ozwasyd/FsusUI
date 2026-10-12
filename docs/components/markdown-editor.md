@@ -605,6 +605,14 @@ running/legacy unknown futures refuse. An old-attempt marker cannot retire a lat
 attempt. Undo/redo never resurrect released File/item/batch records or controllers.
 Rejected removal restores only unchanged original job metadata, with owner/range/
 attempt/revision checks between setters; it issues no deletion or settlement proof.
+An accepted reentrant deletion during File abort never attempts retirement inside
+the cleanup/publication stack. The original binding retains its actual deletion
+attempt; the original cleanup unwind and completed transaction publication retry
+the real retirement sweep. Actual running/pending sweep state blocks resource
+inspection and is measured by the same native surface. Failure retains that
+outstanding work and propagates, with no idle/paused acknowledgement. Outer cancel/
+retry/remove rechecks original attempt/phase/range/binding/document/revision after
+abort callbacks and preserves the accepted reentrant result instead of overwriting it.
 This is same-owner/same-revision source only; full factory/draft/renderer/resource and
 native/worker/kernel/geometry/privacy acceptance remain blocked/UNRUN.
 

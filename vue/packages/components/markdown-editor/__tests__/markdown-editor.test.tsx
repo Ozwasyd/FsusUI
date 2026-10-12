@@ -937,6 +937,48 @@ describe('MarkdownEditor', () => {
     wrapper.unmount()
   })
 
+  it('publishes accepted abort-listener deletion before unwind retirement and preserves deleted state through outer cancel', async () => {
+    vi.useFakeTimers()
+    let editor!: MarkdownEditorInstance
+    let request!: Parameters<MarkdownEditorAttachmentDispatch>[0]
+    let finish!: (result: MarkdownAttachmentProviderResult) => void
+    let nested!: ReturnType<MarkdownEditorInstance['dispatchTransaction']>
+    const work = new Promise<MarkdownAttachmentProviderResult>((resolve) => { finish = resolve })
+    const wrapper = mount(MarkdownEditor, { props: {
+      mode: 'source', modelValue: '', documentIdentity: { id: 'unwind-delete-document', epoch: 1 },
+      attachmentDispatch: (input: Parameters<MarkdownEditorAttachmentDispatch>[0]) => {
+        request = input
+        input.item.signal.addEventListener('abort', () => {
+          const length = wrapper.find<HTMLTextAreaElement>('textarea').element.value.length
+          nested = editor.dispatchTransaction({ changes: [{ from: 0, to: length, insert: '' }], history: 'separate', origin: 'programmatic' })
+        }, { once: true })
+        return work
+      },
+    } })
+    editor = wrapper.vm as MarkdownEditorInstance
+    const picker = wrapper.find<HTMLInputElement>('.el-markdown-editor__attachment-picker')
+    Object.defineProperty(picker.element, 'files', { configurable: true, value: [new File(['source'], 'unwind.pdf', { type: 'application/pdf' })] })
+    await picker.trigger('change')
+    await wrapper.find('.el-markdown-editor__attachment-actions button').trigger('click')
+    expect(nested.accepted).toBe(true)
+    expect(wrapper.emitted('transaction')?.at(-1)?.[0]).toMatchObject({ accepted: true, value: '' })
+    expect(wrapper.emitted('update:modelValue')?.at(-1)?.[0]).toBe('')
+    const session = editor.getSession('session:unwind-delete')
+    await flushPromises()
+    await vi.runAllTimersAsync()
+    expect(session.captureSnapshot(() => 'a'.repeat(64)).panelRefs?.attachmentStateRef ?? null).toBeNull()
+    finish({ status: 'cancelled', batchId: request.batch.batchId, itemId: request.item.itemId,
+      documentIdentity: request.batch.documentIdentity, revision: request.batch.revision })
+    await flushPromises()
+    await vi.runAllTimersAsync()
+    const snapshot = session.captureSnapshot(() => 'b'.repeat(64))
+    expect(snapshot.panelRefs?.attachmentStateRef).toBeTruthy()
+    expect(session.readPanelState(snapshot)!.attachment![0]!.phase).toBe('deleted')
+    expect(editor.withAttachmentFile(request.batch, request.item, () => {})).toBe(false)
+    expect(() => session.pauseResources()).toThrow('editor-session-resource-owner-unavailable')
+    wrapper.unmount()
+  })
+
   it('edits active image and caption subranges through the compact property surface', async () => {
     const source =
       '![初始 alt](/old.png "old title")\n::caption[说明 😀 RTL אב]'

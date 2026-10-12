@@ -18,3 +18,6 @@ deletion provenance in the same original binding and refuse old/running/unknown
 attempts; native undo/redo cannot resurrect File custody.
 Expose read-only native content digest inspection with actual admission/context
 checks and no retained checkpoint/history mutation.
+Retry actual retirement after original File cleanup/publication unwind and preserve
+accepted reentrant deletion through the outer action; do not interrupt document
+notification or turn pending/failed cleanup into an idle resource acknowledgement.

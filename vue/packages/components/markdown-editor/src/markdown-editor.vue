@@ -1667,8 +1667,11 @@ const attachmentBatches = new Map<
   }
 >()
 let attachmentFileCleanupDepth = 0
+let attachmentPublicationDepth = 0
+let attachmentRetirementRequested = false
+let attachmentRetirementRunning = false
 const assertAttachmentFileControlIdle = () => {
-  if (attachmentFileCleanupDepth !== 0)
+  if (attachmentFileCleanupDepth !== 0 || attachmentPublicationDepth !== 0 || attachmentRetirementRunning || attachmentRetirementRequested)
     throw new Error('editor-session-attachment-file-cleanup-in-progress')
 }
 const revokeAttachmentFiles = (itemIds: readonly string[]) => {
@@ -1695,6 +1698,7 @@ const revokeAttachmentFiles = (itemIds: readonly string[]) => {
     for (const controller of batchControllers) controller.abort()
   } finally {
     attachmentFileCleanupDepth -= 1
+    flushAttachmentRetirement()
   }
 }
 const revokeAttachmentFile = (itemId: string) => revokeAttachmentFiles([itemId])
@@ -1716,6 +1720,7 @@ const releaseAttachmentFiles = () => {
     }
   } finally {
     attachmentFileCleanupDepth -= 1
+    flushAttachmentRetirement()
   }
 }
 const legacyAttachmentAttempts = new WeakMap<MarkdownAttachmentItemIntent, number>()
@@ -1723,6 +1728,7 @@ const attachmentJobBindings = new WeakMap<MarkdownAttachmentJob, {
   readonly batch: MarkdownAttachmentBatchIntent
   readonly item: MarkdownAttachmentItemIntent
   readonly deletionAttempt?: number
+  readonly retirementAttempt?: number
 }>()
 // Only an actual settled non-retryable attempt can retire original File/item
 // custody. Keep the SAME job and dispatch proof as terminal checkpoint state.
@@ -1732,7 +1738,10 @@ const retireSettledAttachmentRecords = (
   item: MarkdownAttachmentItemIntent,
   attempt: number,
 ) => {
-  assertAttachmentFileControlIdle()
+  if (attachmentFileCleanupDepth !== 0 || attachmentPublicationDepth !== 0) {
+    attachmentRetirementRequested = true
+    return
+  }
   const originalJob = toRaw(job)
   const proof = inspectMarkdownAttachmentDispatch(originalJob)
   const binding = attachmentJobBindings.get(originalJob)
@@ -1786,13 +1795,45 @@ const acceptAttachmentDeletion = (job: MarkdownAttachmentJob, identity: Markdown
       attachmentBatches.get(binding.batch.batchId)?.batch !== binding.batch) return
   // Derived only from the actual accepted native deletion, in the SAME existing
   // binding. No body/transaction copy, new index or settlement acknowledgement.
-  attachmentJobBindings.set(original, Object.freeze({ ...binding, deletionAttempt: original.attempt }))
+  attachmentJobBindings.set(original, Object.freeze({ ...binding, deletionAttempt: original.attempt, retirementAttempt: original.attempt }))
 }
 const retireAcceptedAttachmentDeletion = (job: MarkdownAttachmentJob) => {
   const original = toRaw(job)
   const binding = attachmentJobBindings.get(original)
-  if (binding?.deletionAttempt === original.attempt)
-    retireSettledAttachmentRecords(original, binding.batch, binding.item, original.attempt)
+  if (binding?.deletionAttempt === original.attempt) {
+    attachmentRetirementRequested = true
+    flushAttachmentRetirement()
+  }
+}
+const requestTerminalAttachmentRetirement = (job: MarkdownAttachmentJob, attempt: number) => {
+  const original = toRaw(job)
+  const binding = attachmentJobBindings.get(original)
+  if (!binding || original.attempt !== attempt ||
+      (original.phase !== 'resolved' && !(original.phase === 'deleted' && binding.deletionAttempt === attempt))) return
+  attachmentJobBindings.set(original, Object.freeze({ ...binding, retirementAttempt: attempt }))
+  attachmentRetirementRequested = true
+  flushAttachmentRetirement()
+}
+const flushAttachmentRetirement = () => {
+  if (!attachmentRetirementRequested || attachmentFileCleanupDepth !== 0 || attachmentPublicationDepth !== 0 || attachmentRetirementRunning) return
+  attachmentRetirementRequested = false
+  attachmentRetirementRunning = true
+  try {
+    for (const job of attachmentJobs.value) {
+      const original = toRaw(job)
+      const binding = attachmentJobBindings.get(original)
+      if (binding?.retirementAttempt === original.attempt && (original.phase === 'resolved' ||
+          (original.phase === 'deleted' && binding.deletionAttempt === original.attempt)))
+        retireSettledAttachmentRecords(original, binding.batch, binding.item, original.attempt)
+    }
+  } catch (error) {
+    // Preserve the actual outstanding sweep and propagate failure; never turn
+    // failed retirement into an idle/paused acknowledgement.
+    attachmentRetirementRequested = true
+    throw error
+  } finally {
+    attachmentRetirementRunning = false
+  }
 }
 const withAttachmentFile = (
   batch: MarkdownAttachmentBatchIntent,
@@ -2620,7 +2661,7 @@ const restoreTextareaSelection = async (
 
 let pendingMetricsChange: MarkdownEditorMetricsChange | undefined
 
-const dispatchEditorOperation = (
+const performEditorOperation = (
   operation: EditorOperation,
 ): MarkdownEditorDispatchResult => {
   const transaction = operationTransaction(
@@ -2815,6 +2856,20 @@ const dispatchEditorOperation = (
     void restoreTextareaSelection(result.selection, true, isCurrentSelection)
   }
   return result
+}
+const dispatchEditorOperation = (operation: EditorOperation): MarkdownEditorDispatchResult => {
+  attachmentPublicationDepth += 1
+  let published = false
+  try {
+    const result = performEditorOperation(operation)
+    published = true
+    return result
+  } finally {
+    attachmentPublicationDepth -= 1
+    // Accepted transaction/model/selection/history effects finish before any
+    // retirement reader can fail. Nested File cleanup drains only after unwind.
+    if (published) flushAttachmentRetirement()
+  }
 }
 
 const readSelectionFrom = (
@@ -5401,7 +5456,7 @@ const dispatchAttachmentBatch = (
       job.code = 'attachment-dispatch-rejected'
       revokeAttachmentFile(item.itemId)
     }).finally(() => {
-      if (record) retireSettledAttachmentRecords(job, record.batch, item, attempt)
+      if (record) requestTerminalAttachmentRetirement(job, attempt)
       // Refresh retry eligibility from real settlement even for cancelled jobs.
       triggerRef(attachmentJobs)
     })
@@ -5416,7 +5471,19 @@ const runAttachmentAction = (
     (candidate) => candidate.itemId === itemId,
   )
   if (!job || sessionDisposed || editorReleased || attachmentPauseRequested.value) return
+  const original = toRaw(job)
+  const originalAttempt = original.attempt
+  const originalPhase = original.phase
+  const originalRange = original.range
+  const originalBinding = attachmentJobBindings.get(original)
+  const originalIdentity = transactionStore.documentIdentity
+  const originalRevision = transactionStore.revision
   revokeAttachmentFile(itemId)
+  if (sessionDisposed || editorReleased || attachmentPauseRequested.value ||
+      !attachmentJobs.value.some((candidate) => toRaw(candidate) === original) || original.attempt !== originalAttempt ||
+      original.phase !== originalPhase || original.range !== originalRange || attachmentJobBindings.get(original) !== originalBinding ||
+      transactionStore.documentIdentity.id !== originalIdentity.id || transactionStore.documentIdentity.epoch !== originalIdentity.epoch ||
+      transactionStore.revision !== originalRevision) return
   if (action === 'cancel') {
     cancelMarkdownAttachmentJob(job)
   } else if (action === 'retry') {
@@ -6678,7 +6745,7 @@ const surfaceResourceParticipant: MarkdownEditorSessionResourceParticipant = {
         renderers: 0,
         observers: typewriterResizeObserver ? 1 : 0,
         timers: layoutGestureTimer === undefined ? 0 : 1,
-        backgroundTasks: 0,
+        backgroundTasks: Number(attachmentFileCleanupDepth !== 0 || attachmentPublicationDepth !== 0 || attachmentRetirementRunning || attachmentRetirementRequested),
         networkRequests: 0,
         memoryUnits: Math.ceil((transactionStore.value.length + transactionStore.retainedSessionUnits) * 2 / 65536) +
           sessionBinding.inspectRetainedPanelMemoryUnits(),
