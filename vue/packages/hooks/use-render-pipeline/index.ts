@@ -720,7 +720,7 @@ const createRenderPipelineProducerAuthority = (missingFeeds: string[] = []) => {
         const result: unknown = subscription.listener()
         if (
           result !== null &&
-          typeof result === 'object' &&
+          (typeof result === 'object' || typeof result === 'function') &&
           typeof (result as { then?: unknown }).then === 'function'
         ) {
           brokenFeed = true
@@ -1029,14 +1029,23 @@ const createRenderPipelineProducerAuthority = (missingFeeds: string[] = []) => {
         ].filter((entry) => entry.registering || entry.unsubscribe === null)
           .length,
         dependencyReleaseObligations: Object.freeze(
-          [...retiringDependencies].map((entry) =>
-            Object.freeze({
-              dependencyId: entry.id,
-              source: entry.source,
-              unsubscribe: entry.unsubscribe,
-              unsubscribed: entry.unsubscribed,
-            }),
-          ),
+          [...dependencies.values(), ...retiringDependencies]
+            .filter(
+              (entry) =>
+                closed ||
+                entry.releaseRequested ||
+                retiringDependencies.has(entry),
+            )
+            .map((entry) =>
+              Object.freeze({
+                dependencyId: entry.id,
+                source: entry.source,
+                unsubscribe: entry.unsubscribe,
+                unsubscribed: entry.unsubscribed,
+                registering: entry.registering,
+                releaseRequested: entry.releaseRequested,
+              }),
+            ),
         ),
         retiringDependencyRecords: retiringDependencies.size,
         closed,
