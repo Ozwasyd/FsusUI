@@ -91,6 +91,7 @@ export interface MarkdownAttachmentDispatchFutureObservation {
 }
 
 interface MarkdownAttachmentDispatchObservationControls {
+  isCompletion(work: unknown): boolean
   within(action: () => void): void
   retain(
     kind: 'result' | 'settled',
@@ -227,12 +228,22 @@ export const runMarkdownAttachmentDispatch = async (
   try {
     const work = dispatch()
     state.dispatching = false
-    if (work && 'result' in work && 'settled' in work) {
+    const fallbackCompletion = () => Boolean(work && !('then' in work) && 'result' in work && 'settled' in work)
+    let completion = false
+    within(() => {
+      try { completion = controls ? controls.isCompletion(work) : fallbackCompletion() }
+      catch (cause) {
+        notificationCauses.push(cause)
+        try { completion = fallbackCompletion() }
+        catch (failure) { notificationCauses.push(failure) }
+      }
+    })
+    if (completion) {
       const capture = (kind: 'result' | 'settled') => {
         let original: unknown
         let access: { readonly cause: unknown } | undefined
         within(() => {
-          try { original = work[kind] }
+          try { original = (work as MarkdownAttachmentDispatchCompletion)[kind] }
           catch (cause) { access = { cause } }
         })
         return { original, access }

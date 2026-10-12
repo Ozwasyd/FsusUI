@@ -1380,6 +1380,7 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
       throw new Error('editor-session-attachment-dispatch-admission-blocked')
     observedAttachmentJobs.add(ownedJob)
     let dispatchRef: object | undefined
+    let completion: object | undefined
     let bindSettlement:
       | ((
           result: MarkdownAttachmentProviderResult,
@@ -1502,10 +1503,11 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
           consumer.binding = binding
           consumer.unknown = undefined
           // Forward the TWO actual original futures; never start another service.
-          return Object.freeze({
+          completion = Object.freeze({
             result: binding.result,
             settled: binding.settled,
           })
+          return completion as { result: typeof binding.result; settled: typeof binding.settled }
         }
         consumer.unknown = capability.reason
         const returnedFutureOwned =
@@ -1554,6 +1556,7 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
         consumer.legacyResultOnly = true
         return work as unknown as PromiseLike<MarkdownAttachmentProviderResult>
       }, {
+        isCompletion: (work) => completion !== undefined && work === completion,
         within: consumerControl,
         retain(kind, ledger) {
           const entry = dispatchRef && consumers.get(dispatchRef)
@@ -1563,7 +1566,7 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
           if (!entry || ledger.work !== original)
             throw new Error('editor-session-attachment-observation-custody-invalid')
           const observation = claimConsumerObservation(original)
-          // BOTH real handlers/observer custody exist before lifecycle notifies us.
+          // Retain the established handler or actual access-failure debt.
           observation.ledger = ledger
           observation.monitor = ledger.monitor
           observation.reserved = false
