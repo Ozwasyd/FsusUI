@@ -107,7 +107,10 @@ import {
   hasUnavailableMarkdownRendererWorkerListenerRegistration,
   inspectMarkdownRendererWorkerCleanupResidue,
 } from './markdown-renderer-session-resources'
-import type { MarkdownRendererRestoreProof } from './markdown-renderer-session-resources'
+import type {
+  MarkdownRendererRestoreProof,
+  MarkdownRendererOwnedTimer,
+} from './markdown-renderer-session-resources'
 import type { FsusRenderPipelineAdapter } from '@element-plus/hooks'
 import type {
   MarkdownHeavyFeatureIdentity,
@@ -330,7 +333,7 @@ const getChunkUnitAttrs = (
 }
 
 let currentTaskId = 0
-let debounceTimer: ReturnType<typeof setTimeout> | null = null
+let debounceTimer: MarkdownRendererOwnedTimer | null = null
 let activationController: AbortController | null = null
 let activationObserver: IntersectionObserver | null = null
 let resettingFeatureActivation = false
@@ -515,6 +518,59 @@ const rendererResourceOwner: ReturnType<
     (activationController ? 1 : 0) +
     (activationObserver ? 1 : 0),
   readDocumentAuthority: () => heavyDocumentContext?.documentAuthority ?? null,
+  pauseRelatedResources: () => [
+    {
+      phase: 'pipeline-resource-pause',
+      resource: renderPipelineRuntime,
+      run: () => {
+        renderPipelineRuntime.pause()
+      },
+    },
+    {
+      phase: 'virtual-resource-pause',
+      resource: virtualWindow,
+      run: () => {
+        virtualWindow.pause()
+      },
+    },
+    {
+      phase: 'heavy-resource-pause',
+      resource: heavyLifecycle,
+      run: () => heavyLifecycle.pause(),
+    },
+    {
+      phase: 'theme-listener-remove',
+      resource: heavyThemeListenerTarget,
+      run: removeHeavyFeatureThemeListener,
+    },
+    controllerCleanup(activationController),
+    observerCleanup(activationObserver),
+  ],
+  resumeRelatedResources: () => [
+    {
+      phase: 'pipeline-resource-resume',
+      resource: renderPipelineRuntime,
+      run: () => {
+        renderPipelineRuntime.resume()
+      },
+    },
+    {
+      phase: 'virtual-resource-resume',
+      resource: virtualWindow,
+      run: () => {
+        virtualWindow.resume()
+      },
+    },
+    {
+      phase: 'heavy-resource-resume',
+      resource: heavyLifecycle,
+      run: () => {
+        if (!heavyLifecycle.resume())
+          throw new Error('markdown-renderer-heavy-resource-resume-unavailable')
+      },
+    },
+  ],
+  recreateCurrentFrames: () => scheduleMeasurementWarmup(),
   readProjectionResources: () => {
     const heavy = heavyLifecycle.metrics()
     return {
@@ -1214,6 +1270,7 @@ const virtualWindow = useFsusVirtualWindow<MarkdownRenderChunk>({
   units: chunkUnits,
 })
 
+rendererResourceOwner.bindRendererDisposer(disposeRendererResources)
 onBeforeUnmount(disposeRendererResources)
 try {
   rendererResourceOwner.bindCheckpointSealSources({
