@@ -1533,6 +1533,7 @@ const attrs = useAttrs()
 const rootElementRef = ref<HTMLElement | null>(null)
 const sessionSurfacePaused = ref(false)
 const nativeHandoverReceiving = ref(false)
+let nativeHandoverViewRestoring = false
 let invalidateNativeSurfacePublication: (() => void) | undefined = undefined
 let sessionDisposed = false
 let retireSnapshotPublicationAuthority: (() => void) | undefined = undefined
@@ -7054,23 +7055,36 @@ const sessionBinding = createMarkdownEditorSessionBinding({
   nativeSurfaceResourceHandle: nativeSurfaceResources.handle,
   setNativeHandoverReceiving: (receiving) => { nativeHandoverReceiving.value = receiving },
   restoreNativeHandoverState: async () => {
-    const identity = transactionStore.documentIdentity
-    const textarea = textareaRef.value
-    const root = rootElementRef.value
-    const current = () => !sessionDisposed && !isComposing.value && !nativeMachine.composing &&
-      isEditorDocumentCurrent(identity) && textareaRef.value === textarea &&
-      rootElementRef.value === root && !!root?.isConnected && !!textarea?.isConnected
-    if (!current()) throw new Error('editor-native-handover-view-unavailable')
-    editorValue.value = transactionStore.value
-    editorRevision.value = transactionStore.revision
-    editorSelection.value = transactionStore.selection
-    nativeCompositionValue.value = transactionStore.value
-    const selection = transactionStore.selection
-    await restoreTextareaSelection(selection, false, current)
-    if (!current() || textarea!.value !== transactionStore.value ||
-      textarea!.selectionStart !== selection.start || textarea!.selectionEnd !== selection.end ||
-      textarea!.selectionDirection !== selection.direction)
-      throw new Error('editor-native-handover-view-restore-not-confirmed')
+    if (nativeHandoverViewRestoring) throw new Error('editor-native-handover-view-reentrant')
+    nativeHandoverViewRestoring = true
+    try {
+      const identity = transactionStore.documentIdentity
+      const textarea = textareaRef.value
+      const root = rootElementRef.value
+      const document = root?.ownerDocument
+      const revision = transactionStore.revision
+      const value = transactionStore.value
+      const selected = transactionStore.selection
+      const sameOwner = () => !sessionDisposed && !isComposing.value && !nativeMachine.composing &&
+        isEditorDocumentCurrent(identity) && textareaRef.value === textarea &&
+        rootElementRef.value === root && transactionStore.revision === revision && transactionStore.value === value &&
+        transactionStore.selection.start === selected.start && transactionStore.selection.end === selected.end &&
+        transactionStore.selection.direction === selected.direction
+      const current = () => sameOwner() && !!document && root?.ownerDocument === document &&
+        textarea?.ownerDocument === document && !!root?.isConnected && !!textarea?.isConnected &&
+        root.contains(textarea) && root.ownerDocument === document && textarea.ownerDocument === document && sameOwner()
+      if (!current()) throw new Error('editor-native-handover-view-unavailable')
+      editorValue.value = transactionStore.value
+      editorRevision.value = transactionStore.revision
+      editorSelection.value = transactionStore.selection
+      nativeCompositionValue.value = transactionStore.value
+      const selection = transactionStore.selection
+      await restoreTextareaSelection(selection, false, current)
+      if (!current() || textarea!.value !== transactionStore.value ||
+        textarea!.selectionStart !== selection.start || textarea!.selectionEnd !== selection.end ||
+        textarea!.selectionDirection !== selection.direction)
+        throw new Error('editor-native-handover-view-restore-not-confirmed')
+    } finally { nativeHandoverViewRestoring = false }
   },
   resourceParticipants: () => [
     frameResourceParticipant, sessionLayoutResources.participant,

@@ -151,6 +151,8 @@ export interface MarkdownEditorSession {
     readonly revision: number
     readonly principal: MarkdownEditorNativeHandoverPrincipal
   }): Promise<MarkdownEditorNativeHandoverProof>
+  inspectNativeHandoverCleanup(): Readonly<{ pending: boolean; running: boolean; primaryCause: unknown; firstCause: unknown; latestCause: unknown }>
+  retryNativeHandoverCleanup(): boolean
   inspectAttachmentResourceSource(): MarkdownEditorSessionAttachmentResourceSource | null
   captureLastValidRender(): MarkdownEditorSessionLastValidRender | null
   restoreLastValidRender(render: MarkdownEditorSessionLastValidRender, expected: {
@@ -251,6 +253,7 @@ export const createMarkdownEditorSessionBinding = <ViewState>(
   const documentAuthority = owner.documentAuthority ?? null
   const readRendererCheckpointHandle = owner.getRendererCheckpointHandle?.bind(owner)
   const nativeSurfaceResourceHandle = owner.nativeSurfaceResourceHandle ?? null
+  const setNativeHandoverReceiving = owner.setNativeHandoverReceiving?.bind(owner)
   // Pin the original producer implementation, not replaceable consumer methods.
   const validatePreparedTransaction = MarkdownEditorTransactionStore.prototype.validatePreparedRetainedSnapshot.bind(transactionStore)
   const publishPreparedTransaction = MarkdownEditorTransactionStore.prototype.commitPreparedRetainedSnapshot.bind(transactionStore)
@@ -280,6 +283,13 @@ export const createMarkdownEditorSessionBinding = <ViewState>(
   let authorityRetired = false
   let nativeHandover: OriginalNativeHandover | null = null
   let adoptingNativeHandover = false
+  let nativeHandoverCleanup: {
+    readonly primaryCause: unknown
+    readonly firstCause: unknown
+    latestCause: unknown
+    running: boolean
+    readonly cleanup: () => void
+  } | undefined
   let sealed: {
     readonly publication: MarkdownEditorSessionSnapshotPublication
     readonly candidate: NonNullable<typeof prepared>
@@ -457,18 +467,38 @@ export const createMarkdownEditorSessionBinding = <ViewState>(
             fullRefsRestored: false, resourcesValidated: false })
           adoptingNativeHandover = true
           try {
-            owner.setNativeHandoverReceiving?.(true)
+            setNativeHandoverReceiving?.(true)
             const originalSequence = await (handover as OriginalNativeHandover)[adoptNativeHandover](
               transactionStore, editorSessionRef, expected.principal, async () => {
                 await restore()
-                owner.setNativeHandoverReceiving?.(false)
+                setNativeHandoverReceiving?.(false)
               }, admit)
             sequence = Math.max(sequence, originalSequence)
             return proof
           } catch (cause) {
-            try { owner.setNativeHandoverReceiving?.(false) } catch { /* Original adoption cause wins. */ }
+            try { setNativeHandoverReceiving?.(false) }
+            catch (cleanupCause) {
+              nativeHandoverCleanup = { primaryCause: cause, firstCause: cleanupCause,
+                latestCause: cleanupCause, running: false, cleanup: () => setNativeHandoverReceiving?.(false) }
+            }
             throw cause
-          } finally { adoptingNativeHandover = false }
+          } finally { if (!nativeHandoverCleanup) adoptingNativeHandover = false }
+        },
+        inspectNativeHandoverCleanup: () => Object.freeze({ pending: nativeHandoverCleanup !== undefined,
+          running: nativeHandoverCleanup?.running ?? false, primaryCause: nativeHandoverCleanup?.primaryCause,
+          firstCause: nativeHandoverCleanup?.firstCause, latestCause: nativeHandoverCleanup?.latestCause }),
+        retryNativeHandoverCleanup() {
+          const debt = nativeHandoverCleanup
+          if (!debt || debt.running) return false
+          debt.running = true
+          try {
+            debt.cleanup()
+            if (nativeHandoverCleanup !== debt) throw new Error('editor-session-native-handover-cleanup-owner-changed')
+            nativeHandoverCleanup = undefined
+            adoptingNativeHandover = false
+            return true
+          } catch (cause) { debt.latestCause = cause; throw cause }
+          finally { debt.running = false }
         },
         getRendererCheckpointHandle() {
           assertAvailable()

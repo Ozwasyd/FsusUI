@@ -1332,3 +1332,14 @@ pause/dispose/eviction or cross-startup revival. Renderer checkpoint recreation,
 panel/provider state and Vue render/v-model/scheduler resource qualification remain
 separate source dependencies. Main factory/composition/host readiness guards and
 all runtime/native/IME/security/privacy/receipt qualifications remain held.
+
+Receiving cleanup has independent original custody. If clearing the receiving
+flag throws after adoption failure, `inspectNativeHandoverCleanup()` retains the
+original primary cause and cleanup first/latest causes; the adopting barrier
+stays closed. The held session's `retryNativeHandoverCleanup()` retries that same
+pinned cleanup callback, refuses reentry/healthy retries, and releases the barrier
+only on genuine success. Primary rejection identity is never replaced by cleanup.
+Actual SFC restoration also pins its original document/root/textarea and locks
+reentry; owner identity, document membership and root containment are checked
+before and after the awaited original selection restoration. A connected node
+moved elsewhere cannot produce a successful native recreation proof.

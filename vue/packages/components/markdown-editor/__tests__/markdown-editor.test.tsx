@@ -113,6 +113,96 @@ describe('MarkdownEditor', () => {
     expect(source.history.canUndo).toBe(false)
   })
 
+  it('retains receiving cleanup debt and the adopting barrier with original primary cause until genuine retry succeeds', async () => {
+    const identity = { id: 'handover-cleanup-debt', epoch: 1 }
+    const source = new MarkdownEditorTransactionStore('source', undefined, identity)
+    let disposed = false
+    const binding = handoverOwner(source, () => disposed)
+    const session = binding.getSession('session:handover-cleanup-debt')
+    const snapshot = session.captureSnapshot(() => 'a'.repeat(64))
+    const principal = { hasCustody: () => true }
+    const offer = session.prepareNativeHandover(snapshot, principal)
+    source.retireDocumentAuthority(); binding.retirePublicationAuthority(); disposed = true; source.releaseRetainedSnapshot()
+    const primary = { tag: 'original-adoption-cause' }
+    const cleanup = { tag: 'independent-receiving-cleanup-cause' }
+    let failCleanup = true
+    let failRestore = true
+    let reenter = false
+    const target = new MarkdownEditorTransactionStore('source', undefined, identity)
+    const targetBinding = createMarkdownEditorSessionBinding({
+      transactionStore: target, isDisposed: () => false, isComposing: () => false,
+      captureViewState: () => null, restoreViewState: () => {},
+      captureLastValidRender: () => null, resourceParticipants: () => [],
+      restoreNativeHandoverState: async () => { if (failRestore) throw primary },
+      setNativeHandoverReceiving: (receiving) => {
+        if (!receiving && reenter) {
+          expect(receiver.retryNativeHandoverCleanup()).toBe(false)
+          expect(() => receiver.inspectDocumentState()).toThrow('editor-session-native-handover-reentrant')
+        }
+        if (!receiving && failCleanup) throw cleanup
+      },
+    })
+    const receiver = targetBinding.getSession(snapshot.editorSessionRef)
+    await expect(receiver.adoptNativeHandover(offer, { documentIdentity: identity, revision: snapshot.revision, principal })).rejects.toBe(primary)
+    expect(receiver.inspectNativeHandoverCleanup()).toMatchObject({ pending: true, running: false,
+      primaryCause: primary, firstCause: cleanup, latestCause: cleanup })
+    expect(() => receiver.inspectDocumentState()).toThrow('editor-session-native-handover-reentrant')
+    let retried: unknown
+    try { receiver.retryNativeHandoverCleanup() } catch (cause) { retried = cause }
+    expect(retried).toBe(cleanup)
+    expect(receiver.inspectNativeHandoverCleanup().pending).toBe(true)
+    failCleanup = false
+    reenter = true
+    expect(receiver.retryNativeHandoverCleanup()).toBe(true)
+    reenter = false
+    expect(receiver.retryNativeHandoverCleanup()).toBe(false)
+    expect(receiver.inspectNativeHandoverCleanup().pending).toBe(false)
+    failRestore = false
+    await receiver.adoptNativeHandover(offer, { documentIdentity: identity, revision: snapshot.revision, principal })
+  })
+
+  it.each(['before', 'during', 'other-document'] as const)(
+    'refuses actual target textarea moved outside its original root or document %s restore without transferring old pins', async (phase) => {
+      const identity = { id: `handover-containment-${phase}`, epoch: 1 }
+      const source = new MarkdownEditorTransactionStore('source', undefined, identity)
+      let disposed = false
+      const binding = handoverOwner(source, () => disposed)
+      const session = binding.getSession(`session:handover-containment-${phase}`)
+      const snapshot = session.captureSnapshot(() => 'a'.repeat(64))
+      const principal = { hasCustody: () => true }
+      const offer = session.prepareNativeHandover(snapshot, principal)
+      source.retireDocumentAuthority(); binding.retirePublicationAuthority(); disposed = true; source.releaseRetainedSnapshot()
+      const wrapper = mount(MarkdownEditor, { attachTo: document.body,
+        props: { modelValue: 'source', mode: 'source', statusDensity: 'minimal', documentIdentity: identity } })
+      await flushPromises()
+      const root = wrapper.element as HTMLElement
+      const textarea = wrapper.find('textarea').element as HTMLTextAreaElement
+      const outside = document.createElement('div')
+      document.body.appendChild(outside)
+      const setSelection = textarea.setSelectionRange.bind(textarea)
+      if (phase === 'during') {
+        textarea.setSelectionRange = (start, end, direction) => {
+          outside.appendChild(textarea)
+          setSelection(start, end, direction)
+        }
+      } else if (phase === 'other-document') {
+        document.implementation.createHTMLDocument('foreign-target').body.appendChild(textarea)
+      } else outside.appendChild(textarea)
+      const receiver = wrapper.vm.getSession(snapshot.editorSessionRef)
+      try {
+        await expect(receiver.adoptNativeHandover(offer, { documentIdentity: identity,
+          revision: snapshot.revision, principal })).rejects.toThrow('editor-native-handover-view-')
+        expect(offer.inspect().state).toBe('released')
+        expect(offer.cancel()).toBe(true)
+      } finally {
+        textarea.setSelectionRange = setSelection
+        root.appendChild(textarea)
+        wrapper.unmount()
+        outside.remove()
+      }
+    },
+  )
+
   it('refuses native handover for foreign handles stale epoch source principal and pre-retirement writes without releasing originals', async () => {
     const identity = { id: 'native-handover-refusal', epoch: 1 }
     const source = new MarkdownEditorTransactionStore('source', undefined, identity)
