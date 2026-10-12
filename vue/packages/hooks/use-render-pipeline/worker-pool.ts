@@ -124,6 +124,8 @@ export type FsusWorkerResourceInspection = {
   scope: FsusWorkerTaskScope | null
   shared: {
     attribution: 'unattributable'
+    /** Producer revocation subscriptions are shared, not task-owned. */
+    authorityListenerCount: number
     backgroundTimerActive: boolean
     canceledResponseIdCount: number
     generationKeyCount: number
@@ -459,6 +461,71 @@ export const createFsusWorkerExecutor = <TRequest, TResponse>(
   const visibilityDocument =
     typeof document === 'undefined' ? undefined : document
 
+  let authorityTicket: object | null = null
+  let authorityDepth = 0
+  let authorityFeedUnavailable = false
+  const authorityListeners = new Set<{ listener: () => void }>()
+
+  // Revoke before external reads/callbacks, including native callback entry.
+  // Nested calls cannot issue tickets, so one synchronous feed per outer entry
+  // covers the whole operation without introducing another scheduler.
+  const withAuthorityChange = <T>(action: () => T): T => {
+    authorityDepth += 1
+    authorityTicket = null
+    try {
+      if (authorityDepth === 1) {
+        for (const subscription of [...authorityListeners]) {
+          if (!authorityListeners.has(subscription)) continue
+          try {
+            const listener = subscription.listener
+            listener()
+          } catch {
+            // A broken custody feed cannot safely issue another ticket. Keep
+            // attempting the other feeds and actual resource cleanup.
+            authorityFeedUnavailable = true
+          }
+        }
+      }
+      return action()
+    } finally {
+      authorityDepth -= 1
+    }
+  }
+
+  const authorityBoundary =
+    <TArgs extends unknown[], TResult>(action: (...args: TArgs) => TResult) =>
+    (...args: TArgs): TResult =>
+      withAuthorityChange(() => action(...args))
+
+  // This proves only producer-owned JS custody. It says nothing about native
+  // worker internals, readiness, memory, or another owner's shared-pool work.
+  const authority = Object.freeze({
+    issueTicket: (): object | null => {
+      if (disposed || authorityDepth > 0 || authorityFeedUnavailable)
+        return null
+      authorityTicket ??= {}
+      return authorityTicket
+    },
+    isCurrent: (ticket: unknown): boolean =>
+      !disposed &&
+      authorityDepth === 0 &&
+      !authorityFeedUnavailable &&
+      authorityTicket !== null &&
+      ticket === authorityTicket,
+    subscribe: (listener: () => void): (() => void) =>
+      withAuthorityChange(() => {
+        if (disposed) throw new Error('fsus_worker_executor_disposed')
+        if (typeof listener !== 'function')
+          throw new TypeError('fsus_worker_authority_listener_invalid')
+        const subscription = { listener }
+        authorityListeners.add(subscription)
+        return () => {
+          if (!authorityListeners.has(subscription)) return
+          withAuthorityChange(() => authorityListeners.delete(subscription))
+        }
+      }),
+  })
+
   const queueDepth = () =>
     lanes.reduce((sum, lane) => sum + queues[lane].length, 0)
   const activeCount = () =>
@@ -626,11 +693,14 @@ export const createFsusWorkerExecutor = <TRequest, TResponse>(
     if (disposed || retainCount > 0 || pending.size > 0 || slots.length === 0)
       return
     clearIdleTimer()
-    idleTerminateTimer = setTimeout(() => {
-      idleTerminateTimer = null
-      if (retainCount > 0 || pending.size > 0) return
-      terminateIdleSlots()
-    }, idleTerminateMs)
+    idleTerminateTimer = setTimeout(
+      authorityBoundary(() => {
+        idleTerminateTimer = null
+        if (retainCount > 0 || pending.size > 0) return
+        terminateIdleSlots()
+      }),
+      idleTerminateMs,
+    )
   }
 
   const releaseRetain = () => {
@@ -745,17 +815,23 @@ export const createFsusWorkerExecutor = <TRequest, TResponse>(
       return
     canceledSlotTimers.set(
       id,
-      setTimeout(() => {
-        canceledSlotTimers.delete(id)
-        if (slot.alive && slot.activeTaskId === id) {
-          const error = createFsusError('timeout', 'fsus_worker_cancel_timeout')
-          runCleanup([
-            () => terminateSlot(slot, 'worker-error', error),
-            () => pump(),
-            () => scheduleIdleTerminate(),
-          ])
-        }
-      }, requestTimeoutMs),
+      setTimeout(
+        authorityBoundary(() => {
+          canceledSlotTimers.delete(id)
+          if (slot.alive && slot.activeTaskId === id) {
+            const error = createFsusError(
+              'timeout',
+              'fsus_worker_cancel_timeout',
+            )
+            runCleanup([
+              () => terminateSlot(slot, 'worker-error', error),
+              () => pump(),
+              () => scheduleIdleTerminate(),
+            ])
+          }
+        }),
+        requestTimeoutMs,
+      ),
     )
   }
 
@@ -1085,9 +1161,9 @@ export const createFsusWorkerExecutor = <TRequest, TResponse>(
     // The returned handle must be visible to teardown before external setters.
     slots.push(slot)
     const messageHandler: Worker['onmessage'] = (event) =>
-      handleWorkerMessage(slot, event)
+      withAuthorityChange(() => handleWorkerMessage(slot, event))
     const errorHandler: Worker['onerror'] = (event) =>
-      handleWorkerCrash(slot, event as ErrorEvent)
+      withAuthorityChange(() => handleWorkerCrash(slot, event as ErrorEvent))
     try {
       if (disposed) throw new Error('fsus_worker_executor_disposed')
       if (slots.length > maxWorkers)
@@ -1142,10 +1218,13 @@ export const createFsusWorkerExecutor = <TRequest, TResponse>(
       if (disposed) return undefined
       if (busy) {
         if (hasRunnable('background') && !backgroundTimer) {
-          backgroundTimer = setTimeout(() => {
-            backgroundTimer = null
-            pump()
-          }, backgroundDeferMs)
+          backgroundTimer = setTimeout(
+            authorityBoundary(() => {
+              backgroundTimer = null
+              pump()
+            }),
+            backgroundDeferMs,
+          )
         }
       } else {
         if (hasRunnable('latency') && latencyServedBeforeBackground < 4) {
@@ -1465,11 +1544,11 @@ export const createFsusWorkerExecutor = <TRequest, TResponse>(
       throw error
     }
     let released = false
-    return () => {
+    return authorityBoundary(() => {
       if (released) return
       released = true
       releaseRetain()
-    }
+    })
   }
 
   const dispose = () => {
@@ -1653,32 +1732,36 @@ export const createFsusWorkerExecutor = <TRequest, TResponse>(
       pending.set(id, task)
       generationAuthority.preparing = false
       try {
-        task.timeoutId = setTimeout(() => {
-          const error = createFsusError(
-            'timeout',
-            'fsus_worker_request_timeout',
-          )
-          const slot = slots.find((candidate) => candidate.id === task.slotId)
-          if (slot?.alive && slot.activeTaskId === task.id)
-            rememberCanceledId(task.id)
-          runCleanup([
-            () => {
-              if (slot) terminateSlot(slot, 'worker-error', error)
-            },
-            () =>
-              settleTask(
-                task,
-                fsusErr(error),
-                'request-timeout',
-                error,
-                undefined,
-                !slot?.alive,
-              ),
-          ])
-        }, requestTimeoutMs)
+        task.timeoutId = setTimeout(
+          authorityBoundary(() => {
+            const error = createFsusError(
+              'timeout',
+              'fsus_worker_request_timeout',
+            )
+            const slot = slots.find((candidate) => candidate.id === task.slotId)
+            if (slot?.alive && slot.activeTaskId === task.id)
+              rememberCanceledId(task.id)
+            runCleanup([
+              () => {
+                if (slot) terminateSlot(slot, 'worker-error', error)
+              },
+              () =>
+                settleTask(
+                  task,
+                  fsusErr(error),
+                  'request-timeout',
+                  error,
+                  undefined,
+                  !slot?.alive,
+                ),
+            ])
+          }),
+          requestTimeoutMs,
+        )
         if (signal) {
-          const abort = () =>
-            cancelTask(task, 'request-abort', 'fsus_worker_request_aborted')
+          const abort = authorityBoundary(() =>
+            cancelTask(task, 'request-abort', 'fsus_worker_request_aborted'),
+          )
           const cleanup = () => signal.removeEventListener('abort', abort)
           task.abortCleanup = cleanup
           task.abortListenerRegistration = 'unknown'
@@ -1724,7 +1807,7 @@ export const createFsusWorkerExecutor = <TRequest, TResponse>(
     })
   }
 
-  const visibilityHandler = () => {
+  const visibilityHandler = authorityBoundary(() => {
     if (
       visibilityDocument?.visibilityState === 'hidden' &&
       pending.size === 0 &&
@@ -1732,7 +1815,7 @@ export const createFsusWorkerExecutor = <TRequest, TResponse>(
     ) {
       terminateIdleSlots()
     }
-  }
+  })
   if (visibilityDocument) {
     visibilityListenerActive = true
     visibilityListenerRegistration = 'unknown'
@@ -1882,6 +1965,7 @@ export const createFsusWorkerExecutor = <TRequest, TResponse>(
       scope: scope === undefined ? null : { ...scope },
       shared: {
         attribution: 'unattributable',
+        authorityListenerCount: authorityListeners.size,
         backgroundTimerActive: backgroundTimer !== null,
         canceledResponseIdCount: canceledIds.size,
         generationKeyCount: latestGenerations.size,
@@ -2025,50 +2109,56 @@ export const createFsusWorkerExecutor = <TRequest, TResponse>(
   }
 
   return {
+    authority,
     dispose: () => {
       // Close admission before any externally supplied cleanup method runs.
       disposed = true
       if (disposing) return
       disposing = true
       try {
-        runCleanup([
-          () => {
-            if (
-              !visibilityDocument ||
-              !visibilityListenerActive ||
-              removingVisibilityListener
-            )
-              return
-            removingVisibilityListener = true
-            visibilityListenerRegistration = 'unknown'
-            try {
-              visibilityDocument.removeEventListener(
-                'visibilitychange',
-                visibilityHandler,
+        withAuthorityChange(() =>
+          runCleanup([
+            () => {
+              if (
+                !visibilityDocument ||
+                !visibilityListenerActive ||
+                removingVisibilityListener
               )
-              visibilityListenerActive = false
-              visibilityListenerRegistration = 'none'
-            } finally {
-              removingVisibilityListener = false
-            }
-          },
-          () => dispose(),
-        ])
+                return
+              removingVisibilityListener = true
+              visibilityListenerRegistration = 'unknown'
+              try {
+                visibilityDocument.removeEventListener(
+                  'visibilitychange',
+                  visibilityHandler,
+                )
+                visibilityListenerActive = false
+                visibilityListenerRegistration = 'none'
+              } finally {
+                removingVisibilityListener = false
+              }
+            },
+            () => dispose(),
+          ]),
+        )
       } finally {
         disposing = false
+        authorityListeners.clear()
       }
     },
     getActiveCount: activeCount,
     getPendingCount: () => pending.size,
     getQueueDepth: queueDepth,
     getWorkerCount: () => slots.length,
-    inspectResources,
-    cancelTasks,
-    resumeTasks: (scope: FsusWorkerTaskScope) =>
+    inspectResources: authorityBoundary(inspectResources),
+    cancelTasks: authorityBoundary(cancelTasks),
+    resumeTasks: authorityBoundary((scope: FsusWorkerTaskScope) =>
       setTasksSuspended(scope, false),
-    suspendTasks: (scope: FsusWorkerTaskScope) =>
+    ),
+    suspendTasks: authorityBoundary((scope: FsusWorkerTaskScope) =>
       setTasksSuspended(scope, true),
-    retain,
-    run,
+    ),
+    retain: authorityBoundary(retain),
+    run: authorityBoundary(run),
   }
 }
