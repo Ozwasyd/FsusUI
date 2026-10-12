@@ -280,15 +280,17 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
       } as ConsumerCleanup
       const observe = async (future: CleanupFuture) => {
         if (future.state === 'absent') return
-        if (!consumerFuture(future.work)) {
-          future.state = 'unknown'
-          return
-        }
+        let observed = false
         try {
+          if (!consumerFuture(future.work)) {
+            future.state = 'unknown'
+            return
+          }
+          observed = true
           await future.work
           future.state = 'fulfilled'
         } catch (cause) {
-          future.state = 'rejected'
+          future.state = observed ? 'rejected' : 'unknown'
           future.cause = cause
         }
       }
