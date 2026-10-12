@@ -15,6 +15,7 @@ import type {
   MarkdownHeavyFeatureResourceInspection,
   MarkdownHeavyFeatureDocumentAuthority,
   MarkdownHeavyFeatureDocumentAuthorityRetirementHandle,
+  MarkdownHeavyFeatureDocumentAuthorityTicket,
 } from '../../../hooks/use-markdown-heavy-feature-lifecycle'
 import type {
   MarkdownEditorFrameScheduler,
@@ -247,6 +248,7 @@ export const createMarkdownRendererSessionResourceOwner = <
         readonly closed: boolean
         readonly retainedListeners: number
         readonly retainedTicket: boolean
+        readonly nativeDocumentTicket: MarkdownHeavyFeatureDocumentAuthorityTicket | null
         readonly retainedSnapshotEntries: number
         readonly failures: readonly unknown[]
         readonly unavailableCallbackResults: readonly unknown[]
@@ -373,6 +375,9 @@ export const createMarkdownRendererSessionResourceOwner = <
     let closed = false
     let published = true
     let ticket: object | null = null
+    let nativeDocumentTicket: MarkdownHeavyFeatureDocumentAuthorityTicket | null =
+      null
+    let nativeDocumentBinding: typeof documentRetirement = null
     let ticketGeneration = -1
     let allocatingTicket = false
     const eligible = () =>
@@ -387,6 +392,25 @@ export const createMarkdownRendererSessionResourceOwner = <
       cleanupFailures.size === 0 &&
       unavailableCallbackResults.length === 0 &&
       asyncObservations.size === 0
+    const hasNativeDocumentCustody = (
+      binding: typeof documentRetirement,
+      captured: MarkdownHeavyFeatureDocumentAuthorityTicket | null,
+    ) => {
+      if (
+        documentRetirementUnknown ||
+        bindingDocumentRetirement ||
+        documentRetirement !== binding
+      )
+        return false
+      if (!binding) return captured === null
+      // Only the accepted original f253 pure methods are borrowed. No Native
+      // ticket is minted here and no handle failureCause becomes getFailures.
+      return (
+        captured !== null &&
+        binding.handle.hasCustody() &&
+        binding.source.hasCustody(captured)
+      )
+    }
     const recordFailure = (
       cause: unknown,
       registration: Registration | null,
@@ -609,6 +633,8 @@ export const createMarkdownRendererSessionResourceOwner = <
     }
     const retire = () => {
       ticket = null
+      nativeDocumentTicket = null
+      nativeDocumentBinding = null
       for (const registration of [...registrations]) {
         if (
           !registrations.has(registration) ||
@@ -627,8 +653,22 @@ export const createMarkdownRendererSessionResourceOwner = <
           const capturedValue = currentValue
           allocatingTicket = true
           try {
-            const candidate = Object.freeze({ scope, value: capturedValue })
+            const capturedBinding = documentRetirement
+            const capturedNative = capturedBinding?.source.capture() ?? null
+            if (capturedBinding && capturedNative === null) return null
+            const candidate = Object.freeze({
+              scope,
+              value: capturedValue,
+              nativeDocumentAuthority: capturedNative,
+            })
+            // Validate the actual original ticket after every allocation, then
+            // repeat private guards last in case the borrowed call reentered.
+            const nativeCurrent = hasNativeDocumentCustody(
+              capturedBinding,
+              capturedNative,
+            )
             if (
+              !nativeCurrent ||
               !eligible() ||
               checkpointAuthorityGeneration !== capturedGeneration ||
               currentValue !== capturedValue
@@ -636,19 +676,38 @@ export const createMarkdownRendererSessionResourceOwner = <
               return null
             ticket = candidate
             ticketGeneration = capturedGeneration
+            nativeDocumentTicket = capturedNative
+            nativeDocumentBinding = capturedBinding
+          } catch (cause) {
+            recordFailure(
+              cause,
+              null,
+              documentRetirement?.source,
+              'native-document-ticket-capture',
+            )
+            throw cause
           } finally {
             allocatingTicket = false
           }
         }
-        return ticket
+        // A cached pin never reacquires Native custody. Loss returns null until
+        // a real owner retirement/replacement creates a new guarded candidate.
+        return hasNativeDocumentCustody(
+          nativeDocumentBinding,
+          nativeDocumentTicket,
+        )
+          ? ticket
+          : null
       },
-      // Pure private identity/version checks; no Vue reads or source callbacks.
+      // Pure private guards and the original Native pure custody checks only;
+      // no Vue reads, capture/reacquisition, callback or publication.
       isCurrent: (value: unknown) =>
         eligible() &&
         !allocatingTicket &&
         ticket !== null &&
         value === ticket &&
-        ticketGeneration === checkpointAuthorityGeneration,
+        ticketGeneration === checkpointAuthorityGeneration &&
+        hasNativeDocumentCustody(nativeDocumentBinding, nativeDocumentTicket),
       getFailures: () => Object.freeze([...failures]),
       subscribe: (listener: () => void) =>
         runCheckpointAuthorityCallback('input-subscribe', () => {
@@ -713,6 +772,8 @@ export const createMarkdownRendererSessionResourceOwner = <
         // Ordinary unmount already retired every receiver before this private
         // terminal flag. Closing cannot recursively notify during disposal.
         ticket = null
+        nativeDocumentTicket = null
+        nativeDocumentBinding = null
       },
       inspect: () =>
         Object.freeze({
@@ -722,6 +783,7 @@ export const createMarkdownRendererSessionResourceOwner = <
           closed,
           retainedListeners: registrations.size,
           retainedTicket: ticket !== null,
+          nativeDocumentTicket,
           retainedSnapshotEntries:
             typeof currentValue === 'object' && currentValue !== null
               ? Object.keys(currentValue).length
@@ -1936,6 +1998,7 @@ export const createMarkdownRendererSessionResourceOwner = <
                 1 +
                 record.retainedListeners +
                 (record.retainedTicket ? 1 : 0) +
+                (record.nativeDocumentTicket ? 1 : 0) +
                 record.retainedSnapshotEntries +
                 record.failures.length +
                 record.unavailableCallbackResults.length +

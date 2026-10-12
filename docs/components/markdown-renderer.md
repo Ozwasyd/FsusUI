@@ -963,3 +963,32 @@ exact pending pipeline postimages. This remaining synchronous-release correction
 requires its own source review; all counterexample/runtime/list/native/qualification
 holds stay UNRUN/HOLD. The upstream pipeline candidate's four P2 groups remain
 with its original owner and are not accepted by this consumer change.
+
+### Borrowed Native document custody on input tickets
+
+In the independent successor to the caught-release correction, a mounted renderer
+with the real f253 document provider captures that provider's original immutable
+ticket while issuing a scoped input ticket. The input candidate retains the exact
+original ticket; its document id/epoch/revision are never reconstructed or issued
+by the renderer. Allocation finishes before original registration/ticket custody
+is checked, followed by the renderer's final private value/generation guard.
+Null capture or changed/lost binding refuses issuance. Standalone input custody
+can have no Native ticket and does not claim Native document authority.
+
+Pure input `isCurrent` checks the held exact input token/version and the original
+f253 handle/ticket custody methods. It never captures or reacquires from that
+pure port. Cached issuance also refuses lost Native custody without refreshing
+an old pin. Real retirement and terminal close release the actual held ticket
+reference. `sources.rendererOwnedInputs.nativeDocumentTicket` exposes the actual
+borrowed ticket and adds one measured logical retained token reference while held.
+Observed capture failures retain their actual cause; no Native `getFailures`
+contract, duplicate document issuer or native cleanup/recovery acknowledgment is
+created. Original SourceOwner subscriptions and epoch-safe invalidation remain.
+
+This is a document-continuity join for scoped input custody only. Full checkpoint
+sealing still needs a checkpoint-bound complete pipeline/resource/native refset
+and qualified restoration/reversal. The current pipeline 582035 postimage is not
+the newer 2ad7af9 repair candidate, and its four P2 groups are not accepted here.
+Neither a scoped Native input ticket nor static compilation qualifies pause,
+full/live seal, restoration or session eviction. Independent source review and
+all original counterexample/runtime/list/native/qualification holds remain.

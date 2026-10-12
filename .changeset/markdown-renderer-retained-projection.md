@@ -2,6 +2,8 @@
 'element-plus': minor
 ---
 
+Join scoped renderer input custody to the original f253 Native document ticket and real registration custody. Capture the original ticket before final guarded publication, use only its original pure custody checks, and preserve absent/stale/unmounted refusals without issuing a duplicate Native ticket or claiming full checkpoint recovery.
+
 Retain actual unsubscribe reentry failure/cause even when a receiver catches the exception and returns normally. Refuse removal until a separate real retry succeeds without reentry, preserving registration, history and view-release obligations.
 
 Wire the actual renderer request/adapter/unit/selected-viewport publications into the original pending pipeline caller-feed options. Keep viewport reads pure, publish observed selections in owned entries, and pass the original runtime/config authority without overrides. Record pending inherited dependency status and preserve all complete/native/live/recovery qualification refusals.
