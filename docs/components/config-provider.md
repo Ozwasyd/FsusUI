@@ -201,6 +201,16 @@ retained upstream failures. A failed revocation prevents the pending write;
 a failure after publication cannot roll back a value already written.
 Same-producer updates during a write are rejected.
 
+Failure records retain `cause`, the original listener, subscription identity
+where available, and the context identity at invocation. An asynchronous result
+still fails the synchronous contract immediately; its actual rejection is
+observed separately and recorded with that same ownership even after release.
+Native promises use intrinsic await observation without a `.then`/`.catch`
+species continuation. Non-native then results have their returned continuation
+observed as well. This does not certify arbitrary hostile then/species behavior
+that creates independently rejected descendants or prevents installing a
+reaction; that requires a separate controllable input contract.
+
 The hook revokes an existing provider owned by the same app/setup instance
 before replacing its injected context. It revokes the process fallback before
 changing its selection, tracks controlled updates from the selected provider,
