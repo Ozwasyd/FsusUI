@@ -382,12 +382,34 @@ export type FsusRenderPipelineRuntimeState<TSource, TUnit> =
     hardwareProfile: ComputedRef<FsusRenderHardwareProfile>
     policy: ComputedRef<FsusResolvedRenderPipelineComponentPolicy | null>
     authority: FsusRenderPipelineAuthority
+    adapterResourceProvider: FsusRenderPipelineAdapterResourceProvider
     inspectResources: () => FsusRenderPipelineRuntimeResourceInspection
     pause: () => FsusRenderPipelineRuntimeResourceInspection
     resume: () => FsusRenderPipelineRuntimeResourceInspection
     render: () => Promise<void>
     renderedStrategy: Ref<FsusRenderPipelineStrategy>
   }
+
+export type FsusRenderPipelineAdapterInvocationResourceInspection = Readonly<{
+  ownerKey: string
+  scope: 'runtime-owned-adapter-invocations'
+  pendingInvocations: number
+  invocationIds: readonly symbol[]
+  admission: 'active' | 'paused' | 'disposed'
+  cancellationCapability: 'cooperative-abort-signal-only'
+  internalCancellationCompletion: 'unsupported'
+  settlement: 'original-prepare-finally'
+  internalResources: 'unsupported'
+}>
+
+export type FsusRenderPipelineAdapterResourceProvider = Readonly<{
+  ownerKey: string
+  authority: FsusRenderPipelineAuthority
+  inspectResources: () => FsusRenderPipelineAdapterInvocationResourceInspection
+  // These are real runtime controls, not control over arbitrary adapter internals.
+  pause: () => FsusRenderPipelineRuntimeResourceInspection
+  resume: () => FsusRenderPipelineRuntimeResourceInspection
+}>
 
 export type FsusRenderPipelineRuntimeResourceInspection = {
   readonly ownerKey: string
@@ -405,7 +427,7 @@ export type FsusRenderPipelineRuntimeResourceInspection = {
   readonly pendingRenderAdmissions: number
   readonly pendingControlTransitions: number
   readonly pendingAdapterJobs: number
-  readonly adapterResources: 'unknown'
+  readonly adapterResources: FsusRenderPipelineAdapterInvocationResourceInspection
   readonly workerCallbackFailure: {
     readonly count: number
     readonly error: FsusErrorDetail
@@ -774,7 +796,7 @@ const createRenderPipelineProducerAuthority = (missingFeeds: string[] = []) => {
       }
     }
   }
-  const change = <T>(action: () => T): T => {
+  const change = <T>(action: () => T, enter?: () => void): T => {
     depth += 1
     ticket = null
     snapshots = []
@@ -793,6 +815,7 @@ const createRenderPipelineProducerAuthority = (missingFeeds: string[] = []) => {
         drainClosedDependencies()
     }
     try {
+      enter?.()
       if (depth === 1) notifyListeners()
       const result = action()
       // Keep async producer continuations inside the same revoked interval.
@@ -3083,6 +3106,22 @@ export const useFsusVirtualWindow = <TUnit>(options: {
   let resizeBinding: ResizeBinding | null = null
   const resizeBindings = new Set<ResizeBinding>()
   const observedTargets = new Set<Element>()
+  const observerCallbacks = new Set<symbol>()
+  const trackObserverCallback =
+    <TArgs extends unknown[]>(run: (...args: TArgs) => void) =>
+    (...args: TArgs) => {
+      const callback = Symbol('virtual-observer-callback')
+      try {
+        producerAuthority.change(
+          () => run(...args),
+          () => {
+            observerCallbacks.add(callback)
+          },
+        )
+      } finally {
+        producerAuthority.change(() => observerCallbacks.delete(callback))
+      }
+    }
   let viewport: FsusViewport | null = null
 
   const totalSize = computed(
@@ -3640,70 +3679,84 @@ export const useFsusVirtualWindow = <TUnit>(options: {
         } else {
           binding.constructorStarted = true
           binding.observer = new Observer(
-            producerAuthority.boundary((entries, reportedObserver) => {
-              // Retain a real callback-reported handle if construction threw or
-              // is still returning; no synthetic observer is manufactured.
-              if (
-                !binding.observer &&
-                binding.constructorStarted &&
-                reportedObserver
-              )
-                binding.observer = reportedObserver
-              if (binding.retired || disposed || resizeBinding !== binding) {
-                try {
-                  releaseResizeBinding(binding)
-                } catch (cause) {
-                  producerAuthority.recordFailure(
-                    cause,
-                    'resize-callback-late-release',
-                    binding.observer,
+            trackObserverCallback(
+              producerAuthority.boundary(
+                (
+                  entries: ResizeObserverEntry[],
+                  reportedObserver: ResizeObserver,
+                ) => {
+                  // Retain a real callback-reported handle if construction threw or
+                  // is still returning; no synthetic observer is manufactured.
+                  if (
+                    !binding.observer &&
+                    binding.constructorStarted &&
+                    reportedObserver
                   )
-                }
-                return
-              }
-              if (
-                binding.retired ||
-                binding.registering ||
-                binding !== resizeBinding ||
-                !binding.observer ||
-                paused ||
-                disposed ||
-                observerEpoch !== observerGeneration
-              )
-                return
-              const callbackControl = generation,
-                callbackInput = inputGeneration,
-                callbackUnits = unitsGeneration
-              const callbackCurrent = () =>
-                !paused &&
-                !disposed &&
-                !binding.retired &&
-                binding === resizeBinding &&
-                observerEpoch === observerGeneration &&
-                callbackControl === generation &&
-                callbackInput === inputGeneration &&
-                callbackUnits === unitsGeneration
-              for (const entry of entries) {
-                if (!callbackCurrent()) return
-                const target = entry.target
-                if (!callbackCurrent()) return
-                const key = variableState.elementKeys.get(target)
-                if (!key || variableState.observedElements.get(key) !== target)
-                  continue
-                const refs = refGenerations.get(key)
-                const size =
-                  entry.borderBoxSize?.[0]?.blockSize ??
-                  entry.contentRect.height ??
-                  (target instanceof HTMLElement ? target.offsetHeight : 0)
-                if (
-                  !callbackCurrent() ||
-                  variableState.observedElements.get(key) !== target ||
-                  refs !== refGenerations.get(key)
-                )
-                  continue
-                queueMeasurement(key, size)
-              }
-            }),
+                    binding.observer = reportedObserver
+                  if (
+                    binding.retired ||
+                    disposed ||
+                    resizeBinding !== binding
+                  ) {
+                    try {
+                      releaseResizeBinding(binding)
+                    } catch (cause) {
+                      producerAuthority.recordFailure(
+                        cause,
+                        'resize-callback-late-release',
+                        binding.observer,
+                      )
+                    }
+                    return
+                  }
+                  if (
+                    binding.retired ||
+                    binding.registering ||
+                    binding !== resizeBinding ||
+                    !binding.observer ||
+                    paused ||
+                    disposed ||
+                    observerEpoch !== observerGeneration
+                  )
+                    return
+                  const callbackControl = generation,
+                    callbackInput = inputGeneration,
+                    callbackUnits = unitsGeneration
+                  const callbackCurrent = () =>
+                    !paused &&
+                    !disposed &&
+                    !binding.retired &&
+                    binding === resizeBinding &&
+                    observerEpoch === observerGeneration &&
+                    callbackControl === generation &&
+                    callbackInput === inputGeneration &&
+                    callbackUnits === unitsGeneration
+                  for (const entry of entries) {
+                    if (!callbackCurrent()) return
+                    const target = entry.target
+                    if (!callbackCurrent()) return
+                    const key = variableState.elementKeys.get(target)
+                    if (
+                      !key ||
+                      variableState.observedElements.get(key) !== target
+                    )
+                      continue
+                    const refs = refGenerations.get(key)
+                    const size =
+                      entry.borderBoxSize?.[0]?.blockSize ??
+                      entry.contentRect.height ??
+                      (target instanceof HTMLElement ? target.offsetHeight : 0)
+                    if (
+                      !callbackCurrent() ||
+                      variableState.observedElements.get(key) !== target ||
+                      refs !== refGenerations.get(key)
+                    )
+                      continue
+                    queueMeasurement(key, size)
+                  }
+                },
+              ),
+            ),
           )
         }
       } catch (cause) {
@@ -4217,6 +4270,14 @@ export const useFsusVirtualWindow = <TUnit>(options: {
       ),
       // ResizeObserver's platform-internal queue is not exposed by this source.
       observerInternalCallbacks: 'unknown' as const,
+      observerCallbackResources: Object.freeze({
+        scope: 'virtual-source-delivered-callbacks' as const,
+        activeCallbacks: observerCallbacks.size,
+        callbackIds: Object.freeze([...observerCallbacks]),
+        settlement: 'source-callback-finally' as const,
+        futurePlatformDelivery: 'unsupported-until-source-entry' as const,
+        internalQueueControl: 'unsupported' as const,
+      }),
       recoverable: false as const,
     })
   const pause = () => {
@@ -4370,8 +4431,20 @@ export const useFsusVirtualWindow = <TUnit>(options: {
     }),
   )
 
+  const observerResourceProvider = Object.freeze({
+    scope: 'virtual-local-observer-resources' as const,
+    authority: producerAuthority.authority,
+    inspectResources: producerAuthority.boundary(inspectResources),
+    pause: producerAuthority.boundary(pause),
+    resume: producerAuthority.boundary(resume),
+    unsupported: Object.freeze([
+      'platform-internal-observer-queue',
+      'future-callback-delivery-before-source-entry',
+    ] as const),
+  })
   return {
     authority: producerAuthority.authority,
+    observerResourceProvider,
     inspectResources: producerAuthority.boundary(inspectResources),
     pause: producerAuthority.boundary(pause),
     resume: producerAuthority.boundary(resume),
@@ -5352,6 +5425,19 @@ export const useFsusRenderPipelineRuntime = <TSource, TUnit>(
     }
   }
 
+  const inspectAdapterResources =
+    (): FsusRenderPipelineAdapterInvocationResourceInspection =>
+      Object.freeze({
+        ownerKey: workerTaskKey,
+        scope: 'runtime-owned-adapter-invocations',
+        pendingInvocations: adapterJobs.size,
+        invocationIds: Object.freeze([...adapterJobs]),
+        admission: disposed ? 'disposed' : paused ? 'paused' : 'active',
+        cancellationCapability: 'cooperative-abort-signal-only',
+        internalCancellationCompletion: 'unsupported',
+        settlement: 'original-prepare-finally',
+        internalResources: 'unsupported',
+      })
   const inspectResources = (): FsusRenderPipelineRuntimeResourceInspection =>
     Object.freeze({
       ownerKey: workerTaskKey,
@@ -5383,7 +5469,7 @@ export const useFsusRenderPipelineRuntime = <TSource, TUnit>(
       pendingRenderAdmissions: renderRequestedWhilePaused ? 1 : 0,
       pendingControlTransitions: controlTransitions.size,
       pendingAdapterJobs: adapterJobs.size,
-      adapterResources: 'unknown',
+      adapterResources: inspectAdapterResources(),
       workerCallbackFailure,
       pendingWorkerCallbackFailureNotification,
       workerResources: inspectWorkerResources(),
@@ -5550,8 +5636,17 @@ export const useFsusRenderPipelineRuntime = <TSource, TUnit>(
     }),
   )
 
+  const adapterResourceProvider: FsusRenderPipelineAdapterResourceProvider =
+    Object.freeze({
+      ownerKey: workerTaskKey,
+      authority: producerAuthority.authority,
+      inspectResources: producerAuthority.boundary(inspectAdapterResources),
+      pause: producerAuthority.boundary(pause),
+      resume: producerAuthority.boundary(resume),
+    })
   return {
     authority: producerAuthority.authority,
+    adapterResourceProvider,
     inspectResources: producerAuthority.boundary(inspectResources),
     pause: producerAuthority.boundary(pause),
     resume: producerAuthority.boundary(resume),
