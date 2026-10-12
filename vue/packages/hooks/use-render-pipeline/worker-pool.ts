@@ -98,10 +98,90 @@ export type FsusWorkerTaskInspection = {
   workerId: number | null
 }
 
+/** Actual executor-owned JS resources; native worker internals are unsupported. */
+export type FsusWorkerProviderResourceInspection = {
+  scope: FsusWorkerTaskScope | null
+  local: {
+    pendingTaskIds: number[]
+    queuedTaskIds: number[]
+    suspendedTaskIds: number[]
+    settledPromiseTaskIds: number[]
+    activeExecutionTaskIds: number[]
+    cleanupTaskIds: number[]
+    requestTimeoutTaskIds: number[]
+    abortCleanupTaskIds: number[]
+    cancelTimeoutTaskIds: number[]
+    retainedTaskIds: number[]
+    preparingScopes: FsusWorkerTaskScope[]
+    workerHandles: Array<{
+      id: number
+      activeTaskId: number | null
+      task: { id: number; key?: string; generation: number } | null
+      attribution: 'task-associated' | 'unattributable'
+      alive: boolean
+      quarantined: boolean
+      messageCleanupRetained: boolean
+      errorCleanupRetained: boolean
+    }>
+  }
+  shared: {
+    attribution: 'unattributable'
+    otherPendingTaskCount: number
+    otherWorkerHandleCount: number
+    idleWorkerHandleCount: number
+    externalRetainCount: number
+    unattributableRetainCount: number
+    unattributableAdmissionCount: number
+    unidentifiedAdmissionCount: number
+    backgroundTimerActive: boolean
+    idleTerminateTimerActive: boolean
+    visibilityCleanupRetained: boolean
+    authorityListenerCount: number
+    authorityFailureCount: number
+    resourceFailureCount: number
+    otherResourceFailureCount: number
+    canceledResponseIdCount: number
+    generationKeyCount: number
+  }
+  settlement: {
+    /** Only local task/queue/execution/cleanup work, never shared or native work. */
+    localTasks: 'pending' | 'settled' | 'unknown'
+    /** Enumerated owned handles/hooks/retains/records, not arbitrary heap memory. */
+    localResources: 'retained' | 'released' | 'unknown'
+    workerInternals: 'unsupported'
+  }
+  control: {
+    queuedSuspension: 'supported'
+    queuedResumption: 'supported'
+    softCancellation: 'request-only'
+    scopedHandleTermination: 'supported'
+    runningSuspension: 'unsupported'
+  }
+  unsupported: Array<
+    | 'worker-internal-resources'
+    | 'worker-internal-settlement'
+    | 'worker-memory'
+    | 'worker-compute'
+    | 'native-handler-registration-census'
+    | 'executor-heap-memory'
+  >
+  failures: Array<
+    Readonly<{
+      cause: unknown
+      operation: 'cancel-post-message'
+      taskId: number
+      key?: string
+      generation: number
+      workerId: number
+    }>
+  >
+}
+
 export type FsusWorkerResourceInspection = {
   activeCount: number
   disposed: boolean
   pendingCount: number
+  provider: FsusWorkerProviderResourceInspection
   pool: {
     activeCount: number
     pendingCount: number
@@ -118,6 +198,7 @@ export type FsusWorkerResourceInspection = {
     requestTimeoutCount: number
     suspendedTaskCount: number
     taskRetainCount: number
+    /** Retained own cleanup callbacks; not a native registration census. */
     workerErrorHandlerCount: number
     workerMessageHandlerCount: number
   }
@@ -149,6 +230,7 @@ export type FsusWorkerResourceInspection = {
     id: number
     /** Teardown began; reuse remains blocked even when termination throws. */
     quarantined: boolean
+    /** Retained own callbacks, not proof of native registration. */
     workerErrorHandlerActive: boolean
     workerMessageHandlerActive: boolean
   }>
@@ -372,6 +454,10 @@ type WorkerSlot = {
 }
 
 type GenerationAuthority = { generation: number; preparing: boolean }
+type WorkerAdmission = {
+  scope: FsusWorkerTaskScope | null
+  identified: boolean
+}
 
 type WorkerTask<TRequest, TResponse> = {
   abortCleanup: (() => void) | null
@@ -386,6 +472,7 @@ type WorkerTask<TRequest, TResponse> = {
   lane: FsusWorkerTaskLane
   queuedAt: number
   release: () => void
+  retained: boolean
   request: TRequest
   reject: (reason: unknown) => void
   resolve: (value: FsusResult<TResponse>) => void
@@ -447,10 +534,13 @@ export const createFsusWorkerExecutor = <TRequest, TResponse>(
   const slots: WorkerSlot[] = []
   const canceledIds = new Set<number>()
   const canceledSlotTimers = new Map<number, ReturnType<typeof setTimeout>>()
+  const resourceFailures: FsusWorkerProviderResourceInspection['failures'] = []
   const latestGenerations = new Map<string, GenerationAuthority>()
+  const preparingAdmissions = new Set<WorkerAdmission>()
   let taskId = 0
   let workerId = 0
   let retainCount = 0
+  let externalRetainCount = 0
   let latencyServedBeforeBackground = 0
   let throughputServedBeforeBackground = 0
   let disposed = false
@@ -888,7 +978,18 @@ export const createFsusWorkerExecutor = <TRequest, TResponse>(
               key: task.key,
               type: 'cancel',
             } satisfies FsusWorkerCancelMessage)
-          } catch {}
+          } catch (cause) {
+            resourceFailures.push(
+              Object.freeze({
+                cause,
+                operation: 'cancel-post-message' as const,
+                taskId: task.id,
+                key: task.key,
+                generation: task.generation,
+                workerId: slot.id,
+              }),
+            )
+          }
           if (
             pending.get(task.id) === task &&
             slot.alive &&
@@ -1556,6 +1657,7 @@ export const createFsusWorkerExecutor = <TRequest, TResponse>(
   const retain = () => {
     if (disposed) throw new Error('fsus_worker_executor_disposed')
     retainCount += 1
+    externalRetainCount += 1
     clearIdleTimer()
     try {
       const reusableSlot = slots.find(isSlotUsable)
@@ -1564,6 +1666,7 @@ export const createFsusWorkerExecutor = <TRequest, TResponse>(
       else if (slots.length < maxWorkers) createSlot()
       if (disposed) throw new Error('fsus_worker_executor_disposed')
     } catch (error) {
+      externalRetainCount -= 1
       releaseRetain()
       throw error
     }
@@ -1571,6 +1674,7 @@ export const createFsusWorkerExecutor = <TRequest, TResponse>(
     return authorityBoundary(() => {
       if (released) return
       released = true
+      externalRetainCount -= 1
       releaseRetain()
     })
   }
@@ -1611,8 +1715,9 @@ export const createFsusWorkerExecutor = <TRequest, TResponse>(
 
   const run = (
     request: TRequest,
-    signalOrOptions?: AbortSignal | FsusWorkerRunOptions,
-    additionalOptions: FsusWorkerRunOptions = {},
+    signalOrOptions: AbortSignal | FsusWorkerRunOptions | undefined,
+    additionalOptions: FsusWorkerRunOptions,
+    admission: WorkerAdmission,
   ) => {
     const runOptions: FsusWorkerRunOptions = isAbortSignal(signalOrOptions)
       ? { ...additionalOptions, signal: signalOrOptions }
@@ -1627,6 +1732,10 @@ export const createFsusWorkerExecutor = <TRequest, TResponse>(
       ? (runOptions.generation ??
         (latestGenerations.get(runOptions.key)?.generation ?? 0) + 1)
       : (runOptions.generation ?? 0)
+    admission.scope = runOptions.key
+      ? { key: runOptions.key, generation }
+      : null
+    admission.identified = true
     if (
       runOptions.key &&
       generation <
@@ -1721,7 +1830,6 @@ export const createFsusWorkerExecutor = <TRequest, TResponse>(
     retainCount += 1
     clearIdleTimer()
     return new Promise<FsusResult<TResponse>>((resolve, reject) => {
-      let released = false
       const task: WorkerTask<TRequest, TResponse> = {
         abortCleanup: null,
         abortListenerRegistration: 'none',
@@ -1735,10 +1843,11 @@ export const createFsusWorkerExecutor = <TRequest, TResponse>(
         lane,
         queuedAt,
         release: () => {
-          if (released) return
-          released = true
+          if (!task.retained) return
+          task.retained = false
           releaseRetain()
         },
+        retained: true,
         request,
         reject,
         resolve,
@@ -1888,6 +1997,172 @@ export const createFsusWorkerExecutor = <TRequest, TResponse>(
     scope === undefined ||
     (identity.key === scope.key && identity.generation === scope.generation)
 
+  const inspectProviderResources = (
+    scope?: FsusWorkerTaskScope,
+  ): FsusWorkerProviderResourceInspection => {
+    if (scope !== undefined) scope = snapshotScope(scope)
+    const selectedTasks = [...pending.values()].filter((task) =>
+      matchesScope(task, scope),
+    )
+    const selectedSlots = slots.filter(
+      (slot) =>
+        scope === undefined ||
+        (slot.activeTaskIdentity &&
+          matchesScope(slot.activeTaskIdentity, scope)),
+    )
+    const activeExecutionTaskIds = selectedSlots.flatMap((slot) =>
+      slot.activeTaskId === null ? [] : [slot.activeTaskId],
+    )
+    const settledPromiseTaskIds = new Set(
+      selectedTasks.filter((task) => task.settled).map((task) => task.id),
+    )
+    for (const id of activeExecutionTaskIds) {
+      if (!pending.has(id)) settledPromiseTaskIds.add(id)
+    }
+    const preparingScopes = [...preparingAdmissions].flatMap(
+      ({ scope: admissionScope }) =>
+        admissionScope && matchesScope(admissionScope, scope)
+          ? [{ ...admissionScope }]
+          : [],
+    )
+    const unidentifiedAdmissionCount = [...preparingAdmissions].filter(
+      (admission) => !admission.identified,
+    ).length
+    const selectedIds = new Set([
+      ...selectedTasks.map((task) => task.id),
+      ...activeExecutionTaskIds,
+    ])
+    const cancelTimeoutTaskIds = [...canceledSlotTimers.keys()].filter(
+      (id) => scope === undefined || selectedIds.has(id),
+    )
+    const selectedFailures = resourceFailures.filter((failure) =>
+      matchesScope(failure, scope),
+    )
+    const localTaskWork =
+      selectedTasks.length > 0 ||
+      activeExecutionTaskIds.length > 0 ||
+      cancelTimeoutTaskIds.length > 0 ||
+      preparingScopes.length > 0 ||
+      (scope === undefined && preparingAdmissions.size > 0)
+    const localResourcesRetained =
+      localTaskWork ||
+      selectedSlots.length > 0 ||
+      selectedFailures.length > 0 ||
+      (scope === undefined &&
+        (retainCount > 0 ||
+          idleTerminateTimer !== null ||
+          backgroundTimer !== null ||
+          visibilityListenerActive ||
+          authorityListeners.size > 0 ||
+          authorityFeedFailures.length > 0 ||
+          canceledIds.size > 0 ||
+          latestGenerations.size > 0))
+    return {
+      scope: scope === undefined ? null : { ...scope },
+      local: {
+        pendingTaskIds: selectedTasks.map((task) => task.id),
+        queuedTaskIds: lanes.flatMap((lane) =>
+          queues[lane]
+            .filter((task) => matchesScope(task, scope))
+            .map((task) => task.id),
+        ),
+        suspendedTaskIds: selectedTasks
+          .filter((task) => task.suspended)
+          .map((task) => task.id),
+        settledPromiseTaskIds: [...settledPromiseTaskIds],
+        activeExecutionTaskIds,
+        cleanupTaskIds: selectedTasks
+          .filter((task) => task.settled || task.settling)
+          .map((task) => task.id),
+        requestTimeoutTaskIds: selectedTasks
+          .filter((task) => task.timeoutId !== null)
+          .map((task) => task.id),
+        abortCleanupTaskIds: selectedTasks
+          .filter((task) => task.abortCleanup !== null)
+          .map((task) => task.id),
+        cancelTimeoutTaskIds,
+        retainedTaskIds: selectedTasks
+          .filter((task) => task.retained)
+          .map((task) => task.id),
+        preparingScopes,
+        workerHandles: selectedSlots.map((slot) => ({
+          id: slot.id,
+          activeTaskId: slot.activeTaskId,
+          task: slot.activeTaskIdentity
+            ? {
+                id: slot.activeTaskIdentity.id,
+                key: slot.activeTaskIdentity.key,
+                generation: slot.activeTaskIdentity.generation,
+              }
+            : null,
+          attribution: slot.activeTaskIdentity
+            ? 'task-associated'
+            : 'unattributable',
+          alive: slot.alive,
+          quarantined: slot.quarantined,
+          messageCleanupRetained: slot.messageHandler !== null,
+          errorCleanupRetained: slot.errorHandler !== null,
+        })),
+      },
+      shared: {
+        attribution: 'unattributable',
+        otherPendingTaskCount: pending.size - selectedTasks.length,
+        otherWorkerHandleCount: slots.length - selectedSlots.length,
+        idleWorkerHandleCount: slots.filter(
+          (slot) => slot.activeTaskId === null,
+        ).length,
+        externalRetainCount,
+        unattributableRetainCount:
+          retainCount -
+          externalRetainCount -
+          [...pending.values()].filter((task) => task.retained).length,
+        unattributableAdmissionCount: [...preparingAdmissions].filter(
+          (admission) => admission.scope === null,
+        ).length,
+        unidentifiedAdmissionCount,
+        backgroundTimerActive: backgroundTimer !== null,
+        idleTerminateTimerActive: idleTerminateTimer !== null,
+        visibilityCleanupRetained: visibilityListenerActive,
+        authorityListenerCount: authorityListeners.size,
+        authorityFailureCount: authorityFeedFailures.length,
+        resourceFailureCount: resourceFailures.length,
+        otherResourceFailureCount:
+          resourceFailures.length - selectedFailures.length,
+        canceledResponseIdCount: canceledIds.size,
+        generationKeyCount: latestGenerations.size,
+      },
+      settlement: {
+        localTasks: localTaskWork
+          ? 'pending'
+          : unidentifiedAdmissionCount > 0
+            ? 'unknown'
+            : 'settled',
+        localResources: localResourcesRetained
+          ? 'retained'
+          : unidentifiedAdmissionCount > 0
+            ? 'unknown'
+            : 'released',
+        workerInternals: 'unsupported',
+      },
+      control: {
+        queuedSuspension: 'supported',
+        queuedResumption: 'supported',
+        softCancellation: 'request-only',
+        scopedHandleTermination: 'supported',
+        runningSuspension: 'unsupported',
+      },
+      unsupported: [
+        'worker-internal-resources',
+        'worker-internal-settlement',
+        'worker-memory',
+        'worker-compute',
+        'native-handler-registration-census',
+        'executor-heap-memory',
+      ],
+      failures: selectedFailures,
+    }
+  }
+
   /** Snapshots executor-owned handles only; worker compute/memory is unknown. */
   const inspectResources = (
     scope?: FsusWorkerTaskScope,
@@ -1957,6 +2232,7 @@ export const createFsusWorkerExecutor = <TRequest, TResponse>(
           : selectedSlots.filter((slot) => slot.activeTaskId !== null).length,
       disposed,
       pendingCount: selectedTasks.length,
+      provider: inspectProviderResources(scope),
       pool: {
         activeCount: activeCount(),
         pendingCount: pending.size,
@@ -1978,12 +2254,12 @@ export const createFsusWorkerExecutor = <TRequest, TResponse>(
           .length,
         suspendedTaskCount: tasks.filter((task) => task.state === 'suspended')
           .length,
-        taskRetainCount: selectedTasks.length,
+        taskRetainCount: selectedTasks.filter((task) => task.retained).length,
         workerErrorHandlerCount: selectedSlots.filter(
-          (slot) => slot.worker.onerror !== null,
+          (slot) => slot.errorHandler !== null,
         ).length,
         workerMessageHandlerCount: selectedSlots.filter(
-          (slot) => slot.worker.onmessage !== null,
+          (slot) => slot.messageHandler !== null,
         ).length,
       },
       scope: scope === undefined ? null : { ...scope },
@@ -1998,13 +2274,14 @@ export const createFsusWorkerExecutor = <TRequest, TResponse>(
         idleWorkerCount: slots.filter((slot) => slot.activeTaskId === null)
           .length,
         idleWorkerErrorHandlerCount: slots.filter(
-          (slot) => slot.activeTaskId === null && slot.worker.onerror !== null,
+          (slot) => slot.activeTaskId === null && slot.errorHandler !== null,
         ).length,
         idleWorkerMessageHandlerCount: slots.filter(
-          (slot) =>
-            slot.activeTaskId === null && slot.worker.onmessage !== null,
+          (slot) => slot.activeTaskId === null && slot.messageHandler !== null,
         ).length,
-        retainCount: retainCount - pending.size,
+        retainCount:
+          retainCount -
+          [...pending.values()].filter((task) => task.retained).length,
         visibilityListenerCount: visibilityListenerActive ? 1 : 0,
         visibilityListenerRegistration,
       },
@@ -2014,8 +2291,8 @@ export const createFsusWorkerExecutor = <TRequest, TResponse>(
         dispatchable: isSlotUsable(slot) && slot.activeTaskId === null,
         id: slot.id,
         quarantined: slot.quarantined,
-        workerErrorHandlerActive: slot.worker.onerror !== null,
-        workerMessageHandlerActive: slot.worker.onmessage !== null,
+        workerErrorHandlerActive: slot.errorHandler !== null,
+        workerMessageHandlerActive: slot.messageHandler !== null,
       })),
       tasks,
       workerCompute: 'unknown',
@@ -2110,12 +2387,20 @@ export const createFsusWorkerExecutor = <TRequest, TResponse>(
         continue
       }
       affectedTaskIds.push(task.id)
+      const failureCount = resourceFailures.length
       cancelTask(
         task,
         'request-cancel',
         'fsus_worker_request_canceled',
         hardCancel ?? task.hardCancel,
       )
+      if (
+        !(hardCancel ?? task.hardCancel) &&
+        resourceFailures
+          .slice(failureCount)
+          .some((failure) => failure.taskId === task.id)
+      )
+        unavailableTaskIds.push(task.id)
     }
     for (const { slot, identity } of selectedSlots) {
       if (!slot.alive || slot.activeTaskId !== identity.id) continue
@@ -2186,6 +2471,7 @@ export const createFsusWorkerExecutor = <TRequest, TResponse>(
     getPendingCount: () => pending.size,
     getQueueDepth: queueDepth,
     getWorkerCount: () => slots.length,
+    inspectProviderResources: authorityBoundary(inspectProviderResources),
     inspectResources: authorityBoundary(inspectResources),
     cancelTasks: authorityBoundary(cancelTasks),
     resumeTasks: authorityBoundary((scope: FsusWorkerTaskScope) =>
@@ -2195,6 +2481,20 @@ export const createFsusWorkerExecutor = <TRequest, TResponse>(
       setTasksSuspended(scope, true),
     ),
     retain: authorityBoundary(retain),
-    run: authorityBoundary(run),
+    run: authorityBoundary(
+      (
+        request: TRequest,
+        signalOrOptions?: AbortSignal | FsusWorkerRunOptions,
+        additionalOptions: FsusWorkerRunOptions = {},
+      ) => {
+        const admission: WorkerAdmission = { scope: null, identified: false }
+        preparingAdmissions.add(admission)
+        try {
+          return run(request, signalOrOptions, additionalOptions, admission)
+        } finally {
+          preparingAdmissions.delete(admission)
+        }
+      },
+    ),
   }
 }
