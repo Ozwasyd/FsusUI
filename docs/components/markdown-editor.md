@@ -1059,6 +1059,85 @@ alone is not a release acknowledgment. Surviving File loans still follow their
 original per-item admission. The guard ends when the actual cleanup frame exits.
 
 
+### Consumer request capabilities
+
+`MarkdownAttachmentFileConsumer` remains a synchronous File loan callback. A void
+callback or a bare provider-result promise supplies no cancellation, resource census,
+full-work settlement or recreation capability. The owning native adapter must keep
+that invocation unknown; it must not record it as zero work or qualify pause/disposal.
+
+Consumers that own these operations may implement `MarkdownAttachmentRequestConsumer`
+or `MarkdownAttachmentRequestDispatch`. Both return their actual original
+`MarkdownAttachmentConsumerRequest`, with distinct `result` and `settled` futures,
+`cancelLocal(reason?)`, and `inspectLocalResources()`. The settlement future covers
+all local request work, including progress callbacks, cancellation/cleanup and work
+that continues after content result settlement. Resource counts include background
+tasks, timers, observers, retained listeners, local network requests and memory units,
+including retained checkpoints. Unknown, missing, negative or noninteger counts are
+unsupported, never normalized to zero. Server-side work is outside this local census.
+
+`bindMarkdownAttachmentConsumerRequest(returned)` retains that same request and both
+original request futures. Binding does not call an upload provider, subscribe to or
+replace those result/settled futures, start another attempt or create a File grant.
+Cleanup invocations separately observe only their actually returned cleanup work.
+Void, bare promises and incomplete handles
+return `{ supported: false, reason, value: returned }`, preserving any original unknown
+work for its invocation owner. Supported bindings forward pinned original methods with
+their original receiver. Census admission checks their identity around the actual
+callback; reentrant binding controls refuse before changing state. Exceptions propagate.
+Calling cancellation does not settle either request future or prove any resource was released.
+
+`cancelLocal` and checkpoint `release` explicitly return either synchronous `void` or
+their actual `PromiseLike<void>` cleanup work. The binding returns that identical work,
+not an async wrapper or synthetic future. It observes the original cleanup future and
+exposes the actual returned observer future in `inspectCleanup()`, together with its
+original checkpoint pointer, pending/fulfilled/rejected/unobservable status, original
+rejection cause and any observation failure cause. The invocation owner must retain
+and await both real futures. Pending, failed or unobservable cleanup blocks census
+admission; cancellation/cleanup statuses do not acknowledge full business settlement.
+Pending or unobservable work cannot be retried by assuming it finished. Synchronous
+exceptions and observed asynchronous rejections retain original cause and cleanup
+references, allowing the same original pinned operation to retry after known failure.
+A successful actual release fulfillment clears the checkpoint; merely returning a
+promise does not. Unobservable work remains held with its pointer and actual return.
+
+The optional original `checkpoint` port supplies `capture()`, `recreate(checkpoint)`
+and `release(checkpoint)`. Without all three methods, checkpoint operations are
+unsupported. A capture retains the original non-null opaque object without inspecting,
+cloning or reconstructing its body. Only that binding's current original pointer can
+recreate. Copies, foreign objects, released checkpoints and repeated or cancelled
+recreations refuse. Recreation invokes the original port once and returns a binding to
+its actual new request; returning the same original attempt or reusing any original
+result/settled future in that recreation chain is unsupported. Different object shape
+alone is not a new attempt. Failed
+recreation still consumes recreation admission. The checkpoint reference remains for
+original release, including after cancellation; a failed release retains it for retry.
+Released or consumed opaque objects remain weakly marked expired in that binding and
+cannot regain recreation admission when returned again by the original capture port.
+`retire()` invalidates checkpoint recreation before an owning attempt/document is
+replaced, retaining original cleanup methods, request, futures and census access.
+The producer does not remint File access from a checkpoint. If capture returns an
+opaque object but changes capabilities during its callback, the unsupported result
+still exposes that identical object. `getRetainedCheckpoint()` also returns the exact
+retained pointer for original release, including after capture failure or retirement.
+It performs no provider read, body cloning or new checkpoint issuance.
+
+These helpers only bind capabilities supplied by the actual invocation. They do not
+grant attachment-job/result/transaction authority. The native attachment owner must
+associate the binding with its actual original attempt, retain unknown/failed requests,
+await the original full-work `settled` future independently of `result`, and obtain a
+current known census before claiming local quiescence. Checkpoint capture/recreation
+also requires that owner's actual current document/attempt and quiescence admission;
+the helper neither dispatches placeholders nor qualifies retained-session restore.
+The producer module declares these helpers/types; its public editor type barrel still
+requires the Main owner's additive re-exports. The existing
+`MarkdownEditorAttachmentDispatch` promise-only hook and shared editor SFC require
+their owning integration to pass this richer actual handle. They are not automatically
+upgraded by these declarations. Existing void-event consumers remain
+unsupported for resource/settlement/recreation admission. No remote cancellation,
+server settlement or disposed-editor recovery guarantee is supplied.
+
+
 ## Prepared native snapshot publication
 
 The same public getSession now supplies prepareSnapshot(digestSource, expected?),

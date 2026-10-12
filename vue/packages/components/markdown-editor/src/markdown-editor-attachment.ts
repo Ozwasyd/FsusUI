@@ -83,6 +83,435 @@ export type MarkdownAttachmentFileConsumer = (
   capture: MarkdownAttachmentCaptureObservation,
 ) => void
 
+/** Counts owned by this local consumer request, including retained checkpoints. */
+export interface MarkdownAttachmentConsumerResources {
+  readonly backgroundTasks: number
+  readonly timers: number
+  readonly observers: number
+  readonly retainedListeners: number
+  readonly networkRequests: number
+  readonly memoryUnits: number
+}
+
+export interface MarkdownAttachmentConsumerCheckpointPort {
+  capture(): object | null
+  recreate(checkpoint: object): MarkdownAttachmentConsumerRequest | null
+  release(checkpoint: object): void | PromiseLike<void>
+}
+
+/** The consumer's actual request; content completion is not work settlement. */
+export interface MarkdownAttachmentConsumerRequest {
+  readonly result: PromiseLike<MarkdownAttachmentProviderResult>
+  readonly settled: PromiseLike<void>
+  cancelLocal(reason?: string): void | PromiseLike<void>
+  inspectLocalResources(): MarkdownAttachmentConsumerResources
+  readonly checkpoint?: MarkdownAttachmentConsumerCheckpointPort
+}
+
+export type MarkdownAttachmentRequestConsumer = (
+  file: File,
+  capture: MarkdownAttachmentCaptureObservation,
+) => MarkdownAttachmentConsumerRequest
+
+export type MarkdownAttachmentRequestDispatch = (input: {
+  readonly batch: MarkdownAttachmentBatchIntent
+  readonly item: MarkdownAttachmentItemIntent
+  readonly file: File | null
+  readonly onProgress: (result: MarkdownAttachmentProviderResult) => boolean
+}) => MarkdownAttachmentConsumerRequest
+
+export type MarkdownAttachmentConsumerCapability<T> =
+  | { readonly supported: true; readonly value: T }
+  | {
+      readonly supported: false
+      readonly reason: string
+      /** Keep the original unknown work available to its invocation owner. */
+      readonly value: unknown
+    }
+
+export interface MarkdownAttachmentConsumerCleanupObservation {
+  readonly operation: 'cancel' | 'release'
+  readonly checkpoint: object | undefined
+  readonly work: unknown
+  readonly observerWork: unknown
+  readonly status: 'pending' | 'fulfilled' | 'rejected' | 'unobservable'
+  readonly cause: unknown
+  readonly observationCause: unknown
+}
+
+export interface MarkdownAttachmentConsumerRequestBinding {
+  readonly request: MarkdownAttachmentConsumerRequest
+  readonly result: PromiseLike<MarkdownAttachmentProviderResult>
+  readonly settled: PromiseLike<void>
+  retire(): void
+  cancelLocal(reason?: string): void | PromiseLike<void>
+  getRetainedCheckpoint(): object | null
+  inspectCleanup(): readonly MarkdownAttachmentConsumerCleanupObservation[]
+  inspectLocalResources(): MarkdownAttachmentConsumerCapability<MarkdownAttachmentConsumerResources>
+  captureCheckpoint(): MarkdownAttachmentConsumerCapability<object>
+  recreateCheckpoint(
+    checkpoint: object,
+  ): MarkdownAttachmentConsumerCapability<MarkdownAttachmentConsumerRequestBinding>
+  releaseCheckpoint(checkpoint: object): void | PromiseLike<void>
+}
+
+const attachmentConsumerMissingProperty = Symbol('attachment-consumer-property')
+const readAttachmentConsumerProperty = (
+  value: object,
+  key: string,
+): unknown => {
+  const visited = new Set<object>()
+  let current: object | null = value
+  while (current && !visited.has(current)) {
+    visited.add(current)
+    const property = Object.getOwnPropertyDescriptor(current, key)
+    if (property)
+      return 'value' in property
+        ? property.value
+        : attachmentConsumerMissingProperty
+    current = Object.getPrototypeOf(current)
+  }
+  return undefined
+}
+const isAttachmentConsumerObject = (value: unknown): value is object =>
+  (typeof value === 'object' && value !== null) || typeof value === 'function'
+const isAttachmentConsumerFuture = (value: unknown) =>
+  isAttachmentConsumerObject(value) &&
+  typeof readAttachmentConsumerProperty(value, 'then') === 'function'
+
+/** Bind the returned original request; never invoke another upload or mint a File grant. */
+export const bindMarkdownAttachmentConsumerRequest = (
+  value: unknown,
+): MarkdownAttachmentConsumerCapability<MarkdownAttachmentConsumerRequestBinding> =>
+  bindAttachmentConsumerRequest(value, new WeakSet<object>())
+
+const bindAttachmentConsumerRequest = (
+  value: unknown,
+  previousFutures: WeakSet<object>,
+): MarkdownAttachmentConsumerCapability<MarkdownAttachmentConsumerRequestBinding> => {
+  const unsupported = (reason: string, originalValue: unknown = value) =>
+    Object.freeze({ supported: false as const, reason, value: originalValue })
+  if (!isAttachmentConsumerObject(value))
+    return unsupported('consumer-request-unavailable')
+  const request = value
+  const result = readAttachmentConsumerProperty(request, 'result')
+  const settled = readAttachmentConsumerProperty(request, 'settled')
+  const cancel = readAttachmentConsumerProperty(request, 'cancelLocal')
+  const inspect = readAttachmentConsumerProperty(
+    request,
+    'inspectLocalResources',
+  )
+  const checkpointPort = readAttachmentConsumerProperty(request, 'checkpoint')
+  if (
+    !isAttachmentConsumerFuture(result) ||
+    !isAttachmentConsumerFuture(settled) ||
+    result === settled ||
+    typeof cancel !== 'function' ||
+    typeof inspect !== 'function'
+  )
+    return unsupported('consumer-request-capabilities-unavailable')
+  if (
+    previousFutures.has(result as object) ||
+    previousFutures.has(settled as object)
+  )
+    return unsupported('consumer-recreation-future-reused')
+  previousFutures.add(result as object)
+  previousFutures.add(settled as object)
+
+  const capture = isAttachmentConsumerObject(checkpointPort)
+    ? readAttachmentConsumerProperty(checkpointPort, 'capture')
+    : undefined
+  const recreate = isAttachmentConsumerObject(checkpointPort)
+    ? readAttachmentConsumerProperty(checkpointPort, 'recreate')
+    : undefined
+  const release = isAttachmentConsumerObject(checkpointPort)
+    ? readAttachmentConsumerProperty(checkpointPort, 'release')
+    : undefined
+  const hasCheckpoint =
+    typeof capture === 'function' &&
+    typeof recreate === 'function' &&
+    typeof release === 'function'
+  let busy = false
+  let retired = false
+  let portsInvalidated = false
+  let checkpointPortsInvalidated = false
+  let retainedCheckpoint: object | undefined
+  let checkpointCurrent = false
+  const expiredCheckpoints = new WeakSet<object>()
+  const current = () => {
+    if (portsInvalidated) return false
+    portsInvalidated =
+      readAttachmentConsumerProperty(request, 'result') !== result ||
+      readAttachmentConsumerProperty(request, 'settled') !== settled ||
+      readAttachmentConsumerProperty(request, 'cancelLocal') !== cancel ||
+      readAttachmentConsumerProperty(request, 'inspectLocalResources') !==
+        inspect ||
+      readAttachmentConsumerProperty(request, 'checkpoint') !== checkpointPort
+    return !portsInvalidated
+  }
+  const checkpointMethodsCurrent = () => {
+    if (checkpointPortsInvalidated) return false
+    checkpointPortsInvalidated = !(
+      hasCheckpoint &&
+      isAttachmentConsumerObject(checkpointPort) &&
+      readAttachmentConsumerProperty(checkpointPort, 'capture') === capture &&
+      readAttachmentConsumerProperty(checkpointPort, 'recreate') === recreate &&
+      readAttachmentConsumerProperty(checkpointPort, 'release') === release
+    )
+    return !checkpointPortsInvalidated
+  }
+  const enter = () => {
+    if (busy) throw new Error('attachment-consumer-request-reentry')
+    busy = true
+  }
+  const callback = <T>(run: () => T): T => {
+    enter()
+    try {
+      return run()
+    } finally {
+      busy = false
+    }
+  }
+  type Cleanup = {
+    -readonly [Key in keyof MarkdownAttachmentConsumerCleanupObservation]: MarkdownAttachmentConsumerCleanupObservation[Key]
+  }
+  let cancellation: Cleanup | undefined
+  let checkpointRelease: Cleanup | undefined
+  const cleanupUnsettled = () =>
+    [cancellation, checkpointRelease].some(
+      (cleanup) => cleanup && cleanup.status !== 'fulfilled',
+    )
+  const runCleanup = (
+    operation: Cleanup['operation'],
+    checkpoint: object | undefined,
+    run: () => unknown,
+  ): void | PromiseLike<void> => {
+    const previous = operation === 'cancel' ? cancellation : checkpointRelease
+    if (previous?.status === 'pending' || previous?.status === 'unobservable')
+      throw new Error('attachment-consumer-cleanup-unsettled')
+    const cleanup: Cleanup = {
+      operation,
+      checkpoint,
+      work: undefined,
+      observerWork: undefined,
+      status: 'pending',
+      cause: undefined,
+      observationCause: undefined,
+    }
+    if (operation === 'cancel') cancellation = cleanup
+    else checkpointRelease = cleanup
+    const releaseSucceeded = () => {
+      if (
+        operation === 'release' &&
+        checkpointRelease === cleanup &&
+        retainedCheckpoint === checkpoint
+      )
+        retainedCheckpoint = undefined
+    }
+    try {
+      cleanup.work = run()
+    } catch (cause) {
+      cleanup.status = 'rejected'
+      cleanup.cause = cause
+      throw cause
+    }
+    if (cleanup.work === undefined) {
+      cleanup.status = 'fulfilled'
+      releaseSucceeded()
+      return
+    }
+    let subscribed = false
+    let outcome: 'fulfilled' | 'rejected' | undefined
+    const finish = () => {
+      if (!subscribed || cleanup.status === 'unobservable' || !outcome) return
+      cleanup.status = outcome
+      if (outcome === 'fulfilled') releaseSucceeded()
+    }
+    try {
+      if (!isAttachmentConsumerFuture(cleanup.work))
+        throw new Error('attachment-consumer-cleanup-future-unavailable')
+      const then = readAttachmentConsumerProperty(
+        cleanup.work as object,
+        'then',
+      )
+      // Observe the actual returned work, exposing its actual observer future too.
+      // No Promise.resolve/async wrapper substitutes another cleanup future.
+      cleanup.observerWork = Reflect.apply(
+        then as PromiseLike<void>['then'],
+        cleanup.work,
+        [
+          () => {
+            if (outcome) return
+            outcome = 'fulfilled'
+            finish()
+          },
+          (cause: unknown) => {
+            if (outcome) return
+            outcome = 'rejected'
+            cleanup.cause = cause
+            finish()
+          },
+        ],
+      )
+      if (!isAttachmentConsumerFuture(cleanup.observerWork))
+        throw new Error('attachment-consumer-cleanup-observer-unavailable')
+      subscribed = true
+      finish()
+    } catch (cause) {
+      cleanup.status = 'unobservable'
+      cleanup.observationCause = cause
+      throw cause
+    }
+    return cleanup.work as PromiseLike<void>
+  }
+  const binding: MarkdownAttachmentConsumerRequestBinding = Object.freeze({
+    request: request as MarkdownAttachmentConsumerRequest,
+    result: result as PromiseLike<MarkdownAttachmentProviderResult>,
+    settled: settled as PromiseLike<void>,
+    getRetainedCheckpoint() {
+      return retainedCheckpoint ?? null
+    },
+    inspectCleanup() {
+      return Object.freeze(
+        [cancellation, checkpointRelease]
+          .filter((cleanup): cleanup is Cleanup => Boolean(cleanup))
+          .map((cleanup) => Object.freeze({ ...cleanup })),
+      )
+    },
+    retire() {
+      callback(() => {
+        retired = true
+        checkpointCurrent = false
+        if (retainedCheckpoint) expiredCheckpoints.add(retainedCheckpoint)
+      })
+    },
+    cancelLocal(reason?: string) {
+      return callback(() => {
+        // Cleanup retains the pinned original cancellation method even after retirement.
+        checkpointCurrent = false
+        if (retainedCheckpoint) expiredCheckpoints.add(retainedCheckpoint)
+        return runCleanup('cancel', undefined, () =>
+          Reflect.apply(cancel, request, [reason]),
+        )
+      })
+    },
+    inspectLocalResources() {
+      return callback(() => {
+        if (!current()) return unsupported('consumer-request-stale')
+        if (cleanupUnsettled()) return unsupported('consumer-cleanup-unsettled')
+        const resources: unknown = Reflect.apply(inspect, request, [])
+        if (!isAttachmentConsumerObject(resources))
+          return unsupported('consumer-resource-census-unavailable')
+        const fields = [
+          'backgroundTasks',
+          'timers',
+          'observers',
+          'retainedListeners',
+          'networkRequests',
+          'memoryUnits',
+        ] as const
+        const counts = fields.map((key) =>
+          readAttachmentConsumerProperty(resources, key),
+        )
+        if (
+          !counts.every(
+            (count) => Number.isSafeInteger(count) && (count as number) >= 0,
+          ) ||
+          !current()
+        )
+          return unsupported('consumer-resource-census-unavailable')
+        return Object.freeze({
+          supported: true as const,
+          value: Object.freeze(
+            Object.fromEntries(
+              fields.map((key, index) => [key, counts[index]]),
+            ),
+          ) as unknown as MarkdownAttachmentConsumerResources,
+        })
+      })
+    },
+    captureCheckpoint() {
+      return callback(() => {
+        if (
+          retired ||
+          cleanupUnsettled() ||
+          !current() ||
+          !checkpointMethodsCurrent()
+        )
+          return unsupported('consumer-checkpoint-unavailable')
+        if (retainedCheckpoint)
+          return unsupported(
+            'consumer-checkpoint-already-retained',
+            retainedCheckpoint,
+          )
+        const checkpoint: unknown = Reflect.apply(
+          capture as MarkdownAttachmentConsumerCheckpointPort['capture'],
+          checkpointPort,
+          [],
+        )
+        if (!isAttachmentConsumerObject(checkpoint))
+          return unsupported('consumer-checkpoint-unavailable')
+        // Retain the actual opaque object even if its callback invalidated admission.
+        retainedCheckpoint = checkpoint
+        checkpointCurrent =
+          !expiredCheckpoints.has(checkpoint) &&
+          current() &&
+          checkpointMethodsCurrent()
+        return checkpointCurrent
+          ? Object.freeze({ supported: true as const, value: checkpoint })
+          : unsupported('consumer-checkpoint-stale', checkpoint)
+      })
+    },
+    recreateCheckpoint(checkpoint: object) {
+      return callback(() => {
+        if (
+          retainedCheckpoint !== checkpoint ||
+          cleanupUnsettled() ||
+          retired ||
+          !checkpointCurrent ||
+          !current() ||
+          !checkpointMethodsCurrent()
+        )
+          return unsupported('consumer-checkpoint-foreign-or-stale')
+        // Recreation is single-use, including a failed or throwing native invocation.
+        checkpointCurrent = false
+        expiredCheckpoints.add(checkpoint)
+        const recreated: unknown = Reflect.apply(
+          recreate as MarkdownAttachmentConsumerCheckpointPort['recreate'],
+          checkpointPort,
+          [checkpoint],
+        )
+        if (!current() || !checkpointMethodsCurrent())
+          return Object.freeze({
+            supported: false as const,
+            reason: 'consumer-recreation-stale',
+            value: recreated,
+          })
+        if (recreated === request)
+          return unsupported('consumer-recreation-original-attempt')
+        return bindAttachmentConsumerRequest(recreated, previousFutures)
+      })
+    },
+    releaseCheckpoint(checkpoint: object) {
+      return callback(() => {
+        if (checkpoint !== retainedCheckpoint || !hasCheckpoint)
+          throw new Error('attachment-consumer-checkpoint-foreign')
+        checkpointCurrent = false
+        expiredCheckpoints.add(checkpoint)
+        // On failure keep the original reference for this actual release's retry.
+        return runCleanup('release', checkpoint, () =>
+          Reflect.apply(
+            release as MarkdownAttachmentConsumerCheckpointPort['release'],
+            checkpointPort,
+            [checkpoint],
+          ),
+        )
+      })
+    },
+  })
+  return Object.freeze({ supported: true as const, value: binding })
+}
+
 export interface MarkdownAttachmentResolvedPayload {
   readonly markdownKind: MarkdownAttachmentMarkdownKind
   readonly href: string
