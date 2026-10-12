@@ -71,6 +71,7 @@ export interface MarkdownHeavyFeatureOwnedTimer {
 
 export interface MarkdownHeavyFeatureAdapterResourceOwner {
   readonly resources: MarkdownHeavyFeatureAdapterResources
+  readonly acceptsWork: () => boolean
   readonly setTimer: (
     run: () => void | Promise<void>,
     delay: number,
@@ -625,6 +626,7 @@ export const createMarkdownHeavyFeatureAdapterResourceOwner =
     })
     return Object.freeze({
       resources,
+      acceptsWork: () => !closed,
       setTimer,
       clearTimer,
       fetchBytes,
