@@ -552,6 +552,10 @@ consumer callback runs after the final renderer/view read and before original
 transaction retain/restore, with native availability/context checks preserved.
 A thrown guard preserves prior custody/selection/history. The consuming factory
 supplies its real owner/reference/admission guard; no success or receipt is issued.
+The final admission is followed by the actual panel quiescence/custody fence before
+transaction retain or restore. Public `openSearch()` can enqueue an original
+nextTick continuation at unchanged document/revision; it refuses before native
+history/selection mutation or replacement of the previous retained token.
 
 The original native owner now optionally captures immutable panel metadata into
 that SAME bounded checkpoint. `snapshot.panelRefs` contains independent backed
@@ -578,6 +582,11 @@ null attachment ref. Terminal cleanup, removal, retry, signal or phase/attempt/r
 changes invalidate it. State restoration preserves verified original settled jobs;
 it cannot revive a File loan/controller/request or rewind a terminal operation.
 Weak identity witnesses retain no additional File/controller ownership. This is
+not a completed nonempty production attachment checkpoint path: the current
+terminal owner retains batch/item records, and the original map cleanup also
+removes jobs. That missing original-owner transition keeps nonempty attachment
+refs unavailable; isolated helper settlement does not establish production custody.
+This is
 same-owner/same-revision state source only; full factory/draft/renderer/resource and
 native/worker/kernel/geometry/privacy acceptance remain blocked/UNRUN.
 

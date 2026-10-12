@@ -6794,11 +6794,18 @@ const sessionBinding = createMarkdownEditorSessionBinding({
       attachment: attachment?.state ?? null,
     })
     const isCurrent = () => {
+      // Attachment inspection reads original owner inputs. Recheck continuations
+      // and native identity after that reader, not only before it.
+      try {
+        requireQuiescent()
+        if (attachment && !attachment.isCurrent()) return false
+        requireQuiescent()
+      } catch { return false }
+      const currentPreview = previewElement()
       if (sessionDisposed || isComposing.value || editorProjection.value !== projection ||
           transactionStore.documentIdentity.id !== identity.id || transactionStore.documentIdentity.epoch !== identity.epoch ||
-          transactionStore.revision !== revision || textareaRef.value !== textarea || previewElement() !== preview) return false
-      try { requireQuiescent() } catch { return false }
-      return attachment === null || attachment.isCurrent()
+          transactionStore.revision !== revision || textareaRef.value !== textarea || currentPreview !== preview) return false
+      return true
     }
     return Object.freeze({
       state, missingOwners: Object.freeze(attachment ? [] : ['attachment-original-settled-state-custody']),

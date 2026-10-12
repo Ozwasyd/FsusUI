@@ -333,6 +333,9 @@ export const createMarkdownEditorSessionBinding = <ViewState>(
             if (panels && !panels.isCurrent()) throw new Error('editor-session-panel-owner-stale')
             assertAdmission?.()
             assertAvailable()
+            // Admission can synchronously schedule original panel continuations
+            // without changing the document. Fence them before retaining history.
+            if (panels && !panels.isCurrent()) throw new Error('editor-session-panel-owner-stale')
             if (store.revision !== revision || store.value !== source ||
                 store.documentIdentity.id !== identity.id || store.documentIdentity.epoch !== identity.epoch) {
               throw new Error('editor-session-snapshot-stale')
@@ -427,6 +430,9 @@ export const createMarkdownEditorSessionBinding = <ViewState>(
           // Final actual admission after renderer callbacks and before history/selection mutation.
           assertAdmission?.()
           assertAvailable()
+          // openSearch and other public callbacks can enqueue original nextTick
+          // work at the same revision. No native mutation precedes this fence.
+          if (custody.panels && !custody.panels.isCurrent()) return blocked('editor-session-panel-owner-stale')
           if (retained !== custody) return blocked('editor-session-snapshot-custody-invalid')
           if (!store.restoreRetainedSnapshot(custody.transaction)) {
             return blocked('editor-session-history-checkpoint-invalid')

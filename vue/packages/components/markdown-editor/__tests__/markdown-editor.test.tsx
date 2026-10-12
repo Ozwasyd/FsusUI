@@ -26,6 +26,38 @@ import type {
 import { getMarkdownXssSourceUrl } from '../../../../tests/support/markdown-xss-corpus'
 
 describe('MarkdownEditor', () => {
+  it('refuses final admission openSearch continuations before native panel retain or restore', async () => {
+    const wrapper = mount(MarkdownEditor, { props: {
+      mode: 'source', modelValue: '# Original panel', documentIdentity: { id: 'panel-admission-document', epoch: 1 },
+    } })
+    await flushPromises()
+    await nextTick()
+    const editor = wrapper.vm as MarkdownEditorInstance
+    const session = editor.getSession('session:panel-admission')
+    const snapshot = session.captureSnapshot(() => 'a'.repeat(64))
+    expect(snapshot.panelRefs).not.toBeNull()
+    const expected = { documentIdentity: snapshot.documentIdentity, revision: snapshot.revision }
+    editor.dispatchTransaction({ changes: [], selection: { start: 0, end: 0, direction: 'none' }, origin: 'programmatic' })
+    await nextTick()
+    await flushPromises()
+    const textarea = wrapper.find('textarea').element as HTMLTextAreaElement
+    const selection = { start: textarea.selectionStart, end: textarea.selectionEnd, direction: textarea.selectionDirection }
+    const proof = session.restoreSnapshot(snapshot, { ...expected, assertAdmission: () => editor.openSearch() })
+    expect(proof.reason).toBe('editor-session-panel-owner-stale')
+    expect({ start: textarea.selectionStart, end: textarea.selectionEnd, direction: textarea.selectionDirection }).toEqual(selection)
+    expect(editor.dispatchTransaction({ changes: [], origin: 'programmatic' }).selection).toEqual({ start: 0, end: 0, direction: 'none' })
+    expect(session.validateRetainedSnapshot(snapshot, expected)).toBe(true)
+    await nextTick()
+    await flushPromises()
+    let calls = 0
+    expect(() => session.captureSnapshot(() => 'b'.repeat(64), {
+      ...expected, assertAdmission: () => { if (++calls === 3) editor.openSearch() },
+    })).toThrow('editor-session-panel-owner-stale')
+    expect(calls).toBe(3)
+    expect(session.validateRetainedSnapshot(snapshot, expected)).toBe(true)
+    wrapper.unmount()
+  })
+
   it('checks actual consumer admission after view capture and before replacing or restoring original custody', () => {
     const identity = { id: 'admission-document', epoch: 1 }
     const store = new MarkdownEditorTransactionStore('source', undefined, identity)
