@@ -891,9 +891,11 @@ describe('original attachment consumer request capabilities', () => {
       'native-release-failed',
     )
     expect(bound.inspectLocalResources()).toEqual({
-      supported: true,
-      value: { ...resources(), memoryUnits: 1 },
+      supported: false,
+      reason: 'consumer-cleanup-unsettled',
+      value: bound.request,
     })
+    expect(bound.request.inspectLocalResources().memoryUnits).toBe(1)
     bound.releaseCheckpoint(opaque)
     expect(releases).toBe(2)
     expect(() => bound.releaseCheckpoint(opaque)).toThrow(
@@ -982,5 +984,230 @@ describe('original attachment consumer request capabilities', () => {
     expect(bound.recreateCheckpoint(opaque).supported).toBe(false)
     expect(bound.settled).toBe(original.settled)
     bound.releaseCheckpoint(opaque)
+  })
+
+  it('returns a stale capture pointer and exposes its pinned cleanup after capability mutation', () => {
+    const opaque = {}
+    const released: object[] = []
+    const original = {
+      ...request(),
+      checkpoint: {
+        capture() {
+          original.inspectLocalResources = () => resources()
+          return opaque
+        },
+        recreate: () => request(),
+        release(checkpoint: object) {
+          released.push(checkpoint)
+        },
+      },
+    }
+    const bound = bind(original)
+    const failed = bound.captureCheckpoint()
+    expect(failed.supported).toBe(false)
+    expect(failed.value).toBe(opaque)
+    expect(bound.getRetainedCheckpoint()).toBe(opaque)
+    bound.releaseCheckpoint(opaque)
+    expect(released).toEqual([opaque])
+    expect(bound.getRetainedCheckpoint()).toBe(null)
+  })
+
+  it('retains an asynchronous release pointer and original failure until an actual retry settles', async () => {
+    const opaque = {}
+    const cause = new Error('async-release-failed')
+    let reject!: (cause: unknown) => void
+    let finish!: () => void
+    const first = new Promise<void>((_, fail) => {
+      reject = fail
+    })
+    const second = new Promise<void>((resolve) => {
+      finish = resolve
+    })
+    let calls = 0
+    const receivers: unknown[] = []
+    const port = {
+      capture: () => opaque,
+      recreate: () => request(),
+      release(this: unknown, checkpoint: object) {
+        expect(checkpoint).toBe(opaque)
+        receivers.push(this)
+        calls += 1
+        return calls === 1 ? first : second
+      },
+    }
+    const bound = bind({ ...request(), checkpoint: port })
+    bound.captureCheckpoint()
+    expect(bound.releaseCheckpoint(opaque)).toBe(first)
+    expect(bound.getRetainedCheckpoint()).toBe(opaque)
+    expect(bound.inspectCleanup()[0]!.work).toBe(first)
+    expect(bound.inspectCleanup()[0]!.checkpoint).toBe(opaque)
+    expect(bound.inspectCleanup()[0]!.status).toBe('pending')
+    expect(() => bound.releaseCheckpoint(opaque)).toThrow(
+      'attachment-consumer-cleanup-unsettled',
+    )
+    expect(bound.inspectLocalResources().supported).toBe(false)
+    reject(cause)
+    await expect(first).rejects.toBe(cause)
+    await bound.inspectCleanup()[0]!.observerWork
+    expect(bound.inspectCleanup()[0]!.status).toBe('rejected')
+    expect(bound.inspectCleanup()[0]!.cause).toBe(cause)
+    expect(bound.getRetainedCheckpoint()).toBe(opaque)
+    expect(bound.releaseCheckpoint(opaque)).toBe(second)
+    finish()
+    await second
+    await bound.inspectCleanup()[0]!.observerWork
+    expect(bound.getRetainedCheckpoint()).toBe(null)
+    expect(bound.inspectCleanup()[0]!.status).toBe('fulfilled')
+    expect(receivers).toEqual([port, port])
+  })
+
+  it('returns asynchronous cancellation work and preserves its original rejection for retry', async () => {
+    const cause = new Error('async-cancel-failed')
+    let reject!: (cause: unknown) => void
+    let finish!: () => void
+    const first = new Promise<void>((_, fail) => {
+      reject = fail
+    })
+    const second = new Promise<void>((resolve) => {
+      finish = resolve
+    })
+    let calls = 0
+    const receivers: unknown[] = []
+    const original = {
+      ...request(),
+      cancelLocal(this: unknown) {
+        receivers.push(this)
+        calls += 1
+        return calls === 1 ? first : second
+      },
+    }
+    const bound = bind(original)
+    expect(bound.cancelLocal()).toBe(first)
+    expect(bound.inspectCleanup()[0]!.operation).toBe('cancel')
+    expect(() => bound.cancelLocal()).toThrow(
+      'attachment-consumer-cleanup-unsettled',
+    )
+    reject(cause)
+    await expect(first).rejects.toBe(cause)
+    await bound.inspectCleanup()[0]!.observerWork
+    expect(bound.inspectCleanup()[0]!.cause).toBe(cause)
+    expect(bound.cancelLocal()).toBe(second)
+    finish()
+    await second
+    await bound.inspectCleanup()[0]!.observerWork
+    expect(bound.inspectCleanup()[0]!.status).toBe('fulfilled')
+    expect(bound.result).toBe(original.result)
+    expect(bound.settled).toBe(original.settled)
+    expect(receivers).toEqual([original, original])
+  })
+
+  it('retains unobservable cleanup work and pointer instead of accepting a synchronous return', () => {
+    const opaque = {}
+    const work = { unavailable: true }
+    const bound = bind({
+      ...request(),
+      checkpoint: {
+        capture: () => opaque,
+        recreate: () => request(),
+        release: () => work,
+      },
+    })
+    bound.captureCheckpoint()
+    expect(() => bound.releaseCheckpoint(opaque)).toThrow(
+      'attachment-consumer-cleanup-future-unavailable',
+    )
+    const observation = bound.inspectCleanup()[0]!
+    expect(observation.work).toBe(work)
+    expect(observation.checkpoint).toBe(opaque)
+    expect(observation.status).toBe('unobservable')
+    expect(observation.observationCause).toBeInstanceOf(Error)
+    expect(bound.getRetainedCheckpoint()).toBe(opaque)
+    expect(bound.inspectLocalResources().supported).toBe(false)
+  })
+
+  it('does not discard a pointer when then fulfills synchronously and subsequently throws', () => {
+    const opaque = {}
+    const cause = new Error('subscription-failed')
+    const work = {
+      then(fulfilled: () => void) {
+        fulfilled()
+        throw cause
+      },
+    }
+    const bound = bind({
+      ...request(),
+      checkpoint: {
+        capture: () => opaque,
+        recreate: () => request(),
+        release: () => work,
+      },
+    })
+    bound.captureCheckpoint()
+    expect(() => bound.releaseCheckpoint(opaque)).toThrow(cause)
+    expect(bound.getRetainedCheckpoint()).toBe(opaque)
+    expect(bound.inspectCleanup()[0]!.work).toBe(work)
+    expect(bound.inspectCleanup()[0]!.observationCause).toBe(cause)
+    expect(bound.inspectCleanup()[0]!.status).toBe('unobservable')
+  })
+
+  it('refuses recreated objects reusing either original future while retaining the actual child', () => {
+    for (const reuse of ['result', 'settled', 'both'] as const) {
+      const opaque = {}
+      const original = request()
+      const fresh = request()
+      const child = {
+        ...fresh,
+        result: reuse === 'settled' ? fresh.result : original.result,
+        settled: reuse === 'result' ? fresh.settled : original.settled,
+      }
+      const bound = bind({
+        ...original,
+        checkpoint: {
+          capture: () => opaque,
+          recreate: () => child,
+          release() {},
+        },
+      })
+      bound.captureCheckpoint()
+      const refused = bound.recreateCheckpoint(opaque)
+      expect(refused.supported).toBe(false)
+      if (refused.supported === true) throw new Error('old future admitted')
+      expect(refused.reason).toBe('consumer-recreation-future-reused')
+      expect(refused.value).toBe(child)
+      expect(bound.getRetainedCheckpoint()).toBe(opaque)
+      bound.releaseCheckpoint(opaque)
+    }
+  })
+
+  it('refuses an ancestor future reused later in the same original recreation chain', () => {
+    const firstOpaque = {}
+    const secondOpaque = {}
+    const original = request()
+    const grandchild = { ...request(), settled: original.settled }
+    const child = {
+      ...request(),
+      checkpoint: {
+        capture: () => secondOpaque,
+        recreate: () => grandchild,
+        release() {},
+      },
+    }
+    const bound = bind({
+      ...original,
+      checkpoint: {
+        capture: () => firstOpaque,
+        recreate: () => child,
+        release() {},
+      },
+    })
+    bound.captureCheckpoint()
+    const next = bound.recreateCheckpoint(firstOpaque)
+    if (next.supported === false) throw new Error(next.reason)
+    next.value.captureCheckpoint()
+    const refused = next.value.recreateCheckpoint(secondOpaque)
+    expect(refused.supported).toBe(false)
+    expect(refused.value).toBe(grandchild)
+    next.value.releaseCheckpoint(secondOpaque)
+    bound.releaseCheckpoint(firstOpaque)
   })
 })

@@ -1077,13 +1077,29 @@ including retained checkpoints. Unknown, missing, negative or noninteger counts 
 unsupported, never normalized to zero. Server-side work is outside this local census.
 
 `bindMarkdownAttachmentConsumerRequest(returned)` retains that same request and both
-original futures. It does not call an upload provider, observe/replace a future, start
-another attempt or create a File grant. Void, bare promises and incomplete handles
+original request futures. Binding does not call an upload provider, subscribe to or
+replace those result/settled futures, start another attempt or create a File grant.
+Cleanup invocations separately observe only their actually returned cleanup work.
+Void, bare promises and incomplete handles
 return `{ supported: false, reason, value: returned }`, preserving any original unknown
 work for its invocation owner. Supported bindings forward pinned original methods with
 their original receiver. Census admission checks their identity around the actual
 callback; reentrant binding controls refuse before changing state. Exceptions propagate.
-Calling cancellation does not settle either future or prove any resource was released.
+Calling cancellation does not settle either request future or prove any resource was released.
+
+`cancelLocal` and checkpoint `release` explicitly return either synchronous `void` or
+their actual `PromiseLike<void>` cleanup work. The binding returns that identical work,
+not an async wrapper or synthetic future. It observes the original cleanup future and
+exposes the actual returned observer future in `inspectCleanup()`, together with its
+original checkpoint pointer, pending/fulfilled/rejected/unobservable status, original
+rejection cause and any observation failure cause. The invocation owner must retain
+and await both real futures. Pending, failed or unobservable cleanup blocks census
+admission; cancellation/cleanup statuses do not acknowledge full business settlement.
+Pending or unobservable work cannot be retried by assuming it finished. Synchronous
+exceptions and observed asynchronous rejections retain original cause and cleanup
+references, allowing the same original pinned operation to retry after known failure.
+A successful actual release fulfillment clears the checkpoint; merely returning a
+promise does not. Unobservable work remains held with its pointer and actual return.
 
 The optional original `checkpoint` port supplies `capture()`, `recreate(checkpoint)`
 and `release(checkpoint)`. Without all three methods, checkpoint operations are
@@ -1091,14 +1107,20 @@ unsupported. A capture retains the original non-null opaque object without inspe
 cloning or reconstructing its body. Only that binding's current original pointer can
 recreate. Copies, foreign objects, released checkpoints and repeated or cancelled
 recreations refuse. Recreation invokes the original port once and returns a binding to
-its actual new request; returning the same original attempt is unsupported. Failed
+its actual new request; returning the same original attempt or reusing any original
+result/settled future in that recreation chain is unsupported. Different object shape
+alone is not a new attempt. Failed
 recreation still consumes recreation admission. The checkpoint reference remains for
 original release, including after cancellation; a failed release retains it for retry.
 Released or consumed opaque objects remain weakly marked expired in that binding and
 cannot regain recreation admission when returned again by the original capture port.
 `retire()` invalidates checkpoint recreation before an owning attempt/document is
 replaced, retaining original cleanup methods, request, futures and census access.
-The producer does not remint File access from a checkpoint.
+The producer does not remint File access from a checkpoint. If capture returns an
+opaque object but changes capabilities during its callback, the unsupported result
+still exposes that identical object. `getRetainedCheckpoint()` also returns the exact
+retained pointer for original release, including after capture failure or retirement.
+It performs no provider read, body cloning or new checkpoint issuance.
 
 These helpers only bind capabilities supplied by the actual invocation. They do not
 grant attachment-job/result/transaction authority. The native attachment owner must
