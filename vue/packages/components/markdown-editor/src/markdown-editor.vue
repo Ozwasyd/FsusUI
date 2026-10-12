@@ -1736,6 +1736,7 @@ const retireSettledAttachmentRecords = (
   const binding = attachmentJobBindings.get(originalJob)
   const record = attachmentBatches.get(batch.batchId)
   const identity = transactionStore.documentIdentity
+  const revision = transactionStore.revision
   if (sessionDisposed || editorReleased || attachmentPauseRequested.value ||
       !proof?.settlementAvailable || !proof.settled || proof.dispatching ||
       proof.attempt !== attempt || originalJob.attempt !== attempt ||
@@ -1748,6 +1749,18 @@ const retireSettledAttachmentRecords = (
       batch.documentIdentity.id !== identity.id || batch.documentIdentity.epoch !== identity.epoch ||
       (props.documentIdentity?.id ?? commandTrayId) !== identity.id || (props.documentIdentity?.epoch ?? 0) !== identity.epoch)
     return
+  // Document prop readers can reenter. Recheck real private custody after the
+  // last reader before releasing any original records.
+  const current = transactionStore.documentIdentity
+  const finalProof = inspectMarkdownAttachmentDispatch(originalJob)
+  if (sessionDisposed || editorReleased || attachmentPauseRequested.value ||
+      current.id !== identity.id || current.epoch !== identity.epoch || transactionStore.revision !== revision ||
+      finalProof?.dispatchRef !== proof.dispatchRef || finalProof.attempt !== attempt ||
+      !finalProof.settlementAvailable || !finalProof.settled || finalProof.dispatching ||
+      originalJob.attempt !== attempt || (originalJob.phase !== 'resolved' && originalJob.phase !== 'deleted') ||
+      !attachmentJobs.value.some((candidate) => toRaw(candidate) === originalJob) ||
+      attachmentJobBindings.get(originalJob) !== binding || attachmentBatches.get(batch.batchId) !== record ||
+      attachmentItems.get(item.itemId) !== item || record.files.has(item)) return
   attachmentFileCleanupDepth += 1
   try {
     attachmentItems.delete(item.itemId)
