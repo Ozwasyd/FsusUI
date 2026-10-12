@@ -888,6 +888,7 @@ const createRenderPipelineProducerAuthority = (missingFeeds: string[] = []) => {
     source: unknown,
     missingName: string,
     canRelease: () => boolean = () => true,
+    onRevoked?: () => void,
   ) =>
     change(() => {
       if (closed) throw new Error('fsus_pipeline_authority_closed')
@@ -930,7 +931,7 @@ const createRenderPipelineProducerAuthority = (missingFeeds: string[] = []) => {
       // Publish the actual in-progress registration before foreign subscribe.
       dependencies.set(source, dependency)
       try {
-        const unsubscribe = subscribe(() => change(() => undefined))
+        const unsubscribe = subscribe(() => change(() => onRevoked?.()))
         if (typeof unsubscribe !== 'function') {
           missing.add(missingName)
           brokenFeed = true
@@ -1028,8 +1029,14 @@ const createRenderPipelineProducerAuthority = (missingFeeds: string[] = []) => {
     change(() => {
       closed = true
     })
+  const recordFailure = (cause: unknown, phase: string, resource: unknown) =>
+    change(() => {
+      brokenFeed = true
+      feedFailures.push(Object.freeze({ cause, phase, resource }))
+    })
   return {
     authority,
+    recordFailure,
     boundary,
     change,
     retainDependency,
@@ -1108,6 +1115,24 @@ const retainRenderPipelineConfigAuthority = (
 
 const renderPipelineModuleAuthority = createRenderPipelineProducerAuthority()
 
+const attemptRenderPipelineCleanup = (
+  producerAuthority: ReturnType<typeof createRenderPipelineProducerAuthority>,
+  actions: Array<{ resource: unknown; action: () => void }>,
+) => {
+  let failed = false
+  let firstCause: unknown
+  for (const { resource, action } of actions) {
+    try {
+      action()
+    } catch (cause) {
+      producerAuthority.recordFailure(cause, 'resource-cleanup', resource)
+      if (!failed) firstCause = cause
+      failed = true
+    }
+  }
+  if (failed) throw firstCause
+}
+
 // Own only callbacks requested here. Opaque platform work remains unknown.
 const createRenderPipelineCallbackResources = (
   producerAuthority: ReturnType<typeof createRenderPipelineProducerAuthority>,
@@ -1116,6 +1141,7 @@ const createRenderPipelineCallbackResources = (
     kind: 'raf' | 'idle' | 'timeout'
     cancelled: boolean
     cancel: (() => void) | null
+    allocation: 'pending' | 'registered' | 'unavailable'
   }
   const entries = new Set<Entry>()
   const schedule = (
@@ -1123,7 +1149,12 @@ const createRenderPipelineCallbackResources = (
     request: (run: () => void) => (() => void) | null,
     run: () => void,
   ) => {
-    const entry: Entry = { kind, cancelled: false, cancel: null }
+    const entry: Entry = {
+      kind,
+      cancelled: false,
+      cancel: null,
+      allocation: 'pending',
+    }
     entries.add(entry)
     try {
       entry.cancel = request(
@@ -1132,16 +1163,24 @@ const createRenderPipelineCallbackResources = (
           if (!entry.cancelled) run()
         }),
       )
+      entry.allocation = 'registered'
     } catch (error) {
-      entries.delete(entry)
+      // A throwing allocator does not prove that no callback was registered.
+      entry.allocation = 'unavailable'
+      producerAuthority.recordFailure(error, 'callback-allocation', entry)
       throw error
     }
     return producerAuthority.boundary(() => {
       if (!entries.has(entry)) return
       entry.cancelled = true
       if (entry.cancel) {
-        entry.cancel()
-        entries.delete(entry)
+        try {
+          entry.cancel()
+          entries.delete(entry)
+        } catch (cause) {
+          producerAuthority.recordFailure(cause, 'callback-cancel', entry)
+          throw cause
+        }
       }
     })
   }
@@ -1179,22 +1218,45 @@ const createRenderPipelineCallbackResources = (
       run,
     )
   const cancelAll = (isCurrent: () => boolean = () => true) => {
-    for (const entry of [...entries]) {
-      if (!isCurrent()) break
-      entry.cancelled = true
-      if (entry.cancel) {
-        entry.cancel()
-        entries.delete(entry)
-      }
-    }
+    const actions = [...entries].map((entry) => ({
+      resource: entry,
+      action: () => {
+        if (!isCurrent() || !entries.has(entry)) return
+        entry.cancelled = true
+        if (entry.cancel) {
+          entry.cancel()
+          entries.delete(entry)
+        }
+      },
+    }))
+    attemptRenderPipelineCleanup(producerAuthority, actions)
   }
   const inspect = () =>
     Object.freeze({
-      rafHandles: [...entries].filter((entry) => entry.kind === 'raf').length,
-      idleHandles: [...entries].filter((entry) => entry.kind === 'idle').length,
-      timers: [...entries].filter((entry) => entry.kind === 'timeout').length,
-      uncancellableCallbacks: [...entries].filter((entry) => !entry.cancel)
-        .length,
+      rafHandles: [...entries].filter(
+        (entry) => entry.kind === 'raf' && entry.allocation === 'registered',
+      ).length,
+      idleHandles: [...entries].filter(
+        (entry) => entry.kind === 'idle' && entry.allocation === 'registered',
+      ).length,
+      timers: [...entries].filter(
+        (entry) =>
+          entry.kind === 'timeout' && entry.allocation === 'registered',
+      ).length,
+      callbackRegistrationObligations: Object.freeze(
+        [...entries]
+          .filter((entry) => entry.allocation !== 'registered')
+          .map((entry) =>
+            Object.freeze({
+              kind: entry.kind,
+              allocation: entry.allocation,
+              cancelled: entry.cancelled,
+            }),
+          ),
+      ),
+      uncancellableCallbacks: [...entries].filter(
+        (entry) => entry.allocation === 'registered' && !entry.cancel,
+      ).length,
     })
   return {
     cancelAll: producerAuthority.boundary(cancelAll),
@@ -1235,17 +1297,31 @@ export const createFsusRafRefreshSampler = ({
     previous = timestamp
     if (deltas.length >= Math.max(4, sampleSize)) {
       stopped = true
-      onSample(estimateFsusRenderRefreshProfile(deltas))
+      try {
+        onSample(estimateFsusRenderRefreshProfile(deltas))
+      } catch (cause) {
+        producerAuthority.recordFailure(cause, 'sampler-publication', onSample)
+        throw cause
+      } finally {
+        producerAuthority.close()
+      }
       return
     }
     handle = requestFrame(sample)
   })
-  handle = requestFrame(sample)
+  producerAuthority.change(() => {
+    handle = requestFrame(sample)
+  })
   const stop = producerAuthority.boundary(() => {
     stopped = true
     if (handle !== null && cancelFrame) {
-      cancelFrame(handle)
-      handle = null
+      try {
+        cancelFrame(handle)
+        handle = null
+      } catch (cause) {
+        producerAuthority.recordFailure(cause, 'sampler-cancel', handle)
+        throw cause
+      }
     }
     if (handle === null) producerAuthority.close()
   })
@@ -1478,18 +1554,21 @@ const isReducedMotionPreferred = () =>
 let renderPipelineLowPower = false
 let calibratedMainOpsPerMs: number | null = null
 
-export const calibrateFsusMainThreadThroughput = () => {
-  if (calibratedMainOpsPerMs !== null) return calibratedMainOpsPerMs
-  const operations = 50_000
-  const startedAt = readRenderPipelineNow()
-  let checksum = 0
-  for (let index = 0; index < operations; index++) {
-    checksum = (checksum * 33 + index) >>> 0
-  }
-  const elapsedMs = Math.max(0.1, readRenderPipelineNow() - startedAt)
-  calibratedMainOpsPerMs = Math.round((operations + (checksum & 1)) / elapsedMs)
-  return calibratedMainOpsPerMs
-}
+export const calibrateFsusMainThreadThroughput =
+  renderPipelineModuleAuthority.boundary(() => {
+    if (calibratedMainOpsPerMs !== null) return calibratedMainOpsPerMs
+    const operations = 50_000
+    const startedAt = readRenderPipelineNow()
+    let checksum = 0
+    for (let index = 0; index < operations; index++) {
+      checksum = (checksum * 33 + index) >>> 0
+    }
+    const elapsedMs = Math.max(0.1, readRenderPipelineNow() - startedAt)
+    calibratedMainOpsPerMs = Math.round(
+      (operations + (checksum & 1)) / elapsedMs,
+    )
+    return calibratedMainOpsPerMs
+  })
 
 const resolveAutoHardwareProfile = (): FsusRenderHardwareProfile => {
   if (typeof window === 'undefined' || typeof document === 'undefined') {
@@ -1656,9 +1735,11 @@ export const resolveFsusRenderPipelineUnitAttrs = ({
 export const useFsusRenderPipelineHardwareProfile = (
   config?: MaybeRef<FsusRenderPipelineConfig | null | undefined>,
 ) => {
-  const producerAuthority = createRenderPipelineProducerAuthority([
-    'hardware-platform-state',
-  ])
+  const producerAuthority = createRenderPipelineProducerAuthority()
+  producerAuthority.retainDependency(
+    renderPipelineModuleAuthority.authority,
+    'module-hardware-authority',
+  )
   retainRenderPipelineConfigAuthority(producerAuthority, config)
 
   const refreshProfile = shallowRef(estimateFsusRenderRefreshProfile([]))
@@ -1669,16 +1750,23 @@ export const useFsusRenderPipelineHardwareProfile = (
   let disposed = false
   let generation = 0
   let visibilityListener = false
+  let visibilityTarget: Document | null = null
   const batteryJobs = new Set<symbol>()
   const samplers = new Set<ReturnType<typeof createFsusRafRefreshSampler>>()
   const stopSamplers = () => {
-    for (const stop of [...samplers]) {
-      stop()
-      if (stop.inspectResources().rafHandles === 0) {
-        samplers.delete(stop)
-        producerAuthority.releaseDependency(stop.authority)
-      }
-    }
+    attemptRenderPipelineCleanup(
+      producerAuthority,
+      [...samplers].map((stop) => ({
+        resource: stop,
+        action: () => {
+          stop()
+          if (stop.inspectResources().rafHandles === 0) {
+            samplers.delete(stop)
+            producerAuthority.releaseDependency(stop.authority)
+          }
+        },
+      })),
+    )
   }
   const startSampler = () => {
     stopSamplers()
@@ -1703,6 +1791,9 @@ export const useFsusRenderPipelineHardwareProfile = (
       () => stop.inspectResources().rafHandles === 0,
     )
     samplers.add(stop)
+    // Keep the real binding until its actual RAF settles; natural completion
+    // then drains it through the existing source progress notification.
+    producerAuthority.releaseDependency(stop.authority)
   }
   const onVisibilityChange = producerAuthority.boundary(() => {
     if (paused || disposed) return
@@ -1712,17 +1803,22 @@ export const useFsusRenderPipelineHardwareProfile = (
   })
   const connect = () => {
     if (!mounted || paused || disposed) return
+    const connectGeneration = generation
     startSampler()
-    if (!visibilityListener && typeof document !== 'undefined') {
-      document.addEventListener('visibilitychange', onVisibilityChange)
+    if (paused || disposed || connectGeneration !== generation) return
+    if (!visibilityTarget && typeof document !== 'undefined') {
+      visibilityTarget = document
+      visibilityTarget.addEventListener('visibilitychange', onVisibilityChange)
       visibilityListener = true
     }
+    if (paused || disposed || connectGeneration !== generation) return
     if (typeof navigator !== 'undefined') {
       const getBattery = (
         navigator as Navigator & {
           getBattery?: () => Promise<{ charging: boolean; level: number }>
         }
       ).getBattery
+      if (paused || disposed || connectGeneration !== generation) return
       if (typeof getBattery === 'function') {
         const batteryGeneration = generation
         const job = Symbol('battery-query')
@@ -1744,11 +1840,21 @@ export const useFsusRenderPipelineHardwareProfile = (
                 batteryGeneration !== generation
               )
                 return
-              renderPipelineLowPower = !battery.charging && battery.level <= 0.2
-              lowPower.value = renderPipelineLowPower
+              const nextLowPower = !battery.charging && battery.level <= 0.2
+              const current = () =>
+                !paused && !disposed && batteryGeneration === generation
+              if (!current()) return
+              renderPipelineModuleAuthority.change(() => {
+                if (current()) renderPipelineLowPower = nextLowPower
+              })
+              if (current()) lowPower.value = nextLowPower
             }),
           )
-          .catch(producerAuthority.boundary(() => undefined))
+          .catch(
+            producerAuthority.boundary((cause) => {
+              producerAuthority.recordFailure(cause, 'battery-query', job)
+            }),
+          )
           .finally(producerAuthority.boundary(() => batteryJobs.delete(job)))
       }
     }
@@ -1771,7 +1877,13 @@ export const useFsusRenderPipelineHardwareProfile = (
       authorityFeed: producerAuthority.inspect(),
       rafHandles,
       uncancellableCallbacks,
-      retainedListeners: visibilityListener ? 1 : 0,
+      retainedListeners: visibilityTarget ? 1 : 0,
+      visibilityRegistration: visibilityTarget
+        ? visibilityListener
+          ? ('installed' as const)
+          : ('unknown' as const)
+        : ('absent' as const),
+      nativePlatformState: 'unknown' as const,
       pendingBatteryQueries: batteryJobs.size,
       batteryCancellation: batteryJobs.size
         ? ('unavailable' as const)
@@ -1784,17 +1896,29 @@ export const useFsusRenderPipelineHardwareProfile = (
     if (!paused) {
       paused = true
       generation += 1
-      stopSamplers()
-      if (visibilityListener && typeof document !== 'undefined') {
-        document.removeEventListener('visibilitychange', onVisibilityChange)
-        visibilityListener = false
-      }
     }
+    const target = visibilityTarget
+    attemptRenderPipelineCleanup(producerAuthority, [
+      { resource: Object.freeze([...samplers]), action: stopSamplers },
+      {
+        resource: target,
+        action: () => {
+          if (!target) return
+          target.removeEventListener('visibilitychange', onVisibilityChange)
+          if (visibilityTarget === target) {
+            visibilityTarget = null
+            visibilityListener = false
+          }
+        },
+      },
+    ])
     return inspectResources()
   }
   const resume = () => {
     if (disposed) throw new Error('fsus_render_pipeline_hardware_disposed')
     if (paused) {
+      pause()
+      if (disposed || !paused) return inspectResources()
       paused = false
       const resumeGeneration = ++generation
       visibilityVersion.value += 1
