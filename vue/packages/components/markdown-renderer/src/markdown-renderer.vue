@@ -427,7 +427,9 @@ let heavyFeatureMutateCommits = 0
 let heavyFeaturePostPaintCommits = 0
 let renderAnchorDelta: number | null = null
 
-const rendererResourceOwner = createMarkdownRendererSessionResourceOwner({
+const rendererResourceOwner: ReturnType<
+  typeof createMarkdownRendererSessionResourceOwner
+> = createMarkdownRendererSessionResourceOwner({
   ownerKey: localDocumentKey,
   readDocumentState: () => ({
     documentIdentity: {
