@@ -1,5 +1,6 @@
 import {
   computed,
+  isRef,
   nextTick,
   onBeforeUnmount,
   onMounted,
@@ -15,12 +16,15 @@ import {
   fsusOk,
   fsusTryAsync,
   getFsusRenderPipelineComponentPolicy,
+  getFsusRenderPipelineComponentPolicyAuthority,
   isFsusErr,
   isFsusOk,
   type FsusRenderPipelineComponentPolicy,
   type FsusErrorDetail,
   type FsusResult,
 } from '@element-plus/utils'
+
+import { getGlobalConfigFeed } from '@element-plus/components/config-provider/src/hooks/use-global-config'
 
 import type { ComputedRef, MaybeRef, Ref } from 'vue'
 
@@ -1066,6 +1070,19 @@ const createRenderPipelineProducerAuthority = (missingFeeds: string[] = []) => {
   }
 }
 
+// Bind only the original selected Ref registered by the controlled config producer.
+// A computed projection, arbitrary Ref/props or plain object has no inherited feed.
+const retainRenderPipelineConfigAuthority = (
+  producerAuthority: ReturnType<typeof createRenderPipelineProducerAuthority>,
+  config: unknown,
+) =>
+  producerAuthority.change(() => {
+    producerAuthority.retainDependency(
+      isRef(config) ? getGlobalConfigFeed(config) : undefined,
+      'controlled-global-config-authority',
+    )
+  })
+
 const renderPipelineModuleAuthority = createRenderPipelineProducerAuthority()
 
 // Own only callbacks requested here. Opaque platform work remains unknown.
@@ -1619,6 +1636,7 @@ export const useFsusRenderPipelineHardwareProfile = (
   const producerAuthority = createRenderPipelineProducerAuthority([
     'hardware-platform-state',
   ])
+  retainRenderPipelineConfigAuthority(producerAuthority, config)
 
   const refreshProfile = shallowRef(estimateFsusRenderRefreshProfile([]))
   const visibilityVersion = ref(0)
@@ -3293,6 +3311,13 @@ export const useFsusRenderPipelineRuntime = <TSource, TUnit>(
     renderPipelineModuleAuthority.authority,
     'module-registry-authority',
   )
+  producerAuthority.change(() => {
+    producerAuthority.retainDependency(
+      getFsusRenderPipelineComponentPolicyAuthority(),
+      'component-policy-authority',
+    )
+    retainRenderPipelineConfigAuthority(producerAuthority, options.config)
+  })
 
   const documentRef = shallowRef<FsusRenderPipelineDocument<TUnit> | null>(null)
   const error = shallowRef<FsusErrorDetail | null>(null)
@@ -3600,7 +3625,7 @@ export const useFsusRenderPipelineRuntime = <TSource, TUnit>(
   )
 
   const hardwareRuntime = useFsusRenderPipelineHardwareProfile(
-    computed(producerAuthority.boundary(() => unref(options.config))),
+    producerAuthority.change(() => options.config),
   )
   producerAuthority.retainDependency(
     hardwareRuntime.authority,
