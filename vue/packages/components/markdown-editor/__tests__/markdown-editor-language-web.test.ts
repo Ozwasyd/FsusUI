@@ -349,3 +349,137 @@ describe('markdown web language tools integration', () => {
     expect(publicSurface).not.toHaveProperty('textareaRef')
   })
 })
+
+
+describe('markdown web language/search resource custody', () => {
+  const fixture = () => {
+    const source = 'apple banana apple'
+    const documentIdentity = { epoch: 1, id: 'resource-doc' }
+    const textarea = document.createElement('textarea')
+    textarea.value = source
+    const controller = bindMarkdownWebLanguageTools(textarea, {
+      documentIdentity, revision: 1, source,
+    })
+    const input = {
+      documentEpoch: 1, documentId: documentIdentity.id,
+      queryText: 'apple', revision: 1, source,
+    }
+    return { controller, documentIdentity, input, textarea }
+  }
+
+  it('requires custody transfer and reports retained search records, not a worker', () => {
+    const { controller, input } = fixture()
+    expect(() => controller.executeSearch(input)).toThrow('owner-unbound')
+    const previous = { cancelled: false, id: 'previous', query: 'banana' }
+    const participant = controller.adoptSearchTask(previous)
+    expect(previous.cancelled).toBe(true)
+    expect(() => controller.adoptSearchTask(null)).toThrow('already-bound')
+    expect(participant.inspect().usage).toEqual({
+      editorInstances: 0, renderers: 0, observers: 0, timers: 0,
+      backgroundTasks: 0, networkRequests: 0, memoryUnits: 2,
+    })
+    const search = controller.executeSearch(input)
+    expect(search.execution.matches).toHaveLength(2)
+    expect(participant.inspect()).toMatchObject({
+      ownerRef: 'language-search', paused: false, recoverable: false,
+      retainedListeners: 0, usage: { memoryUnits: 7, backgroundTasks: 0 },
+    })
+    controller.cancelSearch()
+    expect(search.task.cancelled).toBe(true)
+    expect(participant.inspect().usage.memoryUnits).toBe(2)
+  })
+
+  it('cancels real tasks and sessions, gates recreation, and rejects late native input', () => {
+    const { controller, input, textarea } = fixture()
+    const participant = controller.adoptSearchTask(null)
+    const search = controller.executeSearch(input)
+    controller.createSession()
+    expect(participant.inspect().usage.memoryUnits).toBe(8)
+    expect(participant.pause()).toMatchObject({ paused: true, retainedListeners: 0 })
+    expect(search.task.cancelled).toBe(true)
+    expect(controller.session).toBeNull()
+    expect(textarea.spellcheck).toBe(false)
+    expect(textarea.getAttribute('autocorrect')).toBe('off')
+    expect(textarea.getAttribute('writingsuggestions')).toBe('false')
+    expect(() => controller.createSession()).toThrow('paused')
+    expect(() => controller.executeSearch(input)).toThrow('paused')
+    controller.switchMode('source')
+    controller.updateContext({})
+    controller.updateState({ revision: 1, source: input.source })
+    expect(textarea.spellcheck).toBe(false)
+    expect(controller.handleBeforeInput({ inputType: 'insertReplacementText' }))
+      .toMatchObject({ handled: true, reason: 'disabled' })
+    expect(participant.resume()).toMatchObject({ paused: false, recoverable: false })
+    expect(textarea.spellcheck).toBe(true)
+    expect(controller.handleBeforeInput({ inputType: 'insertReplacementText' }))
+      .toMatchObject({ handled: true, reason: 'session-required' })
+    controller.createSession()
+    expect(controller.session).not.toBeNull()
+    expect(controller.executeSearch(input).task).not.toBe(search.task)
+  })
+
+  it('refuses stale identities and revisions and cancels searches on state replacement', () => {
+    const { controller, documentIdentity, input } = fixture()
+    const participant = controller.adoptSearchTask(null)
+    const first = controller.executeSearch(input)
+    const second = controller.executeSearch(input)
+    expect(first.task.cancelled).toBe(true)
+    expect(first.execution.requestId).not.toBe(second.execution.requestId)
+    controller.updateState({ revision: 2, source: input.source })
+    expect(second.task.cancelled).toBe(true)
+    expect(participant.inspect().usage.memoryUnits).toBe(2)
+    expect(() => controller.executeSearch(input)).toThrow('stale-document')
+    documentIdentity.epoch = 2
+    expect(() => controller.executeSearch({ ...input, revision: 2 })).toThrow('stale-document')
+    expect(controller.executeSearch({ ...input, documentEpoch: 2, revision: 2 })
+      .execution.matches[0]?.documentEpoch).toBe(2)
+  })
+
+  it('refuses composition pause and unrecoverable disposal without releasing custody', () => {
+    const { controller, input, textarea } = fixture()
+    const participant = controller.adoptSearchTask(null)
+    const search = controller.executeSearch(input)
+    controller.createSession()
+    const session = controller.session
+    const before = participant.inspect()
+    controller.updateContext({ isComposing: true })
+    expect(() => participant.pause()).toThrow('running')
+    expect(participant.inspect()).toEqual(before)
+    expect(search.task.cancelled).toBe(false)
+    expect(controller.session).toBe(session)
+    expect(textarea.spellcheck).toBe(true)
+    controller.updateContext({})
+    participant.pause()
+    const paused = participant.inspect()
+    expect(() => participant.dispose('retained-snapshot')).toThrow('not-recoverable')
+    expect(participant.inspect()).toEqual(paused)
+    expect(participant.resume().paused).toBe(false)
+  })
+
+  it('counts the executing task and refuses pause within the existing synchronous runner', () => {
+    const { controller, input } = fixture()
+    const participant = controller.adoptSearchTask(null)
+    const budget = {
+      maxConcurrent: 1, maxMatches: 100, maxMs: 500, maxRegexLength: 256,
+      get maxSourceBytes() {
+        expect(participant.inspect().usage.backgroundTasks).toBe(1)
+        expect(() => participant.pause()).toThrow('running')
+        return 400_000
+      },
+    }
+    expect(controller.executeSearch({ ...input, budget }).execution.status).toBe('complete')
+    expect(participant.inspect().usage.backgroundTasks).toBe(0)
+  })
+
+  it('rejects results cancelled during execution instead of storing a successful result', () => {
+    const { controller, input } = fixture()
+    const participant = controller.adoptSearchTask(null)
+    const budget = {
+      maxConcurrent: 1, maxMatches: 100, maxMs: 500, maxRegexLength: 256,
+      get maxSourceBytes() { controller.cancelSearch(); return 400_000 },
+    }
+    expect(() => controller.executeSearch({ ...input, budget })).toThrow('stale-request')
+    expect(participant.inspect().usage).toMatchObject({ backgroundTasks: 0, memoryUnits: 2 })
+    expect(controller.executeSearch(input).execution.matches).toHaveLength(2)
+  })
+})

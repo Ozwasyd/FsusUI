@@ -1,10 +1,20 @@
 import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
-import { mount } from '@vue/test-utils'
-import { nextTick } from 'vue'
+import { flushPromises, mount } from '@vue/test-utils'
+import { defineComponent, h, nextTick } from 'vue'
 import { afterEach, describe, expect, expectTypeOf, it, vi } from 'vitest'
 import MarkdownEditor from '../src/markdown-editor.vue'
+import { useMarkdownHeavyFeatureDocumentContext } from '../../../hooks/use-markdown-heavy-feature-lifecycle'
 import { createMarkdownOutlineModel } from '../src/markdown-editor-outline'
+import { createMarkdownEditorSessionBinding } from '../src/markdown-editor-session'
+import { captureMarkdownEditorSessionAttachmentState } from '../src/markdown-editor-session-attachment-state'
+import { createMarkdownAttachmentJob, runMarkdownAttachmentDispatch } from '../src/markdown-editor-attachment-lifecycle'
+import { MarkdownEditorTransactionStore } from '../src/markdown-editor-transaction'
+import type {
+  MarkdownEditorSessionDocumentAuthority,
+  MarkdownEditorSessionDocumentAuthorityTicket,
+  MarkdownEditorSessionDocumentAuthorityRetirementHandle,
+} from '@element-plus/element-plus'
 import {
   defaultMarkdownEditorCommands,
   markdownEditorEmits,
@@ -13,6 +23,8 @@ import {
   runMarkdownEditorCommand,
 } from '../src/markdown-editor'
 import type {
+  MarkdownAttachmentProviderResult,
+  MarkdownEditorAttachmentDispatch,
   MarkdownEditorCommand,
   MarkdownEditorInstance,
   MarkdownEditorProps,
@@ -22,6 +34,661 @@ import type {
 import { getMarkdownXssSourceUrl } from '../../../../tests/support/markdown-xss-corpus'
 
 describe('MarkdownEditor', () => {
+  it('completes actual mounted undo model synchronization without a nested retirement callback', async () => {
+    let authority: NonNullable<ReturnType<typeof useMarkdownHeavyFeatureDocumentContext>>['documentAuthority']
+    const Probe = defineComponent({ setup() {
+      authority = useMarkdownHeavyFeatureDocumentContext()?.documentAuthority
+      return () => null
+    } })
+    const wrapper = mount(MarkdownEditor, { props: {
+      modelValue: 'source', mode: 'source', statusDensity: 'minimal', documentIdentity: { id: 'nested-notification', epoch: 1 },
+    }, slots: { status: () => h(Probe) } })
+    await flushPromises()
+    const vm = wrapper.vm as MarkdownEditorInstance
+    const session = vm.getSession('session:public-document-authority')
+    expectTypeOf(session.documentAuthority).toEqualTypeOf<MarkdownEditorSessionDocumentAuthority | null>()
+    expectTypeOf(session.documentAuthority!.capture()).toEqualTypeOf<MarkdownEditorSessionDocumentAuthorityTicket | null>()
+    expect(session.documentAuthority).toBe(authority)
+    expect(session.documentAuthority!.capture()).toBe(authority!.capture())
+    expect(vm.dispatchTransaction({ changes: [{ from: 0, to: 0, insert: 'seed ' }], history: 'separate', origin: 'programmatic' }).accepted).toBe(true)
+    await nextTick()
+    let calls = 0
+    const cause = { tag: 'nested-notification-must-not-run' }
+    const handle = session.documentAuthority!.subscribeRetirement(() => { if (++calls === 2) throw cause })
+    expectTypeOf(handle).toEqualTypeOf<MarkdownEditorSessionDocumentAuthorityRetirementHandle>()
+    expect(vm.undo().accepted).toBe(true)
+    expect(calls).toBe(1)
+    expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual(['source'])
+    expect(handle.hasCustody()).toBe(true)
+    // Remove this ordinary control before actual unmount can trigger its next legitimate outer notification.
+    let caught: unknown
+    try { handle.unsubscribe() } catch (error) { caught = error }
+    expect(caught).toBe(cause)
+    expect(handle.hasCustody()).toBe(true)
+    handle.unsubscribe()
+    wrapper.unmount()
+  })
+
+  it('attempts original late unmount cleanup after receiver failure and retains its original cause/custody', async () => {
+    let authority: NonNullable<ReturnType<typeof useMarkdownHeavyFeatureDocumentContext>>['documentAuthority']
+    const Probe = defineComponent({ setup() {
+      authority = useMarkdownHeavyFeatureDocumentContext()?.documentAuthority
+      return () => null
+    } })
+    const errors: unknown[] = []
+    const wrapper = mount(MarkdownEditor, { props: {
+      modelValue: 'source', mode: 'source', statusDensity: 'minimal', documentIdentity: { id: 'cleanup-after-retirement-failure', epoch: 1 },
+    }, slots: { status: () => h(Probe) }, global: { config: { errorHandler: error => { errors.push(error) } } } })
+    await flushPromises()
+    const publicAuthority = (wrapper.vm as MarkdownEditorInstance).getSession('session:public-unmount-authority').documentAuthority
+    expect(publicAuthority).toBe(authority)
+    const cause = { tag: 'original-retirement-failure' }
+    let fail = true
+    const handle = publicAuthority!.subscribeRetirement(() => { if (fail) throw cause })
+    const removals = vi.spyOn(window, 'removeEventListener')
+    const release = vi.spyOn(MarkdownEditorTransactionStore.prototype, 'releaseRetainedSnapshot')
+    try {
+      wrapper.unmount()
+      expect(errors).toContain(cause)
+      expect(release).toHaveBeenCalled()
+      expect(removals.mock.calls.some(([event]) => event === 'resize')).toBe(true)
+      expect(handle.hasCustody()).toBe(true)
+      expect(handle.failureCause()).toBe(cause)
+      expect(publicAuthority!.capture()).toBeNull()
+      fail = false
+      expect(handle.unsubscribe()).toBe(true)
+      expect(handle.hasCustody()).toBe(false)
+      expect(publicAuthority!.capture()).toBeNull()
+    } finally {
+      removals.mockRestore()
+      release.mockRestore()
+    }
+  })
+
+  it('seals original native publication and checks/publishes without any external owner reader', () => {
+    const identity = { id: 'sealed-native-document', epoch: 1 }
+    const store = new MarkdownEditorTransactionStore('source', undefined, identity)
+    let forbidReaders = false
+    const read = () => { if (forbidReaders) throw new Error('publication-called-external-owner'); return false }
+    const binding = createMarkdownEditorSessionBinding({
+      transactionStore: store, isComposing: read, isDisposed: read,
+      captureViewState: () => null, restoreViewState: () => {},
+      resourceParticipants: () => [], captureLastValidRender: () => { read(); return null },
+    })
+    const session = binding.getSession('session:sealed-native')
+    expect(session.documentAuthority).toBeNull()
+    const expected = { documentIdentity: identity, revision: 0 }
+    const original = session.captureSnapshot(() => 'a'.repeat(64), expected)
+    const preparation = session.prepareSnapshot(() => 'b'.repeat(64), expected)
+    const publication = session.sealPreparedSnapshot(preparation)
+    expect(() => session.sealPreparedSnapshot(preparation)).toThrow('editor-session-snapshot-already-sealed')
+    expect(session.hasSealedSnapshotCustody({ ...publication })).toBe(false)
+    forbidReaders = true
+    expect(session.hasSealedSnapshotCustody(publication)).toBe(true)
+    expect(session.publishSealedSnapshot(publication)).toBe(preparation.snapshot)
+    expect(session.hasSealedSnapshotCustody(publication)).toBe(false)
+    expect(session.publishSealedSnapshot(publication)).toBeNull()
+    forbidReaders = false
+    expect(session.validateRetainedSnapshot(original, expected)).toBe(false)
+    expect(session.validateRetainedSnapshot(preparation.snapshot, expected)).toBe(true)
+  })
+
+  it('retires a sealed native ticket on genuine private invalidation/cancel/lifetime events and preserves old refs', () => {
+    const identity = { id: 'sealed-retirement-document', epoch: 1 }
+    const store = new MarkdownEditorTransactionStore('source', undefined, identity)
+    const binding = createMarkdownEditorSessionBinding({
+      transactionStore: store, isComposing: () => false, isDisposed: () => false,
+      captureViewState: () => null, restoreViewState: () => {},
+      resourceParticipants: () => [], captureLastValidRender: () => null,
+    })
+    const session = binding.getSession('session:sealed-retirement')
+    const expected = { documentIdentity: identity, revision: 0 }
+    const original = session.captureSnapshot(() => 'a'.repeat(64), expected)
+    const preparation = session.prepareSnapshot(() => 'b'.repeat(64), expected)
+    const publication = session.sealPreparedSnapshot(preparation)
+    binding.invalidatePublicationAuthority()
+    expect(session.hasSealedSnapshotCustody(publication)).toBe(false)
+    expect(session.publishSealedSnapshot(publication)).toBeNull()
+    expect(session.validateRetainedSnapshot(original, expected)).toBe(true)
+    expect(() => session.sealPreparedSnapshot(preparation)).toThrow('editor-session-publication-authority-retired')
+    const cancelled = session.prepareSnapshot(() => 'c'.repeat(64), expected)
+    const cancelledPublication = session.sealPreparedSnapshot(cancelled)
+    expect(session.discardPreparedSnapshot(cancelled)).toBe(true)
+    expect(session.publishSealedSnapshot(cancelledPublication)).toBeNull()
+    expect(session.validateRetainedSnapshot(original, expected)).toBe(true)
+    const retired = session.prepareSnapshot(() => 'd'.repeat(64), expected)
+    const retiredPublication = session.sealPreparedSnapshot(retired)
+    binding.retirePublicationAuthority()
+    expect(session.hasSealedSnapshotCustody(retiredPublication)).toBe(false)
+    expect(session.publishSealedSnapshot(retiredPublication)).toBeNull()
+    expect(session.discardPreparedSnapshot(retired)).toBe(true)
+    expect(() => session.inspectDocumentState()).toThrow('editor-session-disposed')
+  })
+
+  it('invalidates actual mounted native publication synchronously on readonly transition and original unmount', async () => {
+    const wrapper = mount(MarkdownEditor, { props: {
+      mode: 'source', modelValue: '# Sealed original', documentIdentity: { id: 'sealed-mounted-document', epoch: 1 },
+    } })
+    await flushPromises()
+    await nextTick()
+    const session = (wrapper.vm as MarkdownEditorInstance).getSession('session:sealed-mounted')
+    const original = session.captureSnapshot(() => 'a'.repeat(64))
+    const expected = { documentIdentity: original.documentIdentity, revision: original.revision }
+    const preparation = session.prepareSnapshot(() => 'b'.repeat(64), expected)
+    const publication = session.sealPreparedSnapshot(preparation)
+    await wrapper.setProps({ readonly: true })
+    expect(session.hasSealedSnapshotCustody(publication)).toBe(false)
+    expect(session.publishSealedSnapshot(publication)).toBeNull()
+    expect(session.validateRetainedSnapshot(original, expected)).toBe(true)
+    expect(session.discardPreparedSnapshot(preparation)).toBe(true)
+    await flushPromises()
+    const closing = session.prepareSnapshot(() => 'c'.repeat(64), expected)
+    const closingPublication = session.sealPreparedSnapshot(closing)
+    wrapper.unmount()
+    expect(session.hasSealedSnapshotCustody(closingPublication)).toBe(false)
+    expect(session.publishSealedSnapshot(closingPublication)).toBeNull()
+    expect(session.discardPreparedSnapshot(closing)).toBe(false)
+  })
+
+  it('prepares and atomically commits actual native refs without replacing the previous token during preparation', () => {
+    const identity = { id: 'prepared-native-document', epoch: 1 }
+    const store = new MarkdownEditorTransactionStore('original source', undefined, identity)
+    store.dispatch({ changes: [{ from: 0, to: 0, insert: 'actual ' }], history: 'separate', origin: 'programmatic' })
+    const session = createMarkdownEditorSessionBinding({
+      transactionStore: store, isComposing: () => false, isDisposed: () => false,
+      captureViewState: () => null, restoreViewState: () => {},
+      resourceParticipants: () => [], captureLastValidRender: () => null,
+    }).getSession('session:prepared-native')
+    const expected = { documentIdentity: identity, revision: store.revision }
+    const original = session.captureSnapshot(() => 'a'.repeat(64), expected)
+    const before = { history: store.history, selection: store.selection, value: store.value, revision: store.revision }
+    const preparation = session.prepareSnapshot(() => 'b'.repeat(64), expected)
+    expect(session.validateRetainedSnapshot(original, expected)).toBe(true)
+    expect(session.validateRetainedSnapshot(preparation.snapshot, expected)).toBe(false)
+    expect(() => session.captureSnapshot(() => 'c'.repeat(64), expected)).toThrow('editor-session-snapshot-preparation-pending')
+    expect(() => session.commitPreparedSnapshot({ snapshot: preparation.snapshot })).toThrow('editor-session-snapshot-preparation-invalid')
+    expect(session.discardPreparedSnapshot({ snapshot: preparation.snapshot })).toBe(false)
+    const foreignStore = new MarkdownEditorTransactionStore(store.value, undefined, identity)
+    const foreign = createMarkdownEditorSessionBinding({
+      transactionStore: foreignStore, isComposing: () => false, isDisposed: () => false,
+      captureViewState: () => null, restoreViewState: () => {},
+      resourceParticipants: () => [], captureLastValidRender: () => null,
+    }).getSession('session:prepared-foreign')
+    const foreignPreparation = foreign.prepareSnapshot(() => 'b'.repeat(64))
+    expect(() => session.commitPreparedSnapshot(foreignPreparation)).toThrow('editor-session-snapshot-preparation-invalid')
+    expect(session.discardPreparedSnapshot(foreignPreparation)).toBe(false)
+    expect(foreign.discardPreparedSnapshot(foreignPreparation)).toBe(true)
+    const committed = session.commitPreparedSnapshot(preparation)
+    expect(committed).toBe(preparation.snapshot)
+    expect(session.validateRetainedSnapshot(original, expected)).toBe(false)
+    expect(session.validateRetainedSnapshot(committed, expected)).toBe(true)
+    expect(committed.historyRef).toBe(`${committed.snapshotRef}:history`)
+    expect(committed.selectionRef).toBe(`${committed.snapshotRef}:selection`)
+    expect(committed.viewStateRef).toBe(`${committed.snapshotRef}:view`)
+    expect({ history: store.history, selection: store.selection, value: store.value, revision: store.revision }).toEqual(before)
+    expect(() => session.commitPreparedSnapshot(preparation)).toThrow('editor-session-snapshot-preparation-invalid')
+    expect(session.discardPreparedSnapshot(preparation)).toBe(false)
+  })
+
+  it('keeps published snapshot custody pure without availability reads or foreign pointer admission', () => {
+    const identity = { id: 'published-custody-document', epoch: 1 }
+    const store = new MarkdownEditorTransactionStore('source', undefined, identity)
+    let reads = 0
+    let failReaders = false
+    const available = () => {
+      reads += 1
+      if (failReaders) throw new Error('availability-reader-must-not-run')
+      return false
+    }
+    const binding = createMarkdownEditorSessionBinding({
+      transactionStore: store, isComposing: available, isDisposed: available,
+      captureViewState: () => null, restoreViewState: () => {},
+      resourceParticipants: () => [], captureLastValidRender: () => null,
+    })
+    const session = binding.getSession('session:published-custody')
+    const prepared = session.prepareSnapshot(() => 'a'.repeat(64))
+    expect(session.hasRetainedSnapshotCustody(prepared.snapshot)).toBe(false)
+    const publication = session.sealPreparedSnapshot(prepared)
+    const published = session.publishSealedSnapshot(publication)
+    expect(published).toBe(prepared.snapshot)
+    const before = reads
+    failReaders = true
+    expect(session.hasRetainedSnapshotCustody(prepared.snapshot)).toBe(true)
+    expect(session.hasRetainedSnapshotCustody({ ...prepared.snapshot })).toBe(false)
+    expect(reads).toBe(before)
+    failReaders = false
+    const cancelled = session.prepareSnapshot(() => 'b'.repeat(64))
+    expect(session.hasRetainedSnapshotCustody(prepared.snapshot)).toBe(true)
+    expect(session.discardPreparedSnapshot(cancelled)).toBe(true)
+    expect(session.hasRetainedSnapshotCustody(prepared.snapshot)).toBe(true)
+    const next = session.captureSnapshot(() => 'c'.repeat(64))
+    expect(session.hasRetainedSnapshotCustody(prepared.snapshot)).toBe(false)
+    expect(session.hasRetainedSnapshotCustody(next)).toBe(true)
+  })
+
+  it('refuses published custody after private generation, real transaction and retirement changes', () => {
+    const store = new MarkdownEditorTransactionStore('source', undefined, { id: 'published-retirement-document', epoch: 1 })
+    const binding = createMarkdownEditorSessionBinding({
+      transactionStore: store, isComposing: () => false, isDisposed: () => false,
+      captureViewState: () => null, restoreViewState: () => {},
+      resourceParticipants: () => [], captureLastValidRender: () => null,
+    })
+    const session = binding.getSession('session:published-retirement')
+    const original = session.captureSnapshot(() => 'a'.repeat(64))
+    expect(session.hasRetainedSnapshotCustody(original)).toBe(true)
+    binding.invalidatePublicationAuthority()
+    expect(session.hasRetainedSnapshotCustody(original)).toBe(false)
+    const changed = session.captureSnapshot(() => 'b'.repeat(64))
+    store.dispatch({ changes: [{ from: 0, to: 0, insert: 'changed ' }], history: 'separate', origin: 'programmatic' })
+    expect(session.hasRetainedSnapshotCustody(changed)).toBe(false)
+    const retired = session.captureSnapshot(() => 'c'.repeat(64))
+    binding.retirePublicationAuthority()
+    expect(session.hasRetainedSnapshotCustody(retired)).toBe(false)
+  })
+
+  it.each(['write', 'retire', 'unsubscribe', 'failed-write', 'failed-retire', 'failed-unsubscribe'] as const)(
+    'withdraws published session custody during original %s notification and after its failure', (operation) => {
+      const store = new MarkdownEditorTransactionStore('source', undefined, { id: 'published-notification', epoch: 1 })
+      const session = createMarkdownEditorSessionBinding({
+        transactionStore: store, isComposing: () => false, isDisposed: () => false,
+        captureViewState: () => null, restoreViewState: () => {},
+        resourceParticipants: () => [], captureLastValidRender: () => null,
+      }).getSession('session:published-notification')
+      const snapshot = session.captureSnapshot(() => 'a'.repeat(64))
+      const before = { value: store.value, revision: store.revision, history: store.history, selection: store.selection }
+      const cause = { tag: 'original-published-retirement-failure' }
+      let calls = 0
+      const handle = store.subscribeDocumentAuthorityRetirement(() => {
+        calls += 1
+        expect({ value: store.value, revision: store.revision, history: store.history, selection: store.selection }).toEqual(before)
+        expect(session.hasRetainedSnapshotCustody(snapshot)).toBe(false)
+        if (operation.startsWith('failed-')) throw cause
+      })
+      expect(session.hasRetainedSnapshotCustody(snapshot)).toBe(true)
+      let caught: unknown
+      try {
+        if (operation.endsWith('write')) store.setSelection(store.selection)
+        else if (operation.endsWith('retire')) store.retireDocumentAuthority()
+        else handle.unsubscribe()
+      } catch (error) { caught = error }
+      expect(calls).toBe(1)
+      expect(caught).toBe(operation.startsWith('failed-') ? cause : undefined)
+      // Successful registration release does not write the native document. Failed
+      // release permanently retires it; write/retire never revive the old generation.
+      expect(session.hasRetainedSnapshotCustody(snapshot)).toBe(operation === 'unsubscribe')
+    },
+  )
+
+  it('preserves actual prior native token through preparation callback failure, commit admission failure and cancellation', () => {
+    const identity = { id: 'prepared-failure-document', epoch: 1 }
+    const store = new MarkdownEditorTransactionStore('source', undefined, identity)
+    let failView = false
+    let admitted = true
+    const session = createMarkdownEditorSessionBinding({
+      transactionStore: store, isComposing: () => false, isDisposed: () => false,
+      captureViewState: () => { if (failView) throw new Error('actual-view-failed'); return null }, restoreViewState: () => {},
+      resourceParticipants: () => [], captureLastValidRender: () => null,
+    }).getSession('session:prepared-failure')
+    const expected = { documentIdentity: identity, revision: 0, assertAdmission: () => { if (!admitted) throw new Error('actual-admission-retired') } }
+    const original = session.captureSnapshot(() => 'a'.repeat(64), expected)
+    failView = true
+    expect(() => session.prepareSnapshot(() => 'b'.repeat(64), expected)).toThrow('actual-view-failed')
+    expect(session.validateRetainedSnapshot(original, expected)).toBe(true)
+    failView = false
+    const refused = session.prepareSnapshot(() => 'b'.repeat(64), expected)
+    admitted = false
+    expect(() => session.commitPreparedSnapshot(refused)).toThrow('actual-admission-retired')
+    expect(session.validateRetainedSnapshot(original, expected)).toBe(true)
+    admitted = true
+    const cancelled = session.prepareSnapshot(() => 'c'.repeat(64), expected)
+    expect(session.discardPreparedSnapshot(cancelled)).toBe(true)
+    expect(session.discardPreparedSnapshot(cancelled)).toBe(false)
+    expect(session.validateRetainedSnapshot(original, expected)).toBe(true)
+    expect(() => session.commitPreparedSnapshot(cancelled)).toThrow('editor-session-snapshot-preparation-invalid')
+    expect(session.captureSnapshot(() => 'd'.repeat(64), expected).editorContentDigest).toBe('d'.repeat(64))
+  })
+
+  it('keeps native allocation failure and cancellation reentry before publication without losing original refs', () => {
+    const identity = { id: 'prepared-unwind-document', epoch: 1 }
+    const store = new MarkdownEditorTransactionStore('source', undefined, identity)
+    const session = createMarkdownEditorSessionBinding({
+      transactionStore: store, isComposing: () => false, isDisposed: () => false,
+      captureViewState: () => null, restoreViewState: () => {},
+      resourceParticipants: () => [], captureLastValidRender: () => null,
+    }).getSession('session:prepared-unwind')
+    const expected = { documentIdentity: identity, revision: 0 }
+    const original = session.captureSnapshot(() => 'a'.repeat(64), expected)
+    const allocation = session.prepareSnapshot(() => 'b'.repeat(64), expected)
+    const copy = vi.spyOn(Array.prototype, 'slice').mockImplementationOnce(() => { throw new Error('actual-retained-allocation-failed') })
+    try {
+      expect(() => session.commitPreparedSnapshot(allocation)).toThrow('actual-retained-allocation-failed')
+    } finally { copy.mockRestore() }
+    expect(session.validateRetainedSnapshot(original, expected)).toBe(true)
+    const cancelled = session.prepareSnapshot(() => 'c'.repeat(64), expected)
+    expect(() => session.commitPreparedSnapshot(cancelled, () => { session.discardPreparedSnapshot(cancelled) }))
+      .toThrow('editor-session-snapshot-preparation-stale')
+    expect(session.validateRetainedSnapshot(original, expected)).toBe(true)
+    const reentrant = session.prepareSnapshot(() => 'd'.repeat(64), expected)
+    expect(() => session.commitPreparedSnapshot(reentrant, () => { session.captureSnapshot(() => 'e'.repeat(64)) }))
+      .toThrow('editor-session-snapshot-reentrant')
+    expect(session.validateRetainedSnapshot(original, expected)).toBe(true)
+  })
+
+  it('revalidates full native admission and lifetime after allocation reentry that returns real arrays', () => {
+    const identity = { id: 'prepared-allocation-admission-document', epoch: 1 }
+    const store = new MarkdownEditorTransactionStore('source', undefined, identity)
+    let admitted = true
+    let disposed = false
+    const session = createMarkdownEditorSessionBinding({
+      transactionStore: store, isComposing: () => false, isDisposed: () => disposed,
+      captureViewState: () => null, restoreViewState: () => {},
+      resourceParticipants: () => [], captureLastValidRender: () => null,
+    }).getSession('session:prepared-allocation-admission')
+    const expected = { documentIdentity: identity, revision: 0, assertAdmission: () => { if (!admitted) throw new Error('actual-allocation-retired') } }
+    const original = session.captureSnapshot(() => 'a'.repeat(64), expected)
+    const nativeBefore = { value: store.value, revision: store.revision, selection: store.selection, history: store.history }
+    const intrinsicSlice = Array.prototype.slice
+    const candidate = session.prepareSnapshot(() => 'b'.repeat(64), expected)
+    const retirement = vi.spyOn(Array.prototype, 'slice').mockImplementationOnce(function (this: unknown[]) {
+      admitted = false
+      return intrinsicSlice.call(this)
+    })
+    try {
+      expect(() => session.commitPreparedSnapshot(candidate)).toThrow('actual-allocation-retired')
+    } finally { retirement.mockRestore() }
+    expect({ value: store.value, revision: store.revision, selection: store.selection, history: store.history }).toEqual(nativeBefore)
+    expect(session.validateRetainedSnapshot(original, expected)).toBe(true)
+    admitted = true
+    const lifetime = session.prepareSnapshot(() => 'c'.repeat(64), expected)
+    const disposal = vi.spyOn(Array.prototype, 'slice').mockImplementationOnce(function (this: unknown[]) {
+      disposed = true
+      return intrinsicSlice.call(this)
+    })
+    try {
+      expect(() => session.commitPreparedSnapshot(lifetime)).toThrow('editor-session-disposed')
+    } finally { disposal.mockRestore() }
+    disposed = false
+    expect(session.validateRetainedSnapshot(original, expected)).toBe(true)
+    const next = session.prepareSnapshot(() => 'd'.repeat(64), expected)
+    expect(session.commitPreparedSnapshot(next)).toBe(next.snapshot)
+  })
+
+  it('refuses changed original selection and released ABA history custody without restoring a staged token', () => {
+    const identity = { id: 'prepared-stale-document', epoch: 1 }
+    const store = new MarkdownEditorTransactionStore('source', undefined, identity)
+    const session = createMarkdownEditorSessionBinding({
+      transactionStore: store, isComposing: () => false, isDisposed: () => false,
+      captureViewState: () => null, restoreViewState: () => {},
+      resourceParticipants: () => [], captureLastValidRender: () => null,
+    }).getSession('session:prepared-stale')
+    const expected = { documentIdentity: identity, revision: 0 }
+    const original = session.captureSnapshot(() => 'a'.repeat(64), expected)
+    const selection = session.prepareSnapshot(() => 'b'.repeat(64), expected)
+    store.setSelection({ start: 1, end: 1, direction: 'none' })
+    const newerSelection = store.selection
+    expect(() => session.commitPreparedSnapshot(selection)).toThrow('editor-session-snapshot-preparation-stale')
+    expect(store.selection).toEqual(newerSelection)
+    expect(session.validateRetainedSnapshot(original, expected)).toBe(true)
+    const aba = session.prepareSnapshot(() => 'c'.repeat(64), expected)
+    store.switchDocument({ id: 'other-prepared-document', epoch: 2 }, 'other source')
+    store.switchDocument(identity, 'source')
+    expect(() => session.commitPreparedSnapshot(aba)).toThrow('editor-session-snapshot-preparation-stale')
+    expect(session.validateRetainedSnapshot(original, expected)).toBe(false)
+    expect(store.history).toEqual(expect.objectContaining({ undoDepth: 0, redoDepth: 0 }))
+  })
+
+  it('cancels a genuine prepared native candidate after disposal and refuses composition admission', () => {
+    const identity = { id: 'prepared-lifetime-document', epoch: 1 }
+    const store = new MarkdownEditorTransactionStore('source', undefined, identity)
+    let disposed = false
+    let composing = false
+    const session = createMarkdownEditorSessionBinding({
+      transactionStore: store, isComposing: () => composing, isDisposed: () => disposed,
+      captureViewState: () => null, restoreViewState: () => {},
+      resourceParticipants: () => [], captureLastValidRender: () => null,
+    }).getSession('session:prepared-lifetime')
+    const expected = { documentIdentity: identity, revision: 0 }
+    const original = session.captureSnapshot(() => 'a'.repeat(64), expected)
+    const composition = session.prepareSnapshot(() => 'b'.repeat(64), expected)
+    composing = true
+    expect(() => session.commitPreparedSnapshot(composition)).toThrow('editor-session-composition-active')
+    composing = false
+    expect(session.validateRetainedSnapshot(original, expected)).toBe(true)
+    const retired = session.prepareSnapshot(() => 'c'.repeat(64), expected)
+    disposed = true
+    expect(session.discardPreparedSnapshot(retired)).toBe(true)
+    expect(session.discardPreparedSnapshot(retired)).toBe(false)
+    expect(() => session.commitPreparedSnapshot(retired)).toThrow('editor-session-snapshot-preparation-invalid')
+    expect(() => session.inspectDocumentState()).toThrow('editor-session-disposed')
+  })
+
+  it('fences actual mounted openSearch work before committing prepared native panel refs', async () => {
+    const wrapper = mount(MarkdownEditor, { props: {
+      mode: 'source', modelValue: '# Original prepared panel', documentIdentity: { id: 'prepared-panel-document', epoch: 1 },
+    } })
+    await flushPromises()
+    await nextTick()
+    const editor = wrapper.vm as MarkdownEditorInstance
+    const session = editor.getSession('session:prepared-panel')
+    const original = session.captureSnapshot(() => 'a'.repeat(64))
+    const expected = { documentIdentity: original.documentIdentity, revision: original.revision }
+    const prepared = session.prepareSnapshot(() => 'b'.repeat(64), expected)
+    expect(prepared.snapshot.panelRefs).not.toBeNull()
+    expect(() => session.commitPreparedSnapshot(prepared, () => editor.openSearch())).toThrow('editor-session-panel-owner-stale')
+    expect(session.validateRetainedSnapshot(original, expected)).toBe(true)
+    await nextTick()
+    await flushPromises()
+    const next = session.prepareSnapshot(() => 'c'.repeat(64), expected)
+    expect(session.commitPreparedSnapshot(next)).toBe(next.snapshot)
+    expect(session.readPanelState(next.snapshot)?.search).not.toBeNull()
+    wrapper.unmount()
+  })
+
+  it('reads actual native content digest without replacing retained history and fences admission and reentrant capture', () => {
+    const identity = { id: 'digest-source-document', epoch: 1 }
+    const store = new MarkdownEditorTransactionStore('original source', undefined, identity)
+    const session = createMarkdownEditorSessionBinding({
+      transactionStore: store, isComposing: () => false, isDisposed: () => false,
+      captureViewState: () => null, restoreViewState: () => {},
+      resourceParticipants: () => [], captureLastValidRender: () => null,
+    }).getSession('session:content-digest')
+    const expected = { documentIdentity: identity, revision: 0 }
+    const snapshot = session.captureSnapshot(() => 'a'.repeat(64), expected)
+    const before = { history: store.history, selection: store.selection, value: store.value }
+    expect(session.inspectContentDigest((source) => { expect(source).toBe('original source'); return 'b'.repeat(64) }, expected))
+      .toEqual({ documentIdentity: identity, revision: 0, editorContentDigest: 'b'.repeat(64) })
+    expect({ history: store.history, selection: store.selection, value: store.value }).toEqual(before)
+    expect(session.validateRetainedSnapshot(snapshot, expected)).toBe(true)
+    expect(() => session.inspectContentDigest(() => { session.captureSnapshot(() => 'c'.repeat(64)); return 'b'.repeat(64) }, expected))
+      .toThrow('editor-session-snapshot-reentrant')
+    expect(session.validateRetainedSnapshot(snapshot, expected)).toBe(true)
+    let admitted = true
+    expect(() => session.inspectContentDigest(() => { admitted = false; return 'b'.repeat(64) }, {
+      ...expected, assertAdmission: () => { if (!admitted) throw new Error('actual-owner-retired') },
+    })).toThrow('actual-owner-retired')
+    expect(session.validateRetainedSnapshot(snapshot, expected)).toBe(true)
+  })
+
+  it('rejects non-string native digests and session refs without invoking conversion callbacks', () => {
+    const identity = { id: 'digest-conversion-document', epoch: 1 }
+    const store = new MarkdownEditorTransactionStore('original source', undefined, identity)
+    const binding = createMarkdownEditorSessionBinding({
+      transactionStore: store, isComposing: () => false, isDisposed: () => false,
+      captureViewState: () => null, restoreViewState: () => {},
+      resourceParticipants: () => [], captureLastValidRender: () => null,
+    })
+    const session = binding.getSession('session:digest-conversion')
+    const expected = { documentIdentity: identity, revision: 0 }
+    const snapshot = session.captureSnapshot(() => 'a'.repeat(64), expected)
+    let conversions = 0
+    const hostile = { toString() {
+      conversions += 1
+      store.dispatch({ changes: [{ from: 0, to: 0, insert: 'changed ' }], history: 'separate', origin: 'programmatic' })
+      return 'b'.repeat(64)
+    } }
+    const invalidDigest = (() => hostile) as unknown as (source: string) => string
+    expect(() => session.inspectContentDigest(invalidDigest, expected)).toThrow('editor-session-content-digest-invalid')
+    expect(() => session.captureSnapshot(invalidDigest, expected)).toThrow('editor-session-content-digest-invalid')
+    expect(() => binding.getSession(hostile as unknown as string)).toThrow('editor-session-ref-invalid')
+    expect(conversions).toBe(0)
+    expect(store.value).toBe('original source')
+    expect(store.revision).toBe(0)
+    expect(session.validateRetainedSnapshot(snapshot, expected)).toBe(true)
+  })
+
+  it('retains only original settled attachment state and invalidates phase, signal and removal changes', async () => {
+    const controller = new AbortController()
+    const job = createMarkdownAttachmentJob('panel-item', {
+      documentIdentity: { id: 'panel-document', epoch: 1 }, revision: 0, signalController: controller,
+    })
+    let jobs = [job]
+    let finish!: (result: MarkdownAttachmentProviderResult) => void
+    const future = new Promise<MarkdownAttachmentProviderResult>((resolve) => { finish = resolve })
+    const pending = runMarkdownAttachmentDispatch(job, () => future)
+    expect(captureMarkdownEditorSessionAttachmentState(() => jobs, () => {})).toBeNull()
+    finish({ status: 'cancelled', batchId: 'panel-batch', itemId: 'panel-item',
+      documentIdentity: { id: 'panel-document', epoch: 1 }, revision: 0 })
+    await pending
+    job.phase = 'cancelled'
+    const captured = captureMarkdownEditorSessionAttachmentState(() => jobs, () => {})!
+    expect(captured.isCurrent()).toBe(true)
+    expect(Object.isFrozen(captured.state)).toBe(true)
+    expect(Object.isFrozen(captured.state[0])).toBe(true)
+    job.progress = 1
+    expect(captured.state[0]!.progress).toBe(0)
+    expect(captured.isCurrent()).toBe(false)
+    job.progress = 0
+    job.attempt += 1
+    expect(captureMarkdownEditorSessionAttachmentState(() => jobs, () => {})).toBeNull()
+    job.attempt -= 1
+    controller.abort()
+    expect(captured.isCurrent()).toBe(false)
+    jobs = []
+    expect(captured.isCurrent()).toBe(false)
+    const legacy = createMarkdownAttachmentJob('legacy', { documentIdentity: { id: 'panel-document', epoch: 1 }, revision: 0 })
+    legacy.phase = 'cancelled'
+    expect(captureMarkdownEditorSessionAttachmentState(() => [legacy], () => {})).toBeNull()
+  })
+
+  it('refuses final admission openSearch continuations before native panel retain or restore', async () => {
+    const wrapper = mount(MarkdownEditor, { props: {
+      mode: 'source', modelValue: '# Original panel', documentIdentity: { id: 'panel-admission-document', epoch: 1 },
+    } })
+    await flushPromises()
+    await nextTick()
+    const editor = wrapper.vm as MarkdownEditorInstance
+    const session = editor.getSession('session:panel-admission')
+    const snapshot = session.captureSnapshot(() => 'a'.repeat(64))
+    expect(snapshot.panelRefs).not.toBeNull()
+    const expected = { documentIdentity: snapshot.documentIdentity, revision: snapshot.revision }
+    editor.dispatchTransaction({ changes: [], selection: { start: 0, end: 0, direction: 'none' }, history: 'skip', origin: 'programmatic' })
+    await nextTick()
+    await flushPromises()
+    const textarea = wrapper.find('textarea').element as HTMLTextAreaElement
+    const selection = { start: textarea.selectionStart, end: textarea.selectionEnd, direction: textarea.selectionDirection }
+    const proof = session.restoreSnapshot(snapshot, { ...expected, assertAdmission: () => editor.openSearch() })
+    expect(proof.reason).toBe('editor-session-panel-owner-stale')
+    expect({ start: textarea.selectionStart, end: textarea.selectionEnd, direction: textarea.selectionDirection }).toEqual(selection)
+    expect(editor.dispatchTransaction({ changes: [], history: 'skip', origin: 'programmatic' }).selection).toEqual({ start: 0, end: 0, direction: 'none' })
+    expect(session.validateRetainedSnapshot(snapshot, expected)).toBe(true)
+    await nextTick()
+    await flushPromises()
+    let calls = 0
+    expect(() => session.captureSnapshot(() => 'b'.repeat(64), {
+      ...expected, assertAdmission: () => { if (++calls === 3) editor.openSearch() },
+    })).toThrow('editor-session-panel-owner-stale')
+    expect(calls).toBe(3)
+    expect(session.validateRetainedSnapshot(snapshot, expected)).toBe(true)
+    wrapper.unmount()
+  })
+
+  it('checks actual consumer admission after view capture and before replacing or restoring original custody', () => {
+    const identity = { id: 'admission-document', epoch: 1 }
+    const store = new MarkdownEditorTransactionStore('source', undefined, identity)
+    let active = true
+    let retireDuringView = false
+    let viewRestores = 0
+    const session = createMarkdownEditorSessionBinding({
+      transactionStore: store,
+      isComposing: () => false,
+      isDisposed: () => false,
+      captureViewState: () => { if (retireDuringView) active = false; return null },
+      restoreViewState: () => { viewRestores += 1 },
+      resourceParticipants: () => [],
+      captureLastValidRender: () => null,
+    }).getSession('session:admission')
+    const assertAdmission = () => { if (!active) throw new Error('actual-consumer-retired') }
+    const expected = { documentIdentity: identity, revision: 0, assertAdmission }
+    const original = session.captureSnapshot(() => 'a'.repeat(64), expected)
+    retireDuringView = true
+    expect(() => session.captureSnapshot(() => 'b'.repeat(64), expected)).toThrow('actual-consumer-retired')
+    expect(session.validateRetainedSnapshot(original, expected)).toBe(true)
+    store.setSelection({ start: 1, end: 1, direction: 'none' })
+    const before = { history: store.history, selection: store.selection, source: store.value }
+    expect(() => session.restoreSnapshot(original, expected)).toThrow('actual-consumer-retired')
+    expect({ history: store.history, selection: store.selection, source: store.value }).toEqual(before)
+    expect(viewRestores).toBe(0)
+    active = true
+    retireDuringView = false
+    expect(session.restoreSnapshot(original, {
+      ...expected,
+      assertAdmission: () => { session.captureSnapshot(() => 'c'.repeat(64)) },
+    }).reason).toBe('editor-session-snapshot-custody-invalid')
+    expect({ history: store.history, selection: store.selection, source: store.value }).toEqual(before)
+    expect(viewRestores).toBe(0)
+  })
+
+  it('rejects old outer custody after the original transaction store switches away and back to identical coordinates', () => {
+    const identity = { id: 'aba-document', epoch: 1 }
+    const store = new MarkdownEditorTransactionStore('same source', undefined, identity)
+    const binding = createMarkdownEditorSessionBinding({
+      transactionStore: store,
+      isComposing: () => false,
+      isDisposed: () => false,
+      captureViewState: () => null,
+      restoreViewState: () => {},
+      resourceParticipants: () => [],
+      captureLastValidRender: () => null,
+    })
+    const session = binding.getSession('session:aba')
+    const snapshot = session.captureSnapshot(() => 'a'.repeat(64))
+    const expected = { documentIdentity: identity, revision: 0 }
+    expect(session.validateRetainedSnapshot(snapshot, expected)).toBe(true)
+    store.switchDocument({ id: 'other-document', epoch: 2 }, 'other source')
+    store.switchDocument(identity, 'same source')
+    expect(session.inspectDocumentState()).toEqual({ documentIdentity: identity, revision: 0 })
+    const before = { history: store.history, selection: store.selection, source: store.value }
+    expect(session.validateRetainedSnapshot(snapshot, expected)).toBe(false)
+    expect({ history: store.history, selection: store.selection, source: store.value }).toEqual(before)
+    expect(session.restoreSnapshot(snapshot, expected).reason).toBe('editor-session-history-checkpoint-invalid')
+    const originalToken = store.retainSnapshot()
+    expect(store.validateRetainedSnapshot(originalToken)).toBe(true)
+    expect(store.validateRetainedSnapshot({ ...originalToken })).toBe(false)
+    store.releaseRetainedSnapshot()
+    expect(store.validateRetainedSnapshot(originalToken)).toBe(false)
+  })
+
+  it.each(['renderer', 'attachment'] as const)('rejects %s source observation after same-source document epoch drift', (sourceOwner) => {
+    const store = new MarkdownEditorTransactionStore('same source', undefined, { id: 'source-document', epoch: 1 })
+    const binding = createMarkdownEditorSessionBinding({
+      transactionStore: store,
+      isComposing: () => false,
+      isDisposed: () => false,
+      captureViewState: () => null,
+      restoreViewState: () => {},
+      resourceParticipants: () => [],
+      captureLastValidRender: () => null,
+      [sourceOwner === 'renderer' ? 'inspectRendererResourceSource' : 'inspectAttachmentResourceSource']: () => {
+        store.switchDocument({ id: 'source-document', epoch: 2 }, 'same source')
+        return null
+      },
+    })
+    const session = binding.getSession('session:resource-source')
+    expect(() => sourceOwner === 'renderer' ? session.inspectRendererResourceSource() : session.inspectAttachmentResourceSource()).toThrow(`editor-session-${sourceOwner}-resource-source-stale`)
+    expect(session.inspectDocumentState().documentIdentity.epoch).toBe(2)
+    expect(() => session.inspectResources()).toThrow('editor-session-resource-owner-unavailable')
+  })
+
   it('retains the actual public session and sole-owner history and rejects snapshot copies', () => {
     const wrapper = mount(MarkdownEditor, { props: {
       modelValue: 'first', documentIdentity: { id: 'session-document', epoch: 1 },
@@ -35,12 +702,31 @@ describe('MarkdownEditor', () => {
     expect(() => editor.getSession('session:article:two')).toThrow('editor-session-owner-already-bound')
     const snapshot = session.captureSnapshot(() => 'a'.repeat(64))
     expect(snapshot.history.undoDepth).toBe(1)
+    expect(snapshot.lastValidRender).toBeNull()
+    expect(session.captureLastValidRender()).toBeNull()
     expect(snapshot).not.toHaveProperty('value')
     const expected = { documentIdentity: snapshot.documentIdentity, revision: snapshot.revision }
+    expect(session.validateRetainedSnapshot(snapshot, expected)).toBe(true)
+    expect(session.validateRetainedSnapshot({ ...snapshot }, expected)).toBe(false)
+    const foreign = mount(MarkdownEditor, { props: { modelValue: 'first', documentIdentity: snapshot.documentIdentity } })
+    foreign.vm.dispatchTransaction({
+      changes: [{ from: 5, to: 5, insert: ' second' }], history: 'separate', origin: 'programmatic',
+    })
+    const foreignSession = foreign.vm.getSession(session.editorSessionRef)
+    const foreignSnapshot = foreignSession.captureSnapshot(() => 'a'.repeat(64))
+    expect(foreignSnapshot.snapshotRef).toBe(snapshot.snapshotRef)
+    expect(foreignSnapshot.revision).toBe(snapshot.revision)
+    expect(session.validateRetainedSnapshot(foreignSnapshot, expected)).toBe(false)
+    expect(session.validateRetainedSnapshot(snapshot, { ...expected, revision: snapshot.revision + 1 })).toBe(false)
+    expect(session.validateRetainedSnapshot(snapshot, {
+      ...expected, documentIdentity: { ...snapshot.documentIdentity, epoch: snapshot.documentIdentity.epoch + 1 },
+    })).toBe(false)
+    foreign.unmount()
     expect(session.restoreSnapshot({ ...snapshot }, expected).status).toBe('blocked')
     expect(session.restoreSnapshot(snapshot, expected).status).toBe('restored')
     expect(editor.undo().value).toBe('first')
     expect(session.restoreSnapshot(snapshot, expected).reason).toBe('editor-session-revision-mismatch')
+    expect(session.validateRetainedSnapshot(snapshot, expected)).toBe(false)
     wrapper.unmount()
   })
 
@@ -51,10 +737,22 @@ describe('MarkdownEditor', () => {
     const session = (wrapper.vm as MarkdownEditorInstance).getSession('session:retained')
     const snapshot = session.captureSnapshot(() => 'a'.repeat(64))
     expect(() => session.captureSnapshot(() => 'invalid')).toThrow('editor-session-content-digest-invalid')
+    const digest = vi.fn(() => 'a'.repeat(64))
+    expect(() => session.captureSnapshot(digest, {
+      documentIdentity: { id: 'other-document', epoch: 1 }, revision: snapshot.revision,
+    })).toThrow('editor-session-snapshot-context-mismatch')
+    expect(digest).not.toHaveBeenCalled()
+    expect(() => session.captureSnapshot(digest, {
+      documentIdentity: snapshot.documentIdentity, revision: snapshot.revision + 1,
+    })).toThrow('editor-session-snapshot-context-mismatch')
+    expect(digest).not.toHaveBeenCalled()
     const census = session.inspectResourceParticipants()
     expect(census.complete).toBe(false)
     expect(census.missingOwners).toContain('renderer-projection')
-    expect(census.missingOwners).toContain('editor-layout-callbacks')
+    expect(census.missingOwners).toContain('editor-surface')
+    expect(census.participants.some((owner) => owner.ownerRef === 'editor-layout-callbacks')).toBe(true)
+    expect(census.participants.some((owner) => owner.ownerRef === 'language-search')).toBe(true)
+    expect(census.missingOwners).toContain('attachment-embed')
     expect(() => session.pauseResources()).toThrow('editor-session-resource-owner-unavailable')
     expect(session.inspectResourceParticipants().participants.every((owner) => !owner.paused)).toBe(true)
     expect(() => session.disposeAfterSnapshot(snapshot.snapshotRef)).toThrow('editor-session-resource-owner-unavailable')
@@ -426,6 +1124,18 @@ describe('MarkdownEditor', () => {
       revision: number
     }
     const itemId = batch.items[0]!.itemId
+    const session = wrapper.vm.getSession('session:legacy-upload')
+    expect(session.inspectResourceParticipants().missingOwners).toContain('attachment-embed')
+    expect(wrapper.vm.applyAttachmentResult({
+      status: 'progress', batchId: `${batch.batchId}:foreign`, itemId, ratio: 0.9,
+    })).toBe(false)
+    expect(wrapper.vm.applyAttachmentResult({
+      status: 'progress', batchId: batch.batchId, itemId, ratio: 0.9,
+      documentIdentity: { ...batch.documentIdentity, epoch: batch.documentIdentity.epoch + 1 },
+    })).toBe(false)
+    expect(wrapper.vm.applyAttachmentResult({
+      status: 'rejected', batchId: batch.batchId, itemId, revision: batch.revision + 1,
+    })).toBe(false)
     expect(wrapper.find('.el-markdown-editor__attachment').text()).toContain(
       'report.pdf',
     )
@@ -465,6 +1175,291 @@ describe('MarkdownEditor', () => {
     expect(wrapper.find('.el-markdown-editor__attachment-status').text()).toBe(
       'report.pdf 上传完成',
     )
+    // Legal legacy content did not create a service future or lift resource admission.
+    expect(session.inspectResourceParticipants().missingOwners).toContain('attachment-embed')
+    expect(() => session.inspectResources()).toThrow('editor-session-resource-owner-unavailable')
+    expect(wrapper.vm.applyAttachmentResult({
+      status: 'progress', batchId: batch.batchId, itemId, ratio: 0.9,
+    })).toBe(false)
+
+    Object.defineProperty(picker.element, 'files', {
+      configurable: true,
+      value: [new File(['second'], 'second.pdf', { type: 'application/pdf' })],
+    })
+    await picker.trigger('change')
+    const pending = wrapper.emitted('upload-image')?.at(-1)?.[0] as typeof batch
+    const sameSource = wrapper.emitted('update:modelValue')?.at(-1)?.[0] as string
+    await wrapper.setProps({
+      documentIdentity: { ...pending.documentIdentity, epoch: pending.documentIdentity.epoch + 1 },
+      modelValue: sameSource,
+    })
+    const beforeLateReply = wrapper.emitted('update:modelValue')?.length
+    // Same bytes/range and a still-pending job do not authorize the old epoch.
+    expect(wrapper.vm.applyAttachmentResult({
+      status: 'progress', batchId: pending.batchId, itemId: pending.items[0]!.itemId, ratio: 0.9,
+    })).toBe(false)
+    expect(wrapper.vm.applyAttachmentResult({
+      status: 'resolved', batchId: pending.batchId, itemId: pending.items[0]!.itemId,
+      documentIdentity: pending.documentIdentity, revision: pending.revision,
+      payload: { markdownKind: 'file', href: 'https://cdn.example/second.pdf', mimeType: 'application/pdf', name: 'second.pdf' },
+    })).toBe(false)
+    expect(wrapper.emitted('update:modelValue')?.length).toBe(beforeLateReply)
+  })
+
+  it('keeps a started service future behind its proof gate after the dispatch prop is removed', async () => {
+    let request: Parameters<MarkdownEditorAttachmentDispatch>[0] | undefined
+    let finish!: (result: MarkdownAttachmentProviderResult) => void
+    const future = new Promise<MarkdownAttachmentProviderResult>((resolve) => { finish = resolve })
+    const attachmentDispatch: MarkdownEditorAttachmentDispatch = (input) => {
+      request = input
+      return future
+    }
+    const wrapper = mount(MarkdownEditor, {
+      props: { modelValue: 'Draft: ', attachmentDispatch },
+    })
+    const textarea = wrapper.find('textarea').element as HTMLTextAreaElement
+    textarea.setSelectionRange(7, 7)
+    const picker = wrapper.find<HTMLInputElement>('.el-markdown-editor__attachment-picker')
+    Object.defineProperty(picker.element, 'files', {
+      configurable: true,
+      value: [new File(['report'], 'report.pdf', { type: 'application/pdf' })],
+    })
+    await picker.trigger('change')
+    expect(wrapper.emitted('upload-image')).toBeUndefined()
+    const started = request!
+    await wrapper.setProps({ attachmentDispatch: undefined })
+    const result: MarkdownAttachmentProviderResult = {
+      status: 'resolved', batchId: started.batch.batchId, itemId: started.item.itemId,
+      documentIdentity: started.batch.documentIdentity, revision: started.batch.revision,
+      payload: { markdownKind: 'file', href: 'https://cdn.example/report.pdf', mimeType: 'application/pdf', name: 'report.pdf' },
+    }
+    expect(wrapper.vm.applyAttachmentResult(result)).toBe(false)
+    expect(wrapper.vm.applyAttachmentResult({
+      status: 'progress', batchId: started.batch.batchId, itemId: started.item.itemId, ratio: 0.51,
+    })).toBe(false)
+    expect(started.onProgress({
+      status: 'progress', batchId: started.batch.batchId, itemId: started.item.itemId, ratio: 0.51,
+    })).toBe(true)
+    finish(result)
+    await flushPromises()
+    expect(wrapper.emitted('update:modelValue')?.at(-1)?.[0]).toBe('Draft: [report.pdf](https://cdn.example/report.pdf)')
+    expect(wrapper.vm.getSession('session:future-upload').inspectResourceParticipants().missingOwners).toContain('attachment-embed')
+  })
+
+  it('retains nonempty original settled attachment state after terminal File custody release and keeps pending sibling custody', async () => {
+    vi.useFakeTimers()
+    const requests: Parameters<MarkdownEditorAttachmentDispatch>[0][] = []
+    const completions: ((result: MarkdownAttachmentProviderResult) => void)[] = []
+    const attachmentDispatch: MarkdownEditorAttachmentDispatch = (request) => {
+      requests.push(request)
+      return new Promise((resolve) => { completions.push(resolve) })
+    }
+    const wrapper = mount(MarkdownEditor, { props: {
+      mode: 'source', modelValue: '', attachmentDispatch,
+      documentIdentity: { id: 'settled-terminal-document', epoch: 1 },
+    } })
+    const editor = wrapper.vm as MarkdownEditorInstance
+    const picker = wrapper.find<HTMLInputElement>('.el-markdown-editor__attachment-picker')
+    Object.defineProperty(picker.element, 'files', { configurable: true, value: [
+      new File(['first'], 'first.pdf', { type: 'application/pdf' }),
+      new File(['second'], 'second.pdf', { type: 'application/pdf' }),
+    ] })
+    await picker.trigger('change')
+    expect(requests).toHaveLength(2)
+    const session = editor.getSession('session:settled-terminal')
+    const result = (index: number): MarkdownAttachmentProviderResult => ({
+      status: 'resolved', batchId: requests[index]!.batch.batchId, itemId: requests[index]!.item.itemId,
+      documentIdentity: requests[index]!.batch.documentIdentity, revision: requests[index]!.batch.revision,
+      payload: { markdownKind: 'file', href: `https://cdn.example/${index}.pdf`, mimeType: 'application/pdf', name: requests[index]!.item.name },
+    })
+    completions[0]!(result(0))
+    await flushPromises()
+    await vi.runAllTimersAsync()
+    expect(editor.withAttachmentFile(requests[0]!.batch, requests[0]!.item, () => {})).toBe(false)
+    expect(editor.withAttachmentFile(requests[1]!.batch, requests[1]!.item, () => {})).toBe(true)
+    expect(session.captureSnapshot(() => 'a'.repeat(64)).panelRefs?.attachmentStateRef ?? null).toBeNull()
+    completions[1]!(result(1))
+    await flushPromises()
+    await vi.runAllTimersAsync()
+    expect(editor.withAttachmentFile(requests[1]!.batch, requests[1]!.item, () => {})).toBe(false)
+    const snapshot = session.captureSnapshot(() => 'b'.repeat(64))
+    expect(snapshot.panelRefs?.attachmentStateRef).toBeTruthy()
+    const state = session.readPanelState(snapshot)!
+    expect(state.attachment).toHaveLength(2)
+    expect(state.attachment!.map((job) => [job.name, job.kind, job.phase])).toEqual([
+      ['first.pdf', 'file', 'resolved'], ['second.pdf', 'file', 'resolved'],
+    ])
+    expect(Object.isFrozen(state.attachment)).toBe(true)
+    expect(session.restoreSnapshot(snapshot, { documentIdentity: snapshot.documentIdentity, revision: snapshot.revision }).status).toBe('restored')
+    expect(() => session.pauseResources()).toThrow('editor-session-resource-owner-unavailable')
+    wrapper.unmount()
+    expect(() => session.readPanelState(snapshot)).toThrow('editor-session-disposed')
+  })
+
+  it.each([
+    ['rejected', 'button'], ['cancelled', 'button'], ['rejected', 'input'], ['cancelled', 'input'],
+  ] as const)('retires settled %s custody only after accepted %s deletion and preserves it through undo/redo', async (status, removal) => {
+    vi.useFakeTimers()
+    let request!: Parameters<MarkdownEditorAttachmentDispatch>[0]
+    let finish!: (result: MarkdownAttachmentProviderResult) => void
+    const work = new Promise<MarkdownAttachmentProviderResult>((resolve) => { finish = resolve })
+    const wrapper = mount(MarkdownEditor, { props: {
+      mode: 'source', modelValue: '', documentIdentity: { id: 'accepted-delete-document', epoch: 1 },
+      attachmentDispatch: (input: Parameters<MarkdownEditorAttachmentDispatch>[0]) => { request = input; return work },
+    } })
+    const editor = wrapper.vm as MarkdownEditorInstance
+    const picker = wrapper.find<HTMLInputElement>('.el-markdown-editor__attachment-picker')
+    Object.defineProperty(picker.element, 'files', { configurable: true, value: [new File(['source'], 'original.pdf', { type: 'application/pdf' })] })
+    await picker.trigger('change')
+    finish({ status, batchId: request.batch.batchId, itemId: request.item.itemId,
+      documentIdentity: request.batch.documentIdentity, revision: request.batch.revision })
+    await flushPromises()
+    await vi.runAllTimersAsync()
+    const session = editor.getSession('session:accepted-delete')
+    expect(session.captureSnapshot(() => 'a'.repeat(64)).panelRefs?.attachmentStateRef ?? null).toBeNull()
+    await wrapper.setProps({ readonly: true })
+    const rejectedButtons = wrapper.findAll('.el-markdown-editor__attachment-actions button')
+    await rejectedButtons[rejectedButtons.length - 1]!.trigger('click')
+    await flushPromises()
+    await vi.runAllTimersAsync()
+    expect(wrapper.find('.el-markdown-editor__attachment-status').exists()).toBe(true)
+    expect(session.captureSnapshot(() => 'a'.repeat(64)).panelRefs?.attachmentStateRef ?? null).toBeNull()
+    await wrapper.setProps({ readonly: false })
+    if (removal === 'button') {
+      const buttons = wrapper.findAll('.el-markdown-editor__attachment-actions button')
+      await buttons[buttons.length - 1]!.trigger('click')
+    } else {
+      const textarea = wrapper.find<HTMLTextAreaElement>('textarea')
+      textarea.element.value = ''
+      await textarea.trigger('input')
+    }
+    await flushPromises()
+    await vi.runAllTimersAsync()
+    expect(editor.withAttachmentFile(request.batch, request.item, () => {})).toBe(false)
+    const snapshot = session.captureSnapshot(() => 'b'.repeat(64))
+    expect(snapshot.panelRefs?.attachmentStateRef).toBeTruthy()
+    expect(session.readPanelState(snapshot)!.attachment!.map((job) => [job.name, job.phase])).toEqual([['original.pdf', 'deleted']])
+    expect(editor.undo().accepted).toBe(true)
+    expect(session.readPanelState(snapshot)).toBeNull()
+    expect(editor.withAttachmentFile(request.batch, request.item, () => {})).toBe(false)
+    expect(editor.redo().accepted).toBe(true)
+    await flushPromises()
+    await vi.runAllTimersAsync()
+    const after = session.captureSnapshot(() => 'c'.repeat(64))
+    expect(session.readPanelState(after)!.attachment![0]!.phase).toBe('deleted')
+    expect(() => session.pauseResources()).toThrow('editor-session-resource-owner-unavailable')
+    wrapper.unmount()
+  })
+
+  it.each(['future', 'legacy'] as const)('keeps accepted deletion behind original %s settlement', async (source) => {
+    vi.useFakeTimers()
+    let request!: Parameters<MarkdownEditorAttachmentDispatch>[0]
+    let finish!: (result: MarkdownAttachmentProviderResult) => void
+    const work = new Promise<MarkdownAttachmentProviderResult>((resolve) => { finish = resolve })
+    const wrapper = mount(MarkdownEditor, { props: {
+      mode: 'source', modelValue: '', documentIdentity: { id: 'delete-settlement-document', epoch: 1 },
+      attachmentDispatch: source === 'future' ? (input: Parameters<MarkdownEditorAttachmentDispatch>[0]) => { request = input; return work } : undefined,
+    } })
+    const editor = wrapper.vm as MarkdownEditorInstance
+    const picker = wrapper.find<HTMLInputElement>('.el-markdown-editor__attachment-picker')
+    Object.defineProperty(picker.element, 'files', { configurable: true, value: [new File(['source'], 'pending.pdf', { type: 'application/pdf' })] })
+    await picker.trigger('change')
+    const session = editor.getSession('session:delete-settlement')
+    const textarea = wrapper.find<HTMLTextAreaElement>('textarea')
+    textarea.element.value = ''
+    await textarea.trigger('input')
+    await flushPromises()
+    await vi.runAllTimersAsync()
+    expect(session.captureSnapshot(() => 'a'.repeat(64)).panelRefs?.attachmentStateRef ?? null).toBeNull()
+    if (source === 'future') {
+      finish({ status: 'cancelled', batchId: request.batch.batchId, itemId: request.item.itemId,
+        documentIdentity: request.batch.documentIdentity, revision: request.batch.revision })
+      await flushPromises()
+      await vi.runAllTimersAsync()
+      const snapshot = session.captureSnapshot(() => 'b'.repeat(64))
+      expect(snapshot.panelRefs?.attachmentStateRef).toBeTruthy()
+      expect(session.readPanelState(snapshot)!.attachment![0]!.phase).toBe('deleted')
+      expect(editor.withAttachmentFile(request.batch, request.item, () => {})).toBe(false)
+    } else {
+      expect(() => session.inspectResources()).toThrow('editor-session-resource-owner-unavailable')
+    }
+    wrapper.unmount()
+  })
+
+  it('keeps late old future retirement out of replacement document custody with the same document id', async () => {
+    vi.useFakeTimers()
+    const requests: Parameters<MarkdownEditorAttachmentDispatch>[0][] = []
+    const completions: ((result: MarkdownAttachmentProviderResult) => void)[] = []
+    const wrapper = mount(MarkdownEditor, { props: {
+      mode: 'source', modelValue: '', documentIdentity: { id: 'same-delete-document', epoch: 1 },
+      attachmentDispatch: (input: Parameters<MarkdownEditorAttachmentDispatch>[0]) => {
+        requests.push(input)
+        return new Promise<MarkdownAttachmentProviderResult>((resolve) => { completions.push(resolve) })
+      },
+    } })
+    const editor = wrapper.vm as MarkdownEditorInstance
+    const picker = wrapper.find<HTMLInputElement>('.el-markdown-editor__attachment-picker')
+    Object.defineProperty(picker.element, 'files', { configurable: true, value: [new File(['source'], 'same.pdf', { type: 'application/pdf' })] })
+    await picker.trigger('change')
+    await wrapper.setProps({ modelValue: '', documentIdentity: { id: 'same-delete-document', epoch: 2 } })
+    await picker.trigger('change')
+    completions[1]!({ status: 'resolved', batchId: requests[1]!.batch.batchId, itemId: requests[1]!.item.itemId,
+      documentIdentity: requests[1]!.batch.documentIdentity, revision: requests[1]!.batch.revision,
+      payload: { markdownKind: 'file', href: 'https://cdn.example/current.pdf', mimeType: 'application/pdf', name: 'same.pdf' } })
+    await flushPromises()
+    await vi.runAllTimersAsync()
+    completions[0]!({ status: 'cancelled', batchId: requests[0]!.batch.batchId, itemId: requests[0]!.item.itemId,
+      documentIdentity: requests[0]!.batch.documentIdentity, revision: requests[0]!.batch.revision })
+    await flushPromises()
+    await vi.runAllTimersAsync()
+    const session = editor.getSession('session:replacement-delete')
+    const snapshot = session.captureSnapshot(() => 'a'.repeat(64))
+    expect(snapshot.panelRefs?.attachmentStateRef).toBeTruthy()
+    expect(session.readPanelState(snapshot)!.attachment!.map((job) => [job.itemId, job.documentIdentity.epoch])).toEqual([[requests[1]!.item.itemId, 2]])
+    expect(editor.withAttachmentFile(requests[0]!.batch, requests[0]!.item, () => {})).toBe(false)
+    wrapper.unmount()
+  })
+
+  it('publishes accepted abort-listener deletion before unwind retirement and preserves deleted state through outer cancel', async () => {
+    vi.useFakeTimers()
+    let editor!: MarkdownEditorInstance
+    let request!: Parameters<MarkdownEditorAttachmentDispatch>[0]
+    let finish!: (result: MarkdownAttachmentProviderResult) => void
+    let nested!: ReturnType<MarkdownEditorInstance['dispatchTransaction']>
+    const work = new Promise<MarkdownAttachmentProviderResult>((resolve) => { finish = resolve })
+    const wrapper = mount(MarkdownEditor, { props: {
+      mode: 'source', modelValue: '', documentIdentity: { id: 'unwind-delete-document', epoch: 1 },
+      attachmentDispatch: (input: Parameters<MarkdownEditorAttachmentDispatch>[0]) => {
+        request = input
+        input.item.signal.addEventListener('abort', () => {
+          const length = wrapper.find<HTMLTextAreaElement>('textarea').element.value.length
+          nested = editor.dispatchTransaction({ changes: [{ from: 0, to: length, insert: '' }], history: 'separate', origin: 'programmatic' })
+        }, { once: true })
+        return work
+      },
+    } })
+    editor = wrapper.vm as MarkdownEditorInstance
+    const picker = wrapper.find<HTMLInputElement>('.el-markdown-editor__attachment-picker')
+    Object.defineProperty(picker.element, 'files', { configurable: true, value: [new File(['source'], 'unwind.pdf', { type: 'application/pdf' })] })
+    await picker.trigger('change')
+    await wrapper.find('.el-markdown-editor__attachment-actions button').trigger('click')
+    expect(nested.accepted).toBe(true)
+    expect(wrapper.emitted('transaction')?.at(-1)?.[0]).toMatchObject({ accepted: true, value: '' })
+    expect(wrapper.emitted('update:modelValue')?.at(-1)?.[0]).toBe('')
+    const session = editor.getSession('session:unwind-delete')
+    await flushPromises()
+    await vi.runAllTimersAsync()
+    expect(session.captureSnapshot(() => 'a'.repeat(64)).panelRefs?.attachmentStateRef ?? null).toBeNull()
+    finish({ status: 'cancelled', batchId: request.batch.batchId, itemId: request.item.itemId,
+      documentIdentity: request.batch.documentIdentity, revision: request.batch.revision })
+    await flushPromises()
+    await vi.runAllTimersAsync()
+    const snapshot = session.captureSnapshot(() => 'b'.repeat(64))
+    expect(snapshot.panelRefs?.attachmentStateRef).toBeTruthy()
+    expect(session.readPanelState(snapshot)!.attachment![0]!.phase).toBe('deleted')
+    expect(editor.withAttachmentFile(request.batch, request.item, () => {})).toBe(false)
+    expect(() => session.pauseResources()).toThrow('editor-session-resource-owner-unavailable')
+    wrapper.unmount()
   })
 
   it('edits active image and caption subranges through the compact property surface', async () => {

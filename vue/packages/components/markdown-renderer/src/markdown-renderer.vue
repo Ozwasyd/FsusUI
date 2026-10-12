@@ -1,6 +1,6 @@
 <template>
   <div
-    ref="rootEl"
+    :ref="bindRendererRoot"
     :class="[
       markdownSurfaceClasses.root,
       markdownSurfaceClasses.body,
@@ -64,7 +64,9 @@
 import {
   computed,
   nextTick,
+  onActivated,
   onBeforeUnmount,
+  onDeactivated,
   ref,
   shallowRef,
   toRaw,
@@ -99,6 +101,12 @@ import {
   markdownRendererProps,
   resolveMarkdownWorkerScriptUrl,
 } from './markdown-renderer'
+import {
+  createMarkdownRendererSessionResourceOwner,
+  hasUnavailableMarkdownRendererWorkerListenerRegistration,
+  inspectMarkdownRendererWorkerCleanupResidue,
+} from './markdown-renderer-session-resources'
+import type { MarkdownRendererRestoreProof } from './markdown-renderer-session-resources'
 import type { FsusRenderPipelineAdapter } from '@element-plus/hooks'
 import type {
   MarkdownHeavyFeatureIdentity,
@@ -121,7 +129,7 @@ import type {
   MarkdownHeavyFeatureProjectionSnapshot,
   MarkdownHeavyFeatureProjectionTracker,
 } from '../../../wasm/markdown-heavy-feature-identity'
-import type { ComponentPublicInstance } from 'vue'
+import type { ComponentPublicInstance, Ref } from 'vue'
 
 defineOptions({
   name: 'ElMarkdownRenderer',
@@ -135,24 +143,90 @@ const heavyLifecycle = createMarkdownHeavyFeatureLifecycle({
 })
 const heavyThemeRevision = ref(0)
 let heavyThemeListenerInstalled = false
+let heavyThemeListenerTarget: HTMLElement | null = null
+let installingHeavyThemeListener = false
+let removingHeavyThemeListener = false
 const handleHeavyFeatureThemeChange = () => {
-  heavyThemeRevision.value += 1
+  if (rendererResourceOwner.isDisposed()) return
+  rendererResourceOwner.runCheckpointAuthorityCallback(
+    'projection-write',
+    () => {
+      heavyThemeRevision.value += 1
+    },
+  )
 }
 const ensureHeavyFeatureThemeListener = () => {
-  if (heavyThemeListenerInstalled) return
-  document.documentElement.addEventListener(
-    'fsus:theme-change',
-    handleHeavyFeatureThemeChange,
+  if (
+    heavyThemeListenerInstalled ||
+    installingHeavyThemeListener ||
+    rendererResourceOwner.isDisposed()
   )
+    return
+  const installation = rendererResourceOwner.beginInstallation('theme-listener')
+  installingHeavyThemeListener = true
+  let target: HTMLElement
+  try {
+    target = document.documentElement
+  } catch (error) {
+    installingHeavyThemeListener = false
+    installation.fail(error)
+    throw error
+  }
+  if (rendererResourceOwner.isDisposed()) {
+    installingHeavyThemeListener = false
+    installation.complete()
+    return
+  }
+  heavyThemeListenerTarget = target
   heavyThemeListenerInstalled = true
+  installingHeavyThemeListener = true
+  let failed = false
+  let failure: unknown
+  try {
+    target.addEventListener('fsus:theme-change', handleHeavyFeatureThemeChange)
+  } catch (error) {
+    rendererResourceOwner.retireCheckpointAuthority('cleanup-failure')
+    failed = true
+    failure = error
+  } finally {
+    installingHeavyThemeListener = false
+  }
+  try {
+    if (failed || rendererResourceOwner.isDisposed()) {
+      const errors: unknown[] = failed ? [failure] : []
+      try {
+        removeHeavyFeatureThemeListener()
+      } catch (error) {
+        errors.push(error)
+      }
+      if (errors.length === 1) throw errors[0]
+      if (errors.length > 1)
+        throw new AggregateError(
+          errors,
+          'markdown-renderer-theme-cleanup-failed',
+        )
+    }
+  } finally {
+    installation.complete()
+  }
 }
 const removeHeavyFeatureThemeListener = () => {
-  if (!heavyThemeListenerInstalled) return
-  document.documentElement.removeEventListener(
-    'fsus:theme-change',
-    handleHeavyFeatureThemeChange,
-  )
-  heavyThemeListenerInstalled = false
+  const target = heavyThemeListenerTarget
+  if (!heavyThemeListenerInstalled || !target || removingHeavyThemeListener)
+    return
+  removingHeavyThemeListener = true
+  try {
+    target.removeEventListener(
+      'fsus:theme-change',
+      handleHeavyFeatureThemeChange,
+    )
+    if (!installingHeavyThemeListener && heavyThemeListenerTarget === target) {
+      heavyThemeListenerInstalled = false
+      heavyThemeListenerTarget = null
+    }
+  } finally {
+    removingHeavyThemeListener = false
+  }
 }
 const emit = defineEmits<{
   (event: 'render-complete', result: MarkdownSafeRenderResult): void
@@ -195,7 +269,6 @@ const renderedContent = shallowRef<MarkdownSafeHtml | null>(
 )
 const resolveCommittedHtml = (html: MarkdownSafeHtml | null) =>
   html === null ? null : (props.trustedHtmlFactory?.(html) ?? html)
-const chunkUnits = shallowRef<readonly MarkdownRenderChunk[]>([])
 const MIN_INITIAL_MARKDOWN_CHUNKS = 3
 const MAX_INITIAL_MARKDOWN_CHUNKS = 12
 const renderPipelineConfig = useGlobalConfig('renderPipeline')
@@ -259,6 +332,8 @@ let currentTaskId = 0
 let debounceTimer: ReturnType<typeof setTimeout> | null = null
 let activationController: AbortController | null = null
 let activationObserver: IntersectionObserver | null = null
+let resettingFeatureActivation = false
+let installingActivationObserver = false
 let activeChunkResult: MarkdownRuntimeChunkResult | null = null
 let activationDurationMs = 0
 let commitDurationMs = 0
@@ -287,14 +362,18 @@ let heavyLifecycleProjectionNodeIds: Partial<
 let heavyProjectionTrackerPromise: Promise<MarkdownHeavyFeatureProjectionTracker> | null =
   null
 
-const loadHeavyProjectionTracker = () =>
-  (heavyProjectionTrackerPromise ??=
+const loadHeavyProjectionTracker = () => {
+  if (!heavyProjectionTrackerPromise)
+    rendererResourceOwner.retireCheckpointAuthority('projection-tracker')
+  return (heavyProjectionTrackerPromise ??=
     import('../../../wasm/markdown-heavy-feature-identity').then(
       ({ createMarkdownHeavyFeatureProjectionTracker }) =>
         createMarkdownHeavyFeatureProjectionTracker(),
     ))
+}
 
 function recordHeavyLifecycleMetrics() {
+  rendererResourceOwner.retireCheckpointAuthority('heavy-metrics-callback')
   const target = rootEl.value
   if (!target) return
   const metrics = heavyLifecycle.metrics()
@@ -338,12 +417,7 @@ type RenderAnchor = {
 
 const anchorCandidateSelector = `h1,h2,h3,h4,h5,h6,p,li,pre,table,blockquote,.${markdownSurfaceClasses.paragraph},.${markdownSurfaceClasses.text},.${markdownSurfaceClasses.listItem},.${markdownSurfaceClasses.mermaid},.${markdownSurfaceClasses.latex}`
 
-const afterFrame = () =>
-  new Promise<void>((resolve) =>
-    typeof requestAnimationFrame === 'function'
-      ? requestAnimationFrame(() => resolve())
-      : resolve(),
-  )
+const afterFrame = () => rendererResourceOwner.afterFrame()
 
 // Live-surface layout corrections share the editor-owned frame scheduler
 // (#640): embedded in ElMarkdownEditor this is the editor instance provided
@@ -353,53 +427,218 @@ let heavyFeatureMutateCommits = 0
 let heavyFeaturePostPaintCommits = 0
 let renderAnchorDelta: number | null = null
 
+const rendererResourceOwner: ReturnType<
+  typeof createMarkdownRendererSessionResourceOwner
+> = createMarkdownRendererSessionResourceOwner({
+  ownerKey: localDocumentKey,
+  readDocumentState: () => ({
+    documentIdentity: {
+      id: heavyDocumentContext?.documentKey() ?? localDocumentKey,
+      epoch: heavyDocumentContext?.documentEpoch() ?? 0,
+    },
+    revision:
+      heavyDocumentContext?.revision() ??
+      props.contentVersion ??
+      resolveMarkdownSourceIdentity(markdownRenderRequest.value),
+  }),
+  readProjection: () => ({
+    html: renderedContent.value,
+    units: chunkUnits.value,
+    strategy: renderStrategy.value,
+  }),
+  readOwnedCheckpointState: () => {
+    const keys = Object.freeze([...activatedChunkKeys])
+    const elements = Object.freeze(
+      [...chunkActivationElements].map(([key, element]) =>
+        Object.freeze({ key, element }),
+      ),
+    )
+    const contexts = Object.freeze({ ...heavyLifecycleIdentityContexts })
+    const sequences = Object.freeze(
+      Object.fromEntries(
+        Object.entries(heavyLifecycleIdentitySequences).map(
+          ([kind, values]): [
+            string,
+            readonly HeavyLifecycleIdentityContext[],
+          ] => [kind, Object.freeze([...values])],
+        ),
+      ),
+    )
+    const nodeIds = Object.freeze(
+      Object.fromEntries(
+        Object.entries(heavyLifecycleProjectionNodeIds).map(
+          ([kind, values]): [string, readonly string[]] => [
+            kind,
+            Object.freeze([...values]),
+          ],
+        ),
+      ),
+    )
+    return Object.freeze({
+      state: Object.freeze({
+        activeChunkResult,
+        activatedChunkKeys: keys,
+        chunkActivationElements: elements,
+        heavyLifecycleIdentityContexts: contexts,
+        heavyLifecycleIdentitySequences: sequences,
+        heavyLifecycleProjectionNodeIds: nodeIds,
+        lastHeavyLifecycleIdentityContext,
+        heavyProjectionTrackerPromise,
+        heavyThemeRevision: heavyThemeRevision.value,
+        isRendering: isRendering.value,
+        activationDurationMs,
+        commitDurationMs,
+      }),
+      retainedCollectionEntries:
+        keys.length +
+        elements.length +
+        Object.keys(contexts).length +
+        Object.keys(sequences).length +
+        Object.keys(nodeIds).length +
+        Object.values(sequences).reduce(
+          (sum, values) => sum + values.length,
+          0,
+        ) +
+        Object.values(nodeIds).reduce((sum, values) => sum + values.length, 0),
+    })
+  },
+  readPipelineResources: () => renderPipelineRuntime.inspectResources(),
+  readHeavyResources: () => heavyLifecycle.inspectResources(),
+  readVirtualWindowResources: () => virtualWindow.inspectResources(),
+  readComponentCleanupPending: () =>
+    (installingHeavyThemeListener ? 1 : 0) +
+    (removingHeavyThemeListener ? 1 : 0) +
+    (resettingFeatureActivation ? 1 : 0) +
+    (installingActivationObserver ? 1 : 0) +
+    (heavyThemeListenerTarget ? 1 : 0) +
+    (activationController ? 1 : 0) +
+    (activationObserver ? 1 : 0),
+  readDocumentAuthority: () => heavyDocumentContext?.documentAuthority ?? null,
+  readProjectionResources: () => {
+    const heavy = heavyLifecycle.metrics()
+    return {
+      renderers: 0,
+      observers: activationObserver ? 1 : 0,
+      backgroundTasks: 0,
+      retainedListeners: heavyThemeListenerInstalled ? 1 : 0,
+      memoryUnits:
+        chunkUnits.value.length +
+        chunkActivationElements.size +
+        activatedChunkKeys.size +
+        (renderedContent.value === null ? 0 : 1) +
+        (activeChunkResult ? 1 : 0) +
+        (heavyProjectionTrackerPromise ? 1 : 0) +
+        heavy.cacheEntries +
+        heavy.activeNodes +
+        heavy.staticNodes,
+    }
+  },
+})
+
+rendererResourceOwner.bindDocumentAuthorityReceiver()
+
+const rendererChunkInput = rendererResourceOwner.createOwnedInputPublication<
+  readonly MarkdownRenderChunk[]
+>('chunk-units', Object.freeze([]))
+const chunkUnits: Readonly<Ref<readonly MarkdownRenderChunk[]>> =
+  rendererChunkInput.input
+const rendererViewportInput = rendererResourceOwner.createOwnedInputPublication<
+  Readonly<{ root: HTMLElement | null; scroller: HTMLElement | null }>
+>('viewport-reference', Object.freeze({ root: null, scroller: null }))
+const publishChunkUnits = (units: readonly MarkdownRenderChunk[]) =>
+  rendererResourceOwner.runCheckpointAuthorityCallback(
+    'chunk-input-snapshot',
+    () => {
+      const snapshot = Object.freeze(
+        units.map((unit) =>
+          Object.freeze({
+            key: unit.key,
+            kind: unit.kind,
+            html: unit.html,
+            estimatedSize: unit.estimatedSize,
+            htmlStartOffset: unit.htmlStartOffset,
+            htmlEndOffset: unit.htmlEndOffset,
+          }),
+        ),
+      )
+      if (rendererResourceOwner.isDisposed()) rendererChunkInput.clear(snapshot)
+      else rendererChunkInput.replace(snapshot)
+    },
+  )
+
 const scheduleHeavyFeatureCommit = (input: {
   readonly key: string
   readonly run: () => HTMLElement | void
   readonly signal: AbortSignal
 }) =>
   new Promise<HTMLElement | void>((resolve, reject) => {
+    if (input.signal.aborted) {
+      reject(new DOMException('Aborted', 'AbortError'))
+      return
+    }
     let committed: HTMLElement | void
     let mutatePhaseRan = false
     const abort = () => reject(new DOMException('Aborted', 'AbortError'))
-    input.signal.addEventListener('abort', abort, { once: true })
-    const accepted = frameScheduler.schedule({
-      key: input.key,
-      mutate: () => {
-        if (!input.signal.aborted) {
-          committed = input.run()
-          mutatePhaseRan = true
-          heavyFeatureMutateCommits += 1
-        }
+    const removeAbort = rendererResourceOwner.listenForAbort(
+      input.signal,
+      abort,
+    )
+    const accepted = rendererResourceOwner.scheduleFrame(
+      frameScheduler,
+      {
+        key: input.key,
+        mutate: () => {
+          if (!input.signal.aborted) {
+            committed = input.run()
+            mutatePhaseRan = true
+            heavyFeatureMutateCommits += 1
+          }
+        },
+        postPaint: () => {
+          if (mutatePhaseRan) heavyFeaturePostPaintCommits += 1
+          removeAbort()
+          if (input.signal.aborted) abort()
+          else resolve(committed)
+          recordHeavyLifecycleMetrics()
+        },
       },
-      postPaint: () => {
-        if (mutatePhaseRan) heavyFeaturePostPaintCommits += 1
-        input.signal.removeEventListener('abort', abort)
-        if (input.signal.aborted) abort()
-        else resolve(committed)
-        recordHeavyLifecycleMetrics()
+      () => {
+        removeAbort()
+        abort()
       },
-    })
+    )
     if (!accepted) {
-      input.signal.removeEventListener('abort', abort)
+      removeAbort()
       reject(new DOMException('Frame scheduler unavailable', 'AbortError'))
     }
   })
 
 const settleRenderViewport = (key: string) =>
-  new Promise<void>((resolve) => {
-    frameScheduler.schedule({
-      key,
-      measure: () => virtualWindow.readViewport(),
-      postPaint: resolve,
-    })
+  new Promise<boolean>((resolve) => {
+    rendererResourceOwner.scheduleFrame(
+      frameScheduler,
+      {
+        key,
+        measure: () => {
+          publishRendererViewport()
+          virtualWindow.readViewport()
+        },
+        postPaint: () => resolve(true),
+      },
+      () => resolve(false),
+    )
   })
 
 const readPerformanceNow = () =>
   typeof performance === 'undefined' ? Date.now() : performance.now()
 
 const recordCommitDuration = (startedAt: number) => {
-  commitDurationMs += readPerformanceNow() - startedAt
+  rendererResourceOwner.runCheckpointAuthorityCallback(
+    'projection-write',
+    () => {
+      commitDurationMs += readPerformanceNow() - startedAt
+    },
+  )
   rootEl.value?.setAttribute(
     'data-fsus-markdown-commit-ms',
     commitDurationMs.toFixed(3),
@@ -422,6 +661,33 @@ const findScrollContainer = (element: HTMLElement | null) => {
     ? document.scrollingElement
     : document.documentElement
 }
+
+// Publish selected identities only. DOM/style/platform state and externally
+// written exposed refs are not owned by this input publication.
+const publishRendererViewport = () =>
+  rendererResourceOwner.runCheckpointAuthorityCallback(
+    'viewport-input-read',
+    () => {
+      const root = rootEl.value
+      const scroller = root ? findScrollContainer(root) : null
+      const previous = rendererViewportInput.input.value
+      if (previous.root !== root || previous.scroller !== scroller) {
+        const next = Object.freeze({ root, scroller })
+        if (rendererResourceOwner.isDisposed())
+          rendererViewportInput.clear(next)
+        else rendererViewportInput.replace(next)
+      }
+      return scroller
+    },
+  )
+const bindRendererRoot = (element: unknown) =>
+  rendererResourceOwner.runCheckpointAuthorityCallback(
+    'root-reference-input',
+    () => {
+      rootEl.value = element instanceof HTMLElement ? element : null
+      publishRendererViewport()
+    },
+  )
 
 const getElementPath = (root: HTMLElement, target: HTMLElement) => {
   const path: number[] = []
@@ -517,33 +783,39 @@ const restoreRenderAnchor = async (anchor: RenderAnchor | null) => {
   // the scroll correction commits in the mutate phase, and same-frame
   // restores from the editor coalesce under one scheduling authority.
   await new Promise<void>((resolve) => {
-    frameScheduler.schedule({
-      key: 'markdown-render-anchor-restore',
-      measure: () => {
-        renderAnchorDelta = null
-        const root = rootEl.value
-        if (!root || !document.contains(anchor.scrollContainer)) return
+    rendererResourceOwner.scheduleFrame(
+      frameScheduler,
+      {
+        key: 'markdown-render-anchor-restore',
+        measure: () => {
+          renderAnchorDelta = null
+          const root = rootEl.value
+          if (!root || !document.contains(anchor.scrollContainer)) return
 
-        const nextAnchor =
-          (anchor.unitKey
-            ? root.querySelector(
-                `.markdown-renderer__virtual-unit[data-fsus-render-unit-key="${escapeCssAttributeValue(anchor.unitKey)}"]`,
-              )
-            : null) ?? resolveElementPath(root, anchor.path)
-        if (!nextAnchor) return
+          const nextAnchor =
+            (anchor.unitKey
+              ? root.querySelector(
+                  `.markdown-renderer__virtual-unit[data-fsus-render-unit-key="${escapeCssAttributeValue(anchor.unitKey)}"]`,
+                )
+              : null) ?? resolveElementPath(root, anchor.path)
+          if (!nextAnchor) return
 
-        const containerTop = anchor.scrollContainer.getBoundingClientRect().top
-        const nextOffset = nextAnchor.getBoundingClientRect().top - containerTop
-        renderAnchorDelta = nextOffset - anchor.offset
+          const containerTop =
+            anchor.scrollContainer.getBoundingClientRect().top
+          const nextOffset =
+            nextAnchor.getBoundingClientRect().top - containerTop
+          renderAnchorDelta = nextOffset - anchor.offset
+        },
+        mutate: () => {
+          if (renderAnchorDelta !== null && Math.abs(renderAnchorDelta) > 0.5) {
+            anchor.scrollContainer.scrollTop += renderAnchorDelta
+          }
+          renderAnchorDelta = null
+        },
+        postPaint: resolve,
       },
-      mutate: () => {
-        if (renderAnchorDelta !== null && Math.abs(renderAnchorDelta) > 0.5) {
-          anchor.scrollContainer.scrollTop += renderAnchorDelta
-        }
-        renderAnchorDelta = null
-      },
-      postPaint: resolve,
-    })
+      resolve,
+    )
   })
 }
 
@@ -555,40 +827,57 @@ const commitRenderedContent = async (
 
   const startedAt = readPerformanceNow()
   const anchor = preserveAnchor ? captureRenderAnchor() : null
-  chunkUnits.value = []
-  renderStrategy.value = 'sync'
-  renderedContent.value = html
+  rendererResourceOwner.runCheckpointAuthorityCallback(
+    'projection-write',
+    () => {
+      publishChunkUnits([])
+    },
+  )
+  rendererResourceOwner.runCheckpointAuthorityCallback(
+    'projection-write',
+    () => {
+      renderStrategy.value = 'sync'
+    },
+  )
+  rendererResourceOwner.runCheckpointAuthorityCallback(
+    'projection-write',
+    () => {
+      renderedContent.value = html
+    },
+  )
   await restoreRenderAnchor(anchor)
   recordCommitDuration(startedAt)
   return true
 }
 
-const virtualWindow = useFsusVirtualWindow<MarkdownRenderChunk>({
-  estimateSize: (unit) => unit.estimatedSize,
-  getKey: (unit) => unit.key,
-  getViewport: () => findScrollContainer(rootEl.value),
-  measureBatch: computed(
-    () => resolvedRenderPipelineConfig.value.budget.measureBatch,
-  ),
-  minVisibleItems: initialVisibleChunkCount,
-  overscanPx: computed(
-    () => resolvedRenderPipelineConfig.value.budget.overscanPx,
-  ),
-  units: chunkUnits,
-})
-
 const setChunkUnitRef = (key: string, element: Element | null) => {
+  rendererResourceOwner.retireCheckpointAuthority('chunk-reference')
   virtualWindow.setUnitRef(key, element)
   const previous = chunkActivationElements.get(key)
   if (previous && previous !== element) {
     activationObserver?.unobserve(previous)
     heavyLifecycle.unmountRoot(previous)
-    activatedChunkKeys.delete(key)
-    chunkActivationElements.delete(key)
+    rendererResourceOwner.runCheckpointAuthorityCallback(
+      'projection-write',
+      () => {
+        activatedChunkKeys.delete(key)
+      },
+    )
+    rendererResourceOwner.runCheckpointAuthorityCallback(
+      'projection-write',
+      () => {
+        chunkActivationElements.delete(key)
+      },
+    )
     recordHeavyLifecycleMetrics()
   }
   if (!(element instanceof HTMLElement)) return
-  chunkActivationElements.set(key, element)
+  rendererResourceOwner.runCheckpointAuthorityCallback(
+    'projection-write',
+    () => {
+      chunkActivationElements.set(key, element)
+    },
+  )
   observeChunkForActivation(key, element)
 }
 
@@ -601,11 +890,22 @@ const setChunkUnitTemplateRef = (
 
 const vMarkdownHeavyLifecycleUnmount = {
   beforeUnmount(element: HTMLElement) {
+    rendererResourceOwner.retireCheckpointAuthority('chunk-unmount')
     const key = element.dataset.fsusRenderUnitKey
     activationObserver?.unobserve(element)
     if (key) {
-      activatedChunkKeys.delete(key)
-      chunkActivationElements.delete(key)
+      rendererResourceOwner.runCheckpointAuthorityCallback(
+        'projection-write',
+        () => {
+          activatedChunkKeys.delete(key)
+        },
+      )
+      rendererResourceOwner.runCheckpointAuthorityCallback(
+        'projection-write',
+        () => {
+          chunkActivationElements.delete(key)
+        },
+      )
     }
     heavyLifecycle.unmountRoot(element)
     recordHeavyLifecycleMetrics()
@@ -632,16 +932,15 @@ const estimateMarkdownRender = (source: string) => ({
   nodes: Math.max(1, Math.ceil(source.length / 180)),
 })
 
-const createMarkdownRenderRequest = (
-  source: string,
-): MarkdownRenderRequest => ({
-  source,
-  baseUrl: props.baseUrl,
-  mode: props.mode,
-  allowLatex: props.allowLatex,
-  allowMermaid: props.allowMermaid,
-  contentVersion: props.contentVersion,
-})
+const createMarkdownRenderRequest = (source: string): MarkdownRenderRequest =>
+  Object.freeze({
+    source,
+    baseUrl: props.baseUrl,
+    mode: props.mode,
+    allowLatex: props.allowLatex,
+    allowMermaid: props.allowMermaid,
+    contentVersion: props.contentVersion,
+  })
 
 const sampleMarkdownSource = (source: string) => {
   let hash = 0x811c9dc5
@@ -796,14 +1095,30 @@ const canUseMarkdownWorker = () =>
   typeof Worker !== 'undefined' && typeof URL !== 'undefined'
 
 const createMarkdownRendererWorker = () => {
-  const moduleUrl = new URL('./markdown-renderer.worker.ts', import.meta.url)
-  const trustedModuleUrl = resolveMarkdownWorkerScriptUrl(
-    moduleUrl,
-    props.trustedScriptUrlFactory,
-  )
-  return new Worker(trustedModuleUrl as string | URL, {
-    type: 'module',
-  })
+  const installation = rendererResourceOwner.beginInstallation('worker-factory')
+  let constructing = false
+  let creationUnknown = false
+  try {
+    const moduleUrl = new URL('./markdown-renderer.worker.ts', import.meta.url)
+    requireRendererAdmission()
+    const trustedModuleUrl = resolveMarkdownWorkerScriptUrl(
+      moduleUrl,
+      props.trustedScriptUrlFactory,
+    )
+    requireRendererAdmission()
+    constructing = true
+    // Return the actual handle to the original worker-pool owner, which retains
+    // it before handler setters and performs late disposed-slot cleanup.
+    return new Worker(trustedModuleUrl as string | URL, { type: 'module' })
+  } catch (error) {
+    if (constructing) {
+      creationUnknown = true
+      installation.fail(error)
+    }
+    throw error
+  } finally {
+    if (!creationUnknown) installation.complete()
+  }
 }
 
 const markdownRenderPipelineAdapter: FsusRenderPipelineAdapter<
@@ -847,27 +1162,86 @@ const markdownRenderPipelineAdapter: FsusRenderPipelineAdapter<
   },
 }
 
-const markdownRenderRequest = computed(() =>
-  createMarkdownRenderRequest(normalizeMarkdownSource(props.content)),
+const rendererRequestInput = rendererResourceOwner.createOwnedInputPublication(
+  'request-snapshot',
+  rendererResourceOwner.runCheckpointAuthorityCallback(
+    'request-input-read',
+    () => createMarkdownRenderRequest(normalizeMarkdownSource(props.content)),
+  ),
+)
+const markdownRenderRequest: Readonly<Ref<MarkdownRenderRequest>> =
+  rendererRequestInput.input
+const rendererAdapterInput = rendererResourceOwner.createOwnedInputPublication(
+  'adapter-descriptor',
+  Object.freeze({
+    ...markdownRenderPipelineAdapter,
+    worker: Object.freeze({
+      ...markdownRenderPipelineAdapter.worker,
+      createWorker: createMarkdownRendererWorker,
+    }),
+  }),
 )
 
 const renderPipelineRuntime = useFsusRenderPipelineRuntime<
   MarkdownRenderRequest,
   MarkdownRenderChunk
 >({
-  adapter: markdownRenderPipelineAdapter,
+  adapter: rendererAdapterInput.input,
+  adapterAuthority: rendererAdapterInput.authority,
   componentName: 'ElMarkdownRenderer',
   config: renderPipelineConfig,
   source: markdownRenderRequest,
+  sourceAuthority: rendererRequestInput.authority,
 })
 
 const resolvedRenderPipelineConfig = renderPipelineRuntime.config
 
+const virtualWindow = useFsusVirtualWindow<MarkdownRenderChunk>({
+  estimateSize: (unit) => unit.estimatedSize,
+  getKey: (unit) => unit.key,
+  getViewport: () => rendererViewportInput.input.value.scroller,
+  viewportAuthority: rendererViewportInput.authority,
+  unitsAuthority: rendererChunkInput.authority,
+  configAuthority: renderPipelineRuntime.authority,
+  measureBatch: computed(
+    () => resolvedRenderPipelineConfig.value.budget.measureBatch,
+  ),
+  minVisibleItems: initialVisibleChunkCount,
+  overscanPx: computed(
+    () => resolvedRenderPipelineConfig.value.budget.overscanPx,
+  ),
+  units: chunkUnits,
+})
+
+onBeforeUnmount(disposeRendererResources)
+try {
+  rendererResourceOwner.bindCheckpointSealSources({
+    pipeline: renderPipelineRuntime.authority,
+    viewport: virtualWindow.authority,
+  })
+} catch (cause) {
+  try {
+    rendererResourceOwner.runCheckpointAuthorityCallback(
+      'setup-failure-cleanup',
+      disposeRendererResources,
+      rendererResourceOwner,
+    )
+  } catch {
+    // The owner retains actual cleanup failures and unresolved registrations.
+    // Preserve the original binding cause instead of acknowledging cleanup.
+  }
+  throw cause
+}
+
 const scheduleMeasurementWarmup = () => {
   // The viewport warmup read joins the shared frame scheduler's measure
   // phase; the scheduler key coalesces repeated warmups into one frame.
-  frameScheduler.scheduleMeasure('markdown-render-viewport-warmup', () => {
-    virtualWindow.readViewport()
+  rendererResourceOwner.scheduleFrame(frameScheduler, {
+    key: 'markdown-render-viewport-warmup',
+    measure: () => {
+      publishRendererViewport()
+      virtualWindow.readViewport()
+    },
   })
 }
 
@@ -889,23 +1263,128 @@ const hasEnabledHeavyFeature = (
   (features.latex && result.features.includes('latex')) ||
   (features.mermaid && result.features.includes('mermaid'))
 
+function requireRendererAdmission() {
+  if (rendererResourceOwner.isDisposed())
+    throw new Error('markdown-renderer-resource-owner-disposed')
+}
+
+function controllerCleanup(controller: AbortController | null) {
+  return {
+    phase: 'activation-controller-abort',
+    resource: controller,
+    run: () => {
+      controller?.abort()
+      if (activationController === controller) activationController = null
+    },
+  }
+}
+function observerCleanup(observer: IntersectionObserver | null) {
+  return {
+    phase: 'activation-observer-disconnect',
+    resource: observer,
+    run: () => {
+      observer?.disconnect()
+      if (activationObserver === observer) activationObserver = null
+    },
+  }
+}
+
 const resetFeatureActivation = () => {
-  removeHeavyFeatureThemeListener()
-  activationController?.abort()
-  activationController = new AbortController()
-  activationObserver?.disconnect()
-  activationObserver = null
-  activeChunkResult = null
-  activationDurationMs = 0
-  rootEl.value?.removeAttribute('data-fsus-markdown-activation-ms')
-  activatedChunkKeys.clear()
-  chunkActivationElements.clear()
-  lastHeavyLifecycleIdentityContext = null
-  heavyLifecycleIdentityContexts = {}
-  heavyLifecycleIdentitySequences = {}
-  heavyLifecycleProjectionNodeIds = {}
-  if (rootEl.value) heavyLifecycle.unmountRoot(rootEl.value)
-  recordHeavyLifecycleMetrics()
+  rendererResourceOwner.retireCheckpointAuthority('activation-reset')
+  requireRendererAdmission()
+  if (resettingFeatureActivation || installingActivationObserver)
+    throw new Error('markdown-renderer-activation-control-pending')
+  const reset = rendererResourceOwner.beginInstallation('activation-reset')
+  resettingFeatureActivation = true
+  try {
+    rendererResourceOwner.cleanupComponentResources([
+      {
+        phase: 'theme-listener-remove',
+        resource: heavyThemeListenerTarget,
+        run: removeHeavyFeatureThemeListener,
+      },
+      controllerCleanup(activationController),
+      observerCleanup(activationObserver),
+    ])
+    requireRendererAdmission()
+    const installation = rendererResourceOwner.beginInstallation(
+      'activation-controller',
+    )
+    let controller: AbortController
+    try {
+      controller = new AbortController()
+    } catch (error) {
+      rendererResourceOwner.retireCheckpointAuthority('cleanup-failure')
+      installation.fail(error)
+      throw error
+    }
+    activationController = controller
+    try {
+      if (rendererResourceOwner.isDisposed())
+        rendererResourceOwner.cleanupComponentResources([
+          controllerCleanup(controller),
+        ])
+    } finally {
+      installation.complete()
+    }
+    requireRendererAdmission()
+    rendererResourceOwner.runCheckpointAuthorityCallback(
+      'projection-write',
+      () => {
+        activeChunkResult = null
+      },
+    )
+    rendererResourceOwner.runCheckpointAuthorityCallback(
+      'projection-write',
+      () => {
+        activationDurationMs = 0
+      },
+    )
+    rootEl.value?.removeAttribute('data-fsus-markdown-activation-ms')
+    requireRendererAdmission()
+    rendererResourceOwner.runCheckpointAuthorityCallback(
+      'projection-write',
+      () => {
+        activatedChunkKeys.clear()
+      },
+    )
+    rendererResourceOwner.runCheckpointAuthorityCallback(
+      'projection-write',
+      () => {
+        chunkActivationElements.clear()
+      },
+    )
+    rendererResourceOwner.runCheckpointAuthorityCallback(
+      'projection-write',
+      () => {
+        lastHeavyLifecycleIdentityContext = null
+      },
+    )
+    rendererResourceOwner.runCheckpointAuthorityCallback(
+      'projection-write',
+      () => {
+        heavyLifecycleIdentityContexts = {}
+      },
+    )
+    rendererResourceOwner.runCheckpointAuthorityCallback(
+      'projection-write',
+      () => {
+        heavyLifecycleIdentitySequences = {}
+      },
+    )
+    rendererResourceOwner.runCheckpointAuthorityCallback(
+      'projection-write',
+      () => {
+        heavyLifecycleProjectionNodeIds = {}
+      },
+    )
+    if (rootEl.value) heavyLifecycle.unmountRoot(rootEl.value)
+    requireRendererAdmission()
+    recordHeavyLifecycleMetrics()
+  } finally {
+    resettingFeatureActivation = false
+    reset.complete()
+  }
 }
 
 const createHeavyFeatureIdentityResolver = async (
@@ -930,7 +1409,12 @@ const createHeavyFeatureIdentityResolver = async (
       ? (result.chunks as readonly MarkdownRenderChunk[])
       : []
   const nodeIds = projection?.nodeIds
-  heavyLifecycleProjectionNodeIds = nodeIds ?? {}
+  rendererResourceOwner.runCheckpointAuthorityCallback(
+    'projection-write',
+    () => {
+      heavyLifecycleProjectionNodeIds = nodeIds ?? {}
+    },
+  )
   const cursors: Record<MarkdownHeavyFeatureKind, number> = {
     'code-highlight': 0,
     latex: 0,
@@ -974,18 +1458,33 @@ const createHeavyFeatureIdentityResolver = async (
       revision,
       theme,
     })
-    lastHeavyLifecycleIdentityContext = context
-    heavyLifecycleIdentityContexts = {
-      ...heavyLifecycleIdentityContexts,
-      [input.kind]: context,
-    }
-    heavyLifecycleIdentitySequences = {
-      ...heavyLifecycleIdentitySequences,
-      [input.kind]: [
-        ...(heavyLifecycleIdentitySequences[input.kind] ?? []),
-        context,
-      ],
-    }
+    rendererResourceOwner.runCheckpointAuthorityCallback(
+      'projection-write',
+      () => {
+        lastHeavyLifecycleIdentityContext = context
+      },
+    )
+    rendererResourceOwner.runCheckpointAuthorityCallback(
+      'projection-write',
+      () => {
+        heavyLifecycleIdentityContexts = {
+          ...heavyLifecycleIdentityContexts,
+          [input.kind]: context,
+        }
+      },
+    )
+    rendererResourceOwner.runCheckpointAuthorityCallback(
+      'projection-write',
+      () => {
+        heavyLifecycleIdentitySequences = {
+          ...heavyLifecycleIdentitySequences,
+          [input.kind]: [
+            ...(heavyLifecycleIdentitySequences[input.kind] ?? []),
+            context,
+          ],
+        }
+      },
+    )
     return Object.freeze({
       config,
       documentEpoch,
@@ -1020,7 +1519,7 @@ const createHeavyFeatureIsolatedRenderFactory =
         (key, run, drop) =>
           scheduleMarkdownHeavyFeatureFrameContinue(
             frameScheduler,
-            key,
+            `${localDocumentKey}:${key}`,
             run,
             drop,
           ),
@@ -1037,60 +1536,75 @@ const activateRenderedFeatures = async (
   activationRoot: ParentNode | null = rootEl.value,
   signal: AbortSignal | undefined = activationController?.signal,
 ) => {
-  await nextTick()
-
-  if (!activationRoot || signal?.aborted) return
-
-  const activationStartedAt = readPerformanceNow()
-  const features = resolveMarkdownFeatureOptions()
-  const heavyFeaturesEnabled = hasEnabledHeavyFeature(result, features)
-  const resolveHeavyFeatureIdentity = heavyFeaturesEnabled
-    ? await createHeavyFeatureIdentityResolver(result)
-    : () => null
-  if (signal?.aborted) return
-  const isolatedRenderFactory = heavyFeaturesEnabled
-    ? await createHeavyFeatureIsolatedRenderFactory()
-    : undefined
-  if (signal?.aborted) return
-  const activationPromise = activateMarkdownHeavyFeatures({
-    baseUrl: props.baseUrl,
-    concurrency: 3,
-    cspNonce: props.cspNonce,
-    features,
-    heavyLifecycle,
-    isolatedRenderFactory,
-    resolveHeavyFeatureIdentity,
-    root: activationRoot,
-    scheduleHeavyFeatureCommit,
-    signal,
-  })
-  for (let step = 0; step < 8; step += 1) await Promise.resolve()
-  recordHeavyLifecycleMetrics()
-  let activation: Awaited<typeof activationPromise>
+  const finishJob = rendererResourceOwner.trackJob()
   try {
-    activation = await activationPromise
-  } finally {
-    // An aborted activation still settles its adapter bridge asynchronously.
-    // Publish the authoritative post-settlement resource counts before the
-    // early return so diagnostics cannot retain the pre-teardown snapshot.
+    await nextTick()
+
+    if (!activationRoot || signal?.aborted) return
+
+    const activationStartedAt = readPerformanceNow()
+    const features = resolveMarkdownFeatureOptions()
+    const heavyFeaturesEnabled = hasEnabledHeavyFeature(result, features)
+    const resolveHeavyFeatureIdentity = heavyFeaturesEnabled
+      ? await createHeavyFeatureIdentityResolver(result)
+      : () => null
+    if (signal?.aborted) return
+    const isolatedRenderFactory = heavyFeaturesEnabled
+      ? await createHeavyFeatureIsolatedRenderFactory()
+      : undefined
+    if (signal?.aborted) return
+    const activationPromise = activateMarkdownHeavyFeatures({
+      baseUrl: props.baseUrl,
+      concurrency: 3,
+      cspNonce: props.cspNonce,
+      features,
+      heavyLifecycle,
+      isolatedRenderFactory,
+      resolveHeavyFeatureIdentity,
+      root: activationRoot,
+      scheduleHeavyFeatureCommit,
+      signal,
+    })
+    for (let step = 0; step < 8; step += 1) await Promise.resolve()
     recordHeavyLifecycleMetrics()
-  }
-  if (signal?.aborted) return
-  activationDurationMs += readPerformanceNow() - activationStartedAt
-  rootEl.value?.setAttribute(
-    'data-fsus-markdown-activation-ms',
-    activationDurationMs.toFixed(3),
-  )
-  emit('features-activated', activation, result)
-  recordHeavyLifecycleMetrics()
-  if (
-    heavyLifecycle.metrics().staticNodes > 0 ||
-    activation.activated.some(
-      ({ kind }) =>
-        kind === 'code-highlight' || kind === 'latex' || kind === 'mermaid',
+    let activation: Awaited<typeof activationPromise>
+    try {
+      activation = await activationPromise
+    } finally {
+      // An aborted activation still settles its adapter bridge asynchronously.
+      // Publish the authoritative post-settlement resource counts before the
+      // early return so diagnostics cannot retain the pre-teardown snapshot.
+      recordHeavyLifecycleMetrics()
+    }
+    if (signal?.aborted) return
+    rendererResourceOwner.runCheckpointAuthorityCallback(
+      'projection-write',
+      () => {
+        activationDurationMs += readPerformanceNow() - activationStartedAt
+      },
     )
-  ) {
-    ensureHeavyFeatureThemeListener()
+    rootEl.value?.setAttribute(
+      'data-fsus-markdown-activation-ms',
+      activationDurationMs.toFixed(3),
+    )
+    rendererResourceOwner.runCheckpointAuthorityCallback(
+      'external-event',
+      () => {
+        emit('features-activated', activation, result)
+      },
+    )
+    recordHeavyLifecycleMetrics()
+    if (
+      heavyLifecycle.metrics().staticNodes > 0 ||
+      activation.activated.some(
+        ({ kind }) =>
+          kind === 'code-highlight' || kind === 'latex' || kind === 'mermaid',
+      )
+    ) {
+      ensureHeavyFeatureThemeListener()
+    }
+  } finally {
+    finishJob()
   }
 }
 
@@ -1100,6 +1614,7 @@ async function activateChunkFeatures(
   taskId: number,
 ) {
   if (
+    rendererResourceOwner.isDisposed() ||
     taskId !== currentTaskId ||
     activatedChunkKeys.has(key) ||
     !activeChunkResult ||
@@ -1107,7 +1622,13 @@ async function activateChunkFeatures(
   ) {
     return
   }
-  activatedChunkKeys.add(key)
+  rendererResourceOwner.retireCheckpointAuthority('chunk-activation')
+  rendererResourceOwner.runCheckpointAuthorityCallback(
+    'projection-write',
+    () => {
+      activatedChunkKeys.add(key)
+    },
+  )
   await activateRenderedFeatures(
     activeChunkResult,
     element,
@@ -1116,33 +1637,110 @@ async function activateChunkFeatures(
 }
 
 function observeChunkForActivation(key: string, element: HTMLElement) {
+  if (
+    rendererResourceOwner.isDisposed() ||
+    resettingFeatureActivation ||
+    installingActivationObserver
+  )
+    return
   const taskId = currentTaskId
   if (typeof IntersectionObserver === 'undefined') {
+    if (rendererResourceOwner.isDisposed()) return
     void activateChunkFeatures(key, element, taskId)
     return
   }
-  if (!activationObserver) {
-    const viewport = findScrollContainer(rootEl.value)
-    const observerRoot =
-      viewport === document.documentElement || viewport === document.body
-        ? null
-        : viewport
-    activationObserver = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          if (!entry.isIntersecting || !(entry.target instanceof HTMLElement)) {
-            continue
-          }
-          const unitKey = entry.target.dataset.fsusRenderUnitKey
-          if (!unitKey) continue
-          activationObserver?.unobserve(entry.target)
-          void activateChunkFeatures(unitKey, entry.target, currentTaskId)
-        }
-      },
-      { root: observerRoot, rootMargin: '384px 0px' },
-    )
+  const installation = rendererResourceOwner.beginInstallation(
+    'activation-observer',
+  )
+  installingActivationObserver = true
+  let creationUnknown = false
+  try {
+    let observer = activationObserver
+    if (!observer) {
+      const viewport = findScrollContainer(rootEl.value)
+      const observerRoot =
+        viewport === document.documentElement || viewport === document.body
+          ? null
+          : viewport
+      if (rendererResourceOwner.isDisposed()) return
+      try {
+        observer = new IntersectionObserver(
+          (entries) =>
+            rendererResourceOwner.runCheckpointAuthorityCallback(
+              'activation-observer-callback',
+              () => {
+                if (
+                  rendererResourceOwner.isDisposed() ||
+                  installingActivationObserver ||
+                  !observer ||
+                  activationObserver !== observer
+                )
+                  return
+                for (const entry of entries) {
+                  if (
+                    rendererResourceOwner.isDisposed() ||
+                    activationObserver !== observer
+                  )
+                    return
+                  if (
+                    !entry.isIntersecting ||
+                    !(entry.target instanceof HTMLElement)
+                  )
+                    continue
+                  const unitKey = entry.target.dataset.fsusRenderUnitKey
+                  if (!unitKey) continue
+                  observer.unobserve(entry.target)
+                  if (
+                    rendererResourceOwner.isDisposed() ||
+                    activationObserver !== observer
+                  )
+                    return
+                  void activateChunkFeatures(
+                    unitKey,
+                    entry.target,
+                    currentTaskId,
+                  )
+                }
+              },
+              observer ?? entries,
+            ),
+          { root: observerRoot, rootMargin: '384px 0px' },
+        )
+      } catch (error) {
+        rendererResourceOwner.retireCheckpointAuthority('cleanup-failure')
+        creationUnknown = true
+        installation.fail(error)
+        throw error
+      }
+      activationObserver = observer
+    }
+    if (!rendererResourceOwner.isDisposed()) {
+      try {
+        observer.observe(element)
+      } catch (error) {
+        rendererResourceOwner.retireCheckpointAuthority('cleanup-failure')
+        rendererResourceOwner.cleanupComponentResources([
+          {
+            phase: 'activation-observer-observe',
+            resource: observer,
+            run: () => {
+              throw error
+            },
+          },
+          observerCleanup(observer),
+        ])
+      }
+    }
+    if (rendererResourceOwner.isDisposed()) {
+      if (!activationObserver) activationObserver = observer
+      rendererResourceOwner.cleanupComponentResources([
+        observerCleanup(observer),
+      ])
+    }
+  } finally {
+    installingActivationObserver = false
+    if (!creationUnknown) installation.complete()
   }
-  activationObserver.observe(element)
 }
 
 const observeMountedChunksForActivation = () => {
@@ -1161,27 +1759,55 @@ const activateMountedChunkFeatures = async (
     '[data-fsus-render-unit-key]',
   )) {
     const key = element.dataset.fsusRenderUnitKey
-    if (key) activatedChunkKeys.add(key)
+    if (key) {
+      rendererResourceOwner.retireCheckpointAuthority('chunk-activation')
+      rendererResourceOwner.runCheckpointAuthorityCallback(
+        'projection-write',
+        () => {
+          activatedChunkKeys.add(key)
+        },
+      )
+    }
   }
   await activateRenderedFeatures(result, root, signal)
 }
 
 const performRender = async () => {
+  const generation = rendererResourceOwner.beginRender()
+  const finishJob = rendererResourceOwner.trackJob()
   const taskId = ++currentTaskId
-  resetFeatureActivation()
-  commitDurationMs = 0
-  rootEl.value?.removeAttribute('data-fsus-markdown-commit-ms')
-  const source = normalizeMarkdownSource(props.content)
-  const request = createMarkdownRenderRequest(source)
-  isRendering.value = source.length > 0
+  const isCurrent = () =>
+    taskId === currentTaskId && rendererResourceOwner.isCurrent(generation)
+  const request = markdownRenderRequest.value
+  const source = request.source
+  rendererResourceOwner.runCheckpointAuthorityCallback(
+    'projection-write',
+    () => {
+      isRendering.value = source.length > 0
+    },
+  )
+  let renderSignal: AbortSignal | undefined
 
   try {
+    resetFeatureActivation()
+    renderSignal = activationController?.signal
+    rendererResourceOwner.runCheckpointAuthorityCallback(
+      'projection-write',
+      () => {
+        commitDurationMs = 0
+      },
+    )
+    rootEl.value?.removeAttribute('data-fsus-markdown-commit-ms')
+    if (!isCurrent()) return
+    if (!heavyLifecycle.resume())
+      throw new Error('markdown-renderer-heavy-owner-disposed')
+    if (!isCurrent()) return
     const strategy = renderPipelineRuntime.strategy.value
 
     if (strategy === 'chunked-main' || strategy === 'chunked-worker') {
       await renderPipelineRuntime.render()
 
-      if (taskId !== currentTaskId) {
+      if (!isCurrent()) {
         return
       }
 
@@ -1205,7 +1831,10 @@ const performRender = async () => {
       const resolvedResult = hasMarkdownCommitAuthority(result)
         ? result
         : materializeMarkdownWorkerResult(request, result, document.units)
-      if (!resolvedResult) {
+      if (
+        !resolvedResult ||
+        !matchesMarkdownRenderRequest(request, resolvedResult)
+      ) {
         throw toFsusError(
           'markdown_safe_result_authority_invalid',
           'markdown_safe_result_authority_invalid',
@@ -1216,46 +1845,96 @@ const performRender = async () => {
       const initialCount = resolveInitialChunkCount(resolvedUnits)
 
       const commitStartedAt = readPerformanceNow()
-      renderedContent.value = null
-      activeChunkResult = resolvedResult
-      chunkUnits.value = resolvedUnits.slice(0, initialCount)
-      renderStrategy.value = renderPipelineRuntime.renderedStrategy.value as
-        | 'chunked-main'
-        | 'chunked-worker'
-      emit('render-profile', {
-        engine: resolvedResult.engine,
-        phase: 'chunks',
-        rendererVersion: resolvedResult.rendererVersion,
-        timings: resolvedResult.timings,
-      })
-      emit('placeholders-ready', resolvedResult.placeholders, resolvedResult)
+      rendererResourceOwner.runCheckpointAuthorityCallback(
+        'projection-write',
+        () => {
+          renderedContent.value = null
+        },
+      )
+      rendererResourceOwner.runCheckpointAuthorityCallback(
+        'projection-write',
+        () => {
+          activeChunkResult = resolvedResult
+        },
+      )
+      rendererResourceOwner.runCheckpointAuthorityCallback(
+        'projection-write',
+        () => {
+          publishChunkUnits(resolvedUnits.slice(0, initialCount))
+        },
+      )
+      rendererResourceOwner.runCheckpointAuthorityCallback(
+        'projection-write',
+        () => {
+          renderStrategy.value = renderPipelineRuntime.renderedStrategy
+            .value as 'chunked-main' | 'chunked-worker'
+        },
+      )
+      rendererResourceOwner.runCheckpointAuthorityCallback(
+        'external-event',
+        () => {
+          emit('render-profile', {
+            engine: resolvedResult.engine,
+            phase: 'chunks',
+            rendererVersion: resolvedResult.rendererVersion,
+            timings: resolvedResult.timings,
+          })
+        },
+      )
+      if (!isCurrent()) return
+      rendererResourceOwner.runCheckpointAuthorityCallback(
+        'external-event',
+        () => {
+          emit(
+            'placeholders-ready',
+            resolvedResult.placeholders,
+            resolvedResult,
+          )
+        },
+      )
       await nextTick()
+      if (!isCurrent()) return
       await settleRenderViewport('markdown-render-settle-initial')
+      if (!isCurrent()) return
       await afterFrame()
+      if (!isCurrent()) return
       if (initialCount < resolvedUnits.length) {
-        if (taskId !== currentTaskId) return
+        if (!isCurrent()) return
         await afterFrame()
-        if (taskId !== currentTaskId) return
-        chunkUnits.value = resolvedUnits
+        if (!isCurrent()) return
+        rendererResourceOwner.runCheckpointAuthorityCallback(
+          'projection-write',
+          () => {
+            publishChunkUnits(resolvedUnits)
+          },
+        )
         await nextTick()
+        if (!isCurrent()) return
         await settleRenderViewport('markdown-render-settle-full')
       }
+      if (!isCurrent()) return
       const initialFeatureActivation = activateMountedChunkFeatures(
         resolvedResult,
-        activationController?.signal,
+        renderSignal,
       )
       observeMountedChunksForActivation()
       await initialFeatureActivation
-      if (taskId !== currentTaskId) return
+      if (!isCurrent()) return
       recordCommitDuration(commitStartedAt)
-      emit('render-complete', resolvedResult)
+      rendererResourceOwner.retainLastValidRender(generation, resolvedResult)
+      rendererResourceOwner.runCheckpointAuthorityCallback(
+        'external-event',
+        () => {
+          emit('render-complete', resolvedResult)
+        },
+      )
       scheduleMeasurementWarmup()
       return
     }
 
     const result = await renderMarkdownResultWithRuntime(request)
 
-    if (taskId !== currentTaskId) {
+    if (!isCurrent()) {
       return
     }
 
@@ -1276,37 +1955,267 @@ const performRender = async () => {
     const resolvedResult = result.value
 
     await commitRenderedContent(resolvedResult.html, true)
-    emit('placeholders-ready', resolvedResult.placeholders, resolvedResult)
-    await activateRenderedFeatures(resolvedResult)
-    emit('render-profile', {
-      engine: resolvedResult.engine,
-      phase: 'full-result',
-      rendererVersion: resolvedResult.rendererVersion,
-      timings: resolvedResult.timings,
-    })
-    emit('render-complete', resolvedResult)
+    if (!isCurrent()) return
+    rendererResourceOwner.runCheckpointAuthorityCallback(
+      'external-event',
+      () => {
+        emit('placeholders-ready', resolvedResult.placeholders, resolvedResult)
+      },
+    )
+    await activateRenderedFeatures(resolvedResult, rootEl.value, renderSignal)
+    if (!isCurrent()) return
+    rendererResourceOwner.runCheckpointAuthorityCallback(
+      'external-event',
+      () => {
+        emit('render-profile', {
+          engine: resolvedResult.engine,
+          phase: 'full-result',
+          rendererVersion: resolvedResult.rendererVersion,
+          timings: resolvedResult.timings,
+        })
+      },
+    )
+    if (!isCurrent()) return
+    rendererResourceOwner.retainLastValidRender(generation, resolvedResult)
+    rendererResourceOwner.runCheckpointAuthorityCallback(
+      'external-event',
+      () => {
+        emit('render-complete', resolvedResult)
+      },
+    )
   } catch (error) {
-    if (taskId !== currentTaskId) {
+    if (!isCurrent()) {
       return
     }
 
     const fallback = renderMarkdownFallbackWithRuntime(request)
-    await commitRenderedContent(fallback.html, true)
-    emit('placeholders-ready', fallback.placeholders, fallback)
-    await activateRenderedFeatures(fallback)
-    emit(
-      'render-error',
-      toFsusError(error, 'markdown_renderer_render_failed', 'infra'),
-    )
-    emit('render-complete', fallback)
-  } finally {
-    if (taskId === currentTaskId) {
-      isRendering.value = false
+    if (
+      !hasMarkdownCommitAuthority(fallback) ||
+      !matchesMarkdownRenderRequest(request, fallback)
+    ) {
+      throw new Error('markdown_safe_fallback_authority_invalid', {
+        cause: error,
+      })
     }
+    await commitRenderedContent(fallback.html, true)
+    if (!isCurrent()) return
+    rendererResourceOwner.runCheckpointAuthorityCallback(
+      'external-event',
+      () => {
+        emit('placeholders-ready', fallback.placeholders, fallback)
+      },
+    )
+    await activateRenderedFeatures(fallback, rootEl.value, renderSignal)
+    if (!isCurrent()) return
+    rendererResourceOwner.runCheckpointAuthorityCallback(
+      'external-event',
+      () => {
+        emit(
+          'render-error',
+          toFsusError(error, 'markdown_renderer_render_failed', 'infra'),
+        )
+      },
+    )
+    if (!isCurrent()) return
+    rendererResourceOwner.retainLastValidRender(generation, fallback)
+    rendererResourceOwner.runCheckpointAuthorityCallback(
+      'external-event',
+      () => {
+        emit('render-complete', fallback)
+      },
+    )
+  } finally {
+    rendererResourceOwner.finalizeRenderJob(finishJob, isCurrent, () => {
+      // Clean only this task's actual activity flag, not a newer request's flag.
+      if (taskId !== currentTaskId) return
+      rendererResourceOwner.runCheckpointAuthorityCallback(
+        'projection-write',
+        () => {
+          isRendering.value = false
+        },
+        isRendering,
+      )
+    })
   }
 }
 
-watch(
+const restoreLastValidRender = async (
+  ref: string,
+): Promise<MarkdownRendererRestoreProof> => {
+  const blocked = (reason: string): MarkdownRendererRestoreProof =>
+    Object.freeze({ ref, status: 'blocked', reason })
+  const retained = rendererResourceOwner.readRetainedRender(ref)
+  if (!retained)
+    return blocked('markdown-renderer-retained-result-unavailable-or-busy')
+  const pipeline = renderPipelineRuntime.inspectResources()
+  const viewport = virtualWindow.inspectResources()
+  const heavy = heavyLifecycle.inspectResources()
+  if (pipeline.pendingWorkerCallbackFailureNotification)
+    return blocked(
+      'markdown-renderer-worker-callback-failure-notification-pending',
+    )
+  if (pipeline.workerCallbackFailure)
+    return blocked('markdown-renderer-worker-callback-failure')
+  if (hasUnavailableMarkdownRendererWorkerListenerRegistration(pipeline))
+    return blocked('markdown-renderer-worker-listener-registration-unavailable')
+  const workerCleanupResidue =
+    inspectMarkdownRendererWorkerCleanupResidue(pipeline)
+  if (
+    workerCleanupResidue.ownedScopes.length > 0 ||
+    workerCleanupResidue.poolContext.length > 0
+  ) {
+    return blocked('markdown-renderer-disposed-worker-resource-residue')
+  }
+  if (
+    heavy.admission !== 'open' ||
+    heavy.usage.tasks > 0 ||
+    heavy.usage.pendingImports > 0 ||
+    heavy.usage.scheduledContinuations > 0 ||
+    pipeline.disposed ||
+    viewport.disposed ||
+    pipeline.paused ||
+    viewport.paused ||
+    pipeline.pendingRenders > 0 ||
+    pipeline.pendingRenderAdmissions > 0 ||
+    pipeline.pendingControlTransitions > 0 ||
+    pipeline.pendingAdapterJobs > 0 ||
+    frameScheduler.resourceState().paused
+  ) {
+    return blocked('markdown-renderer-source-owner-unavailable-or-busy')
+  }
+  const request = markdownRenderRequest.value
+  if (
+    !hasMarkdownCommitAuthority(retained.result) ||
+    !matchesMarkdownRenderRequest(request, retained.result)
+  ) {
+    return blocked('markdown-renderer-retained-result-identity-mismatch')
+  }
+  // Same mounted owner only: replay its actual retained projection, never
+  // synthesize a checkpoint or treat disposal as reversible suspension.
+  currentTaskId += 1
+  rendererResourceOwner.invalidate()
+  if (debounceTimer !== null) {
+    rendererResourceOwner.clearTimer(debounceTimer)
+    debounceTimer = null
+  }
+  const generation = rendererResourceOwner.beginRender()
+  const taskId = currentTaskId
+  const isCurrent = () =>
+    taskId === currentTaskId && rendererResourceOwner.isCurrent(generation)
+  const finishJob = rendererResourceOwner.trackJob()
+  rendererResourceOwner.runCheckpointAuthorityCallback(
+    'projection-write',
+    () => {
+      isRendering.value = true
+    },
+  )
+  try {
+    resetFeatureActivation()
+    const renderSignal = activationController?.signal
+    if (!isCurrent()) return blocked('markdown-renderer-restore-stale')
+    const projection = retained.projection
+    if (projection.units.length) {
+      const anchor = captureRenderAnchor()
+      rendererResourceOwner.runCheckpointAuthorityCallback(
+        'projection-write',
+        () => {
+          renderedContent.value = projection.html
+        },
+      )
+      rendererResourceOwner.runCheckpointAuthorityCallback(
+        'projection-write',
+        () => {
+          publishChunkUnits(projection.units)
+        },
+      )
+      rendererResourceOwner.runCheckpointAuthorityCallback(
+        'projection-write',
+        () => {
+          renderStrategy.value = projection.strategy
+        },
+      )
+      // Chunk projections were retained only after authorized full commits.
+      rendererResourceOwner.runCheckpointAuthorityCallback(
+        'projection-write',
+        () => {
+          activeChunkResult = retained.result as MarkdownRuntimeChunkResult
+        },
+      )
+      await nextTick()
+      if (!isCurrent()) return blocked('markdown-renderer-restore-stale')
+      await restoreRenderAnchor(anchor)
+      if (!isCurrent()) return blocked('markdown-renderer-restore-stale')
+      if (!(await settleRenderViewport('markdown-render-restore-retained'))) {
+        return blocked('markdown-renderer-restore-scheduler-unavailable')
+      }
+      if (!isCurrent()) return blocked('markdown-renderer-restore-stale')
+      const chunkResult = activeChunkResult
+      if (!chunkResult)
+        return blocked('markdown-renderer-retained-projection-invalid')
+      await activateMountedChunkFeatures(chunkResult, renderSignal)
+      if (!isCurrent()) return blocked('markdown-renderer-restore-stale')
+      observeMountedChunksForActivation()
+    } else {
+      if (projection.html === null)
+        return blocked('markdown-renderer-retained-projection-invalid')
+      await commitRenderedContent(projection.html, true)
+      if (!isCurrent()) return blocked('markdown-renderer-restore-stale')
+      if (!(await settleRenderViewport('markdown-render-restore-retained'))) {
+        return blocked('markdown-renderer-restore-scheduler-unavailable')
+      }
+      if (!isCurrent()) return blocked('markdown-renderer-restore-stale')
+      await activateRenderedFeatures(
+        retained.result,
+        rootEl.value,
+        renderSignal,
+      )
+    }
+    if (!isCurrent()) return blocked('markdown-renderer-restore-stale')
+    rendererResourceOwner.runCheckpointAuthorityCallback(
+      'external-event',
+      () => {
+        emit('render-complete', retained.result)
+      },
+    )
+    if (!isCurrent()) return blocked('markdown-renderer-restore-stale')
+    // The result identity is preserved. This proof covers the real projection
+    // commit only; it does not qualify resource quiescence or session readiness.
+    return Object.freeze({ ref, status: 'restored', reason: null })
+  } catch (error) {
+    if (isCurrent())
+      rendererResourceOwner.runCheckpointAuthorityCallback(
+        'external-event',
+        () => {
+          emit(
+            'render-error',
+            toFsusError(error, 'markdown_renderer_restore_failed', 'infra'),
+          )
+        },
+      )
+    return blocked('markdown-renderer-restore-failed')
+  } finally {
+    rendererResourceOwner.finalizeRenderJob(finishJob, isCurrent, () => {
+      // Clean only this task's actual activity flag, not a newer request's flag.
+      if (taskId !== currentTaskId) return
+      rendererResourceOwner.runCheckpointAuthorityCallback(
+        'projection-write',
+        () => {
+          isRendering.value = false
+        },
+        isRendering,
+      )
+    })
+  }
+}
+
+if (validInitialRender) {
+  rendererResourceOwner.retainLastValidRender(
+    rendererResourceOwner.beginRender(),
+    validInitialRender,
+  )
+}
+
+const renderWatchHandle = watch(
   () => [
     props.content,
     props.contentVersion,
@@ -1322,35 +2231,214 @@ watch(
     heavyDocumentContext?.revision(),
   ],
   () => {
-    if (debounceTimer) {
-      clearTimeout(debounceTimer)
+    rendererResourceOwner.retireCheckpointAuthority('source-watch')
+    if (rendererResourceOwner.isDisposed()) return
+    currentTaskId += 1
+    rendererResourceOwner.invalidate()
+    if (rendererResourceOwner.isDisposed()) return
+    rendererResourceOwner.runCheckpointAuthorityCallback(
+      'request-input-publication',
+      () => {
+        rendererRequestInput.replace(
+          createMarkdownRenderRequest(normalizeMarkdownSource(props.content)),
+        )
+      },
+    )
+    if (rendererResourceOwner.isDisposed()) return
+    heavyLifecycle.pause()
+    if (rendererResourceOwner.isDisposed()) return
+    activationController?.abort()
+    if (rendererResourceOwner.isDisposed()) return
+    if (debounceTimer !== null) {
+      rendererResourceOwner.clearTimer(debounceTimer)
     }
-    debounceTimer = setTimeout(() => {
+    debounceTimer = rendererResourceOwner.setTimer(() => {
+      debounceTimer = null
       void performRender()
     }, 16)
   },
-  { immediate: true },
+  { immediate: true, flush: 'sync' },
 )
+rendererResourceOwner.bindRenderWatchHandle(renderWatchHandle)
 
-onBeforeUnmount(() => {
-  removeHeavyFeatureThemeListener()
-  if (debounceTimer) {
-    clearTimeout(debounceTimer)
-    debounceTimer = null
-  }
-  activationController?.abort()
-  activationController = null
-  activationObserver?.disconnect()
-  activationObserver = null
-  activeChunkResult = null
-  activatedChunkKeys.clear()
-  chunkActivationElements.clear()
+onActivated(() => rendererResourceOwner.onCheckpointActivated())
+onDeactivated(() => rendererResourceOwner.onCheckpointDeactivated())
+
+function disposeRendererResources() {
+  rendererResourceOwner.retireCheckpointAuthority('unmount-entry')
+  const controller = activationController
+  const observer = activationObserver
+  const themeTarget = heavyThemeListenerTarget
+  const timer = debounceTimer
   currentTaskId += 1
-  isRendering.value = false
-  heavyLifecycle.dispose()
-})
+  rendererResourceOwner.disposeOnUnmount(
+    [
+      {
+        phase: 'theme-listener-remove',
+        resource: themeTarget,
+        run: removeHeavyFeatureThemeListener,
+      },
+      controllerCleanup(controller),
+      observerCleanup(observer),
+      {
+        phase: 'heavy-lifecycle-dispose',
+        resource: heavyLifecycle,
+        run: () => heavyLifecycle.dispose(),
+      },
+    ],
+    [
+      {
+        phase: 'request-input-clear',
+        resource: rendererRequestInput.input,
+        run: () => rendererRequestInput.clear(Object.freeze({ source: '' })),
+      },
+      {
+        phase: 'viewport-input-clear',
+        resource: rendererViewportInput.input,
+        run: () =>
+          rendererViewportInput.clear(
+            Object.freeze({ root: null, scroller: null }),
+          ),
+      },
+      {
+        phase: 'debounce-reference-release',
+        resource: timer,
+        run: () => {
+          if (debounceTimer === timer) debounceTimer = null
+        },
+      },
+      {
+        phase: 'chunk-result-release',
+        resource: activeChunkResult,
+        run: () => {
+          rendererResourceOwner.runCheckpointAuthorityCallback(
+            'projection-write',
+            () => {
+              activeChunkResult = null
+            },
+          )
+        },
+      },
+      {
+        phase: 'rendered-content-release',
+        resource: renderedContent,
+        run: () => {
+          rendererResourceOwner.runCheckpointAuthorityCallback(
+            'projection-write',
+            () => {
+              renderedContent.value = null
+            },
+          )
+        },
+      },
+      {
+        phase: 'chunk-unit-release',
+        resource: chunkUnits,
+        run: () => {
+          rendererResourceOwner.runCheckpointAuthorityCallback(
+            'projection-write',
+            () => {
+              publishChunkUnits([])
+            },
+          )
+        },
+      },
+      {
+        phase: 'tracker-reference-release',
+        resource: heavyProjectionTrackerPromise,
+        run: () => {
+          rendererResourceOwner.runCheckpointAuthorityCallback(
+            'projection-write',
+            () => {
+              heavyProjectionTrackerPromise = null
+            },
+          )
+        },
+      },
+      {
+        phase: 'activated-key-release',
+        resource: activatedChunkKeys,
+        run: () => activatedChunkKeys.clear(),
+      },
+      {
+        phase: 'chunk-element-release',
+        resource: chunkActivationElements,
+        run: () => chunkActivationElements.clear(),
+      },
+      {
+        phase: 'rendering-state-release',
+        resource: isRendering,
+        run: () => {
+          rendererResourceOwner.runCheckpointAuthorityCallback(
+            'projection-write',
+            () => {
+              isRendering.value = false
+            },
+          )
+        },
+      },
+    ],
+  )
+}
 
 defineExpose({
   rootEl,
+  getPipelineInputSourceOffer: () =>
+    Object.freeze({
+      complete: false as const,
+      request: Object.freeze({
+        input: rendererRequestInput.input,
+        authority: rendererRequestInput.authority,
+        scope: 'owned-request-snapshot' as const,
+      }),
+      adapter: Object.freeze({
+        input: rendererAdapterInput.input,
+        authority: rendererAdapterInput.authority,
+        scope: 'owned-adapter-descriptor' as const,
+      }),
+      units: Object.freeze({
+        input: chunkUnits,
+        authority: rendererChunkInput.authority,
+        scope: 'owned-immutable-chunks' as const,
+      }),
+      viewport: Object.freeze({
+        input: rendererViewportInput.input,
+        authority: rendererViewportInput.authority,
+        scope: 'owned-selected-reference-identities' as const,
+      }),
+      nativeDocumentAuthority:
+        rendererResourceOwner.readNativeDocumentAuthority(),
+      config: renderPipelineConfig,
+      unowned: Object.freeze([
+        'external-props-and-nested-mutable-values',
+        'adapter-callback-platform-and-runtime',
+        'native-document-failure-history',
+        'dom-style-scroll-resize-platform',
+        'uncontrolled-config-provider',
+      ]),
+    }),
+  captureLastValidRender: rendererResourceOwner.captureLastValidRender,
+  getRendererCheckpointHandle:
+    rendererResourceOwner.getRendererCheckpointHandle,
+  captureRendererOwnedCheckpoint:
+    rendererResourceOwner.captureRendererOwnedCheckpoint,
+  prepareRendererOwnedCheckpoint:
+    rendererResourceOwner.prepareRendererOwnedCheckpoint,
+  validatePreparedRendererOwnedCheckpoint:
+    rendererResourceOwner.validatePreparedRendererOwnedCheckpoint,
+  publishPreparedRendererOwnedCheckpoint:
+    rendererResourceOwner.publishPreparedRendererOwnedCheckpoint,
+  cancelPreparedRendererOwnedCheckpoint:
+    rendererResourceOwner.cancelPreparedRendererOwnedCheckpoint,
+  sealPreparedRendererOwnedCheckpoint:
+    rendererResourceOwner.sealPreparedRendererOwnedCheckpoint,
+  hasSealedRendererOwnedCheckpointCustody:
+    rendererResourceOwner.hasSealedRendererOwnedCheckpointCustody,
+  publishSealedRendererOwnedCheckpoint:
+    rendererResourceOwner.publishSealedRendererOwnedCheckpoint,
+  restoreLastValidRender,
+  getSessionResourceParticipant: () => rendererResourceOwner.participant,
+  getSessionResourceSourceOffer: () =>
+    rendererResourceOwner.inspectOwnedResources(),
 })
 </script>

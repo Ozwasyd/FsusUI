@@ -36,8 +36,13 @@ import type { MarkdownFeatureActivationFeatureOptions } from '@element-plus/wasm
 import type { MarkdownEmbedProvider } from '../../../wasm/markdown-embed-provider'
 import type { MarkdownStableProjection } from '@element-plus/wasm'
 import type MarkdownEditor from './markdown-editor.vue'
-import type { MarkdownAttachmentBatchIntent } from './markdown-editor-attachment'
+import type {
+  MarkdownAttachmentBatchIntent,
+  MarkdownAttachmentCaptureObservation,
+} from './markdown-editor-attachment'
 import type { MarkdownEditorMetricsOptions } from './markdown-editor-metrics'
+import type { MarkdownEditorAttachmentDispatch } from './markdown-editor-session-attachment-dispatch'
+export type { MarkdownEditorAttachmentDispatch } from './markdown-editor-session-attachment-dispatch'
 export {
   captureMarkdownAttachmentInput,
   createMarkdownAttachmentCaptureSession,
@@ -58,6 +63,8 @@ export {
   type MarkdownAttachmentAtomicAction,
   type MarkdownAttachmentAtomicPresentation,
   type MarkdownAttachmentBatchIntent,
+  type MarkdownAttachmentCaptureObservation,
+  type MarkdownAttachmentFileConsumer,
   type MarkdownAttachmentCaptureContext,
   type MarkdownAttachmentCaptureInput,
   type MarkdownAttachmentCaptureRejection,
@@ -1816,6 +1823,10 @@ export const markdownEditorProps = buildProps({
     type: Object as PropType<MarkdownFeatureActivationFeatureOptions>,
     default: undefined,
   },
+  attachmentDispatch: {
+    type: definePropType<MarkdownEditorAttachmentDispatch>(Function),
+    default: undefined,
+  },
   embedProvider: {
     type: definePropType<MarkdownEmbedProvider>(Function),
     default: undefined,
@@ -1850,7 +1861,10 @@ export const markdownEditorEmits = {
     mode === 'preview',
   save: (value: string) => typeof value === 'string',
   submit: (value: string) => typeof value === 'string',
-  'upload-image': (_batch: MarkdownAttachmentBatchIntent) => true,
+  'upload-image': (
+    _batch: MarkdownAttachmentBatchIntent,
+    _capture: MarkdownAttachmentCaptureObservation | undefined = undefined,
+  ) => true,
   'render-complete': (..._args: unknown[]) => true,
   'render-error': (..._args: unknown[]) => true,
   'features-activated': (..._args: unknown[]) => true,
@@ -1878,11 +1892,27 @@ export type MarkdownEditorInstance = InstanceType<typeof MarkdownEditor>
 export type {
   MarkdownEditorSession,
   MarkdownEditorSessionCapabilities,
+  MarkdownEditorSessionAttachmentResourceSource,
+  MarkdownEditorSessionDocumentState,
+  MarkdownEditorSessionDocumentAuthority,
+  MarkdownEditorSessionDocumentAuthorityTicket,
+  MarkdownEditorSessionDocumentAuthorityRetirementHandle,
+  MarkdownEditorSessionContentDigest,
   MarkdownEditorSessionExpose,
+  MarkdownEditorSessionLastValidRender,
   MarkdownEditorSessionResourceUsage,
+  MarkdownEditorSessionRendererResourceSource,
   MarkdownEditorSessionRestoreProof,
+  MarkdownEditorSessionRenderRestoreProof,
   MarkdownEditorSessionSnapshot,
+  MarkdownEditorSessionPreparedSnapshot,
+  MarkdownEditorSessionSnapshotPublication,
 } from './markdown-editor-session'
+export type {
+  MarkdownEditorSessionPanelState,
+  MarkdownEditorSessionPanelRefs,
+  MarkdownEditorSessionAttachmentState,
+} from './markdown-editor-session-panels'
 
 export type {
   MarkdownEditorSessionResourceCensus,

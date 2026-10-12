@@ -35,6 +35,7 @@ import {
   resolveMarkdownEditorCommandSession,
   type MarkdownEditorCommandSession,
 } from '../src/markdown-editor-command-async'
+import { createMarkdownEditorSessionCommandResources } from '../src/markdown-editor-session-command-resources'
 import {
   evaluateMarkdownEditorStatusMutations,
   resolveMarkdownEditorStatus,
@@ -1404,5 +1405,54 @@ describe('Issue #432: One migration, one registry, one cross-surface command con
     expect(
       report.mutations.every((mutation) => mutation.equivalent === false),
     ).toBe(true)
+  })
+})
+
+// Source-only additions for the original owner suite; runtime remains UNRUN.
+describe('Markdown editor session command resource ownership', () => {
+  it('keeps concurrent aborted attempts counted until their original finally releases them', () => {
+    const context = makeContext()
+    const command = defaultMarkdownEditorCommands[0]!
+    const resources = createMarkdownEditorSessionCommandResources(() => ({
+      documentIdentity: context.documentIdentity, disposed: false, commands: [command],
+    }), (candidate) => defaultMarkdownEditorCommands.includes(candidate))
+    const first = createMarkdownEditorCommandSession(command.key, context, { concurrent: true })
+    const second = createMarkdownEditorCommandSession(command.key, context, { concurrent: true })
+    resources.begin(first, command)
+    resources.begin(second, command)
+    // The command-key authority can retain only the latest attempt. The resource
+    // ledger must still own both actual continuations, including aborted work.
+    expect(resources.participant.inspect().usage.backgroundTasks).toBe(2)
+    const requested = resources.participant.pause()
+    expect(first.abort.signal.aborted).toBe(true)
+    expect(second.abort.signal.aborted).toBe(true)
+    expect(requested.paused).toBe(false)
+    expect(requested.usage.backgroundTasks).toBe(2)
+    expect(resources.isCurrent(first)).toBe(false)
+    resources.finish(first)
+    expect(resources.participant.inspect().paused).toBe(false)
+    resources.finish(second)
+    expect(resources.participant.inspect().paused).toBe(true)
+    expect(resources.participant.resume().paused).toBe(false)
+    expect(resources.isCurrent(second)).toBe(false)
+  })
+
+  it('cannot hide an unobservable external provider by replacing the command props or aborting it', () => {
+    const context = makeContext()
+    const external: MarkdownEditorCommand = {
+      key: 'external', label: 'External', group: 'external', run: () => ({}),
+    }
+    let commands: readonly MarkdownEditorCommand[] = [external]
+    const resources = createMarkdownEditorSessionCommandResources(() => ({
+      documentIdentity: context.documentIdentity, disposed: false, commands,
+    }), (candidate) => defaultMarkdownEditorCommands.includes(candidate))
+    const attempt = createMarkdownEditorCommandSession(external.key, context)
+    resources.begin(attempt, external)
+    commands = defaultMarkdownEditorCommands
+    resources.abortPending('editor-reset')
+    expect(resources.canInspect()).toBe(false)
+    expect(() => resources.participant.inspect()).toThrow('editor-session-external-command-resource-owner-unavailable')
+    resources.finish(attempt)
+    expect(resources.canInspect()).toBe(false)
   })
 })

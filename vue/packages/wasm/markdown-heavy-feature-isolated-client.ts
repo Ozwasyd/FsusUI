@@ -70,9 +70,19 @@ export const createMarkdownHeavyFeatureIsolatedRender = <
   }
   const capability = createCapability()
   let active = true
-  let cancelScheduledContinue: (() => void) | null = null
+  let readyAttached = false
+  let bootstrapPending = false
+  let bootstrapIssued = false
+  let requestPending = false
+  let started = false
+  let scheduledContinue: { cancel: (() => void) | null } | null = null
   let port: MessagePort | null = null
+  let transferPort: MessagePort | null = null
   let script: HTMLScriptElement | null = null
+  const resourceChangeListeners = new Set<() => void>()
+  const notifyResourceChange = () => {
+    for (const listener of resourceChangeListeners) listener()
+  }
   const iframe = document.createElement('iframe')
   iframe.setAttribute('aria-hidden', 'true')
   iframe.setAttribute('tabindex', '-1')
@@ -96,16 +106,35 @@ export const createMarkdownHeavyFeatureIsolatedRender = <
     rejectPromise = reject
   })
 
-  const removeReadyListener = () => window.removeEventListener('message', ready)
+  const removeReadyListener = () => {
+    if (!readyAttached) return
+    window.removeEventListener('message', ready)
+    readyAttached = false
+  }
+  const removeScriptHandlers = () => {
+    if (!script) return
+    script.onerror = null
+    script.onload = null
+  }
   const cleanup = () => {
-    cancelScheduledContinue?.()
-    cancelScheduledContinue = null
+    const continuation = scheduledContinue
+    scheduledContinue = null
+    continuation?.cancel?.()
     removeReadyListener()
-    if (script) script.onerror = null
+    removeScriptHandlers()
     script = null
+    if (port) {
+      port.onmessage = null
+      port.onmessageerror = null
+    }
     port?.close()
     port = null
+    transferPort?.close()
+    transferPort = null
     iframe.remove()
+    bootstrapPending = false
+    requestPending = false
+    notifyResourceChange()
   }
   const teardown = () => {
     if (!active) return
@@ -125,140 +154,225 @@ export const createMarkdownHeavyFeatureIsolatedRender = <
       return
     }
     removeReadyListener()
-    if (script) script.onerror = null
-    const channel = new MessageChannel()
-    port = channel.port1
-    port.onmessage = (message) => {
-      if (!active) return
-      if (
-        message.data?.scope !== MARKDOWN_HEAVY_FEATURE_FRAME_SCOPE ||
-        message.data?.capability !== capability
-      ) {
-        teardown()
-        return
-      }
-      if (message.data.type === 'started') {
-        iframe.dataset.fsusMarkdownHeavyWork = validatedRequest.kind
-        const continueRender = () => {
-          if (!active) return
-          port?.postMessage({
-            capability,
-            scope: MARKDOWN_HEAVY_FEATURE_FRAME_SCOPE,
-            type: 'continue',
-          })
-        }
-        if (scheduleContinue) {
-          cancelScheduledContinue = scheduleContinue(
-            `markdown-heavy-frame-continue:${validatedRequest.lifecycleKey ?? capability}`,
-            continueRender,
-            teardown,
-          )
-          if (!cancelScheduledContinue) teardown()
-        } else {
-          continueRender()
-        }
-        return
-      }
-      if (message.data.type === 'resolve') {
-        const output = validateMarkdownHeavyFeatureIsolatedRenderOutput(
-          message.data.output,
-          validatedRequest.kind,
-        )
-        if (!output) {
-          active = false
-          cleanup()
-          rejectPromise(
-            new Error('markdown_heavy_feature_frame_output_invalid'),
-          )
+    removeScriptHandlers()
+    bootstrapPending = false
+    try {
+      const channel = new MessageChannel()
+      port = channel.port1
+      transferPort = channel.port2
+      port.onmessageerror = teardown
+      port.onmessage = (message) => {
+        if (!active) return
+        if (
+          message.data?.scope !== MARKDOWN_HEAVY_FEATURE_FRAME_SCOPE ||
+          message.data?.capability !== capability
+        ) {
+          teardown()
           return
         }
-        active = false
-        cleanup()
-        resolvePromise(output as T)
-        return
+        if (message.data.type === 'started') {
+          if (started) {
+            teardown()
+            return
+          }
+          started = true
+          iframe.dataset.fsusMarkdownHeavyWork = validatedRequest.kind
+          const continueRender = () => {
+            if (!active) return
+            try {
+              port?.postMessage({
+                capability,
+                scope: MARKDOWN_HEAVY_FEATURE_FRAME_SCOPE,
+                type: 'continue',
+              })
+            } catch (error) {
+              active = false
+              cleanup()
+              rejectPromise(error)
+            }
+          }
+          if (scheduleContinue) {
+            const continuation = { cancel: null as (() => void) | null }
+            scheduledContinue = continuation
+            notifyResourceChange()
+            try {
+              const cancel = scheduleContinue(
+                `markdown-heavy-frame-continue:${validatedRequest.lifecycleKey ?? 'node'}:${capability}`,
+                () => {
+                  if (scheduledContinue !== continuation) return
+                  scheduledContinue = null
+                  notifyResourceChange()
+                  continueRender()
+                },
+                teardown,
+              )
+              if (scheduledContinue === continuation) {
+                continuation.cancel = cancel
+                if (!cancel) teardown()
+              } else if (!active) cancel?.()
+            } catch (error) {
+              active = false
+              cleanup()
+              rejectPromise(error)
+            }
+          } else {
+            continueRender()
+          }
+          return
+        }
+        if (message.data.type === 'resolve') {
+          const output = validateMarkdownHeavyFeatureIsolatedRenderOutput(
+            message.data.output,
+            validatedRequest.kind,
+          )
+          if (!output) {
+            active = false
+            cleanup()
+            rejectPromise(
+              new Error('markdown_heavy_feature_frame_output_invalid'),
+            )
+            return
+          }
+          active = false
+          cleanup()
+          resolvePromise(output as T)
+          return
+        }
+        if (message.data.type === 'reject') {
+          const error = new Error(
+            typeof message.data.message === 'string'
+              ? message.data.message
+              : 'markdown_heavy_feature_frame_failed',
+          )
+          active = false
+          cleanup()
+          rejectPromise(error)
+          return
+        }
+        teardown()
       }
-      if (message.data.type === 'reject') {
-        const error = new Error(
-          typeof message.data.message === 'string'
-            ? message.data.message
-            : 'markdown_heavy_feature_frame_failed',
-        )
-        active = false
-        cleanup()
-        rejectPromise(error)
-        return
-      }
-      teardown()
+      requestPending = true
+      notifyResourceChange()
+      if (!iframe.contentWindow) throw abortError()
+      iframe.contentWindow.postMessage(
+        {
+          capability,
+          request: validatedRequest,
+          scope: MARKDOWN_HEAVY_FEATURE_FRAME_SCOPE,
+          type: 'render',
+        },
+        expectedOrigin,
+        [channel.port2],
+      )
+      transferPort = null
+    } catch (error) {
+      active = false
+      cleanup()
+      rejectPromise(error)
     }
-    iframe.contentWindow?.postMessage(
-      {
-        capability,
-        request: validatedRequest,
-        scope: MARKDOWN_HEAVY_FEATURE_FRAME_SCOPE,
-        type: 'render',
-      },
-      expectedOrigin,
-      [channel.port2],
-    )
   }
   window.addEventListener('message', ready)
+  readyAttached = true
 
-  const frameDocument = iframe.contentDocument
-  if (!frameDocument) {
-    teardown()
-  } else {
-    initializeFrameDocument(frameDocument)
-    frameDocument.documentElement.dataset.fsusMarkdownFrameCapability =
-      capability
-    frameDocument.documentElement.dataset.fsusMarkdownParentOrigin =
-      expectedOrigin
-    script = frameDocument.createElement('script')
-    script.type = 'module'
-    const moduleUrl = new URL(
-      MarkdownHeavyFeatureFrameUrl,
-      window.location.href,
-    )
-    try {
-      const trustedModuleUrl = trustedScriptUrlFactory
-        ? trustedScriptUrlFactory(moduleUrl)
-        : moduleUrl
-      script.src = trustedModuleUrl as string
-    } catch (cause) {
-      active = false
-      cleanup()
-      rejectPromise(
-        new Error('markdown_heavy_feature_frame_script_url_rejected', {
-          cause,
-        }),
+  const resources: MarkdownHeavyFeatureAdapterResources = Object.freeze({
+    scope: 'owned-handles',
+    get listeners() {
+      return (
+        (readyAttached ? 1 : 0) +
+        (port?.onmessage ? 1 : 0) +
+        (port?.onmessageerror ? 1 : 0) +
+        (script?.onerror ? 1 : 0) +
+        (script?.onload ? 1 : 0)
       )
-      return Object.freeze({
-        promise,
-        resources: (): MarkdownHeavyFeatureAdapterResources =>
-          Object.freeze({ listeners: 0, observers: 0, runtimes: 0, tasks: 0 }),
-        teardown,
-      })
-    }
-    if (validatedRequest.cspNonce) script.nonce = validatedRequest.cspNonce
-    script.onerror = () => {
-      if (!active) return
-      active = false
-      cleanup()
-      rejectPromise(new Error('markdown_heavy_feature_frame_load_failed'))
-    }
-    frameDocument.head.append(script)
-  }
-
-  return Object.freeze({
+    },
+    get networkRequests() {
+      // Realm removal does not expose module-loader/third-party network aborts.
+      return bootstrapIssued ? 'unknown' : 0
+    },
+    observers: 0,
+    pendingImports: 0,
+    get runtimes() {
+      return iframe.isConnected ? 1 : 0
+    },
+    get scheduledContinuations() {
+      return scheduledContinue ? 1 : 0
+    },
+    subscribe(listener: () => void) {
+      resourceChangeListeners.add(listener)
+      return () => resourceChangeListeners.delete(listener)
+    },
+    get tasks() {
+      return (
+        (readyAttached ? 1 : 0) +
+        (bootstrapPending ? 1 : 0) +
+        (requestPending ? 1 : 0) +
+        (scheduledContinue ? 1 : 0)
+      )
+    },
+    get timers() {
+      return bootstrapIssued ? 'unknown' : 0
+    },
+  })
+  const handle = Object.freeze({
     promise,
-    resources: (): MarkdownHeavyFeatureAdapterResources =>
-      Object.freeze({
-        listeners: active ? 2 : 0,
-        observers: 0,
-        runtimes: active ? 1 : 0,
-        tasks: active ? 1 : 0,
-      }),
+    resources: () => resources,
     teardown,
   })
+
+  try {
+    const frameDocument = iframe.contentDocument
+    if (!frameDocument) {
+      teardown()
+    } else {
+      initializeFrameDocument(frameDocument)
+      frameDocument.documentElement.dataset.fsusMarkdownFrameCapability =
+        capability
+      frameDocument.documentElement.dataset.fsusMarkdownParentOrigin =
+        expectedOrigin
+      script = frameDocument.createElement('script')
+      script.type = 'module'
+      const moduleUrl = new URL(
+        MarkdownHeavyFeatureFrameUrl,
+        window.location.href,
+      )
+      try {
+        const trustedModuleUrl = trustedScriptUrlFactory
+          ? trustedScriptUrlFactory(moduleUrl)
+          : moduleUrl
+        script.src = trustedModuleUrl as string
+      } catch (cause) {
+        active = false
+        cleanup()
+        rejectPromise(
+          new Error('markdown_heavy_feature_frame_script_url_rejected', {
+            cause,
+          }),
+        )
+        return handle
+      }
+      if (validatedRequest.cspNonce) script.nonce = validatedRequest.cspNonce
+      script.onerror = () => {
+        if (!active) return
+        active = false
+        cleanup()
+        rejectPromise(new Error('markdown_heavy_feature_frame_load_failed'))
+      }
+      script.onload = () => {
+        bootstrapPending = false
+        removeScriptHandlers()
+        notifyResourceChange()
+      }
+      bootstrapPending = true
+      bootstrapIssued = true
+      frameDocument.head.append(script)
+    }
+  } catch (error) {
+    active = false
+    cleanup()
+    rejectPromise(error)
+  }
+
+  return handle
 }
 
 export const installMarkdownHeavyFeatureIsolatedRenderer = (

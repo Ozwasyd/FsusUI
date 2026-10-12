@@ -27,6 +27,36 @@ const createManualFrames = () => {
 }
 
 describe('createMarkdownEditorFrameScheduler', () => {
+  it('owns and cancels actual auxiliary frame handles without changing phased metrics', () => {
+    const frames = createManualFrames()
+    const scheduler = createMarkdownEditorFrameScheduler({
+      cancelFrame: frames.cancelFrame,
+      requestFrame: frames.requestFrame,
+    })
+    let commits = 0
+    const originalMetricKeys = Object.keys(scheduler.metrics()).sort()
+    scheduler.requestAuxiliaryFrame(() => { commits += 1 })
+    expect(frames.pendingFrames()).toBe(1)
+    expect(scheduler.resourceState().pendingAuxiliaryFrames).toBe(1)
+    scheduler.pause()
+    expect(frames.pendingFrames()).toBe(0)
+    expect(scheduler.resourceState().pendingAuxiliaryFrames).toBe(0)
+    frames.runFrame()
+    expect(commits).toBe(0)
+    expect(scheduler.requestAuxiliaryFrame(() => { commits += 1 })).toBeUndefined()
+    scheduler.resume()
+    scheduler.requestAuxiliaryFrame(() => {
+      expect(scheduler.resourceState().runningAuxiliaryFrames).toBe(1)
+      expect(() => scheduler.pause()).toThrow('markdown-frame-scheduler-phase-active')
+      commits += 1
+    })
+    frames.runFrame()
+    expect(commits).toBe(1)
+    expect(Object.keys(scheduler.metrics()).sort()).toEqual(originalMetricKeys)
+    expect(scheduler.resourceState().runningAuxiliaryFrames).toBe(0)
+    scheduler.dispose()
+  })
+
   it('pauses the real queue and frame handle and resumes current-state scheduling', () => {
     const frames = createManualFrames()
     const scheduler = createMarkdownEditorFrameScheduler({

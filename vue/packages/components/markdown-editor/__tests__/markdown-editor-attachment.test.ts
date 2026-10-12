@@ -569,3 +569,34 @@ describe('attachment atomic presentation and total acceptance (#377)', () => {
     })
   })
 })
+
+describe('attachment capture signal binding', () => {
+  it('keeps supplied batch and independent item signals without exposing Files', () => {
+    const batchController = new AbortController()
+    const controllers = [new AbortController(), new AbortController()]
+    const result = captureMarkdownAttachmentInput({
+      sourceKind: 'pick',
+      documentIdentity: identity,
+      revision: 4,
+      anchor: { range: { start: 0, end: 0 } },
+      signal: batchController.signal,
+      files: controllers.map((controller) => ({
+        name: 'same.png',
+        type: 'image/png',
+        size: 1,
+        signal: controller.signal,
+      })),
+    })
+    expect(result.ok).toBe(true)
+    if (!result.ok) throw new Error('capture rejected')
+    expect(result.batch.signal).toBe(batchController.signal)
+    expect(result.batch.items.map((item) => item.signal)).toEqual(
+      controllers.map((controller) => controller.signal),
+    )
+    controllers[0]!.abort()
+    expect(result.batch.items[0]!.signal.aborted).toBe(true)
+    expect(result.batch.items[1]!.signal.aborted).toBe(false)
+    expect(result.batch.signal.aborted).toBe(false)
+    expect('files' in result.batch).toBe(false)
+  })
+})
