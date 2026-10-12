@@ -1752,6 +1752,10 @@ function dispatchChunkActivation(
     retainDeferredChunkActivation(key, element, taskId)
     return
   }
+  if (activatingChunkKeys.has(key)) {
+    retainDeferredChunkActivation(key, element, taskId)
+    return
+  }
   const resource = { key, element, taskId }
   void activateChunkFeatures(key, element, taskId).catch((cause: unknown) => {
     retainDeferredChunkActivation(key, element, taskId)
@@ -1808,12 +1812,18 @@ async function activateChunkFeatures(
       rendererResourceOwner.isDisposed() ||
       taskId !== currentTaskId ||
       result !== activeChunkResult ||
+      chunkActivationElements.get(key) !== element ||
       activationController?.signal.aborted
     )
       return
     rendererResourceOwner.runCheckpointAuthorityCallback(
       'projection-write',
       () => {
+        if (rendererResourceOwner.isRenderWatchPaused()) {
+          retainDeferredChunkActivation(key, element, taskId)
+          return
+        }
+        activationObserver?.unobserve(element)
         if (rendererResourceOwner.isRenderWatchPaused()) {
           retainDeferredChunkActivation(key, element, taskId)
           return
@@ -1892,7 +1902,6 @@ function observeChunkForActivation(key: string, element: HTMLElement) {
                     )
                     continue
                   }
-                  observer.unobserve(entry.target)
                   if (
                     rendererResourceOwner.isDisposed() ||
                     activationObserver !== observer
@@ -1957,8 +1966,6 @@ function resumeDeferredChunkActivations() {
       continue
     }
     if (pending.element.isConnected) {
-      if (rendererResourceOwner.isRenderWatchPaused()) return
-      activationObserver?.unobserve(pending.element)
       if (rendererResourceOwner.isRenderWatchPaused()) return
       dispatchChunkActivation(key, pending.element, pending.taskId)
     }
