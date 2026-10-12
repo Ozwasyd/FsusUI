@@ -655,3 +655,45 @@ prepare, busy/native residue, callback throw/reentry, cancel, repeated publicati
 dispose, old-ref preservation and incomplete-host refusal cases are UNRUN. Static
 compilation does not lift runtime/test/list/native/security/receipt/authority or
 fixed-roster eviction holds.
+
+### Live seal join is unavailable
+
+The mounted owner exposes the requested seal join names as explicit refusal
+boundaries. It does not issue a live ticket from the existing captured-only pin.
+
+- `sealPreparedRendererOwnedCheckpoint(preparation)` compares the exact pending
+  token and private custody first. Invalid/stale/busy tokens return null. An
+  eligible local preparation throws
+  `markdown-renderer-checkpoint-seal-source-unavailable` with the original source
+  gaps below, before changing validation, pending/published refs or resources.
+- `hasSealedRendererOwnedCheckpointCustody(publication)` returns false: no
+  original live ticket issuer is available. It reads no caller object properties
+  or external state and cannot accept the old captured-only publication token.
+- `publishSealedRendererOwnedCheckpoint(publication)` returns null without any
+  callback, allocation, state/native write or fallback to local pin publication.
+  The old public ref, pending preparation and real cleanup custody remain intact.
+
+These are unsupported-source refusals, not successful seal implementations or
+future ticket-provider stubs. `sources.rendererCheckpointCustody.seal` remains
+`unavailable` and reports the same exact missing original producer sources.
+
+| Required original source                                                                                                                | Inspected current gap                                                                                                                                                                                                                                                                                                                            |
+| --------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Document/source authority ticket with synchronous revocation before identity, epoch, revision or source mutation and external callbacks | `MarkdownHeavyFeatureDocumentContext` exposes callback getters only. The renderer's Vue source watch covers reactive notifications, not arbitrary getter-owned mutations. There is no original private ticket or revocation subscription to acquire.                                                                                             |
+| Pipeline authority ticket with complete synchronous admission/control/worker/callback/cleanup revocation                                | The original runtime returns reactive views, `inspectResources`, pause and resume. Its `onDiagnostic` callback covers selected current diagnostics and can be suppressed; it is not a complete mutation/revocation feed. Worker/resource/control state also lives in non-reactive records. Reading its real census once cannot seal later state. |
+| Complete renderer projection/lifecycle/failed-cleanup ticket revocation                                                                 | Existing render/invalidate/unmount generation controls and exact cleanup proofs remain real. Projection writes, deactivation and every producer failure are not connected to a single authoritative seal lifecycle. There is no current deactivation hook or original live ticket issuer. Partial hooks cannot certify complete coverage.        |
+
+The original document and pipeline owners must supply their real private tickets
+and synchronous revocation channels before this renderer can bind them together
+with its owned projection/source/deactivation/unmount/cleanup-failure paths. Every
+external read, subscription and allocation must finish before its final private
+guard acquires the original ticket; final has/publish must consume only that ticket
+and private generation. This task does not add a second authority, caller-fed
+generation/eligibility option, diagnostic-watch substitute or metadata proof.
+Main/native/Writer/journal stores and all original A/B/C producers are unchanged.
+
+Existing 27313 custody methods retain their original limited behavior. A complete
+host join must stop at this refusal; local custody publication is not a substitute.
+No usage counter, paused/recoverable/full-host/native qualification is expanded.
+Refusal/token/getter/old-ref/cleanup preservation cases are source-inspected only;
+all runtime/test/list/native/security/receipt/authority/eviction cases stay UNRUN.

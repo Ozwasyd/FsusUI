@@ -137,6 +137,12 @@ export const hasUnavailableMarkdownRendererWorkerListenerRegistration = (
 
 // Preserve the remaining real source gaps; available hook counts are exposed
 // separately and never turn opaque adapter/worker/platform state into zero.
+export const markdownRendererCheckpointSealSourceDependencies = Object.freeze([
+  'renderer:document-source-synchronous-authority-ticket',
+  'render-pipeline:complete-synchronous-authority-revocation-ticket',
+  'renderer:projection-deactivation-cleanup-seal-revocation-coverage',
+] as const)
+
 export const markdownRendererSessionSourceDependencies = Object.freeze([
   'markdown-runtime:activation-and-gateway-loader-import-network-census',
   'renderer:validated-snapshot-restoration-after-disposal',
@@ -145,6 +151,7 @@ export const markdownRendererSessionSourceDependencies = Object.freeze([
   'renderer:owned-event-registration-and-reversible-control',
   'renderer:callback-queue-checkpoint-and-epoch-safe-recreation',
   'renderer:callback-free-live-authority-attestation-for-full-host-refset',
+  ...markdownRendererCheckpointSealSourceDependencies,
   // Quarantine is source-reviewed; the worker-owner synchronous lifecycle
   // repairs are composed, but independent review/qualification remains pending.
   'render-pipeline-worker:reentrant-enqueue-disposal-cleanup',
@@ -573,6 +580,31 @@ export const createMarkdownRendererSessionResourceOwner = <
       cancelPreparedRendererOwnedCheckpoint(preparation)
     }
   }
+  const sealPreparedRendererOwnedCheckpoint = (
+    preparation: MarkdownRendererCheckpointPreparation,
+  ): MarkdownRendererCheckpointPublication | null => {
+    const candidate = preparedCheckpoint
+    if (
+      !candidate ||
+      candidate.preparation !== preparation ||
+      !hasCurrentCheckpointCustody()
+    )
+      return null
+    // The original context has getters, and pipeline diagnostics omit control
+    // and resource transitions. Neither supplies a synchronous revocation ticket.
+    // Refuse before changing validation, published custody, or real resources.
+    throw new Error(
+      `markdown-renderer-checkpoint-seal-source-unavailable:${markdownRendererCheckpointSealSourceDependencies.join(',')}`,
+    )
+  }
+  // No original issuer can currently create a live ticket. These pure refusal
+  // ports cannot promote a captured-only publication to sealed live authority.
+  const hasSealedRendererOwnedCheckpointCustody = (
+    _publication: MarkdownRendererCheckpointPublication,
+  ): boolean => false
+  const publishSealedRendererOwnedCheckpoint = (
+    _publication: MarkdownRendererCheckpointPublication,
+  ): MarkdownRendererOwnedCheckpoint | null => null
   const trackJob = () => {
     if (disposed) throw new Error('markdown-renderer-resource-owner-disposed')
     const job = Symbol('renderer-job')
@@ -943,6 +975,9 @@ export const createMarkdownRendererSessionResourceOwner = <
           publication: 'renderer-custody-only' as const,
           liveAuthority: 'unavailable' as const,
           fullHostRefset: 'unavailable' as const,
+          seal: 'unavailable' as const,
+          missingSealSourceDependencies:
+            markdownRendererCheckpointSealSourceDependencies,
         }),
         rendererNative: Object.freeze({
           renderWatchHandleRetained: renderWatchHandle !== null,
@@ -1224,6 +1259,9 @@ export const createMarkdownRendererSessionResourceOwner = <
     validatePreparedRendererOwnedCheckpoint,
     publishPreparedRendererOwnedCheckpoint,
     cancelPreparedRendererOwnedCheckpoint,
+    sealPreparedRendererOwnedCheckpoint,
+    hasSealedRendererOwnedCheckpointCustody,
+    publishSealedRendererOwnedCheckpoint,
     clearTimer,
     cleanupComponentResources,
     disposeOnUnmount,

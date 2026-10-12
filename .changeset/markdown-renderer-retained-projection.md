@@ -2,6 +2,8 @@
 'element-plus': minor
 ---
 
+Expose fail-closed renderer seal join ports with exact missing original document/pipeline revocation sources. Do not issue a live seal from captured-only custody; pure has/publish refuse and preserve old refs, pending custody and cleanup obligations.
+
 Add original-owner staged renderer checkpoint custody with non-invalidating preparation, exact-token private validation, callback-free local pointer publication and cancellation. Keep captured-only authority, complete:false, recoverable:false, nativeRecovery unavailable and full-host publication/restoration refusals explicit.
 
 Preserve cancellation selected during keyed-frame creation even while mounted: a late native accepted return cleans the exact original request instead of reviving it, and failed cleanup retains its real obligation without repeating a completed finalizer.
