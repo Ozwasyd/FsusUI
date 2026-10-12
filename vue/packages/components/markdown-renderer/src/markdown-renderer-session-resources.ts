@@ -36,6 +36,19 @@ export interface MarkdownRendererOwnedCheckpoint extends MarkdownRendererDocumen
   readonly nativeRecovery: 'unavailable'
 }
 
+/** Exact producer-held custody tokens, not complete host/recovery receipts. */
+export interface MarkdownRendererCheckpointPreparation {
+  readonly checkpoint: MarkdownRendererOwnedCheckpoint
+  readonly baseCheckpointRef: string | null
+  readonly scope: 'renderer-custody-only'
+  readonly complete: false
+  readonly recoverable: false
+}
+
+export interface MarkdownRendererCheckpointPublication extends MarkdownRendererCheckpointPreparation {
+  readonly authority: 'captured-renderer-only'
+}
+
 export interface MarkdownRendererRetainedProjection {
   readonly html: MarkdownSafeHtml | null
   readonly units: readonly MarkdownRenderChunk[]
@@ -131,6 +144,7 @@ export const markdownRendererSessionSourceDependencies = Object.freeze([
   'native-vue:renderer-effect-and-flush-resource-census',
   'renderer:owned-event-registration-and-reversible-control',
   'renderer:callback-queue-checkpoint-and-epoch-safe-recreation',
+  'renderer:callback-free-live-authority-attestation-for-full-host-refset',
   // Quarantine is source-reviewed; the worker-owner synchronous lifecycle
   // repairs are composed, but independent review/qualification remains pending.
   'render-pipeline-worker:reentrant-enqueue-disposal-cleanup',
@@ -192,11 +206,20 @@ export const createMarkdownRendererSessionResourceOwner = <
     error: unknown
   }> | null = null
   let retained: MarkdownRendererRetainedRender | null = null
-  let checkpoint: {
+  type CheckpointRecord = {
     readonly capture: MarkdownRendererOwnedCheckpoint
     readonly render: MarkdownRendererRetainedRender
     readonly state: Readonly<State>
     readonly retainedCollectionEntries: number
+  }
+  let checkpoint: CheckpointRecord | null = null
+  let preparedCheckpoint: {
+    readonly record: CheckpointRecord
+    readonly base: CheckpointRecord | null
+    readonly generation: number
+    readonly preparation: MarkdownRendererCheckpointPreparation
+    readonly publication: MarkdownRendererCheckpointPublication
+    validated: boolean
   } | null = null
 
   const beginInstallation = (phase: string) => {
@@ -387,11 +410,12 @@ export const createMarkdownRendererSessionResourceOwner = <
       return null
     return retained
   }
-  const captureRendererOwnedCheckpoint =
-    (): MarkdownRendererOwnedCheckpoint | null => {
+  const prepareRendererOwnedCheckpoint =
+    (): MarkdownRendererCheckpointPreparation | null => {
       if (
         disposed ||
         capturingCheckpoint ||
+        preparedCheckpoint !== null ||
         stoppingRenderWatch ||
         jobs.size > 0 ||
         timers.size > 0 ||
@@ -403,6 +427,7 @@ export const createMarkdownRendererSessionResourceOwner = <
       )
         return null
       const checkpointGeneration = generation
+      const base = checkpoint
       capturingCheckpoint = true
       try {
         const capture = captureLastValidRender()
@@ -445,19 +470,109 @@ export const createMarkdownRendererSessionResourceOwner = <
           scope: 'renderer-owned-state',
           nativeRecovery: 'unavailable',
         })
-        // Pin actual authorized result/projection and actual copied owned stores.
-        // Failed or reentrant capture never replaces the previous checkpoint.
-        checkpoint = Object.freeze({
+        const record: CheckpointRecord = Object.freeze({
           capture: nextCapture,
           render,
           state,
           retainedCollectionEntries,
         })
-        return nextCapture
+        const preparation: MarkdownRendererCheckpointPreparation =
+          Object.freeze({
+            checkpoint: nextCapture,
+            baseCheckpointRef: base?.capture.ref ?? null,
+            scope: 'renderer-custody-only',
+            complete: false,
+            recoverable: false,
+          })
+        // Allocate every publication object before changing the published pin.
+        preparedCheckpoint = {
+          record,
+          base,
+          generation: checkpointGeneration,
+          preparation,
+          publication: Object.freeze({
+            ...preparation,
+            authority: 'captured-renderer-only',
+          }),
+          validated: false,
+        }
+        return preparation
       } finally {
         capturingCheckpoint = false
       }
     }
+  const hasCurrentCheckpointCustody = () => {
+    const candidate = preparedCheckpoint
+    return (
+      candidate !== null &&
+      !disposed &&
+      !capturingCheckpoint &&
+      !stoppingRenderWatch &&
+      generation === candidate.generation &&
+      retained === candidate.record.render &&
+      checkpoint === candidate.base &&
+      jobs.size === 0 &&
+      timers.size === 0 &&
+      frames.size === 0 &&
+      scheduledFrames.size === 0 &&
+      pendingFrameFinalizers.size === 0 &&
+      controlledFrameKeys.size === 0 &&
+      installations.size === 0 &&
+      pendingComponentCleanups.size === 0
+    )
+  }
+  const validatePreparedRendererOwnedCheckpoint = (
+    preparation: MarkdownRendererCheckpointPreparation,
+  ): MarkdownRendererCheckpointPublication | null => {
+    const candidate = preparedCheckpoint
+    // Compare producer identity only; never read caller token properties/getters.
+    if (
+      !candidate ||
+      candidate.preparation !== preparation ||
+      !hasCurrentCheckpointCustody()
+    )
+      return null
+    candidate.validated = true
+    return candidate.publication
+  }
+  const publishPreparedRendererOwnedCheckpoint = (
+    publication: MarkdownRendererCheckpointPublication,
+  ): MarkdownRendererOwnedCheckpoint | null => {
+    const candidate = preparedCheckpoint
+    if (
+      !candidate ||
+      candidate.publication !== publication ||
+      !candidate.validated ||
+      !hasCurrentCheckpointCustody()
+    )
+      return null
+    // Pure local custody publication: no producer callbacks, reactive/native
+    // writes, allocation, cleanup, or claims about live external authority.
+    checkpoint = candidate.record
+    preparedCheckpoint = null
+    return checkpoint.capture
+  }
+  const cancelPreparedRendererOwnedCheckpoint = (
+    preparation: MarkdownRendererCheckpointPreparation,
+  ) => {
+    const candidate = preparedCheckpoint
+    if (!candidate || candidate.preparation !== preparation) return false
+    preparedCheckpoint = null
+    // Only the pending pin is released. Native handles/jobs/failure proofs remain.
+    return true
+  }
+  const captureRendererOwnedCheckpoint = () => {
+    const preparation = prepareRendererOwnedCheckpoint()
+    if (!preparation) return null
+    try {
+      const publication = validatePreparedRendererOwnedCheckpoint(preparation)
+      return publication
+        ? publishPreparedRendererOwnedCheckpoint(publication)
+        : null
+    } finally {
+      cancelPreparedRendererOwnedCheckpoint(preparation)
+    }
+  }
   const trackJob = () => {
     if (disposed) throw new Error('markdown-renderer-resource-owner-disposed')
     const job = Symbol('renderer-job')
@@ -822,6 +937,13 @@ export const createMarkdownRendererSessionResourceOwner = <
       missingSourceDependencies: Object.freeze(missingSourceDependencies),
       sources: Object.freeze({
         rendererOwnedCheckpoint: checkpoint?.capture ?? null,
+        rendererCheckpointCustody: Object.freeze({
+          prepared: preparedCheckpoint?.preparation ?? null,
+          validated: preparedCheckpoint?.validated ?? false,
+          publication: 'renderer-custody-only' as const,
+          liveAuthority: 'unavailable' as const,
+          fullHostRefset: 'unavailable' as const,
+        }),
         rendererNative: Object.freeze({
           renderWatchHandleRetained: renderWatchHandle !== null,
           stoppingRenderWatch,
@@ -991,6 +1113,9 @@ export const createMarkdownRendererSessionResourceOwner = <
             (renderWatchCleanupFailure ? 1 : 0) +
             (retained ? 1 : 0) +
             (checkpoint ? 1 + checkpoint.retainedCollectionEntries : 0) +
+            (preparedCheckpoint
+              ? 3 + preparedCheckpoint.record.retainedCollectionEntries
+              : 0) +
             timers.size +
             frames.size +
             scheduledFrames.size +
@@ -1095,6 +1220,10 @@ export const createMarkdownRendererSessionResourceOwner = <
     beginRender,
     captureLastValidRender,
     captureRendererOwnedCheckpoint,
+    prepareRendererOwnedCheckpoint,
+    validatePreparedRendererOwnedCheckpoint,
+    publishPreparedRendererOwnedCheckpoint,
+    cancelPreparedRendererOwnedCheckpoint,
     clearTimer,
     cleanupComponentResources,
     disposeOnUnmount,
