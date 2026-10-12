@@ -376,10 +376,10 @@ let heavyProjectionTrackerPromise: Promise<MarkdownHeavyFeatureProjectionTracker
 const loadHeavyProjectionTracker = () => {
   if (!heavyProjectionTrackerPromise)
     rendererResourceOwner.retireCheckpointAuthority('projection-tracker')
-  return (heavyProjectionTrackerPromise ??=
-    import('../../../wasm/markdown-heavy-feature-identity').then(
-      ({ createMarkdownHeavyFeatureProjectionTracker }) =>
-        createMarkdownHeavyFeatureProjectionTracker(),
+  return (heavyProjectionTrackerPromise ??= rendererResourceOwner
+    .loadProjectionIdentityModule()
+    .then(({ createMarkdownHeavyFeatureProjectionTracker }) =>
+      createMarkdownHeavyFeatureProjectionTracker(),
     ))
 }
 
@@ -563,6 +563,33 @@ const rendererResourceOwner: ReturnType<
       phase: 'heavy-resource-pause',
       resource: heavyLifecycle,
       run: () => heavyLifecycle.pause(),
+    },
+    {
+      phase: 'heavy-owned-timer-cancel-request',
+      resource: heavyLifecycle,
+      run: () =>
+        rendererResourceOwner.observeHeavyCancellationRequest(
+          'timers',
+          heavyLifecycle.cancelOwnedTimers(),
+        ),
+    },
+    {
+      phase: 'heavy-owned-request-cancel-request',
+      resource: heavyLifecycle,
+      run: () =>
+        rendererResourceOwner.observeHeavyCancellationRequest(
+          'requests',
+          heavyLifecycle.cancelOwnedRequests(),
+        ),
+    },
+    {
+      phase: 'heavy-owned-continuation-cancel-request',
+      resource: heavyLifecycle,
+      run: () =>
+        rendererResourceOwner.observeHeavyCancellationRequest(
+          'continuations',
+          heavyLifecycle.cancelOwnedContinuations(),
+        ),
     },
     {
       phase: 'theme-listener-remove',
@@ -1614,8 +1641,8 @@ const createHeavyFeatureIsolatedRenderFactory =
       { createLazyMarkdownHeavyFeatureIsolatedRender },
       { scheduleMarkdownHeavyFeatureFrameContinue },
     ] = await Promise.all([
-      import('../../../wasm/markdown-heavy-feature-isolated-lazy'),
-      import('../../../wasm/markdown-heavy-feature-frame-scheduler'),
+      rendererResourceOwner.loadLazyModule(),
+      rendererResourceOwner.loadFrameSchedulerModule(),
     ])
     return <T,>(
       request: Parameters<MarkdownHeavyFeatureIsolatedRenderFactory>[0],

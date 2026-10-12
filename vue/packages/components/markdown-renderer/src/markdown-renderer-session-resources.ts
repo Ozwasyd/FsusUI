@@ -24,6 +24,11 @@ import type {
 } from '../../../hooks/use-markdown-editor-frame-scheduler'
 import type { WatchHandle } from 'vue'
 import { customRef } from 'vue'
+import { createMarkdownHeavyFeatureAdapterResourceOwner } from '../../../wasm/markdown-heavy-feature-resource'
+import type {
+  MarkdownHeavyFeatureAdapterResources,
+  MarkdownHeavyFeatureCancellationRequest,
+} from '../../../wasm/markdown-heavy-feature-resource'
 
 const rendererInputNativePromise = Promise
 const rendererInputNativePromisePrototype = Promise.prototype
@@ -38,6 +43,64 @@ const rendererInputNativeSpecies = Object.getOwnPropertyDescriptor(
   Promise,
   Symbol.species,
 )?.get
+
+// These three original support-module allocations belong to this module realm,
+// never to an editor instance or a consumer's cancellation authority.
+const rendererSupportImportRealmOwner =
+  createMarkdownHeavyFeatureAdapterResourceOwner()
+const rendererSupportImportAllocations = new Map<string, number>()
+let rendererProjectionIdentityModule: Promise<
+  typeof import('../../../wasm/markdown-heavy-feature-identity')
+> | null = null
+let rendererLazyModule: Promise<
+  typeof import('../../../wasm/markdown-heavy-feature-isolated-lazy')
+> | null = null
+let rendererFrameSchedulerModule: Promise<
+  typeof import('../../../wasm/markdown-heavy-feature-frame-scheduler')
+> | null = null
+const allocateRendererProjectionIdentityModule = () =>
+  (rendererProjectionIdentityModule ??=
+    rendererSupportImportRealmOwner.loadImport(() => {
+      rendererSupportImportAllocations.set(
+        'projection-identity',
+        (rendererSupportImportAllocations.get('projection-identity') ?? 0) + 1,
+      )
+      return import('../../../wasm/markdown-heavy-feature-identity')
+    }))
+const allocateRendererLazyModule = () =>
+  (rendererLazyModule ??= rendererSupportImportRealmOwner.loadImport(() => {
+    rendererSupportImportAllocations.set(
+      'isolated-lazy',
+      (rendererSupportImportAllocations.get('isolated-lazy') ?? 0) + 1,
+    )
+    return import('../../../wasm/markdown-heavy-feature-isolated-lazy')
+  }))
+const allocateRendererFrameSchedulerModule = () =>
+  (rendererFrameSchedulerModule ??= rendererSupportImportRealmOwner.loadImport(
+    () => {
+      rendererSupportImportAllocations.set(
+        'frame-scheduler',
+        (rendererSupportImportAllocations.get('frame-scheduler') ?? 0) + 1,
+      )
+      return import('../../../wasm/markdown-heavy-feature-frame-scheduler')
+    },
+  ))
+const inspectRendererImportResources = (
+  resources: MarkdownHeavyFeatureAdapterResources,
+) =>
+  Object.freeze({
+    scope: resources.scope,
+    listeners: resources.listeners,
+    observers: resources.observers,
+    runtimes: resources.runtimes,
+    tasks: resources.tasks,
+    pendingImports: resources.pendingImports,
+    pendingRequests: resources.pendingRequests,
+    pendingInstallations: resources.pendingInstallations,
+    timers: resources.timers,
+    networkRequests: resources.networkRequests,
+    failures: resources.failures,
+  })
 
 /** Custody of a private input publication only, never of foreign mutable state. */
 export interface MarkdownRendererOwnedInputAuthority {
@@ -304,6 +367,12 @@ export const createMarkdownRendererSessionResourceOwner = <
   readonly resumeWatchActivity?: () => void
   readonly commitRelatedResourceResume?: () => void
 }) => {
+  const rendererImportObserver =
+    createMarkdownHeavyFeatureAdapterResourceOwner()
+  const heavyCancellationReports = new Map<
+    string,
+    MarkdownHeavyFeatureCancellationRequest
+  >()
   const timers = new Set<ReturnType<typeof setTimeout>>()
   type TimerActivation = {
     handle: ReturnType<typeof setTimeout> | undefined
@@ -1986,6 +2055,60 @@ export const createMarkdownRendererSessionResourceOwner = <
     // Only the selected real finally settlements are awaited. New admissions,
     // imports and subordinate/native resources are not a quiescence receipt.
   }
+  const observeRendererSupportImport = <T>(
+    readOriginalPromise: () => Promise<T>,
+  ): Promise<T> => {
+    const finishJob = trackJob()
+    try {
+      const originalPromise = readOriginalPromise()
+      const observed = rendererImportObserver.observeImport(originalPromise)
+      const settle = () => {
+        try {
+          finishJob()
+        } catch (cause) {
+          try {
+            runCleanupBatch([
+              {
+                phase: 'support-import-job-settlement',
+                resource: originalPromise,
+                run: () => {
+                  throw cause
+                },
+              },
+            ])
+          } catch {
+            // The actual failure is retained; no terminal receipt is issued.
+          }
+        }
+      }
+      void observed.then(settle, settle)
+      return observed
+    } catch (cause) {
+      finishJob()
+      throw cause
+    }
+  }
+  const observeHeavyCancellationRequest = (
+    kind: string,
+    request: MarkdownHeavyFeatureCancellationRequest,
+  ) => {
+    heavyCancellationReports.set(kind, request)
+    runCleanupBatch(
+      request.failures.map((failure) => ({
+        phase: `heavy-cancellation:${failure.operation}`,
+        resource: failure.resource,
+        run: () => {
+          throw failure.cause
+        },
+      })),
+    )
+    if (request.unavailable)
+      throw new MarkdownRendererResourceControlUnsupportedError(
+        [`heavy:${kind}-cancellation-unavailable`],
+        inspectComponentHandles(),
+      )
+    // A successfully issued request is not asynchronous settlement or release.
+  }
   const finalizeRenderJob = (
     finishJob: () => void,
     readCurrent: () => boolean,
@@ -2726,6 +2849,9 @@ export const createMarkdownRendererSessionResourceOwner = <
     const pipeline = options.readPipelineResources()
     const viewport = options.readVirtualWindowResources()
     const heavy = options.readHeavyResources()
+    const supportImports = inspectRendererImportResources(
+      rendererImportObserver.resources,
+    )
     const workerCleanupResidue =
       inspectMarkdownRendererWorkerCleanupResidue(pipeline)
     const workerScopes = pipeline.workerResources.scopes.map(
@@ -2812,13 +2938,28 @@ export const createMarkdownRendererSessionResourceOwner = <
         `heavy-feature-runtime:network-${heavy.usage.networkRequests}`,
       )
     }
+    if (typeof supportImports.timers !== 'number')
+      missingSourceDependencies.push(
+        `renderer-support-import:timers-${supportImports.timers ?? 'unavailable'}`,
+      )
+    if (typeof supportImports.networkRequests !== 'number')
+      missingSourceDependencies.push(
+        `renderer-support-import:network-${supportImports.networkRequests ?? 'unavailable'}`,
+      )
+    if (supportImports.failures?.length)
+      missingSourceDependencies.push(
+        'renderer-support-import:retained-failures',
+      )
     // Count measurable handles only. Unknown fields remain verbatim under
     // sources/unknownUsage; this subtotal is never a participant inspection.
     let knownTimers = timers.size + pipeline.timers + viewport.timers
     let knownNetworkRequests: number | null = null
     if (typeof heavy.usage.timers === 'number')
       knownTimers += heavy.usage.timers
-    if (typeof heavy.usage.networkRequests === 'number')
+    if (
+      typeof heavy.usage.networkRequests === 'number' &&
+      typeof supportImports.networkRequests === 'number'
+    )
       knownNetworkRequests = heavy.usage.networkRequests
     for (const scope of workerScopes) {
       knownTimers +=
@@ -2829,6 +2970,22 @@ export const createMarkdownRendererSessionResourceOwner = <
       measuredUsageOnly: true as const,
       missingSourceDependencies: Object.freeze(missingSourceDependencies),
       sources: Object.freeze({
+        supportImportObservation: supportImports,
+        supportImportRealm: Object.freeze({
+          scope: 'realm-shared-renderer-support-imports' as const,
+          allocations: Object.freeze(
+            Object.fromEntries(rendererSupportImportAllocations),
+          ),
+          resources: inspectRendererImportResources(
+            rendererSupportImportRealmOwner.resources,
+          ),
+          cancellationRights: 'realm-producer-only' as const,
+        }),
+        heavyCancellationRequests: Object.freeze(
+          [...heavyCancellationReports].map(([kind, request]) =>
+            Object.freeze({ kind, request }),
+          ),
+        ),
         adapterInvocationResources: pipeline.adapterInvocationResources,
         workerProviderResources: Object.freeze(
           workerScopes.map((scope) => scope.provider),
@@ -2970,6 +3127,12 @@ export const createMarkdownRendererSessionResourceOwner = <
           pipeline.pendingWorkerCallbackFailureNotification,
       }),
       unknownUsage: Object.freeze({
+        rendererSupportImports: Object.freeze({
+          timers: supportImports.timers,
+          networkRequests: supportImports.networkRequests,
+          scope: 'observation-only' as const,
+          cancellationRights: 'none' as const,
+        }),
         documentRetirementRegistrations: documentRetirementUnknown
           ? ('unknown' as const)
           : 0,
@@ -3089,6 +3252,8 @@ export const createMarkdownRendererSessionResourceOwner = <
           // separately; an unknown heavy count is never coerced into this zero.
           networkRequests: 0,
           memoryUnits:
+            heavyCancellationReports.size +
+            1 +
             timerRecords.size * 2 +
             abortBindings.size +
             jobSettlements.size * 3 +
@@ -3355,6 +3520,13 @@ export const createMarkdownRendererSessionResourceOwner = <
     }
   return Object.freeze({
     afterFrame,
+    loadProjectionIdentityModule: () =>
+      observeRendererSupportImport(allocateRendererProjectionIdentityModule),
+    loadLazyModule: () =>
+      observeRendererSupportImport(allocateRendererLazyModule),
+    loadFrameSchedulerModule: () =>
+      observeRendererSupportImport(allocateRendererFrameSchedulerModule),
+    observeHeavyCancellationRequest,
     getOwnedHandleControl: () => ownedHandleControl,
     isRenderWatchPaused: () => renderWatchPaused,
     bindRenderWatchSource,
