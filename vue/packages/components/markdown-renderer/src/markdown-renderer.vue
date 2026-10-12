@@ -1648,7 +1648,7 @@ const activateRenderedFeatures = async (
     rendererResourceOwner.isRenderWatchPaused() ||
     signal?.aborted
   )
-    return false
+    return 'cancelled' as const
   const finishJob = rendererResourceOwner.trackJob()
   try {
     await nextTick()
@@ -1658,7 +1658,7 @@ const activateRenderedFeatures = async (
       signal?.aborted ||
       rendererResourceOwner.isRenderWatchPaused()
     )
-      return false
+      return 'cancelled' as const
 
     const activationStartedAt = readPerformanceNow()
     const features = resolveMarkdownFeatureOptions()
@@ -1667,12 +1667,12 @@ const activateRenderedFeatures = async (
       ? await createHeavyFeatureIdentityResolver(result)
       : () => null
     if (signal?.aborted || rendererResourceOwner.isRenderWatchPaused())
-      return false
+      return 'cancelled' as const
     const isolatedRenderFactory = heavyFeaturesEnabled
       ? await createHeavyFeatureIsolatedRenderFactory()
       : undefined
     if (signal?.aborted || rendererResourceOwner.isRenderWatchPaused())
-      return false
+      return 'cancelled' as const
     const activationPromise = activateMarkdownHeavyFeatures({
       baseUrl: props.baseUrl,
       concurrency: 3,
@@ -1696,8 +1696,23 @@ const activateRenderedFeatures = async (
       // early return so diagnostics cannot retain the pre-teardown snapshot.
       recordHeavyLifecycleMetrics()
     }
+    const activationFailed = activation.errors.length > 0
+    for (const error of activation.errors) {
+      try {
+        rendererResourceOwner.runCheckpointAuthorityCallback(
+          'feature-activation-result-failure',
+          () => {
+            throw error
+          },
+          activation,
+          'feature-activation-result-failure',
+        )
+      } catch {
+        // Preserve the exact producer error record; fulfillment is not success.
+      }
+    }
     if (signal?.aborted || rendererResourceOwner.isRenderWatchPaused())
-      return false
+      return 'cancelled' as const
     rendererResourceOwner.runCheckpointAuthorityCallback(
       'projection-write',
       () => {
@@ -1724,7 +1739,7 @@ const activateRenderedFeatures = async (
     ) {
       ensureHeavyFeatureThemeListener()
     }
-    return true
+    return activationFailed ? ('failed' as const) : ('activated' as const)
   } finally {
     finishJob()
   }
@@ -1738,6 +1753,7 @@ function retainDeferredChunkActivation(
   if (
     !rendererResourceOwner.isDisposed() &&
     taskId === currentTaskId &&
+    chunkActivationElements.get(key) === element &&
     !activatedChunkKeys.has(key)
   )
     deferredChunkActivations.set(key, { element, taskId })
@@ -1795,36 +1811,37 @@ async function activateChunkFeatures(
     return
   const result = activeChunkResult
   const signal = activationController?.signal
+  const isCurrentActivation = () =>
+    !rendererResourceOwner.isDisposed() &&
+    !rendererResourceOwner.isRenderWatchPaused() &&
+    taskId === currentTaskId &&
+    result === activeChunkResult &&
+    chunkActivationElements.get(key) === element &&
+    element.isConnected &&
+    activationController?.signal === signal &&
+    !signal?.aborted
   activatingChunkKeys.add(key)
   try {
-    // Claim the activated key only after actual admitted work settles, rather
-    // than losing an observed target when job admission closes synchronously.
-    const activated = await activateRenderedFeatures(result, element, signal)
-    if (
-      !activated ||
-      signal?.aborted ||
-      rendererResourceOwner.isRenderWatchPaused()
-    ) {
+    const outcome = await activateRenderedFeatures(result, element, signal)
+    if (outcome !== 'activated') {
       retainDeferredChunkActivation(key, element, taskId)
       return
     }
-    if (
-      rendererResourceOwner.isDisposed() ||
-      taskId !== currentTaskId ||
-      result !== activeChunkResult ||
-      chunkActivationElements.get(key) !== element ||
-      activationController?.signal.aborted
-    )
+    if (!isCurrentActivation()) {
+      retainDeferredChunkActivation(key, element, taskId)
       return
+    }
     rendererResourceOwner.runCheckpointAuthorityCallback(
       'projection-write',
       () => {
-        if (rendererResourceOwner.isRenderWatchPaused()) {
+        // Original retirement receivers run before this callback. Revalidate the
+        // whole captured lifetime/identity both here and after native unobserve.
+        if (!isCurrentActivation()) {
           retainDeferredChunkActivation(key, element, taskId)
           return
         }
         activationObserver?.unobserve(element)
-        if (rendererResourceOwner.isRenderWatchPaused()) {
+        if (!isCurrentActivation()) {
           retainDeferredChunkActivation(key, element, taskId)
           return
         }
@@ -1834,7 +1851,31 @@ async function activateChunkFeatures(
     )
   } finally {
     activatingChunkKeys.delete(key)
+    advanceReplacementChunkActivation(key, element)
   }
+}
+
+function advanceReplacementChunkActivation(
+  key: string,
+  settledElement: HTMLElement,
+) {
+  const pending = deferredChunkActivations.get(key)
+  if (
+    !pending ||
+    pending.element === settledElement ||
+    activatingChunkKeys.has(key) ||
+    rendererResourceOwner.isDisposed() ||
+    rendererResourceOwner.isRenderWatchPaused() ||
+    pending.taskId !== currentTaskId ||
+    chunkActivationElements.get(key) !== pending.element ||
+    !pending.element.isConnected ||
+    activatedChunkKeys.has(key)
+  )
+    return
+  // Only a different current target queued behind the settled attempt advances.
+  // A failure of this same target remains for explicit resume/re-observation,
+  // so a permanent producer failure cannot create an immediate retry loop.
+  dispatchChunkActivation(key, pending.element, pending.taskId)
 }
 
 function observeChunkForActivation(key: string, element: HTMLElement) {
