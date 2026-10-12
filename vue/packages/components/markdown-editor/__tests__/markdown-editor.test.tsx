@@ -28,6 +28,172 @@ import type {
 import { getMarkdownXssSourceUrl } from '../../../../tests/support/markdown-xss-corpus'
 
 describe('MarkdownEditor', () => {
+  it('prepares and atomically commits actual native refs without replacing the previous token during preparation', () => {
+    const identity = { id: 'prepared-native-document', epoch: 1 }
+    const store = new MarkdownEditorTransactionStore('original source', undefined, identity)
+    store.dispatch({ changes: [{ from: 0, to: 0, insert: 'actual ' }], history: 'separate', origin: 'programmatic' })
+    const session = createMarkdownEditorSessionBinding({
+      transactionStore: store, isComposing: () => false, isDisposed: () => false,
+      captureViewState: () => null, restoreViewState: () => {},
+      resourceParticipants: () => [], captureLastValidRender: () => null,
+    }).getSession('session:prepared-native')
+    const expected = { documentIdentity: identity, revision: store.revision }
+    const original = session.captureSnapshot(() => 'a'.repeat(64), expected)
+    const before = { history: store.history, selection: store.selection, value: store.value, revision: store.revision }
+    const preparation = session.prepareSnapshot(() => 'b'.repeat(64), expected)
+    expect(session.validateRetainedSnapshot(original, expected)).toBe(true)
+    expect(session.validateRetainedSnapshot(preparation.snapshot, expected)).toBe(false)
+    expect(() => session.captureSnapshot(() => 'c'.repeat(64), expected)).toThrow('editor-session-snapshot-preparation-pending')
+    expect(() => session.commitPreparedSnapshot({ snapshot: preparation.snapshot })).toThrow('editor-session-snapshot-preparation-invalid')
+    expect(session.discardPreparedSnapshot({ snapshot: preparation.snapshot })).toBe(false)
+    const foreignStore = new MarkdownEditorTransactionStore(store.value, undefined, identity)
+    const foreign = createMarkdownEditorSessionBinding({
+      transactionStore: foreignStore, isComposing: () => false, isDisposed: () => false,
+      captureViewState: () => null, restoreViewState: () => {},
+      resourceParticipants: () => [], captureLastValidRender: () => null,
+    }).getSession('session:prepared-foreign')
+    const foreignPreparation = foreign.prepareSnapshot(() => 'b'.repeat(64))
+    expect(() => session.commitPreparedSnapshot(foreignPreparation)).toThrow('editor-session-snapshot-preparation-invalid')
+    expect(session.discardPreparedSnapshot(foreignPreparation)).toBe(false)
+    expect(foreign.discardPreparedSnapshot(foreignPreparation)).toBe(true)
+    const committed = session.commitPreparedSnapshot(preparation)
+    expect(committed).toBe(preparation.snapshot)
+    expect(session.validateRetainedSnapshot(original, expected)).toBe(false)
+    expect(session.validateRetainedSnapshot(committed, expected)).toBe(true)
+    expect(committed.historyRef).toBe(`${committed.snapshotRef}:history`)
+    expect(committed.selectionRef).toBe(`${committed.snapshotRef}:selection`)
+    expect(committed.viewStateRef).toBe(`${committed.snapshotRef}:view`)
+    expect({ history: store.history, selection: store.selection, value: store.value, revision: store.revision }).toEqual(before)
+    expect(() => session.commitPreparedSnapshot(preparation)).toThrow('editor-session-snapshot-preparation-invalid')
+    expect(session.discardPreparedSnapshot(preparation)).toBe(false)
+  })
+
+  it('preserves actual prior native token through preparation callback failure, commit admission failure and cancellation', () => {
+    const identity = { id: 'prepared-failure-document', epoch: 1 }
+    const store = new MarkdownEditorTransactionStore('source', undefined, identity)
+    let failView = false
+    let admitted = true
+    const session = createMarkdownEditorSessionBinding({
+      transactionStore: store, isComposing: () => false, isDisposed: () => false,
+      captureViewState: () => { if (failView) throw new Error('actual-view-failed'); return null }, restoreViewState: () => {},
+      resourceParticipants: () => [], captureLastValidRender: () => null,
+    }).getSession('session:prepared-failure')
+    const expected = { documentIdentity: identity, revision: 0, assertAdmission: () => { if (!admitted) throw new Error('actual-admission-retired') } }
+    const original = session.captureSnapshot(() => 'a'.repeat(64), expected)
+    failView = true
+    expect(() => session.prepareSnapshot(() => 'b'.repeat(64), expected)).toThrow('actual-view-failed')
+    expect(session.validateRetainedSnapshot(original, expected)).toBe(true)
+    failView = false
+    const refused = session.prepareSnapshot(() => 'b'.repeat(64), expected)
+    admitted = false
+    expect(() => session.commitPreparedSnapshot(refused)).toThrow('actual-admission-retired')
+    expect(session.validateRetainedSnapshot(original, expected)).toBe(true)
+    admitted = true
+    const cancelled = session.prepareSnapshot(() => 'c'.repeat(64), expected)
+    expect(session.discardPreparedSnapshot(cancelled)).toBe(true)
+    expect(session.discardPreparedSnapshot(cancelled)).toBe(false)
+    expect(session.validateRetainedSnapshot(original, expected)).toBe(true)
+    expect(() => session.commitPreparedSnapshot(cancelled)).toThrow('editor-session-snapshot-preparation-invalid')
+    expect(session.captureSnapshot(() => 'd'.repeat(64), expected).editorContentDigest).toBe('d'.repeat(64))
+  })
+
+  it('keeps native allocation failure and cancellation reentry before publication without losing original refs', () => {
+    const identity = { id: 'prepared-unwind-document', epoch: 1 }
+    const store = new MarkdownEditorTransactionStore('source', undefined, identity)
+    const session = createMarkdownEditorSessionBinding({
+      transactionStore: store, isComposing: () => false, isDisposed: () => false,
+      captureViewState: () => null, restoreViewState: () => {},
+      resourceParticipants: () => [], captureLastValidRender: () => null,
+    }).getSession('session:prepared-unwind')
+    const expected = { documentIdentity: identity, revision: 0 }
+    const original = session.captureSnapshot(() => 'a'.repeat(64), expected)
+    const allocation = session.prepareSnapshot(() => 'b'.repeat(64), expected)
+    const copy = vi.spyOn(Array.prototype, 'slice').mockImplementationOnce(() => { throw new Error('actual-retained-allocation-failed') })
+    try {
+      expect(() => session.commitPreparedSnapshot(allocation)).toThrow('actual-retained-allocation-failed')
+    } finally { copy.mockRestore() }
+    expect(session.validateRetainedSnapshot(original, expected)).toBe(true)
+    const cancelled = session.prepareSnapshot(() => 'c'.repeat(64), expected)
+    expect(() => session.commitPreparedSnapshot(cancelled, () => { session.discardPreparedSnapshot(cancelled) }))
+      .toThrow('editor-session-snapshot-preparation-stale')
+    expect(session.validateRetainedSnapshot(original, expected)).toBe(true)
+    const reentrant = session.prepareSnapshot(() => 'd'.repeat(64), expected)
+    expect(() => session.commitPreparedSnapshot(reentrant, () => { session.captureSnapshot(() => 'e'.repeat(64)) }))
+      .toThrow('editor-session-snapshot-reentrant')
+    expect(session.validateRetainedSnapshot(original, expected)).toBe(true)
+  })
+
+  it('refuses changed original selection and released ABA history custody without restoring a staged token', () => {
+    const identity = { id: 'prepared-stale-document', epoch: 1 }
+    const store = new MarkdownEditorTransactionStore('source', undefined, identity)
+    const session = createMarkdownEditorSessionBinding({
+      transactionStore: store, isComposing: () => false, isDisposed: () => false,
+      captureViewState: () => null, restoreViewState: () => {},
+      resourceParticipants: () => [], captureLastValidRender: () => null,
+    }).getSession('session:prepared-stale')
+    const expected = { documentIdentity: identity, revision: 0 }
+    const original = session.captureSnapshot(() => 'a'.repeat(64), expected)
+    const selection = session.prepareSnapshot(() => 'b'.repeat(64), expected)
+    store.setSelection({ start: 1, end: 1, direction: 'none' })
+    const newerSelection = store.selection
+    expect(() => session.commitPreparedSnapshot(selection)).toThrow('editor-session-snapshot-preparation-stale')
+    expect(store.selection).toEqual(newerSelection)
+    expect(session.validateRetainedSnapshot(original, expected)).toBe(true)
+    const aba = session.prepareSnapshot(() => 'c'.repeat(64), expected)
+    store.switchDocument({ id: 'other-prepared-document', epoch: 2 }, 'other source')
+    store.switchDocument(identity, 'source')
+    expect(() => session.commitPreparedSnapshot(aba)).toThrow('editor-session-snapshot-preparation-stale')
+    expect(session.validateRetainedSnapshot(original, expected)).toBe(false)
+    expect(store.history).toEqual(expect.objectContaining({ undoDepth: 0, redoDepth: 0 }))
+  })
+
+  it('cancels a genuine prepared native candidate after disposal and refuses composition admission', () => {
+    const identity = { id: 'prepared-lifetime-document', epoch: 1 }
+    const store = new MarkdownEditorTransactionStore('source', undefined, identity)
+    let disposed = false
+    let composing = false
+    const session = createMarkdownEditorSessionBinding({
+      transactionStore: store, isComposing: () => composing, isDisposed: () => disposed,
+      captureViewState: () => null, restoreViewState: () => {},
+      resourceParticipants: () => [], captureLastValidRender: () => null,
+    }).getSession('session:prepared-lifetime')
+    const expected = { documentIdentity: identity, revision: 0 }
+    const original = session.captureSnapshot(() => 'a'.repeat(64), expected)
+    const composition = session.prepareSnapshot(() => 'b'.repeat(64), expected)
+    composing = true
+    expect(() => session.commitPreparedSnapshot(composition)).toThrow('editor-session-composition-active')
+    composing = false
+    expect(session.validateRetainedSnapshot(original, expected)).toBe(true)
+    const retired = session.prepareSnapshot(() => 'c'.repeat(64), expected)
+    disposed = true
+    expect(session.discardPreparedSnapshot(retired)).toBe(true)
+    expect(session.discardPreparedSnapshot(retired)).toBe(false)
+    expect(() => session.commitPreparedSnapshot(retired)).toThrow('editor-session-snapshot-preparation-invalid')
+    expect(() => session.inspectDocumentState()).toThrow('editor-session-disposed')
+  })
+
+  it('fences actual mounted openSearch work before committing prepared native panel refs', async () => {
+    const wrapper = mount(MarkdownEditor, { props: {
+      mode: 'source', modelValue: '# Original prepared panel', documentIdentity: { id: 'prepared-panel-document', epoch: 1 },
+    } })
+    await flushPromises()
+    await nextTick()
+    const editor = wrapper.vm as MarkdownEditorInstance
+    const session = editor.getSession('session:prepared-panel')
+    const original = session.captureSnapshot(() => 'a'.repeat(64))
+    const expected = { documentIdentity: original.documentIdentity, revision: original.revision }
+    const prepared = session.prepareSnapshot(() => 'b'.repeat(64), expected)
+    expect(prepared.snapshot.panelRefs).not.toBeNull()
+    expect(() => session.commitPreparedSnapshot(prepared, () => editor.openSearch())).toThrow('editor-session-panel-owner-stale')
+    expect(session.validateRetainedSnapshot(original, expected)).toBe(true)
+    await nextTick()
+    await flushPromises()
+    const next = session.prepareSnapshot(() => 'c'.repeat(64), expected)
+    expect(session.commitPreparedSnapshot(next)).toBe(next.snapshot)
+    expect(session.readPanelState(next.snapshot)?.search).not.toBeNull()
+    wrapper.unmount()
+  })
+
   it('reads actual native content digest without replacing retained history and fences admission and reentrant capture', () => {
     const identity = { id: 'digest-source-document', epoch: 1 }
     const store = new MarkdownEditorTransactionStore('original source', undefined, identity)

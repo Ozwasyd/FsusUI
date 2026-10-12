@@ -372,6 +372,11 @@ export interface MarkdownEditorRetainedTransactionSnapshot {
   readonly selection: MarkdownEditorResolvedSelection
 }
 
+/** Pending metadata only; original history arrays remain in this transaction owner. */
+export interface MarkdownEditorRetainedTransactionPreparation {
+  readonly snapshot: MarkdownEditorRetainedTransactionSnapshot
+}
+
 interface MarkdownEditorStoreMutation extends MarkdownEditorDispatchResult {
   readonly historyChanged: boolean
   readonly selectionChanged: boolean
@@ -621,6 +626,16 @@ const freezeTransaction = (
 
 export class MarkdownEditorTransactionStore {
   #documentIdentity: MarkdownEditorDocumentIdentity
+  #preparedRetainedSnapshot: {
+    readonly preparation: MarkdownEditorRetainedTransactionPreparation
+    readonly identity: MarkdownEditorDocumentIdentity
+    readonly revision: number
+    readonly selection: MarkdownEditorResolvedSelection
+    readonly undo: readonly HistoryEntry[]
+    readonly redo: readonly HistoryEntry[]
+    readonly previous: MarkdownEditorRetainedTransactionSnapshot | undefined
+    readonly mergeBlocked: boolean
+  } | undefined
   #retainedSnapshot: MarkdownEditorRetainedTransactionSnapshot | undefined
   #retainedHistory: readonly HistoryEntry[] | undefined
   #retainedRedo: readonly HistoryEntry[] | undefined
@@ -694,6 +709,7 @@ export class MarkdownEditorTransactionStore {
   }
 
   retainSnapshot(): MarkdownEditorRetainedTransactionSnapshot {
+    if (this.#preparedRetainedSnapshot) throw new Error('editor-history-snapshot-preparation-pending')
     const snapshot = Object.freeze({
       documentIdentity: this.documentIdentity,
       history: this.history,
@@ -706,6 +722,57 @@ export class MarkdownEditorTransactionStore {
     this.#retainedHistory = this.#undo.slice()
     this.#retainedRedo = this.#redo.slice()
     return snapshot
+  }
+
+  prepareRetainedSnapshot(): MarkdownEditorRetainedTransactionPreparation {
+    if (this.#preparedRetainedSnapshot) throw new Error('editor-history-snapshot-preparation-pending')
+    const snapshot = Object.freeze({
+      documentIdentity: this.documentIdentity,
+      history: this.history,
+      revision: this.#revision,
+      selection: Object.freeze(this.selection),
+    })
+    const preparation = Object.freeze({ snapshot })
+    this.#preparedRetainedSnapshot = {
+      preparation, identity: this.#documentIdentity, revision: this.#revision,
+      selection: this.#selection, undo: this.#undo, redo: this.#redo,
+      previous: this.#retainedSnapshot, mergeBlocked: this.#mergeBlocked,
+    }
+    return preparation
+  }
+
+  /** Callback-free private slot and original live-history continuity check. */
+  validatePreparedRetainedSnapshot(preparation: MarkdownEditorRetainedTransactionPreparation): boolean {
+    return this.#isPreparedRetainedSnapshotCurrent(preparation)
+  }
+
+  #isPreparedRetainedSnapshotCurrent(preparation: MarkdownEditorRetainedTransactionPreparation): boolean {
+    const custody = this.#preparedRetainedSnapshot
+    return custody !== undefined && custody.preparation === preparation && this.#documentIdentity === custody.identity &&
+      this.#revision === custody.revision && this.#selection === custody.selection &&
+      this.#undo === custody.undo && this.#redo === custody.redo && this.#retainedSnapshot === custody.previous &&
+      this.#mergeBlocked === custody.mergeBlocked
+  }
+
+  commitPreparedRetainedSnapshot(preparation: MarkdownEditorRetainedTransactionPreparation): MarkdownEditorRetainedTransactionSnapshot | null {
+    if (!this.#isPreparedRetainedSnapshotCurrent(preparation)) return null
+    const custody = this.#preparedRetainedSnapshot!
+    // Allocate the original retained array containers before any publication.
+    // Preparation itself pins the live arrays and creates no second history.
+    const history = custody.undo.slice()
+    const redo = custody.redo.slice()
+    if (!this.#isPreparedRetainedSnapshotCurrent(preparation)) return null
+    this.#retainedSnapshot = preparation.snapshot
+    this.#retainedHistory = history
+    this.#retainedRedo = redo
+    this.#preparedRetainedSnapshot = undefined
+    return preparation.snapshot
+  }
+
+  discardPreparedRetainedSnapshot(preparation: MarkdownEditorRetainedTransactionPreparation): boolean {
+    if (!this.#preparedRetainedSnapshot || this.#preparedRetainedSnapshot.preparation !== preparation) return false
+    this.#preparedRetainedSnapshot = undefined
+    return true
   }
 
   /** Read only this store's actual bounded token/history custody; never restore or retain. */
@@ -737,6 +804,7 @@ export class MarkdownEditorTransactionStore {
   }
 
   releaseRetainedSnapshot() {
+    this.#preparedRetainedSnapshot = undefined
     this.#retainedSnapshot = undefined
     this.#retainedHistory = undefined
     this.#retainedRedo = undefined

@@ -1057,3 +1057,42 @@ and participant control refuse while cleanup callbacks are still executing.
 Detached records/controllers can remain on that cleanup stack; an empty Map
 alone is not a release acknowledgment. Surviving File loans still follow their
 original per-item admission. The guard ends when the actual cleanup frame exits.
+
+
+## Prepared native snapshot publication
+
+The same public getSession now supplies prepareSnapshot(digestSource, expected?),
+commitPreparedSnapshot(preparation, assertAdmission?) and
+discardPreparedSnapshot(preparation). Preparation returns a frozen
+MarkdownEditorSessionPreparedSnapshot containing the proposed native snapshot.
+It is uncommitted: validateRetainedSnapshot rejects the candidate and the original
+retained token remains current. Equal-data copies or another owner's candidate
+cannot commit or cancel it. There is at most one pending candidate per original
+transaction/session owner. Additional prepare/legacy capture refuses until it
+is committed or discarded.
+
+The original transaction store pins its own live immutable history entries/array
+identity, selection, revision/document identity, merge boundary and prior
+retained token. It creates no second history/body owner and exposes no entries or
+source. Commit performs all fallible allocation before publication and rechecks
+original private custody afterward. Original admission, renderer/panel/lifetime
+checks precede final native mutation; no callback/await/fallible owner action
+follows native token publication. All native refs in that one snapshot publish
+with the original transaction token as one synchronous operation. Nullable render
+or panel/attachment refs remain nullable; they are not full-host completeness.
+
+Preparation/commit failure propagates and cancels only that candidate. The prior
+original token is not replaced; genuine independent edits, identity changes or
+release can still invalidate it and are never undone. Cancel is allowed after
+owner retirement for cleanup, returns true only for actual candidate custody,
+and does not release the committed checkpoint. Actual retained panel memory
+includes the one pending candidate. CaptureSnapshot now uses these real methods
+without changing getSession or the component's expose owner. Original mutating
+restore history code remains unchanged.
+
+This provides atomic publication of issued native refs only. Draft/journal/renderer
+participants still need original non-invalidating preparation, private validation
+and callback-free publication/failure protocols for a complete application refset.
+Existing native restore remains same-owner/same-identity/epoch/revision. Identity
+props reset history and cannot supply cross-body/epoch restoration. Resource
+completeness, pause/disposal/eviction and every runtime qualification remain held.
