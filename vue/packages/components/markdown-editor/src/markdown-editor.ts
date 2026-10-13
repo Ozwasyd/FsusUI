@@ -67,6 +67,8 @@ export {
   type MarkdownAttachmentBatchIntent,
   type MarkdownAttachmentCaptureObservation,
   type MarkdownAttachmentTerminalCustody,
+  type MarkdownAttachmentTerminalRevisionIssuer,
+  type MarkdownAttachmentTerminalRevisionReservation,
   type MarkdownAttachmentTerminalObservation,
   type MarkdownAttachmentTerminalObserver,
   type MarkdownAttachmentTerminalConsumer,
