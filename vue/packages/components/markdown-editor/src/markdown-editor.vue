@@ -1879,10 +1879,11 @@ let attachmentRetirementRequested = false
 let attachmentRetirementRunning = false
 let attachmentRetirementContinuation: { handle: number | null; cancelled: boolean } | null = null
 const assertAttachmentFileControlIdle = () => {
-  if (attachmentFileCleanupDepth !== 0 || attachmentPublicationDepth !== 0 || attachmentRetirementRunning || attachmentRetirementRequested || attachmentRetirementContinuation)
+  if (pendingAttachmentFileCleanups.size || attachmentFileCleanupDepth !== 0 || attachmentPublicationDepth !== 0 || attachmentRetirementRunning || attachmentRetirementRequested || attachmentRetirementContinuation)
     throw new Error('editor-session-attachment-file-cleanup-in-progress')
 }
 type NativeAttachmentFileCleanup = {
+  readonly application: NativeAttachmentTerminalApplication | null
   readonly itemIds: readonly string[]
   readonly itemControllers: AbortController[]
   readonly batchControllers: AbortController[]
@@ -1892,8 +1893,9 @@ type NativeAttachmentFileCleanup = {
   running: boolean
   complete: boolean
 }
-const createAttachmentFileCleanup = (itemIds: readonly string[]): NativeAttachmentFileCleanup => ({
-  itemIds, itemControllers: [], batchControllers: [], detached: false,
+const pendingAttachmentFileCleanups = new Set<NativeAttachmentFileCleanup>()
+const createAttachmentFileCleanup = (itemIds: readonly string[], application: NativeAttachmentTerminalApplication | null = null): NativeAttachmentFileCleanup => ({
+  application, itemIds, itemControllers: [], batchControllers: [], detached: false,
   itemIndex: 0, batchIndex: 0, running: false, complete: false,
 })
 // The original File owner retains its actual abort cursor for application cleanup
@@ -1901,6 +1903,7 @@ const createAttachmentFileCleanup = (itemIds: readonly string[]): NativeAttachme
 const runAttachmentFileCleanup = (cleanup: NativeAttachmentFileCleanup) => {
   if (cleanup.running) throw new Error('attachment-native-file-cleanup-reentry')
   cleanup.running = true
+  pendingAttachmentFileCleanups.add(cleanup)
   attachmentFileCleanupDepth += 1
   try {
     if (!cleanup.detached) {
@@ -1938,9 +1941,18 @@ const runAttachmentFileCleanup = (cleanup: NativeAttachmentFileCleanup) => {
     cleanup.batchControllers.length = 0
     cleanup.itemIndex = 0
     cleanup.batchIndex = 0
+  } catch (cause) {
+    if (cleanup.application) retainAttachmentApplicationEndFailure(cleanup.application, 'input-cleanup', cause)
+    throw cause
   } finally {
     attachmentFileCleanupDepth -= 1
-    try { flushAttachmentRetirement() } finally { cleanup.running = false }
+    try { flushAttachmentRetirement() } catch (cause) {
+      if (cleanup.application) retainAttachmentApplicationEndFailure(cleanup.application, 'retirement', cause)
+      throw cause
+    } finally {
+      cleanup.running = false
+      if (cleanup.complete) pendingAttachmentFileCleanups.delete(cleanup)
+    }
   }
 }
 const revokeAttachmentFiles = (itemIds: readonly string[], retainedCleanup?: NativeAttachmentFileCleanup) =>
@@ -5830,10 +5842,7 @@ const attachmentTerminalApplicationEndIssuer = Object.freeze<MarkdownAttachmentT
     publishAttachmentApplicationEnd(record)
     try {
       if (application.inputCleanup && !application.inputCleanup.complete) {
-        try { runAttachmentFileCleanup(application.inputCleanup) } catch (cause) {
-          retainAttachmentApplicationEndFailure(application, 'input-cleanup', cause)
-          throw cause
-        }
+        runAttachmentFileCleanup(application.inputCleanup)
       }
       try {
         flushAttachmentRetirement()
@@ -6062,12 +6071,9 @@ const applyAttachmentResult = (result: MarkdownAttachmentProviderResult) => {
     if (!nativeCustody()) return refuseCompletion()
     if (application) application.releasingInput = true
     try {
-      if (application) application.inputCleanup = createAttachmentFileCleanup([job.itemId ?? job.id])
+      if (application) application.inputCleanup = createAttachmentFileCleanup([job.itemId ?? job.id], application)
       revokeAttachmentFile(job.itemId ?? job.id, application?.inputCleanup ?? undefined)
       if (application) application.inputReleased = true
-    } catch (cause) {
-      if (application) retainAttachmentApplicationEndFailure(application, 'input-cleanup', cause)
-      throw cause
     } finally {
       if (application) application.releasingInput = false
     }

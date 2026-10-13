@@ -1717,6 +1717,9 @@ released. It never looks up an item ID again after detachment, repeats source
 publication, reruns a consumer callback or acts on a new session. Throws and
 reentry preserve debt and the same retry handle. The original detach-before-abort
 and item-before-batch order remains; successful retired controls are not replayed.
+Incomplete original abort cursors remain retained by this File owner and block
+session resource inspection/pause/resume rather than yielding an incomplete census.
+A body throw and a later finally throw retain both real raw causes separately.
 
 A non-Boolean observer/loan return is unsupported work. If it returns a Promise
 or other unknown work, synchronous stack exit cannot prove that work ended;
