@@ -353,7 +353,7 @@ export const parseMarkdownLinkNode = (
 }
 
 export const planMarkdownLinkPropertyEdit = (
-  source: string,
+  _source: string,
   link: MarkdownParsedLink,
   properties: { label?: string; url?: string; title?: string },
   expectedRevision?: number,

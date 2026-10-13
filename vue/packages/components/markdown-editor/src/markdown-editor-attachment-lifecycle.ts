@@ -390,7 +390,7 @@ export const formatMarkdownAttachmentPendingSource = (
 }
 
 export const planMarkdownAttachmentInsert = (
-  source: string,
+  _source: string,
   anchor: MarkdownAttachmentAnchor,
   batch: MarkdownAttachmentBatchIntent,
   uploading: (name: string) => string = (name) => name,
@@ -485,7 +485,7 @@ export const rebaseMarkdownAttachmentJob = (
 }
 
 export const planMarkdownAttachmentResolve = (
-  source: string,
+  _source: string,
   job: MarkdownAttachmentJob,
   result: MarkdownAttachmentProviderResult,
 ): {
@@ -575,7 +575,7 @@ export const planMarkdownAttachmentResolve = (
 }
 
 export const planMarkdownAttachmentRemove = (
-  source: string,
+  _source: string,
   job: MarkdownAttachmentJob,
 ): {
   readonly transaction: MarkdownEditorTransaction

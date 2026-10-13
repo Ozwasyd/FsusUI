@@ -42,7 +42,7 @@ const utf16ToUtf8 = (source: string, utf16: number): number => {
 
 const exclusiveUtf8End = (
   source: string,
-  lineStart: number,
+  _lineStart: number,
   lineEnd: number,
 ): number => {
   const utf8End = utf16ToUtf8(source, lineEnd)
