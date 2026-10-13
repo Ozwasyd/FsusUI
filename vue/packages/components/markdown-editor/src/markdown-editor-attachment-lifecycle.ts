@@ -49,6 +49,13 @@ interface MarkdownAttachmentDispatchState {
   settled: boolean
   dispatching: boolean
   settlementAvailable: boolean
+  resultSettlement?: 'pending' | 'fulfilled' | 'rejected' | 'unknown'
+  resultSettlementCause?: unknown
+  resultObservationCause?: unknown
+  localSettlement?: 'pending' | 'fulfilled' | 'unknown'
+  localSettlementCause?: unknown
+  localObservationCause?: unknown
+  observationNotificationCauses?: readonly unknown[]
 }
 const attachmentDispatches = new WeakMap<
   MarkdownAttachmentJob,
@@ -63,10 +70,112 @@ export const inspectMarkdownAttachmentDispatch = (
   return state ? Object.freeze({ ...state }) : null
 }
 
-/** Only completion/rejection of this invocation can settle its resource record. */
+/** Only the original result and full-local future can settle a richer invocation. */
+export interface MarkdownAttachmentDispatchCompletion {
+  readonly result: PromiseLike<MarkdownAttachmentProviderResult>
+  readonly settled: PromiseLike<void>
+}
+
+export interface MarkdownAttachmentDispatchFutureObservation {
+  readonly work: unknown
+  /** Actual observation work, never a replacement for the original future. */
+  readonly monitor: Promise<void>
+  inspect(): {
+    readonly status: 'pending' | 'fulfilled' | 'rejected' | 'unavailable'
+    readonly primary: 'pending' | 'fulfilled' | 'rejected'
+    readonly value: unknown
+    readonly cause: unknown
+    readonly observerWork: unknown
+    readonly observationCause: unknown
+  }
+}
+
+interface MarkdownAttachmentDispatchObservationControls {
+  isCompletion(work: unknown): boolean
+  within(action: () => void): void
+  retain(
+    kind: 'result' | 'settled',
+    observation: MarkdownAttachmentDispatchFutureObservation,
+  ): void
+}
+
+const createDispatchFutureObservation = (
+  work: unknown,
+  access: { readonly cause: unknown } | undefined,
+  otherWork: unknown = work,
+) => {
+  let status: 'pending' | 'fulfilled' | 'rejected' | 'unavailable' = 'pending'
+  let primary: 'pending' | 'fulfilled' | 'rejected' = 'pending'
+  let value: unknown
+  let cause: unknown
+  let observerWork: unknown
+  let observationCause: unknown
+  let finish!: () => void
+  const monitor = new Promise<void>((resolve) => { finish = resolve })
+  const observation: MarkdownAttachmentDispatchFutureObservation = Object.freeze({
+    work,
+    monitor,
+    inspect: () => Object.freeze({ status, primary, value, cause, observerWork, observationCause }),
+  })
+  let started = false
+  const start = () => {
+    if (started) return
+    started = true
+    try {
+      if (access) throw access.cause
+      // Pin the one actual read; a second .then lookup could change or throw.
+      const then = (work as PromiseLike<unknown>).then
+      if (typeof then !== 'function')
+        throw new Error('markdown-attachment-future-unavailable')
+      observerWork = Reflect.apply(then, work, [
+        (fulfilled: unknown) => {
+          if (primary !== 'pending') return
+          primary = 'fulfilled'
+          value = fulfilled
+        },
+        (rejected: unknown) => {
+          if (primary !== 'pending') return
+          primary = 'rejected'
+          cause = rejected
+        },
+      ])
+      if (
+        observerWork === work || observerWork === otherWork ||
+        ((typeof observerWork !== 'object' || observerWork === null) &&
+          typeof observerWork !== 'function')
+      )
+        throw new Error('markdown-attachment-observer-work-unavailable')
+    } catch (failure) {
+      status = 'unavailable'
+      observationCause = failure
+      finish()
+      return
+    }
+    // Retain and await the actual returned observer work, including its failure.
+    void (async () => {
+      try {
+        const observed = await observerWork
+        if (observed === observerWork || primary === 'pending')
+          throw new Error('markdown-attachment-observer-work-unavailable')
+        status = primary
+      } catch (failure) {
+        status = 'unavailable'
+        observationCause = failure
+      } finally {
+        finish()
+      }
+    })()
+  }
+  return { observation, start }
+}
+
+/** Legacy result futures do not assert ownership of opaque consumer resources. */
 export const runMarkdownAttachmentDispatch = async (
   job: MarkdownAttachmentJob,
-  dispatch: () => PromiseLike<MarkdownAttachmentProviderResult>,
+  dispatch: () =>
+    | PromiseLike<MarkdownAttachmentProviderResult>
+    | MarkdownAttachmentDispatchCompletion,
+  controls?: MarkdownAttachmentDispatchObservationControls,
 ): Promise<MarkdownAttachmentProviderResult> => {
   const ownedJob = toRaw(job)
   const previous = attachmentDispatches.get(ownedJob)
@@ -84,18 +193,125 @@ export const runMarkdownAttachmentDispatch = async (
     settlementAvailable: false,
   }
   attachmentDispatches.set(ownedJob, state)
+  const notificationCauses: unknown[] = []
+  const within = (action: () => void) => {
+    let invoked = false
+    const once = () => {
+      if (invoked) return
+      invoked = true
+      action()
+    }
+    try {
+      if (controls) controls.within(once)
+      else once()
+    } catch (cause) {
+      notificationCauses.push(cause)
+    }
+    // A failed control hook must not abandon either original future's handler.
+    if (!invoked) once()
+  }
+  const retain = (
+    kind: 'result' | 'settled',
+    observation: MarkdownAttachmentDispatchFutureObservation,
+  ) => {
+    try { controls?.retain(kind, observation) }
+    catch (cause) { notificationCauses.push(cause) }
+  }
+  const retainResultState = (
+    observed: ReturnType<MarkdownAttachmentDispatchFutureObservation['inspect']>,
+  ) => {
+    state.resultSettlement = observed.status === 'fulfilled' || observed.status === 'rejected' ? observed.status : 'unknown'
+    state.resultSettlementCause = observed.cause
+    state.resultObservationCause = observed.observationCause
+    state.observationNotificationCauses = Object.freeze([...notificationCauses])
+  }
   try {
     const work = dispatch()
     state.dispatching = false
-    if (!work || typeof work.then !== 'function') {
-      throw new Error('markdown-attachment-dispatch-settlement-unavailable')
-    }
-    state.settlementAvailable = true
-    try {
-      return await work
-    } finally {
+    const fallbackCompletion = () => Boolean(work && !('then' in work) && 'result' in work && 'settled' in work)
+    let completion = false
+    within(() => {
+      try { completion = controls ? controls.isCompletion(work) : fallbackCompletion() }
+      catch (cause) {
+        notificationCauses.push(cause)
+        try { completion = fallbackCompletion() }
+        catch (failure) { notificationCauses.push(failure) }
+      }
+    })
+    if (completion) {
+      const capture = (kind: 'result' | 'settled') => {
+        let original: unknown
+        let access: { readonly cause: unknown } | undefined
+        within(() => {
+          try { original = (work as MarkdownAttachmentDispatchCompletion)[kind] }
+          catch (cause) { access = { cause } }
+        })
+        return { original, access }
+      }
+      const resultWork = capture('result')
+      const localWork = capture('settled')
+      const result = createDispatchFutureObservation(resultWork.original, resultWork.access, localWork.original)
+      const same = resultWork.original === localWork.original && !resultWork.access && !localWork.access
+      const local = same ? result : createDispatchFutureObservation(localWork.original, localWork.access, resultWork.original)
+      state.resultSettlement = 'pending'
+      state.localSettlement = 'pending'
+      // Install BOTH independent handlers before any custody notification can fail.
+      within(result.start)
+      if (local !== result) within(local.start)
+      retain('result', result.observation)
+      retain('settled', local.observation)
+      state.settlementAvailable = !same &&
+        result.observation.inspect().status !== 'unavailable' &&
+        local.observation.inspect().status !== 'unavailable'
+      await Promise.all([result.observation.monitor, local.observation.monitor])
+      const resultState = result.observation.inspect()
+      const localState = local.observation.inspect()
+      retainResultState(resultState)
+      state.localSettlement = localState.status === 'fulfilled' && !same && !notificationCauses.length
+        ? 'fulfilled' : 'unknown'
+      state.localSettlementCause = localState.cause
+      state.localObservationCause = localState.observationCause
+      state.settlementAvailable = !same &&
+        (resultState.status === 'fulfilled' || resultState.status === 'rejected') &&
+        (localState.status === 'fulfilled' || localState.status === 'rejected')
+      if (
+        same || (resultState.status !== 'fulfilled' && resultState.status !== 'rejected') ||
+        state.localSettlement !== 'fulfilled' || notificationCauses.length
+      ) {
+        const causes: unknown[] = []
+        for (const observed of [resultState, localState]) {
+          if (observed.primary === 'rejected') causes.push(observed.cause)
+          if (observed.status === 'unavailable') causes.push(observed.observationCause)
+        }
+        if (same) causes.push(new Error('markdown-attachment-dispatch-future-reused'))
+        causes.push(...notificationCauses)
+        throw new AggregateError(
+          causes,
+          'markdown-attachment-local-settlement-unavailable',
+        )
+      }
       state.settled = true
+      if (resultState.status === 'rejected') throw resultState.cause
+      return resultState.value as MarkdownAttachmentProviderResult
     }
+    const result = createDispatchFutureObservation(work, undefined)
+    state.resultSettlement = 'pending'
+    within(result.start)
+    retain('result', result.observation)
+    state.settlementAvailable = result.observation.inspect().status !== 'unavailable'
+    await result.observation.monitor
+    const observed = result.observation.inspect()
+    retainResultState(observed)
+    state.settlementAvailable = observed.status === 'fulfilled' || observed.status === 'rejected'
+    if (!state.settlementAvailable || notificationCauses.length)
+      throw new AggregateError([
+        ...(observed.primary === 'rejected' ? [observed.cause] : []),
+        ...(observed.status === 'unavailable' ? [observed.observationCause] : []),
+        ...notificationCauses,
+      ], 'markdown-attachment-dispatch-settlement-unavailable')
+    state.settled = true
+    if (observed.status === 'rejected') throw observed.cause
+    return observed.value as MarkdownAttachmentProviderResult
   } finally {
     state.dispatching = false
   }

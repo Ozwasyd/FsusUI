@@ -17,13 +17,22 @@ import type {
   MarkdownEmbedRequest,
   MarkdownEmbedResult,
 } from '../../../wasm/markdown-embed-provider'
-import type { MarkdownAttachmentJob } from './markdown-editor-attachment-lifecycle'
+import type {
+  MarkdownAttachmentJob,
+  MarkdownAttachmentDispatchFutureObservation,
+} from './markdown-editor-attachment-lifecycle'
 import {
   inspectMarkdownAttachmentDispatch,
   runMarkdownAttachmentDispatch,
 } from './markdown-editor-attachment-lifecycle'
-import { inspectMarkdownAttachmentCaptureResources } from './markdown-editor-attachment'
+import {
+  bindMarkdownAttachmentConsumerRequest,
+  inspectMarkdownAttachmentCaptureResources,
+} from './markdown-editor-attachment'
 import type {
+  MarkdownAttachmentConsumerRequest,
+  MarkdownAttachmentConsumerRequestBinding,
+  MarkdownAttachmentConsumerCleanupObservation,
   MarkdownAttachmentProviderResult,
   MarkdownAttachmentCaptureSession,
   MarkdownAttachmentBatchIntent,
@@ -44,14 +53,18 @@ export interface MarkdownAttachmentEmbedOwnerBindings {
   readonly readAttachmentJobs: () => readonly MarkdownAttachmentJob[]
   readonly readAttachmentBatches: () => ReadonlyMap<
     string,
-    MarkdownAttachmentBatchIntent | {
-      readonly batch: MarkdownAttachmentBatchIntent
-      readonly capture?: MarkdownAttachmentCaptureObservation
-      readonly files: ReadonlyMap<MarkdownAttachmentItemIntent, {
-        readonly file: File
-        readonly controller: AbortController
-      }>
-    }
+    | MarkdownAttachmentBatchIntent
+    | {
+        readonly batch: MarkdownAttachmentBatchIntent
+        readonly capture?: MarkdownAttachmentCaptureObservation
+        readonly files: ReadonlyMap<
+          MarkdownAttachmentItemIntent,
+          {
+            readonly file: File
+            readonly controller: AbortController
+          }
+        >
+      }
   >
   readonly readAttachmentItems: () => ReadonlyMap<
     string,
@@ -142,8 +155,9 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
     () => Reflect.apply(readAttachmentJobsBinding, bindings, [])
   const mapSize = Object.getOwnPropertyDescriptor(Map.prototype, 'size')!.get!
   const mapValues = Map.prototype.values
-  const readContainerValues = <T>(container: ReadonlyMap<unknown, T>): IterableIterator<T> =>
-    Reflect.apply(mapValues, container, [])
+  const readContainerValues = <T>(
+    container: ReadonlyMap<unknown, T>,
+  ): IterableIterator<T> => Reflect.apply(mapValues, container, [])
   const readContainerSize = (container: ReadonlyMap<unknown, unknown>) => {
     if (Object.getPrototypeOf(container) !== Map.prototype)
       throw new Error('editor-session-attachment-container-unavailable')
@@ -183,6 +197,382 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
   >()
   // Aborting a preparation can return before its consumer resolver has settled.
   const draining = new Set<MarkdownEmbedRequest>()
+  type CleanupFuture = {
+    readonly work: unknown
+    state: 'absent' | 'pending' | 'fulfilled' | 'rejected' | 'unknown'
+    cause?: unknown
+  }
+  type ConsumerCleanup = {
+    readonly snapshot: MarkdownAttachmentConsumerCleanupObservation
+    readonly work: CleanupFuture
+    readonly observer: CleanupFuture
+    readonly monitor?: Promise<void>
+    done: boolean
+  }
+  type ConsumerFutureObservation = {
+    readonly observationRef: object
+    readonly work: unknown
+    started: boolean
+    reserved: boolean
+    observation: 'pending' | 'fulfilled' | 'failed' | 'unavailable'
+    reason?: string
+    cause?: unknown
+    monitor?: Promise<void>
+    ledger?: MarkdownAttachmentDispatchFutureObservation
+  }
+  type ConsumerEntry = {
+    readonly dispatchRef: object
+    readonly job: MarkdownAttachmentJob
+    readonly attempt: number
+    readonly generation: number
+    returned: unknown
+    binding?: MarkdownAttachmentConsumerRequestBinding
+    unknown?: string
+    legacyResultOnly?: boolean
+    cause?: unknown
+    readonly cleanup: ConsumerCleanup[]
+    unknownObserverWork?: Promise<void>
+    unknownReturned?: ConsumerFutureObservation
+    readonly unknownFields: {
+      readonly field: 'result' | 'settled'
+      future: ConsumerFutureObservation
+    }[]
+  }
+  const consumers = new Map<object, ConsumerEntry>()
+  // Binding chains are not global ownership: this owner deduplicates originals.
+  const consumerRequests = new WeakSet<object>()
+  const consumerFutures = new WeakSet<object>()
+  const consumerObservations = new WeakMap<object, ConsumerFutureObservation>()
+  let consumerControlDepth = 0
+  const consumerControl = <T>(control: () => T): T => {
+    consumerControlDepth += 1
+    try {
+      return control()
+    } finally {
+      consumerControlDepth -= 1
+    }
+  }
+  const consumerFuture = (work: unknown): work is PromiseLike<void> => {
+    if (
+      (typeof work !== 'object' || work === null) &&
+      typeof work !== 'function'
+    )
+      return false
+    let value: object | null = work as object
+    const seen = new Set<object>()
+    while (value && !seen.has(value)) {
+      seen.add(value)
+      const then = Object.getOwnPropertyDescriptor(value, 'then')
+      if (then) return 'value' in then && typeof then.value === 'function'
+      value = Object.getPrototypeOf(value)
+    }
+    return false
+  }
+  const claimConsumerObservation = (
+    work: unknown,
+    reserved = false,
+  ): ConsumerFutureObservation => {
+    const object =
+      (typeof work === 'object' && work !== null) || typeof work === 'function'
+        ? (work as object)
+        : undefined
+    const previous = object && consumerObservations.get(object)
+    if (previous) return previous
+    const reason =
+      reserved ? 'consumer-future-observation-reserved' :
+      (object && consumerFutures.has(object)
+        ? 'consumer-future-already-owned'
+        : undefined)
+    const observation: ConsumerFutureObservation = {
+      observationRef: Object.freeze({}),
+      work,
+      started: !reserved && Boolean(reason),
+      reserved,
+      observation: 'unavailable',
+      reason,
+    }
+    if (object) {
+      // Publish custody before any descriptor, then access or callback can reenter.
+      consumerObservations.set(object, observation)
+      consumerFutures.add(object)
+    }
+    return observation
+  }
+  const observeUnknownFuture = (observation: ConsumerFutureObservation) => {
+    if (observation.started || observation.reserved) return
+    observation.started = true
+    try {
+      if (!consumerControl(() => consumerFuture(observation.work))) {
+        observation.reason = 'consumer-field-future-unavailable'
+        return
+      }
+    } catch (cause) {
+      observation.reason = 'consumer-field-future-access-failed'
+      observation.cause = cause
+      return
+    }
+    observation.observation = 'pending'
+    // Initial await/then access runs under the same synchronous reentry fence.
+    // The shared record already exists even before this monitor is returned.
+    observation.monitor = consumerControl(() =>
+      (async () => {
+        try {
+          await observation.work
+          observation.observation = 'fulfilled'
+        } catch (cause) {
+          observation.observation = 'failed'
+          observation.cause = cause
+        }
+      })(),
+    )
+  }
+  const readConsumerObservation = (observation: ConsumerFutureObservation) => {
+    const ledger = observation.ledger?.inspect()
+    return Object.freeze({
+      observationRef: observation.observationRef,
+      work: observation.work,
+      observation: ledger ? (ledger.status === 'rejected' ? 'failed' : ledger.status) : observation.observation,
+      reason: ledger?.status === 'unavailable' ? 'consumer-future-observation-unavailable' : observation.reason,
+      cause: ledger ? ledger.cause : observation.cause,
+      primary: ledger?.primary,
+      observerWork: ledger?.observerWork,
+      observationCause: ledger?.observationCause,
+      monitor: observation.monitor,
+    })
+  }
+  const retainUnknownFields = (entry: ConsumerEntry) => {
+    const returned = entry.returned
+    if (
+      (typeof returned !== 'object' || returned === null) &&
+      typeof returned !== 'function'
+    )
+      return
+    consumerRequests.add(returned)
+    const records: ConsumerEntry['unknownFields'] = []
+    for (const field of ['result', 'settled'] as const) {
+      let work: unknown
+      let property: PropertyDescriptor | undefined
+      let reason: string | undefined
+      let accessFailed = false
+      let accessCause: unknown
+      try {
+        consumerControl(() => {
+          let value: object | null = returned
+          const visited = new Set<object>()
+          while (value && !visited.has(value)) {
+            visited.add(value)
+            property = Object.getOwnPropertyDescriptor(value, field)
+            if (property) break
+            value = Object.getPrototypeOf(value)
+          }
+          if (property) {
+            if ('value' in property) work = property.value
+            else reason = 'consumer-field-accessor-unavailable'
+          }
+        })
+      } catch (cause) {
+        accessFailed = true
+        accessCause = cause
+        reason = 'consumer-field-access-failed'
+      }
+      if (!property && !accessFailed) continue
+      const record: ConsumerEntry['unknownFields'][number] = {
+        field,
+        future: {
+          observationRef: Object.freeze({}),
+          work,
+          started: false,
+          reserved: false,
+          observation: 'unavailable',
+          reason,
+          ...(accessFailed ? { cause: accessCause } : {}),
+        },
+      }
+      entry.unknownFields.push(record)
+      records.push(record)
+    }
+    // Register all captured references before any thenable can run observation code.
+    for (const record of records) {
+      if (record.future.reason) continue
+      record.future = claimConsumerObservation(record.future.work)
+    }
+    for (const record of records) {
+      if (!record.future.reason) observeUnknownFuture(record.future)
+    }
+  }
+  const retainCleanup = (entry: ConsumerEntry) => {
+    const binding = entry.binding
+    if (!binding) return
+    for (const snapshot of binding.inspectCleanup()) {
+      if (
+        entry.cleanup.some(
+          (record) =>
+            record.snapshot.operation === snapshot.operation &&
+            record.snapshot.status === snapshot.status &&
+            record.snapshot.work === snapshot.work &&
+            record.snapshot.observerWork === snapshot.observerWork &&
+            record.snapshot.checkpoint === snapshot.checkpoint &&
+            record.snapshot.cause === snapshot.cause &&
+            record.snapshot.observationCause === snapshot.observationCause,
+        )
+      )
+        continue
+      const work: CleanupFuture = {
+        work: snapshot.work,
+        state: snapshot.work === undefined ? 'absent' : 'pending',
+      }
+      const observer: CleanupFuture = {
+        work: snapshot.observerWork,
+        state: snapshot.observerWork === undefined ? 'absent' : 'pending',
+      }
+      const record = {
+        snapshot,
+        work,
+        observer,
+        done: false,
+      } as ConsumerCleanup
+      const observe = async (future: CleanupFuture) => {
+        if (future.state === 'absent') return
+        let observed = false
+        try {
+          if (!consumerFuture(future.work)) {
+            future.state = 'unknown'
+            return
+          }
+          observed = true
+          await future.work
+          future.state = 'fulfilled'
+        } catch (cause) {
+          future.state = observed ? 'rejected' : 'unknown'
+          future.cause = cause
+        }
+      }
+      // Await the TWO original futures. The binder's status is not observer settlement.
+      if (work.state === 'absent' && observer.state === 'absent')
+        record.done = true
+      else
+        Object.assign(record, {
+          monitor: (async () => {
+            await Promise.all([observe(work), observe(observer)])
+            record.done = true
+          })(),
+        })
+      entry.cleanup.push(record)
+    }
+  }
+  const cancelConsumers = (reason: string) => {
+    const failures: unknown[] = []
+    for (const entry of [...consumers.values()]) {
+      if (!entry.binding) {
+        failures.push(
+          new Error(entry.unknown ?? 'attachment-consumer-request-unavailable'),
+        )
+        continue
+      }
+      try {
+        consumerControl(() => retainCleanup(entry))
+      } catch (cause) {
+        entry.cause = cause
+        failures.push(cause)
+        continue
+      }
+      if (entry.cleanup.some((record) => !record.done)) continue // Existing actual cancellation/observer remains pending.
+      try {
+        consumerControl(() => {
+          try {
+            entry.binding!.cancelLocal(reason)
+          } finally {
+            retainCleanup(entry)
+          }
+        })
+      } catch (cause) {
+        entry.cause = cause
+        failures.push(cause)
+      }
+    }
+    if (failures.length)
+      throw new AggregateError(
+        failures,
+        'editor-session-attachment-consumer-cancel-failed',
+      )
+  }
+  const inspectConsumers = (entries = [...consumers.values()]) => {
+    const counts = {
+      backgroundTasks: 0,
+      timers: 0,
+      observers: 0,
+      retainedListeners: 0,
+      networkRequests: 0,
+      memoryUnits: 0,
+    }
+    for (const entry of entries) {
+      if (!entry.binding || entry.unknown)
+        throw new Error(
+          entry.unknown ?? 'editor-session-attachment-consumer-unavailable',
+        )
+      const binding = entry.binding
+      consumerControl(() => retainCleanup(entry))
+      const local = inspectMarkdownAttachmentDispatch(entry.job)
+      if (
+        local?.dispatchRef !== entry.dispatchRef ||
+        local.attempt !== entry.attempt ||
+        local.localSettlement === 'unknown' ||
+        local.resultSettlement === 'unknown' ||
+        local.observationNotificationCauses?.length
+      )
+        throw new Error(
+          'editor-session-attachment-consumer-settlement-unavailable',
+        )
+      const resource = consumerControl(() => binding.inspectLocalResources())
+      if (resource.supported === false) {
+        entry.cause = resource
+        throw new Error(resource.reason)
+      }
+      const pending = entry.cleanup.filter((record) => !record.done).length
+      if (
+        entry.cleanup.some(
+          (record) =>
+            record.work.state === 'unknown' ||
+            record.observer.state === 'unknown',
+        )
+      )
+        throw new Error(
+          'editor-session-attachment-consumer-cleanup-unobservable',
+        )
+      const checkpoint = binding.getRetainedCheckpoint()
+      const empty = Object.values(resource.value).every((count) => count === 0)
+      if (
+        empty &&
+        local.settled &&
+        local.localSettlement === 'fulfilled' &&
+        !pending &&
+        !checkpoint
+      ) {
+        consumerControl(() => binding.retire())
+        consumers.delete(entry.dispatchRef)
+        continue
+      }
+      for (const key of Object.keys(counts) as (keyof typeof counts)[])
+        counts[key] += resource.value[key]
+      counts.backgroundTasks += pending
+      // These actual retained records/future/checkpoint references outlive callbacks.
+      counts.memoryUnits +=
+        2 +
+        entry.cleanup.reduce(
+          (sum, record) =>
+            sum +
+            1 +
+            (record.snapshot.work !== undefined ? 1 : 0) +
+            (record.snapshot.observerWork !== undefined ? 1 : 0) +
+            (record.snapshot.checkpoint ? 1 : 0) +
+            (record.snapshot.cause !== undefined ? 1 : 0) +
+            (record.snapshot.observationCause !== undefined ? 1 : 0),
+          0,
+        ) +
+        (checkpoint ? 1 : 0)
+    }
+    return counts
+  }
   // Completion authority is per invocation, never a presentation version.
   const embedAttempts = new Map<string, object>()
   const versions = new Map<string, number>()
@@ -206,7 +596,8 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
     if (
       lifecycleTransition ||
       watcherTransitions !== 0 ||
-      requestTransitions !== 0
+      requestTransitions !== 0 ||
+      consumerControlDepth !== 0
     )
       throw new Error('editor-session-attachment-embed-lifecycle-transition')
     if (!cleanupOnly && (failedWatcherStops.size || watcherConstructionFailure))
@@ -515,6 +906,8 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
       throw new Error('editor-session-attachment-embed-lifecycle-transition')
     if (failedWatcherStops.size || watcherConstructionFailure)
       throw new Error('editor-session-attachment-embed-watcher-unavailable')
+    if (consumerControlDepth)
+      throw new Error('editor-session-attachment-consumer-control-transition')
     if (watcherTransitions !== 0)
       throw new Error('editor-session-attachment-embed-watcher-transition')
     if (requestTransitions !== 0)
@@ -522,6 +915,11 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
     const boundary = boundaryRef
     collectDraining()
     const frame = readAttachmentFrame()
+    const consumer = inspectConsumers()
+    if (frame.version !== attachmentObservationRef || boundaryRef !== boundary)
+      throw new Error(
+        'editor-session-attachment-consumer-inspection-invalidated',
+      )
     const jobs = frame.jobs
     const currentJobs = new Set(jobs)
     for (const job of currentJobs) observedAttachmentJobs.add(job)
@@ -559,18 +957,20 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
     let fileMemoryUnits = 0
     for (const value of readContainerValues(attachmentBatches)) {
       const record = snapshotPassiveRecord(value)
-      if (!record) throw new Error('editor-session-attachment-file-record-unavailable')
+      if (!record)
+        throw new Error('editor-session-attachment-file-record-unavailable')
       if ('files' in record) {
         fileMemoryUnits += 1 + readContainerSize(record.files) * 2
-        if (record.capture) fileMemoryUnits += 1 + record.capture.placements.length
+        if (record.capture)
+          fileMemoryUnits += 1 + record.capture.placements.length
       }
     }
     if (boundaryRef !== boundary || frame.version !== attachmentObservationRef)
       throw new Error('editor-session-attachment-embed-inspection-reentered')
     const requests = new Set([...active].map((operation) => operation.request))
     for (const request of draining) requests.add(request)
-    let timers = 0
-    let retainedListeners = 0
+    let timers = consumer.timers
+    let retainedListeners = consumer.retainedListeners
     let preparationTasks = 0
     for (const request of requests) {
       const resources = inspectMarkdownEmbedRequestResources(request)
@@ -579,7 +979,10 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
       preparationTasks += resources.backgroundTasks
     }
     const backgroundTasks =
-      active.size + preparationTasks + attachmentRunning.size
+      active.size +
+      preparationTasks +
+      attachmentRunning.size +
+      consumer.backgroundTasks
     return Object.freeze({
       ownerRef: 'attachment-embed',
       paused:
@@ -587,6 +990,8 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
         stopWatcher === undefined &&
         stopAttachmentWatcher === undefined &&
         ownedWatchers.size === 0 &&
+        consumer.observers === 0 &&
+        consumer.networkRequests === 0 &&
         backgroundTasks === 0 &&
         timers === 0 &&
         retainedListeners === 0,
@@ -596,6 +1001,7 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
         backgroundTasks === 0 &&
         jobCount === 0 &&
         observedAttachmentJobs.size === 0 &&
+        consumers.size === 0 &&
         batchCount === 0 &&
         itemCount === 0 &&
         capture.memoryUnits === 0 &&
@@ -607,12 +1013,11 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
       usage: Object.freeze({
         editorInstances: 0,
         renderers: 0,
-        observers: ownedWatchers.size,
+        observers: ownedWatchers.size + consumer.observers,
         timers,
         backgroundTasks,
-        // This library performs no network I/O. Opaque consumer work blocks pause
-        // through actual dispatch/provider futures; it is never reported as cancelled.
-        networkRequests: 0,
+        // Scope-reported native requests; this is not all-business-work qualification.
+        networkRequests: consumer.networkRequests,
         memoryUnits:
           active.size +
           draining.size +
@@ -627,7 +1032,8 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
           embedAttempts.size +
           versions.size +
           nodes.length +
-          ownedWatchers.size,
+          ownedWatchers.size +
+          consumer.memoryUnits,
       }),
     })
   }
@@ -822,6 +1228,11 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
       failures.push(error)
     }
     try {
+      cancelConsumers('editor-session-pause')
+    } catch (cause) {
+      failures.push(cause)
+    }
+    try {
       if (boundaryRef === boundary) cancel()
     } catch (error) {
       failures.push(error)
@@ -919,94 +1330,123 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
         : delivered.status !== 'progress' && dispatch.settled)
     )
   }
-  return Object.freeze({
-    participant,
-    async runAttachmentDispatch(
-      job: MarkdownAttachmentJob,
-      dispatch: (
-        admitProgress: (result: MarkdownAttachmentProviderResult) => boolean,
-      ) => PromiseLike<MarkdownAttachmentProviderResult>,
-    ): Promise<MarkdownAttachmentProviderResult> {
-      assertLifecycleIdle()
-      if (disposed || pauseRequested)
-        throw new Error('editor-session-attachment-dispatch-admission-blocked')
-      const boundary = beginBoundary()
-      const epoch = attachmentGeneration
-      const observation = readAttachmentObservation()
-      const context = observation.context
-      const ownedJob = toRaw(job)
-      const jobSnapshot = snapshotPassiveRecord(ownedJob)
-      const jobIdentity =
-        jobSnapshot?.documentIdentity &&
-        snapshotPassiveRecord(toRaw(jobSnapshot.documentIdentity))
-      if (!jobSnapshot || !observation.jobs.includes(ownedJob))
-        throw new Error('editor-session-attachment-dispatch-job-unavailable')
-      const ownsDocument =
-        jobIdentity?.id === context.id && jobIdentity.epoch === context.epoch
-      if (
-        !ownsDocument ||
-        observation.version !== attachmentObservationRef ||
-        boundaryRef !== boundary ||
-        attachmentGeneration !== epoch ||
-        disposed ||
-        pauseRequested
+  const runAttachmentDispatch = async (
+    job: MarkdownAttachmentJob,
+    dispatch: (
+      admitProgress: (result: MarkdownAttachmentProviderResult) => boolean,
+    ) => unknown,
+    requireConsumer: boolean,
+  ): Promise<MarkdownAttachmentProviderResult> => {
+    assertLifecycleIdle()
+    if (disposed || pauseRequested)
+      throw new Error('editor-session-attachment-dispatch-admission-blocked')
+    const ownedJob = toRaw(job)
+    const previousConsumers = [...consumers.values()].filter(
+      (entry) => entry.job === ownedJob,
+    )
+    // Retire a real completed scope before reusing the job. Opaque legacy records
+    // stay retained, while the original dispatch ledger still gates content retries.
+    inspectConsumers(previousConsumers.filter((entry) => entry.binding))
+    if (
+      previousConsumers.some(
+        (entry) =>
+          consumers.has(entry.dispatchRef) &&
+          (requireConsumer || !entry.legacyResultOnly),
       )
-        throw new Error('editor-session-attachment-dispatch-admission-blocked')
-      observedAttachmentJobs.add(ownedJob)
-      let dispatchRef: object | undefined
-      let bindSettlement:
-        | ((
-            result: MarkdownAttachmentProviderResult,
-          ) => MarkdownAttachmentProviderResult)
-        | undefined
-      try {
-        const result = await runMarkdownAttachmentDispatch(ownedJob, () => {
-          const state = inspectMarkdownAttachmentDispatch(ownedJob)!
-          dispatchRef = state.dispatchRef
-          attachmentTasks.set(dispatchRef, ownedJob)
-          const bindResult = (
-            result: MarkdownAttachmentProviderResult,
-            kind: 'progress' | 'settlement',
-          ) => {
-            const previous = attachmentResults.get(result)
-            if (
-              previous &&
-              (previous.dispatchRef !== state.dispatchRef ||
-                previous.kind !== kind)
-            )
-              return false
-            attachmentResults.set(
-              result,
-              Object.freeze({
-                job: ownedJob,
-                dispatchRef: state.dispatchRef,
-                attempt: state.attempt,
-                generation: epoch,
-                kind,
-              }),
-            )
-            return acceptsAttachmentResult(result)
-          }
-          bindSettlement = (result) => {
-            // Snapshot actual settled data; no caller can upgrade a progress object.
-            const snapshot = { ...result }
-            const settled = Object.freeze({
-              ...snapshot,
-              ...(snapshot.documentIdentity
-                ? {
-                    documentIdentity: Object.freeze({
-                      ...snapshot.documentIdentity,
-                    }),
-                  }
-                : {}),
-              ...(snapshot.status === 'resolved'
-                ? { payload: Object.freeze({ ...snapshot.payload }) }
-                : {}),
-            }) as MarkdownAttachmentProviderResult
-            bindResult(settled, 'settlement')
-            return settled
-          }
-          const work = dispatch((progress) => {
+    )
+      throw new Error(
+        'editor-session-attachment-consumer-previous-attempt-retained',
+      )
+    const boundary = beginBoundary()
+    const epoch = attachmentGeneration
+    const observation = readAttachmentObservation()
+    const context = observation.context
+    const jobSnapshot = snapshotPassiveRecord(ownedJob)
+    const jobIdentity =
+      jobSnapshot?.documentIdentity &&
+      snapshotPassiveRecord(toRaw(jobSnapshot.documentIdentity))
+    if (!jobSnapshot || !observation.jobs.includes(ownedJob))
+      throw new Error('editor-session-attachment-dispatch-job-unavailable')
+    const ownsDocument =
+      jobIdentity?.id === context.id && jobIdentity.epoch === context.epoch
+    if (
+      !ownsDocument ||
+      observation.version !== attachmentObservationRef ||
+      boundaryRef !== boundary ||
+      attachmentGeneration !== epoch ||
+      disposed ||
+      pauseRequested
+    )
+      throw new Error('editor-session-attachment-dispatch-admission-blocked')
+    observedAttachmentJobs.add(ownedJob)
+    let dispatchRef: object | undefined
+    let completion: object | undefined
+    let bindSettlement:
+      | ((
+          result: MarkdownAttachmentProviderResult,
+        ) => MarkdownAttachmentProviderResult)
+      | undefined
+    try {
+      const result = await runMarkdownAttachmentDispatch(ownedJob, () => {
+        const state = inspectMarkdownAttachmentDispatch(ownedJob)!
+        dispatchRef = state.dispatchRef
+        attachmentTasks.set(dispatchRef, ownedJob)
+        const bindResult = (
+          result: MarkdownAttachmentProviderResult,
+          kind: 'progress' | 'settlement',
+        ) => {
+          const previous = attachmentResults.get(result)
+          if (
+            previous &&
+            (previous.dispatchRef !== state.dispatchRef ||
+              previous.kind !== kind)
+          )
+            return false
+          attachmentResults.set(
+            result,
+            Object.freeze({
+              job: ownedJob,
+              dispatchRef: state.dispatchRef,
+              attempt: state.attempt,
+              generation: epoch,
+              kind,
+            }),
+          )
+          return acceptsAttachmentResult(result)
+        }
+        bindSettlement = (result) => {
+          // Snapshot actual settled data; no caller can upgrade a progress object.
+          const snapshot = { ...result }
+          const settled = Object.freeze({
+            ...snapshot,
+            ...(snapshot.documentIdentity
+              ? {
+                  documentIdentity: Object.freeze({
+                    ...snapshot.documentIdentity,
+                  }),
+                }
+              : {}),
+            ...(snapshot.status === 'resolved'
+              ? { payload: Object.freeze({ ...snapshot.payload }) }
+              : {}),
+          }) as MarkdownAttachmentProviderResult
+          bindResult(settled, 'settlement')
+          return settled
+        }
+        const consumer: ConsumerEntry = {
+          dispatchRef,
+          job: ownedJob,
+          attempt: state.attempt,
+          generation: epoch,
+          returned: undefined,
+          unknown: 'consumer-dispatch-not-returned',
+          cleanup: [],
+          unknownFields: [],
+        }
+        consumers.set(dispatchRef, consumer)
+        let work: unknown
+        try {
+          work = dispatch((progress) => {
             const current = inspectMarkdownAttachmentDispatch(ownedJob)
             if (
               progress.status !== 'progress' ||
@@ -1022,19 +1462,202 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
             Object.freeze(progress)
             return bindResult(progress, 'progress')
           })
-          // An event emission or terminal label is not a settlement future.
-          if (!work || typeof work.then !== 'function') {
-            throw new Error(
-              'editor-session-attachment-dispatch-settlement-unavailable',
-            )
+        } catch (cause) {
+          consumer.cause = cause
+          consumer.unknown = 'consumer-dispatch-failed'
+          throw cause
+        }
+        consumer.returned = work
+        let capability
+        try {
+          capability = consumerControl(() =>
+            bindMarkdownAttachmentConsumerRequest(work),
+          )
+        } catch (cause) {
+          consumer.cause = cause
+          consumer.unknown = 'consumer-binding-failed'
+          retainUnknownFields(consumer)
+          throw cause
+        }
+        if (capability.supported) {
+          const binding = capability.value
+          if (
+            binding.request !== work ||
+            consumerRequests.has(binding.request) ||
+            consumerFutures.has(binding.result as object) ||
+            consumerFutures.has(binding.settled as object)
+          ) {
+            consumer.unknown = 'consumer-request-or-future-reused'
+            retainUnknownFields(consumer)
+            throw new Error(consumer.unknown)
           }
-          return work
-        })
-        // Ledger settlement happens before final provenance is issued.
-        return bindSettlement!(result)
-      } finally {
-        if (dispatchRef) attachmentTasks.delete(dispatchRef)
-      }
+          consumerRequests.add(binding.request)
+          claimConsumerObservation(
+            binding.result,
+            true,
+          )
+          claimConsumerObservation(
+            binding.settled,
+            true,
+          )
+          consumer.binding = binding
+          consumer.unknown = undefined
+          // Forward the TWO actual original futures; never start another service.
+          completion = Object.freeze({
+            result: binding.result,
+            settled: binding.settled,
+          })
+          return completion as { result: typeof binding.result; settled: typeof binding.settled }
+        }
+        consumer.unknown = capability.reason
+        const returnedFutureOwned =
+          ((typeof work === 'object' && work !== null) ||
+            typeof work === 'function') &&
+          consumerFutures.has(work as object)
+        if (requireConsumer) {
+          retainUnknownFields(consumer)
+          const observation = claimConsumerObservation(work)
+          consumer.unknownReturned = observation
+          observeUnknownFuture(observation)
+          consumer.unknownObserverWork = observation.monitor
+          throw new Error(capability.reason)
+        }
+        if (returnedFutureOwned) {
+          retainUnknownFields(consumer)
+          consumer.unknownReturned = claimConsumerObservation(work)
+          consumer.unknown = 'consumer-request-or-future-reused'
+          throw new Error(consumer.unknown)
+        }
+        // Legacy content can consume its real result, but its opaque scope stays unknown.
+        // An event emission or terminal label is not a settlement future.
+        const observation = claimConsumerObservation(work, true)
+        consumer.unknownReturned = observation
+        let legacyFuture: boolean
+        try {
+          legacyFuture = consumerControl(() => consumerFuture(work))
+        } catch (cause) {
+          observation.reserved = false
+          observation.started = true
+          observation.reason = 'consumer-field-future-access-failed'
+          observation.cause = cause
+          retainUnknownFields(consumer)
+          throw cause
+        }
+        if (!legacyFuture) {
+          observation.reserved = false
+          observation.started = true
+          observation.reason = 'consumer-field-future-unavailable'
+          retainUnknownFields(consumer)
+          throw new Error(
+            'editor-session-attachment-dispatch-settlement-unavailable',
+          )
+        }
+        retainUnknownFields(consumer)
+        consumer.legacyResultOnly = true
+        return work as unknown as PromiseLike<MarkdownAttachmentProviderResult>
+      }, {
+        isCompletion: (work) => completion !== undefined && work === completion,
+        within: consumerControl,
+        retain(kind, ledger) {
+          const entry = dispatchRef && consumers.get(dispatchRef)
+          const original = entry?.binding
+            ? (kind === 'result' ? entry.binding.result : entry.binding.settled)
+            : entry?.returned
+          if (!entry || ledger.work !== original)
+            throw new Error('editor-session-attachment-observation-custody-invalid')
+          const observation = claimConsumerObservation(original)
+          // Retain the established handler or actual access-failure debt.
+          observation.ledger = ledger
+          observation.monitor = ledger.monitor
+          observation.reserved = false
+          observation.started = true
+          observation.reason = undefined
+          for (const work of [ledger.monitor, ledger.inspect().observerWork]) {
+            if ((typeof work !== 'object' || work === null) && typeof work !== 'function') continue
+            const owned = claimConsumerObservation(work)
+            if (owned.started || owned.reserved) continue
+            owned.started = true
+            owned.reason = 'consumer-future-observed-by-dispatch-ledger'
+            owned.monitor = ledger.monitor
+          }
+        },
+      })
+      // Ledger settlement happens before final provenance is issued.
+      return bindSettlement!(result)
+    } catch (cause) {
+      const retained = dispatchRef && consumers.get(dispatchRef)
+      if (retained) retained.cause = cause
+      throw cause
+    } finally {
+      if (dispatchRef) attachmentTasks.delete(dispatchRef)
+    }
+  }
+  return Object.freeze({
+    participant,
+    runAttachmentDispatch(
+      job: MarkdownAttachmentJob,
+      dispatch: (
+        admitProgress: (result: MarkdownAttachmentProviderResult) => boolean,
+      ) => PromiseLike<MarkdownAttachmentProviderResult>,
+    ) {
+      return runAttachmentDispatch(job, dispatch, false)
+    },
+    runAttachmentConsumerRequest(
+      job: MarkdownAttachmentJob,
+      dispatch: (
+        admitProgress: (result: MarkdownAttachmentProviderResult) => boolean,
+      ) => MarkdownAttachmentConsumerRequest | unknown,
+    ) {
+      return runAttachmentDispatch(job, dispatch, true)
+    },
+    readAttachmentConsumerSource() {
+      if (consumerControlDepth || lifecycleTransition)
+        throw new Error('editor-session-attachment-consumer-control-transition')
+      return Object.freeze({
+        complete: false as const,
+        sourceReview: 'unqualified' as const,
+        producerHead: 'acdafdb18ee4668d6db8705837ff5e73c83a2f6e',
+        businessCoverage: 'not-proven' as const,
+        requests: Object.freeze(
+          [...consumers.values()].map((entry) =>
+            Object.freeze({
+              dispatchRef: entry.dispatchRef,
+              job: entry.job,
+              attempt: entry.attempt,
+              generation: entry.generation,
+              returned: entry.returned,
+              request: entry.binding?.request,
+              result: entry.binding?.result,
+              settled: entry.binding?.settled,
+              unknown: entry.unknown,
+              cause: entry.cause,
+              unknownObserverWork: entry.unknownObserverWork,
+              unknownReturned: entry.unknownReturned
+                ? readConsumerObservation(entry.unknownReturned)
+                : undefined,
+              unknownFields: Object.freeze(
+                entry.unknownFields.map((record) =>
+                  Object.freeze({
+                    field: record.field,
+                    ...readConsumerObservation(record.future),
+                  }),
+                ),
+              ),
+              cleanup: Object.freeze(
+                entry.cleanup.map((record) =>
+                  Object.freeze({
+                    snapshot: record.snapshot,
+                    monitor: record.monitor,
+                    done: record.done,
+                    work: Object.freeze({ ...record.work }),
+                    observer: Object.freeze({ ...record.observer }),
+                  }),
+                ),
+              ),
+            }),
+          ),
+        ),
+      })
     },
     bindAttachmentInputs(inputs: MarkdownAttachmentEmbedInputs) {
       return withLifecycleTransition((transition) => {

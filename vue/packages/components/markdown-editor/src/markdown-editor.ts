@@ -44,6 +44,7 @@ import type { MarkdownEditorMetricsOptions } from './markdown-editor-metrics'
 import type { MarkdownEditorAttachmentDispatch } from './markdown-editor-session-attachment-dispatch'
 export type { MarkdownEditorAttachmentDispatch } from './markdown-editor-session-attachment-dispatch'
 export {
+  bindMarkdownAttachmentConsumerRequest,
   captureMarkdownAttachmentInput,
   createMarkdownAttachmentCaptureSession,
   createMarkdownAttachmentAtomicPresentation,
@@ -64,6 +65,14 @@ export {
   type MarkdownAttachmentAtomicPresentation,
   type MarkdownAttachmentBatchIntent,
   type MarkdownAttachmentCaptureObservation,
+  type MarkdownAttachmentConsumerCapability,
+  type MarkdownAttachmentConsumerCheckpointPort,
+  type MarkdownAttachmentConsumerCleanupObservation,
+  type MarkdownAttachmentConsumerRequest,
+  type MarkdownAttachmentConsumerRequestBinding,
+  type MarkdownAttachmentConsumerResources,
+  type MarkdownAttachmentRequestConsumer,
+  type MarkdownAttachmentRequestDispatch,
   type MarkdownAttachmentFileConsumer,
   type MarkdownAttachmentCaptureContext,
   type MarkdownAttachmentCaptureInput,
