@@ -1560,3 +1560,10 @@ resource owner, business grant, full snapshot/recovery or qualification is added
 
 This source is isolated from the independently pending atomic retry candidate.
 Runtime, tests, native/IME/receipt and resource qualification remain unrun.
+
+Terminal observation admission retains actual inner invocation and synchronous
+acceptance separately from the outer observer return. Inner false, raw thrown
+causes (including undefined), unsupported returned work and post-callback custody
+failure remain original notification debt even if an outer callback catches or
+returns true. Notify requires the actual accepted inner loan and no failure debt;
+a later refusal notification cannot erase the first/raw failure.

@@ -5565,6 +5565,10 @@ type NativeAttachmentTerminalApplication = {
   observation: MarkdownAttachmentTerminalObservation | null
   notifying: boolean
   loanTaken: boolean
+  loanInvoked: boolean
+  loanAccepted: boolean
+  loanReturned: unknown
+  loanFailure: { readonly firstCause: unknown; latestCause: unknown } | null
   releasingInput: boolean
   inputReleased: boolean
   transaction: MarkdownEditorTransactionEvent | null
@@ -5578,13 +5582,31 @@ const withAttachmentTerminalTransaction = (
 ): boolean => {
   const application = nativeAttachmentTerminalApplication
   if (!application || !application.notifying || application.loanTaken ||
-      application.observation !== observation || observation.custody !== application.custody ||
-      (observation.phase !== 'refused' && !application.custody.hasCustody())) return false
-  application.loanTaken = true
-  const accepted = consume(observation)
-  return accepted === true && nativeAttachmentTerminalApplication === application &&
-    application.observation === observation &&
-    (observation.phase === 'refused' || application.custody.hasCustody())
+      application.observation !== observation || observation.custody !== application.custody) return false
+  const retainFailure = (cause: unknown, returned: unknown) => {
+    application.loanFailure ??= { firstCause: cause, latestCause: cause }
+    application.loanFailure.latestCause = cause
+    application.cause = application.loanFailure.firstCause
+    attachmentTerminalNotificationFailures.push(Object.freeze({ observation, cause, returned }))
+  }
+  try {
+    if (observation.phase !== 'refused' && !application.custody.hasCustody()) return false
+    application.loanTaken = true
+    application.loanInvoked = true
+    const returned: unknown = consume(observation)
+    application.loanReturned = returned
+    if (typeof returned !== 'boolean') throw new Error('attachment-terminal-consumer-return-unavailable')
+    const accepted = returned === true && nativeAttachmentTerminalApplication === application &&
+      application.observation === observation &&
+      (observation.phase === 'refused' || application.custody.hasCustody())
+    application.loanAccepted = accepted
+    if (!accepted) retainFailure(undefined, returned)
+    return accepted && application.loanFailure === null
+  } catch (cause) {
+    application.loanAccepted = false
+    retainFailure(cause, application.loanReturned)
+    throw cause
+  }
 }
 const inspectAttachmentTerminalNotificationFailures = () =>
   Object.freeze([...attachmentTerminalNotificationFailures])
@@ -5682,16 +5704,21 @@ const applyAttachmentResult = (result: MarkdownAttachmentProviderResult) => {
     application.observation = observation
     application.notifying = true
     application.loanTaken = false
+    application.loanInvoked = false
+    application.loanAccepted = false
+    application.loanReturned = undefined
+    // Previous raw failure/unsupported work debt cannot be erased by a later callback.
     let returned: unknown
     try {
       returned = observer(observation)
       if (typeof returned !== 'boolean') throw new Error('attachment-terminal-observer-return-unavailable')
-      const accepted = returned && application.loanTaken &&
+      const accepted = returned && application.loanTaken && application.loanInvoked &&
+        application.loanAccepted && application.loanFailure === null &&
         (observation.phase === 'refused' || application.custody.hasCustody())
       if (!accepted) attachmentTerminalNotificationFailures.push(Object.freeze({ observation, cause: application.cause, returned }))
       return accepted
     } catch (cause) {
-      application.cause = cause
+      application.cause = application.loanFailure ? application.loanFailure.firstCause : cause
       attachmentTerminalNotificationFailures.push(Object.freeze({ observation, cause, returned }))
       throw cause
     } finally {
@@ -5735,6 +5762,7 @@ const applyAttachmentResult = (result: MarkdownAttachmentProviderResult) => {
           application?.releasingInput === true && nativeCustody(),
       })
       application = { custody, observation: null, notifying: false, loanTaken: false,
+        loanInvoked: false, loanAccepted: false, loanReturned: undefined, loanFailure: null,
         releasingInput: false, inputReleased: false, transaction: null, cause: undefined }
       nativeAttachmentTerminalApplication = application
       if (!notify(Object.freeze({ phase: 'applying', custody }))) return refuseCompletion()
