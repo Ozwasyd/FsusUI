@@ -1681,6 +1681,59 @@ Without a reservation, the existing applying/committed unavailable path remains.
 The SDK controlled transition and Main same-entry association are separate source
 work and are not implemented or qualified by this native producer alone.
 
+### Original native application-ended source offer (not activated)
+
+The mounted editor exposes `getAttachmentTerminalApplicationEndIssuer()`.
+`reserve(custody, reservation, leaseRef)` only binds a handle inside the original
+applying loan with the genuine single-application reservation, the SAME private
+native application/capture/item/job and exact caller lease reference. The SDK
+must still authenticate that lease and producer through its original adapter.
+Cancellation of the single reservation does not erase this original end handle,
+its failure history or an already observed native publication.
+
+The original observer invocation and terminal loan increment/decrement real
+private depths at their actual entry/finally exit. Only the actual application
+finally, after clearing its native application slot and returning publication
+depth, records application release. An end observation is produced after that
+finally's actual retirement cleanup call. It is independent of content
+accepted/committed, provider result, consumer Boolean or the application return
+value. `inspect(handle, leaseRef)` only reads that source observation; it cannot
+perform cleanup or promote it. `hasEnded(handle, leaseRef, exactObservation)`
+authenticates the exact source event and original application association.
+
+Observations distinguish `running`, `cleanup-blocked` and `ended`, expose actual
+callback/loan/application release and native cleanup facts, preserve the SAME
+historical transaction object, and retain tagged raw failure history (including
+`undefined`). An ended observation reports physical completion of this native
+scope; it does not declare success or clear original observer/loan/business
+failure debt. False admission, cancellation and synchronous callback throws
+remain separate facts after their original stacks actually unwind.
+
+The original File cleanup owner retains a cursor over its actual item/batch
+abort controllers for this application. Controllers advance only after their
+real abort call returns. `retry(handle, leaseRef)` resumes that SAME cursor and
+the original retirement sweep after the application/loan/cleanup stack has
+released. It never looks up an item ID again after detachment, repeats source
+publication, reruns a consumer callback or acts on a new session. Throws and
+reentry preserve debt and the same retry handle. The original detach-before-abort
+and item-before-batch order remains; successful retired controls are not replayed.
+
+A non-Boolean observer/loan return is unsupported work. If it returns a Promise
+or other unknown work, synchronous stack exit cannot prove that work ended;
+the handle remains explicitly blocked even after native cleanup. No new settled
+wrapper or guessed Promise observation is introduced. Resolving that blocker
+requires a genuine original returned-work/cleanup producer capability.
+
+This producer never waits for its own consumer's full-local settled signal:
+that can depend on the SDK acknowledgement it is meant to provide. An original
+retirement sweep returning does not prove all File/item records, network/provider
+work or session resources retired. Census, settlement, recovery and eviction
+remain with their actual owners. There is no Main/SDK activation or new end
+callback/subscription in this source offer; consume the handle after the original
+native stack releases, and keep SDK cancellation/lease/context checks strict.
+Runtime/native/security/privacy/receipt/renderer/full qualification remain held.
+The offer is based on #954 and has no dependency on the separate unreviewed cohort.
+
 ### Isolated original issuer and retry source composition
 
 The isolated composite preserves UI914 `570f2c4f6076c8ab489d100bca29127bf7126d17`
