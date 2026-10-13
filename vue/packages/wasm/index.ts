@@ -346,6 +346,7 @@ export type WasmAsciiIndexUpdate = {
  * ALLOW_MEMORY_GROWTH replaces the backing ArrayBuffer.
  */
 export class WasmDataSession {
+  private readonly module: LoadedEpWasmModule
   private readonly buffers = new Map<string, PersistentBuffer>()
   private heapBuffer: ArrayBuffer
   private allocationCount = 0
@@ -354,7 +355,8 @@ export class WasmDataSession {
   private disposed = false
   private asciiCount = 0
 
-  constructor(private readonly module: LoadedEpWasmModule) {
+  constructor(module: LoadedEpWasmModule) {
+    this.module = module
     this.heapBuffer = module.HEAPU8.buffer as ArrayBuffer
   }
 
