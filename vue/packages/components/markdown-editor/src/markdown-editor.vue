@@ -3162,8 +3162,11 @@ const readSelectionFrom = (
 
 const captureSelection = (breakMerge = true) => {
   const previous = transactionStore.selection
+  const next = readSelectionFrom(textareaRef.value)
+  if (next.start !== previous.start || next.end !== previous.end || next.direction !== previous.direction)
+    invalidateAttachmentCohorts?.()
   transactionStore.setSelection(
-    readSelectionFrom(textareaRef.value),
+    next,
     breakMerge,
   )
   const selection = transactionStore.selection
@@ -3214,6 +3217,7 @@ const selectTableCell = async (cell: MarkdownTableCellIdentity) => {
     return
   }
   currentTableCell.value = resolved
+  invalidateAttachmentCohorts?.()
   transactionStore.setSelection(
     {
       direction: 'none',
@@ -5546,6 +5550,7 @@ const setMode = (mode: MarkdownEditorMode) => {
     selection: captureSelection(false),
     source: transactionStore.value,
   })
+  invalidateAttachmentCohorts?.()
   transactionStore.setSelection(retained.selection, false)
   currentMode.value = nextMode
   refreshWritingAidsDocument()
@@ -5788,6 +5793,17 @@ guardAttachmentCohortOperation = (job) => {
         !currentAttachmentCohort(record)) revokeAttachmentCohort(record)
   }
 }
+const retainAttachmentCohortReaderFailure = (
+  application: NativeAttachmentTerminalApplication | null,
+  observation: MarkdownAttachmentTerminalObservation | null,
+  cause: unknown,
+) => {
+  // A reader failure belongs only to the original loan/notification it read.
+  // Reentry must never attribute it to a replacement application or observation.
+  if (application && observation && nativeAttachmentTerminalApplication === application &&
+      application.notifying && application.observation === observation)
+    retainAttachmentTerminalLoanFailure(application, observation, cause, application.loanReturned)
+}
 const attachmentTerminalCohortIssuer = Object.freeze<MarkdownAttachmentTerminalCohortIssuer>({
   reserve(custody, reservation, members) {
     const application = nativeAttachmentTerminalApplication
@@ -5835,6 +5851,7 @@ const attachmentTerminalCohortIssuer = Object.freeze<MarkdownAttachmentTerminalC
   join(token, custody, reservation, leaseRef) {
     const record = nativeAttachmentCohorts.get(token)
     const application = nativeAttachmentTerminalApplication
+    const observation = application?.observation ?? null
     if (!record?.active || record.application || !application || application.custody !== custody || custody.capture !== record.capture ||
         custody.beforeRevision !== record.revision || !record.members.some((member) => !member.published &&
           member.item === custody.item && member.jobRef === custody.jobRef && member.leaseRef === leaseRef)) return false
@@ -5844,11 +5861,14 @@ const attachmentTerminalCohortIssuer = Object.freeze<MarkdownAttachmentTerminalC
       record.application = application
       return true
     } catch (cause) {
+      retainAttachmentCohortReaderFailure(application, observation, cause)
       revokeAttachmentCohort(record)
       throw cause
     }
   },
   inspectContinuation(token, input) {
+    const application = nativeAttachmentTerminalApplication
+    const observation = application?.observation ?? null
     const record = nativeAttachmentCohorts.get(token)
     if (!record?.active) return null
     try {
@@ -5859,6 +5879,7 @@ const attachmentTerminalCohortIssuer = Object.freeze<MarkdownAttachmentTerminalC
       return Object.freeze({ capture: record.capture, beforeRevision: record.beforeRevision,
         revision: record.revision, publications: Object.freeze([...record.publications]) })
     } catch (cause) {
+      retainAttachmentCohortReaderFailure(application, observation, cause)
       revokeAttachmentCohort(record)
       throw cause
     }
@@ -5866,12 +5887,14 @@ const attachmentTerminalCohortIssuer = Object.freeze<MarkdownAttachmentTerminalC
   hasPublication(token, reservation, leaseRef, phase, event) {
     const record = nativeAttachmentCohorts.get(token)
     const application = nativeAttachmentTerminalApplication
+    const observation = application?.observation ?? null
     if (!record?.active || !application || record.application !== application || application.transaction !== event ||
         !record.members.some((member) => !member.published && member.jobRef === application.custody.jobRef && member.leaseRef === leaseRef)) return false
     try {
       return attachmentTerminalRevisionIssuer.hasReservation(reservation, leaseRef, phase, event) &&
         currentAttachmentCohort(record, true) && attachmentTerminalRevisionIssuer.hasReservation(reservation, leaseRef, phase, event) && record.active
     } catch (cause) {
+      retainAttachmentCohortReaderFailure(application, observation, cause)
       revokeAttachmentCohort(record)
       throw cause
     }
@@ -6681,6 +6704,7 @@ const handleEmbedAction = async (
     result.action === 'select-node'
   ) {
     if (currentMode.value === 'preview') setMode('source')
+    invalidateAttachmentCohorts?.()
     transactionStore.setSelection(result.selection, false)
     await restoreTextareaSelection(result.selection)
     return
@@ -7350,6 +7374,7 @@ const revealActiveImageSource = () => {
   if (!active) return
   const range = active.figure?.captionRange ?? active.range
   setMode('source')
+  invalidateAttachmentCohorts?.()
   transactionStore.setSelection(
     { direction: 'none', end: range.end, start: range.start },
     false,
@@ -7463,6 +7488,7 @@ const commitRevealSelection = async (
     end: range.start,
     start: range.start,
   })
+  invalidateAttachmentCohorts?.()
   transactionStore.setSelection(selection, true)
   refreshLiveWindow('feature')
   refreshWritingAidsDocument()
