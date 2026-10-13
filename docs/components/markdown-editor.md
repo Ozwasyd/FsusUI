@@ -1558,3 +1558,27 @@ This is pending-source integration, not completed P2 acceptance. Original contro
 and all runtime/qualification remain UNRUN/HOLD; Root physical staging and real
 Blog business producer/wiring remain separate. No complete resources, recovery,
 full-ready or eviction is granted.
+
+### Accepted atomic retry preparation consumer dependency
+
+The isolated retry consumer replaces only the original owner/lifecycle source
+with the exact accepted `e0351af7c1a855caf0fdc4d42507cc364ebb76dc` postimages.
+After mutation, admission reads the original undelivered ledger preparation's
+`targetAttempt`, never a native attempt increment prediction. The original File
+loan identity is checked before its idempotent native revocation; partial prior
+revocation cannot transfer a new File. File and actual attempt are still read only
+inside admitted dispatch.
+
+A real undelivered nonmutating preparation can display continuation retry without
+claiming settlement. Original strict/legacy entries reuse that same preparation;
+no repeated File callback, attempt increment, replacement job or duplicate ledger
+is introduced. The consumer composite remains independently reviewable and is
+separate from the native terminal transaction source. Runtime and qualification
+remain unrun; preparation is not settled work.
+
+Continuation adds the original Retry action metadata alongside the existing action
+without rewriting the native job phase to rejected or marking its ledger settled.
+The `attachment-retry-failure` scoped slot receives the original preparation's
+`previousFailure` object and original raw `failures` values; default display uses
+the existing localized retry status. No token, geometry, locale or typography
+source changes. Final admission belongs to the original owner after all callbacks.

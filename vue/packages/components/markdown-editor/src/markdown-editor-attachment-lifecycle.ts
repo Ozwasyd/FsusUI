@@ -45,7 +45,7 @@ export interface MarkdownAttachmentJob {
 
 interface MarkdownAttachmentDispatchState {
   readonly dispatchRef: object
-  readonly attempt: number
+  attempt: number
   settled: boolean
   dispatching: boolean
   settlementAvailable: boolean
@@ -56,6 +56,24 @@ interface MarkdownAttachmentDispatchState {
   localSettlementCause?: unknown
   localObservationCause?: unknown
   observationNotificationCauses?: readonly unknown[]
+  retryPreparation?: {
+    readonly fromDispatchRef: object
+    readonly fromAttempt: number
+    readonly targetAttempt: number
+    readonly previousFailure: Readonly<{
+      resultSettlement?: MarkdownAttachmentDispatchState['resultSettlement']
+      resultSettlementCause?: unknown
+      resultObservationCause?: unknown
+      localSettlement?: MarkdownAttachmentDispatchState['localSettlement']
+      localSettlementCause?: unknown
+      localObservationCause?: unknown
+      observationNotificationCauses?: readonly unknown[]
+    }>
+    mutationComplete: boolean
+    mutating: boolean
+    dispatched: boolean
+    readonly failures: unknown[]
+  }
 }
 const attachmentDispatches = new WeakMap<
   MarkdownAttachmentJob,
@@ -67,7 +85,15 @@ export const inspectMarkdownAttachmentDispatch = (
   job: MarkdownAttachmentJob,
 ) => {
   const state = attachmentDispatches.get(toRaw(job))
-  return state ? Object.freeze({ ...state }) : null
+  return state ? Object.freeze({
+    ...state,
+    ...(state.retryPreparation ? {
+      retryPreparation: Object.freeze({
+        ...state.retryPreparation,
+        failures: Object.freeze([...state.retryPreparation.failures]),
+      }),
+    } : {}),
+  }) : null
 }
 
 /** Only the original result and full-local future can settle a richer invocation. */
@@ -179,19 +205,24 @@ export const runMarkdownAttachmentDispatch = async (
 ): Promise<MarkdownAttachmentProviderResult> => {
   const ownedJob = toRaw(job)
   const previous = attachmentDispatches.get(ownedJob)
-  if (previous && !previous.settled)
+  const prepared = previous?.retryPreparation && !previous.retryPreparation.dispatched
+  if (previous && !previous.settled && !prepared)
     throw new Error('markdown-attachment-dispatch-still-running')
   if (ownedJob.phase !== 'pending')
     throw new Error('markdown-attachment-dispatch-phase-unavailable')
-  if (previous?.attempt === ownedJob.attempt)
+  if (prepared && (!previous.retryPreparation!.mutationComplete || previous.attempt !== ownedJob.attempt))
+    throw new Error('markdown-attachment-retry-preparation-incomplete')
+  if (previous?.attempt === ownedJob.attempt && !prepared)
     throw new Error('markdown-attachment-attempt-already-dispatched')
-  const state: MarkdownAttachmentDispatchState = {
+  const state: MarkdownAttachmentDispatchState = prepared ? previous! : {
     dispatchRef: Object.freeze({}),
     attempt: ownedJob.attempt,
     settled: false,
     dispatching: true,
     settlementAvailable: false,
   }
+  if (prepared) state.retryPreparation!.dispatched = true
+  state.dispatching = true
   attachmentDispatches.set(ownedJob, state)
   const notificationCauses: unknown[] = []
   const within = (action: () => void) => {
@@ -589,6 +620,14 @@ export const cancelMarkdownAttachmentJob = (job: MarkdownAttachmentJob) => {
 
 export const assertMarkdownAttachmentRetryAdmission = (job: MarkdownAttachmentJob) => {
   const dispatch = inspectMarkdownAttachmentDispatch(job)
+  const prepared = dispatch?.retryPreparation
+  if (prepared && !prepared.dispatched) {
+    if (prepared.mutating)
+      throw new Error('markdown-attachment-retry-preparation-in-progress')
+    if (job.attempt !== prepared.targetAttempt && (prepared.mutationComplete || job.attempt !== prepared.fromAttempt))
+      throw new Error('markdown-attachment-retry-preparation-invalidated')
+    return
+  }
   if (
     !dispatch ||
     dispatch.attempt !== job.attempt ||
@@ -599,14 +638,70 @@ export const assertMarkdownAttachmentRetryAdmission = (job: MarkdownAttachmentJo
     throw new Error('markdown-attachment-retry-dispatch-still-running')
 }
 
+/** Preserve the actual failed admission without claiming a request was dispatched. */
+export const captureMarkdownAttachmentRetryFailureHandler = (job: MarkdownAttachmentJob) => {
+  const prepared = attachmentDispatches.get(toRaw(job))?.retryPreparation
+  // Pin this invocation's actual record; a later dispatch must not steal its error.
+  return (cause: unknown) => {
+    if (prepared) prepared.failures.push(cause)
+  }
+}
+
 export const retryMarkdownAttachmentJob = (job: MarkdownAttachmentJob) => {
   assertMarkdownAttachmentRetryAdmission(job)
-  job.phase = 'pending'
-  job.progress = 0
-  job.attempt += 1
-  job.code = undefined
-  job.message = undefined
-  return job
+  const ownedJob = toRaw(job)
+  const previous = attachmentDispatches.get(ownedJob)!
+  const continuing = previous.retryPreparation && !previous.retryPreparation.dispatched
+  const preparation = continuing ? previous.retryPreparation! : {
+    fromDispatchRef: previous.dispatchRef,
+    fromAttempt: previous.attempt,
+    targetAttempt: previous.attempt + 1,
+    previousFailure: Object.freeze({
+      resultSettlement: previous.resultSettlement,
+      resultSettlementCause: previous.resultSettlementCause,
+      resultObservationCause: previous.resultObservationCause,
+      localSettlement: previous.localSettlement,
+      localSettlementCause: previous.localSettlementCause,
+      localObservationCause: previous.localObservationCause,
+      observationNotificationCauses: previous.observationNotificationCauses,
+    }),
+    mutationComplete: false,
+    mutating: false,
+    dispatched: false,
+    failures: [] as unknown[],
+  }
+  if (!Number.isSafeInteger(preparation.targetAttempt))
+    throw new Error('markdown-attachment-retry-attempt-unavailable')
+  const state: MarkdownAttachmentDispatchState = {
+    dispatchRef: continuing ? previous.dispatchRef : Object.freeze({}),
+    attempt: previous.attempt,
+    settled: false,
+    dispatching: false,
+    settlementAvailable: false,
+    retryPreparation: preparation,
+  }
+  preparation.mutationComplete = false
+  preparation.mutating = true
+  attachmentDispatches.set(ownedJob, state)
+  try {
+    job.phase = 'pending'
+    job.progress = 0
+    job.attempt = preparation.targetAttempt
+    job.code = undefined
+    job.message = undefined
+    preparation.mutationComplete = true
+    return job
+  } catch (cause) {
+    preparation.mutationComplete = false
+    preparation.failures.push(cause)
+    throw cause
+  } finally {
+    preparation.mutating = false
+    // Read native data without invoking a replacement getter or masking the error.
+    const attempt = Object.getOwnPropertyDescriptor(ownedJob, 'attempt')
+    state.attempt = attempt && 'value' in attempt && Number.isSafeInteger(attempt.value)
+      ? attempt.value : Number.NaN
+  }
 }
 
 export type MarkdownAttachmentLifecycleMutationKind =

@@ -429,7 +429,13 @@
             :class="ns.e('attachment-status')"
             :aria-live="attachment.statusAriaLive"
           >
-            {{ attachment.progressAriaText }}
+            <slot
+              v-if="attachment.retryPreparation"
+              name="attachment-retry-failure"
+              :failure="attachment.retryPreparation.previousFailure"
+              :causes="attachment.retryPreparation.failures"
+            >{{ attachment.progressAriaText }}</slot>
+            <template v-else>{{ attachment.progressAriaText }}</template>
           </span>
           <div :class="ns.e('attachment-actions')">
             <button
@@ -2110,6 +2116,22 @@ const attachmentPresentations = computed(() =>
     .filter((job) => job.phase !== 'deleted')
     .map((job) => {
       const item = attachmentItems.get(job.itemId ?? job.id)
+      const settlement = inspectMarkdownAttachmentDispatch(job)
+      const preparation = settlement?.retryPreparation
+      const original = toRaw(job)
+      const binding = attachmentJobBindings.get(original)
+      const record = binding && attachmentBatches.get(binding.batch.batchId)
+      const continuing = !!preparation && !preparation.dispatched && !preparation.mutating &&
+        !sessionDisposed && !editorReleased && !attachmentPauseRequested.value &&
+        ['pending', 'progress', 'rejected', 'cancelled'].includes(original.phase) &&
+        (original.attempt === preparation.targetAttempt || (!preparation.mutationComplete && original.attempt === preparation.fromAttempt)) &&
+        !!binding && !!item && binding.item === item && record?.batch === binding.batch &&
+        binding.batch.items[item.order] === item && attachmentItems.get(item.itemId) === item &&
+        original.documentIdentity?.id === transactionStore.documentIdentity.id &&
+        original.documentIdentity.epoch === transactionStore.documentIdentity.epoch &&
+        binding.batch.documentIdentity.id === original.documentIdentity.id &&
+        binding.batch.documentIdentity.epoch === original.documentIdentity.epoch &&
+        isEditorDocumentCurrent(transactionStore.documentIdentity)
       const presentation = createMarkdownAttachmentAtomicPresentation({
         itemId: job.itemId ?? job.id,
         name: item?.name ?? job.name ?? localeText.value.attachments.unnamed,
@@ -2118,11 +2140,19 @@ const attachmentPresentations = computed(() =>
         progress: job.progress,
         copy: localeText.value.attachments,
       })
-      const settlement = inspectMarkdownAttachmentDispatch(job)
+      const actions = [...presentation.actions]
+      const originalAction = actions.find((action) => action.key === 'cancel')
+      if (continuing && originalAction && !actions.some((action) => action.key === 'retry'))
+        actions.push(Object.freeze({ ...originalAction, key: 'retry', label: localeText.value.attachments.actions.retry }))
       return Object.freeze({
         ...presentation,
-        actions: Object.freeze(presentation.actions.map((action) => action.key === 'retry'
-          ? Object.freeze({ ...action, disabled: action.disabled || !settlement?.settled || settlement.attempt !== job.attempt })
+        // Preserve actual job phase and the original preparation failure objects.
+        retryPreparation: continuing ? preparation : null,
+        progressAriaText: continuing
+          ? localeText.value.attachments.status(presentation.name, 'retry', presentation.progress)
+          : presentation.progressAriaText,
+        actions: Object.freeze(actions.map((action) => action.key === 'retry'
+          ? Object.freeze({ ...action, disabled: action.disabled || (!continuing && (!settlement?.settled || settlement.attempt !== job.attempt)) })
           : action)),
       })
     }),
@@ -5768,14 +5798,19 @@ const runAttachmentAction = (
     if (!dispatchConfiguration || (!dispatchConfiguration.dispatch && !dispatchConfiguration.requestDispatch) ||
       !batch || !item || record?.batch !== batch || batch.items[item.order] !== item ||
       item.itemId !== itemId || attachmentItems.get(itemId) !== item) return
+    const originalFile = record.files.get(item)
     const progress = original.progress
     const code = original.code
     const message = original.message
     const assertAdmission: NonNullable<MarkdownAttachmentDispatchOptions['retry']>['assertAdmission'] = (phase) => {
       const retried = phase === 'after-retry'
+      const preparation = inspectMarkdownAttachmentDispatch(original)?.retryPreparation
+      const expectedAttempt = retried && preparation && !preparation.dispatched
+        ? preparation.targetAttempt : originalAttempt
       if (sessionDisposed || editorReleased || attachmentPauseRequested.value || !isEditorDocumentCurrent(originalIdentity) ||
         !attachmentJobs.value.some((candidate) => toRaw(candidate) === original) ||
-        original.attempt !== originalAttempt + Number(retried) || original.phase !== (retried ? 'pending' : originalPhase) ||
+        (retried && (!preparation || preparation.dispatched || preparation.mutating || !preparation.mutationComplete)) ||
+        original.attempt !== expectedAttempt || original.phase !== (retried ? 'pending' : originalPhase) ||
         original.progress !== (retried ? 0 : progress) || original.code !== (retried ? undefined : code) ||
         original.message !== (retried ? undefined : message) || original.range !== originalRange ||
         attachmentJobBindings.get(original) !== originalBinding || attachmentItems.get(itemId) !== item ||
@@ -5785,7 +5820,13 @@ const runAttachmentAction = (
         original.documentIdentity.epoch !== originalIdentity.epoch) throw new Error('editor-attachment-retry-original-custody-invalidated')
     }
     const options: MarkdownAttachmentDispatchOptions = Object.freeze({ retry: Object.freeze({
-      beforeRetry: () => { assertAdmission('before-retry'); revokeAttachmentFile(itemId) },
+      beforeRetry: () => {
+        assertAdmission('before-retry')
+        const currentFile = record.files.get(item)
+        if (currentFile && currentFile !== originalFile) throw new Error('editor-attachment-retry-file-custody-invalidated')
+        // The original revoke is idempotent after a partial callback already removed this loan.
+        revokeAttachmentFile(itemId)
+      },
       assertAdmission,
     }) })
     dispatchAttachmentBatch(Object.freeze({ ...batch, items: Object.freeze([item]) }), undefined, dispatchConfiguration, options)

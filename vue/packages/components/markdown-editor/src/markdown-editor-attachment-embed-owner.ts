@@ -26,6 +26,7 @@ import {
   runMarkdownAttachmentDispatch,
   assertMarkdownAttachmentRetryAdmission,
   retryMarkdownAttachmentJob,
+  captureMarkdownAttachmentRetryFailureHandler,
 } from './markdown-editor-attachment-lifecycle'
 import {
   bindMarkdownAttachmentConsumerRequest,
@@ -1374,8 +1375,10 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
       // Old-scope refusal precedes every Main callback and every retry mutation.
       releasePrevious()
       assertMarkdownAttachmentRetryAdmission(ownedJob)
-      const previous = inspectMarkdownAttachmentDispatch(ownedJob)!
-      if (!Number.isSafeInteger(original.attempt + 1))
+      let previous = inspectMarkdownAttachmentDispatch(ownedJob)!
+      const prepared = previous.retryPreparation && !previous.retryPreparation.dispatched
+      const targetAttempt = prepared ? previous.retryPreparation!.targetAttempt : original.attempt + 1
+      if (!Number.isSafeInteger(targetAttempt))
         throw new Error('editor-session-attachment-retry-attempt-unavailable')
       const callbacks = snapshotPassiveRecord(retry)
       if (!callbacks || typeof callbacks.beforeRetry !== 'function' || typeof callbacks.assertAdmission !== 'function')
@@ -1395,7 +1398,7 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
           !current || !keys || keys.length !== Reflect.ownKeys(expected).length ||
           keys.some((key) => !Object.is(Reflect.get(current, key), Reflect.get(expected, key))) ||
           ledger?.dispatchRef !== previous.dispatchRef || ledger.attempt !== previous.attempt ||
-          !ledger.settled || !ledger.settlementAvailable
+          (!(ledger.retryPreparation && !ledger.retryPreparation.dispatched) && (!ledger.settled || !ledger.settlementAvailable))
         ) throw new Error('editor-session-attachment-retry-admission-invalidated')
         return frame
       }
@@ -1404,15 +1407,18 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
         Reflect.apply(callbacks.assertAdmission, retry, [name])
         return guard(expected, version)
       }
-      phase('before-retry', original, initial.version)
-      Reflect.apply(callbacks.beforeRetry, retry, [])
+      if (!prepared) {
+        phase('before-retry', original, initial.version)
+        Reflect.apply(callbacks.beforeRetry, retry, [])
+      }
       const released = phase('after-file-release', original, initial.version)
       // Mutate the actual native reactive job, including synchronous invalidation.
       const live = readNativeRef(attachmentInputs!.jobs)[released.jobs.indexOf(ownedJob)]
       if (!isReactive(live) || toRaw(live) !== ownedJob)
         throw new Error('editor-session-attachment-retry-job-unavailable')
       retryMarkdownAttachmentJob(live)
-      const expected = Object.freeze({ ...original, phase: 'pending' as const, progress: 0, attempt: original.attempt + 1, code: undefined, message: undefined })
+      previous = inspectMarkdownAttachmentDispatch(ownedJob)!
+      const expected = Object.freeze({ ...original, phase: 'pending' as const, progress: 0, attempt: targetAttempt, code: undefined, message: undefined })
       const retried = phase('after-retry', expected, attachmentObservationRef)
       const observation = readAttachmentObservation(transition)
       guard(expected, retried.version)
@@ -1656,6 +1662,13 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
       if (dispatchRef) attachmentTasks.delete(dispatchRef)
     }
   }
+  const retainRetryFailure = <T>(job: MarkdownAttachmentJob, work: Promise<T>) => {
+    const retain = captureMarkdownAttachmentRetryFailureHandler(toRaw(job))
+    return work.catch((cause) => {
+      retain(cause)
+      throw cause
+    })
+  }
   return Object.freeze({
     participant,
     runAttachmentDispatch(
@@ -1665,7 +1678,7 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
       ) => PromiseLike<MarkdownAttachmentProviderResult>,
       options?: MarkdownAttachmentDispatchOptions,
     ) {
-      return runAttachmentDispatch(job, dispatch, false, options)
+      return retainRetryFailure(job, runAttachmentDispatch(job, dispatch, false, options))
     },
     runAttachmentConsumerRequest(
       job: MarkdownAttachmentJob,
@@ -1674,7 +1687,7 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
       ) => MarkdownAttachmentConsumerRequest | unknown,
       options?: MarkdownAttachmentDispatchOptions,
     ) {
-      return runAttachmentDispatch(job, dispatch, true, options)
+      return retainRetryFailure(job, runAttachmentDispatch(job, dispatch, true, options))
     },
     readAttachmentConsumerSource() {
       if (consumerControlDepth || lifecycleTransition)
