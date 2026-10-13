@@ -225,7 +225,7 @@ const buildKeyframes = (
 // WAAPI primary path — uses the browser's animation engine.
 const runWaapiMotion = (
   el: HTMLElement,
-  properties: readonly (keyof MotionStyleState)[],
+  _properties: readonly (keyof MotionStyleState)[],
   keyframes: Keyframe[],
   durationMs: number,
   delayMs: number,
