@@ -70,6 +70,7 @@ interface MarkdownAttachmentDispatchState {
       observationNotificationCauses?: readonly unknown[]
     }>
     mutationComplete: boolean
+    mutating: boolean
     dispatched: boolean
     readonly failures: unknown[]
   }
@@ -621,7 +622,9 @@ export const assertMarkdownAttachmentRetryAdmission = (job: MarkdownAttachmentJo
   const dispatch = inspectMarkdownAttachmentDispatch(job)
   const prepared = dispatch?.retryPreparation
   if (prepared && !prepared.dispatched) {
-    if (job.attempt !== prepared.targetAttempt && job.attempt !== prepared.fromAttempt)
+    if (prepared.mutating)
+      throw new Error('markdown-attachment-retry-preparation-in-progress')
+    if (job.attempt !== prepared.targetAttempt && (prepared.mutationComplete || job.attempt !== prepared.fromAttempt))
       throw new Error('markdown-attachment-retry-preparation-invalidated')
     return
   }
@@ -663,6 +666,7 @@ export const retryMarkdownAttachmentJob = (job: MarkdownAttachmentJob) => {
       observationNotificationCauses: previous.observationNotificationCauses,
     }),
     mutationComplete: false,
+    mutating: false,
     dispatched: false,
     failures: [] as unknown[],
   }
@@ -677,6 +681,7 @@ export const retryMarkdownAttachmentJob = (job: MarkdownAttachmentJob) => {
     retryPreparation: preparation,
   }
   preparation.mutationComplete = false
+  preparation.mutating = true
   attachmentDispatches.set(ownedJob, state)
   try {
     job.phase = 'pending'
@@ -691,6 +696,7 @@ export const retryMarkdownAttachmentJob = (job: MarkdownAttachmentJob) => {
     preparation.failures.push(cause)
     throw cause
   } finally {
+    preparation.mutating = false
     // Read native data without invoking a replacement getter or masking the error.
     const attempt = Object.getOwnPropertyDescriptor(ownedJob, 'attempt')
     state.attempt = attempt && 'value' in attempt && Number.isSafeInteger(attempt.value)
