@@ -429,7 +429,13 @@
             :class="ns.e('attachment-status')"
             :aria-live="attachment.statusAriaLive"
           >
-            {{ attachment.progressAriaText }}
+            <slot
+              v-if="attachment.retryPreparation"
+              name="attachment-retry-failure"
+              :failure="attachment.retryPreparation.previousFailure"
+              :causes="attachment.retryPreparation.failures"
+            >{{ attachment.progressAriaText }}</slot>
+            <template v-else>{{ attachment.progressAriaText }}</template>
           </span>
           <div :class="ns.e('attachment-actions')">
             <button
@@ -1325,7 +1331,6 @@ import {
   planMarkdownAttachmentResolve,
   progressMarkdownAttachmentJob,
   rebaseMarkdownAttachmentJob,
-  retryMarkdownAttachmentJob,
   type MarkdownAttachmentJob,
 } from './markdown-editor-attachment-lifecycle'
 import {
@@ -1462,7 +1467,7 @@ import { createMarkdownEditorSessionBinding } from './markdown-editor-session'
 import { createMarkdownEditorNativeTargetOwner } from './markdown-editor-native-target'
 import { freezeMarkdownEditorSessionPanelState, markdownEditorSessionPanelMemoryUnits } from './markdown-editor-session-panels'
 import { captureMarkdownEditorSessionAttachmentState } from './markdown-editor-session-attachment-state'
-import { createMarkdownAttachmentEmbedResourceOwner } from './markdown-editor-attachment-embed-owner'
+import { createMarkdownAttachmentEmbedResourceOwner, type MarkdownAttachmentDispatchOptions } from './markdown-editor-attachment-embed-owner'
 import { createMarkdownEditorSessionCommandResources, isMarkdownEditorSessionOwnedCommand } from './markdown-editor-session-command-resources'
 import type { MarkdownRendererCheckpointHandle, MarkdownRendererLastValidRender, createMarkdownRendererSessionResourceOwner } from '../../markdown-renderer/src/markdown-renderer-session-resources'
 import { createMarkdownEditorSessionLayoutResources } from './markdown-editor-session-layout'
@@ -2111,6 +2116,22 @@ const attachmentPresentations = computed(() =>
     .filter((job) => job.phase !== 'deleted')
     .map((job) => {
       const item = attachmentItems.get(job.itemId ?? job.id)
+      const settlement = inspectMarkdownAttachmentDispatch(job)
+      const preparation = settlement?.retryPreparation
+      const original = toRaw(job)
+      const binding = attachmentJobBindings.get(original)
+      const record = binding && attachmentBatches.get(binding.batch.batchId)
+      const continuing = !!preparation && !preparation.dispatched && !preparation.mutating &&
+        !sessionDisposed && !editorReleased && !attachmentPauseRequested.value &&
+        ['pending', 'progress', 'rejected', 'cancelled'].includes(original.phase) &&
+        (original.attempt === preparation.targetAttempt || (!preparation.mutationComplete && original.attempt === preparation.fromAttempt)) &&
+        !!binding && !!item && binding.item === item && record?.batch === binding.batch &&
+        binding.batch.items[item.order] === item && attachmentItems.get(item.itemId) === item &&
+        original.documentIdentity?.id === transactionStore.documentIdentity.id &&
+        original.documentIdentity.epoch === transactionStore.documentIdentity.epoch &&
+        binding.batch.documentIdentity.id === original.documentIdentity.id &&
+        binding.batch.documentIdentity.epoch === original.documentIdentity.epoch &&
+        isEditorDocumentCurrent(transactionStore.documentIdentity)
       const presentation = createMarkdownAttachmentAtomicPresentation({
         itemId: job.itemId ?? job.id,
         name: item?.name ?? job.name ?? localeText.value.attachments.unnamed,
@@ -2119,11 +2140,19 @@ const attachmentPresentations = computed(() =>
         progress: job.progress,
         copy: localeText.value.attachments,
       })
-      const settlement = inspectMarkdownAttachmentDispatch(job)
+      const actions = [...presentation.actions]
+      const originalAction = actions.find((action) => action.key === 'cancel')
+      if (continuing && originalAction && !actions.some((action) => action.key === 'retry'))
+        actions.push(Object.freeze({ ...originalAction, key: 'retry', label: localeText.value.attachments.actions.retry }))
       return Object.freeze({
         ...presentation,
-        actions: Object.freeze(presentation.actions.map((action) => action.key === 'retry'
-          ? Object.freeze({ ...action, disabled: action.disabled || !settlement?.settled || settlement.attempt !== job.attempt })
+        // Preserve actual job phase and the original preparation failure objects.
+        retryPreparation: continuing ? preparation : null,
+        progressAriaText: continuing
+          ? localeText.value.attachments.status(presentation.name, 'retry', presentation.progress)
+          : presentation.progressAriaText,
+        actions: Object.freeze(actions.map((action) => action.key === 'retry'
+          ? Object.freeze({ ...action, disabled: action.disabled || (!continuing && (!settlement?.settled || settlement.attempt !== job.attempt)) })
           : action)),
       })
     }),
@@ -5677,6 +5706,7 @@ const dispatchAttachmentBatch = (
   batch: MarkdownAttachmentBatchIntent,
   capture?: MarkdownAttachmentCaptureObservation,
   dispatchConfiguration = readAttachmentDispatchConfiguration(),
+  options?: MarkdownAttachmentDispatchOptions,
 ) => {
   const { dispatch, requestDispatch } = dispatchConfiguration
   opaqueAttachmentResourcesObserved.value = true
@@ -5698,28 +5728,35 @@ const dispatchAttachmentBatch = (
   for (const item of batch.items) {
     const job = attachmentJobs.value.find((candidate) => candidate.itemId === item.itemId && candidate.batchId === batch.batchId)
     if (!job) continue
-    const attempt = job.attempt
+    let attempt: number | undefined
     const identity = Object.freeze({ ...transactionStore.documentIdentity })
     const record = attachmentBatches.get(batch.batchId)
-    const original = record?.batch.items[item.order]
-    const file = original === item && attachmentItems.get(item.itemId) === item &&
-      attachmentJobBindings.get(toRaw(job))?.batch === record?.batch &&
-      attachmentJobBindings.get(toRaw(job))?.item === item
-      ? record?.files.get(item)?.file ?? null : null
-    const dispatchInput = (admitProgress: (result: MarkdownAttachmentProviderResult) => boolean) => Object.freeze({
-      batch,
-      item,
-      file,
-      // Synchronous content admission only. Never await this enclosing request.
-      onProgress: (progress: MarkdownAttachmentProviderResult) => admitProgress(progress) && applyAttachmentResult(progress),
-    })
+    const dispatchInput = (admitProgress: (result: MarkdownAttachmentProviderResult) => boolean) => {
+      // The original owner has admitted the dispatch and owns the actual attempt.
+      attempt = job.attempt
+      // Read the actual File only inside owner dispatch, after its retry File phase.
+      const currentRecord = attachmentBatches.get(batch.batchId)
+      const original = currentRecord?.batch.items[item.order]
+      const file = original === item && attachmentItems.get(item.itemId) === item &&
+        attachmentJobBindings.get(toRaw(job))?.batch === currentRecord?.batch &&
+        attachmentJobBindings.get(toRaw(job))?.item === item
+        ? currentRecord?.files.get(item)?.file ?? null : null
+      return Object.freeze({
+        batch,
+        item,
+        file,
+        // Synchronous content admission only. Never await this enclosing request.
+        onProgress: (progress: MarkdownAttachmentProviderResult) => admitProgress(progress) && applyAttachmentResult(progress),
+      })
+    }
     const work = requestDispatch
-      ? attachmentEmbedOwner.runAttachmentConsumerRequest(job, (admitProgress) => requestDispatch(dispatchInput(admitProgress)))
-      : attachmentEmbedOwner.runAttachmentDispatch(job, (admitProgress) => dispatch!(dispatchInput(admitProgress)))
+      ? attachmentEmbedOwner.runAttachmentConsumerRequest(job, (admitProgress) => requestDispatch(dispatchInput(admitProgress)), options)
+      : attachmentEmbedOwner.runAttachmentDispatch(job, (admitProgress) => dispatch!(dispatchInput(admitProgress)), options)
     void work.then((settled) => {
       // Only the real owner's awaited terminal proof reaches content commit.
       applyAttachmentResult(settled)
     }).catch(() => {
+      if (attempt === undefined) return
       const settled = inspectMarkdownAttachmentDispatch(job)
       if (!settled?.settled || settled.attempt !== attempt || job.attempt !== attempt ||
         sessionDisposed || attachmentPauseRequested.value ||
@@ -5731,7 +5768,7 @@ const dispatchAttachmentBatch = (
       job.code = 'attachment-dispatch-rejected'
       revokeAttachmentFile(item.itemId)
     }).finally(() => {
-      if (record) requestTerminalAttachmentRetirement(job, attempt)
+      if (record && attempt !== undefined) requestTerminalAttachmentRetirement(job, attempt)
       // Refresh retry eligibility from real settlement even for cancelled jobs.
       triggerRef(attachmentJobs)
     })
@@ -5754,6 +5791,47 @@ const runAttachmentAction = (
   const originalBinding = attachmentJobBindings.get(original)
   const originalIdentity = transactionStore.documentIdentity
   const originalRevision = transactionStore.revision
+  if (action === 'retry') {
+    const batch = originalBinding?.batch
+    const item = originalBinding?.item
+    const record = batch && attachmentBatches.get(batch.batchId)
+    if (!dispatchConfiguration || (!dispatchConfiguration.dispatch && !dispatchConfiguration.requestDispatch) ||
+      !batch || !item || record?.batch !== batch || batch.items[item.order] !== item ||
+      item.itemId !== itemId || attachmentItems.get(itemId) !== item) return
+    const originalFile = record.files.get(item)
+    const progress = original.progress
+    const code = original.code
+    const message = original.message
+    const assertAdmission: NonNullable<MarkdownAttachmentDispatchOptions['retry']>['assertAdmission'] = (phase) => {
+      const retried = phase === 'after-retry'
+      const preparation = inspectMarkdownAttachmentDispatch(original)?.retryPreparation
+      const expectedAttempt = retried && preparation && !preparation.dispatched
+        ? preparation.targetAttempt : originalAttempt
+      if (sessionDisposed || editorReleased || attachmentPauseRequested.value || !isEditorDocumentCurrent(originalIdentity) ||
+        !attachmentJobs.value.some((candidate) => toRaw(candidate) === original) ||
+        (retried && (!preparation || preparation.dispatched || preparation.mutating || !preparation.mutationComplete)) ||
+        original.attempt !== expectedAttempt || original.phase !== (retried ? 'pending' : originalPhase) ||
+        original.progress !== (retried ? 0 : progress) || original.code !== (retried ? undefined : code) ||
+        original.message !== (retried ? undefined : message) || original.range !== originalRange ||
+        attachmentJobBindings.get(original) !== originalBinding || attachmentItems.get(itemId) !== item ||
+        attachmentBatches.get(batch.batchId) !== record || batch.items[item.order] !== item ||
+        transactionStore.documentIdentity.id !== originalIdentity.id || transactionStore.documentIdentity.epoch !== originalIdentity.epoch ||
+        transactionStore.revision !== originalRevision || original.documentIdentity?.id !== originalIdentity.id ||
+        original.documentIdentity.epoch !== originalIdentity.epoch) throw new Error('editor-attachment-retry-original-custody-invalidated')
+    }
+    const options: MarkdownAttachmentDispatchOptions = Object.freeze({ retry: Object.freeze({
+      beforeRetry: () => {
+        assertAdmission('before-retry')
+        const currentFile = record.files.get(item)
+        if (currentFile && currentFile !== originalFile) throw new Error('editor-attachment-retry-file-custody-invalidated')
+        // The original revoke is idempotent after a partial callback already removed this loan.
+        revokeAttachmentFile(itemId)
+      },
+      assertAdmission,
+    }) })
+    dispatchAttachmentBatch(Object.freeze({ ...batch, items: Object.freeze([item]) }), undefined, dispatchConfiguration, options)
+    return
+  }
   revokeAttachmentFile(itemId)
   if (sessionDisposed || editorReleased || attachmentPauseRequested.value ||
       !attachmentJobs.value.some((candidate) => toRaw(candidate) === original) || original.attempt !== originalAttempt ||
@@ -5762,17 +5840,6 @@ const runAttachmentAction = (
       transactionStore.revision !== originalRevision) return
   if (action === 'cancel') {
     cancelMarkdownAttachmentJob(job)
-  } else if (action === 'retry') {
-    if (attachmentPauseRequested.value) return
-    try { retryMarkdownAttachmentJob(job) } catch {
-      // Unknown legacy settlement or a still-running attempt cannot be retried.
-      return
-    }
-    const batch = job.batchId ? attachmentBatches.get(job.batchId)?.batch : undefined
-    const item = batch?.items.find((candidate) => candidate.itemId === itemId)
-    if (batch && item) {
-      dispatchAttachmentBatch(Object.freeze({ ...batch, items: Object.freeze([item]) }), undefined, dispatchConfiguration)
-    }
   } else {
     const originalPhase = job.phase
     const originalRange = job.range

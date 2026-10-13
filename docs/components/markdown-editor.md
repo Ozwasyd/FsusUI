@@ -1530,3 +1530,55 @@ and throw a conflict after allocating source state. Retry configuration refusal
 likewise precedes File withdrawal and attempt mutation.
 Paste and drop pass their same frozen entry configuration through transfer parsing,
 selection reentry, capture and dispatch; transfer never rereads later props.
+
+### Pending original atomic retry consumer candidate
+
+The separate consumer candidate depends on original owner
+`b0775bf73a6a5a78067ff72afdc598f27639caa2`, which is still under independent
+review. Its exact lifecycle/consumer postimages are staged only in this candidate;
+the owner algorithms are not rewritten by Main and are not called accepted.
+
+Main forwards the same frozen dispatch configuration and original job/binding/
+document admission through the original strict or legacy entry's retry option.
+It performs no File withdrawal or native retry mutation before owner admission.
+The owner alone admits the old private scope/ledger, invokes Main's original File
+callback, mutates the original native attempt and issues the one dispatch. Main's
+phase callback checks the actual captured job, binding, item/batch membership,
+document identity/epoch/revision and expected old/new native fields. File lookup
+occurs inside the actual dispatch callback after owner File handling, so no earlier
+loan is smuggled through cancellation/reentry. No public census or cloned ledger
+grants retry. A pre-admission refusal leaves the old attempt and content unchanged.
+Main records the actual attempt only inside that admitted dispatch callback, never
+an old-attempt prediction. If the callback was not entered, its rejection and
+retirement continuations do not mutate a guessed attempt. The b077 owner review
+remains OPEN for custody between native retry mutation and new dispatch ledger;
+Main does not implement ledger rollback or claim that finding closed.
+
+This is pending-source integration, not completed P2 acceptance. Original controls
+and all runtime/qualification remain UNRUN/HOLD; Root physical staging and real
+Blog business producer/wiring remain separate. No complete resources, recovery,
+full-ready or eviction is granted.
+
+### Accepted atomic retry preparation consumer dependency
+
+The isolated retry consumer replaces only the original owner/lifecycle source
+with the exact accepted `e0351af7c1a855caf0fdc4d42507cc364ebb76dc` postimages.
+After mutation, admission reads the original undelivered ledger preparation's
+`targetAttempt`, never a native attempt increment prediction. The original File
+loan identity is checked before its idempotent native revocation; partial prior
+revocation cannot transfer a new File. File and actual attempt are still read only
+inside admitted dispatch.
+
+A real undelivered nonmutating preparation can display continuation retry without
+claiming settlement. Original strict/legacy entries reuse that same preparation;
+no repeated File callback, attempt increment, replacement job or duplicate ledger
+is introduced. The consumer composite remains independently reviewable and is
+separate from the native terminal transaction source. Runtime and qualification
+remain unrun; preparation is not settled work.
+
+Continuation adds the original Retry action metadata alongside the existing action
+without rewriting the native job phase to rejected or marking its ledger settled.
+The `attachment-retry-failure` scoped slot receives the original preparation's
+`previousFailure` object and original raw `failures` values; default display uses
+the existing localized retry status. No token, geometry, locale or typography
+source changes. Final admission belongs to the original owner after all callbacks.
