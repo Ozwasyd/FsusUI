@@ -221,6 +221,11 @@ does not switch its source. Use a keyed remount for a different binding. The
 component's provided context releases with its setup scope; the producer
 remains owned by its creator and can be shared with another provider. Without
 a producer at setup, the existing reactive plain-props path remains unowned.
+Its stable configuration view reads the original prop fields through property
+Refs; `configProducer` is excluded from enumeration and reads. Supplying a
+handle later therefore does not expose binding metadata through injected or
+slot configuration. The view copies neither configuration values nor nested
+objects and does not confer custody on externally writable props.
 
 `ConfigProviderProps` continues describing configuration data only, so the
 context's data type excludes the producer binding. `ConfigProviderInputProps`

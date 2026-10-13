@@ -3,7 +3,10 @@ import {
   defineComponent,
   inject,
   onBeforeUnmount,
+  proxyRefs,
   renderSlot,
+  shallowReadonly,
+  toRefs,
   watch,
 } from 'vue'
 import { provideGlobalConfig } from './hooks/use-global-config'
@@ -25,9 +28,12 @@ const ConfigProvider = defineComponent({
     const inheritedThemeModeAtSetup = parentConfig?.value?.themeMode
     const inheritedMotionAtSetup = parentConfig?.value?.motion
     // Bind once: replacing an external prop is not a controlled producer write.
-    const producer = props.configProducer
+    const { configProducer: producerRef, ...configRefs } = toRefs(props)
+    const producer = producerRef?.value
+    // A stable live view keeps fallback reads reactive without binding metadata.
+    const plainConfig = shallowReadonly(proxyRefs(configRefs))
     const localConfig = computed(() =>
-      producer ? producer.config.value : props
+      producer ? producer.config.value : plainConfig
     )
 
     watch(
@@ -86,7 +92,7 @@ const ConfigProvider = defineComponent({
       }
     })
 
-    const config = provideGlobalConfig(producer ?? props)
+    const config = provideGlobalConfig(producer ?? plainConfig)
     return () => renderSlot(slots, 'default', { config: config?.value })
   },
 })
