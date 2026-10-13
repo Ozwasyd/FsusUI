@@ -1317,6 +1317,8 @@ import {
   type MarkdownAttachmentProviderResult,
   type MarkdownAttachmentRange,
   type MarkdownAttachmentTerminalCustody,
+  type MarkdownAttachmentTerminalRevisionIssuer,
+  type MarkdownAttachmentTerminalRevisionReservation,
   type MarkdownAttachmentTerminalObservation,
   type MarkdownAttachmentTerminalConsumer,
   type MarkdownAttachmentTerminalNotificationFailure,
@@ -5560,6 +5562,14 @@ const handleAttachmentPickerChange = (event: Event) => {
   input.value = ''
 }
 
+type NativeAttachmentTerminalRevisionReservation = {
+  readonly token: MarkdownAttachmentTerminalRevisionReservation
+  readonly application: NativeAttachmentTerminalApplication
+  readonly leaseRef: object
+  active: boolean
+  applyingAccepted: boolean
+  publicationAccepted: boolean
+}
 type NativeAttachmentTerminalApplication = {
   readonly custody: MarkdownAttachmentTerminalCustody
   observation: MarkdownAttachmentTerminalObservation | null
@@ -5569,6 +5579,8 @@ type NativeAttachmentTerminalApplication = {
   loanAccepted: boolean
   loanReturned: unknown
   loanFailure: { readonly firstCause: unknown; latestCause: unknown } | null
+  revisionReservation: NativeAttachmentTerminalRevisionReservation | null
+  reservingRevision: boolean
   releasingInput: boolean
   inputReleased: boolean
   transaction: MarkdownEditorTransactionEvent | null
@@ -5576,6 +5588,78 @@ type NativeAttachmentTerminalApplication = {
 }
 let nativeAttachmentTerminalApplication: NativeAttachmentTerminalApplication | null = null
 const attachmentTerminalNotificationFailures: MarkdownAttachmentTerminalNotificationFailure[] = []
+const nativeAttachmentTerminalRevisionReservations = new WeakMap<MarkdownAttachmentTerminalRevisionReservation, NativeAttachmentTerminalRevisionReservation>()
+const retainAttachmentTerminalLoanFailure = (
+  application: NativeAttachmentTerminalApplication,
+  observation: MarkdownAttachmentTerminalObservation,
+  cause: unknown,
+  returned: unknown,
+) => {
+  application.loanFailure ??= { firstCause: cause, latestCause: cause }
+  application.loanFailure.latestCause = cause
+  application.loanAccepted = false
+  application.cause = application.loanFailure.firstCause
+  attachmentTerminalNotificationFailures.push(Object.freeze({ observation, cause, returned }))
+}
+const attachmentTerminalRevisionIssuer = Object.freeze<MarkdownAttachmentTerminalRevisionIssuer>({
+  reserve(custody, leaseRef) {
+    const application = nativeAttachmentTerminalApplication
+    if (!application || application.custody !== custody || application.revisionReservation || application.reservingRevision ||
+        !application.notifying || application.observation?.phase !== 'applying' ||
+        !application.loanTaken || !application.loanInvoked || application.loanFailure !== null ||
+        (typeof leaseRef !== 'object' && typeof leaseRef !== 'function') || leaseRef === null) return null
+    const observation = application.observation
+    application.reservingRevision = true
+    try {
+      if (!custody.hasCustody() || nativeAttachmentTerminalApplication !== application ||
+          application.revisionReservation || application.loanFailure !== null || !application.notifying ||
+          !application.loanTaken || !application.loanInvoked || application.observation?.phase !== 'applying') return null
+      // This binds one actual caller-owned reference; the original SDK independently proves its private lease.
+      const token = Object.freeze({}) as MarkdownAttachmentTerminalRevisionReservation
+      const record: NativeAttachmentTerminalRevisionReservation = { token, application, leaseRef,
+        active: true, applyingAccepted: false, publicationAccepted: false }
+      application.revisionReservation = record
+      nativeAttachmentTerminalRevisionReservations.set(token, record)
+      return token
+    } catch (cause) {
+      // Reader debt belongs to this original loan even when its consumer catches the throw.
+      retainAttachmentTerminalLoanFailure(application, observation, cause, application.loanReturned)
+      throw cause
+    } finally {
+      application.reservingRevision = false
+    }
+  },
+  hasReservation(reservation, leaseRef, phase, transaction) {
+    const record = nativeAttachmentTerminalRevisionReservations.get(reservation)
+    const application = nativeAttachmentTerminalApplication
+    if (!record || !application) return false
+    const current = () => record.active && record.leaseRef === leaseRef && record.application === application &&
+      nativeAttachmentTerminalApplication === application && application.revisionReservation === record &&
+      !application.reservingRevision && application.loanFailure === null && application.notifying &&
+      application.loanTaken && application.loanInvoked && application.observation?.phase === phase
+    const observation = application.observation
+    if (!observation || !current()) return false
+    try {
+      if (!application.custody.hasCustody() || !current()) return false
+      if (phase === 'applying') return transaction === undefined
+      return record.applyingAccepted && (phase !== 'committed' || record.publicationAccepted) &&
+        application.transaction === transaction && transaction?.accepted === true &&
+        transaction.beforeRevision === application.custody.beforeRevision && transaction.revision > transaction.beforeRevision && current()
+    } catch (cause) {
+      record.active = false
+      retainAttachmentTerminalLoanFailure(application, observation, cause, application.loanReturned)
+      throw cause
+    }
+  },
+  cancelReservation(reservation, leaseRef) {
+    const record = nativeAttachmentTerminalRevisionReservations.get(reservation)
+    if (!record || record.leaseRef !== leaseRef) return false
+    record.active = false
+    return true // Native association withdrawal only; never SDK cancellation or settlement.
+  },
+})
+const getAttachmentTerminalRevisionIssuer = () => attachmentTerminalRevisionIssuer
+
 const withAttachmentTerminalTransaction = (
   observation: MarkdownAttachmentTerminalObservation,
   consume: MarkdownAttachmentTerminalConsumer,
@@ -5584,10 +5668,7 @@ const withAttachmentTerminalTransaction = (
   if (!application || !application.notifying || application.loanTaken ||
       application.observation !== observation || observation.custody !== application.custody) return false
   const retainFailure = (cause: unknown, returned: unknown) => {
-    application.loanFailure ??= { firstCause: cause, latestCause: cause }
-    application.loanFailure.latestCause = cause
-    application.cause = application.loanFailure.firstCause
-    attachmentTerminalNotificationFailures.push(Object.freeze({ observation, cause, returned }))
+    retainAttachmentTerminalLoanFailure(application, observation, cause, returned)
   }
   try {
     if (observation.phase !== 'refused' && !application.custody.hasCustody()) return false
@@ -5762,10 +5843,11 @@ const applyAttachmentResult = (result: MarkdownAttachmentProviderResult) => {
           application?.releasingInput === true && nativeCustody(),
       })
       application = { custody, observation: null, notifying: false, loanTaken: false,
-        loanInvoked: false, loanAccepted: false, loanReturned: undefined, loanFailure: null,
+        loanInvoked: false, loanAccepted: false, loanReturned: undefined, loanFailure: null, revisionReservation: null, reservingRevision: false,
         releasingInput: false, inputReleased: false, transaction: null, cause: undefined }
       nativeAttachmentTerminalApplication = application
       if (!notify(Object.freeze({ phase: 'applying', custody }))) return refuseCompletion()
+      if (application.revisionReservation) application.revisionReservation.applyingAccepted = true
     }
     if (!nativeCustody()) return refuseCompletion()
     if (application) application.releasingInput = true
@@ -5784,6 +5866,14 @@ const applyAttachmentResult = (result: MarkdownAttachmentProviderResult) => {
       if (event.accepted) {
         job.range = resolvedRange
         triggerRef(attachmentJobs)
+        const reservation = application?.revisionReservation
+        // The sole accepted dispatcher supplies this exact event before public source callbacks.
+        // Unarmed consumers keep their original applying/committed observation path.
+        if (application && reservation?.active && reservation.applyingAccepted) {
+          if (!nativeCustody() || !notify(Object.freeze({ phase: 'accepted', custody: application.custody, transaction: event })))
+            throw new Error('attachment-terminal-revision-publication-refused')
+          reservation.publicationAccepted = true
+        }
       }
     }, job)
     const event = application?.transaction
@@ -5813,6 +5903,7 @@ const applyAttachmentResult = (result: MarkdownAttachmentProviderResult) => {
       hasCleanupFailure = true
       cleanupFailure = cause
     } finally {
+      if (application?.revisionReservation) application.revisionReservation.active = false
       if (nativeAttachmentTerminalApplication === application) nativeAttachmentTerminalApplication = null
       attachmentPublicationDepth -= 1
       try {
@@ -7625,6 +7716,7 @@ defineExpose({
   applyAttachmentResult,
   withAttachmentFile,
   withAttachmentTerminalTransaction,
+  getAttachmentTerminalRevisionIssuer,
   inspectAttachmentTerminalNotificationFailures,
   dispatchTransaction: (transaction: MarkdownEditorTransaction) => dispatchTransaction(transaction),
   insertMarkdownAtCursor,

@@ -1567,3 +1567,35 @@ causes (including undefined), unsupported returned work and post-callback custod
 failure remain original notification debt even if an outer callback catches or
 returns true. Notify requires the actual accepted inner loan and no failure debt;
 a later refusal notification cannot erase the first/raw failure.
+
+### Original terminal revision issuer producer seam
+
+Issuer `reserve` and `hasReservation` retain thrown control-read failures in the
+existing original loan failure holder before rethrowing the same raw cause,
+including `undefined`. That holder's explicit presence permanently blocks
+reissuance and reservation validation for the application. The existing terminal
+notification gates observe this debt even if a consumer catches the reader throw
+and returns `true`; cancellation and application end do not erase failure history.
+
+The actual mounted editor exposes one stable
+`getAttachmentTerminalRevisionIssuer()` object. Its `reserve(custody, leaseRef)`
+method only runs within the original authentic applying loan and binds one opaque
+reservation to that real native application/job/dispatch and exact caller lease
+reference. The original SDK must independently validate its real private lease
+and bind this issuer through the existing original mounted/Writer composition.
+A supplied object shape or Boolean callback is not that binding.
+
+`hasReservation(reservation, leaseRef, phase, exactEvent)` reads the actual private
+native association, original notification/loan state and custody. It does not take
+a second loan, complete the SDK lease or publish an SDK document. Cancellation
+withdraws only that native association; refusal/debt/application end invalidate it
+without granting cleanup or settlement. No body/history copy or second authority
+is introduced.
+
+Only an armed reservation emits `accepted` from the existing dispatcher's private
+accepted observer, before public transaction/model/source callbacks, carrying the
+SAME accepted event. The original SDK can use that genuine producer seam for one
+controlled source publication and then the same `committed` event for completion.
+Without a reservation, the existing applying/committed unavailable path remains.
+The SDK controlled transition and Main same-entry association are separate source
+work and are not implemented or qualified by this native producer alone.
