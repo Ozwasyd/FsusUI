@@ -3,8 +3,10 @@ import { EVENT_CODE } from '@element-plus/constants'
 import SubMenu from './submenu'
 
 class MenuItem {
+  public domNode: HTMLElement
   public submenu: SubMenu | null = null
-  constructor(public domNode: HTMLElement, namespace: string) {
+  constructor(domNode: HTMLElement, namespace: string) {
+    this.domNode = domNode
     this.init(namespace)
   }
 

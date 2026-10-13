@@ -22,11 +22,13 @@ const flatNodes = (nodes: Node[], leafOnly: boolean) => {
 }
 
 export default class Store {
+  readonly config: CascaderConfig
   readonly nodes: Node[]
   readonly allNodes: Node[]
   readonly leafNodes: Node[]
 
-  constructor(data: CascaderOption[], readonly config: CascaderConfig) {
+  constructor(data: CascaderOption[], config: CascaderConfig) {
+    this.config = config
     const nodes = (data || []).map(
       (nodeData) => new Node(nodeData, this.config)
     )
