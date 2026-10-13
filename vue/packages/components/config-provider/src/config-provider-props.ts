@@ -6,6 +6,7 @@ import { themeModes } from './theme-mode'
 
 import type { ExtractPropTypes } from 'vue'
 import type { Language } from '@element-plus/locale'
+import type { GlobalConfigSnapshotProducer } from './constants'
 import type {
   ButtonConfigContract,
   ExperimentalFeatures,
@@ -14,7 +15,7 @@ import type {
   RenderPipelineConfigContract,
 } from './config-contract'
 
-export const configProviderProps = buildProps({
+const configProviderValueProps = buildProps({
   /**
    * @description Controlling if the users want a11y features
    */
@@ -96,4 +97,15 @@ export const configProviderProps = buildProps({
     default: 'el',
   },
 } as const)
-export type ConfigProviderProps = ExtractPropTypes<typeof configProviderProps>
+
+// Keep the context's data type separate from the producer binding itself.
+export type ConfigProviderProps = ExtractPropTypes<typeof configProviderValueProps>
+
+export const configProviderProps = buildProps({
+  ...configProviderValueProps,
+  configProducer: {
+    type: definePropType<GlobalConfigSnapshotProducer>(Object),
+  },
+} as const)
+
+export type ConfigProviderInputProps = ExtractPropTypes<typeof configProviderProps>
