@@ -1324,6 +1324,9 @@ import {
   type MarkdownAttachmentRange,
   type MarkdownAttachmentTerminalCustody,
   type MarkdownAttachmentTerminalRevisionIssuer,
+  type MarkdownAttachmentTerminalCohort,
+  type MarkdownAttachmentTerminalCohortMember,
+  type MarkdownAttachmentTerminalCohortIssuer,
   type MarkdownAttachmentTerminalRevisionReservation,
   type MarkdownAttachmentTerminalObservation,
   type MarkdownAttachmentTerminalConsumer,
@@ -1546,6 +1549,8 @@ const attrs = useAttrs()
 const rootElementRef = ref<HTMLElement | null>(null)
 const sessionSurfacePaused = ref(false)
 const nativeHandoverReceiving = ref(false)
+let invalidateAttachmentCohorts: (() => void) | undefined = undefined
+let guardAttachmentCohortOperation: ((job: MarkdownAttachmentJob | undefined) => void) | undefined = undefined
 let invalidateNativeTargetLifetime: (() => void) | undefined = undefined
 let nativeHandoverViewRestoring = false
 let invalidateNativeSurfacePublication: (() => void) | undefined = undefined
@@ -1554,10 +1559,11 @@ let retireSnapshotPublicationAuthority: (() => void) | undefined = undefined
 let sessionUnmountFailed = false
 let sessionUnmountFirstCause: unknown
 // Initial ref attachment establishes the birth; replacement/withdrawal retires it.
-watch(rootElementRef, (_root, previous) => { if (previous) invalidateNativeTargetLifetime?.() }, { flush: 'sync' })
-watch(sessionSurfacePaused, (paused) => { if (paused) invalidateNativeTargetLifetime?.() }, { flush: 'sync' })
+watch(rootElementRef, (_root, previous) => { if (previous) { invalidateAttachmentCohorts?.(); invalidateNativeTargetLifetime?.() } }, { flush: 'sync' })
+watch(sessionSurfacePaused, (paused) => { if (paused) { invalidateAttachmentCohorts?.(); invalidateNativeTargetLifetime?.() } }, { flush: 'sync' })
 // Retire before the original scheduler registers its cleanup callbacks.
 onBeforeUnmount(() => {
+  invalidateAttachmentCohorts?.()
   try { invalidateNativeTargetLifetime?.() } catch (cause) {
     if (!sessionUnmountFailed) sessionUnmountFirstCause = cause
     sessionUnmountFailed = true
@@ -1908,6 +1914,7 @@ const revokeAttachmentFiles = (itemIds: readonly string[]) => {
 const revokeAttachmentFile = (itemId: string) => revokeAttachmentFiles([itemId])
 
 const releaseAttachmentFiles = () => {
+  invalidateAttachmentCohorts?.()
   attachmentFileCleanupDepth += 1
   try {
     const records = [...attachmentBatches.values()]
@@ -2933,6 +2940,7 @@ let pendingMetricsChange: MarkdownEditorMetricsChange | undefined
 const performEditorOperation = (
   operation: EditorOperation,
 ): MarkdownEditorDispatchResult => {
+  guardAttachmentCohortOperation?.(operation.kind === 'transaction' ? operation.attachmentJob : undefined)
   const transaction = operationTransaction(
     operation.kind === 'transaction'
       ? {
@@ -3154,8 +3162,11 @@ const readSelectionFrom = (
 
 const captureSelection = (breakMerge = true) => {
   const previous = transactionStore.selection
+  const next = readSelectionFrom(textareaRef.value)
+  if (next.start !== previous.start || next.end !== previous.end || next.direction !== previous.direction)
+    invalidateAttachmentCohorts?.()
   transactionStore.setSelection(
-    readSelectionFrom(textareaRef.value),
+    next,
     breakMerge,
   )
   const selection = transactionStore.selection
@@ -3206,6 +3217,7 @@ const selectTableCell = async (cell: MarkdownTableCellIdentity) => {
     return
   }
   currentTableCell.value = resolved
+  invalidateAttachmentCohorts?.()
   transactionStore.setSelection(
     {
       direction: 'none',
@@ -4196,6 +4208,7 @@ nativeSurfaceResources.ownWatch(watch([editingBlocked, overflowItemCount],
   if (blocked || !itemCount) commandsExpanded.value = false
   if (!blocked) return
 
+  invalidateAttachmentCohorts?.()
   transactionStore.breakMergeGroup()
   if (isComposing.value) {
     nativeMachine.apply({
@@ -5537,6 +5550,7 @@ const setMode = (mode: MarkdownEditorMode) => {
     selection: captureSelection(false),
     source: transactionStore.value,
   })
+  invalidateAttachmentCohorts?.()
   transactionStore.setSelection(retained.selection, false)
   currentMode.value = nextMode
   refreshWritingAidsDocument()
@@ -5688,6 +5702,237 @@ const attachmentTerminalRevisionIssuer = Object.freeze<MarkdownAttachmentTermina
   },
 })
 const getAttachmentTerminalRevisionIssuer = () => attachmentTerminalRevisionIssuer
+
+type NativeAttachmentCohortMember = MarkdownAttachmentTerminalCohortMember & {
+  readonly controller: AbortController
+  published: boolean
+  dispatchRef: object | null
+}
+type NativeAttachmentCohort = {
+  readonly token: MarkdownAttachmentTerminalCohort
+  readonly capture: MarkdownAttachmentCaptureObservation
+  readonly beforeRevision: number
+  revision: number
+  value: string
+  active: boolean
+  members: NativeAttachmentCohortMember[]
+  publications: MarkdownEditorTransactionEvent[]
+  application: NativeAttachmentTerminalApplication | null
+}
+const nativeAttachmentCohorts = new WeakMap<MarkdownAttachmentTerminalCohort, NativeAttachmentCohort>()
+const issuedAttachmentCohorts = new WeakSet<MarkdownAttachmentTerminalCohort>()
+const activeAttachmentCohorts = new Set<NativeAttachmentCohort>()
+let reservingAttachmentCohort = false
+const revokeAttachmentCohort = (record: NativeAttachmentCohort) => {
+  record.active = false
+  activeAttachmentCohorts.delete(record)
+  nativeAttachmentCohorts.delete(record.token)
+  record.application = null
+  record.members = []
+  record.publications = []
+}
+invalidateAttachmentCohorts = () => {
+  for (const record of activeAttachmentCohorts) revokeAttachmentCohort(record)
+}
+// Read passive tuples once. Accessor/proxy reentry cannot grant a reservation:
+// the original single issuer and private custody are checked again afterwards.
+const readAttachmentCohortMember = (value: MarkdownAttachmentTerminalCohortMember): MarkdownAttachmentTerminalCohortMember | null => {
+  if (!value || typeof value !== 'object') return null
+  const prototype = Object.getPrototypeOf(value)
+  if (prototype !== Object.prototype && prototype !== null) return null
+  const slots = Object.getOwnPropertyDescriptors(value)
+  if (Reflect.ownKeys(slots).length !== 3 || !slots.item || !('value' in slots.item) ||
+      !slots.jobRef || !('value' in slots.jobRef) || !slots.leaseRef || !('value' in slots.leaseRef)) return null
+  const leaseRef: unknown = slots.leaseRef.value
+  if (leaseRef === null || (typeof leaseRef !== 'object' && typeof leaseRef !== 'function')) return null
+  return Object.freeze({ item: slots.item.value, jobRef: slots.jobRef.value, leaseRef }) as MarkdownAttachmentTerminalCohortMember
+}
+const currentAttachmentCohort = (record: NativeAttachmentCohort, publication = false) => {
+  const declaredId = props.documentIdentity?.id ?? commandTrayId
+  const declaredEpoch = props.documentIdentity?.epoch ?? 0
+  const identity = record.capture.batch.documentIdentity
+  const application = nativeAttachmentTerminalApplication
+  const event = publication && record.application === application ? application?.transaction : null
+  if (!record.active || sessionDisposed || editorReleased || attachmentPauseRequested.value || sessionSurfacePaused.value ||
+      declaredId !== identity.id || declaredEpoch !== identity.epoch ||
+      transactionStore.documentIdentity.id !== identity.id || transactionStore.documentIdentity.epoch !== identity.epoch ||
+      transactionStore.revision !== (event?.revision ?? record.revision) ||
+      transactionStore.value !== (event?.value ?? record.value) ||
+      (event && (!event.accepted || event.beforeRevision !== record.revision)) ||
+      (application && !record.members.some((member) => member.jobRef === application.custody.jobRef && !member.published))) return false
+  return record.members.every((member) => {
+    if (member.published) {
+      // Original retirement may remove File/item bindings, but keeps this SAME job/proof.
+      const proof = inspectMarkdownAttachmentDispatch(member.jobRef as MarkdownAttachmentJob)
+      return member.jobRef.attempt === 1 && member.jobRef.phase === 'resolved' &&
+        attachmentJobs.value.some((candidate) => toRaw(candidate) === member.jobRef) &&
+        proof?.dispatchRef === member.dispatchRef && proof.attempt === 1 && proof.resultSettlement === 'fulfilled'
+    }
+    const current = application?.custody.jobRef === member.jobRef ? application : null
+    if (current && member.jobRef.attempt === 1 && current.custody.attempt === 1 &&
+        current.custody.capture === record.capture && current.custody.item === member.item)
+      return current.custody.hasCustody()
+    const batch = record.capture.batch
+    const batchRecord = attachmentBatches.get(batch.batchId)
+    const binding = attachmentJobBindings.get(member.jobRef as MarkdownAttachmentJob)
+    const job = member.jobRef
+    return batchRecord?.batch === batch && batchRecord.capture === record.capture &&
+      batchRecord.files.get(member.item)?.controller === member.controller && !member.controller.signal.aborted &&
+      !batch.signal.aborted && !member.item.signal.aborted && attachmentItems.get(member.item.itemId) === member.item &&
+      binding?.batch === batch && binding.item === member.item && batch.items[member.item.order] === member.item &&
+      record.capture.plan.jobs.includes(job) && attachmentJobs.value.some((candidate) => toRaw(candidate) === job) &&
+      job.attempt === 1 && job.revision === batch.revision && job.documentIdentity?.id === identity.id &&
+      job.documentIdentity.epoch === identity.epoch && (job.phase === 'pending' || job.phase === 'progress')
+  }) && record.active
+}
+guardAttachmentCohortOperation = (job) => {
+  const application = nativeAttachmentTerminalApplication
+  for (const record of activeAttachmentCohorts) {
+    if (!application || record.application !== application || !job || toRaw(job) !== application.custody.jobRef ||
+        !application.revisionReservation?.active || !application.revisionReservation.applyingAccepted ||
+        !currentAttachmentCohort(record)) revokeAttachmentCohort(record)
+  }
+}
+const retainAttachmentCohortReaderFailure = (
+  application: NativeAttachmentTerminalApplication | null,
+  observation: MarkdownAttachmentTerminalObservation | null,
+  cause: unknown,
+) => {
+  // A reader failure belongs only to the original loan/notification it read.
+  // Reentry must never attribute it to a replacement application or observation.
+  if (application && observation && nativeAttachmentTerminalApplication === application &&
+      application.notifying && application.observation === observation)
+    retainAttachmentTerminalLoanFailure(application, observation, cause, application.loanReturned)
+}
+const attachmentTerminalCohortIssuer = Object.freeze<MarkdownAttachmentTerminalCohortIssuer>({
+  reserve(custody, reservation, members) {
+    const application = nativeAttachmentTerminalApplication
+    const single = nativeAttachmentTerminalRevisionReservations.get(reservation)
+    if (reservingAttachmentCohort || !application || single?.application !== application || application.custody !== custody ||
+        activeAttachmentCohorts.size || !application.observation || application.observation.phase !== 'applying') return null
+    const observation = application.observation
+    reservingAttachmentCohort = true
+    try {
+      if (!Array.isArray(members) || Object.getPrototypeOf(members) !== Array.prototype) return null
+      const slots = Object.getOwnPropertyDescriptors(members)
+      const capture = custody.capture
+      if (members.length !== capture.plan.jobs.length || members.length !== custody.batch.items.length ||
+          Reflect.ownKeys(slots).length !== members.length + 1 || custody.batch !== capture.batch || custody.attempt !== 1) return null
+      const retained: NativeAttachmentCohortMember[] = []
+      const batchRecord = attachmentBatches.get(custody.batch.batchId)
+      if (batchRecord?.batch !== custody.batch || batchRecord.capture !== capture) return null
+      for (let index = 0; index < capture.plan.jobs.length; index += 1) {
+        const slot = slots[String(index)]
+        if (!slot || !('value' in slot)) return null
+        const member = readAttachmentCohortMember(slot.value)
+        if (!member || member.jobRef !== capture.plan.jobs[index] || member.item !== custody.batch.items[index] ||
+            retained.some((previous) => previous.leaseRef === member.leaseRef)) return null
+        const loan = batchRecord.files.get(member.item)
+        if (!loan) return null
+        retained.push({ ...member, controller: loan.controller, published: false, dispatchRef: null })
+      }
+      if (!retained.some((member) => member.jobRef === custody.jobRef && member.item === custody.item && member.leaseRef === single.leaseRef) ||
+          !attachmentTerminalRevisionIssuer.hasReservation(reservation, single.leaseRef, 'applying') || activeAttachmentCohorts.size) return null
+      const token = Object.freeze({}) as MarkdownAttachmentTerminalCohort
+      const record: NativeAttachmentCohort = { token, capture, beforeRevision: custody.beforeRevision,
+        revision: custody.beforeRevision, value: transactionStore.value, active: true, members: retained, publications: [], application }
+      if (!currentAttachmentCohort(record) || !attachmentTerminalRevisionIssuer.hasReservation(reservation, single.leaseRef, 'applying')) return null
+      issuedAttachmentCohorts.add(token)
+      nativeAttachmentCohorts.set(token, record)
+      activeAttachmentCohorts.add(record)
+      return token
+    } catch (cause) {
+      retainAttachmentTerminalLoanFailure(application, observation, cause, application.loanReturned)
+      throw cause
+    } finally {
+      reservingAttachmentCohort = false
+    }
+  },
+  join(token, custody, reservation, leaseRef) {
+    const record = nativeAttachmentCohorts.get(token)
+    const application = nativeAttachmentTerminalApplication
+    const observation = application?.observation ?? null
+    if (!record?.active || record.application || !application || application.custody !== custody || custody.capture !== record.capture ||
+        custody.beforeRevision !== record.revision || !record.members.some((member) => !member.published &&
+          member.item === custody.item && member.jobRef === custody.jobRef && member.leaseRef === leaseRef)) return false
+    try {
+      if (!attachmentTerminalRevisionIssuer.hasReservation(reservation, leaseRef, 'applying') || !currentAttachmentCohort(record) ||
+          !attachmentTerminalRevisionIssuer.hasReservation(reservation, leaseRef, 'applying') || !record.active) return false
+      record.application = application
+      return true
+    } catch (cause) {
+      retainAttachmentCohortReaderFailure(application, observation, cause)
+      revokeAttachmentCohort(record)
+      throw cause
+    }
+  },
+  inspectContinuation(token, input) {
+    const application = nativeAttachmentTerminalApplication
+    const observation = application?.observation ?? null
+    const record = nativeAttachmentCohorts.get(token)
+    if (!record?.active) return null
+    try {
+      const member = readAttachmentCohortMember(input)
+      if (!member || !record.members.some((candidate) => !candidate.published && candidate.item === member.item &&
+          candidate.jobRef === member.jobRef && candidate.leaseRef === member.leaseRef) ||
+          nativeAttachmentTerminalApplication?.transaction || !currentAttachmentCohort(record)) return null
+      return Object.freeze({ capture: record.capture, beforeRevision: record.beforeRevision,
+        revision: record.revision, publications: Object.freeze([...record.publications]) })
+    } catch (cause) {
+      retainAttachmentCohortReaderFailure(application, observation, cause)
+      revokeAttachmentCohort(record)
+      throw cause
+    }
+  },
+  hasPublication(token, reservation, leaseRef, phase, event) {
+    const record = nativeAttachmentCohorts.get(token)
+    const application = nativeAttachmentTerminalApplication
+    const observation = application?.observation ?? null
+    if (!record?.active || !application || record.application !== application || application.transaction !== event ||
+        !record.members.some((member) => !member.published && member.jobRef === application.custody.jobRef && member.leaseRef === leaseRef)) return false
+    try {
+      return attachmentTerminalRevisionIssuer.hasReservation(reservation, leaseRef, phase, event) &&
+        currentAttachmentCohort(record, true) && attachmentTerminalRevisionIssuer.hasReservation(reservation, leaseRef, phase, event) && record.active
+    } catch (cause) {
+      retainAttachmentCohortReaderFailure(application, observation, cause)
+      revokeAttachmentCohort(record)
+      throw cause
+    }
+  },
+  cancel(token) {
+    const record = nativeAttachmentCohorts.get(token)
+    if (!issuedAttachmentCohorts.has(token)) return false
+    if (record) revokeAttachmentCohort(record)
+    return true // Only native continuation revoked. No File, SDK or application-ended acknowledgement.
+  },
+})
+const getAttachmentTerminalCohortIssuer = () => attachmentTerminalCohortIssuer
+const completeAttachmentCohortPublication = (application: NativeAttachmentTerminalApplication) => {
+  for (const record of activeAttachmentCohorts) {
+    if (record.application !== application) continue
+    const event = application.transaction
+    const single = application.revisionReservation
+    if (!event?.accepted || !single?.applyingAccepted || !single.publicationAccepted || application.loanFailure !== null ||
+        !application.loanAccepted || !currentAttachmentCohort(record, true)) {
+      revokeAttachmentCohort(record)
+      continue
+    }
+    const member = record.members.find((candidate) => candidate.jobRef === application.custody.jobRef)
+    if (!member || member.published) { revokeAttachmentCohort(record); continue }
+    record.publications.push(event)
+    record.revision = event.revision
+    record.value = event.value
+    member.dispatchRef = application.custody.dispatchRef
+    member.published = true
+  }
+}
+const endAttachmentCohortApplication = (application: NativeAttachmentTerminalApplication, completed: boolean) => {
+  for (const record of activeAttachmentCohorts) {
+    if (record.application !== application) continue
+    if (!completed || record.members.every((member) => member.published)) revokeAttachmentCohort(record)
+    else record.application = null
+  }
+}
 
 const withAttachmentTerminalTransaction = (
   observation: MarkdownAttachmentTerminalObservation,
@@ -5915,6 +6160,7 @@ const applyAttachmentResult = (result: MarkdownAttachmentProviderResult) => {
       if (!notify(Object.freeze({ phase: 'committed', custody: application.custody, transaction: event })))
         return false // The accepted transaction remains historical; no acknowledgement is fabricated.
     }
+    if (application) completeAttachmentCohortPublication(application)
     completed = true
     return true
   }
@@ -5933,12 +6179,14 @@ const applyAttachmentResult = (result: MarkdownAttachmentProviderResult) => {
       hasCleanupFailure = true
       cleanupFailure = cause
     } finally {
+      if (application) endAttachmentCohortApplication(application, completed)
       if (application?.revisionReservation) application.revisionReservation.active = false
       if (nativeAttachmentTerminalApplication === application) nativeAttachmentTerminalApplication = null
       attachmentPublicationDepth -= 1
       try {
         flushAttachmentRetirement()
       } catch (cause) {
+        invalidateAttachmentCohorts?.()
         if (!hasCleanupFailure) cleanupFailure = cause
         hasCleanupFailure = true
       }
@@ -6456,6 +6704,7 @@ const handleEmbedAction = async (
     result.action === 'select-node'
   ) {
     if (currentMode.value === 'preview') setMode('source')
+    invalidateAttachmentCohorts?.()
     transactionStore.setSelection(result.selection, false)
     await restoreTextareaSelection(result.selection)
     return
@@ -7125,6 +7374,7 @@ const revealActiveImageSource = () => {
   if (!active) return
   const range = active.figure?.captionRange ?? active.range
   setMode('source')
+  invalidateAttachmentCohorts?.()
   transactionStore.setSelection(
     { direction: 'none', end: range.end, start: range.start },
     false,
@@ -7238,6 +7488,7 @@ const commitRevealSelection = async (
     end: range.start,
     start: range.start,
   })
+  invalidateAttachmentCohorts?.()
   transactionStore.setSelection(selection, true)
   refreshLiveWindow('feature')
   refreshWritingAidsDocument()
@@ -7789,6 +8040,7 @@ const sessionBinding = createMarkdownEditorSessionBinding({
 invalidateNativeSurfacePublication = sessionBinding.invalidatePublicationAuthority
 
 retireSnapshotPublicationAuthority = () => {
+  invalidateAttachmentCohorts?.()
   let failed = false
   let firstCause: unknown
   try { retireStoreDocumentAuthority() } catch (cause) { failed = true; firstCause = cause }
@@ -7820,6 +8072,7 @@ defineExpose({
   withAttachmentFile,
   withAttachmentTerminalTransaction,
   getAttachmentTerminalRevisionIssuer,
+  getAttachmentTerminalCohortIssuer,
   inspectAttachmentTerminalNotificationFailures,
   dispatchTransaction: (transaction: MarkdownEditorTransaction) => dispatchTransaction(transaction),
   insertMarkdownAtCursor,
