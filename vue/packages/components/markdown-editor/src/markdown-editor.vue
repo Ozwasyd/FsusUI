@@ -5773,7 +5773,8 @@ const applyAttachmentResult = (result: MarkdownAttachmentProviderResult) => {
   // Read once; replacing the prop during callbacks cannot transfer this application.
   const observer = result.status === 'resolved' ? props.attachmentTerminalObserver : undefined
   if (observer && (isLegacyContent || !capture || !item || !batch ||
-      !dispatchProof?.settled || !dispatchProof.settlementAvailable || dispatchProof.dispatching ||
+      !dispatchProof || dispatchProof.resultSettlement !== 'fulfilled' ||
+      dispatchProof.observationNotificationCauses?.length || dispatchProof.dispatching ||
       dispatchProof.attempt !== attempt)) return false
   let application: NativeAttachmentTerminalApplication | undefined
   let completed = false
@@ -5807,7 +5808,7 @@ const applyAttachmentResult = (result: MarkdownAttachmentProviderResult) => {
         : batch.capture === capture && batch.files.has(item))) &&
       (!application || nativeAttachmentTerminalApplication === application) &&
       (!observer || (proof?.dispatchRef === dispatchProof?.dispatchRef && proof?.attempt === attempt &&
-        proof.settled && proof.settlementAvailable && !proof.dispatching))
+        proof.resultSettlement === 'fulfilled' && !proof.observationNotificationCauses?.length && !proof.dispatching))
   }
   const notify = (observation: MarkdownAttachmentTerminalObservation): boolean => {
     if (!application || !observer) return true
@@ -5975,11 +5976,16 @@ const dispatchAttachmentBatch = (
     const job = attachmentJobs.value.find((candidate) => candidate.itemId === item.itemId && candidate.batchId === batch.batchId)
     if (!job) continue
     let attempt: number | undefined
+    let dispatchRef: object | undefined
     const identity = Object.freeze({ ...transactionStore.documentIdentity })
     const record = attachmentBatches.get(batch.batchId)
+    // Retry dispatch may project one item; custody stays with the original batch.
+    const originalBatch = record?.batch
+    const originalBinding = attachmentJobBindings.get(toRaw(job))
     const dispatchInput = (admitProgress: (result: MarkdownAttachmentProviderResult) => boolean) => {
       // The original owner has admitted the dispatch and owns the actual attempt.
       attempt = job.attempt
+      dispatchRef = inspectMarkdownAttachmentDispatch(job)?.dispatchRef
       // Read the actual File only inside owner dispatch, after its retry File phase.
       const currentRecord = attachmentBatches.get(batch.batchId)
       const original = currentRecord?.batch.items[item.order]
@@ -5995,24 +6001,54 @@ const dispatchAttachmentBatch = (
         onProgress: (progress: MarkdownAttachmentProviderResult) => admitProgress(progress) && applyAttachmentResult(progress),
       })
     }
+    const currentDispatchProof = () => {
+      const declaredId = props.documentIdentity?.id ?? commandTrayId
+      const declaredEpoch = props.documentIdentity?.epoch ?? 0
+      const proof = inspectMarkdownAttachmentDispatch(job)
+      const binding = attachmentJobBindings.get(toRaw(job))
+      if (attempt === undefined || !dispatchRef || !record || !originalBatch || !originalBinding ||
+          proof?.dispatchRef !== dispatchRef || proof.attempt !== attempt || job.attempt !== attempt ||
+          sessionDisposed || editorReleased || attachmentPauseRequested.value ||
+          transactionStore.documentIdentity.id !== identity.id || transactionStore.documentIdentity.epoch !== identity.epoch ||
+          declaredId !== identity.id || declaredEpoch !== identity.epoch ||
+          !attachmentJobs.value.some((candidate) => toRaw(candidate) === toRaw(job)) ||
+          batch.batchId !== originalBatch.batchId || attachmentBatches.get(originalBatch.batchId) !== record ||
+          record.batch !== originalBatch || originalBinding.batch !== originalBatch || originalBinding.item !== item ||
+          originalBatch.items[item.order] !== item || attachmentItems.get(item.itemId) !== item ||
+          binding?.batch !== originalBinding.batch || binding.item !== originalBinding.item)
+        return null
+      return proof
+    }
+    const presentRejection = (caughtFailure = false) => {
+      const proof = currentDispatchProof()
+      if (!proof || (proof.resultSettlement !== 'rejected' && !(caughtFailure && proof.settled)) ||
+          (job.phase !== 'pending' && job.phase !== 'progress')) return
+      // Presentation follows the actual result; cleanup/retry still use the
+      // original full-local proof and retained raw failure, never this phase.
+      job.phase = 'rejected'
+      job.code = 'attachment-dispatch-rejected'
+      triggerRef(attachmentJobs)
+    }
+    const finishSettledAttempt = () => {
+      const proof = currentDispatchProof()
+      if (!proof?.settled || !proof.settlementAvailable || proof.dispatching) return
+      if (job.phase === 'rejected' && record!.files.has(item)) revokeAttachmentFile(item.itemId)
+      if (attempt !== undefined) requestTerminalAttachmentRetirement(job, attempt)
+      triggerRef(attachmentJobs)
+    }
+    const onSettled = () => {
+      presentRejection()
+      finishSettledAttempt()
+    }
     const work = requestDispatch
-      ? attachmentEmbedOwner.runAttachmentConsumerRequest(job, (admitProgress) => requestDispatch(dispatchInput(admitProgress)), options)
-      : attachmentEmbedOwner.runAttachmentDispatch(job, (admitProgress) => dispatch!(dispatchInput(admitProgress)), options)
+      ? attachmentEmbedOwner.runAttachmentConsumerRequest(job, (admitProgress) => requestDispatch(dispatchInput(admitProgress)), options, onSettled)
+      : attachmentEmbedOwner.runAttachmentDispatch(job, (admitProgress) => dispatch!(dispatchInput(admitProgress)), options, onSettled)
     void work.then((settled) => {
       // Only the real owner's awaited terminal proof reaches content commit.
       applyAttachmentResult(settled)
     }).catch(() => {
-      if (attempt === undefined) return
-      const settled = inspectMarkdownAttachmentDispatch(job)
-      if (!settled?.settled || settled.attempt !== attempt || job.attempt !== attempt ||
-        sessionDisposed || attachmentPauseRequested.value ||
-        transactionStore.documentIdentity.id !== identity.id || transactionStore.documentIdentity.epoch !== identity.epoch ||
-        (job.phase !== 'pending' && job.phase !== 'progress')) return
-      // A rejected actual future is settled independently of its UI phase.
-      // Missing/throwing dispatch without a future remains unknown and pending.
-      job.phase = 'rejected'
-      job.code = 'attachment-dispatch-rejected'
-      revokeAttachmentFile(item.itemId)
+      presentRejection(true)
+      finishSettledAttempt()
     }).finally(() => {
       if (record && attempt !== undefined) requestTerminalAttachmentRetirement(job, attempt)
       // Refresh retry eligibility from real settlement even for cancelled jobs.
