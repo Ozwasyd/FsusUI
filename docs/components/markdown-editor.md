@@ -1570,6 +1570,13 @@ a later refusal notification cannot erase the first/raw failure.
 
 ### Original terminal revision issuer producer seam
 
+Issuer `reserve` and `hasReservation` retain thrown control-read failures in the
+existing original loan failure holder before rethrowing the same raw cause,
+including `undefined`. That holder's explicit presence permanently blocks
+reissuance and reservation validation for the application. The existing terminal
+notification gates observe this debt even if a consumer catches the reader throw
+and returns `true`; cancellation and application end do not erase failure history.
+
 The actual mounted editor exposes one stable
 `getAttachmentTerminalRevisionIssuer()` object. Its `reserve(custody, leaseRef)`
 method only runs within the original authentic applying loan and binds one opaque

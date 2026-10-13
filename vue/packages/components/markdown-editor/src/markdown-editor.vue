@@ -5589,6 +5589,18 @@ type NativeAttachmentTerminalApplication = {
 let nativeAttachmentTerminalApplication: NativeAttachmentTerminalApplication | null = null
 const attachmentTerminalNotificationFailures: MarkdownAttachmentTerminalNotificationFailure[] = []
 const nativeAttachmentTerminalRevisionReservations = new WeakMap<MarkdownAttachmentTerminalRevisionReservation, NativeAttachmentTerminalRevisionReservation>()
+const retainAttachmentTerminalLoanFailure = (
+  application: NativeAttachmentTerminalApplication,
+  observation: MarkdownAttachmentTerminalObservation,
+  cause: unknown,
+  returned: unknown,
+) => {
+  application.loanFailure ??= { firstCause: cause, latestCause: cause }
+  application.loanFailure.latestCause = cause
+  application.loanAccepted = false
+  application.cause = application.loanFailure.firstCause
+  attachmentTerminalNotificationFailures.push(Object.freeze({ observation, cause, returned }))
+}
 const attachmentTerminalRevisionIssuer = Object.freeze<MarkdownAttachmentTerminalRevisionIssuer>({
   reserve(custody, leaseRef) {
     const application = nativeAttachmentTerminalApplication
@@ -5596,6 +5608,7 @@ const attachmentTerminalRevisionIssuer = Object.freeze<MarkdownAttachmentTermina
         !application.notifying || application.observation?.phase !== 'applying' ||
         !application.loanTaken || !application.loanInvoked || application.loanFailure !== null ||
         (typeof leaseRef !== 'object' && typeof leaseRef !== 'function') || leaseRef === null) return null
+    const observation = application.observation
     application.reservingRevision = true
     try {
       if (!custody.hasCustody() || nativeAttachmentTerminalApplication !== application ||
@@ -5608,6 +5621,10 @@ const attachmentTerminalRevisionIssuer = Object.freeze<MarkdownAttachmentTermina
       application.revisionReservation = record
       nativeAttachmentTerminalRevisionReservations.set(token, record)
       return token
+    } catch (cause) {
+      // Reader debt belongs to this original loan even when its consumer catches the throw.
+      retainAttachmentTerminalLoanFailure(application, observation, cause, application.loanReturned)
+      throw cause
     } finally {
       application.reservingRevision = false
     }
@@ -5620,11 +5637,19 @@ const attachmentTerminalRevisionIssuer = Object.freeze<MarkdownAttachmentTermina
       nativeAttachmentTerminalApplication === application && application.revisionReservation === record &&
       !application.reservingRevision && application.loanFailure === null && application.notifying &&
       application.loanTaken && application.loanInvoked && application.observation?.phase === phase
-    if (!current() || !application.custody.hasCustody() || !current()) return false
-    if (phase === 'applying') return transaction === undefined
-    return record.applyingAccepted && (phase !== 'committed' || record.publicationAccepted) &&
-      application.transaction === transaction && transaction?.accepted === true &&
-      transaction.beforeRevision === application.custody.beforeRevision && transaction.revision > transaction.beforeRevision && current()
+    const observation = application.observation
+    if (!observation || !current()) return false
+    try {
+      if (!application.custody.hasCustody() || !current()) return false
+      if (phase === 'applying') return transaction === undefined
+      return record.applyingAccepted && (phase !== 'committed' || record.publicationAccepted) &&
+        application.transaction === transaction && transaction?.accepted === true &&
+        transaction.beforeRevision === application.custody.beforeRevision && transaction.revision > transaction.beforeRevision && current()
+    } catch (cause) {
+      record.active = false
+      retainAttachmentTerminalLoanFailure(application, observation, cause, application.loanReturned)
+      throw cause
+    }
   },
   cancelReservation(reservation, leaseRef) {
     const record = nativeAttachmentTerminalRevisionReservations.get(reservation)
@@ -5643,10 +5668,7 @@ const withAttachmentTerminalTransaction = (
   if (!application || !application.notifying || application.loanTaken ||
       application.observation !== observation || observation.custody !== application.custody) return false
   const retainFailure = (cause: unknown, returned: unknown) => {
-    application.loanFailure ??= { firstCause: cause, latestCause: cause }
-    application.loanFailure.latestCause = cause
-    application.cause = application.loanFailure.firstCause
-    attachmentTerminalNotificationFailures.push(Object.freeze({ observation, cause, returned }))
+    retainAttachmentTerminalLoanFailure(application, observation, cause, returned)
   }
   try {
     if (observation.phase !== 'refused' && !application.custody.hasCustody()) return false
