@@ -1349,6 +1349,7 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
     ) => unknown,
     requireConsumer: boolean,
     options?: MarkdownAttachmentDispatchOptions,
+    onSettled?: () => void,
   ): Promise<MarkdownAttachmentProviderResult> => {
     assertLifecycleIdle()
     if (disposed || pauseRequested)
@@ -1630,6 +1631,7 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
       }, {
         isCompletion: (work) => completion !== undefined && work === completion,
         within: consumerControl,
+        settled: onSettled,
         retain(kind, ledger) {
           const entry = dispatchRef && consumers.get(dispatchRef)
           const original = entry?.binding
@@ -1680,8 +1682,9 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
         admitProgress: (result: MarkdownAttachmentProviderResult) => boolean,
       ) => PromiseLike<MarkdownAttachmentProviderResult>,
       options?: MarkdownAttachmentDispatchOptions,
+      onSettled?: () => void,
     ) {
-      return retainRetryFailure(job, runAttachmentDispatch(job, dispatch, false, options))
+      return retainRetryFailure(job, runAttachmentDispatch(job, dispatch, false, options, onSettled))
     },
     runAttachmentConsumerRequest(
       job: MarkdownAttachmentJob,
@@ -1689,8 +1692,9 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
         admitProgress: (result: MarkdownAttachmentProviderResult) => boolean,
       ) => MarkdownAttachmentConsumerRequest | unknown,
       options?: MarkdownAttachmentDispatchOptions,
+      onSettled?: () => void,
     ) {
-      return retainRetryFailure(job, runAttachmentDispatch(job, dispatch, true, options))
+      return retainRetryFailure(job, runAttachmentDispatch(job, dispatch, true, options, onSettled))
     },
     readAttachmentConsumerSource() {
       if (consumerControlDepth || lifecycleTransition)

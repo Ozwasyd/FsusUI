@@ -123,6 +123,7 @@ interface MarkdownAttachmentDispatchObservationControls {
     kind: 'result' | 'settled',
     observation: MarkdownAttachmentDispatchFutureObservation,
   ): void
+  settled?(): void
 }
 
 const createDispatchFutureObservation = (
@@ -259,6 +260,14 @@ export const runMarkdownAttachmentDispatch = async (
     state.resultObservationCause = observed.observationCause
     state.observationNotificationCauses = Object.freeze([...notificationCauses])
   }
+  let settlementNotified = false
+  const notifySettlement = () => {
+    if (!state.settled || settlementNotified) return
+    settlementNotified = true
+    within(() => controls?.settled?.())
+    state.observationNotificationCauses = Object.freeze([...notificationCauses])
+    if (notificationCauses.length) state.settled = false
+  }
   try {
     const work = dispatch()
     state.dispatching = false
@@ -301,6 +310,7 @@ export const runMarkdownAttachmentDispatch = async (
         state.settled = !same && !notificationCauses.length &&
           (resultState.status === 'fulfilled' || resultState.status === 'rejected') &&
           localState.status === 'fulfilled'
+        notifySettlement()
       }
       const result = createDispatchFutureObservation(resultWork.original, resultWork.access, localWork.original, retainCompletionState)
       const local = same ? result : createDispatchFutureObservation(localWork.original, localWork.access, resultWork.original, retainCompletionState)
@@ -353,6 +363,12 @@ export const runMarkdownAttachmentDispatch = async (
         ...notificationCauses,
       ], 'markdown-attachment-dispatch-settlement-unavailable')
     state.settled = true
+    notifySettlement()
+    if (notificationCauses.length)
+      throw new AggregateError([
+        ...(observed.status === 'rejected' ? [observed.cause] : []),
+        ...notificationCauses,
+      ], 'markdown-attachment-settlement-notification-failed')
     if (observed.status === 'rejected') throw observed.cause
     return observed.value as MarkdownAttachmentProviderResult
   } finally {

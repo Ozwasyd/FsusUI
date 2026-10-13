@@ -1521,6 +1521,16 @@ can mark that dispatch settled. Retry, retirement, cancellation, cleanup and
 resource census retain their original settlement requirements. Content delivery
 does not make unknown upload transport work settled or certify zero resources.
 
+A genuinely observed result rejection updates only the current original job's
+presentation while local settlement remains pending. It does not release its File
+or enable retry. The same retained settlement observation notifies the native
+caller once actual settlement is known, so deferred File cleanup and terminal
+retirement checks run and retry presentation refreshes without replaying content.
+That notification stays inside the original observation/control boundary; its
+raw failures remain debt and block settled admission. Replaced attempts, changed
+documents, paused/released editors and removed original bindings refuse these
+late presentation/cleanup effects. The original retirement rules remain intact.
+
 `attachmentDispatch` retains its existing Promise-only compatibility signature
 and original legacy owner path. Providing both hooks refuses before either
 business invocation. Neither legacy content settlement nor a rich supplied handle
