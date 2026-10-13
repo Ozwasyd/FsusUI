@@ -578,7 +578,7 @@ const toTarget = (
   })
 
 const inactive = (
-  selection: MarkdownEditorSelection,
+  _selection: MarkdownEditorSelection,
   extras: Partial<MarkdownLiveRevealPlan> = {},
 ): MarkdownLiveRevealPlan =>
   Object.freeze({

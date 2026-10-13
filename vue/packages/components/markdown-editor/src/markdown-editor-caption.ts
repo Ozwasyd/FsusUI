@@ -46,7 +46,7 @@ export const findMarkdownFigures = (
 }
 
 export const planMarkdownCaptionInsert = (
-  source: string,
+  _source: string,
   mediaRange: MarkdownCaptionRange,
   captionText: string,
 ): MarkdownEditorTransaction => {
@@ -68,7 +68,7 @@ export const planMarkdownCaptionInsert = (
 }
 
 export const planMarkdownCaptionEdit = (
-  source: string,
+  _source: string,
   captionNode: MarkdownCaptionValidNode,
   newText: string,
 ): MarkdownEditorTransaction => {
