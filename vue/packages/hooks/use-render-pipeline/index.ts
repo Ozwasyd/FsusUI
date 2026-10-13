@@ -374,6 +374,7 @@ export type FsusRenderPipelineRuntimeState<TSource, TUnit> =
     hardwareAttrs: ComputedRef<Record<string, string>>
     hardwareProfile: ComputedRef<FsusRenderHardwareProfile>
     policy: ComputedRef<FsusResolvedRenderPipelineComponentPolicy | null>
+    authority: FsusRenderPipelineAuthority
     inspectResources: () => FsusRenderPipelineRuntimeResourceInspection
     pause: () => FsusRenderPipelineRuntimeResourceInspection
     resume: () => FsusRenderPipelineRuntimeResourceInspection
@@ -385,6 +386,9 @@ export type FsusRenderPipelineRuntimeResourceInspection = {
   readonly ownerKey: string
   readonly paused: boolean
   readonly disposed: boolean
+  readonly authorityFeed: ReturnType<
+    ReturnType<typeof createRenderPipelineProducerAuthority>['inspect']
+  >
   readonly rafHandles: number
   readonly idleHandles: number
   readonly timers: number
@@ -592,8 +596,482 @@ export const estimateFsusRenderRefreshProfile = (
   }
 }
 
+export type FsusRenderPipelineAuthority = Readonly<{
+  issueTicket: () => object | null
+  isCurrent: (ticket: unknown) => boolean
+  subscribe: (listener: () => void) => () => void
+  getFailures: () => readonly unknown[]
+}>
+
+const authorityNativePromise = Promise
+const authorityNativePromisePrototype = Promise.prototype
+
+const createRenderPipelineProducerAuthority = (missingFeeds: string[] = []) => {
+  let ticket: object | null = null
+  let snapshots: Array<{
+    current: (value: unknown) => boolean
+    value: object
+  }> = []
+  let depth = 0
+  let brokenFeed = false
+  let closed = false
+  let draining = false
+  const archivedForeignFailures = new Set<unknown>()
+  const feedFailures: unknown[] = []
+  const asyncFeedObservers = new Set<{
+    source: object
+    listener: () => void
+    subscriptionId: symbol
+    state: 'pending' | 'unavailable'
+  }>()
+  const observeAsyncFeed = (
+    source: object,
+    subscription: { id: symbol; listener: () => void },
+  ) => {
+    const record = {
+      source,
+      listener: subscription.listener,
+      subscriptionId: subscription.id,
+      state: 'pending' as 'pending' | 'unavailable',
+    }
+    asyncFeedObservers.add(record)
+    try {
+      const prototype = Object.getPrototypeOf(source)
+      const ownConstructor = Object.getOwnPropertyDescriptor(
+        source,
+        'constructor',
+      )
+      const prototypeConstructor = Object.getOwnPropertyDescriptor(
+        authorityNativePromisePrototype,
+        'constructor',
+      )
+      // Native await uses PerformPromiseThen without a species-derived result.
+      // Foreign/subclass/thenable chains have no safe producer observation port.
+      if (
+        prototype !== authorityNativePromisePrototype ||
+        (ownConstructor &&
+          (!('value' in ownConstructor) ||
+            ownConstructor.value !== authorityNativePromise)) ||
+        !prototypeConstructor ||
+        !('value' in prototypeConstructor) ||
+        prototypeConstructor.value !== authorityNativePromise
+      ) {
+        record.state = 'unavailable'
+        return
+      }
+      void (async () => {
+        try {
+          await source
+        } catch (cause) {
+          change(() =>
+            feedFailures.push(
+              Object.freeze({
+                cause,
+                listener: record.listener,
+                subscriptionId: record.subscriptionId,
+                phase: 'async-feed-rejection',
+              }),
+            ),
+          )
+        } finally {
+          change(() => asyncFeedObservers.delete(record))
+        }
+      })()
+    } catch (cause) {
+      record.state = 'unavailable'
+      feedFailures.push(
+        Object.freeze({
+          cause,
+          listener: record.listener,
+          subscriptionId: record.subscriptionId,
+          phase: 'async-feed-observation',
+        }),
+      )
+    }
+  }
+  const missing = new Set(missingFeeds)
+  const listeners = new Set<{
+    id: symbol
+    listener: () => void
+    quarantined: boolean
+  }>()
+  const dependencies = new Map<
+    object,
+    {
+      issue: () => object | null
+      current: (value: unknown) => boolean
+      unsubscribe: (() => void) | null
+      registering: boolean
+      getFailures?: () => readonly unknown[]
+      id: symbol
+      source: object
+      canRelease: () => boolean
+      unsubscribed: boolean
+      releaseRequested: boolean
+    }
+  >()
+  const retiringDependencies = new Set<
+    ReturnType<typeof dependencies.get> & {}
+  >()
+  const notifyListeners = () => {
+    for (const subscription of [...listeners]) {
+      if (!listeners.has(subscription) || subscription.quarantined) continue
+      try {
+        const result: unknown = subscription.listener()
+        if (
+          result !== null &&
+          (typeof result === 'object' || typeof result === 'function') &&
+          typeof (result as { then?: unknown }).then === 'function'
+        ) {
+          brokenFeed = true
+          subscription.quarantined = true
+          feedFailures.push({
+            cause: new TypeError(
+              'fsus_pipeline_authority_feed_not_synchronous',
+            ),
+            message: 'fsus_pipeline_authority_feed_not_synchronous',
+            listener: subscription.listener,
+            subscriptionId: subscription.id,
+          })
+          observeAsyncFeed(result, subscription)
+        }
+      } catch (cause) {
+        brokenFeed = true
+        feedFailures.push(
+          Object.freeze({
+            cause,
+            listener: subscription.listener,
+            subscriptionId: subscription.id,
+          }),
+        )
+      }
+    }
+  }
+  const change = <T>(action: () => T): T => {
+    depth += 1
+    ticket = null
+    snapshots = []
+    const finish = () => {
+      // Closed producers report actual post-action progress before leaving their
+      // revoked interval, so parents can release only now-settled dependencies.
+      if (closed && depth === 1) notifyListeners()
+      depth -= 1
+      if (
+        depth === 0 &&
+        !draining &&
+        (closed ||
+          retiringDependencies.size > 0 ||
+          [...dependencies.values()].some((entry) => entry.releaseRequested))
+      )
+        drainClosedDependencies()
+    }
+    try {
+      if (depth === 1) notifyListeners()
+      const result = action()
+      // Keep async producer continuations inside the same revoked interval.
+      if (result instanceof Promise) return result.finally(finish) as T
+      finish()
+      return result
+    } catch (cause) {
+      finish()
+      throw cause
+    }
+  }
+  const boundary =
+    <TArgs extends unknown[], TResult>(action: (...args: TArgs) => TResult) =>
+    (...args: TArgs): TResult =>
+      change(() => action(...args))
+  const getFailures = () =>
+    change(() => {
+      const foreign: unknown[] = []
+      for (const dependency of [
+        ...dependencies.values(),
+        ...retiringDependencies,
+      ]) {
+        if (!dependency.getFailures) continue
+        try {
+          foreign.push(...dependency.getFailures())
+        } catch (cause) {
+          brokenFeed = true
+          feedFailures.push(
+            Object.freeze({ cause, dependencyId: dependency.id }),
+          )
+        }
+      }
+      return Object.freeze([
+        ...feedFailures,
+        ...archivedForeignFailures,
+        ...foreign,
+      ])
+    })
+  const authority: FsusRenderPipelineAuthority = Object.freeze({
+    getFailures,
+    issueTicket: () => {
+      if (closed || depth > 0 || brokenFeed || missing.size > 0) return null
+      if (ticket) {
+        if (snapshots.every((entry) => entry.current(entry.value)))
+          return ticket
+        ticket = null
+      }
+      const next: typeof snapshots = []
+      for (const dependency of dependencies.values()) {
+        if (dependency.registering || !dependency.unsubscribe) return null
+        const value = dependency.issue()
+        if (!value) return null
+        next.push({ current: dependency.current, value })
+      }
+      snapshots = next
+      ticket = {}
+      return ticket
+    },
+    // Only private identity and captured pure dependency checks; no census reads.
+    isCurrent: (value) => {
+      if (
+        closed ||
+        depth > 0 ||
+        brokenFeed ||
+        missing.size > 0 ||
+        !ticket ||
+        value !== ticket
+      )
+        return false
+      try {
+        return snapshots.every((entry) => entry.current(entry.value))
+      } catch {
+        return false
+      }
+    },
+    subscribe: (listener) =>
+      change(() => {
+        if (closed) throw new Error('fsus_pipeline_authority_closed')
+        if (typeof listener !== 'function')
+          throw new TypeError('fsus_pipeline_authority_listener_invalid')
+        const subscription = {
+          id: Symbol('fsus-pipeline-authority-subscription'),
+          listener,
+          quarantined: false,
+        }
+        listeners.add(subscription)
+        return boundary(() => {
+          listeners.delete(subscription)
+        })
+      }),
+  })
+  const retainDependency = (
+    source: unknown,
+    missingName: string,
+    canRelease: () => boolean = () => true,
+  ) =>
+    change(() => {
+      if (closed) throw new Error('fsus_pipeline_authority_closed')
+      if (source === authority) return
+      if (!source || typeof source !== 'object') {
+        missing.add(missingName)
+        return
+      }
+      const existing = dependencies.get(source)
+      if (existing) {
+        existing.releaseRequested = false
+        return
+      }
+      const candidate = source as Partial<FsusRenderPipelineAuthority>
+      const issue = candidate.issueTicket,
+        current = candidate.isCurrent,
+        subscribe = candidate.subscribe,
+        readFailures = candidate.getFailures
+      if (
+        typeof issue !== 'function' ||
+        typeof current !== 'function' ||
+        typeof subscribe !== 'function'
+      ) {
+        missing.add(missingName)
+        return
+      }
+      const dependency = {
+        issue,
+        current,
+        unsubscribe: null as (() => void) | null,
+        registering: true,
+        getFailures:
+          typeof readFailures === 'function' ? readFailures : undefined,
+        id: Symbol('fsus-pipeline-authority-dependency'),
+        source,
+        canRelease,
+        unsubscribed: false,
+        releaseRequested: false,
+      }
+      // Publish the actual in-progress registration before foreign subscribe.
+      dependencies.set(source, dependency)
+      try {
+        const unsubscribe = subscribe(() => change(() => undefined))
+        if (typeof unsubscribe !== 'function') {
+          missing.add(missingName)
+          brokenFeed = true
+          return
+        }
+        dependency.unsubscribe = unsubscribe
+        if (typeof readFailures !== 'function')
+          missing.add(`${missingName}:failure-feed`)
+      } catch (cause) {
+        missing.add(missingName)
+        brokenFeed = true
+        feedFailures.push(
+          Object.freeze({
+            cause,
+            source: missingName,
+            dependencyId: dependency.id,
+          }),
+        )
+      } finally {
+        dependency.registering = false
+      }
+    })
+  const releaseRecord = (
+    dependency: ReturnType<typeof dependencies.get> & {},
+  ) => {
+    try {
+      if (
+        dependency.registering ||
+        !dependency.unsubscribe ||
+        !dependency.canRelease()
+      )
+        return false
+      // Detach before foreign code; a reentrant binding gets an independent record.
+      if (dependencies.get(dependency.source) === dependency)
+        dependencies.delete(dependency.source)
+      retiringDependencies.add(dependency)
+      if (dependency.getFailures)
+        for (const failure of dependency.getFailures())
+          archivedForeignFailures.add(failure)
+      if (!dependency.unsubscribed) {
+        dependency.unsubscribe()
+        dependency.unsubscribed = true
+      }
+      if (dependency.getFailures)
+        for (const failure of dependency.getFailures())
+          archivedForeignFailures.add(failure)
+      retiringDependencies.delete(dependency)
+      return true
+    } catch (cause) {
+      brokenFeed = true
+      feedFailures.push(
+        Object.freeze({
+          cause,
+          dependencyId: dependency.id,
+          phase: 'dependency-release',
+        }),
+      )
+      // Actual retained record is kept for another explicit/progress drain.
+      return false
+    }
+  }
+  const releaseDependency = (source: object) =>
+    change(() => {
+      const records = [...retiringDependencies].filter(
+        (entry) => entry.source === source,
+      )
+      const current = dependencies.get(source)
+      if (current) {
+        current.releaseRequested = true
+        records.push(current)
+      }
+      for (const record of records) releaseRecord(record)
+    })
+  const drainClosedDependencies = () => {
+    draining = true
+    try {
+      change(() => {
+        for (const dependency of [
+          ...retiringDependencies,
+          ...dependencies.values(),
+        ]) {
+          if (
+            closed ||
+            dependency.releaseRequested ||
+            retiringDependencies.has(dependency)
+          )
+            releaseRecord(dependency)
+        }
+      })
+    } finally {
+      draining = false
+    }
+  }
+  const close = () =>
+    change(() => {
+      closed = true
+    })
+  return {
+    authority,
+    boundary,
+    change,
+    retainDependency,
+    releaseDependency,
+    close,
+    // Rejected/in-flight releases remain counted; terminal closure never mints.
+    inspect: () =>
+      Object.freeze({
+        activeChangesAtRead: depth,
+        subscriptions: listeners.size,
+        quarantinedSubscriptions: [...listeners].filter(
+          (entry) => entry.quarantined,
+        ).length,
+        retainedDependencyRecords:
+          dependencies.size + retiringDependencies.size,
+        retainedOwnedSubscriptionHandles: [
+          ...dependencies.values(),
+          ...retiringDependencies,
+        ].filter((entry) => entry.unsubscribe !== null && !entry.unsubscribed)
+          .length,
+        pendingSubscriptionRegistrations: [
+          ...dependencies.values(),
+          ...retiringDependencies,
+        ].filter((entry) => entry.registering || entry.unsubscribe === null)
+          .length,
+        dependencyReleaseObligations: Object.freeze(
+          [...dependencies.values(), ...retiringDependencies]
+            .filter(
+              (entry) =>
+                closed ||
+                entry.releaseRequested ||
+                retiringDependencies.has(entry),
+            )
+            .map((entry) =>
+              Object.freeze({
+                dependencyId: entry.id,
+                source: entry.source,
+                unsubscribe: entry.unsubscribe,
+                unsubscribed: entry.unsubscribed,
+                registering: entry.registering,
+                releaseRequested: entry.releaseRequested,
+              }),
+            ),
+        ),
+        retiringDependencyRecords: retiringDependencies.size,
+        closed,
+        pendingAsyncFeedObservers: [...asyncFeedObservers].filter(
+          (record) => record.state === 'pending',
+        ).length,
+        unavailableAsyncFeedObservations: Object.freeze(
+          [...asyncFeedObservers].filter(
+            (record) => record.state === 'unavailable',
+          ),
+        ),
+        foreignSubscriptionActivity: 'unknown' as const,
+        feedFailures: getFailures(),
+        missingFeeds: Object.freeze([...missing]),
+        brokenFeed,
+        completeCustody: false as const,
+      }),
+  }
+}
+
+const renderPipelineModuleAuthority = createRenderPipelineProducerAuthority()
+
 // Own only callbacks requested here. Opaque platform work remains unknown.
-const createRenderPipelineCallbackResources = () => {
+const createRenderPipelineCallbackResources = (
+  producerAuthority: ReturnType<typeof createRenderPipelineProducerAuthority>,
+) => {
   type Entry = {
     kind: 'raf' | 'idle' | 'timeout'
     cancelled: boolean
@@ -608,22 +1086,24 @@ const createRenderPipelineCallbackResources = () => {
     const entry: Entry = { kind, cancelled: false, cancel: null }
     entries.add(entry)
     try {
-      entry.cancel = request(() => {
-        entries.delete(entry)
-        if (!entry.cancelled) run()
-      })
+      entry.cancel = request(
+        producerAuthority.boundary(() => {
+          entries.delete(entry)
+          if (!entry.cancelled) run()
+        }),
+      )
     } catch (error) {
       entries.delete(entry)
       throw error
     }
-    return () => {
+    return producerAuthority.boundary(() => {
       if (!entries.has(entry)) return
       entry.cancelled = true
       if (entry.cancel) {
         entry.cancel()
         entries.delete(entry)
       }
-    }
+    })
   }
   const frame = (run: () => void) => {
     const cancel =
@@ -654,7 +1134,7 @@ const createRenderPipelineCallbackResources = () => {
       'timeout',
       (callback) => {
         const handle = setTimeout(callback, 0)
-        return () => clearTimeout(handle)
+        return producerAuthority.boundary(() => clearTimeout(handle))
       },
       run,
     )
@@ -676,7 +1156,13 @@ const createRenderPipelineCallbackResources = () => {
       uncancellableCallbacks: [...entries].filter((entry) => !entry.cancel)
         .length,
     })
-  return { cancelAll, frame, idle, inspect, timeout }
+  return {
+    cancelAll: producerAuthority.boundary(cancelAll),
+    frame: producerAuthority.boundary(frame),
+    idle: producerAuthority.boundary(idle),
+    inspect: producerAuthority.boundary(inspect),
+    timeout: producerAuthority.boundary(timeout),
+  }
 }
 
 export const createFsusRafRefreshSampler = ({
@@ -693,13 +1179,18 @@ export const createFsusRafRefreshSampler = ({
   cancelFrame?: (handle: number) => void
   sampleSize?: number
 }) => {
+  const producerAuthority = createRenderPipelineProducerAuthority()
+
   const deltas: number[] = []
   let previous: number | null = null
   let handle: number | null = null
   let stopped = false
-  const sample = (timestamp: number) => {
+  const sample = producerAuthority.boundary((timestamp: number) => {
     handle = null
-    if (stopped) return
+    if (stopped) {
+      producerAuthority.close()
+      return
+    }
     if (previous !== null) deltas.push(timestamp - previous)
     previous = timestamp
     if (deltas.length >= Math.max(4, sampleSize)) {
@@ -708,52 +1199,63 @@ export const createFsusRafRefreshSampler = ({
       return
     }
     handle = requestFrame(sample)
-  }
+  })
   handle = requestFrame(sample)
-  const stop = () => {
+  const stop = producerAuthority.boundary(() => {
     stopped = true
     if (handle !== null && cancelFrame) {
       cancelFrame(handle)
       handle = null
     }
-  }
+    if (handle === null) producerAuthority.close()
+  })
   return Object.assign(stop, {
-    inspectResources: () =>
+    authority: producerAuthority.authority,
+    inspectResources: producerAuthority.boundary(() =>
       Object.freeze({
         rafHandles: handle === null ? 0 : 1,
         uncancellableCallbacks: handle !== null && !cancelFrame ? 1 : 0,
         stopped,
       }),
+    ),
   })
 }
 
-export const createFsusRenderStageHistory = (limit = 32, alpha = 0.25) => {
-  const samples = new Map<FsusRenderPipelineStage, number[]>()
-  const ewma = new Map<FsusRenderPipelineStage, number>()
-  const record = (stage: FsusRenderPipelineStage, durationMs: number) => {
-    if (!Number.isFinite(durationMs) || durationMs < 0) return
-    const values = samples.get(stage) ?? []
-    values.push(durationMs)
-    if (values.length > limit) values.shift()
-    samples.set(stage, values)
-    ewma.set(
-      stage,
-      ewma.has(stage)
-        ? ewma.get(stage)! * (1 - alpha) + durationMs * alpha
-        : durationMs,
-    )
-  }
-  const snapshot = (stage: FsusRenderPipelineStage): FsusRenderStageStats => {
-    const values = [...(samples.get(stage) ?? [])].sort((a, b) => a - b)
-    return {
-      ewmaMs: roundBudgetNumber(ewma.get(stage) ?? 0),
-      p50Ms: roundBudgetNumber(percentile(values, 0.5)),
-      p95Ms: roundBudgetNumber(percentile(values, 0.95)),
-      sampleCount: values.length,
-    }
-  }
-  return { record, snapshot }
-}
+export const createFsusRenderStageHistory =
+  renderPipelineModuleAuthority.boundary(
+    (limit: number = 32, alpha: number = 0.25) => {
+      const samples = new Map<FsusRenderPipelineStage, number[]>()
+      const ewma = new Map<FsusRenderPipelineStage, number>()
+      const record = (stage: FsusRenderPipelineStage, durationMs: number) => {
+        if (!Number.isFinite(durationMs) || durationMs < 0) return
+        const values = samples.get(stage) ?? []
+        values.push(durationMs)
+        if (values.length > limit) values.shift()
+        samples.set(stage, values)
+        ewma.set(
+          stage,
+          ewma.has(stage)
+            ? ewma.get(stage)! * (1 - alpha) + durationMs * alpha
+            : durationMs,
+        )
+      }
+      const snapshot = (
+        stage: FsusRenderPipelineStage,
+      ): FsusRenderStageStats => {
+        const values = [...(samples.get(stage) ?? [])].sort((a, b) => a - b)
+        return {
+          ewmaMs: roundBudgetNumber(ewma.get(stage) ?? 0),
+          p50Ms: roundBudgetNumber(percentile(values, 0.5)),
+          p95Ms: roundBudgetNumber(percentile(values, 0.95)),
+          sampleCount: values.length,
+        }
+      }
+      return {
+        record: renderPipelineModuleAuthority.boundary(record),
+        snapshot: renderPipelineModuleAuthority.boundary(snapshot),
+      }
+    },
+  )
 
 export const resolveFsusAdaptiveRenderPipelineConfig = (
   config: FsusResolvedRenderPipelineConfig,
@@ -860,37 +1362,43 @@ export const createFsusRenderPipelineDiagnosticsBuffer = (
 const renderPipelineDiagnosticsBuffer =
   createFsusRenderPipelineDiagnosticsBuffer()
 
-const emitFsusRenderPipelineDiagnostic = (
-  event: FsusRenderPipelineDiagnosticEvent,
-  isCurrent: () => boolean = () => true,
-) => {
-  const normalized = {
-    timestamp: readRenderPipelineNow(),
-    ...event,
-  }
-  renderPipelineDiagnosticsBuffer.push(normalized)
-  for (const sink of Array.from(diagnosticSinks)) {
-    if (!isCurrent()) break
-    sink(normalized)
-  }
-}
+const emitFsusRenderPipelineDiagnostic = renderPipelineModuleAuthority.boundary(
+  (
+    event: FsusRenderPipelineDiagnosticEvent,
+    isCurrent: () => boolean = () => true,
+  ) => {
+    const normalized = {
+      timestamp: readRenderPipelineNow(),
+      ...event,
+    }
+    renderPipelineDiagnosticsBuffer.push(normalized)
+    for (const sink of Array.from(diagnosticSinks)) {
+      if (!isCurrent()) break
+      sink(normalized)
+    }
+  },
+)
 
-export const registerFsusRenderPipelineDiagnosticSink = (
-  sink: FsusRenderPipelineDiagnosticSink,
-) => {
-  diagnosticSinks.add(sink)
-  return () => {
-    diagnosticSinks.delete(sink)
-  }
-}
+export const registerFsusRenderPipelineDiagnosticSink =
+  renderPipelineModuleAuthority.boundary(
+    (sink: FsusRenderPipelineDiagnosticSink) => {
+      diagnosticSinks.add(sink)
+      return renderPipelineModuleAuthority.boundary(() => {
+        diagnosticSinks.delete(sink)
+      })
+    },
+  )
 
-export const getFsusRenderPipelineDiagnosticsSnapshot = () =>
-  renderPipelineDiagnosticsBuffer.snapshot()
+export const getFsusRenderPipelineDiagnosticsSnapshot =
+  renderPipelineModuleAuthority.boundary(() =>
+    renderPipelineDiagnosticsBuffer.snapshot(),
+  )
 
-export const clearFsusRenderPipelineDiagnostics = () => {
-  renderPipelineDiagnosticsBuffer.clear()
-  diagnosticSinks.clear()
-}
+export const clearFsusRenderPipelineDiagnostics =
+  renderPipelineModuleAuthority.boundary(() => {
+    renderPipelineDiagnosticsBuffer.clear()
+    diagnosticSinks.clear()
+  })
 
 export const shouldUseFsusRenderPipeline = (
   estimate: FsusRenderEstimate,
@@ -1108,6 +1616,10 @@ export const resolveFsusRenderPipelineUnitAttrs = ({
 export const useFsusRenderPipelineHardwareProfile = (
   config?: MaybeRef<FsusRenderPipelineConfig | null | undefined>,
 ) => {
+  const producerAuthority = createRenderPipelineProducerAuthority([
+    'hardware-platform-state',
+  ])
+
   const refreshProfile = shallowRef(estimateFsusRenderRefreshProfile([]))
   const visibilityVersion = ref(0)
   const lowPower = ref(renderPipelineLowPower)
@@ -1121,7 +1633,10 @@ export const useFsusRenderPipelineHardwareProfile = (
   const stopSamplers = () => {
     for (const stop of [...samplers]) {
       stop()
-      if (stop.inspectResources().rafHandles === 0) samplers.delete(stop)
+      if (stop.inspectResources().rafHandles === 0) {
+        samplers.delete(stop)
+        producerAuthority.releaseDependency(stop.authority)
+      }
     }
   }
   const startSampler = () => {
@@ -1135,20 +1650,25 @@ export const useFsusRenderPipelineHardwareProfile = (
       return
     const sampleGeneration = generation
     const stop = createFsusRafRefreshSampler({
-      onSample: (sample) => {
+      onSample: producerAuthority.boundary((sample) => {
         if (!paused && !disposed && sampleGeneration === generation) {
           refreshProfile.value = sample
         }
-      },
+      }),
     })
+    producerAuthority.retainDependency(
+      stop.authority,
+      'sampler-authority',
+      () => stop.inspectResources().rafHandles === 0,
+    )
     samplers.add(stop)
   }
-  const onVisibilityChange = () => {
+  const onVisibilityChange = producerAuthority.boundary(() => {
     if (paused || disposed) return
     const visibilityGeneration = generation
     visibilityVersion.value += 1
     if (visibilityGeneration === generation) startSampler()
-  }
+  })
   const connect = () => {
     if (!mounted || paused || disposed) return
     startSampler()
@@ -1167,24 +1687,28 @@ export const useFsusRenderPipelineHardwareProfile = (
         const job = Symbol('battery-query')
         batteryJobs.add(job)
         void Promise.resolve()
-          .then(() => {
-            if (paused || disposed || batteryGeneration !== generation)
-              return null
-            return getBattery.call(navigator)
-          })
-          .then((battery) => {
-            if (
-              !battery ||
-              paused ||
-              disposed ||
-              batteryGeneration !== generation
-            )
-              return
-            renderPipelineLowPower = !battery.charging && battery.level <= 0.2
-            lowPower.value = renderPipelineLowPower
-          })
-          .catch(() => undefined)
-          .finally(() => batteryJobs.delete(job))
+          .then(
+            producerAuthority.boundary(() => {
+              if (paused || disposed || batteryGeneration !== generation)
+                return null
+              return getBattery.call(navigator)
+            }),
+          )
+          .then(
+            producerAuthority.boundary((battery) => {
+              if (
+                !battery ||
+                paused ||
+                disposed ||
+                batteryGeneration !== generation
+              )
+                return
+              renderPipelineLowPower = !battery.charging && battery.level <= 0.2
+              lowPower.value = renderPipelineLowPower
+            }),
+          )
+          .catch(producerAuthority.boundary(() => undefined))
+          .finally(producerAuthority.boundary(() => batteryJobs.delete(job)))
       }
     }
   }
@@ -1195,11 +1719,15 @@ export const useFsusRenderPipelineHardwareProfile = (
       const inspection = stop.inspectResources()
       rafHandles += inspection.rafHandles
       uncancellableCallbacks += inspection.uncancellableCallbacks
-      if (inspection.rafHandles === 0) samplers.delete(stop)
+      if (inspection.rafHandles === 0) {
+        samplers.delete(stop)
+        producerAuthority.releaseDependency(stop.authority)
+      }
     }
     return Object.freeze({
       paused,
       disposed,
+      authorityFeed: producerAuthority.inspect(),
       rafHandles,
       uncancellableCallbacks,
       retainedListeners: visibilityListener ? 1 : 0,
@@ -1233,74 +1761,97 @@ export const useFsusRenderPipelineHardwareProfile = (
     }
     return inspectResources()
   }
-  onMounted(() => {
-    mounted = true
-    connect()
-  })
-  onBeforeUnmount(() => {
-    disposed = true
-    mounted = false
-    pause()
-  })
-  const capabilityProfile = computed(() => {
-    visibilityVersion.value
-    return resolveFsusRenderCapabilityProfile(refreshProfile.value, {
-      lowPower: lowPower.value,
-    })
-  })
-  const baseConfig = computed(() => {
-    const input = unref(config)
-    const resolved = resolveFsusRenderPipelineConfig(input)
-    return input?.budget?.dynamicFrameMs === false ||
-      (input?.budget?.frameMs !== undefined &&
-        input?.budget?.dynamicFrameMs !== true)
-      ? resolved
-      : {
-          ...resolved,
-          budget: {
-            ...resolved.budget,
-            frameMs:
-              capabilityProfile.value.visibility === 'hidden' ||
-              capabilityProfile.value.lowPower
-                ? Math.min(
-                    2,
-                    capabilityProfile.value.refreshProfile.mainThreadBudgetMs,
-                  )
-                : capabilityProfile.value.refreshProfile.mainThreadBudgetMs,
-          },
-        }
-  })
-  const profile = computed(() =>
-    resolveFsusRenderPipelineHardwareProfile(baseConfig.value),
-  )
-  const resolvedConfig = computed(() =>
-    resolveFsusRenderPipelineConfig(baseConfig.value, profile.value),
-  )
-  const compositor = computed(() =>
-    resolveFsusRenderPipelineCompositorEnabled(
-      resolvedConfig.value,
-      profile.value,
-    ),
-  )
-  const contentVisibility = computed(() =>
-    resolveFsusRenderPipelineContentVisibilityEnabled(
-      resolvedConfig.value,
-      profile.value,
-    ),
-  )
-  const attrs = computed(() =>
-    resolveFsusRenderPipelineHardwareAttrs({
-      compositor: compositor.value,
-      contentVisibility: contentVisibility.value,
-      hardwareProfile: profile.value,
-      layerBudget: resolvedConfig.value.acceleration.layerBudget,
+  onMounted(
+    producerAuthority.boundary(() => {
+      mounted = true
+      connect()
     }),
+  )
+  onBeforeUnmount(
+    producerAuthority.boundary(() => {
+      disposed = true
+      mounted = false
+      try {
+        pause()
+      } finally {
+        producerAuthority.close()
+      }
+    }),
+  )
+  const capabilityProfile = computed(
+    producerAuthority.boundary(() => {
+      visibilityVersion.value
+      return resolveFsusRenderCapabilityProfile(refreshProfile.value, {
+        lowPower: lowPower.value,
+      })
+    }),
+  )
+  const baseConfig = computed(
+    producerAuthority.boundary(() => {
+      const input = unref(config)
+      const resolved = resolveFsusRenderPipelineConfig(input)
+      return input?.budget?.dynamicFrameMs === false ||
+        (input?.budget?.frameMs !== undefined &&
+          input?.budget?.dynamicFrameMs !== true)
+        ? resolved
+        : {
+            ...resolved,
+            budget: {
+              ...resolved.budget,
+              frameMs:
+                capabilityProfile.value.visibility === 'hidden' ||
+                capabilityProfile.value.lowPower
+                  ? Math.min(
+                      2,
+                      capabilityProfile.value.refreshProfile.mainThreadBudgetMs,
+                    )
+                  : capabilityProfile.value.refreshProfile.mainThreadBudgetMs,
+            },
+          }
+    }),
+  )
+  const profile = computed(
+    producerAuthority.boundary(() =>
+      resolveFsusRenderPipelineHardwareProfile(baseConfig.value),
+    ),
+  )
+  const resolvedConfig = computed(
+    producerAuthority.boundary(() =>
+      resolveFsusRenderPipelineConfig(baseConfig.value, profile.value),
+    ),
+  )
+  const compositor = computed(
+    producerAuthority.boundary(() =>
+      resolveFsusRenderPipelineCompositorEnabled(
+        resolvedConfig.value,
+        profile.value,
+      ),
+    ),
+  )
+  const contentVisibility = computed(
+    producerAuthority.boundary(() =>
+      resolveFsusRenderPipelineContentVisibilityEnabled(
+        resolvedConfig.value,
+        profile.value,
+      ),
+    ),
+  )
+  const attrs = computed(
+    producerAuthority.boundary(() =>
+      resolveFsusRenderPipelineHardwareAttrs({
+        compositor: compositor.value,
+        contentVisibility: contentVisibility.value,
+        hardwareProfile: profile.value,
+        layerBudget: resolvedConfig.value.acceleration.layerBudget,
+      }),
+    ),
   )
 
   return {
-    inspectResources,
-    pause,
-    resume,
+    authority: producerAuthority.authority,
+    inspectResources: producerAuthority.boundary(inspectResources),
+    pause: producerAuthority.boundary(pause),
+    resume: producerAuthority.boundary(resume),
     attrs,
     capabilityProfile,
     compositor,
@@ -1318,46 +1869,48 @@ const renderPipelineAdapters = new Map<
 
 const normalizeAdapterId = (adapterId: string) => adapterId.trim()
 
-export const registerFsusRenderPipelineAdapter = <TSource, TUnit>(
-  adapter: FsusRenderPipelineAdapter<TSource, TUnit>,
-) => {
-  const adapterId = normalizeAdapterId(adapter.id)
-  if (!adapterId) {
-    throw new Error('fsus_render_pipeline_adapter_id_required')
-  }
+export const registerFsusRenderPipelineAdapter =
+  renderPipelineModuleAuthority.boundary(
+    <TSource, TUnit>(adapter: FsusRenderPipelineAdapter<TSource, TUnit>) => {
+      const adapterId = normalizeAdapterId(adapter.id)
+      if (!adapterId) {
+        throw new Error('fsus_render_pipeline_adapter_id_required')
+      }
 
-  const normalizedAdapter = {
-    ...adapter,
-    id: adapterId,
-  } as FsusRenderPipelineAdapter<unknown, unknown>
-  const previous = renderPipelineAdapters.get(adapterId)
-  renderPipelineAdapters.set(adapterId, normalizedAdapter)
+      const normalizedAdapter = {
+        ...adapter,
+        id: adapterId,
+      } as FsusRenderPipelineAdapter<unknown, unknown>
+      const previous = renderPipelineAdapters.get(adapterId)
+      renderPipelineAdapters.set(adapterId, normalizedAdapter)
 
-  return () => {
-    if (previous) {
-      renderPipelineAdapters.set(adapterId, previous)
-    } else {
-      renderPipelineAdapters.delete(adapterId)
-    }
-  }
-}
+      return renderPipelineModuleAuthority.boundary(() => {
+        if (previous) {
+          renderPipelineAdapters.set(adapterId, previous)
+        } else {
+          renderPipelineAdapters.delete(adapterId)
+        }
+      })
+    },
+  )
 
-export const getFsusRenderPipelineAdapter = <
-  TSource = unknown,
-  TUnit = unknown,
->(
-  adapterId: string,
-) =>
-  renderPipelineAdapters.get(normalizeAdapterId(adapterId)) as
-    | FsusRenderPipelineAdapter<TSource, TUnit>
-    | undefined
+export const getFsusRenderPipelineAdapter =
+  renderPipelineModuleAuthority.boundary(
+    <TSource = unknown, TUnit = unknown>(adapterId: string) =>
+      renderPipelineAdapters.get(normalizeAdapterId(adapterId)) as
+        | FsusRenderPipelineAdapter<TSource, TUnit>
+        | undefined,
+  )
 
-export const listFsusRenderPipelineAdapters = () =>
-  Array.from(renderPipelineAdapters.values())
+export const listFsusRenderPipelineAdapters =
+  renderPipelineModuleAuthority.boundary(() =>
+    Array.from(renderPipelineAdapters.values()),
+  )
 
-export const clearFsusRenderPipelineAdapters = () => {
-  renderPipelineAdapters.clear()
-}
+export const clearFsusRenderPipelineAdapters =
+  renderPipelineModuleAuthority.boundary(() => {
+    renderPipelineAdapters.clear()
+  })
 
 type FsusRenderPipelineStrategyResolverEntry = {
   order: number
@@ -1381,65 +1934,75 @@ export type FsusRenderPipelineStrategyCacheEntry = {
 
 const STRATEGY_CACHE_LIMIT = 128
 const STRATEGY_CACHE_TTL_MS = 60_000
-export const createFsusRenderPipelineStrategyCache = ({
-  limit = STRATEGY_CACHE_LIMIT,
-  now: readNow = readRenderPipelineNow,
-  ttlMs = STRATEGY_CACHE_TTL_MS,
-}: {
-  limit?: number
-  now?: () => number
-  ttlMs?: number
-} = {}) => {
-  const entries = new Map<string, FsusRenderPipelineStrategyCacheEntry>()
-  const get = (cacheKey: string, profileVersion?: string) => {
-    if (!cacheKey) return undefined
-    const entry = entries.get(cacheKey)
-    if (
-      !entry ||
-      entry.expiresAt <= readNow() ||
-      (profileVersion !== undefined && entry.profileVersion !== profileVersion)
-    ) {
-      entries.delete(cacheKey)
-      return undefined
-    }
-    return entry
-  }
-  const set = (
-    cacheKey: string,
-    entry: Pick<
-      FsusRenderPipelineStrategyCacheEntry,
-      'durationMs' | 'strategy'
-    > & { profileVersion?: string; ttlMs?: number },
-  ) => {
-    if (!cacheKey) return
-    const previous = entries.get(cacheKey)
-    const durationEwmaMs =
-      entry.durationMs === undefined
-        ? previous?.durationEwmaMs
-        : previous?.durationEwmaMs === undefined
-          ? entry.durationMs
-          : previous.durationEwmaMs * 0.75 + entry.durationMs * 0.25
-    const updatedAt = readNow()
-    entries.delete(cacheKey)
-    entries.set(cacheKey, {
-      ...entry,
-      durationEwmaMs,
-      expiresAt: updatedAt + positive(entry.ttlMs, ttlMs),
-      sampleCount: (previous?.sampleCount ?? 0) + 1,
-      updatedAt,
-    })
-    if (entries.size > limit) {
-      const firstKey = entries.keys().next().value
-      if (firstKey) entries.delete(firstKey)
-    }
-  }
-  const invalidateProfile = (profileVersion: string) => {
-    for (const [key, entry] of entries) {
-      if (entry.profileVersion !== profileVersion) entries.delete(key)
-    }
-  }
-  return { clear: () => entries.clear(), get, invalidateProfile, set }
-}
+export const createFsusRenderPipelineStrategyCache =
+  renderPipelineModuleAuthority.boundary(
+    ({
+      limit = STRATEGY_CACHE_LIMIT,
+      now: readNow = readRenderPipelineNow,
+      ttlMs = STRATEGY_CACHE_TTL_MS,
+    }: {
+      limit?: number
+      now?: () => number
+      ttlMs?: number
+    } = {}) => {
+      const entries = new Map<string, FsusRenderPipelineStrategyCacheEntry>()
+      const get = (cacheKey: string, profileVersion?: string) => {
+        if (!cacheKey) return undefined
+        const entry = entries.get(cacheKey)
+        if (
+          !entry ||
+          entry.expiresAt <= readNow() ||
+          (profileVersion !== undefined &&
+            entry.profileVersion !== profileVersion)
+        ) {
+          entries.delete(cacheKey)
+          return undefined
+        }
+        return entry
+      }
+      const set = (
+        cacheKey: string,
+        entry: Pick<
+          FsusRenderPipelineStrategyCacheEntry,
+          'durationMs' | 'strategy'
+        > & { profileVersion?: string; ttlMs?: number },
+      ) => {
+        if (!cacheKey) return
+        const previous = entries.get(cacheKey)
+        const durationEwmaMs =
+          entry.durationMs === undefined
+            ? previous?.durationEwmaMs
+            : previous?.durationEwmaMs === undefined
+              ? entry.durationMs
+              : previous.durationEwmaMs * 0.75 + entry.durationMs * 0.25
+        const updatedAt = readNow()
+        entries.delete(cacheKey)
+        entries.set(cacheKey, {
+          ...entry,
+          durationEwmaMs,
+          expiresAt: updatedAt + positive(entry.ttlMs, ttlMs),
+          sampleCount: (previous?.sampleCount ?? 0) + 1,
+          updatedAt,
+        })
+        if (entries.size > limit) {
+          const firstKey = entries.keys().next().value
+          if (firstKey) entries.delete(firstKey)
+        }
+      }
+      const invalidateProfile = (profileVersion: string) => {
+        for (const [key, entry] of entries) {
+          if (entry.profileVersion !== profileVersion) entries.delete(key)
+        }
+      }
+      return {
+        clear: renderPipelineModuleAuthority.boundary(() => entries.clear()),
+        get: renderPipelineModuleAuthority.boundary(get),
+        invalidateProfile:
+          renderPipelineModuleAuthority.boundary(invalidateProfile),
+        set: renderPipelineModuleAuthority.boundary(set),
+      }
+    },
+  )
 
 const strategyCache = createFsusRenderPipelineStrategyCache()
 
@@ -1517,36 +2080,43 @@ const setCachedStrategy = (
 
 export const clearFsusRenderPipelineStrategyCache = strategyCache.clear
 
-export const inspectFsusRenderPipelineStrategyCache = (cacheKey: string) =>
-  strategyCache.get(cacheKey)
+export const inspectFsusRenderPipelineStrategyCache =
+  renderPipelineModuleAuthority.boundary((cacheKey: string) =>
+    strategyCache.get(cacheKey),
+  )
 
-export const registerFsusRenderPipelineStrategyResolver = (
-  resolver: FsusRenderPipelineStrategyResolver,
-  options: FsusRenderPipelineStrategyResolverOptions = {},
-) => {
-  const entry = {
-    order: strategyResolverOrder++,
-    priority:
-      typeof options.priority === 'number' && Number.isFinite(options.priority)
-        ? options.priority
-        : 0,
-    resolver,
-  }
-  strategyResolvers.add(entry)
-  strategyResolverVersion += 1
-  strategyCache.clear()
-  return () => {
-    strategyResolvers.delete(entry)
+export const registerFsusRenderPipelineStrategyResolver =
+  renderPipelineModuleAuthority.boundary(
+    (
+      resolver: FsusRenderPipelineStrategyResolver,
+      options: FsusRenderPipelineStrategyResolverOptions = {},
+    ) => {
+      const entry = {
+        order: strategyResolverOrder++,
+        priority:
+          typeof options.priority === 'number' &&
+          Number.isFinite(options.priority)
+            ? options.priority
+            : 0,
+        resolver,
+      }
+      strategyResolvers.add(entry)
+      strategyResolverVersion += 1
+      strategyCache.clear()
+      return renderPipelineModuleAuthority.boundary(() => {
+        strategyResolvers.delete(entry)
+        strategyResolverVersion += 1
+        strategyCache.clear()
+      })
+    },
+  )
+
+export const clearFsusRenderPipelineStrategyResolvers =
+  renderPipelineModuleAuthority.boundary(() => {
+    strategyResolvers.clear()
     strategyResolverVersion += 1
     strategyCache.clear()
-  }
-}
-
-export const clearFsusRenderPipelineStrategyResolvers = () => {
-  strategyResolvers.clear()
-  strategyResolverVersion += 1
-  strategyCache.clear()
-}
+  })
 
 export const resolveFsusRenderPipelineComponentPolicy = (
   componentName: string,
@@ -1900,6 +2470,7 @@ type FsusSharedWorkerExecutorEntry = {
   listeners: Set<(event: FsusWorkerExecutorEvent) => void>
   owners: Set<symbol>
   cleanupChecks: { pending: number }
+  producerAuthority: ReturnType<typeof createRenderPipelineProducerAuthority>
   disposeIfUnused: () => void
 }
 
@@ -1916,8 +2487,11 @@ const getSharedWorkerExecutor = <TRequest, TResponse>({
   options: FsusWorkerExecutorOptions
   poolKey: string
 }) => {
+  const producerAuthority = createRenderPipelineProducerAuthority()
+
   let entry = sharedWorkerExecutors.get(poolKey)
   if (!entry) {
+    const registryAuthority = createRenderPipelineProducerAuthority()
     const listeners = new Set<(event: FsusWorkerExecutorEvent) => void>()
     const owners = new Set<symbol>()
     const cleanupChecks = { pending: 0 }
@@ -1947,23 +2521,26 @@ const getSharedWorkerExecutor = <TRequest, TResponse>({
       executor: createFsusWorkerExecutor<unknown, unknown>(createWorker, {
         ...options,
         name: options.name ?? poolKey,
-        onEvent: (event) => {
+        onEvent: registryAuthority.boundary((event) => {
           options.onEvent?.(event)
           for (const activeListener of Array.from(listeners)) {
             activeListener(event)
           }
           if (owners.size === 0 && listeners.size === 0) {
             cleanupChecks.pending += 1
-            queueMicrotask(() => {
-              cleanupChecks.pending -= 1
-              disposeIfUnused()
-            })
+            queueMicrotask(
+              registryAuthority.boundary(() => {
+                cleanupChecks.pending -= 1
+                disposeIfUnused()
+              }),
+            )
           }
-        },
+        }),
       }),
       listeners,
       owners,
       cleanupChecks,
+      producerAuthority: registryAuthority,
       disposeIfUnused,
     }
     sharedWorkerExecutors.set(poolKey, entry)
@@ -1971,35 +2548,60 @@ const getSharedWorkerExecutor = <TRequest, TResponse>({
 
   const owner = Symbol('shared-worker-owner')
   const ownedEntry = entry
+  producerAuthority.retainDependency(
+    ownedEntry.producerAuthority.authority,
+    'shared-registry-authority',
+  )
   let released = false
-  ownedEntry.owners.add(owner)
-  ownedEntry.listeners.add(listener)
+  ownedEntry.producerAuthority.change(() => {
+    ownedEntry.owners.add(owner)
+    ownedEntry.listeners.add(listener)
+  })
   return {
-    inspectSubscription: () => ({
+    authority: producerAuthority.authority,
+    inspectSubscription: producerAuthority.boundary(() => ({
       retainedOwner: ownedEntry.owners.has(owner),
       listenerActive: ownedEntry.listeners.has(listener),
-    }),
-    inspectRegistry: (): FsusSharedWorkerRegistryInspection =>
-      Object.freeze({
-        owners: ownedEntry.owners.size,
-        listeners: ownedEntry.listeners.size,
-        pendingCleanupMicrotasks: ownedEntry.cleanupChecks.pending,
-        attribution: 'unattributable',
-      }),
-    pauseListener: () => ownedEntry.listeners.delete(listener),
-    resumeListener: () => {
+    })),
+    inspectRegistry: producerAuthority.boundary(
+      (): FsusSharedWorkerRegistryInspection =>
+        Object.freeze({
+          owners: ownedEntry.owners.size,
+          listeners: ownedEntry.listeners.size,
+          pendingCleanupMicrotasks: ownedEntry.cleanupChecks.pending,
+          attribution: 'unattributable',
+        }),
+    ),
+    pauseListener: producerAuthority.boundary(() =>
+      ownedEntry.producerAuthority.change(() =>
+        ownedEntry.listeners.delete(listener),
+      ),
+    ),
+    resumeListener: producerAuthority.boundary(() => {
       if (released || ownedEntry.executor.inspectResources().disposed) {
         throw new Error('fsus_shared_worker_subscription_unavailable')
       }
-      ownedEntry.listeners.add(listener)
-    },
-    cleanup: () => {
+      ownedEntry.producerAuthority.change(() =>
+        ownedEntry.listeners.add(listener),
+      )
+    }),
+    cleanup: producerAuthority.boundary(() => {
       if (released) return
       released = true
-      ownedEntry.listeners.delete(listener)
-      ownedEntry.owners.delete(owner)
-      ownedEntry.disposeIfUnused()
-    },
+      try {
+        ownedEntry.producerAuthority.change(() => {
+          ownedEntry.listeners.delete(listener)
+          ownedEntry.owners.delete(owner)
+          ownedEntry.disposeIfUnused()
+        })
+      } finally {
+        if (
+          !ownedEntry.listeners.has(listener) &&
+          !ownedEntry.owners.has(owner)
+        )
+          producerAuthority.close()
+      }
+    }),
     executor: ownedEntry.executor as ReturnType<
       typeof createFsusWorkerExecutor<TRequest, TResponse>
     >,
@@ -2047,6 +2649,10 @@ export const useFsusVirtualWindow = <TUnit>(options: {
   overscanPx?: MaybeRef<number | undefined>
   units: Ref<readonly TUnit[]>
 }) => {
+  const producerAuthority = createRenderPipelineProducerAuthority([
+    'viewport-units-platform',
+  ])
+
   const scrollOffset = ref(0)
   const viewportSize = ref(0)
   const indexVersion = ref(0)
@@ -2083,7 +2689,7 @@ export const useFsusVirtualWindow = <TUnit>(options: {
   }
 
   const variableState = fixedItemSize > 0 ? null : createVariableState()
-  const callbacks = createRenderPipelineCallbackResources()
+  const callbacks = createRenderPipelineCallbackResources(producerAuthority)
   let measurementFrame: (() => void) | null = null
   let scrollFrame: (() => void) | null = null
   let paused = false
@@ -2099,48 +2705,55 @@ export const useFsusVirtualWindow = <TUnit>(options: {
     const job = Symbol('viewport-tick')
     const tickGeneration = generation
     viewportJobs.add(job)
-    void nextTick(() => {
-      if (!paused && !disposed && tickGeneration === generation) run()
-    }).finally(() => viewportJobs.delete(job))
+    void nextTick(
+      producerAuthority.boundary(() => {
+        if (!paused && !disposed && tickGeneration === generation) run()
+      }),
+    ).finally(producerAuthority.boundary(() => viewportJobs.delete(job)))
   }
   let resizeObserver: ResizeObserver | null = null
   const observedTargets = new Set<Element>()
   let viewport: FsusViewport | null = null
 
-  const totalSize = computed(() => {
-    if (fixedItemSize > 0) return options.units.value.length * fixedItemSize
-    indexVersion.value
-    return variableState?.index.total ?? 0
-  })
-
-  const range = computed(() => {
-    const overscan =
-      unref(options.overscanPx) ?? defaultRenderPipelineConfig.budget.overscanPx
-    const startOffset = Math.max(0, scrollOffset.value - overscan)
-    const endOffset = scrollOffset.value + viewportSize.value + overscan
-    const count = options.units.value.length
-    const minVisibleItems = Math.max(
-      1,
-      Math.floor(positive(unref(options.minVisibleItems), 1)),
-    )
-    let start = 0
-    let end = 0
-
-    if (fixedItemSize > 0) {
-      start = Math.max(0, Math.ceil(startOffset / fixedItemSize) - 1)
-      end = Math.min(count, Math.floor(endOffset / fixedItemSize) + 1)
-    } else if (variableState) {
+  const totalSize = computed(
+    producerAuthority.boundary(() => {
+      if (fixedItemSize > 0) return options.units.value.length * fixedItemSize
       indexVersion.value
-      start = variableState.index.findFirstEndAtLeast(startOffset)
-      const lastVisible = variableState.index.findFirstEndGreater(endOffset)
-      end = lastVisible >= count ? count : lastVisible + 1
-    }
+      return variableState?.index.total ?? 0
+    }),
+  )
 
-    return {
-      end: Math.min(count, Math.max(end, start + minVisibleItems)),
-      start,
-    }
-  })
+  const range = computed(
+    producerAuthority.boundary(() => {
+      const overscan =
+        unref(options.overscanPx) ??
+        defaultRenderPipelineConfig.budget.overscanPx
+      const startOffset = Math.max(0, scrollOffset.value - overscan)
+      const endOffset = scrollOffset.value + viewportSize.value + overscan
+      const count = options.units.value.length
+      const minVisibleItems = Math.max(
+        1,
+        Math.floor(positive(unref(options.minVisibleItems), 1)),
+      )
+      let start = 0
+      let end = 0
+
+      if (fixedItemSize > 0) {
+        start = Math.max(0, Math.ceil(startOffset / fixedItemSize) - 1)
+        end = Math.min(count, Math.floor(endOffset / fixedItemSize) + 1)
+      } else if (variableState) {
+        indexVersion.value
+        start = variableState.index.findFirstEndAtLeast(startOffset)
+        const lastVisible = variableState.index.findFirstEndGreater(endOffset)
+        end = lastVisible >= count ? count : lastVisible + 1
+      }
+
+      return {
+        end: Math.min(count, Math.max(end, start + minVisibleItems)),
+        start,
+      }
+    }),
+  )
 
   const offsetForIndex = (index: number) =>
     fixedItemSize > 0
@@ -2148,7 +2761,7 @@ export const useFsusVirtualWindow = <TUnit>(options: {
       : (variableState?.index.prefixSize(index) ?? 0)
 
   const visibleItems: ComputedRef<FsusVirtualWindowItem<TUnit>[]> = computed(
-    () => {
+    producerAuthority.boundary(() => {
       indexVersion.value
       const units = options.units.value
       const currentRange = range.value
@@ -2175,12 +2788,16 @@ export const useFsusVirtualWindow = <TUnit>(options: {
         offset += size
       }
       return items
-    },
+    }),
   )
 
-  const topSpacer = computed(() => offsetForIndex(range.value.start))
-  const bottomSpacer = computed(() =>
-    Math.max(0, totalSize.value - offsetForIndex(range.value.end)),
+  const topSpacer = computed(
+    producerAuthority.boundary(() => offsetForIndex(range.value.start)),
+  )
+  const bottomSpacer = computed(
+    producerAuthority.boundary(() =>
+      Math.max(0, totalSize.value - offsetForIndex(range.value.end)),
+    ),
   )
 
   const emitDiagnostic = (
@@ -2221,7 +2838,7 @@ export const useFsusVirtualWindow = <TUnit>(options: {
     viewportSize.value = getViewportHeight(viewport)
   }
 
-  const scheduleViewportRead = () => {
+  const scheduleViewportRead = producerAuthority.boundary(() => {
     if (paused || disposed || scrollFrame) return
     if (typeof requestAnimationFrame !== 'function') {
       readViewport()
@@ -2231,7 +2848,7 @@ export const useFsusVirtualWindow = <TUnit>(options: {
       scrollFrame = null
       readViewport()
     })
-  }
+  })
 
   const flushMeasurements = () => {
     measurementFrame = null
@@ -2346,29 +2963,31 @@ export const useFsusVirtualWindow = <TUnit>(options: {
       return
     if (!resizeObserver) {
       const currentObserverGeneration = ++observerGeneration
-      resizeObserver = new ResizeObserver((entries) => {
-        if (
-          paused ||
-          disposed ||
-          currentObserverGeneration !== observerGeneration
-        )
-          return
-        for (const entry of entries) {
-          const entryKey = variableState.elementKeys.get(entry.target)
+      resizeObserver = new ResizeObserver(
+        producerAuthority.boundary((entries) => {
           if (
-            !entryKey ||
-            variableState.observedElements.get(entryKey) !== entry.target
+            paused ||
+            disposed ||
+            currentObserverGeneration !== observerGeneration
           )
-            continue
-          const blockSize =
-            entry.borderBoxSize?.[0]?.blockSize ??
-            entry.contentRect.height ??
-            (entry.target instanceof HTMLElement
-              ? entry.target.offsetHeight
-              : 0)
-          queueMeasurement(entryKey, blockSize)
-        }
-      })
+            return
+          for (const entry of entries) {
+            const entryKey = variableState.elementKeys.get(entry.target)
+            if (
+              !entryKey ||
+              variableState.observedElements.get(entryKey) !== entry.target
+            )
+              continue
+            const blockSize =
+              entry.borderBoxSize?.[0]?.blockSize ??
+              entry.contentRect.height ??
+              (entry.target instanceof HTMLElement
+                ? entry.target.offsetHeight
+                : 0)
+            queueMeasurement(entryKey, blockSize)
+          }
+        }),
+      )
     }
     resizeObserver.observe(element)
     observedTargets.add(element)
@@ -2536,7 +3155,9 @@ export const useFsusVirtualWindow = <TUnit>(options: {
   const attachListeners = (target: FsusViewport | null) => {
     connected = true
     listenerViewport = target
-    target?.addEventListener('scroll', scheduleViewportRead, { passive: true })
+    target?.addEventListener('scroll', scheduleViewportRead, {
+      passive: true,
+    })
     resizeTarget =
       target && isWindowViewport(target)
         ? target
@@ -2575,6 +3196,7 @@ export const useFsusVirtualWindow = <TUnit>(options: {
     Object.freeze({
       paused,
       disposed,
+      authorityFeed: producerAuthority.inspect(),
       ...callbacks.inspect(),
       scrollFrame: scrollFrame !== null,
       measurementFrame: measurementFrame !== null,
@@ -2621,31 +3243,37 @@ export const useFsusVirtualWindow = <TUnit>(options: {
     }
     return inspectResources()
   }
-  onMounted(() => {
-    afterViewportTick(connect)
-  })
+  onMounted(
+    producerAuthority.boundary(() => {
+      afterViewportTick(connect)
+    }),
+  )
 
-  watch(options.units, syncUnits, { flush: 'sync' })
+  watch(options.units, producerAuthority.boundary(syncUnits), { flush: 'sync' })
 
-  onBeforeUnmount(() => {
-    disposed = true
-    pause()
-    variableState?.observedElements.clear()
-    if (variableState)
-      variableState.elementKeys = new WeakMap<Element, string>()
-    variableState?.measuredSizes.clear()
-  })
+  onBeforeUnmount(
+    producerAuthority.boundary(() => {
+      disposed = true
+      pause()
+      variableState?.observedElements.clear()
+      if (variableState)
+        variableState.elementKeys = new WeakMap<Element, string>()
+      variableState?.measuredSizes.clear()
+      producerAuthority.close()
+    }),
+  )
 
   return {
-    inspectResources,
-    pause,
-    resume,
+    authority: producerAuthority.authority,
+    inspectResources: producerAuthority.boundary(inspectResources),
+    pause: producerAuthority.boundary(pause),
+    resume: producerAuthority.boundary(resume),
     bottomSpacer,
-    connect,
-    readViewport,
+    connect: producerAuthority.boundary(connect),
+    readViewport: producerAuthority.boundary(readViewport),
     range,
     scrollOffset,
-    setUnitRef,
+    setUnitRef: producerAuthority.boundary(setUnitRef),
     topSpacer,
     totalSize,
     viewportSize,
@@ -2658,6 +3286,14 @@ let renderPipelineRuntimeId = 0
 export const useFsusRenderPipelineRuntime = <TSource, TUnit>(
   options: FsusRenderPipelineRuntimeOptions<TSource, TUnit>,
 ): FsusRenderPipelineRuntimeState<TSource, TUnit> => {
+  const producerAuthority = createRenderPipelineProducerAuthority([
+    'external-source-config-adapter',
+  ])
+  producerAuthority.retainDependency(
+    renderPipelineModuleAuthority.authority,
+    'module-registry-authority',
+  )
+
   const documentRef = shallowRef<FsusRenderPipelineDocument<TUnit> | null>(null)
   const error = shallowRef<FsusErrorDetail | null>(null)
   const diagnostics = shallowRef<readonly FsusRenderPipelineDiagnosticEvent[]>(
@@ -2673,7 +3309,7 @@ export const useFsusRenderPipelineRuntime = <TSource, TUnit>(
   let renderRequestedWhilePaused = false
   let controlTransition = Symbol('initial-control')
   const controlTransitions = new Set<symbol>()
-  const callbacks = createRenderPipelineCallbackResources()
+  const callbacks = createRenderPipelineCallbackResources(producerAuthority)
   const waits = new Set<() => void>()
   const renders = new Set<symbol>()
   const adapterJobs = new Set<symbol>()
@@ -2795,6 +3431,26 @@ export const useFsusRenderPipelineRuntime = <TSource, TUnit>(
       | (() => { retainedOwner: boolean; listenerActive: boolean })
       | null
   }>()
+  const workerAuthorityCanRelease = (executor: RuntimeWorkerExecutor) => {
+    if (workerExecutor === executor) return false
+    if ([...retiringExecutors].some((entry) => entry.executor === executor))
+      return false
+    for (const record of workerScopes) {
+      if (record.executor !== executor) continue
+      if (!record.settled) return false
+      const resources = executor.inspectResources(record.scope)
+      if (
+        resources.tasks.length ||
+        resources.pendingCount ||
+        resources.activeCount ||
+        resources.resources.abortListenerCount ||
+        resources.resources.cancelTimeoutCount ||
+        resources.resources.requestTimeoutCount
+      )
+        return false
+    }
+    return true
+  }
   const controlWorkerScope = (
     record: WorkerScopeRecord,
     operation: 'suspend' | 'cancel' | 'resume',
@@ -2885,11 +3541,13 @@ export const useFsusRenderPipelineRuntime = <TSource, TUnit>(
   const isCurrentNotification = () => {
     const generation = taskId
     const transition = controlTransition
-    return () =>
-      generation === taskId &&
-      transition === controlTransition &&
-      !paused &&
-      !disposed
+    return producerAuthority.boundary(
+      () =>
+        generation === taskId &&
+        transition === controlTransition &&
+        !paused &&
+        !disposed,
+    )
   }
   const recordStage = (
     stage: FsusRenderPipelineStage,
@@ -2937,123 +3595,158 @@ export const useFsusRenderPipelineRuntime = <TSource, TUnit>(
     emitFsusRenderPipelineDiagnostic(nextEvent, isCurrent)
   }
 
-  const sourceRef = computed(() => unref(options.source))
+  const sourceRef = computed(
+    producerAuthority.boundary(() => unref(options.source)),
+  )
 
   const hardwareRuntime = useFsusRenderPipelineHardwareProfile(
-    computed(() => unref(options.config)),
+    computed(producerAuthority.boundary(() => unref(options.config))),
+  )
+  producerAuthority.retainDependency(
+    hardwareRuntime.authority,
+    'hardware-authority',
+    () => {
+      const resources = hardwareRuntime.inspectResources()
+      return (
+        resources.disposed &&
+        resources.pendingBatteryQueries === 0 &&
+        resources.rafHandles === 0 &&
+        resources.retainedListeners === 0
+      )
+    },
   )
   const capabilityProfile = hardwareRuntime.capabilityProfile
   watch(
     capabilityProfile,
-    (profile) => {
+    producerAuthority.boundary((profile) => {
       strategyCache.invalidateProfile(profile.version)
       adaptiveSignals.value = {
         ...adaptiveSignals.value,
         rafDriftMs: profile.refreshProfile.rafDriftMs,
       }
-    },
+    }),
     { immediate: true },
   )
-  const config = computed(() =>
-    resolveFsusAdaptiveRenderPipelineConfig(
-      hardwareRuntime.config.value,
-      hardwareRuntime.profile.value,
-      adaptiveSignals.value,
+  const config = computed(
+    producerAuthority.boundary(() =>
+      resolveFsusAdaptiveRenderPipelineConfig(
+        hardwareRuntime.config.value,
+        hardwareRuntime.profile.value,
+        adaptiveSignals.value,
+      ),
     ),
   )
   const hardwareProfile = hardwareRuntime.profile
-  const compositor = computed(() =>
-    resolveFsusRenderPipelineCompositorEnabled(
-      config.value,
-      hardwareProfile.value,
+  const compositor = computed(
+    producerAuthority.boundary(() =>
+      resolveFsusRenderPipelineCompositorEnabled(
+        config.value,
+        hardwareProfile.value,
+      ),
     ),
   )
-  const contentVisibility = computed(() =>
-    resolveFsusRenderPipelineContentVisibilityEnabled(
-      config.value,
-      hardwareProfile.value,
+  const contentVisibility = computed(
+    producerAuthority.boundary(() =>
+      resolveFsusRenderPipelineContentVisibilityEnabled(
+        config.value,
+        hardwareProfile.value,
+      ),
     ),
   )
-  const hardwareAttrs = computed(() =>
-    resolveFsusRenderPipelineHardwareAttrs({
-      compositor: compositor.value,
-      contentVisibility: contentVisibility.value,
-      hardwareProfile: hardwareProfile.value,
-      layerBudget: config.value.acceleration.layerBudget,
-    }),
+  const hardwareAttrs = computed(
+    producerAuthority.boundary(() =>
+      resolveFsusRenderPipelineHardwareAttrs({
+        compositor: compositor.value,
+        contentVisibility: contentVisibility.value,
+        hardwareProfile: hardwareProfile.value,
+        layerBudget: config.value.acceleration.layerBudget,
+      }),
+    ),
   )
 
   const componentPolicy = computed<FsusRenderPipelineComponentPolicy | null>(
-    () => {
+    producerAuthority.boundary(() => {
       const componentName = unref(options.componentName)?.trim()
       if (!componentName) return null
       return (
         getFsusRenderPipelineComponentPolicy(componentName) ??
         createFsusRenderPipelineComponentPolicy(componentName)
       )
-    },
-  )
-
-  const adapter = computed(() => {
-    const directAdapter = unref(options.adapter)
-    if (directAdapter) return directAdapter
-
-    const explicitAdapterId = unref(options.adapterId)?.trim()
-    const policyAdapterId = componentPolicy.value?.adapterId?.trim()
-    const adapterId = explicitAdapterId || policyAdapterId
-    if (!adapterId) return null
-
-    return getFsusRenderPipelineAdapter<TSource, TUnit>(adapterId) ?? null
-  })
-
-  const estimate = computed<FsusRenderPipelineEstimate>(() => ({
-    ...componentPolicy.value?.estimate,
-    ...adapter.value?.estimate(sourceRef.value),
-    ...unref(options.estimate),
-  }))
-
-  const canUseWorker = computed(
-    () =>
-      (adapter.value?.canUseWorker?.(sourceRef.value) ??
-        !!adapter.value?.worker) &&
-      !!adapter.value,
-  )
-
-  const policy = computed(() => {
-    const componentName = componentPolicy.value?.componentName
-    if (!componentName) return null
-    return resolveFsusRenderPipelineComponentPolicy(
-      componentName,
-      config.value,
-      {
-        canUseWorker: canUseWorker.value,
-        estimate: estimate.value,
-      },
-    )
-  })
-
-  const strategyCacheKey = computed(() =>
-    createStrategyCacheKey({
-      adapter: adapter.value,
-      canUseWorker: canUseWorker.value,
-      config: config.value,
-      source: sourceRef.value,
     }),
   )
 
-  const strategy = computed<FsusRenderPipelineStrategy>(() => {
-    const cached = getCachedStrategy(
-      strategyCacheKey.value,
-      capabilityProfile.value.version,
-    )
-    if (cached) return cached.strategy
-    if (policy.value) return policy.value.strategy
-    return chooseFsusRenderPipelineStrategy(
-      estimate.value,
-      config.value,
-      canUseWorker.value,
-    )
-  })
+  const adapter = computed(
+    producerAuthority.boundary(() => {
+      const directAdapter = unref(options.adapter)
+      if (directAdapter) return directAdapter
+
+      const explicitAdapterId = unref(options.adapterId)?.trim()
+      const policyAdapterId = componentPolicy.value?.adapterId?.trim()
+      const adapterId = explicitAdapterId || policyAdapterId
+      if (!adapterId) return null
+
+      return getFsusRenderPipelineAdapter<TSource, TUnit>(adapterId) ?? null
+    }),
+  )
+
+  const estimate = computed<FsusRenderPipelineEstimate>(
+    producerAuthority.boundary(() => ({
+      ...componentPolicy.value?.estimate,
+      ...adapter.value?.estimate(sourceRef.value),
+      ...unref(options.estimate),
+    })),
+  )
+
+  const canUseWorker = computed(
+    producerAuthority.boundary(
+      () =>
+        (adapter.value?.canUseWorker?.(sourceRef.value) ??
+          !!adapter.value?.worker) &&
+        !!adapter.value,
+    ),
+  )
+
+  const policy = computed(
+    producerAuthority.boundary(() => {
+      const componentName = componentPolicy.value?.componentName
+      if (!componentName) return null
+      return resolveFsusRenderPipelineComponentPolicy(
+        componentName,
+        config.value,
+        {
+          canUseWorker: canUseWorker.value,
+          estimate: estimate.value,
+        },
+      )
+    }),
+  )
+
+  const strategyCacheKey = computed(
+    producerAuthority.boundary(() =>
+      createStrategyCacheKey({
+        adapter: adapter.value,
+        canUseWorker: canUseWorker.value,
+        config: config.value,
+        source: sourceRef.value,
+      }),
+    ),
+  )
+
+  const strategy = computed<FsusRenderPipelineStrategy>(
+    producerAuthority.boundary(() => {
+      const cached = getCachedStrategy(
+        strategyCacheKey.value,
+        capabilityProfile.value.version,
+      )
+      if (cached) return cached.strategy
+      if (policy.value) return policy.value.strategy
+      return chooseFsusRenderPipelineStrategy(
+        estimate.value,
+        config.value,
+        canUseWorker.value,
+      )
+    }),
+  )
 
   const clearWorkerExecutor = () => {
     const cleanup = workerExecutorSharedCleanup
@@ -3085,7 +3778,16 @@ export const useFsusRenderPipelineRuntime = <TSource, TUnit>(
       completed = true
     } finally {
       // A thrown callback does not prove cleanup completed.
-      if (completed) retiringExecutors.delete(retired)
+      if (completed) {
+        retiringExecutors.delete(retired)
+        if (
+          retired.executor &&
+          'authority' in retired.executor &&
+          retired.executor.authority &&
+          typeof retired.executor.authority === 'object'
+        )
+          producerAuthority.releaseDependency(retired.executor.authority)
+      }
     }
     publishWorkerCallbackFailure()
   }
@@ -3175,17 +3877,28 @@ export const useFsusRenderPipelineRuntime = <TSource, TUnit>(
         FsusRenderPipelineDocument<TUnit> | null
       >({
         createWorker: workerOptions.createWorker,
-        listener: (event) =>
+        listener: producerAuthority.boundary((event) =>
           invokeWorkerCallback(workerEventListener, event, 'runtime-event'),
+        ),
         options: {
           ...executorOptions,
-          onEvent: (event) =>
+          onEvent: producerAuthority.boundary((event) =>
             invokeWorkerCallback(workerOptions.onEvent, event, 'adapter-event'),
+          ),
         },
         poolKey:
           workerOptions.poolKey ?? workerOptions.name ?? activeAdapter.id,
       })
+      producerAuthority.retainDependency(
+        shared.authority,
+        'shared-registry-authority',
+      )
       workerExecutor = shared.executor
+      producerAuthority.retainDependency(
+        'authority' in workerExecutor ? workerExecutor.authority : undefined,
+        'worker-authority',
+        () => workerAuthorityCanRelease(shared.executor),
+      )
       workerExecutorShared = true
       workerExecutorSharedCleanup = shared.cleanup
       workerExecutorPauseListener = shared.pauseListener
@@ -3201,11 +3914,19 @@ export const useFsusRenderPipelineRuntime = <TSource, TUnit>(
       FsusRenderPipelineDocument<TUnit> | null
     >(workerOptions.createWorker, {
       ...executorOptions,
-      onEvent: (event) => {
+      onEvent: producerAuthority.boundary((event) => {
         invokeWorkerCallback(workerOptions.onEvent, event, 'adapter-event')
         invokeWorkerCallback(workerEventListener, event, 'runtime-event')
-      },
+      }),
     })
+    producerAuthority.retainDependency(
+      'authority' in workerExecutor ? workerExecutor.authority : undefined,
+      'worker-authority',
+      (() => {
+        const executor = workerExecutor
+        return () => workerAuthorityCanRelease(executor)
+      })(),
+    )
     workerExecutorShared = false
 
     return workerExecutor
@@ -3261,7 +3982,7 @@ export const useFsusRenderPipelineRuntime = <TSource, TUnit>(
       () => activeAdapter.prepare(input, signal, activeStrategy),
       'fsus_render_pipeline_prepare_failed',
       'infra',
-    ).finally(() => adapterJobs.delete(job))
+    ).finally(producerAuthority.boundary(() => adapterJobs.delete(job)))
   }
 
   const prepareDocument = async (
@@ -3514,6 +4235,7 @@ export const useFsusRenderPipelineRuntime = <TSource, TUnit>(
       ownerKey: workerTaskKey,
       paused,
       disposed,
+      authorityFeed: producerAuthority.inspect(),
       ...callbacks.inspect(),
       retainedListeners:
         waits.size +
@@ -3646,7 +4368,7 @@ export const useFsusRenderPipelineRuntime = <TSource, TUnit>(
       }
     })
   }
-  const render = async () => {
+  const render = producerAuthority.boundary(async () => {
     if (disposed) return
     if (paused) {
       // Coalesce intent, invalidate the suspended input, and admit latest source
@@ -3669,41 +4391,48 @@ export const useFsusRenderPipelineRuntime = <TSource, TUnit>(
       renders.delete(job)
       if (taskId === renderTaskId) loading.value = false
     }
-  }
-  onBeforeUnmount(() => {
-    // Terminalize before abort/worker events can reenter render or resume.
-    disposed = true
-    transitionControl('dispose', (isCurrent) => {
-      paused = true
-      preservedWorkerTask = false
-      renderRequestedWhilePaused = false
-      taskId += 1
-      const previousController = controller
-      controller = null
-      previousController?.abort()
-      if (!isCurrent()) return
-      for (const record of [...workerScopes]) {
-        controlWorkerScope(record, 'cancel', isCurrent)
-        if (!isCurrent()) return
-      }
-      for (const settle of [...waits]) {
-        settle()
-        if (!isCurrent()) return
-      }
-      callbacks.cancelAll(isCurrent)
-      if (!isCurrent()) return
-      loading.value = false
-      if (!isCurrent()) return
-      hardwareRuntime.pause()
-      if (!isCurrent()) return
-      clearWorkerExecutor()
-    })
   })
+  onBeforeUnmount(
+    producerAuthority.boundary(() => {
+      // Terminalize before abort/worker events can reenter render or resume.
+      disposed = true
+      try {
+        transitionControl('dispose', (isCurrent) => {
+          paused = true
+          preservedWorkerTask = false
+          renderRequestedWhilePaused = false
+          taskId += 1
+          const previousController = controller
+          controller = null
+          previousController?.abort()
+          if (!isCurrent()) return
+          for (const record of [...workerScopes]) {
+            controlWorkerScope(record, 'cancel', isCurrent)
+            if (!isCurrent()) return
+          }
+          for (const settle of [...waits]) {
+            settle()
+            if (!isCurrent()) return
+          }
+          callbacks.cancelAll(isCurrent)
+          if (!isCurrent()) return
+          loading.value = false
+          if (!isCurrent()) return
+          hardwareRuntime.pause()
+          if (!isCurrent()) return
+          clearWorkerExecutor()
+        })
+      } finally {
+        producerAuthority.close()
+      }
+    }),
+  )
 
   return {
-    inspectResources,
-    pause,
-    resume,
+    authority: producerAuthority.authority,
+    inspectResources: producerAuthority.boundary(inspectResources),
+    pause: producerAuthority.boundary(pause),
+    resume: producerAuthority.boundary(resume),
     adapter,
     canUseWorker,
     capabilityProfile,
