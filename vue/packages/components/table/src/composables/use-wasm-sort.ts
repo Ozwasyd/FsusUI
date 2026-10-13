@@ -38,10 +38,16 @@ const yieldToMain = () =>
   })
 
 export class FsusRowIndexView<T> implements Iterable<T> {
+  private readonly rows: readonly T[]
+  readonly indices: Uint32Array
+
   constructor(
-    private readonly rows: readonly T[],
-    readonly indices: Uint32Array,
-  ) {}
+    rows: readonly T[],
+    indices: Uint32Array,
+  ) {
+    this.rows = rows
+    this.indices = indices
+  }
 
   get length() {
     return this.indices.length
