@@ -96,7 +96,7 @@ export const inspectMarkdownAttachmentDispatch = (
   }) : null
 }
 
-/** Only the original result and full-local future can settle a richer invocation. */
+/** Content delivery and full-local settlement use their separate original futures. */
 export interface MarkdownAttachmentDispatchCompletion {
   readonly result: PromiseLike<MarkdownAttachmentProviderResult>
   readonly settled: PromiseLike<void>
@@ -129,6 +129,7 @@ const createDispatchFutureObservation = (
   work: unknown,
   access: { readonly cause: unknown } | undefined,
   otherWork: unknown = work,
+  onObserved?: () => void,
 ) => {
   let status: 'pending' | 'fulfilled' | 'rejected' | 'unavailable' = 'pending'
   let primary: 'pending' | 'fulfilled' | 'rejected' = 'pending'
@@ -174,6 +175,7 @@ const createDispatchFutureObservation = (
     } catch (failure) {
       status = 'unavailable'
       observationCause = failure
+      onObserved?.()
       finish()
       return
     }
@@ -188,6 +190,7 @@ const createDispatchFutureObservation = (
         status = 'unavailable'
         observationCause = failure
       } finally {
+        onObserved?.()
         finish()
       }
     })()
@@ -251,7 +254,7 @@ export const runMarkdownAttachmentDispatch = async (
   const retainResultState = (
     observed: ReturnType<MarkdownAttachmentDispatchFutureObservation['inspect']>,
   ) => {
-    state.resultSettlement = observed.status === 'fulfilled' || observed.status === 'rejected' ? observed.status : 'unknown'
+    state.resultSettlement = observed.status === 'unavailable' ? 'unknown' : observed.status
     state.resultSettlementCause = observed.cause
     state.resultObservationCause = observed.observationCause
     state.observationNotificationCauses = Object.freeze([...notificationCauses])
@@ -281,9 +284,26 @@ export const runMarkdownAttachmentDispatch = async (
       }
       const resultWork = capture('result')
       const localWork = capture('settled')
-      const result = createDispatchFutureObservation(resultWork.original, resultWork.access, localWork.original)
       const same = resultWork.original === localWork.original && !resultWork.access && !localWork.access
-      const local = same ? result : createDispatchFutureObservation(localWork.original, localWork.access, resultWork.original)
+      // This updates only this invocation's retained ledger, including after
+      // content delivery. It cannot apply content or acknowledge cleanup.
+      const retainCompletionState = () => {
+        const resultState = result.observation.inspect()
+        const localState = local.observation.inspect()
+        retainResultState(resultState)
+        state.localSettlement = localState.status === 'pending' ? 'pending'
+          : localState.status === 'fulfilled' && !same && !notificationCauses.length
+            ? 'fulfilled' : 'unknown'
+        state.localSettlementCause = localState.cause
+        state.localObservationCause = localState.observationCause
+        state.settlementAvailable = !same &&
+          resultState.status !== 'unavailable' && localState.status !== 'unavailable'
+        state.settled = !same && !notificationCauses.length &&
+          (resultState.status === 'fulfilled' || resultState.status === 'rejected') &&
+          localState.status === 'fulfilled'
+      }
+      const result = createDispatchFutureObservation(resultWork.original, resultWork.access, localWork.original, retainCompletionState)
+      const local = same ? result : createDispatchFutureObservation(localWork.original, localWork.access, resultWork.original, retainCompletionState)
       state.resultSettlement = 'pending'
       state.localSettlement = 'pending'
       // Install BOTH independent handlers before any custody notification can fail.
@@ -291,23 +311,16 @@ export const runMarkdownAttachmentDispatch = async (
       if (local !== result) within(local.start)
       retain('result', result.observation)
       retain('settled', local.observation)
-      state.settlementAvailable = !same &&
-        result.observation.inspect().status !== 'unavailable' &&
-        local.observation.inspect().status !== 'unavailable'
-      await Promise.all([result.observation.monitor, local.observation.monitor])
+      retainCompletionState()
+      // The original result is content evidence, not a full-resource terminal.
+      // The local observer remains retained and updates its own ledger later.
+      await result.observation.monitor
+      retainCompletionState()
       const resultState = result.observation.inspect()
       const localState = local.observation.inspect()
-      retainResultState(resultState)
-      state.localSettlement = localState.status === 'fulfilled' && !same && !notificationCauses.length
-        ? 'fulfilled' : 'unknown'
-      state.localSettlementCause = localState.cause
-      state.localObservationCause = localState.observationCause
-      state.settlementAvailable = !same &&
-        (resultState.status === 'fulfilled' || resultState.status === 'rejected') &&
-        (localState.status === 'fulfilled' || localState.status === 'rejected')
       if (
         same || (resultState.status !== 'fulfilled' && resultState.status !== 'rejected') ||
-        state.localSettlement !== 'fulfilled' || notificationCauses.length
+        notificationCauses.length
       ) {
         const causes: unknown[] = []
         for (const observed of [resultState, localState]) {
@@ -318,10 +331,9 @@ export const runMarkdownAttachmentDispatch = async (
         causes.push(...notificationCauses)
         throw new AggregateError(
           causes,
-          'markdown-attachment-local-settlement-unavailable',
+          'markdown-attachment-result-delivery-unavailable',
         )
       }
-      state.settled = true
       if (resultState.status === 'rejected') throw resultState.cause
       return resultState.value as MarkdownAttachmentProviderResult
     }

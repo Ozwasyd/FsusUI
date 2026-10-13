@@ -1511,6 +1511,16 @@ Terminal consumption likewise performs a synchronous content commit after the
 original owner's existing proof. Removing the hook does not replace or release
 the original in-flight request.
 
+Content provenance follows fulfillment of the original result future and its
+actual observation work, independently of the request's full-local `settled`
+future. The owner installs and retains both observations before content delivery.
+Pending or unobservable local settlement and its original failures remain in the
+same invocation ledger after the content result returns. Only actual known result
+termination plus distinct full-local fulfillment, without observation failure,
+can mark that dispatch settled. Retry, retirement, cancellation, cleanup and
+resource census retain their original settlement requirements. Content delivery
+does not make unknown upload transport work settled or certify zero resources.
+
 `attachmentDispatch` retains its existing Promise-only compatibility signature
 and original legacy owner path. Providing both hooks refuses before either
 business invocation. Neither legacy content settlement nor a rich supplied handle
