@@ -70,9 +70,9 @@ const isPaneName = (value: unknown): value is string | number =>
 
 export const tabsEmits = {
   [UPDATE_MODEL_EVENT]: (name: TabPaneName) => isPaneName(name),
-  tabClick: (pane: TabsPaneContext, ev: Event) => ev instanceof Event,
+  tabClick: (_pane: TabsPaneContext, ev: Event) => ev instanceof Event,
   tabChange: (name: TabPaneName) => isPaneName(name),
-  edit: (paneName: TabPaneName | undefined, action: 'remove' | 'add') =>
+  edit: (_paneName: TabPaneName | undefined, action: 'remove' | 'add') =>
     ['remove', 'add'].includes(action),
   tabRemove: (name: TabPaneName) => isPaneName(name),
   tabAdd: () => true,

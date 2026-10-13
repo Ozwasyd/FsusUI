@@ -56,9 +56,9 @@ export const tabNavProps = buildProps({
 } as const)
 
 export const tabNavEmits = {
-  tabClick: (tab: TabsPaneContext, tabName: TabPaneName, ev: Event) =>
+  tabClick: (_tab: TabsPaneContext, _tabName: TabPaneName, ev: Event) =>
     ev instanceof Event,
-  tabRemove: (tab: TabsPaneContext, ev: Event) => ev instanceof Event,
+  tabRemove: (_tab: TabsPaneContext, ev: Event) => ev instanceof Event,
 }
 
 export type TabNavProps = ExtractPropTypes<typeof tabNavProps>
