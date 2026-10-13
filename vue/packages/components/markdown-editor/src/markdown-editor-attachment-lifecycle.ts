@@ -587,7 +587,7 @@ export const cancelMarkdownAttachmentJob = (job: MarkdownAttachmentJob) => {
   return job
 }
 
-export const retryMarkdownAttachmentJob = (job: MarkdownAttachmentJob) => {
+export const assertMarkdownAttachmentRetryAdmission = (job: MarkdownAttachmentJob) => {
   const dispatch = inspectMarkdownAttachmentDispatch(job)
   if (
     !dispatch ||
@@ -597,6 +597,10 @@ export const retryMarkdownAttachmentJob = (job: MarkdownAttachmentJob) => {
     throw new Error('markdown-attachment-retry-settlement-unavailable')
   if (!dispatch.settled)
     throw new Error('markdown-attachment-retry-dispatch-still-running')
+}
+
+export const retryMarkdownAttachmentJob = (job: MarkdownAttachmentJob) => {
+  assertMarkdownAttachmentRetryAdmission(job)
   job.phase = 'pending'
   job.progress = 0
   job.attempt += 1

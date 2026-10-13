@@ -24,6 +24,8 @@ import type {
 import {
   inspectMarkdownAttachmentDispatch,
   runMarkdownAttachmentDispatch,
+  assertMarkdownAttachmentRetryAdmission,
+  retryMarkdownAttachmentJob,
 } from './markdown-editor-attachment-lifecycle'
 import {
   bindMarkdownAttachmentConsumerRequest,
@@ -81,6 +83,13 @@ export interface MarkdownAttachmentEmbedInputs {
   readonly documentIdentity: MarkdownDocumentIdentity
   readonly revision: Ref<number>
   readonly jobs: Ref<MarkdownAttachmentJob[]>
+}
+
+export interface MarkdownAttachmentDispatchOptions {
+  readonly retry?: {
+    beforeRetry(): void
+    assertAdmission(phase: 'before-retry' | 'after-file-release' | 'after-retry'): void
+  }
 }
 
 const snapshotJobs = (value: readonly MarkdownAttachmentJob[]) => {
@@ -742,11 +751,12 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
     left.revision === right.revision &&
     left.id === right.id &&
     left.epoch === right.epoch
-  const readAttachmentObservation = () => {
+  const readAttachmentObservation = (transition?: object) => {
+    if (transition) assertLifecycleTransition(transition)
     if (
       !stopAttachmentWatcher ||
       watcherTransitions !== 0 ||
-      lifecycleTransition !== undefined ||
+      (lifecycleTransition !== undefined && lifecycleTransition !== transition) ||
       failedWatcherStops.size !== 0 ||
       watcherConstructionFailure !== undefined ||
       pauseRequested ||
@@ -1336,30 +1346,84 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
       admitProgress: (result: MarkdownAttachmentProviderResult) => boolean,
     ) => unknown,
     requireConsumer: boolean,
+    options?: MarkdownAttachmentDispatchOptions,
   ): Promise<MarkdownAttachmentProviderResult> => {
     assertLifecycleIdle()
     if (disposed || pauseRequested)
       throw new Error('editor-session-attachment-dispatch-admission-blocked')
     const ownedJob = toRaw(job)
-    const previousConsumers = [...consumers.values()].filter(
-      (entry) => entry.job === ownedJob,
-    )
-    // Retire a real completed scope before reusing the job. Opaque legacy records
-    // stay retained, while the original dispatch ledger still gates content retries.
-    inspectConsumers(previousConsumers.filter((entry) => entry.binding))
-    if (
-      previousConsumers.some(
-        (entry) =>
-          consumers.has(entry.dispatchRef) &&
-          (requireConsumer || !entry.legacyResultOnly),
-      )
-    )
-      throw new Error(
-        'editor-session-attachment-consumer-previous-attempt-retained',
-      )
-    const boundary = beginBoundary()
-    const epoch = attachmentGeneration
-    const observation = readAttachmentObservation()
+    const releasePrevious = () => {
+      const previous = [...consumers.values()].filter((entry) => entry.job === ownedJob)
+      // Use the original scope/settlement custody, never aggregate census authority.
+      inspectConsumers(previous.filter((entry) => entry.binding))
+      if (previous.some((entry) => consumers.has(entry.dispatchRef) && (requireConsumer || !entry.legacyResultOnly)))
+        throw new Error('editor-session-attachment-consumer-previous-attempt-retained')
+    }
+    const retry = options && consumerControl(() => {
+      const captured = snapshotPassiveRecord(options)
+      if (!captured) throw new Error('editor-session-attachment-retry-port-unavailable')
+      return captured.retry
+    })
+    const admission = retry ? withLifecycleTransition((transition) => {
+      const boundary = beginBoundary()
+      const epoch = attachmentGeneration
+      const initial = readAttachmentFrame()
+      const original = snapshotPassiveRecord(ownedJob)
+      if (!original || !initial.jobs.includes(ownedJob))
+        throw new Error('editor-session-attachment-dispatch-job-unavailable')
+      // Old-scope refusal precedes every Main callback and every retry mutation.
+      releasePrevious()
+      assertMarkdownAttachmentRetryAdmission(ownedJob)
+      const previous = inspectMarkdownAttachmentDispatch(ownedJob)!
+      if (!Number.isSafeInteger(original.attempt + 1))
+        throw new Error('editor-session-attachment-retry-attempt-unavailable')
+      const callbacks = snapshotPassiveRecord(retry)
+      if (!callbacks || typeof callbacks.beforeRetry !== 'function' || typeof callbacks.assertAdmission !== 'function')
+        throw new Error('editor-session-attachment-retry-port-unavailable')
+      const guard = (expected: Readonly<MarkdownAttachmentJob>, version: object) => {
+        assertLifecycleTransition(transition)
+        const frame = readAttachmentFrame()
+        const current = snapshotPassiveRecord(ownedJob)
+        const identity = current?.documentIdentity && snapshotPassiveRecord(toRaw(current.documentIdentity))
+        const ledger = inspectMarkdownAttachmentDispatch(ownedJob)
+        const keys = current && Reflect.ownKeys(current)
+        if (
+          pauseRequested || disposed || attachmentGeneration !== epoch || boundaryRef !== boundary ||
+          frame.version !== version || !sameDocumentContext(initial.context, frame.context) ||
+          !sameJobs(initial.jobs, frame.jobs) || !frame.jobs.includes(ownedJob) ||
+          identity?.id !== frame.context.id || identity.epoch !== frame.context.epoch ||
+          !current || !keys || keys.length !== Reflect.ownKeys(expected).length ||
+          keys.some((key) => !Object.is(Reflect.get(current, key), Reflect.get(expected, key))) ||
+          ledger?.dispatchRef !== previous.dispatchRef || ledger.attempt !== previous.attempt ||
+          !ledger.settled || !ledger.settlementAvailable
+        ) throw new Error('editor-session-attachment-retry-admission-invalidated')
+        return frame
+      }
+      const phase = (name: 'before-retry' | 'after-file-release' | 'after-retry', expected: Readonly<MarkdownAttachmentJob>, version: object) => {
+        guard(expected, version)
+        Reflect.apply(callbacks.assertAdmission, retry, [name])
+        return guard(expected, version)
+      }
+      phase('before-retry', original, initial.version)
+      Reflect.apply(callbacks.beforeRetry, retry, [])
+      const released = phase('after-file-release', original, initial.version)
+      // Mutate the actual native reactive job, including synchronous invalidation.
+      const live = readNativeRef(attachmentInputs!.jobs)[released.jobs.indexOf(ownedJob)]
+      if (!isReactive(live) || toRaw(live) !== ownedJob)
+        throw new Error('editor-session-attachment-retry-job-unavailable')
+      retryMarkdownAttachmentJob(live)
+      const expected = Object.freeze({ ...original, phase: 'pending' as const, progress: 0, attempt: original.attempt + 1, code: undefined, message: undefined })
+      const retried = phase('after-retry', expected, attachmentObservationRef)
+      const observation = readAttachmentObservation(transition)
+      guard(expected, retried.version)
+      return { boundary, epoch, observation }
+    }) : (() => {
+      releasePrevious()
+      const boundary = beginBoundary()
+      const epoch = attachmentGeneration
+      return { boundary, epoch, observation: readAttachmentObservation() }
+    })()
+    const { boundary, epoch, observation } = admission
     const context = observation.context
     const jobSnapshot = snapshotPassiveRecord(ownedJob)
     const jobIdentity =
@@ -1599,16 +1663,18 @@ export const createMarkdownAttachmentEmbedResourceOwner = (
       dispatch: (
         admitProgress: (result: MarkdownAttachmentProviderResult) => boolean,
       ) => PromiseLike<MarkdownAttachmentProviderResult>,
+      options?: MarkdownAttachmentDispatchOptions,
     ) {
-      return runAttachmentDispatch(job, dispatch, false)
+      return runAttachmentDispatch(job, dispatch, false, options)
     },
     runAttachmentConsumerRequest(
       job: MarkdownAttachmentJob,
       dispatch: (
         admitProgress: (result: MarkdownAttachmentProviderResult) => boolean,
       ) => MarkdownAttachmentConsumerRequest | unknown,
+      options?: MarkdownAttachmentDispatchOptions,
     ) {
-      return runAttachmentDispatch(job, dispatch, true)
+      return runAttachmentDispatch(job, dispatch, true, options)
     },
     readAttachmentConsumerSource() {
       if (consumerControlDepth || lifecycleTransition)

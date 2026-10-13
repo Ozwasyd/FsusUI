@@ -1530,3 +1530,26 @@ and throw a conflict after allocating source state. Retry configuration refusal
 likewise precedes File withdrawal and attempt mutation.
 Paste and drop pass their same frozen entry configuration through transfer parsing,
 selection reentry, capture and dispatch; transfer never rereads later props.
+
+### Pending original atomic retry consumer candidate
+
+The separate consumer candidate depends on original owner
+`b0775bf73a6a5a78067ff72afdc598f27639caa2`, which is still under independent
+review. Its exact lifecycle/consumer postimages are staged only in this candidate;
+the owner algorithms are not rewritten by Main and are not called accepted.
+
+Main forwards the same frozen dispatch configuration and original job/binding/
+document admission through the original strict or legacy entry's retry option.
+It performs no File withdrawal or native retry mutation before owner admission.
+The owner alone admits the old private scope/ledger, invokes Main's original File
+callback, mutates the original native attempt and issues the one dispatch. Main's
+phase callback checks the actual captured job, binding, item/batch membership,
+document identity/epoch/revision and expected old/new native fields. File lookup
+occurs inside the actual dispatch callback after owner File handling, so no earlier
+loan is smuggled through cancellation/reentry. No public census or cloned ledger
+grants retry. A pre-admission refusal leaves the old attempt and content unchanged.
+
+This is pending-source integration, not completed P2 acceptance. Original controls
+and all runtime/qualification remain UNRUN/HOLD; Root physical staging and real
+Blog business producer/wiring remain separate. No complete resources, recovery,
+full-ready or eviction is granted.
