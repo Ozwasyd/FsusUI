@@ -4632,10 +4632,10 @@ const applyClipboardTransfer = (
   event: { preventDefault(): void; dataTransfer?: DataTransfer | null },
   origin: 'paste' | 'drop',
   data: DataTransfer | null | undefined,
+  dispatchConfiguration: AttachmentDispatchConfiguration,
   attachmentSelection?: MarkdownEditorSelection | null,
 ) => {
   const transfer = markdownClipboardItemsFromDataTransfer(data ?? null)
-  const dispatchConfiguration = transfer.files.length > 0 ? readAttachmentDispatchConfiguration() : undefined
   const hasTransfer = transfer.items.length > 0 || transfer.files.length > 0
   if (!hasTransfer) {
     if (!editingBlocked.value && !nativeMachine.freezeSmartInput) {
@@ -4700,7 +4700,7 @@ const applyClipboardTransfer = (
 }
 
 const handlePaste = (event: ClipboardEvent) => {
-  if (event.clipboardData?.files.length) readAttachmentDispatchConfiguration()
+  const dispatchConfiguration = readAttachmentDispatchConfiguration()
   const cell = refreshCurrentTableCell(captureSelection(false).start)
   const clipboard = event.clipboardData
   if (
@@ -4763,16 +4763,17 @@ const handlePaste = (event: ClipboardEvent) => {
       }
     }
   }
-  applyClipboardTransfer(event, 'paste', event.clipboardData)
+  applyClipboardTransfer(event, 'paste', event.clipboardData, dispatchConfiguration)
 }
 
 const handleDrop = (event: DragEvent) => {
-  if (event.dataTransfer?.files.length) readAttachmentDispatchConfiguration()
+  const dispatchConfiguration = readAttachmentDispatchConfiguration()
   event.preventDefault()
   applyClipboardTransfer(
     event,
     'drop',
     event.dataTransfer,
+    dispatchConfiguration,
     resolveDropSelection(event),
   )
 }

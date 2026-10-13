@@ -1734,6 +1734,59 @@ describe('MarkdownEditor', () => {
     expect(wrapper.emitted('update:modelValue')).toBeUndefined()
   })
 
+  it.each(['paste', 'drop'] as const)('keeps the same entry dispatch configuration through %s selection reentry', async (origin) => {
+    let input!: Parameters<MarkdownEditorAttachmentRequestDispatch>[0]
+    let finishResult!: (result: MarkdownAttachmentProviderResult) => void
+    let finishSettled!: () => void
+    const request: MarkdownAttachmentConsumerRequest = {
+      result: new Promise((resolve) => { finishResult = resolve }),
+      settled: new Promise((resolve) => { finishSettled = resolve }), cancelLocal: () => {},
+      inspectLocalResources: () => ({ backgroundTasks: 0, timers: 0, observers: 0,
+        retainedListeners: 0, networkRequests: 0, memoryUnits: 0 }),
+    }
+    const initial = vi.fn<MarkdownEditorAttachmentRequestDispatch>((value) => { input = value; return request })
+    const replacement = vi.fn<MarkdownEditorAttachmentRequestDispatch>(() => { throw new Error('replacement must not run') })
+    const legacy = vi.fn<MarkdownEditorAttachmentDispatch>(() => { throw new Error('legacy must not run') })
+    const errors: unknown[] = []
+    let armed = false
+    let wrapper!: ReturnType<typeof mount<typeof MarkdownEditor>>
+    const replaceDuringSelection = () => {
+      if (!armed) return
+      // Synchronous prop replacement exercises the real callback boundary;
+      // no asynchronous parent render can hide the second-read counterexample.
+      Object.assign(wrapper.vm.$.props, { attachmentRequestDispatch: replacement, attachmentDispatch: legacy })
+    }
+    wrapper = mount(MarkdownEditor, { props: { modelValue: 'Draft: ',
+      attachmentRequestDispatch: initial, onSelectionChange: replaceDuringSelection },
+    global: { config: { errorHandler: (cause) => { errors.push(cause) } } } })
+    const textarea = wrapper.find('textarea').element
+    textarea.setSelectionRange(0, 0)
+    armed = true
+    if (origin === 'drop') Object.defineProperty(document, 'caretPositionFromPoint', {
+      configurable: true, value: () => { replaceDuringSelection(); return { offset: 0, offsetNode: textarea } },
+    })
+    const event = new Event(origin, { bubbles: true, cancelable: true })
+    Object.defineProperties(event, {
+      clientX: { value: 1 }, clientY: { value: 1 },
+      [origin === 'paste' ? 'clipboardData' : 'dataTransfer']: { value: {
+        files: [new File(['report'], 'report.pdf', { type: 'application/pdf' })],
+        getData: () => '', types: ['Files'],
+      } },
+    })
+    try {
+      textarea.dispatchEvent(event)
+      await nextTick()
+      expect(initial).toHaveBeenCalledTimes(1)
+      expect(replacement).not.toHaveBeenCalled()
+      expect(legacy).not.toHaveBeenCalled()
+      expect(errors).toEqual([])
+      armed = false
+      finishResult({ status: 'rejected', batchId: input.batch.batchId, itemId: input.item.itemId })
+      finishSettled()
+      await flushPromises()
+    } finally { if (origin === 'drop') Reflect.deleteProperty(document, 'caretPositionFromPoint') }
+  })
+
   it('keeps a started service future behind its proof gate after the dispatch prop is removed', async () => {
     let request: Parameters<MarkdownEditorAttachmentDispatch>[0] | undefined
     let finish!: (result: MarkdownAttachmentProviderResult) => void

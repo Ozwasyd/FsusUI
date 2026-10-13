@@ -1528,3 +1528,5 @@ The capture holds that same immutable configuration through synchronous transact
 callbacks and uses it for the one original dispatch; it does not reread later props
 and throw a conflict after allocating source state. Retry configuration refusal
 likewise precedes File withdrawal and attempt mutation.
+Paste and drop pass their same frozen entry configuration through transfer parsing,
+selection reentry, capture and dispatch; transfer never rereads later props.

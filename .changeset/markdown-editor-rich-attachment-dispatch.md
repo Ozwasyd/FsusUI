@@ -13,3 +13,5 @@ Refuse conflicting dispatch configuration before selection, native transfer,
 controllers, placeholders and File/job registration, and before retry File or
 attempt changes. Pin the same accepted configuration through capture callbacks
 and the one original dispatch instead of rereading conflicting props later.
+Keep the original paste/drop entry snapshot through selection and transfer reentry
+by passing it into transfer, capture and dispatch without a second props read.
