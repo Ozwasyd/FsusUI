@@ -5773,7 +5773,8 @@ const applyAttachmentResult = (result: MarkdownAttachmentProviderResult) => {
   // Read once; replacing the prop during callbacks cannot transfer this application.
   const observer = result.status === 'resolved' ? props.attachmentTerminalObserver : undefined
   if (observer && (isLegacyContent || !capture || !item || !batch ||
-      !dispatchProof?.settled || !dispatchProof.settlementAvailable || dispatchProof.dispatching ||
+      !dispatchProof || dispatchProof.resultSettlement !== 'fulfilled' ||
+      dispatchProof.observationNotificationCauses?.length || dispatchProof.dispatching ||
       dispatchProof.attempt !== attempt)) return false
   let application: NativeAttachmentTerminalApplication | undefined
   let completed = false
@@ -5807,7 +5808,7 @@ const applyAttachmentResult = (result: MarkdownAttachmentProviderResult) => {
         : batch.capture === capture && batch.files.has(item))) &&
       (!application || nativeAttachmentTerminalApplication === application) &&
       (!observer || (proof?.dispatchRef === dispatchProof?.dispatchRef && proof?.attempt === attempt &&
-        proof.settled && proof.settlementAvailable && !proof.dispatching))
+        proof.resultSettlement === 'fulfilled' && !proof.observationNotificationCauses?.length && !proof.dispatching))
   }
   const notify = (observation: MarkdownAttachmentTerminalObservation): boolean => {
     if (!application || !observer) return true
