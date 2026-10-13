@@ -94,8 +94,24 @@ export interface MarkdownAttachmentTerminalCustody {
 /** Only committed carries the actual accepted terminal transaction, never the capture transaction. */
 export type MarkdownAttachmentTerminalObservation =
   | { readonly phase: 'applying'; readonly custody: MarkdownAttachmentTerminalCustody }
+  | { readonly phase: 'accepted'; readonly custody: MarkdownAttachmentTerminalCustody; readonly transaction: MarkdownEditorTransactionEvent }
   | { readonly phase: 'committed'; readonly custody: MarkdownAttachmentTerminalCustody; readonly transaction: MarkdownEditorTransactionEvent }
   | { readonly phase: 'refused'; readonly custody: MarkdownAttachmentTerminalCustody; readonly transaction: MarkdownEditorTransactionEvent | null; readonly cause: unknown }
+
+declare const markdownAttachmentTerminalRevisionReservationBrand: unique symbol
+
+/** Opaque single application association. The native issuer does not own or complete the SDK lease. */
+export interface MarkdownAttachmentTerminalRevisionReservation {
+  readonly [markdownAttachmentTerminalRevisionReservationBrand]: true
+}
+
+/** Obtain only from the actual mounted editor in the original application composition. */
+export interface MarkdownAttachmentTerminalRevisionIssuer {
+  reserve(custody: MarkdownAttachmentTerminalCustody, leaseRef: object): MarkdownAttachmentTerminalRevisionReservation | null
+  hasReservation(reservation: MarkdownAttachmentTerminalRevisionReservation, leaseRef: object,
+    phase: 'applying' | 'accepted' | 'committed', transaction?: MarkdownEditorTransactionEvent): boolean
+  cancelReservation(reservation: MarkdownAttachmentTerminalRevisionReservation, leaseRef: object): boolean
+}
 
 /** Return synchronous observation admission; no business, cleanup or qualification grant. */
 export type MarkdownAttachmentTerminalObserver = (observation: MarkdownAttachmentTerminalObservation) => boolean

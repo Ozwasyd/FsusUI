@@ -1627,5 +1627,49 @@ terminal and retry owning statements remain exact; original owner/lifecycle and
 control blobs remain exact. Only the obsolete native retry helper import is
 removed because the original owner now performs mutation. Constituents have
 bounded source acceptance; this composite is independently reviewable and adds
-no runtime/task/resource qualification. The native revision issuer/SDK transition
-producer remains a separate source lane.
+no runtime/task/resource qualification. The issuer/SDK source lane remains
+independently owned and is composed below.
+### Original terminal revision issuer producer seam
+
+Issuer `reserve` and `hasReservation` retain thrown control-read failures in the
+existing original loan failure holder before rethrowing the same raw cause,
+including `undefined`. That holder's explicit presence permanently blocks
+reissuance and reservation validation for the application. The existing terminal
+notification gates observe this debt even if a consumer catches the reader throw
+and returns `true`; cancellation and application end do not erase failure history.
+
+The actual mounted editor exposes one stable
+`getAttachmentTerminalRevisionIssuer()` object. Its `reserve(custody, leaseRef)`
+method only runs within the original authentic applying loan and binds one opaque
+reservation to that real native application/job/dispatch and exact caller lease
+reference. The original SDK must independently validate its real private lease
+and bind this issuer through the existing original mounted/Writer composition.
+A supplied object shape or Boolean callback is not that binding.
+
+`hasReservation(reservation, leaseRef, phase, exactEvent)` reads the actual private
+native association, original notification/loan state and custody. It does not take
+a second loan, complete the SDK lease or publish an SDK document. Cancellation
+withdraws only that native association; refusal/debt/application end invalidate it
+without granting cleanup or settlement. No body/history copy or second authority
+is introduced.
+
+Only an armed reservation emits `accepted` from the existing dispatcher's private
+accepted observer, before public transaction/model/source callbacks, carrying the
+SAME accepted event. The original SDK can use that genuine producer seam for one
+controlled source publication and then the same `committed` event for completion.
+Without a reservation, the existing applying/committed unavailable path remains.
+The SDK controlled transition and Main same-entry association are separate source
+work and are not implemented or qualified by this native producer alone.
+
+### Isolated original issuer and retry source composition
+
+The isolated composite preserves UI914 `570f2c4f6076c8ab489d100bca29127bf7126d17`
+as its session/native/renderer and original atomic retry consumer base, and
+UI945 `8130a71b4e30441f67fa6183c5cdfa060db87426` as its exact terminal application,
+accepted observer and single native revision issuer implementation. The shared
+terminal failure holder retains both inner-loan and issuer control-read debt;
+there is one mounted issuer and one original private application/reservation.
+Original owner/lifecycle and frozen source controls are inherited unchanged.
+This reconciles source overlap; it does not bind or complete the original SDK,
+qualify business acknowledgement, run tests/native paths or allow session eviction.
+Inherited changesets cover the public surface; this composition adds no new API.
