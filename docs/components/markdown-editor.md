@@ -1530,3 +1530,40 @@ and throw a conflict after allocating source state. Retry configuration refusal
 likewise precedes File withdrawal and attempt mutation.
 Paste and drop pass their same frozen entry configuration through transfer parsing,
 selection reentry, capture and dispatch; transfer never rereads later props.
+
+### Original terminal transaction observation
+
+`attachmentTerminalObserver` is a synchronous application observation callback.
+It receives `applying` before the original terminal application's File release,
+`committed` only after the existing native dispatcher accepted a resolved content
+transaction and all synchronous transaction/model callbacks returned with current
+custody, or `refused` when the operation or notification did not finish admission.
+Progress and the accepted placeholder capture never supply this terminal event.
+
+The mounted editor's `withAttachmentTerminalTransaction` authenticates the exact
+observation only inside its original notification. It lends the same capture,
+batch/item, raw job, original settled dispatch reference/attempt, private-authorized
+resolved result and actual transaction. The consumer returns a synchronous
+boolean observation admission, not business success or work settlement. Copies,
+repeated loans and asynchronous substitutes refuse. The original publication
+barrier blocks lifecycle pause/resume during the application; original native
+custody is rechecked after each callback and after the content transaction.
+
+The custody's `isReleasingInput()` distinguishes this application's real File
+release from unrelated input cancellation while it is in progress. It does not
+revive a revoked File. Applications must still retain genuine cancellation and
+notification failures. `inspectAttachmentTerminalNotificationFailures()` returns
+original failed notifications, raw causes and unsupported returned work; it is not
+a settlement or resource census. An accepted transaction remains historical even
+if a later notification refuses. No second history, attachment result issuer,
+resource owner, business grant, full snapshot/recovery or qualification is added.
+
+This source is isolated from the independently pending atomic retry candidate.
+Runtime, tests, native/IME/receipt and resource qualification remain unrun.
+
+Terminal observation admission retains actual inner invocation and synchronous
+acceptance separately from the outer observer return. Inner false, raw thrown
+causes (including undefined), unsupported returned work and post-callback custody
+failure remain original notification debt even if an outer callback catches or
+returns true. Notify requires the actual accepted inner loan and no failure debt;
+a later refusal notification cannot erase the first/raw failure.

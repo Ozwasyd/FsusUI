@@ -77,6 +77,38 @@ export interface MarkdownAttachmentCaptureObservation {
   }>[]
 }
 
+/** Synchronous custody of one original native terminal application, not work settlement. */
+export interface MarkdownAttachmentTerminalCustody {
+  readonly capture: MarkdownAttachmentCaptureObservation
+  readonly batch: MarkdownAttachmentBatchIntent
+  readonly item: MarkdownAttachmentItemIntent
+  readonly jobRef: Readonly<MarkdownAttachmentJob>
+  readonly result: Extract<MarkdownAttachmentProviderResult, { status: 'resolved' }>
+  readonly dispatchRef: object
+  readonly attempt: number
+  readonly beforeRevision: number
+  hasCustody(): boolean
+  isReleasingInput(): boolean
+}
+
+/** Only committed carries the actual accepted terminal transaction, never the capture transaction. */
+export type MarkdownAttachmentTerminalObservation =
+  | { readonly phase: 'applying'; readonly custody: MarkdownAttachmentTerminalCustody }
+  | { readonly phase: 'committed'; readonly custody: MarkdownAttachmentTerminalCustody; readonly transaction: MarkdownEditorTransactionEvent }
+  | { readonly phase: 'refused'; readonly custody: MarkdownAttachmentTerminalCustody; readonly transaction: MarkdownEditorTransactionEvent | null; readonly cause: unknown }
+
+/** Return synchronous observation admission; no business, cleanup or qualification grant. */
+export type MarkdownAttachmentTerminalObserver = (observation: MarkdownAttachmentTerminalObservation) => boolean
+
+export type MarkdownAttachmentTerminalConsumer = (observation: MarkdownAttachmentTerminalObservation) => boolean
+
+export interface MarkdownAttachmentTerminalNotificationFailure {
+  readonly observation: MarkdownAttachmentTerminalObservation
+  readonly cause: unknown
+  /** Retain an unsupported original return value rather than inventing its settlement. */
+  readonly returned: unknown
+}
+
 /** Synchronous loan of the original File; the item's signal bounds its lifetime. */
 export type MarkdownAttachmentFileConsumer = (
   file: File,

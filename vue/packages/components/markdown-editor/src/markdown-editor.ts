@@ -39,6 +39,7 @@ import type MarkdownEditor from './markdown-editor.vue'
 import type {
   MarkdownAttachmentBatchIntent,
   MarkdownAttachmentCaptureObservation,
+  MarkdownAttachmentTerminalObserver,
 } from './markdown-editor-attachment'
 import type { MarkdownEditorMetricsOptions } from './markdown-editor-metrics'
 import type { MarkdownEditorAttachmentDispatch, MarkdownEditorAttachmentRequestDispatch } from './markdown-editor-session-attachment-dispatch'
@@ -65,6 +66,11 @@ export {
   type MarkdownAttachmentAtomicPresentation,
   type MarkdownAttachmentBatchIntent,
   type MarkdownAttachmentCaptureObservation,
+  type MarkdownAttachmentTerminalCustody,
+  type MarkdownAttachmentTerminalObservation,
+  type MarkdownAttachmentTerminalObserver,
+  type MarkdownAttachmentTerminalConsumer,
+  type MarkdownAttachmentTerminalNotificationFailure,
   type MarkdownAttachmentConsumerCapability,
   type MarkdownAttachmentConsumerCheckpointPort,
   type MarkdownAttachmentConsumerCleanupObservation,
@@ -1835,6 +1841,10 @@ export const markdownEditorProps = buildProps({
   attachmentDispatch: {
     type: definePropType<MarkdownEditorAttachmentDispatch>(Function),
     default: undefined,
+  },
+  /** Observe the original native terminal application synchronously through its exposed loan. */
+  attachmentTerminalObserver: {
+    type: definePropType<MarkdownAttachmentTerminalObserver>(Function),
   },
   attachmentRequestDispatch: {
     type: definePropType<MarkdownEditorAttachmentRequestDispatch>(Function),
