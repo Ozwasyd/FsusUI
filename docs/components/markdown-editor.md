@@ -1521,3 +1521,10 @@ producer and callable adapter. This SDK integration supplies no upload/runtime/
 binary-transport implementation or synthetic full-settled wrapper. All existing
 full-ready/resource/restoration/eviction and runtime/native/IME/security/privacy/
 receipt/race/backup-restore holds remain HOLD/UNRUN.
+
+Dispatch configuration is captured before picker selection reads, attachment
+clipboard/drop state changes, controllers, placeholders, jobs and File registration.
+The capture holds that same immutable configuration through synchronous transaction
+callbacks and uses it for the one original dispatch; it does not reread later props
+and throw a conflict after allocating source state. Retry configuration refusal
+likewise precedes File withdrawal and attempt mutation.

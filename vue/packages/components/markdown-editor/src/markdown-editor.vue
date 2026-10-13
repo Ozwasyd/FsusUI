@@ -1825,6 +1825,16 @@ const editorAnchorMap = computed(() => {
 })
 const attachmentCaptureSession = createMarkdownAttachmentCaptureSession()
 const attachmentPauseRequested = ref(false)
+type AttachmentDispatchConfiguration = Readonly<{
+  dispatch: typeof props.attachmentDispatch
+  requestDispatch: typeof props.attachmentRequestDispatch
+}>
+const readAttachmentDispatchConfiguration = (): AttachmentDispatchConfiguration => {
+  const dispatch = props.attachmentDispatch
+  const requestDispatch = props.attachmentRequestDispatch
+  if (dispatch && requestDispatch) throw new Error('editor-attachment-dispatch-hooks-conflict')
+  return Object.freeze({ dispatch, requestDispatch })
+}
 // A public consumer callback has no network/timer census. Remember that it was
 // bound/invoked; replacing props or completing a job cannot prove it released
 // resources. Only a real consumer resource owner may lift this limitation.
@@ -3177,6 +3187,7 @@ const captureAttachmentFiles = (
   selection: MarkdownEditorSelection,
   eventFingerprint?: string,
   nodeId: string | null = null,
+  dispatchConfiguration = readAttachmentDispatchConfiguration(),
 ) => {
   if (attachmentPauseRequested.value || sessionDisposed || editorReleased ||
     !isEditorDocumentCurrent(transactionStore.documentIdentity)) return
@@ -3317,7 +3328,7 @@ const captureAttachmentFiles = (
       ]),
     ),
   })
-  dispatchAttachmentBatch(captured.batch, capture)
+  dispatchAttachmentBatch(captured.batch, capture, dispatchConfiguration)
   return captured
 }
 
@@ -4624,6 +4635,7 @@ const applyClipboardTransfer = (
   attachmentSelection?: MarkdownEditorSelection | null,
 ) => {
   const transfer = markdownClipboardItemsFromDataTransfer(data ?? null)
+  const dispatchConfiguration = transfer.files.length > 0 ? readAttachmentDispatchConfiguration() : undefined
   const hasTransfer = transfer.items.length > 0 || transfer.files.length > 0
   if (!hasTransfer) {
     if (!editingBlocked.value && !nativeMachine.freezeSmartInput) {
@@ -4676,6 +4688,8 @@ const applyClipboardTransfer = (
         Array.from(data?.files ?? []),
         attachmentSelection ?? captureSelection(),
         plan.identity,
+        null,
+        dispatchConfiguration,
       )
     }
     if (plan.transaction) dispatchTransaction(plan.transaction)
@@ -4686,6 +4700,7 @@ const applyClipboardTransfer = (
 }
 
 const handlePaste = (event: ClipboardEvent) => {
+  if (event.clipboardData?.files.length) readAttachmentDispatchConfiguration()
   const cell = refreshCurrentTableCell(captureSelection(false).start)
   const clipboard = event.clipboardData
   if (
@@ -4752,6 +4767,7 @@ const handlePaste = (event: ClipboardEvent) => {
 }
 
 const handleDrop = (event: DragEvent) => {
+  if (event.dataTransfer?.files.length) readAttachmentDispatchConfiguration()
   event.preventDefault()
   applyClipboardTransfer(
     event,
@@ -5517,6 +5533,7 @@ const handleAttachmentPickerChange = (event: Event) => {
   if (!(input instanceof HTMLInputElement)) return
   const files = Array.from(input.files ?? [])
   if (files.length > 0) {
+    const dispatchConfiguration = readAttachmentDispatchConfiguration()
     const replacement = attachmentReplaceRange.value
     captureAttachmentFiles(
       'pick',
@@ -5530,6 +5547,7 @@ const handleAttachmentPickerChange = (event: Event) => {
         : captureSelection(),
       `pick:${event.timeStamp}:${files.map((file) => `${file.name}:${file.size}:${file.lastModified}`).join('|')}`,
       replacement?.nodeId ?? null,
+      dispatchConfiguration,
     )
   }
   attachmentReplaceRange.value = null
@@ -5657,10 +5675,9 @@ const applyAttachmentResult = (result: MarkdownAttachmentProviderResult) => {
 const dispatchAttachmentBatch = (
   batch: MarkdownAttachmentBatchIntent,
   capture?: MarkdownAttachmentCaptureObservation,
+  dispatchConfiguration = readAttachmentDispatchConfiguration(),
 ) => {
-  const dispatch = props.attachmentDispatch
-  const requestDispatch = props.attachmentRequestDispatch
-  if (dispatch && requestDispatch) throw new Error('editor-attachment-dispatch-hooks-conflict')
+  const { dispatch, requestDispatch } = dispatchConfiguration
   opaqueAttachmentResourcesObserved.value = true
   if (!dispatch && !requestDispatch) {
     // Mark the content channel before emitting: synchronous legacy consumers
@@ -5728,6 +5745,7 @@ const runAttachmentAction = (
     (candidate) => candidate.itemId === itemId,
   )
   if (!job || sessionDisposed || editorReleased || attachmentPauseRequested.value) return
+  const dispatchConfiguration = action === 'retry' ? readAttachmentDispatchConfiguration() : undefined
   const original = toRaw(job)
   const originalAttempt = original.attempt
   const originalPhase = original.phase
@@ -5752,7 +5770,7 @@ const runAttachmentAction = (
     const batch = job.batchId ? attachmentBatches.get(job.batchId)?.batch : undefined
     const item = batch?.items.find((candidate) => candidate.itemId === itemId)
     if (batch && item) {
-      dispatchAttachmentBatch(Object.freeze({ ...batch, items: Object.freeze([item]) }))
+      dispatchAttachmentBatch(Object.freeze({ ...batch, items: Object.freeze([item]) }), undefined, dispatchConfiguration)
     }
   } else {
     const originalPhase = job.phase

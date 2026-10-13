@@ -1716,6 +1716,10 @@ describe('MarkdownEditor', () => {
     const wrapper = mount(MarkdownEditor, { props: { modelValue: '',
       attachmentRequestDispatch: rich, attachmentDispatch: legacy },
     global: { config: { errorHandler: (cause) => { errors.push(cause) } } } })
+    const session = wrapper.vm.getSession('session:conflicting-hooks')
+    const authority = session.documentAuthority!
+    const ticket = authority.capture()!
+    const before = session.inspectDocumentState()
     const picker = wrapper.find<HTMLInputElement>('.el-markdown-editor__attachment-picker')
     Object.defineProperty(picker.element, 'files', { configurable: true,
       value: [new File(['report'], 'report.pdf', { type: 'application/pdf' })] })
@@ -1723,6 +1727,11 @@ describe('MarkdownEditor', () => {
     expect(rich).not.toHaveBeenCalled()
     expect(legacy).not.toHaveBeenCalled()
     expect(errors.some((cause) => cause instanceof Error && cause.message === 'editor-attachment-dispatch-hooks-conflict')).toBe(true)
+    expect(session.inspectDocumentState()).toEqual(before)
+    expect(authority.hasCustody(ticket)).toBe(true)
+    expect(wrapper.find('textarea').element.value).toBe('')
+    expect(wrapper.find('.el-markdown-editor__attachment').exists()).toBe(false)
+    expect(wrapper.emitted('update:modelValue')).toBeUndefined()
   })
 
   it('keeps a started service future behind its proof gate after the dispatch prop is removed', async () => {
