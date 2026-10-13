@@ -1530,3 +1530,102 @@ and throw a conflict after allocating source state. Retry configuration refusal
 likewise precedes File withdrawal and attempt mutation.
 Paste and drop pass their same frozen entry configuration through transfer parsing,
 selection reentry, capture and dispatch; transfer never rereads later props.
+
+### Original terminal transaction observation
+
+`attachmentTerminalObserver` is a synchronous application observation callback.
+It receives `applying` before the original terminal application's File release,
+`committed` only after the existing native dispatcher accepted a resolved content
+transaction and all synchronous transaction/model callbacks returned with current
+custody, or `refused` when the operation or notification did not finish admission.
+Progress and the accepted placeholder capture never supply this terminal event.
+
+The mounted editor's `withAttachmentTerminalTransaction` authenticates the exact
+observation only inside its original notification. It lends the same capture,
+batch/item, raw job, original settled dispatch reference/attempt, private-authorized
+resolved result and actual transaction. The consumer returns a synchronous
+boolean observation admission, not business success or work settlement. Copies,
+repeated loans and asynchronous substitutes refuse. The original publication
+barrier blocks lifecycle pause/resume during the application; original native
+custody is rechecked after each callback and after the content transaction.
+
+The custody's `isReleasingInput()` distinguishes this application's real File
+release from unrelated input cancellation while it is in progress. It does not
+revive a revoked File. Applications must still retain genuine cancellation and
+notification failures. `inspectAttachmentTerminalNotificationFailures()` returns
+original failed notifications, raw causes and unsupported returned work; it is not
+a settlement or resource census. An accepted transaction remains historical even
+if a later notification refuses. No second history, attachment result issuer,
+resource owner, business grant, full snapshot/recovery or qualification is added.
+
+This source is isolated from the independently pending atomic retry candidate.
+Runtime, tests, native/IME/receipt and resource qualification remain unrun.
+
+Terminal observation admission retains actual inner invocation and synchronous
+acceptance separately from the outer observer return. Inner false, raw thrown
+causes (including undefined), unsupported returned work and post-callback custody
+failure remain original notification debt even if an outer callback catches or
+returns true. Notify requires the actual accepted inner loan and no failure debt;
+a later refusal notification cannot erase the first/raw failure.
+
+### Pending original atomic retry consumer candidate
+
+The separate consumer candidate depends on original owner
+`b0775bf73a6a5a78067ff72afdc598f27639caa2`, which is still under independent
+review. Its exact lifecycle/consumer postimages are staged only in this candidate;
+the owner algorithms are not rewritten by Main and are not called accepted.
+
+Main forwards the same frozen dispatch configuration and original job/binding/
+document admission through the original strict or legacy entry's retry option.
+It performs no File withdrawal or native retry mutation before owner admission.
+The owner alone admits the old private scope/ledger, invokes Main's original File
+callback, mutates the original native attempt and issues the one dispatch. Main's
+phase callback checks the actual captured job, binding, item/batch membership,
+document identity/epoch/revision and expected old/new native fields. File lookup
+occurs inside the actual dispatch callback after owner File handling, so no earlier
+loan is smuggled through cancellation/reentry. No public census or cloned ledger
+grants retry. A pre-admission refusal leaves the old attempt and content unchanged.
+Main records the actual attempt only inside that admitted dispatch callback, never
+an old-attempt prediction. If the callback was not entered, its rejection and
+retirement continuations do not mutate a guessed attempt. The b077 owner review
+remains OPEN for custody between native retry mutation and new dispatch ledger;
+Main does not implement ledger rollback or claim that finding closed.
+
+This is pending-source integration, not completed P2 acceptance. Original controls
+and all runtime/qualification remain UNRUN/HOLD; Root physical staging and real
+Blog business producer/wiring remain separate. No complete resources, recovery,
+full-ready or eviction is granted.
+
+### Accepted atomic retry preparation consumer dependency
+
+The isolated retry consumer replaces only the original owner/lifecycle source
+with the exact accepted `e0351af7c1a855caf0fdc4d42507cc364ebb76dc` postimages.
+After mutation, admission reads the original undelivered ledger preparation's
+`targetAttempt`, never a native attempt increment prediction. The original File
+loan identity is checked before its idempotent native revocation; partial prior
+revocation cannot transfer a new File. File and actual attempt are still read only
+inside admitted dispatch.
+
+A real undelivered nonmutating preparation can display continuation retry without
+claiming settlement. Original strict/legacy entries reuse that same preparation;
+no repeated File callback, attempt increment, replacement job or duplicate ledger
+is introduced. The consumer composite remains independently reviewable and is
+separate from the native terminal transaction source. Runtime and qualification
+remain unrun; preparation is not settled work.
+
+Continuation adds the original Retry action metadata alongside the existing action
+without rewriting the native job phase to rejected or marking its ledger settled.
+The `attachment-retry-failure` scoped slot receives the original preparation's
+`previousFailure` object and original raw `failures` values; default display uses
+the existing localized retry status. No token, geometry, locale or typography
+source changes. Final admission belongs to the original owner after all callbacks.
+
+The original UI session branch composes accepted terminal observation/inner-loan
+repair source `00645b8e4d2579bb2245fde29391b1e24b5beb07` with accepted atomic
+retry consumer source `480cd78c9e15be6817b590fc23f1a7891e2a3e0f`. Their native
+terminal and retry owning statements remain exact; original owner/lifecycle and
+control blobs remain exact. Only the obsolete native retry helper import is
+removed because the original owner now performs mutation. Constituents have
+bounded source acceptance; this composite is independently reviewable and adds
+no runtime/task/resource qualification. The native revision issuer/SDK transition
+producer remains a separate source lane.

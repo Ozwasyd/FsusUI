@@ -1787,6 +1787,51 @@ describe('MarkdownEditor', () => {
     } finally { if (origin === 'drop') Reflect.deleteProperty(document, 'caretPositionFromPoint') }
   })
 
+  it.each(['rich', 'legacy'] as const)('does not wedge original rich scope retry into %s before release and reads File after the owner phase', async (nextHook) => {
+    let memory = 1
+    const inputs: Parameters<MarkdownEditorAttachmentRequestDispatch>[0][] = []
+    const results: ((result: MarkdownAttachmentProviderResult) => void)[] = []
+    const settlements: (() => void)[] = []
+    const dispatch: MarkdownEditorAttachmentRequestDispatch = (input) => {
+      inputs.push(input)
+      return {
+        result: new Promise((resolve) => { results.push(resolve) }),
+        settled: new Promise((resolve) => { settlements.push(resolve) }), cancelLocal: () => {},
+        inspectLocalResources: () => ({ backgroundTasks: 0, timers: 0, observers: 0,
+          retainedListeners: 0, networkRequests: 0, memoryUnits: memory }),
+      }
+    }
+    const wrapper = mount(MarkdownEditor, { props: { modelValue: '', attachmentRequestDispatch: dispatch } })
+    const picker = wrapper.find<HTMLInputElement>('.el-markdown-editor__attachment-picker')
+    Object.defineProperty(picker.element, 'files', { configurable: true,
+      value: [new File(['report'], 'report.pdf', { type: 'application/pdf' })] })
+    await picker.trigger('change')
+    results[0]!({ status: 'rejected', batchId: inputs[0]!.batch.batchId, itemId: inputs[0]!.item.itemId })
+    settlements[0]!()
+    await flushPromises()
+    expect(inputs).toHaveLength(1)
+    if (nextHook === 'legacy') await wrapper.setProps({ attachmentRequestDispatch: undefined,
+      attachmentDispatch: (input) => {
+        inputs.push(input)
+        return new Promise((resolve) => { results.push(resolve) })
+      },
+    })
+    const before = wrapper.find('.el-markdown-editor__attachment-status').text()
+    await wrapper.findAll('.el-markdown-editor__attachment-actions button')[0]!.trigger('click')
+    await flushPromises()
+    expect(inputs).toHaveLength(1)
+    expect(wrapper.find('.el-markdown-editor__attachment-status').text()).toBe(before)
+    memory = 0
+    await wrapper.findAll('.el-markdown-editor__attachment-actions button')[0]!.trigger('click')
+    await flushPromises()
+    expect(inputs).toHaveLength(2)
+    expect(inputs[0]!.file).toBeInstanceOf(File)
+    expect(inputs[1]!.file).toBeNull()
+    results[1]!({ status: 'rejected', batchId: inputs[1]!.batch.batchId, itemId: inputs[1]!.item.itemId })
+    settlements[1]?.()
+    await flushPromises()
+  })
+
   it('keeps a started service future behind its proof gate after the dispatch prop is removed', async () => {
     let request: Parameters<MarkdownEditorAttachmentDispatch>[0] | undefined
     let finish!: (result: MarkdownAttachmentProviderResult) => void
