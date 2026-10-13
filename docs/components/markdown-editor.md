@@ -1548,6 +1548,11 @@ document identity/epoch/revision and expected old/new native fields. File lookup
 occurs inside the actual dispatch callback after owner File handling, so no earlier
 loan is smuggled through cancellation/reentry. No public census or cloned ledger
 grants retry. A pre-admission refusal leaves the old attempt and content unchanged.
+Main records the actual attempt only inside that admitted dispatch callback, never
+an old-attempt prediction. If the callback was not entered, its rejection and
+retirement continuations do not mutate a guessed attempt. The b077 owner review
+remains OPEN for custody between native retry mutation and new dispatch ledger;
+Main does not implement ledger rollback or claim that finding closed.
 
 This is pending-source integration, not completed P2 acceptance. Original controls
 and all runtime/qualification remain UNRUN/HOLD; Root physical staging and real

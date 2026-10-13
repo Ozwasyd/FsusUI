@@ -5698,11 +5698,12 @@ const dispatchAttachmentBatch = (
   for (const item of batch.items) {
     const job = attachmentJobs.value.find((candidate) => candidate.itemId === item.itemId && candidate.batchId === batch.batchId)
     if (!job) continue
-    // The original owner mutates retry only after prior-scope admission.
-    const attempt = job.attempt + (options?.retry ? 1 : 0)
+    let attempt: number | undefined
     const identity = Object.freeze({ ...transactionStore.documentIdentity })
     const record = attachmentBatches.get(batch.batchId)
     const dispatchInput = (admitProgress: (result: MarkdownAttachmentProviderResult) => boolean) => {
+      // The original owner has admitted the dispatch and owns the actual attempt.
+      attempt = job.attempt
       // Read the actual File only inside owner dispatch, after its retry File phase.
       const currentRecord = attachmentBatches.get(batch.batchId)
       const original = currentRecord?.batch.items[item.order]
@@ -5725,6 +5726,7 @@ const dispatchAttachmentBatch = (
       // Only the real owner's awaited terminal proof reaches content commit.
       applyAttachmentResult(settled)
     }).catch(() => {
+      if (attempt === undefined) return
       const settled = inspectMarkdownAttachmentDispatch(job)
       if (!settled?.settled || settled.attempt !== attempt || job.attempt !== attempt ||
         sessionDisposed || attachmentPauseRequested.value ||
@@ -5736,7 +5738,7 @@ const dispatchAttachmentBatch = (
       job.code = 'attachment-dispatch-rejected'
       revokeAttachmentFile(item.itemId)
     }).finally(() => {
-      if (record) requestTerminalAttachmentRetirement(job, attempt)
+      if (record && attempt !== undefined) requestTerminalAttachmentRetirement(job, attempt)
       // Refresh retry eligibility from real settlement even for cancelled jobs.
       triggerRef(attachmentJobs)
     })
