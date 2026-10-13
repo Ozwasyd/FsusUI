@@ -1681,6 +1681,49 @@ Without a reservation, the existing applying/committed unavailable path remains.
 The SDK controlled transition and Main same-entry association are separate source
 work and are not implemented or qualified by this native producer alone.
 
+### Original native cohort continuation (source offer; not activated)
+
+`getAttachmentTerminalCohortIssuer()` exposes a stable native producer alongside
+(the same) single-application revision issuer. `reserve(custody, reservation,
+members)` is available only inside the actual applying loan with its genuine
+single reservation. Its passive member tuples contain the exact original
+`item`, `jobRef` and SDK `leaseRef`; the roster must match every original capture
+job/item in order. The native owner validates private registration, attempt one,
+original File-controller custody and current document lifetime. Batch IDs,
+cloned observations and copied jobs cannot reserve or join a cohort. The opaque
+token binds this one original capture; it does not authenticate SDK leases.
+
+For a later member, `inspectContinuation(token, member)` returns the original
+capture, original starting revision and the exact accepted native event objects
+recorded after successful committed loans. `join(token, custody, reservation,
+leaseRef)` binds that member's own genuine applying reservation, at the current
+end of this continuous publication chain. `hasPublication(token, reservation,
+leaseRef, phase, exactEvent)` jointly checks the actual private application,
+single reservation, exact accepted/committed event and its before/after revision.
+An in-flight accepted transaction cannot be read as a completed continuation.
+Completed members must still have the same retained original job/dispatch proof;
+ordinary settled retirement may remove their File/item bindings. Pending members
+must still have their original private File/controller/job/item registrations.
+The token does not retain Files after their original owner releases them.
+
+Ordinary native transactions (including selection/history operations), unrelated
+attachment publication, document switch, blocked editing, pause, native lifetime
+retirement, refused publication and explicit token cancellation revoke the
+continuation permanently. Original cancellation is idempotent and clears native
+association metadata; it is not SDK cancellation, File cleanup, settlement,
+resource zero, recovery qualification or application-ended acknowledgement.
+Cleanup/control-read throws retain their original raw cause, including
+`undefined`; failed original cleanup must still be retried by its original owner.
+
+The SDK must separately validate every actual same-adapter active/pending lease,
+its original started envelope and the exact source/digest revision chain. SDK
+scope/retire/cancel and ordinary update entrances (including same-value updates,
+which native source cannot observe) must cancel the original token. Ordinary
+`isTaskCurrent`, Main anchors and runtime context checks remain strict. This
+source offer is not connected to Main or SDK and does not replace the separate
+application-ended acknowledgement capability. Runtime, native, security,
+privacy, receipt, renderer and session-eviction qualification remain unrun/held.
+
 ### Isolated original issuer and retry source composition
 
 The isolated composite preserves UI914 `570f2c4f6076c8ab489d100bca29127bf7126d17`

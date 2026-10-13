@@ -113,6 +113,40 @@ export interface MarkdownAttachmentTerminalRevisionIssuer {
   cancelReservation(reservation: MarkdownAttachmentTerminalRevisionReservation, leaseRef: object): boolean
 }
 
+declare const markdownAttachmentTerminalCohortBrand: unique symbol
+
+/** Native association only. No SDK context, lease completion or application-ended grant. */
+export interface MarkdownAttachmentTerminalCohort {
+  readonly [markdownAttachmentTerminalCohortBrand]: true
+}
+
+export interface MarkdownAttachmentTerminalCohortMember {
+  readonly item: MarkdownAttachmentItemIntent
+  readonly jobRef: Readonly<MarkdownAttachmentJob>
+  readonly leaseRef: object
+}
+
+/** Exact native publications since the original applying revision, not copied observations. */
+export interface MarkdownAttachmentTerminalCohortContinuation {
+  readonly capture: MarkdownAttachmentCaptureObservation
+  readonly beforeRevision: number
+  readonly revision: number
+  readonly publications: readonly MarkdownEditorTransactionEvent[]
+}
+
+/** The original SDK must independently prove every same-adapter active/pending lease. */
+export interface MarkdownAttachmentTerminalCohortIssuer {
+  reserve(custody: MarkdownAttachmentTerminalCustody, reservation: MarkdownAttachmentTerminalRevisionReservation,
+    members: readonly MarkdownAttachmentTerminalCohortMember[]): MarkdownAttachmentTerminalCohort | null
+  join(cohort: MarkdownAttachmentTerminalCohort, custody: MarkdownAttachmentTerminalCustody,
+    reservation: MarkdownAttachmentTerminalRevisionReservation, leaseRef: object): boolean
+  inspectContinuation(cohort: MarkdownAttachmentTerminalCohort, member: MarkdownAttachmentTerminalCohortMember): MarkdownAttachmentTerminalCohortContinuation | null
+  hasPublication(cohort: MarkdownAttachmentTerminalCohort, reservation: MarkdownAttachmentTerminalRevisionReservation,
+    leaseRef: object, phase: 'accepted' | 'committed', transaction: MarkdownEditorTransactionEvent): boolean
+  /** Idempotent native association withdrawal only; original File/SDK cleanup remains separate. */
+  cancel(cohort: MarkdownAttachmentTerminalCohort): boolean
+}
+
 /** Return synchronous observation admission; no business, cleanup or qualification grant. */
 export type MarkdownAttachmentTerminalObserver = (observation: MarkdownAttachmentTerminalObservation) => boolean
 
