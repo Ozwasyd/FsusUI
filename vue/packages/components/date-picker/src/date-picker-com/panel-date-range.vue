@@ -659,7 +659,7 @@ const handleTimeInput = (value: string | null, type: ChangeType) => {
   }
 }
 
-const handleTimeChange = (value: string | null, type: ChangeType) => {
+const handleTimeChange = (_value: string | null, type: ChangeType) => {
   timeUserInput.value[type] = null
   if (type === 'min') {
     leftDate.value = minDate.value!
