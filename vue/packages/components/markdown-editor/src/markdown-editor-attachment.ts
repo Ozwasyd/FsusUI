@@ -113,6 +113,79 @@ export interface MarkdownAttachmentTerminalRevisionIssuer {
   cancelReservation(reservation: MarkdownAttachmentTerminalRevisionReservation, leaseRef: object): boolean
 }
 
+declare const markdownAttachmentTerminalCohortBrand: unique symbol
+
+/** Native association only. No SDK context, lease completion or application-ended grant. */
+export interface MarkdownAttachmentTerminalCohort {
+  readonly [markdownAttachmentTerminalCohortBrand]: true
+}
+
+export interface MarkdownAttachmentTerminalCohortMember {
+  readonly item: MarkdownAttachmentItemIntent
+  readonly jobRef: Readonly<MarkdownAttachmentJob>
+  readonly leaseRef: object
+}
+
+/** Exact native publications since the original applying revision, not copied observations. */
+export interface MarkdownAttachmentTerminalCohortContinuation {
+  readonly capture: MarkdownAttachmentCaptureObservation
+  readonly beforeRevision: number
+  readonly revision: number
+  readonly publications: readonly MarkdownEditorTransactionEvent[]
+}
+
+/** The original SDK must independently prove every same-adapter active/pending lease. */
+export interface MarkdownAttachmentTerminalCohortIssuer {
+  reserve(custody: MarkdownAttachmentTerminalCustody, reservation: MarkdownAttachmentTerminalRevisionReservation,
+    members: readonly MarkdownAttachmentTerminalCohortMember[]): MarkdownAttachmentTerminalCohort | null
+  join(cohort: MarkdownAttachmentTerminalCohort, custody: MarkdownAttachmentTerminalCustody,
+    reservation: MarkdownAttachmentTerminalRevisionReservation, leaseRef: object): boolean
+  inspectContinuation(cohort: MarkdownAttachmentTerminalCohort, member: MarkdownAttachmentTerminalCohortMember): MarkdownAttachmentTerminalCohortContinuation | null
+  hasPublication(cohort: MarkdownAttachmentTerminalCohort, reservation: MarkdownAttachmentTerminalRevisionReservation,
+    leaseRef: object, phase: 'accepted' | 'committed', transaction: MarkdownEditorTransactionEvent): boolean
+  /** Idempotent native association withdrawal only; original File/SDK cleanup remains separate. */
+  cancel(cohort: MarkdownAttachmentTerminalCohort): boolean
+}
+
+declare const markdownAttachmentTerminalApplicationEndHandleBrand: unique symbol
+
+/** One actual native application, bound to its original single reservation and lease. */
+export interface MarkdownAttachmentTerminalApplicationEndHandle {
+  readonly [markdownAttachmentTerminalApplicationEndHandleBrand]: true
+}
+
+export interface MarkdownAttachmentTerminalApplicationEndFailure {
+  readonly stage: 'loan' | 'observer' | 'application' | 'input-cleanup' | 'retirement' | 'retry'
+  readonly cause: unknown
+}
+
+/** Source-produced native stack/cleanup evidence. Failure history and publication are independent. */
+export interface MarkdownAttachmentTerminalApplicationEndObservation {
+  readonly applicationRef: MarkdownAttachmentTerminalApplicationEndHandle
+  readonly custody: MarkdownAttachmentTerminalCustody
+  readonly reservation: MarkdownAttachmentTerminalRevisionReservation
+  readonly leaseRef: object
+  readonly phase: 'running' | 'cleanup-blocked' | 'ended'
+  readonly callbacksReleased: boolean
+  readonly loanReleased: boolean
+  readonly applicationReleased: boolean
+  readonly cleanupComplete: boolean
+  readonly unsupportedWork: boolean
+  readonly transaction: MarkdownEditorTransactionEvent | null
+  readonly failures: readonly MarkdownAttachmentTerminalApplicationEndFailure[]
+}
+
+/** Never acknowledges provider/network/business settlement, census zero or recovery. */
+export interface MarkdownAttachmentTerminalApplicationEndIssuer {
+  reserve(custody: MarkdownAttachmentTerminalCustody, reservation: MarkdownAttachmentTerminalRevisionReservation,
+    leaseRef: object): MarkdownAttachmentTerminalApplicationEndHandle | null
+  inspect(handle: MarkdownAttachmentTerminalApplicationEndHandle, leaseRef: object): MarkdownAttachmentTerminalApplicationEndObservation | null
+  hasEnded(handle: MarkdownAttachmentTerminalApplicationEndHandle, leaseRef: object,
+    observation: MarkdownAttachmentTerminalApplicationEndObservation): boolean
+  /** Continue only the same retained native cleanup; never rerun source publication or consumer work. */
+  retry(handle: MarkdownAttachmentTerminalApplicationEndHandle, leaseRef: object): MarkdownAttachmentTerminalApplicationEndObservation | null
+}
+
 /** Return synchronous observation admission; no business, cleanup or qualification grant. */
 export type MarkdownAttachmentTerminalObserver = (observation: MarkdownAttachmentTerminalObservation) => boolean
 

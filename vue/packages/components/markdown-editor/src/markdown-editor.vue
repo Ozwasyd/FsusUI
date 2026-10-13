@@ -1324,6 +1324,13 @@ import {
   type MarkdownAttachmentRange,
   type MarkdownAttachmentTerminalCustody,
   type MarkdownAttachmentTerminalRevisionIssuer,
+  type MarkdownAttachmentTerminalCohort,
+  type MarkdownAttachmentTerminalCohortMember,
+  type MarkdownAttachmentTerminalCohortIssuer,
+  type MarkdownAttachmentTerminalApplicationEndHandle,
+  type MarkdownAttachmentTerminalApplicationEndObservation,
+  type MarkdownAttachmentTerminalApplicationEndFailure,
+  type MarkdownAttachmentTerminalApplicationEndIssuer,
   type MarkdownAttachmentTerminalRevisionReservation,
   type MarkdownAttachmentTerminalObservation,
   type MarkdownAttachmentTerminalConsumer,
@@ -1546,6 +1553,8 @@ const attrs = useAttrs()
 const rootElementRef = ref<HTMLElement | null>(null)
 const sessionSurfacePaused = ref(false)
 const nativeHandoverReceiving = ref(false)
+let invalidateAttachmentCohorts: (() => void) | undefined = undefined
+let guardAttachmentCohortOperation: ((job: MarkdownAttachmentJob | undefined) => void) | undefined = undefined
 let invalidateNativeTargetLifetime: (() => void) | undefined = undefined
 let nativeHandoverViewRestoring = false
 let invalidateNativeSurfacePublication: (() => void) | undefined = undefined
@@ -1554,10 +1563,11 @@ let retireSnapshotPublicationAuthority: (() => void) | undefined = undefined
 let sessionUnmountFailed = false
 let sessionUnmountFirstCause: unknown
 // Initial ref attachment establishes the birth; replacement/withdrawal retires it.
-watch(rootElementRef, (_root, previous) => { if (previous) invalidateNativeTargetLifetime?.() }, { flush: 'sync' })
-watch(sessionSurfacePaused, (paused) => { if (paused) invalidateNativeTargetLifetime?.() }, { flush: 'sync' })
+watch(rootElementRef, (_root, previous) => { if (previous) { invalidateAttachmentCohorts?.(); invalidateNativeTargetLifetime?.() } }, { flush: 'sync' })
+watch(sessionSurfacePaused, (paused) => { if (paused) { invalidateAttachmentCohorts?.(); invalidateNativeTargetLifetime?.() } }, { flush: 'sync' })
 // Retire before the original scheduler registers its cleanup callbacks.
 onBeforeUnmount(() => {
+  invalidateAttachmentCohorts?.()
   try { invalidateNativeTargetLifetime?.() } catch (cause) {
     if (!sessionUnmountFailed) sessionUnmountFirstCause = cause
     sessionUnmountFailed = true
@@ -1875,39 +1885,89 @@ let attachmentRetirementRequested = false
 let attachmentRetirementRunning = false
 let attachmentRetirementContinuation: { handle: number | null; cancelled: boolean } | null = null
 const assertAttachmentFileControlIdle = () => {
-  if (attachmentFileCleanupDepth !== 0 || attachmentPublicationDepth !== 0 || attachmentRetirementRunning || attachmentRetirementRequested || attachmentRetirementContinuation)
+  if (pendingAttachmentFileCleanups.size || attachmentFileCleanupDepth !== 0 || attachmentPublicationDepth !== 0 || attachmentRetirementRunning || attachmentRetirementRequested || attachmentRetirementContinuation)
     throw new Error('editor-session-attachment-file-cleanup-in-progress')
 }
-const revokeAttachmentFiles = (itemIds: readonly string[]) => {
+type NativeAttachmentFileCleanup = {
+  readonly application: NativeAttachmentTerminalApplication | null
+  readonly itemIds: readonly string[]
+  readonly itemControllers: AbortController[]
+  readonly batchControllers: AbortController[]
+  detached: boolean
+  itemIndex: number
+  batchIndex: number
+  running: boolean
+  complete: boolean
+}
+const pendingAttachmentFileCleanups = new Set<NativeAttachmentFileCleanup>()
+const createAttachmentFileCleanup = (itemIds: readonly string[], application: NativeAttachmentTerminalApplication | null = null): NativeAttachmentFileCleanup => ({
+  application, itemIds, itemControllers: [], batchControllers: [], detached: false,
+  itemIndex: 0, batchIndex: 0, running: false, complete: false,
+})
+// The original File owner retains its actual abort cursor for application cleanup
+// retry. Once detached, it never looks up an item ID or a newer session again.
+const runAttachmentFileCleanup = (cleanup: NativeAttachmentFileCleanup) => {
+  if (cleanup.running) throw new Error('attachment-native-file-cleanup-reentry')
+  cleanup.running = true
+  pendingAttachmentFileCleanups.add(cleanup)
   attachmentFileCleanupDepth += 1
   try {
-    const itemControllers: AbortController[] = []
-    const batchControllers: AbortController[] = []
-    for (const itemId of itemIds) {
-      const item = attachmentItems.get(itemId)
-      if (!item) continue
-      for (const record of attachmentBatches.values()) {
-        const loan = record.files.get(item)
-        if (!loan) continue
-        record.files.delete(item)
-        itemControllers.push(loan.controller)
-        if (!record.files.size) {
-          record.capture = undefined
-          batchControllers.push(record.controller)
+    if (!cleanup.detached) {
+      for (const itemId of cleanup.itemIds) {
+        const item = attachmentItems.get(itemId)
+        if (!item) continue
+        for (const record of attachmentBatches.values()) {
+          const loan = record.files.get(item)
+          if (!loan) continue
+          record.files.delete(item)
+          cleanup.itemControllers.push(loan.controller)
+          if (!record.files.size) {
+            record.capture = undefined
+            cleanup.batchControllers.push(record.controller)
+          }
+          break
         }
-        break
       }
+      cleanup.detached = true
     }
-    for (const controller of itemControllers) controller.abort()
-    for (const controller of batchControllers) controller.abort()
+    while (cleanup.itemIndex < cleanup.itemControllers.length) {
+      const controller = cleanup.itemControllers[cleanup.itemIndex]!
+      controller.abort()
+      if (!controller.signal.aborted) throw new Error('attachment-native-file-abort-unavailable')
+      cleanup.itemIndex += 1
+    }
+    while (cleanup.batchIndex < cleanup.batchControllers.length) {
+      const controller = cleanup.batchControllers[cleanup.batchIndex]!
+      controller.abort()
+      if (!controller.signal.aborted) throw new Error('attachment-native-batch-abort-unavailable')
+      cleanup.batchIndex += 1
+    }
+    cleanup.complete = true
+    cleanup.itemControllers.length = 0
+    cleanup.batchControllers.length = 0
+    cleanup.itemIndex = 0
+    cleanup.batchIndex = 0
+  } catch (cause) {
+    if (cleanup.application) retainAttachmentApplicationEndFailure(cleanup.application, 'input-cleanup', cause)
+    throw cause
   } finally {
     attachmentFileCleanupDepth -= 1
-    flushAttachmentRetirement()
+    try { flushAttachmentRetirement() } catch (cause) {
+      if (cleanup.application) retainAttachmentApplicationEndFailure(cleanup.application, 'retirement', cause)
+      throw cause
+    } finally {
+      cleanup.running = false
+      if (cleanup.complete) pendingAttachmentFileCleanups.delete(cleanup)
+    }
   }
 }
-const revokeAttachmentFile = (itemId: string) => revokeAttachmentFiles([itemId])
+const revokeAttachmentFiles = (itemIds: readonly string[], retainedCleanup?: NativeAttachmentFileCleanup) =>
+  runAttachmentFileCleanup(retainedCleanup ?? createAttachmentFileCleanup(itemIds))
+const revokeAttachmentFile = (itemId: string, retainedCleanup?: NativeAttachmentFileCleanup) =>
+  revokeAttachmentFiles([itemId], retainedCleanup)
 
 const releaseAttachmentFiles = () => {
+  invalidateAttachmentCohorts?.()
   attachmentFileCleanupDepth += 1
   try {
     const records = [...attachmentBatches.values()]
@@ -2933,6 +2993,7 @@ let pendingMetricsChange: MarkdownEditorMetricsChange | undefined
 const performEditorOperation = (
   operation: EditorOperation,
 ): MarkdownEditorDispatchResult => {
+  guardAttachmentCohortOperation?.(operation.kind === 'transaction' ? operation.attachmentJob : undefined)
   const transaction = operationTransaction(
     operation.kind === 'transaction'
       ? {
@@ -3154,8 +3215,11 @@ const readSelectionFrom = (
 
 const captureSelection = (breakMerge = true) => {
   const previous = transactionStore.selection
+  const next = readSelectionFrom(textareaRef.value)
+  if (next.start !== previous.start || next.end !== previous.end || next.direction !== previous.direction)
+    invalidateAttachmentCohorts?.()
   transactionStore.setSelection(
-    readSelectionFrom(textareaRef.value),
+    next,
     breakMerge,
   )
   const selection = transactionStore.selection
@@ -3206,6 +3270,7 @@ const selectTableCell = async (cell: MarkdownTableCellIdentity) => {
     return
   }
   currentTableCell.value = resolved
+  invalidateAttachmentCohorts?.()
   transactionStore.setSelection(
     {
       direction: 'none',
@@ -4196,6 +4261,7 @@ nativeSurfaceResources.ownWatch(watch([editingBlocked, overflowItemCount],
   if (blocked || !itemCount) commandsExpanded.value = false
   if (!blocked) return
 
+  invalidateAttachmentCohorts?.()
   transactionStore.breakMergeGroup()
   if (isComposing.value) {
     nativeMachine.apply({
@@ -5537,6 +5603,7 @@ const setMode = (mode: MarkdownEditorMode) => {
     selection: captureSelection(false),
     source: transactionStore.value,
   })
+  invalidateAttachmentCohorts?.()
   transactionStore.setSelection(retained.selection, false)
   currentMode.value = nextMode
   refreshWritingAidsDocument()
@@ -5601,6 +5668,11 @@ type NativeAttachmentTerminalRevisionReservation = {
 }
 type NativeAttachmentTerminalApplication = {
   readonly custody: MarkdownAttachmentTerminalCustody
+  endRecord: NativeAttachmentApplicationEnd | null
+  reservingEnd: boolean
+  callbackDepth: number
+  loanDepth: number
+  inputCleanup: NativeAttachmentFileCleanup | null
   observation: MarkdownAttachmentTerminalObservation | null
   notifying: boolean
   loanTaken: boolean
@@ -5624,6 +5696,7 @@ const retainAttachmentTerminalLoanFailure = (
   cause: unknown,
   returned: unknown,
 ) => {
+  retainAttachmentApplicationEndFailure(application, 'loan', cause)
   application.loanFailure ??= { firstCause: cause, latestCause: cause }
   application.loanFailure.latestCause = cause
   application.loanAccepted = false
@@ -5689,6 +5762,349 @@ const attachmentTerminalRevisionIssuer = Object.freeze<MarkdownAttachmentTermina
 })
 const getAttachmentTerminalRevisionIssuer = () => attachmentTerminalRevisionIssuer
 
+type NativeAttachmentCohortMember = MarkdownAttachmentTerminalCohortMember & {
+  readonly controller: AbortController
+  published: boolean
+  dispatchRef: object | null
+}
+type NativeAttachmentCohort = {
+  readonly token: MarkdownAttachmentTerminalCohort
+  readonly capture: MarkdownAttachmentCaptureObservation
+  readonly beforeRevision: number
+  revision: number
+  value: string
+  active: boolean
+  members: NativeAttachmentCohortMember[]
+  publications: MarkdownEditorTransactionEvent[]
+  application: NativeAttachmentTerminalApplication | null
+}
+const nativeAttachmentCohorts = new WeakMap<MarkdownAttachmentTerminalCohort, NativeAttachmentCohort>()
+const issuedAttachmentCohorts = new WeakSet<MarkdownAttachmentTerminalCohort>()
+const activeAttachmentCohorts = new Set<NativeAttachmentCohort>()
+let reservingAttachmentCohort = false
+const revokeAttachmentCohort = (record: NativeAttachmentCohort) => {
+  record.active = false
+  activeAttachmentCohorts.delete(record)
+  nativeAttachmentCohorts.delete(record.token)
+  record.application = null
+  record.members = []
+  record.publications = []
+}
+invalidateAttachmentCohorts = () => {
+  for (const record of activeAttachmentCohorts) revokeAttachmentCohort(record)
+}
+// Read passive tuples once. Accessor/proxy reentry cannot grant a reservation:
+// the original single issuer and private custody are checked again afterwards.
+const readAttachmentCohortMember = (value: MarkdownAttachmentTerminalCohortMember): MarkdownAttachmentTerminalCohortMember | null => {
+  if (!value || typeof value !== 'object') return null
+  const prototype = Object.getPrototypeOf(value)
+  if (prototype !== Object.prototype && prototype !== null) return null
+  const slots = Object.getOwnPropertyDescriptors(value)
+  if (Reflect.ownKeys(slots).length !== 3 || !slots.item || !('value' in slots.item) ||
+      !slots.jobRef || !('value' in slots.jobRef) || !slots.leaseRef || !('value' in slots.leaseRef)) return null
+  const leaseRef: unknown = slots.leaseRef.value
+  if (leaseRef === null || (typeof leaseRef !== 'object' && typeof leaseRef !== 'function')) return null
+  return Object.freeze({ item: slots.item.value, jobRef: slots.jobRef.value, leaseRef }) as MarkdownAttachmentTerminalCohortMember
+}
+const currentAttachmentCohort = (record: NativeAttachmentCohort, publication = false) => {
+  const declaredId = props.documentIdentity?.id ?? commandTrayId
+  const declaredEpoch = props.documentIdentity?.epoch ?? 0
+  const identity = record.capture.batch.documentIdentity
+  const application = nativeAttachmentTerminalApplication
+  const event = publication && record.application === application ? application?.transaction : null
+  if (!record.active || sessionDisposed || editorReleased || attachmentPauseRequested.value || sessionSurfacePaused.value ||
+      declaredId !== identity.id || declaredEpoch !== identity.epoch ||
+      transactionStore.documentIdentity.id !== identity.id || transactionStore.documentIdentity.epoch !== identity.epoch ||
+      transactionStore.revision !== (event?.revision ?? record.revision) ||
+      transactionStore.value !== (event?.value ?? record.value) ||
+      (event && (!event.accepted || event.beforeRevision !== record.revision)) ||
+      (application && !record.members.some((member) => member.jobRef === application.custody.jobRef && !member.published))) return false
+  return record.members.every((member) => {
+    if (member.published) {
+      // Original retirement may remove File/item bindings, but keeps this SAME job/proof.
+      const proof = inspectMarkdownAttachmentDispatch(member.jobRef as MarkdownAttachmentJob)
+      return member.jobRef.attempt === 1 && member.jobRef.phase === 'resolved' &&
+        attachmentJobs.value.some((candidate) => toRaw(candidate) === member.jobRef) &&
+        proof?.dispatchRef === member.dispatchRef && proof.attempt === 1 && proof.resultSettlement === 'fulfilled'
+    }
+    const current = application?.custody.jobRef === member.jobRef ? application : null
+    if (current && member.jobRef.attempt === 1 && current.custody.attempt === 1 &&
+        current.custody.capture === record.capture && current.custody.item === member.item)
+      return current.custody.hasCustody()
+    const batch = record.capture.batch
+    const batchRecord = attachmentBatches.get(batch.batchId)
+    const binding = attachmentJobBindings.get(member.jobRef as MarkdownAttachmentJob)
+    const job = member.jobRef
+    return batchRecord?.batch === batch && batchRecord.capture === record.capture &&
+      batchRecord.files.get(member.item)?.controller === member.controller && !member.controller.signal.aborted &&
+      !batch.signal.aborted && !member.item.signal.aborted && attachmentItems.get(member.item.itemId) === member.item &&
+      binding?.batch === batch && binding.item === member.item && batch.items[member.item.order] === member.item &&
+      record.capture.plan.jobs.includes(job) && attachmentJobs.value.some((candidate) => toRaw(candidate) === job) &&
+      job.attempt === 1 && job.revision === batch.revision && job.documentIdentity?.id === identity.id &&
+      job.documentIdentity.epoch === identity.epoch && (job.phase === 'pending' || job.phase === 'progress')
+  }) && record.active
+}
+guardAttachmentCohortOperation = (job) => {
+  const application = nativeAttachmentTerminalApplication
+  for (const record of activeAttachmentCohorts) {
+    if (!application || record.application !== application || !job || toRaw(job) !== application.custody.jobRef ||
+        !application.revisionReservation?.active || !application.revisionReservation.applyingAccepted ||
+        !currentAttachmentCohort(record)) revokeAttachmentCohort(record)
+  }
+}
+const retainAttachmentCohortReaderFailure = (
+  application: NativeAttachmentTerminalApplication | null,
+  observation: MarkdownAttachmentTerminalObservation | null,
+  cause: unknown,
+) => {
+  // A reader failure belongs only to the original loan/notification it read.
+  // Reentry must never attribute it to a replacement application or observation.
+  if (application && observation && nativeAttachmentTerminalApplication === application &&
+      application.notifying && application.observation === observation)
+    retainAttachmentTerminalLoanFailure(application, observation, cause, application.loanReturned)
+}
+const attachmentTerminalCohortIssuer = Object.freeze<MarkdownAttachmentTerminalCohortIssuer>({
+  reserve(custody, reservation, members) {
+    const application = nativeAttachmentTerminalApplication
+    const single = nativeAttachmentTerminalRevisionReservations.get(reservation)
+    if (reservingAttachmentCohort || !application || single?.application !== application || application.custody !== custody ||
+        activeAttachmentCohorts.size || !application.observation || application.observation.phase !== 'applying') return null
+    const observation = application.observation
+    reservingAttachmentCohort = true
+    try {
+      if (!Array.isArray(members) || Object.getPrototypeOf(members) !== Array.prototype) return null
+      const slots = Object.getOwnPropertyDescriptors(members)
+      const capture = custody.capture
+      if (members.length !== capture.plan.jobs.length || members.length !== custody.batch.items.length ||
+          Reflect.ownKeys(slots).length !== members.length + 1 || custody.batch !== capture.batch || custody.attempt !== 1) return null
+      const retained: NativeAttachmentCohortMember[] = []
+      const batchRecord = attachmentBatches.get(custody.batch.batchId)
+      if (batchRecord?.batch !== custody.batch || batchRecord.capture !== capture) return null
+      for (let index = 0; index < capture.plan.jobs.length; index += 1) {
+        const slot = slots[String(index)]
+        if (!slot || !('value' in slot)) return null
+        const member = readAttachmentCohortMember(slot.value)
+        if (!member || member.jobRef !== capture.plan.jobs[index] || member.item !== custody.batch.items[index] ||
+            retained.some((previous) => previous.leaseRef === member.leaseRef)) return null
+        const loan = batchRecord.files.get(member.item)
+        if (!loan) return null
+        retained.push({ ...member, controller: loan.controller, published: false, dispatchRef: null })
+      }
+      if (!retained.some((member) => member.jobRef === custody.jobRef && member.item === custody.item && member.leaseRef === single.leaseRef) ||
+          !attachmentTerminalRevisionIssuer.hasReservation(reservation, single.leaseRef, 'applying') || activeAttachmentCohorts.size) return null
+      const token = Object.freeze({}) as MarkdownAttachmentTerminalCohort
+      const record: NativeAttachmentCohort = { token, capture, beforeRevision: custody.beforeRevision,
+        revision: custody.beforeRevision, value: transactionStore.value, active: true, members: retained, publications: [], application }
+      if (!currentAttachmentCohort(record) || !attachmentTerminalRevisionIssuer.hasReservation(reservation, single.leaseRef, 'applying')) return null
+      issuedAttachmentCohorts.add(token)
+      nativeAttachmentCohorts.set(token, record)
+      activeAttachmentCohorts.add(record)
+      return token
+    } catch (cause) {
+      retainAttachmentTerminalLoanFailure(application, observation, cause, application.loanReturned)
+      throw cause
+    } finally {
+      reservingAttachmentCohort = false
+    }
+  },
+  join(token, custody, reservation, leaseRef) {
+    const record = nativeAttachmentCohorts.get(token)
+    const application = nativeAttachmentTerminalApplication
+    const observation = application?.observation ?? null
+    if (!record?.active || record.application || !application || application.custody !== custody || custody.capture !== record.capture ||
+        custody.beforeRevision !== record.revision || !record.members.some((member) => !member.published &&
+          member.item === custody.item && member.jobRef === custody.jobRef && member.leaseRef === leaseRef)) return false
+    try {
+      if (!attachmentTerminalRevisionIssuer.hasReservation(reservation, leaseRef, 'applying') || !currentAttachmentCohort(record) ||
+          !attachmentTerminalRevisionIssuer.hasReservation(reservation, leaseRef, 'applying') || !record.active) return false
+      record.application = application
+      return true
+    } catch (cause) {
+      retainAttachmentCohortReaderFailure(application, observation, cause)
+      revokeAttachmentCohort(record)
+      throw cause
+    }
+  },
+  inspectContinuation(token, input) {
+    const application = nativeAttachmentTerminalApplication
+    const observation = application?.observation ?? null
+    const record = nativeAttachmentCohorts.get(token)
+    if (!record?.active) return null
+    try {
+      const member = readAttachmentCohortMember(input)
+      if (!member || !record.members.some((candidate) => !candidate.published && candidate.item === member.item &&
+          candidate.jobRef === member.jobRef && candidate.leaseRef === member.leaseRef) ||
+          nativeAttachmentTerminalApplication?.transaction || !currentAttachmentCohort(record)) return null
+      return Object.freeze({ capture: record.capture, beforeRevision: record.beforeRevision,
+        revision: record.revision, publications: Object.freeze([...record.publications]) })
+    } catch (cause) {
+      retainAttachmentCohortReaderFailure(application, observation, cause)
+      revokeAttachmentCohort(record)
+      throw cause
+    }
+  },
+  hasPublication(token, reservation, leaseRef, phase, event) {
+    const record = nativeAttachmentCohorts.get(token)
+    const application = nativeAttachmentTerminalApplication
+    const observation = application?.observation ?? null
+    if (!record?.active || !application || record.application !== application || application.transaction !== event ||
+        !record.members.some((member) => !member.published && member.jobRef === application.custody.jobRef && member.leaseRef === leaseRef)) return false
+    try {
+      return attachmentTerminalRevisionIssuer.hasReservation(reservation, leaseRef, phase, event) &&
+        currentAttachmentCohort(record, true) && attachmentTerminalRevisionIssuer.hasReservation(reservation, leaseRef, phase, event) && record.active
+    } catch (cause) {
+      retainAttachmentCohortReaderFailure(application, observation, cause)
+      revokeAttachmentCohort(record)
+      throw cause
+    }
+  },
+  cancel(token) {
+    const record = nativeAttachmentCohorts.get(token)
+    if (!issuedAttachmentCohorts.has(token)) return false
+    if (record) revokeAttachmentCohort(record)
+    return true // Only native continuation revoked. No File, SDK or application-ended acknowledgement.
+  },
+})
+const getAttachmentTerminalCohortIssuer = () => attachmentTerminalCohortIssuer
+const completeAttachmentCohortPublication = (application: NativeAttachmentTerminalApplication) => {
+  for (const record of activeAttachmentCohorts) {
+    if (record.application !== application) continue
+    const event = application.transaction
+    const single = application.revisionReservation
+    if (!event?.accepted || !single?.applyingAccepted || !single.publicationAccepted || application.loanFailure !== null ||
+        !application.loanAccepted || !currentAttachmentCohort(record, true)) {
+      revokeAttachmentCohort(record)
+      continue
+    }
+    const member = record.members.find((candidate) => candidate.jobRef === application.custody.jobRef)
+    if (!member || member.published) { revokeAttachmentCohort(record); continue }
+    record.publications.push(event)
+    record.revision = event.revision
+    record.value = event.value
+    member.dispatchRef = application.custody.dispatchRef
+    member.published = true
+  }
+}
+const endAttachmentCohortApplication = (application: NativeAttachmentTerminalApplication, completed: boolean) => {
+  for (const record of activeAttachmentCohorts) {
+    if (record.application !== application) continue
+    if (!completed || record.members.every((member) => member.published)) revokeAttachmentCohort(record)
+    else record.application = null
+  }
+}
+
+type NativeAttachmentApplicationEnd = {
+  readonly handle: MarkdownAttachmentTerminalApplicationEndHandle
+  readonly application: NativeAttachmentTerminalApplication
+  readonly reservation: MarkdownAttachmentTerminalRevisionReservation
+  readonly leaseRef: object
+  readonly failures: MarkdownAttachmentTerminalApplicationEndFailure[]
+  unsupportedWork: boolean
+  applicationReleased: boolean
+  retirementReturned: boolean
+  retrying: boolean
+  observation: MarkdownAttachmentTerminalApplicationEndObservation | null
+}
+const nativeAttachmentApplicationEnds = new WeakMap<MarkdownAttachmentTerminalApplicationEndHandle, NativeAttachmentApplicationEnd>()
+const retainAttachmentApplicationEndFailure = (application: NativeAttachmentTerminalApplication,
+  stage: MarkdownAttachmentTerminalApplicationEndFailure['stage'], cause: unknown) => {
+  application.endRecord?.failures.push(Object.freeze({ stage, cause }))
+}
+const publishAttachmentApplicationEnd = (record: NativeAttachmentApplicationEnd) => {
+  const application = record.application
+  const callbacksReleased = application.callbackDepth === 0 && !application.notifying
+  const loanReleased = application.loanDepth === 0 && !application.reservingRevision && !application.reservingEnd
+  const cleanupComplete = record.applicationReleased && record.retirementReturned && !record.retrying && !record.unsupportedWork &&
+    (!application.inputCleanup || application.inputCleanup.complete) && !application.releasingInput &&
+    attachmentFileCleanupDepth === 0 && attachmentPublicationDepth === 0 && !attachmentRetirementRunning &&
+    !attachmentRetirementRequested && attachmentRetirementContinuation === null
+  const phase = !record.applicationReleased || !callbacksReleased || !loanReleased
+    ? 'running' as const : cleanupComplete ? 'ended' as const : 'cleanup-blocked' as const
+  record.observation = Object.freeze({ applicationRef: record.handle, custody: application.custody,
+    reservation: record.reservation, leaseRef: record.leaseRef, phase, callbacksReleased, loanReleased,
+    applicationReleased: record.applicationReleased, cleanupComplete, unsupportedWork: record.unsupportedWork,
+    transaction: application.transaction, failures: Object.freeze([...record.failures]) })
+  return record.observation
+}
+const attachmentTerminalApplicationEndIssuer = Object.freeze<MarkdownAttachmentTerminalApplicationEndIssuer>({
+  reserve(custody, reservation, leaseRef) {
+    const application = nativeAttachmentTerminalApplication
+    const single = nativeAttachmentTerminalRevisionReservations.get(reservation)
+    if (!application || single?.application !== application || application.custody !== custody ||
+        application.endRecord || application.reservingEnd || single.leaseRef !== leaseRef) return null
+    const observation = application.observation
+    application.reservingEnd = true
+    try {
+      if (!attachmentTerminalRevisionIssuer.hasReservation(reservation, leaseRef, 'applying') || application.endRecord ||
+          nativeAttachmentTerminalApplication !== application) return null
+      const handle = Object.freeze({}) as MarkdownAttachmentTerminalApplicationEndHandle
+      const record: NativeAttachmentApplicationEnd = { handle, application, reservation, leaseRef,
+        failures: [], unsupportedWork: false, applicationReleased: false, retirementReturned: false, retrying: false, observation: null }
+      application.endRecord = record
+      nativeAttachmentApplicationEnds.set(handle, record)
+      publishAttachmentApplicationEnd(record)
+      return handle
+    } catch (cause) {
+      if (observation && nativeAttachmentTerminalApplication === application && application.notifying &&
+          application.observation === observation)
+        retainAttachmentTerminalLoanFailure(application, observation, cause, application.loanReturned)
+      throw cause
+    } finally {
+      application.reservingEnd = false
+    }
+  },
+  inspect(handle, leaseRef) {
+    const record = nativeAttachmentApplicationEnds.get(handle)
+    if (!record || record.leaseRef !== leaseRef) return null
+    // Inspection reports the last source event. It cannot run cleanup or declare release.
+    return record.observation
+  },
+  hasEnded(handle, leaseRef, observation) {
+    const record = nativeAttachmentApplicationEnds.get(handle)
+    const single = record && nativeAttachmentTerminalRevisionReservations.get(record.reservation)
+    return !!record && record.leaseRef === leaseRef && single?.application === record.application && single.leaseRef === leaseRef &&
+      record.observation === observation && observation.applicationRef === handle && observation.phase === 'ended' &&
+      observation.applicationReleased && observation.callbacksReleased && observation.loanReleased && observation.cleanupComplete &&
+      record.applicationReleased && record.application.callbackDepth === 0 && record.application.loanDepth === 0 && !record.retrying
+  },
+  retry(handle, leaseRef) {
+    const record = nativeAttachmentApplicationEnds.get(handle)
+    if (!record || record.leaseRef !== leaseRef) return null
+    const application = record.application
+    if (record.retrying) {
+      const cause = new Error('attachment-native-application-end-retry-reentry')
+      retainAttachmentApplicationEndFailure(application, 'retry', cause)
+      throw cause
+    }
+    if (record.observation?.phase === 'ended') return record.observation
+    // Never wait for or reenter the original callback/loan, another application,
+    // or the owner's cleanup stack. No Promise, content replay or new session lookup.
+    if (!record.applicationReleased || application.callbackDepth !== 0 || application.loanDepth !== 0 ||
+        nativeAttachmentTerminalApplication || attachmentPublicationDepth !== 0 || attachmentFileCleanupDepth !== 0 || attachmentRetirementRunning)
+      return record.observation
+    record.retrying = true
+    record.retirementReturned = false
+    publishAttachmentApplicationEnd(record)
+    try {
+      if (application.inputCleanup && !application.inputCleanup.complete) {
+        runAttachmentFileCleanup(application.inputCleanup)
+      }
+      try {
+        flushAttachmentRetirement()
+        record.retirementReturned = true
+      } catch (cause) {
+        retainAttachmentApplicationEndFailure(application, 'retirement', cause)
+        throw cause
+      }
+    } finally {
+      record.retrying = false
+      publishAttachmentApplicationEnd(record)
+    }
+    return record.observation
+  },
+})
+const getAttachmentTerminalApplicationEndIssuer = () => attachmentTerminalApplicationEndIssuer
+
 const withAttachmentTerminalTransaction = (
   observation: MarkdownAttachmentTerminalObservation,
   consume: MarkdownAttachmentTerminalConsumer,
@@ -5696,6 +6112,7 @@ const withAttachmentTerminalTransaction = (
   const application = nativeAttachmentTerminalApplication
   if (!application || !application.notifying || application.loanTaken ||
       application.observation !== observation || observation.custody !== application.custody) return false
+  let loanEntered = false
   const retainFailure = (cause: unknown, returned: unknown) => {
     retainAttachmentTerminalLoanFailure(application, observation, cause, returned)
   }
@@ -5703,9 +6120,14 @@ const withAttachmentTerminalTransaction = (
     if (observation.phase !== 'refused' && !application.custody.hasCustody()) return false
     application.loanTaken = true
     application.loanInvoked = true
+    loanEntered = true
+    application.loanDepth += 1
     const returned: unknown = consume(observation)
     application.loanReturned = returned
-    if (typeof returned !== 'boolean') throw new Error('attachment-terminal-consumer-return-unavailable')
+    if (typeof returned !== 'boolean') {
+      if (application.endRecord) application.endRecord.unsupportedWork = true
+      throw new Error('attachment-terminal-consumer-return-unavailable')
+    }
     const accepted = returned === true && nativeAttachmentTerminalApplication === application &&
       application.observation === observation &&
       (observation.phase === 'refused' || application.custody.hasCustody())
@@ -5716,6 +6138,8 @@ const withAttachmentTerminalTransaction = (
     application.loanAccepted = false
     retainFailure(cause, application.loanReturned)
     throw cause
+  } finally {
+    if (loanEntered) application.loanDepth -= 1
   }
 }
 const inspectAttachmentTerminalNotificationFailures = () =>
@@ -5814,6 +6238,7 @@ const applyAttachmentResult = (result: MarkdownAttachmentProviderResult) => {
     if (!application || !observer) return true
     application.observation = observation
     application.notifying = true
+    application.callbackDepth += 1
     application.loanTaken = false
     application.loanInvoked = false
     application.loanAccepted = false
@@ -5822,17 +6247,25 @@ const applyAttachmentResult = (result: MarkdownAttachmentProviderResult) => {
     let returned: unknown
     try {
       returned = observer(observation)
-      if (typeof returned !== 'boolean') throw new Error('attachment-terminal-observer-return-unavailable')
+      if (typeof returned !== 'boolean') {
+        if (application.endRecord) application.endRecord.unsupportedWork = true
+        throw new Error('attachment-terminal-observer-return-unavailable')
+      }
       const accepted = returned && application.loanTaken && application.loanInvoked &&
         application.loanAccepted && application.loanFailure === null &&
         (observation.phase === 'refused' || application.custody.hasCustody())
-      if (!accepted) attachmentTerminalNotificationFailures.push(Object.freeze({ observation, cause: application.cause, returned }))
+      if (!accepted) {
+        retainAttachmentApplicationEndFailure(application, 'observer', application.cause)
+        attachmentTerminalNotificationFailures.push(Object.freeze({ observation, cause: application.cause, returned }))
+      }
       return accepted
     } catch (cause) {
+      retainAttachmentApplicationEndFailure(application, 'observer', cause)
       application.cause = application.loanFailure ? application.loanFailure.firstCause : cause
       attachmentTerminalNotificationFailures.push(Object.freeze({ observation, cause, returned }))
       throw cause
     } finally {
+      application.callbackDepth -= 1
       application.notifying = false
       application.observation = null
     }
@@ -5872,7 +6305,8 @@ const applyAttachmentResult = (result: MarkdownAttachmentProviderResult) => {
         isReleasingInput: () => nativeAttachmentTerminalApplication === application &&
           application?.releasingInput === true && nativeCustody(),
       })
-      application = { custody, observation: null, notifying: false, loanTaken: false,
+      application = { custody, endRecord: null, reservingEnd: false, callbackDepth: 0, loanDepth: 0, inputCleanup: null,
+        observation: null, notifying: false, loanTaken: false,
         loanInvoked: false, loanAccepted: false, loanReturned: undefined, loanFailure: null, revisionReservation: null, reservingRevision: false,
         releasingInput: false, inputReleased: false, transaction: null, cause: undefined }
       nativeAttachmentTerminalApplication = application
@@ -5882,7 +6316,8 @@ const applyAttachmentResult = (result: MarkdownAttachmentProviderResult) => {
     if (!nativeCustody()) return refuseCompletion()
     if (application) application.releasingInput = true
     try {
-      revokeAttachmentFile(job.itemId ?? job.id)
+      if (application) application.inputCleanup = createAttachmentFileCleanup([job.itemId ?? job.id], application)
+      revokeAttachmentFile(job.itemId ?? job.id, application?.inputCleanup ?? undefined)
       if (application) application.inputReleased = true
     } finally {
       if (application) application.releasingInput = false
@@ -5915,6 +6350,7 @@ const applyAttachmentResult = (result: MarkdownAttachmentProviderResult) => {
       if (!notify(Object.freeze({ phase: 'committed', custody: application.custody, transaction: event })))
         return false // The accepted transaction remains historical; no acknowledgement is fabricated.
     }
+    if (application) completeAttachmentCohortPublication(application)
     completed = true
     return true
   }
@@ -5924,7 +6360,10 @@ const applyAttachmentResult = (result: MarkdownAttachmentProviderResult) => {
   } catch (cause) {
     hasPrimaryFailure = true
     primaryFailure = cause
-    if (application) application.cause = cause
+    if (application) {
+      retainAttachmentApplicationEndFailure(application, 'application', cause)
+      application.cause = cause
+    }
   } finally {
     try {
       if (application && !completed) notify(Object.freeze({ phase: 'refused', custody: application.custody,
@@ -5933,14 +6372,21 @@ const applyAttachmentResult = (result: MarkdownAttachmentProviderResult) => {
       hasCleanupFailure = true
       cleanupFailure = cause
     } finally {
+      if (application) endAttachmentCohortApplication(application, completed)
       if (application?.revisionReservation) application.revisionReservation.active = false
       if (nativeAttachmentTerminalApplication === application) nativeAttachmentTerminalApplication = null
       attachmentPublicationDepth -= 1
+      if (application?.endRecord) application.endRecord.applicationReleased = true
       try {
         flushAttachmentRetirement()
+        if (application?.endRecord) application.endRecord.retirementReturned = true
       } catch (cause) {
+        if (application) retainAttachmentApplicationEndFailure(application, 'retirement', cause)
+        invalidateAttachmentCohorts?.()
         if (!hasCleanupFailure) cleanupFailure = cause
         hasCleanupFailure = true
+      } finally {
+        if (application?.endRecord) publishAttachmentApplicationEnd(application.endRecord)
       }
     }
   }
@@ -6456,6 +6902,7 @@ const handleEmbedAction = async (
     result.action === 'select-node'
   ) {
     if (currentMode.value === 'preview') setMode('source')
+    invalidateAttachmentCohorts?.()
     transactionStore.setSelection(result.selection, false)
     await restoreTextareaSelection(result.selection)
     return
@@ -7125,6 +7572,7 @@ const revealActiveImageSource = () => {
   if (!active) return
   const range = active.figure?.captionRange ?? active.range
   setMode('source')
+  invalidateAttachmentCohorts?.()
   transactionStore.setSelection(
     { direction: 'none', end: range.end, start: range.start },
     false,
@@ -7238,6 +7686,7 @@ const commitRevealSelection = async (
     end: range.start,
     start: range.start,
   })
+  invalidateAttachmentCohorts?.()
   transactionStore.setSelection(selection, true)
   refreshLiveWindow('feature')
   refreshWritingAidsDocument()
@@ -7789,6 +8238,7 @@ const sessionBinding = createMarkdownEditorSessionBinding({
 invalidateNativeSurfacePublication = sessionBinding.invalidatePublicationAuthority
 
 retireSnapshotPublicationAuthority = () => {
+  invalidateAttachmentCohorts?.()
   let failed = false
   let firstCause: unknown
   try { retireStoreDocumentAuthority() } catch (cause) { failed = true; firstCause = cause }
@@ -7820,6 +8270,8 @@ defineExpose({
   withAttachmentFile,
   withAttachmentTerminalTransaction,
   getAttachmentTerminalRevisionIssuer,
+  getAttachmentTerminalCohortIssuer,
+  getAttachmentTerminalApplicationEndIssuer,
   inspectAttachmentTerminalNotificationFailures,
   dispatchTransaction: (transaction: MarkdownEditorTransaction) => dispatchTransaction(transaction),
   insertMarkdownAtCursor,
