@@ -162,7 +162,8 @@ Ref, copying a producer handle, or forwarding it through an ordinary computed
 input does not transfer custody.
 
 For the explicit controlled path, pass the factory's original handle to
-`provideGlobalConfig`. The factory copies and recursively freezes acyclic
+`provideGlobalConfig` directly, or use the local-source component's
+`config-producer` input. The factory copies and recursively freezes acyclic
 plain data; functions, accessors, Vue proxies and class instances are rejected.
 Subsequent changes must use `producer.update(next)` with another plain snapshot.
 It replaces the complete local snapshot. An injected parent is still inherited
@@ -170,6 +171,68 @@ with the same merge rule; a controlled child of an unowned parent stays unowned.
 A controlled root without an injected parent owns its complete configuration
 and does not inherit the process fallback. This avoids making a root depend on
 the fallback that it publishes itself.
+
+### Component handoff through the local source alias
+
+`ElConfigProvider.config-producer` accepts the original
+`createGlobalConfigSnapshot` handle. The component captures it during setup and
+passes that same object directly to `provideGlobalConfig`. The accepted hook's
+private identity registry decides ownership; the prop type, an arbitrary
+structural callback, a copied handle, or an arbitrary Ref cannot certify it.
+
+```vue
+<script setup lang="ts">
+import { createGlobalConfigSnapshot, ElConfigProvider } from 'element-plus'
+
+const configProducer = createGlobalConfigSnapshot({
+  a11y: true,
+  keyboardNavigation: true,
+  namespace: 'el',
+  renderPipeline: { mode: 'auto', worker: 'auto' },
+})
+
+function disableWorker() {
+  configProducer.update({
+    a11y: true,
+    keyboardNavigation: true,
+    namespace: 'el',
+    renderPipeline: { mode: 'auto', worker: 'disabled' },
+  })
+}
+</script>
+
+<template>
+  <ElConfigProvider :config-producer="configProducer">
+    <slot :disable-worker="disableWorker" />
+  </ElConfigProvider>
+</template>
+```
+
+With that setup-bound handle, the snapshot supplies the component's local
+configuration, including its existing message/theme/motion synchronization.
+Other configuration props do not override or supplement it. The snapshot must
+therefore carry the complete local values its owner intends to publish; its
+`update` replaces that local snapshot and keeps the existing injected-parent
+merge semantics. Those side-effect watchers observe values after publication
+and do not establish prewrite custody.
+
+Replacing, adding or removing `config-producer` on an already mounted component
+does not switch its source. Use a keyed remount for a different binding. The
+component's provided context releases with its setup scope; the producer
+remains owned by its creator and can be shared with another provider. Without
+a producer at setup, the existing reactive plain-props path remains unowned.
+Its stable configuration view reads the original prop fields through property
+Refs; `configProducer` is excluded from enumeration and reads. Supplying a
+handle later therefore does not expose binding metadata through injected or
+slot configuration. The view copies neither configuration values nor nested
+objects and does not confer custody on externally writable props.
+
+`ConfigProviderProps` continues describing configuration data only, so the
+context's data type excludes the producer binding. `ConfigProviderInputProps`
+describes the complete component inputs, including `configProducer`. This
+handoff remains an internal local-source integration surface; it does not add
+a package entry point, migrate a shared application root, or establish complete
+Renderer/pipeline authority.
 
 For a Ref returned by `provideGlobalConfig`, `useGlobalConfig()`, or
 `useGlobalConfig('renderPipeline')`, `getGlobalConfigFeed(ref)` performs only an
@@ -228,7 +291,8 @@ producer shared by other providers.
 
 Remaining integration inputs are the actual producer handle, the exact returned
 selected Ref/feed, synchronous cancellation subscribers, and an explicit
-reacquisition point. Ordinary `ElConfigProvider` does not create this handle.
+reacquisition point. `ElConfigProvider` receives but does not create this handle;
+ordinary plain-props use remains unowned.
 Renderer/pipeline consumers still need to retain the real config dependency
 and combine its ticket with every other required authority; an unknown or
 missing input must continue denying full authority. Direct external

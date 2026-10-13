@@ -3,7 +3,10 @@ import {
   defineComponent,
   inject,
   onBeforeUnmount,
+  proxyRefs,
   renderSlot,
+  shallowReadonly,
+  toRefs,
   watch,
 } from 'vue'
 import { provideGlobalConfig } from './hooks/use-global-config'
@@ -24,9 +27,17 @@ const ConfigProvider = defineComponent({
     const parentConfig = inject(configProviderContextKey, undefined)
     const inheritedThemeModeAtSetup = parentConfig?.value?.themeMode
     const inheritedMotionAtSetup = parentConfig?.value?.motion
+    // Bind once: replacing an external prop is not a controlled producer write.
+    const { configProducer: producerRef, ...configRefs } = toRefs(props)
+    const producer = producerRef?.value
+    // A stable live view keeps fallback reads reactive without binding metadata.
+    const plainConfig = shallowReadonly(proxyRefs(configRefs))
+    const localConfig = computed(() =>
+      producer ? producer.config.value : plainConfig
+    )
 
     watch(
-      () => props.message,
+      () => localConfig.value.message,
       (val) => {
         Object.assign(messageConfig, val ?? {})
       },
@@ -36,7 +47,7 @@ const ConfigProvider = defineComponent({
     watch(
       computed(
         () =>
-          props.themeMode ??
+          localConfig.value.themeMode ??
           parentConfig?.value?.themeMode ??
           inheritedThemeModeAtSetup
       ),
@@ -50,7 +61,9 @@ const ConfigProvider = defineComponent({
     watch(
       computed(
         () =>
-          props.motion ?? parentConfig?.value?.motion ?? inheritedMotionAtSetup
+          localConfig.value.motion ??
+          parentConfig?.value?.motion ??
+          inheritedMotionAtSetup
       ),
       (motion) => {
         syncMotionConfig(motion)
@@ -59,7 +72,7 @@ const ConfigProvider = defineComponent({
     )
 
     onBeforeUnmount(() => {
-      if (props.themeMode !== undefined) {
+      if (localConfig.value.themeMode !== undefined) {
         const fallbackThemeMode =
           parentConfig?.value?.themeMode ?? inheritedThemeModeAtSetup
         if (fallbackThemeMode) {
@@ -69,7 +82,7 @@ const ConfigProvider = defineComponent({
         }
       }
 
-      if (props.motion !== undefined) {
+      if (localConfig.value.motion !== undefined) {
         const fallbackMotion = parentConfig?.value?.motion ?? inheritedMotionAtSetup
         if (fallbackMotion) {
           syncMotionConfig(fallbackMotion)
@@ -79,7 +92,7 @@ const ConfigProvider = defineComponent({
       }
     })
 
-    const config = provideGlobalConfig(props)
+    const config = provideGlobalConfig(producer ?? plainConfig)
     return () => renderSlot(slots, 'default', { config: config?.value })
   },
 })
