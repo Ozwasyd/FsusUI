@@ -5979,6 +5979,9 @@ const dispatchAttachmentBatch = (
     let dispatchRef: object | undefined
     const identity = Object.freeze({ ...transactionStore.documentIdentity })
     const record = attachmentBatches.get(batch.batchId)
+    // Retry dispatch may project one item; custody stays with the original batch.
+    const originalBatch = record?.batch
+    const originalBinding = attachmentJobBindings.get(toRaw(job))
     const dispatchInput = (admitProgress: (result: MarkdownAttachmentProviderResult) => boolean) => {
       // The original owner has admitted the dispatch and owns the actual attempt.
       attempt = job.attempt
@@ -6003,14 +6006,16 @@ const dispatchAttachmentBatch = (
       const declaredEpoch = props.documentIdentity?.epoch ?? 0
       const proof = inspectMarkdownAttachmentDispatch(job)
       const binding = attachmentJobBindings.get(toRaw(job))
-      if (attempt === undefined || !dispatchRef || !record ||
+      if (attempt === undefined || !dispatchRef || !record || !originalBatch || !originalBinding ||
           proof?.dispatchRef !== dispatchRef || proof.attempt !== attempt || job.attempt !== attempt ||
           sessionDisposed || editorReleased || attachmentPauseRequested.value ||
           transactionStore.documentIdentity.id !== identity.id || transactionStore.documentIdentity.epoch !== identity.epoch ||
           declaredId !== identity.id || declaredEpoch !== identity.epoch ||
           !attachmentJobs.value.some((candidate) => toRaw(candidate) === toRaw(job)) ||
-          attachmentBatches.get(batch.batchId) !== record || record.batch !== batch ||
-          attachmentItems.get(item.itemId) !== item || binding?.batch !== batch || binding.item !== item)
+          batch.batchId !== originalBatch.batchId || attachmentBatches.get(originalBatch.batchId) !== record ||
+          record.batch !== originalBatch || originalBinding.batch !== originalBatch || originalBinding.item !== item ||
+          originalBatch.items[item.order] !== item || attachmentItems.get(item.itemId) !== item ||
+          binding?.batch !== originalBinding.batch || binding.item !== originalBinding.item)
         return null
       return proof
     }
