@@ -41,8 +41,8 @@ import type {
   MarkdownAttachmentCaptureObservation,
 } from './markdown-editor-attachment'
 import type { MarkdownEditorMetricsOptions } from './markdown-editor-metrics'
-import type { MarkdownEditorAttachmentDispatch } from './markdown-editor-session-attachment-dispatch'
-export type { MarkdownEditorAttachmentDispatch } from './markdown-editor-session-attachment-dispatch'
+import type { MarkdownEditorAttachmentDispatch, MarkdownEditorAttachmentRequestDispatch } from './markdown-editor-session-attachment-dispatch'
+export type { MarkdownEditorAttachmentDispatch, MarkdownEditorAttachmentRequestDispatch } from './markdown-editor-session-attachment-dispatch'
 export {
   bindMarkdownAttachmentConsumerRequest,
   captureMarkdownAttachmentInput,
@@ -1834,6 +1834,10 @@ export const markdownEditorProps = buildProps({
   },
   attachmentDispatch: {
     type: definePropType<MarkdownEditorAttachmentDispatch>(Function),
+    default: undefined,
+  },
+  attachmentRequestDispatch: {
+    type: definePropType<MarkdownEditorAttachmentRequestDispatch>(Function),
     default: undefined,
   },
   embedProvider: {

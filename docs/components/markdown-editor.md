@@ -1131,9 +1131,9 @@ also requires that owner's actual current document/attempt and quiescence admiss
 the helper neither dispatches placeholders nor qualifies retained-session restore.
 Import these original helpers/types from `@ozwasyd/element-plus`; the public editor
 type barrel additively exports the same producer declarations. The existing
-`MarkdownEditorAttachmentDispatch` promise-only hook and shared editor SFC require
-their owning integration to pass this richer actual handle. They are not automatically
-upgraded by these declarations. Existing void-event consumers remain
+`MarkdownEditorAttachmentDispatch` remains the promise-only legacy hook. The shared
+editor now accepts `attachmentRequestDispatch` through the original strict request
+entry described below. Existing void-event consumers remain
 unsupported for resource/settlement/recreation admission. No remote cancellation,
 server settlement or disposed-editor recovery guarantee is supplied.
 
@@ -1488,3 +1488,36 @@ producer or synthetic full-settled wrapper is supplied by this intake.
 remain literal original producer fields. Full resource/recovery/eviction and all
 runtime/native/IME/security/privacy/receipt/race/backup-restore qualification holds
 remain HOLD/UNRUN. Local source alias only; no package publication.
+
+### Shared strict attachment request entry
+
+Provide `attachmentRequestDispatch` with a
+`MarkdownEditorAttachmentRequestDispatch` imported from `@ozwasyd/element-plus`.
+It aliases the original canonical `MarkdownAttachmentRequestDispatch`: the
+synchronous callback returns its actual `MarkdownAttachmentConsumerRequest`,
+including the separate original result/full-local settlement futures and owned
+resource/cleanup capabilities. It must not return an async wrapper, bare provider
+promise or invented settlement acknowledgment.
+
+The existing single SFC dispatch chooses this original strict hook before invoking
+the consumer, calls the original `runAttachmentConsumerRequest` once for that job,
+and returns the identical supplied request directly inside the original dispatch
+admission. No provider invocation occurs before that admission or through a second
+dispatch. The original owner alone binds the actual request/futures, observers,
+cleanup history and epoch/attempt-qualified frozen progress/terminal snapshots.
+Synchronous `onProgress` performs only original admission and content application;
+it never awaits an upstream result/settled future or its enclosing SDK request.
+Terminal consumption likewise performs a synchronous content commit after the
+original owner's existing proof. Removing the hook does not replace or release
+the original in-flight request.
+
+`attachmentDispatch` retains its existing Promise-only compatibility signature
+and original legacy owner path. Providing both hooks refuses before either
+business invocation. Neither legacy content settlement nor a rich supplied handle
+admits the whole component's resource/recovery census. Existing opaque-consumer
+observation and `attachmentResourceOwnerReviewed:false` remain; no source/runtime
+qualification is promoted. Blog still needs its real accepted business request
+producer and callable adapter. This SDK integration supplies no upload/runtime/
+binary-transport implementation or synthetic full-settled wrapper. All existing
+full-ready/resource/restoration/eviction and runtime/native/IME/security/privacy/
+receipt/race/backup-restore holds remain HOLD/UNRUN.

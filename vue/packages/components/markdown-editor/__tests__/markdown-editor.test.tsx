@@ -25,7 +25,9 @@ import {
 } from '../src/markdown-editor'
 import type {
   MarkdownAttachmentProviderResult,
+  MarkdownAttachmentConsumerRequest,
   MarkdownEditorAttachmentDispatch,
+  MarkdownEditorAttachmentRequestDispatch,
   MarkdownEditorCommand,
   MarkdownEditorInstance,
   MarkdownEditorProps,
@@ -1629,6 +1631,98 @@ describe('MarkdownEditor', () => {
       payload: { markdownKind: 'file', href: 'https://cdn.example/second.pdf', mimeType: 'application/pdf', name: 'second.pdf' },
     })).toBe(false)
     expect(wrapper.emitted('update:modelValue')?.length).toBe(beforeLateReply)
+  })
+
+  it('dispatches the original rich request once and waits real full settlement after synchronous progress admission', async () => {
+    let input!: Parameters<MarkdownEditorAttachmentRequestDispatch>[0]
+    let finishResult!: (result: MarkdownAttachmentProviderResult) => void
+    let finishSettled!: () => void
+    const result = new Promise<MarkdownAttachmentProviderResult>((resolve) => { finishResult = resolve })
+    const settled = new Promise<void>((resolve) => { finishSettled = resolve })
+    const request: MarkdownAttachmentConsumerRequest = {
+      result, settled, cancelLocal: () => {},
+      inspectLocalResources: () => ({ backgroundTasks: 0, timers: 0, observers: 0,
+        retainedListeners: 0, networkRequests: 0, memoryUnits: 0 }),
+    }
+    const dispatch = vi.fn((value: Parameters<MarkdownEditorAttachmentRequestDispatch>[0]) => {
+      input = value
+      return request
+    })
+    const wrapper = mount(MarkdownEditor, { props: { modelValue: 'Draft: ', attachmentRequestDispatch: dispatch } })
+    wrapper.find('textarea').element.setSelectionRange(7, 7)
+    const file = new File(['report'], 'report.pdf', { type: 'application/pdf' })
+    const picker = wrapper.find<HTMLInputElement>('.el-markdown-editor__attachment-picker')
+    Object.defineProperty(picker.element, 'files', { configurable: true, value: [file] })
+    await picker.trigger('change')
+    expect(dispatch).toHaveBeenCalledTimes(1)
+    expect(input.file).toBe(file)
+    expect(Object.isFrozen(input)).toBe(true)
+    expect(wrapper.emitted('upload-image')).toBeUndefined()
+    const progress: MarkdownAttachmentProviderResult = { status: 'progress',
+      batchId: input.batch.batchId, itemId: input.item.itemId, ratio: 0.5 }
+    expect(input.onProgress(progress)).toBe(true)
+    expect(Object.isFrozen(progress)).toBe(true)
+    await wrapper.setProps({ attachmentRequestDispatch: undefined })
+    const terminal: MarkdownAttachmentProviderResult = {
+      status: 'resolved', batchId: input.batch.batchId, itemId: input.item.itemId,
+      documentIdentity: input.batch.documentIdentity, revision: input.batch.revision,
+      payload: { markdownKind: 'file', href: 'https://cdn.example/report.pdf', mimeType: 'application/pdf', name: 'report.pdf' },
+    }
+    expect(wrapper.vm.applyAttachmentResult(terminal)).toBe(false)
+    finishResult(terminal)
+    await flushPromises()
+    expect(wrapper.emitted('update:modelValue')?.at(-1)?.[0]).not.toBe('Draft: [report.pdf](https://cdn.example/report.pdf)')
+    finishSettled()
+    await flushPromises()
+    expect(wrapper.emitted('update:modelValue')?.at(-1)?.[0]).toBe('Draft: [report.pdf](https://cdn.example/report.pdf)')
+    expect(dispatch).toHaveBeenCalledTimes(1)
+    expect(wrapper.vm.getSession('session:rich-upload').inspectResourceParticipants().missingOwners).toContain('attachment-embed')
+  })
+
+  it('refuses old rich progress and terminal content after replacement with the same document id and a new epoch', async () => {
+    let input!: Parameters<MarkdownEditorAttachmentRequestDispatch>[0]
+    let finishResult!: (result: MarkdownAttachmentProviderResult) => void
+    let finishSettled!: () => void
+    const request: MarkdownAttachmentConsumerRequest = {
+      result: new Promise((resolve) => { finishResult = resolve }),
+      settled: new Promise((resolve) => { finishSettled = resolve }), cancelLocal: () => {},
+      inspectLocalResources: () => ({ backgroundTasks: 0, timers: 0, observers: 0,
+        retainedListeners: 0, networkRequests: 0, memoryUnits: 0 }),
+    }
+    const dispatch: MarkdownEditorAttachmentRequestDispatch = (value) => { input = value; return request }
+    const wrapper = mount(MarkdownEditor, { props: { modelValue: 'Old',
+      documentIdentity: { id: 'rich-replacement', epoch: 1 }, attachmentRequestDispatch: dispatch } })
+    const picker = wrapper.find<HTMLInputElement>('.el-markdown-editor__attachment-picker')
+    Object.defineProperty(picker.element, 'files', { configurable: true,
+      value: [new File(['old'], 'old.pdf', { type: 'application/pdf' })] })
+    await picker.trigger('change')
+    await wrapper.setProps({ documentIdentity: { id: 'rich-replacement', epoch: 2 }, modelValue: 'New' })
+    const before = wrapper.emitted('update:modelValue')?.length
+    expect(input.onProgress({ status: 'progress', batchId: input.batch.batchId,
+      itemId: input.item.itemId, ratio: 1 })).toBe(false)
+    finishResult({ status: 'resolved', batchId: input.batch.batchId, itemId: input.item.itemId,
+      documentIdentity: input.batch.documentIdentity, revision: input.batch.revision,
+      payload: { markdownKind: 'file', href: 'https://cdn.example/old.pdf', mimeType: 'application/pdf', name: 'old.pdf' } })
+    finishSettled()
+    await flushPromises()
+    expect(wrapper.emitted('update:modelValue')?.length).toBe(before)
+    expect(wrapper.find('textarea').element.value).toBe('New')
+  })
+
+  it('refuses conflicting rich and legacy dispatch hooks before either business invocation', async () => {
+    const rich = vi.fn<MarkdownEditorAttachmentRequestDispatch>(() => { throw new Error('rich must not run') })
+    const legacy = vi.fn<MarkdownEditorAttachmentDispatch>(() => { throw new Error('legacy must not run') })
+    const errors: unknown[] = []
+    const wrapper = mount(MarkdownEditor, { props: { modelValue: '',
+      attachmentRequestDispatch: rich, attachmentDispatch: legacy },
+    global: { config: { errorHandler: (cause) => { errors.push(cause) } } } })
+    const picker = wrapper.find<HTMLInputElement>('.el-markdown-editor__attachment-picker')
+    Object.defineProperty(picker.element, 'files', { configurable: true,
+      value: [new File(['report'], 'report.pdf', { type: 'application/pdf' })] })
+    await picker.trigger('change')
+    expect(rich).not.toHaveBeenCalled()
+    expect(legacy).not.toHaveBeenCalled()
+    expect(errors.some((cause) => cause instanceof Error && cause.message === 'editor-attachment-dispatch-hooks-conflict')).toBe(true)
   })
 
   it('keeps a started service future behind its proof gate after the dispatch prop is removed', async () => {

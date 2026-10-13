@@ -1,4 +1,4 @@
-import type { MarkdownAttachmentBatchIntent, MarkdownAttachmentItemIntent, MarkdownAttachmentProviderResult } from './markdown-editor-attachment'
+import type { MarkdownAttachmentBatchIntent, MarkdownAttachmentItemIntent, MarkdownAttachmentProviderResult, MarkdownAttachmentRequestDispatch } from './markdown-editor-attachment'
 
 /** Return the real service future; progress and terminal content have distinct custody. */
 export type MarkdownEditorAttachmentDispatch = (input: {
@@ -7,3 +7,6 @@ export type MarkdownEditorAttachmentDispatch = (input: {
   readonly file: File | null
   readonly onProgress: (result: MarkdownAttachmentProviderResult) => boolean
 }) => PromiseLike<MarkdownAttachmentProviderResult>
+
+/** Strict original request entry; no async wrapper or legacy settlement adaptation. */
+export type MarkdownEditorAttachmentRequestDispatch = MarkdownAttachmentRequestDispatch

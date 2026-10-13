@@ -1828,8 +1828,8 @@ const attachmentPauseRequested = ref(false)
 // A public consumer callback has no network/timer census. Remember that it was
 // bound/invoked; replacing props or completing a job cannot prove it released
 // resources. Only a real consumer resource owner may lift this limitation.
-const opaqueAttachmentResourcesObserved = ref(Boolean(props.embedProvider || props.attachmentDispatch))
-nativeSurfaceResources.ownWatch(watch([() => props.embedProvider, () => props.attachmentDispatch],
+const opaqueAttachmentResourcesObserved = ref(Boolean(props.embedProvider || props.attachmentDispatch || props.attachmentRequestDispatch))
+nativeSurfaceResources.ownWatch(watch([() => props.embedProvider, () => props.attachmentDispatch, () => props.attachmentRequestDispatch],
   (providers) => nativeSurfaceResources.runWatchCallback(() => {
   if (providers.some(Boolean)) opaqueAttachmentResourcesObserved.value = true
 }),
@@ -5658,9 +5658,11 @@ const dispatchAttachmentBatch = (
   batch: MarkdownAttachmentBatchIntent,
   capture?: MarkdownAttachmentCaptureObservation,
 ) => {
-  opaqueAttachmentResourcesObserved.value = true
   const dispatch = props.attachmentDispatch
-  if (!dispatch) {
+  const requestDispatch = props.attachmentRequestDispatch
+  if (dispatch && requestDispatch) throw new Error('editor-attachment-dispatch-hooks-conflict')
+  opaqueAttachmentResourcesObserved.value = true
+  if (!dispatch && !requestDispatch) {
     // Mark the content channel before emitting: synchronous legacy consumers
     // may reply here. This metadata does not issue any settlement/resource proof.
     for (const item of batch.items) {
@@ -5686,12 +5688,17 @@ const dispatchAttachmentBatch = (
       attachmentJobBindings.get(toRaw(job))?.batch === record?.batch &&
       attachmentJobBindings.get(toRaw(job))?.item === item
       ? record?.files.get(item)?.file ?? null : null
-    void attachmentEmbedOwner.runAttachmentDispatch(job, (admitProgress) => dispatch(Object.freeze({
+    const dispatchInput = (admitProgress: (result: MarkdownAttachmentProviderResult) => boolean) => Object.freeze({
       batch,
       item,
       file,
+      // Synchronous content admission only. Never await this enclosing request.
       onProgress: (progress: MarkdownAttachmentProviderResult) => admitProgress(progress) && applyAttachmentResult(progress),
-    }))).then((settled) => {
+    })
+    const work = requestDispatch
+      ? attachmentEmbedOwner.runAttachmentConsumerRequest(job, (admitProgress) => requestDispatch(dispatchInput(admitProgress)))
+      : attachmentEmbedOwner.runAttachmentDispatch(job, (admitProgress) => dispatch!(dispatchInput(admitProgress)))
+    void work.then((settled) => {
       // Only the real owner's awaited terminal proof reaches content commit.
       applyAttachmentResult(settled)
     }).catch(() => {
