@@ -347,6 +347,7 @@
               ns.is('csp-hidden', !mobileSearchExpanded),
             ]"
             :aria-hidden="!mobileSearchExpanded"
+            :inert="!mobileSearchExpanded || undefined"
           >
             <slot name="mobile-search">
               <form
@@ -388,6 +389,7 @@
               ns.is('expanded', mobileSearchExpanded),
             ]"
             :aria-hidden="!mobileSearchExpanded"
+            :inert="!mobileSearchExpanded || undefined"
           >
             <slot name="mobile-search">
               <form
@@ -488,6 +490,14 @@ import {
   useSlots,
   watch,
 } from 'vue'
+import {
+  autoUpdate,
+  computePosition,
+  flip,
+  offset,
+  platform,
+  size,
+} from '@floating-ui/dom'
 import { ElInput } from '@element-plus/components/input'
 import { ElSiteHeader } from '@element-plus/components/site-header'
 import { CHANGE_EVENT, UPDATE_MODEL_EVENT } from '@element-plus/constants'
@@ -514,6 +524,10 @@ const desktopSearchTriggerRef = ref<HTMLAnchorElement>()
 const mobileSearchRowId = useId().value
 const mobileSearchRowRef = ref<HTMLElement>()
 const mobileSearchTriggerRef = ref<HTMLAnchorElement>()
+let mobileSearchPositioningMounted = false
+let mobileSearchPositioningRevision = 0
+let mobileSearchPositioningCleanup: (() => void) | undefined
+let positionedMobileSearch: HTMLElement | undefined
 const desktopNavRef = ref<HTMLElement>()
 const mobileNavMenuRef = ref<HTMLDetailsElement>()
 const mobileNavMenuTriggerRef = ref<HTMLElement>()
@@ -570,6 +584,12 @@ const showMobileInlineNav = computed(
 )
 const mobileToolbarKls = computed(() => [
   ns.e('mobile-toolbar'),
+  ns.is(
+    'search-only',
+    showMobileSearchTrigger.value &&
+      !showMobileInlineNav.value &&
+      !slots['mobile-actions'],
+  ),
   ns.is(
     'collapsed',
     showMobileSearchTrigger.value &&
@@ -688,7 +708,95 @@ const syncNavIndicators = async () => {
 
 const handleIndicatorResize = () => {
   void syncNavIndicators()
+  syncMobileSearchPositioning()
 }
+
+const stopMobileSearchPositioning = () => {
+  mobileSearchPositioningRevision += 1
+  mobileSearchPositioningCleanup?.()
+  mobileSearchPositioningCleanup = undefined
+  if (positionedMobileSearch) {
+    positionedMobileSearch.style.top = ''
+    positionedMobileSearch.style.left = ''
+    positionedMobileSearch.style.right = ''
+    positionedMobileSearch.style.maxBlockSize = ''
+    positionedMobileSearch = undefined
+  }
+}
+
+const syncMobileSearchPositioning = () => {
+  stopMobileSearchPositioning()
+  const panel = mobileSearchRowRef.value
+  if (
+    !mobileSearchPositioningMounted ||
+    !mobileSearchExpanded.value ||
+    !panel
+  ) {
+    return
+  }
+  if (getComputedStyle(panel).position !== 'absolute') return
+  const anchor = panel.offsetParent
+  if (!(anchor instanceof HTMLElement)) return
+
+  positionedMobileSearch = panel
+  const revision = mobileSearchPositioningRevision
+  let updateRevision = 0
+  const isCurrent = (update: number) =>
+    mobileSearchPositioningMounted &&
+    mobileSearchExpanded.value &&
+    mobileSearchRowRef.value === panel &&
+    mobileSearchPositioningRevision === revision &&
+    updateRevision === update &&
+    getComputedStyle(panel).position === 'absolute'
+
+  const update = async () => {
+    const currentUpdate = ++updateRevision
+    if (!isCurrent(currentUpdate)) return
+    const style = getComputedStyle(panel)
+    const gap = Number.parseFloat(style.marginBlockStart)
+    const bottomGap = Number.parseFloat(style.marginBlockEnd)
+    const endGap = Number.parseFloat(style.marginInlineEnd)
+    const leftMargin = Number.parseFloat(style.marginLeft)
+    if (![gap, bottomGap, endGap, leftMargin].every(Number.isFinite)) return
+    const scale = await platform.getScale(anchor)
+    if (
+      !isCurrent(currentUpdate) ||
+      !Number.isFinite(scale.y) ||
+      scale.y <= 0
+    ) {
+      return
+    }
+    const padding = { top: gap * scale.y, bottom: bottomGap * scale.y }
+    const position = await computePosition(anchor, panel, {
+      placement: 'bottom-end',
+      strategy: 'absolute',
+      middleware: [
+        offset({ mainAxis: gap, crossAxis: -endGap }),
+        flip({ padding }),
+        size({
+          padding,
+          apply({ availableHeight }) {
+            if (isCurrent(currentUpdate)) {
+              panel.style.maxBlockSize = `${Math.max(0, availableHeight)}px`
+            }
+          },
+        }),
+      ],
+    })
+    if (!isCurrent(currentUpdate)) return
+    panel.style.top = `${position.y - gap}px`
+    panel.style.left = `${position.x - leftMargin}px`
+    panel.style.right = 'auto'
+  }
+
+  mobileSearchPositioningCleanup = autoUpdate(anchor, panel, () => {
+    void update()
+  })
+}
+
+watch([mobileSearchExpanded, mobileSearchRowRef], syncMobileSearchPositioning, {
+  flush: 'post',
+})
 
 watch(
   () => [props.activeNav, props.activeNavMotion, props.navItems],
@@ -708,12 +816,16 @@ onMounted(() => {
     mobileNavMenuVisible.value = true
   }
   mobileNavMenuCspReady.value = true
+  mobileSearchPositioningMounted = true
+  syncMobileSearchPositioning()
   void syncNavIndicators()
   window.addEventListener('resize', handleIndicatorResize)
   document.addEventListener('pointerdown', handleDesktopSearchOutsidePointer)
 })
 
 onBeforeUnmount(() => {
+  mobileSearchPositioningMounted = false
+  stopMobileSearchPositioning()
   window.removeEventListener('resize', handleIndicatorResize)
   document.removeEventListener('pointerdown', handleDesktopSearchOutsidePointer)
 })
