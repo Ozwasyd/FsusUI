@@ -728,7 +728,40 @@
 
   @media (max-height: 520px) and (orientation: landscape) {
     @include e(inner) {
+      position: relative;
       padding-block: var(--fsus-space-1, 4px);
+    }
+
+    @include e(mobile-toolbar) {
+      @include when(search-only) {
+        margin-top: 0;
+
+        .#{$namespace}-public-shell__mobile-actions {
+          margin-top: 0;
+        }
+      }
+    }
+
+    @include e(mobile-search-row) {
+      position: absolute;
+      inset-block-start: calc(100% + var(--fsus-space-2, 8px));
+      inset-inline-end: var(--fsus-space-6, 24px);
+      z-index: 60;
+      inline-size: min(
+        20rem,
+        calc(100% - var(--fsus-space-6, 24px) - var(--fsus-space-6, 24px))
+      );
+      max-block-size: calc(
+        #{fsus-viewport-safe-block-size(var(--fsus-space-2, 8px))} - 100%
+      );
+      overflow: auto;
+      margin-block: 0;
+      padding: var(--fsus-space-3, 12px);
+      border: 1px solid getCssVar('border-color-lighter');
+      border-radius: var(--fsus-radius-popover, 10px);
+      background: var(--fsus-surface-overlay, #{getCssVar('bg-color')});
+      box-shadow: var(--fsus-shadow-floating, none);
+      box-sizing: border-box;
     }
   }
 

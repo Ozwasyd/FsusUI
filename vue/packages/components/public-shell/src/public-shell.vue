@@ -347,6 +347,7 @@
               ns.is('csp-hidden', !mobileSearchExpanded),
             ]"
             :aria-hidden="!mobileSearchExpanded"
+            :inert="!mobileSearchExpanded || undefined"
           >
             <slot name="mobile-search">
               <form
@@ -388,6 +389,7 @@
               ns.is('expanded', mobileSearchExpanded),
             ]"
             :aria-hidden="!mobileSearchExpanded"
+            :inert="!mobileSearchExpanded || undefined"
           >
             <slot name="mobile-search">
               <form
@@ -570,6 +572,12 @@ const showMobileInlineNav = computed(
 )
 const mobileToolbarKls = computed(() => [
   ns.e('mobile-toolbar'),
+  ns.is(
+    'search-only',
+    showMobileSearchTrigger.value &&
+      !showMobileInlineNav.value &&
+      !slots['mobile-actions'],
+  ),
   ns.is(
     'collapsed',
     showMobileSearchTrigger.value &&
