@@ -744,18 +744,19 @@
 
     @include e(mobile-search-row) {
       position: absolute;
-      inset-block-start: calc(100% + var(--fsus-space-2, 8px));
-      inset-inline-end: var(--fsus-space-6, 24px);
+      inset-block-start: 100%;
+      inset-inline-end: 0;
       z-index: 60;
       inline-size: min(
         20rem,
         calc(100% - var(--fsus-space-6, 24px) - var(--fsus-space-6, 24px))
       );
-      max-block-size: calc(
-        #{fsus-viewport-safe-block-size(var(--fsus-space-2, 8px))} - 100%
-      );
+      max-block-size: fsus-viewport-safe-block-size(var(--fsus-space-2, 8px));
       overflow: auto;
       margin-block: 0;
+      margin-block-start: fsus-safe-area-max(var(--fsus-space-2, 8px), top);
+      margin-block-end: fsus-safe-area-max(var(--fsus-space-2, 8px), bottom);
+      margin-inline-end: var(--fsus-space-6, 24px);
       padding: var(--fsus-space-3, 12px);
       border: 1px solid getCssVar('border-color-lighter');
       border-radius: var(--fsus-radius-popover, 10px);
