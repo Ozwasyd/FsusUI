@@ -59,6 +59,8 @@ import {
   computed,
   defineComponent,
   getCurrentInstance,
+  nextTick,
+  onBeforeUnmount,
   provide,
   ref,
   toRef,
@@ -115,7 +117,11 @@ export default defineComponent({
       (ComponentPublicInstance & { $el: HTMLElement }) | null
     >(null)
     const popperRef = ref<InstanceType<typeof ElTooltip> | null>(null)
-    let restoreTriggerAfterHide = false
+    let focusRestoreGeneration = 0
+    let stopFocusRestore: (() => void) | undefined
+    let focusRestoreRequest:
+      | { generation: number; trigger: HTMLElement; content: HTMLElement }
+      | undefined
     let popupVisible = false
     const contentRef = ref<HTMLElement | null>(null)
     const scrollbar = ref(null)
@@ -197,7 +203,6 @@ export default defineComponent({
       'before-show': handleBeforeShowTooltip,
       show: handleShowTooltip,
       'before-hide': handleBeforeHideTooltip,
-      hide: handleHideTooltip,
     }
     const rovingFocusGroupBindings = computed(() => ({
       loop: props.loop,
@@ -230,10 +235,12 @@ export default defineComponent({
     }
 
     function handleClose() {
+      cancelFocusRestore()
       popperRef.value?.onClose()
     }
 
     function handleOpen() {
+      cancelFocusRestore()
       popperRef.value?.onOpen()
     }
 
@@ -264,7 +271,7 @@ export default defineComponent({
 
     function handleBeforeShowTooltip(event?: Event) {
       popupVisible = true
-      restoreTriggerAfterHide = false
+      cancelFocusRestore()
       isUsingKeyboard.value = event?.type === 'keydown'
       emit('visible-change', true)
     }
@@ -277,28 +284,94 @@ export default defineComponent({
 
     function handleBeforeHideTooltip() {
       popupVisible = false
+      const request = focusRestoreRequest
       emit('visible-change', false)
+
+      if (!request) return
+      nextTick(() => {
+        if (
+          focusRestoreRequest !== request ||
+          request.generation !== focusRestoreGeneration ||
+          popupVisible
+        ) {
+          return
+        }
+
+        const { trigger, content } = request
+        const document = trigger.ownerDocument
+        const focused = document.activeElement
+        const ownsFocus =
+          content.contains(focused) ||
+          (!content.isConnected && focused === document.body)
+        cancelFocusRestore()
+        if (
+          ownsFocus &&
+          document.hasFocus() &&
+          trigger === triggeringElementRef.value?.$el &&
+          trigger.isConnected &&
+          !props.disabled
+        ) {
+          trigger.focus({ preventScroll: true })
+        }
+      })
     }
 
     function handleContentKeydown(event: KeyboardEvent) {
-      restoreTriggerAfterHide = event.code === EVENT_CODE.esc
+      if (event.code === EVENT_CODE.esc) requestFocusRestore()
     }
 
     function handleTriggerKeydown(event: KeyboardEvent) {
-      if (popupVisible && event.code === EVENT_CODE.esc) {
+      if (!props.disabled && triggerKeys.includes(event.code)) {
+        cancelFocusRestore()
+      }
+      if (event.code !== EVENT_CODE.esc) return
+
+      if (popupVisible) {
         event.preventDefault()
         event.stopPropagation()
-        restoreTriggerAfterHide = true
-        popperRef.value?.onClose(event)
+        requestFocusRestore()
+      }
+      // onClose also replaces a show-timeout before before-show has fired.
+      popperRef.value?.onClose(event)
+    }
+
+    function cancelFocusRestore() {
+      ++focusRestoreGeneration
+      focusRestoreRequest = undefined
+      stopFocusRestore?.()
+      stopFocusRestore = undefined
+    }
+
+    function requestFocusRestore() {
+      cancelFocusRestore()
+      const trigger = triggeringElementRef.value?.$el
+      const content = contentRef.value
+      if (!popupVisible || !trigger || !content) return
+      const document = trigger.ownerDocument
+      if (!content.contains(document.activeElement)) return
+
+      const request = { generation: focusRestoreGeneration, trigger, content }
+      focusRestoreRequest = request
+      const revoke = () => {
+        if (focusRestoreRequest === request) cancelFocusRestore()
+      }
+      const onFocusIn = (event: FocusEvent) => {
+        if (!content.contains(event.target as Node)) revoke()
+      }
+      // A released trap or newer input owns focus; never reclaim it after leave.
+      document.addEventListener('focusin', onFocusIn, true)
+      document.addEventListener('keydown', revoke, true)
+      document.addEventListener('pointerdown', revoke, true)
+      document.addEventListener('pointermove', revoke, true)
+      stopFocusRestore = () => {
+        document.removeEventListener('focusin', onFocusIn, true)
+        document.removeEventListener('keydown', revoke, true)
+        document.removeEventListener('pointerdown', revoke, true)
+        document.removeEventListener('pointermove', revoke, true)
       }
     }
 
-    function handleHideTooltip() {
-      if (restoreTriggerAfterHide) {
-        restoreTriggerAfterHide = false
-        triggeringElementRef.value?.$el?.focus({ preventScroll: true })
-      }
-    }
+    onBeforeUnmount(cancelFocusRestore)
 
     provide(DROPDOWN_INJECTION_KEY, {
       contentRef,

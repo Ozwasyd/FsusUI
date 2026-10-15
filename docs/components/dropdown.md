@@ -78,6 +78,10 @@ ArrowUp/Down/Home/End and skips disabled items. Escape returns focus to the
 trigger. Use one focusable trigger in the default slot, including compact custom
 content, and observe visibility through `visible-change`.
 
+Escape also cancels a pending delayed open. During close, focus restoration is
+limited to the current Escape session and yields to restored focus, newer input,
+or reopening; it does not reclaim focus when the leave animation finishes.
+
 The `command` event receives `(command, instance, event)`. A consumer activation
 adapter may navigate an item's URL or start its async command. Enter/Space on
 the item emit that command rather than clicking a nested anchor. Avoid a second
@@ -101,6 +105,8 @@ engine and convert style/arrow output back to CSS coordinates. Popper retains
 placement and listener cleanup. Nested or independently zoomed append contexts,
 browser page zoom, and assistive technology need separate qualification.
 Measured viewport CSS properties are internal, not consumer theme tokens.
+Visual viewport resize requests an update from the existing Popper instance;
+the listener and measured properties are cleaned up with the modifier effect.
 
 Forced-colors styling supplies an opaque system Canvas popup/arrow surface and
 inset keyboard focus borders when box shadows are suppressed. It reuses existing

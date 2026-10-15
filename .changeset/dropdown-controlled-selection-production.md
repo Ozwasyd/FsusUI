@@ -8,3 +8,7 @@ selection with `hide-on-click="false"`.
 
 Add opt-in multiline content with description and suffix slots, viewport-bounded
 Dropdown geometry, and forced-colors popup surfaces and inset focus indicators.
+
+Cancel delayed opening on Escape, fence close-time focus restoration against
+newer focus/input sessions, and update viewport bounds on visual viewport resize
+with paired listener cleanup.

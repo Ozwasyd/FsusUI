@@ -49,16 +49,21 @@ export const dropdownViewportModifiers = (): Modifier<any, any>[] => [
         state.modifiersData[name] = { zoom, normalized: true }
       }
     },
-    effect:
-      ({ state }) =>
-      () => {
-        state.elements.popper.style.removeProperty(
-          '--el-dropdown-viewport-width',
-        )
-        state.elements.popper.style.removeProperty(
-          '--el-dropdown-viewport-height',
-        )
-      },
+    effect: ({ state, instance }) => {
+      const element = state.elements.popper
+      const viewport = element.ownerDocument.defaultView?.visualViewport
+      let active = true
+      const update = () => {
+        if (active) void instance.update()
+      }
+      viewport?.addEventListener('resize', update)
+      return () => {
+        active = false
+        viewport?.removeEventListener('resize', update)
+        element.style.removeProperty('--el-dropdown-viewport-width')
+        element.style.removeProperty('--el-dropdown-viewport-height')
+      }
+    },
   },
   {
     ...offset,
