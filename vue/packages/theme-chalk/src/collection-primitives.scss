@@ -131,8 +131,11 @@
 
     @include when(active) {
       background: var(--fsus-state-selected-bg, getCssVar('fill-color-light'));
-      color: var(--fsus-scholarly-blue, getCssVar('text-color-primary'));
       box-shadow: none;
+
+      &:not(:disabled) {
+        color: getCssVar('text-color-primary');
+      }
     }
   }
 
