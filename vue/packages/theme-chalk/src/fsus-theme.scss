@@ -3191,7 +3191,7 @@ button.#{$namespace}-card:active {
     -webkit-tap-highlight-color: transparent;
   }
 
-  .#{$namespace}-button:not(.is-disabled):hover,
+  .#{$namespace}-button:not(.is-disabled):hover:not(:focus-visible),
   .#{$namespace}-button:not(.is-disabled):focus:not(:focus-visible) {
     transform: none;
     box-shadow: none !important;
@@ -3444,5 +3444,19 @@ button.#{$namespace}-card:active {
 
   .#{$namespace}-image-viewer__btn:hover {
     background: rgba(255, 255, 255, 0.12);
+  }
+}
+
+// Preserve the public danger-link color variables after coarse-pointer resets.
+.#{$namespace}-button.#{$namespace}-button--danger.is-link:not(.is-disabled) {
+  color: getCssVar('button', 'text-color');
+
+  &:hover,
+  &:focus {
+    color: getCssVar('button', 'hover', 'link-text-color');
+  }
+
+  &:active {
+    color: getCssVar('button', 'active-color');
   }
 }
