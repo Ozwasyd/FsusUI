@@ -29,7 +29,7 @@
     >
       <component
         :is="rowTag(row, index)"
-        :ref="(element) => setRowRef(getRowKey(row, index), element)"
+        :ref="(element: unknown) => setRowRef(getRowKey(row, index), element)"
         :class="rowKls(row, index)"
         :href="isDisabled(row, index) ? undefined : rowHref(row, index)"
         :type="rowButtonType(row, index)"
