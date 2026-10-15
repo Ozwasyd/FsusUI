@@ -168,12 +168,14 @@
                 aria-haspopup="listbox"
                 autocapitalize="off"
                 :aria-expanded="expanded"
+                :aria-controls="listboxId"
+                :aria-activedescendant="activeOptionId"
                 :aria-labelledby="label"
                 :class="[
                   nsSelectV2.is(selectSize),
                   nsSelectV2.e('combobox-input'),
                 ]"
-                :disabled="disabled"
+                :disabled="selectDisabled"
                 role="combobox"
                 :readonly="!filterable"
                 spellcheck="false"
@@ -216,10 +218,12 @@
                 aria-haspopup="listbox"
                 :aria-labelledby="label"
                 :aria-expanded="expanded"
+                :aria-controls="listboxId"
+                :aria-activedescendant="activeOptionId"
                 autocapitalize="off"
                 :autocomplete="autocomplete"
                 :class="nsSelectV2.e('combobox-input')"
-                :disabled="disabled"
+                :disabled="selectDisabled"
                 :name="name"
                 role="combobox"
                 :readonly="!filterable"
@@ -287,6 +291,7 @@
       </template>
       <template #content>
         <el-select-menu
+          :id="listboxId"
           ref="menuRef"
           :data="filteredOptions"
           :width="popperSize"
