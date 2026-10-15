@@ -80,11 +80,29 @@
   }
 
   @include e(actions) {
-    left: 50%;
+    @include fsus-inset-safe-area(left, 16px);
+    @include fsus-inset-safe-area(right, 16px);
     @include fsus-inset-safe-area(bottom, 30px);
-    transform: translateX(-50%);
     width: 282px;
-    height: 44px;
+    max-width: calc(
+      100% - #{fsus-safe-area-max(16px, left)} -
+        #{fsus-safe-area-max(16px, right)}
+    );
+    min-height: 44px;
+    // Keep wrapped rows below close and navigation controls in short viewports.
+    max-height: min(
+      calc(
+        var(--fsus-viewport-block-size) - #{fsus-safe-area-max(40px, top)} -
+          44px - #{fsus-safe-area-max(30px, bottom)}
+      ),
+      calc(
+        var(--fsus-viewport-block-size) / 2 - 22px -
+          #{fsus-safe-area-max(30px, bottom)}
+      )
+    );
+    margin-inline: auto;
+    flex-wrap: wrap;
+    overflow: auto;
     padding: 0 24px;
     background-color: var(
       --fsus-image-viewer-control-bg,
@@ -105,10 +123,18 @@
 
     @include e(action) {
       display: inline-flex;
+      min-width: 44px;
+      min-height: 44px;
+      flex-shrink: 0;
       align-items: center;
       justify-content: center;
       border-radius: var(--fsus-radius-pill);
       cursor: pointer;
+
+      > svg {
+        width: 1em;
+        height: 1em;
+      }
 
       &:focus-visible {
         @include a11y-focus-ring(2px, var(--fsus-radius-pill));
