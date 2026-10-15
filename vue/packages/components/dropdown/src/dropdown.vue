@@ -70,6 +70,7 @@ import ElTooltip from '@element-plus/components/tooltip'
 import ElScrollbar from '@element-plus/components/scrollbar'
 import ElIcon from '@element-plus/components/icon'
 import ElRovingFocusGroup from '@element-plus/components/roving-focus-group'
+import { FOCUS_AFTER_RELEASED } from '@element-plus/components/focus-trap'
 import { ElOnlyChild } from '@element-plus/components/slot'
 import { useFormSize } from '@element-plus/components/form'
 import { addUnit, ensureArray } from '@element-plus/utils'
@@ -346,7 +347,8 @@ export default defineComponent({
       cancelFocusRestore()
       const trigger = triggeringElementRef.value?.$el
       const content = contentRef.value
-      if (!popupVisible || !trigger || !content) return
+      const trap = popperRef.value?.popperRef?.contentRef
+      if (!popupVisible || !trigger || !content || !trap) return
       const document = trigger.ownerDocument
       if (!content.contains(document.activeElement)) return
 
@@ -358,12 +360,31 @@ export default defineComponent({
       const onFocusIn = (event: FocusEvent) => {
         if (!content.contains(event.target as Node)) revoke()
       }
-      // A released trap or newer input owns focus; never reclaim it after leave.
+      const onFocusReleased = (event: Event) => {
+        const focused = document.activeElement
+        if (
+          event.target === trap &&
+          focusRestoreRequest === request &&
+          request.generation === focusRestoreGeneration &&
+          trigger === triggeringElementRef.value?.$el &&
+          trigger.isConnected &&
+          !props.disabled &&
+          document.hasFocus() &&
+          (content.contains(focused) ||
+            (!content.isConnected && focused === document.body))
+        ) {
+          // This Escape owns the return to its trigger, not the trap's prior input.
+          event.preventDefault()
+        }
+      }
+      trap.addEventListener(FOCUS_AFTER_RELEASED, onFocusReleased, true)
+      // External focus or newer input revokes ownership; leave never reclaims it.
       document.addEventListener('focusin', onFocusIn, true)
       document.addEventListener('keydown', revoke, true)
       document.addEventListener('pointerdown', revoke, true)
       document.addEventListener('pointermove', revoke, true)
       stopFocusRestore = () => {
+        trap.removeEventListener(FOCUS_AFTER_RELEASED, onFocusReleased, true)
         document.removeEventListener('focusin', onFocusIn, true)
         document.removeEventListener('keydown', revoke, true)
         document.removeEventListener('pointerdown', revoke, true)

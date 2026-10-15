@@ -79,8 +79,11 @@ trigger. Use one focusable trigger in the default slot, including compact custom
 content, and observe visibility through `visible-change`.
 
 Escape also cancels a pending delayed open. During close, focus restoration is
-limited to the current Escape session and yields to restored focus, newer input,
-or reopening; it does not reclaim focus when the leave animation finishes.
+limited to the current Escape session and yields to newer input, external focus,
+or reopening. While that session still owns focus, Dropdown takes responsibility
+for the trap release so its generic return to a previously focused input does
+not replace the Escape return to the trigger. It does not reclaim focus when
+the leave animation finishes.
 
 The `command` event receives `(command, instance, event)`. A consumer activation
 adapter may navigate an item's URL or start its async command. Enter/Space on
