@@ -1678,6 +1678,7 @@ const activateRenderedFeatures = async (
     return 'cancelled' as const
   const finishJob = rendererResourceOwner.trackJob()
   try {
+    if (!activationRoot) return 'cancelled' as const
     const features = resolveMarkdownFeatureOptions()
     const heavyFeaturesEnabled = hasEnabledHeavyFeature(result, features)
     if (heavyFeaturesEnabled) ensureHeavyFeatureThemeListener()
