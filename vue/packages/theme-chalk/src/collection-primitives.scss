@@ -345,6 +345,8 @@
 
   @include res(xs) {
     @include when(responsive) {
+      grid-template-columns: minmax(0, 1fr);
+
       @include e((head, row)) {
         grid-template-columns: minmax(0, 1fr);
       }
