@@ -91,7 +91,7 @@
           <img
             v-for="(url, i) in urlList"
             v-show="i === activeIndex"
-            :ref="(el) => (imgRefs[i] = el as HTMLImageElement)"
+            :ref="createImgRef(i)"
             :key="url"
             :src="url"
             :style="imgStyle"
@@ -162,6 +162,7 @@ const ns = useNamespace('image-viewer')
 const { nextZIndex } = useZIndex()
 const wrapper = ref<HTMLDivElement>()
 const imgRefs = ref<HTMLImageElement[]>([])
+const imgRefOwners: symbol[] = []
 
 const scopeEventListener = effectScope()
 
@@ -299,6 +300,20 @@ function registerEventListener() {
 
 function unregisterEventListener() {
   scopeEventListener.stop()
+}
+
+function createImgRef(index: number) {
+  const owner = Symbol()
+  return (el: unknown) => {
+    // A stale unmount must not clear a slot claimed by a newer ref callback.
+    if (el) {
+      imgRefOwners[index] = owner
+      imgRefs.value[index] = el as HTMLImageElement
+    } else if (imgRefOwners[index] === owner) {
+      delete imgRefOwners[index]
+      delete imgRefs.value[index]
+    }
+  }
 }
 
 function getActiveImage() {
