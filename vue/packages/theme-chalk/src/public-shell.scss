@@ -458,11 +458,22 @@
     @include fsus-viewport-safe-overlay-host(var(--fsus-space-2, 8px));
     z-index: 60;
     display: none;
+    inline-size: auto;
+    block-size: auto;
+    margin: 0;
+    border: 0;
+    background: transparent;
+    color: inherit;
     align-items: flex-start;
     justify-content: flex-end;
     pointer-events: none;
 
-    .#{$namespace}-public-shell__mobile-search-row {
+    &::backdrop {
+      background: transparent;
+      pointer-events: none;
+    }
+
+    .#{$namespace}-public-shell__mobile-search-row.is-expanded {
       position: static;
       inset: auto;
       display: grid;
@@ -497,7 +508,7 @@
 
   @media (max-width: 767px), (max-height: 520px) and (orientation: landscape) {
     @include e(mobile-search-host) {
-      @include when(expanded) {
+      &:popover-open {
         display: flex;
       }
     }
