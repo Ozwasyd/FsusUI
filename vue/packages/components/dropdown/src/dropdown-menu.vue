@@ -9,6 +9,7 @@
     @blur="onBlur"
     @focus="onFocus"
     @keydown="handleKeydown"
+    @keydown.capture="handleMenuKeydown"
     @mousedown.self="onMousedown"
   >
     <slot />
@@ -80,7 +81,7 @@ export default defineComponent({
       undefined
     )!
 
-    const { contentRef, role, triggerId } = inject(
+    const { contentRef, role, triggerId, onMenuKeydown } = inject(
       DROPDOWN_INJECTION_KEY,
       undefined
     )!
@@ -229,6 +230,10 @@ export default defineComponent({
       }
     )
 
+    const handleMenuKeydown = (e: KeyboardEvent) => {
+      onMenuKeydown(e, focusTrapRef)
+    }
+
     const handleKeydown = (e: KeyboardEvent) => {
       composedKeydown(e)
       onKeydown(e)
@@ -243,6 +248,7 @@ export default defineComponent({
       triggerId,
       dropdownListWrapperRef,
       handleKeydown,
+      handleMenuKeydown,
       onBlur,
       onFocus,
       onMousedown,
