@@ -716,10 +716,14 @@ const stopMobileSearchPositioning = () => {
   mobileSearchPositioningCleanup?.()
   mobileSearchPositioningCleanup = undefined
   if (positionedMobileSearch) {
-    positionedMobileSearch.style.top = ''
-    positionedMobileSearch.style.left = ''
-    positionedMobileSearch.style.right = ''
-    positionedMobileSearch.style.maxBlockSize = ''
+    if (props.cspSafe) {
+      positionedMobileSearch.removeAttribute('style')
+    } else {
+      positionedMobileSearch.style.top = ''
+      positionedMobileSearch.style.left = ''
+      positionedMobileSearch.style.right = ''
+      positionedMobileSearch.style.maxBlockSize = ''
+    }
     positionedMobileSearch = undefined
   }
 }
@@ -729,6 +733,7 @@ const syncMobileSearchPositioning = () => {
   const panel = mobileSearchRowRef.value
   if (
     !mobileSearchPositioningMounted ||
+    props.cspSafe ||
     !mobileSearchExpanded.value ||
     !panel
   ) {
@@ -743,6 +748,7 @@ const syncMobileSearchPositioning = () => {
   let updateRevision = 0
   const isCurrent = (update: number) =>
     mobileSearchPositioningMounted &&
+    !props.cspSafe &&
     mobileSearchExpanded.value &&
     mobileSearchRowRef.value === panel &&
     mobileSearchPositioningRevision === revision &&
@@ -794,9 +800,11 @@ const syncMobileSearchPositioning = () => {
   })
 }
 
-watch([mobileSearchExpanded, mobileSearchRowRef], syncMobileSearchPositioning, {
-  flush: 'post',
-})
+watch(
+  [() => props.cspSafe, mobileSearchExpanded, mobileSearchRowRef],
+  syncMobileSearchPositioning,
+  { flush: 'post' },
+)
 
 watch(
   () => [props.activeNav, props.activeNavMotion, props.navItems],
