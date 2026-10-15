@@ -1730,7 +1730,7 @@ const writingAidsController: MarkdownEditorWritingAidsController =
     source: transactionStore.value,
     selection: transactionStore.selection,
   })
-const resolvedWritingAids = computed(() => writingAidsController.options)
+const resolvedWritingAids = ref(writingAidsController.options)
 const writingAidsState = ref(writingAidsController.state)
 const writingAidsFocusState = ref(writingAidsController.focusState!)
 const writingAidsDataAttrs = computed(() => ({
@@ -1791,6 +1791,7 @@ const refreshWritingAidsDocument = () => {
     source: transactionStore.value,
     writingAids: props.writingAids,
   })
+  resolvedWritingAids.value = writingAidsController.options
   writingAidsFocusState.value = writingAidsController.focusState!
   writingAidsState.value = writingAidsController.state
   writingAidsController.handleProjectionChange()
