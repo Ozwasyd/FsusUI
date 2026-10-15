@@ -336,51 +336,73 @@
             {{ item.label }}
           </a>
         </nav>
-        <Transition name="el-public-shell-mobile-search">
+        <Teleport
+          v-if="cspSafe && showMobileSearchTrigger && mobileSearchCspReady"
+          to="body"
+        >
           <div
-            v-if="cspSafe && showMobileSearchTrigger"
-            :id="mobileSearchRowId"
-            ref="mobileSearchRowRef"
             :class="[
-              ns.e('mobile-search-row'),
+              ns.e('mobile-search-host'),
               ns.is('expanded', mobileSearchExpanded),
-              ns.is('csp-hidden', !mobileSearchExpanded),
             ]"
             :aria-hidden="!mobileSearchExpanded"
             :inert="!mobileSearchExpanded || undefined"
           >
-            <slot name="mobile-search">
-              <form
-                v-if="showSearch"
-                :class="[ns.e('search'), ns.em('search', 'trigger')]"
-                :action="searchAction"
-                method="get"
-                @submit="handleSearchSubmit"
-                @keydown.esc="handleMobileSearchEscape"
+            <div
+              :id="mobileSearchRowId"
+              ref="mobileSearchRowRef"
+              :class="[
+                ns.e('mobile-search-row'),
+                ns.is('expanded', mobileSearchExpanded),
+                ns.is('csp-hidden', !mobileSearchExpanded),
+              ]"
+              :aria-hidden="!mobileSearchExpanded"
+              :inert="!mobileSearchExpanded || undefined"
+              @keydown.esc="handleMobileSearchEscape"
+            >
+              <button
+                type="button"
+                :class="ns.e('mobile-search-trigger')"
+                @click="closeMobileSearch(true)"
               >
-                <el-input
-                  :model-value="searchValue"
-                  :placeholder="searchPlaceholder"
-                  :label="searchAriaLabel"
-                  size="small"
-                  :class="ns.e('search-input')"
-                  :csp-safe="cspSafe"
-                  clearable
-                  @focus="emit('search-focus')"
-                  @input="handleSearchInput"
-                  @keydown.enter="handleSearchEnter"
-                />
-                <input
-                  v-if="searchName"
-                  type="hidden"
-                  :name="searchName"
-                  :value="searchValue"
-                />
-              </form>
-            </slot>
+                {{ mobileSearchCancelLabel }}
+              </button>
+              <div :class="ns.e('mobile-search-content')">
+                <slot name="mobile-search">
+                  <form
+                    v-if="showSearch"
+                    :class="[ns.e('search'), ns.em('search', 'trigger')]"
+                    :action="searchAction"
+                    method="get"
+                    @submit="handleSearchSubmit"
+                  >
+                    <el-input
+                      :model-value="searchValue"
+                      :placeholder="searchPlaceholder"
+                      :label="searchAriaLabel"
+                      size="small"
+                      :class="ns.e('search-input')"
+                      :csp-safe="cspSafe"
+                      clearable
+                      @focus="emit('search-focus')"
+                      @input="handleSearchInput"
+                      @keydown.enter="handleSearchEnter"
+                    />
+                    <input
+                      v-if="searchName"
+                      type="hidden"
+                      :name="searchName"
+                      :value="searchValue"
+                    />
+                  </form>
+                </slot>
+              </div>
+            </div>
           </div>
+        </Teleport>
+        <Transition name="el-public-shell-mobile-search">
           <div
-            v-else-if="showMobileSearchTrigger"
+            v-if="!cspSafe && showMobileSearchTrigger"
             v-show="mobileSearchExpanded"
             :id="mobileSearchRowId"
             ref="mobileSearchRowRef"
@@ -524,6 +546,7 @@ const desktopSearchTriggerRef = ref<HTMLAnchorElement>()
 const mobileSearchRowId = useId().value
 const mobileSearchRowRef = ref<HTMLElement>()
 const mobileSearchTriggerRef = ref<HTMLAnchorElement>()
+const mobileSearchCspReady = ref(false)
 let mobileSearchPositioningMounted = false
 let mobileSearchPositioningRevision = 0
 let mobileSearchPositioningCleanup: (() => void) | undefined
@@ -824,6 +847,7 @@ onMounted(() => {
     mobileNavMenuVisible.value = true
   }
   mobileNavMenuCspReady.value = true
+  mobileSearchCspReady.value = true
   mobileSearchPositioningMounted = true
   syncMobileSearchPositioning()
   void syncNavIndicators()
