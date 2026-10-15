@@ -54,6 +54,10 @@ export const tagProps = buildProps({
    * @description whether Tag is rounded
    */
   round: Boolean,
+  /**
+   * @description whether text wraps within the available width and grows the Tag height
+   */
+  multiline: Boolean,
 } as const)
 export type TagProps = ExtractPropTypes<typeof tagProps>
 
