@@ -650,7 +650,10 @@ const desktopSearchTriggerText = computed(
   () => props.desktopSearchTriggerLabel || props.searchAriaLabel,
 )
 const mobileSearchDisclosureAvailable = computed(
-  () => !props.cspSafe || mobileSearchCspReady.value,
+  () =>
+    !props.cspSafe ||
+    (mobileSearchCspReady.value &&
+      Boolean(mobileSearchCspHostRef.value?.isConnected)),
 )
 const mobileSearchButtonLabel = computed(() =>
   mobileSearchExpanded.value && mobileSearchDisclosureAvailable.value
@@ -1034,7 +1037,7 @@ function handleDesktopSearchOutsidePointer(event: PointerEvent) {
 
 const handleMobileSearchTrigger = (event: MouseEvent) => {
   if (isModifiedClick(event)) return
-  if (props.cspSafe && !mobileSearchCspReady.value) return
+  if (!mobileSearchDisclosureAvailable.value) return
   event.preventDefault()
   toggleMobileSearch()
 }

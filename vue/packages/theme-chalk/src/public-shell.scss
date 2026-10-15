@@ -473,7 +473,7 @@
       pointer-events: none;
     }
 
-    .#{$namespace}-public-shell__mobile-search-row {
+    .#{$namespace}-public-shell__mobile-search-row.is-expanded {
       position: static;
       inset: auto;
       display: grid;
