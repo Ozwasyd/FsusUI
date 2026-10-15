@@ -15,4 +15,6 @@ with paired listener cleanup.
 
 Keep an owned Escape return directed to the Dropdown trigger when the focus
 trap would otherwise return to a previously focused input; newer user input
-and external focus continue to revoke that return.
+and external focus continue to revoke that return. Bind release handling to
+the menu's actual injected trap across keyed remounts and retain exact target
+isolation from nested traps.

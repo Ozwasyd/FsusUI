@@ -84,6 +84,8 @@ or reopening. While that session still owns focus, Dropdown takes responsibility
 for the trap release so its generic return to a previously focused input does
 not replace the Escape return to the trigger. It does not reclaim focus when
 the leave animation finishes.
+Release handling uses the menu's current injected trap reference, including
+after keyed menu remounts, and matches that exact trap rather than nested traps.
 
 The `command` event receives `(command, instance, event)`. A consumer activation
 adapter may navigate an item's URL or start its async command. Enter/Space on

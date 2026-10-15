@@ -85,7 +85,7 @@ import { ElCollection as ElDropdownCollection, dropdownProps } from './dropdown'
 import { DROPDOWN_INJECTION_KEY } from './tokens'
 import { dropdownViewportModifiers } from './viewport-modifiers'
 
-import type { CSSProperties, ComponentPublicInstance } from 'vue'
+import type { CSSProperties, ComponentPublicInstance, Ref } from 'vue'
 import type { Measurable } from '@element-plus/components/popper'
 import type { Placement } from '@element-plus/components/popper'
 
@@ -302,8 +302,9 @@ export default defineComponent({
         const document = trigger.ownerDocument
         const focused = document.activeElement
         const ownsFocus =
-          content.contains(focused) ||
-          (!content.isConnected && focused === document.body)
+          (!contentRef.value || contentRef.value === content) &&
+          (content.contains(focused) ||
+            (!content.isConnected && focused === document.body))
         cancelFocusRestore()
         if (
           ownsFocus &&
@@ -317,8 +318,11 @@ export default defineComponent({
       })
     }
 
-    function handleContentKeydown(event: KeyboardEvent) {
-      if (event.code === EVENT_CODE.esc) requestFocusRestore()
+    function handleContentKeydown(
+      event: KeyboardEvent,
+      trapRef: Ref<HTMLElement | undefined>,
+    ) {
+      if (event.code === EVENT_CODE.esc) requestFocusRestore(trapRef)
     }
 
     function handleTriggerKeydown(event: KeyboardEvent) {
@@ -330,7 +334,6 @@ export default defineComponent({
       if (popupVisible) {
         event.preventDefault()
         event.stopPropagation()
-        requestFocusRestore()
       }
       // onClose also replaces a show-timeout before before-show has fired.
       popperRef.value?.onClose(event)
@@ -343,11 +346,11 @@ export default defineComponent({
       stopFocusRestore = undefined
     }
 
-    function requestFocusRestore() {
+    function requestFocusRestore(trapRef: Ref<HTMLElement | undefined>) {
       cancelFocusRestore()
       const trigger = triggeringElementRef.value?.$el
       const content = contentRef.value
-      const trap = popperRef.value?.popperRef?.contentRef
+      const trap = trapRef.value
       if (!popupVisible || !trigger || !content || !trap) return
       const document = trigger.ownerDocument
       if (!content.contains(document.activeElement)) return
@@ -364,6 +367,8 @@ export default defineComponent({
         const focused = document.activeElement
         if (
           event.target === trap &&
+          trapRef.value === trap &&
+          contentRef.value === content &&
           focusRestoreRequest === request &&
           request.generation === focusRestoreGeneration &&
           trigger === triggeringElementRef.value?.$el &&

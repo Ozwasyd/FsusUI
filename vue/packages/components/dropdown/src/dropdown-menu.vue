@@ -9,7 +9,7 @@
     @blur="onBlur"
     @focus="onFocus"
     @keydown="handleKeydown"
-    @keydown.capture="onMenuKeydown"
+    @keydown.capture="handleMenuKeydown"
     @mousedown.self="onMousedown"
   >
     <slot />
@@ -230,6 +230,10 @@ export default defineComponent({
       }
     )
 
+    const handleMenuKeydown = (e: KeyboardEvent) => {
+      onMenuKeydown(e, focusTrapRef)
+    }
+
     const handleKeydown = (e: KeyboardEvent) => {
       composedKeydown(e)
       onKeydown(e)
@@ -244,7 +248,7 @@ export default defineComponent({
       triggerId,
       dropdownListWrapperRef,
       handleKeydown,
-      onMenuKeydown,
+      handleMenuKeydown,
       onBlur,
       onFocus,
       onMousedown,
