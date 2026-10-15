@@ -190,10 +190,17 @@
           :href="searchAction"
           :class="[
             ns.e('mobile-search-trigger'),
-            ns.is('expanded', mobileSearchExpanded),
+            ns.is(
+              'expanded',
+              mobileSearchDisclosureAvailable && mobileSearchExpanded,
+            ),
           ]"
-          :aria-expanded="mobileSearchExpanded"
-          :aria-controls="mobileSearchRowId"
+          :aria-expanded="
+            mobileSearchDisclosureAvailable ? mobileSearchExpanded : undefined
+          "
+          :aria-controls="
+            mobileSearchDisclosureAvailable ? mobileSearchRowId : undefined
+          "
           :aria-label="mobileSearchButtonLabel"
           @click="handleMobileSearchTrigger"
         >
@@ -336,70 +343,67 @@
             {{ item.label }}
           </a>
         </nav>
-        <Teleport
+        <div
           v-if="cspSafe && showMobileSearchTrigger && mobileSearchCspReady"
-          to="body"
+          ref="mobileSearchCspHostRef"
+          :class="[
+            ns.e('mobile-search-host'),
+            ns.is('expanded', mobileSearchExpanded),
+          ]"
+          :aria-hidden="!mobileSearchExpanded"
+          :inert="!mobileSearchExpanded || undefined"
         >
           <div
+            :id="mobileSearchRowId"
+            ref="mobileSearchRowRef"
             :class="[
-              ns.e('mobile-search-host'),
+              ns.e('mobile-search-row'),
               ns.is('expanded', mobileSearchExpanded),
+              ns.is('csp-hidden', !mobileSearchExpanded),
             ]"
             :aria-hidden="!mobileSearchExpanded"
             :inert="!mobileSearchExpanded || undefined"
+            @keydown.esc="handleMobileSearchEscape"
           >
-            <div
-              :id="mobileSearchRowId"
-              ref="mobileSearchRowRef"
-              :class="[
-                ns.e('mobile-search-row'),
-                ns.is('expanded', mobileSearchExpanded),
-                ns.is('csp-hidden', !mobileSearchExpanded),
-              ]"
-              :aria-hidden="!mobileSearchExpanded"
-              :inert="!mobileSearchExpanded || undefined"
-              @keydown.esc="handleMobileSearchEscape"
+            <button
+              type="button"
+              :class="ns.e('mobile-search-trigger')"
+              @click="closeMobileSearch(true)"
             >
-              <button
-                type="button"
-                :class="ns.e('mobile-search-trigger')"
-                @click="closeMobileSearch(true)"
-              >
-                {{ mobileSearchCancelLabel }}
-              </button>
-              <div :class="ns.e('mobile-search-content')">
-                <slot name="mobile-search">
-                  <form
-                    v-if="showSearch"
-                    :class="[ns.e('search'), ns.em('search', 'trigger')]"
-                    :action="searchAction"
-                    method="get"
-                    @submit="handleSearchSubmit"
-                  >
-                    <el-input
-                      :model-value="searchValue"
-                      :placeholder="searchPlaceholder"
-                      :label="searchAriaLabel"
-                      size="small"
-                      :class="ns.e('search-input')"
-                      :csp-safe="cspSafe"
-                      clearable
-                      @focus="emit('search-focus')"
-                      @input="handleSearchInput"
-                      @keydown.enter="handleSearchEnter"
-                    />
-                    <input
-                      v-if="searchName"
-                      type="hidden"
-                      :name="searchName"
-                      :value="searchValue"
-                    />
-                  </form>
-                </slot>
-              </div>
+              {{ mobileSearchCancelLabel }}
+            </button>
+            <div :class="ns.e('mobile-search-content')">
+              <slot name="mobile-search">
+                <form
+                  v-if="showSearch"
+                  :class="[ns.e('search'), ns.em('search', 'trigger')]"
+                  :action="searchAction"
+                  method="get"
+                  @submit="handleSearchSubmit"
+                >
+                  <el-input
+                    :model-value="searchValue"
+                    :placeholder="searchPlaceholder"
+                    :label="searchAriaLabel"
+                    size="small"
+                    :class="ns.e('search-input')"
+                    :csp-safe="cspSafe"
+                    clearable
+                    @focus="emit('search-focus')"
+                    @input="handleSearchInput"
+                    @keydown.enter="handleSearchEnter"
+                  />
+                  <input
+                    v-if="searchName"
+                    type="hidden"
+                    :name="searchName"
+                    :value="searchValue"
+                  />
+                </form>
+              </slot>
             </div>
           </div>
-        </Teleport>
+        </div>
         <Transition name="el-public-shell-mobile-search">
           <div
             v-if="!cspSafe && showMobileSearchTrigger"
@@ -547,6 +551,8 @@ const mobileSearchRowId = useId().value
 const mobileSearchRowRef = ref<HTMLElement>()
 const mobileSearchTriggerRef = ref<HTMLAnchorElement>()
 const mobileSearchCspReady = ref(false)
+const mobileSearchCspHostRef = ref<HTMLElement>()
+let openedMobileSearchCspHost: HTMLElement | undefined
 let mobileSearchPositioningMounted = false
 let mobileSearchPositioningRevision = 0
 let mobileSearchPositioningCleanup: (() => void) | undefined
@@ -643,8 +649,11 @@ const mobileSearchTriggerText = computed(
 const desktopSearchTriggerText = computed(
   () => props.desktopSearchTriggerLabel || props.searchAriaLabel,
 )
+const mobileSearchDisclosureAvailable = computed(
+  () => !props.cspSafe || mobileSearchCspReady.value,
+)
 const mobileSearchButtonLabel = computed(() =>
-  mobileSearchExpanded.value
+  mobileSearchExpanded.value && mobileSearchDisclosureAvailable.value
     ? props.mobileSearchCancelLabel
     : mobileSearchTriggerText.value,
 )
@@ -732,6 +741,7 @@ const syncNavIndicators = async () => {
 const handleIndicatorResize = () => {
   void syncNavIndicators()
   syncMobileSearchPositioning()
+  syncMobileSearchCspHost()
 }
 
 const stopMobileSearchPositioning = () => {
@@ -823,6 +833,68 @@ const syncMobileSearchPositioning = () => {
   })
 }
 
+const stopMobileSearchCspHost = () => {
+  const host = openedMobileSearchCspHost
+  openedMobileSearchCspHost = undefined
+  if (!host?.isConnected || !host.matches(':popover-open')) return
+  try {
+    host.hidePopover()
+  } catch (error) {
+    if (
+      !(error instanceof DOMException && error.name === 'InvalidStateError')
+    ) {
+      throw error
+    }
+  }
+}
+
+const syncMobileSearchCspHost = () => {
+  const host = mobileSearchCspHostRef.value
+  if (openedMobileSearchCspHost && openedMobileSearchCspHost !== host) {
+    stopMobileSearchCspHost()
+  }
+  if (
+    !mobileSearchPositioningMounted ||
+    !props.cspSafe ||
+    !mobileSearchExpanded.value ||
+    !host?.isConnected ||
+    !window.matchMedia(
+      '(max-width: 767px), (max-height: 520px) and (orientation: landscape)',
+    ).matches
+  ) {
+    stopMobileSearchCspHost()
+    return
+  }
+  if (host.popover !== 'manual') host.popover = 'manual'
+  if (host.matches(':popover-open')) {
+    openedMobileSearchCspHost = host
+    return
+  }
+  try {
+    host.showPopover()
+  } catch (error) {
+    if (
+      !(error instanceof DOMException && error.name === 'InvalidStateError')
+    ) {
+      throw error
+    }
+    mobileSearchCspReady.value = false
+    mobileSearchExpanded.value = false
+    return
+  }
+  if (host.matches(':popover-open')) {
+    openedMobileSearchCspHost = host
+  } else {
+    mobileSearchExpanded.value = false
+  }
+}
+
+watch(
+  [() => props.cspSafe, mobileSearchExpanded, mobileSearchCspHostRef],
+  syncMobileSearchCspHost,
+  { flush: 'post' },
+)
+
 watch(
   [() => props.cspSafe, mobileSearchExpanded, mobileSearchRowRef],
   syncMobileSearchPositioning,
@@ -847,7 +919,12 @@ onMounted(() => {
     mobileNavMenuVisible.value = true
   }
   mobileNavMenuCspReady.value = true
-  mobileSearchCspReady.value = true
+  mobileSearchCspReady.value =
+    typeof HTMLElement.prototype.showPopover === 'function' &&
+    typeof HTMLElement.prototype.hidePopover === 'function' &&
+    typeof CSS !== 'undefined' &&
+    typeof CSS.supports === 'function' &&
+    CSS.supports('selector(:popover-open)')
   mobileSearchPositioningMounted = true
   syncMobileSearchPositioning()
   void syncNavIndicators()
@@ -857,6 +934,7 @@ onMounted(() => {
 
 onBeforeUnmount(() => {
   mobileSearchPositioningMounted = false
+  stopMobileSearchCspHost()
   stopMobileSearchPositioning()
   window.removeEventListener('resize', handleIndicatorResize)
   document.removeEventListener('pointerdown', handleDesktopSearchOutsidePointer)
@@ -956,6 +1034,7 @@ function handleDesktopSearchOutsidePointer(event: PointerEvent) {
 
 const handleMobileSearchTrigger = (event: MouseEvent) => {
   if (isModifiedClick(event)) return
+  if (props.cspSafe && !mobileSearchCspReady.value) return
   event.preventDefault()
   toggleMobileSearch()
 }
