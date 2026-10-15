@@ -80,24 +80,36 @@
   }
 
   @include e(actions) {
+    // A full 44px action row also needs the two existing 1px toolbar borders.
+    $row-height: 46px;
+    $controls-bottom: max(
+      calc(var(--fsus-viewport-block-size) / 2 + 22px),
+      calc(#{fsus-safe-area-max(40px, top)} + 44px)
+    );
+    // Compress the preferred dock gap before consuming the action row budget.
+    $bottom-gap: fsus-safe-area-max(
+      min(
+        30px,
+        calc(var(--fsus-viewport-block-size) - #{$controls-bottom} - #{$row-height})
+      ),
+      bottom
+    );
+
     @include fsus-inset-safe-area(left, 16px);
     @include fsus-inset-safe-area(right, 16px);
-    @include fsus-inset-safe-area(bottom, 30px);
+    bottom: $bottom-gap;
     width: 282px;
     max-width: calc(
       100% - #{fsus-safe-area-max(16px, left)} -
         #{fsus-safe-area-max(16px, right)}
     );
-    min-height: 44px;
-    // Keep wrapped rows below close and navigation controls in short viewports.
-    max-height: min(
+    min-height: $row-height;
+    // If even the safe inset leaves too little space, retain the full target row;
+    // fitting all controls in that physical rectangle remains a layout limit.
+    max-height: max(
+      $row-height,
       calc(
-        var(--fsus-viewport-block-size) - #{fsus-safe-area-max(40px, top)} -
-          44px - #{fsus-safe-area-max(30px, bottom)}
-      ),
-      calc(
-        var(--fsus-viewport-block-size) / 2 - 22px -
-          #{fsus-safe-area-max(30px, bottom)}
+        var(--fsus-viewport-block-size) - #{$controls-bottom} - #{$bottom-gap}
       )
     );
     margin-inline: auto;
