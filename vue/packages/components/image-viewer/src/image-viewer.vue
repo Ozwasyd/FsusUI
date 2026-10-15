@@ -91,7 +91,7 @@
           <img
             v-for="(url, i) in urlList"
             v-show="i === activeIndex"
-            :ref="(el) => (imgRefs[i] = el as HTMLImageElement)"
+            :ref="createImgRef(i)"
             :key="url"
             :src="url"
             :style="imgStyle"
@@ -162,6 +162,7 @@ const ns = useNamespace('image-viewer')
 const { nextZIndex } = useZIndex()
 const wrapper = ref<HTMLDivElement>()
 const imgRefs = ref<HTMLImageElement[]>([])
+const imgRefOwners: symbol[] = []
 
 const scopeEventListener = effectScope()
 
@@ -301,12 +302,34 @@ function unregisterEventListener() {
   scopeEventListener.stop()
 }
 
-function handleImgLoad() {
-  loading.value = false
+function createImgRef(index: number) {
+  const owner = Symbol()
+  return (el: unknown) => {
+    // A stale unmount must not clear a slot claimed by a newer ref callback.
+    if (el) {
+      imgRefOwners[index] = owner
+      imgRefs.value[index] = el as HTMLImageElement
+    } else if (imgRefOwners[index] === owner) {
+      delete imgRefOwners[index]
+      delete imgRefs.value[index]
+    }
+  }
+}
+
+function getActiveImage() {
+  const img = imgRefs.value[activeIndex.value]
+  return img?.getAttribute('src') === currentImg.value ? img : undefined
+}
+
+function handleImgLoad(e: Event) {
+  const img = getActiveImage()
+  if (img && e.target === img && img.complete) {
+    loading.value = false
+  }
 }
 
 function handleImgError(e: Event) {
-  loading.value = false
+  handleImgLoad(e)
   ;(e.target as HTMLImageElement).alt = t('el.image.error')
 }
 
@@ -432,14 +455,16 @@ function handleActions(action: ImageViewerAction, options = {}) {
   transform.value.enableTransition = enableTransition
 }
 
-watch(currentImg, () => {
-  nextTick(() => {
-    const $img = imgRefs.value[0]
-    if (!$img?.complete) {
-      loading.value = true
-    }
-  })
-})
+watch(
+  [currentImg, activeIndex],
+  () => {
+    loading.value = !getActiveImage()?.complete
+    nextTick(() => {
+      loading.value = !getActiveImage()?.complete
+    })
+  },
+  { immediate: true }
+)
 
 watch(activeIndex, (val) => {
   reset()
