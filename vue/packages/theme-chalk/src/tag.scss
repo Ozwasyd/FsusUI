@@ -101,7 +101,10 @@ $tag-icon-span-gap: map.merge(
   line-height: 1;
   border-width: $tag-border-width;
   border-style: solid;
-  border-radius: var(--fsus-radius-control-small, #{getCssVar('tag-border-radius')});
+  border-radius: var(
+    --fsus-radius-control-small,
+    #{getCssVar('tag-border-radius')}
+  );
   box-sizing: border-box;
   white-space: nowrap;
   letter-spacing: var(--fsus-tag-letter-spacing, 0);
@@ -198,6 +201,60 @@ $tag-icon-span-gap: map.merge(
     &.#{bem('tag', '', $type)} {
       @include when(hit) {
         border-color: getCssVar('color', $type);
+      }
+    }
+  }
+
+  @include when(multiline) {
+    min-inline-size: 0;
+    max-inline-size: 100%;
+    height: auto;
+    min-height: var(--fsus-tag-height, var(--fsus-tag-height-default));
+    white-space: normal;
+    line-height: 1.5;
+    text-align: start;
+
+    @each $size in (large, small) {
+      &.#{bem('tag', '', $size)} {
+        min-height: map.get($tag-height, $size);
+      }
+    }
+
+    .#{bem('tag', 'content')} {
+      flex: 1 1 auto;
+      min-inline-size: 0;
+      overflow-wrap: anywhere;
+    }
+
+    .#{bem('tag', 'close')} {
+      flex: 0 0 auto;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      inline-size: var(--fsus-icon-target-small, 32px);
+      block-size: var(--fsus-icon-target-small, 32px);
+      padding: 0;
+      border: 0;
+      border-radius: getCssVar('border-radius', 'circle');
+      background-color: transparent;
+      cursor: pointer;
+      margin-left: 0;
+      margin-inline-start: map.get($tag-icon-span-gap, 'default');
+
+      &:hover {
+        color: getCssVar('color-white');
+        background-color: getCssVar('tag-hover-color');
+      }
+
+      &:focus-visible {
+        outline: 2px solid getCssVar('color', 'primary');
+        outline-offset: 2px;
+      }
+    }
+
+    @each $size in (large, small) {
+      &.#{bem('tag', '', $size)} .#{bem('tag', 'close')} {
+        margin-inline-start: map.get($tag-icon-span-gap, $size);
       }
     }
   }
