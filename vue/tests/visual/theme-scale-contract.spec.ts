@@ -193,6 +193,19 @@ test.describe('coarse pointer Button keyboard focus', () => {
           focusVisible: element.matches(':focus-visible'),
         }))
 
+      const renderedState = () =>
+        button.evaluate((element) => {
+          const style = getComputedStyle(element)
+          const { x, y, width, height } = element.getBoundingClientRect()
+          return {
+            hovered: element.matches(':hover'),
+            focusVisible: element.matches(':focus-visible'),
+            boxShadow: style.boxShadow,
+            transform: style.transform,
+            bounds: { x, y, width, height },
+          }
+        })
+
       await button.scrollIntoViewIfNeeded()
       const restingBounds = await button.boundingBox()
       expect(restingBounds).not.toBeNull()
@@ -219,6 +232,7 @@ test.describe('coarse pointer Button keyboard focus', () => {
         )
         .toBe('none')
       await expectNoTravel()
+      const tapState = await renderedState()
 
       await page.keyboard.press('Tab')
       await expect(nextButton).toBeFocused()
@@ -227,13 +241,21 @@ test.describe('coarse pointer Button keyboard focus', () => {
       await expect
         .poll(focusState)
         .toEqual({ hovered: true, focusVisible: true })
-      await expectTwoPixelInsetRing(button)
       await expectNoTravel()
+      await testInfo.attach(`theme-scale-button-coarse-state-${theme}`, {
+        contentType: 'application/json',
+        body: JSON.stringify(
+          { theme, restingBounds, tap: tapState, keyboard: await renderedState() },
+          null,
+          2,
+        ),
+      })
       await attachScreenshot(
         page,
         testInfo,
         `theme-scale-button-coarse-focus-${theme}`,
       )
+      await expectTwoPixelInsetRing(button)
     })
   }
 })
