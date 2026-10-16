@@ -1,5 +1,5 @@
 <template>
-  <nav ref="breadcrumb" :class="ns.b()" :aria-label="ariaLabel">
+  <nav v-bind="templateRef" :class="ns.b()" :aria-label="ariaLabel">
     <ol :class="ns.e('list')">
       <slot />
     </ol>
@@ -23,6 +23,7 @@ const { ariaLabel } = props
 
 const ns = useNamespace('breadcrumb')
 const breadcrumb = ref<HTMLElement>()
+const templateRef = { ref: breadcrumb, ref_key: 'breadcrumb' }
 const {
   children: items,
   addChild: addItem,
