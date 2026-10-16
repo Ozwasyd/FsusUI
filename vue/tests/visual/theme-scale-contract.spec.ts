@@ -250,12 +250,21 @@ test.describe('coarse pointer Button keyboard focus', () => {
           2,
         ),
       })
+      await expectTwoPixelInsetRing(button)
+      await expectNoTravel()
+      await testInfo.attach(`theme-scale-button-coarse-settled-state-${theme}`, {
+        contentType: 'application/json',
+        body: JSON.stringify(
+          { theme, restingBounds, keyboard: await renderedState() },
+          null,
+          2,
+        ),
+      })
       await attachScreenshot(
         page,
         testInfo,
         `theme-scale-button-coarse-focus-${theme}`,
       )
-      await expectTwoPixelInsetRing(button)
     })
   }
 })
