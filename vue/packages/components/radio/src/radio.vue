@@ -18,8 +18,8 @@
     >
       <input
         :ref="templateRef.ref"
-        ref_key="radioRef"
         v-model="modelValue"
+        ref_key="radioRef"
         :class="ns.e('original')"
         :value="actualValue"
         :name="name || radioGroup?.name"

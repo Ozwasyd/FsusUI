@@ -10,8 +10,8 @@
   >
     <input
       :ref="templateRef.ref"
-      ref_key="radioRef"
       v-model="modelValue"
+      ref_key="radioRef"
       :class="ns.be('button', 'original-radio')"
       role="radio"
       :value="actualValue"
