@@ -5,15 +5,15 @@ import { spawnSync } from 'node:child_process'
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 import { loadConformanceOwnerPlan } from './conformance-playwright-plan.mjs'
-import { runConformanceCell } from './conformance-playwright-runner.mjs'
+import {
+  loadConformanceCliImpactPlan,
+  runConformanceCell,
+} from './conformance-playwright-runner.mjs'
 import {
   loadConformanceReceiptsFromDirectory,
   verifyConformanceOwnerReceipts,
 } from './conformance-playwright-verify.mjs'
-import {
-  filterOwnerPlanByImpact,
-  loadPlaywrightImpactPlan,
-} from './playwright-impact-filter.mjs'
+import { filterOwnerPlanByImpact } from './playwright-impact-filter.mjs'
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 
@@ -96,7 +96,7 @@ export async function runConformanceOwner(argv = process.argv.slice(2)) {
 
   const results = []
   let overallFailed = false
-  const impactPlan = loadPlaywrightImpactPlan(root, impactPlanPath)
+  const impactPlan = loadConformanceCliImpactPlan(argv)
   for (const cell of cells) {
     const result = await runConformanceCell(ownerId, cell.id, group, {
       evidenceDir,
