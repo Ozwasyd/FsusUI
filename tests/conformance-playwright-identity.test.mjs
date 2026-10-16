@@ -540,3 +540,36 @@ test('PR missing and malformed plans still fail closed', () => {
     rmSync(scratch, { recursive: true, force: true })
   }
 })
+
+
+test('a full branch checkout retains the real default-branch baseline and candidate', () =>
+  fixture(({ scratch, producer, candidate: main }) => {
+    checkedGit(producer, ['switch', '--quiet', '-c', 'dispatch-candidate'])
+    writeFileSync(join(producer, 'dispatch-change'), 'dispatch-change')
+    checkedGit(producer, ['add', 'dispatch-change'])
+    checkedGit(producer, ['commit', '--quiet', '-m', 'dispatch-change'])
+    const candidate = checkedGit(producer, ['rev-parse', 'HEAD'])
+    checkedGit(producer, ['switch', '--quiet', 'main'])
+    const checkout = join(scratch, 'full-branch-checkout')
+    checkedGit(scratch, [
+      'clone',
+      '--quiet',
+      '--branch',
+      'dispatch-candidate',
+      `file://${producer}`,
+      checkout,
+    ])
+    assert.equal(checkedGit(checkout, ['rev-parse', 'origin/main']), main)
+    assert.equal(checkedGit(checkout, ['rev-parse', 'HEAD']), candidate)
+    assert.deepEqual(
+      resolveConformanceInteractionIdentity({
+        repositoryRoot: checkout,
+        group: 'main',
+        env: { GITHUB_SHA: candidate },
+      }),
+      { baseline: main, candidate },
+    )
+    const original = probe(checkout, {})
+    assert.equal(original.status, 0, original.stderr)
+    assert.deepEqual(JSON.parse(original.stdout), { baseline: main, candidate })
+  }))

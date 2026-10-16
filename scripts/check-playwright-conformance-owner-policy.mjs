@@ -77,6 +77,11 @@ for (const group of ['main', 'nightly', 'release']) {
 const workflow = read('.github/workflows/_quality-playwright.yml')
 const job = workflowJob(workflow, CONFORMANCE_OWNER)
 assert.ok(job, 'playwright-conformance workflow owner is required')
+assert.match(
+  job,
+  /- uses: actions\/checkout@v4\n\s+with:\n\s+fetch-depth: 0\n/u,
+  'conformance checkout must retain origin/main and history for non-PR baselines',
+)
 assert.ok(!/\n\s+(?:strategy|matrix):/u.test(job), 'outer matrix is forbidden')
 assert.ok(job.includes('conformance-playwright-owner-run.mjs'))
 assert.ok(!job.includes('pnpm test:conformance:web-interaction'))
