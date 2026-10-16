@@ -1,6 +1,14 @@
 import { expect, test } from '@playwright/test'
 import type { Locator, Page, TestInfo } from '@playwright/test'
 import { buildVisualUrl } from '../../../scripts/visual-variant.mjs'
+import playwrightConfig from '../../playwright.config'
+
+test.use({
+  launchOptions: {
+    ...playwrightConfig.use?.launchOptions,
+    chromiumSandbox: true,
+  },
+})
 
 test.setTimeout(120_000)
 
