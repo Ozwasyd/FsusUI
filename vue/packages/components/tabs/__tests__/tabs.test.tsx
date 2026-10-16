@@ -1,4 +1,4 @@
-import { defineComponent, nextTick, ref } from 'vue'
+import { defineComponent, h, nextTick, ref } from 'vue'
 import { mount } from '@vue/test-utils'
 import { describe, expect, test, vi } from 'vitest'
 import { EVENT_CODE } from '@element-plus/constants'
@@ -25,21 +25,25 @@ describe('Tabs.vue', () => {
   test('forwards current ARIA names to the tablist and preserves root attrs', async () => {
     const label = ref<string | undefined>('Editor modes')
     const labelledby = ref<string | undefined>('editor-mode-title')
-    const wrapper = mount(() => (
-      <Tabs
-        id="consumer-tabs"
-        data-owner="consumer"
-        aria-label={label.value}
-        aria-labelledby={labelledby.value}
-      >
-        <TabPane name="write" label="Write">
-          Editor
-        </TabPane>
-        <TabPane name="preview" label="Preview">
-          Preview
-        </TabPane>
-      </Tabs>
-    ))
+    const wrapper = mount(() =>
+      h(
+        Tabs,
+        {
+          id: 'consumer-tabs',
+          'data-owner': 'consumer',
+          'aria-label': label.value,
+          'aria-labelledby': labelledby.value,
+        },
+        () => [
+          <TabPane name="write" label="Write">
+            Editor
+          </TabPane>,
+          <TabPane name="preview" label="Preview">
+            Preview
+          </TabPane>,
+        ],
+      ),
+    )
     try {
       await nextTick()
       const tabs = wrapper.findComponent(Tabs)
