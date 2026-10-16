@@ -259,7 +259,7 @@
     "deps:freshness": "node ./scripts/deps-freshness.mjs",
     "check:visual-governance": "node ./scripts/with-node-heap.mjs node ./scripts/check-visual-governance.mjs",
     "test:visual-governance": "node ./scripts/with-node-heap.mjs run-s test:visual-governance:registry test:visual-governance:evaluator test:visual-governance:corpus",
-    "test:visual-governance:registry": "node ./scripts/with-node-heap.mjs node --test tests/component-surface-semantic-registry.test.mjs",
+    "test:visual-governance:registry": "node ./scripts/with-node-heap.mjs node --test tests/component-surface-semantic-registry.test.mjs tests/component-surface-semantic-registry-refresh.test.mjs",
     "test:visual-governance:evaluator": "node ./scripts/with-node-heap.mjs node --test tests/component-semantic-style-evaluator.test.mjs",
     "test:visual-governance:corpus": "node ./scripts/with-node-heap.mjs node --test tests/component-semantic-corpus.test.mjs"
   },

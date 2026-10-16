@@ -206,6 +206,8 @@ const containerKls = computed(() => [
   nsInput.is('hidden', props.type === 'hidden'),
   nsInput.is('exceed', inputExceed.value),
   {
+    [nsTextarea.m(`resize-${props.resize}`)]:
+      props.type === 'textarea' && props.cspSafe && !!props.resize,
     [nsInput.b('group')]: slots.prepend || slots.append,
     [nsInput.bm('group', 'append')]: slots.append,
     [nsInput.bm('group', 'prepend')]: slots.prepend,

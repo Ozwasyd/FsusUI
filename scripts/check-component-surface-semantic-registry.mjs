@@ -1,4 +1,5 @@
 import { createHash } from 'node:crypto'
+import { execFileSync } from 'node:child_process'
 import fs from 'node:fs/promises'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -1040,12 +1041,73 @@ export const checkComponentSurfaceSemanticRegistry = async (options = {}) => {
   }
 }
 
+export const refreshComponentSurfaceSemanticRegistrySourceDigests = async (
+  options = {},
+) => {
+  const root = options.root ?? defaultRoot
+  const registryPath = options.registryPath ?? defaultRegistryPath
+  const assets = await loadComponentSurfaceSemanticRegistry({
+    ...options,
+    root,
+  })
+  validateSchemaContract(assets.schema)
+  executeSchema(assets.schema, assets.registry)
+  const registry = structuredClone(assets.registry)
+  for (const source of Object.values(registry.sourceDigests)) {
+    source.digest = createHash('sha256')
+      .update(await fs.readFile(resolveInputPath(root, source.path)))
+      .digest('hex')
+  }
+  registry.generated.producer =
+    'scripts/check-component-surface-semantic-registry.mjs'
+  registry.generated.sourceRevision = execFileSync(
+    'git',
+    ['rev-parse', 'HEAD'],
+    { cwd: root, encoding: 'utf8' },
+  ).trim()
+  const validation = await validateComponentSurfaceSemanticRegistry({
+    ...assets,
+    registry,
+    root,
+  })
+  assertInventory(registry, options.expectedInventory)
+  assertSemanticOwnership(registry, options.expectedSemanticOwnership)
+  const outputPath = resolveInputPath(root, registryPath)
+  await fs.writeFile(outputPath, `${JSON.stringify(registry, null, 2)}\n`)
+  return {
+    ...validation,
+    writePaths: [outputPath],
+    executedCommands: ['git rev-parse HEAD'],
+  }
+}
+
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
   try {
-    const result = await checkComponentSurfaceSemanticRegistry()
-    process.stdout.write(
-      `component surface semantic registry valid: ${result.ruleCount} rules, ${result.issueMappingCount} issue mappings\n`,
-    )
+    const args = process.argv.slice(2)
+    if (args.length) {
+      if (
+        args[0] !== '--refresh-source-digests' ||
+        (args.length !== 1 && args.length !== 3) ||
+        (args.length === 3 && args[1] !== '--registry')
+      ) {
+        throw new Error(
+          'Usage: check-component-surface-semantic-registry.mjs [--refresh-source-digests [--registry path]]',
+        )
+      }
+      const result = await refreshComponentSurfaceSemanticRegistrySourceDigests(
+        {
+          registryPath: args[2],
+        },
+      )
+      process.stdout.write(
+        `registry source digests refreshed: ${result.writePaths[0]}\n`,
+      )
+    } else {
+      const result = await checkComponentSurfaceSemanticRegistry()
+      process.stdout.write(
+        `component surface semantic registry valid: ${result.ruleCount} rules, ${result.issueMappingCount} issue mappings\n`,
+      )
+    }
   } catch (error) {
     process.stderr.write(
       `${error.code ?? 'registry-check-failed'}: ${error.message}\n`,
