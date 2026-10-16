@@ -2,6 +2,7 @@ using System.Security.Cryptography;
 using System.Text.Json;
 using Avalonia;
 using Avalonia.Automation;
+using Avalonia.Automation.Peers;
 using Avalonia.Controls;
 using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
@@ -78,7 +79,22 @@ public class FsusTreeRowPresenterHeadlessTests
       var defaultRows = GetRows(fixture.DefaultTree);
       Assert.Equal(4, defaultRows.Length);
       Assert.All(defaultRows, row => Assert.True(row.MinHeight > 30));
-      Assert.All(defaultRows, row => Assert.IsType<TextBlock>(row.Child));
+      Assert.All(defaultRows, row =>
+      {
+        var label = Assert.IsType<FsusTreeDefaultLabel>(row.Child);
+        Assert.IsAssignableFrom<TextBlock>(label);
+        Assert.Equal(typeof(TextBlock), label.StyleKey);
+        Assert.Equal(VerticalAlignment.Center, label.VerticalAlignment);
+        Assert.Equal(TextTrimming.CharacterEllipsis, label.TextTrimming);
+        Assert.True(label.IsMeasureValid);
+        Assert.True(label.Bounds.Height > 0);
+        Assert.Equal(AutomationControlType.TreeItem, AutomationProperties.GetControlTypeOverride(row));
+        var peer = Assert.IsType<TextBlockAutomationPeer>(ControlAutomationPeer.CreatePeerForElement(label));
+        Assert.Equal("TextBlock", peer.GetClassName());
+        Assert.Equal(AutomationControlType.Text, peer.GetAutomationControlType());
+        Assert.Equal(label.Text, peer.GetName());
+        Assert.Same(peer, ControlAutomationPeer.CreatePeerForElement(label));
+      });
 
       Assert.Equal(2, AutomationProperties.GetPositionInSet(FindRow(fixture.CustomTree, "notes")));
       Assert.Equal(2, AutomationProperties.GetSizeOfSet(FindRow(fixture.CustomTree, "notes")));
