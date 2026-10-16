@@ -1,8 +1,10 @@
 import assert from 'node:assert/strict'
+import { spawnSync } from 'node:child_process'
 import { createHash } from 'node:crypto'
 import fs from 'node:fs'
 import os from 'node:os'
 import path from 'node:path'
+import { loadConformanceReceiptsFromDirectory } from './conformance-playwright-verify.mjs'
 import {
   filterOwnerPlanByImpact,
   loadPlaywrightImpactPlan,
@@ -766,8 +768,144 @@ for (const testCase of prCases) {
   fs.rmSync(root, { recursive: true, force: true })
 }
 
+// Exercise the actual producer CLI before the strict consumer. Fixture receipts
+// use the original owner's named trace paths; this is not browser execution.
+{
+  const root = copyFixture(prFixtureRoot)
+  const originals = new Map()
+  const ownerDirectory = path.join(root, '.tmp', 'conformance-owner-receipts')
+  const runProducer = () =>
+    spawnSync(
+      process.execPath,
+      [
+        path.resolve('scripts/ci-readiness.mjs'),
+        'emit',
+        '--root',
+        root,
+        '--evidence-root',
+        root,
+        '--gate',
+        'playwright-conformance',
+        '--group',
+        'pr',
+        '--playwright-plan',
+        'plan.json',
+        '--playwright-receipts',
+        ownerDirectory,
+      ],
+      {
+        encoding: 'utf8',
+        env: {
+          ...process.env,
+          GITHUB_SHA: 'a'.repeat(40),
+          GITHUB_RUN_ID: '42',
+          GITHUB_RUN_ATTEMPT: '1',
+        },
+      },
+    )
+  try {
+    for (const browser of ['chromium', 'firefox', 'webkit']) {
+      const cell = `web-interaction-conformance-${browser}`
+      const manifest = JSON.parse(
+        fs.readFileSync(
+          path.join(root, 'manifests', `playwright-conformance-${cell}.json`),
+          'utf8',
+        ),
+      )
+      const sourceReceiptFile = path.join(root, manifest.playwright.receiptPath)
+      const receipt = JSON.parse(fs.readFileSync(sourceReceiptFile, 'utf8'))
+      const receiptFile = path.join(ownerDirectory, `${cell}.json`)
+      const trace = receipt.conformance.traces[0]
+      const traceBytes = fs.readFileSync(path.join(root, trace.path))
+      const sourceTrace = `.tmp/playwright-conformance/traces/${browser}/named.interaction-trace.json`
+      fs.mkdirSync(path.dirname(path.join(root, sourceTrace)), {
+        recursive: true,
+      })
+      fs.writeFileSync(path.join(root, sourceTrace), traceBytes)
+      receipt.conformance.traces = [{ ...trace, path: sourceTrace }]
+      receipt.report = { path: manifest.playwright.report.path }
+      receipt.config = manifest.playwright.config
+      receipt.runtime = { mode: manifest.playwright.runtime.runtimeMode }
+      receipt.toolchain = {
+        [`${browser}Revision`]: receipt.conformance.browserRevision,
+      }
+      writeJson(receiptFile, receipt)
+      originals.set(browser, {
+        sourceTrace,
+        traceBytes,
+        rawDigest: trace.sha256,
+        receiptFile,
+        receiptBytes: fs.readFileSync(receiptFile),
+        receipt,
+      })
+    }
+    const ownerReceipts = loadConformanceReceiptsFromDirectory(ownerDirectory)
+    assert.equal(ownerReceipts.length, 3)
+    for (let attempt = 0; attempt < 2; attempt++) {
+      const emitted = runProducer()
+      assert.equal(emitted.status, 0, emitted.stderr)
+      checkPr(root)
+      assert.deepEqual(
+        loadConformanceReceiptsFromDirectory(ownerDirectory),
+        ownerReceipts,
+      )
+    }
+    for (const [browser, original] of originals) {
+      const file = `playwright-conformance-web-interaction-conformance-${browser}.json`
+      const manifest = JSON.parse(
+        fs.readFileSync(path.join(root, 'manifests', file), 'utf8'),
+      )
+      const trace = manifest.playwright.conformance.traces[0]
+      const copied = path.join(root, trace.path)
+      assert.deepEqual(fs.readFileSync(copied), original.traceBytes)
+      assert.deepEqual(
+        fs.readFileSync(path.join(root, original.sourceTrace)),
+        original.traceBytes,
+      )
+      assert.deepEqual(
+        fs.readFileSync(original.receiptFile),
+        original.receiptBytes,
+      )
+      const receiptPath = path.join(root, manifest.playwright.receiptPath)
+      assert.notEqual(receiptPath, original.receiptFile)
+      const receipt = JSON.parse(fs.readFileSync(receiptPath, 'utf8'))
+      assert.deepEqual(receipt, {
+        ...original.receipt,
+        conformance: { ...original.receipt.conformance, traces: [trace] },
+      })
+      assert.deepEqual(receipt.conformance, manifest.playwright.conformance)
+      assert.equal(manifest.playwright.receiptDigest, sha256Path(receiptPath))
+      assert.equal(trace.sha256, original.rawDigest)
+      const artifact = manifest.artifacts.find((entry) =>
+        entry.name.startsWith('trace-'),
+      )
+      assert.equal(artifact.sha256, sha256Path(copied))
+      assert.notEqual(artifact.sha256, trace.sha256)
+    }
+    const file =
+      'playwright-conformance-web-interaction-conformance-chromium.json'
+    const originalManifest = JSON.parse(
+      fs.readFileSync(path.join(root, 'manifests', file), 'utf8'),
+    )
+    mutate(root, file, (manifest) => {
+      manifest.artifacts.find((entry) =>
+        entry.name.startsWith('trace-'),
+      ).sha256 = manifest.playwright.conformance.traces[0].sha256
+    })
+    assert.throws(() => checkPr(root), /artifact digest mismatch/iu)
+    writeJson(path.join(root, 'manifests', file), originalManifest)
+    const original = originals.get('chromium')
+    fs.appendFileSync(path.join(root, original.sourceTrace), '\n')
+    const tampered = runProducer()
+    assert.notEqual(tampered.status, 0)
+    assert.match(tampered.stderr, /conformance trace digest mismatch/iu)
+  } finally {
+    fs.rmSync(root, { recursive: true, force: true })
+  }
+}
+
 console.log(
-  `[ci-readiness-fixtures] profiles=3 invalid=${cases.length} conformance-invalid=${conformanceNegativeCases.length} pr-invalid=${prCases.length} pr-valid=2 identity-mix=1 impact-filter=1`,
+  `[ci-readiness-fixtures] profiles=3 invalid=${cases.length} conformance-invalid=${conformanceNegativeCases.length} pr-invalid=${prCases.length} pr-valid=2 identity-mix=1 impact-filter=1 producer-roundtrip=3 producer-repeat=1 producer-invalid=2`,
 )
 
 for (const root of [fixtureRoot, prFixtureRoot, prSkipFixtureRoot])
