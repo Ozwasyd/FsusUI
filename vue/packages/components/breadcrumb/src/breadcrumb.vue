@@ -1,5 +1,10 @@
 <template>
-  <nav v-bind="templateRef" :class="ns.b()" :aria-label="ariaLabel">
+  <nav
+    :ref="templateRef.ref"
+    ref_key="breadcrumb"
+    :class="ns.b()"
+    :aria-label="ariaLabel"
+  >
     <ol :class="ns.e('list')">
       <slot />
     </ol>

@@ -9,7 +9,8 @@
     ]"
   >
     <input
-      v-bind="templateRef"
+      :ref="templateRef.ref"
+      ref_key="radioRef"
       v-model="modelValue"
       :class="ns.be('button', 'original-radio')"
       role="radio"

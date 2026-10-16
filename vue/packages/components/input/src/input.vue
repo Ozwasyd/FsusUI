@@ -13,7 +13,7 @@
         <slot name="prepend" />
       </div>
 
-      <div v-bind="templateRef" :class="wrapperKls">
+      <div :ref="templateRef.ref" ref_key="wrapperRef" :class="wrapperKls">
         <!-- prefix slot -->
         <span v-if="$slots.prefix || prefixIcon" :class="nsInput.e('prefix')">
           <span :class="nsInput.e('prefix-inner')">

@@ -1,6 +1,7 @@
 <template>
   <div
-    v-bind="templateRef"
+    :ref="templateRef.ref"
+    ref_key="root"
     :class="carouselClasses"
     @pointercancel="handlePointerCancel"
     @pointerdown="handlePointerDown"

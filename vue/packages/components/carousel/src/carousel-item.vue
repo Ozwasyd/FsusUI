@@ -1,7 +1,8 @@
 <template>
   <div
     v-show="ready"
-    v-bind="templateRef"
+    :ref="templateRef.ref"
+    ref_key="carouselItemRef"
     :class="[
       ns.e('item'),
       ns.is('active', active),

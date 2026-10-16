@@ -10,7 +10,7 @@
     @mousedown.prevent="handleMouseDown"
     @mouseup="handleMouseUp"
   >
-    <tbody v-bind="templateRef">
+    <tbody :ref="templateRef.ref" ref_key="tbodyRef">
       <tr>
         <th v-if="showWeekNumber" scope="col">{{ weekLabel }}</th>
         <th
