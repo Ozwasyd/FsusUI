@@ -322,6 +322,9 @@ importers:
       '@pnpm/logger':
         specifier: 4.0.0
         version: 4.0.0
+      '@pnpm/types':
+        specifier: 8.10.0
+        version: 8.10.0
       consola:
         specifier: 3.4.2
         version: 3.4.2
