@@ -26,17 +26,48 @@ const EMPTY_NODE = {
 } as const
 
 // enums
-export enum TreeOptionsEnum {
+// Ambient enum types retain nominal members; the runtime object uses erasable syntax.
+declare enum TreeOptionsEnum {
   KEY = 'id',
   LABEL = 'label',
   CHILDREN = 'children',
   DISABLED = 'disabled',
 }
 
-export const enum SetOperationEnum {
+const treeOptionsEnum = {
+  KEY: 'id',
+  LABEL: 'label',
+  CHILDREN: 'children',
+  DISABLED: 'disabled',
+} as typeof TreeOptionsEnum
+
+type treeOptionsEnum = TreeOptionsEnum
+declare namespace treeOptionsEnum {
+  type KEY = TreeOptionsEnum.KEY
+  type LABEL = TreeOptionsEnum.LABEL
+  type CHILDREN = TreeOptionsEnum.CHILDREN
+  type DISABLED = TreeOptionsEnum.DISABLED
+}
+
+export { treeOptionsEnum as TreeOptionsEnum }
+
+declare const enum SetOperationEnum {
   ADD = 'add',
   DELETE = 'delete',
 }
+
+const setOperationEnum = {
+  ADD: 'add' as SetOperationEnum.ADD,
+  DELETE: 'delete' as SetOperationEnum.DELETE,
+} as const
+
+type setOperationEnum = SetOperationEnum
+declare namespace setOperationEnum {
+  type ADD = SetOperationEnum.ADD
+  type DELETE = SetOperationEnum.DELETE
+}
+
+export { setOperationEnum as SetOperationEnum }
 
 const itemSize = {
   type: Number,
@@ -60,10 +91,10 @@ export const treeProps = buildProps({
     type: definePropType<TreeOptionProps>(Object),
     default: () =>
       mutable({
-        children: TreeOptionsEnum.CHILDREN,
-        label: TreeOptionsEnum.LABEL,
-        disabled: TreeOptionsEnum.DISABLED,
-        value: TreeOptionsEnum.KEY,
+        children: treeOptionsEnum.CHILDREN,
+        label: treeOptionsEnum.LABEL,
+        disabled: treeOptionsEnum.DISABLED,
+        value: treeOptionsEnum.KEY,
       } as const),
   },
   highlightCurrent: {
