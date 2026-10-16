@@ -10,7 +10,7 @@
     @mousedown.prevent="handleMouseDown"
     @mouseup="handleMouseUp"
   >
-    <tbody ref="tbodyRef">
+    <tbody :ref="templateRef.ref" ref_key="tbodyRef">
       <tr>
         <th v-if="showWeekNumber" scope="col">{{ weekLabel }}</th>
         <th
@@ -75,6 +75,7 @@ const {
   handleMouseMove,
   handleFocus,
 } = useBasicDateTable(props, emit)
+const templateRef = { ref: tbodyRef, ref_key: 'tbodyRef' }
 const { tableLabel, tableKls, weekLabel, getCellClasses, getRowKls, t } =
   useBasicDateTableDOM(props, {
     isCurrent,

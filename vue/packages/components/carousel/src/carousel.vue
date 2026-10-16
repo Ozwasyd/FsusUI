@@ -1,6 +1,7 @@
 <template>
   <div
-    ref="root"
+    :ref="templateRef.ref"
+    ref_key="root"
     :class="carouselClasses"
     @pointercancel="handlePointerCancel"
     @pointerdown="handlePointerDown"
@@ -120,6 +121,7 @@ const {
   throttledArrowClick,
   throttledIndicatorHover,
 } = useCarousel(props, emit, COMPONENT_NAME)
+const templateRef = { ref: root, ref_key: 'root' }
 const ns = useNamespace('carousel')
 const { t } = useLocale()
 
