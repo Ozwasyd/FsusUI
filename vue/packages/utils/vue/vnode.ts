@@ -19,7 +19,8 @@ import type {
 
 const SCOPE = 'utils/vue/vnode'
 
-export enum PatchFlags {
+// Ambient enum types retain nominal members; the runtime object uses erasable syntax.
+declare enum PatchFlags {
   TEXT = 1,
   CLASS = 2,
   STYLE = 4,
@@ -34,6 +35,54 @@ export enum PatchFlags {
   HOISTED = -1,
   BAIL = -2,
 }
+
+const patchFlags = {
+  TEXT: 1,
+  1: 'TEXT',
+  CLASS: 2,
+  2: 'CLASS',
+  STYLE: 4,
+  4: 'STYLE',
+  PROPS: 8,
+  8: 'PROPS',
+  FULL_PROPS: 16,
+  16: 'FULL_PROPS',
+  HYDRATE_EVENTS: 32,
+  32: 'HYDRATE_EVENTS',
+  STABLE_FRAGMENT: 64,
+  64: 'STABLE_FRAGMENT',
+  KEYED_FRAGMENT: 128,
+  128: 'KEYED_FRAGMENT',
+  UNKEYED_FRAGMENT: 256,
+  256: 'UNKEYED_FRAGMENT',
+  NEED_PATCH: 512,
+  512: 'NEED_PATCH',
+  DYNAMIC_SLOTS: 1024,
+  1024: 'DYNAMIC_SLOTS',
+  HOISTED: -1,
+  [-1]: 'HOISTED',
+  BAIL: -2,
+  [-2]: 'BAIL',
+} as typeof PatchFlags
+
+type patchFlags = PatchFlags
+declare namespace patchFlags {
+  type TEXT = PatchFlags.TEXT
+  type CLASS = PatchFlags.CLASS
+  type STYLE = PatchFlags.STYLE
+  type PROPS = PatchFlags.PROPS
+  type FULL_PROPS = PatchFlags.FULL_PROPS
+  type HYDRATE_EVENTS = PatchFlags.HYDRATE_EVENTS
+  type STABLE_FRAGMENT = PatchFlags.STABLE_FRAGMENT
+  type KEYED_FRAGMENT = PatchFlags.KEYED_FRAGMENT
+  type UNKEYED_FRAGMENT = PatchFlags.UNKEYED_FRAGMENT
+  type NEED_PATCH = PatchFlags.NEED_PATCH
+  type DYNAMIC_SLOTS = PatchFlags.DYNAMIC_SLOTS
+  type HOISTED = PatchFlags.HOISTED
+  type BAIL = PatchFlags.BAIL
+}
+
+export { patchFlags as PatchFlags }
 
 export type VNodeChildAtom = Exclude<VNodeChild, Array<any>>
 export type RawSlots = Exclude<
