@@ -143,3 +143,71 @@ for (const theme of ['light', 'dark'] as const) {
     )
   })
 }
+
+test.describe('coarse pointer Button keyboard focus', () => {
+  test.use({ hasTouch: true })
+
+  for (const theme of ['light', 'dark'] as const) {
+    test(`keeps the Button ring when hover and focus-visible coexist in ${theme}`, async ({
+      page,
+    }, testInfo) => {
+      await openFixture(page, 'basic', theme)
+      expect(
+        await page.evaluate(() => ({
+          coarsePointer: window.matchMedia('(pointer: coarse)').matches,
+          noHover: window.matchMedia('(hover: none)').matches,
+        })),
+      ).toEqual({ coarsePointer: true, noHover: true })
+
+      const buttons = page
+        .getByTestId('section-basic')
+        .locator('.demo-block')
+        .filter({
+          has: page.getByRole('heading', {
+            name: 'Button & ButtonGroup',
+            exact: true,
+          }),
+        })
+      const button = buttons.getByRole('button', {
+        name: 'Default',
+        exact: true,
+      })
+      const nextButton = buttons.getByRole('button', {
+        name: 'Primary',
+        exact: true,
+      })
+      const focusState = () =>
+        button.evaluate((element) => ({
+          hovered: element.matches(':hover'),
+          focusVisible: element.matches(':focus-visible'),
+        }))
+
+      await button.tap()
+      await expect(button).toBeFocused()
+      await expect
+        .poll(focusState)
+        .toEqual({ hovered: true, focusVisible: false })
+      await expect
+        .poll(() =>
+          button.evaluate(
+            (element) => window.getComputedStyle(element).boxShadow,
+          ),
+        )
+        .toBe('none')
+
+      await page.keyboard.press('Tab')
+      await expect(nextButton).toBeFocused()
+      await page.keyboard.press('Shift+Tab')
+      await expect(button).toBeFocused()
+      await expect
+        .poll(focusState)
+        .toEqual({ hovered: true, focusVisible: true })
+      await expectTwoPixelInsetRing(button)
+      await attachScreenshot(
+        page,
+        testInfo,
+        `theme-scale-button-coarse-focus-${theme}`,
+      )
+    })
+  }
+})
