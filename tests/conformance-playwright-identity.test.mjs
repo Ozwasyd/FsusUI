@@ -11,7 +11,11 @@ import { tmpdir } from 'node:os'
 import { dirname, join, resolve } from 'node:path'
 import { test } from 'node:test'
 import { fileURLToPath } from 'node:url'
-import { resolveConformanceInteractionIdentity } from '../scripts/conformance-playwright-runner.mjs'
+import {
+  loadConformanceCliImpactPlan,
+  resolveConformanceInteractionIdentity,
+} from '../scripts/conformance-playwright-runner.mjs'
+import { filterOwnerPlanByImpact } from '../scripts/playwright-impact-filter.mjs'
 import {
   assertMarkdownPlaywrightCollection,
   createMarkdownPlaywrightEnvironment,
@@ -423,6 +427,116 @@ test('failed collection retains the original JSON report and counters in its fai
     )
   } finally {
     process.env.PATH = previousPath
+    rmSync(scratch, { recursive: true, force: true })
+  }
+})
+
+for (const group of ['main', 'nightly', 'release']) {
+  test(`${group} CLI ignores the absent PR plan without consuming evidence-dir`, () => {
+    for (const args of [
+      ['--group', group, '--impact-plan', '--evidence-dir', '.tmp/conformance'],
+      ['--group', group, '--impact-plan=missing-pr-plan.json'],
+      [`--group=${group}`, '--evidence-dir', '.tmp/conformance'],
+    ]) {
+      assert.equal(loadConformanceCliImpactPlan(args), null)
+    }
+  })
+}
+
+test('default main CLI does not load a PR impact plan', () => {
+  assert.equal(
+    loadConformanceCliImpactPlan([
+      '--impact-plan',
+      '--evidence-dir',
+      '.tmp/conformance',
+    ]),
+    null,
+  )
+})
+
+test('PR CLI retains the real impact plan and verified shallow identity', () =>
+  fixture(({ scratch, baseline, candidate, options }) => {
+    const planPath = join(scratch, 'impact.json')
+    const impact = {
+      schemaVersion: 1,
+      planDigest: 'unit-plan-digest',
+      baseRef: baseline,
+      decisions: [{ suiteId: 'web-interaction-conformance', decision: 'run' }],
+    }
+    writeFileSync(planPath, JSON.stringify(impact))
+    const loaded = loadConformanceCliImpactPlan([
+      '--group=pr',
+      `--impact-plan=${planPath}`,
+    ])
+    assert.deepEqual(loaded, impact)
+    const cell = { id: 'unit-cell', suiteId: 'web-interaction-conformance' }
+    const selected = filterOwnerPlanByImpact({
+      root,
+      plan: { cells: [cell] },
+      group: 'pr',
+      impactPlanPath: planPath,
+    })
+    assert.deepEqual(selected.plan.cells, [cell])
+    assert.equal(selected.impactPlanDigest, impact.planDigest)
+    assert.deepEqual(
+      resolveConformanceInteractionIdentity({ ...options, impactPlan: loaded }),
+      { baseline, candidate },
+    )
+  }))
+
+test('PR missing and malformed plans still fail closed', () => {
+  const scratch = mkdtempSync(join(tmpdir(), 'fsus-conformance-plan-'))
+  const planPath = join(scratch, 'impact.json')
+  const load = () =>
+    loadConformanceCliImpactPlan(['--group', 'pr', '--impact-plan', planPath])
+  try {
+    assert.equal(loadConformanceCliImpactPlan(['--group', 'pr']), null)
+    assert.throws(
+      () =>
+        filterOwnerPlanByImpact({
+          root,
+          plan: { cells: [] },
+          group: 'pr',
+          impactPlanPath: '',
+        }),
+      /requires --impact-plan/u,
+    )
+    assert.throws(load, /impact plan is missing/u)
+    assert.throws(
+      () =>
+        loadConformanceCliImpactPlan([
+          '--group',
+          'pr',
+          '--impact-plan',
+          '--evidence-dir',
+          '.tmp/conformance',
+        ]),
+      /impact plan is missing/u,
+    )
+    writeFileSync(planPath, '{')
+    for (const group of ['main', 'nightly', 'release']) {
+      assert.equal(
+        loadConformanceCliImpactPlan(['--group', group, '--impact-plan', planPath]),
+        null,
+      )
+    }
+    assert.throws(load, SyntaxError)
+    writeFileSync(planPath, JSON.stringify({ schemaVersion: 2, decisions: [] }))
+    assert.throws(load, /schemaVersion must be 1/u)
+    writeFileSync(planPath, JSON.stringify({ schemaVersion: 1 }))
+    assert.throws(load, /must contain decisions/u)
+    writeFileSync(planPath, JSON.stringify({ schemaVersion: 1, decisions: [] }))
+    assert.throws(
+      () =>
+        filterOwnerPlanByImpact({
+          root,
+          plan: { cells: [] },
+          group: 'pr',
+          impactPlanPath: planPath,
+        }),
+      /must declare planDigest/u,
+    )
+  } finally {
     rmSync(scratch, { recursive: true, force: true })
   }
 })

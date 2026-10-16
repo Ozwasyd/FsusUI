@@ -400,6 +400,12 @@ const option = (args, name, fallback) => {
   )
 }
 
+export function loadConformanceCliImpactPlan(argv) {
+  return option(argv, 'group', 'main') === 'pr'
+    ? loadPlaywrightImpactPlan(root, option(argv, 'impact-plan'))
+    : null
+}
+
 if (import.meta.url === pathToFileURL(process.argv[1] ?? '').href) {
   const cellId = option(process.argv.slice(2), 'cell')
   if (!cellId) throw new Error('cell-run requires --cell')
@@ -409,10 +415,7 @@ if (import.meta.url === pathToFileURL(process.argv[1] ?? '').href) {
     option(process.argv.slice(2), 'group', 'main'),
     {
       evidenceDir: option(process.argv.slice(2), 'evidence-dir'),
-      impactPlan: loadPlaywrightImpactPlan(
-        root,
-        option(process.argv.slice(2), 'impact-plan'),
-      ),
+      impactPlan: loadConformanceCliImpactPlan(process.argv.slice(2)),
     },
   )
   if (!result.ok) process.exitCode = 1
