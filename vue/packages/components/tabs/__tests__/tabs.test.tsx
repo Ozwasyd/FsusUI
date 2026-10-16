@@ -1,4 +1,4 @@
-import { defineComponent, nextTick, ref } from 'vue'
+import { defineComponent, h, nextTick, ref } from 'vue'
 import { mount } from '@vue/test-utils'
 import { describe, expect, test, vi } from 'vitest'
 import { EVENT_CODE } from '@element-plus/constants'
@@ -22,6 +22,81 @@ const Comp = defineComponent({
 })
 
 describe('Tabs.vue', () => {
+  test('forwards current ARIA names to the tablist and preserves root attrs', async () => {
+    const label = ref<string | undefined>('Editor modes')
+    const labelledby = ref<string | undefined>('editor-mode-title')
+    const wrapper = mount(() =>
+      h(
+        Tabs,
+        {
+          id: 'consumer-tabs',
+          'data-owner': 'consumer',
+          'aria-label': label.value,
+          'aria-labelledby': labelledby.value,
+        },
+        () => [
+          <TabPane name="write" label="Write">
+            Editor
+          </TabPane>,
+          <TabPane name="preview" label="Preview">
+            Preview
+          </TabPane>,
+        ],
+      ),
+    )
+    try {
+      await nextTick()
+      const tabs = wrapper.findComponent(Tabs)
+      const nav = wrapper.findComponent(TabNav)
+      const tablist = wrapper.get('[role="tablist"]')
+      expect(nav.attributes('aria-label')).toBe('Editor modes')
+      expect(nav.attributes('aria-labelledby')).toBe('editor-mode-title')
+      expect(tablist.attributes('aria-label')).toBe('Editor modes')
+      expect(tablist.attributes('aria-labelledby')).toBe('editor-mode-title')
+      expect(tabs.attributes('aria-label')).toBe('Editor modes')
+      expect(tabs.attributes('aria-labelledby')).toBe('editor-mode-title')
+      expect(tabs.attributes('id')).toBe('consumer-tabs')
+      expect(tabs.attributes('data-owner')).toBe('consumer')
+      expect(tablist.attributes('id')).toBeUndefined()
+      expect(tablist.attributes('data-owner')).toBeUndefined()
+
+      label.value = 'Changed editor modes'
+      await nextTick()
+      expect(nav.attributes('aria-label')).toBe('Changed editor modes')
+      expect(tablist.attributes('aria-labelledby')).toBe('editor-mode-title')
+      labelledby.value = 'changed-editor-mode-title'
+      await nextTick()
+      expect(nav.attributes('aria-labelledby')).toBe(
+        'changed-editor-mode-title',
+      )
+      expect(tablist.attributes('aria-label')).toBe('Changed editor modes')
+      expect(tablist.attributes('aria-labelledby')).toBe(
+        'changed-editor-mode-title',
+      )
+      expect(tabs.attributes('aria-label')).toBe('Changed editor modes')
+      expect(tabs.attributes('aria-labelledby')).toBe(
+        'changed-editor-mode-title',
+      )
+
+      label.value = undefined
+      await nextTick()
+      expect(nav.attributes('aria-label')).toBeUndefined()
+      expect(tablist.attributes('aria-label')).toBeUndefined()
+      expect(tablist.attributes('aria-labelledby')).toBe(
+        'changed-editor-mode-title',
+      )
+      labelledby.value = undefined
+      await nextTick()
+      expect(nav.attributes('aria-labelledby')).toBeUndefined()
+      expect(tablist.attributes('aria-label')).toBeUndefined()
+      expect(tablist.attributes('aria-labelledby')).toBeUndefined()
+      expect(tabs.attributes('aria-label')).toBeUndefined()
+      expect(tabs.attributes('aria-labelledby')).toBeUndefined()
+    } finally {
+      wrapper.unmount()
+    }
+  })
+
   test('applies component motion attrs', async () => {
     const wrapper = mount(() => <Tabs motion="route-fade" />)
 
