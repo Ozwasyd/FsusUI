@@ -48,7 +48,9 @@ const validateMarkdownWorkflowSource = (source) => {
   if (
     !/- uses: actions\/checkout@v4\n\s+with:\n\s+fetch-depth: 0\n/u.test(job)
   ) {
-    failures.push('playwright-markdown checkout must retain origin/main and history')
+    failures.push(
+      'playwright-markdown checkout must retain origin/main and history',
+    )
   }
   if (/\n\s+(?:strategy|matrix):/u.test(job)) {
     failures.push('playwright-markdown job must not use strategy/matrix')

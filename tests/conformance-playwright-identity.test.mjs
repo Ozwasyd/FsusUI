@@ -516,7 +516,12 @@ test('PR missing and malformed plans still fail closed', () => {
     writeFileSync(planPath, '{')
     for (const group of ['main', 'nightly', 'release']) {
       assert.equal(
-        loadConformanceCliImpactPlan(['--group', group, '--impact-plan', planPath]),
+        loadConformanceCliImpactPlan([
+          '--group',
+          group,
+          '--impact-plan',
+          planPath,
+        ]),
         null,
       )
     }
@@ -540,7 +545,6 @@ test('PR missing and malformed plans still fail closed', () => {
     rmSync(scratch, { recursive: true, force: true })
   }
 })
-
 
 test('a full branch checkout retains the real default-branch baseline and candidate', () =>
   fixture(({ scratch, producer, candidate: main }) => {
