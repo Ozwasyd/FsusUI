@@ -1,3 +1,4 @@
+---
 'element-plus': minor
 ---
 
