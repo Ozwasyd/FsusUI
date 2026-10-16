@@ -152,6 +152,9 @@ test.describe('coarse pointer Button keyboard focus', () => {
       page,
     }, testInfo) => {
       await openFixture(page, 'basic', theme)
+      await page.evaluate(async () => {
+        await document.fonts.ready
+      })
       expect(
         await page.evaluate(() => ({
           coarsePointer: window.matchMedia('(pointer: coarse)').matches,
@@ -182,6 +185,19 @@ test.describe('coarse pointer Button keyboard focus', () => {
           focusVisible: element.matches(':focus-visible'),
         }))
 
+      await button.scrollIntoViewIfNeeded()
+      const restingBounds = await button.boundingBox()
+      expect(restingBounds).not.toBeNull()
+      const expectNoTravel = async () => {
+        await expect
+          .poll(() =>
+            button.evaluate((element) => getComputedStyle(element).transform),
+          )
+          .toBe('none')
+        await expect.poll(() => button.boundingBox()).toEqual(restingBounds)
+      }
+      await expectNoTravel()
+
       await button.tap()
       await expect(button).toBeFocused()
       await expect
@@ -194,6 +210,7 @@ test.describe('coarse pointer Button keyboard focus', () => {
           ),
         )
         .toBe('none')
+      await expectNoTravel()
 
       await page.keyboard.press('Tab')
       await expect(nextButton).toBeFocused()
@@ -203,6 +220,7 @@ test.describe('coarse pointer Button keyboard focus', () => {
         .poll(focusState)
         .toEqual({ hovered: true, focusVisible: true })
       await expectTwoPixelInsetRing(button)
+      await expectNoTravel()
       await attachScreenshot(
         page,
         testInfo,
