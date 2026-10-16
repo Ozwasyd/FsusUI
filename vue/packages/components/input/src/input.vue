@@ -13,7 +13,7 @@
         <slot name="prepend" />
       </div>
 
-      <div ref="wrapperRef" :class="wrapperKls">
+      <div v-bind="templateRef" :class="wrapperKls">
         <!-- prefix slot -->
         <span v-if="$slots.prefix || prefixIcon" :class="nsInput.e('prefix')">
           <span :class="nsInput.e('prefix-inner')">
@@ -260,6 +260,8 @@ const { wrapperRef, isFocused, handleFocus, handleBlur } = useFocusController(
     },
   },
 )
+
+const templateRef = { ref: wrapperRef, ref_key: 'wrapperRef' }
 
 const needStatusIcon = computed(() => form?.statusIcon ?? false)
 const validateState = computed(() => formItem?.validateState || '')

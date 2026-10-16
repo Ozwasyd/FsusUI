@@ -1,7 +1,7 @@
 <template>
   <div
     v-show="ready"
-    ref="carouselItemRef"
+    v-bind="templateRef"
     :class="[
       ns.e('item'),
       ns.is('active', active),
@@ -51,6 +51,7 @@ const {
   ready,
   handleItemClick,
 } = useCarouselItem(props, COMPONENT_NAME)
+const templateRef = { ref: carouselItemRef, ref_key: 'carouselItemRef' }
 
 const itemStyle = computed<CSSProperties>(() => {
   const translateType = `translate${unref(isVertical) ? 'Y' : 'X'}`
