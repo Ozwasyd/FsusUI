@@ -2,6 +2,7 @@
   <div
     v-bind="componentMotionAttrs"
     :class="[ns.b(), ns.is('disabled', disabled)]"
+    @keydown="handleTriggerKeydown"
   >
     <el-tooltip ref="popperRef" v-bind="tooltipBindings" v-on="tooltipEvents">
       <template #content>
@@ -58,6 +59,8 @@ import {
   computed,
   defineComponent,
   getCurrentInstance,
+  nextTick,
+  onBeforeUnmount,
   provide,
   ref,
   toRef,
@@ -67,6 +70,7 @@ import ElTooltip from '@element-plus/components/tooltip'
 import ElScrollbar from '@element-plus/components/scrollbar'
 import ElIcon from '@element-plus/components/icon'
 import ElRovingFocusGroup from '@element-plus/components/roving-focus-group'
+import { FOCUS_AFTER_RELEASED } from '@element-plus/components/focus-trap'
 import { ElOnlyChild } from '@element-plus/components/slot'
 import { useFormSize } from '@element-plus/components/form'
 import { addUnit, ensureArray } from '@element-plus/utils'
@@ -79,8 +83,9 @@ import {
 } from '@element-plus/components/motion'
 import { ElCollection as ElDropdownCollection, dropdownProps } from './dropdown'
 import { DROPDOWN_INJECTION_KEY } from './tokens'
+import { dropdownViewportModifiers } from './viewport-modifiers'
 
-import type { CSSProperties, ComponentPublicInstance } from 'vue'
+import type { CSSProperties, ComponentPublicInstance, Ref } from 'vue'
 import type { Measurable } from '@element-plus/components/popper'
 import type { Placement } from '@element-plus/components/popper'
 
@@ -113,18 +118,31 @@ export default defineComponent({
       (ComponentPublicInstance & { $el: HTMLElement }) | null
     >(null)
     const popperRef = ref<InstanceType<typeof ElTooltip> | null>(null)
+    let focusRestoreGeneration = 0
+    let stopFocusRestore: (() => void) | undefined
+    let focusRestoreRequest:
+      | { generation: number; trigger: HTMLElement; content: HTMLElement }
+      | undefined
+    let popupVisible = false
     const contentRef = ref<HTMLElement | null>(null)
     const scrollbar = ref(null)
     const currentTabId = ref<string | null>(null)
     const isUsingKeyboard = ref(false)
-    const triggerKeys = [EVENT_CODE.enter, EVENT_CODE.space, EVENT_CODE.down]
+    const triggerKeys = [
+      EVENT_CODE.enter,
+      EVENT_CODE.space,
+      EVENT_CODE.down,
+      EVENT_CODE.up,
+    ]
     const triggerTargetEl = computed(() => contentRef.value ?? undefined)
     const virtualRef = computed<Measurable | undefined>(
       () => triggeringElementRef.value?.$el ?? undefined,
     )
 
     const wrapStyle = computed<CSSProperties>(() => ({
-      maxHeight: addUnit(props.maxHeight),
+      maxHeight: props.viewportBounded
+        ? `min(${addUnit(props.maxHeight) || '274px'}, calc(var(--el-dropdown-viewport-height, 100dvh) - 24px))`
+        : addUnit(props.maxHeight),
     }))
     const dropdownTriggerKls = computed(() => [ns.m(dropdownSize.value)])
     const trigger = computed(() => ensureArray(props.trigger))
@@ -152,10 +170,22 @@ export default defineComponent({
       role: props.role,
       effect: props.effect,
       fallbackPlacements,
-      popperOptions: props.popperOptions,
+      popperOptions: props.viewportBounded
+        ? {
+            ...props.popperOptions,
+            modifiers: [
+              ...dropdownViewportModifiers(),
+              ...(props.popperOptions.modifiers || []),
+            ],
+          }
+        : props.popperOptions,
       hideAfter: trigger.value.includes('hover') ? props.hideTimeout : 0,
       placement: props.placement,
-      popperClass: [ns.e('popper'), props.popperClass],
+      popperClass: [
+        ns.e('popper'),
+        ns.is('viewport-bounded', props.viewportBounded),
+        props.popperClass,
+      ],
       referenceElement: referenceElementRef.value?.$el,
       trigger: trigger.value,
       triggerKeys,
@@ -206,10 +236,12 @@ export default defineComponent({
     }
 
     function handleClose() {
+      cancelFocusRestore()
       popperRef.value?.onClose()
     }
 
     function handleOpen() {
+      cancelFocusRestore()
       popperRef.value?.onOpen()
     }
 
@@ -238,7 +270,10 @@ export default defineComponent({
       }
     }
 
-    function handleBeforeShowTooltip() {
+    function handleBeforeShowTooltip(event?: Event) {
+      popupVisible = true
+      cancelFocusRestore()
+      isUsingKeyboard.value = event?.type === 'keydown'
       emit('visible-change', true)
     }
 
@@ -249,8 +284,120 @@ export default defineComponent({
     }
 
     function handleBeforeHideTooltip() {
+      popupVisible = false
+      const request = focusRestoreRequest
       emit('visible-change', false)
+
+      if (!request) return
+      nextTick(() => {
+        if (
+          focusRestoreRequest !== request ||
+          request.generation !== focusRestoreGeneration ||
+          popupVisible
+        ) {
+          return
+        }
+
+        const { trigger, content } = request
+        const document = trigger.ownerDocument
+        const focused = document.activeElement
+        const ownsFocus =
+          (!contentRef.value || contentRef.value === content) &&
+          (content.contains(focused) ||
+            (!content.isConnected && focused === document.body))
+        cancelFocusRestore()
+        if (
+          ownsFocus &&
+          document.hasFocus() &&
+          trigger === triggeringElementRef.value?.$el &&
+          trigger.isConnected &&
+          !props.disabled
+        ) {
+          trigger.focus({ preventScroll: true })
+        }
+      })
     }
+
+    function handleContentKeydown(
+      event: KeyboardEvent,
+      trapRef: Ref<HTMLElement | undefined>,
+    ) {
+      if (event.code === EVENT_CODE.esc) requestFocusRestore(trapRef)
+    }
+
+    function handleTriggerKeydown(event: KeyboardEvent) {
+      if (!props.disabled && triggerKeys.includes(event.code)) {
+        cancelFocusRestore()
+      }
+      if (event.code !== EVENT_CODE.esc) return
+
+      if (popupVisible) {
+        event.preventDefault()
+        event.stopPropagation()
+      }
+      // onClose also replaces a show-timeout before before-show has fired.
+      popperRef.value?.onClose(event)
+    }
+
+    function cancelFocusRestore() {
+      ++focusRestoreGeneration
+      focusRestoreRequest = undefined
+      stopFocusRestore?.()
+      stopFocusRestore = undefined
+    }
+
+    function requestFocusRestore(trapRef: Ref<HTMLElement | undefined>) {
+      cancelFocusRestore()
+      const trigger = triggeringElementRef.value?.$el
+      const content = contentRef.value
+      const trap = trapRef.value
+      if (!popupVisible || !trigger || !content || !trap) return
+      const document = trigger.ownerDocument
+      if (!content.contains(document.activeElement)) return
+
+      const request = { generation: focusRestoreGeneration, trigger, content }
+      focusRestoreRequest = request
+      const revoke = () => {
+        if (focusRestoreRequest === request) cancelFocusRestore()
+      }
+      const onFocusIn = (event: FocusEvent) => {
+        if (!content.contains(event.target as Node)) revoke()
+      }
+      const onFocusReleased = (event: Event) => {
+        const focused = document.activeElement
+        if (
+          event.target === trap &&
+          trapRef.value === trap &&
+          contentRef.value === content &&
+          focusRestoreRequest === request &&
+          request.generation === focusRestoreGeneration &&
+          trigger === triggeringElementRef.value?.$el &&
+          trigger.isConnected &&
+          !props.disabled &&
+          document.hasFocus() &&
+          (content.contains(focused) ||
+            (!content.isConnected && focused === document.body))
+        ) {
+          // This Escape owns the return to its trigger, not the trap's prior input.
+          event.preventDefault()
+        }
+      }
+      trap.addEventListener(FOCUS_AFTER_RELEASED, onFocusReleased, true)
+      // External focus or newer input revokes ownership; leave never reclaims it.
+      document.addEventListener('focusin', onFocusIn, true)
+      document.addEventListener('keydown', revoke, true)
+      document.addEventListener('pointerdown', revoke, true)
+      document.addEventListener('pointermove', revoke, true)
+      stopFocusRestore = () => {
+        trap.removeEventListener(FOCUS_AFTER_RELEASED, onFocusReleased, true)
+        document.removeEventListener('focusin', onFocusIn, true)
+        document.removeEventListener('keydown', revoke, true)
+        document.removeEventListener('pointerdown', revoke, true)
+        document.removeEventListener('pointermove', revoke, true)
+      }
+    }
+
+    onBeforeUnmount(cancelFocusRestore)
 
     provide(DROPDOWN_INJECTION_KEY, {
       contentRef,
@@ -259,6 +406,7 @@ export default defineComponent({
       isUsingKeyboard,
       onItemEnter,
       onItemLeave,
+      onMenuKeydown: handleContentKeydown,
     })
 
     provide('elDropdown', {
@@ -309,6 +457,8 @@ export default defineComponent({
       handleBeforeShowTooltip,
       handleShowTooltip,
       handleBeforeHideTooltip,
+      handleContentKeydown,
+      handleTriggerKeydown,
       onFocusAfterTrapped,
       popperRef,
       contentRef,
