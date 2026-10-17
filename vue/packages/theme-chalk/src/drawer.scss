@@ -114,6 +114,10 @@ $drawer-inline-pad: getCssVar('drawer-padding-primary');
   &.btt {
     left: 0;
     right: 0;
+
+    .#{$namespace}-drawer__close-btn {
+      @include fsus-inset-safe-area(right, $drawer-inline-pad);
+    }
   }
 
   &.ltr {
