@@ -79,6 +79,7 @@ function inputDigests(repoRoot) {
     'scripts/npm-candidate-lib.mjs',
     'scripts/package-candidate.mjs',
     'scripts/prepare-npm-package.mjs',
+    'scripts/bundled-workspace-references.mjs',
     'vue/packages/element-plus/package.json',
   ]
   return Object.fromEntries(

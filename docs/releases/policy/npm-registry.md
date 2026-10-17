@@ -104,7 +104,10 @@ its failure stops the package build. Process exit releases compiler heaps and
 caches between these stages without changing their configurations or skipping
 any package checks. Within each full-bundle stage, the entry and every discovered
 locale are built sequentially; both original unminified and minified passes and
-all output formats remain required.
+all output formats remain required. The two complete full-bundle variants also
+run in separate, sequential children through the normal entry and heap wrapper,
+releasing each process's compiler state before the next variant begins. A failed
+variant stops the package build.
 
 Output formats are also written sequentially in their original option order,
 preserving all maps and the returned results' order, count, and object identities.
@@ -116,6 +119,12 @@ The tarball must not contain `.env`, `.npmrc`, private tokens, `workspace:`
 protocols, local paths, private registry URLs, source maps, WASM debug output,
 unnecessary tests/fixtures, private screenshots/docs, or large unused files.
 The current audit is under `docs/releases/evidence/npm-public-preview/`.
+
+Bundled workspace reference rewriting and its residual audit inspect code
+literals and compiler dependency directives, retaining generated license comments
+unchanged. Unsupported compiler directives and real workspace references still
+fail preparation; license attribution is not a runtime dependency. The reference
+inspector is bound by the candidate input fingerprint.
 
 Verify a fresh consumer install from that tarball:
 

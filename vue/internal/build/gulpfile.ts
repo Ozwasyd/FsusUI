@@ -100,7 +100,7 @@ const resolveBundledWorkspaceRuntimeSpecifier = (
     filePath.endsWith('.d.mts') ||
     filePath.endsWith('.d.cts')
   ) {
-    return 'element-plus/es/motion'
+    return 'element-plus/es/motion/index'
   }
 
   const relativePath = path

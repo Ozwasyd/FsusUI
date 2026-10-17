@@ -5,6 +5,7 @@ import * as vueCompiler from 'vue/compiler-sfc'
 import glob from 'fast-glob'
 import chalk from 'chalk'
 import { Project } from 'ts-morph'
+import { copy } from 'fs-extra'
 import {
   buildOutput,
   epRoot,
@@ -229,6 +230,12 @@ const runGenerateTypesDefinitions = async () => {
   )
 
   await writeWasmDeclarationOwner()
+  // The public wrapper and bundled runtime have distinct owners. Preserve the
+  // canonical generated icons declaration tree beside its runtime modules.
+  await copy(
+    path.dirname(iconsVueTypesEntry),
+    path.join(outDir, 'packages', 'icons-vue', 'src'),
+  )
 }
 
 export const generateTypesDefinitions: TaskFunction = (done) => {
