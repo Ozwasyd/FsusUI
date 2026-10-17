@@ -6,6 +6,12 @@ export * from '@element-plus/hooks'
 export * from './make-installer'
 export * from './render-pipeline-policies'
 export * from './result'
+export {
+  currentMarkdownAnchors,
+  planMarkdownAnchorInsert,
+  planMarkdownAnchorEdit,
+  planMarkdownAnchorRemove,
+} from '@element-plus/components/markdown-editor/src/markdown-editor-anchor-commands'
 export { ElEmptyState } from '@element-plus/components/empty-state'
 export { ElSiteHeader } from '@element-plus/components/site-header'
 export {

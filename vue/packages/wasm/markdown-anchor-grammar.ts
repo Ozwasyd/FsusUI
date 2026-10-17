@@ -1,3 +1,6 @@
+import { createMarkdownSourceCoordinateMap } from './markdown-source-coordinate-map'
+import { collectMarkdownSyntaxNodesFromParser } from './markdown-syntax-collect'
+
 export const MARKDOWN_ANCHOR_ID = /^[a-z][a-z0-9-]{0,63}$/
 
 export const MARKDOWN_ANCHOR_DIAGNOSTIC_CODES = Object.freeze([
@@ -155,13 +158,15 @@ export const parseMarkdownAnchorMarker = (
   text: string,
   start: number,
 ): MarkdownAnchorNode | null => {
-  const match = /(?:^| )(\^([a-zA-Z0-9-]{1,64}))$/.exec(text)
+  // Recognize a marker token before validating its ID; malformed IDs must
+  // remain available for diagnostics. Backticks and whitespace delimit prose.
+  const match = /(?:^| )(\^([^\s`]+))$/u.exec(text)
   if (!match || match.index === undefined) return null
   const marker = match[1]!
   const id = match[2]!
   const markerStart = start + match.index + (match[0].startsWith(' ') ? 1 : 0)
   const markerEnd = markerStart + marker.length
-  if (!match[0].startsWith(' ') && match.index !== 0) {
+  if (match[0].startsWith(' ') && (match.index === 0 || /\s/u.test(text[match.index - 1]!))) {
     return fail(markerStart, markerEnd, 'anchor-placement', 'anchor requires a single leading space or exclusive line')
   }
   if (!MARKDOWN_ANCHOR_ID.test(id)) {
@@ -188,6 +193,23 @@ export const collectMarkdownAnchorNodes = (
   const insideAtomic = markAtomicRegionLines(lines)
   const nodes: MarkdownAnchorNode[] = []
   const seen = new Map<string, number>()
+  let paragraphRanges: readonly MarkdownAnchorRange[] | undefined
+  const isFinalParagraphLine = (marker: MarkdownAnchorRange) => {
+    if (!paragraphRanges) {
+      // Reuse canonical block ownership; source line scanning must not invent
+      // paragraph boundaries. Parser offsets are normalized UTF-8 bytes.
+      const coordinates = createMarkdownSourceCoordinateMap(source)
+      const normalizedCoordinates = createMarkdownSourceCoordinateMap(coordinates.normalizedSource)
+      paragraphRanges = collectMarkdownSyntaxNodesFromParser(source)
+        .filter((node) => node.kind === 'paragraph')
+        .map((node) => coordinates.toRawRange({
+          start: normalizedCoordinates.toRawOffsetFromUtf8(node.start),
+          end: normalizedCoordinates.toRawOffsetFromUtf8(node.end),
+        }))
+    }
+    const owner = paragraphRanges.find((range) => range.start <= marker.start && marker.end <= range.end)
+    return !owner || source.slice(marker.end, owner.end).trim() === ''
+  }
   const hasPrecedingBlock = (index: number) => {
     for (let cursor = index - 1; cursor >= 0; cursor -= 1) {
       if (lines[cursor]!.text.trim() !== '') return true
@@ -249,6 +271,12 @@ export const collectMarkdownAnchorNodes = (
     if (parsed.placement === 'line-end' && !INLINE_CAPABLE.test(line.text.slice(0, -parsed.ranges.full.end + parsed.ranges.full.start))) {
       nodes.push(
         fail(parsed.ranges.full.start, parsed.ranges.full.end, 'anchor-placement', 'line-end anchors require an inline-capable block'),
+      )
+      continue
+    }
+    if (parsed.placement === 'line-end' && !isFinalParagraphLine(parsed.ranges.full)) {
+      nodes.push(
+        fail(parsed.ranges.full.start, parsed.ranges.full.end, 'anchor-placement', 'line-end anchors must be on the final source line of their owning paragraph'),
       )
       continue
     }
