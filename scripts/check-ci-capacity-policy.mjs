@@ -361,4 +361,112 @@ console.log(
   `[ci-capacity] full-build scheduler: ${localeFiles.length} locales, both variants, serial/await/error controls ok`,
 )
 
+const { writeBundles } = require('../vue/internal/build/src/utils/rollup.ts')
+for (const outputOptions of [
+  [
+    { format: 'esm', sourcemap: true },
+    { format: 'cjs', sourcemap: true },
+  ],
+  [
+    { format: 'umd', sourcemap: false },
+    { format: 'esm', sourcemap: false },
+  ],
+]) {
+  const options = outputOptions.map((option) => Object.freeze(option))
+  const results = options.map(() => ({ output: [] }))
+  const calls = []
+  let active = 0
+  let maxActive = 0
+  let settled = false
+  const firstGate = deferred()
+  const secondGate = deferred()
+  const secondStarted = deferred()
+  const work = writeBundles(
+    {
+      write: async (option) => {
+        calls.push(option)
+        active += 1
+        maxActive = Math.max(maxActive, active)
+        if (option === options[0]) await firstGate.promise
+        else {
+          secondStarted.release()
+          await secondGate.promise
+        }
+        active -= 1
+        return results[options.indexOf(option)]
+      },
+    },
+    options,
+  ).then((outputs) => {
+    settled = true
+    return outputs
+  })
+  console.log(
+    `[ci-capacity] writer initial dispatch=${calls.map((option) => option.format).join(',')} active=${active} max=${maxActive}`,
+  )
+  assert.equal(maxActive, 1, 'output writers must not overlap')
+  assert.deepEqual(calls, [options[0]])
+  assert.equal(settled, false)
+  firstGate.release()
+  await Promise.race([
+    secondStarted.promise,
+    work.then(() => {
+      throw new Error('writer finished without starting its second output')
+    }),
+  ])
+  assert.equal(active, 1)
+  assert.equal(maxActive, 1)
+  assert.equal(settled, false)
+  assert.equal(calls.length, 2)
+  assert.equal(calls[0], options[0])
+  assert.equal(calls[1], options[1])
+  secondGate.release()
+  const outputs = await work
+  assert.equal(settled, true)
+  assert.equal(active, 0)
+  assert.equal(maxActive, 1)
+  assert.equal(outputs.length, results.length)
+  for (const [index, result] of results.entries()) {
+    assert.equal(
+      outputs[index],
+      result,
+      'preserve each original output identity',
+    )
+  }
+}
+const writerOptions = [
+  { format: 'esm', sourcemap: true },
+  { format: 'cjs', sourcemap: true },
+]
+for (const failingIndex of [0, 1]) {
+  const error = new Error(`output writer ${failingIndex} failure`)
+  const calls = []
+  await assert.rejects(
+    writeBundles(
+      {
+        write: async (option) => {
+          calls.push(option)
+          if (option === writerOptions[failingIndex]) throw error
+          return { output: [] }
+        },
+      },
+      writerOptions,
+    ),
+    (actualError) => actualError === error,
+  )
+  assert.deepEqual(calls, writerOptions.slice(0, failingIndex + 1))
+}
+const emptyOutputs = await writeBundles(
+  {
+    write: async () => {
+      assert.fail('an empty output list must not invoke a writer')
+    },
+  },
+  [],
+)
+assert.deepEqual(emptyOutputs, [])
+console.log(
+  '[ci-capacity] output writer order/identity/await/error controls ok',
+)
+
 console.log('[ci-capacity] fixtures ok')

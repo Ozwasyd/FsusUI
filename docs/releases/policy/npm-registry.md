@@ -106,6 +106,12 @@ any package checks. Within each full-bundle stage, the entry and every discovere
 locale are built sequentially; both original unminified and minified passes and
 all output formats remain required.
 
+Output formats are also written sequentially in their original option order,
+preserving all maps and the returned results' order, count, and object identities.
+A writer failure propagates its original error and stops later formats from
+starting. This is an internal scheduling boundary; it does not recursively limit
+all asynchronous work or guarantee constant memory use.
+
 The tarball must not contain `.env`, `.npmrc`, private tokens, `workspace:`
 protocols, local paths, private registry URLs, source maps, WASM debug output,
 unnecessary tests/fixtures, private screenshots/docs, or large unused files.

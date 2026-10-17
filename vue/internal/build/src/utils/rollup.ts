@@ -1,6 +1,6 @@
 import { epPackage, getPackageDependencies } from '@element-plus/build-utils'
 
-import type { OutputOptions, RollupBuild } from 'rollup'
+import type { OutputOptions, RollupBuild, RollupOutput } from 'rollup'
 
 type RollupWarning = {
   code?: string
@@ -86,8 +86,13 @@ export const generateExternal = async (options: { full: boolean }) => {
   }
 }
 
-export function writeBundles(bundle: RollupBuild, options: OutputOptions[]) {
-  return Promise.all(options.map((option) => bundle.write(option)))
+export async function writeBundles(
+  bundle: RollupBuild,
+  options: OutputOptions[],
+): Promise<RollupOutput[]> {
+  const outputs: RollupOutput[] = []
+  for (const option of options) outputs.push(await bundle.write(option))
+  return outputs
 }
 
 export function formatBundleFilename(
