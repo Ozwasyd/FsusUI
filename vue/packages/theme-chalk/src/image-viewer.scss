@@ -8,6 +8,10 @@
 }
 
 @include b(image-viewer) {
+  // A full 44px action row also needs the two existing 1px toolbar borders.
+  $row-height: 46px;
+  $bottom-gap: fsus-safe-area-max(30px, bottom);
+
   @include e(wrapper) {
     // Scrim-equivalent surface: full viewport coverage, never safe-area shrunk.
     @include fsus-overlay-scrim;
@@ -80,21 +84,9 @@
   }
 
   @include e(actions) {
-    // A full 44px action row also needs the two existing 1px toolbar borders.
-    $row-height: 46px;
     $controls-bottom: max(
       calc(var(--fsus-viewport-block-size) / 2 + 22px),
       calc(#{fsus-safe-area-max(40px, top)} + 44px)
-    );
-    // Compress the preferred dock gap before consuming the action row budget.
-    $bottom-gap: fsus-safe-area-max(
-      min(
-        30px,
-        calc(
-          var(--fsus-viewport-block-size) - #{$controls-bottom} - #{$row-height}
-        )
-      ),
-      bottom
     );
 
     @include fsus-inset-safe-area(left, 16px);
@@ -175,6 +167,24 @@
 
   @include e(close) {
     @include op-icon();
+  }
+
+  // Below the default close/navigation separation budget, reserve the full
+  // toolbar row and keep next beside close instead of painting over it.
+  @media (max-height: #{2 * (40px + 44px + 22px)}) {
+    @include e((prev, next)) {
+      top: min(
+        50%,
+        calc(
+          var(--fsus-viewport-block-size) - #{$bottom-gap} - #{$row-height} -
+            22px
+        )
+      );
+    }
+
+    @include e(next) {
+      right: calc(#{fsus-safe-area-max(40px, right)} + 44px);
+    }
   }
 
   @include e(mask) {
