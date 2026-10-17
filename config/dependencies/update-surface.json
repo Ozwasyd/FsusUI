@@ -736,6 +736,22 @@
       "stabilityPolicy": "stable-only"
     },
     {
+      "id": "npm-happy-dom",
+      "datasource": "npm",
+      "packageName": "happy-dom",
+      "authorityKey": "happy-dom",
+      "manager": "custom.jsonata",
+      "customManager": "npm-authority",
+      "files": [
+        "config/dependencies/npm-authority.json",
+        "package.json",
+        "pnpm-lock.yaml"
+      ],
+      "versioning": "npm",
+      "group": "js-test-quality-tooling",
+      "stabilityPolicy": "stable-only"
+    },
+    {
       "id": "npm-husky",
       "datasource": "npm",
       "packageName": "husky",

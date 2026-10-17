@@ -47,6 +47,7 @@ import {
 } from '@element-plus/components/descriptions'
 import { ElDialog } from '@element-plus/components/dialog'
 import { ElDivider } from '@element-plus/components/divider'
+import { ElResizeSeparator } from '@element-plus/components/resize-separator'
 import { ElDrawer } from '@element-plus/components/drawer'
 import {
   ElDropdown,
@@ -211,6 +212,7 @@ export const allComponents = [
   ElDescriptionsItem,
   ElDialog,
   ElDivider,
+  ElResizeSeparator,
   ElDrawer,
   ElDropdown,
   ElDropdownItem,

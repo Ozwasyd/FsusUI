@@ -330,6 +330,8 @@ export interface MarkdownEditorTransactionDispatcher {
 }
 
 export interface MarkdownEditorSelectionEvent {
+  /** Always captured by the editor; optional for legacy event-object compatibility. */
+  readonly documentIdentity?: MarkdownEditorDocumentIdentity
   readonly revision: number
   readonly selection: MarkdownEditorResolvedSelection
 }
@@ -360,6 +362,14 @@ interface HistoryEntry {
   readonly retainedUnits: number
   readonly steps: readonly HistoryStep[]
   readonly timestamp: number
+}
+
+/** Opaque checkpoint retained by the sole transaction/history owner. */
+export interface MarkdownEditorRetainedTransactionSnapshot {
+  readonly documentIdentity: MarkdownEditorDocumentIdentity
+  readonly history: MarkdownEditorHistoryState
+  readonly revision: number
+  readonly selection: MarkdownEditorResolvedSelection
 }
 
 interface MarkdownEditorStoreMutation extends MarkdownEditorDispatchResult {
@@ -611,6 +621,9 @@ const freezeTransaction = (
 
 export class MarkdownEditorTransactionStore {
   #documentIdentity: MarkdownEditorDocumentIdentity
+  #retainedSnapshot: MarkdownEditorRetainedTransactionSnapshot | undefined
+  #retainedHistory: readonly HistoryEntry[] | undefined
+  #retainedRedo: readonly HistoryEntry[] | undefined
   #mergeBlocked = false
   #redo: HistoryEntry[] = []
   #revision = 0
@@ -668,8 +681,65 @@ export class MarkdownEditorTransactionStore {
     })
   }
 
+  get retainedSessionUnits() {
+    const entries = new Set([
+      ...this.#undo, ...this.#redo,
+      ...(this.#retainedHistory ?? []), ...(this.#retainedRedo ?? []),
+    ])
+    return [...entries].reduce((total, entry) => total + entry.retainedUnits, 0)
+  }
+
   get documentIdentity() {
     return Object.freeze({ ...this.#documentIdentity })
+  }
+
+  retainSnapshot(): MarkdownEditorRetainedTransactionSnapshot {
+    const snapshot = Object.freeze({
+      documentIdentity: this.documentIdentity,
+      history: this.history,
+      revision: this.#revision,
+      selection: this.selection,
+    })
+    // History entries are immutable. Only this store retains and restores them;
+    // consumers receive neither the source nor the undo/redo entries.
+    this.#retainedSnapshot = snapshot
+    this.#retainedHistory = this.#undo.slice()
+    this.#retainedRedo = this.#redo.slice()
+    return snapshot
+  }
+
+  /** Read only this store's actual bounded token/history custody; never restore or retain. */
+  validateRetainedSnapshot(snapshot: MarkdownEditorRetainedTransactionSnapshot): boolean {
+    return snapshot === this.#retainedSnapshot &&
+      snapshot.documentIdentity.id === this.#documentIdentity.id &&
+      snapshot.documentIdentity.epoch === this.#documentIdentity.epoch &&
+      snapshot.revision === this.#revision &&
+      this.#retainedHistory !== undefined && this.#retainedRedo !== undefined
+  }
+
+  restoreRetainedSnapshot(snapshot: MarkdownEditorRetainedTransactionSnapshot) {
+    if (
+      snapshot !== this.#retainedSnapshot ||
+      snapshot.documentIdentity.id !== this.#documentIdentity.id ||
+      snapshot.documentIdentity.epoch !== this.#documentIdentity.epoch ||
+      snapshot.revision !== this.#revision ||
+      !this.#retainedHistory ||
+      !this.#retainedRedo
+    ) {
+      return false
+    }
+    this.#undo = [...this.#retainedHistory]
+    this.#redo = [...this.#retainedRedo]
+    this.#selection = snapshot.selection
+    // A resumed session must never merge into input preceding suspension.
+    this.breakMergeGroup()
+    return true
+  }
+
+  releaseRetainedSnapshot() {
+    this.#retainedSnapshot = undefined
+    this.#retainedHistory = undefined
+    this.#retainedRedo = undefined
   }
 
   switchDocument(
@@ -677,6 +747,7 @@ export class MarkdownEditorTransactionStore {
     value: string,
     selection?: MarkdownEditorSelection,
   ) {
+    this.releaseRetainedSnapshot()
     this.#documentIdentity = Object.freeze({ ...documentIdentity })
     this.#value = value
     this.#selection = normalizeMarkdownEditorSelection(

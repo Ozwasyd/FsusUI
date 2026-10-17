@@ -1,10 +1,12 @@
 import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
-import { mount } from '@vue/test-utils'
+import { flushPromises, mount } from '@vue/test-utils'
 import { nextTick } from 'vue'
 import { afterEach, describe, expect, expectTypeOf, it, vi } from 'vitest'
 import MarkdownEditor from '../src/markdown-editor.vue'
 import { createMarkdownOutlineModel } from '../src/markdown-editor-outline'
+import { createMarkdownEditorSessionBinding } from '../src/markdown-editor-session'
+import { MarkdownEditorTransactionStore } from '../src/markdown-editor-transaction'
 import {
   defaultMarkdownEditorCommands,
   markdownEditorEmits,
@@ -13,6 +15,8 @@ import {
   runMarkdownEditorCommand,
 } from '../src/markdown-editor'
 import type {
+  MarkdownAttachmentProviderResult,
+  MarkdownEditorAttachmentDispatch,
   MarkdownEditorCommand,
   MarkdownEditorInstance,
   MarkdownEditorProps,
@@ -22,6 +26,179 @@ import type {
 import { getMarkdownXssSourceUrl } from '../../../../tests/support/markdown-xss-corpus'
 
 describe('MarkdownEditor', () => {
+  it('checks actual consumer admission after view capture and before replacing or restoring original custody', () => {
+    const identity = { id: 'admission-document', epoch: 1 }
+    const store = new MarkdownEditorTransactionStore('source', undefined, identity)
+    let active = true
+    let retireDuringView = false
+    let viewRestores = 0
+    const session = createMarkdownEditorSessionBinding({
+      transactionStore: store,
+      isComposing: () => false,
+      isDisposed: () => false,
+      captureViewState: () => { if (retireDuringView) active = false; return null },
+      restoreViewState: () => { viewRestores += 1 },
+      resourceParticipants: () => [],
+      captureLastValidRender: () => null,
+    }).getSession('session:admission')
+    const assertAdmission = () => { if (!active) throw new Error('actual-consumer-retired') }
+    const expected = { documentIdentity: identity, revision: 0, assertAdmission }
+    const original = session.captureSnapshot(() => 'a'.repeat(64), expected)
+    retireDuringView = true
+    expect(() => session.captureSnapshot(() => 'b'.repeat(64), expected)).toThrow('actual-consumer-retired')
+    expect(session.validateRetainedSnapshot(original, expected)).toBe(true)
+    store.setSelection({ start: 1, end: 1, direction: 'none' })
+    const before = { history: store.history, selection: store.selection, source: store.value }
+    expect(() => session.restoreSnapshot(original, expected)).toThrow('actual-consumer-retired')
+    expect({ history: store.history, selection: store.selection, source: store.value }).toEqual(before)
+    expect(viewRestores).toBe(0)
+    active = true
+    retireDuringView = false
+    expect(session.restoreSnapshot(original, {
+      ...expected,
+      assertAdmission: () => { session.captureSnapshot(() => 'c'.repeat(64)) },
+    }).reason).toBe('editor-session-snapshot-custody-invalid')
+    expect({ history: store.history, selection: store.selection, source: store.value }).toEqual(before)
+    expect(viewRestores).toBe(0)
+  })
+
+  it('rejects old outer custody after the original transaction store switches away and back to identical coordinates', () => {
+    const identity = { id: 'aba-document', epoch: 1 }
+    const store = new MarkdownEditorTransactionStore('same source', undefined, identity)
+    const binding = createMarkdownEditorSessionBinding({
+      transactionStore: store,
+      isComposing: () => false,
+      isDisposed: () => false,
+      captureViewState: () => null,
+      restoreViewState: () => {},
+      resourceParticipants: () => [],
+      captureLastValidRender: () => null,
+    })
+    const session = binding.getSession('session:aba')
+    const snapshot = session.captureSnapshot(() => 'a'.repeat(64))
+    const expected = { documentIdentity: identity, revision: 0 }
+    expect(session.validateRetainedSnapshot(snapshot, expected)).toBe(true)
+    store.switchDocument({ id: 'other-document', epoch: 2 }, 'other source')
+    store.switchDocument(identity, 'same source')
+    expect(session.inspectDocumentState()).toEqual({ documentIdentity: identity, revision: 0 })
+    const before = { history: store.history, selection: store.selection, source: store.value }
+    expect(session.validateRetainedSnapshot(snapshot, expected)).toBe(false)
+    expect({ history: store.history, selection: store.selection, source: store.value }).toEqual(before)
+    expect(session.restoreSnapshot(snapshot, expected).reason).toBe('editor-session-history-checkpoint-invalid')
+    const originalToken = store.retainSnapshot()
+    expect(store.validateRetainedSnapshot(originalToken)).toBe(true)
+    expect(store.validateRetainedSnapshot({ ...originalToken })).toBe(false)
+    store.releaseRetainedSnapshot()
+    expect(store.validateRetainedSnapshot(originalToken)).toBe(false)
+  })
+
+  it.each(['renderer', 'attachment'] as const)('rejects %s source observation after same-source document epoch drift', (sourceOwner) => {
+    const store = new MarkdownEditorTransactionStore('same source', undefined, { id: 'source-document', epoch: 1 })
+    const binding = createMarkdownEditorSessionBinding({
+      transactionStore: store,
+      isComposing: () => false,
+      isDisposed: () => false,
+      captureViewState: () => null,
+      restoreViewState: () => {},
+      resourceParticipants: () => [],
+      captureLastValidRender: () => null,
+      [sourceOwner === 'renderer' ? 'inspectRendererResourceSource' : 'inspectAttachmentResourceSource']: () => {
+        store.switchDocument({ id: 'source-document', epoch: 2 }, 'same source')
+        return null
+      },
+    })
+    const session = binding.getSession('session:resource-source')
+    expect(() => sourceOwner === 'renderer' ? session.inspectRendererResourceSource() : session.inspectAttachmentResourceSource()).toThrow(`editor-session-${sourceOwner}-resource-source-stale`)
+    expect(session.inspectDocumentState().documentIdentity.epoch).toBe(2)
+    expect(() => session.inspectResources()).toThrow('editor-session-resource-owner-unavailable')
+  })
+
+  it('retains the actual public session and sole-owner history and rejects snapshot copies', () => {
+    const wrapper = mount(MarkdownEditor, { props: {
+      modelValue: 'first', documentIdentity: { id: 'session-document', epoch: 1 },
+    } })
+    const editor = wrapper.vm as MarkdownEditorInstance
+    editor.dispatchTransaction({
+      changes: [{ from: 5, to: 5, insert: ' second' }], history: 'separate', origin: 'programmatic',
+    })
+    const session = editor.getSession('session:article:one')
+    expect(editor.getSession('session:article:one')).toBe(session)
+    expect(() => editor.getSession('session:article:two')).toThrow('editor-session-owner-already-bound')
+    const snapshot = session.captureSnapshot(() => 'a'.repeat(64))
+    expect(snapshot.history.undoDepth).toBe(1)
+    expect(snapshot.lastValidRender).toBeNull()
+    expect(session.captureLastValidRender()).toBeNull()
+    expect(snapshot).not.toHaveProperty('value')
+    const expected = { documentIdentity: snapshot.documentIdentity, revision: snapshot.revision }
+    expect(session.validateRetainedSnapshot(snapshot, expected)).toBe(true)
+    expect(session.validateRetainedSnapshot({ ...snapshot }, expected)).toBe(false)
+    const foreign = mount(MarkdownEditor, { props: { modelValue: 'first', documentIdentity: snapshot.documentIdentity } })
+    foreign.vm.dispatchTransaction({
+      changes: [{ from: 5, to: 5, insert: ' second' }], history: 'separate', origin: 'programmatic',
+    })
+    const foreignSession = foreign.vm.getSession(session.editorSessionRef)
+    const foreignSnapshot = foreignSession.captureSnapshot(() => 'a'.repeat(64))
+    expect(foreignSnapshot.snapshotRef).toBe(snapshot.snapshotRef)
+    expect(foreignSnapshot.revision).toBe(snapshot.revision)
+    expect(session.validateRetainedSnapshot(foreignSnapshot, expected)).toBe(false)
+    expect(session.validateRetainedSnapshot(snapshot, { ...expected, revision: snapshot.revision + 1 })).toBe(false)
+    expect(session.validateRetainedSnapshot(snapshot, {
+      ...expected, documentIdentity: { ...snapshot.documentIdentity, epoch: snapshot.documentIdentity.epoch + 1 },
+    })).toBe(false)
+    foreign.unmount()
+    expect(session.restoreSnapshot({ ...snapshot }, expected).status).toBe('blocked')
+    expect(session.restoreSnapshot(snapshot, expected).status).toBe('restored')
+    expect(editor.undo().value).toBe('first')
+    expect(session.restoreSnapshot(snapshot, expected).reason).toBe('editor-session-revision-mismatch')
+    expect(session.validateRetainedSnapshot(snapshot, expected)).toBe(false)
+    wrapper.unmount()
+  })
+
+  it('keeps the retained snapshot after failed capture and missing resource disposal', () => {
+    const wrapper = mount(MarkdownEditor, { props: {
+      modelValue: 'retained', documentIdentity: { id: 'retained-document', epoch: 1 },
+    } })
+    const session = (wrapper.vm as MarkdownEditorInstance).getSession('session:retained')
+    const snapshot = session.captureSnapshot(() => 'a'.repeat(64))
+    expect(() => session.captureSnapshot(() => 'invalid')).toThrow('editor-session-content-digest-invalid')
+    const digest = vi.fn(() => 'a'.repeat(64))
+    expect(() => session.captureSnapshot(digest, {
+      documentIdentity: { id: 'other-document', epoch: 1 }, revision: snapshot.revision,
+    })).toThrow('editor-session-snapshot-context-mismatch')
+    expect(digest).not.toHaveBeenCalled()
+    expect(() => session.captureSnapshot(digest, {
+      documentIdentity: snapshot.documentIdentity, revision: snapshot.revision + 1,
+    })).toThrow('editor-session-snapshot-context-mismatch')
+    expect(digest).not.toHaveBeenCalled()
+    const census = session.inspectResourceParticipants()
+    expect(census.complete).toBe(false)
+    expect(census.missingOwners).toContain('renderer-projection')
+    expect(census.missingOwners).toContain('editor-surface')
+    expect(census.participants.some((owner) => owner.ownerRef === 'editor-layout-callbacks')).toBe(true)
+    expect(census.participants.some((owner) => owner.ownerRef === 'language-search')).toBe(true)
+    expect(census.missingOwners).toContain('attachment-embed')
+    expect(() => session.pauseResources()).toThrow('editor-session-resource-owner-unavailable')
+    expect(session.inspectResourceParticipants().participants.every((owner) => !owner.paused)).toBe(true)
+    expect(() => session.disposeAfterSnapshot(snapshot.snapshotRef)).toThrow('editor-session-resource-owner-unavailable')
+    expect(session.restoreSnapshot(snapshot, { documentIdentity: snapshot.documentIdentity, revision: snapshot.revision }).status).toBe('restored')
+    wrapper.unmount()
+    expect(() => session.captureSnapshot(() => 'a'.repeat(64))).toThrow('editor-session-disposed')
+  })
+
+  it('rejects public session capture during IME and snapshots from an old document epoch', async () => {
+    const wrapper = mount(MarkdownEditor, { props: {
+      modelValue: 'same source', documentIdentity: { id: 'article-one', epoch: 1 },
+    } })
+    const session = (wrapper.vm as MarkdownEditorInstance).getSession('session:epoch')
+    const snapshot = session.captureSnapshot(() => 'a'.repeat(64))
+    await wrapper.find('textarea').trigger('compositionstart')
+    expect(() => session.captureSnapshot(() => 'a'.repeat(64))).toThrow('editor-session-composition-active')
+    await wrapper.find('textarea').trigger('compositionend')
+    await wrapper.setProps({ documentIdentity: { id: 'article-two', epoch: 2 } })
+    expect(session.restoreSnapshot(snapshot, { documentIdentity: { id: 'article-two', epoch: 2 }, revision: 0 }).status).toBe('blocked')
+    wrapper.unmount()
+  })
+
   // Synthetic composition events in this suite are not native-IME evidence.
   afterEach(() => {
     vi.useRealTimers()
@@ -371,6 +548,18 @@ describe('MarkdownEditor', () => {
       revision: number
     }
     const itemId = batch.items[0]!.itemId
+    const session = wrapper.vm.getSession('session:legacy-upload')
+    expect(session.inspectResourceParticipants().missingOwners).toContain('attachment-embed')
+    expect(wrapper.vm.applyAttachmentResult({
+      status: 'progress', batchId: `${batch.batchId}:foreign`, itemId, ratio: 0.9,
+    })).toBe(false)
+    expect(wrapper.vm.applyAttachmentResult({
+      status: 'progress', batchId: batch.batchId, itemId, ratio: 0.9,
+      documentIdentity: { ...batch.documentIdentity, epoch: batch.documentIdentity.epoch + 1 },
+    })).toBe(false)
+    expect(wrapper.vm.applyAttachmentResult({
+      status: 'rejected', batchId: batch.batchId, itemId, revision: batch.revision + 1,
+    })).toBe(false)
     expect(wrapper.find('.el-markdown-editor__attachment').text()).toContain(
       'report.pdf',
     )
@@ -410,6 +599,75 @@ describe('MarkdownEditor', () => {
     expect(wrapper.find('.el-markdown-editor__attachment-status').text()).toBe(
       'report.pdf 上传完成',
     )
+    // Legal legacy content did not create a service future or lift resource admission.
+    expect(session.inspectResourceParticipants().missingOwners).toContain('attachment-embed')
+    expect(() => session.inspectResources()).toThrow('editor-session-resource-owner-unavailable')
+    expect(wrapper.vm.applyAttachmentResult({
+      status: 'progress', batchId: batch.batchId, itemId, ratio: 0.9,
+    })).toBe(false)
+
+    Object.defineProperty(picker.element, 'files', {
+      configurable: true,
+      value: [new File(['second'], 'second.pdf', { type: 'application/pdf' })],
+    })
+    await picker.trigger('change')
+    const pending = wrapper.emitted('upload-image')?.at(-1)?.[0] as typeof batch
+    const sameSource = wrapper.emitted('update:modelValue')?.at(-1)?.[0] as string
+    await wrapper.setProps({
+      documentIdentity: { ...pending.documentIdentity, epoch: pending.documentIdentity.epoch + 1 },
+      modelValue: sameSource,
+    })
+    const beforeLateReply = wrapper.emitted('update:modelValue')?.length
+    // Same bytes/range and a still-pending job do not authorize the old epoch.
+    expect(wrapper.vm.applyAttachmentResult({
+      status: 'progress', batchId: pending.batchId, itemId: pending.items[0]!.itemId, ratio: 0.9,
+    })).toBe(false)
+    expect(wrapper.vm.applyAttachmentResult({
+      status: 'resolved', batchId: pending.batchId, itemId: pending.items[0]!.itemId,
+      documentIdentity: pending.documentIdentity, revision: pending.revision,
+      payload: { markdownKind: 'file', href: 'https://cdn.example/second.pdf', mimeType: 'application/pdf', name: 'second.pdf' },
+    })).toBe(false)
+    expect(wrapper.emitted('update:modelValue')?.length).toBe(beforeLateReply)
+  })
+
+  it('keeps a started service future behind its proof gate after the dispatch prop is removed', async () => {
+    let request: Parameters<MarkdownEditorAttachmentDispatch>[0] | undefined
+    let finish!: (result: MarkdownAttachmentProviderResult) => void
+    const future = new Promise<MarkdownAttachmentProviderResult>((resolve) => { finish = resolve })
+    const attachmentDispatch: MarkdownEditorAttachmentDispatch = (input) => {
+      request = input
+      return future
+    }
+    const wrapper = mount(MarkdownEditor, {
+      props: { modelValue: 'Draft: ', attachmentDispatch },
+    })
+    const textarea = wrapper.find('textarea').element as HTMLTextAreaElement
+    textarea.setSelectionRange(7, 7)
+    const picker = wrapper.find<HTMLInputElement>('.el-markdown-editor__attachment-picker')
+    Object.defineProperty(picker.element, 'files', {
+      configurable: true,
+      value: [new File(['report'], 'report.pdf', { type: 'application/pdf' })],
+    })
+    await picker.trigger('change')
+    expect(wrapper.emitted('upload-image')).toBeUndefined()
+    const started = request!
+    await wrapper.setProps({ attachmentDispatch: undefined })
+    const result: MarkdownAttachmentProviderResult = {
+      status: 'resolved', batchId: started.batch.batchId, itemId: started.item.itemId,
+      documentIdentity: started.batch.documentIdentity, revision: started.batch.revision,
+      payload: { markdownKind: 'file', href: 'https://cdn.example/report.pdf', mimeType: 'application/pdf', name: 'report.pdf' },
+    }
+    expect(wrapper.vm.applyAttachmentResult(result)).toBe(false)
+    expect(wrapper.vm.applyAttachmentResult({
+      status: 'progress', batchId: started.batch.batchId, itemId: started.item.itemId, ratio: 0.51,
+    })).toBe(false)
+    expect(started.onProgress({
+      status: 'progress', batchId: started.batch.batchId, itemId: started.item.itemId, ratio: 0.51,
+    })).toBe(true)
+    finish(result)
+    await flushPromises()
+    expect(wrapper.emitted('update:modelValue')?.at(-1)?.[0]).toBe('Draft: [report.pdf](https://cdn.example/report.pdf)')
+    expect(wrapper.vm.getSession('session:future-upload').inspectResourceParticipants().missingOwners).toContain('attachment-embed')
   })
 
   it('edits active image and caption subranges through the compact property surface', async () => {

@@ -4,9 +4,12 @@ import {
   type MarkdownEmbedMode,
   type MarkdownEmbedValidNode,
 } from './markdown-embed-directive'
-import type {
-  MarkdownEmbedProviderStatus,
-  MarkdownEmbedResult,
+import {
+  commitMarkdownEmbedResult,
+  readMarkdownEmbedProjection,
+  type MarkdownEmbedRequest,
+  type MarkdownEmbedProviderStatus,
+  type MarkdownEmbedResult,
 } from './markdown-embed-provider'
 
 export const MARKDOWN_EMBED_PRESENTATION_VERSION =
@@ -58,6 +61,9 @@ const PROVIDER_STATUS_STATES: Readonly<
   stale: 'stale',
   forbidden: 'forbidden',
   missing: 'error',
+  deleted: 'error',
+  unsupported: 'unsupported',
+  cancelled: 'stale',
   cycle: 'error',
   'depth-exceeded': 'error',
   'size-exceeded': 'error',
@@ -82,6 +88,7 @@ export interface MarkdownEmbedPresentationAccessibility {
 export interface MarkdownEmbedPresentationContent {
   readonly editable: false
   readonly excerpt: string | null
+  readonly markdown: string | null
   readonly html: null
   readonly renderVia: 'markdown-runtime'
   readonly title: string | null
@@ -112,6 +119,7 @@ export type MarkdownEmbedPresentationInput = Readonly<
       readonly kind: 'valid'
       readonly node: MarkdownEmbedValidNode
       readonly result?: MarkdownEmbedResult | null
+      readonly request?: MarkdownEmbedRequest
     }
   | {
       readonly kind: 'provider-status'
@@ -140,7 +148,10 @@ const stateOfInput = (
   if (input.kind === 'provider-status') {
     return PROVIDER_STATUS_STATES[input.status]
   }
-  if (input.failure === 'mode-mismatch' || input.failure === 'invalid-directive') {
+  if (
+    input.failure === 'mode-mismatch' ||
+    input.failure === 'invalid-directive'
+  ) {
     return 'unsupported'
   }
   return BUDGET_FAILURE_STATES[input.failure]
@@ -160,6 +171,15 @@ const statusDescriptionOf = (
   if (status === 'rejected') {
     return 'embed error: target missing or deleted'
   }
+  if (status === 'missing' || status === 'deleted') {
+    return `embed error: target ${status}`
+  }
+  if (status === 'unsupported' || status === 'mode-mismatch') {
+    return `embed unsupported: ${status}`
+  }
+  if (status === 'cancelled') {
+    return 'embed stale: cancelled'
+  }
   if (status === 'stale') {
     return 'embed stale: result older than request'
   }
@@ -178,14 +198,41 @@ export const resolveMarkdownEmbedPresentation = (
   input: MarkdownEmbedPresentationInput,
   mode: MarkdownEmbedPresentationMode,
 ): MarkdownEmbedPresentation => {
-  const state = stateOfInput(input)
+  const result = input.kind === 'valid' ? input.result : null
+  const controlled = Boolean(result?.projection || result?.targetVersion)
+  const checked =
+    input.kind === 'valid' && input.request && result
+      ? commitMarkdownEmbedResult(input.request, result)
+      : result
+  const matchesNode =
+    input.kind !== 'valid' ||
+    !result ||
+    (result.target === input.node.target && result.mode === input.node.mode)
+  const markdown =
+    controlled &&
+    input.kind === 'valid' &&
+    input.request &&
+    checked?.status === 'resolved' &&
+    matchesNode
+      ? readMarkdownEmbedProjection(checked)
+      : null
+  const state =
+    !matchesNode || (controlled && markdown === null)
+      ? checked?.status === 'rejected'
+        ? 'error'
+        : 'stale'
+      : stateOfInput(input)
+
   const target = input.kind === 'valid' ? input.node.target : input.target
   const embedMode = input.kind === 'valid' ? input.node.mode : input.embedMode
   const directive =
     input.kind === 'valid'
       ? formatMarkdownEmbedDirective(target, embedMode)
       : input.directive
-  const resolved = resolvedFields(input)
+  const resolved =
+    state === 'resolved'
+      ? resolvedFields(input)
+      : { excerpt: null, title: null }
   const statusDescription = statusDescriptionOf(input, state)
 
   return Object.freeze({
@@ -203,7 +250,8 @@ export const resolveMarkdownEmbedPresentation = (
     }),
     content: Object.freeze({
       editable: false as const,
-      excerpt: resolved.excerpt,
+      excerpt: controlled ? null : resolved.excerpt,
+      markdown,
       html: null,
       renderVia: 'markdown-runtime' as const,
       title: resolved.title,
@@ -231,7 +279,12 @@ export interface LegacyMarkdownEmbedPresentation {
   readonly card: false
   readonly hasNestedScroll: false
   readonly tabStop: false
-  readonly actions: readonly ('source-reveal' | 'open-source' | 'retry' | 'copy')[]
+  readonly actions: readonly (
+    | 'source-reveal'
+    | 'open-source'
+    | 'retry'
+    | 'copy'
+  )[]
   readonly excerpt: string
   readonly error?: true
 }
@@ -265,9 +318,10 @@ export const presentMarkdownEmbed = (
         ? (['source-reveal', 'retry', 'open-source', 'copy'] as const)
         : (['source-reveal', 'open-source', 'copy'] as const),
     excerpt,
-    error: state === 'error' || state === 'stale' || state === 'forbidden'
-      ? (true as const)
-      : undefined,
+    error:
+      state === 'error' || state === 'stale' || state === 'forbidden'
+        ? (true as const)
+        : undefined,
   })
 }
 
@@ -354,7 +408,9 @@ export const evaluateMarkdownEmbedPresentationMutations = (): Readonly<{
     signatureOf('article') !== signatureOf('block') ||
     presentation.layout.modeAsVisualVariant !== false
 
-  const providerExcerpt = (mutationResult('mutation-target', 'article').excerpt ?? '').trim()
+  const providerExcerpt = (
+    mutationResult('mutation-target', 'article').excerpt ?? ''
+  ).trim()
   const sourceExpansion = presentation.directive.includes(providerExcerpt)
 
   return Object.freeze({

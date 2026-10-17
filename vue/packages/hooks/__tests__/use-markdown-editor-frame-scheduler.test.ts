@@ -27,6 +27,77 @@ const createManualFrames = () => {
 }
 
 describe('createMarkdownEditorFrameScheduler', () => {
+  it('owns and cancels actual auxiliary frame handles without changing phased metrics', () => {
+    const frames = createManualFrames()
+    const scheduler = createMarkdownEditorFrameScheduler({
+      cancelFrame: frames.cancelFrame,
+      requestFrame: frames.requestFrame,
+    })
+    let commits = 0
+    const originalMetricKeys = Object.keys(scheduler.metrics()).sort()
+    scheduler.requestAuxiliaryFrame(() => { commits += 1 })
+    expect(frames.pendingFrames()).toBe(1)
+    expect(scheduler.resourceState().pendingAuxiliaryFrames).toBe(1)
+    scheduler.pause()
+    expect(frames.pendingFrames()).toBe(0)
+    expect(scheduler.resourceState().pendingAuxiliaryFrames).toBe(0)
+    frames.runFrame()
+    expect(commits).toBe(0)
+    expect(scheduler.requestAuxiliaryFrame(() => { commits += 1 })).toBeUndefined()
+    scheduler.resume()
+    scheduler.requestAuxiliaryFrame(() => {
+      expect(scheduler.resourceState().runningAuxiliaryFrames).toBe(1)
+      expect(() => scheduler.pause()).toThrow('markdown-frame-scheduler-phase-active')
+      commits += 1
+    })
+    frames.runFrame()
+    expect(commits).toBe(1)
+    expect(Object.keys(scheduler.metrics()).sort()).toEqual(originalMetricKeys)
+    expect(scheduler.resourceState().runningAuxiliaryFrames).toBe(0)
+    scheduler.dispose()
+  })
+
+  it('pauses the real queue and frame handle and resumes current-state scheduling', () => {
+    const frames = createManualFrames()
+    const scheduler = createMarkdownEditorFrameScheduler({
+      cancelFrame: frames.cancelFrame,
+      requestFrame: frames.requestFrame,
+    })
+    let oldCommits = 0
+    let newCommits = 0
+    scheduler.scheduleMutate('old-epoch', () => { oldCommits += 1 })
+    expect(frames.pendingFrames()).toBe(1)
+    expect(scheduler.resourceState().pendingFrames).toBe(1)
+    scheduler.pause()
+    expect(frames.pendingFrames()).toBe(0)
+    expect(scheduler.metrics().pendingTasks).toBe(0)
+    expect(scheduler.resourceState()).toMatchObject({ paused: true, pendingFrames: 0 })
+    expect(scheduler.scheduleMutate('while-paused', () => { oldCommits += 1 })).toBe(false)
+    frames.runFrame()
+    expect(oldCommits).toBe(0)
+    scheduler.resume()
+    expect(scheduler.scheduleMutate('current-epoch', () => { newCommits += 1 })).toBe(true)
+    frames.runFrame()
+    expect(newCommits).toBe(1)
+    expect(oldCommits).toBe(0)
+    scheduler.dispose()
+    expect(() => scheduler.resume()).toThrow('markdown-frame-scheduler-disposed')
+  })
+
+  it('refuses pause during an executing phase without a false paused state', () => {
+    const frames = createManualFrames()
+    const scheduler = createMarkdownEditorFrameScheduler({
+      cancelFrame: frames.cancelFrame,
+      requestFrame: frames.requestFrame,
+    })
+    scheduler.scheduleMutate('executing', () => {
+      expect(() => scheduler.pause()).toThrow('markdown-frame-scheduler-phase-active')
+      expect(scheduler.resourceState().paused).toBe(false)
+    })
+    frames.runFrame()
+    expect(scheduler.metrics().idle).toBe(true)
+  })
+
   it('runs measure before mutate before post-paint inside one frame', () => {
     const frames = createManualFrames()
     const order: string[] = []

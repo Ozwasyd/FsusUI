@@ -1,3 +1,4 @@
+import { toRaw } from 'vue'
 import type { MarkdownDocumentIdentity } from '../../../wasm/markdown-runtime'
 import type {
   MarkdownAttachmentAnchor,
@@ -39,6 +40,64 @@ export interface MarkdownAttachmentJob {
   readonly signalController?: AbortController
 }
 
+interface MarkdownAttachmentDispatchState {
+  readonly dispatchRef: object
+  readonly attempt: number
+  settled: boolean
+  dispatching: boolean
+  settlementAvailable: boolean
+}
+const attachmentDispatches = new WeakMap<
+  MarkdownAttachmentJob,
+  MarkdownAttachmentDispatchState
+>()
+
+/** Internal evidence from the actual invocation, independent of UI job phase. */
+export const inspectMarkdownAttachmentDispatch = (
+  job: MarkdownAttachmentJob,
+) => {
+  const state = attachmentDispatches.get(toRaw(job))
+  return state ? Object.freeze({ ...state }) : null
+}
+
+/** Only completion/rejection of this invocation can settle its resource record. */
+export const runMarkdownAttachmentDispatch = async (
+  job: MarkdownAttachmentJob,
+  dispatch: () => PromiseLike<MarkdownAttachmentProviderResult>,
+): Promise<MarkdownAttachmentProviderResult> => {
+  const ownedJob = toRaw(job)
+  const previous = attachmentDispatches.get(ownedJob)
+  if (previous && !previous.settled)
+    throw new Error('markdown-attachment-dispatch-still-running')
+  if (ownedJob.phase !== 'pending')
+    throw new Error('markdown-attachment-dispatch-phase-unavailable')
+  if (previous?.attempt === ownedJob.attempt)
+    throw new Error('markdown-attachment-attempt-already-dispatched')
+  const state: MarkdownAttachmentDispatchState = {
+    dispatchRef: Object.freeze({}),
+    attempt: ownedJob.attempt,
+    settled: false,
+    dispatching: true,
+    settlementAvailable: false,
+  }
+  attachmentDispatches.set(ownedJob, state)
+  try {
+    const work = dispatch()
+    state.dispatching = false
+    if (!work || typeof work.then !== 'function') {
+      throw new Error('markdown-attachment-dispatch-settlement-unavailable')
+    }
+    state.settlementAvailable = true
+    try {
+      return await work
+    } finally {
+      state.settled = true
+    }
+  } finally {
+    state.dispatching = false
+  }
+}
+
 export const createMarkdownAttachmentJob = (
   id: string,
   options?: {
@@ -54,7 +113,9 @@ export const createMarkdownAttachmentJob = (
   id,
   batchId: options?.batchId,
   itemId: options?.itemId ?? id,
-  documentIdentity: options?.documentIdentity,
+  documentIdentity: options?.documentIdentity
+    ? Object.freeze({ ...options.documentIdentity })
+    : undefined,
   revision: options?.revision,
   attempt: options?.attempt ?? 1,
   phase: 'pending',
@@ -142,9 +203,11 @@ export const rebaseMarkdownAttachmentJob = (
     for (const change of [...changes].sort(
       (left, right) => left.from - right.from || left.to - right.to,
     )) {
-      minimumLength +=
-        change.insert.length - (change.to - change.from)
-      syntheticSource = ''.padStart(Math.max(minimumLength, change.to + 1), '\u0000')
+      minimumLength += change.insert.length - (change.to - change.from)
+      syntheticSource = ''.padStart(
+        Math.max(minimumLength, change.to + 1),
+        '\u0000',
+      )
     }
   }
   const rebased = createMarkdownEditorPositionMap(changes, {
@@ -175,6 +238,23 @@ export const planMarkdownAttachmentResolve = (
   readonly transaction?: MarkdownEditorTransaction
   readonly markdown?: string
 } => {
+  if (job.phase === 'deleted') {
+    return Object.freeze({ accepted: false, status: 'deleted' as const })
+  }
+
+  if (job.phase === 'cancelled') {
+    return Object.freeze({ accepted: false, status: 'cancelled' as const })
+  }
+
+  if (
+    job.phase === 'document-abort' ||
+    job.phase === 'stale' ||
+    job.phase === 'resolved' ||
+    job.phase === 'rejected'
+  ) {
+    return Object.freeze({ accepted: false, status: job.phase })
+  }
+
   if (
     result.documentIdentity &&
     job.documentIdentity &&
@@ -183,14 +263,6 @@ export const planMarkdownAttachmentResolve = (
   ) {
     job.phase = 'document-abort'
     return Object.freeze({ accepted: false, status: 'document-abort' as const })
-  }
-
-  if (job.phase === 'deleted') {
-    return Object.freeze({ accepted: false, status: 'deleted' as const })
-  }
-
-  if (job.phase === 'cancelled') {
-    return Object.freeze({ accepted: false, status: 'cancelled' as const })
   }
 
   if (result.status !== 'resolved') {
@@ -276,7 +348,7 @@ export const progressMarkdownAttachmentJob = (
   job: MarkdownAttachmentJob,
   progress: number,
 ) => {
-  if (job.phase === 'cancelled' || job.phase === 'deleted') return job
+  if (job.phase !== 'pending' && job.phase !== 'progress') return job
   job.phase = 'progress'
   job.progress = Math.min(100, Math.max(0, progress))
   return job
@@ -291,6 +363,15 @@ export const cancelMarkdownAttachmentJob = (job: MarkdownAttachmentJob) => {
 }
 
 export const retryMarkdownAttachmentJob = (job: MarkdownAttachmentJob) => {
+  const dispatch = inspectMarkdownAttachmentDispatch(job)
+  if (
+    !dispatch ||
+    dispatch.attempt !== job.attempt ||
+    (!dispatch.settlementAvailable && !dispatch.dispatching)
+  )
+    throw new Error('markdown-attachment-retry-settlement-unavailable')
+  if (!dispatch.settled)
+    throw new Error('markdown-attachment-retry-dispatch-still-running')
   job.phase = 'pending'
   job.progress = 0
   job.attempt += 1

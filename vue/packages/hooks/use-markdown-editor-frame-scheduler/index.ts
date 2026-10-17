@@ -70,6 +70,15 @@ export interface MarkdownEditorFrameSchedulerMetrics {
   readonly idle: boolean
 }
 
+export interface MarkdownEditorFrameSchedulerResourceState {
+  readonly paused: boolean
+  readonly pendingFrames: number
+  readonly pendingAuxiliaryFrames: number
+  readonly runningAuxiliaryFrames: number
+  readonly frameRequestKind: 'animation-frame' | 'timer' | 'custom'
+  readonly runningPhase: MarkdownEditorFramePhase | null
+}
+
 export interface MarkdownEditorFrameScheduler {
   schedule: (task: MarkdownEditorFrameTask) => boolean
   scheduleMeasure: (
@@ -89,7 +98,12 @@ export interface MarkdownEditorFrameScheduler {
   ) => boolean
   cancel: (key: string) => void
   cancelAll: () => void
+  pause: () => void
+  resume: () => void
   metrics: () => MarkdownEditorFrameSchedulerMetrics
+  resourceState: () => MarkdownEditorFrameSchedulerResourceState
+  requestAuxiliaryFrame: (run: () => void, guard?: () => boolean) => number | undefined
+  cancelAuxiliaryFrame: (handle: number) => void
   dispose: () => void
 }
 
@@ -126,6 +140,11 @@ const defaultCancelFrame = (handle: number) => {
 export const createMarkdownEditorFrameScheduler = (
   options: MarkdownEditorFrameSchedulerOptions = {},
 ): MarkdownEditorFrameScheduler => {
+  const frameRequestKind = options.requestFrame
+    ? ('custom' as const)
+    : typeof requestAnimationFrame === 'function'
+      ? ('animation-frame' as const)
+      : ('timer' as const)
   const requestFrame = options.requestFrame ?? defaultRequestFrame
   const cancelFrame = options.cancelFrame ?? defaultCancelFrame
   const now =
@@ -135,9 +154,12 @@ export const createMarkdownEditorFrameScheduler = (
   const maxQueuedTasks = options.maxQueuedTasks ?? DEFAULT_MAX_QUEUED_TASKS
 
   const entries = new Map<string, FrameTaskEntry>()
+  const auxiliaryFrames = new Set<number>()
   let disposed = false
+  let paused = false
   let frameHandle = 0
   let runningPhase: MarkdownEditorFramePhase | null = null
+  let runningAuxiliaryFrames = 0
   let frameId = 0
   let framesExecuted = 0
   let frameRequests = 0
@@ -173,8 +195,44 @@ export const createMarkdownEditorFrameScheduler = (
       idle: entries.size === 0 && frameHandle === 0 && runningPhase === null,
     })
 
+  const resourceState = (): MarkdownEditorFrameSchedulerResourceState =>
+    Object.freeze({
+      paused,
+      pendingFrames: frameHandle === 0 ? 0 : 1,
+      pendingAuxiliaryFrames: auxiliaryFrames.size,
+      runningAuxiliaryFrames,
+      frameRequestKind,
+      runningPhase,
+    })
+
+  // Legacy editor frame continuations keep their original timing while the
+  // same scheduler now owns their actual handles, guards and cancellation.
+  const requestAuxiliaryFrame = (run: () => void, guard?: () => boolean) => {
+    if (disposed || paused) return undefined
+    const handle = requestFrame(() => {
+      auxiliaryFrames.delete(handle)
+      if (disposed || paused) return
+      runningAuxiliaryFrames += 1
+      try {
+        if (!guard || guard()) run()
+      } finally {
+        runningAuxiliaryFrames -= 1
+      }
+    })
+    auxiliaryFrames.add(handle)
+    return handle
+  }
+  const cancelAuxiliaryFrame = (handle: number) => {
+    if (!auxiliaryFrames.has(handle)) return
+    cancelFrame(handle)
+    auxiliaryFrames.delete(handle)
+  }
+  const cancelAuxiliaryFrames = () => {
+    for (const handle of [...auxiliaryFrames]) cancelAuxiliaryFrame(handle)
+  }
+
   const requestNextFrame = () => {
-    if (frameHandle || runningPhase) return
+    if (paused || disposed || frameHandle || runningPhase) return
     frameHandle = requestFrame(runFrame)
     frameRequests += 1
   }
@@ -226,7 +284,7 @@ export const createMarkdownEditorFrameScheduler = (
 
   const runFrame = () => {
     frameHandle = 0
-    if (disposed || runningPhase) return
+    if (disposed || paused || runningPhase) return
     frameId += 1
     framesExecuted += 1
     runningPhase = 'measure'
@@ -243,7 +301,7 @@ export const createMarkdownEditorFrameScheduler = (
   }
 
   const schedule = (task: MarkdownEditorFrameTask) => {
-    if (disposed) return false
+    if (disposed || paused) return false
     if (
       entries.size >= maxQueuedTasks &&
       !entries.has(task.key) &&
@@ -283,8 +341,26 @@ export const createMarkdownEditorFrameScheduler = (
     }
   }
 
+  const pause = () => {
+    if (disposed) throw new Error('markdown-frame-scheduler-disposed')
+    if (runningPhase !== null || runningAuxiliaryFrames > 0) {
+      throw new Error('markdown-frame-scheduler-phase-active')
+    }
+    paused = true
+    // Release the actual handle and queued closures; do not merely reset metrics.
+    cancelAll()
+    cancelAuxiliaryFrames()
+  }
+
+  const resume = () => {
+    if (disposed) throw new Error('markdown-frame-scheduler-disposed')
+    paused = false
+    // Cancelled layout tasks are recreated by the editor's current-state reflow.
+  }
+
   const dispose = () => {
     disposed = true
+    cancelAuxiliaryFrames()
     entries.clear()
     if (frameHandle) {
       cancelFrame(frameHandle)
@@ -302,7 +378,12 @@ export const createMarkdownEditorFrameScheduler = (
       schedule({ guard, key, postPaint: run }),
     cancel,
     cancelAll,
+    pause,
+    resume,
     metrics,
+    resourceState,
+    requestAuxiliaryFrame,
+    cancelAuxiliaryFrame,
     dispose,
   })
 }

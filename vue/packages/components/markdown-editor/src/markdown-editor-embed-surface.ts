@@ -4,6 +4,7 @@ import {
   type MarkdownEmbedPresentation,
   type MarkdownEmbedPresentationMode,
   type MarkdownEmbedResult,
+  type MarkdownEmbedRequest,
   type MarkdownStableSyntaxNode,
 } from '../../../wasm/markdown-runtime'
 import type { MarkdownEditorMode } from './markdown-editor-live-contract'
@@ -16,12 +17,11 @@ import {
   resolveMarkdownLiveLayoutStability,
   type MarkdownLiveLayoutPlan,
 } from './markdown-editor-live-layout'
-import type {
-  MarkdownEditorSelection,
-} from './markdown-editor-transaction'
+import type { MarkdownEditorSelection } from './markdown-editor-transaction'
 
-const toPresentationMode = (mode: MarkdownEditorMode): MarkdownEmbedPresentationMode =>
-  mode
+const toPresentationMode = (
+  mode: MarkdownEditorMode,
+): MarkdownEmbedPresentationMode => mode
 
 /**
  * Embed interaction reuses the shared #335 atomic primitive; no per-kind
@@ -30,8 +30,12 @@ const toPresentationMode = (mode: MarkdownEditorMode): MarkdownEmbedPresentation
 export const resolveMarkdownEmbedAtomic = (input: {
   readonly action: MarkdownAtomicNodeAction
   readonly composing?: boolean
-  readonly currentIdentity?: Parameters<typeof resolveMarkdownAtomicNodeIntent>[0]['currentIdentity']
-  readonly documentIdentity?: Parameters<typeof resolveMarkdownAtomicNodeIntent>[0]['documentIdentity']
+  readonly currentIdentity?: Parameters<
+    typeof resolveMarkdownAtomicNodeIntent
+  >[0]['currentIdentity']
+  readonly documentIdentity?: Parameters<
+    typeof resolveMarkdownAtomicNodeIntent
+  >[0]['documentIdentity']
   readonly expectedRevision?: number
   readonly mode?: MarkdownEditorMode
   readonly nodeId?: string
@@ -51,11 +55,19 @@ export const resolveMarkdownEmbedAtomic = (input: {
  */
 export const resolveMarkdownEmbedHeight = (input: {
   readonly composing?: boolean
-  readonly currentIdentity?: Parameters<typeof resolveMarkdownLiveLayoutStability>[0]['currentIdentity']
-  readonly documentIdentity?: Parameters<typeof resolveMarkdownLiveLayoutStability>[0]['documentIdentity']
+  readonly currentIdentity?: Parameters<
+    typeof resolveMarkdownLiveLayoutStability
+  >[0]['currentIdentity']
+  readonly documentIdentity?: Parameters<
+    typeof resolveMarkdownLiveLayoutStability
+  >[0]['documentIdentity']
   readonly expectedRevision?: number
-  readonly gesture?: Parameters<typeof resolveMarkdownLiveLayoutStability>[0]['gesture']
-  readonly previousAnchor?: Parameters<typeof resolveMarkdownLiveLayoutStability>[0]['previousAnchor']
+  readonly gesture?: Parameters<
+    typeof resolveMarkdownLiveLayoutStability
+  >[0]['gesture']
+  readonly previousAnchor?: Parameters<
+    typeof resolveMarkdownLiveLayoutStability
+  >[0]['previousAnchor']
   readonly reducedMotion?: boolean
   readonly revision?: number
   readonly selection: MarkdownEditorSelection
@@ -76,6 +88,7 @@ export const resolveMarkdownEmbedSurface = (input: {
   readonly mode: MarkdownEditorMode
   readonly node: MarkdownStableSyntaxNode
   readonly result?: MarkdownEmbedResult | null
+  readonly request?: MarkdownEmbedRequest
   readonly source: string
 }): MarkdownEmbedSurface => {
   const mode = toPresentationMode(input.mode)
@@ -83,21 +96,29 @@ export const resolveMarkdownEmbedSurface = (input: {
     .slice(input.node.rawRange.start, input.node.rawRange.end)
     .replace(/\r?\n$/, '')
   const parsed = parseMarkdownEmbedLine(raw, input.node.rawRange.start)
-  const presentation = parsed && parsed.ok
-    ? resolveMarkdownEmbedPresentation(
-        { kind: 'valid', node: parsed, result: input.result },
-        mode,
-      )
-    : resolveMarkdownEmbedPresentation(
-        {
-          kind: 'local-failure',
-          failure: 'invalid-directive',
-          target: '',
-          embedMode: 'block',
-          directive: raw,
-        },
-        mode,
-      )
+  const presentation =
+    parsed && parsed.ok
+      ? resolveMarkdownEmbedPresentation(
+          {
+            kind: 'valid',
+            node: parsed,
+            result: input.result,
+            request: input.request
+              ? { ...input.request, nodeId: input.node.id }
+              : undefined,
+          },
+          mode,
+        )
+      : resolveMarkdownEmbedPresentation(
+          {
+            kind: 'local-failure',
+            failure: 'invalid-directive',
+            target: '',
+            embedMode: 'block',
+            directive: raw,
+          },
+          mode,
+        )
   return Object.freeze({
     contentVisible: mode !== 'source' && presentation.state !== 'unsupported',
     directiveVisible: mode === 'source' || presentation.state === 'unsupported',
@@ -111,11 +132,14 @@ export interface MarkdownEmbedSurfacePlan {
 }
 
 export const planMarkdownEmbedSurface = (input: {
-  readonly documentIdentity: Parameters<typeof resolveMarkdownLiveLayoutStability>[0]['documentIdentity']
+  readonly documentIdentity: Parameters<
+    typeof resolveMarkdownLiveLayoutStability
+  >[0]['documentIdentity']
   readonly mode: MarkdownEditorMode
   readonly node: MarkdownStableSyntaxNode
   readonly reducedMotion?: boolean
   readonly result?: MarkdownEmbedResult | null
+  readonly request?: MarkdownEmbedRequest
   readonly revision: number
   readonly selection: MarkdownEditorSelection
   readonly source: string
@@ -131,6 +155,15 @@ export const planMarkdownEmbedSurface = (input: {
       mode: input.mode,
       node: input.node,
       result: input.result,
+      request: input.request
+        ? {
+            ...input.request,
+            documentIdentity:
+              input.documentIdentity ?? input.request.documentIdentity,
+            revision: input.revision,
+            nodeId: input.node.id,
+          }
+        : undefined,
       source: input.source,
     }),
   })

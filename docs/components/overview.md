@@ -21,6 +21,7 @@ motion behavior is defined by the [theme token](../theme/tokens.md) and
 | [Space](./space.md) | Consistent spacing between adjacent elements. |
 | [Layout](./layout.md) | Responsive 24-column layout. |
 | [Divider](./divider.md) | Separates related content. |
+| [ResizeSeparator](./resize-separator.md) | Controlled, accessible resize proposals between consumer-owned regions. |
 | [Motion](./motion.md) | Semantic presets, directives, recipes, and transitions. |
 
 ## Form components

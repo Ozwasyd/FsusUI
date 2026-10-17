@@ -72,6 +72,7 @@ const NPM_GROUP_MEMBERS = {
     'eslint-plugin-unicorn',
     'eslint-plugin-vue',
     'expect-type',
+    'happy-dom',
     'husky',
     'jsdom',
     'lint-staged',

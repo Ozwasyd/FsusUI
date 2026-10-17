@@ -372,8 +372,11 @@ identity.
 `embed-provider` is the consumer-owned resolution boundary for valid
 `::embed[...]` projection nodes. The editor supplies an identity-, revision-,
 node-, target-, mode-, and version-bound request. It commits only a matching
-result and treats late or mismatched results as stale. Provider excerpts are
-rendered as escaped text, never `innerHTML`; the directive remains the only host
+result and treats late or mismatched results as stale. Prepared Markdown projections
+use the existing read-only renderer and host base URL, CSP and feature settings;
+the consumer supplies authorized bytes and the current target version through
+[`prepareMarkdownEmbedResult`](../api/markdown-runtime-projection.md).
+Metadata-only provider excerpts are rendered as escaped text; the directive remains the only host
 source/history authority. Source mode displays the exact directive. Live keeps
 the textarea as its only input surface and places the controlled read-only embed
 regions below it; Split and Preview interleave those regions with the normal
@@ -422,7 +425,7 @@ an independent acceptance lane and is not replaced by these simulations.
 | update:modelValue  | 已接受的公开内容更新                                         |
 | change             | 与 `update:modelValue` 相同的公开内容更新                    |
 | transaction        | 每次 accepted/rejected dispatch 的只读 result 与 transaction |
-| selection-change   | revision 与 grapheme-safe、direction-preserving selection    |
+| selection-change   | producer 捕获的只读 documentIdentity、revision 与 grapheme-safe、direction-preserving selection |
 | history-change     | `canUndo/canRedo`、depth 与 retained UTF-16 units            |
 | command            | toolbar command 已通过 dispatcher 执行                       |
 | mode-change        | 编辑模式切换                                                 |
@@ -516,3 +519,469 @@ The transaction implementation is complete, but its tracking acceptance remains
 separate: native CJK IME commit, cancel, and undo require direct evidence from real
 browser/OS/input-method combinations. Synthetic composition events validate only the
 component state machine and are not native-IME acceptance evidence.
+
+### Retained public editor session (source WIP)
+
+`getSession(editorSessionRef)` binds one stable consumer session ref to the mounted
+editor and returns the same `MarkdownEditorSession` on repeat calls. A different ref
+on that instance is rejected. Types are exported from `@ozwasyd/element-plus`;
+the internal session binding factory is not a public entry point.
+
+`captureSnapshot(digestSource)` synchronously hashes the actual transaction-owner
+source with the consumer's content digest function. The callback must return a
+lowercase 64-character SHA-256 digest and must not retain the source. Snapshots
+expose only opaque refs, document identity/epoch, transaction revision, selection,
+history counts and the digest. The sole transaction store retains one bounded
+checkpoint of its immutable history entries. A subsequent successful capture
+supersedes the previous checkpoint; failed captures retain the previous checkpoint.
+No source or undo/redo entries are copied to the consuming application.
+
+`validateRetainedSnapshot(snapshot, expected)` is a read-only check of that
+original retained token object and the actual current document id/epoch/revision.
+Matching strings from another native instance, copied or superseded tokens and
+stale expected context return false; IME/disposed owner refusal is preserved.
+It does not recapture or restore state and does not certify view/renderer restore
+or resource readiness. Application composition uses it to reject foreign native
+custody and replacement during asynchronous original journal reads.
+The check also delegates to the original transaction store's read-only retained
+token/history custody check. A switch away and back to identical id/epoch/revision
+does not revive a released transaction checkpoint. Original mutating restore and
+its history-checkpoint refusal remain unchanged; no metadata-only ABA acceptance.
+Capture/restore expected context may include `assertAdmission`. This actual
+consumer callback runs after the final renderer/view read and before original
+transaction retain/restore, with native availability/context checks preserved.
+A thrown guard preserves prior custody/selection/history. The consuming factory
+supplies its real owner/reference/admission guard; no success or receipt is issued.
+
+`restoreSnapshot(snapshot, expected)` accepts only the exact retained snapshot
+object, on the same mounted owner, document identity/epoch and source revision.
+It restores the transaction owner's history and selection plus retained mode,
+search and textarea scroll state without taking focus. Foreign, cloned, superseded,
+document-switched or source-modified snapshots are rejected. Capture/restore during
+IME composition or after unmount is rejected. This is in-memory same-instance
+restoration, not cross-instance hydration, serialization or crash recovery.
+
+`inspectCapabilities()` reports the actual current roster and renderer proof
+availability on this instance. A real authorized last-valid-render ref is available
+only from an existing full-document renderer at the exact current identity/epoch/
+revision. That retained ref does not supply renderer hydration after disposal.
+Native/template surface subscriptions, complete renderer pipeline controls and
+external command/embed/upload resource owners remain absent. Aggregate inspect,
+pause and resume refuse before a partial transition when any roster owner is
+missing; disposal also requires every original owner to be paused and recoverable.
+A valid snapshot is preserved after refusal. Application panel/draft/crash-journal
+refs remain original-owner dependencies. This source must not mint an immediate
+ready receipt or admit workspace eviction.
+
+The resource participant contract is now exported as types from the root API:
+`MarkdownEditorSessionResourceParticipant` has one closed `ownerRef` and real
+`inspect`, `pause`, `resume` and recoverable `dispose` operations. The coordinator
+requires the entire owner roster before returning aggregate usage or beginning a
+transition. Duplicate/unknown owners, invalid counts, nonzero running resources
+reported as paused, failed resumes and unrecoverable disposal are refusals.
+`inspectResourceParticipants()` exposes the partial census and explicit missing
+owners; it does not claim that a partial census is total resource usage.
+
+The actual shared frame scheduler reports pending phase entries/handles, auxiliary
+frame handles and executing callbacks through a separate `resourceState()`; its
+original metrics field contract is unchanged. Pause cancels the actual handles
+and queue, rejects scheduling while paused and refuses cancellation inside an
+executing callback. Auxiliary continuations preserve their existing RAF timing;
+this increment does not qualify phase ordering or typography behavior.
+
+The partial editor-surface owner controls the actual gesture timer, ResizeObserver
+and owned viewport listeners. It remains excluded from the complete roster: Vue
+template/v-model DOM subscriptions lack a reversible detach/drain/rebind owner.
+Disabled/readonly does not prove subscription release; no full surface paused
+acknowledgment is available from these imperative controls alone. The layout owner
+tracks every existing nextTick/microtask continuation until it actually settles;
+its document identity, revision and lifecycle leases suppress stale effects.
+Pending microtasks cannot be removed physically and prevent a paused acknowledgment
+until settlement. Existing unnamed frames now go through the same scheduler.
+Retained transaction memory units count the union of live and checkpoint history
+entries as logical 64 KiB payload units, not physical heap measurements.
+
+The asynchronous command resource ledger retains the original attempt objects
+until their original `finally`, including aborted, concurrent and superseded
+attempts. It aborts the actual signals on pause and suppresses late commits and
+failure UI after lifecycle/document changes. It does not replace the command-key
+registry or recreate a command on resume. The async-command participant registers
+only when all configured and pending commands are the original editor-owned pure
+commands. Arbitrary public `run()` providers lack a resource census/control API;
+AbortSignal alone cannot establish request cancellation or zero network usage.
+Changing command props does not hide an outstanding external attempt. Blog's
+command adapters currently include such external providers, so this dependency
+remains explicit there.
+
+These implemented owners do not close the roster. Renderer/projection awaits complete underlying controls;
+native/template surface and external provider custody remain incomplete;
+external-command census, renderer last-valid checkpoint and recoverable disposal
+remain dependencies. Full public pause/resume/inspect/dispose refuse before a
+transition when any owner is absent. Integration with the concurrent typography
+increment additionally needs its visibility listener, deferred callbacks,
+measurement DOM and pending reflow promise in the actual resource census; the
+session-only patch does not modify that owner's source.
+
+
+The actual Web language controller now exclusively owns search creation/run/cancel.
+On mount it takes search custody before the first search; the editor no longer
+retains a second task alias or calls the runner independently. Search refreshes
+original source/revision/config/context before execution. Its actual language-search
+participant is registered only after controller binding. Pause first checks actual
+composition, cancels the real task/session, gates native attributes and clears
+existing match/highlight view aliases; document switches and unmount cancel through
+the same controller. Resume permits only fresh work, without replaying cancelled
+searches or automatically re-arming delayed native replacements. Controller memory
+and existing renderer/layout/native aliases retain their separate actual custody.
+`recoverable:false` and disposal refusal remain unchanged.
+
+This source consumes language owner offer `6b9eb126984973438bba02c89316bdd8a85bad73`
+as an isolated increment. Its six original-suite cases remain UNRUN. No runtime,
+native language-tool, IME, privacy, cross-session CSS-highlight or recovery
+qualification is supplied by this wiring.
+
+
+`captureLastValidRender()` reads the actual existing full-document renderer's
+opaque authorized result, checking the sole transaction owner's current document
+identity/epoch/revision. It returns null for absent, fragment/embed or stale renders;
+no hidden renderer or synthetic ref is created. `captureSnapshot` retains that
+nullable proof. A snapshot with a render proof cannot restore if the original
+renderer has lost/replaced that exact ref. This is same-owner custody checking,
+not serialized renderer hydration or recoverable disposal. The new snapshot field
+has no content/HTML payload and does not qualify a complete host snapshot.
+
+Renderer source offer `53d83a1c1f4c020597c6e807c8582f8c04309454` is consumed as its
+own isolated increment. Its partial resource source offer remains complete:false;
+the renderer-projection participant is not admitted. Real worker-pool/pipeline,
+hardware sampler, virtual-window and heavy-runtime control APIs and validated
+restoration remain upstream dependencies. Existing security/privacy/render/race/
+backuprestore/native/IME holds continue unchanged.
+
+
+The original editor now uses `createMarkdownAttachmentEmbedResourceOwner` as its
+single embed watcher/request/generation/version/results lifecycle. The previous
+component maps/Sets and async runner are removed rather than run in parallel.
+Retry, presentation versions, unmount abort and attachment-result eligibility
+all go through the actual owner. Cancelled provider promises and preparation
+work remain counted until their real settlement. Creation identity on original
+attachment jobs is retained; old-document and terminal progress cannot commit.
+
+The integrating participant refuses pause before any change when an upload is
+unfinished, preserving its original terminal-result path. Capture/retry use the
+actual pause gate. Opaque consumer networking has no inspect/control interface:
+once an embed provider is bound or an upload is invoked, this participant is
+excluded from the complete session roster until a real consumer owner exists.
+Replacing props or receiving a terminal response does not prove the producer
+released independent resources. Its library-only zero network count is never
+presented as whole-session usage for those consumers. The empty, never-external
+lifecycle can report its actual watcher/record census; disposal remains restricted
+to the source owner's verified empty paused state. No other owner's
+`recoverable:false` is promoted.
+
+Attachment offers `a4a25d2c` and
+`b4baa7d5b2ef43e9c0133584cf58f1922e23c2db` are preserved as separate source
+increments. The author's 51 runtime cases lacked coordinating-root approval and
+are excluded from this task's acceptance. Their command is not adopted as a
+preflight or executed here. This task performs source parsing/lint/compilation
+only; native/worker/network exposure of that external run is unresolved under
+the root audit and supplies no zero-resource or qualification evidence.
+
+
+Consumers may pass expected original document identity/epoch/revision as the second
+`captureSnapshot` argument. The transaction owner validates it before hashing or
+checkpoint mutation; stale mounted binding therefore preserves the prior snapshot.
+This supplements the post-digest actual-owner checks, without trusting registry
+identity as a substitute for reading the mounted original editor.
+
+
+The public `restoreLastValidRender(capture, expected)` delegates to the existing
+full-document mounted renderer's real retained projection restoration. It checks
+the original document epoch/revision and renderer instance across the await.
+Segmented/embed projections and replaced/busy owners fail closed. This operation
+does not restore the complete workspace snapshot or prove resource quiescence.
+The exact upstream renderer offer is UI916 `21c9e8769c005ffbc1fbd0a09a7ccc463211984e`;
+its measured source census remains `complete:false` and its participant remains
+excluded. Its A/B/C source review and all runtime qualification are still held.
+
+Language/search now consumes the reviewed UI917 final offer
+`e37960672df85705793d6534ed4c7c076b4a0f86`, including real runner buffer custody
+and cancellation checks. Its participant remains non-recoverable. The attachment
+participant is excluded pending original owner settlement/admission repairs.
+An `upload-image` event has no service future and cannot prove settlement.
+External command observation is monotonic for this instance: command prop
+replacement, abort or Promise settlement does not prove opaque resource release.
+The original default command implementation functions are validated as well as
+object identity. Deferred selection restoration rechecks its owner after focus.
+All incoming source cases and owning session cases remain UNRUN here.
+
+Document switches explicitly cancel the old typewriter owner's actual layout and
+scroll-cleanup frame handles and reset its scroll suppression flags. Old geometry
+callbacks keep their document-epoch guard; cleanup never executes stale geometry.
+This minimal source fix addresses the independent reviewer P2 on the original
+`9f600e0c` checkpoint. Runtime geometry/scroll/IME acceptance remains UNRUN.
+
+
+`attachmentDispatch({ batch, item, file, onProgress })` is an optional per-item
+consumer hook returning the **actual service Promise/thenable**, not a synchronous
+result. Native file capture retains the original File in the existing item custody
+for that attempt/retry. When configured, capture/retry invokes this hook through
+the original attachment owner's real dispatch ledger and does not also emit
+`upload-image` for that attempt. `onProgress` enters only its progress admission
+gate; terminal content receives the owner's immutable settled proof after the real
+future resolves. Rejection settles that ledger and updates only a still-current
+original job. No Promise is manufactured from an event or terminal label.
+
+Without the hook, the existing void `upload-image` event and legal
+`applyAttachmentResult` progress/Markdown completion remain compatible. Content
+admission is recorded on the original item before the event and still checks the
+original document/epoch, batch/item, revision, range and terminal state. This is
+content permission only: no service future, settlement proof or recoverability is
+issued. Started service-future attempts still need their exclusive owner proof even
+if the dispatch prop is later removed. Legacy resource settlement remains unknown, so an unknown or still-running legacy attempt cannot be retried as a
+settled attempt. The original paste-as-Markdown event producer has no registered
+attachment job/service future and retains its legacy event/unknown custody. No
+second upload is started. The existing MarkdownTextEditor Blog upload permission
+and callback path is unchanged; it supplies no real service future here.
+
+The immutable UI915 `90cc75bb5afce355430d414ee2e1b421ea265804` fixes are consumed
+as separate upstream commits. They separate embed refresh from attachment
+admission generations and progress from awaited terminal provenance, and control
+capacity refusal. Root source review remains held. Attachment total-roster
+registration remains disabled; arbitrary consumer network/timer resources and
+retained File physical-heap qualification are not inferred from promise settlement.
+All runtime/native/worker/network/IME/receipt qualifications remain UNRUN here.
+
+The public `inspectDocumentState()` reads identity/epoch/revision directly from
+the original transaction owner without digesting, capturing or replacing a
+checkpoint. It gives the existing Writer mount resolver a real editor binding
+before first edit/render, independent of adapter event caches. No body, history
+copy, route identity fallback or second mounted-session registry is introduced.
+
+
+`inspectRendererResourceSource()` reads scalar observations from the existing
+full-document mounted renderer, with the original editor document/epoch/revision
+and renderer-instance checks around the read. Missing, source-only or segmented
+renderer ownership returns null, never synthetic zero usage. The result keeps
+`complete:false`, `measuredUsageOnly:true`, `sourceReview:'unqualified'`, the actual
+nullable network measurement and original unknown timer/network/worker/pool tags.
+`pendingRenderAdmissions` and `pendingControlTransitions` read the underlying
+owner's actual counters. No scope capabilities, handles or mutation methods are
+exposed by this scalar projection; it does not enter the complete resource roster.
+
+This wiring consumes immutable renderer UI916
+`439ad560207b6cde1a6641c41d35c73714b45ad8` (A227/B54/C210 source) as a separate
+upstream offer. Its A cleanup-exception P1 remains under original-owner repair and
+is retained explicitly as a missing source-review dependency. Language UI917 final
+`e37960672df85705793d6534ed4c7c076b4a0f86` remains the actual registered controller
+participant, recoverable=false. Attachment review stays closed to registration;
+UI9155be7dcee904c4ea90db6835abf97a1e7319bd6a4 attempt-cache/unlink repairs are not consumed or accepted here. Readonly
+source inspection does not issue ready, paused, recovery or eviction proofs.
+
+`inspectAttachmentResourceSource()` reads the sole setup-owned attachment/embed
+participant's actual scalar counters through the same public session. The original
+inspection may refuse unknown legacy settlement or owner transitions; those
+exceptions remain visible. The result always keeps complete:false and unqualified
+source review, excludes opaque consumer network totals (`null`) and records missing
+consumer controls, dispatch continuation custody and recoverable checkpoint owners.
+It exposes no paused/recoverable acknowledgment or control capability and does not
+admit the attachment participant into the aggregate roster. Actual document epoch
+and revision are checked before/after this read, including same-source replacement.
+Candidate UI915311ffe5d remains under independent review and is not consumed by this
+owning scalar observation increment; the legacy content compatibility fix remains.
+
+The current renderer source combination is UI916
+`26d94443350bfbe91e0862640f7b8eacd17b5471`, consuming corrected A927
+`ef17179f8788a4bf69f0998e8635191460ad1db1`. Independent review closes the original
+worker cleanup callback exception P1 in source; the notification-watermark P2
+remains an explicit scalar source dependency. The actual renderer retains its
+callback failure, counts its diagnostic record and refuses projection restore
+while it remains. This session forwards the original missing recovery dependency
+and measured values without exposing failure causes/control handles or creating
+notification-delivery acknowledgment. Complete/unqualified and runtime holds remain.
+Attachment311ffe5d stays unconsumed; final-jobs callback context and raw/proxy job
+findings are under original-owner repair. Legacy settlement stays unknown.
+
+The current renderer combination is UI916
+`f3be19325c00e933c0590a988843d502ddec5f81`, consuming A928
+`f99529d944c604b0c2a0f518b95eb3403bf07d9f`. Root reports the notification-watermark
+P2 source CLOSED; the prior unconditional review-gap tag is removed. Actual pending
+notification still adds the original conditional settlement dependency and retained
+logical diagnostic unit, and blocks projection restore. A cleared pending snapshot
+means a notification attempt only; the original retained failure/recovery gap and
+all complete:false/unqualified/resource qualification holds remain.
+
+Attachment7d771a96 still has an original watcher lifecycle/unique-handle P1 under
+repair. Its actual bindAttachmentInputs contract was inspected: original reactive
+documentIdentity, editorRevision ref and deep attachmentJobs ref are the exact
+inputs; one prepared `.vue` hunk stays unapplied until source review. Existing
+attachmentEmbedOwner.abort owns watcher cleanup; no consumer watcher is added.
+
+Original editor panel captureViewState retains partial mode/search/caret scroll.
+Outline methods are model/reveal planners, not an active-node/scroll-anchor retained
+checkpoint issuer. Search and attachment original owners do not currently expose
+full immutable checkpoint/validation/restore refs. Those original producers must
+supply actual #2294/#2295 panel state before a complete factory refset can exist;
+ref aliases or reconstructed parallel panel state are not used here.
+
+The current attachment source is UI915
+`b1693bdb302714c11a974994246d11e4ca48d8b5`, consumed as an independent upstream
+increment. The sole setup-owned attachmentEmbedOwner now receives exactly one
+bindAttachmentInputs call using the existing reactive documentIdentity, original
+editorRevision ref and original deep attachmentJobs ref. Existing stable batch/item
+Maps remain the owner callbacks. No consumer watcher, copied job queue or second
+attachment owner is introduced. The original abort on unmount stops owner watcher
+lifetimes; original pause/resume delegates remain the sole lifecycle controls.
+
+Actual future dispatch/onProgress/frozen awaited-final provenance and original
+legacy content compatibility remain unchanged. Prior context/proxy/transition P1s
+are root-reported source CLOSED; combined session wiring is still unqualified.
+Failed native watcher stops remain actually owned/counted. Sequential request
+cancellation can stop early on a throwing cleanup while references remain; it is
+not release proof. Reviewed flag stays false and aggregate roster remains excluded
+until genuine consumer resource controls and acceptance exist. The separate public
+attachment892 FileConsumer/capture offer is not fabricated or replaced here; the
+original upload-image event is not renamed. Runtime/list/discovery/mount/native,
+consumer/native heap and eviction qualification all remain UNRUN.
+
+
+## Native attachment File bridge
+
+Native pick, paste, and drop retain their actual `File` objects only for active
+attachment jobs in the owning editor. The `upload-image` event still receives the
+metadata-only `MarkdownAttachmentBatchIntent` first; it never gains a `files`
+property. Native accepted captures add an optional second argument,
+`MarkdownAttachmentCaptureObservation`:
+
+```ts
+interface MarkdownAttachmentCaptureObservation {
+  readonly batch: MarkdownAttachmentBatchIntent
+  readonly transaction: MarkdownEditorTransactionEvent
+  readonly plan: Readonly<{
+    transaction: MarkdownEditorTransaction
+    jobs: readonly Readonly<MarkdownAttachmentJob>[]
+  }>
+  readonly placements: readonly Readonly<{
+    item: MarkdownAttachmentItemIntent
+    range: MarkdownAttachmentRange
+  }>[]
+}
+
+type MarkdownAttachmentFileConsumer = (
+  file: File,
+  capture: MarkdownAttachmentCaptureObservation,
+) => void
+
+const accepted = editor.value?.withAttachmentFile(batch, item, (file, capture) => {
+  // Bind the consumer's original capture to this accepted placeholder transaction,
+  // then lend this exact File and item.signal to its genuine pending upload handle.
+})
+```
+
+These types are exported by the existing MarkdownEditor public type boundary.
+`withAttachmentFile(batch, item, consume): boolean` calls the consumer synchronously
+with the identical original native File and genuine capture observation, or returns
+`false` without calling it. It requires the original batch and item objects from this
+editor, the exact item order, capture revision, document id/epoch, first attempt, and
+active batch/item signals. Equal metadata, object spreads, reconstructed IDs,
+serialized observations, another editor's objects, and metadata-only captures do
+not grant a File association. The observation itself contains no Files.
+
+The observation's `transaction` is the exact read-only object emitted by the
+existing `transaction` event for the accepted placeholder insertion. Its
+`beforeRevision === batch.revision` and its
+`transaction.expectedRevision === batch.revision`. Its post `revision` increments
+once when content changes; replacing a placeholder with identical bytes is an
+accepted no-op with the same before/post revision, following the existing kernel.
+The replacement still revokes the previous File, even for equal metadata. Native
+event fingerprints distinguish new batch/item IDs at an unchanged revision;
+fingerprints and IDs alone never grant File access. All ordered placeholders
+enter that one change/dispatch. `upload-image` runs after dispatch and job registration;
+the File loan performs no capture or dispatch. `plan` is the actual original
+planner result, including the original transaction and job objects; its jobs stay
+owned by the existing lifecycle and can subsequently rebase. `placements` retains
+the original frozen range objects from those jobs, paired with the original ordered
+items. Use these ranges and the actual accepted transaction/result/position map to
+verify the localized placeholders; do not replan or derive offsets from filenames.
+Consumers connect their original capture to genuine pending handles by admitting
+that existing transaction in their own context. A consumer `commitCreated` that
+dispatches its own placeholder requires a consumer-owned admission change first;
+receiving this event must not insert placeholders again. An observer that changes
+the document/revision during dispatch prevents the old capture from granting Files.
+The original accepted jobs enter the existing attachment lifecycle before public
+dispatch callbacks run; File associations are registered only after those jobs
+remain current. A callback that deletes or replaces an original placement prevents
+admission even when it inserts identical bytes and the revision stays unchanged.
+Selection-only callbacks and non-deleting edits at the same revision preserve the
+association. Refusal retires only that capture's original jobs/items before aborting
+its signals; it does not recreate a placement or grant from matching source bytes.
+Public transaction metadata cannot exempt an attachment from mapping. Completion
+and removal keep their existing exemption through their actual private owning job,
+without granting authority to a copied item ID.
+
+Each item has its own `AbortSignal`. Cancellation, retry, rejection, completion,
+removal, replacement, or deletion revoke that item's loan and release the retained
+File. Other pending items remain independent. Ordinary edits keep surviving jobs
+current through the existing range rebasing. A document id/epoch change or unmount
+revokes every loan before abort listeners run. The batch signal aborts when its last
+loan is revoked. Metadata retry events keep their existing first-argument contract
+but have no native capture observation and cannot remint a released File: obtaining
+another File requires a new native capture.
+
+Accepted edits rebase every affected attachment job and remove all deleted File
+associations before invoking any item abort listener. A deleted sibling cannot be
+borrowed during another item's abort callback; surviving rebased siblings remain
+usable. Abort signals still run their normal synchronous listeners.
+
+Completion plans retain the actual placeholder range until the existing dispatcher
+accepts the replacement. After File revocation and its callbacks, the editor verifies
+the original item/batch/job binding, attempt, range, source, current document id/epoch
+(including props awaiting a switch), and current revision. The completion transaction
+carries that document identity and `expectedRevision`; the resolved range is published
+with the actual accepted result/position map before outward transaction observers.
+A callback that edits, replaces, deletes, switches, or releases this context causes
+coherent refusal and preserves the current source. Equal numeric revisions alone
+cannot authorize a completion: an equal-byte replacement map can delete its anchor.
+A stale completion cannot be revived by later progress/resolved callbacks. Recover
+through a fresh native replacement and its new original File association. Ordinary
+current completions and surviving independent items continue through
+`applyAttachmentResult()`.
+
+Accepted transaction events retain their original result/map as historical evidence,
+even if a synchronous listener commits a newer transaction. Model/change notifications
+and saved selection/history effects require the result's document id/epoch, current
+source and revision to remain current. The editor checks again after each outward
+callback, including the model notification; a nested edit cannot be followed by an
+older model/change value. A selection-only callback can keep the content result current
+while superseding its selection. Queued selection restoration checks the actual document,
+source, revision and selection again after the next tick and after focus listeners.
+Release/unmount also suppresses saved effects. Native capture checks the released state
+before capture and again after the accepted dispatch, before registering any job or
+File association. If a transaction listener unmounts the editor, the fresh unregistered
+batch/item controllers abort and no association is recreated after cleanup. File loans
+also require a live editor. The editor preserves callbacks and the accepted historical
+transaction; it does not replay or remint the superseded operation.
+
+Applications own their pending handles, upload IO, callbacks, and cleanup of any
+references they retain from the synchronous loan; observe `item.signal` when lending
+into an upload. Continue returning results through `applyAttachmentResult()`.
+File access and transaction observations confer no asset/reference/cleanup
+authority. Descriptor-only upload events remain metadata-only and omit the second
+argument. This bridge does not qualify a browser/device or consumer integration.
+
+The #2295 integration keeps `getSession`, capture fingerprint census and all
+existing real future/attempt result gates. Legacy content-attempt bookkeeping
+uses the original item object without replacing it or retaining another File.
+Copied job document identity is checked together with private raw-job/original
+batch/item proof. The original batch Map now owns revocable records; its actual
+resource census includes File/controller entries and accepted capture placements.
+Opaque consumer resources and post-future continuations remain unqualified;
+`attachmentResourceOwnerReviewed` stays false and complete pause/disposal is
+unavailable. Selection restoration keeps the existing tracked layout scheduler
+and rechecks current native state after focus. These are source capabilities,
+not runtime, resource-release, recovery or eviction qualification.
+
+During actual synchronous File revocation, public attachment resource inspection
+and participant control refuse while cleanup callbacks are still executing.
+Detached records/controllers can remain on that cleanup stack; an empty Map
+alone is not a release acknowledgment. Surviving File loans still follow their
+original per-item admission. The guard ends when the actual cleanup frame exits.
