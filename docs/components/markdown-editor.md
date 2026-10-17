@@ -174,6 +174,12 @@ authority. See the [heavy-feature lifecycle contract](../api/markdown-heavy-feat
 
 ## Command registry
 
+The overflow trigger is a normal-flow sibling of the horizontal primary-command scroller.
+Scrolling primary commands keeps the trigger reachable without horizontal sticky positioning
+or covering a command. It follows the toolbar during page scrolling; only the existing compact
+`editor-profile="prose"` toolbar has vertical sticky behavior. The tray keeps its command/action
+count, expanded state, and Escape focus return to the trigger.
+
 Every command surface consumes the same `MarkdownEditorCommand` registry. Commands use stable
 `key`, `label`, `group`, controlled icon tokens, shortcuts, and presentation targets;
 `when(context)` controls presentation and `enabled(context)` controls execution. `preview`

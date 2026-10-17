@@ -168,31 +168,33 @@
       ref="toolbarRef"
       :class="ns.e('toolbar')"
     >
-      <div :class="ns.e('commands')">
-        <button
-          v-for="command in primaryCommands"
-          :key="command.key"
-          type="button"
-          :class="ns.e('command')"
-          :disabled="isCommandDisabled(command)"
-          :aria-describedby="commandDescriptionId(command)"
-          :aria-label="commandName(command)"
-          :title="commandName(command)"
-          @click="activateCommand(command)"
-        >
-          {{ commandName(command) }}
-        </button>
-        <button
-          v-if="gatedPasteAsMarkdownCommand"
-          type="button"
-          :class="ns.e('command')"
-          disabled
-          :aria-describedby="pasteAsMarkdownDescriptionId"
-          :aria-label="commandName(gatedPasteAsMarkdownCommand)"
-          :title="commandName(gatedPasteAsMarkdownCommand)"
-        >
-          {{ commandName(gatedPasteAsMarkdownCommand) }}
-        </button>
+      <div :class="ns.e('command-group')">
+        <div :class="ns.e('commands')">
+          <button
+            v-for="command in primaryCommands"
+            :key="command.key"
+            type="button"
+            :class="ns.e('command')"
+            :disabled="isCommandDisabled(command)"
+            :aria-describedby="commandDescriptionId(command)"
+            :aria-label="commandName(command)"
+            :title="commandName(command)"
+            @click="activateCommand(command)"
+          >
+            {{ commandName(command) }}
+          </button>
+          <button
+            v-if="gatedPasteAsMarkdownCommand"
+            type="button"
+            :class="ns.e('command')"
+            disabled
+            :aria-describedby="pasteAsMarkdownDescriptionId"
+            :aria-label="commandName(gatedPasteAsMarkdownCommand)"
+            :title="commandName(gatedPasteAsMarkdownCommand)"
+          >
+            {{ commandName(gatedPasteAsMarkdownCommand) }}
+          </button>
+        </div>
         <button
           v-if="overflowItemCount"
           ref="commandOverflowRef"
