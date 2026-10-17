@@ -126,6 +126,10 @@ Each unregister handle retires its own registration once. It restores the
 nearest still-live predecessor only while its own policy remains current.
 Releasing an older registration cannot overwrite a newer registration, revive
 an already-released predecessor, or restore entries removed by `clear*`.
+Live unregister handles own predecessor restoration. Releasing a registration
+unlinks it from that history; Map membership alone does not retain discarded
+handles or their predecessor chains. A still-current policy value remains stored
+even when its handle is discarded.
 Batch acquisition releases previously acquired handles if a later input throws;
 batch release attempts all handles in reverse order, preserving original causes.
 

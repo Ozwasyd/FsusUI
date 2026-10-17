@@ -1,3 +1,6 @@
+import { execFileSync } from 'node:child_process'
+import { resolve } from 'node:path'
+import { pathToFileURL } from 'node:url'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 let registry: typeof import('../vue/render-pipeline-policy')
@@ -239,5 +242,101 @@ describe('component policy ownership', () => {
     registry.clearFsusRenderPipelineComponentPolicies()
     expect(authority.getFailures()).toEqual(failures)
     expect(authority.issueTicket()).toBeNull()
+  })
+
+  it('preserves the surviving predecessor when a listener reenters the same release', () => {
+    const authority = registry.getFsusRenderPipelineComponentPolicyAuthority()
+    const releaseFirst =
+      registry.registerFsusRenderPipelineComponentPolicyByName('ElButton')
+    const first = registry.getFsusRenderPipelineComponentPolicy('ElButton')
+    const releaseSecond =
+      registry.registerFsusRenderPipelineComponentPolicyByName('ElButton')
+    let releaseReplacement = () => {}
+    let armed = false
+    const releaseListener = authority.subscribe(() => {
+      if (!armed) return
+      armed = false
+      releaseSecond()
+      releaseReplacement =
+        registry.registerFsusRenderPipelineComponentPolicyByName('ElButton')
+    })
+    armed = true
+    releaseSecond()
+    expect(registry.getFsusRenderPipelineComponentPolicy('ElButton')).not.toBe(
+      first,
+    )
+    releaseReplacement()
+    expect(registry.getFsusRenderPipelineComponentPolicy('ElButton')).toBe(
+      first,
+    )
+    releaseFirst()
+    expect(registry.hasFsusRenderPipelineComponentPolicy('ElButton')).toBe(
+      false,
+    )
+    releaseListener()
+  })
+})
+
+it('releases retired and discarded registration history under real garbage collection', () => {
+  const moduleUrl = pathToFileURL(
+    resolve('vue/packages/utils/vue/render-pipeline-policy.ts'),
+  ).href
+  const script = `
+    import assert from 'node:assert/strict'
+    const loaded = await import(${JSON.stringify(moduleUrl)})
+    const registry = loaded.default ?? loaded
+    const collect = async () => {
+      for (let turn = 0; turn < 8; turn++) {
+        await new Promise((resolve) => setImmediate(resolve))
+        globalThis.gc()
+      }
+    }
+    const populate = (mode) => {
+      const references = []
+      let previousRelease
+      for (let index = 0; index < 1000; index++) {
+        const release = registry.registerFsusRenderPipelineComponentPolicyByName('ElButton')
+        references.push(new WeakRef(registry.getFsusRenderPipelineComponentPolicy('ElButton')))
+        if (mode === 'released') {
+          previousRelease?.()
+          previousRelease = release
+        }
+      }
+      return { references, release: previousRelease }
+    }
+    const results = {}
+    for (const mode of ['released', 'discarded']) {
+      const state = populate(mode)
+      await collect()
+      const retained = state.references.filter((reference) => reference.deref()).length
+      assert.equal(retained, 1, mode + ' history must not be owned by Map membership')
+      state.release?.()
+      state.release = undefined
+      registry.clearFsusRenderPipelineComponentPolicies()
+      await collect()
+      const afterClear = state.references.filter((reference) => reference.deref()).length
+      assert.equal(afterClear, 0)
+      results[mode] = { retained, afterClear }
+    }
+    registry.registerFsusRenderPipelineComponentPolicyByName('ElButton')
+    const predecessor = new WeakRef(registry.getFsusRenderPipelineComponentPolicy('ElButton'))
+    await collect()
+    const release = registry.registerFsusRenderPipelineComponentPolicyByName('ElButton')
+    await collect()
+    assert.ok(predecessor.deref(), 'a live undo handle must still own its predecessor')
+    release()
+    assert.equal(registry.getFsusRenderPipelineComponentPolicy('ElButton'), predecessor.deref())
+    results.restored = true
+    console.log(JSON.stringify(results))
+  `
+  const output = execFileSync(
+    process.execPath,
+    ['--expose-gc', '--import', 'tsx', '--input-type=module', '-e', script],
+    { encoding: 'utf8', cwd: process.cwd() },
+  )
+  expect(JSON.parse(output)).toEqual({
+    released: { retained: 1, afterClear: 0 },
+    discarded: { retained: 1, afterClear: 0 },
+    restored: true,
   })
 })

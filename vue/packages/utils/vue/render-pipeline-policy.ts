@@ -79,12 +79,13 @@ const componentPolicies = new Map<string, OwnedComponentPolicy>()
 type PolicyRegistration = {
   policy: OwnedComponentPolicy
   previous?: PolicyRegistration
+  next?: WeakRef<PolicyRegistration>
   active: boolean
   generation: object
 }
 const policyRegistrations = new WeakMap<
   OwnedComponentPolicy,
-  PolicyRegistration
+  WeakRef<PolicyRegistration>
 >()
 let policyGeneration = {}
 let policyTicket: object | null = null
@@ -351,27 +352,48 @@ const normalizeComponentPolicy = (
 const registerComponentPolicy = (policy: FsusRenderPipelineComponentPolicy) => {
   const normalized = normalizeComponentPolicy(policy)
   const previousPolicy = componentPolicies.get(normalized.componentName)
+  let previous =
+    previousPolicy && policyRegistrations.get(previousPolicy)?.deref()
+  if (previousPolicy && !previous) {
+    // A discarded handle cannot own history, but its current value still exists.
+    previous = {
+      policy: previousPolicy,
+      active: true,
+      generation: policyGeneration,
+    }
+    policyRegistrations.set(previousPolicy, new WeakRef(previous))
+  }
   const registration: PolicyRegistration = {
     policy: normalized,
-    previous: previousPolicy && policyRegistrations.get(previousPolicy),
+    previous,
     active: true,
     generation: policyGeneration,
   }
-  policyRegistrations.set(normalized, registration)
+  if (previous) previous.next = new WeakRef(registration)
+  // Live handles own rollback history; Map membership must not retain that graph.
+  policyRegistrations.set(normalized, new WeakRef(registration))
   componentPolicies.set(normalized.componentName, normalized)
 
   return () => {
     if (!registration.active) return
     changeComponentPolicies('unregister', () => {
+      if (!registration.active) return
       registration.active = false
+      let previous = registration.previous
+      while (previous && !previous.active) previous = previous.previous
+      const next = registration.next?.deref()
+      if (next?.previous === registration) next.previous = previous
+      if (previous?.next?.deref() === registration) {
+        previous.next = registration.next
+      }
+      registration.previous = undefined
+      registration.next = undefined
       if (
         registration.generation !== policyGeneration ||
         componentPolicies.get(normalized.componentName) !== normalized
       ) {
         return
       }
-      let previous = registration.previous
-      while (previous && !previous.active) previous = previous.previous
       if (previous) {
         componentPolicies.set(normalized.componentName, previous.policy)
       } else {
