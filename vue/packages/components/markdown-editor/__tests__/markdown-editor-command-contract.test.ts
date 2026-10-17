@@ -1,6 +1,7 @@
 import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { describe, expect, it } from 'vitest'
+import { commandLifecycleViolations } from './markdown-editor-command-lifecycle-guard'
 
 const editorRoot = resolve(__dirname, '..')
 
@@ -202,9 +203,7 @@ describe('Markdown editor command contract', () => {
   it('requires command lifecycle ownership instead of creating a controller for each invocation', () => {
     const component = readFileSync(resolve(editorRoot, 'src', 'markdown-editor.vue'), 'utf8')
 
-    expect(component).toMatch(/pending.*command|command.*pending/is)
-    expect(component).toMatch(/abort\(/)
-    expect(component).not.toMatch(/const controller = new AbortController\(\)/)
+    expect(commandLifecycleViolations(component)).toEqual([])
   })
 
   it('keeps the command source shared by every command surface', () => {
@@ -222,5 +221,748 @@ describe('Markdown editor command contract', () => {
     )
 
     expect(interactionTests).not.toMatch(/native[- ]IME.*(?:passed|accepted)/i)
+  })
+})
+
+// Exact historical per-invocation owner before3179ca0d, from80c1a14f9ab911b81af64e2fd77d30216c25c50b.
+const historicalPerInvocationRun = `const runCommand = async (command: MarkdownEditorCommand) => {
+  if (editingBlocked.value || nativeMachine.freezeSmartInput) return
+  if (pendingCommandKeys.value.has(command.key)) return
+
+  const selection = captureSelection()
+  const commandController = new AbortController()
+  commandControllers.set(command.key, commandController)
+  pendingCommandKeys.value = new Set(pendingCommandKeys.value).add(command.key)
+  const revision = transactionStore.revision
+  const value = transactionStore.value
+  try {
+    const context = {
+      dispatch: { dispatch: dispatchTransaction },
+      documentIdentity,
+      mode: currentMode.value,
+      readonly: editingBlocked.value,
+      revision,
+      selection,
+      signal: commandController.signal,
+      value,
+    }
+    if (!isMarkdownEditorCommandVisible(command, context) || !isMarkdownEditorCommandEnabled(command, context)) return
+    const result = await runMarkdownEditorCommand(command, context)
+    if (commandController.signal.aborted || commandControllers.get(command.key) !== commandController) return
+    if (!result?.transaction) return
+    const dispatchResult = dispatchTransaction({
+      ...result.transaction,
+      expectedRevision: revision,
+      history: result.transaction.history ?? 'separate',
+      metadata: Object.freeze({ command: command.key }),
+      origin: 'command',
+    })
+    if (dispatchResult.accepted) emit('command', command)
+  } finally {
+    if (commandControllers.get(command.key) === commandController) {
+      commandControllers.delete(command.key)
+      const pending = new Set(pendingCommandKeys.value)
+      pending.delete(command.key)
+      pendingCommandKeys.value = pending
+    }
+  }
+}
+
+`
+
+describe('Markdown editor command lifecycle source guard controls', () => {
+  const component = readFileSync(
+    resolve(editorRoot, 'src', 'markdown-editor.vue'),
+    'utf8',
+  )
+  const replace = (from: string, to: string) => {
+    expect(component.includes(from), from).toBe(true)
+    const changed = component.replace(from, to)
+    expect(changed).not.toBe(component)
+    return changed
+  }
+  const historical = () => {
+    const start = component.indexOf('const runCommand = async (')
+    const end = component.indexOf('const runAction = (', start)
+    expect(start).toBeGreaterThan(0)
+    expect(end).toBeGreaterThan(start)
+    return (
+      component.slice(0, start) +
+      historicalPerInvocationRun +
+      component.slice(end)
+    )
+  }
+
+  it.each(['original', 'renamed-and-reformatted', 'comment-decoy'] as const)(
+    'rejects the historical per-invocation command owner: %s',
+    (kind) => {
+      let source = historical()
+      if (kind === 'renamed-and-reformatted')
+        source = source
+          .replaceAll('commandController', 'otherCancellationOwner')
+          .replaceAll('new AbortController()', 'new   AbortController ( )')
+      if (kind === 'comment-decoy') {
+        const start = component.indexOf('const runCommand = async (')
+        const end = component.indexOf('const runAction = (', start)
+        source = source.replace(
+          '</script>',
+          `/* ${component.slice(start, end)} */\n</script>`,
+        )
+      }
+      const violations = commandLifecycleViolations(source)
+      expect(violations).toContain('command-local-controller')
+      expect(violations).toContain('real-session-factory')
+    },
+  )
+
+  it.each([
+    [
+      'a command-local controller regardless of its name',
+      'const session = createMarkdownEditorCommandSession(',
+      'const differentlyNamedOwner = new   AbortController ( )\n  const session = createMarkdownEditorCommandSession(',
+      'command-local-controller',
+    ],
+    [
+      'an aliased command-local controller constructor',
+      'const activeSession = commandSessions.get(command.key)',
+      'const CancellationOwner = AbortController\n  const hiddenOwner = new CancellationOwner()\n  const activeSession = commandSessions.get(command.key)',
+      'command-local-controller',
+    ],
+    [
+      'a foreign signal',
+      'signal: session.abort.signal,',
+      'signal: commandContextSignal,',
+      'original-session-signal',
+    ],
+    [
+      'a fabricated factory call',
+      'const session = createMarkdownEditorCommandSession(',
+      'const session = fabricatedSessionFactory(',
+      'real-session-factory',
+    ],
+    [
+      'a factory imported from a different module',
+      "from './markdown-editor-command-async'",
+      "from './fake-command-async'",
+      'real-session-factory',
+    ],
+    [
+      'a shadowed factory with the right name',
+      'const session = createMarkdownEditorCommandSession(',
+      'const createMarkdownEditorCommandSession = (...args: unknown[]) => ({ abort: { signal: commandContextSignal } })\n  const session = createMarkdownEditorCommandSession(',
+      'real-session-factory',
+    ],
+    [
+      'a private registry passed to the factory',
+      'activeSessions: commandSessions,',
+      'activeSessions: new Map(),',
+      'shared-session-registry',
+    ],
+    [
+      'a shadowed shared registry',
+      'const activeSession = commandSessions.get(command.key)',
+      'const commandSessions = new Map()\n  const activeSession = commandSessions.get(command.key)',
+      'shared-session-registry',
+    ],
+    [
+      'missing shared registration',
+      'commandSessions.set(command.key, session)',
+      'void session',
+      'register-original-session',
+    ],
+    [
+      'registration of a session clone',
+      'commandSessions.set(command.key, session)',
+      'commandSessions.set(command.key, { ...session })',
+      'register-original-session',
+    ],
+    [
+      'registration under a different key',
+      'commandSessions.set(command.key, session)',
+      "commandSessions.set('foreign', session)",
+      'register-original-session',
+    ],
+    [
+      'missing pending publication',
+      "commandRuntimeStates.value.set(command.key, { state: 'pending' })",
+      'void command.key',
+      'publish-pending-session',
+    ],
+    [
+      'missing post-await ownership check',
+      'if (commandSessions.get(command.key) !== session) return',
+      '',
+      'post-await-original-session',
+    ],
+    [
+      'checking ownership before await only',
+      'const result = await runMarkdownEditorCommand(command, context)\n    if (commandSessions.get(command.key) !== session) return',
+      'if (commandSessions.get(command.key) !== session) return\n    const result = await runMarkdownEditorCommand(command, context)',
+      'post-await-original-session',
+    ],
+    [
+      'a copied session in the post-await check',
+      'if (commandSessions.get(command.key) !== session) return',
+      'if (commandSessions.get(command.key) !== { ...session }) return',
+      'post-await-original-session',
+    ],
+    [
+      'post-await lookup under a different key',
+      'if (commandSessions.get(command.key) !== session) return',
+      "if (commandSessions.get('foreign') !== session) return",
+      'post-await-original-session',
+    ],
+    [
+      'a different executor',
+      'await runMarkdownEditorCommand(command, context)',
+      'await fabricatedExecutor(command, context)',
+      'await-real-command',
+    ],
+    [
+      'a different rebase helper',
+      'const rebasedState = rebaseMarkdownEditorCommandSession(',
+      'const rebasedState = fabricatedRebase(',
+      'rebase-original-session',
+    ],
+    [
+      'rebasing a session copy',
+      'session,\n      currentContext,\n      positionMap,',
+      '{ ...session },\n      currentContext,\n      positionMap,',
+      'rebase-original-session',
+    ],
+    [
+      'an unrelated revision map',
+      'session.revision,\n      currentContext.revision,',
+      '0,\n      currentContext.revision,',
+      'rebase-original-session',
+    ],
+    [
+      'resolving a session copy',
+      "session,\n      currentContext,\n      'resolved-current',",
+      "{ ...session },\n      currentContext,\n      'resolved-current',",
+      'resolve-original-session',
+    ],
+    [
+      'missing rebase outcome guard',
+      "if (rebasedState !== 'pending') {",
+      'if (false) {',
+      'guard-current-commit',
+    ],
+    [
+      'missing resolution outcome guard',
+      "if (resolvedState !== 'resolved-current') return",
+      '',
+      'guard-current-commit',
+    ],
+    [
+      'dispatch before current-session resolution',
+      'const result = await runMarkdownEditorCommand(command, context)',
+      "dispatchTransaction({ changes: [], history: 'skip', origin: 'command' })\n    const result = await runMarkdownEditorCommand(command, context)",
+      'guard-current-commit',
+    ],
+    [
+      'a copied session in finally',
+      'if (commandSessions.get(command.key) === session) {',
+      'if (commandSessions.get(command.key) === { ...session }) {',
+      'retire-original-session',
+    ],
+    [
+      'missing session retirement',
+      'commandSessions.delete(command.key)',
+      'void command.key',
+      'retire-original-session',
+    ],
+    [
+      'a shadowed cancellation helper',
+      'const abortPendingCommands = () => {',
+      'const abortPendingCommands = () => {\n  const abortMarkdownEditorCommandSessions = () => undefined',
+      'abort-shared-sessions',
+    ],
+    [
+      'a private cancellation registry',
+      'const abortPendingCommands = () => {',
+      'const abortPendingCommands = () => {\n  const commandSessions = new Map()',
+      'abort-shared-sessions',
+    ],
+    [
+      'a shadowed model-reset canceller',
+      '    abortPendingCommands()\n    // Document switch:',
+      '    const abortPendingCommands = () => undefined\n    abortPendingCommands()\n    // Document switch:',
+      'cancel-model-reset',
+    ],
+    [
+      'missing imported cancellation',
+      "abortMarkdownEditorCommandSessions(commandSessions.values(), 'editor-reset')",
+      'void commandSessions.values()',
+      'abort-shared-sessions',
+    ],
+    [
+      'cancellation of another registry',
+      "abortMarkdownEditorCommandSessions(commandSessions.values(), 'editor-reset')",
+      "abortMarkdownEditorCommandSessions(new Map().values(), 'editor-reset')",
+      'abort-shared-sessions',
+    ],
+    [
+      'missing registry cleanup',
+      'commandSessions.clear()',
+      'void commandSessions',
+      'abort-shared-sessions',
+    ],
+    [
+      'missing original controller abort',
+      "session.abort.abort('editor-reset')",
+      'void session',
+      'abort-original-controllers',
+    ],
+    [
+      'missing model-reset cancellation',
+      '    abortPendingCommands()\n    // Document switch:',
+      '    // Document switch:',
+      'cancel-model-reset',
+    ],
+    [
+      'missing document-reset cancellation',
+      'const previousHistory = transactionStore.history\n    abortPendingCommands()',
+      'const previousHistory = transactionStore.history',
+      'cancel-document-reset',
+    ],
+    [
+      'missing unmount cancellation',
+      'languageToolsController = null\n  abortPendingCommands()',
+      'languageToolsController = null',
+      'cancel-unmount',
+    ],
+  ] as const)('rejects %s', (_name, from, to, rule) => {
+    expect(commandLifecycleViolations(replace(from, to))).toContain(rule)
+  })
+
+  it('accepts legitimate local binding renames and formatting', () => {
+    const renamed = component
+      .replaceAll('commandSessions', 'ownedAttempts')
+      .replace(/\bsession\b/gu, 'attempt')
+      .replaceAll('attempt.abort.signal', 'attempt . abort . signal')
+    expect(renamed).toContain('attempt . abort . signal')
+    expect(commandLifecycleViolations(renamed)).toEqual([])
+  })
+
+  it('accepts the actual imported factory through its local import alias', () => {
+    const aliased = component
+      .replace(
+        '  createMarkdownEditorCommandSession,',
+        '  createMarkdownEditorCommandSession as createOwnedSession,',
+      )
+      .replace(
+        'const session = createMarkdownEditorCommandSession(',
+        'const session = createOwnedSession(',
+      )
+    expect(aliased).not.toBe(component)
+    expect(commandLifecycleViolations(aliased)).toEqual([])
+  })
+
+  it('allows the independent native attachment controller boundary unchanged', () => {
+    expect(component).toContain('const controller = new AbortController()')
+    expect(component).toContain(
+      'const fileControllers = files.map(() => new AbortController())',
+    )
+    expect(commandLifecycleViolations(component)).toEqual([])
+    const extended = component.replace(
+      '<script lang="ts" setup>',
+      '<script lang="ts" setup>\nconst unrelatedOwner = new AbortController()',
+    )
+    expect(commandLifecycleViolations(extended)).toEqual([])
+  })
+})
+
+describe('Command lifecycle guard execution-boundary regressions', () => {
+  const component = readEditorSource('markdown-editor.vue')
+  const replace = (from: string, to: string) => {
+    expect(component.split(from)).toHaveLength(2)
+    return component.replace(from, to)
+  }
+  const execute = '    const result = await runMarkdownEditorCommand(command, context)'
+
+  it.each([
+    ['an aliased context signal write', 'const loan = context\n    loan.signal = commandContextSignal'],
+    ['a reassigned context alias', 'let loan\n    loan = context\n    loan.signal = commandContextSignal'],
+    ['an element-access signal write', "context['signal'] = commandContextSignal"],
+    ['a context replacement', 'context = { ...context, signal: commandContextSignal }'],
+    ['a destructured signal write', '[context.signal] = [commandContextSignal]'],
+    ['a deleted signal', 'delete context.signal'],
+    ['an Object.assign signal write', 'Object.assign(context, { signal: commandContextSignal })'],
+    ['an aliased Object.assign write', 'const loan = context\n    Object.assign(loan, { signal: commandContextSignal })'],
+    ['a Reflect.set signal write', "Reflect.set(context, 'signal', commandContextSignal)"],
+    ['an Object.defineProperty signal write', "Object.defineProperty(context, 'signal', { value: commandContextSignal })"],
+    ['an aliased controller replacement', 'const loan = session\n    loan.abort = foreignAbort'],
+  ] as const)('rejects %s before the real executor', (_name, write) => {
+    expect(commandLifecycleViolations(replace(execute, `    ${write}\n${execute}`))).toContain('original-session-signal')
+  })
+
+  it.each([
+    ['a block return', '{ return }'],
+    ['a throw', "throw new Error('cancelled')"],
+    ['a constant true exit', 'if (true) return'],
+    ['a negated constant exit', 'if (!false) return'],
+    ['two exiting branches', 'if (commandContextSignal.aborted) return; else return'],
+    ['an infinite while loop', 'while (true) {}'],
+    ['an infinite for loop', 'for (;;) {}'],
+  ] as const)('rejects %s before the cancellation owner', (_name, exit) => {
+    expect(commandLifecycleViolations(replace('const abortPendingCommands = () => {', `const abortPendingCommands = () => {\n  ${exit}`))).toContain('abort-shared-sessions')
+  })
+
+  it('rejects unreachable cleanup after the genuine abort helper', () => {
+    expect(commandLifecycleViolations(replace('commandSessions.clear()', 'return\n  commandSessions.clear()'))).toContain('abort-shared-sessions')
+  })
+
+  it('rejects a replaced original controller before the context is created', () => {
+    expect(commandLifecycleViolations(replace('  try {\n    const context = {', '  try {\n    session.abort = foreignAbort\n    const context = {'))).toContain('original-session-signal')
+  })
+
+  it('rejects an initializer spread that can replace its genuine signal', () => {
+    expect(commandLifecycleViolations(replace('signal: session.abort.signal,', 'signal: session.abort.signal,\n      ...initialContext,'))).toContain('original-session-signal')
+  })
+
+  it('rejects unreachable original controller aborts inside the registry loop', () => {
+    expect(commandLifecycleViolations(replace("session.abort.abort('editor-reset')", "return\n    session.abort.abort('editor-reset')"))).toContain('abort-original-controllers')
+  })
+
+  it.each([
+    ['model reset', '    abortPendingCommands()\n    // Document switch:', 'cancel-model-reset'],
+    ['document reset', 'const previousHistory = transactionStore.history\n    abortPendingCommands()', 'cancel-document-reset'],
+    ['unmount', 'languageToolsController = null\n  abortPendingCommands()', 'cancel-unmount'],
+  ] as const)('rejects an unreachable %s hook call', (_name, from, rule) => {
+    const offset = from.lastIndexOf('abortPendingCommands()')
+    const to = `${from.slice(0, offset)}return\n  abortPendingCommands()${from.slice(offset + 'abortPendingCommands()'.length)}`
+    expect(commandLifecycleViolations(replace(from, to))).toContain(rule)
+  })
+
+  it('rejects a key taken from another defined parameter path', () => {
+    const start = component.indexOf('const runCommand = async (')
+    const end = component.indexOf('const runAction = (', start)
+    expect(end).toBeGreaterThan(start)
+    const original = component.slice(start, end)
+    expect(commandLifecycleViolations(replace(original, original.replaceAll('command.key', 'foreign.key')))).toContain('original-command-key')
+  })
+
+  it('rejects a rewritten legitimate parameter key', () => {
+    expect(commandLifecycleViolations(replace('const session = createMarkdownEditorCommandSession(', "command.key = 'foreign'\n  const session = createMarkdownEditorCommandSession("))).toContain('original-command-key')
+  })
+
+  it('rejects a command key rewritten through a local alias', () => {
+    expect(commandLifecycleViolations(replace('const session = createMarkdownEditorCommandSession(', "const loan = command\n  loan.key = 'foreign'\n  const session = createMarkdownEditorCommandSession("))).toContain('original-command-key')
+  })
+
+  it('rejects execution of a different command than the registered parameter', () => {
+    expect(commandLifecycleViolations(replace(execute, execute.replace('(command, context)', '(foreign, context)')))).toContain('execute-original-command')
+  })
+
+  it('accepts a renamed real command parameter', () => {
+    const start = component.indexOf('const runCommand = async (')
+    const end = component.indexOf('const runAction = (', start)
+    expect(end).toBeGreaterThan(start)
+    const original = component.slice(start, end)
+    expect(commandLifecycleViolations(replace(original, original.replace(/\bcommand\b/gu, 'operation')))).toEqual([])
+  })
+
+  it('accepts readonly context aliases before execution', () => {
+    expect(commandLifecycleViolations(replace(execute, `    const loan = context\n    void loan.signal\n${execute}`))).toEqual([])
+  })
+
+  it('accepts a definitely bypassed cancellation exit', () => {
+    expect(commandLifecycleViolations(replace('const abortPendingCommands = () => {', 'const abortPendingCommands = () => {\n  if (false) return'))).toEqual([])
+  })
+})
+
+describe("Command lifecycle guard alias and registry provenance", () => {
+  const component = readEditorSource("markdown-editor.vue");
+  const replace = (from: string, to: string) => {
+    expect(component.split(from)).toHaveLength(2);
+    return component.replace(from, to);
+  };
+  const beforeContext = (statements: string) =>
+    replace(
+      "  try {\n    const context = {",
+      `  try {\n    ${statements}\n    const context = {`,
+    );
+  const beforeCancel = (statements: string) =>
+    replace(
+      "const abortPendingCommands = () => {",
+      `const abortPendingCommands = () => {\n  ${statements}`,
+    );
+
+  it.each([
+    [
+      "array controller aliases",
+      "const [loan] = [session.abort]; loan.signal = commandContextSignal",
+    ],
+    [
+      "nested object controller aliases",
+      "const { owner: { abort: loan } } = { owner: session }; Reflect.defineProperty(loan, 'signal', { value: commandContextSignal })",
+    ],
+    [
+      "transitive destructured aliases",
+      "const { abort: loan } = session; const borrowed = loan; Object.assign(borrowed, { signal: commandContextSignal })",
+    ],
+    [
+      "computed reflection methods",
+      "Object['defineProperty'](session.abort, 'signal', { value: commandContextSignal })",
+    ],
+    [
+      "aliased reflection functions",
+      "const replace = Object.defineProperty; const { abort: loan } = session; replace(loan, 'signal', { value: commandContextSignal })",
+    ],
+    [
+      "destructured reflection functions",
+      "const { defineProperty: replace } = Object; replace(session.abort, 'signal', { value: commandContextSignal })",
+    ],
+    [
+      "array reflection functions",
+      "const [replace] = [Object.defineProperty]; replace(session.abort, 'signal', { value: commandContextSignal })",
+    ],
+    [
+      "reflection namespace aliases",
+      "const reflection = Reflect; reflection.set(session.abort, 'signal', commandContextSignal)",
+    ],
+    [
+      "mutable reflection functions",
+      "let replace = Object.keys; replace = Object.defineProperty; replace(session.abort, 'signal', { value: commandContextSignal })",
+    ],
+    [
+      "reflection call invocations",
+      "Object.defineProperty.call(Object, session.abort, 'signal', { value: commandContextSignal })",
+    ],
+    [
+      "reflection apply invocations",
+      "Object.defineProperty.apply(Object, [session.abort, 'signal', { value: commandContextSignal }])",
+    ],
+    [
+      "Reflect.apply invocations",
+      "Reflect.apply(Object.defineProperty, Object, [session.abort, 'signal', { value: commandContextSignal }])",
+    ],
+    [
+      "controller prototype replacement",
+      "Reflect.setPrototypeOf(session.abort, { signal: commandContextSignal })",
+    ],
+  ] as const)("rejects signal mutations through %s", (_name, statements) => {
+    expect(commandLifecycleViolations(beforeContext(statements))).toContain(
+      "original-session-signal",
+    );
+  });
+
+  it.each([
+    [
+      "a simple registry alias",
+      "const registry = commandSessions; registry.values = () => new Map().values()",
+    ],
+    [
+      "a nested registry alias",
+      "const { owner: { registry } } = { owner: { registry: commandSessions } }; Object.defineProperty(registry, 'values', { value: () => new Map().values() })",
+    ],
+    [
+      "an array registry alias",
+      "const [registry] = [commandSessions]; Reflect.set(registry, 'values', () => new Map().values())",
+    ],
+    [
+      "a computed registry method",
+      "commandSessions['values'] = () => new Map().values()",
+    ],
+    ["registry method deletion", "delete commandSessions.values"],
+    ["registry clear replacement", "commandSessions.clear = () => undefined"],
+    ["registry get replacement", "commandSessions.get = () => undefined"],
+    ["registry rebinding", "commandSessions = new Map()"],
+    [
+      "an aliased registry mutator",
+      "const { defineProperty: replace } = Object; replace(commandSessions, 'values', { value: () => new Map().values() })",
+    ],
+    [
+      "registry prototype replacement",
+      "Object.setPrototypeOf(commandSessions, { values: () => new Map().values() })",
+    ],
+    [
+      "shared Map prototype replacement",
+      "Map.prototype.values = () => new Map().entries()",
+    ],
+  ] as const)("rejects cancellation through %s", (_name, statements) => {
+    expect(commandLifecycleViolations(beforeCancel(statements))).toContain(
+      "abort-shared-sessions",
+    );
+  });
+
+  it("rejects registry method mutation on the model-reset hook path", () => {
+    const source = replace(
+      "    abortPendingCommands()\n    // Document switch:",
+      "    commandSessions.values = () => new Map().values()\n    abortPendingCommands()\n    // Document switch:",
+    );
+    expect(commandLifecycleViolations(source)).toContain("cancel-model-reset");
+  });
+
+  it("rejects registry method mutation before the command factory", () => {
+    const source = replace(
+      "const session = createMarkdownEditorCommandSession(",
+      "commandSessions.get = () => undefined\n  const session = createMarkdownEditorCommandSession(",
+    );
+    expect(commandLifecycleViolations(source)).toContain(
+      "shared-session-registry",
+    );
+  });
+
+  it.each([
+    [
+      "readonly array controller aliases",
+      "const [loan] = [session.abort]; void loan.signal",
+    ],
+    [
+      "readonly nested controller aliases",
+      "const { owner: { abort: loan } } = { owner: session }; void loan.signal",
+    ],
+    [
+      "readonly reflection on the original controller",
+      "const { abort: loan } = session; Object.keys(loan)",
+    ],
+  ] as const)("accepts %s", (_name, statements) => {
+    expect(commandLifecycleViolations(beforeContext(statements))).toEqual([]);
+  });
+
+  it.each([
+    [
+      "normal entry operations through a shared registry alias",
+      'const registry = commandSessions; const extra = registry.get("extra"); if (extra) { registry.set("extra", extra); registry.delete("extra") }',
+    ],
+    [
+      "method replacement on an unrelated registry",
+      "const foreign = new Map(); foreign.values = () => [].values()",
+    ],
+    [
+      "method replacement on a copied registry",
+      "const snapshot = new Map(commandSessions); snapshot.values = () => [].values()",
+    ],
+  ] as const)("accepts %s", (_name, statements) => {
+    expect(commandLifecycleViolations(beforeCancel(statements))).toEqual([]);
+  });
+});
+
+describe('Command guard invocation provenance transitions', () => {
+  const component = readEditorSource('markdown-editor.vue')
+  const insert = (scope: 'signal' | 'registry', statements: string) => {
+    const from =
+      scope === 'signal'
+        ? '  try {\n    const context = {'
+        : 'const abortPendingCommands = () => {'
+    expect(component.split(from)).toHaveLength(2)
+    const to =
+      scope === 'signal'
+        ? `  try {\n    ${statements}\n    const context = {`
+        : `${from}\n  ${statements}`
+    return component.replace(from, to)
+  }
+  const forms = [
+    [
+      'transitive changed aliases',
+      (args: string) =>
+        `let invoke: any = Object.defineProperty; invoke = Reflect.apply; const borrowed = invoke; borrowed(${args})`,
+    ],
+    [
+      'object-destructured changed aliases',
+      (args: string) =>
+        `let invoke: any = Object.defineProperty; invoke = Reflect.apply; const { borrowed } = { borrowed: invoke }; borrowed(${args})`,
+    ],
+    [
+      'array-destructured changed aliases',
+      (args: string) =>
+        `let invoke: any = Object.defineProperty; invoke = Reflect.apply; const [borrowed] = [invoke]; borrowed(${args})`,
+    ],
+    [
+      'call-wrapped changed invokers',
+      (args: string) =>
+        `let invoke: any = Object.defineProperty; invoke = Reflect.apply; invoke.call(Reflect, ${args})`,
+    ],
+    [
+      'apply-wrapped changed invokers',
+      (args: string) =>
+        `let invoke: any = Object.defineProperty; invoke = Reflect.apply; invoke.apply(Reflect, [${args}])`,
+    ],
+    [
+      'reverse invoker-to-mutator transitions',
+      (_args: string, target: string, field: string, value: string) =>
+        `let invoke: any = Reflect.apply; invoke = Object.defineProperty; invoke(${target}, '${field}', { value: ${value} })`,
+    ],
+    [
+      'conditional invocation forms',
+      (args: string) =>
+        `let invoke: any = Object.keys; invoke = commandContextSignal.aborted ? Object.defineProperty : Reflect.apply; invoke(${args})`,
+    ],
+    [
+      'changed reflection namespaces',
+      (args: string) =>
+        `let namespace: any = Object; namespace = Reflect; const invoke = namespace.apply; invoke(${args})`,
+    ],
+    [
+      'unproven assigned origins',
+      (args: string) =>
+        `let invoke: any = Object.defineProperty; invoke = (globalThis as any).unrecognizedInvoker; invoke(${args})`,
+    ],
+    [
+      'opaque returned invokers',
+      (args: string) =>
+        `const getInvoker = () => Reflect.apply; let invoke: any = Object.defineProperty; invoke = getInvoker(); invoke(${args})`,
+    ],
+    [
+      'parenthesized unproven aliases',
+      (args: string) =>
+        `let invoke: any = Object.defineProperty; invoke = (globalThis as any).unrecognizedInvoker; (invoke)(${args})`,
+    ],
+    [
+      'cyclic unresolved aliases',
+      (_args: string, target: string) =>
+        `const first = second; const second = first; first(${target})`,
+    ],
+  ] as const
+  const controls = forms.flatMap(([name, form]) =>
+    (['signal', 'registry'] as const).map((scope) => {
+      const target = scope === 'signal' ? 'session.abort' : 'commandSessions'
+      const field = scope === 'signal' ? 'signal' : 'values'
+      const value =
+        scope === 'signal' ? 'commandContextSignal' : '() => new Map().values()'
+      const args = `Object.defineProperty, Object, [${target}, '${field}', { value: ${value} }]`
+      return { name, scope, statements: form(args, target, field, value) }
+    }),
+  )
+  it.each(controls)(
+    'rejects $name for $scope ownership',
+    ({ scope, statements }) => {
+      expect(commandLifecycleViolations(insert(scope, statements))).toContain(
+        scope === 'signal'
+          ? 'original-session-signal'
+          : 'abort-shared-sessions',
+      )
+    },
+  )
+
+  it.each([
+    [
+      'readonly reassigned invokers',
+      'let inspect: any = Reflect.apply; inspect = Reflect.apply; inspect(Object.keys, Object, [session.abort])',
+    ],
+    [
+      'readonly call-wrapped invokers',
+      'let inspect: any = Reflect.apply; inspect = Reflect.apply; inspect.call(Reflect, Object.keys, Object, [session.abort])',
+    ],
+    [
+      'readonly apply-wrapped invokers',
+      'let inspect: any = Reflect.apply; inspect = Reflect.apply; inspect.apply(Reflect, [Object.keys, Object, [session.abort]])',
+    ],
+    [
+      'readonly method transitions',
+      'let inspect: any = Object.keys; inspect = Object.values; inspect(session.abort)',
+    ],
+    [
+      'readonly namespace method transitions',
+      'let inspect: any = Object.keys; inspect = Reflect.ownKeys; inspect(session.abort)',
+    ],
+    [
+      'changed invokers mutating a foreign object',
+      "let invoke: any = Object.defineProperty; invoke = Reflect.apply; const foreign = { signal: commandContextSignal }; invoke(Object.defineProperty, Object, [foreign, 'signal', { value: commandContextSignal }])",
+    ],
+  ] as const)('accepts %s', (_name, statements) => {
+    expect(commandLifecycleViolations(insert('signal', statements))).toEqual([])
   })
 })
