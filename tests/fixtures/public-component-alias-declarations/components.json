@@ -1,0 +1,44 @@
+{
+  "inbox-primitives": [
+    "SplitPane",
+    "InboxLayout",
+    "ConversationList",
+    "ConversationListItem",
+    "ThreadPanel",
+    "MessageTimeline",
+    "MessageBubble",
+    "ConversationContextBar",
+    "ReplyComposerShell",
+    "EmptySelectionState",
+    "InboxEmptyState"
+  ],
+  "metric-primitives": [
+    "MetricList",
+    "MetricItem",
+    "DistributionList",
+    "DistributionBarRow",
+    "KpiGroup",
+    "KeyValueGrid",
+    "KeyValueItem",
+    "StatusSummary",
+    "DiagnosticsList",
+    "DiagnosticsItem",
+    "CopyableDetail"
+  ],
+  "settings-primitives": [
+    "SectionNav",
+    "SectionNavLink",
+    "SettingsSection",
+    "SectionHeader",
+    "FormSection",
+    "ResourceList",
+    "ResourceListItem",
+    "MetadataRow",
+    "MetadataItem",
+    "InlineActions",
+    "DangerZone",
+    "DestructiveActionPanel",
+    "RiskNotice",
+    "TypedConfirmField"
+  ]
+}

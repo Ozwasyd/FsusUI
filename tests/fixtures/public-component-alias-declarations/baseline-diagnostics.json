@@ -1,0 +1,34 @@
+{
+  "sourceHead": "48ac5c2029a231e574a77a4aa537907f5bd447da",
+  "total": 191,
+  "byCode": {
+    "TS2300": 34,
+    "TS2344": 145,
+    "TS2307": 4,
+    "TS2503": 2,
+    "TS2339": 6
+  },
+  "byFile": {
+    "es/components/color-picker/index.d.ts": 4,
+    "es/components/color-picker/src/color-picker.vue.d.ts": 4,
+    "es/components/inbox-primitives/index.d.ts": 58,
+    "es/components/inbox-primitives/src/conversation-list-item.vue.d.ts": 2,
+    "es/components/index.d.ts": 4,
+    "es/components/markdown-editor/index.d.ts": 4,
+    "es/components/markdown-editor/src/markdown-editor.vue.d.ts": 4,
+    "es/components/metric-primitives/index.d.ts": 44,
+    "es/components/settings-primitives/index.d.ts": 56,
+    "es/components/table-v2/src/components/sort-icon.d.ts": 1,
+    "es/components/table-v2/src/types.d.ts": 1,
+    "es/components/table/src/util.d.ts": 1,
+    "es/components/tree-v2/index.d.ts": 2,
+    "global.d.ts": 6
+  },
+  "aliasConstraints": {
+    "es/components/inbox-primitives/index.d.ts": 44,
+    "es/components/metric-primitives/index.d.ts": 44,
+    "es/components/settings-primitives/index.d.ts": 56
+  },
+  "evidence": "https://github.com/Ozwasyd/FsusUI/blob/0bd761bfc64a629368a0c4c59c1bf95d6116df4b/docs/releases/evidence/public-declaration-closure-48ac/remaining-diagnostics.json",
+  "evidenceSHA256": "fe9fafd00d790c71475d1a6423e0d9e15845e74ab626a1e418f8b03827144602"
+}

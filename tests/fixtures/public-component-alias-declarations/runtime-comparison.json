@@ -1,0 +1,15 @@
+{
+  "runtimeJavaScriptFiles": 4432,
+  "different": 6,
+  "files": [
+    "package/lib/motion/components/FsuTransition.vue2.js",
+    "package/dist/index.full.js",
+    "package/dist/index.full.min.js",
+    "package/es/motion/components/FsuTransition.vue2.mjs",
+    "package/dist/index.full.min.mjs",
+    "package/dist/index.full.mjs"
+  ],
+  "ownedRuntimeJavaScriptFiles": 174,
+  "ownedDifferentFiles": 0,
+  "explanation": "The six generated differences are outside the three repaired groups: FsuTransition optional mode prop uses absent type versus type:null, and full bundles reflect that representation and named import/minifier ordering. Vue 3.5.32 validates only type != null, so both mode forms have identical validation and casting. No runtime source changed; all 174 repaired-group JavaScript files are byte-identical."
+}

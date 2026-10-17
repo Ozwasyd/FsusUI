@@ -1,0 +1,78 @@
+{
+  "productionSourceHead": "9aa0d16fac57c95180f95ad48fd721686a686bbb",
+  "producerPrerequisite": "48ac5c2029a231e574a77a4aa537907f5bd447da",
+  "observedMain": "8db0ac8f49749e3e5f28be5051bb3d3ed71ada71",
+  "publishedBaselineTarballSHA256": "91dbac01c30df9c9b3d9f29811a3d045244ceb65f82845fba9f23f210f391256",
+  "rebuiltBaselineTarballSHA256": "b2f330a60eff703f19b267f0b4769bfff2c2f82edc9293ea0d420acc395217b3",
+  "repairedTarballSHA256": "3f3070b93758b078807c142d93e3a945c7a4e2f0738f200a6001ba2901746855",
+  "sourceLockSHA256": "c7d35e65a7f82bf145786f0d5697a8fcff2109b7f47a85146ed0acb22510ce94",
+  "publishedConsumerLockSHA256": "bbfa09dbafb4fb0b8aa8657a97b3f2df0449f655e671cb97e1ff05387e02fe15",
+  "rebuiltBaselineConsumerLockSHA256": "aafc28aec6832f96ae127288362752fc3e5b9875dd4167de3720b6e8887420d0",
+  "repairedConsumerLockSHA256": "7b29dfde53e83e75c54c248b8b98e8813e18833662564fb954970a380eee7248",
+  "consumerGraph": "Registry package resolutions/versions and dependency snapshots are identical between the paired installs. Fresh candidate-local locks change only the local tarball integrity and importer file specifier. Original repository and published evidence lockfiles are preserved.",
+  "toolchain": {
+    "node": "24.19.0",
+    "pnpm": "10.33.0",
+    "npm": "11.13.0",
+    "typescript": "6.0.2",
+    "vue": "3.5.32",
+    "vueTsc": "3.2.6",
+    "tsMorph": "27.0.2",
+    "producerTypescript": "5.9.2"
+  },
+  "results": {
+    "canonicalBuild": "pass",
+    "canonicalArtifactVerify": "pass",
+    "frozenSourceInstall": "pass",
+    "frozenConsumerInstall": "pass",
+    "focusedTests": {
+      "pass": 6,
+      "fail": 0
+    },
+    "aliasSourceContracts": 36,
+    "sourceNegativeControls": 9,
+    "packedNegativeControls": 9,
+    "existingSourceTests": {
+      "pass": 18,
+      "fail": 0
+    },
+    "packedESMCJSAliasesAndInstallers": 72,
+    "mountedControls": 4,
+    "publishedStrictDiagnostics": 191,
+    "rebuiltBaselineStrictDiagnostics": 259,
+    "repairedStrictDiagnostics": 103,
+    "ownedTS2344Removed": 144,
+    "incidentalDuplicatedTS2300Removed": 12,
+    "newPairedDiagnostics": 0
+  },
+  "producerBlocker": {
+    "owner": "827",
+    "status": "open; source not edited by alias worker",
+    "source": "scripts/prepare-npm-package.mjs:952 calls scripts/npm-authority-lib.mjs:272 applyPublishedExternalFields; it reconstructs dependencies from authority.published.dependencies, omitting type-fest and vue-router. Source vue/packages/element-plus/package.json declares both pins, but config/dependencies/npm-authority.json published dependencies omits both.",
+    "observedExtraDiagnostics": 68,
+    "acceptance": "The handed-off 191 baseline was not reproduced by canonical generation. Repaired strict package still fails 103 diagnostics. No all-green package or whole-issue closure claim."
+  },
+  "commands": [
+    "pnpm install --frozen-lockfile --store-dir <existing pinned store>",
+    "pnpm run package:candidate:build --output <candidate directory>",
+    "pnpm run package:candidate:verify --tarball <real repaired tarball>",
+    "pnpm install --lockfile-only --ignore-scripts --store-dir <existing pinned store>",
+    "pnpm install --frozen-lockfile --ignore-scripts --store-dir <existing pinned store>",
+    "pnpm exec tsc --noEmit --pretty false -p tsconfig.all.json (unchanged published strict configuration and probes)",
+    "FSUS_ALIAS_BASELINE_CONSUMER=<installed baseline> FSUS_ALIAS_FINAL_CONSUMER=<installed repaired> node --test tests/public-component-alias-declarations.test.mjs",
+    "pnpm exec changeset status --since 48ac5c2029a231e574a77a4aa537907f5bd447da"
+  ],
+  "retainedProvisionalFailures": [
+    "Initial npm pack used an unwritable default cache; original NPM_CONFIG_CACHE selected a writable cache.",
+    "Existing local consumer projection resolved source Vue 3.5.33; discarded qualification and rebuilt in isolated frozen checkouts resolving 3.5.32.",
+    "Fresh native artifacts initially required activating existing pinned Emscripten setup.",
+    "New fixture initial relative source path and Vitest/manifest package-export lookup errors were corrected before final six-test run."
+  ],
+  "notClaimed": [
+    "npm publication",
+    "remote CI",
+    "ready/merge",
+    "complete UI/visual/device acceptance",
+    "green full strict installed package"
+  ]
+}
