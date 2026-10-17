@@ -1,7 +1,12 @@
 <template>
   <li
+    :id="id"
     ref="itemRef"
+    role="option"
     :aria-selected="selected"
+    :aria-disabled="disabled"
+    :aria-posinset="position"
+    :aria-setsize="total"
     :style="style"
     :class="[
       ns.be('dropdown', 'option-item'),
@@ -20,7 +25,15 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, inject, onMounted, onUpdated, ref } from 'vue'
+import {
+  defineComponent,
+  inject,
+  onBeforeUnmount,
+  onMounted,
+  onUpdated,
+  ref,
+  watch,
+} from 'vue'
 import { useNamespace } from '@element-plus/hooks'
 import { useOption } from './useOption'
 import { useProps } from './useProps'
@@ -28,8 +41,13 @@ import { OptionProps } from './defaults'
 import { selectV2InjectionKey } from './token'
 
 export default defineComponent({
-  props: OptionProps,
-  emits: ['select', 'hover', 'resize'],
+  props: {
+    ...OptionProps,
+    id: String,
+    position: Number,
+    total: Number,
+  },
+  emits: ['select', 'hover', 'resize', 'rendered'],
   setup(props, { emit }) {
     const select = inject(selectV2InjectionKey)!
     const ns = useNamespace('select')
@@ -50,8 +68,18 @@ export default defineComponent({
     }
 
     onMounted(() => {
+      emit('rendered', props.index, true)
       emitHeight()
     })
+
+    watch(
+      () => props.index,
+      (index, previous) => {
+        emit('rendered', previous, false)
+        emit('rendered', index, true)
+      },
+    )
+    onBeforeUnmount(() => emit('rendered', props.index, false))
 
     onUpdated(() => {
       emitHeight()
