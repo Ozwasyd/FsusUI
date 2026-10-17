@@ -287,6 +287,7 @@ FsusUI 默认使用 paper/document material、细边框和稳定留白表达层�
 - 阴影默认 `none`，仅在需要明确层级时 opt into `--el-box-shadow-light`，不叠加额外外发光。
 - 选中项用 `Scholarly Blue` 或浅蓝背景表达，不使用高饱和整行色块。
 - 列表项需要稳定高度，Hover、Active、Disabled 三种状态必须可区分。
+- DropdownItem 显式 `multiline` 内容变体允许主标签与语义描述换行，行高随内容自然扩展，最小高度仍使用 `--fsus-select-option-height`；默认单行 `34px` 密度不变。保留平面行的选中、禁用与 inset focus 状态，不增加独立卡片、圆角或装饰。显式 `viewportBounded` 模式在视口内限制面板宽度和可滚动高度，CSS zoom 不得通过缩小文字规避溢出。
 
 ### Dialog and Drawer
 
