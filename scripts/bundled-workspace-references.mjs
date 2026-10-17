@@ -1,7 +1,7 @@
 import ts from 'typescript'
 
-// Inspect literals rather than license comments. Keep non-exact literals in the
-// result so unsupported subpaths and computed references still fail the audit.
+// Inspect literals and compiler dependencies rather than license comments. Keep
+// unsupported references in the result so the residual audit still rejects them.
 export function findBundledWorkspaceReferences(content, fileName, names) {
   const source = ts.createSourceFile(
     fileName,
@@ -14,6 +14,25 @@ export function findBundledWorkspaceReferences(content, fileName, names) {
   }
 
   const references = []
+  // Compiler directives use their own resolution rules; leave them for refusal
+  // rather than applying a JavaScript runtime-entry mapping.
+  for (const reference of [
+    ...source.typeReferenceDirectives,
+    ...source.referencedFiles,
+    ...source.libReferenceDirectives,
+  ]) {
+    for (const dependencyName of names) {
+      if (reference.fileName.includes(dependencyName)) {
+        references.push({
+          dependencyName,
+          value: reference.fileName,
+          start: reference.pos,
+          end: reference.end,
+          literal: false,
+        })
+      }
+    }
+  }
   const visit = (node) => {
     const literal = ts.isStringLiteralLike(node)
     if (
@@ -35,6 +54,7 @@ export function findBundledWorkspaceReferences(content, fileName, names) {
       }
     }
     ts.forEachChild(node, visit)
+    for (const doc of node.jsDoc ?? []) visit(doc)
   }
   visit(source)
   return references

@@ -14,6 +14,7 @@ import os from 'node:os'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import assert from 'node:assert/strict'
+import ts from 'typescript'
 import {
   findBundledWorkspaceReferences,
   rewriteBundledWorkspaceReferences,
@@ -190,6 +191,53 @@ try {
     /Unable to inspect workspace references/u,
     'malformed module workspace audit',
   )
+
+  for (const dependency of workspaceNames) {
+    for (const specifier of [dependency, `${dependency}/private`]) {
+      const emitted = ts.transpileDeclaration(
+        `/// <reference types="${specifier}" preserve="true" />\nexport interface Contract { value: string }\n`,
+        {
+          fileName: 'workspace-directive.ts',
+          compilerOptions: { declaration: true, emitDeclarationOnly: true },
+        },
+      )
+      assert.deepEqual(emitted.diagnostics, [])
+      const declaration = emitted.outputText
+      const parsed = ts.createSourceFile(
+        'workspace-directive.d.ts',
+        declaration,
+        ts.ScriptTarget.Latest,
+        true,
+      )
+      assert.equal(parsed.typeReferenceDirectives[0]?.fileName, specifier)
+      assert.equal(
+        findBundledWorkspaceReferences(
+          declaration,
+          'es/workspace-directive.d.ts',
+          workspaceNames,
+        ).length,
+        1,
+        'the residual audit must detect the real emitted compiler dependency',
+      )
+      const rewritten = rewriteBundledWorkspaceReferences(
+        declaration,
+        'es/workspace-directive.d.ts',
+        workspaceNames,
+        () => assert.fail('compiler directives must not use runtime mappings'),
+      )
+      assert.equal(rewritten.content, declaration)
+      assert.equal(rewritten.replacementCount, 0)
+      assert.equal(
+        findBundledWorkspaceReferences(
+          rewritten.content,
+          'es/workspace-directive.d.ts',
+          workspaceNames,
+        ).length,
+        1,
+        'an unsupported emitted dependency must remain a failing audit input',
+      )
+    }
+  }
 
   const crossDeviceSource = path.join(tempRoot, 'cross-device-source.tgz')
   const crossDeviceDestination = path.join(
