@@ -1,0 +1,438 @@
+{
+  "producerSha": "48ac5c2029a231e574a77a4aa537907f5bd447da",
+  "historicalTarballSha256": "91dbac01c30df9c9b3d9f29811a3d045244ceb65f82845fba9f23f210f391256",
+  "historicalDiagnosticCount": 191,
+  "historicalDiagnostics": [
+    {
+      "file": "es/components/color-picker/index.d.ts",
+      "code": 2300,
+      "message": "Duplicate identifier 'event'.",
+      "count": 4
+    },
+    {
+      "file": "es/components/color-picker/src/color-picker.vue.d.ts",
+      "code": 2300,
+      "message": "Duplicate identifier 'event'.",
+      "count": 4
+    },
+    {
+      "file": "es/components/inbox-primitives/index.d.ts",
+      "code": 2300,
+      "message": "Duplicate identifier 'event'.",
+      "count": 14
+    },
+    {
+      "file": "es/components/inbox-primitives/index.d.ts",
+      "code": 2344,
+      "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.",
+      "count": 44
+    },
+    {
+      "file": "es/components/inbox-primitives/src/conversation-list-item.vue.d.ts",
+      "code": 2300,
+      "message": "Duplicate identifier 'event'.",
+      "count": 2
+    },
+    {
+      "file": "es/components/index.d.ts",
+      "code": 2307,
+      "message": "Cannot find module './cascader' or its corresponding type declarations.",
+      "count": 1
+    },
+    {
+      "file": "es/components/index.d.ts",
+      "code": 2307,
+      "message": "Cannot find module './select' or its corresponding type declarations.",
+      "count": 1
+    },
+    {
+      "file": "es/components/index.d.ts",
+      "code": 2307,
+      "message": "Cannot find module './slider' or its corresponding type declarations.",
+      "count": 1
+    },
+    {
+      "file": "es/components/index.d.ts",
+      "code": 2307,
+      "message": "Cannot find module './time-select' or its corresponding type declarations.",
+      "count": 1
+    },
+    {
+      "file": "es/components/markdown-editor/index.d.ts",
+      "code": 2300,
+      "message": "Duplicate identifier 'event'.",
+      "count": 4
+    },
+    {
+      "file": "es/components/markdown-editor/src/markdown-editor.vue.d.ts",
+      "code": 2300,
+      "message": "Duplicate identifier 'event'.",
+      "count": 4
+    },
+    {
+      "file": "es/components/metric-primitives/index.d.ts",
+      "code": 2344,
+      "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.",
+      "count": 44
+    },
+    {
+      "file": "es/components/settings-primitives/index.d.ts",
+      "code": 2344,
+      "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.",
+      "count": 56
+    },
+    {
+      "file": "es/components/table-v2/src/components/sort-icon.d.ts",
+      "code": 2503,
+      "message": "Cannot find namespace 'JSX'.",
+      "count": 1
+    },
+    {
+      "file": "es/components/table-v2/src/types.d.ts",
+      "code": 2503,
+      "message": "Cannot find namespace 'JSX'.",
+      "count": 1
+    },
+    {
+      "file": "es/components/table/src/util.d.ts",
+      "code": 2344,
+      "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.",
+      "count": 1
+    },
+    {
+      "file": "es/components/tree-v2/index.d.ts",
+      "code": 2300,
+      "message": "Duplicate identifier 'event'.",
+      "count": 2
+    },
+    {
+      "file": "global.d.ts",
+      "code": 2339,
+      "message": "Property 'ElCascader' does not exist on type 'typeof import(\"@ozwasyd/element-plus/es/index\")'.",
+      "count": 1
+    },
+    {
+      "file": "global.d.ts",
+      "code": 2339,
+      "message": "Property 'ElOption' does not exist on type 'typeof import(\"@ozwasyd/element-plus/es/index\")'.",
+      "count": 1
+    },
+    {
+      "file": "global.d.ts",
+      "code": 2339,
+      "message": "Property 'ElOptionGroup' does not exist on type 'typeof import(\"@ozwasyd/element-plus/es/index\")'.",
+      "count": 1
+    },
+    {
+      "file": "global.d.ts",
+      "code": 2339,
+      "message": "Property 'ElSelect' does not exist on type 'typeof import(\"@ozwasyd/element-plus/es/index\")'.",
+      "count": 1
+    },
+    {
+      "file": "global.d.ts",
+      "code": 2339,
+      "message": "Property 'ElSlider' does not exist on type 'typeof import(\"@ozwasyd/element-plus/es/index\")'.",
+      "count": 1
+    },
+    {
+      "file": "global.d.ts",
+      "code": 2339,
+      "message": "Property 'ElTimeSelect' does not exist on type 'typeof import(\"@ozwasyd/element-plus/es/index\")'.",
+      "count": 1
+    }
+  ],
+  "reproducedTarballSha256": "827b28ce7e6e9247b24fa554453d8520d0d38b5cb2f0cd18f07b431193dc1aa1",
+  "reproducedDiagnosticCount": 259,
+  "metadataBlocker": "Unchanged prepare-npm-package authority projection removes source-declared vue-router and type-fest. With the original full-package tsconfig.all.json, the reproduced artifact retains all historical 191 diagnostics plus 68 missing-dependency diagnostics.",
+  "sourceLockSha256": "c7d35e65a7f82bf145786f0d5697a8fcff2109b7f47a85146ed0acb22510ce94",
+  "toolchain": {
+    "node": "v24.19.0",
+    "pnpm": "10.33.0",
+    "npm": "11.13.0",
+    "typescript": "6.0.2",
+    "vue": "3.5.32",
+    "vueTsc": "3.2.6",
+    "producerTsMorph": "27.0.2"
+  },
+  "canonicalHashes": {
+    "vue/packages/components/color-picker/src/color-picker.ts": "de9d46b0a3f3ed5fce9967d2c89aac6cab6d4ac79c1a6ae53a8ce0a3fcf4b950",
+    "es/components/color-picker/index.d.ts": "9f67befb326d27e3a3454b00985b0d35cdd037f5bac02a8c6e61e6930bdf67dc",
+    "es/components/color-picker/src/color-picker.d.ts": "11e1329649dda6d7943ddf635e839515506f66d30bfbfdb870ea98e50189f0d9",
+    "es/components/color-picker/src/color-picker.mjs": "a68c3bd069c4d95e028ae60a5ab2e42baa1bce1f884dbd1be55f4e9d56905042",
+    "es/components/color-picker/src/color-picker.vue.d.ts": "f7198cb3402c80ccbf9ea91a73fdfe75a6e0f4212765c113de7029cc110be3d9",
+    "es/components/color-picker/src/components/alpha-slider.vue.d.ts": "3aa1fe56d98b9f636734cbcc14603378522d3a6b6364482ceb29ede7fa524e4f",
+    "es/components/color-picker/src/components/hue-slider.vue.d.ts": "924bb15414993291cab6d30b4d21e3d92fb47cd98ba5354cfd52ab2aa3a295ab",
+    "es/components/color-picker/src/components/predefine.vue.d.ts": "7a3402d89ceaf076b732984baa47b09d86afc8c755519ad206bf14ea766c5a12",
+    "es/components/color-picker/src/components/sv-panel.vue.d.ts": "a1f17e48c90cbeb58dd60d1cfc61e4b6dd4a522d463e0e85caabab0f66602df0",
+    "es/components/color-picker/src/composables/use-alpha-slider.d.ts": "c27ac0ad25344904a0b5f2dbacad12465c95d2a37380c9ab5756f3c9a4f9ef1f",
+    "es/components/color-picker/src/props/alpha-slider.d.ts": "2a34692a89e0fda846c48d53b072e08002e93d6b582b0341482568dd691ddcb5",
+    "es/components/color-picker/src/utils/color.d.ts": "604a0fd44e925b5a2d38b240935bcd7debb4d7d886e8429f40d4d68d5f624e56",
+    "es/components/color-picker/src/utils/draggable.d.ts": "984c1aed1c900e1b9f68cba0a94d8a365259389fed960725f96ae9646ef2edc1",
+    "es/components/color-picker/style/css.d.ts": "cc609c4e3d4221ab31636cc9003cbf36e7d6dbde9beed05997a4ce77b72deb5f",
+    "es/components/color-picker/style/index.d.ts": "5d7c02cdda0874c8da47f188eec4657d9f31ffe43f657ea165710559b3834952",
+    "lib/components/color-picker/index.d.ts": "9f67befb326d27e3a3454b00985b0d35cdd037f5bac02a8c6e61e6930bdf67dc",
+    "lib/components/color-picker/src/color-picker.d.ts": "11e1329649dda6d7943ddf635e839515506f66d30bfbfdb870ea98e50189f0d9",
+    "lib/components/color-picker/src/color-picker.js": "e528e45dabc7a6510d4ed54defadc144c012d1f8d089c5c071dbdaf14ae61f0f",
+    "lib/components/color-picker/src/color-picker.vue.d.ts": "f7198cb3402c80ccbf9ea91a73fdfe75a6e0f4212765c113de7029cc110be3d9",
+    "lib/components/color-picker/src/components/alpha-slider.vue.d.ts": "3aa1fe56d98b9f636734cbcc14603378522d3a6b6364482ceb29ede7fa524e4f",
+    "lib/components/color-picker/src/components/hue-slider.vue.d.ts": "924bb15414993291cab6d30b4d21e3d92fb47cd98ba5354cfd52ab2aa3a295ab",
+    "lib/components/color-picker/src/components/predefine.vue.d.ts": "7a3402d89ceaf076b732984baa47b09d86afc8c755519ad206bf14ea766c5a12",
+    "lib/components/color-picker/src/components/sv-panel.vue.d.ts": "a1f17e48c90cbeb58dd60d1cfc61e4b6dd4a522d463e0e85caabab0f66602df0",
+    "lib/components/color-picker/src/composables/use-alpha-slider.d.ts": "c27ac0ad25344904a0b5f2dbacad12465c95d2a37380c9ab5756f3c9a4f9ef1f",
+    "lib/components/color-picker/src/props/alpha-slider.d.ts": "2a34692a89e0fda846c48d53b072e08002e93d6b582b0341482568dd691ddcb5",
+    "lib/components/color-picker/src/utils/color.d.ts": "604a0fd44e925b5a2d38b240935bcd7debb4d7d886e8429f40d4d68d5f624e56",
+    "lib/components/color-picker/src/utils/draggable.d.ts": "984c1aed1c900e1b9f68cba0a94d8a365259389fed960725f96ae9646ef2edc1",
+    "lib/components/color-picker/style/css.d.ts": "cc609c4e3d4221ab31636cc9003cbf36e7d6dbde9beed05997a4ce77b72deb5f",
+    "lib/components/color-picker/style/index.d.ts": "5d7c02cdda0874c8da47f188eec4657d9f31ffe43f657ea165710559b3834952",
+    "vue/packages/components/inbox-primitives/src/shared.ts": "3e77562fff27feccce3642b01897405ce7938327789fad38a5d4168ce319c748",
+    "es/components/inbox-primitives/index.d.ts": "f1b75d0a79dc6b532b2bd6bfa16d63ed17bc459d97ea64590d7fe9f1ca3ff013",
+    "es/components/inbox-primitives/src/conversation-context-bar.vue.d.ts": "f370de1350b84fd970f6acaa86520c6f5ea6b15e164879858ed37c79c5d2249e",
+    "es/components/inbox-primitives/src/conversation-list-item.vue.d.ts": "20a163136e1a4046e6353244d5fcb35e15816eb4d39bf6c64c09ac765669393f",
+    "es/components/inbox-primitives/src/conversation-list.vue.d.ts": "22f7791346210021f9f2e948d37caab44a0b30a96e28e25f6ce631192adc8016",
+    "es/components/inbox-primitives/src/empty-selection-state.vue.d.ts": "7883b8e0d71ea82348ad86a824333b68dcb0aa622621df38954c69d2742dd21a",
+    "es/components/inbox-primitives/src/inbox-empty-state.vue.d.ts": "7883b8e0d71ea82348ad86a824333b68dcb0aa622621df38954c69d2742dd21a",
+    "es/components/inbox-primitives/src/inbox-layout.vue.d.ts": "a2512407f85ef832422b9610c105872eafdd2791e09e1b8eefde813df12e2500",
+    "es/components/inbox-primitives/src/instance.d.ts": "3964edd4129cc6da687bf586fba11c3e2eaf3a2c670a5a5e735868e583190eb9",
+    "es/components/inbox-primitives/src/message-bubble.vue.d.ts": "313549bdda45fa29ff4df43f05d82af5019ccf24ae341ad5a46e3271e5dd0c55",
+    "es/components/inbox-primitives/src/message-timeline.vue.d.ts": "0bc1f2f0337f824e16ffbd054be0735689802135932474eb7002ba12036cb397",
+    "es/components/inbox-primitives/src/reply-composer-shell.vue.d.ts": "7a83b1810ea0cddd79e3c669af79f62846b22fce30f92c3bb12216ba7a88de8c",
+    "es/components/inbox-primitives/src/shared.d.ts": "f672c28702c58222d888d5be469d3e6defe647bba27a7432384055604d9db964",
+    "es/components/inbox-primitives/src/shared.mjs": "1a59f8b9255c646b5e28e81db7ed182ab1131395289e548425e18c178e1c7fd0",
+    "es/components/inbox-primitives/src/split-pane.vue.d.ts": "a2512407f85ef832422b9610c105872eafdd2791e09e1b8eefde813df12e2500",
+    "es/components/inbox-primitives/src/thread-panel.vue.d.ts": "3ca27370f6cd0d894c88342fcd73aa24dea079831031821fab1ab4b2271ff3e3",
+    "es/components/inbox-primitives/style/css.d.ts": "c4f4f695a63c5a5867faad3fdc0fe1989867ca52479232c9a1cca9ed96c64060",
+    "es/components/inbox-primitives/style/index.d.ts": "d431cc9d543759e56ffe0a03cd1d8ad6cfa7f2722f2bc96bacbc22663e434bd5",
+    "lib/components/inbox-primitives/index.d.ts": "f1b75d0a79dc6b532b2bd6bfa16d63ed17bc459d97ea64590d7fe9f1ca3ff013",
+    "lib/components/inbox-primitives/src/conversation-context-bar.vue.d.ts": "f370de1350b84fd970f6acaa86520c6f5ea6b15e164879858ed37c79c5d2249e",
+    "lib/components/inbox-primitives/src/conversation-list-item.vue.d.ts": "20a163136e1a4046e6353244d5fcb35e15816eb4d39bf6c64c09ac765669393f",
+    "lib/components/inbox-primitives/src/conversation-list.vue.d.ts": "22f7791346210021f9f2e948d37caab44a0b30a96e28e25f6ce631192adc8016",
+    "lib/components/inbox-primitives/src/empty-selection-state.vue.d.ts": "7883b8e0d71ea82348ad86a824333b68dcb0aa622621df38954c69d2742dd21a",
+    "lib/components/inbox-primitives/src/inbox-empty-state.vue.d.ts": "7883b8e0d71ea82348ad86a824333b68dcb0aa622621df38954c69d2742dd21a",
+    "lib/components/inbox-primitives/src/inbox-layout.vue.d.ts": "a2512407f85ef832422b9610c105872eafdd2791e09e1b8eefde813df12e2500",
+    "lib/components/inbox-primitives/src/instance.d.ts": "3964edd4129cc6da687bf586fba11c3e2eaf3a2c670a5a5e735868e583190eb9",
+    "lib/components/inbox-primitives/src/message-bubble.vue.d.ts": "313549bdda45fa29ff4df43f05d82af5019ccf24ae341ad5a46e3271e5dd0c55",
+    "lib/components/inbox-primitives/src/message-timeline.vue.d.ts": "0bc1f2f0337f824e16ffbd054be0735689802135932474eb7002ba12036cb397",
+    "lib/components/inbox-primitives/src/reply-composer-shell.vue.d.ts": "7a83b1810ea0cddd79e3c669af79f62846b22fce30f92c3bb12216ba7a88de8c",
+    "lib/components/inbox-primitives/src/shared.d.ts": "f672c28702c58222d888d5be469d3e6defe647bba27a7432384055604d9db964",
+    "lib/components/inbox-primitives/src/shared.js": "9882e40a9cd493cc729d40447ae59f2d31cce70d31665d352a356a814e321b5f",
+    "lib/components/inbox-primitives/src/split-pane.vue.d.ts": "a2512407f85ef832422b9610c105872eafdd2791e09e1b8eefde813df12e2500",
+    "lib/components/inbox-primitives/src/thread-panel.vue.d.ts": "3ca27370f6cd0d894c88342fcd73aa24dea079831031821fab1ab4b2271ff3e3",
+    "lib/components/inbox-primitives/style/css.d.ts": "c4f4f695a63c5a5867faad3fdc0fe1989867ca52479232c9a1cca9ed96c64060",
+    "lib/components/inbox-primitives/style/index.d.ts": "d431cc9d543759e56ffe0a03cd1d8ad6cfa7f2722f2bc96bacbc22663e434bd5",
+    "vue/packages/components/tree-v2/src/virtual-tree.ts": "f945c29d1c336b992e0e2ae86361b9e4a2ecaa0dc7f57374e4d8dedc7da5512d",
+    "es/components/tree-v2/index.d.ts": "945ca99e59530d428ab3f24487960fd1c1b05e90ed83979ff6823493fb212f23",
+    "es/components/tree-v2/src/composables/useCheck.d.ts": "f43e0636c065b5eab6f32ef5544cee8b767d48cac96b5df97f98ca9f5db2afcf",
+    "es/components/tree-v2/src/composables/useFilter.d.ts": "71ed4bac69f0e3759cf34004189835b15488268d72f21df3af411458ed09bbbc",
+    "es/components/tree-v2/src/composables/useTree.d.ts": "6e9daa388bfc459cb2c94864171a42149005ddbad2495105d2ec4b52f8ce84a1",
+    "es/components/tree-v2/src/tree-node-content.d.ts": "33c19c2d4cc40c14690eef0935f52f5ec11777fd32c87c9a09bed719e8e87194",
+    "es/components/tree-v2/src/tree-node.vue.d.ts": "c0dd9321bc2117846b9a9578d624dafc00ccda8cc077d768a50f188140fe1d73",
+    "es/components/tree-v2/src/tree.vue.d.ts": "2da3540e4ebe5d377baed0b2861b97769c2567086647307928335a1061e03dbe",
+    "es/components/tree-v2/src/types.d.ts": "fa6ce02df97ec4a9714c87639a3a950db0bdfc8d07e76cc2f2a108620f2a57a4",
+    "es/components/tree-v2/src/virtual-tree.d.ts": "2d1e6588c8f36dc758722006146b818646f2466a5d93a76bc9298254bbedb1b3",
+    "es/components/tree-v2/src/virtual-tree.mjs": "ef529da782204c1b71f392e3e47f8614740301d887cd79456819894326f77a00",
+    "es/components/tree-v2/style/css.d.ts": "31c25a18cfdbe64365dafdc6a31b0751016ef59badfdda8b2baa39bf7fa627b1",
+    "es/components/tree-v2/style/index.d.ts": "71ffb59ce858da868aa75c9b08833724f3a1e3fa66babfd3c6808561044bb0ef",
+    "lib/components/tree-v2/index.d.ts": "945ca99e59530d428ab3f24487960fd1c1b05e90ed83979ff6823493fb212f23",
+    "lib/components/tree-v2/src/composables/useCheck.d.ts": "f43e0636c065b5eab6f32ef5544cee8b767d48cac96b5df97f98ca9f5db2afcf",
+    "lib/components/tree-v2/src/composables/useFilter.d.ts": "71ed4bac69f0e3759cf34004189835b15488268d72f21df3af411458ed09bbbc",
+    "lib/components/tree-v2/src/composables/useTree.d.ts": "6e9daa388bfc459cb2c94864171a42149005ddbad2495105d2ec4b52f8ce84a1",
+    "lib/components/tree-v2/src/tree-node-content.d.ts": "33c19c2d4cc40c14690eef0935f52f5ec11777fd32c87c9a09bed719e8e87194",
+    "lib/components/tree-v2/src/tree-node.vue.d.ts": "c0dd9321bc2117846b9a9578d624dafc00ccda8cc077d768a50f188140fe1d73",
+    "lib/components/tree-v2/src/tree.vue.d.ts": "2da3540e4ebe5d377baed0b2861b97769c2567086647307928335a1061e03dbe",
+    "lib/components/tree-v2/src/types.d.ts": "fa6ce02df97ec4a9714c87639a3a950db0bdfc8d07e76cc2f2a108620f2a57a4",
+    "lib/components/tree-v2/src/virtual-tree.d.ts": "2d1e6588c8f36dc758722006146b818646f2466a5d93a76bc9298254bbedb1b3",
+    "lib/components/tree-v2/src/virtual-tree.js": "a983e5553b48276affaf81d4ecebd1752a1dea4df7020eaa87f86f018717a19f",
+    "lib/components/tree-v2/style/css.d.ts": "31c25a18cfdbe64365dafdc6a31b0751016ef59badfdda8b2baa39bf7fa627b1",
+    "lib/components/tree-v2/style/index.d.ts": "71ffb59ce858da868aa75c9b08833724f3a1e3fa66babfd3c6808561044bb0ef"
+  },
+  "overloadCounts": {
+    "focus": 4,
+    "blur": 4,
+    "select": 16,
+    "node-contextmenu": 4
+  },
+  "diagnostics": [
+    {
+      "file": "es/components/breadcrumb/src/breadcrumb-item.d.ts",
+      "code": 2307,
+      "message": "Cannot find module 'vue-router' or its corresponding type declarations.",
+      "count": 9
+    },
+    {
+      "file": "es/components/color-picker/index.d.ts",
+      "code": 2300,
+      "message": "Duplicate identifier 'event'.",
+      "count": 4
+    },
+    {
+      "file": "es/components/color-picker/src/color-picker.vue.d.ts",
+      "code": 2300,
+      "message": "Duplicate identifier 'event'.",
+      "count": 4
+    },
+    {
+      "file": "es/components/inbox-primitives/index.d.ts",
+      "code": 2300,
+      "message": "Duplicate identifier 'event'.",
+      "count": 14
+    },
+    {
+      "file": "es/components/inbox-primitives/index.d.ts",
+      "code": 2344,
+      "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.\n  Index signature for type 'string' is missing in type 'GlobalComponents'.",
+      "count": 44
+    },
+    {
+      "file": "es/components/inbox-primitives/src/conversation-list-item.vue.d.ts",
+      "code": 2300,
+      "message": "Duplicate identifier 'event'.",
+      "count": 2
+    },
+    {
+      "file": "es/components/index.d.ts",
+      "code": 2307,
+      "message": "Cannot find module './cascader' or its corresponding type declarations.",
+      "count": 1
+    },
+    {
+      "file": "es/components/index.d.ts",
+      "code": 2307,
+      "message": "Cannot find module './select' or its corresponding type declarations.",
+      "count": 1
+    },
+    {
+      "file": "es/components/index.d.ts",
+      "code": 2307,
+      "message": "Cannot find module './slider' or its corresponding type declarations.",
+      "count": 1
+    },
+    {
+      "file": "es/components/index.d.ts",
+      "code": 2307,
+      "message": "Cannot find module './time-select' or its corresponding type declarations.",
+      "count": 1
+    },
+    {
+      "file": "es/components/markdown-editor/index.d.ts",
+      "code": 2300,
+      "message": "Duplicate identifier 'event'.",
+      "count": 4
+    },
+    {
+      "file": "es/components/markdown-editor/src/markdown-editor.vue.d.ts",
+      "code": 2300,
+      "message": "Duplicate identifier 'event'.",
+      "count": 4
+    },
+    {
+      "file": "es/components/menu/index.d.ts",
+      "code": 2307,
+      "message": "Cannot find module 'vue-router' or its corresponding type declarations.",
+      "count": 32
+    },
+    {
+      "file": "es/components/menu/src/menu-item.d.ts",
+      "code": 2307,
+      "message": "Cannot find module 'vue-router' or its corresponding type declarations.",
+      "count": 8
+    },
+    {
+      "file": "es/components/menu/src/menu-item.vue.d.ts",
+      "code": 2307,
+      "message": "Cannot find module 'vue-router' or its corresponding type declarations.",
+      "count": 16
+    },
+    {
+      "file": "es/components/menu/src/menu.d.ts",
+      "code": 2307,
+      "message": "Cannot find module 'vue-router' or its corresponding type declarations.",
+      "count": 1
+    },
+    {
+      "file": "es/components/menu/src/types.d.ts",
+      "code": 2307,
+      "message": "Cannot find module 'vue-router' or its corresponding type declarations.",
+      "count": 1
+    },
+    {
+      "file": "es/components/metric-primitives/index.d.ts",
+      "code": 2344,
+      "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.\n  Index signature for type 'string' is missing in type 'GlobalComponents'.",
+      "count": 44
+    },
+    {
+      "file": "es/components/settings-primitives/index.d.ts",
+      "code": 2344,
+      "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.\n  Index signature for type 'string' is missing in type 'GlobalComponents'.",
+      "count": 56
+    },
+    {
+      "file": "es/components/table-v2/src/components/sort-icon.d.ts",
+      "code": 2503,
+      "message": "Cannot find namespace 'JSX'.",
+      "count": 1
+    },
+    {
+      "file": "es/components/table-v2/src/types.d.ts",
+      "code": 2503,
+      "message": "Cannot find namespace 'JSX'.",
+      "count": 1
+    },
+    {
+      "file": "es/components/table/src/util.d.ts",
+      "code": 2344,
+      "message": "Type 'GlobalComponents' does not satisfy the constraint 'Record<string, Component<any, any, any, ComputedOptions, MethodOptions, {}, any>>'.\n  Index signature for type 'string' is missing in type 'GlobalComponents'.",
+      "count": 1
+    },
+    {
+      "file": "es/components/tree-v2/index.d.ts",
+      "code": 2300,
+      "message": "Duplicate identifier 'event'.",
+      "count": 2
+    },
+    {
+      "file": "es/utils/objects.d.ts",
+      "code": 2307,
+      "message": "Cannot find module 'type-fest' or its corresponding type declarations.",
+      "count": 1
+    },
+    {
+      "file": "global.d.ts",
+      "code": 2339,
+      "message": "Property 'ElCascader' does not exist on type 'typeof import(\"@ozwasyd/element-plus/es/index\")'.",
+      "count": 1
+    },
+    {
+      "file": "global.d.ts",
+      "code": 2339,
+      "message": "Property 'ElOption' does not exist on type 'typeof import(\"@ozwasyd/element-plus/es/index\")'.",
+      "count": 1
+    },
+    {
+      "file": "global.d.ts",
+      "code": 2339,
+      "message": "Property 'ElOptionGroup' does not exist on type 'typeof import(\"@ozwasyd/element-plus/es/index\")'.",
+      "count": 1
+    },
+    {
+      "file": "global.d.ts",
+      "code": 2339,
+      "message": "Property 'ElSelect' does not exist on type 'typeof import(\"@ozwasyd/element-plus/es/index\")'.",
+      "count": 1
+    },
+    {
+      "file": "global.d.ts",
+      "code": 2339,
+      "message": "Property 'ElSlider' does not exist on type 'typeof import(\"@ozwasyd/element-plus/es/index\")'.",
+      "count": 1
+    },
+    {
+      "file": "global.d.ts",
+      "code": 2339,
+      "message": "Property 'ElTimeSelect' does not exist on type 'typeof import(\"@ozwasyd/element-plus/es/index\")'.",
+      "count": 1
+    }
+  ],
+  "metadataDiagnosticCount": 68
+}
