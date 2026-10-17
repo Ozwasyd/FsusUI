@@ -27,6 +27,8 @@
             :aria-labelledby="!title ? titleId : undefined"
             :aria-describedby="bodyId"
             v-bind="drawerAttrs"
+            :aria-hidden="!visible || undefined"
+            :inert="!visible || undefined"
             :class="[ns.b(), direction, visible && 'open', customClass]"
             :style="
               isHorizontal ? 'width: ' + drawerSize : 'height: ' + drawerSize
