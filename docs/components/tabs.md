@@ -10,6 +10,12 @@ must identify its content; add/close controls need readable text or an
 accessible icon name. When tabs are added or removed dynamically, the consumer
 must maintain the active item so focus is not lost.
 
+Set `aria-label` or `aria-labelledby` on `ElTabs` to name its tablist. Both
+attributes are forwarded to the tablist on every render, including updates and
+removal, and remain on the outer root through normal attribute fallthrough.
+Other attributes, such as `id` and `data-*`, are not forwarded to the tablist.
+When using `aria-labelledby`, provide the referenced label elements.
+
 > See the [Playground](../playground.md) for runnable component examples.
 
 ---
