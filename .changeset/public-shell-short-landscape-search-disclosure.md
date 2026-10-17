@@ -14,3 +14,5 @@ Keep CSP-safe trigger search in its original DOM scope using a component-owned n
 Preserve scoped theme and public-token inheritance without token copying or inline styles. Own native top-layer opening, closing, breakpoint/ref changes and unmount cleanup; retain the original search link when native support is unavailable.
 
 Tie trigger disclosure labels/ARIA/actions to a supported connected host, preserving the internal query and native href before readiness. Keep the CSP expanded content grid more specific than the common expanded-row display rule so long content scrolls separately from Cancel.
+
+Retain the original CSP search subtree before native readiness, hidden and inert while the search link remains available. Guard native synchronization by readiness and resynchronize when support becomes available, preserving SSR and unsupported-engine markup without invoking unavailable APIs.
