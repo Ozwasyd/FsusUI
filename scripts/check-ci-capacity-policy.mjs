@@ -361,7 +361,9 @@ console.log(
   `[ci-capacity] full-build scheduler: ${localeFiles.length} locales, both variants, serial/await/error controls ok`,
 )
 
-const { writeBundles } = require('../vue/internal/build/src/utils/rollup.ts')
+const {
+  writeBundles,
+} = require('../vue/internal/build/src/utils/output-writes.ts')
 for (const outputOptions of [
   [
     { format: 'esm', sourcemap: true },
