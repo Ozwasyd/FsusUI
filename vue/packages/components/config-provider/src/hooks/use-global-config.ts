@@ -87,6 +87,17 @@ const publicationFailures = (publication: Publication): readonly unknown[] =>
     ...[...publication.sources].flatMap(publicationFailures),
   ])
 
+const detachPublicationSource = (
+  publication: Publication,
+  source: Publication
+) => {
+  if (!publication.sources.has(source)) return
+  publication.failures = Object.freeze([
+    ...new Set([...publication.failures, ...publicationFailures(source)]),
+  ])
+  publication.sources.delete(source)
+}
+
 const recordCallbackFailure = (
   publication: Publication,
   owner: { listener: () => void; subscriptionId?: object; contextIdentity: object },
@@ -494,7 +505,7 @@ export const provideGlobalConfig = (
         source.revoke.delete(revoke)
         source.publish.delete(refresh)
         source.cleanup.delete(release)
-        publication.sources.delete(source)
+        detachPublicationSource(publication, source)
       })
     }
     if (producer) connect(producer)
@@ -558,7 +569,7 @@ export const provideGlobalConfig = (
           publication.revoke.delete(revoke)
           publication.publish.delete(publish)
           publication.cleanup.delete(release)
-          globalPublication.sources.delete(publication)
+          detachPublicationSource(globalPublication, publication)
           globalPublication.cleanup.delete(release)
         }
         publication.revoke.add(revoke)

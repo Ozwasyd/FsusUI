@@ -202,6 +202,9 @@ the affected feed failed closed; `getFailures()` includes actual local and
 retained upstream failures. A failed revocation prevents the pending write;
 a failure after publication cannot roll back a value already written.
 Same-producer updates during a write are rejected.
+Detaching or releasing a context retains the upstream failure records already
+observed, with their original ownership. It does not retain the live source
+dependency or collect later failures from that detached source.
 
 Failure records retain `cause`, the original listener, subscription identity
 where available, and the context identity at invocation. An asynchronous result

@@ -188,6 +188,43 @@ describe('controlled global config custody', () => {
     expect(feed.issueTicket()).toBeNull()
   })
 
+  it('retains observed upstream failures after releasing one shared provider', () => {
+    const producer = createGlobalConfigSnapshot({ namespace: 'first' })
+    cleanup.push(producer.release)
+    const first = provideGlobalConfig(producer, createApp({}))!
+    const second = provideGlobalConfig(producer, createApp({}))!
+    cleanup.push(
+      () => releaseGlobalConfig(first),
+      () => releaseGlobalConfig(second),
+    )
+    const firstFeed = getGlobalConfigFeed(first)!
+    const secondFeed = getGlobalConfigFeed(second)!
+    const cause = new Error('shared producer revocation failed')
+    const throwing = vi.fn(() => {
+      throw cause
+    })
+    const other = vi.fn()
+    cleanup.push(firstFeed.subscribe(throwing), secondFeed.subscribe(other))
+
+    expect(() => producer.update({ namespace: 'second' })).toThrow(cause)
+    const observed = secondFeed.getFailures()
+    expect(observed).toEqual(
+      expect.arrayContaining([expect.objectContaining({ cause })]),
+    )
+    releaseGlobalConfig(second)
+    expect(secondFeed.getFailures()).toEqual(observed)
+    expect(secondFeed.getFailures()[0]).toBe(observed[0])
+    expect(other).toHaveBeenCalledTimes(2)
+
+    // The remaining provider still observes the live producer. The detached
+    // provider retains only its history, not future failures or callbacks.
+    expect(() => producer.update({ namespace: 'third' })).toThrow(cause)
+    expect(throwing).toHaveBeenCalledTimes(2)
+    expect(other).toHaveBeenCalledTimes(2)
+    expect(firstFeed.getFailures().length).toBeGreaterThan(observed.length)
+    expect(secondFeed.getFailures()).toEqual(observed)
+  })
+
   it('inherits controlled parent snapshots and revokes selected child feeds', () => {
     const parent = createGlobalConfigSnapshot({
       namespace: 'parent',
@@ -270,5 +307,45 @@ describe('controlled global config custody', () => {
     expect(selected.value).toBe('third')
     expect(feed.issueTicket()?.value).toBe('third')
     unsubscribe()
+  })
+
+  it('retains fallback failure history without following a detached source', () => {
+    const producer = createGlobalConfigSnapshot({ namespace: 'first' })
+    cleanup.push(producer.release)
+    const context = provideGlobalConfig(producer, createApp({}))!
+    cleanup.push(() => releaseGlobalConfig(context))
+    const cause = new Error('upstream failure')
+    cleanup.push(
+      getGlobalConfigFeed(context)!.subscribe(() => {
+        throw cause
+      }),
+    )
+    const wrapper = mount(
+      defineComponent({
+        setup() {
+          provideGlobalConfig(producer, undefined, true)
+          return () => null
+        },
+      }),
+    )
+    cleanup.push(() => wrapper.unmount())
+    const fallback = useGlobalConfig()
+    const feed = getGlobalConfigFeed(fallback)!
+    const revoke = vi.fn()
+    cleanup.push(feed.subscribe(revoke))
+
+    expect(() => producer.update({ namespace: 'second' })).toThrow(cause)
+    const observed = feed.getFailures()
+    expect(observed).toEqual(
+      expect.arrayContaining([expect.objectContaining({ cause })]),
+    )
+    fallback.value = { namespace: 'external' }
+    expect(feed.getFailures()).toEqual(observed)
+    expect(feed.getFailures()[0]).toBe(observed[0])
+    expect(() => producer.update({ namespace: 'third' })).toThrow(cause)
+    expect(revoke).toHaveBeenCalledTimes(2)
+    expect(fallback.value.namespace).toBe('external')
+    expect(feed.getFailures()).toEqual(observed)
+    expect(feed.issueTicket()).toBeNull()
   })
 })
