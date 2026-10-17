@@ -18,12 +18,19 @@ namespace FsusUI.Avalonia.HeadlessTests;
 
 public class FsusShortcutRecorderHeadlessTests
 {
-  [AvaloniaFact]
-  public void UserStartsRecordingAndPressesCtrlShiftPToCaptureOneShortcut()
+  [AvaloniaTheory]
+  [InlineData(FsusShortcutPlatform.Windows, RawInputModifiers.Control, "Ctrl+Shift+P")]
+  [InlineData(FsusShortcutPlatform.Linux, RawInputModifiers.Control, "Ctrl+Shift+P")]
+  [InlineData(FsusShortcutPlatform.macOS, RawInputModifiers.Meta, "Command+Shift+P")]
+  public void UserStartsRecordingAndPressesCtrlShiftPToCaptureOneShortcut(
+    FsusShortcutPlatform platform,
+    RawInputModifiers primaryModifier,
+    string displayShortcut)
   {
     var recorder = new FsusShortcutRecorder
     {
       AccessibleName = "Shortcut input",
+      Platform = platform,
     };
 
     var window = MountWindow([("recorder", recorder)]);
@@ -36,14 +43,15 @@ public class FsusShortcutRecorderHeadlessTests
     recorder.StartRecording();
     Assert.True(recorder.IsRecording);
 
-    // Press Ctrl+Shift+P
-    window.KeyPress(Key.P, RawInputModifiers.Control | RawInputModifiers.Shift, PhysicalKey.None, "P");
+    // Capture the platform's primary modifier through the routed input path.
+    window.KeyPress(Key.P, primaryModifier | RawInputModifiers.Shift, PhysicalKey.None, "P");
 
     Assert.False(recorder.IsRecording);
     Assert.NotNull(recorder.Value);
     Assert.Equal(Key.P, recorder.Value.Key);
     Assert.Equal(KeyModifiers.Control | KeyModifiers.Shift, recorder.Value.Modifiers);
-    Assert.Equal("Ctrl+Shift+P", recorder.DisplayText);
+    Assert.Equal(displayShortcut, recorder.DisplayText);
+    Assert.Equal("Ctrl+Shift+P", recorder.Value.SerializedText);
     Assert.Equal(FsusShortcutValidationStatus.Valid, recorder.Status);
     Assert.False(recorder.IsInvalid);
 
@@ -56,6 +64,7 @@ public class FsusShortcutRecorderHeadlessTests
     var initial = new FsusShortcutGesture(Key.S, KeyModifiers.Control);
     var recorder = new FsusShortcutRecorder
     {
+      Platform = FsusShortcutPlatform.Windows,
       Value = initial,
     };
 
@@ -136,6 +145,7 @@ public class FsusShortcutRecorderHeadlessTests
     {
       var recorder = new FsusShortcutRecorder
       {
+        Platform = FsusShortcutPlatform.Windows,
         Value = new FsusShortcutGesture(Key.F, KeyModifiers.Control),
       };
 
