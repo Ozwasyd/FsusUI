@@ -1,3 +1,4 @@
+/// <reference types="gsap" preserve="true" />
 import { getCurrentScope, onScopeDispose } from 'vue'
 import {
   getGsap,

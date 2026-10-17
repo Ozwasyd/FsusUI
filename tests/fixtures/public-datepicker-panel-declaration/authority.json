@@ -1,0 +1,310 @@
+{
+  "baseline": "2d05f240e5fb04ac0cd602b4ed638ffe00b1859b",
+  "combinedEvidenceSha": "736b981fba100a0c2e956e74b61ddef62ff4d508",
+  "sourceStates": [
+    {
+      "name": "original",
+      "sourceSha": "2d05f240e5fb04ac0cd602b4ed638ffe00b1859b",
+      "sourceInputCount": 2450,
+      "sourceInputFingerprint": "492ef7bbcbf59b4a735502689963ebd8db94e7cd68a395e5aea0c2d09bef757d",
+      "producerDiagnostics": [
+        {
+          "code": 7056,
+          "file": "vue/packages/components/cascader/index.ts",
+          "start": 441,
+          "message": "The inferred type of this node exceeds the maximum length the compiler will serialize. An explicit type annotation is needed."
+        },
+        {
+          "code": 7056,
+          "file": "vue/packages/components/cascader/src/cascader.vue.ts",
+          "start": 1642,
+          "message": "The inferred type of this node exceeds the maximum length the compiler will serialize. An explicit type annotation is needed."
+        },
+        {
+          "code": 7056,
+          "file": "vue/packages/components/date-picker/src/panel-utils.ts",
+          "start": 284,
+          "message": "The inferred type of this node exceeds the maximum length the compiler will serialize. An explicit type annotation is needed."
+        },
+        {
+          "code": 7056,
+          "file": "vue/packages/components/pagination/src/components/sizes.vue.ts",
+          "start": 371,
+          "message": "The inferred type of this node exceeds the maximum length the compiler will serialize. An explicit type annotation is needed."
+        },
+        {
+          "code": 7056,
+          "file": "vue/packages/components/select/index.ts",
+          "start": 207,
+          "message": "The inferred type of this node exceeds the maximum length the compiler will serialize. An explicit type annotation is needed."
+        },
+        {
+          "code": 7056,
+          "file": "vue/packages/components/select/src/select.vue.ts",
+          "start": 1314,
+          "message": "The inferred type of this node exceeds the maximum length the compiler will serialize. An explicit type annotation is needed."
+        },
+        {
+          "code": 7056,
+          "file": "vue/packages/components/select/src/useSelect.ts",
+          "start": 1693,
+          "message": "The inferred type of this node exceeds the maximum length the compiler will serialize. An explicit type annotation is needed."
+        },
+        {
+          "code": 7056,
+          "file": "vue/packages/components/slider/index.ts",
+          "start": 103,
+          "message": "The inferred type of this node exceeds the maximum length the compiler will serialize. An explicit type annotation is needed."
+        },
+        {
+          "code": 7056,
+          "file": "vue/packages/components/slider/src/composables/use-slide.ts",
+          "start": 480,
+          "message": "The inferred type of this node exceeds the maximum length the compiler will serialize. An explicit type annotation is needed."
+        },
+        {
+          "code": 7056,
+          "file": "vue/packages/components/slider/src/slider.vue.ts",
+          "start": 644,
+          "message": "The inferred type of this node exceeds the maximum length the compiler will serialize. An explicit type annotation is needed."
+        },
+        {
+          "code": 7056,
+          "file": "vue/packages/components/time-select/index.ts",
+          "start": 463,
+          "message": "The inferred type of this node exceeds the maximum length the compiler will serialize. An explicit type annotation is needed."
+        },
+        {
+          "code": 7056,
+          "file": "vue/packages/components/time-select/src/time-select.vue.ts",
+          "start": 539,
+          "message": "The inferred type of this node exceeds the maximum length the compiler will serialize. An explicit type annotation is needed."
+        }
+      ]
+    },
+    {
+      "name": "independent",
+      "sourceSha": "bba1a73bfa2f89cf638afeaca8d724626f412ef2",
+      "sourceInputCount": 2450,
+      "sourceInputFingerprint": "66a3deb5b64ea12d99f621aaf33e25925e8e3b78677093d557899c1b211c764c",
+      "producerDiagnostics": [
+        {
+          "code": 7056,
+          "file": "vue/packages/components/cascader/index.ts",
+          "start": 441,
+          "message": "The inferred type of this node exceeds the maximum length the compiler will serialize. An explicit type annotation is needed."
+        },
+        {
+          "code": 7056,
+          "file": "vue/packages/components/cascader/src/cascader.vue.ts",
+          "start": 1642,
+          "message": "The inferred type of this node exceeds the maximum length the compiler will serialize. An explicit type annotation is needed."
+        },
+        {
+          "code": 7056,
+          "file": "vue/packages/components/pagination/src/components/sizes.vue.ts",
+          "start": 371,
+          "message": "The inferred type of this node exceeds the maximum length the compiler will serialize. An explicit type annotation is needed."
+        },
+        {
+          "code": 7056,
+          "file": "vue/packages/components/select/index.ts",
+          "start": 207,
+          "message": "The inferred type of this node exceeds the maximum length the compiler will serialize. An explicit type annotation is needed."
+        },
+        {
+          "code": 7056,
+          "file": "vue/packages/components/select/src/select.vue.ts",
+          "start": 1314,
+          "message": "The inferred type of this node exceeds the maximum length the compiler will serialize. An explicit type annotation is needed."
+        },
+        {
+          "code": 7056,
+          "file": "vue/packages/components/select/src/useSelect.ts",
+          "start": 1693,
+          "message": "The inferred type of this node exceeds the maximum length the compiler will serialize. An explicit type annotation is needed."
+        },
+        {
+          "code": 7056,
+          "file": "vue/packages/components/slider/index.ts",
+          "start": 103,
+          "message": "The inferred type of this node exceeds the maximum length the compiler will serialize. An explicit type annotation is needed."
+        },
+        {
+          "code": 7056,
+          "file": "vue/packages/components/slider/src/composables/use-slide.ts",
+          "start": 480,
+          "message": "The inferred type of this node exceeds the maximum length the compiler will serialize. An explicit type annotation is needed."
+        },
+        {
+          "code": 7056,
+          "file": "vue/packages/components/slider/src/slider.vue.ts",
+          "start": 644,
+          "message": "The inferred type of this node exceeds the maximum length the compiler will serialize. An explicit type annotation is needed."
+        },
+        {
+          "code": 7056,
+          "file": "vue/packages/components/time-select/index.ts",
+          "start": 463,
+          "message": "The inferred type of this node exceeds the maximum length the compiler will serialize. An explicit type annotation is needed."
+        },
+        {
+          "code": 7056,
+          "file": "vue/packages/components/time-select/src/time-select.vue.ts",
+          "start": 539,
+          "message": "The inferred type of this node exceeds the maximum length the compiler will serialize. An explicit type annotation is needed."
+        }
+      ]
+    },
+    {
+      "name": "four-component",
+      "sourceSha": "f4a094f300384185918fc6d4be86e88d9ab9f097",
+      "sourceInputCount": 2450,
+      "sourceInputFingerprint": "63674e7597f8048f2a506dac646fc3cf28bf03fa27b07d0c9d39cbd3632d8425",
+      "producerDiagnostics": []
+    }
+  ],
+  "artifacts": [
+    {
+      "sourceSha": "20d905921f9494917320d32f05becaf602da2826",
+      "sha256": "fb5f37d9237fdd33f5343341230d9619d8abd0bd1fc3b0af99585bd5bada35c0",
+      "libraryDiagnostics": [
+        {
+          "code": 2307,
+          "file": "package/es/components/index.d.ts",
+          "message": "Cannot find module './cascader' or its corresponding type declarations."
+        },
+        {
+          "code": 2307,
+          "file": "package/es/components/index.d.ts",
+          "message": "Cannot find module './select' or its corresponding type declarations."
+        },
+        {
+          "code": 2307,
+          "file": "package/es/components/index.d.ts",
+          "message": "Cannot find module './slider' or its corresponding type declarations."
+        },
+        {
+          "code": 2307,
+          "file": "package/es/components/index.d.ts",
+          "message": "Cannot find module './time-select' or its corresponding type declarations."
+        }
+      ],
+      "manifest": {
+        "artifact": {
+          "filename": "fsusui-npm-candidate.tgz",
+          "sha256": "fb5f37d9237fdd33f5343341230d9619d8abd0bd1fc3b0af99585bd5bada35c0"
+        },
+        "build": {
+          "command": "pnpm run build:npm-package",
+          "inputFingerprint": "7217f67caec65cf436e55462175080cc4d487cb561c9dc5ce28c370ebdbe8d8f",
+          "inputs": {
+            "package.json": "4e6502bacf6c8edfe52fd20f7d59bd5df9a05f8f627546e62fb889f6e5c50ace",
+            "pnpm-lock.yaml": "c7d35e65a7f82bf145786f0d5697a8fcff2109b7f47a85146ed0acb22510ce94",
+            "scripts/npm-candidate-lib.mjs": "b2015f52ba6652a4deb714b85fddbc11bc8463826d9767353b97278053e35d3e",
+            "scripts/package-candidate.mjs": "3eaa9761f4728e155531bf8eba34186596106730eff24561ceb8cf09a30c33b9",
+            "scripts/prepare-npm-package.mjs": "4c155a30de334fc3e34a5d9ebf659b7d779d3a8f8e0b1d51bebd314b0a465ecc",
+            "vue/packages/element-plus/package.json": "7bbb40ed812927e56a198d439023224fe750ab4ad368e372b5775bf57d6b910b"
+          },
+          "lockfileSha256": "c7d35e65a7f82bf145786f0d5697a8fcff2109b7f47a85146ed0acb22510ce94",
+          "scriptVersion": 1
+        },
+        "commitSha": "20d905921f9494917320d32f05becaf602da2826",
+        "metadata": {
+          "provenanceEligible": true,
+          "publicAccess": true,
+          "publishConfigPresent": true,
+          "registry": "https://registry.npmjs.org/"
+        },
+        "package": {
+          "distTag": "latest",
+          "name": "@ozwasyd/element-plus",
+          "packageJsonCanonicalSha256": "545e8aef06c99df84e361a4b4838f105f1513318cf3143678b27f529cd8b14e8",
+          "version": "1.5.1"
+        },
+        "schemaVersion": 1,
+        "sourceProfile": "Release",
+        "toolchain": {
+          "node": "v24.19.0",
+          "npm": "11.13.0",
+          "pnpm": "10.33.0"
+        }
+      },
+      "installationAdditions": [
+        [
+          "node_modules/.bin/katex",
+          "b9553539f21fe3af00140c41a282144116a8ed643d5ce062e74880b6cbcd4597"
+        ]
+      ]
+    },
+    {
+      "sourceSha": "f4a094f300384185918fc6d4be86e88d9ab9f097",
+      "sha256": "82724daaa96d47e22bf5ec17694224bfc40192d50ff3a1554b6e8a6775bec4d9",
+      "libraryDiagnostics": [],
+      "manifest": {
+        "artifact": {
+          "filename": "fsusui-npm-candidate.tgz",
+          "sha256": "82724daaa96d47e22bf5ec17694224bfc40192d50ff3a1554b6e8a6775bec4d9"
+        },
+        "build": {
+          "command": "pnpm run build:npm-package",
+          "inputFingerprint": "8dc5a6987ba3a43a6a60d41ef589725b93ab578a396d81e11d21ac12b335771f",
+          "inputs": {
+            "package.json": "4e6502bacf6c8edfe52fd20f7d59bd5df9a05f8f627546e62fb889f6e5c50ace",
+            "pnpm-lock.yaml": "c7d35e65a7f82bf145786f0d5697a8fcff2109b7f47a85146ed0acb22510ce94",
+            "scripts/npm-candidate-lib.mjs": "b2015f52ba6652a4deb714b85fddbc11bc8463826d9767353b97278053e35d3e",
+            "scripts/package-candidate.mjs": "3eaa9761f4728e155531bf8eba34186596106730eff24561ceb8cf09a30c33b9",
+            "scripts/prepare-npm-package.mjs": "4c155a30de334fc3e34a5d9ebf659b7d779d3a8f8e0b1d51bebd314b0a465ecc",
+            "vue/packages/element-plus/package.json": "7bbb40ed812927e56a198d439023224fe750ab4ad368e372b5775bf57d6b910b"
+          },
+          "lockfileSha256": "c7d35e65a7f82bf145786f0d5697a8fcff2109b7f47a85146ed0acb22510ce94",
+          "scriptVersion": 1
+        },
+        "commitSha": "f4a094f300384185918fc6d4be86e88d9ab9f097",
+        "metadata": {
+          "provenanceEligible": true,
+          "publicAccess": true,
+          "publishConfigPresent": true,
+          "registry": "https://registry.npmjs.org/"
+        },
+        "package": {
+          "distTag": "latest",
+          "name": "@ozwasyd/element-plus",
+          "packageJsonCanonicalSha256": "545e8aef06c99df84e361a4b4838f105f1513318cf3143678b27f529cd8b14e8",
+          "version": "1.5.1"
+        },
+        "schemaVersion": 1,
+        "sourceProfile": "Release",
+        "toolchain": {
+          "node": "v24.19.0",
+          "npm": "11.13.0",
+          "pnpm": "10.33.0"
+        }
+      },
+      "installationAdditions": [
+        [
+          "node_modules/.bin/katex",
+          "b9553539f21fe3af00140c41a282144116a8ed643d5ce062e74880b6cbcd4597"
+        ]
+      ]
+    }
+  ],
+  "negativeTargets": [
+    {
+      "code": 2345,
+      "line": 3
+    },
+    {
+      "code": 2345,
+      "line": 4
+    },
+    {
+      "code": 2554,
+      "line": 5
+    },
+    {
+      "code": 2322,
+      "line": 6
+    }
+  ]
+}
