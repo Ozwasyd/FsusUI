@@ -22,6 +22,14 @@ controls use the shared `max(base, safe-area)` helper and remain inside the safe
 rectangle in landscape cutout layouts. The `pnpm audit:visual-boundaries` matrix
 asserts this with #260 variable overrides; real-device evidence is separate.
 
+Toolbar actions keep 44px minimum hit targets and wrap into an internally
+scrollable toolbar on narrow layouts. Wheel input over the toolbar preserves
+native scrolling without chaining to the background page; wheel input on the
+image canvas continues to zoom the image. The toolbar retains its 30px/safe-inset
+bottom floor. In short layouts, navigation reserves the full toolbar row and
+the next control moves inward to avoid covering the close control; the four
+canonical safe-area profiles retain their original chrome geometry.
+
 ## Basic Usage
 
 ```vue
