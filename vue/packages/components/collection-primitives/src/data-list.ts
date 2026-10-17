@@ -63,6 +63,25 @@ export const dataListProps = buildProps({
     default: null,
   },
   /**
+   * @description disable every row while the collection is loading
+   */
+  loading: Boolean,
+  /**
+   * @description disable every interactive row
+   */
+  disabled: Boolean,
+  /**
+   * @description stable keys of rows that must not activate
+   */
+  disabledKeys: {
+    type: definePropType<DataListRowKey[]>(Array),
+    default: () => [],
+  },
+  /**
+   * @description stack columns at the existing extra-small viewport breakpoint
+   */
+  responsive: Boolean,
+  /**
    * @description optional href getter; when present rows render as anchors
    */
   href: {
