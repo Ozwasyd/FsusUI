@@ -15,6 +15,36 @@ afterEach(() => {
 })
 
 describe('DataList focus recovery', () => {
+  test('uses the latest row position when a reorder is followed by post-flush removal', async () => {
+    const records = [...initialRows, { id: 'd', name: 'Delta' }]
+    const rows = ref(records)
+    const wrapper = mount(
+      defineComponent({
+        setup() {
+          watch(
+            rows,
+            () => {
+              if (rows.value[0]?.id === 'b') {
+                rows.value = rows.value.filter((row) => row.id !== 'b')
+              }
+            },
+            { flush: 'post' },
+          )
+          return () => h(DataList, { rows: rows.value, columns })
+        },
+      }),
+      { attachTo: document.body },
+    )
+    ;(wrapper.findAll('button')[1].element as HTMLButtonElement).focus()
+
+    rows.value = [records[1], records[0], records[2], records[3]]
+    await nextTick()
+    await nextTick()
+
+    expect(wrapper.findAll('button')[0].text()).toBe('Alpha')
+    expect(document.activeElement).toBe(wrapper.findAll('button')[0].element)
+  })
+
   test.each(['disabledKeys', 'loadingKey', 'loading'] as const)(
     'keeps removal recovery across a post-flush %s update',
     async (state) => {
