@@ -18,6 +18,10 @@ export {
   applyMarkdownUrlValidation,
   classifyMarkdownUrl,
   collectMarkdownEmbedNodes,
+  cancelMarkdownEmbedRequest,
+  createMarkdownEmbedProjectionRequest,
+  prepareMarkdownEmbedResult,
+  resolveMarkdownEmbedPresentation,
   commitMarkdownEmbedResult,
   createMarkdownEmbedRequest,
   evaluateMarkdownHtmlImportMutations,
@@ -112,7 +116,7 @@ export {
   renderMarkdownResultWithRuntime,
   renderMarkdownSummaryWithRuntime,
   renderMarkdownWithRuntime,
-} from '@element-plus/wasm'
+} from '../wasm/index'
 
 export type {
   MarkdownDocumentIdentity,
@@ -124,6 +128,13 @@ export type {
   MarkdownEditorProjectionIdentity,
   MarkdownEditorProjectionResult,
   MarkdownEditorRequiredSyntaxKind,
+  MarkdownEmbedRequest,
+  MarkdownEmbedResult,
+  MarkdownEmbedProvider,
+  MarkdownEmbedTargetVersion,
+  MarkdownEmbedProjection,
+  MarkdownEmbedProjectionAuthority,
+  MarkdownEmbedPresentation,
   MarkdownEmbedCommandPlan,
   MarkdownEmbedDiagnosticCode,
   MarkdownEmbedInvalidNode,
@@ -250,4 +261,4 @@ export type {
   MarkdownSourceOffset,
   MarkdownSourceRange,
   MarkdownSourceUtf8Offset,
-} from '@element-plus/wasm'
+} from '../wasm/index'

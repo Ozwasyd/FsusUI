@@ -132,6 +132,21 @@ import type {
   MarkdownEditorWritingAidsOptions,
 } from './markdown-editor-writing-aids'
 import type {
+  MarkdownEditorTypographyRequest,
+  MarkdownEditorTypographyResult,
+} from './markdown-editor-typography'
+export {
+  MARKDOWN_EDITOR_TYPOGRAPHY_CATALOG,
+  resolveMarkdownEditorTypography,
+  type MarkdownEditorTypographyDimension,
+  type MarkdownEditorTypographyProfile,
+  type MarkdownEditorTypographyResolution,
+  type MarkdownEditorTypographyRequest,
+  type MarkdownEditorTypographyEffective,
+  type MarkdownEditorTypographyRejection,
+  type MarkdownEditorTypographyResult,
+} from './markdown-editor-typography'
+import type {
   MarkdownEditorHistoryState,
   MarkdownEditorDocumentIdentity,
   MarkdownEditorPositionMap,
@@ -1735,6 +1750,10 @@ export const markdownEditorProps = buildProps({
     values: ['markdown', 'prose'],
     default: 'markdown',
   },
+  typography: {
+    type: definePropType<MarkdownEditorTypographyRequest>(Object),
+    default: undefined,
+  },
   interactionProfile: {
     type: String as PropType<MarkdownEditorInteractionProfile>,
     values: ['auto', 'touch', 'keyboard'],
@@ -1840,6 +1859,7 @@ export const markdownEditorProps = buildProps({
 } as const)
 
 export const markdownEditorEmits = {
+  'typography-result': (_result: MarkdownEditorTypographyResult) => true,
   [UPDATE_MODEL_EVENT]: (value: string) => typeof value === 'string',
   [CHANGE_EVENT]: (value: string) => typeof value === 'string',
   command: (command: MarkdownEditorCommand) => Boolean(command?.key),

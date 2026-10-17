@@ -13,6 +13,12 @@
       ns.is('commands-expanded', commandsExpanded),
       ns.is('focus-mode', writingAidsFocusState.enabled),
       ns.is('typewriter-mode', resolvedWritingAids.typewriter),
+      ns.is('typography-baseline', activeTypography !== null),
+      activeTypography && ns.m(`typography-size-${activeTypography.fontSize}`),
+      activeTypography &&
+        ns.m(`typography-line-height-${activeTypography.lineHeight}`),
+      activeTypography &&
+        ns.m(`typography-width-${activeTypography.canvasWidth}`),
     ]"
     role="region"
     tabindex="-1"
@@ -357,6 +363,7 @@
         @pointerup="handleSelectionDragEnd"
         @scroll="handleLayoutScroll"
         @select="handleSelectionMove"
+        @selectionchange="handleSelectionMove"
         @touchmove="handleLayoutTouch"
         @wheel="handleLayoutWheel"
       />
@@ -564,7 +571,18 @@
               segment.plan.statusText
             }}</span>
           </header>
-          <p v-if="segment.plan.excerpt" class="el-markdown-embed__body">
+          <el-markdown-renderer
+            v-if="segment.plan.markdown !== undefined"
+            :base-url="previewBaseUrl"
+            :content="segment.plan.markdown"
+            :csp-nonce="previewCspNonce"
+            :features="previewFeatures"
+            mode="editor"
+            @features-activated="emitRenderEvent('features-activated', $event)"
+            @render-complete="handleRendererComplete($event)"
+            @render-error="emitRenderEvent('render-error', $event)"
+          />
+          <p v-else-if="segment.plan.excerpt" class="el-markdown-embed__body">
             {{ segment.plan.excerpt }}
           </p>
           <div class="el-markdown-embed__actions">
@@ -630,7 +648,18 @@
                 segment.plan.statusText
               }}</span>
             </header>
-            <p v-if="segment.plan.excerpt" class="el-markdown-embed__body">
+            <el-markdown-renderer
+              v-if="segment.plan.markdown !== undefined"
+              :base-url="previewBaseUrl"
+              :content="segment.plan.markdown"
+              :csp-nonce="previewCspNonce"
+              :features="previewFeatures"
+              mode="editor"
+              @features-activated="emitRenderEvent('features-activated', $event)"
+              @render-complete="handleRendererComplete($event)"
+              @render-error="emitRenderEvent('render-error', $event)"
+            />
+            <p v-else-if="segment.plan.excerpt" class="el-markdown-embed__body">
               {{ segment.plan.excerpt }}
             </p>
             <div class="el-markdown-embed__actions">
@@ -957,7 +986,7 @@
             "
             @keydown.down.prevent="selectNextPaletteItem"
             @keydown.up.prevent="selectPreviousPaletteItem"
-            @keydown.enter.prevent="executeActivePaletteItem"
+            @keydown.enter="executeActivePaletteItem"
           />
           <div :id="paletteListId" :class="ns.e('palette-list')" role="listbox">
             <div
@@ -1298,6 +1327,9 @@ import {
 } from './markdown-editor-outline'
 import { planMarkdownOutlineReveal } from './markdown-editor-outline-active'
 import {
+  captureMarkdownLiveLayoutAnchor,
+  createMarkdownLiveLayoutTextMeasurement,
+  measureMarkdownLiveLayoutTextMetrics,
   resolveMarkdownLiveLayoutStability,
   resolveMarkdownLiveVirtualWindow,
   type MarkdownLiveLayoutGesture,
@@ -1305,6 +1337,16 @@ import {
   type MarkdownLiveLayoutTrigger,
   type MarkdownLiveVirtualWindow,
 } from './markdown-editor-live-layout'
+import {
+  MARKDOWN_EDITOR_TYPOGRAPHY_CATALOG,
+  readMarkdownEditorTypographyRequest,
+  resolveMarkdownEditorTypography,
+  type MarkdownEditorTypographyEffective,
+  type MarkdownEditorTypographyProfile,
+  type MarkdownEditorTypographyRejection,
+  type MarkdownEditorTypographyRequest,
+  type MarkdownEditorTypographyResult,
+} from './markdown-editor-typography'
 import {
   planMarkdownTableAlignColumn,
   planMarkdownTableDeleteColumn,
@@ -1350,8 +1392,11 @@ import {
 } from './markdown-editor-embed'
 import {
   commitMarkdownEmbedResult,
+  cancelMarkdownEmbedRequest,
+  createMarkdownEmbedProjectionRequest,
   createMarkdownEmbedRequest,
   forgetMarkdownEmbedRequest,
+  type MarkdownEmbedRequest,
   type MarkdownEmbedResult,
 } from '../../../wasm/markdown-embed-provider'
 
@@ -1830,6 +1875,20 @@ const atomicActionNodes = computed(() => {
     .map((plan) => ({ id: plan.nodeId, kind: plan.kind }))
 })
 const layoutGesture = ref<MarkdownLiveLayoutGesture | null>(null)
+const activeTypography = ref<MarkdownEditorTypographyProfile | null>(null)
+let typographyDisposed = false
+let pendingTypography: {
+  cancel: (reason: MarkdownEditorTypographyRejection) => void
+  acceptRestoreScroll: () => boolean
+} | null = null
+const typographyMeasurements = new Set<HTMLElement>()
+const clearTypographyMeasurements = () => {
+  for (const element of typographyMeasurements) element.remove()
+  typographyMeasurements.clear()
+}
+const cancelTypography = (reason: MarkdownEditorTypographyRejection) => {
+  pendingTypography?.cancel(reason)
+}
 const liveWindow = ref<MarkdownLiveVirtualWindow | null>(null)
 const liveLayout = ref<MarkdownLiveLayoutPlan>(
   resolveMarkdownLiveLayoutStability({
@@ -1857,7 +1916,17 @@ const liveDecorations = computed(() => {
   const mounted = new Set(liveWindow.value.mountedNodeIds)
   return decorations.filter((decoration) => mounted.has(decoration.nodeId))
 })
-const restoreTextareaViewport = (plan: MarkdownLiveLayoutPlan) => {
+const restoreTextareaViewport = (
+  plan: MarkdownLiveLayoutPlan,
+  continuity?: {
+    readonly viewportOffset: number
+    readonly anchorY: () => number | null
+    readonly guard: () => boolean
+    readonly settled: () => void
+    readonly unavailable: () => void
+    readonly beforeScrollWrite: (scrollTop: number) => void
+  },
+) => {
   const textarea = textareaRef.value
   if (!textarea || plan.action !== 'restore' || !plan.anchor) return
   const anchor = plan.anchor
@@ -1866,12 +1935,27 @@ const restoreTextareaViewport = (plan: MarkdownLiveLayoutPlan) => {
   frameScheduler.schedule({
     // Same-frame supersede: a newer layout plan (or a user gesture yield)
     // replaces or cancels this restore before the frame commits it.
-    guard: () => liveLayout.value === plan,
+    guard: () =>
+      liveLayout.value === plan && (!continuity || continuity.guard()),
     key: 'viewport-restore',
     measure: () => {
       const target = textareaRef.value
       if (!target) {
         viewportRestoreNextScrollTop = null
+        return
+      }
+      if (continuity) {
+        const y = continuity.anchorY()
+        if (y === null) {
+          viewportRestoreNextScrollTop = null
+          continuity.unavailable()
+          return
+        }
+        viewportRestoreNextScrollTop = Math.min(
+          Math.max(0, y - continuity.viewportOffset),
+          Math.max(0, target.scrollHeight - target.clientHeight),
+        )
+        viewportRestoreCurrentScrollTop = target.scrollTop
         return
       }
       const lineHeight =
@@ -1895,13 +1979,417 @@ const restoreTextareaViewport = (plan: MarkdownLiveLayoutPlan) => {
         return
       }
       restoringViewport = true
+      continuity?.beforeScrollWrite(viewportRestoreNextScrollTop)
       target.scrollTop = viewportRestoreNextScrollTop
       viewportRestoreNextScrollTop = null
-      queueMicrotask(() => {
-        restoringViewport = false
-      })
+      if (!continuity)
+        queueMicrotask(() => {
+          restoringViewport = false
+        })
     },
+    postPaint: continuity?.settled,
   })
+}
+
+/** One bounded reflow submitted to the editor's existing scheduler/anchor owner. */
+const applyTypography = (
+  input: MarkdownEditorTypographyRequest,
+): Promise<MarkdownEditorTypographyResult> => {
+  const request = readMarkdownEditorTypographyRequest(input)
+  const rejected = (
+    reason: MarkdownEditorTypographyRejection,
+  ): MarkdownEditorTypographyResult => {
+    const result = Object.freeze({
+      status: 'rejected' as const,
+      requestId: request?.requestId ?? null,
+      reason,
+      visualCommitted: false,
+      settle: 'not-applied' as const,
+      effective: null,
+    })
+    queueMicrotask(() => {
+      if (!typographyDisposed) emit('typography-result', result)
+    })
+    return result
+  }
+  if (!request) return Promise.resolve(rejected('invalid-request'))
+  const resolution = resolveMarkdownEditorTypography(request.profile)
+  if (resolution.status !== 'supported')
+    return Promise.resolve(rejected('unsupported-profile'))
+  if (typographyDisposed) return Promise.resolve(rejected('disposed'))
+  if (
+    request.expectedDocumentIdentity.id !==
+      transactionStore.documentIdentity.id ||
+    request.expectedDocumentIdentity.epoch !==
+      transactionStore.documentIdentity.epoch
+  )
+    return Promise.resolve(rejected('stale-document'))
+  if (request.expectedRevision !== transactionStore.revision)
+    return Promise.resolve(rejected('stale-revision'))
+  if (isComposing.value) return Promise.resolve(rejected('composition-active'))
+  if (
+    layoutGesture.value ||
+    writingAidsState.value === 'selection-drag-suspended'
+  )
+    return Promise.resolve(rejected('user-scroll'))
+  const textarea = textareaRef.value
+  if (
+    !textarea ||
+    currentMode.value === 'preview' ||
+    !textarea.isConnected ||
+    textarea.ownerDocument.visibilityState === 'hidden'
+  )
+    return Promise.resolve(rejected('surface-unavailable'))
+  if (textarea.ownerDocument.fonts?.status === 'loading')
+    return Promise.resolve(rejected('font-loading'))
+
+  cancelTypography('superseded')
+  const identity = Object.freeze({ ...transactionStore.documentIdentity })
+  const revision = transactionStore.revision
+  const source = transactionStore.value
+  const selection = Object.freeze({ ...transactionStore.selection })
+  const history = transactionStore.history
+  const mode = currentMode.value
+  const projection = editorProjection.value
+  const anchor = captureMarkdownLiveLayoutAnchor({
+    documentIdentity: identity,
+    projection,
+    revision,
+    selection,
+    source,
+  })
+  const plan = resolveMarkdownLiveLayoutStability({
+    documentIdentity: identity,
+    currentIdentity: transactionStore.documentIdentity,
+    expectedRevision: revision,
+    revision,
+    selection,
+    source,
+    previousAnchor: anchor,
+    projection,
+    reducedMotion: reducedMotionRequested(),
+    trigger: 'typography',
+  })
+  const keys = [
+    'typography-capture',
+    'typography-apply',
+    'typography-metrics',
+    'typography-verify',
+  ] as const
+  let committed = false
+  let done = false
+  let viewportOffset = 0
+  let permittedScrollTop = textarea.scrollTop
+  const permittedScrollLeft = textarea.scrollLeft
+  let expectedRestoreScroll: number | null = null
+  let effective: MarkdownEditorTypographyEffective | null = null
+  let measurement: ReturnType<
+    typeof createMarkdownLiveLayoutTextMeasurement
+  > | null = null
+  let metrics: ReturnType<typeof measureMarkdownLiveLayoutTextMetrics> = null
+  let resolveResult:
+    | ((result: MarkdownEditorTypographyResult) => void)
+    | undefined
+  const promise = new Promise<MarkdownEditorTypographyResult>((resolve) => {
+    resolveResult = resolve
+  })
+  const operation = {
+    acceptRestoreScroll: () => {
+      const expected = expectedRestoreScroll
+      expectedRestoreScroll = null
+      return (
+        expected !== null &&
+        Math.abs(textarea.scrollTop - expected) <= 1 &&
+        textarea.scrollLeft === permittedScrollLeft
+      )
+    },
+    cancel: (reason: MarkdownEditorTypographyRejection) =>
+      finish(
+        Object.freeze({
+          status: committed ? 'interrupted' : 'rejected',
+          requestId: request.requestId,
+          reason,
+          visualCommitted: committed,
+          settle: committed ? 'incomplete' : 'not-applied',
+          effective,
+        }),
+      ),
+  }
+  const finish = (result: MarkdownEditorTypographyResult) => {
+    if (done) return
+    done = true
+    for (const key of keys) frameScheduler.cancel(key)
+    if (liveLayout.value === plan) {
+      frameScheduler.cancel('viewport-restore')
+      restoringViewport = false
+    }
+    if (pendingTypography === operation) pendingTypography = null
+    frameScheduler.scheduleMutate(
+      'typography-cleanup',
+      clearTypographyMeasurements,
+    )
+    resolveResult?.(result)
+    queueMicrotask(() => {
+      if (!typographyDisposed) emit('typography-result', result)
+    })
+  }
+  const guard = () => {
+    if (done) return false
+    let reason: MarkdownEditorTypographyRejection | null = null
+    if (typographyDisposed) reason = 'disposed'
+    else if (
+      transactionStore.documentIdentity.id !== identity.id ||
+      transactionStore.documentIdentity.epoch !== identity.epoch
+    )
+      reason = 'stale-document'
+    else if (
+      transactionStore.revision !== revision ||
+      transactionStore.value !== source ||
+      textarea.value !== source ||
+      !historiesEqual(transactionStore.history, history)
+    )
+      reason = 'stale-revision'
+    else if (
+      transactionStore.selection.start !== selection.start ||
+      transactionStore.selection.end !== selection.end ||
+      transactionStore.selection.direction !== selection.direction ||
+      textarea.selectionStart !== selection.start ||
+      textarea.selectionEnd !== selection.end ||
+      textarea.selectionDirection !== selection.direction
+    )
+      reason = 'selection-changed'
+    else if (isComposing.value) reason = 'composition-active'
+    else if (textarea.ownerDocument.fonts?.status === 'loading')
+      reason = 'font-loading'
+    else if (
+      layoutGesture.value ||
+      writingAidsState.value === 'selection-drag-suspended'
+    )
+      reason = 'user-scroll'
+    else if (
+      textareaRef.value !== textarea ||
+      !textarea.isConnected ||
+      currentMode.value !== mode ||
+      textarea.ownerDocument.visibilityState === 'hidden'
+    )
+      reason = 'surface-unavailable'
+    else if (
+      editorProjection.value !== projection ||
+      (committed && liveLayout.value !== plan)
+    )
+      reason = 'layout-superseded'
+    if (reason) operation.cancel(reason)
+    return reason === null
+  }
+  const checkViewport = () => {
+    if (
+      Math.abs(textarea.scrollTop - permittedScrollTop) <= 1 &&
+      textarea.scrollLeft === permittedScrollLeft
+    )
+      return true
+    operation.cancel('user-scroll')
+    return false
+  }
+  const readEffectiveTypography =
+    (): MarkdownEditorTypographyEffective | null => {
+      const reference = measurement?.reference
+      const view = textarea.ownerDocument.defaultView
+      if (!reference?.isConnected || !view || !metrics) return null
+      const style = view.getComputedStyle(textarea)
+      const expected = view.getComputedStyle(reference)
+      const marker = (name: string) =>
+        expected
+          .getPropertyValue(`--el-markdown-editor-typography-${name}`)
+          .trim()
+      const fontSizePx = Number.parseFloat(style.fontSize)
+      const lineHeightPx = Number.parseFloat(style.lineHeight)
+      const expectedFontSize = Number.parseFloat(expected.fontSize)
+      const expectedLineHeight = Number.parseFloat(expected.lineHeight)
+      const actualWidth = textarea.getBoundingClientRect().width
+      const expectedWidth = reference.getBoundingClientRect().width
+      const family = style.fontFamily
+        .replace(/["']/g, '')
+        .replace(/\s+/g, ' ')
+        .toLowerCase()
+      if (
+        marker('mapping') !==
+          MARKDOWN_EDITOR_TYPOGRAPHY_CATALOG.mappingVersion ||
+        marker('size') !== resolution.profile.fontSize ||
+        marker('line-height') !== resolution.profile.lineHeight ||
+        marker('width') !== resolution.profile.canvasWidth ||
+        style.writingMode !== 'horizontal-tb' ||
+        family !== 'system-ui, sans-serif' ||
+        !Number.isFinite(fontSizePx) ||
+        fontSizePx < 14 ||
+        !Number.isFinite(lineHeightPx) ||
+        lineHeightPx <= 0 ||
+        !Number.isFinite(expectedFontSize) ||
+        !Number.isFinite(expectedLineHeight) ||
+        Math.abs(fontSizePx - expectedFontSize) > 0.01 ||
+        Math.abs(lineHeightPx - expectedLineHeight) > 0.01 ||
+        Math.abs(
+          fontSizePx - Number.parseFloat(metrics.properties['font-size'] ?? ''),
+        ) > 0.01 ||
+        Math.abs(
+          lineHeightPx -
+            Number.parseFloat(metrics.properties['line-height'] ?? ''),
+        ) > 0.01 ||
+        actualWidth <= 0 ||
+        expectedWidth <= 0 ||
+        Math.abs(actualWidth - expectedWidth) > 1 ||
+        Math.abs(textarea.clientWidth - metrics.inlineSize) > 1
+      )
+        return null
+      return Object.freeze({
+        mappingVersion: MARKDOWN_EDITOR_TYPOGRAPHY_CATALOG.mappingVersion,
+        profile: resolution.profile,
+        contractId: resolution.contractId,
+        fontSizePx,
+        lineHeightPx,
+        canvasWidthPx: textarea.clientWidth,
+        paragraphSpacing: 'source-blank-lines',
+        font: Object.freeze({
+          identity: MARKDOWN_EDITOR_TYPOGRAPHY_CATALOG.baseline.fontIdentity,
+          kind: 'system',
+          state: 'current',
+          computedFamily: style.fontFamily,
+          faceEvidence: 'not-collected',
+          networkPolicy: 'no-font-loader',
+        }),
+      })
+    }
+  pendingTypography = operation
+  // Submit only after the current scheduler frame ends. A measure submitted
+  // directly during post-paint is still a read-after-write contract violation.
+  const schedule = (
+    task: Omit<Parameters<typeof frameScheduler.schedule>[0], 'guard'>,
+  ) => {
+    queueMicrotask(() => {
+      if (done) return
+      if (!frameScheduler.schedule({ ...task, guard }))
+        operation.cancel('surface-unavailable')
+    })
+  }
+  // Entry from a consumer result callback must wait for that frame to finish.
+  schedule({
+    key: keys[0],
+    measure: () => {
+      if (!checkViewport()) return
+      metrics = measureMarkdownLiveLayoutTextMetrics(textarea)
+      if (!metrics) operation.cancel('geometry-unavailable')
+    },
+    mutate: () => {
+      if (!metrics) return
+      measurement = createMarkdownLiveLayoutTextMeasurement(
+        textarea.ownerDocument,
+        source,
+        metrics,
+      )
+      typographyMeasurements.add(measurement.element)
+    },
+    postPaint: () =>
+      schedule({
+        key: keys[1],
+        measure: () => {
+          if (!checkViewport()) return
+          const y = measurement?.anchorY(anchor)
+          if (y == null) {
+            operation.cancel('geometry-unavailable')
+            return
+          }
+          viewportOffset = y - textarea.scrollTop
+        },
+        mutate: () => {
+          measurement?.element.remove()
+          if (measurement) typographyMeasurements.delete(measurement.element)
+          measurement = null
+          liveLayout.value = plan
+          // Supersede older automatic positioning before changing this same surface.
+          frameScheduler.cancel('viewport-restore')
+          activeTypography.value = resolution.profile
+          committed = true
+        },
+        postPaint: () =>
+          schedule({
+            key: keys[2],
+            measure: () => {
+              if (!checkViewport()) return
+              metrics = measureMarkdownLiveLayoutTextMetrics(textarea)
+              if (!metrics || !textarea.parentElement)
+                operation.cancel('geometry-unavailable')
+            },
+            mutate: () => {
+              if (!metrics || !textarea.parentElement) return
+              measurement = createMarkdownLiveLayoutTextMeasurement(
+                textarea.ownerDocument,
+                source,
+                metrics,
+                {
+                  parent: textarea.parentElement,
+                  className: ns.e('typography-measurement'),
+                },
+              )
+              typographyMeasurements.add(measurement.element)
+              if (measurement.reference)
+                typographyMeasurements.add(measurement.reference)
+            },
+            postPaint: () => {
+              queueMicrotask(() => {
+                if (!guard()) return
+                restoreTextareaViewport(plan, {
+                  anchorY: () => {
+                    if (!checkViewport()) return null
+                    effective = readEffectiveTypography()
+                    return effective
+                      ? (measurement?.anchorY(anchor) ?? null)
+                      : null
+                  },
+                  guard,
+                  viewportOffset,
+                  beforeScrollWrite: (scrollTop) => {
+                    permittedScrollTop = scrollTop
+                    expectedRestoreScroll = scrollTop
+                  },
+                  unavailable: () => operation.cancel('geometry-unavailable'),
+                  settled: () =>
+                    schedule({
+                      key: keys[3],
+                      measure: () => {
+                        if (!checkViewport()) return
+                        const y = measurement?.anchorY(anchor)
+                        const offset = y == null ? null : y - textarea.scrollTop
+                        const verified = readEffectiveTypography()
+                        if (
+                          offset === null ||
+                          Math.abs(offset - viewportOffset) > 1 ||
+                          !verified
+                        ) {
+                          operation.cancel('geometry-unavailable')
+                          return
+                        }
+                        finish(
+                          Object.freeze({
+                            status: 'applied',
+                            requestId: request.requestId,
+                            documentIdentity: identity,
+                            revision,
+                            selection,
+                            anchor,
+                            effective: verified,
+                            settle: 'restored-after-frame',
+                            viewportOffsetBefore: viewportOffset,
+                            viewportOffsetAfter: offset,
+                          }),
+                        )
+                      },
+                    }),
+                })
+              })
+            },
+          }),
+      }),
+  })
+  return promise
 }
 const applyLiveLayout = (
   trigger: MarkdownLiveLayoutTrigger,
@@ -1910,6 +2398,7 @@ const applyLiveLayout = (
     readonly reducedMotion?: boolean
   } = {},
 ) => {
+  if (trigger !== 'typography') cancelTypography('layout-superseded')
   const plan = resolveMarkdownLiveLayoutStability({
     composing: isComposing.value,
     documentIdentity,
@@ -1950,6 +2439,7 @@ const refreshLiveWindow = (
   })
 }
 const markLayoutGesture = (gesture: MarkdownLiveLayoutGesture) => {
+  cancelTypography('user-scroll')
   layoutGesture.value = gesture
   applyLiveLayout('block-height-change', { gesture })
   if (layoutGestureTimer) clearTimeout(layoutGestureTimer)
@@ -1963,6 +2453,7 @@ const suspendTypewriterForUserScroll = () => {
   writingAidsState.value = writingAidsController.state
 }
 const settleTypewriterLayout = () => {
+  if (pendingTypography) return
   if (typewriterLayoutFrame !== undefined) {
     cancelAnimationFrame(typewriterLayoutFrame)
   }
@@ -1999,6 +2490,13 @@ const handleLayoutTouch = () => {
 const handleLayoutScroll = () => {
   const textarea = textareaRef.value
   if (textarea) syncFocusLayerScroll(textarea.scrollTop)
+  if (pendingTypography) {
+    if (!pendingTypography.acceptRestoreScroll()) {
+      suspendTypewriterForUserScroll()
+      markLayoutGesture('scrollbar')
+    }
+    return
+  }
   if (restoringSelection || restoringViewport || restoringTypewriter) return
   if (textarea && typewriterScrollTarget !== null) {
     const reachedTarget =
@@ -2070,7 +2568,12 @@ const sourceAnchorY = (textarea: HTMLTextAreaElement, lineHeight: number) => {
 const applyTypewriterScroll = (
   trigger: 'input' | 'explicit-navigation' | 'async-layout' = 'input',
 ) => {
-  if (!resolvedWritingAids.value.typewriter || isComposing.value) return
+  if (
+    !resolvedWritingAids.value.typewriter ||
+    isComposing.value ||
+    pendingTypography
+  )
+    return
   const textarea = textareaRef.value
   if (!textarea) return
   const response =
@@ -2463,6 +2966,7 @@ const dispatchEditorOperation = (
     emit(
       'selection-change',
       Object.freeze({
+        documentIdentity: result.documentIdentity,
         revision: result.revision,
         selection: result.selection,
       }),
@@ -2514,6 +3018,7 @@ const captureSelection = (breakMerge = true) => {
     emit(
       'selection-change',
       Object.freeze({
+        documentIdentity: transactionStore.documentIdentity,
         revision: transactionStore.revision,
         selection,
       }),
@@ -2671,6 +3176,7 @@ const dispatchReplacement = (
 watch(
   [() => props.mode, () => props.defaultMode, () => props.mobileLayout],
   ([mode, defaultMode]) => {
+    cancelTypography('surface-unavailable')
     transactionStore.breakMergeGroup()
     currentMode.value = normalizeModeForLayout(mode ?? defaultMode)
     refreshWritingAidsDocument()
@@ -2688,10 +3194,12 @@ watch(
   (value) => {
     if (value === transactionStore.value) return
 
+    cancelTypography('stale-revision')
     abortPendingCommands()
     // Document switch: pending frame tasks from the previous document must
     // not commit geometry into the new document (#640 stale cancellation).
     frameScheduler.cancelAll()
+    frameScheduler.scheduleMutate('typography-cleanup', clearTypographyMeasurements)
     // One settle frame samples the scheduler so evidence can observe that no
     // stale task survived the document switch.
     frameScheduler.schedulePostPaint('frame-metrics-settle', () => undefined)
@@ -3192,7 +3700,9 @@ const movePaletteIndex = (direction: 1 | -1) => {
 }
 const selectNextPaletteItem = () => movePaletteIndex(1)
 const selectPreviousPaletteItem = () => movePaletteIndex(-1)
-const executeActivePaletteItem = () => {
+const executeActivePaletteItem = (event: KeyboardEvent) => {
+  if (event.isComposing || event.keyCode === 229 || isComposing.value) return
+  event.preventDefault()
   const command = paletteCommands.value[activePaletteIndex.value]
   if (command && !isCommandDisabled(command)) {
     executePaletteCommand(command)
@@ -3461,6 +3971,7 @@ watch(
     if (nextId === previousId && nextEpoch === previousEpoch) return
 
     const previousHistory = transactionStore.history
+    cancelTypography('stale-document')
     abortPendingCommands()
     commandPaletteOpen.value = false
     contextualSurface.value = null
@@ -3610,9 +4121,14 @@ onMounted(() => {
   window.visualViewport?.addEventListener('resize', updateVisualViewportHeight)
   window.visualViewport?.addEventListener('scroll', updateVisualViewportHeight)
   window.addEventListener('resize', updateVisualViewportHeight)
+  document.addEventListener('visibilitychange', handleTypographyVisibility)
+  if (props.typography) void applyTypography(props.typography)
 })
 
 onBeforeUnmount(() => {
+  typographyDisposed = true
+  cancelTypography('disposed')
+  clearTypographyMeasurements()
   languageToolsController = null
   abortPendingCommands()
   attachmentCaptureSession.clear()
@@ -3626,7 +4142,12 @@ onBeforeUnmount(() => {
   cssHighlightRegistry()?.delete('markdown-search-match')
   cssHighlightRegistry()?.delete('markdown-search-current')
   embedResolutionGeneration += 1
-  for (const requestId of pendingEmbedRequests) forgetMarkdownEmbedRequest(requestId)
+  for (const controller of pendingEmbedControllers) controller.abort()
+  pendingEmbedControllers.clear()
+  for (const requestId of pendingEmbedRequests) {
+    cancelMarkdownEmbedRequest(requestId)
+    forgetMarkdownEmbedRequest(requestId)
+  }
   pendingEmbedRequests.clear()
   if (typeof window === 'undefined') return
 
@@ -3639,7 +4160,21 @@ onBeforeUnmount(() => {
     updateVisualViewportHeight,
   )
   window.removeEventListener('resize', updateVisualViewportHeight)
+  document.removeEventListener('visibilitychange', handleTypographyVisibility)
 })
+
+const handleTypographyVisibility = () => {
+  if (document.visibilityState === 'hidden')
+    cancelTypography('surface-unavailable')
+}
+watch(
+  () => props.typography,
+  (request) => {
+    if (request) void applyTypography(request)
+    else cancelTypography('superseded')
+  },
+  { flush: 'post' },
+)
 
 watch(
   () => props.writingAids?.typewriter,
@@ -3759,6 +4294,7 @@ const handleInput = (event: Event) => {
 }
 
 const handleCompositionStart = (event: CompositionEvent) => {
+  cancelTypography('composition-active')
   const target = event.target
   nativeCompositionValue.value =
     target instanceof HTMLTextAreaElement ? target.value : transactionStore.value
@@ -4066,6 +4602,7 @@ const handleSelectionMove = () => {
 
 const handleSelectionDragStart = () => {
   if (isComposing.value) return
+  cancelTypography('user-scroll')
   typewriterScrollTarget = null
   writingAidsController.handleSelectionDragStart()
   writingAidsState.value = writingAidsController.state
@@ -4951,6 +5488,7 @@ type MarkdownEmbedRenderSegment =
 const embedResults = ref<ReadonlyMap<string, MarkdownEmbedResult>>(new Map())
 let embedResolutionGeneration = 0
 const pendingEmbedRequests = new Set<string>()
+const pendingEmbedControllers = new Set<AbortController>()
 const embedRequestVersions = new Map<string, number>()
 const embedNodeId = (node: MarkdownEmbedValidNode) =>
   `embed:${node.ranges.full.start}:${node.target}:${node.mode}`
@@ -4969,14 +5507,41 @@ const resolveEmbedNode = async (
   const nodeId = embedNodeId(node)
   const version = (embedRequestVersions.get(nodeId) ?? 0) + 1
   embedRequestVersions.set(nodeId, version)
-  const request = createMarkdownEmbedRequest({
-    documentIdentity,
+  const requestInput = {
+    documentIdentity: Object.freeze({ ...transactionStore.documentIdentity }),
     mode: node.mode,
     nodeId,
     revision: transactionStore.revision,
     target: node.target,
     version,
-  })
+  }
+  const controller = new AbortController()
+  pendingEmbedControllers.add(controller)
+  let request: MarkdownEmbedRequest
+  try {
+    request = globalThis.crypto?.subtle
+      ? await createMarkdownEmbedProjectionRequest({
+          ...requestInput,
+          signal: controller.signal,
+        })
+      : createMarkdownEmbedRequest({
+          ...requestInput,
+          signal: controller.signal,
+        })
+  } catch {
+    request = createMarkdownEmbedRequest({
+      ...requestInput,
+      signal: controller.signal,
+    })
+  }
+  if (
+    generation !== embedResolutionGeneration ||
+    embedRequestVersions.get(nodeId) !== version
+  ) {
+    cancelMarkdownEmbedRequest(request)
+    pendingEmbedControllers.delete(controller)
+    return
+  }
   pendingEmbedRequests.add(request.requestId)
   const pending: MarkdownEmbedResult = Object.freeze({
     ...request,
@@ -4989,16 +5554,25 @@ const resolveEmbedNode = async (
   } catch {
     result = Object.freeze({ ...request, status: 'rejected' as const })
   } finally {
+    pendingEmbedControllers.delete(controller)
     pendingEmbedRequests.delete(request.requestId)
     forgetMarkdownEmbedRequest(request.requestId)
   }
-  if (generation !== embedResolutionGeneration) return
+  if (
+    generation !== embedResolutionGeneration ||
+    embedRequestVersions.get(nodeId) !== version
+  )
+    return
   const committed = commitMarkdownEmbedResult(request, result)
   embedResults.value = new Map(embedResults.value).set(nodeId, committed)
 }
 
 const refreshEmbedPresentations = () => {
   const generation = ++embedResolutionGeneration
+  for (const controller of pendingEmbedControllers) controller.abort()
+  pendingEmbedControllers.clear()
+  for (const requestId of pendingEmbedRequests) cancelMarkdownEmbedRequest(requestId)
+  pendingEmbedRequests.clear()
   const activeIds = new Set(embedNodes.value.map(embedNodeId))
   embedResults.value = new Map(
     [...embedResults.value].filter(([nodeId]) => activeIds.has(nodeId)),
@@ -5028,6 +5602,16 @@ const embedRenderSegments = computed<readonly MarkdownEmbedRenderSegment[]>(
           node,
           result,
           localeText.value.embeds,
+          result ? {
+            requestId: result.requestId,
+            requestDigest: result.requestDigest,
+            documentIdentity,
+            revision: transactionStore.revision,
+            nodeId: embedNodeId(node),
+            target: node.target,
+            mode: node.mode,
+            version: embedRequestVersions.get(embedNodeId(node)) ?? 0,
+          } : undefined,
         ),
         result,
       })
@@ -5342,7 +5926,13 @@ const searchReplaceAll = () => {
 }
 
 watch(
-  [editorValue, editorRevision, () => props.embedProvider],
+  [
+    editorValue,
+    editorRevision,
+    () => documentIdentity.id,
+    () => documentIdentity.epoch,
+    () => props.embedProvider,
+  ],
   refreshEmbedPresentations,
   { immediate: true },
 )
@@ -5482,7 +6072,10 @@ const handleKeydown = (event: KeyboardEvent) => {
                 : event.key === 'PageDown'
                   ? 'page-down'
                   : null
-    if (motionKey) {
+    const nativeDocumentNavigation =
+      (event.ctrlKey || event.metaKey) &&
+      (event.key === 'Home' || event.key === 'End')
+    if (motionKey && !nativeDocumentNavigation) {
       event.preventDefault()
       applyLiveSelectionMotion(motionKey, { shift: event.shiftKey })
       return
@@ -5974,6 +6567,7 @@ const revealSourceRange = (
 }
 
 defineExpose({
+  applyTypography,
   closeSearch,
   closeCommandPalette,
   applyAttachmentResult,

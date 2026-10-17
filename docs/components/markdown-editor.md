@@ -372,8 +372,11 @@ identity.
 `embed-provider` is the consumer-owned resolution boundary for valid
 `::embed[...]` projection nodes. The editor supplies an identity-, revision-,
 node-, target-, mode-, and version-bound request. It commits only a matching
-result and treats late or mismatched results as stale. Provider excerpts are
-rendered as escaped text, never `innerHTML`; the directive remains the only host
+result and treats late or mismatched results as stale. Prepared Markdown projections
+use the existing read-only renderer and host base URL, CSP and feature settings;
+the consumer supplies authorized bytes and the current target version through
+[`prepareMarkdownEmbedResult`](../api/markdown-runtime-projection.md).
+Metadata-only provider excerpts are rendered as escaped text; the directive remains the only host
 source/history authority. Source mode displays the exact directive. Live keeps
 the textarea as its only input surface and places the controlled read-only embed
 regions below it; Split and Preview interleave those regions with the normal
@@ -422,7 +425,7 @@ an independent acceptance lane and is not replaced by these simulations.
 | update:modelValue  | 已接受的公开内容更新                                         |
 | change             | 与 `update:modelValue` 相同的公开内容更新                    |
 | transaction        | 每次 accepted/rejected dispatch 的只读 result 与 transaction |
-| selection-change   | revision 与 grapheme-safe、direction-preserving selection    |
+| selection-change   | producer 捕获的只读 documentIdentity、revision 与 grapheme-safe、direction-preserving selection |
 | history-change     | `canUndo/canRedo`、depth 与 retained UTF-16 units            |
 | command            | toolbar command 已通过 dispatcher 执行                       |
 | mode-change        | 编辑模式切换                                                 |
@@ -458,6 +461,11 @@ focus, scroll, or history.
 The Focus layer is an `aria-hidden` presentation; the textarea remains the sole owner of input,
 selection, clipboard, focus, and IME. Neither writing aid modifies Markdown source or history.
 
+The optional [public typography catalog and apply/reflow API](../api/markdown-editor-typography.md)
+uses a closed profile and identity/revision-bound request in this same editor.
+The `applyTypography` Promise and `typography-result` event distinguish actual
+settle from refusal/interruption; they do not store preferences or issue receipts.
+
 ## Attributes
 
 | 属性名            | 说明                                        | 类型                                      | 默认值   |
@@ -471,6 +479,7 @@ selection, clipboard, focus, and IME. Neither writing aid modifies Markdown sour
 | writing-aids      | prose focus 与 typewriter opt-in             | `MarkdownEditorWritingAidsOptions`        | —        |
 | focus-exemptions  | Focus mode 中保持清晰的 source node 状态     | `MarkdownEditorFocusExemptions`          | —        |
 | editor-profile    | markdown 或 prose 写作表面                   | `'markdown' \| 'prose'`                  | markdown |
+| typography        | guarded authoring typography request         | `MarkdownEditorTypographyRequest`         | —        |
 | readonly          | Read-only; blocks input and mutation methods     | `boolean`                                 | `false`  |
 | disabled          | 禁用输入与全部 mutation method              | `boolean`                                 | `false`  |
 | loading           | 标记 busy 并冻结输入与全部 mutation method  | `boolean`                                 | `false`  |

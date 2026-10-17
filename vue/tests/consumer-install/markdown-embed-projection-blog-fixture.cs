@@ -1,0 +1,11 @@
+using System.Security.Cryptography;
+using System.Text;
+using System.Text.Json;
+using FsusBlog.Shared.Contracts.ArticleEmbeds;
+const string source = "A **controlled** body.\n";
+var digest = Convert.ToHexStringLower(SHA256.HashData(Encoding.UTF8.GetBytes(source)));
+var projection = new ArticleEmbedSafeProjectionReference(ArticleEmbedProjectionKind.Markdown, "projection:article-body:17", digest);
+var target = new ArticleEmbedTargetIdentity("article:01991e72-9a2c-7b60-8f47-b339f58e4a11", ArticleEmbedTargetKind.Article, null, null);
+var coordinate = new ArticleEmbedDependencyCoordinate(ArticleEmbedSchemas.DependencyCoordinate, ArticleEmbedSchemas.Version, target, 17, "article-version:17", projection.ProjectionIdentity, projection.ContentDigest, "");
+coordinate = coordinate with { DependencyDigest = ArticleEmbedContractDigest.ComputeDependency(coordinate) };
+Console.WriteLine(JsonSerializer.Serialize(new { UpstreamRevision = "1194ee45037862aa30803650ec2a622700631224", Coordinate = coordinate, Projection = projection, Source = source }, new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase, WriteIndented = true }));

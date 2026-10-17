@@ -292,8 +292,12 @@ describe('markdown embed safe presentation and atomic interaction', () => {
         modelValue: source,
       },
     })
-    await nextTick()
-    await nextTick()
+    await expect
+      .poll(() => wrapper.find('.el-markdown-embed').text(), {
+        timeout: 2_000,
+        interval: 10,
+      })
+      .toContain('Safe Document')
 
     const embed = wrapper.find('.el-markdown-embed')
     expect(embed.exists()).toBe(true)
@@ -327,8 +331,12 @@ describe('markdown embed safe presentation and atomic interaction', () => {
         modelValue: source,
       },
     })
-    await nextTick()
-    await nextTick()
+    await expect
+      .poll(() => wrapper.find('.el-markdown-embed').text(), {
+        timeout: 2_000,
+        interval: 10,
+      })
+      .toContain('Safe Live Document')
 
     expect(wrapper.find('textarea').isVisible()).toBe(true)
     expect(wrapper.find('.el-markdown-editor__preview').exists()).toBe(false)

@@ -36,6 +36,7 @@ export const MARKDOWN_LIVE_LAYOUT_TRIGGERS = Object.freeze([
   'locale',
   'density',
   'mode-switch',
+  'typography',
 ] as const)
 
 export type MarkdownLiveLayoutTrigger =
@@ -201,6 +202,83 @@ export const captureMarkdownLiveLayoutAnchor = (input: {
     revision: input.revision,
     sourceOffset: offset,
     visual,
+  })
+}
+
+/** Geometry for the canonical source anchor; no additional position map. */
+export interface MarkdownLiveLayoutTextMetrics {
+  readonly inlineSize: number
+  readonly properties: Readonly<Record<string, string>>
+}
+
+/** Read only in the scheduler measure phase. */
+export const measureMarkdownLiveLayoutTextMetrics = (
+  textarea: HTMLTextAreaElement,
+): MarkdownLiveLayoutTextMetrics | null => {
+  if (textarea.clientWidth <= 0 || textarea.clientHeight <= 0) return null
+  const style = textarea.ownerDocument.defaultView?.getComputedStyle(textarea)
+  if (!style || style.display === 'none' || style.visibility === 'hidden') return null
+  const properties: Record<string, string> = {}
+  for (const property of [
+    'direction', 'font-family', 'font-size', 'font-weight', 'font-style',
+    'font-stretch', 'font-variant', 'font-feature-settings', 'font-kerning',
+    'font-variation-settings', 'font-optical-sizing', 'font-synthesis',
+    'line-height', 'letter-spacing', 'word-spacing', 'unicode-bidi',
+    'text-align', 'text-indent', 'text-transform', 'tab-size', 'white-space',
+    'overflow-wrap', 'word-break', 'line-break', 'hyphens', 'writing-mode',
+    'text-orientation', 'text-rendering', 'padding-top', 'padding-bottom',
+    'padding-left', 'padding-right',
+  ]) properties[property] = style.getPropertyValue(property)
+  return Object.freeze({ inlineSize: textarea.clientWidth, properties: Object.freeze(properties) })
+}
+
+/** Write only in the scheduler mutate phase. This temporary node is text, never HTML. */
+export const createMarkdownLiveLayoutTextMeasurement = (
+  owner: Document,
+  source: string,
+  metrics: MarkdownLiveLayoutTextMetrics,
+  typographyReference?: Readonly<{ parent: HTMLElement; className: string }>,
+) => {
+  const element = owner.createElement('div')
+  element.setAttribute('aria-hidden', 'true')
+  for (const [property, value] of Object.entries(metrics.properties)) element.style.setProperty(property, value)
+  Object.assign(element.style, {
+    boxSizing: 'border-box', position: 'fixed', left: '0', top: '0',
+    width: `${metrics.inlineSize}px`, height: 'auto', minHeight: '0',
+    margin: '0', border: '0', visibility: 'hidden', pointerEvents: 'none', overflow: 'visible',
+  })
+  const text = owner.createTextNode(`${source}\u200b`)
+  element.append(text)
+  owner.body.append(element)
+  // The same owning SCSS resolves the requested typography in the textarea's
+  // actual grid cell. This empty reference is measurement, never an input surface.
+  const reference = typographyReference ? owner.createElement('div') : null
+  if (reference && typographyReference) {
+    reference.className = typographyReference.className
+    reference.setAttribute('aria-hidden', 'true')
+    Object.assign(reference.style, {
+      position: 'absolute', gridArea: '1 / 1 / 2 / 2', height: '0', minHeight: '0',
+      minWidth: '0', maxWidth: '100%', boxSizing: 'border-box', margin: '0',
+      border: '0', padding: '0', visibility: 'hidden', pointerEvents: 'none',
+    })
+    for (const property of ['font-weight', 'font-style', 'font-stretch', 'font-feature-settings', 'font-variation-settings'])
+      reference.style.setProperty(property, metrics.properties[property] ?? '')
+    typographyReference.parent.append(reference)
+  }
+  return Object.freeze({
+    element,
+    reference,
+    /** Native UTF-16 rect read in measure; the sentinel covers an empty/final line. */
+    anchorY: (anchor: MarkdownLiveLayoutAnchor): number | null => {
+      if (!element.isConnected || anchor.sourceOffset < 0 || anchor.sourceOffset > source.length) return null
+      const range = owner.createRange()
+      range.setStart(text, anchor.sourceOffset)
+      range.setEnd(text, Math.min(text.length, anchor.sourceOffset + 1))
+      const rect = range.getClientRects()[0]
+      if (!rect || rect.height <= 0) return null
+      const y = rect.top - element.getBoundingClientRect().top
+      return Number.isFinite(y) ? y : null
+    },
   })
 }
 

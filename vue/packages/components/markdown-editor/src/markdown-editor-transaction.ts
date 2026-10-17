@@ -330,6 +330,8 @@ export interface MarkdownEditorTransactionDispatcher {
 }
 
 export interface MarkdownEditorSelectionEvent {
+  /** Always captured by the editor; optional for legacy event-object compatibility. */
+  readonly documentIdentity?: MarkdownEditorDocumentIdentity
   readonly revision: number
   readonly selection: MarkdownEditorResolvedSelection
 }

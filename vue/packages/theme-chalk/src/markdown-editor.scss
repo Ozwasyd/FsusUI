@@ -1,6 +1,32 @@
 @use 'mixins/mixins' as *;
 @use 'common/var' as *;
 
+$markdown-editor-prose-width: 74ch;
+$markdown-editor-prose-line-height: 1.84;
+$markdown-editor-source-line-height: 1.6;
+
+// One owner for the existing prose metrics and opt-in typography baseline.
+@mixin markdown-editor-prose-typography($system-only: false) {
+  width: min(100%, $markdown-editor-prose-width);
+  @if $system-only {
+    font-family: system-ui, sans-serif;
+    --el-markdown-editor-typography-mapping: markdown-editor-typography.v2;
+    --el-markdown-editor-typography-size: standard;
+    --el-markdown-editor-typography-line-height: standard;
+    --el-markdown-editor-typography-width: standard;
+  } @else {
+    font-family:
+      getCssVar('font-family'),
+      -apple-system,
+      BlinkMacSystemFont,
+      'Segoe UI',
+      sans-serif;
+  }
+  font-size: 18px;
+  line-height: $markdown-editor-prose-line-height;
+  letter-spacing: 0;
+}
+
 @include b(markdown-editor) {
   position: relative;
   display: grid;
@@ -546,8 +572,8 @@
     }
 
     @include e(textarea) {
+      @include markdown-editor-prose-typography;
       justify-self: center;
-      width: min(100%, 74ch);
       min-height: clamp(
         30rem,
         calc(var(--el-markdown-editor-visual-viewport-height, 100vh) - 18rem),
@@ -556,15 +582,6 @@
       padding: clamp(1.35rem, 3vw, 2.75rem) clamp(1.1rem, 4vw, 3rem);
       resize: vertical;
       background: getCssVar('fill-color', 'blank');
-      font-family:
-        getCssVar('font-family'),
-        -apple-system,
-        BlinkMacSystemFont,
-        'Segoe UI',
-        sans-serif;
-      font-size: 18px;
-      line-height: 1.84;
-      letter-spacing: 0;
       caret-color: var(--fsus-state-focus-border);
       transition:
         background-color getCssVar('transition-duration-fast') ease,
@@ -584,8 +601,8 @@
     }
 
     @include e(focus-layer) {
+      @include markdown-editor-prose-typography;
       justify-self: center;
-      width: min(100%, 74ch);
       min-height: clamp(
         30rem,
         calc(var(--el-markdown-editor-visual-viewport-height, 100vh) - 18rem),
@@ -593,15 +610,6 @@
       );
       padding: clamp(1.35rem, 3vw, 2.75rem) clamp(1.1rem, 4vw, 3rem);
       background: getCssVar('fill-color', 'blank');
-      font-family:
-        getCssVar('font-family'),
-        -apple-system,
-        BlinkMacSystemFont,
-        'Segoe UI',
-        sans-serif;
-      font-size: 18px;
-      line-height: 1.84;
-      letter-spacing: 0;
     }
 
     @include e(preview) {
@@ -612,6 +620,65 @@
     @include e(status) {
       gap: 8px 14px;
       background: getCssVar('bg-color');
+    }
+  }
+
+  @include when(typography-baseline) {
+    @include e(typography-measurement) {
+      @include markdown-editor-prose-typography(true);
+    }
+
+    @include e(textarea) {
+      @include markdown-editor-prose-typography(true);
+      justify-self: center;
+    }
+
+    @include e(focus-layer) {
+      @include markdown-editor-prose-typography(true);
+      justify-self: center;
+    }
+
+    @include e(preview) {
+      @include markdown-editor-prose-typography(true);
+      justify-self: center;
+    }
+  }
+
+  // Engineering mapping v2: closed discrete steps, never consumer CSS/numeric input.
+  @each $size, $token in (compact: medium, large: extra-large) {
+    @include m(typography-size-#{$size}) {
+      @include e((textarea, focus-layer, preview, typography-measurement)) {
+        font-size: getCssVar('font-size', $token);
+        --el-markdown-editor-typography-size: #{$size};
+      }
+    }
+  }
+
+  @include m(typography-line-height-compact) {
+    @include e((textarea, focus-layer, preview, typography-measurement)) {
+      line-height: $markdown-editor-source-line-height;
+      --el-markdown-editor-typography-line-height: compact;
+    }
+  }
+
+  @include m(typography-line-height-relaxed) {
+    @include e((textarea, focus-layer, preview, typography-measurement)) {
+      line-height: calc(#{$markdown-editor-prose-line-height}em + var(--fsus-space-1, 4px));
+      --el-markdown-editor-typography-line-height: relaxed;
+    }
+  }
+
+  @include m(typography-width-narrow) {
+    @include e((textarea, focus-layer, preview, typography-measurement)) {
+      width: min(100%, calc(#{$markdown-editor-prose-width} - 2 * var(--fsus-space-8, 32px)));
+      --el-markdown-editor-typography-width: narrow;
+    }
+  }
+
+  @include m(typography-width-wide) {
+    @include e((textarea, focus-layer, preview, typography-measurement)) {
+      width: min(100%, calc(#{$markdown-editor-prose-width} + 2 * var(--fsus-space-8, 32px)));
+      --el-markdown-editor-typography-width: wide;
     }
   }
 
