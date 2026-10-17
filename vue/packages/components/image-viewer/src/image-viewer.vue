@@ -114,7 +114,7 @@
           <div :class="ns.e('canvas')">
             <img
               v-for="(url, i) in urlList"
-              :ref="(el) => (imgRefs[i] = el as HTMLImageElement)"
+              :ref="createImgRef(i)"
               :key="url"
               :src="url"
               :alt="altList[i] || ''"
@@ -226,6 +226,7 @@ const viewerZIndex = nextZIndex()
 const wrapper = ref<HTMLDivElement>()
 const caption = ref<HTMLElement>()
 const imgRefs = ref<HTMLImageElement[]>([])
+const imgRefOwners: symbol[] = []
 
 let scopeEventListener = effectScope()
 const visible = ref(props.visible)
@@ -376,12 +377,34 @@ function unregisterEventListener() {
   scopeEventListener.stop()
 }
 
-function handleImgLoad() {
-  loading.value = false
+function createImgRef(index: number) {
+  const owner = Symbol()
+  return (el: unknown) => {
+    // A stale unmount must not clear a slot claimed by a newer ref callback.
+    if (el) {
+      imgRefOwners[index] = owner
+      imgRefs.value[index] = el as HTMLImageElement
+    } else if (imgRefOwners[index] === owner) {
+      delete imgRefOwners[index]
+      delete imgRefs.value[index]
+    }
+  }
+}
+
+function getActiveImage() {
+  const img = imgRefs.value[activeIndex.value]
+  return img?.getAttribute('src') === currentImg.value ? img : undefined
+}
+
+function handleImgLoad(e: Event) {
+  const img = getActiveImage()
+  if (img && e.target === img && img.complete) {
+    loading.value = false
+  }
 }
 
 function handleImgError(e: Event) {
-  loading.value = false
+  handleImgLoad(e)
   const image = e.target as HTMLImageElement
   if (!image.alt) image.alt = t('el.image.error')
 }
@@ -517,14 +540,16 @@ function handleActions(action: ImageViewerAction, options = {}) {
   transform.value.enableTransition = enableTransition
 }
 
-watch(currentImg, () => {
-  nextTick(() => {
-    const $img = imgRefs.value[activeIndex.value]
-    if (!$img?.complete) {
-      loading.value = true
-    }
-  })
-})
+watch(
+  [currentImg, activeIndex],
+  () => {
+    loading.value = !getActiveImage()?.complete
+    nextTick(() => {
+      loading.value = !getActiveImage()?.complete
+    })
+  },
+  { immediate: true },
+)
 
 watch(activeIndex, (val) => {
   reset()
