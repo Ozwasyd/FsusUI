@@ -22,7 +22,15 @@ export const obtainAllFocusableElements = (
 ): HTMLElement[] => {
   const canUseCache = element !== document.body
   const cached = canUseCache ? focusableCache.get(element) : undefined
-  if (cached) return cached
+  const activeElement = document.activeElement
+  if (
+    cached &&
+    (!activeElement ||
+      activeElement === element ||
+      !element.contains(activeElement) ||
+      cached.some((node) => node === activeElement))
+  )
+    return cached
 
   const nodes: HTMLElement[] = []
   const walker = document.createTreeWalker(element, NodeFilter.SHOW_ELEMENT, {
@@ -37,15 +45,37 @@ export const obtainAllFocusableElements = (
       const isHiddenInput = node.tagName === 'INPUT' && node.type === 'hidden'
       if (node.disabled || node.hidden || isHiddenInput)
         return NodeFilter.FILTER_SKIP
-      return node.tabIndex >= 0 || node === document.activeElement
-        ? NodeFilter.FILTER_ACCEPT
-        : NodeFilter.FILTER_SKIP
+      const isCandidate = cached
+        ? node === activeElement && node.tabIndex < 0
+        : node.tabIndex >= 0 || node === activeElement
+      return isCandidate ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_SKIP
     },
   })
-  while (walker.nextNode()) nodes.push(walker.currentNode as HTMLElement)
+  while (walker.nextNode()) {
+    nodes.push(walker.currentNode as HTMLElement)
+    if (cached) break
+  }
 
+  if (cached) {
+    const activeNode = nodes[0]
+    if (!activeNode) return cached
+    const index = cached.findIndex(
+      (node) =>
+        activeNode.compareDocumentPosition(node) &
+        Node.DOCUMENT_POSITION_FOLLOWING,
+    )
+    const candidates = [...cached]
+    candidates.splice(index < 0 ? candidates.length : index, 0, activeNode)
+    return candidates
+  }
+
+  // The active negative-tabindex exception changes without a DOM mutation.
+  // Cache sequential candidates only; merge the current exception on demand.
   if (canUseCache) {
-    focusableCache.set(element, nodes)
+    focusableCache.set(
+      element,
+      nodes.filter((node) => node.tabIndex >= 0),
+    )
   }
   return nodes
 }
