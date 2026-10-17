@@ -42,7 +42,7 @@
           </span>
         </template>
         <!-- ACTIONS -->
-        <div :class="[ns.e('btn'), ns.e('actions')]">
+        <div :class="[ns.e('btn'), ns.e('actions')]" @wheel.stop>
           <span
             :class="ns.e('action')"
             role="button"
