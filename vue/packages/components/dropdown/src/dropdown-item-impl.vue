@@ -9,7 +9,13 @@
     :ref="itemRef"
     v-bind="{ ...dataset, ...$attrs }"
     :aria-disabled="disabled"
-    :class="[ns.be('menu', 'item'), ns.is('disabled', disabled)]"
+    :aria-checked="checkedState"
+    :class="[
+      ns.be('menu', 'item'),
+      ns.is('disabled', disabled),
+      ns.is('multiline', multiline),
+      { selected: checkedState === true },
+    ]"
     :tabindex="tabIndex"
     :role="role"
     @click="(e) => $emit('clickimpl', e)"
@@ -22,7 +28,21 @@
     <el-icon v-if="icon">
       <component :is="icon" />
     </el-icon>
-    <slot />
+    <template v-if="multiline">
+      <span :class="ns.be('menu', 'item-content')">
+        <span :class="ns.be('menu', 'item-label')"><slot /></span>
+        <span
+          v-if="$slots.description"
+          :class="ns.be('menu', 'item-description')"
+        >
+          <slot name="description" />
+        </span>
+      </span>
+    </template>
+    <slot v-else />
+    <span v-if="$slots.suffix" :class="ns.be('menu', 'item-suffix')">
+      <slot name="suffix" />
+    </span>
   </li>
 </template>
 
@@ -52,19 +72,19 @@ export default defineComponent({
   },
   props: dropdownItemProps,
   emits: ['pointermove', 'pointerleave', 'click', 'clickimpl'],
-  setup(_, { emit }) {
+  setup(props, { emit }) {
     const ns = useNamespace('dropdown')
 
     const { role: menuRole } = inject(DROPDOWN_INJECTION_KEY, undefined)!
 
     const { collectionItemRef: dropdownCollectionItemRef } = inject(
       DROPDOWN_COLLECTION_ITEM_INJECTION_KEY,
-      undefined
+      undefined,
     )!
 
     const { collectionItemRef: rovingFocusCollectionItemRef } = inject(
       ROVING_FOCUS_ITEM_COLLECTION_INJECTION_KEY,
-      undefined
+      undefined,
     )!
 
     const {
@@ -75,26 +95,30 @@ export default defineComponent({
       handleMousedown,
     } = inject(ROVING_FOCUS_GROUP_ITEM_INJECTION_KEY, undefined)!
 
-    const assignElementRef = (element: Element | ComponentPublicInstance | undefined) => {
-      const resolvedElement = element instanceof HTMLElement ? element : undefined
+    const assignElementRef = (
+      element: Element | ComponentPublicInstance | undefined,
+    ) => {
+      const resolvedElement =
+        element instanceof HTMLElement ? element : undefined
 
       dropdownCollectionItemRef.value = resolvedElement ?? null
       rovingFocusCollectionItemRef.value = resolvedElement ?? null
       rovingFocusGroupItemRef.value = resolvedElement ?? null
     }
 
-    const itemRef = composeRefs(
-      assignElementRef
-    )
+    const itemRef = composeRefs(assignElementRef)
 
     const role = computed<string>(() => {
       if (menuRole.value === 'menu') {
-        return 'menuitem'
+        return props.checked === undefined ? 'menuitem' : 'menuitemradio'
       } else if (menuRole.value === 'navigation') {
         return 'link'
       }
       return 'button'
     })
+    const checkedState = computed(() =>
+      menuRole.value === 'menu' ? props.checked : undefined,
+    )
 
     const handleKeydown = composeEventHandlers((e: KeyboardEvent) => {
       const { code } = e
@@ -113,6 +137,7 @@ export default defineComponent({
         [COLLECTION_ITEM_SIGN]: '',
       },
       role,
+      checkedState,
       tabIndex,
       handleFocus,
       handleKeydown,
