@@ -113,6 +113,56 @@ const unregisterPolicy = registerFsusRenderPipelineComponentPolicy({
 })
 ```
 
+### Component-policy registry ownership
+
+Registration copies the declared scalar fields and copies/freezes `estimate`.
+`getFsusRenderPipelineComponentPolicy()` and
+`listFsusRenderPipelineComponentPolicies()` return those immutable owned values.
+To change a policy, register a replacement and release the returned handle;
+mutating a retrieved policy or the original input does not update the registry.
+Built-in roles, estimates, and numeric defaults are unchanged.
+
+Each unregister handle retires its own registration once. It restores the
+nearest still-live predecessor only while its own policy remains current.
+Releasing an older registration cannot overwrite a newer registration, revive
+an already-released predecessor, or restore entries removed by `clear*`.
+Batch acquisition releases previously acquired handles if a later input throws;
+batch release attempts all handles in reverse order, preserving original causes.
+
+The internal source offer is the producer in
+`vue/packages/utils/vue/render-pipeline-policy.ts`, obtained through
+`getFsusRenderPipelineComponentPolicyAuthority()` from the local
+`@element-plus/utils` source alias. This addition is not exported by the dedicated
+package entry yet. The offer covers exactly the private `componentPolicies` Map:
+
+| Source boundary | Offered behavior |
+| --- | --- |
+| Single, by-name, batch, and default registration | Revoke before inspecting caller input or changing the Map. |
+| Returned unregister handles and `clear*` | Revoke before retiring a registration, restoring/deleting an entry, or clearing the Map. |
+| `issueTicket()` | Return the current private identity, or `null` during a change or after a broken synchronous feed. |
+| `isCurrent(ticket)` | Compare private state and identity only; no external getter, callback, allocation, or refresh. |
+| `subscribe(listener)` | Own a synchronous revocation subscription until its returned release handle runs. Subscription acquisition/release also revoke. |
+| `getFailures()` | Return a frozen copy of failure records retaining the original `cause`, phase, and subscription identity where applicable. |
+| `hasFsusRenderPipelineComponentPolicy(name)` | Pure Map membership for an exact normalized key; no coercion, getter, or allocation. |
+
+Revocation notifications run before the mutation and attempt every subscription
+from the initial snapshot that is still owned. Reentrant writes stay inside the
+revoked interval. A throwing listener or returned thenable permanently breaks
+the feed; it does not prevent other notifications or the requested mutation.
+Listeners run as plain functions without a subscription receiver. They must
+finish synchronously and must not return asynchronous work.
+Releasing a listener removes only that subscription and does not erase failures
+or repair a broken feed. Keep and release every registration and subscription
+handle; clearing entries does not release subscriptions or outstanding handles.
+
+A registry ticket proves only currency of this module's owned data and feed.
+It does not establish full custody of the runtime, adapters, renderer,
+ConfigProvider, workers, browser/native resources, or asynchronous listener work.
+Those real upstream producers need their own feeds and release obligations.
+This source offer supplies no receipt, qualification, account permission, or
+acceptance evidence. Use the local FsusUI source alias for integration; package
+publication is separate.
+
 The shared executor owns the protocol: run `{ type: 'run', id, generation,
 key?, lane, request }`, cancel `{ type: 'cancel', id, generation, key? }`, and
 respond `{ id, generation?, status?: 'complete', result, timings? }`,
