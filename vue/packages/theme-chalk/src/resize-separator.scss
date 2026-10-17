@@ -1,0 +1,70 @@
+@use 'mixins/mixins' as *;
+
+@include b(resize-separator) {
+  position: relative;
+  flex: none;
+  align-self: stretch;
+  touch-action: none;
+  user-select: none;
+
+  &::after {
+    content: '';
+    position: absolute;
+    background-color: getCssVar('border-color');
+    pointer-events: none;
+  }
+
+  @include m(vertical) {
+    width: var(--fsus-icon-target);
+    cursor: col-resize;
+
+    &::after {
+      inset-block: 0;
+      inset-inline-start: 50%;
+      width: getCssVar('border-width');
+    }
+  }
+
+  @include m(horizontal) {
+    height: var(--fsus-icon-target);
+    cursor: row-resize;
+
+    &::after {
+      inset-inline: 0;
+      inset-block-start: 50%;
+      height: getCssVar('border-width');
+    }
+  }
+
+  &:hover:not(.is-disabled)::after {
+    background-color: getCssVar('color-primary');
+  }
+
+  &:focus-visible {
+    @include a11y-focus-ring;
+  }
+
+  @include when(disabled) {
+    cursor: not-allowed;
+
+    &::after {
+      background-color: getCssVar('disabled-border-color');
+    }
+  }
+
+  @media (forced-colors: active) {
+    &::after {
+      background-color: CanvasText;
+    }
+
+    &:focus-visible {
+      outline: getCssVar('border-width') solid Highlight !important;
+    }
+
+    @include when(disabled) {
+      &::after {
+        background-color: GrayText;
+      }
+    }
+  }
+}
