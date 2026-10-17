@@ -9,6 +9,13 @@ regions. It renders one focusable separator handle and emits resize proposals.
 It does not render, measure, size, hide, mount, scroll, or persist either region.
 The consumer remains the sole layout and accepted-value owner.
 
+The platform classification is `native-adapter`: bounded controlled proposals,
+keyboard steps and cancellation are reusable semantics, while viewport client
+coordinates, pointer capture, DOM region IDs and ARIA require a native input and
+automation adapter on Avalonia. The generated contract records the Avalonia
+binding as unbound; this classification does not claim a native implementation
+or cross-platform acceptance. See [platform differences](../avalonia/platform-differences.md).
+
 ## Supported imports
 
 ```ts
