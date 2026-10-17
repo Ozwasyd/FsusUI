@@ -33,7 +33,7 @@ export function findBundledWorkspaceReferences(content, fileName, names) {
       }
     }
   }
-  const visit = (node) => {
+  const visit = (node, runtimeMapping = true) => {
     const literal = ts.isStringLiteralLike(node)
     if (
       literal ||
@@ -48,13 +48,14 @@ export function findBundledWorkspaceReferences(content, fileName, names) {
             value: node.text,
             start: node.getStart(source),
             end: node.end,
-            literal,
+            literal: literal && runtimeMapping,
           })
         }
       }
     }
-    ts.forEachChild(node, visit)
-    for (const doc of node.jsDoc ?? []) visit(doc)
+    // JSDoc imports follow compiler dependency resolution as well.
+    for (const doc of node.jsDoc ?? []) visit(doc, false)
+    ts.forEachChild(node, (child) => visit(child, runtimeMapping))
   }
   visit(source)
   return references
@@ -69,13 +70,9 @@ export function rewriteBundledWorkspaceReferences(
   let rewritten = content
   let replacementCount = 0
   const references = findBundledWorkspaceReferences(content, fileName, names)
-  for (const {
-    dependencyName,
-    value,
-    start,
-    end,
-    literal,
-  } of references.reverse()) {
+  for (const { dependencyName, value, start, end, literal } of references.sort(
+    (left, right) => right.start - left.start,
+  )) {
     if (!literal || value !== dependencyName) continue
     const replacement = resolve(dependencyName)
     const quote = content[start]

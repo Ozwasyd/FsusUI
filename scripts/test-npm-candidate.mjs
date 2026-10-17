@@ -239,6 +239,48 @@ try {
     }
   }
 
+  const mixedJavaScript = ts.transpileModule(
+    `/** @type {import('@element-plus/motion').Value} */\nconst value = import('@element-plus/icons-vue');\n`,
+    {
+      fileName: 'mixed-dependencies.ts',
+      compilerOptions: {
+        module: ts.ModuleKind.ESNext,
+        target: ts.ScriptTarget.ES2022,
+        removeComments: false,
+      },
+    },
+  ).outputText
+  assert.equal(
+    findBundledWorkspaceReferences(
+      mixedJavaScript,
+      'es/mixed.mjs',
+      workspaceNames,
+    ).length,
+    2,
+  )
+  const mixedRewritten = rewriteBundledWorkspaceReferences(
+    mixedJavaScript,
+    'es/mixed.mjs',
+    workspaceNames,
+    (dependency) => {
+      assert.equal(dependency, '@element-plus/icons-vue')
+      return './icons.mjs'
+    },
+  )
+  assert.equal(mixedRewritten.replacementCount, 1)
+  assert.equal(
+    mixedRewritten.content,
+    mixedJavaScript.replace('@element-plus/icons-vue', './icons.mjs'),
+  )
+  const mixedResidual = findBundledWorkspaceReferences(
+    mixedRewritten.content,
+    'es/mixed.mjs',
+    workspaceNames,
+  )
+  assert.equal(mixedResidual.length, 1)
+  assert.equal(mixedResidual[0].dependencyName, '@element-plus/motion')
+  assert.equal(mixedResidual[0].literal, false)
+
   const crossDeviceSource = path.join(tempRoot, 'cross-device-source.tgz')
   const crossDeviceDestination = path.join(
     tempRoot,
