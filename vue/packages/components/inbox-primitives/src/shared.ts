@@ -88,7 +88,7 @@ export const conversationListItemProps = buildProps({
 } as const)
 
 export const conversationListItemEmits = {
-  select: (event: MouseEvent) => event instanceof MouseEvent,
+  select: (payload: MouseEvent) => payload instanceof MouseEvent,
 }
 
 export const threadPanelProps = buildProps({

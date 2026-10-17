@@ -70,8 +70,8 @@ export const colorPickerEmits = {
   [UPDATE_MODEL_EVENT]: (val: string | null) => isString(val) || isNil(val),
   [CHANGE_EVENT]: (val: string | null) => isString(val) || isNil(val),
   activeChange: (val: string | null) => isString(val) || isNil(val),
-  focus: (event: FocusEvent) => event instanceof FocusEvent,
-  blur: (event: FocusEvent) => event instanceof FocusEvent,
+  focus: (payload: FocusEvent) => payload instanceof FocusEvent,
+  blur: (payload: FocusEvent) => payload instanceof FocusEvent,
 }
 
 export type ColorPickerProps = ExtractPropTypes<typeof colorPickerProps>

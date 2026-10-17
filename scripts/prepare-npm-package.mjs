@@ -834,17 +834,18 @@ function rewriteBundledWorkspaceDependencyReferences(rootDir, packageName) {
     let rewritten = original
 
     for (const dependencyName of bundledWorkspaceDependencyNames) {
-      if (!rewritten.includes(dependencyName)) continue
+      const pattern = new RegExp(
+        `(['"])${dependencyName.replace('/', '\\/')}\\1`,
+        'g',
+      )
+      if (!pattern.test(rewritten)) continue
+      pattern.lastIndex = 0
 
       const replacement = resolveBundledWorkspaceRuntimeSpecifier(
         rootDir,
         filePath,
         packageName,
         dependencyName,
-      )
-      const pattern = new RegExp(
-        `(['"])${dependencyName.replace('/', '\\/')}\\1`,
-        'g',
       )
       rewritten = rewritten.replace(pattern, (_match, quote) => {
         replacementCount += 1
@@ -885,7 +886,10 @@ function assertNoBundledWorkspaceDependencyReferences(packageJson, rootDir) {
   for (const filePath of collectSelfReferenceCandidates(rootDir)) {
     const content = readFileSync(filePath, 'utf8')
     for (const dependencyName of bundledWorkspaceDependencyNames) {
-      if (content.includes(dependencyName)) {
+      const pattern = new RegExp(
+        `(['"])${dependencyName.replace('/', '\\/')}(?:/[^'"]*)?\\1`,
+      )
+      if (pattern.test(content)) {
         contentLeaks.push(path.relative(rootDir, filePath))
       }
     }
