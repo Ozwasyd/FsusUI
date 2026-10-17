@@ -166,9 +166,10 @@ watch(
       pendingRecovery = undefined
       return
     }
-    const index = pendingRecovery?.key === key
+    const previousIndex = previousEntries.findIndex((entry) => entry.key === key)
+    const index = previousIndex === -1 && pendingRecovery?.key === key
       ? pendingRecovery.index
-      : previousEntries.findIndex((entry) => entry.key === key)
+      : previousIndex
     // A post-flush consumer update can supersede recovery after DOM removal.
     pendingRecovery = { key, index }
     let cancelled = false
