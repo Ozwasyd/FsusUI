@@ -117,6 +117,7 @@
     margin-inline: auto;
     flex-wrap: wrap;
     overflow: auto;
+    overscroll-behavior: contain;
     padding: 0 24px;
     background-color: var(
       --fsus-image-viewer-control-bg,
