@@ -628,11 +628,15 @@
     box-sizing: border-box;
   }
 
-  @media (max-width: 767px) {
+  @media (max-width: 767px), (max-height: 520px) and (orientation: landscape) {
     @include when(mobile-nav-bottom) {
       padding-bottom: calc(
         var(--fsus-bottom-tab-height, 56px) + #{fsus-safe-area-inset(bottom)}
       );
+    }
+
+    @include e(bottom-tab) {
+      display: flex;
     }
 
     @include e(inner) {
@@ -707,20 +711,21 @@
       }
     }
 
-    @include e(bottom-tab) {
-      display: flex;
-    }
-
     @include e(mobile-actions) {
       justify-content: flex-start;
       min-width: 0;
     }
+  }
 
+  @media (max-height: 520px) and (orientation: landscape) {
+    @include e(inner) {
+      padding-block: var(--fsus-space-2, 8px);
+    }
+  }
+
+  @media (max-width: 767px) {
     @include e(footer) {
-      padding-bottom: max(
-        40px,
-        calc(24px + #{fsus-safe-area-inset(bottom)})
-      );
+      padding-bottom: max(40px, calc(24px + #{fsus-safe-area-inset(bottom)}));
     }
   }
 

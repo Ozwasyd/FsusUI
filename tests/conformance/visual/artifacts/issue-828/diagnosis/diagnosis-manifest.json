@@ -1,0 +1,220 @@
+{
+  "baselineCommit": "f2b3bb89ffe5f749da26c388f058efdbb6aee864",
+  "runtimeSourceCommit": "c325c600ea2760156d467bfaa375613879211cd9",
+  "candidateEvidenceHead": "55f7951abb75ee5b28f4781ed91ee5aa11f70320",
+  "priorEvidenceManifestSha256": "e455b7dd414e234275fdefd21d1ce8d623642933d7f403cc95cc212c40fe58ca",
+  "priorRejectedUxReceiptDigest": "475533dcc3252c125de65000b19a57042c9a030d8f4925f060c088b3e24db6d0",
+  "baselineDevStatus": "running",
+  "files": [
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/diagnosis/README.md",
+      "bytes": 8038,
+      "sha256": "577792012b85bff54956b05b9cb864a20edee910cc5a8e1aac1d023c04d7fd41"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/diagnosis/baseline-preview-paired-first.log",
+      "bytes": 188742,
+      "sha256": "6ff95848c4797aa49ca7f78a12dde7558c6993b6afddc30a922c778fed72c26f"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/diagnosis/baseline-preview-paired-summary.json",
+      "bytes": 8875,
+      "sha256": "d7763273819d700288f32e168f9cbba7cb3049a0a507f8d5c976e04cd4d06beb"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/diagnosis/baseline-runtime-check-first.log",
+      "bytes": 145,
+      "sha256": "6598fb11be0dee342ffcd46bf9578a3709adbe23e7cbc2c6fa66c22c9350b3aa"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/diagnosis/baseline-runtime-first.log",
+      "bytes": 79769,
+      "sha256": "072c21d867203e7a41bc3272665550a5f2bc62ae506b6c4643f4ddc240425b28"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/diagnosis/candidate-g1.log",
+      "bytes": 23712,
+      "sha256": "f109849c79a0d4424c55daf7d15a0d19411ead6513e442413f98299bd5d72504"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/diagnosis/candidate-g2.log",
+      "bytes": 117741,
+      "sha256": "0d9c768c8f9e52db5fad1e403038119049ef2d99f56f6c26a4190a5833335153"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/diagnosis/candidate-g3.log",
+      "bytes": 24858,
+      "sha256": "62b8ca8d443fdbb8c644897e237debd6e54aa687cf457aee36a02d146fef9c82"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/diagnosis/candidate-g4.log",
+      "bytes": 30463,
+      "sha256": "21fe13261f4ebf6b06fe252ab9bca66cd83170e5b1fc6c9b66a23f61fe9dec46"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/diagnosis/candidate-g5-retry.log",
+      "bytes": 6310,
+      "sha256": "49e31b0ca56c34afe3a2352af2d0d886bacb1ebfe2fca83a96bcd87b99be8d29"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/diagnosis/candidate-g5.log",
+      "bytes": 166,
+      "sha256": "10430d4abdbd108757550247ef54aa526417db51010e4fcac2d0bf16fe54e830"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/diagnosis/commands.json",
+      "bytes": 4750,
+      "sha256": "050bd99dee60c5668bcdbeaf938709f7236846864452f4df13514943f97d6bf9"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/diagnosis/failure-index.json",
+      "bytes": 47654,
+      "sha256": "dcd5bfad223e91b9584e8e6c6a8dffae75ff9cbab8c5727bf37703b0b850e842"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/diagnosis/paired-mobile-screenshots/project-mobile-dark/shard-local/markdown-editor-chrome-mar-03ee5-rect-geometry-and-semantics-mobile-dark/chrome-matrix/framed-live-actual.png",
+      "bytes": 77466,
+      "sha256": "9da121b7312ecc2cbf369fd0131034db58f0ecbcff68c78b2a52a220ae22b813"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/diagnosis/paired-mobile-screenshots/project-mobile-dark/shard-local/markdown-editor-chrome-mar-23d8b-rect-geometry-and-semantics-mobile-dark/chrome-matrix/minimal-split-actual.png",
+      "bytes": 96386,
+      "sha256": "6d29b895e91d1ed00f34fa24859800fa6fe2b2ec8964ad63f43dab2d877c4fd8"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/diagnosis/paired-mobile-screenshots/project-mobile-dark/shard-local/markdown-editor-chrome-mar-40855-rect-geometry-and-semantics-mobile-dark/chrome-matrix/embedded-source-actual.png",
+      "bytes": 75890,
+      "sha256": "1ab49ac360e65ade10d6b0474c4678c0b647d98ac746399c7e616cc4cc9a8f21"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/diagnosis/paired-mobile-screenshots/project-mobile-dark/shard-local/markdown-editor-chrome-mar-76014-rect-geometry-and-semantics-mobile-dark/chrome-matrix/framed-split-actual.png",
+      "bytes": 95081,
+      "sha256": "9afad452fb9e862e50f97bc5948f7e2a26c3b43727418deb6f6e1b636891a640"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/diagnosis/paired-mobile-screenshots/project-mobile-dark/shard-local/markdown-editor-chrome-mar-7ab56-eometry-under-forced-colors-mobile-dark/chrome-evidence/forced-colors-actual.png",
+      "bytes": 67080,
+      "sha256": "e2bdb41b664b08718d9503c54ffda60ffe5d7df944ccaa44ffa866bfa3139859"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/diagnosis/paired-mobile-screenshots/project-mobile-dark/shard-local/markdown-editor-chrome-mar-82321-rect-geometry-and-semantics-mobile-dark/chrome-matrix/minimal-live-actual.png",
+      "bytes": 66456,
+      "sha256": "3d300356e998ea2365660ef4aa1bc078acf9ba5f6b588faa9ac0c277bef22065"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/diagnosis/paired-mobile-screenshots/project-mobile-dark/shard-local/markdown-editor-chrome-mar-9563a-rect-geometry-and-semantics-mobile-dark/chrome-matrix/embedded-live-actual.png",
+      "bytes": 75758,
+      "sha256": "0ac9cef96515302e126b3166d57c7c597df16d90922fd42ef1e0d08dbd1a2544"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/diagnosis/paired-mobile-screenshots/project-mobile-dark/shard-local/markdown-editor-chrome-mar-b0df0--usable-at-150-and-200-zoom-mobile-dark/chrome-evidence/zoom-150-actual.png",
+      "bytes": 80143,
+      "sha256": "43e350f81d80596943c7af907541357f55cba7353ff6ae532109e309df6edb97"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/diagnosis/paired-mobile-screenshots/project-mobile-dark/shard-local/markdown-editor-chrome-mar-cd2a8-rect-geometry-and-semantics-mobile-dark/chrome-matrix/framed-source-actual.png",
+      "bytes": 77570,
+      "sha256": "caf961f36948e39ed634a29b5a714a2f09966184b2c1e7dc4a5f489565864d47"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/diagnosis/paired-mobile-screenshots/project-mobile-dark/shard-local/markdown-editor-chrome-mar-db242-rect-geometry-and-semantics-mobile-dark/chrome-matrix/minimal-source-actual.png",
+      "bytes": 66595,
+      "sha256": "f834c6ebd31b0246a20f9c5379fb7e8420ed771ba8b87b81963d8c8ba9ca5a17"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/diagnosis/paired-mobile-screenshots/project-mobile-dark/shard-local/markdown-editor-chrome-mar-e19e3-rect-geometry-and-semantics-mobile-dark/chrome-matrix/embedded-split-actual.png",
+      "bytes": 97880,
+      "sha256": "d3c832a503a84bb43da00edb82c8eb633cca6aa4827debca4ee7c18f5fe54806"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/diagnosis/paired-mobile-screenshots/project-mobile-light/shard-local/markdown-editor-chrome-mar-03ee5-rect-geometry-and-semantics-mobile-light/chrome-matrix/framed-live-actual.png",
+      "bytes": 76060,
+      "sha256": "fd935e9251bb9dee2d771a0912a3d1ed4bd299fb3515e2825dfff5549a8ffcfb"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/diagnosis/paired-mobile-screenshots/project-mobile-light/shard-local/markdown-editor-chrome-mar-23d8b-rect-geometry-and-semantics-mobile-light/chrome-matrix/minimal-split-actual.png",
+      "bytes": 95107,
+      "sha256": "906532d8f61bfd38176abf2344863895f376746eac75d7d1be45202f7c8869de"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/diagnosis/paired-mobile-screenshots/project-mobile-light/shard-local/markdown-editor-chrome-mar-40855-rect-geometry-and-semantics-mobile-light/chrome-matrix/embedded-source-actual.png",
+      "bytes": 74552,
+      "sha256": "181c931736ce881689867b45a9e64a1f4f5bbf3dedf0134c680db5fabf0e188a"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/diagnosis/paired-mobile-screenshots/project-mobile-light/shard-local/markdown-editor-chrome-mar-76014-rect-geometry-and-semantics-mobile-light/chrome-matrix/framed-split-actual.png",
+      "bytes": 93072,
+      "sha256": "7098d76222227f67dedcbdb038b670bf312b0add37697803007a288a668d73ab"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/diagnosis/paired-mobile-screenshots/project-mobile-light/shard-local/markdown-editor-chrome-mar-7ab56-eometry-under-forced-colors-mobile-light/chrome-evidence/forced-colors-actual.png",
+      "bytes": 66730,
+      "sha256": "1328dce9266986fe32c7fb7d0204ff020c3dedc136d8220603bbdb8a59008aea"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/diagnosis/paired-mobile-screenshots/project-mobile-light/shard-local/markdown-editor-chrome-mar-82321-rect-geometry-and-semantics-mobile-light/chrome-matrix/minimal-live-actual.png",
+      "bytes": 65658,
+      "sha256": "6f0cfc206570c869d39738973ccfe654aab776c2a07d340e01d37a9900f52f6e"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/diagnosis/paired-mobile-screenshots/project-mobile-light/shard-local/markdown-editor-chrome-mar-9563a-rect-geometry-and-semantics-mobile-light/chrome-matrix/embedded-live-actual.png",
+      "bytes": 74434,
+      "sha256": "ff718ff80b4923444a364de5c66cacb0c7595bf86cb3e642e55bbc4ee27a738e"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/diagnosis/paired-mobile-screenshots/project-mobile-light/shard-local/markdown-editor-chrome-mar-b0df0--usable-at-150-and-200-zoom-mobile-light/chrome-evidence/zoom-150-actual.png",
+      "bytes": 78339,
+      "sha256": "a9957480770a073ed3465b278501d5350f3790986b71699ef5169a1c1a1f9265"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/diagnosis/paired-mobile-screenshots/project-mobile-light/shard-local/markdown-editor-chrome-mar-cd2a8-rect-geometry-and-semantics-mobile-light/chrome-matrix/framed-source-actual.png",
+      "bytes": 76167,
+      "sha256": "447dfb0cb0d2953ce64057f4c2b673a2ae46a1047937296b6b183e8526e16df1"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/diagnosis/paired-mobile-screenshots/project-mobile-light/shard-local/markdown-editor-chrome-mar-db242-rect-geometry-and-semantics-mobile-light/chrome-matrix/minimal-source-actual.png",
+      "bytes": 65842,
+      "sha256": "c9f78b06c40c66886c3af46991fa1892f750eab1694f86c075adcb0d71ce35a5"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/diagnosis/paired-mobile-screenshots/project-mobile-light/shard-local/markdown-editor-chrome-mar-e19e3-rect-geometry-and-semantics-mobile-light/chrome-matrix/embedded-split-actual.png",
+      "bytes": 95878,
+      "sha256": "1f7e5708686f9139864a3d3c4ecaef06c37d5d7ff43f1afd2560c1bed82e792a"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/diagnosis/paired-screenshot-comparison.json",
+      "bytes": 28892,
+      "sha256": "700fa537979e8159f7dfefa924acb9c01d425d1ee2fa5ee5aa647b08a1b972d0"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/diagnosis/selector-exposure-corrected.log",
+      "bytes": 95,
+      "sha256": "10970824c704beebfbc1ee5053807c212a620ec57e9e827bfd25b6738be34f96"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/diagnosis/selector-exposure-first.json",
+      "bytes": 3306,
+      "sha256": "6d5fc57faa6e94a5b3175077bf7db94b7bae18b03111bc0c1871ecd054095ce6"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/diagnosis/selector-exposure.json",
+      "bytes": 19130,
+      "sha256": "4fb18c8f7c0e7342cfabafb658082e9fc0a62b32bd0ab63686257210b0e7ff8e"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/diagnosis/selector-exposure.log",
+      "bytes": 94,
+      "sha256": "0e37283a1b73871fcf791366cf3c67d2eb0d5e33db37ed4f36a3c4ef60c193a8"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/diagnosis/selector-exposure.mjs",
+      "bytes": 3230,
+      "sha256": "6aae33ca43c5c48913f56af320714b6888cdaf20441df65049b9d808597d7032"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/diagnosis/shared-public-types-384112.patch",
+      "bytes": 2212,
+      "sha256": "42eb9a8beeb97a0fd37a8bd23b84ef16b2f9950014f3c196cb662e6bcaf22482"
+    }
+  ]
+}

@@ -1,0 +1,546 @@
+{
+  "baseline": "f2b3bb89ffe5f749da26c388f058efdbb6aee864",
+  "candidate": "55f7951abb75ee5b28f4781ed91ee5aa11f70320",
+  "productionSourceCommit": "c325c600ea2760156d467bfaa375613879211cd9",
+  "baseURL": "http://127.0.0.1:5190",
+  "changed": [
+    {
+      "file": "vue/packages/theme-chalk/src/public-shell.scss",
+      "removed": [
+        {
+          "selector": ".el-public-shell.is-mobile-nav-bottom",
+          "path": ["(max-width: 767px)"],
+          "css": "padding-bottom: calc(var(--fsus-bottom-tab-height, 56px) + var(--fsus-safe-area-inset-bottom));"
+        },
+        {
+          "selector": ".el-public-shell__inner",
+          "path": ["(max-width: 767px)"],
+          "css": "padding-block: 20px;"
+        },
+        {
+          "selector": ".el-public-shell__primary-row",
+          "path": ["(max-width: 767px)"],
+          "css": "align-items: center; gap: 8px;"
+        },
+        {
+          "selector": ".el-public-shell__brand-nav",
+          "path": ["(max-width: 767px)"],
+          "css": "overflow: hidden;"
+        },
+        {
+          "selector": ".el-public-shell__brand",
+          "path": ["(max-width: 767px)"],
+          "css": "display: inline-flex; align-items: center; box-sizing: border-box; max-width: 100%; min-width: 0px; min-height: var(--fsus-public-shell-mobile-action-height, 44px); overflow: hidden; text-overflow: ellipsis;"
+        },
+        {
+          "selector": ".el-public-shell__desktop-nav",
+          "path": ["(max-width: 767px)"],
+          "css": "display: none;"
+        },
+        {
+          "selector": ".el-public-shell__actions",
+          "path": ["(max-width: 767px)"],
+          "css": "display: none;"
+        },
+        {
+          "selector": ".el-public-shell__mobile-primary-actions",
+          "path": ["(max-width: 767px)"],
+          "css": "display: inline-flex; max-width: 100%; align-items: center; justify-content: flex-end; flex-wrap: nowrap; gap: 8px;"
+        },
+        {
+          "selector": ".el-public-shell__mobile-primary-actions > :where(a, button, [role=\"button\"])",
+          "path": ["(max-width: 767px)"],
+          "css": "flex: 0 1 auto; min-width: var(--fsus-public-shell-mobile-action-height, 44px); min-height: var(--fsus-public-shell-mobile-action-height, 44px); box-sizing: border-box;"
+        },
+        {
+          "selector": ".el-public-shell__mobile-primary-actions > :where(a, button, [role=\"button\"])[aria-label]:empty",
+          "path": ["(max-width: 767px)"],
+          "css": "min-width: var(--fsus-public-shell-mobile-action-height, 44px);"
+        },
+        {
+          "selector": ".el-public-shell__mobile-primary-actions svg",
+          "path": ["(max-width: 767px)"],
+          "css": "width: 16px; height: 16px;"
+        },
+        {
+          "selector": ".el-public-shell__mobile-toolbar",
+          "path": ["(max-width: 767px)"],
+          "css": "display: block;"
+        },
+        {
+          "selector": ".el-public-shell__mobile-toolbar.is-collapsed",
+          "path": ["(max-width: 767px)"],
+          "css": "display: none; margin-top: 0px;"
+        },
+        {
+          "selector": ".el-public-shell__mobile-nav--inline",
+          "path": ["(max-width: 767px)"],
+          "css": "display: flex;"
+        },
+        {
+          "selector": ".el-public-shell__bottom-tab",
+          "path": ["(max-width: 767px)"],
+          "css": "display: flex;"
+        },
+        {
+          "selector": ".el-public-shell__mobile-actions",
+          "path": ["(max-width: 767px)"],
+          "css": "justify-content: flex-start; min-width: 0px;"
+        }
+      ],
+      "added": [
+        {
+          "selector": ".el-public-shell.is-mobile-nav-bottom",
+          "path": [
+            "(max-width: 767px), (max-height: 520px) and (orientation: landscape)"
+          ],
+          "css": "padding-bottom: calc(var(--fsus-bottom-tab-height, 56px) + var(--fsus-safe-area-inset-bottom));"
+        },
+        {
+          "selector": ".el-public-shell__bottom-tab",
+          "path": [
+            "(max-width: 767px), (max-height: 520px) and (orientation: landscape)"
+          ],
+          "css": "display: flex;"
+        },
+        {
+          "selector": ".el-public-shell__inner",
+          "path": [
+            "(max-width: 767px), (max-height: 520px) and (orientation: landscape)"
+          ],
+          "css": "padding-block: 20px;"
+        },
+        {
+          "selector": ".el-public-shell__primary-row",
+          "path": [
+            "(max-width: 767px), (max-height: 520px) and (orientation: landscape)"
+          ],
+          "css": "align-items: center; gap: 8px;"
+        },
+        {
+          "selector": ".el-public-shell__brand-nav",
+          "path": [
+            "(max-width: 767px), (max-height: 520px) and (orientation: landscape)"
+          ],
+          "css": "overflow: hidden;"
+        },
+        {
+          "selector": ".el-public-shell__brand",
+          "path": [
+            "(max-width: 767px), (max-height: 520px) and (orientation: landscape)"
+          ],
+          "css": "display: inline-flex; align-items: center; box-sizing: border-box; max-width: 100%; min-width: 0px; min-height: var(--fsus-public-shell-mobile-action-height, 44px); overflow: hidden; text-overflow: ellipsis;"
+        },
+        {
+          "selector": ".el-public-shell__desktop-nav",
+          "path": [
+            "(max-width: 767px), (max-height: 520px) and (orientation: landscape)"
+          ],
+          "css": "display: none;"
+        },
+        {
+          "selector": ".el-public-shell__actions",
+          "path": [
+            "(max-width: 767px), (max-height: 520px) and (orientation: landscape)"
+          ],
+          "css": "display: none;"
+        },
+        {
+          "selector": ".el-public-shell__mobile-primary-actions",
+          "path": [
+            "(max-width: 767px), (max-height: 520px) and (orientation: landscape)"
+          ],
+          "css": "display: inline-flex; max-width: 100%; align-items: center; justify-content: flex-end; flex-wrap: nowrap; gap: 8px;"
+        },
+        {
+          "selector": ".el-public-shell__mobile-primary-actions > :where(a, button, [role=\"button\"])",
+          "path": [
+            "(max-width: 767px), (max-height: 520px) and (orientation: landscape)"
+          ],
+          "css": "flex: 0 1 auto; min-width: var(--fsus-public-shell-mobile-action-height, 44px); min-height: var(--fsus-public-shell-mobile-action-height, 44px); box-sizing: border-box;"
+        },
+        {
+          "selector": ".el-public-shell__mobile-primary-actions > :where(a, button, [role=\"button\"])[aria-label]:empty",
+          "path": [
+            "(max-width: 767px), (max-height: 520px) and (orientation: landscape)"
+          ],
+          "css": "min-width: var(--fsus-public-shell-mobile-action-height, 44px);"
+        },
+        {
+          "selector": ".el-public-shell__mobile-primary-actions svg",
+          "path": [
+            "(max-width: 767px), (max-height: 520px) and (orientation: landscape)"
+          ],
+          "css": "width: 16px; height: 16px;"
+        },
+        {
+          "selector": ".el-public-shell__mobile-toolbar",
+          "path": [
+            "(max-width: 767px), (max-height: 520px) and (orientation: landscape)"
+          ],
+          "css": "display: block;"
+        },
+        {
+          "selector": ".el-public-shell__mobile-toolbar.is-collapsed",
+          "path": [
+            "(max-width: 767px), (max-height: 520px) and (orientation: landscape)"
+          ],
+          "css": "display: none; margin-top: 0px;"
+        },
+        {
+          "selector": ".el-public-shell__mobile-nav--inline",
+          "path": [
+            "(max-width: 767px), (max-height: 520px) and (orientation: landscape)"
+          ],
+          "css": "display: flex;"
+        },
+        {
+          "selector": ".el-public-shell__mobile-actions",
+          "path": [
+            "(max-width: 767px), (max-height: 520px) and (orientation: landscape)"
+          ],
+          "css": "justify-content: flex-start; min-width: 0px;"
+        },
+        {
+          "selector": ".el-public-shell__inner",
+          "path": ["(max-height: 520px) and (orientation: landscape)"],
+          "css": "padding-block: var(--fsus-space-2, 8px);"
+        }
+      ]
+    },
+    {
+      "file": "vue/packages/theme-chalk/src/public-shell-critical.scss",
+      "removed": [
+        {
+          "selector": ".el-public-shell.is-mobile-nav-bottom",
+          "path": ["(max-width: 767px)"],
+          "css": "padding-bottom: calc(var(--fsus-bottom-tab-height, 56px) + var(--fsus-safe-area-inset-bottom));"
+        },
+        {
+          "selector": ".el-public-shell__inner",
+          "path": ["(max-width: 767px)"],
+          "css": "padding-block: 20px;"
+        },
+        {
+          "selector": ".el-public-shell__primary-row",
+          "path": ["(max-width: 767px)"],
+          "css": "align-items: center; gap: 8px;"
+        },
+        {
+          "selector": ".el-public-shell__brand-nav",
+          "path": ["(max-width: 767px)"],
+          "css": "overflow: hidden;"
+        },
+        {
+          "selector": ".el-public-shell__brand",
+          "path": ["(max-width: 767px)"],
+          "css": "display: inline-flex; align-items: center; box-sizing: border-box; max-width: 100%; min-width: 0px; min-height: var(--fsus-public-shell-mobile-action-height, 44px); overflow: hidden; text-overflow: ellipsis;"
+        },
+        {
+          "selector": ".el-public-shell__desktop-nav",
+          "path": ["(max-width: 767px)"],
+          "css": "display: none;"
+        },
+        {
+          "selector": ".el-public-shell__actions",
+          "path": ["(max-width: 767px)"],
+          "css": "display: none;"
+        },
+        {
+          "selector": ".el-public-shell__mobile-primary-actions",
+          "path": ["(max-width: 767px)"],
+          "css": "display: inline-flex; max-width: 100%; align-items: center; justify-content: flex-end; flex-wrap: nowrap; gap: 8px;"
+        },
+        {
+          "selector": ".el-public-shell__mobile-primary-actions > :where(a, button, [role=\"button\"])",
+          "path": ["(max-width: 767px)"],
+          "css": "flex: 0 1 auto; min-width: var(--fsus-public-shell-mobile-action-height, 44px); min-height: var(--fsus-public-shell-mobile-action-height, 44px); box-sizing: border-box;"
+        },
+        {
+          "selector": ".el-public-shell__mobile-primary-actions > :where(a, button, [role=\"button\"])[aria-label]:empty",
+          "path": ["(max-width: 767px)"],
+          "css": "min-width: var(--fsus-public-shell-mobile-action-height, 44px);"
+        },
+        {
+          "selector": ".el-public-shell__mobile-primary-actions svg",
+          "path": ["(max-width: 767px)"],
+          "css": "width: 16px; height: 16px;"
+        },
+        {
+          "selector": ".el-public-shell__mobile-toolbar",
+          "path": ["(max-width: 767px)"],
+          "css": "display: block;"
+        },
+        {
+          "selector": ".el-public-shell__mobile-toolbar.is-collapsed",
+          "path": ["(max-width: 767px)"],
+          "css": "display: none; margin-top: 0px;"
+        },
+        {
+          "selector": ".el-public-shell__mobile-nav--inline",
+          "path": ["(max-width: 767px)"],
+          "css": "display: flex;"
+        },
+        {
+          "selector": ".el-public-shell__bottom-tab",
+          "path": ["(max-width: 767px)"],
+          "css": "display: flex;"
+        },
+        {
+          "selector": ".el-public-shell__mobile-actions",
+          "path": ["(max-width: 767px)"],
+          "css": "justify-content: flex-start; min-width: 0px;"
+        }
+      ],
+      "added": [
+        {
+          "selector": ".el-public-shell.is-mobile-nav-bottom",
+          "path": [
+            "(max-width: 767px), (max-height: 520px) and (orientation: landscape)"
+          ],
+          "css": "padding-bottom: calc(var(--fsus-bottom-tab-height, 56px) + var(--fsus-safe-area-inset-bottom));"
+        },
+        {
+          "selector": ".el-public-shell__bottom-tab",
+          "path": [
+            "(max-width: 767px), (max-height: 520px) and (orientation: landscape)"
+          ],
+          "css": "display: flex;"
+        },
+        {
+          "selector": ".el-public-shell__inner",
+          "path": [
+            "(max-width: 767px), (max-height: 520px) and (orientation: landscape)"
+          ],
+          "css": "padding-block: 20px;"
+        },
+        {
+          "selector": ".el-public-shell__primary-row",
+          "path": [
+            "(max-width: 767px), (max-height: 520px) and (orientation: landscape)"
+          ],
+          "css": "align-items: center; gap: 8px;"
+        },
+        {
+          "selector": ".el-public-shell__brand-nav",
+          "path": [
+            "(max-width: 767px), (max-height: 520px) and (orientation: landscape)"
+          ],
+          "css": "overflow: hidden;"
+        },
+        {
+          "selector": ".el-public-shell__brand",
+          "path": [
+            "(max-width: 767px), (max-height: 520px) and (orientation: landscape)"
+          ],
+          "css": "display: inline-flex; align-items: center; box-sizing: border-box; max-width: 100%; min-width: 0px; min-height: var(--fsus-public-shell-mobile-action-height, 44px); overflow: hidden; text-overflow: ellipsis;"
+        },
+        {
+          "selector": ".el-public-shell__desktop-nav",
+          "path": [
+            "(max-width: 767px), (max-height: 520px) and (orientation: landscape)"
+          ],
+          "css": "display: none;"
+        },
+        {
+          "selector": ".el-public-shell__actions",
+          "path": [
+            "(max-width: 767px), (max-height: 520px) and (orientation: landscape)"
+          ],
+          "css": "display: none;"
+        },
+        {
+          "selector": ".el-public-shell__mobile-primary-actions",
+          "path": [
+            "(max-width: 767px), (max-height: 520px) and (orientation: landscape)"
+          ],
+          "css": "display: inline-flex; max-width: 100%; align-items: center; justify-content: flex-end; flex-wrap: nowrap; gap: 8px;"
+        },
+        {
+          "selector": ".el-public-shell__mobile-primary-actions > :where(a, button, [role=\"button\"])",
+          "path": [
+            "(max-width: 767px), (max-height: 520px) and (orientation: landscape)"
+          ],
+          "css": "flex: 0 1 auto; min-width: var(--fsus-public-shell-mobile-action-height, 44px); min-height: var(--fsus-public-shell-mobile-action-height, 44px); box-sizing: border-box;"
+        },
+        {
+          "selector": ".el-public-shell__mobile-primary-actions > :where(a, button, [role=\"button\"])[aria-label]:empty",
+          "path": [
+            "(max-width: 767px), (max-height: 520px) and (orientation: landscape)"
+          ],
+          "css": "min-width: var(--fsus-public-shell-mobile-action-height, 44px);"
+        },
+        {
+          "selector": ".el-public-shell__mobile-primary-actions svg",
+          "path": [
+            "(max-width: 767px), (max-height: 520px) and (orientation: landscape)"
+          ],
+          "css": "width: 16px; height: 16px;"
+        },
+        {
+          "selector": ".el-public-shell__mobile-toolbar",
+          "path": [
+            "(max-width: 767px), (max-height: 520px) and (orientation: landscape)"
+          ],
+          "css": "display: block;"
+        },
+        {
+          "selector": ".el-public-shell__mobile-toolbar.is-collapsed",
+          "path": [
+            "(max-width: 767px), (max-height: 520px) and (orientation: landscape)"
+          ],
+          "css": "display: none; margin-top: 0px;"
+        },
+        {
+          "selector": ".el-public-shell__mobile-nav--inline",
+          "path": [
+            "(max-width: 767px), (max-height: 520px) and (orientation: landscape)"
+          ],
+          "css": "display: flex;"
+        },
+        {
+          "selector": ".el-public-shell__mobile-actions",
+          "path": [
+            "(max-width: 767px), (max-height: 520px) and (orientation: landscape)"
+          ],
+          "css": "justify-content: flex-start; min-width: 0px;"
+        },
+        {
+          "selector": ".el-public-shell__inner",
+          "path": ["(max-height: 520px) and (orientation: landscape)"],
+          "css": "padding-block: var(--fsus-space-2, 8px);"
+        }
+      ]
+    }
+  ],
+  "observations": [
+    {
+      "route": "home",
+      "theme": "light",
+      "width": 1440,
+      "height": 1600,
+      "publicShellCount": 0,
+      "changedSelectorMatches": []
+    },
+    {
+      "route": "data",
+      "theme": "light",
+      "width": 1440,
+      "height": 1600,
+      "publicShellCount": 0,
+      "changedSelectorMatches": []
+    },
+    {
+      "route": "data",
+      "theme": "light",
+      "width": 412,
+      "height": 1200,
+      "publicShellCount": 0,
+      "changedSelectorMatches": []
+    },
+    {
+      "route": "form",
+      "theme": "light",
+      "width": 320,
+      "height": 720,
+      "publicShellCount": 0,
+      "changedSelectorMatches": []
+    },
+    {
+      "route": "markdown-editor-chrome-visual",
+      "theme": "light",
+      "width": 1440,
+      "height": 1600,
+      "publicShellCount": 0,
+      "changedSelectorMatches": []
+    },
+    {
+      "route": "markdown-editor-chrome-visual",
+      "theme": "light",
+      "width": 412,
+      "height": 1200,
+      "publicShellCount": 0,
+      "changedSelectorMatches": []
+    },
+    {
+      "route": "markdown-stress",
+      "theme": "light",
+      "width": 900,
+      "height": 760,
+      "publicShellCount": 0,
+      "changedSelectorMatches": []
+    },
+    {
+      "route": "markdown-stress",
+      "theme": "light",
+      "width": 520,
+      "height": 760,
+      "publicShellCount": 0,
+      "changedSelectorMatches": []
+    },
+    {
+      "route": "home",
+      "theme": "dark",
+      "width": 1440,
+      "height": 1600,
+      "publicShellCount": 0,
+      "changedSelectorMatches": []
+    },
+    {
+      "route": "data",
+      "theme": "dark",
+      "width": 1440,
+      "height": 1600,
+      "publicShellCount": 0,
+      "changedSelectorMatches": []
+    },
+    {
+      "route": "data",
+      "theme": "dark",
+      "width": 412,
+      "height": 1200,
+      "publicShellCount": 0,
+      "changedSelectorMatches": []
+    },
+    {
+      "route": "form",
+      "theme": "dark",
+      "width": 320,
+      "height": 720,
+      "publicShellCount": 0,
+      "changedSelectorMatches": []
+    },
+    {
+      "route": "markdown-editor-chrome-visual",
+      "theme": "dark",
+      "width": 1440,
+      "height": 1600,
+      "publicShellCount": 0,
+      "changedSelectorMatches": []
+    },
+    {
+      "route": "markdown-editor-chrome-visual",
+      "theme": "dark",
+      "width": 412,
+      "height": 1200,
+      "publicShellCount": 0,
+      "changedSelectorMatches": []
+    },
+    {
+      "route": "markdown-stress",
+      "theme": "dark",
+      "width": 900,
+      "height": 760,
+      "publicShellCount": 0,
+      "changedSelectorMatches": []
+    },
+    {
+      "route": "markdown-stress",
+      "theme": "dark",
+      "width": 520,
+      "height": 760,
+      "publicShellCount": 0,
+      "changedSelectorMatches": []
+    }
+  ]
+}

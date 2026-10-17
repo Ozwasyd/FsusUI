@@ -1,0 +1,26 @@
+{
+  "issue": "Ozwasyd/FsusUI#828",
+  "restores": "Public header budget without changing 44px hit targets or public navigation modes",
+  "sourceObservation": "Both full/critical inner styles use 24px vertical padding above 767px; action row has 44px minimum.",
+  "requiredMatrix": {
+    "engines": [
+      "chromium",
+      "webkit"
+    ],
+    "themes": [
+      "light",
+      "dark"
+    ],
+    "viewport": "844x390",
+    "zoom": [
+      1,
+      1.5,
+      2
+    ]
+  },
+  "limits": [
+    "Blog live stack and published-package parity need their own admission and evidence",
+    "No real iOS Safari device provided",
+    "Independent UX acceptance not yet supplied"
+  ]
+}

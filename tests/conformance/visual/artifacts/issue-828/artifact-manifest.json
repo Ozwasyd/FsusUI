@@ -1,0 +1,248 @@
+{
+  "sourceCommit": "c325c600ea2760156d467bfaa375613879211cd9",
+  "releaseMetadataCommit": "79988a85e5f893a5d06eb9ee499c07c3abc37e39",
+  "classificationReceiptDigest": "43a263c11e8f7805ccc79c7fafb6693c9b4e79d440394e938a5fd57e48237e8d",
+  "rejectedUxReceiptDigest": "475533dcc3252c125de65000b19a57042c9a030d8f4925f060c088b3e24db6d0",
+  "files": [
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/README.md",
+      "bytes": 18297,
+      "sha256": "4c12e8f35f8335402f097fd25be1a341084d6f8dac9bbf8015505578fdc20cef"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/affected-visual-retry.log",
+      "bytes": 8974,
+      "sha256": "e053e7d04a310b04d2d516388d4cb7e66fc992b4114b740c6568abd5b990772c"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/affected-visual.log",
+      "bytes": 83848,
+      "sha256": "07bc2a97c45bf8afc1adfef19e9ec57bd8cbad4bd4fabcebb1d9e34480904ae1"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/before-chromium-chromium-dark-1.5.png",
+      "bytes": 15341,
+      "sha256": "9f9e8094b8fd02c48e7aa6cf5b61437d540c603feafab6e29f78ac9e0f3c4ee8"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/before-chromium-chromium-dark-1.png",
+      "bytes": 24377,
+      "sha256": "2ad5c1f99077939b1a5cd0fb43f30b1dcaf4449caa73dec31102ab5eee843f1c"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/before-chromium-chromium-dark-2.png",
+      "bytes": 18668,
+      "sha256": "3ff96f54fa3b24463f8ca9a1e48b42c78a4d2af3bdd43bf513571f7523384305"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/before-chromium-chromium-light-1.5.png",
+      "bytes": 15177,
+      "sha256": "c40817f89ff5e7775e596c1e0b32a2dd3c0819dff65660ce5777b54ec1dd31a8"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/before-chromium-chromium-light-1.png",
+      "bytes": 24115,
+      "sha256": "ebf0d163d7bf9d4067ec0255ebe761fd860d72c252bd6baa3f60e171cf3a1675"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/before-chromium-chromium-light-2.png",
+      "bytes": 18432,
+      "sha256": "fb6487d06f4f72298be396b5d8ac66d07321b3962663a1806058ef0241d689da"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/before-chromium.json",
+      "bytes": 7444,
+      "sha256": "1955d6964400cc07b496bfb7220bc4ce3528ddefc6591c32806647b65499847a"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/build-theme-first.log",
+      "bytes": 5962,
+      "sha256": "25209eb1d8d6cb3c7c6a37989143397da9307374d641fe7992611bed30fa96d1"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/bwrap-probe.log",
+      "bytes": 49,
+      "sha256": "f427400003f1438951931a9e02e12a36f46d63466731694d824cbf9e0d36a5d4"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/capture.mjs",
+      "bytes": 1883,
+      "sha256": "d66482f5830d760bee5b94485948d3721ea27b2caee70afb6bf39587d5ed5da0"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/changeset-status.json",
+      "bytes": 1114,
+      "sha256": "f6b248bcc63defcdeb7f672226761d3a5b1482fbf1828406dd7c5205b2d4bd63"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/changeset-status.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/classification-evidence.json",
+      "bytes": 671,
+      "sha256": "13ead8302a75b195d8e47586bd0b5b34393f0ca14fce3b6da0e0dc3bededcb6f"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/design-checks.log",
+      "bytes": 379,
+      "sha256": "b65c5545e4c1c8e084c6c1f82c8b08c2d0a33fb5573f2d9135a30cb710280617"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/focused-unit-c325c600.log",
+      "bytes": 207,
+      "sha256": "e4bf1c65e03e20eed1ee0d0a408921ea968e80e63e1d57f19c33714804c81fb9"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/format-c325c600.log",
+      "bytes": 66,
+      "sha256": "17aa973d3f004560237d9a95171210b0671deff23d61628eecf7322ff5938f20"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/full-visual.log",
+      "bytes": 303467,
+      "sha256": "c401587cac1fd854fbd8ae6729e636fff4eb2ef4ce01fa16f64aacae11e012c7"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/independence-limit.json",
+      "bytes": 308,
+      "sha256": "4ae55af72d1efd616b81aafedc48fff51d11bdf19168dabb15b4e5080dea169c"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/interaction-c325c600.json",
+      "bytes": 32377,
+      "sha256": "6dc8c84c3e2554e5f72d338c5c962ed89993c04ef705a5c5eb4f39144c44cfc1"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/interaction-c325c600.log",
+      "bytes": 108,
+      "sha256": "c891db117a59268287c98e24596fd6977c1485df56f048952bc48aa994482c7d"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/interaction.mjs",
+      "bytes": 3321,
+      "sha256": "d0e27e3566a42b57d170f41d079ce9a2633dc46d9c6feadd3250fa51de1e9265"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/local-dist-after.json",
+      "bytes": 1129,
+      "sha256": "ebf33418b526524a9a821f4cc67c5a18b2022770b6f9295ac015107eefbb748f"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/local-dist-before.json",
+      "bytes": 1138,
+      "sha256": "38cf8a2a57c36f801aa294c1b6ba7fb3b3e3631c2ef5dcc4f436a93f4bb31ccd"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/preimplementation-classification-receipt.json",
+      "bytes": 3474,
+      "sha256": "2d5d73836e5f6d760a5d0d784c13cf54fa47f3009e4dd5d22a933f8e449109ff"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/production-c325c600-chromium-dark-1.5.png",
+      "bytes": 18589,
+      "sha256": "a93ea93221477c0089ca7b39539eb97c21aaf69f96edc959c59968fda37b5b01"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/production-c325c600-chromium-dark-1.png",
+      "bytes": 22860,
+      "sha256": "f4e117620befb636202cbb985d5ad5d328883cdcb0f58bf0aa181a5edc8f4307"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/production-c325c600-chromium-dark-2.png",
+      "bytes": 15300,
+      "sha256": "56f29b4638492069672ccbb8629976c95e13a310e9b362f4175f0f1f04c06cc5"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/production-c325c600-chromium-light-1.5.png",
+      "bytes": 18420,
+      "sha256": "f32b2dd2f8687293362981bad5e927ddfc591379782ec5ec78296743daebceb5"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/production-c325c600-chromium-light-1.png",
+      "bytes": 22634,
+      "sha256": "a5ace57e34acaf3d78de8c5891ec718519a5f84df1b269fda03d926b1f090969"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/production-c325c600-chromium-light-2.png",
+      "bytes": 15104,
+      "sha256": "e444423f88406065ae5e7817535d49a4428da1eaf7df73be285714a9ae4ce18d"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/production-c325c600.json",
+      "bytes": 7478,
+      "sha256": "2e9bd92d60acd8a62b8fb68bd403bcbe8e6287e1630fe12fea3743e3db427183"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/production-runtime-manifest-c325c600.json",
+      "bytes": 1314,
+      "sha256": "2fc7f2676a6f79391288b37af0c55b6d842c95d842f24ae27a4ce5ad1225e8ae"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/receipt-validation.log",
+      "bytes": 612,
+      "sha256": "2839afbc84a8ef7a92b000912c6f665fa19fd9ff82f6c1b7912a26ef48d8da0d"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/release-format.log",
+      "bytes": 66,
+      "sha256": "17aa973d3f004560237d9a95171210b0671deff23d61628eecf7322ff5938f20"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/remote-check-runs-c325c600.json",
+      "bytes": 105276,
+      "sha256": "a11c466c22091ee67c30049323647fbc2143e287b30fa835148793daa53d23f2"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/runner-artifact-restoration.json",
+      "bytes": 6205,
+      "sha256": "218c9f27220561b418e1282524139099c4f293d3a1b26872ec2519f90ee2a58b"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/runtime-readiness-postbuild.log",
+      "bytes": 145,
+      "sha256": "6598fb11be0dee342ffcd46bf9578a3709adbe23e7cbc2c6fa66c22c9350b3aa"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/runtime-readiness-release-only.log",
+      "bytes": 145,
+      "sha256": "6598fb11be0dee342ffcd46bf9578a3709adbe23e7cbc2c6fa66c22c9350b3aa"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/runtime-readiness-restored.log",
+      "bytes": 145,
+      "sha256": "6598fb11be0dee342ffcd46bf9578a3709adbe23e7cbc2c6fa66c22c9350b3aa"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/source-release-equivalence.json",
+      "bytes": 1059,
+      "sha256": "8b295b86fea40f83a18ba5e7035e0844c79bc25346a89c7947ba458d0cc9119a"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/terminal-status.json",
+      "bytes": 11156,
+      "sha256": "11ce90906dc85361b63e69ab520f6314c921f193873b6fb9d3f378137a4b977b"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/ui-ux-classification-receipt.json",
+      "bytes": 4602,
+      "sha256": "d188029770d947c54ec63195ff1ee06abc19f88fece9227d690d7894d060fdc5"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/ux-acceptance-receipt.json",
+      "bytes": 5739,
+      "sha256": "77cfda7d9993cd883bb4540a250163133ef658825cded78b230bad895942e7a9"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/visual-plan.log",
+      "bytes": 2781,
+      "sha256": "af0e3bd8a9163e1d7cf2c3c22c5a9823d4185e6b0023561802466386e356a83f"
+    },
+    {
+      "path": "tests/conformance/visual/artifacts/issue-828/webkit-launch.log",
+      "bytes": 743,
+      "sha256": "08a7c5c629247da33dfbd7939685e587aa225bab8840468ddbeb2ef05c2b58cf"
+    }
+  ]
+}

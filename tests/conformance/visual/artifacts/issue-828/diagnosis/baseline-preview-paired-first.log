@@ -1,0 +1,2208 @@
+
+Running 116 tests using 3 workers
+
+  ✓    3 [desktop-light] › vue/tests/visual/capture-all.spec.ts:67:7 › capture basic (3.1s)
+  ✘    2 [desktop-light] › vue/tests/visual/capture-all.spec.ts:67:7 › capture data (4.5s)
+  ✓    1 [desktop-light] › vue/tests/visual/capture-all.spec.ts:67:7 › capture form (5.7s)
+  ✓    4 [desktop-light] › vue/tests/visual/capture-all.spec.ts:67:7 › capture navigation (2.8s)
+  ✓    5 [desktop-light] › vue/tests/visual/capture-all.spec.ts:67:7 › capture others (2.5s)
+  ✓    7 [desktop-light] › vue/tests/visual/capture-all.spec.ts:67:7 › capture icons (3.3s)
+  ✓    6 [desktop-light] › vue/tests/visual/capture-all.spec.ts:67:7 › capture feedback (3.4s)
+  ✓    8 [desktop-light] › vue/tests/visual/form-production.spec.ts:63:5 › keeps production form columns aligned for its project viewport and 320px (4.7s)
+  ✓   10 [desktop-light] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders framed chrome in live mode with correct geometry and semantics (3.6s)
+  ✓    9 [desktop-light] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders framed chrome in source mode with correct geometry and semantics (4.0s)
+  ✓   11 [desktop-light] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders framed chrome in split mode with correct geometry and semantics (3.6s)
+  ✓   12 [desktop-light] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders framed chrome in preview mode with correct geometry and semantics (3.5s)
+  ✓   13 [desktop-light] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders embedded chrome in source mode with correct geometry and semantics (3.4s)
+  ✓   14 [desktop-light] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders embedded chrome in live mode with correct geometry and semantics (3.7s)
+  ✓   15 [desktop-light] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders embedded chrome in split mode with correct geometry and semantics (3.6s)
+  ✓   16 [desktop-light] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders embedded chrome in preview mode with correct geometry and semantics (3.8s)
+  ✓   17 [desktop-light] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders minimal chrome in source mode with correct geometry and semantics (3.2s)
+  ✓   18 [desktop-light] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders minimal chrome in live mode with correct geometry and semantics (3.0s)
+  ✓   19 [desktop-light] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders minimal chrome in split mode with correct geometry and semantics (3.0s)
+  ✓   20 [desktop-light] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders minimal chrome in preview mode with correct geometry and semantics (3.6s)
+  ✓   22 [desktop-light] › vue/tests/visual/markdown-editor-chrome.spec.ts:354:13 › markdown editor chrome variants matrix (#429) › stays usable at 150% and 200% zoom (6.5s)
+  ✓   24 [desktop-light] › vue/tests/visual/markdown-editor-chrome.spec.ts:520:13 › markdown editor chrome variants matrix (#429) › keeps framed geometry under forced colors (2.8s)
+  ✘   21 [desktop-light] › vue/tests/visual/markdown-editor-chrome.spec.ts:186:13 › markdown editor chrome variants matrix (#429) › keeps one editor instance through rapid mode switches (9.4s)
+  ✘   25 [desktop-light] › vue/tests/visual/motion-transition-acceptance.spec.ts:25:5 › zoom-in transitions use opacity+translate, no axis scale (4.6s)
+  ✘   26 [desktop-light] › vue/tests/visual/motion-transition-acceptance.spec.ts:50:5 › list transitions use <=8px displacement (4.8s)
+  ✘   27 [desktop-light] › vue/tests/visual/motion-transition-acceptance.spec.ts:72:5 › zoom-in overlay transitions have scale >= 0.98 (5.0s)
+  ✘   28 [desktop-light] › vue/tests/visual/motion-transition-acceptance.spec.ts:94:5 › no transition uses 500ms (4.4s)
+  ✓   29 [desktop-light] › vue/tests/visual/motion-transition-acceptance.spec.ts:106:5 › motion scss compiles without error (2.3s)
+  ✓   30 [mobile-light] › vue/tests/visual/capture-all.spec.ts:67:7 › capture basic (3.6s)
+  ✘   23 [desktop-light] › vue/tests/visual/markdown-editor-chrome.spec.ts:400:13 › markdown editor chrome variants matrix (#429) › renders toolbar, status, and slot visibility contract (26.2s)
+  ✘   32 [mobile-light] › vue/tests/visual/capture-all.spec.ts:67:7 › capture data (6.2s)
+  ✓   31 [mobile-light] › vue/tests/visual/capture-all.spec.ts:67:7 › capture form (9.5s)
+  ✓   33 [mobile-light] › vue/tests/visual/capture-all.spec.ts:67:7 › capture navigation (4.4s)
+  ✓   35 [mobile-light] › vue/tests/visual/capture-all.spec.ts:67:7 › capture others (3.5s)
+  ✓   34 [mobile-light] › vue/tests/visual/capture-all.spec.ts:67:7 › capture feedback (5.3s)
+  ✓   36 [mobile-light] › vue/tests/visual/capture-all.spec.ts:67:7 › capture icons (6.6s)
+  ✓   37 [mobile-light] › vue/tests/visual/form-production.spec.ts:63:5 › keeps production form columns aligned for its project viewport and 320px (6.7s)
+  ✘   38 [mobile-light] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders framed chrome in source mode with correct geometry and semantics (4.9s)
+  ✘   39 [mobile-light] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders framed chrome in live mode with correct geometry and semantics (5.2s)
+  ✘   40 [mobile-light] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders framed chrome in split mode with correct geometry and semantics (4.9s)
+  ✓   41 [mobile-light] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders framed chrome in preview mode with correct geometry and semantics (3.6s)
+  ✘   42 [mobile-light] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders embedded chrome in source mode with correct geometry and semantics (4.8s)
+  ✘   43 [mobile-light] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders embedded chrome in split mode with correct geometry and semantics (4.3s)
+  ✘   44 [mobile-light] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders embedded chrome in live mode with correct geometry and semantics (4.6s)
+  ✓   45 [mobile-light] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders embedded chrome in preview mode with correct geometry and semantics (3.7s)
+  ✘   46 [mobile-light] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders minimal chrome in source mode with correct geometry and semantics (4.1s)
+  ✘   47 [mobile-light] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders minimal chrome in live mode with correct geometry and semantics (4.1s)
+  ✘   48 [mobile-light] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders minimal chrome in split mode with correct geometry and semantics (4.7s)
+  ✓   49 [mobile-light] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders minimal chrome in preview mode with correct geometry and semantics (2.4s)
+  ✘   51 [mobile-light] › vue/tests/visual/markdown-editor-chrome.spec.ts:354:13 › markdown editor chrome variants matrix (#429) › stays usable at 150% and 200% zoom (3.5s)
+  ✘   50 [mobile-light] › vue/tests/visual/markdown-editor-chrome.spec.ts:186:13 › markdown editor chrome variants matrix (#429) › keeps one editor instance through rapid mode switches (4.5s)
+  ✘   53 [mobile-light] › vue/tests/visual/markdown-editor-chrome.spec.ts:520:13 › markdown editor chrome variants matrix (#429) › keeps framed geometry under forced colors (2.6s)
+  ✓   54 [mobile-light] › vue/tests/visual/motion-transition-acceptance.spec.ts:25:5 › zoom-in transitions use opacity+translate, no axis scale (3.0s)
+  ✓   56 [mobile-light] › vue/tests/visual/motion-transition-acceptance.spec.ts:72:5 › zoom-in overlay transitions have scale >= 0.98 (2.7s)
+  ✓   55 [mobile-light] › vue/tests/visual/motion-transition-acceptance.spec.ts:50:5 › list transitions use <=8px displacement (3.1s)
+  ✓   58 [mobile-light] › vue/tests/visual/motion-transition-acceptance.spec.ts:106:5 › motion scss compiles without error (1.7s)
+  ✓   57 [mobile-light] › vue/tests/visual/motion-transition-acceptance.spec.ts:94:5 › no transition uses 500ms (2.8s)
+  ✓   59 [desktop-dark] › vue/tests/visual/capture-all.spec.ts:67:7 › capture basic (1.5s)
+  ✓   60 [desktop-dark] › vue/tests/visual/capture-all.spec.ts:67:7 › capture form (2.9s)
+  ✘   61 [desktop-dark] › vue/tests/visual/capture-all.spec.ts:67:7 › capture data (1.8s)
+  ✓   62 [desktop-dark] › vue/tests/visual/capture-all.spec.ts:67:7 › capture navigation (1.9s)
+  ✓   63 [desktop-dark] › vue/tests/visual/capture-all.spec.ts:67:7 › capture feedback (2.2s)
+  ✓   64 [desktop-dark] › vue/tests/visual/capture-all.spec.ts:67:7 › capture others (1.9s)
+  ✓   65 [desktop-dark] › vue/tests/visual/capture-all.spec.ts:67:7 › capture icons (2.0s)
+  ✘   52 [mobile-light] › vue/tests/visual/markdown-editor-chrome.spec.ts:400:13 › markdown editor chrome variants matrix (#429) › renders toolbar, status, and slot visibility contract (24.0s)
+  ✓   66 [desktop-dark] › vue/tests/visual/form-production.spec.ts:63:5 › keeps production form columns aligned for its project viewport and 320px (2.7s)
+  ✓   67 [desktop-dark] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders framed chrome in source mode with correct geometry and semantics (2.0s)
+  ✓   68 [desktop-dark] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders framed chrome in split mode with correct geometry and semantics (2.2s)
+  ✓   70 [desktop-dark] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders framed chrome in preview mode with correct geometry and semantics (2.2s)
+  ✓   69 [desktop-dark] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders framed chrome in live mode with correct geometry and semantics (2.3s)
+  ✓   71 [desktop-dark] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders embedded chrome in source mode with correct geometry and semantics (1.9s)
+  ✓   72 [desktop-dark] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders embedded chrome in live mode with correct geometry and semantics (2.1s)
+  ✓   73 [desktop-dark] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders embedded chrome in split mode with correct geometry and semantics (2.1s)
+  ✓   74 [desktop-dark] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders embedded chrome in preview mode with correct geometry and semantics (2.0s)
+  ✓   75 [desktop-dark] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders minimal chrome in source mode with correct geometry and semantics (2.0s)
+  ✓   76 [desktop-dark] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders minimal chrome in live mode with correct geometry and semantics (1.8s)
+  ✓   77 [desktop-dark] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders minimal chrome in split mode with correct geometry and semantics (1.9s)
+  ✓   78 [desktop-dark] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders minimal chrome in preview mode with correct geometry and semantics (1.9s)
+  ✓   80 [desktop-dark] › vue/tests/visual/markdown-editor-chrome.spec.ts:354:13 › markdown editor chrome variants matrix (#429) › stays usable at 150% and 200% zoom (3.9s)
+  ✘   79 [desktop-dark] › vue/tests/visual/markdown-editor-chrome.spec.ts:186:13 › markdown editor chrome variants matrix (#429) › keeps one editor instance through rapid mode switches (4.9s)
+  ✓   82 [desktop-dark] › vue/tests/visual/markdown-editor-chrome.spec.ts:520:13 › markdown editor chrome variants matrix (#429) › keeps framed geometry under forced colors (1.4s)
+  ✘   84 [desktop-dark] › vue/tests/visual/motion-transition-acceptance.spec.ts:50:5 › list transitions use <=8px displacement (3.0s)
+  ✘   83 [desktop-dark] › vue/tests/visual/motion-transition-acceptance.spec.ts:25:5 › zoom-in transitions use opacity+translate, no axis scale (3.1s)
+  ✘   85 [desktop-dark] › vue/tests/visual/motion-transition-acceptance.spec.ts:94:5 › no transition uses 500ms (3.3s)
+  ✘   86 [desktop-dark] › vue/tests/visual/motion-transition-acceptance.spec.ts:72:5 › zoom-in overlay transitions have scale >= 0.98 (3.4s)
+  ✓   88 [mobile-dark] › vue/tests/visual/capture-all.spec.ts:67:7 › capture basic (1.5s)
+  ✓   87 [desktop-dark] › vue/tests/visual/motion-transition-acceptance.spec.ts:106:5 › motion scss compiles without error (1.7s)
+  ✘   90 [mobile-dark] › vue/tests/visual/capture-all.spec.ts:67:7 › capture data (2.6s)
+  ✓   89 [mobile-dark] › vue/tests/visual/capture-all.spec.ts:67:7 › capture form (4.0s)
+  ✓   91 [mobile-dark] › vue/tests/visual/capture-all.spec.ts:67:7 › capture feedback (3.1s)
+  ✓   92 [mobile-dark] › vue/tests/visual/capture-all.spec.ts:67:7 › capture navigation (2.8s)
+  ✓   93 [mobile-dark] › vue/tests/visual/capture-all.spec.ts:67:7 › capture others (2.3s)
+  ✘   81 [desktop-dark] › vue/tests/visual/markdown-editor-chrome.spec.ts:400:13 › markdown editor chrome variants matrix (#429) › renders toolbar, status, and slot visibility contract (24.1s)
+  ✓   94 [mobile-dark] › vue/tests/visual/capture-all.spec.ts:67:7 › capture icons (4.1s)
+  ✓   95 [mobile-dark] › vue/tests/visual/form-production.spec.ts:63:5 › keeps production form columns aligned for its project viewport and 320px (4.2s)
+  ✘   96 [mobile-dark] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders framed chrome in source mode with correct geometry and semantics (3.4s)
+  ✘   97 [mobile-dark] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders framed chrome in live mode with correct geometry and semantics (3.0s)
+  ✘   98 [mobile-dark] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders framed chrome in split mode with correct geometry and semantics (3.1s)
+  ✓   99 [mobile-dark] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders framed chrome in preview mode with correct geometry and semantics (2.5s)
+  ✘  100 [mobile-dark] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders embedded chrome in source mode with correct geometry and semantics (3.2s)
+  ✘  101 [mobile-dark] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders embedded chrome in live mode with correct geometry and semantics (3.1s)
+  ✘  102 [mobile-dark] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders embedded chrome in split mode with correct geometry and semantics (3.0s)
+  ✓  103 [mobile-dark] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders embedded chrome in preview mode with correct geometry and semantics (3.2s)
+  ✘  104 [mobile-dark] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders minimal chrome in source mode with correct geometry and semantics (3.7s)
+  ✘  105 [mobile-dark] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders minimal chrome in live mode with correct geometry and semantics (4.1s)
+  ✘  106 [mobile-dark] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders minimal chrome in split mode with correct geometry and semantics (4.0s)
+  ✓  107 [mobile-dark] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders minimal chrome in preview mode with correct geometry and semantics (3.0s)
+  ✘  109 [mobile-dark] › vue/tests/visual/markdown-editor-chrome.spec.ts:354:13 › markdown editor chrome variants matrix (#429) › stays usable at 150% and 200% zoom (4.1s)
+  ✘  108 [mobile-dark] › vue/tests/visual/markdown-editor-chrome.spec.ts:186:13 › markdown editor chrome variants matrix (#429) › keeps one editor instance through rapid mode switches (5.7s)
+  ✘  111 [mobile-dark] › vue/tests/visual/markdown-editor-chrome.spec.ts:520:13 › markdown editor chrome variants matrix (#429) › keeps framed geometry under forced colors (2.3s)
+  ✓  112 [mobile-dark] › vue/tests/visual/motion-transition-acceptance.spec.ts:25:5 › zoom-in transitions use opacity+translate, no axis scale (2.7s)
+  ✓  113 [mobile-dark] › vue/tests/visual/motion-transition-acceptance.spec.ts:72:5 › zoom-in overlay transitions have scale >= 0.98 (2.9s)
+  ✓  114 [mobile-dark] › vue/tests/visual/motion-transition-acceptance.spec.ts:50:5 › list transitions use <=8px displacement (3.0s)
+  ✓  116 [mobile-dark] › vue/tests/visual/motion-transition-acceptance.spec.ts:106:5 › motion scss compiles without error (3.2s)
+  ✓  115 [mobile-dark] › vue/tests/visual/motion-transition-acceptance.spec.ts:94:5 › no transition uses 500ms (4.1s)
+  ✘  110 [mobile-dark] › vue/tests/visual/markdown-editor-chrome.spec.ts:400:13 › markdown editor chrome variants matrix (#429) › renders toolbar, status, and slot visibility contract (24.6s)
+
+
+  1) [desktop-light] › vue/tests/visual/capture-all.spec.ts:67:7 › capture data ────────────────────
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoEqual[2m([22m[32mexpected[39m[2m) // deep equality[22m
+
+    [32m- Expected  - 1[39m
+    [31m+ Received  + 6[39m
+
+    [32m- Array [][39m
+    [31m+ Array [[39m
+    [31m+   "requestfailed: GET https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png net::ERR_CERT_AUTHORITY_INVALID",[39m
+    [31m+   "console.error: Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID",[39m
+    [31m+   "requestfailed: GET https://cube.elemecdn.com/9/c2/f0ee8a3c7c9638a54940382568c9dpng.png net::ERR_CERT_AUTHORITY_INVALID",[39m
+    [31m+   "console.error: Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID",[39m
+    [31m+ ][39m
+
+      35 |
+      36 | test.afterEach(async ({ page }) => {
+    > 37 |   expect(diagnostics.get(page) ?? []).toEqual([])
+         |                                       ^
+      38 | })
+      39 |
+      40 | const sections: VisualSection[] = [
+        at /workspace/FsusUI-828-baseline/vue/tests/visual/capture-all.spec.ts:37:39
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-desktop-light/shard-local/capture-all-capture-data-desktop-light/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-desktop-light/shard-local/capture-all-capture-data-desktop-light/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-desktop-light/shard-local/capture-all-capture-data-desktop-light/trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-desktop-light/shard-local/capture-all-capture-data-desktop-light/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2) [desktop-light] › vue/tests/visual/markdown-editor-chrome.spec.ts:186:13 › markdown editor chrome variants matrix (#429) › keeps one editor instance through rapid mode switches 
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoEqual[2m([22m[32mexpected[39m[2m) // deep equality[22m
+
+    [32m- Expected  - 1[39m
+    [31m+ Received  + 3[39m
+
+    [32m- Array [][39m
+    [31m+ Array [[39m
+    [31m+   "requestfailed: GET http://127.0.0.1:5195/assets/markdown-feature-output-gateway-CtVvWhQD.js net::ERR_ABORTED",[39m
+    [31m+ ][39m
+
+      133 |
+      134 | test.afterEach(async ({ page }) => {
+    > 135 |   expect(diagnostics.get(page) ?? []).toEqual([])
+          |                                       ^
+      136 | })
+      137 |
+      138 | test.describe('markdown editor chrome variants matrix (#429)', () => {
+        at /workspace/FsusUI-828-baseline/vue/tests/visual/markdown-editor-chrome.spec.ts:135:39
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-desktop-light/shard-local/markdown-editor-chrome-mar-ef79c-through-rapid-mode-switches-desktop-light/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-desktop-light/shard-local/markdown-editor-chrome-mar-ef79c-through-rapid-mode-switches-desktop-light/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-desktop-light/shard-local/markdown-editor-chrome-mar-ef79c-through-rapid-mode-switches-desktop-light/trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-desktop-light/shard-local/markdown-editor-chrome-mar-ef79c-through-rapid-mode-switches-desktop-light/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  3) [desktop-light] › vue/tests/visual/markdown-editor-chrome.spec.ts:400:13 › markdown editor chrome variants matrix (#429) › renders toolbar, status, and slot visibility contract 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoContainText[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Locator: locator('.el-markdown-editor').getByTestId('chrome-visual-status-slot')
+    Timeout: 20000ms
+    [32m- Expected substring  -  1[39m
+    [31m+ Received string     + 11[39m
+
+    [32m- 已同步到草稿箱[39m
+    [31m+ 227 字 · 45 词 · {[39m
+    [31m+   "mode": "source",[39m
+    [31m+   "readonly": false,[39m
+    [31m+   "disabled": false,[39m
+    [31m+   "loading": false[39m
+    [31m+ } · supported{[39m
+    [31m+   "mode": "source",[39m
+    [31m+   "readonly": false,[39m
+    [31m+   "disabled": false,[39m
+    [31m+   "loading": false[39m
+    [31m+ }[39m
+
+    Call log:
+    [2m  - Expect "toContainText" with timeout 20000ms[22m
+    [2m  - waiting for locator('.el-markdown-editor').getByTestId('chrome-visual-status-slot')[22m
+    [2m    23 × locator resolved to <span data-v-525503f0="" data-testid="chrome-visual-status-slot">227 字 · 45 词 · {↵  "mode": "source",↵  "readonly"…</span>[22m
+    [2m       - unexpected value "227 字 · 45 词 · {[22m
+    [2m  "mode": "source",[22m
+    [2m  "readonly": false,[22m
+    [2m  "disabled": false,[22m
+    [2m  "loading": false[22m
+    [2m} · supported{[22m
+    [2m  "mode": "source",[22m
+    [2m  "readonly": false,[22m
+    [2m  "disabled": false,[22m
+    [2m  "loading": false[22m
+    [2m}"[22m
+
+
+      424 |       await expect(
+      425 |         slotted.getByTestId('chrome-visual-status-slot'),
+    > 426 |       ).toContainText('已同步到草稿箱')
+          |         ^
+      427 |     },
+      428 |   )
+      429 |
+        at /workspace/FsusUI-828-baseline/vue/tests/visual/markdown-editor-chrome.spec.ts:426:9
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-desktop-light/shard-local/markdown-editor-chrome-mar-33728-nd-slot-visibility-contract-desktop-light/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-desktop-light/shard-local/markdown-editor-chrome-mar-33728-nd-slot-visibility-contract-desktop-light/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-desktop-light/shard-local/markdown-editor-chrome-mar-33728-nd-slot-visibility-contract-desktop-light/trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-desktop-light/shard-local/markdown-editor-chrome-mar-33728-nd-slot-visibility-contract-desktop-light/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  4) [desktop-light] › vue/tests/visual/motion-transition-acceptance.spec.ts:25:5 › zoom-in transitions use opacity+translate, no axis scale 
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoEqual[2m([22m[32mexpected[39m[2m) // deep equality[22m
+
+    [32m- Expected  - 1[39m
+    [31m+ Received  + 6[39m
+
+    [32m- Array [][39m
+    [31m+ Array [[39m
+    [31m+   "requestfailed: GET https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png net::ERR_CERT_AUTHORITY_INVALID",[39m
+    [31m+   "console.error: Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID",[39m
+    [31m+   "requestfailed: GET https://cube.elemecdn.com/9/c2/f0ee8a3c7c9638a54940382568c9dpng.png net::ERR_CERT_AUTHORITY_INVALID",[39m
+    [31m+   "console.error: Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID",[39m
+    [31m+ ][39m
+
+      19 |
+      20 | test.afterEach(async ({ page }) => {
+    > 21 |   expect(diagnostics.get(page) ?? []).toEqual([])
+         |                                       ^
+      22 | })
+      23 |
+      24 | // Check compiled CSS for all zoom-in-* transitions
+        at /workspace/FsusUI-828-baseline/vue/tests/visual/motion-transition-acceptance.spec.ts:21:39
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-desktop-light/shard-local/motion-transition-acceptan-ff12f-ity-translate-no-axis-scale-desktop-light/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-desktop-light/shard-local/motion-transition-acceptan-ff12f-ity-translate-no-axis-scale-desktop-light/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-desktop-light/shard-local/motion-transition-acceptan-ff12f-ity-translate-no-axis-scale-desktop-light/trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-desktop-light/shard-local/motion-transition-acceptan-ff12f-ity-translate-no-axis-scale-desktop-light/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  5) [desktop-light] › vue/tests/visual/motion-transition-acceptance.spec.ts:50:5 › list transitions use <=8px displacement 
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoEqual[2m([22m[32mexpected[39m[2m) // deep equality[22m
+
+    [32m- Expected  - 1[39m
+    [31m+ Received  + 6[39m
+
+    [32m- Array [][39m
+    [31m+ Array [[39m
+    [31m+   "requestfailed: GET https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png net::ERR_CERT_AUTHORITY_INVALID",[39m
+    [31m+   "console.error: Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID",[39m
+    [31m+   "requestfailed: GET https://cube.elemecdn.com/9/c2/f0ee8a3c7c9638a54940382568c9dpng.png net::ERR_CERT_AUTHORITY_INVALID",[39m
+    [31m+   "console.error: Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID",[39m
+    [31m+ ][39m
+
+      19 |
+      20 | test.afterEach(async ({ page }) => {
+    > 21 |   expect(diagnostics.get(page) ?? []).toEqual([])
+         |                                       ^
+      22 | })
+      23 |
+      24 | // Check compiled CSS for all zoom-in-* transitions
+        at /workspace/FsusUI-828-baseline/vue/tests/visual/motion-transition-acceptance.spec.ts:21:39
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-desktop-light/shard-local/motion-transition-acceptan-b0716-itions-use-8px-displacement-desktop-light/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-desktop-light/shard-local/motion-transition-acceptan-b0716-itions-use-8px-displacement-desktop-light/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-desktop-light/shard-local/motion-transition-acceptan-b0716-itions-use-8px-displacement-desktop-light/trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-desktop-light/shard-local/motion-transition-acceptan-b0716-itions-use-8px-displacement-desktop-light/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  6) [desktop-light] › vue/tests/visual/motion-transition-acceptance.spec.ts:72:5 › zoom-in overlay transitions have scale >= 0.98 
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoEqual[2m([22m[32mexpected[39m[2m) // deep equality[22m
+
+    [32m- Expected  - 1[39m
+    [31m+ Received  + 6[39m
+
+    [32m- Array [][39m
+    [31m+ Array [[39m
+    [31m+   "requestfailed: GET https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png net::ERR_CERT_AUTHORITY_INVALID",[39m
+    [31m+   "console.error: Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID",[39m
+    [31m+   "requestfailed: GET https://cube.elemecdn.com/9/c2/f0ee8a3c7c9638a54940382568c9dpng.png net::ERR_CERT_AUTHORITY_INVALID",[39m
+    [31m+   "console.error: Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID",[39m
+    [31m+ ][39m
+
+      19 |
+      20 | test.afterEach(async ({ page }) => {
+    > 21 |   expect(diagnostics.get(page) ?? []).toEqual([])
+         |                                       ^
+      22 | })
+      23 |
+      24 | // Check compiled CSS for all zoom-in-* transitions
+        at /workspace/FsusUI-828-baseline/vue/tests/visual/motion-transition-acceptance.spec.ts:21:39
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-desktop-light/shard-local/motion-transition-acceptan-c7dc2-transitions-have-scale-0-98-desktop-light/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-desktop-light/shard-local/motion-transition-acceptan-c7dc2-transitions-have-scale-0-98-desktop-light/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-desktop-light/shard-local/motion-transition-acceptan-c7dc2-transitions-have-scale-0-98-desktop-light/trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-desktop-light/shard-local/motion-transition-acceptan-c7dc2-transitions-have-scale-0-98-desktop-light/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  7) [desktop-light] › vue/tests/visual/motion-transition-acceptance.spec.ts:94:5 › no transition uses 500ms 
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoEqual[2m([22m[32mexpected[39m[2m) // deep equality[22m
+
+    [32m- Expected  - 1[39m
+    [31m+ Received  + 6[39m
+
+    [32m- Array [][39m
+    [31m+ Array [[39m
+    [31m+   "requestfailed: GET https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png net::ERR_CERT_AUTHORITY_INVALID",[39m
+    [31m+   "console.error: Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID",[39m
+    [31m+   "requestfailed: GET https://cube.elemecdn.com/9/c2/f0ee8a3c7c9638a54940382568c9dpng.png net::ERR_CERT_AUTHORITY_INVALID",[39m
+    [31m+   "console.error: Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID",[39m
+    [31m+ ][39m
+
+      19 |
+      20 | test.afterEach(async ({ page }) => {
+    > 21 |   expect(diagnostics.get(page) ?? []).toEqual([])
+         |                                       ^
+      22 | })
+      23 |
+      24 | // Check compiled CSS for all zoom-in-* transitions
+        at /workspace/FsusUI-828-baseline/vue/tests/visual/motion-transition-acceptance.spec.ts:21:39
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-desktop-light/shard-local/motion-transition-acceptance-no-transition-uses-500ms-desktop-light/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-desktop-light/shard-local/motion-transition-acceptance-no-transition-uses-500ms-desktop-light/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-desktop-light/shard-local/motion-transition-acceptance-no-transition-uses-500ms-desktop-light/trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-desktop-light/shard-local/motion-transition-acceptance-no-transition-uses-500ms-desktop-light/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  8) [mobile-light] › vue/tests/visual/capture-all.spec.ts:67:7 › capture data ─────────────────────
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoEqual[2m([22m[32mexpected[39m[2m) // deep equality[22m
+
+    [32m- Expected  - 1[39m
+    [31m+ Received  + 6[39m
+
+    [32m- Array [][39m
+    [31m+ Array [[39m
+    [31m+   "requestfailed: GET https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png net::ERR_CERT_AUTHORITY_INVALID",[39m
+    [31m+   "console.error: Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID",[39m
+    [31m+   "requestfailed: GET https://cube.elemecdn.com/9/c2/f0ee8a3c7c9638a54940382568c9dpng.png net::ERR_CERT_AUTHORITY_INVALID",[39m
+    [31m+   "console.error: Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID",[39m
+    [31m+ ][39m
+
+      35 |
+      36 | test.afterEach(async ({ page }) => {
+    > 37 |   expect(diagnostics.get(page) ?? []).toEqual([])
+         |                                       ^
+      38 | })
+      39 |
+      40 | const sections: VisualSection[] = [
+        at /workspace/FsusUI-828-baseline/vue/tests/visual/capture-all.spec.ts:37:39
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-light/shard-local/capture-all-capture-data-mobile-light/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-light/shard-local/capture-all-capture-data-mobile-light/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-light/shard-local/capture-all-capture-data-mobile-light/trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-light/shard-local/capture-all-capture-data-mobile-light/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  9) [mobile-light] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders framed chrome in source mode with correct geometry and semantics 
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveScreenshot[2m([22m[32mexpected[39m[2m)[22m failed
+
+      18384 pixels (ratio 0.04 of all image pixels) are different.
+
+      Snapshot: chrome-matrix/framed-source.png
+
+    Call log:
+    [2m  - Expect "toHaveScreenshot(chrome-matrix/framed-source.png)" with timeout 20000ms[22m
+    [2m    - verifying given screenshot expectation[22m
+    [2m  - taking page screenshot[22m
+    [2m    - disabled all CSS animations[22m
+    [2m  - waiting for fonts to load...[22m
+    [2m  - fonts loaded[22m
+    [2m  - 18384 pixels (ratio 0.04 of all image pixels) are different.[22m
+    [2m  - waiting 100ms before taking screenshot[22m
+    [2m  - taking page screenshot[22m
+    [2m    - disabled all CSS animations[22m
+    [2m  - waiting for fonts to load...[22m
+    [2m  - fonts loaded[22m
+    [2m  - captured a stable screenshot[22m
+    [2m  - 18384 pixels (ratio 0.04 of all image pixels) are different.[22m
+
+
+      175 |           }
+      176 |
+    > 177 |           await expect(page).toHaveScreenshot([
+          |                              ^
+      178 |             'chrome-matrix',
+      179 |             `${chrome}-${mode}.png`,
+      180 |           ])
+        at /workspace/FsusUI-828-baseline/vue/tests/visual/markdown-editor-chrome.spec.ts:177:30
+
+    attachment #1: chrome-matrix/framed-source (image/png) ─────────────────────────────────────────
+    Expected: vue/tests/visual/markdown-editor-chrome.spec.ts-snapshots/chrome-matrix/framed-source-mobile-light-linux.png
+    Received: vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-light/shard-local/markdown-editor-chrome-mar-cd2a8-rect-geometry-and-semantics-mobile-light/chrome-matrix/framed-source-actual.png
+    Diff:     vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-light/shard-local/markdown-editor-chrome-mar-cd2a8-rect-geometry-and-semantics-mobile-light/chrome-matrix/framed-source-diff.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-light/shard-local/markdown-editor-chrome-mar-cd2a8-rect-geometry-and-semantics-mobile-light/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-light/shard-local/markdown-editor-chrome-mar-cd2a8-rect-geometry-and-semantics-mobile-light/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-light/shard-local/markdown-editor-chrome-mar-cd2a8-rect-geometry-and-semantics-mobile-light/trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-light/shard-local/markdown-editor-chrome-mar-cd2a8-rect-geometry-and-semantics-mobile-light/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  10) [mobile-light] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders framed chrome in live mode with correct geometry and semantics 
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveScreenshot[2m([22m[32mexpected[39m[2m)[22m failed
+
+      18385 pixels (ratio 0.04 of all image pixels) are different.
+
+      Snapshot: chrome-matrix/framed-live.png
+
+    Call log:
+    [2m  - Expect "toHaveScreenshot(chrome-matrix/framed-live.png)" with timeout 20000ms[22m
+    [2m    - verifying given screenshot expectation[22m
+    [2m  - taking page screenshot[22m
+    [2m    - disabled all CSS animations[22m
+    [2m  - waiting for fonts to load...[22m
+    [2m  - fonts loaded[22m
+    [2m  - 18385 pixels (ratio 0.04 of all image pixels) are different.[22m
+    [2m  - waiting 100ms before taking screenshot[22m
+    [2m  - taking page screenshot[22m
+    [2m    - disabled all CSS animations[22m
+    [2m  - waiting for fonts to load...[22m
+    [2m  - fonts loaded[22m
+    [2m  - captured a stable screenshot[22m
+    [2m  - 18385 pixels (ratio 0.04 of all image pixels) are different.[22m
+
+
+      175 |           }
+      176 |
+    > 177 |           await expect(page).toHaveScreenshot([
+          |                              ^
+      178 |             'chrome-matrix',
+      179 |             `${chrome}-${mode}.png`,
+      180 |           ])
+        at /workspace/FsusUI-828-baseline/vue/tests/visual/markdown-editor-chrome.spec.ts:177:30
+
+    attachment #1: chrome-matrix/framed-live (image/png) ───────────────────────────────────────────
+    Expected: vue/tests/visual/markdown-editor-chrome.spec.ts-snapshots/chrome-matrix/framed-live-mobile-light-linux.png
+    Received: vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-light/shard-local/markdown-editor-chrome-mar-03ee5-rect-geometry-and-semantics-mobile-light/chrome-matrix/framed-live-actual.png
+    Diff:     vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-light/shard-local/markdown-editor-chrome-mar-03ee5-rect-geometry-and-semantics-mobile-light/chrome-matrix/framed-live-diff.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-light/shard-local/markdown-editor-chrome-mar-03ee5-rect-geometry-and-semantics-mobile-light/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-light/shard-local/markdown-editor-chrome-mar-03ee5-rect-geometry-and-semantics-mobile-light/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-light/shard-local/markdown-editor-chrome-mar-03ee5-rect-geometry-and-semantics-mobile-light/trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-light/shard-local/markdown-editor-chrome-mar-03ee5-rect-geometry-and-semantics-mobile-light/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  11) [mobile-light] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders framed chrome in split mode with correct geometry and semantics 
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveScreenshot[2m([22m[32mexpected[39m[2m)[22m failed
+
+      27136 pixels (ratio 0.06 of all image pixels) are different.
+
+      Snapshot: chrome-matrix/framed-split.png
+
+    Call log:
+    [2m  - Expect "toHaveScreenshot(chrome-matrix/framed-split.png)" with timeout 20000ms[22m
+    [2m    - verifying given screenshot expectation[22m
+    [2m  - taking page screenshot[22m
+    [2m    - disabled all CSS animations[22m
+    [2m  - waiting for fonts to load...[22m
+    [2m  - fonts loaded[22m
+    [2m  - 27136 pixels (ratio 0.06 of all image pixels) are different.[22m
+    [2m  - waiting 100ms before taking screenshot[22m
+    [2m  - taking page screenshot[22m
+    [2m    - disabled all CSS animations[22m
+    [2m  - waiting for fonts to load...[22m
+    [2m  - fonts loaded[22m
+    [2m  - captured a stable screenshot[22m
+    [2m  - 27136 pixels (ratio 0.06 of all image pixels) are different.[22m
+
+
+      175 |           }
+      176 |
+    > 177 |           await expect(page).toHaveScreenshot([
+          |                              ^
+      178 |             'chrome-matrix',
+      179 |             `${chrome}-${mode}.png`,
+      180 |           ])
+        at /workspace/FsusUI-828-baseline/vue/tests/visual/markdown-editor-chrome.spec.ts:177:30
+
+    attachment #1: chrome-matrix/framed-split (image/png) ──────────────────────────────────────────
+    Expected: vue/tests/visual/markdown-editor-chrome.spec.ts-snapshots/chrome-matrix/framed-split-mobile-light-linux.png
+    Received: vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-light/shard-local/markdown-editor-chrome-mar-76014-rect-geometry-and-semantics-mobile-light/chrome-matrix/framed-split-actual.png
+    Diff:     vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-light/shard-local/markdown-editor-chrome-mar-76014-rect-geometry-and-semantics-mobile-light/chrome-matrix/framed-split-diff.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-light/shard-local/markdown-editor-chrome-mar-76014-rect-geometry-and-semantics-mobile-light/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-light/shard-local/markdown-editor-chrome-mar-76014-rect-geometry-and-semantics-mobile-light/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-light/shard-local/markdown-editor-chrome-mar-76014-rect-geometry-and-semantics-mobile-light/trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-light/shard-local/markdown-editor-chrome-mar-76014-rect-geometry-and-semantics-mobile-light/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  12) [mobile-light] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders embedded chrome in source mode with correct geometry and semantics 
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveScreenshot[2m([22m[32mexpected[39m[2m)[22m failed
+
+      18152 pixels (ratio 0.04 of all image pixels) are different.
+
+      Snapshot: chrome-matrix/embedded-source.png
+
+    Call log:
+    [2m  - Expect "toHaveScreenshot(chrome-matrix/embedded-source.png)" with timeout 20000ms[22m
+    [2m    - verifying given screenshot expectation[22m
+    [2m  - taking page screenshot[22m
+    [2m    - disabled all CSS animations[22m
+    [2m  - waiting for fonts to load...[22m
+    [2m  - fonts loaded[22m
+    [2m  - 18152 pixels (ratio 0.04 of all image pixels) are different.[22m
+    [2m  - waiting 100ms before taking screenshot[22m
+    [2m  - taking page screenshot[22m
+    [2m    - disabled all CSS animations[22m
+    [2m  - waiting for fonts to load...[22m
+    [2m  - fonts loaded[22m
+    [2m  - captured a stable screenshot[22m
+    [2m  - 18152 pixels (ratio 0.04 of all image pixels) are different.[22m
+
+
+      175 |           }
+      176 |
+    > 177 |           await expect(page).toHaveScreenshot([
+          |                              ^
+      178 |             'chrome-matrix',
+      179 |             `${chrome}-${mode}.png`,
+      180 |           ])
+        at /workspace/FsusUI-828-baseline/vue/tests/visual/markdown-editor-chrome.spec.ts:177:30
+
+    attachment #1: chrome-matrix/embedded-source (image/png) ───────────────────────────────────────
+    Expected: vue/tests/visual/markdown-editor-chrome.spec.ts-snapshots/chrome-matrix/embedded-source-mobile-light-linux.png
+    Received: vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-light/shard-local/markdown-editor-chrome-mar-40855-rect-geometry-and-semantics-mobile-light/chrome-matrix/embedded-source-actual.png
+    Diff:     vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-light/shard-local/markdown-editor-chrome-mar-40855-rect-geometry-and-semantics-mobile-light/chrome-matrix/embedded-source-diff.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-light/shard-local/markdown-editor-chrome-mar-40855-rect-geometry-and-semantics-mobile-light/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-light/shard-local/markdown-editor-chrome-mar-40855-rect-geometry-and-semantics-mobile-light/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-light/shard-local/markdown-editor-chrome-mar-40855-rect-geometry-and-semantics-mobile-light/trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-light/shard-local/markdown-editor-chrome-mar-40855-rect-geometry-and-semantics-mobile-light/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  13) [mobile-light] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders embedded chrome in live mode with correct geometry and semantics 
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveScreenshot[2m([22m[32mexpected[39m[2m)[22m failed
+
+      18153 pixels (ratio 0.04 of all image pixels) are different.
+
+      Snapshot: chrome-matrix/embedded-live.png
+
+    Call log:
+    [2m  - Expect "toHaveScreenshot(chrome-matrix/embedded-live.png)" with timeout 20000ms[22m
+    [2m    - verifying given screenshot expectation[22m
+    [2m  - taking page screenshot[22m
+    [2m    - disabled all CSS animations[22m
+    [2m  - waiting for fonts to load...[22m
+    [2m  - fonts loaded[22m
+    [2m  - 18153 pixels (ratio 0.04 of all image pixels) are different.[22m
+    [2m  - waiting 100ms before taking screenshot[22m
+    [2m  - taking page screenshot[22m
+    [2m    - disabled all CSS animations[22m
+    [2m  - waiting for fonts to load...[22m
+    [2m  - fonts loaded[22m
+    [2m  - captured a stable screenshot[22m
+    [2m  - 18153 pixels (ratio 0.04 of all image pixels) are different.[22m
+
+
+      175 |           }
+      176 |
+    > 177 |           await expect(page).toHaveScreenshot([
+          |                              ^
+      178 |             'chrome-matrix',
+      179 |             `${chrome}-${mode}.png`,
+      180 |           ])
+        at /workspace/FsusUI-828-baseline/vue/tests/visual/markdown-editor-chrome.spec.ts:177:30
+
+    attachment #1: chrome-matrix/embedded-live (image/png) ─────────────────────────────────────────
+    Expected: vue/tests/visual/markdown-editor-chrome.spec.ts-snapshots/chrome-matrix/embedded-live-mobile-light-linux.png
+    Received: vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-light/shard-local/markdown-editor-chrome-mar-9563a-rect-geometry-and-semantics-mobile-light/chrome-matrix/embedded-live-actual.png
+    Diff:     vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-light/shard-local/markdown-editor-chrome-mar-9563a-rect-geometry-and-semantics-mobile-light/chrome-matrix/embedded-live-diff.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-light/shard-local/markdown-editor-chrome-mar-9563a-rect-geometry-and-semantics-mobile-light/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-light/shard-local/markdown-editor-chrome-mar-9563a-rect-geometry-and-semantics-mobile-light/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-light/shard-local/markdown-editor-chrome-mar-9563a-rect-geometry-and-semantics-mobile-light/trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-light/shard-local/markdown-editor-chrome-mar-9563a-rect-geometry-and-semantics-mobile-light/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  14) [mobile-light] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders embedded chrome in split mode with correct geometry and semantics 
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveScreenshot[2m([22m[32mexpected[39m[2m)[22m failed
+
+      28902 pixels (ratio 0.06 of all image pixels) are different.
+
+      Snapshot: chrome-matrix/embedded-split.png
+
+    Call log:
+    [2m  - Expect "toHaveScreenshot(chrome-matrix/embedded-split.png)" with timeout 20000ms[22m
+    [2m    - verifying given screenshot expectation[22m
+    [2m  - taking page screenshot[22m
+    [2m    - disabled all CSS animations[22m
+    [2m  - waiting for fonts to load...[22m
+    [2m  - fonts loaded[22m
+    [2m  - 28902 pixels (ratio 0.06 of all image pixels) are different.[22m
+    [2m  - waiting 100ms before taking screenshot[22m
+    [2m  - taking page screenshot[22m
+    [2m    - disabled all CSS animations[22m
+    [2m  - waiting for fonts to load...[22m
+    [2m  - fonts loaded[22m
+    [2m  - captured a stable screenshot[22m
+    [2m  - 28902 pixels (ratio 0.06 of all image pixels) are different.[22m
+
+
+      175 |           }
+      176 |
+    > 177 |           await expect(page).toHaveScreenshot([
+          |                              ^
+      178 |             'chrome-matrix',
+      179 |             `${chrome}-${mode}.png`,
+      180 |           ])
+        at /workspace/FsusUI-828-baseline/vue/tests/visual/markdown-editor-chrome.spec.ts:177:30
+
+    attachment #1: chrome-matrix/embedded-split (image/png) ────────────────────────────────────────
+    Expected: vue/tests/visual/markdown-editor-chrome.spec.ts-snapshots/chrome-matrix/embedded-split-mobile-light-linux.png
+    Received: vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-light/shard-local/markdown-editor-chrome-mar-e19e3-rect-geometry-and-semantics-mobile-light/chrome-matrix/embedded-split-actual.png
+    Diff:     vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-light/shard-local/markdown-editor-chrome-mar-e19e3-rect-geometry-and-semantics-mobile-light/chrome-matrix/embedded-split-diff.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-light/shard-local/markdown-editor-chrome-mar-e19e3-rect-geometry-and-semantics-mobile-light/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-light/shard-local/markdown-editor-chrome-mar-e19e3-rect-geometry-and-semantics-mobile-light/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-light/shard-local/markdown-editor-chrome-mar-e19e3-rect-geometry-and-semantics-mobile-light/trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-light/shard-local/markdown-editor-chrome-mar-e19e3-rect-geometry-and-semantics-mobile-light/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  15) [mobile-light] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders minimal chrome in source mode with correct geometry and semantics 
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveScreenshot[2m([22m[32mexpected[39m[2m)[22m failed
+
+      17761 pixels (ratio 0.04 of all image pixels) are different.
+
+      Snapshot: chrome-matrix/minimal-source.png
+
+    Call log:
+    [2m  - Expect "toHaveScreenshot(chrome-matrix/minimal-source.png)" with timeout 20000ms[22m
+    [2m    - verifying given screenshot expectation[22m
+    [2m  - taking page screenshot[22m
+    [2m    - disabled all CSS animations[22m
+    [2m  - waiting for fonts to load...[22m
+    [2m  - fonts loaded[22m
+    [2m  - 17761 pixels (ratio 0.04 of all image pixels) are different.[22m
+    [2m  - waiting 100ms before taking screenshot[22m
+    [2m  - taking page screenshot[22m
+    [2m    - disabled all CSS animations[22m
+    [2m  - waiting for fonts to load...[22m
+    [2m  - fonts loaded[22m
+    [2m  - captured a stable screenshot[22m
+    [2m  - 17761 pixels (ratio 0.04 of all image pixels) are different.[22m
+
+
+      175 |           }
+      176 |
+    > 177 |           await expect(page).toHaveScreenshot([
+          |                              ^
+      178 |             'chrome-matrix',
+      179 |             `${chrome}-${mode}.png`,
+      180 |           ])
+        at /workspace/FsusUI-828-baseline/vue/tests/visual/markdown-editor-chrome.spec.ts:177:30
+
+    attachment #1: chrome-matrix/minimal-source (image/png) ────────────────────────────────────────
+    Expected: vue/tests/visual/markdown-editor-chrome.spec.ts-snapshots/chrome-matrix/minimal-source-mobile-light-linux.png
+    Received: vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-light/shard-local/markdown-editor-chrome-mar-db242-rect-geometry-and-semantics-mobile-light/chrome-matrix/minimal-source-actual.png
+    Diff:     vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-light/shard-local/markdown-editor-chrome-mar-db242-rect-geometry-and-semantics-mobile-light/chrome-matrix/minimal-source-diff.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-light/shard-local/markdown-editor-chrome-mar-db242-rect-geometry-and-semantics-mobile-light/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-light/shard-local/markdown-editor-chrome-mar-db242-rect-geometry-and-semantics-mobile-light/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-light/shard-local/markdown-editor-chrome-mar-db242-rect-geometry-and-semantics-mobile-light/trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-light/shard-local/markdown-editor-chrome-mar-db242-rect-geometry-and-semantics-mobile-light/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  16) [mobile-light] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders minimal chrome in live mode with correct geometry and semantics 
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveScreenshot[2m([22m[32mexpected[39m[2m)[22m failed
+
+      17761 pixels (ratio 0.04 of all image pixels) are different.
+
+      Snapshot: chrome-matrix/minimal-live.png
+
+    Call log:
+    [2m  - Expect "toHaveScreenshot(chrome-matrix/minimal-live.png)" with timeout 20000ms[22m
+    [2m    - verifying given screenshot expectation[22m
+    [2m  - taking page screenshot[22m
+    [2m    - disabled all CSS animations[22m
+    [2m  - waiting for fonts to load...[22m
+    [2m  - fonts loaded[22m
+    [2m  - 17761 pixels (ratio 0.04 of all image pixels) are different.[22m
+    [2m  - waiting 100ms before taking screenshot[22m
+    [2m  - taking page screenshot[22m
+    [2m    - disabled all CSS animations[22m
+    [2m  - waiting for fonts to load...[22m
+    [2m  - fonts loaded[22m
+    [2m  - captured a stable screenshot[22m
+    [2m  - 17761 pixels (ratio 0.04 of all image pixels) are different.[22m
+
+
+      175 |           }
+      176 |
+    > 177 |           await expect(page).toHaveScreenshot([
+          |                              ^
+      178 |             'chrome-matrix',
+      179 |             `${chrome}-${mode}.png`,
+      180 |           ])
+        at /workspace/FsusUI-828-baseline/vue/tests/visual/markdown-editor-chrome.spec.ts:177:30
+
+    attachment #1: chrome-matrix/minimal-live (image/png) ──────────────────────────────────────────
+    Expected: vue/tests/visual/markdown-editor-chrome.spec.ts-snapshots/chrome-matrix/minimal-live-mobile-light-linux.png
+    Received: vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-light/shard-local/markdown-editor-chrome-mar-82321-rect-geometry-and-semantics-mobile-light/chrome-matrix/minimal-live-actual.png
+    Diff:     vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-light/shard-local/markdown-editor-chrome-mar-82321-rect-geometry-and-semantics-mobile-light/chrome-matrix/minimal-live-diff.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-light/shard-local/markdown-editor-chrome-mar-82321-rect-geometry-and-semantics-mobile-light/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-light/shard-local/markdown-editor-chrome-mar-82321-rect-geometry-and-semantics-mobile-light/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-light/shard-local/markdown-editor-chrome-mar-82321-rect-geometry-and-semantics-mobile-light/trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-light/shard-local/markdown-editor-chrome-mar-82321-rect-geometry-and-semantics-mobile-light/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  17) [mobile-light] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders minimal chrome in split mode with correct geometry and semantics 
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveScreenshot[2m([22m[32mexpected[39m[2m)[22m failed
+
+      32906 pixels (ratio 0.07 of all image pixels) are different.
+
+      Snapshot: chrome-matrix/minimal-split.png
+
+    Call log:
+    [2m  - Expect "toHaveScreenshot(chrome-matrix/minimal-split.png)" with timeout 20000ms[22m
+    [2m    - verifying given screenshot expectation[22m
+    [2m  - taking page screenshot[22m
+    [2m    - disabled all CSS animations[22m
+    [2m  - waiting for fonts to load...[22m
+    [2m  - fonts loaded[22m
+    [2m  - 32906 pixels (ratio 0.07 of all image pixels) are different.[22m
+    [2m  - waiting 100ms before taking screenshot[22m
+    [2m  - taking page screenshot[22m
+    [2m    - disabled all CSS animations[22m
+    [2m  - waiting for fonts to load...[22m
+    [2m  - fonts loaded[22m
+    [2m  - captured a stable screenshot[22m
+    [2m  - 32906 pixels (ratio 0.07 of all image pixels) are different.[22m
+
+
+      175 |           }
+      176 |
+    > 177 |           await expect(page).toHaveScreenshot([
+          |                              ^
+      178 |             'chrome-matrix',
+      179 |             `${chrome}-${mode}.png`,
+      180 |           ])
+        at /workspace/FsusUI-828-baseline/vue/tests/visual/markdown-editor-chrome.spec.ts:177:30
+
+    attachment #1: chrome-matrix/minimal-split (image/png) ─────────────────────────────────────────
+    Expected: vue/tests/visual/markdown-editor-chrome.spec.ts-snapshots/chrome-matrix/minimal-split-mobile-light-linux.png
+    Received: vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-light/shard-local/markdown-editor-chrome-mar-23d8b-rect-geometry-and-semantics-mobile-light/chrome-matrix/minimal-split-actual.png
+    Diff:     vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-light/shard-local/markdown-editor-chrome-mar-23d8b-rect-geometry-and-semantics-mobile-light/chrome-matrix/minimal-split-diff.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-light/shard-local/markdown-editor-chrome-mar-23d8b-rect-geometry-and-semantics-mobile-light/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-light/shard-local/markdown-editor-chrome-mar-23d8b-rect-geometry-and-semantics-mobile-light/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-light/shard-local/markdown-editor-chrome-mar-23d8b-rect-geometry-and-semantics-mobile-light/trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-light/shard-local/markdown-editor-chrome-mar-23d8b-rect-geometry-and-semantics-mobile-light/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  18) [mobile-light] › vue/tests/visual/markdown-editor-chrome.spec.ts:186:13 › markdown editor chrome variants matrix (#429) › keeps one editor instance through rapid mode switches 
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoEqual[2m([22m[32mexpected[39m[2m) // deep equality[22m
+
+    [32m- Expected  - 1[39m
+    [31m+ Received  + 8[39m
+
+    [32m- Array [][39m
+    [31m+ Array [[39m
+    [31m+   "requestfailed: GET http://127.0.0.1:5195/assets/typescript-BqvgUolh.js net::ERR_ABORTED",[39m
+    [31m+   "requestfailed: GET http://127.0.0.1:5195/assets/typescript-BqvgUolh.js net::ERR_ABORTED",[39m
+    [31m+   "requestfailed: GET http://127.0.0.1:5195/assets/github-light-Rcb2q3L5.js net::ERR_ABORTED",[39m
+    [31m+   "requestfailed: GET http://127.0.0.1:5195/assets/markdown-feature-output-gateway-CtVvWhQD.js net::ERR_ABORTED",[39m
+    [31m+   "requestfailed: GET http://127.0.0.1:5195/assets/markdown-feature-output-gateway-CtVvWhQD.js net::ERR_ABORTED",[39m
+    [31m+   "requestfailed: GET http://127.0.0.1:5195/assets/markdown-feature-output-gateway-CtVvWhQD.js net::ERR_ABORTED",[39m
+    [31m+ ][39m
+
+      133 |
+      134 | test.afterEach(async ({ page }) => {
+    > 135 |   expect(diagnostics.get(page) ?? []).toEqual([])
+          |                                       ^
+      136 | })
+      137 |
+      138 | test.describe('markdown editor chrome variants matrix (#429)', () => {
+        at /workspace/FsusUI-828-baseline/vue/tests/visual/markdown-editor-chrome.spec.ts:135:39
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-light/shard-local/markdown-editor-chrome-mar-ef79c-through-rapid-mode-switches-mobile-light/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-light/shard-local/markdown-editor-chrome-mar-ef79c-through-rapid-mode-switches-mobile-light/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-light/shard-local/markdown-editor-chrome-mar-ef79c-through-rapid-mode-switches-mobile-light/trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-light/shard-local/markdown-editor-chrome-mar-ef79c-through-rapid-mode-switches-mobile-light/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  19) [mobile-light] › vue/tests/visual/markdown-editor-chrome.spec.ts:354:13 › markdown editor chrome variants matrix (#429) › stays usable at 150% and 200% zoom 
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveScreenshot[2m([22m[32mexpected[39m[2m)[22m failed
+
+      26020 pixels (ratio 0.06 of all image pixels) are different.
+
+      Snapshot: chrome-evidence/zoom-150.png
+
+    Call log:
+    [2m  - Expect "toHaveScreenshot(chrome-evidence/zoom-150.png)" with timeout 20000ms[22m
+    [2m    - verifying given screenshot expectation[22m
+    [2m  - taking page screenshot[22m
+    [2m    - disabled all CSS animations[22m
+    [2m  - waiting for fonts to load...[22m
+    [2m  - fonts loaded[22m
+    [2m  - 26020 pixels (ratio 0.06 of all image pixels) are different.[22m
+    [2m  - waiting 100ms before taking screenshot[22m
+    [2m  - taking page screenshot[22m
+    [2m    - disabled all CSS animations[22m
+    [2m  - waiting for fonts to load...[22m
+    [2m  - fonts loaded[22m
+    [2m  - captured a stable screenshot[22m
+    [2m  - 26020 pixels (ratio 0.06 of all image pixels) are different.[22m
+
+
+      369 |         })
+      370 |         expect(overflow).toBeLessThanOrEqual(1)
+    > 371 |         await expect(page).toHaveScreenshot([
+          |                            ^
+      372 |           'chrome-evidence',
+      373 |           `zoom-${Math.round(zoom * 100)}.png`,
+      374 |         ])
+        at /workspace/FsusUI-828-baseline/vue/tests/visual/markdown-editor-chrome.spec.ts:371:28
+
+    attachment #1: chrome-evidence/zoom-150 (image/png) ────────────────────────────────────────────
+    Expected: vue/tests/visual/markdown-editor-chrome.spec.ts-snapshots/chrome-evidence/zoom-150-mobile-light-linux.png
+    Received: vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-light/shard-local/markdown-editor-chrome-mar-b0df0--usable-at-150-and-200-zoom-mobile-light/chrome-evidence/zoom-150-actual.png
+    Diff:     vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-light/shard-local/markdown-editor-chrome-mar-b0df0--usable-at-150-and-200-zoom-mobile-light/chrome-evidence/zoom-150-diff.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-light/shard-local/markdown-editor-chrome-mar-b0df0--usable-at-150-and-200-zoom-mobile-light/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-light/shard-local/markdown-editor-chrome-mar-b0df0--usable-at-150-and-200-zoom-mobile-light/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-light/shard-local/markdown-editor-chrome-mar-b0df0--usable-at-150-and-200-zoom-mobile-light/trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-light/shard-local/markdown-editor-chrome-mar-b0df0--usable-at-150-and-200-zoom-mobile-light/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  20) [mobile-light] › vue/tests/visual/markdown-editor-chrome.spec.ts:400:13 › markdown editor chrome variants matrix (#429) › renders toolbar, status, and slot visibility contract 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoContainText[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Locator: locator('.el-markdown-editor').getByTestId('chrome-visual-status-slot')
+    Timeout: 20000ms
+    [32m- Expected substring  -  1[39m
+    [31m+ Received string     + 11[39m
+
+    [32m- 已同步到草稿箱[39m
+    [31m+ 227 字 · 45 词 · {[39m
+    [31m+   "mode": "source",[39m
+    [31m+   "readonly": false,[39m
+    [31m+   "disabled": false,[39m
+    [31m+   "loading": false[39m
+    [31m+ } · supported{[39m
+    [31m+   "mode": "source",[39m
+    [31m+   "readonly": false,[39m
+    [31m+   "disabled": false,[39m
+    [31m+   "loading": false[39m
+    [31m+ }[39m
+
+    Call log:
+    [2m  - Expect "toContainText" with timeout 20000ms[22m
+    [2m  - waiting for locator('.el-markdown-editor').getByTestId('chrome-visual-status-slot')[22m
+    [2m    23 × locator resolved to <span data-v-525503f0="" data-testid="chrome-visual-status-slot">227 字 · 45 词 · {↵  "mode": "source",↵  "readonly"…</span>[22m
+    [2m       - unexpected value "227 字 · 45 词 · {[22m
+    [2m  "mode": "source",[22m
+    [2m  "readonly": false,[22m
+    [2m  "disabled": false,[22m
+    [2m  "loading": false[22m
+    [2m} · supported{[22m
+    [2m  "mode": "source",[22m
+    [2m  "readonly": false,[22m
+    [2m  "disabled": false,[22m
+    [2m  "loading": false[22m
+    [2m}"[22m
+
+
+      424 |       await expect(
+      425 |         slotted.getByTestId('chrome-visual-status-slot'),
+    > 426 |       ).toContainText('已同步到草稿箱')
+          |         ^
+      427 |     },
+      428 |   )
+      429 |
+        at /workspace/FsusUI-828-baseline/vue/tests/visual/markdown-editor-chrome.spec.ts:426:9
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-light/shard-local/markdown-editor-chrome-mar-33728-nd-slot-visibility-contract-mobile-light/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-light/shard-local/markdown-editor-chrome-mar-33728-nd-slot-visibility-contract-mobile-light/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-light/shard-local/markdown-editor-chrome-mar-33728-nd-slot-visibility-contract-mobile-light/trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-light/shard-local/markdown-editor-chrome-mar-33728-nd-slot-visibility-contract-mobile-light/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  21) [mobile-light] › vue/tests/visual/markdown-editor-chrome.spec.ts:520:13 › markdown editor chrome variants matrix (#429) › keeps framed geometry under forced colors 
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveScreenshot[2m([22m[32mexpected[39m[2m)[22m failed
+
+      21486 pixels (ratio 0.05 of all image pixels) are different.
+
+      Snapshot: chrome-evidence/forced-colors.png
+
+    Call log:
+    [2m  - Expect "toHaveScreenshot(chrome-evidence/forced-colors.png)" with timeout 20000ms[22m
+    [2m    - verifying given screenshot expectation[22m
+    [2m  - taking page screenshot[22m
+    [2m    - disabled all CSS animations[22m
+    [2m  - waiting for fonts to load...[22m
+    [2m  - fonts loaded[22m
+    [2m  - 21486 pixels (ratio 0.05 of all image pixels) are different.[22m
+    [2m  - waiting 100ms before taking screenshot[22m
+    [2m  - taking page screenshot[22m
+    [2m    - disabled all CSS animations[22m
+    [2m  - waiting for fonts to load...[22m
+    [2m  - fonts loaded[22m
+    [2m  - captured a stable screenshot[22m
+    [2m  - 21486 pixels (ratio 0.05 of all image pixels) are different.[22m
+
+
+      531 |       })
+      532 |       expect(border.style).not.toBe('none')
+    > 533 |       await expect(page).toHaveScreenshot([
+          |                          ^
+      534 |         'chrome-evidence',
+      535 |         'forced-colors.png',
+      536 |       ])
+        at /workspace/FsusUI-828-baseline/vue/tests/visual/markdown-editor-chrome.spec.ts:533:26
+
+    attachment #1: chrome-evidence/forced-colors (image/png) ───────────────────────────────────────
+    Expected: vue/tests/visual/markdown-editor-chrome.spec.ts-snapshots/chrome-evidence/forced-colors-mobile-light-linux.png
+    Received: vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-light/shard-local/markdown-editor-chrome-mar-7ab56-eometry-under-forced-colors-mobile-light/chrome-evidence/forced-colors-actual.png
+    Diff:     vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-light/shard-local/markdown-editor-chrome-mar-7ab56-eometry-under-forced-colors-mobile-light/chrome-evidence/forced-colors-diff.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-light/shard-local/markdown-editor-chrome-mar-7ab56-eometry-under-forced-colors-mobile-light/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-light/shard-local/markdown-editor-chrome-mar-7ab56-eometry-under-forced-colors-mobile-light/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-light/shard-local/markdown-editor-chrome-mar-7ab56-eometry-under-forced-colors-mobile-light/trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-light/shard-local/markdown-editor-chrome-mar-7ab56-eometry-under-forced-colors-mobile-light/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  22) [desktop-dark] › vue/tests/visual/capture-all.spec.ts:67:7 › capture data ────────────────────
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoEqual[2m([22m[32mexpected[39m[2m) // deep equality[22m
+
+    [32m- Expected  - 1[39m
+    [31m+ Received  + 6[39m
+
+    [32m- Array [][39m
+    [31m+ Array [[39m
+    [31m+   "requestfailed: GET https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png net::ERR_CERT_AUTHORITY_INVALID",[39m
+    [31m+   "console.error: Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID",[39m
+    [31m+   "requestfailed: GET https://cube.elemecdn.com/9/c2/f0ee8a3c7c9638a54940382568c9dpng.png net::ERR_CERT_AUTHORITY_INVALID",[39m
+    [31m+   "console.error: Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID",[39m
+    [31m+ ][39m
+
+      35 |
+      36 | test.afterEach(async ({ page }) => {
+    > 37 |   expect(diagnostics.get(page) ?? []).toEqual([])
+         |                                       ^
+      38 | })
+      39 |
+      40 | const sections: VisualSection[] = [
+        at /workspace/FsusUI-828-baseline/vue/tests/visual/capture-all.spec.ts:37:39
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-desktop-dark/shard-local/capture-all-capture-data-desktop-dark/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-desktop-dark/shard-local/capture-all-capture-data-desktop-dark/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-desktop-dark/shard-local/capture-all-capture-data-desktop-dark/trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-desktop-dark/shard-local/capture-all-capture-data-desktop-dark/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  23) [desktop-dark] › vue/tests/visual/markdown-editor-chrome.spec.ts:186:13 › markdown editor chrome variants matrix (#429) › keeps one editor instance through rapid mode switches 
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoEqual[2m([22m[32mexpected[39m[2m) // deep equality[22m
+
+    [32m- Expected  - 1[39m
+    [31m+ Received  + 4[39m
+
+    [32m- Array [][39m
+    [31m+ Array [[39m
+    [31m+   "requestfailed: GET http://127.0.0.1:5195/assets/github-dark-BQV5ugrc.js net::ERR_ABORTED",[39m
+    [31m+   "requestfailed: GET http://127.0.0.1:5195/assets/typescript-BqvgUolh.js net::ERR_ABORTED",[39m
+    [31m+ ][39m
+
+      133 |
+      134 | test.afterEach(async ({ page }) => {
+    > 135 |   expect(diagnostics.get(page) ?? []).toEqual([])
+          |                                       ^
+      136 | })
+      137 |
+      138 | test.describe('markdown editor chrome variants matrix (#429)', () => {
+        at /workspace/FsusUI-828-baseline/vue/tests/visual/markdown-editor-chrome.spec.ts:135:39
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-desktop-dark/shard-local/markdown-editor-chrome-mar-ef79c-through-rapid-mode-switches-desktop-dark/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-desktop-dark/shard-local/markdown-editor-chrome-mar-ef79c-through-rapid-mode-switches-desktop-dark/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-desktop-dark/shard-local/markdown-editor-chrome-mar-ef79c-through-rapid-mode-switches-desktop-dark/trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-desktop-dark/shard-local/markdown-editor-chrome-mar-ef79c-through-rapid-mode-switches-desktop-dark/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  24) [desktop-dark] › vue/tests/visual/markdown-editor-chrome.spec.ts:400:13 › markdown editor chrome variants matrix (#429) › renders toolbar, status, and slot visibility contract 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoContainText[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Locator: locator('.el-markdown-editor').getByTestId('chrome-visual-status-slot')
+    Timeout: 20000ms
+    [32m- Expected substring  -  1[39m
+    [31m+ Received string     + 11[39m
+
+    [32m- 已同步到草稿箱[39m
+    [31m+ 227 字 · 45 词 · {[39m
+    [31m+   "mode": "source",[39m
+    [31m+   "readonly": false,[39m
+    [31m+   "disabled": false,[39m
+    [31m+   "loading": false[39m
+    [31m+ } · supported{[39m
+    [31m+   "mode": "source",[39m
+    [31m+   "readonly": false,[39m
+    [31m+   "disabled": false,[39m
+    [31m+   "loading": false[39m
+    [31m+ }[39m
+
+    Call log:
+    [2m  - Expect "toContainText" with timeout 20000ms[22m
+    [2m  - waiting for locator('.el-markdown-editor').getByTestId('chrome-visual-status-slot')[22m
+    [2m    23 × locator resolved to <span data-v-525503f0="" data-testid="chrome-visual-status-slot">227 字 · 45 词 · {↵  "mode": "source",↵  "readonly"…</span>[22m
+    [2m       - unexpected value "227 字 · 45 词 · {[22m
+    [2m  "mode": "source",[22m
+    [2m  "readonly": false,[22m
+    [2m  "disabled": false,[22m
+    [2m  "loading": false[22m
+    [2m} · supported{[22m
+    [2m  "mode": "source",[22m
+    [2m  "readonly": false,[22m
+    [2m  "disabled": false,[22m
+    [2m  "loading": false[22m
+    [2m}"[22m
+
+
+      424 |       await expect(
+      425 |         slotted.getByTestId('chrome-visual-status-slot'),
+    > 426 |       ).toContainText('已同步到草稿箱')
+          |         ^
+      427 |     },
+      428 |   )
+      429 |
+        at /workspace/FsusUI-828-baseline/vue/tests/visual/markdown-editor-chrome.spec.ts:426:9
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-desktop-dark/shard-local/markdown-editor-chrome-mar-33728-nd-slot-visibility-contract-desktop-dark/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-desktop-dark/shard-local/markdown-editor-chrome-mar-33728-nd-slot-visibility-contract-desktop-dark/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-desktop-dark/shard-local/markdown-editor-chrome-mar-33728-nd-slot-visibility-contract-desktop-dark/trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-desktop-dark/shard-local/markdown-editor-chrome-mar-33728-nd-slot-visibility-contract-desktop-dark/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  25) [desktop-dark] › vue/tests/visual/motion-transition-acceptance.spec.ts:25:5 › zoom-in transitions use opacity+translate, no axis scale 
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoEqual[2m([22m[32mexpected[39m[2m) // deep equality[22m
+
+    [32m- Expected  - 1[39m
+    [31m+ Received  + 6[39m
+
+    [32m- Array [][39m
+    [31m+ Array [[39m
+    [31m+   "requestfailed: GET https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png net::ERR_CERT_AUTHORITY_INVALID",[39m
+    [31m+   "console.error: Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID",[39m
+    [31m+   "requestfailed: GET https://cube.elemecdn.com/9/c2/f0ee8a3c7c9638a54940382568c9dpng.png net::ERR_CERT_AUTHORITY_INVALID",[39m
+    [31m+   "console.error: Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID",[39m
+    [31m+ ][39m
+
+      19 |
+      20 | test.afterEach(async ({ page }) => {
+    > 21 |   expect(diagnostics.get(page) ?? []).toEqual([])
+         |                                       ^
+      22 | })
+      23 |
+      24 | // Check compiled CSS for all zoom-in-* transitions
+        at /workspace/FsusUI-828-baseline/vue/tests/visual/motion-transition-acceptance.spec.ts:21:39
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-desktop-dark/shard-local/motion-transition-acceptan-ff12f-ity-translate-no-axis-scale-desktop-dark/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-desktop-dark/shard-local/motion-transition-acceptan-ff12f-ity-translate-no-axis-scale-desktop-dark/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-desktop-dark/shard-local/motion-transition-acceptan-ff12f-ity-translate-no-axis-scale-desktop-dark/trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-desktop-dark/shard-local/motion-transition-acceptan-ff12f-ity-translate-no-axis-scale-desktop-dark/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  26) [desktop-dark] › vue/tests/visual/motion-transition-acceptance.spec.ts:50:5 › list transitions use <=8px displacement 
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoEqual[2m([22m[32mexpected[39m[2m) // deep equality[22m
+
+    [32m- Expected  - 1[39m
+    [31m+ Received  + 6[39m
+
+    [32m- Array [][39m
+    [31m+ Array [[39m
+    [31m+   "requestfailed: GET https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png net::ERR_CERT_AUTHORITY_INVALID",[39m
+    [31m+   "console.error: Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID",[39m
+    [31m+   "requestfailed: GET https://cube.elemecdn.com/9/c2/f0ee8a3c7c9638a54940382568c9dpng.png net::ERR_CERT_AUTHORITY_INVALID",[39m
+    [31m+   "console.error: Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID",[39m
+    [31m+ ][39m
+
+      19 |
+      20 | test.afterEach(async ({ page }) => {
+    > 21 |   expect(diagnostics.get(page) ?? []).toEqual([])
+         |                                       ^
+      22 | })
+      23 |
+      24 | // Check compiled CSS for all zoom-in-* transitions
+        at /workspace/FsusUI-828-baseline/vue/tests/visual/motion-transition-acceptance.spec.ts:21:39
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-desktop-dark/shard-local/motion-transition-acceptan-b0716-itions-use-8px-displacement-desktop-dark/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-desktop-dark/shard-local/motion-transition-acceptan-b0716-itions-use-8px-displacement-desktop-dark/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-desktop-dark/shard-local/motion-transition-acceptan-b0716-itions-use-8px-displacement-desktop-dark/trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-desktop-dark/shard-local/motion-transition-acceptan-b0716-itions-use-8px-displacement-desktop-dark/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  27) [desktop-dark] › vue/tests/visual/motion-transition-acceptance.spec.ts:72:5 › zoom-in overlay transitions have scale >= 0.98 
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoEqual[2m([22m[32mexpected[39m[2m) // deep equality[22m
+
+    [32m- Expected  - 1[39m
+    [31m+ Received  + 6[39m
+
+    [32m- Array [][39m
+    [31m+ Array [[39m
+    [31m+   "requestfailed: GET https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png net::ERR_CERT_AUTHORITY_INVALID",[39m
+    [31m+   "console.error: Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID",[39m
+    [31m+   "requestfailed: GET https://cube.elemecdn.com/9/c2/f0ee8a3c7c9638a54940382568c9dpng.png net::ERR_CERT_AUTHORITY_INVALID",[39m
+    [31m+   "console.error: Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID",[39m
+    [31m+ ][39m
+
+      19 |
+      20 | test.afterEach(async ({ page }) => {
+    > 21 |   expect(diagnostics.get(page) ?? []).toEqual([])
+         |                                       ^
+      22 | })
+      23 |
+      24 | // Check compiled CSS for all zoom-in-* transitions
+        at /workspace/FsusUI-828-baseline/vue/tests/visual/motion-transition-acceptance.spec.ts:21:39
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-desktop-dark/shard-local/motion-transition-acceptan-c7dc2-transitions-have-scale-0-98-desktop-dark/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-desktop-dark/shard-local/motion-transition-acceptan-c7dc2-transitions-have-scale-0-98-desktop-dark/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-desktop-dark/shard-local/motion-transition-acceptan-c7dc2-transitions-have-scale-0-98-desktop-dark/trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-desktop-dark/shard-local/motion-transition-acceptan-c7dc2-transitions-have-scale-0-98-desktop-dark/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  28) [desktop-dark] › vue/tests/visual/motion-transition-acceptance.spec.ts:94:5 › no transition uses 500ms 
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoEqual[2m([22m[32mexpected[39m[2m) // deep equality[22m
+
+    [32m- Expected  - 1[39m
+    [31m+ Received  + 6[39m
+
+    [32m- Array [][39m
+    [31m+ Array [[39m
+    [31m+   "requestfailed: GET https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png net::ERR_CERT_AUTHORITY_INVALID",[39m
+    [31m+   "console.error: Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID",[39m
+    [31m+   "requestfailed: GET https://cube.elemecdn.com/9/c2/f0ee8a3c7c9638a54940382568c9dpng.png net::ERR_CERT_AUTHORITY_INVALID",[39m
+    [31m+   "console.error: Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID",[39m
+    [31m+ ][39m
+
+      19 |
+      20 | test.afterEach(async ({ page }) => {
+    > 21 |   expect(diagnostics.get(page) ?? []).toEqual([])
+         |                                       ^
+      22 | })
+      23 |
+      24 | // Check compiled CSS for all zoom-in-* transitions
+        at /workspace/FsusUI-828-baseline/vue/tests/visual/motion-transition-acceptance.spec.ts:21:39
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-desktop-dark/shard-local/motion-transition-acceptance-no-transition-uses-500ms-desktop-dark/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-desktop-dark/shard-local/motion-transition-acceptance-no-transition-uses-500ms-desktop-dark/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-desktop-dark/shard-local/motion-transition-acceptance-no-transition-uses-500ms-desktop-dark/trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-desktop-dark/shard-local/motion-transition-acceptance-no-transition-uses-500ms-desktop-dark/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  29) [mobile-dark] › vue/tests/visual/capture-all.spec.ts:67:7 › capture data ─────────────────────
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoEqual[2m([22m[32mexpected[39m[2m) // deep equality[22m
+
+    [32m- Expected  - 1[39m
+    [31m+ Received  + 6[39m
+
+    [32m- Array [][39m
+    [31m+ Array [[39m
+    [31m+   "requestfailed: GET https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png net::ERR_CERT_AUTHORITY_INVALID",[39m
+    [31m+   "console.error: Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID",[39m
+    [31m+   "requestfailed: GET https://cube.elemecdn.com/9/c2/f0ee8a3c7c9638a54940382568c9dpng.png net::ERR_CERT_AUTHORITY_INVALID",[39m
+    [31m+   "console.error: Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID",[39m
+    [31m+ ][39m
+
+      35 |
+      36 | test.afterEach(async ({ page }) => {
+    > 37 |   expect(diagnostics.get(page) ?? []).toEqual([])
+         |                                       ^
+      38 | })
+      39 |
+      40 | const sections: VisualSection[] = [
+        at /workspace/FsusUI-828-baseline/vue/tests/visual/capture-all.spec.ts:37:39
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-dark/shard-local/capture-all-capture-data-mobile-dark/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-dark/shard-local/capture-all-capture-data-mobile-dark/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-dark/shard-local/capture-all-capture-data-mobile-dark/trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-dark/shard-local/capture-all-capture-data-mobile-dark/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  30) [mobile-dark] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders framed chrome in source mode with correct geometry and semantics 
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveScreenshot[2m([22m[32mexpected[39m[2m)[22m failed
+
+      18830 pixels (ratio 0.04 of all image pixels) are different.
+
+      Snapshot: chrome-matrix/framed-source.png
+
+    Call log:
+    [2m  - Expect "toHaveScreenshot(chrome-matrix/framed-source.png)" with timeout 20000ms[22m
+    [2m    - verifying given screenshot expectation[22m
+    [2m  - taking page screenshot[22m
+    [2m    - disabled all CSS animations[22m
+    [2m  - waiting for fonts to load...[22m
+    [2m  - fonts loaded[22m
+    [2m  - 18830 pixels (ratio 0.04 of all image pixels) are different.[22m
+    [2m  - waiting 100ms before taking screenshot[22m
+    [2m  - taking page screenshot[22m
+    [2m    - disabled all CSS animations[22m
+    [2m  - waiting for fonts to load...[22m
+    [2m  - fonts loaded[22m
+    [2m  - captured a stable screenshot[22m
+    [2m  - 18830 pixels (ratio 0.04 of all image pixels) are different.[22m
+
+
+      175 |           }
+      176 |
+    > 177 |           await expect(page).toHaveScreenshot([
+          |                              ^
+      178 |             'chrome-matrix',
+      179 |             `${chrome}-${mode}.png`,
+      180 |           ])
+        at /workspace/FsusUI-828-baseline/vue/tests/visual/markdown-editor-chrome.spec.ts:177:30
+
+    attachment #1: chrome-matrix/framed-source (image/png) ─────────────────────────────────────────
+    Expected: vue/tests/visual/markdown-editor-chrome.spec.ts-snapshots/chrome-matrix/framed-source-mobile-dark-linux.png
+    Received: vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-dark/shard-local/markdown-editor-chrome-mar-cd2a8-rect-geometry-and-semantics-mobile-dark/chrome-matrix/framed-source-actual.png
+    Diff:     vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-dark/shard-local/markdown-editor-chrome-mar-cd2a8-rect-geometry-and-semantics-mobile-dark/chrome-matrix/framed-source-diff.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-dark/shard-local/markdown-editor-chrome-mar-cd2a8-rect-geometry-and-semantics-mobile-dark/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-dark/shard-local/markdown-editor-chrome-mar-cd2a8-rect-geometry-and-semantics-mobile-dark/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-dark/shard-local/markdown-editor-chrome-mar-cd2a8-rect-geometry-and-semantics-mobile-dark/trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-dark/shard-local/markdown-editor-chrome-mar-cd2a8-rect-geometry-and-semantics-mobile-dark/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  31) [mobile-dark] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders framed chrome in live mode with correct geometry and semantics 
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveScreenshot[2m([22m[32mexpected[39m[2m)[22m failed
+
+      18830 pixels (ratio 0.04 of all image pixels) are different.
+
+      Snapshot: chrome-matrix/framed-live.png
+
+    Call log:
+    [2m  - Expect "toHaveScreenshot(chrome-matrix/framed-live.png)" with timeout 20000ms[22m
+    [2m    - verifying given screenshot expectation[22m
+    [2m  - taking page screenshot[22m
+    [2m    - disabled all CSS animations[22m
+    [2m  - waiting for fonts to load...[22m
+    [2m  - fonts loaded[22m
+    [2m  - 18830 pixels (ratio 0.04 of all image pixels) are different.[22m
+    [2m  - waiting 100ms before taking screenshot[22m
+    [2m  - taking page screenshot[22m
+    [2m    - disabled all CSS animations[22m
+    [2m  - waiting for fonts to load...[22m
+    [2m  - fonts loaded[22m
+    [2m  - captured a stable screenshot[22m
+    [2m  - 18830 pixels (ratio 0.04 of all image pixels) are different.[22m
+
+
+      175 |           }
+      176 |
+    > 177 |           await expect(page).toHaveScreenshot([
+          |                              ^
+      178 |             'chrome-matrix',
+      179 |             `${chrome}-${mode}.png`,
+      180 |           ])
+        at /workspace/FsusUI-828-baseline/vue/tests/visual/markdown-editor-chrome.spec.ts:177:30
+
+    attachment #1: chrome-matrix/framed-live (image/png) ───────────────────────────────────────────
+    Expected: vue/tests/visual/markdown-editor-chrome.spec.ts-snapshots/chrome-matrix/framed-live-mobile-dark-linux.png
+    Received: vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-dark/shard-local/markdown-editor-chrome-mar-03ee5-rect-geometry-and-semantics-mobile-dark/chrome-matrix/framed-live-actual.png
+    Diff:     vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-dark/shard-local/markdown-editor-chrome-mar-03ee5-rect-geometry-and-semantics-mobile-dark/chrome-matrix/framed-live-diff.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-dark/shard-local/markdown-editor-chrome-mar-03ee5-rect-geometry-and-semantics-mobile-dark/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-dark/shard-local/markdown-editor-chrome-mar-03ee5-rect-geometry-and-semantics-mobile-dark/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-dark/shard-local/markdown-editor-chrome-mar-03ee5-rect-geometry-and-semantics-mobile-dark/trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-dark/shard-local/markdown-editor-chrome-mar-03ee5-rect-geometry-and-semantics-mobile-dark/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  32) [mobile-dark] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders framed chrome in split mode with correct geometry and semantics 
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveScreenshot[2m([22m[32mexpected[39m[2m)[22m failed
+
+      27594 pixels (ratio 0.06 of all image pixels) are different.
+
+      Snapshot: chrome-matrix/framed-split.png
+
+    Call log:
+    [2m  - Expect "toHaveScreenshot(chrome-matrix/framed-split.png)" with timeout 20000ms[22m
+    [2m    - verifying given screenshot expectation[22m
+    [2m  - taking page screenshot[22m
+    [2m    - disabled all CSS animations[22m
+    [2m  - waiting for fonts to load...[22m
+    [2m  - fonts loaded[22m
+    [2m  - 27594 pixels (ratio 0.06 of all image pixels) are different.[22m
+    [2m  - waiting 100ms before taking screenshot[22m
+    [2m  - taking page screenshot[22m
+    [2m    - disabled all CSS animations[22m
+    [2m  - waiting for fonts to load...[22m
+    [2m  - fonts loaded[22m
+    [2m  - captured a stable screenshot[22m
+    [2m  - 27594 pixels (ratio 0.06 of all image pixels) are different.[22m
+
+
+      175 |           }
+      176 |
+    > 177 |           await expect(page).toHaveScreenshot([
+          |                              ^
+      178 |             'chrome-matrix',
+      179 |             `${chrome}-${mode}.png`,
+      180 |           ])
+        at /workspace/FsusUI-828-baseline/vue/tests/visual/markdown-editor-chrome.spec.ts:177:30
+
+    attachment #1: chrome-matrix/framed-split (image/png) ──────────────────────────────────────────
+    Expected: vue/tests/visual/markdown-editor-chrome.spec.ts-snapshots/chrome-matrix/framed-split-mobile-dark-linux.png
+    Received: vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-dark/shard-local/markdown-editor-chrome-mar-76014-rect-geometry-and-semantics-mobile-dark/chrome-matrix/framed-split-actual.png
+    Diff:     vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-dark/shard-local/markdown-editor-chrome-mar-76014-rect-geometry-and-semantics-mobile-dark/chrome-matrix/framed-split-diff.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-dark/shard-local/markdown-editor-chrome-mar-76014-rect-geometry-and-semantics-mobile-dark/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-dark/shard-local/markdown-editor-chrome-mar-76014-rect-geometry-and-semantics-mobile-dark/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-dark/shard-local/markdown-editor-chrome-mar-76014-rect-geometry-and-semantics-mobile-dark/trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-dark/shard-local/markdown-editor-chrome-mar-76014-rect-geometry-and-semantics-mobile-dark/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  33) [mobile-dark] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders embedded chrome in source mode with correct geometry and semantics 
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveScreenshot[2m([22m[32mexpected[39m[2m)[22m failed
+
+      18594 pixels (ratio 0.04 of all image pixels) are different.
+
+      Snapshot: chrome-matrix/embedded-source.png
+
+    Call log:
+    [2m  - Expect "toHaveScreenshot(chrome-matrix/embedded-source.png)" with timeout 20000ms[22m
+    [2m    - verifying given screenshot expectation[22m
+    [2m  - taking page screenshot[22m
+    [2m    - disabled all CSS animations[22m
+    [2m  - waiting for fonts to load...[22m
+    [2m  - fonts loaded[22m
+    [2m  - 18594 pixels (ratio 0.04 of all image pixels) are different.[22m
+    [2m  - waiting 100ms before taking screenshot[22m
+    [2m  - taking page screenshot[22m
+    [2m    - disabled all CSS animations[22m
+    [2m  - waiting for fonts to load...[22m
+    [2m  - fonts loaded[22m
+    [2m  - captured a stable screenshot[22m
+    [2m  - 18594 pixels (ratio 0.04 of all image pixels) are different.[22m
+
+
+      175 |           }
+      176 |
+    > 177 |           await expect(page).toHaveScreenshot([
+          |                              ^
+      178 |             'chrome-matrix',
+      179 |             `${chrome}-${mode}.png`,
+      180 |           ])
+        at /workspace/FsusUI-828-baseline/vue/tests/visual/markdown-editor-chrome.spec.ts:177:30
+
+    attachment #1: chrome-matrix/embedded-source (image/png) ───────────────────────────────────────
+    Expected: vue/tests/visual/markdown-editor-chrome.spec.ts-snapshots/chrome-matrix/embedded-source-mobile-dark-linux.png
+    Received: vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-dark/shard-local/markdown-editor-chrome-mar-40855-rect-geometry-and-semantics-mobile-dark/chrome-matrix/embedded-source-actual.png
+    Diff:     vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-dark/shard-local/markdown-editor-chrome-mar-40855-rect-geometry-and-semantics-mobile-dark/chrome-matrix/embedded-source-diff.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-dark/shard-local/markdown-editor-chrome-mar-40855-rect-geometry-and-semantics-mobile-dark/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-dark/shard-local/markdown-editor-chrome-mar-40855-rect-geometry-and-semantics-mobile-dark/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-dark/shard-local/markdown-editor-chrome-mar-40855-rect-geometry-and-semantics-mobile-dark/trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-dark/shard-local/markdown-editor-chrome-mar-40855-rect-geometry-and-semantics-mobile-dark/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  34) [mobile-dark] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders embedded chrome in live mode with correct geometry and semantics 
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveScreenshot[2m([22m[32mexpected[39m[2m)[22m failed
+
+      18594 pixels (ratio 0.04 of all image pixels) are different.
+
+      Snapshot: chrome-matrix/embedded-live.png
+
+    Call log:
+    [2m  - Expect "toHaveScreenshot(chrome-matrix/embedded-live.png)" with timeout 20000ms[22m
+    [2m    - verifying given screenshot expectation[22m
+    [2m  - taking page screenshot[22m
+    [2m    - disabled all CSS animations[22m
+    [2m  - waiting for fonts to load...[22m
+    [2m  - fonts loaded[22m
+    [2m  - 18594 pixels (ratio 0.04 of all image pixels) are different.[22m
+    [2m  - waiting 100ms before taking screenshot[22m
+    [2m  - taking page screenshot[22m
+    [2m    - disabled all CSS animations[22m
+    [2m  - waiting for fonts to load...[22m
+    [2m  - fonts loaded[22m
+    [2m  - captured a stable screenshot[22m
+    [2m  - 18594 pixels (ratio 0.04 of all image pixels) are different.[22m
+
+
+      175 |           }
+      176 |
+    > 177 |           await expect(page).toHaveScreenshot([
+          |                              ^
+      178 |             'chrome-matrix',
+      179 |             `${chrome}-${mode}.png`,
+      180 |           ])
+        at /workspace/FsusUI-828-baseline/vue/tests/visual/markdown-editor-chrome.spec.ts:177:30
+
+    attachment #1: chrome-matrix/embedded-live (image/png) ─────────────────────────────────────────
+    Expected: vue/tests/visual/markdown-editor-chrome.spec.ts-snapshots/chrome-matrix/embedded-live-mobile-dark-linux.png
+    Received: vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-dark/shard-local/markdown-editor-chrome-mar-9563a-rect-geometry-and-semantics-mobile-dark/chrome-matrix/embedded-live-actual.png
+    Diff:     vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-dark/shard-local/markdown-editor-chrome-mar-9563a-rect-geometry-and-semantics-mobile-dark/chrome-matrix/embedded-live-diff.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-dark/shard-local/markdown-editor-chrome-mar-9563a-rect-geometry-and-semantics-mobile-dark/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-dark/shard-local/markdown-editor-chrome-mar-9563a-rect-geometry-and-semantics-mobile-dark/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-dark/shard-local/markdown-editor-chrome-mar-9563a-rect-geometry-and-semantics-mobile-dark/trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-dark/shard-local/markdown-editor-chrome-mar-9563a-rect-geometry-and-semantics-mobile-dark/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  35) [mobile-dark] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders embedded chrome in split mode with correct geometry and semantics 
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveScreenshot[2m([22m[32mexpected[39m[2m)[22m failed
+
+      29465 pixels (ratio 0.06 of all image pixels) are different.
+
+      Snapshot: chrome-matrix/embedded-split.png
+
+    Call log:
+    [2m  - Expect "toHaveScreenshot(chrome-matrix/embedded-split.png)" with timeout 20000ms[22m
+    [2m    - verifying given screenshot expectation[22m
+    [2m  - taking page screenshot[22m
+    [2m    - disabled all CSS animations[22m
+    [2m  - waiting for fonts to load...[22m
+    [2m  - fonts loaded[22m
+    [2m  - 29465 pixels (ratio 0.06 of all image pixels) are different.[22m
+    [2m  - waiting 100ms before taking screenshot[22m
+    [2m  - taking page screenshot[22m
+    [2m    - disabled all CSS animations[22m
+    [2m  - waiting for fonts to load...[22m
+    [2m  - fonts loaded[22m
+    [2m  - captured a stable screenshot[22m
+    [2m  - 29465 pixels (ratio 0.06 of all image pixels) are different.[22m
+
+
+      175 |           }
+      176 |
+    > 177 |           await expect(page).toHaveScreenshot([
+          |                              ^
+      178 |             'chrome-matrix',
+      179 |             `${chrome}-${mode}.png`,
+      180 |           ])
+        at /workspace/FsusUI-828-baseline/vue/tests/visual/markdown-editor-chrome.spec.ts:177:30
+
+    attachment #1: chrome-matrix/embedded-split (image/png) ────────────────────────────────────────
+    Expected: vue/tests/visual/markdown-editor-chrome.spec.ts-snapshots/chrome-matrix/embedded-split-mobile-dark-linux.png
+    Received: vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-dark/shard-local/markdown-editor-chrome-mar-e19e3-rect-geometry-and-semantics-mobile-dark/chrome-matrix/embedded-split-actual.png
+    Diff:     vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-dark/shard-local/markdown-editor-chrome-mar-e19e3-rect-geometry-and-semantics-mobile-dark/chrome-matrix/embedded-split-diff.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-dark/shard-local/markdown-editor-chrome-mar-e19e3-rect-geometry-and-semantics-mobile-dark/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-dark/shard-local/markdown-editor-chrome-mar-e19e3-rect-geometry-and-semantics-mobile-dark/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-dark/shard-local/markdown-editor-chrome-mar-e19e3-rect-geometry-and-semantics-mobile-dark/trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-dark/shard-local/markdown-editor-chrome-mar-e19e3-rect-geometry-and-semantics-mobile-dark/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  36) [mobile-dark] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders minimal chrome in source mode with correct geometry and semantics 
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveScreenshot[2m([22m[32mexpected[39m[2m)[22m failed
+
+      18213 pixels (ratio 0.04 of all image pixels) are different.
+
+      Snapshot: chrome-matrix/minimal-source.png
+
+    Call log:
+    [2m  - Expect "toHaveScreenshot(chrome-matrix/minimal-source.png)" with timeout 20000ms[22m
+    [2m    - verifying given screenshot expectation[22m
+    [2m  - taking page screenshot[22m
+    [2m    - disabled all CSS animations[22m
+    [2m  - waiting for fonts to load...[22m
+    [2m  - fonts loaded[22m
+    [2m  - 18213 pixels (ratio 0.04 of all image pixels) are different.[22m
+    [2m  - waiting 100ms before taking screenshot[22m
+    [2m  - taking page screenshot[22m
+    [2m    - disabled all CSS animations[22m
+    [2m  - waiting for fonts to load...[22m
+    [2m  - fonts loaded[22m
+    [2m  - captured a stable screenshot[22m
+    [2m  - 18213 pixels (ratio 0.04 of all image pixels) are different.[22m
+
+
+      175 |           }
+      176 |
+    > 177 |           await expect(page).toHaveScreenshot([
+          |                              ^
+      178 |             'chrome-matrix',
+      179 |             `${chrome}-${mode}.png`,
+      180 |           ])
+        at /workspace/FsusUI-828-baseline/vue/tests/visual/markdown-editor-chrome.spec.ts:177:30
+
+    attachment #1: chrome-matrix/minimal-source (image/png) ────────────────────────────────────────
+    Expected: vue/tests/visual/markdown-editor-chrome.spec.ts-snapshots/chrome-matrix/minimal-source-mobile-dark-linux.png
+    Received: vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-dark/shard-local/markdown-editor-chrome-mar-db242-rect-geometry-and-semantics-mobile-dark/chrome-matrix/minimal-source-actual.png
+    Diff:     vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-dark/shard-local/markdown-editor-chrome-mar-db242-rect-geometry-and-semantics-mobile-dark/chrome-matrix/minimal-source-diff.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-dark/shard-local/markdown-editor-chrome-mar-db242-rect-geometry-and-semantics-mobile-dark/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-dark/shard-local/markdown-editor-chrome-mar-db242-rect-geometry-and-semantics-mobile-dark/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-dark/shard-local/markdown-editor-chrome-mar-db242-rect-geometry-and-semantics-mobile-dark/trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-dark/shard-local/markdown-editor-chrome-mar-db242-rect-geometry-and-semantics-mobile-dark/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  37) [mobile-dark] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders minimal chrome in live mode with correct geometry and semantics 
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveScreenshot[2m([22m[32mexpected[39m[2m)[22m failed
+
+      18213 pixels (ratio 0.04 of all image pixels) are different.
+
+      Snapshot: chrome-matrix/minimal-live.png
+
+    Call log:
+    [2m  - Expect "toHaveScreenshot(chrome-matrix/minimal-live.png)" with timeout 20000ms[22m
+    [2m    - verifying given screenshot expectation[22m
+    [2m  - taking page screenshot[22m
+    [2m    - disabled all CSS animations[22m
+    [2m  - waiting for fonts to load...[22m
+    [2m  - fonts loaded[22m
+    [2m  - 18213 pixels (ratio 0.04 of all image pixels) are different.[22m
+    [2m  - waiting 100ms before taking screenshot[22m
+    [2m  - taking page screenshot[22m
+    [2m    - disabled all CSS animations[22m
+    [2m  - waiting for fonts to load...[22m
+    [2m  - fonts loaded[22m
+    [2m  - captured a stable screenshot[22m
+    [2m  - 18213 pixels (ratio 0.04 of all image pixels) are different.[22m
+
+
+      175 |           }
+      176 |
+    > 177 |           await expect(page).toHaveScreenshot([
+          |                              ^
+      178 |             'chrome-matrix',
+      179 |             `${chrome}-${mode}.png`,
+      180 |           ])
+        at /workspace/FsusUI-828-baseline/vue/tests/visual/markdown-editor-chrome.spec.ts:177:30
+
+    attachment #1: chrome-matrix/minimal-live (image/png) ──────────────────────────────────────────
+    Expected: vue/tests/visual/markdown-editor-chrome.spec.ts-snapshots/chrome-matrix/minimal-live-mobile-dark-linux.png
+    Received: vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-dark/shard-local/markdown-editor-chrome-mar-82321-rect-geometry-and-semantics-mobile-dark/chrome-matrix/minimal-live-actual.png
+    Diff:     vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-dark/shard-local/markdown-editor-chrome-mar-82321-rect-geometry-and-semantics-mobile-dark/chrome-matrix/minimal-live-diff.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-dark/shard-local/markdown-editor-chrome-mar-82321-rect-geometry-and-semantics-mobile-dark/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-dark/shard-local/markdown-editor-chrome-mar-82321-rect-geometry-and-semantics-mobile-dark/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-dark/shard-local/markdown-editor-chrome-mar-82321-rect-geometry-and-semantics-mobile-dark/trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-dark/shard-local/markdown-editor-chrome-mar-82321-rect-geometry-and-semantics-mobile-dark/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  38) [mobile-dark] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders minimal chrome in split mode with correct geometry and semantics 
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveScreenshot[2m([22m[32mexpected[39m[2m)[22m failed
+
+      33904 pixels (ratio 0.07 of all image pixels) are different.
+
+      Snapshot: chrome-matrix/minimal-split.png
+
+    Call log:
+    [2m  - Expect "toHaveScreenshot(chrome-matrix/minimal-split.png)" with timeout 20000ms[22m
+    [2m    - verifying given screenshot expectation[22m
+    [2m  - taking page screenshot[22m
+    [2m    - disabled all CSS animations[22m
+    [2m  - waiting for fonts to load...[22m
+    [2m  - fonts loaded[22m
+    [2m  - 33904 pixels (ratio 0.07 of all image pixels) are different.[22m
+    [2m  - waiting 100ms before taking screenshot[22m
+    [2m  - taking page screenshot[22m
+    [2m    - disabled all CSS animations[22m
+    [2m  - waiting for fonts to load...[22m
+    [2m  - fonts loaded[22m
+    [2m  - captured a stable screenshot[22m
+    [2m  - 33904 pixels (ratio 0.07 of all image pixels) are different.[22m
+
+
+      175 |           }
+      176 |
+    > 177 |           await expect(page).toHaveScreenshot([
+          |                              ^
+      178 |             'chrome-matrix',
+      179 |             `${chrome}-${mode}.png`,
+      180 |           ])
+        at /workspace/FsusUI-828-baseline/vue/tests/visual/markdown-editor-chrome.spec.ts:177:30
+
+    attachment #1: chrome-matrix/minimal-split (image/png) ─────────────────────────────────────────
+    Expected: vue/tests/visual/markdown-editor-chrome.spec.ts-snapshots/chrome-matrix/minimal-split-mobile-dark-linux.png
+    Received: vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-dark/shard-local/markdown-editor-chrome-mar-23d8b-rect-geometry-and-semantics-mobile-dark/chrome-matrix/minimal-split-actual.png
+    Diff:     vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-dark/shard-local/markdown-editor-chrome-mar-23d8b-rect-geometry-and-semantics-mobile-dark/chrome-matrix/minimal-split-diff.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-dark/shard-local/markdown-editor-chrome-mar-23d8b-rect-geometry-and-semantics-mobile-dark/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-dark/shard-local/markdown-editor-chrome-mar-23d8b-rect-geometry-and-semantics-mobile-dark/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-dark/shard-local/markdown-editor-chrome-mar-23d8b-rect-geometry-and-semantics-mobile-dark/trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-dark/shard-local/markdown-editor-chrome-mar-23d8b-rect-geometry-and-semantics-mobile-dark/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  39) [mobile-dark] › vue/tests/visual/markdown-editor-chrome.spec.ts:186:13 › markdown editor chrome variants matrix (#429) › keeps one editor instance through rapid mode switches 
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoEqual[2m([22m[32mexpected[39m[2m) // deep equality[22m
+
+    [32m- Expected  - 1[39m
+    [31m+ Received  + 8[39m
+
+    [32m- Array [][39m
+    [31m+ Array [[39m
+    [31m+   "requestfailed: GET http://127.0.0.1:5195/assets/github-dark-BQV5ugrc.js net::ERR_ABORTED",[39m
+    [31m+   "requestfailed: GET http://127.0.0.1:5195/assets/typescript-BqvgUolh.js net::ERR_ABORTED",[39m
+    [31m+   "requestfailed: GET http://127.0.0.1:5195/assets/github-dark-BQV5ugrc.js net::ERR_ABORTED",[39m
+    [31m+   "requestfailed: GET http://127.0.0.1:5195/assets/typescript-BqvgUolh.js net::ERR_ABORTED",[39m
+    [31m+   "requestfailed: GET http://127.0.0.1:5195/assets/typescript-BqvgUolh.js net::ERR_ABORTED",[39m
+    [31m+   "requestfailed: GET http://127.0.0.1:5195/assets/github-dark-BQV5ugrc.js net::ERR_ABORTED",[39m
+    [31m+ ][39m
+
+      133 |
+      134 | test.afterEach(async ({ page }) => {
+    > 135 |   expect(diagnostics.get(page) ?? []).toEqual([])
+          |                                       ^
+      136 | })
+      137 |
+      138 | test.describe('markdown editor chrome variants matrix (#429)', () => {
+        at /workspace/FsusUI-828-baseline/vue/tests/visual/markdown-editor-chrome.spec.ts:135:39
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-dark/shard-local/markdown-editor-chrome-mar-ef79c-through-rapid-mode-switches-mobile-dark/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-dark/shard-local/markdown-editor-chrome-mar-ef79c-through-rapid-mode-switches-mobile-dark/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-dark/shard-local/markdown-editor-chrome-mar-ef79c-through-rapid-mode-switches-mobile-dark/trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-dark/shard-local/markdown-editor-chrome-mar-ef79c-through-rapid-mode-switches-mobile-dark/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  40) [mobile-dark] › vue/tests/visual/markdown-editor-chrome.spec.ts:354:13 › markdown editor chrome variants matrix (#429) › stays usable at 150% and 200% zoom 
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveScreenshot[2m([22m[32mexpected[39m[2m)[22m failed
+
+      26274 pixels (ratio 0.06 of all image pixels) are different.
+
+      Snapshot: chrome-evidence/zoom-150.png
+
+    Call log:
+    [2m  - Expect "toHaveScreenshot(chrome-evidence/zoom-150.png)" with timeout 20000ms[22m
+    [2m    - verifying given screenshot expectation[22m
+    [2m  - taking page screenshot[22m
+    [2m    - disabled all CSS animations[22m
+    [2m  - waiting for fonts to load...[22m
+    [2m  - fonts loaded[22m
+    [2m  - 26274 pixels (ratio 0.06 of all image pixels) are different.[22m
+    [2m  - waiting 100ms before taking screenshot[22m
+    [2m  - taking page screenshot[22m
+    [2m    - disabled all CSS animations[22m
+    [2m  - waiting for fonts to load...[22m
+    [2m  - fonts loaded[22m
+    [2m  - captured a stable screenshot[22m
+    [2m  - 26274 pixels (ratio 0.06 of all image pixels) are different.[22m
+
+
+      369 |         })
+      370 |         expect(overflow).toBeLessThanOrEqual(1)
+    > 371 |         await expect(page).toHaveScreenshot([
+          |                            ^
+      372 |           'chrome-evidence',
+      373 |           `zoom-${Math.round(zoom * 100)}.png`,
+      374 |         ])
+        at /workspace/FsusUI-828-baseline/vue/tests/visual/markdown-editor-chrome.spec.ts:371:28
+
+    attachment #1: chrome-evidence/zoom-150 (image/png) ────────────────────────────────────────────
+    Expected: vue/tests/visual/markdown-editor-chrome.spec.ts-snapshots/chrome-evidence/zoom-150-mobile-dark-linux.png
+    Received: vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-dark/shard-local/markdown-editor-chrome-mar-b0df0--usable-at-150-and-200-zoom-mobile-dark/chrome-evidence/zoom-150-actual.png
+    Diff:     vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-dark/shard-local/markdown-editor-chrome-mar-b0df0--usable-at-150-and-200-zoom-mobile-dark/chrome-evidence/zoom-150-diff.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-dark/shard-local/markdown-editor-chrome-mar-b0df0--usable-at-150-and-200-zoom-mobile-dark/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-dark/shard-local/markdown-editor-chrome-mar-b0df0--usable-at-150-and-200-zoom-mobile-dark/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-dark/shard-local/markdown-editor-chrome-mar-b0df0--usable-at-150-and-200-zoom-mobile-dark/trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-dark/shard-local/markdown-editor-chrome-mar-b0df0--usable-at-150-and-200-zoom-mobile-dark/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  41) [mobile-dark] › vue/tests/visual/markdown-editor-chrome.spec.ts:400:13 › markdown editor chrome variants matrix (#429) › renders toolbar, status, and slot visibility contract 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoContainText[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Locator: locator('.el-markdown-editor').getByTestId('chrome-visual-status-slot')
+    Timeout: 20000ms
+    [32m- Expected substring  -  1[39m
+    [31m+ Received string     + 11[39m
+
+    [32m- 已同步到草稿箱[39m
+    [31m+ 227 字 · 45 词 · {[39m
+    [31m+   "mode": "source",[39m
+    [31m+   "readonly": false,[39m
+    [31m+   "disabled": false,[39m
+    [31m+   "loading": false[39m
+    [31m+ } · supported{[39m
+    [31m+   "mode": "source",[39m
+    [31m+   "readonly": false,[39m
+    [31m+   "disabled": false,[39m
+    [31m+   "loading": false[39m
+    [31m+ }[39m
+
+    Call log:
+    [2m  - Expect "toContainText" with timeout 20000ms[22m
+    [2m  - waiting for locator('.el-markdown-editor').getByTestId('chrome-visual-status-slot')[22m
+    [2m    24 × locator resolved to <span data-v-525503f0="" data-testid="chrome-visual-status-slot">227 字 · 45 词 · {↵  "mode": "source",↵  "readonly"…</span>[22m
+    [2m       - unexpected value "227 字 · 45 词 · {[22m
+    [2m  "mode": "source",[22m
+    [2m  "readonly": false,[22m
+    [2m  "disabled": false,[22m
+    [2m  "loading": false[22m
+    [2m} · supported{[22m
+    [2m  "mode": "source",[22m
+    [2m  "readonly": false,[22m
+    [2m  "disabled": false,[22m
+    [2m  "loading": false[22m
+    [2m}"[22m
+
+
+      424 |       await expect(
+      425 |         slotted.getByTestId('chrome-visual-status-slot'),
+    > 426 |       ).toContainText('已同步到草稿箱')
+          |         ^
+      427 |     },
+      428 |   )
+      429 |
+        at /workspace/FsusUI-828-baseline/vue/tests/visual/markdown-editor-chrome.spec.ts:426:9
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-dark/shard-local/markdown-editor-chrome-mar-33728-nd-slot-visibility-contract-mobile-dark/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-dark/shard-local/markdown-editor-chrome-mar-33728-nd-slot-visibility-contract-mobile-dark/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-dark/shard-local/markdown-editor-chrome-mar-33728-nd-slot-visibility-contract-mobile-dark/trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-dark/shard-local/markdown-editor-chrome-mar-33728-nd-slot-visibility-contract-mobile-dark/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  42) [mobile-dark] › vue/tests/visual/markdown-editor-chrome.spec.ts:520:13 › markdown editor chrome variants matrix (#429) › keeps framed geometry under forced colors 
+
+    Error: [2mexpect([22m[31mpage[39m[2m).[22mtoHaveScreenshot[2m([22m[32mexpected[39m[2m)[22m failed
+
+      22258 pixels (ratio 0.05 of all image pixels) are different.
+
+      Snapshot: chrome-evidence/forced-colors.png
+
+    Call log:
+    [2m  - Expect "toHaveScreenshot(chrome-evidence/forced-colors.png)" with timeout 20000ms[22m
+    [2m    - verifying given screenshot expectation[22m
+    [2m  - taking page screenshot[22m
+    [2m    - disabled all CSS animations[22m
+    [2m  - waiting for fonts to load...[22m
+    [2m  - fonts loaded[22m
+    [2m  - 22258 pixels (ratio 0.05 of all image pixels) are different.[22m
+    [2m  - waiting 100ms before taking screenshot[22m
+    [2m  - taking page screenshot[22m
+    [2m    - disabled all CSS animations[22m
+    [2m  - waiting for fonts to load...[22m
+    [2m  - fonts loaded[22m
+    [2m  - captured a stable screenshot[22m
+    [2m  - 22258 pixels (ratio 0.05 of all image pixels) are different.[22m
+
+
+      531 |       })
+      532 |       expect(border.style).not.toBe('none')
+    > 533 |       await expect(page).toHaveScreenshot([
+          |                          ^
+      534 |         'chrome-evidence',
+      535 |         'forced-colors.png',
+      536 |       ])
+        at /workspace/FsusUI-828-baseline/vue/tests/visual/markdown-editor-chrome.spec.ts:533:26
+
+    attachment #1: chrome-evidence/forced-colors (image/png) ───────────────────────────────────────
+    Expected: vue/tests/visual/markdown-editor-chrome.spec.ts-snapshots/chrome-evidence/forced-colors-mobile-dark-linux.png
+    Received: vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-dark/shard-local/markdown-editor-chrome-mar-7ab56-eometry-under-forced-colors-mobile-dark/chrome-evidence/forced-colors-actual.png
+    Diff:     vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-dark/shard-local/markdown-editor-chrome-mar-7ab56-eometry-under-forced-colors-mobile-dark/chrome-evidence/forced-colors-diff.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-dark/shard-local/markdown-editor-chrome-mar-7ab56-eometry-under-forced-colors-mobile-dark/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-dark/shard-local/markdown-editor-chrome-mar-7ab56-eometry-under-forced-colors-mobile-dark/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-dark/shard-local/markdown-editor-chrome-mar-7ab56-eometry-under-forced-colors-mobile-dark/trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace vue/test-results/profile-issue-828-baseline-preview/suite-preview/project-mobile-dark/shard-local/markdown-editor-chrome-mar-7ab56-eometry-under-forced-colors-mobile-dark/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  42 failed
+    [desktop-light] › vue/tests/visual/capture-all.spec.ts:67:7 › capture data ─────────────────────
+    [desktop-light] › vue/tests/visual/markdown-editor-chrome.spec.ts:186:13 › markdown editor chrome variants matrix (#429) › keeps one editor instance through rapid mode switches 
+    [desktop-light] › vue/tests/visual/markdown-editor-chrome.spec.ts:400:13 › markdown editor chrome variants matrix (#429) › renders toolbar, status, and slot visibility contract 
+    [desktop-light] › vue/tests/visual/motion-transition-acceptance.spec.ts:25:5 › zoom-in transitions use opacity+translate, no axis scale 
+    [desktop-light] › vue/tests/visual/motion-transition-acceptance.spec.ts:50:5 › list transitions use <=8px displacement 
+    [desktop-light] › vue/tests/visual/motion-transition-acceptance.spec.ts:72:5 › zoom-in overlay transitions have scale >= 0.98 
+    [desktop-light] › vue/tests/visual/motion-transition-acceptance.spec.ts:94:5 › no transition uses 500ms 
+    [mobile-light] › vue/tests/visual/capture-all.spec.ts:67:7 › capture data ──────────────────────
+    [mobile-light] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders framed chrome in source mode with correct geometry and semantics 
+    [mobile-light] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders framed chrome in live mode with correct geometry and semantics 
+    [mobile-light] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders framed chrome in split mode with correct geometry and semantics 
+    [mobile-light] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders embedded chrome in source mode with correct geometry and semantics 
+    [mobile-light] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders embedded chrome in live mode with correct geometry and semantics 
+    [mobile-light] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders embedded chrome in split mode with correct geometry and semantics 
+    [mobile-light] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders minimal chrome in source mode with correct geometry and semantics 
+    [mobile-light] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders minimal chrome in live mode with correct geometry and semantics 
+    [mobile-light] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders minimal chrome in split mode with correct geometry and semantics 
+    [mobile-light] › vue/tests/visual/markdown-editor-chrome.spec.ts:186:13 › markdown editor chrome variants matrix (#429) › keeps one editor instance through rapid mode switches 
+    [mobile-light] › vue/tests/visual/markdown-editor-chrome.spec.ts:354:13 › markdown editor chrome variants matrix (#429) › stays usable at 150% and 200% zoom 
+    [mobile-light] › vue/tests/visual/markdown-editor-chrome.spec.ts:400:13 › markdown editor chrome variants matrix (#429) › renders toolbar, status, and slot visibility contract 
+    [mobile-light] › vue/tests/visual/markdown-editor-chrome.spec.ts:520:13 › markdown editor chrome variants matrix (#429) › keeps framed geometry under forced colors 
+    [desktop-dark] › vue/tests/visual/capture-all.spec.ts:67:7 › capture data ──────────────────────
+    [desktop-dark] › vue/tests/visual/markdown-editor-chrome.spec.ts:186:13 › markdown editor chrome variants matrix (#429) › keeps one editor instance through rapid mode switches 
+    [desktop-dark] › vue/tests/visual/markdown-editor-chrome.spec.ts:400:13 › markdown editor chrome variants matrix (#429) › renders toolbar, status, and slot visibility contract 
+    [desktop-dark] › vue/tests/visual/motion-transition-acceptance.spec.ts:25:5 › zoom-in transitions use opacity+translate, no axis scale 
+    [desktop-dark] › vue/tests/visual/motion-transition-acceptance.spec.ts:50:5 › list transitions use <=8px displacement 
+    [desktop-dark] › vue/tests/visual/motion-transition-acceptance.spec.ts:72:5 › zoom-in overlay transitions have scale >= 0.98 
+    [desktop-dark] › vue/tests/visual/motion-transition-acceptance.spec.ts:94:5 › no transition uses 500ms 
+    [mobile-dark] › vue/tests/visual/capture-all.spec.ts:67:7 › capture data ───────────────────────
+    [mobile-dark] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders framed chrome in source mode with correct geometry and semantics 
+    [mobile-dark] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders framed chrome in live mode with correct geometry and semantics 
+    [mobile-dark] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders framed chrome in split mode with correct geometry and semantics 
+    [mobile-dark] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders embedded chrome in source mode with correct geometry and semantics 
+    [mobile-dark] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders embedded chrome in live mode with correct geometry and semantics 
+    [mobile-dark] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders embedded chrome in split mode with correct geometry and semantics 
+    [mobile-dark] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders minimal chrome in source mode with correct geometry and semantics 
+    [mobile-dark] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders minimal chrome in live mode with correct geometry and semantics 
+    [mobile-dark] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders minimal chrome in split mode with correct geometry and semantics 
+    [mobile-dark] › vue/tests/visual/markdown-editor-chrome.spec.ts:186:13 › markdown editor chrome variants matrix (#429) › keeps one editor instance through rapid mode switches 
+    [mobile-dark] › vue/tests/visual/markdown-editor-chrome.spec.ts:354:13 › markdown editor chrome variants matrix (#429) › stays usable at 150% and 200% zoom 
+    [mobile-dark] › vue/tests/visual/markdown-editor-chrome.spec.ts:400:13 › markdown editor chrome variants matrix (#429) › renders toolbar, status, and slot visibility contract 
+    [mobile-dark] › vue/tests/visual/markdown-editor-chrome.spec.ts:520:13 › markdown editor chrome variants matrix (#429) › keeps framed geometry under forced colors 
+  74 passed (3.4m)

@@ -1,0 +1,374 @@
+[
+  {
+    "name": "chromium",
+    "theme": "light",
+    "zoom": 1,
+    "geometry": {
+      "header": {
+        "x": 24,
+        "y": 24,
+        "width": 796,
+        "height": 93,
+        "display": "block",
+        "padding": "0px"
+      },
+      "inner": {
+        "x": 24,
+        "y": 24,
+        "width": 796,
+        "height": 92,
+        "display": "block",
+        "padding": "24px"
+      },
+      "primary-row": {
+        "x": 48,
+        "y": 48,
+        "width": 748,
+        "height": 44,
+        "display": "grid",
+        "padding": "0px"
+      },
+      "brand-nav": {
+        "x": 48,
+        "y": 54.5,
+        "width": 682,
+        "height": 31,
+        "display": "flex",
+        "padding": "0px"
+      },
+      "actions": {
+        "x": 754,
+        "y": 48,
+        "width": 42,
+        "height": 44,
+        "display": "flex",
+        "padding": "0px"
+      },
+      "mobile-primary-actions": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0,
+        "display": "none",
+        "padding": "0px"
+      },
+      "viewport": {
+        "width": 844,
+        "height": 390
+      },
+      "overflow": 0
+    },
+    "errors": [],
+    "path": ".tmp/issue-828/before-chromium-chromium-light-1.png"
+  },
+  {
+    "name": "chromium",
+    "theme": "light",
+    "zoom": 1.5,
+    "geometry": {
+      "header": {
+        "x": 36,
+        "y": 36,
+        "width": 772,
+        "height": 139,
+        "display": "block",
+        "padding": "0px"
+      },
+      "inner": {
+        "x": 36,
+        "y": 36,
+        "width": 772,
+        "height": 138,
+        "display": "block",
+        "padding": "24px"
+      },
+      "primary-row": {
+        "x": 72,
+        "y": 72,
+        "width": 700,
+        "height": 66,
+        "display": "grid",
+        "padding": "0px"
+      },
+      "brand-nav": {
+        "x": 72,
+        "y": 81.25,
+        "width": 600,
+        "height": 47.5,
+        "display": "flex",
+        "padding": "0px"
+      },
+      "actions": {
+        "x": 708,
+        "y": 72,
+        "width": 64,
+        "height": 66,
+        "display": "flex",
+        "padding": "0px"
+      },
+      "mobile-primary-actions": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0,
+        "display": "none",
+        "padding": "0px"
+      },
+      "viewport": {
+        "width": 844,
+        "height": 390
+      },
+      "overflow": 0
+    },
+    "errors": [],
+    "path": ".tmp/issue-828/before-chromium-chromium-light-1.5.png"
+  },
+  {
+    "name": "chromium",
+    "theme": "light",
+    "zoom": 2,
+    "geometry": {
+      "header": {
+        "x": 48,
+        "y": 48,
+        "width": 748,
+        "height": 186,
+        "display": "block",
+        "padding": "0px"
+      },
+      "inner": {
+        "x": 48,
+        "y": 48,
+        "width": 748,
+        "height": 184,
+        "display": "block",
+        "padding": "24px"
+      },
+      "primary-row": {
+        "x": 96,
+        "y": 96,
+        "width": 652,
+        "height": 88,
+        "display": "grid",
+        "padding": "0px"
+      },
+      "brand-nav": {
+        "x": 96,
+        "y": 109,
+        "width": 518,
+        "height": 62,
+        "display": "flex",
+        "padding": "0px"
+      },
+      "actions": {
+        "x": 662,
+        "y": 96,
+        "width": 86,
+        "height": 88,
+        "display": "flex",
+        "padding": "0px"
+      },
+      "mobile-primary-actions": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0,
+        "display": "none",
+        "padding": "0px"
+      },
+      "viewport": {
+        "width": 844,
+        "height": 390
+      },
+      "overflow": 0
+    },
+    "errors": [],
+    "path": ".tmp/issue-828/before-chromium-chromium-light-2.png"
+  },
+  {
+    "name": "chromium",
+    "theme": "dark",
+    "zoom": 1,
+    "geometry": {
+      "header": {
+        "x": 24,
+        "y": 24,
+        "width": 796,
+        "height": 93,
+        "display": "block",
+        "padding": "0px"
+      },
+      "inner": {
+        "x": 24,
+        "y": 24,
+        "width": 796,
+        "height": 92,
+        "display": "block",
+        "padding": "24px"
+      },
+      "primary-row": {
+        "x": 48,
+        "y": 48,
+        "width": 748,
+        "height": 44,
+        "display": "grid",
+        "padding": "0px"
+      },
+      "brand-nav": {
+        "x": 48,
+        "y": 54.5,
+        "width": 682,
+        "height": 31,
+        "display": "flex",
+        "padding": "0px"
+      },
+      "actions": {
+        "x": 754,
+        "y": 48,
+        "width": 42,
+        "height": 44,
+        "display": "flex",
+        "padding": "0px"
+      },
+      "mobile-primary-actions": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0,
+        "display": "none",
+        "padding": "0px"
+      },
+      "viewport": {
+        "width": 844,
+        "height": 390
+      },
+      "overflow": 0
+    },
+    "errors": [],
+    "path": ".tmp/issue-828/before-chromium-chromium-dark-1.png"
+  },
+  {
+    "name": "chromium",
+    "theme": "dark",
+    "zoom": 1.5,
+    "geometry": {
+      "header": {
+        "x": 36,
+        "y": 36,
+        "width": 772,
+        "height": 139,
+        "display": "block",
+        "padding": "0px"
+      },
+      "inner": {
+        "x": 36,
+        "y": 36,
+        "width": 772,
+        "height": 138,
+        "display": "block",
+        "padding": "24px"
+      },
+      "primary-row": {
+        "x": 72,
+        "y": 72,
+        "width": 700,
+        "height": 66,
+        "display": "grid",
+        "padding": "0px"
+      },
+      "brand-nav": {
+        "x": 72,
+        "y": 81.25,
+        "width": 600,
+        "height": 47.5,
+        "display": "flex",
+        "padding": "0px"
+      },
+      "actions": {
+        "x": 708,
+        "y": 72,
+        "width": 64,
+        "height": 66,
+        "display": "flex",
+        "padding": "0px"
+      },
+      "mobile-primary-actions": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0,
+        "display": "none",
+        "padding": "0px"
+      },
+      "viewport": {
+        "width": 844,
+        "height": 390
+      },
+      "overflow": 0
+    },
+    "errors": [],
+    "path": ".tmp/issue-828/before-chromium-chromium-dark-1.5.png"
+  },
+  {
+    "name": "chromium",
+    "theme": "dark",
+    "zoom": 2,
+    "geometry": {
+      "header": {
+        "x": 48,
+        "y": 48,
+        "width": 748,
+        "height": 186,
+        "display": "block",
+        "padding": "0px"
+      },
+      "inner": {
+        "x": 48,
+        "y": 48,
+        "width": 748,
+        "height": 184,
+        "display": "block",
+        "padding": "24px"
+      },
+      "primary-row": {
+        "x": 96,
+        "y": 96,
+        "width": 652,
+        "height": 88,
+        "display": "grid",
+        "padding": "0px"
+      },
+      "brand-nav": {
+        "x": 96,
+        "y": 109,
+        "width": 518,
+        "height": 62,
+        "display": "flex",
+        "padding": "0px"
+      },
+      "actions": {
+        "x": 662,
+        "y": 96,
+        "width": 86,
+        "height": 88,
+        "display": "flex",
+        "padding": "0px"
+      },
+      "mobile-primary-actions": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0,
+        "display": "none",
+        "padding": "0px"
+      },
+      "viewport": {
+        "width": 844,
+        "height": 390
+      },
+      "overflow": 0
+    },
+    "errors": [],
+    "path": ".tmp/issue-828/before-chromium-chromium-dark-2.png"
+  }
+]

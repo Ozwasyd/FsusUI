@@ -1,0 +1,27 @@
+{
+  "sourceCommit": "c325c600ea2760156d467bfaa375613879211cd9",
+  "releaseMetadataCommit": "79988a85e5f893a5d06eb9ee499c07c3abc37e39",
+  "onlyChangedPaths": [
+    ".changeset/public-shell-short-landscape.md"
+  ],
+  "files": [
+    {
+      "path": "vue/packages/theme-chalk/src/public-shell.scss",
+      "sourceSha256": "1415372e8be38995b6a11f55b105e3c3b9a099ce3bb9b5fd04b7f512c3e12853",
+      "releaseSha256": "1415372e8be38995b6a11f55b105e3c3b9a099ce3bb9b5fd04b7f512c3e12853",
+      "equal": true
+    },
+    {
+      "path": "vue/packages/theme-chalk/src/public-shell-critical.scss",
+      "sourceSha256": "b1fcf3b737e032a147783b8f2b2b8f4919f0f5eddbc79d89111de626276f6705",
+      "releaseSha256": "b1fcf3b737e032a147783b8f2b2b8f4919f0f5eddbc79d89111de626276f6705",
+      "equal": true
+    },
+    {
+      "path": "docs/components/public-shell.md",
+      "sourceSha256": "ba48704f77a4ff58856c66d761917a106613341ae651d475ff26780b64d7c883",
+      "releaseSha256": "ba48704f77a4ff58856c66d761917a106613341ae651d475ff26780b64d7c883",
+      "equal": true
+    }
+  ]
+}

@@ -1,0 +1,45 @@
+{
+  "changesets": [
+    {
+      "releases": [
+        {
+          "name": "element-plus",
+          "type": "patch"
+        },
+        {
+          "name": "@element-plus/theme-chalk",
+          "type": "patch"
+        }
+      ],
+      "summary": "Use the existing mobile PublicShell header in short landscape viewports and reduce its vertical padding with the shared spacing token. Keep 44px action targets and avoid overlapping desktop links at high zoom; synchronize the full and critical CSS.",
+      "id": "public-shell-short-landscape"
+    }
+  ],
+  "releases": [
+    {
+      "name": "element-plus",
+      "type": "patch",
+      "oldVersion": "1.5.1",
+      "changesets": [
+        "public-shell-short-landscape"
+      ],
+      "newVersion": "1.5.2"
+    },
+    {
+      "name": "@element-plus/theme-chalk",
+      "type": "patch",
+      "oldVersion": "0.1.0",
+      "changesets": [
+        "public-shell-short-landscape"
+      ],
+      "newVersion": "0.1.1"
+    },
+    {
+      "name": "demo-app",
+      "type": "patch",
+      "oldVersion": "0.0.1",
+      "changesets": [],
+      "newVersion": "0.0.2"
+    }
+  ]
+}

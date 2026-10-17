@@ -1,0 +1,112 @@
+{
+  "schema": "fsusui-design-conformance.ui-ux-classification-receipt.v2",
+  "ownerRepository": "Ozwasyd/FsusUI",
+  "affectedSurfaces": ["ElPublicShell public-header short-landscape geometry"],
+  "uiDecisionClass": "layout-judgment",
+  "verificationClass": "ux-path",
+  "requiredAuthorities": [
+    {
+      "id": "docs/index.md",
+      "path": "docs/index.md",
+      "digest": "b7aefe9f989ce962ada16c1fcbabf0613d862dfe0ec2bd016865a1a33d5b6f18"
+    },
+    {
+      "id": "docs/design.md",
+      "path": "docs/design.md",
+      "digest": "24c88676101dde43bb0907ed173f001b6e1659973caf19701ea57eddf0617039"
+    },
+    {
+      "id": "docs/design/governance.md",
+      "path": "docs/design/governance.md",
+      "digest": "d871bc86ed2a66f3a851f947530ff576c3d1d0a1a37c721d11cf09b1cbc4e104"
+    },
+    {
+      "id": "docs/design/change-classification.md",
+      "path": "docs/design/change-classification.md",
+      "digest": "c5d43303e89931346f9d634dd592ecb54418d15a74ae923f72e52795a115544e"
+    },
+    {
+      "id": "docs/workflows/visual-change.md",
+      "path": "docs/workflows/visual-change.md",
+      "digest": "0bd20f9ae6997aa9b7daeb0cec2f558738565bd0932828617aea2f5b84626042"
+    },
+    {
+      "id": "docs/components/public-shell.md",
+      "path": "docs/components/public-shell.md",
+      "digest": "ba48704f77a4ff58856c66d761917a106613341ae651d475ff26780b64d7c883"
+    },
+    {
+      "id": "docs/consumers/design-integration.md",
+      "path": "docs/consumers/design-integration.md",
+      "digest": "0aece5130fd251487b3215f62f38a8a743ed4c0d02ed8e292b865daecae0195b"
+    },
+    {
+      "id": "spec/tokens/tokens.json",
+      "path": "spec/tokens/tokens.json",
+      "digest": "c97d4b2f3ffcf311fb060b21e12e13367763fb4ca9ba9c8fa4cacf6f72d381d1"
+    }
+  ],
+  "requiredSkillDigests": [
+    "c88357a6ba0340000bae5839daeb67a3cd2722e8242cf7e0148006c3610a44fe"
+  ],
+  "activeBaselineIdentity": {
+    "repository": "Ozwasyd/FsusUI",
+    "revision": "f2b3bb89ffe5f749da26c388f058efdbb6aee864",
+    "skillDigest": "c88357a6ba0340000bae5839daeb67a3cd2722e8242cf7e0148006c3610a44fe",
+    "authorityDigest": "5f5b0e065e699bb4ca3bc5798407819b78d09c895cb14ae66672972b5885db15",
+    "dirtyFingerprint": "f12c05b61ccc1885cce6de58ff939b00bbf1a4e8b6799d0a4d0c2a7b745324a2"
+  },
+  "candidateSha": "c325c600ea2760156d467bfaa375613879211cd9",
+  "candidateDigest": "af2559c187db98050acbd2a1aec8b98d6436fc845e287b30f9a52f154b6dc3be",
+  "stateEvidenceMatrix": [
+    {
+      "state": "Default menu and collapsed search; production full theme",
+      "viewport": "844x390 CSS zoom 1",
+      "theme": "light",
+      "evidenceDigest": "3019e02483341f105fa1c292401884082de45bfd7e3e22e2181674cf37632998"
+    },
+    {
+      "state": "Default menu and collapsed search; production full theme",
+      "viewport": "844x390 CSS zoom 1.5",
+      "theme": "light",
+      "evidenceDigest": "3b74db3456830b0339c5465fdd08a817892ba655028c8b89bfe80a17511a455c"
+    },
+    {
+      "state": "Default menu and collapsed search; production full theme",
+      "viewport": "844x390 CSS zoom 2",
+      "theme": "light",
+      "evidenceDigest": "8624fbfbb9904ebc6979c34f3413236270c726a0a031d9b3d7beeeca7067f184"
+    },
+    {
+      "state": "Default menu and collapsed search; production full theme",
+      "viewport": "844x390 CSS zoom 1",
+      "theme": "dark",
+      "evidenceDigest": "51226c22c4746251dfcb406a732588dc800b32ba93a565a397e495a274ce2845"
+    },
+    {
+      "state": "Default menu and collapsed search; production full theme",
+      "viewport": "844x390 CSS zoom 1.5",
+      "theme": "dark",
+      "evidenceDigest": "15e9261675504533e8e3423555e37171a47e974b01c336469b5857483b1dc5ae"
+    },
+    {
+      "state": "Default menu and collapsed search; production full theme",
+      "viewport": "844x390 CSS zoom 2",
+      "theme": "dark",
+      "evidenceDigest": "85b941f7091f9cfde309760e561ad05b6eddeaf2307f92a5f01eca6716fb3028"
+    }
+  ],
+  "inScope": [
+    "Full and critical ElPublicShell inner padding at max-height 520px and landscape",
+    "Consumer-visible patch changeset and exact evidence report"
+  ],
+  "outOfScope": [
+    "FsusBlog implementation, fixtures, helpers, matrix, assertions",
+    "Other public navigation modes, consumer routes and copy",
+    "New design tokens, package publishing, deployment and merging"
+  ],
+  "classificationEvidenceDigest": "e2da8893909a17c882a3ae06203604750960e8c1f1ad9f5e2f498b1d5957f402",
+  "domainPolicyDigest": "620c4f746c1f259e3b640044975ad2878b7913806038706f7991bee9d72104d3",
+  "status": "frozen",
+  "receiptDigest": "43a263c11e8f7805ccc79c7fafb6693c9b4e79d440394e938a5fd57e48237e8d"
+}

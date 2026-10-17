@@ -1,0 +1,116 @@
+{
+  "sourceCommit": "c325c600ea2760156d467bfaa375613879211cd9",
+  "releaseMetadataCommit": "79988a85e5f893a5d06eb9ee499c07c3abc37e39",
+  "fullVisual": {
+    "command": "pnpm run test:visual:full",
+    "exitCode": 1,
+    "preview": {
+      "passed": 645,
+      "failed": 43,
+      "total": 688,
+      "duration": "10.1m"
+    },
+    "dev": {
+      "passed": 10,
+      "failed": 9,
+      "total": 19,
+      "duration": "5.4m"
+    },
+    "aggregate": {
+      "passed": 655,
+      "failed": 52,
+      "total": 707
+    },
+    "failureLines": [
+      "  ✘    8 [desktop-light] › vue/tests/visual/capture-all.spec.ts:67:7 › capture data (2.1s)",
+      "  ✘   40 [desktop-light] › vue/tests/visual/markdown-editor-chrome.spec.ts:186:13 › markdown editor chrome variants matrix (#429) › keeps one editor instance through rapid mode switches (4.1s)",
+      "  ✘   46 [desktop-light] › vue/tests/visual/markdown-editor-chrome.spec.ts:400:13 › markdown editor chrome variants matrix (#429) › renders toolbar, status, and slot visibility contract (23.3s)",
+      "  ✘   78 [desktop-light] › vue/tests/visual/motion-transition-acceptance.spec.ts:50:5 › list transitions use <=8px displacement (3.1s)",
+      "  ✘   79 [desktop-light] › vue/tests/visual/motion-transition-acceptance.spec.ts:25:5 › zoom-in transitions use opacity+translate, no axis scale (3.3s)",
+      "  ✘   80 [desktop-light] › vue/tests/visual/motion-transition-acceptance.spec.ts:72:5 › zoom-in overlay transitions have scale >= 0.98 (3.0s)",
+      "  ✘   81 [desktop-light] › vue/tests/visual/motion-transition-acceptance.spec.ts:94:5 › no transition uses 500ms (3.3s)",
+      "  ✘  183 [mobile-light] › vue/tests/visual/capture-all.spec.ts:67:7 › capture data (2.8s)",
+      "  ✘  197 [mobile-light] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders framed chrome in live mode with correct geometry and semantics (1.8s)",
+      "  ✘  196 [mobile-light] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders framed chrome in source mode with correct geometry and semantics (2.1s)",
+      "  ✘  198 [mobile-light] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders framed chrome in split mode with correct geometry and semantics (2.3s)",
+      "  ✘  200 [mobile-light] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders embedded chrome in source mode with correct geometry and semantics (1.9s)",
+      "  ✘  201 [mobile-light] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders embedded chrome in live mode with correct geometry and semantics (1.8s)",
+      "  ✘  202 [mobile-light] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders embedded chrome in split mode with correct geometry and semantics (2.4s)",
+      "  ✘  204 [mobile-light] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders minimal chrome in source mode with correct geometry and semantics (2.0s)",
+      "  ✘  205 [mobile-light] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders minimal chrome in live mode with correct geometry and semantics (1.9s)",
+      "  ✘  206 [mobile-light] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders minimal chrome in split mode with correct geometry and semantics (2.1s)",
+      "  ✘  208 [mobile-light] › vue/tests/visual/markdown-editor-chrome.spec.ts:186:13 › markdown editor chrome variants matrix (#429) › keeps one editor instance through rapid mode switches (3.5s)",
+      "  ✘  211 [mobile-light] › vue/tests/visual/markdown-editor-chrome.spec.ts:354:13 › markdown editor chrome variants matrix (#429) › stays usable at 150% and 200% zoom (2.2s)",
+      "  ✘  217 [mobile-light] › vue/tests/visual/markdown-editor-chrome.spec.ts:520:13 › markdown editor chrome variants matrix (#429) › keeps framed geometry under forced colors (1.8s)",
+      "  ✘  214 [mobile-light] › vue/tests/visual/markdown-editor-chrome.spec.ts:400:13 › markdown editor chrome variants matrix (#429) › renders toolbar, status, and slot visibility contract (23.3s)",
+      "  ✘  352 [desktop-dark] › vue/tests/visual/capture-all.spec.ts:67:7 › capture data (2.3s)",
+      "  ✘  367 [desktop-dark] › vue/tests/visual/form-production.spec.ts:63:5 › keeps production form columns aligned for its project viewport and 320px (2.6s)",
+      "  ✘  385 [desktop-dark] › vue/tests/visual/markdown-editor-chrome.spec.ts:186:13 › markdown editor chrome variants matrix (#429) › keeps one editor instance through rapid mode switches (4.5s)",
+      "  ✘  391 [desktop-dark] › vue/tests/visual/markdown-editor-chrome.spec.ts:400:13 › markdown editor chrome variants matrix (#429) › renders toolbar, status, and slot visibility contract (23.3s)",
+      "  ✘  423 [desktop-dark] › vue/tests/visual/motion-transition-acceptance.spec.ts:25:5 › zoom-in transitions use opacity+translate, no axis scale (3.0s)",
+      "  ✘  424 [desktop-dark] › vue/tests/visual/motion-transition-acceptance.spec.ts:72:5 › zoom-in overlay transitions have scale >= 0.98 (2.8s)",
+      "  ✘  425 [desktop-dark] › vue/tests/visual/motion-transition-acceptance.spec.ts:50:5 › list transitions use <=8px displacement (2.9s)",
+      "  ✘  426 [desktop-dark] › vue/tests/visual/motion-transition-acceptance.spec.ts:94:5 › no transition uses 500ms (3.1s)",
+      "  ✘  524 [mobile-dark] › vue/tests/visual/capture-all.spec.ts:67:7 › capture data (2.8s)",
+      "  ✘  538 [mobile-dark] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders framed chrome in source mode with correct geometry and semantics (1.7s)",
+      "  ✘  539 [mobile-dark] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders framed chrome in live mode with correct geometry and semantics (2.1s)",
+      "  ✘  540 [mobile-dark] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders framed chrome in split mode with correct geometry and semantics (2.0s)",
+      "  ✘  542 [mobile-dark] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders embedded chrome in source mode with correct geometry and semantics (1.9s)",
+      "  ✘  543 [mobile-dark] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders embedded chrome in live mode with correct geometry and semantics (2.0s)",
+      "  ✘  544 [mobile-dark] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders embedded chrome in split mode with correct geometry and semantics (2.2s)",
+      "  ✘  546 [mobile-dark] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders minimal chrome in source mode with correct geometry and semantics (2.0s)",
+      "  ✘  547 [mobile-dark] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders minimal chrome in live mode with correct geometry and semantics (2.2s)",
+      "  ✘  548 [mobile-dark] › vue/tests/visual/markdown-editor-chrome.spec.ts:141:17 › markdown editor chrome variants matrix (#429) › renders minimal chrome in split mode with correct geometry and semantics (2.1s)",
+      "  ✘  550 [mobile-dark] › vue/tests/visual/markdown-editor-chrome.spec.ts:186:13 › markdown editor chrome variants matrix (#429) › keeps one editor instance through rapid mode switches (3.3s)",
+      "  ✘  553 [mobile-dark] › vue/tests/visual/markdown-editor-chrome.spec.ts:354:13 › markdown editor chrome variants matrix (#429) › stays usable at 150% and 200% zoom (1.9s)",
+      "  ✘  559 [mobile-dark] › vue/tests/visual/markdown-editor-chrome.spec.ts:520:13 › markdown editor chrome variants matrix (#429) › keeps framed geometry under forced colors (1.8s)",
+      "  ✘  556 [mobile-dark] › vue/tests/visual/markdown-editor-chrome.spec.ts:400:13 › markdown editor chrome variants matrix (#429) › renders toolbar, status, and slot visibility contract (23.3s)",
+      "  ✘   1 vue/tests/demo-app-dev/demo-app-dev.spec.ts:159:7 › dev server home route has no browser diagnostics (6.4s)",
+      "  ✘   4 vue/tests/demo-app-dev/demo-app-dev.spec.ts:159:7 › dev server data route has no browser diagnostics (2.0s)",
+      "  ✘  11 vue/tests/demo-app-dev/demo-app-dev.spec.ts:251:5 › default home mounts only the virtual window and navigates to sections (4.0s)",
+      "  ✘  12 vue/tests/demo-app-dev/demo-app-dev.spec.ts:269:5 › default home TreeSelect dropdown does not bleed into the next section (3.1s)",
+      "  ✘  14 vue/tests/demo-app-dev/demo-app-dev.spec.ts:372:5 › Calendar header controls use soft segmented styling (1.9s)",
+      "  ✘  16 vue/tests/demo-app-dev/demo-app-dev.spec.ts:429:5 › markdown stress route renders long raw HTML without browser diagnostics (1.5m)",
+      "  ✘  17 vue/tests/demo-app-dev/demo-app-dev.spec.ts:661:5 › markdown stress scrollbar thumb drag stays smooth without text blur (1.6m)",
+      "  ✘  18 vue/tests/demo-app-dev/demo-app-dev.spec.ts:814:5 › markdown stress preview scroll remains monotonic while renderer settles (57.0s)",
+      "  ✘  19 vue/tests/demo-app-dev/demo-app-dev.spec.ts:839:5 › markdown stress preview keeps position in narrow devtools-like viewport (25.2s)"
+    ]
+  },
+  "focusedUnit": {
+    "exitCode": 0,
+    "passed": 30
+  },
+  "affectedVisual": {
+    "exitCode": 0,
+    "passed": 38
+  },
+  "productionInteraction": {
+    "exitCode": 0,
+    "variants": 36
+  },
+  "themeBuild": {
+    "command": "pnpm run build:theme",
+    "firstAttempt": true,
+    "exitCode": 0
+  },
+  "changesetStatus": {
+    "exitCode": 0
+  },
+  "uiReceipt": {
+    "status": "rejected",
+    "digest": "475533dcc3252c125de65000b19a57042c9a030d8f4925f060c088b3e24db6d0"
+  },
+  "refVerification": {
+    "defaultBranch": "main",
+    "revision": "f2b3bb89ffe5f749da26c388f058efdbb6aee864",
+    "remoteMasterExists": false
+  },
+  "remaining": [
+    "Original WebKit host gate",
+    "Independent full/domain UX acceptance",
+    "Genuine published package parity and Blog live stack qualification",
+    "Standalone critical-only browser evidence",
+    "Expanded/inline/other-height and actual-device qualification"
+  ],
+  "noDeploymentPublishingMergeOrAutoMerge": true
+}

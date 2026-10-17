@@ -1,0 +1,128 @@
+{
+  "schema": "fsusui-design-conformance.ux-acceptance-receipt.v2",
+  "classificationReceiptDigest": "43a263c11e8f7805ccc79c7fafb6693c9b4e79d440394e938a5fd57e48237e8d",
+  "candidateSha": "c325c600ea2760156d467bfaa375613879211cd9",
+  "candidateDigest": "af2559c187db98050acbd2a1aec8b98d6436fc845e287b30f9a52f154b6dc3be",
+  "verificationClass": "ux-path",
+  "requiredSkillDigests": [
+    "c88357a6ba0340000bae5839daeb67a3cd2722e8242cf7e0148006c3610a44fe"
+  ],
+  "authorityDigests": [
+    "b7aefe9f989ce962ada16c1fcbabf0613d862dfe0ec2bd016865a1a33d5b6f18",
+    "24c88676101dde43bb0907ed173f001b6e1659973caf19701ea57eddf0617039",
+    "d871bc86ed2a66f3a851f947530ff576c3d1d0a1a37c721d11cf09b1cbc4e104",
+    "c5d43303e89931346f9d634dd592ecb54418d15a74ae923f72e52795a115544e",
+    "0bd20f9ae6997aa9b7daeb0cec2f558738565bd0932828617aea2f5b84626042",
+    "ba48704f77a4ff58856c66d761917a106613341ae651d475ff26780b64d7c883",
+    "0aece5130fd251487b3215f62f38a8a743ed4c0d02ed8e292b865daecae0195b",
+    "c97d4b2f3ffcf311fb060b21e12e13367763fb4ca9ba9c8fa4cacf6f72d381d1"
+  ],
+  "activeBaselineIdentityDigest": "ed78751006b0d5cba68eb0d93c985c5f0ee67ffef51f9e3cb880f39051eff4e3",
+  "domainPolicyDigest": "620c4f746c1f259e3b640044975ad2878b7913806038706f7991bee9d72104d3",
+  "independenceEvidenceDigest": "fad20ac22bdf865a3b38b632409ca2c38785da2dec1d8f5858946bd75aef2b04",
+  "modifiedPaths": [],
+  "productionFixture": true,
+  "viewportStateMatrix": [
+    {
+      "viewport": "844x390 CSS zoom 1",
+      "state": "Default native-menu shell with collapsed trigger search",
+      "theme": "light",
+      "inputModes": ["zoom"],
+      "evidenceDigest": "3019e02483341f105fa1c292401884082de45bfd7e3e22e2181674cf37632998"
+    },
+    {
+      "viewport": "844x390 CSS zoom 1.5",
+      "state": "Default native-menu shell with collapsed trigger search",
+      "theme": "light",
+      "inputModes": ["zoom"],
+      "evidenceDigest": "3b74db3456830b0339c5465fdd08a817892ba655028c8b89bfe80a17511a455c"
+    },
+    {
+      "viewport": "844x390 CSS zoom 2",
+      "state": "Default native-menu shell with collapsed trigger search",
+      "theme": "light",
+      "inputModes": ["zoom"],
+      "evidenceDigest": "8624fbfbb9904ebc6979c34f3413236270c726a0a031d9b3d7beeeca7067f184"
+    },
+    {
+      "viewport": "844x390 CSS zoom 1",
+      "state": "Default native-menu shell with collapsed trigger search",
+      "theme": "dark",
+      "inputModes": ["zoom"],
+      "evidenceDigest": "51226c22c4746251dfcb406a732588dc800b32ba93a565a397e495a274ce2845"
+    },
+    {
+      "viewport": "844x390 CSS zoom 1.5",
+      "state": "Default native-menu shell with collapsed trigger search",
+      "theme": "dark",
+      "inputModes": ["zoom"],
+      "evidenceDigest": "15e9261675504533e8e3423555e37171a47e974b01c336469b5857483b1dc5ae"
+    },
+    {
+      "viewport": "844x390 CSS zoom 2",
+      "state": "Default native-menu shell with collapsed trigger search",
+      "theme": "dark",
+      "inputModes": ["zoom"],
+      "evidenceDigest": "85b941f7091f9cfde309760e561ad05b6eddeaf2307f92a5f01eca6716fb3028"
+    }
+  ],
+  "inspectedRenderedArtifacts": [
+    {
+      "id": "chromium-light-1",
+      "kind": "screenshot",
+      "path": "tests/conformance/visual/artifacts/issue-828/production-c325c600-chromium-light-1.png",
+      "digest": "a5ace57e34acaf3d78de8c5891ec718519a5f84df1b269fda03d926b1f090969",
+      "inspected": true,
+      "fixtureClass": "production"
+    },
+    {
+      "id": "chromium-light-1.5",
+      "kind": "screenshot",
+      "path": "tests/conformance/visual/artifacts/issue-828/production-c325c600-chromium-light-1.5.png",
+      "digest": "f32b2dd2f8687293362981bad5e927ddfc591379782ec5ec78296743daebceb5",
+      "inspected": true,
+      "fixtureClass": "production"
+    },
+    {
+      "id": "chromium-light-2",
+      "kind": "screenshot",
+      "path": "tests/conformance/visual/artifacts/issue-828/production-c325c600-chromium-light-2.png",
+      "digest": "e444423f88406065ae5e7817535d49a4428da1eaf7df73be285714a9ae4ce18d",
+      "inspected": true,
+      "fixtureClass": "production"
+    },
+    {
+      "id": "chromium-dark-1",
+      "kind": "screenshot",
+      "path": "tests/conformance/visual/artifacts/issue-828/production-c325c600-chromium-dark-1.png",
+      "digest": "f4e117620befb636202cbb985d5ad5d328883cdcb0f58bf0aa181a5edc8f4307",
+      "inspected": true,
+      "fixtureClass": "production"
+    },
+    {
+      "id": "chromium-dark-1.5",
+      "kind": "screenshot",
+      "path": "tests/conformance/visual/artifacts/issue-828/production-c325c600-chromium-dark-1.5.png",
+      "digest": "a93ea93221477c0089ca7b39539eb97c21aaf69f96edc959c59968fda37b5b01",
+      "inspected": true,
+      "fixtureClass": "production"
+    },
+    {
+      "id": "chromium-dark-2",
+      "kind": "screenshot",
+      "path": "tests/conformance/visual/artifacts/issue-828/production-c325c600-chromium-dark-2.png",
+      "digest": "56f29b4638492069672ccbb8629976c95e13a310e9b362f4175f0f1f04c06cc5",
+      "inspected": true,
+      "fixtureClass": "production"
+    }
+  ],
+  "blockers": [
+    "Original Playwright WebKit launch gate refuses system-cache libGLESv2.so.2; local library extraction does not satisfy that gate.",
+    "Independent UX review has not been supplied.",
+    "Published package parity and Blog live-stack acceptance have not been proved.",
+    "Only the tested 844x390 collapsed default-header budget is proved; expanded search/explicit inline and other short heights retain their own acceptance requirements.",
+    "Full visual command exited 1: Preview 645 passed/43 failed; Dev 10 passed/9 failed; 655 passed/52 failed across 707 tests."
+  ],
+  "status": "rejected",
+  "receiptDigest": "475533dcc3252c125de65000b19a57042c9a030d8f4925f060c088b3e24db6d0"
+}
