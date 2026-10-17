@@ -188,7 +188,7 @@ test('ImageViewer geometry rejects actual zero-area and escaped action controls'
   expect(await isReachableTarget()).toBe(true)
 })
 
-test('short ImageViewer compresses its docking gap while preserving a full action row', async ({
+test('short ImageViewer preserves a full action row below navigation', async ({
   page,
 }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' })
@@ -210,5 +210,62 @@ test('short ImageViewer compresses its docking gap while preserving a full actio
     expect(rect.width).toBeGreaterThanOrEqual(44)
     expect(rect.height).toBeGreaterThanOrEqual(44)
     expect(rect.reachable).toBe(true)
+  }
+})
+
+test('short ImageViewer chrome remains reachable and disjoint from the toolbar', async ({
+  page,
+}) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' })
+  const viewer = await openViewer(page, 'light')
+  for (const profileId of ['no-inset', 'portrait-notch'] as const) {
+    const canonical = getSafeAreaProfile(profileId)
+    for (const viewport of [
+      { width: 320, height: 180 },
+      { width: 240, height: 180 },
+      { width: 240, height: 200 },
+      { width: 320, height: 200 },
+      { width: 320, height: 212 },
+    ]) {
+      await applySafeAreaProfile(page, { ...canonical, viewport })
+      const controls = []
+      for (const name of ['close', 'prev', 'next']) {
+        const rect = await measureControl(
+          viewer.locator(`.el-image-viewer__${name}`),
+        )
+        expect(rect.width).toBe(44)
+        expect(rect.height).toBe(44)
+        expect(rect.reachable).toBe(true)
+        expect(rect.x).toBeGreaterThanOrEqual(canonical.insets.left)
+        expect(rect.y).toBeGreaterThanOrEqual(canonical.insets.top)
+        expect(rect.right).toBeLessThanOrEqual(
+          viewport.width - canonical.insets.right,
+        )
+        expect(rect.bottom).toBeLessThanOrEqual(
+          viewport.height - canonical.insets.bottom,
+        )
+        controls.push(rect)
+      }
+      const toolbar = await measureControl(
+        viewer.locator('.el-image-viewer__actions'),
+      )
+      expect(viewport.height - toolbar.bottom).toBeGreaterThanOrEqual(
+        Math.max(30, canonical.insets.bottom),
+      )
+      for (let first = 0; first < controls.length; first++) {
+        const a = controls[first]
+        for (const b of [...controls.slice(first + 1), toolbar]) {
+          const overlapWidth = Math.max(
+            0,
+            Math.min(a.right, b.right) - Math.max(a.x, b.x),
+          )
+          const overlapHeight = Math.max(
+            0,
+            Math.min(a.bottom, b.bottom) - Math.max(a.y, b.y),
+          )
+          expect(overlapWidth * overlapHeight).toBe(0)
+        }
+      }
+    }
   }
 })
