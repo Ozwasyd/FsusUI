@@ -227,6 +227,12 @@ import type {
   Tag,
 } from '@element-plus/components/cascader-panel'
 
+// Keep component refs named when the setup contract is serialized.
+interface CascaderTooltipRef extends Ref<TooltipInstance | null> {}
+interface CascaderInputRef extends Ref<InputInstance | null> {}
+interface CascaderPanelRef extends Ref<CascaderPanelInstance | null> {}
+interface CascaderScrollbarRef extends Ref<ScrollbarInstance | null> {}
+
 const isPromiseLike = (value: unknown): value is PromiseLike<unknown> => {
   return (
     typeof value === 'object' &&
@@ -270,11 +276,11 @@ const nsInput = useNamespace('input')
 const { t } = useLocale()
 const { form, formItem } = useFormItem()
 
-const tooltipRef: Ref<TooltipInstance | null> = ref(null)
-const input: Ref<InputInstance | null> = ref(null)
+const tooltipRef: CascaderTooltipRef = ref(null)
+const input: CascaderInputRef = ref(null)
 const tagWrapper = ref(null)
-const cascaderPanelRef: Ref<CascaderPanelInstance | null> = ref(null)
-const suggestionPanel: Ref<ScrollbarInstance | null> = ref(null)
+const cascaderPanelRef: CascaderPanelRef = ref(null)
+const suggestionPanel: CascaderScrollbarRef = ref(null)
 const popperVisible = ref(false)
 const inputHover = ref(false)
 const filtering = ref(false)

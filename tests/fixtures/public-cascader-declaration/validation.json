@@ -1,0 +1,204 @@
+{
+  "originalSource": "2d05f240e5fb04ac0cd602b4ed638ffe00b1859b",
+  "implementationCommit": "642e212ed8aef9a12f439f0a617eb0e4667c4570",
+  "regressionCommit": "a2b9829764c08a6bc503af19a867d446d4d7dd78",
+  "branch": "fix/cascader-public-declaration-2d05f",
+  "sourceRoot": "/workspace/FsusUI-cascader",
+  "ownedExistingSources": [
+    "vue/packages/components/cascader/index.ts",
+    "vue/packages/components/cascader/src/cascader.vue"
+  ],
+  "ownedNewScope": [
+    "tests/public-cascader-declaration.test.mjs",
+    "tests/fixtures/public-cascader-declaration/",
+    ".changeset/fix-cascader-public-declaration.md"
+  ],
+  "inheritedScope": "All other source, package metadata, generator, producer, lockfile, pins and frozen golden files are unchanged from the original source. No dependency branch was combined. CascaderPanel source remains unchanged.",
+  "unchangedInputSha256": {
+    "package.json": "4e6502bacf6c8edfe52fd20f7d59bd5df9a05f8f627546e62fb889f6e5c50ace",
+    "pnpm-lock.yaml": "c7d35e65a7f82bf145786f0d5697a8fcff2109b7f47a85146ed0acb22510ce94",
+    "vue/packages/element-plus/package.json": "7bbb40ed812927e56a198d439023224fe750ab4ad368e372b5775bf57d6b910b",
+    "vue/internal/build/src/tasks/types-definitions.ts": "e3a5bdc2789da788c05bae5df5b7770076663c2856a8c5d955bbb3b82f0a49cd"
+  },
+  "sourceSha256": {
+    "vue/packages/components/cascader/index.ts": "4a65278f4005ac8c2c2543acf888bf769ef622fcc1265cd5c2dd007a54c90032",
+    "vue/packages/components/cascader/src/cascader.vue": "fe6bef73627dae5d609ad9b5546410a816486bc946d4187e7673424c7d4cda24"
+  },
+  "compilerIdentities": {
+    "node": "24.19.0",
+    "pnpm": "10.33.0",
+    "producerTsMorph": "27.0.2",
+    "producerTypeScript": "5.9.2",
+    "installedTypeScript": "6.0.2",
+    "vue": "3.5.32"
+  },
+  "canonicalProducer": {
+    "status": "PASS",
+    "command": "node --test tests/public-cascader-declaration.test.mjs (invokes unchanged canonical generateTypesDefinitions task)",
+    "originalDiagnostics": 12,
+    "repairedDiagnostics": 10,
+    "originalCascaderDiagnostics": [
+      {
+        "code": 7056,
+        "source": "vue/packages/components/cascader/index.ts",
+        "node": "ElCascader"
+      },
+      {
+        "code": 7056,
+        "source": "vue/packages/components/cascader/src/cascader.vue",
+        "node": "export"
+      }
+    ],
+    "repairedCascaderDiagnostics": [],
+    "emitted": [
+      {
+        "file": "index.d.ts",
+        "emitted": true
+      },
+      {
+        "file": "src/cascader.vue.d.ts",
+        "emitted": true
+      }
+    ],
+    "parityAssertions": [
+      "entire inferred component",
+      "props",
+      "emits",
+      "slots",
+      "instance refs",
+      "actual inferred getCheckedNodes and togglePopperVisible parameters and returns"
+    ],
+    "parityErrors": [],
+    "originalControlReproduces7056": true,
+    "originalDiagnosticReturnUnchanged": true,
+    "remainingDiagnostics": [
+      {
+        "code": 7056,
+        "source": "vue/packages/components/date-picker/src/panel-utils.ts"
+      },
+      {
+        "code": 7056,
+        "source": "vue/packages/components/pagination/src/components/sizes.vue"
+      },
+      {
+        "code": 7056,
+        "source": "vue/packages/components/select/index.ts"
+      },
+      {
+        "code": 7056,
+        "source": "vue/packages/components/select/src/select.vue"
+      },
+      {
+        "code": 7056,
+        "source": "vue/packages/components/select/src/useSelect.ts"
+      },
+      {
+        "code": 7056,
+        "source": "vue/packages/components/slider/index.ts"
+      },
+      {
+        "code": 7056,
+        "source": "vue/packages/components/slider/src/composables/use-slide.ts"
+      },
+      {
+        "code": 7056,
+        "source": "vue/packages/components/slider/src/slider.vue"
+      },
+      {
+        "code": 7056,
+        "source": "vue/packages/components/time-select/index.ts"
+      },
+      {
+        "code": 7056,
+        "source": "vue/packages/components/time-select/src/time-select.vue"
+      }
+    ]
+  },
+  "runtimeParity": {
+    "script": "PASS",
+    "template": "PASS",
+    "barrel": "PASS",
+    "pinnedInputs": "PASS",
+    "scriptSha256": "75bf804fe8fc84bafb8ae7dcc81db7c00a86b24c4a4f3aca8e9b8569e0b7ecfa",
+    "packedRuntimeParity": "PASS",
+    "packedFiles": [
+      "package/es/components/cascader/index.mjs",
+      "package/es/components/cascader/src/cascader.mjs",
+      "package/es/components/cascader/src/cascader.vue.mjs",
+      "package/es/components/cascader/src/cascader.vue2.mjs",
+      "package/es/components/cascader/src/instances.mjs",
+      "package/es/components/cascader/style/css.mjs",
+      "package/es/components/cascader/style/index.mjs",
+      "package/lib/components/cascader/index.js",
+      "package/lib/components/cascader/src/cascader.js",
+      "package/lib/components/cascader/src/cascader.vue.js",
+      "package/lib/components/cascader/src/cascader.vue2.js",
+      "package/lib/components/cascader/src/instances.js",
+      "package/lib/components/cascader/style/css.js",
+      "package/lib/components/cascader/style/index.js"
+    ]
+  },
+  "packedStrict": {
+    "positiveContract": "PASS",
+    "negativeContract": "PASS",
+    "negativeControls": 20,
+    "positiveStrict": "FAIL",
+    "positiveStrictRemainingErrors": 3,
+    "libraryStrict": "FAIL",
+    "originalLibraryErrors": 10,
+    "repairedLibraryErrors": 8,
+    "remainingMissingBarrels": ["select", "slider", "time-select"],
+    "remainingMissingGlobalExports": [
+      "ElOption",
+      "ElOptionGroup",
+      "ElSelect",
+      "ElSlider",
+      "ElTimeSelect"
+    ],
+    "rootAndGlobalCascaderConsumerErrors": 0,
+    "strict": true,
+    "skipLibCheck": false
+  },
+  "candidate": {
+    "build": "PASS",
+    "verify": "PASS",
+    "implementationCommit": "642e212ed8aef9a12f439f0a617eb0e4667c4570",
+    "sha256": "02578bb17407ae06f10d34247bc529138aebe6d33f02248c055183d64cedaf58",
+    "package": "@ozwasyd/element-plus",
+    "version": "1.5.1",
+    "publication": "UNRUN"
+  },
+  "originalUnitSelection": {
+    "preflight": "PASS",
+    "selectedTests": 22,
+    "testFile": "vue/packages/components/cascader/__tests__/cascader.test.tsx",
+    "baseline": "PASS 22/22",
+    "repaired": "PASS 22/22",
+    "artifactHook": "pnpm run prepare:test-artifacts",
+    "command": "PATH=<pinned pnpm and repository bins> node scripts/with-node-heap.mjs vitest run --config vue/vitest.config.ts vue/packages/components/cascader/__tests__/cascader.test.tsx"
+  },
+  "finalRegression": {
+    "status": "PASS",
+    "tests": 3,
+    "failed": 0,
+    "skipped": 0,
+    "command": "FSUS_CASCADER_BASELINE_CANDIDATE=<baseline tarball> FSUS_CASCADER_CANDIDATE=<repaired tarball> FSUS_CASCADER_EVIDENCE=<evidence directory> FSUS_CASCADER_STORE=<store> node --test tests/public-cascader-declaration.test.mjs"
+  },
+  "sourceLint": "PASS",
+  "fixtureFormatting": "PASS",
+  "changesetStatus": "PASS after correcting the owned changeset to the existing workspace package name element-plus",
+  "retainedFailedAttempts": [
+    "Baseline candidate first packing failed with ENOENT at npm default cache; the existing packer succeeded with NPM_CONFIG_CACHE in /tmp.",
+    "First installed regression used null as a positive change payload. The original inferred contract rejects it; the corrected positive case and retained negative null case pass the final regression.",
+    "First changeset status used the public npm name. Correcting only the owned changeset to the workspace name element-plus made the exact rerun pass.",
+    "First Vitest preflight failed to resolve its executable. The corrected executable PATH yielded exactly 22 tests before any unit execution."
+  ],
+  "continuity": "Two exec-server transport disconnects recovered through bounded successful workspace reads; neither was a GitHub rate-limit or permission denial. Source and unpublished tests were preserved in the same environment.",
+  "unrun": [
+    "npm publication",
+    "final combination owned by Original827",
+    "broad runtime or visual qualification outside this component declaration scope"
+  ],
+  "localEvidenceDirectory": "/tmp/cascader-evidence",
+  "rollback": "Revert implementation commit 642e212ed8aef9a12f439f0a617eb0e4667c4570; this restores the original missing declaration behavior and the regression will detect it."
+}

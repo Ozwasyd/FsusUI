@@ -2,6 +2,7 @@
   <div
     v-bind="componentMotionAttrs"
     :class="[ns.b(), ns.is('disabled', disabled)]"
+    @keydown="handleTriggerKeydown"
   >
     <el-tooltip ref="popperRef" v-bind="tooltipBindings" v-on="tooltipEvents">
       <template #content>
@@ -79,6 +80,7 @@ import {
 } from '@element-plus/components/motion'
 import { ElCollection as ElDropdownCollection, dropdownProps } from './dropdown'
 import { DROPDOWN_INJECTION_KEY } from './tokens'
+import { dropdownViewportModifiers } from './viewport-modifiers'
 
 import type { CSSProperties, ComponentPublicInstance } from 'vue'
 import type { Measurable } from '@element-plus/components/popper'
@@ -113,18 +115,26 @@ export default defineComponent({
       (ComponentPublicInstance & { $el: HTMLElement }) | null
     >(null)
     const popperRef = ref<InstanceType<typeof ElTooltip> | null>(null)
+    let popupVisible = false
     const contentRef = ref<HTMLElement | null>(null)
     const scrollbar = ref(null)
     const currentTabId = ref<string | null>(null)
     const isUsingKeyboard = ref(false)
-    const triggerKeys = [EVENT_CODE.enter, EVENT_CODE.space, EVENT_CODE.down]
+    const triggerKeys = [
+      EVENT_CODE.enter,
+      EVENT_CODE.space,
+      EVENT_CODE.down,
+      EVENT_CODE.up,
+    ]
     const triggerTargetEl = computed(() => contentRef.value ?? undefined)
     const virtualRef = computed<Measurable | undefined>(
       () => triggeringElementRef.value?.$el ?? undefined,
     )
 
     const wrapStyle = computed<CSSProperties>(() => ({
-      maxHeight: addUnit(props.maxHeight),
+      maxHeight: props.viewportBounded
+        ? `min(${addUnit(props.maxHeight) || '274px'}, calc(var(--el-dropdown-viewport-height, 100dvh) - 24px))`
+        : addUnit(props.maxHeight),
     }))
     const dropdownTriggerKls = computed(() => [ns.m(dropdownSize.value)])
     const trigger = computed(() => ensureArray(props.trigger))
@@ -152,10 +162,22 @@ export default defineComponent({
       role: props.role,
       effect: props.effect,
       fallbackPlacements,
-      popperOptions: props.popperOptions,
+      popperOptions: props.viewportBounded
+        ? {
+            ...props.popperOptions,
+            modifiers: [
+              ...dropdownViewportModifiers(),
+              ...(props.popperOptions.modifiers || []),
+            ],
+          }
+        : props.popperOptions,
       hideAfter: trigger.value.includes('hover') ? props.hideTimeout : 0,
       placement: props.placement,
-      popperClass: [ns.e('popper'), props.popperClass],
+      popperClass: [
+        ns.e('popper'),
+        ns.is('viewport-bounded', props.viewportBounded),
+        props.popperClass,
+      ],
       referenceElement: referenceElementRef.value?.$el,
       trigger: trigger.value,
       triggerKeys,
@@ -174,6 +196,7 @@ export default defineComponent({
       'before-show': handleBeforeShowTooltip,
       show: handleShowTooltip,
       'before-hide': handleBeforeHideTooltip,
+      hide: handleHideTooltip,
     }
     const rovingFocusGroupBindings = computed(() => ({
       loop: props.loop,
@@ -238,7 +261,9 @@ export default defineComponent({
       }
     }
 
-    function handleBeforeShowTooltip() {
+    function handleBeforeShowTooltip(event?: Event) {
+      popupVisible = true
+      isUsingKeyboard.value = event?.type === 'keydown'
       emit('visible-change', true)
     }
 
@@ -249,7 +274,33 @@ export default defineComponent({
     }
 
     function handleBeforeHideTooltip() {
+      popupVisible = false
       emit('visible-change', false)
+    }
+
+    function handleContentKeydown(event: KeyboardEvent) {
+      handleTriggerKeydown(event)
+    }
+
+    function handleTriggerKeydown(event: KeyboardEvent) {
+      if (
+        popupVisible &&
+        !event.defaultPrevented &&
+        event.code === EVENT_CODE.esc
+      ) {
+        event.preventDefault()
+        event.stopPropagation()
+        popperRef.value?.onClose(event)
+      }
+    }
+
+    function handleHideTooltip(event?: Event) {
+      if (
+        event?.type === 'keydown' &&
+        (event as KeyboardEvent).code === EVENT_CODE.esc
+      ) {
+        triggeringElementRef.value?.$el?.focus({ preventScroll: true })
+      }
     }
 
     provide(DROPDOWN_INJECTION_KEY, {
@@ -259,6 +310,7 @@ export default defineComponent({
       isUsingKeyboard,
       onItemEnter,
       onItemLeave,
+      onMenuKeydown: handleContentKeydown,
     })
 
     provide('elDropdown', {
@@ -309,6 +361,8 @@ export default defineComponent({
       handleBeforeShowTooltip,
       handleShowTooltip,
       handleBeforeHideTooltip,
+      handleContentKeydown,
+      handleTriggerKeydown,
       onFocusAfterTrapped,
       popperRef,
       contentRef,

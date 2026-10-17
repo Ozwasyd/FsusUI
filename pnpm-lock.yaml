@@ -4,6 +4,11 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+patchedDependencies:
+  '@vue-macros/api@0.13.4':
+    hash: fbc74ce390248f5ea099e1b0f585f2fde9ba2b243a5d925bc2154023f9b6d88e
+    path: patches/@vue-macros__api@0.13.4.patch
+
 importers:
 
   .:
@@ -322,6 +327,9 @@ importers:
       '@pnpm/logger':
         specifier: 4.0.0
         version: 4.0.0
+      '@pnpm/types':
+        specifier: 8.10.0
+        version: 8.10.0
       consola:
         specifier: 3.4.2
         version: 3.4.2
@@ -513,6 +521,12 @@ importers:
       shiki:
         specifier: ^4.2.0
         version: 4.2.0
+      type-fest:
+        specifier: 4.41.0
+        version: 4.41.0
+      vue-router:
+        specifier: 4.6.4
+        version: 4.6.4(vue@3.5.32(typescript@6.0.2))
     devDependencies:
       '@types/node':
         specifier: 25.5.2
@@ -523,9 +537,6 @@ importers:
       vue:
         specifier: 3.5.32
         version: 3.5.32(typescript@6.0.2)
-      vue-router:
-        specifier: 4.6.4
-        version: 4.6.4(vue@3.5.32(typescript@6.0.2))
 
   vue/packages/hooks:
     dependencies:
@@ -10671,7 +10682,7 @@ snapshots:
       path-browserify: 1.0.1
       vscode-uri: 3.1.0
 
-  '@vue-macros/api@0.13.4(vue@3.5.32(typescript@6.0.2))':
+  '@vue-macros/api@0.13.4(patch_hash=fbc74ce390248f5ea099e1b0f585f2fde9ba2b243a5d925bc2154023f9b6d88e)(vue@3.5.32(typescript@6.0.2))':
     dependencies:
       '@vue-macros/common': 1.16.1(vue@3.5.32(typescript@6.0.2))
       oxc-resolver: 4.2.0
@@ -10680,7 +10691,7 @@ snapshots:
 
   '@vue-macros/better-define@1.11.4(vue@3.5.32(typescript@6.0.2))':
     dependencies:
-      '@vue-macros/api': 0.13.4(vue@3.5.32(typescript@6.0.2))
+      '@vue-macros/api': 0.13.4(patch_hash=fbc74ce390248f5ea099e1b0f585f2fde9ba2b243a5d925bc2154023f9b6d88e)(vue@3.5.32(typescript@6.0.2))
       '@vue-macros/common': 1.16.1(vue@3.5.32(typescript@6.0.2))
       unplugin: 1.16.1
     transitivePeerDependencies:
@@ -10737,7 +10748,7 @@ snapshots:
 
   '@vue-macros/define-prop@0.6.5(vue@3.5.32(typescript@6.0.2))':
     dependencies:
-      '@vue-macros/api': 0.13.4(vue@3.5.32(typescript@6.0.2))
+      '@vue-macros/api': 0.13.4(patch_hash=fbc74ce390248f5ea099e1b0f585f2fde9ba2b243a5d925bc2154023f9b6d88e)(vue@3.5.32(typescript@6.0.2))
       '@vue-macros/common': 1.16.1(vue@3.5.32(typescript@6.0.2))
       unplugin: 1.16.1
       vue: 3.5.32(typescript@6.0.2)

@@ -1858,14 +1858,14 @@ export const markdownEditorEmits = {
     typeof target === 'string' && typeof mode === 'string',
   'embed-retry': (target: string, mode: string) =>
     typeof target === 'string' && typeof mode === 'string',
-  transaction: (event: MarkdownEditorTransactionEvent) =>
-    typeof event?.accepted === 'boolean' &&
-    typeof event.revision === 'number' &&
-    typeof event.value === 'string',
-  'selection-change': (event: MarkdownEditorSelectionEvent) =>
-    typeof event?.revision === 'number' &&
-    typeof event.selection?.start === 'number' &&
-    typeof event.selection?.end === 'number',
+  transaction: (transactionEvent: MarkdownEditorTransactionEvent) =>
+    typeof transactionEvent?.accepted === 'boolean' &&
+    typeof transactionEvent.revision === 'number' &&
+    typeof transactionEvent.value === 'string',
+  'selection-change': (selectionEvent: MarkdownEditorSelectionEvent) =>
+    typeof selectionEvent?.revision === 'number' &&
+    typeof selectionEvent.selection?.start === 'number' &&
+    typeof selectionEvent.selection?.end === 'number',
   'history-change': (history: MarkdownEditorHistoryState) =>
     typeof history?.undoDepth === 'number' &&
     typeof history.redoDepth === 'number',

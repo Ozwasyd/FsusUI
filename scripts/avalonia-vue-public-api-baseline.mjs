@@ -4,6 +4,8 @@ import path from 'node:path'
 import process from 'node:process'
 import { execFileSync } from 'node:child_process'
 import { fileURLToPath, pathToFileURL } from 'node:url'
+import { parse as parseScript } from '@babel/parser'
+import { parse as parseSfc } from 'vue/compiler-sfc'
 import {
   extractDeprecatedDeclarations,
   extractComponentSemantics,
@@ -560,6 +562,325 @@ const fallbackPropsAndEmits = (sources, exportName) => {
   }
 }
 
+// Options props belong to the selected component binding, including an empty
+// binding. A sibling export is never evidence for an unresolved expression.
+const selectedOptionsProps = (
+  root,
+  moduleName,
+  sources,
+  exportName,
+  vueSource,
+) => {
+  const absent = { state: 'absent', selected: false, props: [] }
+  const unresolved = { state: 'unresolved', selected: true, props: [] }
+  if (!vueSource?.relativePath.endsWith('.vue')) return absent
+  const { descriptor } = parseSfc(vueSource.content)
+  if (descriptor.scriptSetup || !descriptor.script) return absent
+  const modules = new Map()
+  const unwrap = (node) => {
+    while (
+      node &&
+      [
+        'TSAsExpression',
+        'TSTypeAssertion',
+        'TSSatisfiesExpression',
+        'TSNonNullExpression',
+        'ParenthesizedExpression',
+      ].includes(node.type)
+    )
+      node = node.expression
+    return node
+  }
+  const load = (file) => {
+    if (modules.has(file)) return modules.get(file)
+    modules.set(file, null)
+    if (!file.startsWith(`${path.resolve(root)}${path.sep}`) || !exists(file))
+      return null
+    let content = read(file)
+    if (file.endsWith('.vue')) {
+      const { descriptor } = parseSfc(content, { filename: file })
+      if (descriptor.scriptSetup || !descriptor.script) return null
+      content = descriptor.script.content
+    }
+    let ast
+    try {
+      ast = parseScript(content, {
+        sourceType: 'module',
+        plugins: ['typescript', 'jsx'],
+      })
+    } catch {
+      return null
+    }
+    const module = {
+      file,
+      locals: new Map(),
+      imports: new Map(),
+      exports: new Map(),
+      stars: [],
+    }
+    const declarations = (node) => {
+      if (node?.type !== 'VariableDeclaration') return
+      for (const declaration of node.declarations) {
+        if (declaration.id.type === 'Identifier')
+          module.locals.set(declaration.id.name, declaration.init)
+      }
+    }
+    for (const node of ast.program.body) {
+      declarations(node)
+      if (node.type === 'ImportDeclaration' && node.importKind !== 'type') {
+        for (const specifier of node.specifiers) {
+          if (specifier.importKind === 'type') continue
+          module.imports.set(specifier.local.name, {
+            source: node.source.value,
+            name:
+              specifier.type === 'ImportSpecifier'
+                ? (specifier.imported.name ?? specifier.imported.value)
+                : specifier.type === 'ImportDefaultSpecifier'
+                  ? 'default'
+                  : '*',
+          })
+        }
+      }
+      if (
+        node.type === 'ExportNamedDeclaration' &&
+        node.exportKind !== 'type'
+      ) {
+        declarations(node.declaration)
+        if (node.declaration?.type === 'VariableDeclaration') {
+          for (const declaration of node.declaration.declarations) {
+            if (declaration.id.type === 'Identifier')
+              module.exports.set(declaration.id.name, {
+                local: declaration.id.name,
+              })
+          }
+        }
+        for (const specifier of node.specifiers ?? []) {
+          if (
+            specifier.type !== 'ExportSpecifier' ||
+            specifier.exportKind === 'type'
+          )
+            continue
+          module.exports.set(
+            specifier.exported.name ?? specifier.exported.value,
+            {
+              local: specifier.local.name ?? specifier.local.value,
+              source: node.source?.value,
+            },
+          )
+        }
+      }
+      if (node.type === 'ExportDefaultDeclaration')
+        module.exports.set('default', { node: node.declaration })
+      if (node.type === 'ExportAllDeclaration' && node.exportKind !== 'type')
+        module.stars.push(node.source.value)
+    }
+    modules.set(file, module)
+    return module
+  }
+  const importedModule = (specifier, module) => {
+    let base
+    if (specifier.startsWith('.'))
+      base = path.resolve(path.dirname(module.file), specifier)
+    else if (specifier.startsWith('@element-plus/'))
+      base = path.resolve(
+        root,
+        'vue/packages',
+        specifier.slice('@element-plus/'.length),
+      )
+    else return null
+    for (const file of [
+      base,
+      `${base}.ts`,
+      `${base}.tsx`,
+      `${base}.js`,
+      `${base}.vue`,
+      path.join(base, 'index.ts'),
+      path.join(base, 'index.js'),
+    ]) {
+      if (exists(file) && fs.statSync(file).isFile()) return load(file)
+    }
+    return null
+  }
+  const declaresExport = (name, module, active = new Set()) => {
+    if (module.exports.has(name)) return true
+    if (name === 'default' || active.has(module.file)) return false
+    const next = new Set([...active, module.file])
+    return module.stars.some((source) => {
+      const owner = importedModule(source, module)
+      return owner && declaresExport(name, owner, next)
+    })
+  }
+  const exportValue = (name, module, active, mode) => {
+    const key = `${module.file}:export:${name}`
+    if (active.has(key)) return null
+    const next = new Set([...active, key])
+    const binding = module.exports.get(name)
+    if (!binding) {
+      if (name === 'default') return null
+      const owners = []
+      for (const source of module.stars) {
+        const owner = importedModule(source, module)
+        if (!owner) return null
+        const candidate = exportValue(name, owner, next, mode)
+        if (!candidate && declaresExport(name, owner)) return null
+        if (
+          candidate &&
+          !owners.some(
+            (item) =>
+              item.node === candidate.node && item.module === candidate.module,
+          )
+        )
+          owners.push(candidate)
+      }
+      return owners.length === 1 ? owners[0] : null
+    }
+    if (binding.source) {
+      const owner = importedModule(binding.source, module)
+      return owner ? exportValue(binding.local, owner, next, mode) : null
+    }
+    return binding.node
+      ? value(binding.node, module, next, mode)
+      : localValue(binding.local, module, next, mode)
+  }
+  const localValue = (name, module, active, mode) => {
+    const key = `${module.file}:local:${name}`
+    if (active.has(key)) return null
+    const next = new Set([...active, key])
+    if (module.locals.has(name))
+      return value(module.locals.get(name), module, next, mode)
+    const binding = module.imports.get(name)
+    if (!binding || binding.name === '*') return null
+    const owner = importedModule(binding.source, module)
+    return owner ? exportValue(binding.name, owner, next, mode) : null
+  }
+  const propertyName = (property, module, active) => {
+    if (!property.computed && property.key.type === 'Identifier')
+      return property.key.name
+    const key = value(property.key, module, active, 'props')?.node
+    return key && ['StringLiteral', 'NumericLiteral'].includes(key.type)
+      ? String(key.value)
+      : null
+  }
+  const value = (expression, module, active, mode) => {
+    const node = unwrap(expression)
+    if (!node) return null
+    if (node.type === 'Identifier')
+      return localValue(node.name, module, active, mode)
+    if (node.type === 'CallExpression' && node.callee.type === 'Identifier') {
+      const binding = module.imports.get(node.callee.name)
+      const allowed =
+        mode === 'options'
+          ? (binding?.source === 'vue' && binding.name === 'defineComponent') ||
+            (binding?.source === '@element-plus/utils' &&
+              ['withInstall', 'withNoopInstall'].includes(binding.name))
+          : binding?.source === '@element-plus/utils' &&
+            binding.name === 'buildProps'
+      return allowed ? value(node.arguments[0], module, active, mode) : null
+    }
+    if (node.type === 'MemberExpression') {
+      const name = propertyName(
+        { key: node.property, computed: node.computed },
+        module,
+        active,
+      )
+      if (name === null) return null
+      const namespace =
+        node.object.type === 'Identifier' &&
+        module.imports.get(node.object.name)
+      if (namespace?.name === '*') {
+        const owner = importedModule(namespace.source, module)
+        return owner ? exportValue(name, owner, active, mode) : null
+      }
+      const owner = value(
+        node.object,
+        module,
+        active,
+        name === 'props' ? 'options' : mode,
+      )
+      if (owner?.node.type !== 'ObjectExpression') return null
+      const property = selectedProperty(
+        owner,
+        name,
+        name === 'props' ? 'options' : mode,
+        mode,
+      )
+      return property.state === 'resolved' ? property.value : null
+    }
+    return { node, module, active }
+  }
+  const selectedProperty = (owner, name, ownerMode, valueMode) => {
+    if (owner?.node.type !== 'ObjectExpression') return { state: 'unresolved' }
+    let selected = { state: 'absent' }
+    for (const property of owner.node.properties) {
+      if (property.type === 'SpreadElement') {
+        const spread = selectedProperty(
+          value(property.argument, owner.module, owner.active, ownerMode),
+          name,
+          ownerMode,
+          valueMode,
+        )
+        if (spread.state !== 'absent') selected = spread
+        continue
+      }
+      const key = propertyName(property, owner.module, owner.active)
+      if (key === null) {
+        selected = { state: 'unresolved' }
+      } else if (key === name) {
+        const resolved =
+          property.type === 'ObjectProperty' &&
+          value(property.value, owner.module, owner.active, valueMode)
+        selected = resolved
+          ? { state: 'resolved', value: resolved }
+          : { state: 'unresolved' }
+      }
+    }
+    return selected
+  }
+  const names = (resolved) => {
+    if (!resolved) return null
+    const { node, module, active } = resolved
+    if (node.type === 'ArrayExpression') {
+      const result = node.elements.map(
+        (item) => value(item, module, active, 'props')?.node,
+      )
+      return result.every((item) => item?.type === 'StringLiteral')
+        ? result.map((item) => item.value)
+        : null
+    }
+    if (node.type !== 'ObjectExpression') return null
+    const result = []
+    for (const property of node.properties) {
+      if (property.type === 'SpreadElement') {
+        const spread = names(value(property.argument, module, active, 'props'))
+        if (spread === null) return null
+        result.push(...spread)
+      } else {
+        const name = propertyName(property, module, active)
+        if (name === null) return null
+        result.push(name)
+      }
+    }
+    return result
+  }
+  // The public export identifies the owner even when legacy source selection
+  // falls back to a different SFC in the same module.
+  const entry = sources.find(
+    (source) =>
+      source.relativePath === `vue/packages/components/${moduleName}/index.ts`,
+  )
+  const module = entry && load(path.resolve(root, entry.relativePath))
+  if (!module) return unresolved
+  const options = exportValue(exportName, module, new Set(), 'options')
+  if (options?.node.type !== 'ObjectExpression') return unresolved
+  const props = selectedProperty(options, 'props', 'options', 'props')
+  if (props.state === 'absent') return { ...absent, selected: true }
+  if (props.state === 'unresolved') return unresolved
+  const result = names(props.value)
+  return result === null
+    ? unresolved
+    : { state: 'resolved', selected: true, props: uniqueSorted(result) }
+}
+
 const parseComponent = (
   root,
   moduleName,
@@ -578,6 +899,13 @@ const parseComponent = (
     fromVue.props.length || fromVue.emits.length
       ? { props: [], emits: [] }
       : fallbackPropsAndEmits(sources, exportName)
+  const optionsProps = selectedOptionsProps(
+    root,
+    moduleName,
+    sources,
+    exportName,
+    vueSource,
+  )
   const semantics = extractComponentSemantics({
     root,
     moduleSources: sources,
@@ -601,7 +929,9 @@ const parseComponent = (
     module: moduleName,
     classification,
     source: vueSource?.relativePath ?? null,
-    props: uniqueSorted([...fromVue.props, ...fallback.props]),
+    props: optionsProps.selected
+      ? optionsProps.props
+      : uniqueSorted([...fromVue.props, ...fallback.props]),
     emits: uniqueSorted([...fromVue.emits, ...fallback.emits]),
     slots: slotSemantics.semanticSlots,
     exposed: vueSource ? parseDefineExpose(vueSource.content) : [],
@@ -847,7 +1177,7 @@ export const buildArtifacts = (root, options = {}) => {
       packageVersion: packageJson.version,
       tokenHash: hashFiles(root, tokenFiles),
       iconHash: hashFiles(root, iconFiles),
-      toolVersion: `avalonia-vue-public-api-baseline@${semanticVersion}+vue-semantic-baseline@${semanticVersion}`,
+      toolVersion: `avalonia-vue-public-api-baseline@1.4.2+vue-semantic-baseline@${semanticVersion}`,
       inputTreeHash,
       compilerOptionsHash,
       dependencyVersionHash,

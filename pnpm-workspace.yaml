@@ -1,6 +1,8 @@
 packages:
   - vue/packages/*
   - vue/internal/*
+patchedDependencies:
+  '@vue-macros/api@0.13.4': patches/@vue-macros__api@0.13.4.patch
 
 peerDependencyRules:
   ignoreMissing:

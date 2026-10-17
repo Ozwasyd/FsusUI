@@ -3,7 +3,7 @@
     :disabled="disabled"
     :text-value="textValue ?? textContent"
   >
-    <el-roving-focus-item :focusable="!disabled">
+    <el-roving-focus-item :focusable="!disabled" :active="isActiveRadio">
       <el-dropdown-item-impl
         v-bind="propsAndAttrs"
         @pointerleave="handlePointerLeave"
@@ -11,6 +11,12 @@
         @clickimpl="handleClick"
       >
         <slot />
+        <template v-if="$slots.description" #description>
+          <slot name="description" />
+        </template>
+        <template v-if="$slots.suffix" #suffix>
+          <slot name="suffix" />
+        </template>
       </el-dropdown-item-impl>
     </el-roving-focus-item>
   </el-dropdown-collection-item>
@@ -57,10 +63,13 @@ export default defineComponent({
     const _instance = getCurrentInstance()
     const itemRef = ref<HTMLElement | null>(null)
     const textContent = computed(() => unref(itemRef)?.textContent ?? '')
-    const { onItemEnter, onItemLeave } = inject(
+    const { role, onItemEnter, onItemLeave } = inject(
       DROPDOWN_INJECTION_KEY,
       undefined,
     )!
+    const isActiveRadio = computed(
+      () => role.value === 'menu' && props.checked === true,
+    )
 
     const handlePointerMove = composeEventHandlers(
       (e: PointerEvent) => {
@@ -132,6 +141,7 @@ export default defineComponent({
 
     return {
       handleClick,
+      isActiveRadio,
       handlePointerMove,
       handlePointerLeave,
       textContent,

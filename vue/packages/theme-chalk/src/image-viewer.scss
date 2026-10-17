@@ -1,5 +1,6 @@
 @use 'mixins/mixins' as *;
 @use 'common/var' as *;
+@use 'mixins/function' as *;
 
 @mixin op-icon() {
   width: 44px;
@@ -11,6 +12,9 @@
   @include e(wrapper) {
     // Scrim-equivalent surface: full viewport coverage, never safe-area shrunk.
     @include fsus-overlay-scrim;
+    z-index: getCssVar('index-top');
+    display: flex;
+    flex-direction: column;
   }
 
   @include e(btn) {
@@ -21,10 +25,7 @@
     justify-content: center;
     border-radius: 50%;
     opacity: var(--fsus-image-viewer-control-opacity, 0.88);
-    color: var(
-      --fsus-image-viewer-control-fg,
-      var(--fsus-color-surface-base)
-    );
+    color: var(--fsus-image-viewer-control-fg, var(--fsus-color-surface-base));
     background-color: var(
       --fsus-image-viewer-control-bg,
       rgba(15, 15, 17, 0.72)
@@ -69,14 +70,40 @@
     font-size: 40px;
   }
 
+  @include e(img) {
+    @include when(contain) {
+      max-width: 100%;
+      max-height: 100%;
+    }
+    @include when(hidden) {
+      display: none;
+    }
+  }
+
   @include e(canvas) {
     position: static;
     width: 100%;
-    height: 100%;
+    flex: 1;
+    min-height: 0;
+    box-sizing: border-box;
+    @include fsus-padding-safe-area-box(84px);
     display: flex;
     justify-content: center;
     align-items: center;
     user-select: none;
+  }
+
+  @include e(caption) {
+    position: relative;
+    flex: none;
+    max-height: 25%;
+    overflow: auto;
+    overflow-wrap: anywhere;
+    text-align: center;
+    color: var(--fsus-image-viewer-control-fg, var(--fsus-color-surface-base));
+    @include fsus-padding-safe-area(left, 16px);
+    @include fsus-padding-safe-area(right, 16px);
+    @include fsus-padding-safe-area(bottom, 84px);
   }
 
   @include e(actions) {
@@ -97,14 +124,19 @@
     border-radius: 999px;
     cursor: default;
     font-size: 23px;
-    color: var(
-      --fsus-image-viewer-control-fg,
-      var(--fsus-color-surface-base)
-    );
+    color: var(--fsus-image-viewer-control-fg, var(--fsus-color-surface-base));
     justify-content: space-around;
 
     @include e(action) {
       display: inline-flex;
+      width: 44px;
+      height: 44px;
+      flex: 0 0 44px;
+
+      > svg {
+        width: 1em;
+        height: 1em;
+      }
       align-items: center;
       justify-content: center;
       border-radius: var(--fsus-radius-pill);
@@ -171,11 +203,7 @@
 
 @keyframes viewer-fade-in {
   0% {
-    transform: translate3d(
-      0,
-      var(--fsus-image-viewer-enter-y, -12px),
-      0
-    );
+    transform: translate3d(0, var(--fsus-image-viewer-enter-y, -12px), 0);
     opacity: 0;
   }
   100% {
@@ -190,11 +218,7 @@
     opacity: 1;
   }
   100% {
-    transform: translate3d(
-      0,
-      var(--fsus-image-viewer-enter-y, -12px),
-      0
-    );
+    transform: translate3d(0, var(--fsus-image-viewer-enter-y, -12px), 0);
     opacity: 0;
   }
 }

@@ -1,0 +1,254 @@
+{
+  "schemaVersion": 1,
+  "baseline": "2d05f240e5fb04ac0cd602b4ed638ffe00b1859b",
+  "evidenceCommit": "736b981fba100a0c2e956e74b61ddef62ff4d508",
+  "sliderRuntime": {
+    "count": 36,
+    "sha256": "6d3953b3b642c10b431bc4f90101e0fd9c7c77b9f35070844eb1ab193c4a38c6"
+  },
+  "negative": [
+    {
+      "file": "slider-negative.ts",
+      "line": 8,
+      "code": 2322,
+      "message": "Type 'string' is not assignable to type 'EpPropMergeType<(new (...args: any[]) => number | number[]) | (() => Arrayable<number>) | ((new (...args: any[]) => number | number[]) | (() => Arrayable<number>) | null)[], unknown, unknown> | undefined'."
+    },
+    {
+      "file": "slider-negative.ts",
+      "line": 10,
+      "code": 2322,
+      "message": "Type '\"huge\"' is not assignable to type 'EpPropMergeType<StringConstructor, \"\" | \"small\" | \"default\" | \"large\", never> | undefined'."
+    },
+    {
+      "file": "slider-negative.ts",
+      "line": 11,
+      "code": 2322,
+      "message": "Type '\"middle\"' is not assignable to type 'EpPropMergeType<StringConstructor, Placement, unknown> | undefined'."
+    },
+    {
+      "file": "slider-negative.ts",
+      "line": 13,
+      "code": 2322,
+      "message": "Type '(value: string) => string' is not assignable to type '(val: number) => string'.\n  Types of parameters 'value' and 'val' are incompatible.\n    Type 'number' is not assignable to type 'string'."
+    },
+    {
+      "file": "slider-negative.ts",
+      "line": 15,
+      "code": 2345,
+      "message": "Argument of type 'KeyboardEvent' is not assignable to parameter of type 'MouseEvent | TouchEvent'.\n  Type 'KeyboardEvent' is missing the following properties from type 'MouseEvent': button, buttons, clientX, clientY, and 14 more."
+    },
+    {
+      "file": "slider-negative.ts",
+      "line": 16,
+      "code": 2769,
+      "message": "No overload matches this call.\n  Overload 1 of 3, '(event: \"input\", value: Arrayable<number>): void', gave the following error.\n    Argument of type '\"change\"' is not assignable to parameter of type '\"input\"'.\n  Overload 2 of 3, '(event: \"change\", value: Arrayable<number>): void', gave the following error.\n    Argument of type 'string' is not assignable to parameter of type 'Arrayable<number>'.\n  Overload 3 of 3, '(event: \"update:modelValue\", value: Arrayable<number>): void', gave the following error.\n    Argument of type '\"change\"' is not assignable to parameter of type '\"update:modelValue\"'."
+    },
+    {
+      "file": "slider-negative.ts",
+      "line": 17,
+      "code": 2769,
+      "message": "No overload matches this call.\n  Overload 1 of 3, '(event: \"input\", value: Arrayable<number>): void', gave the following error.\n    Argument of type '\"not-a-slider-event\"' is not assignable to parameter of type '\"input\"'.\n  Overload 2 of 3, '(event: \"change\", value: Arrayable<number>): void', gave the following error.\n    Argument of type '\"not-a-slider-event\"' is not assignable to parameter of type '\"change\"'.\n  Overload 3 of 3, '(event: \"update:modelValue\", value: Arrayable<number>): void', gave the following error.\n    Argument of type '\"not-a-slider-event\"' is not assignable to parameter of type '\"update:modelValue\"'."
+    },
+    {
+      "file": "slider-negative.ts",
+      "line": 18,
+      "code": 2322,
+      "message": "Type 'number' is not assignable to type 'CreateComponentPublicInstanceWithMixins<Readonly<ExtractPropTypes<{ readonly modelValue: { readonly type: PropType<number>; readonly required: false; readonly validator?: ((val: unknown) => boolean) | undefined; readonly default: 0; __epPropKey: true; }; readonly vertical: BooleanConstructor; readonly tooltipClass: ...'.\n  Type 'number' is not assignable to type '{ $: ComponentInternalInstance; $data: {}; $props: Partial<{ readonly vertical: boolean; readonly modelValue: number; readonly placement: EpPropMergeType<StringConstructor, Placement, unknown>; }> & Omit<...>; ... 11 more ...; $watch<T extends string | ((...args: any) => any)>(source: T, cb: T extends (...args: any)...'."
+    },
+    {
+      "file": "slider-negative.ts",
+      "line": 19,
+      "code": 2345,
+      "message": "Argument of type 'string' is not assignable to parameter of type 'number'."
+    },
+    {
+      "file": "slider-negative.ts",
+      "line": 20,
+      "code": 2345,
+      "message": "Argument of type 'MouseEvent' is not assignable to parameter of type 'KeyboardEvent'.\n  Type 'MouseEvent' is missing the following properties from type 'KeyboardEvent': charCode, code, isComposing, key, and 8 more."
+    },
+    {
+      "file": "slider-negative.ts",
+      "line": 21,
+      "code": 2345,
+      "message": "Argument of type 'undefined' is not assignable to parameter of type 'number'."
+    },
+    {
+      "file": "slider-negative.ts",
+      "line": 22,
+      "code": 2345,
+      "message": "Argument of type 'string' is not assignable to parameter of type 'number'."
+    },
+    {
+      "file": "slider-negative.ts",
+      "line": 23,
+      "code": 2345,
+      "message": "Argument of type 'MouseEvent' is not assignable to parameter of type 'TouchEvent'.\n  Type 'MouseEvent' is missing the following properties from type 'TouchEvent': changedTouches, targetTouches, touches"
+    },
+    {
+      "file": "slider-negative.ts",
+      "line": 24,
+      "code": 2322,
+      "message": "Type 'Promise<void>' is not assignable to type 'number'."
+    },
+    {
+      "file": "slider-negative.ts",
+      "line": 25,
+      "code": 2322,
+      "message": "Type 'void' is not assignable to type 'Promise<void>'."
+    },
+    {
+      "file": "slider-negative.ts",
+      "line": 28,
+      "code": 2322,
+      "message": "Type 'boolean | undefined' is not assignable to type 'string | undefined'.\n  Type 'boolean' is not assignable to type 'string'."
+    }
+  ],
+  "profiles": [
+    {
+      "name": "independent-slider",
+      "sourceCommit": "4214f38b38c8d891c3b25b0e2e56d5e28839edee",
+      "sourceInputsSha256": "aada160779f8b093850f18346216b89b3895716bd37c92f95cb054b7e03061f8",
+      "sourceInputCount": 2004,
+      "tarballSha256": "c3b064aa8cca53d7e1d78a3ba921171d47d4a1e02f9679bfa3d34e73eecb5fe7",
+      "producerDiagnostics": [
+        {
+          "code": 7056,
+          "file": "vue/packages/components/cascader/index.ts",
+          "start": 441,
+          "message": "The inferred type of this node exceeds the maximum length the compiler will serialize. An explicit type annotation is needed."
+        },
+        {
+          "code": 7056,
+          "file": "vue/packages/components/cascader/src/cascader.vue",
+          "start": 1642,
+          "message": "The inferred type of this node exceeds the maximum length the compiler will serialize. An explicit type annotation is needed."
+        },
+        {
+          "code": 7056,
+          "file": "vue/packages/components/date-picker/src/panel-utils.ts",
+          "start": 284,
+          "message": "The inferred type of this node exceeds the maximum length the compiler will serialize. An explicit type annotation is needed."
+        },
+        {
+          "code": 7056,
+          "file": "vue/packages/components/pagination/src/components/sizes.vue",
+          "start": 371,
+          "message": "The inferred type of this node exceeds the maximum length the compiler will serialize. An explicit type annotation is needed."
+        },
+        {
+          "code": 7056,
+          "file": "vue/packages/components/select/index.ts",
+          "start": 207,
+          "message": "The inferred type of this node exceeds the maximum length the compiler will serialize. An explicit type annotation is needed."
+        },
+        {
+          "code": 7056,
+          "file": "vue/packages/components/select/src/select.vue",
+          "start": 1314,
+          "message": "The inferred type of this node exceeds the maximum length the compiler will serialize. An explicit type annotation is needed."
+        },
+        {
+          "code": 7056,
+          "file": "vue/packages/components/select/src/useSelect.ts",
+          "start": 1693,
+          "message": "The inferred type of this node exceeds the maximum length the compiler will serialize. An explicit type annotation is needed."
+        },
+        {
+          "code": 7056,
+          "file": "vue/packages/components/time-select/index.ts",
+          "start": 463,
+          "message": "The inferred type of this node exceeds the maximum length the compiler will serialize. An explicit type annotation is needed."
+        },
+        {
+          "code": 7056,
+          "file": "vue/packages/components/time-select/src/time-select.vue",
+          "start": 539,
+          "message": "The inferred type of this node exceeds the maximum length the compiler will serialize. An explicit type annotation is needed."
+        }
+      ],
+      "externalDiagnostics": [
+        {
+          "file": "@ozwasyd/element-plus/es/components/index.d.ts",
+          "line": 12,
+          "code": 2307,
+          "message": "Cannot find module './cascader' or its corresponding type declarations."
+        },
+        {
+          "file": "@ozwasyd/element-plus/es/components/index.d.ts",
+          "line": 56,
+          "code": 2307,
+          "message": "Cannot find module './select' or its corresponding type declarations."
+        },
+        {
+          "file": "@ozwasyd/element-plus/es/components/index.d.ts",
+          "line": 74,
+          "code": 2307,
+          "message": "Cannot find module './time-select' or its corresponding type declarations."
+        },
+        {
+          "file": "@ozwasyd/element-plus/global.d.ts",
+          "line": 19,
+          "code": 2339,
+          "message": "Property 'ElCascader' does not exist on type 'typeof import(\"@ozwasyd/element-plus/es/index\")'."
+        },
+        {
+          "file": "@ozwasyd/element-plus/global.d.ts",
+          "line": 108,
+          "code": 2339,
+          "message": "Property 'ElOption' does not exist on type 'typeof import(\"@ozwasyd/element-plus/es/index\")'."
+        },
+        {
+          "file": "@ozwasyd/element-plus/global.d.ts",
+          "line": 109,
+          "code": 2339,
+          "message": "Property 'ElOptionGroup' does not exist on type 'typeof import(\"@ozwasyd/element-plus/es/index\")'."
+        },
+        {
+          "file": "@ozwasyd/element-plus/global.d.ts",
+          "line": 136,
+          "code": 2339,
+          "message": "Property 'ElSelect' does not exist on type 'typeof import(\"@ozwasyd/element-plus/es/index\")'."
+        },
+        {
+          "file": "@ozwasyd/element-plus/global.d.ts",
+          "line": 157,
+          "code": 2339,
+          "message": "Property 'ElTimeSelect' does not exist on type 'typeof import(\"@ozwasyd/element-plus/es/index\")'."
+        }
+      ]
+    },
+    {
+      "name": "four-component",
+      "sourceCommit": "f4a094f300384185918fc6d4be86e88d9ab9f097",
+      "sourceInputsSha256": "a10d8222fb1844856a4b52374afc37f48244fec59c70152251fb17034c0c81fa",
+      "sourceInputCount": 2004,
+      "tarballSha256": "82724daaa96d47e22bf5ec17694224bfc40192d50ff3a1554b6e8a6775bec4d9",
+      "producerDiagnostics": [],
+      "externalDiagnostics": []
+    }
+  ],
+  "candidateContract": {
+    "toolchain": {
+      "node": "v24.19.0",
+      "npm": "11.13.0",
+      "pnpm": "10.33.0"
+    },
+    "package": {
+      "distTag": "latest",
+      "name": "@ozwasyd/element-plus",
+      "packageJsonCanonicalSha256": "545e8aef06c99df84e361a4b4838f105f1513318cf3143678b27f529cd8b14e8",
+      "version": "1.5.1"
+    },
+    "thirdPartyLock": {
+      "packages": {
+        "count": 273,
+        "sha256": "cc235e5b3be7607e5f4d31ccb4dcbd3f8a21878b0e7f1ddd6b4e8d50cb9dc95d"
+      },
+      "snapshots": {
+        "count": 273,
+        "sha256": "36c3f3314e5c771bfc2f3f344a8f52ac8684dee791a25e083629f044e12623d5"
+      }
+    }
+  }
+}
