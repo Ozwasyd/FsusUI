@@ -27,5 +27,6 @@
 
   <ItemGroup>
     <AvaloniaResources Include="Assets/Fonts/*.ttf" />
+    <AvaloniaResource Include="Assets/Fonts/TableV2/*.ttf" />
   </ItemGroup>
 </Project>
