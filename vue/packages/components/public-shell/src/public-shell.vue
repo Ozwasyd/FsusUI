@@ -344,14 +344,21 @@
           </a>
         </nav>
         <div
-          v-if="cspSafe && showMobileSearchTrigger && mobileSearchCspReady"
+          v-if="cspSafe && showMobileSearchTrigger"
           ref="mobileSearchCspHostRef"
           :class="[
             ns.e('mobile-search-host'),
             ns.is('expanded', mobileSearchExpanded),
           ]"
-          :aria-hidden="!mobileSearchExpanded"
-          :inert="!mobileSearchExpanded || undefined"
+          :hidden="!mobileSearchDisclosureAvailable"
+          :aria-hidden="
+            !mobileSearchExpanded || !mobileSearchDisclosureAvailable
+          "
+          :inert="
+            !mobileSearchExpanded ||
+            !mobileSearchDisclosureAvailable ||
+            undefined
+          "
         >
           <div
             :id="mobileSearchRowId"
@@ -859,6 +866,7 @@ const syncMobileSearchCspHost = () => {
   if (
     !mobileSearchPositioningMounted ||
     !props.cspSafe ||
+    !mobileSearchCspReady.value ||
     !mobileSearchExpanded.value ||
     !host?.isConnected ||
     !window.matchMedia(
@@ -893,7 +901,12 @@ const syncMobileSearchCspHost = () => {
 }
 
 watch(
-  [() => props.cspSafe, mobileSearchExpanded, mobileSearchCspHostRef],
+  [
+    () => props.cspSafe,
+    mobileSearchExpanded,
+    mobileSearchCspHostRef,
+    mobileSearchCspReady,
+  ],
   syncMobileSearchCspHost,
   { flush: 'post' },
 )
