@@ -89,6 +89,7 @@ const ns = useNamespace('data-list')
 const listRef = ref<HTMLElement>()
 const rowElements = new Map<DataListRowKey, HTMLElement>()
 let recoveryKey: DataListRowKey | undefined
+let pendingRecovery: { key: DataListRowKey; index: number } | undefined
 
 const setRowRef = (key: DataListRowKey, element: unknown) => {
   if (element instanceof HTMLElement) rowElements.set(key, element)
@@ -97,6 +98,7 @@ const setRowRef = (key: DataListRowKey, element: unknown) => {
 const handleFocusOut = (event: FocusEvent) => {
   if (event.relatedTarget && !listRef.value?.contains(event.relatedTarget as Node)) {
     recoveryKey = undefined
+    pendingRecovery = undefined
   }
 }
 
@@ -157,15 +159,25 @@ watch(
     const document = list.ownerDocument
     const focused = document.activeElement
     const focusedEntry = [...rowElements].find(([, element]) => element === focused)
-    const key = focusedEntry?.[0] ?? (focused === list ? recoveryKey : undefined)
-    if (key === undefined) return
-    const index = previousEntries.findIndex((entry) => entry.key === key)
+    const key = focusedEntry?.[0]
+      ?? (focused === list ? recoveryKey : undefined)
+      ?? (focused === document.body ? pendingRecovery?.key : undefined)
+    if (key === undefined) {
+      pendingRecovery = undefined
+      return
+    }
+    const index = pendingRecovery?.key === key
+      ? pendingRecovery.index
+      : previousEntries.findIndex((entry) => entry.key === key)
+    // A post-flush consumer update can supersede recovery after DOM removal.
+    pendingRecovery = { key, index }
     let cancelled = false
     onCleanup(() => { cancelled = true })
 
     nextTick(() => {
       if (cancelled || !list.isConnected) return
       const currentFocus = document.activeElement
+      pendingRecovery = undefined
       if (currentFocus !== focused && currentFocus !== document.body) return
       const sameEntry = entries.find((entry) => entry.key === key && entry.enabled)
       const start = Math.max(0, index)
