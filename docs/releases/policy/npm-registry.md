@@ -117,6 +117,11 @@ protocols, local paths, private registry URLs, source maps, WASM debug output,
 unnecessary tests/fixtures, private screenshots/docs, or large unused files.
 The current audit is under `docs/releases/evidence/npm-public-preview/`.
 
+Bundled workspace reference rewriting and its residual audit inspect code
+literals, retaining generated license comments unchanged. Real unsupported
+workspace references still fail preparation; license attribution is not a runtime
+dependency. The reference inspector is bound by the candidate input fingerprint.
+
 Verify a fresh consumer install from that tarball:
 
 ```bash

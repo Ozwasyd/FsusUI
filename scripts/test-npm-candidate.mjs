@@ -13,6 +13,11 @@ import {
 import os from 'node:os'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
+import assert from 'node:assert/strict'
+import {
+  findBundledWorkspaceReferences,
+  rewriteBundledWorkspaceReferences,
+} from './bundled-workspace-references.mjs'
 import {
   candidateManifestName,
   candidateTarballName,
@@ -94,6 +99,98 @@ function createFixture(name, packageOverrides = {}) {
 }
 
 try {
+  const workspaceNames = ['@element-plus/icons-vue', '@element-plus/motion']
+  const license = `/*! Bundled license information:
+@element-plus/icons-vue/dist/index.js:
+  (*! Element Plus Icons Vue *)
+*/`
+  const fullBundle = `const icons = {};\n${license}\n`
+  assert.deepEqual(
+    rewriteBundledWorkspaceReferences(
+      fullBundle,
+      'dist/index.full.js',
+      workspaceNames,
+      () => assert.fail('license comments must not request a runtime mapping'),
+    ),
+    { content: fullBundle, replacementCount: 0 },
+  )
+  assert.deepEqual(
+    findBundledWorkspaceReferences(
+      fullBundle,
+      'dist/index.full.js',
+      workspaceNames,
+    ),
+    [],
+  )
+  for (const [fileName, input] of [
+    ['es/example.mjs', `export * from '@element-plus/icons-vue';\n${license}`],
+    ['lib/example.js', `require("@element-plus/icons-vue");\n${license}`],
+    [
+      'es/example.d.ts',
+      `export type Icon = import('@element-plus/icons-vue').Icon;\n${license}`,
+    ],
+    ['es/example.mjs', 'import(`@element-plus/icons-vue`);'],
+    ['es/example.mjs', 'import("\\u0040element-plus/icons-vue");'],
+  ]) {
+    const rewritten = rewriteBundledWorkspaceReferences(
+      input,
+      fileName,
+      workspaceNames,
+      () => './icons.mjs',
+    )
+    assert.equal(rewritten.replacementCount, 1)
+    assert.deepEqual(
+      findBundledWorkspaceReferences(
+        rewritten.content,
+        fileName,
+        workspaceNames,
+      ),
+      [],
+    )
+    if (input.includes(license)) assert.ok(rewritten.content.endsWith(license))
+  }
+  for (const input of [
+    `import '@element-plus/motion';`,
+    `export * from '@element-plus/motion';`,
+    `require('@element-plus/motion');`,
+    `import('@element-plus/motion');`,
+    `import(\`@element-plus/motion\`);`,
+  ]) {
+    assertThrows(
+      () =>
+        rewriteBundledWorkspaceReferences(
+          input,
+          'dist/index.full.js',
+          workspaceNames,
+          () => {
+            throw new Error('unsupported full-bundle runtime reference')
+          },
+        ),
+      /unsupported full-bundle runtime reference/u,
+      'full-bundle executable workspace reference',
+    )
+  }
+  for (const input of [
+    `import '@element-plus/icons-vue/dist/index.js';`,
+    `const runtime = '@element-plus/motion';`,
+    'import(`@element-plus/motion/${name}`);',
+  ]) {
+    assert.ok(
+      findBundledWorkspaceReferences(input, 'es/example.mjs', workspaceNames)
+        .length > 0,
+    )
+  }
+  assertThrows(
+    () =>
+      findBundledWorkspaceReferences(
+        'import "unterminated',
+        'es/example.mjs',
+        workspaceNames,
+      ),
+    /Unable to inspect workspace references/u,
+    'malformed module workspace audit',
+  )
+
   const crossDeviceSource = path.join(tempRoot, 'cross-device-source.tgz')
   const crossDeviceDestination = path.join(
     tempRoot,
@@ -230,7 +327,9 @@ try {
   )
 
   const fileDependencyRoot = path.join(tempRoot, 'file-dependency-package')
-  makePackage(fileDependencyRoot, { dependencies: { local: 'file:../local-pkg' } })
+  makePackage(fileDependencyRoot, {
+    dependencies: { local: 'file:../local-pkg' },
+  })
   assertThrows(
     () =>
       createCandidate({
@@ -244,7 +343,9 @@ try {
   )
 
   const linkDependencyRoot = path.join(tempRoot, 'link-dependency-package')
-  makePackage(linkDependencyRoot, { dependencies: { local: 'link:../local-pkg' } })
+  makePackage(linkDependencyRoot, {
+    dependencies: { local: 'link:../local-pkg' },
+  })
   assertThrows(
     () =>
       createCandidate({
