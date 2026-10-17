@@ -1468,6 +1468,57 @@ describe('MarkdownEditor command contract migration', () => {
 })
 
 describe('MarkdownEditor writing-aids integration', () => {
+  it('refreshes the Typewriter class and input guard when options change after mounting', async () => {
+    const wrapper = mount(MarkdownEditor, {
+      props: {
+        editorProfile: 'prose',
+        modelValue: 'initial',
+        writingAids: { focus: true, typewriter: true },
+      },
+    })
+    await nextTick()
+    expect(wrapper.classes()).toContain('is-typewriter-mode')
+    const controller = (wrapper.vm as MarkdownEditorInstance)
+      .writingAidsController
+    const handleInput = vi.spyOn(controller, 'handleInput')
+
+    await wrapper.setProps({
+      writingAids: { focus: true, typewriter: false },
+    })
+    expect(wrapper.classes()).not.toContain('is-typewriter-mode')
+    expect(wrapper.attributes('data-markdown-focus-enabled')).toBe('true')
+    await wrapper.find('textarea').setValue('disabled')
+    expect(handleInput).not.toHaveBeenCalled()
+
+    await wrapper.setProps({
+      writingAids: { focus: true, typewriter: true },
+    })
+    expect(wrapper.classes()).toContain('is-typewriter-mode')
+    await wrapper.find('textarea').setValue('enabled again')
+    expect(handleInput).toHaveBeenCalled()
+    wrapper.unmount()
+  })
+
+  it('restores default writing aids when the consumer removes the options prop', async () => {
+    const wrapper = mount(MarkdownEditor, {
+      props: {
+        editorProfile: 'prose',
+        modelValue: 'initial',
+        writingAids: { focus: true, typewriter: true },
+      },
+    })
+    await nextTick()
+    expect(wrapper.classes()).toContain('is-typewriter-mode')
+
+    await wrapper.setProps({ writingAids: undefined })
+    expect(wrapper.classes()).not.toContain('is-typewriter-mode')
+    expect(wrapper.attributes('data-markdown-focus-enabled')).toBe('false')
+    expect(
+      (wrapper.vm as MarkdownEditorInstance).writingAidsController.options,
+    ).toMatchObject({ focus: false, typewriter: false })
+    wrapper.unmount()
+  })
+
   it('renders focus presentation and makes outline reveal select, focus, and scroll the textarea', async () => {
     const source =
       '# Intro\n\nFirst paragraph.\n\n## Details\n\nSecond paragraph.\n'
