@@ -428,6 +428,7 @@ public class FsusDocumentTabs : FsusTabs
     }
 
     var selectedKey = SelectedKey;
+    var wasFocused = document.IsFocused;
     isReordering = true;
     try
     {
@@ -442,6 +443,10 @@ public class FsusDocumentTabs : FsusTabs
     if (!string.IsNullOrEmpty(selectedKey))
     {
       SelectKey(selectedKey);
+    }
+    if (wasFocused)
+    {
+      document.Focus();
     }
     Reordered?.Invoke(
       this,
