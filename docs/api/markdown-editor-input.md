@@ -37,6 +37,47 @@ Public editor mode is exactly `source` / `live` / `split` / `preview`. Live
 capability tokens are exactly the six frozen values from
 `markdownLiveCapabilities`. There is no `write` mode alias.
 
+Command palette search leaves Enter to native composition when the keyboard
+event reports `isComposing`, the IME compatibility key code `229`, or the existing
+editor composition machine is active. It does not prevent that composition
+commit or execute a command. Ordinary Enter still executes the active eligible
+command after composition ends; command eligibility, arrow navigation, and
+Escape cancellation retain their existing behavior.
+
+An open command palette owns exclusive Ctrl/Cmd+P locally inside its current
+teleported dialog, including repeated keydown. It prevents browser print without
+reopening the palette, resetting its query or selection, or running a command.
+Disabled/read-only editors, native or editor composition, extra modifiers,
+already-handled keys, unrelated targets and retired dialog elements are left
+unclaimed. The public `openCommandPalette()` method remains unchanged; consumers
+own the first shortcut within their host scope. No global listener is installed.
+
+`closeCommandPalette(): void` is idempotent. It closes the current palette and
+restores the saved source selection/focus only when focus still belongs to that
+palette. A newer control or source caret keeps its focus and selection. Delayed
+restoration is cancelled if focus moves, the palette reopens, the document
+identity/revision changes, composition starts, or the editor is disposed. Normal
+Escape, backdrop and command dismissals retain their selection-restoration
+behavior. Document replacement keeps its existing reset/focus lifecycle.
+
+`ElMarkdownEditor` emits `selection-change` for accepted transaction selection
+changes and native selection/caret movement, including Ctrl+Home/End and pointer
+selection. Its immutable payload contains `documentIdentity: { id, epoch }`,
+`revision`, and the normalized, direction-preserving `selection`. Transaction
+observations use the accepted dispatch result's identity/revision; native
+observations capture the existing transaction store's identity/revision when
+the host selection is read. Opaque IDs are preserved exactly. No new epoch or
+selection authority is introduced, and unchanged selections do not emit twice.
+
+`MarkdownEditorSelectionEvent.documentIdentity` remains optional in the public
+TypeScript type to preserve compatibility with previously constructed event
+objects. The editor always supplies it. A consumer requiring document isolation
+must reject absent or stale identities/epochs/revisions, including observations
+delivered after a document replacement or host rebind; it must not fill in an
+identity from its current props. Replacements retain the existing revision/reset
+and cancellation semantics. Selection observations do not imply a public
+viewport-change event or complete viewport arbitration.
+
 `createMarkdownLiveSurface` is the #333 owner plan: one `source-textarea`
 selection/focus/IME host. Split and preview may show the safe renderer pane;
 live does not. Projection failure keeps the source bytes and falls back to a

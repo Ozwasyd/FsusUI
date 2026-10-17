@@ -136,6 +136,7 @@ const heavyLifecycle = createMarkdownHeavyFeatureLifecycle({
 const heavyThemeRevision = ref(0)
 let heavyThemeListenerInstalled = false
 const handleHeavyFeatureThemeChange = () => {
+  activationController?.abort()
   heavyThemeRevision.value += 1
 }
 const ensureHeavyFeatureThemeListener = () => {
@@ -1044,6 +1045,8 @@ const activateRenderedFeatures = async (
   const activationStartedAt = readPerformanceNow()
   const features = resolveMarkdownFeatureOptions()
   const heavyFeaturesEnabled = hasEnabledHeavyFeature(result, features)
+  // Theme changes must invalidate pending imports and activation too.
+  if (heavyFeaturesEnabled) ensureHeavyFeatureThemeListener()
   const resolveHeavyFeatureIdentity = heavyFeaturesEnabled
     ? await createHeavyFeatureIdentityResolver(result)
     : () => null

@@ -14,6 +14,7 @@ import {
 } from './markdown-projection-invalidation'
 import { MarkdownRuntimeError } from './markdown-runtime-error'
 import {
+  createMarkdownSyntaxIdentityResolver,
   stabilizeMarkdownEditorProjection,
   type MarkdownDocumentIdentity,
   type MarkdownStableProjection,
@@ -118,8 +119,8 @@ export const isMarkdownProjectionWorkerResult = (
     typeof result.taskId === 'string' &&
     Number.isInteger(result.revision) &&
     Boolean(result.documentIdentity?.id) &&
-    Array.isArray(result.nodeIds)
-    && Object(result.projection) === result.projection
+    Array.isArray(result.nodeIds) &&
+    Object(result.projection) === result.projection
   )
 }
 
@@ -178,7 +179,6 @@ export const reviveMarkdownStableProjection = (
       childNormalizedRanges: Object.freeze([]),
     }),
   ) as MarkdownStableSyntaxNode[]
-  const byId = new Map(nodes.map((node) => [node.id, node]))
   const documentIdentity = Object.freeze({
     id: snapshot.documentIdentity.id,
     epoch: snapshot.documentIdentity.epoch,
@@ -201,19 +201,7 @@ export const reviveMarkdownStableProjection = (
     }),
     normalizedSource: snapshot.normalizedSource,
     nodes: Object.freeze(nodes),
-    resolve(id: string) {
-      if (!id.startsWith('syn:')) return { status: 'invalid' as const }
-      const parts = id.split(':')
-      if (parts.length < 5 || parts[1] !== documentIdentity.id) {
-        return { status: 'invalid' as const }
-      }
-      if (Number(parts[2]) !== documentIdentity.epoch) {
-        return { status: 'deleted' as const }
-      }
-      const node = byId.get(id)
-      if (!node) return { status: 'deleted' as const }
-      return { status: 'current' as const, node }
-    },
+    resolve: createMarkdownSyntaxIdentityResolver(documentIdentity, nodes),
   })
 }
 

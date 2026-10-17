@@ -207,7 +207,17 @@ availability state, and pending/result authority.
 
 `surfaces.commandPalette`, `surfaces.selectionToolbar`, and `surfaces.slashMenu` are opt-in
 presentations. Palette search reads only command `label`, `description`, and `keywords`; visible
-copy comes from `localeText.commandPalette`. `Esc` in the selection toolbar or slash menu closes
+copy comes from `localeText.commandPalette`. Within its active teleported dialog,
+the palette consumes Ctrl/Cmd+P (including repeat) without reopening or executing
+a command; the consumer still owns its first host-scoped `openCommandPalette()`
+invocation. Disabled, composing, modified or unrelated keys remain unclaimed.
+See the [palette keyboard boundary](../api/markdown-editor-input.md).
+The public `closeCommandPalette(): void` is idempotent and restores source
+selection/focus only for a dismissal that still owns palette focus. Closing after
+focus moves to another control, or repeating a close, preserves that newer focus.
+Pending restoration also yields to a reopened palette, a replaced document or
+revision, composition and disposal.
+`Esc` in the selection toolbar or slash menu closes
 the current surface, restores source focus, and retains source, selection, and history. The
 current projection/input context validates a slash trigger; execution merges the trigger range
 and command result into one revision-bound transaction, so it cannot delete the trigger first
@@ -422,7 +432,7 @@ an independent acceptance lane and is not replaced by these simulations.
 | update:modelValue  | 已接受的公开内容更新                                         |
 | change             | 与 `update:modelValue` 相同的公开内容更新                    |
 | transaction        | 每次 accepted/rejected dispatch 的只读 result 与 transaction |
-| selection-change   | revision 与 grapheme-safe、direction-preserving selection    |
+| selection-change   | producer 捕获的只读 documentIdentity、revision 与 grapheme-safe、direction-preserving selection |
 | history-change     | `canUndo/canRedo`、depth 与 retained UTF-16 units            |
 | command            | toolbar command 已通过 dispatcher 执行                       |
 | mode-change        | 编辑模式切换                                                 |
@@ -436,6 +446,14 @@ an independent acceptance lane and is not replaced by these simulations.
 | embed-retry        | consumer 应重新解析指定 target/mode                          |
 
 ## Outline and writing aids
+
+`createMarkdownOutlineModel(source, documentIdentity, previousProjection)` from
+`@ozwasyd/element-plus` retains parser-recognized empty ATX headings, including
+bare `#` at end of line or end of file. Each empty item carries an
+`empty-heading` diagnostic bound to its stable `nodeId`. `sourceRange` includes
+the parser-owned whole heading; `contentRange` consumes parser content ranges
+and is collapsed at the opening marker end when there is no content. Consumers
+must render these diagnostics rather than deriving them from heading text.
 
 `revealHeading(nodeId)` and `revealSourceRange(range)` use the current document identity,
 revision, and projection. On success, the component mounts the live virtual window containing
