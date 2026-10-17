@@ -251,6 +251,21 @@ const fullBundleSource = readFileSync(
 )
 assert.match(
   fullBundleSource,
+  /export const buildFullUnminified: TaskFunction = buildFull\(false\)/u,
+  'the unminified child must retain the original complete variant',
+)
+assert.match(
+  fullBundleSource,
+  /export const buildFullMinified: TaskFunction = buildFull\(true\)/u,
+  'the minified child must retain the original complete variant',
+)
+assert.match(
+  fullBundleSource,
+  /export const buildFullBundle: TaskFunction = series\(\s*withTaskName\('buildFull', \(\) =>\s*run\('pnpm run -C vue\/internal\/build start buildFullUnminified'\),?\s*\),\s*withTaskName\('buildFullMinified', \(\) =>\s*run\('pnpm run -C vue\/internal\/build start buildFullMinified'\),?\s*\),?\s*\)/u,
+  'complete variants must run sequentially in separate original-entry children',
+)
+assert.match(
+  fullBundleSource,
   /await runFullBuildTasks\(\s*\(\) => buildFullEntry\(minify\),\s*files,\s*\(file\) => buildFullLocale\(file, minify\),?\s*\)/u,
   'full builds must await the scheduler with the entry, all discovered locales, and the same minify mode',
 )

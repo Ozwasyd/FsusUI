@@ -28,6 +28,7 @@ import {
   formatBundleFilename,
   generateExternal,
   shouldIgnoreRollupWarning,
+  run,
   withTaskName,
   writeBundles,
 } from '../utils'
@@ -197,7 +198,14 @@ export const buildFull =
     )
   }
 
+export const buildFullUnminified: TaskFunction = buildFull(false)
+export const buildFullMinified: TaskFunction = buildFull(true)
+
 export const buildFullBundle: TaskFunction = series(
-  withTaskName('buildFull', buildFull(false)),
-  withTaskName('buildFullMinified', buildFull(true)),
+  withTaskName('buildFull', () =>
+    run('pnpm run -C vue/internal/build start buildFullUnminified'),
+  ),
+  withTaskName('buildFullMinified', () =>
+    run('pnpm run -C vue/internal/build start buildFullMinified'),
+  ),
 )
