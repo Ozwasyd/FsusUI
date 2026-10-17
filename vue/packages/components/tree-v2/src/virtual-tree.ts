@@ -185,8 +185,8 @@ export const treeEmits = {
     data && checkedInfo,
   [NODE_CHECK_CHANGE]: (data: TreeNodeData, checked: boolean) =>
     data && typeof checked === 'boolean',
-  [NODE_CONTEXTMENU]: (event: Event, data: TreeNodeData, node: TreeNode) =>
-    event && data && node,
+  [NODE_CONTEXTMENU]: (payload: Event, data: TreeNodeData, node: TreeNode) =>
+    payload && data && node,
 }
 
 export const treeNodeEmits = {

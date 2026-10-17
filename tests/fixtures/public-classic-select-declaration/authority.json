@@ -1,0 +1,1394 @@
+{
+  "schema": 1,
+  "referenceEvidenceCommit": "736b981fba100a0c2e956e74b61ddef62ff4d508",
+  "producerCompiler": "5.9.2",
+  "consumerCompiler": "6.0.2",
+  "vue": "3.5.32",
+  "declarationPaths": [
+    "es/components/index.d.ts",
+    "global.d.ts",
+    "es/components/select/index.d.ts",
+    "es/components/select/src/select.vue.d.ts",
+    "es/components/select/src/useSelect.d.ts",
+    "es/components/cascader/index.d.ts",
+    "es/components/cascader/src/cascader.vue.d.ts",
+    "es/components/date-picker/src/panel-utils.d.ts",
+    "es/components/slider/index.d.ts",
+    "es/components/slider/src/composables/use-slide.d.ts",
+    "es/components/slider/src/slider.vue.d.ts",
+    "lib/components/select/index.d.ts",
+    "lib/components/select/src/select.vue.d.ts",
+    "lib/components/select/src/useSelect.d.ts",
+    "lib/components/cascader/index.d.ts",
+    "lib/components/cascader/src/cascader.vue.d.ts",
+    "lib/components/date-picker/src/panel-utils.d.ts",
+    "lib/components/slider/index.d.ts",
+    "lib/components/slider/src/composables/use-slide.d.ts",
+    "lib/components/slider/src/slider.vue.d.ts",
+    "es/components/index.d.mts",
+    "es/components/select/index.d.mts",
+    "es/components/select/src/select.vue.d.mts",
+    "es/components/select/src/useSelect.d.mts",
+    "es/components/cascader/index.d.mts",
+    "es/components/cascader/src/cascader.vue.d.mts",
+    "es/components/date-picker/src/panel-utils.d.mts",
+    "es/components/slider/index.d.mts",
+    "es/components/slider/src/composables/use-slide.d.mts",
+    "es/components/slider/src/slider.vue.d.mts"
+  ],
+  "node16BoundaryDiagnostics": [
+    {
+      "file": "PACKAGE/es/components/breadcrumb/src/breadcrumb-item.d.ts",
+      "line": 2,
+      "code": 1541,
+      "message": "Type-only import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "file": "PACKAGE/es/components/breadcrumb/src/breadcrumb-item.d.ts",
+      "line": 9,
+      "code": 1542,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "file": "PACKAGE/es/components/breadcrumb/src/breadcrumb-item.d.ts",
+      "line": 9,
+      "code": 1542,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "file": "PACKAGE/es/components/breadcrumb/src/breadcrumb-item.d.ts",
+      "line": 9,
+      "code": 1542,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "file": "PACKAGE/es/components/breadcrumb/src/breadcrumb-item.d.ts",
+      "line": 9,
+      "code": 1542,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "file": "PACKAGE/es/components/breadcrumb/src/breadcrumb-item.d.ts",
+      "line": 9,
+      "code": 1542,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "file": "PACKAGE/es/components/breadcrumb/src/breadcrumb-item.d.ts",
+      "line": 9,
+      "code": 1542,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "file": "PACKAGE/es/components/breadcrumb/src/breadcrumb-item.d.ts",
+      "line": 9,
+      "code": 1542,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "file": "PACKAGE/es/components/breadcrumb/src/breadcrumb-item.d.ts",
+      "line": 9,
+      "code": 1542,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "file": "PACKAGE/es/components/menu/index.d.ts",
+      "line": 160,
+      "code": 1542,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "file": "PACKAGE/es/components/menu/index.d.ts",
+      "line": 160,
+      "code": 1542,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "file": "PACKAGE/es/components/menu/index.d.ts",
+      "line": 160,
+      "code": 1542,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "file": "PACKAGE/es/components/menu/index.d.ts",
+      "line": 160,
+      "code": 1542,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "file": "PACKAGE/es/components/menu/index.d.ts",
+      "line": 160,
+      "code": 1542,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "file": "PACKAGE/es/components/menu/index.d.ts",
+      "line": 160,
+      "code": 1542,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "file": "PACKAGE/es/components/menu/index.d.ts",
+      "line": 160,
+      "code": 1542,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "file": "PACKAGE/es/components/menu/index.d.ts",
+      "line": 160,
+      "code": 1542,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "file": "PACKAGE/es/components/menu/index.d.ts",
+      "line": 218,
+      "code": 1542,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "file": "PACKAGE/es/components/menu/index.d.ts",
+      "line": 218,
+      "code": 1542,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "file": "PACKAGE/es/components/menu/index.d.ts",
+      "line": 218,
+      "code": 1542,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "file": "PACKAGE/es/components/menu/index.d.ts",
+      "line": 218,
+      "code": 1542,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "file": "PACKAGE/es/components/menu/index.d.ts",
+      "line": 218,
+      "code": 1542,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "file": "PACKAGE/es/components/menu/index.d.ts",
+      "line": 218,
+      "code": 1542,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "file": "PACKAGE/es/components/menu/index.d.ts",
+      "line": 218,
+      "code": 1542,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "file": "PACKAGE/es/components/menu/index.d.ts",
+      "line": 218,
+      "code": 1542,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "file": "PACKAGE/es/components/menu/index.d.ts",
+      "line": 4873,
+      "code": 1542,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "file": "PACKAGE/es/components/menu/index.d.ts",
+      "line": 4873,
+      "code": 1542,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "file": "PACKAGE/es/components/menu/index.d.ts",
+      "line": 4873,
+      "code": 1542,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "file": "PACKAGE/es/components/menu/index.d.ts",
+      "line": 4873,
+      "code": 1542,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "file": "PACKAGE/es/components/menu/index.d.ts",
+      "line": 4873,
+      "code": 1542,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "file": "PACKAGE/es/components/menu/index.d.ts",
+      "line": 4873,
+      "code": 1542,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "file": "PACKAGE/es/components/menu/index.d.ts",
+      "line": 4873,
+      "code": 1542,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "file": "PACKAGE/es/components/menu/index.d.ts",
+      "line": 4873,
+      "code": 1542,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "file": "PACKAGE/es/components/menu/index.d.ts",
+      "line": 4931,
+      "code": 1542,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "file": "PACKAGE/es/components/menu/index.d.ts",
+      "line": 4931,
+      "code": 1542,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "file": "PACKAGE/es/components/menu/index.d.ts",
+      "line": 4931,
+      "code": 1542,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "file": "PACKAGE/es/components/menu/index.d.ts",
+      "line": 4931,
+      "code": 1542,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "file": "PACKAGE/es/components/menu/index.d.ts",
+      "line": 4931,
+      "code": 1542,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "file": "PACKAGE/es/components/menu/index.d.ts",
+      "line": 4931,
+      "code": 1542,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "file": "PACKAGE/es/components/menu/index.d.ts",
+      "line": 4931,
+      "code": 1542,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "file": "PACKAGE/es/components/menu/index.d.ts",
+      "line": 4931,
+      "code": 1542,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "file": "PACKAGE/es/components/menu/src/menu-item.d.ts",
+      "line": 12,
+      "code": 1542,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "file": "PACKAGE/es/components/menu/src/menu-item.d.ts",
+      "line": 12,
+      "code": 1542,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "file": "PACKAGE/es/components/menu/src/menu-item.d.ts",
+      "line": 12,
+      "code": 1542,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "file": "PACKAGE/es/components/menu/src/menu-item.d.ts",
+      "line": 12,
+      "code": 1542,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "file": "PACKAGE/es/components/menu/src/menu-item.d.ts",
+      "line": 12,
+      "code": 1542,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "file": "PACKAGE/es/components/menu/src/menu-item.d.ts",
+      "line": 12,
+      "code": 1542,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "file": "PACKAGE/es/components/menu/src/menu-item.d.ts",
+      "line": 12,
+      "code": 1542,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "file": "PACKAGE/es/components/menu/src/menu-item.d.ts",
+      "line": 12,
+      "code": 1542,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "file": "PACKAGE/es/components/menu/src/menu-item.vue.d.ts",
+      "line": 11,
+      "code": 1542,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "file": "PACKAGE/es/components/menu/src/menu-item.vue.d.ts",
+      "line": 11,
+      "code": 1542,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "file": "PACKAGE/es/components/menu/src/menu-item.vue.d.ts",
+      "line": 11,
+      "code": 1542,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "file": "PACKAGE/es/components/menu/src/menu-item.vue.d.ts",
+      "line": 11,
+      "code": 1542,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "file": "PACKAGE/es/components/menu/src/menu-item.vue.d.ts",
+      "line": 11,
+      "code": 1542,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "file": "PACKAGE/es/components/menu/src/menu-item.vue.d.ts",
+      "line": 11,
+      "code": 1542,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "file": "PACKAGE/es/components/menu/src/menu-item.vue.d.ts",
+      "line": 11,
+      "code": 1542,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "file": "PACKAGE/es/components/menu/src/menu-item.vue.d.ts",
+      "line": 11,
+      "code": 1542,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "file": "PACKAGE/es/components/menu/src/menu-item.vue.d.ts",
+      "line": 69,
+      "code": 1542,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "file": "PACKAGE/es/components/menu/src/menu-item.vue.d.ts",
+      "line": 69,
+      "code": 1542,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "file": "PACKAGE/es/components/menu/src/menu-item.vue.d.ts",
+      "line": 69,
+      "code": 1542,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "file": "PACKAGE/es/components/menu/src/menu-item.vue.d.ts",
+      "line": 69,
+      "code": 1542,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "file": "PACKAGE/es/components/menu/src/menu-item.vue.d.ts",
+      "line": 69,
+      "code": 1542,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "file": "PACKAGE/es/components/menu/src/menu-item.vue.d.ts",
+      "line": 69,
+      "code": 1542,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "file": "PACKAGE/es/components/menu/src/menu-item.vue.d.ts",
+      "line": 69,
+      "code": 1542,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "file": "PACKAGE/es/components/menu/src/menu-item.vue.d.ts",
+      "line": 69,
+      "code": 1542,
+      "message": "Type import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "file": "PACKAGE/es/components/menu/src/menu.d.ts",
+      "line": 2,
+      "code": 1541,
+      "message": "Type-only import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "file": "PACKAGE/es/components/menu/src/types.d.ts",
+      "line": 2,
+      "code": 1541,
+      "message": "Type-only import of an ECMAScript module from a CommonJS module must have a 'resolution-mode' attribute."
+    },
+    {
+      "file": "PACKAGE/es/utils/arrays.d.ts",
+      "line": 5,
+      "code": 1479,
+      "message": "The current file is a CommonJS module whose imports will produce 'require' calls; however, the referenced file is an ECMAScript module and cannot be imported with 'require'. Consider writing a dynamic 'import(\"lodash-unified\")' call instead."
+    }
+  ],
+  "node16PositiveDiagnostics": [
+    {
+      "file": "positive.ts",
+      "line": 7,
+      "code": 2339,
+      "message": "Property 'install' does not exist on type 'typeof import(\"PACKAGE/es/components/select/index\")'."
+    },
+    {
+      "file": "positive.ts",
+      "line": 10,
+      "code": 2322,
+      "message": "Type 'typeof import(\"PACKAGE/es/components/select/index\")' is not assignable to type 'SFCWithInstall<DefineComponent<ExtractPropTypes<{ name: StringConstructor; id: StringConstructor; modelValue: { type: (ObjectConstructor | StringConstructor | BooleanConstructor | NumberConstructor | ArrayConstructor)[]; default: undefined; }; ... 36 more ...; ariaLabel: { ...; }; }>, ... 18 more ..., any>> & { ...; }'.\n  Type 'typeof import(\"PACKAGE/es/components/select/index\")' is not assignable to type 'ComponentPublicInstanceConstructor<CreateComponentPublicInstanceWithMixins<Readonly<ExtractPropTypes<{ name: StringConstructor; id: StringConstructor; modelValue: { type: (ObjectConstructor | StringConstructor | BooleanConstructor | NumberConstructor | ArrayConstructor)[]; default: undefined; }; ... 36 more ...; ari...'.\n    Type 'typeof import(\"PACKAGE/es/components/select/index\")' is not assignable to type 'ComponentPublicInstanceConstructor<CreateComponentPublicInstanceWithMixins<Readonly<ExtractPropTypes<{ name: StringConstructor; id: StringConstructor; modelValue: { type: (ObjectConstructor | StringConstructor | BooleanConstructor | NumberConstructor | ArrayConstructor)[]; default: undefined; }; ... 36 more ...; ari...'.\n      Type 'typeof import(\"PACKAGE/es/components/select/index\")' provides no match for the signature 'new (...args: any[]): CreateComponentPublicInstanceWithMixins<Readonly<ExtractPropTypes<{ name: StringConstructor; id: StringConstructor; modelValue: { type: (ObjectConstructor | StringConstructor | BooleanConstructor | NumberConstructor | ArrayConstructor)[]; default: undefined; }; ... 36 more ...; ariaLabel: { ...; }; }>> & Readonly<...>, ... 24 more ..., { ...; }>'."
+    },
+    {
+      "file": "positive.ts",
+      "line": 11,
+      "code": 2322,
+      "message": "Type 'typeof import(\"PACKAGE/lib/components/select/index\")' is not assignable to type 'SFCWithInstall<DefineComponent<ExtractPropTypes<{ name: StringConstructor; id: StringConstructor; modelValue: { type: (ObjectConstructor | StringConstructor | BooleanConstructor | NumberConstructor | ArrayConstructor)[]; default: undefined; }; ... 36 more ...; ariaLabel: { ...; }; }>, ... 18 more ..., any>> & { ...; }'.\n  Type 'typeof import(\"PACKAGE/lib/components/select/index\")' is not assignable to type 'ComponentPublicInstanceConstructor<CreateComponentPublicInstanceWithMixins<Readonly<ExtractPropTypes<{ name: StringConstructor; id: StringConstructor; modelValue: { type: (ObjectConstructor | StringConstructor | BooleanConstructor | NumberConstructor | ArrayConstructor)[]; default: undefined; }; ... 36 more ...; ari...'.\n    Type 'typeof import(\"PACKAGE/lib/components/select/index\")' is not assignable to type 'ComponentPublicInstanceConstructor<CreateComponentPublicInstanceWithMixins<Readonly<ExtractPropTypes<{ name: StringConstructor; id: StringConstructor; modelValue: { type: (ObjectConstructor | StringConstructor | BooleanConstructor | NumberConstructor | ArrayConstructor)[]; default: undefined; }; ... 36 more ...; ari...'.\n      Type 'typeof import(\"PACKAGE/lib/components/select/index\")' provides no match for the signature 'new (...args: any[]): CreateComponentPublicInstanceWithMixins<Readonly<ExtractPropTypes<{ name: StringConstructor; id: StringConstructor; modelValue: { type: (ObjectConstructor | StringConstructor | BooleanConstructor | NumberConstructor | ArrayConstructor)[]; default: undefined; }; ... 36 more ...; ariaLabel: { ...; }; }>> & Readonly<...>, ... 24 more ..., { ...; }>'."
+    },
+    {
+      "file": "positive.ts",
+      "line": 16,
+      "code": 2344,
+      "message": "Type 'typeof import(\"PACKAGE/es/components/select/index\")' does not satisfy the constraint 'abstract new (...args: any) => any'.\n  Type 'typeof import(\"PACKAGE/es/components/select/index\")' provides no match for the signature 'new (...args: any): any'."
+    },
+    {
+      "file": "positive.ts",
+      "line": 23,
+      "code": 2344,
+      "message": "Type 'typeof import(\"PACKAGE/es/components/select/index\")' does not satisfy the constraint 'abstract new (...args: any) => any'.\n  Type 'typeof import(\"PACKAGE/es/components/select/index\")' provides no match for the signature 'new (...args: any): any'."
+    }
+  ],
+  "profiles": [
+    {
+      "name": "independent-classic-select-2d05f",
+      "sourceSha": "6dd7dc60158ee4a9ffeea18612e1143c47f4b600",
+      "sourceFingerprint": "0a2702054e7477c22233f2084c670c333ec72e2f87f030f94a856cf724f2d8e6",
+      "installedFingerprint": "38e5b60ba0c7e66eeae01375429ad188c997a3e0c908455ebe6c353e6b4a785e",
+      "referenceArtifactSha256": "3863df16ffafc85627e338002d8cb275804f61299e8d847bf8d2654298327e44",
+      "producerDiagnostics": [
+        {
+          "code": 7056,
+          "file": "vue/packages/components/cascader/index.ts",
+          "start": 441,
+          "message": "The inferred type of this node exceeds the maximum length the compiler will serialize. An explicit type annotation is needed."
+        },
+        {
+          "code": 7056,
+          "file": "vue/packages/components/cascader/src/cascader.vue.ts",
+          "start": 1642,
+          "message": "The inferred type of this node exceeds the maximum length the compiler will serialize. An explicit type annotation is needed."
+        },
+        {
+          "code": 7056,
+          "file": "vue/packages/components/date-picker/src/panel-utils.ts",
+          "start": 284,
+          "message": "The inferred type of this node exceeds the maximum length the compiler will serialize. An explicit type annotation is needed."
+        },
+        {
+          "code": 7056,
+          "file": "vue/packages/components/slider/index.ts",
+          "start": 103,
+          "message": "The inferred type of this node exceeds the maximum length the compiler will serialize. An explicit type annotation is needed."
+        },
+        {
+          "code": 7056,
+          "file": "vue/packages/components/slider/src/composables/use-slide.ts",
+          "start": 480,
+          "message": "The inferred type of this node exceeds the maximum length the compiler will serialize. An explicit type annotation is needed."
+        },
+        {
+          "code": 7056,
+          "file": "vue/packages/components/slider/src/slider.vue.ts",
+          "start": 644,
+          "message": "The inferred type of this node exceeds the maximum length the compiler will serialize. An explicit type annotation is needed."
+        }
+      ],
+      "installedDiagnostics": {
+        "bundler-positive": [
+          {
+            "file": "PACKAGE/es/components/index.d.ts",
+            "line": 12,
+            "code": 2307,
+            "message": "Cannot find module './cascader' or its corresponding type declarations."
+          },
+          {
+            "file": "PACKAGE/es/components/index.d.ts",
+            "line": 61,
+            "code": 2307,
+            "message": "Cannot find module './slider' or its corresponding type declarations."
+          }
+        ],
+        "bundler-negative": [
+          {
+            "file": "negative.ts",
+            "line": 4,
+            "code": 2322,
+            "message": "Type '\"giant\"' is not assignable to type '\"\" | \"small\" | \"default\" | \"large\" | undefined'."
+          },
+          {
+            "file": "negative.ts",
+            "line": 5,
+            "code": 2322,
+            "message": "Type 'string' is not assignable to type 'boolean | undefined'."
+          },
+          {
+            "file": "negative.ts",
+            "line": 6,
+            "code": 2322,
+            "message": "Type 'symbol' is not assignable to type 'string | number | boolean | Record<string, any>'."
+          },
+          {
+            "file": "negative.ts",
+            "line": 7,
+            "code": 2322,
+            "message": "Type 'number' is not assignable to type 'string'."
+          },
+          {
+            "file": "negative.ts",
+            "line": 9,
+            "code": 2554,
+            "message": "Expected 0 arguments, but got 1."
+          },
+          {
+            "file": "negative.ts",
+            "line": 10,
+            "code": 2554,
+            "message": "Expected 0 arguments, but got 1."
+          },
+          {
+            "file": "negative.ts",
+            "line": 12,
+            "code": 2322,
+            "message": "Type 'number' is not assignable to type 'CreateComponentPublicInstanceWithMixins<Readonly<ExtractPropTypes<{ showArrow: { readonly type: PropType<EpPropMergeType<BooleanConstructor, unknown, unknown>>; readonly required: false; readonly validator?: ((val: unknown) => boolean) | undefined; readonly default: boolean; __epPropKey: true; }; ... 49 more ...; ro...'.\n  Type 'number' is not assignable to type '{ $: ComponentInternalInstance; $data: {}; $props: Partial<{ content: string; motion: EpPropMergeType<(new (...args: any[]) => string | false) | (() => ComponentMotion) | ((new (...args: any[]) => string | false) | ... 1 more ... | null)[], unknown, unknown>; ... 28 more ...; showArrow: EpPropMergeType<...>; }> & Om...'."
+          },
+          {
+            "file": "negative.ts",
+            "line": 13,
+            "code": 2345,
+            "message": "Argument of type 'string' is not assignable to parameter of type 'FocusEvent'."
+          },
+          {
+            "file": "PACKAGE/es/components/index.d.ts",
+            "line": 12,
+            "code": 2307,
+            "message": "Cannot find module './cascader' or its corresponding type declarations."
+          },
+          {
+            "file": "PACKAGE/es/components/index.d.ts",
+            "line": 61,
+            "code": 2307,
+            "message": "Cannot find module './slider' or its corresponding type declarations."
+          }
+        ],
+        "bundler-whole-package": [
+          {
+            "file": "PACKAGE/es/components/index.d.ts",
+            "line": 12,
+            "code": 2307,
+            "message": "Cannot find module './cascader' or its corresponding type declarations."
+          },
+          {
+            "file": "PACKAGE/es/components/index.d.ts",
+            "line": 61,
+            "code": 2307,
+            "message": "Cannot find module './slider' or its corresponding type declarations."
+          },
+          {
+            "file": "PACKAGE/global.d.ts",
+            "line": 19,
+            "code": 2339,
+            "message": "Property 'ElCascader' does not exist on type 'typeof import(\"PACKAGE/es/index\")'."
+          },
+          {
+            "file": "PACKAGE/global.d.ts",
+            "line": 141,
+            "code": 2339,
+            "message": "Property 'ElSlider' does not exist on type 'typeof import(\"PACKAGE/es/index\")'."
+          }
+        ],
+        "bundler-options": [
+          {
+            "file": "PACKAGE/es/components/index.d.ts",
+            "line": 12,
+            "code": 2307,
+            "message": "Cannot find module './cascader' or its corresponding type declarations."
+          },
+          {
+            "file": "PACKAGE/es/components/index.d.ts",
+            "line": 61,
+            "code": 2307,
+            "message": "Cannot find module './slider' or its corresponding type declarations."
+          },
+          {
+            "file": "packed-options-compatibility.ts",
+            "line": 7,
+            "code": 2322,
+            "message": "Type 'number' is not assignable to type 'Placement | undefined'."
+          },
+          {
+            "file": "packed-options-compatibility.ts",
+            "line": 8,
+            "code": 2322,
+            "message": "Type '\"invalid\"' is not assignable to type 'PositioningStrategy | undefined'."
+          }
+        ]
+      }
+    },
+    {
+      "name": "four-component-f4a094",
+      "sourceSha": "f4a094f300384185918fc6d4be86e88d9ab9f097",
+      "sourceFingerprint": "d98ffad51d924ed037a24d3f9c328bb6afeb7beb6ef4f18f67640938b813724e",
+      "installedFingerprint": "4cd32f1f7cfa1328414b23c276c671c1e6a20d0d07884778bd3f74478b8e2583",
+      "referenceArtifactSha256": "82724daaa96d47e22bf5ec17694224bfc40192d50ff3a1554b6e8a6775bec4d9",
+      "producerDiagnostics": [],
+      "installedDiagnostics": {
+        "bundler-positive": [],
+        "bundler-negative": [
+          {
+            "file": "negative.ts",
+            "line": 4,
+            "code": 2322,
+            "message": "Type '\"giant\"' is not assignable to type '\"\" | \"small\" | \"default\" | \"large\" | undefined'."
+          },
+          {
+            "file": "negative.ts",
+            "line": 5,
+            "code": 2322,
+            "message": "Type 'string' is not assignable to type 'boolean | undefined'."
+          },
+          {
+            "file": "negative.ts",
+            "line": 6,
+            "code": 2322,
+            "message": "Type 'symbol' is not assignable to type 'string | number | boolean | Record<string, any>'."
+          },
+          {
+            "file": "negative.ts",
+            "line": 7,
+            "code": 2322,
+            "message": "Type 'number' is not assignable to type 'string'."
+          },
+          {
+            "file": "negative.ts",
+            "line": 9,
+            "code": 2554,
+            "message": "Expected 0 arguments, but got 1."
+          },
+          {
+            "file": "negative.ts",
+            "line": 10,
+            "code": 2554,
+            "message": "Expected 0 arguments, but got 1."
+          },
+          {
+            "file": "negative.ts",
+            "line": 12,
+            "code": 2322,
+            "message": "Type 'number' is not assignable to type 'CreateComponentPublicInstanceWithMixins<Readonly<ExtractPropTypes<{ showArrow: { readonly type: PropType<EpPropMergeType<BooleanConstructor, unknown, unknown>>; readonly required: false; readonly validator?: ((val: unknown) => boolean) | undefined; readonly default: boolean; __epPropKey: true; }; ... 49 more ...; ro...'.\n  Type 'number' is not assignable to type '{ $: ComponentInternalInstance; $data: {}; $props: Partial<{ content: string; motion: EpPropMergeType<(new (...args: any[]) => string | false) | (() => ComponentMotion) | ((new (...args: any[]) => string | false) | ... 1 more ... | null)[], unknown, unknown>; ... 28 more ...; showArrow: EpPropMergeType<...>; }> & Om...'."
+          },
+          {
+            "file": "negative.ts",
+            "line": 13,
+            "code": 2345,
+            "message": "Argument of type 'string' is not assignable to parameter of type 'FocusEvent'."
+          }
+        ],
+        "bundler-whole-package": [],
+        "bundler-options": [
+          {
+            "file": "packed-options-compatibility.ts",
+            "line": 7,
+            "code": 2322,
+            "message": "Type 'number' is not assignable to type 'Placement | undefined'."
+          },
+          {
+            "file": "packed-options-compatibility.ts",
+            "line": 8,
+            "code": 2322,
+            "message": "Type '\"invalid\"' is not assignable to type 'PositioningStrategy | undefined'."
+          }
+        ]
+      },
+      "verifiedLocalArtifactSha256": "ae7b65c71e8e1de0f856a42159e6ee25a8c2b8dce16ba88792f68d5b34306fdc",
+      "buildInputFingerprint": "8dc5a6987ba3a43a6a60d41ef589725b93ab578a396d81e11d21ac12b335771f"
+    },
+    {
+      "name": "shared-node16-2b78cfa",
+      "sourceSha": "2b78cfa1d671e8e6a4f6d4c0cc55107310bfb533",
+      "sourceFingerprint": "60237cfb38d1f686311e67164e4a2541b718d7fe491da99543767d191fcaf9e3",
+      "installedFingerprint": "ff1f346d671f841cb1e12da52a722d864be8ef732f501fbccab35f3d9c55f53a",
+      "node16ModuleObject": true,
+      "verifiedLocalArtifactSha256": "94e19b4259e170cab73b428dccecc6f0729c955525db0e5a29e2e976fdb43c9b",
+      "sourceManifest": {
+        "artifact": {
+          "filename": "fsusui-npm-candidate.tgz",
+          "sha256": "94e19b4259e170cab73b428dccecc6f0729c955525db0e5a29e2e976fdb43c9b"
+        },
+        "build": {
+          "command": "pnpm run build:npm-package",
+          "inputFingerprint": "4e5d68477fbf444f89847741db1c68406617da596fbe9e84573265cf954f2201",
+          "inputs": {
+            "package.json": "4e6502bacf6c8edfe52fd20f7d59bd5df9a05f8f627546e62fb889f6e5c50ace",
+            "pnpm-lock.yaml": "18a914f22acaba3b0157a32b0d612f6fc441b919944b463b2dad0ae2066e22b4",
+            "scripts/npm-candidate-lib.mjs": "192e73da5a535bde4b265a1e5827a7d839d44c3ee32646ef3ff1c1f001371cb0",
+            "scripts/package-candidate.mjs": "3eaa9761f4728e155531bf8eba34186596106730eff24561ceb8cf09a30c33b9",
+            "scripts/prepare-component-exports.mjs": "72236db86085b4e144e0ddac751d7c2547d0f8f9cdab1a4d9e932f3b8f04ca73",
+            "scripts/prepare-npm-package.mjs": "59ee48a333fb3ad5d19e624bac31d6423d15945a391a07c418dacb9fa9c5cc8b",
+            "vue/packages/element-plus/package.json": "679ac1bf633b28d2f40fcc6e43937f23808480f681a405e56bca94a5ad69be66"
+          },
+          "lockfileSha256": "18a914f22acaba3b0157a32b0d612f6fc441b919944b463b2dad0ae2066e22b4",
+          "scriptVersion": 1
+        },
+        "commitSha": "2b78cfa1d671e8e6a4f6d4c0cc55107310bfb533",
+        "metadata": {
+          "provenanceEligible": true,
+          "publicAccess": true,
+          "publishConfigPresent": true,
+          "registry": "https://registry.npmjs.org/"
+        },
+        "package": {
+          "distTag": "latest",
+          "name": "@ozwasyd/element-plus",
+          "packageJsonCanonicalSha256": "4705f1f494c485e673b58ed280dae1a1feb233b8aed837402eb704206f47c73d",
+          "version": "1.5.1"
+        },
+        "schemaVersion": 1,
+        "sourceProfile": "Release",
+        "toolchain": {
+          "node": "v24.19.0",
+          "npm": "11.13.0",
+          "pnpm": "10.33.0"
+        }
+      },
+      "producerDiagnostics": [],
+      "installedDiagnostics": {
+        "bundler-positive": [],
+        "bundler-negative": [
+          {
+            "file": "negative.ts",
+            "line": 4,
+            "code": 2322,
+            "message": "Type '\"giant\"' is not assignable to type '\"\" | \"small\" | \"default\" | \"large\" | undefined'."
+          },
+          {
+            "file": "negative.ts",
+            "line": 5,
+            "code": 2322,
+            "message": "Type 'string' is not assignable to type 'boolean | undefined'."
+          },
+          {
+            "file": "negative.ts",
+            "line": 6,
+            "code": 2322,
+            "message": "Type 'symbol' is not assignable to type 'string | number | boolean | Record<string, any>'."
+          },
+          {
+            "file": "negative.ts",
+            "line": 7,
+            "code": 2322,
+            "message": "Type 'number' is not assignable to type 'string'."
+          },
+          {
+            "file": "negative.ts",
+            "line": 9,
+            "code": 2554,
+            "message": "Expected 0 arguments, but got 1."
+          },
+          {
+            "file": "negative.ts",
+            "line": 10,
+            "code": 2554,
+            "message": "Expected 0 arguments, but got 1."
+          },
+          {
+            "file": "negative.ts",
+            "line": 12,
+            "code": 2322,
+            "message": "Type 'number' is not assignable to type 'CreateComponentPublicInstanceWithMixins<Readonly<ExtractPropTypes<{ showArrow: { readonly type: PropType<EpPropMergeType<BooleanConstructor, unknown, unknown>>; readonly required: false; readonly validator?: ((val: unknown) => boolean) | undefined; readonly default: boolean; __epPropKey: true; }; ... 49 more ...; ro...'.\n  Type 'number' is not assignable to type '{ $: ComponentInternalInstance; $data: {}; $props: Partial<{ content: string; motion: EpPropMergeType<(new (...args: any[]) => string | false) | (() => ComponentMotion) | ((new (...args: any[]) => string | false) | ... 1 more ... | null)[], unknown, unknown>; ... 28 more ...; showArrow: EpPropMergeType<...>; }> & Om...'."
+          },
+          {
+            "file": "negative.ts",
+            "line": 13,
+            "code": 2345,
+            "message": "Argument of type 'string' is not assignable to parameter of type 'FocusEvent'."
+          }
+        ],
+        "bundler-whole-package": [],
+        "bundler-options": [
+          {
+            "file": "packed-options-compatibility.ts",
+            "line": 7,
+            "code": 2322,
+            "message": "Type 'number' is not assignable to type 'Placement | undefined'."
+          },
+          {
+            "file": "packed-options-compatibility.ts",
+            "line": 8,
+            "code": 2322,
+            "message": "Type '\"invalid\"' is not assignable to type 'PositioningStrategy | undefined'."
+          }
+        ],
+        "node16-positive": [],
+        "node16-negative": [
+          {
+            "file": "negative.ts",
+            "line": 4,
+            "code": 2322,
+            "message": "Type '\"giant\"' is not assignable to type '\"\" | \"small\" | \"default\" | \"large\" | undefined'."
+          },
+          {
+            "file": "negative.ts",
+            "line": 5,
+            "code": 2322,
+            "message": "Type 'string' is not assignable to type 'boolean | undefined'."
+          },
+          {
+            "file": "negative.ts",
+            "line": 6,
+            "code": 2322,
+            "message": "Type 'symbol' is not assignable to type 'string | number | boolean | Record<string, any>'."
+          },
+          {
+            "file": "negative.ts",
+            "line": 7,
+            "code": 2322,
+            "message": "Type 'number' is not assignable to type 'string'."
+          },
+          {
+            "file": "negative.ts",
+            "line": 9,
+            "code": 2554,
+            "message": "Expected 0 arguments, but got 1."
+          },
+          {
+            "file": "negative.ts",
+            "line": 10,
+            "code": 2554,
+            "message": "Expected 0 arguments, but got 1."
+          },
+          {
+            "file": "negative.ts",
+            "line": 12,
+            "code": 2322,
+            "message": "Type 'number' is not assignable to type 'CreateComponentPublicInstanceWithMixins<Readonly<ExtractPropTypes<{ showArrow: { readonly type: PropType<EpPropMergeType<BooleanConstructor, unknown, unknown>>; readonly required: false; readonly validator?: ((val: unknown) => boolean) | undefined; readonly default: boolean; __epPropKey: true; }; ... 49 more ...; ro...'.\n  Type 'number' is not assignable to type '{ $: ComponentInternalInstance; $data: {}; $props: Partial<{ content: string; motion: EpPropMergeType<(new (...args: any[]) => string | false) | (() => ComponentMotion) | ((new (...args: any[]) => string | false) | ... 1 more ... | null)[], unknown, unknown>; ... 28 more ...; showArrow: EpPropMergeType<...>; }> & Om...'."
+          },
+          {
+            "file": "negative.ts",
+            "line": 13,
+            "code": 2345,
+            "message": "Argument of type 'string' is not assignable to parameter of type 'FocusEvent'."
+          }
+        ],
+        "node16-whole-package": [],
+        "node16-module-negative": [
+          {
+            "file": "negative-node16-module.ts",
+            "line": 5,
+            "code": 2322,
+            "message": "Type 'typeof import(\"PACKAGE/lib/components/select/index\")' is not assignable to type 'SFCWithInstall<DefineComponent<ExtractPropTypes<{ name: StringConstructor; id: StringConstructor; modelValue: { type: (ObjectConstructor | StringConstructor | BooleanConstructor | NumberConstructor | ArrayConstructor)[]; default: undefined; }; ... 36 more ...; ariaLabel: { ...; }; }>, ... 18 more ..., any>> & { ...; }'.\n  Type 'typeof import(\"PACKAGE/lib/components/select/index\")' is not assignable to type 'ComponentPublicInstanceConstructor<CreateComponentPublicInstanceWithMixins<Readonly<ExtractPropTypes<{ name: StringConstructor; id: StringConstructor; modelValue: { type: (ObjectConstructor | StringConstructor | BooleanConstructor | NumberConstructor | ArrayConstructor)[]; default: undefined; }; ... 36 more ...; ari...'.\n    Type 'typeof import(\"PACKAGE/lib/components/select/index\")' is not assignable to type 'ComponentPublicInstanceConstructor<CreateComponentPublicInstanceWithMixins<Readonly<ExtractPropTypes<{ name: StringConstructor; id: StringConstructor; modelValue: { type: (ObjectConstructor | StringConstructor | BooleanConstructor | NumberConstructor | ArrayConstructor)[]; default: undefined; }; ... 36 more ...; ari...'.\n      Type 'typeof import(\"PACKAGE/lib/components/select/index\")' provides no match for the signature 'new (...args: any[]): CreateComponentPublicInstanceWithMixins<Readonly<ExtractPropTypes<{ name: StringConstructor; id: StringConstructor; modelValue: { type: (ObjectConstructor | StringConstructor | BooleanConstructor | NumberConstructor | ArrayConstructor)[]; default: undefined; }; ... 36 more ...; ariaLabel: { ...; }; }>> & Readonly<...>, ... 24 more ..., { ...; }>'."
+          },
+          {
+            "file": "negative-node16-module.ts",
+            "line": 6,
+            "code": 2339,
+            "message": "Property 'install' does not exist on type 'typeof import(\"PACKAGE/lib/components/select/index\")'."
+          }
+        ],
+        "node16-legacy-default-negative": [
+          {
+            "file": "positive.ts",
+            "line": 11,
+            "code": 2322,
+            "message": "Type 'typeof import(\"PACKAGE/lib/components/select/index\")' is not assignable to type 'SFCWithInstall<DefineComponent<ExtractPropTypes<{ name: StringConstructor; id: StringConstructor; modelValue: { type: (ObjectConstructor | StringConstructor | BooleanConstructor | NumberConstructor | ArrayConstructor)[]; default: undefined; }; ... 36 more ...; ariaLabel: { ...; }; }>, ... 18 more ..., any>> & { ...; }'.\n  Type 'typeof import(\"PACKAGE/lib/components/select/index\")' is not assignable to type 'ComponentPublicInstanceConstructor<CreateComponentPublicInstanceWithMixins<Readonly<ExtractPropTypes<{ name: StringConstructor; id: StringConstructor; modelValue: { type: (ObjectConstructor | StringConstructor | BooleanConstructor | NumberConstructor | ArrayConstructor)[]; default: undefined; }; ... 36 more ...; ari...'.\n    Type 'typeof import(\"PACKAGE/lib/components/select/index\")' is not assignable to type 'ComponentPublicInstanceConstructor<CreateComponentPublicInstanceWithMixins<Readonly<ExtractPropTypes<{ name: StringConstructor; id: StringConstructor; modelValue: { type: (ObjectConstructor | StringConstructor | BooleanConstructor | NumberConstructor | ArrayConstructor)[]; default: undefined; }; ... 36 more ...; ari...'.\n      Type 'typeof import(\"PACKAGE/lib/components/select/index\")' provides no match for the signature 'new (...args: any[]): CreateComponentPublicInstanceWithMixins<Readonly<ExtractPropTypes<{ name: StringConstructor; id: StringConstructor; modelValue: { type: (ObjectConstructor | StringConstructor | BooleanConstructor | NumberConstructor | ArrayConstructor)[]; default: undefined; }; ... 36 more ...; ariaLabel: { ...; }; }>> & Readonly<...>, ... 24 more ..., { ...; }>'."
+          }
+        ]
+      }
+    },
+    {
+      "name": "shared-node16-31fe270",
+      "sourceSha": "31fe270f524cdd09ea43949077f4826196ebc550",
+      "sourceFingerprint": "97d4773518d110c93ff95881dbd6d41c9ce0cc3a9fb529f3b1dacf94595dc445",
+      "installedFingerprint": "ff1f346d671f841cb1e12da52a722d864be8ef732f501fbccab35f3d9c55f53a",
+      "node16ModuleObject": true,
+      "verifiedLocalArtifactSha256": "462360d7342f8f17e40f19eaae6f1246ba5de2909d9bd1b0072e2884798ec215",
+      "sourceManifest": {
+        "artifact": {
+          "filename": "fsusui-npm-candidate.tgz",
+          "sha256": "462360d7342f8f17e40f19eaae6f1246ba5de2909d9bd1b0072e2884798ec215"
+        },
+        "build": {
+          "command": "pnpm run build:npm-package",
+          "inputFingerprint": "1f81a70fffde6d37aa8db989ab315eb4c9ab0f76e3abd509a0e1c392df2ddb88",
+          "inputs": {
+            "package.json": "4e6502bacf6c8edfe52fd20f7d59bd5df9a05f8f627546e62fb889f6e5c50ace",
+            "pnpm-lock.yaml": "37272929247ae0ab5cbd430747b6872ed5f1a5fa811db28f70951819a59b9244",
+            "scripts/npm-candidate-lib.mjs": "192e73da5a535bde4b265a1e5827a7d839d44c3ee32646ef3ff1c1f001371cb0",
+            "scripts/package-candidate.mjs": "3eaa9761f4728e155531bf8eba34186596106730eff24561ceb8cf09a30c33b9",
+            "scripts/prepare-component-exports.mjs": "980c5be4b60e634e349299ddfcb855e7138d37bbfffe35677cc84764a0d1eab7",
+            "scripts/prepare-npm-package.mjs": "59ee48a333fb3ad5d19e624bac31d6423d15945a391a07c418dacb9fa9c5cc8b",
+            "vue/packages/element-plus/package.json": "679ac1bf633b28d2f40fcc6e43937f23808480f681a405e56bca94a5ad69be66"
+          },
+          "lockfileSha256": "37272929247ae0ab5cbd430747b6872ed5f1a5fa811db28f70951819a59b9244",
+          "scriptVersion": 1
+        },
+        "commitSha": "31fe270f524cdd09ea43949077f4826196ebc550",
+        "metadata": {
+          "provenanceEligible": true,
+          "publicAccess": true,
+          "publishConfigPresent": true,
+          "registry": "https://registry.npmjs.org/"
+        },
+        "package": {
+          "distTag": "latest",
+          "name": "@ozwasyd/element-plus",
+          "packageJsonCanonicalSha256": "4705f1f494c485e673b58ed280dae1a1feb233b8aed837402eb704206f47c73d",
+          "version": "1.5.1"
+        },
+        "schemaVersion": 1,
+        "sourceProfile": "Release",
+        "toolchain": {
+          "node": "v24.19.0",
+          "npm": "11.13.0",
+          "pnpm": "10.33.0"
+        }
+      },
+      "producerDiagnostics": [],
+      "installedDiagnostics": {
+        "bundler-positive": [],
+        "bundler-negative": [
+          {
+            "file": "negative.ts",
+            "line": 4,
+            "code": 2322,
+            "message": "Type '\"giant\"' is not assignable to type '\"\" | \"small\" | \"default\" | \"large\" | undefined'."
+          },
+          {
+            "file": "negative.ts",
+            "line": 5,
+            "code": 2322,
+            "message": "Type 'string' is not assignable to type 'boolean | undefined'."
+          },
+          {
+            "file": "negative.ts",
+            "line": 6,
+            "code": 2322,
+            "message": "Type 'symbol' is not assignable to type 'string | number | boolean | Record<string, any>'."
+          },
+          {
+            "file": "negative.ts",
+            "line": 7,
+            "code": 2322,
+            "message": "Type 'number' is not assignable to type 'string'."
+          },
+          {
+            "file": "negative.ts",
+            "line": 9,
+            "code": 2554,
+            "message": "Expected 0 arguments, but got 1."
+          },
+          {
+            "file": "negative.ts",
+            "line": 10,
+            "code": 2554,
+            "message": "Expected 0 arguments, but got 1."
+          },
+          {
+            "file": "negative.ts",
+            "line": 12,
+            "code": 2322,
+            "message": "Type 'number' is not assignable to type 'CreateComponentPublicInstanceWithMixins<Readonly<ExtractPropTypes<{ showArrow: { readonly type: PropType<EpPropMergeType<BooleanConstructor, unknown, unknown>>; readonly required: false; readonly validator?: ((val: unknown) => boolean) | undefined; readonly default: boolean; __epPropKey: true; }; ... 49 more ...; ro...'.\n  Type 'number' is not assignable to type '{ $: ComponentInternalInstance; $data: {}; $props: Partial<{ content: string; motion: EpPropMergeType<(new (...args: any[]) => string | false) | (() => ComponentMotion) | ((new (...args: any[]) => string | false) | ... 1 more ... | null)[], unknown, unknown>; ... 28 more ...; showArrow: EpPropMergeType<...>; }> & Om...'."
+          },
+          {
+            "file": "negative.ts",
+            "line": 13,
+            "code": 2345,
+            "message": "Argument of type 'string' is not assignable to parameter of type 'FocusEvent'."
+          }
+        ],
+        "bundler-whole-package": [],
+        "bundler-options": [
+          {
+            "file": "packed-options-compatibility.ts",
+            "line": 7,
+            "code": 2322,
+            "message": "Type 'number' is not assignable to type 'Placement | undefined'."
+          },
+          {
+            "file": "packed-options-compatibility.ts",
+            "line": 8,
+            "code": 2322,
+            "message": "Type '\"invalid\"' is not assignable to type 'PositioningStrategy | undefined'."
+          }
+        ],
+        "node16-positive": [],
+        "node16-negative": [
+          {
+            "file": "negative.ts",
+            "line": 4,
+            "code": 2322,
+            "message": "Type '\"giant\"' is not assignable to type '\"\" | \"small\" | \"default\" | \"large\" | undefined'."
+          },
+          {
+            "file": "negative.ts",
+            "line": 5,
+            "code": 2322,
+            "message": "Type 'string' is not assignable to type 'boolean | undefined'."
+          },
+          {
+            "file": "negative.ts",
+            "line": 6,
+            "code": 2322,
+            "message": "Type 'symbol' is not assignable to type 'string | number | boolean | Record<string, any>'."
+          },
+          {
+            "file": "negative.ts",
+            "line": 7,
+            "code": 2322,
+            "message": "Type 'number' is not assignable to type 'string'."
+          },
+          {
+            "file": "negative.ts",
+            "line": 9,
+            "code": 2554,
+            "message": "Expected 0 arguments, but got 1."
+          },
+          {
+            "file": "negative.ts",
+            "line": 10,
+            "code": 2554,
+            "message": "Expected 0 arguments, but got 1."
+          },
+          {
+            "file": "negative.ts",
+            "line": 12,
+            "code": 2322,
+            "message": "Type 'number' is not assignable to type 'CreateComponentPublicInstanceWithMixins<Readonly<ExtractPropTypes<{ showArrow: { readonly type: PropType<EpPropMergeType<BooleanConstructor, unknown, unknown>>; readonly required: false; readonly validator?: ((val: unknown) => boolean) | undefined; readonly default: boolean; __epPropKey: true; }; ... 49 more ...; ro...'.\n  Type 'number' is not assignable to type '{ $: ComponentInternalInstance; $data: {}; $props: Partial<{ content: string; motion: EpPropMergeType<(new (...args: any[]) => string | false) | (() => ComponentMotion) | ((new (...args: any[]) => string | false) | ... 1 more ... | null)[], unknown, unknown>; ... 28 more ...; showArrow: EpPropMergeType<...>; }> & Om...'."
+          },
+          {
+            "file": "negative.ts",
+            "line": 13,
+            "code": 2345,
+            "message": "Argument of type 'string' is not assignable to parameter of type 'FocusEvent'."
+          }
+        ],
+        "node16-whole-package": [],
+        "node16-module-negative": [
+          {
+            "file": "negative-node16-module.ts",
+            "line": 5,
+            "code": 2322,
+            "message": "Type 'typeof import(\"PACKAGE/lib/components/select/index\")' is not assignable to type 'SFCWithInstall<DefineComponent<ExtractPropTypes<{ name: StringConstructor; id: StringConstructor; modelValue: { type: (ObjectConstructor | StringConstructor | BooleanConstructor | NumberConstructor | ArrayConstructor)[]; default: undefined; }; ... 36 more ...; ariaLabel: { ...; }; }>, ... 18 more ..., any>> & { ...; }'.\n  Type 'typeof import(\"PACKAGE/lib/components/select/index\")' is not assignable to type 'ComponentPublicInstanceConstructor<CreateComponentPublicInstanceWithMixins<Readonly<ExtractPropTypes<{ name: StringConstructor; id: StringConstructor; modelValue: { type: (ObjectConstructor | StringConstructor | BooleanConstructor | NumberConstructor | ArrayConstructor)[]; default: undefined; }; ... 36 more ...; ari...'.\n    Type 'typeof import(\"PACKAGE/lib/components/select/index\")' is not assignable to type 'ComponentPublicInstanceConstructor<CreateComponentPublicInstanceWithMixins<Readonly<ExtractPropTypes<{ name: StringConstructor; id: StringConstructor; modelValue: { type: (ObjectConstructor | StringConstructor | BooleanConstructor | NumberConstructor | ArrayConstructor)[]; default: undefined; }; ... 36 more ...; ari...'.\n      Type 'typeof import(\"PACKAGE/lib/components/select/index\")' provides no match for the signature 'new (...args: any[]): CreateComponentPublicInstanceWithMixins<Readonly<ExtractPropTypes<{ name: StringConstructor; id: StringConstructor; modelValue: { type: (ObjectConstructor | StringConstructor | BooleanConstructor | NumberConstructor | ArrayConstructor)[]; default: undefined; }; ... 36 more ...; ariaLabel: { ...; }; }>> & Readonly<...>, ... 24 more ..., { ...; }>'."
+          },
+          {
+            "file": "negative-node16-module.ts",
+            "line": 6,
+            "code": 2339,
+            "message": "Property 'install' does not exist on type 'typeof import(\"PACKAGE/lib/components/select/index\")'."
+          }
+        ],
+        "node16-legacy-default-negative": [
+          {
+            "file": "positive.ts",
+            "line": 11,
+            "code": 2322,
+            "message": "Type 'typeof import(\"PACKAGE/lib/components/select/index\")' is not assignable to type 'SFCWithInstall<DefineComponent<ExtractPropTypes<{ name: StringConstructor; id: StringConstructor; modelValue: { type: (ObjectConstructor | StringConstructor | BooleanConstructor | NumberConstructor | ArrayConstructor)[]; default: undefined; }; ... 36 more ...; ariaLabel: { ...; }; }>, ... 18 more ..., any>> & { ...; }'.\n  Type 'typeof import(\"PACKAGE/lib/components/select/index\")' is not assignable to type 'ComponentPublicInstanceConstructor<CreateComponentPublicInstanceWithMixins<Readonly<ExtractPropTypes<{ name: StringConstructor; id: StringConstructor; modelValue: { type: (ObjectConstructor | StringConstructor | BooleanConstructor | NumberConstructor | ArrayConstructor)[]; default: undefined; }; ... 36 more ...; ari...'.\n    Type 'typeof import(\"PACKAGE/lib/components/select/index\")' is not assignable to type 'ComponentPublicInstanceConstructor<CreateComponentPublicInstanceWithMixins<Readonly<ExtractPropTypes<{ name: StringConstructor; id: StringConstructor; modelValue: { type: (ObjectConstructor | StringConstructor | BooleanConstructor | NumberConstructor | ArrayConstructor)[]; default: undefined; }; ... 36 more ...; ari...'.\n      Type 'typeof import(\"PACKAGE/lib/components/select/index\")' provides no match for the signature 'new (...args: any[]): CreateComponentPublicInstanceWithMixins<Readonly<ExtractPropTypes<{ name: StringConstructor; id: StringConstructor; modelValue: { type: (ObjectConstructor | StringConstructor | BooleanConstructor | NumberConstructor | ArrayConstructor)[]; default: undefined; }; ... 36 more ...; ariaLabel: { ...; }; }>> & Readonly<...>, ... 24 more ..., { ...; }>'."
+          }
+        ]
+      },
+      "qualificationScope": "Classic Select complete producer, source contract and installed declaration diagnostic controls only; shared default-through-export-star resolver P2 and broader runtime/package acceptance remain unaccepted. No successor graph recognized.",
+      "sourceIntake": {
+        "originalFilterInputCount": 2454,
+        "acceptedSourceBaseline": "2b78cfa1d671e8e6a4f6d4c0cc55107310bfb533",
+        "changedInputs": [
+          {
+            "path": "pnpm-lock.yaml",
+            "before": "18a914f22acaba3b0157a32b0d612f6fc441b919944b463b2dad0ae2066e22b4",
+            "after": "37272929247ae0ab5cbd430747b6872ed5f1a5fa811db28f70951819a59b9244",
+            "status": "changed"
+          },
+          {
+            "path": "vue/internal/build/src/utils/node-declarations.ts",
+            "before": "021eff52b172031a79f72aa96461ad05a56c3421f8973ee3f7e77bbdcd916f46",
+            "after": "3919cb4f971cec8e6cb56e57f98454b219099014f6158a8281b2580d5887f960",
+            "status": "changed"
+          },
+          {
+            "path": "vue/packages/components/markdown-renderer/src/markdown-renderer.vue",
+            "before": "d38ff8c94a6e7f0bc8d17050dbe3bf0c88c6b5946311b4ae304a4627b522fbe0",
+            "after": "1ceac41dc3e8e60b29689baf3a8019f9839d4ac034d0ae58620b093ed8c20332",
+            "status": "changed"
+          },
+          {
+            "path": "vue/packages/icons-vue/build/build.ts",
+            "before": "9b78f84f4bd7c535be1d9fcd93ad3a62a70facb0587a277d7e946f6ee5c04dad",
+            "after": "a437ae6a68c811b6f401a281c8dcbb4d2c9798407f779032bd9e3ef224e42e4d",
+            "status": "changed"
+          },
+          {
+            "path": "vue/packages/icons-vue/src/components/index.ts",
+            "before": "f989cc015742b7c8153efc43acfa8a7692e208c3790c5d52ce61a5efc871c330",
+            "after": "a1d167e6c8a47fc01774cbc35d160afca7451fc674e1ab9041d0630a7f3a7b64",
+            "status": "changed"
+          }
+        ],
+        "ownedBlobs": [
+          {
+            "path": ".changeset/fix-classic-select-public-declaration.md",
+            "reviewedBlob": "932b9059fb19eab62cd1754271e310481d6392f2",
+            "compositionBlob": "932b9059fb19eab62cd1754271e310481d6392f2",
+            "identical": true
+          },
+          {
+            "path": "tests/fixtures/public-classic-select-declaration/README.md",
+            "reviewedBlob": "5137e8e6d0ca8b3be352873e7374d06d86b7f0e5",
+            "compositionBlob": "5137e8e6d0ca8b3be352873e7374d06d86b7f0e5",
+            "identical": true
+          },
+          {
+            "path": "tests/fixtures/public-classic-select-declaration/authority.json",
+            "reviewedBlob": "b4dbdd6ba9af945b25c7d15a32dc7312fbca90a5",
+            "compositionBlob": "b4dbdd6ba9af945b25c7d15a32dc7312fbca90a5",
+            "identical": true
+          },
+          {
+            "path": "tests/fixtures/public-classic-select-declaration/authority.mjs",
+            "reviewedBlob": "87341e2994ca1c0622e1c11f60b2c58f762a3df5",
+            "compositionBlob": "87341e2994ca1c0622e1c11f60b2c58f762a3df5",
+            "identical": true
+          },
+          {
+            "path": "tests/fixtures/public-classic-select-declaration/bundler-defaults.ts",
+            "reviewedBlob": "a0bc257bf9c4349a66f7fc0e02eb0201dfda3e38",
+            "compositionBlob": "a0bc257bf9c4349a66f7fc0e02eb0201dfda3e38",
+            "identical": true
+          },
+          {
+            "path": "tests/fixtures/public-classic-select-declaration/compile-control.mjs",
+            "reviewedBlob": "15cc2b58a3b64454b9475aae2fb32b5a13aebeb7",
+            "compositionBlob": "15cc2b58a3b64454b9475aae2fb32b5a13aebeb7",
+            "identical": true
+          },
+          {
+            "path": "tests/fixtures/public-classic-select-declaration/inferred-contract.ts",
+            "reviewedBlob": "8539bfff1fc733e2a18ae2fbefa4b7a52b65ddc6",
+            "compositionBlob": "8539bfff1fc733e2a18ae2fbefa4b7a52b65ddc6",
+            "identical": true
+          },
+          {
+            "path": "tests/fixtures/public-classic-select-declaration/native-defaults.mjs",
+            "reviewedBlob": "13e61f22bd40bbbcfae8ea47505330375f03f1a5",
+            "compositionBlob": "13e61f22bd40bbbcfae8ea47505330375f03f1a5",
+            "identical": true
+          },
+          {
+            "path": "tests/fixtures/public-classic-select-declaration/negative-node16-module.ts",
+            "reviewedBlob": "a818ed0a44373696af2cae96bb9eb07256da7cea",
+            "compositionBlob": "a818ed0a44373696af2cae96bb9eb07256da7cea",
+            "identical": true
+          },
+          {
+            "path": "tests/fixtures/public-classic-select-declaration/negative.ts",
+            "reviewedBlob": "6aa669d401f7e2846df806be0cf904a54bb8994d",
+            "compositionBlob": "6aa669d401f7e2846df806be0cf904a54bb8994d",
+            "identical": true
+          },
+          {
+            "path": "tests/fixtures/public-classic-select-declaration/options-compatibility.ts",
+            "reviewedBlob": "1ec4757ffbb4cfa2897ae39349abb7541921b717",
+            "compositionBlob": "1ec4757ffbb4cfa2897ae39349abb7541921b717",
+            "identical": true
+          },
+          {
+            "path": "tests/fixtures/public-classic-select-declaration/package.json",
+            "reviewedBlob": "c762230967e7304be2899fd398352e3581f8117b",
+            "compositionBlob": "c762230967e7304be2899fd398352e3581f8117b",
+            "identical": true
+          },
+          {
+            "path": "tests/fixtures/public-classic-select-declaration/packed-controls.mjs",
+            "reviewedBlob": "05373c16b05e7dc826cdc47758f64153c52b7aa5",
+            "compositionBlob": "05373c16b05e7dc826cdc47758f64153c52b7aa5",
+            "identical": true
+          },
+          {
+            "path": "tests/fixtures/public-classic-select-declaration/packed-options-compatibility.ts",
+            "reviewedBlob": "83a5cc5ca59281207d5776d3fba275a62bdbf1ac",
+            "compositionBlob": "83a5cc5ca59281207d5776d3fba275a62bdbf1ac",
+            "identical": true
+          },
+          {
+            "path": "tests/fixtures/public-classic-select-declaration/packed-options-controls.mjs",
+            "reviewedBlob": "05b75922a80e37fc43d1c85a0c64ead8cfa9e626",
+            "compositionBlob": "05b75922a80e37fc43d1c85a0c64ead8cfa9e626",
+            "identical": true
+          },
+          {
+            "path": "tests/fixtures/public-classic-select-declaration/positive-node16.ts",
+            "reviewedBlob": "3b2e2df2625dee0c0f782087b87e458cedecc30c",
+            "compositionBlob": "3b2e2df2625dee0c0f782087b87e458cedecc30c",
+            "identical": true
+          },
+          {
+            "path": "tests/fixtures/public-classic-select-declaration/positive.ts",
+            "reviewedBlob": "790f0e3bc53331fea8eb0ff574aedb3ef6bf26c6",
+            "compositionBlob": "790f0e3bc53331fea8eb0ff574aedb3ef6bf26c6",
+            "identical": true
+          },
+          {
+            "path": "tests/fixtures/public-classic-select-declaration/runtime-default-controls.mjs",
+            "reviewedBlob": "f572ace4b807810ab7212ea81f8a18ce6a20da22",
+            "compositionBlob": "f572ace4b807810ab7212ea81f8a18ce6a20da22",
+            "identical": true
+          },
+          {
+            "path": "tests/fixtures/public-classic-select-declaration/whole-package.ts",
+            "reviewedBlob": "e5cc76af3bbdce6a0e5a418d822ac879ceb5fb8e",
+            "compositionBlob": "e5cc76af3bbdce6a0e5a418d822ac879ceb5fb8e",
+            "identical": true
+          },
+          {
+            "path": "tests/public-classic-select-declaration.test.mjs",
+            "reviewedBlob": "2f3bcd9f4bb52a23828955f324a432acef801099",
+            "compositionBlob": "2f3bcd9f4bb52a23828955f324a432acef801099",
+            "identical": true
+          },
+          {
+            "path": "vue/packages/components/select/index.ts",
+            "reviewedBlob": "07ff5b7d94f24270f53795d0118169384cd90a0d",
+            "compositionBlob": "07ff5b7d94f24270f53795d0118169384cd90a0d",
+            "identical": true
+          },
+          {
+            "path": "vue/packages/components/select/src/select.vue",
+            "reviewedBlob": "0fca7650eef5ea5c8d244ad4ec438f7d578894c1",
+            "compositionBlob": "0fca7650eef5ea5c8d244ad4ec438f7d578894c1",
+            "identical": true
+          },
+          {
+            "path": "vue/packages/components/select/src/useSelect.ts",
+            "reviewedBlob": "18cfd198a26503662c349819558be374b011eb82",
+            "compositionBlob": "18cfd198a26503662c349819558be374b011eb82",
+            "identical": true
+          }
+        ],
+        "canonicalBoundaryByteParity": [
+          {
+            "path": "select/index.d.ts",
+            "accepted2bSha256": "a64b140f814778c6ea163a212f9d96d004cdf80e2bb921c6b359d1d0f4e8abcc",
+            "actual31Sha256": "a64b140f814778c6ea163a212f9d96d004cdf80e2bb921c6b359d1d0f4e8abcc",
+            "identical": true,
+            "bytes": 4325
+          },
+          {
+            "path": "select/src/select.vue.d.ts",
+            "accepted2bSha256": "baefed042380049d77a0e9e4425e22a17365ca417f269da65ce109536b90ee2a",
+            "actual31Sha256": "baefed042380049d77a0e9e4425e22a17365ca417f269da65ce109536b90ee2a",
+            "identical": true,
+            "bytes": 377897
+          },
+          {
+            "path": "select/src/useSelect.d.ts",
+            "accepted2bSha256": "34b7e4e51209e2e5b110baa2cf7043870836a02c273d222068b82d55e137950c",
+            "actual31Sha256": "34b7e4e51209e2e5b110baa2cf7043870836a02c273d222068b82d55e137950c",
+            "identical": true,
+            "bytes": 4530
+          },
+          {
+            "path": "time-select/index.d.ts",
+            "accepted2bSha256": "d3a530da223846686227077d0135562fd52daf6741a08318b47891b417852e43",
+            "actual31Sha256": "d3a530da223846686227077d0135562fd52daf6741a08318b47891b417852e43",
+            "identical": true,
+            "bytes": 1246135
+          },
+          {
+            "path": "time-select/src/time-select.vue.d.ts",
+            "accepted2bSha256": "f6d47f66d61518cd6ee54e2e1cd46536873196fedaa9df8232e16203357756c1",
+            "actual31Sha256": "f6d47f66d61518cd6ee54e2e1cd46536873196fedaa9df8232e16203357756c1",
+            "identical": true,
+            "bytes": 1247091
+          },
+          {
+            "path": "pagination/src/components/sizes.vue.d.ts",
+            "accepted2bSha256": "c0a8e27b025c5c318848efba43bbcbd46eaadf1b62c82a33f14e5cdfd6966a5c",
+            "actual31Sha256": "c0a8e27b025c5c318848efba43bbcbd46eaadf1b62c82a33f14e5cdfd6966a5c",
+            "identical": true,
+            "bytes": 416557
+          }
+        ],
+        "realProducerObservation": {
+          "sourceSha": "31fe270f524cdd09ea43949077f4826196ebc550",
+          "compiler": "5.9.2",
+          "node": "v24.19.0",
+          "observations": [
+            []
+          ],
+          "originalDiagnosticReturnUnchanged": true,
+          "qualification": "Observational only; source guard remains unchanged and refuses this source."
+        },
+        "actualVerifiedArtifact": {
+          "library_file_id": "libfile_9ffb624a1b648191aa537b4a4619631a",
+          "file_id": "file_00000000b3d081fd9198c570c165a14c",
+          "version": 0,
+          "bundleSHA256": "e5e4e193987b34ecb3dfc358c3a81ee1f9fba39928d2fdc9cee9ac2ca7396ae4",
+          "candidateSHA256": "462360d7342f8f17e40f19eaae6f1246ba5de2909d9bd1b0072e2884798ec215",
+          "payloadFileCount": 8519,
+          "fullPayloadDigest": "276a5edd7a81cd08397e29d5d5ac8b7684d79ea60775c5c8a53b30f95405adcc",
+          "differencesFromIndependentRebuild": [
+            {
+              "path": "es/components/carousel/index.d.mts",
+              "before": "f07d48b43d90a0ab787b53006da617e1ff41eaae58846c5240f5bf47cc4f03fd",
+              "after": "e93dc5d4846ba09452b71c782671a63ead8f9c75256cc790cd174e3777b527e4"
+            },
+            {
+              "path": "es/components/carousel/index.d.ts",
+              "before": "71ba4e304815dfccffb90bf765bd6d097079639970c01d066e38aecd3f73e72e",
+              "after": "78d79b069f7267266e069bdf80007a5bdd507bf01ff60ddf3fe5f34f91e4e830"
+            },
+            {
+              "path": "es/components/carousel/src/carousel.vue.d.mts",
+              "before": "2fe74666986c081180555338f996ab2bca8a4cabc104366f3d1234ac7cc545df",
+              "after": "b058b6ce3534c7d4642905eca52248b3af60dc57aa9057ce867408d599b89fe6"
+            },
+            {
+              "path": "es/components/carousel/src/carousel.vue.d.ts",
+              "before": "2fe74666986c081180555338f996ab2bca8a4cabc104366f3d1234ac7cc545df",
+              "after": "b058b6ce3534c7d4642905eca52248b3af60dc57aa9057ce867408d599b89fe6"
+            },
+            {
+              "path": "lib/components/carousel/index.d.ts",
+              "before": "ae9713da204e97c1f4e81c4a003e2cdb73f682d08bdb32580903f678826051cc",
+              "after": "2aee600d3b4677e3baa26837b230c56cb2ff013e5044217a19f0cfccb4103333"
+            },
+            {
+              "path": "lib/components/carousel/src/carousel.vue.d.ts",
+              "before": "3787616668fc44e9aac12faece756557aecf5033300a25935927e0ef3f1d9406",
+              "after": "b437beead0cfa3c119b62dd6179ea99de9304342745c44bc303ae8536191d18a"
+            }
+          ],
+          "differenceInspection": "Only readonly interval:number property position changes in the six Carousel declaration files; no candidate bytes or historical authority normalized or changed.",
+          "all30DeclarationBoundariesAndMetadataByteIdenticalToAccepted2b": true
+        }
+      }
+    }
+  ]
+}
