@@ -48,7 +48,7 @@ const bundledWorkspaceRuntimeEntries = new Map([
     {
       es: 'es/icons-vue/src/index.mjs',
       lib: 'lib/icons-vue/src/index.js',
-      types: 'es/icons-vue',
+      types: 'es/icons-vue/src/index',
     },
   ],
   [
@@ -56,7 +56,7 @@ const bundledWorkspaceRuntimeEntries = new Map([
     {
       es: 'es/motion/index.mjs',
       lib: 'lib/motion/index.js',
-      types: 'es/motion',
+      types: 'es/motion/index',
     },
   ],
 ])
