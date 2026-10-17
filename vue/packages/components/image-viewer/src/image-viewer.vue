@@ -61,7 +61,7 @@
             </span>
           </template>
           <!-- ACTIONS -->
-          <div v-if="showToolbar" :class="[ns.e('btn'), ns.e('actions')]">
+          <div v-if="showToolbar" :class="[ns.e('btn'), ns.e('actions')]" @wheel.stop>
             <span
               :class="ns.e('action')"
               role="button"
