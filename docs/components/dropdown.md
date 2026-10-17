@@ -78,6 +78,10 @@ ArrowUp/Down/Home/End and skips disabled items. Escape returns focus to the
 trigger. Use one focusable trigger in the default slot, including compact custom
 content, and observe visibility through `visible-change`.
 
+Keyboard entry uses the current committed `checked` and `disabled` state,
+including updates received during the enter transition. Updating these states
+keeps later entry and navigation current without moving an existing item focus.
+
 Escape also cancels a pending delayed open. During close, focus restoration is
 limited to the current Escape session and yields to newer input, external focus,
 or reopening. While that session still owns focus, Dropdown takes responsibility
