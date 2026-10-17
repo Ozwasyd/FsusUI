@@ -171,7 +171,7 @@ public class FsusNativeMenuHeadlessTests
     var palette = new FsusCommandPaletteModel([undoCommand, redoCommand]);
 
     // Search query
-    var results = palette.Search("und");
+    var results = palette.Search("und", FsusShortcutPlatform.Windows);
     Assert.Single(results);
     var result = results[0];
     Assert.Equal("edit.undo", result.CommandId);
