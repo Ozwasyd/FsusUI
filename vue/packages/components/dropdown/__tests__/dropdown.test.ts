@@ -443,6 +443,113 @@ describe('Dropdown', () => {
     ).toBe('0')
   })
 
+  const mountControlledSelection = () =>
+    _mount(
+      `
+      <el-dropdown trigger="click" :hide-on-click="false">
+        <button type="button" class="selection-trigger">Choose</button>
+        <template #dropdown>
+          <el-dropdown-menu>
+            <el-dropdown-item command="a" :checked="selected === 'a'" :disabled="disabledA">Alpha</el-dropdown-item>
+            <el-dropdown-item command="b" :checked="selected === 'b'">Beta</el-dropdown-item>
+            <el-dropdown-item command="c" :checked="selected === 'c'">Gamma</el-dropdown-item>
+          </el-dropdown-menu>
+        </template>
+      </el-dropdown>
+      `,
+      () => ({ selected: 'a', disabledA: false }),
+      {
+        attachTo: document.body,
+        global: { stubs: { transition: false } },
+      },
+    )
+
+  test('keyboard entry uses selection committed during the enter transition', async () => {
+    vi.useFakeTimers()
+    try {
+      const wrapper = mountControlledSelection()
+      await nextTick()
+      await wrapper.find('.selection-trigger').trigger('keydown', {
+        key: EVENT_CODE.down,
+        code: EVENT_CODE.down,
+      })
+      await vi.advanceTimersByTimeAsync(0)
+      await wrapper.setData({ selected: 'b' })
+      await vi.advanceTimersByTimeAsync(100)
+
+      const items = document.querySelectorAll('.el-dropdown-menu__item')
+      expect(items[1].getAttribute('aria-checked')).toBe('true')
+      expect(document.activeElement).toBe(items[1])
+      expect(wrapper.findComponent(Dropdown).emitted('command')).toBeUndefined()
+      document.activeElement?.dispatchEvent(
+        new KeyboardEvent('keydown', {
+          key: EVENT_CODE.enter,
+          code: EVENT_CODE.enter,
+          bubbles: true,
+          cancelable: true,
+        }),
+      )
+      expect(wrapper.findComponent(Dropdown).emitted('command')?.[0][0]).toBe(
+        'b',
+      )
+      await wrapper.unmount()
+    } finally {
+      vi.useRealTimers()
+    }
+  })
+
+  test('keyboard entry and Home skip an item disabled during enter', async () => {
+    vi.useFakeTimers()
+    try {
+      const wrapper = mountControlledSelection()
+      await nextTick()
+      await wrapper.find('.selection-trigger').trigger('keydown', {
+        key: EVENT_CODE.down,
+        code: EVENT_CODE.down,
+      })
+      await vi.advanceTimersByTimeAsync(0)
+      await wrapper.setData({ disabledA: true })
+      await vi.advanceTimersByTimeAsync(100)
+
+      const items = document.querySelectorAll('.el-dropdown-menu__item')
+      expect(document.activeElement).toBe(items[1])
+      await wrapper.findComponent(DropdownMenu).trigger('keydown', {
+        key: EVENT_CODE.home,
+        code: EVENT_CODE.home,
+      })
+      expect(document.activeElement).toBe(items[1])
+      await wrapper.unmount()
+    } finally {
+      vi.useRealTimers()
+    }
+  })
+
+  test('a committed selection does not steal focus after keyboard entry', async () => {
+    vi.useFakeTimers()
+    try {
+      const wrapper = mountControlledSelection()
+      await nextTick()
+      await wrapper.find('.selection-trigger').trigger('keydown', {
+        key: EVENT_CODE.down,
+        code: EVENT_CODE.down,
+      })
+      await vi.advanceTimersByTimeAsync(100)
+      const items = document.querySelectorAll<HTMLElement>(
+        '.el-dropdown-menu__item',
+      )
+      expect(document.activeElement).toBe(items[0])
+      items[1].focus()
+      await wrapper.setData({ selected: 'c' })
+      await vi.advanceTimersByTimeAsync(100)
+
+      expect(items[2].getAttribute('aria-checked')).toBe('true')
+      expect(document.activeElement).toBe(items[1])
+      await wrapper.unmount()
+    } finally {
+      vi.useRealTimers()
+    }
+  })
+
   test('dropdown menu typeahead search', async () => {
     const wrapper = _mount(
       `

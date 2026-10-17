@@ -47,8 +47,9 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, inject } from 'vue'
+import { computed, defineComponent, inject, onUpdated } from 'vue'
 import {
+  ROVING_FOCUS_COLLECTION_INJECTION_KEY,
   ROVING_FOCUS_GROUP_ITEM_INJECTION_KEY,
   ROVING_FOCUS_ITEM_COLLECTION_INJECTION_KEY,
 } from '@element-plus/components/roving-focus-group'
@@ -58,6 +59,7 @@ import { useNamespace } from '@element-plus/hooks'
 import { composeEventHandlers, composeRefs } from '@element-plus/utils'
 import { EVENT_CODE } from '@element-plus/constants'
 import {
+  DROPDOWN_COLLECTION_INJECTION_KEY,
   DROPDOWN_COLLECTION_ITEM_INJECTION_KEY,
   dropdownItemProps,
 } from './dropdown'
@@ -76,6 +78,14 @@ export default defineComponent({
     const ns = useNamespace('dropdown')
 
     const { role: menuRole } = inject(DROPDOWN_INJECTION_KEY, undefined)!
+    const { itemMap: dropdownItems } = inject(
+      DROPDOWN_COLLECTION_INJECTION_KEY,
+      undefined,
+    )!
+    const { itemMap: rovingFocusItems } = inject(
+      ROVING_FOCUS_COLLECTION_INJECTION_KEY,
+      undefined,
+    )!
 
     const { collectionItemRef: dropdownCollectionItemRef } = inject(
       DROPDOWN_COLLECTION_ITEM_INJECTION_KEY,
@@ -119,6 +129,22 @@ export default defineComponent({
     const checkedState = computed(() =>
       menuRole.value === 'menu' ? props.checked : undefined,
     )
+
+    // Collection records snapshot attrs on mount. Keep this item's registration
+    // current for later focus entry/navigation without moving existing focus.
+    onUpdated(() => {
+      const element = rovingFocusGroupItemRef.value
+      if (!element) return
+
+      const dropdownItem = dropdownItems.get(element)
+      if (dropdownItem) dropdownItem.disabled = props.disabled
+
+      const rovingItem = rovingFocusItems.get(element)
+      if (rovingItem) {
+        rovingItem.active = checkedState.value === true
+        rovingItem.focusable = !props.disabled
+      }
+    })
 
     const handleKeydown = composeEventHandlers((e: KeyboardEvent) => {
       const { code } = e
