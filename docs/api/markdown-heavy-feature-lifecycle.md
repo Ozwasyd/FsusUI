@@ -27,6 +27,14 @@ version mismatch prevents a stale commit. The stable syntax projection supplies
 node identity; DOM paths, array indexes, source offsets, and body hashes are not
 cache authority.
 
+MarkdownRenderer reuses the immutable canonical projection snapshot while the
+document key, epoch, and raw source remain exactly equal. Mounted chunks and
+theme changes do not rebuild whole-document stable identity alignment. A source
+or document change still uses the canonical tracker; revision and feature
+identity contexts are rebuilt for each activation. This single renderer-local
+snapshot is released on unmount and never becomes a parser or persisted source
+authority.
+
 Mermaid and LaTeX output already materialized by the authorized Markdown render
 result enters the same authority directly as a zero-resource `static-mounted`
 node. Placeholder-driven Mermaid, KaTeX, and Shiki adapter work instead enters

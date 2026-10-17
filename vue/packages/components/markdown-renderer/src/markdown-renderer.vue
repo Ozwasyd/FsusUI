@@ -11,7 +11,7 @@
     ]"
     role="article"
     aria-live="polite"
-    :aria-busy="isRendering ? 'true' : 'false'"
+    :aria-busy="isRendering"
     v-bind="rootRenderAttrs()"
   >
     <div
@@ -136,6 +136,7 @@ const heavyLifecycle = createMarkdownHeavyFeatureLifecycle({
 const heavyThemeRevision = ref(0)
 let heavyThemeListenerInstalled = false
 const handleHeavyFeatureThemeChange = () => {
+  activationController?.abort()
   heavyThemeRevision.value += 1
 }
 const ensureHeavyFeatureThemeListener = () => {
@@ -286,12 +287,10 @@ let heavyLifecycleProjectionNodeIds: Partial<
 > = {}
 let heavyProjectionTrackerPromise: Promise<MarkdownHeavyFeatureProjectionTracker> | null =
   null
-
 const loadHeavyProjectionTracker = () =>
   (heavyProjectionTrackerPromise ??=
-    import('../../../wasm/markdown-heavy-feature-identity').then(
-      ({ createMarkdownHeavyFeatureProjectionTracker }) =>
-        createMarkdownHeavyFeatureProjectionTracker(),
+    import('./markdown-renderer-heavy-projection').then((module) =>
+      module.default(),
     ))
 
 function recordHeavyLifecycleMetrics() {
@@ -882,12 +881,12 @@ const resolveMarkdownFeatureOptions = () => ({
 })
 
 const hasEnabledHeavyFeature = (
-  result: MarkdownSafeRenderResult,
+  { features: renderedFeatures }: MarkdownSafeRenderResult,
   features: ReturnType<typeof resolveMarkdownFeatureOptions>,
 ) =>
-  (features.codeHighlight && result.features.includes('code_block')) ||
-  (features.latex && result.features.includes('latex')) ||
-  (features.mermaid && result.features.includes('mermaid'))
+  (features.codeHighlight && renderedFeatures.includes('code_block')) ||
+  (features.latex && renderedFeatures.includes('latex')) ||
+  (features.mermaid && renderedFeatures.includes('mermaid'))
 
 const resetFeatureActivation = () => {
   removeHeavyFeatureThemeListener()
@@ -1044,6 +1043,8 @@ const activateRenderedFeatures = async (
   const activationStartedAt = readPerformanceNow()
   const features = resolveMarkdownFeatureOptions()
   const heavyFeaturesEnabled = hasEnabledHeavyFeature(result, features)
+  // Theme changes must invalidate pending imports and activation too.
+  if (heavyFeaturesEnabled) ensureHeavyFeatureThemeListener()
   const resolveHeavyFeatureIdentity = heavyFeaturesEnabled
     ? await createHeavyFeatureIdentityResolver(result)
     : () => null
@@ -1348,6 +1349,7 @@ onBeforeUnmount(() => {
   currentTaskId += 1
   isRendering.value = false
   heavyLifecycle.dispose()
+  heavyProjectionTrackerPromise = null
 })
 
 defineExpose({
