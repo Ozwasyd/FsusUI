@@ -2,7 +2,7 @@ import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 import path from 'node:path'
 import test from 'node:test'
-import { fileURLToPath } from 'node:url'
+import { fileURLToPath, URL } from 'node:url'
 import { Script } from 'node:vm'
 import ts from 'typescript'
 
@@ -97,7 +97,34 @@ test('full selection preserves every scenario, size and dimension combination', 
     if (!cases.has(key)) cases.set(key, [])
     cases.get(key).push(dimensions)
   }
-  assert.equal(cases.size, 23)
+  assert.deepEqual(
+    [...cases.keys()],
+    [
+      'virtual-list-fixed-1000',
+      'virtual-list-fixed-10000',
+      'virtual-list-fixed-100000',
+      'virtual-list-variable-1000',
+      'virtual-list-variable-10000',
+      'virtual-list-variable-100000',
+      'virtual-grid-10000',
+      'virtual-grid-100000',
+      'markdown-cold-24576',
+      'markdown-hot-262144',
+      'markdown-hot-1048576',
+      'select-v2-2000',
+      'select-v2-10000',
+      'select-v2-100000',
+      'table-1000',
+      'data-pipeline-table-5000',
+      'data-pipeline-table-10000',
+      'data-pipeline-table-100000',
+      'render-pipeline-monolithic-2000000',
+      'render-pipeline-cooperative-2000000',
+      'virtual-window-index-legacy-100000',
+      'virtual-window-index-incremental-100000',
+      'markdown-feature-activation-4096',
+    ],
+  )
   const expected = [60, 120].flatMap((hz) =>
     [1, 2].flatMap((dpr) =>
       ['enabled', 'reduced', 'disabled'].map((motion) => [hz, dpr, motion]),
