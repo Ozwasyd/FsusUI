@@ -17,8 +17,9 @@
       ]"
     >
       <input
-        ref="radioRef"
+        :ref="templateRef.ref"
         v-model="modelValue"
+        ref_key="radioRef"
         :class="ns.e('original')"
         :value="actualValue"
         :name="name || radioGroup?.name"
@@ -55,6 +56,7 @@ const emit = defineEmits(radioEmits)
 const ns = useNamespace('radio')
 const { radioRef, radioGroup, actualValue, focus, size, disabled, modelValue } =
   useRadio(props, emit)
+const templateRef = { ref: radioRef, ref_key: 'radioRef' }
 
 function handleChange() {
   nextTick(() => emit('change', modelValue.value))

@@ -9,8 +9,9 @@
     ]"
   >
     <input
-      ref="radioRef"
+      :ref="templateRef.ref"
       v-model="modelValue"
+      ref_key="radioRef"
       :class="ns.be('button', 'original-radio')"
       role="radio"
       :value="actualValue"
@@ -49,6 +50,7 @@ const props = defineProps(radioButtonProps)
 const ns = useNamespace('radio')
 const { radioRef, actualValue, focus, size, disabled, modelValue, radioGroup } =
   useRadio(props)
+const templateRef = { ref: radioRef, ref_key: 'radioRef' }
 
 const activeStyle = computed<CSSProperties>(() => {
   return {
