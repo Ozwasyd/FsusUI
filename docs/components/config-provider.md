@@ -151,6 +151,12 @@ The local source alias exposes `createGlobalConfigSnapshot`,
 config-provider hook. These are internal integration surfaces, not supported
 package imports or a certificate of complete application custody.
 
+Reads and feed lookups do not initialize the publication runtime. The first
+provider or snapshot-producer call initializes it synchronously. Selected Refs
+created before that point remain readable but have no feed identity; select
+again after initialization to obtain a managed feed. The original whole-config
+fallback Ref keeps its identity and its subsequent writes are intercepted.
+
 `provideGlobalConfig(config, app?, global?)` continues accepting the existing
 object/MaybeRef inputs and inheriting configuration by top-level nullish merge.
 Those inputs, including ordinary `ElConfigProvider` props, remain unowned:

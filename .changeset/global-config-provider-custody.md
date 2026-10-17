@@ -10,3 +10,5 @@ fallback values follow their selected producer's updates; released publications
 retain readable values without authority.
 Detaching a provider or fallback preserves its previously observed upstream
 failure records without retaining the live dependency or following later failures.
+Keep the publication engine out of ordinary component read imports; initialize
+it synchronously at the first provider or snapshot-producer call.
