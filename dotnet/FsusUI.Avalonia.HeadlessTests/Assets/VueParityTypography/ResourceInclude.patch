@@ -1,0 +1,11 @@
+diff --git a/dotnet/FsusUI.Avalonia.HeadlessTests/FsusUI.Avalonia.HeadlessTests.csproj b/dotnet/FsusUI.Avalonia.HeadlessTests/FsusUI.Avalonia.HeadlessTests.csproj
+--- a/dotnet/FsusUI.Avalonia.HeadlessTests/FsusUI.Avalonia.HeadlessTests.csproj
++++ b/dotnet/FsusUI.Avalonia.HeadlessTests/FsusUI.Avalonia.HeadlessTests.csproj
+@@ -28,4 +28,7 @@
+   <ItemGroup>
+     <AvaloniaResources Include="Assets/Fonts/*.ttf" />
+   </ItemGroup>
++  <ItemGroup>
++    <AvaloniaResource Include="Assets/VueParityTypography/**/*.ttf;Assets/VueParityTypography/Source/*/LICENSE;Assets/VueParityTypography/Source/*/COPYRIGHT.txt" />
++  </ItemGroup>
+ </Project>

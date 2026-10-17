@@ -7,6 +7,11 @@ using Avalonia.Headless.XUnit;
 using Avalonia.Markup.Xaml.Styling;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
+using Avalonia.Media.Fonts;
+using Avalonia.Platform;
+using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
+using System.Runtime.CompilerServices;
 using Avalonia.Styling;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
@@ -28,11 +33,10 @@ namespace FsusUI.Avalonia.HeadlessTests;
 /// </summary>
 public class FsusVueParityBatch3EvidenceTests
 {
-  // Matches the Web demo font stack (Google Sans for Latin, Noto Sans SC for
-  // CJK); the bundled faces are registered by TestAppBuilder under
-  // FSUS_HEADLESS_GSANS=1 and fall back to system faces otherwise.
-  private static readonly FontFamily BodyFont = new(
-    "Hiragino Sans GB, Microsoft YaHei, Helvetica Neue, Helvetica, Arial, sans-serif");
+  // Opt-in parity uses the pinned Web faces through fixture-local resource
+  // identities. Standalone mode uses the specification's system font stack.
+  private static FontFamily BodyFont => FsusVueParityTypography.CreateBodyFont(
+    Environment.GetEnvironmentVariable("FSUS_HEADLESS_GSANS") == "1");
 
   public static TheoryData<string> ParityCases => new()
   {
@@ -58,6 +62,7 @@ public class FsusVueParityBatch3EvidenceTests
 
     var window = new Window
     {
+      FontFamily = BodyFont,
       Width = measure.Width + 2,
       Height = measure.Height + 2,
       Content = surface,
@@ -461,6 +466,9 @@ public class FsusVueParityBatch3EvidenceTests
         Source = new Uri(
           $"avares://FsusUI.Avalonia.Themes/Themes/Fsus{variant}.axaml"),
       });
+    // The Empty template binds this resource directly instead of inheriting
+    // Window.FontFamily. Keep the override local to this parity window.
+    window.Resources["FsusTypographyFamilyBody"] = BodyFont;
     window.RequestedThemeVariant = variant == FsusThemeVariant.Dark
       ? ThemeVariant.Dark
       : ThemeVariant.Light;
@@ -480,5 +488,116 @@ public class FsusVueParityBatch3EvidenceTests
     }
 
     return dir?.FullName ?? throw new InvalidOperationException("repository root not found");
+  }
+}
+
+// These resources belong only to the parity fixture. Do not change font
+// defaults, map system families, or reuse the global GoogleSans collection.
+internal static class FsusVueParityTypography
+{
+  internal const string ResourceRoot =
+    "avares://FsusUI.Avalonia.HeadlessTests/Assets/VueParityTypography/";
+  internal const string GoogleSansFamily = "Google Sans 18pt";
+  internal const string NotoSansFamily = "Noto Sans SC Thin";
+  internal static readonly Uri NotoCollectionKey = new("fonts:FsusVueParityTypographyNotoSansSC");
+  private static readonly ConditionalWeakTable<FontManager, ExactNotoFontCollection> NotoCollections = new();
+  internal const string StandaloneStack =
+    "Google Sans, Inter, Noto Sans SC, Noto Sans CJK SC, Noto Sans TC, Noto Sans JP, " +
+    "PingFang SC, Hiragino Sans GB, Microsoft YaHei, 微软雅黑, Helvetica Neue, " +
+    "Helvetica, Arial, ui-sans-serif, system-ui, sans-serif";
+
+  internal static FontFamily CreateBodyFont(bool useBundledFonts)
+  {
+    if (!useBundledFonts)
+    {
+      return FontFamily.Parse(StandaloneStack);
+    }
+
+    foreach (var weight in new[] { FontWeight.Normal, FontWeight.Medium, FontWeight.Bold })
+    {
+      RequireFace(ResourceRoot + "GoogleSans/Latin/", GoogleSansFamily, weight);
+      RequireFace(ResourceRoot + "GoogleSans/Symbols/", GoogleSansFamily, weight);
+      RequireFace(ResourceRoot + "NotoSansSC/", NotoSansFamily, weight);
+    }
+
+    return FontFamily.Parse(
+      $"{ResourceRoot}GoogleSans/Latin/#{GoogleSansFamily}, " +
+      $"{ResourceRoot}GoogleSans/Symbols/#{GoogleSansFamily}, " +
+      $"{NotoCollectionKey}#{NotoSansFamily}, {StandaloneStack}");
+  }
+
+  internal static GlyphTypeface RequireFace(string source, string nativeFamily, FontWeight weight)
+  {
+    var asset = new Uri($"{source}{(int)weight}.ttf");
+    if (!AssetLoader.Exists(asset))
+    {
+      throw new InvalidOperationException($"Vue parity font resource is missing: {asset}");
+    }
+
+    if (source == ResourceRoot + "NotoSansSC/")
+    {
+      // Avalonia's default embedded collection normalizes "Thin" in the
+      // pinned font's literal family name into weight 100. Keep the source
+      // name tables intact and scope literal lookup to this resource set.
+      var manager = FontManager.Current;
+      lock (NotoCollections)
+      {
+        if (!NotoCollections.TryGetValue(manager, out _))
+        {
+          var collection = new ExactNotoFontCollection();
+          manager.AddFontCollection(collection);
+          NotoCollections.Add(manager, collection);
+        }
+      }
+    }
+
+    var familySource = source == ResourceRoot + "NotoSansSC/" ? NotoCollectionKey.ToString() : source;
+    var typeface = new Typeface(FontFamily.Parse($"{familySource}#{nativeFamily}"), weight: weight);
+    if (!FontManager.Current.TryGetGlyphTypeface(typeface, out var glyphTypeface) ||
+        Family(glyphTypeface) != nativeFamily ||
+        glyphTypeface.Weight != weight || glyphTypeface.Style != FontStyle.Normal ||
+        glyphTypeface.FontSimulations != FontSimulations.None)
+    {
+      throw new InvalidOperationException(
+        $"Vue parity requires the real {nativeFamily} {(int)weight} face from {source}. " +
+        $"Resolved: {glyphTypeface?.FamilyName}; typographic: {glyphTypeface?.TypographicFamilyName}; " +
+        $"weight: {glyphTypeface?.Weight}; style: {glyphTypeface?.Style}; simulations: {glyphTypeface?.FontSimulations}.");
+    }
+
+    return glyphTypeface;
+  }
+
+  internal static string Family(GlyphTypeface face) => string.IsNullOrEmpty(face.TypographicFamilyName)
+    ? face.FamilyName : face.TypographicFamilyName;
+
+  private sealed class ExactNotoFontCollection : EmbeddedFontCollection
+  {
+    public ExactNotoFontCollection() : base(NotoCollectionKey, new Uri(ResourceRoot + "NotoSansSC/"))
+    {
+    }
+
+    public override bool TryGetGlyphTypeface(string familyName, FontStyle style, FontWeight weight,
+      FontStretch stretch, [NotNullWhen(true)] out GlyphTypeface? glyphTypeface)
+    {
+      glyphTypeface = null;
+      return familyName == NotoSansFamily &&
+        TryGetGlyphTypeface(familyName, new FontCollectionKey(style, weight, stretch),
+          allowNearestMatch: false, out glyphTypeface);
+    }
+
+    public override bool TryMatchCharacter(int codepoint, FontStyle style, FontWeight weight,
+      FontStretch stretch, string? familyName, CultureInfo? culture, out Typeface match)
+    {
+      match = default;
+      if (familyName != NotoSansFamily ||
+          !TryGetGlyphTypeface(familyName, style, weight, stretch, out var face) ||
+          !face.CharacterToGlyphMap.TryGetGlyph(codepoint, out var glyph) || glyph == 0)
+      {
+        return false;
+      }
+
+      match = new Typeface(FontFamily.Parse($"{Key}#{NotoSansFamily}"), style, weight, stretch);
+      return true;
+    }
   }
 }

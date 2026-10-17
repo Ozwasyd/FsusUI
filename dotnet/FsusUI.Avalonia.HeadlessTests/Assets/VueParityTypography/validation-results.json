@@ -1,0 +1,165 @@
+{
+  "baseline": "8db0ac8f49749e3e5f28be5051bb3d3ed71ada71",
+  "branch": "fix/batch3-native-web-typography-20261009",
+  "sourceSha256": {
+    "dotnet/FsusUI.Avalonia.HeadlessTests/FsusVueParityBatch3EvidenceTests.cs": "a11142db841da66d0361b2997d0489eb06b396ada8e69e68cb1e2d5eb579eaf0",
+    "dotnet/FsusUI.Avalonia.HeadlessTests/FsusVueParityTypographyTests.cs": "41db86a8ee88ad5e0eda50583265743bed08ecaad18b849db0561a62b1076a1e"
+  },
+  "unchangedPrerequisiteSha256": {
+    "dotnet/global.json": "4abaa2e11994cf8cc74205531dcdd8ec7c7d01b63489079b1b87b7b879b96e39",
+    "dotnet/Directory.Packages.props": "824af0f9d84d1636422a1bd140fc9a0b83e2fc1d16206fb88103cbf9abaf880d",
+    "dotnet/Directory.Build.props": "4ec4e24a597f7e5afefe96fcb88c13bf39bfe57714ab3040fbdebb5ed2900760",
+    "dotnet/FsusUI.Avalonia.HeadlessTests/FsusUI.Avalonia.HeadlessTests.csproj": "988a2ddef82c63fa15ea2940e2151bc9d5dce2301c9fa5c1f5f3547f27cc54fc",
+    "dotnet/FsusUI.Avalonia.HeadlessTests/TestAppBuilder.cs": "098720190ce4da6fdba39747770944d85dee7438e3a18abd8cf6f938a626d24d",
+    "dotnet/FsusUI.Avalonia.HeadlessTests/TestAssembly.cs": "3f7edd72eac91614fcf49f709dd4e560c74ebef8da68a53a02947e5611cd1869",
+    "dotnet/FsusUI.Avalonia/packages.lock.json": "758d99d10aeb737ba26545c0865a11f0ba2bd583b0de8cee34943157bc802344",
+    "dotnet/FsusUI.Avalonia.Icons/packages.lock.json": "b47e2a2f69c44c6a17e6cef48eef06c490e0e3e30f7fded73644d749e520720c",
+    "dotnet/FsusUI.Avalonia.Themes/packages.lock.json": "b47e2a2f69c44c6a17e6cef48eef06c490e0e3e30f7fded73644d749e520720c",
+    "dotnet/FsusUI.Avalonia.Demo/packages.lock.json": "fc6ff427dc1c36a8c73e955708bdfc98e534e0e7c07ea3b03bbc3d77ad93e385",
+    "dotnet/FsusUI.Avalonia.FormGenerator/packages.lock.json": "b9c4438133868e312f2c1edfe34e914a22d40a609a318b6dc2a76a9f5d5295b6",
+    "dotnet/FsusUI.Avalonia.HeadlessTests/packages.lock.json": "9ceff33140e66773191d7bb7b85e0a4c4e50f17f16f3668842be072e647edecf"
+  },
+  "sdk": "10.0.401",
+  "runtime": "Microsoft.NETCore.App 10.0.12 linux-x64",
+  "sdkPolicy": "10.0.108 minimum, latestFeature (unchanged)",
+  "dotnetExecutableSha256": "01d89e0a0191052bfea616cd4ce624c8faf13b05bbddf7f64499c23e2a9d9269",
+  "avaloniaVersion": "12.0.4",
+  "originalTestAssemblySha256": "ad82153392f5872c46103e3380cdb86aa9e033e3f35c75f5c50d11a623ecf1b2",
+  "lockedRestore": "PASS",
+  "resourceInclude": "STAGED external MSBuild import; original project and assembly application host; shared csproj unchanged",
+  "resourceItemCount": 13,
+  "resourceIncludeTargetsSha256": "e0bae8eaeee85c12934623293a46b9c175c3fe39aa320a0e9b23aa41fc284be1",
+  "positiveFqns": [
+    "FsusUI.Avalonia.HeadlessTests.FsusVueParityTypographyTests.PinnedFacesHaveRealWeightsAndGlyphCoverage",
+    "FsusUI.Avalonia.HeadlessTests.FsusVueParityTypographyTests.MixedLayoutsUsePinnedLatinCjkAndSymbolFaces",
+    "FsusUI.Avalonia.HeadlessTests.FsusVueParityTypographyTests.StandaloneModeKeepsCjkBeforeGenericFallbacks",
+    "FsusUI.Avalonia.HeadlessTests.FsusVueParityTypographyTests.FixtureUsesExplicitGsansMode",
+    "FsusUI.Avalonia.HeadlessTests.FsusVueParityTypographyTests.MissingResourceIsRejected",
+    "FsusUI.Avalonia.HeadlessTests.FsusVueParityTypographyTests.UnavailableResourceFamilyIsRejected",
+    "FsusUI.Avalonia.HeadlessTests.FsusVueParityTypographyTests.MissingWeightCannotUseANearestOrSynthesizedFace"
+  ],
+  "expectedCases": 11,
+  "runs": [
+    {
+      "FSUS_HEADLESS_GSANS": "0",
+      "total": 11,
+      "passed": 11,
+      "failed": 0,
+      "skipped": 0,
+      "trxSha256": "328ac0c2c1f5c0eba0a4586b5bf24233b4dbed8b36e311e1845d5e35b1aea814",
+      "discoverySha256": "802273658f90dc55b6859d2cc31e0d4f10487a8e0ed66d98e6570d263333c5eb",
+      "cases": [
+        {
+          "name": "FsusUI.Avalonia.HeadlessTests.FsusVueParityTypographyTests.PinnedFacesHaveRealWeightsAndGlyphCoverage(value: 500)",
+          "outcome": "Passed"
+        },
+        {
+          "name": "FsusUI.Avalonia.HeadlessTests.FsusVueParityTypographyTests.UnavailableResourceFamilyIsRejected",
+          "outcome": "Passed"
+        },
+        {
+          "name": "FsusUI.Avalonia.HeadlessTests.FsusVueParityTypographyTests.MissingResourceIsRejected",
+          "outcome": "Passed"
+        },
+        {
+          "name": "FsusUI.Avalonia.HeadlessTests.FsusVueParityTypographyTests.PinnedFacesHaveRealWeightsAndGlyphCoverage(value: 700)",
+          "outcome": "Passed"
+        },
+        {
+          "name": "FsusUI.Avalonia.HeadlessTests.FsusVueParityTypographyTests.PinnedFacesHaveRealWeightsAndGlyphCoverage(value: 400)",
+          "outcome": "Passed"
+        },
+        {
+          "name": "FsusUI.Avalonia.HeadlessTests.FsusVueParityTypographyTests.MixedLayoutsUsePinnedLatinCjkAndSymbolFaces(value: 400)",
+          "outcome": "Passed"
+        },
+        {
+          "name": "FsusUI.Avalonia.HeadlessTests.FsusVueParityTypographyTests.MixedLayoutsUsePinnedLatinCjkAndSymbolFaces(value: 500)",
+          "outcome": "Passed"
+        },
+        {
+          "name": "FsusUI.Avalonia.HeadlessTests.FsusVueParityTypographyTests.FixtureUsesExplicitGsansMode",
+          "outcome": "Passed"
+        },
+        {
+          "name": "FsusUI.Avalonia.HeadlessTests.FsusVueParityTypographyTests.MissingWeightCannotUseANearestOrSynthesizedFace",
+          "outcome": "Passed"
+        },
+        {
+          "name": "FsusUI.Avalonia.HeadlessTests.FsusVueParityTypographyTests.StandaloneModeKeepsCjkBeforeGenericFallbacks",
+          "outcome": "Passed"
+        },
+        {
+          "name": "FsusUI.Avalonia.HeadlessTests.FsusVueParityTypographyTests.MixedLayoutsUsePinnedLatinCjkAndSymbolFaces(value: 700)",
+          "outcome": "Passed"
+        }
+      ]
+    },
+    {
+      "FSUS_HEADLESS_GSANS": "1",
+      "total": 11,
+      "passed": 11,
+      "failed": 0,
+      "skipped": 0,
+      "trxSha256": "4f5c7d28d4c0b6c20f9677f0d4ca4e0d72e1afdb598344dd30f8da0359be2185",
+      "discoverySha256": "802273658f90dc55b6859d2cc31e0d4f10487a8e0ed66d98e6570d263333c5eb",
+      "cases": [
+        {
+          "name": "FsusUI.Avalonia.HeadlessTests.FsusVueParityTypographyTests.FixtureUsesExplicitGsansMode",
+          "outcome": "Passed"
+        },
+        {
+          "name": "FsusUI.Avalonia.HeadlessTests.FsusVueParityTypographyTests.MixedLayoutsUsePinnedLatinCjkAndSymbolFaces(value: 700)",
+          "outcome": "Passed"
+        },
+        {
+          "name": "FsusUI.Avalonia.HeadlessTests.FsusVueParityTypographyTests.PinnedFacesHaveRealWeightsAndGlyphCoverage(value: 500)",
+          "outcome": "Passed"
+        },
+        {
+          "name": "FsusUI.Avalonia.HeadlessTests.FsusVueParityTypographyTests.UnavailableResourceFamilyIsRejected",
+          "outcome": "Passed"
+        },
+        {
+          "name": "FsusUI.Avalonia.HeadlessTests.FsusVueParityTypographyTests.MissingWeightCannotUseANearestOrSynthesizedFace",
+          "outcome": "Passed"
+        },
+        {
+          "name": "FsusUI.Avalonia.HeadlessTests.FsusVueParityTypographyTests.PinnedFacesHaveRealWeightsAndGlyphCoverage(value: 700)",
+          "outcome": "Passed"
+        },
+        {
+          "name": "FsusUI.Avalonia.HeadlessTests.FsusVueParityTypographyTests.MixedLayoutsUsePinnedLatinCjkAndSymbolFaces(value: 400)",
+          "outcome": "Passed"
+        },
+        {
+          "name": "FsusUI.Avalonia.HeadlessTests.FsusVueParityTypographyTests.MixedLayoutsUsePinnedLatinCjkAndSymbolFaces(value: 500)",
+          "outcome": "Passed"
+        },
+        {
+          "name": "FsusUI.Avalonia.HeadlessTests.FsusVueParityTypographyTests.PinnedFacesHaveRealWeightsAndGlyphCoverage(value: 400)",
+          "outcome": "Passed"
+        },
+        {
+          "name": "FsusUI.Avalonia.HeadlessTests.FsusVueParityTypographyTests.MissingResourceIsRejected",
+          "outcome": "Passed"
+        },
+        {
+          "name": "FsusUI.Avalonia.HeadlessTests.FsusVueParityTypographyTests.StandaloneModeKeepsCjkBeforeGenericFallbacks",
+          "outcome": "Passed"
+        }
+      ]
+    }
+  ],
+  "visualAcceptance": "UNRUN",
+  "integratedCsprojRoute": "UNRUN pending sole owner include and coordinator rerun",
+  "authoritySha256": {
+    ".agents/skills/fsusui-design-conformance/SKILL.md": "c88357a6ba0340000bae5839daeb67a3cd2722e8242cf7e0148006c3610a44fe",
+    "docs/index.md": "b7aefe9f989ce962ada16c1fcbabf0613d862dfe0ec2bd016865a1a33d5b6f18",
+    "docs/design.md": "24c88676101dde43bb0907ed173f001b6e1659973caf19701ea57eddf0617039",
+    "docs/design/governance.md": "d871bc86ed2a66f3a851f947530ff576c3d1d0a1a37c721d11cf09b1cbc4e104",
+    "docs/design/change-classification.md": "c5d43303e89931346f9d634dd592ecb54418d15a74ae923f72e52795a115544e",
+    "docs/workflows/visual-change.md": "0bd20f9ae6997aa9b7daeb0cec2f558738565bd0932828617aea2f5b84626042",
+    "spec/typography/baseline.json": "883c8f21558a82a727454dfb9b028cac87806c43ac91fcea49b88cd1d5fc6d4d"
+  }
+}
