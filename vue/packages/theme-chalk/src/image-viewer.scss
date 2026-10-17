@@ -90,7 +90,9 @@
     $bottom-gap: fsus-safe-area-max(
       min(
         30px,
-        calc(var(--fsus-viewport-block-size) - #{$controls-bottom} - #{$row-height})
+        calc(
+          var(--fsus-viewport-block-size) - #{$controls-bottom} - #{$row-height}
+        )
       ),
       bottom
     );
