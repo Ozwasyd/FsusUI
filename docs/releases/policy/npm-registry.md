@@ -97,6 +97,13 @@ pnpm package:candidate:build
 pnpm package:candidate:verify dist/npm-candidate/fsusui-npm-candidate.tgz
 ```
 
+The package build runs module compilation, declaration generation, and full
+bundle generation in separate, sequential Gulp child processes through their
+original named tasks. Each child uses the normal build entry and heap wrapper;
+its failure stops the package build. Process exit releases compiler heaps and
+caches between these stages without changing their configurations or skipping
+any package checks.
+
 The tarball must not contain `.env`, `.npmrc`, private tokens, `workspace:`
 protocols, local paths, private registry URLs, source maps, WASM debug output,
 unnecessary tests/fixtures, private screenshots/docs, or large unused files.
