@@ -566,6 +566,20 @@ for (const task of [
 ]) {
   assert(gulpfile.includes(task), `internal build gulpfile must keep ${task}`)
 }
+for (const task of [
+  'buildModules',
+  'generateTypesDefinitions',
+  'buildFullBundle',
+]) {
+  const childTask = new RegExp(
+    `withTaskName\\(\\s*'${task}',\\s*\\(\\)\\s*=>\\s*run\\('pnpm run -C vue/internal/build start ${task}'\\),?\\s*\\)`,
+    'u',
+  )
+  assert(
+    childTask.test(gulpfile),
+    `internal build ${task} must run its original named task in a child process`,
+  )
+}
 
 if (existsSync(path.join(publishedDistRoot, 'package.json'))) {
   const distPackage = readJson('dist/element-plus/package.json')

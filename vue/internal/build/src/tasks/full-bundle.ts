@@ -32,6 +32,7 @@ import {
   writeBundles,
 } from '../utils'
 import { target } from '../build-info'
+import { runFullBuildTasks } from '../utils/full-build-tasks'
 import type { TaskFunction } from 'gulp'
 import type { Plugin } from 'rollup'
 
@@ -137,63 +138,64 @@ async function buildFullEntry(minify: boolean) {
   ])
 }
 
-async function buildFullLocale(minify: boolean) {
-  const files = await glob(`**/*.ts`, {
-    cwd: path.resolve(localeRoot, 'lang'),
-    absolute: true,
-  })
-  return Promise.all(
-    files.map(async (file) => {
-      const filename = path.basename(file, '.ts')
-      const name = upperFirst(camelCase(filename))
+async function buildFullLocale(file: string, minify: boolean) {
+  const filename = path.basename(file, '.ts')
+  const name = upperFirst(camelCase(filename))
 
-      const bundle = await rollup({
-        input: file,
-        onwarn(warning, warn) {
-          if (shouldIgnoreRollupWarning(warning)) return
-          warn(warning)
-        },
-        plugins: [
-          esbuild({
-            minify,
-            sourceMap: minify,
-            target,
-            tsconfig,
-          }),
-        ],
-      })
-      await writeBundles(bundle, [
-        {
-          format: 'umd',
-          file: path.resolve(
-            epOutput,
-            'dist/locale',
-            formatBundleFilename(filename, minify, 'js'),
-          ),
-          exports: 'default',
-          name: `${PKG_CAMELCASE_LOCAL_NAME}${name}`,
-          sourcemap: minify,
-          banner,
-        },
-        {
-          format: 'esm',
-          file: path.resolve(
-            epOutput,
-            'dist/locale',
-            formatBundleFilename(filename, minify, 'mjs'),
-          ),
-          sourcemap: minify,
-          banner,
-        },
-      ])
-    }),
-  )
+  const bundle = await rollup({
+    input: file,
+    onwarn(warning, warn) {
+      if (shouldIgnoreRollupWarning(warning)) return
+      warn(warning)
+    },
+    plugins: [
+      esbuild({
+        minify,
+        sourceMap: minify,
+        target,
+        tsconfig,
+      }),
+    ],
+  })
+  await writeBundles(bundle, [
+    {
+      format: 'umd',
+      file: path.resolve(
+        epOutput,
+        'dist/locale',
+        formatBundleFilename(filename, minify, 'js'),
+      ),
+      exports: 'default',
+      name: `${PKG_CAMELCASE_LOCAL_NAME}${name}`,
+      sourcemap: minify,
+      banner,
+    },
+    {
+      format: 'esm',
+      file: path.resolve(
+        epOutput,
+        'dist/locale',
+        formatBundleFilename(filename, minify, 'mjs'),
+      ),
+      sourcemap: minify,
+      banner,
+    },
+  ])
 }
 
 export const buildFull =
   (minify: boolean): TaskFunction =>
-  async () =>
-    Promise.all([buildFullEntry(minify), buildFullLocale(minify)])
+  async () => {
+    const files = await glob(`**/*.ts`, {
+      cwd: path.resolve(localeRoot, 'lang'),
+      absolute: true,
+    })
+    await runFullBuildTasks(
+      () => buildFullEntry(minify),
+      files,
+      (file) => buildFullLocale(file, minify),
+    )
+  }
 
 export const buildFullBundle: TaskFunction = series(
   withTaskName('buildFull', buildFull(false)),
