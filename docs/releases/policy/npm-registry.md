@@ -102,7 +102,9 @@ bundle generation in separate, sequential Gulp child processes through their
 original named tasks. Each child uses the normal build entry and heap wrapper;
 its failure stops the package build. Process exit releases compiler heaps and
 caches between these stages without changing their configurations or skipping
-any package checks.
+any package checks. Within each full-bundle stage, the entry and every discovered
+locale are built sequentially; both original unminified and minified passes and
+all output formats remain required.
 
 The tarball must not contain `.env`, `.npmrc`, private tokens, `workspace:`
 protocols, local paths, private registry URLs, source maps, WASM debug output,

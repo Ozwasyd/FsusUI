@@ -2,6 +2,8 @@
 
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
+import { createRequire } from 'node:module'
+import glob from 'fast-glob'
 import {
   createCapacityPlan,
   createUnitMatrix,
@@ -235,6 +237,128 @@ const consumerViteBuildCall = consumerInstallSource.match(
 assert.ok(
   consumerViteBuildCall,
   'consumer Vite build must use the governed package manager and shared build heap profile without inheriting small-task NODE_OPTIONS',
+)
+
+// Exercise the actual internal scheduler without replacing or invoking Rollup.
+const require = createRequire(import.meta.url)
+require('tsx/cjs')
+const {
+  runFullBuildTasks,
+} = require('../vue/internal/build/src/utils/full-build-tasks.ts')
+const fullBundleSource = readFileSync(
+  'vue/internal/build/src/tasks/full-bundle.ts',
+  'utf8',
+)
+assert.match(
+  fullBundleSource,
+  /await runFullBuildTasks\(\s*\(\) => buildFullEntry\(minify\),\s*files,\s*\(file\) => buildFullLocale\(file, minify\),?\s*\)/u,
+  'full builds must await the scheduler with the entry, all discovered locales, and the same minify mode',
+)
+const localeFiles = glob.sync('**/*.ts', {
+  cwd: 'vue/packages/locale/lang',
+  absolute: true,
+})
+assert.ok(localeFiles.length >= 3, 'exercise the complete source locale set')
+const deferred = () => {
+  let release
+  const promise = new Promise((resolve) => {
+    release = resolve
+  })
+  return { promise, release }
+}
+for (const minify of [false, true]) {
+  const calls = []
+  let active = 0
+  let maxActive = 0
+  let settled = false
+  const entryGate = deferred()
+  const localeGate = deferred()
+  const firstLocaleStarted = deferred()
+  const run = async (file, gate) => {
+    calls.push({ file, minify })
+    active += 1
+    maxActive = Math.max(maxActive, active)
+    if (gate) await gate.promise
+    await Promise.resolve()
+    active -= 1
+  }
+  const work = runFullBuildTasks(
+    () => run('entry', entryGate),
+    localeFiles,
+    async (file) => {
+      if (file === localeFiles[0]) firstLocaleStarted.release()
+      await run(file, file === localeFiles[0] ? localeGate : undefined)
+    },
+  ).then(() => {
+    settled = true
+  })
+  assert.deepEqual(calls, [{ file: 'entry', minify }])
+  assert.equal(settled, false)
+  entryGate.release()
+  await Promise.race([
+    firstLocaleStarted.promise,
+    work.then(() => {
+      throw new Error('scheduler finished without starting the first locale')
+    }),
+  ])
+  assert.deepEqual(calls, [
+    { file: 'entry', minify },
+    { file: localeFiles[0], minify },
+  ])
+  assert.equal(active, 1)
+  assert.equal(settled, false)
+  localeGate.release()
+  await work
+  assert.deepEqual(calls, [
+    { file: 'entry', minify },
+    ...localeFiles.map((file) => ({ file, minify })),
+  ])
+  assert.equal(active, 0)
+  assert.equal(maxActive, 1)
+  assert.equal(settled, true)
+}
+const entryError = new Error('entry failure')
+const localesAfterEntryError = []
+await assert.rejects(
+  runFullBuildTasks(
+    async () => {
+      throw entryError
+    },
+    localeFiles,
+    async (file) => {
+      localesAfterEntryError.push(file)
+    },
+  ),
+  (error) => error === entryError,
+)
+assert.deepEqual(localesAfterEntryError, [])
+const localeError = new Error('locale failure')
+const localesBeforeError = []
+await assert.rejects(
+  runFullBuildTasks(
+    async () => {},
+    localeFiles,
+    async (file) => {
+      localesBeforeError.push(file)
+      if (file === localeFiles[1]) throw localeError
+    },
+  ),
+  (error) => error === localeError,
+)
+assert.deepEqual(localesBeforeError, localeFiles.slice(0, 2))
+let emptySetEntries = 0
+await runFullBuildTasks(
+  async () => {
+    emptySetEntries += 1
+  },
+  [],
+  async () => {
+    assert.fail('an empty locale set must not schedule a locale')
+  },
+)
+assert.equal(emptySetEntries, 1)
+console.log(
+  `[ci-capacity] full-build scheduler: ${localeFiles.length} locales, both variants, serial/await/error controls ok`,
 )
 
 console.log('[ci-capacity] fixtures ok')
