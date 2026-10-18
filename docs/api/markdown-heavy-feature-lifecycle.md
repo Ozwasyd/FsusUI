@@ -60,6 +60,13 @@ The lifecycle creates no RAF, interval, polling observer, or feature-local frame
 scheduler. Layout-sensitive commits continue to consume the single editor-owned
 [frame scheduler](./markdown-editor-frame-scheduler.md).
 
+Activation capacity is used by ready work, not by children waiting for a parent.
+Ready work is FIFO; newly released dependents join behind already-ready work.
+Parent failure still releases dependent work for its normal connected/stale-root
+checks. Cancellation stops new starts and suppresses obsolete commits. The
+internal producer references earlier work only; invalid dependency graphs are
+rejected before starting adapters.
+
 The renderer exposes current test observability in
 `data-markdown-heavy-lifecycle`: active/static counts, activation/reuse/abort/
 teardown/eviction/stale totals, cache entries/bytes, and independent retained

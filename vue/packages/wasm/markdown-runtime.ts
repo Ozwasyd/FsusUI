@@ -1836,17 +1836,47 @@ const activateMarkdownFeatureWork = async (
   signal?: AbortSignal,
 ) => {
   const work = batches.flatMap((batch) => batch.work)
+  const ready: MarkdownFeatureActivationWork[] = []
+  const pendingDependencies = new Map<MarkdownFeatureActivationWork, number>()
+  const dependents = new Map<
+    MarkdownFeatureActivationWork,
+    MarkdownFeatureActivationWork[]
+  >()
+  for (const current of work) {
+    // The producer only references earlier work, so reject invalid graphs
+    // before any adapter starts rather than waiting on a cycle forever.
+    if (
+      pendingDependencies.has(current) ||
+      current.dependencies.some(
+        (dependency) => !pendingDependencies.has(dependency),
+      )
+    ) {
+      throw new Error('markdown_feature_activation_dependency_invalid')
+    }
+    pendingDependencies.set(current, current.dependencies.length)
+    if (current.dependencies.length === 0) ready.push(current)
+    for (const dependency of current.dependencies) {
+      const children = dependents.get(dependency) ?? []
+      children.push(current)
+      dependents.set(dependency, children)
+    }
+  }
+
+  let remaining = work.length
   let nextIndex = 0
+  const waiters: Array<() => void> = []
 
   const activateNext = async () => {
     while (!signal?.aborted) {
-      const current = work[nextIndex++]
-      if (!current) return
+      const current = ready[nextIndex]
+      if (!current) {
+        if (remaining === 0) return
+        await new Promise<void>((resolve) => waiters.push(resolve))
+        continue
+      }
+      nextIndex += 1
 
       try {
-        await Promise.all(
-          current.dependencies.map((dependency) => dependency.completed),
-        )
         if (
           signal?.aborted ||
           !isElementInActivationRoot(current.context.root, current.element)
@@ -1865,6 +1895,13 @@ const activateMarkdownFeatureWork = async (
         current.error = createActivationError(current.context.kind, error)
       } finally {
         current.complete()
+        remaining -= 1
+        for (const dependent of dependents.get(current) ?? []) {
+          const count = pendingDependencies.get(dependent)! - 1
+          pendingDependencies.set(dependent, count)
+          if (count === 0) ready.push(dependent)
+        }
+        waiters.splice(0).forEach((wake) => wake())
       }
     }
   }
