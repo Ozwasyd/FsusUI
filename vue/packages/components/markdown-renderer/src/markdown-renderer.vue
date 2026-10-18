@@ -731,8 +731,8 @@ const materializeMarkdownWorkerResult = (
     unboundBaseUrl(metadata.baseUrl) !== unboundBaseUrl(request.baseUrl) ||
     metadata.allowLatex !== (request.allowLatex !== false) ||
     metadata.allowMermaid !== (request.allowMermaid !== false) ||
-    metadata.sourceLength !== request.source.length ||
-    metadata.normalizedSourceLength !== result.normalizedSource.length ||
+    metadata.sourceLength !== utf8ByteLength(request.source) ||
+    metadata.normalizedSourceLength !== utf8ByteLength(result.normalizedSource) ||
     metadata.featureCount !== result.features.length ||
     (result.placeholders.length > 0 &&
       metadata.placeholderCount !== result.placeholders.length) ||
