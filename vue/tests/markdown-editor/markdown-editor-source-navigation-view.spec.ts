@@ -13,7 +13,7 @@ const ready = async (page: Page, query = '') => {
 for (const direction of ['backward', 'forward'] as const) {
   test(`measures original ${direction} focus endpoint, native viewport and progress`, async ({
     page,
-  }) => {
+  }, testInfo) => {
     await ready(page)
     if (direction === 'forward')
       await page.evaluate(() => window.sourceViewFixture.reveal('forward'))
