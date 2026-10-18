@@ -746,11 +746,11 @@ std::string render_heading(
   while (level < trimmed.size() && trimmed[level] == '#') {
     ++level;
   }
-  if (level == 0 || level > 6 || level >= trimmed.size() || trimmed[level] != ' ') {
+  if (level == 0 || level > 6 || (level < trimmed.size() && trimmed[level] != ' ')) {
     return {};
   }
 
-  std::string_view content = trim(trimmed.substr(level + 1));
+  std::string_view content = trim(trimmed.substr(std::min(level + 1, trimmed.size())));
   while (content.size() > 1 && content.back() == '#') {
     content = trim_right(content.substr(0, content.size() - 1));
   }
@@ -2181,7 +2181,7 @@ bool is_atx_heading_line(std::string_view line) {
   while (level < trimmed.size() && trimmed[level] == '#') {
     ++level;
   }
-  return level >= 1 && level <= 6 && level < trimmed.size() && trimmed[level] == ' ';
+  return level >= 1 && level <= 6 && (level == trimmed.size() || trimmed[level] == ' ');
 }
 
 bool is_footnote_definition_line(std::string_view line) {
