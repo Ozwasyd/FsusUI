@@ -221,6 +221,11 @@ public class FsusTransfer : ContentControl
 
   public bool ToggleLeftSelection(object? value)
   {
+    if (!IsEffectivelyEnabled)
+    {
+      return false;
+    }
+
     var item = filteredLeftItems.FirstOrDefault((candidate) => ValuesEqual(candidate.Value, value));
     if (item is null || item.IsDisabled)
     {
@@ -234,6 +239,11 @@ public class FsusTransfer : ContentControl
 
   public bool ToggleRightSelection(object? value)
   {
+    if (!IsEffectivelyEnabled)
+    {
+      return false;
+    }
+
     var item = filteredRightItems.FirstOrDefault((candidate) => ValuesEqual(candidate.Value, value));
     if (item is null || item.IsDisabled)
     {
@@ -247,6 +257,11 @@ public class FsusTransfer : ContentControl
 
   public bool MoveSelectedRight()
   {
+    if (!IsEffectivelyEnabled)
+    {
+      return false;
+    }
+
     var moved = false;
     foreach (var item in filteredLeftItems)
     {
@@ -268,8 +283,15 @@ public class FsusTransfer : ContentControl
 
   public bool MoveSelectedLeft()
   {
+    if (!IsEffectivelyEnabled)
+    {
+      return false;
+    }
+
     var before = targetValues.Count;
-    targetValues.RemoveAll((value) => selectedRightValues.Any((selected) => ValuesEqual(selected, value)));
+    targetValues.RemoveAll((value) =>
+      selectedRightValues.Any((selected) => ValuesEqual(selected, value)) &&
+      filteredRightItems.Any((item) => ValuesEqual(item.Value, value) && !item.IsDisabled));
     selectedRightValues.Clear();
     RebuildFilteredLists();
     SyncState();
@@ -286,6 +308,11 @@ public class FsusTransfer : ContentControl
 
   protected ValueTask<bool> HandleKeyAsync(Key key)
   {
+    if (!IsEffectivelyEnabled)
+    {
+      return ValueTask.FromResult(false);
+    }
+
     RefreshIfNeeded();
     if (key == Key.Down)
     {
@@ -308,6 +335,15 @@ public class FsusTransfer : ContentControl
     }
 
     return ValueTask.FromResult(false);
+  }
+
+  protected override void OnKeyDown(KeyEventArgs e)
+  {
+    base.OnKeyDown(e);
+    if (!e.Handled && HandleKeyAsync(e.Key).GetAwaiter().GetResult())
+    {
+      e.Handled = true;
+    }
   }
 
   private void RefreshIfNeeded()
