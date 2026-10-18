@@ -1477,6 +1477,11 @@ import {
   revealSourceRange as revealSourceRangeOutline,
 } from './markdown-editor-outline'
 import { planMarkdownOutlineReveal } from './markdown-editor-outline-active'
+import { measureMarkdownEditorReveal, MarkdownEditorRevealError } from './markdown-editor-reveal-completion'
+import type { MarkdownEditorRevealCompletion, MarkdownEditorRevealCompletionOptions, MarkdownEditorRevealFailureReason } from './markdown-editor-reveal-completion'
+import type { MarkdownEditorSession } from './markdown-editor-session'
+import type { MarkdownEditorResolvedSelection } from './markdown-editor-transaction'
+import { normalizeMarkdownEditorSelection } from './markdown-editor-transaction'
 import { createMarkdownEditorSessionBinding } from './markdown-editor-session'
 import { createMarkdownEditorNativeTargetOwner } from './markdown-editor-native-target'
 import { freezeMarkdownEditorSessionPanelState, markdownEditorSessionPanelMemoryUnits } from './markdown-editor-session-panels'
@@ -7798,6 +7803,207 @@ const revealSourceRange = (
   return 'success'
 }
 
+// Completion belongs to this mounted public API owner, never to a host receipt adapter.
+let publicRevealSession: MarkdownEditorSession | null = null
+let pendingPublicReveal: { selection: MarkdownEditorResolvedSelection; cancel: (reason: MarkdownEditorRevealFailureReason) => void } | null = null
+const revealSourceRangeAndWait = async (
+  requested: MarkdownEditorResolvedSelection,
+  options: MarkdownEditorRevealCompletionOptions,
+): Promise<MarkdownEditorRevealCompletion> => {
+  const selection = Object.freeze({ start: requested.start, end: requested.end, direction: requested.direction })
+  const expected = Object.freeze({
+    documentIdentity: Object.freeze({ ...options.expected.documentIdentity }),
+    revision: options.expected.revision,
+  })
+  const session = options.session
+  const signal = options.signal
+  const assertAdmission = options.assertAdmission
+  const timeoutMs = options.timeoutMs ?? 1500
+  const startedAt = performance.now()
+  const textarea = textareaRef.value
+  const root = rootElementRef.value
+  const mode = currentMode.value
+  const source = transactionStore.value
+  const generation = nativeSurfaceImperativeGeneration
+  const fail = (reason: MarkdownEditorRevealFailureReason): never => { throw new MarkdownEditorRevealError(reason) }
+  if (source.length > 1_000_000) fail('unsupported')
+  const context = () => {
+    let aborted: unknown
+    try { aborted = Reflect.get(AbortSignal.prototype, 'aborted', signal) }
+    catch (cause) { throw new MarkdownEditorRevealError('unsupported', cause) }
+    if (aborted) fail('aborted')
+    if (performance.now() - startedAt >= timeoutMs) fail('timeout')
+    if (session !== publicRevealSession) fail('unavailable')
+    if (!isEditorDocumentCurrent(expected.documentIdentity) || transactionStore.revision !== expected.revision ||
+      transactionStore.value !== source) fail('stale')
+    if (!textarea || !root || textareaRef.value !== textarea || rootElementRef.value !== root ||
+      !root.isConnected || !textarea.isConnected || !root.contains(textarea) ||
+      sessionDisposed || editorReleased || sessionSurfacePaused.value ||
+      generation !== nativeSurfaceImperativeGeneration || inputDisabled.value || props.readonly ||
+      isComposing.value || nativeMachine.composing) fail('unavailable')
+    if (textarea?.value !== source) fail('stale')
+    if (mode !== currentMode.value || mode === 'preview' || !liveSurface.value.inputVisible) fail('unsupported')
+  }
+  const admitted = () => {
+    context()
+    try { assertAdmission() } catch (cause) { throw new MarkdownEditorRevealError('admission-rejected', cause) }
+    context() // A consumer callback may reenter or synchronously revoke the original owner.
+  }
+  admitted()
+  if (!Number.isInteger(timeoutMs) || timeoutMs < 1 || timeoutMs > 5000) fail('unsupported')
+  if (!Number.isInteger(selection.start) || !Number.isInteger(selection.end) ||
+    selection.start < 0 || selection.end < selection.start || selection.end > source.length ||
+    !['none', 'forward', 'backward'].includes(selection.direction)) fail('invalid-selection')
+  const normalized = normalizeMarkdownEditorSelection(source, selection)
+  if (!normalized || normalized.start !== selection.start || normalized.end !== selection.end ||
+    normalized.direction !== selection.direction) fail('invalid-selection')
+  if (!measureMarkdownEditorReveal(textarea!, selection)) fail('unsupported')
+  admitted()
+  pendingPublicReveal?.cancel('superseded')
+  return new Promise<MarkdownEditorRevealCompletion>((resolve, reject) => {
+    let settled = false
+    let focused = false
+    let frame: number | undefined
+    let previousMeasurement: string | undefined
+    const cancel = (reason: MarkdownEditorRevealFailureReason) => finish(new MarkdownEditorRevealError(reason))
+    const operation = { cancel, selection }
+    const aborted = () => cancel('aborted')
+    const lostFocus = () => cancel('focus-lost')
+    const movedFocus = (event: FocusEvent) => { if (event.target !== textarea) lostFocus() }
+    const interrupted = () => cancel('interrupted')
+    const finish = (error?: unknown, completion?: MarkdownEditorRevealCompletion) => {
+      if (settled) return
+      settled = true
+      if (pendingPublicReveal === operation) pendingPublicReveal = null
+      if (timer !== undefined) clearTimeout(timer)
+      if (frame !== undefined) sessionLayoutResources.cancelFrame(frame)
+      EventTarget.prototype.removeEventListener.call(signal, 'abort', aborted)
+      textarea!.ownerDocument.removeEventListener('focusin', movedFocus, true)
+      textarea!.removeEventListener('blur', lostFocus)
+      textarea!.ownerDocument.defaultView?.removeEventListener('blur', lostFocus)
+      for (const name of ['wheel', 'touchstart', 'pointerdown', 'keydown'])
+        root!.removeEventListener(name, interrupted, true)
+      if (error !== undefined) reject(error)
+      else if (completion) resolve(completion)
+    }
+    const guard = () => {
+      if (settled) fail('superseded')
+      admitted()
+      if (settled) fail('superseded')
+      const actual = transactionStore.selection
+      if (actual.start !== selection.start || actual.end !== selection.end || actual.direction !== selection.direction)
+        fail('selection-changed')
+      if (focused && (textarea!.ownerDocument.activeElement !== textarea || !textarea!.ownerDocument.hasFocus()))
+        fail('focus-lost')
+    }
+    const sample = () => {
+      frame = undefined
+      try {
+        guard()
+        if (textarea!.selectionStart !== selection.start || textarea!.selectionEnd !== selection.end ||
+          textarea!.selectionDirection !== selection.direction) fail('selection-changed')
+        const measured = measureMarkdownEditorReveal(textarea!, selection)
+        if (!measured) throw new MarkdownEditorRevealError('unsupported')
+        if (measured.visible && measured.fingerprint === previousMeasurement) {
+          guard()
+          // Last admission callback may itself move native focus/selection/viewport.
+          const final = measureMarkdownEditorReveal(textarea!, selection)
+          context()
+          if (settled) return
+          if (textarea!.ownerDocument.activeElement !== textarea || !textarea!.ownerDocument.hasFocus()) fail('focus-lost')
+          if (textarea!.selectionStart !== selection.start || textarea!.selectionEnd !== selection.end ||
+            textarea!.selectionDirection !== selection.direction) fail('selection-changed')
+          if (final?.visible && final.fingerprint === measured.fingerprint) {
+            finish(undefined, Object.freeze({ status: 'success', editorSessionRef: session.editorSessionRef,
+              ...expected, selection, focus: 'textarea', viewport: 'full-selection-visible' }))
+            return
+          }
+        }
+        previousMeasurement = measured.visible ? measured.fingerprint : undefined
+        frame = sessionLayoutResources.requestFrame(sample)
+        if (frame === undefined) fail('unavailable')
+      } catch (error) { finish(error) }
+    }
+    pendingPublicReveal = operation
+    EventTarget.prototype.addEventListener.call(signal, 'abort', aborted, { once: true })
+    textarea!.ownerDocument.addEventListener('focusin', movedFocus, true)
+    textarea!.addEventListener('blur', lostFocus)
+    textarea!.ownerDocument.defaultView?.addEventListener('blur', lostFocus)
+    for (const name of ['wheel', 'touchstart', 'pointerdown', 'keydown'])
+      root!.addEventListener(name, interrupted, true)
+    const timer = setTimeout(() => cancel('timeout'), timeoutMs)
+    void (async () => {
+      try {
+        admitted()
+        if (settled) return
+        cancelOwnedTypewriterFrames()
+        invalidateAttachmentCohorts?.()
+        admitted()
+        if (settled) return
+        transactionStore.setSelection(selection, true)
+        editorSelection.value = transactionStore.selection
+        selectionTick.value += 1
+        refreshLiveWindow('feature')
+        refreshWritingAidsDocument()
+        await restoreTextareaSelection(selection, false, () => {
+          try { guard(); return true } catch (error) { finish(error); return false }
+        })
+        if (settled) return
+        guard()
+        textarea!.focus({ preventScroll: true })
+        focused = true
+        guard()
+        textarea!.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: 'instant' })
+        guard()
+        const measured = measureMarkdownEditorReveal(textarea!, selection)
+        if (!measured) throw new MarkdownEditorRevealError('unsupported')
+        if (measured.bottom - measured.top > textarea!.clientHeight ||
+          measured.right - measured.left > textarea!.clientWidth) fail('unsupported')
+        guard()
+        // Deterministic instant movement; acknowledgement still requires observed completion.
+        textarea!.scrollTop = Math.max(0, Math.min(measured.top - Math.min(textarea!.clientHeight / 3, textarea!.clientHeight - (measured.bottom - measured.top)),
+          textarea!.scrollHeight - textarea!.clientHeight))
+        textarea!.scrollLeft = Math.max(0, measured.left - 16)
+        syncFocusLayerScroll(textarea!.scrollTop)
+        guard()
+        frame = sessionLayoutResources.requestFrame(sample)
+        if (frame === undefined) fail('unavailable')
+      } catch (error) { finish(error) }
+    })()
+  })
+}
+watch([
+  editorRevision, editorValue, currentMode, isComposing, sessionSurfacePaused,
+  () => props.disabled, () => props.loading, () => props.readonly,
+  () => props.documentIdentity?.id, () => props.documentIdentity?.epoch,
+  textareaRef, rootElementRef,
+], () => pendingPublicReveal?.cancel('stale'), { flush: 'sync' })
+watch(editorSelection, (selection) => {
+  const pending = pendingPublicReveal
+  if (pending && (pending.selection.start !== selection.start || pending.selection.end !== selection.end ||
+    pending.selection.direction !== selection.direction)) pending.cancel('selection-changed')
+}, { flush: 'sync' })
+onBeforeUnmount(() => pendingPublicReveal?.cancel('unavailable'))
+const publicRevealLayoutParticipant: MarkdownEditorSessionResourceParticipant = {
+  ownerRef: 'editor-layout-callbacks',
+  inspect() {
+    const original = sessionLayoutResources.participant.inspect()
+    const pending = pendingPublicReveal ? 1 : 0
+    return { ...original, paused: original.paused && pending === 0,
+      retainedListeners: original.retainedListeners + pending * 8,
+      usage: { ...original.usage, timers: original.usage.timers + pending,
+        backgroundTasks: original.usage.backgroundTasks + pending,
+        memoryUnits: original.usage.memoryUnits + pending } }
+  },
+  pause() {
+    pendingPublicReveal?.cancel('unavailable')
+    sessionLayoutResources.participant.pause()
+    return this.inspect()
+  },
+  resume() { sessionLayoutResources.participant.resume(); return this.inspect() },
+  dispose(ref) { pendingPublicReveal?.cancel('unavailable'); sessionLayoutResources.participant.dispose(ref) },
+}
+
 const frameResourceParticipant = createMarkdownEditorFrameResourceParticipant(frameScheduler)
 const pauseNativeSurfaceImperative = () => {
   nativeSurfaceImperativeGeneration += 1
@@ -7948,7 +8154,7 @@ const sessionBinding = createMarkdownEditorSessionBinding({
     } finally { nativeHandoverViewRestoring = false }
   },
   resourceParticipants: () => [
-    frameResourceParticipant, sessionLayoutResources.participant,
+    frameResourceParticipant, publicRevealLayoutParticipant,
     ...(surfaceResourceOwnerComplete ? [surfaceResourceParticipant] : []),
     ...(languageSearchParticipant ? [languageSearchParticipant] : []),
     ...(attachmentResourceOwnerReviewed && !opaqueAttachmentResourcesObserved.value ? [attachmentResourceParticipant] : []),
@@ -8263,7 +8469,11 @@ watch([
 }, { flush: 'sync' })
 
 defineExpose({
-  getSession: sessionBinding.getSession,
+  getSession: (ref: string) => {
+    const session = sessionBinding.getSession(ref)
+    publicRevealSession = session
+    return session
+  },
   closeSearch,
   closeCommandPalette,
   applyAttachmentResult,
@@ -8285,6 +8495,7 @@ defineExpose({
   undo,
   revealHeading,
   revealSourceRange,
+  revealSourceRangeAndWait,
   writingAidsController,
 })
 </script>
