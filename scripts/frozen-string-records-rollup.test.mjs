@@ -13,6 +13,7 @@ import path from 'node:path'
 import { pathToFileURL } from 'node:url'
 import test from 'node:test'
 import { rollup } from 'rollup'
+import { build as buildVite } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import { createSSRApp } from 'vue'
 import { renderToString } from 'vue/server-renderer'
@@ -87,7 +88,14 @@ const fixture = async (
       const recordNamespace = await imported(
         pathToFileURL(path.join(outputDirectory, 'record.mjs')),
       )
-      outputs.push({ code, namespace, recordNamespace, chunks: result.output })
+      outputs.push({
+        code,
+        namespace,
+        recordNamespace,
+        chunks: result.output,
+        directory: outputDirectory,
+        entry: path.join(outputDirectory, `${entryName}.mjs`),
+      })
     } finally {
       await bundle.close()
     }
@@ -243,7 +251,7 @@ test('retains initialization errors in a real cyclic module graph', async (t) =>
   assert.equal(original.namespace instanceof ReferenceError, true)
   assert.equal(optimized.namespace instanceof ReferenceError, true)
   assert.equal(optimized.namespace.message, original.namespace.message)
-  assert.match(optimized.code, /classes,\s*"record-root"/u)
+  assert.equal(optimized.code, original.code)
 })
 
 test('resolves actual named export aliases without confusing shadowed imports', async (t) => {
@@ -257,4 +265,49 @@ test('resolves actual named export aliases without confusing shadowed imports', 
   )
   assert.doesNotMatch(optimized.code, /value = data\.root/u)
   assert.match(optimized.code, /local\.root/u)
+})
+
+test('preserves cyclic initialization failures through actual Vite production minification', async (t) => {
+  const record = `import { read } from './entry.js'; read(); export const classes = Object.freeze({root: 'record-root'})`
+  const entry = `import { classes } from './record.js'; export function read() { return classes.root }`
+  const outputs = await fixture(t, record, entry, { throws: true })
+  for (const output of outputs) {
+    const directory = path.join(output.directory, 'minified')
+    await buildVite({
+      configFile: false,
+      root: output.directory,
+      logLevel: 'error',
+      build: {
+        target: 'es2022',
+        minify: 'esbuild',
+        lib: {
+          entry: output.entry,
+          formats: ['es'],
+          fileName: () => 'entry.mjs',
+        },
+        outDir: directory,
+      },
+    })
+    await assert.rejects(
+      import(pathToFileURL(path.join(directory, 'entry.mjs'))),
+      ReferenceError,
+    )
+  }
+})
+
+test('refuses leaf owners with preceding observable evaluation and owners with dependencies', async (t) => {
+  for (const record of [
+    `globalThis.beforeRecord?.(); ${frozen}`,
+    `await Promise.resolve(); ${frozen}`,
+    `import { ready } from './dependency.js'; void ready; ${frozen}`,
+  ]) {
+    const [original, optimized] = await fixture(
+      t,
+      record,
+      `import {classes} from './record.js'; export const read = () => classes.root`,
+      { extra: { 'dependency.js': 'export const ready = true' } },
+    )
+    assert.equal(optimized.code, original.code)
+    assert.equal(optimized.namespace.read(), original.namespace.read())
+  }
 })

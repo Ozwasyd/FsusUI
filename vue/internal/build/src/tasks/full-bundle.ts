@@ -3,7 +3,7 @@ import { nodeResolve } from '@rollup/plugin-node-resolve'
 import { rollup } from 'rollup'
 import commonjs from '@rollup/plugin-commonjs'
 import vue from '@vitejs/plugin-vue'
-import VueMacros from 'unplugin-vue-macros/rollup'
+import { createVueMacros } from '../utils/vue-macros'
 import vueJsx from '@vitejs/plugin-vue-jsx'
 import esbuild, { minify as minifyPlugin } from 'rollup-plugin-esbuild'
 import { series } from 'gulp'
@@ -48,7 +48,7 @@ async function buildFullEntry(minify: boolean) {
     id === './ep_wasm.mjs' ||
     id.endsWith('/packages/wasm/ep_wasm.mjs') ||
     id.endsWith('/packages/wasm/dist/ep_wasm.mjs')
-  const vueMacrosPlugins = await VueMacros({
+  const vueMacrosPlugins = await createVueMacros({
     setupComponent: false,
     setupSFC: false,
     plugins: {

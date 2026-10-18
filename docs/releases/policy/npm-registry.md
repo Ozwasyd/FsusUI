@@ -110,13 +110,26 @@ releasing each process's compiler state before the next variant begins. A failed
 variant stops the package build.
 
 The preserved ES module producer may fold reads of own string data fields from
-literal frozen exported records. It resolves actual Rollup entry owners and lexical
-imports, including Vue unref reads, while preserving a read of the original binding
-for initialization errors. It keeps public records, descriptors, component metadata,
-source maps and all original build options. Mutable records, accessors, spreads,
-reference markers, custom prototypes, shadowed bindings, eval and write targets
-remain untouched. This optimization assumes the standard native Object.freeze
-and Vue unref implementations; it never changes consumer budgets or baselines.
+literal frozen exported records only in leaf modules without static or dynamic
+dependencies, after a prefix of primitive constant declarations or inert function
+and export declarations. Cycles and preceding observable evaluation are refused;
+a comma read alone cannot preserve initialization errors through downstream
+minification. Public records, descriptors, component metadata, maps and original
+build options remain intact. Mutable records, accessors, spreads, reference
+markers, custom prototypes, shadowed bindings, eval and write targets remain
+untouched. Standard native Object.freeze and Vue unref implementations are
+required. Actual Vite production minification covers the cyclic refusal.
+
+Aggregate installed components name their extra public aliases through independent
+SFC/alias-factory type owners, preventing a value/property reference cycle during
+consumer declaration emission. Cold consumers emit and reconsume ordinary
+unannotated ES/CJS aliases using the complete original project configuration.
+
+The pinned Vue macro resolver exposes its namespace before async imports finish.
+The producer completes Vue's shared type graph once, through the same locked
+factory/API module graph, before parallel SFC compilation begins. All original
+macro options and plugins remain; concurrent and sequential real FsuTransition
+compilation and complete repeated package builds cover determinism.
 
 Output formats are also written sequentially in their original option order,
 preserving all maps and the returned results' order, count, and object identities.

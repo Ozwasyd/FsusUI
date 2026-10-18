@@ -1304,6 +1304,27 @@ try {
       ``,
     ].join('\n'),
   )
+  const componentAliasNames = [
+    'ElSplitPane',
+    'ElDataList',
+    'FsusSplitPane',
+    'FsusDataList',
+    'ElButton',
+    'ElSelect',
+    'ElTable',
+  ]
+  for (const format of ['es', 'lib']) {
+    writeFileSync(
+      path.join(fixtureRoot, 'src', `public-component-aliases.${format}.ts`),
+      [
+        `import { ${componentAliasNames.join(', ')} } from '${packageName}/${format}'`,
+        ...componentAliasNames.map(
+          (name) => `export const Alias${name} = ${name}`,
+        ),
+        '',
+      ].join('\n'),
+    )
+  }
   stage('typecheck', () => {
     run(
       'node',
@@ -1318,6 +1339,70 @@ try {
           FSUS_NODE_HEAP_PROFILE: 'typecheck',
           NODE_OPTIONS: '',
         },
+      },
+    )
+    const declarationOutput = path.join(
+      fixtureRoot,
+      '.tmp',
+      'component-alias-declarations',
+    )
+    run(
+      'node',
+      [
+        path.join(repoRoot, 'scripts', 'with-node-heap.mjs'),
+        packageManager,
+        ...execArgs('vue-tsc', [
+          '--declaration',
+          '--emitDeclarationOnly',
+          '--noEmit',
+          'false',
+          '--rootDir',
+          fixtureRoot,
+          '--outDir',
+          declarationOutput,
+        ]),
+      ],
+      {
+        cwd: fixtureRoot,
+        env: { FSUS_NODE_HEAP_PROFILE: 'typecheck', NODE_OPTIONS: '' },
+      },
+    )
+    for (const format of ['es', 'lib']) {
+      const emitted = path.join(
+        declarationOutput,
+        'src',
+        `public-component-aliases.${format}.d.ts`,
+      )
+      if (!existsSync(emitted) || !readFileSync(emitted, 'utf8').trim())
+        throw new Error(
+          `Missing actual component alias declarations: ${format}`,
+        )
+      writeFileSync(
+        path.join(
+          fixtureRoot,
+          'src',
+          `reconsumed-component-aliases.${format}.ts`,
+        ),
+        [
+          `import type * as emitted from '../.tmp/component-alias-declarations/src/public-component-aliases.${format}'`,
+          `import type { ${componentAliasNames.join(', ')} } from '${packageName}/${format}'`,
+          'type Assert<T extends true> = T',
+          'type Equal<A, B> = (<T>() => T extends A ? 1 : 2) extends (<T>() => T extends B ? 1 : 2) ? true : false',
+          `export type ReconsumedComponentAliases = [${componentAliasNames.map((name) => `Assert<Equal<typeof emitted.Alias${name}, typeof ${name}>>`).join(', ')}]`,
+          '',
+        ].join('\n'),
+      )
+    }
+    run(
+      'node',
+      [
+        path.join(repoRoot, 'scripts', 'with-node-heap.mjs'),
+        packageManager,
+        ...execArgs('vue-tsc', ['--noEmit']),
+      ],
+      {
+        cwd: fixtureRoot,
+        env: { FSUS_NODE_HEAP_PROFILE: 'typecheck', NODE_OPTIONS: '' },
       },
     )
   })

@@ -12,6 +12,8 @@ export function annotateInstallTypes(content, fileName) {
   const helpers = new Map()
   const aliases = new Set()
   const named = new Set()
+  const values = new Map()
+  const extraTypes = new Map()
   for (const statement of source.statements) {
     if (
       ts.isImportDeclaration(statement) &&
@@ -35,6 +37,13 @@ export function annotateInstallTypes(content, fileName) {
     }
     if (ts.isVariableStatement(statement)) {
       for (const declaration of statement.declarationList.declarations) {
+        if (
+          ts.isIdentifier(declaration.name) &&
+          statement.modifiers?.some(
+            (modifier) => modifier.kind === ts.SyntaxKind.ExportKeyword,
+          )
+        )
+          values.set(declaration.name.text, declaration)
         const fn = declaration.initializer
         if (
           ts.isIdentifier(declaration.name) &&
@@ -117,7 +126,41 @@ export function annotateInstallTypes(content, fileName) {
             throw new Error(
               `Unsupported installed component extras in ${fileName}.`,
             )
-          parameters.push(extra)
+          const properties = expression.arguments[1]
+          if (properties && ts.isObjectLiteralExpression(properties)) {
+            const members = new Map()
+            const entries = []
+            for (const property of properties.properties) {
+              if (
+                !ts.isPropertyAssignment(property) &&
+                !ts.isShorthandPropertyAssignment(property)
+              )
+                throw new Error(`Unsupported installed extras in ${fileName}.`)
+              const key = property.name.getText(source)
+              const value = expressionType(
+                ts.isPropertyAssignment(property)
+                  ? property.initializer
+                  : property.name,
+              )
+              if (!value)
+                throw new Error(
+                  `Unsupported installed extra type in ${fileName}.`,
+                )
+              members.set(key, value)
+              const alias = values.get(key)?.initializer
+              const direct =
+                alias &&
+                ts.isPropertyAccessExpression(alias) &&
+                ts.isIdentifier(alias.expression) &&
+                alias.expression.text === declaration.name.text &&
+                alias.name.text === key
+              // Root the public extra in its own factory/SFC, not back through
+              // the aggregate property that exposes it during serialization.
+              entries.push(`${key}: ${direct ? `typeof ${key}` : value}`)
+            }
+            extraTypes.set(declaration.name.text, members)
+            parameters.push(`{ ${entries.join('; ')} }`)
+          } else parameters.push(extra)
         }
         type = `ReturnType<typeof ${helper}<${parameters.join(', ')}>>`
       } else if (ts.isAsExpression(expression))
@@ -129,7 +172,10 @@ export function annotateInstallTypes(content, fileName) {
         ts.isIdentifier(expression.expression) &&
         named.has(expression.expression.text)
       )
-        type = expressionType(expression)
+        type =
+          extraTypes
+            .get(expression.expression.text)
+            ?.get(expression.name.text) ?? expressionType(expression)
       if (type) {
         edits.push({ position: declaration.name.end, type })
         named.add(declaration.name.text)

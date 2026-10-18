@@ -2,7 +2,7 @@ import path from 'node:path'
 import { rollup } from 'rollup'
 import vue from '@vitejs/plugin-vue'
 import vueJsx from '@vitejs/plugin-vue-jsx'
-import VueMacros from 'unplugin-vue-macros/rollup'
+import { createVueMacros } from '../utils/vue-macros'
 import json from '@rollup/plugin-json'
 import { nodeResolve } from '@rollup/plugin-node-resolve'
 import commonjs from '@rollup/plugin-commonjs'
@@ -36,7 +36,7 @@ export const buildModules = async () => {
       onlyFiles: true,
     }),
   )
-  const vueMacrosPlugins = await VueMacros({
+  const vueMacrosPlugins = await createVueMacros({
     setupComponent: false,
     setupSFC: false,
     plugins: {

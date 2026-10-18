@@ -12,14 +12,20 @@ const nameOf = (node: { type: string; name?: string; value?: unknown }) =>
       ? node.value
       : undefined
 
-// Fold only own string data properties of literal, frozen records. The original
-// binding read remains, preserving initialization/TDZ behavior. Public records
-// and their descriptors are retained in the library module.
+// Fold only initialized leaf-module records. A comma read alone does not
+// preserve TDZ through downstream minification. Public records and descriptors
+// remain intact; dependencies and preceding observable evaluation are refused.
 export const frozenStringReads = () => {
   const cache = new Map<string, { code: string; values: FrozenExports }>()
   const exportsOf = (context: PluginContext, id: string): FrozenExports => {
     const info = context.getModuleInfo(id)
-    if (!info?.code || info.isExternal || !info.code.includes('Object.freeze'))
+    if (
+      !info?.code ||
+      info.isExternal ||
+      info.importedIds.length ||
+      info.dynamicallyImportedIds.length ||
+      !info.code.includes('Object.freeze')
+    )
       return new Map()
     const cached = cache.get(id)
     if (cached?.code === info.code) return cached.values
@@ -53,6 +59,41 @@ export const frozenStringReads = () => {
         definition?.node.type !== 'VariableDeclarator' ||
         definition.parent?.type !== 'VariableDeclaration' ||
         definition.parent.kind !== 'const'
+      )
+        continue
+      const parent = analysis.parents.get(definition.parent)
+      const statement =
+        parent?.node.type === 'ExportNamedDeclaration'
+          ? parent.node
+          : definition.parent
+      const index = analysis.program.body.indexOf(statement)
+      if (
+        index < 0 ||
+        !analysis.program.body.slice(0, index).every((statement) => {
+          const node =
+            statement.type === 'ExportNamedDeclaration'
+              ? statement.declaration
+              : statement
+          if (
+            !node ||
+            node.type === 'EmptyStatement' ||
+            node.type === 'FunctionDeclaration'
+          )
+            return true
+          return (
+            node.type === 'VariableDeclaration' &&
+            node.kind === 'const' &&
+            node.declarations.every(
+              (variable) =>
+                variable.id.type === 'Identifier' &&
+                variable.init?.type === 'Literal' &&
+                (variable.init.value === null ||
+                  ['string', 'number', 'boolean', 'bigint'].includes(
+                    typeof variable.init.value,
+                  )),
+            )
+          )
+        })
       )
         continue
       const call = definition.node.init
