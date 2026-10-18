@@ -82,6 +82,11 @@ Keyboard entry uses the current committed `checked` and `disabled` state,
 including updates received during the enter transition. Updating these states
 keeps later entry and navigation current without moving an existing item focus.
 
+Delayed entry focus belongs to the original opening session. It yields to
+user-established item or outside focus, newer keyboard/pointer input, window
+focus loss, or a replaced trigger/menu. Close, reopen and unmount revoke pending
+entry; temporary listeners are removed on completion or revocation.
+
 Escape also cancels a pending delayed open. During close, focus restoration is
 limited to the current Escape session and yields to newer input, external focus,
 or reopening. While that session still owns focus, Dropdown takes responsibility
