@@ -1,10 +1,9 @@
 import path from 'path'
-import { lstat, mkdir, readFile, writeFile } from 'fs/promises'
+import { lstat, mkdir, readFile, rm, writeFile } from 'fs/promises'
+import { spawn } from 'node:child_process'
 import consola from 'consola'
-import * as vueCompiler from 'vue/compiler-sfc'
 import glob from 'fast-glob'
 import chalk from 'chalk'
-import { Project } from 'ts-morph'
 import { copy } from 'fs-extra'
 import {
   buildOutput,
@@ -15,7 +14,6 @@ import {
 } from '@element-plus/build-utils'
 import { pathRewriter } from '../utils'
 import type { TaskFunction } from 'gulp'
-import type { CompilerOptions, SourceFile } from 'ts-morph'
 
 const TSCONFIG_PATH = path.resolve(projRoot, 'vue/tsconfig.web.json')
 const outDir = path.resolve(buildOutput, 'types')
@@ -93,7 +91,10 @@ const writeWasmDeclarationOwner = async () => {
     allowWorkspaceSpecifier: true,
   })
 
-  const publishedDeclaration = pathRewriter('esm')(sourceDeclaration)
+  const publishedDeclaration = pathRewriter(
+    'esm',
+    'wasm/index.d.ts',
+  )(sourceDeclaration)
   assertWasmDeclarationOwner(publishedDeclaration, 'WASM published declaration')
 
   await mkdir(path.dirname(wasmPublishedTypesEntry), {
@@ -109,132 +110,142 @@ const writeWasmDeclarationOwner = async () => {
   )
 }
 
-/**
- * fork = require( https://github.com/egoist/vue-dts-gen/blob/main/src/index.ts
- */
+// Use Vue's declaration compiler for SFCs as well as TypeScript entry points.
+// compileScript + a plain TypeScript emitter loses template slots and can emit
+// invalid expanded Vue generics, duplicate emit parameters or no entry at all.
 const runGenerateTypesDefinitions = async () => {
-  const compilerOptions: CompilerOptions = {
-    emitDeclarationOnly: true,
-    declaration: true,
-    outDir,
-    baseUrl: projRoot,
-    paths: {
-      '@element-plus/motion': [
-        path.resolve(projRoot, 'vue/packages/motion/index.ts'),
-      ],
-      '@element-plus/motion/*': [
-        path.resolve(projRoot, 'vue/packages/motion/*'),
-      ],
-      '@element-plus/*': [path.resolve(projRoot, 'vue/packages/*')],
-      '@element-plus/icons-vue': [iconsVueTypesEntry],
-      '@element-plus/icons-vue/*': [
-        path.resolve(projRoot, 'vue/packages/icons-vue/dist/*'),
-      ],
-      '@element-plus/wasm': [wasmTypesEntry],
-      '@element-plus/wasm/*': [
-        path.resolve(projRoot, 'vue/packages/wasm/dist/*'),
-      ],
-    },
-    // pnpm links workspace package peer deps through nested symlinks. Keeping the
-    // symlink path here makes Vue's own d.ts re-exports unable to resolve
-    // @vue/runtime-* packages during declaration generation.
-    preserveSymlinks: false,
-    skipLibCheck: true,
-    noImplicitAny: false,
-  }
-  const project = new Project({
-    compilerOptions,
-    tsConfigFilePath: TSCONFIG_PATH,
-    skipAddingFilesFromTsConfig: true,
-  })
-
-  await addSourceFiles(project)
-  consola.success('Added source files')
-
+  const sourceFiles = await collectSourceFiles()
+  const sourceFilePaths = new Set(sourceFiles)
   const enumMemberDeclarations = await Promise.all(
     enumMemberDeclarationPaths.map(async (relativePath) => {
       const declarationPath = path.resolve(pkgRoot, relativePath)
       const runtimePath = declarationPath.replace(/\.d\.ts$/u, '.js')
-      const sourceFile = project.getSourceFileOrThrow(declarationPath)
-      const [declarationStat, runtimeStat, runtimeSource] = await Promise.all([
-        lstat(declarationPath),
-        lstat(runtimePath),
-        readFile(runtimePath, 'utf8'),
-      ])
+      const [declarationStat, runtimeStat, declaration, runtime] =
+        await Promise.all([
+          lstat(declarationPath),
+          lstat(runtimePath),
+          readFile(declarationPath, 'utf8'),
+          readFile(runtimePath, 'utf8'),
+        ])
       if (
+        !sourceFilePaths.has(declarationPath) ||
         !declarationStat.isFile() ||
         !runtimeStat.isFile() ||
-        !sourceFile.getFullText().trim() ||
-        !runtimeSource.trim()
+        !declaration.trim() ||
+        !runtime.trim()
       ) {
         throw new Error(
           `Enum source pair must contain regular, nonempty files: ${relativePath}`,
         )
       }
-      return { relativePath, sourceFile }
+      return { relativePath, declaration }
     }),
   )
 
-  typeCheck(project)
-  consola.success('Type check passed!')
-
-  const emitOutput = project.emitToMemory({
-    emitOnlyDtsFiles: true,
-  })
-  const emitFiles = emitOutput.getFiles()
-  if (emitFiles.length === 0) {
-    consola.info(chalk.yellow('No declaration files were emitted.'))
-  } else {
-    const tasks = emitFiles.map(async (outputFile) => {
-      const filepath = outputFile.filePath
-      const relativePath = path.relative(outDir, filepath)
-      const declaration =
-        relativePath === path.join('packages', 'wasm.d.ts')
-          ? wasmPublicDeclaration
-          : outputFile.text
-
-      consola.trace(
-        chalk.yellow(
-          `Generating definition for file: ${chalk.bold(relativePath)}`,
-        ),
-      )
-
-      await mkdir(path.dirname(filepath), {
-        recursive: true,
-      })
-
-      await writeFile(filepath, pathRewriter('esm')(declaration), 'utf8')
-
-      consola.success(
-        chalk.green(
-          `Definition for file: ${chalk.bold(relativePath)} generated`,
-        ),
-      )
+  await rm(outDir, { recursive: true, force: true })
+  await mkdir(outDir, { recursive: true })
+  const rawOutput = path.join(outDir, '.vue-tsc')
+  const generatedConfig = path.join(outDir, 'tsconfig.declarations.json')
+  await writeFile(
+    generatedConfig,
+    JSON.stringify(
+      {
+        extends: TSCONFIG_PATH,
+        compilerOptions: {
+          declaration: true,
+          emitDeclarationOnly: true,
+          noEmit: false,
+          noEmitOnError: true,
+          declarationMap: false,
+          rootDir: path.join(projRoot, 'vue'),
+          outDir: rawOutput,
+          paths: {
+            '@element-plus/icons-vue': [iconsVueTypesEntry],
+            '@element-plus/icons-vue/*': [
+              path.resolve(projRoot, 'vue/packages/icons-vue/dist/types/*'),
+            ],
+            '@element-plus/*': [path.resolve(pkgRoot, '*')],
+          },
+          preserveSymlinks: false,
+        },
+        files: sourceFiles,
+        include: [],
+      },
+      null,
+      2,
+    ),
+  )
+  const vueTsc = path.join(
+    projRoot,
+    'scripts/generate-package-declarations.mjs',
+  )
+  await new Promise<void>((resolve, reject) => {
+    const child = spawn(
+      process.execPath,
+      [vueTsc, '--project', generatedConfig],
+      {
+        cwd: projRoot,
+        stdio: 'inherit',
+      },
+    )
+    child.once('error', reject)
+    child.once('exit', (code, signal) => {
+      if (code === 0) resolve()
+      else
+        reject(
+          new Error(`Vue declaration generation failed (${signal ?? code}).`),
+        )
     })
+  })
 
-    await Promise.all(tasks)
+  const declarations = await glob('packages/**/*.d.ts', {
+    cwd: rawOutput,
+    onlyFiles: true,
+  })
+  if (declarations.length === 0) {
+    throw new Error('No declaration files were emitted.')
+  }
+  for (const emittedPath of declarations.sort()) {
+    let relativePath = emittedPath
+    const publicDirectory = `${path.join('packages', 'element-plus')}${path.sep}`
+    if (relativePath.startsWith(publicDirectory)) {
+      relativePath = path.join(
+        'packages',
+        relativePath.slice(publicDirectory.length),
+      )
+    }
+    const source = await readFile(path.join(rawOutput, emittedPath), 'utf8')
+    const declaration =
+      relativePath === path.join('packages', 'wasm.d.ts')
+        ? wasmPublicDeclaration
+        : source
+    const target = path.join(outDir, relativePath)
+    await mkdir(path.dirname(target), { recursive: true })
+    await writeFile(
+      target,
+      pathRewriter('esm', path.relative('packages', relativePath))(declaration),
+      'utf8',
+    )
   }
 
-  // Handwritten declarations own the paired JavaScript module types. TypeScript
-  // does not emit these inputs; preserve the same layout in both package formats.
-  await Promise.all(
-    enumMemberDeclarations.map(async ({ relativePath, sourceFile }) => {
-      const filepath = path.join(outDir, 'packages', relativePath)
-      await mkdir(path.dirname(filepath), { recursive: true })
-      await writeFile(
-        filepath,
-        pathRewriter('esm')(sourceFile.getFullText()),
-        'utf8',
-      )
-    }),
-  )
-
+  // TypeScript does not emit handwritten declaration inputs. Preserve each
+  // JavaScript enum owner's original companion in both package formats.
+  for (const { relativePath, declaration } of enumMemberDeclarations) {
+    const target = path.join(outDir, 'packages', relativePath)
+    await mkdir(path.dirname(target), { recursive: true })
+    await writeFile(
+      target,
+      pathRewriter('esm', relativePath)(declaration),
+      'utf8',
+    )
+  }
   await writeWasmDeclarationOwner()
-  // The public wrapper and bundled runtime have distinct owners. Preserve the
-  // canonical generated icons declaration tree beside its runtime modules.
   await copy(
     path.dirname(iconsVueTypesEntry),
     path.join(outDir, 'packages', 'icons-vue', 'src'),
+  )
+  consola.success(
+    `Generated ${declarations.length} Vue/TypeScript declarations`,
   )
 }
 
@@ -242,103 +253,33 @@ export const generateTypesDefinitions: TaskFunction = (done) => {
   runGenerateTypesDefinitions().then(() => done(), done)
 }
 
-async function addSourceFiles(project: Project) {
-  project.addSourceFileAtPath(path.resolve(projRoot, 'vue/typings/env.d.ts'))
-  project.addSourceFileAtPath(
-    path.resolve(projRoot, 'vue/typings/vite-worker.d.ts'),
-  )
-
-  const globSourceFile = '**/*.{js?(x),ts?(x),vue}'
-  const workspaceExternalPackages = [
-    '!demo-app/**/*',
-    '!icons-svg/**/*',
-    '!icons-vue/**/*',
-    '!theme-chalk/**/*',
-    '!wasm/**/*',
-  ]
-  const filePaths = excludeFiles(
+async function collectSourceFiles() {
+  // Keep the original owned package roots and add WASM's referenced type owners;
+  // its canonical bundled public declaration is still copied above.
+  const packageFiles = excludeFiles(
     await glob(
-      [globSourceFile, '!element-plus/**/*', ...workspaceExternalPackages],
-      {
-        cwd: pkgRoot,
-        absolute: true,
-        onlyFiles: true,
-      },
+      [
+        '**/*.{js?(x),ts?(x),vue}',
+        '!element-plus/**/*',
+        '!demo-app/**/*',
+        '!icons-svg/**/*',
+        '!icons-vue/**/*',
+        '!theme-chalk/**/*',
+      ],
+      { cwd: pkgRoot, absolute: true, onlyFiles: true },
     ),
-  )
-  const epPaths = excludeFiles(
-    await glob(globSourceFile, {
+  ).filter((file) => !enumRuntimeSourceFiles.has(path.resolve(file)))
+  const publicFiles = excludeFiles(
+    await glob('**/*.{js?(x),ts?(x),vue}', {
       cwd: epRoot,
+      absolute: true,
       onlyFiles: true,
     }),
   )
-
-  const sourceFiles: SourceFile[] = []
-  await Promise.all([
-    ...filePaths.map(async (file) => {
-      // Only these declared JavaScript owners use their companion as the type
-      // root. The module builder still consumes the real JavaScript source.
-      if (enumRuntimeSourceFiles.has(path.resolve(file))) return
-
-      if (file.endsWith('.vue')) {
-        const content = await readFile(file, 'utf-8')
-        const hasTsNoCheck = content.includes('@ts-nocheck')
-
-        const sfc = vueCompiler.parse(content)
-        const { script, scriptSetup } = sfc.descriptor
-        if (script || scriptSetup) {
-          let content =
-            (hasTsNoCheck ? '// @ts-nocheck\n' : '') + (script?.content ?? '')
-
-          if (scriptSetup) {
-            const compiled = vueCompiler.compileScript(sfc.descriptor, {
-              id: 'xxx',
-            })
-            content += compiled.content
-          }
-
-          const lang = scriptSetup?.lang || script?.lang || 'js'
-          const sourceFile = project.createSourceFile(
-            `${path.relative(process.cwd(), file)}.${lang}`,
-            content,
-          )
-          sourceFiles.push(sourceFile)
-        }
-      } else {
-        const sourceFile = project.addSourceFileAtPath(file)
-        sourceFiles.push(sourceFile)
-      }
-    }),
-    ...epPaths.map(async (file) => {
-      const content = await readFile(path.resolve(epRoot, file), 'utf-8')
-      const sourceFile = project.createSourceFile(
-        path.resolve(pkgRoot, file),
-        content,
-      )
-      if (file === 'wasm.ts' || file === 'markdown-runtime.ts') {
-        // These entries move above element-plus; retain the existing WASM owner.
-        for (const declaration of sourceFile.getExportDeclarations()) {
-          if (declaration.getModuleSpecifierValue() === '../wasm/index') {
-            declaration.setModuleSpecifier('@element-plus/wasm')
-          }
-        }
-      }
-      sourceFiles.push(sourceFile)
-    }),
-  ])
-
-  return sourceFiles
-}
-
-function typeCheck(project: Project) {
-  const diagnostics = project.getPreEmitDiagnostics().filter((diagnostic) => {
-    const code = diagnostic.getCode()
-    // 7056 is already accepted for generated library declarations.
-    // 2742 is a pnpm realpath portability diagnostic emitted before the
-    // in-memory declaration output is rewritten to public package paths.
-    return code !== 7056 && code !== 2742
-  })
-  if (diagnostics.length > 0) {
-    throw new Error(project.formatDiagnosticsWithColorAndContext(diagnostics))
-  }
+  return [
+    path.resolve(projRoot, 'vue/typings/env.d.ts'),
+    path.resolve(projRoot, 'vue/typings/vite-worker.d.ts'),
+    ...packageFiles,
+    ...publicFiles,
+  ].sort()
 }

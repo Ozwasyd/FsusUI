@@ -126,6 +126,16 @@ unchanged. Unsupported compiler directives and real workspace references still
 fail preparation; license attribution is not a runtime dependency. The reference
 inspector is bound by the candidate input fingerprint.
 
+Package declarations use the locked Vue declaration compiler over the original
+owned source roots, including the referenced WASM type owners. Install helper
+annotations preserve named component owners, props, slots, aliases and install
+signatures instead of expanding private Vue constructors. These are compiler
+inputs only; runtime sources are not rewritten. The original enum companions and
+canonical icon/WASM declarations remain validated and copied into both formats.
+Bundled declaration references resolve within the package, independently of its
+public subpath allowlist. Missing source types or published type dependencies
+remain real strict-consumer failures.
+
 Verify a fresh consumer install from that tarball:
 
 ```bash

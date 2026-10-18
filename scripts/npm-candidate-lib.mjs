@@ -80,6 +80,8 @@ function inputDigests(repoRoot) {
     'scripts/package-candidate.mjs',
     'scripts/prepare-npm-package.mjs',
     'scripts/bundled-workspace-references.mjs',
+    'scripts/generate-package-declarations.mjs',
+    'scripts/package-declaration-source.mjs',
     'vue/packages/element-plus/package.json',
   ]
   return Object.fromEntries(
