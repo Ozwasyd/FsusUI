@@ -137,7 +137,11 @@ export default defineComponent({
       if (!element) return
 
       const dropdownItem = dropdownItems.get(element)
-      if (dropdownItem) dropdownItem.disabled = props.disabled
+      if (dropdownItem) {
+        dropdownItem.disabled = props.disabled
+        // Keep absent/empty values so typeahead falls back to the current label.
+        dropdownItem['text-value'] = props.textValue
+      }
 
       const rovingItem = rovingFocusItems.get(element)
       if (rovingItem) {
