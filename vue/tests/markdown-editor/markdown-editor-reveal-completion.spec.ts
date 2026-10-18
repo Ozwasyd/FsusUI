@@ -1,11 +1,11 @@
+import { resolve } from 'node:path'
 import { expect, test } from '@playwright/test'
 
-const fixture =
-  '/@fs/workspace/FsusUI/vue/tests/markdown-editor/reveal-completion.fixture.html'
+const fixture = `/@fs${resolve('vue/tests/markdown-editor/reveal-completion.fixture.html')}`
 for (const theme of ['light', 'dark']) {
   test(`acknowledges actual full backward selection/focus/viewport in ${theme}`, async ({
     page,
-  }) => {
+  }, testInfo) => {
     await page.emulateMedia({
       colorScheme: theme === 'light' ? 'light' : 'dark',
       reducedMotion: 'reduce',
@@ -48,7 +48,7 @@ for (const theme of ['light', 'dark']) {
       input!.y + input!.height,
     )
     await page.screenshot({
-      path: `/workspace/reveal-evidence/success-${theme}.png`,
+      path: testInfo.outputPath(`success-${theme}.png`),
     })
   })
 }

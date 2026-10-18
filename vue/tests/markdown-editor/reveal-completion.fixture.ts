@@ -110,6 +110,7 @@ createApp(
                 modelValue: source.value,
                 documentIdentity: { id: 'browser-document', epoch: 9 },
                 mode: 'source',
+                editorProfile: 'prose',
                 minRows: 8,
                 height: '320px',
                 writingAids: { focus: true },

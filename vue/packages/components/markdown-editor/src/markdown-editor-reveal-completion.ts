@@ -57,6 +57,7 @@ export const measureMarkdownEditorReveal = (
     !view ||
     !textarea.isConnected ||
     textarea.hidden ||
+    document.fonts?.status === 'loading' ||
     textarea.value.length > 1_000_000
   )
     return null
@@ -66,6 +67,7 @@ export const measureMarkdownEditorReveal = (
     style.direction !== 'ltr' ||
     style.display === 'none' ||
     style.visibility !== 'visible' ||
+    Number(style.opacity) === 0 ||
     style.transform !== 'none' ||
     textarea.wrap === 'off' ||
     textarea.clientWidth <= 0 ||
@@ -122,28 +124,39 @@ export const measureMarkdownEditorReveal = (
   mirror.append(text)
   document.body.append(mirror)
   try {
-    const origin = mirror.getBoundingClientRect()
-    // Refuse if native control and measured text layout do not agree.
-    if (
+    const agreesWithNative = () =>
       Math.abs(
         textarea.scrollHeight -
           Math.max(textarea.clientHeight, mirror.scrollHeight),
-      ) > 1 ||
+      ) <= 1 &&
       Math.abs(
         textarea.scrollWidth -
           Math.max(textarea.clientWidth, mirror.scrollWidth),
-      ) > 1
-    )
-      return null
+      ) <= 1
+    if (!agreesWithNative()) {
+      // Native text controls quantize fractional line boxes to layout units.
+      // Keep the native extent fence: this is never a relaxed success threshold.
+      const lineHeight = Number.parseFloat(style.lineHeight)
+      if (!Number.isFinite(lineHeight)) return null
+      mirror.style.lineHeight = `${Math.floor(lineHeight * 64) / 64}px`
+      if (!agreesWithNative()) return null
+    }
+    const origin = mirror.getBoundingClientRect()
     const range = document.createRange()
     range.setStart(text, selection.start)
     range.setEnd(text, selection.end)
     const rects = Array.from(range.getClientRects())
     if (!rects.length || rects.some((rect) => rect.height <= 0)) return null
-    const top = Math.min(...rects.map((rect) => rect.top)) - origin.top
-    const bottom = Math.max(...rects.map((rect) => rect.bottom)) - origin.top
-    const left = Math.min(...rects.map((rect) => rect.left)) - origin.left
-    const right = Math.max(...rects.map((rect) => rect.right)) - origin.left
+    let top = Infinity
+    let bottom = -Infinity
+    let left = Infinity
+    let right = -Infinity
+    for (const rect of rects) {
+      top = Math.min(top, rect.top - origin.top)
+      bottom = Math.max(bottom, rect.bottom - origin.top)
+      left = Math.min(left, rect.left - origin.left)
+      right = Math.max(right, rect.right - origin.left)
+    }
     const box = textarea.getBoundingClientRect()
     // Transformed ancestors/zoom need a different coordinate mapping; fail closed.
     if (
@@ -177,7 +190,12 @@ export const measureMarkdownEditorReveal = (
       parent = parent.parentElement
     ) {
       const css = view.getComputedStyle(parent)
-      if (css.transform !== 'none' || css.visibility !== 'visible') return null
+      if (
+        css.transform !== 'none' ||
+        css.visibility !== 'visible' ||
+        Number(css.opacity) === 0
+      )
+        return null
       const rect = parent.getBoundingClientRect()
       if (/(auto|scroll|hidden|clip)/u.test(css.overflowY)) {
         clipTop = Math.max(clipTop, rect.top + parent.clientTop)

@@ -441,10 +441,11 @@ an independent acceptance lane and is not replaced by these simulations.
 ## Outline and writing aids
 
 `revealHeading(nodeId)` and `revealSourceRange(range)` use the current document identity,
-revision, and projection. On success, the component mounts the live virtual window containing
-the target, restores source selection, focuses the sole textarea input owner, and scrolls the
-target into view. A stale, deleted, unsupported, or missing target does not move selection,
-focus, scroll, or history.
+revision, and projection. The synchronous success status admits the target and starts
+the legacy asynchronous selection/focus/scroll continuation; it is not a completion
+acknowledgement. A stale, deleted, unsupported, or missing target does not move selection,
+focus, scroll, or history. Use `revealSourceRangeAndWait` below when navigation needs
+observed completion.
 
 `writing-aids` takes effect only when explicitly enabled by the consumer:
 
@@ -1823,7 +1824,8 @@ presentation or a host navigation/history receipt.
 The promise rejects with exported `MarkdownEditorRevealError` and a `reason`:
 `aborted`, `admission-rejected`, `stale`, `unavailable`, `unsupported`,
 `invalid-selection`, `focus-lost`, `selection-changed`, `superseded`,
-`interrupted` or `timeout`. A thrown admission error remains in `cause`.
+`interrupted` or `timeout`. A thrown admission error remains in `cause`. Original owner failures propagate
+unchanged and never become success.
 Cancellation, pause, unmount, document/epoch/revision/mode drift, composition,
 disabled/loading/readonly state, genuine focus loss, a new reveal or manual
 wheel/touch/pointer/keyboard input cannot produce a completion. All listeners,
