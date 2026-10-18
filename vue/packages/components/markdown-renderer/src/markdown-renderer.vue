@@ -1036,7 +1036,7 @@ const activateRenderedFeatures = async (
   const activationStartedAt = readPerformanceNow()
   const features = resolveMarkdownFeatureOptions()
   const heavyFeaturesEnabled = hasEnabledHeavyFeature(result, features)
-  if (heavyFeaturesEnabled) heavyThemeRelevant = true
+  heavyThemeRelevant ||= heavyFeaturesEnabled
   const resolveHeavyFeatureIdentity = heavyFeaturesEnabled
     ? await createHeavyFeatureIdentityResolver(result)
     : () => null
@@ -1076,15 +1076,12 @@ const activateRenderedFeatures = async (
   )
   emit('features-activated', activation, result)
   recordHeavyLifecycleMetrics()
-  if (
+  heavyThemeRelevant ||=
     heavyLifecycle.metrics().staticNodes > 0 ||
     activation.activated.some(
       ({ kind }) =>
         kind === 'code-highlight' || kind === 'latex' || kind === 'mermaid',
     )
-  ) {
-    heavyThemeRelevant = true
-  }
 }
 
 async function activateChunkFeatures(
