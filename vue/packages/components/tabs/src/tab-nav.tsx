@@ -220,6 +220,7 @@ const TabNav = defineComponent({
         )
       )
       const currentIndex = tabList.indexOf(e.target as HTMLDivElement)
+      if (currentIndex < 0) return
 
       let nextIndex: number
       if (code === left || code === up) {
