@@ -131,6 +131,9 @@ public class FsusVirtualList : ContentControl
   private string? lastAutomationStatus;
   private string? lastStateName;
   private bool isApplyingScroll;
+  private Func<int, string>? previousItemKeyProvider;
+  private Func<int, object?>? previousItemProvider;
+  private FsusVirtualListSourceProvider? previousSourceProvider;
 
   public FsusVirtualList()
   {
@@ -339,6 +342,9 @@ public class FsusVirtualList : ContentControl
   private void RememberItemKeys()
   {
     previousItemCount = ItemCount;
+    previousItemKeyProvider = ItemKeyProvider;
+    previousItemProvider = ItemProvider;
+    previousSourceProvider = SourceProvider;
     retainedItemKeys.Clear();
     if (ItemKeyProvider is null)
     {
@@ -363,9 +369,13 @@ public class FsusVirtualList : ContentControl
   {
     restoreFocusIndex = null;
     var focused = realizedContainers.Values.FirstOrDefault(container => container.IsKeyboardFocusWithin);
-    // Unfocused count growth uses the insertion notification. Keep surviving
-    // focus across rebuilds, retaining keys only for bounded windows and navigation.
-    if (ItemKeyProvider is null || ItemCount <= 0 || (ItemCount > previousItemCount && focused is null) ||
+    var providerReplaced = !ReferenceEquals(previousItemKeyProvider, ItemKeyProvider) ||
+      !ReferenceEquals(previousItemProvider, ItemProvider) ||
+      !ReferenceEquals(previousSourceProvider, SourceProvider);
+    // Provider rebuilds preserve the viewport independently of keyboard focus.
+    // Unfocused growth through unchanged providers still requires insertion notification.
+    if (ItemKeyProvider is null || ItemCount <= 0 ||
+      (ItemCount > previousItemCount && focused is null && !providerReplaced) ||
       !retainedItemKeys.Any(pair => pair.Key >= ItemCount || ResolveKey(pair.Key) != pair.Value))
     {
       return false;

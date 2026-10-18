@@ -12,3 +12,7 @@ Retain surviving item identities across deletion, reordering and source rebuilds
 Restore actual item focus independently from the navigation index, migrate
 bounded measurement and loaded windows by key, and reveal surviving focused
 items that move beyond the previous viewport.
+
+Preserve the visible anchor when a replacement provider grows while keyboard
+focus remains in another control, keeping the existing insertion notification
+contract for unchanged providers.
