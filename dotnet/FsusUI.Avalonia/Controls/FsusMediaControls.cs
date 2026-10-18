@@ -187,6 +187,7 @@ public class FsusImageViewer : ContentControl, IFsusOverlayLifecycle, IDisposabl
   private double zoom = 1;
   private Vector translation;
   private string transformSource = string.Empty;
+  private bool isDisposed;
 
   public FsusImageViewer()
   {
@@ -215,6 +216,7 @@ public class FsusImageViewer : ContentControl, IFsusOverlayLifecycle, IDisposabl
       {
         newNotify.CollectionChanged += OnSourcesCollectionChanged;
       }
+      activeIndex = Math.Clamp(activeIndex, 0, Math.Max(0, Sources.Count - 1));
       HandleActiveSourceTransformChange();
       SyncState();
     }
@@ -225,7 +227,7 @@ public class FsusImageViewer : ContentControl, IFsusOverlayLifecycle, IDisposabl
     get => activeIndex;
     set
     {
-      var clamped = Sources.Count == 0 ? Math.Max(0, value) : Math.Clamp(value, 0, Sources.Count - 1);
+      var clamped = Math.Clamp(value, 0, Math.Max(0, Sources.Count - 1));
       if (activeIndex != clamped)
       {
         activeIndex = clamped;
@@ -359,6 +361,7 @@ public class FsusImageViewer : ContentControl, IFsusOverlayLifecycle, IDisposabl
 
   public FsusOverlayEntry Open(FsusOverlayHost host, Control? restoreFocusTo = null)
   {
+    ObjectDisposedException.ThrowIf(isDisposed, this);
     ArgumentNullException.ThrowIfNull(host);
     return IsOpen && OverlayEntry is not null
       ? OverlayEntry
@@ -395,9 +398,11 @@ public class FsusImageViewer : ContentControl, IFsusOverlayLifecycle, IDisposabl
 
   public void OnOverlayClosed(FsusOverlayCloseReason reason)
   {
-    currentLoadCts?.Cancel();
-    currentLoadCts?.Dispose();
-    currentLoadCts = null;
+    CancelCurrentLoad();
+    if (Status == FsusImageStatus.Loading)
+    {
+      Status = FsusImageStatus.Idle;
+    }
     OverlayEntry = null;
     overlayHost = null;
     IsOpen = false;
@@ -412,6 +417,11 @@ public class FsusImageViewer : ContentControl, IFsusOverlayLifecycle, IDisposabl
 
   public Task<bool> LoadActiveSourceAsync(CancellationToken cancellationToken = default)
   {
+    if (isDisposed)
+    {
+      return Task.FromResult(false);
+    }
+
     var sourceToLoad = ActiveSource;
     if (currentLoadTask is not null &&
         string.Equals(currentLoadingSource, sourceToLoad, StringComparison.Ordinal) &&
@@ -427,12 +437,7 @@ public class FsusImageViewer : ContentControl, IFsusOverlayLifecycle, IDisposabl
 
   private async Task<bool> LoadActiveSourceCoreAsync(CancellationToken cancellationToken)
   {
-    if (currentLoadCts is not null)
-    {
-      currentLoadCts.Cancel();
-      currentLoadCts.Dispose();
-      currentLoadCts = null;
-    }
+    CancelCurrentLoad();
 
     var sourceToLoad = ActiveSource;
     currentLoadingSource = sourceToLoad;
@@ -670,21 +675,20 @@ public class FsusImageViewer : ContentControl, IFsusOverlayLifecycle, IDisposabl
   {
     HandleActiveSourceTransformChange();
     ActiveSourceChanged?.Invoke(this, new FsusActiveSourceChangedEventArgs(ActiveSource, ActiveIndex));
-    if (HasLoader && !string.IsNullOrWhiteSpace(ActiveSource))
-    {
-      _ = LoadActiveSourceAsync();
-    }
+    _ = LoadActiveSourceAsync();
   }
 
   private void OnSourcesCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
   {
+    if (isDisposed)
+    {
+      return;
+    }
+
+    activeIndex = Math.Clamp(activeIndex, 0, Math.Max(0, Sources.Count - 1));
     var activeSourceChanged = HandleActiveSourceTransformChange();
     SyncState();
-    if (
-      (activeSourceChanged || Status == FsusImageStatus.Idle) &&
-      Sources.Count > 0 &&
-      HasLoader &&
-      !string.IsNullOrWhiteSpace(ActiveSource))
+    if (activeSourceChanged || Status == FsusImageStatus.Idle)
     {
       _ = LoadActiveSourceAsync();
     }
@@ -737,14 +741,34 @@ public class FsusImageViewer : ContentControl, IFsusOverlayLifecycle, IDisposabl
     }
   }
 
+  private void CancelCurrentLoad()
+  {
+    var cts = currentLoadCts;
+    currentLoadCts = null;
+    currentLoadTask = null;
+    currentLoadingSource = null;
+    cts?.Cancel();
+    cts?.Dispose();
+  }
+
   public void Dispose()
   {
+    if (isDisposed)
+    {
+      return;
+    }
+
+    isDisposed = true;
+    if (sources is INotifyCollectionChanged notify)
+    {
+      notify.CollectionChanged -= OnSourcesCollectionChanged;
+    }
     EndPan(capturedPointer);
-    currentLoadCts?.Cancel();
-    currentLoadCts?.Dispose();
-    currentLoadCts = null;
-    currentLoadingSource = null;
+    CancelCurrentLoad();
     SetLoadedContent(null, null);
+    Status = FsusImageStatus.Idle;
+    ErrorMessage = null;
+    SyncState();
     GC.SuppressFinalize(this);
   }
 
