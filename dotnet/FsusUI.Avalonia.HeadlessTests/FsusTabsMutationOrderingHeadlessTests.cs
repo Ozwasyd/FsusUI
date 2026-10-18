@@ -1,3 +1,4 @@
+using Avalonia.Automation;
 using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
 using Avalonia.Markup.Xaml.Styling;
@@ -199,7 +200,10 @@ public class FsusTabsMutationOrderingHeadlessTests(ITestOutputHelper output)
   public void PendingMutationsAcrossUnloadAndRemountKeepLatestSelectionAndOneSubscription()
   {
     var tabs = new FsusDocumentTabs();
-    var first = new FsusDocumentTab { Key = "first", Header = "First" };
+    var first = new FsusDocumentTab
+    {
+      Key = "first", Header = "First", IsDirty = true, IsClosable = false,
+    };
     var second = new FsusDocumentTab { Key = "second", Header = "Second" };
     tabs.AddDocument(first);
     tabs.AddDocument(second);
@@ -209,6 +213,8 @@ public class FsusTabsMutationOrderingHeadlessTests(ITestOutputHelper output)
 
     try
     {
+      Assert.Contains("unsaved changes", AutomationProperties.GetItemStatus(first));
+      Assert.Contains("not closable", AutomationProperties.GetItemStatus(first));
       var selections = new List<string>();
       tabs.SelectionChanged += (_, e) => selections.Add(e.SelectedKey);
       second.IsSelected = true;
@@ -228,6 +234,8 @@ public class FsusTabsMutationOrderingHeadlessTests(ITestOutputHelper output)
 
       Assert.Same(first, tabs.SelectedItem);
       Assert.Equal("first", tabs.SelectedKey);
+      Assert.Contains("unsaved changes", AutomationProperties.GetItemStatus(first));
+      Assert.Contains("not closable", AutomationProperties.GetItemStatus(first));
       Assert.Equal(new[] { "first" }, selections);
       selections.Clear();
       second.IsSelected = true;

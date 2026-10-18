@@ -248,7 +248,10 @@ public class FsusTabs : TabControl
       {
         SelectedItem = selectedPane;
       }
-      SyncPanes();
+      foreach (var pane in panes)
+      {
+        pane.IsSelected = pane.Key == SelectedKey;
+      }
     });
   }
 
