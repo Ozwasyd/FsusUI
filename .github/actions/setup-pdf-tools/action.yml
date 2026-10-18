@@ -4,6 +4,7 @@ runs:
   using: composite
   steps:
     - name: Install Ubuntu Poppler utilities
+      id: linux
       if: runner.os == 'Linux'
       shell: bash
       run: |
@@ -21,8 +22,13 @@ runs:
           "/usr/bin/$tool" -v
         done
         echo /usr/bin >> "$GITHUB_PATH"
+        actual=$(/usr/bin/pdfinfo -v 2>&1)
+        first_line=${actual%%$'\n'*}
+        echo 'bin=/usr/bin' >> "$GITHUB_OUTPUT"
+        echo "version=${first_line#pdfinfo version }" >> "$GITHUB_OUTPUT"
 
     - name: Install Homebrew Poppler
+      id: macos
       if: runner.os == 'macOS'
       shell: bash
       env:
@@ -43,8 +49,11 @@ runs:
           test "$(printf '%s\n' "$actual" | head -n 1)" = "$tool version $version"
         done
         echo "$bin" >> "$GITHUB_PATH"
+        echo "bin=$bin" >> "$GITHUB_OUTPUT"
+        echo "version=$version" >> "$GITHUB_OUTPUT"
 
     - name: Install Chocolatey Poppler
+      id: windows
       if: runner.os == 'Windows'
       shell: pwsh
       run: |
@@ -76,12 +85,39 @@ runs:
           if ($actual[0].ToString() -ne "$tool version 26.09.0") { throw "Unexpected $tool version" }
         }
         $bin | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+        "bin=$bin" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+        'version=26.09.0' | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
 
     - name: Require PDF tools on the test PATH
       shell: bash
+      env:
+        FSUS_PDF_TOOLS_BIN: ${{ steps.linux.outputs.bin || steps.macos.outputs.bin || steps.windows.outputs.bin }}
+        FSUS_PDF_TOOLS_VERSION: ${{ steps.linux.outputs.version || steps.macos.outputs.version || steps.windows.outputs.version }}
       run: |
         set -euo pipefail
+        bin=${FSUS_PDF_TOOLS_BIN:?Missing installed Poppler bin directory}
+        version=${FSUS_PDF_TOOLS_VERSION:?Missing installed Poppler version}
+        if [ "$RUNNER_OS" = Windows ]; then
+          bin=$(cygpath -u "$bin")
+        fi
+        bin=$(cd "$bin" && pwd -P)
+        # Git for Windows' Bash profile can prepend /mingw64/bin ahead of GITHUB_PATH.
+        # Select the verified installation again in this shell; later native steps
+        # receive its original platform path through GITHUB_PATH above.
+        export PATH="$bin:$PATH"
+        hash -r
         for tool in pdfinfo pdftotext pdftoppm; do
-          command -v "$tool"
-          "$tool" -v
+          selected=$(command -v "$tool")
+          echo "$tool: $selected"
+          if [ "$selected" != "$bin/$tool" ]; then
+            if [ "$RUNNER_OS" != Windows ] || [ "$selected" != "$bin/$tool.exe" ]; then
+              echo "Expected $tool from installed Poppler directory: $bin" >&2
+              exit 1
+            fi
+          fi
+          actual=$("$tool" -v 2>&1)
+          actual=${actual//$'\r'/}
+          echo "$actual"
+          test "${actual%%$'\n'*}" = "$tool version $version"
+          [[ "$actual" == *'The Poppler Developers'* ]]
         done
