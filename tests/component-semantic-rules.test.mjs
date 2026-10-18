@@ -13,6 +13,7 @@ import test from 'node:test'
 import { fileURLToPath, URL } from 'node:url'
 
 import { compile } from 'sass'
+import * as csstree from 'css-tree'
 
 const repositoryRoot = fileURLToPath(new URL('..', import.meta.url))
 const fixtureRoot = join(
@@ -153,6 +154,7 @@ const evaluateFixture = async ({
   mutation,
   mutations = mutation ? [mutation] : [],
   overrides = [],
+  compiledCss,
 } = {}) => {
   const registry = await loadProductionRegistry()
   const temporaryParent = await mkdtemp(join(tmpdir(), 'fsusui-rules-eval-'))
@@ -166,7 +168,10 @@ const evaluateFixture = async ({
     productionSchemaPath,
     join(temporaryRoot, 'component-surface-semantic-registry.schema.json'),
   )
-  await writeFile(join(temporaryRoot, compiledPath), productionCss())
+  await writeFile(
+    join(temporaryRoot, compiledPath),
+    compiledCss ?? productionCss(),
+  )
 
   const relativeCompiledPath = relative(
     join(temporaryRoot, 'entrypoints'),
@@ -220,6 +225,233 @@ const tokenVariable = async (name) => {
   const token = tokens.tokens.find((entry) => entry.name === name)
   assert.ok(token)
   return `var(${token.aliases[0]}, ${token.value})`
+}
+
+const productionFocusDeclarations = () => {
+  const declarations = []
+  csstree.walk(csstree.parse(productionCss(), { positions: true }), {
+    visit: 'Rule',
+    enter(rule) {
+      if (
+        csstree.generate(rule.prelude) !== '.el-dialog__headerbtn:focus-visible'
+      )
+        return
+      for (const declaration of rule.block.children) {
+        if (declaration.property === 'box-shadow')
+          declarations.push(declaration)
+      }
+    },
+  })
+  assert.equal(declarations.length, 1)
+  return declarations
+}
+
+// Replay the non-important focus declaration specified by the independent
+// review. This is a separate temporary CSS fixture, never a product edit.
+const reviewFocusProfile = () => {
+  let css = productionCss()
+  for (const declaration of productionFocusDeclarations().reverse()) {
+    const { start, end } = declaration.loc
+    declaration.important = false
+    css =
+      css.slice(0, start.offset) +
+      csstree.generate(declaration) +
+      css.slice(end.offset)
+  }
+  return css
+}
+
+const focusCascadeCases = [
+  [
+    'ordinary none overrides from an important layer',
+    'fail',
+    ({ target }) =>
+      `@layer override { ${target} { box-shadow: none !important; } }`,
+  ],
+  [
+    'ordinary incorrect spread overrides from an important layer',
+    'fail',
+    ({ target, bad }) =>
+      `@layer override { ${target} { box-shadow: ${bad} !important; } }`,
+  ],
+  [
+    'ordinary specificity wins at equal importance',
+    'fail',
+    ({ target, good, bad }) =>
+      `${target}:focus-visible { box-shadow: ${good} !important; }
+     ${target}${target}${target} { box-shadow: ${bad} !important; }`,
+  ],
+  [
+    'important focus beats more specific normal rules',
+    'pass',
+    ({ target, good, bad }) =>
+      `${target}:focus-visible { box-shadow: ${good} !important; }
+     ${target}${target}${target} { box-shadow: ${bad}; }`,
+  ],
+  [
+    'later ordinary declaration wins at equal priority',
+    'fail',
+    ({ target, good, bad }) =>
+      `${target}${target} { box-shadow: ${good} !important; }
+     ${target}${target} { box-shadow: ${bad} !important; }`,
+  ],
+  [
+    'later valid ordinary declaration restores the ring',
+    'pass',
+    ({ target, good, bad }) =>
+      `${target}${target} { box-shadow: ${bad} !important; }
+     ${target}${target} { box-shadow: ${good} !important; }`,
+  ],
+  [
+    'a hover-specific ring cannot hide a broken non-hover focus state',
+    'fail',
+    ({ target, good }) =>
+      `${target}${target} { box-shadow: none !important; }
+     ${target}:focus-visible:hover { box-shadow: ${good} !important; }`,
+  ],
+  [
+    'unfocused and disabled styles do not override focus-visible',
+    'pass',
+    ({ target, bad }) =>
+      `${target}:not(:focus-visible), ${target}:hover:not(:focus-visible),
+     ${target}:focus:not(:focus-visible), ${target}:disabled { box-shadow: ${bad} !important; }`,
+  ],
+  [
+    'hover can coexist with focus-visible',
+    'fail',
+    ({ target }) => `${target}${target}:hover { box-shadow: none !important; }`,
+  ],
+  [
+    'selected styles restricted to unfocused state remain legal',
+    'pass',
+    ({ target }) =>
+      `${target}.is-selected:not(:focus-visible) { box-shadow: none !important; }`,
+  ],
+  [
+    'selected ordinary styles can break the focused state',
+    'fail',
+    ({ target }) => `${target}.is-selected { box-shadow: none !important; }`,
+  ],
+  [
+    'custom properties resolve in the same interaction state',
+    'pass',
+    ({ target, good, bad }) =>
+      `${target}:focus-visible { --probe-focus: ${good}; box-shadow: var(--probe-focus) !important; }
+     ${target}:not(:focus-visible) { --probe-focus: ${bad} !important; }`,
+  ],
+  [
+    'functional incompatible states remain excluded',
+    'pass',
+    ({ target }) =>
+      `${target}:where(:not(:focus-visible), :disabled) { box-shadow: none !important; }`,
+  ],
+  [
+    'functional alternatives include compatible hover state',
+    'fail',
+    ({ target }) =>
+      `${target}:is(:hover, :not(:focus-visible)) { box-shadow: none !important; }`,
+  ],
+  [
+    'ancestor non-focus does not exclude a focused descendant',
+    'fail',
+    ({ target }) =>
+      `:root:not(:focus-visible) ${target} { box-shadow: none !important; }`,
+  ],
+]
+
+for (const [name, expected, css] of focusCascadeCases) {
+  test(`focus cascade: ${name}`, async () => {
+    const width = await tokenVariable('thickness.focus.md')
+    const { analysis } = await evaluateFixture({
+      overrides: [
+        css({
+          target: '.el-dialog__headerbtn',
+          good: `inset 0 0 0 ${width} #000`,
+          bad: `inset 0 0 0 calc(${width} + 1px) #000`,
+        }),
+      ],
+    })
+    const records = analysis.diagnostics.filter(
+      ({ ruleId, property }) =>
+        ruleId === 'web.dialog.overlay-close-optical' &&
+        property === 'box-shadow',
+    )
+    assert.ok(
+      records.length > 0,
+      JSON.stringify(
+        analysis.staticUnknowns.filter(
+          ({ ruleId, property }) =>
+            ruleId === 'web.dialog.overlay-close-optical' &&
+            property === 'box-shadow',
+        ),
+      ),
+    )
+    if (expected === 'fail') {
+      const failure = records.find(({ status }) => status === 'fail')
+      assert.ok(failure, JSON.stringify(records))
+      assert.equal(failure.actual.source.path, 'mutations/property-scope-0.css')
+    } else {
+      assert.ok(
+        records.every(({ status }) => status === 'pass'),
+        JSON.stringify(records),
+      )
+      assert.ok(
+        !analysis.staticUnknowns.some(
+          ({ ruleId, property }) =>
+            ruleId === 'web.dialog.overlay-close-optical' &&
+            property === 'box-shadow',
+        ),
+      )
+    }
+  })
+}
+
+for (const value of ['none', 'inset 0 0 0 3px #000']) {
+  test(`focus cascade: retain the exact ordinary ${value} review control`, async () => {
+    const { analysis } = await evaluateFixture({
+      overrides: [`.el-dialog__headerbtn { box-shadow: ${value} !important; }`],
+    })
+    const records = analysis.diagnostics.filter(
+      ({ ruleId, property }) =>
+        ruleId === 'web.dialog.overlay-close-optical' &&
+        property === 'box-shadow',
+    )
+    assert.ok(records.length > 0)
+    for (const record of records) {
+      assert.ok(
+        record.actual.cascade.some(
+          ({ source, value: observed }) =>
+            source.path === 'mutations/property-scope-0.css' &&
+            observed === value,
+        ),
+      )
+      const importantFocus = productionFocusDeclarations()[0].important
+      // The local production declaration is important. The independent review
+      // used a non-important declaration; the ordinary override wins there.
+      assert.equal(record.status, importantFocus ? 'pass' : 'fail')
+    }
+  })
+}
+
+for (const value of ['none', 'inset 0 0 0 3px #000']) {
+  test(`focus cascade: reject exact review override ${value} in the reviewed CSS profile`, async () => {
+    const { analysis } = await evaluateFixture({
+      compiledCss: reviewFocusProfile(),
+      overrides: [`.el-dialog__headerbtn { box-shadow: ${value} !important; }`],
+    })
+    const failures = analysis.diagnostics.filter(
+      ({ ruleId, property, status }) =>
+        ruleId === 'web.dialog.overlay-close-optical' &&
+        property === 'box-shadow' &&
+        status === 'fail',
+    )
+    assert.ok(failures.length > 0)
+    assert.ok(
+      failures.every(
+        ({ actual }) => actual.source.path === 'mutations/property-scope-0.css',
+      ),
+    )
+  })
 }
 
 test('production Dialog target and focus thickness compare their own dimensions', async () => {
