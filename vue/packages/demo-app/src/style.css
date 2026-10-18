@@ -759,6 +759,10 @@ body {
   box-shadow: var(--el-box-shadow-lighter);
 }
 
+.audit-card[data-audit-component='ElResizeSeparator'] {
+  height: auto;
+}
+
 .audit-page.is-boundary .audit-card {
   height: auto;
   min-height: 286px;
