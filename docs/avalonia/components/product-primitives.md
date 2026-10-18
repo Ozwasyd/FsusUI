@@ -10,6 +10,17 @@ Use settings primitives, metric primitives, and inbox primitives such as
 `FsusThreadPanel`. `FsusCopyableDetail.IsDisabled` maps to the native Avalonia
 disabled state and prevents `Copy()` from returning the protected value.
 
+When focused, `FsusSettingsSectionNav`, `FsusDiagnosticsList`, and
+`FsusConversationList` handle Down/Right and Up/Left to move between item keys,
+and Home/End to reach the first/last eligible key. Movement clamps at either
+end. Settings navigation and conversations update both `FocusedKey` and
+`SelectedKey`; diagnostics updates only `FocusedKey`. Conversation navigation
+skips items whose `IsDisabled` is true. Native keyboard focus stays in place.
+
+Setting `IsEnabled` to false on the control or an ancestor prevents keyboard
+navigation. Already handled events are ignored. Unsupported keys and an empty
+eligible item collection remain unhandled and leave key state unchanged.
+
 ## Vue Contract Mapping
 
 Vue product slots map to typed records and content controls for settings,
