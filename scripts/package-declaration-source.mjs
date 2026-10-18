@@ -94,6 +94,7 @@ export function annotateInstallTypes(content, fileName) {
     return undefined
   }
   const edits = []
+  const declarations = new Map()
   for (const statement of source.statements) {
     if (!ts.isVariableStatement(statement)) continue
     for (const declaration of statement.declarationList.declarations) {
@@ -177,13 +178,28 @@ export function annotateInstallTypes(content, fileName) {
             .get(expression.expression.text)
             ?.get(expression.name.text) ?? expressionType(expression)
       if (type) {
-        edits.push({ position: declaration.name.end, type })
+        const exported = statement.modifiers?.some(
+          (modifier) => modifier.kind === ts.SyntaxKind.ExportKeyword,
+        )
+        if (exported) {
+          // A public type name keeps consumer declaration emit from expanding
+          // Vue's implementation constructors and losing their constraints.
+          const aliases = declarations.get(statement.getStart(source)) ?? []
+          aliases.push(`export type ${declaration.name.text} = ${type}\n`)
+          declarations.set(statement.getStart(source), aliases)
+          type = declaration.name.text
+        }
+        edits.push({ position: declaration.name.end, text: `: ${type}` })
         named.add(declaration.name.text)
       }
     }
   }
+  for (const [position, aliases] of declarations)
+    edits.push({ position, text: aliases.join('') })
   let result = content
-  for (const { position, type } of edits.reverse())
-    result = `${result.slice(0, position)}: ${type}${result.slice(position)}`
+  for (const { position, text } of edits.sort(
+    (a, b) => b.position - a.position,
+  ))
+    result = `${result.slice(0, position)}${text}${result.slice(position)}`
   return result
 }

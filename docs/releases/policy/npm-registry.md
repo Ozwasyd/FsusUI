@@ -126,8 +126,12 @@ required. Actual Vite production minification covers the cyclic refusal.
 
 Aggregate installed components name their extra public aliases through independent
 SFC/alias-factory type owners, preventing a value/property reference cycle during
-consumer declaration emission. Cold consumers emit and reconsume ordinary
-unannotated ES/CJS aliases using the complete original project configuration.
+consumer declaration emission. Their generated declarations also give each
+installed value a matching exported type name. This keeps downstream emission
+from expanding Vue implementation constructors, which can lose generic
+constraints and component type identity. Cold consumers emit and reconsume
+ordinary unannotated ES/CJS aliases using the complete original project
+configuration, checking identity, non-any types, props, slots and install methods.
 
 The pinned Vue macro resolver exposes its namespace before async imports finish.
 The producer completes Vue's shared type graph once, through the same locked

@@ -1388,7 +1388,12 @@ try {
           `import type { ${componentAliasNames.join(', ')} } from '${packageName}/${format}'`,
           'type Assert<T extends true> = T',
           'type Equal<A, B> = (<T>() => T extends A ? 1 : 2) extends (<T>() => T extends B ? 1 : 2) ? true : false',
+          'type IsAny<T> = 0 extends 1 & T ? true : false',
           `export type ReconsumedComponentAliases = [${componentAliasNames.map((name) => `Assert<Equal<typeof emitted.Alias${name}, typeof ${name}>>`).join(', ')}]`,
+          ...componentAliasNames.map(
+            (name) =>
+              `export type Reconsumed${name} = [Assert<Equal<IsAny<typeof emitted.Alias${name}>, false>>, Assert<Equal<InstanceType<typeof emitted.Alias${name}>['$props'], InstanceType<typeof ${name}>['$props']>>, Assert<Equal<InstanceType<typeof emitted.Alias${name}>['$slots'], InstanceType<typeof ${name}>['$slots']>>, Assert<Equal<typeof emitted.Alias${name}.install, typeof ${name}.install>>]`,
+          ),
           '',
         ].join('\n'),
       )
