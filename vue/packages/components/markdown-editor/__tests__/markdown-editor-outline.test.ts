@@ -84,6 +84,49 @@ describe('markdown editor leftover outline planner', () => {
 })
 
 describe('markdown outline projection model', () => {
+  it('preserves bare and spaced empty ATX headings with canonical ranges and diagnostics (#829)', () => {
+    const source = '#\n\n#  \n'
+    const first = createMarkdownOutlineModel(source, identity)
+    expect(first.items).toHaveLength(2)
+    expect(first.items.map(({ text, sourceRange, contentRange }) => ({
+      text, sourceRange, contentRange,
+    }))).toEqual([
+      { text: '', sourceRange: { start: 0, end: 2 }, contentRange: { start: 1, end: 1 } },
+      { text: '', sourceRange: { start: 3, end: 7 }, contentRange: { start: 6, end: 6 } },
+    ])
+    expect(new Set(first.items.map((item) => item.nodeId)).size).toBe(2)
+    for (const item of first.items) {
+      expect(item.diagnostics).toContainEqual({ code: 'empty-heading', nodeId: item.nodeId })
+      expect(first.projection.resolve(item.nodeId).status).toBe('current')
+    }
+
+    const prefix = 'intro\n\n'
+    const next = createMarkdownOutlineModel(prefix + source, identity, first.projection)
+    expect(next.items).toHaveLength(2)
+    expect(next.items.map((item) => item.nodeId)).toEqual(first.items.map((item) => item.nodeId))
+    expect(next.items.map((item) => item.sourceRange)).toEqual([
+      { start: 7, end: 9 }, { start: 10, end: 14 },
+    ])
+    expect(next.items.map((item) => item.contentRange)).toEqual([
+      { start: 8, end: 8 }, { start: 13, end: 13 },
+    ])
+    for (const item of next.items) {
+      expect(item.diagnostics).toContainEqual({ code: 'empty-heading', nodeId: item.nodeId })
+    }
+
+    const endOfFile = createMarkdownOutlineModel('#', identity)
+    expect(endOfFile.items).toHaveLength(1)
+    expect(endOfFile.items[0]).toMatchObject({
+      sourceRange: { start: 0, end: 1 }, contentRange: { start: 1, end: 1 }, text: '',
+    })
+    expect(createMarkdownOutlineModel('#not a heading\n\n#######\n', identity).items).toHaveLength(0)
+    const opaqueDocument = createMarkdownOutlineModel(source, { id: 'article-a:tab', epoch: 1 })
+    expect(opaqueDocument.items).toHaveLength(2)
+    expect(opaqueDocument.items.map((item) => item.contentRange)).toEqual(
+      first.items.map((item) => item.contentRange),
+    )
+  })
+
   it('uses stable projection identities instead of title or offset keys', () => {
     const document = { id: 'doc-a', epoch: 1 }
     const first = createMarkdownOutlineModel(
