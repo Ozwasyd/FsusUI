@@ -484,10 +484,11 @@ const contextOf = (declaration) => ({
 })
 
 const selectorCompounds = (selector) => {
-  const compounds = [[]]
+  const compounds = [{ nodes: [], combinator: null }]
   for (const node of selector.children ?? []) {
-    if (node.type === 'Combinator') compounds.push([])
-    else compounds.at(-1).push(node)
+    if (node.type === 'Combinator')
+      compounds.push({ nodes: [], combinator: node.name })
+    else compounds.at(-1).nodes.push(node)
   }
   return compounds
 }
@@ -513,11 +514,10 @@ const logicalPseudos = new Set(['is', 'where', 'not'])
 const focusStates = (declarations, target) => {
   const axes = new Set()
   const collect = (selector) => {
-    for (const node of selectorCompounds(selector).at(-1)) {
+    for (const node of selectorCompounds(selector).at(-1).nodes) {
       if (
         node.type === 'ClassSelector' &&
-        !target.facts.terminalClasses.has(node.name) &&
-        node.name !== 'dark'
+        !target.facts.terminalClasses.has(node.name)
       ) {
         axes.add(`class:${node.name}`)
       }
@@ -541,65 +541,118 @@ const focusStates = (declarations, target) => {
 }
 
 const matchesFocusState = (selector, target, state, context) => {
-  const match = (branch, targetCompound = true) => {
-    const compounds = selectorCompounds(branch)
-    return stateAnd(
-      compounds.map((nodes, index) => {
-        const terminal = targetCompound && index === compounds.length - 1
-        return stateAnd(
-          nodes.map((node) => {
-            if (node.type === 'UniversalSelector')
-              return node.name === '*' ? true : undefined
-            if (node.type === 'ClassSelector') {
-              if (node.name === 'dark') return context.theme === 'dark'
-              if (!terminal) return undefined
-              return (
-                target.facts.terminalClasses.has(node.name) ||
-                state[`class:${node.name}`]
-              )
-            }
-            if (node.type === 'AttributeSelector') {
-              if (node.name.name === 'data-density') {
-                if (!node.value || node.matcher !== '=') return undefined
-                return (
-                  node.value?.value === context.density ||
-                  node.value?.name === context.density
-                )
-              }
-              if (terminal && node.name.name === 'disabled') return false
-              return undefined
-            }
-            if (node.type === 'TypeSelector') {
-              return !terminal && ['html', 'body'].includes(node.name)
-                ? true
-                : undefined
-            }
-            if (node.type !== 'PseudoClassSelector') return undefined
-            if (logicalPseudos.has(node.name)) {
-              if (!node.children?.first?.children) return undefined
-              const result = stateOr(
-                [...node.children.first.children].map((branch) =>
-                  match(branch, terminal),
-                ),
-              )
-              return node.name === 'not' && result !== undefined
-                ? !result
-                : result
-            }
-            if (focusPseudos.has(node.name))
-              return terminal || node.name === 'focus-within'
-            if (node.name === 'root') return !terminal
-            if (terminal && node.name === 'disabled') return false
-            if (terminal && node.name === 'enabled') return true
-            if (terminal && interactionPseudos.has(node.name))
-              return state[`pseudo:${node.name}`]
-            return undefined
-          }),
-        )
-      }),
-    )
+  // No DOM topology is supplied to this evaluator. Root ancestry and focus
+  // containment are provable; a particular parent or sibling generally is not.
+  const relatives = (scope, combinator) => {
+    if (scope.root === true) return { candidates: [], guaranteed: false }
+    const ancestorRole = scope.role === 'unknown' ? 'unknown' : 'ancestor'
+    if (combinator === ' ' || combinator === '>') {
+      return {
+        candidates: [
+          {
+            scope: { role: ancestorRole, root: true },
+            exists: combinator === ' ' && scope.root === false,
+          },
+          { scope: { role: ancestorRole, root: false }, exists: false },
+        ],
+        guaranteed: scope.root === false,
+      }
+    }
+    if (combinator === '+' || combinator === '~') {
+      return {
+        candidates: [
+          { scope: { role: 'sibling', root: false }, exists: false },
+        ],
+        guaranteed: false,
+      }
+    }
+    return {
+      candidates: [
+        { scope: { role: 'unknown', root: undefined }, exists: false },
+      ],
+      guaranteed: false,
+    }
   }
-  return match(selector.ast)
+  const match = (branch, scope) => {
+    const compounds = selectorCompounds(branch)
+    const matchPart = (index, currentScope) => {
+      const { nodes, combinator } = compounds[index]
+      if (!nodes.length) return undefined
+      const terminal = currentScope.role === 'target'
+      const own = stateAnd(
+        nodes.map((node) => {
+          if (node.type === 'UniversalSelector')
+            return node.name === '*' ? true : undefined
+          if (node.type === 'ClassSelector') {
+            if (node.name === 'dark' && currentScope.root === true)
+              return context.theme === 'dark'
+            if (!terminal) return undefined
+            return (
+              target.facts.terminalClasses.has(node.name) ||
+              state[`class:${node.name}`]
+            )
+          }
+          if (node.type === 'AttributeSelector') {
+            if (node.name.name === 'data-density') {
+              if (!terminal) return undefined
+              if (!node.value || node.matcher !== '=') return undefined
+              return (
+                node.value?.value === context.density ||
+                node.value?.name === context.density
+              )
+            }
+            if (terminal && node.name.name === 'disabled') return false
+            return undefined
+          }
+          if (node.type === 'TypeSelector') {
+            if (node.name === 'html') return currentScope.root
+            if (currentScope.root === true) return false
+            return undefined
+          }
+          if (node.type !== 'PseudoClassSelector') return undefined
+          if (logicalPseudos.has(node.name)) {
+            if (!node.children?.first?.children) return undefined
+            const result = stateOr(
+              [...node.children.first.children].map((branch) =>
+                match(branch, currentScope),
+              ),
+            )
+            return node.name === 'not' && result !== undefined
+              ? !result
+              : result
+          }
+          if (focusPseudos.has(node.name)) {
+            if (currentScope.role === 'unknown') return undefined
+            return (
+              terminal ||
+              (node.name === 'focus-within' && currentScope.role === 'ancestor')
+            )
+          }
+          if (node.name === 'root') return currentScope.root
+          if (terminal && node.name === 'disabled') return false
+          if (terminal && node.name === 'enabled') return true
+          if (terminal && interactionPseudos.has(node.name))
+            return state[`pseudo:${node.name}`]
+          return undefined
+        }),
+      )
+      if (own === false || index === 0) return own
+      const { candidates, guaranteed } = relatives(currentScope, combinator)
+      const results = candidates.map(({ scope, exists }) => ({
+        result: matchPart(index - 1, scope),
+        exists,
+      }))
+      const left = results.every(({ result }) => result === false)
+        ? false
+        : results.some(({ result, exists }) => result === true && exists) ||
+            (guaranteed && results.every(({ result }) => result === true))
+          ? true
+          : undefined
+      return stateAnd([own, left])
+    }
+    return matchPart(compounds.length - 1, scope)
+  }
+  return match(selector.ast, { role: 'target', root: false })
 }
 
 const applies = (declaration, context) => {
