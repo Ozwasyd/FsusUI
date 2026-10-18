@@ -45,6 +45,8 @@ declare module '@vue/runtime-core' {
     FsusDiagnosticsList: (typeof import('element-plus'))['FsusDiagnosticsList']
     ElDialog: (typeof import('element-plus'))['ElDialog']
     ElDivider: (typeof import('element-plus'))['ElDivider']
+    ElResizeSeparator: (typeof import('element-plus'))['ElResizeSeparator']
+    FsusResizeSeparator: (typeof import('element-plus'))['FsusResizeSeparator']
     ElDrawer: (typeof import('element-plus'))['ElDrawer']
     ElDropdown: (typeof import('element-plus'))['ElDropdown']
     ElDropdownItem: (typeof import('element-plus'))['ElDropdownItem']

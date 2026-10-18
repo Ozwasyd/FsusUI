@@ -14,7 +14,7 @@
   "allowlist": [],
   "generated": {
     "producer": "scripts/check-component-surface-semantic-registry.mjs",
-    "sourceRevision": "2b32686f3ab8645cc5e578ad8218e37459da17a6",
+    "sourceRevision": "7e72bfcdd6a16e35af684503e7d72b73fa154082",
     "digestAlgorithm": "sha256"
   },
   "sourceDigests": {
@@ -34,7 +34,7 @@
       "path": "spec/components/contracts/v1/vue-public-contracts.json",
       "kind": "authority",
       "algorithm": "sha256",
-      "digest": "25c0ec51de05d6e66147ee2d2a17522b5fdd92f521fde6bbac1197f5b0825d41"
+      "digest": "0cd6d1b939a5d134dc38ceec82f373e040180a4095b741d63655942c5ee92124"
     },
     "component-motion": {
       "path": "docs/components/motion.md",
@@ -124,7 +124,7 @@
       "path": "vue/packages/theme-chalk/src/collection-primitives.scss",
       "kind": "implementation",
       "algorithm": "sha256",
-      "digest": "877ddedf369135c19440b50410861a70733e9edc966853afde9826c3a0e2c774"
+      "digest": "5c2f857779e5cc83331bcb254209c9dcfae6971e03a0f7b566571251c3dc070c"
     },
     "implementation-14": {
       "path": "vue/packages/theme-chalk/src/input-number.scss",

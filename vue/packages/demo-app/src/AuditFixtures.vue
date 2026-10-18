@@ -929,6 +929,10 @@
         <span>After</span>
       </AuditCard>
 
+      <AuditCard name="ElResizeSeparator" :state="auditState">
+        <ResizeSeparatorAuditFixture :boundary="boundary" />
+      </AuditCard>
+
       <AuditCard name="ElDrawer" :state="auditState">
         <el-button
           v-if="!drawerVisible"
@@ -2094,6 +2098,7 @@ import type {
   MarkdownEditorTransactionEvent,
 } from '../../element-plus'
 import AuditCard from './AuditCard.vue'
+import ResizeSeparatorAuditFixture from './ResizeSeparatorAuditFixture.vue'
 import {
   auditComponentNames,
   auditStateNames,
