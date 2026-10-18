@@ -23,8 +23,8 @@ public class FsusProductPrimitiveKeyboardHeadlessTests
       Assert.True(control.Focus(NavigationMethod.Tab));
       foreach (var (key, expected) in new[]
       {
-        (Key.Home, "a"), (Key.Down, "b"), (Key.Right, "c"),
-        (Key.Up, "b"), (Key.Left, "a"), (Key.End, "c"),
+        (Key.Down, "b"), (Key.Home, "a"), (Key.Down, "b"), (Key.Right, "c"),
+        (Key.Right, "c"), (Key.Up, "b"), (Key.Left, "a"), (Key.Left, "a"), (Key.End, "c"),
       })
       {
         Assert.True(Press(window, key));
@@ -166,19 +166,24 @@ public class FsusProductPrimitiveKeyboardHeadlessTests
     var control = Create(family);
     var first = Show(control);
     var second = Show(null);
+    var sentinel = new Control { Focusable = true };
     try
     {
       for (var pass = 0; pass < 3; pass++)
       {
         first.Content = control;
+        first.Activate();
         Assert.True(control.Focus());
         Assert.True(Press(first, Key.Home));
-        first.Content = null;
+        first.Content = sentinel;
         second.Content = control;
+        second.Activate();
         Assert.True(control.Focus());
         Assert.True(Press(second, Key.Down));
         AssertState(control, "b");
-        Press(first, Key.End);
+        first.Activate();
+        Assert.True(sentinel.Focus());
+        Assert.False(Press(first, Key.End));
         AssertState(control, "b");
         second.Content = null;
       }
@@ -187,6 +192,87 @@ public class FsusProductPrimitiveKeyboardHeadlessTests
     {
       first.Close();
       second.Close();
+    }
+  }
+
+  [AvaloniaTheory]
+  [InlineData("settings", false)]
+  [InlineData("diagnostics", false)]
+  [InlineData("conversations", false)]
+  [InlineData("settings", true)]
+  [InlineData("diagnostics", true)]
+  [InlineData("conversations", true)]
+  public void KernelFailuresStayWithTheNativeInputCaller(string family, bool cancellation)
+  {
+    Exception? failure = null;
+    Action fail = () =>
+    {
+      if (failure is not null)
+      {
+        throw failure;
+      }
+    };
+    FsusProductPrimitiveControl control = family switch
+    {
+      "settings" => new FaultingSettingsNav(fail),
+      "diagnostics" => new FaultingDiagnosticsList(fail),
+      _ => new FaultingConversationList(fail),
+    };
+    switch (control)
+    {
+      case FsusSettingsSectionNav settings: settings.Items.Add(new("a", "A")); break;
+      case FsusDiagnosticsList diagnostics: diagnostics.Items.Add(new("a", "A", FsusStatusTone.Neutral)); break;
+      case FsusConversationList conversations: conversations.Items.Add(new("a", "A", "First")); break;
+    }
+
+    var window = Show(control);
+    try
+    {
+      Assert.True(control.Focus());
+      failure = cancellation
+        ? new OperationCanceledException(new CancellationToken(canceled: true))
+        : new InvalidOperationException("Synthetic state synchronization failure");
+      // These kernels return completed ValueTasks. Their errors must not escape
+      // into an async-void callback or an unobserved fire-and-forget task.
+      Assert.Same(failure, Record.Exception(() =>
+        window.KeyPress(Key.Home, RawInputModifiers.None, PhysicalKey.Home, null)));
+      window.KeyRelease(Key.Home, RawInputModifiers.None, PhysicalKey.Home, null);
+      failure = null;
+      Dispatcher.UIThread.RunJobs();
+      Assert.True(Press(window, Key.Home));
+      AssertState(control, "a");
+    }
+    finally
+    {
+      failure = null;
+      window.Close();
+    }
+  }
+
+  private sealed class FaultingSettingsNav(Action fail) : FsusSettingsSectionNav
+  {
+    protected override void SyncState()
+    {
+      base.SyncState();
+      fail?.Invoke();
+    }
+  }
+
+  private sealed class FaultingDiagnosticsList(Action fail) : FsusDiagnosticsList
+  {
+    protected override void SyncState()
+    {
+      base.SyncState();
+      fail?.Invoke();
+    }
+  }
+
+  private sealed class FaultingConversationList(Action fail) : FsusConversationList
+  {
+    protected override void SyncState()
+    {
+      base.SyncState();
+      fail?.Invoke();
     }
   }
 
