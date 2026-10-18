@@ -6,7 +6,7 @@ import os from 'node:os'
 import path from 'node:path'
 import process from 'node:process'
 import { chromium } from '@playwright/test'
-import { collectDataPipelineProbes } from './render-performance-data-pipeline-probe.mjs'
+import { collectPerformanceProbes } from './render-performance-probes.mjs'
 
 const root = path.resolve(import.meta.dirname, '..')
 const argv = process.argv.slice(2)
@@ -195,6 +195,7 @@ try {
     executablePath: configuredBrowser || systemBrowser,
   })
   const results = []
+  const capturedCases = []
 
   for (const [scenario, size, refreshHz, dpr, motion] of matrix) {
     const context = await browser.newContext({
@@ -310,9 +311,11 @@ try {
         }
         window.__fsusFrameIntervals = []
         window.__fsusLongTasks = []
+        window.__fsusLastFrameTimestamp = null
         let previous = performance.now()
         let measurementWindowStartedAt = Number.POSITIVE_INFINITY
         const tick = (now) => {
+          window.__fsusLastFrameTimestamp = now
           window.__fsusFrameIntervals.push(now - previous)
           previous = now
           requestAnimationFrame(tick)
@@ -374,9 +377,7 @@ try {
     const inputToFrame = []
     const frameWork = []
     const heapSamples = []
-    const worker = []
-    const workerPoolBursts = []
-    const wasm = []
+    const measurementWindows = []
     const markdownPhases = []
     const domParseOperations = []
     for (let index = 0; index < samples; index++) {
@@ -389,12 +390,16 @@ try {
             throw new Error('DOM parser instrumentation is unavailable')
           }
           const started = performance.now()
+          const previousFrameTimestampMs = window.__fsusLastFrameTimestamp
           await window.__FSUSUI_PERFORMANCE_FIXTURE__.act(iteration)
           const actionCompleted = performance.now()
           const after = measureDomParses
             ? window.__fsusDomParseOperations.snapshot()
             : null
-          await new Promise((resolve) => requestAnimationFrame(() => resolve()))
+          const nextFrameTimestampMs = await new Promise((resolve) =>
+            requestAnimationFrame(resolve),
+          )
+          const nextFrameCallbackAtMs = performance.now()
           return {
             domParseOperations:
               before && after
@@ -409,45 +414,28 @@ try {
                   }
                 : null,
             frameWorkMs: actionCompleted - started,
-            inputToNextFrameMs: performance.now() - started,
+            inputToNextFrameMs: nextFrameCallbackAtMs - started,
+            measurementWindow: {
+              actionCompletedAtMs: actionCompleted,
+              inputStartedAtMs: started,
+              nextFrameCallbackAtMs,
+              nextFrameTimestampMs,
+              previousFrameTimestampMs,
+            },
           }
         },
         { iteration: index + warmups, measureDomParses },
       )
       frameWork.push(sample.frameWorkMs)
       inputToFrame.push(sample.inputToNextFrameMs)
+      measurementWindows.push(sample.measurementWindow)
       if (scenario === 'markdown-feature-activation') {
         if (!sample.domParseOperations) {
           throw new Error('DOM parser instrumentation is unavailable')
         }
         domParseOperations.push(sample.domParseOperations)
       }
-      worker.push(
-        await page.evaluate(
-          (iteration) =>
-            window.__FSUSUI_PERFORMANCE_FIXTURE__.workerProbe(iteration),
-          index,
-        ),
-      )
-      if (
-        (scenario.startsWith('markdown') &&
-          scenario !== 'markdown-feature-activation') ||
-        scenario === 'select-v2'
-      ) {
-        workerPoolBursts.push(
-          await page.evaluate(() =>
-            window.__FSUSUI_PERFORMANCE_FIXTURE__.workerPoolBurstProbe(),
-          ),
-        )
-      }
       if (scenario.startsWith('markdown')) {
-        if (scenario !== 'markdown-feature-activation') {
-          wasm.push(
-            await page.evaluate(() =>
-              window.__FSUSUI_PERFORMANCE_FIXTURE__.wasmProbe(),
-            ),
-          )
-        }
         markdownPhases.push(
           await page.evaluate(() =>
             window.__FSUSUI_PERFORMANCE_FIXTURE__.markdownPhaseProbe(),
@@ -514,20 +502,6 @@ try {
       { refreshHz },
     )
     await context.close()
-    const dataPipelineProbes =
-      scenario === 'data-pipeline-table'
-        ? await collectDataPipelineProbes({
-            browser,
-            contextOptions: {
-              deviceScaleFactor: dpr,
-              reducedMotion: motion === 'reduced' ? 'reduce' : 'no-preference',
-              viewport: { width: 1280, height: 800 },
-            },
-            url,
-            warmups,
-            samples,
-          })
-        : []
     const raw = {
       id: `${scenario}-${size}-${refreshHz}hz-dpr${dpr}-${motion}`,
       scenario,
@@ -538,14 +512,11 @@ try {
       navigationMs,
       inputToFrame,
       frameWork,
+      measurementWindows,
       frameIntervals: pageMetrics.frameIntervals,
       longTasks: pageMetrics.longTasks,
-      worker,
-      workerPoolBursts,
-      wasm,
       markdownPhases,
       domParseOperations,
-      dataPipeline: dataPipelineProbes,
       trace: {
         styleMs: sumTrace(
           traceEvents,
@@ -566,6 +537,51 @@ try {
       layerArea,
       droppedFrameRate: pageMetrics.droppedFrameRate,
     }
+    capturedCases.push({ raw, url })
+  }
+
+  for (const { raw, url } of capturedCases) {
+    const {
+      scenario,
+      size,
+      refreshHz,
+      dpr,
+      motion,
+      navigationMs,
+      inputToFrame,
+      frameWork,
+      heapSamples,
+      stableHeapBytes,
+      layerCount,
+      layerArea,
+      markdownPhases,
+      domParseOperations,
+    } = raw
+    const pageMetrics = raw
+    const metrics = raw.browserMetrics
+    const {
+      dataPipeline: dataPipelineProbes,
+      wasm,
+      worker,
+      workerPoolBursts,
+    } = await collectPerformanceProbes({
+      browser,
+      contextOptions: {
+        deviceScaleFactor: dpr,
+        reducedMotion: motion === 'reduced' ? 'reduce' : 'no-preference',
+        viewport: { width: 1280, height: 800 },
+      },
+      url,
+      scenario,
+      warmups,
+      samples,
+    })
+    Object.assign(raw, {
+      dataPipeline: dataPipelineProbes,
+      wasm,
+      worker,
+      workerPoolBursts,
+    })
     await writeFile(
       path.join(output, `${raw.id}.raw.json`),
       `${JSON.stringify(raw, null, 2)}\n`,
@@ -661,7 +677,7 @@ try {
     gitSha:
       process.env.GITHUB_SHA || process.env.GIT_COMMIT || 'local-worktree',
     profile,
-    dataPipelineObservation: 'isolated-context-after-measurement-v1',
+    dataPipelineObservation: 'all-active-probes-isolated-context-v2',
     environment: {
       os: `${os.platform()} ${os.release()} ${os.arch()}`,
       cpu: os.cpus()[0]?.model ?? 'unknown',

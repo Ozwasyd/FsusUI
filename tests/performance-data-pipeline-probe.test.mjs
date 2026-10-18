@@ -6,19 +6,161 @@ import path from 'node:path'
 import process from 'node:process'
 import { URL } from 'node:url'
 import { promisify } from 'node:util'
+import vm from 'node:vm'
 import test from 'node:test'
-import { collectDataPipelineProbes } from '../scripts/render-performance-data-pipeline-probe.mjs'
+import ts from 'typescript'
+import { collectPerformanceProbes } from '../scripts/render-performance-probes.mjs'
 import {
   createImpactPlan,
   loadOwnershipRegistry,
 } from '../scripts/render-performance-impact.mjs'
+
+test('raw window witnesses preserve the original action and single-RAF timing', async () => {
+  const source = await readFile(
+    new URL('../scripts/web-render-performance.mjs', import.meta.url),
+    'utf8',
+  )
+  const parsed = ts.createSourceFile(
+    'web-render-performance.mjs',
+    source,
+    ts.ScriptTarget.Latest,
+    true,
+    ts.ScriptKind.JS,
+  )
+  let callback
+  const visit = (node) => {
+    if (
+      ts.isCallExpression(node) &&
+      ts.isPropertyAccessExpression(node.expression) &&
+      node.expression.name.text === 'evaluate'
+    ) {
+      const first = node.arguments[0]
+      if (
+        first &&
+        ts.isArrowFunction(first) &&
+        first.getText(parsed).includes('inputToNextFrameMs:')
+      )
+        callback = first.getText(parsed)
+    }
+    ts.forEachChild(node, visit)
+  }
+  visit(parsed)
+  assert.ok(callback)
+  const times = [100, 106, 116]
+  const calls = []
+  const fixtureWindow = {
+    __fsusLastFrameTimestamp: 90,
+    __FSUSUI_PERFORMANCE_FIXTURE__: {
+      act: async (iteration) => calls.push(iteration),
+    },
+  }
+  let frames = 0
+  const measure = vm.runInNewContext(`(${callback})`, {
+    window: fixtureWindow,
+    performance: { now: () => times.shift() },
+    requestAnimationFrame: (resolve) => {
+      frames++
+      fixtureWindow.__fsusLastFrameTimestamp = 115
+      resolve(115)
+    },
+  })
+  const sample = await measure({ iteration: 7, measureDomParses: false })
+  assert.deepEqual(calls, [7])
+  assert.equal(frames, 1)
+  assert.equal(sample.frameWorkMs, 6)
+  assert.equal(sample.inputToNextFrameMs, 16)
+  assert.deepEqual(JSON.parse(JSON.stringify(sample.measurementWindow)), {
+    actionCompletedAtMs: 106,
+    inputStartedAtMs: 100,
+    nextFrameCallbackAtMs: 116,
+    nextFrameTimestampMs: 115,
+    previousFrameTimestampMs: 90,
+  })
+  assert.equal(times.length, 0)
+})
+
+test('replays every original active probe with unchanged counts and order', async () => {
+  for (const scenario of [
+    'virtual-list-fixed',
+    'select-v2',
+    'markdown-cold',
+    'markdown-feature-activation',
+    'data-pipeline-table',
+  ]) {
+    const calls = []
+    const fixture = Object.fromEntries(
+      [
+        'act',
+        'workerProbe',
+        'workerPoolBurstProbe',
+        'wasmProbe',
+        'dataPipelineProbe',
+      ].map((name) => [
+        name,
+        async (iteration) => {
+          calls.push([name, iteration])
+          return { name, iteration }
+        },
+      ]),
+    )
+    const browser = {
+      newContext: async () => ({
+        close: async () => {},
+        newPage: async () => ({
+          goto: async () => {},
+          locator: () => ({ waitFor: async () => {} }),
+          evaluate: (fn, arg) =>
+            vm.runInNewContext(`(${fn})`, {
+              window: { __FSUSUI_PERFORMANCE_FIXTURE__: fixture },
+              requestAnimationFrame: (resolve) => resolve(0),
+            })(arg),
+        }),
+      }),
+    }
+    const result = await collectPerformanceProbes({
+      browser,
+      url: 'http://fixture',
+      scenario,
+      warmups: 1,
+      samples: 21,
+    })
+    assert.equal(result.worker.length, 21)
+    const active = ['act', 'workerProbe']
+    if (
+      (scenario.startsWith('markdown') &&
+        scenario !== 'markdown-feature-activation') ||
+      scenario === 'select-v2'
+    )
+      active.push('workerPoolBurstProbe')
+    if (
+      scenario.startsWith('markdown') &&
+      scenario !== 'markdown-feature-activation'
+    )
+      active.push('wasmProbe')
+    if (scenario === 'data-pipeline-table') active.push('dataPipelineProbe')
+    assert.deepEqual(calls[0], ['act', 0])
+    for (let index = 0; index < 21; index++) {
+      const round = calls.slice(
+        1 + index * active.length,
+        1 + (index + 1) * active.length,
+      )
+      assert.deepEqual(
+        round.map((x) => x[0]),
+        active,
+      )
+      assert.equal(round[0][1], index + 1)
+      assert.equal(round[1][1], index)
+    }
+    assert.equal(calls.length, 1 + 21 * active.length)
+  }
+})
 
 test('comparison rejects mixed observation protocols and retains the original budget', async () => {
   const root = path.resolve(import.meta.dirname, '..')
   const temporary = await mkdtemp(
     path.join(os.tmpdir(), 'fsus-probe-contract-'),
   )
-  const protocol = 'isolated-context-after-measurement-v1'
+  const protocol = 'all-active-probes-isolated-context-v2'
   const plan = createImpactPlan({
     changedFiles: ['vue/packages/demo-app/src/PerformanceFixture.vue'],
     registry: await loadOwnershipRegistry(root),
@@ -64,6 +206,13 @@ test('comparison rejects mixed observation protocols and retains the original bu
     await compare()
     await write([undefined, protocol, undefined, protocol])
     await assert.rejects(compare(), /observation protocol differs/u)
+    await write([
+      'isolated-context-after-measurement-v1',
+      protocol,
+      'isolated-context-after-measurement-v1',
+      protocol,
+    ])
+    await assert.rejects(compare(), /observation protocol differs/u)
     await write([protocol, protocol, undefined, protocol])
     await assert.rejects(compare(), /observation protocol differs/u)
     await write([protocol, protocol, protocol, protocol], [100, 116, 100, 116])
@@ -94,9 +243,10 @@ test('closes the diagnostic context when its original action rejects', async () 
     }),
   }
   await assert.rejects(
-    collectDataPipelineProbes({
+    collectPerformanceProbes({
       browser,
       url: 'http://fixture',
+      scenario: 'data-pipeline-table',
       warmups: 1,
       samples: 21,
     }),
@@ -105,22 +255,101 @@ test('closes the diagnostic context when its original action rejects', async () 
   assert.equal(closed, true)
 })
 
-test('collects data-pipeline evidence after production metric capture and teardown', async () => {
+test('collects every active probe after production metric capture and teardown', async () => {
   const source = await readFile(
     new URL('../scripts/web-render-performance.mjs', import.meta.url),
     'utf8',
   )
   const capture = source.indexOf('const pageMetrics = await page.evaluate(')
   const teardown = source.indexOf('await context.close()', capture)
-  const diagnostic = source.indexOf('await collectDataPipelineProbes(')
+  const diagnostic = source.indexOf('await collectPerformanceProbes(')
+  const replay = source.indexOf('for (const { raw, url } of capturedCases)')
   assert.ok(capture > 0 && teardown > capture && diagnostic > teardown)
-  assert.equal(
-    source.includes('.__FSUSUI_PERFORMANCE_FIXTURE__.dataPipelineProbe()'),
-    false,
-  )
+  assert.ok(replay > teardown && diagnostic > replay)
+  for (const probe of [
+    'dataPipelineProbe',
+    'wasmProbe',
+    'workerPoolBurstProbe',
+    'workerProbe',
+  ]) {
+    assert.equal(
+      source.includes(`.__FSUSUI_PERFORMANCE_FIXTURE__.${probe}(`),
+      false,
+    )
+  }
 })
 
 const browserUrl = process.env.FSUSUI_DATA_PIPELINE_BROWSER_URL
+test(
+  'real fixed-list Worker evidence never calls the production fixture probes',
+  { skip: !browserUrl, timeout: 120_000 },
+  async () => {
+    const { chromium } = await import('@playwright/test')
+    const browser = await chromium.launch({ headless: true })
+    try {
+      const contextOptions = { viewport: { width: 1280, height: 800 } }
+      const context = await browser.newContext(contextOptions)
+      const page = await context.newPage()
+      const url = new URL(
+        '/?performance=virtual-list-fixed&size=100000&motion=enabled',
+        browserUrl,
+      ).href
+      await page.goto(url, { waitUntil: 'domcontentloaded' })
+      await page
+        .locator('[data-performance-ready="true"]')
+        .waitFor({ timeout: 120_000 })
+      const before = await page.evaluate(() => {
+        const fixture = window.__FSUSUI_PERFORMANCE_FIXTURE__
+        window.__performanceProbeCalls = []
+        for (const name of [
+          'workerProbe',
+          'workerPoolBurstProbe',
+          'wasmProbe',
+          'dataPipelineProbe',
+        ]) {
+          const original = fixture[name]
+          fixture[name] = (...args) => {
+            window.__performanceProbeCalls.push(name)
+            return original(...args)
+          }
+        }
+        return [...document.querySelectorAll('.performance-row')].map(
+          (row) => row.textContent,
+        )
+      })
+      const result = await collectPerformanceProbes({
+        browser,
+        contextOptions,
+        url,
+        scenario: 'virtual-list-fixed',
+        warmups: 1,
+        samples: 21,
+      })
+      assert.equal(result.worker.length, 21)
+      assert.equal(result.workerPoolBursts.length, 0)
+      assert.equal(result.wasm.length, 0)
+      assert.equal(result.dataPipeline.length, 0)
+      const after = await page.evaluate(() => ({
+        calls: window.__performanceProbeCalls,
+        rows: [...document.querySelectorAll('.performance-row')].map(
+          (row) => row.textContent,
+        ),
+      }))
+      assert.deepEqual(after.calls, [])
+      assert.deepEqual(after.rows, before)
+      await page.evaluate(() =>
+        window.__FSUSUI_PERFORMANCE_FIXTURE__.workerProbe(0),
+      )
+      assert.deepEqual(
+        await page.evaluate(() => window.__performanceProbeCalls),
+        ['workerProbe'],
+      )
+      await context.close()
+    } finally {
+      await browser.close()
+    }
+  },
+)
 test(
   'real fixture evidence cannot train a subsequent production auto sort',
   { skip: !browserUrl, timeout: 120_000 },
@@ -179,14 +408,17 @@ test(
         }
       }, strategyUrl)
       assert.equal(before.choice, 'worker-wasm')
-      const evidence = await collectDataPipelineProbes({
+      const probes = await collectPerformanceProbes({
         browser,
         contextOptions,
         url,
+        scenario: 'data-pipeline-table',
         warmups: 1,
         samples: 21,
       })
+      const evidence = probes.dataPipeline
       assert.equal(evidence.length, 21)
+      assert.equal(probes.worker.length, 21)
       for (const sample of evidence) {
         assert.deepEqual(Object.keys(sample).sort(), [
           'legacyBlockMs',
