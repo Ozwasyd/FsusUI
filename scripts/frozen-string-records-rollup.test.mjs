@@ -15,6 +15,7 @@ import test from 'node:test'
 import { rollup } from 'rollup'
 import { build as buildVite } from 'vite'
 import vue from '@vitejs/plugin-vue'
+import esbuild from 'rollup-plugin-esbuild'
 import { createSSRApp } from 'vue'
 import { renderToString } from 'vue/server-renderer'
 import pluginModule from '../vue/internal/build/src/plugins/frozen-string-records.ts'
@@ -53,6 +54,7 @@ const fixture = async (
       treeshake: false,
       plugins: [
         sfc && vue({ isProduction: false }),
+        sfc && esbuild({ target: 'es2022', loaders: { '.vue': 'ts' } }),
         optimized && FrozenStringRecords(),
       ],
     })
@@ -105,7 +107,7 @@ const fixture = async (
 
 const frozen = `export const classes = Object.freeze({root: 'record-root', body: 'record-body'})`
 
-test('folds actual immutable exports and Vue unref reads, retaining public records and maps', async (t) => {
+test('keeps ordinary public readers, frozen records, licenses and maps unchanged', async (t) => {
   const entry = `/*! retained consumer license */
 import { classes as surface } from './record.js'
 import { unref as unwrap } from 'vue'
@@ -130,12 +132,12 @@ export const sameRecord = surface
     Object.prototype,
   )
   assert.match(optimized.code, /retained consumer license/u)
-  assert.doesNotMatch(optimized.code, /surface\.root|unwrap\(surface\)/u)
-  assert.match(optimized.code, /classes,\s*"record-root"/u)
+  assert.equal(optimized.code, original.code)
   const chunk = optimized.chunks.find(
     (chunk) => chunk.type === 'chunk' && chunk.fileName === 'entry.mjs',
   )
-  const offset = chunk.code.indexOf('"record-root"')
+  const offset = chunk.code.indexOf('classes.root')
+  assert.ok(offset >= 0)
   const preceding = chunk.code.slice(0, offset).split('\n')
   const mapped = new SourceMap(chunk.map).findEntry(
     preceding.length - 1,
@@ -146,13 +148,14 @@ export const sameRecord = surface
 })
 
 test('uses the real SFC compiler and preserves rendered markup, component metadata and props', async (t) => {
-  const sfc = `<script setup>
+  const sfc = `<script setup lang="ts">
 import { classes } from './record.js'
 defineOptions({ name: 'FrozenRecordProbe' })
 defineProps({ text: { type: String, required: true } })
 </script>
 <template><article :class="classes.root"><span :class="classes.body">{{ text }}</span></article></template>`
-  const [original, optimized] = await fixture(t, frozen, sfc, { sfc: true })
+  const aliased = `const data = Object.freeze({root:'record-root',body:'record-body'}); export {data as classes}`
+  const [original, optimized] = await fixture(t, aliased, sfc, { sfc: true })
   const first = original.namespace.default
   const second = optimized.namespace.default
   assert.equal(
@@ -168,6 +171,7 @@ defineProps({ text: { type: String, required: true } })
     .map((chunk) => chunk.code)
     .join('\n')
   assert.match(compiled, /"record-root"/u)
+  assert.match(compiled, /\([\w$]+,\s*"record-root"\)/u)
   assert.doesNotMatch(compiled, /unref\(classes\)\.root/u)
 })
 
@@ -263,7 +267,7 @@ test('resolves actual named export aliases without confusing shadowed imports', 
     optimized.namespace.nested({ root: 'nested-root' }),
     'nested-root',
   )
-  assert.doesNotMatch(optimized.code, /value = data\.root/u)
+  assert.equal(optimized.code, original.code)
   assert.match(optimized.code, /local\.root/u)
 })
 
@@ -364,5 +368,47 @@ test('preserves initialization through consumer and re-export ancestor cycles af
     }
     assert.equal(minifiedFailures[0], minifiedFailures[1])
     if (!indirect) assert.deepEqual(minifiedFailures, [true, true])
+  }
+})
+
+test('retains initialization errors when a consuming application adds its own cycle', async (t) => {
+  for (const kind of ['plain', 'const', 'var']) {
+    const component = kind !== 'plain'
+    const entry = component
+      ? `import {classes} from './record.js'; import {defineComponent} from 'vue'; ${kind} owner=/* @__PURE__ */defineComponent({setup(){return {value:classes.root}}}); export function read(){return owner.setup().value}`
+      : `import {classes} from './record.js'; export function read(){return classes.root}`
+    const outputs = await fixture(t, frozen, entry)
+    if (component) assert.match(outputs[1].code, /\([\w$]+,\s*"record-root"\)/u)
+    else assert.equal(outputs[1].code, outputs[0].code)
+    for (const output of outputs) {
+      await writeFile(
+        path.join(output.directory, 'app.mjs'),
+        `import './app-dependency.mjs'; import {read} from './entry.mjs'; export function consumerRead(){return read()}`,
+      )
+      await writeFile(
+        path.join(output.directory, 'app-dependency.mjs'),
+        `import {consumerRead} from './app.mjs'; consumerRead()`,
+      )
+      const directory = path.join(output.directory, 'app-minified')
+      await buildVite({
+        configFile: false,
+        root: output.directory,
+        logLevel: 'error',
+        build: {
+          target: 'es2022',
+          minify: 'esbuild',
+          lib: {
+            entry: path.join(output.directory, 'app.mjs'),
+            formats: ['es'],
+            fileName: () => 'app.mjs',
+          },
+          outDir: directory,
+        },
+      })
+      await assert.rejects(
+        import(pathToFileURL(path.join(directory, 'app.mjs'))),
+        kind === 'var' ? TypeError : ReferenceError,
+      )
+    }
   }
 })

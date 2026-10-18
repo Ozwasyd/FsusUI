@@ -110,11 +110,15 @@ releasing each process's compiler state before the next variant begins. A failed
 variant stops the package build.
 
 The preserved ES module producer may fold reads of own string data fields from
-literal frozen exported records only in leaf modules without static or dynamic
+literal frozen exported records only inside real Vue defineComponent setup
+closures in leaf modules without static or dynamic
 dependencies and with acyclic static consumer/importer ancestry, after a prefix of primitive constant declarations or inert function
 and export declarations. Direct cycles, consumer/re-export ancestor cycles and preceding observable evaluation are refused;
 a comma read alone cannot preserve initialization errors through downstream
-minification. Public records, descriptors, component metadata, maps and original
+minification. Ordinary exported readers remain unchanged because consuming apps
+can introduce cycles outside the library graph. Setup reads remain behind the
+real Vue component construction boundary; real application-cycle controls cover
+both the refused reader and eligible component paths. Public records, descriptors, component metadata, maps and original
 build options remain intact. Mutable records, accessors, spreads, reference
 markers, custom prototypes, shadowed bindings, eval and write targets remain
 untouched. Standard native Object.freeze and Vue unref implementations are

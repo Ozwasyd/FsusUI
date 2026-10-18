@@ -168,6 +168,62 @@ export const frozenStringReads = () => {
       proven.set(id, safe)
       return safe
     }
+    // Future applications can add cycles outside this library's graph. Only
+    // component setup closures behind the real Vue constructor are eligible;
+    // ordinary public readers must retain their original property access.
+    const protectedSetup = (node: GeneratedNode) => {
+      for (
+        let parent = analysis.parents.get(node);
+        parent;
+        parent = analysis.parents.get(parent.node)
+      ) {
+        const property = parent.node
+        if (
+          property.type !== 'Property' ||
+          property.computed ||
+          property.kind !== 'init' ||
+          nameOf(property.key) !== 'setup' ||
+          (property.value.type !== 'FunctionExpression' &&
+            property.value.type !== 'ArrowFunctionExpression')
+        )
+          continue
+        const object = analysis.parents.get(property)?.node
+        const call = object && analysis.parents.get(object)?.node
+        if (
+          object?.type !== 'ObjectExpression' ||
+          call?.type !== 'CallExpression' ||
+          call.optional ||
+          call.arguments.length !== 1 ||
+          call.arguments[0] !== object ||
+          call.callee.type !== 'Identifier'
+        )
+          continue
+        const helper = analysis.references.get(call.callee)?.resolved?.defs[0]
+        if (
+          helper?.type !== 'ImportBinding' ||
+          helper.node.type !== 'ImportSpecifier' ||
+          nameOf(helper.node.imported) !== 'defineComponent' ||
+          helper.parent?.type !== 'ImportDeclaration' ||
+          helper.parent.source.value !== 'vue'
+        )
+          continue
+        const variable = analysis.parents.get(call)?.node
+        const declaration = variable && analysis.parents.get(variable)?.node
+        const container = declaration && analysis.parents.get(declaration)?.node
+        if (
+          variable?.type !== 'VariableDeclarator' ||
+          variable.init !== call ||
+          variable.id.type !== 'Identifier' ||
+          declaration?.type !== 'VariableDeclaration' ||
+          !['const', 'var'].includes(declaration.kind)
+        )
+          continue
+        const statement =
+          container?.type === 'ExportNamedDeclaration' ? container : declaration
+        if (analysis.program.body.includes(statement)) return true
+      }
+      return false
+    }
     const consumer =
       chunk.facadeModuleId ??
       (chunk.moduleIds.length === 1 ? chunk.moduleIds[0] : undefined)
@@ -256,7 +312,12 @@ export const frozenStringReads = () => {
       const id = owner?.facadeModuleId
       if (!owner?.isEntry || !id || !owner.exports.includes(exported)) continue
       const value = exportsOf(context, id).get(exported)?.get(key)
-      if (value === undefined || !consumer || !initializedBeforeUse(consumer))
+      if (
+        value === undefined ||
+        !consumer ||
+        !initializedBeforeUse(consumer) ||
+        !protectedSetup(node)
+      )
         continue
       output.overwrite(
         node.range![0],

@@ -8,6 +8,7 @@ import test from 'node:test'
 import { rollup } from 'rollup'
 import { minify } from 'rollup-plugin-esbuild'
 import { readonly, shallowRef } from 'vue'
+import { MagicString } from 'vue/compiler-sfc'
 import canonicalModule from '../vue/internal/build/src/plugins/canonical-imports.ts'
 
 const { CanonicalExternalImports } = canonicalModule
@@ -23,6 +24,33 @@ const compile = async (bindings, canonical, format = 'es', comment = '') => {
         load: (id) => (id === 'entry' ? source : undefined),
       },
       minify({ target: 'es2022', sourceMap: true }),
+      {
+        // Replay the two valid external-binding permutations observed in real
+        // full builds, independently of the minifier's order on this run.
+        name: 'observed-external-binding-order-fixture',
+        renderChunk(code, chunk, options) {
+          if (options.format !== 'es') return null
+          const statement = this.parse(code).body.find(
+            (node) => node.type === 'ImportDeclaration',
+          )
+          const nodes = statement.specifiers
+          const order = bindings.split(',')
+          const arranged = [...nodes].sort(
+            (a, b) =>
+              order.indexOf(a.imported.name) - order.indexOf(b.imported.name),
+          )
+          const output = new MagicString(code)
+          output.overwrite(
+            nodes[0].start,
+            nodes.at(-1).end,
+            arranged.map((node) => code.slice(node.start, node.end)).join(','),
+          )
+          return {
+            code: output.toString(),
+            map: output.generateMap({ hires: true, includeContent: true }),
+          }
+        },
+      },
       canonical && CanonicalExternalImports(),
     ],
   })
@@ -39,7 +67,7 @@ test('canonicalizes actual minified external binding order without changing bind
   const first = 'readonly,shallowRef'
   const second = 'shallowRef,readonly'
   const red = await Promise.all([compile(first, false), compile(second, false)])
-  assert.match(red[0].code, /import\{shallowRef.+readonly/u)
+  assert.notEqual(red[0].code, red[1].code)
   const green = await Promise.all([compile(first, true), compile(second, true)])
   assert.equal(green[0].code, green[1].code)
   assert.match(green[0].code, /import\{readonly.+shallowRef/u)
