@@ -50,6 +50,11 @@ createApp(
             )
               controller.abort()
             if (
+              action === 'blur' &&
+              document.activeElement?.tagName === 'TEXTAREA'
+            )
+              document.getElementById('outside')!.focus()
+            if (
               action === 'focus-return' &&
               document.activeElement?.tagName === 'TEXTAREA'
             ) {
@@ -89,8 +94,6 @@ createApp(
             history: 'separate',
             origin: 'programmatic',
           })
-        if (action === 'blur')
-          setTimeout(() => document.getElementById('outside')!.focus(), 0)
         if (action === 'timeout') {
           const overlay = document.createElement('div')
           overlay.id = 'occlusion'
