@@ -48,7 +48,7 @@ export interface MarkdownEditorOutlineInput {
 
 const headingTitleOf = (source: string, range: MarkdownEditorOutlineRange) => {
   const slice = source.slice(range.start, range.end)
-  const atx = /^(#{1,6})\s*(.*)$/u.exec(slice.trimEnd())
+  const atx = /^(#{1,6})\s*(.*)$/u.exec(slice.trim())
   if (atx) {
     return { level: atx[1]!.length, text: atx[2]!.trim() }
   }
