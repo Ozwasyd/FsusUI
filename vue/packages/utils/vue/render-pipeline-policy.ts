@@ -99,6 +99,57 @@ const policySubscriptions = new Set<{
   listener: () => void
 }>()
 
+const nativePromiseThen = Promise.prototype.then
+const discardContinuation = () => {}
+
+const observeSubscriptionContinuation = (
+  value: unknown,
+  seen = new WeakSet<object>(),
+): void => {
+  if (
+    value === null ||
+    (typeof value !== 'object' && typeof value !== 'function') ||
+    seen.has(value)
+  ) {
+    return
+  }
+  seen.add(value)
+  try {
+    try {
+      // Observe the native rejection without reading its exposed then/catch.
+      Reflect.apply(nativePromiseThen, value, [
+        discardContinuation,
+        discardContinuation,
+      ])
+      return
+    } catch {
+      // Non-native thenables need their own captured method instead.
+    }
+    const then = (value as { then?: unknown }).then
+    if (typeof then !== 'function') return
+    queueMicrotask(() => {
+      let settled = false
+      try {
+        const continuation = Reflect.apply(then, value, [
+          (resolved: unknown) => {
+            if (settled) return
+            settled = true
+            observeSubscriptionContinuation(resolved, seen)
+          },
+          () => {
+            settled = true
+          },
+        ])
+        observeSubscriptionContinuation(continuation, seen)
+      } catch {
+        // Observation callbacks must not introduce another rejected chain.
+      }
+    })
+  } catch {
+    // A hostile continuation getter does not repair the already broken feed.
+  }
+}
+
 const changeComponentPolicies = <T>(phase: string, action: () => T): T => {
   policyChangeDepth += 1
   policyTicket = null
@@ -125,15 +176,13 @@ const changeComponentPolicies = <T>(phase: string, action: () => T): T => {
                 }),
               )
               // Read then once and discard settlements without trusting .call.
-              // Also observe a rejecting return from an async then callback.
+              // Also observe work returned by an untrusted then callback.
               const discard = () => {}
               const continuation = Reflect.apply(then, result, [
                 discard,
                 discard,
               ])
-              void new Promise<unknown>((resolve) => {
-                resolve(continuation)
-              }).catch(discard)
+              observeSubscriptionContinuation(continuation)
             }
           }
         } catch (cause) {

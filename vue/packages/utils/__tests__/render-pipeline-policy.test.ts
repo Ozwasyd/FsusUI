@@ -285,6 +285,7 @@ it.each([
   'a throwing then getter',
   'a then getter that must only be read once',
   'a then callback that rejects then throws',
+  'a then callback that settles repeatedly then throws',
   'an async then callback that throws',
   'a then callback returning a promise with a hostile catch',
   'a then callback returning a throwing then getter',
@@ -353,6 +354,12 @@ it.each([
         case 'a then callback that rejects then throws':
           result = { then(resolve, reject) { reject(cause); throw callbackCause } }
           break
+        case 'a then callback that settles repeatedly then throws':
+          result = { then(resolve, reject) {
+            resolve(); reject(cause); resolve(); reject(cause)
+            throw callbackCause
+          } }
+          break
         case 'an async then callback that throws':
           result = { async then() { await new Promise(setImmediate); throw callbackCause } }
           break
@@ -397,7 +404,7 @@ it.each([
     assert.equal(typeof failures[0].subscriptionId, 'symbol')
     assert.ok(Object.isFrozen(failures))
     assert.ok(failures.every(Object.isFrozen))
-    if (mode === 'a then callback that rejects then throws') {
+    if (mode === 'a then callback that rejects then throws' || mode === 'a then callback that settles repeatedly then throws') {
       assert.equal(failures.length, 2)
       assert.equal(failures[1].cause, callbackCause)
       assert.equal(failures[1].phase, 'subscription')
@@ -434,6 +441,132 @@ it.each([
     listenerEvents: 0,
     broken: true,
   })
+})
+
+it.each([
+  'native-throwing-then',
+  'native-hostile-then-call',
+  'cross-realm-native',
+  'nested-thenable-return',
+  'nested-thenable-fulfillment',
+  'repeated-continuation-callbacks',
+])('observes %s with no global rejection handler', (mode) => {
+  const moduleUrl = pathToFileURL(
+    resolve('vue/packages/utils/vue/render-pipeline-policy.ts'),
+  ).href
+  // A genuinely orphaned rejection must terminate this same child setup.
+  const orphan = execFileSync.bind(
+    null,
+    process.execPath,
+    [
+      '--import',
+      'tsx',
+      '--input-type=module',
+      '-e',
+      `import assert from 'node:assert/strict';
+     assert.equal(process.listenerCount('unhandledRejection'), 0);
+     Promise.reject(new Error('orphan-control'));
+     await new Promise(setImmediate);`,
+    ],
+    { encoding: 'utf8', cwd: process.cwd(), stdio: 'pipe' },
+  )
+  expect(orphan).toThrow('orphan-control')
+
+  const script = `
+    import assert from 'node:assert/strict'
+    import vm from 'node:vm'
+    const loaded = await import(${JSON.stringify(moduleUrl)})
+    const registry = loaded.default ?? loaded
+    const authority = registry.getFsusRenderPipelineComponentPolicyAuthority()
+    const mode = ${JSON.stringify(mode)}
+    assert.equal(process.listenerCount('unhandledRejection'), 0)
+    const originalThen = Promise.prototype.then
+    const originalCatch = Promise.prototype.catch
+    const cause = new Error('native-continuation-rejected')
+    let getterReads = 0
+    let ignoredReads = 0
+    let calls = 0
+    let active = false
+    const poisoned = () => {
+      const promise = mode === 'cross-realm-native'
+        ? vm.runInNewContext('Promise.reject(new Error("native-continuation-rejected"))')
+        : Promise.reject(cause)
+      Object.defineProperty(promise, 'then', mode === 'native-hostile-then-call'
+        ? { value() { throw new Error('exposed then must not be called') } }
+        : { get() { getterReads++; throw new Error('continuation-then-getter') } })
+      Object.defineProperty(promise, 'catch', { get() { throw new Error('exposed catch must not be read') } })
+      return promise
+    }
+    const result = { then() {
+      assert.equal(registry.hasFsusRenderPipelineComponentPolicy('ElButton'), false)
+      if (mode === 'nested-thenable-return') {
+        const nested = { get then() {
+          getterReads++
+          return () => { calls++; return poisoned() }
+        } }
+        return { get then() {
+          assert.equal(registry.hasFsusRenderPipelineComponentPolicy('ElButton'), false)
+          return () => {
+            assert.equal(registry.hasFsusRenderPipelineComponentPolicy('ElButton'), true)
+            return nested
+          }
+        } }
+      }
+      if (mode === 'nested-thenable-fulfillment') {
+        return { then(resolve) { resolve(poisoned()) } }
+      }
+      if (mode === 'repeated-continuation-callbacks') {
+        const ignored = { get then() { ignoredReads++; throw new Error('second settlement must be ignored') } }
+        const cycle = { then(resolve, reject) {
+          calls++
+          resolve(Promise.resolve())
+          resolve(ignored)
+          reject(cause)
+          return cycle
+        } }
+        return cycle
+      }
+      return poisoned()
+    } }
+    const releaseListener = authority.subscribe(() => active ? result : undefined)
+    let laterCalls = 0
+    const releaseLater = authority.subscribe(() => { if (active) laterCalls++ })
+    const ticket = authority.issueTicket()
+    assert.ok(ticket)
+    active = true
+    const releasePolicy = registry.registerFsusRenderPipelineComponentPolicyByName('ElButton')
+    assert.equal(laterCalls, 1)
+    assert.equal(registry.hasFsusRenderPipelineComponentPolicy('ElButton'), true)
+    assert.equal(authority.isCurrent(ticket), false)
+    assert.equal(authority.issueTicket(), null)
+    for (let turn = 0; turn < 4; turn++) await new Promise(setImmediate)
+    assert.equal(getterReads, mode === 'nested-thenable-return' ? 1 : 0)
+    assert.equal(ignoredReads, 0)
+    if (mode === 'nested-thenable-return' || mode === 'repeated-continuation-callbacks') assert.equal(calls, 1)
+    const failures = authority.getFailures()
+    assert.equal(failures.length, 1)
+    assert.equal(failures[0].cause, result)
+    assert.equal(failures[0].phase, 'asynchronous-subscription')
+    assert.equal(typeof failures[0].subscriptionId, 'symbol')
+    active = false
+    releaseListener(); releaseLater(); releasePolicy()
+    registry.clearFsusRenderPipelineComponentPolicies()
+    registry.registerFsusRenderPipelineComponentPolicyByName('ElMessage')
+    for (let turn = 0; turn < 4; turn++) await new Promise(setImmediate)
+    assert.equal(authority.issueTicket(), null)
+    assert.equal(authority.isCurrent(ticket), false)
+    assert.deepEqual(authority.getFailures(), failures)
+    assert.equal(Promise.prototype.then, originalThen)
+    assert.equal(Promise.prototype.catch, originalCatch)
+    assert.equal(process.listenerCount('unhandledRejection'), 0)
+    console.log(JSON.stringify({ handlers: 0, broken: true }))
+  `
+  const output = execFileSync(
+    process.execPath,
+    ['--import', 'tsx', '--input-type=module', '-e', script],
+    { encoding: 'utf8', cwd: process.cwd(), stdio: 'pipe' },
+  )
+  expect(JSON.parse(output)).toEqual({ handlers: 0, broken: true })
 })
 
 it('releases retired and discarded registration history under real garbage collection', () => {
