@@ -431,15 +431,17 @@ function handleActions(action: ImageViewerAction, options = {}) {
   switch (action) {
     case 'zoomOut':
       if (transform.value.scale > minScale) {
-        transform.value.scale = Number.parseFloat(
-          (transform.value.scale / zoomRate).toFixed(3),
+        transform.value.scale = Math.max(
+          minScale,
+          Number.parseFloat((transform.value.scale / zoomRate).toFixed(3)),
         )
       }
       break
     case 'zoomIn':
       if (transform.value.scale < maxScale) {
-        transform.value.scale = Number.parseFloat(
-          (transform.value.scale * zoomRate).toFixed(3),
+        transform.value.scale = Math.min(
+          maxScale,
+          Number.parseFloat((transform.value.scale * zoomRate).toFixed(3)),
         )
       }
       break
