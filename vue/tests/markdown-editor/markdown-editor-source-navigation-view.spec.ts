@@ -1,8 +1,9 @@
 import { resolve } from 'node:path'
 import { expect, test } from '@playwright/test'
+import type { Page } from '@playwright/test'
 
 const fixture = `/@fs${resolve('vue/tests/markdown-editor/source-navigation-view.fixture.html')}`
-const ready = async (page: import('@playwright/test').Page, query = '') => {
+const ready = async (page: Page, query = '') => {
   await page.goto(`${fixture}${query}`)
   await page.evaluate(() => document.fonts.ready)
   await page.waitForFunction(() => !!window.sourceViewFixture)

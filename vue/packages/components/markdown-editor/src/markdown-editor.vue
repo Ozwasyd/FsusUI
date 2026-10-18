@@ -7843,12 +7843,12 @@ nativeSurfaceResources.ownWatch(watch([
   editorRevision, editorValue, editorSelection, currentMode, isComposing, sessionSurfacePaused,
   textareaRef, rootElementRef, () => props.disabled, () => props.loading,
   () => props.documentIdentity?.id, () => props.documentIdentity?.epoch,
-] , () => sourceNavigationViewOwner?.mount(), { flush: 'post' }))
+], () => nativeSurfaceResources.runWatchCallback(() => sourceNavigationViewOwner?.mount()), { flush: 'post' }))
 nativeSurfaceResources.ownWatch(watch([
   editorRevision, editorValue, editorSelection, currentMode, isComposing, sessionSurfacePaused,
   textareaRef, rootElementRef, () => props.disabled, () => props.loading,
   () => props.documentIdentity?.id, () => props.documentIdentity?.epoch,
-], () => sourceNavigationViewOwner?.invalidate(), { flush: 'sync' }))
+], () => nativeSurfaceResources.runWatchCallback(() => sourceNavigationViewOwner?.invalidate()), { flush: 'sync' }))
 const readSourceNavigationView = sourceNavigationViewOwner.read
 const isCurrentSourceNavigationView = sourceNavigationViewOwner.current
 let pendingPublicReveal: { observers: number; selection: MarkdownEditorResolvedSelection; cancel: (reason: MarkdownEditorRevealFailureReason) => void } | null = null

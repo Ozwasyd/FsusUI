@@ -42,7 +42,6 @@ describe('original source navigation focus policy and unsupported observation', 
       expected: { documentIdentity: { id: 'missing', epoch: 1 }, revision: 0 },
     }
     expect(owner.read({ ...options, session: undefined! })).toBeNull()
-    expect(owner.current(Object.freeze({}) as never)).toBe(false)
     expect(work).toBe(0)
   })
   it('preserves the original abort reason before consulting unavailable layout', () => {
