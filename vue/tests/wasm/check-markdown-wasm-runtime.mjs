@@ -549,7 +549,10 @@ async function renderNestedListWithKind(kind) {
     }
   }
   for (const prefix of ['', '> ', '> > ']) {
-    for (const indent of ['    ', '     ', '\t', ' \t', '   \t']) {
+    const codeIndents = prefix === '> '
+      ? ['    ', '     ', '\t\t', '   \t']
+      : ['    ', '     ', '\t', ' \t', '   \t']
+    for (const indent of codeIndents) {
       for (const heading of ['#', '######', '#  ', '## title']) {
         const source = `${prefix}${indent}${heading}\n`
         const html = renderSource(source)
@@ -568,6 +571,33 @@ async function renderNestedListWithKind(kind) {
     renderSource('>    #\n').includes('<blockquote><h1></h1></blockquote>'),
     `[markdown-wasm-runtime] blockquote-relative three-space ATX rejected: ${kind}`,
   )
+  for (const source of ['>\t#\n', '> \t#\n', '>  \t#\n']) {
+    assert(renderSource(source).includes('<blockquote><h1></h1></blockquote>'),
+      `[markdown-wasm-runtime] quote tab delimiter changed ${JSON.stringify(source)}: ${kind}`)
+  }
+  assert(
+    renderSource('>\tTitle\n>\t=====\n').includes('<blockquote><h1>Title</h1></blockquote>'),
+    `[markdown-wasm-runtime] quote tab setext changed: ${kind}`,
+  )
+  assert(
+    renderSource('> >\t## title\n').includes('<blockquote><blockquote><h2>title</h2></blockquote></blockquote>'),
+    `[markdown-wasm-runtime] nested quote tab heading changed: ${kind}`,
+  )
+  const nestedTabCode = renderSource('> > \t#\n')
+  assert(nestedTabCode.startsWith('<blockquote><blockquote><pre') && !/<h[1-6]>/.test(nestedTabCode),
+    `[markdown-wasm-runtime] nested quote tab column origin lost: ${kind}`)
+  for (const payload of ['>\ttext', '> >\ttext', '\ttext']) {
+    const html = renderSource(`> \`\`\`\n> ${payload}\n> \`\`\`\n`)
+    const escapedPayload = payload.replaceAll('>', '&gt;')
+    assert(html.includes(`<code>${escapedPayload}\n</code>`),
+      `[markdown-wasm-runtime] quoted fenced payload bytes changed ${JSON.stringify(payload)}: ${kind}: ${html}`)
+  }
+  const varyingColumns = renderSource('> #\n  > \t#\n')
+  assert((varyingColumns.match(/<h1>/g) ?? []).length === 1 && varyingColumns.includes('<pre'),
+    `[markdown-wasm-runtime] per-line quote origins lost: ${kind}`)
+  const filteredColumns = renderSource('> [ref]: https://example.test\n> > \t#\n')
+  assert(filteredColumns.includes('<pre') && !/<h[1-6]>/.test(filteredColumns),
+    `[markdown-wasm-runtime] reference filtering shifted quote origins: ${kind}`)
   const setext = renderSource('Title\n=====\n\nSubtitle\n-----\n')
   assert(setext.includes('<h1>Title</h1>') && setext.includes('<h2>Subtitle</h2>'),
     `[markdown-wasm-runtime] setext boundary changed: ${kind}`)

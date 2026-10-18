@@ -37,7 +37,8 @@ std::string render_blockquote(
   const render_request& request,
   std::vector<std::string>& footnote_refs,
   std::vector<footnote_def>& footnote_defs,
-  std::vector<reference_def>& reference_defs
+  std::vector<reference_def>& reference_defs,
+  const std::vector<std::size_t>& line_columns
 );
 std::string render_document_v2(
   std::string_view source,
@@ -45,7 +46,8 @@ std::string render_document_v2(
   std::vector<std::string>& footnote_refs,
   std::vector<footnote_def>& footnote_defs,
   std::vector<reference_def>& reference_defs,
-  bool is_top_level
+  bool is_top_level,
+  const std::vector<std::size_t>* column_origins = nullptr
 );
 
 std::size_t count_lines(std::string_view text) {
@@ -844,39 +846,39 @@ int parse_setext_heading_level(std::string_view line) {
   return marker == '=' ? 1 : 2;
 }
 
-bool is_indented_code_line(std::string_view line) {
-  std::size_t spaces = 0;
+bool is_indented_code_line(std::string_view line, std::size_t column = 0) {
+  const std::size_t start_column = column;
   for (char ch : line) {
     if (ch == ' ') {
-      ++spaces;
+      ++column;
     } else if (ch == '\t') {
-      spaces += 4;
+      column += 4 - column % 4;
     } else {
       break;
     }
-    if (spaces >= 4) {
+    if (column - start_column >= 4) {
       return true;
     }
   }
   return false;
 }
 
-std::string_view strip_code_indent(std::string_view line) {
+std::string strip_code_indent(std::string_view line, std::size_t column = 0) {
   std::size_t index = 0;
-  std::size_t spaces = 0;
-  while (index < line.size() && spaces < 4) {
+  const std::size_t target_column = column + 4;
+  while (index < line.size() && column < target_column) {
     if (line[index] == ' ') {
-      ++spaces;
+      ++column;
       ++index;
     } else if (line[index] == '\t') {
-      spaces += 4;
+      column += 4 - column % 4;
       ++index;
-      break;
     } else {
       break;
     }
   }
-  return line.substr(index);
+  return std::string(column > target_column ? column - target_column : 0, ' ') +
+    std::string(line.substr(index));
 }
 
 bool parse_fence_start(std::string_view line, char& fence_char, std::string_view& language) {
@@ -1010,18 +1012,32 @@ std::vector<std::string_view> split_lines(std::string_view source) {
   return lines;
 }
 
-std::string_view strip_blockquote_prefix(std::string_view line) {
+struct blockquote_line final {
+  std::string source;
+  std::size_t column{0};
+};
+
+blockquote_line strip_blockquote_prefix(std::string_view line, std::size_t column) {
   const std::string_view trimmed = trim_left(line);
   if (trimmed.empty() || trimmed.front() != '>') {
     return {};
   }
 
-  std::size_t index = 1;
-  if (index < trimmed.size() && trimmed[index] == ' ') {
+  const std::size_t marker = line.size() - trimmed.size();
+  for (std::size_t cursor = 0; cursor <= marker; ++cursor) {
+    column += line[cursor] == '\t' ? 4 - column % 4 : 1;
+  }
+  std::size_t index = marker + 1;
+  if (index < line.size() && line[index] == '\t') {
+    const std::size_t remainder = 4 - column % 4 - 1;
+    return {std::string(remainder, ' ') + std::string(line.substr(index + 1)), column + 1};
+  }
+  if (index < line.size() && line[index] == ' ') {
     ++index;
+    ++column;
   }
 
-  return trimmed.substr(index);
+  return {std::string(line.substr(index)), column};
 }
 
 struct table_cell_source_range final {
@@ -1333,9 +1349,11 @@ std::string render_blockquote(
   const render_request& request,
   std::vector<std::string>& footnote_refs,
   std::vector<footnote_def>& footnote_defs,
-  std::vector<reference_def>& reference_defs
+  std::vector<reference_def>& reference_defs,
+  const std::vector<std::size_t>& line_columns
 ) {
   std::string inner;
+  std::vector<std::size_t> inner_columns;
   bool first_line = true;
 
   while (index < lines.size()) {
@@ -1345,11 +1363,12 @@ std::string render_blockquote(
       break;
     }
 
-    const std::string_view content = strip_blockquote_prefix(raw_line);
+    const auto content = strip_blockquote_prefix(raw_line, line_columns[index]);
     if (!first_line) {
       inner.push_back('\n');
     }
-    inner.append(content.data(), content.size());
+    inner.append(content.source);
+    inner_columns.push_back(content.column);
     first_line = false;
     ++index;
   }
@@ -1359,7 +1378,7 @@ std::string render_blockquote(
   }
 
   // Pass down both footnote_refs and footnote_defs
-  return "<blockquote>" + render_document_v2(inner, request, footnote_refs, footnote_defs, reference_defs, false) + "</blockquote>";
+  return "<blockquote>" + render_document_v2(inner, request, footnote_refs, footnote_defs, reference_defs, false, &inner_columns) + "</blockquote>";
 }
 
 std::string render_paragraph_group(
@@ -1414,7 +1433,8 @@ std::string render_document_v2(
   std::vector<std::string>& footnote_refs,
   std::vector<footnote_def>& footnote_defs,
   std::vector<reference_def>& reference_defs,
-  bool is_top_level = false
+  bool is_top_level,
+  const std::vector<std::size_t>* column_origins
 ) {
   if (source.empty()) {
     return {};
@@ -1422,10 +1442,13 @@ std::string render_document_v2(
 
   std::vector<std::string_view> raw_lines = split_lines(source);
   std::vector<std::string_view> lines;
+  std::vector<std::size_t> line_columns;
   lines.reserve(raw_lines.size());
+  line_columns.reserve(raw_lines.size());
 
   // First pass: collect footnote/reference definitions and filter them out.
-  for (const auto& line : raw_lines) {
+  for (std::size_t raw_index = 0; raw_index < raw_lines.size(); ++raw_index) {
+    const auto& line = raw_lines[raw_index];
     const std::string_view trimmed = trim_left(line);
     if (trimmed.starts_with("[^")) {
       const std::size_t label_end = trimmed.find("]:");
@@ -1480,6 +1503,7 @@ std::string render_document_v2(
       }
     }
     lines.push_back(line);
+    line_columns.push_back(column_origins ? (*column_origins)[raw_index] : 0);
   }
 
   std::string html;
@@ -1618,7 +1642,7 @@ std::string render_document_v2(
       flush_paragraph();
       flush_list();
       std::size_t quote_index = index;
-      const std::string quote_html = render_blockquote(lines, quote_index, request, footnote_refs, footnote_defs, reference_defs);
+      const std::string quote_html = render_blockquote(lines, quote_index, request, footnote_refs, footnote_defs, reference_defs, line_columns);
       if (!quote_html.empty()) {
         html.append(quote_html);
         index = quote_index;
@@ -1637,7 +1661,7 @@ std::string render_document_v2(
       const int setext_level = parse_setext_heading_level(lines[index + 1]);
       char setext_fence_char = '\0';
       std::string_view setext_fence_lang;
-      if (setext_level > 0 && !trimmed.empty() && trimmed.front() != '>' && !is_indented_code_line(line) && !parse_fence_start(line, setext_fence_char, setext_fence_lang)) {
+      if (setext_level > 0 && !trimmed.empty() && trimmed.front() != '>' && !is_indented_code_line(line, line_columns[index]) && !parse_fence_start(line, setext_fence_char, setext_fence_lang)) {
         flush_paragraph();
         flush_list();
         html.append(setext_level == 1 ? "<h1>" : "<h2>");
@@ -1648,7 +1672,7 @@ std::string render_document_v2(
       }
     }
 
-    if (trimmed.front() == '#' && !is_indented_code_line(line)) {
+    if (trimmed.front() == '#' && !is_indented_code_line(line, line_columns[index])) {
       const std::string heading_html = render_heading(line, request, footnote_refs, reference_defs);
       if (!heading_html.empty()) {
         flush_paragraph();
@@ -1685,7 +1709,7 @@ std::string render_document_v2(
       }
     }
 
-    if (is_indented_code_line(line)) {
+    if (is_indented_code_line(line, line_columns[index])) {
       flush_paragraph();
       flush_list();
       std::string indented_code;
@@ -1696,10 +1720,10 @@ std::string render_document_v2(
           ++code_index;
           continue;
         }
-        if (!is_indented_code_line(lines[code_index])) {
+        if (!is_indented_code_line(lines[code_index], line_columns[code_index])) {
           break;
         }
-        const std::string_view code_line = strip_code_indent(lines[code_index]);
+        const std::string code_line = strip_code_indent(lines[code_index], line_columns[code_index]);
         indented_code.append(code_line.data(), code_line.size());
         indented_code.push_back('\n');
         ++code_index;
