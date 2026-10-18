@@ -1814,9 +1814,24 @@ The frozen successful result is exactly `{ status: 'success', editorSessionRef,
 documentIdentity, revision, selection, focus: 'textarea',
 viewport: 'full-selection-visible' }`. It acknowledges the same mounted owner,
 source revision, complete native selection/direction and actual focused textarea,
-with the complete selection visible and stable across two frame observations.
-Native control geometry, clipping and hit testing must agree with a temporary
-inert browser text-layout measurement; this never creates another input owner.
+with every measured selection fragment inside the viewport. Success requires two
+fresh native Intersection Observer V2 observations (`trackVisibility: true`,
+`isVisible: true`), at least 100ms apart, confirming the entire textarea is
+unoccluded. Whole-textarea visibility is deliberately conservative: an obstruction
+elsewhere in the input can also prevent completion. Point hit tests, visible-area
+percentages, bounding-box corners and frame counts cannot grant success.
+Native control geometry and clipping must agree with a temporary inert browser
+text-layout measurement; this never creates another input owner. Geometry must
+remain stable between observations. DOM changes invalidate the pending proof;
+only the owner's temporary nonpainting measurement nodes are excluded. Running
+or pending document animations postpone confirmation. The final native proof must
+postdate the latest synchronous admission check and match the current native
+bounds and every selection fragment. No consumer callback runs between that
+proof and resolution; the host still rechecks its own admission after await.
+The [native visibility algorithm](https://w3c.github.io/IntersectionObserver/#calculate-visibility-algo)
+requires a complete unocclusion guarantee and may conservatively refuse.
+Engines without genuine V2 support reject as `unsupported`; there is no sampled
+or intersection-only fallback.
 No source or history entry is written. Positioning is instant, including under
 reduced motion. This bounded source-input contract is separate from renderer
 presentation or a host navigation/history receipt.
@@ -1829,10 +1844,10 @@ unchanged and never become success.
 Cancellation, pause, unmount, document/epoch/revision/mode drift, composition,
 disabled/loading/readonly state, genuine focus loss, a new reveal or manual
 wheel/touch/pointer/keyboard input cannot produce a completion. All listeners,
-frames and the failure deadline are released on settlement. After a failure,
+frames, both observers and the failure deadline are released on settlement. After a failure,
 selection/scroll effects already made are not rolled back over a newer action.
 
-Preview without the source input, RTL/vertical/transformed geometry, sources over
+Preview without the source input, RTL/vertical/transformed or masked/clipped-path geometry, sources over
 1,000,000 UTF-16 units, a selection larger than the input viewport, or unavailable
 or inconsistent native text measurement reject as `unsupported`. Clipped or
 occluded targets never receive a nearby/estimated success. These limitations

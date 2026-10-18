@@ -4,6 +4,20 @@ import type {
 } from './markdown-editor-session'
 import type { MarkdownEditorResolvedSelection } from './markdown-editor-transaction'
 
+const measurementNodes = new WeakSet<Node>()
+
+/** Only these transient, nonpainting nodes are excluded from paint invalidation. */
+export const isMarkdownEditorRevealMeasurementMutation = (
+  record: MutationRecord,
+) => {
+  const nodes = [...record.addedNodes, ...record.removedNodes]
+  return (
+    record.type === 'childList' &&
+    nodes.length > 0 &&
+    nodes.every((node) => measurementNodes.has(node))
+  )
+}
+
 export interface MarkdownEditorRevealCompletionOptions {
   /** The exact object returned by this mounted editor's getSession(). */
   readonly session: MarkdownEditorSession
@@ -20,6 +34,7 @@ export interface MarkdownEditorRevealCompletion extends MarkdownEditorSessionDoc
   readonly editorSessionRef: string
   readonly selection: MarkdownEditorResolvedSelection
   readonly focus: 'textarea'
+  /** All selection fragments inside the viewport; native full-area unocclusion confirmed. */
   readonly viewport: 'full-selection-visible'
 }
 
@@ -61,8 +76,13 @@ export const measureMarkdownEditorReveal = (
     textarea.value.length > 1_000_000
   )
     return null
+  const uncertainClip = (css: CSSStyleDeclaration) =>
+    !['', 'none'].includes(css.getPropertyValue('clip-path')) ||
+    !['', 'none'].includes(css.getPropertyValue('mask-image')) ||
+    !['', 'auto'].includes(css.getPropertyValue('clip'))
   const style = view.getComputedStyle(textarea)
   if (
+    uncertainClip(style) ||
     style.writingMode !== 'horizontal-tb' ||
     style.direction !== 'ltr' ||
     style.display === 'none' ||
@@ -76,6 +96,7 @@ export const measureMarkdownEditorReveal = (
     return null
   const nativeBox = textarea.getBoundingClientRect()
   const mirror = document.createElement('div')
+  measurementNodes.add(mirror)
   mirror.setAttribute('aria-hidden', 'true')
   mirror.inert = true
   // Copy the actual text layout, including wrapping, spacing and native padding.
@@ -191,6 +212,7 @@ export const measureMarkdownEditorReveal = (
     ) {
       const css = view.getComputedStyle(parent)
       if (
+        uncertainClip(css) ||
         css.transform !== 'none' ||
         css.visibility !== 'visible' ||
         Number(css.opacity) === 0
@@ -217,20 +239,27 @@ export const measureMarkdownEditorReveal = (
       target.bottom <= clipBottom &&
       target.left >= clipLeft &&
       target.right <= clipRight
-    const unobscured =
-      inside &&
-      [
-        [target.left, target.top],
-        [target.right, target.bottom],
-        [(target.left + target.right) / 2, (target.top + target.bottom) / 2],
-      ].every(([px, py]) => document.elementFromPoint(px!, py!) === textarea)
+    const regions = rects.map((rect) => ({
+      top: y + rect.top - origin.top - textarea.scrollTop,
+      bottom: y + rect.bottom - origin.top - textarea.scrollTop,
+      left: x + rect.left - origin.left - textarea.scrollLeft,
+      right: x + rect.right - origin.left - textarea.scrollLeft,
+    }))
     return {
       top,
       bottom,
       left,
       right,
-      visible: unobscured,
+      visible: inside,
+      regions,
+      nativeBounds: {
+        left: box.left,
+        top: box.top,
+        width: box.width,
+        height: box.height,
+      },
       fingerprint: JSON.stringify([
+        regions,
         target,
         textarea.scrollTop,
         textarea.scrollLeft,
