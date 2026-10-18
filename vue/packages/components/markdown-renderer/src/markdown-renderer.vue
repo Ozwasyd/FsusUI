@@ -65,6 +65,7 @@ import {
   computed,
   nextTick,
   onBeforeUnmount,
+  onMounted,
   ref,
   shallowRef,
   toRaw,
@@ -135,8 +136,9 @@ const heavyLifecycle = createMarkdownHeavyFeatureLifecycle({
 })
 const heavyThemeRevision = ref(0)
 let heavyThemeListenerInstalled = false
+let heavyThemeRelevant = false
 const handleHeavyFeatureThemeChange = () => {
-  heavyThemeRevision.value += 1
+  if (isRendering.value || heavyThemeRelevant) heavyThemeRevision.value += 1
 }
 const ensureHeavyFeatureThemeListener = () => {
   if (heavyThemeListenerInstalled) return
@@ -154,6 +156,7 @@ const removeHeavyFeatureThemeListener = () => {
   )
   heavyThemeListenerInstalled = false
 }
+onMounted(ensureHeavyFeatureThemeListener)
 const emit = defineEmits<{
   (event: 'render-complete', result: MarkdownSafeRenderResult): void
   (event: 'render-error', error: FsusErrorDetail): void
@@ -689,7 +692,7 @@ const markdownRuntimeKindPattern = /^(?:SIMD-128|SCALAR-BASIC|UNKNOWN)$/
 const isFiniteNonNegative = (value: unknown): value is number =>
   typeof value === 'number' && Number.isFinite(value) && value >= 0
 
-// Wasm emits UTF-8 byte offsets; JS string.length is UTF-16 code units.
+// Wasm emits UTF-8 byte counts/offsets; JS string.length is UTF-16 code units.
 const utf8ByteLength = (value: string) =>
   new TextEncoder().encode(value).byteLength
 const unboundBaseUrl = (value: string | null | undefined) => value || null
@@ -731,8 +734,9 @@ const materializeMarkdownWorkerResult = (
     unboundBaseUrl(metadata.baseUrl) !== unboundBaseUrl(request.baseUrl) ||
     metadata.allowLatex !== (request.allowLatex !== false) ||
     metadata.allowMermaid !== (request.allowMermaid !== false) ||
-    metadata.sourceLength !== request.source.length ||
-    metadata.normalizedSourceLength !== result.normalizedSource.length ||
+    metadata.sourceLength !== utf8ByteLength(request.source) ||
+    metadata.normalizedSourceLength !==
+      utf8ByteLength(result.normalizedSource) ||
     metadata.featureCount !== result.features.length ||
     (result.placeholders.length > 0 &&
       metadata.placeholderCount !== result.placeholders.length) ||
@@ -890,7 +894,6 @@ const hasEnabledHeavyFeature = (
   (features.mermaid && result.features.includes('mermaid'))
 
 const resetFeatureActivation = () => {
-  removeHeavyFeatureThemeListener()
   activationController?.abort()
   activationController = new AbortController()
   activationObserver?.disconnect()
@@ -1044,6 +1047,7 @@ const activateRenderedFeatures = async (
   const activationStartedAt = readPerformanceNow()
   const features = resolveMarkdownFeatureOptions()
   const heavyFeaturesEnabled = hasEnabledHeavyFeature(result, features)
+  if (heavyFeaturesEnabled) heavyThemeRelevant = true
   const resolveHeavyFeatureIdentity = heavyFeaturesEnabled
     ? await createHeavyFeatureIdentityResolver(result)
     : () => null
@@ -1090,7 +1094,7 @@ const activateRenderedFeatures = async (
         kind === 'code-highlight' || kind === 'latex' || kind === 'mermaid',
     )
   ) {
-    ensureHeavyFeatureThemeListener()
+    heavyThemeRelevant = true
   }
 }
 

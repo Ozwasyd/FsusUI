@@ -646,6 +646,169 @@ describe('MarkdownRenderer.vue', () => {
     expect(renderMarkdownResult).toHaveBeenCalledTimes(initialCalls + 1)
   })
 
+  test('observes a theme event while the first heavy result is pending', async () => {
+    const source = '```mermaid\ngraph LR\nA-->B\n```'
+    const result = fsusOk(makeResult(source, '<p>Pending heavy result</p>'))
+    let settle!: (value: typeof result) => void
+    const pending = new Promise<typeof result>((resolve) => (settle = resolve))
+    renderMarkdownResult
+      .mockImplementationOnce(() => pending)
+      .mockResolvedValue(result)
+    const previousTheme = document.documentElement.getAttribute(
+      'data-theme-resolved',
+    )
+    const wrapper = mount(MarkdownRenderer, { props: { content: source } })
+    try {
+      await vi.advanceTimersByTimeAsync(250)
+      expect(renderMarkdownResult).toHaveBeenCalledOnce()
+      document.documentElement.setAttribute('data-theme-resolved', 'dark')
+      document.documentElement.dispatchEvent(
+        new CustomEvent('fsus:theme-change', {
+          detail: { mode: 'dark', resolved: 'dark' },
+        }),
+      )
+      await vi.waitFor(() =>
+        expect(renderMarkdownResult).toHaveBeenCalledTimes(2),
+      )
+      settle(result)
+      await flushRenderer()
+      expect(renderMarkdownResult).toHaveBeenCalledTimes(2)
+      expect(document.documentElement.getAttribute('data-theme-resolved')).toBe(
+        'dark',
+      )
+    } finally {
+      wrapper.unmount()
+      settle(result)
+      await flushPromises()
+      if (previousTheme === null)
+        document.documentElement.removeAttribute('data-theme-resolved')
+      else
+        document.documentElement.setAttribute(
+          'data-theme-resolved',
+          previousTheme,
+        )
+    }
+  })
+
+  test('removes its early theme listener when unmounted before initialization settles', async () => {
+    const source = '```mermaid\ngraph LR\nA-->B\n```'
+    const result = fsusOk(makeResult(source, '<p>Pending heavy result</p>'))
+    let settle!: (value: typeof result) => void
+    renderMarkdownResult.mockReturnValue(
+      new Promise<typeof result>((resolve) => (settle = resolve)),
+    )
+    const add = vi.spyOn(document.documentElement, 'addEventListener')
+    const remove = vi.spyOn(document.documentElement, 'removeEventListener')
+    const wrapper = mount(MarkdownRenderer, { props: { content: source } })
+    try {
+      await vi.advanceTimersByTimeAsync(250)
+      const listener = add.mock.calls.find(
+        ([name]) => name === 'fsus:theme-change',
+      )?.[1]
+      expect(listener).toBeTypeOf('function')
+      wrapper.unmount()
+      expect(remove).toHaveBeenCalledWith('fsus:theme-change', listener)
+      document.documentElement.dispatchEvent(
+        new CustomEvent('fsus:theme-change'),
+      )
+      settle(result)
+      await flushRenderer()
+      document.documentElement.dispatchEvent(
+        new CustomEvent('fsus:theme-change'),
+      )
+      await flushRenderer()
+      expect(renderMarkdownResult).toHaveBeenCalledOnce()
+      expect(
+        add.mock.calls.filter(([name]) => name === 'fsus:theme-change'),
+      ).toHaveLength(1)
+    } finally {
+      wrapper.unmount()
+      settle(result)
+      await flushPromises()
+      add.mockRestore()
+      remove.mockRestore()
+    }
+  })
+
+  test('initializes a fresh theme listener after a pending renderer is destroyed', async () => {
+    const source = '```mermaid\ngraph LR\nA-->B\n```'
+    const result = fsusOk(makeResult(source, '<p>Pending heavy result</p>'))
+    let settleFirst!: (value: typeof result) => void
+    let settleSecond!: (value: typeof result) => void
+    renderMarkdownResult
+      .mockReturnValueOnce(
+        new Promise<typeof result>((resolve) => (settleFirst = resolve)),
+      )
+      .mockReturnValueOnce(
+        new Promise<typeof result>((resolve) => (settleSecond = resolve)),
+      )
+      .mockResolvedValue(result)
+    const add = vi.spyOn(document.documentElement, 'addEventListener')
+    const remove = vi.spyOn(document.documentElement, 'removeEventListener')
+    const first = mount(MarkdownRenderer, { props: { content: source } })
+    let second: ReturnType<typeof mount> | undefined
+    try {
+      await vi.advanceTimersByTimeAsync(250)
+      first.unmount()
+      second = mount(MarkdownRenderer, { props: { content: source } })
+      await vi.advanceTimersByTimeAsync(250)
+      expect(renderMarkdownResult).toHaveBeenCalledTimes(2)
+      document.documentElement.dispatchEvent(
+        new CustomEvent('fsus:theme-change'),
+      )
+      await vi.waitFor(() =>
+        expect(renderMarkdownResult).toHaveBeenCalledTimes(3),
+      )
+      settleFirst(result)
+      settleSecond(result)
+      await flushRenderer()
+      expect(
+        add.mock.calls.filter(([name]) => name === 'fsus:theme-change'),
+      ).toHaveLength(2)
+      expect(
+        remove.mock.calls.filter(([name]) => name === 'fsus:theme-change'),
+      ).toHaveLength(1)
+      second.unmount()
+      document.documentElement.dispatchEvent(
+        new CustomEvent('fsus:theme-change'),
+      )
+      await flushRenderer()
+      expect(renderMarkdownResult).toHaveBeenCalledTimes(3)
+      expect(
+        remove.mock.calls.filter(([name]) => name === 'fsus:theme-change'),
+      ).toHaveLength(2)
+    } finally {
+      first.unmount()
+      second?.unmount()
+      settleFirst(result)
+      settleSecond(result)
+      await flushPromises()
+      add.mockRestore()
+      remove.mockRestore()
+    }
+  })
+
+  test('does not rerender settled content without heavy features for a theme event', async () => {
+    const source = 'Plain content'
+    renderMarkdownResult.mockResolvedValue(
+      fsusOk(makeResult(source, '<p>Plain content</p>')),
+    )
+    const wrapper = mount(MarkdownRenderer, { props: { content: source } })
+    try {
+      await flushRenderer()
+      await vi.waitFor(() =>
+        expect(wrapper.emitted('render-complete')).toHaveLength(1),
+      )
+      document.documentElement.dispatchEvent(
+        new CustomEvent('fsus:theme-change'),
+      )
+      await flushRenderer()
+      expect(renderMarkdownResult).toHaveBeenCalledOnce()
+    } finally {
+      wrapper.unmount()
+    }
+  })
+
   test('keeps the scroll anchor when the full result changes html', async () => {
     let resolveFull:
       | ((result: FsusResult<MarkdownRuntimeRenderResult>) => void)
@@ -911,6 +1074,67 @@ describe('MarkdownRenderer.vue', () => {
     expect(wrapper.find('svg').exists()).toBe(false)
     expect(wrapper.emitted('render-complete')).toHaveLength(1)
   })
+
+  test.each([
+    'valid UTF-8',
+    'source code units',
+    'normalized code units',
+    'both code units',
+  ] as const)(
+    'validates Worker source metadata lengths as UTF-8 bytes: %s',
+    async (variant) => {
+      vi.stubGlobal('Worker', MarkdownWorkerHarness)
+      const source = `${'# Worker 中文 😀\n\n'}${'段落 😀\n\n'.repeat(1_600)}`
+      const result = structuredClone(
+        makeWorkerChunkResult(source),
+      ) as MarkdownRuntimeChunkResult
+      const byteLength = new TextEncoder().encode(source).byteLength
+      Reflect.set(
+        result.metadata,
+        'sourceLength',
+        variant === 'source code units' || variant === 'both code units'
+          ? source.length
+          : byteLength,
+      )
+      Reflect.set(
+        result.metadata,
+        'normalizedSourceLength',
+        variant === 'normalized code units' || variant === 'both code units'
+          ? source.length
+          : byteLength,
+      )
+      const wrapper = mount(MarkdownRenderer, {
+        ...workerChunkedPipeline,
+        props: { content: source },
+      })
+      try {
+        await vi.advanceTimersByTimeAsync(250)
+        await flushPromises()
+        const worker = MarkdownWorkerHarness.instances[0]!
+        const post = worker.posts.find((message) => message.type === 'run')!
+        worker.respond({
+          generation: post.generation,
+          id: post.id,
+          result: { metadata: result, units: result.chunks },
+          status: 'complete',
+        })
+        await flushRenderer()
+        if (variant === 'valid UTF-8') {
+          expect(wrapper.attributes('data-fsus-render-strategy')).toBe(
+            'chunked-worker',
+          )
+          expect(wrapper.emitted('render-error')).toBeUndefined()
+          expect(wrapper.find('h1').text()).toBe('Chunked')
+        } else {
+          expect(wrapper.attributes('data-fsus-render-strategy')).toBe('sync')
+          expect(wrapper.emitted('render-error')).toHaveLength(1)
+          expect(wrapper.find('h1').exists()).toBe(false)
+        }
+      } finally {
+        wrapper.unmount()
+      }
+    },
+  )
 
   test('keeps one canonical result aligned across sync, worker, and SSR paths', async () => {
     vi.stubGlobal('Worker', MarkdownWorkerHarness)
