@@ -92,14 +92,10 @@ const selectorFacts = (selector) => {
     attributes: new Map(),
     classes: new Set(),
     positiveClasses: new Set(),
-    positivePseudoClasses: new Set(),
     specificity: selectorSpecificity(selector),
     terminalClasses: new Set(),
   }
   const visit = (node, negative = false) => {
-    if (node.type === 'PseudoClassSelector' && !negative) {
-      facts.positivePseudoClasses.add(node.name)
-    }
     if (node.type === 'ClassSelector') {
       facts.classes.add(node.name)
       if (!negative) facts.positiveClasses.add(node.name)
@@ -486,6 +482,125 @@ const contextOf = (declaration) => ({
   media: declaration.media,
   theme: declaration.selector.facts.classes.has('dark') ? 'dark' : 'light',
 })
+
+const selectorCompounds = (selector) => {
+  const compounds = [[]]
+  for (const node of selector.children ?? []) {
+    if (node.type === 'Combinator') compounds.push([])
+    else compounds.at(-1).push(node)
+  }
+  return compounds
+}
+const stateAnd = (values) =>
+  values.includes(false)
+    ? false
+    : values.every((value) => value === true)
+      ? true
+      : undefined
+const stateOr = (values) =>
+  values.includes(true)
+    ? true
+    : values.every((value) => value === false)
+      ? false
+      : undefined
+const focusPseudos = new Set(['focus', 'focus-visible', 'focus-within'])
+const interactionPseudos = new Set(['hover', 'active'])
+const logicalPseudos = new Set(['is', 'where', 'not'])
+
+// Focus-visible implies focus/focus-within, but other interaction states can
+// coexist. Enumerate those axes rather than letting a hover-only winner hide
+// a broken non-hover focus state. Unsupported selectors remain unknown.
+const focusStates = (declarations, target) => {
+  const axes = new Set()
+  const collect = (selector) => {
+    for (const node of selectorCompounds(selector).at(-1)) {
+      if (
+        node.type === 'ClassSelector' &&
+        !target.facts.terminalClasses.has(node.name) &&
+        node.name !== 'dark'
+      ) {
+        axes.add(`class:${node.name}`)
+      }
+      if (node.type !== 'PseudoClassSelector') continue
+      if (interactionPseudos.has(node.name)) axes.add(`pseudo:${node.name}`)
+      if (logicalPseudos.has(node.name)) {
+        for (const branch of node.children?.first?.children ?? [])
+          collect(branch)
+      }
+    }
+  }
+  for (const declaration of declarations) collect(declaration.selector.ast)
+  let states = [{}]
+  for (const axis of [...axes].sort()) {
+    states = states.flatMap((state) => [
+      { ...state, [axis]: false },
+      { ...state, [axis]: true },
+    ])
+  }
+  return states
+}
+
+const matchesFocusState = (selector, target, state, context) => {
+  const match = (branch, targetCompound = true) => {
+    const compounds = selectorCompounds(branch)
+    return stateAnd(
+      compounds.map((nodes, index) => {
+        const terminal = targetCompound && index === compounds.length - 1
+        return stateAnd(
+          nodes.map((node) => {
+            if (node.type === 'UniversalSelector')
+              return node.name === '*' ? true : undefined
+            if (node.type === 'ClassSelector') {
+              if (node.name === 'dark') return context.theme === 'dark'
+              if (!terminal) return undefined
+              return (
+                target.facts.terminalClasses.has(node.name) ||
+                state[`class:${node.name}`]
+              )
+            }
+            if (node.type === 'AttributeSelector') {
+              if (node.name.name === 'data-density') {
+                if (!node.value || node.matcher !== '=') return undefined
+                return (
+                  node.value?.value === context.density ||
+                  node.value?.name === context.density
+                )
+              }
+              if (terminal && node.name.name === 'disabled') return false
+              return undefined
+            }
+            if (node.type === 'TypeSelector') {
+              return !terminal && ['html', 'body'].includes(node.name)
+                ? true
+                : undefined
+            }
+            if (node.type !== 'PseudoClassSelector') return undefined
+            if (logicalPseudos.has(node.name)) {
+              if (!node.children?.first?.children) return undefined
+              const result = stateOr(
+                [...node.children.first.children].map((branch) =>
+                  match(branch, terminal),
+                ),
+              )
+              return node.name === 'not' && result !== undefined
+                ? !result
+                : result
+            }
+            if (focusPseudos.has(node.name))
+              return terminal || node.name === 'focus-within'
+            if (node.name === 'root') return !terminal
+            if (terminal && node.name === 'disabled') return false
+            if (terminal && node.name === 'enabled') return true
+            if (terminal && interactionPseudos.has(node.name))
+              return state[`pseudo:${node.name}`]
+            return undefined
+          }),
+        )
+      }),
+    )
+  }
+  return match(selector.ast)
+}
 
 const applies = (declaration, context) => {
   const scope = contextOf(declaration)
@@ -1221,12 +1336,11 @@ export const evaluateSemanticStyles = async (options) => {
       const matching = cascade.declarations.filter(
         (declaration) =>
           declaration.property === property &&
-          selectorMatchesOwnership(declaration, [target]) &&
-          (property !== 'box-shadow' ||
-            declaration.selector.facts.positiveClasses.has('is-focus') ||
-            [...declaration.selector.facts.positivePseudoClasses].some((name) =>
-              name.startsWith('focus'),
-            )),
+          (selectorMatchesOwnership(declaration, [target]) ||
+            (property === 'box-shadow' &&
+              [...declaration.selector.facts.positiveClasses].every(
+                (name) => name === 'dark',
+              ))),
       )
       if (!matching.length) continue
       const contexts = new Map()
@@ -1240,12 +1354,50 @@ export const evaluateSemanticStyles = async (options) => {
         const context = contextOf(declaration)
         contexts.set(JSON.stringify(context), context)
       }
-      for (const context of contexts.values()) {
-        const applicable = matching.filter((declaration) =>
+      const interactions =
+        property === 'box-shadow'
+          ? focusStates(
+              [
+                ...matching,
+                ...cascade.declarations.filter(
+                  (declaration) =>
+                    selectorMatchesOwnership(declaration, [target]) &&
+                    declaration.property.startsWith('--'),
+                ),
+              ],
+              target,
+            )
+          : [undefined]
+      const evaluations = [...contexts.values()].flatMap((context) =>
+        interactions.map((interaction) => ({ context, interaction })),
+      )
+      for (const { context, interaction } of evaluations) {
+        const stateMatch = (declaration) =>
+          interaction
+            ? matchesFocusState(
+                declaration.selector,
+                target,
+                interaction,
+                context,
+              )
+            : true
+        const candidates = matching.filter((declaration) =>
           applies(declaration, context),
         )
-        const actual = winner(applicable)
+        const applicable = candidates.filter(
+          (declaration) => stateMatch(declaration) === true,
+        )
+        const uncertain = candidates.filter(
+          (declaration) => stateMatch(declaration) === undefined,
+        )
+        const actual = winner(applicable) ?? winner(uncertain)
         if (!actual) continue
+        let uncertainWinner = uncertain.some(
+          (declaration) => cascadeCompare(declaration, actual) >= 0,
+        )
+        const unresolved = uncertain.filter(
+          (declaration) => cascadeCompare(declaration, actual) >= 0,
+        )
         const variableResolver = (name) => {
           const candidates = cascade.declarations.filter(
             (declaration) =>
@@ -1255,12 +1407,29 @@ export const evaluateSemanticStyles = async (options) => {
                 declaration.selector.facts.classes.has('dark') ||
                 selectorMatchesOwnership(declaration, [target])),
           )
-          return winner(candidates)?.value
+          const variableStateMatch = (declaration) =>
+            interaction && selectorMatchesOwnership(declaration, [target])
+              ? stateMatch(declaration)
+              : true
+          const known = winner(
+            candidates.filter(
+              (declaration) => variableStateMatch(declaration) === true,
+            ),
+          )
+          const unresolvedVariables = candidates.filter(
+            (declaration) =>
+              variableStateMatch(declaration) === undefined &&
+              (!known || cascadeCompare(declaration, known) > 0),
+          )
+          if (unresolvedVariables.length) uncertainWinner = true
+          unresolved.push(...unresolvedVariables)
+          return known?.value
         }
-        const actualSemantic =
+        const resolvedSemantic =
           property === 'box-shadow'
             ? focusSpread(actual.value, variableResolver)
             : semanticValue(actual.value, variableResolver)
+        const actualSemantic = uncertainWinner ? undefined : resolvedSemantic
         const densityVariants = alternatives.filter((candidate) =>
           candidate.resolved.name.includes(`.${context.density}.`),
         )
@@ -1316,6 +1485,16 @@ export const evaluateSemanticStyles = async (options) => {
             semanticValue: actualSemantic,
             source: sourceDetails(root, actual, rule.owner),
             value: actual.value,
+            ...(interaction ? { interactionState: interaction } : {}),
+            ...(unresolved.length
+              ? {
+                  unresolvedCascade: unresolved.map((declaration) => ({
+                    selector: declaration.selector.text,
+                    property: declaration.property,
+                    source: sourceDetails(root, declaration, rule.owner),
+                  })),
+                }
+              : {}),
           },
           componentId: rule.componentId,
           partId: rule.partId,
