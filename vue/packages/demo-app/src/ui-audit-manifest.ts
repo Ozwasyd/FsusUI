@@ -43,6 +43,7 @@ export const auditComponentNames = [
   'ElDescriptionsItem',
   'ElDialog',
   'ElDivider',
+  'ElResizeSeparator',
   'ElDrawer',
   'ElDropdown',
   'ElDropdownItem',
