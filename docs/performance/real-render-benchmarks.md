@@ -42,6 +42,27 @@ The full browser matrix is the Cartesian product of the scenarios below with 60/
 
 The runner records frame work/intervals, dropped-frame rate, Long Tasks, input-to-next-frame latency, style/layout/paint/composite trace durations, DOM nodes, Chromium layers and estimated layer area, JS heap, Worker queue/compute/transfer time, and WASM startup/compute/end-to-end time. Markdown adds `markdownPhases.parseMs`, `transferMs`, `commitMs`, `activationMs`, and matching Chromium `paintMs` so 24 KiB, 256 KiB, and 1 MiB paths can be diagnosed phase by phase. `data-pipeline-table` adds p50/p95/p99 for legacy synchronous-sort blocking, Worker submission blocking, and Worker/WASM completion, distinguishing main-thread responsiveness from total completion. Refresh targets are analysis budgets, not a claim that a virtual CI display physically refreshes at 120 Hz.
 
+The data-pipeline diagnostic replays the same fixture, dimensions, warm-ups,
+actions and sample count in a separate browser context after production trace,
+frame and heap capture and context teardown. Its forced-worker sorts retain all
+three diagnostic fields without training the measured page's adaptive strategy
+or warming its controller, dataset cache or Worker. Summaries identify this
+protocol as `dataPipelineObservation=isolated-context-after-measurement-v1`.
+Earlier interleaved measurements use a different observation protocol; do not
+claim that a difference against those numbers explains a component regression.
+For source attribution, apply the same observation protocol to both source
+candidates and retain the original order-balanced plan and budgets.
+
+Run the isolation controls, including the original in-page negative control
+with real Workers/WASM, against the original demo server:
+
+```bash
+FSUSUI_DATA_PIPELINE_BROWSER_URL=http://127.0.0.1:5173 node --test tests/performance-data-pipeline-probe.test.mjs
+```
+
+Without that URL the real browser control is explicitly skipped. Node controls
+alone do not establish browser or performance acceptance.
+
 To collect only the three Markdown sizes while preserving cold/hot scenario semantics:
 
 ```bash
