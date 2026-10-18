@@ -1,5 +1,58 @@
 import ts from 'typescript'
 
+// Declaration-only input: retain the real SFC object behind a public type name.
+// The runtime module producer reads the original source, not this projection.
+export function annotateBareComponentExports(content, fileName) {
+  const normalized = fileName.replaceAll('\\', '/')
+  if (!/(?:\/components\/|\/motion\/)/u.test(normalized)) return content
+  const source = ts.createSourceFile(
+    fileName,
+    content,
+    ts.ScriptTarget.Latest,
+    true,
+  )
+  const exported = new Set()
+  for (const statement of source.statements) {
+    if (
+      ts.isExportDeclaration(statement) &&
+      !statement.isTypeOnly &&
+      !statement.moduleSpecifier &&
+      statement.exportClause &&
+      ts.isNamedExports(statement.exportClause)
+    ) {
+      for (const entry of statement.exportClause.elements)
+        if (!entry.isTypeOnly)
+          exported.add((entry.propertyName ?? entry.name).text)
+    }
+  }
+  const edits = []
+  for (const statement of source.statements) {
+    if (
+      !ts.isImportDeclaration(statement) ||
+      !statement.moduleSpecifier.text.endsWith('.vue') ||
+      statement.importClause?.isTypeOnly ||
+      !statement.importClause?.name
+    )
+      continue
+    const name = statement.importClause.name
+    if (!exported.has(name.text) || !/^(?:El|Fsus|Fsu)[A-Z]/u.test(name.text))
+      continue
+    const owner = `__fsusDeclaration_${name.text}`
+    if (new RegExp(`\\b${owner}\\b`, 'u').test(content))
+      throw new Error(`Declaration owner name already exists in ${fileName}.`)
+    edits.push({ start: name.getStart(source), end: name.end, text: owner })
+    edits.push({
+      start: statement.end,
+      end: statement.end,
+      text: `\ntype ${name.text} = typeof ${owner} & {}\nconst ${name.text}: ${name.text} = ${owner}\n`,
+    })
+  }
+  let result = content
+  for (const edit of edits.sort((a, b) => b.start - a.start))
+    result = result.slice(0, edit.start) + edit.text + result.slice(edit.end)
+  return result
+}
+
 // Name installed component types through their SFC owners before emission. This
 // prevents serialization of Vue's internal constructor/mixin implementation.
 export function annotateInstallTypes(content, fileName) {

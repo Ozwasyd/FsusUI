@@ -135,6 +135,14 @@ still expanded by TypeScript. Cold consumers emit and reconsume
 ordinary unannotated ES/CJS aliases using the complete original project
 configuration, checking identity, non-any types, props, slots and install methods.
 
+The declaration-only compiler inputs also name bare SFC re-exports through their
+original component objects. Runtime module inputs remain unchanged. Declaration
+emit omits added Vue generic arguments only when they equal the installed Vue
+declaration's actual default: the component element default and ShallowRef's
+matching setter type. A non-default argument fails instead of weakening its
+contract. The existing Vue 3.5.0 peer floor is retained. Canonical icons use this
+same compiler entry, and artifact fingerprints include the shared producers.
+
 The pinned Vue macro resolver exposes its namespace before async imports finish.
 The producer completes Vue's shared type graph once, through the same locked
 factory/API module graph, before parallel SFC compilation begins. All original

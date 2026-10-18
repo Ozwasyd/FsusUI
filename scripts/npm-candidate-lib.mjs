@@ -82,6 +82,7 @@ function inputDigests(repoRoot) {
     'scripts/bundled-workspace-references.mjs',
     'scripts/generate-package-declarations.mjs',
     'scripts/package-declaration-source.mjs',
+    'scripts/vue-declaration-compat.mjs',
     'vue/internal/build/src/plugins/frozen-string-records.ts',
     'vue/internal/build/src/plugins/frozen-strings.ts',
     'vue/internal/build/src/plugins/generated-code.ts',
