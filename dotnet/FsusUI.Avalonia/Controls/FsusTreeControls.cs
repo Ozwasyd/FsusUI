@@ -12,6 +12,7 @@ using Avalonia.VisualTree;
 using FsusUI.Avalonia.Overlay;
 using System.Collections.ObjectModel;
 using System.Globalization;
+using System.Text;
 
 namespace FsusUI.Avalonia.Controls;
 
@@ -313,7 +314,12 @@ public class FsusTree : ContentControl
   private int loadVersion;
   private int textCacheAttachmentVersion;
   private TopLevel? textCacheTopLevel;
-  private Dictionary<Typeface, GlyphTypeface>? layoutGlyphTypefaces;
+  private sealed class LayoutFonts
+  {
+    internal Dictionary<Typeface, GlyphTypeface> Primary { get; } = [];
+    internal Dictionary<(Typeface, int), GlyphTypeface?> Fallback { get; } = [];
+  }
+  private LayoutFonts? layoutGlyphTypefaces;
 
   public FsusTree()
   {
@@ -326,7 +332,7 @@ public class FsusTree : ContentControl
   protected override Size MeasureOverride(Size availableSize)
   {
     var previous = layoutGlyphTypefaces;
-    layoutGlyphTypefaces = [];
+    layoutGlyphTypefaces = new LayoutFonts();
     try
     {
       return base.MeasureOverride(availableSize);
@@ -340,7 +346,7 @@ public class FsusTree : ContentControl
   protected override Size ArrangeOverride(Size finalSize)
   {
     var previous = layoutGlyphTypefaces;
-    layoutGlyphTypefaces = [];
+    layoutGlyphTypefaces = new LayoutFonts();
     try
     {
       return base.ArrangeOverride(finalSize);
@@ -357,12 +363,30 @@ public class FsusTree : ContentControl
     // pass, then query the provider afresh on the next pass or standalone label.
     if (layoutGlyphTypefaces is null)
       return typeface.GlyphTypeface;
-    if (!layoutGlyphTypefaces.TryGetValue(typeface, out var glyphTypeface))
-      layoutGlyphTypefaces[typeface] = glyphTypeface = typeface.GlyphTypeface;
+    if (!layoutGlyphTypefaces.Primary.TryGetValue(typeface, out var glyphTypeface))
+      layoutGlyphTypefaces.Primary[typeface] = glyphTypeface = typeface.GlyphTypeface;
     return glyphTypeface;
   }
 
-  internal void InvalidateLayoutGlyphTypefaces() => layoutGlyphTypefaces?.Clear();
+  internal GlyphTypeface? ResolveLayoutFallbackGlyphTypeface(Typeface typeface, int codepoint)
+  {
+    if (layoutGlyphTypefaces?.Fallback.TryGetValue((typeface, codepoint), out var cached) == true)
+      return cached;
+    var manager = FontManager.Current;
+    GlyphTypeface? face = null;
+    if (manager.TryMatchCharacter(codepoint, typeface.Style, typeface.Weight, typeface.Stretch,
+        typeface.FontFamily, null, out var fallback))
+      manager.TryGetGlyphTypeface(fallback, out face);
+    if (layoutGlyphTypefaces is not null)
+      layoutGlyphTypefaces.Fallback[(typeface, codepoint)] = face;
+    return face;
+  }
+
+  internal void InvalidateLayoutGlyphTypefaces()
+  {
+    layoutGlyphTypefaces?.Primary.Clear();
+    layoutGlyphTypefaces?.Fallback.Clear();
+  }
 
   public string? AccessibleName { get; set; }
   public Collection<FsusTreeNode> Nodes { get; } = [];
@@ -978,6 +1002,20 @@ public class FsusTree : ContentControl
 
   private void RefreshRows()
   {
+    var previous = layoutGlyphTypefaces;
+    layoutGlyphTypefaces = new LayoutFonts();
+    try
+    {
+      RefreshRowsCore();
+    }
+    finally
+    {
+      layoutGlyphTypefaces = previous;
+    }
+  }
+
+  private void RefreshRowsCore()
+  {
     var previousRows = new Dictionary<string, RenderedTreeRow>(renderedRows, StringComparer.Ordinal);
     var desiredRows = new List<Control>();
     renderedRows.Clear();
@@ -1005,6 +1043,8 @@ public class FsusTree : ContentControl
           ActiveInlineEdit?.Key != node.Key && row.Child is TextBlock label)
       {
         label.Text = GetDefaultNodeText(context);
+        if (label is FsusTreeDefaultLabel defaultLabel)
+          defaultLabel.RefreshFontResolution();
       }
       else
       {
@@ -1563,6 +1603,7 @@ internal sealed class FsusTreeDefaultLabel : TextBlock
   private TextRunCache? shapingCache;
   private ShapingInputs? shapingInputs;
   private GenericTextRunProperties? shapingProperties;
+  private List<(int Codepoint, GlyphTypeface? Face)>? fallbackGlyphTypefaces;
 
   private sealed record ShapingInputs(
     string? Text,
@@ -1594,7 +1635,6 @@ internal sealed class FsusTreeDefaultLabel : TextBlock
       {
         owner.InvalidateLayoutGlyphTypefaces();
         ReleaseShapingCache();
-        InvalidateTextLayout();
       }
     };
   }
@@ -1603,12 +1643,52 @@ internal sealed class FsusTreeDefaultLabel : TextBlock
   internal bool HoldsShapingCache => shapingCache is not null;
   protected override Type StyleKeyOverride => typeof(TextBlock);
 
-  internal void ReleaseShapingCache()
+  internal void ReleaseShapingCache() => ReleaseShapingCache(true);
+
+  private void ReleaseShapingCache(bool invalidateLayout)
   {
+    // TextBlock may still hold a valid layout even after a real unload. Retire
+    // that layout together with its shaping data before the label is rebound.
+    if (invalidateLayout)
+      InvalidateTextLayout();
     shapingCache?.Dispose();
     shapingCache = null;
     shapingInputs = null;
     shapingProperties = null;
+    fallbackGlyphTypefaces = null;
+  }
+
+  internal void RefreshFontResolution()
+  {
+    if (shapingInputs is { } inputs &&
+        (!ReferenceEquals(inputs.GlyphTypeface, owner.ResolveLayoutGlyphTypeface(inputs.Typeface)) ||
+         FallbackFontsChanged(inputs.Typeface)))
+      ReleaseShapingCache();
+  }
+
+  private bool FallbackFontsChanged(Typeface typeface)
+  {
+    if (fallbackGlyphTypefaces is null)
+      return false;
+    foreach (var (codepoint, face) in fallbackGlyphTypefaces)
+      if (!ReferenceEquals(face, owner.ResolveLayoutFallbackGlyphTypeface(typeface, codepoint)))
+        return true;
+    return false;
+  }
+
+  private void CaptureFallbackFonts(ShapingInputs inputs)
+  {
+    // FontManager has no public collection generation. Track effective fallback
+    // identities (including unresolved characters), without retaining providers
+    // or invalidating unrelated labels. Queries are shared only within a pass.
+    foreach (var rune in (inputs.Text ?? string.Empty).EnumerateRunes())
+    {
+      if (inputs.GlyphTypeface.CharacterToGlyphMap.TryGetGlyph(rune.Value, out _))
+        continue;
+      fallbackGlyphTypefaces ??= [];
+      fallbackGlyphTypefaces.Add((rune.Value,
+        owner.ResolveLayoutFallbackGlyphTypeface(inputs.Typeface, rune.Value)));
+    }
   }
 
   protected override TextLayout CreateTextLayout(string? text)
@@ -1621,7 +1701,7 @@ internal sealed class FsusTreeDefaultLabel : TextBlock
         text?.IndexOfAny(ParagraphBreaks) >= 0 ||
         Foreground is not null and not ISolidColorBrush)
     {
-      ReleaseShapingCache();
+      ReleaseShapingCache(false);
       return base.CreateTextLayout(text);
     }
 
@@ -1636,10 +1716,12 @@ internal sealed class FsusTreeDefaultLabel : TextBlock
     if (inputs != shapingInputs ||
         !ReferenceEquals(inputs.Foreground, shapingInputs?.Foreground) ||
         !ReferenceEquals(inputs.GlyphTypeface, shapingInputs?.GlyphTypeface) ||
-        !ReferenceEquals(inputs.ResourceRoot, shapingInputs?.ResourceRoot))
+        !ReferenceEquals(inputs.ResourceRoot, shapingInputs?.ResourceRoot) ||
+        FallbackFontsChanged(typeface))
     {
-      ReleaseShapingCache();
+      ReleaseShapingCache(false);
       shapingInputs = inputs;
+      CaptureFallbackFonts(inputs);
       shapingCache = new TextRunCache();
       // Line metrics resolve the glyph typeface through these properties.
       // Keep their lazy resolution with the shaped runs across fresh layouts.
