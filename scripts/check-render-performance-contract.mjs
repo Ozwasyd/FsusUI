@@ -100,13 +100,17 @@ for (const probe of [
 const metricCapture = web.indexOf('const pageMetrics = await page.evaluate(')
 const contextTeardown = web.indexOf('await context.close()', metricCapture)
 const probeCollection = web.indexOf('await collectPerformanceProbes(')
+const diagnosticReplay = web.indexOf(
+  'for (const { raw, url } of capturedCases)',
+)
 if (
   metricCapture < 0 ||
   contextTeardown <= metricCapture ||
-  probeCollection <= contextTeardown
+  diagnosticReplay <= contextTeardown ||
+  probeCollection <= diagnosticReplay
 )
   failures.push(
-    'active probes must follow production metric capture and context teardown',
+    'active probes must follow capture and teardown of all production cases',
   )
 const warmupBoundary = web.indexOf(
   'for (let index = 0; index < warmups; index++)',

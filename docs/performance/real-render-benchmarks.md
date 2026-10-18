@@ -44,8 +44,8 @@ The runner records frame work/intervals, dropped-frame rate, Long Tasks, input-t
 
 All active diagnostics (Worker, pool burst, WASM and data-pipeline probes) replay
 the same fixture, dimensions, warm-ups, actions, invocation order and sample
-count in a separate browser context after production trace, frame and heap
-capture and context teardown. Read-only Markdown phase evidence stays with its
+count in separate browser contexts after every production case has completed
+trace, frame and heap capture and context teardown. Read-only Markdown phase evidence stays with its
 production action. Diagnostic work cannot train the production strategy, warm
 its caches or drive the next production input. Summaries retain the historical
 protocol field with

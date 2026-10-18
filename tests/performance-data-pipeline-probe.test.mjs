@@ -263,7 +263,9 @@ test('collects every active probe after production metric capture and teardown',
   const capture = source.indexOf('const pageMetrics = await page.evaluate(')
   const teardown = source.indexOf('await context.close()', capture)
   const diagnostic = source.indexOf('await collectPerformanceProbes(')
+  const replay = source.indexOf('for (const { raw, url } of capturedCases)')
   assert.ok(capture > 0 && teardown > capture && diagnostic > teardown)
+  assert.ok(replay > teardown && diagnostic > replay)
   for (const probe of [
     'dataPipelineProbe',
     'wasmProbe',

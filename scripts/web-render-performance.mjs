@@ -195,6 +195,7 @@ try {
     executablePath: configuredBrowser || systemBrowser,
   })
   const results = []
+  const capturedCases = []
 
   for (const [scenario, size, refreshHz, dpr, motion] of matrix) {
     const context = await browser.newContext({
@@ -501,23 +502,6 @@ try {
       { refreshHz },
     )
     await context.close()
-    const {
-      dataPipeline: dataPipelineProbes,
-      wasm,
-      worker,
-      workerPoolBursts,
-    } = await collectPerformanceProbes({
-      browser,
-      contextOptions: {
-        deviceScaleFactor: dpr,
-        reducedMotion: motion === 'reduced' ? 'reduce' : 'no-preference',
-        viewport: { width: 1280, height: 800 },
-      },
-      url,
-      scenario,
-      warmups,
-      samples,
-    })
     const raw = {
       id: `${scenario}-${size}-${refreshHz}hz-dpr${dpr}-${motion}`,
       scenario,
@@ -531,12 +515,8 @@ try {
       measurementWindows,
       frameIntervals: pageMetrics.frameIntervals,
       longTasks: pageMetrics.longTasks,
-      worker,
-      workerPoolBursts,
-      wasm,
       markdownPhases,
       domParseOperations,
-      dataPipeline: dataPipelineProbes,
       trace: {
         styleMs: sumTrace(
           traceEvents,
@@ -557,6 +537,51 @@ try {
       layerArea,
       droppedFrameRate: pageMetrics.droppedFrameRate,
     }
+    capturedCases.push({ raw, url })
+  }
+
+  for (const { raw, url } of capturedCases) {
+    const {
+      scenario,
+      size,
+      refreshHz,
+      dpr,
+      motion,
+      navigationMs,
+      inputToFrame,
+      frameWork,
+      heapSamples,
+      stableHeapBytes,
+      layerCount,
+      layerArea,
+      markdownPhases,
+      domParseOperations,
+    } = raw
+    const pageMetrics = raw
+    const metrics = raw.browserMetrics
+    const {
+      dataPipeline: dataPipelineProbes,
+      wasm,
+      worker,
+      workerPoolBursts,
+    } = await collectPerformanceProbes({
+      browser,
+      contextOptions: {
+        deviceScaleFactor: dpr,
+        reducedMotion: motion === 'reduced' ? 'reduce' : 'no-preference',
+        viewport: { width: 1280, height: 800 },
+      },
+      url,
+      scenario,
+      warmups,
+      samples,
+    })
+    Object.assign(raw, {
+      dataPipeline: dataPipelineProbes,
+      wasm,
+      worker,
+      workerPoolBursts,
+    })
     await writeFile(
       path.join(output, `${raw.id}.raw.json`),
       `${JSON.stringify(raw, null, 2)}\n`,
