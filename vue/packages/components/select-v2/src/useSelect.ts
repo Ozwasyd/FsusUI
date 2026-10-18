@@ -114,6 +114,7 @@ const useSelect = (props: ISelectProps, emit) => {
 
   // the controller of the expanded popup
   const expanded = ref(false)
+  const keyboardNavigation = ref(false)
   const listboxId = useId()
   const activeOptionId = computed(() =>
     expanded.value ? menuRef.value?.activeOptionId : undefined,
@@ -689,6 +690,8 @@ const useSelect = (props: ISelectProps, emit) => {
   }
 
   const onSelect = (option: Option, idx: number, byClick = true) => {
+    if (selectDisabled.value) return
+    if (byClick) keyboardNavigation.value = false
     const generation = focusGeneration
     if (props.multiple) {
       let selectedOptions = (props.modelValue as any[]).slice()
@@ -708,7 +711,7 @@ const useSelect = (props: ISelectProps, emit) => {
         selectedOptions = [...selectedOptions, getValue(option)]
         states.cachedOptions.push(option)
         selectNewOption(option)
-        updateHoveringIndex(idx)
+        if (!byClick) updateHoveringIndex(idx)
       }
       update(selectedOptions)
       if (option.created) {
@@ -801,6 +804,7 @@ const useSelect = (props: ISelectProps, emit) => {
   }
 
   const handleDel = (e: KeyboardEvent) => {
+    if (selectDisabled.value) return
     if (states.displayInputValue.length === 0) {
       e.preventDefault()
       const selected = (props.modelValue as Array<any>).slice()
@@ -811,6 +815,7 @@ const useSelect = (props: ISelectProps, emit) => {
   }
 
   const handleClear = () => {
+    if (selectDisabled.value) return
     const generation = focusGeneration
     let emptyValue: string | any[]
     if (isArray(props.modelValue)) {
@@ -875,12 +880,14 @@ const useSelect = (props: ISelectProps, emit) => {
       // prevent dispatching multiple nextTick callbacks.
       return onKeyboardNavigate(direction, newIndex)
     } else {
+      keyboardNavigation.value = true
       updateHoveringIndex(newIndex)
       scrollToItem(newIndex)
     }
   }
 
   const onKeyboardSelect = () => {
+    if (selectDisabled.value) return
     if (!expanded.value) {
       return toggleMenu()
     } else if (
@@ -901,6 +908,7 @@ const useSelect = (props: ISelectProps, emit) => {
 
   const resetHoveringIndex = () => {
     states.hoveringIndex = -1
+    keyboardNavigation.value = false
   }
 
   const setSoftFocus = (generation: number) => {
@@ -1000,6 +1008,14 @@ const useSelect = (props: ISelectProps, emit) => {
   // reactive object which could cause perf penalty when unnecessary field gets changed the watch method will
   // be invoked.
 
+  watch(
+    selectDisabled,
+    (disabled) => {
+      if (disabled) blur()
+    },
+    { flush: 'sync' },
+  )
+
   watch(expanded, (val) => {
     emit('visible-change', val)
     if (val) {
@@ -1092,6 +1108,7 @@ const useSelect = (props: ISelectProps, emit) => {
     collapseTagSize,
     currentPlaceholder,
     expanded,
+    keyboardNavigation,
     listboxId,
     activeOptionId,
     emptyText,
@@ -1153,7 +1170,11 @@ const useSelect = (props: ISelectProps, emit) => {
     onKeyboardNavigate,
     onKeyboardSelect,
     onSelect,
-    onHover: updateHoveringIndex,
+    onHover: (index: number) => {
+      if (selectDisabled.value) return
+      keyboardNavigation.value = false
+      updateHoveringIndex(index)
+    },
     onUpdateInputValue,
     handleCompositionStart,
     handleCompositionEnd,

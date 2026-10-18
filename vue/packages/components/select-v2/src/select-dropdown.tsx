@@ -175,9 +175,9 @@ export default defineComponent({
     }
 
     const isItemDisabled = (modelValue: any[] | any, selected: boolean) => {
-      const { disabled, multiple, multipleLimit } = select.props
+      const { multiple, multipleLimit } = select.props
       return (
-        disabled ||
+        select.selectDisabled.value ||
         (!selected &&
           (multiple
             ? multipleLimit > 0 && modelValue.length >= multipleLimit
@@ -238,6 +238,10 @@ export default defineComponent({
       return (
         <OptionItem
           {...itemProps}
+          class={ns.is(
+            'keyboard',
+            isHovering && select.keyboardNavigation.value,
+          )}
           id={`${props.id}-${index}`}
           position={optionPositions.value.positions[index]}
           total={optionPositions.value.total}

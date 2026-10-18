@@ -376,6 +376,8 @@ export default defineComponent({
     provide(selectV2InjectionKey, {
       props: selectProps,
       expanded: API.expanded,
+      selectDisabled: API.selectDisabled,
+      keyboardNavigation: API.keyboardNavigation,
       popper: API.popper,
       onSelect: API.onSelect,
       onHover: API.onHover,

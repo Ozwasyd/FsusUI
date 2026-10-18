@@ -6,6 +6,8 @@ import type { TooltipInstance } from '@element-plus/components/tooltip'
 export interface SelectV2Context {
   props: ExtractPropTypes<typeof SelectProps>
   expanded: Ref<boolean>
+  selectDisabled: Ref<boolean | undefined>
+  keyboardNavigation: Ref<boolean>
   popper: Ref<TooltipInstance | null>
   onSelect: (option: Option, index: number, byClick?: boolean) => void
   onHover: (idx: number) => void

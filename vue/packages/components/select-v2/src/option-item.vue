@@ -16,6 +16,8 @@
       { hover: hovering },
     ]"
     @mouseenter="hoverItem"
+    @pointerdown="handlePointerDown"
+    @pointercancel="handlePointerDown"
     @click.stop="selectOptionClick"
   >
     <slot :item="item" :index="index" :disabled="disabled">
@@ -51,7 +53,12 @@ export default defineComponent({
   setup(props, { emit }) {
     const select = inject(selectV2InjectionKey)!
     const ns = useNamespace('select')
-    const { hoverItem, selectOptionClick } = useOption(props, { emit })
+    const { hoverItem, selectOptionClick, handlePointerDown } = useOption(
+      props,
+      {
+        emit,
+      },
+    )
     const { getLabel } = useProps(select.props)
     const itemRef = ref<HTMLElement | null>(null)
 
@@ -88,6 +95,7 @@ export default defineComponent({
     return {
       ns,
       hoverItem,
+      handlePointerDown,
       selectOptionClick,
       getLabel,
       itemRef,
