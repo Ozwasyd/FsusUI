@@ -162,6 +162,112 @@ public class FsusCollapseRenderedEvidenceTests
     }
   }
 
+  [AvaloniaTheory]
+  [InlineData(FsusThemeVariant.Light)]
+  [InlineData(FsusThemeVariant.Dark)]
+  public void OuterPointerMustPreserveNestedOwner(FsusThemeVariant variant)
+  {
+    var outerItem = new FsusCollapseItem { Title = "Outer", ItemKey = "outer", Content = "Outer content." };
+    var innerItem = new FsusCollapseItem { Title = "Inner", ItemKey = "inner", Content = "Inner content." };
+    var inner = new FsusCollapse { Content = innerItem };
+    var stack = new StackPanel();
+    stack.Children.Add(outerItem);
+    stack.Children.Add(inner);
+    var outer = new FsusCollapse { Content = stack };
+    var window = MountCollapse(outer, variant);
+    try
+    {
+      inner.ActiveNames = new object?[] { "inner" };
+      window.UpdateLayout();
+      AssertItemState(innerItem, true);
+      SaveNestedFrame(window, variant, "before");
+      ClickHeader(window, outerItem);
+      SaveNestedFrame(window, variant, "after");
+      Assert.Equal(new object?[] { "outer" }, outer.ActiveNames);
+      Assert.Equal(new object?[] { "inner" }, inner.ActiveNames);
+      AssertItemState(innerItem, true);
+      Assert.Equal(100, innerItem.Bounds.Height, 2);
+      var peer = global::Avalonia.Automation.Peers.ControlAutomationPeer.CreatePeerForElement(innerItem);
+      Assert.NotNull(peer);
+      Assert.Equal("Expanded", peer.GetHelpText());
+    }
+    finally
+    {
+      window.Close();
+    }
+  }
+
+  [AvaloniaTheory]
+  [InlineData(FsusThemeVariant.Light, false)]
+  [InlineData(FsusThemeVariant.Light, true)]
+  [InlineData(FsusThemeVariant.Dark, false)]
+  [InlineData(FsusThemeVariant.Dark, true)]
+  public void NestedOwnerWithMatchingKeyKeepsItsOwnModelAndEvents(
+    FsusThemeVariant variant,
+    bool innerActive)
+  {
+    var outerItem = new FsusCollapseItem { Title = "Outer", ItemKey = "shared", Content = "Outer content." };
+    var innerItem = new FsusCollapseItem { Title = "Inner", ItemKey = "shared", Content = "Inner content." };
+    var inner = new FsusCollapse { Content = innerItem };
+    var stack = new StackPanel();
+    stack.Children.Add(outerItem);
+    stack.Children.Add(inner);
+    var outer = new FsusCollapse { Accordion = true, Content = stack };
+    var window = MountCollapse(outer, variant);
+    try
+    {
+      var innerNames = innerActive ? new object?[] { "shared" } : Array.Empty<object?>();
+      inner.ActiveNames = innerNames;
+      window.UpdateLayout();
+      AssertItemState(innerItem, innerActive);
+      var outerChanges = new List<FsusCollapseValueChangedEventArgs>();
+      var innerChanges = new List<FsusCollapseValueChangedEventArgs>();
+      outer.ValueChanged += (_, args) => outerChanges.Add(args);
+      inner.ValueChanged += (_, args) => innerChanges.Add(args);
+
+      ClickHeader(window, outerItem);
+      Assert.Equal(new object?[] { "shared" }, outer.ActiveNames);
+      AssertItemState(outerItem, true);
+      AssertItemState(innerItem, innerActive);
+      Assert.Same(innerNames, inner.ActiveNames);
+      Assert.Single(outerChanges);
+      Assert.Empty(innerChanges);
+
+      outer.ActiveNames = Array.Empty<object?>();
+      window.UpdateLayout();
+      AssertItemState(outerItem, false);
+      AssertItemState(innerItem, innerActive);
+      outer.ActiveNames = new object?[] { "shared" };
+      window.UpdateLayout();
+      AssertItemState(outerItem, true);
+      AssertItemState(innerItem, innerActive);
+      Assert.Same(innerNames, inner.ActiveNames);
+      Assert.Single(outerChanges);
+      Assert.Empty(innerChanges);
+
+      ClickHeader(window, outerItem);
+      Assert.Empty(outer.ActiveNames);
+      AssertItemState(outerItem, false);
+      AssertItemState(innerItem, innerActive);
+      Assert.Same(innerNames, inner.ActiveNames);
+      Assert.Equal(2, outerChanges.Count);
+      Assert.Empty(innerChanges);
+    }
+    finally
+    {
+      window.Close();
+    }
+  }
+
+  private static void SaveNestedFrame(Window window, FsusThemeVariant variant, string phase)
+  {
+    var outputRoot = HeadlessVisualEvidenceOutput.ResolveOutputRoot(
+      FindRepositoryRoot(), "fsus-collapse-nested-owner");
+    using var frame = window.CaptureRenderedFrame();
+    Assert.NotNull(frame);
+    frame.Save(Path.Combine(outputRoot, $"nested-{variant}-{phase}.png"));
+  }
+
   private static Window MountCollapse(FsusCollapse collapse, FsusThemeVariant variant)
   {
     ApplyTheme(variant);
