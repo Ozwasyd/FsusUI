@@ -444,6 +444,9 @@ bare `#` at end of line or end of file. Each empty item carries an
 the parser-owned whole heading; `contentRange` consumes parser content ranges
 and is collapsed at the opening marker end when there is no content. Consumers
 must render these diagnostics rather than deriving them from heading text.
+ATX headings may have zero to three leading spaces; four-space or tab-indented
+lines remain code. Blockquote parsing preserves the remaining container-relative
+indentation and nested quote structure.
 
 `revealHeading(nodeId)` and `revealSourceRange(range)` use the current document identity,
 revision, and projection. On success, the component mounts the live virtual window containing

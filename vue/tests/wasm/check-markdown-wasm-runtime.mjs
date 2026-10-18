@@ -576,10 +576,22 @@ async function renderNestedListWithKind(kind) {
     '~~~\n#\n~~~\n',
     '#not a heading\n',
     '#######\n',
-    '- parent\n  - #\n    - ######\n',
+    '    #\n---\n',
+    '\t#\n===\n',
   ]) {
     assert(!/<h[1-6]>/.test(renderSource(source)),
       `[markdown-wasm-runtime] nonheading context changed ${JSON.stringify(source)}: ${kind}`)
+  }
+  for (const source of [
+    '- parent\n  - #\n    - ######\n',
+    '- parent\n\n  - #\n    - ######\n',
+  ]) {
+    const html = renderSource(source)
+    assert(
+      html.includes('<ul><li class="markdown-renderer__list-item"><h1></h1><ul>') &&
+        html.includes('<li class="markdown-renderer__list-item">######</li>'),
+      `[markdown-wasm-runtime] existing nested list structure changed: ${kind}: ${html}`,
+    )
   }
 
   // Compact nested list (no blank lines)

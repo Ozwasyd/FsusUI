@@ -1016,15 +1016,12 @@ std::string_view strip_blockquote_prefix(std::string_view line) {
     return {};
   }
 
-  std::size_t index = 0;
-  while (index < trimmed.size() && trimmed[index] == '>') {
+  std::size_t index = 1;
+  if (index < trimmed.size() && trimmed[index] == ' ') {
     ++index;
-    while (index < trimmed.size() && trimmed[index] == ' ') {
-      ++index;
-    }
   }
 
-  return trim_left(trimmed.substr(index));
+  return trimmed.substr(index);
 }
 
 struct table_cell_source_range final {
@@ -1640,7 +1637,7 @@ std::string render_document_v2(
       const int setext_level = parse_setext_heading_level(lines[index + 1]);
       char setext_fence_char = '\0';
       std::string_view setext_fence_lang;
-      if (setext_level > 0 && !trimmed.empty() && trimmed.front() != '>' && !parse_fence_start(line, setext_fence_char, setext_fence_lang)) {
+      if (setext_level > 0 && !trimmed.empty() && trimmed.front() != '>' && !is_indented_code_line(line) && !parse_fence_start(line, setext_fence_char, setext_fence_lang)) {
         flush_paragraph();
         flush_list();
         html.append(setext_level == 1 ? "<h1>" : "<h2>");
@@ -1651,7 +1648,7 @@ std::string render_document_v2(
       }
     }
 
-    if (trimmed.front() == '#') {
+    if (trimmed.front() == '#' && !is_indented_code_line(line)) {
       const std::string heading_html = render_heading(line, request, footnote_refs, reference_defs);
       if (!heading_html.empty()) {
         flush_paragraph();
@@ -2176,6 +2173,9 @@ void decorate_block_syntax(std::string_view source, syntax_node& node) {
 }
 
 bool is_atx_heading_line(std::string_view line) {
+  if (is_indented_code_line(line)) {
+    return false;
+  }
   const std::string_view trimmed = trim_left(line);
   std::size_t level = 0;
   while (level < trimmed.size() && trimmed[level] == '#') {
@@ -2609,6 +2609,7 @@ std::vector<syntax_node> collect_syntax_nodes_impl(std::string_view source) {
         setext_level > 0 &&
         !trimmed.empty() &&
         trimmed.front() != '>' &&
+        !is_indented_code_line(line.text) &&
         !parse_fence_start(line.text, setext_fence_char, setext_fence_lang)
       ) {
         flush_paragraph(line.start);

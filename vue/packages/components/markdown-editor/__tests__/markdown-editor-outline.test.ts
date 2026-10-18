@@ -92,6 +92,8 @@ describe('markdown outline projection model', () => {
           const model = createMarkdownOutlineModel(source, identity)
           expect(model.items, JSON.stringify(source)).toHaveLength(1)
           const item = model.items[0]!
+          expect(item.depth).toBe(level)
+          expect(item.text).toBe('')
           expect(item.sourceRange).toEqual({ start: 0, end: source.length })
           expect(item.contentRange.start).toBe(item.contentRange.end)
           expect(item.diagnostics).toContainEqual({ code: 'empty-heading', nodeId: item.nodeId })
@@ -119,6 +121,8 @@ describe('markdown outline projection model', () => {
       '~~~\n#\n~~~\n',
       '#not a heading\n',
       '#######\n',
+      '    #\n---\n',
+      '\t#\n===\n',
     ]) {
       expect(createMarkdownOutlineModel(source, identity).items, source).toHaveLength(0)
     }

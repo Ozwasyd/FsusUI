@@ -37,7 +37,7 @@ const headingTitleOf = (source: string, node: MarkdownStableSyntaxNode) => {
   const slice = source
     .slice(node.normalizedRange.start, node.normalizedRange.end)
     .replace(/\r$/, '')
-  const trimmed = slice.trimEnd()
+  const trimmed = slice.trim()
   const atx = /^(#{1,6})\s*(.*)$/u.exec(trimmed)
   if (atx) {
     return { level: atx[1]!.length, title: atx[2]!.trim() }
