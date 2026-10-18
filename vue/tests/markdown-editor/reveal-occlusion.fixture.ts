@@ -65,12 +65,15 @@ createApp(
         const controller = new AbortController()
         let moving: number | undefined
         let started = false
+        let delayed: ReturnType<typeof setTimeout> | undefined
+        let admissionValid = true
         const pending = owner.revealSourceRangeAndWait(selection, {
           session,
           expected: session.inspectDocumentState(),
           signal: controller.signal,
           timeoutMs: Number(query.get('timeout') ?? 600),
           assertAdmission: () => {
+            if (!admissionValid) throw new Error('fixture-admission-revoked')
             const textarea = document.querySelector('textarea')
             if (
               started ||
@@ -94,7 +97,7 @@ createApp(
                 : kind === 'middle-fragment'
                   ? rects[Math.floor(rects.length / 2)]!
                   : rects[0]!
-            if (kind !== 'moving' && kind !== 'clear') {
+            const cover = () => {
               const overlay = document.createElement('div')
               overlay.id = 'partial-occlusion'
               Object.assign(overlay.style, {
@@ -119,15 +122,44 @@ createApp(
                 )?.id,
               })
             }
+            if (
+              !kind.startsWith('moving') &&
+              kind !== 'clear' &&
+              kind !== 'late-admission'
+            ) {
+              if (kind === 'late-cover') delayed = setTimeout(cover, 60)
+              else cover()
+            }
+            if (kind === 'late-admission')
+              delayed = setTimeout(() => {
+                admissionValid = false
+                trace.push({
+                  event: 'admission-revoked',
+                  time: performance.now(),
+                })
+              }, 60)
             if (kind === 'clear')
               trace.push({
                 event: 'clear',
                 fragments: rects.map((rect) => rect.toJSON()),
               })
-            if (kind === 'moving') {
+            if (kind.startsWith('moving')) {
               const main = document.querySelector('main')!
               let step = 0
+              const movingSince = performance.now()
               const move = () => {
+                if (
+                  kind === 'moving-reveal' &&
+                  performance.now() - movingSince >= 240
+                ) {
+                  main.style.left = '0px'
+                  moving = undefined
+                  trace.push({
+                    event: 'geometry-settled',
+                    time: performance.now(),
+                  })
+                  return
+                }
                 main.style.position = 'relative'
                 main.style.left = `${++step % 2 ? 7 : 0}px`
                 moving = requestAnimationFrame(move)
@@ -160,6 +192,7 @@ createApp(
           })
         } finally {
           if (moving !== undefined) cancelAnimationFrame(moving)
+          if (delayed !== undefined) clearTimeout(delayed)
         }
       }
       return () =>

@@ -7951,6 +7951,8 @@ const revealSourceRangeAndWait = async (
         }
         paintRequest = null
         visibility!.cancel()
+        // Separate native observations, including delayed observer delivery.
+        lastPaintRequest = Math.max(lastPaintRequest, paint.time)
         paintCount += 1
         if (paintCount < 2) return
         guard(false)

@@ -165,3 +165,52 @@ test('aborts while a real overlay still covers the selected source', async ({
   expect(outcome.completion).toBeUndefined()
   expectReleased(outcome)
 })
+
+test('does not reuse an earlier unobstructed proof after late coverage', async ({
+  page,
+}) => {
+  await page.goto(`${fixture}?kind=late-cover`)
+  await page.evaluate(() => document.fonts.ready)
+  await page.getByTestId('run').click()
+  await expect(page.getByTestId('outcome')).toContainText(
+    'markdown-editor-reveal-timeout',
+  )
+  const outcome = JSON.parse((await page.getByTestId('outcome').textContent())!)
+  expect(outcome.trace[0].event).toBe('covered')
+  expect(outcome.trace.at(-1).overlayPresent).toBe(true)
+  expect(outcome.completion).toBeUndefined()
+  expectReleased(outcome)
+})
+
+test('acknowledges only after moving geometry actually settles', async ({
+  page,
+}) => {
+  await page.goto(`${fixture}?kind=moving-reveal&timeout=1500`)
+  await page.evaluate(() => document.fonts.ready)
+  await page.getByTestId('run').click()
+  await expect(page.getByTestId('outcome')).toContainText(
+    'full-selection-visible',
+  )
+  const outcome = JSON.parse((await page.getByTestId('outcome').textContent())!)
+  const settled = outcome.trace.find(
+    (entry: { event: string }) => entry.event === 'geometry-settled',
+  )
+  expect(settled).toBeDefined()
+  expect(outcome.trace.at(-1).time - settled.time).toBeGreaterThanOrEqual(100)
+  expectReleased(outcome)
+})
+
+test('refuses admission revoked while native visibility confirmation is pending', async ({
+  page,
+}) => {
+  await page.goto(`${fixture}?kind=late-admission`)
+  await page.evaluate(() => document.fonts.ready)
+  await page.getByTestId('run').click()
+  await expect(page.getByTestId('outcome')).toContainText(
+    'markdown-editor-reveal-admission-rejected',
+  )
+  const outcome = JSON.parse((await page.getByTestId('outcome').textContent())!)
+  expect(outcome.trace[0].event).toBe('admission-revoked')
+  expect(outcome.completion).toBeUndefined()
+  expectReleased(outcome)
+})
