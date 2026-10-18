@@ -538,6 +538,92 @@ async function renderNestedListWithKind(kind) {
     }
   }
 
+  // Re-enter the same block parser with container-relative indentation intact.
+  for (let level = 1; level <= 6; level++) {
+    for (let spaces = 0; spaces <= 3; spaces++) {
+      const source = ' '.repeat(spaces) + '#'.repeat(level) + '\n'
+      assert(
+        renderSource(source).includes(`<h${level}></h${level}>`),
+        `[markdown-wasm-runtime] empty ATX boundary ${JSON.stringify(source)}: ${kind}`,
+      )
+    }
+  }
+  for (const prefix of ['', '> ', '> > ']) {
+    const codeIndents = prefix === '> '
+      ? ['    ', '     ', '\t\t', '   \t']
+      : ['    ', '     ', '\t', ' \t', '   \t']
+    for (const indent of codeIndents) {
+      for (const heading of ['#', '######', '#  ', '## title']) {
+        const source = `${prefix}${indent}${heading}\n`
+        const html = renderSource(source)
+        assert(
+          html.includes('<pre') && !/<h[1-6]>/.test(html),
+          `[markdown-wasm-runtime] indented code ${JSON.stringify(source)}: ${kind}: ${html}`,
+        )
+      }
+    }
+  }
+  assert(
+    renderSource('> > #\n').includes('<blockquote><blockquote><h1></h1></blockquote></blockquote>'),
+    `[markdown-wasm-runtime] nested blockquote structure lost: ${kind}`,
+  )
+  assert(
+    renderSource('>    #\n').includes('<blockquote><h1></h1></blockquote>'),
+    `[markdown-wasm-runtime] blockquote-relative three-space ATX rejected: ${kind}`,
+  )
+  for (const source of ['>\t#\n', '> \t#\n', '>  \t#\n']) {
+    assert(renderSource(source).includes('<blockquote><h1></h1></blockquote>'),
+      `[markdown-wasm-runtime] quote tab delimiter changed ${JSON.stringify(source)}: ${kind}`)
+  }
+  assert(
+    renderSource('>\tTitle\n>\t=====\n').includes('<blockquote><h1>Title</h1></blockquote>'),
+    `[markdown-wasm-runtime] quote tab setext changed: ${kind}`,
+  )
+  assert(
+    renderSource('> >\t## title\n').includes('<blockquote><blockquote><h2>title</h2></blockquote></blockquote>'),
+    `[markdown-wasm-runtime] nested quote tab heading changed: ${kind}`,
+  )
+  const nestedTabCode = renderSource('> > \t#\n')
+  assert(nestedTabCode.startsWith('<blockquote><blockquote><pre') && !/<h[1-6]>/.test(nestedTabCode),
+    `[markdown-wasm-runtime] nested quote tab column origin lost: ${kind}`)
+  for (const payload of ['>\ttext', '> >\ttext', '\ttext']) {
+    const html = renderSource(`> \`\`\`\n> ${payload}\n> \`\`\`\n`)
+    const escapedPayload = payload.replaceAll('>', '&gt;')
+    assert(html.includes(`<code>${escapedPayload}\n</code>`),
+      `[markdown-wasm-runtime] quoted fenced payload bytes changed ${JSON.stringify(payload)}: ${kind}: ${html}`)
+  }
+  const varyingColumns = renderSource('> #\n  > \t#\n')
+  assert((varyingColumns.match(/<h1>/g) ?? []).length === 1 && varyingColumns.includes('<pre'),
+    `[markdown-wasm-runtime] per-line quote origins lost: ${kind}`)
+  const filteredColumns = renderSource('> [ref]: https://example.test\n> > \t#\n')
+  assert(filteredColumns.includes('<pre') && !/<h[1-6]>/.test(filteredColumns),
+    `[markdown-wasm-runtime] reference filtering shifted quote origins: ${kind}`)
+  const setext = renderSource('Title\n=====\n\nSubtitle\n-----\n')
+  assert(setext.includes('<h1>Title</h1>') && setext.includes('<h2>Subtitle</h2>'),
+    `[markdown-wasm-runtime] setext boundary changed: ${kind}`)
+  for (const source of [
+    '```md\n#\n   ######\n    #\n```\n',
+    '~~~\n#\n~~~\n',
+    '#not a heading\n',
+    '#######\n',
+    '    #\n---\n',
+    '\t#\n===\n',
+  ]) {
+    assert(!/<h[1-6]>/.test(renderSource(source)),
+      `[markdown-wasm-runtime] nonheading context changed ${JSON.stringify(source)}: ${kind}`)
+  }
+  for (const source of [
+    '- parent\n  - #\n    - ######\n',
+    '- parent\n\n  - #\n    - ######\n',
+  ]) {
+    const html = renderSource(source)
+    assert(
+      html.includes('<ul><li class="markdown-renderer__list-item"><h1></h1><ul>') &&
+        html.includes('<li class="markdown-renderer__list-item">######</li>'),
+      `[markdown-wasm-runtime] existing nested list structure changed: ${kind}: ${html}`,
+    )
+  }
+
   // Compact nested list (no blank lines)
   const compact = [
     '* 第三层项目 B.2.a',
