@@ -75,6 +75,12 @@ loading, processes a drop, or detaches from the visual tree.
 
 ## Known Limitations
 
+When `FsusTransfer` has keyboard focus, Up/Down navigate enabled source items,
+Space toggles the highlighted source selection, and Enter moves selected source
+items to the target. Both move directions recheck item disabled state and the
+current filtered list when invoked. Selection and movement are blocked while
+the control or an ancestor has `IsEnabled = false`.
+
 The control does not perform network upload or file reading by itself; product
 apps own the file IO and network adapter. It does not open an operating-system
 file picker: consumers handle `BrowseRequested` or `BrowseCommand` and choose
