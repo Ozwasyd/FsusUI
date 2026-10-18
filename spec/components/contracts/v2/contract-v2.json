@@ -10,22 +10,22 @@
   "baselines": {
     "web": {
       "path": "spec/baselines/vue-current.json",
-      "hash": "735c6cb3781e381fd4c1e366030aeeee7c66dd99118c2812dbd2c9069f56d4e4",
+      "hash": "3f54bcc8e94d127cec74ebd678488ef909e1136b2d6e1786fd2b631b90f5176b",
       "packageVersion": "1.5.1"
     },
     "avalonia": {
       "path": "spec/avalonia/semantic/FsusUI.Avalonia.semantic.json",
-      "hash": "449c2b74a3ab976b86c3758b9ff280f04cc9999d216d4a6ce64040f37df3f34f",
+      "hash": "c82dd355dad7b5c3b8c741a917c554773d878f54245d2b16264331b036156634",
       "packageId": "FsusUI.Avalonia"
     },
     "avaloniaThemes": {
       "path": "spec/avalonia/semantic/FsusUI.Avalonia.Themes.semantic.json",
-      "hash": "102f35527961bb3bcb4d973d221e7b1fa25adf8252ffb9cd3c9ce0cb64be9f71",
+      "hash": "d044aa1220e74762ea7986d89ffb67d3de14b635929f83a9d0a50c22c446da85",
       "packageId": "FsusUI.Avalonia.Themes"
     },
     "avaloniaIcons": {
       "path": "spec/avalonia/semantic/FsusUI.Avalonia.Icons.semantic.json",
-      "hash": "64709523884bf29777b55fefc3cf953799bccbe376f15b9abe8bd324d960bc42",
+      "hash": "4f77f0cd83e3a20f25d69e0f21baf3344f8ca53f29eadeb3ab420eb6b0601fbd",
       "packageId": "FsusUI.Avalonia.Icons"
     },
     "markdownEditorGate": {
