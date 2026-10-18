@@ -7,6 +7,7 @@ import path from 'node:path'
 import process from 'node:process'
 import { chromium } from '@playwright/test'
 import { collectPerformanceProbes } from './render-performance-probes.mjs'
+import { waitForPerformanceFixture } from './render-performance-fixture.mjs'
 
 const root = path.resolve(import.meta.dirname, '..')
 const argv = process.argv.slice(2)
@@ -345,9 +346,7 @@ try {
     const url = `${baseURL}/?performance=${scenario}&size=${size}&motion=${motion}`
     const navigationStarted = performance.now()
     await page.goto(url, { waitUntil: 'domcontentloaded' })
-    await page
-      .locator('[data-performance-ready="true"]')
-      .waitFor({ timeout: 120_000 })
+    await waitForPerformanceFixture(page)
     const navigationMs = performance.now() - navigationStarted
 
     for (let index = 0; index < warmups; index++) {

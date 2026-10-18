@@ -42,6 +42,13 @@ The full browser matrix is the Cartesian product of the scenarios below with 60/
 
 The runner records frame work/intervals, dropped-frame rate, Long Tasks, input-to-next-frame latency, style/layout/paint/composite trace durations, DOM nodes, Chromium layers and estimated layer area, JS heap, Worker queue/compute/transfer time, and WASM startup/compute/end-to-end time. Markdown adds `markdownPhases.parseMs`, `transferMs`, `commitMs`, `activationMs`, and matching Chromium `paintMs` so 24 KiB, 256 KiB, and 1 MiB paths can be diagnosed phase by phase. `data-pipeline-table` adds p50/p95/p99 for legacy synchronous-sort blocking, Worker submission blocking, and Worker/WASM completion, distinguishing main-thread responsiveness from total completion. Refresh targets are analysis budgets, not a claim that a virtual CI display physically refreshes at 120 Hz.
 
+Production capture and diagnostic replay reject a fixture with
+`data-performance-error` or `data-performance-ready="error"` before any warm-up
+or measured action. A later fallback completion cannot override the retained
+error, even when it sets `data-performance-ready="true"`. A rejected render
+does not produce a qualifying performance summary. This readiness validation
+does not add actions, warm-ups or RAFs to a valid sample.
+
 All active diagnostics (Worker, pool burst, WASM and data-pipeline probes) replay
 the same fixture, dimensions, warm-ups, actions, invocation order and sample
 count in separate browser contexts after every production case has completed
