@@ -161,29 +161,28 @@ describe('Markdown feature activation scheduling', () => {
 
   it('does not let an aborted activation suppress a replacement generation', async () => {
     const controller = new AbortController()
-    const old = harness()
+    const h = harness()
     const oldParent = makeWork('old-parent')
     const obsolete = makeWork('obsolete', [oldParent])
-    const oldCompletion = old.run(
+    const oldCompletion = h.run(
       [{ work: [oldParent, obsolete] }],
       2,
       controller.signal,
     )
     await flush()
     controller.abort()
-    const next = harness()
     const nextParent = makeWork('next-parent')
     const nextChild = makeWork('next-child', [nextParent])
-    const nextCompletion = next.run([{ work: [nextParent, nextChild] }], 2)
+    const nextCompletion = h.run([{ work: [nextParent, nextChild] }], 2)
     await flush()
-    old.finish.get('old-parent')!.resolve()
+    h.finish.get('old-parent')!.resolve()
     await oldCompletion
-    expect(old.started).toEqual(['old-parent'])
+    expect(h.started).toEqual(['old-parent', 'next-parent'])
     expect(oldParent.committed).toBeUndefined()
-    next.finish.get('next-parent')!.resolve()
+    h.finish.get('next-parent')!.resolve()
     await flush()
-    expect(next.started).toEqual(['next-parent', 'next-child'])
-    next.finish.get('next-child')!.resolve()
+    expect(h.started).toEqual(['old-parent', 'next-parent', 'next-child'])
+    h.finish.get('next-child')!.resolve()
     await nextCompletion
     expect(nextChild.committed).toBe(true)
   })
@@ -208,9 +207,12 @@ describe('Markdown feature activation scheduling', () => {
   })
 
   it('checks stale queued roots at execution and isolates repeated scheduling', async () => {
+    const stale = new Set<string>()
+    const h = harness(stale)
     for (let iteration = 0; iteration < 3; iteration++) {
-      const stale = new Set<string>()
-      const h = harness(stale)
+      stale.clear()
+      h.started.length = 0
+      h.finish.clear()
       const parent = makeWork('parent')
       const child = makeWork('child', [parent])
       const queued = makeWork('queued')
