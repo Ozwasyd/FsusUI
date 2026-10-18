@@ -248,7 +248,7 @@ createApp(
                     editorProfile: 'prose',
                     minRows: 8,
                     height: '320px',
-                    writingAids: { focus: true },
+                    writingAids: { focus: query.get('focus') !== '0' },
                     onSourceNavigationGesture: (
                       event: MarkdownEditorSourceNavigationGesture,
                     ) => events.push(event),

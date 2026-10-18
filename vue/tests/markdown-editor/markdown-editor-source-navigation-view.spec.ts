@@ -359,3 +359,52 @@ test('retires a source view across actual native font loading', async ({
   })
   expect(result).toEqual({ status: 'loaded', oldCurrent: false })
 })
+
+for (const theme of ['light', 'dark'] as const) {
+  test(`reads actual ${theme} mobile geometry`, async ({ page }, testInfo) => {
+    await page.setViewportSize({ width: 390, height: 844 })
+    await ready(page, `?theme=${theme}`)
+    const result = await page.evaluate(() => {
+      const api = window.sourceViewFixture
+      const view = api.hold()!
+      const input = document.querySelector('textarea')!
+      return {
+        view,
+        current: api.current(),
+        selection: {
+          start: input.selectionStart,
+          end: input.selectionEnd,
+          direction: input.selectionDirection,
+        },
+        progress: input.scrollTop / (input.scrollHeight - input.clientHeight),
+      }
+    })
+    expect(result.current).toBe(true)
+    expect(result.view.selection).toEqual(result.selection)
+    expect(result.view.percentage).toBeCloseTo(result.progress, 12)
+    expect(result.view.viewport.height).toBeGreaterThan(0)
+    await testInfo.attach('mobile-native-source-view', {
+      body: JSON.stringify(result, null, 2),
+      contentType: 'application/json',
+    })
+    await page.screenshot({
+      path: testInfo.outputPath(`source-view-mobile-${theme}.png`),
+    })
+  })
+}
+
+test('reads a blurred standard source input without a Focus presentation or focus side effects', async ({
+  page,
+}) => {
+  await ready(page, '?focus=0')
+  await expect(page.locator('.el-markdown-editor__focus-layer')).toHaveCount(0)
+  const result = await page.evaluate(() => {
+    document.querySelector('textarea')!.blur()
+    return window.sourceViewFixture.readonlyWitness()
+  })
+  expect(result.view).not.toBeNull()
+  expect(result.before.active).toBe(false)
+  expect(result.after).toEqual(result.before)
+  expect(result.mutations).toBe(0)
+  expect(result.current).toBe(true)
+})
