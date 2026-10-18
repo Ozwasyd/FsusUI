@@ -123,6 +123,7 @@ export const prepareMarkdownEditorRevealTextLayout = (
     return null
   const style = view.getComputedStyle(textarea)
   const nativeBox = textarea.getBoundingClientRect()
+  const key = textLayoutKey(textarea)
   const mirror = document.createElement('div')
   measurementNodes.add(mirror)
   mirror.setAttribute('aria-hidden', 'true')
@@ -155,7 +156,6 @@ export const prepareMarkdownEditorRevealTextLayout = (
   if (Number.isFinite(lineHeight))
     mirror.style.lineHeight = `${(Math.floor(lineHeight * 64) - 0.5) / 64}px`
   document.body.append(mirror)
-  const key = textLayoutKey(textarea)
   if (key === null) {
     mirror.remove()
     return null

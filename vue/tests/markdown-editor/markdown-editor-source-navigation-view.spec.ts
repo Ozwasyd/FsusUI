@@ -408,3 +408,42 @@ test('reads a blurred standard source input without a Focus presentation or focu
   expect(result.mutations).toBe(0)
   expect(result.current).toBe(true)
 })
+
+test('prepares the latest document after a trusted gesture retires an older layout lease', async ({
+  page,
+}) => {
+  await ready(page)
+  await page.evaluate(() => {
+    const api = window.sourceViewFixture
+    api.hold()
+    api.change('arm-document-switch')
+  })
+  await page.locator('textarea').first().hover()
+  await page.mouse.wheel(0, 80)
+  await expect
+    .poll(() =>
+      page.evaluate(() =>
+        document
+          .querySelector('textarea')!
+          .value.startsWith('Changed document'),
+      ),
+    )
+    .toBe(true)
+  expect(await page.evaluate(() => window.sourceViewFixture.current())).toBe(
+    false,
+  )
+  await page.evaluate(() => {
+    window.sourceViewFixture.renewExpected()
+  })
+  await page.evaluate(() => window.sourceViewFixture.reveal('backward'))
+  await expect
+    .poll(() => page.evaluate(() => window.sourceViewFixture.read() !== null))
+    .toBe(true)
+  const fresh = await page.evaluate(() => {
+    const api = window.sourceViewFixture
+    const view = api.hold()
+    return { view, current: api.current() }
+  })
+  expect(fresh.view!.documentIdentity.epoch).toBe(20)
+  expect(fresh.current).toBe(true)
+})

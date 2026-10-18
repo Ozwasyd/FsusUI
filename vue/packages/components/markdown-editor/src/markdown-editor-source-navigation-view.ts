@@ -95,7 +95,11 @@ export const createMarkdownEditorSourceNavigationViewOwner = (owner: {
   }
   const refresh = () => {
     invalidate()
-    if (frame === undefined && !disposed) frame = owner.requestFrame(prepare)
+    // An original document/lifecycle lease can suppress the old callback. Do
+    // not let its undelivered handle starve preparation for the current native view.
+    if (frame !== undefined) owner.cancelFrame(frame)
+    frame = undefined
+    if (!disposed) frame = owner.requestFrame(prepare)
   }
   const pause = () => {
     invalidate()

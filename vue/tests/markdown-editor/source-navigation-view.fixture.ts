@@ -174,6 +174,9 @@ const createControls = (
       controller = new AbortController()
       return { readAdmission, currentAdmission, readAbort, currentAbort }
     },
+    renewExpected() {
+      expected = session!.inspectDocumentState()
+    },
     race() {
       const input = options()
       let calls = 0
@@ -203,6 +206,8 @@ createApp(
       const editor = ref<MarkdownEditorInstance>()
       const second = ref<MarkdownEditorInstance>()
       const mode = ref<'source' | 'preview'>('source')
+      const sourceValue = ref(source)
+      let switchOnGesture = false
       const epoch = ref(19)
       const mounted = ref(true)
       const events: MarkdownEditorSourceNavigationGesture[] = []
@@ -211,6 +216,7 @@ createApp(
         () => second.value,
         events,
         (kind) => {
+          if (kind === 'arm-document-switch') switchOnGesture = true
           if (kind === 'mode')
             mode.value = mode.value === 'source' ? 'preview' : 'source'
           if (kind === 'epoch') epoch.value += 1
@@ -239,7 +245,7 @@ createApp(
               mounted.value
                 ? h(ElMarkdownEditor, {
                     ref: editor,
-                    modelValue: query.has('short') ? 'Short source.' : source,
+                    modelValue: sourceValue.value,
                     mode: mode.value,
                     documentIdentity: {
                       id: 'source-view-document',
@@ -251,7 +257,14 @@ createApp(
                     writingAids: { focus: query.get('focus') !== '0' },
                     onSourceNavigationGesture: (
                       event: MarkdownEditorSourceNavigationGesture,
-                    ) => events.push(event),
+                    ) => {
+                      events.push(event)
+                      if (switchOnGesture) {
+                        switchOnGesture = false
+                        sourceValue.value = `Changed document\n${source}`
+                        epoch.value += 1
+                      }
+                    },
                   })
                 : null,
             ],
