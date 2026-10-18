@@ -217,8 +217,9 @@ createApp(
           if (kind === 'unmount') mounted.value = false
           if (kind === 'transaction')
             editor.value!.dispatchTransaction({
-              origin: 'api',
-              operations: [{ start: 0, end: 0, insert: 'Changed\n' }],
+              origin: 'programmatic',
+              history: 'separate',
+              changes: [{ from: 0, to: 0, insert: 'Changed\n' }],
             })
         },
       )

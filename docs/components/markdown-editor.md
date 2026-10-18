@@ -1903,3 +1903,12 @@ admission authority. Keep the exact object and check original-instance currentne
 before and after capture and after awaiting reveal; recheck host lifetime and
 admission as well. This source WIP does not supply the Blog wrappers or package
 declaration build producer.
+
+The source view is retired by deliberate reveal selection/scroll changes too.
+Do not exempt those changes to keep an old token current. A host must distinguish
+its original admission/lifetime fencing from the current spatial observation and
+obtain/fence the appropriate post-reveal observation before committing history.
+CSSOM changes to copied text styles can make preparation incomplete; readers then
+return null until the original layout lifecycle refreshes it. Readers do not queue
+that preparation themselves. CSSOM occlusion without geometry change is outside
+this observation's authority and still requires the reveal contract and host guards.

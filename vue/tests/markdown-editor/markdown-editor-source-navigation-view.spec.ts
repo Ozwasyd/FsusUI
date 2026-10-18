@@ -34,7 +34,11 @@ for (const direction of ['backward', 'forward'] as const) {
       let passed = 0
       while (walker.nextNode()) {
         const length = walker.currentNode.textContent!.length
-        if (offset <= passed + length) {
+        if (
+          offset < passed + length ||
+          (offset === passed + length &&
+            input.selectionDirection !== 'backward')
+        ) {
           range.setStart(walker.currentNode, offset - passed)
           range.collapse(true)
           break
@@ -61,6 +65,13 @@ for (const direction of ['backward', 'forward'] as const) {
           native.top -
           input.clientTop,
       }
+    })
+    await testInfo.attach('native-source-view', {
+      body: JSON.stringify(value, null, 2),
+      contentType: 'application/json',
+    })
+    await page.screenshot({
+      path: testInfo.outputPath(`source-view-${direction}.png`),
     })
     expect(value.current).toBe(true)
     expect(value.view.selection).toEqual(value.selection)
@@ -238,7 +249,13 @@ test('trusted manual input notifies, while timer clearance never announces resum
     before,
   )
 })
-for (const action of ['mode', 'epoch', 'unmount', 'pause'] as const) {
+for (const action of [
+  'mode',
+  'epoch',
+  'unmount',
+  'pause',
+  'transaction',
+] as const) {
   test(`retires the observation on ${action}`, async ({ page }) => {
     await ready(page)
     await page.evaluate((action) => {
@@ -260,4 +277,79 @@ test('admission-time physical drift cannot issue an observation', async ({
 }) => {
   await ready(page)
   expect(await page.evaluate(() => window.sourceViewFixture.race())).toBeNull()
+})
+
+test('rejects raw native selection drift before canonical selection catches up', async ({
+  page,
+}) => {
+  await ready(page)
+  const result = await page.evaluate(() => {
+    const api = window.sourceViewFixture
+    api.hold()
+    document.querySelector('textarea')!.setSelectionRange(0, 1, 'forward')
+    return { current: api.current(), value: api.read() }
+  })
+  expect(result).toEqual({ current: false, value: null })
+})
+
+test('measures the usable viewport from a real nested rectangular scroll clip', async ({
+  page,
+}) => {
+  await page.goto(`${fixture}?clip=1`)
+  await page.evaluate(() => document.fonts.ready)
+  await page.locator('textarea').first().click()
+  await page.waitForFunction(() => window.sourceViewFixture.read() !== null)
+  const result = await page.evaluate(() => {
+    const view = window.sourceViewFixture.read()!
+    const input = document.querySelector('textarea')!
+    const box = input.getBoundingClientRect()
+    const clip = document.querySelector('.clip')!.getBoundingClientRect()
+    const top = Math.max(box.top + input.clientTop, clip.top)
+    const bottom = Math.min(
+      box.top + input.clientTop + input.clientHeight,
+      clip.bottom,
+      innerHeight,
+    )
+    return { view, start: top, height: bottom - top }
+  })
+  expect(result.view.viewport.blockStart).toBe(result.start)
+  expect(result.view.viewport.height).toBe(result.height)
+  expect(result.view.viewport.height).toBeLessThan(250)
+})
+
+test('returns null for hidden native geometry and never revives the prior view', async ({
+  page,
+}) => {
+  await ready(page)
+  const result = await page.evaluate(() => {
+    const api = window.sourceViewFixture
+    api.hold()
+    const main = document.querySelector('main')!
+    main.style.display = 'none'
+    const hidden = api.read()
+    const current = api.current()
+    main.style.display = ''
+    return { hidden, current, restored: api.current() }
+  })
+  expect(result).toEqual({ hidden: null, current: false, restored: false })
+})
+
+test('retires a source view across actual native font loading', async ({
+  page,
+}) => {
+  await ready(page)
+  const result = await page.evaluate(async () => {
+    const api = window.sourceViewFixture
+    api.hold()
+    const font = new FontFace(
+      'SourceViewRealFont',
+      'url(/@fs/workspace/reveal-candidate/dotnet/FsusUI.Avalonia.HeadlessTests/Assets/Fonts/GoogleSans-Regular.ttf)',
+    )
+    document.fonts.add(font)
+    document.querySelector('textarea')!.style.fontFamily = 'SourceViewRealFont'
+    await document.fonts.load('18px SourceViewRealFont')
+    await document.fonts.ready
+    return { status: font.status, oldCurrent: api.current() }
+  })
+  expect(result).toEqual({ status: 'loaded', oldCurrent: false })
 })
