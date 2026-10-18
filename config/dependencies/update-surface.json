@@ -481,6 +481,7 @@
         "config/dependencies/npm-authority.json",
         "package.json",
         "pnpm-lock.yaml",
+        "vue/internal/build/package.json",
         "vue/internal/eslint-config/package.json"
       ],
       "versioning": "npm",
@@ -1035,6 +1036,7 @@
         "config/dependencies/npm-authority.json",
         "package.json",
         "pnpm-lock.yaml",
+        "vue/internal/build-utils/package.json",
         "vue/internal/build/package.json"
       ],
       "versioning": "npm",
@@ -1301,7 +1303,8 @@
       "files": [
         "config/dependencies/npm-authority.json",
         "package.json",
-        "pnpm-lock.yaml"
+        "pnpm-lock.yaml",
+        "vue/packages/element-plus/package.json"
       ],
       "versioning": "npm",
       "group": "npm-release-tooling",

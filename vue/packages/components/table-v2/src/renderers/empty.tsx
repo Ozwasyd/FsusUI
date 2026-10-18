@@ -2,7 +2,7 @@ import ElEmpty from '@element-plus/components/empty'
 import type { CSSProperties, FunctionalComponent } from 'vue'
 
 type EmptyRendererProps = {
-  class?: JSX.IntrinsicAttributes['class']
+  class?: any
   style?: CSSProperties
 }
 

@@ -79,6 +79,14 @@ function inputDigests(repoRoot) {
     'scripts/npm-candidate-lib.mjs',
     'scripts/package-candidate.mjs',
     'scripts/prepare-npm-package.mjs',
+    'scripts/bundled-workspace-references.mjs',
+    'scripts/generate-package-declarations.mjs',
+    'scripts/package-declaration-source.mjs',
+    'vue/internal/build/src/plugins/frozen-string-records.ts',
+    'vue/internal/build/src/plugins/frozen-strings.ts',
+    'vue/internal/build/src/plugins/generated-code.ts',
+    'vue/internal/build/src/utils/vue-macros.ts',
+    'vue/internal/build/src/plugins/canonical-imports.ts',
     'vue/packages/element-plus/package.json',
   ]
   return Object.fromEntries(

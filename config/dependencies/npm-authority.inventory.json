@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-06T16:39:22.146Z",
+  "generator": "node scripts/generate-npm-authority-inventory.mjs",
   "externalPackageCount": 94,
   "packages": {
     "@changesets/cli": {
@@ -143,6 +143,11 @@
         {
           "path": "package.json",
           "field": "devDependencies",
+          "version": "8.10.0"
+        },
+        {
+          "path": "vue/internal/build-utils/package.json",
+          "field": "dependencies",
           "version": "8.10.0"
         },
         {
@@ -603,6 +608,11 @@
         {
           "path": "package.json",
           "field": "devDependencies",
+          "version": "10.2.0"
+        },
+        {
+          "path": "vue/internal/build/package.json",
+          "field": "dependencies",
           "version": "10.2.0"
         },
         {
@@ -1124,6 +1134,11 @@
           "path": "package.json",
           "field": "devDependencies",
           "version": "4.41.0"
+        },
+        {
+          "path": "vue/packages/element-plus/package.json",
+          "field": "dependencies",
+          "version": "^4.41.0"
         }
       ]
     },
