@@ -906,6 +906,34 @@ export const buildArtifacts = (root, options = {}) => {
   }
 }
 
+// A generated-output commit must not become the next input revision. Reuse
+// provenance only when the complete freshly rebuilt baseline still matches.
+export const buildWriteArtifacts = (root) => {
+  const baselineFile = path.join(root, 'spec/baselines/vue-current.json')
+  if (exists(baselineFile)) {
+    const previous = parseJson(baselineFile)
+    const revision = previous.source?.commitSha
+    let ancestor = false
+    if (/^[a-f0-9]{40}$/u.test(revision ?? '')) {
+      try {
+        execFileSync('git', ['merge-base', '--is-ancestor', revision, 'HEAD'], {
+          cwd: root,
+          stdio: 'ignore',
+        })
+        ancestor = true
+      } catch {
+        // Missing or unrelated provenance must bind to the current inputs.
+      }
+    }
+    if (ancestor) {
+      const artifacts = buildArtifacts(root, { commitShaOverride: revision })
+      if (stableJson(artifacts.baseline) === stableJson(previous))
+        return artifacts
+    }
+  }
+  return buildArtifacts(root)
+}
+
 const renderReport = (baseline) => {
   const rows = baseline.components
     .map(
@@ -1082,9 +1110,11 @@ const main = async () => {
   )
   const existingBaseline =
     checkMode && exists(baselineFile) ? parseJson(baselineFile) : undefined
-  const { baseline, report } = buildArtifacts(defaultRoot, {
-    commitShaOverride: existingBaseline?.source?.commitSha,
-  })
+  const { baseline, report } = writeMode
+    ? buildWriteArtifacts(defaultRoot)
+    : buildArtifacts(defaultRoot, {
+        commitShaOverride: existingBaseline?.source?.commitSha,
+      })
 
   const nextBaseline = await formatGenerated(baselineFile, stableJson(baseline))
   const nextReport = await formatGenerated(reportFile, report)
