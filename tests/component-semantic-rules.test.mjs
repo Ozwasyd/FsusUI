@@ -246,8 +246,8 @@ const productionFocusDeclarations = () => {
   return declarations
 }
 
-// Replay the non-important focus declaration specified by the independent
-// review. This is a separate temporary CSS fixture, never a product edit.
+// Retain the alternate non-important fixture from the first review. That
+// review's production-priority claim was corrected; product CSS is important.
 const reviewFocusProfile = () => {
   let css = productionCss()
   for (const declaration of productionFocusDeclarations().reverse()) {
@@ -451,6 +451,96 @@ for (const value of ['none', 'inset 0 0 0 3px #000']) {
         ({ actual }) => actual.source.path === 'mutations/property-scope-0.css',
       ),
     )
+  })
+}
+
+const relationshipCases = [
+  ['root adjacent sibling', ':root + .el-dialog__headerbtn', 'fail'],
+  [
+    'focus-within adjacent sibling',
+    ':focus-within + .el-dialog__headerbtn',
+    'fail',
+  ],
+  ['unproven direct root child', ':root > .el-dialog__headerbtn', 'unknown'],
+  ['root general sibling', ':root ~ .el-dialog__headerbtn', 'fail'],
+  [
+    'unproven unfocused adjacent sibling',
+    ':not(:focus-within) + .el-dialog__headerbtn',
+    'unknown',
+  ],
+  [
+    'unproven density on direct parent',
+    '[data-density="default"] > .el-dialog__headerbtn',
+    'unknown',
+  ],
+  ['root descendant', ':root .el-dialog__headerbtn', 'pass'],
+  [
+    'focused child of focus-within',
+    ':focus-within > .el-dialog__headerbtn',
+    'pass',
+  ],
+  [
+    'focused descendant of focus-within',
+    ':focus-within .el-dialog__headerbtn',
+    'pass',
+  ],
+  [
+    'impossible ancestor before root',
+    ':focus-within :root .el-dialog__headerbtn',
+    'fail',
+  ],
+]
+
+for (const [name, selector, expected] of relationshipCases) {
+  test(`focus relationship: ${name}`, async () => {
+    const width = await tokenVariable('thickness.focus.md')
+    const { analysis } = await evaluateFixture({
+      overrides: [
+        `.el-dialog__headerbtn.el-dialog__headerbtn { box-shadow: none !important; }
+       ${selector} { box-shadow: inset 0 0 0 ${width} #000 !important; }`,
+      ],
+    })
+    const records = analysis.diagnostics.filter(
+      ({ ruleId, property }) =>
+        ruleId === 'web.dialog.overlay-close-optical' &&
+        property === 'box-shadow',
+    )
+    const unknowns = analysis.staticUnknowns.filter(
+      ({ ruleId, property }) =>
+        ruleId === 'web.dialog.overlay-close-optical' &&
+        property === 'box-shadow',
+    )
+    if (expected === 'unknown') {
+      assert.equal(records.length, 0, JSON.stringify(records))
+      assert.ok(unknowns.length > 0)
+      assert.ok(
+        unknowns.every(
+          ({ actual, status }) =>
+            status === 'visual-evidence-required' &&
+            actual.unresolvedCascade.some(
+              (entry) =>
+                entry.selector === selector.replace(/\s*([>+~])\s*/g, '$1') &&
+                entry.source.path === 'mutations/property-scope-0.css',
+            ),
+        ),
+      )
+    } else {
+      assert.ok(records.length > 0)
+      assert.equal(unknowns.length, 0)
+      assert.ok(
+        records.every(({ status }) => status === expected),
+        JSON.stringify(records),
+      )
+      if (expected === 'fail')
+        assert.ok(records.every(({ actual }) => actual.value === 'none'))
+      else
+        assert.ok(
+          records.every(
+            ({ actual }) =>
+              actual.source.path === 'mutations/property-scope-0.css',
+          ),
+        )
+    }
   })
 }
 
