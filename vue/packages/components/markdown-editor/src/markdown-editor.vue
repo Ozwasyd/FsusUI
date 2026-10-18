@@ -1477,7 +1477,9 @@ import {
   revealSourceRange as revealSourceRangeOutline,
 } from './markdown-editor-outline'
 import { planMarkdownOutlineReveal } from './markdown-editor-outline-active'
-import { measureMarkdownEditorReveal, MarkdownEditorRevealError } from './markdown-editor-reveal-completion'
+import { measureMarkdownEditorReveal, MarkdownEditorRevealError, isMarkdownEditorRevealMeasurementMutation } from './markdown-editor-reveal-completion'
+import { createMarkdownEditorRevealVisibility } from './markdown-editor-reveal-visibility'
+import type { MarkdownEditorRevealPaint } from './markdown-editor-reveal-visibility'
 import type { MarkdownEditorRevealCompletion, MarkdownEditorRevealCompletionOptions, MarkdownEditorRevealFailureReason } from './markdown-editor-reveal-completion'
 import type { MarkdownEditorSession } from './markdown-editor-session'
 import type { MarkdownEditorResolvedSelection } from './markdown-editor-transaction'
@@ -7805,7 +7807,7 @@ const revealSourceRange = (
 
 // Completion belongs to this mounted public API owner, never to a host receipt adapter.
 let publicRevealSession: MarkdownEditorSession | null = null
-let pendingPublicReveal: { selection: MarkdownEditorResolvedSelection; cancel: (reason: MarkdownEditorRevealFailureReason) => void } | null = null
+let pendingPublicReveal: { observers: number; selection: MarkdownEditorResolvedSelection; cancel: (reason: MarkdownEditorRevealFailureReason) => void } | null = null
 const revealSourceRangeAndWait = async (
   requested: MarkdownEditorResolvedSelection,
   options: MarkdownEditorRevealCompletionOptions,
@@ -7822,6 +7824,9 @@ const revealSourceRangeAndWait = async (
   const startedAt = performance.now()
   const textarea = textareaRef.value
   const root = rootElementRef.value
+  const revealDocument = textarea?.ownerDocument
+  const revealClock = revealDocument?.defaultView?.performance ?? performance
+  let lastAdmissionAt = 0
   const mode = currentMode.value
   const source = transactionStore.value
   const generation = nativeSurfaceImperativeGeneration
@@ -7838,6 +7843,7 @@ const revealSourceRangeAndWait = async (
       transactionStore.value !== source) fail('stale')
     if (!textarea || !root || textareaRef.value !== textarea || rootElementRef.value !== root ||
       !root.isConnected || !textarea.isConnected || !root.contains(textarea) ||
+      textarea.ownerDocument !== revealDocument || root.ownerDocument !== revealDocument ||
       sessionDisposed || editorReleased || sessionSurfacePaused.value ||
       generation !== nativeSurfaceImperativeGeneration || inputDisabled.value || props.readonly ||
       isComposing.value || nativeMachine.composing) fail('unavailable')
@@ -7848,6 +7854,7 @@ const revealSourceRangeAndWait = async (
     context()
     try { assertAdmission() } catch (cause) { throw new MarkdownEditorRevealError('admission-rejected', cause) }
     context() // A consumer callback may reenter or synchronously revoke the original owner.
+    lastAdmissionAt = revealClock.now()
   }
   admitted()
   if (!Number.isInteger(timeoutMs) || timeoutMs < 1 || timeoutMs > 5000) fail('unsupported')
@@ -7865,8 +7872,27 @@ const revealSourceRangeAndWait = async (
     let focused = false
     let frame: number | undefined
     let previousMeasurement: string | undefined
+    let paintCount = 0
+    let documentVersion = 0
+    let lastPaintRequest = -Infinity
+    let paintRequest: { fingerprint: string; version: number; requestedAt: number } | null = null
+    let visibility: ReturnType<typeof createMarkdownEditorRevealVisibility> = null
+    let mutations: MutationObserver | undefined
+    const invalidatePaint = () => {
+      paintCount = 0
+      paintRequest = null
+      visibility?.cancel()
+    }
+    const receiveMutations = (records: readonly MutationRecord[]) => {
+      if (records.some(record => !isMarkdownEditorRevealMeasurementMutation(record))) {
+        documentVersion += 1
+        invalidatePaint()
+      }
+    }
+    const drainMutations = () => { if (mutations) receiveMutations(mutations.takeRecords()) }
+    const animating = () => revealDocument!.getAnimations().some(animation => animation.pending || animation.playState === 'running')
     const cancel = (reason: MarkdownEditorRevealFailureReason) => finish(new MarkdownEditorRevealError(reason))
-    const operation = { cancel, selection }
+    const operation = { cancel, selection, observers: 0 }
     const aborted = () => cancel('aborted')
     const lostFocus = () => cancel('focus-lost')
     const movedFocus = (event: FocusEvent) => { if (event.target !== textarea) lostFocus() }
@@ -7874,6 +7900,9 @@ const revealSourceRangeAndWait = async (
     const finish = (error?: unknown, completion?: MarkdownEditorRevealCompletion) => {
       if (settled) return
       settled = true
+      visibility?.dispose()
+      mutations?.disconnect()
+      operation.observers = 0
       if (pendingPublicReveal === operation) pendingPublicReveal = null
       if (timer !== undefined) clearTimeout(timer)
       if (frame !== undefined) sessionLayoutResources.cancelFrame(frame)
@@ -7886,9 +7915,10 @@ const revealSourceRangeAndWait = async (
       if (error !== undefined) reject(error)
       else if (completion) resolve(completion)
     }
-    const guard = () => {
+    const guard = (checkAdmission = true) => {
       if (settled) fail('superseded')
-      admitted()
+      if (checkAdmission) admitted()
+      else context()
       if (settled) fail('superseded')
       const actual = transactionStore.selection
       if (actual.start !== selection.start || actual.end !== selection.end || actual.direction !== selection.direction)
@@ -7896,30 +7926,60 @@ const revealSourceRangeAndWait = async (
       if (focused && (textarea!.ownerDocument.activeElement !== textarea || !textarea!.ownerDocument.hasFocus()))
         fail('focus-lost')
     }
+    const receivePaint = (paint: MarkdownEditorRevealPaint) => {
+      if (settled || !paintRequest) return
+      try {
+        // The last consumer callback precedes this fresh browser paint proof.
+        // Do not execute arbitrary consumer code after that proof and reuse it.
+        guard(false)
+        drainMutations()
+        const request = paintRequest
+        if (!request) return
+        const measured = measureMarkdownEditorReveal(textarea!, selection)
+        drainMutations()
+        guard(false)
+        if (!paintRequest || !measured || !measured.visible || animating() ||
+          documentVersion !== request.version || measured.fingerprint !== request.fingerprint ||
+          paint.time < lastAdmissionAt || paint.time < request.requestedAt ||
+          paint.bounds.left !== measured.nativeBounds.left || paint.bounds.top !== measured.nativeBounds.top ||
+          paint.bounds.width !== measured.nativeBounds.width || paint.bounds.height !== measured.nativeBounds.height ||
+          !paint.visible || !measured.regions.every(region =>
+            region.left >= paint.intersection.left && region.right <= paint.intersection.right &&
+            region.top >= paint.intersection.top && region.bottom <= paint.intersection.bottom)) {
+          invalidatePaint()
+          return
+        }
+        paintRequest = null
+        visibility!.cancel()
+        // Separate native observations, including delayed observer delivery.
+        lastPaintRequest = Math.max(lastPaintRequest, paint.time)
+        paintCount += 1
+        if (paintCount < 2) return
+        guard(false)
+        if (textarea!.selectionStart !== selection.start || textarea!.selectionEnd !== selection.end ||
+          textarea!.selectionDirection !== selection.direction) fail('selection-changed')
+        finish(undefined, Object.freeze({ status: 'success', editorSessionRef: session.editorSessionRef,
+          ...expected, selection, focus: 'textarea', viewport: 'full-selection-visible' }))
+      } catch (error) { finish(error) }
+    }
     const sample = () => {
       frame = undefined
       try {
         guard()
+        drainMutations()
         if (textarea!.selectionStart !== selection.start || textarea!.selectionEnd !== selection.end ||
           textarea!.selectionDirection !== selection.direction) fail('selection-changed')
         const measured = measureMarkdownEditorReveal(textarea!, selection)
+        drainMutations()
         if (!measured) throw new MarkdownEditorRevealError('unsupported')
-        if (measured.visible && measured.fingerprint === previousMeasurement) {
-          guard()
-          // Last admission callback may itself move native focus/selection/viewport.
-          const final = measureMarkdownEditorReveal(textarea!, selection)
-          context()
-          if (settled) return
-          if (textarea!.ownerDocument.activeElement !== textarea || !textarea!.ownerDocument.hasFocus()) fail('focus-lost')
-          if (textarea!.selectionStart !== selection.start || textarea!.selectionEnd !== selection.end ||
-            textarea!.selectionDirection !== selection.direction) fail('selection-changed')
-          if (final?.visible && final.fingerprint === measured.fingerprint) {
-            finish(undefined, Object.freeze({ status: 'success', editorSessionRef: session.editorSessionRef,
-              ...expected, selection, focus: 'textarea', viewport: 'full-selection-visible' }))
-            return
-          }
+        if (!measured.visible || animating() || measured.fingerprint !== previousMeasurement) invalidatePaint()
+        const stable = measured.visible && measured.fingerprint === previousMeasurement && !animating()
+        previousMeasurement = measured.fingerprint
+        if (stable && !paintRequest && revealClock.now() - lastPaintRequest >= 100) {
+          lastPaintRequest = revealClock.now()
+          paintRequest = { fingerprint: measured.fingerprint, version: documentVersion, requestedAt: lastPaintRequest }
+          visibility!.request()
         }
-        previousMeasurement = measured.visible ? measured.fingerprint : undefined
         frame = sessionLayoutResources.requestFrame(sample)
         if (frame === undefined) fail('unavailable')
       } catch (error) { finish(error) }
@@ -7936,6 +7996,12 @@ const revealSourceRangeAndWait = async (
       try {
         admitted()
         if (settled) return
+        visibility = createMarkdownEditorRevealVisibility(textarea!, receivePaint)
+        if (!visibility) fail('unsupported')
+        operation.observers += 1
+        mutations = new MutationObserver(receiveMutations)
+        mutations.observe(revealDocument!, { subtree: true, attributes: true, characterData: true, childList: true })
+        operation.observers += 1
         cancelOwnedTypewriterFrames()
         invalidateAttachmentCohorts?.()
         admitted()
@@ -7991,7 +8057,7 @@ const publicRevealLayoutParticipant: MarkdownEditorSessionResourceParticipant = 
     const pending = pendingPublicReveal ? 1 : 0
     return { ...original, paused: original.paused && pending === 0,
       retainedListeners: original.retainedListeners + pending * 8,
-      usage: { ...original.usage, timers: original.usage.timers + pending,
+      usage: { ...original.usage, observers: original.usage.observers + (pendingPublicReveal?.observers ?? 0), timers: original.usage.timers + pending,
         backgroundTasks: original.usage.backgroundTasks + pending,
         memoryUnits: original.usage.memoryUnits + pending } }
   },
