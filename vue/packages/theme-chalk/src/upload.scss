@@ -2,23 +2,6 @@
 @use 'mixins/utils' as *;
 @use 'common/var' as *;
 
-@mixin upload-success($color: null) {
-  right: -15px;
-  top: -6px;
-  width: 40px;
-  height: 24px;
-  background: getCssVar('color-success');
-  text-align: center;
-  transform: rotate(45deg);
-
-  i {
-    font-size: 12px;
-    margin-top: 11px;
-    transform: rotate(-45deg);
-    color: $color;
-  }
-}
-
 @include b(upload) {
   @include set-component-css-var('upload', $upload);
 }
@@ -862,24 +845,10 @@
       box-sizing: border-box;
       margin-top: 10px;
       padding: 10px;
-      display: flex;
+      display: grid;
+      grid-template-columns: 70px minmax(0, 1fr) auto auto;
+      gap: var(--fsus-space-2, 8px);
       align-items: center;
-
-      .#{bem('icon', '' ,'check')},
-      .#{bem('icon', '' ,'circle-check')} {
-        color: $color-white;
-      }
-
-      &:hover {
-        .#{bem('upload-list', 'item-status-label')} {
-          opacity: 0;
-          display: inline-flex;
-        }
-
-        .#{bem('progress', 'text')} {
-          display: block;
-        }
-      }
 
       &.is-success {
         .#{bem('upload-list', 'item-name')} {
@@ -887,12 +856,22 @@
             display: none;
           }
         }
-      }
 
-      & .#{bem('icon', '' ,'close')} {
-        top: 5px;
-        transform: translateY(0);
+        &,
+        &:hover,
+        &:focus-within {
+          .#{bem('upload-list', 'item-status-label')} {
+            display: inline-flex;
+            opacity: 1;
+          }
+        }
       }
+    }
+
+    .#{bem('upload-list', 'item-info')} {
+      width: auto;
+      margin: 0;
+      min-width: 0;
     }
 
     .#{bem('upload-list', 'item-thumbnail')} {
@@ -912,25 +891,79 @@
     }
 
     .#{bem('upload-list', 'item-status-label')} {
-      position: absolute;
-      right: -17px;
-      top: -7px;
-      width: 46px;
-      height: 26px;
-      background: getCssVar('color-success');
-      text-align: center;
-      transform: rotate(45deg);
+      position: static;
+      display: inline-flex;
+      align-items: center;
+      gap: var(--fsus-space-1, 4px);
+      width: auto;
+      height: auto;
+      background: transparent;
+      transform: none;
+      opacity: 1;
+      font-size: getCssVar('font-size', 'extra-small');
+      color: getCssVar('text-color', 'secondary');
+      white-space: nowrap;
 
-      i {
-        font-size: 12px;
-        margin-top: 12px;
-        transform: rotate(-45deg);
+      .#{$namespace}-icon {
+        color: inherit;
+      }
+    }
+
+    .#{bem('upload-list', 'item')}.is-success
+      .#{bem('upload-list', 'item-status-label')} {
+      color: getCssVar('color-success');
+    }
+
+    .#{bem('upload-list', 'item')}.is-fail
+      .#{bem('upload-list', 'item-status-label')} {
+      color: getCssVar('color-danger');
+    }
+
+    .#{bem('upload-list', 'item')}.is-uploading
+      .#{bem('upload-list', 'item-status-label')} {
+      color: getCssVar('color-primary');
+    }
+
+    .#{bem('upload-list', 'item-actions')} {
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .#{bem('icon', '', 'close')} {
+      position: static;
+      display: inline-flex;
+      transform: none;
+      opacity: 1;
+    }
+
+    @media (pointer: coarse) {
+      .#{bem('icon', '', 'close')} {
+        @include ghost-icon-button(44px, 999px, 0, true);
+      }
+    }
+
+    // Keep the filename and status readable when the row cannot fit four columns.
+    @media (max-width: 480px) {
+      .#{bem('upload-list', 'item')} {
+        grid-template-columns: minmax(0, 70px) minmax(0, 1fr) auto;
+      }
+
+      .#{bem('upload-list', 'item-info')} {
+        grid-column: 2 / 4;
+      }
+
+      .#{bem('upload-list', 'item-status-label')} {
+        grid-column: 1 / 3;
+      }
+
+      .#{bem('upload-list', 'item-actions')} {
+        grid-column: 3;
       }
     }
 
     .#{$namespace}-progress {
       position: relative;
-      top: -7px;
+      top: auto;
     }
   }
 }
@@ -953,7 +986,15 @@
   }
 
   @include e(label) {
-    @include upload-success(#fff);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: getCssVar('color-success');
+
+    i {
+      font-size: var(--fsus-icon-size-md, 16px);
+      color: inherit;
+    }
   }
 
   @include e(progress) {
