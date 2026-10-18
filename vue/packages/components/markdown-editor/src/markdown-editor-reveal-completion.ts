@@ -76,13 +76,62 @@ export const measureMarkdownEditorReveal = (
     textarea.value.length > 1_000_000
   )
     return null
-  const uncertainClip = (css: CSSStyleDeclaration) =>
-    !['', 'none'].includes(css.getPropertyValue('clip-path')) ||
-    !['', 'none'].includes(css.getPropertyValue('mask-image')) ||
-    !['', 'auto'].includes(css.getPropertyValue('clip'))
+  const nativeBox = textarea.getBoundingClientRect()
+  const uncertainClip = (
+    css: CSSStyleDeclaration,
+    box: DOMRectReadOnly,
+    nativeControl = false,
+  ) => {
+    if (
+      !['', 'none'].includes(css.getPropertyValue('clip-path')) ||
+      ['mask-image', 'mask-border-source', '-webkit-mask-box-image-source'].some(
+        (property) => !['', 'none'].includes(css.getPropertyValue(property)),
+      ) ||
+      !['', 'auto'].includes(css.getPropertyValue('clip'))
+    )
+      return true
+    const clips =
+      nativeControl ||
+      /(auto|scroll|hidden|clip)/u.test(`${css.overflowX} ${css.overflowY}`) ||
+      /(paint|strict|content)/u.test(css.contain) ||
+      ['auto', 'hidden'].includes(css.getPropertyValue('content-visibility'))
+    if (!clips) return false
+    // Native unocclusion/intersection do not prove curved clipping. The whole
+    // input must fit a guaranteed rectangular strip between every corner arc.
+    const radius = (value: string, extent: number) =>
+      value.endsWith('%')
+        ? (Number.parseFloat(value) * extent) / 100
+        : value.endsWith('px') || value === '0'
+          ? Number.parseFloat(value)
+          : NaN
+    const corners = [
+      'border-top-left-radius',
+      'border-top-right-radius',
+      'border-bottom-left-radius',
+      'border-bottom-right-radius',
+    ].map((property) => {
+      const [x = '0px', y = x] = css
+        .getPropertyValue(property)
+        .trim()
+        .split(/\s+/u)
+      return [radius(x, box.width), radius(y, box.height)]
+    })
+    if (
+      corners.some((pair) =>
+        pair.some((value) => !Number.isFinite(value) || value < 0),
+      )
+    )
+      return true
+    const x = Math.max(...corners.map((pair) => pair[0]))
+    const y = Math.max(...corners.map((pair) => pair[1]))
+    return !(
+      (nativeBox.left >= box.left + x && nativeBox.right <= box.right - x) ||
+      (nativeBox.top >= box.top + y && nativeBox.bottom <= box.bottom - y)
+    )
+  }
   const style = view.getComputedStyle(textarea)
   if (
-    uncertainClip(style) ||
+    uncertainClip(style, nativeBox, true) ||
     style.writingMode !== 'horizontal-tb' ||
     style.direction !== 'ltr' ||
     style.display === 'none' ||
@@ -94,7 +143,6 @@ export const measureMarkdownEditorReveal = (
     textarea.clientHeight <= 0
   )
     return null
-  const nativeBox = textarea.getBoundingClientRect()
   const mirror = document.createElement('div')
   measurementNodes.add(mirror)
   mirror.setAttribute('aria-hidden', 'true')
@@ -211,14 +259,14 @@ export const measureMarkdownEditorReveal = (
       parent = parent.parentElement
     ) {
       const css = view.getComputedStyle(parent)
+      const rect = parent.getBoundingClientRect()
       if (
-        uncertainClip(css) ||
+        uncertainClip(css, rect) ||
         css.transform !== 'none' ||
         css.visibility !== 'visible' ||
         Number(css.opacity) === 0
       )
         return null
-      const rect = parent.getBoundingClientRect()
       if (/(auto|scroll|hidden|clip)/u.test(css.overflowY)) {
         clipTop = Math.max(clipTop, rect.top + parent.clientTop)
         clipBottom = Math.min(

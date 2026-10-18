@@ -1820,6 +1820,9 @@ fresh native Intersection Observer V2 observations (`trackVisibility: true`,
 unoccluded. Whole-textarea visibility is deliberately conservative: an obstruction
 elsewhere in the input can also prevent completion. Point hit tests, visible-area
 percentages, bounding-box corners and frame counts cannot grant success.
+Masks and clip paths refuse. Rounded input/overflow clips must contain the whole
+input in a guaranteed rectangular interior; otherwise they also refuse. A native
+rectangular intersection alone does not prove a curved clip's visible interior.
 Native control geometry and clipping must agree with a temporary inert browser
 text-layout measurement; this never creates another input owner. Geometry must
 remain stable between observations. DOM changes invalidate the pending proof;

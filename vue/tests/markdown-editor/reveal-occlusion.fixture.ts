@@ -125,10 +125,19 @@ createApp(
             if (
               !kind.startsWith('moving') &&
               kind !== 'clear' &&
-              kind !== 'late-admission'
+              kind !== 'late-admission' &&
+              kind !== 'rounded-clip'
             ) {
               if (kind === 'late-cover') delayed = setTimeout(cover, 60)
               else cover()
+            }
+            if (kind === 'rounded-clip') {
+              textarea.style.borderTopLeftRadius = '100%'
+              trace.push({
+                event: 'rounded-clipped',
+                fragments: rects.map((rect) => rect.toJSON()),
+                time: performance.now(),
+              })
             }
             if (kind === 'late-admission')
               delayed = setTimeout(() => {

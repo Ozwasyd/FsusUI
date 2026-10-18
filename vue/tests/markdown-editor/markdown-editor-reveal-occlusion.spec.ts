@@ -214,3 +214,49 @@ test('refuses admission revoked while native visibility confirmation is pending'
   expect(outcome.completion).toBeUndefined()
   expectReleased(outcome)
 })
+
+test('refuses curved clipping even when native V2 reports unoccluded', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1280, height: 900 })
+  await page.goto(`${fixture}?kind=rounded-clip&timeout=1500`)
+  await page.evaluate(() => document.fonts.ready)
+  await page.getByTestId('run').click()
+  await expect(page.getByTestId('outcome')).toContainText(
+    'markdown-editor-reveal-unsupported',
+  )
+  const outcome = JSON.parse((await page.getByTestId('outcome').textContent())!)
+  expect(outcome.completion).toBeUndefined()
+  expect(outcome.trace[0].event).toBe('rounded-clipped')
+  const fragment = outcome.trace[0].fragments[0]
+  const input = await page.locator('textarea').boundingBox()
+  expect(fragment.top).toBeGreaterThanOrEqual(input!.y)
+  expect(fragment.bottom).toBeLessThanOrEqual(input!.y + input!.height)
+  expect(
+    await page.evaluate(
+      ({ left, top }: { left: number; top: number }) =>
+        document.elementFromPoint(left + 1, top + 1) ===
+        document.querySelector('textarea'),
+      fragment,
+    ),
+  ).toBe(false)
+  const nativeVisible = await page.evaluate(
+    () =>
+      new Promise<boolean>((resolve) => {
+        const options = { threshold: 0, trackVisibility: true, delay: 100 }
+        const observer = new IntersectionObserver((entries) => {
+          resolve(
+            Reflect.get(
+              IntersectionObserverEntry.prototype,
+              'isVisible',
+              entries[0],
+            ) === true,
+          )
+          observer.disconnect()
+        }, options)
+        observer.observe(document.querySelector('textarea')!)
+      }),
+  )
+  expect(nativeVisible).toBe(true)
+  expectReleased(outcome)
+})
