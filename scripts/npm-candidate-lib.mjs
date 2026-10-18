@@ -86,6 +86,7 @@ function inputDigests(repoRoot) {
     'vue/internal/build/src/plugins/frozen-strings.ts',
     'vue/internal/build/src/plugins/generated-code.ts',
     'vue/internal/build/src/utils/vue-macros.ts',
+    'vue/internal/build/src/plugins/canonical-imports.ts',
     'vue/packages/element-plus/package.json',
   ]
   return Object.fromEntries(

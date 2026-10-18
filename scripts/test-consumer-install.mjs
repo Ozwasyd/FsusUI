@@ -1341,10 +1341,10 @@ try {
         },
       },
     )
-    const declarationOutput = path.join(
-      fixtureRoot,
-      '.tmp',
-      'component-alias-declarations',
+    const declarationRoot = path.join(fixtureRoot, '.tmp')
+    mkdirSync(declarationRoot, { recursive: true })
+    const declarationOutput = mkdtempSync(
+      path.join(declarationRoot, 'component-alias-declarations-'),
     )
     run(
       'node',
@@ -1384,7 +1384,7 @@ try {
           `reconsumed-component-aliases.${format}.ts`,
         ),
         [
-          `import type * as emitted from '../.tmp/component-alias-declarations/src/public-component-aliases.${format}'`,
+          `import type * as emitted from '../.tmp/${path.basename(declarationOutput)}/src/public-component-aliases.${format}'`,
           `import type { ${componentAliasNames.join(', ')} } from '${packageName}/${format}'`,
           'type Assert<T extends true> = T',
           'type Equal<A, B> = (<T>() => T extends A ? 1 : 2) extends (<T>() => T extends B ? 1 : 2) ? true : false',

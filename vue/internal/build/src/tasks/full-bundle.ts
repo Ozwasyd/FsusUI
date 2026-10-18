@@ -23,6 +23,7 @@ import {
 } from '@element-plus/build-utils'
 import { version } from '../../../../packages/element-plus/version'
 import { ElementPlusAlias } from '../plugins/element-plus-alias'
+import { CanonicalExternalImports } from '../plugins/canonical-imports'
 import { MarkdownHeavyFeatureFrameUrl } from '../plugins/markdown-heavy-feature-frame'
 import {
   formatBundleFilename,
@@ -97,6 +98,8 @@ async function buildFullEntry(minify: boolean) {
       }),
     )
   }
+
+  plugins.push(CanonicalExternalImports())
 
   const bundle = await rollup({
     input: path.resolve(epRoot, 'index.ts'),

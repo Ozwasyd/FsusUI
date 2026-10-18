@@ -153,6 +153,24 @@ export const frozenStringReads = () => {
     output: MagicString,
   ) => {
     if (analysis.hasEval) return false
+    // A leaf can still be read early through a cycle among its consumers or
+    // their re-exporting ancestors. Recompute this graph per chunk/watch pass.
+    const proven = new Map<string, boolean>()
+    const visiting = new Set<string>()
+    const initializedBeforeUse = (id: string): boolean => {
+      if (proven.has(id)) return proven.get(id)!
+      if (visiting.has(id)) return false
+      const info = context.getModuleInfo(id)
+      if (!info || info.isExternal) return false
+      visiting.add(id)
+      const safe = info.importers.every(initializedBeforeUse)
+      visiting.delete(id)
+      proven.set(id, safe)
+      return safe
+    }
+    const consumer =
+      chunk.facadeModuleId ??
+      (chunk.moduleIds.length === 1 ? chunk.moduleIds[0] : undefined)
     let changed = false
     for (const node of analysis.nodes) {
       if (node.type !== 'MemberExpression' || node.optional) continue
@@ -238,7 +256,8 @@ export const frozenStringReads = () => {
       const id = owner?.facadeModuleId
       if (!owner?.isEntry || !id || !owner.exports.includes(exported)) continue
       const value = exportsOf(context, id).get(exported)?.get(key)
-      if (value === undefined) continue
+      if (value === undefined || !consumer || !initializedBeforeUse(consumer))
+        continue
       output.overwrite(
         node.range![0],
         node.range![1],

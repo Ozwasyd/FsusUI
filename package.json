@@ -89,7 +89,7 @@
     "package:candidate:verify": "node ./scripts/with-node-heap.mjs node ./scripts/package-candidate.mjs verify",
     "package:candidate:compare": "node ./scripts/with-node-heap.mjs node ./scripts/package-candidate.mjs compare",
     "test:package-candidate": "node ./scripts/with-node-heap.mjs node ./scripts/test-npm-candidate.mjs && pnpm run test:markdown-heavy-feature-package",
-    "test:markdown-heavy-feature-package": "node ./scripts/with-node-heap.mjs node --import tsx --test ./scripts/markdown-heavy-feature-frame-rollup.test.mjs ./scripts/frozen-string-records-rollup.test.mjs ./scripts/vue-macro-types.test.mjs ./scripts/package-declaration-source.test.mjs",
+    "test:markdown-heavy-feature-package": "node ./scripts/with-node-heap.mjs node --import tsx --test ./scripts/markdown-heavy-feature-frame-rollup.test.mjs ./scripts/frozen-string-records-rollup.test.mjs ./scripts/vue-macro-types.test.mjs ./scripts/package-declaration-source.test.mjs ./scripts/canonical-imports-rollup.test.mjs",
     "build:package-smoke": "node ./scripts/with-node-heap.mjs node ./scripts/check-package-build-smoke.mjs",
     "build:theme": "node ./scripts/with-node-heap.mjs pnpm run -C vue/packages/theme-chalk build",
     "build:wasm": "node ./scripts/with-node-heap.mjs node ./scripts/ensure-wasm-artifacts.mjs --force",

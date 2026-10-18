@@ -311,3 +311,58 @@ test('refuses leaf owners with preceding observable evaluation and owners with d
     assert.equal(optimized.namespace.read(), original.namespace.read())
   }
 })
+
+test('preserves initialization through consumer and re-export ancestor cycles after minification', async (t) => {
+  for (const indirect of [false, true]) {
+    const entry = indirect
+      ? `import './dependency.js'; export {read} from './consumer.js'`
+      : `import './dependency.js'; import {classes} from './record.js'; export function read(){return classes.root}`
+    const extra = {
+      'dependency.js': `import {read} from './entry.js'; read()`,
+      ...(indirect
+        ? {
+            'consumer.js': `import {classes} from './record.js'; export function read(){return classes.root}`,
+          }
+        : {}),
+    }
+    const outputs = await fixture(t, frozen, entry, { throws: true, extra })
+    const failed = outputs[0].namespace instanceof ReferenceError
+    if (!indirect) assert.equal(failed, true)
+    const minifiedFailures = []
+    for (const output of outputs) {
+      assert.equal(output.namespace instanceof ReferenceError, failed)
+      assert.doesNotMatch(
+        output.chunks
+          .filter((item) => item.type === 'chunk')
+          .map((item) => item.code)
+          .join('\n'),
+        /classes,\s*"record-root"/u,
+      )
+      const directory = path.join(output.directory, 'minified')
+      await buildVite({
+        configFile: false,
+        root: output.directory,
+        logLevel: 'error',
+        build: {
+          target: 'es2022',
+          minify: 'esbuild',
+          lib: {
+            entry: output.entry,
+            formats: ['es'],
+            fileName: () => 'entry.mjs',
+          },
+          outDir: directory,
+        },
+      })
+      try {
+        await import(pathToFileURL(path.join(directory, 'entry.mjs')))
+        minifiedFailures.push(false)
+      } catch (error) {
+        assert.equal(error instanceof ReferenceError, true)
+        minifiedFailures.push(true)
+      }
+    }
+    assert.equal(minifiedFailures[0], minifiedFailures[1])
+    if (!indirect) assert.deepEqual(minifiedFailures, [true, true])
+  }
+})

@@ -111,8 +111,8 @@ variant stops the package build.
 
 The preserved ES module producer may fold reads of own string data fields from
 literal frozen exported records only in leaf modules without static or dynamic
-dependencies, after a prefix of primitive constant declarations or inert function
-and export declarations. Cycles and preceding observable evaluation are refused;
+dependencies and with acyclic static consumer/importer ancestry, after a prefix of primitive constant declarations or inert function
+and export declarations. Direct cycles, consumer/re-export ancestor cycles and preceding observable evaluation are refused;
 a comma read alone cannot preserve initialization errors through downstream
 minification. Public records, descriptors, component metadata, maps and original
 build options remain intact. Mutable records, accessors, spreads, reference
@@ -129,7 +129,10 @@ The pinned Vue macro resolver exposes its namespace before async imports finish.
 The producer completes Vue's shared type graph once, through the same locked
 factory/API module graph, before parallel SFC compilation begins. All original
 macro options and plugins remain; concurrent and sequential real FsuTransition
-compilation and complete repeated package builds cover determinism.
+compilation and complete repeated package builds cover determinism. Final ES full
+bundles also order named bindings within each external import deterministically;
+module declaration order, binding identities, comments, source maps and original
+minifier options remain intact.
 
 Output formats are also written sequentially in their original option order,
 preserving all maps and the returned results' order, count, and object identities.
