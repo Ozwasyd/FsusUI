@@ -129,7 +129,9 @@ SFC/alias-factory type owners, preventing a value/property reference cycle durin
 consumer declaration emission. Their generated declarations also give each
 installed value a matching exported type name. This keeps downstream emission
 from expanding Vue implementation constructors, which can lose generic
-constraints and component type identity. Cold consumers emit and reconsume
+constraints and component type identity. A non-null object intersection retains
+the alias name for these concrete component values; a bare ReturnType alias is
+still expanded by TypeScript. Cold consumers emit and reconsume
 ordinary unannotated ES/CJS aliases using the complete original project
 configuration, checking identity, non-any types, props, slots and install methods.
 

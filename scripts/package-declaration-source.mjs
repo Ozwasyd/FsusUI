@@ -182,10 +182,11 @@ export function annotateInstallTypes(content, fileName) {
           (modifier) => modifier.kind === ts.SyntaxKind.ExportKeyword,
         )
         if (exported) {
-          // A public type name keeps consumer declaration emit from expanding
-          // Vue's implementation constructors and losing their constraints.
+          // These concrete component values are non-null objects/functions.
+          // An object intersection gives the alias its own serializable name;
+          // ReturnType alone is eagerly expanded by downstream declaration emit.
           const aliases = declarations.get(statement.getStart(source)) ?? []
-          aliases.push(`export type ${declaration.name.text} = ${type}\n`)
+          aliases.push(`export type ${declaration.name.text} = ${type} & {}\n`)
           declarations.set(statement.getStart(source), aliases)
           type = declaration.name.text
         }
