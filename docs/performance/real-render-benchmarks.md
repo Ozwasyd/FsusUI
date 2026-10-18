@@ -48,6 +48,18 @@ To collect only the three Markdown sizes while preserving cold/hot scenario sema
 pnpm perf:render:web -- --profile full --scenario markdown- --warmups 3 --samples 12 --output .tmp/performance/markdown-renderer
 ```
 
+Use `--case` to select one complete case ID from the chosen profile without
+changing its scenario, size or dimensions. It cannot be combined with
+`--scenario`; missing, empty or unknown IDs fail before measurement starts:
+
+```bash
+pnpm perf:render:web -- --profile full --case virtual-grid-100000-120hz-dpr2-reduced --output .tmp/performance/exact-case
+```
+
+The existing `pnpm run check:render-performance-contract` governance gate runs
+the complete argument and matrix selection regression suite before reporting
+success. These Node controls do not launch a browser or collect measurements.
+
 To reproduce the real 100K Table data-path measurement without unrelated scenarios:
 
 ```bash

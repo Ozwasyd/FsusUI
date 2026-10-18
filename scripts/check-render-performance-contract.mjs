@@ -1,5 +1,7 @@
+import { execFileSync } from 'node:child_process'
 import { readFile } from 'node:fs/promises'
 import path from 'node:path'
+import process from 'node:process'
 
 const root = path.resolve(import.meta.dirname, '..')
 const read = (file) => readFile(path.join(root, file), 'utf8')
@@ -239,4 +241,12 @@ if (failures.length)
     `Real-render performance contract failed:\n${failures.join('\n')}`,
   )
 await import('./test-render-performance-impact-plan.mjs')
+execFileSync(
+  process.execPath,
+  [
+    '--test',
+    path.join(root, 'tests/web-render-performance-selection.test.mjs'),
+  ],
+  { cwd: root, stdio: 'inherit' },
+)
 console.info('Real-render performance contract passed.')
