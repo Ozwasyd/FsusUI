@@ -116,6 +116,7 @@ public class FsusVirtualList : ContentControl
   private readonly List<FsusVirtualListItem> loadedItems = [];
   private readonly Dictionary<int, FsusVirtualListItem> loadedItemsByIndex = [];
   private readonly Dictionary<int, FsusVirtualListItemContainer> realizedContainers = [];
+  private readonly Dictionary<int, string> retainedItemKeys = [];
   private readonly Queue<FsusVirtualListItemContainer> containerPool = [];
   private readonly FsusVariableSizeIndex variableSizeIndex = new();
   private readonly Canvas itemHost = new();
@@ -123,6 +124,7 @@ public class FsusVirtualList : ContentControl
   private CancellationTokenSource? loadCancellation;
   private int loadVersion;
   private int nextContainerId;
+  private int previousItemCount;
   private double scrollOffset;
   private FsusVirtualListState state = FsusVirtualListState.Ready;
   private string? lastAutomationName;
@@ -222,8 +224,21 @@ public class FsusVirtualList : ContentControl
 
   public void RefreshWindow() => RefreshWindow(updateScrollViewer: true);
 
-  private void RefreshWindow(bool updateScrollViewer)
+  private void RefreshWindow(bool updateScrollViewer, int? restoreFocusIndex = null, bool reconcileIdentities = true)
   {
+    if (reconcileIdentities && ReconcileItemIdentities(out var reconciledFocusIndex))
+    {
+      restoreFocusIndex = reconciledFocusIndex ?? restoreFocusIndex;
+      updateScrollViewer = true;
+    }
+    if (restoreFocusIndex is int targetIndex && targetIndex >= 0 && targetIndex < ItemCount)
+    {
+      var top = ResolveOffset(targetIndex);
+      if (top + GetResolvedSize(targetIndex) <= ScrollOffset || top >= ScrollOffset + ViewportSize)
+      {
+        ScrollOffset = top;
+      }
+    }
     FocusedIndex = Math.Clamp(FocusedIndex, 0, Math.Max(0, ItemCount - 1));
     ScrollOffset = Math.Min(ScrollOffset, Math.Max(0d, ResolveTotalSize() - ViewportSize));
     if (ItemCount <= 0)
@@ -241,6 +256,7 @@ public class FsusVirtualList : ContentControl
       itemHost.Height = 0;
       AnchorKey = string.Empty;
       ApplyScrollOffset();
+      RememberItemKeys();
       SyncState();
       return;
     }
@@ -305,12 +321,112 @@ public class FsusVirtualList : ContentControl
 
     itemHost.Height = ResolveTotalSize();
     itemHost.MinWidth = Math.Max(1d, Bounds.Width);
+    RememberItemKeys();
+    // Restoring focus can request scrolling against the previous layout.
+    // Apply the preserved anchor after that request.
+    if (restoreFocusIndex is int focusedIndex && realizedContainers.TryGetValue(focusedIndex, out var focusedContainer))
+    {
+      focusedContainer.Focus();
+    }
     if (updateScrollViewer)
     {
       ApplyScrollOffset();
     }
 
     SyncState();
+  }
+
+  private void RememberItemKeys()
+  {
+    previousItemCount = ItemCount;
+    retainedItemKeys.Clear();
+    if (ItemKeyProvider is null)
+    {
+      return;
+    }
+
+    var retainedIndices = realizedContainers.Keys
+      .Concat(measurementCache.Keys)
+      .Concat(loadedItemsByIndex.Keys)
+      .Append(FocusedIndex)
+      .Distinct();
+    foreach (var index in retainedIndices)
+    {
+      if (index >= 0 && index < ItemCount)
+      {
+        retainedItemKeys[index] = ResolveKey(index);
+      }
+    }
+  }
+
+  private bool ReconcileItemIdentities(out int? restoreFocusIndex)
+  {
+    restoreFocusIndex = null;
+    var focused = realizedContainers.Values.FirstOrDefault(container => container.IsKeyboardFocusWithin);
+    // Unfocused count growth uses the insertion notification. Keep surviving
+    // focus across rebuilds, retaining keys only for bounded windows and navigation.
+    if (ItemKeyProvider is null || ItemCount <= 0 || (ItemCount > previousItemCount && focused is null) ||
+      !retainedItemKeys.Any(pair => pair.Key >= ItemCount || ResolveKey(pair.Key) != pair.Value))
+    {
+      return false;
+    }
+
+    var anchor = realizedItems.FirstOrDefault(item => item.Offset <= ScrollOffset && item.Offset + item.Size > ScrollOffset);
+    var remaining = retainedItemKeys.Values.ToHashSet(StringComparer.Ordinal);
+    var indices = new Dictionary<string, int>(StringComparer.Ordinal);
+    for (var index = 0; index < ItemCount && remaining.Count > 0; index++)
+    {
+      var key = ResolveKey(index);
+      if (remaining.Remove(key))
+      {
+        indices[key] = index;
+      }
+    }
+
+    int? FindSurvivor(int index) =>
+      retainedItemKeys.TryGetValue(index, out var key) && indices.TryGetValue(key, out var nextIndex)
+        ? nextIndex
+        : null;
+
+    CancelPendingLoad();
+    var measurements = measurementOrder
+      .Where(measurementCache.ContainsKey)
+      .Select(index => (Index: FindSurvivor(index), Size: measurementCache[index]))
+      .ToArray();
+    measurementCache.Clear();
+    measurementOrder.Clear();
+    foreach (var measurement in measurements)
+    {
+      if (measurement.Index is int index)
+      {
+        measurementCache[index] = measurement.Size;
+        measurementOrder.Enqueue(index);
+      }
+    }
+    variableSizeIndex.Ensure(0, FixedItemSize, measurementCache);
+    EnsureVariableIndex();
+
+    var loaded = loadedItems.Select(item => (Item: item, Index: FindSurvivor(item.Index))).ToArray();
+    loadedItems.Clear();
+    loadedItemsByIndex.Clear();
+    foreach (var item in loaded)
+    {
+      if (item.Index is int index)
+      {
+        var shifted = item.Item with { Index = index };
+        loadedItems.Add(shifted);
+        loadedItemsByIndex[index] = shifted;
+      }
+    }
+
+    FocusedIndex = FindSurvivor(FocusedIndex) ?? FocusedIndex;
+    if (anchor is not null && FindSurvivor(anchor.Index) is int anchorIndex)
+    {
+      ScrollOffset += ResolveOffset(anchorIndex) - anchor.Offset;
+      AnchorKey = anchor.Key;
+    }
+    restoreFocusIndex = focused is null ? null : FindSurvivor(focused.Index);
+    return true;
   }
 
   public void ScrollToIndex(int index)
@@ -358,6 +474,10 @@ public class FsusVirtualList : ContentControl
     measurementCache[index] = nextSize;
     variableSizeIndex.Update(index, previousSize, nextSize);
     TrimMeasurementCache();
+    if (ItemKeyProvider is not null && index < ItemCount && measurementCache.ContainsKey(index))
+    {
+      retainedItemKeys[index] = ResolveKey(index);
+    }
     if (SizeMode == FsusVirtualSizeMode.Variable)
     {
       ScrollOffset += ResolveOffset(anchorIndex) - anchorOffset;
@@ -405,7 +525,7 @@ public class FsusVirtualList : ContentControl
 
     var anchor = CaptureAnchor();
     var hadItems = ItemCount > 0;
-    var restoreFocus = realizedContainers.Values.Any(container => container.IsFocused);
+    var actualFocusIndex = realizedContainers.Values.FirstOrDefault(container => container.IsKeyboardFocusWithin)?.Index;
     CancelPendingLoad();
     loadedItemsByIndex.Clear();
     for (var position = 0; position < loadedItems.Count; position++)
@@ -442,11 +562,11 @@ public class FsusVirtualList : ContentControl
     {
       FocusedIndex = Math.Min(ItemCount - 1, FocusedIndex + insertedCount);
     }
-    RefreshWindow();
-    if (restoreFocus && realizedContainers.TryGetValue(FocusedIndex, out var focusedContainer))
+    if (actualFocusIndex is int focusIndex && index <= focusIndex)
     {
-      focusedContainer.Focus();
+      actualFocusIndex += insertedCount;
     }
+    RefreshWindow(updateScrollViewer: true, restoreFocusIndex: actualFocusIndex, reconcileIdentities: false);
   }
 
   protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
@@ -666,6 +786,10 @@ public class FsusVirtualList : ContentControl
       if (measurementCache.Remove(index, out var size))
       {
         variableSizeIndex.Update(index, size, FixedItemSize);
+        if (index != FocusedIndex && !realizedContainers.ContainsKey(index) && !loadedItemsByIndex.ContainsKey(index))
+        {
+          retainedItemKeys.Remove(index);
+        }
       }
     }
   }
