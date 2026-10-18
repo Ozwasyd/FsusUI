@@ -1,4 +1,5 @@
 /* global requestAnimationFrame */
+import { waitForPerformanceFixture } from './render-performance-fixture.mjs'
 
 export const collectPerformanceProbes = async ({
   browser,
@@ -12,9 +13,7 @@ export const collectPerformanceProbes = async ({
   try {
     const page = await context.newPage()
     await page.goto(url, { waitUntil: 'domcontentloaded' })
-    await page
-      .locator('[data-performance-ready="true"]')
-      .waitFor({ timeout: 120_000 })
+    await waitForPerformanceFixture(page)
 
     // Replay every original action and active probe after production capture.
     // Worker startup, WASM work and forced sorts must not drive the next input.

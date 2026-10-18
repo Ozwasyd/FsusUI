@@ -7,6 +7,7 @@ import path from 'node:path'
 import process from 'node:process'
 import { chromium } from '@playwright/test'
 import { collectPerformanceProbes } from './render-performance-probes.mjs'
+import { waitForPerformanceFixture } from './render-performance-fixture.mjs'
 
 const root = path.resolve(import.meta.dirname, '..')
 const argv = process.argv.slice(2)
@@ -182,6 +183,7 @@ const server = has('--no-server')
       { cwd: root, stdio: ['ignore', 'pipe', 'pipe'] },
     )
 
+let browser
 try {
   if (server) await waitForServer(server)
   await mkdir(output, { recursive: true })
@@ -190,7 +192,7 @@ try {
     process.platform === 'linux' && existsSync('/usr/bin/google-chrome')
       ? '/usr/bin/google-chrome'
       : undefined
-  const browser = await chromium.launch({
+  browser = await chromium.launch({
     headless: true,
     executablePath: configuredBrowser || systemBrowser,
   })
@@ -345,9 +347,7 @@ try {
     const url = `${baseURL}/?performance=${scenario}&size=${size}&motion=${motion}`
     const navigationStarted = performance.now()
     await page.goto(url, { waitUntil: 'domcontentloaded' })
-    await page
-      .locator('[data-performance-ready="true"]')
-      .waitFor({ timeout: 120_000 })
+    await waitForPerformanceFixture(page)
     const navigationMs = performance.now() - navigationStarted
 
     for (let index = 0; index < warmups; index++) {
@@ -778,5 +778,9 @@ try {
     `Web real-render performance: ${results.length} scenarios -> ${path.relative(root, output)}`,
   )
 } finally {
-  if (server && server.exitCode === null) server.kill('SIGTERM')
+  try {
+    if (browser?.isConnected()) await browser.close()
+  } finally {
+    if (server && server.exitCode === null) server.kill('SIGTERM')
+  }
 }

@@ -10,10 +10,60 @@ import vm from 'node:vm'
 import test from 'node:test'
 import ts from 'typescript'
 import { collectPerformanceProbes } from '../scripts/render-performance-probes.mjs'
+import { waitForPerformanceFixture } from '../scripts/render-performance-fixture.mjs'
 import {
   createImpactPlan,
   loadOwnershipRegistry,
 } from '../scripts/render-performance-impact.mjs'
+
+const readyFixture = async () => ({
+  jsonValue: async () => ({ ready: 'true', error: null, scenario: 'fixture' }),
+  dispose: async () => {},
+})
+
+test('fixture errors take precedence over fallback completion', async () => {
+  for (const [ready, error] of [
+    ['true', 'markdown_safe_result_authority_invalid'],
+    ['error', null],
+    ['true', ''],
+    ['true', null],
+  ]) {
+    let disposed = false
+    const page = {
+      waitForFunction: async (callback, argument, options) => {
+        assert.equal(argument, undefined)
+        assert.equal(options.timeout, 120_000)
+        const state = vm.runInNewContext(`(${callback})`, {
+          document: {
+            querySelector: () => ({
+              getAttribute: (name) =>
+                ({
+                  'data-performance-ready': ready,
+                  'data-performance-error': error,
+                  'data-performance-scenario': 'markdown-hot',
+                })[name],
+            }),
+          },
+        })()
+        return {
+          jsonValue: async () => state,
+          dispose: async () => {
+            disposed = true
+          },
+        }
+      },
+    }
+    if (error !== null || ready === 'error') {
+      await assert.rejects(
+        waitForPerformanceFixture(page),
+        /Performance fixture failed \(markdown-hot\):/u,
+      )
+    } else {
+      await waitForPerformanceFixture(page)
+    }
+    assert.equal(disposed, true)
+  }
+})
 
 test('raw window witnesses preserve the original action and single-RAF timing', async () => {
   const source = await readFile(
@@ -108,7 +158,7 @@ test('replays every original active probe with unchanged counts and order', asyn
         close: async () => {},
         newPage: async () => ({
           goto: async () => {},
-          locator: () => ({ waitFor: async () => {} }),
+          waitForFunction: readyFixture,
           evaluate: (fn, arg) =>
             vm.runInNewContext(`(${fn})`, {
               window: { __FSUSUI_PERFORMANCE_FIXTURE__: fixture },
@@ -235,7 +285,7 @@ test('closes the diagnostic context when its original action rejects', async () 
       },
       newPage: async () => ({
         goto: async () => {},
-        locator: () => ({ waitFor: async () => {} }),
+        waitForFunction: readyFixture,
         evaluate: async () => {
           throw failure
         },
@@ -280,6 +330,110 @@ test('collects every active probe after production metric capture and teardown',
 })
 
 const browserUrl = process.env.FSUSUI_DATA_PIPELINE_BROWSER_URL
+test(
+  'real Markdown fixture readiness preserves its reported render error',
+  { skip: !browserUrl, timeout: 120_000 },
+  async (t) => {
+    const { chromium } = await import('@playwright/test')
+    const browser = await chromium.launch({ headless: true })
+    try {
+      const context = await browser.newContext({
+        deviceScaleFactor: 2,
+        reducedMotion: 'reduce',
+        viewport: { width: 1280, height: 800 },
+      })
+      const page = await context.newPage()
+      const url = new URL(
+        '/?performance=markdown-hot&size=1048576&motion=reduced',
+        browserUrl,
+      ).href
+      await page.goto(url, { waitUntil: 'domcontentloaded' })
+      // Keep the original predicate as the real negative control. The
+      // component can report an error and then complete its safe fallback.
+      await page
+        .locator('[data-performance-ready="true"]')
+        .waitFor({ timeout: 120_000 })
+      const reported = await page
+        .locator('[data-performance-scenario]')
+        .getAttribute('data-performance-error')
+      await page.evaluate(() => {
+        window.__readinessControlActions = 0
+        const fixture = window.__FSUSUI_PERFORMANCE_FIXTURE__
+        const original = fixture.act
+        fixture.act = (...args) => {
+          window.__readinessControlActions++
+          return original(...args)
+        }
+      })
+      if (reported !== null) {
+        await assert.rejects(
+          waitForPerformanceFixture(page),
+          (error) => error.message.endsWith(`: ${reported || 'render error'}`),
+        )
+        t.diagnostic(`Original readiness accepted a real render error: ${reported}`)
+      } else {
+        await waitForPerformanceFixture(page)
+        t.diagnostic('Real Markdown runtime completed without a retained error')
+      }
+      assert.equal(
+        await page.evaluate(() => window.__readinessControlActions),
+        0,
+      )
+      await context.close()
+    } finally {
+      await browser.close()
+    }
+  },
+)
+test(
+  'real browser rejects the observed fallback DOM before diagnostic actions',
+  { skip: !browserUrl, timeout: 120_000 },
+  async () => {
+    const { chromium } = await import('@playwright/test')
+    const browser = await chromium.launch({ headless: true })
+    try {
+      const page = await browser.newPage()
+      await page.setContent(
+        '<main data-performance-scenario="markdown-hot" data-performance-ready="true" data-performance-error="markdown_safe_result_authority_invalid">Safe text fallback</main>',
+      )
+      // Original readiness accepts the real DOM state captured from both arms.
+      await page.locator('[data-performance-ready="true"]').waitFor()
+      await assert.rejects(
+        waitForPerformanceFixture(page),
+        /Performance fixture failed \(markdown-hot\): markdown_safe_result_authority_invalid/u,
+      )
+      await page.setContent(
+        '<main data-performance-scenario="markdown-hot" data-performance-ready="true">Healthy fixture</main>',
+      )
+      await waitForPerformanceFixture(page)
+      let closed = false
+      const diagnosticBrowser = {
+        newContext: async () => ({
+          close: async () => {
+            closed = true
+          },
+          newPage: async () => page,
+        }),
+      }
+      const fallback = `data:text/html,${encodeURIComponent(
+        '<main data-performance-scenario="markdown-hot" data-performance-ready="true" data-performance-error="markdown_safe_result_authority_invalid"></main>',
+      )}`
+      await assert.rejects(
+        collectPerformanceProbes({
+          browser: diagnosticBrowser,
+          url: fallback,
+          scenario: 'markdown-hot',
+          warmups: 1,
+          samples: 21,
+        }),
+        /markdown_safe_result_authority_invalid/u,
+      )
+      assert.equal(closed, true)
+    } finally {
+      await browser.close()
+    }
+  },
+)
 test(
   'real fixed-list Worker evidence never calls the production fixture probes',
   { skip: !browserUrl, timeout: 120_000 },
