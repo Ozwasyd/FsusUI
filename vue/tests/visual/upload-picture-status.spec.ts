@@ -22,25 +22,22 @@ test.afterEach(async ({ page }) => {
 const assertPictureSuccess = async (row: Locator, disabled = false) => {
   const status = row.getByRole('status')
   await expect(status).toHaveCount(1)
-  await expect(status).toBeVisible()
-  await expect(status).toHaveAccessibleName(/Uploaded|已上传/)
-  await expect(status).toContainText(/Uploaded|已上传/)
-  await expect(status.locator('.el-icon--upload-success')).toBeVisible()
-  const style = await status.evaluate((element) => {
-    const computed = getComputedStyle(element)
-    return {
-      position: computed.position,
-      transform: computed.transform,
-      background: computed.backgroundColor,
-    }
-  })
-  expect(style).toEqual({
-    position: 'static',
-    transform: 'none',
-    background: 'rgba(0, 0, 0, 0)',
-  })
-  const [itemBox, thumbnailBox, infoBox, statusBox, actionsBox] =
+  await Promise.all([
+    expect(status).toBeVisible(),
+    expect(status).toHaveAccessibleName(/Uploaded|已上传/),
+    expect(status).toContainText(/Uploaded|已上传/),
+    expect(status.locator('.el-icon--upload-success')).toBeVisible(),
+  ])
+  const [style, itemBox, thumbnailBox, infoBox, statusBox, actionsBox] =
     await Promise.all([
+      status.evaluate((element) => {
+        const computed = getComputedStyle(element)
+        return {
+          position: computed.position,
+          transform: computed.transform,
+          background: computed.backgroundColor,
+        }
+      }),
       row.boundingBox(),
       row.locator('img').boundingBox(),
       row.locator('.el-upload-list__item-info').boundingBox(),
@@ -49,6 +46,11 @@ const assertPictureSuccess = async (row: Locator, disabled = false) => {
         ? Promise.resolve(null)
         : row.locator('.el-upload-list__item-actions').boundingBox(),
     ])
+  expect(style).toEqual({
+    position: 'static',
+    transform: 'none',
+    background: 'rgba(0, 0, 0, 0)',
+  })
   expect(itemBox).not.toBeNull()
   expect(thumbnailBox).not.toBeNull()
   expect(infoBox).not.toBeNull()
