@@ -919,6 +919,7 @@ const generationInputPaths = new Set([
 const isVueGenerationInput = (file) =>
   (file.startsWith('vue/packages/') &&
     !file.startsWith('vue/packages/demo-app/') &&
+    !file.startsWith('vue/packages/wasm/build/') &&
     /\.(?:[cm]?js|tsx?|vue|json|scss|css|ya?ml)$/u.test(file)) ||
   /^vue\/[^/]+\.(?:json|ts)$/u.test(file) ||
   /^vue\/typings\/.*\.ts$/u.test(file)

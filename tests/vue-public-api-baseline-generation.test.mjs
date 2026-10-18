@@ -287,3 +287,16 @@ for (const [name, file, content] of [
     assert.equal(git(cwd, 'show', `${realInput}:${file}`), content.trim())
   })
 }
+
+test('baseline CLI excludes normal native build outputs from source provenance', async (t) => {
+  const { cwd } = await fixture(t)
+  const before = await readFile(path.join(cwd, baselinePath), 'utf8')
+  const output = path.join(
+    cwd,
+    'vue/packages/wasm/build/CMakeFiles/CMakeConfigureLog.yaml',
+  )
+  await mkdir(path.dirname(output), { recursive: true })
+  await writeFile(output, 'events: []\n')
+  assert.equal(cli(cwd).status, 0)
+  assert.deepEqual(await current(cwd), JSON.parse(before))
+})
