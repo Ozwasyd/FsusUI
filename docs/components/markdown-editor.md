@@ -1858,3 +1858,48 @@ are explicit; legacy target admission remains available for existing consumers.
 The consumer must still verify its own current navigation admission after await.
 This source contract does not qualify full Blog navigation, native IME, screen
 reader, Avalonia or independent UX acceptance.
+
+### Read-only source navigation view (source WIP)
+
+The original public instance owns these synchronous methods:
+
+```ts
+readSourceNavigationView(options: MarkdownEditorSourceNavigationViewOptions): MarkdownEditorSourceNavigationView | null
+isCurrentSourceNavigationView(view: MarkdownEditorSourceNavigationView): boolean
+```
+
+Options require the same mounted `getSession(ref)` object, the original expected
+native `{ documentIdentity: { id, epoch }, revision }`, genuine `AbortSignal` and
+synchronous throwing `assertAdmission`. The getter neither focuses, scrolls,
+dispatches, creates a session nor acquires a snapshot. Abortion throws the original
+signal reason through the native abort check; admission exceptions propagate
+unchanged. A foreign or copied view returns false without invoking its properties.
+For an issued view, currentness also preserves its original abort/admission errors.
+
+The frozen view contains `editorSessionRef`, native document identity/revision,
+`viewGeneration`, the complete UTF-16 `selection`, `focusOffset`, `affinity`,
+`viewportOffset`, `percentage`, and `viewport: { blockStart, height, reducedMotion }`.
+Focus/affinity use the same endpoint policy as original live layout. Block values
+are CSS pixels in the actual usable source viewport coordinate system; the focus
+endpoint offset can be negative. Percentage is actual native
+`scrollTop / (scrollHeight - clientHeight)`; a zero range produces zero. Reduced
+motion comes from the real media query, without a false fallback.
+
+Measurement preparation belongs to the original layout lifecycle, outside both
+readers. Missing, hidden, suspended, stale, ambiguous or unsupported measurement
+returns null. Both readers remeasure existing prepared layout and actual native
+bounds/clipping; CSSOM geometry drift cannot reuse a cached positive answer.
+Selection, scroll, layout, media, document and lifetime changes retire the original
+observation generation. No second editor, history registry or canonical identity
+is obtained from presentation DOM.
+
+`source-navigation-gesture` carries `MarkdownEditorSourceNavigationGesture` from
+actual trusted wheel/touch/pointer/navigation-key source input. It does not infer
+manual intent from programmatic scroll, nor emit resume when the original layout
+gesture timer clears. The consumer owns its explicit Anchor manual/resume policy.
+
+A view is an observation, not visibility, focus completion or navigation/history
+admission authority. Keep the exact object and check original-instance currentness
+before and after capture and after awaiting reveal; recheck host lifetime and
+admission as well. This source WIP does not supply the Blog wrappers or package
+declaration build producer.
