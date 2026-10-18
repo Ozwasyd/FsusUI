@@ -183,6 +183,7 @@ const server = has('--no-server')
       { cwd: root, stdio: ['ignore', 'pipe', 'pipe'] },
     )
 
+let browser
 try {
   if (server) await waitForServer(server)
   await mkdir(output, { recursive: true })
@@ -191,7 +192,7 @@ try {
     process.platform === 'linux' && existsSync('/usr/bin/google-chrome')
       ? '/usr/bin/google-chrome'
       : undefined
-  const browser = await chromium.launch({
+  browser = await chromium.launch({
     headless: true,
     executablePath: configuredBrowser || systemBrowser,
   })
@@ -777,5 +778,9 @@ try {
     `Web real-render performance: ${results.length} scenarios -> ${path.relative(root, output)}`,
   )
 } finally {
-  if (server && server.exitCode === null) server.kill('SIGTERM')
+  try {
+    if (browser?.isConnected()) await browser.close()
+  } finally {
+    if (server && server.exitCode === null) server.kill('SIGTERM')
+  }
 }
