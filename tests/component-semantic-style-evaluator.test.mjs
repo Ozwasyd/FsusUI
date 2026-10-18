@@ -18,6 +18,8 @@ import { fileURLToPath, pathToFileURL, URL } from 'node:url'
 import { format, resolveConfig } from 'prettier'
 import { compile } from 'sass'
 
+import './component-semantic-rules.test.mjs'
+
 const repositoryRoot = fileURLToPath(new URL('..', import.meta.url))
 const fixtureRoot = join(
   repositoryRoot,
