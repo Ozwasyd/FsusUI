@@ -11,7 +11,7 @@ import {
 import { isArray, isFunction, isObject } from '@vue/shared'
 import { get, isEqual, isNil, debounce as lodashDebounce } from 'lodash-unified'
 import { useResizeObserver } from '@element-plus/hooks/use-runtime'
-import { useLocale, useNamespace } from '@element-plus/hooks'
+import { useId, useLocale, useNamespace } from '@element-plus/hooks'
 import { CHANGE_EVENT, UPDATE_MODEL_EVENT } from '@element-plus/constants'
 import {
   ValidateComponentsMap,
@@ -93,7 +93,7 @@ const useSelect = (props: ISelectProps, emit) => {
 
   // DOM & Component refs
   const controlRef = ref(null)
-  const inputRef = ref(null) // el-input ref
+  const inputRef = ref<HTMLInputElement | null>(null)
   const menuRef = ref(null)
   const popper = ref<InstanceType<typeof ElTooltip> | null>(null)
   const selectRef = ref(null)
@@ -114,6 +114,11 @@ const useSelect = (props: ISelectProps, emit) => {
 
   // the controller of the expanded popup
   const expanded = ref(false)
+  const keyboardNavigation = ref(false)
+  const listboxId = useId()
+  const activeOptionId = computed(() =>
+    expanded.value ? menuRef.value?.activeOptionId : undefined,
+  )
 
   const selectDisabled = computed(() => props.disabled || elForm?.disabled)
 
@@ -559,18 +564,39 @@ const useSelect = (props: ISelectProps, emit) => {
   } = useInput((e) => onInput(e))
 
   // methods
-  const focusAndUpdatePopup = () => {
-    inputRef.value?.focus?.()
+  let focusGeneration = 0
+  const focusInput = (generation: number) => {
+    if (generation === focusGeneration && !selectDisabled.value) {
+      inputRef.value?.focus()
+    }
+  }
+
+  const focus = () => {
+    focusInput(++focusGeneration)
+  }
+
+  const blur = () => {
+    ++focusGeneration
+    expanded.value = false
+    states.softFocus = false
+    inputRef.value?.blur()
+  }
+
+  const focusAndUpdatePopup = (generation: number) => {
+    if (generation !== focusGeneration) return
+    focusInput(generation)
     popper.value?.updatePopper()
   }
 
   const toggleMenu = () => {
     if (props.automaticDropdown) return
     if (!selectDisabled.value) {
+      const generation = focusGeneration
       if (states.isComposing) states.softFocus = true
       return nextTick(() => {
+        if (generation !== focusGeneration || selectDisabled.value) return
         expanded.value = !expanded.value
-        inputRef.value?.focus?.()
+        focusInput(generation)
       })
     }
   }
@@ -664,6 +690,9 @@ const useSelect = (props: ISelectProps, emit) => {
   }
 
   const onSelect = (option: Option, idx: number, byClick = true) => {
+    if (selectDisabled.value) return
+    if (byClick) keyboardNavigation.value = false
+    const generation = focusGeneration
     if (props.multiple) {
       let selectedOptions = (props.modelValue as any[]).slice()
 
@@ -682,7 +711,7 @@ const useSelect = (props: ISelectProps, emit) => {
         selectedOptions = [...selectedOptions, getValue(option)]
         states.cachedOptions.push(option)
         selectNewOption(option)
-        updateHoveringIndex(idx)
+        if (!byClick) updateHoveringIndex(idx)
       }
       update(selectedOptions)
       if (option.created) {
@@ -691,7 +720,7 @@ const useSelect = (props: ISelectProps, emit) => {
         states.inputLength = 20
       }
       if (props.filterable && !props.reserveKeyword) {
-        inputRef.value.focus?.()
+        focusInput(generation)
         onUpdateInputValue('')
       }
       if (props.filterable) {
@@ -699,7 +728,7 @@ const useSelect = (props: ISelectProps, emit) => {
           calculatorRef.value.getBoundingClientRect().width
       }
       resetInputHeight()
-      setSoftFocus()
+      setSoftFocus(generation)
     } else {
       selectedIndex.value = idx
       states.selectedLabel = getLabel(option)
@@ -716,6 +745,7 @@ const useSelect = (props: ISelectProps, emit) => {
   }
 
   const deleteTag = (event: MouseEvent, option: Option) => {
+    const generation = focusGeneration
     let selectedOptions = (props.modelValue as any[]).slice()
 
     const index = getValueIndex(selectedOptions, getValue(option))
@@ -728,9 +758,9 @@ const useSelect = (props: ISelectProps, emit) => {
       states.cachedOptions.splice(index, 1)
       update(selectedOptions)
       emit('remove-tag', getValue(option))
-      states.softFocus = true
+      if (generation === focusGeneration) states.softFocus = true
       removeNewOption(option)
-      return nextTick(focusAndUpdatePopup)
+      return nextTick(() => focusAndUpdatePopup(generation))
     }
     event.stopPropagation()
   }
@@ -747,24 +777,20 @@ const useSelect = (props: ISelectProps, emit) => {
   }
 
   const handleBlur = (event: FocusEvent) => {
+    const focused = states.isComposing
+    const silent = states.isSilentBlur
     states.softFocus = false
+    states.isComposing = false
+    states.isSilentBlur = false
 
     // reset input value when blurred
     // https://github.com/ElemeFE/element/pull/10822
     return nextTick(() => {
-      inputRef.value?.blur?.()
       if (calculatorRef.value) {
         states.calculatedWidth =
           calculatorRef.value.getBoundingClientRect().width
       }
-      if (states.isSilentBlur) {
-        states.isSilentBlur = false
-      } else {
-        if (states.isComposing) {
-          emit('blur', event)
-        }
-      }
-      states.isComposing = false
+      if (focused && !silent) emit('blur', event)
     })
   }
 
@@ -778,6 +804,7 @@ const useSelect = (props: ISelectProps, emit) => {
   }
 
   const handleDel = (e: KeyboardEvent) => {
+    if (selectDisabled.value) return
     if (states.displayInputValue.length === 0) {
       e.preventDefault()
       const selected = (props.modelValue as Array<any>).slice()
@@ -788,6 +815,8 @@ const useSelect = (props: ISelectProps, emit) => {
   }
 
   const handleClear = () => {
+    if (selectDisabled.value) return
+    const generation = focusGeneration
     let emptyValue: string | any[]
     if (isArray(props.modelValue)) {
       emptyValue = []
@@ -805,7 +834,7 @@ const useSelect = (props: ISelectProps, emit) => {
     update(emptyValue)
     emit('clear')
     clearAllNewOption()
-    return nextTick(focusAndUpdatePopup)
+    return nextTick(() => focusAndUpdatePopup(generation))
   }
 
   const onUpdateInputValue = (val: string) => {
@@ -851,12 +880,14 @@ const useSelect = (props: ISelectProps, emit) => {
       // prevent dispatching multiple nextTick callbacks.
       return onKeyboardNavigate(direction, newIndex)
     } else {
+      keyboardNavigation.value = true
       updateHoveringIndex(newIndex)
       scrollToItem(newIndex)
     }
   }
 
   const onKeyboardSelect = () => {
+    if (selectDisabled.value) return
     if (!expanded.value) {
       return toggleMenu()
     } else if (
@@ -877,13 +908,11 @@ const useSelect = (props: ISelectProps, emit) => {
 
   const resetHoveringIndex = () => {
     states.hoveringIndex = -1
+    keyboardNavigation.value = false
   }
 
-  const setSoftFocus = () => {
-    const _input = inputRef.value
-    if (_input) {
-      _input.focus?.()
-    }
+  const setSoftFocus = (generation: number) => {
+    focusInput(generation)
   }
 
   const onInput = (event) => {
@@ -905,7 +934,7 @@ const useSelect = (props: ISelectProps, emit) => {
   }
 
   const handleClickOutside = () => {
-    expanded.value = false
+    blur()
     return handleBlur()
   }
 
@@ -978,6 +1007,14 @@ const useSelect = (props: ISelectProps, emit) => {
   // in order to track these individually, we need to turn them into refs instead of watching the entire
   // reactive object which could cause perf penalty when unnecessary field gets changed the watch method will
   // be invoked.
+
+  watch(
+    selectDisabled,
+    (disabled) => {
+      if (disabled) blur()
+    },
+    { flush: 'sync' },
+  )
 
   watch(expanded, (val) => {
     emit('visible-change', val)
@@ -1071,6 +1108,9 @@ const useSelect = (props: ISelectProps, emit) => {
     collapseTagSize,
     currentPlaceholder,
     expanded,
+    keyboardNavigation,
+    listboxId,
+    activeOptionId,
     emptyText,
     popupHeight,
     debounce,
@@ -1108,6 +1148,8 @@ const useSelect = (props: ISelectProps, emit) => {
     collapseTagList,
 
     // methods exports
+    focus,
+    blur,
     debouncedOnInputChange,
     deleteTag,
     getLabel,
@@ -1128,7 +1170,11 @@ const useSelect = (props: ISelectProps, emit) => {
     onKeyboardNavigate,
     onKeyboardSelect,
     onSelect,
-    onHover: updateHoveringIndex,
+    onHover: (index: number) => {
+      if (selectDisabled.value) return
+      keyboardNavigation.value = false
+      updateHoveringIndex(index)
+    },
     onUpdateInputValue,
     handleCompositionStart,
     handleCompositionEnd,

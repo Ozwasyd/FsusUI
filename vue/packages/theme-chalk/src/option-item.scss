@@ -51,13 +51,27 @@
   }
 
   @media (hover: none) and (pointer: coarse) {
-    .#{$namespace}-select-dropdown__option-item:hover::before,
-    .#{$namespace}-select-dropdown__option-item.hover::before {
+    .#{$namespace}-select-dropdown__option-item:not(.is-disabled):not(
+        .is-selected
+      ):not(.is-keyboard):hover,
+    .#{$namespace}-select-dropdown__option-item.hover:not(.is-disabled):not(
+        .is-selected
+      ):not(.is-keyboard) {
+      background: transparent;
+      color: var(--el-text-color-regular);
+    }
+
+    .#{$namespace}-select-dropdown__option-item:not(.is-keyboard):hover::before,
+    .#{$namespace}-select-dropdown__option-item.hover:not(
+        .is-keyboard
+      )::before {
       background: transparent;
       box-shadow: none;
     }
 
-    .#{$namespace}-select-dropdown__option-item:active::before {
+    .#{$namespace}-select-dropdown__option-item:not(
+        .is-disabled
+      ):active::before {
       background: var(--fsus-state-emphasis-bg);
       box-shadow: inset 0 0 0 1px var(--fsus-state-focus-border);
     }
@@ -67,7 +81,10 @@
   .#{$namespace}-select-dropdown__option-item.is-selected {
     color: var(--fsus-scholarly-blue);
     font-weight: var(--fsus-font-weight-medium, 500);
-    background-color: var(--fsus-select-option-selected-bg, var(--fsus-state-selected-bg));
+    background-color: var(
+      --fsus-select-option-selected-bg,
+      var(--fsus-state-selected-bg)
+    );
   }
 
   @include when(multiple) {
