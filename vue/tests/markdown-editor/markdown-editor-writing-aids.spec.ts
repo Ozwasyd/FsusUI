@@ -349,3 +349,135 @@ test('covers aid combinations across the 375/768/1366/1440 viewport matrix', asy
     }
   }
 })
+
+for (const theme of ['light', 'dark'] as const) {
+  test(`retains the original opacity on dimmed Focus spans in ${theme}`, async ({
+    page,
+  }, testInfo) => {
+    const pageErrors: string[] = []
+    page.on('pageerror', (error) => pageErrors.push(error.message))
+    await page.setViewportSize(
+      theme === 'light'
+        ? { width: 1280, height: 900 }
+        : { width: 390, height: 844 },
+    )
+    const fixture = await openFixture(
+      page,
+      theme,
+      '&markdownWritingAidsCombo=focus',
+    )
+    const editor = fixture.locator('.el-markdown-editor')
+    const textarea = editor.locator('textarea')
+    const layer = editor.locator('.el-markdown-editor__focus-layer')
+    const firstBlock = layer.locator('span').filter({ hasText: /^A\n$/ })
+    const secondBlock = layer.locator('span').filter({ hasText: /^B$/ })
+    await textarea.fill('A\n\nB')
+    await expect(layer).toHaveAttribute('aria-hidden', 'true')
+    await expect(editor.locator('textarea')).toHaveCount(1)
+    const typography = await layer.evaluate((element) => {
+      const style = getComputedStyle(element)
+      return {
+        fontFamily: style.fontFamily,
+        fontSize: style.fontSize,
+        lineHeight: style.lineHeight,
+        color: style.color,
+      }
+    })
+    const observations: unknown[] = []
+
+    for (const [start, end, firstDimmed, secondDimmed] of [
+      [0, 0, false, true],
+      [0, 3, false, true],
+      [3, 4, true, false],
+      [0, 4, false, false],
+      [4, 4, true, false],
+    ] as const) {
+      await textarea.evaluate(
+        (element, selection) => {
+          const input = element as HTMLTextAreaElement
+          input.setSelectionRange(selection[0], selection[1])
+          input.dispatchEvent(new Event('select', { bubbles: true }))
+        },
+        [start, end] as const,
+      )
+      await expect(firstBlock).toHaveClass(firstDimmed ? /is-dimmed/ : '')
+      await expect(secondBlock).toHaveClass(secondDimmed ? /is-dimmed/ : '')
+      const styles = await layer.evaluate((element) => {
+        const layerStyle = getComputedStyle(element)
+        return {
+          layerOpacity: layerStyle.opacity,
+          typography: {
+            fontFamily: layerStyle.fontFamily,
+            fontSize: layerStyle.fontSize,
+            lineHeight: layerStyle.lineHeight,
+            color: layerStyle.color,
+          },
+          spans: [...element.querySelectorAll('span[data-node-id]')].map(
+            (span) => ({
+              opacity: getComputedStyle(span).opacity,
+              color: getComputedStyle(span).color,
+            }),
+          ),
+        }
+      })
+      observations.push({ selection: [start, end], styles })
+      expect.soft(styles).toEqual({
+        layerOpacity: '1',
+        typography,
+        spans: [
+          { opacity: firstDimmed ? '0.72' : '1', color: typography.color },
+          { opacity: secondDimmed ? '0.72' : '1', color: typography.color },
+        ],
+      })
+      await expect(textarea).toBeFocused()
+      await expect(textarea).toHaveValue('A\n\nB')
+      if (start === 0 && end === 3) {
+        await textarea.scrollIntoViewIfNeeded()
+        await page.screenshot({
+          path: testInfo.outputPath(`focus-opacity-${theme}.png`),
+        })
+      }
+    }
+
+    const ordinaryFixture = await openFixture(
+      page,
+      theme,
+      '&markdownWritingAidsCombo=none',
+    )
+    const ordinaryEditor = ordinaryFixture.locator('.el-markdown-editor')
+    const ordinaryTextarea = ordinaryEditor.locator('textarea')
+    await expect(ordinaryEditor).toHaveAttribute(
+      'data-markdown-focus-enabled',
+      'false',
+    )
+    await expect(
+      ordinaryEditor.locator('.el-markdown-editor__focus-layer'),
+    ).toHaveCount(0)
+    await ordinaryTextarea.fill('A\n\nB')
+    await expect(ordinaryTextarea).toBeFocused()
+    await expect(ordinaryTextarea).toHaveCSS('opacity', '1')
+    expect(
+      await ordinaryTextarea.evaluate(
+        (element) => getComputedStyle(element).color,
+      ),
+    ).not.toBe('rgba(0, 0, 0, 0)')
+    await ordinaryTextarea.press('End')
+    await ordinaryTextarea.press('!')
+    await expect(ordinaryTextarea).toHaveValue('A\n\nB!')
+    expect(pageErrors).toEqual([])
+    await writeFile(
+      testInfo.outputPath(`focus-opacity-${theme}.json`),
+      JSON.stringify({
+        theme,
+        observations,
+        noFocus: await ordinaryTextarea.evaluate((element) => ({
+          opacity: getComputedStyle(element).opacity,
+          color: getComputedStyle(element).color,
+          focused: element === document.activeElement,
+          source: (element as HTMLTextAreaElement).value,
+        })),
+        pageErrors,
+      }),
+    )
+  })
+}

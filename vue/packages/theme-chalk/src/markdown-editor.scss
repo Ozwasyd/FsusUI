@@ -426,8 +426,10 @@
       background: transparent;
     }
 
-    @include when(dimmed) {
-      opacity: 0.72;
+    > span {
+      @include when(dimmed) {
+        opacity: 0.72;
+      }
     }
   }
 
