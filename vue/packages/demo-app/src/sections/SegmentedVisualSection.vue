@@ -90,36 +90,55 @@
     <div class="demo-block" data-segmented-fixture="collection">
       <h3>Collection Segmented</h3>
       <div class="segmented-fixture-row" data-segmented-variant="collection-default">
-        <div class="el-segmented-control" role="tablist">
-          <button
-            v-for="item in collectionItems"
-            :key="item"
-            type="button"
-            class="el-segmented-control__item"
-            :class="{ 'is-active': item === collectionActive }"
-            role="tab"
-            :aria-selected="item === collectionActive ? 'true' : 'false'"
-            @click="collectionActive = item"
-          >
-            {{ item }}
-          </button>
-        </div>
+        <ElSegmentedControl
+          v-model="collectionActive"
+          :items="collectionItems"
+          ariaLabel="Collection state"
+          @update:model-value="recordCollectionEvent('default', 'update:modelValue', $event)"
+          @change="recordCollectionEvent('default', 'change', $event)"
+        />
+        <output hidden>{{ collectionResult('default', collectionActive) }}</output>
       </div>
       <div class="segmented-fixture-row" data-segmented-variant="collection-six">
-        <div class="el-segmented-control" role="tablist">
-          <button
-            v-for="item in collectionSixItems"
-            :key="item"
-            type="button"
-            class="el-segmented-control__item"
-            :class="{ 'is-active': item === collectionSixActive }"
-            role="tab"
-            :aria-selected="item === collectionSixActive ? 'true' : 'false'"
-            @click="collectionSixActive = item"
-          >
-            {{ item }}
-          </button>
-        </div>
+        <ElSegmentedControl
+          v-model="collectionSixActive"
+          :items="collectionSixItems"
+          ariaLabel="Collection period"
+        />
+      </div>
+      <div class="segmented-fixture-row" data-segmented-variant="collection-mixed">
+        <ElSegmentedControl
+          v-model="collectionMixedActive"
+          :items="collectionDisabledItems"
+          ariaLabel="Collection with disabled item"
+          @update:model-value="recordCollectionEvent('mixed', 'update:modelValue', $event)"
+          @change="recordCollectionEvent('mixed', 'change', $event)"
+        />
+        <output hidden>{{ collectionResult('mixed', collectionMixedActive) }}</output>
+      </div>
+      <div
+        class="segmented-fixture-row"
+        data-segmented-variant="collection-disabled-selected"
+        tabindex="-1"
+      >
+        <ElSegmentedControl
+          v-model="collectionDisabledActive"
+          :items="collectionDisabledItems"
+          ariaLabel="Collection with disabled selection"
+          @update:model-value="recordCollectionEvent('disabled-selected', 'update:modelValue', $event)"
+          @change="recordCollectionEvent('disabled-selected', 'change', $event)"
+        />
+        <output hidden>{{ collectionResult('disabled-selected', collectionDisabledActive) }}</output>
+      </div>
+      <div class="segmented-fixture-row" data-segmented-variant="collection-values">
+        <ElSegmentedControl
+          v-model="collectionValueActive"
+          :items="collectionValueItems"
+          ariaLabel="Collection typed values"
+          @update:model-value="recordCollectionEvent('values', 'update:modelValue', $event)"
+          @change="recordCollectionEvent('values', 'change', $event)"
+        />
+        <output hidden>{{ collectionResult('values', collectionValueActive) }}</output>
       </div>
     </div>
 
@@ -134,6 +153,8 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
+import { ElSegmentedControl } from '../../../element-plus'
+import type { SegmentedControlItem, SegmentedControlValue } from '../../../element-plus'
 import type { CheckboxGroupValueType } from '@element-plus/components/checkbox'
 
 const radio1 = ref<string | number | boolean>('a')
@@ -146,9 +167,47 @@ const checkbox1 = ref<CheckboxGroupValueType>(['a'])
 const checkbox2 = ref<CheckboxGroupValueType>(['a'])
 const checkbox3 = ref<CheckboxGroupValueType>(['a', 'c'])
 
-const collectionActive = ref('全部')
-const collectionItems = ['全部', '进行中', '已完成']
+// Use the same public local entry as the demo's element-plus Vite alias.
+// No private component import or hand-authored radio/tab DOM is used here.
+const collectionActive = ref<SegmentedControlValue>('all')
+const collectionItems: SegmentedControlItem[] = [
+  { label: '全部', value: 'all' },
+  { label: '进行中', value: 'open' },
+  { label: '已完成', value: 'closed' },
+]
+const collectionSixActive = ref<SegmentedControlValue>('day')
+const collectionSixItems: SegmentedControlItem[] = [
+  { label: '日', value: 'day' },
+  { label: '周', value: 'week' },
+  { label: '月', value: 'month' },
+  { label: '季', value: 'quarter' },
+  { label: '半年', value: 'half-year' },
+  { label: '年', value: 'year' },
+]
+const collectionMixedActive = ref<SegmentedControlValue>('all')
+const collectionDisabledActive = ref<SegmentedControlValue>('open')
+const collectionDisabledItems: SegmentedControlItem[] = [
+  { label: '全部', value: 'all' },
+  { label: '进行中', value: 'open', disabled: true },
+  { label: '已完成', value: 'closed' },
+]
+const collectionValueActive = ref<SegmentedControlValue>(false)
+const collectionValueItems: SegmentedControlItem[] = [
+  { label: '关闭', value: false },
+  { label: '零', value: 0 },
+  { label: '字符串零', value: '0' },
+  { label: '启用', value: true },
+]
 
-const collectionSixActive = ref('日')
-const collectionSixItems = ['日', '周', '月', '季', '半年', '年']
+type CollectionEvent = ['update:modelValue' | 'change', SegmentedControlValue]
+const collectionEvents = ref<Record<string, CollectionEvent[]>>({})
+const recordCollectionEvent = (
+  variant: string,
+  event: CollectionEvent[0],
+  value: SegmentedControlValue,
+) => {
+  ;(collectionEvents.value[variant] ??= []).push([event, value])
+}
+const collectionResult = (variant: string, value: SegmentedControlValue) =>
+  JSON.stringify({ value, events: collectionEvents.value[variant] ?? [] })
 </script>
