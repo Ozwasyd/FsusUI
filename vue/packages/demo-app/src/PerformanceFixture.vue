@@ -312,6 +312,7 @@ type PerformanceFixtureApi = {
     poolInputMs: number
   }>
   workerProbe: (iteration: number) => Promise<{
+    clockOffsetCorrectionMs?: number
     queueWaitMs: number
     computeMs: number
     transferMs: number
@@ -771,6 +772,7 @@ const workerProbe = async (iteration: number) => {
     const payload = new Uint32Array(16_384 + iteration * 17)
     const queued = performance.now()
     return await new Promise<{
+      clockOffsetCorrectionMs?: number
       queueWaitMs: number
       computeMs: number
       transferMs: number
@@ -784,13 +786,28 @@ const workerProbe = async (iteration: number) => {
         event.preventDefault()
         fail(new Error(event.message || 'worker_probe_error'))
       }
-      worker.onmessageerror = () => fail(new Error('worker_probe_message_error'))
+      worker.onmessageerror = () =>
+        fail(new Error('worker_probe_message_error'))
       worker.onmessage = ({ data }) => {
         const completed = performance.now()
         if (!cleanup()) return
-        // Translate Worker timestamps into the window's performance time origin.
-        const workerOffset = data.timeOrigin - performance.timeOrigin
+        // Quantized origins can put Worker marks outside their causal window.
+        // Adjust only a consistent origin estimate; keep compute and elapsed intact.
+        const originOffset = data.timeOrigin - performance.timeOrigin
+        const minimumOffset = queued - data.received
+        const maximumOffset = completed - data.computed
+        const epochRoundingMs =
+          2 * Number.EPSILON * Math.max(data.timeOrigin, performance.timeOrigin)
+        let workerOffset = originOffset
+        if (minimumOffset <= maximumOffset) {
+          if (workerOffset < minimumOffset - epochRoundingMs)
+            workerOffset = minimumOffset
+          else if (workerOffset > maximumOffset + epochRoundingMs)
+            workerOffset = maximumOffset
+        }
+        const clockOffsetCorrectionMs = workerOffset - originOffset
         resolve({
+          ...(clockOffsetCorrectionMs === 0 ? {} : { clockOffsetCorrectionMs }),
           queueWaitMs: workerOffset + data.received - queued,
           computeMs: data.computed - data.received,
           transferMs: completed - (workerOffset + data.computed),

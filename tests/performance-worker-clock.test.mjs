@@ -449,6 +449,56 @@ await mount()
   },
 )
 
+test('worker probe bounds a quantized origin that puts completion after receipt', async () => {
+  const result = await runProbe({
+    windowOrigin: 1_700_000_000_000,
+    workerOrigin: 1_700_000_000_100.1,
+    queued: 100,
+    received: 10,
+    computed: 12,
+    completed: 112,
+  })
+  assert.deepEqual(result, {
+    clockOffsetCorrectionMs: -0.10009765625,
+    queueWaitMs: 10,
+    computeMs: 2,
+    transferMs: 0,
+  })
+  assert.equal(result.queueWaitMs + result.computeMs + result.transferMs, 12)
+})
+
+test('worker probe bounds a quantized origin that puts receipt before submission', async () => {
+  const result = await runProbe({
+    windowOrigin: 1_700_000_000_000,
+    workerOrigin: 1_700_000_000_099.9,
+    queued: 110,
+    received: 10,
+    computed: 12,
+    completed: 113,
+  })
+  assert.deepEqual(result, {
+    clockOffsetCorrectionMs: 0.10009765625,
+    queueWaitMs: 0,
+    computeMs: 2,
+    transferMs: 1,
+  })
+  assert.equal(result.queueWaitMs + result.computeMs + result.transferMs, 3)
+})
+
+test('worker probe preserves incompatible timestamp evidence', async () => {
+  assert.deepEqual(
+    await runProbe({
+      windowOrigin: 1_700_000_000_000,
+      workerOrigin: 1_700_000_000_000,
+      queued: 100,
+      received: 101,
+      computed: 104,
+      completed: 102,
+    }),
+    { queueWaitMs: 1, computeMs: 3, transferMs: -2 },
+  )
+})
+
 for (const mode of ['constructor', 'post', 'allocation']) {
   test(`worker probe lifecycle cleans up synchronous ${mode} failure`, async () => {
     const { state, start } = lifecycleProbe(mode)
