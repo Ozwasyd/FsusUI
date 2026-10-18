@@ -15,6 +15,7 @@ import {
   writeBundles,
 } from '../utils'
 import { ElementPlusAlias } from '../plugins/element-plus-alias'
+import { FrozenStringRecords } from '../plugins/frozen-string-records'
 import { MarkdownHeavyFeatureFrameUrl } from '../plugins/markdown-heavy-feature-frame'
 import { buildConfigEntries, target } from '../build-info'
 
@@ -75,6 +76,7 @@ export const buildModules = async () => {
           '.vue': 'ts',
         },
       }),
+      FrozenStringRecords(),
     ],
     external,
     treeshake: false,

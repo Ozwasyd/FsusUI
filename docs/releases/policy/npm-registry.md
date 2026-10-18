@@ -109,6 +109,15 @@ run in separate, sequential children through the normal entry and heap wrapper,
 releasing each process's compiler state before the next variant begins. A failed
 variant stops the package build.
 
+The preserved ES module producer may fold reads of own string data fields from
+literal frozen exported records. It resolves actual Rollup entry owners and lexical
+imports, including Vue unref reads, while preserving a read of the original binding
+for initialization errors. It keeps public records, descriptors, component metadata,
+source maps and all original build options. Mutable records, accessors, spreads,
+reference markers, custom prototypes, shadowed bindings, eval and write targets
+remain untouched. This optimization assumes the standard native Object.freeze
+and Vue unref implementations; it never changes consumer budgets or baselines.
+
 Output formats are also written sequentially in their original option order,
 preserving all maps and the returned results' order, count, and object identities.
 A writer failure propagates its original error and stops later formats from

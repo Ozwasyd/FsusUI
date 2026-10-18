@@ -27,6 +27,7 @@
     "components-helper": "2.2.0",
     "consola": "3.4.2",
     "esbuild": "0.28.0",
+    "eslint": "10.2.0",
     "fast-glob": "3.3.3",
     "fs-extra": "11.3.4",
     "gulp": "5.0.1",
