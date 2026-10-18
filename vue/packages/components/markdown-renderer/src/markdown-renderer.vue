@@ -894,6 +894,7 @@ const hasEnabledHeavyFeature = (
   (features.mermaid && result.features.includes('mermaid'))
 
 const resetFeatureActivation = () => {
+  heavyThemeRelevant = false
   activationController?.abort()
   activationController = new AbortController()
   activationObserver?.disconnect()

@@ -809,6 +809,34 @@ describe('MarkdownRenderer.vue', () => {
     }
   })
 
+  test('stops theme reparsing when heavy content becomes plain content', async () => {
+    const heavySource = '```mermaid\ngraph LR\nA-->B\n```'
+    renderMarkdownResult.mockImplementation(async (request) => {
+      const source = typeof request === 'string' ? request : request.source
+      return fsusOk(makeResult(source, `<p>${source}</p>`))
+    })
+    const wrapper = mount(MarkdownRenderer, { props: { content: heavySource } })
+    try {
+      await flushRenderer()
+      await vi.waitFor(() =>
+        expect(wrapper.emitted('render-complete')).toHaveLength(1),
+      )
+      await wrapper.setProps({ content: 'Now plain content' })
+      await flushRenderer()
+      await vi.waitFor(() =>
+        expect(wrapper.emitted('render-complete')).toHaveLength(2),
+      )
+      const calls = renderMarkdownResult.mock.calls.length
+      document.documentElement.dispatchEvent(
+        new CustomEvent('fsus:theme-change'),
+      )
+      await flushRenderer()
+      expect(renderMarkdownResult).toHaveBeenCalledTimes(calls)
+    } finally {
+      wrapper.unmount()
+    }
+  })
+
   test('keeps the scroll anchor when the full result changes html', async () => {
     let resolveFull:
       | ((result: FsusResult<MarkdownRuntimeRenderResult>) => void)
