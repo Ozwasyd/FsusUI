@@ -1367,8 +1367,8 @@
         },
         {
           "path": "vue/packages/element-plus/package.json",
-          "field": "devDependencies",
-          "version": "4.6.4"
+          "field": "dependencies",
+          "version": "^4.6.4"
         }
       ]
     },

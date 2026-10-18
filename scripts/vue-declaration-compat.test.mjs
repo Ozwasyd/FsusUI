@@ -2,7 +2,7 @@ import assert from 'node:assert/strict'
 import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs'
 import path from 'node:path'
 import test from 'node:test'
-import { execFileSync } from 'node:child_process'
+import { execFileSync, spawnSync } from 'node:child_process'
 import ts from 'typescript'
 import { withVueDeclarationDefaults } from './vue-declaration-compat.mjs'
 
@@ -125,4 +125,138 @@ test('the original Vue CLI program applies the same default normalization', () =
     'utf8',
   )
   assert.doesNotMatch(declaration, /, any>;/u)
+})
+
+test('the original Vue CLI preserves shadowed bindings and normalizes real Vue references', () => {
+  const root = mkdtempSync(path.join(temporary, 'vue-cli-bindings-'))
+  writeFileSync(
+    path.join(root, 'source.ts'),
+    `import {shallowRef} from 'vue'
+import type {ShallowRef, ShallowRef as NativeRef} from 'vue'
+import type * as Vue from 'vue'
+export declare const Native: ShallowRef<string,string>
+export declare const NativeQualified: Vue.ShallowRef<string,string>
+export declare const NativeAliased: NativeRef<string,string>
+export const NativeInferred = shallowRef<string>('value')
+export namespace Legitimate {
+  export declare const Nested: ShallowRef<string,string>
+  export declare const Qualified: Vue.ShallowRef<string,string>
+  export declare const Inline: import('vue').ShallowRef<string,string>
+}
+export namespace Local {
+  export type ShallowRef<T,S=any> = {read:T;write:(value:S)=>void}
+  export declare const Value: ShallowRef<string,string>
+}
+export namespace Shadow {
+  export namespace Vue {
+    export type ShallowRef<T,S=any> = {read:T;write:(value:S)=>void}
+  }
+  export declare const Value: Vue.ShallowRef<string,string>
+}
+export namespace LocalAlias {
+  export type NativeRef<T,S=any> = {read:T;write:(value:S)=>void}
+  export declare const Value: NativeRef<string,string>
+}
+`,
+  )
+  const compilerOptions = {
+    target: 'ES2022',
+    module: 'ESNext',
+    moduleResolution: 'Bundler',
+    strict: true,
+    skipLibCheck: false,
+    noEmitOnError: true,
+    types: [],
+  }
+  const stockCli = path.resolve('node_modules/vue-tsc/bin/vue-tsc.js')
+  let normalizedOutput
+  for (const variant of ['raw', 'normalized']) {
+    const configuration = path.join(root, `tsconfig.${variant}.json`)
+    writeFileSync(
+      configuration,
+      JSON.stringify({
+        compilerOptions: {
+          ...compilerOptions,
+          declaration: true,
+          emitDeclarationOnly: true,
+          outDir: `./${variant}`,
+        },
+        files: ['source.ts'],
+      }),
+    )
+    const output = execFileSync(
+      process.execPath,
+      [
+        variant === 'raw'
+          ? stockCli
+          : path.resolve('scripts/generate-package-declarations.mjs'),
+        '-p',
+        configuration,
+      ],
+      { encoding: 'utf8' },
+    )
+    if (variant === 'normalized') normalizedOutput = output
+  }
+  const native = [
+    'Native',
+    'NativeQualified',
+    'NativeAliased',
+    'NativeInferred',
+    'Legitimate.Nested',
+    'Legitimate.Qualified',
+    'Legitimate.Inline',
+  ]
+  const local = ['Local', 'Shadow', 'LocalAlias']
+  const compare = path.join(root, 'compare.ts')
+  writeFileSync(
+    compare,
+    `import type * as raw from './raw/source'
+import type * as normalized from './normalized/source'
+type Assert<T extends true> = T
+type Equal<A,B> = (<T>()=>T extends A?1:2) extends (<T>()=>T extends B?1:2)?true:false
+type IsAny<T> = 0 extends 1 & T ? true:false
+export type NativeContracts = [${native.map((name) => `Assert<Equal<typeof raw.${name},typeof normalized.${name}>>`).join(',')}]
+export type LocalContracts = [${local.map((name) => `Assert<Equal<typeof raw.${name}.Value,typeof normalized.${name}.Value>>,Assert<Equal<Parameters<typeof normalized.${name}.Value.write>[0],string>>,Assert<Equal<IsAny<Parameters<typeof normalized.${name}.Value.write>[0]>,false>>`).join(',')}]
+`,
+  )
+  const comparisonConfig = path.join(root, 'tsconfig.compare.json')
+  writeFileSync(
+    comparisonConfig,
+    JSON.stringify({
+      compilerOptions: { ...compilerOptions, noEmit: true },
+      files: ['compare.ts'],
+    }),
+  )
+  const comparison = spawnSync(
+    process.execPath,
+    [stockCli, '-p', comparisonConfig],
+    { encoding: 'utf8' },
+  )
+  assert.equal(comparison.status, 0, comparison.stdout + comparison.stderr)
+  assert.deepEqual(
+    diagnostics(ts.createProgram([compare], { ...options, noEmit: true })),
+    [],
+  )
+  assert.match(normalizedOutput, /"ShallowRef":7/u)
+  const declaration = readFileSync(
+    path.join(root, 'normalized/source.d.ts'),
+    'utf8',
+  )
+  assert.match(declaration, /Native: ShallowRef<string>;/u)
+  assert.match(declaration, /NativeQualified: Vue\.ShallowRef<string>;/u)
+  assert.match(declaration, /NativeAliased: NativeRef<string>;/u)
+})
+
+test('unrelated local arguments are not rejected as non-default Vue arguments', () => {
+  const root = mkdtempSync(path.join(temporary, 'vue-local-arguments-'))
+  const source = `import type {ShallowRef} from 'vue'
+export declare const Native: ShallowRef<string,string>
+export namespace Local {
+  export type ShallowRef<T,S=any> = {read:T;write:(value:S)=>void}
+  export declare const Value: ShallowRef<string,number>
+}
+`
+  const declaration = emit(root, source, true)
+  assert.match(declaration, /Native: ShallowRef<string>;/u)
+  assert.match(declaration, /Value: ShallowRef<string, number>;/u)
 })
