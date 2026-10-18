@@ -1341,6 +1341,8 @@ try {
         },
       },
     )
+  })
+  stage('component-alias-declarations', () => {
     const declarationRoot = path.join(fixtureRoot, '.tmp')
     mkdirSync(declarationRoot, { recursive: true })
     const declarationOutput = mkdtempSync(
