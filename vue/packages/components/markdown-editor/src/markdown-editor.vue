@@ -1478,6 +1478,7 @@ import {
 } from './markdown-editor-outline'
 import { planMarkdownOutlineReveal } from './markdown-editor-outline-active'
 import { measureMarkdownEditorReveal, MarkdownEditorRevealError, isMarkdownEditorRevealMeasurementMutation } from './markdown-editor-reveal-completion'
+import { createMarkdownEditorSourceNavigationViewOwner } from './markdown-editor-source-navigation-view'
 import { createMarkdownEditorRevealVisibility } from './markdown-editor-reveal-visibility'
 import type { MarkdownEditorRevealPaint } from './markdown-editor-reveal-visibility'
 import type { MarkdownEditorRevealCompletion, MarkdownEditorRevealCompletionOptions, MarkdownEditorRevealFailureReason } from './markdown-editor-reveal-completion'
@@ -1715,6 +1716,8 @@ const nativeSurfaceResources = createMarkdownEditorNativeSurfaceResources({
   inspectImperative: () => ({ resizeObservers: typewriterObserverUnknown ? null : Number(typewriterResizeObserver !== undefined),
     layoutGestureTimers: Number(layoutGestureTimer !== undefined) }),
 })
+let sourceNavigationViewOwner: ReturnType<typeof createMarkdownEditorSourceNavigationViewOwner> | null = null
+onBeforeUnmount(() => sourceNavigationViewOwner?.dispose())
 const vSessionNativeEvents = nativeSurfaceResources.directive
 
 const editorRevision = ref(transactionStore.revision)
@@ -2620,15 +2623,18 @@ const settleTypewriterLayout = () => {
   }
   typewriterLayoutFrame = sessionLayoutResources.requestFrame(settle)
 }
-const handleLayoutWheel = () => {
+const handleLayoutWheel = (event?: Event) => {
+  sourceNavigationViewOwner?.gesture(event, 'wheel')
   suspendTypewriterForUserScroll()
   markLayoutGesture('wheel')
 }
-const handleLayoutTouch = () => {
+const handleLayoutTouch = (event?: Event) => {
+  sourceNavigationViewOwner?.gesture(event, 'touch')
   suspendTypewriterForUserScroll()
   markLayoutGesture('touch')
 }
 const handleLayoutScroll = () => {
+  sourceNavigationViewOwner?.refresh()
   const textarea = textareaRef.value
   if (textarea) syncFocusLayerScroll(textarea.scrollTop)
   if (restoringSelection || restoringViewport || restoringTypewriter) return
@@ -4359,6 +4365,7 @@ const wordCount = computed(() => editorMetrics.value.wordCount)
 let viewportHeightNext: number | null = null
 let viewportTrigger: MarkdownLiveLayoutTrigger | null = null
 const updateVisualViewportHeight = () => {
+  sourceNavigationViewOwner?.refresh()
   if (sessionSurfacePaused.value || typeof window === 'undefined') return
 
   const previous = visualViewportHeight.value
@@ -4955,6 +4962,7 @@ const handleCut = (event: ClipboardEvent) => {
 }
 
 const handleSelectionMove = () => {
+  sourceNavigationViewOwner?.refresh()
   if (restoringSelection || isComposing.value) return
   captureSelection()
   refreshCurrentTableCell()
@@ -4976,7 +4984,8 @@ const handleSelectionMove = () => {
   refreshLiveReveal()
 }
 
-const handleSelectionDragStart = () => {
+const handleSelectionDragStart = (event?: Event) => {
+  sourceNavigationViewOwner?.gesture(event, 'pointer')
   if (isComposing.value) return
   typewriterScrollTarget = null
   writingAidsController.handleSelectionDragStart()
@@ -7182,6 +7191,8 @@ nativeSurfaceResources.ownWatch(watch([searchMatches, searchCurrentIndex, () => 
   { flush: 'post' }))
 
 const handleKeydown = (event: KeyboardEvent) => {
+  if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Home', 'End', 'PageUp', 'PageDown'].includes(event.key))
+    sourceNavigationViewOwner?.gesture(event, 'keyboard')
   if (event.key === 'Escape' && searchUiState.value.open) {
     event.preventDefault()
     closeSearch()
@@ -7807,6 +7818,40 @@ const revealSourceRange = (
 
 // Completion belongs to this mounted public API owner, never to a host receipt adapter.
 let publicRevealSession: MarkdownEditorSession | null = null
+sourceNavigationViewOwner = createMarkdownEditorSourceNavigationViewOwner({
+  readNative: () => {
+    const textarea = textareaRef.value
+    const root = rootElementRef.value
+    if (!textarea || !root || !textarea.isConnected || !root.isConnected || !root.contains(textarea) ||
+      textarea.ownerDocument !== root.ownerDocument || sessionDisposed || editorReleased || sessionSurfacePaused.value ||
+      isComposing.value || nativeMachine.composing || restoringSelection || inputDisabled.value || nativeHandoverReceiving.value ||
+      !isEditorDocumentCurrent(transactionStore.documentIdentity) ||
+      currentMode.value === 'preview' || !liveSurface.value.inputVisible) return null
+    return { textarea, root, session: publicRevealSession, source: transactionStore.value,
+      documentIdentity: transactionStore.documentIdentity, revision: transactionStore.revision,
+      selection: transactionStore.selection, mode: currentMode.value, nativeGeneration: nativeSurfaceImperativeGeneration }
+  },
+  requestFrame: run => sessionLayoutResources.requestFrame(run),
+  cancelFrame: frame => sessionLayoutResources.cancelFrame(frame),
+  bind: (target, events) => {
+    nativeSurfaceResources.bindTarget(target, events, false)
+    return () => nativeSurfaceResources.releaseTarget(target, false)
+  },
+  notify: event => emit('source-navigation-gesture', event),
+})
+onMounted(() => sourceNavigationViewOwner?.mount())
+nativeSurfaceResources.ownWatch(watch([
+  editorRevision, editorValue, editorSelection, currentMode, isComposing, sessionSurfacePaused, nativeHandoverReceiving,
+  textareaRef, rootElementRef, () => props.disabled, () => props.loading,
+  () => props.documentIdentity?.id, () => props.documentIdentity?.epoch,
+], () => nativeSurfaceResources.runWatchCallback(() => sourceNavigationViewOwner?.mount()), { flush: 'post' }))
+nativeSurfaceResources.ownWatch(watch([
+  editorRevision, editorValue, editorSelection, currentMode, isComposing, sessionSurfacePaused, nativeHandoverReceiving,
+  textareaRef, rootElementRef, () => props.disabled, () => props.loading,
+  () => props.documentIdentity?.id, () => props.documentIdentity?.epoch,
+], () => nativeSurfaceResources.runWatchCallback(() => sourceNavigationViewOwner?.invalidate()), { flush: 'sync' }))
+const readSourceNavigationView = sourceNavigationViewOwner.read
+const isCurrentSourceNavigationView = sourceNavigationViewOwner.current
 let pendingPublicReveal: { observers: number; selection: MarkdownEditorResolvedSelection; cancel: (reason: MarkdownEditorRevealFailureReason) => void } | null = null
 const revealSourceRangeAndWait = async (
   requested: MarkdownEditorResolvedSelection,
@@ -8059,14 +8104,15 @@ const publicRevealLayoutParticipant: MarkdownEditorSessionResourceParticipant = 
       retainedListeners: original.retainedListeners + pending * 8,
       usage: { ...original.usage, observers: original.usage.observers + (pendingPublicReveal?.observers ?? 0), timers: original.usage.timers + pending,
         backgroundTasks: original.usage.backgroundTasks + pending,
-        memoryUnits: original.usage.memoryUnits + pending } }
+        memoryUnits: original.usage.memoryUnits + pending + (sourceNavigationViewOwner?.inspect().memoryUnits ?? 0) } }
   },
   pause() {
     pendingPublicReveal?.cancel('unavailable')
+    sourceNavigationViewOwner?.pause()
     sessionLayoutResources.participant.pause()
     return this.inspect()
   },
-  resume() { sessionLayoutResources.participant.resume(); return this.inspect() },
+  resume() { sessionLayoutResources.participant.resume(); sourceNavigationViewOwner?.mount(); return this.inspect() },
   dispose(ref) { pendingPublicReveal?.cancel('unavailable'); sessionLayoutResources.participant.dispose(ref) },
 }
 
@@ -8074,6 +8120,7 @@ const frameResourceParticipant = createMarkdownEditorFrameResourceParticipant(fr
 const pauseNativeSurfaceImperative = () => {
   nativeSurfaceImperativeGeneration += 1
   sessionSurfacePaused.value = true
+  sourceNavigationViewOwner?.pause()
   restoringSelection = false
   restoringViewport = false
   let failed = false
@@ -8092,6 +8139,7 @@ const pauseNativeSurfaceImperative = () => {
 const resumeNativeSurfaceImperative = () => {
   nativeSurfaceImperativeGeneration += 1
   sessionSurfacePaused.value = false
+  sourceNavigationViewOwner?.mount()
   attachViewportListeners()
   refreshTypewriterResizeObserver()
   updateVisualViewportHeight()
@@ -8562,6 +8610,8 @@ defineExpose({
   revealHeading,
   revealSourceRange,
   revealSourceRangeAndWait,
+  readSourceNavigationView,
+  isCurrentSourceNavigationView,
   writingAidsController,
 })
 </script>

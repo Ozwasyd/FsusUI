@@ -6,3 +6,9 @@ export const ElMarkdownEditor = withInstall(MarkdownEditor)
 export default ElMarkdownEditor
 
 export * from './src/markdown-editor'
+
+export type {
+  MarkdownEditorSourceNavigationView,
+  MarkdownEditorSourceNavigationViewOptions,
+  MarkdownEditorSourceNavigationGesture,
+} from './src/markdown-editor-source-navigation-view'
