@@ -7826,6 +7826,7 @@ const revealSourceRangeAndWait = async (
   const source = transactionStore.value
   const generation = nativeSurfaceImperativeGeneration
   const fail = (reason: MarkdownEditorRevealFailureReason): never => { throw new MarkdownEditorRevealError(reason) }
+  if (source.length > 1_000_000) fail('unsupported')
   const context = () => {
     let aborted: unknown
     try { aborted = Reflect.get(AbortSignal.prototype, 'aborted', signal) }
