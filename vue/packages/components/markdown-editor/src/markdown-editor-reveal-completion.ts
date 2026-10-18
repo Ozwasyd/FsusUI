@@ -37,12 +37,12 @@ export type MarkdownEditorRevealFailureReason =
   | 'timeout'
 
 export class MarkdownEditorRevealError extends Error {
-  constructor(
-    readonly reason: MarkdownEditorRevealFailureReason,
-    cause?: unknown,
-  ) {
+  readonly reason: MarkdownEditorRevealFailureReason
+
+  constructor(reason: MarkdownEditorRevealFailureReason, cause?: unknown) {
     super(`markdown-editor-reveal-${reason}`, { cause })
     this.name = 'MarkdownEditorRevealError'
+    this.reason = reason
   }
 }
 
@@ -74,6 +74,7 @@ export const measureMarkdownEditorReveal = (
     textarea.clientHeight <= 0
   )
     return null
+  const nativeBox = textarea.getBoundingClientRect()
   const mirror = document.createElement('div')
   mirror.setAttribute('aria-hidden', 'true')
   mirror.inert = true
@@ -113,7 +114,8 @@ export const measureMarkdownEditorReveal = (
     boxSizing: 'border-box',
     border: '0',
     margin: '0',
-    width: `${textarea.clientWidth}px`,
+    // clientWidth is integer-rounded; retain the native fractional content width.
+    width: `${nativeBox.width - textarea.offsetWidth + textarea.clientWidth}px`,
     height: 'auto',
     minHeight: '0',
     maxHeight: 'none',
@@ -122,6 +124,11 @@ export const measureMarkdownEditorReveal = (
   })
   const text = document.createTextNode(`${textarea.value}\u200b`)
   mirror.append(text)
+  // Initialize the native fixed-point line strut before the first layout. A
+  // block strut rounds at the opposite boundary from a native text control.
+  const lineHeight = Number.parseFloat(style.lineHeight)
+  if (Number.isFinite(lineHeight))
+    mirror.style.lineHeight = `${(Math.floor(lineHeight * 64) - 0.5) / 64}px`
   document.body.append(mirror)
   try {
     const agreesWithNative = () =>
@@ -133,15 +140,7 @@ export const measureMarkdownEditorReveal = (
         textarea.scrollWidth -
           Math.max(textarea.clientWidth, mirror.scrollWidth),
       ) <= 1
-    if (!agreesWithNative()) {
-      // Native controls and block line struts round at opposite fixed-point boundaries.
-      // Use the interior of the native unit to avoid CSSOM decimal serialization
-      // crossing its boundary. The same native extent fence still has to pass.
-      const lineHeight = Number.parseFloat(style.lineHeight)
-      if (!Number.isFinite(lineHeight)) return null
-      mirror.style.lineHeight = `${(Math.floor(lineHeight * 64) - 0.5) / 64}px`
-      if (!agreesWithNative()) return null
-    }
+    if (!agreesWithNative()) return null
     const origin = mirror.getBoundingClientRect()
     const range = document.createRange()
     range.setStart(text, selection.start)
