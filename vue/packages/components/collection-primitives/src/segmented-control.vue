@@ -41,8 +41,8 @@ const rootRef = ref<HTMLElement>()
 const enabledItems = computed(() =>
   props.items.filter((item) => !item.disabled),
 )
-const selectedIndex = computed(() =>
-  props.items.findIndex((item) => item.value === props.modelValue),
+const selectedEnabledIndex = computed(() =>
+  enabledItems.value.findIndex((item) => item.value === props.modelValue),
 )
 const controlKls = computed(() => [ns.b(), ns.m(props.density)])
 const controlAttrs = computed(() => ({
@@ -61,7 +61,7 @@ const optionKls = (item: SegmentedControlItem) => [
 
 const optionTabIndex = (item: SegmentedControlItem) => {
   if (item.disabled) return -1
-  if (selectedIndex.value === -1) {
+  if (selectedEnabledIndex.value === -1) {
     return enabledItems.value[0]?.value === item.value ? 0 : -1
   }
   return isSelected(item) ? 0 : -1
