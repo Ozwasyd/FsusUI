@@ -224,11 +224,23 @@ public class FsusVirtualList : ContentControl
 
   private void RefreshWindow(bool updateScrollViewer)
   {
+    FocusedIndex = Math.Clamp(FocusedIndex, 0, Math.Max(0, ItemCount - 1));
+    ScrollOffset = Math.Min(ScrollOffset, Math.Max(0d, ResolveTotalSize() - ViewportSize));
     if (ItemCount <= 0)
     {
+      if (realizedItems.Count > 0)
+      {
+        CancelPendingLoad();
+        loadedItems.Clear();
+        loadedItemsByIndex.Clear();
+        measurementCache.Clear();
+        measurementOrder.Clear();
+      }
       RecycleAllContainers();
       realizedItems.Clear();
       itemHost.Height = 0;
+      AnchorKey = string.Empty;
+      ApplyScrollOffset();
       SyncState();
       return;
     }
@@ -338,19 +350,20 @@ public class FsusVirtualList : ContentControl
     var nextSize = Math.Max(1d, size);
     var previousSize = GetResolvedSize(index);
     var anchorIndex = ResolveIndexFromOffset(ScrollOffset);
+    var anchorOffset = ResolveOffset(anchorIndex);
     if (!measurementCache.ContainsKey(index))
     {
       measurementOrder.Enqueue(index);
     }
     measurementCache[index] = nextSize;
     variableSizeIndex.Update(index, previousSize, nextSize);
-    if (index < anchorIndex)
-    {
-      ScrollOffset += nextSize - previousSize;
-    }
-
     TrimMeasurementCache();
-    if (realizedContainers.ContainsKey(index))
+    if (SizeMode == FsusVirtualSizeMode.Variable)
+    {
+      ScrollOffset += ResolveOffset(anchorIndex) - anchorOffset;
+      RefreshWindow();
+    }
+    else if (realizedContainers.ContainsKey(index))
     {
       RefreshWindow();
     }
@@ -363,8 +376,12 @@ public class FsusVirtualList : ContentControl
 
   public FsusVirtualAnchor CaptureAnchor()
   {
-    var index = FocusedIndex;
-    var anchor = new FsusVirtualAnchor(ResolveKey(index), index, ScrollOffset);
+    var index = ResolveIndexFromOffset(ScrollOffset);
+    // The provider may already contain inserted data; realized keys still describe
+    // the viewport before its mutation notification.
+    var key = ItemCount <= 0 ? string.Empty :
+      realizedItems.FirstOrDefault(item => item.Index == index)?.Key ?? ResolveKey(index);
+    var anchor = new FsusVirtualAnchor(key, index, ScrollOffset);
     AnchorKey = anchor.Key;
     return anchor;
   }
@@ -387,6 +404,20 @@ public class FsusVirtualList : ContentControl
     }
 
     var anchor = CaptureAnchor();
+    var hadItems = ItemCount > 0;
+    var restoreFocus = realizedContainers.Values.Any(container => container.IsFocused);
+    CancelPendingLoad();
+    loadedItemsByIndex.Clear();
+    for (var position = 0; position < loadedItems.Count; position++)
+    {
+      var item = loadedItems[position];
+      if (item.Index >= index)
+      {
+        item = item with { Index = item.Index + insertedCount };
+        loadedItems[position] = item;
+      }
+      loadedItemsByIndex[item.Index] = item;
+    }
     var shifted = measurementCache
       .Select(pair => new KeyValuePair<int, double>(
         pair.Key >= index ? pair.Key + insertedCount : pair.Key,
@@ -403,12 +434,36 @@ public class FsusVirtualList : ContentControl
 
     ItemCount += insertedCount;
     variableSizeIndex.Ensure(ItemCount, FixedItemSize, measurementCache);
-    if (index <= anchor.Index)
+    if (hadItems && index <= anchor.Index)
     {
-      FocusedIndex = Math.Min(ItemCount - 1, anchor.Index + insertedCount);
       ScrollOffset = anchor.Offset + insertedCount * Math.Max(1d, FixedItemSize);
     }
+    if (hadItems && index <= FocusedIndex)
+    {
+      FocusedIndex = Math.Min(ItemCount - 1, FocusedIndex + insertedCount);
+    }
     RefreshWindow();
+    if (restoreFocus && realizedContainers.TryGetValue(FocusedIndex, out var focusedContainer))
+    {
+      focusedContainer.Focus();
+    }
+  }
+
+  protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
+  {
+    CancelPendingLoad();
+    base.OnDetachedFromVisualTree(e);
+  }
+
+  private void CancelPendingLoad()
+  {
+    if (loadCancellation is not null)
+    {
+      LastLoadCanceled = true;
+      loadVersion++;
+      loadCancellation.Cancel();
+      State = FsusVirtualListState.Ready;
+    }
   }
 
   public async ValueTask<bool> LoadWindowAsync()
@@ -444,6 +499,10 @@ public class FsusVirtualList : ContentControl
       var boundedItems = items.Take(Math.Max(1, LoadedWindowLimit)).ToArray();
       await CommitOnUiThreadAsync(() =>
       {
+        if (cancellation.IsCancellationRequested || version != loadVersion)
+        {
+          return;
+        }
         loadedItems.Clear();
         loadedItems.AddRange(boundedItems);
         loadedItemsByIndex.Clear();
@@ -454,7 +513,7 @@ public class FsusVirtualList : ContentControl
         State = FsusVirtualListState.Ready;
         RefreshWindow();
       });
-      return true;
+      return !cancellation.IsCancellationRequested && version == loadVersion;
     }
     catch (OperationCanceledException)
     {
@@ -462,6 +521,10 @@ public class FsusVirtualList : ContentControl
     }
     catch (Exception error)
     {
+      if (cancellation.IsCancellationRequested || version != loadVersion)
+      {
+        return false;
+      }
       ErrorMessage = error.Message;
       State = FsusVirtualListState.Error;
       return false;
@@ -500,8 +563,17 @@ public class FsusVirtualList : ContentControl
     return ValueTask.FromResult(false);
   }
 
-  private int ResolveVisibleCount() =>
-    Math.Min(ItemCount, Math.Max(1, (int)Math.Ceiling(ViewportSize / Math.Max(1d, FixedItemSize)) + Math.Max(0, Overscan)));
+  private int ResolveVisibleCount()
+  {
+    var count = (int)Math.Ceiling(ViewportSize / Math.Max(1d, FixedItemSize));
+    if (SizeMode == FsusVirtualSizeMode.Variable && ItemCount > 0)
+    {
+      var start = ResolveIndexFromOffset(ScrollOffset);
+      var end = ResolveIndexFromOffset(ScrollOffset + ViewportSize);
+      count = end - start + (ResolveOffset(end) < ScrollOffset + ViewportSize ? 1 : 0);
+    }
+    return Math.Min(ItemCount, Math.Max(1, count + Math.Max(0, Overscan)));
+  }
 
   private int ResolveIndexFromOffset(double offset)
   {
