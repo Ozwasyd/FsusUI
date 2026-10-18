@@ -1792,3 +1792,49 @@ Original owner/lifecycle and frozen source controls are inherited unchanged.
 This reconciles source overlap; it does not bind or complete the original SDK,
 qualify business acknowledgement, run tests/native paths or allow session eviction.
 Inherited changesets cover the public surface; this composition adds no new API.
+
+### Observed public source reveal completion (source WIP)
+
+The legacy `revealHeading` and `revealSourceRange` return synchronous target
+admission statuses. Their `success` does not acknowledge asynchronous focus or
+viewport completion. Existing signatures and behavior are preserved.
+
+`revealSourceRangeAndWait(selection, options): Promise<MarkdownEditorRevealCompletion>`
+is the completion-bearing public instance method. `selection` requires raw UTF-16
+`start`, `end` and `direction` (`none`, `forward` or `backward`); it is never
+collapsed or silently snapped to a different grapheme boundary. Options require
+`session` (the exact object returned by this mounted instance's `getSession`),
+`expected: { documentIdentity: { id, epoch }, revision }`, a genuine `signal`,
+and `assertAdmission: () => void`. The host callback throws when its current
+navigation admission no longer holds. `timeoutMs` defaults to 1500 and accepts
+integer values from 1 through 5000. A deadline always rejects.
+
+The frozen successful result is exactly `{ status: 'success', editorSessionRef,
+documentIdentity, revision, selection, focus: 'textarea',
+viewport: 'full-selection-visible' }`. It acknowledges the same mounted owner,
+source revision, complete native selection/direction and actual focused textarea,
+with the complete selection visible and stable across two frame observations.
+Native control geometry, clipping and hit testing must agree with a temporary
+inert browser text-layout measurement; this never creates another input owner.
+No source or history entry is written. Positioning is instant, including under
+reduced motion. This bounded source-input contract is separate from renderer
+presentation or a host navigation/history receipt.
+
+The promise rejects with exported `MarkdownEditorRevealError` and a `reason`:
+`aborted`, `admission-rejected`, `stale`, `unavailable`, `unsupported`,
+`invalid-selection`, `focus-lost`, `selection-changed`, `superseded`,
+`interrupted` or `timeout`. A thrown admission error remains in `cause`.
+Cancellation, pause, unmount, document/epoch/revision/mode drift, composition,
+disabled/loading/readonly state, genuine focus loss, a new reveal or manual
+wheel/touch/pointer/keyboard input cannot produce a completion. All listeners,
+frames and the failure deadline are released on settlement. After a failure,
+selection/scroll effects already made are not rolled back over a newer action.
+
+Preview without the source input, RTL/vertical/transformed geometry, sources over
+1,000,000 UTF-16 units, a selection larger than the input viewport, or unavailable
+or inconsistent native text measurement reject as `unsupported`. Clipped or
+occluded targets never receive a nearby/estimated success. These limitations
+are explicit; legacy target admission remains available for existing consumers.
+The consumer must still verify its own current navigation admission after await.
+This source contract does not qualify full Blog navigation, native IME, screen
+reader, Avalonia or independent UX acceptance.

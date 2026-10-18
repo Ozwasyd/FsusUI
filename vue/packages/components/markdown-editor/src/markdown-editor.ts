@@ -1968,3 +1968,6 @@ export type {
   MarkdownEditorNativeTargetSubscription,
   MarkdownEditorNativeTargetLifetimeHandle,
 } from './markdown-editor-native-target'
+
+export { MarkdownEditorRevealError } from './markdown-editor-reveal-completion'
+export type { MarkdownEditorRevealCompletion, MarkdownEditorRevealCompletionOptions, MarkdownEditorRevealFailureReason } from './markdown-editor-reveal-completion'
