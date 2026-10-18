@@ -2,7 +2,10 @@ import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 import test from 'node:test'
 import ts from 'typescript'
-import { annotateInstallTypes } from './package-declaration-source.mjs'
+import {
+  annotateBareComponentExports,
+  annotateInstallTypes,
+} from './package-declaration-source.mjs'
 
 for (const component of [
   'inbox-primitives',
@@ -38,5 +41,42 @@ for (const component of [
         /export type FsusDataList = ReturnType<typeof createAlias<typeof DataList>>/u,
       )
     }
+  })
+}
+
+for (const file of [
+  'vue/packages/components/popper/index.ts',
+  'vue/packages/components/visual-hidden/index.ts',
+  'vue/packages/motion/index.ts',
+]) {
+  test(`bare SFC compiler inputs retain the original component objects: ${file}`, () => {
+    const original = readFileSync(file, 'utf8')
+    const projected = annotateBareComponentExports(original, file)
+    assert.notEqual(projected, original)
+    const source = ts.createSourceFile(
+      file,
+      projected,
+      ts.ScriptTarget.Latest,
+      true,
+    )
+    assert.deepEqual(source.parseDiagnostics, [])
+    for (const statement of source.statements) {
+      if (!ts.isVariableStatement(statement)) continue
+      for (const declaration of statement.declarationList.declarations) {
+        if (!declaration.type || !ts.isIdentifier(declaration.name)) continue
+        const owner = `__fsusDeclaration_${declaration.name.text}`
+        if (!projected.includes(`import ${owner} from`)) continue
+        assert.equal(declaration.type.getText(source), declaration.name.text)
+        assert.equal(declaration.initializer.getText(source), owner)
+        assert.match(
+          projected,
+          new RegExp(
+            `type ${declaration.name.text} = typeof ${owner} & \\{\\}`,
+            'u',
+          ),
+        )
+      }
+    }
+    assert.equal(annotateBareComponentExports(projected, file), projected)
   })
 }

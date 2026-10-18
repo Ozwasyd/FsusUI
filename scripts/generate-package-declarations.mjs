@@ -1,7 +1,12 @@
 import path from 'node:path'
 import { createRequire } from 'node:module'
 import { fileURLToPath } from 'node:url'
-import { annotateInstallTypes } from './package-declaration-source.mjs'
+import typescript from 'typescript'
+import {
+  annotateBareComponentExports,
+  annotateInstallTypes,
+} from './package-declaration-source.mjs'
+import { withVueDeclarationDefaults } from './vue-declaration-compat.mjs'
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const vueRequire = createRequire(
@@ -9,10 +14,24 @@ const vueRequire = createRequire(
 )
 const { runTsc } = vueRequire('@volar/typescript/lib/quickstart/runTsc')
 const core = vueRequire('@vue/language-core')
+const proxyApi = vueRequire('@volar/typescript/lib/node/proxyCreateProgram')
+const originalProxy = proxyApi.proxyCreateProgram
+proxyApi.proxyCreateProgram = (ts, createProgram, plugins) =>
+  originalProxy(
+    ts,
+    function (...args) {
+      return withVueDeclarationDefaults(
+        typescript,
+        Reflect.apply(createProgram, this, args),
+      )
+    },
+    plugins,
+  )
 const ownedRoot = `${path.join(root, 'vue', 'packages')}${path.sep}`
 
-// Keep the locked Vue CLI language plugin, full diagnostics and normal emit.
-// Annotations are compiler inputs; no runtime or emitted declarations are patched.
+// Keep the locked Vue CLI language plugin, diagnostics and complete program.
+// Anchors are compiler inputs; redundant defaults are handled by declaration AST
+// emit. Runtime sources and generated files are never rewritten in place.
 runTsc(vueRequire.resolve('typescript/lib/tsc'), ['.vue'], (ts, options) => {
   const vueOptions = core.createParsedCommandLine(
     ts,
@@ -34,7 +53,10 @@ runTsc(vueRequire.resolve('typescript/lib/tsc'), ['.vue'], (ts, options) => {
       return source
     if (cache.has(source)) return cache.get(source)
     let text = ownedFile.endsWith(`${path.sep}index.ts`)
-      ? annotateInstallTypes(source.text, fileName)
+      ? annotateInstallTypes(
+          annotateBareComponentExports(source.text, fileName),
+          fileName,
+        )
       : source.text
     if (
       ownedFile.includes(`${path.sep}motion${path.sep}`) &&
