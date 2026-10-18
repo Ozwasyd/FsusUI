@@ -69,6 +69,16 @@ for (const platform of ['web', 'avalonia']) {
   const currentRepeat = currentRepeatDirectory
     ? await read(currentRepeatDirectory, platform)
     : null
+  if (platform === 'web') {
+    const protocols = [baseline, current, baselineRepeat, currentRepeat]
+      .filter(Boolean)
+      .map((summary) => summary.dataPipelineObservation ?? 'interleaved-v1')
+    if (protocols.some((protocol) => protocol !== protocols[0])) {
+      throw new Error(
+        `baseline unavailable/contract changed: data-pipeline observation protocol differs (${protocols.join(', ')})`,
+      )
+    }
+  }
   const entriesOf = (summary) => summary.results ?? summary.Results
   const mapOf = (summary) =>
     new Map(entriesOf(summary).map((entry) => [entry.id ?? entry.Id, entry]))

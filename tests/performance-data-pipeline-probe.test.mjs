@@ -1,10 +1,80 @@
 import assert from 'node:assert/strict'
-import { readFile } from 'node:fs/promises'
+import { execFile } from 'node:child_process'
+import { mkdtemp, mkdir, readFile, rm, writeFile } from 'node:fs/promises'
+import os from 'node:os'
 import path from 'node:path'
 import process from 'node:process'
 import { URL } from 'node:url'
+import { promisify } from 'node:util'
 import test from 'node:test'
 import { collectDataPipelineProbes } from '../scripts/render-performance-data-pipeline-probe.mjs'
+import {
+  createImpactPlan,
+  loadOwnershipRegistry,
+} from '../scripts/render-performance-impact.mjs'
+
+test('comparison rejects mixed observation protocols and retains the original budget', async () => {
+  const root = path.resolve(import.meta.dirname, '..')
+  const temporary = await mkdtemp(
+    path.join(os.tmpdir(), 'fsus-probe-contract-'),
+  )
+  const protocol = 'isolated-context-after-measurement-v1'
+  const plan = createImpactPlan({
+    changedFiles: ['vue/packages/demo-app/src/PerformanceFixture.vue'],
+    registry: await loadOwnershipRegistry(root),
+  })
+  const directories = ['base', 'head', 'base-repeat', 'head-repeat'].map(
+    (name) => path.join(temporary, name),
+  )
+  const run = promisify(execFile)
+  const compare = () =>
+    run(process.execPath, [
+      path.join(root, 'scripts/compare-render-performance.mjs'),
+      directories[0],
+      directories[1],
+      '0.15',
+      directories[2],
+      directories[3],
+    ])
+  const write = async (protocols, values = [100, 100, 100, 100]) => {
+    for (const [index, directory] of directories.entries()) {
+      await mkdir(path.join(directory, 'web'), { recursive: true })
+      await writeFile(
+        path.join(directory, 'impact-plan.json'),
+        JSON.stringify(plan),
+      )
+      await writeFile(
+        path.join(directory, 'web/summary.json'),
+        JSON.stringify({
+          dataPipelineObservation: protocols[index],
+          results: [
+            {
+              id: 'data-pipeline-table',
+              inputToNextFrameMs: { p95: values[index] },
+            },
+          ],
+        }),
+      )
+    }
+  }
+  try {
+    await write([undefined, undefined, undefined, undefined])
+    await compare()
+    await write([protocol, protocol, protocol, protocol])
+    await compare()
+    await write([undefined, protocol, undefined, protocol])
+    await assert.rejects(compare(), /observation protocol differs/u)
+    await write([protocol, protocol, undefined, protocol])
+    await assert.rejects(compare(), /observation protocol differs/u)
+    await write([protocol, protocol, protocol, protocol], [100, 116, 100, 116])
+    await assert.rejects(
+      compare(),
+      /Relative real-render performance regressions/u,
+    )
+  } finally {
+    await rm(temporary, { recursive: true, force: true })
+  }
+})
 
 test('closes the diagnostic context when its original action rejects', async () => {
   const failure = new Error('real action failed')

@@ -48,8 +48,9 @@ frame and heap capture and context teardown. Its forced-worker sorts retain all
 three diagnostic fields without training the measured page's adaptive strategy
 or warming its controller, dataset cache or Worker. Summaries identify this
 protocol as `dataPipelineObservation=isolated-context-after-measurement-v1`.
-Earlier interleaved measurements use a different observation protocol; do not
-claim that a difference against those numbers explains a component regression.
+The comparator rejects mixed observation protocols across all repetitions.
+Earlier interleaved measurements use a different protocol; do not claim that a
+difference against those numbers explains a component regression.
 For source attribution, apply the same observation protocol to both source
 candidates and retain the original order-balanced plan and budgets.
 
@@ -60,6 +61,7 @@ with real Workers/WASM, against the original demo server:
 FSUSUI_DATA_PIPELINE_BROWSER_URL=http://127.0.0.1:5173 node --test tests/performance-data-pipeline-probe.test.mjs
 ```
 
+The normal unit boundary suite also executes this complete control file.
 Without that URL the real browser control is explicitly skipped. Node controls
 alone do not establish browser or performance acceptance.
 
