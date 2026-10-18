@@ -64,6 +64,7 @@ import {
   provide,
   ref,
   toRef,
+  watch,
 } from 'vue'
 import ElButton from '@element-plus/components/button'
 import ElTooltip from '@element-plus/components/tooltip'
@@ -118,6 +119,15 @@ export default defineComponent({
       (ComponentPublicInstance & { $el: HTMLElement }) | null
     >(null)
     const popperRef = ref<InstanceType<typeof ElTooltip> | null>(null)
+    let entryFocusRequest:
+      | {
+          reason: Event
+          trigger: HTMLElement
+          content: HTMLElement | null
+          initialFocus: Element | null
+        }
+      | undefined
+    let stopEntryFocus: (() => void) | undefined
     let focusRestoreGeneration = 0
     let stopFocusRestore: (() => void) | undefined
     let focusRestoreRequest:
@@ -236,11 +246,13 @@ export default defineComponent({
     }
 
     function handleClose() {
+      cancelEntryFocus()
       cancelFocusRestore()
       popperRef.value?.onClose()
     }
 
     function handleOpen() {
+      cancelEntryFocus()
       cancelFocusRestore()
       popperRef.value?.onOpen()
     }
@@ -274,17 +286,91 @@ export default defineComponent({
       popupVisible = true
       cancelFocusRestore()
       isUsingKeyboard.value = event?.type === 'keydown'
+      requestEntryFocus(event)
       emit('visible-change', true)
     }
 
     function handleShowTooltip(event?: Event) {
-      if (event?.type === 'keydown') {
-        contentRef.value?.focus()
+      const request = entryFocusRequest
+      if (!request || request.reason !== event) return
+      const content = contentRef.value
+      const { trigger, initialFocus } = request
+      cancelEntryFocus()
+      if (
+        popupVisible &&
+        !props.disabled &&
+        trigger === triggeringElementRef.value?.$el &&
+        trigger.isConnected &&
+        !trigger.matches(':disabled, [aria-disabled="true"]') &&
+        content &&
+        content === request.content &&
+        content.isConnected &&
+        trigger.ownerDocument.activeElement === initialFocus
+      ) {
+        content.focus()
       }
     }
 
+    function cancelEntryFocus() {
+      entryFocusRequest = undefined
+      stopEntryFocus?.()
+      stopEntryFocus = undefined
+    }
+
+    function requestEntryFocus(reason?: Event) {
+      cancelEntryFocus()
+      const trigger = triggeringElementRef.value?.$el
+      if (reason?.type !== 'keydown' || !trigger) return
+      const document = trigger.ownerDocument
+      const initialFocus = document.activeElement
+      if (initialFocus !== trigger && initialFocus !== document.body) return
+
+      const request = {
+        reason,
+        trigger,
+        content: contentRef.value,
+        initialFocus,
+      }
+      entryFocusRequest = request
+      const revoke = () => {
+        if (entryFocusRequest === request) cancelEntryFocus()
+      }
+      // The original keydown owns entry only until newer input or focus wins.
+      document.addEventListener('focusin', revoke, true)
+      document.addEventListener('keydown', revoke, true)
+      document.addEventListener('pointerdown', revoke, true)
+      document.addEventListener('visibilitychange', revoke)
+      document.defaultView?.addEventListener('blur', revoke)
+      stopEntryFocus = () => {
+        document.removeEventListener('focusin', revoke, true)
+        document.removeEventListener('keydown', revoke, true)
+        document.removeEventListener('pointerdown', revoke, true)
+        document.removeEventListener('visibilitychange', revoke)
+        document.defaultView?.removeEventListener('blur', revoke)
+      }
+    }
+
+    watch(
+      [contentRef, () => triggeringElementRef.value?.$el, () => props.disabled],
+      () => {
+        const request = entryFocusRequest
+        if (!request) return
+        if (
+          props.disabled ||
+          request.trigger !== triggeringElementRef.value?.$el ||
+          (request.content && request.content !== contentRef.value)
+        ) {
+          cancelEntryFocus()
+        } else if (!request.content) {
+          request.content = contentRef.value
+        }
+      },
+      { flush: 'sync' },
+    )
+
     function handleBeforeHideTooltip() {
       popupVisible = false
+      cancelEntryFocus()
       const request = focusRestoreRequest
       emit('visible-change', false)
 
@@ -397,7 +483,10 @@ export default defineComponent({
       }
     }
 
-    onBeforeUnmount(cancelFocusRestore)
+    onBeforeUnmount(() => {
+      cancelEntryFocus()
+      cancelFocusRestore()
+    })
 
     provide(DROPDOWN_INJECTION_KEY, {
       contentRef,

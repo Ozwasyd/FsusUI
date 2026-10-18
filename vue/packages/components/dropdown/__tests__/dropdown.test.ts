@@ -20,6 +20,10 @@ const dropdownMenuName = DropdownMenu.name || 'ElDropdownMenu'
 
 type MountDataFactory = () => Record<string, unknown>
 type MountExtraOptions = Record<string, unknown>
+type DropdownMountOptions = {
+  attachTo?: HTMLElement
+  global?: { stubs?: Record<string, boolean> }
+}
 type DropdownRefExposed = {
   handleOpen: () => void
   handleClose: () => void
@@ -29,18 +33,22 @@ const _mount = (
   template: string,
   data: MountDataFactory,
   otherObj?: MountExtraOptions,
+  mountOptions?: DropdownMountOptions,
 ) =>
-  mount({
-    components: {
-      [buttonName]: Button,
-      [dropdownName]: Dropdown,
-      [dropdownItemName]: DropdownItem,
-      [dropdownMenuName]: DropdownMenu,
+  mount(
+    {
+      components: {
+        [buttonName]: Button,
+        [dropdownName]: Dropdown,
+        [dropdownItemName]: DropdownItem,
+        [dropdownMenuName]: DropdownMenu,
+      },
+      template,
+      data,
+      ...otherObj,
     },
-    template,
-    data,
-    ...otherObj,
-  })
+    mountOptions,
+  )
 
 describe('Dropdown', () => {
   afterEach(() => {
@@ -458,9 +466,10 @@ describe('Dropdown', () => {
       </el-dropdown>
       `,
       () => ({ selected: 'a', disabledA: false }),
+      undefined,
       {
         attachTo: document.body,
-        global: { stubs: { transition: false } },
+        global: { stubs: { transition: false, teleport: false } },
       },
     )
 
@@ -549,6 +558,226 @@ describe('Dropdown', () => {
       vi.useRealTimers()
     }
   })
+
+  const mountEnteringSelection = () => {
+    const style = document.createElement('style')
+    style.textContent = `
+      .el-zoom-in-top-enter-active {
+        transition-property: opacity;
+        transition-duration: 0.22s;
+        transition-delay: 0s;
+      }
+    `
+    document.head.append(style)
+    const wrapper = _mount(
+      `
+      <div>
+        <button class="outside-target">Outside</button>
+        <el-dropdown trigger="click" :hide-on-click="false">
+          <button :key="triggerKey" class="entry-trigger">Choose</button>
+          <template #dropdown>
+            <el-dropdown-menu :key="menuKey">
+              <el-dropdown-item command="a" :checked="selected === 'a'">Alpha</el-dropdown-item>
+              <el-dropdown-item command="b" :checked="selected === 'b'">Beta</el-dropdown-item>
+              <el-dropdown-item command="c" :checked="selected === 'c'">Gamma</el-dropdown-item>
+            </el-dropdown-menu>
+          </template>
+        </el-dropdown>
+      </div>
+      `,
+      () => ({ selected: 'a', menuKey: 0, triggerKey: 0 }),
+      undefined,
+      {
+        attachTo: document.body,
+        global: { stubs: { transition: false, teleport: false } },
+      },
+    )
+    const open = async () => {
+      const trigger = wrapper.find('.entry-trigger').element as HTMLElement
+      trigger.focus()
+      await wrapper.find('.entry-trigger').trigger('keydown', {
+        key: EVENT_CODE.down,
+        code: EVENT_CODE.down,
+      })
+      await vi.advanceTimersByTimeAsync(60)
+      const popup = document.querySelector<HTMLElement>('.el-dropdown__popper')!
+      expect(popup.classList.contains('el-zoom-in-top-enter-active')).toBe(true)
+      expect(getComputedStyle(popup).transitionDuration).toBe('0.22s')
+      expect(document.activeElement).toBe(trigger)
+    }
+    const dispose = () => {
+      wrapper.unmount()
+      style.remove()
+    }
+    return { wrapper, open, dispose }
+  }
+
+  test('preserves pointer-established item focus when entry finishes', async () => {
+    vi.useFakeTimers()
+    const fixture = mountEnteringSelection()
+    try {
+      await fixture.open()
+      const items = document.querySelectorAll<HTMLElement>(
+        '.el-dropdown-menu__item',
+      )
+      const move = new Event('pointermove', { bubbles: true })
+      Object.defineProperty(move, 'pointerType', { value: 'mouse' })
+      items[1].dispatchEvent(move)
+      await nextTick()
+      expect(document.activeElement).toBe(items[1])
+      await fixture.wrapper.setData({ selected: 'c' })
+      expect(items[2].getAttribute('aria-checked')).toBe('true')
+      expect(document.activeElement).toBe(items[1])
+      await vi.advanceTimersByTimeAsync(300)
+      expect(document.activeElement).toBe(items[1])
+      for (const code of [EVENT_CODE.enter, EVENT_CODE.space]) {
+        document.activeElement?.dispatchEvent(
+          new KeyboardEvent('keydown', {
+            key: code,
+            code,
+            bubbles: true,
+            cancelable: true,
+          }),
+        )
+      }
+      expect(
+        fixture.wrapper
+          .findComponent(Dropdown)
+          .emitted('command')
+          ?.map(([command]) => command),
+      ).toEqual(['b', 'b'])
+      expect(items[2].getAttribute('aria-checked')).toBe('true')
+    } finally {
+      fixture.dispose()
+      vi.useRealTimers()
+    }
+  })
+
+  test('pending entry yields to focus outside the popup', async () => {
+    vi.useFakeTimers()
+    const fixture = mountEnteringSelection()
+    try {
+      await fixture.open()
+      const outside = fixture.wrapper.find('.outside-target')
+        .element as HTMLElement
+      outside.focus()
+      await fixture.wrapper.setData({ selected: 'c' })
+      await vi.advanceTimersByTimeAsync(300)
+      expect(document.activeElement).toBe(outside)
+    } finally {
+      fixture.dispose()
+      vi.useRealTimers()
+    }
+  })
+
+  test('newer keyboard input revokes pending entry while the trigger stays focused', async () => {
+    vi.useFakeTimers()
+    const fixture = mountEnteringSelection()
+    try {
+      await fixture.open()
+      const trigger = fixture.wrapper.find('.entry-trigger')
+      await trigger.trigger('keydown', {
+        key: EVENT_CODE.tab,
+        code: EVENT_CODE.tab,
+      })
+      await vi.advanceTimersByTimeAsync(300)
+      expect(document.activeElement).toBe(trigger.element)
+    } finally {
+      fixture.dispose()
+      vi.useRealTimers()
+    }
+  })
+
+  test.each(['menuKey', 'triggerKey'])(
+    'replacement of %s revokes pending entry',
+    async (key) => {
+      vi.useFakeTimers()
+      const fixture = mountEnteringSelection()
+      try {
+        await fixture.open()
+        await fixture.wrapper.setData({ [key]: 1, selected: 'c' })
+        const focused = document.activeElement
+        await vi.advanceTimersByTimeAsync(300)
+        expect(document.activeElement).toBe(focused)
+      } finally {
+        fixture.dispose()
+        vi.useRealTimers()
+      }
+    },
+  )
+
+  test('closing during enter does not prevent fresh keyboard entry after reopening', async () => {
+    vi.useFakeTimers()
+    const fixture = mountEnteringSelection()
+    try {
+      await fixture.open()
+      fixture.wrapper.findComponent(Dropdown).vm.handleClose()
+      await vi.advanceTimersByTimeAsync(300)
+      await fixture.wrapper.setData({ selected: 'c' })
+      await fixture.open()
+      await vi.advanceTimersByTimeAsync(300)
+      expect(document.activeElement).toBe(
+        document.querySelectorAll('.el-dropdown-menu__item')[2],
+      )
+    } finally {
+      fixture.dispose()
+      vi.useRealTimers()
+    }
+  })
+
+  test('pending entry yields to owner-window blur', async () => {
+    vi.useFakeTimers()
+    const fixture = mountEnteringSelection()
+    try {
+      await fixture.open()
+      const trigger = fixture.wrapper.find('.entry-trigger').element
+      window.dispatchEvent(new Event('blur'))
+      await vi.advanceTimersByTimeAsync(300)
+      expect(document.activeElement).toBe(trigger)
+    } finally {
+      fixture.dispose()
+      vi.useRealTimers()
+    }
+  })
+
+  test.each(['completion', 'unmount'])(
+    'entry listeners are released on %s',
+    async (ending) => {
+      vi.useFakeTimers()
+      const fixture = mountEnteringSelection()
+      await nextTick()
+      const add = vi.spyOn(document, 'addEventListener')
+      const remove = vi.spyOn(document, 'removeEventListener')
+      const addWindow = vi.spyOn(window, 'addEventListener')
+      const removeWindow = vi.spyOn(window, 'removeEventListener')
+      try {
+        await fixture.open()
+        const listener = add.mock.calls
+          .filter(
+            ([type, , capture]) => type === 'pointerdown' && capture === true,
+          )
+          .at(-1)?.[1]
+        expect(listener).toBeDefined()
+        const subscriptions = add.mock.calls.filter(([, fn]) => fn === listener)
+        expect(subscriptions).toHaveLength(4)
+        expect(addWindow).toHaveBeenCalledWith('blur', listener)
+
+        if (ending === 'unmount') fixture.dispose()
+        await vi.advanceTimersByTimeAsync(300)
+        for (const subscription of subscriptions) {
+          expect(remove.mock.calls).toContainEqual(subscription)
+        }
+        expect(removeWindow).toHaveBeenCalledWith('blur', listener)
+      } finally {
+        fixture.dispose()
+        add.mockRestore()
+        remove.mockRestore()
+        addWindow.mockRestore()
+        removeWindow.mockRestore()
+        vi.useRealTimers()
+      }
+    },
+  )
 
   test('dropdown menu typeahead search', async () => {
     const wrapper = _mount(
