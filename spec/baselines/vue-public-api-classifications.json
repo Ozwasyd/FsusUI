@@ -60,6 +60,7 @@
     "public-shell": "platform-override",
     "radio": "native-adapter",
     "rate": "native-adapter",
+    "resize-separator": "native-adapter",
     "responsive-collection": "platform-override",
     "result": "portable",
     "row": "portable",

@@ -311,6 +311,18 @@ export const publicComponentBoundaries: Record<
     fixtureModes: ['data-boundaries'],
   }),
   result: entry(simpleBoundaries, { fixtureModes: ['states'] }),
+  'resize-separator': entry(
+    [
+      'default-render',
+      'props-state',
+      'model-value',
+      'disabled-readonly',
+      'event',
+      'keyboard-focus',
+      'unmount-cleanup',
+    ],
+    { fixtureModes: ['states', 'data-boundaries'] },
+  ),
   'roving-focus-group': entry([
     'default-render',
     'event',

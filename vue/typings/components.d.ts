@@ -36,6 +36,8 @@ declare module 'vue' {
     ElDatePicker: typeof import('../packages/element-plus')['ElDatePicker']
     ElDialog: typeof import('../packages/element-plus')['ElDialog']
     ElDivider: typeof import('../packages/element-plus')['ElDivider']
+    ElResizeSeparator: typeof import('../packages/element-plus')['ElResizeSeparator']
+    FsusResizeSeparator: typeof import('../packages/element-plus')['FsusResizeSeparator']
     ElDrawer: typeof import('../packages/element-plus')['ElDrawer']
     ElDropdown: typeof import('../packages/element-plus')['ElDropdown']
     ElDropdownItem: typeof import('../packages/element-plus')['ElDropdownItem']
