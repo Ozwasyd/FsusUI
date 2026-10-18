@@ -1,3 +1,4 @@
+import type { MarkdownEditorSourceNavigationGesture } from './markdown-editor-source-navigation-view'
 export {
   commitMarkdownLanguageToolMutation,
   createMarkdownLanguageToolSession,
@@ -1884,6 +1885,8 @@ export const markdownEditorProps = buildProps({
 } as const)
 
 export const markdownEditorEmits = {
+  'source-navigation-gesture': (event: MarkdownEditorSourceNavigationGesture) =>
+    typeof event?.viewGeneration === 'number' && ['wheel', 'touch', 'pointer', 'keyboard'].includes(event.gesture),
   [UPDATE_MODEL_EVENT]: (value: string) => typeof value === 'string',
   [CHANGE_EVENT]: (value: string) => typeof value === 'string',
   command: (command: MarkdownEditorCommand) => Boolean(command?.key),

@@ -61,10 +61,121 @@ export class MarkdownEditorRevealError extends Error {
   }
 }
 
+const revealTextProperties = [
+  'font-family',
+  'font-size',
+  'font-weight',
+  'font-style',
+  'font-stretch',
+  'font-variant',
+  'font-kerning',
+  'font-feature-settings',
+  'font-variation-settings',
+  'line-height',
+  'letter-spacing',
+  'word-spacing',
+  'text-indent',
+  'text-transform',
+  'text-align',
+  'tab-size',
+  'white-space',
+  'word-break',
+  'overflow-wrap',
+  'padding-top',
+  'padding-right',
+  'padding-bottom',
+  'padding-left',
+] as const
+
+export interface MarkdownEditorRevealTextLayout {
+  readonly textarea: HTMLTextAreaElement
+  readonly mirror: HTMLDivElement
+  readonly text: Text
+  readonly key: string
+  readonly cssText: string
+  dispose(): void
+}
+
+const textLayoutKey = (textarea: HTMLTextAreaElement) => {
+  const view = textarea.ownerDocument.defaultView
+  if (!view) return null
+  const css = view.getComputedStyle(textarea)
+  return JSON.stringify([
+    textarea.value,
+    textarea.clientWidth,
+    textarea.offsetWidth,
+    textarea.getBoundingClientRect().width,
+    revealTextProperties.map((property) => css.getPropertyValue(property)),
+  ])
+}
+
+/** Called only by an owned layout lifecycle, never by a read-only view getter. */
+export const prepareMarkdownEditorRevealTextLayout = (
+  textarea: HTMLTextAreaElement,
+): MarkdownEditorRevealTextLayout | null => {
+  const document = textarea.ownerDocument
+  const view = document.defaultView
+  if (
+    !view ||
+    !document.body ||
+    !textarea.isConnected ||
+    textarea.value.length > 1_000_000
+  )
+    return null
+  const style = view.getComputedStyle(textarea)
+  const nativeBox = textarea.getBoundingClientRect()
+  const mirror = document.createElement('div')
+  measurementNodes.add(mirror)
+  mirror.setAttribute('aria-hidden', 'true')
+  mirror.inert = true
+  // Same native text-layout producer used by reveal and read-only observations.
+  for (const property of revealTextProperties)
+    mirror.style.setProperty(property, style.getPropertyValue(property))
+  Object.assign(mirror.style, {
+    position: 'fixed',
+    left: '0',
+    top: '0',
+    visibility: 'hidden',
+    pointerEvents: 'none',
+    boxSizing: 'border-box',
+    border: '0',
+    margin: '0',
+    // clientWidth is integer-rounded; retain the native fractional content width.
+    width: `${nativeBox.width - textarea.offsetWidth + textarea.clientWidth}px`,
+    height: 'auto',
+    minHeight: '0',
+    maxHeight: 'none',
+    overflow: 'hidden',
+    direction: 'ltr',
+  })
+  const text = document.createTextNode(`${textarea.value}\u200b`)
+  mirror.append(text)
+  // Initialize the native fixed-point line strut before the first layout. A
+  // block strut rounds at the opposite boundary from a native text control.
+  const lineHeight = Number.parseFloat(style.lineHeight)
+  if (Number.isFinite(lineHeight))
+    mirror.style.lineHeight = `${(Math.floor(lineHeight * 64) - 0.5) / 64}px`
+  document.body.append(mirror)
+  const key = textLayoutKey(textarea)
+  if (key === null) {
+    mirror.remove()
+    return null
+  }
+  return Object.freeze({
+    textarea,
+    mirror,
+    text,
+    key,
+    cssText: mirror.style.cssText,
+    dispose: () => mirror.remove(),
+  })
+}
+
 /** Native layout measurement only; the mirror is inert, temporary and never an input owner. */
 export const measureMarkdownEditorReveal = (
   textarea: HTMLTextAreaElement,
   selection: MarkdownEditorResolvedSelection,
+  prepared?: MarkdownEditorRevealTextLayout,
 ) => {
   const document = textarea.ownerDocument
   const view = document.defaultView
@@ -84,7 +195,11 @@ export const measureMarkdownEditorReveal = (
   ) => {
     if (
       !['', 'none'].includes(css.getPropertyValue('clip-path')) ||
-      ['mask-image', 'mask-border-source', '-webkit-mask-box-image-source'].some(
+      [
+        'mask-image',
+        'mask-border-source',
+        '-webkit-mask-box-image-source',
+      ].some(
         (property) => !['', 'none'].includes(css.getPropertyValue(property)),
       ) ||
       !['', 'auto'].includes(css.getPropertyValue('clip'))
@@ -143,62 +258,9 @@ export const measureMarkdownEditorReveal = (
     textarea.clientHeight <= 0
   )
     return null
-  const mirror = document.createElement('div')
-  measurementNodes.add(mirror)
-  mirror.setAttribute('aria-hidden', 'true')
-  mirror.inert = true
-  // Copy the actual text layout, including wrapping, spacing and native padding.
-  for (const property of [
-    'font-family',
-    'font-size',
-    'font-weight',
-    'font-style',
-    'font-stretch',
-    'font-variant',
-    'font-kerning',
-    'font-feature-settings',
-    'font-variation-settings',
-    'line-height',
-    'letter-spacing',
-    'word-spacing',
-    'text-indent',
-    'text-transform',
-    'text-align',
-    'tab-size',
-    'white-space',
-    'word-break',
-    'overflow-wrap',
-    'padding-top',
-    'padding-right',
-    'padding-bottom',
-    'padding-left',
-  ])
-    mirror.style.setProperty(property, style.getPropertyValue(property))
-  Object.assign(mirror.style, {
-    position: 'fixed',
-    left: '0',
-    top: '0',
-    visibility: 'hidden',
-    pointerEvents: 'none',
-    boxSizing: 'border-box',
-    border: '0',
-    margin: '0',
-    // clientWidth is integer-rounded; retain the native fractional content width.
-    width: `${nativeBox.width - textarea.offsetWidth + textarea.clientWidth}px`,
-    height: 'auto',
-    minHeight: '0',
-    maxHeight: 'none',
-    overflow: 'hidden',
-    direction: 'ltr',
-  })
-  const text = document.createTextNode(`${textarea.value}\u200b`)
-  mirror.append(text)
-  // Initialize the native fixed-point line strut before the first layout. A
-  // block strut rounds at the opposite boundary from a native text control.
-  const lineHeight = Number.parseFloat(style.lineHeight)
-  if (Number.isFinite(lineHeight))
-    mirror.style.lineHeight = `${(Math.floor(lineHeight * 64) - 0.5) / 64}px`
-  document.body.append(mirror)
+  const layout = prepared ?? prepareMarkdownEditorRevealTextLayout(textarea)
+  if (!layout) return null
+  const { mirror, text } = layout
   try {
     const agreesWithNative = () =>
       Math.abs(
@@ -209,7 +271,16 @@ export const measureMarkdownEditorReveal = (
         textarea.scrollWidth -
           Math.max(textarea.clientWidth, mirror.scrollWidth),
       ) <= 1
-    if (!agreesWithNative()) return null
+    if (
+      layout.textarea !== textarea ||
+      !mirror.isConnected ||
+      mirror.ownerDocument !== document ||
+      text.data !== `${textarea.value}\u200b` ||
+      mirror.style.cssText !== layout.cssText ||
+      layout.key !== textLayoutKey(textarea) ||
+      !agreesWithNative()
+    )
+      return null
     const origin = mirror.getBoundingClientRect()
     const range = document.createRange()
     range.setStart(text, selection.start)
@@ -300,6 +371,12 @@ export const measureMarkdownEditorReveal = (
       right,
       visible: inside,
       regions,
+      viewport: {
+        top: clipTop,
+        left: clipLeft,
+        bottom: clipBottom,
+        right: clipRight,
+      },
       nativeBounds: {
         left: box.left,
         top: box.top,
@@ -309,6 +386,7 @@ export const measureMarkdownEditorReveal = (
       fingerprint: JSON.stringify([
         regions,
         target,
+        [clipTop, clipLeft, clipBottom, clipRight],
         textarea.scrollTop,
         textarea.scrollLeft,
         box.width,
@@ -316,6 +394,6 @@ export const measureMarkdownEditorReveal = (
       ]),
     }
   } finally {
-    mirror.remove()
+    if (!prepared) layout.dispose()
   }
 }

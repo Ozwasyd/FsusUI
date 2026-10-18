@@ -135,8 +135,11 @@ const sameDocument = (
 const clampOffset = (source: string, offset: number) =>
   Math.max(0, Math.min(source.length, offset))
 
-const caretOf = (selection: MarkdownEditorSelection) =>
-  selection.direction === 'backward' ? selection.start : selection.end
+/** Original source focus policy, shared by layout restoration and native view observations. */
+export const resolveMarkdownEditorFocusEndpoint = (selection: MarkdownEditorSelection) =>
+  Object.freeze({ offset: selection.direction === 'backward' ? selection.start : selection.end,
+    affinity: selection.direction === 'backward' ? 'before' as const : 'after' as const })
+
 
 const projectionOf = (
   source: string,
@@ -184,9 +187,8 @@ export const captureMarkdownLiveLayoutAnchor = (input: {
     projection,
     source: input.source,
   })
-  const offset = clampOffset(input.source, caretOf(input.selection))
-  const affinity =
-    input.selection.direction === 'backward' ? 'before' : 'after'
+  const offset = clampOffset(input.source, resolveMarkdownEditorFocusEndpoint(input.selection).offset)
+  const affinity = resolveMarkdownEditorFocusEndpoint(input.selection).affinity
   const visual = map.sourcePositionToVisual({ affinity, offset })
   const node = coveringNode(projection, offset)
   return Object.freeze({
@@ -250,7 +252,7 @@ export const resolveMarkdownLiveLayoutStability = (input: {
 
   const remappedOffset = clampOffset(
     input.source,
-    input.previousAnchor?.sourceOffset ?? caretOf(input.selection),
+    input.previousAnchor?.sourceOffset ?? resolveMarkdownEditorFocusEndpoint(input.selection).offset,
   )
   const nextSelection =
     input.trigger === 'mode-switch' && input.previousAnchor
@@ -418,7 +420,7 @@ export const resolveMarkdownLiveVirtualWindow = (input: {
     input.documentIdentity,
     input.projection,
   )
-  const caret = clampOffset(input.source, caretOf(input.selection))
+  const caret = clampOffset(input.source, resolveMarkdownEditorFocusEndpoint(input.selection).offset)
   const invalidated = new Set(input.invalidatedNodeIds ?? [])
   if (
     input.change &&
