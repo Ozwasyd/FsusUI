@@ -152,6 +152,7 @@ const evaluateFixture = async ({
   compiledPath = 'compiled/theme.css',
   mutation,
   mutations = mutation ? [mutation] : [],
+  overrides = [],
 } = {}) => {
   const registry = await loadProductionRegistry()
   const temporaryParent = await mkdtemp(join(tmpdir(), 'fsusui-rules-eval-'))
@@ -186,6 +187,11 @@ const evaluateFixture = async ({
     )
     imports.push(`@import "../mutations/${mutationName}";`)
   }
+  for (const [index, css] of overrides.entries()) {
+    const name = `property-scope-${index}.css`
+    await writeFile(join(temporaryRoot, 'mutations', name), css)
+    imports.push(`@import "../mutations/${name}";`)
+  }
   await writeFile(
     join(temporaryRoot, 'entrypoints/candidate.css'),
     `${imports.join('\n')}\n`,
@@ -208,6 +214,138 @@ const evaluateFixture = async ({
     await rm(temporaryParent, { force: true, recursive: true })
   }
 }
+
+const tokenVariable = async (name) => {
+  const tokens = await readJson(join(repositoryRoot, 'spec/tokens/tokens.json'))
+  const token = tokens.tokens.find((entry) => entry.name === name)
+  assert.ok(token)
+  return `var(${token.aliases[0]}, ${token.value})`
+}
+
+test('production Dialog target and focus thickness compare their own dimensions', async () => {
+  const { analysis } = await evaluateFixture()
+  const dialog = analysis.diagnostics.filter(
+    ({ ruleId }) => ruleId === 'web.dialog.overlay-close-optical',
+  )
+  const target = dialog.find(({ property }) => property === 'min-height')
+  assert.equal(target.status, 'pass')
+  assert.equal(target.actual.value, '54px')
+  assert.equal(
+    target.expected.canonicalReference.pointer,
+    '/tokens/density.icon.target',
+  )
+  const focus = dialog.find(({ property }) => property === 'box-shadow')
+  assert.equal(focus.status, 'pass')
+  assert.equal(
+    focus.expected.canonicalReference.pointer,
+    '/tokens/thickness.focus.md',
+  )
+  assert.ok(
+    !dialog.some(
+      ({ property, expected }) =>
+        property === 'min-height' &&
+        expected.canonicalReference.pointer.includes('thickness.'),
+    ),
+  )
+})
+
+test('production cascade rejects an undersized target and an incorrect focus-ring spread', async () => {
+  const target = await tokenVariable('density.icon.target')
+  const focus = await tokenVariable('thickness.focus.md')
+  const { analysis } = await evaluateFixture({
+    overrides: [
+      `.el-dialog__headerbtn { min-height: calc(${target} - 1px) !important; }
+     .el-dialog__headerbtn:focus-visible { box-shadow: inset 0 0 0 calc(${focus} + 1px) #000 !important; }`,
+    ],
+  })
+  for (const [property, pointer] of [
+    ['min-height', '/tokens/density.icon.target'],
+    ['box-shadow', '/tokens/thickness.focus.md'],
+  ]) {
+    const failure = analysis.diagnostics.find(
+      (record) =>
+        record.ruleId === 'web.dialog.overlay-close-optical' &&
+        record.property === property &&
+        record.status === 'fail' &&
+        record.actual.source.path === 'mutations/property-scope-0.css',
+    )
+    assert.ok(failure, `missing ${property} negative control`)
+    assert.equal(failure.expected.canonicalReference.pointer, pointer)
+  }
+})
+
+test('declared segmented sizes are alternatives without leaking across density scope', async () => {
+  const compact = await tokenVariable('density.control.compact.y')
+  const action = await tokenVariable('density.control.action.y')
+  const positive = await evaluateFixture({
+    overrides: [
+      `.el-segmented-control__item { min-height: ${compact} !important; }`,
+    ],
+  })
+  const record = positive.analysis.diagnostics.find(
+    ({ ruleId, property }) =>
+      ruleId === 'web.segmented-control.segmented-item' &&
+      property === 'min-height',
+  )
+  assert.equal(record.status, 'pass')
+  assert.equal(
+    record.expected.canonicalReference.pointer,
+    '/tokens/density.control.compact.y',
+  )
+  assert.equal(record.expected.resolvedValue.raw, '40px')
+  const negative = await evaluateFixture({
+    overrides: [
+      `.el-segmented-control__item { min-height: calc(${action} + 1px) !important; }
+     [data-density='compact'] .el-segmented-control__item { min-height: ${action} !important; }`,
+    ],
+  })
+  const failures = negative.analysis.diagnostics.filter(
+    ({ ruleId, property, status }) =>
+      ruleId === 'web.segmented-control.segmented-item' &&
+      property === 'min-height' &&
+      status === 'fail',
+  )
+  assert.ok(failures.some(({ scope }) => scope.density === 'default'))
+  assert.ok(
+    failures.some(
+      ({ scope, expected }) =>
+        scope.density === 'compact' &&
+        expected.canonicalReference.pointer ===
+          '/tokens/density.control.compact.y',
+    ),
+  )
+})
+
+test('non-height bindings remain explicit unknowns and unresolved Upload geometry stays visible', async () => {
+  const { analysis } = await evaluateFixture()
+  assert.ok(
+    !analysis.diagnostics.some(
+      ({ property, expected }) =>
+        property === 'min-height' &&
+        /\/tokens\/(motion|typography|thickness)\./u.test(
+          expected.canonicalReference?.pointer,
+        ),
+    ),
+  )
+  const unbound = analysis.staticUnknowns.find(
+    ({ reasonCode, canonicalReference }) =>
+      reasonCode === 'canonical-property-binding-required' &&
+      canonicalReference?.pointer === '/tokens/motion.duration.panel',
+  )
+  assert.ok(unbound)
+  assert.equal(unbound.status, 'visual-evidence-required')
+  assert.ok(unbound.visualRequirements.length > 0)
+  assert.ok(
+    analysis.diagnostics.some(
+      ({ ruleId, property, expected, status }) =>
+        ruleId === 'web.upload.file-row' &&
+        property === 'min-height' &&
+        status === 'fail' &&
+        expected.canonicalReference.pointer ===
+          '/tokens/density.control.default.y',
+    ),
+  )
+})
 
 const assertEnvelope = (analysis) => {
   assert.deepEqual(Object.keys(analysis).sort(), [
