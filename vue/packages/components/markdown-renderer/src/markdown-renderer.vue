@@ -135,28 +135,16 @@ const heavyLifecycle = createMarkdownHeavyFeatureLifecycle({
   onMetricsChange: recordHeavyLifecycleMetrics,
 })
 const heavyThemeRevision = ref(0)
-let heavyThemeListenerInstalled = false
 let heavyThemeRelevant = false
 const handleHeavyFeatureThemeChange = () => {
   if (isRendering.value || heavyThemeRelevant) heavyThemeRevision.value += 1
 }
-const ensureHeavyFeatureThemeListener = () => {
-  if (heavyThemeListenerInstalled) return
+onMounted(() => {
   document.documentElement.addEventListener(
     'fsus:theme-change',
     handleHeavyFeatureThemeChange,
   )
-  heavyThemeListenerInstalled = true
-}
-const removeHeavyFeatureThemeListener = () => {
-  if (!heavyThemeListenerInstalled) return
-  document.documentElement.removeEventListener(
-    'fsus:theme-change',
-    handleHeavyFeatureThemeChange,
-  )
-  heavyThemeListenerInstalled = false
-}
-onMounted(ensureHeavyFeatureThemeListener)
+})
 const emit = defineEmits<{
   (event: 'render-complete', result: MarkdownSafeRenderResult): void
   (event: 'render-error', error: FsusErrorDetail): void
@@ -1338,7 +1326,10 @@ watch(
 )
 
 onBeforeUnmount(() => {
-  removeHeavyFeatureThemeListener()
+  document.documentElement.removeEventListener(
+    'fsus:theme-change',
+    handleHeavyFeatureThemeChange,
+  )
   if (debounceTimer) {
     clearTimeout(debounceTimer)
     debounceTimer = null
