@@ -17,6 +17,7 @@ const [
   performanceFixture,
   markdownFeatureFixture,
   markdownFeatureMigration,
+  performanceProbeCollector,
 ] = await Promise.all([
   read('scripts/web-render-performance.mjs'),
   read('dotnet/FsusUI.Avalonia.Demo/RenderPerformanceRunner.cs'),
@@ -31,6 +32,7 @@ const [
   read('vue/packages/demo-app/src/PerformanceFixture.vue'),
   read('vue/packages/demo-app/src/markdown-feature-performance.ts'),
   read('docs/migration/markdown-feature-output-gateway.md'),
+  read('scripts/render-performance-probes.mjs'),
 ])
 
 const failures = []
@@ -74,8 +76,38 @@ for (const token of [
   "['p50', 'p95']",
   'after > before * 1.05',
 ]) {
-  if (!web.includes(token)) failures.push(`web runner missing ${token}`)
+  const source = [
+    'workerProbe',
+    'workerPoolBurstProbe',
+    'wasmProbe',
+    'dataPipelineProbe',
+  ].includes(token)
+    ? performanceProbeCollector
+    : web
+  if (!source.includes(token)) failures.push(`web producer missing ${token}`)
 }
+for (const probe of [
+  'workerProbe',
+  'workerPoolBurstProbe',
+  'wasmProbe',
+  'dataPipelineProbe',
+]) {
+  if (web.includes(`.__FSUSUI_PERFORMANCE_FIXTURE__.${probe}(`))
+    failures.push(
+      `active probe ${probe} must be outside the production context`,
+    )
+}
+const metricCapture = web.indexOf('const pageMetrics = await page.evaluate(')
+const contextTeardown = web.indexOf('await context.close()', metricCapture)
+const probeCollection = web.indexOf('await collectPerformanceProbes(')
+if (
+  metricCapture < 0 ||
+  contextTeardown <= metricCapture ||
+  probeCollection <= contextTeardown
+)
+  failures.push(
+    'active probes must follow production metric capture and context teardown',
+  )
 const warmupBoundary = web.indexOf(
   'for (let index = 0; index < warmups; index++)',
 )

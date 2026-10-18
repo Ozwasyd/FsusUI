@@ -42,12 +42,14 @@ The full browser matrix is the Cartesian product of the scenarios below with 60/
 
 The runner records frame work/intervals, dropped-frame rate, Long Tasks, input-to-next-frame latency, style/layout/paint/composite trace durations, DOM nodes, Chromium layers and estimated layer area, JS heap, Worker queue/compute/transfer time, and WASM startup/compute/end-to-end time. Markdown adds `markdownPhases.parseMs`, `transferMs`, `commitMs`, `activationMs`, and matching Chromium `paintMs` so 24 KiB, 256 KiB, and 1 MiB paths can be diagnosed phase by phase. `data-pipeline-table` adds p50/p95/p99 for legacy synchronous-sort blocking, Worker submission blocking, and Worker/WASM completion, distinguishing main-thread responsiveness from total completion. Refresh targets are analysis budgets, not a claim that a virtual CI display physically refreshes at 120 Hz.
 
-The data-pipeline diagnostic replays the same fixture, dimensions, warm-ups,
-actions and sample count in a separate browser context after production trace,
-frame and heap capture and context teardown. Its forced-worker sorts retain all
-three diagnostic fields without training the measured page's adaptive strategy
-or warming its controller, dataset cache or Worker. Summaries identify this
-protocol as `dataPipelineObservation=isolated-context-after-measurement-v1`.
+All active diagnostics (Worker, pool burst, WASM and data-pipeline probes) replay
+the same fixture, dimensions, warm-ups, actions, invocation order and sample
+count in a separate browser context after production trace, frame and heap
+capture and context teardown. Read-only Markdown phase evidence stays with its
+production action. Diagnostic work cannot train the production strategy, warm
+its caches or drive the next production input. Summaries retain the historical
+protocol field with
+`dataPipelineObservation=all-active-probes-isolated-context-v2`.
 The comparator rejects mixed observation protocols across all repetitions.
 Earlier interleaved measurements use a different protocol; do not claim that a
 difference against those numbers explains a component regression.
@@ -64,6 +66,14 @@ FSUSUI_DATA_PIPELINE_BROWSER_URL=http://127.0.0.1:5173 node --test tests/perform
 The normal unit boundary suite also executes this complete control file.
 Without that URL the real browser control is explicitly skipped. Node controls
 alone do not establish browser or performance acceptance.
+
+Raw `measurementWindows` retain each input start, action completion, preceding
+RAF timestamp, next RAF timestamp and next callback completion. Existing timing
+arrays keep their original arithmetic and the sampler adds no warm-up, action,
+delay or RAF. `inputToNextFrameMs` ends at the next RAF callback; it is not a
+presentation timestamp. Use these witnesses to distinguish action work from
+driver/frame-phase waiting. Do not drop cold samples or infer a component
+regression from an unobserved phase difference.
 
 To collect only the three Markdown sizes while preserving cold/hot scenario semantics:
 
