@@ -6,6 +6,7 @@ import os from 'node:os'
 import path from 'node:path'
 import process from 'node:process'
 import { chromium } from '@playwright/test'
+import { collectDataPipelineProbes } from './render-performance-data-pipeline-probe.mjs'
 
 const root = path.resolve(import.meta.dirname, '..')
 const argv = process.argv.slice(2)
@@ -377,7 +378,6 @@ try {
     const workerPoolBursts = []
     const wasm = []
     const markdownPhases = []
-    const dataPipeline = []
     const domParseOperations = []
     for (let index = 0; index < samples; index++) {
       const sample = await page.evaluate(
@@ -454,13 +454,6 @@ try {
           ),
         )
       }
-      if (scenario === 'data-pipeline-table') {
-        dataPipeline.push(
-          await page.evaluate(() =>
-            window.__FSUSUI_PERFORMANCE_FIXTURE__.dataPipelineProbe(),
-          ),
-        )
-      }
       const sampleMetrics = await session.send('Performance.getMetrics')
       heapSamples.push(
         sampleMetrics.metrics.find(({ name }) => name === 'JSHeapUsedSize')
@@ -520,6 +513,21 @@ try {
       },
       { refreshHz },
     )
+    await context.close()
+    const dataPipelineProbes =
+      scenario === 'data-pipeline-table'
+        ? await collectDataPipelineProbes({
+            browser,
+            contextOptions: {
+              deviceScaleFactor: dpr,
+              reducedMotion: motion === 'reduced' ? 'reduce' : 'no-preference',
+              viewport: { width: 1280, height: 800 },
+            },
+            url,
+            warmups,
+            samples,
+          })
+        : []
     const raw = {
       id: `${scenario}-${size}-${refreshHz}hz-dpr${dpr}-${motion}`,
       scenario,
@@ -537,7 +545,7 @@ try {
       wasm,
       markdownPhases,
       domParseOperations,
-      dataPipeline,
+      dataPipeline: dataPipelineProbes,
       trace: {
         styleMs: sumTrace(
           traceEvents,
@@ -629,21 +637,20 @@ try {
       domParseOperations: domParseOperations.length
         ? domParseOperationStats(domParseOperations)
         : null,
-      dataPipeline: dataPipeline.length
+      dataPipeline: dataPipelineProbes.length
         ? {
             legacyBlockMs: stats(
-              dataPipeline.map((entry) => entry.legacyBlockMs),
+              dataPipelineProbes.map((entry) => entry.legacyBlockMs),
             ),
             workerEndToEndMs: stats(
-              dataPipeline.map((entry) => entry.workerEndToEndMs),
+              dataPipelineProbes.map((entry) => entry.workerEndToEndMs),
             ),
             workerSubmitBlockMs: stats(
-              dataPipeline.map((entry) => entry.workerSubmitBlockMs),
+              dataPipelineProbes.map((entry) => entry.workerSubmitBlockMs),
             ),
           }
         : null,
     })
-    await context.close()
   }
   const version = browser.version()
   await browser.close()
@@ -654,6 +661,7 @@ try {
     gitSha:
       process.env.GITHUB_SHA || process.env.GIT_COMMIT || 'local-worktree',
     profile,
+    dataPipelineObservation: 'isolated-context-after-measurement-v1',
     environment: {
       os: `${os.platform()} ${os.release()} ${os.arch()}`,
       cpu: os.cpus()[0]?.model ?? 'unknown',
