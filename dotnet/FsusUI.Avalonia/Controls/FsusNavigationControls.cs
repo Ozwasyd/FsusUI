@@ -225,6 +225,22 @@ public class FsusTabs : TabControl
       }
     }
 
+    // Normalize incoming selection before realization can replace the active pane.
+    // Existing containers must still wait for ItemsSource to process the change.
+    if (e.NewItems is not null &&
+        e.Action is NotifyCollectionChangedAction.Add or NotifyCollectionChangedAction.Replace)
+    {
+      var selectedPane = panes.FirstOrDefault(
+        (pane) => pane.Key == SelectedKey && pane.IsEnabled);
+      foreach (var pane in e.NewItems.OfType<FsusTabPane>())
+      {
+        if (!ReferenceEquals(pane, selectedPane) && pane.IsSelected)
+        {
+          pane.IsSelected = false;
+        }
+      }
+    }
+
     // ItemsSource has not processed this notification yet. IsSelected can reenter
     // its selection model, so commit pane state with SelectedItem below.
     SyncAutomation();
