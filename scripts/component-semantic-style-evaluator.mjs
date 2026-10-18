@@ -92,10 +92,14 @@ const selectorFacts = (selector) => {
     attributes: new Map(),
     classes: new Set(),
     positiveClasses: new Set(),
+    positivePseudoClasses: new Set(),
     specificity: selectorSpecificity(selector),
     terminalClasses: new Set(),
   }
   const visit = (node, negative = false) => {
+    if (node.type === 'PseudoClassSelector' && !negative) {
+      facts.positivePseudoClasses.add(node.name)
+    }
     if (node.type === 'ClassSelector') {
       facts.classes.add(node.name)
       if (!negative) facts.positiveClasses.add(node.name)
@@ -656,6 +660,50 @@ const semanticValue = (
   return Array.isArray(result) && !allowSequence ? undefined : result
 }
 
+// Only compare a canonical value when its property semantics are known. Other
+// references retain a blocking evidence requirement instead of becoming heights.
+const comparisonProperty = (token) => {
+  if (token.type === 'color') {
+    return token.name.endsWith('.border') ? 'border-color' : 'background-color'
+  }
+  if (token.type === 'radius') return 'border-radius'
+  if (
+    token.type === 'dimension' &&
+    token.name.startsWith('density.') &&
+    (token.name.endsWith('.y') || token.name.includes('.target'))
+  ) {
+    return 'min-height'
+  }
+  if (token.type === 'thickness' && token.name.startsWith('thickness.focus.')) {
+    return 'box-shadow'
+  }
+  return undefined
+}
+
+const focusSpread = (input, variableResolver) => {
+  if (input === 'none') return { kind: 'length', unit: 'px', value: 0 }
+  const ast = csstree.parse(input, { context: 'value' })
+  const firstShadow = new csstree.List()
+  for (const node of ast.children) {
+    if (node.type === 'Operator' && node.value === ',') break
+    firstShadow.appendData(node)
+  }
+  const values = semanticValue(
+    { type: 'Value', children: firstShadow },
+    variableResolver,
+    new Set(),
+    true,
+  )
+  const lengths = (Array.isArray(values) ? values : [values]).filter(
+    (value) => typeof value === 'number' || value?.kind === 'length',
+  )
+  if (lengths.length < 2) return undefined
+  const spread = lengths[3] ?? 0
+  return typeof spread === 'number'
+    ? { kind: 'length', unit: 'px', value: spread }
+    : spread
+}
+
 const sourceDetails = (root, declaration, owner) => ({
   column: declaration.node.loc.start.column,
   line: declaration.node.loc.start.line,
@@ -1129,12 +1177,41 @@ export const evaluateSemanticStyles = async (options) => {
       }
     }
     for (const { reference, resolved } of references.values()) {
-      const property =
-        resolved.type === 'color'
-          ? 'background-color'
-          : resolved.type === 'radius'
-            ? 'border-radius'
-            : 'min-height'
+      const property = comparisonProperty(resolved)
+      if (!property) {
+        const unknown = staticUnknowns.find(
+          (entry) =>
+            entry.ruleId === rule.id &&
+            entry.reasonCode === 'canonical-property-binding-required',
+        )
+        if (unknown) {
+          unknown.canonicalReferences.push(clone(reference))
+          continue
+        }
+        staticUnknowns.push({
+          componentId: rule.componentId,
+          partId: rule.partId,
+          ruleId: rule.id,
+          selector: ownedSelectors[0].text,
+          scope: { density: 'default', media: 'all', theme: 'light' },
+          fields: [...rule.verificationPolicy.visualProbeFields],
+          reasonCode: 'canonical-property-binding-required',
+          status: 'visual-evidence-required',
+          verificationRequirement: 'visual-evidence-required',
+          visualRequirements: clone(rule.verificationPolicy.visualRequirements),
+          canonicalReference: clone(reference),
+          canonicalReferences: [clone(reference)],
+        })
+        continue
+      }
+      const alternatives = [...references.values()].filter(
+        (candidate) => comparisonProperty(candidate.resolved) === property,
+      )
+      // Multiple declared control-height tokens are legal size variants, not
+      // simultaneous equality requirements for one winning declaration.
+      const heightVariants =
+        property === 'min-height' && alternatives.length > 1
+      if (heightVariants && alternatives[0].reference !== reference) continue
       const target =
         ownedSelectors.find(
           (selector) =>
@@ -1144,7 +1221,12 @@ export const evaluateSemanticStyles = async (options) => {
       const matching = cascade.declarations.filter(
         (declaration) =>
           declaration.property === property &&
-          selectorMatchesOwnership(declaration, [target]),
+          selectorMatchesOwnership(declaration, [target]) &&
+          (property !== 'box-shadow' ||
+            declaration.selector.facts.positiveClasses.has('is-focus') ||
+            [...declaration.selector.facts.positivePseudoClasses].some((name) =>
+              name.startsWith('focus'),
+            )),
       )
       if (!matching.length) continue
       const contexts = new Map()
@@ -1175,8 +1257,42 @@ export const evaluateSemanticStyles = async (options) => {
           )
           return winner(candidates)?.value
         }
-        const actualSemantic = semanticValue(actual.value, variableResolver)
-        const expectedSemantic = semanticValue(resolved.value, () => undefined)
+        const actualSemantic =
+          property === 'box-shadow'
+            ? focusSpread(actual.value, variableResolver)
+            : semanticValue(actual.value, variableResolver)
+        const densityVariants = alternatives.filter((candidate) =>
+          candidate.resolved.name.includes(`.${context.density}.`),
+        )
+        const applicableVariants = densityVariants.length
+          ? densityVariants
+          : alternatives
+        const matchedVariant = heightVariants
+          ? applicableVariants.find(
+              (candidate) =>
+                JSON.stringify(
+                  semanticValue(candidate.resolved.value, () => undefined),
+                ) === JSON.stringify(actualSemantic),
+            )
+          : undefined
+        const expectedVariant =
+          matchedVariant ??
+          (heightVariants ? applicableVariants[0] : { reference, resolved })
+        const expectedReference = expectedVariant.reference
+        const expectedSemantic = semanticValue(
+          expectedVariant.resolved.value,
+          () => undefined,
+        )
+        const minimumTarget =
+          property === 'min-height' && resolved.name.includes('.target')
+        // Hit targets are lower bounds; the component contract may require a
+        // larger target (for example the Dialog close affordance).
+        const matchesMinimum =
+          minimumTarget &&
+          actualSemantic?.kind === 'length' &&
+          expectedSemantic?.kind === 'length' &&
+          actualSemantic.unit === expectedSemantic.unit &&
+          actualSemantic.value >= expectedSemantic.value
         const actualCascade = applicable
           .sort((left, right) => left.order - right.order)
           .map((declaration) => {
@@ -1224,15 +1340,16 @@ export const evaluateSemanticStyles = async (options) => {
           diagnostics.push({
             ...common,
             expected: {
-              canonicalReference: clone(reference),
+              canonicalReference: clone(expectedReference),
               resolvedValue: {
-                raw: resolved.value,
+                raw: expectedVariant.resolved.value,
                 semantic: expectedSemantic,
               },
             },
             status:
+              matchesMinimum ||
               JSON.stringify(actualSemantic) ===
-              JSON.stringify(expectedSemantic)
+                JSON.stringify(expectedSemantic)
                 ? 'pass'
                 : 'fail',
           })
