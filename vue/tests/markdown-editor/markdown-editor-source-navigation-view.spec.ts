@@ -298,6 +298,7 @@ test('measures the usable viewport from a real nested rectangular scroll clip', 
   await page.goto(`${fixture}?clip=1`)
   await page.evaluate(() => document.fonts.ready)
   await page.locator('textarea').first().click()
+  await page.locator('textarea').first().press('Shift+ArrowRight')
   await page.waitForFunction(() => window.sourceViewFixture.read() !== null)
   const result = await page.evaluate(() => {
     const view = window.sourceViewFixture.read()!
@@ -310,11 +311,16 @@ test('measures the usable viewport from a real nested rectangular scroll clip', 
       clip.bottom,
       innerHeight,
     )
-    return { view, start: top, height: bottom - top }
+    return {
+      view,
+      start: top,
+      height: bottom - top,
+      nativeHeight: input.clientHeight,
+    }
   })
   expect(result.view.viewport.blockStart).toBe(result.start)
   expect(result.view.viewport.height).toBe(result.height)
-  expect(result.view.viewport.height).toBeLessThan(250)
+  expect(result.view.viewport.height).toBeLessThan(result.nativeHeight)
 })
 
 test('returns null for hidden native geometry and never revives the prior view', async ({

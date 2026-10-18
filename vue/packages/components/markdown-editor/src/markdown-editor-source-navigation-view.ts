@@ -160,7 +160,8 @@ export const createMarkdownEditorSourceNavigationViewOwner = (owner: {
       textarea.selectionStart !== selection.start ||
       textarea.selectionEnd !== selection.end ||
       textarea.selectionDirection !== selection.direction ||
-      textarea.ownerDocument.visibilityState !== 'visible'
+      textarea.ownerDocument.visibilityState !== 'visible' ||
+      textarea.ownerDocument.fonts?.status !== 'loaded'
     )
       return unavailable()
     const measured = measureMarkdownEditorReveal(textarea, selection, layout)

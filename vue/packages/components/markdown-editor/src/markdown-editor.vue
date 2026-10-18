@@ -7824,7 +7824,8 @@ sourceNavigationViewOwner = createMarkdownEditorSourceNavigationViewOwner({
     const root = rootElementRef.value
     if (!textarea || !root || !textarea.isConnected || !root.isConnected || !root.contains(textarea) ||
       textarea.ownerDocument !== root.ownerDocument || sessionDisposed || editorReleased || sessionSurfacePaused.value ||
-      isComposing.value || nativeMachine.composing || restoringSelection || inputDisabled.value ||
+      isComposing.value || nativeMachine.composing || restoringSelection || inputDisabled.value || nativeHandoverReceiving.value ||
+      !isEditorDocumentCurrent(transactionStore.documentIdentity) ||
       currentMode.value === 'preview' || !liveSurface.value.inputVisible) return null
     return { textarea, root, session: publicRevealSession, source: transactionStore.value,
       documentIdentity: transactionStore.documentIdentity, revision: transactionStore.revision,
@@ -7840,12 +7841,12 @@ sourceNavigationViewOwner = createMarkdownEditorSourceNavigationViewOwner({
 })
 onMounted(() => sourceNavigationViewOwner?.mount())
 nativeSurfaceResources.ownWatch(watch([
-  editorRevision, editorValue, editorSelection, currentMode, isComposing, sessionSurfacePaused,
+  editorRevision, editorValue, editorSelection, currentMode, isComposing, sessionSurfacePaused, nativeHandoverReceiving,
   textareaRef, rootElementRef, () => props.disabled, () => props.loading,
   () => props.documentIdentity?.id, () => props.documentIdentity?.epoch,
 ], () => nativeSurfaceResources.runWatchCallback(() => sourceNavigationViewOwner?.mount()), { flush: 'post' }))
 nativeSurfaceResources.ownWatch(watch([
-  editorRevision, editorValue, editorSelection, currentMode, isComposing, sessionSurfacePaused,
+  editorRevision, editorValue, editorSelection, currentMode, isComposing, sessionSurfacePaused, nativeHandoverReceiving,
   textareaRef, rootElementRef, () => props.disabled, () => props.loading,
   () => props.documentIdentity?.id, () => props.documentIdentity?.epoch,
 ], () => nativeSurfaceResources.runWatchCallback(() => sourceNavigationViewOwner?.invalidate()), { flush: 'sync' }))
