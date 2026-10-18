@@ -23,6 +23,7 @@ import {
   VUE_BASELINE_PATH,
 } from '../scripts/contract-v2.mjs'
 import { validateVuePublicCoverage } from '../scripts/conformance-v2-vue-public-gate.mjs'
+import './vue-public-api-baseline-generation.test.mjs'
 import { extractStructuredEmitPayloads } from '../scripts/vue-structured-emit-payload.mjs'
 import { extractStructuredExposedSignatures } from '../scripts/vue-structured-exposed-signature.mjs'
 import {
