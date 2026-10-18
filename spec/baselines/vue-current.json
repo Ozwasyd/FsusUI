@@ -1,23 +1,23 @@
 {
   "schemaVersion": 1,
   "source": {
-    "commitSha": "5b0333a402cb848f6c612eb804c0f2fcfacd4d16",
+    "commitSha": "78f431cfc55681e2a15063eb797d6899ca2116dc",
     "packageName": "element-plus",
     "packageVersion": "1.5.1",
     "tokenHash": "f40182721e8a812c248cb0bc43de556cd7568c5a9de1bc8b2c099df9b78e47b0",
     "iconHash": "6ae868b15cefc99ebec9d8a78c7602da1fb07b46ec172c43f6a3662af54be167",
     "toolVersion": "avalonia-vue-public-api-baseline@1.4.0+vue-semantic-baseline@1.4.0",
-    "inputTreeHash": "8f3772cc51d36040782dd8da602bba89f96d4aee7ee55757e37cfdc521096198",
+    "inputTreeHash": "021995368b0c303b562f2423c48ae627bbb0935cfe179ae3b7b83f39e76c7355",
     "compilerOptionsHash": "919b1f4f85e411ccb762efdc5a2d646f412fd73928c05ad302bbfdda0ab731e4",
     "dependencyVersionHash": "79ca1004d5204ee4ddc2de6b1d63f0946d36a42283d113ce8ad01ac4adaa7d27",
     "structuredOutputSelectionHash": "b4b7c00db1f817b08a1e7bec8a6af03a505f605d2dcf16fb2e52febbf830388f",
     "contractSchemaVersion": "2.0.0",
-    "outputHash": "195e70c3b81a0fbd788cdef26f843619a47afc9b5a5b3c1d8f34687d6fa42393"
+    "outputHash": "8819e45d3d6fb48dfa7f8aeda79f70a51e5a1bbfe79f2de9fca552676ded3e43"
   },
   "summary": {
-    "componentModules": 93,
-    "components": 228,
-    "installableComponents": 153,
+    "componentModules": 94,
+    "components": 230,
+    "installableComponents": 154,
     "directives": 3,
     "services": 4,
     "plugins": 7,
@@ -25,7 +25,7 @@
     "deprecatedApis": 21,
     "componentCountByClassification": {
       "portable": 126,
-      "native-adapter": 76,
+      "native-adapter": 78,
       "platform-override": 21,
       "web-only": 5
     }
@@ -446,6 +446,10 @@
     {
       "name": "ElReplyComposerShell",
       "module": "inbox-primitives"
+    },
+    {
+      "name": "ElResizeSeparator",
+      "module": "resize-separator"
     },
     {
       "name": "ElResourceList",
@@ -22578,6 +22582,255 @@
       }
     },
     {
+      "name": "ElResizeSeparator",
+      "module": "resize-separator",
+      "classification": "native-adapter",
+      "source": "vue/packages/components/resize-separator/src/resize-separator.vue",
+      "props": [
+        "coordinateRange",
+        "disabled",
+        "label",
+        "max",
+        "min",
+        "orientation",
+        "primaryRegionId",
+        "secondaryRegionId",
+        "step",
+        "value",
+        "valueText"
+      ],
+      "emits": ["cancel", "end", "proposal", "start"],
+      "slots": [],
+      "exposed": ["cancel"],
+      "semantic": {
+        "props": [
+          {
+            "name": "coordinateRange",
+            "runtimeType": "Object",
+            "semanticType": "ResizeSeparatorCoordinateRange",
+            "nullable": false,
+            "values": null,
+            "valuesKnown": false,
+            "default": {
+              "kind": "missing"
+            },
+            "required": true,
+            "readonly": false,
+            "deprecated": false,
+            "deprecationMessage": null
+          },
+          {
+            "name": "disabled",
+            "runtimeType": "Boolean",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "valuesKnown": false,
+            "default": {
+              "kind": "missing"
+            },
+            "required": false,
+            "readonly": false,
+            "deprecated": false,
+            "deprecationMessage": null
+          },
+          {
+            "name": "label",
+            "runtimeType": "String",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "valuesKnown": false,
+            "default": {
+              "kind": "missing"
+            },
+            "required": true,
+            "readonly": false,
+            "deprecated": false,
+            "deprecationMessage": null
+          },
+          {
+            "name": "max",
+            "runtimeType": "Number",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "valuesKnown": false,
+            "default": {
+              "kind": "literal",
+              "value": 1
+            },
+            "required": false,
+            "readonly": false,
+            "deprecated": false,
+            "deprecationMessage": null
+          },
+          {
+            "name": "min",
+            "runtimeType": "Number",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "valuesKnown": false,
+            "default": {
+              "kind": "literal",
+              "value": 0
+            },
+            "required": false,
+            "readonly": false,
+            "deprecated": false,
+            "deprecationMessage": null
+          },
+          {
+            "name": "orientation",
+            "runtimeType": "String",
+            "semanticType": null,
+            "nullable": false,
+            "values": ["vertical", "horizontal"],
+            "valuesKnown": true,
+            "default": {
+              "kind": "literal",
+              "value": "vertical"
+            },
+            "required": false,
+            "readonly": false,
+            "deprecated": false,
+            "deprecationMessage": null
+          },
+          {
+            "name": "primaryRegionId",
+            "runtimeType": "String",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "valuesKnown": false,
+            "default": {
+              "kind": "missing"
+            },
+            "required": true,
+            "readonly": false,
+            "deprecated": false,
+            "deprecationMessage": null
+          },
+          {
+            "name": "secondaryRegionId",
+            "runtimeType": "String",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "valuesKnown": false,
+            "default": {
+              "kind": "missing"
+            },
+            "required": false,
+            "readonly": false,
+            "deprecated": false,
+            "deprecationMessage": null
+          },
+          {
+            "name": "step",
+            "runtimeType": "Number",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "valuesKnown": false,
+            "default": {
+              "kind": "literal",
+              "value": 0.01
+            },
+            "required": false,
+            "readonly": false,
+            "deprecated": false,
+            "deprecationMessage": null
+          },
+          {
+            "name": "value",
+            "runtimeType": "Number",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "valuesKnown": false,
+            "default": {
+              "kind": "missing"
+            },
+            "required": true,
+            "readonly": false,
+            "deprecated": false,
+            "deprecationMessage": null
+          },
+          {
+            "name": "valueText",
+            "runtimeType": "String",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "valuesKnown": false,
+            "default": {
+              "kind": "missing"
+            },
+            "required": false,
+            "readonly": false,
+            "deprecated": false,
+            "deprecationMessage": null
+          }
+        ],
+        "emits": [
+          {
+            "name": "cancel",
+            "payload": [
+              {
+                "name": "payload",
+                "type": "ResizeSeparatorCancelPayload",
+                "optional": false,
+                "rest": false
+              }
+            ]
+          },
+          {
+            "name": "end",
+            "payload": [
+              {
+                "name": "payload",
+                "type": "ResizeSeparatorPayload",
+                "optional": false,
+                "rest": false
+              }
+            ]
+          },
+          {
+            "name": "proposal",
+            "payload": [
+              {
+                "name": "payload",
+                "type": "ResizeSeparatorPayload",
+                "optional": false,
+                "rest": false
+              }
+            ]
+          },
+          {
+            "name": "start",
+            "payload": [
+              {
+                "name": "payload",
+                "type": "ResizeSeparatorPayload",
+                "optional": false,
+                "rest": false
+              }
+            ]
+          }
+        ],
+        "exposed": [
+          {
+            "name": "cancel",
+            "parameters": [],
+            "returnType": null
+          }
+        ],
+        "slots": []
+      }
+    },
+    {
       "name": "ElResourceList",
       "module": "settings-primitives",
       "classification": "portable",
@@ -38292,6 +38545,255 @@
       }
     },
     {
+      "name": "FsusResizeSeparator",
+      "module": "resize-separator",
+      "classification": "native-adapter",
+      "source": "vue/packages/components/resize-separator/src/resize-separator.vue",
+      "props": [
+        "coordinateRange",
+        "disabled",
+        "label",
+        "max",
+        "min",
+        "orientation",
+        "primaryRegionId",
+        "secondaryRegionId",
+        "step",
+        "value",
+        "valueText"
+      ],
+      "emits": ["cancel", "end", "proposal", "start"],
+      "slots": [],
+      "exposed": ["cancel"],
+      "semantic": {
+        "props": [
+          {
+            "name": "coordinateRange",
+            "runtimeType": "Object",
+            "semanticType": "ResizeSeparatorCoordinateRange",
+            "nullable": false,
+            "values": null,
+            "valuesKnown": false,
+            "default": {
+              "kind": "missing"
+            },
+            "required": true,
+            "readonly": false,
+            "deprecated": false,
+            "deprecationMessage": null
+          },
+          {
+            "name": "disabled",
+            "runtimeType": "Boolean",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "valuesKnown": false,
+            "default": {
+              "kind": "missing"
+            },
+            "required": false,
+            "readonly": false,
+            "deprecated": false,
+            "deprecationMessage": null
+          },
+          {
+            "name": "label",
+            "runtimeType": "String",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "valuesKnown": false,
+            "default": {
+              "kind": "missing"
+            },
+            "required": true,
+            "readonly": false,
+            "deprecated": false,
+            "deprecationMessage": null
+          },
+          {
+            "name": "max",
+            "runtimeType": "Number",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "valuesKnown": false,
+            "default": {
+              "kind": "literal",
+              "value": 1
+            },
+            "required": false,
+            "readonly": false,
+            "deprecated": false,
+            "deprecationMessage": null
+          },
+          {
+            "name": "min",
+            "runtimeType": "Number",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "valuesKnown": false,
+            "default": {
+              "kind": "literal",
+              "value": 0
+            },
+            "required": false,
+            "readonly": false,
+            "deprecated": false,
+            "deprecationMessage": null
+          },
+          {
+            "name": "orientation",
+            "runtimeType": "String",
+            "semanticType": null,
+            "nullable": false,
+            "values": ["vertical", "horizontal"],
+            "valuesKnown": true,
+            "default": {
+              "kind": "literal",
+              "value": "vertical"
+            },
+            "required": false,
+            "readonly": false,
+            "deprecated": false,
+            "deprecationMessage": null
+          },
+          {
+            "name": "primaryRegionId",
+            "runtimeType": "String",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "valuesKnown": false,
+            "default": {
+              "kind": "missing"
+            },
+            "required": true,
+            "readonly": false,
+            "deprecated": false,
+            "deprecationMessage": null
+          },
+          {
+            "name": "secondaryRegionId",
+            "runtimeType": "String",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "valuesKnown": false,
+            "default": {
+              "kind": "missing"
+            },
+            "required": false,
+            "readonly": false,
+            "deprecated": false,
+            "deprecationMessage": null
+          },
+          {
+            "name": "step",
+            "runtimeType": "Number",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "valuesKnown": false,
+            "default": {
+              "kind": "literal",
+              "value": 0.01
+            },
+            "required": false,
+            "readonly": false,
+            "deprecated": false,
+            "deprecationMessage": null
+          },
+          {
+            "name": "value",
+            "runtimeType": "Number",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "valuesKnown": false,
+            "default": {
+              "kind": "missing"
+            },
+            "required": true,
+            "readonly": false,
+            "deprecated": false,
+            "deprecationMessage": null
+          },
+          {
+            "name": "valueText",
+            "runtimeType": "String",
+            "semanticType": null,
+            "nullable": false,
+            "values": null,
+            "valuesKnown": false,
+            "default": {
+              "kind": "missing"
+            },
+            "required": false,
+            "readonly": false,
+            "deprecated": false,
+            "deprecationMessage": null
+          }
+        ],
+        "emits": [
+          {
+            "name": "cancel",
+            "payload": [
+              {
+                "name": "payload",
+                "type": "ResizeSeparatorCancelPayload",
+                "optional": false,
+                "rest": false
+              }
+            ]
+          },
+          {
+            "name": "end",
+            "payload": [
+              {
+                "name": "payload",
+                "type": "ResizeSeparatorPayload",
+                "optional": false,
+                "rest": false
+              }
+            ]
+          },
+          {
+            "name": "proposal",
+            "payload": [
+              {
+                "name": "payload",
+                "type": "ResizeSeparatorPayload",
+                "optional": false,
+                "rest": false
+              }
+            ]
+          },
+          {
+            "name": "start",
+            "payload": [
+              {
+                "name": "payload",
+                "type": "ResizeSeparatorPayload",
+                "optional": false,
+                "rest": false
+              }
+            ]
+          }
+        ],
+        "exposed": [
+          {
+            "name": "cancel",
+            "parameters": [],
+            "returnType": null
+          }
+        ],
+        "slots": []
+      }
+    },
+    {
       "name": "FsusResourceList",
       "module": "settings-primitives",
       "classification": "portable",
@@ -43895,7 +44397,8 @@
       "files": [
         "vue/packages/theme-chalk/src/common/fsus-tokens.scss",
         "vue/packages/theme-chalk/src/generated/tokens.css",
-        "vue/packages/theme-chalk/src/generated/tokens.scss"
+        "vue/packages/theme-chalk/src/generated/tokens.scss",
+        "vue/packages/theme-chalk/src/resize-separator.scss"
       ],
       "classification": "portable"
     },
