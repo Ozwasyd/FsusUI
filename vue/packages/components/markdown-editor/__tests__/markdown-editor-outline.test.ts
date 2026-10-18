@@ -84,6 +84,50 @@ describe('markdown editor leftover outline planner', () => {
 })
 
 describe('markdown outline projection model', () => {
+  it('preserves the empty ATX indentation boundary from raw block input (#829)', () => {
+    for (let level = 1; level <= 6; level++) {
+      for (let spaces = 0; spaces <= 3; spaces++) {
+        for (const suffix of ['', '  ', '\n', '  \r\n']) {
+          const source = ' '.repeat(spaces) + '#'.repeat(level) + suffix
+          const model = createMarkdownOutlineModel(source, identity)
+          expect(model.items, JSON.stringify(source)).toHaveLength(1)
+          const item = model.items[0]!
+          expect(item.sourceRange).toEqual({ start: 0, end: source.length })
+          expect(item.contentRange.start).toBe(item.contentRange.end)
+          expect(item.diagnostics).toContainEqual({ code: 'empty-heading', nodeId: item.nodeId })
+        }
+      }
+    }
+    for (const indent of ['    ', '     ', '\t', ' \t', '   \t']) {
+      for (const heading of ['#', '######', '#  ', '## title']) {
+        const source = `${indent}${heading}\n`
+        const model = createMarkdownOutlineModel(source, identity)
+        expect(model.items, JSON.stringify(source)).toHaveLength(0)
+        expect(model.projection.nodes.map((node) => node.kind)).toEqual(['code'])
+        expect(model.projection.nodes[0]!.rawRange).toEqual({ start: 0, end: source.length })
+      }
+    }
+  })
+
+  it('keeps container, fence, setext and nonheading block rules around empty ATX (#829)', () => {
+    for (const source of [
+      '- parent\n  - #\n    - ######\n',
+      '- parent\n\n  - #\n    - ######\n',
+      '> #\n>     #\n',
+      '> > #\n> >     #\n',
+      '```md\n#\n   ######\n    #\n```\n',
+      '~~~\n#\n~~~\n',
+      '#not a heading\n',
+      '#######\n',
+    ]) {
+      expect(createMarkdownOutlineModel(source, identity).items, source).toHaveLength(0)
+    }
+    const source = 'Title\n=====\n\nSubtitle\n-----\n'
+    expect(createMarkdownOutlineModel(source, identity).items.map((item) => item.text)).toEqual([
+      'Title', 'Subtitle',
+    ])
+  })
+
   it('preserves bare and spaced empty ATX headings with canonical ranges and diagnostics (#829)', () => {
     const source = '#\n\n#  \n'
     const first = createMarkdownOutlineModel(source, identity)

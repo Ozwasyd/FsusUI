@@ -538,6 +538,50 @@ async function renderNestedListWithKind(kind) {
     }
   }
 
+  // Re-enter the same block parser with container-relative indentation intact.
+  for (let level = 1; level <= 6; level++) {
+    for (let spaces = 0; spaces <= 3; spaces++) {
+      const source = ' '.repeat(spaces) + '#'.repeat(level) + '\n'
+      assert(
+        renderSource(source).includes(`<h${level}></h${level}>`),
+        `[markdown-wasm-runtime] empty ATX boundary ${JSON.stringify(source)}: ${kind}`,
+      )
+    }
+  }
+  for (const prefix of ['', '> ', '> > ']) {
+    for (const indent of ['    ', '     ', '\t', ' \t', '   \t']) {
+      for (const heading of ['#', '######', '#  ', '## title']) {
+        const source = `${prefix}${indent}${heading}\n`
+        const html = renderSource(source)
+        assert(
+          html.includes('<pre') && !/<h[1-6]>/.test(html),
+          `[markdown-wasm-runtime] indented code ${JSON.stringify(source)}: ${kind}: ${html}`,
+        )
+      }
+    }
+  }
+  assert(
+    renderSource('> > #\n').includes('<blockquote><blockquote><h1></h1></blockquote></blockquote>'),
+    `[markdown-wasm-runtime] nested blockquote structure lost: ${kind}`,
+  )
+  assert(
+    renderSource('>    #\n').includes('<blockquote><h1></h1></blockquote>'),
+    `[markdown-wasm-runtime] blockquote-relative three-space ATX rejected: ${kind}`,
+  )
+  const setext = renderSource('Title\n=====\n\nSubtitle\n-----\n')
+  assert(setext.includes('<h1>Title</h1>') && setext.includes('<h2>Subtitle</h2>'),
+    `[markdown-wasm-runtime] setext boundary changed: ${kind}`)
+  for (const source of [
+    '```md\n#\n   ######\n    #\n```\n',
+    '~~~\n#\n~~~\n',
+    '#not a heading\n',
+    '#######\n',
+    '- parent\n  - #\n    - ######\n',
+  ]) {
+    assert(!/<h[1-6]>/.test(renderSource(source)),
+      `[markdown-wasm-runtime] nonheading context changed ${JSON.stringify(source)}: ${kind}`)
+  }
+
   // Compact nested list (no blank lines)
   const compact = [
     '* 第三层项目 B.2.a',
