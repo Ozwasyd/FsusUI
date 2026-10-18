@@ -1,13 +1,18 @@
 <template>
   <div class="resize-separator-audit">
-    <el-checkbox v-model="disabled">Disabled</el-checkbox>
+    <el-checkbox
+      :model-value="disabled"
+      @update:model-value="disabled = $event === true"
+    >
+      Disabled
+    </el-checkbox>
     <div
       v-for="orientation in orientations"
       :key="orientation"
       :ref="(element) => setElement(frames, orientation, element)"
       class="resize-separator-audit__frame"
       :class="`is-${orientation}`"
-      :data-resize-frame="orientation"
+      :data-testid="`resize-frame-${orientation}`"
       :style="tracks(orientation)"
       @pointerdown.capture="refresh"
       @keydown.capture="refresh"

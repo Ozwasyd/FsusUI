@@ -25,8 +25,8 @@ const render = async () => {
   const wrapper = mount(ResizeSeparatorAuditFixture, {
     attachTo: document.body,
   })
-  const vertical = wrapper.get('[data-resize-frame="vertical"]')
-  const horizontal = wrapper.get('[data-resize-frame="horizontal"]')
+  const vertical = wrapper.get('[data-testid="resize-frame-vertical"]')
+  const horizontal = wrapper.get('[data-testid="resize-frame-horizontal"]')
   vi.spyOn(vertical.element, 'getBoundingClientRect').mockReturnValue(
     rect(100, 100, 400, 120),
   )
