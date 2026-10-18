@@ -277,6 +277,165 @@ describe('component policy ownership', () => {
   })
 })
 
+it.each([
+  'an immediately rejected async listener',
+  'a delayed async rejection',
+  'a rejected native promise',
+  'a rejecting function thenable',
+  'a throwing then getter',
+  'a then getter that must only be read once',
+  'a then callback that rejects then throws',
+  'an async then callback that throws',
+  'a then callback returning a promise with a hostile catch',
+  'a then callback returning a throwing then getter',
+  'a fulfilled thenable',
+])('observes %s without repairing the broken feed', (mode) => {
+  const moduleUrl = pathToFileURL(
+    resolve('vue/packages/utils/vue/render-pipeline-policy.ts'),
+  ).href
+  const script = `
+    import assert from 'node:assert/strict'
+    const loaded = await import(${JSON.stringify(moduleUrl)})
+    const registry = loaded.default ?? loaded
+    const authority = registry.getFsusRenderPipelineComponentPolicyAuthority()
+    const mode = ${JSON.stringify(mode)}
+    const events = []
+    process.on('unhandledRejection', (reason) => events.push(reason))
+    const drain = async () => {
+      for (let turn = 0; turn < 4; turn++) await new Promise(setImmediate)
+    }
+    // Prove that this isolated process reports real, unrelated rejections.
+    const control = new Error('unhandled control')
+    Promise.reject(control)
+    await drain()
+    assert.deepEqual(events, [control])
+    events.length = 0
+
+    const cause = new Error('listener rejected')
+    const callbackCause = new Error('then callback failed')
+    let result
+    let active = false
+    let reads = 0
+    let calls = 0
+    const rejectThen = function (resolve, reject) {
+      assert.equal(this, result)
+      assert.equal(authority.issueTicket(), null)
+      calls++
+      setImmediate(() => reject(cause))
+    }
+    // Invocation must not depend on the untrusted function's .call property.
+    Object.defineProperty(rejectThen, 'call', { get() { throw callbackCause } })
+    const releaseListener = authority.subscribe(() => {
+      if (!active) return
+      switch (mode) {
+        case 'an immediately rejected async listener':
+          result = (async () => { throw cause })()
+          break
+        case 'a delayed async rejection':
+          result = (async () => { await new Promise(setImmediate); throw cause })()
+          break
+        case 'a rejected native promise':
+          result = Promise.reject(cause)
+          break
+        case 'a rejecting function thenable':
+          result = Object.assign(() => {}, { then: rejectThen })
+          break
+        case 'a throwing then getter':
+          result = { get then() { reads++; throw cause } }
+          break
+        case 'a then getter that must only be read once':
+          result = { get then() {
+            reads++
+            if (reads > 1) throw callbackCause
+            return rejectThen
+          } }
+          break
+        case 'a then callback that rejects then throws':
+          result = { then(resolve, reject) { reject(cause); throw callbackCause } }
+          break
+        case 'an async then callback that throws':
+          result = { async then() { await new Promise(setImmediate); throw callbackCause } }
+          break
+        case 'a then callback returning a promise with a hostile catch':
+          result = { then() {
+            const continuation = Promise.reject(callbackCause)
+            Object.defineProperty(continuation, 'catch', { get() { throw cause } })
+            return continuation
+          } }
+          break
+        case 'a then callback returning a throwing then getter':
+          result = { then() { return { get then() { throw callbackCause } } } }
+          break
+        case 'a fulfilled thenable':
+          result = Promise.resolve()
+          break
+        default:
+          assert.fail('unknown case')
+      }
+      return result
+    })
+    let laterCalls = 0
+    const releaseLater = authority.subscribe(() => {
+      if (active) {
+        laterCalls++
+        assert.equal(authority.issueTicket(), null)
+      }
+    })
+    const ticket = authority.issueTicket()
+    assert.ok(ticket)
+    active = true
+    const releasePolicy = registry.registerFsusRenderPipelineComponentPolicyByName('ElButton')
+    assert.equal(laterCalls, 1)
+    assert.equal(registry.hasFsusRenderPipelineComponentPolicy('ElButton'), true)
+    assert.equal(authority.isCurrent(ticket), false)
+    assert.equal(authority.issueTicket(), null)
+    await drain()
+    assert.deepEqual(events, [], 'listener work must not leak global unhandledRejection')
+    const failures = authority.getFailures()
+    assert.equal(failures[0].cause, mode === 'a throwing then getter' ? cause : result)
+    assert.equal(failures[0].phase, mode === 'a throwing then getter' ? 'subscription' : 'asynchronous-subscription')
+    assert.equal(typeof failures[0].subscriptionId, 'symbol')
+    assert.ok(Object.isFrozen(failures))
+    assert.ok(failures.every(Object.isFrozen))
+    if (mode === 'a then callback that rejects then throws') {
+      assert.equal(failures.length, 2)
+      assert.equal(failures[1].cause, callbackCause)
+      assert.equal(failures[1].phase, 'subscription')
+      assert.equal(failures[1].subscriptionId, failures[0].subscriptionId)
+    } else {
+      assert.equal(failures.length, 1)
+    }
+    if (mode === 'a throwing then getter' || mode === 'a then getter that must only be read once') {
+      assert.equal(reads, 1)
+    }
+    if (mode === 'a rejecting function thenable' || mode === 'a then getter that must only be read once') {
+      assert.equal(calls, 1)
+    }
+    active = false
+    releaseListener()
+    releaseLater()
+    releasePolicy()
+    registry.clearFsusRenderPipelineComponentPolicies()
+    registry.registerFsusRenderPipelineComponentPolicyByName('ElMessage')
+    await drain()
+    assert.deepEqual(events, [])
+    assert.deepEqual(authority.getFailures(), failures)
+    assert.equal(authority.issueTicket(), null)
+    assert.equal(authority.isCurrent(ticket), false)
+    console.log(JSON.stringify({ controlEvents: 1, listenerEvents: events.length, broken: authority.issueTicket() === null }))
+  `
+  const output = execFileSync(
+    process.execPath,
+    ['--import', 'tsx', '--input-type=module', '-e', script],
+    { encoding: 'utf8', cwd: process.cwd() },
+  )
+  expect(JSON.parse(output)).toEqual({
+    controlEvents: 1,
+    listenerEvents: 0,
+    broken: true,
+  })
+})
+
 it('releases retired and discarded registration history under real garbage collection', () => {
   const moduleUrl = pathToFileURL(
     resolve('vue/packages/utils/vue/render-pipeline-policy.ts'),

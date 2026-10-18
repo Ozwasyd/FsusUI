@@ -112,17 +112,29 @@ const changeComponentPolicies = <T>(phase: string, action: () => T): T => {
           const result: unknown = listener()
           if (
             result !== null &&
-            (typeof result === 'object' || typeof result === 'function') &&
-            typeof (result as { then?: unknown }).then === 'function'
+            (typeof result === 'object' || typeof result === 'function')
           ) {
-            brokenPolicyFeed = true
-            policyFeedFailures.push(
-              Object.freeze({
-                cause: result,
-                phase: 'asynchronous-subscription',
-                subscriptionId: subscription.id,
-              }),
-            )
+            const then = (result as { then?: unknown }).then
+            if (typeof then === 'function') {
+              brokenPolicyFeed = true
+              policyFeedFailures.push(
+                Object.freeze({
+                  cause: result,
+                  phase: 'asynchronous-subscription',
+                  subscriptionId: subscription.id,
+                }),
+              )
+              // Read then once and discard settlements without trusting .call.
+              // Also observe a rejecting return from an async then callback.
+              const discard = () => {}
+              const continuation = Reflect.apply(then, result, [
+                discard,
+                discard,
+              ])
+              void new Promise<unknown>((resolve) => {
+                resolve(continuation)
+              }).catch(discard)
+            }
           }
         } catch (cause) {
           brokenPolicyFeed = true
