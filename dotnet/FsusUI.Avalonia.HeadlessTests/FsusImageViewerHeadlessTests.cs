@@ -209,6 +209,231 @@ public class FsusImageViewerHeadlessTests
   }
 
   [AvaloniaFact]
+  public async Task ImageViewerLifecycleClearCancelsPendingLoadAndReleasesMountedContent()
+  {
+    var window = CreateStyledWindow();
+    var host = new FsusOverlayHost();
+    window.Content = host;
+    window.Show();
+    using var viewer = new FsusImageViewer { Sources = { "loaded.png", "pending.png" } };
+    var loaded = new DisposableControl("loaded");
+    var stale = new DisposableControl("stale");
+    var pending = new TaskCompletionSource<object?>(TaskCreationOptions.RunContinuationsAsynchronously);
+    CancellationToken observedToken = default;
+    viewer.ImageLoader = (source, token) =>
+    {
+      observedToken = token;
+      return source == "loaded.png" ? Task.FromResult<object?>(loaded) : pending.Task;
+    };
+
+    try
+    {
+      viewer.Open(host);
+      Assert.True(await viewer.CurrentLoadTask!);
+      viewer.ActiveIndex = 1;
+      var pendingLoad = viewer.CurrentLoadTask!;
+      Assert.Same(loaded, viewer.Content);
+      viewer.Sources.Clear();
+      var cancelledOnClear = observedToken.IsCancellationRequested;
+      var clearedOnClear = viewer.LoadedContent is null && viewer.Content is null && loaded.IsDisposed;
+      pending.SetResult(stale);
+      var accepted = await pendingLoad;
+      Dispatcher.UIThread.RunJobs();
+
+      Assert.True(cancelledOnClear);
+      Assert.True(clearedOnClear);
+      Assert.False(accepted);
+      Assert.True(stale.IsDisposed);
+      Assert.Null(viewer.LoadedContent);
+      Assert.Null(viewer.Content);
+      Assert.Equal(FsusImageStatus.Idle, viewer.Status);
+      Assert.Null(viewer.ErrorMessage);
+      Assert.Contains("fsus-idle", viewer.Classes);
+      Assert.DoesNotContain("fsus-loaded", viewer.Classes);
+      Assert.Equal(0, viewer.ActiveIndex);
+      Assert.Equal("empty", AutomationProperties.GetItemStatus(viewer));
+    }
+    finally
+    {
+      pending.TrySetResult(stale);
+      await viewer.CloseAsync();
+      window.Close();
+    }
+  }
+
+  [AvaloniaFact]
+  public async Task ImageViewerLifecycleClearRejectsLateSuccessBeforeReloadingSameSource()
+  {
+    var window = CreateStyledWindow();
+    var host = new FsusOverlayHost();
+    window.Content = host;
+    window.Show();
+    using var viewer = new FsusImageViewer { Sources = { "same.png" } };
+    var pending = new TaskCompletionSource<object?>(TaskCreationOptions.RunContinuationsAsynchronously);
+    var stale = new DisposableControl("stale");
+    var fresh = new DisposableControl("fresh");
+    var calls = 0;
+    viewer.ImageLoader = (_, _) => ++calls == 1 ? pending.Task : Task.FromResult<object?>(fresh);
+
+    try
+    {
+      viewer.Open(host);
+      var oldLoad = viewer.CurrentLoadTask!;
+      viewer.Sources.Clear();
+      pending.SetResult(stale);
+      Assert.False(await oldLoad);
+      Assert.True(stale.IsDisposed);
+      Assert.Equal(FsusImageStatus.Idle, viewer.Status);
+      Assert.Null(viewer.Content);
+
+      viewer.Sources.Add("same.png");
+      Assert.True(await viewer.CurrentLoadTask!);
+      Assert.Equal(2, calls);
+      Assert.Same(fresh, viewer.Content);
+      Assert.Equal("image 1 of 1", AutomationProperties.GetItemStatus(viewer));
+    }
+    finally
+    {
+      pending.TrySetResult(stale);
+      await viewer.CloseAsync();
+      window.Close();
+    }
+  }
+
+  [AvaloniaFact]
+  public async Task ImageViewerLifecycleDisposeCannotBeRevivedBySourcesOrExplicitLoad()
+  {
+    var window = CreateStyledWindow();
+    var host = new FsusOverlayHost();
+    window.Content = host;
+    window.Show();
+    using var viewer = new FsusImageViewer { Sources = { "pending.png" } };
+    var pending = new TaskCompletionSource<object?>(TaskCreationOptions.RunContinuationsAsynchronously);
+    var stale = new DisposableControl("stale");
+    CancellationToken observedToken = default;
+    var calls = 0;
+    viewer.ImageLoader = (_, token) =>
+    {
+      calls++;
+      observedToken = token;
+      return pending.Task;
+    };
+
+    try
+    {
+      viewer.Open(host);
+      var oldLoad = viewer.CurrentLoadTask!;
+      viewer.Dispose();
+      Assert.True(observedToken.IsCancellationRequested);
+      viewer.Sources.Clear();
+      viewer.Sources.Add("after-dispose.png");
+      var callsAfterMutation = calls;
+      pending.SetResult(stale);
+      Assert.False(await oldLoad);
+      Assert.Equal(1, callsAfterMutation);
+      Assert.True(stale.IsDisposed);
+      Assert.False(await viewer.RefreshAsync());
+      viewer.ActiveIndex = 1;
+      viewer.ImageLoader = (_, _) =>
+      {
+        calls++;
+        return Task.FromResult<object?>(new DisposableControl("revived"));
+      };
+      Assert.False(await viewer.LoadActiveSourceAsync());
+      Dispatcher.UIThread.RunJobs();
+      Assert.Equal(1, calls);
+      Assert.Null(viewer.LoadedContent);
+      Assert.Null(viewer.Content);
+      Assert.Equal(FsusImageStatus.Idle, viewer.Status);
+      Assert.Contains("fsus-idle", viewer.Classes);
+      viewer.Dispose();
+      Assert.True(await viewer.CloseAsync());
+      Assert.Throws<ObjectDisposedException>(() => viewer.Open(host));
+    }
+    finally
+    {
+      pending.TrySetResult(stale);
+      await viewer.CloseAsync();
+      window.Close();
+    }
+  }
+
+  [AvaloniaFact]
+  public async Task ImageViewerLifecycleShrinkClampsIndexContentAndAutomationTogether()
+  {
+    var window = CreateStyledWindow();
+    var host = new FsusOverlayHost();
+    window.Content = host;
+    window.Show();
+    using var viewer = new FsusImageViewer
+    {
+      Sources = { "first.png", "second.png", "third.png" },
+      ImageLoader = (source, _) => Task.FromResult<object?>(new DisposableControl(source)),
+    };
+
+    try
+    {
+      viewer.Open(host);
+      viewer.ActiveIndex = 2;
+      Assert.True(await viewer.CurrentLoadTask!);
+      var replaced = Assert.IsType<DisposableControl>(viewer.Content);
+      viewer.Sources.RemoveAt(2);
+      viewer.Sources.RemoveAt(1);
+      Assert.True(await viewer.CurrentLoadTask!);
+      Dispatcher.UIThread.RunJobs();
+
+      Assert.Equal(0, viewer.ActiveIndex);
+      Assert.Equal("first.png", viewer.ActiveSource);
+      Assert.Equal("first.png", Assert.IsType<DisposableControl>(viewer.Content).NameTag);
+      Assert.True(replaced.IsDisposed);
+      Assert.Equal("image 1 of 1", AutomationProperties.GetItemStatus(viewer));
+      Assert.True(await viewer.NextAsync());
+      Assert.Equal(0, viewer.ActiveIndex);
+    }
+    finally
+    {
+      await viewer.CloseAsync();
+      window.Close();
+    }
+  }
+
+  [AvaloniaFact]
+  public async Task ImageViewerLifecycleCloseReopenStartsFreshLoadForSameSource()
+  {
+    var window = CreateStyledWindow();
+    var host = new FsusOverlayHost();
+    window.Content = host;
+    window.Show();
+    using var viewer = new FsusImageViewer { Sources = { "same.png" } };
+    var pending = new TaskCompletionSource<object?>(TaskCreationOptions.RunContinuationsAsynchronously);
+    var stale = new DisposableControl("stale");
+    var fresh = new DisposableControl("fresh");
+    var calls = 0;
+    viewer.ImageLoader = (_, _) => ++calls == 1 ? pending.Task : Task.FromResult<object?>(fresh);
+
+    try
+    {
+      viewer.Open(host);
+      var oldLoad = viewer.CurrentLoadTask!;
+      Assert.True(await viewer.CloseAsync());
+      viewer.Open(host);
+      var reopenedLoad = viewer.CurrentLoadTask!;
+      pending.SetResult(stale);
+      Assert.True(await reopenedLoad);
+      Assert.False(await oldLoad);
+      Assert.Equal(2, calls);
+      Assert.True(stale.IsDisposed);
+      Assert.Same(fresh, viewer.Content);
+    }
+    finally
+    {
+      pending.TrySetResult(stale);
+      await viewer.CloseAsync();
+      window.Close();
+    }
+  }
+
+  [AvaloniaFact]
   public async Task ImageViewerHeadlessKeyboardNavigationEscapeAndFocusRestoration()
   {
     var window = CreateStyledWindow();
