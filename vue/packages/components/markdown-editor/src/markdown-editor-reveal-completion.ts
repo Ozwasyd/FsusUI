@@ -134,11 +134,12 @@ export const measureMarkdownEditorReveal = (
           Math.max(textarea.clientWidth, mirror.scrollWidth),
       ) <= 1
     if (!agreesWithNative()) {
-      // Native text controls quantize fractional line boxes to layout units.
-      // Keep the native extent fence: this is never a relaxed success threshold.
+      // Native controls and block line struts round at opposite fixed-point boundaries.
+      // Use the interior of the native unit to avoid CSSOM decimal serialization
+      // crossing its boundary. The same native extent fence still has to pass.
       const lineHeight = Number.parseFloat(style.lineHeight)
       if (!Number.isFinite(lineHeight)) return null
-      mirror.style.lineHeight = `${Math.floor(lineHeight * 64) / 64}px`
+      mirror.style.lineHeight = `${(Math.floor(lineHeight * 64) - 0.5) / 64}px`
       if (!agreesWithNative()) return null
     }
     const origin = mirror.getBoundingClientRect()

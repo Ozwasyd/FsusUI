@@ -6,6 +6,11 @@ import type {
 } from 'element-plus'
 import '../../packages/theme-chalk/src/index.scss'
 
+document.documentElement.classList.toggle(
+  'dark',
+  new URL(location.href).searchParams.get('theme') === 'dark',
+)
+
 createApp(
   defineComponent({
     setup() {
@@ -18,6 +23,7 @@ createApp(
       )
       const editor = ref<MarkdownEditorInstance>()
       const shown = ref(true)
+      const epoch = ref(9)
       const outcome = ref('idle')
       const target = source.value.indexOf('Paragraph 60')
       const selection = {
@@ -35,9 +41,22 @@ createApp(
           session,
           expected: session.inspectDocumentState(),
           signal: controller.signal,
-          timeoutMs: 400,
+          timeoutMs: action === 'timeout' ? 150 : 1500,
           assertAdmission: () => {
             calls += 1
+            if (
+              action === 'abort-after-focus' &&
+              document.activeElement?.tagName === 'TEXTAREA'
+            )
+              controller.abort()
+            if (
+              action === 'focus-return' &&
+              document.activeElement?.tagName === 'TEXTAREA'
+            ) {
+              const input = document.querySelector('textarea')
+              document.getElementById('outside')!.focus()
+              input?.focus()
+            }
             if (action === 'admission' && calls >= 4) throw new Error('revoked')
           },
         }
@@ -45,6 +64,21 @@ createApp(
         const before = session.inspectDocumentState()
         const pending = owner.revealSourceRangeAndWait(selection, options)
         if (action === 'abort') controller.abort()
+        if (action === 'epoch') {
+          epoch.value += 1
+          await nextTick()
+        }
+        if (action === 'selection')
+          owner.dispatchTransaction({
+            changes: [],
+            selection: { start: 0, end: 1, direction: 'forward' },
+            history: 'separate',
+            origin: 'programmatic',
+          })
+        if (action === 'superseded')
+          void owner
+            .revealSourceRangeAndWait(selection, options)
+            .catch(() => {})
         if (action === 'unmount') {
           shown.value = false
           await nextTick()
@@ -96,6 +130,11 @@ createApp(
             'unmount',
             'blur',
             'timeout',
+            'epoch',
+            'selection',
+            'superseded',
+            'abort-after-focus',
+            'focus-return',
           ].map((action) =>
             h(
               'button',
@@ -103,12 +142,14 @@ createApp(
               action,
             ),
           ),
-          h('output', { 'data-testid': 'outcome' }, outcome.value),
           shown.value
             ? h(ElMarkdownEditor, {
                 ref: editor,
                 modelValue: source.value,
-                documentIdentity: { id: 'browser-document', epoch: 9 },
+                documentIdentity: {
+                  id: 'browser-document',
+                  epoch: epoch.value,
+                },
                 mode: 'source',
                 editorProfile: 'prose',
                 minRows: 8,
@@ -119,6 +160,7 @@ createApp(
                 },
               })
             : null,
+          h('output', { 'data-testid': 'outcome' }, outcome.value),
         ])
     },
   }),

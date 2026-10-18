@@ -2,15 +2,24 @@ import { resolve } from 'node:path'
 import { expect, test } from '@playwright/test'
 
 const fixture = `/@fs${resolve('vue/tests/markdown-editor/reveal-completion.fixture.html')}`
-for (const theme of ['light', 'dark']) {
-  test(`acknowledges actual full backward selection/focus/viewport in ${theme}`, async ({
+for (const [theme, width] of [
+  ['light', 1280],
+  ['dark', 1280],
+  ['light', 390],
+  ['dark', 390],
+] as const) {
+  test(`acknowledges actual full backward selection/focus/viewport in ${theme} at ${width}`, async ({
     page,
   }, testInfo) => {
+    await page.setViewportSize({ width, height: width === 390 ? 844 : 900 })
+    const errors: string[] = []
+    page.on('pageerror', (error) => errors.push(error.message))
     await page.emulateMedia({
       colorScheme: theme === 'light' ? 'light' : 'dark',
       reducedMotion: 'reduce',
     })
-    await page.goto(fixture)
+    await page.goto(`${fixture}?theme=${theme}`)
+    await page.evaluate(() => document.fonts.ready)
     await page.locator('[data-action="success"]').click()
     const outcome = page.getByTestId('outcome')
     await expect(outcome).toContainText('full-selection-visible')
@@ -47,6 +56,7 @@ for (const theme of ['light', 'dark']) {
     expect(target!.y + target!.height).toBeLessThanOrEqual(
       input!.y + input!.height,
     )
+    expect(errors).toEqual([])
     await page.screenshot({
       path: testInfo.outputPath(`success-${theme}.png`),
     })
@@ -60,9 +70,15 @@ for (const [action, reason] of [
   ['unmount', 'unavailable'],
   ['blur', 'focus-lost'],
   ['timeout', 'timeout'],
+  ['epoch', 'stale'],
+  ['selection', 'selection-changed'],
+  ['superseded', 'superseded'],
+  ['abort-after-focus', 'aborted'],
+  ['focus-return', 'focus-lost'],
 ]) {
   test(`refuses ${action} without completion`, async ({ page }) => {
     await page.goto(fixture)
+    await page.evaluate(() => document.fonts.ready)
     await page.locator(`[data-action="${action}"]`).click()
     await expect(page.getByTestId('outcome')).toContainText(
       `markdown-editor-reveal-${reason}`,
