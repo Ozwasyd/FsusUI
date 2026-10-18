@@ -210,7 +210,7 @@ export const resolveFocusState = (
     }
   } else {
     const intersecting = nodes.filter(
-      (n) => !(n.rawRange.end < selStart || n.rawRange.start > selEnd),
+      (n) => n.rawRange.end > selStart && n.rawRange.start < selEnd,
     )
     if (intersecting.length > 0) {
       for (const b of intersecting) {
@@ -250,8 +250,10 @@ export const resolveFocusState = (
             exemptNodeIds.push(matchNode.id)
           }
         } else if (Array.isArray(sm)) {
-          const matchNodes = nodes.filter(
-            (n) => !(n.rawRange.end < sm[0] || n.rawRange.start > sm[1]),
+          const matchNodes = nodes.filter((n) =>
+            sm[0] === sm[1]
+              ? n.rawRange.start <= sm[0] && sm[0] <= n.rawRange.end
+              : n.rawRange.end > sm[0] && n.rawRange.start < sm[1],
           )
           for (const mn of matchNodes) {
             if (!exemptNodeIds.includes(mn.id)) exemptNodeIds.push(mn.id)
