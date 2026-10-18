@@ -190,12 +190,6 @@ test('picture states remain readable at narrow widths, zoom, RTL and reduced mot
             (element) => element.scrollWidth > element.clientWidth + 1,
           ),
         ).toBe(false)
-        if (width === 320 && zoom === 2 && direction === 'rtl') {
-          await testInfo.attach('picture-320-zoom200-rtl', {
-            body: await fixture.screenshot(),
-            contentType: 'image/png',
-          })
-        }
       }
     }
   }
@@ -232,12 +226,12 @@ test('picture states remain readable at narrow widths, zoom, RTL and reduced mot
   const touch = Boolean(testInfo.project.use.hasTouch)
   expect(target.width).toBeGreaterThanOrEqual(touch ? 44 : 32)
   expect(target.height).toBeGreaterThanOrEqual(touch ? 44 : 32)
-  await testInfo.attach('picture-status-matrix', {
-    body: await fixture.screenshot(),
-    contentType: 'image/png',
-  })
   if (touch) await remove.tap()
   else await remove.click()
   await expect(success).toHaveCount(0)
   await expect(fixture.locator('.el-upload-list__item')).toHaveCount(3)
+  await testInfo.attach('picture-status-matrix', {
+    body: await fixture.screenshot(),
+    contentType: 'image/png',
+  })
 })
