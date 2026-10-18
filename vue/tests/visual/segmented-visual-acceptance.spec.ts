@@ -494,6 +494,8 @@ for (const zoom of [1, 1.5, 2]) {
     expect(box!.height / zoom).toBeLessThanOrEqual(40)
     await expect.poll(() => group.evaluate((node) => node.scrollWidth > 0)).toBe(true)
     await waitForFontsAndLayout(page)
-    await row.screenshot({ path: testInfo.outputPath(`collection-zoom-${zoom * 100}.png`) })
+    // Capture the page: Chromium locator clipping can use stale scroll offsets
+    // under root CSS zoom and otherwise photograph a different fixture row.
+    await page.screenshot({ path: testInfo.outputPath(`collection-zoom-${zoom * 100}.png`), fullPage: true })
   })
 }
