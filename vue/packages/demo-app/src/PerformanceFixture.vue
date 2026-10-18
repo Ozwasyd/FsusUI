@@ -698,6 +698,7 @@ const workerProbe = async (iteration: number) => {
   })
 }
 
+let latestWasmRenderMs: number | null = null
 let initialWasmProfile: {
   startupMs: number
   computeMs: number
@@ -706,6 +707,7 @@ let initialWasmProfile: {
 } | null = null
 
 const captureWasmProfile = (profile: MarkdownRuntimeProfile) => {
+  latestWasmRenderMs = profile.timings.totalMs
   if (initialWasmProfile) return
   initialWasmProfile = {
     startupMs: profile.timings.initMs,
@@ -796,7 +798,7 @@ const markdownPhaseProbe = () => {
     commitMs:
       Number(renderer?.dataset.fsusMarkdownCommitMs ?? '0') ||
       latestStage('vue-commit'),
-    parseMs: initialWasmProfile?.endToEndMs ?? latestStage('worker-compute'),
+    parseMs: latestWasmRenderMs ?? latestStage('worker-compute'),
     transferMs: latestStage('worker-transfer'),
   }
 }

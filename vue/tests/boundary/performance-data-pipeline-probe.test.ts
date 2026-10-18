@@ -7,7 +7,11 @@ it('runs the complete performance observation controls', () => {
   const root = path.resolve(import.meta.dirname, '../../..')
   execFileSync(
     process.execPath,
-    ['--test', 'tests/performance-data-pipeline-probe.test.mjs'],
+    [
+      '--test',
+      'tests/performance-data-pipeline-probe.test.mjs',
+      'tests/performance-markdown-phases.test.mjs',
+    ],
     { cwd: root, stdio: 'inherit' },
   )
 }, 120_000)
