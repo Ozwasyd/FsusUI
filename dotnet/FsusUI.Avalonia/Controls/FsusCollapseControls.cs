@@ -30,8 +30,6 @@ public class FsusCollapse : ContentControl
       nameof(ActiveNames),
       Array.Empty<object?>());
 
-  private bool isSyncingChildren;
-
   public FsusCollapse()
   {
     FsusComponentClasses.SetBaseClasses(this, "fsus-collapse");
@@ -94,9 +92,7 @@ public class FsusCollapse : ContentControl
       return;
     }
 
-    isSyncingChildren = true;
     SetCurrentValue(ActiveNamesProperty, next);
-    isSyncingChildren = false;
     ValueChanged?.Invoke(
       this,
       new FsusCollapseValueChangedEventArgs(current, next));
@@ -104,9 +100,24 @@ public class FsusCollapse : ContentControl
 
   private void SyncChildren()
   {
-    foreach (var item in this.GetLogicalDescendants().OfType<FsusCollapseItem>())
+    SyncOwnedChildren(this);
+  }
+
+  private void SyncOwnedChildren(ILogical parent)
+  {
+    foreach (var child in parent.GetLogicalChildren())
     {
-      item.SetIsActiveFromParent(IsActive(item.ItemKey));
+      if (child is FsusCollapse)
+      {
+        continue;
+      }
+
+      if (child is FsusCollapseItem item)
+      {
+        item.SetIsActiveFromParent(IsActive(item.ItemKey));
+      }
+
+      SyncOwnedChildren(child);
     }
   }
 
@@ -119,7 +130,7 @@ public class FsusCollapse : ContentControl
   protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
   {
     base.OnPropertyChanged(change);
-    if (change.Property == ActiveNamesProperty && !isSyncingChildren)
+    if (change.Property == ActiveNamesProperty)
     {
       SyncChildren();
     }

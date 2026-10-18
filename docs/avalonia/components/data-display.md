@@ -20,6 +20,17 @@ collapse contracts map to page values, item collections, placement/status
 enums, content controls, `FsusAvatarShape`, and `FsusCollapse`
 `Accordion`/`ActiveNames` state.
 
+Use `FsusCollapseItem.ItemKey` to match entries in `ActiveNames`. A header
+pointer toggle updates child `IsActive`, the `fsus-active` class, content
+visibility and automation help text before `ValueChanged` is raised. Each
+accepted toggle raises one event with the old and new active-name lists.
+With `Accordion = true`, opening another item closes the previous item;
+toggling the active item closes it. `Disabled` items ignore pointer toggles
+without changing the model or raising the event. Programmatic `ActiveNames`
+changes still synchronize child state, including disabled items. Each item
+belongs to its nearest `FsusCollapse` ancestor; synchronization stops at nested
+Collapse owners, whose active-name lists, item states and events stay independent.
+
 `FsusDescriptions` renders its `Items` collection as a responsive key/value
 grid. `RefreshLayout(width)` resolves the mobile one-column layout below 480px
 and otherwise uses the requested `Column` count; call it after the host layout
