@@ -56,6 +56,10 @@ changing its scenario, size or dimensions. It cannot be combined with
 pnpm perf:render:web -- --profile full --case virtual-grid-100000-120hz-dpr2-reduced --output .tmp/performance/exact-case
 ```
 
+The existing `pnpm run check:render-performance-contract` governance gate runs
+the complete argument and matrix selection regression suite before reporting
+success. These Node controls do not launch a browser or collect measurements.
+
 To reproduce the real 100K Table data-path measurement without unrelated scenarios:
 
 ```bash
