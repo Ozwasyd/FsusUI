@@ -1912,3 +1912,8 @@ CSSOM changes to copied text styles can make preparation incomplete; readers the
 return null until the original layout lifecycle refreshes it. Readers do not queue
 that preparation themselves. CSSOM occlusion without geometry change is outside
 this observation's authority and still requires the reveal contract and host guards.
+
+Observations retain only identity/revision, geometry and style provenance, not a
+body/history snapshot. The single prepared text layout stays with its original
+mounted owner. Moving the native tree to another Document or a shadow root is
+unsupported and returns null until supported original layout custody exists.

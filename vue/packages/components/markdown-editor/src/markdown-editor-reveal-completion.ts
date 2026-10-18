@@ -101,7 +101,6 @@ const textLayoutKey = (textarea: HTMLTextAreaElement) => {
   if (!view) return null
   const css = view.getComputedStyle(textarea)
   return JSON.stringify([
-    textarea.value,
     textarea.clientWidth,
     textarea.offsetWidth,
     textarea.getBoundingClientRect().width,

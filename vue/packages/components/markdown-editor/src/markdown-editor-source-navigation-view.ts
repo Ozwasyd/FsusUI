@@ -69,6 +69,7 @@ export const createMarkdownEditorSourceNavigationViewOwner = (owner: {
   let layout: MarkdownEditorRevealTextLayout | null = null
   let frame: number | undefined
   let root: HTMLElement | null = null
+  let mountedDocument: Document | null = null
   let lastPhysical: string | null = null
   let media: MediaQueryList | null = null
   let releases: Array<() => void> = []
@@ -104,6 +105,7 @@ export const createMarkdownEditorSourceNavigationViewOwner = (owner: {
     releases = []
     media = null
     root = null
+    mountedDocument = null
     layout?.dispose()
     layout = null
   }
@@ -114,13 +116,18 @@ export const createMarkdownEditorSourceNavigationViewOwner = (owner: {
       pause()
       return
     }
-    if (root === context.root && layout?.textarea === context.textarea) {
+    if (
+      root === context.root &&
+      layout?.textarea === context.textarea &&
+      mountedDocument === context.textarea.ownerDocument
+    ) {
       refresh()
       return
     }
     pause()
     root = context.root
     const document = context.textarea.ownerDocument
+    mountedDocument = document
     const view = document.defaultView
     if (!view || typeof view.matchMedia !== 'function') return
     media = view.matchMedia('(prefers-reduced-motion: reduce)')
@@ -156,6 +163,11 @@ export const createMarkdownEditorSourceNavigationViewOwner = (owner: {
       return null
     const { textarea, selection } = context
     if (
+      textarea.ownerDocument !== mountedDocument ||
+      context.root.getRootNode() !== mountedDocument
+    )
+      return unavailable()
+    if (
       textarea.value !== context.source ||
       textarea.selectionStart !== selection.start ||
       textarea.selectionEnd !== selection.end ||
@@ -164,7 +176,6 @@ export const createMarkdownEditorSourceNavigationViewOwner = (owner: {
       textarea.ownerDocument.fonts?.status !== 'loaded'
     )
       return unavailable()
-    const measured = measureMarkdownEditorReveal(textarea, selection, layout)
     const focus = resolveMarkdownEditorFocusEndpoint(selection)
     const endpoint = measureMarkdownEditorReveal(
       textarea,
@@ -176,11 +187,11 @@ export const createMarkdownEditorSourceNavigationViewOwner = (owner: {
       layout,
     )
     if (
-      !measured ||
       !endpoint ||
       endpoint.regions.some((region) => region.top !== endpoint.regions[0].top)
     )
       return unavailable()
+    const measured = endpoint
     const height = measured.viewport.bottom - measured.viewport.top
     const range = textarea.scrollHeight - textarea.clientHeight
     const top = textarea.scrollTop
@@ -317,7 +328,13 @@ export const createMarkdownEditorSourceNavigationViewOwner = (owner: {
       disposed = true
     },
     inspect: () => ({
-      memoryUnits: layout ? Math.ceil((layout.text.length * 2) / 65536) : 0,
+      memoryUnits: layout
+        ? Math.ceil(
+            ((layout.text.length + layout.key.length + layout.cssText.length) *
+              2) /
+              65536,
+          )
+        : 0,
     }),
   })
 }
