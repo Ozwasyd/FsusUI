@@ -15,6 +15,7 @@ import MarkdownRenderer from '../src/markdown-renderer.vue'
 import { resolveMarkdownWorkerScriptUrl } from '../src/markdown-renderer'
 import {
   MARKDOWN_RENDERER_VERSION,
+  normalizeMarkdownSource,
   renderMarkdownFallbackWithRuntime,
   renderMarkdownChunksWithRuntime,
   renderMarkdownHtmlWithRuntime,
@@ -273,8 +274,11 @@ const makeWorkerChunkResult = (
       baseUrl: null,
       allowLatex: true,
       allowMermaid: true,
-      sourceLength: source.length,
-      normalizedSourceLength: source.length,
+      sourceLength: new TextEncoder().encode(normalizeMarkdownSource(source))
+        .byteLength,
+      normalizedSourceLength: new TextEncoder().encode(
+        normalizeMarkdownSource(source),
+      ).byteLength,
       featureCount: result.features.length,
       placeholderCount: result.placeholders.length,
       rendererVersion: MARKDOWN_RENDERER_VERSION,
@@ -853,6 +857,78 @@ describe('MarkdownRenderer.vue', () => {
     await flushPromises()
     expect(wrapper.emitted('render-complete')?.[0]?.[0]).toEqual(result)
   })
+
+  test.each([
+    ['ASCII', '# Worker\n\nParagraph\n\n'],
+    ['CJK', '# 原生 Worker\n\n中文段落\n\n'],
+    ['astral emoji', '# Worker 😀\n\nParagraph 🚀\n\n'],
+    ['BOM and CRLF', '\uFEFF# Worker 中文😀\r\n\r\nParagraph\r\n\r\n'],
+  ])('accepts native UTF-8 Worker metadata for %s', async (_label, seed) => {
+    vi.stubGlobal('Worker', MarkdownWorkerHarness)
+    const rawSource = seed.repeat(1_600)
+    const wrapper = mount(MarkdownRenderer, {
+      ...workerChunkedPipeline,
+      props: { content: rawSource },
+    })
+    await vi.advanceTimersByTimeAsync(250)
+    await flushPromises()
+
+    const worker = MarkdownWorkerHarness.instances[0]!
+    const post = worker.posts.find((message) => message.type === 'run')!
+    const source = normalizeMarkdownSource(rawSource)
+    expect(post.request?.source).toBe(source)
+    const result = structuredClone(
+      makeWorkerChunkResult(source),
+    ) as MarkdownRuntimeChunkResult
+    worker.respond({
+      generation: post.generation,
+      id: post.id,
+      result: { metadata: result, units: result.chunks },
+      status: 'complete',
+    })
+    await flushRenderer()
+
+    expect(wrapper.find('h1').text()).toBe('Chunked')
+    expect(wrapper.attributes('data-fsus-render-strategy')).toBe(
+      'chunked-worker',
+    )
+    expect(wrapper.emitted('render-error')).toBeUndefined()
+    expect(wrapper.emitted('render-complete')).toHaveLength(1)
+    wrapper.unmount()
+  })
+
+  test.each(['sourceLength', 'normalizedSourceLength'] as const)(
+    'rejects forged UTF-16 Worker %s metadata',
+    async (field) => {
+      vi.stubGlobal('Worker', MarkdownWorkerHarness)
+      const source = '# Worker 中文😀\n\n'.repeat(1_600)
+      const wrapper = mount(MarkdownRenderer, {
+        ...workerChunkedPipeline,
+        props: { content: source },
+      })
+      await vi.advanceTimersByTimeAsync(250)
+      await flushPromises()
+
+      const worker = MarkdownWorkerHarness.instances[0]!
+      const post = worker.posts.find((message) => message.type === 'run')!
+      const result = structuredClone(
+        makeWorkerChunkResult(source),
+      ) as MarkdownRuntimeChunkResult
+      expect(result.metadata?.[field]).toBeGreaterThan(source.length)
+      Reflect.set(result.metadata!, field, source.length)
+      worker.respond({
+        generation: post.generation,
+        id: post.id,
+        result: { metadata: result, units: result.chunks },
+        status: 'complete',
+      })
+      await flushRenderer()
+
+      expect(wrapper.attributes('data-fsus-render-strategy')).toBe('sync')
+      expect(wrapper.emitted('render-error')).toHaveLength(1)
+      wrapper.unmount()
+    },
+  )
 
   test('accepts one response only from the exact pending markdown worker', async () => {
     vi.stubGlobal('Worker', MarkdownWorkerHarness)

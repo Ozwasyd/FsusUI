@@ -159,6 +159,12 @@ Thresholds and budgets are controlled by `ElConfigProvider`'s `render-pipeline` 
 
 Large documents prefer the Render Pipeline adapter's shared Worker pool. Each pool slot uses a lightweight broker Worker to manage a terminable parser Worker; the Worker handles Markdown chunking, metadata precomputation, and incremental full fingerprints, while the main thread handles virtual mounting, measurement, and anchor retention. Each renderer has its own key/generation; consecutive edits send cancel to the Worker and terminate any parser Worker running synchronous WASM, so an old generation cannot continue transferring, committing, or writing cache. A timeout or crash affects only its slot and other renderer tasks continue. If Worker is unavailable, the component waits for main-thread idle/frame budget and falls back to `chunked-main`; it does not own a private executor.
 
+Native Worker metadata `sourceLength` and `normalizedSourceLength` count UTF-8
+bytes. The renderer validates those counts after its existing BOM/newline
+normalization, while retaining source identity, version and complete chunk
+checks. These counts are separate from the JavaScript UTF-16 edit/selection
+ranges in the [public projection contract](../api/markdown-runtime-projection.md).
+
 ---
 
 ## API
