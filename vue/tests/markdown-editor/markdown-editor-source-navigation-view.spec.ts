@@ -3,6 +3,7 @@ import { expect, test } from '@playwright/test'
 import type { Page } from '@playwright/test'
 
 const fixture = `/@fs${resolve('vue/tests/markdown-editor/source-navigation-view.fixture.html')}`
+const nativeFontFixture = `/@fs${resolve('dotnet/FsusUI.Avalonia.HeadlessTests/Assets/Fonts/GoogleSans-Regular.ttf')}`
 const ready = async (page: Page, query = '') => {
   await page.goto(`${fixture}${query}`)
   await page.evaluate(() => document.fonts.ready)
@@ -344,19 +345,16 @@ test('retires a source view across actual native font loading', async ({
   page,
 }) => {
   await ready(page)
-  const result = await page.evaluate(async () => {
+  const result = await page.evaluate(async (fontUrl) => {
     const api = window.sourceViewFixture
     api.hold()
-    const font = new FontFace(
-      'SourceViewRealFont',
-      'url(/@fs/workspace/reveal-candidate/dotnet/FsusUI.Avalonia.HeadlessTests/Assets/Fonts/GoogleSans-Regular.ttf)',
-    )
+    const font = new FontFace('SourceViewRealFont', `url("${fontUrl}")`)
     document.fonts.add(font)
     document.querySelector('textarea')!.style.fontFamily = 'SourceViewRealFont'
     await document.fonts.load('18px SourceViewRealFont')
     await document.fonts.ready
     return { status: font.status, oldCurrent: api.current() }
-  })
+  }, nativeFontFixture)
   expect(result).toEqual({ status: 'loaded', oldCurrent: false })
 })
 
