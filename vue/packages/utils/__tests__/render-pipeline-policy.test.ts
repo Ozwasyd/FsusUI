@@ -632,3 +632,100 @@ it('releases retired and discarded registration history under real garbage colle
     restored: true,
   })
 })
+
+it.each([
+  'throwing getter',
+  'hostile method',
+  'missing method',
+  'cross-realm throwing getter',
+])('observes an original native result with %s', (mode) => {
+  const moduleUrl = pathToFileURL(
+    resolve('vue/packages/utils/vue/render-pipeline-policy.ts'),
+  ).href
+  const options = {
+    encoding: 'utf8' as const,
+    cwd: process.cwd(),
+    stdio: 'pipe' as const,
+  }
+  const args = ['--import', 'tsx', '--input-type=module', '-e']
+  expect(() =>
+    execFileSync(
+      process.execPath,
+      [
+        ...args,
+        `
+      import assert from 'node:assert/strict'
+      assert.equal(process.listenerCount('unhandledRejection'), 0)
+      Promise.reject(new Error('original-result-orphan-control'))
+      await new Promise(setImmediate)
+    `,
+      ],
+      options,
+    ),
+  ).toThrow('original-result-orphan-control')
+
+  const script = `
+    import assert from 'node:assert/strict'
+    import vm from 'node:vm'
+    const loaded = await import(${JSON.stringify(moduleUrl)})
+    const registry = loaded.default ?? loaded
+    const authority = registry.getFsusRenderPipelineComponentPolicyAuthority()
+    const mode = ${JSON.stringify(mode)}
+    assert.equal(process.listenerCount('unhandledRejection'), 0)
+    const originalThen = Promise.prototype.then
+    const originalCatch = Promise.prototype.catch
+    let active = false
+    let result
+    let exposedReads = 0
+    let laterCalls = 0
+    const releaseListener = authority.subscribe(() => {
+      if (!active) return
+      result = mode === 'cross-realm throwing getter'
+        ? vm.runInNewContext('Promise.reject(new Error("original-native-rejection"))')
+        : Promise.reject(new Error('original-native-rejection'))
+      Object.defineProperty(result, 'then', mode === 'hostile method'
+        ? { value() { exposedReads++; throw new Error('exposed then must not run') } }
+        : mode === 'missing method'
+          ? { value: undefined }
+          : { get() { exposedReads++; throw new Error('exposed then must not be read') } })
+      Object.defineProperty(result, 'catch', {
+        get() { exposedReads++; throw new Error('exposed catch must not be read') },
+      })
+      return result
+    })
+    const releaseLater = authority.subscribe(() => { if (active) laterCalls++ })
+    const ticket = authority.issueTicket()
+    assert.ok(ticket)
+    active = true
+    const releasePolicy = registry.registerFsusRenderPipelineComponentPolicyByName('ElButton')
+    assert.equal(laterCalls, 1)
+    assert.equal(registry.hasFsusRenderPipelineComponentPolicy('ElButton'), true)
+    assert.equal(authority.isCurrent(ticket), false)
+    assert.equal(authority.issueTicket(), null)
+    for (let turn = 0; turn < 4; turn++) await new Promise(setImmediate)
+    assert.equal(exposedReads, 0)
+    const failures = authority.getFailures()
+    assert.equal(failures.length, 1)
+    assert.equal(failures[0].cause, result)
+    assert.equal(failures[0].phase, 'asynchronous-subscription')
+    assert.equal(typeof failures[0].subscriptionId, 'symbol')
+    active = false
+    releaseListener(); releaseLater(); releasePolicy()
+    registry.clearFsusRenderPipelineComponentPolicies()
+    registry.registerFsusRenderPipelineComponentPolicyByName('ElMessage')
+    for (let turn = 0; turn < 4; turn++) await new Promise(setImmediate)
+    assert.equal(authority.issueTicket(), null)
+    assert.equal(authority.isCurrent(ticket), false)
+    assert.deepEqual(authority.getFailures(), failures)
+    assert.equal(Promise.prototype.then, originalThen)
+    assert.equal(Promise.prototype.catch, originalCatch)
+    assert.equal(process.listenerCount('unhandledRejection'), 0)
+    console.log(JSON.stringify({ handlers: 0, exposedReads, broken: true }))
+  `
+  const output = execFileSync(process.execPath, [...args, script], options)
+  expect(JSON.parse(output)).toEqual({
+    handlers: 0,
+    exposedReads: 0,
+    broken: true,
+  })
+})

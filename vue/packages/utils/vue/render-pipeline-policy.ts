@@ -102,6 +102,18 @@ const policySubscriptions = new Set<{
 const nativePromiseThen = Promise.prototype.then
 const discardContinuation = () => {}
 
+const observeNativeSubscriptionContinuation = (value: unknown): boolean => {
+  try {
+    Reflect.apply(nativePromiseThen, value, [
+      discardContinuation,
+      discardContinuation,
+    ])
+    return true
+  } catch {
+    return false
+  }
+}
+
 const observeSubscriptionContinuation = (
   value: unknown,
   seen = new WeakSet<object>(),
@@ -115,16 +127,8 @@ const observeSubscriptionContinuation = (
   }
   seen.add(value)
   try {
-    try {
-      // Observe the native rejection without reading its exposed then/catch.
-      Reflect.apply(nativePromiseThen, value, [
-        discardContinuation,
-        discardContinuation,
-      ])
-      return
-    } catch {
-      // Non-native thenables need their own captured method instead.
-    }
+    // Observe the native rejection without reading its exposed then/catch.
+    if (observeNativeSubscriptionContinuation(value)) return
     const then = (value as { then?: unknown }).then
     if (typeof then !== 'function') return
     queueMicrotask(() => {
@@ -165,8 +169,11 @@ const changeComponentPolicies = <T>(phase: string, action: () => T): T => {
             result !== null &&
             (typeof result === 'object' || typeof result === 'function')
           ) {
-            const then = (result as { then?: unknown }).then
-            if (typeof then === 'function') {
+            const native = observeNativeSubscriptionContinuation(result)
+            const then = native
+              ? undefined
+              : (result as { then?: unknown }).then
+            if (native || typeof then === 'function') {
               brokenPolicyFeed = true
               policyFeedFailures.push(
                 Object.freeze({
@@ -177,12 +184,14 @@ const changeComponentPolicies = <T>(phase: string, action: () => T): T => {
               )
               // Read then once and discard settlements without trusting .call.
               // Also observe work returned by an untrusted then callback.
-              const discard = () => {}
-              const continuation = Reflect.apply(then, result, [
-                discard,
-                discard,
-              ])
-              observeSubscriptionContinuation(continuation)
+              if (typeof then === 'function') {
+                const discard = () => {}
+                const continuation = Reflect.apply(then, result, [
+                  discard,
+                  discard,
+                ])
+                observeSubscriptionContinuation(continuation)
+              }
             }
           }
         } catch (cause) {

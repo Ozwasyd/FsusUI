@@ -154,7 +154,10 @@ from the initial snapshot that is still owned. Reentrant writes stay inside the
 revoked interval. A throwing listener or returned thenable permanently breaks
 the feed; it does not prevent other notifications or the requested mutation.
 Listeners run as plain functions without a subscription receiver. They must
-finish synchronously and must not return asynchronous work.
+finish synchronously and must not return asynchronous work. Native Promise
+results are observed through the captured intrinsic reaction method without
+reading exposed `then` or `catch` properties. Other thenables retain their
+single-read callback contract.
 Releasing a listener removes only that subscription and does not erase failures
 or repair a broken feed. Keep and release every registration and subscription
 handle; clearing entries does not release subscriptions or outstanding handles.
