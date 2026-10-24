@@ -3,7 +3,7 @@ import { nodeResolve } from '@rollup/plugin-node-resolve'
 import { rollup } from 'rollup'
 import commonjs from '@rollup/plugin-commonjs'
 import vue from '@vitejs/plugin-vue'
-import VueMacros from 'unplugin-vue-macros/rollup'
+import { createVueMacros } from '../utils/vue-macros'
 import vueJsx from '@vitejs/plugin-vue-jsx'
 import esbuild, { minify as minifyPlugin } from 'rollup-plugin-esbuild'
 import { series } from 'gulp'
@@ -23,15 +23,18 @@ import {
 } from '@element-plus/build-utils'
 import { version } from '../../../../packages/element-plus/version'
 import { ElementPlusAlias } from '../plugins/element-plus-alias'
+import { CanonicalExternalImports } from '../plugins/canonical-imports'
 import { MarkdownHeavyFeatureFrameUrl } from '../plugins/markdown-heavy-feature-frame'
 import {
   formatBundleFilename,
   generateExternal,
   shouldIgnoreRollupWarning,
+  run,
   withTaskName,
   writeBundles,
 } from '../utils'
 import { target } from '../build-info'
+import { runFullBuildTasks } from '../utils/full-build-tasks'
 import type { TaskFunction } from 'gulp'
 import type { Plugin } from 'rollup'
 
@@ -46,7 +49,7 @@ async function buildFullEntry(minify: boolean) {
     id === './ep_wasm.mjs' ||
     id.endsWith('/packages/wasm/ep_wasm.mjs') ||
     id.endsWith('/packages/wasm/dist/ep_wasm.mjs')
-  const vueMacrosPlugins = await VueMacros({
+  const vueMacrosPlugins = await createVueMacros({
     setupComponent: false,
     setupSFC: false,
     plugins: {
@@ -96,6 +99,8 @@ async function buildFullEntry(minify: boolean) {
     )
   }
 
+  plugins.push(CanonicalExternalImports())
+
   const bundle = await rollup({
     input: path.resolve(epRoot, 'index.ts'),
     onwarn(warning, warn) {
@@ -137,65 +142,73 @@ async function buildFullEntry(minify: boolean) {
   ])
 }
 
-async function buildFullLocale(minify: boolean) {
-  const files = await glob(`**/*.ts`, {
-    cwd: path.resolve(localeRoot, 'lang'),
-    absolute: true,
-  })
-  return Promise.all(
-    files.map(async (file) => {
-      const filename = path.basename(file, '.ts')
-      const name = upperFirst(camelCase(filename))
+async function buildFullLocale(file: string, minify: boolean) {
+  const filename = path.basename(file, '.ts')
+  const name = upperFirst(camelCase(filename))
 
-      const bundle = await rollup({
-        input: file,
-        onwarn(warning, warn) {
-          if (shouldIgnoreRollupWarning(warning)) return
-          warn(warning)
-        },
-        plugins: [
-          esbuild({
-            minify,
-            sourceMap: minify,
-            target,
-            tsconfig,
-          }),
-        ],
-      })
-      await writeBundles(bundle, [
-        {
-          format: 'umd',
-          file: path.resolve(
-            epOutput,
-            'dist/locale',
-            formatBundleFilename(filename, minify, 'js'),
-          ),
-          exports: 'default',
-          name: `${PKG_CAMELCASE_LOCAL_NAME}${name}`,
-          sourcemap: minify,
-          banner,
-        },
-        {
-          format: 'esm',
-          file: path.resolve(
-            epOutput,
-            'dist/locale',
-            formatBundleFilename(filename, minify, 'mjs'),
-          ),
-          sourcemap: minify,
-          banner,
-        },
-      ])
-    }),
-  )
+  const bundle = await rollup({
+    input: file,
+    onwarn(warning, warn) {
+      if (shouldIgnoreRollupWarning(warning)) return
+      warn(warning)
+    },
+    plugins: [
+      esbuild({
+        minify,
+        sourceMap: minify,
+        target,
+        tsconfig,
+      }),
+    ],
+  })
+  await writeBundles(bundle, [
+    {
+      format: 'umd',
+      file: path.resolve(
+        epOutput,
+        'dist/locale',
+        formatBundleFilename(filename, minify, 'js'),
+      ),
+      exports: 'default',
+      name: `${PKG_CAMELCASE_LOCAL_NAME}${name}`,
+      sourcemap: minify,
+      banner,
+    },
+    {
+      format: 'esm',
+      file: path.resolve(
+        epOutput,
+        'dist/locale',
+        formatBundleFilename(filename, minify, 'mjs'),
+      ),
+      sourcemap: minify,
+      banner,
+    },
+  ])
 }
 
 export const buildFull =
   (minify: boolean): TaskFunction =>
-  async () =>
-    Promise.all([buildFullEntry(minify), buildFullLocale(minify)])
+  async () => {
+    const files = await glob(`**/*.ts`, {
+      cwd: path.resolve(localeRoot, 'lang'),
+      absolute: true,
+    })
+    await runFullBuildTasks(
+      () => buildFullEntry(minify),
+      files,
+      (file) => buildFullLocale(file, minify),
+    )
+  }
+
+export const buildFullUnminified: TaskFunction = buildFull(false)
+export const buildFullMinified: TaskFunction = buildFull(true)
 
 export const buildFullBundle: TaskFunction = series(
-  withTaskName('buildFull', buildFull(false)),
-  withTaskName('buildFullMinified', buildFull(true)),
+  withTaskName('buildFull', () =>
+    run('pnpm run -C vue/internal/build start buildFullUnminified'),
+  ),
+  withTaskName('buildFullMinified', () =>
+    run('pnpm run -C vue/internal/build start buildFullMinified'),
+  ),
 )

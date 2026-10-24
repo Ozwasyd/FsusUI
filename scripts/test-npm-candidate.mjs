@@ -13,6 +13,12 @@ import {
 import os from 'node:os'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
+import assert from 'node:assert/strict'
+import ts from 'typescript'
+import {
+  findBundledWorkspaceReferences,
+  rewriteBundledWorkspaceReferences,
+} from './bundled-workspace-references.mjs'
 import {
   candidateManifestName,
   candidateTarballName,
@@ -94,6 +100,187 @@ function createFixture(name, packageOverrides = {}) {
 }
 
 try {
+  const workspaceNames = ['@element-plus/icons-vue', '@element-plus/motion']
+  const license = `/*! Bundled license information:
+@element-plus/icons-vue/dist/index.js:
+  (*! Element Plus Icons Vue *)
+*/`
+  const fullBundle = `const icons = {};\n${license}\n`
+  assert.deepEqual(
+    rewriteBundledWorkspaceReferences(
+      fullBundle,
+      'dist/index.full.js',
+      workspaceNames,
+      () => assert.fail('license comments must not request a runtime mapping'),
+    ),
+    { content: fullBundle, replacementCount: 0 },
+  )
+  assert.deepEqual(
+    findBundledWorkspaceReferences(
+      fullBundle,
+      'dist/index.full.js',
+      workspaceNames,
+    ),
+    [],
+  )
+  for (const [fileName, input] of [
+    ['es/example.mjs', `export * from '@element-plus/icons-vue';\n${license}`],
+    ['lib/example.js', `require("@element-plus/icons-vue");\n${license}`],
+    [
+      'es/example.d.ts',
+      `export type Icon = import('@element-plus/icons-vue').Icon;\n${license}`,
+    ],
+    ['es/example.mjs', 'import(`@element-plus/icons-vue`);'],
+    ['es/example.mjs', 'import("\\u0040element-plus/icons-vue");'],
+  ]) {
+    const rewritten = rewriteBundledWorkspaceReferences(
+      input,
+      fileName,
+      workspaceNames,
+      () => './icons.mjs',
+    )
+    assert.equal(rewritten.replacementCount, 1)
+    assert.deepEqual(
+      findBundledWorkspaceReferences(
+        rewritten.content,
+        fileName,
+        workspaceNames,
+      ),
+      [],
+    )
+    if (input.includes(license)) assert.ok(rewritten.content.endsWith(license))
+  }
+  for (const input of [
+    `import '@element-plus/motion';`,
+    `export * from '@element-plus/motion';`,
+    `require('@element-plus/motion');`,
+    `import('@element-plus/motion');`,
+    `import(\`@element-plus/motion\`);`,
+  ]) {
+    assertThrows(
+      () =>
+        rewriteBundledWorkspaceReferences(
+          input,
+          'dist/index.full.js',
+          workspaceNames,
+          () => {
+            throw new Error('unsupported full-bundle runtime reference')
+          },
+        ),
+      /unsupported full-bundle runtime reference/u,
+      'full-bundle executable workspace reference',
+    )
+  }
+  for (const input of [
+    `import '@element-plus/icons-vue/dist/index.js';`,
+    `const runtime = '@element-plus/motion';`,
+    'import(`@element-plus/motion/${name}`);',
+  ]) {
+    assert.ok(
+      findBundledWorkspaceReferences(input, 'es/example.mjs', workspaceNames)
+        .length > 0,
+    )
+  }
+  assertThrows(
+    () =>
+      findBundledWorkspaceReferences(
+        'import "unterminated',
+        'es/example.mjs',
+        workspaceNames,
+      ),
+    /Unable to inspect workspace references/u,
+    'malformed module workspace audit',
+  )
+
+  for (const dependency of workspaceNames) {
+    for (const specifier of [dependency, `${dependency}/private`]) {
+      const emitted = ts.transpileDeclaration(
+        `/// <reference types="${specifier}" preserve="true" />\nexport interface Contract { value: string }\n`,
+        {
+          fileName: 'workspace-directive.ts',
+          compilerOptions: { declaration: true, emitDeclarationOnly: true },
+        },
+      )
+      assert.deepEqual(emitted.diagnostics, [])
+      const declaration = emitted.outputText
+      const parsed = ts.createSourceFile(
+        'workspace-directive.d.ts',
+        declaration,
+        ts.ScriptTarget.Latest,
+        true,
+      )
+      assert.equal(parsed.typeReferenceDirectives[0]?.fileName, specifier)
+      assert.equal(
+        findBundledWorkspaceReferences(
+          declaration,
+          'es/workspace-directive.d.ts',
+          workspaceNames,
+        ).length,
+        1,
+        'the residual audit must detect the real emitted compiler dependency',
+      )
+      const rewritten = rewriteBundledWorkspaceReferences(
+        declaration,
+        'es/workspace-directive.d.ts',
+        workspaceNames,
+        () => assert.fail('compiler directives must not use runtime mappings'),
+      )
+      assert.equal(rewritten.content, declaration)
+      assert.equal(rewritten.replacementCount, 0)
+      assert.equal(
+        findBundledWorkspaceReferences(
+          rewritten.content,
+          'es/workspace-directive.d.ts',
+          workspaceNames,
+        ).length,
+        1,
+        'an unsupported emitted dependency must remain a failing audit input',
+      )
+    }
+  }
+
+  const mixedJavaScript = ts.transpileModule(
+    `/** @type {import('@element-plus/motion').Value} */\nconst value = import('@element-plus/icons-vue');\n`,
+    {
+      fileName: 'mixed-dependencies.ts',
+      compilerOptions: {
+        module: ts.ModuleKind.ESNext,
+        target: ts.ScriptTarget.ES2022,
+        removeComments: false,
+      },
+    },
+  ).outputText
+  assert.equal(
+    findBundledWorkspaceReferences(
+      mixedJavaScript,
+      'es/mixed.mjs',
+      workspaceNames,
+    ).length,
+    2,
+  )
+  const mixedRewritten = rewriteBundledWorkspaceReferences(
+    mixedJavaScript,
+    'es/mixed.mjs',
+    workspaceNames,
+    (dependency) => {
+      assert.equal(dependency, '@element-plus/icons-vue')
+      return './icons.mjs'
+    },
+  )
+  assert.equal(mixedRewritten.replacementCount, 1)
+  assert.equal(
+    mixedRewritten.content,
+    mixedJavaScript.replace('@element-plus/icons-vue', './icons.mjs'),
+  )
+  const mixedResidual = findBundledWorkspaceReferences(
+    mixedRewritten.content,
+    'es/mixed.mjs',
+    workspaceNames,
+  )
+  assert.equal(mixedResidual.length, 1)
+  assert.equal(mixedResidual[0].dependencyName, '@element-plus/motion')
+  assert.equal(mixedResidual[0].literal, false)
+
   const crossDeviceSource = path.join(tempRoot, 'cross-device-source.tgz')
   const crossDeviceDestination = path.join(
     tempRoot,
@@ -230,7 +417,9 @@ try {
   )
 
   const fileDependencyRoot = path.join(tempRoot, 'file-dependency-package')
-  makePackage(fileDependencyRoot, { dependencies: { local: 'file:../local-pkg' } })
+  makePackage(fileDependencyRoot, {
+    dependencies: { local: 'file:../local-pkg' },
+  })
   assertThrows(
     () =>
       createCandidate({
@@ -244,7 +433,9 @@ try {
   )
 
   const linkDependencyRoot = path.join(tempRoot, 'link-dependency-package')
-  makePackage(linkDependencyRoot, { dependencies: { local: 'link:../local-pkg' } })
+  makePackage(linkDependencyRoot, {
+    dependencies: { local: 'link:../local-pkg' },
+  })
   assertThrows(
     () =>
       createCandidate({

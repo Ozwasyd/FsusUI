@@ -97,10 +97,87 @@ pnpm package:candidate:build
 pnpm package:candidate:verify dist/npm-candidate/fsusui-npm-candidate.tgz
 ```
 
+The package build runs module compilation, declaration generation, and full
+bundle generation in separate, sequential Gulp child processes through their
+original named tasks. Each child uses the normal build entry and heap wrapper;
+its failure stops the package build. Process exit releases compiler heaps and
+caches between these stages without changing their configurations or skipping
+any package checks. Within each full-bundle stage, the entry and every discovered
+locale are built sequentially; both original unminified and minified passes and
+all output formats remain required. The two complete full-bundle variants also
+run in separate, sequential children through the normal entry and heap wrapper,
+releasing each process's compiler state before the next variant begins. A failed
+variant stops the package build.
+
+The preserved ES module producer may fold reads of own string data fields from
+literal frozen exported records only inside real Vue defineComponent setup
+closures in leaf modules without static or dynamic
+dependencies and with acyclic static consumer/importer ancestry, after a prefix of primitive constant declarations or inert function
+and export declarations. Direct cycles, consumer/re-export ancestor cycles and preceding observable evaluation are refused;
+a comma read alone cannot preserve initialization errors through downstream
+minification. Ordinary exported readers remain unchanged because consuming apps
+can introduce cycles outside the library graph. Setup reads remain behind the
+real Vue component construction boundary; real application-cycle controls cover
+both the refused reader and eligible component paths. Public records, descriptors, component metadata, maps and original
+build options remain intact. Mutable records, accessors, spreads, reference
+markers, custom prototypes, shadowed bindings, eval and write targets remain
+untouched. Standard native Object.freeze and Vue unref implementations are
+required. Actual Vite production minification covers the cyclic refusal.
+
+Aggregate installed components name their extra public aliases through independent
+SFC/alias-factory type owners, preventing a value/property reference cycle during
+consumer declaration emission. Their generated declarations also give each
+installed value a matching exported type name. This keeps downstream emission
+from expanding Vue implementation constructors, which can lose generic
+constraints and component type identity. A non-null object intersection retains
+the alias name for these concrete component values; a bare ReturnType alias is
+still expanded by TypeScript. Cold consumers emit and reconsume
+ordinary unannotated ES/CJS aliases using the complete original project
+configuration, checking identity, non-any types, props, slots and install methods.
+
+The declaration-only compiler inputs also name bare SFC re-exports through their
+original component objects. Runtime module inputs remain unchanged. Declaration
+emit omits added Vue generic arguments only when they equal the installed Vue
+declaration's actual default: the component element default and ShallowRef's
+matching setter type. A non-default argument fails instead of weakening its
+contract. The existing Vue 3.5.0 peer floor is retained. Canonical icons use this
+same compiler entry, and artifact fingerprints include the shared producers.
+
+The pinned Vue macro resolver exposes its namespace before async imports finish.
+The producer completes Vue's shared type graph once, through the same locked
+factory/API module graph, before parallel SFC compilation begins. All original
+macro options and plugins remain; concurrent and sequential real FsuTransition
+compilation and complete repeated package builds cover determinism. Final ES full
+bundles also order named bindings within each external import deterministically;
+module declaration order, binding identities, comments, source maps and original
+minifier options remain intact.
+
+Output formats are also written sequentially in their original option order,
+preserving all maps and the returned results' order, count, and object identities.
+A writer failure propagates its original error and stops later formats from
+starting. This is an internal scheduling boundary; it does not recursively limit
+all asynchronous work or guarantee constant memory use.
+
 The tarball must not contain `.env`, `.npmrc`, private tokens, `workspace:`
 protocols, local paths, private registry URLs, source maps, WASM debug output,
 unnecessary tests/fixtures, private screenshots/docs, or large unused files.
 The current audit is under `docs/releases/evidence/npm-public-preview/`.
+
+Bundled workspace reference rewriting and its residual audit inspect code
+literals and compiler dependency directives, retaining generated license comments
+unchanged. Unsupported compiler directives and real workspace references still
+fail preparation; license attribution is not a runtime dependency. The reference
+inspector is bound by the candidate input fingerprint.
+
+Package declarations use the locked Vue declaration compiler over the original
+owned source roots, including the referenced WASM type owners. Install helper
+annotations preserve named component owners, props, slots, aliases and install
+signatures instead of expanding private Vue constructors. These are compiler
+inputs only; runtime sources are not rewritten. The original enum companions and
+canonical icon/WASM declarations remain validated and copied into both formats.
+Bundled declaration references resolve within the package, independently of its
+public subpath allowlist. Missing source types or published type dependencies
+remain real strict-consumer failures.
 
 Verify a fresh consumer install from that tarball:
 
