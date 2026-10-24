@@ -87,6 +87,29 @@ pnpm deps:check
 pnpm test:deps-check
 ```
 
+## Frozen migration evidence
+
+`pnpm deps:baseline:verify` preserves the completed zero-version-change migration
+record from [#405](https://github.com/Ozwasyd/FsusUI/issues/405) through
+[#410](https://github.com/Ozwasyd/FsusUI/issues/410). Its trusted Git checkpoint is
+`f7e0e2d526c43ec4a24f06fe649a38797e1fbd9a`, the last commit that changed
+`migration-baseline.json`. That commit must be available locally and be an
+ancestor of the current `HEAD`; missing history fails closed without fetching
+or choosing another revision.
+
+The current frozen record must remain byte-identical to its regular Git blob at
+that checkpoint. Each of its four recorded SHA-256 digests must match the
+corresponding regular historical Git blob. The verifier rejects altered records,
+missing or unrelated checkpoints, nonregular files, and changed file sets or
+hashes. The CLI has no revision override.
+
+Current dependencies continue to evolve only through `npm-authority.json` and
+its governed projections. Their authority/schema, projection and lock-resolution
+checks remain in `pnpm deps:check` and its negative tests. Frozen installation,
+candidate verification, and consumer checks remain required for the current
+candidate. Historical migration verification neither freezes current versions
+to that checkpoint nor replaces any current dependency or package gate.
+
 ## Renovate ownership
 
 Renovate reads npm versions only from `npm-authority.json`. The custom
