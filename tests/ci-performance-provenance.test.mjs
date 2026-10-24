@@ -116,16 +116,18 @@ const fixture = (t) => {
     )
     const receipt = path.join(directory, `receipt-${invocation++}`)
     const declaredSha = measurement.step.includes(
-      'GITHUB_SHA: ${{ github.event.pull_request.base.sha }}',
+      'FSUS_MEASUREMENT_SHA: ${{ github.event.pull_request.base.sha }}',
     )
       ? baseline
       : current
     const childEnv = {
       ...env,
-      GITHUB_SHA: sha === undefined ? declaredSha : sha,
+      // The runner owns GITHUB_* defaults, including the merge SHA on a PR.
+      GITHUB_SHA: current,
+      FSUS_MEASUREMENT_SHA: sha === undefined ? declaredSha : sha,
       PERF_RECEIPT: receipt,
     }
-    if (sha === null) delete childEnv.GITHUB_SHA
+    if (sha === null) delete childEnv.FSUS_MEASUREMENT_SHA
     const result = spawnSync(
       '/bin/bash',
       [
@@ -171,15 +173,17 @@ test('ABBA steps retain their measurement commands, checkouts, conditions, and o
   )
 })
 
-test('only baseline measurement steps bind GITHUB_SHA to the declared PR base', () => {
+test('measurement expectations use a non-reserved variable with the declared checkout identity', () => {
   for (const { name, checkout, step } of measurements) {
-    if (checkout === 'baseline')
-      assert.match(
-        step,
-        /\n {8}env:\n {10}GITHUB_SHA: \$\{\{ github\.event\.pull_request\.base\.sha \}\}\n/u,
-        name,
-      )
-    else assert.doesNotMatch(step, /\n {8}env:|\n {10}GITHUB_SHA:/u, name)
+    assert.doesNotMatch(step, /\n {10}GITHUB_SHA:/u, name)
+    const expression =
+      checkout === 'baseline'
+        ? 'github.event.pull_request.base.sha'
+        : 'github.sha'
+    assert.ok(
+      step.includes(`FSUS_MEASUREMENT_SHA: \${{ ${expression} }}\n`),
+      name,
+    )
   }
 })
 
@@ -226,6 +230,19 @@ test('real detached base and current checkouts launch with their own identities 
       '--output',
       `../${measurement.output}`,
     ])
+  }
+})
+
+test('baseline child summaries use the verified base despite a runner-owned merge SHA', (t) => {
+  const { baseline, current, run } = fixture(t)
+  assert.notEqual(baseline, current)
+  for (const measurement of measurements.filter(
+    ({ checkout }) => checkout === 'baseline',
+  )) {
+    const result = run(measurement, { head: baseline })
+    assert.equal(result.status, 0, result.stderr)
+    assert.equal(result.receipt?.[0], baseline)
+    assert.notEqual(result.receipt?.[0], current)
   }
 })
 

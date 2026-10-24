@@ -277,40 +277,44 @@ jobs:
         if: steps.baseline-contract.outputs.available == 'true'
         working-directory: baseline
         env:
-          GITHUB_SHA: ${{ github.event.pull_request.base.sha }}
+          FSUS_MEASUREMENT_SHA: ${{ github.event.pull_request.base.sha }}
         run: >-
-          test -n "${GITHUB_SHA:-}" &&
+          test -n "${FSUS_MEASUREMENT_SHA:-}" &&
           measurement_sha="$(git rev-parse HEAD)" &&
-          test "$measurement_sha" = "$GITHUB_SHA" ||
-          { echo "::error::Performance measurement GITHUB_SHA must match checkout HEAD" >&2; exit 1; };
+          test "$measurement_sha" = "$FSUS_MEASUREMENT_SHA" ||
+          { echo "::error::Performance measurement identity must match checkout HEAD" >&2; exit 1; };
 
-          pnpm perf:render --
+          GITHUB_SHA="$measurement_sha" pnpm perf:render --
           --impact-plan ../performance-impact-plan.json
           --profile quick
           --output ../performance-baseline
       - name: Measure current quick matrix
         if: steps.render-impact.outputs.run == 'true'
         working-directory: current
+        env:
+          FSUS_MEASUREMENT_SHA: ${{ github.sha }}
         run: >-
-          test -n "${GITHUB_SHA:-}" &&
+          test -n "${FSUS_MEASUREMENT_SHA:-}" &&
           measurement_sha="$(git rev-parse HEAD)" &&
-          test "$measurement_sha" = "$GITHUB_SHA" ||
-          { echo "::error::Performance measurement GITHUB_SHA must match checkout HEAD" >&2; exit 1; };
+          test "$measurement_sha" = "$FSUS_MEASUREMENT_SHA" ||
+          { echo "::error::Performance measurement identity must match checkout HEAD" >&2; exit 1; };
 
-          pnpm perf:render --
+          GITHUB_SHA="$measurement_sha" pnpm perf:render --
           --impact-plan ../performance-impact-plan.json
           --profile quick
           --output ../performance-current
       - name: Repeat current quick matrix for order balance
         if: steps.baseline-contract.outputs.available == 'true'
         working-directory: current
+        env:
+          FSUS_MEASUREMENT_SHA: ${{ github.sha }}
         run: >-
-          test -n "${GITHUB_SHA:-}" &&
+          test -n "${FSUS_MEASUREMENT_SHA:-}" &&
           measurement_sha="$(git rev-parse HEAD)" &&
-          test "$measurement_sha" = "$GITHUB_SHA" ||
-          { echo "::error::Performance measurement GITHUB_SHA must match checkout HEAD" >&2; exit 1; };
+          test "$measurement_sha" = "$FSUS_MEASUREMENT_SHA" ||
+          { echo "::error::Performance measurement identity must match checkout HEAD" >&2; exit 1; };
 
-          pnpm perf:render --
+          GITHUB_SHA="$measurement_sha" pnpm perf:render --
           --impact-plan ../performance-impact-plan.json
           --profile quick
           --output ../performance-current-repeat
@@ -318,14 +322,14 @@ jobs:
         if: steps.baseline-contract.outputs.available == 'true'
         working-directory: baseline
         env:
-          GITHUB_SHA: ${{ github.event.pull_request.base.sha }}
+          FSUS_MEASUREMENT_SHA: ${{ github.event.pull_request.base.sha }}
         run: >-
-          test -n "${GITHUB_SHA:-}" &&
+          test -n "${FSUS_MEASUREMENT_SHA:-}" &&
           measurement_sha="$(git rev-parse HEAD)" &&
-          test "$measurement_sha" = "$GITHUB_SHA" ||
-          { echo "::error::Performance measurement GITHUB_SHA must match checkout HEAD" >&2; exit 1; };
+          test "$measurement_sha" = "$FSUS_MEASUREMENT_SHA" ||
+          { echo "::error::Performance measurement identity must match checkout HEAD" >&2; exit 1; };
 
-          pnpm perf:render --
+          GITHUB_SHA="$measurement_sha" pnpm perf:render --
           --impact-plan ../performance-impact-plan.json
           --profile quick
           --output ../performance-baseline-repeat
