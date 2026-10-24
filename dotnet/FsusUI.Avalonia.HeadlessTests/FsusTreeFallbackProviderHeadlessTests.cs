@@ -119,13 +119,13 @@ public class FsusTreeFallbackProviderHeadlessTests(ITestOutputHelper output)
     FsusTree, Grid, FsusTreeDefaultLabel> check)
   {
     var manager = FontManager.Current;
-    var originalFace = new Typeface("Noto Sans CJK SC").GlyphTypeface;
-    var replacementFace = new Typeface("Noto Serif CJK SC").GlyphTypeface;
+    var originalFace = new Typeface("avares://FsusUI.Avalonia.HeadlessTests/Assets/TreeFallbackFonts#Noto Sans CJK SC").GlyphTypeface;
+    var replacementFace = new Typeface("avares://FsusUI.Avalonia.HeadlessTests/Assets/TreeFallbackFonts#Noto Serif CJK SC").GlyphTypeface;
     Assert.NotSame(originalFace, replacementFace);
     Assert.True(originalFace.CharacterToGlyphMap.TryGetGlyph('中', out _));
     Assert.True(replacementFace.CharacterToGlyphMap.TryGetGlyph('中', out _));
-    Assert.False(new Typeface("DejaVu Sans").GlyphTypeface.CharacterToGlyphMap.TryGetGlyph('中', out _));
-    var primary = new FallbackCollection(new Typeface("DejaVu Sans").GlyphTypeface,
+    Assert.False(new Typeface("avares://FsusUI.Avalonia.HeadlessTests/Assets/TreeFallbackFonts#DejaVu Sans").GlyphTypeface.CharacterToGlyphMap.TryGetGlyph('中', out _));
+    var primary = new FallbackCollection(new Typeface("avares://FsusUI.Avalonia.HeadlessTests/Assets/TreeFallbackFonts#DejaVu Sans").GlyphTypeface,
       "fonts:fsus-tree-fallback-primary", false);
     manager.AddFontCollection(primary);
     var original = new FallbackCollection(originalFace);
