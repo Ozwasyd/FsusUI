@@ -46,8 +46,10 @@ The built-in renderer derives Mermaid themeVariables, KaTeX error colors, Shiki 
 Shared theme observation starts at mount and remains active while heavy feature
 initialization or a later render is pending. Initialization reads the current
 resolved theme; a theme change invalidates pending output. Unmount removes the
-listener before asynchronous work settles. Settled content with no heavy
-features does not reparse for a theme event.
+listener before asynchronous work settles. Theme invalidation aborts pending
+activation synchronously; superseded or aborted stages cannot emit completion,
+profile or error events. Settled content with no heavy features does not reparse
+for a theme event.
 
 Use `features` to disable an activation:
 

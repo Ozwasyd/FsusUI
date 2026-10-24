@@ -137,7 +137,9 @@ const heavyLifecycle = createMarkdownHeavyFeatureLifecycle({
 const heavyThemeRevision = ref(0)
 let heavyThemeRelevant = false
 const handleHeavyFeatureThemeChange = () => {
-  if (isRendering.value || heavyThemeRelevant) heavyThemeRevision.value += 1
+  if (!isRendering.value && !heavyThemeRelevant) return
+  activationController?.abort()
+  heavyThemeRevision.value += 1
 }
 onMounted(() => {
   document.documentElement.addEventListener(
@@ -1159,6 +1161,8 @@ const activateMountedChunkFeatures = async (
 const performRender = async () => {
   const taskId = ++currentTaskId
   resetFeatureActivation()
+  const signal = activationController?.signal
+  const isCurrentRender = () => taskId === currentTaskId && !signal?.aborted
   commitDurationMs = 0
   rootEl.value?.removeAttribute('data-fsus-markdown-commit-ms')
   const source = normalizeMarkdownSource(props.content)
@@ -1171,7 +1175,7 @@ const performRender = async () => {
     if (strategy === 'chunked-main' || strategy === 'chunked-worker') {
       await renderPipelineRuntime.render()
 
-      if (taskId !== currentTaskId) {
+      if (!isCurrentRender()) {
         return
       }
 
@@ -1222,21 +1226,22 @@ const performRender = async () => {
       await nextTick()
       await settleRenderViewport('markdown-render-settle-initial')
       await afterFrame()
+      if (!isCurrentRender()) return
       if (initialCount < resolvedUnits.length) {
-        if (taskId !== currentTaskId) return
+        if (!isCurrentRender()) return
         await afterFrame()
-        if (taskId !== currentTaskId) return
+        if (!isCurrentRender()) return
         chunkUnits.value = resolvedUnits
         await nextTick()
         await settleRenderViewport('markdown-render-settle-full')
       }
       const initialFeatureActivation = activateMountedChunkFeatures(
         resolvedResult,
-        activationController?.signal,
+        signal,
       )
       observeMountedChunksForActivation()
       await initialFeatureActivation
-      if (taskId !== currentTaskId) return
+      if (!isCurrentRender()) return
       recordCommitDuration(commitStartedAt)
       emit('render-complete', resolvedResult)
       scheduleMeasurementWarmup()
@@ -1245,7 +1250,7 @@ const performRender = async () => {
 
     const result = await renderMarkdownResultWithRuntime(request)
 
-    if (taskId !== currentTaskId) {
+    if (!isCurrentRender()) {
       return
     }
 
@@ -1266,8 +1271,10 @@ const performRender = async () => {
     const resolvedResult = result.value
 
     await commitRenderedContent(resolvedResult.html, true)
+    if (!isCurrentRender()) return
     emit('placeholders-ready', resolvedResult.placeholders, resolvedResult)
-    await activateRenderedFeatures(resolvedResult)
+    await activateRenderedFeatures(resolvedResult, rootEl.value, signal)
+    if (!isCurrentRender()) return
     emit('render-profile', {
       engine: resolvedResult.engine,
       phase: 'full-result',
@@ -1276,21 +1283,23 @@ const performRender = async () => {
     })
     emit('render-complete', resolvedResult)
   } catch (error) {
-    if (taskId !== currentTaskId) {
+    if (!isCurrentRender()) {
       return
     }
 
     const fallback = renderMarkdownFallbackWithRuntime(request)
     await commitRenderedContent(fallback.html, true)
+    if (!isCurrentRender()) return
     emit('placeholders-ready', fallback.placeholders, fallback)
-    await activateRenderedFeatures(fallback)
+    await activateRenderedFeatures(fallback, rootEl.value, signal)
+    if (!isCurrentRender()) return
     emit(
       'render-error',
       toFsusError(error, 'markdown_renderer_render_failed', 'infra'),
     )
     emit('render-complete', fallback)
   } finally {
-    if (taskId === currentTaskId) {
+    if (isCurrentRender()) {
       isRendering.value = false
     }
   }
