@@ -136,6 +136,12 @@ the runner's pnpm store cache; Chromium is installed once. This preserves
 isolation without comparing unrelated hardware or concurrent CPU, GC, renderer,
 and I/O noise.
 
+Before each CI measurement starts, its nonempty `GITHUB_SHA` must equal that
+checkout's actual Git `HEAD`. Both baseline steps bind `GITHUB_SHA` to the PR's
+declared base SHA; both current steps inherit the PR merge SHA. A missing Git
+checkout or a mismatched identity stops the step before the measurement process
+starts, so web and Avalonia summaries identify the source actually measured.
+
 The complete local paired workflow is:
 
 ```bash

@@ -120,3 +120,5 @@ test('quality SDK setup keeps the canonical global.json owner', () => {
   }
   assert.equal(setups, 6)
 })
+
+import './ci-performance-provenance.test.mjs'

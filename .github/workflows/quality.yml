@@ -276,7 +276,14 @@ jobs:
       - name: Measure same-runner baseline first
         if: steps.baseline-contract.outputs.available == 'true'
         working-directory: baseline
+        env:
+          GITHUB_SHA: ${{ github.event.pull_request.base.sha }}
         run: >-
+          test -n "${GITHUB_SHA:-}" &&
+          measurement_sha="$(git rev-parse HEAD)" &&
+          test "$measurement_sha" = "$GITHUB_SHA" ||
+          { echo "::error::Performance measurement GITHUB_SHA must match checkout HEAD" >&2; exit 1; };
+
           pnpm perf:render --
           --impact-plan ../performance-impact-plan.json
           --profile quick
@@ -285,6 +292,11 @@ jobs:
         if: steps.render-impact.outputs.run == 'true'
         working-directory: current
         run: >-
+          test -n "${GITHUB_SHA:-}" &&
+          measurement_sha="$(git rev-parse HEAD)" &&
+          test "$measurement_sha" = "$GITHUB_SHA" ||
+          { echo "::error::Performance measurement GITHUB_SHA must match checkout HEAD" >&2; exit 1; };
+
           pnpm perf:render --
           --impact-plan ../performance-impact-plan.json
           --profile quick
@@ -293,6 +305,11 @@ jobs:
         if: steps.baseline-contract.outputs.available == 'true'
         working-directory: current
         run: >-
+          test -n "${GITHUB_SHA:-}" &&
+          measurement_sha="$(git rev-parse HEAD)" &&
+          test "$measurement_sha" = "$GITHUB_SHA" ||
+          { echo "::error::Performance measurement GITHUB_SHA must match checkout HEAD" >&2; exit 1; };
+
           pnpm perf:render --
           --impact-plan ../performance-impact-plan.json
           --profile quick
@@ -300,7 +317,14 @@ jobs:
       - name: Repeat baseline quick matrix last for order balance
         if: steps.baseline-contract.outputs.available == 'true'
         working-directory: baseline
+        env:
+          GITHUB_SHA: ${{ github.event.pull_request.base.sha }}
         run: >-
+          test -n "${GITHUB_SHA:-}" &&
+          measurement_sha="$(git rev-parse HEAD)" &&
+          test "$measurement_sha" = "$GITHUB_SHA" ||
+          { echo "::error::Performance measurement GITHUB_SHA must match checkout HEAD" >&2; exit 1; };
+
           pnpm perf:render --
           --impact-plan ../performance-impact-plan.json
           --profile quick
