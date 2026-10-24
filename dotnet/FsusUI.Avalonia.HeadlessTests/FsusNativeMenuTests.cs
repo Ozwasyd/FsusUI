@@ -11,8 +11,14 @@ namespace FsusUI.Avalonia.HeadlessTests;
 
 public class FsusNativeMenuTests
 {
-  [AvaloniaFact]
-  public void SameCommandModelUsableByCommandPaletteAndNativeMenu()
+  [AvaloniaTheory]
+  [InlineData(FsusShortcutPlatform.Windows, "Ctrl+S", KeyModifiers.Control)]
+  [InlineData(FsusShortcutPlatform.Linux, "Ctrl+S", KeyModifiers.Control)]
+  [InlineData(FsusShortcutPlatform.macOS, "Command+S", KeyModifiers.Meta)]
+  public void SameCommandModelUsableByCommandPaletteAndNativeMenu(
+    FsusShortcutPlatform platform,
+    string displayShortcut,
+    KeyModifiers nativePrimaryModifier)
   {
     var saveCommand = new FsusPlatformCommand("file.save", "Save Document", FsusPlatformRole.FileSave)
     {
@@ -37,7 +43,7 @@ public class FsusNativeMenuTests
       FsusNativeMenuItemModel.Action(exportCommand));
 
     using var builder = new FsusNativeMenuBuilder();
-    var nativeMenu = builder.Build([fileMenuModel], FsusShortcutPlatform.Windows);
+    var nativeMenu = builder.Build([fileMenuModel], platform);
 
     Assert.NotNull(nativeMenu);
     var rootFile = Assert.IsType<NativeMenuItem>(Assert.Single(nativeMenu.Items, i => i is NativeMenuItem m && m.Header == "File"));
@@ -46,15 +52,22 @@ public class FsusNativeMenuTests
     Assert.Equal("Save Document", saveItem.Header);
     Assert.NotNull(saveItem.Gesture);
     Assert.Equal(Key.S, saveItem.Gesture.Key);
+    Assert.Equal(nativePrimaryModifier, saveItem.Gesture.KeyModifiers);
+    Assert.True(saveItem.Gesture.Matches(new KeyEventArgs
+    {
+      Key = Key.S,
+      KeyModifiers = nativePrimaryModifier,
+    }));
+    Assert.Equal("Ctrl+S", saveCommand.Gesture!.SerializedText);
 
     // 2. Used by Command Palette
     var palette = new FsusCommandPaletteModel(commands);
-    var searchResults = palette.Search("save");
+    var searchResults = palette.Search("save", platform);
     Assert.Single(searchResults);
     Assert.Equal("file.save", searchResults[0].CommandId);
     Assert.Equal("Save Document", searchResults[0].Label);
     Assert.Equal("File", searchResults[0].Category);
-    Assert.Equal("Ctrl+S", searchResults[0].DisplayShortcut);
+    Assert.Equal(displayShortcut, searchResults[0].DisplayShortcut);
     Assert.True(searchResults[0].IsEnabled);
 
     // Execute via palette
@@ -62,6 +75,23 @@ public class FsusNativeMenuTests
     saveCommand.ExecuteAction = _ => executed = true;
     searchResults[0].Execute();
     Assert.True(executed);
+  }
+
+  [AvaloniaFact]
+  public void DefaultPaletteSearchUsesHostPlatformAfterExplicitSearches()
+  {
+    var gesture = new FsusShortcutGesture(Key.S, KeyModifiers.Control);
+    var command = new FsusPlatformCommand("file.save", "Save") { Gesture = gesture };
+    var palette = new FsusCommandPaletteModel([command]);
+
+    Assert.Equal("Ctrl+S", Assert.Single(palette.Search(platform: FsusShortcutPlatform.Windows)).DisplayShortcut);
+    Assert.Equal("Command+S", Assert.Single(palette.Search(platform: FsusShortcutPlatform.macOS)).DisplayShortcut);
+    Assert.Equal(
+      OperatingSystem.IsMacOS() ? "Command+S" : "Ctrl+S",
+      Assert.Single(palette.Search()).DisplayShortcut);
+    Assert.Same(gesture, command.Gesture);
+    Assert.Equal("Ctrl+S", gesture.SerializedText);
+    Assert.Equal(KeyModifiers.Control, gesture.ToKeyGesture().KeyModifiers);
   }
 
   [AvaloniaFact]
@@ -106,8 +136,13 @@ public class FsusNativeMenuTests
     Assert.False(exportMenuItem.IsEnabled);
   }
 
-  [AvaloniaFact]
-  public void CustomShortcutUpdateImmediatelyRefreshesNativeMenuAccelerator()
+  [AvaloniaTheory]
+  [InlineData(FsusShortcutPlatform.Windows)]
+  [InlineData(FsusShortcutPlatform.Linux)]
+  [InlineData(FsusShortcutPlatform.macOS)]
+  [InlineData(FsusShortcutPlatform.Auto)]
+  public void CustomShortcutUpdateImmediatelyRefreshesNativeMenuAccelerator(
+    FsusShortcutPlatform platform)
   {
     var command = new FsusPlatformCommand("file.save", "Save", FsusPlatformRole.FileSave)
     {
@@ -116,23 +151,95 @@ public class FsusNativeMenuTests
 
     var fileMenu = FsusNativeMenuItemModel.SubMenu("File", FsusNativeMenuItemModel.Action(command));
     using var builder = new FsusNativeMenuBuilder();
-    var menu = builder.Build([fileMenu], FsusShortcutPlatform.Windows);
+    var menu = builder.Build([fileMenu], platform);
 
     var fileItem = (NativeMenuItem)menu.Items.First(i => i is NativeMenuItem m && m.Header == "File");
     var saveItem = (NativeMenuItem)fileItem.Menu!.Items.First(i => i is NativeMenuItem m && m.Header == "Save");
 
     Assert.NotNull(saveItem.Gesture);
     Assert.Equal(Key.S, saveItem.Gesture.Key);
-    Assert.True(saveItem.Gesture.KeyModifiers.HasFlag(KeyModifiers.Control));
+    var isMac = platform == FsusShortcutPlatform.macOS ||
+      (platform == FsusShortcutPlatform.Auto && OperatingSystem.IsMacOS());
+    var nativePrimary = isMac ? KeyModifiers.Meta : KeyModifiers.Control;
+    var otherPrimary = isMac ? KeyModifiers.Control : KeyModifiers.Meta;
+    Assert.Equal(nativePrimary, saveItem.Gesture.KeyModifiers);
+    Assert.True(saveItem.Gesture.Matches(new KeyEventArgs
+    {
+      Key = Key.S,
+      KeyModifiers = nativePrimary,
+    }));
+    Assert.False(saveItem.Gesture.Matches(new KeyEventArgs
+    {
+      Key = Key.S,
+      KeyModifiers = otherPrimary,
+    }));
 
-    // User updates shortcut to Ctrl+Shift+S
-    command.Gesture = new FsusShortcutGesture(Key.S, KeyModifiers.Control | KeyModifiers.Shift);
+    // Neutral primary intent stays Ctrl in storage, including after an update.
+    var updated = new FsusShortcutGesture(
+      Key.K,
+      KeyModifiers.Control | KeyModifiers.Alt | KeyModifiers.Shift);
+    command.Gesture = updated;
 
     // Immediately refreshed accelerator!
     Assert.NotNull(saveItem.Gesture);
-    Assert.Equal(Key.S, saveItem.Gesture.Key);
-    Assert.True(saveItem.Gesture.KeyModifiers.HasFlag(KeyModifiers.Control));
-    Assert.True(saveItem.Gesture.KeyModifiers.HasFlag(KeyModifiers.Shift));
+    Assert.Equal(Key.K, saveItem.Gesture.Key);
+    Assert.Equal(
+      nativePrimary | KeyModifiers.Alt | KeyModifiers.Shift,
+      saveItem.Gesture.KeyModifiers);
+    Assert.True(saveItem.Gesture.Matches(new KeyEventArgs
+    {
+      Key = Key.K,
+      KeyModifiers = nativePrimary | KeyModifiers.Alt | KeyModifiers.Shift,
+    }));
+    Assert.False(saveItem.Gesture.Matches(new KeyEventArgs
+    {
+      Key = Key.K,
+      KeyModifiers = otherPrimary | KeyModifiers.Alt | KeyModifiers.Shift,
+    }));
+    Assert.Same(updated, command.Gesture);
+    Assert.Equal("Ctrl+Alt+Shift+K", updated.SerializedText);
+
+    // Explicit Meta and non-primary modifiers are not rewritten on other platforms.
+    command.Gesture = new FsusShortcutGesture(Key.P, KeyModifiers.Meta | KeyModifiers.Shift);
+    Assert.Equal(KeyModifiers.Meta | KeyModifiers.Shift, saveItem.Gesture.KeyModifiers);
+    command.Gesture = new FsusShortcutGesture(Key.P, KeyModifiers.Alt);
+    Assert.Equal(KeyModifiers.Alt, saveItem.Gesture.KeyModifiers);
+    command.Gesture = null;
+    Assert.Null(saveItem.Gesture);
+  }
+
+  [AvaloniaFact]
+  public void DockPrimaryAcceleratorUsesCommandWithoutMutatingSharedGesture()
+  {
+    var gesture = new FsusShortcutGesture(Key.S, KeyModifiers.Control | KeyModifiers.Shift);
+    var executed = false;
+    var command = new FsusPlatformCommand("file.save", "Save")
+    {
+      Gesture = gesture,
+      ExecuteAction = _ => executed = true,
+    };
+    var menu = FsusDockMenuContract.BuildDockMenu(
+      [],
+      additionalCommands: [command],
+      platform: FsusShortcutPlatform.macOS);
+    Assert.NotNull(menu);
+    var item = Assert.IsType<NativeMenuItem>(Assert.Single(menu.Items));
+    Assert.NotNull(item.Gesture);
+    Assert.True(item.Gesture.Matches(new KeyEventArgs
+    {
+      Key = Key.S,
+      KeyModifiers = KeyModifiers.Meta | KeyModifiers.Shift,
+    }));
+    Assert.False(item.Gesture.Matches(new KeyEventArgs
+    {
+      Key = Key.S,
+      KeyModifiers = KeyModifiers.Control | KeyModifiers.Shift,
+    }));
+    Assert.Same(gesture, command.Gesture);
+    Assert.Equal("Ctrl+Shift+S", gesture.SerializedText);
+    Assert.Equal("Command+Shift+S", gesture.ToDisplayText(FsusShortcutPlatform.macOS));
+    item.Command!.Execute(null);
+    Assert.True(executed);
   }
 
   [AvaloniaFact]

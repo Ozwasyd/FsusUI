@@ -46,6 +46,20 @@ public sealed class FsusShortcutGesture : IEquatable<FsusShortcutGesture>
 
   public KeyGesture ToKeyGesture() => new(Key, Modifiers);
 
+  internal KeyGesture ToNativeMenuKeyGesture(FsusShortcutPlatform platform)
+  {
+    var modifiers = Modifiers;
+    // Control stores platform-neutral primary intent; Avalonia's native menu
+    // exporter treats Control as physical Control and Meta as Command on macOS.
+    if (ResolvePlatform(platform) == FsusShortcutPlatform.macOS &&
+        modifiers.HasFlag(KeyModifiers.Control))
+    {
+      modifiers = (modifiers & ~KeyModifiers.Control) | KeyModifiers.Meta;
+    }
+
+    return new KeyGesture(Key, modifiers);
+  }
+
   public static FsusShortcutGesture FromKeyGesture(KeyGesture gesture)
   {
     ArgumentNullException.ThrowIfNull(gesture);
