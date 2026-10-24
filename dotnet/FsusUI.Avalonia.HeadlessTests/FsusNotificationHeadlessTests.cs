@@ -17,6 +17,7 @@ using Avalonia.VisualTree;
 using FsusUI.Avalonia.Controls;
 using FsusUI.Avalonia.Overlay;
 using FsusUI.Avalonia.Themes;
+using System.Diagnostics;
 using System.Windows.Input;
 
 namespace FsusUI.Avalonia.HeadlessTests;
@@ -405,9 +406,12 @@ public class FsusNotificationHeadlessTests
     Dispatcher.UIThread.RunJobs();
     Assert.False(handle.IsClosed);
     Assert.False(notification.IsPointerOver);
+    var exitPause = Stopwatch.StartNew();
     await Task.Delay(75);
     Dispatcher.UIThread.RunJobs();
-    Assert.False(handle.IsClosed);
+    Assert.False(
+      handle.IsClosed,
+      $"Exit pause observation: elapsed={exitPause.Elapsed.TotalMilliseconds:F1} ms, Duration={notification.Duration.TotalMilliseconds:F1} ms.");
 
     await Task.Delay(200);
     Dispatcher.UIThread.RunJobs();
