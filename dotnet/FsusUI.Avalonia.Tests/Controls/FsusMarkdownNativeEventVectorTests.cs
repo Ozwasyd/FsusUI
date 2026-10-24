@@ -1,4 +1,3 @@
-using System.Runtime.CompilerServices;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using FsusUI.Avalonia.Controls;
@@ -14,6 +13,16 @@ namespace FsusUI.Avalonia.Tests.Controls;
 /// </summary>
 public class FsusMarkdownNativeEventVectorTests
 {
+  [Fact]
+  public void FixtureRootIgnoresCompilerMappedSourcePaths()
+  {
+#line 1 "/_/fsusui-native-fixture-root-control.cs"
+    var repositoryRoot = RepositoryRoot();
+#line default
+    Assert.True(File.Exists(Path.Combine(repositoryRoot, "pnpm-workspace.yaml")));
+    Assert.True(File.Exists(Path.Combine(repositoryRoot, "dotnet", "FsusUI.Avalonia.slnx")));
+  }
+
   [Theory]
   [MemberData(nameof(CompositionVectors))]
   public void ProducesTheFrozenPlansAndTrace(string id, JsonNode vector)
@@ -199,9 +208,9 @@ public class FsusMarkdownNativeEventVectorTests
     return trace;
   }
 
-  private static string RepositoryRoot([CallerFilePath] string sourceFile = "")
+  private static string RepositoryRoot()
   {
-    var directory = new DirectoryInfo(Path.GetDirectoryName(sourceFile) ?? string.Empty);
+    var directory = new DirectoryInfo(AppContext.BaseDirectory);
     while (directory is not null)
     {
       if (File.Exists(Path.Combine(directory.FullName, "dotnet", "FsusUI.Avalonia.slnx")))

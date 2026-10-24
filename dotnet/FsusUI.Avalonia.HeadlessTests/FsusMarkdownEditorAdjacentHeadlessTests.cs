@@ -1,4 +1,3 @@
-using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
 using Avalonia;
 using Avalonia.Controls;
@@ -16,6 +15,16 @@ namespace FsusUI.Avalonia.HeadlessTests;
 
 public class FsusMarkdownEditorAdjacentHeadlessTests
 {
+  [Fact]
+  public void FixtureRootIgnoresCompilerMappedSourcePaths()
+  {
+#line 1 "/_/fsusui-native-fixture-root-control.cs"
+    var repositoryRoot = FindRepositoryRoot();
+#line default
+    Assert.True(File.Exists(Path.Combine(repositoryRoot, "pnpm-workspace.yaml")));
+    Assert.True(File.Exists(Path.Combine(repositoryRoot, "dotnet", "FsusUI.Avalonia.slnx")));
+  }
+
   [AvaloniaTheory]
   [InlineData(FsusThemeVariant.Light)]
   [InlineData(FsusThemeVariant.Dark)]
@@ -182,9 +191,9 @@ public class FsusMarkdownEditorAdjacentHeadlessTests
     Dispatcher.UIThread.RunJobs();
   }
 
-  private static string FindRepositoryRoot([CallerFilePath] string sourceFile = "")
+  private static string FindRepositoryRoot()
   {
-    for (var directory = new DirectoryInfo(Path.GetDirectoryName(sourceFile)!);
+    for (var directory = new DirectoryInfo(AppContext.BaseDirectory);
       directory is not null;
       directory = directory.Parent)
     {
