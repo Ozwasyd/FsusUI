@@ -15,7 +15,7 @@
     },
     "avalonia": {
       "path": "spec/avalonia/semantic/FsusUI.Avalonia.semantic.json",
-      "hash": "d88e36d9940ac39f190304cdaead751a59128e42b7b4823607737faa611515c2",
+      "hash": "e74195bbe6b641e8f94beddb80276fe508050b2955d07610c02131458ddf8fcc",
       "packageId": "FsusUI.Avalonia"
     },
     "avaloniaThemes": {
@@ -1759,7 +1759,7 @@
         "surfaceHash": "dfbf9e5fd0db4de21cc2158fb28fd2b64fc0cb82d80075497762527094dc2591",
         "stateContractFingerprint": "baed4b385e29c1bcac6834ab2a083e13a90b853d03bac0277c7f8d7f6e8954b1",
         "automationContractFingerprint": "77c92ad184d419a49cf51f8a99733f96ef63eef17566337eb3544bfa369ffbe3",
-        "tokenThemeContractFingerprint": "6367c5074eb3c510705d0bf0955db3765d3d62d67c3e6c88c48d9727039b5f4e"
+        "tokenThemeContractFingerprint": "bc55d500da4640bf961a34077d700ab80ba46e5f4a25bd9631243be9fce79985"
       },
       "basis": "name-equality"
     },
@@ -138209,9 +138209,9 @@
             ]
           },
           "tokenThemeContract": {
-            "fingerprint": "6367c5074eb3c510705d0bf0955db3765d3d62d67c3e6c88c48d9727039b5f4e",
-            "dependencyCount": 12,
-            "resolvedCount": 10,
+            "fingerprint": "bc55d500da4640bf961a34077d700ab80ba46e5f4a25bd9631243be9fce79985",
+            "dependencyCount": 11,
+            "resolvedCount": 9,
             "contractDeclared": false,
             "renderedEvidenceVerified": false,
             "baselines": [
@@ -189231,11 +189231,11 @@
   "tokenThemeBaselines": {
     "avalonia": {
       "baseline": "spec/avalonia/semantic/FsusUI.Avalonia.semantic.json",
-      "fingerprint": "0454285de60e0c5849bef4828f0afd79d036bd7918cc2cc5d865167f6aadb125",
+      "fingerprint": "6267a1380301039588f7d5d2962d52826c8db19d516d336cb362114b153f644e",
       "definitionCount": 124,
-      "dependencyCount": 26,
-      "resolvedCount": 26,
-      "ownerBoundCount": 22,
+      "dependencyCount": 25,
+      "resolvedCount": 25,
+      "ownerBoundCount": 21,
       "contractDeclared": false,
       "renderedEvidenceVerified": false
     },
