@@ -1,3 +1,4 @@
+/// <reference path="./style-modules.d.ts" />
 import type { vShow } from 'vue'
 import type { INSTALLED_KEY } from '@element-plus/constants'
 
@@ -129,13 +130,6 @@ declare module '*.vue' {
   >
   export default component
 }
-
-declare module '*.css' {}
-
-// theme-chalk side-effect style imports
-declare module '@element-plus/theme-chalk/*.css' {}
-declare module '@element-plus/theme-chalk/src/*.scss' {}
-declare module '@element-plus/theme-chalk/src/**/*.scss' {}
 
 declare module '*.mjs' {
   const mod: any

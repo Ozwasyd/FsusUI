@@ -906,6 +906,141 @@ export const buildArtifacts = (root, options = {}) => {
   }
 }
 
+const generationInputPaths = new Set([
+  'package.json',
+  'pnpm-lock.yaml',
+  'pnpm-workspace.yaml',
+  'spec/baselines/vue-public-api-classifications.json',
+  'spec/components/contracts/v2/semantic-member-bindings.json',
+  'spec/tokens/tokens.json',
+  'spec/icons/registry.yaml',
+  'spec/icons/categories.yaml',
+])
+const isVueGenerationInput = (file) =>
+  (file.startsWith('vue/packages/') &&
+    !file.startsWith('vue/packages/demo-app/') &&
+    !file.startsWith('vue/packages/wasm/build/') &&
+    /\.(?:[cm]?js|tsx?|vue|json|scss|css|ya?ml)$/u.test(file)) ||
+  /^vue\/[^/]+\.(?:json|ts)$/u.test(file) ||
+  /^vue\/typings\/.*\.ts$/u.test(file)
+
+// Cover the actual parser inputs, including TSX, aggregate exports, styles,
+// optional authorities and local producer modules, not only inputTreeHash's
+// legacy subset. Missing files matter too: additions/deletions must rebind.
+const generationInputSnapshot = (root) => {
+  const paths = new Set(generationInputPaths)
+  for (const file of walkFiles(path.join(root, 'vue'))) {
+    const relative = toPosix(path.relative(root, file))
+    if (isVueGenerationInput(relative)) paths.add(relative)
+  }
+  const modules = ['scripts/avalonia-vue-public-api-baseline.mjs']
+  while (modules.length) {
+    const relative = modules.pop()
+    if (paths.has(relative)) continue
+    paths.add(relative)
+    const file = path.join(root, relative)
+    if (!exists(file)) continue
+    for (const match of read(file).matchAll(
+      /(?:from\s*|import\s*(?:\(\s*)?)['"](\.[^'"]+)['"]/gu,
+    )) {
+      const dependency = toPosix(
+        path.relative(root, path.resolve(path.dirname(file), match[1])),
+      )
+      if (dependency.startsWith('../') || path.isAbsolute(dependency))
+        throw new Error('baseline generation module is outside the input tree')
+      modules.push(dependency)
+    }
+  }
+  const format = execFileSync('git', ['rev-parse', '--show-object-format'], {
+    cwd: root,
+    encoding: 'utf8',
+  }).trim()
+  return new Map(
+    [...paths].map((relative) => {
+      const file = path.join(root, relative)
+      if (!exists(file)) return [relative, null]
+      if (!fs.lstatSync(file).isFile())
+        throw new Error(
+          `baseline generation input is not a regular file: ${relative}`,
+        )
+      const content = fs.readFileSync(file)
+      return [
+        relative,
+        crypto
+          .createHash(format)
+          .update(`blob ${content.length}\0`)
+          .update(content)
+          .digest('hex'),
+      ]
+    }),
+  )
+}
+const generationInputsMatchRevision = (root, revision, snapshot) => {
+  const tree = execFileSync('git', ['ls-tree', '-rz', revision], {
+    cwd: root,
+    encoding: 'utf8',
+    maxBuffer: 16 * 1024 * 1024,
+  })
+  const blobs = new Map()
+  for (const entry of tree.split('\0').filter(Boolean)) {
+    const [metadata, file] = entry.split('\t')
+    const [mode, type, blob] = metadata.split(' ')
+    if (
+      snapshot.has(file) ||
+      isVueGenerationInput(file) ||
+      generationInputPaths.has(file)
+    )
+      blobs.set(file, type === 'blob' && mode !== '120000' ? blob : undefined)
+  }
+  return [...new Set([...snapshot.keys(), ...blobs.keys()])].every(
+    (file) =>
+      (snapshot.get(file) ?? null) ===
+      (blobs.has(file) ? blobs.get(file) : null),
+  )
+}
+
+// An ancestor label and self-consistent JSON do not prove input provenance.
+// Both the current capture and any retained revision must match real Git blobs.
+export const buildWriteArtifacts = (root) => {
+  const head = getGitSha(root)
+  const snapshot = generationInputSnapshot(root)
+  if (!generationInputsMatchRevision(root, head, snapshot))
+    throw new Error(
+      'baseline generation input is uncommitted or does not match HEAD',
+    )
+  const verified = (artifacts) => {
+    if (
+      getGitSha(root) !== head ||
+      !generationInputsMatchRevision(root, head, generationInputSnapshot(root))
+    )
+      throw new Error('baseline generation input changed while rebuilding')
+    return artifacts
+  }
+  const baselineFile = path.join(root, 'spec/baselines/vue-current.json')
+  if (exists(baselineFile)) {
+    const previous = parseJson(baselineFile)
+    const revision = previous.source?.commitSha
+    let ancestor = false
+    if (/^[a-f0-9]{40}$/u.test(revision ?? '')) {
+      try {
+        execFileSync('git', ['merge-base', '--is-ancestor', revision, 'HEAD'], {
+          cwd: root,
+          stdio: 'ignore',
+        })
+        ancestor = true
+      } catch {
+        // Missing or unrelated provenance must bind to the current inputs.
+      }
+    }
+    if (ancestor && generationInputsMatchRevision(root, revision, snapshot)) {
+      const artifacts = buildArtifacts(root, { commitShaOverride: revision })
+      if (stableJson(artifacts.baseline) === stableJson(previous))
+        return verified(artifacts)
+    }
+  }
+  return verified(buildArtifacts(root, { commitShaOverride: head }))
+}
+
 const renderReport = (baseline) => {
   const rows = baseline.components
     .map(
@@ -1082,9 +1217,11 @@ const main = async () => {
   )
   const existingBaseline =
     checkMode && exists(baselineFile) ? parseJson(baselineFile) : undefined
-  const { baseline, report } = buildArtifacts(defaultRoot, {
-    commitShaOverride: existingBaseline?.source?.commitSha,
-  })
+  const { baseline, report } = writeMode
+    ? buildWriteArtifacts(defaultRoot)
+    : buildArtifacts(defaultRoot, {
+        commitShaOverride: existingBaseline?.source?.commitSha,
+      })
 
   const nextBaseline = await formatGenerated(baselineFile, stableJson(baseline))
   const nextReport = await formatGenerated(reportFile, report)

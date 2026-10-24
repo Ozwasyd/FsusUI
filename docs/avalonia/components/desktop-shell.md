@@ -61,7 +61,19 @@ After a selected document closes, the tab at the same index is selected; when
 that was the last document, the previous adjacent tab is selected.
 
 Pointer drag calls `ReorderDocument` and raises typed `Reordered` arguments with
-the old/new indexes and source. The horizontally scrollable header reveals the
+the old/new indexes and source. Reordering preserves the active document and
+the focused document header, including its keyboard or pointer focus origin and
+corresponding visible focus indication; moving another header does not take focus
+or change that indication.
+A mounted reordered header refreshes its generated presenter children before
+focus restoration, so queued layout uses the current header after reinsertion.
+The selected document body retains its `Content` identity across template or
+theme replacement. The outgoing selected-content presenter retires its template
+before releasing its visual child, including when the template can recycle a
+view for null content. The document's own `ContentTemplate` remains available to
+the replacement presenter and on remount; the document header does not present
+the body.
+The horizontally scrollable header reveals the
 selected tab; `CanScrollBackward`, `CanScrollForward`, `ScrollHeaders`, and the
 header extent/viewport/offset properties expose overflow without product
 state. Right-click and Shift+F10/Apps raise `DocumentContextRequested` with the

@@ -10,6 +10,10 @@ import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { registryUrl, resolvePackageContract } from './npm-package-contract.mjs'
 import {
+  findBundledWorkspaceReferences,
+  rewriteBundledWorkspaceReferences,
+} from './bundled-workspace-references.mjs'
+import {
   loadAuthority,
   applyPublishedExternalFields,
 } from './npm-authority-lib.mjs'
@@ -44,7 +48,7 @@ const bundledWorkspaceRuntimeEntries = new Map([
     {
       es: 'es/icons-vue/src/index.mjs',
       lib: 'lib/icons-vue/src/index.js',
-      types: 'es/icons-vue',
+      types: 'es/icons-vue/src/index',
     },
   ],
   [
@@ -52,7 +56,7 @@ const bundledWorkspaceRuntimeEntries = new Map([
     {
       es: 'es/motion/index.mjs',
       lib: 'lib/motion/index.js',
-      types: 'es/motion',
+      types: 'es/motion/index',
     },
   ],
 ])
@@ -831,26 +835,20 @@ function rewriteBundledWorkspaceDependencyReferences(rootDir, packageName) {
     if (!existsSync(filePath)) continue
 
     const original = readFileSync(filePath, 'utf8')
-    let rewritten = original
-
-    for (const dependencyName of bundledWorkspaceDependencyNames) {
-      if (!rewritten.includes(dependencyName)) continue
-
-      const replacement = resolveBundledWorkspaceRuntimeSpecifier(
-        rootDir,
-        filePath,
-        packageName,
-        dependencyName,
-      )
-      const pattern = new RegExp(
-        `(['"])${dependencyName.replace('/', '\\/')}\\1`,
-        'g',
-      )
-      rewritten = rewritten.replace(pattern, (_match, quote) => {
-        replacementCount += 1
-        return `${quote}${replacement}${quote}`
-      })
-    }
+    const result = rewriteBundledWorkspaceReferences(
+      original,
+      path.relative(rootDir, filePath),
+      bundledWorkspaceDependencyNames,
+      (dependencyName) =>
+        resolveBundledWorkspaceRuntimeSpecifier(
+          rootDir,
+          filePath,
+          packageName,
+          dependencyName,
+        ),
+    )
+    const rewritten = result.content
+    replacementCount += result.replacementCount
 
     if (rewritten !== original) {
       writeFileSync(filePath, rewritten)
@@ -884,10 +882,14 @@ function assertNoBundledWorkspaceDependencyReferences(packageJson, rootDir) {
   const contentLeaks = []
   for (const filePath of collectSelfReferenceCandidates(rootDir)) {
     const content = readFileSync(filePath, 'utf8')
-    for (const dependencyName of bundledWorkspaceDependencyNames) {
-      if (content.includes(dependencyName)) {
-        contentLeaks.push(path.relative(rootDir, filePath))
-      }
+    if (
+      findBundledWorkspaceReferences(
+        content,
+        path.relative(rootDir, filePath),
+        bundledWorkspaceDependencyNames,
+      ).length > 0
+    ) {
+      contentLeaks.push(path.relative(rootDir, filePath))
     }
   }
 

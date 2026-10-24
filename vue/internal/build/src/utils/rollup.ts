@@ -1,6 +1,6 @@
 import { epPackage, getPackageDependencies } from '@element-plus/build-utils'
 
-import type { OutputOptions, RollupBuild } from 'rollup'
+export { writeBundles } from './output-writes'
 
 type RollupWarning = {
   code?: string
@@ -84,10 +84,6 @@ export const generateExternal = async (options: { full: boolean }) => {
       (pkg) => id === pkg || id.startsWith(`${pkg}/`),
     )
   }
-}
-
-export function writeBundles(bundle: RollupBuild, options: OutputOptions[]) {
-  return Promise.all(options.map((option) => bundle.write(option)))
 }
 
 export function formatBundleFilename(

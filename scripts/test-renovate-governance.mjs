@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 import assert from 'node:assert/strict'
+import { execFileSync } from 'node:child_process'
 import { createRequire } from 'node:module'
 import { readFileSync } from 'node:fs'
 import path from 'node:path'
@@ -182,6 +183,15 @@ for (const candidate of fixture.negative) {
     `${candidate.manager} must reject the negative fixture`,
   )
 }
+
+execFileSync(
+  process.execPath,
+  [
+    '--test',
+    path.join(root, 'scripts/update-surface-source-discovery.test.mjs'),
+  ],
+  { cwd: root, stdio: 'inherit' },
+)
 
 console.log(
   `Renovate governance mutation contract passed: mutations=${mutations.length} positive=${fixture.positive.length} negative=${fixture.negative.length}.`,

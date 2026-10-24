@@ -25,6 +25,8 @@ public static class TestAppBuilder
       {
         UseHeadlessDrawing = false,
       })
+      .WithInterFont()
+      .With(CreateFontManagerOptions())
       .ConfigureFonts(fontManager =>
       {
         if (Environment.GetEnvironmentVariable("FSUS_HEADLESS_GSANS") == "1")
@@ -32,6 +34,33 @@ public static class TestAppBuilder
           fontManager.AddFontCollection(new GoogleSansFontCollection().Collection);
         }
       });
+
+  private static FontManagerOptions CreateFontManagerOptions()
+  {
+    var mappings = new Dictionary<string, FontFamily>
+    {
+      ["Inter"] = new FontFamily("fonts:Inter#Inter"),
+    };
+    if (Environment.GetEnvironmentVariable("FSUS_HEADLESS_GSANS") == "1")
+    {
+      // The bundled Google Sans assets declare this optical family name.
+      mappings["Google Sans"] =
+        new FontFamily("fonts:GoogleSans?family=Google%20Sans#Google Sans 18pt");
+    }
+    if (OperatingSystem.IsLinux())
+    {
+      using var monospace = SKFontManager.Default.MatchFamily("monospace");
+      if (monospace is { IsFixedPitch: true })
+      {
+        // Avalonia 12's system collection looks up the requested family after
+        // native alias matching. Use the native-selected name for this alias.
+        var family = new FontFamily(monospace.FamilyName);
+        mappings["monospace"] = family;
+      }
+    }
+
+    return new FontManagerOptions { FontFamilyMappings = mappings };
+  }
 }
 
 /// <summary>

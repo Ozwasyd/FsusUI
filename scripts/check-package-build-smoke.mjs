@@ -8,6 +8,7 @@ import {
 import { Buffer } from 'node:buffer'
 import { createHash } from 'node:crypto'
 import path from 'node:path'
+import ts from 'typescript'
 import { fileURLToPath } from 'node:url'
 import { registryUrl, resolvePackageContract } from './npm-package-contract.mjs'
 
@@ -41,6 +42,49 @@ function assert(condition, message) {
   if (!condition) {
     throw new Error(message)
   }
+}
+
+let declarationChecker
+let declarationProgram
+function exposesDeclaration(filePath, name) {
+  if (!declarationProgram) {
+    const configPath = path.join(root, 'vue/tsconfig.web.json')
+    const config = ts.readConfigFile(configPath, ts.sys.readFile)
+    assert(!config.error, 'package declaration check must load the Web project')
+    const project = ts.parseJsonConfigFileContent(
+      config.config,
+      ts.sys,
+      path.dirname(configPath),
+    )
+    assert(
+      project.errors.length === 0,
+      'package declaration check must parse the complete Web project',
+    )
+    declarationProgram = ts.createProgram({
+      rootNames: [
+        ...project.fileNames,
+        ...ts.sys.readDirectory(publishedDistRoot, ['.d.ts']),
+      ],
+      options: project.options,
+    })
+    declarationChecker = declarationProgram.getTypeChecker()
+  }
+  const source = declarationProgram.getSourceFile(filePath)
+  const symbol = source && declarationChecker.getSymbolAtLocation(source)
+  return (
+    !!symbol &&
+    declarationChecker
+      .getExportsOfModule(symbol)
+      .some((exported) => exported.name === name)
+  )
+}
+
+function exposesContract(filePath, token) {
+  // Named declarations may be re-exported through a barrel without being
+  // serialized into the install constructor. Check the actual public symbol.
+  return filePath.endsWith('.d.ts') && /^[A-Za-z_$][\w$]*$/u.test(token)
+    ? exposesDeclaration(filePath, token)
+    : readFileSync(filePath, 'utf8').includes(token)
 }
 
 function assertExportTarget(packageJson, exportPath, expected, label) {
@@ -566,6 +610,20 @@ for (const task of [
 ]) {
   assert(gulpfile.includes(task), `internal build gulpfile must keep ${task}`)
 }
+for (const task of [
+  'buildModules',
+  'generateTypesDefinitions',
+  'buildFullBundle',
+]) {
+  const childTask = new RegExp(
+    `withTaskName\\(\\s*'${task}',\\s*\\(\\)\\s*=>\\s*run\\('pnpm run -C vue/internal/build start ${task}'\\),?\\s*\\)`,
+    'u',
+  )
+  assert(
+    childTask.test(gulpfile),
+    `internal build ${task} must run its original named task in a child process`,
+  )
+}
 
 if (existsSync(path.join(publishedDistRoot, 'package.json'))) {
   const distPackage = readJson('dist/element-plus/package.json')
@@ -642,7 +700,7 @@ if (existsSync(path.join(publishedDistRoot, 'package.json'))) {
       `published package must include ${relativePath}`,
     )
     assert(
-      readFileSync(absolutePath, 'utf8').includes(token),
+      exposesContract(absolutePath, token),
       `published package ${relativePath} must expose ${token}`,
     )
   }
@@ -709,7 +767,7 @@ if (existsSync(path.join(publishedDistRoot, 'package.json'))) {
       `published package must include ${relativePath}`,
     )
     assert(
-      readFileSync(absolutePath, 'utf8').includes(token),
+      exposesContract(absolutePath, token),
       `published package ${relativePath} must expose ${token}`,
     )
   }
