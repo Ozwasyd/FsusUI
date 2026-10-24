@@ -30,6 +30,19 @@ does not match, and an npm candidate producer/consumer digest mismatch. A failed
 or cancelled job therefore cannot be replaced by an artifact from an earlier
 run.
 
+The PR feedback and static-quality leaves run the original complete
+`conformance:v2` producer before governance consumes its candidate-bound
+alignment. NuGet candidate leaves run that same producer before packaging.
+Each checkout produces its own evidence; a head artifact cannot be relabeled as
+the PR merge candidate. These Linux executions install the real Orca/AT-SPI
+prerequisites through `.github/actions/setup-conformance-accessibility` and run
+inside a D-Bus session with Xvfb. Missing tools, producer failures, alignment
+gaps, and stale identities retain their original failure behavior. A local
+`verify:pr-fast` invocation likewise requires the governed producer's current
+alignment before its governance consumer runs. Each CI producer retains its
+own `.tmp/conformance-v2` diagnostics even on failure; those diagnostic uploads
+do not attest to a passing alignment or replace a candidate package.
+
 The Playwright readiness owners are derived from
 `spec/ci/playwright-owners.json`. The `playwright-conformance` owner contributes
 one required receipt for each Chromium, Firefox, and WebKit cell. Its manifests

@@ -97,6 +97,23 @@ jobs:
           pnpm run icons:lint
       - name: Run conformance
         run: pnpm run conformance
+      - uses: emscripten-core/setup-emsdk@v15
+        with:
+          version: 5.0.4
+          actions-cache-folder: emsdk-cache
+      - uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: dotnet/global.json
+      - run: pnpm exec playwright install --with-deps chromium
+      - uses: ./.github/actions/setup-conformance-accessibility
+      - name: Produce exact-candidate alignment before governance
+        run: dbus-run-session -- xvfb-run -a pnpm run conformance:v2
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: conformance-v2-static-${{ inputs.group }}
+          path: .tmp/conformance-v2
+          retention-days: 14
       - name: Run governance
         run: pnpm run governance:check
       - name: Run accessibility contract
@@ -184,6 +201,7 @@ jobs:
           global-json-file: dotnet/global.json
       - run: pnpm install --frozen-lockfile
       - run: pnpm exec playwright install --with-deps chromium
+      - uses: ./.github/actions/setup-conformance-accessibility
       - name: Restore canonical .NET package cache
         uses: actions/cache@v4
         with:
@@ -196,9 +214,15 @@ jobs:
       - name: Build and verify the unique NuGet candidate
         id: candidate
         run: |
-          xvfb-run -a pnpm run conformance:v2
+          dbus-run-session -- xvfb-run -a pnpm run conformance:v2
           node scripts/dotnet-package-verify.mjs
           echo "digest=$(node -p \"require('./dotnet/artifacts/package/manifest.json').candidateSha256\")" >> "$GITHUB_OUTPUT"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: conformance-v2-package-${{ inputs.group }}
+          path: .tmp/conformance-v2
+          retention-days: 14
       - uses: actions/upload-artifact@v4
         with:
           name: dotnet-nuget-candidate

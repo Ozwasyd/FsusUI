@@ -118,7 +118,7 @@ test('quality SDK setup keeps the canonical global.json owner', () => {
       assert.doesNotMatch(match[1], /dotnet-version:/u)
     }
   }
-  assert.equal(setups, 6)
+  assert.equal(setups, 8)
 })
 
 import './ci-performance-provenance.test.mjs'

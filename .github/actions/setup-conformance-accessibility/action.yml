@@ -1,0 +1,14 @@
+name: Set up Contract V2 accessibility prerequisites
+description: Install the real Linux AT-SPI and Orca tools used by the governed conformance producer.
+runs:
+  using: composite
+  steps:
+    - name: Install and verify native screen-reader tools
+      shell: bash
+      run: |
+        test "${RUNNER_OS}" = Linux
+        sudo apt-get update
+        sudo apt-get install --yes --no-install-recommends orca python3-pyatspi dbus-x11 at-spi2-core
+        command -v orca
+        command -v dbus-run-session
+        python3 -c 'import pyatspi'

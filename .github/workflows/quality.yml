@@ -84,14 +84,21 @@ jobs:
           global-json-file: dotnet/global.json
       - run: pnpm install --frozen-lockfile
       - run: pnpm exec playwright install --with-deps chromium
+      - uses: ./.github/actions/setup-conformance-accessibility
       - name: Build the immutable NuGet candidate once
         id: candidate
         env:
           GITHUB_SHA: ${{ github.event.pull_request.head.sha }}
         run: |
-          xvfb-run -a pnpm run conformance:v2
+          dbus-run-session -- xvfb-run -a pnpm run conformance:v2
           node scripts/dotnet-package-verify.mjs
           echo "digest=$(node -p \"require('./dotnet/artifacts/package/manifest.json').candidateSha256\")" >> "$GITHUB_OUTPUT"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: conformance-v2-pr-head
+          path: .tmp/conformance-v2
+          retention-days: 14
       - uses: actions/upload-artifact@v4
         with:
           name: pr-dotnet-nuget-candidate
@@ -165,6 +172,19 @@ jobs:
           echo "typecheck-cache-hit=${{ steps.typecheck-cache.outputs.cache-hit }}"
           echo "cache-hit=${{ steps.typecheck-cache.outputs.cache-hit }}"
           echo "cache-primary-key=${{ steps.typecheck-cache.outputs.cache-primary-key }}"
+      - uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: dotnet/global.json
+      - run: pnpm exec playwright install --with-deps chromium
+      - uses: ./.github/actions/setup-conformance-accessibility
+      - name: Produce exact-candidate alignment before PR governance
+        run: dbus-run-session -- xvfb-run -a pnpm run conformance:v2
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: conformance-v2-pr-feedback
+          path: .tmp/conformance-v2
+          retention-days: 14
       - run: pnpm run verify:pr-fast
       - name: Determine PR demo build path impact
         id: demo-build-path
