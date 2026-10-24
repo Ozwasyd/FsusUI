@@ -35,7 +35,7 @@ concurrency:
 jobs:
   pr-avalonia-aot-plan:
     if: github.event_name == 'pull_request'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 5
     outputs:
       run: ${{ steps.plan.outputs.run }}
@@ -59,7 +59,7 @@ jobs:
   pr-avalonia-aot-candidate:
     if: needs.pr-avalonia-aot-plan.outputs.run == 'true'
     needs: pr-avalonia-aot-plan
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 60
     outputs:
       candidate-digest: ${{ steps.candidate.outputs.digest }}
@@ -113,7 +113,7 @@ jobs:
 
   pr-feedback:
     if: github.event_name == 'pull_request'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 35
     steps:
       - uses: actions/checkout@v4
@@ -183,7 +183,7 @@ jobs:
 
   pr-real-render-performance:
     if: github.event_name == 'pull_request'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 45
     steps:
       - name: Checkout current change
@@ -349,7 +349,7 @@ jobs:
       - pr-real-render-performance
       - premerge-main
       - premerge-playwright
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 5
     steps:
       - name: Enforce complete PR merge readiness
@@ -374,7 +374,7 @@ jobs:
     needs:
       - premerge-main
       - premerge-playwright
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 5
     steps:
       - name: Preserve required PR gate on merge queue candidates
@@ -390,7 +390,7 @@ jobs:
     if: always() && github.event_name == 'merge_group'
     needs:
       - premerge-main
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 5
     steps:
       - name: Preserve required render gate on merge queue candidates

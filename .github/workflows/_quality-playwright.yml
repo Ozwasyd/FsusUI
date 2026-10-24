@@ -11,7 +11,7 @@ on:
 
 jobs:
   playwright-pr-impact-plan:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
@@ -44,7 +44,7 @@ jobs:
 
   playwright-layout:
     needs: playwright-pr-impact-plan
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 120
     env:
       PLAYWRIGHT_BROWSERS_PATH: ${{ github.workspace }}/.tmp/playwright-browsers
@@ -131,7 +131,7 @@ jobs:
 
   playwright-markdown:
     needs: playwright-pr-impact-plan
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 120
     env:
       PLAYWRIGHT_BROWSERS_PATH: ${{ github.workspace }}/.tmp/playwright-browsers
@@ -218,7 +218,7 @@ jobs:
           playwright-plan: ${{ inputs.group == 'pr' && '.tmp/playwright-impact/receipt.json' || '' }}
   playwright-motion:
     needs: playwright-pr-impact-plan
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 120
     env:
       PLAYWRIGHT_BROWSERS_PATH: ${{ github.workspace }}/.tmp/playwright-browsers
@@ -304,7 +304,7 @@ jobs:
 
   playwright-boundary:
     needs: playwright-pr-impact-plan
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 120
     env:
       PLAYWRIGHT_BROWSERS_PATH: ${{ github.workspace }}/.tmp/playwright-browsers
@@ -392,7 +392,7 @@ jobs:
           playwright-plan: ${{ inputs.group == 'pr' && '.tmp/playwright-impact/receipt.json' || '' }}
   visual-runtime-reuse:
     needs: playwright-pr-impact-plan
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 120
     env:
       PLAYWRIGHT_BROWSERS_PATH: ${{ github.workspace }}/.tmp/playwright-browsers
@@ -475,7 +475,7 @@ jobs:
 
   playwright-conformance:
     needs: playwright-pr-impact-plan
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 120
     env:
       PLAYWRIGHT_BROWSERS_PATH: ${{ github.workspace }}/.tmp/playwright-browsers
@@ -556,7 +556,7 @@ jobs:
       - playwright-motion
       - playwright-boundary
       - visual-runtime-reuse
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4

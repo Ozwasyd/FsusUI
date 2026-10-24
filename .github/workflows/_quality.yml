@@ -23,7 +23,7 @@ on:
 
 jobs:
   real-render-performance:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 120
     steps:
       - uses: actions/checkout@v4
@@ -64,7 +64,7 @@ jobs:
           artifacts: real-render-performance=.tmp/performance/current
 
   static-quality:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
@@ -113,7 +113,7 @@ jobs:
       matrix:
         include:
           - platform: linux
-            os: ubuntu-latest
+            os: ubuntu-24.04
           - platform: windows
             os: windows-latest
           - platform: macos
@@ -153,7 +153,7 @@ jobs:
           artifact-suffix: ${{ matrix.platform }}
 
   dotnet-package:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 60
     outputs:
       candidate-digest: ${{ steps.candidate.outputs.digest }}
@@ -220,7 +220,7 @@ jobs:
 
   avalonia-aot:
     if: always()
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 10
     needs:
       - dotnet-package
@@ -253,7 +253,7 @@ jobs:
           artifacts: avalonia-aot=.avalonia-aot-readiness
 
   typecheck:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
@@ -289,7 +289,7 @@ jobs:
           status: ${{ job.status }}
 
   capacity:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 5
     outputs:
       unit-matrix: ${{ steps.plan.outputs.unit-matrix }}
@@ -309,7 +309,7 @@ jobs:
         run: node ./scripts/ci-capacity.mjs --dry-run --github-output="$GITHUB_OUTPUT"
 
   unit-artifacts:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
@@ -361,7 +361,7 @@ jobs:
     needs:
       - capacity
       - unit-artifacts
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 30
     strategy:
       fail-fast: false
@@ -401,7 +401,7 @@ jobs:
           artifact-suffix: ${{ strategy.job-index }}
 
   coverage-plan:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 5
     outputs:
       mode: ${{ steps.plan.outputs.mode }}
@@ -425,7 +425,7 @@ jobs:
   coverage-single:
     if: needs.coverage-plan.outputs.mode == 'single'
     needs: coverage-plan
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
@@ -476,7 +476,7 @@ jobs:
   coverage-shard:
     if: needs.coverage-plan.outputs.mode == 'sharded'
     needs: coverage-plan
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 30
     strategy:
       fail-fast: false
@@ -529,7 +529,7 @@ jobs:
     needs:
       - coverage-plan
       - coverage-shard
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
@@ -563,7 +563,7 @@ jobs:
       - coverage-single
       - coverage-shard
       - coverage-merge
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
@@ -599,7 +599,7 @@ jobs:
           artifacts: coverage-report=.coverage-evidence
 
   build-package:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 40
     outputs:
       candidate-digest: ${{ steps.candidate.outputs.digest }}
@@ -664,7 +664,7 @@ jobs:
           artifacts: npm-candidate=dist/npm-candidate
 
   consumer-install:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 45
     needs:
       - static-quality
@@ -736,7 +736,7 @@ jobs:
           artifacts: consumer-matrix=.consumer-matrix
 
   build-demo:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
@@ -783,7 +783,7 @@ jobs:
           status: ${{ job.status }}
 
   visual:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 30
     env:
       FSUS_VISUAL_EVIDENCE: ${{ inputs.group == 'release' && '1' || '0' }}
@@ -871,7 +871,7 @@ jobs:
 
   stable-readiness:
     if: always()
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 10
     needs:
       - static-quality
@@ -926,7 +926,7 @@ jobs:
 
   nightly-readiness:
     if: always() && inputs.group == 'nightly'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 10
     needs:
       - stable-readiness
@@ -974,7 +974,7 @@ jobs:
 
   release-readiness:
     if: always() && inputs.group == 'release'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 10
     outputs:
       evidence-digest: ${{ steps.release-evidence.outputs.digest }}

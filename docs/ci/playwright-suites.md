@@ -54,3 +54,18 @@ These commands are offline and do not install browsers or start servers.
 historical external evidence. The reusable workflow derives execution-owner
 cells from this registry. `web-interaction-conformance` has one owner and runs
 each browser project once through `pnpm test:conformance:web-interaction`.
+
+## Runner compatibility
+
+The quality workflows use the fixed `ubuntu-24.04` image for Linux work.
+The locked Playwright `1.59.1` [host classifier](https://github.com/microsoft/playwright/blob/v1.59.1/packages/playwright-core/src/server/utils/hostPlatform.ts)
+accepts Ubuntu 24.04 and rejects Ubuntu 26.04. A floating `ubuntu-latest` image
+can therefore make browser dependency installation fail before the original
+test cells run. Current Playwright documentation describes newer versions and
+does not replace the locked version's support contract.
+
+The existing browser installation, sandbox, validation, suite cells, assertions
+and readiness requirements remain unchanged. `check:dotnet-matrix` also runs
+the shared CI runtime regression controls for runner compatibility and the
+exact SDK/lock selection; image or SDK maintenance must update these contracts
+through the same reviewed change.
