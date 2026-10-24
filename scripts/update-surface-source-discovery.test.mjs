@@ -100,3 +100,60 @@ test('a tracked Dockerfile cannot escape through a symlink parent directory', (t
   symlinkSync(outside, path.join(root, 'source'), 'dir')
   assert.throws(() => sourceDockerfiles(root), /without symlinks/u)
 })
+
+test('Git redirection cannot replace the root index or a managed worktree view', (t) => {
+  const root = fixture(t)
+  const foreign = fixture(t)
+  const managed = path.join(root, 'managed')
+  write(root, 'Dockerfile', 'FROM node:22\n')
+  execFileSync('git', ['add', 'Dockerfile'], { cwd: root, stdio: 'pipe' })
+  execFileSync(
+    'git',
+    [
+      '-c',
+      'user.name=Source Fixture',
+      '-c',
+      'user.email=source-fixture@example.invalid',
+      'commit',
+      '--quiet',
+      '-m',
+      'Track source Dockerfile',
+    ],
+    { cwd: root, stdio: 'pipe' },
+  )
+  execFileSync(
+    'git',
+    ['worktree', 'add', '--quiet', '--detach', managed, 'HEAD'],
+    {
+      cwd: root,
+      stdio: 'pipe',
+    },
+  )
+  write(foreign, '.git/info/exclude', 'Dockerfile\n')
+  const redirects = {
+    GIT_DIR: path.join(foreign, '.git'),
+    GIT_WORK_TREE: root,
+    GIT_COMMON_DIR: path.join(foreign, '.git'),
+    GIT_INDEX_FILE: path.join(foreign, '.git/index'),
+    GIT_OBJECT_DIRECTORY: path.join(foreign, '.git/objects'),
+    GIT_ALTERNATE_OBJECT_DIRECTORIES: path.join(foreign, '.git/objects'),
+  }
+  const previous = Object.fromEntries(
+    Object.keys(redirects).map((key) => [key, process.env[key]]),
+  )
+  try {
+    Object.assign(process.env, redirects)
+    assert.deepEqual(sourceDockerfiles(root), ['Dockerfile'])
+    process.env.GIT_WORK_TREE = managed
+    assert.deepEqual(sourceDockerfiles(managed), ['Dockerfile'])
+  } finally {
+    for (const [key, value] of Object.entries(previous)) {
+      if (value === undefined) delete process.env[key]
+      else process.env[key] = value
+    }
+    execFileSync('git', ['worktree', 'remove', '--force', managed], {
+      cwd: root,
+      stdio: 'pipe',
+    })
+  }
+})

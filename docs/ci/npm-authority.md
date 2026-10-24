@@ -106,6 +106,8 @@ NuGet locks, or misleading Renovate policy.
 Dockerfile discovery uses Git-tracked files and new files that Git does not
 ignore. Run it from the repository root. Ignored SDK/vendor caches are excluded;
 new source Dockerfiles remain subject to the generated inventory check.
+Git subprocesses discard inherited `GIT_*` variables so discovery stays bound
+to that root's own repository or managed worktree index and ignore rules.
 Symlink Dockerfiles and symlink parent directories fail closed instead of
 reading outside the repository source view.
 

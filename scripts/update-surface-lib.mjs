@@ -619,6 +619,11 @@ export function sourceDockerfiles(root) {
   const directory = realpathSync(root)
   const options = {
     cwd: directory,
+    env: Object.fromEntries(
+      Object.entries(process.env).filter(
+        ([key]) => !key.toUpperCase().startsWith('GIT_'),
+      ),
+    ),
     encoding: 'utf8',
     stdio: ['ignore', 'pipe', 'pipe'],
     maxBuffer: 16 * 1024 * 1024,
