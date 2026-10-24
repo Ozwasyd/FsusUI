@@ -1,6 +1,7 @@
 import fs from 'node:fs'
 import { spawnSync } from 'node:child_process'
 import process from 'node:process'
+import path from 'node:path'
 
 const packageJson = JSON.parse(fs.readFileSync('package.json', 'utf8'))
 const scripts = packageJson.scripts ?? {}
@@ -18,6 +19,12 @@ const platformVerifier = fs.readFileSync(
   'scripts/dotnet-platform-verify.mjs',
   'utf8',
 )
+const visualEvidenceEnvironment = fs
+  .readFileSync(
+    'dotnet/FsusUI.Avalonia.HeadlessTests/HeadlessVisualEvidenceOutput.cs',
+    'utf8',
+  )
+  .match(/EnvironmentVariable = "([^"]+)"/u)?.[1]
 
 const job = (source, name) =>
   source.match(
@@ -56,6 +63,31 @@ const validate = (source) => {
     platform.includes('node scripts/dotnet-platform-verify.mjs'),
     'platform matrix must run only the platform verifier',
   )
+  const platformSteps = platform.split(/\n      - /u).slice(1)
+  const verifierStep = platformSteps.find((step) =>
+    step.includes('run: node scripts/dotnet-platform-verify.mjs'),
+  )
+  const visualEvidenceRoot = verifierStep?.match(
+    new RegExp(`^          ${visualEvidenceEnvironment}: (.+)$`, 'mu'),
+  )?.[1]
+  const artifactRoot = platformSteps
+    .find((step) =>
+      step.includes('name: dotnet-platform-${{ matrix.platform }}'),
+    )
+    ?.match(/^          path: (.+)$/mu)?.[1]
+  for (const name of ['linux', 'windows', 'macos']) {
+    const resolveMatrix = (value) =>
+      value?.replaceAll('${{ matrix.platform }}', name)
+    const output = resolveMatrix(visualEvidenceRoot)
+    const artifact = resolveMatrix(artifactRoot)
+    const relative = output && artifact && path.posix.relative(artifact, output)
+    assert(
+      visualEvidenceEnvironment &&
+        artifact === `dotnet/artifacts/platform/${name}` &&
+        relative === 'visual-evidence',
+      `platform ${name} visual evidence must be inside its uploaded artifact`,
+    )
+  }
   for (const forbidden of [
     'pnpm install',
     'dotnet pack',
@@ -153,6 +185,48 @@ const validate = (source) => {
 }
 
 const failures = validate(workflow)
+for (const [name, mutate] of [
+  [
+    'missing visual evidence binding',
+    (source) =>
+      source.replace(
+        /^          FSUS_AVALONIA_VISUAL_EVIDENCE_ROOT: .+\n/mu,
+        '',
+      ),
+  ],
+  [
+    'uncaptured visual evidence output',
+    (source) =>
+      source.replace(
+        'platform/${{ matrix.platform }}/visual-evidence',
+        'uncaptured/visual-evidence',
+      ),
+  ],
+  [
+    'another platform visual evidence output',
+    (source) =>
+      source.replace(
+        'platform/${{ matrix.platform }}/visual-evidence',
+        'platform/linux/visual-evidence',
+      ),
+  ],
+  [
+    'visual evidence escaping the upload root',
+    (source) =>
+      source.replace(
+        'platform/${{ matrix.platform }}/visual-evidence',
+        'platform/${{ matrix.platform }}/../visual-evidence',
+      ),
+  ],
+]) {
+  if (
+    !validate(mutate(workflow)).some((failure) =>
+      failure.includes('visual evidence must be inside its uploaded artifact'),
+    )
+  ) {
+    failures.push(`${name} must be rejected by the visual evidence path guard`)
+  }
+}
 const callerPackageJob = job(callerWorkflow, 'pr-avalonia-aot-candidate')
 if (
   !callerPackageJob.includes('pnpm run conformance:v2') ||

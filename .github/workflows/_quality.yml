@@ -141,6 +141,7 @@ jobs:
       - name: Run platform-owned restore, build, tests, and smoke
         env:
           FSUS_WEBVIEW_CANDIDATE_SHA: ${{ github.sha }}
+          FSUS_AVALONIA_VISUAL_EVIDENCE_ROOT: dotnet/artifacts/platform/${{ matrix.platform }}/visual-evidence
         run: node scripts/dotnet-platform-verify.mjs --output dotnet/artifacts/platform/${{ matrix.platform }}/manifest.json
       - uses: actions/upload-artifact@v4
         if: always()
