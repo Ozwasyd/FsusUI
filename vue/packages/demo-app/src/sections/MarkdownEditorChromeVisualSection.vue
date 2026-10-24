@@ -24,15 +24,12 @@
         :surfaces="{ toolbar: toolbarVisible }"
         :toolbar-density="toolbarDensity"
       >
-        <template
-          v-if="useStatusSlot"
-          #status="{ metrics, state: slotState, capability }"
-        >
+        <template v-if="useStatusSlot" #status="{ metrics, capability }">
           <span data-testid="chrome-visual-status-slot">
-            {{ metrics.graphemeCount }} 字 · {{ metrics.wordCount }} 词 · {{ slotState
-            }}{{
+            {{ metrics.graphemeCount }} 字 · {{ metrics.wordCount }} 词 ·
+            已同步到草稿箱{{
               capability.length ? ` · ${capability.join(' / ')}` : ''
-            }}{{ slotState }}
+            }}
           </span>
         </template>
       </el-markdown-editor>
