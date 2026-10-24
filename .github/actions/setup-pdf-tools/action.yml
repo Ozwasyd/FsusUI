@@ -119,5 +119,8 @@ runs:
           actual=${actual//$'\r'/}
           echo "$actual"
           test "${actual%%$'\n'*}" = "$tool version $version"
-          [[ "$actual" == *'The Poppler Developers'* ]]
+          if [[ "$actual" != *'The Poppler Developers'* ]]; then
+            echo "Expected Poppler identity from installed $tool" >&2
+            exit 1
+          fi
         done
