@@ -43,6 +43,14 @@ The WASM renderer preserves HTML, MathML, SVG, or placeholder data for Mermaid a
 
 The built-in renderer derives Mermaid themeVariables, KaTeX error colors, Shiki light/dark themes, and permitted dynamic `<style>` nonces from `data-theme-resolved`, Element Plus tokens, and `csp-nonce`. Mermaid, KaTeX, and Shiki activate only when their chunk nears the viewport. The security gateway and each third-party renderer load on demand in parallel, while all three activations share one gateway singleton result; Shiki loads only grammars actually encountered and the current theme. Activations across renderers use bounded concurrency rather than one global Promise lock. Failure does not crash the renderer: the component creates an `el-markdown-renderer__feature-error` node with `textContent` and reports the error in `features-activated.errors`.
 
+Shared theme observation starts at mount and remains active while heavy feature
+initialization or a later render is pending. Initialization reads the current
+resolved theme; a theme change invalidates pending output. Unmount removes the
+listener before asynchronous work settles. Theme invalidation aborts pending
+activation synchronously; superseded or aborted stages cannot emit completion,
+profile or error events. Settled content with no heavy features does not reparse
+for a theme event.
+
 Use `features` to disable an activation:
 
 ```vue
@@ -140,6 +148,11 @@ All of these asynchronous APIs return `Promise<FsusResult<T>>`. When `ok: false`
 `renderMarkdownHtmlWithRuntime` returns a `value` containing only HTML and timings; `renderMarkdownSummaryWithRuntime` returns HTML, features, and metadata counts; `renderMarkdownResultWithRuntime` returns `html`, `features`, `placeholders`, `metadata`, timings, and current engine information; `renderMarkdownChunksWithRuntime` additionally returns block-level `chunks` for Render Pipeline virtual mounting; `renderMarkdownWithRuntime` returns only an HTML string.
 
 Chunk boundaries come from the WASM rendering pipeline and include `heading`, `paragraph`, `list`, `table`, `code`, `blockquote`, `latex`, `mermaid`, `footnotes`, `rule`, and `generated`. `generated` means only a renderer-generated block that does not fit another category; it does not indicate raw HTML input capability. The component does not split final HTML with regex in the Vue layer.
+
+WASM metadata `sourceLength` and `normalizedSourceLength`, like chunk HTML
+offsets, count UTF-8 bytes. They are not JavaScript UTF-16 `string.length` values.
+Worker result validation compares these byte counts while retaining source
+identity, version, generation, chunk and metadata checks.
 
 ## Long-Document Virtual Mount
 
