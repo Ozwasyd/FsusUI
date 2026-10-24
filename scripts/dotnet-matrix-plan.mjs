@@ -1,7 +1,7 @@
 import process from 'node:process'
 
 const supported = new Map([
-  ['linux', 'ubuntu-latest'],
+  ['linux', 'ubuntu-24.04'],
   ['windows', 'windows-latest'],
   ['macos', 'macos-latest'],
 ])
@@ -39,7 +39,7 @@ const plan = {
   })),
   canonicalPackage: {
     os: 'linux',
-    runner: 'ubuntu-latest',
+    runner: 'ubuntu-24.04',
     command: 'pnpm dotnet:package:verify',
     owns: [
       'restore',
@@ -53,7 +53,7 @@ const plan = {
   },
   staticQuality: {
     os: 'linux',
-    runner: 'ubuntu-latest',
+    runner: 'ubuntu-24.04',
     owns: ['icons', 'tokens', 'conformance', 'governance', 'a11y-contract'],
   },
 }

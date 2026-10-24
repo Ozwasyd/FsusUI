@@ -46,7 +46,7 @@ const validate = (source) => {
       `platform matrix must include ${value}`,
     )
   }
-  for (const value of ['ubuntu-latest', 'windows-latest', 'macos-latest']) {
+  for (const value of ['ubuntu-24.04', 'windows-latest', 'macos-latest']) {
     assert(
       platform.includes(`os: ${value}`),
       `platform matrix must include ${value}`,
@@ -89,7 +89,7 @@ const validate = (source) => {
     assert(platform.includes(input), `platform cache key must cover ${input}`)
   }
   assert(
-    /dotnet-package:[\s\S]*?runs-on: ubuntu-latest/u.test(source),
+    /dotnet-package:[\s\S]*?runs-on: ubuntu-24\.04/u.test(source),
     'dotnet-package must use the canonical Ubuntu runner',
   )
   assert(
@@ -231,5 +231,14 @@ if (failures.length > 0) {
     failures.map((failure) => `[dotnet-matrix] ${failure}`).join('\n'),
   )
   process.exit(1)
+}
+const toolchainRegression = spawnSync(
+  process.execPath,
+  ['--test', 'tests/ci-runtime-compatibility.test.mjs'],
+  { stdio: 'inherit' },
+)
+if (toolchainRegression.error || toolchainRegression.status !== 0) {
+  if (toolchainRegression.error) console.error(toolchainRegression.error)
+  process.exit(toolchainRegression.status || 1)
 }
 console.log('[dotnet-matrix] policy and negative fixtures passed')
