@@ -1,4 +1,3 @@
-using System.Runtime.CompilerServices;
 using System.Text.Json.Nodes;
 using FsusUI.Avalonia.Controls;
 
@@ -6,6 +5,16 @@ namespace FsusUI.Avalonia.Tests.Controls;
 
 public class FsusMarkdownEditorClipboardVectorTests
 {
+  [Fact]
+  public void FixtureRootIgnoresCompilerMappedSourcePaths()
+  {
+#line 1 "/_/fsusui-native-fixture-root-control.cs"
+    var repositoryRoot = RepositoryRoot();
+#line default
+    Assert.True(File.Exists(Path.Combine(repositoryRoot, "pnpm-workspace.yaml")));
+    Assert.True(File.Exists(Path.Combine(repositoryRoot, "dotnet", "FsusUI.Avalonia.slnx")));
+  }
+
   public static TheoryData<string> ClipboardVectorIds()
   {
     var ids = new TheoryData<string>();
@@ -180,9 +189,9 @@ public class FsusMarkdownEditorClipboardVectorTests
     return root["clipboard"]!.AsArray().Select(node => node!).ToList();
   }
 
-  private static string RepositoryRoot([CallerFilePath] string sourceFile = "")
+  private static string RepositoryRoot()
   {
-    var directory = new DirectoryInfo(Path.GetDirectoryName(sourceFile) ?? string.Empty);
+    var directory = new DirectoryInfo(AppContext.BaseDirectory);
     while (directory is not null)
     {
       if (File.Exists(Path.Combine(directory.FullName, "dotnet", "FsusUI.Avalonia.slnx")))
