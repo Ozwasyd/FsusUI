@@ -217,7 +217,7 @@ jobs:
         run: |
           dbus-run-session -- xvfb-run -a pnpm run conformance:v2
           node scripts/dotnet-package-verify.mjs
-          echo "digest=$(node -p \"require('./dotnet/artifacts/package/manifest.json').candidateSha256\")" >> "$GITHUB_OUTPUT"
+          echo "digest=$(node -p "require('./dotnet/artifacts/package/manifest.json').candidateSha256")" >> "$GITHUB_OUTPUT"
       - uses: actions/upload-artifact@v4
         if: always()
         with:

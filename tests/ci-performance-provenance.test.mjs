@@ -106,6 +106,16 @@ const fixture = (t) => {
     '#!/bin/bash\nprintf \'%s\\n\' "$GITHUB_SHA" > "$PERF_RECEIPT"\nprintf \'%s\\n\' "$@" >> "$PERF_RECEIPT"\n',
     { mode: 0o755 },
   )
+  for (const command of ['dbus-run-session', 'node']) {
+    writeFileSync(
+      path.join(bin, command),
+      `#!/bin/bash
+if [ "$1" = '-p' ]; then printf 'fixture-digest'; exit 0; fi
+printf '%s:%s:%s\\n' '${command}' "$GITHUB_SHA" "$*" >> "$PERF_RECEIPT"
+`,
+      { mode: 0o755 },
+    )
+  }
   let invocation = 0
   const run = (measurement, { head, sha, cwd, shell } = {}) => {
     git(
@@ -115,19 +125,25 @@ const fixture = (t) => {
       head ?? (measurement.checkout === 'baseline' ? baseline : current),
     )
     const receipt = path.join(directory, `receipt-${invocation++}`)
-    const declaredSha = measurement.step.includes(
-      'FSUS_MEASUREMENT_SHA: ${{ github.event.pull_request.base.sha }}',
-    )
-      ? baseline
-      : current
+    const output = `${receipt}-output`
+    const expectedVariable =
+      measurement.expectedVariable ?? 'FSUS_MEASUREMENT_SHA'
+    const declaredSha =
+      expectedVariable === 'FSUS_CANDIDATE_SHA' ||
+      measurement.step.includes(
+        'FSUS_MEASUREMENT_SHA: ${{ github.event.pull_request.base.sha }}',
+      )
+        ? baseline
+        : current
     const childEnv = {
       ...env,
       // The runner owns GITHUB_* defaults, including the merge SHA on a PR.
       GITHUB_SHA: current,
-      FSUS_MEASUREMENT_SHA: sha === undefined ? declaredSha : sha,
+      [expectedVariable]: sha === undefined ? declaredSha : sha,
       PERF_RECEIPT: receipt,
+      GITHUB_OUTPUT: output,
     }
-    if (sha === null) delete childEnv.FSUS_MEASUREMENT_SHA
+    if (sha === null) delete childEnv[expectedVariable]
     const result = spawnSync(
       '/bin/bash',
       [
@@ -146,6 +162,7 @@ const fixture = (t) => {
       receipt: existsSync(receipt)
         ? readFileSync(receipt, 'utf8').trimEnd().split('\n')
         : undefined,
+      output: existsSync(output) ? readFileSync(output, 'utf8') : undefined,
     }
   }
   return { baseline, current, outside, run }
@@ -269,5 +286,116 @@ test('all four actual Bash steps reject a non-repository working directory befor
     })
     assert.notEqual(result.status, 0, measurement.name)
     assert.equal(result.receipt, undefined, measurement.name)
+  }
+})
+
+const candidateSteps = [
+  ['.github/workflows/quality.yml', 'Build the immutable NuGet candidate once'],
+  [
+    '.github/workflows/_avalonia-aot-leaf.yml',
+    'Publish and run the final native binary',
+  ],
+].map(([file, name]) => {
+  const lines = readFileSync(path.join(root, file), 'utf8').split('\n')
+  const start = lines.indexOf(`      - name: ${name}`)
+  assert.notEqual(start, -1, name)
+  const next = lines.findIndex(
+    (line, index) => index > start && line.startsWith('      - '),
+  )
+  const step = lines.slice(start, next === -1 ? undefined : next).join('\n')
+  const marker = '        run: |\n'
+  const run = step.indexOf(marker)
+  const shell =
+    run === -1
+      ? step.match(/^ {8}run: (.+)$/mu)?.[1]
+      : step
+          .slice(run + marker.length)
+          .split('\n')
+          .map((line) => line.replace(/^ {10}/u, ''))
+          .join('\n')
+  assert.ok(shell, `${name} must have an executable command`)
+  return {
+    name,
+    step,
+    checkout: 'baseline',
+    expectedVariable: 'FSUS_CANDIDATE_SHA',
+    shell,
+  }
+})
+
+test('candidate producer and consumer bind declared head identities without overriding runner defaults', () => {
+  assert.ok(
+    candidateSteps[0].step.includes(
+      'FSUS_CANDIDATE_SHA: ${{ github.event.pull_request.head.sha }}',
+    ),
+  )
+  assert.ok(
+    candidateSteps[1].step.includes(
+      'FSUS_CANDIDATE_SHA: ${{ inputs.commit-sha }}',
+    ),
+  )
+  for (const { step } of candidateSteps)
+    assert.doesNotMatch(step, /\n {10}GITHUB_SHA:/u)
+})
+
+test('real head checkout labels conformance, package, and AOT children despite the inherited merge SHA', (t) => {
+  const { baseline: head, current: merge, run } = fixture(t)
+  assert.notEqual(head, merge)
+  const producer = run(candidateSteps[0], { head })
+  assert.equal(producer.status, 0, producer.stderr)
+  assert.deepEqual(producer.receipt, [
+    `dbus-run-session:${head}:-- xvfb-run -a pnpm run conformance:v2`,
+    `node:${head}:scripts/dotnet-package-verify.mjs`,
+  ])
+  assert.equal(producer.output, 'digest=fixture-digest\n')
+  const consumer = run(candidateSteps[1], { head })
+  assert.equal(consumer.status, 0, consumer.stderr)
+  assert.deepEqual(consumer.receipt, [
+    `node:${head}:scripts/test-avalonia-aot-smoke.mjs`,
+  ])
+})
+
+test('candidate producer and consumer reject a different real checkout before starting children', (t) => {
+  const { current: merge, run } = fixture(t)
+  for (const step of candidateSteps) {
+    const result = run(step, { head: merge })
+    assert.notEqual(result.status, 0, step.name)
+    assert.equal(result.receipt, undefined, step.name)
+  }
+})
+
+test('candidate producer and consumer reject empty or absent expected identities before starting children', (t) => {
+  const { run } = fixture(t)
+  for (const step of candidateSteps) {
+    for (const sha of ['', null]) {
+      const result = run(step, { sha })
+      assert.notEqual(result.status, 0, step.name)
+      assert.equal(result.receipt, undefined, step.name)
+    }
+  }
+})
+
+test('candidate producer and consumer reject a non-repository checkout before starting children', (t) => {
+  const { outside, run } = fixture(t)
+  for (const step of candidateSteps) {
+    const result = run(step, { cwd: outside })
+    assert.notEqual(result.status, 0, step.name)
+    assert.equal(result.receipt, undefined, step.name)
+  }
+})
+
+test('both NuGet digest exports execute their actual Bash quoting', (t) => {
+  const { run } = fixture(t)
+  for (const file of [
+    '.github/workflows/quality.yml',
+    '.github/workflows/_quality.yml',
+  ]) {
+    const command = readFileSync(path.join(root, file), 'utf8').match(
+      /^ {10}(echo "digest=.+)$/mu,
+    )?.[1]
+    assert.ok(command, file)
+    const result = run(candidateSteps[0], { shell: command })
+    assert.equal(result.status, 0, result.stderr)
+    assert.equal(result.output, 'digest=fixture-digest\n', file)
   }
 })

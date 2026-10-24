@@ -48,10 +48,16 @@ jobs:
       - name: Publish and run the final native binary
         if: inputs.rid == 'linux-x64'
         env:
+          FSUS_CANDIDATE_SHA: ${{ inputs.commit-sha }}
           FSUSUI_AOT_CANDIDATE_ROOT: ${{ github.workspace }}/.dotnet-candidate/nuget
           FSUSUI_AOT_CANDIDATE_MANIFEST: ${{ github.workspace }}/.dotnet-candidate/package/manifest.json
           FSUSUI_AOT_EVIDENCE_OUT: ${{ github.workspace }}/.avalonia-aot-leaf/${{ inputs.rid }}
-        run: node scripts/test-avalonia-aot-smoke.mjs
+        run: |
+          test -n "${FSUS_CANDIDATE_SHA:-}" &&
+          candidate_sha="$(git rev-parse HEAD)" &&
+          test "$candidate_sha" = "$FSUS_CANDIDATE_SHA" ||
+          { echo "::error::Native AOT candidate identity must match checkout HEAD" >&2; exit 1; }
+          GITHUB_SHA="$candidate_sha" node scripts/test-avalonia-aot-smoke.mjs
       - name: Validate leaf identity
         if: inputs.rid == 'linux-x64'
         run: >-

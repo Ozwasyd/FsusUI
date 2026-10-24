@@ -43,6 +43,13 @@ alignment before its governance consumer runs. Each CI producer retains its
 own `.tmp/conformance-v2` diagnostics even on failure; those diagnostic uploads
 do not attest to a passing alignment or replace a candidate package.
 
+The PR head NuGet producer and Native AOT consumer bind a non-reserved
+`FSUS_CANDIDATE_SHA` to their declared head/input SHA and verify actual Git
+`HEAD` before starting the governed child processes. Only those children receive
+the verified SHA as `GITHUB_SHA`; the runner's PR merge default cannot label a
+head package. The existing package alignment and consumer manifest identity
+checks remain required.
+
 The Playwright readiness owners are derived from
 `spec/ci/playwright-owners.json`. The `playwright-conformance` owner contributes
 one required receipt for each Chromium, Firefox, and WebKit cell. Its manifests

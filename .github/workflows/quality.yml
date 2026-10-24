@@ -88,11 +88,15 @@ jobs:
       - name: Build the immutable NuGet candidate once
         id: candidate
         env:
-          GITHUB_SHA: ${{ github.event.pull_request.head.sha }}
+          FSUS_CANDIDATE_SHA: ${{ github.event.pull_request.head.sha }}
         run: |
-          dbus-run-session -- xvfb-run -a pnpm run conformance:v2
-          node scripts/dotnet-package-verify.mjs
-          echo "digest=$(node -p \"require('./dotnet/artifacts/package/manifest.json').candidateSha256\")" >> "$GITHUB_OUTPUT"
+          test -n "${FSUS_CANDIDATE_SHA:-}" &&
+          candidate_sha="$(git rev-parse HEAD)" &&
+          test "$candidate_sha" = "$FSUS_CANDIDATE_SHA" ||
+          { echo "::error::NuGet candidate identity must match checkout HEAD" >&2; exit 1; }
+          GITHUB_SHA="$candidate_sha" dbus-run-session -- xvfb-run -a pnpm run conformance:v2
+          GITHUB_SHA="$candidate_sha" node scripts/dotnet-package-verify.mjs
+          echo "digest=$(node -p "require('./dotnet/artifacts/package/manifest.json').candidateSha256")" >> "$GITHUB_OUTPUT"
       - uses: actions/upload-artifact@v4
         if: always()
         with:
