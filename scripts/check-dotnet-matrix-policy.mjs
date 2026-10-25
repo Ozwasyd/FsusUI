@@ -63,7 +63,7 @@ const validate = (source) => {
     platform.includes('node scripts/dotnet-platform-verify.mjs'),
     'platform matrix must run only the platform verifier',
   )
-  const platformSteps = platform.split(/\n      - /u).slice(1)
+  const platformSteps = platform.split(/\n {6}- /u).slice(1)
   const verifierStep = platformSteps.find((step) =>
     step.includes('run: node scripts/dotnet-platform-verify.mjs'),
   )
@@ -74,7 +74,7 @@ const validate = (source) => {
     .find((step) =>
       step.includes('name: dotnet-platform-${{ matrix.platform }}'),
     )
-    ?.match(/^          path: (.+)$/mu)?.[1]
+    ?.match(/^ {10}path: (.+)$/mu)?.[1]
   for (const name of ['linux', 'windows', 'macos']) {
     const resolveMatrix = (value) =>
       value?.replaceAll('${{ matrix.platform }}', name)
@@ -189,10 +189,7 @@ for (const [name, mutate] of [
   [
     'missing visual evidence binding',
     (source) =>
-      source.replace(
-        /^          FSUS_AVALONIA_VISUAL_EVIDENCE_ROOT: .+\n/mu,
-        '',
-      ),
+      source.replace(/^ {10}FSUS_AVALONIA_VISUAL_EVIDENCE_ROOT: .+\n/mu, ''),
   ],
   [
     'uncaptured visual evidence output',
@@ -269,7 +266,9 @@ if (!scripts['governance:check']?.includes('check:dotnet-matrix')) {
   failures.push('governance:check must include check:dotnet-matrix')
 }
 if (!scripts['dotnet:stable-package']?.includes('--stable-publication')) {
-  failures.push('dotnet:stable-package must require explicit stable publication')
+  failures.push(
+    'dotnet:stable-package must require explicit stable publication',
+  )
 }
 if (scripts['dotnet:package:verify']?.includes('--stable-publication')) {
   failures.push(

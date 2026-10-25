@@ -176,7 +176,7 @@ test('ABBA steps retain their measurement commands, checkouts, conditions, and o
       name === 'Measure current quick matrix'
         ? 'render-impact.outputs.run'
         : 'baseline-contract.outputs.available'
-    assert.ok(step.includes(`if: steps.${condition} == 'true'\n`), name)
+    assert.ok(step.includes(`steps.${condition} == 'true'`), name)
     assert.equal(
       command.slice(command.indexOf('pnpm perf:render --')),
       `pnpm perf:render --\n--impact-plan ../performance-impact-plan.json\n--profile quick\n--output ../${output}`,

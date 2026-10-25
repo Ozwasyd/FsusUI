@@ -298,6 +298,7 @@ jobs:
         working-directory: current
         run: pnpm run ensure:wasm
       - name: Measure same-runner baseline first
+        id: baseline-first
         if: steps.baseline-contract.outputs.available == 'true'
         working-directory: baseline
         env:
@@ -313,7 +314,12 @@ jobs:
           --profile quick
           --output ../performance-baseline
       - name: Measure current quick matrix
-        if: steps.render-impact.outputs.run == 'true'
+        id: current-first
+        if: >-
+          !cancelled() && steps.render-impact.outputs.run == 'true' &&
+          ((steps.baseline-contract.outputs.available == 'true' &&
+          (steps.baseline-first.outcome == 'success' || steps.baseline-first.outcome == 'failure')) ||
+          (steps.baseline-contract.outputs.available != 'true' && success()))
         working-directory: current
         env:
           FSUS_MEASUREMENT_SHA: ${{ github.sha }}
@@ -328,7 +334,10 @@ jobs:
           --profile quick
           --output ../performance-current
       - name: Repeat current quick matrix for order balance
-        if: steps.baseline-contract.outputs.available == 'true'
+        id: current-repeat
+        if: >-
+          !cancelled() && steps.baseline-contract.outputs.available == 'true' &&
+          (steps.current-first.outcome == 'success' || steps.current-first.outcome == 'failure')
         working-directory: current
         env:
           FSUS_MEASUREMENT_SHA: ${{ github.sha }}
@@ -343,7 +352,10 @@ jobs:
           --profile quick
           --output ../performance-current-repeat
       - name: Repeat baseline quick matrix last for order balance
-        if: steps.baseline-contract.outputs.available == 'true'
+        id: baseline-repeat
+        if: >-
+          !cancelled() && steps.baseline-contract.outputs.available == 'true' &&
+          (steps.current-repeat.outcome == 'success' || steps.current-repeat.outcome == 'failure')
         working-directory: baseline
         env:
           FSUS_MEASUREMENT_SHA: ${{ github.event.pull_request.base.sha }}
@@ -357,8 +369,24 @@ jobs:
           --impact-plan ../performance-impact-plan.json
           --profile quick
           --output ../performance-baseline-repeat
+      - name: Verify complete source-bound ABBA diagnostic artifacts
+        id: paired-integrity
+        if: >-
+          !cancelled() && steps.baseline-contract.outputs.available == 'true' &&
+          (steps.baseline-repeat.outcome == 'success' || steps.baseline-repeat.outcome == 'failure')
+        env:
+          FSUS_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          FSUS_CURRENT_SHA: ${{ github.sha }}
+        run: >-
+          node current/scripts/render-performance-diagnostic-integrity.mjs
+          performance-impact-plan.json "$FSUS_BASE_SHA" "$FSUS_CURRENT_SHA"
+          performance-baseline performance-current
+          performance-current-repeat performance-baseline-repeat
       - name: Compare against base revision on the same runner
-        if: steps.baseline-contract.outputs.available == 'true'
+        id: paired-comparison
+        if: >-
+          !cancelled() && steps.baseline-contract.outputs.available == 'true' &&
+          steps.paired-integrity.outcome == 'success'
         working-directory: current
         run: >-
           pnpm perf:render:compare --
@@ -367,6 +395,27 @@ jobs:
           0.15
           ../performance-baseline-repeat
           ../performance-current-repeat
+      - name: Require every original measurement and comparison to pass
+        if: >-
+          !cancelled() && steps.render-impact.outputs.run == 'true'
+        env:
+          FSUS_BASE_AVAILABLE: ${{ steps.baseline-contract.outputs.available }}
+          FSUS_BASE_FIRST: ${{ steps.baseline-first.outcome }}
+          FSUS_CURRENT_FIRST: ${{ steps.current-first.outcome }}
+          FSUS_CURRENT_REPEAT: ${{ steps.current-repeat.outcome }}
+          FSUS_BASE_REPEAT: ${{ steps.baseline-repeat.outcome }}
+          FSUS_INTEGRITY: ${{ steps.paired-integrity.outcome }}
+          FSUS_COMPARISON: ${{ steps.paired-comparison.outcome }}
+        run: |
+          test "$FSUS_BASE_AVAILABLE" = true || test "$FSUS_BASE_AVAILABLE" = false
+          test "$FSUS_CURRENT_FIRST" = success
+          if [ "$FSUS_BASE_AVAILABLE" = true ]; then
+            test "$FSUS_BASE_FIRST" = success
+            test "$FSUS_CURRENT_REPEAT" = success
+            test "$FSUS_BASE_REPEAT" = success
+            test "$FSUS_INTEGRITY" = success
+            test "$FSUS_COMPARISON" = success
+          fi
       - name: Skip unaffected PR real-render measurement
         if: steps.render-impact.outputs.run != 'true'
         run: echo "Skipping real-render measurement; ownership plan is skip-safe."

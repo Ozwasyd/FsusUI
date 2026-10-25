@@ -145,6 +145,19 @@ pass its actual SHA to the measurement child as `GITHUB_SHA`. A missing Git
 checkout or a mismatched identity stops the step before the measurement process
 starts, so web and Avalonia summaries identify the source actually measured.
 
+The PR job continues the four original measurement commands after an attempted
+measurement fails, preserving their ABBA order and every original exit status.
+This collects diagnostic evidence when the historical base already exceeds an
+absolute guard. Failed setup or a cancelled job does not start that diagnostic
+chain. Before comparison, the job verifies four complete, source-bound result
+directories with the identical immutable plan, scenario sets, raw files,
+warm-ups, and twenty-one samples. Partial or mismatched evidence is rejected.
+The original 15% comparator is unchanged. A final gate still requires every
+original measurement, integrity check, and comparison to succeed; a baseline
+absolute failure therefore remains a failed PR gate even if the proposed runs
+and relative comparison pass. Diagnostic continuation is not baseline promotion
+or a merge exemption.
+
 The complete local paired workflow is:
 
 ```bash

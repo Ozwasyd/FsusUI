@@ -122,3 +122,4 @@ test('quality SDK setup keeps the canonical global.json owner', () => {
 })
 
 import './ci-performance-provenance.test.mjs'
+import './render-performance-diagnostic-integrity.test.mjs'
