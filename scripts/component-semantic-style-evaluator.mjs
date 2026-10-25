@@ -483,6 +483,178 @@ const contextOf = (declaration) => ({
   theme: declaration.selector.facts.classes.has('dark') ? 'dark' : 'light',
 })
 
+const selectorCompounds = (selector) => {
+  const compounds = [{ nodes: [], combinator: null }]
+  for (const node of selector.children ?? []) {
+    if (node.type === 'Combinator')
+      compounds.push({ nodes: [], combinator: node.name })
+    else compounds.at(-1).nodes.push(node)
+  }
+  return compounds
+}
+const stateAnd = (values) =>
+  values.includes(false)
+    ? false
+    : values.every((value) => value === true)
+      ? true
+      : undefined
+const stateOr = (values) =>
+  values.includes(true)
+    ? true
+    : values.every((value) => value === false)
+      ? false
+      : undefined
+const focusPseudos = new Set(['focus', 'focus-visible', 'focus-within'])
+const interactionPseudos = new Set(['hover', 'active'])
+const logicalPseudos = new Set(['is', 'where', 'not'])
+
+// Focus-visible implies focus/focus-within, but other interaction states can
+// coexist. Enumerate those axes rather than letting a hover-only winner hide
+// a broken non-hover focus state. Unsupported selectors remain unknown.
+const focusStates = (declarations, target) => {
+  const axes = new Set()
+  const collect = (selector) => {
+    for (const node of selectorCompounds(selector).at(-1).nodes) {
+      if (
+        node.type === 'ClassSelector' &&
+        !target.facts.terminalClasses.has(node.name)
+      ) {
+        axes.add(`class:${node.name}`)
+      }
+      if (node.type !== 'PseudoClassSelector') continue
+      if (interactionPseudos.has(node.name)) axes.add(`pseudo:${node.name}`)
+      if (logicalPseudos.has(node.name)) {
+        for (const branch of node.children?.first?.children ?? [])
+          collect(branch)
+      }
+    }
+  }
+  for (const declaration of declarations) collect(declaration.selector.ast)
+  let states = [{}]
+  for (const axis of [...axes].sort()) {
+    states = states.flatMap((state) => [
+      { ...state, [axis]: false },
+      { ...state, [axis]: true },
+    ])
+  }
+  return states
+}
+
+const matchesFocusState = (selector, target, state, context) => {
+  // No DOM topology is supplied to this evaluator. Root ancestry and focus
+  // containment are provable; a particular parent or sibling generally is not.
+  const relatives = (scope, combinator) => {
+    if (scope.root === true) return { candidates: [], guaranteed: false }
+    const ancestorRole = scope.role === 'unknown' ? 'unknown' : 'ancestor'
+    if (combinator === ' ' || combinator === '>') {
+      return {
+        candidates: [
+          {
+            scope: { role: ancestorRole, root: true },
+            exists: combinator === ' ' && scope.root === false,
+          },
+          { scope: { role: ancestorRole, root: false }, exists: false },
+        ],
+        guaranteed: scope.root === false,
+      }
+    }
+    if (combinator === '+' || combinator === '~') {
+      return {
+        candidates: [
+          { scope: { role: 'sibling', root: false }, exists: false },
+        ],
+        guaranteed: false,
+      }
+    }
+    return {
+      candidates: [
+        { scope: { role: 'unknown', root: undefined }, exists: false },
+      ],
+      guaranteed: false,
+    }
+  }
+  const match = (branch, scope) => {
+    const compounds = selectorCompounds(branch)
+    const matchPart = (index, currentScope) => {
+      const { nodes, combinator } = compounds[index]
+      if (!nodes.length) return undefined
+      const terminal = currentScope.role === 'target'
+      const own = stateAnd(
+        nodes.map((node) => {
+          if (node.type === 'UniversalSelector')
+            return node.name === '*' ? true : undefined
+          if (node.type === 'ClassSelector') {
+            if (node.name === 'dark' && currentScope.root === true)
+              return context.theme === 'dark'
+            if (!terminal) return undefined
+            return (
+              target.facts.terminalClasses.has(node.name) ||
+              state[`class:${node.name}`]
+            )
+          }
+          if (node.type === 'AttributeSelector') {
+            if (node.name.name === 'data-density') {
+              if (!terminal) return undefined
+              if (!node.value || node.matcher !== '=') return undefined
+              return (
+                node.value?.value === context.density ||
+                node.value?.name === context.density
+              )
+            }
+            if (terminal && node.name.name === 'disabled') return false
+            return undefined
+          }
+          if (node.type === 'TypeSelector') {
+            if (node.name === 'html') return currentScope.root
+            if (currentScope.root === true) return false
+            return undefined
+          }
+          if (node.type !== 'PseudoClassSelector') return undefined
+          if (logicalPseudos.has(node.name)) {
+            if (!node.children?.first?.children) return undefined
+            const result = stateOr(
+              [...node.children.first.children].map((branch) =>
+                match(branch, currentScope),
+              ),
+            )
+            return node.name === 'not' && result !== undefined
+              ? !result
+              : result
+          }
+          if (focusPseudos.has(node.name)) {
+            if (currentScope.role === 'unknown') return undefined
+            return (
+              terminal ||
+              (node.name === 'focus-within' && currentScope.role === 'ancestor')
+            )
+          }
+          if (node.name === 'root') return currentScope.root
+          if (terminal && node.name === 'disabled') return false
+          if (terminal && node.name === 'enabled') return true
+          if (terminal && interactionPseudos.has(node.name))
+            return state[`pseudo:${node.name}`]
+          return undefined
+        }),
+      )
+      if (own === false || index === 0) return own
+      const { candidates, guaranteed } = relatives(currentScope, combinator)
+      const results = candidates.map(({ scope, exists }) => ({
+        result: matchPart(index - 1, scope),
+        exists,
+      }))
+      const left = results.every(({ result }) => result === false)
+        ? false
+        : results.some(({ result, exists }) => result === true && exists) ||
+            (guaranteed && results.every(({ result }) => result === true))
+          ? true
+          : undefined
+      return stateAnd([own, left])
+    }
+    return matchPart(compounds.length - 1, scope)
+  }
+  return match(selector.ast, { role: 'target', root: false })
+}
+
 const applies = (declaration, context) => {
   const scope = contextOf(declaration)
   return (
@@ -654,6 +826,50 @@ const semanticValue = (
   }
   const result = evaluate(ast)
   return Array.isArray(result) && !allowSequence ? undefined : result
+}
+
+// Only compare a canonical value when its property semantics are known. Other
+// references retain a blocking evidence requirement instead of becoming heights.
+const comparisonProperty = (token) => {
+  if (token.type === 'color') {
+    return token.name.endsWith('.border') ? 'border-color' : 'background-color'
+  }
+  if (token.type === 'radius') return 'border-radius'
+  if (
+    token.type === 'dimension' &&
+    token.name.startsWith('density.') &&
+    (token.name.endsWith('.y') || token.name.includes('.target'))
+  ) {
+    return 'min-height'
+  }
+  if (token.type === 'thickness' && token.name.startsWith('thickness.focus.')) {
+    return 'box-shadow'
+  }
+  return undefined
+}
+
+const focusSpread = (input, variableResolver) => {
+  if (input === 'none') return { kind: 'length', unit: 'px', value: 0 }
+  const ast = csstree.parse(input, { context: 'value' })
+  const firstShadow = new csstree.List()
+  for (const node of ast.children) {
+    if (node.type === 'Operator' && node.value === ',') break
+    firstShadow.appendData(node)
+  }
+  const values = semanticValue(
+    { type: 'Value', children: firstShadow },
+    variableResolver,
+    new Set(),
+    true,
+  )
+  const lengths = (Array.isArray(values) ? values : [values]).filter(
+    (value) => typeof value === 'number' || value?.kind === 'length',
+  )
+  if (lengths.length < 2) return undefined
+  const spread = lengths[3] ?? 0
+  return typeof spread === 'number'
+    ? { kind: 'length', unit: 'px', value: spread }
+    : spread
 }
 
 const sourceDetails = (root, declaration, owner) => ({
@@ -1129,12 +1345,41 @@ export const evaluateSemanticStyles = async (options) => {
       }
     }
     for (const { reference, resolved } of references.values()) {
-      const property =
-        resolved.type === 'color'
-          ? 'background-color'
-          : resolved.type === 'radius'
-            ? 'border-radius'
-            : 'min-height'
+      const property = comparisonProperty(resolved)
+      if (!property) {
+        const unknown = staticUnknowns.find(
+          (entry) =>
+            entry.ruleId === rule.id &&
+            entry.reasonCode === 'canonical-property-binding-required',
+        )
+        if (unknown) {
+          unknown.canonicalReferences.push(clone(reference))
+          continue
+        }
+        staticUnknowns.push({
+          componentId: rule.componentId,
+          partId: rule.partId,
+          ruleId: rule.id,
+          selector: ownedSelectors[0].text,
+          scope: { density: 'default', media: 'all', theme: 'light' },
+          fields: [...rule.verificationPolicy.visualProbeFields],
+          reasonCode: 'canonical-property-binding-required',
+          status: 'visual-evidence-required',
+          verificationRequirement: 'visual-evidence-required',
+          visualRequirements: clone(rule.verificationPolicy.visualRequirements),
+          canonicalReference: clone(reference),
+          canonicalReferences: [clone(reference)],
+        })
+        continue
+      }
+      const alternatives = [...references.values()].filter(
+        (candidate) => comparisonProperty(candidate.resolved) === property,
+      )
+      // Multiple declared control-height tokens are legal size variants, not
+      // simultaneous equality requirements for one winning declaration.
+      const heightVariants =
+        property === 'min-height' && alternatives.length > 1
+      if (heightVariants && alternatives[0].reference !== reference) continue
       const target =
         ownedSelectors.find(
           (selector) =>
@@ -1144,7 +1389,11 @@ export const evaluateSemanticStyles = async (options) => {
       const matching = cascade.declarations.filter(
         (declaration) =>
           declaration.property === property &&
-          selectorMatchesOwnership(declaration, [target]),
+          (selectorMatchesOwnership(declaration, [target]) ||
+            (property === 'box-shadow' &&
+              [...declaration.selector.facts.positiveClasses].every(
+                (name) => name === 'dark',
+              ))),
       )
       if (!matching.length) continue
       const contexts = new Map()
@@ -1158,12 +1407,50 @@ export const evaluateSemanticStyles = async (options) => {
         const context = contextOf(declaration)
         contexts.set(JSON.stringify(context), context)
       }
-      for (const context of contexts.values()) {
-        const applicable = matching.filter((declaration) =>
+      const interactions =
+        property === 'box-shadow'
+          ? focusStates(
+              [
+                ...matching,
+                ...cascade.declarations.filter(
+                  (declaration) =>
+                    selectorMatchesOwnership(declaration, [target]) &&
+                    declaration.property.startsWith('--'),
+                ),
+              ],
+              target,
+            )
+          : [undefined]
+      const evaluations = [...contexts.values()].flatMap((context) =>
+        interactions.map((interaction) => ({ context, interaction })),
+      )
+      for (const { context, interaction } of evaluations) {
+        const stateMatch = (declaration) =>
+          interaction
+            ? matchesFocusState(
+                declaration.selector,
+                target,
+                interaction,
+                context,
+              )
+            : true
+        const candidates = matching.filter((declaration) =>
           applies(declaration, context),
         )
-        const actual = winner(applicable)
+        const applicable = candidates.filter(
+          (declaration) => stateMatch(declaration) === true,
+        )
+        const uncertain = candidates.filter(
+          (declaration) => stateMatch(declaration) === undefined,
+        )
+        const actual = winner(applicable) ?? winner(uncertain)
         if (!actual) continue
+        let uncertainWinner = uncertain.some(
+          (declaration) => cascadeCompare(declaration, actual) >= 0,
+        )
+        const unresolved = uncertain.filter(
+          (declaration) => cascadeCompare(declaration, actual) >= 0,
+        )
         const variableResolver = (name) => {
           const candidates = cascade.declarations.filter(
             (declaration) =>
@@ -1173,10 +1460,61 @@ export const evaluateSemanticStyles = async (options) => {
                 declaration.selector.facts.classes.has('dark') ||
                 selectorMatchesOwnership(declaration, [target])),
           )
-          return winner(candidates)?.value
+          const variableStateMatch = (declaration) =>
+            interaction && selectorMatchesOwnership(declaration, [target])
+              ? stateMatch(declaration)
+              : true
+          const known = winner(
+            candidates.filter(
+              (declaration) => variableStateMatch(declaration) === true,
+            ),
+          )
+          const unresolvedVariables = candidates.filter(
+            (declaration) =>
+              variableStateMatch(declaration) === undefined &&
+              (!known || cascadeCompare(declaration, known) > 0),
+          )
+          if (unresolvedVariables.length) uncertainWinner = true
+          unresolved.push(...unresolvedVariables)
+          return known?.value
         }
-        const actualSemantic = semanticValue(actual.value, variableResolver)
-        const expectedSemantic = semanticValue(resolved.value, () => undefined)
+        const resolvedSemantic =
+          property === 'box-shadow'
+            ? focusSpread(actual.value, variableResolver)
+            : semanticValue(actual.value, variableResolver)
+        const actualSemantic = uncertainWinner ? undefined : resolvedSemantic
+        const densityVariants = alternatives.filter((candidate) =>
+          candidate.resolved.name.includes(`.${context.density}.`),
+        )
+        const applicableVariants = densityVariants.length
+          ? densityVariants
+          : alternatives
+        const matchedVariant = heightVariants
+          ? applicableVariants.find(
+              (candidate) =>
+                JSON.stringify(
+                  semanticValue(candidate.resolved.value, () => undefined),
+                ) === JSON.stringify(actualSemantic),
+            )
+          : undefined
+        const expectedVariant =
+          matchedVariant ??
+          (heightVariants ? applicableVariants[0] : { reference, resolved })
+        const expectedReference = expectedVariant.reference
+        const expectedSemantic = semanticValue(
+          expectedVariant.resolved.value,
+          () => undefined,
+        )
+        const minimumTarget =
+          property === 'min-height' && resolved.name.includes('.target')
+        // Hit targets are lower bounds; the component contract may require a
+        // larger target (for example the Dialog close affordance).
+        const matchesMinimum =
+          minimumTarget &&
+          actualSemantic?.kind === 'length' &&
+          expectedSemantic?.kind === 'length' &&
+          actualSemantic.unit === expectedSemantic.unit &&
+          actualSemantic.value >= expectedSemantic.value
         const actualCascade = applicable
           .sort((left, right) => left.order - right.order)
           .map((declaration) => {
@@ -1200,6 +1538,16 @@ export const evaluateSemanticStyles = async (options) => {
             semanticValue: actualSemantic,
             source: sourceDetails(root, actual, rule.owner),
             value: actual.value,
+            ...(interaction ? { interactionState: interaction } : {}),
+            ...(unresolved.length
+              ? {
+                  unresolvedCascade: unresolved.map((declaration) => ({
+                    selector: declaration.selector.text,
+                    property: declaration.property,
+                    source: sourceDetails(root, declaration, rule.owner),
+                  })),
+                }
+              : {}),
           },
           componentId: rule.componentId,
           partId: rule.partId,
@@ -1224,15 +1572,16 @@ export const evaluateSemanticStyles = async (options) => {
           diagnostics.push({
             ...common,
             expected: {
-              canonicalReference: clone(reference),
+              canonicalReference: clone(expectedReference),
               resolvedValue: {
-                raw: resolved.value,
+                raw: expectedVariant.resolved.value,
                 semantic: expectedSemantic,
               },
             },
             status:
+              matchesMinimum ||
               JSON.stringify(actualSemantic) ===
-              JSON.stringify(expectedSemantic)
+                JSON.stringify(expectedSemantic)
                 ? 'pass'
                 : 'fail',
           })

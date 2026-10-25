@@ -17,15 +17,7 @@ import {
   epPackage,
   projRoot,
 } from '@element-plus/build-utils'
-import {
-  buildConfig,
-  buildFullBundle,
-  buildHelper,
-  buildModules,
-  generateTypesDefinitions,
-  run,
-  withTaskName,
-} from './src'
+import { buildConfig, buildHelper, run, withTaskName } from './src'
 import type { TaskFunction } from 'gulp'
 import type { Module } from './src'
 
@@ -108,7 +100,7 @@ const resolveBundledWorkspaceRuntimeSpecifier = (
     filePath.endsWith('.d.mts') ||
     filePath.endsWith('.d.cts')
   ) {
-    return 'element-plus/es/motion'
+    return 'element-plus/es/motion/index'
   }
 
   const relativePath = path
@@ -387,15 +379,21 @@ const buildPackage: TaskFunction = series(
 
   series(
     withTaskName('buildHelper', buildHelper),
-    withTaskName('buildModules', buildModules),
-    withTaskName('generateTypesDefinitions', generateTypesDefinitions),
+    withTaskName('buildModules', () =>
+      run('pnpm run -C vue/internal/build start buildModules'),
+    ),
+    withTaskName('generateTypesDefinitions', () =>
+      run('pnpm run -C vue/internal/build start generateTypesDefinitions'),
+    ),
     series(
       withTaskName('buildThemeChalk', () =>
         run('pnpm run -C vue/packages/theme-chalk build'),
       ),
       copyFullStyle,
     ),
-    withTaskName('buildFullBundle', buildFullBundle),
+    withTaskName('buildFullBundle', () =>
+      run('pnpm run -C vue/internal/build start buildFullBundle'),
+    ),
     withTaskName(
       'rewriteBuiltBundledWorkspaceDependencyReferences',
       rewriteBuiltBundledWorkspaceDependencyReferences,

@@ -10,7 +10,7 @@ import {
   throwError,
 } from '@element-plus/utils'
 import { useDelayedToggle } from '@element-plus/hooks'
-import type { PopperInstance } from '@element-plus/components/popper'
+import type { Instance as PopperInstance } from '@popperjs/core'
 import type { Nullable } from '@element-plus/utils'
 import type { TableColumnCtx } from './table-column/defaults'
 import type { ElTooltipProps } from '@element-plus/components/tooltip'

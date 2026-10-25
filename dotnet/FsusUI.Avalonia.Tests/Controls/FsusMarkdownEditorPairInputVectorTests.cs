@@ -1,4 +1,3 @@
-using System.Runtime.CompilerServices;
 using System.Text.Json.Nodes;
 using FsusUI.Avalonia.Controls;
 
@@ -13,6 +12,16 @@ namespace FsusUI.Avalonia.Tests.Controls;
 /// </summary>
 public class FsusMarkdownEditorPairInputVectorTests
 {
+  [Fact]
+  public void FixtureRootIgnoresCompilerMappedSourcePaths()
+  {
+#line 1 "/_/fsusui-native-fixture-root-control.cs"
+    var repositoryRoot = RepositoryRoot();
+#line default
+    Assert.True(File.Exists(Path.Combine(repositoryRoot, "pnpm-workspace.yaml")));
+    Assert.True(File.Exists(Path.Combine(repositoryRoot, "dotnet", "FsusUI.Avalonia.slnx")));
+  }
+
   public static TheoryData<string> FrozenPairVectorIds()
   {
     var data = new TheoryData<string>();
@@ -111,9 +120,9 @@ public class FsusMarkdownEditorPairInputVectorTests
       ?? throw new InvalidOperationException("Input vectors are missing the pairInput section.");
   }
 
-  private static string RepositoryRoot([CallerFilePath] string sourceFile = "")
+  private static string RepositoryRoot()
   {
-    var directory = new DirectoryInfo(Path.GetDirectoryName(sourceFile) ?? string.Empty);
+    var directory = new DirectoryInfo(AppContext.BaseDirectory);
     while (directory is not null)
     {
       if (File.Exists(Path.Combine(directory.FullName, "dotnet", "FsusUI.Avalonia.slnx")))

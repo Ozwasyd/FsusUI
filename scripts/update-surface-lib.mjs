@@ -1,9 +1,12 @@
 import {
   existsSync,
+  lstatSync,
   readFileSync,
   readdirSync,
+  realpathSync,
   statSync,
 } from 'node:fs'
+import { execFileSync } from 'node:child_process'
 import path from 'node:path'
 import {
   AUTHORITY_REL,
@@ -612,10 +615,50 @@ function toolchainEntries(root) {
   ]
 }
 
-function dockerEntries(root) {
-  const dockerfiles = walkFiles(root, '.', (relative) =>
-    /(^|\/)Dockerfile(?:\.[^/]+)?$/u.test(relative),
+export function sourceDockerfiles(root) {
+  const directory = realpathSync(root)
+  const options = {
+    cwd: directory,
+    env: Object.fromEntries(
+      Object.entries(process.env).filter(
+        ([key]) => !key.toUpperCase().startsWith('GIT_'),
+      ),
+    ),
+    encoding: 'utf8',
+    stdio: ['ignore', 'pipe', 'pipe'],
+    maxBuffer: 16 * 1024 * 1024,
+  }
+  const gitRoot = execFileSync(
+    'git',
+    ['rev-parse', '--show-toplevel'],
+    options,
+  ).trim()
+  if (realpathSync(gitRoot) !== directory) {
+    throw new Error('Dockerfile discovery must use the Git repository root')
+  }
+  const files = execFileSync(
+    'git',
+    ['ls-files', '--cached', '--others', '--exclude-standard', '-z'],
+    options,
   )
+  const dockerfiles = uniqueSorted(
+    files
+      .split('\0')
+      .filter((relative) => /(^|\/)Dockerfile(?:\.[^/]+)?$/u.test(relative)),
+  )
+  for (const relative of dockerfiles) {
+    const absolute = path.join(directory, relative)
+    if (!lstatSync(absolute).isFile() || realpathSync(absolute) !== absolute) {
+      throw new Error(
+        `Dockerfile source must be a regular repository file without symlinks: ${relative}`,
+      )
+    }
+  }
+  return dockerfiles
+}
+
+function dockerEntries(root) {
+  const dockerfiles = sourceDockerfiles(root)
   const images = new Map()
   for (const relative of dockerfiles) {
     const text = readText(root, relative)

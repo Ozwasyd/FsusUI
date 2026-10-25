@@ -23,6 +23,7 @@ import {
   VUE_BASELINE_PATH,
 } from '../scripts/contract-v2.mjs'
 import { validateVuePublicCoverage } from '../scripts/conformance-v2-vue-public-gate.mjs'
+import './vue-public-api-baseline-generation.test.mjs'
 import { extractStructuredEmitPayloads } from '../scripts/vue-structured-emit-payload.mjs'
 import { extractStructuredExposedSignatures } from '../scripts/vue-structured-exposed-signature.mjs'
 import {
@@ -169,7 +170,7 @@ test('Avalonia semantic baselines retain compiler and input freshness identity',
   assert.equal(
     properties.filter((property) => typeof property.required === 'boolean')
       .length,
-    2098,
+    2115,
   )
   assert.equal(properties.filter((property) => property.required).length, 15)
   assert.equal(
@@ -427,12 +428,12 @@ test('Avalonia automation baseline separates source observations from declared a
     ]),
   )
   assert.equal(automationTypes.length, 112)
-  assert.equal(mappings.length, 408)
+  assert.equal(mappings.length, 410)
   assert.deepEqual(semanticCounts, {
     role: 107,
-    name: 123,
+    name: 124,
     value: 4,
-    state: 115,
+    state: 116,
     'help-text': 25,
     'accessibility-view': 22,
     'live-setting': 12,

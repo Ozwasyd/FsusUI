@@ -53,7 +53,7 @@
     "build": "node ../../../scripts/with-node-heap.mjs pnpm run build:generate && node ../../../scripts/with-node-heap.mjs run-p build:build build:types",
     "build:generate": "node ../../../scripts/with-node-heap.mjs tsx build/generate.ts",
     "build:build": "NODE_ENV=production node ../../../scripts/with-node-heap.mjs tsx build/build.ts",
-    "build:types": "node ../../../scripts/with-node-heap.mjs vue-tsc --declaration --emitDeclarationOnly"
+    "build:types": "node ../../../scripts/with-node-heap.mjs node ../../../scripts/generate-package-declarations.mjs --declaration --emitDeclarationOnly"
   },
   "peerDependencies": {
     "vue": "^3.5.0"

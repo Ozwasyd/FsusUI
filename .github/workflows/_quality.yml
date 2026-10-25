@@ -23,7 +23,7 @@ on:
 
 jobs:
   real-render-performance:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 120
     steps:
       - uses: actions/checkout@v4
@@ -64,10 +64,12 @@ jobs:
           artifacts: real-render-performance=.tmp/performance/current
 
   static-quality:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: pnpm/action-setup@v4
         with:
           version: 10.33.0
@@ -77,6 +79,8 @@ jobs:
           cache: pnpm
           cache-dependency-path: pnpm-lock.yaml
       - run: pnpm install --frozen-lockfile
+      - name: Run dependency projection and migration history controls
+        run: pnpm run test:deps-check
       - name: Run contract checks
         run: |
           pnpm run check:consumer-contract
@@ -93,6 +97,23 @@ jobs:
           pnpm run icons:lint
       - name: Run conformance
         run: pnpm run conformance
+      - uses: emscripten-core/setup-emsdk@v15
+        with:
+          version: 5.0.4
+          actions-cache-folder: emsdk-cache
+      - uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: dotnet/global.json
+      - run: pnpm exec playwright install --with-deps chromium
+      - uses: ./.github/actions/setup-conformance-accessibility
+      - name: Produce exact-candidate alignment before governance
+        run: dbus-run-session -- xvfb-run -a pnpm run conformance:v2
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: conformance-v2-static-${{ inputs.group }}
+          path: .tmp/conformance-v2
+          retention-days: 14
       - name: Run governance
         run: pnpm run governance:check
       - name: Run accessibility contract
@@ -113,7 +134,7 @@ jobs:
       matrix:
         include:
           - platform: linux
-            os: ubuntu-latest
+            os: ubuntu-24.04
           - platform: windows
             os: windows-latest
           - platform: macos
@@ -132,7 +153,12 @@ jobs:
           key: ${{ runner.os }}-${{ runner.arch }}-fsusui-dotnet-sdk-${{ hashFiles('dotnet/global.json') }}-${{ hashFiles('dotnet/**/*.csproj', 'dotnet/**/*.props', 'dotnet/**/*.targets', 'dotnet/**/*.slnx', 'dotnet/**/packages.lock.json', 'NuGet.config') }}
           restore-keys: |
             ${{ runner.os }}-${{ runner.arch }}-fsusui-dotnet-sdk-${{ hashFiles('dotnet/global.json') }}-
+      - name: Set up PDF inspection tools
+        uses: ./.github/actions/setup-pdf-tools
       - name: Run platform-owned restore, build, tests, and smoke
+        env:
+          FSUS_WEBVIEW_CANDIDATE_SHA: ${{ github.sha }}
+          FSUS_AVALONIA_VISUAL_EVIDENCE_ROOT: dotnet/artifacts/platform/${{ matrix.platform }}/visual-evidence
         run: node scripts/dotnet-platform-verify.mjs --output dotnet/artifacts/platform/${{ matrix.platform }}/manifest.json
       - uses: actions/upload-artifact@v4
         if: always()
@@ -153,7 +179,7 @@ jobs:
           artifact-suffix: ${{ matrix.platform }}
 
   dotnet-package:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 60
     outputs:
       candidate-digest: ${{ steps.candidate.outputs.digest }}
@@ -176,6 +202,7 @@ jobs:
           global-json-file: dotnet/global.json
       - run: pnpm install --frozen-lockfile
       - run: pnpm exec playwright install --with-deps chromium
+      - uses: ./.github/actions/setup-conformance-accessibility
       - name: Restore canonical .NET package cache
         uses: actions/cache@v4
         with:
@@ -188,9 +215,15 @@ jobs:
       - name: Build and verify the unique NuGet candidate
         id: candidate
         run: |
-          xvfb-run -a pnpm run conformance:v2
+          dbus-run-session -- xvfb-run -a pnpm run conformance:v2
           node scripts/dotnet-package-verify.mjs
-          echo "digest=$(node -p \"require('./dotnet/artifacts/package/manifest.json').candidateSha256\")" >> "$GITHUB_OUTPUT"
+          echo "digest=$(node -p "require('./dotnet/artifacts/package/manifest.json').candidateSha256")" >> "$GITHUB_OUTPUT"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: conformance-v2-package-${{ inputs.group }}
+          path: .tmp/conformance-v2
+          retention-days: 14
       - uses: actions/upload-artifact@v4
         with:
           name: dotnet-nuget-candidate
@@ -220,7 +253,7 @@ jobs:
 
   avalonia-aot:
     if: always()
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 10
     needs:
       - dotnet-package
@@ -253,7 +286,7 @@ jobs:
           artifacts: avalonia-aot=.avalonia-aot-readiness
 
   typecheck:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
@@ -289,7 +322,7 @@ jobs:
           status: ${{ job.status }}
 
   capacity:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 5
     outputs:
       unit-matrix: ${{ steps.plan.outputs.unit-matrix }}
@@ -309,7 +342,7 @@ jobs:
         run: node ./scripts/ci-capacity.mjs --dry-run --github-output="$GITHUB_OUTPUT"
 
   unit-artifacts:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
@@ -361,7 +394,7 @@ jobs:
     needs:
       - capacity
       - unit-artifacts
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 30
     strategy:
       fail-fast: false
@@ -401,7 +434,7 @@ jobs:
           artifact-suffix: ${{ strategy.job-index }}
 
   coverage-plan:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 5
     outputs:
       mode: ${{ steps.plan.outputs.mode }}
@@ -425,7 +458,7 @@ jobs:
   coverage-single:
     if: needs.coverage-plan.outputs.mode == 'single'
     needs: coverage-plan
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
@@ -476,7 +509,7 @@ jobs:
   coverage-shard:
     if: needs.coverage-plan.outputs.mode == 'sharded'
     needs: coverage-plan
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 30
     strategy:
       fail-fast: false
@@ -529,7 +562,7 @@ jobs:
     needs:
       - coverage-plan
       - coverage-shard
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
@@ -563,7 +596,7 @@ jobs:
       - coverage-single
       - coverage-shard
       - coverage-merge
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
@@ -599,7 +632,7 @@ jobs:
           artifacts: coverage-report=.coverage-evidence
 
   build-package:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 40
     outputs:
       candidate-digest: ${{ steps.candidate.outputs.digest }}
@@ -664,7 +697,7 @@ jobs:
           artifacts: npm-candidate=dist/npm-candidate
 
   consumer-install:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 45
     needs:
       - static-quality
@@ -736,7 +769,7 @@ jobs:
           artifacts: consumer-matrix=.consumer-matrix
 
   build-demo:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
@@ -783,7 +816,7 @@ jobs:
           status: ${{ job.status }}
 
   visual:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 30
     env:
       FSUS_VISUAL_EVIDENCE: ${{ inputs.group == 'release' && '1' || '0' }}
@@ -871,7 +904,7 @@ jobs:
 
   stable-readiness:
     if: always()
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 10
     needs:
       - static-quality
@@ -926,7 +959,7 @@ jobs:
 
   nightly-readiness:
     if: always() && inputs.group == 'nightly'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 10
     needs:
       - stable-readiness
@@ -974,7 +1007,7 @@ jobs:
 
   release-readiness:
     if: always() && inputs.group == 'release'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 10
     outputs:
       evidence-digest: ${{ steps.release-evidence.outputs.digest }}

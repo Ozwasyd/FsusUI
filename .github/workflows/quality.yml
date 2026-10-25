@@ -35,7 +35,7 @@ concurrency:
 jobs:
   pr-avalonia-aot-plan:
     if: github.event_name == 'pull_request'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 5
     outputs:
       run: ${{ steps.plan.outputs.run }}
@@ -59,7 +59,7 @@ jobs:
   pr-avalonia-aot-candidate:
     if: needs.pr-avalonia-aot-plan.outputs.run == 'true'
     needs: pr-avalonia-aot-plan
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 60
     outputs:
       candidate-digest: ${{ steps.candidate.outputs.digest }}
@@ -84,14 +84,25 @@ jobs:
           global-json-file: dotnet/global.json
       - run: pnpm install --frozen-lockfile
       - run: pnpm exec playwright install --with-deps chromium
+      - uses: ./.github/actions/setup-conformance-accessibility
       - name: Build the immutable NuGet candidate once
         id: candidate
         env:
-          GITHUB_SHA: ${{ github.event.pull_request.head.sha }}
+          FSUS_CANDIDATE_SHA: ${{ github.event.pull_request.head.sha }}
         run: |
-          xvfb-run -a pnpm run conformance:v2
-          node scripts/dotnet-package-verify.mjs
-          echo "digest=$(node -p \"require('./dotnet/artifacts/package/manifest.json').candidateSha256\")" >> "$GITHUB_OUTPUT"
+          test -n "${FSUS_CANDIDATE_SHA:-}" &&
+          candidate_sha="$(git rev-parse HEAD)" &&
+          test "$candidate_sha" = "$FSUS_CANDIDATE_SHA" ||
+          { echo "::error::NuGet candidate identity must match checkout HEAD" >&2; exit 1; }
+          GITHUB_SHA="$candidate_sha" dbus-run-session -- xvfb-run -a pnpm run conformance:v2
+          GITHUB_SHA="$candidate_sha" node scripts/dotnet-package-verify.mjs
+          echo "digest=$(node -p "require('./dotnet/artifacts/package/manifest.json').candidateSha256")" >> "$GITHUB_OUTPUT"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: conformance-v2-pr-head
+          path: .tmp/conformance-v2
+          retention-days: 14
       - uses: actions/upload-artifact@v4
         with:
           name: pr-dotnet-nuget-candidate
@@ -113,7 +124,7 @@ jobs:
 
   pr-feedback:
     if: github.event_name == 'pull_request'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 35
     steps:
       - uses: actions/checkout@v4
@@ -165,6 +176,19 @@ jobs:
           echo "typecheck-cache-hit=${{ steps.typecheck-cache.outputs.cache-hit }}"
           echo "cache-hit=${{ steps.typecheck-cache.outputs.cache-hit }}"
           echo "cache-primary-key=${{ steps.typecheck-cache.outputs.cache-primary-key }}"
+      - uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: dotnet/global.json
+      - run: pnpm exec playwright install --with-deps chromium
+      - uses: ./.github/actions/setup-conformance-accessibility
+      - name: Produce exact-candidate alignment before PR governance
+        run: dbus-run-session -- xvfb-run -a pnpm run conformance:v2
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: conformance-v2-pr-feedback
+          path: .tmp/conformance-v2
+          retention-days: 14
       - run: pnpm run verify:pr-fast
       - name: Determine PR demo build path impact
         id: demo-build-path
@@ -183,7 +207,7 @@ jobs:
 
   pr-real-render-performance:
     if: github.event_name == 'pull_request'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 45
     steps:
       - name: Checkout current change
@@ -274,39 +298,95 @@ jobs:
         working-directory: current
         run: pnpm run ensure:wasm
       - name: Measure same-runner baseline first
+        id: baseline-first
         if: steps.baseline-contract.outputs.available == 'true'
         working-directory: baseline
+        env:
+          FSUS_MEASUREMENT_SHA: ${{ github.event.pull_request.base.sha }}
         run: >-
-          pnpm perf:render --
+          test -n "${FSUS_MEASUREMENT_SHA:-}" &&
+          measurement_sha="$(git rev-parse HEAD)" &&
+          test "$measurement_sha" = "$FSUS_MEASUREMENT_SHA" ||
+          { echo "::error::Performance measurement identity must match checkout HEAD" >&2; exit 1; };
+
+          GITHUB_SHA="$measurement_sha" pnpm perf:render --
           --impact-plan ../performance-impact-plan.json
           --profile quick
           --output ../performance-baseline
       - name: Measure current quick matrix
-        if: steps.render-impact.outputs.run == 'true'
+        id: current-first
+        if: >-
+          !cancelled() && steps.render-impact.outputs.run == 'true' &&
+          ((steps.baseline-contract.outputs.available == 'true' &&
+          (steps.baseline-first.outcome == 'success' || steps.baseline-first.outcome == 'failure')) ||
+          (steps.baseline-contract.outputs.available != 'true' && success()))
         working-directory: current
+        env:
+          FSUS_MEASUREMENT_SHA: ${{ github.sha }}
         run: >-
-          pnpm perf:render --
+          test -n "${FSUS_MEASUREMENT_SHA:-}" &&
+          measurement_sha="$(git rev-parse HEAD)" &&
+          test "$measurement_sha" = "$FSUS_MEASUREMENT_SHA" ||
+          { echo "::error::Performance measurement identity must match checkout HEAD" >&2; exit 1; };
+
+          GITHUB_SHA="$measurement_sha" pnpm perf:render --
           --impact-plan ../performance-impact-plan.json
           --profile quick
           --output ../performance-current
       - name: Repeat current quick matrix for order balance
-        if: steps.baseline-contract.outputs.available == 'true'
+        id: current-repeat
+        if: >-
+          !cancelled() && steps.baseline-contract.outputs.available == 'true' &&
+          (steps.current-first.outcome == 'success' || steps.current-first.outcome == 'failure')
         working-directory: current
+        env:
+          FSUS_MEASUREMENT_SHA: ${{ github.sha }}
         run: >-
-          pnpm perf:render --
+          test -n "${FSUS_MEASUREMENT_SHA:-}" &&
+          measurement_sha="$(git rev-parse HEAD)" &&
+          test "$measurement_sha" = "$FSUS_MEASUREMENT_SHA" ||
+          { echo "::error::Performance measurement identity must match checkout HEAD" >&2; exit 1; };
+
+          GITHUB_SHA="$measurement_sha" pnpm perf:render --
           --impact-plan ../performance-impact-plan.json
           --profile quick
           --output ../performance-current-repeat
       - name: Repeat baseline quick matrix last for order balance
-        if: steps.baseline-contract.outputs.available == 'true'
+        id: baseline-repeat
+        if: >-
+          !cancelled() && steps.baseline-contract.outputs.available == 'true' &&
+          (steps.current-repeat.outcome == 'success' || steps.current-repeat.outcome == 'failure')
         working-directory: baseline
+        env:
+          FSUS_MEASUREMENT_SHA: ${{ github.event.pull_request.base.sha }}
         run: >-
-          pnpm perf:render --
+          test -n "${FSUS_MEASUREMENT_SHA:-}" &&
+          measurement_sha="$(git rev-parse HEAD)" &&
+          test "$measurement_sha" = "$FSUS_MEASUREMENT_SHA" ||
+          { echo "::error::Performance measurement identity must match checkout HEAD" >&2; exit 1; };
+
+          GITHUB_SHA="$measurement_sha" pnpm perf:render --
           --impact-plan ../performance-impact-plan.json
           --profile quick
           --output ../performance-baseline-repeat
+      - name: Verify complete source-bound ABBA diagnostic artifacts
+        id: paired-integrity
+        if: >-
+          !cancelled() && steps.baseline-contract.outputs.available == 'true' &&
+          (steps.baseline-repeat.outcome == 'success' || steps.baseline-repeat.outcome == 'failure')
+        env:
+          FSUS_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          FSUS_CURRENT_SHA: ${{ github.sha }}
+        run: >-
+          node current/scripts/render-performance-diagnostic-integrity.mjs
+          performance-impact-plan.json "$FSUS_BASE_SHA" "$FSUS_CURRENT_SHA"
+          performance-baseline performance-current
+          performance-current-repeat performance-baseline-repeat
       - name: Compare against base revision on the same runner
-        if: steps.baseline-contract.outputs.available == 'true'
+        id: paired-comparison
+        if: >-
+          !cancelled() && steps.baseline-contract.outputs.available == 'true' &&
+          steps.paired-integrity.outcome == 'success'
         working-directory: current
         run: >-
           pnpm perf:render:compare --
@@ -315,6 +395,27 @@ jobs:
           0.15
           ../performance-baseline-repeat
           ../performance-current-repeat
+      - name: Require every original measurement and comparison to pass
+        if: >-
+          !cancelled() && steps.render-impact.outputs.run == 'true'
+        env:
+          FSUS_BASE_AVAILABLE: ${{ steps.baseline-contract.outputs.available }}
+          FSUS_BASE_FIRST: ${{ steps.baseline-first.outcome }}
+          FSUS_CURRENT_FIRST: ${{ steps.current-first.outcome }}
+          FSUS_CURRENT_REPEAT: ${{ steps.current-repeat.outcome }}
+          FSUS_BASE_REPEAT: ${{ steps.baseline-repeat.outcome }}
+          FSUS_INTEGRITY: ${{ steps.paired-integrity.outcome }}
+          FSUS_COMPARISON: ${{ steps.paired-comparison.outcome }}
+        run: |
+          test "$FSUS_BASE_AVAILABLE" = true || test "$FSUS_BASE_AVAILABLE" = false
+          test "$FSUS_CURRENT_FIRST" = success
+          if [ "$FSUS_BASE_AVAILABLE" = true ]; then
+            test "$FSUS_BASE_FIRST" = success
+            test "$FSUS_CURRENT_REPEAT" = success
+            test "$FSUS_BASE_REPEAT" = success
+            test "$FSUS_INTEGRITY" = success
+            test "$FSUS_COMPARISON" = success
+          fi
       - name: Skip unaffected PR real-render measurement
         if: steps.render-impact.outputs.run != 'true'
         run: echo "Skipping real-render measurement; ownership plan is skip-safe."
@@ -349,7 +450,7 @@ jobs:
       - pr-real-render-performance
       - premerge-main
       - premerge-playwright
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 5
     steps:
       - name: Enforce complete PR merge readiness
@@ -374,7 +475,7 @@ jobs:
     needs:
       - premerge-main
       - premerge-playwright
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 5
     steps:
       - name: Preserve required PR gate on merge queue candidates
@@ -390,7 +491,7 @@ jobs:
     if: always() && github.event_name == 'merge_group'
     needs:
       - premerge-main
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 5
     steps:
       - name: Preserve required render gate on merge queue candidates

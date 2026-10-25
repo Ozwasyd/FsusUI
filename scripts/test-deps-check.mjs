@@ -498,3 +498,5 @@ function setupMinimalTree(tempRoot, authority, options = {}) {
 }
 
 console.log('[test-deps-check] all mutation tests passed')
+
+await import('./test-deps-baseline-verify.mjs')

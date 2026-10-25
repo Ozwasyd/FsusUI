@@ -293,14 +293,14 @@ export const validateWorkflowContracts = ({
     'scripts/avalonia-aot-native.mjs affected',
     'rid: linux-x64',
     'ref: ${{ github.event.pull_request.head.sha }}',
-    'GITHUB_SHA: ${{ github.event.pull_request.head.sha }}',
+    'FSUS_CANDIDATE_SHA: ${{ github.event.pull_request.head.sha }}',
+    'test "$candidate_sha" = "$FSUS_CANDIDATE_SHA"',
+    'GITHUB_SHA="$candidate_sha" node scripts/dotnet-package-verify.mjs',
   ])
     if (!caller.includes(term)) throw new Error(`PR workflow missing ${term}`)
   if (
     !publish.includes('release-readiness-digest') ||
-    !publish.includes(
-      'needs: [quality, plan, preflight, fsusblog-consumer]',
-    )
+    !publish.includes('needs: [quality, plan, preflight, fsusblog-consumer]')
   )
     throw new Error('publish workflow must remain bound to release readiness')
   return true

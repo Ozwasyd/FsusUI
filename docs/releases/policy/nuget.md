@@ -50,20 +50,22 @@ not produce package candidates.
 
 ## SDK selection and dependency locks
 
-`dotnet/global.json` retains the original `10.0.108` minimum with
-`latestFeature`: select the highest installed compatible 10.0 feature band,
-rather than require the 10.0.1xx band. The existing restore, platform, and
-package verifiers execute .NET from `dotnet/` so the CLI finds this policy,
-and print the selected SDK before restoring. Successful platform and package
-manifests also record that SDK. A setup-dotnet installation result alone is
-not proof of the SDK used by a verifier.
+`dotnet/global.json` selects the reviewed SDK `10.0.401` with
+`rollForward: disable`. The exact SDK must be installed; a newer SDK must not
+silently replace the SDK that produced the locked graph. The existing restore,
+platform, and package verifiers execute .NET from `dotnet/` so the CLI finds
+this policy, and print the selected SDK before restoring. Successful platform
+and package manifests also record that SDK. A setup-dotnet installation result
+alone is not proof of the SDK used by a verifier.
 
 CI platform and package restores use locked mode. SDK-supplied dependencies,
 including the implicit ILLink package of AOT-compatible libraries, can change
-between feature bands. An installed SDK allowed by `latestFeature` must still
-match the committed lock requests; a mismatch fails verification and requires
-reviewed lock maintenance, not an unlocked CI restore. A lock snapshot verified
-with one SDK does not qualify another feature band.
+between feature bands and patches. The former `latestFeature` selection could
+choose SDK `10.0.402`, whose implicit ILLink `10.0.13` conflicts with the
+reviewed SDK `10.0.401` / ILLink `10.0.12` graph. Keep the exact SDK and locks
+in step, as recommended by the [.NET SDK selection contract](https://learn.microsoft.com/en-us/dotnet/core/tools/global-json#rollforward).
+A mismatch still fails verification; never use an unlocked CI restore to
+accept it. A lock snapshot verified with one SDK does not qualify another.
 
 Run `pnpm dotnet:restore:update-locks` with the intended SDK installed to
 regenerate every project lock, then run `pnpm dotnet:restore` and the affected
