@@ -1,9 +1,4 @@
-import {
-  existsSync,
-  readFileSync,
-  readdirSync,
-  statSync,
-} from 'node:fs'
+import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs'
 import path from 'node:path'
 import {
   AUTHORITY_REL,
@@ -12,8 +7,7 @@ import {
   loadAuthority,
 } from './npm-authority-lib.mjs'
 
-export const UPDATE_SURFACE_REL =
-  'config/dependencies/update-surface.json'
+export const UPDATE_SURFACE_REL = 'config/dependencies/update-surface.json'
 export const UPDATE_SURFACE_SCHEMA_REL =
   'config/dependencies/update-surface.schema.json'
 export const RENOVATE_REL = 'renovate.json5'
@@ -182,8 +176,7 @@ const EXCLUSIONS = [
   },
   {
     id: 'vue-public-api-package-fixture',
-    path:
-      'tests/fixtures/vue-public-api-baseline/vue/packages/element-plus/package.json',
+    path: 'tests/fixtures/vue-public-api-baseline/vue/packages/element-plus/package.json',
     field: '*',
     reason:
       'Frozen input fixture for public API baseline mutation tests, not a consumable manifest.',
@@ -202,8 +195,7 @@ const EXCLUSIONS = [
     owner: 'dependency-governance',
     createdAt: '2026-08-27',
     reviewAfter: '2027-02-28',
-    removalCondition:
-      'Remove with the custom manager mutation suite.',
+    removalCondition: 'Remove with the custom manager mutation suite.',
   },
   {
     id: 'npm-authority-documentation-examples',
@@ -219,8 +211,7 @@ const EXCLUSIONS = [
   },
   {
     id: 'form-generator-netstandard-contract',
-    path:
-      'dotnet/FsusUI.Avalonia.FormGenerator/FsusUI.Avalonia.FormGenerator.csproj',
+    path: 'dotnet/FsusUI.Avalonia.FormGenerator/FsusUI.Avalonia.FormGenerator.csproj',
     field: 'TargetFramework',
     reason:
       'netstandard2.0 is the frozen public analyzer compatibility target, not a floating runtime pin.',
@@ -244,47 +235,40 @@ const EXCLUSIONS = [
   },
   {
     id: 'avalonia-nuget-accidental-publication-fixture',
-    path:
-      'tests/fixtures/avalonia-nuget-stable/accidental-demo-publication.csproj',
+    path: 'tests/fixtures/avalonia-nuget-stable/accidental-demo-publication.csproj',
     field: '*',
     reason:
       'Intentionally invalid NuGet publication fixture used by negative governance tests.',
     owner: 'avalonia-maintainers',
     createdAt: '2026-08-27',
     reviewAfter: '2027-02-28',
-    removalCondition:
-      'Remove with the negative NuGet publication fixture.',
+    removalCondition: 'Remove with the negative NuGet publication fixture.',
   },
   {
     id: 'avalonia-nuget-missing-metadata-fixture',
-    path:
-      'tests/fixtures/avalonia-nuget-stable/missing-package-metadata.csproj',
+    path: 'tests/fixtures/avalonia-nuget-stable/missing-package-metadata.csproj',
     field: '*',
     reason:
       'Intentionally invalid missing-metadata fixture used by negative NuGet tests.',
     owner: 'avalonia-maintainers',
     createdAt: '2026-08-27',
     reviewAfter: '2027-02-28',
-    removalCondition:
-      'Remove with the negative NuGet metadata fixture.',
+    removalCondition: 'Remove with the negative NuGet metadata fixture.',
   },
   {
     id: 'avalonia-nuget-stale-notes-fixture',
-    path:
-      'tests/fixtures/avalonia-nuget-stable/stale-release-notes.props',
+    path: 'tests/fixtures/avalonia-nuget-stable/stale-release-notes.props',
     field: '*',
     reason:
       'Intentionally stale release-note fixture used by negative NuGet tests.',
     owner: 'avalonia-maintainers',
     createdAt: '2026-08-27',
     reviewAfter: '2027-02-28',
-    removalCondition:
-      'Remove with the stale release-note negative fixture.',
+    removalCondition: 'Remove with the stale release-note negative fixture.',
   },
   {
     id: 'avalonia-packed-consumer-project-fixture',
-    path:
-      'tests/fixtures/avalonia-packed-consumer/FsusUI.Avalonia.PackedConsumerSample.csproj',
+    path: 'tests/fixtures/avalonia-packed-consumer/FsusUI.Avalonia.PackedConsumerSample.csproj',
     field: '*',
     reason:
       'Local packed-package consumer input whose package versions are supplied by the fixture runner.',
@@ -312,6 +296,8 @@ function walkFiles(root, relativeDir, predicate, output = []) {
   const absoluteDir = path.join(root, relativeDir)
   if (!existsSync(absoluteDir)) return output
   for (const name of readdirSync(absoluteDir)) {
+    // The CI setup action installs an external SDK checkout at this root path.
+    if (relativeDir === '.' && name === 'emsdk-cache') continue
     if (
       [
         '.git',
@@ -347,9 +333,7 @@ function slug(value) {
 }
 
 function uniqueSorted(values) {
-  return [...new Set(values)].sort((left, right) =>
-    left.localeCompare(right),
-  )
+  return [...new Set(values)].sort((left, right) => left.localeCompare(right))
 }
 
 function npmGroup(authorityKey) {
@@ -404,10 +388,8 @@ function npmSurfaceEntries(root) {
 }
 
 function projectFiles(root) {
-  return walkFiles(
-    root,
-    'dotnet',
-    (relative) => relative.endsWith('.csproj'),
+  return walkFiles(root, 'dotnet', (relative) =>
+    relative.endsWith('.csproj'),
   ).sort()
 }
 
@@ -463,15 +445,11 @@ function nugetSurfaceEntries(root) {
 
 function yamlFiles(root) {
   return [
-    ...walkFiles(
-      root,
-      '.github/workflows',
-      (relative) => /\.ya?ml$/u.test(relative),
+    ...walkFiles(root, '.github/workflows', (relative) =>
+      /\.ya?ml$/u.test(relative),
     ),
-    ...walkFiles(
-      root,
-      '.github/actions',
-      (relative) => /\/action\.ya?ml$/u.test(relative),
+    ...walkFiles(root, '.github/actions', (relative) =>
+      /\/action\.ya?ml$/u.test(relative),
     ),
   ].sort()
 }
@@ -507,16 +485,12 @@ function githubActionEntries(root) {
 }
 
 function filesContaining(root, relatives, pattern) {
-  return relatives.filter((relative) =>
-    pattern.test(readText(root, relative)),
-  )
+  return relatives.filter((relative) => pattern.test(readText(root, relative)))
 }
 
 function toolchainEntries(root) {
-  const workflows = walkFiles(
-    root,
-    '.github/workflows',
-    (relative) => /\.ya?ml$/u.test(relative),
+  const workflows = walkFiles(root, '.github/workflows', (relative) =>
+    /\.ya?ml$/u.test(relative),
   ).sort()
   const nodeWorkflowFiles = filesContaining(
     root,
@@ -612,7 +586,7 @@ function toolchainEntries(root) {
   ]
 }
 
-function dockerEntries(root) {
+export function dockerEntries(root) {
   const dockerfiles = walkFiles(root, '.', (relative) =>
     /(^|\/)Dockerfile(?:\.[^/]+)?$/u.test(relative),
   )

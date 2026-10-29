@@ -10,13 +10,10 @@ import { buildExpectedUpdateSurface } from './update-surface-lib.mjs'
 const require = createRequire(import.meta.url)
 const JSON5 = require('json5')
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
-const read = (relative) =>
-  readFileSync(path.join(root, relative), 'utf8')
+const read = (relative) => readFileSync(path.join(root, relative), 'utf8')
 const clone = (value) => structuredClone(value)
 
-const surface = JSON.parse(
-  read('config/dependencies/update-surface.json'),
-)
+const surface = JSON.parse(read('config/dependencies/update-surface.json'))
 const schema = JSON.parse(
   read('config/dependencies/update-surface.schema.json'),
 )
@@ -186,3 +183,5 @@ for (const candidate of fixture.negative) {
 console.log(
   `Renovate governance mutation contract passed: mutations=${mutations.length} positive=${fixture.positive.length} negative=${fixture.negative.length}.`,
 )
+
+await import('./test-update-surface-emsdk.mjs')
