@@ -4,6 +4,7 @@ import process from 'node:process'
 
 const packageJson = JSON.parse(fs.readFileSync('package.json', 'utf8'))
 const scripts = packageJson.scripts ?? {}
+const sdk = JSON.parse(fs.readFileSync('dotnet/global.json', 'utf8')).sdk
 const workflow = fs.readFileSync('.github/workflows/_quality.yml', 'utf8')
 const callerWorkflow = fs.readFileSync('.github/workflows/quality.yml', 'utf8')
 const stablePackageAudit = fs.readFileSync(
@@ -153,6 +154,9 @@ const validate = (source) => {
 }
 
 const failures = validate(workflow)
+if (sdk?.rollForward !== 'disable') {
+  failures.push('dotnet SDK must not roll forward beyond the locked restore inputs')
+}
 const callerPackageJob = job(callerWorkflow, 'pr-avalonia-aot-candidate')
 if (
   !callerPackageJob.includes('pnpm run conformance:v2') ||
