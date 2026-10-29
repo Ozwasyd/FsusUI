@@ -115,3 +115,5 @@ for (const fragment of [
 }
 
 console.log('[test-artifact-cache] ok')
+
+await import('../tests/wasm-bundle-input-identity.test.mjs')
