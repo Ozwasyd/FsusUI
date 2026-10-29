@@ -14,7 +14,7 @@
   "allowlist": [],
   "generated": {
     "producer": "scripts/check-component-surface-semantic-registry.mjs",
-    "sourceRevision": "7d5988985c80964cd7e23cb017abe7b7016b2838",
+    "sourceRevision": "df8c77670e9a6f191f19ac33b23e053396565123",
     "digestAlgorithm": "sha256"
   },
   "sourceDigests": {
@@ -34,7 +34,7 @@
       "path": "spec/components/contracts/v1/vue-public-contracts.json",
       "kind": "authority",
       "algorithm": "sha256",
-      "digest": "dfd912fbf97a0bc4b3370a1048993c100c1effb5fa712707bd99283c1b4abb8c"
+      "digest": "72fed271b1fca9a5af6d23179684f5e5ffecf4086d91aff70ed0785fa543e3c9"
     },
     "component-select": {
       "path": "docs/components/select.md",
