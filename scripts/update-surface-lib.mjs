@@ -312,8 +312,6 @@ function walkFiles(root, relativeDir, predicate, output = []) {
   const absoluteDir = path.join(root, relativeDir)
   if (!existsSync(absoluteDir)) return output
   for (const name of readdirSync(absoluteDir)) {
-    // The CI setup action installs an external SDK checkout at this root path.
-    if (relativeDir === '.' && name === 'emsdk-cache') continue
     if (
       [
         '.git',
@@ -616,7 +614,7 @@ function toolchainEntries(root) {
   ]
 }
 
-export function dockerEntries(root) {
+function dockerEntries(root) {
   const dockerfiles = walkFiles(root, '.', (relative) =>
     /(^|\/)Dockerfile(?:\.[^/]+)?$/u.test(relative),
   )

@@ -189,5 +189,3 @@ testUpdateSurfaceSourceOwnership(root)
 console.log(
   `Renovate governance mutation contract passed: mutations=${mutations.length} positive=${fixture.positive.length} negative=${fixture.negative.length}.`,
 )
-
-await import('./test-update-surface-emsdk.mjs')
