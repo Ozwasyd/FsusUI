@@ -131,3 +131,5 @@ expectFailure('empty cells', () => {
 })
 
 console.log('[playwright-suites] fixtures ok')
+
+await import('./test-playwright-runner-policy.mjs')
