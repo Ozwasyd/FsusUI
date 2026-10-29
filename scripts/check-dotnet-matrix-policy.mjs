@@ -89,8 +89,8 @@ const validate = (source) => {
     assert(platform.includes(input), `platform cache key must cover ${input}`)
   }
   assert(
-    /dotnet-package:[\s\S]*?runs-on: ubuntu-latest/u.test(source),
-    'dotnet-package must use the canonical Ubuntu runner',
+    packageJob.includes('runs-on: ubuntu-24.04'),
+    'dotnet-package must use the Playwright-supported Ubuntu runner',
   )
   assert(
     !packageJob.includes('matrix:'),
@@ -195,7 +195,9 @@ if (!scripts['governance:check']?.includes('check:dotnet-matrix')) {
   failures.push('governance:check must include check:dotnet-matrix')
 }
 if (!scripts['dotnet:stable-package']?.includes('--stable-publication')) {
-  failures.push('dotnet:stable-package must require explicit stable publication')
+  failures.push(
+    'dotnet:stable-package must require explicit stable publication',
+  )
 }
 if (scripts['dotnet:package:verify']?.includes('--stable-publication')) {
   failures.push(
@@ -217,6 +219,19 @@ const invalidConcurrency = spawnSync(
   ['scripts/dotnet-platform-verify.mjs', '--max-cpu-count', '0'],
   { encoding: 'utf8' },
 )
+const matrixPlan = spawnSync(
+  process.execPath,
+  ['scripts/dotnet-matrix-plan.mjs'],
+  {
+    encoding: 'utf8',
+  },
+)
+if (
+  matrixPlan.status !== 0 ||
+  JSON.parse(matrixPlan.stdout).canonicalPackage.runner !== 'ubuntu-24.04'
+) {
+  failures.push('canonical package plan must match the package runner')
+}
 if (
   invalidConcurrency.status === 0 ||
   !`${invalidConcurrency.stdout}${invalidConcurrency.stderr}`.includes(
