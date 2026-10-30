@@ -99,6 +99,15 @@ jobs:
       - name: Report workspace changes after candidate failure
         if: failure()
         run: git status --short --untracked-files=all
+      - name: Retain conformance evidence after candidate failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pr-aot-conformance-failure
+          path: .tmp/conformance-v2
+          include-hidden-files: true
+          if-no-files-found: ignore
+          retention-days: 7
       - uses: actions/upload-artifact@v4
         with:
           name: pr-dotnet-nuget-candidate
