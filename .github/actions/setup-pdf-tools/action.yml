@@ -95,7 +95,7 @@ runs:
         $ErrorActionPreference = 'Stop'
         foreach ($tool in @('pdfinfo', 'pdftotext', 'pdftoppm')) {
           $expected = Join-Path $env:FSUSUI_PDF_BIN "$tool.exe"
-          $actual = (Get-Command "$tool.exe" -CommandType Application).Source
+          $actual = (Get-Command "$tool.exe" -CommandType Application | Select-Object -First 1).Source
           if ($actual -ne $expected) { throw "Unexpected $tool on PATH: $actual" }
           & $actual -v
           if ($LASTEXITCODE -ne 0) { throw "$tool version check failed: $LASTEXITCODE" }
