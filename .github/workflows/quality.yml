@@ -59,7 +59,7 @@ jobs:
   pr-avalonia-aot-candidate:
     if: needs.pr-avalonia-aot-plan.outputs.run == 'true'
     needs: pr-avalonia-aot-plan
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 60
     outputs:
       candidate-digest: ${{ steps.candidate.outputs.digest }}
@@ -84,14 +84,30 @@ jobs:
           global-json-file: dotnet/global.json
       - run: pnpm install --frozen-lockfile
       - run: pnpm exec playwright install --with-deps chromium
+      - name: Install native screen-reader prerequisites
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y orca at-spi2-core python3-pyatspi dbus-x11
       - name: Build the immutable NuGet candidate once
         id: candidate
         env:
           GITHUB_SHA: ${{ github.event.pull_request.head.sha }}
         run: |
-          xvfb-run -a pnpm run conformance:v2
+          dbus-run-session -- xvfb-run -a pnpm run conformance:v2
           node scripts/dotnet-package-verify.mjs
           echo "digest=$(node -p \"require('./dotnet/artifacts/package/manifest.json').candidateSha256\")" >> "$GITHUB_OUTPUT"
+      - name: Report workspace changes after candidate failure
+        if: failure()
+        run: git status --short --untracked-files=all
+      - name: Retain conformance evidence after candidate failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pr-aot-conformance-failure
+          path: .tmp/conformance-v2
+          include-hidden-files: true
+          if-no-files-found: ignore
+          retention-days: 7
       - uses: actions/upload-artifact@v4
         with:
           name: pr-dotnet-nuget-candidate
@@ -183,7 +199,7 @@ jobs:
 
   pr-real-render-performance:
     if: github.event_name == 'pull_request'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 45
     steps:
       - name: Checkout current change

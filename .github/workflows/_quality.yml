@@ -23,7 +23,7 @@ on:
 
 jobs:
   real-render-performance:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 120
     steps:
       - uses: actions/checkout@v4
@@ -132,7 +132,11 @@ jobs:
           key: ${{ runner.os }}-${{ runner.arch }}-fsusui-dotnet-sdk-${{ hashFiles('dotnet/global.json') }}-${{ hashFiles('dotnet/**/*.csproj', 'dotnet/**/*.props', 'dotnet/**/*.targets', 'dotnet/**/*.slnx', 'dotnet/**/packages.lock.json', 'NuGet.config') }}
           restore-keys: |
             ${{ runner.os }}-${{ runner.arch }}-fsusui-dotnet-sdk-${{ hashFiles('dotnet/global.json') }}-
+      - name: Set up PDF inspection tools
+        uses: ./.github/actions/setup-pdf-tools
       - name: Run platform-owned restore, build, tests, and smoke
+        env:
+          FSUS_WEBVIEW_CANDIDATE_SHA: ${{ github.sha }}
         run: node scripts/dotnet-platform-verify.mjs --output dotnet/artifacts/platform/${{ matrix.platform }}/manifest.json
       - uses: actions/upload-artifact@v4
         if: always()
@@ -153,7 +157,7 @@ jobs:
           artifact-suffix: ${{ matrix.platform }}
 
   dotnet-package:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 60
     outputs:
       candidate-digest: ${{ steps.candidate.outputs.digest }}
@@ -176,6 +180,10 @@ jobs:
           global-json-file: dotnet/global.json
       - run: pnpm install --frozen-lockfile
       - run: pnpm exec playwright install --with-deps chromium
+      - name: Install native screen-reader prerequisites
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y orca at-spi2-core python3-pyatspi dbus-x11
       - name: Restore canonical .NET package cache
         uses: actions/cache@v4
         with:
@@ -188,9 +196,21 @@ jobs:
       - name: Build and verify the unique NuGet candidate
         id: candidate
         run: |
-          xvfb-run -a pnpm run conformance:v2
+          dbus-run-session -- xvfb-run -a pnpm run conformance:v2
           node scripts/dotnet-package-verify.mjs
           echo "digest=$(node -p \"require('./dotnet/artifacts/package/manifest.json').candidateSha256\")" >> "$GITHUB_OUTPUT"
+      - name: Report workspace changes after candidate failure
+        if: failure()
+        run: git status --short --untracked-files=all
+      - name: Retain conformance evidence after candidate failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dotnet-package-conformance-failure
+          path: .tmp/conformance-v2
+          include-hidden-files: true
+          if-no-files-found: ignore
+          retention-days: 7
       - uses: actions/upload-artifact@v4
         with:
           name: dotnet-nuget-candidate
@@ -783,7 +803,7 @@ jobs:
           status: ${{ job.status }}
 
   visual:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 30
     env:
       FSUS_VISUAL_EVIDENCE: ${{ inputs.group == 'release' && '1' || '0' }}
