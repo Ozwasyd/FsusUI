@@ -112,6 +112,7 @@ import type {
   MarkdownFeatureActivationResult,
   MarkdownFeatureThemeTokens,
   MarkdownRuntimeChunkResult,
+  MarkdownRuntimeRenderResult,
   MarkdownRuntimeProfile,
   MarkdownSafeHtml,
   MarkdownSafeRenderAuthority,
@@ -136,23 +137,17 @@ const heavyLifecycle = createMarkdownHeavyFeatureLifecycle({
 const heavyThemeRevision = ref(0)
 let heavyThemeListenerInstalled = false
 const handleHeavyFeatureThemeChange = () => {
+  activationController?.abort()
   heavyThemeRevision.value += 1
 }
-const ensureHeavyFeatureThemeListener = () => {
-  if (heavyThemeListenerInstalled) return
-  document.documentElement.addEventListener(
-    'fsus:theme-change',
-    handleHeavyFeatureThemeChange,
-  )
-  heavyThemeListenerInstalled = true
-}
-const removeHeavyFeatureThemeListener = () => {
-  if (!heavyThemeListenerInstalled) return
-  document.documentElement.removeEventListener(
-    'fsus:theme-change',
-    handleHeavyFeatureThemeChange,
-  )
-  heavyThemeListenerInstalled = false
+const setHeavyFeatureThemeListener = (enabled: boolean) => {
+  if (heavyThemeListenerInstalled === enabled) return
+  const target = document.documentElement
+  if (enabled)
+    target.addEventListener('fsus:theme-change', handleHeavyFeatureThemeChange)
+  else
+    target.removeEventListener('fsus:theme-change', handleHeavyFeatureThemeChange)
+  heavyThemeListenerInstalled = enabled
 }
 const emit = defineEmits<{
   (event: 'render-complete', result: MarkdownSafeRenderResult): void
@@ -890,9 +885,9 @@ const hasEnabledHeavyFeature = (
   (features.mermaid && result.features.includes('mermaid'))
 
 const resetFeatureActivation = () => {
-  removeHeavyFeatureThemeListener()
   activationController?.abort()
-  activationController = new AbortController()
+  const controller = new AbortController()
+  activationController = controller
   activationObserver?.disconnect()
   activationObserver = null
   activeChunkResult = null
@@ -906,6 +901,7 @@ const resetFeatureActivation = () => {
   heavyLifecycleProjectionNodeIds = {}
   if (rootEl.value) heavyLifecycle.unmountRoot(rootEl.value)
   recordHeavyLifecycleMetrics()
+  return controller.signal
 }
 
 const createHeavyFeatureIdentityResolver = async (
@@ -1044,6 +1040,8 @@ const activateRenderedFeatures = async (
   const activationStartedAt = readPerformanceNow()
   const features = resolveMarkdownFeatureOptions()
   const heavyFeaturesEnabled = hasEnabledHeavyFeature(result, features)
+  // Theme changes must invalidate pending imports and activation too.
+  setHeavyFeatureThemeListener(heavyFeaturesEnabled)
   const resolveHeavyFeatureIdentity = heavyFeaturesEnabled
     ? await createHeavyFeatureIdentityResolver(result)
     : () => null
@@ -1090,7 +1088,7 @@ const activateRenderedFeatures = async (
         kind === 'code-highlight' || kind === 'latex' || kind === 'mermaid',
     )
   ) {
-    ensureHeavyFeatureThemeListener()
+    setHeavyFeatureThemeListener(true)
   }
 }
 
@@ -1168,7 +1166,32 @@ const activateMountedChunkFeatures = async (
 
 const performRender = async () => {
   const taskId = ++currentTaskId
-  resetFeatureActivation()
+  const signal = resetFeatureActivation()
+  const isCurrentRender = () => taskId === currentTaskId && !signal.aborted
+  const invalidAuthority = () =>
+    toFsusError(
+      'markdown_safe_result_authority_invalid',
+      'markdown_safe_result_authority_invalid',
+      'invariant',
+    )
+  const emitPlaceholders = (result: MarkdownSafeRenderResult) =>
+    emit('placeholders-ready', result.placeholders, result)
+  const commitAndActivate = async (result: MarkdownSafeRenderResult) => {
+    await commitRenderedContent(result.html, true)
+    if (!isCurrentRender()) return
+    emitPlaceholders(result)
+    await activateRenderedFeatures(result, rootEl.value, signal)
+  }
+  const emitRenderProfile = (
+    result: MarkdownRuntimeRenderResult,
+    phase: 'chunks' | 'full-result',
+  ) =>
+    emit('render-profile', {
+      engine: result.engine,
+      phase,
+      rendererVersion: result.rendererVersion,
+      timings: result.timings,
+    })
   commitDurationMs = 0
   rootEl.value?.removeAttribute('data-fsus-markdown-commit-ms')
   const source = normalizeMarkdownSource(props.content)
@@ -1181,7 +1204,7 @@ const performRender = async () => {
     if (strategy === 'chunked-main' || strategy === 'chunked-worker') {
       await renderPipelineRuntime.render()
 
-      if (taskId !== currentTaskId) {
+      if (!isCurrentRender()) {
         return
       }
 
@@ -1206,11 +1229,7 @@ const performRender = async () => {
         ? result
         : materializeMarkdownWorkerResult(request, result, document.units)
       if (!resolvedResult) {
-        throw toFsusError(
-          'markdown_safe_result_authority_invalid',
-          'markdown_safe_result_authority_invalid',
-          'invariant',
-        )
+        throw invalidAuthority()
       }
       const resolvedUnits = resolvedResult.chunks
       const initialCount = resolveInitialChunkCount(resolvedUnits)
@@ -1222,31 +1241,26 @@ const performRender = async () => {
       renderStrategy.value = renderPipelineRuntime.renderedStrategy.value as
         | 'chunked-main'
         | 'chunked-worker'
-      emit('render-profile', {
-        engine: resolvedResult.engine,
-        phase: 'chunks',
-        rendererVersion: resolvedResult.rendererVersion,
-        timings: resolvedResult.timings,
-      })
-      emit('placeholders-ready', resolvedResult.placeholders, resolvedResult)
+      emitRenderProfile(resolvedResult, 'chunks')
+      emitPlaceholders(resolvedResult)
       await nextTick()
       await settleRenderViewport('markdown-render-settle-initial')
       await afterFrame()
+      if (!isCurrentRender()) return
       if (initialCount < resolvedUnits.length) {
-        if (taskId !== currentTaskId) return
         await afterFrame()
-        if (taskId !== currentTaskId) return
+        if (!isCurrentRender()) return
         chunkUnits.value = resolvedUnits
         await nextTick()
         await settleRenderViewport('markdown-render-settle-full')
       }
       const initialFeatureActivation = activateMountedChunkFeatures(
         resolvedResult,
-        activationController?.signal,
+        signal,
       )
       observeMountedChunksForActivation()
       await initialFeatureActivation
-      if (taskId !== currentTaskId) return
+      if (!isCurrentRender()) return
       recordCommitDuration(commitStartedAt)
       emit('render-complete', resolvedResult)
       scheduleMeasurementWarmup()
@@ -1255,7 +1269,7 @@ const performRender = async () => {
 
     const result = await renderMarkdownResultWithRuntime(request)
 
-    if (taskId !== currentTaskId) {
+    if (!isCurrentRender()) {
       return
     }
 
@@ -1266,41 +1280,30 @@ const performRender = async () => {
       !hasMarkdownCommitAuthority(result.value) ||
       !matchesMarkdownRenderRequest(request, result.value)
     ) {
-      throw toFsusError(
-        'markdown_safe_result_authority_invalid',
-        'markdown_safe_result_authority_invalid',
-        'invariant',
-      )
+      throw invalidAuthority()
     }
 
     const resolvedResult = result.value
 
-    await commitRenderedContent(resolvedResult.html, true)
-    emit('placeholders-ready', resolvedResult.placeholders, resolvedResult)
-    await activateRenderedFeatures(resolvedResult)
-    emit('render-profile', {
-      engine: resolvedResult.engine,
-      phase: 'full-result',
-      rendererVersion: resolvedResult.rendererVersion,
-      timings: resolvedResult.timings,
-    })
+    await commitAndActivate(resolvedResult)
+    if (!isCurrentRender()) return
+    emitRenderProfile(resolvedResult, 'full-result')
     emit('render-complete', resolvedResult)
   } catch (error) {
-    if (taskId !== currentTaskId) {
+    if (!isCurrentRender()) {
       return
     }
 
     const fallback = renderMarkdownFallbackWithRuntime(request)
-    await commitRenderedContent(fallback.html, true)
-    emit('placeholders-ready', fallback.placeholders, fallback)
-    await activateRenderedFeatures(fallback)
+    await commitAndActivate(fallback)
+    if (!isCurrentRender()) return
     emit(
       'render-error',
       toFsusError(error, 'markdown_renderer_render_failed', 'infra'),
     )
     emit('render-complete', fallback)
   } finally {
-    if (taskId === currentTaskId) {
+    if (isCurrentRender()) {
       isRendering.value = false
     }
   }
@@ -1333,7 +1336,7 @@ watch(
 )
 
 onBeforeUnmount(() => {
-  removeHeavyFeatureThemeListener()
+  setHeavyFeatureThemeListener(false)
   if (debounceTimer) {
     clearTimeout(debounceTimer)
     debounceTimer = null
