@@ -140,21 +140,14 @@ const handleHeavyFeatureThemeChange = () => {
   activationController?.abort()
   heavyThemeRevision.value += 1
 }
-const ensureHeavyFeatureThemeListener = () => {
-  if (heavyThemeListenerInstalled) return
-  document.documentElement.addEventListener(
-    'fsus:theme-change',
-    handleHeavyFeatureThemeChange,
-  )
-  heavyThemeListenerInstalled = true
-}
-const removeHeavyFeatureThemeListener = () => {
-  if (!heavyThemeListenerInstalled) return
-  document.documentElement.removeEventListener(
-    'fsus:theme-change',
-    handleHeavyFeatureThemeChange,
-  )
-  heavyThemeListenerInstalled = false
+const setHeavyFeatureThemeListener = (enabled: boolean) => {
+  if (heavyThemeListenerInstalled === enabled) return
+  const target = document.documentElement
+  if (enabled)
+    target.addEventListener('fsus:theme-change', handleHeavyFeatureThemeChange)
+  else
+    target.removeEventListener('fsus:theme-change', handleHeavyFeatureThemeChange)
+  heavyThemeListenerInstalled = enabled
 }
 const emit = defineEmits<{
   (event: 'render-complete', result: MarkdownSafeRenderResult): void
@@ -1048,8 +1041,7 @@ const activateRenderedFeatures = async (
   const features = resolveMarkdownFeatureOptions()
   const heavyFeaturesEnabled = hasEnabledHeavyFeature(result, features)
   // Theme changes must invalidate pending imports and activation too.
-  if (heavyFeaturesEnabled) ensureHeavyFeatureThemeListener()
-  else removeHeavyFeatureThemeListener()
+  setHeavyFeatureThemeListener(heavyFeaturesEnabled)
   const resolveHeavyFeatureIdentity = heavyFeaturesEnabled
     ? await createHeavyFeatureIdentityResolver(result)
     : () => null
@@ -1096,7 +1088,7 @@ const activateRenderedFeatures = async (
         kind === 'code-highlight' || kind === 'latex' || kind === 'mermaid',
     )
   ) {
-    ensureHeavyFeatureThemeListener()
+    setHeavyFeatureThemeListener(true)
   }
 }
 
@@ -1182,10 +1174,12 @@ const performRender = async () => {
       'markdown_safe_result_authority_invalid',
       'invariant',
     )
+  const emitPlaceholders = (result: MarkdownSafeRenderResult) =>
+    emit('placeholders-ready', result.placeholders, result)
   const commitAndActivate = async (result: MarkdownSafeRenderResult) => {
     await commitRenderedContent(result.html, true)
     if (!isCurrentRender()) return
-    emit('placeholders-ready', result.placeholders, result)
+    emitPlaceholders(result)
     await activateRenderedFeatures(result, rootEl.value, signal)
   }
   const emitRenderProfile = (
@@ -1248,7 +1242,7 @@ const performRender = async () => {
         | 'chunked-main'
         | 'chunked-worker'
       emitRenderProfile(resolvedResult, 'chunks')
-      emit('placeholders-ready', resolvedResult.placeholders, resolvedResult)
+      emitPlaceholders(resolvedResult)
       await nextTick()
       await settleRenderViewport('markdown-render-settle-initial')
       await afterFrame()
@@ -1342,7 +1336,7 @@ watch(
 )
 
 onBeforeUnmount(() => {
-  removeHeavyFeatureThemeListener()
+  setHeavyFeatureThemeListener(false)
   if (debounceTimer) {
     clearTimeout(debounceTimer)
     debounceTimer = null
