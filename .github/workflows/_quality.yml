@@ -195,6 +195,9 @@ jobs:
           xvfb-run -a pnpm run conformance:v2
           node scripts/dotnet-package-verify.mjs
           echo "digest=$(node -p \"require('./dotnet/artifacts/package/manifest.json').candidateSha256\")" >> "$GITHUB_OUTPUT"
+      - name: Report workspace changes after candidate failure
+        if: failure()
+        run: git status --short --untracked-files=all
       - uses: actions/upload-artifact@v4
         with:
           name: dotnet-nuget-candidate
