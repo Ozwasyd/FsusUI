@@ -1,4 +1,3 @@
-using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
 using Avalonia;
 using Avalonia.Controls;
@@ -182,9 +181,9 @@ public class FsusMarkdownEditorAdjacentHeadlessTests
     Dispatcher.UIThread.RunJobs();
   }
 
-  private static string FindRepositoryRoot([CallerFilePath] string sourceFile = "")
+  private static string FindRepositoryRoot()
   {
-    for (var directory = new DirectoryInfo(Path.GetDirectoryName(sourceFile)!);
+    for (var directory = new DirectoryInfo(AppContext.BaseDirectory);
       directory is not null;
       directory = directory.Parent)
     {
