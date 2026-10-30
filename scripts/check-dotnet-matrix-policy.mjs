@@ -5,6 +5,7 @@ import process from 'node:process'
 const packageJson = JSON.parse(fs.readFileSync('package.json', 'utf8'))
 const scripts = packageJson.scripts ?? {}
 const sdk = JSON.parse(fs.readFileSync('dotnet/global.json', 'utf8')).sdk
+const rootSdk = JSON.parse(fs.readFileSync('global.json', 'utf8')).sdk
 const workflow = fs.readFileSync('.github/workflows/_quality.yml', 'utf8')
 const callerWorkflow = fs.readFileSync('.github/workflows/quality.yml', 'utf8')
 const stablePackageAudit = fs.readFileSync(
