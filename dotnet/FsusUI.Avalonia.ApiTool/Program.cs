@@ -18,7 +18,12 @@ internal static class Program
 
   private static int Main(string[] args)
   {
-    var repoRoot = Directory.GetCurrentDirectory();
+    var directory = new DirectoryInfo(Directory.GetCurrentDirectory());
+    while (directory is not null && !File.Exists(Path.Combine(directory.FullName, "pnpm-workspace.yaml")))
+    {
+      directory = directory.Parent;
+    }
+    var repoRoot = directory?.FullName ?? throw new InvalidOperationException("FsusUI repository root not found.");
     if (args.Contains("--verify-source-semantics", StringComparer.Ordinal))
     {
       SourceSemanticVerifier.Verify(repoRoot);

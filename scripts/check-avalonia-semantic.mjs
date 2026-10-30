@@ -88,7 +88,7 @@ try {
       tmpDir,
     ],
     {
-      cwd: root,
+      cwd: path.join(root, 'dotnet'),
       stdio: 'inherit',
       encoding: 'utf8',
     },
