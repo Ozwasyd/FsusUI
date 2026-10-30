@@ -180,6 +180,10 @@ jobs:
           global-json-file: dotnet/global.json
       - run: pnpm install --frozen-lockfile
       - run: pnpm exec playwright install --with-deps chromium
+      - name: Install native screen-reader prerequisites
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y orca at-spi2-core python3-pyatspi dbus-x11
       - name: Restore canonical .NET package cache
         uses: actions/cache@v4
         with:
@@ -192,7 +196,7 @@ jobs:
       - name: Build and verify the unique NuGet candidate
         id: candidate
         run: |
-          xvfb-run -a pnpm run conformance:v2
+          dbus-run-session -- xvfb-run -a pnpm run conformance:v2
           node scripts/dotnet-package-verify.mjs
           echo "digest=$(node -p \"require('./dotnet/artifacts/package/manifest.json').candidateSha256\")" >> "$GITHUB_OUTPUT"
       - name: Report workspace changes after candidate failure

@@ -162,6 +162,19 @@ if (sdk?.rollForward !== 'disable') {
   failures.push('dotnet SDK must not roll forward beyond the locked restore inputs')
 }
 const callerPackageJob = job(callerWorkflow, 'pr-avalonia-aot-candidate')
+for (const [name, candidateJob] of [
+  ['dotnet-package', job(workflow, 'dotnet-package')],
+  ['pr-avalonia-aot-candidate', callerPackageJob],
+]) {
+  for (const requirement of [
+    'orca at-spi2-core python3-pyatspi dbus-x11',
+    'dbus-run-session -- xvfb-run -a pnpm run conformance:v2',
+  ]) {
+    if (!candidateJob.includes(requirement)) {
+      failures.push(`${name} must provision and run native screen-reader evidence`)
+    }
+  }
+}
 if (
   !callerPackageJob.includes('pnpm run conformance:v2') ||
   callerPackageJob.indexOf('pnpm run conformance:v2') >
