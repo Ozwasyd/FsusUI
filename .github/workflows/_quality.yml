@@ -23,7 +23,7 @@ on:
 
 jobs:
   real-render-performance:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 120
     steps:
       - uses: actions/checkout@v4
@@ -132,7 +132,11 @@ jobs:
           key: ${{ runner.os }}-${{ runner.arch }}-fsusui-dotnet-sdk-${{ hashFiles('dotnet/global.json') }}-${{ hashFiles('dotnet/**/*.csproj', 'dotnet/**/*.props', 'dotnet/**/*.targets', 'dotnet/**/*.slnx', 'dotnet/**/packages.lock.json', 'NuGet.config') }}
           restore-keys: |
             ${{ runner.os }}-${{ runner.arch }}-fsusui-dotnet-sdk-${{ hashFiles('dotnet/global.json') }}-
+      - name: Set up PDF inspection tools
+        uses: ./.github/actions/setup-pdf-tools
       - name: Run platform-owned restore, build, tests, and smoke
+        env:
+          FSUS_WEBVIEW_CANDIDATE_SHA: ${{ github.sha }}
         run: node scripts/dotnet-platform-verify.mjs --output dotnet/artifacts/platform/${{ matrix.platform }}/manifest.json
       - uses: actions/upload-artifact@v4
         if: always()
@@ -153,7 +157,7 @@ jobs:
           artifact-suffix: ${{ matrix.platform }}
 
   dotnet-package:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 60
     outputs:
       candidate-digest: ${{ steps.candidate.outputs.digest }}
@@ -783,7 +787,7 @@ jobs:
           status: ${{ job.status }}
 
   visual:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 30
     env:
       FSUS_VISUAL_EVIDENCE: ${{ inputs.group == 'release' && '1' || '0' }}
