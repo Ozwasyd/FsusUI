@@ -4,11 +4,11 @@
   "source": {
     "toolVersion": "FsusUI.Avalonia.ApiTool@1.8.0",
     "assemblyVersion": "0.0.0.0",
-    "inputTreeHash": "49ccaf6f3bcb9aa4dfe4ae2ece0477ff85745d2fd27290dd4870e63f2d8707e2",
+    "inputTreeHash": "433309dc76a34e4dfc68555d84d6d01314a7808c0cdbb1d2e55f0e40363ba9ce",
     "compilerOptionsHash": "7e5271d568360ccb03852002c427b2d740466121049706513eb89a731476ad09",
     "dependencyVersionHash": "b0acaf728062500d48b252b58655a9fad423f83f197e79ddcdfff680a80ab71e",
     "contractSchemaVersion": "2.0.0",
-    "outputHash": "572e4633f03b712305cdb2dfe657606b2c505eb1ced79c3f897390cdad2e5468"
+    "outputHash": "17199f391a893fa330a11ab976d98619bf76bf6e70a628c4377f3a30e643eb7d"
   },
   "semanticTypes": [
     {
