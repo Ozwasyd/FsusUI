@@ -354,14 +354,15 @@ const scheduleHeavyFeatureCommit = (input: {
   readonly signal: AbortSignal
 }) =>
   new Promise<HTMLElement | void>((resolve, reject) => {
+    const signal = input.signal
     let committed: HTMLElement | void
     let mutatePhaseRan = false
     const abort = () => reject(new DOMException('Aborted', 'AbortError'))
-    input.signal.addEventListener('abort', abort, { once: true })
+    signal.addEventListener('abort', abort, { once: true })
     const accepted = frameScheduler.schedule({
       key: input.key,
       mutate: () => {
-        if (!input.signal.aborted) {
+        if (!signal.aborted) {
           committed = input.run()
           mutatePhaseRan = true
           heavyFeatureMutateCommits += 1
@@ -369,14 +370,14 @@ const scheduleHeavyFeatureCommit = (input: {
       },
       postPaint: () => {
         if (mutatePhaseRan) heavyFeaturePostPaintCommits += 1
-        input.signal.removeEventListener('abort', abort)
-        if (input.signal.aborted) abort()
+        signal.removeEventListener('abort', abort)
+        if (signal.aborted) abort()
         else resolve(committed)
         recordHeavyLifecycleMetrics()
       },
     })
     if (!accepted) {
-      input.signal.removeEventListener('abort', abort)
+      signal.removeEventListener('abort', abort)
       reject(new DOMException('Frame scheduler unavailable', 'AbortError'))
     }
   })
