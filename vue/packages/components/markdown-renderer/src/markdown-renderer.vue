@@ -142,11 +142,10 @@ const handleHeavyFeatureThemeChange = () => {
 }
 const setHeavyFeatureThemeListener = (enabled: boolean) => {
   if (heavyThemeListenerInstalled === enabled) return
-  const target = document.documentElement
-  if (enabled)
-    target.addEventListener('fsus:theme-change', handleHeavyFeatureThemeChange)
-  else
-    target.removeEventListener('fsus:theme-change', handleHeavyFeatureThemeChange)
+  document.documentElement[enabled ? 'addEventListener' : 'removeEventListener'](
+    'fsus:theme-change',
+    handleHeavyFeatureThemeChange,
+  )
   heavyThemeListenerInstalled = enabled
 }
 const emit = defineEmits<{
