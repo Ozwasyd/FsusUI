@@ -292,11 +292,15 @@ jobs:
       - name: Measure same-runner baseline first
         if: steps.baseline-contract.outputs.available == 'true'
         working-directory: baseline
-        run: >-
-          pnpm perf:render --
-          --impact-plan ../performance-impact-plan.json
-          --profile quick
-          --output ../performance-baseline
+        env:
+          EXPECTED_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: |
+          baseline_sha="$(git rev-parse --verify HEAD)"
+          test "$baseline_sha" = "$EXPECTED_BASE_SHA"
+          GITHUB_SHA="$baseline_sha" pnpm perf:render -- \
+            --impact-plan ../performance-impact-plan.json \
+            --profile quick \
+            --output ../performance-baseline
       - name: Measure current quick matrix
         if: steps.render-impact.outputs.run == 'true'
         working-directory: current
@@ -316,11 +320,15 @@ jobs:
       - name: Repeat baseline quick matrix last for order balance
         if: steps.baseline-contract.outputs.available == 'true'
         working-directory: baseline
-        run: >-
-          pnpm perf:render --
-          --impact-plan ../performance-impact-plan.json
-          --profile quick
-          --output ../performance-baseline-repeat
+        env:
+          EXPECTED_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: |
+          baseline_sha="$(git rev-parse --verify HEAD)"
+          test "$baseline_sha" = "$EXPECTED_BASE_SHA"
+          GITHUB_SHA="$baseline_sha" pnpm perf:render -- \
+            --impact-plan ../performance-impact-plan.json \
+            --profile quick \
+            --output ../performance-baseline-repeat
       - name: Compare against base revision on the same runner
         if: steps.baseline-contract.outputs.available == 'true'
         working-directory: current
