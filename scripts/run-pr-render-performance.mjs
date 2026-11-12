@@ -3,6 +3,10 @@ import { mkdtemp, mkdir, readFile, rm } from 'node:fs/promises'
 import os from 'node:os'
 import path from 'node:path'
 import process from 'node:process'
+import {
+  measurementEnvironment,
+  resolveRevision,
+} from './render-performance-revision.mjs'
 
 const root = path.resolve(import.meta.dirname, '..')
 const args = process.argv.slice(2)
@@ -12,6 +16,8 @@ const valueOf = (name, fallback = '') => {
 }
 const base = valueOf('--base')
 if (!base) throw new Error('Usage: pnpm perf:render:pr --base <ref>')
+const baseRevision = await resolveRevision(root, base)
+const currentRevision = await resolveRevision(root)
 const output = path.resolve(root, valueOf('--output', '.tmp/performance/pr'))
 const plan = path.join(output, 'impact-plan.json')
 const run = (command, commandArgs, cwd = root, env = process.env) =>
@@ -29,7 +35,7 @@ await mkdir(output, { recursive: true })
 await run(process.execPath, [
   'scripts/render-performance-impact-plan.mjs',
   '--base',
-  base,
+  baseRevision,
   '--output',
   plan,
 ])
@@ -51,9 +57,10 @@ const baseline = suppliedBaseline
 let ownsWorktree = false
 try {
   if (!suppliedBaseline) {
-    await run('git', ['worktree', 'add', '--detach', baseline, base])
+    await run('git', ['worktree', 'add', '--detach', baseline, baseRevision])
     ownsWorktree = true
   }
+  await measurementEnvironment(baseline, baseRevision, process.env)
   const status = path.join(output, 'baseline-status.json')
   await run(process.execPath, [
     'scripts/check-render-performance-baseline.mjs',
@@ -81,25 +88,36 @@ try {
         path.join(output, 'baseline'),
       ],
       baseline,
+      await measurementEnvironment(baseline, baseRevision, process.env),
     )
   }
-  await run('pnpm', [
-    'perf:render',
-    '--',
-    '--impact-plan',
-    plan,
-    '--output',
-    path.join(output, 'current'),
-  ])
-  if (baselineStatus.available)
-    await run('pnpm', [
+  await run(
+    'pnpm',
+    [
       'perf:render',
       '--',
       '--impact-plan',
       plan,
       '--output',
-      path.join(output, 'current-repeat'),
-    ])
+      path.join(output, 'current'),
+    ],
+    root,
+    await measurementEnvironment(root, currentRevision, process.env),
+  )
+  if (baselineStatus.available)
+    await run(
+      'pnpm',
+      [
+        'perf:render',
+        '--',
+        '--impact-plan',
+        plan,
+        '--output',
+        path.join(output, 'current-repeat'),
+      ],
+      root,
+      await measurementEnvironment(root, currentRevision, process.env),
+    )
   if (baselineStatus.available)
     await run(
       'pnpm',
@@ -112,6 +130,7 @@ try {
         path.join(output, 'baseline-repeat'),
       ],
       baseline,
+      await measurementEnvironment(baseline, baseRevision, process.env),
     )
   if (baselineStatus.available)
     await run('pnpm', [

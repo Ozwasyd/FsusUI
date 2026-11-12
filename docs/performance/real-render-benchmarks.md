@@ -149,6 +149,9 @@ It creates an isolated temporary base worktree, validates compatibility, install
 through the shared pnpm store, resolves Chromium once, runs the order-balanced
 four-measurement sequence, and removes only that worktree. No remote performance
 database or fixed wall-clock threshold is involved.
+Each measurement verifies its checkout revision and records that revision instead
+of inheriting `GITHUB_SHA`. A supplied baseline directory must match the chosen
+base commit. Uncommitted changes are not captured by this revision identifier.
 
 `main` runs Quick; nightly and release workflow groups run Full. All jobs upload
 raw samples, environment metadata, and summaries. Absolute limits in

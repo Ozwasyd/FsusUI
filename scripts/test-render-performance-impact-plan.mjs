@@ -17,6 +17,10 @@ import {
   loadOwnershipRegistry,
   verifyImpactPlan,
 } from './render-performance-impact.mjs'
+import {
+  measurementEnvironment,
+  resolveRevision,
+} from './render-performance-revision.mjs'
 
 const root = path.resolve(import.meta.dirname, '..')
 const execFileAsync = promisify(execFile)
@@ -220,6 +224,17 @@ if (process.platform !== 'win32') {
         env: gitEnv,
       })
     ).stdout.trim()
+    const inherited = { ...gitEnv, GITHUB_SHA: 'f'.repeat(40) }
+    assert.equal(await resolveRevision(checkout), sha)
+    assert.equal(
+      (await measurementEnvironment(checkout, sha, inherited)).GITHUB_SHA,
+      sha,
+    )
+    assert.equal(inherited.GITHUB_SHA, 'f'.repeat(40))
+    await assert.rejects(
+      measurementEnvironment(checkout, '0'.repeat(40), inherited),
+      /Performance checkout mismatch/u,
+    )
     const pnpm = path.join(bin, 'pnpm')
     await writeFile(
       pnpm,
