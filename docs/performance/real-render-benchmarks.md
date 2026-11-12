@@ -135,6 +135,9 @@ Checkouts have independent `node_modules` and process/server lifetimes but share
 the runner's pnpm store cache; Chromium is installed once. This preserves
 isolation without comparing unrelated hardware or concurrent CPU, GC, renderer,
 and I/O noise.
+For both baseline measurements, CI verifies the baseline checkout against the
+pull request base SHA and supplies that verified SHA to the measurement process.
+This keeps the recorded Avalonia source identity bound to the measured checkout.
 
 The complete local paired workflow is:
 
