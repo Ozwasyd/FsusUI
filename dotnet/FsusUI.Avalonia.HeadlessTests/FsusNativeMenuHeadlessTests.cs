@@ -177,7 +177,7 @@ public class FsusNativeMenuHeadlessTests
     Assert.Equal("edit.undo", result.CommandId);
     Assert.Equal("Undo", result.Label);
     Assert.True(result.IsEnabled);
-    Assert.Equal("Ctrl+Z", result.DisplayShortcut);
+    Assert.Equal(OperatingSystem.IsMacOS() ? "Command+Z" : "Ctrl+Z", result.DisplayShortcut);
 
     result.Execute();
     Assert.True(undoInvoked);
