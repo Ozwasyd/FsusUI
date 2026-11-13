@@ -125,6 +125,39 @@ public class FsusDesktopShellHeadlessTests
   }
 
   [AvaloniaFact]
+  public void DocumentHeaderScrollingPreservesSelectionAndReachesBothBounds()
+  {
+    var tabs = BuildDocumentTabs(9);
+    var window = MountWindow(tabs, 520, 360);
+    window.Show();
+    Dispatcher.UIThread.RunJobs();
+
+    var firstKey = tabs.Documents[0].Key;
+    tabs.SelectKey(firstKey);
+    Dispatcher.UIThread.RunJobs();
+    var selectionEvents = 0;
+    tabs.SelectionChanged += (_, _) => selectionEvents++;
+    Assert.False(tabs.ScrollHeaders(forward: false));
+    Assert.True(tabs.CanScrollForward);
+    for (var step = 0; step < 100 && tabs.ScrollHeaders(forward: true); step++)
+    {
+    }
+    Assert.False(tabs.CanScrollForward);
+    Assert.True(tabs.CanScrollBackward);
+    Assert.InRange(tabs.HeaderScrollOffset, tabs.HeaderExtentWidth - tabs.HeaderViewportWidth - 0.01,
+      tabs.HeaderExtentWidth - tabs.HeaderViewportWidth + 0.01);
+    for (var step = 0; step < 100 && tabs.ScrollHeaders(forward: false); step++)
+    {
+    }
+    Assert.False(tabs.CanScrollBackward);
+    Assert.True(tabs.CanScrollForward);
+    Assert.Equal(0, tabs.HeaderScrollOffset);
+    Assert.Equal(firstKey, tabs.SelectedKey);
+    Assert.Equal(0, selectionEvents);
+    window.Close();
+  }
+
+  [AvaloniaFact]
   public void DocumentTabsSupportCloseDragReorderOverflowContextAndPlatformCycling()
   {
     var tabs = BuildDocumentTabs(9);
@@ -163,6 +196,24 @@ public class FsusDesktopShellHeadlessTests
     Assert.Equal(firstKey, tabs.SelectedKey);
 
     var contextTarget = tabs.Documents[2];
+    contextTarget.BringIntoView();
+    Dispatcher.UIThread.RunJobs();
+    window.UpdateLayout();
+    Assert.Equal(firstKey, tabs.SelectedKey);
+    var targetPoint = CenterIn(window, contextTarget);
+    Assert.InRange(targetPoint.X, 0, window.Bounds.Width - 1);
+    Assert.InRange(targetPoint.Y, 0, window.Bounds.Height - 1);
+    var headerScroller = contextTarget.GetVisualAncestors().OfType<ScrollViewer>().First();
+    var pointInScroller = Assert.NotNull(contextTarget.TranslatePoint(
+      new Point(contextTarget.Bounds.Width / 2, contextTarget.Bounds.Height / 2), headerScroller));
+    Assert.InRange(pointInScroller.X, 0, headerScroller.Viewport.Width - 1);
+    Assert.InRange(pointInScroller.Y, 0, headerScroller.Viewport.Height - 1);
+    window.MouseMove(targetPoint);
+    Dispatcher.UIThread.RunJobs();
+    Assert.Equal(targetPoint, CenterIn(window, contextTarget));
+    var hit = Assert.IsAssignableFrom<Visual>(window.InputHitTest(targetPoint));
+    Assert.True(ReferenceEquals(hit, contextTarget) || hit.GetVisualAncestors().Contains(contextTarget),
+      $"Pointer did not hit {contextTarget.Key} at {targetPoint}.");
     Click(window, contextTarget, MouseButton.Right);
     Assert.Equal(contextTarget.Key, contextRequests[^1].Key);
     Assert.True(contextRequests[^1].AnchorBounds.Width > 0);
