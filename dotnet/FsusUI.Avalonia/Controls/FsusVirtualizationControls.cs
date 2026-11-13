@@ -121,6 +121,7 @@ public class FsusVirtualList : ContentControl
   private readonly Canvas itemHost = new();
   private readonly ScrollViewer scrollViewer = new();
   private CancellationTokenSource? loadCancellation;
+  private int loadStartingItemCount;
   private int loadVersion;
   private int nextContainerId;
   private double scrollOffset;
@@ -228,7 +229,7 @@ public class FsusVirtualList : ContentControl
     ScrollOffset = Math.Min(ScrollOffset, Math.Max(0d, ResolveTotalSize() - ViewportSize));
     if (ItemCount <= 0)
     {
-      if (realizedItems.Count > 0)
+      if (realizedItems.Count > 0 || (loadCancellation is not null && loadStartingItemCount > 0))
       {
         CancelPendingLoad();
         loadedItems.Clear();
@@ -481,6 +482,7 @@ public class FsusVirtualList : ContentControl
 
     using var cancellation = new CancellationTokenSource();
     loadCancellation = cancellation;
+    loadStartingItemCount = ItemCount;
     var version = ++loadVersion;
     State = FsusVirtualListState.Loading;
 
