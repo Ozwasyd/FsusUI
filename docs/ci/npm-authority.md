@@ -102,6 +102,8 @@ field to one manager and semantic group. `check:update-surface` regenerates the
 expected inventory in memory, validates its schema, and rejects drift,
 unowned/overlapping groups, permanent ignores, disabled update types, missing
 NuGet locks, or misleading Renovate policy.
+Docker discovery excludes the ignored repository-root `emsdk-cache/` populated
+by `setup-emsdk`; same-named directories inside source remain discoverable.
 
 Local validation proves only repository configuration and deterministic
 projection. Mend Renovate App installation, repository visibility, hosted

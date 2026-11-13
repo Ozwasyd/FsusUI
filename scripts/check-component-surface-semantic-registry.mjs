@@ -1,4 +1,5 @@
 import { createHash } from 'node:crypto'
+import { execFileSync } from 'node:child_process'
 import fs from 'node:fs/promises'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -12,6 +13,18 @@ const defaultRegistryPath =
   'spec/components/component-surface-semantic-registry.json'
 const defaultSchemaPath =
   'spec/components/component-surface-semantic-registry.schema.json'
+const producerPath = 'scripts/check-component-surface-semantic-registry.mjs'
+const bindingTargets = [
+  [defaultRegistryPath, '.'],
+  [
+    'tests/fixtures/component-surface-semantic-registry/valid-registry.json',
+    '.',
+  ],
+  [
+    'tests/fixtures/component-semantic-style-evaluator/registry.json',
+    'tests/fixtures/component-semantic-style-evaluator',
+  ],
+]
 const constraintFields = [
   'geometry',
   'typography',
@@ -1040,12 +1053,133 @@ export const checkComponentSurfaceSemanticRegistry = async (options = {}) => {
   }
 }
 
+// Refresh bindings only. Rules, acceptance mappings, and source files remain
+// owner-authored inputs; every source must match the recorded Git revision.
+export const generateComponentSurfaceSemanticRegistryBindings = async ({
+  root = defaultRoot,
+} = {}) => {
+  const revision = execFileSync('git', ['rev-parse', 'HEAD'], {
+    cwd: root,
+    encoding: 'utf8',
+  }).trim()
+  const outputs = []
+  for (const [registryPath, implementationRoot] of bindingTargets) {
+    const { registry, schema } = await loadComponentSurfaceSemanticRegistry({
+      root,
+      registryPath,
+    })
+    const sourceOverrides = {}
+    const inputs = []
+    for (const [id, source] of Object.entries(registry.sourceDigests)) {
+      if (
+        !['authority', 'implementation'].includes(source.kind) ||
+        source.algorithm !== 'sha256' ||
+        !/^[a-f0-9]{64}$/u.test(source.digest) ||
+        path.isAbsolute(source.path) ||
+        source.path.split(/[\\/]/u).includes('..')
+      ) {
+        fail('registry-source-invalid', `${id} has an invalid source binding`)
+      }
+      const inputPath = path.posix.join(
+        source.kind === 'authority' ? '.' : implementationRoot,
+        source.path,
+      )
+      const content = await fs.readFile(path.join(root, inputPath))
+      const committed = execFileSync(
+        'git',
+        ['show', `${revision}:${inputPath}`],
+        {
+          cwd: root,
+          maxBuffer: 16 * 1024 * 1024,
+        },
+      )
+      if (!content.equals(committed)) {
+        fail(
+          'registry-source-uncommitted',
+          `${inputPath} does not match ${revision}`,
+        )
+      }
+      source.digest = createHash('sha256').update(content).digest('hex')
+      sourceOverrides[source.path] = content.toString('utf8')
+      inputs.push({ path: inputPath, content })
+    }
+    // Keep a still-accurate input revision when only the bindings themselves
+    // were committed; otherwise generation would chase its own output commit.
+    const previousRevision = registry.generated.sourceRevision
+    let previousInputsMatch = false
+    if (/^[a-f0-9]{40}$/u.test(previousRevision)) {
+      try {
+        previousInputsMatch = inputs.every((input) =>
+          input.content.equals(
+            execFileSync('git', ['show', `${previousRevision}:${input.path}`], {
+              cwd: root,
+              maxBuffer: 16 * 1024 * 1024,
+              stdio: ['ignore', 'pipe', 'pipe'],
+            }),
+          ),
+        )
+      } catch {
+        // An unavailable or stale previous input revision must be rebound.
+      }
+    }
+    registry.generated.producer = producerPath
+    registry.generated.sourceRevision = previousInputsMatch
+      ? previousRevision
+      : revision
+    await validateComponentSurfaceSemanticRegistry({
+      registry,
+      schema,
+      root,
+      sourceOverrides,
+    })
+    if (registryPath === defaultRegistryPath) {
+      const fixtureRoot = 'tests/fixtures/component-surface-semantic-registry'
+      assertInventory(
+        registry,
+        await readJson(
+          path.join(root, fixtureRoot, 'production-rule-inventory.json'),
+        ),
+      )
+      assertSemanticOwnership(
+        registry,
+        await readJson(
+          path.join(root, fixtureRoot, 'semantic-ownership-contract.json'),
+        ),
+      )
+    }
+    outputs.push({
+      path: registryPath,
+      content: `${JSON.stringify(registry, null, 2)}\n`,
+    })
+  }
+  // Validate the complete set before writing any generated binding.
+  for (const output of outputs) {
+    await fs.writeFile(path.join(root, output.path), output.content)
+  }
+  return outputs.map(({ path: outputPath }) => outputPath)
+}
+
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
   try {
-    const result = await checkComponentSurfaceSemanticRegistry()
-    process.stdout.write(
-      `component surface semantic registry valid: ${result.ruleCount} rules, ${result.issueMappingCount} issue mappings\n`,
-    )
+    if (
+      process.argv.length === 3 &&
+      process.argv[2] === '--generate-bindings'
+    ) {
+      const outputs = await generateComponentSurfaceSemanticRegistryBindings()
+      process.stdout.write(
+        `semantic registry bindings generated: ${outputs.join(', ')}\n`,
+      )
+    } else if (process.argv.length === 2) {
+      const result = await checkComponentSurfaceSemanticRegistry()
+      process.stdout.write(
+        `component surface semantic registry valid: ${result.ruleCount} rules, ${result.issueMappingCount} issue mappings\n`,
+      )
+    } else {
+      fail(
+        'registry-usage',
+        'Usage: node scripts/check-component-surface-semantic-registry.mjs [--generate-bindings]',
+      )
+    }
   } catch (error) {
     process.stderr.write(
       `${error.code ?? 'registry-check-failed'}: ${error.message}\n`,

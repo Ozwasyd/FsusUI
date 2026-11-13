@@ -54,7 +54,7 @@ public class FsusNativeMenuTests
     Assert.Equal("file.save", searchResults[0].CommandId);
     Assert.Equal("Save Document", searchResults[0].Label);
     Assert.Equal("File", searchResults[0].Category);
-    Assert.Equal("Ctrl+S", searchResults[0].DisplayShortcut);
+    Assert.Equal(OperatingSystem.IsMacOS() ? "Command+S" : "Ctrl+S", searchResults[0].DisplayShortcut);
     Assert.True(searchResults[0].IsEnabled);
 
     // Execute via palette

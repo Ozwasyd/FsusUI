@@ -303,7 +303,7 @@ const cases = [
     inject: () =>
       mutateText(
         '.github/workflows/_quality.yml',
-        '          xvfb-run -a pnpm run conformance:v2\n',
+        '          dbus-run-session -- xvfb-run -a pnpm run conformance:v2\n',
         '',
       ),
     command: [process.execPath, ['scripts/check-dotnet-matrix-policy.mjs']],
@@ -316,7 +316,7 @@ const cases = [
     inject: () =>
       mutateText(
         '.github/workflows/quality.yml',
-        '          xvfb-run -a pnpm run conformance:v2\n',
+        '          dbus-run-session -- xvfb-run -a pnpm run conformance:v2\n',
         '',
       ),
     command: [process.execPath, ['scripts/check-dotnet-matrix-policy.mjs']],

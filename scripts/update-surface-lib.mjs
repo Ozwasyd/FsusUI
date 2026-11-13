@@ -329,6 +329,8 @@ function walkFiles(root, relativeDir, predicate, output = []) {
     }
     const absolute = path.join(absoluteDir, name)
     const relative = toPosix(path.relative(root, absolute))
+    // setup-emsdk owns this ignored root cache, not repository version inputs.
+    if (relative === 'emsdk-cache') continue
     const stat = statSync(absolute)
     if (stat.isDirectory()) {
       walkFiles(root, relative, predicate, output)

@@ -4,6 +4,8 @@ import process from 'node:process'
 
 const packageJson = JSON.parse(fs.readFileSync('package.json', 'utf8'))
 const scripts = packageJson.scripts ?? {}
+const sdk = JSON.parse(fs.readFileSync('dotnet/global.json', 'utf8')).sdk
+const rootSdk = JSON.parse(fs.readFileSync('global.json', 'utf8')).sdk
 const workflow = fs.readFileSync('.github/workflows/_quality.yml', 'utf8')
 const callerWorkflow = fs.readFileSync('.github/workflows/quality.yml', 'utf8')
 const stablePackageAudit = fs.readFileSync(
@@ -89,8 +91,8 @@ const validate = (source) => {
     assert(platform.includes(input), `platform cache key must cover ${input}`)
   }
   assert(
-    /dotnet-package:[\s\S]*?runs-on: ubuntu-latest/u.test(source),
-    'dotnet-package must use the canonical Ubuntu runner',
+    packageJob.includes('runs-on: ubuntu-24.04'),
+    'dotnet-package must use the Playwright-supported Ubuntu runner',
   )
   assert(
     !packageJob.includes('matrix:'),
@@ -153,7 +155,26 @@ const validate = (source) => {
 }
 
 const failures = validate(workflow)
+if (JSON.stringify(rootSdk) !== JSON.stringify(sdk)) {
+  failures.push('root and dotnet SDK selections must match')
+}
+if (sdk?.rollForward !== 'disable') {
+  failures.push('dotnet SDK must not roll forward beyond the locked restore inputs')
+}
 const callerPackageJob = job(callerWorkflow, 'pr-avalonia-aot-candidate')
+for (const [name, candidateJob] of [
+  ['dotnet-package', job(workflow, 'dotnet-package')],
+  ['pr-avalonia-aot-candidate', callerPackageJob],
+]) {
+  for (const requirement of [
+    'orca at-spi2-core python3-pyatspi dbus-x11',
+    'dbus-run-session -- xvfb-run -a pnpm run conformance:v2',
+  ]) {
+    if (!candidateJob.includes(requirement)) {
+      failures.push(`${name} must provision and run native screen-reader evidence`)
+    }
+  }
+}
 if (
   !callerPackageJob.includes('pnpm run conformance:v2') ||
   callerPackageJob.indexOf('pnpm run conformance:v2') >
@@ -195,7 +216,9 @@ if (!scripts['governance:check']?.includes('check:dotnet-matrix')) {
   failures.push('governance:check must include check:dotnet-matrix')
 }
 if (!scripts['dotnet:stable-package']?.includes('--stable-publication')) {
-  failures.push('dotnet:stable-package must require explicit stable publication')
+  failures.push(
+    'dotnet:stable-package must require explicit stable publication',
+  )
 }
 if (scripts['dotnet:package:verify']?.includes('--stable-publication')) {
   failures.push(
@@ -217,6 +240,19 @@ const invalidConcurrency = spawnSync(
   ['scripts/dotnet-platform-verify.mjs', '--max-cpu-count', '0'],
   { encoding: 'utf8' },
 )
+const matrixPlan = spawnSync(
+  process.execPath,
+  ['scripts/dotnet-matrix-plan.mjs'],
+  {
+    encoding: 'utf8',
+  },
+)
+if (
+  matrixPlan.status !== 0 ||
+  JSON.parse(matrixPlan.stdout).canonicalPackage.runner !== 'ubuntu-24.04'
+) {
+  failures.push('canonical package plan must match the package runner')
+}
 if (
   invalidConcurrency.status === 0 ||
   !`${invalidConcurrency.stdout}${invalidConcurrency.stderr}`.includes(

@@ -6,6 +6,7 @@ import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { auditModels } from './check-update-surface.mjs'
 import { buildExpectedUpdateSurface } from './update-surface-lib.mjs'
+import { testUpdateSurfaceSourceOwnership } from './test-update-surface-source-ownership.mjs'
 
 const require = createRequire(import.meta.url)
 const JSON5 = require('json5')
@@ -182,6 +183,8 @@ for (const candidate of fixture.negative) {
     `${candidate.manager} must reject the negative fixture`,
   )
 }
+
+testUpdateSurfaceSourceOwnership(root)
 
 console.log(
   `Renovate governance mutation contract passed: mutations=${mutations.length} positive=${fixture.positive.length} negative=${fixture.negative.length}.`,
