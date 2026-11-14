@@ -30,6 +30,10 @@ without changing the model or raising the event. Programmatic `ActiveNames`
 changes still synchronize child state, including disabled items. Each item
 belongs to its nearest `FsusCollapse` ancestor; synchronization stops at nested
 Collapse owners, whose active-name lists, item states and events stay independent.
+Items added after mounting and changes to `ItemKey` follow the current owner
+model. Mutating an observable active-name collection also updates its items;
+subscriptions are removed when the owner detaches or the collection is replaced.
+Pointer input in item content does not toggle its containing item.
 
 `FsusDescriptions` renders its `Items` collection as a responsive key/value
 grid. `RefreshLayout(width)` resolves the mobile one-column layout below 480px
@@ -47,9 +51,11 @@ danger dot with a 2px surface ring overhanging the host's top-right corner.
 Cross-platform element-crop evidence is registered in
 `tests/conformance/visual/fixtures/visual-comparisons.json`
 (`tag-vue-parity-web-avalonia`, `badge-vue-parity-web-avalonia`). `FsusCollapse`/`FsusCollapseItem` retain the Web geometry: 52px
-headers with 13px/500 captions, a 48px expanded area with 20px inline and 25px
-bottom padding, and `color.border.subtle` separators under expanded content
-and each collapsed header; the active header has no bottom border.
+headers with 13px/500 captions, an expanded area with a 48px minimum height,
+20px inline and 25px bottom padding, and `color.border.subtle` separators under
+expanded content and each collapsed header; the active header has no bottom
+border. The expanded area grows to fit its content, including nested Collapse
+controls, rather than clipping it to the minimum.
 
 ## Theme Tokens
 

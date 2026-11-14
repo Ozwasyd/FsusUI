@@ -1,3 +1,6 @@
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
+
 using Avalonia;
 using Avalonia.Automation;
 using Avalonia.Controls;
@@ -256,6 +259,206 @@ public class FsusCollapseRenderedEvidenceTests
     finally
     {
       window.Close();
+    }
+  }
+
+  [AvaloniaTheory]
+  [InlineData(FsusThemeVariant.Light)]
+  [InlineData(FsusThemeVariant.Dark)]
+  public void InnerPointerDoesNotToggleEnclosingItem(FsusThemeVariant variant)
+  {
+    var innerItem = new FsusCollapseItem { Title = "Inner", ItemKey = "inner", Content = "Inner content" };
+    var inner = new FsusCollapse { Content = innerItem };
+    var outerItem = new FsusCollapseItem { Title = "Outer", ItemKey = "outer", Content = inner };
+    var outer = new FsusCollapse { Content = outerItem, ActiveNames = new object?[] { "outer" } };
+    var window = MountCollapse(outer, variant);
+    try
+    {
+      var outerChanges = new List<FsusCollapseValueChangedEventArgs>();
+      var innerChanges = new List<FsusCollapseValueChangedEventArgs>();
+      outer.ValueChanged += (_, args) => outerChanges.Add(args);
+      inner.ValueChanged += (_, args) => innerChanges.Add(args);
+      Assert.True(outerItem.IsActive);
+      window.UpdateLayout();
+      using var frame = window.CaptureRenderedFrame();
+      Assert.NotNull(frame);
+      var output = HeadlessVisualEvidenceOutput.ResolveOutputRoot(FindRepositoryRoot(), "fsus-collapse-inner-pointer");
+      frame.Save(Path.Combine(output, $"{variant}-before.png"));
+      var header = Assert.Single(innerItem.GetVisualDescendants().OfType<Border>(), border => border.Name == "PART_Header");
+      var point = Assert.NotNull(header.TranslatePoint(new Point(30, 8), window));
+      var hit = window.InputHitTest(point);
+      Assert.True(ReferenceEquals(hit, header) || hit is Visual visual && visual.GetVisualAncestors().Contains(header), $"Header at {point} should be hit; actual: {hit}.");
+      window.MouseMove(point);
+      window.MouseDown(point, MouseButton.Left);
+      window.MouseUp(point, MouseButton.Left);
+      Dispatcher.UIThread.RunJobs();
+      window.UpdateLayout();
+      Assert.Equal(new object?[] { "outer" }, outer.ActiveNames);
+      Assert.Equal(new object?[] { "inner" }, inner.ActiveNames);
+      Assert.True(outerItem.IsActive);
+      AssertItemState(innerItem, true);
+      Assert.Empty(outerChanges);
+      Assert.Single(innerChanges);
+      Assert.True(innerItem.Bounds.Height >= 100, $"Expanded inner content must fit, actual height: {innerItem.Bounds.Height}.");
+      var outerContent = outerItem.GetVisualDescendants().OfType<Border>()
+        .First(border => border.Name == "PART_Content");
+      Assert.True(outerContent.Bounds.Height >= innerItem.Bounds.Height + 25,
+        $"Outer content must contain the inner item and its bottom padding; actual height: {outerContent.Bounds.Height}.");
+      using var after = window.CaptureRenderedFrame();
+      Assert.NotNull(after);
+      after.Save(Path.Combine(output, $"{variant}-after.png"));
+    }
+    finally { window.Close(); }
+  }
+
+  [AvaloniaFact]
+  public void ContentPointerActivatesButtonWithoutTogglingItem()
+  {
+    var button = new Button { Content = "Inner action" };
+    var item = new FsusCollapseItem { ItemKey = "a", Title = "A", Content = button };
+    var collapse = new FsusCollapse { Content = item, ActiveNames = new object?[] { "a" } };
+    var window = MountCollapse(collapse, FsusThemeVariant.Light);
+    try
+    {
+      var clicks = 0;
+      var changes = new List<FsusCollapseValueChangedEventArgs>();
+      button.Click += (_, _) => clicks++;
+      collapse.ValueChanged += (_, args) => changes.Add(args);
+      window.UpdateLayout();
+      using var frame = window.CaptureRenderedFrame();
+      Assert.NotNull(frame);
+      var point = Assert.NotNull(button.TranslatePoint(new Point(button.Bounds.Width / 2, button.Bounds.Height / 2), window));
+      var hit = window.InputHitTest(point);
+      Assert.True(ReferenceEquals(hit, button) || hit is Visual visual && visual.GetVisualAncestors().Contains(button));
+      window.MouseMove(point);
+      window.MouseDown(point, MouseButton.Left);
+      window.MouseUp(point, MouseButton.Left);
+      Dispatcher.UIThread.RunJobs();
+      window.UpdateLayout();
+      Assert.Equal(1, clicks);
+      Assert.Equal(new object?[] { "a" }, collapse.ActiveNames);
+      AssertItemState(item, true);
+      Assert.Empty(changes);
+    }
+    finally { window.Close(); }
+  }
+
+  [AvaloniaFact]
+  public void ContentBackgroundPointerDoesNotToggleItem()
+  {
+    var item = new FsusCollapseItem { ItemKey = "a", Title = "A", Content = "Content" };
+    var collapse = new FsusCollapse { Content = item, ActiveNames = new object?[] { "a" } };
+    var window = MountCollapse(collapse, FsusThemeVariant.Light);
+    try
+    {
+      var changes = new List<FsusCollapseValueChangedEventArgs>();
+      collapse.ValueChanged += (_, args) => changes.Add(args);
+      window.UpdateLayout();
+      using var frame = window.CaptureRenderedFrame();
+      Assert.NotNull(frame);
+      var content = Assert.Single(item.GetVisualDescendants().OfType<Border>(), border => border.Name == "PART_Content");
+      var point = Assert.NotNull(content.TranslatePoint(new Point(content.Bounds.Width - 10, 5), window));
+      var hit = window.InputHitTest(point);
+      Assert.True(ReferenceEquals(hit, content) || hit is Visual visual && visual.GetVisualAncestors().Contains(content));
+      window.MouseMove(point);
+      window.MouseDown(point, MouseButton.Left);
+      window.MouseUp(point, MouseButton.Left);
+      Dispatcher.UIThread.RunJobs();
+      window.UpdateLayout();
+      Assert.Equal(new object?[] { "a" }, collapse.ActiveNames);
+      AssertItemState(item, true);
+      Assert.Empty(changes);
+    }
+    finally { window.Close(); }
+  }
+
+  [AvaloniaFact]
+  public void AddedItemAndChangedKeyFollowTheCurrentOwnerState()
+  {
+    var panel = new StackPanel();
+    var collapse = new FsusCollapse { Content = panel, ActiveNames = new object?[] { "a" } };
+    var window = MountCollapse(collapse, FsusThemeVariant.Light);
+    try
+    {
+      var item = new FsusCollapseItem { ItemKey = "a", Title = "New", Content = "content" };
+      panel.Children.Add(item);
+      window.UpdateLayout();
+      AssertItemState(item, true);
+      item.ItemKey = "b";
+      window.UpdateLayout();
+      AssertItemState(item, false);
+      item.ItemKey = "a";
+      window.UpdateLayout();
+      AssertItemState(item, true);
+    }
+    finally { window.Close(); }
+  }
+
+  [AvaloniaFact]
+  public void ObservableActiveNamesChangesUpdateChildrenWithoutToggleEvent()
+  {
+    var item = new FsusCollapseItem { ItemKey = "a", Title = "A", Content = "content" };
+    var names = new ObservableCollection<object?>();
+    var collapse = new FsusCollapse { Content = item, ActiveNames = names };
+    var window = MountCollapse(collapse, FsusThemeVariant.Light);
+    try
+    {
+      var changes = new List<FsusCollapseValueChangedEventArgs>();
+      collapse.ValueChanged += (_, args) => changes.Add(args);
+      names.Add("a");
+      window.UpdateLayout();
+      AssertItemState(item, true);
+      names.Remove("a");
+      window.UpdateLayout();
+      AssertItemState(item, false);
+      collapse.ActiveNames = new object?[] { "a" };
+      names.Add("a");
+      window.UpdateLayout();
+      AssertItemState(item, true);
+      Assert.Empty(changes);
+    }
+    finally { window.Close(); }
+  }
+
+  [AvaloniaFact]
+  public void ObservableActiveNamesSubscriptionFollowsOwnerLifetime()
+  {
+    var item = new FsusCollapseItem { ItemKey = "a", Title = "A", Content = "content" };
+    var first = new TrackedNames();
+    var second = new TrackedNames { "a" };
+    var collapse = new FsusCollapse { Content = item, ActiveNames = first };
+    var window = MountCollapse(collapse, FsusThemeVariant.Light);
+    try
+    {
+      Assert.Equal(1, first.Subscribers);
+      collapse.ActiveNames = second;
+      Assert.Equal(0, first.Subscribers);
+      Assert.Equal(1, second.Subscribers);
+      AssertItemState(item, true);
+      window.Content = null;
+      window.UpdateLayout();
+    }
+    finally { window.Close(); }
+    Assert.Equal(0, second.Subscribers);
+    second.Remove("a");
+    var reopened = MountCollapse(collapse, FsusThemeVariant.Light);
+    try
+    {
+      Assert.Equal(1, second.Subscribers);
+      AssertItemState(item, false);
+    }
+    finally { reopened.Close(); }
+    Assert.Equal(0, second.Subscribers);
+  }
+
+  private sealed class TrackedNames : ObservableCollection<object?>
+  {
+    public int Subscribers { get; private set; }
+
+    public override event NotifyCollectionChangedEventHandler? CollectionChanged
+    {
+      add { base.CollectionChanged += value; Subscribers++; }
+      remove { base.CollectionChanged -= value; Subscribers--; }
     }
   }
 
