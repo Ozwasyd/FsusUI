@@ -11,6 +11,32 @@ namespace FsusUI.Avalonia.HeadlessTests;
 public class FsusTransferHeadlessTests
 {
   [AvaloniaFact]
+  public void FocusedChildDoesNotTriggerTransferKeyboardCommands()
+  {
+    var child = new Border { Focusable = true };
+    var transfer = new FsusTransfer { Content = child };
+    transfer.Items.Add(new FsusTransferItem("alpha", "Alpha"));
+    transfer.Items.Add(new FsusTransferItem("beta", "Beta"));
+    transfer.RefreshLists();
+    var window = Mount(transfer);
+    try
+    {
+      Assert.True(child.Focus());
+      Assert.True(child.IsFocused);
+      window.KeyPress(Key.Down, RawInputModifiers.None, PhysicalKey.ArrowDown, null);
+      window.KeyPress(Key.Space, RawInputModifiers.None, PhysicalKey.Space, null);
+      window.KeyPress(Key.Enter, RawInputModifiers.None, PhysicalKey.Enter, null);
+      Assert.Equal(0, transfer.HighlightedLeftIndex);
+      Assert.Empty(transfer.SelectedLeftValues);
+      Assert.Empty(transfer.TargetValues);
+    }
+    finally
+    {
+      window.Close();
+    }
+  }
+
+  [AvaloniaFact]
   public void WindowKeyboardInputNavigatesSelectsAndMovesWithoutHelperCalls()
   {
     var transfer = new FsusTransfer { AccessibleName = "Review routing" };

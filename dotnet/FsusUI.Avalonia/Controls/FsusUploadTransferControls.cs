@@ -340,7 +340,7 @@ public class FsusTransfer : ContentControl
   protected override void OnKeyDown(KeyEventArgs e)
   {
     base.OnKeyDown(e);
-    if (!e.Handled && HandleKeyAsync(e.Key).GetAwaiter().GetResult())
+    if (IsFocused && !e.Handled && HandleKeyAsync(e.Key).GetAwaiter().GetResult())
     {
       e.Handled = true;
     }
