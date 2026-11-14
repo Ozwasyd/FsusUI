@@ -273,7 +273,7 @@ let heavyLifecycleIdentityContexts: Partial<
   Record<MarkdownHeavyFeatureKind, HeavyLifecycleIdentityContext>
 > = {}
 let heavyLifecycleIdentitySequences: Partial<
-  Record<MarkdownHeavyFeatureKind, readonly HeavyLifecycleIdentityContext[]>
+  Record<MarkdownHeavyFeatureKind, HeavyLifecycleIdentityContext[]>
 > = {}
 let heavyLifecycleProjectionNodeIds: Partial<
   Record<MarkdownHeavyFeatureKind, readonly string[]>
@@ -971,29 +971,15 @@ const createHeavyFeatureIdentityResolver = async (
       theme,
     })
     lastHeavyLifecycleIdentityContext = context
-    heavyLifecycleIdentityContexts = {
-      ...heavyLifecycleIdentityContexts,
-      [input.kind]: context,
-    }
-    heavyLifecycleIdentitySequences = {
-      ...heavyLifecycleIdentitySequences,
-      [input.kind]: [
-        ...(heavyLifecycleIdentitySequences[input.kind] ?? []),
-        context,
-      ],
-    }
+    heavyLifecycleIdentityContexts[input.kind] = context
+    ;(heavyLifecycleIdentitySequences[input.kind] ??= []).push(context)
     return Object.freeze({
-      config,
-      documentEpoch,
-      documentKey,
+      ...context,
       featureKind: input.kind,
       gatewayVersion: MARKDOWN_FEATURE_OUTPUT_GATEWAY_VERSION,
       locale: 'locale-independent',
-      nodeId,
       rendererVersion: result.rendererVersion,
-      revision,
       sourceIdentity: result.sourceIdentity,
-      theme,
     })
   }
 }
