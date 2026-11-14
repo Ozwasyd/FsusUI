@@ -739,8 +739,11 @@ test('Collapse content minimum token has generated authorities and a resolved th
     [avalonia, themes].every((contract) =>
       contract.definitions.some(
         (definition) =>
-          definition.canonicalName === 'component.collapse.content.min-height' &&
-          definition.resourceKeys.includes('FsusComponentCollapseContentMinHeight'),
+          definition.canonicalName ===
+            'component.collapse.content.min-height' &&
+          definition.resourceKeys.includes(
+            'FsusComponentCollapseContentMinHeight',
+          ),
       ),
     ),
   )
