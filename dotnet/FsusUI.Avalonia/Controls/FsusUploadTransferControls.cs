@@ -1,7 +1,12 @@
+using Avalonia;
 using Avalonia.Automation;
 using Avalonia.Automation.Peers;
 using Avalonia.Controls;
+using Avalonia.Controls.Primitives;
+using Avalonia.Controls.Templates;
 using Avalonia.Input;
+using Avalonia.Layout;
+using Avalonia.VisualTree;
 using System.Collections.ObjectModel;
 using System.Globalization;
 
@@ -167,9 +172,21 @@ public sealed class FsusTransferItem(
   object? value,
   string label)
 {
+  private bool isDisabled;
   public object? Value { get; } = value;
   public string Label { get; } = label;
-  public bool IsDisabled { get; set; }
+  public bool IsDisabled
+  {
+    get => isDisabled;
+    set
+    {
+      if (isDisabled == value) return;
+      isDisabled = value;
+      DisabledChanged?.Invoke(this, EventArgs.Empty);
+    }
+  }
+
+  internal event EventHandler? DisabledChanged;
 }
 
 public class FsusTransfer : ContentControl
@@ -180,17 +197,34 @@ public class FsusTransfer : ContentControl
   private readonly List<object?> targetValues = [];
   private readonly List<object?> selectedLeftValues = [];
   private readonly List<object?> selectedRightValues = [];
+  private readonly ListBox sourceList = new();
+  private readonly ListBox targetList = new();
+  private readonly FsusButton moveRight = new();
+  private readonly FsusButton moveLeft = new();
+  private readonly TextBox filter = new();
+  private readonly Grid defaultView = new();
+  private bool isFilterable;
 
   public FsusTransfer()
   {
     FsusComponentClasses.SetBaseClasses(this, "fsus-transfer");
     Focusable = true;
+    InitializeDefaultView();
     SyncState();
   }
 
   public string? AccessibleName { get; set; }
   public Collection<FsusTransferItem> Items { get; } = [];
-  public bool IsFilterable { get; set; }
+  public bool IsFilterable
+  {
+    get => isFilterable;
+    set
+    {
+      if (isFilterable == value) return;
+      isFilterable = value;
+      SyncState();
+    }
+  }
   public string FilterText { get; private set; } = string.Empty;
   public int HighlightedLeftIndex { get; private set; } = -1;
   public int VirtualizationThreshold { get; set; } = 250;
@@ -215,6 +249,10 @@ public class FsusTransfer : ContentControl
   public void ApplyFilter(string query)
   {
     FilterText = query ?? string.Empty;
+    if (filter.Text != FilterText)
+    {
+      filter.Text = FilterText;
+    }
     RebuildFilteredLists();
     SyncState();
   }
@@ -303,6 +341,10 @@ public class FsusTransfer : ContentControl
     var maxStart = Math.Max(0, filteredLeftItems.Count - Math.Max(1, VisibleItemLimit));
     VirtualizedLeftStartIndex = Math.Clamp(startIndex, 0, maxStart);
     RebuildVirtualizedLeft();
+    if (filteredLeftItems.Count > 0)
+    {
+      sourceList.ScrollIntoView(VirtualizedLeftStartIndex);
+    }
     SyncState();
   }
 
@@ -380,6 +422,84 @@ public class FsusTransfer : ContentControl
     IsVirtualized = filteredLeftItems.Count > VirtualizationThreshold;
     VirtualizedLeftStartIndex = 0;
     RebuildVirtualizedLeft();
+    RefreshViewItems();
+  }
+
+  private void InitializeDefaultView()
+  {
+    sourceList.Classes.Add("fsus-transfer-list");
+    targetList.Classes.Add("fsus-transfer-list");
+    filter.Classes.Add("fsus-transfer-filter");
+    sourceList.ItemTemplate = new FuncDataTemplate<FsusTransferItem>((item, _) => CreateRow(item, true), supportsRecycling: false);
+    targetList.ItemTemplate = new FuncDataTemplate<FsusTransferItem>((item, _) => CreateRow(item, false), supportsRecycling: false);
+    AutomationProperties.SetName(sourceList, "Source items");
+    AutomationProperties.SetName(targetList, "Target items");
+    AutomationProperties.SetName(moveRight, "Move selected right");
+    AutomationProperties.SetName(moveLeft, "Move selected left");
+    AutomationProperties.SetName(filter, "Filter items");
+    filter.Watermark = "Filter items";
+    moveRight.Content = "→";
+    moveLeft.Content = "←";
+    moveRight.Click += (_, _) => MoveSelectedRight();
+    moveLeft.Click += (_, _) => MoveSelectedLeft();
+    filter.TextChanged += (_, _) => ApplyFilter(filter.Text ?? string.Empty);
+
+    var source = new DockPanel();
+    DockPanel.SetDock(filter, Dock.Top);
+    source.Children.Add(filter);
+    source.Children.Add(sourceList);
+    var actions = new StackPanel { VerticalAlignment = VerticalAlignment.Center };
+    actions.Children.Add(moveRight);
+    actions.Children.Add(moveLeft);
+    defaultView.ColumnDefinitions = new ColumnDefinitions("*,Auto,*");
+    Grid.SetColumn(source, 0);
+    Grid.SetColumn(actions, 1);
+    Grid.SetColumn(targetList, 2);
+    defaultView.Children.Add(source);
+    defaultView.Children.Add(actions);
+    defaultView.Children.Add(targetList);
+    Content = defaultView;
+    RefreshViewItems();
+  }
+
+  private CheckBox CreateRow(FsusTransferItem? item, bool source)
+  {
+    if (item is null)
+    {
+      return new CheckBox { IsVisible = false };
+    }
+    var row = new CheckBox { Content = item.Label, Tag = item, IsEnabled = !item.IsDisabled };
+    row.Classes.Add("fsus-transfer-row");
+    var selected = source ? selectedLeftValues : selectedRightValues;
+    row.IsChecked = selected.Any(value => ValuesEqual(value, item.Value));
+    row.PropertyChanged += (_, change) =>
+    {
+      if (change.Property != ToggleButton.IsCheckedProperty) return;
+      bool isSelected = selected.Any(value => ValuesEqual(value, item.Value));
+      if (isSelected != (row.IsChecked == true))
+      {
+        if (source) ToggleLeftSelection(item.Value);
+        else ToggleRightSelection(item.Value);
+      }
+    };
+    EventHandler disabledChanged = (_, _) =>
+    {
+      row.IsEnabled = !item.IsDisabled;
+      SyncState();
+    };
+    row.AttachedToVisualTree += (_, _) =>
+    {
+      item.DisabledChanged += disabledChanged;
+      row.IsEnabled = !item.IsDisabled;
+    };
+    row.DetachedFromVisualTree += (_, _) => item.DisabledChanged -= disabledChanged;
+    return row;
+  }
+
+  private void RefreshViewItems()
+  {
+    sourceList.ItemsSource = filteredLeftItems.ToArray();
+    targetList.ItemsSource = filteredRightItems.ToArray();
   }
 
   private void RebuildVirtualizedLeft()
@@ -413,6 +533,8 @@ public class FsusTransfer : ContentControl
       if (!filteredLeftItems[current].IsDisabled)
       {
         HighlightedLeftIndex = current;
+        sourceList.SelectedIndex = current;
+        sourceList.ScrollIntoView(current);
         SyncState();
         return true;
       }
@@ -457,6 +579,25 @@ public class FsusTransfer : ContentControl
     AutomationProperties.SetItemStatus(
       this,
       $"{SourceCount.ToString(CultureInfo.InvariantCulture)} source, {TargetValues.Count.ToString(CultureInfo.InvariantCulture)} target");
+    filter.IsVisible = IsFilterable;
+    moveRight.IsEnabled = selectedLeftValues.Any(value => filteredLeftItems.Any(item => !item.IsDisabled && ValuesEqual(item.Value, value)));
+    moveLeft.IsEnabled = selectedRightValues.Any(value => filteredRightItems.Any(item => !item.IsDisabled && ValuesEqual(item.Value, value)));
+    foreach (var row in sourceList.GetVisualDescendants().OfType<CheckBox>())
+    {
+      if (row.Tag is FsusTransferItem item)
+      {
+        row.IsEnabled = !item.IsDisabled;
+        row.IsChecked = selectedLeftValues.Any(value => ValuesEqual(value, item.Value));
+      }
+    }
+    foreach (var row in targetList.GetVisualDescendants().OfType<CheckBox>())
+    {
+      if (row.Tag is FsusTransferItem item)
+      {
+        row.IsEnabled = !item.IsDisabled;
+        row.IsChecked = selectedRightValues.Any(value => ValuesEqual(value, item.Value));
+      }
+    }
   }
 
   private static bool ValuesEqual(object? first, object? second) =>

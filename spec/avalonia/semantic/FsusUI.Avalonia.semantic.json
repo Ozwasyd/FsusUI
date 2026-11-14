@@ -4,11 +4,11 @@
   "source": {
     "toolVersion": "FsusUI.Avalonia.ApiTool@1.8.0",
     "assemblyVersion": "0.0.0.0",
-    "inputTreeHash": "4afb90b6b6f4dab08dbdcb2db2a38cb5bcf221764d42151a730e0a1fc24ff03f",
+    "inputTreeHash": "c0a17d50138592c60682dd5015de4962debdb5e51cc29259e2c414242b95ce6c",
     "compilerOptionsHash": "7e5271d568360ccb03852002c427b2d740466121049706513eb89a731476ad09",
     "dependencyVersionHash": "b0acaf728062500d48b252b58655a9fad423f83f197e79ddcdfff680a80ab71e",
     "contractSchemaVersion": "2.0.0",
-    "outputHash": "39a2706297e2acaa4d75a59ae44d1d00b0f1c36088be6329220cf92cfb6dcb90"
+    "outputHash": "022b306eddd84e59f7872ebd1900d265e78823cd72f1c6e946e934bb4d8f7f19"
   },
   "semanticTypes": [
     {
@@ -55405,6 +55405,61 @@
           "state"
         ],
         "mappings": [
+          {
+            "semantic": "name",
+            "provider": "AutomationProperties.SetName",
+            "authority": "roslyn-automation-attached-property-write",
+            "targetKind": "owned-element-expression",
+            "targetExpression": "filter",
+            "valueKnown": true,
+            "value": "Filter items",
+            "publicDependencies": [],
+            "sourceMember": "FsusUI.Avalonia.Controls.FsusTransfer.InitializeDefaultView"
+          },
+          {
+            "semantic": "name",
+            "provider": "AutomationProperties.SetName",
+            "authority": "roslyn-automation-attached-property-write",
+            "targetKind": "owned-element-expression",
+            "targetExpression": "moveLeft",
+            "valueKnown": true,
+            "value": "Move selected left",
+            "publicDependencies": [],
+            "sourceMember": "FsusUI.Avalonia.Controls.FsusTransfer.InitializeDefaultView"
+          },
+          {
+            "semantic": "name",
+            "provider": "AutomationProperties.SetName",
+            "authority": "roslyn-automation-attached-property-write",
+            "targetKind": "owned-element-expression",
+            "targetExpression": "moveRight",
+            "valueKnown": true,
+            "value": "Move selected right",
+            "publicDependencies": [],
+            "sourceMember": "FsusUI.Avalonia.Controls.FsusTransfer.InitializeDefaultView"
+          },
+          {
+            "semantic": "name",
+            "provider": "AutomationProperties.SetName",
+            "authority": "roslyn-automation-attached-property-write",
+            "targetKind": "owned-element-expression",
+            "targetExpression": "sourceList",
+            "valueKnown": true,
+            "value": "Source items",
+            "publicDependencies": [],
+            "sourceMember": "FsusUI.Avalonia.Controls.FsusTransfer.InitializeDefaultView"
+          },
+          {
+            "semantic": "name",
+            "provider": "AutomationProperties.SetName",
+            "authority": "roslyn-automation-attached-property-write",
+            "targetKind": "owned-element-expression",
+            "targetExpression": "targetList",
+            "valueKnown": true,
+            "value": "Target items",
+            "publicDependencies": [],
+            "sourceMember": "FsusUI.Avalonia.Controls.FsusTransfer.InitializeDefaultView"
+          },
           {
             "semantic": "name",
             "provider": "AutomationProperties.SetName",

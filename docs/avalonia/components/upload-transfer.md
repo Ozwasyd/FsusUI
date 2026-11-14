@@ -52,6 +52,11 @@ dropZone.FilesDropped += (sender, args) =>
 
 var upload = new FsusUpload { AccessibleName = "Attachments" };
 upload.Items.Add(new FsusUploadItem("report.csv", 42_000, "text/csv"));
+
+var transfer = new FsusTransfer { AccessibleName = "Review assignments", IsFilterable = true };
+transfer.Items.Add(new FsusTransferItem("draft", "Draft review"));
+transfer.Items.Add(new FsusTransferItem("release", "Release review") { IsDisabled = true });
+transfer.RefreshLists();
 ```
 
 `FilesDropped` and `FilesRejected` expose accepted and rejected storage items
