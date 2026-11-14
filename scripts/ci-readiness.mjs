@@ -180,7 +180,7 @@ const emitPlaywright = (root, gate, group) => {
       : null
     if (!reportSource || !existsSync(reportSource))
       throw new Error(`missing playwright report for ${cell.cellId}.`)
-    const receiptRelative = path.relative(evidenceRoot, receiptPath)
+    let packagedReceiptPath = receiptPath
     const reportRelative = path.join(
       'receipts',
       gate,
@@ -190,7 +190,6 @@ const emitPlaywright = (root, gate, group) => {
     const reportDest = path.resolve(evidenceRoot, reportRelative)
     mkdirSync(path.dirname(reportDest), { recursive: true })
     copyFileSync(reportSource, reportDest)
-    const receiptDigest = sha256Path(receiptPath)
     const reportDigest = sha256Path(reportDest)
     const conformanceTraceArtifacts = []
     let conformance = undefined
@@ -224,11 +223,36 @@ const emitPlaywright = (root, gate, group) => {
         conformanceTraceArtifacts.push({
           name: `trace-${cell.cellId}-${index}`,
           path: traceRelative,
-          sha256: digest,
+          sha256: sha256Path(traceDest),
         })
       }
       conformance = { ...receipt.conformance, traces }
+      // Keep projected receipts outside the recursively loaded owner directory.
+      packagedReceiptPath = path.join(
+        evidenceRoot,
+        'receipt-projections',
+        gate,
+        receiptFile,
+      )
+      const ownerRelative = path.relative(receiptsDir, packagedReceiptPath)
+      if (
+        ownerRelative === '' ||
+        (!ownerRelative.startsWith(`..${path.sep}`) &&
+          ownerRelative !== '..' &&
+          !path.isAbsolute(ownerRelative))
+      ) {
+        throw new Error(
+          'projected receipt must be outside owner receipts directory.',
+        )
+      }
+      mkdirSync(path.dirname(packagedReceiptPath), { recursive: true })
+      writeFileSync(
+        packagedReceiptPath,
+        `${JSON.stringify({ ...receipt, conformance }, null, 2)}\n`,
+      )
     }
+    const receiptRelative = path.relative(evidenceRoot, packagedReceiptPath)
+    const receiptDigest = sha256Path(packagedReceiptPath)
     const id = `${gate}-${cell.cellId.replaceAll('/', '-')}`
     const reportSummary = `reports/${id}.json`
     const browser = cell.dimensions.browser
