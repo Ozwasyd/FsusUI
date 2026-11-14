@@ -1,8 +1,11 @@
+using System.Collections.Specialized;
+
 using Avalonia;
 using Avalonia.Automation;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.LogicalTree;
+using Avalonia.VisualTree;
 
 namespace FsusUI.Avalonia.Controls;
 
@@ -30,7 +33,8 @@ public class FsusCollapse : ContentControl
       nameof(ActiveNames),
       Array.Empty<object?>());
 
-  private bool isSyncingChildren;
+  private INotifyCollectionChanged? activeNamesNotifier;
+  private bool isLogicallyAttached;
 
   public FsusCollapse()
   {
@@ -94,9 +98,7 @@ public class FsusCollapse : ContentControl
       return;
     }
 
-    isSyncingChildren = true;
     SetCurrentValue(ActiveNamesProperty, next);
-    isSyncingChildren = false;
     ValueChanged?.Invoke(
       this,
       new FsusCollapseValueChangedEventArgs(current, next));
@@ -104,23 +106,67 @@ public class FsusCollapse : ContentControl
 
   private void SyncChildren()
   {
-    foreach (var item in this.GetLogicalDescendants().OfType<FsusCollapseItem>())
+    SyncOwnedChildren(this);
+  }
+
+  private void SyncOwnedChildren(ILogical parent)
+  {
+    foreach (var child in parent.GetLogicalChildren())
     {
-      item.SetIsActiveFromParent(IsActive(item.ItemKey));
+      if (child is FsusCollapse)
+      {
+        continue;
+      }
+
+      if (child is FsusCollapseItem item)
+      {
+        item.SetIsActiveFromParent(IsActive(item.ItemKey));
+      }
+
+      SyncOwnedChildren(child);
     }
+  }
+
+  private void BindActiveNamesNotifications()
+  {
+    if (activeNamesNotifier is not null)
+    {
+      activeNamesNotifier.CollectionChanged -= OnActiveNamesCollectionChanged;
+    }
+
+    activeNamesNotifier = isLogicallyAttached ? ActiveNames as INotifyCollectionChanged : null;
+    if (activeNamesNotifier is not null)
+    {
+      activeNamesNotifier.CollectionChanged += OnActiveNamesCollectionChanged;
+    }
+  }
+
+  private void OnActiveNamesCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+  {
+    SyncChildren();
   }
 
   protected override void OnAttachedToLogicalTree(LogicalTreeAttachmentEventArgs e)
   {
     base.OnAttachedToLogicalTree(e);
+    isLogicallyAttached = true;
+    BindActiveNamesNotifications();
     SyncChildren();
+  }
+
+  protected override void OnDetachedFromLogicalTree(LogicalTreeAttachmentEventArgs e)
+  {
+    isLogicallyAttached = false;
+    BindActiveNamesNotifications();
+    base.OnDetachedFromLogicalTree(e);
   }
 
   protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
   {
     base.OnPropertyChanged(change);
-    if (change.Property == ActiveNamesProperty && !isSyncingChildren)
+    if (change.Property == ActiveNamesProperty)
     {
+      BindActiveNamesNotifications();
       SyncChildren();
     }
 
@@ -193,6 +239,23 @@ public class FsusCollapseItem : ContentControl
       return;
     }
 
+    if (e.Source is Visual source)
+    {
+      var ancestors = source.GetVisualAncestors().Prepend(source);
+      if (ancestors.OfType<Border>().Any(border =>
+          border.Name == "PART_Content" && ReferenceEquals(border.TemplatedParent, this)))
+      {
+        return;
+      }
+
+      var owner = source as FsusCollapseItem ??
+        source.GetVisualAncestors().OfType<FsusCollapseItem>().FirstOrDefault();
+      if (owner is not null && !ReferenceEquals(owner, this))
+      {
+        return;
+      }
+    }
+
     var parent = this.FindLogicalAncestorOfType<FsusCollapse>();
     if (parent is not null)
     {
@@ -205,9 +268,29 @@ public class FsusCollapseItem : ContentControl
     SetCurrentValue(IsActiveProperty, active);
   }
 
+  protected override void OnAttachedToLogicalTree(LogicalTreeAttachmentEventArgs e)
+  {
+    base.OnAttachedToLogicalTree(e);
+    var parent = this.FindLogicalAncestorOfType<FsusCollapse>();
+    if (parent is not null)
+    {
+      SetIsActiveFromParent(parent.IsActive(ItemKey));
+    }
+  }
+
   protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
   {
     base.OnPropertyChanged(change);
+    if (change.Property == ItemKeyProperty)
+    {
+      var parent = this.FindLogicalAncestorOfType<FsusCollapse>();
+      if (parent is not null)
+      {
+        SetIsActiveFromParent(parent.IsActive(ItemKey));
+      }
+      SyncAutomation();
+    }
+
     if (change.Property == IsActiveProperty ||
         change.Property == DisabledProperty ||
         change.Property == TitleProperty)

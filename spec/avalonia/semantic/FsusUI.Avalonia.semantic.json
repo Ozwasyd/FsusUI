@@ -4,11 +4,11 @@
   "source": {
     "toolVersion": "FsusUI.Avalonia.ApiTool@1.8.0",
     "assemblyVersion": "0.0.0.0",
-    "inputTreeHash": "4afb90b6b6f4dab08dbdcb2db2a38cb5bcf221764d42151a730e0a1fc24ff03f",
+    "inputTreeHash": "fc9b423bd2a1b04feb374f776cfeb20d284e07207dfdc34601641a48154a57f8",
     "compilerOptionsHash": "7e5271d568360ccb03852002c427b2d740466121049706513eb89a731476ad09",
     "dependencyVersionHash": "b0acaf728062500d48b252b58655a9fad423f83f197e79ddcdfff680a80ab71e",
     "contractSchemaVersion": "2.0.0",
-    "outputHash": "39a2706297e2acaa4d75a59ae44d1d00b0f1c36088be6329220cf92cfb6dcb90"
+    "outputHash": "50eade052ef06fcfd4c1c0bcdaca7b573f12ce480436902e7bd9da51f0738084"
   },
   "semanticTypes": [
     {
@@ -63216,6 +63216,17 @@
           "deprecated": false
         },
         {
+          "name": "ComponentCollapseContentMinHeightDouble",
+          "type": "System.Double",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": true,
+          "required": false,
+          "defaultKnown": false,
+          "deprecated": false
+        },
+        {
           "name": "ComponentDialogMinHeightDouble",
           "type": "System.Double",
           "nullable": false,
@@ -66466,6 +66477,24 @@
           "ComponentCascaderSuggestionMaxHeightName",
           "ComponentCascaderSuggestionMaxHeightResourceKey",
           "ComponentCascaderSuggestionMaxHeightValue"
+        ],
+        "declarationAuthority": "canonical-json\u002Broslyn-generated-constants\u002Bxml-generated-resources"
+      },
+      {
+        "canonicalName": "component.collapse.content.min-height",
+        "owner": "FsusUI component maintainers",
+        "generatedOutputs": [
+          "dotnet/FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml",
+          "dotnet/FsusUI.Avalonia/Generated/FsusTokens.g.cs"
+        ],
+        "resourceKeys": [
+          "FsusComponentCollapseContentMinHeight"
+        ],
+        "csharpMembers": [
+          "ComponentCollapseContentMinHeightDouble",
+          "ComponentCollapseContentMinHeightName",
+          "ComponentCollapseContentMinHeightResourceKey",
+          "ComponentCollapseContentMinHeightValue"
         ],
         "declarationAuthority": "canonical-json\u002Broslyn-generated-constants\u002Bxml-generated-resources"
       },
