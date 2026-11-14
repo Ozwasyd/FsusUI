@@ -56,7 +56,7 @@ public class FsusUploadTransferPrimitiveTests
   }
 
   [Fact]
-  public async Task TransferFiltersSelectsMovesAndSupportsKeyboardOnlyOperation()
+  public async Task TransferFiltersSelectsMovesAndHandlesKeyboardCommands()
   {
     var transfer = new KeyboardTransfer
     {
@@ -120,6 +120,92 @@ public class FsusUploadTransferPrimitiveTests
 
     Assert.Equal(500, transfer.VirtualizedLeftStartIndex);
     Assert.Equal("Item 0500", transfer.VirtualizedLeftItems[0].Label);
+  }
+
+  [Theory]
+  [InlineData(false)]
+  [InlineData(true)]
+  public void TransferMovesRecheckDisabledItemsAndClearAttemptedSelection(bool moveLeft)
+  {
+    var transfer = new FsusTransfer();
+    var locked = new FsusTransferItem("locked", "Locked");
+    var enabled = new FsusTransferItem("enabled", "Enabled");
+    transfer.Items.Add(locked);
+    transfer.Items.Add(enabled);
+    transfer.RefreshLists();
+    if (moveLeft)
+    {
+      transfer.ToggleLeftSelection(locked.Value);
+      transfer.ToggleLeftSelection(enabled.Value);
+      Assert.True(transfer.MoveSelectedRight());
+      transfer.ToggleRightSelection(locked.Value);
+      transfer.ToggleRightSelection(enabled.Value);
+    }
+    else
+    {
+      transfer.ToggleLeftSelection(locked.Value);
+      transfer.ToggleLeftSelection(enabled.Value);
+    }
+
+    locked.IsDisabled = true;
+    Assert.True(moveLeft ? transfer.MoveSelectedLeft() : transfer.MoveSelectedRight());
+    Assert.Equal(new object?[] { moveLeft ? "locked" : "enabled" }, transfer.TargetValues);
+    Assert.Empty(moveLeft ? transfer.SelectedRightValues : transfer.SelectedLeftValues);
+    Assert.False(transfer.ToggleLeftSelection(locked.Value));
+    Assert.False(transfer.ToggleRightSelection(locked.Value));
+  }
+
+  [Theory]
+  [InlineData(false)]
+  [InlineData(true)]
+  public void TransferMovesRespectCurrentFilterInBothDirections(bool moveLeft)
+  {
+    var transfer = new FsusTransfer { IsFilterable = true };
+    transfer.Items.Add(new FsusTransferItem("alpha", "Alpha"));
+    transfer.Items.Add(new FsusTransferItem("beta", "Beta"));
+    transfer.RefreshLists();
+    transfer.ToggleLeftSelection("alpha");
+    if (moveLeft)
+    {
+      Assert.True(transfer.MoveSelectedRight());
+      transfer.ToggleRightSelection("alpha");
+    }
+
+    transfer.ApplyFilter("Beta");
+    Assert.False(moveLeft ? transfer.MoveSelectedLeft() : transfer.MoveSelectedRight());
+    Assert.Equal(moveLeft ? new object?[] { "alpha" } : [], transfer.TargetValues);
+    Assert.Empty(moveLeft ? transfer.SelectedRightValues : transfer.SelectedLeftValues);
+  }
+
+  [Fact]
+  public async Task TransferDisabledControlRejectsSelectionMovementAndKeyboardChanges()
+  {
+    var transfer = new KeyboardTransfer();
+    transfer.Items.Add(new FsusTransferItem("alpha", "Alpha"));
+    transfer.Items.Add(new FsusTransferItem("beta", "Beta"));
+    transfer.Items.Add(new FsusTransferItem("gamma", "Gamma"));
+    transfer.RefreshLists();
+    transfer.ToggleLeftSelection("alpha");
+    Assert.True(transfer.MoveSelectedRight());
+    transfer.ToggleRightSelection("alpha");
+    transfer.ToggleLeftSelection("beta");
+    transfer.IsEnabled = false;
+
+    Assert.False(transfer.ToggleLeftSelection("gamma"));
+    Assert.False(transfer.ToggleRightSelection("alpha"));
+    Assert.False(transfer.MoveSelectedRight());
+    Assert.False(transfer.MoveSelectedLeft());
+    Assert.False(await transfer.PressAsync(Key.Down));
+    Assert.False(await transfer.PressAsync(Key.Space));
+    Assert.False(await transfer.PressAsync(Key.Enter));
+    Assert.Equal(new object?[] { "alpha" }, transfer.TargetValues);
+    Assert.Equal(new object?[] { "beta" }, transfer.SelectedLeftValues);
+    Assert.Equal(new object?[] { "alpha" }, transfer.SelectedRightValues);
+
+    transfer.IsEnabled = true;
+    Assert.True(transfer.MoveSelectedRight());
+    Assert.True(transfer.MoveSelectedLeft());
+    Assert.Equal(new object?[] { "beta" }, transfer.TargetValues);
   }
 
   [Fact]

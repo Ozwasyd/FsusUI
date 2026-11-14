@@ -42,6 +42,66 @@
     <Setter Property="Background" Value="{DynamicResource FsusThemeSurfaceRaisedBrush}" />
   </Style>
 
+  <Style Selector="ListBox.fsus-transfer-list">
+    <Setter Property="Background" Value="{DynamicResource FsusThemeSurfaceBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource FsusThemeBorderBrush}" />
+    <Setter Property="BorderThickness" Value="{DynamicResource FsusBorderControlWidth}" />
+    <Setter Property="CornerRadius" Value="{DynamicResource FsusRadiusSurfaceMd}" />
+  </Style>
+
+  <Style Selector="TextBox.fsus-transfer-filter">
+    <Setter Property="PlaceholderForeground" Value="{DynamicResource FsusThemeMutedTextBrush}" />
+  </Style>
+
+  <Style Selector="CheckBox.fsus-transfer-row">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="BorderThickness" Value="0" />
+    <Setter Property="CornerRadius" Value="0" />
+    <Setter Property="Margin" Value="0" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Border Background="{TemplateBinding Background}"
+                BorderBrush="{TemplateBinding BorderBrush}"
+                BorderThickness="{TemplateBinding BorderThickness}">
+          <Grid ColumnDefinitions="Auto,*">
+            <Border Name="PART_TransferIndicator"
+                    Width="{DynamicResource FsusIconSizeMd}"
+                    Height="{DynamicResource FsusIconSizeMd}"
+                    VerticalAlignment="Center"
+                    BorderBrush="{DynamicResource FsusThemeMutedTextBrush}"
+                    BorderThickness="{DynamicResource FsusBorderControlWidth}">
+              <TextBlock Name="PART_TransferCheck"
+                         Text="✓"
+                         IsVisible="False"
+                         HorizontalAlignment="Center"
+                         VerticalAlignment="Center"
+                         Foreground="{DynamicResource FsusThemeTextBrush}" />
+            </Border>
+            <TextBlock Grid.Column="1"
+                       Margin="{DynamicResource FsusSpace2}"
+                       VerticalAlignment="Center"
+                       Text="{TemplateBinding Content}"
+                       TextWrapping="Wrap"
+                       Foreground="{TemplateBinding Foreground}" />
+          </Grid>
+        </Border>
+      </ControlTemplate>
+    </Setter>
+  </Style>
+
+  <Style Selector="CheckBox.fsus-transfer-row:checked /template/ TextBlock#PART_TransferCheck">
+    <Setter Property="IsVisible" Value="True" />
+  </Style>
+
+  <Style Selector="CheckBox.fsus-transfer-row:checked">
+    <Setter Property="Background" Value="{DynamicResource FsusThemeSurfaceRaisedBrush}" />
+  </Style>
+
+  <Style Selector="CheckBox.fsus-transfer-row:focus">
+    <Setter Property="BorderBrush" Value="{DynamicResource FsusThemeFocusBrush}" />
+    <Setter Property="BorderThickness" Value="{DynamicResource FsusThemeFocusBorderThickness}" />
+  </Style>
+
   <Style Selector="fsus|FsusDropZone">
     <Setter Property="MinHeight" Value="88" />
     <Setter Property="Padding" Value="{DynamicResource FsusSpace4}" />
