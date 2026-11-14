@@ -203,7 +203,9 @@ public class FsusTransfer : ContentControl
   private readonly FsusButton moveLeft = new();
   private readonly TextBox filter = new();
   private readonly Grid defaultView = new();
+  private readonly HashSet<FsusTransferItem> observedSelections = [];
   private bool isFilterable;
+  private bool isViewAttached;
 
   public FsusTransfer()
   {
@@ -385,6 +387,44 @@ public class FsusTransfer : ContentControl
     if (IsFocused && !e.Handled && HandleKeyAsync(e.Key).GetAwaiter().GetResult())
     {
       e.Handled = true;
+    }
+  }
+
+  protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
+  {
+    base.OnAttachedToVisualTree(e);
+    isViewAttached = true;
+    SyncState();
+  }
+
+  protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
+  {
+    isViewAttached = false;
+    foreach (var item in observedSelections)
+    {
+      item.DisabledChanged -= OnSelectedItemDisabledChanged;
+    }
+    observedSelections.Clear();
+    base.OnDetachedFromVisualTree(e);
+  }
+
+  private void OnSelectedItemDisabledChanged(object? sender, EventArgs e) => SyncState();
+
+  private void SyncSelectedItemSubscriptions()
+  {
+    if (!isViewAttached) return;
+    var selectedItems = Items.Where(item =>
+      selectedLeftValues.Any(value => ValuesEqual(value, item.Value)) ||
+      selectedRightValues.Any(value => ValuesEqual(value, item.Value))).ToHashSet();
+    foreach (var item in observedSelections.Except(selectedItems).ToArray())
+    {
+      item.DisabledChanged -= OnSelectedItemDisabledChanged;
+      observedSelections.Remove(item);
+    }
+    foreach (var item in selectedItems.Except(observedSelections))
+    {
+      item.DisabledChanged += OnSelectedItemDisabledChanged;
+      observedSelections.Add(item);
     }
   }
 
@@ -570,6 +610,7 @@ public class FsusTransfer : ContentControl
 
   private void SyncState()
   {
+    SyncSelectedItemSubscriptions();
     FsusComponentClasses.Ensure(this, "fsus-filterable", IsFilterable);
     FsusComponentClasses.Ensure(this, "fsus-filtered", !string.IsNullOrWhiteSpace(FilterText));
     FsusComponentClasses.Ensure(this, "fsus-has-target", TargetValues.Count > 0);

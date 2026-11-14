@@ -256,6 +256,43 @@ public class FsusTransferRenderedInteractionTests
     finally { window.Close(); }
   }
 
+  [AvaloniaFact]
+  public void DisabledSelectedItemUpdatesMoveActionWhileItsRowIsOffscreen()
+  {
+    var transfer = new FsusTransfer();
+    var first = new FsusTransferItem(0, "Item 0");
+    transfer.Items.Add(first);
+    for (var index = 1; index < 1000; index++)
+      transfer.Items.Add(new FsusTransferItem(index, $"Item {index}"));
+    transfer.RefreshLists();
+    var window = new Window { Content = transfer, Width = 640, Height = 320 };
+    AttachTheme(window);
+    window.Show();
+    try
+    {
+      window.UpdateLayout();
+      var source = Assert.Single(transfer.GetVisualDescendants().OfType<ListBox>(), list => AutomationProperties.GetName(list) == "Source items");
+      var row = Assert.Single(source.GetVisualDescendants().OfType<CheckBox>(), item => Equals(item.Content, "Item 0"));
+      Click(window, row);
+      var move = Assert.Single(transfer.GetVisualDescendants().OfType<Button>(), button => AutomationProperties.GetName(button) == "Move selected right");
+      Assert.True(move.IsEnabled);
+      transfer.ScrollLeftTo(300);
+      Dispatcher.UIThread.RunJobs();
+      window.UpdateLayout();
+      Assert.DoesNotContain(source.GetVisualDescendants().OfType<CheckBox>(), item => Equals(item.Content, "Item 0"));
+      first.IsDisabled = true;
+      Assert.False(move.IsEnabled);
+      Assert.False(transfer.MoveSelectedRight());
+      Assert.Empty(transfer.TargetValues);
+      transfer.ScrollLeftTo(0);
+      Dispatcher.UIThread.RunJobs();
+      window.UpdateLayout();
+      var returned = Assert.Single(source.GetVisualDescendants().OfType<CheckBox>(), item => Equals(item.Content, "Item 0"));
+      Assert.False(returned.IsEnabled);
+    }
+    finally { window.Close(); }
+  }
+
   private static void Click(Window window, Control control)
   {
     window.UpdateLayout();
