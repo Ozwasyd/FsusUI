@@ -30,14 +30,21 @@ public class FsusTextEditorPrimitiveTests
       peer.GetProvider<IValueProvider>());
     Assert.False(valueProvider.IsReadOnly);
     Assert.Equal(new string('a', 29) + "b", valueProvider.Value);
-    Assert.Equal(
-      "30 chars, selection 30-30, preview synced, undo redo available",
-      peer.GetItemStatus());
+    Assert.Equal("ready", editor.PreviewStateName);
+    AssertAutomationStatus(
+      editor,
+      peer,
+      "30 chars, selection 30-30, preview synced, undo redo available");
     Assert.Equal("TextEditor", peer.GetClassName());
 
     valueProvider.SetValue("replacement");
 
     Assert.Equal("replacement", editor.Text);
+    Assert.Equal("replacement", valueProvider.Value);
+    AssertAutomationStatus(
+      editor,
+      peer,
+      "11 chars, selection 11-11, preview pending, undo unavailable, redo unavailable");
   }
 
   [Fact]
@@ -49,9 +56,15 @@ public class FsusTextEditorPrimitiveTests
       PreviewDebounce = TimeSpan.Zero,
       SplitPreviewEnabled = true,
     };
+    var peer = Assert.IsAssignableFrom<AutomationPeer>(
+      ControlAutomationPeer.CreatePeerForElement(editor));
 
     editor.TypeText("# Draft");
     editor.Select(2, 5);
+    AssertAutomationStatus(
+      editor,
+      peer,
+      "7 chars, selection 2-7, preview pending, undo available, redo unavailable");
     editor.Paste("Release notes");
     editor.TypeText("\n- Fixed layout");
 
@@ -60,6 +73,11 @@ public class FsusTextEditorPrimitiveTests
     Assert.Equal(3, editor.UndoDepth);
     Assert.Equal(0, editor.RedoDepth);
     Assert.True(editor.IsPreviewUpdatePending);
+    Assert.Equal("ready", editor.PreviewStateName);
+    AssertAutomationStatus(
+      editor,
+      peer,
+      "30 chars, selection 30-30, preview pending, undo available, redo unavailable");
 
     Assert.True(await editor.SyncPreviewAsync());
 
@@ -69,15 +87,27 @@ public class FsusTextEditorPrimitiveTests
     Assert.Equal(FsusTextBlockKind.ListItem, editor.Preview.RenderedBlocks[1].Kind);
     Assert.Equal(AutomationControlType.Edit, AutomationProperties.GetControlTypeOverride(editor));
     Assert.Equal("Article editor", AutomationProperties.GetName(editor));
-    Assert.Equal("ready, 30 chars, selection 30-30, preview synced", AutomationProperties.GetItemStatus(editor));
+    Assert.Equal("ready", editor.PreviewStateName);
+    AssertAutomationStatus(
+      editor,
+      peer,
+      "30 chars, selection 30-30, preview synced, undo available, redo unavailable");
 
     Assert.True(await editor.PressAsync(Key.Z, KeyModifiers.Control));
     Assert.Equal("# Release notes", editor.Text);
     Assert.Equal(1, editor.RedoDepth);
+    AssertAutomationStatus(
+      editor,
+      peer,
+      "15 chars, selection 15-15, preview pending, undo redo available");
 
     Assert.True(await editor.PressAsync(Key.Y, KeyModifiers.Control));
     Assert.Equal("# Release notes\n- Fixed layout", editor.Text);
     Assert.Equal(0, editor.RedoDepth);
+    AssertAutomationStatus(
+      editor,
+      peer,
+      "30 chars, selection 30-30, preview pending, undo available, redo unavailable");
   }
 
   [Fact]
@@ -87,6 +117,8 @@ public class FsusTextEditorPrimitiveTests
     {
       PreviewDebounce = TimeSpan.Zero,
     };
+    var peer = Assert.IsAssignableFrom<AutomationPeer>(
+      ControlAutomationPeer.CreatePeerForElement(editor));
     editor.TypeText("Hello ");
 
     editor.BeginComposition();
@@ -102,6 +134,11 @@ public class FsusTextEditorPrimitiveTests
     Assert.Equal("Hello 你", editor.Text);
     Assert.Equal(2, editor.UndoDepth);
     Assert.True(editor.IsPreviewUpdatePending);
+    Assert.Equal("ready", editor.PreviewStateName);
+    AssertAutomationStatus(
+      editor,
+      peer,
+      "7 chars, selection 7-7, preview pending, undo available, redo unavailable");
 
     using var cancellation = new CancellationTokenSource();
     cancellation.Cancel();
@@ -110,10 +147,62 @@ public class FsusTextEditorPrimitiveTests
     Assert.True(editor.LastPreviewCanceled);
     Assert.Equal("canceled", editor.PreviewStateName);
     Assert.True(editor.IsPreviewUpdatePending);
+    AssertAutomationStatus(
+      editor,
+      peer,
+      "7 chars, selection 7-7, preview canceled, undo available, redo unavailable");
+
+    var observedSyncing = false;
+    editor.PropertyChanged += (_, change) =>
+    {
+      if (change.Property == AutomationProperties.ItemStatusProperty &&
+          editor.PreviewStateName == "syncing")
+      {
+        observedSyncing = true;
+        Assert.False(editor.LastPreviewCanceled);
+        Assert.True(editor.IsPreviewUpdatePending);
+        AssertAutomationStatus(
+          editor,
+          peer,
+          "7 chars, selection 7-7, preview pending, undo available, redo unavailable");
+      }
+    };
+
+    Assert.False(await editor.SyncPreviewAsync(cancellation.Token));
+    Assert.True(observedSyncing);
+    Assert.True(editor.LastPreviewCanceled);
+    Assert.Equal("canceled", editor.PreviewStateName);
+    Assert.True(editor.IsPreviewUpdatePending);
+    AssertAutomationStatus(
+      editor,
+      peer,
+      "7 chars, selection 7-7, preview canceled, undo available, redo unavailable");
 
     Assert.True(await editor.SyncPreviewAsync());
+    Assert.False(editor.LastPreviewCanceled);
+    Assert.False(editor.IsPreviewUpdatePending);
     Assert.Equal("ready", editor.PreviewStateName);
     Assert.Single(editor.Preview.RenderedBlocks);
+    AssertAutomationStatus(
+      editor,
+      peer,
+      "7 chars, selection 7-7, preview synced, undo available, redo unavailable");
+
+    Assert.True(editor.Undo());
+    Assert.Equal("Hello ", editor.Text);
+    Assert.Equal(1, editor.UndoDepth);
+    AssertAutomationStatus(
+      editor,
+      peer,
+      "6 chars, selection 6-6, preview pending, undo redo available");
+
+    Assert.True(editor.Redo());
+    Assert.Equal("Hello 你", editor.Text);
+    Assert.Equal(2, editor.UndoDepth);
+    AssertAutomationStatus(
+      editor,
+      peer,
+      "7 chars, selection 7-7, preview pending, undo available, redo unavailable");
   }
 
   [Fact]
@@ -202,6 +291,15 @@ public class FsusTextEditorPrimitiveTests
       "components",
       "avalonia-stable-performance-budgets.json"));
     Assert.Contains("\"id\": \"text-editor\"", performanceBudgets);
+  }
+
+  private static void AssertAutomationStatus(
+    FsusTextEditor editor,
+    AutomationPeer peer,
+    string expected)
+  {
+    Assert.Equal(expected, AutomationProperties.GetItemStatus(editor));
+    Assert.Equal(expected, peer.GetItemStatus());
   }
 
   private sealed class KeyboardTextEditor : FsusTextEditor
