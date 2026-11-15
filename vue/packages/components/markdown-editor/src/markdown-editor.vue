@@ -957,7 +957,7 @@
             "
             @keydown.down.prevent="selectNextPaletteItem"
             @keydown.up.prevent="selectPreviousPaletteItem"
-            @keydown.enter.prevent="executeActivePaletteItem"
+            @keydown.enter="executeActivePaletteItem"
           />
           <div :id="paletteListId" :class="ns.e('palette-list')" role="listbox">
             <div
@@ -3192,7 +3192,9 @@ const movePaletteIndex = (direction: 1 | -1) => {
 }
 const selectNextPaletteItem = () => movePaletteIndex(1)
 const selectPreviousPaletteItem = () => movePaletteIndex(-1)
-const executeActivePaletteItem = () => {
+const executeActivePaletteItem = (event: KeyboardEvent) => {
+  if (event.isComposing || event.keyCode === 229) return
+  event.preventDefault()
   const command = paletteCommands.value[activePaletteIndex.value]
   if (command && !isCommandDisabled(command)) {
     executePaletteCommand(command)

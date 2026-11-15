@@ -197,6 +197,7 @@
       <el-markdown-editor
         ref="markdownTransactionEditor"
         v-model="markdownTransactionValue"
+        :commands="markdownPaletteImeCommands"
         v-bind="markdownPasteGateAttributes"
         :document-identity="{
           epoch: 1,
@@ -240,6 +241,13 @@
         >
           Open command palette
         </button>
+        <output
+          v-if="markdownPaletteImeFixture"
+          aria-label="Command runs"
+          data-testid="markdown-palette-command-runs"
+        >
+          {{ markdownPaletteCommandRuns }}
+        </output>
         <button
           type="button"
           data-testid="markdown-programmatic"
@@ -2085,6 +2093,7 @@ import type {
   MarkdownEmbedProvider,
   MarkdownEmbedRequest,
   MarkdownAttachmentBatchIntent,
+  MarkdownEditorCommand,
   MarkdownEditorDispatchResult,
   MarkdownEditorHistoryState,
   MarkdownEditorInstance,
@@ -2322,6 +2331,25 @@ const markdownCommandSurfacesFixture =
   typeof window !== 'undefined' &&
   new URLSearchParams(window.location.search).get('markdownCommandSurfaces') ===
     '1'
+const markdownPaletteImeFixture =
+  typeof window !== 'undefined' &&
+  new URLSearchParams(window.location.search).get('markdownPaletteIme') === '1'
+const markdownPaletteCommandRuns = ref(0)
+const markdownPaletteImeCommands: readonly MarkdownEditorCommand[] | undefined =
+  markdownPaletteImeFixture
+    ? [
+        {
+          key: 'ime-confirm-witness',
+          label: 'Confirm command 确认',
+          group: 'custom',
+          presentation: ['palette'],
+          run: () => {
+            markdownPaletteCommandRuns.value += 1
+            return { focus: 'none' }
+          },
+        },
+      ]
+    : undefined
 const markdownContextualSurface =
   typeof window !== 'undefined'
     ? new URLSearchParams(window.location.search).get('markdownContextual')
