@@ -680,11 +680,25 @@ test('Avalonia token/theme baseline retains generated authorities and honest dep
   const themes = avaloniaBaselines.avaloniaThemes.tokenThemeContract
   assert.equal(avalonia.definitions.length, 124)
   assert.equal(themes.definitions.length, 124)
-  assert.equal(avalonia.dependencies.length, 26)
+  // Retained Tree rows apply padding in ApplyRowState; the redundant
+  // RefreshRows initializer no longer contributes a second token reference.
+  assert.equal(avalonia.dependencies.length, 25)
   assert.equal(themes.dependencies.length, 1000)
   assert.equal(
     avalonia.dependencies.filter((dependency) => dependency.resolved).length,
-    26,
+    25,
+  )
+  assert.ok(
+    avalonia.dependencies.some(
+      (dependency) =>
+        dependency.sourceMember ===
+          'FsusUI.Avalonia.Controls.FsusTree.ApplyRowState' &&
+        dependency.dependency === 'Space2Thickness' &&
+        dependency.canonicalName === 'space.2' &&
+        dependency.resolved &&
+        dependency.ownerType === 'FsusUI.Avalonia.Controls.FsusTree' &&
+        dependency.ownership === 'resolved',
+    ),
   )
   assert.equal(
     themes.dependencies.filter((dependency) => dependency.resolved).length,
