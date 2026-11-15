@@ -78,8 +78,8 @@
     "authorityDigest": "5e9f3d3abe1010160f440fcbec4152c3b4ac4c5ffe9080f573432d4cc12ff96b",
     "dirtyFingerprint": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
   },
-  "candidateSha": "90e4956b1618058cb5858bfb1336f8f7045616b0",
-  "candidateDigest": "9d6451e3173e7dc21c97de350e74280251866c0f8b68975ba012d29dc0321a4b",
+  "candidateSha": "8dd4804c229f36007fa71da58ea9a4160eb4cbbc",
+  "candidateDigest": "a1d7f9eacdb20b08a0f6d83376cfa6d743d3bc708044d63f4b73643003f5ec2e",
   "stateEvidenceMatrix": [
     {
       "state": "Inspected macos original producer table-v2-whole-header-overlay-light.png",
@@ -132,5 +132,5 @@
   "classificationEvidenceDigest": "e10a10e53b59cd560b4f6fc45434b763f6d48a6b8a4fb1d4a7a45265fdab7a72",
   "domainPolicyDigest": "620c4f746c1f259e3b640044975ad2878b7913806038706f7991bee9d72104d3",
   "status": "frozen",
-  "receiptDigest": "ba5f133a69e6cd69ba1cdf2a3795df8d79b662b0484a7b8ddb389fe26083aafb"
+  "receiptDigest": "80a93bb8f816f960fe9ff6c50310effe17db5f6e6b62d01ad06f153e77dbfa29"
 }

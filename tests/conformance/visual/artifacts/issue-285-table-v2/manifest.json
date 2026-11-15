@@ -1,8 +1,8 @@
 {
   "schema": "fsusui-table-v2-render-evidence.v1",
   "issue": 285,
-  "candidateSha": "90e4956b1618058cb5858bfb1336f8f7045616b0",
-  "candidateDigest": "9d6451e3173e7dc21c97de350e74280251866c0f8b68975ba012d29dc0321a4b",
+  "candidateSha": "8dd4804c229f36007fa71da58ea9a4160eb4cbbc",
+  "candidateDigest": "a1d7f9eacdb20b08a0f6d83376cfa6d743d3bc708044d63f4b73643003f5ec2e",
   "productionFixture": true,
   "theme": "light",
   "motionMode": "reduced",
@@ -34,7 +34,7 @@
     },
     {
       "path": "spec/components/contracts/v2/contract-v2.json",
-      "sha256": "2b9d65ec56d0ba86ff8e173c9d5cbb848d0170068d035f35371eb750ea748751"
+      "sha256": "791310aea081a098f3a2975f56a660432122141a7df163daa218cc212f332d76"
     },
     {
       "path": "dotnet/FsusUI.Avalonia.HeadlessTests/FsusUI.Avalonia.HeadlessTests.csproj",
@@ -424,10 +424,10 @@
       ]
     },
     "candidateReverification": {
-      "candidate": "90e4956b1618058cb5858bfb1336f8f7045616b0",
+      "candidate": "8dd4804c229f36007fa71da58ea9a4160eb4cbbc",
       "status": "pending",
-      "reason": "The MarkdownEditor palette IME fix and original-producer web provenance have a new source identity. Parent 59a974970d passed three 691-case hosted native suites at actual merge 0258ef9c7883dc8b95bb0e1cbbd2b4977ee7583e; those results are historical for this new candidate. Exact current hosted qualification and independent review remain pending."
+      "reason": "The existing normalized-source and bounded-parent-scan fixes are now integrated with the current shared prerequisites and original-producer provenance. Parent d7751f25 passed three 691-case hosted native suites at actual merge cc0388faf719a1404a3c91987297859f3d34ee47; those results are historical for this new candidate. Exact current hosted qualification and independent review remain pending."
     }
   },
-  "manifestDigest": "cc85bcc09c2ae07d0143b7b1b3a7416cd980e62bc03f15e45c07f05c2d5a3ecc"
+  "manifestDigest": "48495b1c5d915d2b00629de6c4526b7240e637546b6aef59f75f78490c6d5942"
 }

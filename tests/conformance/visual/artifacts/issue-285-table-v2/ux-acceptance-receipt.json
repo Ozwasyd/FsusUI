@@ -1,8 +1,8 @@
 {
   "schema": "fsusui-design-conformance.ux-acceptance-receipt.v2",
-  "classificationReceiptDigest": "ba5f133a69e6cd69ba1cdf2a3795df8d79b662b0484a7b8ddb389fe26083aafb",
-  "candidateSha": "90e4956b1618058cb5858bfb1336f8f7045616b0",
-  "candidateDigest": "9d6451e3173e7dc21c97de350e74280251866c0f8b68975ba012d29dc0321a4b",
+  "classificationReceiptDigest": "80a93bb8f816f960fe9ff6c50310effe17db5f6e6b62d01ad06f153e77dbfa29",
+  "candidateSha": "8dd4804c229f36007fa71da58ea9a4160eb4cbbc",
+  "candidateDigest": "a1d7f9eacdb20b08a0f6d83376cfa6d743d3bc708044d63f4b73643003f5ec2e",
   "verificationClass": "ux-path",
   "requiredSkillDigests": [
     "c88357a6ba0340000bae5839daeb67a3cd2722e8242cf7e0148006c3610a44fe"
@@ -134,8 +134,8 @@
   ],
   "blockers": [
     "Independent exact-candidate UX/source review has not been performed; the retained historical review keeps its original candidate and is not an acceptance of this integration.",
-    "Exact current hosted qualification is pending after the palette IME source change. Parent 59a974970d passed all three 691-case hosted native suites; predecessor 675-case producer results retain their original identities. Neither is relabeled as this candidate execution."
+    "Exact current hosted qualification is pending after syntax-source integration. Parent d7751f25 passed all three 691-case hosted native suites; earlier parent and predecessor results retain their original identities. None is relabeled as this candidate execution."
   ],
   "status": "rejected",
-  "receiptDigest": "702cf8d55c2fd9c9352853496178a3a815783855ea2b71b6d201922d638ad688"
+  "receiptDigest": "ce9abda6c71ed55e5d412e8f95639a217b9db6009e551ad2ce865df82d5f5992"
 }
