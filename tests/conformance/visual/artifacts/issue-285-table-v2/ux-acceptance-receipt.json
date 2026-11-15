@@ -1,8 +1,8 @@
 {
   "schema": "fsusui-design-conformance.ux-acceptance-receipt.v2",
-  "classificationReceiptDigest": "fb424218036941013ab326349731df0888804a2692172ce8fb11cf316de251ca",
-  "candidateSha": "a09c4e721ec799885e239247376f82dbccb9e79d",
-  "candidateDigest": "9b65584e5ea7eb841d91a47d2cdef84678db27ed12e3b38c1ceabc42181cae2b",
+  "classificationReceiptDigest": "ba5f133a69e6cd69ba1cdf2a3795df8d79b662b0484a7b8ddb389fe26083aafb",
+  "candidateSha": "90e4956b1618058cb5858bfb1336f8f7045616b0",
+  "candidateDigest": "9d6451e3173e7dc21c97de350e74280251866c0f8b68975ba012d29dc0321a4b",
   "verificationClass": "ux-path",
   "requiredSkillDigests": [
     "c88357a6ba0340000bae5839daeb67a3cd2722e8242cf7e0148006c3610a44fe"
@@ -134,8 +134,8 @@
   ],
   "blockers": [
     "Independent exact-candidate UX/source review has not been performed; the retained historical review keeps its original candidate and is not an acceptance of this integration.",
-    "Exact hosted Windows/macOS/Linux qualification of the new Tree integration is pending. Local Linux 691/691 belongs to the explicitly retained source-equivalent checkout 86ba1042ff7ff50354f62a8afdb111f9eced262b; predecessor three-platform 675-case results are historical."
+    "Exact current hosted qualification is pending after the palette IME source change. Parent 59a974970d passed all three 691-case hosted native suites; predecessor 675-case producer results retain their original identities. Neither is relabeled as this candidate execution."
   ],
   "status": "rejected",
-  "receiptDigest": "4ba3b032e3253e53657003af10e0642f71b2b69da44c2b003284cc19980b6970"
+  "receiptDigest": "702cf8d55c2fd9c9352853496178a3a815783855ea2b71b6d201922d638ad688"
 }
