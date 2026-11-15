@@ -1,8 +1,8 @@
 {
   "schema": "fsusui-table-v2-render-evidence.v1",
   "issue": 285,
-  "candidateSha": "2d4f89623bd08a4a717d62cf1e3fe35a377f597d",
-  "candidateDigest": "b726188e908b8c819151d587dcaa9eb5fb19011a86938cd65baf7411947d4ca1",
+  "candidateSha": "954fedbb2f2de1eee37421974037d812181e837f",
+  "candidateDigest": "d64352be951bb0e415e0d2057c411e9759299bf848989d17c959eeae3987d449",
   "productionFixture": true,
   "theme": "light",
   "motionMode": "reduced",
@@ -18,7 +18,7 @@
     },
     {
       "path": "dotnet/FsusUI.Avalonia.HeadlessTests/FsusTableV2RenderedEvidenceTests.cs",
-      "sha256": "f934163b4389b3be84e6fb1ac852dd493609c10ebaf1750728071f1408f54b59"
+      "sha256": "ece537b91a9c7d5e01b24c77628286c243a0e6711662429946ca818997a5c37e"
     },
     {
       "path": "scripts/vue-semantic-baseline.mjs",
@@ -65,7 +65,7 @@
     {
       "id": "table-v2-content-regions-light",
       "path": "tests/conformance/visual/artifacts/issue-285-table-v2/table-v2-content-regions-light.png",
-      "sha256": "28fce3ba05b59cfbdca78f207fdd8e5ad64943c3c3f04a905348c63562e194ae",
+      "sha256": "bdcbd2013bcbc8b0de9005866c33ab7c543bf5572ad67f47b0ea3336e3e02104",
       "bytes": 41480,
       "width": 488,
       "height": 540,
@@ -74,7 +74,7 @@
     {
       "id": "table-v2-whole-header-overlay-light",
       "path": "tests/conformance/visual/artifacts/issue-285-table-v2/table-v2-whole-header-overlay-light.png",
-      "sha256": "a2cdcabc1b471e690fcd8c73fcb83cea9316ec8064a3aee0ba393434340150ba",
+      "sha256": "d21f63c789843b6c3717756b9cd778bf4ccf0181452968d1266aba4755dc0aad",
       "bytes": 18148,
       "width": 488,
       "height": 320,
@@ -87,14 +87,17 @@
     "family": "avares://FsusUI.Avalonia.HeadlessTests/Assets/Fonts#Google Sans 18pt",
     "fallbackRejected": true,
     "scope": "original two fixture windows only",
-    "dependencyPinsChanged": false
+    "dependencyPinsChanged": false,
+    "textRenderingMode": "Antialias",
+    "textHintingMode": "None",
+    "rasterScope": "original fixture render roots only"
   },
   "classificationEvidence": {
     "preImplementationClassification": {
       "schema": "fsusui-design-conformance.ui-ux-classification-receipt.v2",
       "ownerRepository": "Ozwasyd/FsusUI",
       "affectedSurfaces": [
-        "FsusUI-owned Avalonia TableV2 content-region screenshot fixtures"
+        "Original two TableV2 fixture roots: deterministic embedded-font rasterization across Linux, Windows and macOS"
       ],
       "uiDecisionClass": "prescribed",
       "verificationClass": "ux-path",
@@ -145,46 +148,58 @@
       ],
       "activeBaselineIdentity": {
         "repository": "Ozwasyd/FsusUI",
-        "revision": "5b13756ef97522d442969fca11970f40b2f8344e",
+        "revision": "6a65339a4129084a83d10b38d9d9840702903bc8",
         "skillDigest": "c88357a6ba0340000bae5839daeb67a3cd2722e8242cf7e0148006c3610a44fe",
         "authorityDigest": "755f5fe460c37d6523c6bc1f8521958cac020a6a3bedefe77253f6fc29870f59",
         "dirtyFingerprint": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
       },
-      "candidateSha": "5b13756ef97522d442969fca11970f40b2f8344e",
-      "candidateDigest": "346d1c2099ad92c9ae92ce9ffcf6cc6d10dbc78d8d44dd25e2d907535cf2f0f7",
+      "candidateSha": "6a65339a4129084a83d10b38d9d9840702903bc8",
+      "candidateDigest": "2c980917b61ba229b1bf403febb6cdb82de65894667edbbabc3bc36a63b3d0ff",
       "stateEvidenceMatrix": [
         {
-          "state": "sealed baseline artifact: two-row-scoped-header-populated-footer-empty",
+          "state": "Inspected actual macos table-v2-content-regions-light.png",
           "viewport": "avalonia-headless-488x540",
           "theme": "light",
-          "evidenceDigest": "12c592158d6d33a79c5e97ef319e924e65a7b118071531683551c5d13e660bc8"
+          "evidenceDigest": "d9b5261846139feb8ef49465952cf3a623c982e60480205ae85c704c83a3a8ae"
         },
         {
-          "state": "sealed baseline artifact: whole-header-loading-overlay",
+          "state": "Inspected actual macos table-v2-whole-header-overlay-light.png",
           "viewport": "avalonia-headless-488x320",
           "theme": "light",
-          "evidenceDigest": "3ddb0fef6bcf5080df423f22aa6ab289458032d3bc032a340f59157b3c77a16d"
+          "evidenceDigest": "c057619dcc5e990f68a756e9a0ceb36e8842466fd054f5bd603d3dc57cf13d98"
+        },
+        {
+          "state": "Inspected actual windows table-v2-content-regions-light.png",
+          "viewport": "avalonia-headless-488x540",
+          "theme": "light",
+          "evidenceDigest": "f050ca0ea8dc18f81ea41900d105b62ccc3c520b4cfd653aff5bc0ab296e273d"
+        },
+        {
+          "state": "Inspected actual windows table-v2-whole-header-overlay-light.png",
+          "viewport": "avalonia-headless-488x320",
+          "theme": "light",
+          "evidenceDigest": "971bbf473646b882611f1ab8486ad239998e661c19052e16b74c61ef1b0310fe"
         }
       ],
       "inScope": [
-        "Authorized deterministic embedded-font precondition for the original two TableV2 production-control fixtures",
-        "Original light/reduced-motion states, content, viewport geometry and assertions",
-        "New rendered comparison and exact-candidate review before resealing acceptance"
+        "Explicit text antialiasing and hinting prerequisites on the original two fixture roots",
+        "Preserve actual component, content, geometry, original assertions, strict PNG comparison and existing failure diagnostics",
+        "Use the original producer for real renders and compare actual platform pixels before any acceptance"
       ],
       "outOfScope": [
-        "Production component or token changes",
-        "Weakening assertions, budgets or platform review requirements",
-        "Declaring diagnostic generation or self-review to be independent UX acceptance"
+        "Production component, token, theme or font-file changes",
+        "Platform-specific baselines, assertion skips or tolerance/budget changes",
+        "Declaring author inspection or diagnostic generation independent UX acceptance"
       ],
-      "classificationEvidenceDigest": "25e37d25356bacaee37ae068fec6509d04104f8e836616c87e87d83e7663a5f1",
+      "classificationEvidenceDigest": "0e2648b061cc3d7d533fa609867d76dc85c823575f630326d6000cab09a85307",
       "domainPolicyDigest": "620c4f746c1f259e3b640044975ad2878b7913806038706f7991bee9d72104d3",
       "status": "frozen",
-      "receiptDigest": "033a12104debadb116377794c30417c387ddede054779dc542ac18de65b27679"
+      "receiptDigest": "761190052119a96b674e839b0d3de6ef8bef1540e0d2e0e0dd846d0853cf3b9a"
     },
     "classificationDecisionUnchanged": true,
-    "candidate": "2d4f89623bd08a4a717d62cf1e3fe35a377f597d",
-    "candidateDigest": "b726188e908b8c819151d587dcaa9eb5fb19011a86938cd65baf7411947d4ca1",
-    "sourceAndArtifactBindings": "100407ad3528a4f94586df97ef3c503963054d34a1070943e4c7035e464d75cd",
+    "candidate": "954fedbb2f2de1eee37421974037d812181e837f",
+    "candidateDigest": "d64352be951bb0e415e0d2057c411e9759299bf848989d17c959eeae3987d449",
+    "sourceAndArtifactBindings": "6f1fd46a92e45f5e9d3e9ab7559aa53ea0649896b5ee243d7b14757869702837",
     "independentAcceptancePerformed": false
   },
   "failureDiagnostics": {
@@ -193,5 +208,12 @@
     "negativeVerification": "One temporarily perturbed expected byte fails the original assertion; actual PNG retains the sealed hash; expected bytes restored",
     "negativeControlDigest": "b6abb6875842c69f87750c053caf70904838ddac5e7c6f1fa164d06fd8a8dd82"
   },
-  "manifestDigest": "4f1c303eed9db0c491275aea3e9a2a27d5899f07769c11a8f87654f11c5a9d0c"
+  "rasterVerification": {
+    "producer": "Original manifest generation command, default Debug configuration",
+    "normal": "2/2 original strict comparisons pass without generation mode",
+    "hostFontCounterfactual": "2/2 original strict comparisons pass with changed host font default",
+    "configurationCounterfactual": "Debug and Release produce byte-identical PNGs",
+    "crossPlatform": "Pending actual hosted rerender; prior platform renders were inspected and had real text pixel differences"
+  },
+  "manifestDigest": "2a3ec07f4146687482a83f48558b0dce8fe753eee94df93df99fda5e70e528a6"
 }

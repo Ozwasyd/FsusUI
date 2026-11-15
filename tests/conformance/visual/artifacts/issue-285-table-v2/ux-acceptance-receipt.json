@@ -1,8 +1,8 @@
 {
   "schema": "fsusui-design-conformance.ux-acceptance-receipt.v2",
-  "classificationReceiptDigest": "fd1ecbe8fe72c2c2aa0af44d7d06eaf95887e22bb9a88eb1bfad07ccee7319b7",
-  "candidateSha": "2d4f89623bd08a4a717d62cf1e3fe35a377f597d",
-  "candidateDigest": "b726188e908b8c819151d587dcaa9eb5fb19011a86938cd65baf7411947d4ca1",
+  "classificationReceiptDigest": "6221f32939b5e569290a7f22310141bf0300163cec630cdcaa7de3be127a1bdc",
+  "candidateSha": "954fedbb2f2de1eee37421974037d812181e837f",
+  "candidateDigest": "d64352be951bb0e415e0d2057c411e9759299bf848989d17c959eeae3987d449",
   "verificationClass": "ux-path",
   "requiredSkillDigests": [
     "c88357a6ba0340000bae5839daeb67a3cd2722e8242cf7e0148006c3610a44fe"
@@ -17,7 +17,7 @@
     "53a86d45ea16ab2d47e7634f79ac1785e2544f49c43c10568d574887d7d2ad5e",
     "c97d4b2f3ffcf311fb060b21e12e13367763fb4ca9ba9c8fa4cacf6f72d381d1"
   ],
-  "activeBaselineIdentityDigest": "580cdb1bdf3ce91a0e782c2bd73bbc1856d264d3e9d5fc6ccbb2c23542012a4f",
+  "activeBaselineIdentityDigest": "67316497192beb7fcbc1ef8eba55ff35c97bbf1e121c43eea9d295604a288fee",
   "domainPolicyDigest": "620c4f746c1f259e3b640044975ad2878b7913806038706f7991bee9d72104d3",
   "independenceEvidenceDigest": "d405091311e0abfb127f1cea717622c06677883b417b7fb04a40a2570a2eab2b",
   "modifiedPaths": [],
@@ -30,7 +30,7 @@
       "inputModes": [
         "reduced-motion"
       ],
-      "evidenceDigest": "28fce3ba05b59cfbdca78f207fdd8e5ad64943c3c3f04a905348c63562e194ae"
+      "evidenceDigest": "bdcbd2013bcbc8b0de9005866c33ab7c543bf5572ad67f47b0ea3336e3e02104"
     },
     {
       "viewport": "avalonia-headless-488x320",
@@ -39,7 +39,7 @@
       "inputModes": [
         "reduced-motion"
       ],
-      "evidenceDigest": "a2cdcabc1b471e690fcd8c73fcb83cea9316ec8064a3aee0ba393434340150ba"
+      "evidenceDigest": "d21f63c789843b6c3717756b9cd778bf4ccf0181452968d1266aba4755dc0aad"
     }
   ],
   "inspectedRenderedArtifacts": [
@@ -47,7 +47,7 @@
       "id": "table-v2-content-regions-light",
       "kind": "screenshot",
       "path": "tests/conformance/visual/artifacts/issue-285-table-v2/table-v2-content-regions-light.png",
-      "digest": "28fce3ba05b59cfbdca78f207fdd8e5ad64943c3c3f04a905348c63562e194ae",
+      "digest": "bdcbd2013bcbc8b0de9005866c33ab7c543bf5572ad67f47b0ea3336e3e02104",
       "inspected": true,
       "fixtureClass": "production"
     },
@@ -55,15 +55,15 @@
       "id": "table-v2-whole-header-overlay-light",
       "kind": "screenshot",
       "path": "tests/conformance/visual/artifacts/issue-285-table-v2/table-v2-whole-header-overlay-light.png",
-      "digest": "a2cdcabc1b471e690fcd8c73fcb83cea9316ec8064a3aee0ba393434340150ba",
+      "digest": "d21f63c789843b6c3717756b9cd778bf4ccf0181452968d1266aba4755dc0aad",
       "inspected": true,
       "fixtureClass": "production"
     }
   ],
   "blockers": [
-    "Independent exact-candidate UX review has not been performed; the retained historical review is bound to an older candidate.",
-    "Hosted Windows and macOS still failed the two strict PNG comparisons on predecessor 1f2bda7399; actual platform renders must be inspected before cross-platform acceptance."
+    "Independent exact-candidate UX review has not been performed; retained historical review remains bound to an older candidate.",
+    "Actual supported-platform rerenders with the explicit raster prerequisites are pending; no cross-platform byte equality or platform-specific acceptance is claimed."
   ],
   "status": "rejected",
-  "receiptDigest": "320d2508a3997034e39538c8ca758b6b186c94e1d4bf6521baed46b5e26ab6bf"
+  "receiptDigest": "e2b2713f61983557d0815ac63539daaef3e0002743c7c2da19861fcd1e69a41b"
 }
