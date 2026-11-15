@@ -1,8 +1,8 @@
 {
   "schema": "fsusui-table-v2-render-evidence.v1",
   "issue": 285,
-  "candidateSha": "b05b40350d4e040b635e2db2a9867d27041a1d59",
-  "candidateDigest": "e6baeb93fe8deb54d01312824e0f431b28e161b235a2ebe33486b30280e005d7",
+  "candidateSha": "7f194dc546a4007e3d38200f0af0ab0e7fb6e6a1",
+  "candidateDigest": "95cf2de697b5f01e420a3b4a3fe773028e2edd5d20ddf45f17d69c53950fddee",
   "productionFixture": true,
   "theme": "light",
   "motionMode": "reduced",
@@ -34,7 +34,7 @@
     },
     {
       "path": "spec/components/contracts/v2/contract-v2.json",
-      "sha256": "c9a5a2dc1d2649ed5d97395f853fd2b014d2066f28edc65e6d55eb8a5259a6a6"
+      "sha256": "c969b5f34b74fbda7e0a815627b453538f968e4fc06a15c1f1e1e4ea258f9228"
     },
     {
       "path": "dotnet/FsusUI.Avalonia.HeadlessTests/FsusUI.Avalonia.HeadlessTests.csproj",
@@ -284,25 +284,43 @@
       "receiptDigest": "6db4394fb36b16eb953b157d386fe261beadf6b02df35e304073cc4d41d6767e"
     },
     "classificationDecisionUnchanged": true,
-    "candidate": "b05b40350d4e040b635e2db2a9867d27041a1d59",
-    "candidateDigest": "e6baeb93fe8deb54d01312824e0f431b28e161b235a2ebe33486b30280e005d7",
-    "sourceAndArtifactBindings": "068475e274864ff6716a901c2734aff91876c9b4b2d2621fe156d953834c8a2b",
+    "candidate": "7f194dc546a4007e3d38200f0af0ab0e7fb6e6a1",
+    "candidateDigest": "95cf2de697b5f01e420a3b4a3fe773028e2edd5d20ddf45f17d69c53950fddee",
+    "sourceAndArtifactBindings": "cb234d1c6b66122762442173ee9cd1240bff3b1a380aa289ed936948acba480c",
     "scopeRationale": "Existing registered platform typography contracts permit OS rasterizer differences; every original byte assertion now selects its actual checked-in OS/architecture profile. All original assertion statements are unchanged.",
     "originalAssertionStatementsPreserved": 12,
-    "independentAcceptancePerformed": false
+    "independentAcceptancePerformed": false,
+    "provenanceRefresh": {
+      "candidate": "7f194dc546a4007e3d38200f0af0ab0e7fb6e6a1",
+      "predecessor": "8b856667f47fa886e2253fe1ca6ac440053cc6aa",
+      "changedPaths": [
+        "docs/avalonia/vue-public-api-baseline.md",
+        "spec/baselines/vue-current.json",
+        "spec/components/contracts/v1/vue-public-contracts.json",
+        "spec/components/contracts/v2/contract-v2.json"
+      ],
+      "producerCommands": [
+        "pnpm run avalonia:baseline",
+        "pnpm run component-contracts:generate",
+        "pnpm run contract-v2:generate"
+      ],
+      "scope": "Canonical generated source identities only; API payload, summary and all rendering source/artifact bytes unchanged",
+      "verification": "Three original freshness checks and all 49 original Contract V2 controls passed on these exact four postimages before committing; no independent acceptance claimed"
+    }
   },
   "failureDiagnostics": {
     "scope": "Unchanged strict PNG byte assertion; actual mismatch renders retained in the existing platform artifact directory",
-    "positiveVerification": "Original sealed comparisons pass 2/2 without generation mode",
-    "negativeVerification": "One temporarily perturbed expected byte fails the original assertion; actual PNG retains the sealed hash; expected bytes restored",
-    "negativeControlDigest": "b6abb6875842c69f87750c053caf70904838ddac5e7c6f1fa164d06fd8a8dd82"
+    "positiveVerification": "Historical diagnostic-helper control: original comparisons passed 2/2 on 2d4f8962; the completed three-platform profile verification is separately bound below",
+    "negativeVerification": "Historical diagnostic-helper control on 2d4f8962: one temporarily perturbed expected byte failed the original assertion and retained the then-sealed actual PNG; bytes restored. This control predates the current raster/profile PNGs and was not rerun on this candidate.",
+    "negativeControlDigest": "b6abb6875842c69f87750c053caf70904838ddac5e7c6f1fa164d06fd8a8dd82",
+    "sourceCandidate": "2d4f89623bd08a4a717d62cf1e3fe35a377f597d"
   },
   "rasterVerification": {
     "producer": "Original manifest generation command, default Debug configuration",
-    "normal": "2/2 original strict comparisons pass without generation mode",
-    "hostFontCounterfactual": "2/2 original strict comparisons pass with changed host font default",
-    "configurationCounterfactual": "Debug and Release produce byte-identical PNGs",
-    "crossPlatform": "Six actual producer artifacts bound to three OS/architecture profiles; fresh hosted normal-mode verification pending."
+    "normal": "2/2 original normal-mode Linux strict comparisons on b05b4035; all three complete native suites passed on predecessor 8b856667 as separately bound below",
+    "hostFontCounterfactual": "2/2 original normal-mode comparisons on b05b4035 with changed host font; not relabeled as a new candidate execution",
+    "configurationCounterfactual": "Original Debug and Release producer PNGs matched on source 954fedbb2f",
+    "crossPlatform": "All three normal-mode profiles passed within the complete 675-case suites on predecessor 8b856667; exact new metadata-candidate hosted rerun pending"
   },
   "renderProfiles": [
     {
@@ -337,7 +355,7 @@
     "linux": {
       "sourceCandidate": "954fedbb2f2de1eee37421974037d812181e837f",
       "mode": "literal original update producer; default Debug and byte-identical Release",
-      "currentProfileVerification": "2/2 normal and 2/2 changed host font; generation mode unset"
+      "currentProfileVerification": "At b05b4035: 2/2 normal and 2/2 changed-host-font cases, generation unset; predecessor 8b856667 complete suite 675/675"
     },
     "windowsAndMacos": {
       "workflowRunId": 43730825943,
@@ -345,8 +363,71 @@
       "checkoutCommit": "5a4293d3751bad95c006903795cc4bf3bace257c",
       "sourceCandidate": "954fedbb2f2de1eee37421974037d812181e837f",
       "mode": "actual original bitmap producer captured before strict Linux-baseline mismatch; no synthetic or edited pixels",
-      "currentProfileVerification": "Fresh normal-mode hosted verification pending"
+      "currentProfileVerification": "At predecessor 8b856667: both complete normal-mode native platform suites 675/675 plus Demo smoke, workflow 43733008585"
+    },
+    "completePredecessorVerification": {
+      "prHead": "8b856667f47fa886e2253fe1ca6ac440053cc6aa",
+      "sourceCandidate": "b05b40350d4e040b635e2db2a9867d27041a1d59",
+      "workflowRun": 43733008585,
+      "results": [
+        {
+          "platform": "linux",
+          "architecture": "x64",
+          "sdk": "10.0.401",
+          "actualCheckout": "460a9f8ebec02e1ad16e124f51a0af8c9a96e141",
+          "tests": {
+            "total": 675,
+            "executed": 675,
+            "passed": 675,
+            "failed": 0,
+            "errors": 0
+          },
+          "smoke": {
+            "project": "dotnet/FsusUI.Avalonia.Demo/FsusUI.Avalonia.Demo.csproj",
+            "status": "passed"
+          }
+        },
+        {
+          "platform": "windows",
+          "architecture": "x64",
+          "sdk": "10.0.401",
+          "actualCheckout": "460a9f8ebec02e1ad16e124f51a0af8c9a96e141",
+          "tests": {
+            "total": 675,
+            "executed": 675,
+            "passed": 675,
+            "failed": 0,
+            "errors": 0
+          },
+          "smoke": {
+            "project": "dotnet/FsusUI.Avalonia.Demo/FsusUI.Avalonia.Demo.csproj",
+            "status": "passed"
+          }
+        },
+        {
+          "platform": "macos",
+          "architecture": "arm64",
+          "sdk": "10.0.401",
+          "actualCheckout": "460a9f8ebec02e1ad16e124f51a0af8c9a96e141",
+          "tests": {
+            "total": 675,
+            "executed": 675,
+            "passed": 675,
+            "failed": 0,
+            "errors": 0
+          },
+          "smoke": {
+            "project": "dotnet/FsusUI.Avalonia.Demo/FsusUI.Avalonia.Demo.csproj",
+            "status": "passed"
+          }
+        }
+      ]
+    },
+    "candidateReverification": {
+      "candidate": "7f194dc546a4007e3d38200f0af0ab0e7fb6e6a1",
+      "status": "pending",
+      "reason": "New metadata-only candidate requires its own actual hosted checkout results; predecessor success is retained with its original identity"
     }
   },
-  "manifestDigest": "10df0b73bd12863e717dd6e7832800692b186db348fbf2744b51a04b2477dee4"
+  "manifestDigest": "bef27b70cdeace229e7e3d62030302f53d95a9d6b960e249510d2e0e9a814cc0"
 }

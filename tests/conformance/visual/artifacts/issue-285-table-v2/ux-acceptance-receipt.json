@@ -1,8 +1,8 @@
 {
   "schema": "fsusui-design-conformance.ux-acceptance-receipt.v2",
-  "classificationReceiptDigest": "984aec27227ac00ccc6b123b62561827668d417d429e56bbd6ee440431804745",
-  "candidateSha": "b05b40350d4e040b635e2db2a9867d27041a1d59",
-  "candidateDigest": "e6baeb93fe8deb54d01312824e0f431b28e161b235a2ebe33486b30280e005d7",
+  "classificationReceiptDigest": "3df8bd67e23800557f15d256ac7933e3e265616702e3c6cc92bbce0d5094a37e",
+  "candidateSha": "7f194dc546a4007e3d38200f0af0ab0e7fb6e6a1",
+  "candidateDigest": "95cf2de697b5f01e420a3b4a3fe773028e2edd5d20ddf45f17d69c53950fddee",
   "verificationClass": "ux-path",
   "requiredSkillDigests": [
     "c88357a6ba0340000bae5839daeb67a3cd2722e8242cf7e0148006c3610a44fe"
@@ -134,8 +134,8 @@
   ],
   "blockers": [
     "Independent exact-candidate UX/source review has not been performed for the complete six-artifact matrix; the retained historical review is still bound to an older candidate.",
-    "Fresh hosted Windows/macOS normal-mode strict byte and original structural verification remains pending after platform profile selection."
+    "Exact new metadata-candidate normal-mode hosted platform verification is pending; predecessor 8b856667 passed all three 675-case suites and is recorded separately without relabeling."
   ],
   "status": "rejected",
-  "receiptDigest": "860dc656b2f871f177a5846a56531d7e857be648e61ecc259eae119db89a25f5"
+  "receiptDigest": "3b58a9d73097edc1fb1d70f21c272547ca57104b5e6851ba8065c04d4b8e5090"
 }

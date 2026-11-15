@@ -78,8 +78,8 @@
     "authorityDigest": "5e9f3d3abe1010160f440fcbec4152c3b4ac4c5ffe9080f573432d4cc12ff96b",
     "dirtyFingerprint": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
   },
-  "candidateSha": "b05b40350d4e040b635e2db2a9867d27041a1d59",
-  "candidateDigest": "e6baeb93fe8deb54d01312824e0f431b28e161b235a2ebe33486b30280e005d7",
+  "candidateSha": "7f194dc546a4007e3d38200f0af0ab0e7fb6e6a1",
+  "candidateDigest": "95cf2de697b5f01e420a3b4a3fe773028e2edd5d20ddf45f17d69c53950fddee",
   "stateEvidenceMatrix": [
     {
       "state": "Inspected macos original producer table-v2-whole-header-overlay-light.png",
@@ -129,8 +129,8 @@
     "Skipping original tests, accepting absent profiles, or generating expected images during verification",
     "Claiming diagnostic capture, author inspection or old receipts are independent current acceptance"
   ],
-  "classificationEvidenceDigest": "43476dba6ce05d8161de405ac820e9120941e789e0e9b0816171e1fa1928cf2e",
+  "classificationEvidenceDigest": "e10a10e53b59cd560b4f6fc45434b763f6d48a6b8a4fb1d4a7a45265fdab7a72",
   "domainPolicyDigest": "620c4f746c1f259e3b640044975ad2878b7913806038706f7991bee9d72104d3",
   "status": "frozen",
-  "receiptDigest": "984aec27227ac00ccc6b123b62561827668d417d429e56bbd6ee440431804745"
+  "receiptDigest": "3df8bd67e23800557f15d256ac7933e3e265616702e3c6cc92bbce0d5094a37e"
 }
