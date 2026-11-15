@@ -56,6 +56,13 @@ All entries reuse `stabilizeMarkdownEditorProjection` identities.
 `resolveMarkdownConsumerIdentity` reports `current`, `deleted`, or `invalid`.
 A deleted heading, table, fence, link, or image must not be retargeted.
 
+The collector assigns parents by strict range containment, choosing the smallest
+containing span and retaining the first node in parser order for ties. Its sorted
+sweep discards ranges ending before the current start, so disjoint siblings no
+longer require an all-pairs scan. Dense overlapping ranges still require pairwise
+comparisons within the active set. The native differential regression uses a C++23
+compiler (`CXX`, default `c++`) alongside the original standalone WASM check.
+
 ## Shared inputs
 
 1. Build a projection with `createMarkdownEditorProjection(rawSource)`.
@@ -66,6 +73,10 @@ A deleted heading, table, fence, link, or image must not be retargeted.
 5. Plan incremental work with `planMarkdownProjectionInvalidation`.
 
 Raw JavaScript UTF-16 offsets are the only edit/selection coordinates.
+The syntax collector parses the same normalized text as the identity and
+coordinate map: CRLF and lone CR each become one LF, and an initial BOM is
+removed. Returned raw ranges still address the original input, including its
+original line endings and supplementary Unicode characters.
 Supplemental hidden, nested, atomic, or virtual anchors bind to a stable
 projection node through `projectionId`; an anchor range outside that projection
 fails closed. Visual selections round-trip only when the document id and epoch,

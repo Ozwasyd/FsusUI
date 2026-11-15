@@ -2419,6 +2419,37 @@ bool is_inline_bearing_kind(syntax_kind kind) {
   }
 }
 
+void assign_syntax_parents(std::vector<syntax_node>& nodes) {
+  std::vector<std::size_t> active;
+  for (std::size_t index = 0; index < nodes.size(); ++index) {
+    const syntax_node& child = nodes[index];
+    // Sorted starts let us discard ranges that cannot contain this or later nodes.
+    // Keep touching endpoints: a zero-width child can still have a strict parent.
+    active.erase(std::remove_if(active.begin(), active.end(), [&](std::size_t candidate) {
+      return nodes[candidate].end_offset < child.start_offset;
+    }), active.end());
+    std::size_t best = static_cast<std::size_t>(-1);
+    std::size_t best_span = static_cast<std::size_t>(-1);
+    for (const std::size_t candidate : active) {
+      const syntax_node& parent = nodes[candidate];
+      const bool contains =
+        parent.start_offset <= child.start_offset &&
+        parent.end_offset >= child.end_offset &&
+        (parent.start_offset < child.start_offset || parent.end_offset > child.end_offset);
+      if (!contains) {
+        continue;
+      }
+      const std::size_t span = parent.end_offset - parent.start_offset;
+      if (span < best_span) {
+        best_span = span;
+        best = candidate;
+      }
+    }
+    nodes[index].parent_index = best;
+    active.push_back(index);
+  }
+}
+
 std::vector<syntax_node> collect_syntax_nodes_impl(std::string_view source) {
   std::vector<SourceLine> raw_lines;
   std::size_t line_start = 0;
@@ -2810,30 +2841,7 @@ std::vector<syntax_node> collect_syntax_nodes_impl(std::string_view source) {
     return static_cast<int>(left.kind) < static_cast<int>(right.kind);
   });
 
-  for (std::size_t index = 0; index < nodes.size(); ++index) {
-    std::size_t best = static_cast<std::size_t>(-1);
-    std::size_t best_span = static_cast<std::size_t>(-1);
-    for (std::size_t candidate = 0; candidate < nodes.size(); ++candidate) {
-      if (candidate == index) {
-        continue;
-      }
-      const syntax_node& parent = nodes[candidate];
-      const syntax_node& child = nodes[index];
-      const bool contains =
-        parent.start_offset <= child.start_offset &&
-        parent.end_offset >= child.end_offset &&
-        (parent.start_offset < child.start_offset || parent.end_offset > child.end_offset);
-      if (!contains) {
-        continue;
-      }
-      const std::size_t span = parent.end_offset - parent.start_offset;
-      if (span < best_span) {
-        best_span = span;
-        best = candidate;
-      }
-    }
-    nodes[index].parent_index = best;
-  }
+  assign_syntax_parents(nodes);
   for (auto& node : nodes) {
     if (node.kind == syntax_kind::malformed) {
       node.status = syntax_status::malformed;
