@@ -20,9 +20,12 @@ deletion and recreation, stale epochs, cross-document rejection, anchor reveal
 and selection round trips. All existing unit tests remain unchanged.
 
 For a negative control, run this unchanged fixture on the main implementation
-before the #850 resolver repair. Plain IDs must still pass; separator-bearing IDs
-must fail their current-status assertions. Record the exact two source revisions
-and actual outputs; do not treat expected failures as candidate acceptance.
+before the #850 resolver repair. Plain IDs must still pass their current-status
+assertions; separator-bearing IDs must fail those assertions. The complete plain-ID
+cases also check that a different document named `doc-a:other` is rejected as
+`invalid`, not `deleted`; the old positional resolver fails that isolation check.
+Record the exact two source revisions and actual outputs; do not treat expected
+failures as candidate acceptance.
 
 This internal fixture adds no consumer-visible contract beyond the patch
 changeset already accompanying #850; an additional changeset is not needed.
