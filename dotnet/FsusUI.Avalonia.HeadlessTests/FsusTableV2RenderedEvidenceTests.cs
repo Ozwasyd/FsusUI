@@ -272,6 +272,13 @@ public class FsusTableV2RenderedEvidenceTests
 
   private static void AttachTheme(Window window)
   {
+    // Sealed renders use the existing embedded face, independent of host fonts.
+    window.FontFamily = new FontFamily(
+      "avares://FsusUI.Avalonia.HeadlessTests/Assets/Fonts#Google Sans 18pt");
+    Assert.Equal(
+      "Google Sans 18pt",
+      new Typeface(window.FontFamily).GlyphTypeface.FamilyName);
+
     var resources = new ResourceDictionary();
     new FsusThemeManager().Apply(resources, new FsusThemeOptions
     {
