@@ -1081,15 +1081,6 @@ const activateRenderedFeatures = async (
   )
   emit('features-activated', activation, result)
   recordHeavyLifecycleMetrics()
-  if (
-    heavyLifecycle.metrics().staticNodes > 0 ||
-    activation.activated.some(
-      ({ kind }) =>
-        kind === 'code-highlight' || kind === 'latex' || kind === 'mermaid',
-    )
-  ) {
-    setHeavyFeatureThemeListener(true)
-  }
 }
 
 async function activateChunkFeatures(
