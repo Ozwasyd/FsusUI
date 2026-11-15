@@ -1,8 +1,8 @@
 {
   "schema": "fsusui-design-conformance.ux-acceptance-receipt.v2",
-  "classificationReceiptDigest": "3df8bd67e23800557f15d256ac7933e3e265616702e3c6cc92bbce0d5094a37e",
-  "candidateSha": "7f194dc546a4007e3d38200f0af0ab0e7fb6e6a1",
-  "candidateDigest": "95cf2de697b5f01e420a3b4a3fe773028e2edd5d20ddf45f17d69c53950fddee",
+  "classificationReceiptDigest": "a293469f3f89dba08b434c6eb568c838e0c25848673be42206f74e494457897d",
+  "candidateSha": "a117d7dc0450274cdccf8a5765d1528d1f38767e",
+  "candidateDigest": "2870215f0eded73ea9802c975b40907fc17c583a5a73bf449e231e88beac8162",
   "verificationClass": "ux-path",
   "requiredSkillDigests": [
     "c88357a6ba0340000bae5839daeb67a3cd2722e8242cf7e0148006c3610a44fe"
@@ -133,9 +133,9 @@
     }
   ],
   "blockers": [
-    "Independent exact-candidate UX/source review has not been performed for the complete six-artifact matrix; the retained historical review is still bound to an older candidate.",
-    "Exact new metadata-candidate normal-mode hosted platform verification is pending; predecessor 8b856667 passed all three 675-case suites and is recorded separately without relabeling."
+    "Independent exact-candidate UX/source review has not been performed; the retained historical review keeps its original candidate and is not an acceptance of this integration.",
+    "Exact hosted Windows/macOS/Linux qualification of the new Tree integration is pending. Local Linux 691/691 belongs to the explicitly retained source-equivalent checkout 86ba1042ff7ff50354f62a8afdb111f9eced262b; predecessor three-platform 675-case results are historical."
   ],
   "status": "rejected",
-  "receiptDigest": "3b58a9d73097edc1fb1d70f21c272547ca57104b5e6851ba8065c04d4b8e5090"
+  "receiptDigest": "74a712727687f43a287bf3d71f864bb6f25e576c42c820f8f3af9786ab66d554"
 }

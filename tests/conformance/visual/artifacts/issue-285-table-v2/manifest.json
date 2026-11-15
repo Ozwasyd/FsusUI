@@ -1,8 +1,8 @@
 {
   "schema": "fsusui-table-v2-render-evidence.v1",
   "issue": 285,
-  "candidateSha": "7f194dc546a4007e3d38200f0af0ab0e7fb6e6a1",
-  "candidateDigest": "95cf2de697b5f01e420a3b4a3fe773028e2edd5d20ddf45f17d69c53950fddee",
+  "candidateSha": "a117d7dc0450274cdccf8a5765d1528d1f38767e",
+  "candidateDigest": "2870215f0eded73ea9802c975b40907fc17c583a5a73bf449e231e88beac8162",
   "productionFixture": true,
   "theme": "light",
   "motionMode": "reduced",
@@ -34,7 +34,7 @@
     },
     {
       "path": "spec/components/contracts/v2/contract-v2.json",
-      "sha256": "c969b5f34b74fbda7e0a815627b453538f968e4fc06a15c1f1e1e4ea258f9228"
+      "sha256": "b7309c782db9d4703e6d86d60da95c3f60ea81d5f1c137117bb28fd53c9930d2"
     },
     {
       "path": "dotnet/FsusUI.Avalonia.HeadlessTests/FsusUI.Avalonia.HeadlessTests.csproj",
@@ -424,10 +424,10 @@
       ]
     },
     "candidateReverification": {
-      "candidate": "7f194dc546a4007e3d38200f0af0ab0e7fb6e6a1",
+      "candidate": "a117d7dc0450274cdccf8a5765d1528d1f38767e",
       "status": "pending",
-      "reason": "New metadata-only candidate requires its own actual hosted checkout results; predecessor success is retained with its original identity"
+      "reason": "Tree integration and canonical native token metadata have new source identity. Linux normal-mode 691/691 belongs to source-equivalent checkout 86ba1042ff7ff50354f62a8afdb111f9eced262b; current exact hosted platform results and independent review remain pending."
     }
   },
-  "manifestDigest": "bef27b70cdeace229e7e3d62030302f53d95a9d6b960e249510d2e0e9a814cc0"
+  "manifestDigest": "3d51e1d703528f09c8eb8840579d2180a5444adb0a2a04270115d76ee2d0f902"
 }
