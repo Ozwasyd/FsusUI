@@ -1,5 +1,15 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
+import {
+  mkdtempSync,
+  mkdirSync,
+  readFileSync,
+  rmSync,
+  symlinkSync,
+  writeFileSync,
+} from 'node:fs'
+import os from 'node:os'
+import path from 'node:path'
 
 import {
   classifyConsumerMatrixImpact,
@@ -8,6 +18,7 @@ import {
   createMatrixSummary,
   digestJson,
   projectConsumerPackage,
+  readConsumerVueVersions,
   resolveConsumerProfile,
   validateConsumerBuildEvidence,
   validateMatrixReceiptDigests,
@@ -296,4 +307,78 @@ test('kills worker, Wasm, private export, SSR, duplicate Vue, lazy, and source-o
   for (const [mutant, pattern] of mutants) {
     assert.throws(() => validateConsumerBuildEvidence(mutant), pattern)
   }
+})
+
+function installedVueFixture(t, isolated, versions = {}) {
+  const root = mkdtempSync(path.join(os.tmpdir(), 'fsusui-vue-resolution-'))
+  t.after(() => rmSync(root, { recursive: true, force: true }))
+  writeFileSync(
+    path.join(root, 'package.json'),
+    JSON.stringify({ private: true }),
+  )
+  const modules = path.join(root, 'node_modules')
+  const store = isolated
+    ? path.join(modules, '.pnpm', 'vue@3.5.32', 'node_modules')
+    : modules
+  for (const id of ['vue', '@vue/compiler-dom', '@vue/shared']) {
+    if (versions[id] === null) continue
+    const directory = path.join(store, id)
+    mkdirSync(directory, { recursive: true })
+    writeFileSync(
+      path.join(directory, 'package.json'),
+      JSON.stringify({
+        name: id,
+        version: versions[id] ?? '3.5.32',
+      }),
+    )
+  }
+  if (isolated)
+    symlinkSync(path.join(store, 'vue'), path.join(modules, 'vue'), 'junction')
+  return root
+}
+
+test('reads matching Vue dependencies in the original hoisted layout', (t) => {
+  const root = installedVueFixture(t, false)
+  assert.deepEqual(readConsumerVueVersions(root), {
+    vue: '3.5.32',
+    '@vue/compiler-dom': '3.5.32',
+    '@vue/shared': '3.5.32',
+  })
+})
+
+test('reads actual Vue dependencies in an isolated pnpm layout', (t) => {
+  const root = installedVueFixture(t, true)
+  assert.throws(
+    () =>
+      readFileSync(
+        path.join(root, 'node_modules', '@vue/compiler-dom/package.json'),
+      ),
+    { code: 'ENOENT' },
+  )
+  assert.deepEqual(readConsumerVueVersions(root), {
+    vue: '3.5.32',
+    '@vue/compiler-dom': '3.5.32',
+    '@vue/shared': '3.5.32',
+  })
+})
+
+test('isolated layout still rejects mismatched compiler and shared versions', (t) => {
+  for (const id of ['@vue/compiler-dom', '@vue/shared']) {
+    const root = installedVueFixture(t, true, { [id]: '3.5.0' })
+    assert.throws(
+      () => readConsumerVueVersions(root),
+      /not a compatible singleton/,
+    )
+  }
+})
+
+test('isolated layout does not fabricate missing or invalid dependency versions', (t) => {
+  const missing = installedVueFixture(t, true, { '@vue/compiler-dom': null })
+  assert.throws(() => readConsumerVueVersions(missing), {
+    code: 'MODULE_NOT_FOUND',
+  })
+  const invalid = installedVueFixture(t, true, {
+    '@vue/shared': 'not-a-version',
+  })
+  assert.throws(() => readConsumerVueVersions(invalid), /invalid version/)
 })

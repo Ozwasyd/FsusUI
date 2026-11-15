@@ -188,3 +188,9 @@ completed successfully.
 - `pnpm deps:authority:check` fails on `*`, `latest`, git URLs, missing install pins for published IDs, and consumer profiles that invent unregistered package IDs.
 - `pnpm test:deps-sync` fails if sync scripts embed package version tables, select registry latest, produce nondeterministic key order, or skip required consumer fixtures.
 - `pnpm test:deps-check` fails if the checker auto-fixes, accepts wide-range install bypass, or skips required fixture scanning; negative fixtures cover root/workspace/fixture drift, published range exclusion, peer-floor failures, unregistered IDs, multi-version installs, candidate mismatch, and missing authority fields.
+
+The consumer singleton check resolves compiler and shared package metadata from
+Vue's own installed dependency context, supporting both hoisted npm and isolated
+pnpm layouts. Runtime/compiler/shared version equality and the package manager's
+complete duplicate-version graph checks remain required; a missing dependency is
+not treated as a successful observation.
