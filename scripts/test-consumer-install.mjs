@@ -28,6 +28,7 @@ import {
   consumerMatrixConfigDigest,
   projectConsumerPackage,
   readConsumerAuthority,
+  readConsumerVueVersions,
   resolveConsumerProfile,
   validateConsumerBuildEvidence,
 } from './consumer-matrix-lib.mjs'
@@ -1011,20 +1012,7 @@ async function verifyPackedHeavyFrameRuntime() {
 }
 
 function assertDependencySingleton() {
-  const versions = Object.fromEntries(
-    ['vue', '@vue/compiler-dom', '@vue/shared'].map((id) => [
-      id,
-      installedVersion(id),
-    ]),
-  )
-  if (
-    versions.vue !== versions['@vue/compiler-dom'] ||
-    versions.vue !== versions['@vue/shared']
-  ) {
-    throw new Error(
-      `Consumer Vue runtime is not a compatible singleton: ${JSON.stringify(versions)}.`,
-    )
-  }
+  const versions = readConsumerVueVersions(fixtureRoot)
   const listArgs =
     packageManager === 'npm'
       ? ['ls', 'vue', '@vue/compiler-dom', '@vue/shared', '--all', '--json']
