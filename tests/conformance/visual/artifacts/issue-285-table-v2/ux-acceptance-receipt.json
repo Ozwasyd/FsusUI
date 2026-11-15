@@ -1,23 +1,23 @@
 {
   "schema": "fsusui-design-conformance.ux-acceptance-receipt.v2",
-  "classificationReceiptDigest": "b6fa5c3fb4c6c597ce8b310d9941cc7153e9409e43af2106a1a43edf8d51c44e",
-  "candidateSha": "e9ec7e3c8145b598d41b08d3610ab6f245c258ca",
-  "candidateDigest": "1a9ff9de943cd711c652d4ad3a779e0212e9f074714ba0f69e838a277d1ccb79",
+  "classificationReceiptDigest": "cdcd33299db9e0f82412daa2f53bb68613369bb23c0479a602795149c313d7c1",
+  "candidateSha": "12ff2d256714e5f4865be30babfe023728bc881f",
+  "candidateDigest": "90925df11114266565f2e394632420b9fad00711655cdc5dcc36fa7ee141349b",
   "verificationClass": "ux-path",
   "requiredSkillDigests": [
     "c88357a6ba0340000bae5839daeb67a3cd2722e8242cf7e0148006c3610a44fe"
   ],
   "authorityDigests": [
+    "b7aefe9f989ce962ada16c1fcbabf0613d862dfe0ec2bd016865a1a33d5b6f18",
     "24c88676101dde43bb0907ed173f001b6e1659973caf19701ea57eddf0617039",
-    "892896b49b21c1f37667ebec8ac7bce08c94e15f53942e0e0b10d1e8b7edb3a5",
-    "96a293a38282e63f67976b97b4ecfbd2802ae28812735a6259d25940d56bdc84",
-    "22b63749bd3ed35a4f8c174f4b8b026033bd2d645ffa39e335ba5b30489142b4",
-    "21d1319e8f5fad2c0c541b9c78ce2cb88b87c6dd40552b2d17a846128afcd506",
-    "2d01b44c296cb07a74394ba5eee35df9d75298d2f9fd6c14a14b6864182a9eb3",
-    "96dd3a8cbb0724907d5cbead977241f33be09d1450b69953f745071d1dd2998a",
-    "4d65770a17706c8946781f13529fac477f3ec69bf3f4ac19fbd52cefc2fc5ab1"
+    "d871bc86ed2a66f3a851f947530ff576c3d1d0a1a37c721d11cf09b1cbc4e104",
+    "c5d43303e89931346f9d634dd592ecb54418d15a74ae923f72e52795a115544e",
+    "0bd20f9ae6997aa9b7daeb0cec2f558738565bd0932828617aea2f5b84626042",
+    "aca042c7a3077be176c511cec98eb952d959d8e840fe81059d6325a32dbe8982",
+    "53a86d45ea16ab2d47e7634f79ac1785e2544f49c43c10568d574887d7d2ad5e",
+    "c97d4b2f3ffcf311fb060b21e12e13367763fb4ca9ba9c8fa4cacf6f72d381d1"
   ],
-  "activeBaselineIdentityDigest": "ae8d108312a2d2cc6d2b25dccd32620a9ad00b4a5d999d07c44ecd3ba710c284",
+  "activeBaselineIdentityDigest": "580cdb1bdf3ce91a0e782c2bd73bbc1856d264d3e9d5fc6ccbb2c23542012a4f",
   "domainPolicyDigest": "620c4f746c1f259e3b640044975ad2878b7913806038706f7991bee9d72104d3",
   "independenceEvidenceDigest": "d405091311e0abfb127f1cea717622c06677883b417b7fb04a40a2570a2eab2b",
   "modifiedPaths": [],
@@ -30,7 +30,7 @@
       "inputModes": [
         "reduced-motion"
       ],
-      "evidenceDigest": "12c592158d6d33a79c5e97ef319e924e65a7b118071531683551c5d13e660bc8"
+      "evidenceDigest": "28fce3ba05b59cfbdca78f207fdd8e5ad64943c3c3f04a905348c63562e194ae"
     },
     {
       "viewport": "avalonia-headless-488x320",
@@ -39,7 +39,7 @@
       "inputModes": [
         "reduced-motion"
       ],
-      "evidenceDigest": "3ddb0fef6bcf5080df423f22aa6ab289458032d3bc032a340f59157b3c77a16d"
+      "evidenceDigest": "a2cdcabc1b471e690fcd8c73fcb83cea9316ec8064a3aee0ba393434340150ba"
     }
   ],
   "inspectedRenderedArtifacts": [
@@ -47,7 +47,7 @@
       "id": "table-v2-content-regions-light",
       "kind": "screenshot",
       "path": "tests/conformance/visual/artifacts/issue-285-table-v2/table-v2-content-regions-light.png",
-      "digest": "12c592158d6d33a79c5e97ef319e924e65a7b118071531683551c5d13e660bc8",
+      "digest": "28fce3ba05b59cfbdca78f207fdd8e5ad64943c3c3f04a905348c63562e194ae",
       "inspected": true,
       "fixtureClass": "production"
     },
@@ -55,12 +55,14 @@
       "id": "table-v2-whole-header-overlay-light",
       "kind": "screenshot",
       "path": "tests/conformance/visual/artifacts/issue-285-table-v2/table-v2-whole-header-overlay-light.png",
-      "digest": "3ddb0fef6bcf5080df423f22aa6ab289458032d3bc032a340f59157b3c77a16d",
+      "digest": "a2cdcabc1b471e690fcd8c73fcb83cea9316ec8064a3aee0ba393434340150ba",
       "inspected": true,
       "fixtureClass": "production"
     }
   ],
-  "blockers": [],
-  "status": "accepted",
-  "receiptDigest": "8b65532e123c419c5d3eb0850a5f94e94d9e0a1e0c0ca2cf511728d1c02f3e2d"
+  "blockers": [
+    "Independent exact-candidate UX review has not been performed; the retained historical review is bound to an older candidate."
+  ],
+  "status": "rejected",
+  "receiptDigest": "95ff55a726d6fab2368dbee6c4bb6e8cd0a2389fcbd9c8f07931030e2bfa44ea"
 }

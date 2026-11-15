@@ -1,8 +1,8 @@
 {
   "schema": "fsusui-table-v2-render-evidence.v1",
   "issue": 285,
-  "candidateSha": "e9ec7e3c8145b598d41b08d3610ab6f245c258ca",
-  "candidateDigest": "1a9ff9de943cd711c652d4ad3a779e0212e9f074714ba0f69e838a277d1ccb79",
+  "candidateSha": "12ff2d256714e5f4865be30babfe023728bc881f",
+  "candidateDigest": "90925df11114266565f2e394632420b9fad00711655cdc5dcc36fa7ee141349b",
   "productionFixture": true,
   "theme": "light",
   "motionMode": "reduced",
@@ -18,15 +18,15 @@
     },
     {
       "path": "dotnet/FsusUI.Avalonia.HeadlessTests/FsusTableV2RenderedEvidenceTests.cs",
-      "sha256": "6e68f52a5ace3c92b890077682ad8c5f962066b2cc0b0250802a16cee3b5384a"
+      "sha256": "792051242f5d4a15935dfc6e5340bc37cb771fc6af22c7ad469007708380054f"
     },
     {
       "path": "scripts/vue-semantic-baseline.mjs",
-      "sha256": "b76c1394f6b44692aa9efe41ebeb33b135e6a50b2a0eefa2b47485263e5dab68"
+      "sha256": "740bccceeb80fddced94ea13be69f73ffcf78787d7a684ade713da24a84d0c3c"
     },
     {
       "path": "scripts/contract-v2.mjs",
-      "sha256": "037e5adfd2fe474183f2f690a96f7b7b42f3f89349933402aac0d281891161f6"
+      "sha256": "f39e4f83717d53b3490c62ea258737a1441f10803661ce7dd1f812047eca91ab"
     },
     {
       "path": "scripts/table-v2-render-evidence.mjs",
@@ -34,15 +34,39 @@
     },
     {
       "path": "spec/components/contracts/v2/contract-v2.json",
-      "sha256": "abbbaeaa65f5cf586ea58a64770b92f41528b0a2b1212070c2c2a934e9f12ad6"
+      "sha256": "c9a5a2dc1d2649ed5d97395f853fd2b014d2066f28edc65e6d55eb8a5259a6a6"
+    },
+    {
+      "path": "dotnet/FsusUI.Avalonia.HeadlessTests/FsusUI.Avalonia.HeadlessTests.csproj",
+      "sha256": "5ae0d2996d4c194c8d0b711f3bfcc2c9e5b5bf972068babb2a0f5d4765bc8bca"
+    },
+    {
+      "path": "dotnet/FsusUI.Avalonia.HeadlessTests/TestAppBuilder.cs",
+      "sha256": "098720190ce4da6fdba39747770944d85dee7438e3a18abd8cf6f938a626d24d"
+    },
+    {
+      "path": "dotnet/FsusUI.Avalonia.HeadlessTests/Assets/Fonts/GoogleSans-Bold.ttf",
+      "sha256": "abcfd5c258f59b7f022cd1d4a3db2cc43196d2c202ceeff15e715ec3cfb42409"
+    },
+    {
+      "path": "dotnet/FsusUI.Avalonia.HeadlessTests/Assets/Fonts/GoogleSans-Regular.ttf",
+      "sha256": "c8ad4829efc73ac3474392c56b6052bc078980dcc0d7f9c5e31be8d1b7492d6b"
+    },
+    {
+      "path": "dotnet/FsusUI.Avalonia.HeadlessTests/Assets/Fonts/GoogleSansExt-Bold.ttf",
+      "sha256": "2e4da3632ad02df709f3f71c126ffbdf42b91e0707910a918c0c3c4360051fce"
+    },
+    {
+      "path": "dotnet/FsusUI.Avalonia.HeadlessTests/Assets/Fonts/GoogleSansExt-Regular.ttf",
+      "sha256": "9974dc3b1c3f13f8e39cc7c7b6fc5be312fb78bb9a5ff51a118a4606611a498a"
     }
   ],
   "artifacts": [
     {
       "id": "table-v2-content-regions-light",
       "path": "tests/conformance/visual/artifacts/issue-285-table-v2/table-v2-content-regions-light.png",
-      "sha256": "12c592158d6d33a79c5e97ef319e924e65a7b118071531683551c5d13e660bc8",
-      "bytes": 38293,
+      "sha256": "28fce3ba05b59cfbdca78f207fdd8e5ad64943c3c3f04a905348c63562e194ae",
+      "bytes": 41480,
       "width": 488,
       "height": 540,
       "state": "two-row-scoped-header-populated-footer-empty"
@@ -50,12 +74,118 @@
     {
       "id": "table-v2-whole-header-overlay-light",
       "path": "tests/conformance/visual/artifacts/issue-285-table-v2/table-v2-whole-header-overlay-light.png",
-      "sha256": "3ddb0fef6bcf5080df423f22aa6ab289458032d3bc032a340f59157b3c77a16d",
-      "bytes": 17037,
+      "sha256": "a2cdcabc1b471e690fcd8c73fcb83cea9316ec8064a3aee0ba393434340150ba",
+      "bytes": 18148,
       "width": 488,
       "height": 320,
       "state": "whole-header-loading-overlay"
     }
   ],
-  "manifestDigest": "6c36aca59e6c101ba06972b7620ace3185d8a5e55447290bab29671728243d6b"
+  "generator": "FsusTableV2RenderedEvidenceTests; check-fsusui-design-conformance.mjs digestValue/sealReceipt",
+  "fontPrecondition": {
+    "resourceItem": "AvaloniaResource",
+    "family": "avares://FsusUI.Avalonia.HeadlessTests/Assets/Fonts#Google Sans 18pt",
+    "fallbackRejected": true,
+    "scope": "original two fixture windows only",
+    "dependencyPinsChanged": false
+  },
+  "classificationEvidence": {
+    "preImplementationClassification": {
+      "schema": "fsusui-design-conformance.ui-ux-classification-receipt.v2",
+      "ownerRepository": "Ozwasyd/FsusUI",
+      "affectedSurfaces": [
+        "FsusUI-owned Avalonia TableV2 content-region screenshot fixtures"
+      ],
+      "uiDecisionClass": "prescribed",
+      "verificationClass": "ux-path",
+      "requiredAuthorities": [
+        {
+          "id": "docs/index.md",
+          "path": "docs/index.md",
+          "digest": "b7aefe9f989ce962ada16c1fcbabf0613d862dfe0ec2bd016865a1a33d5b6f18"
+        },
+        {
+          "id": "docs/design.md",
+          "path": "docs/design.md",
+          "digest": "24c88676101dde43bb0907ed173f001b6e1659973caf19701ea57eddf0617039"
+        },
+        {
+          "id": "docs/design/governance.md",
+          "path": "docs/design/governance.md",
+          "digest": "d871bc86ed2a66f3a851f947530ff576c3d1d0a1a37c721d11cf09b1cbc4e104"
+        },
+        {
+          "id": "docs/design/change-classification.md",
+          "path": "docs/design/change-classification.md",
+          "digest": "c5d43303e89931346f9d634dd592ecb54418d15a74ae923f72e52795a115544e"
+        },
+        {
+          "id": "docs/workflows/visual-change.md",
+          "path": "docs/workflows/visual-change.md",
+          "digest": "0bd20f9ae6997aa9b7daeb0cec2f558738565bd0932828617aea2f5b84626042"
+        },
+        {
+          "id": "docs/avalonia/components/virtualization.md",
+          "path": "docs/avalonia/components/virtualization.md",
+          "digest": "aca042c7a3077be176c511cec98eb952d959d8e840fe81059d6325a32dbe8982"
+        },
+        {
+          "id": "docs/avalonia/platform-differences.md",
+          "path": "docs/avalonia/platform-differences.md",
+          "digest": "53a86d45ea16ab2d47e7634f79ac1785e2544f49c43c10568d574887d7d2ad5e"
+        },
+        {
+          "id": "spec/tokens/tokens.json",
+          "path": "spec/tokens/tokens.json",
+          "digest": "c97d4b2f3ffcf311fb060b21e12e13367763fb4ca9ba9c8fa4cacf6f72d381d1"
+        }
+      ],
+      "requiredSkillDigests": [
+        "c88357a6ba0340000bae5839daeb67a3cd2722e8242cf7e0148006c3610a44fe"
+      ],
+      "activeBaselineIdentity": {
+        "repository": "Ozwasyd/FsusUI",
+        "revision": "5b13756ef97522d442969fca11970f40b2f8344e",
+        "skillDigest": "c88357a6ba0340000bae5839daeb67a3cd2722e8242cf7e0148006c3610a44fe",
+        "authorityDigest": "755f5fe460c37d6523c6bc1f8521958cac020a6a3bedefe77253f6fc29870f59",
+        "dirtyFingerprint": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "candidateSha": "5b13756ef97522d442969fca11970f40b2f8344e",
+      "candidateDigest": "346d1c2099ad92c9ae92ce9ffcf6cc6d10dbc78d8d44dd25e2d907535cf2f0f7",
+      "stateEvidenceMatrix": [
+        {
+          "state": "sealed baseline artifact: two-row-scoped-header-populated-footer-empty",
+          "viewport": "avalonia-headless-488x540",
+          "theme": "light",
+          "evidenceDigest": "12c592158d6d33a79c5e97ef319e924e65a7b118071531683551c5d13e660bc8"
+        },
+        {
+          "state": "sealed baseline artifact: whole-header-loading-overlay",
+          "viewport": "avalonia-headless-488x320",
+          "theme": "light",
+          "evidenceDigest": "3ddb0fef6bcf5080df423f22aa6ab289458032d3bc032a340f59157b3c77a16d"
+        }
+      ],
+      "inScope": [
+        "Authorized deterministic embedded-font precondition for the original two TableV2 production-control fixtures",
+        "Original light/reduced-motion states, content, viewport geometry and assertions",
+        "New rendered comparison and exact-candidate review before resealing acceptance"
+      ],
+      "outOfScope": [
+        "Production component or token changes",
+        "Weakening assertions, budgets or platform review requirements",
+        "Declaring diagnostic generation or self-review to be independent UX acceptance"
+      ],
+      "classificationEvidenceDigest": "25e37d25356bacaee37ae068fec6509d04104f8e836616c87e87d83e7663a5f1",
+      "domainPolicyDigest": "620c4f746c1f259e3b640044975ad2878b7913806038706f7991bee9d72104d3",
+      "status": "frozen",
+      "receiptDigest": "033a12104debadb116377794c30417c387ddede054779dc542ac18de65b27679"
+    },
+    "classificationDecisionUnchanged": true,
+    "candidate": "12ff2d256714e5f4865be30babfe023728bc881f",
+    "candidateDigest": "90925df11114266565f2e394632420b9fad00711655cdc5dcc36fa7ee141349b",
+    "sourceAndArtifactBindings": "5c6716726502f8463794b40774309082defa2c43bc041a3c033db3bf6ff6328c",
+    "independentAcceptancePerformed": false
+  },
+  "manifestDigest": "321bd21090a67bb76b472279b28f13f90b9b7f76bdf49466b737b5869254bac1"
 }
