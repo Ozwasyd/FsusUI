@@ -1,8 +1,8 @@
 {
   "schema": "fsusui-table-v2-render-evidence.v1",
   "issue": 285,
-  "candidateSha": "12ff2d256714e5f4865be30babfe023728bc881f",
-  "candidateDigest": "90925df11114266565f2e394632420b9fad00711655cdc5dcc36fa7ee141349b",
+  "candidateSha": "2d4f89623bd08a4a717d62cf1e3fe35a377f597d",
+  "candidateDigest": "b726188e908b8c819151d587dcaa9eb5fb19011a86938cd65baf7411947d4ca1",
   "productionFixture": true,
   "theme": "light",
   "motionMode": "reduced",
@@ -18,7 +18,7 @@
     },
     {
       "path": "dotnet/FsusUI.Avalonia.HeadlessTests/FsusTableV2RenderedEvidenceTests.cs",
-      "sha256": "792051242f5d4a15935dfc6e5340bc37cb771fc6af22c7ad469007708380054f"
+      "sha256": "f934163b4389b3be84e6fb1ac852dd493609c10ebaf1750728071f1408f54b59"
     },
     {
       "path": "scripts/vue-semantic-baseline.mjs",
@@ -182,10 +182,16 @@
       "receiptDigest": "033a12104debadb116377794c30417c387ddede054779dc542ac18de65b27679"
     },
     "classificationDecisionUnchanged": true,
-    "candidate": "12ff2d256714e5f4865be30babfe023728bc881f",
-    "candidateDigest": "90925df11114266565f2e394632420b9fad00711655cdc5dcc36fa7ee141349b",
-    "sourceAndArtifactBindings": "5c6716726502f8463794b40774309082defa2c43bc041a3c033db3bf6ff6328c",
+    "candidate": "2d4f89623bd08a4a717d62cf1e3fe35a377f597d",
+    "candidateDigest": "b726188e908b8c819151d587dcaa9eb5fb19011a86938cd65baf7411947d4ca1",
+    "sourceAndArtifactBindings": "100407ad3528a4f94586df97ef3c503963054d34a1070943e4c7035e464d75cd",
     "independentAcceptancePerformed": false
   },
-  "manifestDigest": "321bd21090a67bb76b472279b28f13f90b9b7f76bdf49466b737b5869254bac1"
+  "failureDiagnostics": {
+    "scope": "Unchanged strict PNG byte assertion; actual mismatch renders retained in the existing platform artifact directory",
+    "positiveVerification": "Original sealed comparisons pass 2/2 without generation mode",
+    "negativeVerification": "One temporarily perturbed expected byte fails the original assertion; actual PNG retains the sealed hash; expected bytes restored",
+    "negativeControlDigest": "b6abb6875842c69f87750c053caf70904838ddac5e7c6f1fa164d06fd8a8dd82"
+  },
+  "manifestDigest": "4f1c303eed9db0c491275aea3e9a2a27d5899f07769c11a8f87654f11c5a9d0c"
 }

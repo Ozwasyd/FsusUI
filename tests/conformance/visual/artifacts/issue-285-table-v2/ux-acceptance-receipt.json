@@ -1,8 +1,8 @@
 {
   "schema": "fsusui-design-conformance.ux-acceptance-receipt.v2",
-  "classificationReceiptDigest": "cdcd33299db9e0f82412daa2f53bb68613369bb23c0479a602795149c313d7c1",
-  "candidateSha": "12ff2d256714e5f4865be30babfe023728bc881f",
-  "candidateDigest": "90925df11114266565f2e394632420b9fad00711655cdc5dcc36fa7ee141349b",
+  "classificationReceiptDigest": "fd1ecbe8fe72c2c2aa0af44d7d06eaf95887e22bb9a88eb1bfad07ccee7319b7",
+  "candidateSha": "2d4f89623bd08a4a717d62cf1e3fe35a377f597d",
+  "candidateDigest": "b726188e908b8c819151d587dcaa9eb5fb19011a86938cd65baf7411947d4ca1",
   "verificationClass": "ux-path",
   "requiredSkillDigests": [
     "c88357a6ba0340000bae5839daeb67a3cd2722e8242cf7e0148006c3610a44fe"
@@ -61,8 +61,9 @@
     }
   ],
   "blockers": [
-    "Independent exact-candidate UX review has not been performed; the retained historical review is bound to an older candidate."
+    "Independent exact-candidate UX review has not been performed; the retained historical review is bound to an older candidate.",
+    "Hosted Windows and macOS still failed the two strict PNG comparisons on predecessor 1f2bda7399; actual platform renders must be inspected before cross-platform acceptance."
   ],
   "status": "rejected",
-  "receiptDigest": "95ff55a726d6fab2368dbee6c4bb6e8cd0a2389fcbd9c8f07931030e2bfa44ea"
+  "receiptDigest": "320d2508a3997034e39538c8ca758b6b186c94e1d4bf6521baed46b5e26ab6bf"
 }

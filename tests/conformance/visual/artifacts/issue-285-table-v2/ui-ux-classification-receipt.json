@@ -58,8 +58,8 @@
     "authorityDigest": "755f5fe460c37d6523c6bc1f8521958cac020a6a3bedefe77253f6fc29870f59",
     "dirtyFingerprint": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
   },
-  "candidateSha": "12ff2d256714e5f4865be30babfe023728bc881f",
-  "candidateDigest": "90925df11114266565f2e394632420b9fad00711655cdc5dcc36fa7ee141349b",
+  "candidateSha": "2d4f89623bd08a4a717d62cf1e3fe35a377f597d",
+  "candidateDigest": "b726188e908b8c819151d587dcaa9eb5fb19011a86938cd65baf7411947d4ca1",
   "stateEvidenceMatrix": [
     {
       "state": "two-row-scoped-header-populated-footer-empty",
@@ -84,8 +84,8 @@
     "Weakening assertions, budgets or platform review requirements",
     "Declaring diagnostic generation or self-review to be independent UX acceptance"
   ],
-  "classificationEvidenceDigest": "ab95e1227f686086cd433285751d2a67b3f54fac5f1a60e00fb9c209ae30edb8",
+  "classificationEvidenceDigest": "8cd6018a3091c2bc01eb593e829e9a5e75eca36d11f449c0b1a4399d5fc5a6b7",
   "domainPolicyDigest": "620c4f746c1f259e3b640044975ad2878b7913806038706f7991bee9d72104d3",
   "status": "frozen",
-  "receiptDigest": "cdcd33299db9e0f82412daa2f53bb68613369bb23c0479a602795149c313d7c1"
+  "receiptDigest": "fd1ecbe8fe72c2c2aa0af44d7d06eaf95887e22bb9a88eb1bfad07ccee7319b7"
 }
