@@ -1,8 +1,8 @@
 {
   "schema": "fsusui-design-conformance.ux-acceptance-receipt.v2",
-  "classificationReceiptDigest": "6221f32939b5e569290a7f22310141bf0300163cec630cdcaa7de3be127a1bdc",
-  "candidateSha": "954fedbb2f2de1eee37421974037d812181e837f",
-  "candidateDigest": "d64352be951bb0e415e0d2057c411e9759299bf848989d17c959eeae3987d449",
+  "classificationReceiptDigest": "984aec27227ac00ccc6b123b62561827668d417d429e56bbd6ee440431804745",
+  "candidateSha": "b05b40350d4e040b635e2db2a9867d27041a1d59",
+  "candidateDigest": "e6baeb93fe8deb54d01312824e0f431b28e161b235a2ebe33486b30280e005d7",
   "verificationClass": "ux-path",
   "requiredSkillDigests": [
     "c88357a6ba0340000bae5839daeb67a3cd2722e8242cf7e0148006c3610a44fe"
@@ -15,16 +15,20 @@
     "0bd20f9ae6997aa9b7daeb0cec2f558738565bd0932828617aea2f5b84626042",
     "aca042c7a3077be176c511cec98eb952d959d8e840fe81059d6325a32dbe8982",
     "53a86d45ea16ab2d47e7634f79ac1785e2544f49c43c10568d574887d7d2ad5e",
-    "c97d4b2f3ffcf311fb060b21e12e13367763fb4ca9ba9c8fa4cacf6f72d381d1"
+    "c97d4b2f3ffcf311fb060b21e12e13367763fb4ca9ba9c8fa4cacf6f72d381d1",
+    "ef764001987e4847759d980f64cfda1643b258af695f53316339cb0fee2bbafd",
+    "61255374e99e3f3eac910331facc6f4d08b024a3f40550dfcf8b32d0df6920eb",
+    "8973a8b071fe0a7e53ac21d422c36a871e66a5a77a0c76b38dc94e248dacf84a",
+    "c027cfb438addbdc4f3f66b1dfb3c7fb52ba7f7867ea08977176fb9c0fc50521"
   ],
-  "activeBaselineIdentityDigest": "67316497192beb7fcbc1ef8eba55ff35c97bbf1e121c43eea9d295604a288fee",
+  "activeBaselineIdentityDigest": "c116882e96615c5b215b13562316ca8299aeb89a11f7c6d5ef4b5ba144e3e753",
   "domainPolicyDigest": "620c4f746c1f259e3b640044975ad2878b7913806038706f7991bee9d72104d3",
   "independenceEvidenceDigest": "d405091311e0abfb127f1cea717622c06677883b417b7fb04a40a2570a2eab2b",
   "modifiedPaths": [],
   "productionFixture": true,
   "viewportStateMatrix": [
     {
-      "viewport": "avalonia-headless-488x540",
+      "viewport": "linux-x64-avalonia-headless-488x540",
       "state": "two-row-scoped-header-populated-footer-empty",
       "theme": "light",
       "inputModes": [
@@ -33,13 +37,49 @@
       "evidenceDigest": "bdcbd2013bcbc8b0de9005866c33ab7c543bf5572ad67f47b0ea3336e3e02104"
     },
     {
-      "viewport": "avalonia-headless-488x320",
+      "viewport": "linux-x64-avalonia-headless-488x320",
       "state": "whole-header-loading-overlay",
       "theme": "light",
       "inputModes": [
         "reduced-motion"
       ],
       "evidenceDigest": "d21f63c789843b6c3717756b9cd778bf4ccf0181452968d1266aba4755dc0aad"
+    },
+    {
+      "viewport": "windows-x64-avalonia-headless-488x540",
+      "state": "two-row-scoped-header-populated-footer-empty",
+      "theme": "light",
+      "inputModes": [
+        "reduced-motion"
+      ],
+      "evidenceDigest": "fea85f525fa99efd054551725746037dccd1cfe0fbbe5bec8131f4bc2b4d5752"
+    },
+    {
+      "viewport": "windows-x64-avalonia-headless-488x320",
+      "state": "whole-header-loading-overlay",
+      "theme": "light",
+      "inputModes": [
+        "reduced-motion"
+      ],
+      "evidenceDigest": "870a6309d03db076673ace2cc64da6872d97e5cbdfb225565cc1b927bee9d60a"
+    },
+    {
+      "viewport": "macos-arm64-avalonia-headless-488x540",
+      "state": "two-row-scoped-header-populated-footer-empty",
+      "theme": "light",
+      "inputModes": [
+        "reduced-motion"
+      ],
+      "evidenceDigest": "53622ea260d359a5138ec4e665694d70bf0fe8b6427f6454b050ac523ca36b67"
+    },
+    {
+      "viewport": "macos-arm64-avalonia-headless-488x320",
+      "state": "whole-header-loading-overlay",
+      "theme": "light",
+      "inputModes": [
+        "reduced-motion"
+      ],
+      "evidenceDigest": "5763739ddad9c8184aae0cf05c82cc9450d347e615651bf6b9e73e2bd15b7f00"
     }
   ],
   "inspectedRenderedArtifacts": [
@@ -58,12 +98,44 @@
       "digest": "d21f63c789843b6c3717756b9cd778bf4ccf0181452968d1266aba4755dc0aad",
       "inspected": true,
       "fixtureClass": "production"
+    },
+    {
+      "id": "windows-x64-table-v2-content-regions-light",
+      "kind": "screenshot",
+      "path": "tests/conformance/visual/artifacts/issue-285-table-v2/platforms/windows-x64/table-v2-content-regions-light.png",
+      "digest": "fea85f525fa99efd054551725746037dccd1cfe0fbbe5bec8131f4bc2b4d5752",
+      "inspected": true,
+      "fixtureClass": "production"
+    },
+    {
+      "id": "windows-x64-table-v2-whole-header-overlay-light",
+      "kind": "screenshot",
+      "path": "tests/conformance/visual/artifacts/issue-285-table-v2/platforms/windows-x64/table-v2-whole-header-overlay-light.png",
+      "digest": "870a6309d03db076673ace2cc64da6872d97e5cbdfb225565cc1b927bee9d60a",
+      "inspected": true,
+      "fixtureClass": "production"
+    },
+    {
+      "id": "macos-arm64-table-v2-content-regions-light",
+      "kind": "screenshot",
+      "path": "tests/conformance/visual/artifacts/issue-285-table-v2/platforms/macos-arm64/table-v2-content-regions-light.png",
+      "digest": "53622ea260d359a5138ec4e665694d70bf0fe8b6427f6454b050ac523ca36b67",
+      "inspected": true,
+      "fixtureClass": "production"
+    },
+    {
+      "id": "macos-arm64-table-v2-whole-header-overlay-light",
+      "kind": "screenshot",
+      "path": "tests/conformance/visual/artifacts/issue-285-table-v2/platforms/macos-arm64/table-v2-whole-header-overlay-light.png",
+      "digest": "5763739ddad9c8184aae0cf05c82cc9450d347e615651bf6b9e73e2bd15b7f00",
+      "inspected": true,
+      "fixtureClass": "production"
     }
   ],
   "blockers": [
-    "Independent exact-candidate UX review has not been performed; retained historical review remains bound to an older candidate.",
-    "Actual supported-platform rerenders with the explicit raster prerequisites are pending; no cross-platform byte equality or platform-specific acceptance is claimed."
+    "Independent exact-candidate UX/source review has not been performed for the complete six-artifact matrix; the retained historical review is still bound to an older candidate.",
+    "Fresh hosted Windows/macOS normal-mode strict byte and original structural verification remains pending after platform profile selection."
   ],
   "status": "rejected",
-  "receiptDigest": "e2b2713f61983557d0815ac63539daaef3e0002743c7c2da19861fcd1e69a41b"
+  "receiptDigest": "860dc656b2f871f177a5846a56531d7e857be648e61ecc259eae119db89a25f5"
 }

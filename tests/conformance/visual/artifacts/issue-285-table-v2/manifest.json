@@ -1,8 +1,8 @@
 {
   "schema": "fsusui-table-v2-render-evidence.v1",
   "issue": 285,
-  "candidateSha": "954fedbb2f2de1eee37421974037d812181e837f",
-  "candidateDigest": "d64352be951bb0e415e0d2057c411e9759299bf848989d17c959eeae3987d449",
+  "candidateSha": "b05b40350d4e040b635e2db2a9867d27041a1d59",
+  "candidateDigest": "e6baeb93fe8deb54d01312824e0f431b28e161b235a2ebe33486b30280e005d7",
   "productionFixture": true,
   "theme": "light",
   "motionMode": "reduced",
@@ -18,7 +18,7 @@
     },
     {
       "path": "dotnet/FsusUI.Avalonia.HeadlessTests/FsusTableV2RenderedEvidenceTests.cs",
-      "sha256": "ece537b91a9c7d5e01b24c77628286c243a0e6711662429946ca818997a5c37e"
+      "sha256": "df27ef96dbec2cfb542a70ecf9e41b9b4fa3992ab76302b4b58a7ce001ec1363"
     },
     {
       "path": "scripts/vue-semantic-baseline.mjs",
@@ -66,19 +66,73 @@
       "id": "table-v2-content-regions-light",
       "path": "tests/conformance/visual/artifacts/issue-285-table-v2/table-v2-content-regions-light.png",
       "sha256": "bdcbd2013bcbc8b0de9005866c33ab7c543bf5572ad67f47b0ea3336e3e02104",
-      "bytes": 41480,
+      "bytes": 46236,
       "width": 488,
       "height": 540,
-      "state": "two-row-scoped-header-populated-footer-empty"
+      "state": "two-row-scoped-header-populated-footer-empty",
+      "platform": "linux",
+      "architecture": "x64",
+      "renderProfile": "linux-x64"
     },
     {
       "id": "table-v2-whole-header-overlay-light",
       "path": "tests/conformance/visual/artifacts/issue-285-table-v2/table-v2-whole-header-overlay-light.png",
       "sha256": "d21f63c789843b6c3717756b9cd778bf4ccf0181452968d1266aba4755dc0aad",
-      "bytes": 18148,
+      "bytes": 18428,
       "width": 488,
       "height": 320,
-      "state": "whole-header-loading-overlay"
+      "state": "whole-header-loading-overlay",
+      "platform": "linux",
+      "architecture": "x64",
+      "renderProfile": "linux-x64"
+    },
+    {
+      "id": "windows-x64-table-v2-content-regions-light",
+      "path": "tests/conformance/visual/artifacts/issue-285-table-v2/platforms/windows-x64/table-v2-content-regions-light.png",
+      "sha256": "fea85f525fa99efd054551725746037dccd1cfe0fbbe5bec8131f4bc2b4d5752",
+      "bytes": 34266,
+      "width": 488,
+      "height": 540,
+      "state": "two-row-scoped-header-populated-footer-empty",
+      "platform": "windows",
+      "architecture": "x64",
+      "renderProfile": "windows-x64"
+    },
+    {
+      "id": "windows-x64-table-v2-whole-header-overlay-light",
+      "path": "tests/conformance/visual/artifacts/issue-285-table-v2/platforms/windows-x64/table-v2-whole-header-overlay-light.png",
+      "sha256": "870a6309d03db076673ace2cc64da6872d97e5cbdfb225565cc1b927bee9d60a",
+      "bytes": 14970,
+      "width": 488,
+      "height": 320,
+      "state": "whole-header-loading-overlay",
+      "platform": "windows",
+      "architecture": "x64",
+      "renderProfile": "windows-x64"
+    },
+    {
+      "id": "macos-arm64-table-v2-content-regions-light",
+      "path": "tests/conformance/visual/artifacts/issue-285-table-v2/platforms/macos-arm64/table-v2-content-regions-light.png",
+      "sha256": "53622ea260d359a5138ec4e665694d70bf0fe8b6427f6454b050ac523ca36b67",
+      "bytes": 46306,
+      "width": 488,
+      "height": 540,
+      "state": "two-row-scoped-header-populated-footer-empty",
+      "platform": "macos",
+      "architecture": "arm64",
+      "renderProfile": "macos-arm64"
+    },
+    {
+      "id": "macos-arm64-table-v2-whole-header-overlay-light",
+      "path": "tests/conformance/visual/artifacts/issue-285-table-v2/platforms/macos-arm64/table-v2-whole-header-overlay-light.png",
+      "sha256": "5763739ddad9c8184aae0cf05c82cc9450d347e615651bf6b9e73e2bd15b7f00",
+      "bytes": 18277,
+      "width": 488,
+      "height": 320,
+      "state": "whole-header-loading-overlay",
+      "platform": "macos",
+      "architecture": "arm64",
+      "renderProfile": "macos-arm64"
     }
   ],
   "generator": "FsusTableV2RenderedEvidenceTests; check-fsusui-design-conformance.mjs digestValue/sealReceipt",
@@ -97,7 +151,7 @@
       "schema": "fsusui-design-conformance.ui-ux-classification-receipt.v2",
       "ownerRepository": "Ozwasyd/FsusUI",
       "affectedSurfaces": [
-        "Original two TableV2 fixture roots: deterministic embedded-font rasterization across Linux, Windows and macOS"
+        "Original TableV2 content/overlay production-control fixtures, verified against real per-platform/architecture PNG producer outputs"
       ],
       "uiDecisionClass": "prescribed",
       "verificationClass": "ux-path",
@@ -141,6 +195,26 @@
           "id": "spec/tokens/tokens.json",
           "path": "spec/tokens/tokens.json",
           "digest": "c97d4b2f3ffcf311fb060b21e12e13367763fb4ca9ba9c8fa4cacf6f72d381d1"
+        },
+        {
+          "id": "spec/platform-overrides/avalonia-linux.yaml",
+          "path": "spec/platform-overrides/avalonia-linux.yaml",
+          "digest": "ef764001987e4847759d980f64cfda1643b258af695f53316339cb0fee2bbafd"
+        },
+        {
+          "id": "spec/platform-overrides/avalonia-windows.yaml",
+          "path": "spec/platform-overrides/avalonia-windows.yaml",
+          "digest": "61255374e99e3f3eac910331facc6f4d08b024a3f40550dfcf8b32d0df6920eb"
+        },
+        {
+          "id": "spec/platform-overrides/avalonia-macos.yaml",
+          "path": "spec/platform-overrides/avalonia-macos.yaml",
+          "digest": "8973a8b071fe0a7e53ac21d422c36a871e66a5a77a0c76b38dc94e248dacf84a"
+        },
+        {
+          "id": "spec/platform-overrides/visual-thresholds.yaml",
+          "path": "spec/platform-overrides/visual-thresholds.yaml",
+          "digest": "c027cfb438addbdc4f3f66b1dfb3c7fb52ba7f7867ea08977176fb9c0fc50521"
         }
       ],
       "requiredSkillDigests": [
@@ -148,58 +222,73 @@
       ],
       "activeBaselineIdentity": {
         "repository": "Ozwasyd/FsusUI",
-        "revision": "6a65339a4129084a83d10b38d9d9840702903bc8",
+        "revision": "01304c2564ef6fb966707c0e43e62270754437d9",
         "skillDigest": "c88357a6ba0340000bae5839daeb67a3cd2722e8242cf7e0148006c3610a44fe",
-        "authorityDigest": "755f5fe460c37d6523c6bc1f8521958cac020a6a3bedefe77253f6fc29870f59",
+        "authorityDigest": "5e9f3d3abe1010160f440fcbec4152c3b4ac4c5ffe9080f573432d4cc12ff96b",
         "dirtyFingerprint": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
       },
-      "candidateSha": "6a65339a4129084a83d10b38d9d9840702903bc8",
-      "candidateDigest": "2c980917b61ba229b1bf403febb6cdb82de65894667edbbabc3bc36a63b3d0ff",
+      "candidateSha": "01304c2564ef6fb966707c0e43e62270754437d9",
+      "candidateDigest": "3338b2ab5872e8195044679dd403eefe99f6bdd6bae7e40517b0ae0b6ef68008",
       "stateEvidenceMatrix": [
         {
-          "state": "Inspected actual macos table-v2-content-regions-light.png",
-          "viewport": "avalonia-headless-488x540",
-          "theme": "light",
-          "evidenceDigest": "d9b5261846139feb8ef49465952cf3a623c982e60480205ae85c704c83a3a8ae"
-        },
-        {
-          "state": "Inspected actual macos table-v2-whole-header-overlay-light.png",
+          "state": "Inspected macos original producer table-v2-whole-header-overlay-light.png",
           "viewport": "avalonia-headless-488x320",
           "theme": "light",
-          "evidenceDigest": "c057619dcc5e990f68a756e9a0ceb36e8842466fd054f5bd603d3dc57cf13d98"
+          "evidenceDigest": "5763739ddad9c8184aae0cf05c82cc9450d347e615651bf6b9e73e2bd15b7f00"
         },
         {
-          "state": "Inspected actual windows table-v2-content-regions-light.png",
+          "state": "Inspected macos original producer table-v2-content-regions-light.png",
           "viewport": "avalonia-headless-488x540",
           "theme": "light",
-          "evidenceDigest": "f050ca0ea8dc18f81ea41900d105b62ccc3c520b4cfd653aff5bc0ab296e273d"
+          "evidenceDigest": "53622ea260d359a5138ec4e665694d70bf0fe8b6427f6454b050ac523ca36b67"
         },
         {
-          "state": "Inspected actual windows table-v2-whole-header-overlay-light.png",
+          "state": "Inspected windows original producer table-v2-whole-header-overlay-light.png",
           "viewport": "avalonia-headless-488x320",
           "theme": "light",
-          "evidenceDigest": "971bbf473646b882611f1ab8486ad239998e661c19052e16b74c61ef1b0310fe"
+          "evidenceDigest": "870a6309d03db076673ace2cc64da6872d97e5cbdfb225565cc1b927bee9d60a"
+        },
+        {
+          "state": "Inspected windows original producer table-v2-content-regions-light.png",
+          "viewport": "avalonia-headless-488x540",
+          "theme": "light",
+          "evidenceDigest": "fea85f525fa99efd054551725746037dccd1cfe0fbbe5bec8131f4bc2b4d5752"
+        },
+        {
+          "state": "Inspected linux-x64 original producer table-v2-content-regions-light.png",
+          "viewport": "avalonia-headless-488x540",
+          "theme": "light",
+          "evidenceDigest": "bdcbd2013bcbc8b0de9005866c33ab7c543bf5572ad67f47b0ea3336e3e02104"
+        },
+        {
+          "state": "Inspected linux-x64 original producer table-v2-whole-header-overlay-light.png",
+          "viewport": "avalonia-headless-488x320",
+          "theme": "light",
+          "evidenceDigest": "d21f63c789843b6c3717756b9cd778bf4ccf0181452968d1266aba4755dc0aad"
         }
       ],
       "inScope": [
-        "Explicit text antialiasing and hinting prerequisites on the original two fixture roots",
-        "Preserve actual component, content, geometry, original assertions, strict PNG comparison and existing failure diagnostics",
-        "Use the original producer for real renders and compare actual platform pixels before any acceptance"
+        "Preserve the same embedded font and explicit antialias/no-hinting fixture prerequisites",
+        "Select a checked-in platform/architecture profile for both original strict PNG byte assertions",
+        "Add actual hosted Windows x64 and macOS arm64 producer PNGs alongside the existing Linux x64 PNGs",
+        "Retain every original structural assertion and require real normal-mode platform rerenders plus independent review"
       ],
       "outOfScope": [
-        "Production component, token, theme or font-file changes",
-        "Platform-specific baselines, assertion skips or tolerance/budget changes",
-        "Declaring author inspection or diagnostic generation independent UX acceptance"
+        "Production controls, font assets, registered typography exceptions, budgets or thresholds",
+        "Skipping original tests, accepting absent profiles, or generating expected images during verification",
+        "Claiming diagnostic capture, author inspection or old receipts are independent current acceptance"
       ],
-      "classificationEvidenceDigest": "0e2648b061cc3d7d533fa609867d76dc85c823575f630326d6000cab09a85307",
+      "classificationEvidenceDigest": "d5b739c8eb398cda745774f7362c99fe6a0513b67301d5d5b2d82c72a0ed2509",
       "domainPolicyDigest": "620c4f746c1f259e3b640044975ad2878b7913806038706f7991bee9d72104d3",
       "status": "frozen",
-      "receiptDigest": "761190052119a96b674e839b0d3de6ef8bef1540e0d2e0e0dd846d0853cf3b9a"
+      "receiptDigest": "6db4394fb36b16eb953b157d386fe261beadf6b02df35e304073cc4d41d6767e"
     },
     "classificationDecisionUnchanged": true,
-    "candidate": "954fedbb2f2de1eee37421974037d812181e837f",
-    "candidateDigest": "d64352be951bb0e415e0d2057c411e9759299bf848989d17c959eeae3987d449",
-    "sourceAndArtifactBindings": "6f1fd46a92e45f5e9d3e9ab7559aa53ea0649896b5ee243d7b14757869702837",
+    "candidate": "b05b40350d4e040b635e2db2a9867d27041a1d59",
+    "candidateDigest": "e6baeb93fe8deb54d01312824e0f431b28e161b235a2ebe33486b30280e005d7",
+    "sourceAndArtifactBindings": "068475e274864ff6716a901c2734aff91876c9b4b2d2621fe156d953834c8a2b",
+    "scopeRationale": "Existing registered platform typography contracts permit OS rasterizer differences; every original byte assertion now selects its actual checked-in OS/architecture profile. All original assertion statements are unchanged.",
+    "originalAssertionStatementsPreserved": 12,
     "independentAcceptancePerformed": false
   },
   "failureDiagnostics": {
@@ -213,7 +302,51 @@
     "normal": "2/2 original strict comparisons pass without generation mode",
     "hostFontCounterfactual": "2/2 original strict comparisons pass with changed host font default",
     "configurationCounterfactual": "Debug and Release produce byte-identical PNGs",
-    "crossPlatform": "Pending actual hosted rerender; prior platform renders were inspected and had real text pixel differences"
+    "crossPlatform": "Six actual producer artifacts bound to three OS/architecture profiles; fresh hosted normal-mode verification pending."
   },
-  "manifestDigest": "2a3ec07f4146687482a83f48558b0dce8fe753eee94df93df99fda5e70e528a6"
+  "renderProfiles": [
+    {
+      "id": "linux-x64",
+      "platform": "linux",
+      "architecture": "x64",
+      "artifactPaths": [
+        "tests/conformance/visual/artifacts/issue-285-table-v2/table-v2-content-regions-light.png",
+        "tests/conformance/visual/artifacts/issue-285-table-v2/table-v2-whole-header-overlay-light.png"
+      ]
+    },
+    {
+      "id": "windows-x64",
+      "platform": "windows",
+      "architecture": "x64",
+      "artifactPaths": [
+        "tests/conformance/visual/artifacts/issue-285-table-v2/platforms/windows-x64/table-v2-content-regions-light.png",
+        "tests/conformance/visual/artifacts/issue-285-table-v2/platforms/windows-x64/table-v2-whole-header-overlay-light.png"
+      ]
+    },
+    {
+      "id": "macos-arm64",
+      "platform": "macos",
+      "architecture": "arm64",
+      "artifactPaths": [
+        "tests/conformance/visual/artifacts/issue-285-table-v2/platforms/macos-arm64/table-v2-content-regions-light.png",
+        "tests/conformance/visual/artifacts/issue-285-table-v2/platforms/macos-arm64/table-v2-whole-header-overlay-light.png"
+      ]
+    }
+  ],
+  "platformProducerEvidence": {
+    "linux": {
+      "sourceCandidate": "954fedbb2f2de1eee37421974037d812181e837f",
+      "mode": "literal original update producer; default Debug and byte-identical Release",
+      "currentProfileVerification": "2/2 normal and 2/2 changed host font; generation mode unset"
+    },
+    "windowsAndMacos": {
+      "workflowRunId": 43730825943,
+      "prHead": "01304c2564ef6fb966707c0e43e62270754437d9",
+      "checkoutCommit": "5a4293d3751bad95c006903795cc4bf3bace257c",
+      "sourceCandidate": "954fedbb2f2de1eee37421974037d812181e837f",
+      "mode": "actual original bitmap producer captured before strict Linux-baseline mismatch; no synthetic or edited pixels",
+      "currentProfileVerification": "Fresh normal-mode hosted verification pending"
+    }
+  },
+  "manifestDigest": "10df0b73bd12863e717dd6e7832800692b186db348fbf2744b51a04b2477dee4"
 }
