@@ -159,7 +159,9 @@ if (JSON.stringify(rootSdk) !== JSON.stringify(sdk)) {
   failures.push('root and dotnet SDK selections must match')
 }
 if (sdk?.rollForward !== 'disable') {
-  failures.push('dotnet SDK must not roll forward beyond the locked restore inputs')
+  failures.push(
+    'dotnet SDK must not roll forward beyond the locked restore inputs',
+  )
 }
 const callerPackageJob = job(callerWorkflow, 'pr-avalonia-aot-candidate')
 for (const [name, candidateJob] of [
@@ -171,7 +173,9 @@ for (const [name, candidateJob] of [
     'dbus-run-session -- xvfb-run -a pnpm run conformance:v2',
   ]) {
     if (!candidateJob.includes(requirement)) {
-      failures.push(`${name} must provision and run native screen-reader evidence`)
+      failures.push(
+        `${name} must provision and run native screen-reader evidence`,
+      )
     }
   }
 }
@@ -261,6 +265,16 @@ if (
 ) {
   failures.push('platform verifier must reject invalid concurrency overrides')
 }
+
+const environmentTests = spawnSync(
+  process.execPath,
+  ['--test', 'tests/dotnet-platform-environment.test.mjs'],
+  { encoding: 'utf8' },
+)
+if (environmentTests.status !== 0)
+  failures.push(
+    `native platform environment tests failed: ${environmentTests.stdout}${environmentTests.stderr}`,
+  )
 
 if (failures.length > 0) {
   console.error(
