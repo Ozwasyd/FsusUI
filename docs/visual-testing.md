@@ -113,3 +113,20 @@ fixture keeps a stable subdirectory and records resolved output, manifest,
 receipt, and capture paths in JSON evidence. This variable changes only the
 destination; it does not select tests, update tracked baselines, or weaken
 render, pixel, geometry, automation, or composition assertions.
+
+## Native TableV2 render profiles
+
+The original [TableV2 fixture producer](../dotnet/FsusUI.Avalonia.HeadlessTests/FsusTableV2RenderedEvidenceTests.cs)
+uses its bundled face and explicit text rasterization settings. Each original
+PNG byte assertion selects a checked-in operating-system/architecture profile.
+Linux x64 retains the canonical artifact paths; Windows x64 and macOS arm64
+snapshots live under the fixture's `platforms/` directory. These profiles apply
+the existing [platform typography contracts](avalonia/platform-differences.md);
+they introduce no new visual deviation or tolerance.
+
+Authorized regeneration uses the original `FSUSUI_UPDATE_VISUAL_ARTIFACTS=1`
+producer on the corresponding host. Normal verification requires an existing
+profile and compares exact bytes before the original structural assertions.
+Missing profiles fail. The evidence manifest binds every profile artifact and
+its actual producer context; independent exact-candidate UX acceptance remains
+required before the evidence is accepted.

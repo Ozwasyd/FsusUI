@@ -1,3 +1,4 @@
+using System.Runtime.InteropServices;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Templates;
@@ -115,14 +116,7 @@ public class FsusTableV2RenderedEvidenceTests
     surface.Arrange(new Rect(0, 0, 488, 540));
     Dispatcher.UIThread.RunJobs();
 
-    var repositoryRoot = FindRepositoryRoot();
-    var outputDirectory = Path.Combine(
-      repositoryRoot,
-      "tests",
-      "conformance",
-      "visual",
-      "artifacts",
-      "issue-285-table-v2");
+    var outputDirectory = GetArtifactDirectory();
     Directory.CreateDirectory(outputDirectory);
     var outputPath = Path.Combine(outputDirectory, "table-v2-content-regions-light.png");
     using var bitmap = new RenderTargetBitmap(new PixelSize(488, 540), new Vector(96, 96));
@@ -212,13 +206,7 @@ public class FsusTableV2RenderedEvidenceTests
     surface.Arrange(new Rect(0, 0, 488, 320));
     Dispatcher.UIThread.RunJobs();
 
-    var outputDirectory = Path.Combine(
-      FindRepositoryRoot(),
-      "tests",
-      "conformance",
-      "visual",
-      "artifacts",
-      "issue-285-table-v2");
+    var outputDirectory = GetArtifactDirectory();
     Directory.CreateDirectory(outputDirectory);
     var outputPath = Path.Combine(outputDirectory, "table-v2-whole-header-overlay-light.png");
     using var bitmap = new RenderTargetBitmap(new PixelSize(488, 320), new Vector(96, 96));
@@ -351,6 +339,20 @@ public class FsusTableV2RenderedEvidenceTests
     }
     Assert.Equal(File.ReadAllBytes(outputPath), bytes);
     return bytes;
+  }
+
+  private static string GetArtifactDirectory()
+  {
+    var root = Path.Combine(
+      FindRepositoryRoot(), "tests", "conformance", "visual", "artifacts", "issue-285-table-v2");
+    var platform = OperatingSystem.IsWindows() ? "windows"
+      : OperatingSystem.IsMacOS() ? "macos"
+      : OperatingSystem.IsLinux() ? "linux"
+      : throw new PlatformNotSupportedException("No TableV2 render profile for this platform.");
+    var architecture = RuntimeInformation.ProcessArchitecture.ToString().ToLowerInvariant();
+    return platform == "linux" && architecture == "x64"
+      ? root
+      : Path.Combine(root, "platforms", $"{platform}-{architecture}");
   }
 
   private static string FindRepositoryRoot()
