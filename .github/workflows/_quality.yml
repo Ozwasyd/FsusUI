@@ -134,6 +134,8 @@ jobs:
             ${{ runner.os }}-${{ runner.arch }}-fsusui-dotnet-sdk-${{ hashFiles('dotnet/global.json') }}-
       - name: Set up PDF inspection tools
         uses: ./.github/actions/setup-pdf-tools
+      - name: Set up native Tree fixture fonts
+        uses: ./.github/actions/setup-tree-fonts
       - name: Run platform-owned restore, build, tests, and smoke
         env:
           FSUS_WEBVIEW_CANDIDATE_SHA: ${{ github.sha }}
@@ -193,6 +195,8 @@ jobs:
           key: ${{ runner.os }}-${{ runner.arch }}-fsusui-dotnet-package-sdk-${{ hashFiles('dotnet/global.json') }}-${{ hashFiles('dotnet/**/*.csproj', 'dotnet/**/*.props', 'dotnet/**/*.targets', 'dotnet/**/*.slnx', 'dotnet/**/packages.lock.json', 'NuGet.config') }}
           restore-keys: |
             ${{ runner.os }}-${{ runner.arch }}-fsusui-dotnet-package-sdk-${{ hashFiles('dotnet/global.json') }}-
+      - name: Set up native Tree fixture fonts
+        uses: ./.github/actions/setup-tree-fonts
       - name: Build and verify the unique NuGet candidate
         id: candidate
         run: |
