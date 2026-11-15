@@ -207,7 +207,10 @@ availability state, and pending/result authority.
 
 `surfaces.commandPalette`, `surfaces.selectionToolbar`, and `surfaces.slashMenu` are opt-in
 presentations. Palette search reads only command `label`, `description`, and `keywords`; visible
-copy comes from `localeText.commandPalette`. `Esc` in the selection toolbar or slash menu closes
+copy comes from `localeText.commandPalette`. In the palette search input,
+composing Enter stays with the input method: it does not execute a command or
+close the palette. After composition ends, ordinary Enter executes the
+available selected command once. `Esc` in the selection toolbar or slash menu closes
 the current surface, restores source focus, and retains source, selection, and history. The
 current projection/input context validates a slash trigger; execution merges the trigger range
 and command result into one revision-bound transaction, so it cannot delete the trigger first
