@@ -1,8 +1,8 @@
 {
   "schema": "fsusui-table-v2-render-evidence.v1",
   "issue": 285,
-  "candidateSha": "e9ec7e3c8145b598d41b08d3610ab6f245c258ca",
-  "candidateDigest": "1a9ff9de943cd711c652d4ad3a779e0212e9f074714ba0f69e838a277d1ccb79",
+  "candidateSha": "90e4956b1618058cb5858bfb1336f8f7045616b0",
+  "candidateDigest": "9d6451e3173e7dc21c97de350e74280251866c0f8b68975ba012d29dc0321a4b",
   "productionFixture": true,
   "theme": "light",
   "motionMode": "reduced",
@@ -18,15 +18,15 @@
     },
     {
       "path": "dotnet/FsusUI.Avalonia.HeadlessTests/FsusTableV2RenderedEvidenceTests.cs",
-      "sha256": "6e68f52a5ace3c92b890077682ad8c5f962066b2cc0b0250802a16cee3b5384a"
+      "sha256": "df27ef96dbec2cfb542a70ecf9e41b9b4fa3992ab76302b4b58a7ce001ec1363"
     },
     {
       "path": "scripts/vue-semantic-baseline.mjs",
-      "sha256": "b76c1394f6b44692aa9efe41ebeb33b135e6a50b2a0eefa2b47485263e5dab68"
+      "sha256": "740bccceeb80fddced94ea13be69f73ffcf78787d7a684ade713da24a84d0c3c"
     },
     {
       "path": "scripts/contract-v2.mjs",
-      "sha256": "037e5adfd2fe474183f2f690a96f7b7b42f3f89349933402aac0d281891161f6"
+      "sha256": "f39e4f83717d53b3490c62ea258737a1441f10803661ce7dd1f812047eca91ab"
     },
     {
       "path": "scripts/table-v2-render-evidence.mjs",
@@ -34,28 +34,400 @@
     },
     {
       "path": "spec/components/contracts/v2/contract-v2.json",
-      "sha256": "abbbaeaa65f5cf586ea58a64770b92f41528b0a2b1212070c2c2a934e9f12ad6"
+      "sha256": "2b9d65ec56d0ba86ff8e173c9d5cbb848d0170068d035f35371eb750ea748751"
+    },
+    {
+      "path": "dotnet/FsusUI.Avalonia.HeadlessTests/FsusUI.Avalonia.HeadlessTests.csproj",
+      "sha256": "5ae0d2996d4c194c8d0b711f3bfcc2c9e5b5bf972068babb2a0f5d4765bc8bca"
+    },
+    {
+      "path": "dotnet/FsusUI.Avalonia.HeadlessTests/TestAppBuilder.cs",
+      "sha256": "098720190ce4da6fdba39747770944d85dee7438e3a18abd8cf6f938a626d24d"
+    },
+    {
+      "path": "dotnet/FsusUI.Avalonia.HeadlessTests/Assets/Fonts/GoogleSans-Bold.ttf",
+      "sha256": "abcfd5c258f59b7f022cd1d4a3db2cc43196d2c202ceeff15e715ec3cfb42409"
+    },
+    {
+      "path": "dotnet/FsusUI.Avalonia.HeadlessTests/Assets/Fonts/GoogleSans-Regular.ttf",
+      "sha256": "c8ad4829efc73ac3474392c56b6052bc078980dcc0d7f9c5e31be8d1b7492d6b"
+    },
+    {
+      "path": "dotnet/FsusUI.Avalonia.HeadlessTests/Assets/Fonts/GoogleSansExt-Bold.ttf",
+      "sha256": "2e4da3632ad02df709f3f71c126ffbdf42b91e0707910a918c0c3c4360051fce"
+    },
+    {
+      "path": "dotnet/FsusUI.Avalonia.HeadlessTests/Assets/Fonts/GoogleSansExt-Regular.ttf",
+      "sha256": "9974dc3b1c3f13f8e39cc7c7b6fc5be312fb78bb9a5ff51a118a4606611a498a"
     }
   ],
   "artifacts": [
     {
       "id": "table-v2-content-regions-light",
       "path": "tests/conformance/visual/artifacts/issue-285-table-v2/table-v2-content-regions-light.png",
-      "sha256": "12c592158d6d33a79c5e97ef319e924e65a7b118071531683551c5d13e660bc8",
-      "bytes": 38293,
+      "sha256": "bdcbd2013bcbc8b0de9005866c33ab7c543bf5572ad67f47b0ea3336e3e02104",
+      "bytes": 46236,
       "width": 488,
       "height": 540,
-      "state": "two-row-scoped-header-populated-footer-empty"
+      "state": "two-row-scoped-header-populated-footer-empty",
+      "platform": "linux",
+      "architecture": "x64",
+      "renderProfile": "linux-x64"
     },
     {
       "id": "table-v2-whole-header-overlay-light",
       "path": "tests/conformance/visual/artifacts/issue-285-table-v2/table-v2-whole-header-overlay-light.png",
-      "sha256": "3ddb0fef6bcf5080df423f22aa6ab289458032d3bc032a340f59157b3c77a16d",
-      "bytes": 17037,
+      "sha256": "d21f63c789843b6c3717756b9cd778bf4ccf0181452968d1266aba4755dc0aad",
+      "bytes": 18428,
       "width": 488,
       "height": 320,
-      "state": "whole-header-loading-overlay"
+      "state": "whole-header-loading-overlay",
+      "platform": "linux",
+      "architecture": "x64",
+      "renderProfile": "linux-x64"
+    },
+    {
+      "id": "windows-x64-table-v2-content-regions-light",
+      "path": "tests/conformance/visual/artifacts/issue-285-table-v2/platforms/windows-x64/table-v2-content-regions-light.png",
+      "sha256": "fea85f525fa99efd054551725746037dccd1cfe0fbbe5bec8131f4bc2b4d5752",
+      "bytes": 34266,
+      "width": 488,
+      "height": 540,
+      "state": "two-row-scoped-header-populated-footer-empty",
+      "platform": "windows",
+      "architecture": "x64",
+      "renderProfile": "windows-x64"
+    },
+    {
+      "id": "windows-x64-table-v2-whole-header-overlay-light",
+      "path": "tests/conformance/visual/artifacts/issue-285-table-v2/platforms/windows-x64/table-v2-whole-header-overlay-light.png",
+      "sha256": "870a6309d03db076673ace2cc64da6872d97e5cbdfb225565cc1b927bee9d60a",
+      "bytes": 14970,
+      "width": 488,
+      "height": 320,
+      "state": "whole-header-loading-overlay",
+      "platform": "windows",
+      "architecture": "x64",
+      "renderProfile": "windows-x64"
+    },
+    {
+      "id": "macos-arm64-table-v2-content-regions-light",
+      "path": "tests/conformance/visual/artifacts/issue-285-table-v2/platforms/macos-arm64/table-v2-content-regions-light.png",
+      "sha256": "53622ea260d359a5138ec4e665694d70bf0fe8b6427f6454b050ac523ca36b67",
+      "bytes": 46306,
+      "width": 488,
+      "height": 540,
+      "state": "two-row-scoped-header-populated-footer-empty",
+      "platform": "macos",
+      "architecture": "arm64",
+      "renderProfile": "macos-arm64"
+    },
+    {
+      "id": "macos-arm64-table-v2-whole-header-overlay-light",
+      "path": "tests/conformance/visual/artifacts/issue-285-table-v2/platforms/macos-arm64/table-v2-whole-header-overlay-light.png",
+      "sha256": "5763739ddad9c8184aae0cf05c82cc9450d347e615651bf6b9e73e2bd15b7f00",
+      "bytes": 18277,
+      "width": 488,
+      "height": 320,
+      "state": "whole-header-loading-overlay",
+      "platform": "macos",
+      "architecture": "arm64",
+      "renderProfile": "macos-arm64"
     }
   ],
-  "manifestDigest": "6c36aca59e6c101ba06972b7620ace3185d8a5e55447290bab29671728243d6b"
+  "generator": "FsusTableV2RenderedEvidenceTests; check-fsusui-design-conformance.mjs digestValue/sealReceipt",
+  "fontPrecondition": {
+    "resourceItem": "AvaloniaResource",
+    "family": "avares://FsusUI.Avalonia.HeadlessTests/Assets/Fonts#Google Sans 18pt",
+    "fallbackRejected": true,
+    "scope": "original two fixture windows only",
+    "dependencyPinsChanged": false,
+    "textRenderingMode": "Antialias",
+    "textHintingMode": "None",
+    "rasterScope": "original fixture render roots only"
+  },
+  "classificationEvidence": {
+    "preImplementationClassification": {
+      "schema": "fsusui-design-conformance.ui-ux-classification-receipt.v2",
+      "ownerRepository": "Ozwasyd/FsusUI",
+      "affectedSurfaces": [
+        "Original TableV2 content/overlay production-control fixtures, verified against real per-platform/architecture PNG producer outputs"
+      ],
+      "uiDecisionClass": "prescribed",
+      "verificationClass": "ux-path",
+      "requiredAuthorities": [
+        {
+          "id": "docs/index.md",
+          "path": "docs/index.md",
+          "digest": "b7aefe9f989ce962ada16c1fcbabf0613d862dfe0ec2bd016865a1a33d5b6f18"
+        },
+        {
+          "id": "docs/design.md",
+          "path": "docs/design.md",
+          "digest": "24c88676101dde43bb0907ed173f001b6e1659973caf19701ea57eddf0617039"
+        },
+        {
+          "id": "docs/design/governance.md",
+          "path": "docs/design/governance.md",
+          "digest": "d871bc86ed2a66f3a851f947530ff576c3d1d0a1a37c721d11cf09b1cbc4e104"
+        },
+        {
+          "id": "docs/design/change-classification.md",
+          "path": "docs/design/change-classification.md",
+          "digest": "c5d43303e89931346f9d634dd592ecb54418d15a74ae923f72e52795a115544e"
+        },
+        {
+          "id": "docs/workflows/visual-change.md",
+          "path": "docs/workflows/visual-change.md",
+          "digest": "0bd20f9ae6997aa9b7daeb0cec2f558738565bd0932828617aea2f5b84626042"
+        },
+        {
+          "id": "docs/avalonia/components/virtualization.md",
+          "path": "docs/avalonia/components/virtualization.md",
+          "digest": "aca042c7a3077be176c511cec98eb952d959d8e840fe81059d6325a32dbe8982"
+        },
+        {
+          "id": "docs/avalonia/platform-differences.md",
+          "path": "docs/avalonia/platform-differences.md",
+          "digest": "53a86d45ea16ab2d47e7634f79ac1785e2544f49c43c10568d574887d7d2ad5e"
+        },
+        {
+          "id": "spec/tokens/tokens.json",
+          "path": "spec/tokens/tokens.json",
+          "digest": "c97d4b2f3ffcf311fb060b21e12e13367763fb4ca9ba9c8fa4cacf6f72d381d1"
+        },
+        {
+          "id": "spec/platform-overrides/avalonia-linux.yaml",
+          "path": "spec/platform-overrides/avalonia-linux.yaml",
+          "digest": "ef764001987e4847759d980f64cfda1643b258af695f53316339cb0fee2bbafd"
+        },
+        {
+          "id": "spec/platform-overrides/avalonia-windows.yaml",
+          "path": "spec/platform-overrides/avalonia-windows.yaml",
+          "digest": "61255374e99e3f3eac910331facc6f4d08b024a3f40550dfcf8b32d0df6920eb"
+        },
+        {
+          "id": "spec/platform-overrides/avalonia-macos.yaml",
+          "path": "spec/platform-overrides/avalonia-macos.yaml",
+          "digest": "8973a8b071fe0a7e53ac21d422c36a871e66a5a77a0c76b38dc94e248dacf84a"
+        },
+        {
+          "id": "spec/platform-overrides/visual-thresholds.yaml",
+          "path": "spec/platform-overrides/visual-thresholds.yaml",
+          "digest": "c027cfb438addbdc4f3f66b1dfb3c7fb52ba7f7867ea08977176fb9c0fc50521"
+        }
+      ],
+      "requiredSkillDigests": [
+        "c88357a6ba0340000bae5839daeb67a3cd2722e8242cf7e0148006c3610a44fe"
+      ],
+      "activeBaselineIdentity": {
+        "repository": "Ozwasyd/FsusUI",
+        "revision": "01304c2564ef6fb966707c0e43e62270754437d9",
+        "skillDigest": "c88357a6ba0340000bae5839daeb67a3cd2722e8242cf7e0148006c3610a44fe",
+        "authorityDigest": "5e9f3d3abe1010160f440fcbec4152c3b4ac4c5ffe9080f573432d4cc12ff96b",
+        "dirtyFingerprint": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "candidateSha": "01304c2564ef6fb966707c0e43e62270754437d9",
+      "candidateDigest": "3338b2ab5872e8195044679dd403eefe99f6bdd6bae7e40517b0ae0b6ef68008",
+      "stateEvidenceMatrix": [
+        {
+          "state": "Inspected macos original producer table-v2-whole-header-overlay-light.png",
+          "viewport": "avalonia-headless-488x320",
+          "theme": "light",
+          "evidenceDigest": "5763739ddad9c8184aae0cf05c82cc9450d347e615651bf6b9e73e2bd15b7f00"
+        },
+        {
+          "state": "Inspected macos original producer table-v2-content-regions-light.png",
+          "viewport": "avalonia-headless-488x540",
+          "theme": "light",
+          "evidenceDigest": "53622ea260d359a5138ec4e665694d70bf0fe8b6427f6454b050ac523ca36b67"
+        },
+        {
+          "state": "Inspected windows original producer table-v2-whole-header-overlay-light.png",
+          "viewport": "avalonia-headless-488x320",
+          "theme": "light",
+          "evidenceDigest": "870a6309d03db076673ace2cc64da6872d97e5cbdfb225565cc1b927bee9d60a"
+        },
+        {
+          "state": "Inspected windows original producer table-v2-content-regions-light.png",
+          "viewport": "avalonia-headless-488x540",
+          "theme": "light",
+          "evidenceDigest": "fea85f525fa99efd054551725746037dccd1cfe0fbbe5bec8131f4bc2b4d5752"
+        },
+        {
+          "state": "Inspected linux-x64 original producer table-v2-content-regions-light.png",
+          "viewport": "avalonia-headless-488x540",
+          "theme": "light",
+          "evidenceDigest": "bdcbd2013bcbc8b0de9005866c33ab7c543bf5572ad67f47b0ea3336e3e02104"
+        },
+        {
+          "state": "Inspected linux-x64 original producer table-v2-whole-header-overlay-light.png",
+          "viewport": "avalonia-headless-488x320",
+          "theme": "light",
+          "evidenceDigest": "d21f63c789843b6c3717756b9cd778bf4ccf0181452968d1266aba4755dc0aad"
+        }
+      ],
+      "inScope": [
+        "Preserve the same embedded font and explicit antialias/no-hinting fixture prerequisites",
+        "Select a checked-in platform/architecture profile for both original strict PNG byte assertions",
+        "Add actual hosted Windows x64 and macOS arm64 producer PNGs alongside the existing Linux x64 PNGs",
+        "Retain every original structural assertion and require real normal-mode platform rerenders plus independent review"
+      ],
+      "outOfScope": [
+        "Production controls, font assets, registered typography exceptions, budgets or thresholds",
+        "Skipping original tests, accepting absent profiles, or generating expected images during verification",
+        "Claiming diagnostic capture, author inspection or old receipts are independent current acceptance"
+      ],
+      "classificationEvidenceDigest": "d5b739c8eb398cda745774f7362c99fe6a0513b67301d5d5b2d82c72a0ed2509",
+      "domainPolicyDigest": "620c4f746c1f259e3b640044975ad2878b7913806038706f7991bee9d72104d3",
+      "status": "frozen",
+      "receiptDigest": "6db4394fb36b16eb953b157d386fe261beadf6b02df35e304073cc4d41d6767e"
+    },
+    "classificationDecisionUnchanged": true,
+    "candidate": "7f194dc546a4007e3d38200f0af0ab0e7fb6e6a1",
+    "candidateDigest": "95cf2de697b5f01e420a3b4a3fe773028e2edd5d20ddf45f17d69c53950fddee",
+    "sourceAndArtifactBindings": "cb234d1c6b66122762442173ee9cd1240bff3b1a380aa289ed936948acba480c",
+    "scopeRationale": "Existing registered platform typography contracts permit OS rasterizer differences; every original byte assertion now selects its actual checked-in OS/architecture profile. All original assertion statements are unchanged.",
+    "originalAssertionStatementsPreserved": 12,
+    "independentAcceptancePerformed": false,
+    "provenanceRefresh": {
+      "candidate": "7f194dc546a4007e3d38200f0af0ab0e7fb6e6a1",
+      "predecessor": "8b856667f47fa886e2253fe1ca6ac440053cc6aa",
+      "changedPaths": [
+        "docs/avalonia/vue-public-api-baseline.md",
+        "spec/baselines/vue-current.json",
+        "spec/components/contracts/v1/vue-public-contracts.json",
+        "spec/components/contracts/v2/contract-v2.json"
+      ],
+      "producerCommands": [
+        "pnpm run avalonia:baseline",
+        "pnpm run component-contracts:generate",
+        "pnpm run contract-v2:generate"
+      ],
+      "scope": "Canonical generated source identities only; API payload, summary and all rendering source/artifact bytes unchanged",
+      "verification": "Three original freshness checks and all 49 original Contract V2 controls passed on these exact four postimages before committing; no independent acceptance claimed"
+    }
+  },
+  "failureDiagnostics": {
+    "scope": "Unchanged strict PNG byte assertion; actual mismatch renders retained in the existing platform artifact directory",
+    "positiveVerification": "Historical diagnostic-helper control: original comparisons passed 2/2 on 2d4f8962; the completed three-platform profile verification is separately bound below",
+    "negativeVerification": "Historical diagnostic-helper control on 2d4f8962: one temporarily perturbed expected byte failed the original assertion and retained the then-sealed actual PNG; bytes restored. This control predates the current raster/profile PNGs and was not rerun on this candidate.",
+    "negativeControlDigest": "b6abb6875842c69f87750c053caf70904838ddac5e7c6f1fa164d06fd8a8dd82",
+    "sourceCandidate": "2d4f89623bd08a4a717d62cf1e3fe35a377f597d"
+  },
+  "rasterVerification": {
+    "producer": "Original manifest generation command, default Debug configuration",
+    "normal": "2/2 original normal-mode Linux strict comparisons on b05b4035; all three complete native suites passed on predecessor 8b856667 as separately bound below",
+    "hostFontCounterfactual": "2/2 original normal-mode comparisons on b05b4035 with changed host font; not relabeled as a new candidate execution",
+    "configurationCounterfactual": "Original Debug and Release producer PNGs matched on source 954fedbb2f",
+    "crossPlatform": "All three normal-mode profiles passed within the complete 675-case suites on predecessor 8b856667; exact new metadata-candidate hosted rerun pending"
+  },
+  "renderProfiles": [
+    {
+      "id": "linux-x64",
+      "platform": "linux",
+      "architecture": "x64",
+      "artifactPaths": [
+        "tests/conformance/visual/artifacts/issue-285-table-v2/table-v2-content-regions-light.png",
+        "tests/conformance/visual/artifacts/issue-285-table-v2/table-v2-whole-header-overlay-light.png"
+      ]
+    },
+    {
+      "id": "windows-x64",
+      "platform": "windows",
+      "architecture": "x64",
+      "artifactPaths": [
+        "tests/conformance/visual/artifacts/issue-285-table-v2/platforms/windows-x64/table-v2-content-regions-light.png",
+        "tests/conformance/visual/artifacts/issue-285-table-v2/platforms/windows-x64/table-v2-whole-header-overlay-light.png"
+      ]
+    },
+    {
+      "id": "macos-arm64",
+      "platform": "macos",
+      "architecture": "arm64",
+      "artifactPaths": [
+        "tests/conformance/visual/artifacts/issue-285-table-v2/platforms/macos-arm64/table-v2-content-regions-light.png",
+        "tests/conformance/visual/artifacts/issue-285-table-v2/platforms/macos-arm64/table-v2-whole-header-overlay-light.png"
+      ]
+    }
+  ],
+  "platformProducerEvidence": {
+    "linux": {
+      "sourceCandidate": "954fedbb2f2de1eee37421974037d812181e837f",
+      "mode": "literal original update producer; default Debug and byte-identical Release",
+      "currentProfileVerification": "At b05b4035: 2/2 normal and 2/2 changed-host-font cases, generation unset; predecessor 8b856667 complete suite 675/675"
+    },
+    "windowsAndMacos": {
+      "workflowRunId": 43730825943,
+      "prHead": "01304c2564ef6fb966707c0e43e62270754437d9",
+      "checkoutCommit": "5a4293d3751bad95c006903795cc4bf3bace257c",
+      "sourceCandidate": "954fedbb2f2de1eee37421974037d812181e837f",
+      "mode": "actual original bitmap producer captured before strict Linux-baseline mismatch; no synthetic or edited pixels",
+      "currentProfileVerification": "At predecessor 8b856667: both complete normal-mode native platform suites 675/675 plus Demo smoke, workflow 43733008585"
+    },
+    "completePredecessorVerification": {
+      "prHead": "8b856667f47fa886e2253fe1ca6ac440053cc6aa",
+      "sourceCandidate": "b05b40350d4e040b635e2db2a9867d27041a1d59",
+      "workflowRun": 43733008585,
+      "results": [
+        {
+          "platform": "linux",
+          "architecture": "x64",
+          "sdk": "10.0.401",
+          "actualCheckout": "460a9f8ebec02e1ad16e124f51a0af8c9a96e141",
+          "tests": {
+            "total": 675,
+            "executed": 675,
+            "passed": 675,
+            "failed": 0,
+            "errors": 0
+          },
+          "smoke": {
+            "project": "dotnet/FsusUI.Avalonia.Demo/FsusUI.Avalonia.Demo.csproj",
+            "status": "passed"
+          }
+        },
+        {
+          "platform": "windows",
+          "architecture": "x64",
+          "sdk": "10.0.401",
+          "actualCheckout": "460a9f8ebec02e1ad16e124f51a0af8c9a96e141",
+          "tests": {
+            "total": 675,
+            "executed": 675,
+            "passed": 675,
+            "failed": 0,
+            "errors": 0
+          },
+          "smoke": {
+            "project": "dotnet/FsusUI.Avalonia.Demo/FsusUI.Avalonia.Demo.csproj",
+            "status": "passed"
+          }
+        },
+        {
+          "platform": "macos",
+          "architecture": "arm64",
+          "sdk": "10.0.401",
+          "actualCheckout": "460a9f8ebec02e1ad16e124f51a0af8c9a96e141",
+          "tests": {
+            "total": 675,
+            "executed": 675,
+            "passed": 675,
+            "failed": 0,
+            "errors": 0
+          },
+          "smoke": {
+            "project": "dotnet/FsusUI.Avalonia.Demo/FsusUI.Avalonia.Demo.csproj",
+            "status": "passed"
+          }
+        }
+      ]
+    },
+    "candidateReverification": {
+      "candidate": "90e4956b1618058cb5858bfb1336f8f7045616b0",
+      "status": "pending",
+      "reason": "The MarkdownEditor palette IME fix and original-producer web provenance have a new source identity. Parent 59a974970d passed three 691-case hosted native suites at actual merge 0258ef9c7883dc8b95bb0e1cbbd2b4977ee7583e; those results are historical for this new candidate. Exact current hosted qualification and independent review remain pending."
+    }
+  },
+  "manifestDigest": "cc85bcc09c2ae07d0143b7b1b3a7416cd980e62bc03f15e45c07f05c2d5a3ecc"
 }

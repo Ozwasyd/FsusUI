@@ -169,7 +169,7 @@ test('Avalonia semantic baselines retain compiler and input freshness identity',
   assert.equal(
     properties.filter((property) => typeof property.required === 'boolean')
       .length,
-    2098,
+    2115,
   )
   assert.equal(properties.filter((property) => property.required).length, 15)
   assert.equal(
@@ -427,12 +427,12 @@ test('Avalonia automation baseline separates source observations from declared a
     ]),
   )
   assert.equal(automationTypes.length, 112)
-  assert.equal(mappings.length, 408)
+  assert.equal(mappings.length, 410)
   assert.deepEqual(semanticCounts, {
     role: 107,
-    name: 123,
+    name: 124,
     value: 4,
-    state: 115,
+    state: 116,
     'help-text': 25,
     'accessibility-view': 22,
     'live-setting': 12,
@@ -680,11 +680,25 @@ test('Avalonia token/theme baseline retains generated authorities and honest dep
   const themes = avaloniaBaselines.avaloniaThemes.tokenThemeContract
   assert.equal(avalonia.definitions.length, 124)
   assert.equal(themes.definitions.length, 124)
+  // Retained Tree rows apply padding in ApplyRowState; the redundant
+  // RefreshRows initializer no longer contributes a second token reference.
   assert.equal(avalonia.dependencies.length, 25)
   assert.equal(themes.dependencies.length, 1000)
   assert.equal(
     avalonia.dependencies.filter((dependency) => dependency.resolved).length,
     25,
+  )
+  assert.ok(
+    avalonia.dependencies.some(
+      (dependency) =>
+        dependency.sourceMember ===
+          'FsusUI.Avalonia.Controls.FsusTree.ApplyRowState' &&
+        dependency.dependency === 'Space2Thickness' &&
+        dependency.canonicalName === 'space.2' &&
+        dependency.resolved &&
+        dependency.ownerType === 'FsusUI.Avalonia.Controls.FsusTree' &&
+        dependency.ownership === 'resolved',
+    ),
   )
   assert.equal(
     themes.dependencies.filter((dependency) => dependency.resolved).length,

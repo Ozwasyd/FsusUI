@@ -43,7 +43,7 @@ public class FsusShortcutRecorderHeadlessTests
     Assert.NotNull(recorder.Value);
     Assert.Equal(Key.P, recorder.Value.Key);
     Assert.Equal(KeyModifiers.Control | KeyModifiers.Shift, recorder.Value.Modifiers);
-    Assert.Equal("Ctrl+Shift+P", recorder.DisplayText);
+    Assert.Equal(OperatingSystem.IsMacOS() ? "Command+Shift+P" : "Ctrl+Shift+P", recorder.DisplayText);
     Assert.Equal(FsusShortcutValidationStatus.Valid, recorder.Status);
     Assert.False(recorder.IsInvalid);
 
@@ -71,7 +71,7 @@ public class FsusShortcutRecorderHeadlessTests
 
     Assert.False(recorder.IsRecording);
     Assert.Equal(initial, recorder.Value);
-    Assert.Equal("Ctrl+S", recorder.DisplayText);
+    Assert.Equal(OperatingSystem.IsMacOS() ? "Command+S" : "Ctrl+S", recorder.DisplayText);
 
     window.Close();
   }
@@ -146,7 +146,7 @@ public class FsusShortcutRecorderHeadlessTests
       Assert.True(recorder.IsArrangeValid);
       Assert.True(recorder.Bounds.Width > 0);
       Assert.True(recorder.Bounds.Height > 0);
-      Assert.Equal("Ctrl+F", recorder.DisplayText);
+      Assert.Equal(OperatingSystem.IsMacOS() ? "Command+F" : "Ctrl+F", recorder.DisplayText);
 
       window.Close();
     }

@@ -2,51 +2,70 @@
   "schema": "fsusui-design-conformance.ui-ux-classification-receipt.v2",
   "ownerRepository": "Ozwasyd/FsusUI",
   "affectedSurfaces": [
-    "Avalonia TableV2 content regions",
-    "Contract V2 TableV2 content-region mapping"
+    "Original TableV2 content/overlay production-control fixtures, verified against real per-platform/architecture PNG producer outputs"
   ],
   "uiDecisionClass": "prescribed",
   "verificationClass": "ux-path",
   "requiredAuthorities": [
     {
-      "id": "design",
+      "id": "docs/index.md",
+      "path": "docs/index.md",
+      "digest": "b7aefe9f989ce962ada16c1fcbabf0613d862dfe0ec2bd016865a1a33d5b6f18"
+    },
+    {
+      "id": "docs/design.md",
       "path": "docs/design.md",
       "digest": "24c88676101dde43bb0907ed173f001b6e1659973caf19701ea57eddf0617039"
     },
     {
-      "id": "design-governance",
+      "id": "docs/design/governance.md",
       "path": "docs/design/governance.md",
-      "digest": "892896b49b21c1f37667ebec8ac7bce08c94e15f53942e0e0b10d1e8b7edb3a5"
+      "digest": "d871bc86ed2a66f3a851f947530ff576c3d1d0a1a37c721d11cf09b1cbc4e104"
     },
     {
-      "id": "change-classification",
+      "id": "docs/design/change-classification.md",
       "path": "docs/design/change-classification.md",
-      "digest": "96a293a38282e63f67976b97b4ecfbd2802ae28812735a6259d25940d56bdc84"
+      "digest": "c5d43303e89931346f9d634dd592ecb54418d15a74ae923f72e52795a115544e"
     },
     {
-      "id": "visual-workflow",
+      "id": "docs/workflows/visual-change.md",
       "path": "docs/workflows/visual-change.md",
-      "digest": "22b63749bd3ed35a4f8c174f4b8b026033bd2d645ffa39e335ba5b30489142b4"
+      "digest": "0bd20f9ae6997aa9b7daeb0cec2f558738565bd0932828617aea2f5b84626042"
     },
     {
-      "id": "avalonia-index",
-      "path": "docs/avalonia/README.md",
-      "digest": "21d1319e8f5fad2c0c541b9c78ce2cb88b87c6dd40552b2d17a846128afcd506"
-    },
-    {
-      "id": "avalonia-virtualization",
+      "id": "docs/avalonia/components/virtualization.md",
       "path": "docs/avalonia/components/virtualization.md",
-      "digest": "2d01b44c296cb07a74394ba5eee35df9d75298d2f9fd6c14a14b6864182a9eb3"
+      "digest": "aca042c7a3077be176c511cec98eb952d959d8e840fe81059d6325a32dbe8982"
     },
     {
-      "id": "platform-differences",
+      "id": "docs/avalonia/platform-differences.md",
       "path": "docs/avalonia/platform-differences.md",
-      "digest": "96dd3a8cbb0724907d5cbead977241f33be09d1450b69953f745071d1dd2998a"
+      "digest": "53a86d45ea16ab2d47e7634f79ac1785e2544f49c43c10568d574887d7d2ad5e"
     },
     {
-      "id": "api-stability",
-      "path": "docs/api-stability.md",
-      "digest": "4d65770a17706c8946781f13529fac477f3ec69bf3f4ac19fbd52cefc2fc5ab1"
+      "id": "spec/tokens/tokens.json",
+      "path": "spec/tokens/tokens.json",
+      "digest": "c97d4b2f3ffcf311fb060b21e12e13367763fb4ca9ba9c8fa4cacf6f72d381d1"
+    },
+    {
+      "id": "spec/platform-overrides/avalonia-linux.yaml",
+      "path": "spec/platform-overrides/avalonia-linux.yaml",
+      "digest": "ef764001987e4847759d980f64cfda1643b258af695f53316339cb0fee2bbafd"
+    },
+    {
+      "id": "spec/platform-overrides/avalonia-windows.yaml",
+      "path": "spec/platform-overrides/avalonia-windows.yaml",
+      "digest": "61255374e99e3f3eac910331facc6f4d08b024a3f40550dfcf8b32d0df6920eb"
+    },
+    {
+      "id": "spec/platform-overrides/avalonia-macos.yaml",
+      "path": "spec/platform-overrides/avalonia-macos.yaml",
+      "digest": "8973a8b071fe0a7e53ac21d422c36a871e66a5a77a0c76b38dc94e248dacf84a"
+    },
+    {
+      "id": "spec/platform-overrides/visual-thresholds.yaml",
+      "path": "spec/platform-overrides/visual-thresholds.yaml",
+      "digest": "c027cfb438addbdc4f3f66b1dfb3c7fb52ba7f7867ea08977176fb9c0fc50521"
     }
   ],
   "requiredSkillDigests": [
@@ -54,39 +73,64 @@
   ],
   "activeBaselineIdentity": {
     "repository": "Ozwasyd/FsusUI",
-    "revision": "c3bd2184effd2e75a6d86a4741a9c0cf75e806bb",
+    "revision": "01304c2564ef6fb966707c0e43e62270754437d9",
     "skillDigest": "c88357a6ba0340000bae5839daeb67a3cd2722e8242cf7e0148006c3610a44fe",
-    "authorityDigest": "0ae22b000bdb8d0451880f4e9405b788c16249cd6cbdb2c6becee22bfa603d80",
+    "authorityDigest": "5e9f3d3abe1010160f440fcbec4152c3b4ac4c5ffe9080f573432d4cc12ff96b",
     "dirtyFingerprint": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
   },
-  "candidateSha": "e9ec7e3c8145b598d41b08d3610ab6f245c258ca",
-  "candidateDigest": "1a9ff9de943cd711c652d4ad3a779e0212e9f074714ba0f69e838a277d1ccb79",
+  "candidateSha": "90e4956b1618058cb5858bfb1336f8f7045616b0",
+  "candidateDigest": "9d6451e3173e7dc21c97de350e74280251866c0f8b68975ba012d29dc0321a4b",
   "stateEvidenceMatrix": [
     {
-      "state": "two-row-scoped-header-populated-footer-empty",
-      "viewport": "avalonia-headless-488x540",
-      "theme": "light",
-      "evidenceDigest": "12c592158d6d33a79c5e97ef319e924e65a7b118071531683551c5d13e660bc8"
-    },
-    {
-      "state": "whole-header-loading-overlay",
+      "state": "Inspected macos original producer table-v2-whole-header-overlay-light.png",
       "viewport": "avalonia-headless-488x320",
       "theme": "light",
-      "evidenceDigest": "3ddb0fef6bcf5080df423f22aa6ab289458032d3bc032a340f59157b3c77a16d"
+      "evidenceDigest": "5763739ddad9c8184aae0cf05c82cc9450d347e615651bf6b9e73e2bd15b7f00"
+    },
+    {
+      "state": "Inspected macos original producer table-v2-content-regions-light.png",
+      "viewport": "avalonia-headless-488x540",
+      "theme": "light",
+      "evidenceDigest": "53622ea260d359a5138ec4e665694d70bf0fe8b6427f6454b050ac523ca36b67"
+    },
+    {
+      "state": "Inspected windows original producer table-v2-whole-header-overlay-light.png",
+      "viewport": "avalonia-headless-488x320",
+      "theme": "light",
+      "evidenceDigest": "870a6309d03db076673ace2cc64da6872d97e5cbdfb225565cc1b927bee9d60a"
+    },
+    {
+      "state": "Inspected windows original producer table-v2-content-regions-light.png",
+      "viewport": "avalonia-headless-488x540",
+      "theme": "light",
+      "evidenceDigest": "fea85f525fa99efd054551725746037dccd1cfe0fbbe5bec8131f4bc2b4d5752"
+    },
+    {
+      "state": "Inspected linux-x64 original producer table-v2-content-regions-light.png",
+      "viewport": "avalonia-headless-488x540",
+      "theme": "light",
+      "evidenceDigest": "bdcbd2013bcbc8b0de9005866c33ab7c543bf5572ad67f47b0ea3336e3e02104"
+    },
+    {
+      "state": "Inspected linux-x64 original producer table-v2-whole-header-overlay-light.png",
+      "viewport": "avalonia-headless-488x320",
+      "theme": "light",
+      "evidenceDigest": "d21f63c789843b6c3717756b9cd778bf4ccf0181452968d1266aba4755dc0aad"
     }
   ],
   "inScope": [
-    "TableV2 header, header-cell, row, footer, empty, and overlay content-region rendering",
-    "scalar and multi-row header heights with exact scoped payload contexts",
-    "fixed light-theme Avalonia production-control renders under reduced motion"
+    "Preserve the same embedded font and explicit antialias/no-hinting fixture prerequisites",
+    "Select a checked-in platform/architecture profile for both original strict PNG byte assertions",
+    "Add actual hosted Windows x64 and macOS arm64 producer PNGs alongside the existing Linux x64 PNGs",
+    "Retain every original structural assertion and require real normal-mode platform rerenders plus independent review"
   ],
   "outOfScope": [
-    "dark-theme, mobile, zoom, screen-reader, and cross-platform pixel-equality claims",
-    "unrelated TableV2 API members and public-value alignment",
-    "new tokens, decoration, content, or adjacent component redesign"
+    "Production controls, font assets, registered typography exceptions, budgets or thresholds",
+    "Skipping original tests, accepting absent profiles, or generating expected images during verification",
+    "Claiming diagnostic capture, author inspection or old receipts are independent current acceptance"
   ],
-  "classificationEvidenceDigest": "fef0fad090c728e09e50b5788f18facd97275cba64bbc03b2ad01ce64899c9bd",
+  "classificationEvidenceDigest": "e10a10e53b59cd560b4f6fc45434b763f6d48a6b8a4fb1d4a7a45265fdab7a72",
   "domainPolicyDigest": "620c4f746c1f259e3b640044975ad2878b7913806038706f7991bee9d72104d3",
   "status": "frozen",
-  "receiptDigest": "b6fa5c3fb4c6c597ce8b310d9941cc7153e9409e43af2106a1a43edf8d51c44e"
+  "receiptDigest": "ba5f133a69e6cd69ba1cdf2a3795df8d79b662b0484a7b8ddb389fe26083aafb"
 }
