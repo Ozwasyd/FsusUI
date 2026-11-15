@@ -10,6 +10,7 @@ Run from the repository root after the locked dependency install:
 
 ```sh
 pnpm run ensure:wasm
+pnpm exec vue-tsc --noEmit -p vue/tests/markdown-identity/tsconfig.json
 pnpm exec playwright test --config vue/playwright.markdown-identity.config.ts
 ```
 
