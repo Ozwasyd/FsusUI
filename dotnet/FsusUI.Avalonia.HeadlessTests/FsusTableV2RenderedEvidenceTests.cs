@@ -272,6 +272,10 @@ public class FsusTableV2RenderedEvidenceTests
 
   private static void AttachTheme(Window window)
   {
+    var surface = Assert.IsAssignableFrom<Visual>(window.Content);
+    TextOptions.SetTextRenderingMode(surface, TextRenderingMode.Antialias);
+    TextOptions.SetTextHintingMode(surface, TextHintingMode.None);
+
     // Sealed renders use the existing embedded face, independent of host fonts.
     window.FontFamily = new FontFamily(
       "avares://FsusUI.Avalonia.HeadlessTests/Assets/Fonts#Google Sans 18pt");
