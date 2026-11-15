@@ -1,3 +1,4 @@
+using System.Runtime.InteropServices;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Templates;
@@ -115,14 +116,7 @@ public class FsusTableV2RenderedEvidenceTests
     surface.Arrange(new Rect(0, 0, 488, 540));
     Dispatcher.UIThread.RunJobs();
 
-    var repositoryRoot = FindRepositoryRoot();
-    var outputDirectory = Path.Combine(
-      repositoryRoot,
-      "tests",
-      "conformance",
-      "visual",
-      "artifacts",
-      "issue-285-table-v2");
+    var outputDirectory = GetArtifactDirectory();
     Directory.CreateDirectory(outputDirectory);
     var outputPath = Path.Combine(outputDirectory, "table-v2-content-regions-light.png");
     using var bitmap = new RenderTargetBitmap(new PixelSize(488, 540), new Vector(96, 96));
@@ -212,13 +206,7 @@ public class FsusTableV2RenderedEvidenceTests
     surface.Arrange(new Rect(0, 0, 488, 320));
     Dispatcher.UIThread.RunJobs();
 
-    var outputDirectory = Path.Combine(
-      FindRepositoryRoot(),
-      "tests",
-      "conformance",
-      "visual",
-      "artifacts",
-      "issue-285-table-v2");
+    var outputDirectory = GetArtifactDirectory();
     Directory.CreateDirectory(outputDirectory);
     var outputPath = Path.Combine(outputDirectory, "table-v2-whole-header-overlay-light.png");
     using var bitmap = new RenderTargetBitmap(new PixelSize(488, 320), new Vector(96, 96));
@@ -272,6 +260,17 @@ public class FsusTableV2RenderedEvidenceTests
 
   private static void AttachTheme(Window window)
   {
+    var surface = Assert.IsAssignableFrom<Visual>(window.Content);
+    TextOptions.SetTextRenderingMode(surface, TextRenderingMode.Antialias);
+    TextOptions.SetTextHintingMode(surface, TextHintingMode.None);
+
+    // Sealed renders use the existing embedded face, independent of host fonts.
+    window.FontFamily = new FontFamily(
+      "avares://FsusUI.Avalonia.HeadlessTests/Assets/Fonts#Google Sans 18pt");
+    Assert.Equal(
+      "Google Sans 18pt",
+      new Typeface(window.FontFamily).GlyphTypeface.FamilyName);
+
     var resources = new ResourceDictionary();
     new FsusThemeManager().Apply(resources, new FsusThemeOptions
     {
@@ -328,8 +327,32 @@ public class FsusTableV2RenderedEvidenceTests
     }
 
     Assert.True(File.Exists(outputPath), $"sealed artifact missing: {outputPath}");
+    if (!File.ReadAllBytes(outputPath).AsSpan().SequenceEqual(bytes))
+    {
+      var platform = OperatingSystem.IsWindows() ? "windows"
+        : OperatingSystem.IsMacOS() ? "macos" : "linux";
+      var diagnostics = Path.Combine(
+        FindRepositoryRoot(), "dotnet", "artifacts", "platform", platform,
+        "render-diagnostics", "table-v2");
+      Directory.CreateDirectory(diagnostics);
+      File.WriteAllBytes(Path.Combine(diagnostics, Path.GetFileName(outputPath)), bytes);
+    }
     Assert.Equal(File.ReadAllBytes(outputPath), bytes);
     return bytes;
+  }
+
+  private static string GetArtifactDirectory()
+  {
+    var root = Path.Combine(
+      FindRepositoryRoot(), "tests", "conformance", "visual", "artifacts", "issue-285-table-v2");
+    var platform = OperatingSystem.IsWindows() ? "windows"
+      : OperatingSystem.IsMacOS() ? "macos"
+      : OperatingSystem.IsLinux() ? "linux"
+      : throw new PlatformNotSupportedException("No TableV2 render profile for this platform.");
+    var architecture = RuntimeInformation.ProcessArchitecture.ToString().ToLowerInvariant();
+    return platform == "linux" && architecture == "x64"
+      ? root
+      : Path.Combine(root, "platforms", $"{platform}-{architecture}");
   }
 
   private static string FindRepositoryRoot()

@@ -1,5 +1,6 @@
 import { createHash } from 'node:crypto'
 import { readFileSync } from 'node:fs'
+import { createRequire } from 'node:module'
 import path from 'node:path'
 import semver from 'semver'
 
@@ -45,6 +46,34 @@ export const consumerMatrixConfigDigest = (repoRoot) =>
       ]),
     ),
   )
+
+export function readConsumerVueVersions(fixtureRoot) {
+  const requireFixture = createRequire(
+    path.resolve(fixtureRoot, 'package.json'),
+  )
+  const vuePackage = requireFixture.resolve('vue/package.json')
+  const requireVue = createRequire(vuePackage)
+  const versions = Object.fromEntries(
+    Object.entries({
+      vue: vuePackage,
+      '@vue/compiler-dom': requireVue.resolve('@vue/compiler-dom/package.json'),
+      '@vue/shared': requireVue.resolve('@vue/shared/package.json'),
+    }).map(([id, file]) => {
+      const { version } = JSON.parse(readFileSync(file, 'utf8'))
+      if (!semver.valid(version))
+        throw new Error(`Consumer Vue dependency ${id} has an invalid version.`)
+      return [id, version]
+    }),
+  )
+  if (
+    versions.vue !== versions['@vue/compiler-dom'] ||
+    versions.vue !== versions['@vue/shared']
+  )
+    throw new Error(
+      `Consumer Vue runtime is not a compatible singleton: ${JSON.stringify(versions)}.`,
+    )
+  return versions
+}
 
 export function readConsumerAuthority(repoRoot) {
   const authorityPath = path.join(

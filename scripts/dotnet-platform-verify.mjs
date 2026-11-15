@@ -5,6 +5,7 @@ import os from 'node:os'
 import path from 'node:path'
 import process from 'node:process'
 import { fileURLToPath } from 'node:url'
+import { platformEnvironment } from './dotnet-platform-environment.mjs'
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const solution = 'dotnet/FsusUI.Avalonia.slnx'
@@ -35,9 +36,12 @@ const output = path.resolve(
 )
 const resultsRoot = path.join(path.dirname(output), 'test-results')
 
+const environment = platformEnvironment(root)
+
 const run = (args, capture = false) =>
   execFileSync('dotnet', args, {
     cwd: dotnetRoot,
+    env: environment,
     encoding: capture ? 'utf8' : undefined,
     stdio: capture ? ['ignore', 'pipe', 'pipe'] : 'inherit',
   })
@@ -137,12 +141,7 @@ const tests = trxFiles.map((file) => {
   }
 })
 
-const gitSha =
-  process.env.GITHUB_SHA ??
-  execFileSync('git', ['rev-parse', 'HEAD'], {
-    cwd: root,
-    encoding: 'utf8',
-  }).trim()
+const gitSha = environment.GITHUB_SHA
 const runtimes = run(['--list-runtimes'], true)
   .trim()
   .split(/\r?\n/u)

@@ -1,4 +1,3 @@
-using System.Runtime.CompilerServices;
 using System.Text.Json;
 using FsusUI.Avalonia.Controls;
 
@@ -374,10 +373,9 @@ public class FsusMarkdownProjectionProducerContractTests
   private static JsonSerializerOptions JsonOptions() =>
     new() { PropertyNameCaseInsensitive = true };
 
-  private static string RepositoryRoot([CallerFilePath] string sourceFile = "")
+  private static string RepositoryRoot()
   {
-    var directory = new DirectoryInfo(
-      Path.GetDirectoryName(sourceFile) ?? string.Empty);
+    var directory = new DirectoryInfo(AppContext.BaseDirectory);
     while (directory is not null)
     {
       if (File.Exists(Path.Combine(

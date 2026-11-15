@@ -1,4 +1,3 @@
-using System.Runtime.CompilerServices;
 using System.Text.Json.Nodes;
 using FsusUI.Avalonia.Controls;
 
@@ -111,9 +110,9 @@ public class FsusMarkdownEditorPairInputVectorTests
       ?? throw new InvalidOperationException("Input vectors are missing the pairInput section.");
   }
 
-  private static string RepositoryRoot([CallerFilePath] string sourceFile = "")
+  private static string RepositoryRoot()
   {
-    var directory = new DirectoryInfo(Path.GetDirectoryName(sourceFile) ?? string.Empty);
+    var directory = new DirectoryInfo(AppContext.BaseDirectory);
     while (directory is not null)
     {
       if (File.Exists(Path.Combine(directory.FullName, "dotnet", "FsusUI.Avalonia.slnx")))

@@ -8,12 +8,12 @@ matrix is complete.
 
 ## Packages and metadata
 
-| Package | Policy |
-| --- | --- |
-| `FsusUI.Avalonia` | Publishable library |
-| `FsusUI.Avalonia.Themes` | Publishable library |
-| `FsusUI.Avalonia.Icons` | Publishable library |
-| `FsusUI.Avalonia.Demo` | Reference shell; publish only with explicit release-owner approval |
+| Package                  | Policy                                                             |
+| ------------------------ | ------------------------------------------------------------------ |
+| `FsusUI.Avalonia`        | Publishable library                                                |
+| `FsusUI.Avalonia.Themes` | Publishable library                                                |
+| `FsusUI.Avalonia.Icons`  | Publishable library                                                |
+| `FsusUI.Avalonia.Demo`   | Reference shell; publish only with explicit release-owner approval |
 
 Each publishable package must define its package metadata: package ID, description, repository
 URL, license, tags, optional readme metadata, deterministic build settings
@@ -38,6 +38,11 @@ pnpm dotnet:package:verify
 solution for the current host and emits its platform manifest. It defaults to
 one worker; set `FSUS_DOTNET_MAX_CPU_COUNT` or `--max-cpu-count` only when the
 headless render workload has been sized for it.
+
+The entry binds its manifest and child WebView fixtures to the actual Git checkout.
+Local callers do not need to supply `FSUS_WEBVIEW_CANDIDATE_SHA`; when supplied,
+it must match that checkout or verification stops before replacing existing output.
+An inherited `GITHUB_SHA` cannot relabel local source as a different candidate.
 
 `dotnet:package:verify` independently restores/builds, packs the unique
 canonical NuGet candidate, validates metadata and contents, runs packed-consumer
