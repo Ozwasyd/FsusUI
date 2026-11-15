@@ -1,0 +1,83 @@
+name: Set up Tree fixture fonts
+description: Install checksum-pinned genuine primary and CJK fallback faces for native Tree tests.
+runs:
+  using: composite
+  steps:
+    - name: Install verified Tree font prerequisites
+      shell: pwsh
+      run: |
+        $ErrorActionPreference = 'Stop'
+        $fontDownloadRoot = Join-Path $env:RUNNER_TEMP 'fsusui-tree-fonts'
+        New-Item -ItemType Directory -Path $fontDownloadRoot -Force | Out-Null
+        $downloads = @(
+          @{
+            Name = 'NotoSansCJKsc-Regular.otf'
+            Uri = 'https://raw.githubusercontent.com/notofonts/noto-cjk/f8d157532fbfaeda587e826d4cd5b21a49186f7c/Sans/OTF/SimplifiedChinese/NotoSansCJKsc-Regular.otf'
+            Sha256 = '2c76254f6fc379fddfce0a7e84fb5385bb135d3e399294f6eeb6680d0365b74b'
+          },
+          @{
+            Name = 'NotoSerifCJKsc-Regular.otf'
+            Uri = 'https://raw.githubusercontent.com/notofonts/noto-cjk/f8d157532fbfaeda587e826d4cd5b21a49186f7c/Serif/OTF/SimplifiedChinese/NotoSerifCJKsc-Regular.otf'
+            Sha256 = '2a2eae2628df83556c54018c41e20fa532c1b862c5256ae8b3f23feb918d12ca'
+          },
+          @{
+            Name = 'dejavu-sans-ttf-2.37.zip'
+            Uri = 'https://github.com/dejavu-fonts/dejavu-fonts/releases/download/version_2_37/dejavu-sans-ttf-2.37.zip'
+            Sha256 = '5c6e497a2f36552cb5ffb112c413a6af39c0f3c47653662b90b4fa6499822fd7'
+          }
+        )
+        foreach ($download in $downloads) {
+          $target = Join-Path $fontDownloadRoot $download.Name
+          Invoke-WebRequest -Uri $download.Uri -OutFile $target
+          $actualHash = (Get-FileHash $target -Algorithm SHA256).Hash
+          if ($actualHash -ne $download.Sha256) { throw "Font checksum mismatch: $($download.Name)" }
+          Write-Host "$($download.Name) SHA256=$actualHash"
+        }
+        $dejavuRoot = Join-Path $fontDownloadRoot 'dejavu'
+        Expand-Archive -Path (Join-Path $fontDownloadRoot 'dejavu-sans-ttf-2.37.zip') -DestinationPath $dejavuRoot -Force
+        $dejavuFaces = @(Get-ChildItem $dejavuRoot -Recurse -File -Filter DejaVuSans.ttf)
+        if ($dejavuFaces.Count -ne 1) { throw 'Expected exactly one official DejaVu Sans regular face' }
+        $faces = @(
+          @{ Path = (Join-Path $fontDownloadRoot 'NotoSansCJKsc-Regular.otf'); Family = 'Noto Sans CJK SC'; Format = 'OpenType' },
+          @{ Path = (Join-Path $fontDownloadRoot 'NotoSerifCJKsc-Regular.otf'); Family = 'Noto Serif CJK SC'; Format = 'OpenType' },
+          @{ Path = $dejavuFaces[0].FullName; Family = 'DejaVu Sans'; Format = 'TrueType' }
+        )
+        $fontUserRoot = [Environment]::GetFolderPath('UserProfile')
+        if ($IsWindows) {
+          $fontDestination = Join-Path $env:WINDIR 'Fonts'
+          Add-Type @'
+        using System.Runtime.InteropServices;
+        public static class FsusTreeFontRegistration {
+          [DllImport("gdi32.dll", EntryPoint = "AddFontResourceW", CharSet = CharSet.Unicode)]
+          public static extern int AddFontResource(string fileName);
+        }
+        '@
+        } elseif ($IsMacOS) {
+          $fontDestination = Join-Path $fontUserRoot 'Library/Fonts'
+        } elseif ($IsLinux) {
+          $fontDataRoot = if ($env:XDG_DATA_HOME) { $env:XDG_DATA_HOME } else { Join-Path $fontUserRoot '.local/share' }
+          $fontDestination = Join-Path $fontDataRoot 'fonts/fsusui-tree-fixtures'
+        } else {
+          throw 'Unsupported native font installation platform'
+        }
+        New-Item -ItemType Directory -Path $fontDestination -Force | Out-Null
+        foreach ($face in $faces) {
+          $fileName = [IO.Path]::GetFileName($face.Path)
+          $installed = Join-Path $fontDestination $fileName
+          Copy-Item -LiteralPath $face.Path -Destination $installed -Force
+          if ((Get-FileHash $installed -Algorithm SHA256).Hash -ne (Get-FileHash $face.Path -Algorithm SHA256).Hash) {
+            throw "Installed font checksum mismatch: $fileName"
+          }
+          if ($IsWindows) {
+            New-ItemProperty -Path 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Fonts' -Name "$($face.Family) ($($face.Format))" -Value $fileName -PropertyType String -Force | Out-Null
+            if ([FsusTreeFontRegistration]::AddFontResource($installed) -le 0) { throw "Font registration failed: $fileName" }
+          }
+        }
+        if ($IsLinux) {
+          & fc-cache -f $fontDestination
+          if ($LASTEXITCODE -ne 0) { throw 'Fontconfig cache refresh failed' }
+          foreach ($face in $faces) {
+            $resolved = & fc-match --format='%{family[0]}' $face.Family
+            if ($LASTEXITCODE -ne 0 -or $resolved -ne $face.Family) { throw "Unresolved required font: $($face.Family)" }
+          }
+        }

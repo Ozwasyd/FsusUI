@@ -122,6 +122,69 @@ if (!webOnly) {
     }
   }
   await run(command, commandArgs)
+
+  // Mirror only validated fields from this completed run, before the gate.
+  // Diagnostic failures must not replace the existing checker result.
+  try {
+    const summary = JSON.parse(
+      await readFile(path.join(output, 'avalonia', 'summary.json'), 'utf8'),
+    )
+    const trees = Array.isArray(summary?.Results)
+      ? summary.Results.filter((result) => result?.Id === 'tree-expand-scroll')
+      : []
+    if (trees.length) {
+      const tree = trees[0]
+      const environment = summary.Environment
+      const runner = summary.Runner
+      const finiteNonnegative = (value) =>
+        typeof value === 'number' && Number.isFinite(value) && value >= 0
+      const positiveCount = (value) => Number.isSafeInteger(value) && value > 0
+      if (
+        summary.SchemaVersion !== 2 ||
+        summary.Kind !== 'real-avalonia-render-measurement' ||
+        trees.length !== 1 ||
+        !['quick', 'full'].includes(summary.Profile) ||
+        !['auto', 'software', 'gpu'].includes(environment?.RequestedBackend) ||
+        environment?.RenderingBackend !==
+          'Avalonia.Rendering.Composition.CompositingRenderer' ||
+        ![
+          'software-no-platform-graphics',
+          'Avalonia.X11.Glx.GlxPlatformGraphics',
+          'Avalonia.OpenGL.Egl.EglPlatformGraphics',
+          'Avalonia.X11.Vulkan.VulkanPlatformGraphics',
+        ].includes(environment?.PlatformGraphicsBackend) ||
+        !Number.isSafeInteger(runner?.Warmups) ||
+        runner.Warmups < 0 ||
+        !positiveCount(runner?.Samples) ||
+        !positiveCount(runner?.LongScrollIterations) ||
+        tree.LongScroll?.Iterations !== runner.LongScrollIterations ||
+        ![tree.FrameMs, tree.MeasureArrangeMs, tree.DrawMs].every(
+          (metric) =>
+            finiteNonnegative(metric?.P95) &&
+            metric?.Samples === runner.Samples,
+        )
+      ) {
+        throw new Error('Invalid Tree diagnostic fields')
+      }
+      console.info(
+        `Avalonia Tree diagnostic: ${JSON.stringify({
+          profile: summary.Profile,
+          requestedBackend: environment.RequestedBackend,
+          renderingBackend: environment.RenderingBackend,
+          platformGraphicsBackend: environment.PlatformGraphicsBackend,
+          scenario: 'tree-expand-scroll',
+          frameP95Ms: tree.FrameMs.P95,
+          layoutP95Ms: tree.MeasureArrangeMs.P95,
+          drawP95Ms: tree.DrawMs.P95,
+          warmups: runner.Warmups,
+          samples: runner.Samples,
+          longScrollIterations: runner.LongScrollIterations,
+        })}`,
+      )
+    }
+  } catch {
+    console.info('Avalonia Tree diagnostic unavailable.')
+  }
 }
 
 if (!webOnly && !avaloniaOnly) {

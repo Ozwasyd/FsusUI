@@ -114,6 +114,17 @@ receipt, and capture paths in JSON evidence. This variable changes only the
 destination; it does not select tests, update tracked baselines, or weaken
 render, pixel, geometry, automation, or composition assertions.
 
+## Native Tree font prerequisites
+
+The Tree fallback-provider controls require genuine Noto Sans CJK SC, Noto
+Serif CJK SC, and DejaVu Sans faces. The native CI jobs install the same
+checksum-pinned upstream fonts through
+[setup-tree-fonts](../.github/actions/setup-tree-fonts/action.yml) before running
+the original tests. Local execution requires these families to be installed.
+A missing face fails the original controls; it does not select a substitute,
+skip a test, or regenerate a visual baseline. Font installation alone does not
+establish cross-platform or independent rendered acceptance.
+
 ## Native TableV2 render profiles
 
 The original [TableV2 fixture producer](../dotnet/FsusUI.Avalonia.HeadlessTests/FsusTableV2RenderedEvidenceTests.cs)
