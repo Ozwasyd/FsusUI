@@ -335,6 +335,16 @@ public class FsusTableV2RenderedEvidenceTests
     }
 
     Assert.True(File.Exists(outputPath), $"sealed artifact missing: {outputPath}");
+    if (!File.ReadAllBytes(outputPath).AsSpan().SequenceEqual(bytes))
+    {
+      var platform = OperatingSystem.IsWindows() ? "windows"
+        : OperatingSystem.IsMacOS() ? "macos" : "linux";
+      var diagnostics = Path.Combine(
+        FindRepositoryRoot(), "dotnet", "artifacts", "platform", platform,
+        "render-diagnostics", "table-v2");
+      Directory.CreateDirectory(diagnostics);
+      File.WriteAllBytes(Path.Combine(diagnostics, Path.GetFileName(outputPath)), bytes);
+    }
     Assert.Equal(File.ReadAllBytes(outputPath), bytes);
     return bytes;
   }
