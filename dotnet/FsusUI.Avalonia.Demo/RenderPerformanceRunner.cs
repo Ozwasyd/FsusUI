@@ -141,6 +141,8 @@ internal static class RenderPerformanceRunner
       }
 
       var frame = new List<double>();
+      var action = new List<double>();
+      var renderAwait = new List<double>();
       var measureArrange = new List<double>();
       var draw = new List<double>();
       var mountUnmount = new List<double>();
@@ -158,6 +160,7 @@ internal static class RenderPerformanceRunner
         var allocationBefore = GC.GetAllocatedBytesForCurrentThread();
         var totalWatch = Stopwatch.StartNew();
         definition.Act(control, index + warmups);
+        var actionFinishedMs = totalWatch.Elapsed.TotalMilliseconds;
         var layoutWatch = Stopwatch.StartNew();
         host.Measure(new Size(1120, 700));
         host.Arrange(new Rect(0, 0, 1120, 700));
@@ -165,9 +168,13 @@ internal static class RenderPerformanceRunner
         var drawWatch = Stopwatch.StartNew();
         Render(host);
         drawWatch.Stop();
+        var renderAwaitStartedMs = totalWatch.Elapsed.TotalMilliseconds;
         await WaitForRenderAsync();
         totalWatch.Stop();
-        frame.Add(totalWatch.Elapsed.TotalMilliseconds);
+        var frameMs = totalWatch.Elapsed.TotalMilliseconds;
+        frame.Add(frameMs);
+        action.Add(actionFinishedMs);
+        renderAwait.Add(frameMs - renderAwaitStartedMs);
         measureArrange.Add(layoutWatch.Elapsed.TotalMilliseconds);
         draw.Add(drawWatch.Elapsed.TotalMilliseconds);
         var mountWatch = Stopwatch.StartNew();
@@ -206,6 +213,8 @@ internal static class RenderPerformanceRunner
       {
         definition.Id,
         FrameMs = frame,
+        ActionMs = action,
+        RenderAwaitMs = renderAwait,
         MeasureArrangeMs = measureArrange,
         DrawMs = draw,
         MountUnmountMs = mountUnmount,
@@ -235,6 +244,8 @@ internal static class RenderPerformanceRunner
       {
         definition.Id,
         FrameMs = Statistics(frame),
+        ActionMs = Statistics(action),
+        RenderAwaitMs = Statistics(renderAwait),
         MeasureArrangeMs = Statistics(measureArrange),
         DrawMs = Statistics(draw),
         MountUnmountMs = Statistics(mountUnmount),
