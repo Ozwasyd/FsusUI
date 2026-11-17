@@ -39,7 +39,7 @@ describe('issue #1082: MarkdownRenderer canonical block anchors and fragment loc
     ].join('\n')
 
     const anchors = collectMarkdownAnchorNodes(source)
-    expect(anchors.filter((node) => node.ok).map((node) => node.fragment)).toEqual([
+    expect(anchors.flatMap((node) => (node.ok ? [node.fragment] : []))).toEqual([
       '#harbor',
       '#detail',
       '#sample',
