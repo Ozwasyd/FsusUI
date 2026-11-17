@@ -314,24 +314,27 @@ public class FsusTree : ContentControl
   private sealed record ViewportAncestorStamp(Visual Visual, Rect Bounds, object? Clip,
     bool ClipToBounds, Matrix Transform, RelativePoint Origin, double Width, double Height,
     double MinWidth, double MinHeight, double MaxWidth, double MaxHeight, Thickness Margin);
+  // Read geometry without creating or applying a transform.
+  private static Matrix ReadVisualTransform(Visual visual) =>
+    visual.GetValue(Visual.RenderTransformProperty)?.Value ?? Matrix.Identity;
   private ViewportAncestorStamp[] CaptureAncestorStamp() => this.GetVisualAncestors().Select(v =>
   {
     var l = v as global::Avalonia.Layout.Layoutable;
     return new ViewportAncestorStamp(v, v.Bounds, v.Clip, v.ClipToBounds,
-      v.RenderTransform?.Value ?? Matrix.Identity, v.RenderTransformOrigin,
+      ReadVisualTransform(v), v.RenderTransformOrigin,
       l?.Width ?? double.NaN, l?.Height ?? double.NaN,
       l?.MinWidth ?? 0, l?.MinHeight ?? 0, l?.MaxWidth ?? double.PositiveInfinity,
       l?.MaxHeight ?? double.PositiveInfinity, l?.Margin ?? default);
   }).ToArray();
   private bool HasSimpleViewportGeometry() => this.GetVisualAncestors().Prepend(this).All(v =>
-    v.Clip is null && (v.RenderTransform?.Value ?? Matrix.Identity) == Matrix.Identity);
+    v.Clip is null && ReadVisualTransform(v) == Matrix.Identity);
   // A same-turn remount can retain the viewport proof only when the current
   // ancestry and clipping still contain the full control.
   private bool RevalidateTranslatedAncestorStamp()
   {
     var current = CaptureAncestorStamp();
     if (!fullEffectiveViewport || !boundedViewport || current.Length == 0 || current.Length != verifiedAncestors.Length ||
-        Clip is not null || (RenderTransform?.Value ?? Matrix.Identity) != Matrix.Identity) return false;
+        Clip is not null || ReadVisualTransform(this) != Matrix.Identity) return false;
     for (var i = 0; i < current.Length; i++)
     {
       var old = verifiedAncestors[i]; var next = current[i];
@@ -355,7 +358,7 @@ public class FsusTree : ContentControl
       viewportCheckQueued = false;
       if (TopLevel.GetTopLevel(this) is null) return;
       var own = new Rect(Bounds.Size);
-      var contains = HasSimpleViewportGeometry() && own.Width > 0 && own.Height > 0 &&
+      var contains = ClipToBounds && HasSimpleViewportGeometry() && own.Width > 0 && own.Height > 0 &&
         lastEffectiveViewport.Inflate(0.001).Contains(own);
       if (contains) verifiedAncestors = CaptureAncestorStamp();
       if (contains == fullEffectiveViewport) return;
@@ -372,7 +375,9 @@ public class FsusTree : ContentControl
       QueueViewportCheck();
     }
     lastAvailableSize = availableSize;
-    var bounded = double.IsFinite(availableSize.Height) && availableSize.Height > 0 &&
+    var bounded = double.IsFinite(availableSize.Width) && availableSize.Width > 0 &&
+      HorizontalAlignment == global::Avalonia.Layout.HorizontalAlignment.Stretch &&
+      double.IsFinite(availableSize.Height) && availableSize.Height > 0 &&
       !this.GetVisualAncestors().Any(x => x is ScrollViewer);
     if (bounded != boundedViewport) { boundedViewport = bounded; RefreshRows(); }
     return base.MeasureOverride(availableSize);
@@ -383,7 +388,7 @@ public class FsusTree : ContentControl
   {
     if (!ReferenceEquals(Content, rowsPanel) &&
         (viewportItems is null || !ReferenceEquals(Content, viewportItems))) return;
-    var eligible = HasSimpleViewportGeometry() && !viewportDetached && !requireLegacyRowGeometry && boundedViewport && fullEffectiveViewport && GetType() == typeof(FsusTree) && flattenedNodes.Count >= 250 &&
+    var eligible = HorizontalAlignment == global::Avalonia.Layout.HorizontalAlignment.Stretch && ClipToBounds && HasSimpleViewportGeometry() && !viewportDetached && !requireLegacyRowGeometry && boundedViewport && fullEffectiveViewport && GetType() == typeof(FsusTree) && flattenedNodes.Count >= 250 &&
       RowPresenter is null && ActiveInlineEdit is null && Filter is null && ChildrenLoader is null;
     if (eligible == usingViewport) return;
     RowChildren.Clear();
@@ -392,7 +397,7 @@ public class FsusTree : ContentControl
     usingViewport = eligible;
     if (eligible)
     {
-      viewportItems ??= new FsusTreeViewportItems(virtualRows);
+      viewportItems ??= new FsusTreeViewportItems(virtualRows, this);
       Content = viewportItems;
     }
     else Content = rowsPanel;
@@ -411,7 +416,7 @@ public class FsusTree : ContentControl
     FsusComponentClasses.SetBaseClasses(this, "fsus-tree");
     Focusable = true;
     Content = rowsPanel;
-    PropertyChanged += (_, e) => { if (e.Property == BoundsProperty) QueueViewportCheck(); };
+    PropertyChanged += (_, e) => { if (e.Property == BoundsProperty || e.Property == ClipToBoundsProperty) QueueViewportCheck(); };
     EffectiveViewportChanged += (_, e) => { lastEffectiveViewport = e.EffectiveViewport; QueueViewportCheck(); };
     SyncState();
   }
@@ -1836,12 +1841,15 @@ internal sealed class FsusTreeViewportItems : ItemsControl
 {
   internal ObservableCollection<Control> Rows { get; }
   protected override Type StyleKeyOverride => typeof(ItemsControl);
-  internal FsusTreeViewportItems(ObservableCollection<Control> rows)
+  internal FsusTreeViewportItems(ObservableCollection<Control> rows, FsusTree tree)
   {
     Rows = rows;
+    // The legacy StackPanel paints into the tree padding. Only the outer tree
+    // owns clipping; the bounded fast path requires its ClipToBounds to be true.
+    ClipToBounds = false;
     ItemsSource = rows;
     Template = new FuncControlTemplate<FsusTreeViewportItems>((owner, scope) =>
-      new global::Avalonia.Controls.Presenters.ItemsPresenter
+      new FsusTreeViewportPresenter(tree)
       {
         Name = "PART_ItemsPresenter",
         ItemsPanel = owner.ItemsPanel,
@@ -1874,5 +1882,34 @@ internal sealed class FsusTreeViewportRow(FsusTreeViewportItems owner) : Border
   {
     protected override string GetClassNameCore() => nameof(Border);
     protected override void BringIntoViewCore() => owner.Realize(row);
+  }
+}
+
+internal sealed class FsusTreeViewportPresenter(FsusTree tree) : global::Avalonia.Controls.Presenters.ItemsPresenter
+{
+  protected override Size ArrangeOverride(Size finalSize)
+  {
+    var origin = this.TranslatePoint(default, tree);
+    var height = origin is { } point && tree.Bounds.Height > 0
+      ? Math.Max(finalSize.Height, tree.Bounds.Height - point.Y)
+      : finalSize.Height;
+    // Keep row width and origin unchanged, but realize through the outer tree
+    // bottom rather than truncating at the inner content/padding boundary.
+    Panel?.Arrange(new Rect(0, 0, finalSize.Width, height));
+    return finalSize;
+  }
+  protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
+  {
+    base.OnAttachedToVisualTree(e);
+    tree.PropertyChanged += TreeBoundsChanged;
+  }
+  protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
+  {
+    tree.PropertyChanged -= TreeBoundsChanged;
+    base.OnDetachedFromVisualTree(e);
+  }
+  private void TreeBoundsChanged(object? sender, AvaloniaPropertyChangedEventArgs e)
+  {
+    if (e.Property == BoundsProperty) InvalidateArrange();
   }
 }
