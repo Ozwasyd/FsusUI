@@ -1,3 +1,4 @@
+import { execFileSync } from 'node:child_process'
 import {
   existsSync,
   readFileSync,
@@ -612,10 +613,40 @@ function toolchainEntries(root) {
   ]
 }
 
-function dockerEntries(root) {
-  const dockerfiles = walkFiles(root, '.', (relative) =>
-    /(^|\/)Dockerfile(?:\.[^/]+)?$/u.test(relative),
+export function listDockerDependencyFiles(root) {
+  const isDockerfile = (relative) =>
+    /(^|\/)Dockerfile(?:\.[^/]+)?$/u.test(relative)
+  if (!existsSync(path.join(root, '.git'))) {
+    return walkFiles(root, '.', isDockerfile).sort()
+  }
+  // Dependency ownership follows tracked sources and new, non-ignored files.
+  // Installed toolchains may contain Dockerfiles, but are not update targets.
+  return execFileSync(
+    'git',
+    [
+      '-C',
+      root,
+      'ls-files',
+      '-z',
+      '--cached',
+      '--others',
+      '--exclude-standard',
+      '--',
+      ':(glob)**/Dockerfile',
+      ':(glob)**/Dockerfile.*',
+    ],
+    { encoding: 'utf8' },
   )
+    .split('\0')
+    .filter(
+      (relative) =>
+        isDockerfile(relative) && existsSync(path.join(root, relative)),
+    )
+    .sort()
+}
+
+function dockerEntries(root) {
+  const dockerfiles = listDockerDependencyFiles(root)
   const images = new Map()
   for (const relative of dockerfiles) {
     const text = readText(root, relative)
