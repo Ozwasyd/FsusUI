@@ -1,8 +1,13 @@
 import { expect, test } from '@playwright/test'
 import type { Page } from '@playwright/test'
 import { attachPageDiagnostics } from '../support/page-diagnostics'
+import { observeManagedMarkdownCancellation } from '../support/managed-markdown-cancellation'
 
 const diagnostics = new WeakMap<Page, string[]>()
+const scrollCancellation = new WeakMap<
+  Page,
+  Awaited<ReturnType<typeof observeManagedMarkdownCancellation>>
+>()
 
 const demoRoutes = [
   { name: 'home', path: '/?theme=light' },
@@ -47,7 +52,8 @@ test.beforeEach(async ({ page }) => {
 })
 
 test.afterEach(async ({ page }) => {
-  expect(diagnostics.get(page) ?? []).toEqual([])
+  const messages = diagnostics.get(page) ?? []
+  expect(scrollCancellation.get(page)?.(messages) ?? messages).toEqual([])
 })
 
 type MarkdownScrollSample = {
@@ -59,12 +65,22 @@ type MarkdownScrollSample = {
 
 const sampleMarkdownStressScroll = async (
   page: Page,
-  options: { steps?: number; delta?: number; delayMs?: number } = {},
+  options: {
+    steps?: number
+    delta?: number
+    delayMs?: number
+    attributeManagedCancellation?: boolean
+  } = {},
 ) => {
-  const { steps = 80, delta = 900, delayMs = 8 } = options
+  const {
+    steps = 80,
+    delta = 900,
+    delayMs = 8,
+    attributeManagedCancellation = false,
+  } = options
 
   return page.evaluate(
-    async ({ delta, delayMs, steps }) => {
+    async ({ delta, delayMs, steps, attributeManagedCancellation }) => {
       const wrap = document.querySelector<HTMLElement>(
         '.markdown-stress-scrollbar .el-scrollbar__wrap',
       )
@@ -111,6 +127,27 @@ const sampleMarkdownStressScroll = async (
 
       for (let index = 0; index < steps; index += 1) {
         const maxScrollTop = Math.max(0, wrap.scrollHeight - wrap.clientHeight)
+        // Virtual-window eviction cancels pending activation on the outgoing
+        // chunks. Capture exact owned realms before this scroll, not a URL
+        // allowlist or a later inspection of already detached frames.
+        if (attributeManagedCancellation) {
+          for (const node of document.querySelectorAll(
+            'iframe[data-fsus-markdown-heavy-pending]',
+          )) {
+            if (
+              node instanceof HTMLIFrameElement &&
+              ['code-highlight', 'mermaid', 'latex'].includes(
+                node.dataset.fsusMarkdownHeavyPending ?? '',
+              ) &&
+              node.getAttribute('aria-hidden') === 'true'
+            )
+              void (
+                node.contentWindow as Window & {
+                  __fsusCaptureScrollMarkdownRealm: () => Promise<void>
+                }
+              ).__fsusCaptureScrollMarkdownRealm()
+          }
+        }
         wrap.scrollTop = Math.min(maxScrollTop, wrap.scrollTop + delta)
         wrap.dispatchEvent(new Event('scroll', { bubbles: true }))
         await waitForFrames()
@@ -126,7 +163,7 @@ const sampleMarkdownStressScroll = async (
 
       return samples
     },
-    { delta, delayMs, steps },
+    { delta, delayMs, steps, attributeManagedCancellation },
   )
 }
 
@@ -816,6 +853,7 @@ test('markdown stress preview scroll remains monotonic while renderer settles', 
 }) => {
   test.setTimeout(60_000)
   await page.setViewportSize({ width: 900, height: 760 })
+  scrollCancellation.set(page, await observeManagedMarkdownCancellation(page))
   await page.goto('/?visual=markdown-stress&theme=light&debugScroll=1', {
     waitUntil: 'domcontentloaded',
   })
@@ -826,6 +864,7 @@ test('markdown stress preview scroll remains monotonic while renderer settles', 
   })
 
   const samples = await sampleMarkdownStressScroll(page, {
+    attributeManagedCancellation: true,
     delayMs: 8,
     steps: 80,
   })
