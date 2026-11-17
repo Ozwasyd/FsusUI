@@ -165,6 +165,8 @@ for (const token of [
   'cache-dependency-path',
   'performance-impact-plan.json',
   'Measure same-runner baseline first',
+  'run-historical-render-baseline.mjs',
+  '--expected-sha',
   'Measure current quick matrix',
   'Repeat current quick matrix for order balance',
   'Repeat baseline quick matrix last for order balance',
@@ -239,4 +241,5 @@ if (failures.length)
     `Real-render performance contract failed:\n${failures.join('\n')}`,
   )
 await import('./test-render-performance-impact-plan.mjs')
+await import('./test-historical-render-baseline.mjs')
 console.info('Real-render performance contract passed.')

@@ -1,4 +1,4 @@
-import { spawn } from 'node:child_process'
+import { execFileSync, spawn } from 'node:child_process'
 import { mkdtemp, mkdir, readFile, rm } from 'node:fs/promises'
 import os from 'node:os'
 import path from 'node:path'
@@ -12,6 +12,11 @@ const valueOf = (name, fallback = '') => {
 }
 const base = valueOf('--base')
 if (!base) throw new Error('Usage: pnpm perf:render:pr --base <ref>')
+const expectedBaseSha = execFileSync(
+  'git',
+  ['rev-parse', '--verify', `${base}^{commit}`],
+  { cwd: root, encoding: 'utf8' },
+).trim()
 const output = path.resolve(root, valueOf('--output', '.tmp/performance/pr'))
 const plan = path.join(output, 'impact-plan.json')
 const run = (command, commandArgs, cwd = root, env = process.env) =>
@@ -70,18 +75,17 @@ try {
     await run('pnpm', ['exec', 'playwright', 'install', 'chromium'], root)
   if (baselineStatus.available) {
     await run('pnpm', ['install', '--frozen-lockfile'], baseline)
-    await run(
-      'pnpm',
-      [
-        'perf:render',
-        '--',
-        '--impact-plan',
-        plan,
-        '--output',
-        path.join(output, 'baseline'),
-      ],
+    await run(process.execPath, [
+      'scripts/run-historical-render-baseline.mjs',
+      '--directory',
       baseline,
-    )
+      '--expected-sha',
+      expectedBaseSha,
+      '--impact-plan',
+      plan,
+      '--output',
+      path.join(output, 'baseline'),
+    ])
   }
   await run('pnpm', [
     'perf:render',
@@ -101,18 +105,17 @@ try {
       path.join(output, 'current-repeat'),
     ])
   if (baselineStatus.available)
-    await run(
-      'pnpm',
-      [
-        'perf:render',
-        '--',
-        '--impact-plan',
-        plan,
-        '--output',
-        path.join(output, 'baseline-repeat'),
-      ],
+    await run(process.execPath, [
+      'scripts/run-historical-render-baseline.mjs',
+      '--directory',
       baseline,
-    )
+      '--expected-sha',
+      expectedBaseSha,
+      '--impact-plan',
+      plan,
+      '--output',
+      path.join(output, 'baseline-repeat'),
+    ])
   if (baselineStatus.available)
     await run('pnpm', [
       'perf:render:compare',

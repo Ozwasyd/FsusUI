@@ -299,9 +299,9 @@ jobs:
         run: |
           baseline_sha="$(git rev-parse --verify HEAD)"
           test "$baseline_sha" = "$EXPECTED_BASE_SHA"
-          GITHUB_SHA="$baseline_sha" pnpm perf:render -- \
+          GITHUB_SHA="$baseline_sha" node ../current/scripts/run-historical-render-baseline.mjs \
+            --directory . --expected-sha "$baseline_sha" \
             --impact-plan ../performance-impact-plan.json \
-            --profile quick \
             --output ../performance-baseline
       - name: Measure current quick matrix
         if: steps.render-impact.outputs.run == 'true'
@@ -327,9 +327,9 @@ jobs:
         run: |
           baseline_sha="$(git rev-parse --verify HEAD)"
           test "$baseline_sha" = "$EXPECTED_BASE_SHA"
-          GITHUB_SHA="$baseline_sha" pnpm perf:render -- \
+          GITHUB_SHA="$baseline_sha" node ../current/scripts/run-historical-render-baseline.mjs \
+            --directory . --expected-sha "$baseline_sha" \
             --impact-plan ../performance-impact-plan.json \
-            --profile quick \
             --output ../performance-baseline-repeat
       - name: Compare against base revision on the same runner
         if: steps.baseline-contract.outputs.available == 'true'

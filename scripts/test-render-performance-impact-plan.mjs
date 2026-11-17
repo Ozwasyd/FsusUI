@@ -220,7 +220,7 @@ if (process.platform !== 'win32') {
         env: gitEnv,
       })
     ).stdout.trim()
-    const pnpm = path.join(bin, 'pnpm')
+    const pnpm = path.join(bin, 'node')
     await writeFile(
       pnpm,
       '#!/bin/sh\nprintf "%s\\n" "$GITHUB_SHA" "$@" > "$RESULT_FILE"\n',
@@ -263,12 +263,13 @@ if (process.platform !== 'win32') {
       await execFileAsync('bash', ['-e', '-c', command], { cwd: checkout, env })
       assert.deepEqual((await readFile(result, 'utf8')).trim().split('\n'), [
         sha,
-        'perf:render',
-        '--',
+        '../current/scripts/run-historical-render-baseline.mjs',
+        '--directory',
+        '.',
+        '--expected-sha',
+        sha,
         '--impact-plan',
         '../performance-impact-plan.json',
-        '--profile',
-        'quick',
         '--output',
         output,
       ])
