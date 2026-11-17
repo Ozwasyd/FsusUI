@@ -129,6 +129,7 @@ test('cold consumer runtime checks install the matching browser on run paths onl
     .split('\n  consumer-install:\n')[1]
     ?.split('\n  build-demo:')[0]
   assert.ok(consumer)
+  assert.match(consumer, /^ {4}runs-on: ubuntu-24\.04$/mu)
   const setup = consumer.indexOf('Install Chromium headless shell')
   assert.ok(setup > consumer.indexOf('run: pnpm install --frozen-lockfile'))
   assert.ok(

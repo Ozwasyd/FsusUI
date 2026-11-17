@@ -690,7 +690,7 @@ jobs:
           artifacts: npm-candidate=dist/npm-candidate
 
   consumer-install:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 45
     needs:
       - static-quality
