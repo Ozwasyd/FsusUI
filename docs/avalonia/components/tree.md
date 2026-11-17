@@ -92,6 +92,13 @@ tree.RefreshView();
 file.InvalidatePresentation();
 ```
 
+For large default trees that are fully visible in a bounded, non-scrolling
+layout, FsusTree can attach only the row visuals needed for that viewport.
+The logical flattened nodes and presentation APIs remain the same. Use those
+APIs rather than enumerating the internal `Content` host. Scrollable or
+partially clipped trees, custom presenters, and active inline editors keep the
+full row layout so their scroll extent, anchors, and behavior stay intact.
+
 ## Inline editing
 
 `StartRename(key, initialValue)` replaces a visible node label with an editor,
