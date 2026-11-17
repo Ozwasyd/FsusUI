@@ -24,55 +24,41 @@ const diagnostics = new WeakMap<Page, string[]>()
 const modeCancellation = new WeakMap<
   Page,
   {
-    origins: Map<Request, Promise<boolean>>
-    verified: Set<Frame>
+    origins: Map<Request, Frame>
     intended: Set<Frame>
     detached: Set<Frame>
     aborted: { request: Request; message: string }[]
   }
 >()
 
-const observeModeCancellation = (page: Page) => {
+const observeModeCancellation = async (page: Page) => {
   const state = {
-    origins: new Map<Request, Promise<boolean>>(),
-    verified: new Set<Frame>(),
+    origins: new Map<Request, Frame>(),
     intended: new Set<Frame>(),
     detached: new Set<Frame>(),
     aborted: [] as { request: Request; message: string }[],
   }
   modeCancellation.set(page, state)
+  // Calling inside the iframe identifies its execution-context Frame before
+  // teardown can defeat an asynchronous frameElement() lookup.
+  await page.exposeBinding(
+    '__fsusCaptureOutgoingMarkdownRealm',
+    ({ frame }) => {
+      if (
+        frame !== page.mainFrame() &&
+        frame.parentFrame() === page.mainFrame()
+      )
+        state.intended.add(frame)
+    },
+  )
   page.on('request', (request) => {
     const frame = request.frame()
-    if (frame === page.mainFrame() || frame.parentFrame() !== page.mainFrame())
-      return
-    state.origins.set(
-      request,
-      frame
-        .frameElement()
-        .then((element) =>
-          element.evaluate(
-            (node) =>
-              node instanceof HTMLIFrameElement &&
-              ['code-highlight', 'mermaid', 'latex'].includes(
-                node.dataset.fsusMarkdownHeavyPending ?? '',
-              ) &&
-              node.getAttribute('aria-hidden') === 'true',
-          ),
-        )
-        .then((valid) => {
-          if (valid) state.verified.add(frame)
-          return valid
-        })
-        .catch(() => false),
-    )
+    if (frame !== page.mainFrame() && frame.parentFrame() === page.mainFrame())
+      state.origins.set(request, frame)
   })
   page.on('framedetached', (frame) => state.detached.add(frame))
   page.on('requestfailed', (request) => {
-    if (
-      request.failure()?.errorText !== 'net::ERR_ABORTED' ||
-      !state.intended.has(request.frame())
-    )
-      return
+    if (request.failure()?.errorText !== 'net::ERR_ABORTED') return
     state.aborted.push({
       request,
       message: `requestfailed: ${request.method()} ${request.url()} net::ERR_ABORTED`,
@@ -200,10 +186,8 @@ test.afterEach(async ({ page }) => {
   for (const failure of cancellation?.aborted ?? []) {
     const frame = failure.request.frame()
     if (
-      !(
-        (await cancellation!.origins.get(failure.request)) ||
-        cancellation!.verified.has(frame)
-      ) ||
+      cancellation!.origins.get(failure.request) !== frame ||
+      !cancellation!.intended.has(frame) ||
       !cancellation!.detached.has(frame)
     )
       continue
@@ -269,7 +253,7 @@ test.describe('markdown editor chrome variants matrix (#429)', () => {
         mode: 'source',
         state: 'long',
       })
-      const cancellation = observeModeCancellation(page)
+      const cancellation = await observeModeCancellation(page)
       const textarea = editor.locator('textarea')
       const instanceId = await editor.getAttribute('data-markdown-instance')
       const valueBefore = await textarea.inputValue()
@@ -287,17 +271,34 @@ test.describe('markdown editor chrome variants matrix (#429)', () => {
             `[role="tablist"] button.${nsModeClass(label)}`,
           )
           if (!(await tab.isVisible())) continue
-          await Promise.all(cancellation.origins.values())
-          // Record only realms already owned by the outgoing mode. Their
-          // request origin is checked separately at request time above.
-          for (const frame of page.frames()) {
-            if (
-              frame !== page.mainFrame() &&
-              frame.parentFrame() === page.mainFrame() &&
-              cancellation.verified.has(frame)
+          // Capture at the real click, after Playwright actionability waits.
+          // Capture realm identity, not URLs or a pre-click list: a realm may be
+          // mounted while click() is waiting, but only outgoing managed nodes
+          // present before this click's handlers run can be cancelled here.
+          await tab.evaluate((button) => {
+            button.addEventListener(
+              'click',
+              () => {
+                for (const node of document.querySelectorAll(
+                  'iframe[data-fsus-markdown-heavy-pending]',
+                )) {
+                  if (
+                    node instanceof HTMLIFrameElement &&
+                    ['code-highlight', 'mermaid', 'latex'].includes(
+                      node.dataset.fsusMarkdownHeavyPending ?? '',
+                    ) &&
+                    node.getAttribute('aria-hidden') === 'true'
+                  )
+                    void (
+                      node.contentWindow as Window & {
+                        __fsusCaptureOutgoingMarkdownRealm: () => Promise<void>
+                      }
+                    ).__fsusCaptureOutgoingMarkdownRealm()
+                }
+              },
+              { capture: true, once: true },
             )
-              cancellation.intended.add(frame)
-          }
+          })
           await tab.click()
           await expect(editor).toHaveClass(
             new RegExp(`el-markdown-editor--${label}`),
