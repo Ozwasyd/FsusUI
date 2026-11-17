@@ -12,6 +12,7 @@ namespace FsusUI.Avalonia.Controls;
 // of each layout, rendering, inherited styling, clipping and automation.
 internal sealed class FsusTreeLabel : TextBlock
 {
+  private static readonly Queue<FsusTreeLabel> PendingCleanup = new();
   private LayoutKey? measuredKey;
   private LayoutKey? arrangedKey;
   private Size measuredSize;
@@ -82,11 +83,19 @@ internal sealed class FsusTreeLabel : TextBlock
     base.OnDetachedFromVisualTree(e);
     if (cleanupPosted || shapingCache is null) return;
     cleanupPosted = true;
-    Dispatcher.UIThread.Post(() =>
+    // Whole-tree moves can detach thousands of labels in one dispatcher turn.
+    PendingCleanup.Enqueue(this);
+    if (PendingCleanup.Count == 1)
+      Dispatcher.UIThread.Post(ReleaseDetachedCaches, DispatcherPriority.Background);
+  }
+
+  private static void ReleaseDetachedCaches()
+  {
+    while (PendingCleanup.TryDequeue(out var label))
     {
-      cleanupPosted = false;
-      if (!this.IsAttachedToVisualTree()) ReleaseShapingCache();
-    }, DispatcherPriority.Background);
+      label.cleanupPosted = false;
+      if (!label.IsAttachedToVisualTree()) label.ReleaseShapingCache();
+    }
   }
 
   private void ReleaseShapingCache()
@@ -106,7 +115,7 @@ internal sealed class FsusTreeLabel : TextBlock
         TopLevel.GetTopLevel(this)?.RenderScaling ?? 1,
         ActualThemeVariant, CultureInfo.CurrentCulture.Name, CultureInfo.CurrentUICulture.Name, Foreground);
 
-  private sealed record LayoutKey(
+  private readonly record struct LayoutKey(
     Size Constraint, string? Text, FontFamily FontFamily, double FontSize,
     FontStyle FontStyle, FontWeight FontWeight, FontStretch FontStretch,
     FlowDirection FlowDirection, double LineHeight, double LineSpacing,

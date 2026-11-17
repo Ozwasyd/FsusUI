@@ -295,6 +295,8 @@ public class FsusTree : ContentControl
   private readonly HashSet<string> selectedKeys = new(StringComparer.Ordinal);
   private readonly HashSet<string> checkedKeys = new(StringComparer.Ordinal);
   private readonly HashSet<FsusTreeNode> presentationSubscriptions = [];
+  private readonly HashSet<FsusTreeNode> currentPresentationNodes = [];
+  private readonly List<FsusTreeNode> removedPresentationNodes = [];
   private readonly Dictionary<string, Border> renderedRows = new(StringComparer.Ordinal);
   private readonly Dictionary<string, FsusTreeLazyLoadState> lazyLoadStates = new(StringComparer.Ordinal);
   private readonly StackPanel rowsPanel = new();
@@ -1408,28 +1410,39 @@ public class FsusTree : ContentControl
 
   private void SyncPresentationSubscriptions()
   {
-    var currentNodes = new HashSet<FsusTreeNode>();
-    CollectNodes(Nodes, currentNodes);
-
-    foreach (var node in presentationSubscriptions.Except(currentNodes).ToArray())
+    try
     {
-      node.PresentationInvalidated -= OnNodePresentationInvalidated;
-      presentationSubscriptions.Remove(node);
+      CollectNodes(Nodes, currentPresentationNodes);
+      foreach (var node in presentationSubscriptions)
+      {
+        if (!currentPresentationNodes.Contains(node))
+          removedPresentationNodes.Add(node);
+      }
+      foreach (var node in removedPresentationNodes)
+      {
+        node.PresentationInvalidated -= OnNodePresentationInvalidated;
+        presentationSubscriptions.Remove(node);
+      }
+      foreach (var node in currentPresentationNodes)
+      {
+        if (presentationSubscriptions.Add(node))
+          node.PresentationInvalidated += OnNodePresentationInvalidated;
+      }
     }
-
-    foreach (var node in currentNodes.Except(presentationSubscriptions))
+    finally
     {
-      node.PresentationInvalidated += OnNodePresentationInvalidated;
-      presentationSubscriptions.Add(node);
+      currentPresentationNodes.Clear();
+      removedPresentationNodes.Clear();
     }
   }
 
   private static void CollectNodes(
-    IEnumerable<FsusTreeNode> nodes,
-    ISet<FsusTreeNode> destination)
+    Collection<FsusTreeNode> nodes,
+    HashSet<FsusTreeNode> destination)
   {
-    foreach (var node in nodes)
+    for (var index = 0; index < nodes.Count; index++)
     {
+      var node = nodes[index];
       if (!destination.Add(node))
       {
         continue;
