@@ -14,8 +14,12 @@ describe('ImageViewer toolbar wheel ownership', () => {
     async (selector) => {
       const wrapper = mount(<ImageViewer urlList={[IMAGE_SUCCESS]} />)
       try {
-        await wrapper.get('img').trigger('load')
         const image = wrapper.get('img')
+        Object.defineProperty(image.element, 'complete', {
+          value: true,
+          configurable: true,
+        })
+        await image.trigger('load')
         const initialStyle = image.attributes('style')
         for (const delta of [{ deltaY: 120 }, { deltaX: -120 }]) {
           const wheel = new WheelEvent('wheel', {
