@@ -260,7 +260,7 @@ async function main() {
   )
   await writeFile(
     path.join(output, 'historical-process.log'),
-    result.stdout + '\n' + result.stderr,
+    `${result.stdout}\n${result.stderr}`,
   )
   await identity()
   await validateBaselineEvidence(output, plan, sha, startedAt)
@@ -294,7 +294,7 @@ async function main() {
   }
   await writeFile(
     path.join(output, 'historical-measurement-status.json'),
-    JSON.stringify(status, null, 2) + '\n',
+    `${JSON.stringify(status, null, 2)}\n`,
   )
   console.info(
     `Historical baseline ${status.status}; candidate absolute limits and paired comparison remain required.`,

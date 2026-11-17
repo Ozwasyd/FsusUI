@@ -83,7 +83,7 @@ export function validateGovernanceStages({
     )
   }
   assert.ok(
-    !/^    if:/mu.test(job(reusable, 'dotnet-package')),
+    !/^ {4}if:/mu.test(job(reusable, 'dotnet-package')),
     'Required producer must not become conditional',
   )
   assert.ok(

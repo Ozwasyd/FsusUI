@@ -1,24 +1,30 @@
 #!/usr/bin/env node
 import assert from 'node:assert/strict'
 import { createRequire } from 'node:module'
-import { mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+import {
+  mkdtempSync,
+  mkdirSync,
+  readFileSync,
+  rmSync,
+  writeFileSync,
+} from 'node:fs'
 import { execFileSync } from 'node:child_process'
 import { tmpdir } from 'node:os'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { auditModels } from './check-update-surface.mjs'
-import { buildExpectedUpdateSurface, listDockerDependencyFiles } from './update-surface-lib.mjs'
+import {
+  buildExpectedUpdateSurface,
+  listDockerDependencyFiles,
+} from './update-surface-lib.mjs'
 
 const require = createRequire(import.meta.url)
 const JSON5 = require('json5')
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
-const read = (relative) =>
-  readFileSync(path.join(root, relative), 'utf8')
+const read = (relative) => readFileSync(path.join(root, relative), 'utf8')
 const clone = (value) => structuredClone(value)
 
-const surface = JSON.parse(
-  read('config/dependencies/update-surface.json'),
-)
+const surface = JSON.parse(read('config/dependencies/update-surface.json'))
 const schema = JSON.parse(
   read('config/dependencies/update-surface.schema.json'),
 )

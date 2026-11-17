@@ -83,7 +83,7 @@ try {
     { code: 2 },
     { signal: 'SIGTERM' },
     { stderr: 'Error: build failed\n' },
-    { stderr: result.stderr + 'Error: infrastructure failure\n' },
+    { stderr: `${result.stderr}Error: infrastructure failure\n` },
     { stderr: result.stderr.replace('tree-expand-scroll', 'other-scenario') },
   ])
     assert.throws(() =>
