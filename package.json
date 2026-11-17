@@ -20,7 +20,7 @@
     "test:consumer-install": "node ./scripts/with-node-heap.mjs node ./scripts/test-consumer-install.mjs",
     "test:consumer-matrix": "node ./scripts/with-node-heap.mjs node ./scripts/consumer-matrix.mjs",
     "test:consumer-matrix:candidate": "pnpm test:consumer-matrix -- --candidate dist/npm-candidate/fsusui-npm-candidate.tgz",
-    "test:consumer-matrix:fixtures": "node --test ./scripts/consumer-install-args.test.mjs ./scripts/consumer-matrix-lib.test.mjs",
+    "test:consumer-matrix:fixtures": "node --test ./scripts/consumer-install-args.test.mjs ./scripts/consumer-matrix-lib.test.mjs ./scripts/consumer-matrix-impact.test.mjs",
     "_test:run": "node ./scripts/with-node-heap.mjs vitest run --config vue/vitest.config.ts",
     "_test:unit:parallel": "node ./scripts/run-capacity-unit.mjs",
     "_test:unit:components": "node ./scripts/with-node-heap.mjs vitest run --config vue/vitest.config.ts vue/packages/components",

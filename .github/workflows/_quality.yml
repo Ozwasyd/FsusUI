@@ -749,6 +749,7 @@ jobs:
         with:
           name: consumer-matrix-${{ inputs.group }}
           path: .consumer-matrix
+          include-hidden-files: true
           if-no-files-found: error
           retention-days: 30
       - name: Record consumer matrix leaf result

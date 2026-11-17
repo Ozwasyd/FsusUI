@@ -2,7 +2,6 @@ import { createHash } from 'node:crypto'
 import { readFileSync } from 'node:fs'
 import { createRequire } from 'node:module'
 import path from 'node:path'
-import semver from 'semver'
 
 export const consumerMatrixSchema = 'fsusui.consumer-matrix-receipt.v1'
 export const consumerProfileSchema = 'fsusui.consumer-profile-receipt.v1'
@@ -48,6 +47,7 @@ export const consumerMatrixConfigDigest = (repoRoot) =>
   )
 
 export function readConsumerVueVersions(fixtureRoot) {
+  const semver = createRequire(import.meta.url)('semver')
   const requireFixture = createRequire(
     path.resolve(fixtureRoot, 'package.json'),
   )
@@ -100,6 +100,7 @@ export function readConsumerAuthority(repoRoot) {
 }
 
 export function resolveConsumerProfile({ authority, candidatePackage, name }) {
+  const semver = createRequire(import.meta.url)('semver')
   if (!consumerProfiles.includes(name)) {
     throw new Error(
       `Unknown consumer profile ${name}; implicit defaults are forbidden.`,
