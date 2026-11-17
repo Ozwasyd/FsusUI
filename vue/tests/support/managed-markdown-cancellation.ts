@@ -1,9 +1,112 @@
 import type { Frame, Page, Request } from '@playwright/test'
 
-// Only explicit test actions may attribute a managed realm cancellation. The
-// iframe calls this binding itself, preserving its exact execution-context
-// Frame even when synchronous teardown defeats frameElement() inspection.
+// Test-only observation of the actual lazy adapter's external abort path.
+// Ordinary resolve/error cleanup is untouched. Source-shape drift fails closed;
+// no production module, URL-based diagnostic allowlist, or lifecycle is changed.
+export const instrumentManagedBridgeTeardown = (source: string) => {
+  const start = source.indexOf(
+    'const createMarkdownHeavyFeatureAdapterResourceBridgeInternal =',
+  )
+  const end = source.indexOf(
+    'const createMarkdownHeavyFeatureAdapterResourceBridge =',
+    start + 1,
+  )
+  if (start < 0 || end < 0)
+    throw new Error('Managed bridge instrumentation boundary missing')
+  const body = source.slice(start, end)
+  const marker = /return Object\.freeze\(\{\s*resources,\s*run,\s*snapshot:/g
+  if (
+    [...body.matchAll(marker)].length !== 1 ||
+    !/\n\s*teardown,?\s*\n/.test(body)
+  )
+    throw new Error('Managed bridge instrumentation shape changed')
+  const instrumented = body
+    .replace(
+      marker,
+      `let observedRequest;
+  return Object.freeze({
+    resources,
+    run: (...args) => { observedRequest = args[2]; return run(...args); },
+    snapshot:`,
+    )
+    .replace(
+      /\n(\s*)teardown,?\s*\n/,
+      `
+    teardown: () => {
+      try {
+        if (taskActive && isolatedHandle)
+          window.__fsusObserveBridgeAbort?.(observedRequest);
+      } finally { return teardown(); }
+    },
+`,
+    )
+  return source.slice(0, start) + instrumented + source.slice(end)
+}
+
+export const isManagedMarkdownBridgeModule = (url: URL) =>
+  url.pathname.endsWith('/vue/packages/wasm/markdown-heavy-feature-resource.ts')
+
 export const observeManagedMarkdownCancellation = async (page: Page) => {
+  await page.route(isManagedMarkdownBridgeModule, async (route) => {
+    const response = await route.fetch()
+    const source = await response.text()
+    await route.fulfill({
+      response,
+      body: instrumentManagedBridgeTeardown(source),
+    })
+  })
+  await page.addInitScript(() => {
+    const scope = window as Window & {
+      __fsusMeasuredMarkdownScroll?: boolean
+      __fsusObserveBridgeAbort?: (request?: {
+        lifecycleKey?: string
+        kind?: string
+      }) => void
+    }
+    scope.__fsusObserveBridgeAbort = (request) => {
+      if (!scope.__fsusMeasuredMarkdownScroll || !request?.lifecycleKey) return
+      const renderers = document.querySelectorAll<HTMLElement>(
+        '.markdown-stress-content[data-markdown-heavy-lifecycle]',
+      )
+      if (renderers.length !== 1) return
+      const metrics = JSON.parse(
+        renderers[0].dataset.markdownHeavyLifecycle ?? '{}',
+      )
+      const identities = metrics.identitySequences?.[request.kind ?? ''] ?? []
+      if (
+        !identities.some(
+          (identity: {
+            documentKey: string
+            documentEpoch: number
+            nodeId: string
+          }) =>
+            [
+              identity.documentKey,
+              identity.documentEpoch,
+              identity.nodeId,
+              request.kind,
+            ].join(':') === request.lifecycleKey,
+        )
+      )
+        return
+      const frames = Array.from(
+        document.querySelectorAll<HTMLIFrameElement>(
+          'iframe[data-fsus-markdown-heavy-node]',
+        ),
+      ).filter(
+        (frame) =>
+          frame.dataset.fsusMarkdownHeavyNode === request.lifecycleKey &&
+          frame.dataset.fsusMarkdownHeavyPending === request.kind &&
+          frame.getAttribute('aria-hidden') === 'true',
+      )
+      if (frames.length !== 1) return
+      void (
+        frames[0].contentWindow as Window & {
+          __fsusCaptureScrollMarkdownRealm: () => Promise<void>
+        }
+      ).__fsusCaptureScrollMarkdownRealm()
+    }
+  })
   const intended = new Set<Frame>()
   const detached = new Set<Frame>()
   const origins = new Map<Request, Frame>()

@@ -125,42 +125,32 @@ const sampleMarkdownStressScroll = async (
         new Promise<void>((resolve) => setTimeout(resolve, ms))
       const samples: MarkdownScrollSample[] = []
 
-      for (let index = 0; index < steps; index += 1) {
-        const maxScrollTop = Math.max(0, wrap.scrollHeight - wrap.clientHeight)
-        // Virtual-window eviction cancels pending activation on the outgoing
-        // chunks. Capture exact owned realms before this scroll, not a URL
-        // allowlist or a later inspection of already detached frames.
-        if (attributeManagedCancellation) {
-          for (const node of document.querySelectorAll(
-            'iframe[data-fsus-markdown-heavy-pending]',
-          )) {
-            if (
-              node instanceof HTMLIFrameElement &&
-              ['code-highlight', 'mermaid', 'latex'].includes(
-                node.dataset.fsusMarkdownHeavyPending ?? '',
-              ) &&
-              node.getAttribute('aria-hidden') === 'true'
-            )
-              void (
-                node.contentWindow as Window & {
-                  __fsusCaptureScrollMarkdownRealm: () => Promise<void>
-                }
-              ).__fsusCaptureScrollMarkdownRealm()
-          }
-        }
-        wrap.scrollTop = Math.min(maxScrollTop, wrap.scrollTop + delta)
-        wrap.dispatchEvent(new Event('scroll', { bubbles: true }))
-        await waitForFrames()
-        if (delayMs > 0) await wait(delayMs)
-
-        samples.push({
-          clientHeight: wrap.clientHeight,
-          scrollHeight: wrap.scrollHeight,
-          scrollTop: wrap.scrollTop,
-          section: sectionFromViewport(),
-        })
+      const cancellationScope = window as Window & {
+        __fsusMeasuredMarkdownScroll?: boolean
       }
+      if (attributeManagedCancellation)
+        cancellationScope.__fsusMeasuredMarkdownScroll = true
+      try {
+        for (let index = 0; index < steps; index += 1) {
+          const maxScrollTop = Math.max(
+            0,
+            wrap.scrollHeight - wrap.clientHeight,
+          )
+          wrap.scrollTop = Math.min(maxScrollTop, wrap.scrollTop + delta)
+          wrap.dispatchEvent(new Event('scroll', { bubbles: true }))
+          await waitForFrames()
+          if (delayMs > 0) await wait(delayMs)
 
+          samples.push({
+            clientHeight: wrap.clientHeight,
+            scrollHeight: wrap.scrollHeight,
+            scrollTop: wrap.scrollTop,
+            section: sectionFromViewport(),
+          })
+        }
+      } finally {
+        cancellationScope.__fsusMeasuredMarkdownScroll = false
+      }
       return samples
     },
     { delta, delayMs, steps, attributeManagedCancellation },
