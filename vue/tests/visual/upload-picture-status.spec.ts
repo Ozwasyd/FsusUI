@@ -1,8 +1,12 @@
-import { expect, test } from '@playwright/test'
 import type { Locator, Page } from '@playwright/test'
 import { buildVisualUrl } from '../../../scripts/visual-variant.mjs'
 import { collectCssRules } from '../support/css-scan'
 import { attachPageDiagnostics } from '../support/page-diagnostics'
+import {
+  expect,
+  test,
+  type VisualViewportName,
+} from '../support/visual-variant-fixture'
 
 const diagnostics = new WeakMap<Page, string[]>()
 
@@ -168,6 +172,7 @@ test('the rendered contract rejects reintroduced rotated ribbon geometry', async
 
 test('picture states remain readable at narrow widths, zoom, RTL and reduced motion', async ({
   page,
+  useVisualViewport,
 }, testInfo) => {
   const fixture = page.locator('[data-upload-variant="picture-status"]')
   const success = fixture.locator('.el-upload-list__item.is-success')
@@ -175,8 +180,13 @@ test('picture states remain readable at narrow widths, zoom, RTL and reduced mot
     '[data-upload-variant="picture-status-disabled"] .el-upload-list__item',
   )
   await expect(fixture.locator('.el-upload-list__item')).toHaveCount(4)
-  for (const width of [320, 375, 768, 1366]) {
-    await page.setViewportSize({ width, height: 1000 })
+  for (const viewport of [
+    'upload-320',
+    'upload-375',
+    'upload-768',
+    'upload-1366',
+  ] as const satisfies readonly VisualViewportName[]) {
+    await useVisualViewport(viewport)
     for (const zoom of [1, 1.5, 2]) {
       await fixture.evaluate((element, value) => {
         element.style.zoom = String(value)
