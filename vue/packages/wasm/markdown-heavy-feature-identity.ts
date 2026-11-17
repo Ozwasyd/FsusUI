@@ -45,6 +45,8 @@ const nodesByKind = (projection: MarkdownStableProjection) => ({
 
 export const createMarkdownHeavyFeatureProjectionTracker =
   (): MarkdownHeavyFeatureProjectionTracker => {
+    let previousSource: string | undefined
+    let previousSnapshot: MarkdownHeavyFeatureProjectionSnapshot | null = null
     let previousProjection: MarkdownStableProjection | undefined
     let previousDocument: Readonly<{ epoch: number; id: string }> | null = null
 
@@ -53,6 +55,16 @@ export const createMarkdownHeavyFeatureProjectionTracker =
         input: Parameters<MarkdownHeavyFeatureProjectionTracker['project']>[0],
       ) {
         if (!Number.isInteger(input.documentEpoch)) return null
+        // Mounted chunks share one source projection. Reuse only the last exact
+        // document input; feature theme/config/revision remain activation-owned.
+        if (
+          previousSnapshot &&
+          previousSource === input.source &&
+          previousDocument?.id === input.documentKey &&
+          previousDocument?.epoch === input.documentEpoch
+        ) {
+          return previousSnapshot
+        }
         const documentIdentity = Object.freeze({
           epoch: input.documentEpoch as number,
           id: input.documentKey,
@@ -81,9 +93,11 @@ export const createMarkdownHeavyFeatureProjectionTracker =
         previousProjection = projection
         previousDocument = documentIdentity
 
-        return Object.freeze({
+        previousSource = input.source
+        previousSnapshot = Object.freeze({
           nodeIds: Object.freeze(nodesByKind(projection)),
         })
+        return previousSnapshot
       },
     })
   }
