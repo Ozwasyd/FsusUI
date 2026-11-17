@@ -98,6 +98,9 @@ import { isFsusErr, toFsusError } from '@element-plus/utils'
 import {
   markdownRendererProps,
   resolveMarkdownWorkerScriptUrl,
+  type MarkdownFragmentLocateResult,
+  type MarkdownFragmentRevealOptions,
+  type MarkdownFragmentRevealResult,
 } from './markdown-renderer'
 import type { FsusRenderPipelineAdapter } from '@element-plus/hooks'
 import type {
@@ -1344,7 +1347,214 @@ onBeforeUnmount(() => {
   heavyLifecycle.dispose()
 })
 
+const normalizeFragmentTarget = (
+  input: string,
+): { readonly id: string; readonly fragment: string } | null => {
+  const trimmed = input.trim()
+  if (!trimmed) return null
+  const rawId = trimmed.startsWith('#') ? trimmed.slice(1) : trimmed
+  if (!rawId) return null
+  let decoded = rawId
+  try {
+    decoded = decodeURIComponent(rawId)
+  } catch {
+    decoded = rawId
+  }
+  if (!decoded || /[\0\r\n]/.test(decoded)) return null
+  return {
+    id: decoded,
+    fragment: `#${decoded}`,
+  }
+}
+
+const escapeRegExpPattern = (value: string) =>
+  value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+
+const hasFragmentIdInHtml = (html: string, id: string) => {
+  if (!html.includes(id)) return false
+  return new RegExp(`(?:^|[\\s<])id=["']${escapeRegExpPattern(id)}["']`).test(
+    html,
+  )
+}
+
+const findMountedFragmentElement = (id: string): HTMLElement | null => {
+  const root = rootEl.value
+  if (!root) return null
+  return root.querySelector<HTMLElement>(
+    `[id="${escapeCssAttributeValue(id)}"]`,
+  )
+}
+
+const resolveElementChunkLocation = (element: HTMLElement) => {
+  const unitEl = element.closest<HTMLElement>('[data-fsus-render-unit-key]')
+  if (!unitEl) {
+    return {
+      chunkIndex: -1,
+      chunkKey: null as string | null,
+    }
+  }
+  const chunkKey = unitEl.dataset.fsusRenderUnitKey ?? null
+  const rawIndex = unitEl.dataset.fsusRenderUnitIndex
+  const parsedIndex =
+    rawIndex !== undefined && rawIndex !== '' ? Number(rawIndex) : Number.NaN
+  return {
+    chunkIndex: Number.isInteger(parsedIndex)
+      ? parsedIndex
+      : chunkKey
+        ? chunkUnits.value.findIndex((unit) => unit.key === chunkKey)
+        : -1,
+    chunkKey,
+  }
+}
+
+const locateFragment = (fragmentOrId: string): MarkdownFragmentLocateResult => {
+  const target = normalizeFragmentTarget(fragmentOrId)
+  if (!target) {
+    return {
+      found: false,
+      mounted: false,
+      id: '',
+      fragment: '',
+      chunkIndex: -1,
+      chunkKey: null,
+      element: null,
+    }
+  }
+
+  const mountedElement = findMountedFragmentElement(target.id)
+  if (mountedElement) {
+    const location = resolveElementChunkLocation(mountedElement)
+    return {
+      found: true,
+      mounted: true,
+      id: target.id,
+      fragment: target.fragment,
+      chunkIndex: location.chunkIndex,
+      chunkKey: location.chunkKey,
+      element: mountedElement,
+    }
+  }
+
+  const chunkIndex = chunkUnits.value.findIndex((unit) =>
+    hasFragmentIdInHtml(unit.html, target.id),
+  )
+  if (chunkIndex >= 0) {
+    return {
+      found: true,
+      mounted: false,
+      id: target.id,
+      fragment: target.fragment,
+      chunkIndex,
+      chunkKey: chunkUnits.value[chunkIndex]?.key ?? null,
+      element: null,
+    }
+  }
+
+  return {
+    found: false,
+    mounted: false,
+    id: target.id,
+    fragment: target.fragment,
+    chunkIndex: -1,
+    chunkKey: null,
+    element: null,
+  }
+}
+
+const scrollElementIntoFragmentView = (
+  element: HTMLElement,
+  options?: MarkdownFragmentRevealOptions,
+) => {
+  const behavior = options?.behavior ?? 'auto'
+  const block = options?.block ?? 'start'
+  if (typeof element.scrollIntoView === 'function') {
+    element.scrollIntoView({ behavior, block })
+    return
+  }
+  const viewport = findScrollContainer(rootEl.value)
+  if (viewport) {
+    const targetTop =
+      viewport.scrollTop +
+      (element.getBoundingClientRect().top -
+        viewport.getBoundingClientRect().top)
+    viewport.scrollTop = Math.max(0, targetTop)
+  }
+}
+
+const revealFragment = async (
+  fragmentOrId: string,
+  options?: MarkdownFragmentRevealOptions,
+): Promise<MarkdownFragmentRevealResult> => {
+  const initial = locateFragment(fragmentOrId)
+  if (!initial.found) {
+    return {
+      ok: false,
+      id: initial.id,
+      fragment: initial.fragment,
+      chunkIndex: -1,
+      chunkKey: null,
+      element: null,
+    }
+  }
+
+  if (initial.mounted && initial.element) {
+    scrollElementIntoFragmentView(initial.element, options)
+    return {
+      ok: true,
+      id: initial.id,
+      fragment: initial.fragment,
+      chunkIndex: initial.chunkIndex,
+      chunkKey: initial.chunkKey,
+      element: initial.element,
+    }
+  }
+
+  const root = rootEl.value
+  const viewport = findScrollContainer(root)
+  if (root && viewport && initial.chunkIndex >= 0) {
+    const isDocumentViewport =
+      viewport === document.documentElement ||
+      viewport === document.body ||
+      viewport === document.scrollingElement
+    const rootOffsetInViewport = isDocumentViewport
+      ? root.getBoundingClientRect().top + window.scrollY
+      : root.getBoundingClientRect().top -
+        viewport.getBoundingClientRect().top +
+        viewport.scrollTop
+    const estimatedChunkOffset = virtualWindow.offsetForIndex(
+      initial.chunkIndex,
+    )
+    const targetScrollTop = Math.max(
+      0,
+      rootOffsetInViewport + estimatedChunkOffset,
+    )
+    viewport.scrollTop = targetScrollTop
+    if (isDocumentViewport && typeof window.scrollTo === 'function') {
+      window.scrollTo({ top: targetScrollTop, behavior: 'auto' })
+    }
+    virtualWindow.readViewport()
+    await nextTick()
+    await settleRenderViewport('markdown-render-reveal-fragment')
+  }
+
+  const resolvedElement = findMountedFragmentElement(initial.id)
+  if (resolvedElement) {
+    scrollElementIntoFragmentView(resolvedElement, options)
+  }
+
+  return {
+    ok: resolvedElement !== null,
+    id: initial.id,
+    fragment: initial.fragment,
+    chunkIndex: initial.chunkIndex,
+    chunkKey: initial.chunkKey,
+    element: resolvedElement,
+  }
+}
+
 defineExpose({
+  locateFragment,
+  revealFragment,
   rootEl,
 })
 </script>

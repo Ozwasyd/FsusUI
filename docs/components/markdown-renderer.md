@@ -194,8 +194,10 @@ Large documents prefer the Render Pipeline adapter's shared Worker pool. Each po
 
 ### Exposes
 
-| 名称   | 说明         |
-| ------ | ------------ |
-| rootEl | 渲染容器元素 |
+| 名称           | 说明                                                               |
+| -------------- | ------------------------------------------------------------------ |
+| rootEl         | 渲染容器元素                                                       |
+| locateFragment | 同步查询解析块锚点或标题片段目标在当前文档/分块中的定位信息        |
+| revealFragment | 定位并滚动到指定 `#fragment` / `id` 块（支持自动展开未挂载虚拟分块） |
 
 Shared theme invalidation aborts pending heavy-feature work immediately and remains subscribed during replacement parsing. Aborted or superseded async stages cannot emit stale render completion/profile/error events; disabling heavy features and unmount remove the listener.

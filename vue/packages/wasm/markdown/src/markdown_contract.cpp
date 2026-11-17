@@ -741,7 +741,8 @@ std::string render_heading(
   std::string_view line,
   const render_request& request,
   std::vector<std::string>& footnote_refs,
-  const std::vector<reference_def>& reference_defs
+  const std::vector<reference_def>& reference_defs,
+  std::string_view anchor_id = {}
 ) {
   const std::string_view trimmed = trim_left(line);
   std::size_t level = 0;
@@ -757,9 +758,14 @@ std::string render_heading(
     content = trim_right(content.substr(0, content.size() - 1));
   }
   std::string out;
-  out.reserve(content.size() + 32);
+  out.reserve(content.size() + anchor_id.size() + 40);
   out.append("<h");
   out.push_back(static_cast<char>('0' + level));
+  if (!anchor_id.empty()) {
+    out.append(" id=\"");
+    out.append(anchor_id);
+    out.push_back('"');
+  }
   out.append(">");
   out.append(render_inline(content, request, footnote_refs, reference_defs));
   out.append("</h");
@@ -950,7 +956,8 @@ std::string render_list(
   const render_request& request,
   std::vector<std::string>& footnote_refs,
   std::vector<footnote_def>& footnote_defs,
-  std::vector<reference_def>& reference_defs
+  std::vector<reference_def>& reference_defs,
+  const std::vector<std::string_view>* item_anchors = nullptr
 ) {
   if (items.empty()) {
     return {};
@@ -959,12 +966,18 @@ std::string render_list(
   std::string out;
   out.reserve(128 + items.size() * 64);
   out.append(ordered ? "<ol>" : "<ul>");
-  for (const auto& item : items) {
+  for (std::size_t item_index = 0; item_index < items.size(); ++item_index) {
+    const auto& item = items[item_index];
     bool checked = false;
     std::string_view task_content;
     const bool is_task = !ordered && parse_task_list_marker(item, checked, task_content);
     const std::string_view item_content = is_task ? task_content : std::string_view(item);
     out.append("<li");
+    if (item_anchors && item_index < item_anchors->size() && !(*item_anchors)[item_index].empty()) {
+      out.append(" id=\"");
+      out.append((*item_anchors)[item_index]);
+      out.push_back('"');
+    }
     out.append(inline_flow_class_attr(
       item_content,
       "markdown-renderer__list-item",
@@ -1255,10 +1268,17 @@ std::string render_table_row(
   const std::vector<table_alignment>& alignments,
   const render_request& request,
   std::vector<std::string>& footnote_refs,
-  const std::vector<reference_def>& reference_defs
+  const std::vector<reference_def>& reference_defs,
+  std::string_view anchor_id = {}
 ) {
   std::string out;
-  out.append("<tr>");
+  if (anchor_id.empty()) {
+    out.append("<tr>");
+  } else {
+    out.append("<tr id=\"");
+    out.append(anchor_id);
+    out.append("\">");
+  }
 
   const std::size_t column_count = std::max(cells.size(), alignments.size());
   for (std::size_t index = 0; index < column_count; ++index) {
@@ -1283,7 +1303,8 @@ std::string render_table_block(
   std::size_t& index,
   const render_request& request,
   std::vector<std::string>& footnote_refs,
-  const std::vector<reference_def>& reference_defs
+  const std::vector<reference_def>& reference_defs,
+  const std::vector<std::string_view>* line_end_anchors = nullptr
 ) {
   if (index + 1 >= lines.size()) {
     return {};
@@ -1307,8 +1328,10 @@ std::string render_table_block(
   }
 
   std::string html;
+  const std::string_view header_anchor =
+    line_end_anchors && index < line_end_anchors->size() ? (*line_end_anchors)[index] : std::string_view{};
   html.append("<table><thead>");
-  html.append(render_table_row(header_cells, true, alignments, request, footnote_refs, reference_defs));
+  html.append(render_table_row(header_cells, true, alignments, request, footnote_refs, reference_defs, header_anchor));
   html.append("</thead><tbody>");
 
   std::size_t cursor = separator_index + 1;
@@ -1334,7 +1357,9 @@ std::string render_table_block(
       break;
     }
 
-    html.append(render_table_row(split_table_cells(row), false, alignments, request, footnote_refs, reference_defs));
+    const std::string_view row_anchor =
+      line_end_anchors && cursor < line_end_anchors->size() ? (*line_end_anchors)[cursor] : std::string_view{};
+    html.append(render_table_row(split_table_cells(row), false, alignments, request, footnote_refs, reference_defs, row_anchor));
     ++cursor;
   }
 
@@ -1427,6 +1452,246 @@ std::string render_paragraph_group(
     + "</section>";
 }
 
+bool is_valid_block_anchor_id(std::string_view id) {
+  if (id.empty() || id.size() > 64) {
+    return false;
+  }
+  if (id[0] < 'a' || id[0] > 'z') {
+    return false;
+  }
+  for (std::size_t index = 1; index < id.size(); ++index) {
+    const char ch = id[index];
+    const bool valid =
+      (ch >= 'a' && ch <= 'z') ||
+      (ch >= '0' && ch <= '9') ||
+      ch == '-';
+    if (!valid) {
+      return false;
+    }
+  }
+  return true;
+}
+
+bool match_fence_open_prefix(std::string_view line, char& delimiter_out, std::size_t& count_out) {
+  std::size_t indent = 0;
+  while (indent < line.size() && indent < 3 && (line[indent] == ' ' || line[indent] == '\t')) {
+    ++indent;
+  }
+  if (indent < line.size() && (line[indent] == ' ' || line[indent] == '\t')) {
+    return false;
+  }
+  if (indent >= line.size() || (line[indent] != '`' && line[indent] != '~')) {
+    return false;
+  }
+  const char marker = line[indent];
+  std::size_t run = 0;
+  while (indent + run < line.size() && line[indent + run] == marker) {
+    ++run;
+  }
+  if (run < 3) {
+    return false;
+  }
+  delimiter_out = marker;
+  count_out = run;
+  return true;
+}
+
+bool match_fence_close_line(std::string_view line, char delimiter, std::size_t min_count) {
+  char found_delimiter = '\0';
+  std::size_t count = 0;
+  if (!match_fence_open_prefix(line, found_delimiter, count) || found_delimiter != delimiter || count < min_count) {
+    return false;
+  }
+  std::size_t cursor = 0;
+  while (cursor < line.size() && (line[cursor] == ' ' || line[cursor] == '\t')) {
+    ++cursor;
+  }
+  cursor += count;
+  while (cursor < line.size() && (line[cursor] == ' ' || line[cursor] == '\t' || line[cursor] == '\r')) {
+    ++cursor;
+  }
+  return cursor == line.size();
+}
+
+bool is_atomic_anchor_owner_line(std::string_view line) {
+  const std::string_view left = trim_left(line);
+  if (left.starts_with('|')) {
+    return true;
+  }
+  std::size_t indent = 0;
+  while (indent < line.size() && indent < 3 && (line[indent] == ' ' || line[indent] == '\t')) {
+    ++indent;
+  }
+  if (indent < line.size() && (line[indent] == ' ' || line[indent] == '\t')) {
+    return false;
+  }
+  const std::string_view after_indent = line.substr(indent);
+  char fence_delim = '\0';
+  std::size_t fence_count = 0;
+  if (match_fence_open_prefix(line, fence_delim, fence_count)) {
+    return true;
+  }
+  if (after_indent.starts_with("$$") || after_indent.starts_with(":::")) {
+    return true;
+  }
+  if (after_indent.starts_with("::") && after_indent.size() > 3 && after_indent[2] >= 'a' && after_indent[2] <= 'z') {
+    std::size_t cursor = 2;
+    while (cursor < after_indent.size() && ((after_indent[cursor] >= 'a' && after_indent[cursor] <= 'z') || (after_indent[cursor] >= '0' && after_indent[cursor] <= '9') || after_indent[cursor] == '-')) {
+      ++cursor;
+    }
+    if (cursor < after_indent.size() && after_indent[cursor] == '[') {
+      return true;
+    }
+  }
+  return false;
+}
+
+std::vector<std::uint8_t> mark_atomic_anchor_regions(const std::vector<std::string_view>& lines) {
+  std::vector<std::uint8_t> inside(lines.size(), 0);
+  char fence_delim = '\0';
+  std::size_t fence_len = 0;
+  bool in_latex = false;
+  bool in_container = false;
+
+  for (std::size_t index = 0; index < lines.size(); ++index) {
+    const std::string_view line = lines[index];
+    const std::string_view trimmed = trim(line);
+
+    if (fence_len > 0) {
+      inside[index] = 1;
+      if (match_fence_close_line(line, fence_delim, fence_len)) {
+        fence_delim = '\0';
+        fence_len = 0;
+      }
+      continue;
+    }
+
+    if (in_latex) {
+      inside[index] = 1;
+      std::size_t indent = 0;
+      while (indent < line.size() && indent < 3 && (line[indent] == ' ' || line[indent] == '\t')) {
+        ++indent;
+      }
+      if (trim(line.substr(indent)) == "$$") {
+        in_latex = false;
+      }
+      continue;
+    }
+
+    if (in_container) {
+      inside[index] = 1;
+      std::size_t indent = 0;
+      while (indent < line.size() && indent < 3 && (line[indent] == ' ' || line[indent] == '\t')) {
+        ++indent;
+      }
+      if (trim(line.substr(indent)) == ":::") {
+        in_container = false;
+      }
+      continue;
+    }
+
+    if (match_fence_open_prefix(line, fence_delim, fence_len)) {
+      inside[index] = 1;
+      continue;
+    }
+
+    std::size_t indent = 0;
+    while (indent < line.size() && indent < 3 && (line[indent] == ' ' || line[indent] == '\t')) {
+      ++indent;
+    }
+    const std::string_view after_indent = line.substr(indent);
+    if (after_indent.starts_with("$$") && indent == line.size() - after_indent.size()) {
+      inside[index] = 1;
+      const std::string_view rest = trim_right(after_indent.substr(2));
+      if (!rest.ends_with("$$")) {
+        in_latex = true;
+      }
+      continue;
+    }
+    if (after_indent.size() > 3 && after_indent.starts_with(":::") && after_indent[3] != ' ' && after_indent[3] != '\t' && after_indent[3] != '\r') {
+      inside[index] = 1;
+      in_container = true;
+      continue;
+    }
+    (void)trimmed;
+  }
+  return inside;
+}
+
+bool parse_block_anchor_candidate(
+  std::string_view line,
+  std::string_view& id_out,
+  std::size_t& strip_len_out,
+  bool& exclusive_out
+) {
+  std::size_t end = line.size();
+  while (end > 0 && (line[end - 1] == ' ' || line[end - 1] == '\t' || line[end - 1] == '\r')) {
+    --end;
+  }
+  std::size_t token_start = end;
+  while (token_start > 0) {
+    const char ch = line[token_start - 1];
+    const bool is_token =
+      (ch >= 'a' && ch <= 'z') ||
+      (ch >= 'A' && ch <= 'Z') ||
+      (ch >= '0' && ch <= '9') ||
+      ch == '-' ||
+      ch == '_';
+    if (!is_token) {
+      break;
+    }
+    --token_start;
+  }
+  if (token_start == 0 || token_start == end || line[token_start - 1] != '^') {
+    return false;
+  }
+  const std::size_t caret = token_start - 1;
+  const std::string_view id_candidate = line.substr(token_start, end - token_start);
+  if (caret == 0) {
+    if (!is_valid_block_anchor_id(id_candidate)) {
+      return false;
+    }
+    id_out = id_candidate;
+    strip_len_out = 0;
+    exclusive_out = true;
+    return true;
+  }
+  if (line[caret - 1] != ' ') {
+    return false;
+  }
+  const std::size_t strip_len = caret - 1;
+  if (trim(line.substr(0, strip_len)).empty()) {
+    return false;
+  }
+  if (!is_valid_block_anchor_id(id_candidate)) {
+    return false;
+  }
+  id_out = id_candidate;
+  strip_len_out = strip_len;
+  exclusive_out = false;
+  return true;
+}
+
+bool inject_block_anchor_id(std::string& block_html, std::string_view anchor_id) {
+  if (anchor_id.empty() || block_html.empty() || block_html[0] != '<') {
+    return false;
+  }
+  const std::size_t gt = block_html.find('>');
+  if (gt == std::string::npos) {
+    return false;
+  }
+  const std::string_view opening = std::string_view(block_html).substr(0, gt);
+  if (opening.find(" id=\"") != std::string_view::npos) {
+    return false;
+  }
+  const std::size_t pos = block_html.find_first_of(" >/", 1);
+  if (pos == std::string::npos || pos > gt) {
+    return false;
+  }
+  block_html.insert(pos, " id=\"" + std::string(anchor_id) + "\"");
+  return true;
+}
+
 std::string render_document_v2(
   std::string_view source,
   const render_request& request,
@@ -1506,11 +1771,68 @@ std::string render_document_v2(
     line_columns.push_back(column_origins ? (*column_origins)[raw_index] : 0);
   }
 
+  std::vector<std::string_view> line_end_anchors(lines.size());
+  std::vector<std::string_view> following_anchors(lines.size());
+  std::vector<std::uint8_t> consumed_anchor_lines(lines.size(), 0);
+  if (is_top_level && !lines.empty()) {
+    const std::vector<std::uint8_t> inside_atomic = mark_atomic_anchor_regions(lines);
+    std::vector<std::string_view> seen_anchor_ids;
+    auto is_seen_anchor = [&](std::string_view candidate) {
+      for (const auto existing : seen_anchor_ids) {
+        if (existing == candidate) {
+          return true;
+        }
+      }
+      return false;
+    };
+    for (std::size_t line_idx = 0; line_idx < lines.size(); ++line_idx) {
+      if (inside_atomic[line_idx]) {
+        continue;
+      }
+      const std::string_view raw_line = lines[line_idx];
+      if (!raw_line.empty() && raw_line[0] == '^' && raw_line != "^") {
+        std::string_view parsed_id;
+        std::size_t strip_len = 0;
+        bool is_exclusive = false;
+        if (!parse_block_anchor_candidate(raw_line, parsed_id, strip_len, is_exclusive) || !is_exclusive) {
+          continue;
+        }
+        if (line_idx == 0) {
+          continue;
+        }
+        const std::string_view previous_line = lines[line_idx - 1];
+        if (trim(previous_line).empty() || !is_atomic_anchor_owner_line(previous_line)) {
+          continue;
+        }
+        if (is_seen_anchor(parsed_id)) {
+          continue;
+        }
+        seen_anchor_ids.push_back(parsed_id);
+        following_anchors[line_idx - 1] = parsed_id;
+        continue;
+      }
+      std::string_view parsed_id;
+      std::size_t strip_len = 0;
+      bool is_exclusive = false;
+      if (!parse_block_anchor_candidate(raw_line, parsed_id, strip_len, is_exclusive) || is_exclusive) {
+        continue;
+      }
+      if (is_seen_anchor(parsed_id)) {
+        continue;
+      }
+      seen_anchor_ids.push_back(parsed_id);
+      line_end_anchors[line_idx] = parsed_id;
+      lines[line_idx] = raw_line.substr(0, strip_len);
+    }
+  }
+
   std::string html;
   html.reserve(source.size() + 256);
 
   std::string paragraph;
+  std::string_view paragraph_anchor;
   std::vector<std::string> list_items;
+  std::vector<std::string_view> list_item_anchors;
   bool list_ordered = false;
   bool in_code_block = false;
   bool in_latex_block = false;
@@ -1519,10 +1841,24 @@ std::string render_document_v2(
   std::string code_buffer;
   std::string latex_buffer;
 
+  auto attach_following_anchor = [&](std::size_t owner_line, std::string& block_html) {
+    if (owner_line >= following_anchors.size() || following_anchors[owner_line].empty()) {
+      return;
+    }
+    if (inject_block_anchor_id(block_html, following_anchors[owner_line]) && owner_line + 1 < consumed_anchor_lines.size()) {
+      consumed_anchor_lines[owner_line + 1] = 1;
+    }
+  };
+
   auto flush_paragraph = [&]() {
     const std::string_view trimmed = trim(paragraph);
     if (!trimmed.empty()) {
       html.append("<p");
+      if (!paragraph_anchor.empty()) {
+        html.append(" id=\"");
+        html.append(paragraph_anchor);
+        html.push_back('"');
+      }
       html.append(inline_flow_class_attr(
         trimmed,
         "markdown-renderer__text",
@@ -1533,17 +1869,19 @@ std::string render_document_v2(
       html.append("</p>");
     }
     paragraph.clear();
+    paragraph_anchor = {};
   };
 
   auto flush_list = [&]() {
     if (list_items.empty()) {
       return;
     }
-    html.append(render_list(list_items, list_ordered, request, footnote_refs, footnote_defs, reference_defs));
+    html.append(render_list(list_items, list_ordered, request, footnote_refs, footnote_defs, reference_defs, &list_item_anchors));
     list_items.clear();
+    list_item_anchors.clear();
   };
 
-  auto flush_code = [&]() {
+  auto flush_code = [&](std::size_t closing_line) {
     if (code_buffer.empty()) {
       return;
     }
@@ -1551,28 +1889,28 @@ std::string render_document_v2(
     const std::string_view language = trim(fence_lang);
     const std::string_view code_view = code_buffer;
     const bool is_mermaid = language == "mermaid";
-    if (is_mermaid && request.allow_mermaid) {
-      html.append(mermaid::render_block(code_view));
-    } else {
-      html.append(escape_and_wrap_code(code_view, language));
-    }
+    std::string block_html = (is_mermaid && request.allow_mermaid)
+      ? mermaid::render_block(code_view)
+      : escape_and_wrap_code(code_view, language);
+    attach_following_anchor(closing_line, block_html);
+    html.append(block_html);
     code_buffer.clear();
     fence_lang = {};
   };
 
-  auto flush_latex = [&]() {
+  auto flush_latex = [&](std::size_t closing_line) {
     if (latex_buffer.empty()) {
       return;
     }
 
-    if (request.allow_latex) {
-      html.append(latex::render_fragment({
-        latex_buffer,
-        latex::fragment_kind::block_math
-      }));
-    } else {
-      html.append(escape_and_wrap_code(latex_buffer, "latex"));
-    }
+    std::string block_html = request.allow_latex
+      ? latex::render_fragment({
+          latex_buffer,
+          latex::fragment_kind::block_math
+        })
+      : escape_and_wrap_code(latex_buffer, "latex");
+    attach_following_anchor(closing_line, block_html);
+    html.append(block_html);
     latex_buffer.clear();
   };
 
@@ -1583,7 +1921,7 @@ std::string render_document_v2(
     if (in_code_block) {
       if (parse_fence_end(line, fence_char)) {
         in_code_block = false;
-        flush_code();
+        flush_code(index);
       } else {
         code_buffer.append(line.data(), line.size());
         code_buffer.push_back('\n');
@@ -1594,11 +1932,15 @@ std::string render_document_v2(
     if (in_latex_block) {
       if (trimmed == "$$") {
         in_latex_block = false;
-        flush_latex();
+        flush_latex(index);
       } else {
         latex_buffer.append(line.data(), line.size());
         latex_buffer.push_back('\n');
       }
+      continue;
+    }
+
+    if (consumed_anchor_lines[index]) {
       continue;
     }
 
@@ -1642,8 +1984,14 @@ std::string render_document_v2(
       flush_paragraph();
       flush_list();
       std::size_t quote_index = index;
-      const std::string quote_html = render_blockquote(lines, quote_index, request, footnote_refs, footnote_defs, reference_defs, line_columns);
+      std::string quote_html = render_blockquote(lines, quote_index, request, footnote_refs, footnote_defs, reference_defs, line_columns);
       if (!quote_html.empty()) {
+        for (std::size_t q = index; q < quote_index && q < line_end_anchors.size(); ++q) {
+          if (!line_end_anchors[q].empty()) {
+            inject_block_anchor_id(quote_html, line_end_anchors[q]);
+            break;
+          }
+        }
         html.append(quote_html);
         index = quote_index;
       }
@@ -1664,7 +2012,13 @@ std::string render_document_v2(
       if (setext_level > 0 && !trimmed.empty() && trimmed.front() != '>' && !is_indented_code_line(line, line_columns[index]) && !parse_fence_start(line, setext_fence_char, setext_fence_lang)) {
         flush_paragraph();
         flush_list();
-        html.append(setext_level == 1 ? "<h1>" : "<h2>");
+        html.append(setext_level == 1 ? "<h1" : "<h2");
+        if (!line_end_anchors[index].empty()) {
+          html.append(" id=\"");
+          html.append(line_end_anchors[index]);
+          html.push_back('"');
+        }
+        html.push_back('>');
         html.append(render_inline(trimmed, request, footnote_refs, reference_defs));
         html.append(setext_level == 1 ? "</h1>" : "</h2>");
         ++index;
@@ -1673,7 +2027,7 @@ std::string render_document_v2(
     }
 
     if (trimmed.front() == '#' && !is_indented_code_line(line, line_columns[index])) {
-      const std::string heading_html = render_heading(line, request, footnote_refs, reference_defs);
+      const std::string heading_html = render_heading(line, request, footnote_refs, reference_defs, line_end_anchors[index]);
       if (!heading_html.empty()) {
         flush_paragraph();
         flush_list();
@@ -1681,6 +2035,9 @@ std::string render_document_v2(
       } else {
         if (!paragraph.empty()) {
           paragraph.push_back(' ');
+        }
+        if (paragraph_anchor.empty() && !line_end_anchors[index].empty()) {
+          paragraph_anchor = line_end_anchors[index];
         }
         paragraph.append(trimmed.data(), trimmed.size());
       }
@@ -1748,11 +2105,11 @@ std::string render_document_v2(
         ++mermaid_index;
       }
 
-      if (request.allow_mermaid) {
-        html.append(mermaid::render_block(mermaid_buffer));
-      } else {
-        html.append(escape_and_wrap_code(mermaid_buffer, "mermaid"));
-      }
+      std::string mermaid_html = request.allow_mermaid
+        ? mermaid::render_block(mermaid_buffer)
+        : escape_and_wrap_code(mermaid_buffer, "mermaid");
+      attach_following_anchor(mermaid_index, mermaid_html);
+      html.append(mermaid_html);
 
       index = mermaid_index;
       continue;
@@ -1762,14 +2119,14 @@ std::string render_document_v2(
       flush_paragraph();
       flush_list();
       if (trimmed.size() > 4 && trimmed.ends_with("$$")) {
-        if (request.allow_latex) {
-          html.append(latex::render_fragment({
-            trimmed.substr(2, trimmed.size() - 4),
-            latex::fragment_kind::block_math
-          }));
-        } else {
-          html.append(escape_and_wrap_code(trimmed.substr(2, trimmed.size() - 4), "latex"));
-        }
+        std::string latex_html = request.allow_latex
+          ? latex::render_fragment({
+              trimmed.substr(2, trimmed.size() - 4),
+              latex::fragment_kind::block_math
+            })
+          : escape_and_wrap_code(trimmed.substr(2, trimmed.size() - 4), "latex");
+        attach_following_anchor(index, latex_html);
+        html.append(latex_html);
       } else {
         in_latex_block = true;
         latex_buffer.clear();
@@ -1785,8 +2142,9 @@ std::string render_document_v2(
       flush_paragraph();
       flush_list();
       std::size_t table_index = index;
-      const std::string table_html = render_table_block(lines, table_index, request, footnote_refs, reference_defs);
+      std::string table_html = render_table_block(lines, table_index, request, footnote_refs, reference_defs, &line_end_anchors);
       if (!table_html.empty()) {
+        attach_following_anchor(table_index, table_html);
         html.append(table_html);
         index = table_index;
         continue;
@@ -1798,22 +2156,26 @@ std::string render_document_v2(
     if (parse_unordered_list_item(line, list_item)) {
       flush_paragraph();
       if (!list_items.empty() && list_ordered) {
-        html.append(render_list(list_items, list_ordered, request, footnote_refs, footnote_defs, reference_defs));
+        html.append(render_list(list_items, list_ordered, request, footnote_refs, footnote_defs, reference_defs, &list_item_anchors));
         list_items.clear();
+        list_item_anchors.clear();
       }
       list_ordered = false;
       list_items.emplace_back(list_item);
+      list_item_anchors.push_back(line_end_anchors[index]);
       continue;
     }
 
     if (parse_ordered_list_item(line, list_item)) {
       flush_paragraph();
       if (!list_items.empty() && !list_ordered) {
-        html.append(render_list(list_items, list_ordered, request, footnote_refs, footnote_defs, reference_defs));
+        html.append(render_list(list_items, list_ordered, request, footnote_refs, footnote_defs, reference_defs, &list_item_anchors));
         list_items.clear();
+        list_item_anchors.clear();
       }
       list_ordered = true;
       list_items.emplace_back(list_item);
+      list_item_anchors.push_back(line_end_anchors[index]);
       continue;
     }
 
@@ -1821,14 +2183,17 @@ std::string render_document_v2(
     if (!paragraph.empty()) {
       paragraph.push_back(' ');
     }
+    if (paragraph_anchor.empty() && !line_end_anchors[index].empty()) {
+      paragraph_anchor = line_end_anchors[index];
+    }
     paragraph.append(trimmed.data(), trimmed.size());
   }
 
   if (in_code_block) {
-    flush_code();
+    flush_code(lines.size());
   }
   if (in_latex_block) {
-    flush_latex();
+    flush_latex(lines.size());
   }
   flush_paragraph();
   flush_list();

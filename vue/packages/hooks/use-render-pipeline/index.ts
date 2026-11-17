@@ -2194,6 +2194,7 @@ export const useFsusVirtualWindow = <TUnit>(options: {
   return {
     bottomSpacer,
     connect,
+    offsetForIndex,
     readViewport,
     range,
     scrollOffset,
