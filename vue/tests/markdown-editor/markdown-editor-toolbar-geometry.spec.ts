@@ -8,6 +8,7 @@ for (const theme of ['light', 'dark'] as const) {
   ]) {
     test(`overflow follows toolbar page scroll and stays beside horizontal commands ${theme} ${viewport.width}x${viewport.height}`, async ({
       page,
+      browserName,
     }) => {
       await page.setViewportSize(viewport)
       await page.emulateMedia({ colorScheme: theme })
@@ -62,7 +63,11 @@ for (const theme of ['light', 'dark'] as const) {
       await expect(more).toHaveCSS('position', 'static')
       const textarea = editor.locator('textarea')
       await textarea.focus()
-      await textarea.press('Shift+Tab')
+      await textarea.press(
+        process.platform === 'darwin' && browserName === 'webkit'
+          ? 'Alt+Shift+Tab'
+          : 'Shift+Tab',
+      )
       await expect(more).toBeFocused()
       await expect(more).toBeInViewport()
       await more.press('Enter')

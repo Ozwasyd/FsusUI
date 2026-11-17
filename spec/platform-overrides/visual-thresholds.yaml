@@ -39,7 +39,7 @@ thresholds:
     allowedDeviation: medium
     testPolicy: pixelmatch-plus-lab
     owner: fsusui-core
-    reviewAfter: 2026-10-01
+    reviewAfter: 2027-02-28
     linkedIssues: [719]
   - id: visual-vue-parity-batch3-text-003
     area: typography
@@ -53,5 +53,5 @@ thresholds:
     allowedDeviation: elementCrop
     testPolicy: pixelmatch-plus-lab
     owner: fsusui-core
-    reviewAfter: 2026-11-01
+    reviewAfter: 2027-02-28
     linkedIssues: [717]

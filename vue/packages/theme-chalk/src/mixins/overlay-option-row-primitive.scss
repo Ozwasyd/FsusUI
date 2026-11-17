@@ -53,6 +53,14 @@
       }
     }
 
+    @media (hover: none) and (pointer: coarse) {
+      &:not(.selected):not(.is-selected):hover,
+      &:not(.selected):not(.is-selected).hover {
+        background-color: transparent;
+        color: var(--fsus-el-text-color-regular, var(--el-text-color-regular));
+      }
+    }
+
     // Selected
     &.selected {
       color: var(--fsus-scholarly-blue);

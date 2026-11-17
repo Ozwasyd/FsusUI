@@ -63,7 +63,7 @@ test('reduced and globally disabled motion bypass snapshots without changing foc
   const button = page.getByTestId('vt-state')
   await button.focus()
   const before = await page.evaluate(() => window.scrollY)
-  await button.click()
+  await button.press('Enter')
 
   await expect(page.getByTestId('vt-status')).toContainText('fallback backend')
   await expect(button).toBeFocused()

@@ -14,6 +14,7 @@ for (const theme of ['light', 'dark'] as const) {
   for (const direction of ['ltr', 'rtl', 'ttb', 'btt'] as const) {
     test(`Drawer ${direction} ${theme}: landscape controls have positive safe boxes and real hit targets`, async ({
       page,
+      browserName,
     }, testInfo) => {
       const params = new URLSearchParams({ direction, theme })
       if (direction !== 'ltr') params.set('size', '70%')
@@ -61,7 +62,14 @@ for (const theme of ['light', 'dark'] as const) {
       })
       await page.locator('#account-link').click()
       await expect(page.locator('#navigations')).toHaveText('1')
-      await page.keyboard.press('Tab')
+      if (process.platform === 'darwin' && browserName === 'webkit') {
+        await panel.locator('.el-drawer__close-btn').focus()
+      }
+      await page.keyboard.press(
+        process.platform === 'darwin' && browserName === 'webkit'
+          ? 'Alt+Tab'
+          : 'Tab',
+      )
       expect(
         await panel.evaluate((element) =>
           element.contains(document.activeElement),

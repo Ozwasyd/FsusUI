@@ -2932,6 +2932,12 @@ button.#{$namespace}-card:active {
     margin-bottom: var(--fsus-space-6);
   }
 
+  .#{$namespace}-drawer.ltr,
+  .#{$namespace}-drawer.rtl {
+    min-width: min(var(--fsus-dialog-mobile-min-width), 100%);
+    max-width: 100vw;
+  }
+
   .#{$namespace}-dialog__body {
     overflow-wrap: anywhere;
   }
@@ -3367,6 +3373,24 @@ button.#{$namespace}-card:active {
     border-color: var(--el-border-color-light);
     color: var(--el-text-color-regular);
     transform: none;
+  }
+
+  .#{$namespace}-tag.#{$namespace}-tag--light:hover {
+    background-color: color-mix(
+      in srgb,
+      getCssVar('tag-text-color') 2%,
+      getCssVar('fill-color', 'blank')
+    );
+    border-color: color-mix(
+      in srgb,
+      getCssVar('tag-text-color') 7%,
+      getCssVar('border-color-lighter')
+    );
+    color: color-mix(
+      in srgb,
+      getCssVar('tag-text-color') 34%,
+      getCssVar('text-color', 'regular')
+    );
   }
 
   .#{$namespace}-tag:active,

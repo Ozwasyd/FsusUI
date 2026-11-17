@@ -118,7 +118,7 @@
       "path": "vue/packages/theme-chalk/src/fsus-theme.scss",
       "kind": "implementation",
       "algorithm": "sha256",
-      "digest": "01fe6fa8c53f49c97261471714db8ca4532a3d592edc72c07b23fe755e9dcbc3"
+      "digest": "69b46b344cfe36a32ded630430685edbf9c7bc8940bc655f4626b7e30c71ba34"
     },
     "implementation-13": {
       "path": "vue/packages/theme-chalk/src/collection-primitives.scss",
@@ -178,7 +178,7 @@
       "path": "vue/packages/theme-chalk/src/drawer.scss",
       "kind": "implementation",
       "algorithm": "sha256",
-      "digest": "abd8da4be7280e7ee906a1bd225160be3ea732ef6380ece3a2fb39f99f5cb236"
+      "digest": "6d411ac143a8d38b71809d07363c8f250f95b6c686027053c26c1aa3a2b8a3b7"
     },
     "implementation-23": {
       "path": "vue/packages/theme-chalk/src/notification.scss",

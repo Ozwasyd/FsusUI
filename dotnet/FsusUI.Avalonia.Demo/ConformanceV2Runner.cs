@@ -429,16 +429,21 @@ internal static class ConformanceV2Runner
     var checkTagScreenshotPath = Path.Combine(
       Path.GetDirectoryName(absoluteOutput)!,
       "check-tag-avalonia.png");
+    var checkTagRenderScaling = window.RenderScaling > 0 ? window.RenderScaling : 1.0;
     var checkTagPixelSize = new PixelSize(
-      Math.Max(1, (int)Math.Ceiling(window.Bounds.Width)),
-      Math.Max(1, (int)Math.Ceiling(window.Bounds.Height)));
+      Math.Max(1, (int)Math.Ceiling(window.Bounds.Width * checkTagRenderScaling)),
+      Math.Max(1, (int)Math.Ceiling(window.Bounds.Height * checkTagRenderScaling)));
     FocusRingPixelEvidence checkTagFocusRingPixels;
     using (var bitmap = new RenderTargetBitmap(
       checkTagPixelSize,
-      new Vector(96, 96)))
+      new Vector(96 * checkTagRenderScaling, 96 * checkTagRenderScaling)))
     {
       bitmap.Render(window);
-      checkTagFocusRingPixels = AnalyzeFocusRingPixels(bitmap, checkTag, window);
+      checkTagFocusRingPixels = AnalyzeFocusRingPixels(
+        bitmap,
+        checkTag,
+        window,
+        checkTagRenderScaling);
       bitmap.Save(checkTagScreenshotPath);
     }
     var checkTagFocusIndicatorVisible =
@@ -1365,7 +1370,8 @@ internal static class ConformanceV2Runner
   private static FocusRingPixelEvidence AnalyzeFocusRingPixels(
     Bitmap bitmap,
     Control control,
-    Visual relativeTo)
+    Visual relativeTo,
+    double renderScaling = 1.0)
   {
     if (!control.TryFindResource(FsusThemeResourceKeys.FocusBrush, out var resource) ||
         resource is not SolidColorBrush focusBrush)
@@ -1376,14 +1382,14 @@ internal static class ConformanceV2Runner
     var origin = control.TranslatePoint(new Point(0, 0), relativeTo)
       ?? throw new InvalidOperationException(
         "CheckTag bounds could not be translated to the rendered window.");
-    var left = Math.Clamp((int)Math.Round(origin.X), 0, bitmap.PixelSize.Width - 1);
-    var top = Math.Clamp((int)Math.Round(origin.Y), 0, bitmap.PixelSize.Height - 1);
+    var left = Math.Clamp((int)Math.Round(origin.X * renderScaling), 0, bitmap.PixelSize.Width - 1);
+    var top = Math.Clamp((int)Math.Round(origin.Y * renderScaling), 0, bitmap.PixelSize.Height - 1);
     var right = Math.Clamp(
-      (int)Math.Round(origin.X + control.Bounds.Width) - 1,
+      (int)Math.Round((origin.X + control.Bounds.Width) * renderScaling) - 1,
       left,
       bitmap.PixelSize.Width - 1);
     var bottom = Math.Clamp(
-      (int)Math.Round(origin.Y + control.Bounds.Height) - 1,
+      (int)Math.Round((origin.Y + control.Bounds.Height) * renderScaling) - 1,
       top,
       bitmap.PixelSize.Height - 1);
 
@@ -1418,7 +1424,7 @@ internal static class ConformanceV2Runner
       }
     }
 
-    const int cornerInset = 6;
+    var cornerInset = (int)Math.Ceiling(6 * renderScaling);
     for (var x = left + cornerInset; x <= right - cornerInset; x++)
     {
       Sample(x, top);

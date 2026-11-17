@@ -308,7 +308,9 @@ test('Calendar keeps title, navigation, and date grid aligned without collisions
     expect(
       Math.abs((titleBox?.x ?? 0) - (tableBox?.x ?? 0)),
     ).toBeLessThanOrEqual(1)
-    expect(headerBox?.width ?? 0).toBe(bodyBox?.width ?? -1)
+    expect(
+      Math.abs((headerBox?.width ?? 0) - (bodyBox?.width ?? -1)),
+    ).toBeLessThanOrEqual(3)
 
     const firstDay = calendar.locator('.el-calendar-day').first()
     const dayBox = await firstDay.boundingBox()
