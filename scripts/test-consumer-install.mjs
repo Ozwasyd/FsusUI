@@ -415,6 +415,36 @@ function assertConsumerPerformanceGraph(graph) {
   if (!markdownHydration) {
     throw new Error('Consumer graph lost the lazy Markdown hydration entry.')
   }
+  const loaderKeys = Object.keys(graph.manifest).filter((key) =>
+    /\/wasm\/markdown-heavy-runtime-loaders\.mjs$/u.test(key),
+  )
+  if (
+    loaderKeys.length !== 1 ||
+    !graph.manifest[loaderKeys[0]]?.isDynamicEntry
+  ) {
+    throw new Error(
+      'Consumer heavy runtime loaders must have one dynamic entry.',
+    )
+  }
+  const loaderKey = loaderKeys[0]
+  const loaderFile = graph.manifest[loaderKey].file
+  if (
+    manifestClosureContainsFile(
+      graph.manifest,
+      graph.initialKeys,
+      loaderFile,
+    ) ||
+    manifestClosureContainsFile(
+      graph.manifest,
+      collectManifestClosure(graph.manifest, markdownHydration.key),
+      loaderFile,
+    ) ||
+    !hasDynamicManifestPath(graph.manifest, markdownHydration.key, loaderKey)
+  ) {
+    throw new Error(
+      'Consumer heavy runtime loaders must remain behind the hydration dynamic boundary.',
+    )
+  }
   const gatewayKeys = Object.keys(graph.manifest).filter(
     isMarkdownFeatureOutputGatewayModule,
   )
