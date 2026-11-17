@@ -67,6 +67,16 @@ export function validateGovernanceStages({
       'run: pnpm run governance:check:ci-static\n',
     ),
   )
+  for (const consumer of [
+    job(reusable, 'static-quality'),
+    job(quality, 'pr-feedback'),
+  ]) {
+    assert.match(
+      consumer,
+      /uses: actions\/setup-dotnet@v4\n\s+with:\n\s+global-json-file: global\.json/u,
+      'Static governance requires the repository-pinned SDK for source semantics',
+    )
+  }
   for (const producer of [
     job(reusable, 'dotnet-package'),
     job(quality, 'pr-avalonia-aot-candidate'),

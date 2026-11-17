@@ -149,6 +149,9 @@ jobs:
         with:
           version: 5.0.4
           actions-cache-folder: emsdk-cache
+      - uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
       - run: pnpm install --frozen-lockfile
       - name: Restore icons test artifact cache
         id: icons-cache
