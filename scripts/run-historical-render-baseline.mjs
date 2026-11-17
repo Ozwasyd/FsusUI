@@ -1,13 +1,15 @@
-import { spawn, execFile } from 'node:child_process'
-import { access, readFile, writeFile } from 'node:fs/promises'
+import {
+  prepareHistoricalSdk,
+  assertHistoricalIdentity,
+} from './historical-render-environment.mjs'
+import { spawn } from 'node:child_process'
+import { access, mkdir, readFile, writeFile } from 'node:fs/promises'
 import path from 'node:path'
 import process from 'node:process'
-import { promisify } from 'node:util'
 import { pathToFileURL } from 'node:url'
 import { verifyImpactPlan } from './render-performance-impact.mjs'
 
 const root = path.resolve(import.meta.dirname, '..')
-const exec = promisify(execFile)
 const json = async (file) => JSON.parse(await readFile(file, 'utf8'))
 const requireThat = (condition, message) => {
   if (!condition) throw new Error(`Historical baseline rejected: ${message}`)
@@ -222,14 +224,7 @@ async function main() {
   const output = path.resolve(value('--output'))
   const sha = value('--expected-sha')
   requireThat(/^[a-f0-9]{40}$/u.test(sha), 'exact historical SHA required')
-  const identity = async () => {
-    const actual = (
-      await exec('git', ['rev-parse', '--verify', 'HEAD'], { cwd: directory })
-    ).stdout.trim()
-    requireThat(actual === sha, 'historical HEAD mismatch')
-    await exec('git', ['diff', '--quiet', 'HEAD', '--'], { cwd: directory })
-  }
-  await identity()
+  await assertHistoricalIdentity(directory, sha, output, 'before')
   const planPath = path.resolve(value('--impact-plan'))
   const plan = verifyImpactPlan(await json(planPath))
   requireThat(plan.run, 'measurement plan is skipped')
@@ -243,26 +238,46 @@ async function main() {
       },
     )
   }
+  await mkdir(output, { recursive: true })
+  const sdk = plan.platforms.avalonia.run
+    ? await prepareHistoricalSdk(directory, root)
+    : {
+        env: process.env,
+        cleanup: async () => {},
+        evidence: { nativeSdkRequired: false },
+      }
+  await writeFile(
+    path.join(output, 'historical-sdk.json'),
+    `${JSON.stringify(sdk.evidence, null, 2)}\n`,
+  ).catch(async (error) => {
+    await sdk.cleanup()
+    throw error
+  })
   const startedAt = Date.now()
-  const result = await run(
-    'pnpm',
-    [
-      'perf:render',
-      '--',
-      '--impact-plan',
-      planPath,
-      '--profile',
-      plan.measurement.profile,
-      '--output',
-      output,
-    ],
-    { cwd: directory, env: { ...process.env, GITHUB_SHA: sha } },
-  )
+  let result
+  try {
+    result = await run(
+      'pnpm',
+      [
+        'perf:render',
+        '--',
+        '--impact-plan',
+        planPath,
+        '--profile',
+        plan.measurement.profile,
+        '--output',
+        output,
+      ],
+      { cwd: directory, env: { ...sdk.env, GITHUB_SHA: sha } },
+    )
+  } finally {
+    await sdk.cleanup()
+  }
   await writeFile(
     path.join(output, 'historical-process.log'),
     `${result.stdout}\n${result.stderr}`,
   )
-  await identity()
+  await assertHistoricalIdentity(directory, sha, output, 'after')
   await validateBaselineEvidence(output, plan, sha, startedAt)
   let violations = []
   if (result.code !== 0 || result.signal) {

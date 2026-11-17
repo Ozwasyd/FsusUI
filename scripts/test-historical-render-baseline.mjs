@@ -1,3 +1,4 @@
+import './test-historical-render-environment.mjs'
 import assert from 'node:assert/strict'
 import { mkdtemp, mkdir, writeFile, rm } from 'node:fs/promises'
 import os from 'node:os'
