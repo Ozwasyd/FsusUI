@@ -119,3 +119,23 @@ test('consumer evidence upload explicitly includes its hidden directory and rema
     /path: \.consumer-matrix\n\s+include-hidden-files: true\n\s+if-no-files-found: error/u,
   )
 })
+
+test('cold consumer runtime checks install the matching browser on run paths only', () => {
+  const workflow = readFileSync(
+    new URL('../.github/workflows/_quality.yml', import.meta.url),
+    'utf8',
+  )
+  const consumer = workflow
+    .split('\n  consumer-install:\n')[1]
+    ?.split('\n  build-demo:')[0]
+  assert.ok(consumer)
+  const setup = consumer.indexOf('Install Chromium headless shell')
+  assert.ok(setup > consumer.indexOf('run: pnpm install --frozen-lockfile'))
+  assert.ok(
+    setup < consumer.indexOf('Run cold consumer matrix against candidate'),
+  )
+  assert.match(
+    consumer.slice(setup),
+    /checks\n\s+if: steps\.consumer-impact\.outputs\.run == 'true'\n\s+run: pnpm exec playwright install --with-deps --only-shell chromium/u,
+  )
+})

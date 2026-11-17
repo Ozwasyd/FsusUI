@@ -717,6 +717,9 @@ jobs:
           cache-dependency-path: pnpm-lock.yaml
       - if: steps.consumer-impact.outputs.run == 'true'
         run: pnpm install --frozen-lockfile
+      - name: Install Chromium headless shell for packaged runtime checks
+        if: steps.consumer-impact.outputs.run == 'true'
+        run: pnpm exec playwright install --with-deps --only-shell chromium
       - name: Use release npm toolchain
         if: steps.consumer-impact.outputs.run == 'true'
         run: npm install -g npm@^11.5.1
