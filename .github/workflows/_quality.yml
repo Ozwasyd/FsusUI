@@ -94,7 +94,7 @@ jobs:
       - name: Run conformance
         run: pnpm run conformance
       - name: Run governance
-        run: pnpm run governance:check
+        run: pnpm run governance:check:ci-static
       - name: Run accessibility contract
         run: pnpm run a11y:check
       - name: Record static quality leaf result
@@ -163,6 +163,8 @@ jobs:
       candidate-digest: ${{ steps.candidate.outputs.digest }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 3
       - uses: pnpm/action-setup@v4
         with:
           version: 10.33.0
@@ -197,6 +199,7 @@ jobs:
         id: candidate
         run: |
           dbus-run-session -- xvfb-run -a pnpm run conformance:v2
+          pnpm run check:avalonia-stable-readiness
           node scripts/dotnet-package-verify.mjs
           echo "digest=$(node -p \"require('./dotnet/artifacts/package/manifest.json').candidateSha256\")" >> "$GITHUB_OUTPUT"
       - name: Report workspace changes after candidate failure

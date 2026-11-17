@@ -66,6 +66,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
+          fetch-depth: 3
           ref: ${{ github.event.pull_request.head.sha }}
       - uses: pnpm/action-setup@v4
         with:
@@ -94,6 +95,7 @@ jobs:
           GITHUB_SHA: ${{ github.event.pull_request.head.sha }}
         run: |
           dbus-run-session -- xvfb-run -a pnpm run conformance:v2
+          pnpm run check:avalonia-stable-readiness
           node scripts/dotnet-package-verify.mjs
           echo "digest=$(node -p \"require('./dotnet/artifacts/package/manifest.json').candidateSha256\")" >> "$GITHUB_OUTPUT"
       - name: Report workspace changes after candidate failure
@@ -181,7 +183,7 @@ jobs:
           echo "typecheck-cache-hit=${{ steps.typecheck-cache.outputs.cache-hit }}"
           echo "cache-hit=${{ steps.typecheck-cache.outputs.cache-hit }}"
           echo "cache-primary-key=${{ steps.typecheck-cache.outputs.cache-primary-key }}"
-      - run: pnpm run verify:pr-fast
+      - run: pnpm run verify:pr-fast:ci-static
       - name: Determine PR demo build path impact
         id: demo-build-path
         run: node ./scripts/with-node-heap.mjs node ./scripts/should-run-demo-build.mjs
