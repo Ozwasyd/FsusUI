@@ -21,6 +21,12 @@ type CellRendererProps = TableV2RowCellRenderParam &
     ns: UseNamespaceReturn
   }
 
+const simpleDataKey = /^[\w-]+$/u
+
+const defaultCellRenderer = (props: CellRendererParams<any>) => (
+  <TableCell {...props} />
+)
+
 const CellRenderer: FunctionalComponent<CellRendererProps> = (
   {
     // renderer props
@@ -43,7 +49,7 @@ const CellRenderer: FunctionalComponent<CellRendererProps> = (
     iconSize,
     rowKey,
   },
-  { slots }
+  { slots },
 ) => {
   const cellStyle = enforceUnit(style)
 
@@ -55,22 +61,24 @@ const CellRenderer: FunctionalComponent<CellRendererProps> = (
   const columnCellRenderer = componentToSlot(cellRenderer)
 
   const CellComponent =
-    columnCellRenderer ||
-    slots.default ||
-    ((props: CellRendererParams<any>) => <TableCell {...props} />)
+    columnCellRenderer || slots.default || defaultCellRenderer
 
   const cellData = isFunction(dataGetter)
     ? dataGetter({ columns, column, columnIndex, rowData, rowIndex })
-    : get(rowData, dataKey ?? '')
+    : typeof dataKey === 'string' && simpleDataKey.test(dataKey)
+      ? rowData?.[dataKey]
+      : get(rowData, dataKey ?? '')
 
-  const extraCellProps = tryCall(_cellProps, {
-    cellData,
-    columns,
-    column,
-    columnIndex,
-    rowIndex,
-    rowData,
-  })
+  const extraCellProps = isFunction(_cellProps)
+    ? tryCall(_cellProps, {
+        cellData,
+        columns,
+        column,
+        columnIndex,
+        rowIndex,
+        rowData,
+      })
+    : _cellProps
 
   const cellProps = {
     class: ns.e('cell-text'),
@@ -94,12 +102,11 @@ const CellRenderer: FunctionalComponent<CellRendererProps> = (
 
   const expandable =
     rowIndex >= 0 && expandColumnKey && column.key === expandColumnKey
-  const expanded = rowIndex >= 0 && expandedRowKeys.includes(rowData[rowKey])
-
   let IconOrPlaceholder: VNode | undefined
-  const iconStyle = `margin-inline-start: ${depth * indentSize}px;`
   if (expandable) {
+    const iconStyle = `margin-inline-start: ${depth * indentSize}px;`
     if (isObject(expandIconProps)) {
+      const expanded = expandedRowKeys.includes(rowData[rowKey])
       IconOrPlaceholder = (
         <ExpandIcon
           {...expandIconProps}

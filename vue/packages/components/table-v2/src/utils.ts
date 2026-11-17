@@ -12,21 +12,22 @@ export const sum = (listLike: number | number[]) => {
 export const tryCall = <T>(
   fLike: T,
   params: T extends (...args: infer K) => unknown ? K : any,
-  defaultRet = {}
+  defaultRet = {},
 ) => {
-  return isFunction(fLike) ? fLike(params) : fLike ?? defaultRet
+  return isFunction(fLike) ? fLike(params) : (fLike ?? defaultRet)
 }
 
 export const enforceUnit = (style: CSSProperties) => {
-  ;(['width', 'maxWidth', 'minWidth', 'height'] as const).forEach((key) => {
-    style[key] = addUnit(style[key])
-  })
+  style.width = addUnit(style.width)
+  style.maxWidth = addUnit(style.maxWidth)
+  style.minWidth = addUnit(style.minWidth)
+  style.height = addUnit(style.height)
 
   return style
 }
 
 export const componentToSlot = <T>(
-  ComponentLike: VNode | ((props: T) => Component<T>) | undefined
+  ComponentLike: VNode | ((props: T) => Component<T>) | undefined,
 ) =>
   isVNode(ComponentLike)
     ? (props: T) => h(ComponentLike as VNode, props as any)

@@ -57,6 +57,53 @@ describe('TableV2.vue', () => {
     expect(cell.find('span').text()).toBe(customText)
   })
 
+  test('keeps default cell text and applies static and computed cell attributes', async () => {
+    const columns = generateColumns(1)
+    const data = generateData(columns, 1)
+    const wrapper = mount(TableV2, {
+      props: {
+        columns,
+        data,
+        width: 700,
+        height: 400,
+        cellProps: { 'data-static': 'static' },
+      },
+    })
+
+    const cell = () => wrapper.get('.el-table-v2__row-cell')
+    expect(cell().text()).toBe('Row 0 - Col 0')
+    expect(cell().attributes('data-static')).toBe('static')
+
+    await wrapper.setProps({
+      cellProps: ({ cellData, rowIndex }) => ({
+        'data-computed': `${rowIndex}: ${cellData}`,
+      }),
+    })
+
+    expect(cell().text()).toBe('Row 0 - Col 0')
+    expect(cell().attributes('data-static')).toBeUndefined()
+    expect(cell().attributes('data-computed')).toBe('0: Row 0 - Col 0')
+  })
+
+  test('resolves nested cell keys without overriding literal dotted keys', () => {
+    const columns = [{ ...generateColumns(1)[0], dataKey: 'record.label' }]
+    const wrapper = mount(TableV2, {
+      props: {
+        columns,
+        data: [
+          { id: '1', record: { label: 'nested' } },
+          { id: '2', 'record.label': 'literal', record: { label: 'nested' } },
+        ],
+        width: 700,
+        height: 400,
+      },
+    })
+    expect(wrapper.findAll('.el-table-v2__row-cell').map((cell) => cell.text())).toEqual([
+      'nested',
+      'literal',
+    ])
+  })
+
   test('inherits render pipeline budget through virtual grid', async () => {
     const columns = ref(generateColumns(10))
     const data = ref(generateData(columns.value, 200))
