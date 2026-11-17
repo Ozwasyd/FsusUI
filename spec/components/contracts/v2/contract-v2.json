@@ -15,7 +15,7 @@
     },
     "avalonia": {
       "path": "spec/avalonia/semantic/FsusUI.Avalonia.semantic.json",
-      "hash": "81700cf6de532a71e3819e9c023e96205d02a0000de7218b211a7167bf73a826",
+      "hash": "abc084bd022806b9340b2c715fa1cada1aede86720745e59b6f5b55b8bc01e98",
       "packageId": "FsusUI.Avalonia"
     },
     "avaloniaThemes": {

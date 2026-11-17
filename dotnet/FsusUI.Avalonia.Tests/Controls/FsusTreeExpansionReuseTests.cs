@@ -25,8 +25,8 @@ public class FsusTreeExpansionReuseTests
     Assert.NotSame(original, panel.Children[0]);
     Assert.Equal(duplicatesInitiallyVisible ? 4 : 3, panel.Children.Count);
     Assert.Equal(panel.Children.Count, panel.Children.Distinct().Count());
-    Assert.Contains("Child", Assert.IsType<TextBlock>(Assert.IsType<Border>(panel.Children[1]).Child).Text);
-    Assert.Contains("Sibling", Assert.IsType<TextBlock>(Assert.IsType<Border>(panel.Children[2]).Child).Text);
+    Assert.Contains("Child", Assert.IsAssignableFrom<TextBlock>(Assert.IsType<Border>(panel.Children[1]).Child).Text);
+    Assert.Contains("Sibling", Assert.IsAssignableFrom<TextBlock>(Assert.IsType<Border>(panel.Children[2]).Child).Text);
     Assert.True(tree.Collapse("parent"));
     Assert.Equal(duplicatesInitiallyVisible ? 3 : 2, panel.Children.Count);
     Assert.Equal(panel.Children.Count, panel.Children.Distinct().Count());
@@ -95,6 +95,6 @@ public class FsusTreeExpansionReuseTests
     Assert.Contains("first", tree.CheckedKeys);
     Assert.Equal("second", tree.FocusedKey);
     tree.Nodes[0].Label = "Changed";
-    Assert.Contains("Changed", Assert.IsType<TextBlock>(first.Child).Text);
+    Assert.Contains("Changed", Assert.IsAssignableFrom<TextBlock>(first.Child).Text);
   }
 }

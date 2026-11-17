@@ -78,7 +78,7 @@ public class FsusTreeRowPresenterHeadlessTests
       var defaultRows = GetRows(fixture.DefaultTree);
       Assert.Equal(4, defaultRows.Length);
       Assert.All(defaultRows, row => Assert.True(row.MinHeight > 30));
-      Assert.All(defaultRows, row => Assert.IsType<TextBlock>(row.Child));
+      Assert.All(defaultRows, row => Assert.IsAssignableFrom<TextBlock>(row.Child));
 
       Assert.Equal(2, AutomationProperties.GetPositionInSet(FindRow(fixture.CustomTree, "notes")));
       Assert.Equal(2, AutomationProperties.GetSizeOfSet(FindRow(fixture.CustomTree, "notes")));

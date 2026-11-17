@@ -1050,7 +1050,7 @@ public class FsusTree : ContentControl
     var statePrefix = context.IsExpandable
       ? context.IsExpanded ? "▾" : "▸"
       : " ";
-    return new TextBlock
+    return new FsusTreeLabel
     {
       Text = $"{statePrefix} {view.Node.Label}",
       VerticalAlignment = global::Avalonia.Layout.VerticalAlignment.Center,
