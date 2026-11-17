@@ -1,18 +1,26 @@
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Media;
+using Avalonia.Media.TextFormatting;
+using Avalonia.Threading;
+using Avalonia.VisualTree;
 using System.Globalization;
 
 namespace FsusUI.Avalonia.Controls;
 
-// Only the tree's plain default labels use this cache. TextBlock retains ownership
-// of shaping, rendering, inherited styling, clipping and automation.
+// Only the tree's plain default labels use these caches. TextBlock retains ownership
+// of each layout, rendering, inherited styling, clipping and automation.
 internal sealed class FsusTreeLabel : TextBlock
 {
   private LayoutKey? measuredKey;
   private LayoutKey? arrangedKey;
   private Size measuredSize;
   private Size arrangedSize;
+  // TextRunCache is an Unstable Avalonia 12.0.4 API: reverify ownership and
+  // stock paragraph parity before upgrading the pinned Avalonia dependency.
+  private TextRunCache? shapingCache;
+  private LayoutKey? shapingKey;
+  private bool cleanupPosted;
 
   protected override Type StyleKeyOverride => typeof(TextBlock);
 
@@ -37,6 +45,55 @@ internal sealed class FsusTreeLabel : TextBlock
     arrangedKey = key;
     arrangedSize = size;
     return size;
+  }
+
+  protected override TextLayout CreateTextLayout(string? text)
+  {
+    // Paragraph line spacing is internal to Avalonia; nonzero spacing stays stock.
+    var key = this.IsAttachedToVisualTree() && LineSpacing == 0 ? Capture(default) : null;
+    if (key is null)
+    {
+      ReleaseShapingCache();
+      return base.CreateTextLayout(text);
+    }
+    if (key != shapingKey)
+    {
+      shapingCache?.Invalidate();
+      shapingKey = key;
+    }
+    shapingCache ??= new TextRunCache();
+
+    // Match TextBlock's plain-string paragraph construction. Only shaped runs
+    // survive a same-context remount; every TextLayout remains owned by TextBlock.
+    var properties = new GenericTextRunProperties(
+      new Typeface(FontFamily, FontStyle, FontWeight, FontStretch), FontSize,
+      TextDecorations, Foreground, fontFeatures: FontFeatures);
+    var paragraph = new GenericTextParagraphProperties(
+      FlowDirection, IsMeasureValid ? TextAlignment : TextAlignment.Left, true, false,
+      properties, TextWrapping, LineHeight, 0, LetterSpacing);
+    var maximum = GetMaxSizeFromConstraint();
+    return new TextLayout(
+      new SimpleTextSource(text ?? string.Empty, properties), paragraph, TextTrimming,
+      maximum.Width, maximum.Height, MaxLines, shapingCache);
+  }
+
+  protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
+  {
+    base.OnDetachedFromVisualTree(e);
+    if (cleanupPosted || shapingCache is null) return;
+    cleanupPosted = true;
+    Dispatcher.UIThread.Post(() =>
+    {
+      cleanupPosted = false;
+      if (!this.IsAttachedToVisualTree()) ReleaseShapingCache();
+    }, DispatcherPriority.Background);
+  }
+
+  private void ReleaseShapingCache()
+  {
+    shapingCache?.Dispose();
+    shapingCache = null;
+    shapingKey = null;
   }
 
   private LayoutKey? Capture(Size constraint) =>

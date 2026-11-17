@@ -5,6 +5,7 @@ using Avalonia.Headless.XUnit;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using Avalonia.Styling;
+using Avalonia.Threading;
 using FsusUI.Avalonia.Controls;
 using System.Reflection;
 using System.Runtime.InteropServices;
@@ -41,6 +42,7 @@ public class FsusTreeLabelLayoutHeadlessTests
         label => label.LetterSpacing = 1.25,
         label => label.LineHeight = 32,
         label => label.LineSpacing = 2,
+        label => label.LineSpacing = 0,
         label => label.TextAlignment = TextAlignment.Center,
         label => label.TextWrapping = TextWrapping.Wrap,
         label => label.MaxLines = 2,
@@ -48,7 +50,11 @@ public class FsusTreeLabelLayoutHeadlessTests
         label => label.Text = "Changed line\nsecond line 中文",
         _ => window.RequestedThemeVariant = ThemeVariant.Dark,
         label => label.TextDecorations = global::Avalonia.Media.TextDecorations.Underline,
+        label => label.TextDecorations = new TextDecorationCollection(),
+        label => label.FontFeatures = FontFeatureCollection.Parse("liga=0"),
+        label => label.FontFeatures = new FontFeatureCollection(),
         label => label.Inlines!.Add(new Run(" inline content")),
+        label => { label.Inlines!.Clear(); label.Text = "Plain content again 中文"; },
       };
       foreach (var action in actions)
       {
@@ -63,6 +69,12 @@ public class FsusTreeLabelLayoutHeadlessTests
           var remount = LayoutAndPixels(cached, host, constraint);
           Assert.Equal(expected.Desired, remount.Desired);
           Assert.Equal(expected.Pixels, remount.Pixels);
+          var shapingCache = typeof(FsusTreeLabel).GetField("shapingCache", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(cached);
+          if (cached.LineSpacing == 0 && cached.Inlines is not { Count: > 0 } &&
+            cached.FontFeatures is not { Count: > 0 } && cached.TextDecorations is not { Count: > 0 })
+            Assert.NotNull(shapingCache);
+          else
+            Assert.Null(shapingCache);
         }
       }
     }
@@ -166,6 +178,52 @@ public class FsusTreeLabelLayoutHeadlessTests
       Assert.NotNull(layout.GetValue(label));
     }
     finally { window.Close(); }
+  }
+
+  [AvaloniaFact]
+  public void ShapingCacheIsPerLabelSurvivesLayoutReplacementAndReleasesAfterActualDetach()
+  {
+    var label = new FsusTreeLabel { Text = "Parent 中文 shaping ownership", TextTrimming = TextTrimming.CharacterEllipsis };
+    var other = new FsusTreeLabel { Text = label.Text, TextTrimming = label.TextTrimming };
+    var cacheField = typeof(FsusTreeLabel).GetField("shapingCache", BindingFlags.Instance | BindingFlags.NonPublic)!;
+    label.Measure(new Size(180, 80));
+    Assert.Null(cacheField.GetValue(label));
+    var host = new Grid();
+    var window = new Window { Width = 300, Height = 160, Content = host };
+    window.Show();
+    try
+    {
+      var constraint = new Size(180, 80);
+      var first = LayoutAndPixels(label, host, constraint);
+      var ownedCache = cacheField.GetValue(label);
+      Assert.NotNull(ownedCache);
+      var oldLayout = label.TextLayout;
+      label.InvalidateMeasure();
+      label.Measure(constraint);
+      label.Arrange(new Rect(default, constraint));
+      Assert.NotSame(oldLayout, label.TextLayout);
+      Assert.Same(ownedCache, cacheField.GetValue(label));
+      var remount = LayoutAndPixels(label, host, constraint);
+      Assert.Equal(first.Desired, remount.Desired);
+      Assert.Equal(first.Pixels, remount.Pixels);
+      Assert.Same(ownedCache, cacheField.GetValue(label));
+
+      LayoutAndPixels(other, host, constraint);
+      Assert.NotNull(cacheField.GetValue(other));
+      Assert.NotSame(ownedCache, cacheField.GetValue(other));
+      Dispatcher.UIThread.RunJobs();
+      Assert.Null(cacheField.GetValue(label));
+      var reattached = LayoutAndPixels(label, host, constraint);
+      Assert.NotNull(cacheField.GetValue(label));
+      Assert.NotSame(ownedCache, cacheField.GetValue(label));
+      Assert.Equal(first.Desired, reattached.Desired);
+      Assert.Equal(first.Pixels, reattached.Pixels);
+      host.Children.Clear();
+      Dispatcher.UIThread.RunJobs();
+      Assert.Null(cacheField.GetValue(other));
+      Assert.Null(cacheField.GetValue(label));
+    }
+    finally { window.Close(); Dispatcher.UIThread.RunJobs(); }
   }
 
   private static (Size Desired, byte[] Pixels) LayoutAndPixels(TextBlock label, Grid host, Size constraint, Size? arrange = null)
