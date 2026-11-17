@@ -15,7 +15,7 @@
     },
     "avalonia": {
       "path": "spec/avalonia/semantic/FsusUI.Avalonia.semantic.json",
-      "hash": "51f1ac1e7a8ce64d868901580e6da48aa770b7aeaffa576c8b1bd834fa903cab",
+      "hash": "81700cf6de532a71e3819e9c023e96205d02a0000de7218b211a7167bf73a826",
       "packageId": "FsusUI.Avalonia"
     },
     "avaloniaThemes": {
@@ -1759,7 +1759,7 @@
         "surfaceHash": "dfbf9e5fd0db4de21cc2158fb28fd2b64fc0cb82d80075497762527094dc2591",
         "stateContractFingerprint": "baed4b385e29c1bcac6834ab2a083e13a90b853d03bac0277c7f8d7f6e8954b1",
         "automationContractFingerprint": "77c92ad184d419a49cf51f8a99733f96ef63eef17566337eb3544bfa369ffbe3",
-        "tokenThemeContractFingerprint": "6367c5074eb3c510705d0bf0955db3765d3d62d67c3e6c88c48d9727039b5f4e"
+        "tokenThemeContractFingerprint": "9e04a578c8ca9f3fc23419fe0aead98488fab8ffe4215ab5211eccebad47ce8c"
       },
       "basis": "name-equality"
     },
@@ -139412,7 +139412,7 @@
             ]
           },
           "tokenThemeContract": {
-            "fingerprint": "6367c5074eb3c510705d0bf0955db3765d3d62d67c3e6c88c48d9727039b5f4e",
+            "fingerprint": "9e04a578c8ca9f3fc23419fe0aead98488fab8ffe4215ab5211eccebad47ce8c",
             "dependencyCount": 12,
             "resolvedCount": 10,
             "contractDeclared": false,
@@ -190697,7 +190697,7 @@
   "tokenThemeBaselines": {
     "avalonia": {
       "baseline": "spec/avalonia/semantic/FsusUI.Avalonia.semantic.json",
-      "fingerprint": "0454285de60e0c5849bef4828f0afd79d036bd7918cc2cc5d865167f6aadb125",
+      "fingerprint": "a7858c113dc72fe7dd04e463c3a9b52b98de3cbf5c4024e57fd9afc3d6eba784",
       "definitionCount": 124,
       "dependencyCount": 26,
       "resolvedCount": 26,

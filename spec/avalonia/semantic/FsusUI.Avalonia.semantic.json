@@ -4,11 +4,11 @@
   "source": {
     "toolVersion": "FsusUI.Avalonia.ApiTool@1.8.0",
     "assemblyVersion": "0.0.0.0",
-    "inputTreeHash": "46ed361b4f9de14cd5fe8730163052ed7bbc2096861b38d167a7e98429468019",
+    "inputTreeHash": "c10f7bb9e863e30823c05d40519a69fa9d0404e581e6767088253545ac36b0a6",
     "compilerOptionsHash": "7e5271d568360ccb03852002c427b2d740466121049706513eb89a731476ad09",
     "dependencyVersionHash": "b0acaf728062500d48b252b58655a9fad423f83f197e79ddcdfff680a80ab71e",
     "contractSchemaVersion": "2.0.0",
-    "outputHash": "cdfc69231238b3b2ce5df67551ce5d14a79bdb7e96cce2d545ab9d491559a810"
+    "outputHash": "d4539b4bdda5c93329adaaf33cac973ee2b3a85a790dfe3fa747423db8df7ad3"
   },
   "semanticTypes": [
     {
@@ -68318,6 +68318,30 @@
         "kind": "csharp-token-member-reference",
         "authority": "roslyn-symbol-reference",
         "sourceFile": "dotnet/FsusUI.Avalonia/Controls/FsusTreeControls.cs",
+        "sourceMember": "FsusUI.Avalonia.Controls.FsusTree.BuildRow",
+        "dependency": "Space2Thickness",
+        "canonicalName": "space.2",
+        "resolved": true,
+        "ownerType": "FsusUI.Avalonia.Controls.FsusTree",
+        "ownership": "resolved",
+        "ownerExpression": "FsusUI.Avalonia.Controls.FsusTree"
+      },
+      {
+        "kind": "csharp-token-member-reference",
+        "authority": "roslyn-symbol-reference",
+        "sourceFile": "dotnet/FsusUI.Avalonia/Controls/FsusTreeControls.cs",
+        "sourceMember": "FsusUI.Avalonia.Controls.FsusTree.BuildRow",
+        "dependency": "Space5Thickness",
+        "canonicalName": "space.5",
+        "resolved": true,
+        "ownerType": "FsusUI.Avalonia.Controls.FsusTree",
+        "ownership": "resolved",
+        "ownerExpression": "FsusUI.Avalonia.Controls.FsusTree"
+      },
+      {
+        "kind": "csharp-token-member-reference",
+        "authority": "roslyn-symbol-reference",
+        "sourceFile": "dotnet/FsusUI.Avalonia/Controls/FsusTreeControls.cs",
         "sourceMember": "FsusUI.Avalonia.Controls.FsusTree.BuildTransientInlineEditRow",
         "dependency": "DensityControlDefaultYDouble",
         "canonicalName": "density.control.default.y",
@@ -68357,30 +68381,6 @@
         "sourceMember": "FsusUI.Avalonia.Controls.FsusTree.HandleRowPointerPressed",
         "dependency": "Space6Thickness",
         "canonicalName": "space.6",
-        "resolved": true,
-        "ownerType": "FsusUI.Avalonia.Controls.FsusTree",
-        "ownership": "resolved",
-        "ownerExpression": "FsusUI.Avalonia.Controls.FsusTree"
-      },
-      {
-        "kind": "csharp-token-member-reference",
-        "authority": "roslyn-symbol-reference",
-        "sourceFile": "dotnet/FsusUI.Avalonia/Controls/FsusTreeControls.cs",
-        "sourceMember": "FsusUI.Avalonia.Controls.FsusTree.RefreshRows",
-        "dependency": "Space2Thickness",
-        "canonicalName": "space.2",
-        "resolved": true,
-        "ownerType": "FsusUI.Avalonia.Controls.FsusTree",
-        "ownership": "resolved",
-        "ownerExpression": "FsusUI.Avalonia.Controls.FsusTree"
-      },
-      {
-        "kind": "csharp-token-member-reference",
-        "authority": "roslyn-symbol-reference",
-        "sourceFile": "dotnet/FsusUI.Avalonia/Controls/FsusTreeControls.cs",
-        "sourceMember": "FsusUI.Avalonia.Controls.FsusTree.RefreshRows",
-        "dependency": "Space5Thickness",
-        "canonicalName": "space.5",
         "resolved": true,
         "ownerType": "FsusUI.Avalonia.Controls.FsusTree",
         "ownership": "resolved",
