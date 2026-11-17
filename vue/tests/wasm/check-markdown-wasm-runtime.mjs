@@ -541,7 +541,7 @@ async function renderNestedListWithKind(kind) {
   // Re-enter the same block parser with container-relative indentation intact.
   for (let level = 1; level <= 6; level++) {
     for (let spaces = 0; spaces <= 3; spaces++) {
-      const source = ' '.repeat(spaces) + '#'.repeat(level) + '\n'
+      const source = `${' '.repeat(spaces)}${'#'.repeat(level)}\n`
       assert(
         renderSource(source).includes(`<h${level}></h${level}>`),
         `[markdown-wasm-runtime] empty ATX boundary ${JSON.stringify(source)}: ${kind}`,
