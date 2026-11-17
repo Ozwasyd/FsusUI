@@ -430,6 +430,8 @@ public class FsusTree : ContentControl
       return false;
     }
 
+    var context = CreateRowContext(view);
+    ApplyRowState(row, context);
     if (
       ActiveInlineEdit is
       {
@@ -440,8 +442,6 @@ public class FsusTree : ContentControl
       return true;
     }
 
-    var context = CreateRowContext(view);
-    ApplyRowState(row, context);
     row.Child = BuildNodeContent(view, context);
     return true;
   }
@@ -536,8 +536,13 @@ public class FsusTree : ContentControl
       return false;
     }
 
-    FocusedKey = key;
-    RefreshRows();
+    if (FocusedKey != key)
+    {
+      var previousKey = FocusedKey;
+      FocusedKey = key;
+      RefreshNodePresentation(previousKey);
+      RefreshNodePresentation(key);
+    }
     SyncState();
     return true;
   }
