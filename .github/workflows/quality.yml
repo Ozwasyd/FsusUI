@@ -273,6 +273,12 @@ jobs:
           steps.render-impact.outputs.scope != 'avalonia-only'
         working-directory: current
         run: pnpm exec playwright install --with-deps chromium
+      - name: Pin the same Chromium executable for all four measurement arms
+        if: >-
+          steps.render-impact.outputs.run == 'true' &&
+          steps.render-impact.outputs.scope != 'avalonia-only'
+        working-directory: current
+        run: node scripts/pin-render-browser.mjs
       - name: Install Avalonia-only display dependency
         if: steps.render-impact.outputs.scope == 'avalonia-only'
         run: |
@@ -342,6 +348,19 @@ jobs:
             --directory . --expected-sha "$baseline_sha" \
             --impact-plan ../performance-impact-plan.json \
             --output ../performance-baseline-repeat
+      - name: Verify measured browser identity for every required Web arm
+        if: >-
+          steps.render-impact.outputs.run == 'true' &&
+          steps.render-impact.outputs.scope != 'avalonia-only'
+        working-directory: current
+        env:
+          BASELINE_AVAILABLE: ${{ steps.baseline-contract.outputs.available }}
+        run: |
+          set -- ../performance-current
+          if [ "$BASELINE_AVAILABLE" = true ]; then
+            set -- "$@" ../performance-baseline ../performance-current-repeat ../performance-baseline-repeat
+          fi
+          node scripts/pin-render-browser.mjs --verify "$@"
       - name: Compare against base revision on the same runner
         if: steps.baseline-contract.outputs.available == 'true'
         working-directory: current
@@ -365,6 +384,7 @@ jobs:
             performance-current
             performance-current-repeat
             performance-impact-plan.json
+            performance-browser-selection.json
             !performance-*/web/diagnostics/**
           retention-days: 14
       - name: Preserve failed Web measurement diagnostics

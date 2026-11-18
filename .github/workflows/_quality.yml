@@ -45,8 +45,12 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm run ensure:wasm
       - run: pnpm exec playwright install --with-deps chromium
+      - name: Pin the render-performance Chromium executable
+        run: node scripts/pin-render-browser.mjs .tmp/performance/current/browser-selection.json
       - name: Run real-render matrix
         run: pnpm perf:render -- --profile ${{ inputs.group == 'main' && 'quick' || 'full' }} --output .tmp/performance/current
+      - name: Verify measured render-performance browser identity
+        run: node scripts/pin-render-browser.mjs --verify .tmp/performance/current
       - uses: actions/upload-artifact@v4
         if: always()
         with:
