@@ -3,9 +3,16 @@ import { spawn } from 'node:child_process'
 import { existsSync } from 'node:fs'
 import { mkdir, readFile, writeFile } from 'node:fs/promises'
 import os from 'node:os'
+import { URL } from 'node:url'
 import path from 'node:path'
 import process from 'node:process'
 import { chromium } from '@playwright/test'
+import {
+  diagnosticIds,
+  maxTraceEvents,
+  sha256,
+  writeDiagnostics,
+} from './web-render-diagnostics.mjs'
 
 const root = path.resolve(import.meta.dirname, '..')
 const argv = process.argv.slice(2)
@@ -15,6 +22,7 @@ const valueOf = (name, fallback) => {
 }
 const has = (name) => argv.includes(name)
 const profile = valueOf('--profile', 'quick')
+const diagnosticCapture = process.env.FSUSUI_WEB_FAILURE_DIAGNOSTICS === '1'
 const scenarioFilter = valueOf('--scenario', '')
 const output = path.resolve(root, valueOf('--output', '.tmp/performance/web'))
 const baselinePath = valueOf('--baseline', '')
@@ -194,8 +202,14 @@ try {
     executablePath: configuredBrowser || systemBrowser,
   })
   const results = []
+  const diagnostics = []
 
   for (const [scenario, size, refreshHz, dpr, motion] of matrix) {
+    const captureDiagnostic =
+      diagnosticCapture &&
+      diagnosticIds.has(
+        `${scenario}-${size}-${refreshHz}hz-dpr${dpr}-${motion}`,
+      )
     const context = await browser.newContext({
       deviceScaleFactor: dpr,
       reducedMotion: motion === 'reduced' ? 'reduce' : 'no-preference',
@@ -370,6 +384,7 @@ try {
         'devtools.timeline,disabled-by-default-devtools.timeline.layers',
       transferMode: 'ReturnAsStream',
     })
+    const anchors = captureDiagnostic ? [] : null
     const inputToFrame = []
     const frameWork = []
     const heapSamples = []
@@ -381,7 +396,7 @@ try {
     const domParseOperations = []
     for (let index = 0; index < samples; index++) {
       const sample = await page.evaluate(
-        async ({ iteration, measureDomParses }) => {
+        async ({ iteration, measureDomParses, captureDiagnostic }) => {
           const before = measureDomParses
             ? window.__fsusDomParseOperations?.snapshot()
             : null
@@ -394,7 +409,10 @@ try {
           const after = measureDomParses
             ? window.__fsusDomParseOperations.snapshot()
             : null
-          await new Promise((resolve) => requestAnimationFrame(() => resolve()))
+          const rafTimestamp = await new Promise((resolve) =>
+            requestAnimationFrame(resolve),
+          )
+          let frameCompleted
           return {
             domParseOperations:
               before && after
@@ -409,11 +427,21 @@ try {
                   }
                 : null,
             frameWorkMs: actionCompleted - started,
-            inputToNextFrameMs: performance.now() - started,
+            inputToNextFrameMs: (frameCompleted = performance.now()) - started,
+            anchor: captureDiagnostic
+              ? {
+                  iteration,
+                  started,
+                  actionCompleted,
+                  frameCompleted,
+                  rafTimestamp,
+                }
+              : undefined,
           }
         },
-        { iteration: index + warmups, measureDomParses },
+        { iteration: index + warmups, measureDomParses, captureDiagnostic },
       )
+      if (captureDiagnostic) anchors.push(sample.anchor)
       frameWork.push(sample.frameWorkMs)
       inputToFrame.push(sample.inputToNextFrameMs)
       if (scenario === 'markdown-feature-activation') {
@@ -643,6 +671,14 @@ try {
           }
         : null,
     })
+    if (captureDiagnostic) {
+      diagnostics.push({
+        raw,
+        anchors,
+        totalTraceEvents: traceEvents.length,
+        traceEvents: traceEvents.slice(0, maxTraceEvents),
+      })
+    }
     await context.close()
   }
   const version = browser.version()
@@ -671,6 +707,28 @@ try {
     path.join(output, 'summary.json'),
     `${JSON.stringify(artifact, null, 2)}\n`,
   )
+
+  // Diagnostic serialization and I/O must remain after all measured scenarios.
+  // Historical runners may not emit these optional files; comparison stays unchanged.
+  if (diagnostics.length) {
+    try {
+      await writeDiagnostics(output, diagnostics, {
+        gitSha: artifact.gitSha,
+        browser: artifact.environment.browser,
+        profile,
+        warmups,
+        samples,
+        runnerSha256: sha256(await readFile(new URL(import.meta.url))),
+        diagnosticWriterSha256: sha256(
+          await readFile(
+            new URL('./web-render-diagnostics.mjs', import.meta.url),
+          ),
+        ),
+      })
+    } catch (error) {
+      console.warn(`Optional Web diagnostic emission failed: ${error.message}`)
+    }
+  }
 
   if (baselinePath) {
     const baseline = JSON.parse(

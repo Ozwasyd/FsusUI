@@ -240,6 +240,7 @@ if (failures.length)
   throw new Error(
     `Real-render performance contract failed:\n${failures.join('\n')}`,
   )
+await import('./web-render-diagnostics.test.mjs')
 await import('./test-render-performance-impact-plan.mjs')
 await import('./test-historical-render-baseline.mjs')
 console.info('Real-render performance contract passed.')
