@@ -248,11 +248,11 @@ const main = async () => {
 
     context = await chromium.launchPersistentContext(profileDirectory, {
       headless: false,
+      chromiumSandbox: true,
       executablePath: chromePath,
       env: process.env,
       locale: 'zh-CN',
       args: [
-        '--no-sandbox',
         '--disable-dev-shm-usage',
         '--force-renderer-accessibility',
         '--window-size=1280,1100',
