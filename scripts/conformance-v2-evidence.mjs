@@ -791,6 +791,26 @@ const checkedState = (value) => {
   return null
 }
 
+export const validateCheckTagFocusBounds = (bounds, platform) => {
+  const label = `component-v2.el-check-tag.${platform}.visual.focusBounds`
+  const coordinateSpace = platform === 'web' ? 'document' : 'window'
+  const unit = platform === 'web' ? 'css-px' : 'dip'
+  same(coordinateSpace, bounds?.coordinateSpace, `${label}.coordinateSpace`)
+  same(unit, bounds?.unit, `${label}.unit`)
+  for (const phase of ['before', 'afterFocus', 'afterToggle']) {
+    const rect = bounds?.[phase]
+    same(phase !== 'before', rect?.focused, `${label}.${phase}.focused`)
+    for (const field of ['x', 'y', 'width', 'height']) {
+      if (!Number.isFinite(rect?.[field]))
+        fail(`${label}.${phase}.${field} must be finite`)
+    }
+    if (rect.width <= 0 || rect.height <= 0)
+      fail(`${label}.${phase} must have positive size`)
+    for (const field of ['x', 'y', 'width', 'height'])
+      same(bounds.before[field], rect[field], `${label}.${phase}.${field}`)
+  }
+}
+
 const compareCheckTagExecution = (web, avalonia, visualReview = null) => {
   const contractId = 'component-v2.el-check-tag'
   validateContractExecution(web, 'web', contractId)
@@ -842,6 +862,10 @@ const compareCheckTagExecution = (web, avalonia, visualReview = null) => {
     ['web', web],
     ['avalonia', avalonia],
   ]) {
+    validateCheckTagFocusBounds(
+      execution.visual.observation.focusBounds,
+      platform,
+    )
     const node = execution.accessibility.node
     same('checkbox', node.role, `${contractId}.${platform}.a11y.role`)
     same('Check tag', node.name, `${contractId}.${platform}.a11y.name`)

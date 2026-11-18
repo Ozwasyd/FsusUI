@@ -106,6 +106,76 @@ try {
     ],
     { cwd: root },
   )
+  const compare = (limit = '0.15') =>
+    execFileAsync(
+      process.execPath,
+      [
+        path.join(root, 'scripts/compare-render-performance.mjs'),
+        baseline,
+        current,
+        limit,
+        baselineRepeat,
+        currentRepeat,
+      ],
+      { cwd: root },
+    )
+  for (const limit of ['', 'NaN', 'Infinity', '-0.01', '1.01']) {
+    await assert.rejects(compare(limit), /limit must be a number/u)
+  }
+  const scenario = summary.results[0]
+  for (const [badSummary, reason] of [
+    [{ results: [] }, /empty scenario matrix/u],
+    [{ results: [scenario, scenario] }, /duplicate scenario/u],
+    [
+      { results: [{ ...scenario, inputToNextFrameMs: { p95: 0 } }] },
+      /p95 must be finite and positive/u,
+    ],
+    [
+      { results: [{ ...scenario, inputToNextFrameMs: { p95: '10' } }] },
+      /p95 must be finite and positive/u,
+    ],
+    [
+      { results: [{ ...scenario, inputToNextFrameMs: { p95: null } }] },
+      /p95 must be finite and positive/u,
+    ],
+  ]) {
+    await writeFile(
+      path.join(baseline, 'web/summary.json'),
+      JSON.stringify(badSummary),
+    )
+    await assert.rejects(compare(), reason)
+  }
+  await writeFile(
+    path.join(baseline, 'web/summary.json'),
+    JSON.stringify(summary),
+  )
+  const unrepresentable = {
+    results: [{ ...scenario, inputToNextFrameMs: { p95: Number.MAX_VALUE } }],
+  }
+  for (const directory of [baseline, baselineRepeat]) {
+    await writeFile(
+      path.join(directory, 'web/summary.json'),
+      JSON.stringify(unrepresentable),
+    )
+  }
+  await assert.rejects(compare(), /aggregate p95 must be finite and positive/u)
+  for (const directory of [baseline, baselineRepeat]) {
+    await writeFile(
+      path.join(directory, 'web/summary.json'),
+      JSON.stringify(summary),
+    )
+  }
+  await writeFile(
+    path.join(currentRepeat, 'web/summary.json'),
+    JSON.stringify({
+      results: [scenario, { ...scenario, id: 'unexpected-repeat' }],
+    }),
+  )
+  await assert.rejects(compare(), /extra order-balanced repeat scenario/u)
+  await writeFile(
+    path.join(currentRepeat, 'web/summary.json'),
+    JSON.stringify(summary),
+  )
   const slower = {
     results: [
       {

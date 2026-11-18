@@ -660,6 +660,24 @@ const main = async () => {
         'null',
     ).checkTag
     await page.emulateMedia({ reducedMotion: 'reduce' })
+    // Document CSS pixels keep scroll changes separate from control layout.
+    const measureCheckTagBounds = async () =>
+      checkTag.evaluate(async (element) => {
+        await Promise.all(
+          element.getAnimations().map((animation) => animation.finished),
+        )
+        await new Promise(requestAnimationFrame)
+        await new Promise(requestAnimationFrame)
+        const { x, y, width, height } = element.getBoundingClientRect()
+        return {
+          x: x + window.scrollX,
+          y: y + window.scrollY,
+          width,
+          height,
+          focused: element.matches(':focus'),
+        }
+      })
+    const checkTagBoundsBeforeFocus = await measureCheckTagBounds()
     await checkTag.evaluate((element) => {
       element.addEventListener(
         'pointerdown',
@@ -702,6 +720,7 @@ const main = async () => {
         ? element.getAttribute('role') || 'checkbox'
         : document.activeElement?.getAttribute('role') || null,
     )
+    const checkTagBoundsAfterFocus = await measureCheckTagBounds()
     await checkTag.evaluate((element) => {
       element.addEventListener(
         'keydown',
@@ -730,6 +749,14 @@ const main = async () => {
             ?.textContent || 'null',
         ).checkTag.checked === false,
     )
+    const checkTagBoundsAfterToggle = await measureCheckTagBounds()
+    const checkTagFocusBounds = {
+      coordinateSpace: 'document',
+      unit: 'css-px',
+      before: checkTagBoundsBeforeFocus,
+      afterFocus: checkTagBoundsAfterFocus,
+      afterToggle: checkTagBoundsAfterToggle,
+    }
     const checkTagState = JSON.parse(
       (await page.getByTestId('interaction-trace-state').textContent()) ||
         'null',
@@ -1461,6 +1488,7 @@ const main = async () => {
               content: (await checkTag.textContent())?.trim(),
               focused: checkTagFocus === 'checkbox',
               focusIndicatorVisible: checkTagMotion.focusIndicatorVisible,
+              focusBounds: checkTagFocusBounds,
               width: Math.round(checkTagVisualBounds.width),
               height: Math.round(checkTagVisualBounds.height),
             },

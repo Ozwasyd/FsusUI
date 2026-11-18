@@ -39,7 +39,10 @@ const mutate = (relative, rewrite, label) => {
       cpSync(path.join(root, item), target)
     }
     const target = path.join(temporaryRoot, relative)
-    writeFileSync(target, rewrite(readFileSync(target, 'utf8')))
+    const original = readFileSync(target, 'utf8')
+    const mutated = rewrite(original)
+    assert.notEqual(mutated, original, `${label} mutation must change source`)
+    writeFileSync(target, mutated)
     const result = run(temporaryRoot)
     assert.notEqual(result.status, 0, `${label} mutation must fail`)
   } finally {
@@ -72,7 +75,7 @@ mutate(
 mutate(
   'scripts/test-avalonia-aot-smoke.mjs',
   (text) =>
-    text.replace('!fsusUiCandidatePackagePattern.test(entry.name)', 'true'),
+    text.replace('!candidatePackagePattern.test(entry.name)', 'true'),
   'stale cached candidate accepted',
 )
 mutate(

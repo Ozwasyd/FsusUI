@@ -6,9 +6,13 @@ import path from 'node:path'
 export const diagnosticIds = new Set([
   'virtual-list-fixed-100000-60hz-dpr1-enabled',
   'virtual-window-index-legacy-100000-120hz-dpr2-reduced',
+  'virtual-grid-100000-60hz-dpr2-disabled',
+  'data-pipeline-table-100000-120hz-dpr2-reduced',
 ])
-export const maxTraceEvents = 100_000
-export const maxDiagnosticBytes = 8 * 1024 * 1024
+// Four rows share the previous aggregate ceiling: 200k retained events / 16 MiB.
+// Event count is not a byte-level heap bound; truncated prefixes may omit late frames.
+export const maxTraceEvents = 50_000
+export const maxDiagnosticBytes = 4 * 1024 * 1024
 export const sha256 = (value) =>
   createHash('sha256').update(value).digest('hex')
 

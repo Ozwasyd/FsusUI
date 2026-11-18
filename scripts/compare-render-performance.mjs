@@ -21,12 +21,33 @@ if (Boolean(baselineRepeatDirectory) !== Boolean(currentRepeatDirectory))
     'Order-balanced comparison requires both baseline and current repeat directories',
   )
 const limit = Number(limitArgument)
+if (!limitArgument.trim() || !Number.isFinite(limit) || limit < 0 || limit > 1)
+  throw new Error('Relative performance limit must be a number from 0 to 1')
 const read = async (directory, platform) =>
   JSON.parse(
     await readFile(path.join(directory, platform, 'summary.json'), 'utf8'),
   )
 const metricValue = (entry, platform) =>
-  platform === 'web' ? entry.inputToNextFrameMs.p95 : entry.FrameMs.P95
+  platform === 'web' ? entry.inputToNextFrameMs?.p95 : entry.FrameMs?.P95
+
+const measurementMap = (summary, platform, arm) => {
+  const entries = summary.results ?? summary.Results
+  if (!Array.isArray(entries) || entries.length === 0)
+    throw new Error(`${platform}/${arm}: empty scenario matrix`)
+  const result = new Map()
+  for (const entry of entries) {
+    const id = entry?.id ?? entry?.Id
+    if (typeof id !== 'string' || !id.trim() || result.has(id))
+      throw new Error(`${platform}/${arm}: invalid or duplicate scenario ${id}`)
+    const p95 = metricValue(entry, platform)
+    if (!Number.isFinite(p95) || p95 <= 0)
+      throw new Error(
+        `${platform}/${id}: ${arm} p95 must be finite and positive`,
+      )
+    result.set(id, p95)
+  }
+  return result
+}
 
 const readPlan = async (directory) =>
   readFile(path.join(directory, 'impact-plan.json'), 'utf8')
@@ -69,26 +90,31 @@ for (const platform of ['web', 'avalonia']) {
   const currentRepeat = currentRepeatDirectory
     ? await read(currentRepeatDirectory, platform)
     : null
-  const entriesOf = (summary) => summary.results ?? summary.Results
-  const mapOf = (summary) =>
-    new Map(entriesOf(summary).map((entry) => [entry.id ?? entry.Id, entry]))
-  const baselineMap = mapOf(baseline)
-  const baselineRepeatMap = baselineRepeat ? mapOf(baselineRepeat) : null
-  const currentRepeatMap = currentRepeat ? mapOf(currentRepeat) : null
-  const currentResults = current.results ?? current.Results
-  const currentIds = new Set(
-    currentResults.map((entry) => entry.id ?? entry.Id),
-  )
+  const baselineMap = measurementMap(baseline, platform, 'baseline')
+  const currentMap = measurementMap(current, platform, 'current')
+  const baselineRepeatMap = baselineRepeat
+    ? measurementMap(baselineRepeat, platform, 'baseline-repeat')
+    : null
+  const currentRepeatMap = currentRepeat
+    ? measurementMap(currentRepeat, platform, 'current-repeat')
+    : null
   for (const id of baselineMap.keys()) {
-    if (!currentIds.has(id))
+    if (!currentMap.has(id))
       regressions.push(
         `${platform}/${id}: baseline unavailable/contract changed; current scenario is missing from the shared plan`,
       )
   }
-  for (const entry of currentResults) {
-    const id = entry.id ?? entry.Id
-    const previous = baselineMap.get(id)
-    if (!previous) {
+  for (const repeat of [baselineRepeatMap, currentRepeatMap]) {
+    for (const id of repeat?.keys() ?? []) {
+      if (!currentMap.has(id) || !baselineMap.has(id))
+        regressions.push(
+          `${platform}/${id}: extra order-balanced repeat scenario`,
+        )
+    }
+  }
+  for (const [id, afterFirst] of currentMap) {
+    const beforeFirst = baselineMap.get(id)
+    if (beforeFirst === undefined) {
       regressions.push(
         `${platform}/${id}: baseline unavailable/contract changed; missing same-runner scenario`,
       )
@@ -102,15 +128,20 @@ for (const platform of ['web', 'avalonia']) {
       )
       continue
     }
-    const beforeFirst = metricValue(previous, platform)
-    const afterFirst = metricValue(entry, platform)
     const before = previousRepeat
-      ? Math.sqrt(beforeFirst * metricValue(previousRepeat, platform))
+      ? Math.sqrt(beforeFirst * previousRepeat)
       : beforeFirst
-    const after = entryRepeat
-      ? Math.sqrt(afterFirst * metricValue(entryRepeat, platform))
-      : afterFirst
-    if (before > 0 && after > before * (1 + limit)) {
+    const after = entryRepeat ? Math.sqrt(afterFirst * entryRepeat) : afterFirst
+    if (
+      !Number.isFinite(before) ||
+      before <= 0 ||
+      !Number.isFinite(after) ||
+      after <= 0
+    )
+      throw new Error(
+        `${platform}/${id}: aggregate p95 must be finite and positive`,
+      )
+    if (after > before * (1 + limit)) {
       regressions.push(
         `${platform}/${id}: ${baselineRepeatDirectory ? 'order-balanced ' : ''}p95 ${after.toFixed(2)}ms > ${before.toFixed(2)}ms + ${(limit * 100).toFixed(0)}%`,
       )

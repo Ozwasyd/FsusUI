@@ -333,6 +333,22 @@ internal static class ConformanceV2Runner
         checkTag.Bounds.Width > 0 &&
         checkTag.Bounds.Height > 0,
     }, elapsedMilliseconds: checkTagStepStopwatch.Elapsed.TotalMilliseconds);
+    object MeasureCheckTagBounds()
+    {
+      Dispatcher.UIThread.RunJobs();
+      window.UpdateLayout();
+      var origin = checkTag.TranslatePoint(default, window)
+        ?? throw new InvalidOperationException("CheckTag window-relative bounds unavailable.");
+      return new
+      {
+        focused = checkTag.IsFocused,
+        x = origin.X,
+        y = origin.Y,
+        width = checkTag.Bounds.Width,
+        height = checkTag.Bounds.Height,
+      };
+    }
+    var checkTagBoundsBeforeFocus = MeasureCheckTagBounds();
     var checkTagInteractionStopwatch = Stopwatch.StartNew();
     var checkTagPointer = new Pointer(Pointer.GetNextFreeId(), PointerType.Mouse, true);
     checkTag.RaiseEvent(new PointerReleasedEventArgs(
@@ -371,6 +387,9 @@ internal static class ConformanceV2Runner
       actual = new { checkTagFocused, checkTag.IsFocused },
       passed = checkTagFocused && checkTag.IsFocused,
     }, "checkbox", checkTagStepStopwatch.Elapsed.TotalMilliseconds);
+    checkTagInteractionStopwatch.Stop();
+    var checkTagBoundsAfterFocus = MeasureCheckTagBounds();
+    checkTagInteractionStopwatch.Start();
     checkTag.RaiseEvent(new KeyEventArgs
     {
       RoutedEvent = InputElement.KeyDownEvent,
@@ -388,6 +407,7 @@ internal static class ConformanceV2Runner
       passed = checkTagFocused && checkTag.IsFocused && !checkTag.Checked && checkTagEvents.Count == 2,
     }, "checkbox", checkTagStepStopwatch.Elapsed.TotalMilliseconds);
     checkTagInteractionStopwatch.Stop();
+    var checkTagBoundsAfterToggle = MeasureCheckTagBounds();
     window.UpdateLayout();
     var checkTagNode = AutomationNode(checkTag, 3);
     RecordContractStep(checkTagSteps, checkTagIdentity, "accessibility", "FsusCheckTag.AutomationPeer", new
@@ -1199,6 +1219,14 @@ internal static class ConformanceV2Runner
               focused = checkTagSnapshotFocused,
               focusIndicatorVisible = checkTagFocusIndicatorVisible,
               focusRingPixels = checkTagFocusRingPixels,
+              focusBounds = new
+              {
+                coordinateSpace = "window",
+                unit = "dip",
+                before = checkTagBoundsBeforeFocus,
+                afterFocus = checkTagBoundsAfterFocus,
+                afterToggle = checkTagBoundsAfterToggle,
+              },
               width = checkTagPixelSize.Width,
               height = checkTagPixelSize.Height,
             },

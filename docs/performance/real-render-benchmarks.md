@@ -76,7 +76,9 @@ Both variants use the same browser dimension and CPU workload. On the #185 devel
 
 ## Avalonia matrix and metrics
 
-The desktop runner opens a fixed 1180×760 window with fixed font, DPI, and theme inputs. It mounts real FsusUI controls into an Avalonia visual tree and performs scrolling, continuous input, tree expansion, table sort/selection/data-window changes, theme switching, mount/unmount, and bitmap rendering. It records UI-thread frame, Measure/Arrange, draw, allocation, GC, realized/retained visuals, and disposal timing.
+The existing `theme-switch` scenario name is retained for measurement compatibility. It changes `Application.RequestedThemeVariant` while the benchmark window explicitly requests Light, so the button remains Light. Its current metric measures the legacy application-preference action plus layout/render work, including the existing remount lifecycle; it does not demonstrate a visible Light/Dark transition. `FsusThemePreferenceHeadlessTests` separately verifies that inheritance behavior and that changing the owning window switches the actual button variant. That semantic guard is not performance evidence and does not replace or relax the existing scenario, metric, or acceptance limits. A corrected visible-transition benchmark requires an explicitly versioned protocol applied identically to both product revisions, not comparison against this legacy protocol.
+
+The desktop runner opens a fixed 1180×760 window with fixed font, DPI, and theme inputs. It mounts real FsusUI controls into an Avalonia visual tree and performs scrolling, continuous input, tree expansion, table sort/selection/data-window changes, application theme preference changes, mount/unmount, and bitmap rendering. It records UI-thread frame, Measure/Arrange, draw, allocation, GC, realized/retained visuals, and disposal timing.
 
 The artifact records the resolved renderer type and native window handle descriptor. A result with an unresolved renderer/backend is invalid evidence and must not be described as a desktop measurement.
 

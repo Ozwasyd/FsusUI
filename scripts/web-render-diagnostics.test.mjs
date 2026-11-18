@@ -6,6 +6,8 @@ import { tmpdir } from 'node:os'
 import path from 'node:path'
 import {
   diagnosticIds,
+  maxTraceEvents,
+  maxDiagnosticBytes,
   encodeDiagnostic,
   sha256,
   writeDiagnostics,
@@ -162,4 +164,36 @@ test('diagnostics opt-in is limited to two current CI measurements', async () =>
   assert(
     blocks[1].startsWith('name: Repeat current quick matrix for order balance'),
   )
+})
+
+test('four exact confirmed rows preserve the previous aggregate retention ceilings', () => {
+  assert.deepEqual(
+    [...diagnosticIds],
+    [
+      'virtual-list-fixed-100000-60hz-dpr1-enabled',
+      'virtual-window-index-legacy-100000-120hz-dpr2-reduced',
+      'virtual-grid-100000-60hz-dpr2-disabled',
+      'data-pipeline-table-100000-120hz-dpr2-reduced',
+    ],
+  )
+  assert.equal(diagnosticIds.size * maxTraceEvents, 200_000)
+  assert.equal(diagnosticIds.size * maxDiagnosticBytes, 16 * 1024 * 1024)
+  for (const id of diagnosticIds) {
+    const input = { ...record, raw: { ...raw, id } }
+    const out = JSON.parse(encodeDiagnostic(input, identity))
+    assert.equal(out.identity.scenarioId, id)
+    assert.equal(
+      out.identity.rawSha256,
+      sha256(`${JSON.stringify(input.raw, null, 2)}\n`),
+    )
+    assert.deepEqual(out.anchors, record.anchors)
+  }
+  for (const id of [
+    'virtual-grid-100000-60hz-dpr1-enabled',
+    'data-pipeline-table-100000-60hz-dpr1-enabled',
+  ]) {
+    assert.throws(() =>
+      encodeDiagnostic({ ...record, raw: { ...raw, id } }, identity),
+    )
+  }
 })
