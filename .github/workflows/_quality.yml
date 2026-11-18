@@ -205,7 +205,7 @@ jobs:
       - name: Build and verify the unique NuGet candidate
         id: candidate
         run: |
-          dbus-run-session -- xvfb-run -a pnpm run conformance:v2
+          xvfb-run -a dbus-run-session -- pnpm run conformance:v2
           pnpm run check:avalonia-stable-readiness
           node scripts/dotnet-package-verify.mjs
           echo "digest=$(node -p \"require('./dotnet/artifacts/package/manifest.json').candidateSha256\")" >> "$GITHUB_OUTPUT"
