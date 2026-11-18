@@ -257,20 +257,25 @@ public class FsusCommandPaletteHeadlessTests
     var host = new FsusOverlayHost();
     var window = CreateStyledWindow(900, 620, host);
 
-    palette.Open(host);
-    Assert.Equal(FsusCommandPaletteState.Searching, palette.State);
-    releaseSearch.SetResult();
-    await PumpUntilAsync(() => palette.State != FsusCommandPaletteState.Searching);
+    try
+    {
+      var opening = palette.OpenAsync(host).AsTask();
+      Assert.Equal(FsusCommandPaletteState.Searching, palette.State);
+      releaseSearch.SetResult();
+      await opening.WaitAsync(TimeSpan.FromSeconds(5));
 
-    Assert.Equal("remote.publish", palette.SelectedCommandId);
-    var execution = palette.ActivateSelectedAsync().AsTask();
-    Assert.Equal(FsusCommandPaletteState.Executing, palette.State);
-    releaseExecution.SetResult();
-    await PumpUntilAsync(() => execution.IsCompleted);
+      Assert.Equal("remote.publish", palette.SelectedCommandId);
+      var execution = palette.ActivateSelectedAsync().AsTask();
+      Assert.Equal(FsusCommandPaletteState.Executing, palette.State);
+      releaseExecution.SetResult();
 
-    Assert.True(await execution);
-    Assert.False(palette.IsOpen);
-    window.Close();
+      Assert.True(await execution.WaitAsync(TimeSpan.FromSeconds(5)));
+      Assert.False(palette.IsOpen);
+    }
+    finally
+    {
+      window.Close();
+    }
   }
 
   [AvaloniaFact]
@@ -885,16 +890,6 @@ public class FsusCommandPaletteHeadlessTests
     target.RaiseEvent(args);
     Dispatcher.UIThread.RunJobs();
     return args;
-  }
-
-  private static async Task PumpUntilAsync(Func<bool> predicate)
-  {
-    for (var attempt = 0; attempt < 200 && !predicate(); attempt++)
-    {
-      Dispatcher.UIThread.RunJobs();
-      await Task.Yield();
-    }
-    Assert.True(predicate());
   }
 
   private static string FindRepositoryRoot()
