@@ -1,3 +1,4 @@
+import './check-tag-focus-bounds.test.mjs'
 import assert from 'node:assert/strict'
 import crypto from 'node:crypto'
 import fs from 'node:fs'
@@ -217,9 +218,10 @@ test('Avalonia semantic baselines retain compiler and input freshness identity',
     assert.equal(region.canRead, true)
     assert.equal(region.required, false)
   }
-  const typesWithContentProperty = avaloniaBaselines.avalonia.semanticTypes.filter(
-    (type) => typeof type.contentProperty === 'string',
-  )
+  const typesWithContentProperty =
+    avaloniaBaselines.avalonia.semanticTypes.filter(
+      (type) => typeof type.contentProperty === 'string',
+    )
   assert.equal(typesWithContentProperty.length, 158)
   for (const type of typesWithContentProperty) {
     assert.ok(
@@ -1494,7 +1496,8 @@ test('explicit semantic member bindings reject stale and duplicate endpoints', (
     clone(
       duplicate.mappings.find(
         (mapping) =>
-          mapping.component === 'ElMarkdownEditor' && mapping.web === 'modelValue',
+          mapping.component === 'ElMarkdownEditor' &&
+          mapping.web === 'modelValue',
       ),
     ),
   )

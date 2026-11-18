@@ -133,7 +133,7 @@
     "component-contracts:check": "node ./scripts/with-node-heap.mjs node ./scripts/component-contract-registry.mjs --check",
     "contract-v2:generate": "node ./scripts/with-node-heap.mjs node ./scripts/contract-v2.mjs",
     "contract-v2:check": "node ./scripts/with-node-heap.mjs node ./scripts/contract-v2.mjs --check",
-    "test:contract-v2": "node ./scripts/with-node-heap.mjs node --test tests/contract-v2.test.mjs tests/check-tag-focus-bounds.test.mjs",
+    "test:contract-v2": "node ./scripts/with-node-heap.mjs node --test tests/contract-v2.test.mjs",
     "platform-overrides:check": "node ./scripts/with-node-heap.mjs node ./scripts/check-platform-overrides.mjs",
     "typography:check": "node ./scripts/with-node-heap.mjs node ./scripts/check-typography-baseline.mjs",
     "conformance:tokens": "node ./scripts/with-node-heap.mjs node ./scripts/check-conformance.mjs tokens",
