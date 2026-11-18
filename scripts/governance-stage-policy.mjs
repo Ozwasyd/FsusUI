@@ -83,8 +83,8 @@ export function validateGovernanceStages({
   ]) {
     assert.match(
       producer,
-      /uses: actions\/checkout@v4\n\s+with:\n\s+fetch-depth: 3/u,
-      'Conformance must retain the reviewed candidate ancestry',
+      /uses: actions\/checkout@v4\n\s+with:\n\s+fetch-depth: 0[ \t]*\n/u,
+      'Conformance must retain complete ancestry for the independently reviewed candidate',
     )
     assert.match(
       producer,

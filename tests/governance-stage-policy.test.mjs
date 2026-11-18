@@ -23,12 +23,21 @@ for (const mutation of [
   'reverse producer order',
   'optional producer',
   'drop PR dependency',
-  'shallow producer',
+  'shallow NuGet producer',
+  'shallow AOT producer',
+  'missing checkout depth',
 ]) {
   test(`governance split rejects ${mutation}`, () => {
     const value = assets()
-    if (mutation === 'shallow producer')
-      value.reusable = value.reusable.replace('          fetch-depth: 3\n', '')
+    if (mutation === 'shallow NuGet producer')
+      value.reusable = value.reusable.replace('          fetch-depth: 0\n', '          fetch-depth: 3\n')
+    if (mutation === 'shallow AOT producer')
+      value.quality = value.quality.replace(
+        /(\n  pr-avalonia-aot-candidate:\n[\s\S]*?fetch-depth: )0\n/u,
+        (_match, prefix) => `${prefix}3\n`,
+      )
+    if (mutation === 'missing checkout depth')
+      value.reusable = value.reusable.replace('          fetch-depth: 0\n', '')
     if (mutation === 'drop static gate')
       value.scripts['governance:check:ci-static'] = value.scripts[
         'governance:check:ci-static'
