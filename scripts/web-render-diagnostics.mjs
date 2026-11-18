@@ -4,7 +4,7 @@ import { mkdir, writeFile } from 'node:fs/promises'
 import path from 'node:path'
 
 export const diagnosticIds = new Set([
-  'select-v2-100000-60hz-dpr2-disabled',
+  'virtual-list-variable-100000-120hz-dpr2-reduced',
   'virtual-window-index-incremental-100000-60hz-dpr2-disabled',
   'virtual-grid-100000-60hz-dpr2-disabled',
   'data-pipeline-table-100000-120hz-dpr2-reduced',

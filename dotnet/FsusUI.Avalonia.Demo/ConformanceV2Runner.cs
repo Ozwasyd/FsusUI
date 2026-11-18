@@ -14,6 +14,7 @@ using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
+using Avalonia.Rendering.Composition;
 using Avalonia.Styling;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
@@ -116,7 +117,7 @@ internal static class ConformanceV2Runner
       try
       {
         await Dispatcher.UIThread.InvokeAsync(
-          () => Run(window, button, input, checkTag, editor, identity),
+          () => RunAsync(window, button, input, checkTag, editor, identity),
           DispatcherPriority.Background);
         lifetime.Shutdown(0);
       }
@@ -129,7 +130,7 @@ internal static class ConformanceV2Runner
     return window;
   }
 
-  private static void Run(
+  private static async Task RunAsync(
     Window window,
     FsusButton button,
     FsusInput input,
@@ -430,8 +431,7 @@ internal static class ConformanceV2Runner
     var checkTagFocusIndicatorGeometryVisible =
       checkTagFocusRing is not null &&
       checkTagFocusRing.BorderThickness != default;
-    var checkTagDetachedReference = CreateDetachedCheckTag(
-      (StackPanel)window.Content!);
+    var checkTagDetachedReference = await CreateDetachedCheckTagAsync(window);
     window.UpdateLayout();
     Dispatcher.UIThread.RunJobs();
     GC.Collect();
@@ -1475,12 +1475,33 @@ internal static class ConformanceV2Runner
   }
 
   [MethodImpl(MethodImplOptions.NoInlining)]
-  private static WeakReference CreateDetachedCheckTag(StackPanel host)
+  private static async Task<WeakReference> CreateDetachedCheckTagAsync(Window window)
   {
-    var detached = new FsusCheckTag { Content = "Detached lifetime probe" };
+    var host = (StackPanel)window.Content!;
+    var compositor = ElementComposition.GetElementVisual(window)?.Compositor
+      ?? throw new InvalidOperationException("CheckTag lifetime probe requires a compositor.");
+    FsusCheckTag? detached = new() { Content = "Detached lifetime probe" };
+    var reference = new WeakReference(detached);
     host.Children.Add(detached);
+    window.UpdateLayout();
+    if (!detached.IsAttachedToVisualTree() || detached.Bounds.Width <= 0 ||
+        detached.Bounds.Height <= 0)
+    {
+      throw new InvalidOperationException("CheckTag lifetime probe was not mounted.");
+    }
+    // A dispatcher drain is not a composition fence. Dirty visuals remain owned
+    // by the renderer until its queued composition update has been processed.
+    await compositor.RequestCommitAsync().WaitAsync(TimeSpan.FromSeconds(5));
     host.Children.Remove(detached);
-    return new WeakReference(detached);
+    if (detached.Parent is not null || detached.IsAttachedToVisualTree())
+    {
+      throw new InvalidOperationException("CheckTag lifetime probe was not detached.");
+    }
+    // Do not leave a strong control reference in this async state machine.
+    detached = null;
+    window.UpdateLayout();
+    await compositor.RequestCommitAsync().WaitAsync(TimeSpan.FromSeconds(5));
+    return reference;
   }
 
   private static void RecordStep(
