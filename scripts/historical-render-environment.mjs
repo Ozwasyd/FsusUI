@@ -1,5 +1,4 @@
 import { createHash } from 'node:crypto'
-import { execFile } from 'node:child_process'
 import {
   access,
   mkdtemp,
@@ -10,9 +9,18 @@ import {
 } from 'node:fs/promises'
 import os from 'node:os'
 import path from 'node:path'
-import { promisify } from 'node:util'
 
-const exec = promisify(execFile)
+import {
+  execHistoricalProcess,
+  historicalDeadlines,
+} from './historical-bounded-process.mjs'
+
+const exec = (command, args, options = {}) =>
+  execHistoricalProcess(command, args, {
+    ...options,
+    timeoutMs: historicalDeadlines[command === 'git' ? 'git' : 'sdk'],
+    stage: `${command} ${args.join(' ')}`,
+  })
 const json = async (file) => JSON.parse(await readFile(file, 'utf8'))
 const requireThat = (condition, message) => {
   if (!condition) throw new Error(`Historical baseline rejected: ${message}`)
@@ -75,7 +83,14 @@ export async function prepareHistoricalSdk(
     env,
   }).then(
     (result) => result.stdout.trim(),
-    () => null,
+    (error) => {
+      if (
+        error.code === 'HISTORICAL_TIMEOUT' ||
+        error.code === 'HISTORICAL_CANCELLED'
+      )
+        throw error
+      return null
+    },
   )
   if (ambient === current.version)
     return {

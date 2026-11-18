@@ -241,6 +241,7 @@ if (failures.length)
     `Real-render performance contract failed:\n${failures.join('\n')}`,
   )
 await import('./web-render-diagnostics.test.mjs')
+await import('./web-render-liveness.test.mjs')
 await import('./test-render-performance-impact-plan.mjs')
 await import('./test-render-performance-results.mjs')
 await import('./test-historical-render-baseline.mjs')

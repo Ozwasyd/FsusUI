@@ -69,6 +69,7 @@ internal static class RenderPerformanceRunner
       catch (Exception exception)
       {
         exitCode = 1;
+        Console.Error.WriteLine($"Avalonia performance failed: scenario={activeScenario} phase={activePhase}");
         Console.Error.WriteLine(exception);
       }
       finally
@@ -77,6 +78,15 @@ internal static class RenderPerformanceRunner
       }
     };
     return window;
+  }
+
+  private static string activeScenario = "startup";
+  private static string activePhase = "window-open";
+
+  private static void LogPhase(string phase)
+  {
+    activePhase = phase;
+    Console.Error.WriteLine($"Avalonia performance progress: scenario={activeScenario} phase={phase}");
   }
 
   private static async Task RunAsync(Window window)
@@ -119,8 +129,10 @@ internal static class RenderPerformanceRunner
     Directory.CreateDirectory(rawDirectory);
     foreach (var definition in definitions)
     {
+      activeScenario = definition.Id;
+      LogPhase("prepare-mount");
       window.Content = null;
-      await WaitForRenderAsync();
+      await WaitForRenderAsync().WaitAsync(TimeSpan.FromSeconds(30));
       var visualBaseline = window.GetVisualDescendants().Count();
       var control = definition.Create();
       var host = new Grid
@@ -130,14 +142,16 @@ internal static class RenderPerformanceRunner
         Children = { control },
       };
       window.Content = host;
-      await WaitForRenderAsync();
+      await WaitForRenderAsync().WaitAsync(TimeSpan.FromSeconds(30));
+      LogPhase("edge-operations");
       var exercisedOperations = ExerciseEdgeOperations(control);
-      await WaitForRenderAsync();
+      await WaitForRenderAsync().WaitAsync(TimeSpan.FromSeconds(30));
+      LogPhase("warmup-native-render");
       for (var index = 0; index < warmups; index++)
       {
         definition.Act(control, index);
         Render(host);
-        await WaitForRenderAsync();
+        await WaitForRenderAsync().WaitAsync(TimeSpan.FromSeconds(30));
       }
 
       var frame = new List<double>();
@@ -152,6 +166,7 @@ internal static class RenderPerformanceRunner
       var pooledContainers = new List<int>();
       var retainedMeasurements = new List<int>();
       var loadedWindows = new List<int>();
+      LogPhase("measured-action-layout-native-render-dispatch");
       var gc0Before = GC.CollectionCount(0);
       var gc1Before = GC.CollectionCount(1);
       var gc2Before = GC.CollectionCount(2);
@@ -200,8 +215,11 @@ internal static class RenderPerformanceRunner
       // Dispose-backed bitmap samples allocate on the LOH. Clear that completed
       // phase before observing scrolling so its deferred reclamation is not
       // incorrectly attributed to the virtualization loop below.
+      LogPhase("forced-gc");
       GC.Collect(2, GCCollectionMode.Forced, blocking: true, compacting: false);
+      LogPhase("pending-finalizers");
       GC.WaitForPendingFinalizers();
+      LogPhase("long-scroll");
       var longScrollGc2Before = GC.CollectionCount(2);
       for (var index = 0; index < longScrollIterations; index++)
       {
@@ -209,6 +227,7 @@ internal static class RenderPerformanceRunner
       }
       var longScrollGen2 = GC.CollectionCount(2) - longScrollGc2Before;
 
+      LogPhase("write-raw-and-unload");
       var raw = new
       {
         definition.Id,
@@ -235,11 +254,12 @@ internal static class RenderPerformanceRunner
       window.Content = null;
       (control as IDisposable)?.Dispose();
       disposalWatch.Stop();
-      await WaitForRenderAsync();
+      await WaitForRenderAsync().WaitAsync(TimeSpan.FromSeconds(30));
       var retainedVisuals = window.GetVisualDescendants().Count();
       await File.AppendAllTextAsync(
         Path.Combine(rawDirectory, $"{definition.Id}.disposal.txt"),
         disposalWatch.Elapsed.TotalMilliseconds.ToString("F4", CultureInfo.InvariantCulture));
+      LogPhase("scenario-complete");
       results.Add(new
       {
         definition.Id,
@@ -307,6 +327,8 @@ internal static class RenderPerformanceRunner
     global::Avalonia.Threading.Dispatcher.UIThread.Post(
       () => completion.SetResult(),
       global::Avalonia.Threading.DispatcherPriority.Render);
+    // Keep the measured path unchanged. Untimed callers apply a finite wait;
+    // a process watchdog must bound blocked UI/native work and measured samples.
     return completion.Task;
   }
 

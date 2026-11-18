@@ -139,3 +139,5 @@ try {
 }
 
 await import('./test-historical-checker-compatibility.mjs')
+
+await import('./test-historical-bounded-process.mjs')

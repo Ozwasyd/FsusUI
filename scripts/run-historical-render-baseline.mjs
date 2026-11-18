@@ -2,8 +2,11 @@ import {
   prepareHistoricalSdk,
   assertHistoricalIdentity,
 } from './historical-render-environment.mjs'
-import { spawn } from 'node:child_process'
-import { access, mkdir, readFile, writeFile } from 'node:fs/promises'
+import {
+  runHistoricalProcess,
+  historicalDeadlines,
+} from './historical-bounded-process.mjs'
+import { access, mkdir, readFile, readdir, writeFile } from 'node:fs/promises'
 import path from 'node:path'
 import process from 'node:process'
 import { pathToFileURL } from 'node:url'
@@ -160,6 +163,10 @@ export function classifyHistoricalFailure(result, checker) {
   requireThat(
     result.code === 1 &&
       !result.signal &&
+      !result.timedOut &&
+      !result.cancelled &&
+      !checker.timedOut &&
+      !checker.cancelled &&
       checker.code === 1 &&
       !checker.signal,
     'non-policy process failure',
@@ -197,25 +204,14 @@ export function classifyHistoricalFailure(result, checker) {
 }
 
 const run = (command, args, options) =>
-  new Promise((resolve, reject) => {
-    const child = spawn(command, args, {
-      ...options,
-      stdio: ['ignore', 'pipe', 'pipe'],
-    })
-    let stdout = '',
-      stderr = ''
-    child.stdout.on('data', (chunk) => {
-      process.stdout.write(chunk)
-      stdout += chunk
-    })
-    child.stderr.on('data', (chunk) => {
-      process.stderr.write(chunk)
-      stderr += chunk
-    })
-    child.once('error', reject)
-    child.once('close', (code, signal) =>
-      resolve({ code, signal, stdout, stderr }),
-    )
+  runHistoricalProcess(command, args, {
+    ...options,
+    stream: true,
+    stage: command === 'pnpm' ? 'benchmark' : 'checker',
+    timeoutMs:
+      command === 'pnpm'
+        ? historicalDeadlines.benchmark
+        : historicalDeadlines.checker,
   })
 
 // Policy remains byte-identical; checker implementations may evolve only when
@@ -255,6 +251,57 @@ export async function classifyHistoricalOutput(
   return violations
 }
 
+export async function writeHistoricalFailure(output, error, startedAt) {
+  await writeFile(
+    path.join(
+      output,
+      error.stage === 'benchmark'
+        ? 'historical-process.log'
+        : 'historical-failure.log',
+    ),
+    `${error.stdout ?? ''}\n${error.stderr ?? ''}\n${error.message}\n`,
+  )
+  const countRaw = async (relative) =>
+    (await readdir(path.join(output, relative)).catch(() => [])).filter(
+      (name) => name.endsWith('.raw.json'),
+    ).length
+  const present = async (relative) =>
+    access(path.join(output, relative)).then(
+      () => true,
+      () => false,
+    )
+  const status = {
+    schemaVersion: 1,
+    kind: 'historical-baseline-failure',
+    status: 'failed',
+    stage: error.stage ?? 'benchmark',
+    reason: error.code ?? 'process-error',
+    elapsedMs: Date.now() - startedAt,
+    // Presence is diagnostic only: these files are not validated acceptance evidence.
+    partialOutput: {
+      webRawFiles: await countRaw('web'),
+      webSummary: await present('web/summary.json'),
+      avaloniaRawFiles: await countRaw('avalonia/raw'),
+      avaloniaSummary: await present('avalonia/summary.json'),
+    },
+  }
+  await writeFile(
+    path.join(output, 'historical-failure-status.json'),
+    `${JSON.stringify(status, null, 2)}\n`,
+  )
+}
+
+const reportHistoricalFailure = async (output, error, startedAt) => {
+  try {
+    await writeHistoricalFailure(output, error, startedAt)
+  } catch (reportError) {
+    console.error(
+      'Could not preserve historical failure diagnostics:',
+      reportError,
+    )
+  }
+}
+
 async function main() {
   const args = process.argv.slice(2)
   const value = (name) => args[args.indexOf(name) + 1]
@@ -284,8 +331,13 @@ async function main() {
     )
   }
   await mkdir(output, { recursive: true })
+  const sdkStartedAt = Date.now()
   const sdk = plan.platforms.avalonia.run
-    ? await prepareHistoricalSdk(directory, root)
+    ? await prepareHistoricalSdk(directory, root).catch(async (error) => {
+        error.stage ??= 'sdk'
+        await reportHistoricalFailure(output, error, sdkStartedAt)
+        throw error
+      })
     : {
         env: process.env,
         cleanup: async () => {},
@@ -300,6 +352,7 @@ async function main() {
   })
   const startedAt = Date.now()
   let result
+  let processFailure
   try {
     result = await run(
       'pnpm',
@@ -315,9 +368,17 @@ async function main() {
       ],
       { cwd: directory, env: { ...sdk.env, GITHUB_SHA: sha } },
     )
-  } finally {
-    await sdk.cleanup()
+  } catch (error) {
+    processFailure = error
+    await reportHistoricalFailure(output, error, startedAt)
   }
+  try {
+    await sdk.cleanup()
+  } catch (cleanupError) {
+    if (!processFailure) throw cleanupError
+    console.error('Historical SDK cleanup also failed:', cleanupError)
+  }
+  if (processFailure) throw processFailure
   await writeFile(
     path.join(output, 'historical-process.log'),
     `${result.stdout}\n${result.stderr}`,
@@ -326,7 +387,15 @@ async function main() {
   await validateBaselineEvidence(output, plan, sha, startedAt)
   let violations = []
   if (result.code !== 0 || result.signal) {
-    violations = await classifyHistoricalOutput(result, directory, output)
+    violations = await classifyHistoricalOutput(
+      result,
+      directory,
+      output,
+    ).catch(async (error) => {
+      error.stage ??= 'classification'
+      await reportHistoricalFailure(output, error, startedAt)
+      throw error
+    })
   }
   const status = {
     schemaVersion: 1,

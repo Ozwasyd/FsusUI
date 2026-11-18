@@ -295,6 +295,7 @@ jobs:
         working-directory: current
         run: pnpm run ensure:wasm
       - name: Measure same-runner baseline first
+        timeout-minutes: 20
         if: steps.baseline-contract.outputs.available == 'true'
         working-directory: baseline
         env:
@@ -307,6 +308,7 @@ jobs:
             --impact-plan ../performance-impact-plan.json \
             --output ../performance-baseline
       - name: Measure current quick matrix
+        timeout-minutes: 8
         if: steps.render-impact.outputs.run == 'true'
         working-directory: current
         env:
@@ -317,6 +319,7 @@ jobs:
           --profile quick
           --output ../performance-current
       - name: Repeat current quick matrix for order balance
+        timeout-minutes: 8
         if: steps.baseline-contract.outputs.available == 'true'
         working-directory: current
         env:
@@ -327,6 +330,7 @@ jobs:
           --profile quick
           --output ../performance-current-repeat
       - name: Repeat baseline quick matrix last for order balance
+        timeout-minutes: 20
         if: steps.baseline-contract.outputs.available == 'true'
         working-directory: baseline
         env:

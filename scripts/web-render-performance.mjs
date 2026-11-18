@@ -1,4 +1,4 @@
-/* global PerformanceObserver, fetch, performance, requestAnimationFrame, setTimeout */
+/* global PerformanceObserver, performance, requestAnimationFrame */
 import { spawn } from 'node:child_process'
 import { existsSync } from 'node:fs'
 import { mkdir, readFile, writeFile } from 'node:fs/promises'
@@ -13,6 +13,16 @@ import {
   sha256,
   writeDiagnostics,
 } from './web-render-diagnostics.mjs'
+
+import {
+  bounded,
+  guardMethods,
+  waitForServer,
+  readTrace,
+  stopServer,
+  observeServer,
+  cleanupAll,
+} from './web-render-liveness.mjs'
 
 const root = path.resolve(import.meta.dirname, '..')
 const argv = process.argv.slice(2)
@@ -146,31 +156,6 @@ const domParseOperationStats = (samples) => ({
   unsupported: [...new Set(samples.flatMap((sample) => sample.unsupported))],
 })
 
-const waitForServer = async (server) => {
-  const deadline = Date.now() + 120_000
-  while (Date.now() < deadline) {
-    if (server.exitCode !== null)
-      throw new Error(`Vite exited with ${server.exitCode}`)
-    try {
-      const response = await fetch(baseURL)
-      if (response.ok) return
-    } catch {}
-    await new Promise((resolve) => setTimeout(resolve, 250))
-  }
-  throw new Error('Timed out waiting for performance fixture server')
-}
-
-const readTrace = async (session, stream) => {
-  let text = ''
-  while (true) {
-    const chunk = await session.send('IO.read', { handle: stream })
-    text += chunk.data
-    if (chunk.eof) break
-  }
-  await session.send('IO.close', { handle: stream })
-  return JSON.parse(text).traceEvents ?? []
-}
-
 const server = has('--no-server')
   ? null
   : spawn(
@@ -189,15 +174,22 @@ const server = has('--no-server')
       { cwd: root, stdio: ['ignore', 'pipe', 'pipe'] },
     )
 
+// Install the spawn error handler and drain pipes before the first await.
+observeServer(server)
+let browser
+let primaryError
+let phase = 'startup'
+let scenarioLabel = 'browser'
+const label = () => `${scenarioLabel} ${phase}`
 try {
-  if (server) await waitForServer(server)
+  if (server) await waitForServer(server, baseURL)
   await mkdir(output, { recursive: true })
   const configuredBrowser = process.env.FSUSUI_PERF_BROWSER_EXECUTABLE
   const systemBrowser =
     process.platform === 'linux' && existsSync('/usr/bin/google-chrome')
       ? '/usr/bin/google-chrome'
       : undefined
-  const browser = await chromium.launch({
+  browser = await chromium.launch({
     headless: true,
     executablePath: configuredBrowser || systemBrowser,
   })
@@ -205,18 +197,29 @@ try {
   const diagnostics = []
 
   for (const [scenario, size, refreshHz, dpr, motion] of matrix) {
+    scenarioLabel = `${scenario}-${size}-${refreshHz}hz-dpr${dpr}-${motion}`
+    phase = 'navigation'
     const captureDiagnostic =
       diagnosticCapture &&
       diagnosticIds.has(
         `${scenario}-${size}-${refreshHz}hz-dpr${dpr}-${motion}`,
       )
-    const context = await browser.newContext({
-      deviceScaleFactor: dpr,
-      reducedMotion: motion === 'reduced' ? 'reduce' : 'no-preference',
-      viewport: { width: 1280, height: 800 },
-    })
-    const page = await context.newPage()
-    const session = await context.newCDPSession(page)
+    const context = await bounded(
+      () =>
+        browser.newContext({
+          deviceScaleFactor: dpr,
+          reducedMotion: motion === 'reduced' ? 'reduce' : 'no-preference',
+          viewport: { width: 1280, height: 800 },
+        }),
+      `${label()} newContext`,
+    )
+    const rawPage = await bounded(() => context.newPage(), `${label()} newPage`)
+    const page = guardMethods(rawPage, ['evaluate'], label)
+    const rawSession = await bounded(
+      () => context.newCDPSession(rawPage),
+      `${label()} newCDPSession`,
+    )
+    const session = guardMethods(rawSession, ['send'], label)
     await session.send('Performance.enable')
     await session.send('LayerTree.enable')
     let layerCount = 0
@@ -361,6 +364,7 @@ try {
     const navigationMs = performance.now() - navigationStarted
 
     for (let index = 0; index < warmups; index++) {
+      phase = `warmup ${index}`
       await page.evaluate(
         (iteration) => window.__FSUSUI_PERFORMANCE_FIXTURE__.act(iteration),
         index,
@@ -395,6 +399,7 @@ try {
     const dataPipeline = []
     const domParseOperations = []
     for (let index = 0; index < samples; index++) {
+      phase = `sample ${index}`
       const sample = await page.evaluate(
         async ({ iteration, measureDomParses, captureDiagnostic }) => {
           const before = measureDomParses
@@ -524,9 +529,13 @@ try {
         )
       }
     }
+    phase = 'trace completion'
     await session.send('Tracing.end')
-    const traceStream = await traceComplete
-    const traceEvents = await readTrace(session, traceStream)
+    const traceStream = await bounded(
+      () => traceComplete,
+      `${label()} tracingComplete`,
+    )
+    const traceEvents = await readTrace(rawSession, traceStream, label())
     const browserMetrics = await session.send('Performance.getMetrics')
     const metrics = Object.fromEntries(
       browserMetrics.metrics.map(({ name, value }) => [name, value]),
@@ -679,10 +688,11 @@ try {
         traceEvents: traceEvents.slice(0, maxTraceEvents),
       })
     }
-    await context.close()
+    await bounded(() => context.close(), `${label()} context cleanup`, 10_000)
   }
   const version = browser.version()
-  await browser.close()
+  await bounded(() => browser.close(), 'browser cleanup', 10_000)
+  browser = undefined
   const artifact = {
     schemaVersion: 1,
     kind: 'real-web-render-measurement',
@@ -811,6 +821,19 @@ try {
   console.info(
     `Web real-render performance: ${results.length} scenarios -> ${path.relative(root, output)}`,
   )
+} catch (error) {
+  primaryError = error
+  throw error
 } finally {
-  if (server && server.exitCode === null) server.kill('SIGTERM')
+  await cleanupAll(primaryError, [
+    async () => {
+      if (browser)
+        await bounded(
+          () => browser.close(),
+          `${label()} browser failure cleanup`,
+          10_000,
+        )
+    },
+    () => stopServer(server),
+  ])
 }
