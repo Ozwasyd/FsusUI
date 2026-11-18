@@ -1250,23 +1250,14 @@ try {
     },
   )
   if (clone.status !== 0) throw new Error(clone.stderr || clone.stdout)
-  fs.symlinkSync(
-    path.join(root, 'node_modules'),
-    path.join(checkout, 'node_modules'),
-  )
-  const workspaceNodeModules = fs
-    .readdirSync(path.join(root, 'vue/packages'), { withFileTypes: true })
-    .filter((entry) => entry.isDirectory())
-    .map((entry) => path.join('vue/packages', entry.name, 'node_modules'))
-  if (fs.existsSync(path.join(root, 'vue/node_modules'))) {
-    workspaceNodeModules.unshift(path.join('vue', 'node_modules'))
-  }
-  for (const relative of workspaceNodeModules) {
-    const source = path.join(root, relative)
-    if (!fs.existsSync(source)) continue
-    const target = path.join(checkout, relative)
-    fs.mkdirSync(path.dirname(target), { recursive: true })
-    fs.symlinkSync(source, target)
+  // Reuse the package store, not the source checkout's workspace links.
+  // With the hoisted linker those links resolve back to the source tree,
+  // bypassing the clone's generated artifacts and potentially its mutations.
+  const installed = run('pnpm', ['install', '--offline', '--frozen-lockfile'])
+  if (installed.status !== 0) {
+    throw new Error(
+      `clone dependency installation failed: ${installed.stderr || installed.stdout || installed.error}`,
+    )
   }
   const prepared = spawnSync('pnpm', ['run', 'prepare:test-artifacts'], {
     cwd: checkout,
