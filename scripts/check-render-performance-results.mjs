@@ -47,7 +47,12 @@ for (const result of avalonia.Results) {
   ) {
     failures.push(`avalonia/${result.Id} allocation exceeded runaway limit`)
   }
-  if (result.RetainedVisuals > policy.avalonia.maxRetainedVisuals) {
+  const retainedVisuals = result.RetainedVisuals?.AfterUnload
+  if (!Number.isSafeInteger(retainedVisuals) || retainedVisuals < 0) {
+    failures.push(
+      `avalonia/${result.Id} retained visuals must be a nonnegative integer`,
+    )
+  } else if (retainedVisuals > policy.avalonia.maxRetainedVisuals) {
     failures.push(
       `avalonia/${result.Id} retained visuals exceeded runaway limit`,
     )

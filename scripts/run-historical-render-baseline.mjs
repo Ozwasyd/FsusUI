@@ -175,6 +175,14 @@ export function classifyHistoricalFailure(result, checker) {
   )
   const lines = (text) =>
     text.split('\n').filter((line) => /^(?:web|avalonia)\//u.test(line))
+  const checkerErrors = [
+    ...checker.stderr.matchAll(/^[A-Za-z]*Error: (.+)$/gmu),
+  ].map((match) => match[1])
+  requireThat(
+    checkerErrors.length === 1 &&
+      checkerErrors[0] === 'Absolute runaway performance limits failed:',
+    'unexpected checker failure chain',
+  )
   const violations = lines(checker.stderr)
   requireThat(
     violations.length > 0 &&
@@ -209,6 +217,43 @@ const run = (command, args, options) =>
       resolve({ code, signal, stdout, stderr }),
     )
   })
+
+// Policy remains byte-identical; checker implementations may evolve only when
+// both independently reproduce the exact measured historical failure.
+export async function classifyHistoricalOutput(
+  result,
+  directory,
+  output,
+  currentRoot = root,
+  execute = run,
+) {
+  const policy = 'tests/performance/render-performance-policy.json'
+  requireThat(
+    (await readFile(path.join(directory, policy))).equals(
+      await readFile(path.join(currentRoot, policy)),
+    ),
+    `historical acceptance contract changed: ${policy}`,
+  )
+  let violations
+  for (const checkerRoot of [directory, currentRoot]) {
+    const checker = await execute(
+      process.execPath,
+      [
+        path.join(checkerRoot, 'scripts/check-render-performance-results.mjs'),
+        output,
+      ],
+      { cwd: checkerRoot },
+    )
+    const classified = classifyHistoricalFailure(result, checker)
+    if (violations)
+      requireThat(
+        JSON.stringify(violations) === JSON.stringify(classified),
+        'historical/current checker classification disagreement',
+      )
+    violations = classified
+  }
+  return violations
+}
 
 async function main() {
   const args = process.argv.slice(2)
@@ -281,22 +326,7 @@ async function main() {
   await validateBaselineEvidence(output, plan, sha, startedAt)
   let violations = []
   if (result.code !== 0 || result.signal) {
-    for (const file of [
-      'scripts/check-render-performance-results.mjs',
-      'tests/performance/render-performance-policy.json',
-    ])
-      requireThat(
-        (await readFile(path.join(directory, file))).equals(
-          await readFile(path.join(root, file)),
-        ),
-        `historical acceptance contract changed: ${file}`,
-      )
-    const checker = await run(
-      process.execPath,
-      [path.join(root, 'scripts/check-render-performance-results.mjs'), output],
-      { cwd: root },
-    )
-    violations = classifyHistoricalFailure(result, checker)
+    violations = await classifyHistoricalOutput(result, directory, output)
   }
   const status = {
     schemaVersion: 1,

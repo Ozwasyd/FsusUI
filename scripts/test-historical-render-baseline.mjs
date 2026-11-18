@@ -137,3 +137,5 @@ try {
 } finally {
   await rm(directory, { recursive: true, force: true })
 }
+
+await import('./test-historical-checker-compatibility.mjs')

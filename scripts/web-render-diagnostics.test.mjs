@@ -170,8 +170,8 @@ test('four exact confirmed rows preserve the previous aggregate retention ceilin
   assert.deepEqual(
     [...diagnosticIds],
     [
-      'virtual-list-fixed-100000-60hz-dpr1-enabled',
-      'virtual-window-index-legacy-100000-120hz-dpr2-reduced',
+      'select-v2-100000-60hz-dpr2-disabled',
+      'virtual-window-index-incremental-100000-60hz-dpr2-disabled',
       'virtual-grid-100000-60hz-dpr2-disabled',
       'data-pipeline-table-100000-120hz-dpr2-reduced',
     ],
@@ -189,6 +189,10 @@ test('four exact confirmed rows preserve the previous aggregate retention ceilin
     assert.deepEqual(out.anchors, record.anchors)
   }
   for (const id of [
+    'virtual-list-fixed-100000-60hz-dpr1-enabled',
+    'virtual-window-index-legacy-100000-120hz-dpr2-reduced',
+    'select-v2-100000-120hz-dpr2-reduced',
+    'virtual-window-index-incremental-100000-60hz-dpr1-enabled',
     'virtual-grid-100000-60hz-dpr1-enabled',
     'data-pipeline-table-100000-60hz-dpr1-enabled',
   ]) {

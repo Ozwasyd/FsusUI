@@ -98,6 +98,27 @@ for (const platform of ['web', 'avalonia']) {
   const currentRepeatMap = currentRepeat
     ? measurementMap(currentRepeat, platform, 'current-repeat')
     : null
+  const selectedScenario = currentPlan?.platforms[platform].scenario
+  if (selectedScenario) {
+    for (const measurements of [
+      baselineMap,
+      currentMap,
+      baselineRepeatMap,
+      currentRepeatMap,
+    ]) {
+      for (const id of measurements?.keys() ?? []) {
+        // Match the existing producer filters, without changing the measured workload.
+        const selected =
+          platform === 'web'
+            ? id.startsWith(selectedScenario)
+            : id.toLowerCase().includes(selectedScenario.toLowerCase())
+        if (!selected)
+          regressions.push(
+            `${platform}/${id}: scenario is outside the selected impact plan scope ${selectedScenario}`,
+          )
+      }
+    }
+  }
   for (const id of baselineMap.keys()) {
     if (!currentMap.has(id))
       regressions.push(
