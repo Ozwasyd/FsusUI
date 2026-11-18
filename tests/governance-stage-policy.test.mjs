@@ -33,7 +33,7 @@ for (const mutation of [
       value.reusable = value.reusable.replace('          fetch-depth: 0\n', '          fetch-depth: 3\n')
     if (mutation === 'shallow AOT producer')
       value.quality = value.quality.replace(
-        /(\n  pr-avalonia-aot-candidate:\n[\s\S]*?fetch-depth: )0\n/u,
+        /(\n {2}pr-avalonia-aot-candidate:\n[\s\S]*?fetch-depth: )0\n/u,
         (_match, prefix) => `${prefix}3\n`,
       )
     if (mutation === 'missing checkout depth')
