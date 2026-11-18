@@ -1,7 +1,10 @@
 {
   "schema": "fsusui-design-conformance.ui-ux-classification-receipt.v2",
   "ownerRepository": "Ozwasyd/FsusUI",
-  "affectedSurfaces": ["web-check-tag", "avalonia-check-tag"],
+  "affectedSurfaces": [
+    "web-check-tag",
+    "avalonia-check-tag"
+  ],
   "uiDecisionClass": "prescribed",
   "verificationClass": "ux-path",
   "requiredAuthorities": [
@@ -36,22 +39,6 @@
     "authorityDigest": "0899bb73568e4e0430595ecce3c1d605d51c963e27e37250b6dcc0e1a6ff77a9",
     "dirtyFingerprint": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
   },
-  "candidateSha": "5a7ec24a4a1bb97247c2403c71ba5aeacac1d1c1",
-  "candidateDigest": "d8d8d88aae06a4cfe74944dd1c5184c75816f91a12f58357288143bcd670fe95",
-  "stateEvidenceMatrix": [
-    {
-      "state": "focused-unchecked-after-pointer-keyboard",
-      "viewport": "88x24",
-      "theme": "light",
-      "evidenceDigest": "75b17a188084edf56a69eb89fe29d0aaa0573937e29b7e7ce60b583e7d4ae170"
-    },
-    {
-      "state": "focused-unchecked-after-pointer-keyboard",
-      "viewport": "960x720",
-      "theme": "light",
-      "evidenceDigest": "3ae99ccd280405a7e7a0d1f622367ed017a4dc1819de8d3c59e427b6a2764cb0"
-    }
-  ],
   "inScope": [
     "Existing CheckTag focus-visible behavior on Web and Avalonia",
     "Focused unchecked state after real pointer and keyboard activation",
@@ -62,8 +49,24 @@
     "Pixel equality between native renderers",
     "Adjacent component redesign"
   ],
-  "classificationEvidenceDigest": "462aa6e8be188d8701190fc1526c0cf0b16fe4267370900b7bcd7a77edc6ec0c",
   "domainPolicyDigest": "620c4f746c1f259e3b640044975ad2878b7913806038706f7991bee9d72104d3",
   "status": "frozen",
-  "receiptDigest": "a9cb595d3d08cb2c70e8dc071dd068e3fdee8f7f09555dc1940fc6a0bf8be063"
+  "candidateSha": "a21b81d3a1ac4e172ffd4f97c077bad4b83e8c2a",
+  "candidateDigest": "26082d5b187d00520e471a413f6ce39326219988cd500da5e2ccdb4219fb925a",
+  "stateEvidenceMatrix": [
+    {
+      "viewport": "88x24",
+      "state": "focused-unchecked-after-pointer-keyboard",
+      "theme": "light",
+      "evidenceDigest": "75b17a188084edf56a69eb89fe29d0aaa0573937e29b7e7ce60b583e7d4ae170"
+    },
+    {
+      "viewport": "960x720",
+      "state": "focused-unchecked-after-pointer-keyboard",
+      "theme": "light",
+      "evidenceDigest": "3ae99ccd280405a7e7a0d1f622367ed017a4dc1819de8d3c59e427b6a2764cb0"
+    }
+  ],
+  "classificationEvidenceDigest": "db4c4fe7e003704e712bfa1f16b2553e9c9fb61befb5749a2d1b310d4fb5ae89",
+  "receiptDigest": "6cfbec7ff5cbef066882929338a66b70f0e320f3a06b0fc9b60956118c46d908"
 }

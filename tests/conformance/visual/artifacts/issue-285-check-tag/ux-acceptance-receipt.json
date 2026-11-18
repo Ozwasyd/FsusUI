@@ -1,8 +1,8 @@
 {
   "schema": "fsusui-design-conformance.ux-acceptance-receipt.v2",
-  "classificationReceiptDigest": "a9cb595d3d08cb2c70e8dc071dd068e3fdee8f7f09555dc1940fc6a0bf8be063",
-  "candidateSha": "5a7ec24a4a1bb97247c2403c71ba5aeacac1d1c1",
-  "candidateDigest": "d8d8d88aae06a4cfe74944dd1c5184c75816f91a12f58357288143bcd670fe95",
+  "classificationReceiptDigest": "6cfbec7ff5cbef066882929338a66b70f0e320f3a06b0fc9b60956118c46d908",
+  "candidateSha": "a21b81d3a1ac4e172ffd4f97c077bad4b83e8c2a",
+  "candidateDigest": "26082d5b187d00520e471a413f6ce39326219988cd500da5e2ccdb4219fb925a",
   "verificationClass": "ux-path",
   "requiredSkillDigests": [
     "c88357a6ba0340000bae5839daeb67a3cd2722e8242cf7e0148006c3610a44fe"
@@ -15,7 +15,7 @@
   ],
   "activeBaselineIdentityDigest": "5d9888d74dafebcd791aaa3d367bf09d013f0a824f7afa31fe64c6e1f113cc38",
   "domainPolicyDigest": "620c4f746c1f259e3b640044975ad2878b7913806038706f7991bee9d72104d3",
-  "independenceEvidenceDigest": "7eedf62fa5ecea62463d477bce7f0f2729c9a412c82a7a6d936fce2cc9fb6f21",
+  "independenceEvidenceDigest": "1291f3ae72a5280e5e13baf3ee34901f832bb1c94d14227a3a12c01c5718da2e",
   "modifiedPaths": [],
   "productionFixture": true,
   "viewportStateMatrix": [
@@ -23,14 +23,23 @@
       "viewport": "88x24",
       "state": "focused-unchecked-after-pointer-keyboard",
       "theme": "light",
-      "inputModes": ["pointer", "keyboard", "screen-reader", "reduced-motion"],
+      "inputModes": [
+        "pointer",
+        "keyboard",
+        "screen-reader",
+        "reduced-motion"
+      ],
       "evidenceDigest": "75b17a188084edf56a69eb89fe29d0aaa0573937e29b7e7ce60b583e7d4ae170"
     },
     {
       "viewport": "960x720",
       "state": "focused-unchecked-after-pointer-keyboard",
       "theme": "light",
-      "inputModes": ["pointer", "keyboard", "reduced-motion"],
+      "inputModes": [
+        "pointer",
+        "keyboard",
+        "reduced-motion"
+      ],
       "evidenceDigest": "3ae99ccd280405a7e7a0d1f622367ed017a4dc1819de8d3c59e427b6a2764cb0"
     }
   ],
@@ -54,5 +63,5 @@
   ],
   "blockers": [],
   "status": "accepted",
-  "receiptDigest": "0477d6286f7e01a2141f541e2e0ec171efbc19b59c5be91bb09c66f6e7a6888c"
+  "receiptDigest": "86b98cb9f2d3388845392fdb2aeddf1d316cfd9ab1923f1ce35e766b30506d55"
 }
