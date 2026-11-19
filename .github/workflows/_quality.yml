@@ -164,7 +164,7 @@ jobs:
           artifact-suffix: ${{ matrix.platform }}
 
   dotnet-package:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-22.04
     timeout-minutes: 60
     outputs:
       candidate-digest: ${{ steps.candidate.outputs.digest }}
@@ -201,9 +201,9 @@ jobs:
           path: |
             ~/.nuget/packages
             dotnet/**/obj
-          key: ${{ runner.os }}-${{ runner.arch }}-fsusui-dotnet-package-sdk-${{ hashFiles('dotnet/global.json') }}-${{ hashFiles('dotnet/**/*.csproj', 'dotnet/**/*.props', 'dotnet/**/*.targets', 'dotnet/**/*.slnx', 'dotnet/**/packages.lock.json', 'NuGet.config') }}
+          key: ${{ runner.os }}-${{ runner.arch }}-fsusui-dotnet-package-ubuntu-22.04-sdk-${{ hashFiles('dotnet/global.json') }}-${{ hashFiles('dotnet/**/*.csproj', 'dotnet/**/*.props', 'dotnet/**/*.targets', 'dotnet/**/*.slnx', 'dotnet/**/packages.lock.json', 'NuGet.config') }}
           restore-keys: |
-            ${{ runner.os }}-${{ runner.arch }}-fsusui-dotnet-package-sdk-${{ hashFiles('dotnet/global.json') }}-
+            ${{ runner.os }}-${{ runner.arch }}-fsusui-dotnet-package-ubuntu-22.04-sdk-${{ hashFiles('dotnet/global.json') }}-
       - name: Build and verify the unique NuGet candidate
         id: candidate
         run: |

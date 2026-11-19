@@ -91,7 +91,7 @@ const validate = (source) => {
     assert(platform.includes(input), `platform cache key must cover ${input}`)
   }
   assert(
-    packageJob.includes('runs-on: ubuntu-24.04'),
+    packageJob.includes('runs-on: ubuntu-22.04'),
     'dotnet-package must use the Playwright-supported Ubuntu runner',
   )
   assert(
@@ -164,6 +164,9 @@ if (sdk?.rollForward !== 'disable') {
   )
 }
 const callerPackageJob = job(callerWorkflow, 'pr-avalonia-aot-candidate')
+if (!callerPackageJob.includes('runs-on: ubuntu-22.04')) {
+  failures.push('pr-avalonia-aot-candidate must use the canonical Ubuntu runner')
+}
 for (const [name, candidateJob] of [
   ['dotnet-package', job(workflow, 'dotnet-package')],
   ['pr-avalonia-aot-candidate', callerPackageJob],
@@ -253,7 +256,7 @@ const matrixPlan = spawnSync(
 )
 if (
   matrixPlan.status !== 0 ||
-  JSON.parse(matrixPlan.stdout).canonicalPackage.runner !== 'ubuntu-24.04'
+  JSON.parse(matrixPlan.stdout).canonicalPackage.runner !== 'ubuntu-22.04'
 ) {
   failures.push('canonical package plan must match the package runner')
 }
