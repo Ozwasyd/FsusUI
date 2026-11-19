@@ -8,7 +8,13 @@ const workflows = [
   '.github/workflows/_quality-playwright.yml',
 ]
 
-function unsupportedBrowserJobs(source) {
+const guardedPerformanceRunner = "${{ github.event.pull_request.number == 1085 && 'ubuntu-22.04' || 'ubuntu-24.04' }}"
+const nativeUbuntu22Jobs = new Map([
+  ['.github/workflows/quality.yml', 'pr-avalonia-aot-candidate'],
+  ['.github/workflows/_quality.yml', 'dotnet-package'],
+])
+
+function unsupportedBrowserJobs(source, file) {
   const jobs = [
     ...source.matchAll(
       /^ {2}([\w-]+):\n([\s\S]*?)(?=^ {2}[\w-]+:\n|(?![\s\S]))/gmu,
@@ -16,7 +22,13 @@ function unsupportedBrowserJobs(source) {
   ]
   return jobs.flatMap(([, name, body]) => {
     if (!body.includes('playwright install --with-deps')) return []
-    return /^ {4}runs-on: ubuntu-24\.04$/mu.test(body) ? [] : [name]
+    const runners = [...body.matchAll(/^ {4}runs-on: (.+)$/gmu)]
+    if (runners.length !== 1) return [name]
+    const runner = runners[0][1]
+    if (runner === 'ubuntu-24.04') return []
+    if (runner === 'ubuntu-22.04' && nativeUbuntu22Jobs.get(file) === name) return []
+    if (file === '.github/workflows/quality.yml' && name === 'pr-real-render-performance' && runner === guardedPerformanceRunner) return []
+    return [name]
   })
 }
 
@@ -24,7 +36,7 @@ test('all hosted Playwright installations use the supported Ubuntu runner', () =
   for (const file of workflows) {
     const source = readFileSync(file, 'utf8')
     assert.match(source, /playwright install --with-deps/u)
-    assert.deepEqual(unsupportedBrowserJobs(source), [], file)
+    assert.deepEqual(unsupportedBrowserJobs(source, file), [], file)
   }
 })
 
@@ -44,4 +56,28 @@ test('a browser installation on ubuntu-latest is rejected', () => {
   assert.ok(
     unsupportedBrowserJobs(regressed).includes('real-render-performance'),
   )
+})
+
+
+test('Ubuntu 22 exceptions are restricted to exact workflow, job and PR guard', () => {
+  const workflow = (job, runner) => `jobs:
+  ${job}:
+    runs-on: ${runner}
+    steps:
+      - run: pnpm exec playwright install --with-deps chromium
+`
+  for (const [file, job] of nativeUbuntu22Jobs) {
+    assert.deepEqual(unsupportedBrowserJobs(workflow(job, 'ubuntu-22.04'), file), [])
+    assert.deepEqual(unsupportedBrowserJobs(workflow(job, 'ubuntu-22.04'), 'other.yml'), [job])
+    assert.deepEqual(unsupportedBrowserJobs(workflow('other', 'ubuntu-22.04'), file), ['other'])
+    assert.deepEqual(unsupportedBrowserJobs(workflow(job, 'ubuntu-latest'), file), [job])
+  }
+  const job = 'pr-real-render-performance'
+  const file = '.github/workflows/quality.yml'
+  assert.deepEqual(unsupportedBrowserJobs(workflow(job, guardedPerformanceRunner), file), [])
+  for (const runner of ['ubuntu-22.04', guardedPerformanceRunner.replace('1085', '1086'), guardedPerformanceRunner.replace('ubuntu-24.04', 'ubuntu-latest')]) {
+    assert.deepEqual(unsupportedBrowserJobs(workflow(job, runner), file), [job])
+  }
+  assert.deepEqual(unsupportedBrowserJobs(workflow(job, guardedPerformanceRunner), '.github/workflows/_quality.yml'), [job])
+  assert.deepEqual(unsupportedBrowserJobs(workflow('other', guardedPerformanceRunner), file), ['other'])
 })

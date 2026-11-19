@@ -6,6 +6,8 @@ import { launchQuickWeb } from './run-quick-web-60hz.mjs'
 import { verifyWebMeasurement } from './verify-quick-web-60hz.mjs'
 import { execFileSync } from 'node:child_process'
 import { verifyImpactPlan } from './render-performance-impact.mjs'
+import { launchAvaloniaLayoutReady, nativeProtocol } from './run-avalonia-layout-ready.mjs'
+import { verifyAvaloniaLayoutReady } from './verify-avalonia-layout-ready.mjs'
 
 const controllerRoot = path.resolve(import.meta.dirname, '..')
 const args = process.argv.slice(2)
@@ -16,7 +18,9 @@ const valueOf = (name, fallback) => {
 const protocol = process.env.FSUSUI_WEB_MEASUREMENT_PROTOCOL
 if (protocol && protocol !== 'quick-web-60hz.v1') throw new Error('unsupported Web measurement protocol')
 const productOverride = valueOf('--product-root', '')
-if (productOverride && !protocol) throw new Error('product override requires explicit protocol')
+const native = process.env.FSUSUI_AVALONIA_MEASUREMENT_PROTOCOL
+if (native && native !== nativeProtocol) throw new Error('unsupported Avalonia measurement protocol')
+if (productOverride && !protocol && !native) throw new Error('product override requires explicit protocol')
 const root = productOverride ? path.resolve(productOverride) : controllerRoot
 const profile = valueOf('--profile', 'quick')
 const output = path.resolve(
@@ -107,7 +111,17 @@ if (!avaloniaOnly) {
   }
 }
 
-if (!webOnly) {
+if (!webOnly && native) {
+  const scenario = impactPlan?.platforms.avalonia.scenario ?? valueOf('--scenario', '')
+  const nativeOutput = path.join(output, 'avalonia')
+  const appArgs = ['--render-performance', ...forwarded, '--output', path.join(nativeOutput, 'summary.json')]
+  if (scenario) appArgs.push('--scenario', scenario)
+  if (baseline) throw new Error('Avalonia layout-ready requires external four-arm comparison')
+  await launchAvaloniaLayoutReady({
+    controllerRoot, productRoot: root, output: nativeOutput, appArgs, scenario, run,
+  })
+  await verifyAvaloniaLayoutReady(nativeOutput, { scenario, impactPlan })
+} else if (!webOnly) {
   const dotnetArgs = [
     'run',
     '--project',

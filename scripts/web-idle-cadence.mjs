@@ -1,3 +1,4 @@
+/* global requestAnimationFrame */
 import { setTimeout, clearTimeout } from 'node:timers'
 import { describeCadence } from './web-render-cadence.mjs'
 

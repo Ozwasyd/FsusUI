@@ -7,6 +7,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Input;
+using Avalonia.Layout;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
@@ -25,6 +26,9 @@ internal static class RenderPerformanceRunner
   private static int longScrollIterations = 256;
   private static string requestedBackend = "auto";
   private static string? scenarioFilter;
+  private const string LayoutReadyProtocol = "variable-list-layout-ready.v1";
+  private const string SustainedVariableScenario = "virtual-list-variable-100k-sustained";
+  private static string? measurementProtocol;
 
   public static bool IsConfigured { get; private set; }
   public static bool UseSoftwareRendering =>
@@ -42,6 +46,10 @@ internal static class RenderPerformanceRunner
     longScrollIterations = ReadInt(args, "--long-scroll-iterations", 256);
     requestedBackend = ReadArgument(args, "--backend") ?? "auto";
     scenarioFilter = ReadArgument(args, "--scenario");
+    measurementProtocol = Environment.GetEnvironmentVariable("FSUSUI_AVALONIA_MEASUREMENT_PROTOCOL");
+    if (string.IsNullOrEmpty(measurementProtocol)) measurementProtocol = null;
+    if (measurementProtocol is not null && measurementProtocol != LayoutReadyProtocol)
+      throw new InvalidOperationException("Unsupported Avalonia measurement protocol.");
   }
 
   public static Window CreateWindow(IClassicDesktopStyleApplicationLifetime desktop)
@@ -118,12 +126,18 @@ internal static class RenderPerformanceRunner
         Theme("theme-switch"),
       ];
 
+    // Append rather than interleave: preserve the existing scenarios' predecessor history.
+    if (measurementProtocol == LayoutReadyProtocol)
+      definitions = [.. definitions, VirtualList(SustainedVariableScenario, 100_000, true)];
+
     if (!string.IsNullOrWhiteSpace(scenarioFilter))
     {
       definitions = definitions
         .Where(definition => definition.Id.Contains(scenarioFilter, StringComparison.OrdinalIgnoreCase))
         .ToArray();
     }
+    if (measurementProtocol == LayoutReadyProtocol && definitions.Length == 0)
+      throw new InvalidOperationException("The Avalonia scenario filter selected no measurements.");
     var results = new List<object>();
     var rawDirectory = Path.Combine(Path.GetDirectoryName(Path.GetFullPath(outputPath))!, "raw");
     Directory.CreateDirectory(rawDirectory);
@@ -135,6 +149,9 @@ internal static class RenderPerformanceRunner
       await WaitForRenderAsync().WaitAsync(TimeSpan.FromSeconds(30));
       var visualBaseline = window.GetVisualDescendants().Count();
       var control = definition.Create();
+      var layoutReady = measurementProtocol == LayoutReadyProtocol &&
+        control is FsusVirtualList { SizeMode: FsusVirtualSizeMode.Variable };
+      var remountPerSample = definition.Id != SustainedVariableScenario;
       var host = new Grid
       {
         Width = 1120,
@@ -150,6 +167,7 @@ internal static class RenderPerformanceRunner
       for (var index = 0; index < warmups; index++)
       {
         definition.Act(control, index);
+        if (layoutReady) EnsureVariableListLayoutReady(host, (FsusVirtualList)control);
         Render(host);
         await WaitForRenderAsync().WaitAsync(TimeSpan.FromSeconds(30));
       }
@@ -179,6 +197,9 @@ internal static class RenderPerformanceRunner
         var layoutWatch = Stopwatch.StartNew();
         host.Measure(new Size(1120, 700));
         host.Arrange(new Rect(0, 0, 1120, 700));
+        // LayoutUpdated delivers ScrollChanged and realizes the new rows before the bitmap.
+        // Include this readiness work in both FrameMs and MeasureArrangeMs.
+        if (layoutReady) EnsureVariableListLayoutReady(host, (FsusVirtualList)control);
         layoutWatch.Stop();
         var drawWatch = Stopwatch.StartNew();
         Render(host);
@@ -193,8 +214,11 @@ internal static class RenderPerformanceRunner
         measureArrange.Add(layoutWatch.Elapsed.TotalMilliseconds);
         draw.Add(drawWatch.Elapsed.TotalMilliseconds);
         var mountWatch = Stopwatch.StartNew();
-        host.Children.Remove(control);
-        host.Children.Add(control);
+        if (remountPerSample)
+        {
+          host.Children.Remove(control);
+          host.Children.Add(control);
+        }
         mountWatch.Stop();
         mountUnmount.Add(mountWatch.Elapsed.TotalMilliseconds);
         allocated.Add(Math.Max(0, GC.GetAllocatedBytesForCurrentThread() - allocationBefore));
@@ -231,6 +255,8 @@ internal static class RenderPerformanceRunner
       var raw = new
       {
         definition.Id,
+        MeasurementProtocol = measurementProtocol,
+        RemountPerSample = remountPerSample,
         FrameMs = frame,
         ActionMs = action,
         RenderAwaitMs = renderAwait,
@@ -263,6 +289,8 @@ internal static class RenderPerformanceRunner
       results.Add(new
       {
         definition.Id,
+        MeasurementProtocol = measurementProtocol,
+        RemountPerSample = remountPerSample,
         FrameMs = Statistics(frame),
         ActionMs = Statistics(action),
         RenderAwaitMs = Statistics(renderAwait),
@@ -287,6 +315,7 @@ internal static class RenderPerformanceRunner
     {
       SchemaVersion = 2,
       Kind = "real-avalonia-render-measurement",
+      MeasurementProtocol = measurementProtocol,
       GeneratedAt = DateTimeOffset.UtcNow,
       GitSha = Environment.GetEnvironmentVariable("GITHUB_SHA") ?? "local-worktree",
       Profile = profile,
@@ -313,6 +342,22 @@ internal static class RenderPerformanceRunner
     Directory.CreateDirectory(Path.GetDirectoryName(Path.GetFullPath(outputPath))!);
     await File.WriteAllTextAsync(outputPath, JsonSerializer.Serialize(summary, JsonOptions));
     Console.WriteLine($"Avalonia real-render performance: {results.Count} scenarios -> {outputPath}");
+  }
+
+  private static void EnsureVariableListLayoutReady(Grid host, FsusVirtualList list)
+  {
+    static bool Valid(Layoutable value) => value.IsMeasureValid && value.IsArrangeValid;
+    // Always deliver at least one global layout pass: validity alone does not prove
+    // that a queued ScrollChanged notification has rebound the visible rows.
+    for (var pass = 0; pass < 2; pass++)
+    {
+      host.UpdateLayout();
+      if (Valid(host) && Valid(list) && Valid(list.ScrollHost) && Valid(list.VisualHost) &&
+          double.IsFinite(list.ScrollOffset) && double.IsFinite(list.ScrollHost.Offset.Y) &&
+          list.ScrollOffset == list.ScrollHost.Offset.Y)
+        return;
+    }
+    throw new InvalidOperationException("Variable-list layout did not converge before bitmap capture within two passes.");
   }
 
   private static void Render(Control control)

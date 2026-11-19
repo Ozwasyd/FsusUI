@@ -3,7 +3,7 @@ import { test, after } from 'node:test'
 import { readFile, access, mkdtemp, rm } from 'node:fs/promises'
 import os from 'node:os'
 import path from 'node:path'
-import { fileURLToPath } from 'node:url'
+import { URL, fileURLToPath } from 'node:url'
 import { execFileSync } from 'node:child_process'
 import { materializeDriver, launchQuickWeb } from './run-quick-web-60hz.mjs'
 const sha='292a6ca6d7659b18574ac1f3ae7a8f66494af7d4'
@@ -73,6 +73,6 @@ test('materialized exact Playwright import supports CJS default and ESM named ex
   const effective=materializeDriver(source,root,file).effectiveSource
   const snippet=effective.match(/import \* as playwrightModule[^\n]+\nconst chromium[^\n]+\nif \(typeof chromium[^\n]+/u)?.[0]
   assert.ok(snippet)
-  execFileSync(process.execPath,['--input-type=module','-e',snippet+'\nif(typeof chromium.launch!=="function") process.exit(1)'])
+  execFileSync(process.execPath,['--input-type=module','-e',`${snippet}\nif(typeof chromium.launch!=="function") process.exit(1)`])
  }
 })

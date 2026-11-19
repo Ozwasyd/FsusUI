@@ -5,6 +5,8 @@ import path from 'node:path'
 import process from 'node:process'
 import { verifyWebMeasurement } from './verify-quick-web-60hz.mjs'
 import { verifyImpactPlan } from './render-performance-impact.mjs'
+import { historicalNativeSha, nativeDriverHash, nativeProtocol, readNativeBinding } from './run-avalonia-layout-ready.mjs'
+import { verifyAvaloniaLayoutReady } from './verify-avalonia-layout-ready.mjs'
 
 // pnpm/npm may forward a literal `--` when invoked as `pnpm script -- args`.
 const [
@@ -96,6 +98,27 @@ if (currentPlan?.platforms.web.run !== false && (protocol || webSummary?.measure
   }
   if (bindings[1].sourceSha256 !== candidateDriverHash || bindings[3].sourceSha256 !== candidateDriverHash) throw new Error('candidate driver differs from expected checkout')
   if (bindings.some(x=>x.protocolDigest!==bindings[0].protocolDigest) || bindings[0].productSha!==bindings[2].productSha || bindings[1].productSha!==bindings[3].productSha) throw new Error('four-arm protocol/source identity mismatch')
+}
+const native = process.env.FSUSUI_AVALONIA_MEASUREMENT_PROTOCOL
+if (native && native !== nativeProtocol) throw new Error('unsupported Avalonia protocol')
+if (currentPlan?.platforms.avalonia.run !== false) {
+  const dirs = [baselineDirectory, currentDirectory, baselineRepeatDirectory, currentRepeatDirectory].filter(Boolean)
+  const nativeSummaries = await Promise.all(dirs.map((directory) => read(directory, 'avalonia')))
+  if (native || nativeSummaries.some((summary) => summary.MeasurementProtocol)) {
+    if (limit !== 0.15 || dirs.length !== 4) throw new Error('Avalonia layout-ready requires four arms and the 15% limit')
+    const controllerRoot = path.resolve(import.meta.dirname, '..')
+    const sha = execFileSync('git', ['rev-parse', '--verify', 'HEAD'], { cwd: controllerRoot, encoding: 'utf8' }).trim()
+    const driverHash = await nativeDriverHash(controllerRoot)
+    let scenario = currentPlan ? (currentPlan.platforms.avalonia.scenario ?? '') : undefined
+    for (const [index, directory] of dirs.entries()) {
+      const expected = index % 2 === 0 ? historicalNativeSha : sha
+      const nativeOutput = path.join(directory, 'avalonia')
+      if (nativeSummaries[index].GitSha !== expected) throw new Error('Avalonia layout-ready summary identity mismatch')
+      const proof = await readNativeBinding(nativeOutput, expected, driverHash, scenario)
+      scenario ??= proof.scenario
+      await verifyAvaloniaLayoutReady(nativeOutput, { scenario, impactPlan: currentPlan })
+    }
+  }
 }
 const regressions = []
 for (const platform of ['web', 'avalonia']) {

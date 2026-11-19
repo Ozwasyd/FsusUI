@@ -6,7 +6,7 @@ import { adaptQuickWebDriver, verifyAdaptation, verifyFourArmProtocol } from './
 const source = (ref) => execFileSync('git', ['show', `${ref}:scripts/web-render-performance.mjs`], { encoding: 'utf8' })
 const historical = source('f2d929a5d045439c35e93b4771f912ce50ec2337')
 const candidate = source('292a6ca6d7659b18574ac1f3ae7a8f66494af7d4')
-const matrix = (text, profile = 'quick', scenarioFilter = '') => runInNewContext(text.slice(text.indexOf('const definitions ='), text.indexOf('const percentile =')) + '\nJSON.stringify(matrix)', { profile, scenarioFilter })
+const matrix = (text, profile = 'quick', scenarioFilter = '') => runInNewContext(`${text.slice(text.indexOf('const definitions ='), text.indexOf('const percentile ='))  }\nJSON.stringify(matrix)`, { profile, scenarioFilter })
 const entry = (text) => ({source: text, ...adaptQuickWebDriver(text)})
 
 test('historical and candidate actual matrices preserve every workload and only retarget second dimension', () => {
@@ -32,9 +32,9 @@ test('four arms require the same protocol and correct source role', () => {
   assert.throws(() => verifyFourArmProtocol(wrong))
 })
 test('unknown source, transformed bytes, identity/schema and missing arm fail closed', () => {
-  assert.throws(() => adaptQuickWebDriver(candidate + '\n'))
+  assert.throws(() => adaptQuickWebDriver(`${candidate  }\n`))
   const good = entry(candidate)
-  assert.throws(() => verifyAdaptation(candidate, good.effectiveSource + '\n', good.evidence))
+  assert.throws(() => verifyAdaptation(candidate, `${good.effectiveSource  }\n`, good.evidence))
   assert.throws(() => verifyAdaptation(candidate, good.effectiveSource, {...good.evidence,schema:'other'}))
   assert.throws(() => verifyFourArmProtocol({B:good}))
 })

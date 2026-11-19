@@ -1,3 +1,4 @@
+import { URL } from 'node:url'
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
 import { mkdtemp, writeFile, readFile, rm } from 'node:fs/promises'
@@ -20,7 +21,7 @@ test('synthetic artifact controls: exact binding/raw cadence/P95 accepted; stock
   await writeFile(path.join(dir,'measurement-source.mjs'),source)
   await writeFile(path.join(dir,'measurement-effective.mjs'),generated.effectiveSource)
   await json('measurement-binding.json',binding)
-  const matrix=JSON.parse(runInNewContext(generated.effectiveSource.slice(generated.effectiveSource.indexOf('const definitions ='),generated.effectiveSource.indexOf('const percentile ='))+'\nJSON.stringify(matrix)',{profile:'quick',scenarioFilter:''}))
+  const matrix=JSON.parse(runInNewContext(`${generated.effectiveSource.slice(generated.effectiveSource.indexOf('const definitions ='),generated.effectiveSource.indexOf('const percentile ='))}\nJSON.stringify(matrix)`,{profile:'quick',scenarioFilter:''}))
   const idle={schema:'fsusui.idle-raf-preflight.v1',source:'same-browser-blank-context',browserVersion:'147.0.7727.15',intervals:Array(20).fill(1000/60),cadence:describeCadence(60,Array(20).fill(1000/60))}
   const rows=[]
   for(const [scenario,size,refreshHz,dpr,motion] of matrix){

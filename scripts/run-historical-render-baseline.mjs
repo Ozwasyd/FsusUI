@@ -11,6 +11,8 @@ import path from 'node:path'
 import process from 'node:process'
 import { pathToFileURL } from 'node:url'
 import { verifyImpactPlan } from './render-performance-impact.mjs'
+import { nativeDriverHash, nativeProtocol, readNativeBinding } from './run-avalonia-layout-ready.mjs'
+import { verifyAvaloniaLayoutReady } from './verify-avalonia-layout-ready.mjs'
 
 const root = path.resolve(import.meta.dirname, '..')
 const json = async (file) => JSON.parse(await readFile(file, 'utf8'))
@@ -324,6 +326,9 @@ async function main() {
   const planPath = path.resolve(value('--impact-plan'))
   const plan = verifyImpactPlan(await json(planPath))
   requireThat(plan.run, 'measurement plan is skipped')
+  const useNativeProtocol = Boolean(process.env.FSUSUI_AVALONIA_MEASUREMENT_PROTOCOL && plan.platforms.avalonia.run)
+  requireThat(!useNativeProtocol || process.env.FSUSUI_AVALONIA_MEASUREMENT_PROTOCOL === nativeProtocol, 'unsupported Avalonia protocol')
+  const useController = Boolean(process.env.FSUSUI_WEB_MEASUREMENT_PROTOCOL && plan.platforms.web.run) || useNativeProtocol
   for (const platform of ['web', 'avalonia']) {
     await access(path.join(output, platform)).then(
       () => {
@@ -359,9 +364,9 @@ async function main() {
   let processFailure
   try {
     result = await run(
-      process.env.FSUSUI_WEB_MEASUREMENT_PROTOCOL && plan.platforms.web.run ? process.execPath : 'pnpm',
+      useController ? process.execPath : 'pnpm',
       [
-        ...(process.env.FSUSUI_WEB_MEASUREMENT_PROTOCOL && plan.platforms.web.run
+        ...(useController
           ? [path.join(root, 'scripts/run-render-performance.mjs'), '--product-root', directory]
           : ['perf:render', '--']),
         '--impact-plan',
@@ -390,6 +395,12 @@ async function main() {
   )
   await assertHistoricalIdentity(directory, sha, output, 'after')
   await validateBaselineEvidence(output, plan, sha, startedAt)
+  if (useNativeProtocol) {
+    const nativeOutput = path.join(output, 'avalonia')
+    const scenario = plan.platforms.avalonia.scenario ?? ''
+    await readNativeBinding(nativeOutput, sha, await nativeDriverHash(root), scenario)
+    await verifyAvaloniaLayoutReady(nativeOutput, { scenario, impactPlan: plan })
+  }
   let violations = []
   if (result.code !== 0 || result.signal) {
     violations = await classifyHistoricalOutput(

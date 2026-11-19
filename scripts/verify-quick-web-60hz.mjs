@@ -1,3 +1,4 @@
+import { URL } from 'node:url'
 import assert from 'node:assert/strict'
 import { readFile } from 'node:fs/promises'
 import { createHash } from 'node:crypto'
@@ -21,7 +22,7 @@ export async function verifyWebMeasurement(directory, expectedKind, expectedSha)
   assert.equal(binding.productSha,expectedSha,'measured product SHA differs from expected checkout')
   if(expectedKind) assert.equal(binding.sourceKind,expectedKind)
   if(binding.sourceKind==='f2d-historical') assert.equal(binding.productSha,'f2d929a5d045439c35e93b4771f912ce50ec2337')
-  const matrix = JSON.parse(runInNewContext(expected.effectiveSource.slice(expected.effectiveSource.indexOf('const definitions ='),expected.effectiveSource.indexOf('const percentile ='))+'\nJSON.stringify(matrix)',{profile:'quick',scenarioFilter:''},{timeout:1000}))
+  const matrix = JSON.parse(runInNewContext(`${expected.effectiveSource.slice(expected.effectiveSource.indexOf('const definitions ='),expected.effectiveSource.indexOf('const percentile ='))}\nJSON.stringify(matrix)`,{profile:'quick',scenarioFilter:''},{timeout:1000}))
   const summary = await json('summary.json')
   assert.deepEqual(summary.measurementProtocol,binding)
   const idle=summary.idleCadence

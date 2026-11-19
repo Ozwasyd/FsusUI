@@ -6,7 +6,7 @@ import os from 'node:os'
 import path from 'node:path'
 import process from 'node:process'
 import { createRequire } from 'node:module'
-import { fileURLToPath, pathToFileURL } from 'node:url'
+import { URL, fileURLToPath, pathToFileURL } from 'node:url'
 import { adaptQuickWebDriver } from './quick-web-60hz-adapter.mjs'
 import { runHistoricalProcess } from './historical-bounded-process.mjs'
 const hash = (text) => createHash('sha256').update(text).digest('hex')
@@ -29,7 +29,7 @@ if (typeof chromium?.launch !== 'function') throw new Error('Resolved Playwright
   replaceOne('    const raw = {', '    const cadence = describeCadence(refreshHz, pageMetrics.frameIntervals)\n    const raw = {\n      measurementProtocol,\n      idleCadence,\n      cadence,')
   replaceOne('    results.push({', '    results.push({\n      measurementProtocol,\n      idleCadence,\n      cadence,')
   replaceOne('    gitSha:\n', '    measurementProtocol,\n    idleCadence,\n    gitSha:\n')
-  effective = `import { captureIdleCadence } from ${JSON.stringify(pathToFileURL(idleFile).href)}\nimport { describeCadence } from ${JSON.stringify(pathToFileURL(cadenceFile).href)}\nconst measurementProtocol = JSON.parse(process.env.FSUSUI_WEB_PROTOCOL_BINDING)\n` + effective
+  effective = `import { captureIdleCadence } from ${JSON.stringify(pathToFileURL(idleFile).href)}\nimport { describeCadence } from ${JSON.stringify(pathToFileURL(cadenceFile).href)}\nconst measurementProtocol = JSON.parse(process.env.FSUSUI_WEB_PROTOCOL_BINDING)\n${effective}`
   return {effectiveSource:effective, evidence:{...adapted.evidence, adaptedSha256:adapted.evidence.effectiveSha256, effectiveSha256:hash(effective)}}
 }
 
@@ -46,7 +46,7 @@ export async function launchQuickWeb({productRoot, dependenciesRoot, expectedSha
     await mkdir(output,{recursive:true})
     await writeFile(path.join(output,'measurement-source.mjs'),source)
     await writeFile(path.join(output,'measurement-effective.mjs'),generated.effectiveSource)
-    await writeFile(path.join(output,'measurement-binding.json'),JSON.stringify(binding,null,2)+'\n')
+    await writeFile(path.join(output,'measurement-binding.json'),`${JSON.stringify(binding,null,2)}\n`)
   }
   const temp = await mkdtemp(path.join(os.tmpdir(),'fsus-quick60-driver-'))
   const sidecar = path.join(temp,'driver.mjs')
