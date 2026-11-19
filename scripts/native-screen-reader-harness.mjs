@@ -181,14 +181,15 @@ const parseArguments = (argv) => {
   return options
 }
 
-const chromePath = [
-  process.env.FSUS_IME_CHROME_PATH,
-  '/usr/bin/google-chrome-stable',
-  '/usr/bin/google-chrome',
-  '/usr/bin/chromium',
-]
-  .filter(Boolean)
-  .find((candidate) => {
+const configuredChromePath = process.env.FSUS_IME_CHROME_PATH
+const expectedChromiumVersion = process.env.FSUS_IME_EXPECTED_CHROMIUM_VERSION
+const chromePath =
+  configuredChromePath ||
+  [
+    '/usr/bin/google-chrome-stable',
+    '/usr/bin/google-chrome',
+    '/usr/bin/chromium',
+  ].find((candidate) => {
     try {
       readFileSync(candidate)
       return true
@@ -262,6 +263,16 @@ const main = async () => {
     })
     const page = context.pages()[0] ?? (await context.newPage())
     const cdp = await page.context().newCDPSession(page)
+    const { product: browserProduct } = await cdp.send('Browser.getVersion')
+    if (
+      expectedChromiumVersion &&
+      (!configuredChromePath ||
+        browserProduct.split('/').at(-1) !== expectedChromiumVersion)
+    ) {
+      throw new Error(
+        `Expected pinned Chromium ${expectedChromiumVersion}; launched ${browserProduct}`,
+      )
+    }
     const fixtureUrl = `${baseUrl}/?interactionTrace=1`
     await page.goto(fixtureUrl, { waitUntil: 'domcontentloaded' })
     await page.getByTestId('interaction-trace-fixture').waitFor({
@@ -1072,6 +1083,7 @@ const main = async () => {
       os: process.platform,
       display: process.env.DISPLAY ?? null,
       browser: chromePath,
+      browserProduct,
       orcaPid,
       identity,
       browserAccessibility: {

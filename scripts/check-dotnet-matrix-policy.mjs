@@ -170,7 +170,7 @@ for (const [name, candidateJob] of [
 ]) {
   for (const requirement of [
     'orca at-spi2-core python3-pyatspi dbus-x11',
-    'dbus-run-session -- xvfb-run -a pnpm run conformance:v2',
+    'xvfb-run -a dbus-run-session -- pnpm run conformance:v2',
   ]) {
     if (!candidateJob.includes(requirement)) {
       failures.push(

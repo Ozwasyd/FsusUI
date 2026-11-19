@@ -189,6 +189,8 @@ jobs:
           global-json-file: dotnet/global.json
       - run: pnpm install --frozen-lockfile
       - run: pnpm exec playwright install --with-deps chromium
+      - name: Pin Chromium for native screen-reader evidence
+        run: node scripts/pin-render-browser.mjs .tmp/conformance-browser-selection.json
       - name: Install native screen-reader prerequisites
         run: |
           sudo apt-get update

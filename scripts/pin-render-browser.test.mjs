@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
 import { readFileSync } from 'node:fs'
+import { URL } from 'node:url'
 import {
   selectRenderBrowser,
   verifyRenderBrowsers,
@@ -50,7 +51,7 @@ test('workflow pins once before all four arms and uploads selection evidence', (
     new URL('../.github/workflows/quality.yml', import.meta.url),
     'utf8',
   )
-  const pin = workflow.indexOf('node scripts/pin-render-browser.mjs')
+  const pin = workflow.indexOf('run: node scripts/pin-render-browser.mjs\n')
   assert.ok(
     pin >
       workflow.indexOf('Install Chromium and web display dependencies once'),
@@ -116,7 +117,7 @@ test('reusable render job pins and verifies without touching visual jobs', () =>
   )
   assert.ok(job.includes('path: .tmp/performance/current'))
   assert.equal(
-    (workflow.match(/node scripts\/pin-render-browser.mjs/gu) ?? []).length,
+    (job.match(/node scripts\/pin-render-browser.mjs/gu) ?? []).length,
     2,
   )
 })
@@ -161,4 +162,23 @@ test('current and historical child launchers preserve the selected executable', 
   )
   assert.ok(historical.includes('env: process.env'))
   assert.ok(historical.includes('env: { ...sdk.env, GITHUB_SHA: sha }'))
+})
+
+test('both native evidence jobs select the pinned browser before capture', () => {
+  for (const file of ['quality.yml', '_quality.yml']) {
+    const workflow = readFileSync(
+      new URL(`../.github/workflows/${file}`, import.meta.url),
+      'utf8',
+    )
+    const pin = workflow.indexOf(
+      'node scripts/pin-render-browser.mjs .tmp/conformance-browser-selection.json',
+    )
+    assert.ok(pin > workflow.indexOf('playwright install --with-deps chromium'))
+    assert.ok(
+      pin <
+        workflow.indexOf(
+          'xvfb-run -a dbus-run-session -- pnpm run conformance:v2',
+        ),
+    )
+  }
 })

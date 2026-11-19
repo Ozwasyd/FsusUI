@@ -62,7 +62,9 @@ if (
     writeFileSync(receipt, `${JSON.stringify(selected, null, 2)}\n`)
     appendFileSync(
       process.env.GITHUB_ENV,
-      `FSUSUI_PERF_BROWSER_EXECUTABLE=${selected.executable}\n`,
+      `FSUSUI_PERF_BROWSER_EXECUTABLE=${selected.executable}\n` +
+        `FSUS_IME_CHROME_PATH=${selected.executable}\n` +
+        `FSUS_IME_EXPECTED_CHROMIUM_VERSION=${selected.version}\n`,
     )
     console.log(
       `Pinned all render-performance arms to ${selected.reported} (${selected.revision})`,
