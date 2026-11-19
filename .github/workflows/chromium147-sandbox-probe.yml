@@ -1,0 +1,69 @@
+name: Chromium 147 sandbox probe
+on:
+  push:
+    branches:
+      - codex/fsusui-1085-chromium147-sandbox-probe
+
+permissions: {}
+
+jobs:
+  chromium-147-sandbox:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 8
+    steps:
+      - name: Install the pinned Playwright and Chromium
+        shell: bash
+        working-directory: ${{ runner.temp }}
+        run: |
+          mkdir -p chromium147-probe
+          cd chromium147-probe
+          npm install --ignore-scripts --no-audit --no-fund --save-exact playwright@1.59.1
+          ./node_modules/.bin/playwright install --with-deps chromium
+      - name: Verify headed Chromium 147 starts with its sandbox
+        shell: bash
+        working-directory: ${{ runner.temp }}/chromium147-probe
+        run: |
+          cat > probe.cjs <<'EOF'
+          const assert = require('node:assert/strict')
+          const { execFileSync } = require('node:child_process')
+          const { mkdtempSync } = require('node:fs')
+          const { tmpdir } = require('node:os')
+          const { join } = require('node:path')
+          const { chromium } = require('playwright')
+
+          async function verify() {
+            const executablePath = chromium.executablePath()
+            assert.match(executablePath, /[/]chromium-1217[/]/)
+            const binaryVersion = execFileSync(executablePath, ['--version'], {
+              encoding: 'utf8', timeout: 10000,
+            }).trim()
+            assert.match(binaryVersion, /^Google Chrome for Testing 147\.0\.7727\.15$/)
+            console.log(binaryVersion)
+            const context = await chromium.launchPersistentContext(
+              mkdtempSync(join(tmpdir(), 'chromium147-profile-')), {
+                headless: false, chromiumSandbox: true, executablePath, timeout: 30000,
+              },
+            )
+            try {
+              const page = context.pages()[0] || await context.newPage()
+              const cdp = await context.newCDPSession(page)
+              const { product } = await cdp.send('Browser.getVersion')
+              assert.match(product, /\/147\.0\.7727\.15$/)
+              await page.goto('data:text/html,<h1>Sandbox probe</h1>')
+              assert.equal(await page.locator('h1').textContent(), 'Sandbox probe')
+              await page.goto('chrome://sandbox/')
+              const status = await page.locator('body').innerText({ timeout: 10000 })
+              console.log(status)
+              assert.match(status, /Namespace Sandbox\s+Yes/i)
+              assert.match(status, /Seccomp-BPF sandbox\s+Yes/i)
+              console.log(`PASS: ${product}, headed Xvfb, namespace and seccomp sandboxes active`)
+            } finally {
+              await context.close()
+            }
+          }
+          verify().catch((error) => {
+            console.error(error)
+            process.exitCode = 1
+          })
+          EOF
+          xvfb-run -a dbus-run-session -- node probe.cjs
