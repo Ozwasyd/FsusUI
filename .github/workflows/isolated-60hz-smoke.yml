@@ -1,0 +1,90 @@
+name: Isolated 60Hz two-arm smoke
+on:
+  push:
+    branches: [codex/fsusui-60hz-smoke]
+permissions:
+  contents: read
+jobs:
+  smoke:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 55
+    env:
+      FSUSUI_WEB_MEASUREMENT_PROTOCOL: quick-web-60hz.v1
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+          path: controller
+          fetch-depth: 0
+      - uses: actions/checkout@v4
+        with:
+          ref: 292a6ca6d7659b18574ac1f3ae7a8f66494af7d4
+          persist-credentials: false
+          path: candidate
+      - uses: actions/checkout@v4
+        with:
+          ref: f2d929a5d045439c35e93b4771f912ce50ec2337
+          persist-credentials: false
+          path: baseline
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.33.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: emscripten-core/setup-emsdk@v15
+        with:
+          version: 5.0.4
+          actions-cache-folder: emsdk-cache
+      - name: Install locked inputs
+        timeout-minutes: 12
+        run: |
+          set -euo pipefail
+          for root in controller candidate baseline; do
+            (cd "$root" && pnpm install --frozen-lockfile)
+          done
+          (cd controller && pnpm exec playwright install --with-deps chromium)
+          (cd controller && node scripts/pin-render-browser.mjs ../smoke-browser-selection.json)
+          (cd candidate && pnpm run ensure:wasm)
+          (cd baseline && pnpm run ensure:wasm)
+      - name: Verify source and local contract controls
+        working-directory: controller
+        run: |
+          set -euo pipefail
+          test "$(git -C ../candidate rev-parse HEAD)" = 292a6ca6d7659b18574ac1f3ae7a8f66494af7d4
+          test "$(git -C ../baseline rev-parse HEAD)" = f2d929a5d045439c35e93b4771f912ce50ec2337
+          test -x "$FSUSUI_PERF_BROWSER_EXECUTABLE"
+          "$FSUSUI_PERF_BROWSER_EXECUTABLE" --version
+          node --test scripts/quick-web-60hz-adapter.test.mjs scripts/run-quick-web-60hz.test.mjs scripts/verify-quick-web-60hz.test.mjs scripts/quick-web-controller-smoke.test.mjs scripts/web-idle-cadence.test.mjs
+      - name: Measure genuine historical full quick Web arm
+        timeout-minutes: 17
+        run: |
+          set -euo pipefail
+          mkdir -p smoke-logs
+          node controller/scripts/run-quick-web-60hz.mjs "$PWD/baseline" "$PWD/controller" f2d929a5d045439c35e93b4771f912ce50ec2337 "$PWD/smoke-baseline/web" 5188 2>&1 | tee smoke-logs/baseline.log
+          node --input-type=module -e "import {verifyWebMeasurement} from './controller/scripts/verify-quick-web-60hz.mjs'; await verifyWebMeasurement('./smoke-baseline/web','f2d-historical','f2d929a5d045439c35e93b4771f912ce50ec2337');"
+      - name: Measure genuine candidate full quick Web arm
+        timeout-minutes: 17
+        run: |
+          set -euo pipefail
+          node controller/scripts/run-quick-web-60hz.mjs "$PWD/candidate" "$PWD/controller" 292a6ca6d7659b18574ac1f3ae7a8f66494af7d4 "$PWD/smoke-candidate/web" 5188 2>&1 | tee smoke-logs/candidate.log
+          node --input-type=module -e "import {verifyWebMeasurement} from './controller/scripts/verify-quick-web-60hz.mjs'; await verifyWebMeasurement('./smoke-candidate/web','292-candidate','292a6ca6d7659b18574ac1f3ae7a8f66494af7d4');"
+      - name: Confirm pinned browser and unchanged product sources
+        run: |
+          set -euo pipefail
+          node controller/scripts/pin-render-browser.mjs --verify smoke-baseline smoke-candidate
+          git -C baseline diff --exit-code HEAD --
+          git -C candidate diff --exit-code HEAD --
+          echo 'Two-arm execution smoke only. No four-arm regression, native, package, or merge acceptance claimed.'
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: isolated-60hz-two-arm-smoke
+          if-no-files-found: error
+          retention-days: 7
+          path: |
+            smoke-browser-selection.json
+            smoke-logs
+            smoke-baseline
+            smoke-candidate
