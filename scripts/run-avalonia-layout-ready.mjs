@@ -22,6 +22,17 @@ const requireThat = (condition, message) => {
 
 export const nativeDriverHash = (root) => hashFile(path.join(root, driver))
 
+// The historical SDK bridge runs the SDK's managed CLI, not the dotnet muxer.
+// It selects the exact SDK for build; runtime DLLs must use the underlying host.
+export function avaloniaRuntimeCommand(assembly, appArgs, env, platform = process.platform) {
+  const host = env.DOTNET_HOST_PATH || 'dotnet'
+  requireThat(host === 'dotnet' || path.isAbsolute(host), 'runtime host must be absolute')
+  const args = [assembly, ...appArgs]
+  return platform === 'linux' && !env.DISPLAY
+    ? { command: '/usr/bin/xvfb-run', args: ['-a', host, ...args] }
+    : { command: host, args }
+}
+
 const historicalCompileTargets = `<Project>
   <Target Name="FsusLayoutReadyDriver" BeforeTargets="CoreCompile"
           Condition="'$(MSBuildProjectFullPath)' == '$(FsusLayoutReadyProject)'">
@@ -115,13 +126,9 @@ export async function launchAvaloniaLayoutReady({ controllerRoot, productRoot, o
     requireThat(!historical || compileSubstitution === 'original=1/0;adapted=0/1', 'historical replacement was not compiled')
     const assembly = path.join(build, 'FsusUI.Avalonia.Demo.dll')
     const demoAssemblySha256 = await hashFile(assembly)
-    const args = [assembly, ...appArgs]
-    if (process.platform === 'linux' && !env.DISPLAY) {
-      await access('/usr/bin/xvfb-run')
-      await run('/usr/bin/xvfb-run', ['-a', 'dotnet', ...args], { env })
-    } else {
-      await run('dotnet', args, { env })
-    }
+    const runtime = avaloniaRuntimeCommand(assembly, appArgs, env)
+    if (runtime.command === '/usr/bin/xvfb-run') await access(runtime.command)
+    await run(runtime.command, runtime.args, { env })
     if (historical)
       execFileSync('git', ['diff', '--quiet', 'HEAD', '--'], { cwd: productRoot })
     requireThat(productHead(productRoot) === productSha, 'product revision changed during measurement')
