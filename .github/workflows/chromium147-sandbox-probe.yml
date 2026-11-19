@@ -14,11 +14,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: 292a6ca6d7659b18574ac1f3ae7a8f66494af7d4
+          ref: 603323863f1aff50db242747029c7a69671239ad
           fetch-depth: 0
           persist-credentials: false
       - name: Verify the exact PR source
-        run: test "$(git rev-parse HEAD)" = "292a6ca6d7659b18574ac1f3ae7a8f66494af7d4"
+        run: test "$(git rev-parse HEAD)" = "603323863f1aff50db242747029c7a69671239ad"
       - uses: pnpm/action-setup@v4
         with:
           version: 10.33.0
@@ -46,7 +46,7 @@ jobs:
         run: pnpm run build:demo
       - name: Capture original Avalonia and Web conformance evidence
         env:
-          GITHUB_SHA: 292a6ca6d7659b18574ac1f3ae7a8f66494af7d4
+          GITHUB_SHA: 603323863f1aff50db242747029c7a69671239ad
         run: |
           xvfb-run -a dbus-run-session -- bash -e -o pipefail -c '
             pnpm run conformance:v2:avalonia
@@ -57,7 +57,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: exact-292a6ca-checktag-chromium147-raw
+          name: exact-6033238-checktag-chromium147-raw
           path: |
             .tmp/conformance-v2
             .tmp/conformance-browser-selection.json

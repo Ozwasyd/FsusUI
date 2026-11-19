@@ -59,7 +59,7 @@ jobs:
   pr-avalonia-aot-candidate:
     if: needs.pr-avalonia-aot-plan.outputs.run == 'true'
     needs: pr-avalonia-aot-plan
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-22.04
     timeout-minutes: 60
     outputs:
       candidate-digest: ${{ steps.candidate.outputs.digest }}
