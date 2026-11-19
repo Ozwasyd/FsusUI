@@ -63,6 +63,9 @@ jobs:
           fc-match "Noto Sans CJK SC" > "$GITHUB_WORKSPACE/native-diagnostic-environment/font-match.txt"
       - name: Verify diagnostic source and reporting controls
         working-directory: controller
+        env:
+          FSUSUI_DIAGNOSTIC_TEST_BASELINE: ${{ github.workspace }}/baseline
+          FSUSUI_DIAGNOSTIC_TEST_CANDIDATE: ${{ github.workspace }}/candidate
         run: |
           node --test scripts/avalonia-gc-diagnostic.test.mjs
           python3 scripts/diagnostics/avalonia-gc/test_reduce.py

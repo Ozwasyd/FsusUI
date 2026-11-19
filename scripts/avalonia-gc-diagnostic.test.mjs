@@ -1,6 +1,8 @@
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
-import { readFile } from 'node:fs/promises'
+import { mkdtemp, readFile, rm, stat } from 'node:fs/promises'
+import { tmpdir } from 'node:os'
+import path from 'node:path'
 import {
   createGcOverlay,
   diagnosticArms,
@@ -10,6 +12,7 @@ import {
 } from './avalonia-gc-overlay.mjs'
 import {
   diagnosticArguments,
+  main,
   productShas,
 } from './run-avalonia-gc-diagnostic.mjs'
 const source = await readFile(
@@ -105,3 +108,66 @@ test('four fresh arms preserve exact full prefix or exact isolated selector; no 
     ])
   }
 })
+
+test(
+  'real diagnostic bootstrap creates scratch and reaches first build for clean exact checkouts',
+  {
+    skip:
+      !process.env.FSUSUI_DIAGNOSTIC_TEST_BASELINE ||
+      !process.env.FSUSUI_DIAGNOSTIC_TEST_CANDIDATE,
+  },
+  async () => {
+    const temporary = await mkdtemp(path.join(tmpdir(), 'fsus-bootstrap-test-'))
+    const output = path.join(temporary, 'output')
+    const sentinel = new Error('test reached first real build invocation')
+    let scratch
+    try {
+      await assert.rejects(
+        main(
+          [
+            '--baseline',
+            process.env.FSUSUI_DIAGNOSTIC_TEST_BASELINE,
+            '--candidate',
+            process.env.FSUSUI_DIAGNOSTIC_TEST_CANDIDATE,
+            '--output',
+            output,
+          ],
+          {
+            readOsRelease: async () => 'ID=ubuntu\nVERSION_ID="22.04"\n',
+            readDiskSpace: async () => ({ bavail: 1024 ** 2, bsize: 4096 }),
+            probeDotnet: (_, args) => {
+              if (args[0] === '--list-sdks')
+                return '10.0.401 [/test/dotnet/sdk]\n'
+              if (args[0] === '--list-runtimes')
+                return 'Microsoft.NETCore.App 10.0.15 [/test/dotnet/shared]\n'
+              assert.equal(args[1], '--version')
+              return '10.0.401\n'
+            },
+            runCommand: async (command, args, options) => {
+              assert.equal(command, '/test/dotnet/dotnet')
+              assert.equal(options.stage, 'build-baseline')
+              assert.deepEqual(args.slice(0, 2), [
+                '/test/dotnet/sdk/10.0.401/dotnet.dll',
+                'build',
+              ])
+              scratch = path.dirname(args[args.indexOf('--output') + 1])
+              assert.ok((await stat(scratch)).isDirectory())
+              assert.ok((await stat(options.env.DiagnosticAdapted)).isFile())
+              throw sentinel
+            },
+          },
+        ),
+        (error) => error === sentinel,
+      )
+      assert.ok(scratch)
+      await assert.rejects(stat(scratch), { code: 'ENOENT' })
+      const manifest = JSON.parse(
+        await readFile(path.join(output, 'manifest.json'), 'utf8'),
+      )
+      assert.equal(manifest.status, 'failed')
+      assert.equal(manifest.error, sentinel.message)
+    } finally {
+      await rm(temporary, { recursive: true, force: true })
+    }
+  },
+)

@@ -11,7 +11,7 @@ import {
   rm,
 } from 'node:fs/promises'
 import path from 'node:path'
-import os from 'node:os'
+import { tmpdir } from 'node:os'
 import process from 'node:process'
 import { pathToFileURL } from 'node:url'
 import {
@@ -76,7 +76,15 @@ async function checkedRun(command, args, options, log) {
     throw error
   }
 }
-export async function main(args = process.argv.slice(2)) {
+export async function main(
+  args = process.argv.slice(2),
+  {
+    readOsRelease = () => readFile('/etc/os-release', 'utf8'),
+    readDiskSpace = statfs,
+    probeDotnet = execFileSync,
+    runCommand = checkedRun,
+  } = {},
+) {
   const arg = (name) => {
     const i = args.indexOf(name)
     assert.ok(i >= 0 && args[i + 1], `missing ${name}`)
@@ -88,9 +96,9 @@ export async function main(args = process.argv.slice(2)) {
   }
   const output = arg('--output')
   assert.equal(process.platform, 'linux', 'hosted diagnostic requires Linux')
-  const os = await readFile('/etc/os-release', 'utf8')
-  assert.match(os, /^ID=ubuntu$/m)
-  assert.match(os, /^VERSION_ID="22\.04"$/m)
+  const osRelease = await readOsRelease()
+  assert.match(osRelease, /^ID=ubuntu$/m)
+  assert.match(osRelease, /^VERSION_ID="22\.04"$/m)
   assert.ok(
     !process.env.CustomAfterMicrosoftCommonTargets,
     'unexpected target override',
@@ -99,7 +107,7 @@ export async function main(args = process.argv.slice(2)) {
     assert.equal(git(cwd, ['rev-parse', 'HEAD']), productShas[name])
     git(cwd, ['diff', '--quiet', 'HEAD', '--'])
   }
-  const sdkList = execFileSync('dotnet', ['--list-sdks'], {
+  const sdkList = probeDotnet('dotnet', ['--list-sdks'], {
     encoding: 'utf8',
     timeout: 30000,
   })
@@ -109,7 +117,7 @@ export async function main(args = process.argv.slice(2)) {
   const sdkCli = path.join(sdkMatch[1], '10.0.401', 'dotnet.dll')
   for (const cwd of Object.values(products))
     assert.equal(
-      execFileSync(host, [sdkCli, '--version'], {
+      probeDotnet(host, [sdkCli, '--version'], {
         cwd,
         encoding: 'utf8',
         timeout: 30000,
@@ -118,7 +126,7 @@ export async function main(args = process.argv.slice(2)) {
       'SDK mismatch',
     )
   const version = '10.0.401'
-  const runtimes = execFileSync(host, ['--list-runtimes'], {
+  const runtimes = probeDotnet(host, ['--list-runtimes'], {
     encoding: 'utf8',
     timeout: 30000,
   })
@@ -129,7 +137,7 @@ export async function main(args = process.argv.slice(2)) {
   )
   await mkdir(path.dirname(output), { recursive: true })
   await mkdir(output)
-  const fs = await statfs(output)
+  const fs = await readDiskSpace(output)
   assert.ok(fs.bavail * fs.bsize >= 2 * 1024 ** 3, 'need 2 GiB free scratch')
   const driver = await readFile(
     path.join(products.candidate, relativeDriver),
@@ -148,7 +156,7 @@ export async function main(args = process.argv.slice(2)) {
     overlaySha256: sha256(overlay),
     sdk: version,
     installedRuntimes: runtimes,
-    osRelease: os,
+    osRelease,
     provider:
       'Microsoft-Windows-DotNETRuntime:1:4,FsusUI-RenderPhases:FFFFFFFFFFFFFFFF:4',
     sequence: diagnosticArms,
@@ -161,7 +169,7 @@ export async function main(args = process.argv.slice(2)) {
       JSON.stringify(manifest, null, 2),
     )
   await save()
-  const buildScratch = await mkdtemp(path.join(os.tmpdir(), 'fsus-gc-build-'))
+  const buildScratch = await mkdtemp(path.join(tmpdir(), 'fsus-gc-build-'))
   const cleanEnv = {
     ...process.env,
     DOTNET_CLI_TELEMETRY_OPTOUT: '1',
@@ -190,7 +198,7 @@ export async function main(args = process.argv.slice(2)) {
         DiagnosticAdapted: adapted,
         DiagnosticManifest: compileManifest,
       }
-      await checkedRun(
+      await runCommand(
         host,
         [
           sdkCli,
@@ -247,7 +255,7 @@ export async function main(args = process.argv.slice(2)) {
       const command = env.DISPLAY ? host : '/usr/bin/xvfb-run'
       const commandArgs = env.DISPLAY ? appArgs : ['-a', host, ...appArgs]
       const started = Date.now()
-      await checkedRun(
+      await runCommand(
         command,
         commandArgs,
         { cwd, env, stage: arm.name, timeoutMs: 10 * 60_000 },
