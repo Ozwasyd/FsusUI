@@ -2,14 +2,22 @@ import { spawn } from 'node:child_process'
 import { access, mkdir, readFile, writeFile } from 'node:fs/promises'
 import path from 'node:path'
 import process from 'node:process'
+import { launchQuickWeb } from './run-quick-web-60hz.mjs'
+import { verifyWebMeasurement } from './verify-quick-web-60hz.mjs'
+import { execFileSync } from 'node:child_process'
 import { verifyImpactPlan } from './render-performance-impact.mjs'
 
-const root = path.resolve(import.meta.dirname, '..')
+const controllerRoot = path.resolve(import.meta.dirname, '..')
 const args = process.argv.slice(2)
 const valueOf = (name, fallback) => {
   const index = args.indexOf(name)
   return index >= 0 ? args[index + 1] : fallback
 }
+const protocol = process.env.FSUSUI_WEB_MEASUREMENT_PROTOCOL
+if (protocol && protocol !== 'quick-web-60hz.v1') throw new Error('unsupported Web measurement protocol')
+const productOverride = valueOf('--product-root', '')
+if (productOverride && !protocol) throw new Error('product override requires explicit protocol')
+const root = productOverride ? path.resolve(productOverride) : controllerRoot
 const profile = valueOf('--profile', 'quick')
 const output = path.resolve(
   root,
@@ -89,7 +97,14 @@ if (!avaloniaOnly) {
   if (webScenario) webArgs.push('--scenario', webScenario)
   if (baseline)
     webArgs.push('--baseline', path.join(baseline, 'web', 'summary.json'))
-  await run(process.execPath, webArgs)
+  if (protocol) {
+    if (profile !== 'quick' || webScenario || baseline) throw new Error('60Hz requires full quick matrix and external paired comparison')
+    const expectedSha = execFileSync('git',['rev-parse','HEAD'],{cwd:root,encoding:'utf8'}).trim()
+    await launchQuickWeb({productRoot:root,dependenciesRoot:controllerRoot,expectedSha,output:path.join(output,'web')})
+    await verifyWebMeasurement(path.join(output,'web'),undefined,expectedSha)
+  } else {
+    await run(process.execPath, webArgs)
+  }
 }
 
 if (!webOnly) {

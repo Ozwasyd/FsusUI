@@ -203,16 +203,20 @@ export function classifyHistoricalFailure(result, checker) {
   return violations
 }
 
-const run = (command, args, options) =>
-  runHistoricalProcess(command, args, {
+export const historicalStageOptions = (command, options = {}) => {
+  const stage = options.stage ?? (command === 'pnpm' ? 'benchmark' : 'checker')
+  return {
     ...options,
     stream: true,
-    stage: command === 'pnpm' ? 'benchmark' : 'checker',
-    timeoutMs:
-      command === 'pnpm'
-        ? historicalDeadlines.benchmark
-        : historicalDeadlines.checker,
-  })
+    stage,
+    timeoutMs: stage === 'benchmark'
+      ? historicalDeadlines.benchmark
+      : historicalDeadlines.checker,
+  }
+}
+export const runHistoricalStage = (command, args, options = {}) =>
+  runHistoricalProcess(command, args, historicalStageOptions(command, options))
+const run = runHistoricalStage
 
 // Policy remains byte-identical; checker implementations may evolve only when
 // both independently reproduce the exact measured historical failure.
@@ -355,10 +359,11 @@ async function main() {
   let processFailure
   try {
     result = await run(
-      'pnpm',
+      process.env.FSUSUI_WEB_MEASUREMENT_PROTOCOL && plan.platforms.web.run ? process.execPath : 'pnpm',
       [
-        'perf:render',
-        '--',
+        ...(process.env.FSUSUI_WEB_MEASUREMENT_PROTOCOL && plan.platforms.web.run
+          ? [path.join(root, 'scripts/run-render-performance.mjs'), '--product-root', directory]
+          : ['perf:render', '--']),
         '--impact-plan',
         planPath,
         '--profile',
@@ -366,7 +371,7 @@ async function main() {
         '--output',
         output,
       ],
-      { cwd: directory, env: { ...sdk.env, GITHUB_SHA: sha } },
+      { cwd: directory, env: { ...sdk.env, GITHUB_SHA: sha }, stage: 'benchmark' },
     )
   } catch (error) {
     processFailure = error

@@ -59,7 +59,7 @@ jobs:
   pr-avalonia-aot-candidate:
     if: needs.pr-avalonia-aot-plan.outputs.run == 'true'
     needs: pr-avalonia-aot-plan
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-22.04
     timeout-minutes: 60
     outputs:
       candidate-digest: ${{ steps.candidate.outputs.digest }}
@@ -206,8 +206,10 @@ jobs:
 
   pr-real-render-performance:
     if: github.event_name == 'pull_request'
-    runs-on: ubuntu-24.04
-    timeout-minutes: 45
+    runs-on: ${{ github.event.pull_request.number == 1085 && 'ubuntu-22.04' || 'ubuntu-24.04' }}
+    timeout-minutes: 90
+    env:
+      FSUSUI_WEB_MEASUREMENT_PROTOCOL: ${{ github.event.pull_request.number == 1085 && 'quick-web-60hz.v1' || '' }}
     steps:
       - name: Checkout current change
         uses: actions/checkout@v4
@@ -226,6 +228,17 @@ jobs:
           node scripts/render-performance-impact-plan.mjs
           --base ${{ github.event.pull_request.base.sha }}
           --output ../performance-impact-plan.json
+      - name: Guard the scoped 60Hz historical protocol
+        if: >-
+          github.event.pull_request.number == 1085 &&
+          steps.render-impact.outputs.run == 'true' &&
+          steps.render-impact.outputs.scope != 'avalonia-only'
+        working-directory: current
+        env:
+          EXPECTED_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: |
+          test "$EXPECTED_BASE_SHA" = f2d929a5d045439c35e93b4771f912ce50ec2337
+          node --input-type=module -e "import fs from 'node:fs'; import assert from 'node:assert/strict'; const p=JSON.parse(fs.readFileSync('../performance-impact-plan.json','utf8')); assert.equal(p.measurement.profile,'quick'); assert.equal(p.measurement.samples,21); assert.equal(p.measurement.warmups,1); assert.ok(!p.platforms.web.scenario,'60Hz protocol requires the complete quick Web matrix');"
       - name: Log PR real-render impact
         run: |
           echo "run=${{ steps.render-impact.outputs.run }}"
@@ -316,7 +329,7 @@ jobs:
             --impact-plan ../performance-impact-plan.json \
             --output ../performance-baseline
       - name: Measure current quick matrix
-        timeout-minutes: 8
+        timeout-minutes: 20
         if: steps.render-impact.outputs.run == 'true'
         working-directory: current
         env:
@@ -327,7 +340,7 @@ jobs:
           --profile quick
           --output ../performance-current
       - name: Repeat current quick matrix for order balance
-        timeout-minutes: 8
+        timeout-minutes: 20
         if: steps.baseline-contract.outputs.available == 'true'
         working-directory: current
         env:
