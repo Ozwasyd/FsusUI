@@ -21,7 +21,9 @@ export function materializeDriver(source, productRoot, playwrightEntry, cadenceF
     effective = effective.replace(before, after)
   }
   replaceOne("const root = path.resolve(import.meta.dirname, '..')", `const root = ${JSON.stringify(productRoot)}`)
-  replaceOne("from '@playwright/test'", `from ${JSON.stringify(pathToFileURL(playwrightEntry).href)}`)
+  replaceOne("import { chromium } from '@playwright/test'", `import * as playwrightModule from ${JSON.stringify(pathToFileURL(playwrightEntry).href)}
+const chromium = playwrightModule.chromium ?? playwrightModule.default?.chromium
+if (typeof chromium?.launch !== 'function') throw new Error('Resolved Playwright entry does not expose Chromium')`)
   effective = effective.replace(/from '(\.\/[^']+)'/gu, (_, relative) => `from ${JSON.stringify(pathToFileURL(path.resolve(productRoot, 'scripts', relative)).href)}`)
   replaceOne('  const results = []', '  const idleCadence = await captureIdleCadence(browser)\n  const results = []')
   replaceOne('    const raw = {', '    const cadence = describeCadence(refreshHz, pageMetrics.frameIntervals)\n    const raw = {\n      measurementProtocol,\n      idleCadence,\n      cadence,')
@@ -53,13 +55,17 @@ export async function launchQuickWeb({productRoot, dependenciesRoot, expectedSha
   try {
     const result = await run(process.execPath,[sidecar,'--profile','quick','--warmups','1','--samples','21','--output',path.resolve(output),'--port',String(port)],{
       cwd:productRoot, env:{...process.env,GITHUB_SHA:expectedSha,FSUSUI_WEB_FAILURE_DIAGNOSTICS:'0',FSUSUI_WEB_PROTOCOL_BINDING:JSON.stringify(binding)},
-      timeoutMs:900000, stage:'quick-web-60hz',
+      timeoutMs:900000, stage:'quick-web-60hz', stream:true, maxOutputBytes:4 * 1024 * 1024,
     })
-    assert.equal(result.code,0, 'measurement failed; never classify as accepted')
+    if (!injected.run) await writeFile(path.join(output,'measurement-process.log'),`${result.stdout ?? ''}\n${result.stderr ?? ''}`)
+    assert.equal(result.code,0, `measurement failed (${result.code}); never classify as accepted: ${(result.stderr ?? '').slice(-4096)}`)
     assert.ok(!result.signal, 'measurement signalled')
     assert.equal(git('rev-parse','HEAD'),expectedSha)
     assert.equal(git('diff','HEAD','--'),'','tracked product source changed during measurement')
     return {binding,result}
+  } catch (error) {
+    if (!injected.run) await writeFile(path.join(output,'measurement-failure.log'),String(error?.stack ?? error).slice(-16384))
+    throw error
   } finally {
     await rm(temp,{recursive:true,force:true})
   }

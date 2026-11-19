@@ -64,3 +64,15 @@ test('both orchestrators opt into the same sidecar; old pnpm route remains defau
  assert.ok(comparator.includes("currentPlan?.platforms.web.run !== false"))
  assert.ok(comparator.includes("await verifyWebMeasurement(path.join(directory,'web'),kind,"))
 })
+
+test('materialized exact Playwright import supports CJS default and ESM named exports without launching',async()=>{
+ const source=execFileSync('git',['show',`${sha}:scripts/web-render-performance.mjs`],{cwd:repository,encoding:'utf8'})
+ for(const [name,body] of [['playwright.cjs','module.exports={chromium:{launch(){throw new Error("must not launch")}}}'],['playwright.mjs','export const chromium={launch(){throw new Error("must not launch")}}']]){
+  const file=path.join(temp,name)
+  await (await import('node:fs/promises')).writeFile(file,body)
+  const effective=materializeDriver(source,root,file).effectiveSource
+  const snippet=effective.match(/import \* as playwrightModule[^\n]+\nconst chromium[^\n]+\nif \(typeof chromium[^\n]+/u)?.[0]
+  assert.ok(snippet)
+  execFileSync(process.execPath,['--input-type=module','-e',snippet+'\nif(typeof chromium.launch!=="function") process.exit(1)'])
+ }
+})
