@@ -11,8 +11,9 @@ import path from 'node:path'
 import process from 'node:process'
 import { pathToFileURL } from 'node:url'
 import { verifyImpactPlan } from './render-performance-impact.mjs'
-import { nativeDriverHash, nativeProtocol, readNativeBinding } from './run-avalonia-layout-ready.mjs'
+import { nativeDriverHash, nativeSplitProtocol, supportedNativeProtocol, readNativeBinding } from './run-avalonia-layout-ready.mjs'
 import { verifyAvaloniaLayoutReady } from './verify-avalonia-layout-ready.mjs'
+import { verifyAvaloniaSplitArm } from './verify-avalonia-split-arm.mjs'
 
 const root = path.resolve(import.meta.dirname, '..')
 const json = async (file) => JSON.parse(await readFile(file, 'utf8'))
@@ -327,7 +328,7 @@ async function main() {
   const plan = verifyImpactPlan(await json(planPath))
   requireThat(plan.run, 'measurement plan is skipped')
   const useNativeProtocol = Boolean(process.env.FSUSUI_AVALONIA_MEASUREMENT_PROTOCOL && plan.platforms.avalonia.run)
-  requireThat(!useNativeProtocol || process.env.FSUSUI_AVALONIA_MEASUREMENT_PROTOCOL === nativeProtocol, 'unsupported Avalonia protocol')
+  requireThat(!useNativeProtocol || supportedNativeProtocol(process.env.FSUSUI_AVALONIA_MEASUREMENT_PROTOCOL), 'unsupported Avalonia protocol')
   const useController = Boolean(process.env.FSUSUI_WEB_MEASUREMENT_PROTOCOL && plan.platforms.web.run) || useNativeProtocol
   for (const platform of ['web', 'avalonia']) {
     await access(path.join(output, platform)).then(
@@ -398,8 +399,14 @@ async function main() {
   if (useNativeProtocol) {
     const nativeOutput = path.join(output, 'avalonia')
     const scenario = plan.platforms.avalonia.scenario ?? ''
-    await readNativeBinding(nativeOutput, sha, await nativeDriverHash(root), scenario)
-    await verifyAvaloniaLayoutReady(nativeOutput, { scenario, impactPlan: plan })
+    const split = process.env.FSUSUI_AVALONIA_MEASUREMENT_PROTOCOL === nativeSplitProtocol
+    const driverHash = await nativeDriverHash(root, { committed: split })
+    if (split) {
+      await verifyAvaloniaSplitArm(nativeOutput, { productSha: sha, driverHash, plan, startedAt })
+    } else {
+      await readNativeBinding(nativeOutput, sha, driverHash, scenario)
+      await verifyAvaloniaLayoutReady(nativeOutput, { scenario, impactPlan: plan })
+    }
   }
   let violations = []
   if (result.code !== 0 || result.signal) {

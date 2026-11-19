@@ -3,6 +3,7 @@ import { readFile, readdir } from 'node:fs/promises'
 import path from 'node:path'
 
 export const AVALONIA_LAYOUT_READY_PROTOCOL = 'variable-list-layout-ready.v1'
+export const AVALONIA_LAYOUT_READY_SPLIT_PROTOCOL = 'variable-list-layout-ready.v2'
 export const SUSTAINED_VARIABLE_SCENARIO = 'virtual-list-variable-100k-sustained'
 export const ORIGINAL_VARIABLE_SCENARIO = 'virtual-list-variable-100k'
 const quick = ['virtual-list-fixed-100k', ORIGINAL_VARIABLE_SCENARIO,
@@ -17,7 +18,21 @@ const counts = ['RealizedVisuals', 'RealizedContainers', 'PooledContainers',
   'RetainedMeasurements', 'LoadedWindows']
 const finite = (v, label) => assert.ok(typeof v === 'number' && Number.isFinite(v) && v >= 0, `${label}: non-finite/negative value`)
 
-export function expectedAvaloniaLayoutReadyScenarios(profile, scenario = '') {
+export function expectedAvaloniaLayoutReadyScenarios(
+  profile, scenario = '', { protocol = AVALONIA_LAYOUT_READY_PROTOCOL, partition = null } = {},
+) {
+  assert.ok(
+    protocol === AVALONIA_LAYOUT_READY_PROTOCOL ||
+      protocol === AVALONIA_LAYOUT_READY_SPLIT_PROTOCOL,
+    'unknown native measurement protocol',
+  )
+  if (protocol === AVALONIA_LAYOUT_READY_SPLIT_PROTOCOL) {
+    assert.equal(profile, 'quick', 'split native measurement requires quick profile')
+    assert.equal(scenario, '', 'split native measurement must not filter scenarios')
+    assert.ok(partition === 'canonical' || partition === 'sustained', 'unknown native measurement partition')
+    return partition === 'canonical' ? [...quick] : [SUSTAINED_VARIABLE_SCENARIO]
+  }
+  assert.equal(partition, null, 'legacy measurement has no partition')
   assert.ok(profile === 'quick' || profile === 'full', 'unknown native profile')
   assert.equal(typeof scenario, 'string', 'scenario filter must be a string')
   const filter = scenario.trim() ? scenario.toLowerCase() : ''
@@ -29,10 +44,13 @@ export function expectedAvaloniaLayoutReadyScenarios(profile, scenario = '') {
 
 // Semantic validation only: source/driver/output SHA bindings belong to the launcher.
 // readRaw receives a validated scenario ID and returns its parsed raw JSON.
-export async function validateAvaloniaLayoutReady(summary, readRaw, scenario = '', impactPlan = null) {
+export async function validateAvaloniaLayoutReady(
+  summary, readRaw, scenario = '', impactPlan = null,
+  { protocol = AVALONIA_LAYOUT_READY_PROTOCOL, partition = null, launchId = undefined } = {},
+) {
   assert.equal(summary?.SchemaVersion, 2)
   assert.equal(summary.Kind, 'real-avalonia-render-measurement')
-  assert.equal(summary.MeasurementProtocol, AVALONIA_LAYOUT_READY_PROTOCOL)
+  assert.equal(summary.MeasurementProtocol, protocol)
   if (impactPlan) {
     assert.equal(impactPlan.platforms?.avalonia?.run, true, 'impact plan excludes native measurements')
     assert.equal(summary.Profile, impactPlan.measurement?.profile)
@@ -40,7 +58,19 @@ export async function validateAvaloniaLayoutReady(summary, readRaw, scenario = '
     if (scenario) assert.equal(scenario, selected, 'filter differs from impact plan')
     scenario = selected
   }
-  const ids = expectedAvaloniaLayoutReadyScenarios(summary.Profile, scenario)
+  const ids = expectedAvaloniaLayoutReadyScenarios(summary.Profile, scenario, { protocol, partition })
+  const split = protocol === AVALONIA_LAYOUT_READY_SPLIT_PROTOCOL
+  if (split) {
+    assert.equal(summary.MeasurementPartition, partition, 'wrong summary partition')
+    assert.ok(Number.isSafeInteger(summary.ProcessId) && summary.ProcessId > 0, 'invalid native process ID')
+    assert.match(summary.LaunchId, /^[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}$/u)
+    assert.notEqual(summary.LaunchId, '00000000-0000-0000-0000-000000000000', 'empty launch ID')
+    if (launchId !== undefined) assert.equal(summary.LaunchId, launchId, 'wrong native launch ID')
+    assert.equal(summary.Environment?.RequestedBackend, 'auto')
+  } else {
+    assert.equal(launchId, undefined, 'legacy measurement has no launch ID')
+    assert.equal(summary.MeasurementPartition, undefined, 'unexpected legacy summary partition')
+  }
   assert.ok(Array.isArray(summary.Results), 'missing native Results')
   assert.deepEqual(summary.Results.map(row => row.Id), ids, 'missing, duplicate, reordered or mixed native scenarios')
   const samples = impactPlan?.measurement?.samples ?? (summary.Profile === 'full' ? 12 : 21)
@@ -51,11 +81,17 @@ export async function validateAvaloniaLayoutReady(summary, readRaw, scenario = '
   assert.equal(summary.Runner.Warmups, warmups)
   assert.equal(summary.Runner.ScenarioCount, ids.length)
   assert.ok(Number.isInteger(summary.Runner.LongScrollIterations) && summary.Runner.LongScrollIterations > 0)
+  if (split) {
+    assert.equal(samples, 21)
+    assert.equal(warmups, 1)
+    assert.equal(summary.Runner.LongScrollIterations, 256)
+  }
   for (const row of summary.Results) {
     const raw = await readRaw(row.Id)
     assert.equal(raw?.Id, row.Id, 'raw identity mismatch')
     for (const item of [row, raw]) {
-      assert.equal(item.MeasurementProtocol, AVALONIA_LAYOUT_READY_PROTOCOL, `${row.Id}: mixed protocol`)
+      assert.equal(item.MeasurementProtocol, protocol, `${row.Id}: mixed protocol`)
+      assert.equal(item.MeasurementPartition, undefined, `${row.Id}: partition belongs in summary only`)
       assert.equal(item.RemountPerSample, row.Id !== SUSTAINED_VARIABLE_SCENARIO, `${row.Id}: wrong mount policy`)
       assert.equal(item.LongScroll?.Iterations, summary.Runner.LongScrollIterations)
     }
@@ -76,14 +112,20 @@ export async function validateAvaloniaLayoutReady(summary, readRaw, scenario = '
     }
     finite(row.DisposalMs, `${row.Id}.DisposalMs`)
   }
-  return { protocol: AVALONIA_LAYOUT_READY_PROTOCOL, profile: summary.Profile, scenarios: ids, samples, warmups }
+  return {
+    protocol, profile: summary.Profile, scenarios: ids, samples, warmups,
+    ...(split ? { partition, processId: summary.ProcessId, launchId: summary.LaunchId } : {}),
+  }
 }
 
-export async function verifyAvaloniaLayoutReady(directory, { scenario = '', impactPlan = null } = {}) {
+export async function verifyAvaloniaLayoutReady(
+  directory,
+  { scenario = '', impactPlan = null, protocol = AVALONIA_LAYOUT_READY_PROTOCOL, partition = null, launchId = undefined } = {},
+) {
   const summary = JSON.parse(await readFile(path.join(directory, 'summary.json'), 'utf8'))
   const result = await validateAvaloniaLayoutReady(summary,
     async id => JSON.parse(await readFile(path.join(directory, 'raw', `${id}.raw.json`), 'utf8')),
-    scenario, impactPlan)
+    scenario, impactPlan, { protocol, partition, launchId })
   const rawFiles = (await readdir(path.join(directory, 'raw'))).filter(name => name.endsWith('.raw.json')).sort()
   assert.deepEqual(rawFiles, result.scenarios.map(id => `${id}.raw.json`).sort(), 'extra/mixed native raw outputs')
   return result
