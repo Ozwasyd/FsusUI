@@ -3,6 +3,7 @@ using System.Globalization;
 using System.Runtime.InteropServices;
 using System.Reflection;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
@@ -27,8 +28,12 @@ internal static class RenderPerformanceRunner
   private static string requestedBackend = "auto";
   private static string? scenarioFilter;
   private const string LayoutReadyProtocol = "variable-list-layout-ready.v1";
+  private const string SplitLayoutReadyProtocol = "variable-list-layout-ready.v2";
   private const string SustainedVariableScenario = "virtual-list-variable-100k-sustained";
   private static string? measurementProtocol;
+  private static string? measurementPartition;
+  private static string? measurementLaunchId;
+  private static bool LayoutReadyEnabled => measurementProtocol is LayoutReadyProtocol or SplitLayoutReadyProtocol;
 
   public static bool IsConfigured { get; private set; }
   public static bool UseSoftwareRendering =>
@@ -48,8 +53,25 @@ internal static class RenderPerformanceRunner
     scenarioFilter = ReadArgument(args, "--scenario");
     measurementProtocol = Environment.GetEnvironmentVariable("FSUSUI_AVALONIA_MEASUREMENT_PROTOCOL");
     if (string.IsNullOrEmpty(measurementProtocol)) measurementProtocol = null;
-    if (measurementProtocol is not null && measurementProtocol != LayoutReadyProtocol)
+    if (measurementProtocol is not null && !LayoutReadyEnabled)
       throw new InvalidOperationException("Unsupported Avalonia measurement protocol.");
+    measurementPartition = Environment.GetEnvironmentVariable("FSUSUI_AVALONIA_MEASUREMENT_PARTITION");
+    measurementLaunchId = Environment.GetEnvironmentVariable("FSUSUI_AVALONIA_MEASUREMENT_LAUNCH_ID");
+    if (measurementProtocol == SplitLayoutReadyProtocol)
+    {
+      if (profile != "quick" || !string.IsNullOrEmpty(scenarioFilter) ||
+          warmups != 1 || samples != 21 || longScrollIterations != 256 || requestedBackend != "auto")
+        throw new InvalidOperationException("Split Avalonia measurement requires the full quick 1/21/256 auto matrix.");
+      if (measurementPartition is not ("canonical" or "sustained"))
+        throw new InvalidOperationException("Split Avalonia measurement requires an explicit partition.");
+      if (!Guid.TryParseExact(measurementLaunchId, "D", out var launchId) ||
+          launchId == Guid.Empty || measurementLaunchId != launchId.ToString("D"))
+        throw new InvalidOperationException("Split Avalonia measurement requires a canonical, nonempty launch ID.");
+    }
+    else if (measurementPartition is not null || measurementLaunchId is not null)
+    {
+      throw new InvalidOperationException("Partition and launch ID require split Avalonia measurement.");
+    }
   }
 
   public static Window CreateWindow(IClassicDesktopStyleApplicationLifetime desktop)
@@ -126,9 +148,12 @@ internal static class RenderPerformanceRunner
         Theme("theme-switch"),
       ];
 
-    // Append rather than interleave: preserve the existing scenarios' predecessor history.
+    // Legacy v1 appends sustained; v2 keeps the canonical predecessor history
+    // and measures sustained alone in a second process from the same build.
     if (measurementProtocol == LayoutReadyProtocol)
       definitions = [.. definitions, VirtualList(SustainedVariableScenario, 100_000, true)];
+    else if (measurementProtocol == SplitLayoutReadyProtocol && measurementPartition == "sustained")
+      definitions = [VirtualList(SustainedVariableScenario, 100_000, true)];
 
     if (!string.IsNullOrWhiteSpace(scenarioFilter))
     {
@@ -136,7 +161,7 @@ internal static class RenderPerformanceRunner
         .Where(definition => definition.Id.Contains(scenarioFilter, StringComparison.OrdinalIgnoreCase))
         .ToArray();
     }
-    if (measurementProtocol == LayoutReadyProtocol && definitions.Length == 0)
+    if (LayoutReadyEnabled && definitions.Length == 0)
       throw new InvalidOperationException("The Avalonia scenario filter selected no measurements.");
     var results = new List<object>();
     var rawDirectory = Path.Combine(Path.GetDirectoryName(Path.GetFullPath(outputPath))!, "raw");
@@ -149,7 +174,7 @@ internal static class RenderPerformanceRunner
       await WaitForRenderAsync().WaitAsync(TimeSpan.FromSeconds(30));
       var visualBaseline = window.GetVisualDescendants().Count();
       var control = definition.Create();
-      var layoutReady = measurementProtocol == LayoutReadyProtocol &&
+      var layoutReady = LayoutReadyEnabled &&
         control is FsusVirtualList { SizeMode: FsusVirtualSizeMode.Variable };
       var remountPerSample = definition.Id != SustainedVariableScenario;
       var host = new Grid
@@ -340,8 +365,20 @@ internal static class RenderPerformanceRunner
       Results = results,
     };
     Directory.CreateDirectory(Path.GetDirectoryName(Path.GetFullPath(outputPath))!);
-    await File.WriteAllTextAsync(outputPath, JsonSerializer.Serialize(summary, JsonOptions));
+    await File.WriteAllTextAsync(outputPath, SerializeSummary(summary));
     Console.WriteLine($"Avalonia real-render performance: {results.Count} scenarios -> {outputPath}");
+  }
+
+  private static string SerializeSummary<T>(T summary)
+  {
+    if (measurementProtocol != SplitLayoutReadyProtocol)
+      return JsonSerializer.Serialize(summary, JsonOptions);
+
+    var json = JsonSerializer.SerializeToNode(summary, JsonOptions)!.AsObject();
+    json["MeasurementPartition"] = measurementPartition;
+    json["ProcessId"] = Environment.ProcessId;
+    json["LaunchId"] = measurementLaunchId;
+    return json.ToJsonString(JsonOptions);
   }
 
   private static void EnsureVariableListLayoutReady(Grid host, FsusVirtualList list)

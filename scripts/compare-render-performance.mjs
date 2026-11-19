@@ -3,10 +3,12 @@ import { execFileSync } from 'node:child_process'
 import { readFile } from 'node:fs/promises'
 import path from 'node:path'
 import process from 'node:process'
+import { isDeepStrictEqual } from 'node:util'
 import { verifyWebMeasurement } from './verify-quick-web-60hz.mjs'
 import { verifyImpactPlan } from './render-performance-impact.mjs'
-import { historicalNativeSha, nativeDriverHash, nativeProtocol, readNativeBinding } from './run-avalonia-layout-ready.mjs'
+import { historicalNativeSha, nativeDriverHash, nativeSplitProtocol, supportedNativeProtocol, readNativeBinding } from './run-avalonia-layout-ready.mjs'
 import { verifyAvaloniaLayoutReady } from './verify-avalonia-layout-ready.mjs'
+import { verifyAvaloniaSplitArm } from './verify-avalonia-split-arm.mjs'
 
 // pnpm/npm may forward a literal `--` when invoked as `pnpm script -- args`.
 const [
@@ -100,7 +102,8 @@ if (currentPlan?.platforms.web.run !== false && (protocol || webSummary?.measure
   if (bindings.some(x=>x.protocolDigest!==bindings[0].protocolDigest) || bindings[0].productSha!==bindings[2].productSha || bindings[1].productSha!==bindings[3].productSha) throw new Error('four-arm protocol/source identity mismatch')
 }
 const native = process.env.FSUSUI_AVALONIA_MEASUREMENT_PROTOCOL
-if (native && native !== nativeProtocol) throw new Error('unsupported Avalonia protocol')
+if (native && !supportedNativeProtocol(native)) throw new Error('unsupported Avalonia protocol')
+const splitSummaries = new Map()
 if (currentPlan?.platforms.avalonia.run !== false) {
   const dirs = [baselineDirectory, currentDirectory, baselineRepeatDirectory, currentRepeatDirectory].filter(Boolean)
   const nativeSummaries = await Promise.all(dirs.map((directory) => read(directory, 'avalonia')))
@@ -109,27 +112,45 @@ if (currentPlan?.platforms.avalonia.run !== false) {
     const controllerRoot = path.resolve(import.meta.dirname, '..')
     const sha = execFileSync('git', ['rev-parse', '--verify', 'HEAD'], { cwd: controllerRoot, encoding: 'utf8' }).trim()
     const driverHash = await nativeDriverHash(controllerRoot)
+    const split = native === nativeSplitProtocol || nativeSummaries.some(s => s.MeasurementProtocol === nativeSplitProtocol)
+    if (split && nativeSummaries.some(s => s.MeasurementProtocol !== nativeSplitProtocol))
+      throw new Error('Mixed native split/legacy results')
+    let splitEnvironment
     let scenario = currentPlan ? (currentPlan.platforms.avalonia.scenario ?? '') : undefined
     for (const [index, directory] of dirs.entries()) {
       const expected = index % 2 === 0 ? historicalNativeSha : sha
       const nativeOutput = path.join(directory, 'avalonia')
       if (nativeSummaries[index].GitSha !== expected) throw new Error('Avalonia layout-ready summary identity mismatch')
-      const proof = await readNativeBinding(nativeOutput, expected, driverHash, scenario)
-      scenario ??= proof.scenario
-      await verifyAvaloniaLayoutReady(nativeOutput, { scenario, impactPlan: currentPlan })
+      if (split) {
+        const { canonical, sustained } = await verifyAvaloniaSplitArm(nativeOutput, {
+          productSha: expected, driverHash, plan: currentPlan,
+        })
+        if (splitEnvironment && !isDeepStrictEqual(splitEnvironment, canonical.Environment))
+          throw new Error('Avalonia split runtime and renderer must match in all four arms')
+        splitEnvironment ??= canonical.Environment
+        splitSummaries.set(directory, [...canonical.Results, ...sustained.Results])
+      } else {
+        const proof = await readNativeBinding(nativeOutput, expected, driverHash, scenario)
+        scenario ??= proof.scenario
+        await verifyAvaloniaLayoutReady(nativeOutput, { scenario, impactPlan: currentPlan })
+      }
     }
   }
 }
+const readComparable = async (directory, platform) =>
+  platform === 'avalonia' && splitSummaries.has(directory)
+    ? { Results: splitSummaries.get(directory) }
+    : read(directory, platform)
 const regressions = []
 for (const platform of ['web', 'avalonia']) {
   if (currentPlan && !currentPlan.platforms[platform].run) continue
-  const baseline = await read(baselineDirectory, platform)
-  const current = await read(currentDirectory, platform)
+  const baseline = await readComparable(baselineDirectory, platform)
+  const current = await readComparable(currentDirectory, platform)
   const baselineRepeat = baselineRepeatDirectory
-    ? await read(baselineRepeatDirectory, platform)
+    ? await readComparable(baselineRepeatDirectory, platform)
     : null
   const currentRepeat = currentRepeatDirectory
-    ? await read(currentRepeatDirectory, platform)
+    ? await readComparable(currentRepeatDirectory, platform)
     : null
   const baselineMap = measurementMap(baseline, platform, 'baseline')
   const currentMap = measurementMap(current, platform, 'current')

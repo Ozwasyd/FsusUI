@@ -141,6 +141,13 @@ For both baseline measurements, CI verifies the baseline checkout against the
 pull request base SHA and supplies that verified SHA to the measurement process.
 This keeps the recorded Avalonia source identity bound to the measured checkout.
 
+The scoped Avalonia split protocol runs the original seven quick scenarios in
+their existing order, then starts a fresh process from the same assembly for
+continuous variable-list scrolling. The canonical and sustained summaries and
+raw files are stored separately. The gate verifies both launch identities and
+payload hashes before comparing all eight scenarios. Sustained keeps its
+original sample count, workload, absolute checks, and relative policy.
+
 The complete local paired workflow is:
 
 ```bash
