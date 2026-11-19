@@ -295,6 +295,14 @@ jobs:
           steps.render-impact.outputs.scope != 'avalonia-only'
         working-directory: current
         run: node scripts/pin-render-browser.mjs
+      - name: Verify the scoped Web runner can sustain idle 60 Hz cadence
+        if: >-
+          github.event.pull_request.number == 1085 &&
+          steps.render-impact.outputs.run == 'true' &&
+          steps.render-impact.outputs.scope != 'avalonia-only'
+        timeout-minutes: 1
+        working-directory: current
+        run: node scripts/render-ci-web-preflight.mjs ../performance-web-runner-preflight.json
       - name: Install Avalonia-only display dependency
         if: steps.render-impact.outputs.scope == 'avalonia-only'
         run: |
@@ -401,6 +409,7 @@ jobs:
             performance-current-repeat
             performance-impact-plan.json
             performance-browser-selection.json
+            performance-web-runner-preflight.json
             !performance-*/web/diagnostics/**
           retention-days: 14
       - name: Preserve failed Web measurement diagnostics

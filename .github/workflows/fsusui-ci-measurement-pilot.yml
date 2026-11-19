@@ -1,0 +1,89 @@
+name: FsusUI Web CI measurement pilot
+
+on:
+  push:
+    branches:
+      - codex/fsusui-ci-measurement-pilot
+    paths:
+      - .github/workflows/fsusui-ci-measurement-pilot.yml
+
+permissions:
+  contents: read
+
+concurrency:
+  group: fsusui-ci-measurement-pilot
+  cancel-in-progress: false
+
+jobs:
+  web-pilot:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 35
+    env:
+      BASE_SHA: f2d929a5d045439c35e93b4771f912ce50ec2337
+      CANDIDATE_SHA: 4923ba3e148efc84792bef0c5c7593a706b5efc7
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: controller
+          persist-credentials: false
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ env.BASE_SHA }}
+          path: baseline
+          persist-credentials: false
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ env.CANDIDATE_SHA }}
+          path: candidate
+          persist-credentials: false
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.33.0
+          package_json_file: candidate/package.json
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: |
+            baseline/pnpm-lock.yaml
+            candidate/pnpm-lock.yaml
+            controller/pnpm-lock.yaml
+      - uses: emscripten-core/setup-emsdk@v15
+        with:
+          version: 5.0.4
+          actions-cache-folder: emsdk-cache
+      - name: Install reviewed dependency locks
+        run: |
+          for source in controller baseline candidate; do
+            pnpm --dir "$source" install --frozen-lockfile
+          done
+      - name: Install and pin Playwright Chromium
+        working-directory: controller
+        run: |
+          pnpm exec playwright install --with-deps chromium
+          node scripts/pin-render-browser.mjs ../pilot-browser-selection.json
+      - name: Run the same lightweight 60 Hz preflight
+        timeout-minutes: 1
+        working-directory: controller
+        run: node scripts/render-ci-web-preflight.mjs ../pilot-runner-preflight.json
+      - name: Prepare normal WASM artifacts for both exact versions
+        run: |
+          pnpm --dir baseline run ensure:wasm
+          pnpm --dir candidate run ensure:wasm
+      - name: Capture eight isolated Web processes without an acceptance decision
+        timeout-minutes: 15
+        working-directory: controller
+        run: |
+          node scripts/run-web-ci-measurement.mjs \
+            ../baseline "$BASE_SHA" ../candidate "$CANDIDATE_SHA" \
+            "$FSUSUI_PERF_BROWSER_EXECUTABLE" ../web-ci-pilot --pilot
+      - name: Preserve diagnostic evidence, including interrupted captures
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: web-ci-measurement-pilot
+          path: |
+            pilot-browser-selection.json
+            pilot-runner-preflight.json
+            web-ci-pilot/
+          retention-days: 7
