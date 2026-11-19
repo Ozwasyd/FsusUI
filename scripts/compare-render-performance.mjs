@@ -1,6 +1,9 @@
+import { createHash } from 'node:crypto'
+import { execFileSync } from 'node:child_process'
 import { readFile } from 'node:fs/promises'
 import path from 'node:path'
 import process from 'node:process'
+import { verifyWebMeasurement } from './verify-quick-web-60hz.mjs'
 import { verifyImpactPlan } from './render-performance-impact.mjs'
 
 // pnpm/npm may forward a literal `--` when invoked as `pnpm script -- args`.
@@ -79,6 +82,21 @@ if (
     `Performance plan digest mismatch: ${plans.map((plan) => plan.planDigest).join(' ')}`,
   )
 
+const protocol = process.env.FSUSUI_WEB_MEASUREMENT_PROTOCOL
+if (protocol && protocol !== 'quick-web-60hz.v1') throw new Error('unsupported Web protocol')
+const webSummary = currentPlan?.platforms.web.run === false ? null : await read(currentDirectory,'web')
+if (currentPlan?.platforms.web.run !== false && (protocol || webSummary?.measurementProtocol)) {
+  if (limit !== 0.15) throw new Error('60Hz protocol preserves the 15% regression limit')
+  if (!baselineRepeatDirectory || !currentRepeatDirectory) throw new Error('60Hz protocol requires four arms')
+  const candidateSha = execFileSync('git',['rev-parse','HEAD'],{cwd:path.resolve(import.meta.dirname,'..'),encoding:'utf8'}).trim()
+  const candidateDriverHash = createHash('sha256').update(execFileSync('git',['show',`${candidateSha}:scripts/web-render-performance.mjs`],{cwd:path.resolve(import.meta.dirname,'..')})).digest('hex')
+  const bindings=[]
+  for (const [directory,kind] of [[baselineDirectory,'f2d-historical'],[currentDirectory,'292-candidate'],[baselineRepeatDirectory,'f2d-historical'],[currentRepeatDirectory,'292-candidate']]) {
+    bindings.push(await verifyWebMeasurement(path.join(directory,'web'),kind,kind === 'f2d-historical' ? 'f2d929a5d045439c35e93b4771f912ce50ec2337' : candidateSha))
+  }
+  if (bindings[1].sourceSha256 !== candidateDriverHash || bindings[3].sourceSha256 !== candidateDriverHash) throw new Error('candidate driver differs from expected checkout')
+  if (bindings.some(x=>x.protocolDigest!==bindings[0].protocolDigest) || bindings[0].productSha!==bindings[2].productSha || bindings[1].productSha!==bindings[3].productSha) throw new Error('four-arm protocol/source identity mismatch')
+}
 const regressions = []
 for (const platform of ['web', 'avalonia']) {
   if (currentPlan && !currentPlan.platforms[platform].run) continue
