@@ -1,8 +1,8 @@
 {
   "schema": "fsusui-design-conformance.ux-acceptance-receipt.v2",
-  "classificationReceiptDigest": "1840db4effc7551261e33b69bc2b3d39cc369e4e695d8430e1198e1dae960597",
-  "candidateSha": "ceed986108177b1e0cdc3f6086366bf871211931",
-  "candidateDigest": "973bbb13383889f8d1605c0ffe4ebc4581c0de4941c56418af18083993682c1d",
+  "classificationReceiptDigest": "f7b1048038e7de26f22d9a4effd0842884e63e67260ecf262302c65071ba7cb0",
+  "candidateSha": "b639c7b62c01324b0a40fee0a91f263585c422a8",
+  "candidateDigest": "0ff2e7ec3d3b3f51f120cfcf292f76d9c1f227ce6641758d386f5135ecb9fffb",
   "verificationClass": "ux-path",
   "requiredSkillDigests": [
     "c88357a6ba0340000bae5839daeb67a3cd2722e8242cf7e0148006c3610a44fe"
@@ -13,9 +13,9 @@
     "c5d43303e89931346f9d634dd592ecb54418d15a74ae923f72e52795a115544e",
     "0bd20f9ae6997aa9b7daeb0cec2f558738565bd0932828617aea2f5b84626042"
   ],
-  "activeBaselineIdentityDigest": "2422acbddffb2f7e0f2a305b8ecc46a84a1e351c55ed56a080d352acaadcbc32",
+  "activeBaselineIdentityDigest": "6f1418e886ab23d3270efaa946b83833dc1e7984572fef40edf83a6d364a6170",
   "domainPolicyDigest": "620c4f746c1f259e3b640044975ad2878b7913806038706f7991bee9d72104d3",
-  "independenceEvidenceDigest": "878c3fd7c0bf2263ca0e11ebf1de966c430d93493e64340734beb2f54ed74458",
+  "independenceEvidenceDigest": "696dc6287c6cc1730765be2112acb5f80ec49f938fed2dba8e5744101f118cdb",
   "modifiedPaths": [],
   "productionFixture": true,
   "viewportStateMatrix": [
@@ -29,7 +29,7 @@
         "screen-reader",
         "reduced-motion"
       ],
-      "evidenceDigest": "75b17a188084edf56a69eb89fe29d0aaa0573937e29b7e7ce60b583e7d4ae170"
+      "evidenceDigest": "cede06e2196173842ec99b1422f4242f3d54c3afdbfa8d8c35da70bad3e55277"
     },
     {
       "viewport": "960x720",
@@ -40,7 +40,7 @@
         "keyboard",
         "reduced-motion"
       ],
-      "evidenceDigest": "14ece27ab685cac5f510f118acd052802dcf14dbb4dd1b7b92fb8c97cecefdc5"
+      "evidenceDigest": "3ae99ccd280405a7e7a0d1f622367ed017a4dc1819de8d3c59e427b6a2764cb0"
     }
   ],
   "inspectedRenderedArtifacts": [
@@ -48,7 +48,7 @@
       "id": "check-tag-web-focused-unchecked",
       "kind": "screenshot",
       "path": "tests/conformance/visual/artifacts/issue-285-check-tag/check-tag-web-focused-unchecked.png",
-      "digest": "75b17a188084edf56a69eb89fe29d0aaa0573937e29b7e7ce60b583e7d4ae170",
+      "digest": "cede06e2196173842ec99b1422f4242f3d54c3afdbfa8d8c35da70bad3e55277",
       "inspected": true,
       "fixtureClass": "production"
     },
@@ -56,12 +56,12 @@
       "id": "check-tag-avalonia-focused-unchecked",
       "kind": "screenshot",
       "path": "tests/conformance/visual/artifacts/issue-285-check-tag/check-tag-avalonia-focused-unchecked.png",
-      "digest": "14ece27ab685cac5f510f118acd052802dcf14dbb4dd1b7b92fb8c97cecefdc5",
+      "digest": "3ae99ccd280405a7e7a0d1f622367ed017a4dc1819de8d3c59e427b6a2764cb0",
       "inspected": true,
       "fixtureClass": "production"
     }
   ],
   "blockers": [],
   "status": "accepted",
-  "receiptDigest": "9465a72b7f8a3f355918b8ee7ac859262799c923427e867856d1e024a626fc06"
+  "receiptDigest": "a553b28b47e6b39ea82c8c206cee9ea26a397905455b88b70c063c7256f6dcde"
 }

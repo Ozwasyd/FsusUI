@@ -1,12 +1,12 @@
 {
   "schema": "fsusui-independent-ux-review.v1",
   "issue": 285,
-  "candidateSha": "ceed986108177b1e0cdc3f6086366bf871211931",
+  "candidateSha": "b639c7b62c01324b0a40fee0a91f263585c422a8",
   "reviewMode": "read-only-rendered-evidence-inspection",
   "modifiedPaths": [],
   "productionFixture": true,
   "identity": {
-    "executionId": "conformance-v2-check-tag-ceed986108177b1e0cdc3f6086366bf871211931",
+    "executionId": "conformance-v2-check-tag-b639c7b62c01324b0a40fee0a91f263585c422a8",
     "checkpoint": "check-tag-after-pointer-keyboard",
     "contract": "component-v2.el-check-tag",
     "scenario": "scenario.v2.el-check-tag.real-interaction-trace",
@@ -34,7 +34,7 @@
         "screen-reader",
         "reduced-motion"
       ],
-      "evidenceDigest": "75b17a188084edf56a69eb89fe29d0aaa0573937e29b7e7ce60b583e7d4ae170"
+      "evidenceDigest": "cede06e2196173842ec99b1422f4242f3d54c3afdbfa8d8c35da70bad3e55277"
     },
     {
       "platform": "avalonia",
@@ -54,7 +54,7 @@
         "automation-peer",
         "reduced-motion"
       ],
-      "evidenceDigest": "14ece27ab685cac5f510f118acd052802dcf14dbb4dd1b7b92fb8c97cecefdc5"
+      "evidenceDigest": "3ae99ccd280405a7e7a0d1f622367ed017a4dc1819de8d3c59e427b6a2764cb0"
     }
   ],
   "inspectedRenderedArtifacts": [
@@ -63,8 +63,8 @@
       "platform": "web",
       "kind": "screenshot",
       "path": "tests/conformance/visual/artifacts/issue-285-check-tag/check-tag-web-focused-unchecked.png",
-      "digest": "75b17a188084edf56a69eb89fe29d0aaa0573937e29b7e7ce60b583e7d4ae170",
-      "bytes": 1237,
+      "digest": "cede06e2196173842ec99b1422f4242f3d54c3afdbfa8d8c35da70bad3e55277",
+      "bytes": 1246,
       "width": 88,
       "height": 24,
       "inspected": true,
@@ -75,8 +75,8 @@
       "platform": "avalonia",
       "kind": "screenshot",
       "path": "tests/conformance/visual/artifacts/issue-285-check-tag/check-tag-avalonia-focused-unchecked.png",
-      "digest": "14ece27ab685cac5f510f118acd052802dcf14dbb4dd1b7b92fb8c97cecefdc5",
-      "bytes": 9960,
+      "digest": "3ae99ccd280405a7e7a0d1f622367ed017a4dc1819de8d3c59e427b6a2764cb0",
+      "bytes": 9661,
       "width": 960,
       "height": 720,
       "inspected": true,
@@ -87,7 +87,7 @@
     {
       "id": "blue-focus-ring-visible",
       "status": "accepted",
-      "observation": "Both original rendered screenshots show a visible blue focus ring; Avalonia reports 180/180 pixels matching #2A599C."
+      "observation": "Both original rendered screenshots show a visible blue focus ring; Avalonia reports 192/192 pixels matching #2A599C."
     },
     {
       "id": "no-black-default-adorner",
@@ -102,17 +102,18 @@
     {
       "id": "focus-no-bounds-shift",
       "status": "accepted",
-      "observation": "The before-focus, after-focus and after-toggle samples have identical XYWH on each platform: Web (0,136,87.625,24 CSS px) and Avalonia (24,136,88,26 DIP); focus flags false, true, true."
+      "observation": "The before-focus, after-focus and after-toggle samples have identical XYWH on each platform: Web (0,136,87.625,24 CSS px) and Avalonia (24,136,96,24 DIP); focus flags false, true, true."
     }
   ],
   "observations": [
-    "Fresh locally executed Linux VPS CheckTag capture; not a GitHub Actions run. Candidate ceed986108177b1e0cdc3f6086366bf871211931, clean source tree 02e142011cd52ae14776cc6d3eee3592ed6757f8. Independent reviewer viewed both actual PNGs and verified original raw bindings without modifying either raw manifest.",
-    "Web raw SHA-256 03a2b6cbc79588d8e3f6871a062558dfdeab2803180598c38a36cd75cd93a02e; Avalonia raw SHA-256 eb169d2bb14992e78e340ac26580282b0f7644612fc0c9735fa98252e476ed65. Same exact execution verifies nine functional steps per platform plus a separate diagnostic-only timing record.",
-    "Native verification SHA-256 861a889cc2dc1e5d4e3b38953a329261b4ae93a9b55ed4479aa21d37e7c0df8a; Web AT-SPI raw SHA-256 fc906ca2e40eabd15a6909e7ddd30118aaf2a9fbf7e4c8f60af94e5b6c86ae0d; Web harness receipt SHA-256 cc093a377928fe28ad7db3272d3faa09879b2daca42f7d815efa16be3333c52d. Chrome/147.0.7727.15 exposed the Check tag checkbox to Linux AT-SPI; Orca PID 3583151. Focus and unchecked state are present in CDP and the real Avalonia AutomationPeer.",
-    "Web render/interaction 0.8999999761581421/10.700000047683716 ms; Avalonia 5.2143/14.73 ms, diagnostic-only. Both bounded lifetime probes report detachedControlCollected=true."
+    "Official GitHub Actions run 44764939478 AOT artifact 14646525237; verified archive SHA-256 16b8c5381d434029a8656e361faf448ba58d930bac0aecd20417a9c5e9a05422. Candidate b639c7b62c01324b0a40fee0a91f263585c422a8, clean source tree d7938ec60b27beebddf9036a71138cf16b6ace44. Independent reviewer viewed both actual PNGs and verified original raw bindings without modifying either raw manifest.",
+    "Canonical packaging artifact 14644046954 (verified ZIP cb9626aeb7b3a982fa08b59beb4fe5e749f8ee1e301c5939b3ba472416108407) records distinct synthetic candidate 3baa01aa54c750e20351ca02ff13a586b51e53b3 on the same clean source tree and byte-identical CheckTag PNGs; raw identities preserved.",
+    "Web raw SHA-256 f0965d053c72c2f07d7b5cefde84ee65bc7f1926ed855181de1340652ff673cf; Avalonia raw SHA-256 9a4337c472f2ae2b9953e02c9f443825e71ab94c01c7eb14e318b35d2eaacfa9. Same exact execution verifies nine functional steps per platform plus a separate diagnostic-only timing record.",
+    "Native verification SHA-256 ede76777dcc60595d7c65f9e2f0258056d7f422b6e03cf43ad97104b1fe05b91; Web AT-SPI raw SHA-256 443addb61f4ac151dca1bfd224bf4dc0803c2aa66e18f92487ecacc72f6335b5; Web harness receipt SHA-256 90d6d38c00e7c2ba361d7b506cdcbbe84aef9f8ae74c8e94ea3076f13235e34d. Chrome/147.0.7727.15 exposed the Check tag checkbox to Linux AT-SPI; Orca PID 7061. Focus and unchecked state are present in CDP and the real Avalonia AutomationPeer.",
+    "Web render/interaction 0.5999999999767169/2.8999999999650754 ms; Avalonia 2.5841/9.536 ms, diagnostic-only. Both bounded lifetime probes report detachedControlCollected=true."
   ],
   "limitations": [
-    "Visual acceptance covers only the light/default/zh-CN/ltr/reduced-motion CheckTag checkpoint. This local VPS renderer capture is not a hosted CI, package, cross-renderer pixel equality, or timing acceptance claim.",
+    "Visual acceptance covers only the light/default/zh-CN/ltr/reduced-motion CheckTag checkpoint. This is not acceptance of the whole CI job, package, cross-renderer pixel equality, or timing.",
     "Three separately recorded bounds checkpoints do not show intermediate frames. Browser operation timings and native timestamps are not a synchronized cross-platform timeline.",
     "The AT-SPI checkbox is focusable but does not independently expose the focused state here; focus is confirmed by CDP and Avalonia AutomationPeer.",
     "Orca process and AT-SPI registration are not a record of spoken output; NVDA and VoiceOver were not tested. Screenshots cannot independently prove the browser sandbox.",
