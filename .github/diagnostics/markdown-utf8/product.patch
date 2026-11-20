@@ -1,0 +1,102 @@
+diff --git a/vue/packages/components/markdown-renderer/__tests__/markdown-renderer.test.tsx b/vue/packages/components/markdown-renderer/__tests__/markdown-renderer.test.tsx
+index 8e5e976..9bdf2dd 100644
+--- a/vue/packages/components/markdown-renderer/__tests__/markdown-renderer.test.tsx
++++ b/vue/packages/components/markdown-renderer/__tests__/markdown-renderer.test.tsx
+@@ -266,6 +266,7 @@ const makeWorkerChunkResult = (
+   html = '<h1>Chunked</h1><p>Chunk body</p>',
+ ) => {
+   const result = makeChunkResult(source, html)
++  const byteLength = (value: string) => new TextEncoder().encode(value).byteLength
+   return authorizeTestResult({
+     ...result,
+     metadata: {
+@@ -273,8 +274,8 @@ const makeWorkerChunkResult = (
+       baseUrl: null,
+       allowLatex: true,
+       allowMermaid: true,
+-      sourceLength: source.length,
+-      normalizedSourceLength: source.length,
++      sourceLength: byteLength(source),
++      normalizedSourceLength: byteLength(result.normalizedSource),
+       featureCount: result.features.length,
+       placeholderCount: result.placeholders.length,
+       rendererVersion: MARKDOWN_RENDERER_VERSION,
+@@ -1053,6 +1054,54 @@ describe('MarkdownRenderer.vue', () => {
+     expect(wrapper.emitted('render-complete')).toHaveLength(1)
+   })
+ 
++  test.each([null, 'sourceLength', 'normalizedSourceLength'] as const)(
++    'validates UTF-8 lengths on a non-ASCII worker result (wrong field: %s)',
++    async (wrongField) => {
++      vi.stubGlobal('Worker', MarkdownWorkerHarness)
++      const source = `# 川流 🌊\n\n${'段落与表情 🌱\n\n'.repeat(1_600)}`
++      const canonical = makeWorkerChunkResult(source)
++      renderMarkdownChunks.mockResolvedValue(fsusOk(canonical))
++      const wrapper = mount(MarkdownRenderer, {
++        ...workerChunkedPipeline,
++        props: { content: source },
++      })
++      await vi.advanceTimersByTimeAsync(250)
++      await flushPromises()
++
++      const worker = MarkdownWorkerHarness.instances[0]!
++      const post = worker.posts.find((message) => message.type === 'run')!
++      const result = structuredClone(canonical) as MarkdownRuntimeChunkResult
++      expect(result.metadata.sourceLength).toBeGreaterThan(source.length)
++      expect(result.metadata.normalizedSourceLength).toBeGreaterThan(
++        result.normalizedSource.length,
++      )
++      if (wrongField) {
++        const value =
++          wrongField === 'sourceLength' ? source : result.normalizedSource
++        Reflect.set(result.metadata, wrongField, value.length)
++      }
++      worker.respond({
++        generation: post.generation,
++        id: post.id,
++        result: { metadata: result, units: result.chunks },
++        status: 'complete',
++      })
++      await flushRenderer()
++
++      if (wrongField) {
++        expect(wrapper.emitted('render-error')).toHaveLength(1)
++        expect(wrapper.attributes('data-fsus-render-strategy')).toBe('sync')
++      } else {
++        expect(wrapper.emitted('render-error')).toBeUndefined()
++        expect(wrapper.attributes('data-fsus-render-strategy')).toBe(
++          'chunked-worker',
++        )
++        expect(wrapper.text()).toContain('Chunk body')
++      }
++      wrapper.unmount()
++    },
++  )
++
+   test('keeps one canonical result aligned across sync, worker, and SSR paths', async () => {
+     vi.stubGlobal('Worker', MarkdownWorkerHarness)
+     const source = `${'# Canonical\n\n'}${'Paragraph\n\n'.repeat(1_600)}`
+diff --git a/vue/packages/components/markdown-renderer/src/markdown-renderer.vue b/vue/packages/components/markdown-renderer/src/markdown-renderer.vue
+index e91ca0b..1fa3198 100644
+--- a/vue/packages/components/markdown-renderer/src/markdown-renderer.vue
++++ b/vue/packages/components/markdown-renderer/src/markdown-renderer.vue
+@@ -687,7 +687,7 @@ const markdownRuntimeKindPattern = /^(?:SIMD-128|SCALAR-BASIC|UNKNOWN)$/
+ const isFiniteNonNegative = (value: unknown): value is number =>
+   typeof value === 'number' && Number.isFinite(value) && value >= 0
+ 
+-// Wasm emits UTF-8 byte offsets; JS string.length is UTF-16 code units.
++// Wasm emits UTF-8 byte lengths and offsets; JS string.length counts UTF-16 code units.
+ const utf8ByteLength = (value: string) =>
+   new TextEncoder().encode(value).byteLength
+ const unboundBaseUrl = (value: string | null | undefined) => value || null
+@@ -729,8 +729,8 @@ const materializeMarkdownWorkerResult = (
+     unboundBaseUrl(metadata.baseUrl) !== unboundBaseUrl(request.baseUrl) ||
+     metadata.allowLatex !== (request.allowLatex !== false) ||
+     metadata.allowMermaid !== (request.allowMermaid !== false) ||
+-    metadata.sourceLength !== request.source.length ||
+-    metadata.normalizedSourceLength !== result.normalizedSource.length ||
++    metadata.sourceLength !== utf8ByteLength(request.source) ||
++    metadata.normalizedSourceLength !== utf8ByteLength(result.normalizedSource) ||
+     metadata.featureCount !== result.features.length ||
+     (result.placeholders.length > 0 &&
+       metadata.placeholderCount !== result.placeholders.length) ||
