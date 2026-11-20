@@ -40,6 +40,41 @@ jobs:
         with:
           name: ${{ inputs.candidate-artifact }}
           path: .dotnet-candidate
+      - name: Validate and restore canonical Contract V2 alignment
+        if: inputs.rid == 'linux-x64'
+        env:
+          EXPECTED_COMMIT_SHA: ${{ inputs.commit-sha }}
+          EXPECTED_CANDIDATE_DIGEST: ${{ inputs.candidate-digest }}
+        run: |
+          node --input-type=module - <<'JS'
+          import assert from 'node:assert/strict'
+          import { mkdirSync, readFileSync, writeFileSync } from 'node:fs'
+          import {
+            currentIdentity,
+            readStableConsumerAuthority,
+            validatePackageAlignmentBinding,
+          } from './scripts/avalonia-stable-readiness-lib.mjs'
+
+          const commit = process.env.EXPECTED_COMMIT_SHA
+          const digest = process.env.EXPECTED_CANDIDATE_DIGEST
+          assert.match(commit, /^[0-9a-f]{40}$/u)
+          assert.match(digest, /^[0-9a-f]{64}$/u)
+          const expected = currentIdentity()
+          assert.equal(expected.candidate, commit, 'leaf checkout does not match candidate commit')
+          const manifest = JSON.parse(readFileSync('.dotnet-candidate/package/manifest.json', 'utf8'))
+          assert.equal(manifest.kind, 'dotnet-package-candidate')
+          assert.equal(manifest.commitSha, commit, 'downloaded candidate commit mismatch')
+          assert.equal(manifest.candidateSha256, digest, 'downloaded candidate digest mismatch')
+
+          const source = '.dotnet-candidate/package/contract-v2-alignment.json'
+          const bytes = readFileSync(source)
+          validatePackageAlignmentBinding(manifest.contractV2Alignment, bytes, { candidate: commit })
+          readStableConsumerAuthority({ alignmentPath: source, expected })
+
+          mkdirSync('.tmp/conformance-v2', { recursive: true })
+          writeFileSync('.tmp/conformance-v2/alignment.json', bytes, { flag: 'wx' })
+          console.log('[avalonia-aot] Verified and restored canonical Contract V2 alignment')
+          JS
       - name: Install Linux virtual display
         if: inputs.rid == 'linux-x64'
         run: |
