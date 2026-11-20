@@ -15,17 +15,17 @@
     },
     "avalonia": {
       "path": "spec/avalonia/semantic/FsusUI.Avalonia.semantic.json",
-      "hash": "caa4feb5977af864aff8c66046eae6d5abd570e5a280e720c8bfd1e45ad43c56",
+      "hash": "3c7084d23f9897688cd6835761cde015e10766990ebc8082cc1c2ec8b6093687",
       "packageId": "FsusUI.Avalonia"
     },
     "avaloniaThemes": {
       "path": "spec/avalonia/semantic/FsusUI.Avalonia.Themes.semantic.json",
-      "hash": "d044aa1220e74762ea7986d89ffb67d3de14b635929f83a9d0a50c22c446da85",
+      "hash": "fd25bb513c6aee60c23a3684dbcaa687575d7265a544e72a1e9afefcac5f00c1",
       "packageId": "FsusUI.Avalonia.Themes"
     },
     "avaloniaIcons": {
       "path": "spec/avalonia/semantic/FsusUI.Avalonia.Icons.semantic.json",
-      "hash": "4f77f0cd83e3a20f25d69e0f21baf3344f8ca53f29eadeb3ab420eb6b0601fbd",
+      "hash": "4c31a638bb575d9cbf06b629f6f1fbee683d84837c862a79118a9ae3630dee49",
       "packageId": "FsusUI.Avalonia.Icons"
     },
     "markdownEditorGate": {
