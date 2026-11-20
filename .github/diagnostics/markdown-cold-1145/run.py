@@ -54,7 +54,31 @@ def adapt(source, product, helper, playwright):
     end = s.index('const percentile = ', start)
     s = s[:start] + "const matrix = [['markdown-cold', 24 * 1024, 60, 1, 'enabled']]\n\n" + s[end:]
     s = one(s, '      diagnosticCapture &&', '      false && diagnosticCapture &&')
-    cold_observer = '        const coldInitAt = performance.now()\n        const coldQuery = new URLSearchParams(location.search)\n        if (coldQuery.get(\'performance\') === \'markdown-cold\' &&\n            coldQuery.get(\'size\') === \'24576\' &&\n            coldQuery.get(\'motion\') === \'enabled\') {\n          const coldReady = () => {\n            const root = document.querySelector(\'[data-performance-scenario="markdown-cold"][data-performance-ready="true"]\')\n            if (!root || window.__fsusDiagCold) return\n            const probe = window.__FSUSUI_PERFORMANCE_FIXTURE__?.markdownPhaseProbe\n            const readyAt = performance.now()\n            window.__fsusDiagCold = {\n              coldInitAt, readyAt, initToReadyMs: readyAt - coldInitAt,\n              readySinceNavigationStartMs: readyAt, query: location.search,\n              renderer: root.querySelector(\'[data-markdown-renderer]\')?.getAttribute(\'data-markdown-renderer\') ?? null,\n              fixtureError: root.getAttribute('data-performance-error'),\n              phases: typeof probe === \'function\' ? probe() : null,\n            }\n            coldObserver.disconnect()\n          }\n          const coldObserver = new MutationObserver(coldReady)\n          coldObserver.observe(document, { subtree: true, childList: true, attributes: true,\n            attributeFilter: [\'data-performance-ready\', \'data-performance-scenario\'] })\n          coldReady()\n        }\n'
+    cold_observer = """        const coldInitAt = performance.now()
+        const coldQuery = new URLSearchParams(location.search)
+        if (coldQuery.get('performance') === 'markdown-cold' &&
+            coldQuery.get('size') === '24576' &&
+            coldQuery.get('motion') === 'enabled') {
+          const coldReady = () => {
+            const root = document.querySelector('[data-performance-scenario="markdown-cold"][data-performance-ready="true"]')
+            if (!root || window.__fsusDiagCold) return
+            const probe = window.__FSUSUI_PERFORMANCE_FIXTURE__?.markdownPhaseProbe
+            const readyAt = performance.now()
+            window.__fsusDiagCold = {
+              coldInitAt, readyAt, initToReadyMs: readyAt - coldInitAt,
+              readySinceNavigationStartMs: readyAt, query: location.search,
+              renderer: root.querySelector('[data-markdown-renderer]')?.getAttribute('data-markdown-renderer') ?? null,
+              fixtureError: root.getAttribute('data-performance-error'),
+              phases: typeof probe === 'function' ? probe() : null,
+            }
+            coldObserver.disconnect()
+          }
+          const coldObserver = new MutationObserver(coldReady)
+          coldObserver.observe(document, { subtree: true, childList: true, attributes: true,
+            attributeFilter: ['data-performance-ready', 'data-performance-scenario'] })
+          coldReady()
+        }
+"""
     install_at = '        window.__fsusFrameIntervals = []\n        window.__fsusLongTasks = []\n        let previous'
     s = one(s, install_at, cold_observer + install_at)
     nav_at = '    const navigationMs = performance.now() - navigationStarted'
