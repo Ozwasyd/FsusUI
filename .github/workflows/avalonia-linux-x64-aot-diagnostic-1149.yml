@@ -132,7 +132,7 @@ jobs:
         run: |
           patch --fuzz=0 -p1 <<'DIAGNOSTIC_PATCH'
           diff --git a/scripts/test-avalonia-aot-smoke.mjs b/scripts/test-avalonia-aot-smoke.mjs
-          index 28530e9..1437776 100644
+          index 28530e9..dd4d801 100644
           --- a/scripts/test-avalonia-aot-smoke.mjs
           +++ b/scripts/test-avalonia-aot-smoke.mjs
           @@ -60,6 +60,14 @@ const reportPath = path.join(temporaryRoot, 'reports/smoke.json')
@@ -150,7 +150,28 @@ jobs:
            const rid = dotnetInfo.stdout.match(/^\s*RID:\s*(\S+)\s*$/mu)?.[1]
            const commitSha = spawnSync('git', ['rev-parse', 'HEAD'], {
              cwd: root,
-          @@ -367,7 +375,18 @@ if (suppliedManifest) {
+          @@ -115,13 +123,14 @@ const execute = (command, arguments_, options = {}) => {
+             return result
+           }
+           
+          -const globalPackagesOutput = execute(
+          -  'dotnet',
+          -  ['nuget', 'locals', 'global-packages', '--list'],
+          -  { label: 'resolve global NuGet cache' },
+          -).stdout.trim()
+          +const prewarmedPackages = process.env.NUGET_PACKAGES
+           const globalPackages = realpathSync(
+          -  globalPackagesOutput.slice(globalPackagesOutput.indexOf(':') + 1).trim(),
+          +  prewarmedPackages
+          +    ? path.resolve(prewarmedPackages)
+          +    : execute('dotnet', ['nuget', 'locals', 'global-packages', '--list'], {
+          +        cwd: temporaryRoot,
+          +        label: 'resolve global NuGet cache',
+          +      }).stdout.trim().replace(/^[^:]+:\s*/u, ''),
+           )
+           const candidatePackagePattern =
+             /^fsusui\.avalonia(?:\.themes|\.icons)?\..*\.nupkg$/iu
+          @@ -367,7 +376,18 @@ if (suppliedManifest) {
            cpSync(fixture, consumer, { recursive: true })
            writeFileSync(path.join(consumer, 'NuGet.Config'), configFor(feed))
            const consumerProject = path.join(consumer, 'FsusUI.Avalonia.AotSmoke.csproj')
@@ -170,7 +191,7 @@ jobs:
              isolatedDotnet,
              [
                'restore',
-          @@ -379,6 +398,7 @@ const publish = execute(
+          @@ -379,6 +399,7 @@ const publish = execute(
                path.join(consumer, 'NuGet.Config'),
                '--packages',
                consumerPackages,
@@ -178,7 +199,7 @@ jobs:
                '--no-cache',
                '--force',
              ],
-          @@ -387,12 +407,7 @@ const publish = execute(
+          @@ -387,12 +408,7 @@ const publish = execute(
                label: 'isolated local-only consumer restore no-external-sources',
              },
            )
@@ -192,7 +213,7 @@ jobs:
              isolatedDotnet,
              [
                'publish',
-          @@ -412,6 +427,12 @@ execute(
+          @@ -412,6 +428,11 @@ execute(
                label: `Native AOT publish ${rid}`,
              },
            )
@@ -201,7 +222,6 @@ jobs:
           +  /warning\s+(?:IL\d+|AOT\d+|trim)/iu,
           +  'Native AOT publish must not emit IL/AOT/trim warnings',
           +)
-          +
            
            const nativeBinary = path.join(publishRoot, 'FsusUI.Avalonia.AotSmoke')
            assert.ok(
