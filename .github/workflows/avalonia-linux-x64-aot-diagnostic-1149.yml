@@ -1,4 +1,4 @@
-name: Avalonia Linux x64 SDK servicing verification 1149
+name: Avalonia Linux x64 locked Native AOT verification 1149
 
 on:
   push:
@@ -80,6 +80,24 @@ jobs:
           mkdirSync('.tmp/conformance-v2', { recursive: true })
           writeFileSync('.tmp/conformance-v2/alignment.json', bytes, { flag: 'wx' })
           JS
+      - name: Install hosted Linux Native AOT prerequisites
+        timeout-minutes: 5
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes clang zlib1g-dev xvfb xauth x11-utils dbus-daemon dbus-bin at-spi2-core
+          test -x /usr/bin/xdpyinfo
+          test -x /usr/bin/dbus-daemon
+          xvfb-run -a -e /dev/stderr -s '-screen 0 1024x768x24 -nolisten tcp' \
+            /usr/bin/dbus-run-session -- bash -euc '
+              timeout 10s /usr/bin/xdpyinfo -display "$DISPLAY" >/dev/null
+              reply="$(timeout 10s /usr/bin/dbus-send --session --print-reply=literal \
+                --dest=org.a11y.Bus /org/a11y/bus org.a11y.Bus.GetAddress)"
+              address="$(printf "%s" "$reply" | sed -E "s/^[[:space:]]+//; s/[[:space:]]+$//")"
+              [[ "$address" == unix:* ]]
+              timeout 10s /usr/bin/dbus-send --bus="$address" --print-reply \
+                --dest=org.freedesktop.DBus /org/freedesktop/DBus org.freedesktop.DBus.ListNames >/dev/null
+              echo "AT-SPI session activation and accessibility bus verified"
+            '
       - name: Warm dependency cache for the exact consumer fixture
         timeout-minutes: 8
         run: |
@@ -107,31 +125,173 @@ jobs:
           test "$(dotnet --version)" = 10.0.404
           dotnet restore FsusUI.Avalonia.AotSmoke.csproj \
             --runtime linux-x64 -p:UseRidGraph=true \
-            --configfile NuGet.Config --packages "$NUGET_PACKAGES" -p:WarningsAsErrors=NU1903
-          python3 - <<'PY'
-          import json
-          with open('obj/project.assets.json') as f:
-              libraries = json.load(f)['libraries']
-          compiler = sorted(k for k in libraries if k.lower().startswith('microsoft.dotnet.ilcompiler/'))
-          assert compiler == ['Microsoft.DotNet.ILCompiler/10.0.15'], compiler
-          print('Verified Native AOT compiler: ' + compiler[0])
-          PY
-      - name: Regenerate and verify repository locks using serviced SDK
-        working-directory: dotnet
-        timeout-minutes: 9
-        env:
-          WarningsAsErrors: NU1903
+            --configfile NuGet.Config --packages "$NUGET_PACKAGES" --use-lock-file -p:WarningsAsErrors=NU1903
+          test -s packages.lock.json
+          printf 'FSUSUI_AOT_DEPENDENCY_LOCK=%s/warmup/packages.lock.json\n' "$FSUSUI_AOT_TMPDIR" >> "$GITHUB_ENV"
+      - name: Apply proposed harness changes only to historical checkout
         run: |
-          cp "$FSUSUI_AOT_TMPDIR/global.json" global.json
+          patch --fuzz=0 -p1 <<'DIAGNOSTIC_PATCH'
+          diff --git a/scripts/test-avalonia-aot-smoke.mjs b/scripts/test-avalonia-aot-smoke.mjs
+          index 28530e9..1437776 100644
+          --- a/scripts/test-avalonia-aot-smoke.mjs
+          +++ b/scripts/test-avalonia-aot-smoke.mjs
+          @@ -60,6 +60,14 @@ const reportPath = path.join(temporaryRoot, 'reports/smoke.json')
+           const leafManifestPath = path.join(temporaryRoot, 'reports/leaf-manifest.json')
+           const missingDotnetRoot = path.join(temporaryRoot, 'no-dotnet-runtime')
+           const dotnetInfo = spawnSync('dotnet', ['--info'], { encoding: 'utf8' })
+          +const sdkVersion = spawnSync('dotnet', ['--version'], { encoding: 'utf8' })
+          +assert.equal(sdkVersion.status, 0, sdkVersion.stderr)
+          +assert.match(sdkVersion.stdout.trim(), /^\d+\.\d+\.\d+$/u)
+          +writeFileSync(
+          +  path.join(temporaryRoot, 'global.json'),
+          +  JSON.stringify({ sdk: { version: sdkVersion.stdout.trim(), rollForward: 'disable' } }),
+          +  { flag: 'wx' },
+          +)
+           const rid = dotnetInfo.stdout.match(/^\s*RID:\s*(\S+)\s*$/mu)?.[1]
+           const commitSha = spawnSync('git', ['rev-parse', 'HEAD'], {
+             cwd: root,
+          @@ -367,7 +375,18 @@ if (suppliedManifest) {
+           cpSync(fixture, consumer, { recursive: true })
+           writeFileSync(path.join(consumer, 'NuGet.Config'), configFor(feed))
+           const consumerProject = path.join(consumer, 'FsusUI.Avalonia.AotSmoke.csproj')
+          -const publish = execute(
+          +const dependencyLock = process.env.FSUSUI_AOT_DEPENDENCY_LOCK
+          +if (dependencyLock) {
+          +  assert.ok(
+          +    suppliedCandidateRoot && suppliedManifest,
+          +    'dependency lock requires an immutable supplied candidate',
+          +  )
+          +  copyFileSync(
+          +    path.resolve(dependencyLock),
+          +    path.join(consumer, 'packages.lock.json'),
+          +  )
+          +}
+          +execute(
+             isolatedDotnet,
+             [
+               'restore',
+          @@ -379,6 +398,7 @@ const publish = execute(
+               path.join(consumer, 'NuGet.Config'),
+               '--packages',
+               consumerPackages,
+          +    ...(dependencyLock ? ['--locked-mode'] : []),
+               '--no-cache',
+               '--force',
+             ],
+          @@ -387,12 +407,7 @@ const publish = execute(
+               label: 'isolated local-only consumer restore no-external-sources',
+             },
+           )
+          -assert.doesNotMatch(
+          -  `${publish.stdout}\n${publish.stderr}`,
+          -  /warning\s+(?:IL\d+|AOT\d+|trim)/iu,
+          -  'Native AOT publish must not emit IL/AOT/trim warnings',
+          -)
+          -execute(
+          +const publish = execute(
+             isolatedDotnet,
+             [
+               'publish',
+          @@ -412,6 +427,12 @@ execute(
+               label: `Native AOT publish ${rid}`,
+             },
+           )
+          +assert.doesNotMatch(
+          +  `${publish.stdout}\n${publish.stderr}`,
+          +  /warning\s+(?:IL\d+|AOT\d+|trim)/iu,
+          +  'Native AOT publish must not emit IL/AOT/trim warnings',
+          +)
+          +
+           
+           const nativeBinary = path.join(publishRoot, 'FsusUI.Avalonia.AotSmoke')
+           assert.ok(
+          @@ -466,7 +487,16 @@ assert.ok(ready, `Xvfb ${display} did not become ready`)
+           const sessionBus = execute(
+             '/usr/bin/dbus-daemon',
+             ['--session', '--fork', '--print-address=1', '--print-pid=1'],
+          -  { label: 'start isolated desktop session bus' },
+          +  {
+          +    env: {
+          +      ...process.env,
+          +      DISPLAY: display,
+          +      ...(inheritedDisplayReady && process.env.XAUTHORITY
+          +        ? { XAUTHORITY: process.env.XAUTHORITY }
+          +        : {}),
+          +    },
+          +    label: 'start isolated desktop session bus',
+          +  },
+           )
+             .stdout.trim()
+             .split('\n')
+          @@ -579,6 +609,25 @@ const stopProcessId = async (pid, label) => {
+           }
+           
+           try {
+          +  if (dependencyLock) {
+          +    const accessibilityBus = execute(
+          +      '/usr/bin/dbus-send',
+          +      [
+          +        `--bus=${sessionBusAddress}`,
+          +        '--reply-timeout=5000',
+          +        '--print-reply=literal',
+          +        '--dest=org.a11y.Bus',
+          +        '/org/a11y/bus',
+          +        'org.a11y.Bus.GetAddress',
+          +      ],
+          +      { label: 'resolve AT-SPI on the isolated session bus', timeout: 7000 },
+          +    ).stdout.trim()
+          +    assert.match(
+          +      accessibilityBus,
+          +      /^unix:/u,
+          +      'the isolated session returned no usable AT-SPI bus address',
+          +    )
+          +  }
+             const positive = execute(nativeBinary, smokeArguments(reportPath), {
+               cwd: temporaryRoot,
+               env: runtimeFreeEnvironment,
+          DIAGNOSTIC_PATCH
+      - name: Run exact proposed locked Native AOT smoke and negative controls
+        timeout-minutes: 18
+        working-directory: ${{ runner.temp }}/fsus-aot1149
+        env:
+          FSUSUI_KEEP_AOT_SMOKE: '1'
+          FSUSUI_AOT_DIAGNOSTIC: '1'
+        run: |
           test "$(dotnet --version)" = 10.0.404
-          dotnet restore FsusUI.Avalonia.slnx --force-evaluate -p:RestoreLockedMode=false -p:WarningsAsErrors=NU1903
-          node ../scripts/dotnet-restore-all.mjs --update-locks
-          node ../scripts/dotnet-restore-all.mjs --locked-mode
-          git diff --binary -- ':(glob)**/packages.lock.json' > "$RUNNER_TEMP/sdk-10.0.404-locks.patch"
-          test -s "$RUNNER_TEMP/sdk-10.0.404-locks.patch"
+          xvfb-run -a -e /dev/stderr -s '-screen 0 1024x768x24 -nolisten tcp' \
+            bash -euc 'timeout 10s /usr/bin/xdpyinfo -display "$DISPLAY" >/dev/null; exec node "$GITHUB_WORKSPACE/scripts/test-avalonia-aot-smoke.mjs"'
+      - name: Collect failed native report
+        if: failure()
+        run: |
+          shopt -s nullglob
+          reports=("$FSUSUI_AOT_TMPDIR"/fsusui-native-aot-*/reports/smoke.json)
+          if (( ${#reports[@]} == 0 )); then
+            echo "::warning::Native fixture did not write a smoke report."
+            exit 0
+          fi
+          test "${#reports[@]}" -eq 1
+          test -f "${reports[0]}" && test ! -L "${reports[0]}"
+          mkdir -p "$RUNNER_TEMP/fsus-aot1149-failure"
+          cp -- "${reports[0]}" "$RUNNER_TEMP/fsus-aot1149-failure/smoke.json"
       - uses: actions/upload-artifact@v4
+        if: failure()
         with:
-          name: avalonia-sdk-10.0.404-locks-1149
-          path: ${{ runner.temp }}/sdk-10.0.404-locks.patch
-          if-no-files-found: error
+          name: avalonia-linux-x64-aot-failure-report-1149
+          path: ${{ runner.temp }}/fsus-aot1149-failure/smoke.json
+          if-no-files-found: ignore
+          retention-days: 7
+      - name: Validate exact native leaf identity
+        run: >-
+          node scripts/avalonia-aot-native.mjs validate-leaf
+          --manifest .avalonia-aot-leaf/linux-x64/leaf-manifest.json
+          --commit-sha "$EXPECTED_COMMIT_SHA"
+          --candidate-digest "$EXPECTED_CANDIDATE_DIGEST"
+          --rid linux-x64
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: avalonia-linux-x64-aot-diagnostic-1149
+          path: .avalonia-aot-leaf/linux-x64
+          include-hidden-files: true
+          if-no-files-found: warn
           retention-days: 7
