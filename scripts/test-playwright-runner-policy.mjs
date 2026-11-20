@@ -52,7 +52,7 @@ test('a browser installation on ubuntu-latest is rejected', () => {
   )
   const current = readFileSync('.github/workflows/_quality.yml', 'utf8')
   const regressed = current.replace(
-    'runs-on: ' + guardedAbsolutePerformanceRunner,
+    `runs-on: ${guardedAbsolutePerformanceRunner}`,
     'runs-on: ubuntu-latest',
   )
   assert.ok(
@@ -100,7 +100,7 @@ test('Ubuntu 22 exceptions are restricted to exact workflow, job and PR guard', 
   }
 
   const source = readFileSync(absoluteFile, 'utf8')
-  const condition = absoluteRunner.slice(0, absoluteRunner.indexOf(" && 'ubuntu-22.04'")) + ' }}'
-  assert.ok(source.includes('WEB_ONLY_PR_1085: ' + condition))
+  const condition = `${absoluteRunner.slice(0, absoluteRunner.indexOf(" && 'ubuntu-22.04'"))} }}`
+  assert.ok(source.includes(`WEB_ONLY_PR_1085: ${condition}`))
   assert.ok(source.includes("${{ env.WEB_ONLY_PR_1085 == 'true' && ',platform=web' || '' }}"))
 })

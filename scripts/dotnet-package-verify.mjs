@@ -31,9 +31,8 @@ fs.rmSync(nugetRoot, { recursive: true, force: true })
 fs.rmSync(path.dirname(manifestPath), { recursive: true, force: true })
 fs.mkdirSync(nugetRoot, { recursive: true })
 
-const { alignment } = readStableConsumerAuthority({
-  expected: currentIdentity({ requireCleanPackageInputs: true }),
-})
+const packageIdentity = currentIdentity({ requireCleanPackageInputs: true })
+const { alignment } = readStableConsumerAuthority({ expected: packageIdentity })
 const alignmentArtifact = fs.readFileSync(
   path.join(root, '.tmp/conformance-v2/alignment.json'),
 )
@@ -79,12 +78,7 @@ const manifest = {
   kind: 'dotnet-package-candidate',
   canonicalPlatform: 'linux',
   dotnetSdk,
-  commitSha:
-    process.env.GITHUB_SHA ??
-    execFileSync('git', ['rev-parse', 'HEAD'], {
-      cwd: root,
-      encoding: 'utf8',
-    }).trim(),
+  commitSha: packageIdentity.candidate,
   candidateSha256: candidateHash.digest('hex'),
   contractV2Alignment: createPackageAlignmentBinding(
     alignment,
