@@ -92,6 +92,11 @@ The details toggle and copy button and feedback labels use the nearest
 is used for any missing translation. Explicit `detail-label`, `label`,
 `copied-label`, and `error-label` props retain precedence.
 
+Key/value grids reduce their column count as the available width shrinks. Labels
+and values stay grouped at the top of each cell, even beside a taller entry.
+Copyable details place the action below the value if both cannot fit side by
+side in their available container width.
+
 Inline actions use at least a 40×40px desktop target and a 44×44px mobile target.
 `FsusCopyableDetail` accepts `disabled`; the native button remains at full
 opacity while disabled colors and cursor tokens communicate the state. Inline

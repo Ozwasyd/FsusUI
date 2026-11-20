@@ -329,6 +329,104 @@ test('DiagnosticsItem warning uses 3px left border', async ({
   expect(parseFloat(borderInlineStart)).toBe(3)
 })
 
+test('narrow desktop key-value grid keeps labels and copy actions readable', async ({
+  page,
+}, testInfo) => {
+  await page.setViewportSize({ width: 1280, height: 800 })
+  await page.goto(buildVisualUrl('metric-visual', testInfo.project.name), {
+    waitUntil: 'domcontentloaded',
+  })
+  const grid = page.locator(
+    '[data-metric-variant="kv-narrow-desktop"] .el-key-value-grid',
+  )
+  await expect(grid).toBeVisible()
+  await grid.evaluate((el) => {
+    el.style.maxWidth = '925px'
+  })
+  const measure = () =>
+    grid.evaluate((el) => {
+      const rect = (selector: string) =>
+        el.querySelector(selector)!.getBoundingClientRect()
+      const gridRect = el.getBoundingClientRect()
+      const code = rect('.el-copyable-detail__value')
+      const button = rect('.el-copyable-detail__button')
+      const label = rect('.el-key-value-item:first-child dt')
+      const value = rect('.el-key-value-item:first-child dd')
+      const copy = rect('.el-copyable-detail')
+      return {
+        columns: getComputedStyle(el).gridTemplateColumns.split(' ').length,
+        maxWidth: gridRect.width,
+        gap: value.top - label.bottom,
+        codeWidth: code.width,
+        copyIsStacked: button.top >= code.bottom - 1,
+        copyDoesNotOverlap:
+          button.top >= code.bottom - 1 ||
+          button.left >= code.right - 1 ||
+          button.right <= code.left + 1,
+        copyWithinCell:
+          button.left >= copy.left - 1 && button.right <= copy.right + 1,
+        hitArea: button.height,
+      }
+    })
+  const desktop = await measure()
+  expect(desktop.maxWidth).toBeLessThanOrEqual(925)
+  expect(desktop.columns).toBeLessThanOrEqual(4)
+  expect(desktop.gap).toBeLessThanOrEqual(6)
+  expect(desktop.codeWidth).toBeGreaterThan(120)
+  expect(desktop.copyDoesNotOverlap).toBe(true)
+  expect(desktop.copyWithinCell).toBe(true)
+  expect(desktop.hitArea).toBeGreaterThanOrEqual(40)
+
+  const standalone = page.locator(
+    '[data-metric-variant="copy-default"] .el-copyable-detail',
+  )
+  const action = standalone.getByRole('button')
+  const standaloneLayout = () =>
+    standalone.evaluate((el) => {
+      const box = el.getBoundingClientRect()
+      const code = el.querySelector('code')!.getBoundingClientRect()
+      const button = el.querySelector('button')!.getBoundingClientRect()
+      return {
+        stacked: button.top >= code.bottom - 1,
+        contained: button.left >= box.left - 1 && button.right <= box.right + 1,
+      }
+    })
+  await standalone.evaluate((el) => {
+    el.style.width = '152px'
+    el.dir = 'rtl'
+  })
+  expect(await standaloneLayout()).toEqual({ stacked: true, contained: true })
+  await action.focus()
+  await expect(action).toBeFocused()
+
+  const wide = page.locator('[data-metric-variant="copy-wide"]')
+  await expect
+    .poll(() =>
+      wide.evaluate((el) => {
+        const detail = el.querySelector('.el-copyable-detail')!
+        const code = detail.querySelector('code')!.getBoundingClientRect()
+        const button = detail.querySelector('button')!.getBoundingClientRect()
+        return {
+          hostWidth: el.clientWidth,
+          detailWidth: detail.clientWidth,
+          sideBySide: button.left >= code.right - 1 && button.top < code.bottom,
+        }
+      }),
+    )
+    .toEqual({ hostWidth: 425, detailWidth: 425, sideBySide: true })
+
+  await page.setViewportSize({ width: 375, height: 812 })
+  await expect
+    .poll(async () => (await measure()).hitArea)
+    .toBeGreaterThanOrEqual(44)
+  const mobile = await measure()
+  expect(mobile.columns).toBe(1)
+  expect(mobile.copyIsStacked).toBe(true)
+  expect(mobile.copyDoesNotOverlap).toBe(true)
+  expect(mobile.copyWithinCell).toBe(true)
+  expect(mobile.hitArea).toBeGreaterThanOrEqual(44)
+})
+
 // CopyableDetail: 40px button
 test('CopyableDetail button min-height >= 40px', async ({ page }, testInfo) => {
   await page.goto(buildVisualUrl('metric-visual', testInfo.project.name), {
