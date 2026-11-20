@@ -5,6 +5,8 @@ import {
   AVALONIA_LAYOUT_READY_SPLIT_PROTOCOL as splitProtocol,
   AVALONIA_LAYOUT_READY_THEME_SPLIT_PROTOCOL as themeProtocol,
   THEME_SCENARIO as theme,
+  INPUT_SCENARIO as input,
+  AVALONIA_LAYOUT_READY_INPUT_SPLIT_PROTOCOL as inputProtocol,
   ORIGINAL_VARIABLE_SCENARIO as remount,
   SUSTAINED_VARIABLE_SCENARIO as sustained,
   expectedAvaloniaLayoutReadyScenarios,
@@ -127,6 +129,33 @@ test('v3 isolates exactly theme and sustained while keeping all original quick r
     protocol: themeProtocol, partition: 'theme',
   }), /must not filter/u)
   isolated.raw[theme].MeasurementProtocol = splitProtocol
+  await assert.rejects(isolated.verify, /mixed protocol/u)
+  canonical.summary.Results.push(isolated.summary.Results[0])
+  await assert.rejects(canonical.verify, /missing, duplicate/u)
+})
+
+
+test('v4 keeps fixed first and binds each remaining row to exactly one partition', async () => {
+  const get = (partition) => fixture({ protocol: inputProtocol, partition })
+  const canonical = get('canonical')
+  const isolated = get('input')
+  const { scenarios } = await canonical.verify()
+  assert.deepEqual(scenarios, [
+    'virtual-list-fixed-100k',
+    remount,
+    'table-v2-two-axis-100k',
+    'data-table-sort-select-replace',
+    'tree-expand-scroll',
+  ])
+  assert.deepEqual((await isolated.verify()).scenarios, [input])
+  assert.deepEqual((await get('theme').verify()).scenarios, [theme])
+  assert.deepEqual((await get('sustained').verify()).scenarios, [sustained])
+  assert.deepEqual([...scenarios, input, theme, sustained], expectedAvaloniaLayoutReadyScenarios('quick'))
+  assert.throws(() => expectedAvaloniaLayoutReadyScenarios('quick', '', {
+    protocol: themeProtocol, partition: 'input',
+  }), /unknown/u)
+  await assert.rejects(() => isolated.verify('3862c3c5-5a52-43b2-90dc-96c17dafc206'), /wrong native launch ID/u)
+  isolated.raw[input].MeasurementProtocol = themeProtocol
   await assert.rejects(isolated.verify, /mixed protocol/u)
   canonical.summary.Results.push(isolated.summary.Results[0])
   await assert.rejects(canonical.verify, /missing, duplicate/u)

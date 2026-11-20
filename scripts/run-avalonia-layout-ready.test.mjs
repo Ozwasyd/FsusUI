@@ -5,7 +5,7 @@ import { mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import path from 'node:path'
 import process from 'node:process'
-import { avaloniaRuntimeCommand, launchAvaloniaLayoutReady, nativeDriverHash, nativeSplitProtocol, nativeThemeSplitProtocol, readNativeBinding } from './run-avalonia-layout-ready.mjs'
+import { avaloniaRuntimeCommand, launchAvaloniaLayoutReady, nativeDriverHash, nativeSplitProtocol, nativeThemeSplitProtocol, nativeInputSplitProtocol, readNativeBinding } from './run-avalonia-layout-ready.mjs'
 
 test('historical SDK shim is not used for the runtime DLL', () => {
   const env = {
@@ -30,6 +30,7 @@ test('ambient runs keep the default host, and relative overrides fail closed', (
 for (const [protocol, expected] of [
   [nativeSplitProtocol, ['canonical', 'sustained']],
   [nativeThemeSplitProtocol, ['canonical', 'theme', 'sustained']],
+  [nativeInputSplitProtocol, ['canonical', 'input', 'theme', 'sustained']],
 ]) test(`${protocol} builds once and launches independently bound partitions`, async () => {
   const root = path.resolve(import.meta.dirname, '..')
   const productSha = execFileSync('git', ['rev-parse', 'HEAD'], {cwd: root, encoding:'utf8'}).trim()

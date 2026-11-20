@@ -11,6 +11,7 @@ import {
 import {
   SUSTAINED_VARIABLE_SCENARIO,
   THEME_SCENARIO,
+  INPUT_SCENARIO,
   verifyAvaloniaLayoutReady,
 } from './verify-avalonia-layout-ready.mjs'
 
@@ -89,8 +90,12 @@ export const checkSustainedAbsolute = (summary, policy) =>
 export const checkThemeAbsolute = (summary, policy) =>
   checkIsolatedAbsolute(summary, policy, THEME_SCENARIO, 'theme')
 
-export function checkHistoricalSplitDisposal({ theme, sustained }) {
+export const checkInputAbsolute = (summary, policy) =>
+  checkIsolatedAbsolute(summary, policy, INPUT_SCENARIO, 'input')
+
+export function checkHistoricalSplitDisposal({ input, theme, sustained }) {
   for (const [partition, summary] of [
+    ['input', input],
     ['theme', theme],
     ['sustained', sustained],
   ]) {
@@ -159,10 +164,11 @@ export async function verifyAvaloniaSplitArm(
     }
     summaries.set(partition, summary)
   }
-  const { canonical, theme, sustained } = Object.fromEntries(summaries)
-  if (binding.historical) checkHistoricalSplitDisposal({ theme, sustained })
+  const { canonical, input, theme, sustained } = Object.fromEntries(summaries)
+  if (binding.historical) checkHistoricalSplitDisposal({ input, theme, sustained })
   const policy = await readJson(policyPath)
   checkSustainedAbsolute(sustained, policy.avalonia)
   if (theme) checkThemeAbsolute(theme, policy.avalonia)
-  return theme ? { canonical, theme, sustained } : { canonical, sustained }
+  if (input) checkInputAbsolute(input, policy.avalonia)
+  return { canonical, ...(input ? { input } : {}), ...(theme ? { theme } : {}), sustained }
 }

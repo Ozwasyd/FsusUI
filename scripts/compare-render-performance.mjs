@@ -121,13 +121,13 @@ if (currentPlan?.platforms.avalonia.run !== false) {
       const nativeOutput = path.join(directory, 'avalonia')
       if (nativeSummaries[index].GitSha !== expected) throw new Error('Avalonia layout-ready summary identity mismatch')
       if (split) {
-        const { canonical, theme, sustained } = await verifyAvaloniaSplitArm(nativeOutput, {
+        const { canonical, input, theme, sustained } = await verifyAvaloniaSplitArm(nativeOutput, {
           productSha: expected, driverHash, plan: currentPlan, protocol: effectiveNativeProtocol,
         })
         if (splitEnvironment && !isDeepStrictEqual(splitEnvironment, canonical.Environment))
           throw new Error('Avalonia split runtime and renderer must match in all four arms')
         splitEnvironment ??= canonical.Environment
-        splitSummaries.set(directory, [...canonical.Results, ...(theme?.Results ?? []), ...sustained.Results])
+        splitSummaries.set(directory, [...canonical.Results, ...(input?.Results ?? []), ...(theme?.Results ?? []), ...sustained.Results])
       } else {
         const proof = await readNativeBinding(nativeOutput, expected, driverHash, scenario)
         scenario ??= proof.scenario

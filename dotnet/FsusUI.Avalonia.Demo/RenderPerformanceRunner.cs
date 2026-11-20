@@ -31,12 +31,14 @@ internal static class RenderPerformanceRunner
   private const string SplitLayoutReadyProtocol = "variable-list-layout-ready.v2";
   private const string SustainedVariableScenario = "virtual-list-variable-100k-sustained";
   private const string IsolatedThemeProtocol = "variable-list-layout-ready.v3";
+  private const string IsolatedInputProtocol = "variable-list-layout-ready.v4";
+  private const string InputScenario = "input-continuous";
   private const string ThemeScenario = "theme-switch";
   private static string? measurementProtocol;
   private static string? measurementPartition;
   private static string? measurementLaunchId;
   private static bool LayoutReadyEnabled => measurementProtocol == LayoutReadyProtocol || SplitLayoutReadyEnabled;
-  private static bool SplitLayoutReadyEnabled => measurementProtocol is SplitLayoutReadyProtocol or IsolatedThemeProtocol;
+  private static bool SplitLayoutReadyEnabled => measurementProtocol is SplitLayoutReadyProtocol or IsolatedThemeProtocol or IsolatedInputProtocol;
 
   public static bool IsConfigured { get; private set; }
   public static bool UseSoftwareRendering =>
@@ -66,7 +68,8 @@ internal static class RenderPerformanceRunner
           warmups != 1 || samples != 21 || longScrollIterations != 256 || requestedBackend != "auto")
         throw new InvalidOperationException("Split Avalonia measurement requires the full quick 1/21/256 auto matrix.");
       if (measurementPartition is not ("canonical" or "sustained") &&
-          !(measurementProtocol == IsolatedThemeProtocol && measurementPartition == "theme"))
+          !((measurementProtocol is IsolatedThemeProtocol or IsolatedInputProtocol) && measurementPartition == "theme") &&
+          !(measurementProtocol == IsolatedInputProtocol && measurementPartition == "input"))
         throw new InvalidOperationException("Split Avalonia measurement requires an explicit partition.");
       if (!Guid.TryParseExact(measurementLaunchId, "D", out var launchId) ||
           launchId == Guid.Empty || measurementLaunchId != launchId.ToString("D"))
@@ -138,7 +141,7 @@ internal static class RenderPerformanceRunner
         TableV2("table-v2-two-axis-100k", 100_000, 80),
         DataTable("data-table-sort-select-replace", 10_000),
         Tree("tree-expand-scroll", 10_000),
-        Input("input-continuous"),
+        Input(InputScenario),
         Theme(ThemeScenario),
       }
       :
@@ -148,7 +151,7 @@ internal static class RenderPerformanceRunner
         TableV2("table-v2-two-axis-100k", 100_000, 80),
         DataTable("data-table-sort-select-replace", 10_000),
         Tree("tree-expand-scroll", 10_000),
-        Input("input-continuous"),
+        Input(InputScenario),
         Theme(ThemeScenario),
       ];
 
@@ -160,6 +163,13 @@ internal static class RenderPerformanceRunner
       definitions = [VirtualList(SustainedVariableScenario, 100_000, true)];
     else if (measurementProtocol == IsolatedThemeProtocol)
       definitions = definitions.Where(definition => (definition.Id == ThemeScenario) == (measurementPartition == "theme")).ToArray();
+    else if (measurementProtocol == IsolatedInputProtocol)
+      definitions = definitions.Where(definition => measurementPartition switch
+      {
+        "input" => definition.Id == InputScenario,
+        "theme" => definition.Id == ThemeScenario,
+        _ => definition.Id != InputScenario && definition.Id != ThemeScenario,
+      }).ToArray();
 
     if (!string.IsNullOrWhiteSpace(scenarioFilter))
     {

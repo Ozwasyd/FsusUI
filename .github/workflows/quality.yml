@@ -210,7 +210,7 @@ jobs:
     timeout-minutes: 90
     env:
       FSUSUI_WEB_MEASUREMENT_PROTOCOL: ${{ github.event.pull_request.number == 1085 && 'quick-web-60hz.v1' || '' }}
-      FSUSUI_AVALONIA_MEASUREMENT_PROTOCOL: ${{ github.event.pull_request.number == 1085 && 'variable-list-layout-ready.v3' || '' }}
+      FSUSUI_AVALONIA_MEASUREMENT_PROTOCOL: ${{ github.event.pull_request.number == 1085 && 'variable-list-layout-ready.v4' || '' }}
     steps:
       - name: Checkout current change
         uses: actions/checkout@v4

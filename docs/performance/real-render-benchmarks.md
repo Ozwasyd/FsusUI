@@ -141,17 +141,16 @@ For both baseline measurements, CI verifies the baseline checkout against the
 pull request base SHA and supplies that verified SHA to the measurement process.
 This keeps the recorded Avalonia source identity bound to the measured checkout.
 
-The scoped Avalonia v3 split protocol runs the first six quick scenarios in
-their original order. It runs `theme-switch` in its own process so its tail
-latency does not inherit unrelated fixture allocation and collection history,
-and runs continuous variable-list scrolling in another fresh process. All
-three launches use one assembly per measured revision. The gate verifies each
-partition's launch identity and payload hashes before comparing the original
-eight scenarios. It keeps raw outputs separate and applies the same sample
-count, workload, absolute limits, and relative policy to both isolated rows.
-The v2 split (seven canonical rows and independent sustained scrolling) and
-legacy v1 capture remain readable under their own protocol, not comparable
-to v3 arms.
+The scoped Avalonia v4 split protocol keeps the first five quick scenarios
+in their original order. It measures input, theme switching, and sustained
+variable-list scrolling in separate fresh processes, so those results do not
+inherit allocation and collection history from unrelated fixtures. All four
+launches for a revision use one assembly. The gate verifies each partition's
+launch identity and payload hashes before comparing the original eight
+scenarios. Raw outputs stay separate, and existing sample counts, workloads,
+absolute limits, and relative policy still apply. Legacy v1, v2 (isolated
+sustained), and v3 (isolated theme and sustained) results remain readable
+under their own protocols and cannot be mixed with v4 arms.
 
 The complete local paired workflow is:
 

@@ -8,16 +8,24 @@ import process from 'node:process'
 export const nativeProtocol = 'variable-list-layout-ready.v1'
 export const nativeSplitProtocol = 'variable-list-layout-ready.v2'
 export const nativeThemeSplitProtocol = 'variable-list-layout-ready.v3'
+export const nativeInputSplitProtocol = 'variable-list-layout-ready.v4'
 export const isNativeSplitProtocol = protocol =>
-  protocol === nativeSplitProtocol || protocol === nativeThemeSplitProtocol
+  [nativeSplitProtocol, nativeThemeSplitProtocol, nativeInputSplitProtocol].includes(protocol)
 export const supportedNativeProtocol = protocol =>
   protocol === nativeProtocol || isNativeSplitProtocol(protocol)
-const nativePartitions = protocol => protocol === nativeThemeSplitProtocol
-  ? ['canonical', 'theme', 'sustained']
-  : ['canonical', 'sustained']
-const bindingVersion = protocol => protocol === nativeThemeSplitProtocol ? 3 : isNativeSplitProtocol(protocol) ? 2 : 1
+const splitPartitions = {
+  [nativeSplitProtocol]: ['canonical', 'sustained'],
+  [nativeThemeSplitProtocol]: ['canonical', 'theme', 'sustained'],
+  [nativeInputSplitProtocol]: ['canonical', 'input', 'theme', 'sustained'],
+}
+const nativePartitions = protocol => splitPartitions[protocol]
+const bindingVersion = protocol => {
+  if (protocol === nativeInputSplitProtocol) return 4
+  if (protocol === nativeThemeSplitProtocol) return 3
+  return protocol === nativeSplitProtocol ? 2 : 1
+}
 export const nativePartitionPath = (output, partition) => {
-  requireThat(nativePartitions(nativeThemeSplitProtocol).includes(partition), 'unknown process partition')
+  requireThat(nativePartitions(nativeInputSplitProtocol).includes(partition), 'unknown process partition')
   return partition === 'canonical' ? output : path.join(output, partition)
 }
 
