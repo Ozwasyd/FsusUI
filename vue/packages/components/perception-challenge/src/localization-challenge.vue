@@ -8,7 +8,8 @@
     </div>
 
     <div
-      ref="targetRef"
+      :ref="templateRefs.targetRef"
+      ref_key="targetRef"
       :class="ns.e('target')"
       v-bind="targetAttrs"
       :aria-label="targetLabel"
@@ -70,6 +71,7 @@ const emit = defineEmits(localizationChallengeEmits)
 const ns = useNamespace('localization-challenge')
 const targetRef = ref<HTMLElement>()
 const canvasRef = ref<HTMLCanvasElement>()
+const templateRefs = { targetRef }
 const internalPoint = ref<PerceptionChallengePoint | null>(null)
 
 const rootKls = computed(() => [

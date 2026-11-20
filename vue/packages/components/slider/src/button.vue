@@ -1,6 +1,7 @@
 <template>
   <div
-    ref="button"
+    :ref="templateRefs.button"
+    ref_key="button"
     :class="[ns.e('button-wrapper'), { hover: hovering, dragging }]"
     :style="wrapperStyle"
     :tabindex="disabled ? -1 : 0"
@@ -14,7 +15,8 @@
     @keydown="onKeyDown"
   >
     <el-tooltip
-      ref="tooltip"
+      :ref="templateRefs.tooltip"
+      ref_key="tooltip"
       :visible="tooltipVisible"
       :placement="placement"
       :fallback-placements="['top', 'bottom', 'right', 'left']"
@@ -74,6 +76,8 @@ const {
   onKeyDown,
   setPosition,
 } = useSliderButton(props, initData, emit)
+
+const templateRefs = { button, tooltip }
 
 const { hovering, dragging } = toRefs(initData)
 

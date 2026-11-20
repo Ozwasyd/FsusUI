@@ -1,5 +1,10 @@
 <template>
-  <div ref="contentRef" :style="contentStyle" v-bind="rootAttrs">
+  <div
+    :ref="templateRefs.contentRef"
+    ref_key="contentRef"
+    :style="contentStyle"
+    v-bind="rootAttrs"
+  >
     <div v-if="!nowrap" :class="contentClass" v-bind="contentAttrs">
       <slot :content-style="contentStyle" :content-class="contentClass" />
       <el-visually-hidden v-bind="visuallyHiddenAttrs">
@@ -56,6 +61,8 @@ const { referenceRef, contentRef, middlewareData, x, y, update } = useFloating({
     return middleware
   }),
 })
+
+const templateRefs = { contentRef }
 
 const zIndex = useZIndex().nextZIndex()
 

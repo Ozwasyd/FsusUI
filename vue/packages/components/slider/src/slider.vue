@@ -1,7 +1,8 @@
 <template>
   <div
     :id="range ? inputId : undefined"
-    ref="sliderWrapper"
+    :ref="templateRefs.sliderWrapper"
+    ref_key="sliderWrapper"
     :class="sliderKls"
     :role="range ? 'group' : undefined"
     :aria-label="range && !isLabeledByFormItem ? groupLabel : undefined"
@@ -12,7 +13,8 @@
     @touchmove="onSliderWrapperPrevent"
   >
     <div
-      ref="slider"
+      :ref="templateRefs.slider"
+      ref_key="slider"
       :class="[
         ns.e('runway'),
         { 'show-input': showInput && !range },
@@ -27,7 +29,8 @@
       <div :class="ns.e('bar')" :style="barStyle" />
       <slider-button
         v-bind="firstButtonAttrs"
-        ref="firstButton"
+        :ref="templateRefs.firstButton"
+        ref_key="firstButton"
         :model-value="firstValue"
         :vertical="vertical"
         :tooltip-class="tooltipClass"
@@ -38,7 +41,8 @@
       <slider-button
         v-if="range"
         v-bind="secondButtonAttrs"
-        ref="secondButton"
+        :ref="templateRefs.secondButton"
+        ref_key="secondButton"
         :model-value="secondValue"
         :vertical="vertical"
         :tooltip-class="tooltipClass"
@@ -240,6 +244,8 @@ const precision = computed(() => {
 })
 
 const { sliderWrapper } = useLifecycle(props, initData, resetSize)
+
+const templateRefs = { slider, firstButton, secondButton, sliderWrapper }
 
 const { firstValue, secondValue, sliderSize } = toRefs(initData)
 

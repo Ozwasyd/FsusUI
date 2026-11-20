@@ -16,7 +16,10 @@
       :aria-label="ariaLabel"
     >
       <template v-if="items.length > 0">
-        <template v-for="(item, index) in items" :key="getItemKey(item, index)">
+        <template
+          v-for="(item, index) in collection.props.items"
+          :key="collection.getItemKey(item, index)"
+        >
           <slot name="card" :item="item" :index="index" :compact="true">
             <slot name="item" :item="item" :index="index" :compact="true" />
           </slot>
@@ -144,6 +147,8 @@ const getItemKey = (item: unknown, index: number) => {
 
   return index
 }
+
+const collection = { props, getItemKey }
 
 onMounted(startMediaQuery)
 onBeforeUnmount(stopMediaQuery)

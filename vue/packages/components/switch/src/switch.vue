@@ -28,7 +28,12 @@
         inactiveText
       }}</span>
     </span>
-    <span ref="core" :class="ns.e('core')" :style="coreStyle">
+    <span
+      :ref="templateRefs.core"
+      ref_key="core"
+      :class="ns.e('core')"
+      :style="coreStyle"
+    >
       <div v-if="inlinePrompt" :class="ns.e('inner')">
         <template v-if="activeIcon || inactiveIcon">
           <el-icon :class="ns.is('icon')">
@@ -145,6 +150,7 @@ const switchDisabled = useFormDisabled(computed(() => props.loading))
 const isControlled = ref(props.modelValue !== false)
 const input = ref<HTMLInputElement>()
 const core = ref<HTMLSpanElement>()
+const templateRefs = { core }
 const isSliding = ref(false)
 let slidingTimer: ReturnType<typeof setTimeout> | undefined
 

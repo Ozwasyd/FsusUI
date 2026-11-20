@@ -1,5 +1,10 @@
 <template>
-  <span ref="arrowRef" :style="arrowStyle" :class="ns.e('arrow')" />
+  <span
+    :ref="templateRefs.arrowRef"
+    ref_key="arrowRef"
+    :style="arrowStyle"
+    :class="ns.e('arrow')"
+  />
 </template>
 
 <script setup lang="ts">
@@ -20,6 +25,7 @@ const props = defineProps({
 
 const { ns } = inject(tooltipV2RootKey)!
 const { arrowRef } = inject(tooltipV2ContentKey)!
+const templateRefs = { arrowRef }
 
 const arrowStyle = computed<CSSProperties>(() => {
   const { style, width, height } = props
