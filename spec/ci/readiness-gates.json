@@ -30,8 +30,7 @@
       "playwright-boundary",
       "playwright-markdown",
       "playwright-conformance",
-      "visual-runtime-reuse",
-      "real-render-performance"
+      "visual-runtime-reuse"
     ],
     "nightly": [
       "static-quality",
@@ -50,8 +49,7 @@
       "playwright-boundary",
       "playwright-markdown",
       "playwright-conformance",
-      "visual-runtime-reuse",
-      "real-render-performance"
+      "visual-runtime-reuse"
     ],
     "release": [
       "static-quality",
@@ -70,24 +68,20 @@
       "playwright-boundary",
       "playwright-markdown",
       "playwright-conformance",
-      "visual-runtime-reuse",
-      "real-render-performance"
+      "visual-runtime-reuse"
     ]
   },
   "execution": {
     "main": {
       "aggregator": "stable-readiness",
-      "realRenderProfile": "quick",
       "visualProfile": "full"
     },
     "nightly": {
       "aggregator": "nightly-readiness",
-      "realRenderProfile": "full",
       "visualProfile": "full"
     },
     "release": {
       "aggregator": "release-readiness",
-      "realRenderProfile": "full",
       "visualProfile": "evidence",
       "identityBinding": "commit-tag-package"
     }
@@ -113,8 +107,7 @@
     "playwright-boundary": { "cardinality": "playwright" },
     "playwright-markdown": { "cardinality": "playwright" },
     "playwright-conformance": { "cardinality": "playwright" },
-    "visual-runtime-reuse": { "cardinality": "playwright" },
-    "real-render-performance": { "cardinality": "single" }
+    "visual-runtime-reuse": { "cardinality": "playwright" }
   },
   "artifactBindings": [
     {

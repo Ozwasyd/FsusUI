@@ -66,7 +66,6 @@ for (const name of [
 }
 
 for (const gate of [
-  'real-render-performance',
   'static-quality',
   'dotnet-platform',
   'dotnet-package',

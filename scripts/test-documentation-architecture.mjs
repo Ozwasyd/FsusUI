@@ -16,7 +16,6 @@ const requiredFiles = [
   'docs/releases/channels/public-preview.md',
   'docs/releases/readiness/README.md',
   'docs/releases/readiness/avalonia-stable.md',
-  'docs/releases/readiness/avalonia-performance-budgets.md',
   'docs/releases/readiness/platform-overrides.md',
   'docs/releases/evidence/README.md',
   'docs/releases/evidence/npm-public-preview/README.md',

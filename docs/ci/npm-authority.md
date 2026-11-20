@@ -115,7 +115,7 @@ local dry-runs are not substitutes.
 authority. It maps every governed dependency group and update type to the exact
 stable branch-protection contexts and to the leaf gate evidence aggregated by
 those contexts. `pr-fast` binds the complete main and Playwright reusable
-workflows; `pr-real-render-performance` remains independently required. The
+workflows, including all required non-performance checks. The
 package-producing `build-package` gate and its `consumer-install` consumer are
 mandatory for package runtime, Vue build/peer, npm release, Wasm, and mixed
 SDK/image updates.

@@ -1,5 +1,8 @@
 # Performance summary
 
+Historical record. The commands below describe the evidence collected at the
+time, not current verification steps.
+
 ## Static fixture and budget summary
 
 Static fixture/budget commands:
@@ -19,8 +22,3 @@ measurements. Real-render evidence is produced separately with:
 ```bash
 pnpm perf:render -- --profile full --output .tmp/performance/full
 ```
-
-See `docs/performance/real-render-benchmarks.md` for the browser/Avalonia
-matrix, same-runner relative regression policy, environment metadata, and raw
-artifact contract. No cross-machine absolute score comparison is implied by
-this release summary.

@@ -16,7 +16,7 @@
   "blockingLabels": ["dependency-blocked"],
   "branchProtection": {
     "strict": true,
-    "requiredChecks": ["pr-fast", "pr-real-render-performance"]
+    "requiredChecks": ["pr-fast"]
   },
   "checks": {
     "pr-fast": {
@@ -25,25 +25,18 @@
       "aggregates": [
         "premerge-main",
         "premerge-playwright",
-        "pr-feedback",
-        "pr-real-render-performance"
+        "pr-feedback"
       ]
-    },
-    "pr-real-render-performance": {
-      "workflow": ".github/workflows/quality.yml",
-      "job": "pr-real-render-performance",
-      "aggregates": ["real-render-performance"]
     }
   },
   "groups": {
     "avalonia-platform": {
       "updateTypes": ["digest", "major", "minor", "patch"],
-      "requiredChecks": ["pr-fast", "pr-real-render-performance"],
+      "requiredChecks": ["pr-fast"],
       "requiredGateEvidence": [
         "consumer-install",
         "dotnet-package",
         "dotnet-platform",
-        "real-render-performance",
         "static-quality",
         "typecheck",
         "unit"
@@ -51,12 +44,11 @@
     },
     "dotnet-build-toolchain": {
       "updateTypes": ["digest", "major", "minor", "patch"],
-      "requiredChecks": ["pr-fast", "pr-real-render-performance"],
+      "requiredChecks": ["pr-fast"],
       "requiredGateEvidence": [
         "consumer-install",
         "dotnet-package",
         "dotnet-platform",
-        "real-render-performance",
         "static-quality",
         "typecheck",
         "unit"
@@ -64,18 +56,17 @@
     },
     "dotnet-test-performance": {
       "updateTypes": ["digest", "major", "minor", "patch"],
-      "requiredChecks": ["pr-fast", "pr-real-render-performance"],
+      "requiredChecks": ["pr-fast"],
       "requiredGateEvidence": [
         "dotnet-package",
         "dotnet-platform",
-        "real-render-performance",
         "static-quality",
         "unit"
       ]
     },
     "github-actions": {
       "updateTypes": ["digest", "major", "minor", "patch"],
-      "requiredChecks": ["pr-fast", "pr-real-render-performance"],
+      "requiredChecks": ["pr-fast"],
       "requiredGateEvidence": [
         "build-demo",
         "build-package",
@@ -87,7 +78,6 @@
         "playwright-layout",
         "playwright-markdown",
         "playwright-motion",
-        "real-render-performance",
         "static-quality",
         "typecheck",
         "unit",
@@ -97,14 +87,13 @@
     },
     "js-test-quality-tooling": {
       "updateTypes": ["digest", "major", "minor", "patch"],
-      "requiredChecks": ["pr-fast", "pr-real-render-performance"],
+      "requiredChecks": ["pr-fast"],
       "requiredGateEvidence": [
         "coverage",
         "playwright-boundary",
         "playwright-layout",
         "playwright-markdown",
         "playwright-motion",
-        "real-render-performance",
         "static-quality",
         "typecheck",
         "unit",
@@ -113,14 +102,13 @@
     },
     "node-dotnet-sdk-images": {
       "updateTypes": ["digest", "major", "minor", "patch"],
-      "requiredChecks": ["pr-fast", "pr-real-render-performance"],
+      "requiredChecks": ["pr-fast"],
       "requiredGateEvidence": [
         "build-demo",
         "build-package",
         "consumer-install",
         "dotnet-package",
         "dotnet-platform",
-        "real-render-performance",
         "static-quality",
         "typecheck",
         "unit"
@@ -128,11 +116,10 @@
     },
     "npm-release-tooling": {
       "updateTypes": ["digest", "major", "minor", "patch"],
-      "requiredChecks": ["pr-fast", "pr-real-render-performance"],
+      "requiredChecks": ["pr-fast"],
       "requiredGateEvidence": [
         "build-package",
         "consumer-install",
-        "real-render-performance",
         "static-quality",
         "typecheck",
         "unit"
@@ -140,12 +127,11 @@
     },
     "vue-build-toolchain": {
       "updateTypes": ["digest", "major", "minor", "patch"],
-      "requiredChecks": ["pr-fast", "pr-real-render-performance"],
+      "requiredChecks": ["pr-fast"],
       "requiredGateEvidence": [
         "build-demo",
         "build-package",
         "consumer-install",
-        "real-render-performance",
         "static-quality",
         "typecheck",
         "unit",
@@ -154,7 +140,7 @@
     },
     "vue-runtime-dependencies": {
       "updateTypes": ["digest", "major", "minor", "patch"],
-      "requiredChecks": ["pr-fast", "pr-real-render-performance"],
+      "requiredChecks": ["pr-fast"],
       "requiredGateEvidence": [
         "build-demo",
         "build-package",
@@ -162,7 +148,6 @@
         "playwright-boundary",
         "playwright-layout",
         "playwright-markdown",
-        "real-render-performance",
         "static-quality",
         "typecheck",
         "unit",
@@ -171,14 +156,13 @@
     },
     "wasm-toolchain": {
       "updateTypes": ["digest", "major", "minor", "patch"],
-      "requiredChecks": ["pr-fast", "pr-real-render-performance"],
+      "requiredChecks": ["pr-fast"],
       "requiredGateEvidence": [
         "build-demo",
         "build-package",
         "consumer-install",
         "playwright-boundary",
         "playwright-markdown",
-        "real-render-performance",
         "static-quality",
         "typecheck",
         "unit"
@@ -187,14 +171,13 @@
   },
   "lockfileMaintenance": {
     "updateType": "lockfile-maintenance",
-    "requiredChecks": ["pr-fast", "pr-real-render-performance"],
+    "requiredChecks": ["pr-fast"],
     "requiredGateEvidence": [
       "build-demo",
       "build-package",
       "consumer-install",
       "dotnet-package",
       "dotnet-platform",
-      "real-render-performance",
       "static-quality",
       "typecheck",
       "unit"

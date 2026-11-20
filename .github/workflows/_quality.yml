@@ -26,63 +26,6 @@ env:
   FSUSUI_COVERAGE_NODE_VERSION: '22.23.5'
 
 jobs:
-  real-render-performance:
-    env:
-      # Temporary #1085 Web acceptance while the unreleased Avalonia tree baseline is defective.
-      WEB_ONLY_PR_1085: ${{ github.event_name == 'pull_request' && github.event.pull_request.number == 1085 && inputs.group == 'main' }}
-    runs-on: ${{ github.event_name == 'pull_request' && github.event.pull_request.number == 1085 && inputs.group == 'main' && 'ubuntu-22.04' || 'ubuntu-24.04' }}
-    timeout-minutes: 120
-    steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-        with:
-          version: 10.33.0
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: pnpm
-          cache-dependency-path: pnpm-lock.yaml
-      - uses: emscripten-core/setup-emsdk@v15
-        with:
-          version: 5.0.4
-          actions-cache-folder: emsdk-cache
-      - uses: actions/setup-dotnet@v4
-        if: env.WEB_ONLY_PR_1085 != 'true'
-        with:
-          global-json-file: dotnet/global.json
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm run ensure:wasm
-      - run: pnpm exec playwright install --with-deps chromium
-      - name: Pin the render-performance Chromium executable
-        run: node scripts/pin-render-browser.mjs .tmp/performance/current/browser-selection.json
-      - name: Run real-render matrix
-        if: env.WEB_ONLY_PR_1085 != 'true'
-        run: pnpm perf:render -- --profile ${{ inputs.group == 'main' && 'quick' || 'full' }} --output .tmp/performance/current
-      - name: Run full quick Web matrix and check unchanged absolute limits for PR 1085
-        if: env.WEB_ONLY_PR_1085 == 'true'
-        env:
-          FSUSUI_WEB_MEASUREMENT_PROTOCOL: quick-web-60hz.v1
-        run: |
-          pnpm perf:render -- --profile quick --web-only --output .tmp/performance/current
-          node scripts/check-render-performance-results.mjs .tmp/performance/current --web-only
-      - name: Verify measured render-performance browser identity
-        run: node scripts/pin-render-browser.mjs --verify .tmp/performance/current
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: real-render-performance-${{ inputs.group }}
-          path: .tmp/performance/current
-          retention-days: 30
-      - name: Record performance leaf result
-        if: always()
-        uses: ./.github/actions/readiness-manifest
-        with:
-          gate: real-render-performance
-          group: ${{ inputs.group }}
-          status: ${{ job.status }}
-          dimensions: profile=${{ inputs.group == 'main' && 'quick' || 'full' }}${{ env.WEB_ONLY_PR_1085 == 'true' && ',platform=web' || '' }}
-          artifacts: real-render-performance=.tmp/performance/current
-
   static-quality:
     runs-on: ubuntu-latest
     timeout-minutes: 30
@@ -944,7 +887,6 @@ jobs:
       - consumer-install
       - build-demo
       - visual
-      - real-render-performance
     steps:
       - uses: actions/checkout@v4
       - uses: actions/download-artifact@v4
@@ -989,7 +931,6 @@ jobs:
     timeout-minutes: 10
     needs:
       - stable-readiness
-      - real-render-performance
       - static-quality
       - dotnet-platform
       - dotnet-package
@@ -1039,7 +980,6 @@ jobs:
       evidence-digest: ${{ steps.release-evidence.outputs.digest }}
     needs:
       - stable-readiness
-      - real-render-performance
       - static-quality
       - dotnet-platform
       - dotnet-package

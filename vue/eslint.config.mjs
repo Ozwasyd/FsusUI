@@ -194,21 +194,6 @@ export default [
   },
 
   {
-    files: ['scripts/web-render-performance.mjs'],
-    languageOptions: {
-      globals: {
-        DOMParser: 'readonly',
-        Element: 'readonly',
-        Range: 'readonly',
-        ShadowRoot: 'readonly',
-      },
-    },
-    rules: {
-      'no-setter-return': 'off',
-    },
-  },
-
-  {
     files: [
       'scripts/deterministic-render-evidence.mjs',
       'tests/conformance-v2-evidence.test.mjs',

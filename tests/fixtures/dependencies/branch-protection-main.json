@@ -1,7 +1,7 @@
 {
   "required_status_checks": {
     "strict": true,
-    "contexts": ["pr-fast", "pr-real-render-performance"]
+    "contexts": ["pr-fast"]
   },
   "required_pull_request_reviews": null
 }

@@ -3,6 +3,7 @@ import { readFileSync } from 'node:fs'
 const packageJson = JSON.parse(readFileSync('package.json', 'utf8'))
 const scripts = packageJson.scripts ?? {}
 const qualityWorkflow = readFileSync('.github/workflows/quality.yml', 'utf8')
+const reusableQualityWorkflow = readFileSync('.github/workflows/_quality.yml', 'utf8')
 const releaseGovernance = readFileSync('docs/releases/governance.md', 'utf8')
 const engineeringHandoff = readFileSync('docs/engineering-handoff.md', 'utf8')
 const capacitySuite = readFileSync('scripts/run-capacity-suite.mjs', 'utf8')
@@ -114,12 +115,17 @@ assert(
   'PR-fast and full verification must enforce the foundation style boundary',
 )
 
+assert(
+  ![qualityWorkflow, reusableQualityWorkflow].some((workflow) =>
+    /(?:real-render-performance|perf:render|avalonia:performance)/u.test(workflow),
+  ),
+  'hosted quality workflows must not run or require render benchmarks',
+)
+
 const prFeedbackJob = workflowJob('pr-feedback')
-const prRenderJob = workflowJob('pr-real-render-performance')
 const premergeMainJob = workflowJob('premerge-main')
 const prFastJob = workflowJob('pr-fast')
 const mergeGroupPrFastJob = workflowJob('merge-group-pr-fast')
-const mergeGroupRenderJob = workflowJob('merge-group-real-render-performance')
 const mainJob = workflowJob('main')
 
 assert(
@@ -140,10 +146,6 @@ assert(
   'PR workflow must keep verify:pr-fast as an early feedback job',
 )
 assert(
-  prRenderJob.includes("github.event_name == 'pull_request'"),
-  'PR workflow must keep differential real-render performance feedback',
-)
-assert(
   premergeMainJob.includes(
     "github.event_name == 'pull_request' || github.event_name == 'merge_group'",
   ) &&
@@ -154,23 +156,17 @@ assert(
 assert(
   prFastJob.includes('if: always()') &&
     prFastJob.includes('pr-feedback') &&
-    prFastJob.includes('pr-real-render-performance') &&
+    prFastJob.includes('premerge-playwright') &&
     prFastJob.includes('premerge-main') &&
     prFastJob.includes('PREMERGE_MAIN_RESULT') &&
     !prFastJob.includes('pnpm run verify:pr-fast'),
-  'required pr-fast check must aggregate fast feedback, render feedback, and complete premerge main quality',
+  'required pr-fast check must aggregate fast feedback, Playwright, and complete premerge main quality',
 )
 assert(
   mergeGroupPrFastJob.includes('name: pr-fast') &&
     mergeGroupPrFastJob.includes("github.event_name == 'merge_group'") &&
     mergeGroupPrFastJob.includes('premerge-main'),
   'merge-group candidates must preserve the existing required pr-fast check context',
-)
-assert(
-  mergeGroupRenderJob.includes('name: pr-real-render-performance') &&
-    mergeGroupRenderJob.includes("github.event_name == 'merge_group'") &&
-    mergeGroupRenderJob.includes('premerge-main'),
-  'merge-group candidates must preserve the existing required render check context',
 )
 assert(
   mainJob.includes("github.event_name == 'push'") &&

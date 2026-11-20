@@ -1,7 +1,7 @@
 using Avalonia;
 using FsusUI.Avalonia.Controls;
 
-namespace FsusUI.Avalonia.PerformanceTests;
+namespace FsusUI.Avalonia.Tests.Controls;
 
 public class FsusVirtualizationBudgetTests
 {

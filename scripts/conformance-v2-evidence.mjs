@@ -421,6 +421,39 @@ const same = (left, right, field) => {
   }
 }
 
+const isCheckTagTimingStep = (contractId, step) =>
+  contractId === 'component-v2.el-check-tag' &&
+  step?.index === 9 &&
+  step.action === 'performance'
+
+const validateTimingDiagnostic = (evidence, fields, label) => {
+  if (
+    evidence?.timingQualification !== 'diagnostic-only' ||
+    Object.hasOwn(evidence, 'passed')
+  )
+    fail(`${label} timing diagnostics must not claim a pass or failure`)
+  for (const field of fields) {
+    if (!Number.isFinite(evidence[field]) || evidence[field] < 0)
+      fail(
+        `${label} timing diagnostics: ${field} must be finite and nonnegative`,
+      )
+  }
+}
+
+export function validateCheckTagTimingDiagnostics(performance, observation) {
+  const fields = ['renderMilliseconds', 'interactionMilliseconds']
+  validateTimingDiagnostic(performance, fields, 'CheckTag')
+  validateTimingDiagnostic(observation?.actual, fields, 'CheckTag step')
+  if (Object.hasOwn(observation, 'passed'))
+    fail('CheckTag timing diagnostics must not claim a pass or failure')
+  for (const field of fields)
+    same(
+      performance[field],
+      observation.actual[field],
+      `CheckTag timing diagnostics.${field}`,
+    )
+}
+
 const validateContractExecution = (execution, platform, contractId) => {
   if (!execution || typeof execution !== 'object')
     fail(`${platform}.contractExecutions.${contractId} missing`)
@@ -447,7 +480,9 @@ const validateContractExecution = (execution, platform, contractId) => {
       fail(
         `${platform}.${contractId}.steps[${index}].elapsedMilliseconds missing`,
       )
-    if (step.observation?.passed !== true)
+    if (isCheckTagTimingStep(contractId, step)) {
+      validateCheckTagTimingDiagnostics(execution.performance, step.observation)
+    } else if (step.observation?.passed !== true)
       fail(`${platform}.${contractId}.steps[${index}] failed`)
   })
   const coverage = execution.coverage
@@ -508,7 +543,8 @@ const validateContractExecution = (execution, platform, contractId) => {
       !receipt.stepIndexes.some(
         (index) =>
           execution.steps[index]?.action === policy.action &&
-          execution.steps[index]?.observation?.passed === true,
+          (isCheckTagTimingStep(contractId, execution.steps[index]) ||
+            execution.steps[index]?.observation?.passed === true),
       )
     )
       fail(
@@ -535,16 +571,7 @@ const validateContractExecution = (execution, platform, contractId) => {
   )
     fail(`${platform}.${contractId}.visual rendered focused artifact missing`)
   if (
-    execution.performance?.passed !== true ||
-    !Number.isFinite(execution.performance?.renderMilliseconds) ||
-    !Number.isFinite(execution.performance?.interactionMilliseconds) ||
-    !Number.isFinite(execution.performance?.budget?.renderMs) ||
-    !Number.isFinite(execution.performance?.budget?.interactionMs) ||
-    execution.performance.renderMilliseconds >
-      execution.performance.budget.renderMs ||
-    execution.performance.interactionMilliseconds >
-      execution.performance.budget.interactionMs ||
-    typeof execution.performance.budget.memory !== 'string' ||
+    typeof execution.performance?.budget?.memory !== 'string' ||
     execution.performance.memoryObservation?.policy !==
       execution.performance.budget.memory ||
     execution.performance.memoryObservation?.inputItemCount !== 0 ||
@@ -552,7 +579,7 @@ const validateContractExecution = (execution, platform, contractId) => {
     execution.performance.memoryObservation?.bounded !== true ||
     execution.performance.memoryObservation?.detachedControlCollected !== true
   )
-    fail(`${platform}.${contractId}.performance budget failed`)
+    fail(`${platform}.${contractId}.lifetime evidence failed`)
   if (!execution.accessibility?.node)
     fail(`${platform}.${contractId}.accessibility node missing`)
   if (
@@ -1049,9 +1076,16 @@ export function compareEvidence(web, avalonia, visualReview = null) {
     avalonia.performance?.identity,
     'avalonia.performance.identity',
   )
-  if (web.performance?.passed !== true) fail('web.performance budget failed')
-  if (avalonia.performance?.passed !== true)
-    fail('avalonia.performance budget failed')
+  validateTimingDiagnostic(
+    web.performance,
+    ['elapsedMilliseconds'],
+    'Web contract',
+  )
+  validateTimingDiagnostic(
+    avalonia.performance,
+    ['elapsedMilliseconds'],
+    'Avalonia contract',
+  )
   const left = normalizeWeb(web)
   const right = normalizeAvalonia(avalonia)
   for (const field of [

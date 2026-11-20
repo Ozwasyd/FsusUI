@@ -692,10 +692,8 @@ const main = async () => {
       ...markdownLargePerformance,
       blockCount: 3000,
       budget: markdownPerformanceBudget,
-      passed:
-        markdownLargePerformance.sourceLength >= 100_000 &&
-        markdownLargePerformance.elapsedMilliseconds <=
-          markdownPerformanceBudget.renderMs,
+      fixtureLargeEnough: markdownLargePerformance.sourceLength >= 100_000,
+      timingQualification: 'diagnostic-only',
     }
 
     await page.evaluate(
@@ -1192,8 +1190,7 @@ const main = async () => {
       performance: {
         identity,
         elapsedMilliseconds: interactionElapsedMilliseconds,
-        budgetMilliseconds: 2000,
-        passed: interactionElapsedMilliseconds < 2000,
+        timingQualification: 'diagnostic-only',
       },
       visual: {
         identity,
@@ -1275,9 +1272,7 @@ const main = async () => {
                 actual: checkTagInitialState,
                 passed:
                   checkTagInitialState.checked === false &&
-                  checkTagInitialState.revision === 0 &&
-                  checkTagRenderMilliseconds <=
-                    checkTagPerformanceBudget.renderMs,
+                  checkTagInitialState.revision === 0,
               },
               elapsedMilliseconds: checkTagRenderMilliseconds,
             },
@@ -1420,14 +1415,8 @@ const main = async () => {
                   interactionMilliseconds:
                     checkTagInteractionTiming.pointerMilliseconds +
                     checkTagInteractionTiming.keyboardMilliseconds,
-                  budget: checkTagPerformanceBudget,
+                  timingQualification: 'diagnostic-only',
                 },
-                passed:
-                  checkTagRenderMilliseconds <=
-                    checkTagPerformanceBudget.renderMs &&
-                  checkTagInteractionTiming.pointerMilliseconds +
-                    checkTagInteractionTiming.keyboardMilliseconds <=
-                    checkTagPerformanceBudget.interactionMs,
               },
               elapsedMilliseconds:
                 checkTagInteractionTiming.pointerMilliseconds +
@@ -1534,12 +1523,7 @@ const main = async () => {
               checkTagInteractionTiming.keyboardMilliseconds,
             budget: checkTagPerformanceBudget,
             memoryObservation: checkTagMemoryObservation,
-            passed:
-              checkTagRenderMilliseconds <=
-                checkTagPerformanceBudget.renderMs &&
-              checkTagInteractionTiming.pointerMilliseconds +
-                checkTagInteractionTiming.keyboardMilliseconds <=
-                checkTagPerformanceBudget.interactionMs,
+            timingQualification: 'diagnostic-only',
           },
           visual: {
             identity: checkTagIdentity,

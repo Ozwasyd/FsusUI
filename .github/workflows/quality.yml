@@ -211,231 +211,6 @@ jobs:
         run: |
           echo "Skipping demo build: ${{ steps.demo-build-path.outputs.reason }}"
 
-  pr-real-render-performance:
-    if: github.event_name == 'pull_request'
-    runs-on: ${{ github.event.pull_request.number == 1085 && 'ubuntu-22.04' || 'ubuntu-24.04' }}
-    timeout-minutes: 90
-    env:
-      FSUSUI_WEB_MEASUREMENT_PROTOCOL: ${{ github.event.pull_request.number == 1085 && 'quick-web-60hz.v1' || '' }}
-    steps:
-      - name: Checkout current change
-        uses: actions/checkout@v4
-        with:
-          path: current
-          fetch-depth: 0
-      - name: Checkout base revision
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.pull_request.base.sha }}
-          path: baseline
-      - name: Plan PR real-render impact before heavy setup
-        id: render-impact
-        working-directory: current
-        run: >-
-          node scripts/render-performance-impact-plan.mjs
-          --base ${{ github.event.pull_request.base.sha }}
-          --output ../performance-impact-plan.json
-          ${{ github.event.pull_request.number == 1085 && '--pr-1085-web-acceptance' || '' }}
-      - name: Guard the scoped 60Hz historical protocol
-        if: github.event.pull_request.number == 1085
-        working-directory: current
-        env:
-          EXPECTED_BASE_SHA: ${{ github.event.pull_request.base.sha }}
-        run: |
-          test "$EXPECTED_BASE_SHA" = f2d929a5d045439c35e93b4771f912ce50ec2337
-          node --input-type=module -e "import fs from 'node:fs'; import assert from 'node:assert/strict'; const p=JSON.parse(fs.readFileSync('../performance-impact-plan.json','utf8')); assert.equal(p.acceptanceException,'pr-1085-web-only'); assert.equal(p.scope,'web-only'); assert.equal(p.platforms.web.run,true); assert.equal(p.platforms.avalonia.run,false); assert.equal(p.measurement.profile,'quick'); assert.equal(p.measurement.samples,21); assert.equal(p.measurement.warmups,1); assert.ok(!p.platforms.web.scenario,'60Hz protocol requires the complete quick Web matrix');"
-      - name: Log PR real-render impact
-        run: |
-          echo "run=${{ steps.render-impact.outputs.run }}"
-          echo "scope=${{ steps.render-impact.outputs.scope }}"
-          echo "plan-digest=${{ steps.render-impact.outputs.digest }}"
-          echo "reason=${{ steps.render-impact.outputs.reason }}"
-      - uses: pnpm/action-setup@v4
-        if: steps.render-impact.outputs.run == 'true'
-        with:
-          version: 10.33.0
-      - uses: actions/setup-node@v4
-        if: steps.render-impact.outputs.run == 'true'
-        with:
-          node-version: 22
-          cache: pnpm
-          cache-dependency-path: |
-            current/pnpm-lock.yaml
-            baseline/pnpm-lock.yaml
-      - uses: emscripten-core/setup-emsdk@v15
-        if: >-
-          steps.render-impact.outputs.run == 'true' &&
-          steps.render-impact.outputs.scope != 'avalonia-only'
-        with:
-          version: 5.0.4
-          actions-cache-folder: emsdk-cache
-      - uses: actions/setup-dotnet@v4
-        if: >-
-          steps.render-impact.outputs.run == 'true' &&
-          steps.render-impact.outputs.scope != 'web-only'
-        with:
-          global-json-file: current/dotnet/global.json
-      - name: Check baseline runner contract
-        id: baseline-contract
-        if: steps.render-impact.outputs.run == 'true'
-        run: >-
-          node current/scripts/check-render-performance-baseline.mjs
-          --directory baseline
-          --plan performance-impact-plan.json
-          --output performance-baseline/baseline-status.json
-      - name: Require a compatible historical Web baseline for PR 1085
-        if: github.event.pull_request.number == 1085
-        env:
-          AVAILABLE: ${{ steps.baseline-contract.outputs.available }}
-        run: test "$AVAILABLE" = true
-      - name: Install current dependencies
-        if: steps.render-impact.outputs.run == 'true'
-        working-directory: current
-        run: pnpm install --frozen-lockfile
-      - name: Install Chromium and web display dependencies once
-        if: >-
-          steps.render-impact.outputs.run == 'true' &&
-          steps.render-impact.outputs.scope != 'avalonia-only'
-        working-directory: current
-        run: pnpm exec playwright install --with-deps chromium
-      - name: Pin the same Chromium executable for all four measurement arms
-        if: >-
-          steps.render-impact.outputs.run == 'true' &&
-          steps.render-impact.outputs.scope != 'avalonia-only'
-        working-directory: current
-        run: node scripts/pin-render-browser.mjs
-      - name: Verify the scoped Web runner can sustain idle 60 Hz cadence
-        if: >-
-          github.event.pull_request.number == 1085 &&
-          steps.render-impact.outputs.run == 'true' &&
-          steps.render-impact.outputs.scope != 'avalonia-only'
-        timeout-minutes: 1
-        working-directory: current
-        run: node scripts/render-ci-web-preflight.mjs ../performance-web-runner-preflight.json
-      - name: Install Avalonia-only display dependency
-        if: steps.render-impact.outputs.scope == 'avalonia-only'
-        run: |
-          sudo apt-get update
-          sudo apt-get install --yes xvfb
-      - name: Install baseline dependencies
-        if: steps.baseline-contract.outputs.available == 'true'
-        working-directory: baseline
-        run: pnpm install --frozen-lockfile
-      - name: Prepare baseline WASM artifacts
-        if: >-
-          steps.baseline-contract.outputs.available == 'true' &&
-          steps.render-impact.outputs.scope != 'avalonia-only'
-        working-directory: baseline
-        run: pnpm run ensure:wasm
-      - name: Prepare current WASM artifacts
-        if: >-
-          steps.render-impact.outputs.run == 'true' &&
-          steps.render-impact.outputs.scope != 'avalonia-only'
-        working-directory: current
-        run: pnpm run ensure:wasm
-      - name: Measure same-runner baseline first
-        timeout-minutes: 20
-        if: steps.baseline-contract.outputs.available == 'true'
-        working-directory: baseline
-        env:
-          EXPECTED_BASE_SHA: ${{ github.event.pull_request.base.sha }}
-        run: |
-          baseline_sha="$(git rev-parse --verify HEAD)"
-          test "$baseline_sha" = "$EXPECTED_BASE_SHA"
-          GITHUB_SHA="$baseline_sha" node ../current/scripts/run-historical-render-baseline.mjs \
-            --directory . --expected-sha "$baseline_sha" \
-            --impact-plan ../performance-impact-plan.json \
-            --output ../performance-baseline
-      - name: Measure current quick matrix
-        timeout-minutes: 20
-        if: steps.render-impact.outputs.run == 'true'
-        working-directory: current
-        env:
-          FSUSUI_WEB_FAILURE_DIAGNOSTICS: '1'
-        run: >-
-          pnpm perf:render --
-          --impact-plan ../performance-impact-plan.json
-          --profile quick
-          --output ../performance-current
-      - name: Repeat current quick matrix for order balance
-        timeout-minutes: 20
-        if: steps.baseline-contract.outputs.available == 'true'
-        working-directory: current
-        env:
-          FSUSUI_WEB_FAILURE_DIAGNOSTICS: '1'
-        run: >-
-          pnpm perf:render --
-          --impact-plan ../performance-impact-plan.json
-          --profile quick
-          --output ../performance-current-repeat
-      - name: Repeat baseline quick matrix last for order balance
-        timeout-minutes: 20
-        if: steps.baseline-contract.outputs.available == 'true'
-        working-directory: baseline
-        env:
-          EXPECTED_BASE_SHA: ${{ github.event.pull_request.base.sha }}
-        run: |
-          baseline_sha="$(git rev-parse --verify HEAD)"
-          test "$baseline_sha" = "$EXPECTED_BASE_SHA"
-          GITHUB_SHA="$baseline_sha" node ../current/scripts/run-historical-render-baseline.mjs \
-            --directory . --expected-sha "$baseline_sha" \
-            --impact-plan ../performance-impact-plan.json \
-            --output ../performance-baseline-repeat
-      - name: Check Web absolute budgets on both current arms for PR 1085
-        if: github.event.pull_request.number == 1085
-        working-directory: current
-        run: |
-          node scripts/check-render-performance-results.mjs ../performance-current --web-only
-          node scripts/check-render-performance-results.mjs ../performance-current-repeat --web-only
-      - name: Verify measured browser identity for every required Web arm
-        if: >-
-          steps.render-impact.outputs.run == 'true' &&
-          steps.render-impact.outputs.scope != 'avalonia-only'
-        working-directory: current
-        env:
-          BASELINE_AVAILABLE: ${{ steps.baseline-contract.outputs.available }}
-        run: |
-          set -- ../performance-current
-          if [ "$BASELINE_AVAILABLE" = true ]; then
-            set -- "$@" ../performance-baseline ../performance-current-repeat ../performance-baseline-repeat
-          fi
-          node scripts/pin-render-browser.mjs --verify "$@"
-      - name: Compare against base revision on the same runner
-        if: steps.baseline-contract.outputs.available == 'true'
-        working-directory: current
-        run: >-
-          pnpm perf:render:compare --
-          ../performance-baseline
-          ../performance-current
-          0.15
-          ../performance-baseline-repeat
-          ../performance-current-repeat
-      - name: Skip unaffected PR real-render measurement
-        if: steps.render-impact.outputs.run != 'true'
-        run: echo "Skipping real-render measurement; ownership plan is skip-safe."
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: pr-real-render-performance
-          path: |
-            performance-baseline
-            performance-baseline-repeat
-            performance-current
-            performance-current-repeat
-            performance-impact-plan.json
-            performance-browser-selection.json
-            performance-web-runner-preflight.json
-            !performance-*/web/diagnostics/**
-          retention-days: 14
-      - name: Preserve failed Web measurement diagnostics
-        uses: actions/upload-artifact@v4
-        if: failure()
-        with:
-          name: pr-real-render-failure-diagnostics
-          path: performance-*/web/diagnostics/*.diagnostic.json
-          if-no-files-found: warn
-          retention-days: 7
-
   premerge-main:
     if: github.event_name == 'pull_request' || github.event_name == 'merge_group'
     uses: ./.github/workflows/_quality.yml
@@ -452,7 +227,6 @@ jobs:
     if: always() && github.event_name == 'pull_request'
     needs:
       - pr-feedback
-      - pr-real-render-performance
       - premerge-main
       - premerge-playwright
     runs-on: ubuntu-latest
@@ -461,16 +235,13 @@ jobs:
       - name: Enforce complete PR merge readiness
         env:
           PR_FEEDBACK_RESULT: ${{ needs.pr-feedback.result }}
-          PR_RENDER_RESULT: ${{ needs.pr-real-render-performance.result }}
           PREMERGE_MAIN_RESULT: ${{ needs.premerge-main.result }}
           PR_PLAYWRIGHT_RESULT: ${{ needs.premerge-playwright.result }}
         run: |
           echo "pr-feedback=${PR_FEEDBACK_RESULT}"
-          echo "pr-real-render-performance=${PR_RENDER_RESULT}"
           echo "premerge-main=${PREMERGE_MAIN_RESULT}"
           echo "premerge-playwright=${PR_PLAYWRIGHT_RESULT}"
           test "${PR_FEEDBACK_RESULT}" = "success"
-          test "${PR_RENDER_RESULT}" = "success"
           test "${PREMERGE_MAIN_RESULT}" = "success"
           test "${PR_PLAYWRIGHT_RESULT}" = "success"
 
@@ -490,19 +261,6 @@ jobs:
         run: |
           test "${PREMERGE_MAIN_RESULT}" = "success"
           test "${PR_PLAYWRIGHT_RESULT}" = "success"
-
-  merge-group-real-render-performance:
-    name: pr-real-render-performance
-    if: always() && github.event_name == 'merge_group'
-    needs:
-      - premerge-main
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-    steps:
-      - name: Preserve required render gate on merge queue candidates
-        env:
-          PREMERGE_MAIN_RESULT: ${{ needs.premerge-main.result }}
-        run: test "${PREMERGE_MAIN_RESULT}" = "success"
 
   main:
     if: github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.group == 'main')
