@@ -162,6 +162,18 @@ export default {
       noCheckedFormat: '{total} items', // to be translated
       hasCheckedFormat: '{checked}/{total} checked', // to be translated
     },
+    imageViewer: {
+      close: 'Close',
+      previous: 'Previous image',
+      next: 'Next image',
+      title: 'Image preview',
+
+      zoomOut: 'Zoom out',
+      zoomIn: 'Zoom in',
+      toggleMode: 'Toggle image size',
+      rotateLeft: 'Rotate left',
+      rotateRight: 'Rotate right',
+    },
     image: {
       error: 'FAILED',
     },

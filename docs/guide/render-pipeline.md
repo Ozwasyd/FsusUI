@@ -212,15 +212,7 @@ Advanced:
 
 ## Real-browser verification
 
-`pnpm perf:render:web --profile quick` runs the #184
-`render-pipeline-monolithic`/`render-pipeline-cooperative` comparison in real
-Chromium with equal CPU work and records input-to-next-frame, long tasks,
-dropped frames, layout/paint, heap, and layers. The first simulates a
-non-yielding callback; the second uses scheduler continuations. Use
-`--baseline <summary.json>` for comparison; internal function timings do not
-replace page measurements.
-
-Issue #187's `virtual-window-index-legacy` and
+The retired real-render benchmark recorded historical results for issue #187. Its `virtual-window-index-legacy` and
 `virtual-window-index-incremental` scenarios use 100K input. On 2026-07-14,
 system Chrome at 60 Hz/DPR 1 with 2 warmups and 12 samples measured single-item
 frame-work p95 `19.2 ms` → `0.7 ms` and input-to-next-frame p95 `19.7 ms` →

@@ -61,6 +61,7 @@ export default defineComponent({
     'focusout',
     'focusout-prevented',
     'release-requested',
+    'focus-layer-change',
   ],
   setup(props, { emit }) {
     const restoreTarget = inject(focusRestoreTargetKey, null)
@@ -72,6 +73,7 @@ export default defineComponent({
     let focusableObserver: MutationObserver | undefined
     let trapGeneration = 0
     let trapActive = false
+    let lastLayerState: { active: boolean; paused: boolean } | undefined
 
     const { focusReason } = useFocusReason()
 
@@ -85,10 +87,24 @@ export default defineComponent({
       paused: false,
       pause() {
         this.paused = true
+        notifyLayerState()
       },
       resume() {
         this.paused = false
+        notifyLayerState()
       },
+    }
+
+    // Modal isolation observes this owner; it must not register another layer.
+    function notifyLayerState() {
+      const state = { active: trapActive, paused: focusLayer.paused }
+      if (
+        lastLayerState?.active === state.active &&
+        lastLayerState.paused === state.paused
+      )
+        return
+      lastLayerState = { ...state }
+      emit('focus-layer-change', state)
     }
 
     const onKeydown = (e: KeyboardEvent) => {
@@ -260,8 +276,8 @@ export default defineComponent({
       const trapContainer = unref(forwardRef)
       if (trapContainer) {
         trapActive = true
-        focusLayer.resume()
         focusableStack.push(focusLayer)
+        focusLayer.resume()
         const prevFocusedElement =
           pointerTarget?.isConnected && !trapContainer.contains(pointerTarget)
             ? pointerTarget
@@ -316,6 +332,7 @@ export default defineComponent({
       if (!trapActive) return
       trapActive = false
       const wasPaused = focusLayer.paused
+      notifyLayerState()
       focusableStack.remove(focusLayer)
       const trapContainer = unref(forwardRef)
 
@@ -350,6 +367,7 @@ export default defineComponent({
     }
 
     onMounted(() => {
+      notifyLayerState()
       if (props.trapped) {
         startTrap()
       }

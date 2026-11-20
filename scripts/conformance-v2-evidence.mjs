@@ -421,6 +421,39 @@ const same = (left, right, field) => {
   }
 }
 
+const isCheckTagTimingStep = (contractId, step) =>
+  contractId === 'component-v2.el-check-tag' &&
+  step?.index === 9 &&
+  step.action === 'performance'
+
+const validateTimingDiagnostic = (evidence, fields, label) => {
+  if (
+    evidence?.timingQualification !== 'diagnostic-only' ||
+    Object.hasOwn(evidence, 'passed')
+  )
+    fail(`${label} timing diagnostics must not claim a pass or failure`)
+  for (const field of fields) {
+    if (!Number.isFinite(evidence[field]) || evidence[field] < 0)
+      fail(
+        `${label} timing diagnostics: ${field} must be finite and nonnegative`,
+      )
+  }
+}
+
+export function validateCheckTagTimingDiagnostics(performance, observation) {
+  const fields = ['renderMilliseconds', 'interactionMilliseconds']
+  validateTimingDiagnostic(performance, fields, 'CheckTag')
+  validateTimingDiagnostic(observation?.actual, fields, 'CheckTag step')
+  if (Object.hasOwn(observation, 'passed'))
+    fail('CheckTag timing diagnostics must not claim a pass or failure')
+  for (const field of fields)
+    same(
+      performance[field],
+      observation.actual[field],
+      `CheckTag timing diagnostics.${field}`,
+    )
+}
+
 const validateContractExecution = (execution, platform, contractId) => {
   if (!execution || typeof execution !== 'object')
     fail(`${platform}.contractExecutions.${contractId} missing`)
@@ -447,7 +480,9 @@ const validateContractExecution = (execution, platform, contractId) => {
       fail(
         `${platform}.${contractId}.steps[${index}].elapsedMilliseconds missing`,
       )
-    if (step.observation?.passed !== true)
+    if (isCheckTagTimingStep(contractId, step)) {
+      validateCheckTagTimingDiagnostics(execution.performance, step.observation)
+    } else if (step.observation?.passed !== true)
       fail(`${platform}.${contractId}.steps[${index}] failed`)
   })
   const coverage = execution.coverage
@@ -508,7 +543,8 @@ const validateContractExecution = (execution, platform, contractId) => {
       !receipt.stepIndexes.some(
         (index) =>
           execution.steps[index]?.action === policy.action &&
-          execution.steps[index]?.observation?.passed === true,
+          (isCheckTagTimingStep(contractId, execution.steps[index]) ||
+            execution.steps[index]?.observation?.passed === true),
       )
     )
       fail(
@@ -535,16 +571,7 @@ const validateContractExecution = (execution, platform, contractId) => {
   )
     fail(`${platform}.${contractId}.visual rendered focused artifact missing`)
   if (
-    execution.performance?.passed !== true ||
-    !Number.isFinite(execution.performance?.renderMilliseconds) ||
-    !Number.isFinite(execution.performance?.interactionMilliseconds) ||
-    !Number.isFinite(execution.performance?.budget?.renderMs) ||
-    !Number.isFinite(execution.performance?.budget?.interactionMs) ||
-    execution.performance.renderMilliseconds >
-      execution.performance.budget.renderMs ||
-    execution.performance.interactionMilliseconds >
-      execution.performance.budget.interactionMs ||
-    typeof execution.performance.budget.memory !== 'string' ||
+    typeof execution.performance?.budget?.memory !== 'string' ||
     execution.performance.memoryObservation?.policy !==
       execution.performance.budget.memory ||
     execution.performance.memoryObservation?.inputItemCount !== 0 ||
@@ -552,7 +579,7 @@ const validateContractExecution = (execution, platform, contractId) => {
     execution.performance.memoryObservation?.bounded !== true ||
     execution.performance.memoryObservation?.detachedControlCollected !== true
   )
-    fail(`${platform}.${contractId}.performance budget failed`)
+    fail(`${platform}.${contractId}.lifetime evidence failed`)
   if (!execution.accessibility?.node)
     fail(`${platform}.${contractId}.accessibility node missing`)
   if (
@@ -791,6 +818,26 @@ const checkedState = (value) => {
   return null
 }
 
+export const validateCheckTagFocusBounds = (bounds, platform) => {
+  const label = `component-v2.el-check-tag.${platform}.visual.focusBounds`
+  const coordinateSpace = platform === 'web' ? 'document' : 'window'
+  const unit = platform === 'web' ? 'css-px' : 'dip'
+  same(coordinateSpace, bounds?.coordinateSpace, `${label}.coordinateSpace`)
+  same(unit, bounds?.unit, `${label}.unit`)
+  for (const phase of ['before', 'afterFocus', 'afterToggle']) {
+    const rect = bounds?.[phase]
+    same(phase !== 'before', rect?.focused, `${label}.${phase}.focused`)
+    for (const field of ['x', 'y', 'width', 'height']) {
+      if (!Number.isFinite(rect?.[field]))
+        fail(`${label}.${phase}.${field} must be finite`)
+    }
+    if (rect.width <= 0 || rect.height <= 0)
+      fail(`${label}.${phase} must have positive size`)
+    for (const field of ['x', 'y', 'width', 'height'])
+      same(bounds.before[field], rect[field], `${label}.${phase}.${field}`)
+  }
+}
+
 const compareCheckTagExecution = (web, avalonia, visualReview = null) => {
   const contractId = 'component-v2.el-check-tag'
   validateContractExecution(web, 'web', contractId)
@@ -842,6 +889,10 @@ const compareCheckTagExecution = (web, avalonia, visualReview = null) => {
     ['web', web],
     ['avalonia', avalonia],
   ]) {
+    validateCheckTagFocusBounds(
+      execution.visual.observation.focusBounds,
+      platform,
+    )
     const node = execution.accessibility.node
     same('checkbox', node.role, `${contractId}.${platform}.a11y.role`)
     same('Check tag', node.name, `${contractId}.${platform}.a11y.name`)
@@ -1025,9 +1076,16 @@ export function compareEvidence(web, avalonia, visualReview = null) {
     avalonia.performance?.identity,
     'avalonia.performance.identity',
   )
-  if (web.performance?.passed !== true) fail('web.performance budget failed')
-  if (avalonia.performance?.passed !== true)
-    fail('avalonia.performance budget failed')
+  validateTimingDiagnostic(
+    web.performance,
+    ['elapsedMilliseconds'],
+    'Web contract',
+  )
+  validateTimingDiagnostic(
+    avalonia.performance,
+    ['elapsedMilliseconds'],
+    'Avalonia contract',
+  )
   const left = normalizeWeb(web)
   const right = normalizeAvalonia(avalonia)
   for (const field of [

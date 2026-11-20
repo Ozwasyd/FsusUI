@@ -39,7 +39,7 @@ const plan = {
   })),
   canonicalPackage: {
     os: 'linux',
-    runner: 'ubuntu-latest',
+    runner: 'ubuntu-22.04',
     command: 'pnpm dotnet:package:verify',
     owns: [
       'restore',

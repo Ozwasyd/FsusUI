@@ -1,22 +1,30 @@
 #!/usr/bin/env node
 import assert from 'node:assert/strict'
 import { createRequire } from 'node:module'
-import { readFileSync } from 'node:fs'
+import {
+  mkdtempSync,
+  mkdirSync,
+  readFileSync,
+  rmSync,
+  writeFileSync,
+} from 'node:fs'
+import { execFileSync } from 'node:child_process'
+import { tmpdir } from 'node:os'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { auditModels } from './check-update-surface.mjs'
-import { buildExpectedUpdateSurface } from './update-surface-lib.mjs'
+import {
+  buildExpectedUpdateSurface,
+  listDockerDependencyFiles,
+} from './update-surface-lib.mjs'
 
 const require = createRequire(import.meta.url)
 const JSON5 = require('json5')
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
-const read = (relative) =>
-  readFileSync(path.join(root, relative), 'utf8')
+const read = (relative) => readFileSync(path.join(root, relative), 'utf8')
 const clone = (value) => structuredClone(value)
 
-const surface = JSON.parse(
-  read('config/dependencies/update-surface.json'),
-)
+const surface = JSON.parse(read('config/dependencies/update-surface.json'))
 const schema = JSON.parse(
   read('config/dependencies/update-surface.schema.json'),
 )
@@ -186,3 +194,50 @@ for (const candidate of fixture.negative) {
 console.log(
   `Renovate governance mutation contract passed: mutations=${mutations.length} positive=${fixture.positive.length} negative=${fixture.negative.length}.`,
 )
+
+// A CI-installed Emscripten tree must not become a repository dependency owner.
+const dockerFixture = mkdtempSync(path.join(tmpdir(), 'fsus-update-surface-'))
+try {
+  execFileSync('git', ['init', '--quiet', dockerFixture])
+  const write = (relative, content) => {
+    const file = path.join(dockerFixture, relative)
+    mkdirSync(path.dirname(file), { recursive: true })
+    writeFileSync(file, content)
+  }
+  write('.gitignore', '/emsdk-cache/\n')
+  write('Dockerfile', 'FROM node:22\n')
+  execFileSync('git', ['-C', dockerFixture, 'add', 'Dockerfile'])
+  write(
+    'emsdk-cache/emsdk-main/docker/Dockerfile',
+    'FROM ubuntu:noble AS stage_build\n',
+  )
+  write('deploy/Dockerfile.worker', 'FROM node:22\n')
+  assert.deepEqual(
+    listDockerDependencyFiles(dockerFixture),
+    ['Dockerfile', 'deploy/Dockerfile.worker'],
+    'ignored toolchain files must not change the update surface; new source Dockerfiles still must',
+  )
+  execFileSync('git', [
+    '-C',
+    dockerFixture,
+    'add',
+    '-f',
+    'emsdk-cache/emsdk-main/docker/Dockerfile',
+  ])
+  assert.deepEqual(
+    listDockerDependencyFiles(dockerFixture),
+    [
+      'Dockerfile',
+      'deploy/Dockerfile.worker',
+      'emsdk-cache/emsdk-main/docker/Dockerfile',
+    ],
+    'a deliberately tracked source remains an owner even beneath an ignored directory',
+  )
+  rmSync(path.join(dockerFixture, 'Dockerfile'))
+  assert(
+    !listDockerDependencyFiles(dockerFixture).includes('Dockerfile'),
+    'a deleted tracked Dockerfile must not be read from a stale index entry',
+  )
+} finally {
+  rmSync(dockerFixture, { recursive: true, force: true })
+}

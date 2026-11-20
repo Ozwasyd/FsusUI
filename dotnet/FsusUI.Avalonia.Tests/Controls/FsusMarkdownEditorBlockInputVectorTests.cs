@@ -102,14 +102,23 @@ public class FsusMarkdownEditorBlockInputVectorTests
 
   private static string RepositoryRoot([CallerFilePath] string sourceFile = "")
   {
-    var directory = new DirectoryInfo(Path.GetDirectoryName(sourceFile) ?? string.Empty);
-    while (directory is not null)
-    {
-      if (File.Exists(Path.Combine(directory.FullName, "dotnet", "FsusUI.Avalonia.slnx")))
+    foreach (var candidate in new[]
       {
-        return directory.FullName;
+        Path.GetDirectoryName(sourceFile) ?? string.Empty,
+        Environment.CurrentDirectory,
+        AppContext.BaseDirectory,
+      }.Where(static value => !string.IsNullOrWhiteSpace(value))
+        .Distinct(StringComparer.Ordinal))
+    {
+      var directory = new DirectoryInfo(candidate);
+      while (directory is not null)
+      {
+        if (File.Exists(Path.Combine(directory.FullName, "dotnet", "FsusUI.Avalonia.slnx")))
+        {
+          return directory.FullName;
+        }
+        directory = directory.Parent;
       }
-      directory = directory.Parent;
     }
     throw new DirectoryNotFoundException("FsusUI repository root was not found.");
   }

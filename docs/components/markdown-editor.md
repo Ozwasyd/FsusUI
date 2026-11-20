@@ -174,6 +174,12 @@ authority. See the [heavy-feature lifecycle contract](../api/markdown-heavy-feat
 
 ## Command registry
 
+The overflow trigger is a normal-flow sibling of the horizontal primary-command scroller.
+Scrolling primary commands keeps the trigger reachable without horizontal sticky positioning
+or covering a command. It follows the toolbar during page scrolling; only the existing compact
+`editor-profile="prose"` toolbar has vertical sticky behavior. The tray keeps its command/action
+count, expanded state, and Escape focus return to the trigger.
+
 Every command surface consumes the same `MarkdownEditorCommand` registry. Commands use stable
 `key`, `label`, `group`, controlled icon tokens, shortcuts, and presentation targets;
 `when(context)` controls presentation and `enabled(context)` controls execution. `preview`
@@ -207,7 +213,10 @@ availability state, and pending/result authority.
 
 `surfaces.commandPalette`, `surfaces.selectionToolbar`, and `surfaces.slashMenu` are opt-in
 presentations. Palette search reads only command `label`, `description`, and `keywords`; visible
-copy comes from `localeText.commandPalette`. `Esc` in the selection toolbar or slash menu closes
+copy comes from `localeText.commandPalette`. In the palette search input,
+composing Enter stays with the input method: it does not execute a command or
+close the palette. After composition ends, ordinary Enter executes the
+available selected command once. `Esc` in the selection toolbar or slash menu closes
 the current surface, restores source focus, and retains source, selection, and history. The
 current projection/input context validates a slash trigger; execution merges the trigger range
 and command result into one revision-bound transaction, so it cannot delete the trigger first
@@ -436,6 +445,17 @@ an independent acceptance lane and is not replaced by these simulations.
 | embed-retry        | consumer 应重新解析指定 target/mode                          |
 
 ## Outline and writing aids
+
+`createMarkdownOutlineModel(source, documentIdentity, previousProjection)` from
+`@ozwasyd/element-plus` retains parser-recognized empty ATX headings, including
+bare `#` at end of line or end of file. Each empty item carries an
+`empty-heading` diagnostic bound to its stable `nodeId`. `sourceRange` includes
+the parser-owned whole heading; `contentRange` consumes parser content ranges
+and is collapsed at the opening marker end when there is no content. Consumers
+must render these diagnostics rather than deriving them from heading text.
+ATX headings may have zero to three leading spaces; four columns of indentation
+(including tabs) remain code. Blockquote parsing preserves container-relative
+tab stops and nested quote structure without rewriting fenced code payloads.
 
 `revealHeading(nodeId)` and `revealSourceRange(range)` use the current document identity,
 revision, and projection. On success, the component mounts the live virtual window containing

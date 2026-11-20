@@ -1,26 +1,26 @@
 {
   "schema": "fsusui-independent-ux-review.v1",
   "issue": 285,
-  "candidateSha": "102c57cade8e1c53b946ed6a46633db77a494a4d",
+  "candidateSha": "88e6063e3c2b904294ea5904ef66e8994c147015",
   "reviewMode": "read-only-rendered-evidence-inspection",
   "modifiedPaths": [],
   "productionFixture": true,
   "identity": {
-    "executionId": "conformance-v2-check-tag-102c57cade8e1c53b946ed6a46633db77a494a4d",
+    "executionId": "conformance-v2-check-tag-88e6063e3c2b904294ea5904ef66e8994c147015",
     "checkpoint": "check-tag-after-pointer-keyboard",
     "contract": "component-v2.el-check-tag",
     "scenario": "scenario.v2.el-check-tag.real-interaction-trace",
-    "contractHash": "3a95ea8bc348692efc892f79344684e878ceb323cbbcaf68133f21a4355bcf19",
-    "webBaselineHash": "9ed701881a2d41873ffe41ffb17c5257c6d1f33119822205ba0ef700e5806ab1",
-    "avaloniaBaselineHash": "acc27f78f6b45cb3d2bd3efa5b56f0e1583ef350c49c683f4c4a5211c48de229",
-    "runnerHash": "5f8d30bc360781bde14400afc72c08c4e61601efced09f07910642ad8a23cff5"
+    "contractHash": "5c9b38bcb43a7c53e06852c877d610339644df25906b333befc723b390cdfb25",
+    "webBaselineHash": "37ef61830b981a371dab4f05b3e476bb91a062a045ad736e52dbc9a73583572f",
+    "avaloniaBaselineHash": "3c7084d23f9897688cd6835761cde015e10766990ebc8082cc1c2ec8b6093687",
+    "runnerHash": "bad9abc8910c29bd5104e47fc7d693443a414d707776a55c043be5d1e0c0baf2"
   },
   "viewportStateMatrix": [
     {
       "platform": "web",
       "viewport": {
         "width": 88,
-        "height": 25
+        "height": 24
       },
       "state": "focused-unchecked-after-pointer-keyboard",
       "theme": "light",
@@ -28,8 +28,13 @@
       "locale": "zh-CN",
       "direction": "ltr",
       "motion": "reduced",
-      "inputModes": ["pointer", "keyboard", "screen-reader", "reduced-motion"],
-      "evidenceDigest": "ddd6712385f051a1950f30f1be7527740783996fd9cadd444d7ed0e251cf7f70"
+      "inputModes": [
+        "pointer",
+        "keyboard",
+        "screen-reader",
+        "reduced-motion"
+      ],
+      "evidenceDigest": "cede06e2196173842ec99b1422f4242f3d54c3afdbfa8d8c35da70bad3e55277"
     },
     {
       "platform": "avalonia",
@@ -49,7 +54,7 @@
         "automation-peer",
         "reduced-motion"
       ],
-      "evidenceDigest": "0049cc5dd7c175ace6d07507d1ddd40260a838ffd58b3b74c695ba5eae81fa7b"
+      "evidenceDigest": "3ae99ccd280405a7e7a0d1f622367ed017a4dc1819de8d3c59e427b6a2764cb0"
     }
   ],
   "inspectedRenderedArtifacts": [
@@ -58,10 +63,10 @@
       "platform": "web",
       "kind": "screenshot",
       "path": "tests/conformance/visual/artifacts/issue-285-check-tag/check-tag-web-focused-unchecked.png",
-      "digest": "ddd6712385f051a1950f30f1be7527740783996fd9cadd444d7ed0e251cf7f70",
-      "bytes": 1480,
+      "digest": "cede06e2196173842ec99b1422f4242f3d54c3afdbfa8d8c35da70bad3e55277",
+      "bytes": 1246,
       "width": 88,
-      "height": 25,
+      "height": 24,
       "inspected": true,
       "fixtureClass": "production"
     },
@@ -70,8 +75,8 @@
       "platform": "avalonia",
       "kind": "screenshot",
       "path": "tests/conformance/visual/artifacts/issue-285-check-tag/check-tag-avalonia-focused-unchecked.png",
-      "digest": "0049cc5dd7c175ace6d07507d1ddd40260a838ffd58b3b74c695ba5eae81fa7b",
-      "bytes": 10049,
+      "digest": "3ae99ccd280405a7e7a0d1f622367ed017a4dc1819de8d3c59e427b6a2764cb0",
+      "bytes": 9661,
       "width": 960,
       "height": 720,
       "inspected": true,
@@ -82,33 +87,37 @@
     {
       "id": "blue-focus-ring-visible",
       "status": "accepted",
-      "observation": "The Web crop shows the tag enclosed by a continuous blue focus ring on a light fill, and the Avalonia window shows the same tag outlined by a solid blue ring; the recorded ring pixel probe matched 164 of 180 sampled pixels to Scholarly Blue #2A599C within tolerance."
+      "observation": "Both original rendered screenshots show a visible blue focus ring; Avalonia reports 192/192 pixels matching #2A599C."
     },
     {
       "id": "no-black-default-adorner",
       "status": "accepted",
-      "observation": "Neither render shows a browser or native default black outline/adorner; the Avalonia probe recorded zero unexpected dark ring pixels and I saw no dark outline in either image."
+      "observation": "Neither image shows the black default focus adorner; the Avalonia perimeter probe reports zero unexpected dark pixels."
     },
     {
       "id": "unchecked-label-state-match",
       "status": "accepted",
-      "observation": "Both platforms show the full dark label \"Check tag\" on a light/white fill with no checked fill or checkmark, consistent with the observation records checked=false and focused=true on both executions."
+      "observation": "Both images read Check tag with the final unchecked state after pointer and keyboard input, revision 2, confirmed by browser and native accessibility evidence."
     },
     {
       "id": "focus-no-bounds-shift",
       "status": "accepted",
-      "observation": "The ring stays inside the tag rounded-rectangle bounds with no clipping at the crop edge, no overlap with the adjacent Avalonia runner controls (\"Run action\" header, trace textbox with \"Trace start\" caret), and no visible layout shift."
+      "observation": "The before-focus, after-focus and after-toggle samples have identical XYWH on each platform: Web (0,136,87.625,24 CSS px) and Avalonia (24,136,96,24 DIP); focus flags false, true, true."
     }
   ],
   "observations": [
-    "Two consecutive governed reruns produced identical Web and Avalonia raster digests, and independent read-only inspection confirmed the focused unchecked state, Scholarly Blue focus ring, complete label, and absence of a black adorner, clipping, overlap, or bounds shift.",
-    "Web artifact (88x25 production component crop, light theme): a single rounded-rectangle CheckTag with a continuous blue focus ring, pale background, and a dark centered label \"Check tag\" that is fully readable at this size; no clipping, no black default outline, no other elements in the crop.",
-    "Avalonia artifact (960x720 real non-headless window, light theme): the CheckTag renders with a white fill and a blue focus ring, alongside the harness \"Run action\" header and a trace textbox showing the \"Trace start\" caret; the tag carries the same focused-unchecked semantic as the Web render, with no black adorner, no overlap, and undisturbed surrounding controls.",
-    "Both platforms present the same focused-unchecked-after-pointer-keyboard semantics (label \"Check tag\", checked=false, focused=true, visible blue focus indicator); native renderer and viewport scope differ, so the agreement is semantic rather than pixel-geometric."
+    "Official GitHub Actions run 44775687022 AOT artifact 14649718499; verified archive SHA-256 7d694eec63bb35b31723f76d036c25dd3ce809d170a7626718d9e1d53221e169. Candidate 88e6063e3c2b904294ea5904ef66e8994c147015, clean source tree 042dac56bece01f7572c2f2139599b11cb850aac. Independent reviewer viewed both actual PNGs and verified original raw bindings without modifying either raw manifest.",
+    "Two original screenshot files are byte-for-byte identical to the independently opened hosted CheckTag images; current canonical packaging evidence was not used to generate this receipt.",
+    "Web raw SHA-256 9f5aae41a38fb5f83343eed99783665237610812cce03803eb30c6f1102767bc; Avalonia raw SHA-256 ec4b8dd052eef1142a965c9bad92eda0cec257b394b185e6b600253530c3b2ee. Same exact execution verifies nine functional steps per platform plus a separate diagnostic-only timing record.",
+    "Native verification SHA-256 a76555ad8f69fd99f3d8a8660cbb8fc9ab0da65144c36e5317ac16a7d093537a; Web AT-SPI raw SHA-256 194edb75b6728a36aa127338ea08c12bb3a15333ccd47e6acdc39afbdb2fbb6d; Web harness receipt SHA-256 e1543f4e366ea3f0c33353f53823855ea1b33916e641884d94058ae934f7a5f5. Chrome/147.0.7727.15 exposed the Check tag checkbox to Linux AT-SPI; Orca PID 7059. Focus and unchecked state are present in CDP and the real Avalonia AutomationPeer.",
+    "Web render/interaction 0.4000000001396984/2.7000000001862645 ms; Avalonia 2.9797/11.1183 ms, diagnostic-only. Both bounded lifetime probes report detachedControlCollected=true."
   ],
   "limitations": [
-    "This review is limited to the exact light/default/zh-CN/ltr/reduced artifacts and does not claim dark, mobile, zoom, or pixel equality coverage.",
-    "The Web artifact is a component crop and the Avalonia artifact is a full real window, so acceptance is qualitative and semantic rather than cross-platform geometry equality."
+    "Visual acceptance covers only the light/default/zh-CN/ltr/reduced-motion CheckTag checkpoint. This is not acceptance of the whole CI job, package, cross-renderer pixel equality, or timing.",
+    "Three separately recorded bounds checkpoints do not show intermediate frames. Browser operation timings and native timestamps are not a synchronized cross-platform timeline.",
+    "The AT-SPI checkbox is focusable but does not independently expose the focused state here; focus is confirmed by CDP and Avalonia AutomationPeer.",
+    "Orca process and AT-SPI registration are not a record of spoken output; NVDA and VoiceOver were not tested. Screenshots cannot independently prove the browser sandbox.",
+    "The unrelated Markdown editableName diagnostic was false. Bounded lifetime results cover only this fixture."
   ],
   "blockers": [],
   "status": "accepted"

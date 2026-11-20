@@ -28,13 +28,6 @@ public static class Program
       return;
     }
 
-    if (args.Contains("--render-performance", StringComparer.OrdinalIgnoreCase))
-    {
-      RenderPerformanceRunner.Configure(args);
-      BuildAvaloniaApp().StartWithClassicDesktopLifetime(args);
-      return;
-    }
-
     if (args.Contains("--smoke", StringComparer.OrdinalIgnoreCase))
     {
       _ = BuildAvaloniaApp();
@@ -63,24 +56,6 @@ public static class Program
       builder.With(new X11PlatformOptions
       {
         RenderingMode = [X11RenderingMode.Software],
-      });
-    }
-    else if ((RenderPerformanceRunner.IsConfigured || ConformanceV2Runner.IsConfigured) &&
-        RenderPerformanceRunner.UseSoftwareRendering &&
-        OperatingSystem.IsLinux())
-    {
-      builder.With(new X11PlatformOptions
-      {
-        RenderingMode = [X11RenderingMode.Software],
-      });
-    }
-    else if (RenderPerformanceRunner.IsConfigured &&
-             RenderPerformanceRunner.UseGpuRendering &&
-             OperatingSystem.IsLinux())
-    {
-      builder.With(new X11PlatformOptions
-      {
-        RenderingMode = [X11RenderingMode.Glx, X11RenderingMode.Egl, X11RenderingMode.Vulkan],
       });
     }
     return builder;

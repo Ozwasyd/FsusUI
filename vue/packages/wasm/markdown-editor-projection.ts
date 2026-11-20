@@ -278,7 +278,7 @@ export const createMarkdownEditorProjection = (
   }
 
   const sourceIdentity = resolveMarkdownSourceIdentity(rawSource)
-  const parserNodes = collectMarkdownSyntaxNodesFromParser(rawSource)
+  const parserNodes = collectMarkdownSyntaxNodesFromParser(normalizedSource)
   const directed = mergeMarkdownDirectiveSyntax(normalizedSource, parserNodes)
   const parserProjectionNodes = [...directed.nodes].sort((left, right) => {
     if (left.start !== right.start) return left.start - right.start

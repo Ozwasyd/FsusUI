@@ -159,7 +159,7 @@ public class FsusMarkdownEditorPageAndHistoryHeadlessTests
       DocumentIdentity: identity));
     var snapshot = store.CaptureHistory();
     Assert.Equal("hello world", snapshot.Value);
-    Assert.Equal(1, snapshot.Undo.Count);
+    Assert.Single(snapshot.Undo);
 
     Assert.False(new FsusMarkdownEditorTransactionStore(identity, "different").TryRestoreHistory(snapshot));
     Assert.False(

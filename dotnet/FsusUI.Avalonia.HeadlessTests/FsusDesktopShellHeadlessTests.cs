@@ -152,6 +152,7 @@ public class FsusDesktopShellHeadlessTests
 
     var firstKey = tabs.Documents[0].Key;
     tabs.SelectKey(firstKey);
+    Dispatcher.UIThread.RunJobs();
     Assert.True(tabs.Focus(NavigationMethod.Tab));
     window.KeyPress(Key.Tab, RawInputModifiers.Control, PhysicalKey.Tab, "\t");
     Assert.Equal(tabs.Documents[1].Key, tabs.SelectedKey);
@@ -163,6 +164,8 @@ public class FsusDesktopShellHeadlessTests
     Assert.Equal(firstKey, tabs.SelectedKey);
 
     var contextTarget = tabs.Documents[2];
+    contextTarget.BringIntoView();
+    Dispatcher.UIThread.RunJobs();
     Click(window, contextTarget, MouseButton.Right);
     Assert.Equal(contextTarget.Key, contextRequests[^1].Key);
     Assert.True(contextRequests[^1].AnchorBounds.Width > 0);

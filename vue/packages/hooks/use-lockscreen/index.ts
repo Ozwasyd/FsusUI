@@ -69,8 +69,8 @@ const acquireBodyLock = (hiddenCls: string, namespace: string) => {
   }
 
   if (lockState.count === 0) {
-    lockState.classAddedByUs = !hasClass(document.body, hiddenCls)
-    if (lockState.classAddedByUs) {
+    if (!hasClass(document.body, hiddenCls)) {
+      lockState.classAddedByUs = true
       addClass(document.body, hiddenCls)
     }
   }

@@ -25,7 +25,7 @@ overrides:
     allowedDeviation: low
     testPolicy: headless-interaction-and-local-platform-simulation
     owner: fsusui-core
-    reviewAfter: 2026-11-01
+    reviewAfter: 2027-02-28
     linkedIssues: [648]
   - id: avalonia-macos-native-menu-role-001
     area: interaction
@@ -39,5 +39,5 @@ overrides:
     allowedDeviation: low
     testPolicy: local-platform-role-simulation-and-native-menu-contract
     owner: fsusui-core
-    reviewAfter: 2026-11-01
+    reviewAfter: 2027-02-28
     linkedIssues: [649, 688]

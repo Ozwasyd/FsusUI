@@ -170,6 +170,7 @@ public sealed class FsusMessageService(FsusOverlayHost host)
 
 public sealed class FsusNotificationService(FsusOverlayHost host)
 {
+  internal Func<TimeSpan, Action, IDisposable>? ScheduleTimeout { get; init; }
   private readonly FsusOverlayHost host = host;
   private readonly List<FsusServiceHandle<FsusNotification>> activeNotifications = [];
 
@@ -188,6 +189,7 @@ public sealed class FsusNotificationService(FsusOverlayHost host)
 
     var notification = new FsusNotification
     {
+      ScheduleTimeout = ScheduleTimeout,
       Title = options.Title,
       Message = options.Message,
       Type = options.Type,
@@ -328,7 +330,8 @@ public class FsusNotification : ContentControl
   public static readonly StyledProperty<ICommand?> ActionCommandProperty =
     AvaloniaProperty.Register<FsusNotification, ICommand?>(nameof(ActionCommand));
 
-  private DispatcherTimer? timeoutTimer;
+  private IDisposable? timeoutTimer;
+  internal Func<TimeSpan, Action, IDisposable>? ScheduleTimeout { get; init; }
   private Button? actionButton;
   private Button? dismissButton;
   private bool isPointerOver;
@@ -516,22 +519,41 @@ public class FsusNotification : ContentControl
     }
 
     StopTimeout();
-    timeoutTimer = new DispatcherTimer { Interval = Duration };
-    timeoutTimer.Tick += OnTimeoutTick;
-    timeoutTimer.Start();
+    timeoutTimer = ScheduleTimeout is { } schedule
+      ? schedule(Duration, RaiseDismissRequested)
+      : new DispatcherTimeout(Duration, RaiseDismissRequested);
   }
 
   private void StopTimeout()
   {
     if (timeoutTimer is not null)
     {
-      timeoutTimer.Stop();
-      timeoutTimer.Tick -= OnTimeoutTick;
+      timeoutTimer.Dispose();
       timeoutTimer = null;
     }
   }
 
-  private void OnTimeoutTick(object? sender, EventArgs e) => RaiseDismissRequested();
+  private sealed class DispatcherTimeout : IDisposable
+  {
+    private readonly DispatcherTimer timer;
+    private readonly Action callback;
+
+    internal DispatcherTimeout(TimeSpan duration, Action callback)
+    {
+      this.callback = callback;
+      timer = new DispatcherTimer { Interval = duration };
+      timer.Tick += OnTick;
+      timer.Start();
+    }
+
+    private void OnTick(object? sender, EventArgs e) => callback();
+
+    public void Dispose()
+    {
+      timer.Stop();
+      timer.Tick -= OnTick;
+    }
+  }
 
   private bool IsInsideNamedButton(Control? source)
   {

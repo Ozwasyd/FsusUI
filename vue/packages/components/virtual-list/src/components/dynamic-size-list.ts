@@ -122,18 +122,20 @@ const hydrateCacheWithEstimatedHeights = async (
     return
   }
 
-  cache.items = {}
+  // Publish a complete estimate without writing each row through Vue's proxy.
+  const items: ListCache['items'] = {}
 
   let offset = 0
   for (let index = 0; index < measuredCount; index++) {
     const size = Math.max(1, Math.round(estimatedHeights[index]))
-    cache.items[index] = {
+    items[index] = {
       offset,
       size,
     }
     offset += size
   }
 
+  cache.items = items
   cache.estimatedItemSize = Math.max(1, Math.round(offset / measuredCount))
   cache.lastVisitedIndex = measuredCount - 1
   resetItemStyleCache(instance)

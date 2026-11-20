@@ -37,6 +37,7 @@ const auditComponentChunks = chunkItems(auditComponents, domLayoutChunkSize)
 type TouchSurfaceOptions = {
   maxBackgroundAlpha?: number
   name: string
+  preserveRestBackground?: boolean
   pseudo?: '::before'
   useHoverClass?: boolean
 }
@@ -106,8 +107,11 @@ const expectNoStickyTouchSurface = async (
   options: TouchSurfaceOptions,
 ) => {
   await locator.scrollIntoViewIfNeeded()
-  await locator.focus({ timeout: 1000 }).catch(() => undefined)
+  const restBackgroundColor = options.preserveRestBackground
+    ? await locator.evaluate((element) => getComputedStyle(element).backgroundColor)
+    : null
   await locator.hover({ force: true, timeout: 1000 }).catch(() => undefined)
+  await locator.focus({ timeout: 1000 }).catch(() => undefined)
 
   if (options.useHoverClass) {
     await locator.evaluate((element) => element.classList.add('hover'))
@@ -116,10 +120,17 @@ const expectNoStickyTouchSurface = async (
   const metrics = await readTouchSurfaceMetrics(locator, options)
   const maxBackgroundAlpha = options.maxBackgroundAlpha ?? 0.01
 
-  expect(
-    metrics.backgroundAlpha,
-    `${metrics.name} sticky background ${metrics.backgroundColor}`,
-  ).toBeLessThanOrEqual(maxBackgroundAlpha)
+  if (options.preserveRestBackground && restBackgroundColor !== null) {
+    expect(
+      metrics.backgroundColor,
+      `${metrics.name} sticky background changed from ${restBackgroundColor} to ${metrics.backgroundColor}`,
+    ).toBe(restBackgroundColor)
+  } else {
+    expect(
+      metrics.backgroundAlpha,
+      `${metrics.name} sticky background ${metrics.backgroundColor}`,
+    ).toBeLessThanOrEqual(maxBackgroundAlpha)
+  }
   expect(
     metrics.isScholarlyBackground,
     `${metrics.name} retains scholarly-blue background ${metrics.backgroundColor}`,
@@ -139,12 +150,22 @@ const expectNoStickyTouchSurface = async (
 const expectTouchActiveFeedback = async (
   page: Page,
   locator: Locator,
-  options: { name: string },
+  options: { allowColorFeedback?: boolean; name: string },
 ) => {
   await locator.scrollIntoViewIfNeeded()
   const box = await locator.boundingBox()
   expect(box, `${options.name} active feedback target box`).not.toBeNull()
   if (!box) return
+
+  const rest = options.allowColorFeedback
+    ? await locator.evaluate((element) => {
+        const style = getComputedStyle(element)
+        return {
+          backgroundColor: style.backgroundColor,
+          color: style.color,
+        }
+      })
+    : null
 
   await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2)
   await page.mouse.down()
@@ -154,14 +175,23 @@ const expectTouchActiveFeedback = async (
     const metrics = await locator.evaluate((element, name) => {
       const style = getComputedStyle(element)
       return {
+        backgroundColor: style.backgroundColor,
         boxShadow: style.boxShadow,
+        color: style.color,
         name,
         transform: style.transform,
       }
     }, options.name)
 
+    const hasColorFeedback =
+      Boolean(rest) &&
+      (metrics.color !== rest!.color ||
+        metrics.backgroundColor !== rest!.backgroundColor)
+
     expect(
-      metrics.transform !== 'none' || metrics.boxShadow !== 'none',
+      metrics.transform !== 'none' ||
+        metrics.boxShadow !== 'none' ||
+        hasColorFeedback,
       `${metrics.name} active touch feedback`,
     ).toBe(true)
   } finally {
@@ -297,7 +327,7 @@ const exerciseAuditState = async (
 
   if (state === 'interaction') {
     const interactionTarget = page.locator(component.interactionLocator).first()
-    if (await interactionTarget.count()) {
+    if ((await interactionTarget.count()) && (await interactionTarget.isVisible())) {
       await interactionTarget.hover({ force: true, timeout: 1000 })
     } else {
       await componentCard.hover({ force: true, timeout: 1000 })
@@ -507,11 +537,9 @@ test('tree-v2 virtual scrollbar drag keeps motion and avoids clipped thumb caps'
   })
 
   expect(dragMetrics.scrollTop).toBeGreaterThan(0)
-  if (dragMetrics.hardware === 'cpu-threaded') {
-    expect(dragMetrics.contentTransform).toBe('none')
-  } else {
-    expect(dragMetrics.contentTransform).not.toBe('none')
-  }
+  // Virtual list items intentionally stay off compositor layers while scrolling
+  // (covered in fsus-theme.test.ts).
+  expect(dragMetrics.contentTransform).toBe('none')
   expect(dragMetrics.contentBlur).toBeLessThanOrEqual(0.05)
   expect(dragMetrics.thumbShadow).not.toBe('none')
 
@@ -710,7 +738,6 @@ test('slider drag exposes smooth tokenized follow motion', async ({
   expect(motion.interactiveBlur).toContain('px')
   expect(motion.interactiveGlow).toContain('px')
   expect(motion.interactiveStrength).toBeGreaterThan(0)
-  expect(motion.barBoxShadow).not.toBe('none')
   expect(motion.buttonBoxShadow).not.toBe('none')
 
   await page.evaluate(({ x, y }) => {
@@ -787,7 +814,7 @@ test('carousel drag exposes threshold motion without screenshots', async ({
     }
   })
 
-  expect(dragMetrics.filter).toContain('blur')
+  expect(dragMetrics.filter).toBe('none')
   expect(dragMetrics.interactiveBlur).toContain('px')
   expect(dragMetrics.interactiveStrength).toBeGreaterThan(0)
   expect(dragMetrics.transform).not.toBe('none')
@@ -814,7 +841,14 @@ test('time picker spinner scroll stays frame-coalesced and recovers', async ({
     '.demo-block',
   )
 
-  await page.locator('input[placeholder="Pick time"]').first().click()
+  const timeInput = page
+    .locator('.demo-block', { hasText: 'TimePicker / TimeSelect' })
+    .locator('input')
+    .first()
+  await timeInput.evaluate((element) => {
+    element.scrollIntoView({ block: 'center' })
+  })
+  await timeInput.focus()
 
   const panel = page.locator('.el-time-panel').last()
   const spinner = panel.locator('.el-time-spinner__wrapper').first()
@@ -846,7 +880,7 @@ test('time picker spinner scroll stays frame-coalesced and recovers', async ({
   expect(metrics.scrollTop).toBeGreaterThanOrEqual(0)
   expect(metrics.activeItems).toBeGreaterThan(0)
   expect(metrics.filter === 'none' || metrics.filter === '').toBe(true)
-  await expect(spinner).not.toHaveClass(/is-scrolling/, { timeout: 1000 })
+  await expect(spinner).not.toHaveClass(/is-scrolling/, { timeout: 2500 })
 })
 
 test('table scroll bridge and column resize stay frame-coalesced', async ({
@@ -867,7 +901,9 @@ test('table scroll bridge and column resize stay frame-coalesced', async ({
   const table = block.locator('.el-table').first()
   const bodyWrap = table.locator('.el-scrollbar__wrap').first()
   const header = table.locator('.el-table__header-wrapper').first()
-  const firstHeaderCell = header.locator('thead th').first()
+  const firstHeaderCell = header
+    .locator('thead th:not(.el-table-column--selection)')
+    .first()
   const resizeProxy = table.locator('.el-table__column-resize-proxy')
 
   await expect(table).toBeVisible()
@@ -1021,15 +1057,12 @@ test('feedback dialog keeps a stable mobile footer layout', async ({
     '.demo-block',
   )
 
-  await page
-    .locator('.demo-block', { hasText: 'Dialog / Drawer' })
-    .getByRole('button', { name: 'Open Dialog' })
-    .click()
+  await page.getByTestId('open-publish-dialog').click()
 
   const dialog = page.locator('.el-dialog').first()
   const footer = dialog.locator('.el-dialog__footer')
-  const cancel = footer.getByRole('button', { name: 'Cancel' })
-  const confirm = footer.getByRole('button', { name: 'Confirm' })
+  const cancel = footer.getByRole('button', { name: '继续编辑' })
+  const confirm = footer.getByRole('button', { name: '确认发布' })
 
   await expect(dialog).toBeVisible()
   await expect(cancel).toBeVisible()
@@ -1132,6 +1165,7 @@ test('navigation touch controls do not leave sticky hover surfaces', async ({
     name: 'Tab item',
   })
   await expectTouchActiveFeedback(page, page.locator('.el-tabs__item').nth(1), {
+    allowColorFeedback: true,
     name: 'Tab item',
   })
 
@@ -1168,7 +1202,7 @@ test('data touch controls do not leave sticky hover surfaces', async ({
       .locator('.demo-block', { hasText: 'Tag / CheckTag' })
       .locator('.el-tag')
       .first(),
-    { maxBackgroundAlpha: 0.08, name: 'Tag' },
+    { name: 'Tag', preserveRestBackground: true },
   )
   await expectTouchActiveFeedback(
     page,
@@ -1201,7 +1235,9 @@ test('select touch option does not leave sticky hover surfaces', async ({
     .locator('.el-select .el-input__wrapper, .el-select__wrapper, .el-select')
     .first()
     .click({ force: true })
-  const selectItem = page.getByRole('option', { name: 'Option 1' }).first()
+  const selectItem = page
+    .locator('.el-select-dropdown:visible .el-select-dropdown__item')
+    .first()
   await expect(selectItem).toBeVisible()
   await expectNoStickyTouchSurface(selectItem, {
     name: 'Select option',

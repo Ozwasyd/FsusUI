@@ -440,9 +440,12 @@ test.describe('touch path', () => {
         await trigger.evaluate((element) => {
           const target = element as HTMLElement
           const container = target.closest<HTMLElement>(
+            '.el-markdown-editor__command-group',
+          )
+          const strip = container?.querySelector<HTMLElement>(
             '.el-markdown-editor__commands',
           )
-          if (!container) throw new Error('Command strip is not mounted')
+          if (!container || !strip) throw new Error('Command strip is not mounted')
           const targetRect = target.getBoundingClientRect()
           const containerRect = container.getBoundingClientRect()
           const left = Math.max(targetRect.left, containerRect.left, 0)
@@ -465,11 +468,11 @@ test.describe('touch path', () => {
               : null
 
           return {
-            clientWidth: container.clientWidth,
+            clientWidth: strip.clientWidth,
             directlyTappable:
               hit === target || (hit !== null && target.contains(hit)),
-            scrollLeft: container.scrollLeft,
-            scrollWidth: container.scrollWidth,
+            scrollLeft: strip.scrollLeft,
+            scrollWidth: strip.scrollWidth,
             targetHeight: targetRect.height,
             targetWidth: targetRect.width,
             viewport: {
@@ -507,7 +510,7 @@ test.describe('touch path', () => {
       const expandedTriggerReadability = await trigger.evaluate((element) => {
         const target = element as HTMLElement
         const container = target.closest<HTMLElement>(
-          '.el-markdown-editor__commands',
+          '.el-markdown-editor__command-group',
         )
         if (!container) throw new Error('Command strip is not mounted')
 

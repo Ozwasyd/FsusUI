@@ -28,6 +28,7 @@ import {
   consumerMatrixConfigDigest,
   projectConsumerPackage,
   readConsumerAuthority,
+  readConsumerVueVersions,
   resolveConsumerProfile,
   validateConsumerBuildEvidence,
 } from './consumer-matrix-lib.mjs'
@@ -413,6 +414,36 @@ function assertConsumerPerformanceGraph(graph) {
   )
   if (!markdownHydration) {
     throw new Error('Consumer graph lost the lazy Markdown hydration entry.')
+  }
+  const loaderKeys = Object.keys(graph.manifest).filter((key) =>
+    /\/wasm\/markdown-heavy-runtime-loaders\.mjs$/u.test(key),
+  )
+  if (
+    loaderKeys.length !== 1 ||
+    !graph.manifest[loaderKeys[0]]?.isDynamicEntry
+  ) {
+    throw new Error(
+      'Consumer heavy runtime loaders must have one dynamic entry.',
+    )
+  }
+  const loaderKey = loaderKeys[0]
+  const loaderFile = graph.manifest[loaderKey].file
+  if (
+    manifestClosureContainsFile(
+      graph.manifest,
+      graph.initialKeys,
+      loaderFile,
+    ) ||
+    manifestClosureContainsFile(
+      graph.manifest,
+      collectManifestClosure(graph.manifest, markdownHydration.key),
+      loaderFile,
+    ) ||
+    !hasDynamicManifestPath(graph.manifest, markdownHydration.key, loaderKey)
+  ) {
+    throw new Error(
+      'Consumer heavy runtime loaders must remain behind the hydration dynamic boundary.',
+    )
   }
   const gatewayKeys = Object.keys(graph.manifest).filter(
     isMarkdownFeatureOutputGatewayModule,
@@ -1011,20 +1042,7 @@ async function verifyPackedHeavyFrameRuntime() {
 }
 
 function assertDependencySingleton() {
-  const versions = Object.fromEntries(
-    ['vue', '@vue/compiler-dom', '@vue/shared'].map((id) => [
-      id,
-      installedVersion(id),
-    ]),
-  )
-  if (
-    versions.vue !== versions['@vue/compiler-dom'] ||
-    versions.vue !== versions['@vue/shared']
-  ) {
-    throw new Error(
-      `Consumer Vue runtime is not a compatible singleton: ${JSON.stringify(versions)}.`,
-    )
-  }
+  const versions = readConsumerVueVersions(fixtureRoot)
   const listArgs =
     packageManager === 'npm'
       ? ['ls', 'vue', '@vue/compiler-dom', '@vue/shared', '--all', '--json']

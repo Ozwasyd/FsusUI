@@ -1,8 +1,8 @@
 {
   "schema": "fsusui-design-conformance.ux-acceptance-receipt.v2",
-  "classificationReceiptDigest": "b5fead5f15e2634a1074abfa3a93fbc11a72e448bdea73ca0719ca7bbb0e55b8",
-  "candidateSha": "102c57cade8e1c53b946ed6a46633db77a494a4d",
-  "candidateDigest": "b049e4f6ad50e468bb8a729df4492f673632275cc36203987937ca0a9f5954ff",
+  "classificationReceiptDigest": "337fc43ff1579145a720ece5793898ff649150bd244e452a3f7cf896a49e5b5e",
+  "candidateSha": "88e6063e3c2b904294ea5904ef66e8994c147015",
+  "candidateDigest": "187263137624c5457184110ff7e377de5d085caa9cfcde2b813704f04780e379",
   "verificationClass": "ux-path",
   "requiredSkillDigests": [
     "c88357a6ba0340000bae5839daeb67a3cd2722e8242cf7e0148006c3610a44fe"
@@ -13,25 +13,34 @@
     "c5d43303e89931346f9d634dd592ecb54418d15a74ae923f72e52795a115544e",
     "0bd20f9ae6997aa9b7daeb0cec2f558738565bd0932828617aea2f5b84626042"
   ],
-  "activeBaselineIdentityDigest": "5d9888d74dafebcd791aaa3d367bf09d013f0a824f7afa31fe64c6e1f113cc38",
+  "activeBaselineIdentityDigest": "e233deb5c03383fa0b8ee520291148a38f068450ba2f1c283019de569ad73215",
   "domainPolicyDigest": "620c4f746c1f259e3b640044975ad2878b7913806038706f7991bee9d72104d3",
-  "independenceEvidenceDigest": "871060a63563e48a37ff4cfa08133080bd0ef826f5347ee98e9bb578ca8d14cc",
+  "independenceEvidenceDigest": "9b1cf44e49cd3c0d34403e3a7d7664da963f6e2f0c2e94d92cfbd82d57ef3ea4",
   "modifiedPaths": [],
   "productionFixture": true,
   "viewportStateMatrix": [
     {
-      "viewport": "88x25",
+      "viewport": "88x24",
       "state": "focused-unchecked-after-pointer-keyboard",
       "theme": "light",
-      "inputModes": ["pointer", "keyboard", "screen-reader", "reduced-motion"],
-      "evidenceDigest": "ddd6712385f051a1950f30f1be7527740783996fd9cadd444d7ed0e251cf7f70"
+      "inputModes": [
+        "pointer",
+        "keyboard",
+        "screen-reader",
+        "reduced-motion"
+      ],
+      "evidenceDigest": "cede06e2196173842ec99b1422f4242f3d54c3afdbfa8d8c35da70bad3e55277"
     },
     {
       "viewport": "960x720",
       "state": "focused-unchecked-after-pointer-keyboard",
       "theme": "light",
-      "inputModes": ["pointer", "keyboard", "reduced-motion"],
-      "evidenceDigest": "0049cc5dd7c175ace6d07507d1ddd40260a838ffd58b3b74c695ba5eae81fa7b"
+      "inputModes": [
+        "pointer",
+        "keyboard",
+        "reduced-motion"
+      ],
+      "evidenceDigest": "3ae99ccd280405a7e7a0d1f622367ed017a4dc1819de8d3c59e427b6a2764cb0"
     }
   ],
   "inspectedRenderedArtifacts": [
@@ -39,7 +48,7 @@
       "id": "check-tag-web-focused-unchecked",
       "kind": "screenshot",
       "path": "tests/conformance/visual/artifacts/issue-285-check-tag/check-tag-web-focused-unchecked.png",
-      "digest": "ddd6712385f051a1950f30f1be7527740783996fd9cadd444d7ed0e251cf7f70",
+      "digest": "cede06e2196173842ec99b1422f4242f3d54c3afdbfa8d8c35da70bad3e55277",
       "inspected": true,
       "fixtureClass": "production"
     },
@@ -47,12 +56,12 @@
       "id": "check-tag-avalonia-focused-unchecked",
       "kind": "screenshot",
       "path": "tests/conformance/visual/artifacts/issue-285-check-tag/check-tag-avalonia-focused-unchecked.png",
-      "digest": "0049cc5dd7c175ace6d07507d1ddd40260a838ffd58b3b74c695ba5eae81fa7b",
+      "digest": "3ae99ccd280405a7e7a0d1f622367ed017a4dc1819de8d3c59e427b6a2764cb0",
       "inspected": true,
       "fixtureClass": "production"
     }
   ],
   "blockers": [],
   "status": "accepted",
-  "receiptDigest": "e5d80bca432517afb0f9b7d1c233b50d1f11f2bdfad2d0cd0ce5d145c39a0837"
+  "receiptDigest": "5bed113843d8ae2d6b97ec190e5ea025a896939e4a6ed09308d21a9426e64b7e"
 }

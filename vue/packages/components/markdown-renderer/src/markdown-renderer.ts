@@ -74,3 +74,27 @@ export const markdownRendererProps = buildProps({
 export type MarkdownRendererProps = ExtractPropTypes<
   typeof markdownRendererProps
 >
+
+export interface MarkdownFragmentLocateResult {
+  readonly found: boolean
+  readonly mounted: boolean
+  readonly id: string
+  readonly fragment: string
+  readonly chunkIndex: number
+  readonly chunkKey: string | null
+  readonly element: HTMLElement | null
+}
+
+export interface MarkdownFragmentRevealOptions {
+  readonly behavior?: ScrollBehavior
+  readonly block?: ScrollLogicalPosition
+}
+
+export interface MarkdownFragmentRevealResult {
+  readonly ok: boolean
+  readonly id: string
+  readonly fragment: string
+  readonly chunkIndex: number
+  readonly chunkKey: string | null
+  readonly element: HTMLElement | null
+}

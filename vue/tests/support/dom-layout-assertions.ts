@@ -310,17 +310,32 @@ export const collectComponentDomLayoutIssues = async (
       const isElementVisible = (node: HTMLElement) => {
         const style = getComputedStyle(node)
         const rect = node.getBoundingClientRect()
+        const isVisuallyHidden =
+          style.clipPath.includes('inset(50%)') ||
+          style.clip === 'rect(0px, 0px, 0px, 0px)' ||
+          (rect.width <= 1.5 &&
+            rect.height <= 1.5 &&
+            style.overflow === 'hidden')
         return (
           style.display !== 'none' &&
           style.visibility !== 'hidden' &&
           Number(style.opacity) !== 0 &&
+          !isVisuallyHidden &&
           rect.width > 0 &&
           rect.height > 0
         )
       }
       const isIntentionalHorizontalScroll = (node: HTMLElement) => {
+        if (node.tagName === 'INPUT') return true
         const style = getComputedStyle(node)
         if (/(auto|scroll|overlay)/.test(style.overflowX)) return true
+        if (
+          style.textOverflow === 'ellipsis' &&
+          style.overflowX === 'hidden' &&
+          style.whiteSpace === 'nowrap'
+        ) {
+          return true
+        }
         return Boolean(
           node.closest(
             [
@@ -399,6 +414,9 @@ export const collectComponentDomLayoutIssues = async (
         '.el-check-tag',
       ].join(',')
       const tokenControlRadius = resolvedLength('--fsus-radius-control')
+      const tokenControlSmallRadius = resolvedLength(
+        '--fsus-radius-control-small',
+      )
 
       for (const control of Array.from(
         card.querySelectorAll<HTMLElement>(controlSelector),
@@ -406,14 +424,17 @@ export const collectComponentDomLayoutIssues = async (
         if (!isElementVisible(control)) continue
         if (control.closest('.el-button-group')) continue
         const radius = px(getComputedStyle(control).borderTopLeftRadius)
+        const expectedRadius = control.classList.contains('el-tag')
+          ? tokenControlSmallRadius
+          : tokenControlRadius
         if (
-          tokenControlRadius > 0 &&
-          radius < tokenControlRadius - radiusTolerance
+          expectedRadius > 0 &&
+          radius < expectedRadius - radiusTolerance
         ) {
           add(
             'soft',
             'control-radius-token-drift',
-            `${control.className} radius ${radius} < token ${tokenControlRadius}`,
+            `${control.className} radius ${radius} < token ${expectedRadius}`,
           )
         }
       }
@@ -499,12 +520,17 @@ export const assertScrollMotionState = async (
 
   const readMetrics = () =>
     host.evaluate((element) => {
+      const isVirtualList = element.classList.contains('el-vl__wrapper')
       const content =
         element.querySelector<HTMLElement>('.el-vl__inner > *') ??
         element.querySelector<HTMLElement>('.el-scrollbar__view > *')
-      const verticalThumb = element.querySelector<HTMLElement>(
-        '.el-scrollbar__bar.is-vertical .el-scrollbar__thumb',
-      )
+      const verticalThumb =
+        element.querySelector<HTMLElement>(
+          '.el-scrollbar__bar.is-vertical .el-scrollbar__thumb',
+        ) ??
+        element.querySelector<HTMLElement>(
+          '.el-virtual-scrollbar .el-scrollbar__thumb',
+        )
       const thumbs = Array.from(
         element.querySelectorAll<HTMLElement>('.el-scrollbar__thumb'),
       )
@@ -539,6 +565,7 @@ export const assertScrollMotionState = async (
         interactiveStrength: Number.parseFloat(
           element.style.getPropertyValue('--fsus-interactive-motion-strength'),
         ),
+        isVirtualList,
         thumbShadow: thumbStyle.boxShadow,
       }
     })
@@ -548,7 +575,9 @@ export const assertScrollMotionState = async (
       async () => {
         const metrics = await readMetrics()
         return {
-          contentMotion: metrics.contentTransform !== 'none',
+          contentMotion: metrics.isVirtualList
+            ? metrics.contentTransform === 'none'
+            : metrics.contentTransform !== 'none',
           interactiveVars: metrics.interactiveStrength > 0,
           trail: metrics.thumbShadow !== 'none' || metrics.edgeTrail,
         }

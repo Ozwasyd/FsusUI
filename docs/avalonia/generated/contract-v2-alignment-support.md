@@ -555,6 +555,8 @@ The sole source is the derived `fsusui.alignment.v2` artifact. Only `aligned` co
 | `FsusUI.Avalonia.Controls.FsusTreeNodeContextEventArgs` | `avalonia-extra` |
 | `FsusUI.Avalonia.Controls.FsusTreeNodeState` | `avalonia-extra` |
 | `FsusUI.Avalonia.Controls.FsusTreeNodeView` | `avalonia-extra` |
+| `FsusUI.Avalonia.Controls.FsusTreeRowContext` | `avalonia-extra` |
+| `FsusUI.Avalonia.Controls.FsusTreeRowPresenter` | `avalonia-extra` |
 | `FsusUI.Avalonia.Controls.FsusTreeSelectionChangedEventArgs` | `avalonia-extra` |
 | `FsusUI.Avalonia.Controls.FsusTreeSelectionMode` | `avalonia-extra` |
 | `FsusUI.Avalonia.Controls.FsusTreeTable` | `avalonia-extra` |

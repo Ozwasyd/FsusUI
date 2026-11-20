@@ -95,7 +95,10 @@ describe('<image-viewer /> keyboard and pointer scope', () => {
     await doubleWait()
     const viewer = wrapper.find('.el-image-viewer__wrapper')
     const vm = wrapper.vm as any
-    vm.loading = false
+    for (const img of wrapper.findAll('img')) {
+      Object.defineProperty(img.element, 'complete', { value: true })
+    }
+    await wrapper.find('img').trigger('load')
 
     document.dispatchEvent(new KeyboardEvent('keydown', { code: 'ArrowRight' }))
     await doubleWait()

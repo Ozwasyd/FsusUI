@@ -18,6 +18,17 @@ Use `limit` and `on-exceed` to replace an old file automatically when a new one 
 
 Set the file-list style with `list-type`: `text`, `picture`, or `picture-card`.
 
+`picture` rows keep the thumbnail and filename alongside named status feedback:
+pending, progress percentage, uploaded, or failed. Success uses an inline icon
+and text rather than a corner ribbon, and remains visible on hover, keyboard
+focus, and disabled rows. Preview and remove/cancel retain their existing public
+callbacks; remove/cancel stays visible and keyboard/touch reachable when enabled.
+On narrow screens, status and actions follow the thumbnail/name row.
+
+This differs from the legacy Element Plus picture success ribbon. No consumer
+slot or private style override is required. The `picture-card` action-bar layout
+is separate from this picture-row status behavior.
+
 ## Drag and Drop Upload
 
 Set `drag` to `true` to enable drag-and-drop upload.

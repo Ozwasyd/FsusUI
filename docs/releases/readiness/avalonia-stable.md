@@ -48,7 +48,7 @@ Required workflow artifacts:
 - `fsusui-npm-candidate` (tarball, SHA-256 sidecar, and candidate manifest)
 - `dotnet-platform-{linux,windows,macos}`
 - `dotnet-nuget-candidate`
-- `avalonia-aot-leaf-linux-x64`
+- `avalonia-aot-leaf-{main,nightly,release}-linux-x64 (canonical tiers); `avalonia-aot-leaf-pr-fast-linux-x64` is separate`
 - `avalonia-aot-readiness`
 - `avalonia-screenshots-*`
 - `avalonia-generated-artifacts`
