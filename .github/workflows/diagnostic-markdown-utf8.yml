@@ -16,7 +16,7 @@ env:
 jobs:
   validate:
     runs-on: ubuntu-22.04
-    timeout-minutes: 22
+    timeout-minutes: 28
     steps:
       - uses: actions/checkout@v4
         with:
@@ -66,7 +66,7 @@ jobs:
         with:
           version: 5.0.4
           actions-cache-folder: emsdk-cache
-      - name: Restore the exact locked toolchain and WASM
+      - name: Restore the exact locked toolchain and official test artifacts
         working-directory: product
         timeout-minutes: 12
         run: |
@@ -74,7 +74,8 @@ jobs:
           test "$(node --version)" = v22.23.5
           test "$(pnpm --version)" = 10.33.0
           pnpm install --frozen-lockfile
-          pnpm run ensure:wasm
+          pnpm run prepare:test-artifacts
+          pnpm run check:test-artifacts-ready
       - name: Run official Markdown renderer Vitest suite
         working-directory: product
         timeout-minutes: 4
