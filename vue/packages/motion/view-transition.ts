@@ -149,7 +149,7 @@ export const runViewTransition = (
     : undefined
   const previousActive = activeTransitions.get(targetDocument)
   const previousName = root.dataset.fsusViewTransition
-  const originalName = previousActive?.originalName ?? previousName
+  const originalName = previousActive ? previousActive.originalName : previousName
   if (transitionName) root.dataset.fsusViewTransition = transitionName
 
   if (previousActive) skipNativeTransition(previousActive.transition)

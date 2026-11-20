@@ -76,6 +76,9 @@ and z-index. Reduced/disabled modes and the system media query collapse their
 animation to `1ms`; product CSS needs no global `::view-transition-*` override.
 Temporary shared names are runtime-owned and must not be persisted in markup,
 URLs, storage, or application logs.
+When a named native transition is interrupted by another transition, the root
+`data-fsus-view-transition` attribute returns to its original value (including
+being absent), rather than retaining an interrupted transition's name.
 
 ```vue
 <template>

@@ -140,6 +140,37 @@ describe('View Transitions progressive enhancement', () => {
     )
   })
 
+  it('cleans an initially absent root name after overlapping named native transitions', async () => {
+    const transitions = installNativeTransition()
+    const first = runViewTransition(() => undefined, { name: 'first' })
+    const second = runViewTransition(() => undefined, { name: 'second' })
+
+    expect(transitions[0].skipTransition).toHaveBeenCalledTimes(1)
+    expect(document.documentElement.dataset.fsusViewTransition).toBe(
+      normalizeViewTransitionName('second'),
+    )
+    await Promise.all([first.finished, second.finished])
+    expect(document.documentElement.dataset.fsusViewTransition).toBeUndefined()
+  })
+
+  it('keeps an initially absent root name unset through repeated overlap and abort', async () => {
+    const transitions = installNativeTransition()
+    const first = runViewTransition(() => undefined, { name: 'first' })
+    const second = runViewTransition(() => undefined, { name: 'second' })
+    const controller = new AbortController()
+    const third = runViewTransition(() => undefined, {
+      name: 'third',
+      signal: controller.signal,
+    })
+    controller.abort()
+
+    expect(transitions[0].skipTransition).toHaveBeenCalledTimes(1)
+    expect(transitions[1].skipTransition).toHaveBeenCalledTimes(1)
+    expect(transitions[2].skipTransition).toHaveBeenCalledTimes(1)
+    await Promise.all([first.finished, second.finished, third.finished])
+    expect(document.documentElement.dataset.fsusViewTransition).toBeUndefined()
+  })
+
   it('skips the native snapshot when the page becomes hidden', async () => {
     const transitions = installNativeTransition()
     const visibility = vi
