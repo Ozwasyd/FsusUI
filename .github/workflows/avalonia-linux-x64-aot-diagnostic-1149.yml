@@ -16,12 +16,13 @@ jobs:
     env:
       EXPECTED_COMMIT_SHA: 0b2ddaa4d85a4ad576f80faf78752baef87cc15d
       EXPECTED_CANDIDATE_DIGEST: 91dfeee605d60622dfdcc721e57dbe3435c7b5851474511a7ea417d35808dc1a
-      NUGET_PACKAGES: ${{ runner.temp }}/fsus-aot1149/nuget
-      FSUSUI_AOT_TMPDIR: ${{ runner.temp }}/fsus-aot1149
       FSUSUI_AOT_CANDIDATE_ROOT: ${{ github.workspace }}/.dotnet-candidate/nuget
       FSUSUI_AOT_CANDIDATE_MANIFEST: ${{ github.workspace }}/.dotnet-candidate/package/manifest.json
       FSUSUI_AOT_EVIDENCE_OUT: ${{ github.workspace }}/.avalonia-aot-leaf/linux-x64
     steps:
+      - name: Initialize isolated directories
+        run: |
+          printf 'NUGET_PACKAGES=%s/fsus-aot1149/nuget\nFSUSUI_AOT_TMPDIR=%s/fsus-aot1149\n' "$RUNNER_TEMP" "$RUNNER_TEMP" >> "$GITHUB_ENV"
       - uses: actions/checkout@v4
         with:
           ref: 0b2ddaa4d85a4ad576f80faf78752baef87cc15d
