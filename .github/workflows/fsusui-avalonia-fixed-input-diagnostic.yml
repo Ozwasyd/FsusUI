@@ -1,0 +1,82 @@
+name: FsusUI Avalonia fixed-list and input diagnostic
+
+on:
+  push:
+    branches:
+      - codex/fsusui-avalonia-isolated-performance
+    paths:
+      - .github/workflows/fsusui-avalonia-fixed-input-diagnostic.yml
+      - scripts/run-avalonia-fixed-input-abba.mjs
+
+permissions:
+  contents: read
+
+concurrency:
+  group: fsusui-avalonia-fixed-input-diagnostic
+  cancel-in-progress: false
+
+jobs:
+  avalonia-fixed-input-diagnostic:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 30
+    env:
+      BASE_SHA: f2d929a5d045439c35e93b4771f912ce50ec2337
+      CANDIDATE_SHA: fb79db65599f231abea4fa68552953b825456fc0
+      DOTNET_CLI_TELEMETRY_OPTOUT: '1'
+      AVALONIA_TELEMETRY_OPTOUT: '1'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: controller
+          persist-credentials: false
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ env.BASE_SHA }}
+          path: baseline
+          persist-credentials: false
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ env.CANDIDATE_SHA }}
+          path: candidate
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: candidate/dotnet/global.json
+      - name: Verify the pinned SDK and actual application runtime
+        working-directory: candidate/dotnet
+        run: |
+          mkdir -p "$GITHUB_WORKSPACE/native-diagnostic-environment"
+          test "$(dotnet --version)" = "10.0.401"
+          dotnet --list-runtimes | tee "$GITHUB_WORKSPACE/native-diagnostic-environment/dotnet-runtimes.txt"
+          grep -q '^Microsoft.NETCore.App 10\.0\.15 ' "$GITHUB_WORKSPACE/native-diagnostic-environment/dotnet-runtimes.txt"
+          dotnet --info > "$GITHUB_WORKSPACE/native-diagnostic-environment/dotnet-info.txt"
+          printf '%s\n' "ImageOS=${ImageOS:-unknown}" "ImageVersion=${ImageVersion:-unknown}" > "$GITHUB_WORKSPACE/native-diagnostic-environment/runner-image.txt"
+      - name: Ensure native display and font dependencies are present
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes xvfb xauth libfontconfig1 libx11-6 libx11-xcb1 libxcb1 libgl1 libice6 libsm6 libxext6 libxrender1 fonts-liberation
+          command -v xvfb-run
+          fc-match "Noto Sans CJK SC" > "$GITHUB_WORKSPACE/native-diagnostic-environment/font-match.txt"
+      - name: Verify diagnostic controller syntax
+        working-directory: controller
+        run: node --check scripts/run-avalonia-fixed-input-abba.mjs
+      - name: Compare fixed list and fresh/prefixed input without phase instrumentation
+        timeout-minutes: 25
+        working-directory: controller
+        run: |
+          node scripts/run-avalonia-fixed-input-abba.mjs \
+            --baseline "$GITHUB_WORKSPACE/baseline" \
+            --candidate "$GITHUB_WORKSPACE/candidate" \
+            --output "$GITHUB_WORKSPACE/native-fixed-input-diagnostic"
+      - name: Preserve raw fixed-list and input runs and diagnostic comparison
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: avalonia-fixed-input-diagnostic
+          path: |
+            native-diagnostic-environment/
+            native-fixed-input-diagnostic/
+          retention-days: 7
