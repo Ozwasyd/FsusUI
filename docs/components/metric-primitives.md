@@ -87,6 +87,11 @@ health semantics stay in the consuming app.
 Details are collapsed by default through native `details` / `summary`, so the
 toggle remains keyboard reachable.
 
+The details toggle and copy button and feedback labels use the nearest
+`ElConfigProvider` locale when no explicit label is provided. English text
+is used for any missing translation. Explicit `detail-label`, `label`,
+`copied-label`, and `error-label` props retain precedence.
+
 Inline actions use at least a 40×40px desktop target and a 44×44px mobile target.
 `FsusCopyableDetail` accepts `disabled`; the native button remains at full
 opacity while disabled colors and cursor tokens communicate the state. Inline
