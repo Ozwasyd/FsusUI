@@ -120,10 +120,33 @@ jobs:
       - name: Run unchanged isolated Native AOT smoke and negative controls
         timeout-minutes: 18
         working-directory: dotnet
+        env:
+          FSUSUI_KEEP_AOT_SMOKE: '1'
+          FSUSUI_AOT_DIAGNOSTIC: '1'
         run: |
           test "$(dotnet --version)" = 10.0.401
           xvfb-run -a -e /dev/stderr -s '-screen 0 1024x768x24 -nolisten tcp' \
             bash -euc 'timeout 10s /usr/bin/xdpyinfo -display "$DISPLAY" >/dev/null; exec node ../scripts/test-avalonia-aot-smoke.mjs'
+      - name: Collect failed native report
+        if: failure()
+        run: |
+          shopt -s nullglob
+          reports=("$FSUSUI_AOT_TMPDIR"/fsusui-native-aot-*/reports/smoke.json)
+          if (( ${#reports[@]} == 0 )); then
+            echo "::warning::Native fixture did not write a smoke report."
+            exit 0
+          fi
+          test "${#reports[@]}" -eq 1
+          test -f "${reports[0]}" && test ! -L "${reports[0]}"
+          mkdir -p "$RUNNER_TEMP/fsus-aot1149-failure"
+          cp -- "${reports[0]}" "$RUNNER_TEMP/fsus-aot1149-failure/smoke.json"
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: avalonia-linux-x64-aot-failure-report-1149
+          path: ${{ runner.temp }}/fsus-aot1149-failure/smoke.json
+          if-no-files-found: ignore
+          retention-days: 7
       - name: Validate exact native leaf identity
         run: >-
           node scripts/avalonia-aot-native.mjs validate-leaf
