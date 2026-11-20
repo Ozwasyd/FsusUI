@@ -1,0 +1,135 @@
+name: Avalonia Linux x64 Native AOT diagnostic 1149
+
+on:
+  push:
+    branches: [codex/avalonia-linux-x64-aot-diagnostic-1149]
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  avalonia-linux-x64-native-aot-diagnostic:
+    if: github.repository == 'Ozwasyd/FsusUI' && github.ref == 'refs/heads/codex/avalonia-linux-x64-aot-diagnostic-1149'
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    env:
+      EXPECTED_COMMIT_SHA: 0b2ddaa4d85a4ad576f80faf78752baef87cc15d
+      EXPECTED_CANDIDATE_DIGEST: 91dfeee605d60622dfdcc721e57dbe3435c7b5851474511a7ea417d35808dc1a
+      NUGET_PACKAGES: ${{ runner.temp }}/fsus-aot1149/nuget
+      FSUSUI_AOT_TMPDIR: ${{ runner.temp }}/fsus-aot1149
+      FSUSUI_AOT_CANDIDATE_ROOT: ${{ github.workspace }}/.dotnet-candidate/nuget
+      FSUSUI_AOT_CANDIDATE_MANIFEST: ${{ github.workspace }}/.dotnet-candidate/package/manifest.json
+      FSUSUI_AOT_EVIDENCE_OUT: ${{ github.workspace }}/.avalonia-aot-leaf/linux-x64
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: 0b2ddaa4d85a4ad576f80faf78752baef87cc15d
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24.22.2
+      - uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: dotnet/global.json
+      - uses: actions/download-artifact@v4
+        with:
+          artifact-ids: '14601078929'
+          merge-multiple: true
+          run-id: '44673608631'
+          repository: Ozwasyd/FsusUI
+          github-token: ${{ github.token }}
+          path: .dotnet-candidate
+      - name: Validate immutable package and restore canonical alignment
+        run: |
+          node --input-type=module - <<'JS'
+          import assert from 'node:assert/strict'
+          import { createHash } from 'node:crypto'
+          import { mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs'
+          import {
+            currentIdentity, readStableConsumerAuthority, validatePackageAlignmentBinding,
+          } from './scripts/avalonia-stable-readiness-lib.mjs'
+          const commit = process.env.EXPECTED_COMMIT_SHA
+          const digest = process.env.EXPECTED_CANDIDATE_DIGEST
+          assert.match(commit, /^[0-9a-f]{40}$/u)
+          assert.match(digest, /^[0-9a-f]{64}$/u)
+          const expected = currentIdentity({ requireCleanPackageInputs: true })
+          assert.equal(expected.candidate, commit)
+          const manifest = JSON.parse(readFileSync('.dotnet-candidate/package/manifest.json'))
+          assert.equal(manifest.kind, 'dotnet-package-candidate')
+          assert.equal(manifest.commitSha, commit)
+          assert.equal(manifest.candidateSha256, digest)
+          const feed = '.dotnet-candidate/nuget'
+          assert.equal(manifest.packages.length, 6)
+          assert.deepEqual(readdirSync(feed).sort(), manifest.packages.map(item => item.file).sort())
+          const packageDigest = createHash('sha256')
+          for (const item of manifest.packages) {
+            assert.match(item.file, /^FsusUI\.Avalonia(?:\.Icons|\.Themes)?\.[0-9A-Za-z.-]+\.s?nupkg$/u)
+            const bytes = readFileSync(feed + '/' + item.file)
+            const hash = createHash('sha256').update(bytes).digest('hex')
+            assert.equal(bytes.length, item.bytes)
+            assert.equal(hash, item.sha256)
+            packageDigest.update(item.file + '\0' + hash + '\n')
+          }
+          assert.equal(packageDigest.digest('hex'), digest)
+          const source = '.dotnet-candidate/package/contract-v2-alignment.json'
+          const bytes = readFileSync(source)
+          validatePackageAlignmentBinding(manifest.contractV2Alignment, bytes, { candidate: commit })
+          readStableConsumerAuthority({ alignmentPath: source, expected })
+          mkdirSync('.tmp/conformance-v2', { recursive: true })
+          writeFileSync('.tmp/conformance-v2/alignment.json', bytes, { flag: 'wx' })
+          JS
+      - name: Install hosted Linux Native AOT prerequisites
+        timeout-minutes: 5
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes clang zlib1g-dev xvfb
+      - name: Warm dependency cache for the exact consumer fixture
+        timeout-minutes: 8
+        run: |
+          test "$(uname -m)" = x86_64
+          mkdir -p "$NUGET_PACKAGES" "$FSUSUI_AOT_TMPDIR/warmup"
+          cp dotnet/global.json "$FSUSUI_AOT_TMPDIR/global.json"
+          cp tests/fixtures/avalonia-aot-smoke/FsusUI.Avalonia.AotSmoke.csproj "$FSUSUI_AOT_TMPDIR/warmup/"
+          python3 - <<'PY'
+          from pathlib import Path
+          import os
+          import xml.etree.ElementTree as ET
+          root = ET.Element('configuration')
+          sources = ET.SubElement(root, 'packageSources')
+          ET.SubElement(sources, 'clear')
+          ET.SubElement(sources, 'add', key='candidate', value=os.environ['FSUSUI_AOT_CANDIDATE_ROOT'])
+          ET.SubElement(sources, 'add', key='nuget.org', value='https://api.nuget.org/v3/index.json')
+          mappings = ET.SubElement(root, 'packageSourceMapping')
+          local = ET.SubElement(mappings, 'packageSource', key='candidate')
+          for package in ('FsusUI.Avalonia', 'FsusUI.Avalonia.Icons', 'FsusUI.Avalonia.Themes'):
+              ET.SubElement(local, 'package', pattern=package)
+          ET.SubElement(ET.SubElement(mappings, 'packageSource', key='nuget.org'), 'package', pattern='*')
+          ET.ElementTree(root).write(Path(os.environ['FSUSUI_AOT_TMPDIR']) / 'warmup' / 'NuGet.Config', encoding='utf-8')
+          PY
+          cd "$FSUSUI_AOT_TMPDIR/warmup"
+          test "$(dotnet --version)" = 10.0.401
+          dotnet restore FsusUI.Avalonia.AotSmoke.csproj \
+            --runtime linux-x64 -p:UseRidGraph=true \
+            --configfile NuGet.Config --packages "$NUGET_PACKAGES"
+      - name: Run unchanged isolated Native AOT smoke and negative controls
+        timeout-minutes: 18
+        working-directory: dotnet
+        run: |
+          test "$(dotnet --version)" = 10.0.401
+          node ../scripts/test-avalonia-aot-smoke.mjs
+      - name: Validate exact native leaf identity
+        run: >-
+          node scripts/avalonia-aot-native.mjs validate-leaf
+          --manifest .avalonia-aot-leaf/linux-x64/leaf-manifest.json
+          --commit-sha "$EXPECTED_COMMIT_SHA"
+          --candidate-digest "$EXPECTED_CANDIDATE_DIGEST"
+          --rid linux-x64
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: avalonia-linux-x64-aot-diagnostic-1149
+          path: .avalonia-aot-leaf/linux-x64
+          include-hidden-files: true
+          if-no-files-found: warn
+          retention-days: 7
