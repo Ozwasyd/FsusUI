@@ -132,7 +132,7 @@ jobs:
         run: |
           patch --fuzz=0 -p1 <<'DIAGNOSTIC_PATCH'
           diff --git a/scripts/test-avalonia-aot-smoke.mjs b/scripts/test-avalonia-aot-smoke.mjs
-          index 28530e9..dd4d801 100644
+          index 28530e9..7aae508 100644
           --- a/scripts/test-avalonia-aot-smoke.mjs
           +++ b/scripts/test-avalonia-aot-smoke.mjs
           @@ -60,6 +60,14 @@ const reportPath = path.join(temporaryRoot, 'reports/smoke.json')
@@ -269,6 +269,14 @@ jobs:
              const positive = execute(nativeBinary, smokeArguments(reportPath), {
                cwd: temporaryRoot,
                env: runtimeFreeEnvironment,
+          @@ -701,6 +750,7 @@ try {
+                 '--force',
+               ],
+               {
+          +      cwd: consumer,
+                 expectFailure: true,
+                 label: 'missing local FsusUI package',
+                 timeout: negativeControlTimeout,
           DIAGNOSTIC_PATCH
       - name: Run exact proposed locked Native AOT smoke and negative controls
         timeout-minutes: 18
