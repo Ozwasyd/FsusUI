@@ -1,0 +1,15 @@
+{
+  "schema": "fsusui.quick-web-driver-adaptation.v1",
+  "protocolDigest": "d36a8ee405bcb0884294a1bf3a2c1ae691c5c9c22e33b0304a007d3db79188c1",
+  "sourceSha256": "6c1d70347be01841c21eb53afaa9bec0190311225105714d648bfef63a0f1db8",
+  "effectiveSha256": "8184f9c3235e2437099c4cbb741a1fb17cad0aa658498d58de8f823233d984fb",
+  "sourceKind": "292-candidate",
+  "adaptedSha256": "c33b1c0c0eff81d22b662f54b2fd108b17e0bf24d5e98f2949f4d93467b139e6",
+  "productSha": "0a68d88fbc9d410129b2edc910243eb401b38e0d",
+  "productRoot": "/home/runner/work/FsusUI/FsusUI/current",
+  "playwrightEntry": "/home/runner/work/FsusUI/FsusUI/current/node_modules/@playwright/test/index.js",
+  "cadenceModule": "/home/runner/work/FsusUI/FsusUI/current/scripts/web-render-cadence.mjs",
+  "idleModule": "/home/runner/work/FsusUI/FsusUI/current/scripts/web-idle-cadence.mjs",
+  "idleHelperSha256": "f2463d789414dea4d8642e84e230a86d4b23ab9eb47dc51277903a803ef2a3f7",
+  "cadenceHelperSha256": "8382081035eab274e23f505a730c8bd1aea0f8a7c93b442d0a59d9c28f6723d5"
+}

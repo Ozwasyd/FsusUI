@@ -1,0 +1,115 @@
+name: FsusUI Web Markdown cold-render diagnostic
+
+on:
+  push:
+    branches:
+      - codex/fsusui-web-markdown-cold-diagnostic
+    paths:
+      - .github/workflows/fsusui-web-markdown-cold-diagnostic.yml
+      - .github/diagnostics/markdown-cold-1145/**
+
+permissions:
+  contents: read
+
+concurrency:
+  group: fsusui-web-markdown-cold-diagnostic
+  cancel-in-progress: false
+
+jobs:
+  web-markdown-cold-diagnostic:
+    if: github.repository == 'Ozwasyd/FsusUI'
+    runs-on: ubuntu-22.04
+    timeout-minutes: 30
+    env:
+      BASE_SHA: f2d929a5d045439c35e93b4771f912ce50ec2337
+      CANDIDATE_SHA: 358770e78f838943028775fb8125b286d17de127
+      CANDIDATE_TREE: 2142d45adb06a5954a7d4c9dd66b17e0312636a3
+      BLOCKS_PER_KIND: '4'
+      SEED: '1145'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: controller
+          persist-credentials: false
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ env.BASE_SHA }}
+          path: baseline
+          persist-credentials: false
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ env.CANDIDATE_SHA }}
+          path: candidate
+          persist-credentials: false
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.33.0
+          run_install: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.23.5'
+          cache: pnpm
+          cache-dependency-path: |
+            baseline/pnpm-lock.yaml
+            candidate/pnpm-lock.yaml
+      - uses: emscripten-core/setup-emsdk@v15
+        with:
+          version: 5.0.4
+          actions-cache-folder: emsdk-cache
+      - name: Verify exact worktrees and bundled diagnostic transform
+        working-directory: controller/.github/diagnostics/markdown-cold-1145
+        env:
+          FSUSUI_MARKDOWN_COLD_DIAGNOSTIC_ARCHIVE: archive
+        run: |
+          test "$(git -C "$GITHUB_WORKSPACE/baseline" rev-parse HEAD)" = "$BASE_SHA"
+          test "$(git -C "$GITHUB_WORKSPACE/candidate" rev-parse HEAD)" = "$CANDIDATE_SHA"
+          test "$(git -C "$GITHUB_WORKSPACE/candidate" rev-parse 'HEAD^{tree}')" = "$CANDIDATE_TREE"
+          test "$(node --version)" = v22.23.5
+          test "$(pnpm --version)" = 10.33.0
+          python3 -m unittest -v
+          mkdir -p "$GITHUB_WORKSPACE/web-markdown-cold-environment"
+          printf '%s\n' "ImageOS=${ImageOS:-unknown}" "ImageVersion=${ImageVersion:-unknown}" > "$GITHUB_WORKSPACE/web-markdown-cold-environment/runner-image.txt"
+          printf '%s\n' "$BASE_SHA" "$CANDIDATE_SHA" "$CANDIDATE_TREE" > "$GITHUB_WORKSPACE/web-markdown-cold-environment/sources.txt"
+          sha256sum archive/performance-current/web/measurement-effective.mjs > "$GITHUB_WORKSPACE/web-markdown-cold-environment/original-driver.sha256"
+      - name: Prepare exact historical Web runtime
+        working-directory: baseline
+        run: |
+          pnpm install --frozen-lockfile
+          pnpm run ensure:wasm
+      - name: Prepare exact candidate Web runtime
+        working-directory: candidate
+        run: |
+          pnpm install --frozen-lockfile
+          pnpm run ensure:wasm
+          pnpm exec playwright install --with-deps chromium
+      - name: Pin Chromium and check actual idle cadence
+        working-directory: candidate
+        timeout-minutes: 2
+        run: |
+          node scripts/pin-render-browser.mjs "$GITHUB_WORKSPACE/web-markdown-cold-environment/browser-selection.json"
+          export FSUSUI_PERF_BROWSER_EXECUTABLE
+          FSUSUI_PERF_BROWSER_EXECUTABLE="$(node -p "require(process.argv[1]).executable" "$GITHUB_WORKSPACE/web-markdown-cold-environment/browser-selection.json")"
+          node scripts/render-ci-web-preflight.mjs "$GITHUB_WORKSPACE/web-markdown-cold-environment/idle-cadence.json"
+      - name: Run all predetermined AB and AA blocks on this runner
+        working-directory: controller/.github/diagnostics/markdown-cold-1145
+        timeout-minutes: 18
+        run: |
+          python3 run.py \
+            --archive archive \
+            --baseline "$GITHUB_WORKSPACE/baseline" \
+            --candidate "$GITHUB_WORKSPACE/candidate" \
+            --helpers "$GITHUB_WORKSPACE/candidate/scripts" \
+            --playwright "$GITHUB_WORKSPACE/candidate/node_modules/@playwright/test/index.js" \
+            --chrome "$FSUSUI_PERF_BROWSER_EXECUTABLE" \
+            --blocks-per-kind "$BLOCKS_PER_KIND" \
+            --seed "$SEED" \
+            --out "$GITHUB_WORKSPACE/web-markdown-cold-results"
+      - name: Retain all cold and post-ready raw and partial runs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: web-markdown-cold-diagnostic
+          path: |
+            web-markdown-cold-environment/
+            web-markdown-cold-results/
+          retention-days: 7
