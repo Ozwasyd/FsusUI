@@ -217,7 +217,6 @@ jobs:
     timeout-minutes: 90
     env:
       FSUSUI_WEB_MEASUREMENT_PROTOCOL: ${{ github.event.pull_request.number == 1085 && 'quick-web-60hz.v1' || '' }}
-      FSUSUI_AVALONIA_MEASUREMENT_PROTOCOL: ${{ github.event.pull_request.number == 1085 && 'variable-list-layout-ready.v4' || '' }}
     steps:
       - name: Checkout current change
         uses: actions/checkout@v4
@@ -236,17 +235,15 @@ jobs:
           node scripts/render-performance-impact-plan.mjs
           --base ${{ github.event.pull_request.base.sha }}
           --output ../performance-impact-plan.json
+          ${{ github.event.pull_request.number == 1085 && '--pr-1085-web-acceptance' || '' }}
       - name: Guard the scoped 60Hz historical protocol
-        if: >-
-          github.event.pull_request.number == 1085 &&
-          steps.render-impact.outputs.run == 'true' &&
-          steps.render-impact.outputs.scope != 'avalonia-only'
+        if: github.event.pull_request.number == 1085
         working-directory: current
         env:
           EXPECTED_BASE_SHA: ${{ github.event.pull_request.base.sha }}
         run: |
           test "$EXPECTED_BASE_SHA" = f2d929a5d045439c35e93b4771f912ce50ec2337
-          node --input-type=module -e "import fs from 'node:fs'; import assert from 'node:assert/strict'; const p=JSON.parse(fs.readFileSync('../performance-impact-plan.json','utf8')); assert.equal(p.measurement.profile,'quick'); assert.equal(p.measurement.samples,21); assert.equal(p.measurement.warmups,1); assert.ok(!p.platforms.web.scenario,'60Hz protocol requires the complete quick Web matrix');"
+          node --input-type=module -e "import fs from 'node:fs'; import assert from 'node:assert/strict'; const p=JSON.parse(fs.readFileSync('../performance-impact-plan.json','utf8')); assert.equal(p.acceptanceException,'pr-1085-web-only'); assert.equal(p.scope,'web-only'); assert.equal(p.platforms.web.run,true); assert.equal(p.platforms.avalonia.run,false); assert.equal(p.measurement.profile,'quick'); assert.equal(p.measurement.samples,21); assert.equal(p.measurement.warmups,1); assert.ok(!p.platforms.web.scenario,'60Hz protocol requires the complete quick Web matrix');"
       - name: Log PR real-render impact
         run: |
           echo "run=${{ steps.render-impact.outputs.run }}"
@@ -286,6 +283,11 @@ jobs:
           --directory baseline
           --plan performance-impact-plan.json
           --output performance-baseline/baseline-status.json
+      - name: Require a compatible historical Web baseline for PR 1085
+        if: github.event.pull_request.number == 1085
+        env:
+          AVAILABLE: ${{ steps.baseline-contract.outputs.available }}
+        run: test "$AVAILABLE" = true
       - name: Install current dependencies
         if: steps.render-impact.outputs.run == 'true'
         working-directory: current
@@ -379,6 +381,12 @@ jobs:
             --directory . --expected-sha "$baseline_sha" \
             --impact-plan ../performance-impact-plan.json \
             --output ../performance-baseline-repeat
+      - name: Check Web absolute budgets on both current arms for PR 1085
+        if: github.event.pull_request.number == 1085
+        working-directory: current
+        run: |
+          node scripts/check-render-performance-results.mjs ../performance-current --web-only
+          node scripts/check-render-performance-results.mjs ../performance-current-repeat --web-only
       - name: Verify measured browser identity for every required Web arm
         if: >-
           steps.render-impact.outputs.run == 'true' &&

@@ -295,6 +295,7 @@ public class FsusTree : ContentControl
   private readonly HashSet<string> expandedKeys = new(StringComparer.Ordinal);
   private readonly HashSet<string> selectedKeys = new(StringComparer.Ordinal);
   private readonly HashSet<string> checkedKeys = new(StringComparer.Ordinal);
+  private readonly EventHandler nodePresentationHandler;
   private readonly HashSet<FsusTreeNode> presentationSubscriptions = [];
   private readonly HashSet<FsusTreeNode> currentPresentationNodes = [];
   private readonly List<FsusTreeNode> removedPresentationNodes = [];
@@ -413,6 +414,7 @@ public class FsusTree : ContentControl
 
   public FsusTree()
   {
+    nodePresentationHandler = new NodePresentationSubscription(this).OnInvalidated;
     FsusComponentClasses.SetBaseClasses(this, "fsus-tree");
     Focusable = true;
     Content = rowsPanel;
@@ -1546,13 +1548,13 @@ public class FsusTree : ContentControl
       }
       foreach (var node in removedPresentationNodes)
       {
-        node.PresentationInvalidated -= OnNodePresentationInvalidated;
+        node.PresentationInvalidated -= nodePresentationHandler;
         presentationSubscriptions.Remove(node);
       }
       foreach (var node in currentPresentationNodes)
       {
         if (presentationSubscriptions.Add(node))
-          node.PresentationInvalidated += OnNodePresentationInvalidated;
+          node.PresentationInvalidated += nodePresentationHandler;
       }
     }
     finally
@@ -1578,25 +1580,50 @@ public class FsusTree : ContentControl
     }
   }
 
-  private void OnNodePresentationInvalidated(object? sender, EventArgs e)
+  private void RefreshSubscribedNodePresentation(FsusTreeNode node)
   {
-    if (sender is not FsusTreeNode node)
+    if (!presentationSubscriptions.Contains(node))
     {
       return;
     }
 
-    if (Dispatcher.UIThread.CheckAccess())
+    RefreshNodePresentation(node.Key);
+    SyncState();
+  }
+
+  private sealed class NodePresentationSubscription(FsusTree tree)
+  {
+    // Caller-owned nodes may outlive the control, including while it is detached.
+    private readonly WeakReference<FsusTree> owner = new(tree);
+
+    public void OnInvalidated(object? sender, EventArgs e)
     {
-      RefreshNodePresentation(node.Key);
-      SyncState();
-      return;
+      if (sender is not FsusTreeNode node)
+      {
+        return;
+      }
+
+      if (Dispatcher.UIThread.CheckAccess())
+      {
+        Deliver(node);
+      }
+      else
+      {
+        Dispatcher.UIThread.Post(() => Deliver(node));
+      }
     }
 
-    Dispatcher.UIThread.Post(() =>
+    private void Deliver(FsusTreeNode node)
     {
-      RefreshNodePresentation(node.Key);
-      SyncState();
-    });
+      if (owner.TryGetTarget(out var tree))
+      {
+        tree.RefreshSubscribedNodePresentation(node);
+      }
+      else
+      {
+        node.PresentationInvalidated -= OnInvalidated;
+      }
+    }
   }
 
   private FsusTreeNode? FindNode(IEnumerable<FsusTreeNode> nodes, string key)

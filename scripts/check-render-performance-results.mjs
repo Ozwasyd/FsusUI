@@ -12,19 +12,32 @@ const policy = await readJson(
   path.join(root, 'tests/performance/render-performance-policy.json'),
 )
 const web = await readJson(path.join(directory, 'web', 'summary.json'))
-const avalonia = await readJson(
-  path.join(directory, 'avalonia', 'summary.json'),
-)
+const webOnly = process.argv.includes('--web-only')
+const avalonia = webOnly ? null : await readJson(path.join(directory, 'avalonia', 'summary.json'))
 const failures = []
 
-if (avalonia.Environment.RenderingBackend === 'unresolved') {
+if (avalonia?.Environment.RenderingBackend === 'unresolved') {
   failures.push('avalonia rendering backend was not resolved')
 }
-if (avalonia.Environment.WindowPlatform === 'unresolved') {
+if (avalonia?.Environment.WindowPlatform === 'unresolved') {
   failures.push('avalonia native window platform was not resolved')
 }
 
-for (const result of web.results) {
+if (webOnly && (!Array.isArray(web.results) || web.results.length === 0))
+  failures.push('web summary is missing its scenario matrix')
+for (const result of webOnly && !Array.isArray(web.results) ? [] : web.results) {
+  if (
+    webOnly &&
+    ![
+      result.inputToNextFrameMs?.p95,
+      result.droppedFrameRate,
+      result.longTasks?.longestMs,
+      result.domNodes,
+    ].every((value) => Number.isFinite(value) && value >= 0)
+  ) {
+    failures.push(`web/${result.id} has missing or invalid absolute metrics`)
+    continue
+  }
   if (result.inputToNextFrameMs.p95 > policy.web.maxP95InputToNextFrameMs) {
     failures.push(`web/${result.id} input p95 exceeded runaway limit`)
   }
@@ -38,7 +51,7 @@ for (const result of web.results) {
     failures.push(`web/${result.id} DOM nodes exceeded runaway limit`)
   }
 }
-for (const result of avalonia.Results) {
+for (const result of webOnly ? [] : avalonia.Results) {
   if (result.FrameMs.P95 > policy.avalonia.maxP95FrameMs) {
     failures.push(`avalonia/${result.Id} frame p95 exceeded runaway limit`)
   }

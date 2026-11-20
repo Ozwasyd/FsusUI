@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict'
 import { execFile } from 'node:child_process'
+import { createHash } from 'node:crypto'
 import {
   chmod,
   mkdtemp,
@@ -67,12 +68,69 @@ assert.equal(
   }).planDigest,
 )
 
+const scopedWebInputs = {
+  changedFiles: ['dotnet/FsusUI.Avalonia/Controls/FsusTreeControls.cs'],
+  registry,
+  baseRef: 'f2d929a5d045439c35e93b4771f912ce50ec2337',
+  webOnlyForPr1085: true,
+}
+const scopedWebPlan = createImpactPlan(scopedWebInputs)
+assert.throws(
+  () => createImpactPlan({ ...scopedWebInputs, baseRef: 'fixture-base' }),
+  /exact historical baseline/u,
+)
+const { planDigest: scopedDigest, ...scopedPayload } = scopedWebPlan
+for (const patch of [
+  { baseRef: 'a'.repeat(40) },
+  { platforms: { ...scopedPayload.platforms, web: { run: true, scenario: 'tree' } } },
+]) {
+  const invalid = { ...scopedPayload, ...patch }
+  const planDigest = createHash('sha256').update(JSON.stringify(invalid)).digest('hex')
+  assert.notEqual(planDigest, scopedDigest)
+  assert.throws(() => verifyImpactPlan({ ...invalid, planDigest }), /exact historical baseline and full Web-only matrix/u)
+}
+assert.equal(verifyImpactPlan(scopedWebPlan).acceptanceException, 'pr-1085-web-only')
+assert.equal(scopedWebPlan.scope, 'web-only')
+assert.deepEqual(scopedWebPlan.platforms, {
+  web: { run: true, scenario: null },
+  avalonia: { run: false, scenario: null },
+})
+assert.deepEqual(scopedWebPlan.measurement, fallback.measurement)
+assert.notEqual(scopedWebPlan.planDigest, fallback.planDigest)
+
 const compareRoot = await mkdtemp(path.join(os.tmpdir(), 'fsusui-impact-test-'))
 try {
   const baseline = path.join(compareRoot, 'baseline')
   const current = path.join(compareRoot, 'current')
   const baselineRepeat = path.join(compareRoot, 'baseline-repeat')
   const currentRepeat = path.join(compareRoot, 'current-repeat')
+  const absoluteWeb = path.join(compareRoot, 'absolute', 'web')
+  await mkdir(absoluteWeb, { recursive: true })
+  const absoluteSummary = path.join(absoluteWeb, 'summary.json')
+  const checkAbsolute = (...flags) => execFileAsync(process.execPath, [
+    path.join(root, 'scripts/check-render-performance-results.mjs'),
+    path.dirname(absoluteWeb),
+    ...flags,
+  ])
+  const row = {
+    id: 'fixture',
+    inputToNextFrameMs: { p95: 1 },
+    droppedFrameRate: 0,
+    longTasks: { longestMs: 1 },
+    domNodes: 1,
+  }
+  await writeFile(absoluteSummary, JSON.stringify({ results: [row] }))
+  await checkAbsolute('--web-only')
+  await assert.rejects(checkAbsolute(), /ENOENT.*avalonia/u)
+  await writeFile(absoluteSummary, JSON.stringify({
+    results: [{ ...row, inputToNextFrameMs: { p95: Number.MAX_SAFE_INTEGER } }],
+  }))
+  await assert.rejects(checkAbsolute('--web-only'), /input p95 exceeded runaway limit/u)
+  await writeFile(absoluteSummary, JSON.stringify({ results: [{ ...row, domNodes: null }] }))
+  await assert.rejects(checkAbsolute('--web-only'), /missing or invalid absolute metrics/u)
+  await writeFile(absoluteSummary, JSON.stringify({ results: [] }))
+  await assert.rejects(checkAbsolute('--web-only'), /missing its scenario matrix/u)
+
   const webPlan = createImpactPlan({
     changedFiles: cases[0].files,
     registry,

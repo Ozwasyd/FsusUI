@@ -9,6 +9,7 @@ const workflows = [
 ]
 
 const guardedPerformanceRunner = "${{ github.event.pull_request.number == 1085 && 'ubuntu-22.04' || 'ubuntu-24.04' }}"
+const guardedAbsolutePerformanceRunner = "${{ github.event_name == 'pull_request' && github.event.pull_request.number == 1085 && inputs.group == 'main' && 'ubuntu-22.04' || 'ubuntu-24.04' }}"
 const nativeUbuntu22Jobs = new Map([
   ['.github/workflows/quality.yml', 'pr-avalonia-aot-candidate'],
   ['.github/workflows/_quality.yml', 'dotnet-package'],
@@ -28,6 +29,7 @@ function unsupportedBrowserJobs(source, file) {
     if (runner === 'ubuntu-24.04') return []
     if (runner === 'ubuntu-22.04' && nativeUbuntu22Jobs.get(file) === name) return []
     if (file === '.github/workflows/quality.yml' && name === 'pr-real-render-performance' && runner === guardedPerformanceRunner) return []
+    if (file === '.github/workflows/_quality.yml' && name === 'real-render-performance' && runner === guardedAbsolutePerformanceRunner) return []
     return [name]
   })
 }
@@ -50,11 +52,11 @@ test('a browser installation on ubuntu-latest is rejected', () => {
   )
   const current = readFileSync('.github/workflows/_quality.yml', 'utf8')
   const regressed = current.replace(
-    'runs-on: ubuntu-24.04',
+    'runs-on: ' + guardedAbsolutePerformanceRunner,
     'runs-on: ubuntu-latest',
   )
   assert.ok(
-    unsupportedBrowserJobs(regressed).includes('real-render-performance'),
+    unsupportedBrowserJobs(regressed, '.github/workflows/_quality.yml').includes('real-render-performance'),
   )
 })
 
@@ -80,4 +82,25 @@ test('Ubuntu 22 exceptions are restricted to exact workflow, job and PR guard', 
   }
   assert.deepEqual(unsupportedBrowserJobs(workflow(job, guardedPerformanceRunner), '.github/workflows/_quality.yml'), [job])
   assert.deepEqual(unsupportedBrowserJobs(workflow('other', guardedPerformanceRunner), file), ['other'])
+
+  const absoluteJob = 'real-render-performance'
+  const absoluteFile = '.github/workflows/_quality.yml'
+  const absoluteRunner = guardedAbsolutePerformanceRunner
+  assert.deepEqual(unsupportedBrowserJobs(workflow(absoluteJob, absoluteRunner), absoluteFile), [])
+  assert.deepEqual(unsupportedBrowserJobs(workflow(absoluteJob, absoluteRunner), file), [absoluteJob])
+  assert.deepEqual(unsupportedBrowserJobs(workflow('other', absoluteRunner), absoluteFile), ['other'])
+  for (const candidate of [
+    'ubuntu-22.04',
+    absoluteRunner.replace('pull_request', 'merge_group'),
+    absoluteRunner.replace('1085', '1086'),
+    absoluteRunner.replace("'main'", "'release'"),
+    absoluteRunner.replace('ubuntu-24.04', 'ubuntu-latest'),
+  ]) {
+    assert.deepEqual(unsupportedBrowserJobs(workflow(absoluteJob, candidate), absoluteFile), [absoluteJob])
+  }
+
+  const source = readFileSync(absoluteFile, 'utf8')
+  const condition = absoluteRunner.slice(0, absoluteRunner.indexOf(" && 'ubuntu-22.04'")) + ' }}'
+  assert.ok(source.includes('WEB_ONLY_PR_1085: ' + condition))
+  assert.ok(source.includes("${{ env.WEB_ONLY_PR_1085 == 'true' && ',platform=web' || '' }}"))
 })

@@ -2,6 +2,8 @@ import { createHash } from 'node:crypto'
 import { readFile } from 'node:fs/promises'
 import path from 'node:path'
 
+const pr1085Baseline = 'f2d929a5d045439c35e93b4771f912ce50ec2337'
+
 const scopeRank = new Map([
   ['skip', 0],
   ['web-only', 1],
@@ -68,7 +70,10 @@ export const createImpactPlan = ({
   registry,
   baseRef = null,
   fallbackReason = null,
+  webOnlyForPr1085 = false,
 }) => {
+  if (webOnlyForPr1085 && baseRef !== pr1085Baseline)
+    throw new Error('PR #1085 Web acceptance requires the exact historical baseline')
   const files = [
     ...new Set(changedFiles.map((file) => file.replaceAll('\\', '/'))),
   ].sort()
@@ -90,6 +95,7 @@ export const createImpactPlan = ({
     scope = mergeScope(scope, rule.scope)
   }
   if (fallbackReason) scope = 'both'
+  if (webOnlyForPr1085) scope = 'web-only'
   const contract = {
     schemaVersion: 1,
     registrySchemaVersion: registry.schemaVersion,
@@ -98,6 +104,7 @@ export const createImpactPlan = ({
     scope,
     run: scope !== 'skip',
     fallbackReason,
+    ...(webOnlyForPr1085 ? { acceptanceException: 'pr-1085-web-only' } : {}),
     matchedOwnership: matches.map(({ file, rule }) => ({
       file,
       rule: rule.id,
@@ -106,11 +113,11 @@ export const createImpactPlan = ({
     platforms: {
       web: {
         run: scope === 'web-only' || scope === 'both',
-        scenario: fallbackReason ? null : selectedScenario(matches, 'web'),
+        scenario: fallbackReason || webOnlyForPr1085 ? null : selectedScenario(matches, 'web'),
       },
       avalonia: {
         run: scope === 'avalonia-only' || scope === 'both',
-        scenario: fallbackReason ? null : selectedScenario(matches, 'avalonia'),
+        scenario: fallbackReason || webOnlyForPr1085 ? null : selectedScenario(matches, 'avalonia'),
       },
     },
     measurement: {
@@ -140,6 +147,13 @@ export const verifyImpactPlan = (plan) => {
   const { planDigest, ...contract } = plan
   if (!planDigest || digestOf(contract) !== planDigest)
     throw new Error('Performance impact plan digest is invalid')
+  if (plan.acceptanceException !== undefined && (
+    plan.acceptanceException !== 'pr-1085-web-only' ||
+    plan.baseRef !== pr1085Baseline ||
+    plan.scope !== 'web-only' || plan.run !== true ||
+    plan.platforms?.web?.run !== true || plan.platforms.web.scenario !== null ||
+    plan.platforms?.avalonia?.run !== false || plan.platforms.avalonia.scenario !== null
+  )) throw new Error('Performance acceptance exception requires the exact historical baseline and full Web-only matrix')
   if (plan.measurement?.profile !== 'quick')
     throw new Error('PR performance impact plan must use the quick profile')
   if (plan.measurement?.warmups !== 1 || plan.measurement?.samples !== 21)

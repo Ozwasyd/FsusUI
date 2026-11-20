@@ -50,6 +50,7 @@ const plan = createImpactPlan({
   registry,
   baseRef,
   fallbackReason,
+  webOnlyForPr1085: args.includes('--pr-1085-web-acceptance'),
 })
 const reason =
   plan.fallbackReason ||

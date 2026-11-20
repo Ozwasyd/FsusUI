@@ -182,3 +182,18 @@ pnpm perf:render:compare -- \
 Do not compare absolute values from different machines. If fixture inputs, browser
 versions, renderer backends, or environment metadata differ, collect a new paired
 baseline.
+
+## PR #1085 acceptance scope
+
+For PR #1085 only, the performance acceptance gate is the complete quick Web
+matrix under the 60 Hz protocol, using pinned Chromium 147 for all four
+same-runner arms and verifying idle animation-frame cadence. The Web absolute
+limits and the 15% relative comparison are unchanged.
+The historical Web baseline is mandatory; unavailable evidence is not a pass.
+
+The unreleased Avalonia implementation in the historical base rebuilds the full
+visible tree on expansion and again on focus. The old long-scroll fixture
+repeatedly exercises that path and exhausted the controlled host's memory. The
+PR does not use Avalonia performance results as acceptance evidence. Avalonia
+functional, packaging, and Native AOT checks remain required. This exception
+does not alter the merge-queue, main, nightly, or release performance matrix.
