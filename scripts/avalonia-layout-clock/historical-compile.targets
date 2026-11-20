@@ -1,0 +1,20 @@
+<Project>
+  <Target Name="FsusLayoutReadyDriver" BeforeTargets="CoreCompile"
+          Condition="'$(MSBuildProjectFullPath)' == '$(FsusLayoutReadyProject)'">
+    <ItemGroup>
+      <_FsusOld Include="@(Compile)" Condition="'%(Compile.FullPath)' == '$(FsusLayoutReadyOriginal)'" />
+      <_FsusNew Include="@(Compile)" Condition="'%(Compile.FullPath)' == '$(FsusLayoutReadyAdapted)'" />
+    </ItemGroup>
+    <Error Condition="'@(_FsusOld->Count())' != '1' Or '@(_FsusNew->Count())' != '0'"
+           Text="Unexpected Avalonia benchmark Compile inputs" />
+    <ItemGroup>
+      <Compile Remove="@(_FsusOld)" />
+      <Compile Include="$(FsusLayoutReadyAdapted)" />
+      <_FsusOldAfter Include="@(Compile)" Condition="'%(Compile.FullPath)' == '$(FsusLayoutReadyOriginal)'" />
+      <_FsusNewAfter Include="@(Compile)" Condition="'%(Compile.FullPath)' == '$(FsusLayoutReadyAdapted)'" />
+    </ItemGroup>
+    <Error Condition="'@(_FsusOldAfter->Count())' != '0' Or '@(_FsusNewAfter->Count())' != '1'"
+           Text="Avalonia benchmark Compile substitution failed" />
+    <WriteLinesToFile File="$(FsusLayoutReadyManifest)" Lines="original=1/0;adapted=0/1" Overwrite="true" />
+  </Target>
+</Project>
