@@ -84,7 +84,11 @@ jobs:
         timeout-minutes: 5
         run: |
           sudo apt-get update
-          sudo apt-get install --yes clang zlib1g-dev xvfb
+          sudo apt-get install --yes clang zlib1g-dev xvfb xauth x11-utils dbus-daemon
+          test -x /usr/bin/xdpyinfo
+          test -x /usr/bin/dbus-daemon
+          xvfb-run -a -e /dev/stderr -s '-screen 0 1024x768x24 -nolisten tcp' \
+            bash -euc 'timeout 10s /usr/bin/xdpyinfo -display "$DISPLAY" >/dev/null'
       - name: Warm dependency cache for the exact consumer fixture
         timeout-minutes: 8
         run: |
@@ -118,7 +122,8 @@ jobs:
         working-directory: dotnet
         run: |
           test "$(dotnet --version)" = 10.0.401
-          node ../scripts/test-avalonia-aot-smoke.mjs
+          xvfb-run -a -e /dev/stderr -s '-screen 0 1024x768x24 -nolisten tcp' \
+            bash -euc 'timeout 10s /usr/bin/xdpyinfo -display "$DISPLAY" >/dev/null; exec node ../scripts/test-avalonia-aot-smoke.mjs'
       - name: Validate exact native leaf identity
         run: >-
           node scripts/avalonia-aot-native.mjs validate-leaf
