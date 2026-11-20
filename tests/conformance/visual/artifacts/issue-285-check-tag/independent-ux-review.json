@@ -1,12 +1,12 @@
 {
   "schema": "fsusui-independent-ux-review.v1",
   "issue": 285,
-  "candidateSha": "e926205ed02a98c66f790a632a2fc4ec6b893411",
+  "candidateSha": "14d2bfebde3e2afa98d73da0b83a9a6af6c5761a",
   "reviewMode": "read-only-rendered-evidence-inspection",
   "modifiedPaths": [],
   "productionFixture": true,
   "identity": {
-    "executionId": "conformance-v2-check-tag-e926205ed02a98c66f790a632a2fc4ec6b893411",
+    "executionId": "conformance-v2-check-tag-14d2bfebde3e2afa98d73da0b83a9a6af6c5761a",
     "checkpoint": "check-tag-after-pointer-keyboard",
     "contract": "component-v2.el-check-tag",
     "scenario": "scenario.v2.el-check-tag.real-interaction-trace",
@@ -106,11 +106,11 @@
     }
   ],
   "observations": [
-    "GitHub Quality Gates #1144 run 44657850205, pr-aot-conformance-failure artifact 14594093224: 295792-byte ZIP SHA256 cd0969d02c8763b4a762234af648f18c6d23a85de5292d3ca8131c0e659aec26. Executed reviewed PR head e926205ed02a98c66f790a632a2fc4ec6b893411.",
-    "GitHub Quality Gates #1144 run 44657850205, dotnet-package-conformance-failure artifact 14594432415: 297315-byte ZIP SHA256 dc312e5138a3be6588367609611f946c7e53ea5600015c949a58c82c61fbe953. Executed synthetic merge 33c8d6ca8f996defa528b8d23a0ec456152fe53d.",
-    "Both validated clean source trees equal 1a1d6d7164b4a42be594cbc40471f9c26dc5cf4e. Tracked PNGs come from the exact-head pair only; the separate synthetic merge pair was independently read and visually inspected and corroborates the result without relabelling any raw artifact.",
-    "Both routes use real Chrome/147.0.7727.15 with Linux AT-SPI reachability and passing Web screen-reader harness receipts (Orca PIDs 7218 and 7242). CDP and the Avalonia AutomationPeer both report focus and unchecked state. In each route all 10 steps per platform pass, bound to the same exact execution as visual and performance evidence.",
-    "AOT Web 0.6/2.8 ms, Avalonia 3.0741/11.1861 ms; package Web 0.5/2.3 ms, Avalonia 1.4751/5.8367 ms (render/interaction). All four probe collection flags true."
+    "GitHub Quality Gates #1146 run 44664198673, pr-aot-conformance-failure artifact 14597027688: 295941-byte ZIP SHA256 a99775faf0512aec78234be5a473484534b780fb1519dfeed494124aa382c02f. Executed reviewed PR head 14d2bfebde3e2afa98d73da0b83a9a6af6c5761a.",
+    "GitHub Quality Gates #1146 run 44664198673, dotnet-package-conformance-failure artifact 14597826693: 295815-byte ZIP SHA256 cd985f309e5d44ce3d24bfcdb4437cec00cb2fedfd0d129a1def59b652136958. Executed synthetic merge 1aeb3de07e7db924ffadd9613e030f4ceacd071a.",
+    "Both validated clean source trees equal 1ff1085083803605b04b2e0f828649d70b6bc3ac. Tracked PNGs come from the exact-head pair only; the separate synthetic merge pair was independently read and visually inspected and corroborates the result without relabelling any raw artifact.",
+    "Both routes use real Chrome/147.0.7727.15 with Linux AT-SPI reachability and passing Web screen-reader harness receipts (Orca PIDs 7010 and 7289). CDP and the Avalonia AutomationPeer both report focus and unchecked state. In each route all 10 steps per platform pass, bound to the same exact execution as visual and performance evidence.",
+    "AOT Web 0.4/1.9 ms, Avalonia 1.0269/3.9718 ms; package Web 0.7/3.0 ms, Avalonia 2.8468/10.4539 ms (render/interaction). All four probe collection flags true."
   ],
   "limitations": [
     "This acceptance covers only the four CheckTag criteria in the light/default/zh-CN/ltr/reduced-motion, focused unchecked checkpoint. It is not package, full a11y, performance-gate, or CI acceptance.",
