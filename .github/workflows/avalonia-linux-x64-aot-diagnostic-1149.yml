@@ -84,11 +84,20 @@ jobs:
         timeout-minutes: 5
         run: |
           sudo apt-get update
-          sudo apt-get install --yes clang zlib1g-dev xvfb xauth x11-utils dbus-daemon
+          sudo apt-get install --yes clang zlib1g-dev xvfb xauth x11-utils dbus-daemon dbus-bin at-spi2-core
           test -x /usr/bin/xdpyinfo
           test -x /usr/bin/dbus-daemon
           xvfb-run -a -e /dev/stderr -s '-screen 0 1024x768x24 -nolisten tcp' \
-            bash -euc 'timeout 10s /usr/bin/xdpyinfo -display "$DISPLAY" >/dev/null'
+            /usr/bin/dbus-run-session -- bash -euc '
+              timeout 10s /usr/bin/xdpyinfo -display "$DISPLAY" >/dev/null
+              reply="$(timeout 10s /usr/bin/dbus-send --session --print-reply=literal \
+                --dest=org.a11y.Bus /org/a11y/bus org.a11y.Bus.GetAddress)"
+              address="$(printf "%s" "$reply" | sed -E "s/^[[:space:]]+//; s/[[:space:]]+$//")"
+              [[ "$address" == unix:* ]]
+              timeout 10s /usr/bin/dbus-send --bus="$address" --print-reply \
+                --dest=org.freedesktop.DBus /org/freedesktop/DBus org.freedesktop.DBus.ListNames >/dev/null
+              echo "AT-SPI session activation and accessibility bus verified"
+            '
       - name: Warm dependency cache for the exact consumer fixture
         timeout-minutes: 8
         run: |
