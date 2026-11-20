@@ -1,3 +1,7 @@
+import { TreeOptionsEnum as treeOptionsEnum } from './virtual-tree.enum-members.js'
+export { treeOptionsEnum as TreeOptionsEnum }
+import type { SetOperationEnum } from './virtual-tree.enum-members.js'
+export type {} from './virtual-tree.enum-members.js'
 import {
   buildProps,
   definePropType,
@@ -25,18 +29,13 @@ const EMPTY_NODE = {
   data: {},
 } as const
 
-// enums
-export enum TreeOptionsEnum {
-  KEY = 'id',
-  LABEL = 'label',
-  CHILDREN = 'children',
-  DISABLED = 'disabled',
-}
+const setOperationEnum = {
+  ADD: 'add' as SetOperationEnum.ADD,
+  DELETE: 'delete' as SetOperationEnum.DELETE,
+} as const
 
-export const enum SetOperationEnum {
-  ADD = 'add',
-  DELETE = 'delete',
-}
+type setOperationEnum = SetOperationEnum
+export { setOperationEnum as SetOperationEnum }
 
 const itemSize = {
   type: Number,
@@ -60,10 +59,10 @@ export const treeProps = buildProps({
     type: definePropType<TreeOptionProps>(Object),
     default: () =>
       mutable({
-        children: TreeOptionsEnum.CHILDREN,
-        label: TreeOptionsEnum.LABEL,
-        disabled: TreeOptionsEnum.DISABLED,
-        value: TreeOptionsEnum.KEY,
+        children: treeOptionsEnum.CHILDREN,
+        label: treeOptionsEnum.LABEL,
+        disabled: treeOptionsEnum.DISABLED,
+        value: treeOptionsEnum.KEY,
       } as const),
   },
   highlightCurrent: {

@@ -1,5 +1,5 @@
 import path from 'path'
-import { mkdir, readFile, writeFile } from 'fs/promises'
+import { lstat, mkdir, readFile, writeFile } from 'fs/promises'
 import consola from 'consola'
 import * as vueCompiler from 'vue/compiler-sfc'
 import glob from 'fast-glob'
@@ -18,9 +18,20 @@ import type { CompilerOptions, SourceFile } from 'ts-morph'
 
 const TSCONFIG_PATH = path.resolve(projRoot, 'vue/tsconfig.web.json')
 const outDir = path.resolve(buildOutput, 'types')
+const enumMemberDeclarationPaths = [
+  'components/table-v2/src/constants.enum-members.d.ts',
+  'components/tooltip-v2/src/common.enum-members.d.ts',
+  'components/tree-v2/src/virtual-tree.enum-members.d.ts',
+  'utils/vue/vnode.enum-members.d.ts',
+] as const
+const enumRuntimeSourceFiles = new Set(
+  enumMemberDeclarationPaths.map((relativePath) =>
+    path.resolve(pkgRoot, relativePath.replace(/\.d\.ts$/u, '.js')),
+  ),
+)
 const iconsVueTypesEntry = path.resolve(
   projRoot,
-  'vue/packages/icons-vue/dist/index.d.ts',
+  'vue/packages/icons-vue/dist/types/index.d.ts',
 )
 const wasmTypesEntry = path.resolve(
   projRoot,
@@ -139,6 +150,30 @@ const runGenerateTypesDefinitions = async () => {
   await addSourceFiles(project)
   consola.success('Added source files')
 
+  const enumMemberDeclarations = await Promise.all(
+    enumMemberDeclarationPaths.map(async (relativePath) => {
+      const declarationPath = path.resolve(pkgRoot, relativePath)
+      const runtimePath = declarationPath.replace(/\.d\.ts$/u, '.js')
+      const sourceFile = project.getSourceFileOrThrow(declarationPath)
+      const [declarationStat, runtimeStat, runtimeSource] = await Promise.all([
+        lstat(declarationPath),
+        lstat(runtimePath),
+        readFile(runtimePath, 'utf8'),
+      ])
+      if (
+        !declarationStat.isFile() ||
+        !runtimeStat.isFile() ||
+        !sourceFile.getFullText().trim() ||
+        !runtimeSource.trim()
+      ) {
+        throw new Error(
+          `Enum source pair must contain regular, nonempty files: ${relativePath}`,
+        )
+      }
+      return { relativePath, sourceFile }
+    }),
+  )
+
   typeCheck(project)
   consola.success('Type check passed!')
 
@@ -178,6 +213,20 @@ const runGenerateTypesDefinitions = async () => {
 
     await Promise.all(tasks)
   }
+
+  // Handwritten declarations own the paired JavaScript module types. TypeScript
+  // does not emit these inputs; preserve the same layout in both package formats.
+  await Promise.all(
+    enumMemberDeclarations.map(async ({ relativePath, sourceFile }) => {
+      const filepath = path.join(outDir, 'packages', relativePath)
+      await mkdir(path.dirname(filepath), { recursive: true })
+      await writeFile(
+        filepath,
+        pathRewriter('esm')(sourceFile.getFullText()),
+        'utf8',
+      )
+    }),
+  )
 
   await writeWasmDeclarationOwner()
 }
@@ -220,6 +269,10 @@ async function addSourceFiles(project: Project) {
   const sourceFiles: SourceFile[] = []
   await Promise.all([
     ...filePaths.map(async (file) => {
+      // Only these declared JavaScript owners use their companion as the type
+      // root. The module builder still consumes the real JavaScript source.
+      if (enumRuntimeSourceFiles.has(path.resolve(file))) return
+
       if (file.endsWith('.vue')) {
         const content = await readFile(file, 'utf-8')
         const hasTsNoCheck = content.includes('@ts-nocheck')
@@ -251,9 +304,19 @@ async function addSourceFiles(project: Project) {
     }),
     ...epPaths.map(async (file) => {
       const content = await readFile(path.resolve(epRoot, file), 'utf-8')
-      sourceFiles.push(
-        project.createSourceFile(path.resolve(pkgRoot, file), content),
+      const sourceFile = project.createSourceFile(
+        path.resolve(pkgRoot, file),
+        content,
       )
+      if (file === 'wasm.ts' || file === 'markdown-runtime.ts') {
+        // These entries move above element-plus; retain the existing WASM owner.
+        for (const declaration of sourceFile.getExportDeclarations()) {
+          if (declaration.getModuleSpecifierValue() === '../wasm/index') {
+            declaration.setModuleSpecifier('@element-plus/wasm')
+          }
+        }
+      }
+      sourceFiles.push(sourceFile)
     }),
   ])
 

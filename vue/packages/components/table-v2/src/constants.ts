@@ -1,21 +1,12 @@
-export enum SortOrder {
-  ASC = 'asc',
-  DESC = 'desc',
-}
-
-export enum Alignment {
-  CENTER = 'center',
-  RIGHT = 'right',
-}
-
-export enum FixedDir {
-  LEFT = 'left',
-  RIGHT = 'right',
-}
-
+import {
+  SortOrder as sortOrder,
+  Alignment as alignment,
+  FixedDir as fixedDir,
+} from './constants.enum-members.js'
+export { sortOrder as SortOrder, alignment as Alignment, fixedDir as FixedDir }
 export const oppositeOrderMap = {
-  [SortOrder.ASC]: SortOrder.DESC,
-  [SortOrder.DESC]: SortOrder.ASC,
+  [sortOrder.ASC]: sortOrder.DESC,
+  [sortOrder.DESC]: sortOrder.ASC,
 }
 
-export const sortOrders = [SortOrder.ASC, SortOrder.DESC] as const
+export const sortOrders = [sortOrder.ASC, sortOrder.DESC] as const
