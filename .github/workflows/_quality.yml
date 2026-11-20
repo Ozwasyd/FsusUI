@@ -214,7 +214,14 @@ jobs:
           xvfb-run -a dbus-run-session -- pnpm run conformance:v2
           pnpm run check:avalonia-stable-readiness
           node scripts/dotnet-package-verify.mjs
-          echo "digest=$(node -p \"require('./dotnet/artifacts/package/manifest.json').candidateSha256\")" >> "$GITHUB_OUTPUT"
+          digest="$(node -e '
+            const { candidateSha256 } = require("./dotnet/artifacts/package/manifest.json");
+            if (typeof candidateSha256 !== "string" || candidateSha256.length !== 64 || /[^0-9a-f]/u.test(candidateSha256)) {
+              throw new Error("Invalid NuGet candidateSha256");
+            }
+            process.stdout.write(candidateSha256);
+          ')"
+          printf 'digest=%s\n' "$digest" >> "$GITHUB_OUTPUT"
       - name: Report workspace changes after candidate failure
         if: failure()
         run: git status --short --untracked-files=all
