@@ -1,19 +1,19 @@
 {
   "schema": "fsusui-independent-ux-review.v1",
   "issue": 285,
-  "candidateSha": "0a03e5304473578db1a81d2cad7c7b720037c09a",
+  "candidateSha": "b2ef523b15da33bab95f6a1fe08acf70ba1ffe7e",
   "reviewMode": "read-only-rendered-evidence-inspection",
   "modifiedPaths": [],
   "productionFixture": true,
   "identity": {
-    "executionId": "conformance-v2-check-tag-0a03e5304473578db1a81d2cad7c7b720037c09a",
+    "executionId": "conformance-v2-check-tag-b2ef523b15da33bab95f6a1fe08acf70ba1ffe7e",
     "checkpoint": "check-tag-after-pointer-keyboard",
     "contract": "component-v2.el-check-tag",
     "scenario": "scenario.v2.el-check-tag.real-interaction-trace",
-    "contractHash": "e4bde4e2279b3ff6608e53b2d965068015bd510a244d26d8827f3082f55e317b",
+    "contractHash": "5c9b38bcb43a7c53e06852c877d610339644df25906b333befc723b390cdfb25",
     "webBaselineHash": "37ef61830b981a371dab4f05b3e476bb91a062a045ad736e52dbc9a73583572f",
-    "avaloniaBaselineHash": "caa4feb5977af864aff8c66046eae6d5abd570e5a280e720c8bfd1e45ad43c56",
-    "runnerHash": "ff759ad67427837fd4e3ac0b8535fd2deed1c8372c583ecd06ed9e21029f6b54"
+    "avaloniaBaselineHash": "3c7084d23f9897688cd6835761cde015e10766990ebc8082cc1c2ec8b6093687",
+    "runnerHash": "bad9abc8910c29bd5104e47fc7d693443a414d707776a55c043be5d1e0c0baf2"
   },
   "viewportStateMatrix": [
     {
@@ -34,7 +34,7 @@
         "screen-reader",
         "reduced-motion"
       ],
-      "evidenceDigest": "cede06e2196173842ec99b1422f4242f3d54c3afdbfa8d8c35da70bad3e55277"
+      "evidenceDigest": "75b17a188084edf56a69eb89fe29d0aaa0573937e29b7e7ce60b583e7d4ae170"
     },
     {
       "platform": "avalonia",
@@ -54,7 +54,7 @@
         "automation-peer",
         "reduced-motion"
       ],
-      "evidenceDigest": "3ae99ccd280405a7e7a0d1f622367ed017a4dc1819de8d3c59e427b6a2764cb0"
+      "evidenceDigest": "14ece27ab685cac5f510f118acd052802dcf14dbb4dd1b7b92fb8c97cecefdc5"
     }
   ],
   "inspectedRenderedArtifacts": [
@@ -63,8 +63,8 @@
       "platform": "web",
       "kind": "screenshot",
       "path": "tests/conformance/visual/artifacts/issue-285-check-tag/check-tag-web-focused-unchecked.png",
-      "digest": "cede06e2196173842ec99b1422f4242f3d54c3afdbfa8d8c35da70bad3e55277",
-      "bytes": 1246,
+      "digest": "75b17a188084edf56a69eb89fe29d0aaa0573937e29b7e7ce60b583e7d4ae170",
+      "bytes": 1237,
       "width": 88,
       "height": 24,
       "inspected": true,
@@ -75,8 +75,8 @@
       "platform": "avalonia",
       "kind": "screenshot",
       "path": "tests/conformance/visual/artifacts/issue-285-check-tag/check-tag-avalonia-focused-unchecked.png",
-      "digest": "3ae99ccd280405a7e7a0d1f622367ed017a4dc1819de8d3c59e427b6a2764cb0",
-      "bytes": 9661,
+      "digest": "14ece27ab685cac5f510f118acd052802dcf14dbb4dd1b7b92fb8c97cecefdc5",
+      "bytes": 9960,
       "width": 960,
       "height": 720,
       "inspected": true,
@@ -87,37 +87,36 @@
     {
       "id": "blue-focus-ring-visible",
       "status": "accepted",
-      "observation": "All four actual screenshots visibly show a blue focus ring; each native capture reports 192/192 pixels matching #2A599C."
+      "observation": "Both original rendered screenshots show a visible blue focus ring; Avalonia independently sampled 180/180 pixels matching #2A599C."
     },
     {
       "id": "no-black-default-adorner",
       "status": "accepted",
-      "observation": "No black default focus adorner is visible in any screenshot; both native perimeter samplers report zero unexpected dark pixels."
+      "observation": "Neither image shows the black default focus adorner; the Avalonia perimeter probe reports zero unexpected dark pixels."
     },
     {
       "id": "unchecked-label-state-match",
       "status": "accepted",
-      "observation": "All four actual screenshots read Check tag. Pointer followed by keyboard returns to unchecked, revision 2; CDP and native AutomationPeer report false/off."
+      "observation": "Both images read Check tag with the final unchecked state after pointer and keyboard input, revision 2, confirmed by browser and native accessibility evidence."
     },
     {
       "id": "focus-no-bounds-shift",
       "status": "accepted",
-      "observation": "Before focus, after focus, and after toggle are identical in XYWH: Web document CSS px (0,136,87.625,24) and native window DIP (24,136,96,24). Focus changes false to true to true."
+      "observation": "The before-focus, after-focus and after-toggle samples have identical XYWH on each platform: Web (0,136,87.625,24 CSS px) and Avalonia (24,136,88,26 DIP); focus flags false, true, true."
     }
   ],
   "observations": [
-    "GitHub Quality Gates #1148 run 44670027518, pr-aot-conformance-failure artifact 14599532270: 295796-byte ZIP SHA256 ec2e795a50a4cf82a98cb8b287a8d03558d72b41ad817f18d35be5ef56519182. Executed reviewed PR head 0a03e5304473578db1a81d2cad7c7b720037c09a.",
-    "GitHub Quality Gates #1148 run 44670027518, dotnet-package-conformance-failure artifact 14599786404: 297132-byte ZIP SHA256 5e725d4c1a09c5ad323b8077d3666efa137f8ed0c125e7db7fe84f304111fa53. Executed synthetic merge 394a4ebcdc07b8721f3ec1eb1b8758da7192558e.",
-    "Both validated clean source trees equal 365830d7fc4768afd0e80a004eea8559f32a6940. Tracked PNGs come from the exact-head pair only; the separate synthetic merge pair was independently read and visually inspected and corroborates the result without relabelling any raw artifact.",
-    "Both routes use real Chrome/147.0.7727.15 with Linux AT-SPI reachability and passing Web screen-reader harness receipts (Orca PIDs 7184 and 7238). CDP and the Avalonia AutomationPeer both report focus and unchecked state. In each route all 10 steps per platform pass, bound to the same exact execution as visual and performance evidence.",
-    "AOT Web 0.7/2.4 ms, Avalonia 2.741/9.7602 ms; package Web 0.5/2.8 ms, Avalonia 1.9273/6.7299 ms (render/interaction). All four probe collection flags true."
+    "Fresh locally executed Linux VPS CheckTag capture; not a GitHub Actions run. Candidate b2ef523b15da33bab95f6a1fe08acf70ba1ffe7e, clean source tree 41a20b188869088f1308402d5029bbad3e5ba048. Independent reviewer viewed both actual PNGs and verified original raw bindings without modifying either raw manifest.",
+    "Web raw SHA-256 594fd11e01b64eec9d4b06e315edf9563156348945bbd0f8611fa42da4cfc621; Avalonia raw SHA-256 709d4b6fa0e5a06db3dfcf5a96ef7af41ede23b3f58b4e1eb2148acddaa0d944. Same exact execution verifies nine functional steps per platform plus a separate diagnostic-only timing record.",
+    "Native verification SHA-256 e704cf3a26bc38b34f9db68aa85b56750ec8237479817c055c075f4b0144b7cb; Web AT-SPI raw SHA-256 5c5aee8ed15dfb805f570f686e801260684248bfbebf7f4ba71d324e34d2e144; Web harness receipt SHA-256 c826f2972416ab9398867c6a667413bf0e30fa129d53361e512a71352526c550. Chrome/147.0.7727.15 exposed the Check tag checkbox to Linux AT-SPI; Orca PID 3565372. Focus and unchecked state are present in CDP and the real Avalonia AutomationPeer.",
+    "Web render/interaction 0.9/5.6 ms; Avalonia 5.6027/59.1819 ms, diagnostic-only. Both bounded lifetime probes report detachedControlCollected=true."
   ],
   "limitations": [
-    "This acceptance covers only the four CheckTag criteria in the light/default/zh-CN/ltr/reduced-motion, focused unchecked checkpoint. It is not package, full a11y, performance-gate, or CI acceptance.",
-    "Bounds prove the three recorded checkpoints, not an absence of instantaneous movement between them. Per-operation browser durations are not a shared cross-platform timeline.",
-    "AT-SPI exposes Check tag as enabled, focusable, shown/visible, checkable and unchecked, but not focused in this probe. Focus comes from CDP and Avalonia AutomationPeer.",
-    "Orca registration/reachability and PID are not recordings of spoken output; NVDA/VoiceOver were not tested. PNG and browser product do not independently prove sandbox state.",
-    "The Markdown-specific editableName diagnostic is false in both captures; no blanket accessibility pass is claimed. Lifetime observation is specific to this probe."
+    "Visual acceptance covers only the light/default/zh-CN/ltr/reduced-motion CheckTag checkpoint. This local VPS renderer capture is not a hosted CI, package, cross-renderer pixel equality, or timing acceptance claim.",
+    "Three separately recorded bounds checkpoints do not show intermediate frames. Browser operation timings and native timestamps are not a synchronized cross-platform timeline.",
+    "The AT-SPI checkbox is focusable but does not independently expose the focused state here; focus is confirmed by CDP and Avalonia AutomationPeer.",
+    "Orca process and AT-SPI registration are not a record of spoken output; NVDA and VoiceOver were not tested. Screenshots cannot independently prove the browser sandbox.",
+    "The unrelated Markdown editableName diagnostic was false. Bounded lifetime results cover only this fixture."
   ],
   "blockers": [],
   "status": "accepted"

@@ -34,7 +34,7 @@
   ],
   "activeBaselineIdentity": {
     "repository": "Ozwasyd/FsusUI",
-    "revision": "0a03e5304473578db1a81d2cad7c7b720037c09a",
+    "revision": "b2ef523b15da33bab95f6a1fe08acf70ba1ffe7e",
     "skillDigest": "c88357a6ba0340000bae5839daeb67a3cd2722e8242cf7e0148006c3610a44fe",
     "authorityDigest": "0899bb73568e4e0430595ecce3c1d605d51c963e27e37250b6dcc0e1a6ff77a9",
     "dirtyFingerprint": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
@@ -51,22 +51,22 @@
   ],
   "domainPolicyDigest": "620c4f746c1f259e3b640044975ad2878b7913806038706f7991bee9d72104d3",
   "status": "frozen",
-  "candidateSha": "0a03e5304473578db1a81d2cad7c7b720037c09a",
-  "candidateDigest": "800e92c537d15e577467d0dfa70fc1883bc5a34b13b8cdf4e3ccbdd515d7b95f",
+  "candidateSha": "b2ef523b15da33bab95f6a1fe08acf70ba1ffe7e",
+  "candidateDigest": "fcb3efe0c54e948f7928cb393e5e659475918e0379642689ba223d73576c9e88",
   "stateEvidenceMatrix": [
     {
       "viewport": "88x24",
       "state": "focused-unchecked-after-pointer-keyboard",
       "theme": "light",
-      "evidenceDigest": "cede06e2196173842ec99b1422f4242f3d54c3afdbfa8d8c35da70bad3e55277"
+      "evidenceDigest": "75b17a188084edf56a69eb89fe29d0aaa0573937e29b7e7ce60b583e7d4ae170"
     },
     {
       "viewport": "960x720",
       "state": "focused-unchecked-after-pointer-keyboard",
       "theme": "light",
-      "evidenceDigest": "3ae99ccd280405a7e7a0d1f622367ed017a4dc1819de8d3c59e427b6a2764cb0"
+      "evidenceDigest": "14ece27ab685cac5f510f118acd052802dcf14dbb4dd1b7b92fb8c97cecefdc5"
     }
   ],
-  "classificationEvidenceDigest": "bc085be12dbdd9c3299880e738afcc5146206a6da9e232447b28c7f034be0a35",
-  "receiptDigest": "8665550b2f5df6cf3615f76bb35888d12c8db1123da643f96e16f67494c754d6"
+  "classificationEvidenceDigest": "788e75a6931d38e08d079975b439871045919e332910aa7c594b7c16aad3f10c",
+  "receiptDigest": "ccb46aba4026663ea06faf4395cbdedfff8797feaac22cc4444d596f940486af"
 }
