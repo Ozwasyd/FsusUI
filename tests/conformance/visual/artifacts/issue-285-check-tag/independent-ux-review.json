@@ -1,19 +1,19 @@
 {
   "schema": "fsusui-independent-ux-review.v1",
   "issue": 285,
-  "candidateSha": "a21b81d3a1ac4e172ffd4f97c077bad4b83e8c2a",
+  "candidateSha": "e926205ed02a98c66f790a632a2fc4ec6b893411",
   "reviewMode": "read-only-rendered-evidence-inspection",
   "modifiedPaths": [],
   "productionFixture": true,
   "identity": {
-    "executionId": "conformance-v2-check-tag-a21b81d3a1ac4e172ffd4f97c077bad4b83e8c2a",
+    "executionId": "conformance-v2-check-tag-e926205ed02a98c66f790a632a2fc4ec6b893411",
     "checkpoint": "check-tag-after-pointer-keyboard",
     "contract": "component-v2.el-check-tag",
     "scenario": "scenario.v2.el-check-tag.real-interaction-trace",
-    "contractHash": "eba9cebfc06993af5aace5cb12a304c7cc47f1fd2793a3cea291ee6878193ba6",
+    "contractHash": "e4bde4e2279b3ff6608e53b2d965068015bd510a244d26d8827f3082f55e317b",
     "webBaselineHash": "37ef61830b981a371dab4f05b3e476bb91a062a045ad736e52dbc9a73583572f",
-    "avaloniaBaselineHash": "fb17b7071bb175efc3a33bc6c637a37c9b72b12fbefe514c855f5fdba47fadde",
-    "runnerHash": "14a07e8fa6e0df4d9c343afa808e92a840a14b650f8d6309a6bd4da5faff5280"
+    "avaloniaBaselineHash": "caa4feb5977af864aff8c66046eae6d5abd570e5a280e720c8bfd1e45ad43c56",
+    "runnerHash": "ff759ad67427837fd4e3ac0b8535fd2deed1c8372c583ecd06ed9e21029f6b54"
   },
   "viewportStateMatrix": [
     {
@@ -34,7 +34,7 @@
         "screen-reader",
         "reduced-motion"
       ],
-      "evidenceDigest": "75b17a188084edf56a69eb89fe29d0aaa0573937e29b7e7ce60b583e7d4ae170"
+      "evidenceDigest": "cede06e2196173842ec99b1422f4242f3d54c3afdbfa8d8c35da70bad3e55277"
     },
     {
       "platform": "avalonia",
@@ -63,8 +63,8 @@
       "platform": "web",
       "kind": "screenshot",
       "path": "tests/conformance/visual/artifacts/issue-285-check-tag/check-tag-web-focused-unchecked.png",
-      "digest": "75b17a188084edf56a69eb89fe29d0aaa0573937e29b7e7ce60b583e7d4ae170",
-      "bytes": 1237,
+      "digest": "cede06e2196173842ec99b1422f4242f3d54c3afdbfa8d8c35da70bad3e55277",
+      "bytes": 1246,
       "width": 88,
       "height": 24,
       "inspected": true,
@@ -87,37 +87,37 @@
     {
       "id": "blue-focus-ring-visible",
       "status": "accepted",
-      "observation": "Independently opened both actual fresh PNGs. Blue rounded focus ring visibly surrounds Check tag on both platforms; native pixel evidence matches #2A599C at all 192 sampled points."
+      "observation": "All four actual screenshots visibly show a blue focus ring; each native capture reports 192/192 pixels matching #2A599C."
     },
     {
       "id": "no-black-default-adorner",
       "status": "accepted",
-      "observation": "Neither fresh PNG shows a black default focus adorner; native focus-ring perimeter reports zero unexpected dark pixels."
+      "observation": "No black default focus adorner is visible in any screenshot; both native perimeter samplers report zero unexpected dark pixels."
     },
     {
       "id": "unchecked-label-state-match",
       "status": "accepted",
-      "observation": "Both screenshots read Check tag. Pointer then keyboard traces finish unchecked at revision 2, native AutomationPeer checkedState off and browser CDP checkedState false; expected true/false change events recorded."
+      "observation": "All four actual screenshots read Check tag. Pointer followed by keyboard returns to unchecked, revision 2; CDP and native AutomationPeer report false/off."
     },
     {
       "id": "focus-no-bounds-shift",
       "status": "accepted",
-      "observation": "All four bounds dimensions agree across before/afterFocus/afterToggle: native window DIP (24,136,96,24); Web document CSS-px (0,136,87.625,24). Focus flags change false/true/true on each platform."
+      "observation": "Before focus, after focus, and after toggle are identical in XYWH: Web document CSS px (0,136,87.625,24) and native window DIP (24,136,96,24). Focus changes false to true to true."
     }
   ],
   "observations": [
-    "Fresh official run 44290438889 AOT job 134754168308 artifact 14420589641 ZIP independently verified: 304756 bytes, SHA256 c4ef096cbc62d6552d7a7579f9bcd11a1f50fd548ae2ce5de0965be8ebd2bdc8.",
-    "Both manifests, all step bindings, visual and performance bindings agree on exact candidate a21b81d3a1ac4e172ffd4f97c077bad4b83e8c2a, checkpoint check-tag-after-pointer-keyboard, epoch 1/revision 2, contract eba9cebfc06993af5aace5cb12a304c7cc47f1fd2793a3cea291ee6878193ba6 and runner 14a07e8fa6e0df4d9c343afa808e92a840a14b650f8d6309a6bd4da5faff5280. All recorded steps pass.",
-    "Native clocks are finite, nonnegative and ordered 1.9701 through 152.8157 ms. Web operation-duration fields are finite/nonnegative, not a shared monotonic timeline.",
-    "Native captured detachedControlCollected is true; render 1.9017 ms and interaction 6.6408 ms. Web captured collection flag true, render 0.4000 ms and interaction 2.3000 ms.",
-    "Raw Linux AT-SPI exposes Check tag as enabled, focusable, visible, checkable and unchecked. Orca receipt is exact-candidate pass with PID 7227 and Google Chrome. Native AutomationPeer and browser CDP report focused true."
+    "GitHub Quality Gates #1144 run 44657850205, pr-aot-conformance-failure artifact 14594093224: 295792-byte ZIP SHA256 cd0969d02c8763b4a762234af648f18c6d23a85de5292d3ca8131c0e659aec26. Executed reviewed PR head e926205ed02a98c66f790a632a2fc4ec6b893411.",
+    "GitHub Quality Gates #1144 run 44657850205, dotnet-package-conformance-failure artifact 14594432415: 297315-byte ZIP SHA256 dc312e5138a3be6588367609611f946c7e53ea5600015c949a58c82c61fbe953. Executed synthetic merge 33c8d6ca8f996defa528b8d23a0ec456152fe53d.",
+    "Both validated clean source trees equal 1a1d6d7164b4a42be594cbc40471f9c26dc5cf4e. Tracked PNGs come from the exact-head pair only; the separate synthetic merge pair was independently read and visually inspected and corroborates the result without relabelling any raw artifact.",
+    "Both routes use real Chrome/147.0.7727.15 with Linux AT-SPI reachability and passing Web screen-reader harness receipts (Orca PIDs 7218 and 7242). CDP and the Avalonia AutomationPeer both report focus and unchecked state. In each route all 10 steps per platform pass, bound to the same exact execution as visual and performance evidence.",
+    "AOT Web 0.6/2.8 ms, Avalonia 3.0741/11.1861 ms; package Web 0.5/2.3 ms, Avalonia 1.4751/5.8367 ms (render/interaction). All four probe collection flags true."
   ],
   "limitations": [
-    "Acceptance covers these four governed CheckTag criteria in this exact captured light/default/zh-CN/ltr/reduced-motion epoch only, not general performance or package acceptance.",
-    "Paired bounds establish the three recorded checkpoints, not continuous animation behavior; bounds do not have independent timestamps and platform clocks must not be aligned.",
-    "Raw AT-SPI does not expose focused state here; native focus evidence comes from AutomationPeer and browser focus from CDP, not from AT-SPI alone.",
-    "Orca process/reachability receipt is not a verified spoken announcement; NVDA and VoiceOver were not tested.",
-    "Hosted lifetime observation is specific to this probe and run, not proof against every possible retention path."
+    "This acceptance covers only the four CheckTag criteria in the light/default/zh-CN/ltr/reduced-motion, focused unchecked checkpoint. It is not package, full a11y, performance-gate, or CI acceptance.",
+    "Bounds prove the three recorded checkpoints, not an absence of instantaneous movement between them. Per-operation browser durations are not a shared cross-platform timeline.",
+    "AT-SPI exposes Check tag as enabled, focusable, shown/visible, checkable and unchecked, but not focused in this probe. Focus comes from CDP and Avalonia AutomationPeer.",
+    "Orca registration/reachability and PID are not recordings of spoken output; NVDA/VoiceOver were not tested. PNG and browser product do not independently prove sandbox state.",
+    "The Markdown-specific editableName diagnostic is false in both captures; no blanket accessibility pass is claimed. Lifetime observation is specific to this probe."
   ],
   "blockers": [],
   "status": "accepted"
