@@ -1,12 +1,12 @@
 {
   "schema": "fsusui-independent-ux-review.v1",
   "issue": 285,
-  "candidateSha": "b639c7b62c01324b0a40fee0a91f263585c422a8",
+  "candidateSha": "88e6063e3c2b904294ea5904ef66e8994c147015",
   "reviewMode": "read-only-rendered-evidence-inspection",
   "modifiedPaths": [],
   "productionFixture": true,
   "identity": {
-    "executionId": "conformance-v2-check-tag-b639c7b62c01324b0a40fee0a91f263585c422a8",
+    "executionId": "conformance-v2-check-tag-88e6063e3c2b904294ea5904ef66e8994c147015",
     "checkpoint": "check-tag-after-pointer-keyboard",
     "contract": "component-v2.el-check-tag",
     "scenario": "scenario.v2.el-check-tag.real-interaction-trace",
@@ -106,11 +106,11 @@
     }
   ],
   "observations": [
-    "Official GitHub Actions run 44764939478 AOT artifact 14646525237; verified archive SHA-256 16b8c5381d434029a8656e361faf448ba58d930bac0aecd20417a9c5e9a05422. Candidate b639c7b62c01324b0a40fee0a91f263585c422a8, clean source tree d7938ec60b27beebddf9036a71138cf16b6ace44. Independent reviewer viewed both actual PNGs and verified original raw bindings without modifying either raw manifest.",
-    "Canonical packaging artifact 14644046954 (verified ZIP cb9626aeb7b3a982fa08b59beb4fe5e749f8ee1e301c5939b3ba472416108407) records distinct synthetic candidate 3baa01aa54c750e20351ca02ff13a586b51e53b3 on the same clean source tree and byte-identical CheckTag PNGs; raw identities preserved.",
-    "Web raw SHA-256 f0965d053c72c2f07d7b5cefde84ee65bc7f1926ed855181de1340652ff673cf; Avalonia raw SHA-256 9a4337c472f2ae2b9953e02c9f443825e71ab94c01c7eb14e318b35d2eaacfa9. Same exact execution verifies nine functional steps per platform plus a separate diagnostic-only timing record.",
-    "Native verification SHA-256 ede76777dcc60595d7c65f9e2f0258056d7f422b6e03cf43ad97104b1fe05b91; Web AT-SPI raw SHA-256 443addb61f4ac151dca1bfd224bf4dc0803c2aa66e18f92487ecacc72f6335b5; Web harness receipt SHA-256 90d6d38c00e7c2ba361d7b506cdcbbe84aef9f8ae74c8e94ea3076f13235e34d. Chrome/147.0.7727.15 exposed the Check tag checkbox to Linux AT-SPI; Orca PID 7061. Focus and unchecked state are present in CDP and the real Avalonia AutomationPeer.",
-    "Web render/interaction 0.5999999999767169/2.8999999999650754 ms; Avalonia 2.5841/9.536 ms, diagnostic-only. Both bounded lifetime probes report detachedControlCollected=true."
+    "Official GitHub Actions run 44775687022 AOT artifact 14649718499; verified archive SHA-256 7d694eec63bb35b31723f76d036c25dd3ce809d170a7626718d9e1d53221e169. Candidate 88e6063e3c2b904294ea5904ef66e8994c147015, clean source tree 042dac56bece01f7572c2f2139599b11cb850aac. Independent reviewer viewed both actual PNGs and verified original raw bindings without modifying either raw manifest.",
+    "Two original screenshot files are byte-for-byte identical to the independently opened hosted CheckTag images; current canonical packaging evidence was not used to generate this receipt.",
+    "Web raw SHA-256 9f5aae41a38fb5f83343eed99783665237610812cce03803eb30c6f1102767bc; Avalonia raw SHA-256 ec4b8dd052eef1142a965c9bad92eda0cec257b394b185e6b600253530c3b2ee. Same exact execution verifies nine functional steps per platform plus a separate diagnostic-only timing record.",
+    "Native verification SHA-256 a76555ad8f69fd99f3d8a8660cbb8fc9ab0da65144c36e5317ac16a7d093537a; Web AT-SPI raw SHA-256 194edb75b6728a36aa127338ea08c12bb3a15333ccd47e6acdc39afbdb2fbb6d; Web harness receipt SHA-256 e1543f4e366ea3f0c33353f53823855ea1b33916e641884d94058ae934f7a5f5. Chrome/147.0.7727.15 exposed the Check tag checkbox to Linux AT-SPI; Orca PID 7059. Focus and unchecked state are present in CDP and the real Avalonia AutomationPeer.",
+    "Web render/interaction 0.4000000001396984/2.7000000001862645 ms; Avalonia 2.9797/11.1183 ms, diagnostic-only. Both bounded lifetime probes report detachedControlCollected=true."
   ],
   "limitations": [
     "Visual acceptance covers only the light/default/zh-CN/ltr/reduced-motion CheckTag checkpoint. This is not acceptance of the whole CI job, package, cross-renderer pixel equality, or timing.",
