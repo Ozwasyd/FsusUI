@@ -10,6 +10,8 @@ import {
 } from './run-avalonia-layout-ready.mjs'
 import {
   checkSustainedAbsolute,
+  checkThemeAbsolute,
+  checkHistoricalSplitDisposal,
   identifyNativeProtocol,
   requireSplitPlan,
 } from './verify-avalonia-split-arm.mjs'
@@ -40,7 +42,10 @@ test('rejects narrowed and altered formal split scope', () => {
   }
 })
 
-test('sustained alone cannot bypass any unchanged absolute control', () => {
+for (const [scenario, check] of [
+  ['virtual-list-variable-100k-sustained', checkSustainedAbsolute],
+  ['theme-switch', checkThemeAbsolute],
+]) test(`${scenario} cannot bypass any unchanged absolute control`, () => {
   const policy = {
     maxP95FrameMs: 30,
     maxPeakAllocatedBytesPerSample: 2048,
@@ -49,14 +54,14 @@ test('sustained alone cannot bypass any unchanged absolute control', () => {
   const sample = {
     Results: [
       {
-        Id: 'virtual-list-variable-100k-sustained',
+        Id: scenario,
         FrameMs: { P95: 30 },
         AllocatedBytes: { Max: 2048 },
         RetainedVisuals: { AfterUnload: 4 },
       },
     ],
   }
-  checkSustainedAbsolute(sample, policy)
+  check(sample, policy)
   for (const change of [
     (r) => {
       r.FrameMs.P95 += 0.1
@@ -70,8 +75,23 @@ test('sustained alone cannot bypass any unchanged absolute control', () => {
   ]) {
     const s = structuredClone(sample)
     change(s.Results[0])
-    assert.throws(() => checkSustainedAbsolute(s, policy))
+    assert.throws(() => check(s, policy))
   }
+})
+
+test('historical v3 theme must dispose to baseline and v2 remains valid without a theme partition', () => {
+  const clean = { Results: [{ RetainedVisuals: { ReturnedToBaseline: true } }] }
+  const retained = { Results: [{ RetainedVisuals: { ReturnedToBaseline: false } }] }
+  checkHistoricalSplitDisposal({ sustained: clean })
+  checkHistoricalSplitDisposal({ theme: clean, sustained: clean })
+  assert.throws(
+    () => checkHistoricalSplitDisposal({ theme: retained, sustained: clean }),
+    /historical theme visual disposal evidence/u,
+  )
+  assert.throws(
+    () => checkHistoricalSplitDisposal({ theme: clean, sustained: retained }),
+    /historical sustained visual disposal evidence/u,
+  )
 })
 
 const digest = (s) => createHash('sha256').update(s).digest('hex')

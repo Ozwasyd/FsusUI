@@ -11,7 +11,7 @@ import path from 'node:path'
 import process from 'node:process'
 import { pathToFileURL } from 'node:url'
 import { verifyImpactPlan } from './render-performance-impact.mjs'
-import { nativeDriverHash, nativeSplitProtocol, supportedNativeProtocol, readNativeBinding } from './run-avalonia-layout-ready.mjs'
+import { nativeDriverHash, isNativeSplitProtocol, supportedNativeProtocol, readNativeBinding } from './run-avalonia-layout-ready.mjs'
 import { verifyAvaloniaLayoutReady } from './verify-avalonia-layout-ready.mjs'
 import { verifyAvaloniaSplitArm } from './verify-avalonia-split-arm.mjs'
 
@@ -399,10 +399,10 @@ async function main() {
   if (useNativeProtocol) {
     const nativeOutput = path.join(output, 'avalonia')
     const scenario = plan.platforms.avalonia.scenario ?? ''
-    const split = process.env.FSUSUI_AVALONIA_MEASUREMENT_PROTOCOL === nativeSplitProtocol
+    const split = isNativeSplitProtocol(process.env.FSUSUI_AVALONIA_MEASUREMENT_PROTOCOL)
     const driverHash = await nativeDriverHash(root, { committed: split })
     if (split) {
-      await verifyAvaloniaSplitArm(nativeOutput, { productSha: sha, driverHash, plan, startedAt })
+      await verifyAvaloniaSplitArm(nativeOutput, { productSha: sha, driverHash, plan, startedAt, protocol: process.env.FSUSUI_AVALONIA_MEASUREMENT_PROTOCOL })
     } else {
       await readNativeBinding(nativeOutput, sha, driverHash, scenario)
       await verifyAvaloniaLayoutReady(nativeOutput, { scenario, impactPlan: plan })

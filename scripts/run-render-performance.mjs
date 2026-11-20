@@ -6,7 +6,7 @@ import { launchQuickWeb } from './run-quick-web-60hz.mjs'
 import { verifyWebMeasurement } from './verify-quick-web-60hz.mjs'
 import { execFileSync } from 'node:child_process'
 import { verifyImpactPlan } from './render-performance-impact.mjs'
-import { launchAvaloniaLayoutReady, nativeDriverHash, nativeSplitProtocol, supportedNativeProtocol } from './run-avalonia-layout-ready.mjs'
+import { launchAvaloniaLayoutReady, nativeDriverHash, isNativeSplitProtocol, supportedNativeProtocol } from './run-avalonia-layout-ready.mjs'
 import { verifyAvaloniaLayoutReady } from './verify-avalonia-layout-ready.mjs'
 import { requireSplitPlan, verifyAvaloniaSplitArm } from './verify-avalonia-split-arm.mjs'
 
@@ -118,13 +118,13 @@ if (!webOnly && native) {
   const appArgs = ['--render-performance', ...forwarded, '--output', path.join(nativeOutput, 'summary.json')]
   if (scenario) appArgs.push('--scenario', scenario)
   if (baseline) throw new Error('Avalonia layout-ready requires external four-arm comparison')
-  if (native === nativeSplitProtocol) requireSplitPlan(impactPlan)
+  if (isNativeSplitProtocol(native)) requireSplitPlan(impactPlan)
   const { productSha } = await launchAvaloniaLayoutReady({
     controllerRoot, productRoot: root, output: nativeOutput, appArgs, scenario, run, protocol: native,
   })
-  if (native === nativeSplitProtocol) {
+  if (isNativeSplitProtocol(native)) {
     await verifyAvaloniaSplitArm(nativeOutput, {
-      productSha, driverHash: await nativeDriverHash(controllerRoot, { committed: true }), plan: impactPlan,
+      productSha, driverHash: await nativeDriverHash(controllerRoot, { committed: true }), plan: impactPlan, protocol: native,
     })
   } else await verifyAvaloniaLayoutReady(nativeOutput, { scenario, impactPlan })
 } else if (!webOnly) {

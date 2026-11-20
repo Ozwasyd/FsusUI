@@ -52,7 +52,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
     }
     process.exitCode = 1
   }
-  await writeFile(output, JSON.stringify(result, null, 2) + '\n', {
+  await writeFile(output, `${JSON.stringify(result, null, 2)}\n`, {
     flag: 'wx',
   })
   if (process.exitCode)

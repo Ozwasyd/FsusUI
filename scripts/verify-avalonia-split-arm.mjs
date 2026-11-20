@@ -10,6 +10,7 @@ import {
 } from './run-avalonia-layout-ready.mjs'
 import {
   SUSTAINED_VARIABLE_SCENARIO,
+  THEME_SCENARIO,
   verifyAvaloniaLayoutReady,
 } from './verify-avalonia-layout-ready.mjs'
 
@@ -61,32 +62,51 @@ export function requireSplitPlan(plan) {
   )
 }
 
-export function checkSustainedAbsolute(summary, policy) {
+function checkIsolatedAbsolute(summary, policy, scenario, label) {
   const result = summary.Results[0]
-  assert.equal(result.Id, SUSTAINED_VARIABLE_SCENARIO)
+  assert.equal(result.Id, scenario)
   assert.ok(
     Number.isFinite(result.FrameMs.P95) &&
       result.FrameMs.P95 <= policy.maxP95FrameMs,
-    'sustained absolute frame p95 runaway limit',
+    `${label} absolute frame p95 runaway limit`,
   )
   assert.ok(
     Number.isFinite(result.AllocatedBytes.Max) &&
       result.AllocatedBytes.Max <= policy.maxPeakAllocatedBytesPerSample,
-    'sustained absolute allocation runaway limit',
+    `${label} absolute allocation runaway limit`,
   )
   const retained = result.RetainedVisuals?.AfterUnload
   assert.ok(
     Number.isSafeInteger(retained) &&
       retained >= 0 &&
       retained <= policy.maxRetainedVisuals,
-    'sustained absolute retained visuals runaway limit',
+    `${label} absolute retained visuals runaway limit`,
   )
+}
+
+export const checkSustainedAbsolute = (summary, policy) =>
+  checkIsolatedAbsolute(summary, policy, SUSTAINED_VARIABLE_SCENARIO, 'sustained')
+export const checkThemeAbsolute = (summary, policy) =>
+  checkIsolatedAbsolute(summary, policy, THEME_SCENARIO, 'theme')
+
+export function checkHistoricalSplitDisposal({ theme, sustained }) {
+  for (const [partition, summary] of [
+    ['theme', theme],
+    ['sustained', sustained],
+  ]) {
+    if (!summary) continue
+    assert.equal(
+      summary.Results[0].RetainedVisuals?.ReturnedToBaseline,
+      true,
+      `historical ${partition} visual disposal evidence`,
+    )
+  }
 }
 
 // Keep the historical-format canonical file and the isolated result intact on disk.
 export async function verifyAvaloniaSplitArm(
   output,
-  { productSha, driverHash, plan, startedAt },
+  { productSha, driverHash, plan, startedAt, protocol = nativeSplitProtocol },
 ) {
   requireSplitPlan(plan)
   const binding = await readNativeBinding(
@@ -94,14 +114,14 @@ export async function verifyAvaloniaSplitArm(
     productSha,
     driverHash,
     '',
-    nativeSplitProtocol,
+    protocol,
   )
-  const summaries = []
+  const summaries = new Map()
   for (const { partition, launchId } of binding.partitions) {
     const directory = nativePartitionPath(output, partition)
     await verifyAvaloniaLayoutReady(directory, {
       impactPlan: plan,
-      protocol: nativeSplitProtocol,
+      protocol,
       partition,
       launchId,
     })
@@ -132,25 +152,17 @@ export async function verifyAvaloniaSplitArm(
         `split must resolve ${key}`,
       )
     }
-    summaries.push(summary)
+    const previous = [...summaries.values()].at(-1)
+    if (previous) {
+      assert.deepEqual(previous.Environment, summary.Environment, 'split runtime or backend changed')
+      assert.ok(Date.parse(previous.GeneratedAt) <= Date.parse(summary.GeneratedAt), 'split launch order changed')
+    }
+    summaries.set(partition, summary)
   }
-  const [canonical, sustained] = summaries
-  assert.deepEqual(
-    canonical.Environment,
-    sustained.Environment,
-    'split runtime or backend changed',
-  )
-  assert.ok(
-    Date.parse(canonical.GeneratedAt) <= Date.parse(sustained.GeneratedAt),
-    'split launch order changed',
-  )
-  if (binding.historical)
-    assert.equal(
-      sustained.Results[0].RetainedVisuals?.ReturnedToBaseline,
-      true,
-      'historical sustained visual disposal evidence',
-    )
+  const { canonical, theme, sustained } = Object.fromEntries(summaries)
+  if (binding.historical) checkHistoricalSplitDisposal({ theme, sustained })
   const policy = await readJson(policyPath)
   checkSustainedAbsolute(sustained, policy.avalonia)
-  return { canonical, sustained }
+  if (theme) checkThemeAbsolute(theme, policy.avalonia)
+  return theme ? { canonical, theme, sustained } : { canonical, sustained }
 }

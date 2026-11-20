@@ -373,7 +373,8 @@ public class FsusNotificationHeadlessTests
   [AvaloniaFact]
   public async Task HoverPausesTimeoutAndPointerExitRestartsFullDuration()
   {
-    var (window, _, service) = CreateStyledService(nameof(ThemeVariant.Light));
+    var clock = new ManualTimeoutClock();
+    var (window, _, service) = CreateStyledService(nameof(ThemeVariant.Light), scheduleTimeout: clock.Schedule);
     var commandExecuted = 0;
     MovePointerAway(window);
 
@@ -392,11 +393,12 @@ public class FsusNotificationHeadlessTests
 
     var center = notification.TransformToVisual(window)!.Value.Transform(new Point());
     center += new Point(notification.Bounds.Width / 2, notification.Bounds.Height / 2);
+    clock.Advance(TimeSpan.FromMilliseconds(100));
     window.MouseMove(center);
     Dispatcher.UIThread.RunJobs();
     Assert.True(notification.IsPointerOver);
 
-    await Task.Delay(350);
+    clock.Advance(TimeSpan.FromMilliseconds(350));
     Dispatcher.UIThread.RunJobs();
     Assert.False(handle.IsClosed);
 
@@ -405,11 +407,11 @@ public class FsusNotificationHeadlessTests
     Dispatcher.UIThread.RunJobs();
     Assert.False(handle.IsClosed);
     Assert.False(notification.IsPointerOver);
-    await Task.Delay(75);
+    clock.Advance(TimeSpan.FromMilliseconds(149));
     Dispatcher.UIThread.RunJobs();
     Assert.False(handle.IsClosed);
 
-    await Task.Delay(200);
+    clock.Advance(TimeSpan.FromMilliseconds(1));
     Dispatcher.UIThread.RunJobs();
     Assert.True(handle.IsClosed);
     Assert.Equal(0, commandExecuted);
@@ -449,7 +451,8 @@ public class FsusNotificationHeadlessTests
   private static (Window Window, FsusOverlayHost Host, FsusNotificationService Service)
     CreateStyledService(
       string themeName,
-      FsusDensity density = FsusDensity.Default)
+      FsusDensity density = FsusDensity.Default,
+      Func<TimeSpan, Action, IDisposable>? scheduleTimeout = null)
   {
     var application = Assert.IsType<HeadlessTestApplication>(Application.Current);
     var themeOptions = new FsusThemeOptions
@@ -482,7 +485,66 @@ public class FsusNotificationHeadlessTests
     window.Show();
     window.UpdateLayout();
     Dispatcher.UIThread.RunJobs();
-    return (window, host, new FsusNotificationService(host));
+    return (window, host, new FsusNotificationService(host) { ScheduleTimeout = scheduleTimeout });
+  }
+
+  [AvaloniaFact]
+  public async Task ZeroDurationDoesNotArmAndEarlyCloseCancelsTimeout()
+  {
+    var clock = new ManualTimeoutClock();
+    var (window, _, service) = CreateStyledService(nameof(ThemeVariant.Light), scheduleTimeout: clock.Schedule);
+    MovePointerAway(window);
+    var zero = await service.ShowAsync(new FsusNotificationOptions { Duration = TimeSpan.Zero });
+    Assert.NotNull(zero);
+    Assert.Equal(0, clock.ScheduledCount);
+    clock.Advance(TimeSpan.FromDays(1));
+    Assert.False(zero!.IsClosed);
+    await zero.CloseAsync();
+
+    var timed = await service.ShowAsync(new FsusNotificationOptions { Duration = TimeSpan.FromMilliseconds(150) });
+    Assert.NotNull(timed);
+    Assert.Equal(1, clock.ScheduledCount);
+    await timed!.CloseAsync();
+    clock.Advance(TimeSpan.FromDays(1));
+    Assert.True(timed.IsClosed);
+    Assert.Equal(0, clock.FiredCount);
+    window.Close();
+  }
+
+  private sealed class ManualTimeoutClock
+  {
+    private TimeSpan now;
+    private readonly List<ScheduledTimeout> timers = [];
+    public int ScheduledCount { get; private set; }
+    public int FiredCount { get; private set; }
+
+    public IDisposable Schedule(TimeSpan duration, Action callback)
+    {
+      ScheduledCount++;
+      var timer = new ScheduledTimeout(now + duration, callback);
+      timers.Add(timer);
+      return timer;
+    }
+
+    public void Advance(TimeSpan elapsed)
+    {
+      Assert.True(elapsed >= TimeSpan.Zero);
+      now += elapsed;
+      foreach (var timer in timers.Where(value => !value.Cancelled && value.Due <= now).ToArray())
+      {
+        timer.Dispose();
+        FiredCount++;
+        timer.Callback();
+      }
+    }
+
+    private sealed class ScheduledTimeout(TimeSpan due, Action callback) : IDisposable
+    {
+      public TimeSpan Due { get; } = due;
+      public Action Callback { get; } = callback;
+      public bool Cancelled { get; private set; }
+      public void Dispose() => Cancelled = true;
+    }
   }
 
   private static Rect BoundsRelativeTo(Control ancestor, Control control)

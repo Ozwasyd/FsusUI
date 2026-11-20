@@ -21,6 +21,10 @@ on:
         description: SHA-256 of the release aggregator evidence bound to SHA, tag, and package.
         value: ${{ jobs.release-readiness.outputs.evidence-digest }}
 
+env:
+  # Coverage shards and the merger must hash an identical Node patch version.
+  FSUSUI_COVERAGE_NODE_VERSION: '22.23.5'
+
 jobs:
   real-render-performance:
     runs-on: ubuntu-24.04
@@ -520,7 +524,7 @@ jobs:
           version: 10.33.0
       - uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: ${{ env.FSUSUI_COVERAGE_NODE_VERSION }}
           cache: pnpm
           cache-dependency-path: pnpm-lock.yaml
       - uses: emscripten-core/setup-emsdk@v15
@@ -570,7 +574,7 @@ jobs:
           version: 10.33.0
       - uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: ${{ env.FSUSUI_COVERAGE_NODE_VERSION }}
           cache: pnpm
           cache-dependency-path: pnpm-lock.yaml
       - run: pnpm install --frozen-lockfile

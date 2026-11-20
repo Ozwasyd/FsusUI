@@ -3,6 +3,8 @@ import { test } from 'node:test'
 import {
   AVALONIA_LAYOUT_READY_PROTOCOL as protocol,
   AVALONIA_LAYOUT_READY_SPLIT_PROTOCOL as splitProtocol,
+  AVALONIA_LAYOUT_READY_THEME_SPLIT_PROTOCOL as themeProtocol,
+  THEME_SCENARIO as theme,
   ORIGINAL_VARIABLE_SCENARIO as remount,
   SUSTAINED_VARIABLE_SCENARIO as sustained,
   expectedAvaloniaLayoutReadyScenarios,
@@ -106,4 +108,26 @@ test('v2 rejects mixed payloads, missing rows, wrong launch, and changed workloa
   const changed = fixture({ protocol: splitProtocol, partition: 'sustained' })
   changed.summary.Runner.LongScrollIterations = 1
   await assert.rejects(changed.verify, /1 !== 256/u)
+})
+
+
+test('v3 isolates exactly theme and sustained while keeping all original quick rows', async () => {
+  const canonical = fixture({ protocol: themeProtocol, partition: 'canonical' })
+  const isolated = fixture({ protocol: themeProtocol, partition: 'theme' })
+  const scrolling = fixture({ protocol: themeProtocol, partition: 'sustained' })
+  const { scenarios } = await canonical.verify()
+  assert.equal(scenarios.length, 6)
+  assert.deepEqual((await isolated.verify()).scenarios, [theme])
+  assert.deepEqual([...scenarios, theme, ...(await scrolling.verify()).scenarios],
+    expectedAvaloniaLayoutReadyScenarios('quick'))
+  assert.throws(() => expectedAvaloniaLayoutReadyScenarios('quick', '', {
+    protocol: splitProtocol, partition: 'theme',
+  }), /unknown/u)
+  assert.throws(() => expectedAvaloniaLayoutReadyScenarios('quick', theme, {
+    protocol: themeProtocol, partition: 'theme',
+  }), /must not filter/u)
+  isolated.raw[theme].MeasurementProtocol = splitProtocol
+  await assert.rejects(isolated.verify, /mixed protocol/u)
+  canonical.summary.Results.push(isolated.summary.Results[0])
+  await assert.rejects(canonical.verify, /missing, duplicate/u)
 })

@@ -6,7 +6,7 @@ import process from 'node:process'
 import { isDeepStrictEqual } from 'node:util'
 import { verifyWebMeasurement } from './verify-quick-web-60hz.mjs'
 import { verifyImpactPlan } from './render-performance-impact.mjs'
-import { historicalNativeSha, nativeDriverHash, nativeSplitProtocol, supportedNativeProtocol, readNativeBinding } from './run-avalonia-layout-ready.mjs'
+import { historicalNativeSha, nativeDriverHash, isNativeSplitProtocol, supportedNativeProtocol, readNativeBinding } from './run-avalonia-layout-ready.mjs'
 import { verifyAvaloniaLayoutReady } from './verify-avalonia-layout-ready.mjs'
 import { identifyNativeProtocol, verifyAvaloniaSplitArm } from './verify-avalonia-split-arm.mjs'
 
@@ -112,7 +112,7 @@ if (currentPlan?.platforms.avalonia.run !== false) {
     if (limit !== 0.15 || dirs.length !== 4) throw new Error('Avalonia layout-ready requires four arms and the 15% limit')
     const controllerRoot = path.resolve(import.meta.dirname, '..')
     const sha = execFileSync('git', ['rev-parse', '--verify', 'HEAD'], { cwd: controllerRoot, encoding: 'utf8' }).trim()
-    const split = effectiveNativeProtocol === nativeSplitProtocol
+    const split = isNativeSplitProtocol(effectiveNativeProtocol)
     const driverHash = await nativeDriverHash(controllerRoot, { committed: split })
     let splitEnvironment
     let scenario = currentPlan ? (currentPlan.platforms.avalonia.scenario ?? '') : undefined
@@ -121,13 +121,13 @@ if (currentPlan?.platforms.avalonia.run !== false) {
       const nativeOutput = path.join(directory, 'avalonia')
       if (nativeSummaries[index].GitSha !== expected) throw new Error('Avalonia layout-ready summary identity mismatch')
       if (split) {
-        const { canonical, sustained } = await verifyAvaloniaSplitArm(nativeOutput, {
-          productSha: expected, driverHash, plan: currentPlan,
+        const { canonical, theme, sustained } = await verifyAvaloniaSplitArm(nativeOutput, {
+          productSha: expected, driverHash, plan: currentPlan, protocol: effectiveNativeProtocol,
         })
         if (splitEnvironment && !isDeepStrictEqual(splitEnvironment, canonical.Environment))
           throw new Error('Avalonia split runtime and renderer must match in all four arms')
         splitEnvironment ??= canonical.Environment
-        splitSummaries.set(directory, [...canonical.Results, ...sustained.Results])
+        splitSummaries.set(directory, [...canonical.Results, ...(theme?.Results ?? []), ...sustained.Results])
       } else {
         const proof = await readNativeBinding(nativeOutput, expected, driverHash, scenario)
         scenario ??= proof.scenario

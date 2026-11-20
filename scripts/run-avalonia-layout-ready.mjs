@@ -7,11 +7,18 @@ import process from 'node:process'
 
 export const nativeProtocol = 'variable-list-layout-ready.v1'
 export const nativeSplitProtocol = 'variable-list-layout-ready.v2'
-export const supportedNativeProtocol = protocol => [nativeProtocol, nativeSplitProtocol].includes(protocol)
-const partitions = ['canonical', 'sustained']
+export const nativeThemeSplitProtocol = 'variable-list-layout-ready.v3'
+export const isNativeSplitProtocol = protocol =>
+  protocol === nativeSplitProtocol || protocol === nativeThemeSplitProtocol
+export const supportedNativeProtocol = protocol =>
+  protocol === nativeProtocol || isNativeSplitProtocol(protocol)
+const nativePartitions = protocol => protocol === nativeThemeSplitProtocol
+  ? ['canonical', 'theme', 'sustained']
+  : ['canonical', 'sustained']
+const bindingVersion = protocol => protocol === nativeThemeSplitProtocol ? 3 : isNativeSplitProtocol(protocol) ? 2 : 1
 export const nativePartitionPath = (output, partition) => {
-  requireThat(partitions.includes(partition), 'unknown process partition')
-  return partition === 'canonical' ? output : path.join(output, 'sustained')
+  requireThat(nativePartitions(nativeThemeSplitProtocol).includes(partition), 'unknown process partition')
+  return partition === 'canonical' ? output : path.join(output, partition)
 }
 
 export const historicalNativeSha = 'f2d929a5d045439c35e93b4771f912ce50ec2337'
@@ -80,10 +87,10 @@ async function artifactHashes(output) {
 
 const releaseSummary = async output => JSON.parse(await readFile(path.join(output, 'summary.json'), 'utf8'))
 
-async function partitionRecord(output, partition, launchId, productSha) {
+async function partitionRecord(output, partition, launchId, productSha, protocol) {
   const directory = nativePartitionPath(output, partition)
   const summary = await releaseSummary(directory)
-  requireThat(summary.GitSha === productSha && summary.MeasurementProtocol === nativeSplitProtocol
+  requireThat(summary.GitSha === productSha && summary.MeasurementProtocol === protocol
     && summary.MeasurementPartition === partition && summary.LaunchId === launchId
     && Number.isSafeInteger(summary.ProcessId) && summary.ProcessId > 0,
   'partition process/source identity mismatch')
@@ -94,7 +101,7 @@ async function partitionRecord(output, partition, launchId, productSha) {
 export async function readNativeBinding(output, expectedProductSha, expectedDriverHash, expectedScenario, expectedProtocol = nativeProtocol) {
   const evidence = JSON.parse(await readFile(path.join(output, binding), 'utf8'))
   requireThat(
-    evidence.schemaVersion === (expectedProtocol === nativeSplitProtocol ? 2 : 1)
+    evidence.schemaVersion === bindingVersion(expectedProtocol)
       && evidence.protocol === expectedProtocol
       && typeof evidence.scenario === 'string'
       && (expectedScenario === undefined || evidence.scenario === expectedScenario)
@@ -107,15 +114,17 @@ export async function readNativeBinding(output, expectedProductSha, expectedDriv
       && (evidence.historical || evidence.originalDriverSha256 === expectedDriverHash),
     'measurement provenance mismatch',
   )
-  if (expectedProtocol === nativeSplitProtocol) {
+  if (isNativeSplitProtocol(expectedProtocol)) {
+    const partitions = nativePartitions(expectedProtocol)
     requireThat(evidence.scenario === '' && Array.isArray(evidence.partitions)
-      && evidence.partitions.length === 2, 'split manifest incomplete')
+      && evidence.partitions.length === partitions.length, 'split manifest incomplete')
     const actual = await Promise.all(partitions.map(async (partition, i) => {
       const proof = evidence.partitions[i]
       requireThat(proof.partition === partition && /^[a-f0-9-]{36}$/u.test(proof.launchId), 'split partition order or identity')
-      return partitionRecord(output, partition, proof.launchId, expectedProductSha)
+      return partitionRecord(output, partition, proof.launchId, expectedProductSha, expectedProtocol)
     }))
-    requireThat(actual[0].launchId !== actual[1].launchId && actual[0].processId !== actual[1].processId,
+    requireThat(new Set(actual.map(record => record.launchId)).size === partitions.length
+      && new Set(actual.map(record => record.processId)).size === partitions.length,
       'split partitions must have distinct process identities')
     requireThat(JSON.stringify(evidence.partitions) === JSON.stringify(actual), 'split partition artifact mismatch')
   } else {
@@ -127,7 +136,7 @@ export async function readNativeBinding(output, expectedProductSha, expectedDriv
 
 export async function launchAvaloniaLayoutReady({ controllerRoot, productRoot, output, appArgs, scenario, run, protocol = nativeProtocol }) {
   requireThat(supportedNativeProtocol(protocol), 'unsupported measurement protocol')
-  const split = protocol === nativeSplitProtocol
+  const split = isNativeSplitProtocol(protocol)
   requireThat(!split || scenario === '', 'split requires an unfiltered native run')
   const historical = controllerRoot !== productRoot
   const productSha = productHead(productRoot)
@@ -181,15 +190,15 @@ export async function launchAvaloniaLayoutReady({ controllerRoot, productRoot, o
         'unexpected ambient split identity')
       const outputIndex = appArgs.indexOf('--output')
       requireThat(outputIndex !== -1 && appArgs.lastIndexOf('--output') === outputIndex, 'split requires one output flag')
-      for (const partition of partitions) {
+      for (const partition of nativePartitions(protocol)) {
         const launchId = randomUUID()
         const args = [...appArgs]
         args[outputIndex + 1] = path.join(nativePartitionPath(output, partition), 'summary.json')
         await launch(args, { ...env, FSUSUI_AVALONIA_MEASUREMENT_PROTOCOL: protocol,
           FSUSUI_AVALONIA_MEASUREMENT_PARTITION: partition, FSUSUI_AVALONIA_MEASUREMENT_LAUNCH_ID: launchId })
-        splitRecords.push(await partitionRecord(output, partition, launchId, productSha))
+        splitRecords.push(await partitionRecord(output, partition, launchId, productSha, protocol))
       }
-      requireThat(splitRecords[0].processId !== splitRecords[1].processId, 'split reused one process')
+      requireThat(new Set(splitRecords.map(record => record.processId)).size === splitRecords.length, 'split reused one process')
     } else await launch(appArgs, env)
     if (historical || split)
       execFileSync('git', ['diff', '--quiet', 'HEAD', '--'], { cwd: productRoot })
@@ -197,7 +206,7 @@ export async function launchAvaloniaLayoutReady({ controllerRoot, productRoot, o
     requireThat(productHead(productRoot) === productSha, 'product revision changed during measurement')
     requireThat(await nativeDriverHash(controllerRoot) === effectiveDriverSha256, 'driver changed during measurement')
     await writeFile(path.join(output, binding), `${JSON.stringify({
-      schemaVersion: split ? 2 : 1,
+      schemaVersion: bindingVersion(protocol),
       protocol,
       scenario,
       productSha,

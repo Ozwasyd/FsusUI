@@ -4,11 +4,15 @@ import path from 'node:path'
 
 export const AVALONIA_LAYOUT_READY_PROTOCOL = 'variable-list-layout-ready.v1'
 export const AVALONIA_LAYOUT_READY_SPLIT_PROTOCOL = 'variable-list-layout-ready.v2'
+export const AVALONIA_LAYOUT_READY_THEME_SPLIT_PROTOCOL = 'variable-list-layout-ready.v3'
+export const THEME_SCENARIO = 'theme-switch'
+const isSplit = protocol => protocol === AVALONIA_LAYOUT_READY_SPLIT_PROTOCOL ||
+  protocol === AVALONIA_LAYOUT_READY_THEME_SPLIT_PROTOCOL
 export const SUSTAINED_VARIABLE_SCENARIO = 'virtual-list-variable-100k-sustained'
 export const ORIGINAL_VARIABLE_SCENARIO = 'virtual-list-variable-100k'
 const quick = ['virtual-list-fixed-100k', ORIGINAL_VARIABLE_SCENARIO,
   'table-v2-two-axis-100k', 'data-table-sort-select-replace',
-  'tree-expand-scroll', 'input-continuous', 'theme-switch']
+  'tree-expand-scroll', 'input-continuous', THEME_SCENARIO]
 const full = ['virtual-list-fixed-1k', 'virtual-list-fixed-10k', 'virtual-list-fixed-100k',
   'virtual-list-variable-1k', 'virtual-list-variable-10k', ORIGINAL_VARIABLE_SCENARIO,
   'table-v2-two-axis-10k', ...quick.slice(2)]
@@ -23,14 +27,16 @@ export function expectedAvaloniaLayoutReadyScenarios(
 ) {
   assert.ok(
     protocol === AVALONIA_LAYOUT_READY_PROTOCOL ||
-      protocol === AVALONIA_LAYOUT_READY_SPLIT_PROTOCOL,
+      isSplit(protocol),
     'unknown native measurement protocol',
   )
-  if (protocol === AVALONIA_LAYOUT_READY_SPLIT_PROTOCOL) {
+  if (isSplit(protocol)) {
     assert.equal(profile, 'quick', 'split native measurement requires quick profile')
     assert.equal(scenario, '', 'split native measurement must not filter scenarios')
+    if (protocol === AVALONIA_LAYOUT_READY_THEME_SPLIT_PROTOCOL && partition === 'theme') return [THEME_SCENARIO]
     assert.ok(partition === 'canonical' || partition === 'sustained', 'unknown native measurement partition')
-    return partition === 'canonical' ? [...quick] : [SUSTAINED_VARIABLE_SCENARIO]
+    if (partition === 'sustained') return [SUSTAINED_VARIABLE_SCENARIO]
+    return protocol === AVALONIA_LAYOUT_READY_THEME_SPLIT_PROTOCOL ? quick.slice(0, -1) : [...quick]
   }
   assert.equal(partition, null, 'legacy measurement has no partition')
   assert.ok(profile === 'quick' || profile === 'full', 'unknown native profile')
@@ -59,7 +65,7 @@ export async function validateAvaloniaLayoutReady(
     scenario = selected
   }
   const ids = expectedAvaloniaLayoutReadyScenarios(summary.Profile, scenario, { protocol, partition })
-  const split = protocol === AVALONIA_LAYOUT_READY_SPLIT_PROTOCOL
+  const split = isSplit(protocol)
   if (split) {
     assert.equal(summary.MeasurementPartition, partition, 'wrong summary partition')
     assert.ok(Number.isSafeInteger(summary.ProcessId) && summary.ProcessId > 0, 'invalid native process ID')
