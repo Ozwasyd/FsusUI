@@ -11,6 +11,30 @@ import {
 } from '../src/markdown-editor-writing-aids'
 
 describe('markdown-editor writing aids contract', () => {
+  it('distinguishes omitted writing-aid updates from an explicit reset to defaults', () => {
+    const controller = createWritingAidsController({
+      writingAids: {
+        focus: true,
+        typewriter: true,
+        typewriterAnchor: 'center',
+      },
+    })
+
+    controller.updateDocument({ source: 'updated' })
+    expect(controller.options).toEqual({
+      focus: true,
+      typewriter: true,
+      typewriterAnchor: 'center',
+    })
+
+    controller.updateDocument({ writingAids: undefined })
+    expect(controller.options).toEqual({
+      focus: false,
+      typewriter: false,
+      typewriterAnchor: 'upper-third',
+    })
+  })
+
   it('keeps writing aids disabled by default and defaults an enabled typewriter to upper-third', () => {
     expect(resolveWritingAids()).toMatchObject({
       focus: false,

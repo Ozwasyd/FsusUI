@@ -982,7 +982,7 @@ export const createWritingAidsController = (
       const previousIdentity = documentState.documentIdentity
       const previousEpoch = documentState.documentEpoch
       documentState = Object.freeze({ ...documentState, ...document })
-      if (document.writingAids !== undefined) {
+      if (Object.hasOwn(document, 'writingAids')) {
         resolved = resolveWritingAids({
           writingAids: document.writingAids,
         } as MarkdownEditorWritingAidsOptions &
