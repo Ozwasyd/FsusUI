@@ -225,7 +225,9 @@ public class FsusTabs : TabControl
       }
     }
 
-    SyncPanes();
+    // ItemsSource has not processed this notification yet. IsSelected can reenter
+    // its selection model, so commit pane state with SelectedItem below.
+    SyncAutomation();
     SchedulePaneSelectionCommit();
   }
 
@@ -245,6 +247,10 @@ public class FsusTabs : TabControl
       if (!ReferenceEquals(SelectedItem, selectedPane))
       {
         SelectedItem = selectedPane;
+      }
+      foreach (var pane in panes)
+      {
+        pane.IsSelected = pane.Key == SelectedKey;
       }
     });
   }
