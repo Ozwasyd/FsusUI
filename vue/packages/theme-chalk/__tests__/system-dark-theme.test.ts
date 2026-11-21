@@ -26,7 +26,10 @@ const componentRoot =
 const cases = [
   {
     name: 'compatibility palette',
-    selectors: ['.dark', compatibilityRoot],
+    selectors: [
+      '.dark',
+      ":where(html:not(.light))[data-theme-resolved='dark']",
+    ],
     tokens: [
       '--el-color-primary-light-9',
       '--el-color-danger-light-9',

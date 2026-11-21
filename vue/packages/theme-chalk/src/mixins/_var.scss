@@ -35,8 +35,8 @@
   );
 }
 
-@mixin set-css-main-vars {
-  @include set-css-var-value(('color', 'scholarly-blue'), $color-scholarly-blue);
+@mixin set-css-main-vars($scholarly-blue: $color-scholarly-blue) {
+  @include set-css-var-value(('color', 'scholarly-blue'), $scholarly-blue);
   @include set-css-var-value(
     ('bg-color', 'overlay-blur'),
     blur(var(--fsus-backdrop-blur, 0px)) saturate(var(--fsus-backdrop-saturate, 100%))
