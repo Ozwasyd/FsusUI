@@ -93,11 +93,11 @@
 }
 
 // for dark
-.dark {
+.dark,
+:where(html:not(.light))[data-theme-resolved='dark'] {
   color-scheme: dark;
 
-  @include set-css-main-vars;
-  @include set-css-var-value(('color', 'scholarly-blue'), $color-scholarly-blue-dark);
+  @include set-css-main-vars($color-scholarly-blue-dark);
 
   @include set-css-var-value('color-white', map.get($colors-dark, 'white'));
   @include set-css-var-value('color-black', map.get($colors-dark, 'black'));
