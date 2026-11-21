@@ -9,7 +9,7 @@
         [ns.m('hidden')]: isHidden,
         [ns.m('group')]: isGroup,
         [ns.m('fluid-height')]: maxHeight,
-        [ns.m('scrollable-x')]: layout.scrollX.value,
+        [ns.m('scrollable-x')]: hasHorizontalOverflow,
         [ns.m('scrollable-y')]: layout.scrollY.value,
         [ns.m('enable-row-hover')]: !store.states.isComplex.value,
         [ns.m('enable-row-transition')]:
@@ -19,6 +19,7 @@
       },
       ns.m(tableSize),
       className,
+      scrollPositionClass,
       ns.b(),
       ns.m(`layout-${tableLayout}`),
       ns.m(`responsive-${responsive}`),
@@ -293,6 +294,8 @@ export default defineComponent({
       tableBodyStyles,
       tableLayout,
       scrollbarViewStyle,
+      hasHorizontalOverflow,
+      scrollPositionClass,
       tableInnerStyle,
       scrollbarStyle,
       refreshData,
@@ -303,7 +306,7 @@ export default defineComponent({
     const responsiveScrollEnabled = computed(
       () =>
         props.responsive === 'scroll' ||
-        (props.responsive === 'auto' && layout.scrollX.value),
+        (props.responsive === 'auto' && hasHorizontalOverflow.value),
     )
     const responsiveHasScrolled = ref(false)
     const handleResponsiveScroll = ({
@@ -388,6 +391,8 @@ export default defineComponent({
       setScrollLeft,
       setScrollTop,
       responsiveHasScrolled,
+      hasHorizontalOverflow,
+      scrollPositionClass,
       responsiveScrollEnabled,
       handleResponsiveScroll,
       handleResponsiveScrollKeydown,
