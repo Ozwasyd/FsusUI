@@ -218,7 +218,19 @@ describe('issue #1082: MarkdownRenderer canonical block anchors and fragment loc
     expect(beforeReveal.chunkKey).toBeTruthy()
     expect(scroller.querySelector('#sample')).toBeNull()
 
-    const revealed = await vm.revealFragment('#sample')
+    // jsdom does not lay out elements. Keep the existing synthetic viewport
+    // and supply the destination's visible box so reveal can confirm it.
+    const readRect = HTMLElement.prototype.getBoundingClientRect
+    const measure = vi
+      .spyOn(HTMLElement.prototype, 'getBoundingClientRect')
+      .mockImplementation(function (this: HTMLElement) {
+        return this.id === 'sample'
+          ? new DOMRect(0, 8, 160, 32)
+          : readRect.call(this)
+      })
+    const revealed = await vm.revealFragment('#sample').finally(() => {
+      measure.mockRestore()
+    })
     expect(revealed.ok).toBe(true)
     expect(revealed.id).toBe('sample')
     expect(revealed.fragment).toBe('#sample')

@@ -1,7 +1,10 @@
 import { expect, test } from '@playwright/test'
 import type {} from './main'
 
-test.use({ launchOptions: { chromiumSandbox: true } })
+test.use({
+  launchOptions: { chromiumSandbox: true },
+  viewport: { width: 1000, height: 700 },
+})
 
 test.beforeEach(async ({ page }) => {
   await page.goto('/')

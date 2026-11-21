@@ -1,5 +1,6 @@
 import { createApp, h, ref } from 'vue'
 import { ElConfigProvider, ElMarkdownRenderer } from '@ozwasyd/element-plus'
+import '@element-plus/components/markdown-renderer/style'
 
 const fence = '`'.repeat(3)
 const blocks = Array.from(
@@ -12,7 +13,8 @@ const source = [
   '## Heading witness ^harbor',
   'A *paragraph* ^detail',
   `${fence}text\natomic value\n## Fake ^inside-fence\n${fence}\n^sample`,
-  'Duplicate heading ^harbor',
+  'Duplicate heading ^collision',
+  'Second valid owner ^collision',
   'Invalid marker ^Upper',
   `${fence}text\nafter gap\n${fence}`,
   '^skipped',

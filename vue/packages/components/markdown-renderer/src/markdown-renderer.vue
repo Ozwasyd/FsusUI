@@ -233,16 +233,26 @@ const getChunkUnitAttrs = (
   item: {
     index: number
     key: string
+    size: number
     unit: MarkdownRenderChunk
   },
   visibleIndex = 0,
 ) => {
+  const acceleration = resolveFsusRenderPipelineUnitAttrs({
+    baseAttrs: renderPipelineRuntime.hardwareAttrs.value,
+    layerBudget: resolvedRenderPipelineConfig.value.acceleration.layerBudget,
+    unitIndex: visibleIndex,
+  })
   return {
-    ...resolveFsusRenderPipelineUnitAttrs({
-      baseAttrs: renderPipelineRuntime.hardwareAttrs.value,
-      layerBudget: resolvedRenderPipelineConfig.value.acceleration.layerBudget,
-      unitIndex: visibleIndex,
-    }),
+    ...acceleration,
+    // Offscreen content can report its intrinsic placeholder as a measurement.
+    // Give the browser the same fallback size the virtual index currently uses.
+    style:
+      acceleration['data-fsus-content-visibility'] === 'enabled'
+        ? {
+            containIntrinsicSize: `auto var(--fsus-render-unit-intrinsic-size, ${item.size}px)`,
+          }
+        : undefined,
     'data-fsus-render-unit': '',
     'data-fsus-render-unit-key': item.key,
     'data-fsus-render-unit-index': item.index,
@@ -1488,6 +1498,7 @@ const scrollElementIntoFragmentView = (
 // before re-reading its size index. A first jump can land past the target
 // when previously estimated chunk sizes change around the destination.
 const MAX_FRAGMENT_REVEAL_ATTEMPTS = 4
+const FRAGMENT_SETTLE_FRAMES = 2
 const fragmentRevealFrameKey = `${localDocumentKey}-reveal-fragment`
 const scheduleFragmentFrame = (
   signal: AbortSignal,
@@ -1549,6 +1560,10 @@ const revealFragment = async (
     viewport === document.documentElement ||
     viewport === document.body ||
     viewport === document.scrollingElement
+  const usesSmoothScroll =
+    options?.behavior === 'smooth' ||
+    ((options?.behavior ?? 'auto') === 'auto' &&
+      window.getComputedStyle(viewport).scrollBehavior === 'smooth')
   const controller = new AbortController()
   fragmentRevealController = controller
 
@@ -1593,10 +1608,51 @@ const revealFragment = async (
       await scheduleFragmentFrame(controller.signal, virtualWindow.readViewport)
       await nextTick()
       if (controller.signal.aborted) break
-      const element = findMountedFragmentElement(initial.id)
-      if (element) {
+      let element = findMountedFragmentElement(initial.id)
+      // Use the actual element once it exists. One more alignment can absorb
+      // a measured-height adjustment without jumping back to an estimate.
+      for (let alignment = 0; alignment < 2 && element; alignment += 1) {
         scrollElementIntoFragmentView(element, options)
-        return result(element)
+        for (
+          let frame = 0;
+          frame < FRAGMENT_SETTLE_FRAMES && !controller.signal.aborted;
+          frame += 1
+        ) {
+          await scheduleFragmentFrame(
+            controller.signal,
+            virtualWindow.readViewport,
+          )
+          await nextTick()
+        }
+        if (controller.signal.aborted) break
+
+        const confirmed = findMountedFragmentElement(initial.id)
+        if (
+          !confirmed ||
+          resolveElementChunkLocation(confirmed).chunkKey !== initial.chunkKey
+        ) {
+          break
+        }
+        if (usesSmoothScroll) return result(confirmed)
+
+        const viewportTop = isDocumentViewport
+          ? 0
+          : viewport.getBoundingClientRect().top + viewport.clientTop
+        const viewportBottom =
+          viewportTop +
+          (isDocumentViewport ? window.innerHeight : viewport.clientHeight)
+        const targetRect = confirmed.getBoundingClientRect()
+        const startsAboveViewport =
+          (options?.block ?? 'start') === 'start' &&
+          targetRect.top < viewportTop - 1
+        if (
+          !startsAboveViewport &&
+          targetRect.bottom > viewportTop &&
+          targetRect.top < viewportBottom
+        ) {
+          return result(confirmed)
+        }
+        element = confirmed
       }
     }
     return result(null)
