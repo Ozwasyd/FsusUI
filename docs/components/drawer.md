@@ -30,8 +30,11 @@ padding without moving that edge:
 - `btt`: bottom / left / right
 
 The absolutely positioned close button does not move with header padding, so it
-also consumes the top inset and the right inset on `rtl`, `ttb`, and `btt`
-panels through `fsus-inset-safe-area`.
+consumes the top safe-area inset on top-attached panels (`ltr`, `rtl`, `ttb`)
+and the right safe-area inset on `rtl`, `ttb`, and `btt` panels through
+`fsus-inset-safe-area`. Because bottom sheets (`btt`) do not attach to the top
+viewport edge, their close button aligns to the header's base top padding
+instead of the top safe-area inset.
 
 The overlay scrim still covers the full viewport. Do not patch Drawer geometry
 from a consumer; use the shared [viewport and safe-area contract](../theme/tokens.md#viewport-and-safe-area-contract).
@@ -46,6 +49,24 @@ interactive again on reopening; `destroy-on-close` still controls destruction.
 
 The `pnpm audit:visual-boundaries` matrix covers all four Drawer directions.
 It verifies the viewport-safe CSS contract, not a physical Safari toolbar.
+
+## Header, Focus & Edge Surface
+
+- **Header / close optical alignment:** When `show-close` is enabled, the header
+  reserves at least the `54px` close-button track height so single-line titles
+  center optically with the close button and the `54×54` close hit box stays
+  inside `.el-drawer__header` without overhanging into `.el-drawer__body`.
+  Wrapping titles expand the header cleanly above `54px`.
+- **Close-button focus feedback:** Hover and keyboard `:focus-visible` highlight
+  the close icon with the primary accent color, and `:focus-visible` shows the
+  circular `2px` focus ring. Pointer or touch opening does not tint the close
+  icon.
+- **Viewport-flush surface geometry:** Edge-attached drawers (`ltr`, `rtl`,
+  `ttb`, `btt`) render flush against viewport edges with `border-radius: 0` and
+  no redundant outer border on flush edges, keeping only the `1px` inner
+  separating border (`border-right` for `ltr`, `border-left` for `rtl`,
+  `border-bottom` for `ttb`, `border-top` for `btt`). See
+  [Dialog and Drawer](../design.md#dialog-and-drawer).
 
 ## Without a Title
 

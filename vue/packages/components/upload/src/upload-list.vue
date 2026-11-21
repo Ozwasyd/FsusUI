@@ -45,6 +45,7 @@
             v-if="file.status === 'uploading'"
             :type="listType === 'picture-card' ? 'circle' : 'line'"
             :stroke-width="listType === 'picture-card' ? 6 : 2"
+            :width="listType === 'picture-card' ? 84 : undefined"
             :percentage="Number(file.percentage)"
             :style="
               listType === 'picture-card' || listType === 'text'
@@ -103,11 +104,25 @@
 
         <!-- Picture-card retains its own thumbnail and action-bar structure. -->
         <template v-else>
-          <label :class="nsUpload.be('list', 'item-status-label')">
-            <el-icon :class="[nsIcon.m('upload-success'), nsIcon.m('check')]">
+          <span
+            v-if="file.status === 'success' || file.status === 'fail'"
+            :class="nsUpload.be('list', 'item-status-label')"
+            role="status"
+            :aria-label="statusText(file)"
+          >
+            <el-icon
+              v-if="file.status === 'success'"
+              :class="[nsIcon.m('upload-success'), nsIcon.m('check')]"
+            >
               <Check />
             </el-icon>
-          </label>
+            <el-icon
+              v-else-if="file.status === 'fail'"
+              :class="[nsIcon.m('upload-fail'), nsIcon.m('circle-close')]"
+            >
+              <circle-close />
+            </el-icon>
+          </span>
           <button
             v-if="!disabled"
             type="button"
@@ -202,7 +217,6 @@ const STATUS_DEFAULTS: Record<UploadStatus, string> = {
 
 const ACTION_DEFAULTS = {
   cancel: 'Cancel',
-  retry: 'Retry',
 } as const
 
 const resolveLabel = (path: string, fallback: string) => {

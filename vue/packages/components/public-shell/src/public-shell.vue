@@ -350,7 +350,9 @@
             ns.e('mobile-search-host'),
             ns.is('expanded', mobileSearchExpanded),
           ]"
-          :hidden="!mobileSearchDisclosureAvailable"
+          :hidden="
+            mobileSearchUsesCspPopover && !mobileSearchDisclosureAvailable
+          "
           :aria-hidden="
             !mobileSearchExpanded || !mobileSearchDisclosureAvailable
           "
@@ -359,6 +361,8 @@
             !mobileSearchDisclosureAvailable ||
             undefined
           "
+          @pointerdown="handleMobileSearchCspHostPointerDown"
+          @click="handleMobileSearchCspHostClick"
         >
           <div
             :id="mobileSearchRowId"
@@ -372,43 +376,34 @@
             :inert="!mobileSearchExpanded || undefined"
             @keydown.esc="handleMobileSearchEscape"
           >
-            <button
-              type="button"
-              :class="ns.e('mobile-search-trigger')"
-              @click="closeMobileSearch(true)"
-            >
-              {{ mobileSearchCancelLabel }}
-            </button>
-            <div :class="ns.e('mobile-search-content')">
-              <slot name="mobile-search">
-                <form
-                  v-if="showSearch"
-                  :class="[ns.e('search'), ns.em('search', 'trigger')]"
-                  :action="searchAction"
-                  method="get"
-                  @submit="handleSearchSubmit"
-                >
-                  <el-input
-                    :model-value="searchValue"
-                    :placeholder="searchPlaceholder"
-                    :label="searchAriaLabel"
-                    size="small"
-                    :class="ns.e('search-input')"
-                    :csp-safe="cspSafe"
-                    clearable
-                    @focus="emit('search-focus')"
-                    @input="handleSearchInput"
-                    @keydown.enter="handleSearchEnter"
-                  />
-                  <input
-                    v-if="searchName"
-                    type="hidden"
-                    :name="searchName"
-                    :value="searchValue"
-                  />
-                </form>
-              </slot>
-            </div>
+            <slot name="mobile-search">
+              <form
+                v-if="showSearch"
+                :class="[ns.e('search'), ns.em('search', 'trigger')]"
+                :action="searchAction"
+                method="get"
+                @submit="handleSearchSubmit"
+              >
+                <el-input
+                  :model-value="searchValue"
+                  :placeholder="searchPlaceholder"
+                  :label="searchAriaLabel"
+                  size="small"
+                  :class="ns.e('search-input')"
+                  :csp-safe="cspSafe"
+                  clearable
+                  @focus="emit('search-focus')"
+                  @input="handleSearchInput"
+                  @keydown.enter="handleSearchEnter"
+                />
+                <input
+                  v-if="searchName"
+                  type="hidden"
+                  :name="searchName"
+                  :value="searchValue"
+                />
+              </form>
+            </slot>
           </div>
         </div>
         <Transition name="el-public-shell-mobile-search">
@@ -423,6 +418,7 @@
             ]"
             :aria-hidden="!mobileSearchExpanded"
             :inert="!mobileSearchExpanded || undefined"
+            @keydown.esc="handleMobileSearchEscape"
           >
             <slot name="mobile-search">
               <form
@@ -431,7 +427,6 @@
                 :action="searchAction"
                 method="get"
                 @submit="handleSearchSubmit"
-                @keydown.esc="handleMobileSearchEscape"
               >
                 <el-input
                   :model-value="searchValue"
@@ -548,6 +543,9 @@ const props = defineProps(publicShellProps)
 const emit = defineEmits(publicShellEmits)
 const slots = useSlots()
 
+const SHORT_LANDSCAPE_MEDIA_QUERY =
+  '(max-height: 520px) and (orientation: landscape)'
+
 const ns = useNamespace('public-shell')
 const searchValue = ref(props.searchQuery)
 const desktopSearchPanelId = useId().value
@@ -557,8 +555,10 @@ const desktopSearchTriggerRef = ref<HTMLAnchorElement>()
 const mobileSearchRowId = useId().value
 const mobileSearchRowRef = ref<HTMLElement>()
 const mobileSearchTriggerRef = ref<HTMLAnchorElement>()
+const isShortLandscape = ref(false)
 const mobileSearchCspReady = ref(false)
 const mobileSearchCspHostRef = ref<HTMLElement>()
+let shortLandscapeMediaQuery: MediaQueryList | undefined
 let openedMobileSearchCspHost: HTMLElement | undefined
 let mobileSearchPositioningMounted = false
 let mobileSearchPositioningRevision = 0
@@ -656,9 +656,12 @@ const mobileSearchTriggerText = computed(
 const desktopSearchTriggerText = computed(
   () => props.desktopSearchTriggerLabel || props.searchAriaLabel,
 )
+const mobileSearchUsesCspPopover = computed(
+  () => props.cspSafe && isShortLandscape.value,
+)
 const mobileSearchDisclosureAvailable = computed(
   () =>
-    !props.cspSafe ||
+    !mobileSearchUsesCspPopover.value ||
     (mobileSearchCspReady.value &&
       Boolean(mobileSearchCspHostRef.value?.isConnected)),
 )
@@ -748,7 +751,21 @@ const syncNavIndicators = async () => {
   syncNavIndicator(desktopNavRef.value)
 }
 
+const syncShortLandscapeState = () => {
+  isShortLandscape.value = Boolean(
+    window.matchMedia?.(SHORT_LANDSCAPE_MEDIA_QUERY)?.matches,
+  )
+}
+
+const handleShortLandscapeMediaChange = (event?: MediaQueryListEvent) => {
+  isShortLandscape.value =
+    typeof event?.matches === 'boolean'
+      ? event.matches
+      : Boolean(shortLandscapeMediaQuery?.matches)
+}
+
 const handleIndicatorResize = () => {
+  syncShortLandscapeState()
   void syncNavIndicators()
   syncMobileSearchPositioning()
   syncMobileSearchCspHost()
@@ -865,15 +882,20 @@ const syncMobileSearchCspHost = () => {
   }
   if (
     !mobileSearchPositioningMounted ||
-    !props.cspSafe ||
+    !mobileSearchUsesCspPopover.value ||
     !mobileSearchCspReady.value ||
     !mobileSearchExpanded.value ||
-    !host?.isConnected ||
-    !window.matchMedia(
-      '(max-width: 767px), (max-height: 520px) and (orientation: landscape)',
-    ).matches
+    !host?.isConnected
   ) {
     stopMobileSearchCspHost()
+    if (!mobileSearchUsesCspPopover.value && host) {
+      if (host.hasAttribute('popover')) {
+        host.removeAttribute('popover')
+      }
+      if (host.popover != null) {
+        host.popover = null
+      }
+    }
     return
   }
   if (host.popover !== 'manual') host.popover = 'manual'
@@ -903,6 +925,7 @@ const syncMobileSearchCspHost = () => {
 watch(
   [
     () => props.cspSafe,
+    isShortLandscape,
     mobileSearchExpanded,
     mobileSearchCspHostRef,
     mobileSearchCspReady,
@@ -935,6 +958,16 @@ onMounted(() => {
     mobileNavMenuVisible.value = true
   }
   mobileNavMenuCspReady.value = true
+  shortLandscapeMediaQuery = window.matchMedia?.(SHORT_LANDSCAPE_MEDIA_QUERY)
+  isShortLandscape.value = Boolean(shortLandscapeMediaQuery?.matches)
+  if (typeof shortLandscapeMediaQuery?.addEventListener === 'function') {
+    shortLandscapeMediaQuery.addEventListener(
+      'change',
+      handleShortLandscapeMediaChange,
+    )
+  } else if (typeof shortLandscapeMediaQuery?.addListener === 'function') {
+    shortLandscapeMediaQuery.addListener(handleShortLandscapeMediaChange)
+  }
   mobileSearchCspReady.value =
     typeof HTMLElement.prototype.showPopover === 'function' &&
     typeof HTMLElement.prototype.hidePopover === 'function' &&
@@ -943,17 +976,29 @@ onMounted(() => {
     CSS.supports('selector(:popover-open)')
   mobileSearchPositioningMounted = true
   syncMobileSearchPositioning()
+  syncMobileSearchCspHost()
   void syncNavIndicators()
   window.addEventListener('resize', handleIndicatorResize)
   document.addEventListener('pointerdown', handleDesktopSearchOutsidePointer)
+  document.addEventListener('pointerdown', handleMobileSearchOutsidePointer)
 })
 
 onBeforeUnmount(() => {
   mobileSearchPositioningMounted = false
+  if (typeof shortLandscapeMediaQuery?.removeEventListener === 'function') {
+    shortLandscapeMediaQuery.removeEventListener(
+      'change',
+      handleShortLandscapeMediaChange,
+    )
+  } else if (typeof shortLandscapeMediaQuery?.removeListener === 'function') {
+    shortLandscapeMediaQuery.removeListener(handleShortLandscapeMediaChange)
+  }
+  shortLandscapeMediaQuery = undefined
   stopMobileSearchCspHost()
   stopMobileSearchPositioning()
   window.removeEventListener('resize', handleIndicatorResize)
   document.removeEventListener('pointerdown', handleDesktopSearchOutsidePointer)
+  document.removeEventListener('pointerdown', handleMobileSearchOutsidePointer)
 })
 
 const handleSearchInput = (value: string) => {
@@ -987,7 +1032,9 @@ const closeDesktopSearch = (restoreFocus = false) => {
 
 const focusMobileSearchInput = async () => {
   await nextTick()
-  mobileSearchRowRef.value?.querySelector<HTMLInputElement>('input')?.focus()
+  mobileSearchRowRef.value
+    ?.querySelector<HTMLInputElement>('input:not([type="hidden"])')
+    ?.focus()
 }
 
 const focusMobileSearchTrigger = async () => {
@@ -1057,7 +1104,49 @@ const handleMobileSearchTrigger = (event: MouseEvent) => {
 
 const handleMobileSearchEscape = (event: KeyboardEvent) => {
   event.preventDefault()
+  event.stopPropagation()
   closeMobileSearch(true)
+}
+
+const handleMobileSearchCspHostPointerDown = (event: PointerEvent) => {
+  if (
+    !mobileSearchUsesCspPopover.value ||
+    event.target !== event.currentTarget
+  ) {
+    return
+  }
+  event.preventDefault()
+}
+
+const handleMobileSearchCspHostClick = (event: MouseEvent) => {
+  if (
+    !mobileSearchUsesCspPopover.value ||
+    event.target !== event.currentTarget
+  ) {
+    return
+  }
+  event.preventDefault()
+  event.stopPropagation()
+  closeMobileSearch(true)
+}
+
+function handleMobileSearchOutsidePointer(event: PointerEvent) {
+  if (!mobileSearchExpanded.value) return
+  const target = event.target
+  if (!(target instanceof Node)) return
+  if (
+    mobileSearchTriggerRef.value?.contains(target) ||
+    mobileSearchRowRef.value?.contains(target)
+  ) {
+    return
+  }
+  if (
+    mobileSearchUsesCspPopover.value &&
+    target === mobileSearchCspHostRef.value
+  ) {
+    return
+  }
+  closeMobileSearch()
 }
 
 const handleMobileNavMenuToggle = (event: Event) => {

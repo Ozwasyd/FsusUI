@@ -1,6 +1,6 @@
 import { mount } from '@vue/test-utils'
 import { nextTick } from 'vue'
-import { afterEach, describe, expect, test } from 'vitest'
+import { afterEach, describe, expect, test, vi } from 'vitest'
 import DataList from '../src/data-list.vue'
 
 const rows = [
@@ -148,5 +148,123 @@ describe('DataList public activation contract', () => {
     await update
     await nextTick()
     expect(document.activeElement).toBe(document.body)
+  })
+
+  test('leaves zero leaked global listeners or nodes across 3x repeated 1000-row mount/unmount cycles (#831)', async () => {
+    const activeListeners = new Map<string, Set<EventListenerOrEventListenerObject>>()
+    const listenerKey = (
+      target: 'window' | 'document',
+      type: string,
+      options?: boolean | AddEventListenerOptions,
+    ) => {
+      const capture =
+        typeof options === 'boolean' ? options : Boolean(options?.capture)
+      return `${target}:${type}:${capture}`
+    }
+
+    const origWinAdd = window.addEventListener.bind(window)
+    const origWinRemove = window.removeEventListener.bind(window)
+    const origDocAdd = document.addEventListener.bind(document)
+    const origDocRemove = document.removeEventListener.bind(document)
+
+    const recordAdd = (
+      target: 'window' | 'document',
+      type: string,
+      listener: EventListenerOrEventListenerObject | null,
+      options?: boolean | AddEventListenerOptions,
+    ) => {
+      if (!listener) return
+      const key = listenerKey(target, type, options)
+      if (!activeListeners.has(key)) activeListeners.set(key, new Set())
+      activeListeners.get(key)!.add(listener)
+    }
+    const recordRemove = (
+      target: 'window' | 'document',
+      type: string,
+      listener: EventListenerOrEventListenerObject | null,
+      options?: boolean | EventListenerOptions,
+    ) => {
+      if (!listener) return
+      const key = listenerKey(target, type, options)
+      const set = activeListeners.get(key)
+      set?.delete(listener)
+      if (set && set.size === 0) activeListeners.delete(key)
+    }
+
+    const winAddSpy = vi
+      .spyOn(window, 'addEventListener')
+      .mockImplementation((type, listener, options) => {
+        recordAdd('window', type, listener, options)
+        return origWinAdd(type, listener, options)
+      })
+    const winRemoveSpy = vi
+      .spyOn(window, 'removeEventListener')
+      .mockImplementation((type, listener, options) => {
+        recordRemove('window', type, listener, options)
+        return origWinRemove(type, listener, options)
+      })
+    const docAddSpy = vi
+      .spyOn(document, 'addEventListener')
+      .mockImplementation((type, listener, options) => {
+        recordAdd('document', type, listener, options)
+        return origDocAdd(type, listener, options)
+      })
+    const docRemoveSpy = vi
+      .spyOn(document, 'removeEventListener')
+      .mockImplementation((type, listener, options) => {
+        recordRemove('document', type, listener, options)
+        return origDocRemove(type, listener, options)
+      })
+
+    const largeColumns = [
+      { key: 'id', label: 'ID' },
+      { key: 'name', label: 'Name' },
+      { key: 'version', label: 'Version' },
+      { key: 'status', label: 'Status' },
+      { key: 'runtime', label: 'Runtime' },
+    ]
+    const largeRows = Array.from({ length: 1000 }, (_, index) => ({
+      id: `pkg-${index}`,
+      name: `service-${index}`,
+      version: `1.${index % 10}.0`,
+      status: index % 5 === 0 ? 'degraded' : 'healthy',
+      runtime: index % 2 === 0 ? 'node-22' : 'wasm',
+    }))
+
+    try {
+      for (let cycle = 0; cycle < 3; cycle++) {
+        const wrapper = mount(DataList, {
+          props: {
+            rows: largeRows,
+            columns: largeColumns,
+            rowKey: 'id',
+            activeKey: `pkg-${cycle}`,
+            disabledKeys: ['pkg-2'],
+          },
+          attachTo: document.body,
+        })
+        await nextTick()
+        const buttons = wrapper.findAll('button')
+        expect(buttons).toHaveLength(1000)
+        ;(buttons[cycle + 3].element as HTMLButtonElement).focus()
+        await buttons[cycle + 3].trigger('click')
+        expect(wrapper.emitted('change')?.[0]?.[1]).toBe(`pkg-${cycle + 3}`)
+        await wrapper.setProps({ activeKey: `pkg-${cycle + 3}` })
+        await nextTick()
+        wrapper.unmount()
+        await nextTick()
+      }
+
+      expect(activeListeners.size).toBe(0)
+      expect(document.body.querySelectorAll('[role="list"]')).toHaveLength(0)
+      expect(document.body.querySelectorAll('[role="listitem"]')).toHaveLength(
+        0,
+      )
+    } finally {
+      winAddSpy.mockRestore()
+      winRemoveSpy.mockRestore()
+      docAddSpy.mockRestore()
+      docRemoveSpy.mockRestore()
+    }
   })
 })

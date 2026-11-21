@@ -72,7 +72,8 @@
     border: 1px dashed getCssVar('border-color', 'darker');
     border-radius: 6px;
     box-sizing: border-box;
-    width: getCssVar('upload', 'picture-card', 'size');
+    width: min(getCssVar('upload', 'picture-card', 'size'), 100%);
+    max-width: 100%;
     height: getCssVar('upload', 'picture-card', 'size');
     cursor: pointer;
     vertical-align: top;
@@ -144,6 +145,7 @@
   border: 1px dashed getCssVar('border-color');
   border-radius: var(--fsus-radius-panel, 12px);
   box-sizing: border-box;
+  max-width: 100%;
   text-align: center;
   cursor: pointer;
   position: relative;
@@ -411,8 +413,22 @@
         @include a11y-focus-ring(2px, getCssVar('border-radius-base'));
       }
 
-      &:hover,
-      &:focus-within {
+      :where(
+          .#{$namespace}-upload-list:not(
+              .#{$namespace}-upload-list--text,
+              .#{$namespace}-upload-list--picture,
+              .#{$namespace}-upload-list--picture-card
+            )
+        )
+        &:hover,
+      :where(
+          .#{$namespace}-upload-list:not(
+              .#{$namespace}-upload-list--text,
+              .#{$namespace}-upload-list--picture,
+              .#{$namespace}-upload-list--picture-card
+            )
+        )
+        &:focus-within {
         .#{bem('upload-list', 'item-status-label')} {
           display: none;
           opacity: 0;
@@ -492,10 +508,9 @@
     }
 
     .#{bem('upload-list', 'item-info')} {
-      // flex-basis 0 keeps the info cell from claiming a full wrap line from
-      // its (unshrunk) max-content width, so status + actions stay on the
-      // same row and the filename ellipsizes inside the remaining space.
-      flex: 1 1 0;
+      // Bounded basis keeps status + actions on one row at normal widths while
+      // wrapping cleanly instead of squishing the filename at 320px × 200% zoom.
+      flex: 1 1 min(100%, 120px);
       width: auto;
       min-width: 0;
       margin-left: 0;
@@ -620,6 +635,7 @@
     align-items: center;
     border: none;
     background: transparent;
+    box-sizing: border-box;
     max-width: 100%;
     min-width: 0;
 
@@ -679,6 +695,8 @@
 
     display: inline-flex;
     flex-wrap: wrap;
+    gap: 8px;
+    max-width: 100%;
     margin: 0;
 
     .#{bem('upload-list', 'item')} {
@@ -688,17 +706,23 @@
       border: 1px solid getCssVar('border-color');
       border-radius: 6px;
       box-sizing: border-box;
-      width: getCssVar('upload-list', 'picture-card', 'size');
+      width: min(getCssVar('upload-list', 'picture-card', 'size'), 100%);
+      max-width: 100%;
       height: getCssVar('upload-list', 'picture-card', 'size');
-      margin: 0 8px 8px 0;
+      margin: 0;
       padding: 0;
 
       display: flex;
       flex-direction: column;
 
-      .#{bem('icon', '' ,'check')},
-      .#{bem('icon', '' ,'circle-check')} {
+      .#{bem('icon', '', 'check')},
+      .#{bem('icon', '', 'circle-check')} {
         color: getCssVar('color-success');
+      }
+
+      .#{bem('icon', '', 'circle-close')},
+      .#{bem('icon', '', 'upload-fail')} {
+        color: getCssVar('color-danger');
       }
 
       .#{bem('icon', '', 'close')} {
@@ -710,13 +734,34 @@
         box-shadow: inset 0 0 0 var(--fsus-focus-ring-width, 2px) var(--fsus-scholarly-blue, getCssVar('color-primary'));
       }
 
-      // Loading / error state borders
+      // Success / fail state borders and persistent status indicator visibility
       &.is-success {
         border-color: getCssVar('color-success');
+
+        &,
+        &:hover,
+        &:focus-within {
+          .#{bem('upload-list', 'item-status-label')} {
+            display: inline-flex;
+            opacity: 1;
+          }
+        }
       }
 
+      &.is-fail,
       &.is-error {
         border-color: getCssVar('color-danger');
+
+        &,
+        &:hover,
+        &:focus-within {
+          .#{bem('upload-list', 'item-status-label')} {
+            display: inline-flex;
+            opacity: 1;
+            border-color: getCssVar('color-danger');
+            color: getCssVar('color-danger');
+          }
+        }
       }
 
       // Disabled state
@@ -736,6 +781,15 @@
       }
     }
 
+    .#{bem('upload-list', 'item-info')} {
+      flex: 1 1 0;
+      min-height: 0;
+      width: 100%;
+      margin-left: 0;
+      align-items: center;
+      justify-content: center;
+    }
+
     // Thumbnail fills the available space above actions bar
     .#{bem('upload-list', 'item-thumbnail')} {
       flex: 1 1 0;
@@ -744,11 +798,14 @@
       object-fit: cover;
     }
 
-    // Status label: small indicator in top-right corner
+    // Status label: compact corner indicator that stays unobstructed and visible
     .#{bem('upload-list', 'item-status-label')} {
       position: absolute;
       top: 6px;
-      right: 6px;
+      right: auto;
+      inset-inline-end: 6px;
+      transform: none;
+      box-sizing: border-box;
       width: 22px;
       height: 22px;
       display: inline-flex;
@@ -756,18 +813,26 @@
       justify-content: center;
       border-radius: 50%;
       background: getCssVar('fill-color', 'blank');
+      border: 1px solid getCssVar('border-color-lighter');
       box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
       font-size: 12px;
       z-index: 1;
 
-      .#{bem('icon', '' ,'check')} {
+      .#{bem('icon', '', 'check')},
+      .#{bem('icon', '', 'upload-success')} {
         color: getCssVar('color-success');
+      }
+
+      .#{bem('icon', '', 'circle-close')},
+      .#{bem('icon', '', 'upload-fail')} {
+        color: getCssVar('color-danger');
       }
     }
 
     // Actions bar: always visible at the bottom of the card
     .#{bem('upload-list', 'item-actions')} {
       display: flex;
+      flex-shrink: 0;
       align-items: center;
       justify-content: center;
       gap: 8px;
@@ -775,6 +840,7 @@
       padding: 4px 8px;
       background: getCssVar('fill-color', 'blank');
       border-top: 1px solid getCssVar('border-color-lighter');
+      z-index: 1;
 
       span,
       button {
@@ -820,17 +886,44 @@
       }
     }
 
-    // Progress bar: overlay at bottom of thumbnail area
+    // Enforce >=44px touch targets on coarse pointers without overflowing the card.
+    @media (pointer: coarse) {
+      .#{bem('upload-list', 'item-actions')} {
+        min-height: 48px;
+        padding: 2px 8px;
+
+        span,
+        button {
+          min-width: 44px;
+          min-height: 44px;
+          width: 44px;
+          height: 44px;
+        }
+      }
+    }
+
+    // Progress circle centered inside thumbnail region above actions bar
     .#{bem('progress')} {
-      position: absolute;
-      bottom: 36px;
-      left: 0;
-      right: 0;
+      position: relative;
+      top: auto;
+      bottom: auto;
+      left: auto;
+      right: auto;
       width: auto;
+      margin-top: 0;
       transform: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
 
       .#{$namespace}-progress__text {
+        position: absolute;
         top: 50%;
+        left: 0;
+        width: 100%;
+        margin: 0;
+        text-align: center;
+        transform: translateY(-50%);
       }
     }
   }
@@ -1014,55 +1107,6 @@
     left: 0;
     width: 100%;
     height: 100%;
-  }
-
-  @include e(interact) {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: getCssVar('overlay-color', 'light');
-    text-align: center;
-
-    .btn {
-      display: inline-block;
-      color: $color-white;
-      font-size: getCssVar('font-size', 'base');
-      cursor: pointer;
-      vertical-align: middle;
-      transition: getCssVar('transition-md-fade');
-      margin-top: 60px;
-
-      i {
-        margin-top: 0;
-      }
-
-      span {
-        opacity: 0;
-        transition: opacity var(--fsus-motion-control-fast, 140ms) linear;
-      }
-
-      &:not(:first-child) {
-        margin-left: 35px;
-      }
-
-      &:hover {
-        transform: translateY(-1px);
-
-        span {
-          opacity: 1;
-        }
-      }
-
-      i {
-        color: $color-white;
-        display: block;
-        font-size: 24px;
-        line-height: inherit;
-        margin: 0 auto 5px;
-      }
-    }
   }
 
   @include e(title) {

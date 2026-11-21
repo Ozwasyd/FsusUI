@@ -199,6 +199,7 @@ export async function runBoundaryCell(ownerId, cellId, group, options = {}) {
       ...process.env,
       CI: 'true',
       FSUS_BOUNDARY_AUDIT_PORT: String(new URL(serverUrl).port),
+      FSUS_PLAYWRIGHT_EXTERNAL_SERVER: serverUrl,
     }
     const result = spawnSync(
       'pnpm',
