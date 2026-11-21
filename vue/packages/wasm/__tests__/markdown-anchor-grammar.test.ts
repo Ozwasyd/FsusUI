@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 
 import {
   collectMarkdownAnchorNodes,
@@ -24,6 +24,42 @@ describe('markdown block anchor grammar', () => {
     expect(projection.identity.rawSource.slice(anchor!.rawRange.start, anchor!.rawRange.end)).toBe(
       '^heading-a',
     )
+  })
+
+  it.each([
+    ['LF', '\n'],
+    ['CRLF', '\r\n'],
+    ['CR', '\r'],
+  ])('keeps raw UTF-16 anchor ranges with %s and no WebAssembly', (_, newline) => {
+    const source = [
+      '\uFEFF# Alpha 😀 ^one',
+      '',
+      '# Beta 👩‍💻 ^two',
+      '',
+      '```',
+      'body ^literal',
+      '```',
+      '^atomic',
+    ].join(newline)
+    vi.stubGlobal('WebAssembly', undefined)
+    try {
+      const anchors = collectMarkdownAnchorNodes(source).map((node) =>
+        node.ok
+          ? { fragment: node.fragment, marker: node.ranges.marker }
+          : node.code,
+      )
+      expect(anchors).toEqual(
+        ['one', 'two', 'atomic'].map((id) => {
+          const start = source.indexOf(`^${id}`)
+          return {
+            fragment: `#${id}`,
+            marker: { start, end: start + id.length + 1 },
+          }
+        }),
+      )
+    } finally {
+      vi.unstubAllGlobals()
+    }
   })
 
   it('rejects invalid ids, duplicates, orphans, and aliases', () => {

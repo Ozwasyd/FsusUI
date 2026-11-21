@@ -74,16 +74,14 @@ const fail = (
 
 const splitLines = (source: string) => {
   const lines: { readonly text: string; readonly start: number; readonly end: number }[] = []
+  // Match the renderer's newline rules without normalizing away raw offsets.
   let offset = 0
-  while (offset <= source.length) {
-    const newline = source.indexOf('\n', offset)
-    const rawEnd = newline === -1 ? source.length : newline
-    const end =
-      rawEnd > offset && source[rawEnd - 1] === '\r' ? rawEnd - 1 : rawEnd
+  for (const newline of source.matchAll(/\r\n?|\n/g)) {
+    const end = newline.index
     lines.push({ text: source.slice(offset, end), start: offset, end })
-    if (newline === -1) break
-    offset = newline + 1
+    offset = end + newline[0].length
   }
+  lines.push({ text: source.slice(offset), start: offset, end: source.length })
   return lines
 }
 
