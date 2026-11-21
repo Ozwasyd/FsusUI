@@ -160,3 +160,151 @@ for (const theme of themes) {
     await expectNoPageOverflow(page)
   })
 }
+
+for (const theme of themes) {
+  for (const viewport of [320, 375] as const) {
+    test(`${theme} ${viewport}px compact auto and priority fill the scroller and align row disclosure`, async ({
+      page,
+    }) => {
+      await openFixture(page, theme, viewport)
+      for (const mode of ['auto', 'priority'] as const) {
+        const fixture = page.getByTestId(`table-matrix-compact-${mode}`)
+        const region = fixture.locator('.el-table__body-wrapper')
+        await expect(region).not.toHaveAttribute('tabindex')
+        await expect(region).not.toHaveAttribute('role')
+        await expect(region).not.toHaveAttribute('aria-label')
+        await expect(fixture.locator('.el-table--scrollable-x')).toHaveCount(0)
+        await expect(
+          fixture.locator('.el-table__scroll-affordance'),
+        ).toHaveCount(0)
+        const geometry = await fixture.evaluate((element) => {
+          const widths = [
+            '.el-table__header',
+            '.el-table__body',
+            '.el-scrollbar__view',
+            '.el-table__body-wrapper',
+          ].map(
+            (selector) =>
+              element.querySelector(selector)!.getBoundingClientRect().width,
+          )
+          const wrap = element.querySelector('.el-scrollbar__wrap')!
+          return { widths, overflow: wrap.scrollWidth - wrap.clientWidth }
+        })
+        expect(geometry.widths[0]).toBeGreaterThan(240)
+        expect(
+          Math.max(...geometry.widths) - Math.min(...geometry.widths),
+        ).toBeLessThanOrEqual(1)
+        expect(geometry.overflow).toBe(0)
+
+        const toggle = fixture.locator('.el-table__responsive-toggle')
+        const cell = fixture.locator(
+          '.el-table__responsive-primary-cell > .cell',
+        )
+        const [buttonBox, cellBox] = await Promise.all([
+          toggle.boundingBox(),
+          cell.boundingBox(),
+        ])
+        expect(buttonBox).not.toBeNull()
+        expect(cellBox).not.toBeNull()
+        expect(buttonBox!.width).toBeGreaterThanOrEqual(40)
+        expect(buttonBox!.height).toBeGreaterThanOrEqual(40)
+        expect(buttonBox!.x).toBeGreaterThanOrEqual(
+          cellBox!.x + cellBox!.width - 1,
+        )
+        expect(
+          Math.abs(
+            buttonBox!.y +
+              buttonBox!.height / 2 -
+              cellBox!.y -
+              cellBox!.height / 2,
+          ),
+        ).toBeLessThanOrEqual(1)
+        await toggle.focus()
+        await expect(toggle).toBeFocused()
+        await toggle.press('Enter')
+        await expect(toggle).toHaveAttribute('aria-expanded', 'true')
+        const detail = fixture.locator('.el-table__responsive-detail-row')
+        await expect(detail).toBeVisible()
+        await expect(detail).toContainText('Action detail')
+        const detailBox = await detail.boundingBox()
+        expect(
+          Math.abs(detailBox!.width - geometry.widths[1]),
+        ).toBeLessThanOrEqual(1)
+        await toggle.press('Enter')
+        await expect(detail).toBeHidden()
+      }
+    })
+  }
+}
+
+test('auto toggles real desktop overflow through repeated container-only resize without observer errors', async ({
+  page,
+}) => {
+  await page.addInitScript(() => {
+    document.addEventListener('DOMContentLoaded', () => {
+      document.documentElement.dataset.tableResizeErrors = '0'
+    })
+    window.addEventListener('error', (event) => {
+      if (/ResizeObserver loop/i.test(event.message)) {
+        const root = document.documentElement
+        root.dataset.tableResizeErrors = String(
+          Number(root.dataset.tableResizeErrors ?? 0) + 1,
+        )
+      }
+    })
+  })
+  await openFixture(page, 'light', 1440)
+  const fixture = page.getByTestId('table-matrix-resize-overflow')
+  const table = fixture.locator('.el-table')
+  const region = fixture.locator('.el-table__body-wrapper')
+  const wrap = fixture.locator('.el-scrollbar__wrap')
+  for (let index = 0; index < 3; index++) {
+    await fixture.evaluate((element) => {
+      element.style.width = '650px'
+    })
+    await expect(region).toHaveAttribute('role', 'region')
+    await settle(page)
+    await expect(table).toHaveClass(/is-scrolling-left/)
+    expect(
+      await wrap.evaluate((el) => el.scrollWidth - el.clientWidth),
+    ).toBeGreaterThan(0)
+    await region.focus()
+    await region.press('ArrowRight')
+    await expect
+      .poll(() => wrap.evaluate((el) => el.scrollLeft))
+      .toBeGreaterThan(0)
+    await fixture.evaluate((element) => {
+      element.style.width = '343px'
+    })
+    await expect
+      .poll(() =>
+        fixture.evaluate((element) => {
+          const root = element.querySelector('.el-table')!
+          const region = element.querySelector('.el-table__body-wrapper')!
+          const wrap = element.querySelector('.el-scrollbar__wrap')!
+          return {
+            range: wrap.scrollWidth - wrap.clientWidth,
+            direction: [...root.classList].filter((name) =>
+              name.startsWith('is-scrolling-'),
+            ),
+            role: region.getAttribute('role'),
+            tabindex: region.getAttribute('tabindex'),
+            label: region.getAttribute('aria-label'),
+            affordance: !!element.querySelector('.el-table__scroll-affordance'),
+          }
+        }),
+      )
+      .toEqual({
+        range: 0,
+        direction: ['is-scrolling-none'],
+        role: null,
+        tabindex: null,
+        label: null,
+        affordance: false,
+      })
+  }
+  await expect(page.locator('html')).toHaveAttribute(
+    'data-table-resize-errors',
+    '0',
+  )
+})
