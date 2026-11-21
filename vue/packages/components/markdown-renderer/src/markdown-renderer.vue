@@ -1498,32 +1498,35 @@ const revealFragment = async (
   options?: MarkdownFragmentRevealOptions,
 ): Promise<MarkdownFragmentRevealResult> => {
   fragmentRevealController?.abort()
-  const initial = locateFragment(fragmentOrId)
-  const result = (element: HTMLElement | null) => ({
-    ok: element !== null,
-    id: initial.id,
-    fragment: initial.fragment,
-    chunkIndex: initial.chunkIndex,
-    chunkKey: initial.chunkKey,
+  const {
+    id,
+    fragment,
+    chunkIndex,
+    chunkKey,
+    element: target,
+  } = locateFragment(fragmentOrId)
+  const result = (element: HTMLElement | null = null) => ({
+    ok: !!element,
+    id,
+    fragment,
+    chunkIndex,
+    chunkKey,
     element,
   })
-
-  if (!initial.found) return result(null)
-
-  if (initial.mounted && initial.element) {
-    scrollElementIntoFragmentView(initial.element, options)
-    return result(initial.element)
+  if (target) {
+    scrollElementIntoFragmentView(target, options)
+    return result(target)
   }
 
   const root = rootEl.value
-  if (!root || initial.chunkIndex < 0) return result(null)
+  if (!root || chunkIndex < 0) return result()
   const controller = new AbortController()
   fragmentRevealController = controller
   try {
     const virtualReveal = await import('./markdown-fragment-reveal').catch(
       () => null,
     )
-    if (!virtualReveal || controller.signal.aborted) return result(null)
+    if (!virtualReveal || controller.signal.aborted) return result()
     return result(
       await virtualReveal.revealVirtualMarkdownFragment({
         ...options,
@@ -1532,15 +1535,13 @@ const revealFragment = async (
         frameScheduler,
         frameKey: `${localDocumentKey}-reveal-fragment`,
         signal: controller.signal,
-        getEstimatedOffset: () =>
-          virtualWindow.offsetForIndex(initial.chunkIndex),
+        getEstimatedOffset: () => virtualWindow.offsetForIndex(chunkIndex),
         readViewport: virtualWindow.readViewport,
-        isTargetCurrent: () =>
-          chunkUnits.value[initial.chunkIndex]?.key === initial.chunkKey,
+        isTargetCurrent: () => chunkUnits.value[chunkIndex]?.key === chunkKey,
         findTarget: () => {
-          const element = findMountedFragmentElement(initial.id)
+          const element = findMountedFragmentElement(id)
           return element &&
-            resolveElementChunkLocation(element).chunkKey === initial.chunkKey
+            resolveElementChunkLocation(element).chunkKey === chunkKey
             ? element
             : null
         },
