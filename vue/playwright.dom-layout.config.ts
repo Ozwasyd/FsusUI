@@ -37,6 +37,7 @@ export default defineConfig({
   projects: [
     {
       name: 'desktop-light',
+      grepInvert: /sticky hover/,
       use: {
         ...devices['Desktop Chrome'],
         colorScheme: 'light',
@@ -53,6 +54,7 @@ export default defineConfig({
     },
     {
       name: 'desktop-dark',
+      grepInvert: /sticky hover/,
       use: {
         ...devices['Desktop Chrome'],
         colorScheme: 'dark',

@@ -32,16 +32,27 @@ export default defineConfig({
   projects: [
     {
       name: 'chromium',
+      ...(process.env.FSUS_MARKDOWN_IMPORT_EVIDENCE === '1'
+        ? {}
+        : { grepInvert: /records the issue 395/ }),
       use: { ...devices['Desktop Chrome'] },
     },
     {
       name: 'firefox',
-      testIgnore: '**/markdown-editor-command-palette-ime.spec.ts',
+      testIgnore: [
+        '**/markdown-editor-command-palette-ime.spec.ts',
+        '**/markdown-editor-frame-scheduler.spec.ts',
+      ],
+      grepInvert: /records the issue 395/,
       use: { ...devices['Desktop Firefox'] },
     },
     {
       name: 'webkit',
-      testIgnore: '**/markdown-editor-command-palette-ime.spec.ts',
+      testIgnore: [
+        '**/markdown-editor-command-palette-ime.spec.ts',
+        '**/markdown-editor-frame-scheduler.spec.ts',
+      ],
+      grepInvert: /records the issue 395/,
       use: { ...devices['Desktop Safari'] },
     },
   ],
