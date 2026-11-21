@@ -187,3 +187,23 @@ duration, task id, invalidated ranges, retained identities, and heap deltas.
 - using a normalized LF offset on a CRLF raw string
 - committing a stale Worker result or a deleted anchor
 - claiming a consumer parser as the canonical native projection runtime
+
+## Rebuilding the block-anchor owner module
+
+The synchronous block-anchor resolver uses the Markdown parser's private owner
+ABI. The tracked `vue/packages/wasm/markdown/anchor-owner.portable.mjs` is
+generated ES module code, not a separate parser, public import, or downloadable
+WASM asset. It does not instantiate WebAssembly at runtime and does not need
+dynamic code evaluation. The renderer and projection collector retain their own
+existing build paths.
+
+With the repository's Emscripten 5.0.4 SDK active, regenerate it after changing
+the C++ owner parser or its four-function bridge:
+
+```sh
+bash vue/packages/wasm/markdown/build-anchor-owner.sh
+bash vue/packages/wasm/markdown/build-anchor-owner.sh --check
+```
+
+The regular native WASM build also runs the byte-for-byte check. Commit the
+generated module together with its inputs; do not hand-edit it.

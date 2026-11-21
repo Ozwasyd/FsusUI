@@ -48,13 +48,48 @@ describe('issue #448: block anchor coverage across every owning block kind', () 
     ['list item', '- first item ^item\n- second item\n', 'item', 'line-end'],
     ['quote', '> quoted line ^quote\n', 'quote', 'line-end'],
     ['table row', '| alpha | beta | ^row\n', 'row', 'line-end'],
-    ['table block', '| alpha | beta |\n| --- | --- |\n| 1 | 2 |\n^table\n', 'table', 'following-line'],
-    ['fenced code', '```ts\nconst value = 1\n```\n^snippet\n', 'snippet', 'following-line'],
-    ['mermaid technical', '```mermaid\nflowchart LR\n```\n^diagram\n', 'diagram', 'following-line'],
-    ['latex technical', '$$\nx^{2}\n$$\n^formula\n', 'formula', 'following-line'],
-    ['registered embed atomic', '::embed[target="safe-doc" mode="block"]\n^embedded\n', 'embedded', 'following-line'],
-    ['registered caption atomic', '::caption[figure one]\n^captioned\n', 'captioned', 'following-line'],
-    ['container block', ':::note\nbody\n:::\n^noted\n', 'noted', 'following-line'],
+    [
+      'table block',
+      '| alpha | beta |\n| --- | --- |\n| 1 | 2 |\n^table\n',
+      'table',
+      'following-line',
+    ],
+    [
+      'fenced code',
+      '```ts\nconst value = 1\n```\n^snippet\n',
+      'snippet',
+      'following-line',
+    ],
+    [
+      'mermaid technical',
+      '```mermaid\nflowchart LR\n```\n^diagram\n',
+      'diagram',
+      'following-line',
+    ],
+    [
+      'latex technical',
+      '$$\nx^{2}\n$$\n^formula\n',
+      'formula',
+      'following-line',
+    ],
+    [
+      'registered embed atomic',
+      '::embed[target="safe-doc" mode="block"]\n^embedded\n',
+      'embedded',
+      'following-line',
+    ],
+    [
+      'registered caption atomic',
+      '::caption[figure one]\n^captioned\n',
+      'captioned',
+      'following-line',
+    ],
+    [
+      'container block',
+      ':::note\nbody\n:::\n^noted\n',
+      'noted',
+      'following-line',
+    ],
   ]
 
   it.each(coverage)(
@@ -69,9 +104,9 @@ describe('issue #448: block anchor coverage across every owning block kind', () 
       expect(node.kind).toBe('anchor')
       expect(MARKDOWN_ANCHOR_ID.test(node.id)).toBe(true)
       // The marker and id ranges point at exact source bytes.
-      expect(source.slice(node.ranges.marker.start, node.ranges.marker.end)).toBe(
-        `^${id}`,
-      )
+      expect(
+        source.slice(node.ranges.marker.start, node.ranges.marker.end),
+      ).toBe(`^${id}`)
       expect(source.slice(node.ranges.id.start, node.ranges.id.end)).toBe(id)
       expect(node.ranges.full).toEqual(node.ranges.marker)
     },
@@ -132,7 +167,10 @@ describe('issue #448: block anchor coverage across every owning block kind', () 
     // raw range is the same marker bytes the grammar reported. A following-line
     // marker keeps its line terminator inside the projected raw range.
     for (const node of nodes) {
-      const marker = source.slice(node.ranges.marker.start, node.ranges.marker.end)
+      const marker = source.slice(
+        node.ranges.marker.start,
+        node.ranges.marker.end,
+      )
       const match = projected.find(
         (candidate) =>
           candidate.status === 'valid' &&
@@ -150,10 +188,9 @@ describe('issue #448: block anchor coverage across every owning block kind', () 
       epoch: 1,
       id: 'anchor-acceptance',
     })
-    expect(createMarkdownTechnicalEntries(stable).map((entry) => entry.kind)).toEqual([
-      'code',
-      'latex',
-    ])
+    expect(
+      createMarkdownTechnicalEntries(stable).map((entry) => entry.kind),
+    ).toEqual(['code', 'latex'])
   })
 
   it('keeps literal markers inside fenced, LaTeX, and container blocks out of the authority', () => {
@@ -211,14 +248,19 @@ describe('issue #448: duplicate, invalid, orphan, and cross-gap diagnostics fail
 
     for (const [source, code] of cases) {
       const failures = invalidNodes(source)
-      expect(failures, `expected ${code} for ${JSON.stringify(source)}`).toHaveLength(1)
+      expect(
+        failures,
+        `expected ${code} for ${JSON.stringify(source)}`,
+      ).toHaveLength(code === 'anchor-duplicate' ? 2 : 1)
       const [failure] = failures
       if (!failure || failure.ok) throw new Error('unreachable')
       expect(failure.code).toBe(code)
       expect(failure.kind).toBe('anchor')
       expect(failure.message.length).toBeGreaterThan(0)
       expect(failure.range.end).toBeGreaterThan(failure.range.start)
-      expect(source.slice(failure.range.start, failure.range.end)).toContain('^')
+      expect(source.slice(failure.range.start, failure.range.end)).toContain(
+        '^',
+      )
     }
   })
 
@@ -248,13 +290,12 @@ describe('issue #448: duplicate, invalid, orphan, and cross-gap diagnostics fail
     const duplicates = invalidNodes(source).filter(
       (node) => node.code === 'anchor-duplicate',
     )
-    // Every later occurrence is a hard diagnostic; nothing is renamed and no
-    // second fragment target is minted.
-    expect(valid).toHaveLength(1)
-    expect(duplicates).toHaveLength(2)
-    expect(validNodes(source).map((node) => node.id)).toEqual(['same'])
-    expect(nodes.some((node) => node.ok && node.id !== 'same')).toBe(false)
-    expect(duplicates.every((node) => !node.ok && node.message.length > 0)).toBe(true)
+    // No first, last, or renamed target survives an ambiguous ID.
+    expect(valid).toHaveLength(0)
+    expect(duplicates).toHaveLength(3)
+    expect(
+      duplicates.map((node) => source.slice(node.range.start, node.range.end)),
+    ).toEqual(['^same', '^same', '^same'])
   })
 
   it('separates cross-gap ownership from a true orphan', () => {
@@ -276,9 +317,12 @@ describe('issue #448: duplicate, invalid, orphan, and cross-gap diagnostics fail
     const source =
       '^lead\n\none ^same\n\ntwo ^same\n\nParagraph\n\n^gap\n\ntext ^Upper\n'
     const projection = createMarkdownEditorProjection(source)
-    const malformed = projection.nodes.filter((node) => node.status === 'malformed')
+    const malformed = projection.nodes.filter(
+      (node) => node.status === 'malformed',
+    )
     expect(malformed.map((node) => node.diagnosticCode)).toEqual([
       'anchor-orphan',
+      'anchor-duplicate',
       'anchor-duplicate',
       'anchor-cross-gap',
       'anchor-invalid-id',
@@ -287,8 +331,8 @@ describe('issue #448: duplicate, invalid, orphan, and cross-gap diagnostics fail
       malformed.every((node) => node.presentation === 'unsupported-error'),
     ).toBe(true)
     expect(markdownProjectionHasCompleteCoverage(projection)).toBe(true)
-    // The grammar and the projection agree on which single anchor survived.
-    expect(validNodes(source).map((node) => node.id)).toEqual(['same'])
+    // The grammar and the projection agree on that no duplicate anchor survives.
+    expect(validNodes(source).map((node) => node.id)).toEqual([])
   })
 })
 
@@ -350,7 +394,7 @@ describe('issue #448: source reconstructs anchors without DOM, editor, or databa
 
   it('survives CRLF, BOM, CJK, emoji, RTL, and composition text with exact ranges', () => {
     const vectors: readonly [label: string, source: string, id: string][] = [
-      ['crlf', 'Paragraph ^crlf\r\nSecond ^two\r\n', 'crlf'],
+      ['crlf', 'Paragraph ^crlf\r\n\r\nSecond ^two\r\n', 'crlf'],
       ['bom', '\uFEFFParagraph ^bom\n', 'bom'],
       ['cjk', '中文段落 ^cjk\n', 'cjk'],
       ['emoji', 'Party 😀👩‍💻 ^emoji\n', 'emoji'],
@@ -366,7 +410,10 @@ describe('issue #448: source reconstructs anchors without DOM, editor, or databa
       expect(nodes[0]?.id, label).toBe(id)
       expect(nodes[0]?.fragment, label).toBe(`#${id}`)
       expect(
-        vector.slice(nodes[0]!.ranges.marker.start, nodes[0]!.ranges.marker.end),
+        vector.slice(
+          nodes[0]!.ranges.marker.start,
+          nodes[0]!.ranges.marker.end,
+        ),
         label,
       ).toBe(`^${id}`)
       // A carriage return is a line terminator, never part of the marker.
@@ -376,11 +423,13 @@ describe('issue #448: source reconstructs anchors without DOM, editor, or databa
       ).toBe(id)
     }
 
-    const crlf = validNodes('Paragraph ^crlf\r\nSecond ^two\r\n')
+    const crlf = validNodes('Paragraph ^crlf\r\n\r\nSecond ^two\r\n')
     expect(crlf.map((node) => node.id)).toEqual(['crlf', 'two'])
     // The same document with LF newlines yields the same identities.
     expect(
-      validNodes('Paragraph ^crlf\nSecond ^two\n').map((node) => node.fragment),
+      validNodes('Paragraph ^crlf\n\nSecond ^two\n').map(
+        (node) => node.fragment,
+      ),
     ).toEqual(crlf.map((node) => node.fragment))
   })
 })
@@ -398,7 +447,9 @@ describe('issue #448: anchor security corpus', () => {
     ]) {
       const nodes = collectMarkdownAnchorNodes(source)
       expect(
-        nodes.filter((node): node is MarkdownAnchorValidNode => node.ok).map((node) => node.id),
+        nodes
+          .filter((node): node is MarkdownAnchorValidNode => node.ok)
+          .map((node) => node.id),
         `alias source ${JSON.stringify(source)}`,
       ).toEqual(source === 'Paragraph ^custom ^alias\n' ? ['alias'] : [])
     }
@@ -434,7 +485,15 @@ describe('issue #448: anchor security corpus', () => {
   it('keeps DOM clobbering names inside the string authority and off the DOM', () => {
     // The charset admits these words, so acceptance depends on the fragment
     // never becoming a DOM id/name and never leaving the hash scope.
-    const clobbering = ['constructor', 'prototype', 'tostring', 'id', 'name', 'form', 'location']
+    const clobbering = [
+      'constructor',
+      'prototype',
+      'tostring',
+      'id',
+      'name',
+      'form',
+      'location',
+    ]
     for (const id of clobbering) {
       const nodes = validNodes(`Paragraph ^${id}\n`)
       expect(nodes, id).toHaveLength(1)
@@ -461,8 +520,11 @@ describe('issue #448: anchor security corpus', () => {
   it('maps ids to fragments injectively with no ^ in renderer identity', () => {
     const source = [
       'a ^intro',
+      '',
       'b ^intro-',
+      '',
       'c ^intro1',
+      '',
       'd ^intro2',
       '',
       '```ts',
@@ -473,7 +535,13 @@ describe('issue #448: anchor security corpus', () => {
     ].join('\n')
     const nodes = validNodes(source)
     const fragments = nodes.map((node) => node.fragment)
-    expect(fragments).toEqual(['#intro', '#intro-', '#intro1', '#intro2', '#intro3'])
+    expect(fragments).toEqual([
+      '#intro',
+      '#intro-',
+      '#intro1',
+      '#intro2',
+      '#intro3',
+    ])
     // Injective: distinct ids never share a fragment, and the renderer identity
     // carries no `^`.
     expect(new Set(fragments).size).toBe(fragments.length)
@@ -510,9 +578,10 @@ describe('issue #448: anchor security corpus', () => {
       ]
       for (const attempt of attempts) {
         for (const node of validNodes(attempt)) {
-          expect(node.fragment, `${candidate} via ${JSON.stringify(attempt)}`).not.toBe(
-            candidate,
-          )
+          expect(
+            node.fragment,
+            `${candidate} via ${JSON.stringify(attempt)}`,
+          ).not.toBe(candidate)
         }
       }
     }
@@ -547,8 +616,10 @@ describe('issue #448: anchor security corpus', () => {
 })
 
 describe('issue #448: mutation fixtures kill the forbidden anchor implementations', () => {
-  const aliasSource = 'Paragraph {#alias}\n\n# Heading\n\n```\ncode\n```\n^snippet\n'
-  const duplicateSource = 'one ^same\n\ntwo ^same\n\n{#alias}\n\n```\ncode\n```\n\n^skipped\n'
+  const aliasSource =
+    'Paragraph {#alias}\n\n# Heading\n\n```\ncode\n```\n^snippet\n'
+  const duplicateSource =
+    'one ^same\n\ntwo ^same\n\n{#alias}\n\n```\ncode\n```\n\n^skipped\n'
 
   it('rejects the shipped alias, auto-id, DOM post-process, first-wins, and cross-gap mutants', () => {
     for (const source of [aliasSource, duplicateSource]) {
@@ -571,9 +642,11 @@ describe('issue #448: mutation fixtures kill the forbidden anchor implementation
   it('kills an alias mutant that accepts {#id}, #^id, wikilink, or HTML id syntax', () => {
     const aliasMutant = (source: string) => [
       ...validNodes(source),
-      ...[...source.matchAll(/\{#([a-z][a-z0-9-]{0,63})\}|#\^([a-z][a-z0-9-]{0,63})|\[\[([a-z][a-z0-9-]{0,63})\]\]|id="([a-z][a-z0-9-]{0,63})"/gu)].map(
-        (match) => match[1] ?? match[2] ?? match[3] ?? match[4]!,
-      ),
+      ...[
+        ...source.matchAll(
+          /\{#([a-z][a-z0-9-]{0,63})\}|#\^([a-z][a-z0-9-]{0,63})|\[\[([a-z][a-z0-9-]{0,63})\]\]|id="([a-z][a-z0-9-]{0,63})"/gu,
+        ),
+      ].map((match) => match[1] ?? match[2] ?? match[3] ?? match[4]!),
     ]
     const authority = validNodes(aliasSource).map((node) => node.id)
     const mutant = aliasMutant(aliasSource)

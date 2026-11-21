@@ -1,11 +1,12 @@
 {
   "extends": "../../tsconfig.web.json",
   "compilerOptions": {
-    "types": ["node"],
+    "types": ["node", "vite/client"],
     "paths": {
       "@element-plus/icons-vue": ["../../packages/icons-vue/src/index.ts"],
       "@element-plus/icons-vue/*": ["../../packages/icons-vue/src/*"],
       "@element-plus/*": ["../../packages/*"],
+      "@ozwasyd/element-plus": ["../../packages/element-plus/index.ts"],
       "@ozwasyd/element-plus/markdown-runtime": [
         "../../packages/element-plus/markdown-runtime.ts"
       ]
@@ -14,6 +15,8 @@
   "include": [
     "main.ts",
     "identity.spec.ts",
+    "fragment-fixture.ts",
+    "fragment-reveal.spec.ts",
     "../../typings/env.d.ts",
     "../../typings/vite-worker.d.ts"
   ]

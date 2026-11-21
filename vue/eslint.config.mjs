@@ -28,6 +28,7 @@ export default [
       'vue/packages/wasm/dist/**',
       'vue/packages/wasm/build/**',
       'vue/packages/wasm/*.mjs',
+      'vue/packages/wasm/markdown/anchor-owner.portable.mjs',
       'pnpm-lock.yaml',
       'CHANGELOG.en-US.md',
       'docs/components.d.ts',

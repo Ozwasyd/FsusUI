@@ -12,6 +12,7 @@ vue/tests/fixtures/**/dist
 vue/tests/fixtures/**/node_modules
 vue/tests/fixtures/**/.pnpm-store
 vue/packages/wasm/build
+vue/packages/wasm/markdown/anchor-owner.portable.mjs
 vue/packages/wasm/.cmake-check
 packages/demo-app/dist
 packages/icons-vue/dist

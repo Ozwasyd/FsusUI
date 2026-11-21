@@ -115,6 +115,19 @@ for (const profile of ['full', 'consumer']) {
 }
 const heavyIdentityChunkOwner = 'fsus-markdown-heavy-identity'
 for (const profile of ['full', 'consumer']) {
+  for (const prefix of [
+    '/workspace/vue/packages',
+    '/workspace/node_modules/@element-plus',
+    '/workspace/node_modules/@ozwasyd/element-plus/es',
+  ]) {
+    assert(
+      resolveFsusViteManualChunk(
+        `${prefix}/components/markdown-renderer/src/markdown-fragment-reveal.mjs`,
+        { profile },
+      ) === 'fsus-markdown-fragment-reveal',
+      `${profile} must keep offscreen fragment mounting out of routine hydration`,
+    )
+  }
   for (const moduleId of [
     '/workspace/vue/packages/wasm/markdown-heavy-feature-identity.ts',
     '/workspace/node_modules/@element-plus/wasm/markdown-heavy-feature-identity.mjs',
@@ -130,10 +143,7 @@ for (const profile of ['full', 'consumer']) {
 const heavyIdentityDependencyModules = [
   ['/workspace/vue/packages/wasm/markdown-editor-projection.ts', 'fsus-ui'],
   ['/workspace/vue/packages/wasm/markdown-syntax-identity.ts', 'fsus-ui'],
-  [
-    '/workspace/vue/packages/wasm/markdown-source-coordinate-map.ts',
-    'fsus-ui',
-  ],
+  ['/workspace/vue/packages/wasm/markdown-source-coordinate-map.ts', 'fsus-ui'],
   ['/workspace/vue/packages/wasm/markdown-syntax-collect.ts', 'fsus-ui'],
   [
     '/workspace/vue/packages/wasm/markdown/syntax-collect.generated.ts',
@@ -141,6 +151,19 @@ const heavyIdentityDependencyModules = [
   ],
   ['/workspace/vue/packages/wasm/markdown-directive-syntax.ts', 'fsus-ui'],
   ['/workspace/vue/packages/wasm/markdown-anchor-grammar.ts', 'fsus-ui'],
+  ['/workspace/vue/packages/wasm/markdown-anchor-owners.ts', 'fsus-ui'],
+  [
+    '/workspace/vue/packages/wasm/markdown/anchor-owner.portable.mjs',
+    'fsus-ui',
+  ],
+  [
+    '/workspace/node_modules/@element-plus/wasm/markdown-anchor-owners.mjs',
+    'fsus-wasm',
+  ],
+  [
+    '/workspace/node_modules/@ozwasyd/element-plus/es/wasm/markdown/anchor-owner.portable.mjs',
+    'fsus-wasm',
+  ],
   ['/workspace/vue/packages/wasm/markdown-caption-directive.ts', 'fsus-ui'],
   ['/workspace/vue/packages/wasm/markdown-embed-directive.ts', 'fsus-ui'],
   [
