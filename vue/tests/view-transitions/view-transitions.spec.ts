@@ -134,11 +134,9 @@ test('Chromium CPU profiles keep the update responsive and layout stable', async
   await session.send('Emulation.setCPUThrottlingRate', { rate: 1 })
 })
 
-test('dark mode resolves all 36 --el-color-* scale vars and color-scheme in Chromium', async ({
+test('dark mode resolves all 36 --el-color-* scale vars and color-scheme across browsers', async ({
   page,
-  browserName,
 }) => {
-  test.skip(browserName !== 'chromium', 'Chromium dark scale verification')
   await page.emulateMedia({ colorScheme: 'light' })
   await page.goto(route, { waitUntil: 'domcontentloaded' })
   await expectHealthyPage(page)
@@ -210,9 +208,7 @@ test('dark mode resolves all 36 --el-color-* scale vars and color-scheme in Chro
 
 test('Light↔Dark switches via syncThemeMode and runViewTransition resolve control colors atomically and restore transitions', async ({
   page,
-  browserName,
 }) => {
-  test.skip(browserName !== 'chromium', 'Chromium theme transition check')
   await page.emulateMedia({ colorScheme: 'light', reducedMotion: 'no-preference' })
   await page.goto(route, { waitUntil: 'domcontentloaded' })
   await expectHealthyPage(page)
