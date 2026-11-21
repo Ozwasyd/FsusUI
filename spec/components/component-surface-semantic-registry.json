@@ -172,7 +172,7 @@
       "path": "vue/packages/theme-chalk/src/public-shell.scss",
       "kind": "implementation",
       "algorithm": "sha256",
-      "digest": "4441a59c56d975515c263a93e9c887cc4fd95e1641d02776019dcb7d96bce83a"
+      "digest": "8aaa8de76f48fd5196cdbd663d4794e953d7a50f9e1b3f379dfb95f2b4823112"
     },
     "implementation-22": {
       "path": "vue/packages/theme-chalk/src/drawer.scss",
