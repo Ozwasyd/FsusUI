@@ -331,8 +331,9 @@ test('DiagnosticsItem warning uses 3px left border', async ({
 
 test('narrow desktop key-value grid keeps labels and copy actions readable', async ({
   page,
+  useVisualViewport,
 }, testInfo) => {
-  await page.setViewportSize({ width: 1280, height: 800 })
+  await useVisualViewport('metric-detail-desktop')
   await page.goto(buildVisualUrl('metric-visual', testInfo.project.name), {
     waitUntil: 'domcontentloaded',
   })
@@ -415,7 +416,7 @@ test('narrow desktop key-value grid keeps labels and copy actions readable', asy
     )
     .toEqual({ hostWidth: 425, detailWidth: 425, sideBySide: true })
 
-  await page.setViewportSize({ width: 375, height: 812 })
+  await useVisualViewport('metric-detail-mobile')
   await expect
     .poll(async () => (await measure()).hitArea)
     .toBeGreaterThanOrEqual(44)
