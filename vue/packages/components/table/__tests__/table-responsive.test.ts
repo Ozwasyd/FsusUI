@@ -1,5 +1,5 @@
 import { nextTick } from 'vue'
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import ElTable from '../src/table.vue'
 import ElTableColumn from '../src/table-column'
 import { doubleWait, mount } from './table-test-common'
@@ -95,18 +95,33 @@ describe('Table responsive projection', () => {
     expect(wrapper.find('.el-table__scroll-affordance').exists()).toBe(true)
   })
 
-  it('makes auto mode overflow discoverable when desktop columns exceed the container', async () => {
+  it('advertises auto mode overflow only when the rendered wrapper can scroll', async () => {
     const wrapper = createResponsiveTable(8)
     await doubleWait()
 
     const table = wrapper.findComponent(ElTable)
     table.vm.layout.scrollX.value = true
-    await nextTick()
-
+    const wrap = wrapper.find<HTMLElement>('.el-scrollbar__wrap').element
     const scrollRegion = wrapper.find('.el-table__body-wrapper')
-    expect(scrollRegion.attributes('tabindex')).toBe('0')
+    expect(scrollRegion.attributes('tabindex')).toBeUndefined()
+
+    Object.defineProperties(wrap, {
+      clientWidth: { configurable: true, value: 343 },
+      scrollWidth: { configurable: true, value: 420 },
+    })
+    table.vm.doLayout()
+    await vi.waitFor(() =>
+      expect(scrollRegion.attributes('tabindex')).toBe('0'),
+    )
     expect(scrollRegion.attributes('role')).toBe('region')
     expect(scrollRegion.attributes('aria-label')).toBe('Scrollable data table')
     expect(wrapper.find('.el-table__scroll-affordance').exists()).toBe(true)
+
+    Object.defineProperty(wrap, 'scrollWidth', { value: 343 })
+    table.vm.doLayout()
+    await vi.waitFor(() =>
+      expect(scrollRegion.attributes('tabindex')).toBeUndefined(),
+    )
+    expect(wrapper.find('.el-table__scroll-affordance').exists()).toBe(false)
   })
 })

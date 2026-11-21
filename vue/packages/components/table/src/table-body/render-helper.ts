@@ -133,40 +133,44 @@ function useRender<T>(props: Partial<TableBodyProps<T>>) {
         const responsiveDetailsId = `${parent.tableId}-responsive-details-${$index}`
         const isResponsiveExpanded =
           responsiveExpandedRows.value.has(responsiveRowKey)
-        const cellContent = [tdChildren]
+        let cellContent = [tdChildren]
         if (
           isPriorityResponsive.value &&
           column.id === responsiveToggleColumn.value?.id
         ) {
-          cellContent.push(
-            h(
-              'button',
-              {
-                type: 'button',
-                class: ns.e('responsive-toggle'),
-                'aria-expanded': String(isResponsiveExpanded),
-                'aria-controls': responsiveDetailsId,
-                'aria-label': parent.props.responsiveDetailsLabel,
-                onClick: (event: MouseEvent) => {
-                  event.stopPropagation()
-                  const next = new Set(responsiveExpandedRows.value)
-                  if (next.has(responsiveRowKey)) {
-                    next.delete(responsiveRowKey)
-                  } else {
-                    next.add(responsiveRowKey)
-                  }
-                  responsiveExpandedRows.value = next
-                },
+          const toggle = h(
+            'button',
+            {
+              type: 'button',
+              class: ns.e('responsive-toggle'),
+              'aria-expanded': String(isResponsiveExpanded),
+              'aria-controls': responsiveDetailsId,
+              'aria-label': parent.props.responsiveDetailsLabel,
+              onClick: (event: MouseEvent) => {
+                event.stopPropagation()
+                const next = new Set(responsiveExpandedRows.value)
+                if (next.has(responsiveRowKey)) {
+                  next.delete(responsiveRowKey)
+                } else {
+                  next.add(responsiveRowKey)
+                }
+                responsiveExpandedRows.value = next
               },
-              [
-                h(
-                  'span',
-                  { 'aria-hidden': 'true' },
-                  isResponsiveExpanded ? '−' : '+',
-                ),
-              ],
-            ),
+            },
+            [
+              h(
+                'span',
+                { 'aria-hidden': 'true' },
+                isResponsiveExpanded ? '−' : '+',
+              ),
+            ],
           )
+          cellContent = [
+            h('div', { class: ns.e('responsive-primary-cell') }, [
+              tdChildren,
+              toggle,
+            ]),
+          ]
         }
         const mergedTooltipOptions =
           column.showOverflowTooltip &&

@@ -100,6 +100,26 @@
             <el-table-column prop="owner" label="负责人" priority="detail" />
           </el-table>
         </div>
+        <div
+          v-for="mode in ['auto', 'priority'] as const"
+          :key="mode"
+          :data-testid="`table-matrix-compact-${mode}`"
+          style="max-width: 343px"
+        >
+          <el-table :data="compactTableRows" row-key="id" :responsive="mode">
+            <el-table-column prop="title" label="Title" min-width="240" />
+            <el-table-column prop="actions" label="Actions" min-width="180" />
+          </el-table>
+        </div>
+        <div
+          data-testid="table-matrix-resize-overflow"
+          style="width: 650px; max-width: 100%"
+        >
+          <el-table :data="compactTableRows" row-key="id" responsive="auto">
+            <el-table-column prop="title" label="Title" min-width="240" />
+            <el-table-column prop="actions" label="Actions" min-width="480" />
+          </el-table>
+        </div>
         <div data-testid="table-matrix-scroll">
           <el-table
             :data="[tableResponsiveFixtures[2].row]"
@@ -353,6 +373,8 @@ import { Share, useDemoState } from '../demo-state'
 const showTableResponsiveMatrix = new URLSearchParams(
   window.location.search,
 ).has('tableMatrix')
+
+const compactTableRows = [{ id: 1, title: 'Title', actions: 'Action detail' }]
 
 const createTableResponsiveFixture = (columnCount: 3 | 8 | 15) => {
   const columns = Array.from({ length: columnCount }, (_, index) => ({

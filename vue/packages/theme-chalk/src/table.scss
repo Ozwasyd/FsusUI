@@ -707,6 +707,10 @@
     }
   }
 
+  @include e(responsive-primary-cell) {
+    display: contents;
+  }
+
   @include e(responsive-toggle) {
     display: none;
     min-width: 40px;
@@ -778,6 +782,19 @@
         table-layout: auto !important;
       }
 
+      .#{$namespace}-table__body-wrapper
+        > .#{$namespace}-scrollbar
+        > .#{$namespace}-scrollbar__wrap
+        > .#{$namespace}-scrollbar__view {
+        min-inline-size: 100%;
+      }
+
+      // A desktop scroll can be clamped while entering compact layout.
+      // Do not let its rebound create extra horizontal scrollable overflow.
+      .#{$namespace}-table__body {
+        --fsus-interactive-motion-offset-x: 0px;
+      }
+
       col[data-responsive-priority='secondary'],
       col[data-responsive-priority='detail'],
       th[data-responsive-priority='secondary'],
@@ -807,6 +824,16 @@
         .#{$namespace}-button {
           min-width: 40px;
           min-height: 40px;
+        }
+      }
+
+      .#{$namespace}-table__responsive-primary-cell {
+        display: flex;
+        align-items: center;
+        padding-inline-end: 12px;
+
+        > .cell {
+          flex: 1;
         }
       }
 
