@@ -3603,8 +3603,17 @@ describe('Fsus theme visual baseline', () => {
     ])
     expectCssRule(css, '.el-key-value-grid', [
       'display: grid;',
-      'grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));',
+      'grid-template-columns: repeat(auto-fit, minmax(min(100%, 216px), 1fr));',
     ])
+    expectCssRule(css, '.el-key-value-grid--compact', [
+      'grid-template-columns: repeat(auto-fit, minmax(min(100%, 192px), 1fr));',
+    ])
+    expectCssRule(css, '.el-key-value-item', ['align-content: start;'])
+    expectCssRule(css, '.el-copyable-detail', [
+      'display: flex;',
+      'flex-wrap: wrap;',
+    ])
+    expectCssRule(css, '.el-copyable-detail__value', ['flex: 1 1 8rem;'])
     expectCssRule(css, '.el-key-value-item__label', [
       'font-size: 12px;',
       'font-weight: 500;',

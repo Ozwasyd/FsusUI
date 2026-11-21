@@ -59,6 +59,12 @@ export default {
         dec: '十二月',
       },
     },
+    metricPrimitives: {
+      copyDetail: '复制详情',
+      copied: '已复制',
+      copyFailed: '复制失败',
+      details: '详情',
+    },
     select: {
       loading: '加载中',
       noMatch: '无匹配数据',

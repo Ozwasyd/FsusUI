@@ -93,6 +93,33 @@
       </div>
     </div>
 
+    <div class="demo-block" data-metric-variant="kv-narrow-desktop">
+      <ElKeyValueGrid density="compact">
+        <ElKeyValueItem label="Mode" value="Single instance" />
+        <ElKeyValueItem
+          label="Scheduling"
+          value="Unavailable in single-instance mode"
+        />
+        <ElKeyValueItem label="Instance ID" monospace>
+          <ElCopyableDetail
+            value="983732b7-a65e-4110-812e-8ecdcfad15f5"
+            label="Copy detail"
+          />
+        </ElKeyValueItem>
+        <ElKeyValueItem
+          label="Build version"
+          value="1.0.0+eea3af55c2494ac18eb9d8a44d4eaf464e788f79"
+        />
+        <ElKeyValueItem label="Started" value="2026/11/20 20:49:32" />
+        <ElKeyValueItem label="Observed" value="2026/11/20 20:49:37" />
+        <ElKeyValueItem
+          label="Lease"
+          value="Confirmed on primary (174 ms ago)"
+        />
+        <ElKeyValueItem label="Snapshot" value="Ready" />
+      </ElKeyValueGrid>
+    </div>
+
     <!-- StatusSummary -->
     <div class="demo-block" data-metric-fixture="status">
       <h3>StatusSummary</h3>
@@ -246,6 +273,12 @@
       <h3>CopyableDetail</h3>
       <div class="metric-fixture-row" data-metric-variant="copy-default">
         <ElCopyableDetail value="sk-proj-abc123def456" />
+      </div>
+      <div
+        data-metric-variant="copy-wide"
+        style="width: 425px; max-width: 100%"
+      >
+        <ElCopyableDetail value="diagnostic-node:runCheck:sample-0001" />
       </div>
       <div class="metric-fixture-row" data-metric-variant="copy-disabled">
         <ElCopyableDetail
