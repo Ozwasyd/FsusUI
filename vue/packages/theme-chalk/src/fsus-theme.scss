@@ -75,7 +75,11 @@
 }
 
 html.dark .is-glass,
-html.dark [data-fsus-material='glass'] {
+html.dark [data-fsus-material='glass'],
+html:where([data-theme-mode='system']:not(.light))[data-theme-resolved='dark']
+  .is-glass,
+html:where([data-theme-mode='system']:not(.light))[data-theme-resolved='dark']
+  [data-fsus-material='glass'] {
   --fsus-surface-overlay: rgba(18, 18, 20, 0.86);
 }
 
@@ -907,7 +911,9 @@ html.dark {
   border: 1px solid var(--fsus-switch-action-border);
 }
 
-html.dark .#{$namespace}-switch__action {
+html.dark .#{$namespace}-switch__action,
+html:where([data-theme-mode='system']:not(.light))[data-theme-resolved='dark']
+  .#{$namespace}-switch__action {
   --fsus-switch-action-bg: color-mix(
     in srgb,
     var(--fsus-color-surface-base) 82%,

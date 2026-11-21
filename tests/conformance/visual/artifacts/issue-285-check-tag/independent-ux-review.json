@@ -1,12 +1,12 @@
 {
   "schema": "fsusui-independent-ux-review.v1",
   "issue": 285,
-  "candidateSha": "7eb2f7aa22ead02141a6155246a3ef7a75085d20",
+  "candidateSha": "be48c0f942487eb579c87fa66cee6a9fee50fbb8",
   "reviewMode": "read-only-rendered-evidence-inspection",
   "modifiedPaths": [],
   "productionFixture": true,
   "identity": {
-    "executionId": "conformance-v2-check-tag-7eb2f7aa22ead02141a6155246a3ef7a75085d20",
+    "executionId": "conformance-v2-check-tag-be48c0f942487eb579c87fa66cee6a9fee50fbb8",
     "checkpoint": "check-tag-after-pointer-keyboard",
     "contract": "component-v2.el-check-tag",
     "scenario": "scenario.v2.el-check-tag.real-interaction-trace",
@@ -106,12 +106,12 @@
     }
   ],
   "observations": [
-    "Read-only inspection opened both original rendered PNGs of official run 44882264751, job 136779914166, artifact 14697674312. ZIP SHA-256 b365f6c6085cc5456994206cd18ed6802e3a327f34249215af5a48d4c3c9389f.",
-    "Official capture used genuine GitHub checkout 7eb2f7aa22ead02141a6155246a3ef7a75085d20 with parents bc848ea2caa8c21394c49a1b1650ebc465b504fd and 339557b9283e8b3532aabcb5d007df6c7cdef2ef; candidate and pull request head have identical tree f41270704e9946f488985ff51378078c69682122.",
+    "Read-only inspection opened both original rendered PNGs of official run 44889031558, job 136800578273, artifact 14701760322. ZIP SHA-256 cebeb3cd98d81663127fbc8cc2a4cb4d22506fcf6505b89118aa889b2d7f529d.",
+    "Official capture used genuine GitHub checkout be48c0f942487eb579c87fa66cee6a9fee50fbb8 with parents 37bc4bf1af929699fb08e9e90e1367614c8be0da and fe22bc181b79f06c5b0a78dec62c4aa80fd00edc; candidate and pull request head have identical tree 400e6733ba460fb3df1e1e9b4b332703987674b0.",
     "Web artifact is an 88×24 CheckTag element crop; Avalonia artifact is a 960×720 full window. Both tracked PNG bytes are equal to these inspected original PNGs.",
     "Nine functional observations pass in both executions; timing is diagnostic only.",
-    "web-a11y/manifest.json SHA-256 b760625d4f620dabbe239dcca45fd7f7661b65d62faec6929eca64eac1c5ec46",
-    "avalonia.json SHA-256 737479742d0cd14ff7087f364b8fbc0026b685e158520216e1ce295099c4bf63"
+    "web-a11y/manifest.json SHA-256 56675f59170f5a1f0c806f21ac2005e9ffaeabdfe87fb98c966d340ffd955d0d",
+    "avalonia.json SHA-256 856d4d4001bb8d74c35195012503f6ffd14d27a6fdeb63d0cec27e72d1040f7e"
   ],
   "limitations": [
     "Only the light/default/zh-CN/ltr/reduced-motion CheckTag checkpoint was independently accepted, not full CI, AOT, package, cross-platform rendering equivalence or performance.",
