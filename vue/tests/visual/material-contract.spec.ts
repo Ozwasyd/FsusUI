@@ -195,7 +195,7 @@ test('dialog drawer notification keep correct overlay depth hierarchy', async ({
   })
 
   expect(dialogDepth.borderRadius).toMatch(/^12px$/)
-  expect(drawerDepth.borderRadius).toMatch(/^12px$/)
+  expect(drawerDepth.borderRadius).toMatch(/^0px$/)
   expect(notificationDepth.borderRadius).toMatch(/^10px$/)
 
   expect(notificationDepth.boxShadow).not.toMatch(

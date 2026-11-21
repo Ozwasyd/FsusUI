@@ -40,6 +40,15 @@ $drawer-inline-pad: getCssVar('drawer-padding-primary');
       flex: 1;
       min-width: 0;
     }
+
+    // Reserve the 54px close-button track inside the flex content box so
+    // single-line titles center with the close control and the close hit box
+    // never overhangs into the body (#1096).
+    &:has(.#{$namespace}-drawer__close-btn)::after {
+      content: '';
+      flex: 0 0 0;
+      min-height: 54px;
+    }
   }
 
   &__title {
@@ -82,7 +91,7 @@ $drawer-inline-pad: getCssVar('drawer-padding-primary');
     position: absolute;
     @include fsus-inset-safe-area(top, $drawer-block-pad);
     right: $drawer-inline-pad;
-    &:focus,
+    &:focus-visible,
     &:hover {
       i {
         color: getCssVar('color-primary');
@@ -105,6 +114,16 @@ $drawer-inline-pad: getCssVar('drawer-padding-primary');
 
   // Edge-attached positioning without redundant height: 100%.
   // Background stays flush to the screen edge; safe-area enters content padding.
+  // Drop outer border/radius on viewport-flush edges; each direction restores
+  // its inner separating 1px border below (#1096).
+  &.ltr,
+  &.rtl,
+  &.ttb,
+  &.btt {
+    border: 0;
+    border-radius: 0;
+  }
+
   &.ltr,
   &.rtl {
     top: 0;
@@ -123,6 +142,7 @@ $drawer-inline-pad: getCssVar('drawer-padding-primary');
 
   &.ltr {
     left: 0;
+    border-right: 1px solid getCssVar('border-color-light');
 
     .#{$namespace}-drawer__header {
       @include fsus-padding-safe-area(top, $drawer-block-pad);
@@ -153,6 +173,7 @@ $drawer-inline-pad: getCssVar('drawer-padding-primary');
 
   &.rtl {
     right: 0;
+    border-left: 1px solid getCssVar('border-color-light');
 
     .#{$namespace}-drawer__header {
       @include fsus-padding-safe-area(top, $drawer-block-pad);
@@ -192,6 +213,7 @@ $drawer-inline-pad: getCssVar('drawer-padding-primary');
 
   &.ttb {
     top: 0;
+    border-bottom: 1px solid getCssVar('border-color-light');
 
     .#{$namespace}-drawer__header {
       @include fsus-padding-safe-area(top, $drawer-block-pad);
@@ -221,6 +243,7 @@ $drawer-inline-pad: getCssVar('drawer-padding-primary');
 
   &.btt {
     bottom: 0;
+    border-top: 1px solid getCssVar('border-color-light');
 
     .#{$namespace}-drawer__header {
       @include fsus-padding-safe-area(left, $drawer-inline-pad);
@@ -228,6 +251,12 @@ $drawer-inline-pad: getCssVar('drawer-padding-primary');
         calc(#{$drawer-inline-pad} + 54px + var(--fsus-space-2, 8px)),
         calc(#{fsus-safe-area-inset(right)} + 54px + var(--fsus-space-2, 8px))
       );
+    }
+
+    // Bottom sheets do not attach to the top viewport edge; align the close
+    // button with the header's base top padding rather than top safe-area (#1096).
+    .#{$namespace}-drawer__close-btn {
+      top: $drawer-block-pad;
     }
 
     .#{$namespace}-drawer__body {
