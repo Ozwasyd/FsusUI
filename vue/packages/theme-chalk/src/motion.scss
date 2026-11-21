@@ -59,6 +59,13 @@
   }
 }
 
+:root[data-fsus-view-transition-snapshotting],
+:root[data-fsus-view-transition-snapshotting] *,
+:root[data-fsus-view-transition-snapshotting] *::before,
+:root[data-fsus-view-transition-snapshotting] *::after {
+  transition: none !important;
+}
+
 // Motion phase classes for FsusUI components.
 //
 // Vue's `<Transition>` adds six classes to its child by default: one

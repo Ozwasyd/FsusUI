@@ -196,15 +196,17 @@ const scanEmphasisClose = (
   return -1
 }
 
-interface MarkerCandidate {
+export interface MarkdownLiveInlineDecoration {
   readonly field?: MarkdownLiveRevealField
   readonly kind: string
   readonly markerKind: string
   readonly nodeId: string
-  readonly nodeRange: { end: number; start: number }
+  readonly nodeRange: Readonly<{ end: number; start: number }>
   readonly parentId: string | null
   readonly revealedRanges: readonly MarkdownLiveRevealRange[]
 }
+
+type MarkerCandidate = MarkdownLiveInlineDecoration
 
 const pushEmphasis = (
   text: string,
@@ -476,9 +478,13 @@ const partitionExplicit = (node: MarkdownStableSyntaxNode, slice: string): Marke
 const collectCandidates = (
   source: string,
   projection: MarkdownStableProjection,
+  activeNodeIds: ReadonlySet<string> | null = null,
 ): MarkerCandidate[] => {
   const candidates: MarkerCandidate[] = []
   for (const node of projection.nodes) {
+    if (activeNodeIds && !activeNodeIds.has(node.id)) {
+      continue
+    }
     const slice = source.slice(node.rawRange.start, node.rawRange.end)
     if (node.kind === 'link' || node.kind === 'image') {
       const partitioned = partitionLink(slice, node.rawRange.start, node)
@@ -539,6 +545,19 @@ const collectCandidates = (
   }
   return candidates
 }
+
+/**
+ * Shared parser-backed inline and structural range extraction used by both
+ * live syntax reveal and the live visual projection layer.
+ */
+export const collectMarkdownLiveInlineDecorations = (
+  source: string,
+  projection: MarkdownStableProjection,
+  options?: {
+    readonly activeNodeIds?: ReadonlySet<string> | null
+  },
+): readonly MarkdownLiveInlineDecoration[] =>
+  collectCandidates(source, projection, options?.activeNodeIds ?? null)
 
 const pickInnermost = (
   candidates: readonly MarkerCandidate[],

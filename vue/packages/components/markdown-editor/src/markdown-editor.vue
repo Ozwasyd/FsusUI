@@ -12,6 +12,8 @@
       ns.m(`toolbar-${effectiveToolbarDensity}`),
       ns.is('commands-expanded', commandsExpanded),
       ns.is('focus-mode', writingAidsFocusState.enabled),
+      ns.is('live-visual', liveVisualActive),
+      ns.is('composing', isComposing),
       ns.is('typewriter-mode', resolvedWritingAids.typewriter),
     ]"
     role="region"
@@ -168,8 +170,8 @@
       ref="toolbarRef"
       :class="ns.e('toolbar')"
     >
-      <div :class="ns.e('command-group')">
-        <div :class="ns.e('commands')">
+      <div ref="commandGroupRef" :class="ns.e('command-group')">
+        <div ref="commandsRef" :class="ns.e('commands')">
           <button
             v-for="command in primaryCommands"
             :key="command.key"
@@ -289,6 +291,36 @@
       >
         {{ pasteAsMarkdownGateDescription }}
       </span>
+      <div
+        ref="commandMeasureRef"
+        :class="ns.e('command-measure')"
+        aria-hidden="true"
+      >
+        <span
+          v-for="command in configuredPrimaryCommands"
+          :key="`measure:${command.key}`"
+          :class="ns.e('command-measure-item')"
+          data-measure-role="command"
+        >
+          {{ commandName(command) }}
+        </span>
+        <span
+          v-if="gatedPasteAsMarkdownCommand"
+          :class="ns.e('command-measure-item')"
+          data-measure-role="reserved-end"
+        >
+          {{ commandName(gatedPasteAsMarkdownCommand) }}
+        </span>
+        <span
+          :class="ns.e('command-measure-more')"
+          data-measure-role="more"
+        >
+          <span>{{ resolvedCommandOverflowLabel }}</span>
+          <span :class="ns.e('command-more-count')">{{
+            worstCaseOverflowCount
+          }}</span>
+        </span>
+      </div>
     </header>
 
     <div
@@ -305,9 +337,26 @@
       <pre
         v-if="writingAidsFocusState.enabled"
         ref="focusLayerRef"
-        :class="ns.e('focus-layer')"
+        :class="[
+          ns.e('focus-layer'),
+          ns.is('live-visual', liveVisualActive),
+        ]"
         aria-hidden="true"
-      ><span
+        :data-markdown-live-visual="liveVisualActive ? '' : undefined"
+      ><template v-if="liveVisualActive"><span
+          v-for="segment in liveVisualSegments"
+          :key="segment.key"
+          :class="[
+            ns.e('live-token'),
+            ns.em('live-token', segment.kind),
+            ns.is('marker', segment.marker),
+            ns.is('revealed', segment.revealed),
+            ns.is('dimmed', segment.dimmed),
+            ns.is('exempt', segment.exempt),
+          ]"
+          :data-live-kind="segment.kind"
+          :data-node-id="segment.nodeId"
+        >{{ segment.text }}</span></template><template v-else><span
           v-for="segment in focusSegments"
           :key="segment.key"
           :class="[
@@ -315,6 +364,23 @@
             ns.is('exempt', segment.exempt),
           ]"
           :data-node-id="segment.nodeId"
+        >{{ segment.text }}</span></template></pre>
+      <pre
+        v-else-if="liveVisualActive"
+        ref="liveLayerRef"
+        :class="ns.e('live-layer')"
+        aria-hidden="true"
+        data-markdown-live-visual
+      ><span
+          v-for="segment in liveVisualSegments"
+          :key="segment.key"
+          :class="[
+            ns.e('live-token'),
+            ns.em('live-token', segment.kind),
+            ns.is('marker', segment.marker),
+            ns.is('revealed', segment.revealed),
+          ]"
+          :data-live-kind="segment.kind"
         >{{ segment.text }}</span></pre>
       <textarea
         :id="textareaId"
@@ -354,6 +420,7 @@
         @drop="handleDrop"
         @input="handleInput"
         @keydown="handleKeydown"
+        @keyup="handleSelectionKeyup"
         @paste="handlePaste"
         @pointerdown="handleSelectionDragStart"
         @pointerup="handleSelectionDragEnd"
@@ -1278,6 +1345,8 @@ import {
   resolveMarkdownLiveSyntaxReveal,
   type MarkdownLiveRevealIntent,
 } from './markdown-editor-live-reveal'
+import { createMarkdownLiveVisualSegments } from './markdown-editor-live-visual'
+import { resolveMarkdownEditorFittingCommandCount } from './markdown-editor-toolbar-overflow'
 import {
   MARKDOWN_ATOMIC_NODE_KINDS,
   resolveMarkdownAtomicNodeIntent,
@@ -1420,6 +1489,9 @@ const tableMenuTriggerRef = ref<HTMLButtonElement | null>(null)
 const retainedPreviewScrollLeft = ref(0)
 const visualViewportHeight = ref(0)
 const visualViewportOffsetTop = ref(0)
+const commandGroupRef = ref<HTMLElement | null>(null)
+const commandsRef = ref<HTMLElement | null>(null)
+const commandMeasureRef = ref<HTMLElement | null>(null)
 const toolbarRef = ref<HTMLElement | null>(null)
 const inputDisabled = computed(() => props.disabled || props.loading)
 const editingBlocked = computed(() => props.readonly || inputDisabled.value)
@@ -1503,8 +1575,16 @@ const writingAidsDataAttrs = computed(() => ({
 }))
 const rootAttrs = computed(() => ({ ...attrs, ...writingAidsDataAttrs.value }))
 const focusLayerRef = ref<HTMLElement | null>(null)
-const syncFocusLayerScroll = (scrollTop: number) => {
-  if (focusLayerRef.value) focusLayerRef.value.scrollTop = scrollTop
+const liveLayerRef = ref<HTMLElement | null>(null)
+const syncMirrorLayerScroll = (scrollTop: number, scrollLeft = 0) => {
+  if (focusLayerRef.value) {
+    focusLayerRef.value.scrollTop = scrollTop
+    focusLayerRef.value.scrollLeft = scrollLeft
+  }
+  if (liveLayerRef.value) {
+    liveLayerRef.value.scrollTop = scrollTop
+    liveLayerRef.value.scrollLeft = scrollLeft
+  }
 }
 const focusSegments = computed(() => {
   return createMarkdownFocusSegments(
@@ -1746,6 +1826,7 @@ const liveReveal = ref(
   resolveMarkdownLiveSyntaxReveal({
     documentIdentity,
     mode: currentMode.value,
+    projection: editorProjection.value,
     selection: transactionStore.selection,
     source: editorValue.value,
   }),
@@ -1852,12 +1933,41 @@ let typewriterLayoutFrame: number | undefined
 let textareaLayoutHeight = 0
 let textareaLayoutWidth = 0
 let viewportRestoreCurrentScrollTop = 0
+let viewportRestoreCurrentScrollLeft = 0
 let viewportRestoreNextScrollTop: number | null = null
 const liveDecorations = computed(() => {
   const decorations = liveSurface.value.decorations
   if (currentMode.value !== 'live' || !liveWindow.value) return decorations
   const mounted = new Set(liveWindow.value.mountedNodeIds)
   return decorations.filter((decoration) => mounted.has(decoration.nodeId))
+})
+const liveVisualActive = computed(
+  () =>
+    currentMode.value === 'live' &&
+    liveSurface.value.fallbackMode === 'live' &&
+    liveSurface.value.inputVisible &&
+    !isComposing.value,
+)
+const liveVisualSegments = computed(() => {
+  if (!liveVisualActive.value) return []
+  return createMarkdownLiveVisualSegments({
+    activeNodeIds: liveWindow.value?.mountedNodeIds,
+    focusState: writingAidsFocusState.value.enabled
+      ? writingAidsFocusState.value
+      : null,
+    projection: editorProjection.value,
+    reveal: liveReveal.value,
+    source: editorValue.value,
+  })
+})
+watch(liveVisualActive, (active) => {
+  if (!active) return
+  void nextTick(() => {
+    const textarea = textareaRef.value
+    if (textarea) {
+      syncMirrorLayerScroll(textarea.scrollTop, textarea.scrollLeft)
+    }
+  })
 })
 const restoreTextareaViewport = (plan: MarkdownLiveLayoutPlan) => {
   const textarea = textareaRef.value
@@ -1883,6 +1993,7 @@ const restoreTextareaViewport = (plan: MarkdownLiveLayoutPlan) => {
         line * lineHeight - target.clientHeight / 3,
       )
       viewportRestoreCurrentScrollTop = target.scrollTop
+      viewportRestoreCurrentScrollLeft = target.scrollLeft
     },
     mutate: () => {
       const target = textareaRef.value
@@ -1897,7 +2008,9 @@ const restoreTextareaViewport = (plan: MarkdownLiveLayoutPlan) => {
         return
       }
       restoringViewport = true
-      target.scrollTop = viewportRestoreNextScrollTop
+      const nextScrollTop = viewportRestoreNextScrollTop
+      target.scrollTop = nextScrollTop
+      syncMirrorLayerScroll(nextScrollTop, viewportRestoreCurrentScrollLeft)
       viewportRestoreNextScrollTop = null
       queueMicrotask(() => {
         restoringViewport = false
@@ -2000,7 +2113,7 @@ const handleLayoutTouch = () => {
 }
 const handleLayoutScroll = () => {
   const textarea = textareaRef.value
-  if (textarea) syncFocusLayerScroll(textarea.scrollTop)
+  if (textarea) syncMirrorLayerScroll(textarea.scrollTop, textarea.scrollLeft)
   if (restoringSelection || restoringViewport || restoringTypewriter) return
   if (textarea && typewriterScrollTarget !== null) {
     const reachedTarget =
@@ -2119,13 +2232,13 @@ const applyTypewriterScroll = (
       top: scrollTop,
     })
     requestAnimationFrame(() => {
-      syncFocusLayerScroll(textarea.scrollTop)
+      syncMirrorLayerScroll(textarea.scrollTop, textarea.scrollLeft)
     })
   } else {
     typewriterScrollTarget = target.scrollTop
     typewriterScrollSmooth = false
     textarea.scrollTop = target.scrollTop
-    syncFocusLayerScroll(target.scrollTop)
+    syncMirrorLayerScroll(target.scrollTop, textarea.scrollLeft)
   }
   requestAnimationFrame(() => {
     requestAnimationFrame(() => {
@@ -2147,6 +2260,7 @@ const refreshLiveReveal = (
     mode: currentMode.value,
     pointerOffset: extras.pointerOffset,
     previous: liveReveal.value,
+    projection: editorProjection.value,
     selection: transactionStore.selection,
     source: transactionStore.value,
   })
@@ -2453,6 +2567,7 @@ const dispatchEditorOperation = (
   }
   if (result.accepted) {
     refreshWritingAidsDocument()
+    if (currentMode.value === 'live') refreshLiveReveal()
     if (result.value !== previousValue) applyTypewriterScroll()
   }
   if (result.accepted) syncLanguageToolsState()
@@ -2676,7 +2791,16 @@ watch(
     transactionStore.breakMergeGroup()
     currentMode.value = normalizeModeForLayout(mode ?? defaultMode)
     refreshWritingAidsDocument()
+    refreshLiveReveal()
     syncLanguageToolsState()
+    if (currentMode.value === 'live') {
+      void nextTick(() => {
+        const textarea = textareaRef.value
+        if (textarea) {
+          syncMirrorLayerScroll(textarea.scrollTop, textarea.scrollLeft)
+        }
+      })
+    }
   },
 )
 
@@ -3385,20 +3509,39 @@ const commandDescriptionId = (command: MarkdownEditorCommand) => {
     ? commandStateId(command.key)
     : undefined
 }
-const primaryCommands = computed(() =>
+const configuredPrimaryCommands = computed(() =>
   resolveMarkdownEditorPrimaryCommands(
     toolbarCommands.value,
     effectiveToolbarDensity.value,
     props.primaryCommandKeys,
   ),
 )
-const overflowCommands = computed(() =>
+const configuredOverflowCommands = computed(() =>
   resolveMarkdownEditorOverflowCommands(
     toolbarCommands.value,
     effectiveToolbarDensity.value,
     props.primaryCommandKeys,
   ),
 )
+const responsivePrimaryLimit = ref<number | null>(null)
+const primaryCommands = computed(() => {
+  const configured = configuredPrimaryCommands.value
+  const limit = responsivePrimaryLimit.value
+  if (limit === null || limit >= configured.length) return configured
+  return configured.slice(0, Math.max(0, limit))
+})
+const overflowCommands = computed(() => {
+  const configuredPrimary = configuredPrimaryCommands.value
+  const configuredOverflow = configuredOverflowCommands.value
+  const limit = responsivePrimaryLimit.value
+  if (limit === null || limit >= configuredPrimary.length) {
+    return configuredOverflow
+  }
+  return [
+    ...configuredPrimary.slice(Math.max(0, limit)),
+    ...configuredOverflow,
+  ]
+})
 const visibleActions = computed<MarkdownEditorActionItem[]>(() => {
   if (!props.showActions) return []
 
@@ -3439,8 +3582,42 @@ const overflowActions = computed(() =>
 const overflowItemCount = computed(
   () => overflowCommands.value.length + overflowActions.value.length,
 )
+const worstCaseOverflowCount = computed(() =>
+  Math.max(
+    1,
+    configuredPrimaryCommands.value.length +
+      configuredOverflowCommands.value.length +
+      overflowActions.value.length,
+  ),
+)
 watch([editingBlocked, overflowItemCount], ([blocked, itemCount]) => {
-  if (blocked || !itemCount) commandsExpanded.value = false
+  if (blocked || !itemCount) {
+    const activeElement =
+      typeof document !== 'undefined' ? document.activeElement : null
+    const hadOverflowFocus =
+      !blocked &&
+      !itemCount &&
+      Boolean(
+        activeElement &&
+          ((commandsExpanded.value &&
+            commandTrayRef.value?.contains(activeElement)) ||
+            activeElement === commandOverflowRef.value),
+      )
+    commandsExpanded.value = false
+    if (hadOverflowFocus) {
+      void nextTick(() => {
+        const firstVisibleCommand =
+          commandsRef.value?.querySelector<HTMLButtonElement>(
+            'button:not(:disabled)',
+          )
+        if (firstVisibleCommand) {
+          firstVisibleCommand.focus()
+        } else {
+          textareaRef.value?.focus()
+        }
+      })
+    }
+  }
   if (!blocked) return
 
   transactionStore.breakMergeGroup()
@@ -3519,6 +3696,135 @@ const commandOverflowAriaLabel = computed(() =>
     ? `${props.commandOverflowLabel} (${overflowItemCount.value})`
     : localeText.value.overflowAria(overflowItemCount.value),
 )
+const toolbarMeasureSignature = computed(() =>
+  [
+    effectiveToolbarDensity.value,
+    props.interactionProfile,
+    props.mobileLayout,
+    props.editorProfile,
+    resolvedCommandOverflowLabel.value,
+    overflowActions.value.length,
+    configuredOverflowCommands.value.length,
+    gatedPasteAsMarkdownCommand.value
+      ? commandName(gatedPasteAsMarkdownCommand.value)
+      : '',
+    configuredPrimaryCommands.value
+      .map((command) => `${command.key}:${commandName(command)}`)
+      .join('|'),
+  ].join('\u0000'),
+)
+let toolbarResizeObserver: ResizeObserver | undefined
+let pendingToolbarPrimaryLimit: number | null | undefined
+let lastCommandGroupWidth = -1
+let editorUnmounted = false
+
+const measureToolbarOverflow = () => {
+  const group = commandGroupRef.value
+  const probe = commandMeasureRef.value
+  if (!group || !probe || typeof window === 'undefined') {
+    pendingToolbarPrimaryLimit = null
+    return
+  }
+  const availableWidth = group.clientWidth
+  const commandsElement = commandsRef.value
+  const groupStyle = window.getComputedStyle(group)
+  const groupGap = Number.parseFloat(groupStyle.columnGap || groupStyle.gap) || 0
+  const commandsStyle = commandsElement
+    ? window.getComputedStyle(commandsElement)
+    : groupStyle
+  const commandsGap =
+    Number.parseFloat(commandsStyle.columnGap || commandsStyle.gap) || 0
+
+  const commandWidths = Array.from(
+    probe.querySelectorAll<HTMLElement>('[data-measure-role="command"]'),
+    (node) => node.getBoundingClientRect().width,
+  )
+  const reservedEndNode = probe.querySelector<HTMLElement>(
+    '[data-measure-role="reserved-end"]',
+  )
+  const reservedEndWidth = reservedEndNode
+    ? reservedEndNode.getBoundingClientRect().width
+    : 0
+  const moreNode = probe.querySelector<HTMLElement>(
+    '[data-measure-role="more"]',
+  )
+  const overflowTriggerWidth = moreNode
+    ? moreNode.getBoundingClientRect().width
+    : 0
+
+  pendingToolbarPrimaryLimit = resolveMarkdownEditorFittingCommandCount({
+    availableWidth,
+    commandWidths,
+    commandsGap,
+    groupGap,
+    hasBaseOverflow:
+      configuredOverflowCommands.value.length + overflowActions.value.length > 0,
+    overflowTriggerWidth,
+    reservedEndWidth,
+  })
+}
+
+const mutateToolbarOverflow = () => {
+  if (pendingToolbarPrimaryLimit === undefined) return
+  const nextLimit = pendingToolbarPrimaryLimit
+  pendingToolbarPrimaryLimit = undefined
+  if (responsivePrimaryLimit.value !== nextLimit) {
+    responsivePrimaryLimit.value = nextLimit
+  }
+}
+
+const scheduleToolbarOverflowMeasure = () => {
+  if (editorUnmounted || typeof window === 'undefined') return
+  if (!commandGroupRef.value || !commandMeasureRef.value) return
+  frameScheduler.schedule({
+    guard: () =>
+      !editorUnmounted &&
+      Boolean(commandGroupRef.value && commandMeasureRef.value),
+    key: 'toolbar-overflow',
+    measure: measureToolbarOverflow,
+    mutate: mutateToolbarOverflow,
+  })
+}
+
+const disconnectToolbarResizeObserver = () => {
+  toolbarResizeObserver?.disconnect()
+  toolbarResizeObserver = undefined
+  lastCommandGroupWidth = -1
+}
+
+const attachToolbarResizeObserver = (element: HTMLElement | null) => {
+  disconnectToolbarResizeObserver()
+  if (!element) {
+    responsivePrimaryLimit.value = null
+    return
+  }
+  if (typeof ResizeObserver !== 'undefined') {
+    toolbarResizeObserver = new ResizeObserver((entries) => {
+      const entry = entries[0]
+      const nextWidth = entry ? entry.contentRect.width : element.clientWidth
+      if (
+        lastCommandGroupWidth >= 0 &&
+        Math.abs(nextWidth - lastCommandGroupWidth) <= 0.5
+      ) {
+        return
+      }
+      lastCommandGroupWidth = nextWidth
+      scheduleToolbarOverflowMeasure()
+    })
+    toolbarResizeObserver.observe(element)
+  }
+  scheduleToolbarOverflowMeasure()
+}
+
+watch(commandGroupRef, (element) => {
+  attachToolbarResizeObserver(element)
+})
+
+watch(toolbarMeasureSignature, () => {
+  void nextTick(() => {
+    scheduleToolbarOverflowMeasure()
+  })
+})
 const visibleModes = computed(() =>
   compactMode.value
     ? modes.filter((mode) => mode !== 'split' && mode !== 'live')
@@ -3611,12 +3917,22 @@ onMounted(() => {
   refreshWritingAidsDocument()
   updateVisualViewportHeight()
   refreshTypewriterResizeObserver()
+  attachToolbarResizeObserver(commandGroupRef.value)
+  if (typeof document !== 'undefined' && document.fonts?.ready) {
+    void document.fonts.ready.then(() => {
+      if (!editorUnmounted && commandGroupRef.value && commandMeasureRef.value) {
+        scheduleToolbarOverflowMeasure()
+      }
+    })
+  }
   window.visualViewport?.addEventListener('resize', updateVisualViewportHeight)
   window.visualViewport?.addEventListener('scroll', updateVisualViewportHeight)
   window.addEventListener('resize', updateVisualViewportHeight)
 })
 
 onBeforeUnmount(() => {
+  editorUnmounted = true
+  disconnectToolbarResizeObserver()
   languageToolsController = null
   abortPendingCommands()
   attachmentCaptureSession.clear()
@@ -3805,6 +4121,7 @@ const handleCompositionEnd = (event: CompositionEvent) => {
   pendingInputOrigin = undefined
   if (plan.action !== 'commit') {
     if (plan.restoreDisplay) triggerRef(editorValue)
+    refreshLiveReveal()
     return
   }
   const laggedComposition =
@@ -4066,6 +4383,25 @@ const handleSelectionMove = () => {
     }
   }
   refreshLiveReveal()
+}
+
+const handleSelectionKeyup = (event: KeyboardEvent) => {
+  if (
+    currentMode.value !== 'live' ||
+    isComposing.value ||
+    restoringSelection
+  ) {
+    return
+  }
+  if (event.key !== 'ArrowUp' && event.key !== 'ArrowDown') return
+  const textarea = textareaRef.value
+  if (!textarea) return
+  if (
+    textarea.selectionStart !== transactionStore.selection.start ||
+    textarea.selectionEnd !== transactionStore.selection.end
+  ) {
+    handleSelectionMove()
+  }
 }
 
 const handleSelectionDragStart = () => {
@@ -4697,6 +5033,14 @@ const setMode = (mode: MarkdownEditorMode) => {
   refreshLiveWindow('mode-switch')
   refreshLiveReveal()
   restorePreviewScroll()
+  if (nextMode === 'live') {
+    void nextTick(() => {
+      const textarea = textareaRef.value
+      if (textarea) {
+        syncMirrorLayerScroll(textarea.scrollTop, textarea.scrollLeft)
+      }
+    })
+  }
 }
 
 const modeLabel = (mode: MarkdownEditorMode) => localeText.value.modes[mode]
@@ -5889,11 +6233,11 @@ const commitRevealSelection = async (
     )
     textarea.scrollTo({ behavior: smooth ? 'smooth' : 'auto', top: scrollTop })
     requestAnimationFrame(() => {
-      syncFocusLayerScroll(textarea.scrollTop)
+      syncMirrorLayerScroll(textarea.scrollTop, textarea.scrollLeft)
     })
   } else {
     textarea.scrollTop = top
-    syncFocusLayerScroll(top)
+    syncMirrorLayerScroll(top, textarea.scrollLeft)
   }
 }
 

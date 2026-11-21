@@ -90,13 +90,39 @@
 </template>
 
 <script setup lang="ts">
-import { nextTick, ref } from 'vue'
+import { nextTick, onMounted, onUnmounted, ref } from 'vue'
 import {
   FsuSharedElement,
   runMotionRecipeUpdate,
   runViewTransition,
   useSharedElementMotion,
 } from '@element-plus/motion'
+import {
+  clearThemeMode,
+  syncThemeMode,
+} from '../../../components/config-provider'
+
+declare global {
+  interface Window {
+    __fsusViewTransitionHarness?: {
+      clearThemeMode: typeof clearThemeMode
+      runViewTransition: typeof runViewTransition
+      syncThemeMode: typeof syncThemeMode
+    }
+  }
+}
+
+onMounted(() => {
+  window.__fsusViewTransitionHarness = {
+    clearThemeMode,
+    runViewTransition,
+    syncThemeMode,
+  }
+})
+
+onUnmounted(() => {
+  delete window.__fsusViewTransitionHarness
+})
 
 const dark = ref(false)
 const routeName = ref('Overview route')

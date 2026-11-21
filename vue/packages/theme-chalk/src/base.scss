@@ -3,8 +3,11 @@
 @use 'common/transition.scss';
 @use 'icon.scss';
 
-:root {
-  color-scheme: light dark;
+[data-fsus-theme-switching],
+[data-fsus-theme-switching] *,
+[data-fsus-theme-switching] *::before,
+[data-fsus-theme-switching] *::after {
+  transition: none !important;
 }
 
 :root[data-fsus-motion='reduced'],

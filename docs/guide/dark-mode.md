@@ -14,12 +14,17 @@ import ElementPlus from '@ozwasyd/element-plus'
 import '@ozwasyd/element-plus/dist/fsus.css'
 ```
 
-The theme source (`vue/packages/theme-chalk/src/fsus-theme.scss`) defines:
+The theme source (`vue/packages/theme-chalk/src/var.scss` and
+`vue/packages/theme-chalk/src/fsus-theme.scss`) shares one activation contract:
 
-- `html.dark` — force dark mode;
-- `html.light` — force light mode by opting out of the dark media rule; and
+- `html.dark` — force dark mode (`color-scheme: dark`, dark foundation tokens,
+  and all dark `--el-color-*-light-*` / `--el-color-*-dark-2` scales);
+- `html.light` — force light mode (`color-scheme: light`) and opt out of the
+  dark media rule;
+- `:where(html:not(.light))[data-theme-resolved='dark']` — resolved dark state
+  without requiring `.dark`; and
 - `@media (prefers-color-scheme: dark) { html:not(.light) { ... } }` — system
-  adaptation.
+  adaptation before or without runtime JavaScript.
 
 No application JavaScript is needed for basic system-following behavior.
 
@@ -93,6 +98,14 @@ syncThemeMode(
 - `data-theme-resolved="light|dark"`; and
 - `style.colorScheme`.
 
+When the resolved theme actually changes (including OS `prefers-color-scheme`
+`change` events in `system` mode), `syncThemeMode()` transiently sets
+`data-fsus-theme-switching="true"` on the theme root (a CSP-safe attribute that
+suppresses descendant CSS transitions without inline styles or `<style>`
+injection), forces a synchronous style flush, and immediately removes the
+attribute so controls switch colors atomically while preserving hover/focus
+transitions. No-op re-syncs skip suppression and do not flush layout.
+
 ## Consumer overrides
 
 ### CSS variables
@@ -144,6 +157,10 @@ For build-time customization, override the dark maps in
 ```
 
 Load this variable file before FsusUI's theme entry in the app's theme build.
+Overriding a `$colors-dark` base color automatically derives its dark
+`light-1`..`light-9` and `dark-2` levels (mixed against `$color-dark-mix-bg`
+and `$color-dark-mix-ink`), while explicit level overrides in `$colors-dark`
+take precedence.
 
 ## SSR and first paint
 

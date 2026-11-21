@@ -37,10 +37,68 @@ type ViewTransitionStyle = CSSStyleDeclaration & {
 type ActiveViewTransition = {
   transition: NativeViewTransition
   originalName?: string
+  originalSnapshotting?: string
+}
+
+type ActiveFallbackSnapshotting = {
+  count: number
+  originalSnapshotting?: string
 }
 
 const activeTransitions = new WeakMap<Document, ActiveViewTransition>()
+const activeFallbackSnapshotting = new WeakMap<
+  Document,
+  ActiveFallbackSnapshotting
+>()
 const activeNames = new Map<string, Element>()
+
+const restoreDatasetAttribute = (
+  root: HTMLElement,
+  key: 'fsusViewTransition' | 'fsusViewTransitionSnapshotting',
+  original: string | undefined,
+) => {
+  if (original === undefined) delete root.dataset[key]
+  else root.dataset[key] = original
+}
+
+const acquireFallbackSnapshotting = (
+  targetDocument: Document,
+  root: HTMLElement,
+) => {
+  const existing = activeFallbackSnapshotting.get(targetDocument)
+  if (existing) {
+    existing.count += 1
+  } else {
+    const activeNative = activeTransitions.get(targetDocument)
+    const originalSnapshotting = activeNative
+      ? activeNative.originalSnapshotting
+      : root.dataset.fsusViewTransitionSnapshotting
+    activeFallbackSnapshotting.set(targetDocument, {
+      count: 1,
+      originalSnapshotting,
+    })
+  }
+  root.dataset.fsusViewTransitionSnapshotting = 'true'
+
+  let released = false
+  return () => {
+    if (released) return
+    released = true
+    const entry = activeFallbackSnapshotting.get(targetDocument)
+    if (!entry) return
+    entry.count -= 1
+    if (entry.count > 0) return
+    activeFallbackSnapshotting.delete(targetDocument)
+    if (!activeTransitions.has(targetDocument)) {
+      void root.offsetHeight
+      restoreDatasetAttribute(
+        root,
+        'fsusViewTransitionSnapshotting',
+        entry.originalSnapshotting,
+      )
+    }
+  }
+}
 
 const settle = (promise: Promise<unknown>) =>
   promise.then(
@@ -127,6 +185,7 @@ export const runViewTransition = (
 ): ViewTransitionRunResult => {
   let called = false
   let updateDone: Promise<void> | undefined
+
   const invokeUpdate = () => {
     if (called) return updateDone as Promise<void>
     called = true
@@ -138,8 +197,51 @@ export const runViewTransition = (
     return updateDone
   }
 
+  const runFallbackUpdate = () => {
+    const targetDocument =
+      typeof document === 'undefined' ? undefined : document
+    const root = targetDocument?.documentElement
+    const release =
+      targetDocument && root
+        ? acquireFallbackSnapshotting(targetDocument, root)
+        : undefined
+
+    if (called) {
+      return (updateDone as Promise<void>).then(
+        () => {
+          release?.()
+        },
+        (error) => {
+          release?.()
+          throw error
+        },
+      )
+    }
+
+    called = true
+    let raw: void | Promise<void>
+    try {
+      raw = update()
+    } catch (error) {
+      release?.()
+      updateDone = Promise.reject(error)
+      return updateDone
+    }
+
+    updateDone = Promise.resolve(raw).then(
+      () => {
+        release?.()
+      },
+      (error) => {
+        release?.()
+        throw error
+      },
+    )
+    return updateDone
+  }
+
   if (!canUseNativeViewTransitions(options)) {
-    return fallbackResult(invokeUpdate())
+    return fallbackResult(runFallbackUpdate())
   }
 
   const targetDocument = document as ViewTransitionDocument
@@ -148,34 +250,59 @@ export const runViewTransition = (
     ? normalizeViewTransitionName(options.name)
     : undefined
   const previousActive = activeTransitions.get(targetDocument)
+  const previousFallback = activeFallbackSnapshotting.get(targetDocument)
   const previousName = root.dataset.fsusViewTransition
   const originalName = previousActive
     ? previousActive.originalName
     : previousName
+  const previousSnapshotting = root.dataset.fsusViewTransitionSnapshotting
+  const originalSnapshotting = previousActive
+    ? previousActive.originalSnapshotting
+    : previousFallback
+      ? previousFallback.originalSnapshotting
+      : previousSnapshotting
   if (transitionName) root.dataset.fsusViewTransition = transitionName
 
   if (previousActive) skipNativeTransition(previousActive.transition)
 
-  let nativeTransition: NativeViewTransition
+  let nativeTransition: NativeViewTransition | undefined
+  let nativeFinished = false
+  const invokeNativeUpdate = () => {
+    const holdUntilFinished =
+      !nativeFinished &&
+      (!nativeTransition ||
+        activeTransitions.get(targetDocument)?.transition === nativeTransition)
+    if (!holdUntilFinished) {
+      return runFallbackUpdate()
+    }
+    root.dataset.fsusViewTransitionSnapshotting = 'true'
+    return invokeUpdate()
+  }
+
   try {
-    nativeTransition = targetDocument.startViewTransition!(invokeUpdate)
+    nativeTransition = targetDocument.startViewTransition!(invokeNativeUpdate)
   } catch {
     if (transitionName) {
-      if (previousName === undefined) delete root.dataset.fsusViewTransition
-      else root.dataset.fsusViewTransition = previousName
+      restoreDatasetAttribute(root, 'fsusViewTransition', previousName)
     }
-    return fallbackResult(invokeUpdate())
+    restoreDatasetAttribute(
+      root,
+      'fsusViewTransitionSnapshotting',
+      previousSnapshotting,
+    )
+    return fallbackResult(runFallbackUpdate())
   }
 
   activeTransitions.set(targetDocument, {
     transition: nativeTransition,
     originalName,
+    originalSnapshotting,
   })
   let skipped = false
   const skip = () => {
     if (skipped) return
     skipped = true
-    skipNativeTransition(nativeTransition)
+    skipNativeTransition(nativeTransition!)
   }
   const onAbort = () => skip()
   const onVisibilityChange = () => {
@@ -188,14 +315,21 @@ export const runViewTransition = (
   const nativeUpdateDone = nativeTransition.updateCallbackDone
   const finished = settle(nativeTransition.finished)
   void finished.then(() => {
+    nativeFinished = true
     options.signal?.removeEventListener('abort', onAbort)
     targetDocument.removeEventListener('visibilitychange', onVisibilityChange)
     if (
       activeTransitions.get(targetDocument)?.transition === nativeTransition
     ) {
       activeTransitions.delete(targetDocument)
-      if (originalName === undefined) delete root.dataset.fsusViewTransition
-      else root.dataset.fsusViewTransition = originalName
+      restoreDatasetAttribute(root, 'fsusViewTransition', originalName)
+      if (!activeFallbackSnapshotting.has(targetDocument)) {
+        restoreDatasetAttribute(
+          root,
+          'fsusViewTransitionSnapshotting',
+          originalSnapshotting,
+        )
+      }
     }
   })
 

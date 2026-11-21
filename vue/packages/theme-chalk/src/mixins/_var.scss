@@ -54,6 +54,19 @@
   }
 }
 
+// set only css vars whose value differs from $base-variables
+@mixin set-component-css-var-diff($name, $variables, $base-variables) {
+  @each $attribute, $value in $variables {
+    @if map.get($base-variables, $attribute) != $value {
+      @if $attribute == 'default' {
+        #{getCssVarName($name)}: #{$value};
+      } @else {
+        #{getCssVarName($name, $attribute)}: #{$value};
+      }
+    }
+  }
+}
+
 @mixin set-css-color-rgb($type) {
   $color: map.get($colors, $type, 'base');
   @include set-css-var-value(
