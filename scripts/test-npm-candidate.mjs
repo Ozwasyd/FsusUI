@@ -26,6 +26,12 @@ const repoRoot = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
   '..',
 )
+const sourceVersion = JSON.parse(
+  readFileSync(
+    path.join(repoRoot, 'vue/packages/element-plus/package.json'),
+    'utf8',
+  ),
+).version
 const tempRoot = mkdtempSync(path.join(os.tmpdir(), 'fsusui-candidate-tests-'))
 const commitSha = 'a'.repeat(40)
 
@@ -54,7 +60,7 @@ function makePackage(directory, overrides = {}) {
     `${JSON.stringify(
       {
         name: '@ozwasyd/element-plus',
-        version: '1.5.1',
+        version: sourceVersion,
         main: 'lib/index.js',
         module: 'es/index.mjs',
         types: 'es/index.d.ts',
@@ -187,7 +193,7 @@ try {
     candidateManifestName,
   )
   const manifest = JSON.parse(readFileSync(manifestPath, 'utf8'))
-  manifest.package.version = '1.5.2'
+  manifest.package.version = `${sourceVersion}-mismatch`
   writeFileSync(manifestPath, `${JSON.stringify(manifest)}\n`)
   assertThrows(
     () =>

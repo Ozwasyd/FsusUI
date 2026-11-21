@@ -30,6 +30,14 @@ const invalid = spawnSync(
 assert.notEqual(invalid.status, 0)
 assert.match(`${invalid.stdout}\n${invalid.stderr}`, /group: release/u)
 
+const sourceVersion = JSON.parse(
+  fs.readFileSync(
+    path.join(process.cwd(), 'vue/packages/element-plus/package.json'),
+    'utf8',
+  ),
+).version
+const mismatchedTag = `v${sourceVersion}-mismatch`
+
 const candidateRoot = fs.mkdtempSync(
   path.join(os.tmpdir(), 'fsusui-release-profile-'),
 )
@@ -39,7 +47,7 @@ try {
   const candidate = {
     sourceProfile: 'Release',
     commitSha,
-    package: { name: '@ozwasyd/element-plus', version: '1.5.1' },
+    package: { name: '@ozwasyd/element-plus', version: sourceVersion },
     artifact: { sha256: 'b'.repeat(64) },
   }
   fs.writeFileSync(candidateManifestPath, `${JSON.stringify(candidate)}\n`)
@@ -47,17 +55,17 @@ try {
     verifyReleaseIdentity({
       repoRoot: process.cwd(),
       candidateManifestPath,
-      releaseTag: 'v1.5.1',
+      releaseTag: `v${sourceVersion}`,
       commitSha,
     }).packageVersion,
-    '1.5.1',
+    sourceVersion,
   )
   assert.throws(
     () =>
       verifyReleaseIdentity({
         repoRoot: process.cwd(),
         candidateManifestPath,
-        releaseTag: 'v1.5.2',
+        releaseTag: mismatchedTag,
         commitSha,
       }),
     /does not match/u,
@@ -67,7 +75,7 @@ try {
       verifyReleaseIdentity({
         repoRoot: process.cwd(),
         candidateManifestPath,
-        releaseTag: 'v1.5.1',
+        releaseTag: `v${sourceVersion}`,
         commitSha: 'c'.repeat(40),
       }),
     /commit SHA/u,
