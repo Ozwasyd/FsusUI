@@ -449,7 +449,8 @@ $color-picker-size: map.merge($common-component-size, $color-picker-size);
   @include set-css-var-value(('color-picker', 'alpha-bg-b'), 'transparent');
 }
 
-.dark {
+.dark,
+:where(html[data-theme-mode='system']:not(.light))[data-theme-resolved='dark'] {
   .#{bem('color-picker')},
   .#{bem('color-picker', 'panel')} {
     @include set-css-var-value(('color-picker', 'alpha-bg-a'), '#333333');
