@@ -1,3 +1,6 @@
+import { normalizeMarkdownSource } from './markdown'
+import { readMarkdownAnchorOwnerBlocks } from './markdown-anchor-owners'
+
 export const MARKDOWN_ANCHOR_ID = /^[a-z][a-z0-9-]{0,63}$/
 
 export const MARKDOWN_ANCHOR_DIAGNOSTIC_CODES = Object.freeze([
@@ -37,14 +40,15 @@ export interface MarkdownAnchorInvalidNode {
   readonly range: MarkdownAnchorRange
 }
 
-export type MarkdownAnchorNode = MarkdownAnchorValidNode | MarkdownAnchorInvalidNode
+export type MarkdownAnchorNode =
+  | MarkdownAnchorValidNode
+  | MarkdownAnchorInvalidNode
 
 const INLINE_CAPABLE = /^(#{1,6}\s+\S|\s*\S)/
 const FENCE_DELIMITER = /^\s{0,3}(`{3,}|~{3,})/
 const LATEX_DELIMITER = /^\s{0,3}\$\$/
 const CONTAINER_OPEN = /^\s{0,3}:::\S/
 const REGISTERED_ATOMIC_LINE = /^\s{0,3}::[a-z][a-z0-9-]*\[/
-const TABLE_ROW = /^\s*\|/
 
 /**
  * A following-line anchor belongs to the block closed by the previous line.
@@ -55,7 +59,6 @@ const isAtomicOwnerLine = (text: string) =>
   FENCE_DELIMITER.test(text) ||
   LATEX_DELIMITER.test(text) ||
   /^\s{0,3}:::/.test(text) ||
-  TABLE_ROW.test(text) ||
   REGISTERED_ATOMIC_LINE.test(text)
 
 const fail = (
@@ -73,7 +76,11 @@ const fail = (
   })
 
 const splitLines = (source: string) => {
-  const lines: { readonly text: string; readonly start: number; readonly end: number }[] = []
+  const lines: {
+    readonly text: string
+    readonly start: number
+    readonly end: number
+  }[] = []
   // Match the renderer's newline rules without normalizing away raw offsets.
   let offset = 0
   for (const newline of source.matchAll(/\r\n?|\n/g)) {
@@ -125,7 +132,8 @@ const markAtomicRegionLines = (lines: readonly AnchorLine[]) => {
         closesFence(fence[1]!, line),
       )
       const last = close === -1 ? lines.length - 1 : close
-      for (let cursor = index; cursor <= last; cursor += 1) inside[cursor] = true
+      for (let cursor = index; cursor <= last; cursor += 1)
+        inside[cursor] = true
       index = last + 1
       continue
     }
@@ -157,20 +165,32 @@ export const parseMarkdownAnchorMarker = (
   if (!match || match.index === undefined) return null
   const marker = match[1]!
   const id = match[2]!
-  const markerStart = start + match.index + (match[0].startsWith(' ') ? 1 : 0)
+  const inline = match[0].startsWith(' ')
+  const markerStart = start + match.index + (inline ? 1 : 0)
   const markerEnd = markerStart + marker.length
-  if (!match[0].startsWith(' ') && match.index !== 0) {
-    return fail(markerStart, markerEnd, 'anchor-placement', 'anchor requires a single leading space or exclusive line')
+  const ownerPrefix = text.slice(0, match.index)
+  if (inline && (!ownerPrefix.trim() || /[ \t]$/.test(ownerPrefix))) {
+    return fail(
+      markerStart,
+      markerEnd,
+      'anchor-placement',
+      'anchor requires a single leading space or exclusive line',
+    )
   }
   if (!MARKDOWN_ANCHOR_ID.test(id)) {
-    return fail(markerStart, markerEnd, 'anchor-invalid-id', 'anchor id must match [a-z][a-z0-9-]{0,63}')
+    return fail(
+      markerStart,
+      markerEnd,
+      'anchor-invalid-id',
+      'anchor id must match [a-z][a-z0-9-]{0,63}',
+    )
   }
   return Object.freeze({
     ok: true,
     kind: 'anchor',
     id,
     fragment: `#${id}`,
-    placement: match.index === 0 ? 'following-line' : 'line-end',
+    placement: inline ? 'line-end' : 'following-line',
     ranges: Object.freeze({
       full: Object.freeze({ start: markerStart, end: markerEnd }),
       marker: Object.freeze({ start: markerStart, end: markerEnd }),
@@ -182,10 +202,46 @@ export const parseMarkdownAnchorMarker = (
 export const collectMarkdownAnchorNodes = (
   source: string,
 ): readonly MarkdownAnchorNode[] => {
+  if (!source.includes('^')) return Object.freeze([])
   const lines = splitLines(source)
   const insideAtomic = markAtomicRegionLines(lines)
+  const encoder = new TextEncoder()
+  const byteOffsets = [0]
+  for (const [index, line] of lines.entries()) {
+    const text = index === 0 ? line.text.replace(/^\uFEFF/, '') : line.text
+    byteOffsets.push(byteOffsets[index]! + encoder.encode(text).byteLength + 1)
+  }
+  const ownerNodes = readMarkdownAnchorOwnerBlocks(
+    normalizeMarkdownSource(source),
+  )
+  const finalLineOwners = ownerNodes.filter(
+    (node) => node.kind === 'paragraph' || node.kind === 'quote',
+  )
+  const unboundListStarts = new Set(
+    ownerNodes
+      .filter((node) => node.kind === 'unbound-list')
+      .map((node) => node.start),
+  )
+  const code = ownerNodes.filter((node) => node.kind === 'code')
+  const tableEnds = new Set(
+    ownerNodes.filter((node) => node.kind === 'table').map((node) => node.end),
+  )
+  let finalLineIndex = 0
+  let codeIndex = 0
+  const hasLineEndOwner = (index: number) => {
+    const start = byteOffsets[index]!
+    while (code[codeIndex] && code[codeIndex]!.end <= start) codeIndex += 1
+    const literal = code[codeIndex]
+    if (literal && literal.start <= start) return false
+    while (
+      finalLineOwners[finalLineIndex] &&
+      finalLineOwners[finalLineIndex]!.end <= start
+    )
+      finalLineIndex += 1
+    const owner = finalLineOwners[finalLineIndex]
+    return !owner || owner.start > start || owner.end <= byteOffsets[index + 1]!
+  }
   const nodes: MarkdownAnchorNode[] = []
-  const seen = new Map<string, number>()
   const hasPrecedingBlock = (index: number) => {
     for (let cursor = index - 1; cursor >= 0; cursor -= 1) {
       if (lines[cursor]!.text.trim() !== '') return true
@@ -217,7 +273,10 @@ export const collectMarkdownAnchorNodes = (
         )
         continue
       }
-      if (!isAtomicOwnerLine(previous.text)) {
+      if (
+        !isAtomicOwnerLine(previous.text) &&
+        !tableEnds.has(byteOffsets[index]!)
+      ) {
         nodes.push(
           fail(
             line.start,
@@ -228,38 +287,61 @@ export const collectMarkdownAnchorNodes = (
         )
         continue
       }
-      if (seen.has(parsed.id)) {
-        nodes.push(
-          fail(line.start, line.end, 'anchor-duplicate', 'duplicate anchor ids are not renamed'),
-        )
-        continue
-      }
-      seen.set(parsed.id, index)
       nodes.push(parsed)
       continue
     }
+    if (!hasLineEndOwner(index)) continue
     const parsed = parseMarkdownAnchorMarker(line.text, line.start)
     if (!parsed) continue
     if (!parsed.ok) {
       nodes.push(parsed)
       continue
     }
-    if (parsed.placement === 'line-end' && !INLINE_CAPABLE.test(line.text.slice(0, -parsed.ranges.full.end + parsed.ranges.full.start))) {
+    if (unboundListStarts.has(byteOffsets[index]!)) {
       nodes.push(
-        fail(parsed.ranges.full.start, parsed.ranges.full.end, 'anchor-placement', 'line-end anchors require an inline-capable block'),
+        fail(
+          parsed.ranges.marker.start,
+          parsed.ranges.marker.end,
+          'anchor-placement',
+          'nested list items do not have a fragment target',
+        ),
       )
       continue
     }
-    if (seen.has(parsed.id)) {
+    if (
+      parsed.placement === 'line-end' &&
+      !INLINE_CAPABLE.test(
+        line.text.slice(0, -parsed.ranges.full.end + parsed.ranges.full.start),
+      )
+    ) {
       nodes.push(
-        fail(parsed.ranges.full.start, parsed.ranges.full.end, 'anchor-duplicate', 'duplicate anchor ids are not renamed'),
+        fail(
+          parsed.ranges.full.start,
+          parsed.ranges.full.end,
+          'anchor-placement',
+          'line-end anchors require an inline-capable block',
+        ),
       )
       continue
     }
-    seen.set(parsed.id, index)
     nodes.push(parsed)
   }
-  return Object.freeze(nodes)
+  const count = new Map<string, number>()
+  for (const node of nodes) {
+    if (node.ok) count.set(node.id, (count.get(node.id) ?? 0) + 1)
+  }
+  return Object.freeze(
+    nodes.map((node) =>
+      node.ok && count.get(node.id)! > 1
+        ? fail(
+            node.ranges.marker.start,
+            node.ranges.marker.end,
+            'anchor-duplicate',
+            'duplicate anchor ids have no target',
+          )
+        : node,
+    ),
+  )
 }
 
 export type MarkdownAnchorMutationKind =
@@ -278,7 +360,9 @@ export const evaluateMarkdownBlockAnchorMutations = (source: string) => {
     ? authority
     : [{ ok: true, kind: 'anchor', id: 'auto', fragment: '#auto' }]
   const firstWins = (() => {
-    const valid = authority.filter((node) => node.ok) as MarkdownAnchorValidNode[]
+    const valid = authority.filter(
+      (node) => node.ok,
+    ) as MarkdownAnchorValidNode[]
     if (valid.length <= 1) return valid
     return [valid[0]]
   })()

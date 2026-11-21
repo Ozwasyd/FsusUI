@@ -71,6 +71,11 @@ struct syntax_range final {
   std::size_t end_offset{0};
 };
 
+struct anchor_owner_block final {
+  syntax_kind kind;
+  syntax_range range;
+};
+
 struct syntax_node final {
   syntax_kind kind{};
   std::size_t start_offset{0};
@@ -138,6 +143,7 @@ inline constexpr std::string_view renderer_version = "markdown-wasm-contract@202
 [[nodiscard]] std::vector<placeholder> collect_placeholders(std::string_view source);
 [[nodiscard]] std::string_view syntax_kind_name(syntax_kind kind);
 [[nodiscard]] std::vector<syntax_node> collect_syntax_nodes(std::string_view source);
+[[nodiscard]] std::vector<anchor_owner_block> collect_anchor_owner_blocks(std::string_view normalized_source);
 [[nodiscard]] render_result build_summary_result(const render_request& request);
 [[nodiscard]] render_result build_render_result(const render_request& request);
 [[nodiscard]] render_result build_placeholder_result(const render_request& request);
