@@ -853,6 +853,31 @@ test('time picker spinner scroll stays frame-coalesced and recovers', async ({
   const panel = page.locator('.el-time-panel').last()
   const spinner = panel.locator('.el-time-spinner__wrapper').first()
   await expect(spinner).toBeVisible()
+  await spinner.evaluate(async (element) => {
+    const wrap = element.querySelector<HTMLElement>('.el-scrollbar__wrap')
+    if (!wrap) {
+      throw new Error('TimePicker spinner wrap missing')
+    }
+    const nextFrame = () =>
+      new Promise<void>((resolve) => requestAnimationFrame(() => resolve()))
+    for (
+      let attempt = 0;
+      attempt < 30 && wrap.dataset.fsusCustomWheel !== 'true';
+      attempt += 1
+    ) {
+      await nextFrame()
+    }
+    for (let frame = 0; frame < 4; frame += 1) {
+      await nextFrame()
+    }
+    for (
+      let attempt = 0;
+      attempt < 30 && wrap.dataset.fsusSilentScroll === 'true';
+      attempt += 1
+    ) {
+      await nextFrame()
+    }
+  })
 
   const sawScrolling = await spinner.evaluate((element) => {
     const wrap = element.querySelector<HTMLElement>('.el-scrollbar__wrap')
@@ -872,7 +897,7 @@ test('time picker spinner scroll stays frame-coalesced and recovers', async ({
         attributes: true,
         attributeFilter: ['class'],
       })
-      wrap.scrollTop = 88
+      wrap.scrollTop = wrap.scrollTop === 88 ? 176 : 88
       wrap.dispatchEvent(new Event('scroll'))
       if (element.classList.contains('is-scrolling')) {
         seen = true
