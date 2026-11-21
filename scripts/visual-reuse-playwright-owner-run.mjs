@@ -142,7 +142,7 @@ async function main(argv = process.argv.slice(2)) {
         `--port=${serverPort}`,
         `--runtime-dir=${runtimeDir}`,
       ],
-      { cwd: root, stdio: ['ignore', 'pipe', 'pipe'] },
+      { cwd: root, stdio: 'ignore' },
     )
     await waitForServer(serverUrl)
 

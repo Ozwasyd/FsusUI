@@ -807,6 +807,10 @@
       .#{$namespace}-table-fixed-column--left,
       .#{$namespace}-table-fixed-column--right {
         position: static !important;
+
+        &::before {
+          display: none;
+        }
       }
 
       .#{$namespace}-table__cell {

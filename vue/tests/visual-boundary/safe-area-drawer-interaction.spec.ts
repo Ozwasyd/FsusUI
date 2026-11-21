@@ -1,14 +1,21 @@
 import { expect, test } from '@playwright/test'
-import * as path from 'node:path'
 import {
   applySafeAreaProfile,
   getSafeAreaProfile,
   safeRectFromProfile,
 } from '../support/safe-area-profile'
 
-const fixtureUrl =
-  process.env.FSUS_DRAWER_FIXTURE_URL ??
-  `/@fs/${path.resolve(process.cwd(), 'tests/fixtures/drawer-safe-area/index.html')}`
+const buildDrawerFixtureUrl = (params?: URLSearchParams) => {
+  const query = new URLSearchParams(params)
+  if (process.env.FSUS_DRAWER_FIXTURE_URL) {
+    const suffix = query.toString()
+    return suffix
+      ? `${process.env.FSUS_DRAWER_FIXTURE_URL}?${suffix}`
+      : process.env.FSUS_DRAWER_FIXTURE_URL
+  }
+  query.set('audit', 'drawer-safe-area')
+  return `/?${query}`
+}
 
 for (const theme of ['light', 'dark'] as const) {
   for (const direction of ['ltr', 'rtl', 'ttb', 'btt'] as const) {
@@ -18,7 +25,7 @@ for (const theme of ['light', 'dark'] as const) {
     }, testInfo) => {
       const params = new URLSearchParams({ direction, theme })
       if (direction !== 'ltr') params.set('size', '70%')
-      await page.goto(`${fixtureUrl}?${params}`)
+      await page.goto(buildDrawerFixtureUrl(params))
       const profile = getSafeAreaProfile('landscape-notch')
       await applySafeAreaProfile(page, profile)
       const safe = safeRectFromProfile(profile)
@@ -102,7 +109,7 @@ for (const theme of ['light', 'dark'] as const) {
 test('Drawer leave transition retains animation while blocking pointer hit testing and programmatic focus', async ({
   page,
 }, testInfo) => {
-  await page.goto(fixtureUrl)
+  await page.goto(buildDrawerFixtureUrl())
   await applySafeAreaProfile(page, getSafeAreaProfile('landscape-notch'))
   await page.locator('#open').click()
   await expect(page.locator('#events')).toHaveText('open,opened')
@@ -164,7 +171,9 @@ test('Drawer leave transition retains animation while blocking pointer hit testi
 test('Drawer destroy-on-close still destroys lazy content after closed', async ({
   page,
 }) => {
-  await page.goto(`${fixtureUrl}?destroy=true`)
+  await page.goto(
+    buildDrawerFixtureUrl(new URLSearchParams({ destroy: 'true' })),
+  )
   await expect(page.locator('#account-link')).toHaveCount(0)
   await page.locator('#open').click()
   await expect(page.locator('#events')).toHaveText('open,opened')

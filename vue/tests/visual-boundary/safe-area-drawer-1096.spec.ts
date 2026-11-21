@@ -1,14 +1,21 @@
 import { expect, test } from '@playwright/test'
-import * as path from 'node:path'
 import type { Locator, Page } from '@playwright/test'
 import {
   applySafeAreaProfile,
   getSafeAreaProfile,
 } from '../support/safe-area-profile'
 
-const drawerFixtureUrl =
-  process.env.FSUS_DRAWER_FIXTURE_URL ??
-  `/@fs/${path.resolve(process.cwd(), 'tests/fixtures/drawer-safe-area/index.html')}`
+const buildDrawerFixtureUrl = (params?: URLSearchParams) => {
+  const query = new URLSearchParams(params)
+  if (process.env.FSUS_DRAWER_FIXTURE_URL) {
+    const suffix = query.toString()
+    return suffix
+      ? `${process.env.FSUS_DRAWER_FIXTURE_URL}?${suffix}`
+      : process.env.FSUS_DRAWER_FIXTURE_URL
+  }
+  query.set('audit', 'drawer-safe-area')
+  return `/?${query}`
+}
 
 type Direction = 'rtl' | 'ltr' | 'ttb' | 'btt'
 type Theme = 'light' | 'dark'
@@ -186,7 +193,7 @@ test.describe('issue #1096 ElDrawer header alignment, focus-visible tint, and ed
           size,
           theme: scenario.theme,
         })
-        await page.goto(`${drawerFixtureUrl}?${params}`, {
+        await page.goto(buildDrawerFixtureUrl(params), {
           waitUntil: 'domcontentloaded',
         })
         // Park pointer away from the close button before pointer-opening.
@@ -302,7 +309,7 @@ test.describe('issue #1096 ElDrawer header alignment, focus-visible tint, and ed
         size: '70%',
         theme: 'light',
       })
-      await page.goto(`${drawerFixtureUrl}?${params}`, {
+      await page.goto(buildDrawerFixtureUrl(params), {
         waitUntil: 'domcontentloaded',
       })
       await applySafeAreaProfile(page, profile)
