@@ -18,20 +18,20 @@ Use `limit` and `on-exceed` to replace an old file automatically when a new one 
 
 Set the file-list style with `list-type`: `text`, `picture`, or `picture-card`.
 
-`picture` rows keep the thumbnail and filename alongside named status feedback:
-pending, progress percentage, uploaded, or failed. Success uses an inline icon
-and text rather than a corner ribbon, and remains visible on hover, keyboard
-focus, and disabled rows. Preview and remove/cancel retain their existing public
-callbacks; remove/cancel stays visible and keyboard/touch reachable when enabled.
-On narrow screens, status and actions follow the thumbnail/name row.
+- **`text` list**: renders flat document rows separated by hairline bottom dividers rather than per-item card panels or rotated success ribbons. Each row keeps named status feedback (`ready`, `uploading`, `success`, `fail`) and row-end remove/cancel buttons always visible and keyboard/touch reachable, wrapping cleanly at narrow or zoomed widths without overflowing.
+- **`picture` list**: keeps the thumbnail and filename alongside inline named status feedback: pending, progress percentage, uploaded, or failed. Success uses an inline icon and text rather than a corner ribbon, and remains visible on hover, keyboard focus, and disabled rows. Preview and remove/cancel retain their existing public callbacks; remove/cancel stays visible and keyboard/touch reachable when enabled. On narrow screens, status and actions follow the thumbnail/name row.
+- **`picture-card` list**: places the thumbnail above an always-visible bottom action bar (preview and delete) instead of a legacy dark hover-only full-card overlay. Status indicators are status-specific and never show a false success checkmark on non-success items:
+  - `success`: compact top-right checkmark indicator (`role="status"`), retained on hover and keyboard focus.
+  - `fail`: danger card border (`.is-fail`) and a compact top-right non-color fail icon (`role="status"`), retained on hover and keyboard focus without obscuring the thumbnail.
+  - `uploading`: circular progress indicator in the thumbnail region without a success checkmark.
+  - `ready`: neutral card state without a success checkmark.
+- **Coarse-pointer touch targets**: on coarse pointers (`@media (pointer: coarse)`), row remove/cancel controls (`text` and `picture`) and `picture-card` action buttons expand to `44px × 44px` touch targets (keeping `32px` compact desktop targets) without overflowing the card or obscuring thumbnail content.
 
-This differs from the legacy Element Plus picture success ribbon. No consumer
-slot or private style override is required. The `picture-card` action-bar layout
-is separate from this picture-row status behavior.
+This differs from the legacy Element Plus rotated success ribbon and hover-only card overlay. No consumer slot or private style override is required for these default behaviors.
 
 ## Drag and Drop Upload
 
-Set `drag` to `true` to enable drag-and-drop upload.
+Set `drag` to `true` to enable drag-and-drop upload. The migrated dragger uses a quiet Paper surface with a thin dashed border, a compact 16–24px auxiliary icon (rather than a giant centerpiece), a `>=44px` hit target, non-displacing drag-over emphasis (border and subtle fill only, with no glow or scale), and an inset keyboard focus ring.
 
 ## Directory Upload
 
@@ -40,6 +40,8 @@ Set `directory` to `true` to upload a folder; its files are flattened into a lis
 ## Manual Upload
 
 Set `auto-upload` to `false` to disable automatic upload and call `submit` manually.
+
+Retry workflows for failed uploads are intentionally not built into the default file-list rows or cards; retry orchestration remains consumer-owned via the `file` slot and exposed `submit()` method.
 
 ---
 

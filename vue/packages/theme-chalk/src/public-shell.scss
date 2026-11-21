@@ -239,6 +239,7 @@
     font-weight: 500;
     line-height: 1;
     overflow: hidden;
+    text-decoration: none;
     text-overflow: ellipsis;
     white-space: nowrap;
     cursor: pointer;
@@ -253,6 +254,7 @@
       border-color: var(--fsus-scholarly-blue);
       background: getCssVar('fill-color', 'light');
       color: getCssVar('text-color', 'primary');
+      text-decoration: none;
     }
 
     &:focus-visible {
@@ -460,62 +462,15 @@
   }
 
   @include e(mobile-search-host) {
-    @include fsus-viewport-safe-overlay-host(var(--fsus-space-2, 8px));
-    z-index: 60;
-    display: none;
-    inline-size: auto;
-    block-size: auto;
+    display: block;
+    min-width: 0;
     margin: 0;
+    padding: 0;
     border: 0;
     background: transparent;
-    color: inherit;
-    align-items: flex-start;
-    justify-content: flex-end;
-    pointer-events: none;
 
-    &::backdrop {
-      background: transparent;
-      pointer-events: none;
-    }
-
-    .#{$namespace}-public-shell__mobile-search-row.is-expanded {
-      position: static;
-      inset: auto;
-      display: grid;
-      grid-template-rows: auto minmax(0, 1fr);
-      gap: var(--fsus-space-2, 8px);
-      inline-size: min(20rem, 100%);
-      min-block-size: 0;
-      max-block-size: max(
-        0px,
-        #{fsus-viewport-safe-block-size(var(--fsus-space-2, 8px))}
-      );
-      overflow: auto;
-      margin: 0;
-      padding: var(--fsus-space-3, 12px);
-      border: 1px solid getCssVar('border-color-lighter');
-      border-radius: var(--fsus-radius-popover, 10px);
-      background: var(--fsus-surface-overlay, #{getCssVar('bg-color')});
-      box-shadow: var(--fsus-shadow-floating, none);
-      box-sizing: border-box;
-      pointer-events: auto;
-
-      > .#{$namespace}-public-shell__mobile-search-trigger {
-        justify-self: end;
-      }
-    }
-
-    .#{$namespace}-public-shell__mobile-search-content {
-      min-block-size: 0;
-      overflow: auto;
-    }
-  }
-
-  @media (max-width: 767px), (max-height: 520px) and (orientation: landscape) {
-    @include e(mobile-search-host) {
-      &:popover-open {
-        display: flex;
-      }
+    &[hidden] {
+      display: none;
     }
   }
 
@@ -737,6 +692,10 @@
       text-overflow: ellipsis;
     }
 
+    .#{$namespace}-site-header__desktop-nav {
+      display: none;
+    }
+
     @include e(desktop-nav) {
       display: none;
     }
@@ -828,6 +787,62 @@
       background: var(--fsus-surface-overlay, #{getCssVar('bg-color')});
       box-shadow: var(--fsus-shadow-floating, none);
       box-sizing: border-box;
+    }
+
+    @include e(mobile-search-host) {
+      display: none;
+
+      &:popover-open {
+        @include fsus-viewport-safe-overlay-host(var(--fsus-space-2, 8px));
+        z-index: 60;
+        display: flex;
+        inline-size: auto;
+        block-size: auto;
+        margin: 0;
+        border: 0;
+        padding-block-start: max(
+          calc(
+            var(--fsus-public-shell-mobile-action-height, 44px) +
+              var(--fsus-space-4, 16px)
+          ),
+          #{fsus-safe-area-inset(top)}
+        );
+        padding-inline-end: max(
+          var(--fsus-space-6, 24px),
+          #{fsus-safe-area-inset(right)}
+        );
+        background: transparent;
+        color: inherit;
+        align-items: flex-start;
+        justify-content: flex-end;
+        pointer-events: auto;
+
+        &::backdrop {
+          background: transparent;
+          pointer-events: none;
+        }
+
+        .#{$namespace}-public-shell__mobile-search-row.is-expanded {
+          position: static;
+          inset: auto;
+          display: block;
+          inline-size: min(20rem, 100%);
+          min-block-size: 0;
+          max-block-size: 100%;
+          overflow: auto;
+          margin: 0;
+          padding: var(--fsus-space-3, 12px);
+          border: 1px solid getCssVar('border-color-lighter');
+          border-radius: var(--fsus-radius-popover, 10px);
+          background: var(
+            --fsus-paper,
+            var(--#{$namespace}-bg-color-overlay, #ffffff)
+          );
+          box-shadow: var(--fsus-shadow-floating, none);
+          box-sizing: border-box;
+          pointer-events: auto;
+        }
+      }
     }
   }
 

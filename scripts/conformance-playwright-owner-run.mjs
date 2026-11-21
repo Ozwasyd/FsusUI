@@ -19,7 +19,10 @@ const root = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 
 const option = (args, name, fallback) => {
   const index = args.indexOf(`--${name}`)
-  if (index >= 0) return args[index + 1]
+  if (index >= 0) {
+    const value = args[index + 1]
+    return value !== undefined && !value.startsWith('--') ? value : fallback
+  }
   const prefix = `--${name}=`
   return (
     args.find((arg) => arg.startsWith(prefix))?.slice(prefix.length) ?? fallback
@@ -96,7 +99,8 @@ export async function runConformanceOwner(argv = process.argv.slice(2)) {
 
   const results = []
   let overallFailed = false
-  const impactPlan = loadPlaywrightImpactPlan(root, impactPlanPath)
+  const impactPlan =
+    group === 'pr' ? loadPlaywrightImpactPlan(root, impactPlanPath) : null
   for (const cell of cells) {
     const result = await runConformanceCell(ownerId, cell.id, group, {
       evidenceDir,

@@ -1,7 +1,11 @@
-import { expect, test } from '@playwright/test'
 import type { Page } from '@playwright/test'
 import { attachPageDiagnostics } from '../support/page-diagnostics'
 import { collectCssRules } from '../support/css-scan'
+import {
+  expect,
+  test,
+  type VisualViewportName,
+} from '../support/visual-variant-fixture'
 import {
   buildVisualUrl,
   resolveVisualVariant,
@@ -526,6 +530,52 @@ test('picture-card has no giant centered success check overlay', async ({
   expect(widthPx).toBeLessThan(30)
 })
 
+test('picture-card renders per-status indicators and retains visibility on hover/focus', async ({
+  page,
+}, testInfo) => {
+  await page.goto(buildVisualUrl('upload-visual', testInfo.project.name), {
+    waitUntil: 'domcontentloaded',
+  })
+  await stabilizePage(page)
+
+  const list = page.locator('[data-upload-variant="picture-card-default"]')
+
+  // Success card: checkmark visible at rest, hover, and focus-within.
+  const successCard = list.locator('.el-upload-list__item.is-success').first()
+  const successStatus = successCard.getByRole('status')
+  await expect(successStatus).toBeVisible()
+  await expect(successStatus).toHaveAccessibleName(/Uploaded|已上传/)
+  await expect(successStatus.locator('.el-icon--upload-success')).toBeVisible()
+
+  await successCard.hover()
+  await expect(successStatus).toBeVisible()
+  await successCard.locator('.el-upload-list__item-preview').focus()
+  await expect(successStatus).toBeVisible()
+
+  // Fail card: distinct non-color fail indicator, never success checkmark.
+  const failCard = list.locator('.el-upload-list__item.is-fail').first()
+  const failStatus = failCard.getByRole('status')
+  await expect(failStatus).toBeVisible()
+  await expect(failStatus).toHaveAccessibleName(/Failed|失败/)
+  await expect(failStatus.locator('.el-icon--upload-fail')).toBeVisible()
+  await expect(failCard.locator('.el-icon--upload-success')).toHaveCount(0)
+
+  await failCard.hover()
+  await expect(failStatus).toBeVisible()
+  await failCard.locator('.el-upload-list__item-preview').focus()
+  await expect(failStatus).toBeVisible()
+
+  // Uploading card: progress shown without any success checkmark or status pill.
+  const uploadingCard = list
+    .locator('.el-upload-list__item.is-uploading')
+    .first()
+  await expect(uploadingCard.locator('.el-progress')).toBeVisible()
+  await expect(
+    uploadingCard.locator('.el-upload-list__item-status-label'),
+  ).toHaveCount(0)
+  await expect(uploadingCard.locator('.el-icon--upload-success')).toHaveCount(0)
+})
+
 test('picture-card focus-within shows inset ring on card', async ({
   page,
 }, testInfo) => {
@@ -653,15 +703,28 @@ test('picture-card action buttons have compliant hit target', async ({
   })
   await stabilizePage(page)
 
-  const previewBtn = page.locator(
-    '[data-upload-variant="picture-card-default"] .el-upload-list__item-preview',
-  ).first()
+  const card = page
+    .locator('[data-upload-variant="picture-card-default"] .el-upload-list__item.is-success')
+    .first()
+  const cardBox = await card.boundingBox()
+  const thumbBox = await card
+    .locator('.el-upload-list__item-thumbnail')
+    .boundingBox()
+  const minTarget = testInfo.project.use.hasTouch ? 44 : 32
 
-  const box = await previewBtn.boundingBox()
-  expect(box).toBeTruthy()
-  if (box) {
-    expect(box.width).toBeGreaterThanOrEqual(32)
-    expect(box.height).toBeGreaterThanOrEqual(32)
+  for (const selector of [
+    '.el-upload-list__item-preview',
+    '.el-upload-list__item-delete',
+  ]) {
+    const box = await card.locator(selector).boundingBox()
+    expect(box).toBeTruthy()
+    if (box && cardBox && thumbBox) {
+      expect(box.width).toBeGreaterThanOrEqual(minTarget)
+      expect(box.height).toBeGreaterThanOrEqual(minTarget)
+      expect(box.x).toBeGreaterThanOrEqual(cardBox.x - 1)
+      expect(box.x + box.width).toBeLessThanOrEqual(cardBox.x + cardBox.width + 1)
+      expect(box.y).toBeGreaterThanOrEqual(thumbBox.y + thumbBox.height - 1)
+    }
   }
 })
 
@@ -787,4 +850,113 @@ test('upload variants render without visual break in current theme', async ({
     path: testInfo.outputPath('upload-all-variants.png'),
     fullPage: true,
   })
+})
+
+// ============================================================
+// Responsive width × zoom no-overflow / no-clipping matrix
+// ============================================================
+
+test('dragger, text, and picture-card have no overflow or clipping across 320/375/768/1366 widths and 150%/200% zoom', async ({
+  page,
+  useVisualViewport,
+}, testInfo) => {
+  await page.goto(buildVisualUrl('upload-visual', testInfo.project.name), {
+    waitUntil: 'domcontentloaded',
+  })
+  await stabilizePage(page)
+  await expect(page.getByTestId('upload-visual-fixtures')).toBeVisible()
+  await waitForFontsAndLayout(page)
+
+  const targets = [
+    {
+      variant: 'dragger-default',
+      innerSelectors: ['.el-upload-dragger', '.el-upload__text'],
+    },
+    {
+      variant: 'dragger-cjk',
+      innerSelectors: ['.el-upload-dragger', '.el-upload__text'],
+    },
+    {
+      variant: 'text-long-filename',
+      innerSelectors: [
+        '.el-upload-list__item-file-name',
+        '.el-upload-list__item-status-label',
+        '.el-upload-list__item-actions button',
+      ],
+    },
+    {
+      variant: 'text-mixed',
+      innerSelectors: [
+        '.el-upload-list__item-file-name',
+        '.el-upload-list__item-status-label',
+        '.el-upload-list__item-actions button',
+      ],
+    },
+    {
+      variant: 'picture-card-default',
+      innerSelectors: [
+        '.el-upload-list__item',
+        '.el-upload-list__item-actions button',
+      ],
+    },
+  ] as const
+
+  const viewports = [
+    'upload-320',
+    'upload-375',
+    'upload-768',
+    'upload-1366',
+  ] as const satisfies readonly VisualViewportName[]
+
+  for (const viewport of viewports) {
+    await useVisualViewport(viewport)
+    for (const zoom of [1.5, 2] as const) {
+      for (const { variant, innerSelectors } of targets) {
+        const container = page.locator(`[data-upload-variant="${variant}"]`)
+        const metrics = await container.evaluate(
+          (element, { zoomLevel, selectors }) => {
+            const host = element as HTMLElement
+            host.style.zoom = String(zoomLevel)
+            const containerRect = host.getBoundingClientRect()
+            const horizontalOverflow = host.scrollWidth > host.clientWidth + 1
+            const clipped: string[] = []
+
+            for (const selector of selectors) {
+              const nodes = Array.from(host.querySelectorAll(selector))
+              if (nodes.length === 0) {
+                clipped.push(`missing:${selector}`)
+                continue
+              }
+              for (const node of nodes) {
+                const rect = node.getBoundingClientRect()
+                if (rect.width <= 0 || rect.height <= 0) {
+                  clipped.push(`collapsed:${selector}`)
+                } else if (
+                  rect.left < containerRect.left - 1.5 ||
+                  rect.right > containerRect.right + 1.5
+                ) {
+                  clipped.push(
+                    `overflow:${selector}(${rect.left.toFixed(1)}..${rect.right.toFixed(1)} vs ${containerRect.left.toFixed(1)}..${containerRect.right.toFixed(1)})`,
+                  )
+                }
+              }
+            }
+
+            host.style.zoom = '1'
+            return { horizontalOverflow, clipped }
+          },
+          { zoomLevel: zoom, selectors: [...innerSelectors] },
+        )
+
+        expect(
+          metrics.horizontalOverflow,
+          `${variant} overflowed horizontally at ${viewport} zoom ${zoom * 100}%`,
+        ).toBe(false)
+        expect(
+          metrics.clipped,
+          `${variant} had clipped/collapsed elements at ${viewport} zoom ${zoom * 100}%`,
+        ).toEqual([])
+      }
+    }
+  }
 })

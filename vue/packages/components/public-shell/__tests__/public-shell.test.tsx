@@ -1113,4 +1113,323 @@ describe('PublicShell.vue', () => {
       }
     },
   )
+
+  test('keeps CSP-safe portrait mobile trigger search in-flow with a single Cancel control, zero inline styles, Escape focus return, and outside-pointer dismissal', async () => {
+    const outside = document.createElement('button')
+    outside.type = 'button'
+    outside.textContent = 'Outside content'
+    document.body.append(outside)
+
+    const originalMatchMedia = window.matchMedia
+    window.matchMedia = vi.fn().mockImplementation((query: string) => ({
+      matches: false,
+      media: query,
+      onchange: null,
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+      addListener: vi.fn(),
+      removeListener: vi.fn(),
+      dispatchEvent: vi.fn(),
+    }))
+
+    try {
+      const wrapper = mount(PublicShell, {
+        attachTo: document.body,
+        props: {
+          brand: 'Fsus',
+          navItems,
+          cspSafe: true,
+          mobileNavMode: 'menu',
+          mobileSearchMode: 'trigger',
+          mobileSearchTriggerLabel: 'Search',
+          mobileSearchCancelLabel: 'Cancel',
+          spaSearch: true,
+        },
+      })
+
+      await nextTick()
+
+      const toolbar = wrapper.find('.el-public-shell__mobile-toolbar')
+      const host = wrapper.find('.el-public-shell__mobile-search-host')
+      const searchRow = wrapper.find('.el-public-shell__mobile-search-row')
+      const triggers = wrapper.findAll('.el-public-shell__mobile-search-trigger')
+
+      expect(toolbar.classes()).toContain('is-search-only')
+      expect(toolbar.classes()).toContain('is-collapsed')
+      expect(triggers).toHaveLength(1)
+      expect(wrapper.find('.el-public-shell__mobile-search-content').exists()).toBe(false)
+      expect(host.attributes('hidden')).toBeUndefined()
+      expect(host.attributes('popover')).toBeUndefined()
+      expect(wrapper.findAll('[style]')).toHaveLength(0)
+
+      const trigger = triggers[0]
+      expect(trigger.text()).toBe('Search')
+      expect(trigger.attributes('aria-expanded')).toBe('false')
+      expect(trigger.attributes('aria-controls')).toBe(searchRow.attributes('id'))
+
+      // Open
+      await trigger.trigger('click', { button: 0 })
+      await nextTick()
+
+      expect(wrapper.findAll('.el-public-shell__mobile-search-trigger')).toHaveLength(1)
+      expect(trigger.text()).toBe('Cancel')
+      expect(trigger.attributes('aria-expanded')).toBe('true')
+      expect(searchRow.classes()).toContain('is-expanded')
+      expect(searchRow.classes()).not.toContain('is-csp-hidden')
+      expect(host.attributes('popover')).toBeUndefined()
+      expect(toolbar.classes()).not.toContain('is-collapsed')
+      expect(wrapper.findAll('[style]')).toHaveLength(0)
+
+      const input = searchRow.find('input')
+      expect(document.activeElement).toBe(input.element)
+
+      // Type and submit
+      await input.setValue('minimalist')
+      await nextTick()
+      expect(wrapper.findAll('[style]')).toHaveLength(0)
+
+      const submitEvent = new Event('submit', { cancelable: true })
+      searchRow.find('form').element.dispatchEvent(submitEvent)
+      await nextTick()
+      expect(submitEvent.defaultPrevented).toBe(true)
+      expect(wrapper.emitted('search')?.at(-1)).toEqual(['minimalist'])
+      expect(wrapper.findAll('[style]')).toHaveLength(0)
+
+      // Escape closes and restores focus to the single trigger
+      await input.trigger('keydown', { key: 'Escape' })
+      await nextTick()
+      expect(trigger.text()).toBe('Search')
+      expect(trigger.attributes('aria-expanded')).toBe('false')
+      expect(searchRow.classes()).toContain('is-csp-hidden')
+      expect(document.activeElement).toBe(trigger.element)
+      expect(wrapper.findAll('[style]')).toHaveLength(0)
+
+      // Re-open and dismiss via portrait outside pointerdown without stealing focus
+      await trigger.trigger('click', { button: 0 })
+      await nextTick()
+      expect(searchRow.classes()).toContain('is-expanded')
+
+      outside.dispatchEvent(new Event('pointerdown', { bubbles: true }))
+      outside.focus()
+      await nextTick()
+      expect(searchRow.classes()).not.toContain('is-expanded')
+      expect(searchRow.classes()).toContain('is-csp-hidden')
+      expect(trigger.attributes('aria-expanded')).toBe('false')
+      expect(document.activeElement).toBe(outside)
+      expect(wrapper.findAll('[style]')).toHaveLength(0)
+
+      wrapper.unmount()
+    } finally {
+      window.matchMedia = originalMatchMedia
+      outside.remove()
+    }
+  })
+
+  test('scopes CSP-safe native popover to short landscape, dismisses on backdrop click without fallthrough, and syncs viewport transitions', async () => {
+    const originalMatchMedia = window.matchMedia
+    const originalCss = globalThis.CSS
+    const originalShowPopover = HTMLElement.prototype.showPopover
+    const originalHidePopover = HTMLElement.prototype.hidePopover
+    const originalMatches = HTMLElement.prototype.matches
+
+    let landscapeMatches = true
+    const mediaListeners = new Set<(event: MediaQueryListEvent) => void>()
+    const openPopovers = new WeakSet<HTMLElement>()
+    const showPopoverSpy = vi.fn(function (this: HTMLElement) {
+      openPopovers.add(this)
+    })
+    const hidePopoverSpy = vi.fn(function (this: HTMLElement) {
+      openPopovers.delete(this)
+    })
+
+    window.matchMedia = vi.fn().mockImplementation((query: string) => ({
+      get matches() {
+        return query === '(max-height: 520px) and (orientation: landscape)'
+          ? landscapeMatches
+          : false
+      },
+      media: query,
+      onchange: null,
+      addEventListener: (_type: string, listener: (event: MediaQueryListEvent) => void) => {
+        mediaListeners.add(listener)
+      },
+      removeEventListener: (_type: string, listener: (event: MediaQueryListEvent) => void) => {
+        mediaListeners.delete(listener)
+      },
+      addListener: vi.fn(),
+      removeListener: vi.fn(),
+      dispatchEvent: vi.fn(),
+    }))
+
+    Object.defineProperty(globalThis, 'CSS', {
+      configurable: true,
+      writable: true,
+      value: {
+        ...originalCss,
+        supports: (condition: string) =>
+          condition === 'selector(:popover-open)' ||
+          Boolean(originalCss?.supports?.(condition)),
+      },
+    })
+
+    HTMLElement.prototype.showPopover = showPopoverSpy
+    HTMLElement.prototype.hidePopover = hidePopoverSpy
+    HTMLElement.prototype.matches = function (
+      this: HTMLElement,
+      selector: string,
+    ) {
+      if (selector === ':popover-open') return openPopovers.has(this)
+      return originalMatches.call(this, selector)
+    } as typeof HTMLElement.prototype.matches
+
+    const parentClickSpy = vi.fn()
+    const mountRoot = document.createElement('div')
+    mountRoot.addEventListener('click', parentClickSpy)
+    document.body.append(mountRoot)
+
+    try {
+      const wrapper = mount(PublicShell, {
+        attachTo: mountRoot,
+        props: {
+          brand: 'Fsus',
+          navItems,
+          cspSafe: true,
+          mobileNavMode: 'menu',
+          mobileSearchMode: 'trigger',
+          mobileSearchTriggerLabel: 'Search',
+          mobileSearchCancelLabel: 'Cancel',
+        },
+      })
+
+      await nextTick()
+      const trigger = wrapper.find<HTMLAnchorElement>(
+        '.el-public-shell__mobile-search-trigger',
+      )
+      const host = wrapper.find<HTMLElement>(
+        '.el-public-shell__mobile-search-host',
+      )
+      const searchRow = wrapper.find('.el-public-shell__mobile-search-row')
+
+      // Open in short landscape -> promotes to popover="manual"
+      await trigger.trigger('click', { button: 0 })
+      await nextTick()
+
+      expect(wrapper.findAll('.el-public-shell__mobile-search-trigger')).toHaveLength(1)
+      expect(trigger.text()).toBe('Cancel')
+      expect(host.element.popover).toBe('manual')
+      expect(showPopoverSpy).toHaveBeenCalledTimes(1)
+      expect(openPopovers.has(host.element)).toBe(true)
+      expect(wrapper.findAll('[style]')).toHaveLength(0)
+
+      // Backdrop pointerdown keeps popover open so subsequent click is absorbed
+      const backdropPointerDown = new Event('pointerdown', {
+        bubbles: true,
+        cancelable: true,
+      })
+      host.element.dispatchEvent(backdropPointerDown)
+      await nextTick()
+      expect(backdropPointerDown.defaultPrevented).toBe(true)
+      expect(searchRow.classes()).toContain('is-expanded')
+      expect(openPopovers.has(host.element)).toBe(true)
+
+      // Backdrop click absorbs fallthrough, closes popover, and restores trigger focus
+      parentClickSpy.mockClear()
+      const backdropClick = new MouseEvent('click', {
+        bubbles: true,
+        cancelable: true,
+      })
+      host.element.dispatchEvent(backdropClick)
+      await nextTick()
+
+      expect(backdropClick.defaultPrevented).toBe(true)
+      expect(parentClickSpy).not.toHaveBeenCalled()
+      expect(hidePopoverSpy).toHaveBeenCalledTimes(1)
+      expect(openPopovers.has(host.element)).toBe(false)
+      expect(searchRow.classes()).not.toContain('is-expanded')
+      expect(trigger.attributes('aria-expanded')).toBe('false')
+      expect(document.activeElement).toBe(trigger.element)
+
+      // Re-open in short landscape, then transition to portrait -> closes top-layer popover while staying expanded in-flow
+      await trigger.trigger('click', { button: 0 })
+      await nextTick()
+      expect(openPopovers.has(host.element)).toBe(true)
+
+      landscapeMatches = false
+      for (const listener of mediaListeners) {
+        listener({ matches: false } as MediaQueryListEvent)
+      }
+      await nextTick()
+
+      expect(openPopovers.has(host.element)).toBe(false)
+      expect(host.attributes('popover')).toBeUndefined()
+      expect(searchRow.classes()).toContain('is-expanded')
+
+      // Transition back to short landscape -> re-opens popover
+      landscapeMatches = true
+      for (const listener of mediaListeners) {
+        listener({ matches: true } as MediaQueryListEvent)
+      }
+      await nextTick()
+      expect(openPopovers.has(host.element)).toBe(true)
+      expect(wrapper.findAll('[style]')).toHaveLength(0)
+
+      wrapper.unmount()
+      expect(openPopovers.has(host.element)).toBe(false)
+    } finally {
+      window.matchMedia = originalMatchMedia
+      Object.defineProperty(globalThis, 'CSS', {
+        configurable: true,
+        writable: true,
+        value: originalCss,
+      })
+      HTMLElement.prototype.showPopover = originalShowPopover
+      HTMLElement.prototype.hidePopover = originalHidePopover
+      HTMLElement.prototype.matches = originalMatches
+      mountRoot.remove()
+    }
+  })
+
+  test('marks mobile toolbar is-search-only only when trigger search has no inline nav or legacy mobile actions', () => {
+    const searchOnly = mount(PublicShell, {
+      props: {
+        brand: 'Fsus',
+        navItems,
+        mobileNavMode: 'menu',
+        mobileSearchMode: 'trigger',
+      },
+    })
+    const withInlineNav = mount(PublicShell, {
+      props: {
+        brand: 'Fsus',
+        navItems,
+        mobileNavMode: 'inline',
+        mobileSearchMode: 'trigger',
+      },
+    })
+    const withLegacyActions = mount(PublicShell, {
+      props: {
+        brand: 'Fsus',
+        navItems,
+        mobileNavMode: 'menu',
+        mobileSearchMode: 'trigger',
+      },
+      slots: {
+        'mobile-actions': '<button type="button">Legacy</button>',
+      },
+    })
+
+    expect(
+      searchOnly.find('.el-public-shell__mobile-toolbar').classes(),
+    ).toContain('is-search-only')
+    expect(
+      withInlineNav.find('.el-public-shell__mobile-toolbar').classes(),
+    ).not.toContain('is-search-only')
+    expect(
+      withLegacyActions.find('.el-public-shell__mobile-toolbar').classes(),
+    ).not.toContain('is-search-only')
+
+    searchOnly.unmount()
+    withInlineNav.unmount()
+    withLegacyActions.unmount()
+  })
 })
