@@ -185,10 +185,7 @@ export const diagnosticsItemProps = buildProps({
     type: String,
     default: '',
   },
-  detailLabel: {
-    type: String,
-    default: 'Details',
-  },
+  detailLabel: String,
   defaultOpen: Boolean,
   tone: {
     type: String,
@@ -207,18 +204,9 @@ export const copyableDetailProps = buildProps({
     type: String,
     required: true,
   },
-  label: {
-    type: String,
-    default: 'Copy detail',
-  },
-  copiedLabel: {
-    type: String,
-    default: 'Copied',
-  },
-  errorLabel: {
-    type: String,
-    default: 'Copy failed',
-  },
+  label: String,
+  copiedLabel: String,
+  errorLabel: String,
   monospace: {
     type: Boolean,
     default: true,

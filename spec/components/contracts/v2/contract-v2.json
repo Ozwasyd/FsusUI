@@ -10,7 +10,7 @@
   "baselines": {
     "web": {
       "path": "spec/baselines/vue-current.json",
-      "hash": "37ef61830b981a371dab4f05b3e476bb91a062a045ad736e52dbc9a73583572f",
+      "hash": "fba02e209037b43b297dd9a18d1e25654336dcdb969fcf5c9f6b1913348ddfa4",
       "packageVersion": "1.5.1"
     },
     "avalonia": {
@@ -32057,8 +32057,7 @@
             "semanticType": null,
             "nullable": false,
             "default": {
-              "kind": "literal",
-              "value": "Copied"
+              "kind": "missing"
             },
             "values": null,
             "valuesKnown": false,
@@ -32167,8 +32166,7 @@
             "semanticType": null,
             "nullable": false,
             "default": {
-              "kind": "literal",
-              "value": "Copy failed"
+              "kind": "missing"
             },
             "values": null,
             "valuesKnown": false,
@@ -32260,8 +32258,7 @@
             "semanticType": null,
             "nullable": false,
             "default": {
-              "kind": "literal",
-              "value": "Copy detail"
+              "kind": "missing"
             },
             "values": null,
             "valuesKnown": false,
@@ -38077,8 +38074,7 @@
             "semanticType": null,
             "nullable": false,
             "default": {
-              "kind": "literal",
-              "value": "Details"
+              "kind": "missing"
             },
             "values": null,
             "valuesKnown": false,
@@ -151048,8 +151044,7 @@
             "semanticType": null,
             "nullable": false,
             "default": {
-              "kind": "literal",
-              "value": "Copied"
+              "kind": "missing"
             },
             "values": null,
             "valuesKnown": false,
@@ -151158,8 +151153,7 @@
             "semanticType": null,
             "nullable": false,
             "default": {
-              "kind": "literal",
-              "value": "Copy failed"
+              "kind": "missing"
             },
             "values": null,
             "valuesKnown": false,
@@ -151251,8 +151245,7 @@
             "semanticType": null,
             "nullable": false,
             "default": {
-              "kind": "literal",
-              "value": "Copy detail"
+              "kind": "missing"
             },
             "values": null,
             "valuesKnown": false,
@@ -154377,8 +154370,7 @@
             "semanticType": null,
             "nullable": false,
             "default": {
-              "kind": "literal",
-              "value": "Details"
+              "kind": "missing"
             },
             "values": null,
             "valuesKnown": false,

@@ -1,17 +1,17 @@
 {
   "schema": "fsusui-independent-ux-review.v1",
   "issue": 285,
-  "candidateSha": "88e6063e3c2b904294ea5904ef66e8994c147015",
+  "candidateSha": "dc20d285f42d12f0013355cbd8b8e2179b939ec4",
   "reviewMode": "read-only-rendered-evidence-inspection",
   "modifiedPaths": [],
   "productionFixture": true,
   "identity": {
-    "executionId": "conformance-v2-check-tag-88e6063e3c2b904294ea5904ef66e8994c147015",
+    "executionId": "conformance-v2-check-tag-dc20d285f42d12f0013355cbd8b8e2179b939ec4",
     "checkpoint": "check-tag-after-pointer-keyboard",
     "contract": "component-v2.el-check-tag",
     "scenario": "scenario.v2.el-check-tag.real-interaction-trace",
-    "contractHash": "5c9b38bcb43a7c53e06852c877d610339644df25906b333befc723b390cdfb25",
-    "webBaselineHash": "37ef61830b981a371dab4f05b3e476bb91a062a045ad736e52dbc9a73583572f",
+    "contractHash": "21d6b17895bef01bd4e67664deb4b0775dbfde31bdf029b564ad3fd13d3fe130",
+    "webBaselineHash": "fba02e209037b43b297dd9a18d1e25654336dcdb969fcf5c9f6b1913348ddfa4",
     "avaloniaBaselineHash": "3c7084d23f9897688cd6835761cde015e10766990ebc8082cc1c2ec8b6093687",
     "runnerHash": "bad9abc8910c29bd5104e47fc7d693443a414d707776a55c043be5d1e0c0baf2"
   },
@@ -87,37 +87,39 @@
     {
       "id": "blue-focus-ring-visible",
       "status": "accepted",
-      "observation": "Both original rendered screenshots show a visible blue focus ring; Avalonia reports 192/192 pixels matching #2A599C."
+      "observation": "The independent reviewer opened both original PNGs and saw the blue focus ring on both. The Avalonia perimeter probe matched #2A599C in 192 of 192 samples."
     },
     {
       "id": "no-black-default-adorner",
       "status": "accepted",
-      "observation": "Neither image shows the black default focus adorner; the Avalonia perimeter probe reports zero unexpected dark pixels."
+      "observation": "The independent reviewer saw no black default adorner in either PNG; the Avalonia perimeter reported zero unexpected dark samples."
     },
     {
       "id": "unchecked-label-state-match",
       "status": "accepted",
-      "observation": "Both images read Check tag with the final unchecked state after pointer and keyboard input, revision 2, confirmed by browser and native accessibility evidence."
+      "observation": "Both original PNGs and raw executions identify Check tag as unchecked after pointer then keyboard at revision 2. CDP and the real Avalonia AutomationPeer report the checkbox, with tab order 3; browser AT-SPI was reachable."
     },
     {
       "id": "focus-no-bounds-shift",
       "status": "accepted",
-      "observation": "The before-focus, after-focus and after-toggle samples have identical XYWH on each platform: Web (0,136,87.625,24 CSS px) and Avalonia (24,136,96,24 DIP); focus flags false, true, true."
+      "observation": "Before focus, after focus, and after toggle use identical bounds in each original trace: Web (0,136,87.625,24 CSS px), Avalonia (24,136,96,24 DIP), with focus false, true, true."
     }
   ],
   "observations": [
-    "Official GitHub Actions run 44775687022 AOT artifact 14649718499; verified archive SHA-256 7d694eec63bb35b31723f76d036c25dd3ce809d170a7626718d9e1d53221e169. Candidate 88e6063e3c2b904294ea5904ef66e8994c147015, clean source tree 042dac56bece01f7572c2f2139599b11cb850aac. Independent reviewer viewed both actual PNGs and verified original raw bindings without modifying either raw manifest.",
-    "Two original screenshot files are byte-for-byte identical to the independently opened hosted CheckTag images; current canonical packaging evidence was not used to generate this receipt.",
-    "Web raw SHA-256 9f5aae41a38fb5f83343eed99783665237610812cce03803eb30c6f1102767bc; Avalonia raw SHA-256 ec4b8dd052eef1142a965c9bad92eda0cec257b394b185e6b600253530c3b2ee. Same exact execution verifies nine functional steps per platform plus a separate diagnostic-only timing record.",
-    "Native verification SHA-256 a76555ad8f69fd99f3d8a8660cbb8fc9ab0da65144c36e5317ac16a7d093537a; Web AT-SPI raw SHA-256 194edb75b6728a36aa127338ea08c12bb3a15333ccd47e6acdc39afbdb2fbb6d; Web harness receipt SHA-256 e1543f4e366ea3f0c33353f53823855ea1b33916e641884d94058ae934f7a5f5. Chrome/147.0.7727.15 exposed the Check tag checkbox to Linux AT-SPI; Orca PID 7059. Focus and unchecked state are present in CDP and the real Avalonia AutomationPeer.",
-    "Web render/interaction 0.4000000001396984/2.7000000001862645 ms; Avalonia 2.9797/11.1183 ms, diagnostic-only. Both bounded lifetime probes report detachedControlCollected=true."
+    "Independent read-only inspection of official run 44859716969, job 136710065851, artifact 14689333279 (296019 bytes; SHA-256 5ff1e97a221a714f16c5ebb6c2287b5b9b5557f7e5f6a2b4beda61bb6e5dd3af). Both original PNGs were opened. Evidence checkout dc20d285f42d12f0013355cbd8b8e2179b939ec4 has tree 0b57d84809b4d6acbc443483387736460383e4c4 and its own genuine GitHub merge parents dc8569ec520bb1cd91ff4cd7b2f01aac8c5ee33f and 46fd77cdcaabf2e713a1cf7866512f379c5538ba; the latter has the same tree.",
+    "Web screenshot is the 88×24 CheckTag element crop from a 1280×1100 backing viewport; Avalonia screenshot is the 960×720 full native window. Tracked PNG bytes match the archived images exactly.",
+    "Both exact executions pass nine functional steps; tenth is diagnostic-only. Bounded detached control collection was true on both.",
+    "Chrome 147.0.7727.15 and Orca PID 7047 reported passing web Linux AT-SPI receipt.",
+    "web-a11y/manifest.json SHA-256 b7ddaf94f55d79a0c40ac5ce4d9f5c10fb546a0d93efd8382ef1ad50587131fa",
+    "avalonia.json SHA-256 75d20f8534ca0feb06fd7d289856d7e6192baf169d467dc551fb453877ddbdae",
+    "accessibility/avalonia-generated-verification.json SHA-256 781dee48fdb33393f01eb8542e6c15985e4a66d59ae24da264ab8a161952aa9f",
+    "web-a11y/atspi.json SHA-256 3af8ce900bbd9ebc2768bd1ec23533772c7a34451d53971743bd61ca8a9ad533",
+    "web-a11y/receipt.txt SHA-256 83240e2e7dbd22b3d5a6e40cf2bd75510dc87c276b36129b300c51a802f7ee72"
   ],
   "limitations": [
-    "Visual acceptance covers only the light/default/zh-CN/ltr/reduced-motion CheckTag checkpoint. This is not acceptance of the whole CI job, package, cross-renderer pixel equality, or timing.",
-    "Three separately recorded bounds checkpoints do not show intermediate frames. Browser operation timings and native timestamps are not a synchronized cross-platform timeline.",
-    "The AT-SPI checkbox is focusable but does not independently expose the focused state here; focus is confirmed by CDP and Avalonia AutomationPeer.",
-    "Orca process and AT-SPI registration are not a record of spoken output; NVDA and VoiceOver were not tested. Screenshots cannot independently prove the browser sandbox.",
-    "The unrelated Markdown editableName diagnostic was false. Bounded lifetime results cover only this fixture."
+    "Only the light/default/zh-CN/ltr/reduced-motion CheckTag checkpoint was independently accepted, not full CI, AOT, package, cross-platform rendering equivalence or performance.",
+    "Three recorded bounds checkpoints do not prove absence of intermediate-frame movement; cross-platform clocks were not synchronized.",
+    "AT-SPI and the Orca process are not spoken-output evidence. NVDA and VoiceOver were not tested. The Web CheckTag PNG is an element crop, not a visual inspection of the whole viewport."
   ],
   "blockers": [],
   "status": "accepted"

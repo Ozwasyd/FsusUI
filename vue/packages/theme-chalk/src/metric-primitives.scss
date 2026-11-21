@@ -141,7 +141,7 @@
 
 @include b(key-value-grid) {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 216px), 1fr));
   gap: 0;
   min-width: 0;
   margin: 0;
@@ -151,7 +151,7 @@
   }
 
   @include m(compact) {
-    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 192px), 1fr));
     gap: 0;
   }
 }
@@ -161,6 +161,7 @@
   grid-template-columns: minmax(0, 1fr);
   gap: 3px;
   align-items: start;
+  align-content: start;
   min-width: 0;
   min-height: 48px;
   padding: 9px 12px;
@@ -538,19 +539,22 @@
 }
 
 @include b(copyable-detail) {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
+  display: flex;
+  flex-wrap: wrap;
   gap: 8px;
   align-items: center;
   min-width: 0;
 
   @include when(inline) {
-    display: inline-grid;
+    display: inline-flex;
     max-width: 100%;
   }
 
   @include e(value) {
+    // Wrap the button before the technical value is squeezed into a sliver.
+    flex: 1 1 8rem;
     min-width: 0;
+    box-sizing: border-box;
     padding: 6px 8px;
     border: 1px solid getCssVar('border-color-lighter');
     border-radius: var(--fsus-radius-control-small, 6px);
@@ -567,7 +571,9 @@
     // block below.
     min-width: var(--fsus-control-height-compact, 40px);
     min-height: var(--fsus-control-height-compact, 40px);
+    max-width: 100%;
     padding: 0 10px;
+    overflow-wrap: anywhere;
     border: 1px solid getCssVar('border-color');
     border-radius: var(--fsus-radius-control-small, 6px);
     background: getCssVar('bg-color');
@@ -600,7 +606,8 @@
   }
 
   @include e(feedback) {
-    grid-column: 1 / -1;
+    flex-basis: 100%;
+    min-width: 0;
     min-height: 1em;
     color: getCssVar('text-color', 'secondary');
     font-size: 12px;
@@ -622,9 +629,18 @@
   .#{$namespace}-metric-item,
   .#{$namespace}-distribution-bar-row,
   .#{$namespace}-status-summary,
-  .#{$namespace}-diagnostics-item__summary,
-  .#{$namespace}-copyable-detail {
+  .#{$namespace}-diagnostics-item__summary {
     grid-template-columns: minmax(0, 1fr);
+  }
+
+  .#{$namespace}-copyable-detail {
+    flex-flow: column nowrap;
+    align-items: stretch;
+  }
+
+  .#{$namespace}-copyable-detail__value,
+  .#{$namespace}-copyable-detail__feedback {
+    flex-basis: auto;
   }
 
   .#{$namespace}-metric-item__meta,
