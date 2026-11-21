@@ -53,7 +53,7 @@ describe('markdown block anchor grammar', () => {
       vi.stubGlobal('WebAssembly', undefined)
       try {
         const anchors = collectMarkdownAnchorNodes(source).map((node) =>
-          node.ok
+          node.ok === true
             ? { fragment: node.fragment, marker: node.ranges.marker }
             : node.code,
         )
@@ -88,9 +88,9 @@ describe('markdown block anchor grammar', () => {
   it('does not let pipe prose claim a real anchor elsewhere in the document', () => {
     const source = 'Heading ^kept\n\n| ordinary prose\n^kept'
     const result = collectMarkdownAnchorNodes(source)
-    expect(result.map((node) => (node.ok ? node.fragment : node.code))).toEqual(
-      ['#kept', 'anchor-placement'],
-    )
+    expect(
+      result.map((node) => (node.ok === true ? node.fragment : node.code)),
+    ).toEqual(['#kept', 'anchor-placement'])
   })
 
   it.each([
@@ -113,10 +113,9 @@ describe('markdown block anchor grammar', () => {
   it('keeps only the final quote anchor and preserves an independent owner', () => {
     const source = '> First ^still-unique\n> Last ^quote\n\nOther ^still-unique'
     const nodes = collectMarkdownAnchorNodes(source)
-    expect(nodes.map((node) => (node.ok ? node.fragment : node.code))).toEqual([
-      '#quote',
-      '#still-unique',
-    ])
+    expect(
+      nodes.map((node) => (node.ok === true ? node.fragment : node.code)),
+    ).toEqual(['#quote', '#still-unique'])
   })
 
   it('preserves an unclosed quoted fence as code to the quote boundary', () => {
@@ -124,12 +123,12 @@ describe('markdown block anchor grammar', () => {
     expect(collectMarkdownAnchorNodes(quoted)).toEqual([])
     expect(
       collectMarkdownAnchorNodes(`${quoted}\n\nOther ^inside`).map((node) =>
-        node.ok ? node.fragment : node.code,
+        node.ok === true ? node.fragment : node.code,
       ),
     ).toEqual(['#inside'])
     expect(
       collectMarkdownAnchorNodes(`${quoted}\n> \`\`\`\n> Prose ^outside`).map(
-        (node) => (node.ok ? node.fragment : node.code),
+        (node) => (node.ok === true ? node.fragment : node.code),
       ),
     ).toEqual(['#outside'])
   })
@@ -138,7 +137,7 @@ describe('markdown block anchor grammar', () => {
     const source = '- parent\n      - literal ^ignored\n\nOther ^ignored'
     expect(
       collectMarkdownAnchorNodes(source).map((node) =>
-        node.ok ? node.fragment : node.code,
+        node.ok === true ? node.fragment : node.code,
       ),
     ).toEqual(['anchor-placement', '#ignored'])
   })

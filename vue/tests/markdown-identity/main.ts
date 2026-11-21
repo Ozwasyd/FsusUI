@@ -1,3 +1,5 @@
+import type { mountFragmentFixture } from './fragment-fixture'
+
 import {
   createMarkdownAnchorMap,
   createMarkdownEditorProjection,
@@ -90,9 +92,7 @@ declare global {
     runIdentityScenario: typeof runIdentityScenario
     mountFragmentFixture: (
       smooth?: boolean,
-    ) => Promise<
-      ReturnType<typeof import('./fragment-fixture').mountFragmentFixture>
-    >
+    ) => Promise<ReturnType<typeof mountFragmentFixture>>
   }
 }
 
