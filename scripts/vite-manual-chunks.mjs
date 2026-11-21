@@ -172,11 +172,11 @@ const isMarkdownHeavyRuntimeLoaders = (id) =>
   )
 
 const markdownHeavyFeatureIdentityDependencies =
-  '(?:markdown-editor-projection|markdown-syntax-identity|markdown-source-coordinate-map|markdown-syntax-collect|markdown-directive-syntax|markdown-anchor-grammar|markdown-caption-directive|markdown-embed-directive)'
+  '(?:markdown-editor-projection|markdown-syntax-identity|markdown-source-coordinate-map|markdown-syntax-collect|markdown-directive-syntax|markdown-anchor-grammar|markdown-anchor-owners|markdown-caption-directive|markdown-embed-directive)'
 
 const isMarkdownHeavyFeatureIdentityDependency = (id) =>
   new RegExp(
-    `/(?:vue/packages/wasm|node_modules/@element-plus/wasm|node_modules/@ozwasyd/element-plus/es/wasm)/(?:${markdownHeavyFeatureIdentityDependencies}\\.(?:[cm]?[jt]sx?)|markdown/syntax-collect\\.generated\\.(?:[cm]?[jt]sx?))$`,
+    `/(?:vue/packages/wasm|node_modules/@element-plus/wasm|node_modules/@ozwasyd/element-plus/es/wasm)/(?:${markdownHeavyFeatureIdentityDependencies}\\.(?:[cm]?[jt]sx?)|markdown/(?:syntax-collect\\.generated|anchor-owner\\.portable)\\.(?:[cm]?[jt]sx?))$`,
     'u',
   ).test(id)
 
@@ -186,6 +186,14 @@ export const resolveFsusViteManualChunk = (
 ) => {
   const id = normalizeModuleId(moduleId)
   const consumerProfile = profile === 'consumer'
+
+  if (
+    /\/(?:vue\/packages|node_modules\/@element-plus|node_modules\/@ozwasyd\/element-plus\/es)\/components\/markdown-renderer\/src\/markdown-fragment-reveal\.(?:[cm]?[jt]sx?)$/u.test(
+      id,
+    )
+  ) {
+    return 'fsus-markdown-fragment-reveal'
+  }
 
   if (isMarkdownHeavyRuntimeLoaders(id)) {
     return 'fsus-markdown-heavy-loaders'

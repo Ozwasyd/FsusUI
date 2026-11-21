@@ -41,6 +41,9 @@ fi
 
 echo "emcc 版本: $(emcc --version | head -1)"
 
+# Verify the checked-in CSP-safe Markdown owner module before building package artifacts.
+bash "${SCRIPT_DIR}/markdown/build-anchor-owner.sh" --check
+
 detect_jobs() {
   if [[ -n "${WASM_BUILD_JOBS:-}" ]]; then
     echo "${WASM_BUILD_JOBS}"

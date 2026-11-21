@@ -3,6 +3,8 @@
 #include "markdown_mermaid.hpp"
 
 #include <algorithm>
+#include <unordered_map>
+#include <unordered_set>
 #include <cctype>
 #include <string>
 #include <string_view>
@@ -47,7 +49,8 @@ std::string render_document_v2(
   std::vector<footnote_def>& footnote_defs,
   std::vector<reference_def>& reference_defs,
   bool is_top_level,
-  const std::vector<std::size_t>* column_origins = nullptr
+  const std::vector<std::size_t>* column_origins = nullptr,
+  const std::vector<std::string_view>* inherited_line_anchors = nullptr
 );
 
 std::size_t count_lines(std::string_view text) {
@@ -934,6 +937,13 @@ bool is_paragraph_group_end(std::string_view line) {
   return trim(line) == "::";
 }
 
+bool continues_nested_list(std::string_view line) {
+  const auto indentation = line.size() - trim_left(line).size();
+  std::string_view content;
+  return indentation >= 2 &&
+    (parse_unordered_list_item(line, content) || parse_ordered_list_item(line, content));
+}
+
 bool parse_task_list_marker(std::string_view item, bool& checked, std::string_view& content) {
   const std::string_view trimmed = trim_left(item);
   if (trimmed.size() < 4 || trimmed.front() != '[' || trimmed[2] != ']' || trimmed[3] != ' ') {
@@ -957,7 +967,8 @@ std::string render_list(
   std::vector<std::string>& footnote_refs,
   std::vector<footnote_def>& footnote_defs,
   std::vector<reference_def>& reference_defs,
-  const std::vector<std::string_view>* item_anchors = nullptr
+  const std::vector<std::string_view>* item_anchors = nullptr,
+  const std::vector<std::vector<std::string_view>>* child_line_anchors = nullptr
 ) {
   if (items.empty()) {
     return {};
@@ -993,7 +1004,13 @@ std::string render_list(
     }
 
     if (item_content.find('\n') != std::string_view::npos) {
-      out.append(render_document_v2(item_content, request, footnote_refs, footnote_defs, reference_defs, false));
+      const auto* child_anchors =
+        child_line_anchors && item_index < child_line_anchors->size()
+          ? &(*child_line_anchors)[item_index] : nullptr;
+      out.append(render_document_v2(
+        item_content, request, footnote_refs, footnote_defs, reference_defs,
+        false, nullptr, child_anchors
+      ));
     } else {
       out.append(render_inline(item_content, request, footnote_refs, reference_defs));
     }
@@ -1298,6 +1315,25 @@ std::string render_table_row(
   return out;
 }
 
+std::size_t find_next_table_body_row(
+  const std::vector<std::string_view>& lines,
+  std::size_t cursor
+) {
+  if (cursor >= lines.size()) {
+    return std::string_view::npos;
+  }
+  if (trim(lines[cursor]).empty()) {
+    cursor = find_next_non_empty_line(lines, cursor + 1);
+    if (cursor == std::string_view::npos) {
+      return cursor;
+    }
+  }
+  const auto row = trim(lines[cursor]);
+  std::vector<table_alignment> ignored;
+  return row.find('|') == std::string_view::npos || parse_table_separator_row(row, ignored)
+    ? std::string_view::npos : cursor;
+}
+
 std::string render_table_block(
   const std::vector<std::string_view>& lines,
   std::size_t& index,
@@ -1336,26 +1372,12 @@ std::string render_table_block(
 
   std::size_t cursor = separator_index + 1;
   while (cursor < lines.size()) {
-    std::string_view row = trim(lines[cursor]);
-    if (row.empty()) {
-      const std::size_t next_row_index = find_next_non_empty_line(lines, cursor + 1);
-      if (next_row_index == std::string_view::npos) {
-        break;
-      }
-
-      row = trim(lines[next_row_index]);
-      std::vector<table_alignment> next_alignments;
-      if (row.find('|') == std::string_view::npos || parse_table_separator_row(row, next_alignments)) {
-        break;
-      }
-
-      cursor = next_row_index;
-    }
-
-    std::vector<table_alignment> row_alignments;
-    if (row.find('|') == std::string_view::npos || parse_table_separator_row(row, row_alignments)) {
+    const auto row_index = find_next_table_body_row(lines, cursor);
+    if (row_index == std::string_view::npos) {
       break;
     }
+    cursor = row_index;
+    const std::string_view row = trim(lines[cursor]);
 
     const std::string_view row_anchor =
       line_end_anchors && cursor < line_end_anchors->size() ? (*line_end_anchors)[cursor] : std::string_view{};
@@ -1514,10 +1536,6 @@ bool match_fence_close_line(std::string_view line, char delimiter, std::size_t m
 }
 
 bool is_atomic_anchor_owner_line(std::string_view line) {
-  const std::string_view left = trim_left(line);
-  if (left.starts_with('|')) {
-    return true;
-  }
   std::size_t indent = 0;
   while (indent < line.size() && indent < 3 && (line[indent] == ' ' || line[indent] == '\t')) {
     ++indent;
@@ -1624,10 +1642,7 @@ bool parse_block_anchor_candidate(
   std::size_t& strip_len_out,
   bool& exclusive_out
 ) {
-  std::size_t end = line.size();
-  while (end > 0 && (line[end - 1] == ' ' || line[end - 1] == '\t' || line[end - 1] == '\r')) {
-    --end;
-  }
+  const std::size_t end = line.size();
   std::size_t token_start = end;
   while (token_start > 0) {
     const char ch = line[token_start - 1];
@@ -1656,7 +1671,8 @@ bool parse_block_anchor_candidate(
     exclusive_out = true;
     return true;
   }
-  if (line[caret - 1] != ' ') {
+  if (line[caret - 1] != ' ' ||
+      (caret >= 2 && (line[caret - 2] == ' ' || line[caret - 2] == '\t'))) {
     return false;
   }
   const std::size_t strip_len = caret - 1;
@@ -1699,7 +1715,8 @@ std::string render_document_v2(
   std::vector<footnote_def>& footnote_defs,
   std::vector<reference_def>& reference_defs,
   bool is_top_level,
-  const std::vector<std::size_t>* column_origins
+  const std::vector<std::size_t>* column_origins,
+  const std::vector<std::string_view>* inherited_line_anchors
 ) {
   if (source.empty()) {
     return {};
@@ -1708,6 +1725,7 @@ std::string render_document_v2(
   std::vector<std::string_view> raw_lines = split_lines(source);
   std::vector<std::string_view> lines;
   std::vector<std::size_t> line_columns;
+  std::vector<std::string_view> line_end_anchors;
   lines.reserve(raw_lines.size());
   line_columns.reserve(raw_lines.size());
 
@@ -1768,23 +1786,64 @@ std::string render_document_v2(
       }
     }
     lines.push_back(line);
+    line_end_anchors.push_back(
+      inherited_line_anchors && raw_index < inherited_line_anchors->size()
+        ? (*inherited_line_anchors)[raw_index] : std::string_view{}
+    );
     line_columns.push_back(column_origins ? (*column_origins)[raw_index] : 0);
   }
 
-  std::vector<std::string_view> line_end_anchors(lines.size());
   std::vector<std::string_view> following_anchors(lines.size());
   std::vector<std::uint8_t> consumed_anchor_lines(lines.size(), 0);
-  if (is_top_level && !lines.empty()) {
+  if (is_top_level && !lines.empty() && source.find('^') != std::string_view::npos) {
     const std::vector<std::uint8_t> inside_atomic = mark_atomic_anchor_regions(lines);
-    std::vector<std::string_view> seen_anchor_ids;
-    auto is_seen_anchor = [&](std::string_view candidate) {
-      for (const auto existing : seen_anchor_ids) {
-        if (existing == candidate) {
-          return true;
-        }
+    const auto syntax = collect_anchor_owner_blocks(source);
+    std::vector<syntax_range> final_line_owners;
+    std::unordered_set<std::size_t> nested_list_starts;
+    std::vector<syntax_range> code_regions;
+    std::unordered_set<std::size_t> table_end_offsets;
+    for (const auto& node : syntax) {
+      if (node.kind == syntax_kind::paragraph || node.kind == syntax_kind::quote) {
+        final_line_owners.push_back(node.range);
+      } else if (node.kind == syntax_kind::list) {
+        nested_list_starts.insert(node.range.start_offset);
+      } else if (node.kind == syntax_kind::code) {
+        code_regions.push_back(node.range);
+      } else if (node.kind == syntax_kind::table) {
+        table_end_offsets.insert(node.range.end_offset);
       }
-      return false;
+    }
+    auto candidate_is_final_owner_line = [&](const std::string_view line) {
+      const auto start = static_cast<std::size_t>(line.data() - source.data());
+      if (nested_list_starts.contains(start)) {
+        // This line is copied into a child renderer with no source owner binding.
+        return false;
+      }
+      const auto owner = std::upper_bound(
+        final_line_owners.begin(), final_line_owners.end(), start,
+        [](std::size_t offset, const syntax_range& paragraph) {
+          return offset < paragraph.start_offset;
+        }
+      );
+      if (owner == final_line_owners.begin() || start >= (owner - 1)->end_offset) {
+        return true;
+      }
+      const auto end = start + line.size();
+      return end == (owner - 1)->end_offset ||
+        (end + 1 == (owner - 1)->end_offset && source[end] == '\n');
     };
+    auto candidate_is_inside_code = [&](const std::string_view line) {
+      const auto start = static_cast<std::size_t>(line.data() - source.data());
+      const auto owner = std::upper_bound(
+        code_regions.begin(), code_regions.end(), start,
+        [](std::size_t offset, const syntax_range& region) {
+          return offset < region.start_offset;
+        }
+      );
+      return owner != code_regions.begin() && start < (owner - 1)->end_offset;
+    };
+    std::unordered_map<std::string_view, std::size_t> counts;
+    std::vector<std::size_t> strip_lengths(lines.size());
     for (std::size_t line_idx = 0; line_idx < lines.size(); ++line_idx) {
       if (inside_atomic[line_idx]) {
         continue;
@@ -1801,28 +1860,43 @@ std::string render_document_v2(
           continue;
         }
         const std::string_view previous_line = lines[line_idx - 1];
-        if (trim(previous_line).empty() || !is_atomic_anchor_owner_line(previous_line)) {
+        const auto marker_start = static_cast<std::size_t>(raw_line.data() - source.data());
+        if (previous_line.data() + previous_line.size() + 1 != raw_line.data() ||
+            trim(previous_line).empty() ||
+            !(table_end_offsets.contains(marker_start) || is_atomic_anchor_owner_line(previous_line))) {
           continue;
         }
-        if (is_seen_anchor(parsed_id)) {
-          continue;
-        }
-        seen_anchor_ids.push_back(parsed_id);
+        ++counts[parsed_id];
         following_anchors[line_idx - 1] = parsed_id;
         continue;
       }
       std::string_view parsed_id;
       std::size_t strip_len = 0;
       bool is_exclusive = false;
-      if (!parse_block_anchor_candidate(raw_line, parsed_id, strip_len, is_exclusive) || is_exclusive) {
+      if (!parse_block_anchor_candidate(raw_line, parsed_id, strip_len, is_exclusive) ||
+          is_exclusive || candidate_is_inside_code(raw_line) ||
+          !candidate_is_final_owner_line(raw_line)) {
         continue;
       }
-      if (is_seen_anchor(parsed_id)) {
-        continue;
-      }
-      seen_anchor_ids.push_back(parsed_id);
+      ++counts[parsed_id];
       line_end_anchors[line_idx] = parsed_id;
-      lines[line_idx] = raw_line.substr(0, strip_len);
+      strip_lengths[line_idx] = strip_len;
+    }
+    // Keep rejected marker text in the original lines. Only unique eligible
+    // owner claims may alter a line or emit an ID.
+    for (std::size_t index = 0; index < lines.size(); ++index) {
+      auto& inline_id = line_end_anchors[index];
+      if (!inline_id.empty()) {
+        if (counts.at(inline_id) == 1) {
+          lines[index] = lines[index].substr(0, strip_lengths[index]);
+        } else {
+          inline_id = {};
+        }
+      }
+      auto& following_id = following_anchors[index];
+      if (!following_id.empty() && counts.at(following_id) > 1) {
+        following_id = {};
+      }
     }
   }
 
@@ -1833,6 +1907,7 @@ std::string render_document_v2(
   std::string_view paragraph_anchor;
   std::vector<std::string> list_items;
   std::vector<std::string_view> list_item_anchors;
+  std::vector<std::vector<std::string_view>> child_line_anchors;
   bool list_ordered = false;
   bool in_code_block = false;
   bool in_latex_block = false;
@@ -1876,9 +1951,10 @@ std::string render_document_v2(
     if (list_items.empty()) {
       return;
     }
-    html.append(render_list(list_items, list_ordered, request, footnote_refs, footnote_defs, reference_defs, &list_item_anchors));
+    html.append(render_list(list_items, list_ordered, request, footnote_refs, footnote_defs, reference_defs, &list_item_anchors, &child_line_anchors));
     list_items.clear();
     list_item_anchors.clear();
+    child_line_anchors.clear();
   };
 
   auto flush_code = [&](std::size_t closing_line) {
@@ -1954,12 +2030,9 @@ std::string render_document_v2(
           ++lookahead;
         }
         if (lookahead < lines.size()) {
-          const std::string_view next_line = lines[lookahead];
-          const std::string_view next_left = trim_left(next_line);
-          const std::size_t next_indent = next_line.size() - next_left.size();
-          std::string_view dummy_item;
-          if (next_indent >= 2 && (parse_unordered_list_item(next_line, dummy_item) || parse_ordered_list_item(next_line, dummy_item))) {
+          if (continues_nested_list(lines[lookahead])) {
             list_items.back().push_back('\n');
+            child_line_anchors.back().emplace_back();
             continue;
           }
         }
@@ -1986,11 +2059,8 @@ std::string render_document_v2(
       std::size_t quote_index = index;
       std::string quote_html = render_blockquote(lines, quote_index, request, footnote_refs, footnote_defs, reference_defs, line_columns);
       if (!quote_html.empty()) {
-        for (std::size_t q = index; q < quote_index && q < line_end_anchors.size(); ++q) {
-          if (!line_end_anchors[q].empty()) {
-            inject_block_anchor_id(quote_html, line_end_anchors[q]);
-            break;
-          }
+        if (quote_index > index) {
+          inject_block_anchor_id(quote_html, line_end_anchors[quote_index - 1]);
         }
         html.append(quote_html);
         index = quote_index;
@@ -2054,16 +2124,12 @@ std::string render_document_v2(
 
     // List continuation must be checked before indented-code detection to avoid
     // misidentifying deeply-indented (≥4 space) list items as code blocks.
-    {
-      const std::string_view lc_left = trim_left(line);
-      const std::size_t lc_indent = line.size() - lc_left.size();
-      std::string_view lc_item;
-      if (!list_items.empty() && lc_indent >= 2 && (parse_unordered_list_item(line, lc_item) || parse_ordered_list_item(line, lc_item))) {
-        list_items.back().push_back('\n');
-        // Strip exactly 2 chars to preserve relative indentation for multi-level nesting.
-        list_items.back().append(line.data() + 2, line.size() - 2);
-        continue;
-      }
+    if (!list_items.empty() && continues_nested_list(line)) {
+      list_items.back().push_back('\n');
+      child_line_anchors.back().push_back(line_end_anchors[index]);
+      // Strip exactly 2 chars to preserve relative indentation for multi-level nesting.
+      list_items.back().append(line.data() + 2, line.size() - 2);
+      continue;
     }
 
     if (is_indented_code_line(line, line_columns[index])) {
@@ -2156,26 +2222,30 @@ std::string render_document_v2(
     if (parse_unordered_list_item(line, list_item)) {
       flush_paragraph();
       if (!list_items.empty() && list_ordered) {
-        html.append(render_list(list_items, list_ordered, request, footnote_refs, footnote_defs, reference_defs, &list_item_anchors));
+        html.append(render_list(list_items, list_ordered, request, footnote_refs, footnote_defs, reference_defs, &list_item_anchors, &child_line_anchors));
         list_items.clear();
         list_item_anchors.clear();
+        child_line_anchors.clear();
       }
       list_ordered = false;
       list_items.emplace_back(list_item);
       list_item_anchors.push_back(line_end_anchors[index]);
+      child_line_anchors.push_back({{}});
       continue;
     }
 
     if (parse_ordered_list_item(line, list_item)) {
       flush_paragraph();
       if (!list_items.empty() && !list_ordered) {
-        html.append(render_list(list_items, list_ordered, request, footnote_refs, footnote_defs, reference_defs, &list_item_anchors));
+        html.append(render_list(list_items, list_ordered, request, footnote_refs, footnote_defs, reference_defs, &list_item_anchors, &child_line_anchors));
         list_items.clear();
         list_item_anchors.clear();
+        child_line_anchors.clear();
       }
       list_ordered = true;
       list_items.emplace_back(list_item);
       list_item_anchors.push_back(line_end_anchors[index]);
+      child_line_anchors.push_back({{}});
       continue;
     }
 
@@ -2406,6 +2476,14 @@ void decorate_table_syntax(std::string_view source, syntax_node& node) {
       node.end_offset
     );
     const std::string_view line = source.substr(line_start, line_end - line_start);
+    // The envelope can span blank separators between actual rendered rows.
+    if (trim(line).empty()) {
+      if (newline == std::string_view::npos || newline >= node.end_offset) {
+        break;
+      }
+      line_start = newline + 1;
+      continue;
+    }
     const std::size_t row_index = node.table_row_ranges.size();
     node.table_row_ranges.push_back({line_start, line_end});
     std::vector<std::size_t> delimiters;
@@ -2839,7 +2917,10 @@ void assign_syntax_parents(std::vector<syntax_node>& nodes) {
   }
 }
 
-std::vector<syntax_node> collect_syntax_nodes_impl(std::string_view source) {
+std::vector<syntax_node> collect_syntax_blocks_impl(
+  std::string_view source,
+  std::vector<anchor_owner_block>* additional_anchor_regions = nullptr
+) {
   std::vector<SourceLine> raw_lines;
   std::size_t line_start = 0;
   while (line_start <= source.size()) {
@@ -2878,6 +2959,7 @@ std::vector<syntax_node> collect_syntax_nodes_impl(std::string_view source) {
   std::size_t list_start = 0;
   std::size_t list_end = 0;
   bool in_list = false;
+  std::size_t active_nested_list_depth = 0;
   bool list_is_task = false;
   bool in_code_block = false;
   std::size_t code_start = 0;
@@ -2905,6 +2987,7 @@ std::vector<syntax_node> collect_syntax_nodes_impl(std::string_view source) {
     });
     in_list = false;
     list_is_task = false;
+    active_nested_list_depth = 0;
   };
 
   auto start_paragraph = [&](std::size_t start_offset) {
@@ -2915,6 +2998,7 @@ std::vector<syntax_node> collect_syntax_nodes_impl(std::string_view source) {
   };
 
   auto append_list_item = [&](const SourceLine& line, bool task_item) {
+    active_nested_list_depth = 0;
     if (!in_list) {
       list_start = line.start;
       list_is_task = task_item;
@@ -2950,6 +3034,15 @@ std::vector<syntax_node> collect_syntax_nodes_impl(std::string_view source) {
 
     if (trimmed.empty()) {
       flush_paragraph(line.start);
+      if (additional_anchor_regions && in_list) {
+        std::size_t next = index + 1;
+        while (next < lines.size() && trim(lines[next].text).empty()) {
+          ++next;
+        }
+        if (next < lines.size() && continues_nested_list(lines[next].text)) {
+          continue;
+        }
+      }
       flush_list();
       continue;
     }
@@ -2997,12 +3090,36 @@ std::vector<syntax_node> collect_syntax_nodes_impl(std::string_view source) {
       flush_paragraph(line.start);
       flush_list();
       std::size_t quote_index = index;
+      char quoted_fence = '\0';
+      std::size_t quoted_fence_start = index;
       while (quote_index < lines.size()) {
-        const std::string_view quote_trimmed = trim_left(lines[quote_index].text);
+        const auto& quote_line = lines[quote_index];
+        const std::string_view quote_trimmed = trim_left(quote_line.text);
         if (quote_trimmed.empty() || quote_trimmed.front() != '>') {
           break;
         }
+        if (additional_anchor_regions) {
+          const auto inner = strip_blockquote_prefix(quote_line.text, 0);
+          if (quoted_fence != '\0') {
+            if (parse_fence_end(inner.source, quoted_fence)) {
+              quoted_fence = '\0';
+            }
+          } else {
+            std::string_view language;
+            if (parse_fence_start(inner.source, quoted_fence, language)) {
+              quoted_fence_start = quote_index;
+            }
+          }
+        }
         ++quote_index;
+      }
+      // A quote ending inside its child's code fence does not have an inline
+      // anchor on its final line. The child renderer flushes the literal code.
+      if (additional_anchor_regions && quoted_fence != '\0') {
+        additional_anchor_regions->push_back({
+          syntax_kind::code,
+          {lines[quoted_fence_start].start, exclusive_line_end(source, lines[quote_index - 1])},
+        });
       }
       if (quote_index > index) {
         nodes.push_back({
@@ -3056,6 +3173,31 @@ std::vector<syntax_node> collect_syntax_nodes_impl(std::string_view source) {
       flush_list();
       in_code_block = true;
       code_start = line.start;
+      continue;
+    }
+
+    if (additional_anchor_regions && in_list && continues_nested_list(line.text)) {
+      const std::size_t indent = line.text.size() - trim_left(line.text).size();
+      const bool uses_spaces = line.text.substr(0, indent).find_first_not_of(' ') == std::string_view::npos;
+      std::size_t depth = 0;
+      std::size_t remaining = indent;
+      // Every open ancestor list copies away exactly two columns. At the
+      // first level without a list item, four residual spaces start code.
+      // Keep levels in sync when a sibling replaces the current item.
+      while (uses_spaces && depth <= active_nested_list_depth && remaining >= 2) {
+        remaining -= 2;
+        ++depth;
+      }
+      if (uses_spaces && remaining < 4) {
+        active_nested_list_depth = depth;
+      } else {
+        // Do not strip a marker when this copied line cannot bind an item.
+        additional_anchor_regions->push_back({
+          syntax_kind::list, {line.start, exclusive_line_end(source, line)},
+        });
+        active_nested_list_depth = depth > 0 ? depth - 1 : 0;
+      }
+      list_end = exclusive_line_end(source, line);
       continue;
     }
 
@@ -3147,21 +3289,18 @@ std::vector<syntax_node> collect_syntax_nodes_impl(std::string_view source) {
       const std::size_t separator = find_next_non_empty_line(views, index + 1);
       if (
         separator != std::string_view::npos &&
-        parse_table_separator_row(trim(lines[separator].text), alignments)
+        parse_table_separator_row(trim(lines[separator].text), alignments) &&
+        !split_table_cells(trimmed).empty()
       ) {
         flush_paragraph(line.start);
         flush_list();
         std::size_t cursor = separator + 1;
         while (cursor < lines.size()) {
-          std::string_view row = trim(lines[cursor].text);
-          if (row.empty()) {
+          const auto row_index = find_next_table_body_row(views, cursor);
+          if (row_index == std::string_view::npos) {
             break;
           }
-          std::vector<table_alignment> row_alignments;
-          if (row.find('|') == std::string_view::npos || parse_table_separator_row(row, row_alignments)) {
-            break;
-          }
-          ++cursor;
+          cursor = row_index + 1;
         }
         const std::size_t last_index = cursor > index ? cursor - 1 : index;
         nodes.push_back({
@@ -3214,6 +3353,11 @@ std::vector<syntax_node> collect_syntax_nodes_impl(std::string_view source) {
   flush_paragraph(source.size());
   flush_list();
 
+  return nodes;
+}
+
+std::vector<syntax_node> collect_syntax_nodes_impl(std::string_view source) {
+  auto nodes = collect_syntax_blocks_impl(source);
   const std::vector<syntax_node> blocks = nodes;
   for (const auto& block : blocks) {
     if (is_inline_bearing_kind(block.kind)) {
@@ -3490,6 +3634,21 @@ std::string_view syntax_kind_name(syntax_kind kind) {
     case syntax_kind::count: break;
   }
   return "malformed";
+}
+
+std::vector<anchor_owner_block> collect_anchor_owner_blocks(std::string_view source) {
+  std::vector<anchor_owner_block> owners;
+  for (const auto& block : collect_syntax_blocks_impl(source, &owners)) {
+    if (block.status == syntax_status::valid &&
+        (block.kind == syntax_kind::paragraph || block.kind == syntax_kind::code ||
+         block.kind == syntax_kind::table || block.kind == syntax_kind::quote)) {
+      owners.push_back({ block.kind, { block.start_offset, block.end_offset } });
+    }
+  }
+  std::sort(owners.begin(), owners.end(), [](const auto& a, const auto& b) {
+    return a.range.start_offset < b.range.start_offset;
+  });
+  return owners;
 }
 
 std::vector<syntax_node> collect_syntax_nodes(std::string_view source) {

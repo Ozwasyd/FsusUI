@@ -27,9 +27,13 @@ describe('markdown editor projection contract', () => {
 
     expect(projection.identity.parser).toBe(MARKDOWN_EDITOR_PROJECTION_PARSER)
     expect(projection.identity.rawSource).toBe(raw)
-    expect(projection.identity.normalizedSource).toBe(coordinates.normalizedSource)
+    expect(projection.identity.normalizedSource).toBe(
+      coordinates.normalizedSource,
+    )
     expect(projection.identity.version).toBe(MARKDOWN_RENDERER_VERSION)
-    expect(projection.identity.sourceIdentity).toBe(resolveMarkdownSourceIdentity(raw))
+    expect(projection.identity.sourceIdentity).toBe(
+      resolveMarkdownSourceIdentity(raw),
+    )
     expect(projection.identity.sourceIdentity).toBe(rendered.sourceIdentity)
     expect(projection.identity.version).toBe(rendered.rendererVersion)
     expect(markdownRenderIdentitiesEqual(projection, rendered)).toBe(true)
@@ -37,37 +41,50 @@ describe('markdown editor projection contract', () => {
     expect(Array.isArray(projection.diagnostics)).toBe(true)
     expect(projection.syntaxCoverage.parser).toBe(projection.identity.parser)
     expect(projection.syntaxCoverage.version).toBe(projection.identity.version)
-    expect(projection.syntaxCoverage.kinds).toEqual(MARKDOWN_EDITOR_REQUIRED_SYNTAX_KINDS)
-    expect(projection.nodes.map((node) => node.kind)).toEqual(['heading', 'paragraph'])
-    expect(new Set(projection.nodes.map((node) => node.blockIdentity)).size).toBe(
-      projection.nodes.length,
+    expect(projection.syntaxCoverage.kinds).toEqual(
+      MARKDOWN_EDITOR_REQUIRED_SYNTAX_KINDS,
     )
+    expect(projection.nodes.map((node) => node.kind)).toEqual([
+      'heading',
+      'paragraph',
+    ])
+    expect(
+      new Set(projection.nodes.map((node) => node.blockIdentity)).size,
+    ).toBe(projection.nodes.length)
     expect(
       projection.nodes.every(
         (node) =>
           node.rawContentRanges.length > 0 &&
           node.rawMarkerRanges.every(
             (range) =>
-              range.start >= node.rawRange.start && range.end <= node.rawRange.end,
+              range.start >= node.rawRange.start &&
+              range.end <= node.rawRange.end,
           ),
       ),
     ).toBe(true)
   })
 
   it('projects heading, paragraph, list, and table nodes from the C++ parse pass', () => {
-    const raw = '\uFEFF# Title\r\n\nA paragraph.\r\n\n- one\r\n- two\r\n\n| h |\r\n| --- |\r\n| c |\n'
+    const raw =
+      '\uFEFF# Title\r\n\nA paragraph.\r\n\n- one\r\n- two\r\n\n| h |\r\n| --- |\r\n| c |\n'
     const projection = createMarkdownEditorProjection(raw)
     const kinds = projection.nodes.map((node) => node.kind)
     expect(kinds).toEqual(['heading', 'paragraph', 'list', 'table'])
 
     const heading = projection.nodes[0]
-    expect(raw.slice(heading.rawRange.start, heading.rawRange.end)).toContain('# Title')
+    expect(raw.slice(heading.rawRange.start, heading.rawRange.end)).toContain(
+      '# Title',
+    )
     const paragraph = projection.nodes[1]
-    expect(raw.slice(paragraph.rawRange.start, paragraph.rawRange.end)).toContain('A paragraph.')
+    expect(
+      raw.slice(paragraph.rawRange.start, paragraph.rawRange.end),
+    ).toContain('A paragraph.')
     const list = projection.nodes[2]
     expect(raw.slice(list.rawRange.start, list.rawRange.end)).toContain('- one')
     const table = projection.nodes[3]
-    expect(raw.slice(table.rawRange.start, table.rawRange.end)).toContain('| h |')
+    expect(raw.slice(table.rawRange.start, table.rawRange.end)).toContain(
+      '| h |',
+    )
   })
 
   it('projects exact table rows, cells, separator, and alignments from the C++ parse pass', () => {
@@ -110,6 +127,42 @@ describe('markdown editor projection contract', () => {
     ])
   })
 
+  it('does not project blank rows inside a loose table envelope', () => {
+    const raw = [
+      '\uFEFF| left | right |',
+      '| --- | --- |',
+      '| a | b |',
+      '',
+      ' \t ',
+      '| c | d |',
+      '',
+      'Separate.',
+    ].join('\r\n')
+    const projection = createMarkdownEditorProjection(raw)
+    const table = projection.nodes.find((node) => node.kind === 'table')
+
+    expect(table?.table?.separatorRow).toBe(1)
+    expect(
+      table?.table?.rows.map((row) =>
+        raw.slice(row.rawRange.start, row.rawRange.end),
+      ),
+    ).toEqual([
+      '\uFEFF| left | right |',
+      '| --- | --- |',
+      '| a | b |',
+      '| c | d |',
+    ])
+    expect(
+      table?.table?.rows
+        .at(-1)
+        ?.rawCellRanges.map((range) => raw.slice(range.start, range.end)),
+    ).toEqual(['c', 'd'])
+    expect(raw.slice(table!.rawRange.start, table!.rawRange.end)).toContain(
+      '| a | b |\r\n\r\n \t \r\n| c | d |',
+    )
+    expect(projection.nodes.at(-1)?.kind).toBe('paragraph')
+  })
+
   it('maps mermaid/latex blocks through the #321 coordinate map', () => {
     const raw = '\uFEFF```mermaid\r\nflowchart LR\r\n```\n\n$$\na^2\n$$'
     const projection = createMarkdownEditorProjection(raw)
@@ -117,7 +170,9 @@ describe('markdown editor projection contract', () => {
     expect(kinds).toContain('mermaid')
     expect(kinds).toContain('latex')
     for (const node of projection.nodes) {
-      expect(raw.slice(node.rawRange.start, node.rawRange.end).length).toBeGreaterThan(0)
+      expect(
+        raw.slice(node.rawRange.start, node.rawRange.end).length,
+      ).toBeGreaterThan(0)
       expect(node.presentation).toBe(presentationForSyntaxKind(node.kind))
     }
   })
@@ -157,9 +212,9 @@ describe('markdown editor projection contract', () => {
     expect(raw.slice(image!.rawRange.start, image!.rawRange.end)).toBe(
       '![alt](img.png)',
     )
-    expect(raw.slice(malformed!.rawRange.start, malformed!.rawRange.end)).toContain(
-      '[broken](http://x',
-    )
+    expect(
+      raw.slice(malformed!.rawRange.start, malformed!.rawRange.end),
+    ).toContain('[broken](http://x')
     expect(link!.presentation).toBe('live-decorated')
     expect(image!.presentation).toBe('live-atomic')
     expect(footnoteRef!.presentation).toBe('live-decorated')
@@ -176,7 +231,11 @@ describe('markdown editor projection contract', () => {
     expect(image!.parentRawRange).toEqual(paragraph!.rawRange)
     expect(footnoteRef!.parentRawRange).toEqual(paragraph!.rawRange)
     expect(paragraph!.childRawRanges).toEqual(
-      expect.arrayContaining([link!.rawRange, image!.rawRange, footnoteRef!.rawRange]),
+      expect.arrayContaining([
+        link!.rawRange,
+        image!.rawRange,
+        footnoteRef!.rawRange,
+      ]),
     )
     expect(footnoteDef!.parentRawRange).toBeNull()
     expect(footnoteDef!.childRawRanges).toEqual([])
@@ -199,14 +258,17 @@ describe('markdown editor projection contract', () => {
     expect(image!.parentRawRange).toEqual(paragraph!.rawRange)
     expect(heading!.childRawRanges).toEqual([link!.rawRange])
     expect(paragraph!.childRawRanges).toEqual([image!.rawRange])
-    expect(raw.slice(heading!.rawRange.start, heading!.rawRange.end)).toContain('# See')
-    expect(raw.slice(link!.parentRawRange!.start, link!.parentRawRange!.end)).not.toMatch(
-      /<h1|<p|<a /i,
+    expect(raw.slice(heading!.rawRange.start, heading!.rawRange.end)).toContain(
+      '# See',
     )
+    expect(
+      raw.slice(link!.parentRawRange!.start, link!.parentRawRange!.end),
+    ).not.toMatch(/<h1|<p|<a /i)
   })
 
   it('does not invent links from escaped text, code spans, or HTML indexOf', () => {
-    const raw = 'Not \\[escaped](no) and `[code](no)` then [same](a) and [same](b)\n'
+    const raw =
+      'Not \\[escaped](no) and `[code](no)` then [same](a) and [same](b)\n'
     const projection = createMarkdownEditorProjection(raw)
     const links = projection.nodes.filter((node) => node.kind === 'link')
     expect(links).toHaveLength(2)
@@ -217,12 +279,20 @@ describe('markdown editor projection contract', () => {
       '[same](b)',
     )
     expect(links[1]!.rawRange.start).not.toBe(raw.indexOf('[same]'))
-    expect(projection.nodes.some((node) => node.kind === 'link' && raw.slice(node.rawRange.start, node.rawRange.end).includes('escaped'))).toBe(
-      false,
-    )
-    expect(projection.nodes.some((node) => node.kind === 'link' && raw.slice(node.rawRange.start, node.rawRange.end).includes('[code]'))).toBe(
-      false,
-    )
+    expect(
+      projection.nodes.some(
+        (node) =>
+          node.kind === 'link' &&
+          raw.slice(node.rawRange.start, node.rawRange.end).includes('escaped'),
+      ),
+    ).toBe(false)
+    expect(
+      projection.nodes.some(
+        (node) =>
+          node.kind === 'link' &&
+          raw.slice(node.rawRange.start, node.rawRange.end).includes('[code]'),
+      ),
+    ).toBe(false)
   })
 
   it('fails closed when a required syntax kind is not registered', () => {
@@ -287,7 +357,9 @@ describe('markdown editor projection contract', () => {
       const node = projection.nodes.find((candidate) => candidate.kind === kind)
       expect(node, kind).toBeDefined()
       expect(node!.status).toBe('valid')
-      expect(node!.rawContentRanges.length, `${kind} content`).toBeGreaterThan(0)
+      expect(node!.rawContentRanges.length, `${kind} content`).toBeGreaterThan(
+        0,
+      )
       expect(node!.rawMarkerRanges.length, `${kind} markers`).toBeGreaterThan(0)
       for (const range of [
         ...node!.rawContentRanges,
@@ -313,7 +385,9 @@ describe('markdown editor projection contract', () => {
       ),
     ).toEqual(['Heading'])
     expect(
-      heading!.rawMarkerRanges.map((range) => raw.slice(range.start, range.end)),
+      heading!.rawMarkerRanges.map((range) =>
+        raw.slice(range.start, range.end),
+      ),
     ).toEqual(['### ', ' ###'])
 
     expect(latex).toBeDefined()
@@ -334,7 +408,9 @@ describe('markdown editor projection contract', () => {
     ] as const
     for (const fixture of fixtures) {
       const projection = createMarkdownEditorProjection(fixture.raw)
-      const node = projection.nodes.find((candidate) => candidate.status === 'malformed')
+      const node = projection.nodes.find(
+        (candidate) => candidate.status === 'malformed',
+      )
       expect(node, fixture.code).toBeDefined()
       expect(node!.kind).toBe('malformed')
       expect(node!.diagnosticCode).toBe(fixture.code)
@@ -356,7 +432,11 @@ describe('markdown editor projection contract', () => {
     const raw = '\uFEFF# Title\r\n\nA paragraph with [docs](https://x.test).\n'
     const projection = createMarkdownEditorProjection(raw)
     const fallback = renderMarkdownFallbackWithRuntime(raw)
-    const unwrap = <T>(result: { ok: true; value: T } | { ok: false; error: { message: string } }) => {
+    const unwrap = <T>(
+      result:
+        | { ok: true; value: T }
+        | { ok: false; error: { message: string } },
+    ) => {
       if ('error' in result) {
         throw new Error(result.error.message)
       }
@@ -381,8 +461,8 @@ describe('markdown editor projection contract', () => {
     expect(identity.version).toBe(MARKDOWN_RENDERER_VERSION)
     expect(identity.sourceIdentity).toBe(projection.identity.sourceIdentity)
     expect(identity.sourceIdentity).not.toBe(html.html)
-    expect(markdownRenderIdentitiesEqual(html, { ...html, rawSource: 'other' })).toBe(
-      false,
-    )
+    expect(
+      markdownRenderIdentitiesEqual(html, { ...html, rawSource: 'other' }),
+    ).toBe(false)
   })
 })

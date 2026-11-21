@@ -374,6 +374,7 @@ describe('Markdown editor command surface integration', () => {
   })
 
   it('rejects a duplicate inserted anchor without sidecar or source mutation', async () => {
+    const source = 'First ^duplicate\n\nSecond'
     const wrapper = mount(MarkdownEditor, {
       attachTo: document.body,
       props: {
@@ -384,11 +385,11 @@ describe('Markdown editor command surface integration', () => {
             invalidAnchor: 'ANCHOR-INVALID-L10N',
           },
         },
-        modelValue: 'First ^duplicate\nSecond',
+        modelValue: source,
         surfaces: { commandPalette: true },
       },
     })
-    await selectRange(wrapper, 23, 23)
+    await selectRange(wrapper, source.length, source.length)
     ;(
       wrapper.vm as unknown as { openCommandPalette: () => void }
     ).openCommandPalette()
@@ -492,13 +493,18 @@ describe('Markdown editor command surface integration', () => {
         surfaces: { commandPalette: true },
       },
     })
-    ;(wrapper.vm as unknown as { openCommandPalette: () => void }).openCommandPalette()
+    ;(
+      wrapper.vm as unknown as { openCommandPalette: () => void }
+    ).openCommandPalette()
     await nextTick()
     const facts = Array.from(
       document.body.querySelectorAll<HTMLButtonElement>(
         '.el-markdown-editor__palette-item',
       ),
-      (button) => ({ disabled: button.disabled, label: button.textContent?.trim() }),
+      (button) => ({
+        disabled: button.disabled,
+        label: button.textContent?.trim(),
+      }),
     )
     wrapper.unmount()
     await nextTick()
@@ -527,7 +533,9 @@ describe('Markdown editor command surface integration', () => {
     expect(
       buttons.every((button) => (button.element as HTMLButtonElement).disabled),
     ).toBe(true)
-    await wrapper.find('textarea').trigger('keydown', { ctrlKey: true, key: 'b' })
+    await wrapper
+      .find('textarea')
+      .trigger('keydown', { ctrlKey: true, key: 'b' })
     await flushPromises()
     expect(wrapper.emitted('update:modelValue')).toBeUndefined()
     expect(wrapper.emitted('command')).toBeUndefined()
@@ -544,7 +552,9 @@ describe('Markdown editor command surface integration', () => {
       },
     })
     expect(wrapper.findAll('.el-markdown-editor__command')).toHaveLength(0)
-    ;(wrapper.vm as unknown as { openCommandPalette: () => void }).openCommandPalette()
+    ;(
+      wrapper.vm as unknown as { openCommandPalette: () => void }
+    ).openCommandPalette()
     await nextTick()
     expect(
       document.body.querySelector('.el-markdown-editor__palette-dialog'),

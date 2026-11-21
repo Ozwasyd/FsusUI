@@ -145,10 +145,9 @@ const handleHeavyFeatureThemeChange = () => {
 }
 const setHeavyFeatureThemeListener = (enabled: boolean) => {
   if (heavyThemeListenerInstalled === enabled) return
-  document.documentElement[enabled ? 'addEventListener' : 'removeEventListener'](
-    'fsus:theme-change',
-    handleHeavyFeatureThemeChange,
-  )
+  document.documentElement[
+    enabled ? 'addEventListener' : 'removeEventListener'
+  ]('fsus:theme-change', handleHeavyFeatureThemeChange)
   heavyThemeListenerInstalled = enabled
 }
 const emit = defineEmits<{
@@ -233,16 +232,26 @@ const getChunkUnitAttrs = (
   item: {
     index: number
     key: string
+    size: number
     unit: MarkdownRenderChunk
   },
   visibleIndex = 0,
 ) => {
+  const acceleration = resolveFsusRenderPipelineUnitAttrs({
+    baseAttrs: renderPipelineRuntime.hardwareAttrs.value,
+    layerBudget: resolvedRenderPipelineConfig.value.acceleration.layerBudget,
+    unitIndex: visibleIndex,
+  })
   return {
-    ...resolveFsusRenderPipelineUnitAttrs({
-      baseAttrs: renderPipelineRuntime.hardwareAttrs.value,
-      layerBudget: resolvedRenderPipelineConfig.value.acceleration.layerBudget,
-      unitIndex: visibleIndex,
-    }),
+    ...acceleration,
+    // Offscreen content can report its intrinsic placeholder as a measurement.
+    // Give the browser the same fallback size the virtual index currently uses.
+    style:
+      acceleration['data-fsus-content-visibility'] === 'enabled'
+        ? {
+            containIntrinsicSize: `auto var(--fsus-render-unit-intrinsic-size, ${item.size}px)`,
+          }
+        : undefined,
     'data-fsus-render-unit': '',
     'data-fsus-render-unit-key': item.key,
     'data-fsus-render-unit-index': item.index,
@@ -253,6 +262,7 @@ const getChunkUnitAttrs = (
 }
 
 let currentTaskId = 0
+let fragmentRevealController: AbortController | null = null
 let debounceTimer: ReturnType<typeof setTimeout> | null = null
 let activationController: AbortController | null = null
 let activationObserver: IntersectionObserver | null = null
@@ -1319,6 +1329,7 @@ watch(
     heavyDocumentContext?.revision(),
   ],
   () => {
+    fragmentRevealController?.abort()
     if (debounceTimer) {
       clearTimeout(debounceTimer)
     }
@@ -1330,6 +1341,7 @@ watch(
 )
 
 onBeforeUnmount(() => {
+  fragmentRevealController?.abort()
   setHeavyFeatureThemeListener(false)
   if (debounceTimer) {
     clearTimeout(debounceTimer)
@@ -1485,70 +1497,62 @@ const revealFragment = async (
   fragmentOrId: string,
   options?: MarkdownFragmentRevealOptions,
 ): Promise<MarkdownFragmentRevealResult> => {
-  const initial = locateFragment(fragmentOrId)
-  if (!initial.found) {
-    return {
-      ok: false,
-      id: initial.id,
-      fragment: initial.fragment,
-      chunkIndex: -1,
-      chunkKey: null,
-      element: null,
-    }
-  }
-
-  if (initial.mounted && initial.element) {
-    scrollElementIntoFragmentView(initial.element, options)
-    return {
-      ok: true,
-      id: initial.id,
-      fragment: initial.fragment,
-      chunkIndex: initial.chunkIndex,
-      chunkKey: initial.chunkKey,
-      element: initial.element,
-    }
+  fragmentRevealController?.abort()
+  const {
+    id,
+    fragment,
+    chunkIndex,
+    chunkKey,
+    element: target,
+  } = locateFragment(fragmentOrId)
+  const result = (element: HTMLElement | null = null) => ({
+    ok: !!element,
+    id,
+    fragment,
+    chunkIndex,
+    chunkKey,
+    element,
+  })
+  if (target) {
+    scrollElementIntoFragmentView(target, options)
+    return result(target)
   }
 
   const root = rootEl.value
-  const viewport = findScrollContainer(root)
-  if (root && viewport && initial.chunkIndex >= 0) {
-    const isDocumentViewport =
-      viewport === document.documentElement ||
-      viewport === document.body ||
-      viewport === document.scrollingElement
-    const rootOffsetInViewport = isDocumentViewport
-      ? root.getBoundingClientRect().top + window.scrollY
-      : root.getBoundingClientRect().top -
-        viewport.getBoundingClientRect().top +
-        viewport.scrollTop
-    const estimatedChunkOffset = virtualWindow.offsetForIndex(
-      initial.chunkIndex,
+  if (!root || chunkIndex < 0) return result()
+  const controller = new AbortController()
+  fragmentRevealController = controller
+  try {
+    const virtualReveal = await import('./markdown-fragment-reveal').catch(
+      () => null,
     )
-    const targetScrollTop = Math.max(
-      0,
-      rootOffsetInViewport + estimatedChunkOffset,
+    if (!virtualReveal || controller.signal.aborted) return result()
+    return result(
+      await virtualReveal.revealVirtualMarkdownFragment({
+        ...options,
+        root,
+        viewport: findScrollContainer(root),
+        frameScheduler,
+        frameKey: `${localDocumentKey}-reveal-fragment`,
+        signal: controller.signal,
+        getEstimatedOffset: () => virtualWindow.offsetForIndex(chunkIndex),
+        readViewport: virtualWindow.readViewport,
+        isTargetCurrent: () => chunkUnits.value[chunkIndex]?.key === chunkKey,
+        findTarget: () => {
+          const element = findMountedFragmentElement(id)
+          return element &&
+            resolveElementChunkLocation(element).chunkKey === chunkKey
+            ? element
+            : null
+        },
+        scrollTarget: (element) =>
+          scrollElementIntoFragmentView(element, options),
+      }),
     )
-    viewport.scrollTop = targetScrollTop
-    if (isDocumentViewport && typeof window.scrollTo === 'function') {
-      window.scrollTo({ top: targetScrollTop, behavior: 'auto' })
+  } finally {
+    if (fragmentRevealController === controller) {
+      fragmentRevealController = null
     }
-    virtualWindow.readViewport()
-    await nextTick()
-    await settleRenderViewport('markdown-render-reveal-fragment')
-  }
-
-  const resolvedElement = findMountedFragmentElement(initial.id)
-  if (resolvedElement) {
-    scrollElementIntoFragmentView(resolvedElement, options)
-  }
-
-  return {
-    ok: resolvedElement !== null,
-    id: initial.id,
-    fragment: initial.fragment,
-    chunkIndex: initial.chunkIndex,
-    chunkKey: initial.chunkKey,
-    element: resolvedElement,
   }
 }
 

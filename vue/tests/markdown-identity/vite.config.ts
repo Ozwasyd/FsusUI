@@ -3,6 +3,7 @@ import { defineConfig } from 'vite'
 import demoConfig from '../../packages/demo-app/vite.config'
 
 export default defineConfig({
+  plugins: demoConfig.plugins,
   root: fileURLToPath(new URL('.', import.meta.url)),
   resolve: {
     ...demoConfig.resolve,
@@ -14,8 +15,12 @@ export default defineConfig({
           import.meta.url,
         ),
       ),
+      '@ozwasyd/element-plus': fileURLToPath(
+        new URL('../../packages/element-plus/index.ts', import.meta.url),
+      ),
     },
   },
+  worker: demoConfig.worker,
   build: {
     outDir: fileURLToPath(
       new URL('../../../.tmp/markdown-identity', import.meta.url),
