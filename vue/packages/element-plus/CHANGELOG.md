@@ -1,5 +1,12 @@
 # element-plus
 
+## 1.6.0-preview.5
+
+### Preview Changes
+
+- Ship public-preview candidate `@ozwasyd/element-plus@1.6.0-preview.5` (`preview` dist-tag).
+- Stabilize the TimePicker spinner scroll DOM layout check to wait for initial `bindScrollEvent` and `adjustSpinners` programmatic-scroll cooldown before dispatching synthetic scroll input.
+
 ## 1.6.0-preview.4
 
 ### Preview Changes
