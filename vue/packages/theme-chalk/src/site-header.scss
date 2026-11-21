@@ -130,6 +130,12 @@
     }
   }
 
+  @media (max-height: 520px) and (orientation: landscape) {
+    @include e(inner) {
+      padding-block: var(--fsus-space-1, 4px);
+    }
+  }
+
   @media (prefers-reduced-motion: reduce) {
     @include e(brand) {
       :where(a, button) {
