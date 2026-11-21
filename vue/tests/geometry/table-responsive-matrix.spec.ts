@@ -308,3 +308,40 @@ test('auto toggles real desktop overflow through repeated container-only resize 
     '0',
   )
 })
+
+test('compact projection ignores horizontal scrollbar rebound only', async ({
+  page,
+}) => {
+  await openFixture(page, 'light', 1440)
+
+  for (const mode of ['auto', 'priority'] as const) {
+    const fixture = page.getByTestId(`table-matrix-compact-${mode}`)
+    const geometry = await fixture.evaluate((element) => {
+      const scrollbar = element.querySelector<HTMLElement>('.el-scrollbar')!
+      const wrap = element.querySelector<HTMLElement>('.el-scrollbar__wrap')!
+      const body = element.querySelector<HTMLElement>('.el-table__body')!
+
+      // Inject the state that a desktop scroll event can leave behind when
+      // its scrollLeft is clamped at the compact breakpoint.
+      scrollbar.style.setProperty('--fsus-interactive-motion-offset-x', '1px')
+      scrollbar.style.setProperty('--fsus-interactive-motion-offset-y', '2px')
+      scrollbar.style.setProperty('--fsus-interactive-motion-settle', '0ms')
+      scrollbar.classList.add('is-scrolling')
+
+      const position = new DOMMatrixReadOnly(getComputedStyle(body).transform)
+      return {
+        range: wrap.scrollWidth - wrap.clientWidth,
+        rightGap:
+          body.getBoundingClientRect().right -
+          wrap.getBoundingClientRect().right,
+        x: position.m41,
+        y: position.m42,
+      }
+    })
+
+    expect(geometry).toEqual({ range: 0, rightGap: 0, x: 0, y: 2 })
+    await expect(
+      fixture.locator('.el-table__body-wrapper'),
+    ).not.toHaveAttribute('tabindex', '0')
+  }
+})

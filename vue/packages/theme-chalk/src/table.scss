@@ -789,6 +789,12 @@
         min-inline-size: 100%;
       }
 
+      // A desktop scroll can be clamped while entering compact layout.
+      // Do not let its rebound create extra horizontal scrollable overflow.
+      .#{$namespace}-table__body {
+        --fsus-interactive-motion-offset-x: 0px;
+      }
+
       col[data-responsive-priority='secondary'],
       col[data-responsive-priority='detail'],
       th[data-responsive-priority='secondary'],
