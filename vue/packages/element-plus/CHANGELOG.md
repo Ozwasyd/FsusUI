@@ -1,5 +1,12 @@
 # element-plus
 
+## 1.6.0-preview.4
+
+### Preview Changes
+
+- Ship public-preview candidate `@ozwasyd/element-plus@1.6.0-preview.4` (`preview` dist-tag).
+- Run dark scale token and atomic theme-switch View Transition checks across Chromium, Firefox, and WebKit without Chromium-only skips so release readiness passes across all browsers.
+
 ## 1.6.0-preview.3
 
 ### Preview Changes
