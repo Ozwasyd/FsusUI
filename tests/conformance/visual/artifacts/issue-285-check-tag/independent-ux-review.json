@@ -1,12 +1,12 @@
 {
   "schema": "fsusui-independent-ux-review.v1",
   "issue": 285,
-  "candidateSha": "dc20d285f42d12f0013355cbd8b8e2179b939ec4",
+  "candidateSha": "b7b7752abd4b3695b9056046401f20879c4bcb66",
   "reviewMode": "read-only-rendered-evidence-inspection",
   "modifiedPaths": [],
   "productionFixture": true,
   "identity": {
-    "executionId": "conformance-v2-check-tag-dc20d285f42d12f0013355cbd8b8e2179b939ec4",
+    "executionId": "conformance-v2-check-tag-b7b7752abd4b3695b9056046401f20879c4bcb66",
     "checkpoint": "check-tag-after-pointer-keyboard",
     "contract": "component-v2.el-check-tag",
     "scenario": "scenario.v2.el-check-tag.real-interaction-trace",
@@ -87,34 +87,31 @@
     {
       "id": "blue-focus-ring-visible",
       "status": "accepted",
-      "observation": "The independent reviewer opened both original PNGs and saw the blue focus ring on both. The Avalonia perimeter probe matched #2A599C in 192 of 192 samples."
+      "observation": "I opened both original production PNGs and saw the blue focus ring in both. The Avalonia perimeter probe matched the blue sample on 192 of 192 pixels."
     },
     {
       "id": "no-black-default-adorner",
       "status": "accepted",
-      "observation": "The independent reviewer saw no black default adorner in either PNG; the Avalonia perimeter reported zero unexpected dark samples."
+      "observation": "Neither inspected PNG shows a black default focus adorner. The native perimeter probe recorded zero unexpected dark pixels."
     },
     {
       "id": "unchecked-label-state-match",
       "status": "accepted",
-      "observation": "Both original PNGs and raw executions identify Check tag as unchecked after pointer then keyboard at revision 2. CDP and the real Avalonia AutomationPeer report the checkbox, with tab order 3; browser AT-SPI was reachable."
+      "observation": "Both inspected captures show the Check tag label in the unchecked appearance. The archived real checkpoint is focused and unchecked following pointer and keyboard interaction."
     },
     {
       "id": "focus-no-bounds-shift",
       "status": "accepted",
-      "observation": "Before focus, after focus, and after toggle use identical bounds in each original trace: Web (0,136,87.625,24 CSS px), Avalonia (24,136,96,24 DIP), with focus false, true, true."
+      "observation": "The recorded before-focus, after-focus and after-toggle geometry is identical per platform: Web 0,136,87.625,24 CSS px; Avalonia 24,136,96,24 DIP. This does not establish intermediate-frame geometry."
     }
   ],
   "observations": [
-    "Independent read-only inspection of official run 44859716969, job 136710065851, artifact 14689333279 (296019 bytes; SHA-256 5ff1e97a221a714f16c5ebb6c2287b5b9b5557f7e5f6a2b4beda61bb6e5dd3af). Both original PNGs were opened. Evidence checkout dc20d285f42d12f0013355cbd8b8e2179b939ec4 has tree 0b57d84809b4d6acbc443483387736460383e4c4 and its own genuine GitHub merge parents dc8569ec520bb1cd91ff4cd7b2f01aac8c5ee33f and 46fd77cdcaabf2e713a1cf7866512f379c5538ba; the latter has the same tree.",
-    "Web screenshot is the 88×24 CheckTag element crop from a 1280×1100 backing viewport; Avalonia screenshot is the 960×720 full native window. Tracked PNG bytes match the archived images exactly.",
-    "Both exact executions pass nine functional steps; tenth is diagnostic-only. Bounded detached control collection was true on both.",
-    "Chrome 147.0.7727.15 and Orca PID 7047 reported passing web Linux AT-SPI receipt.",
-    "web-a11y/manifest.json SHA-256 b7ddaf94f55d79a0c40ac5ce4d9f5c10fb546a0d93efd8382ef1ad50587131fa",
-    "avalonia.json SHA-256 75d20f8534ca0feb06fd7d289856d7e6192baf169d467dc551fb453877ddbdae",
-    "accessibility/avalonia-generated-verification.json SHA-256 781dee48fdb33393f01eb8542e6c15985e4a66d59ae24da264ab8a161952aa9f",
-    "web-a11y/atspi.json SHA-256 3af8ce900bbd9ebc2768bd1ec23533772c7a34451d53971743bd61ca8a9ad533",
-    "web-a11y/receipt.txt SHA-256 83240e2e7dbd22b3d5a6e40cf2bd75510dc87c276b36129b300c51a802f7ee72"
+    "Read-only inspection opened both original rendered PNGs of official run 44870174716, job 136744088996, artifact 14693853511. ZIP SHA-256 3ff161d84738f707a6493686de65a3613a04efc9f61043686532d12eb349dba6.",
+    "Official capture used genuine GitHub checkout b7b7752abd4b3695b9056046401f20879c4bcb66 with parents 9e206a7edd1bb83982b7f1fb104dc0f812af5245 and d18629aaedbc46e6b764974517965bc92950ffe0; candidate and fork head have identical tree 258a47b6a44395546ba6c025d87d72fe489d3a15.",
+    "Web artifact is an 88×24 CheckTag element crop; Avalonia artifact is a 960×720 full window. Both tracked PNG bytes are equal to these inspected original PNGs.",
+    "Nine functional observations pass in both executions; timing is diagnostic only.",
+    "web-a11y/manifest.json SHA-256 0dbb14a1d8989902e48d040699db7ddd259ed70ee199207d3e374eb874314059",
+    "avalonia.json SHA-256 1c91dce0884f3c7e089c79d537a0588ec0b767f3bff566e1fd116c3f035c77cc"
   ],
   "limitations": [
     "Only the light/default/zh-CN/ltr/reduced-motion CheckTag checkpoint was independently accepted, not full CI, AOT, package, cross-platform rendering equivalence or performance.",
