@@ -378,7 +378,7 @@
     gap: 0;
     padding: 6px;
     border: 1px solid var(--#{$namespace}-border-color-lighter);
-    border-radius: var(--#{$namespace}-border-radius-small);
+    border-radius: var(--fsus-radius-popover, 10px);
     background: var(--#{$namespace}-bg-color);
     box-sizing: border-box;
   }
@@ -439,6 +439,11 @@
       border-color var(--#{$namespace}-transition-duration-fast),
       background-color var(--#{$namespace}-transition-duration-fast),
       color var(--#{$namespace}-transition-duration-fast);
+
+    :where(.#{$namespace}-public-shell__mobile-nav-menu-panel) & {
+      border-color: transparent;
+      font-size: 14px;
+    }
 
     &:hover,
     &:focus-visible {
