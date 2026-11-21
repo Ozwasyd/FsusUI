@@ -11,10 +11,7 @@ const out = path.resolve(
   root,
   process.argv[2] ?? '.tmp/conformance-v2/isolated-mutations.json',
 )
-const checkoutRoot = path.join(
-  root,
-  '.tmp/conformance-v2/isolated-worktrees',
-)
+const checkoutRoot = path.join(root, '.tmp/conformance-v2/isolated-worktrees')
 fs.mkdirSync(checkoutRoot, { recursive: true })
 const checkout = fs.mkdtempSync(path.join(checkoutRoot, 'checkout-'))
 const sha256 = (value) =>
@@ -252,7 +249,8 @@ const cases = [
         "const stableScenarios = JSON.parse(readFileSync(path.join(root, 'spec/ci/avalonia-stable-readiness.json'), 'utf8')).releaseScopeFamilies",
       ),
     command: ['pnpm', ['run', 'check:avalonia-aot-smoke']],
-    expected: 'the AOT runner must derive scenarios from the identity-bound alignment',
+    expected:
+      'the AOT runner must derive scenarios from the identity-bound alignment',
   },
   {
     id: 'aot-production-authority-bypass-mutated',
@@ -303,7 +301,7 @@ const cases = [
     inject: () =>
       mutateText(
         '.github/workflows/_quality.yml',
-        '          xvfb-run -a pnpm run conformance:v2\n',
+        '          xvfb-run -a dbus-run-session -- pnpm run conformance:v2\n',
         '',
       ),
     command: [process.execPath, ['scripts/check-dotnet-matrix-policy.mjs']],
@@ -316,7 +314,7 @@ const cases = [
     inject: () =>
       mutateText(
         '.github/workflows/quality.yml',
-        '          xvfb-run -a pnpm run conformance:v2\n',
+        '          xvfb-run -a dbus-run-session -- pnpm run conformance:v2\n',
         '',
       ),
     command: [process.execPath, ['scripts/check-dotnet-matrix-policy.mjs']],
@@ -345,7 +343,8 @@ const cases = [
         'Dirty Avalonia package candidate.',
       ),
     command: [process.execPath, ['scripts/check-avalonia-nuget-stable.mjs']],
-    expected: 'Avalonia package inputs must match the exact committed candidate',
+    expected:
+      'Avalonia package inputs must match the exact committed candidate',
   },
   {
     id: 'nuget-alignment-artifact-integrity-mutated',
@@ -377,15 +376,12 @@ const cases = [
     id: 'consumer-binding-unknown-contract-mutated',
     file: 'spec/components/contracts/v2/contract-v2.json',
     inject: () =>
-      mutateJson(
-        'spec/components/contracts/v2/contract-v2.json',
-        (value) => {
-          value.consumerBindings.byContract['component-v2.el-unknown'] = {
-            releaseFamily: 'selection',
-            galleryRoute: 'selection',
-          }
-        },
-      ),
+      mutateJson('spec/components/contracts/v2/contract-v2.json', (value) => {
+        value.consumerBindings.byContract['component-v2.el-unknown'] = {
+          releaseFamily: 'selection',
+          galleryRoute: 'selection',
+        }
+      }),
     command: ['pnpm', ['run', 'contract-v2:check']],
     expected: 'contract-v2.json drifted from generated output',
   },
@@ -404,8 +400,7 @@ const cases = [
     ],
   ].map(([id, from, to, expected]) => ({
     id,
-    file:
-      'dotnet/FsusUI.Avalonia.Demo/Gallery/FsusAvaloniaGalleryRegistry.cs',
+    file: 'dotnet/FsusUI.Avalonia.Demo/Gallery/FsusAvaloniaGalleryRegistry.cs',
     inject: () =>
       mutateText(
         'dotnet/FsusUI.Avalonia.Demo/Gallery/FsusAvaloniaGalleryRegistry.cs',
@@ -1067,23 +1062,21 @@ const cases = [
       'visual rendered focused artifact missing',
     ],
     [
-      'check-tag-evidence-performance-mutated',
-      (execution) =>
-        (execution.performance.interactionMilliseconds =
-          execution.performance.budget.interactionMs + 1),
-      'performance budget failed',
+      'check-tag-evidence-timing-diagnostic-mutated',
+      (execution) => (execution.performance.interactionMilliseconds = -1),
+      'CheckTag timing diagnostics: interactionMilliseconds must be finite and nonnegative',
     ],
     [
       'check-tag-evidence-memory-mutated',
       (execution) =>
         (execution.performance.memoryObservation.retainedPerItemStateCount = 1),
-      'performance budget failed',
+      'lifetime evidence failed',
     ],
     [
       'check-tag-evidence-retention-mutated',
       (execution) =>
         (execution.performance.memoryObservation.detachedControlCollected = false),
-      'performance budget failed',
+      'lifetime evidence failed',
     ],
     [
       'check-tag-evidence-checkpoint-mutated',
@@ -1250,23 +1243,14 @@ try {
     },
   )
   if (clone.status !== 0) throw new Error(clone.stderr || clone.stdout)
-  fs.symlinkSync(
-    path.join(root, 'node_modules'),
-    path.join(checkout, 'node_modules'),
-  )
-  const workspaceNodeModules = fs
-    .readdirSync(path.join(root, 'vue/packages'), { withFileTypes: true })
-    .filter((entry) => entry.isDirectory())
-    .map((entry) => path.join('vue/packages', entry.name, 'node_modules'))
-  if (fs.existsSync(path.join(root, 'vue/node_modules'))) {
-    workspaceNodeModules.unshift(path.join('vue', 'node_modules'))
-  }
-  for (const relative of workspaceNodeModules) {
-    const source = path.join(root, relative)
-    if (!fs.existsSync(source)) continue
-    const target = path.join(checkout, relative)
-    fs.mkdirSync(path.dirname(target), { recursive: true })
-    fs.symlinkSync(source, target)
+  // Reuse the package store, not the source checkout's workspace links.
+  // With the hoisted linker those links resolve back to the source tree,
+  // bypassing the clone's generated artifacts and potentially its mutations.
+  const installed = run('pnpm', ['install', '--offline', '--frozen-lockfile'])
+  if (installed.status !== 0) {
+    throw new Error(
+      `clone dependency installation failed: ${installed.stderr || installed.stdout || installed.error}`,
+    )
   }
   const prepared = spawnSync('pnpm', ['run', 'prepare:test-artifacts'], {
     cwd: checkout,

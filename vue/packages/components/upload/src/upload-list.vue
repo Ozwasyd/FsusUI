@@ -54,8 +54,8 @@
           />
         </div>
 
-        <!-- Ordinary text list: always-visible status + row-end actions (#456) -->
-        <template v-if="listType === 'text'">
+        <!-- File rows share named status and reachable row-end actions. -->
+        <template v-if="listType === 'text' || listType === 'picture'">
           <div
             :class="nsUpload.be('list', 'item-status-label')"
             role="status"
@@ -101,7 +101,7 @@
           </div>
         </template>
 
-        <!-- picture / picture-card: preserve existing structure (out of #456 scope) -->
+        <!-- Picture-card retains its own thumbnail and action-bar structure. -->
         <template v-else>
           <label :class="nsUpload.be('list', 'item-status-label')">
             <el-icon :class="[nsIcon.m('upload-success'), nsIcon.m('check')]">

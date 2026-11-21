@@ -1,3 +1,5 @@
+import { execFileSync } from 'node:child_process'
+import { validateGovernanceStages } from './governance-stage-policy.mjs'
 import { readFileSync } from 'node:fs'
 
 const packageJson = JSON.parse(readFileSync('package.json', 'utf8'))
@@ -86,5 +88,18 @@ for (const fragment of [
 ]) {
   assert(docs.includes(fragment), `docs must describe ${fragment}`)
 }
+
+validateGovernanceStages({
+  scripts,
+  reusable: reusableQualityWorkflow,
+  quality: readFileSync('.github/workflows/quality.yml', 'utf8'),
+  capacity: readFileSync('scripts/run-capacity-suite.mjs', 'utf8'),
+})
+
+execFileSync(
+  process.execPath,
+  ['--test', 'tests/governance-stage-policy.test.mjs'],
+  { stdio: 'inherit' },
+)
 
 console.log('[short-quality] ok')

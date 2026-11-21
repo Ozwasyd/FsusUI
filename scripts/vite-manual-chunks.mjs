@@ -166,6 +166,11 @@ const isMarkdownHeavyFeatureIdentity = (id) =>
     id,
   )
 
+const isMarkdownHeavyRuntimeLoaders = (id) =>
+  /\/(?:vue\/packages\/wasm|node_modules\/@element-plus\/wasm|node_modules\/@ozwasyd\/element-plus\/es\/wasm)\/markdown-heavy-runtime-loaders\.(?:[cm]?[jt]sx?)$/u.test(
+    id,
+  )
+
 const markdownHeavyFeatureIdentityDependencies =
   '(?:markdown-editor-projection|markdown-syntax-identity|markdown-source-coordinate-map|markdown-syntax-collect|markdown-directive-syntax|markdown-anchor-grammar|markdown-caption-directive|markdown-embed-directive)'
 
@@ -181,6 +186,10 @@ export const resolveFsusViteManualChunk = (
 ) => {
   const id = normalizeModuleId(moduleId)
   const consumerProfile = profile === 'consumer'
+
+  if (isMarkdownHeavyRuntimeLoaders(id)) {
+    return 'fsus-markdown-heavy-loaders'
+  }
 
   if (isMarkdownFeatureOutputGateway(id)) {
     return 'fsus-markdown-feature-gateway'

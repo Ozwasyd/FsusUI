@@ -31,7 +31,6 @@ domain. Do not recreate the retired `docs/release/` path or repository-root
 ## Readiness contracts
 
 - [Avalonia stable readiness](./readiness/avalonia-stable.md)
-- [Avalonia performance budgets](./readiness/avalonia-performance-budgets.md)
 - [Active platform overrides](./readiness/platform-overrides.md)
 
 ## Evidence records

@@ -8,13 +8,16 @@
       "@element-plus/icons-vue": ["../../packages/icons-vue/src/index.ts"],
       "@element-plus/icons-vue/*": ["../../packages/icons-vue/src/*"],
       "@element-plus/*": ["../../packages/*"]
-    }
+    },
+    "types": ["node"]
   },
   "include": [
     "main.ts",
     "App.vue",
     "env.d.ts",
     "../../typings/env.d.ts",
-    "../../typings/vite-worker.d.ts"
+    "../../typings/vite-worker.d.ts",
+    "FocusCacheDrawer.vue",
+    "focusable-cache.spec.ts"
   ]
 }

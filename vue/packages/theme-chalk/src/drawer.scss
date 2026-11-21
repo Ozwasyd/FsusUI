@@ -33,7 +33,7 @@ $drawer-inline-pad: getCssVar('drawer-padding-primary');
     margin-bottom: 0;
     padding: $drawer-block-pad $drawer-inline-pad;
     // Stable reserve for absolute 54x54 close (LTR + RTL panels) (#299).
-    padding-inline-end: calc(#{$drawer-inline-pad} + 54px);
+    padding-inline-end: calc(#{$drawer-inline-pad} + 54px + var(--fsus-space-2, 8px));
     position: relative;
 
     & > :first-child {
@@ -46,6 +46,7 @@ $drawer-inline-pad: getCssVar('drawer-padding-primary');
     margin: 0;
     flex: 1;
     min-width: 0;
+    overflow-wrap: anywhere;
     line-height: 1.2;
     font-size: 1.5rem;
     font-weight: 700;
@@ -114,6 +115,10 @@ $drawer-inline-pad: getCssVar('drawer-padding-primary');
   &.btt {
     left: 0;
     right: 0;
+
+    .#{$namespace}-drawer__close-btn {
+      @include fsus-inset-safe-area(right, $drawer-inline-pad);
+    }
   }
 
   &.ltr {
@@ -151,7 +156,11 @@ $drawer-inline-pad: getCssVar('drawer-padding-primary');
 
     .#{$namespace}-drawer__header {
       @include fsus-padding-safe-area(top, $drawer-block-pad);
-      @include fsus-padding-safe-area(right, $drawer-inline-pad);
+      // Preserve 54px close button clearance alongside safe-area right inset (#299).
+      padding-right: max(
+        calc(#{$drawer-inline-pad} + 54px + var(--fsus-space-2, 8px)),
+        calc(#{fsus-safe-area-inset(right)} + 54px + var(--fsus-space-2, 8px))
+      );
     }
 
     // Close sits on the screen-right edge for rtl panels.
@@ -187,7 +196,10 @@ $drawer-inline-pad: getCssVar('drawer-padding-primary');
     .#{$namespace}-drawer__header {
       @include fsus-padding-safe-area(top, $drawer-block-pad);
       @include fsus-padding-safe-area(left, $drawer-inline-pad);
-      @include fsus-padding-safe-area(right, $drawer-inline-pad);
+      padding-right: max(
+        calc(#{$drawer-inline-pad} + 54px + var(--fsus-space-2, 8px)),
+        calc(#{fsus-safe-area-inset(right)} + 54px + var(--fsus-space-2, 8px))
+      );
     }
 
     .#{$namespace}-drawer__body {
@@ -212,7 +224,10 @@ $drawer-inline-pad: getCssVar('drawer-padding-primary');
 
     .#{$namespace}-drawer__header {
       @include fsus-padding-safe-area(left, $drawer-inline-pad);
-      @include fsus-padding-safe-area(right, $drawer-inline-pad);
+      padding-right: max(
+        calc(#{$drawer-inline-pad} + 54px + var(--fsus-space-2, 8px)),
+        calc(#{fsus-safe-area-inset(right)} + 54px + var(--fsus-space-2, 8px))
+      );
     }
 
     .#{$namespace}-drawer__body {

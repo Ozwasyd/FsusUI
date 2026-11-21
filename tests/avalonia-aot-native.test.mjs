@@ -243,6 +243,29 @@ test('workflow policy kills repack, allow-failure and missing required Linux wir
     ),
   }
   assert.equal(validateWorkflowContracts(files), true)
+
+  assert.throws(
+    () =>
+      validateWorkflowContracts({
+        ...files,
+        leaf: files.leaf.replace(
+          'name: avalonia-aot-leaf-${{ inputs.group }}-${{ inputs.rid }}',
+          'name: avalonia-aot-leaf-${{ inputs.rid }}',
+        ),
+      }),
+    /AOT leaf workflow missing/u,
+  )
+  assert.throws(
+    () =>
+      validateWorkflowContracts({
+        ...files,
+        quality: files.quality.replace(
+          'name: avalonia-aot-leaf-${{ inputs.group }}-linux-x64',
+          'name: avalonia-aot-leaf-linux-x64',
+        ),
+      }),
+    /quality workflow missing/u,
+  )
   assert.throws(
     () =>
       validateWorkflowContracts({
@@ -256,7 +279,7 @@ test('workflow policy kills repack, allow-failure and missing required Linux wir
       validateWorkflowContracts({
         ...files,
         leaf: files.leaf.replace(
-          'node scripts/test-avalonia-aot-smoke.mjs',
+          'node ../scripts/test-avalonia-aot-smoke.mjs',
           'dotnet pack',
         ),
       }),

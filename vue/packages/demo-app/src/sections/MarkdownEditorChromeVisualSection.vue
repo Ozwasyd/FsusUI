@@ -29,10 +29,9 @@
           #status="{ metrics, state: slotState, capability }"
         >
           <span data-testid="chrome-visual-status-slot">
-            {{ metrics.graphemeCount }} 字 · {{ metrics.wordCount }} 词 · {{ slotState
-            }}{{
-              capability.length ? ` · ${capability.join(' / ')}` : ''
-            }}{{ slotState }}
+            {{ metrics.graphemeCount }} 字 · {{ metrics.wordCount }} 词 ·
+            已同步到草稿箱 · {{ slotState
+            }}{{ capability.length ? ` · ${capability.join(' / ')}` : '' }}
           </span>
         </template>
       </el-markdown-editor>

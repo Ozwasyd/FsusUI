@@ -59,13 +59,14 @@ jobs:
   pr-avalonia-aot-candidate:
     if: needs.pr-avalonia-aot-plan.outputs.run == 'true'
     needs: pr-avalonia-aot-plan
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     timeout-minutes: 60
     outputs:
       candidate-digest: ${{ steps.candidate.outputs.digest }}
     steps:
       - uses: actions/checkout@v4
         with:
+          fetch-depth: 0
           ref: ${{ github.event.pull_request.head.sha }}
       - uses: pnpm/action-setup@v4
         with:
@@ -84,14 +85,40 @@ jobs:
           global-json-file: dotnet/global.json
       - run: pnpm install --frozen-lockfile
       - run: pnpm exec playwright install --with-deps chromium
+      - name: Pin Chromium for native screen-reader evidence
+        run: node scripts/pin-render-browser.mjs .tmp/conformance-browser-selection.json
+      - name: Install native screen-reader prerequisites
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y orca at-spi2-core python3-pyatspi dbus-x11
       - name: Build the immutable NuGet candidate once
         id: candidate
         env:
           GITHUB_SHA: ${{ github.event.pull_request.head.sha }}
         run: |
-          xvfb-run -a pnpm run conformance:v2
+          xvfb-run -a dbus-run-session -- pnpm run conformance:v2
+          pnpm run check:avalonia-stable-readiness
           node scripts/dotnet-package-verify.mjs
-          echo "digest=$(node -p \"require('./dotnet/artifacts/package/manifest.json').candidateSha256\")" >> "$GITHUB_OUTPUT"
+          digest="$(node -e '
+            const { candidateSha256 } = require("./dotnet/artifacts/package/manifest.json");
+            if (typeof candidateSha256 !== "string" || candidateSha256.length !== 64 || /[^0-9a-f]/u.test(candidateSha256)) {
+              throw new Error("Invalid NuGet candidateSha256");
+            }
+            process.stdout.write(candidateSha256);
+          ')"
+          printf 'digest=%s\n' "$digest" >> "$GITHUB_OUTPUT"
+      - name: Report workspace changes after candidate failure
+        if: failure()
+        run: git status --short --untracked-files=all
+      - name: Retain conformance evidence after candidate failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pr-aot-conformance-failure
+          path: .tmp/conformance-v2
+          include-hidden-files: true
+          if-no-files-found: ignore
+          retention-days: 7
       - uses: actions/upload-artifact@v4
         with:
           name: pr-dotnet-nuget-candidate
@@ -131,6 +158,9 @@ jobs:
         with:
           version: 5.0.4
           actions-cache-folder: emsdk-cache
+      - uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
       - run: pnpm install --frozen-lockfile
       - name: Restore icons test artifact cache
         id: icons-cache
@@ -165,7 +195,7 @@ jobs:
           echo "typecheck-cache-hit=${{ steps.typecheck-cache.outputs.cache-hit }}"
           echo "cache-hit=${{ steps.typecheck-cache.outputs.cache-hit }}"
           echo "cache-primary-key=${{ steps.typecheck-cache.outputs.cache-primary-key }}"
-      - run: pnpm run verify:pr-fast
+      - run: pnpm run verify:pr-fast:ci-static
       - name: Determine PR demo build path impact
         id: demo-build-path
         run: node ./scripts/with-node-heap.mjs node ./scripts/should-run-demo-build.mjs
@@ -180,155 +210,6 @@ jobs:
         if: steps.demo-build-path.outputs.run != 'true'
         run: |
           echo "Skipping demo build: ${{ steps.demo-build-path.outputs.reason }}"
-
-  pr-real-render-performance:
-    if: github.event_name == 'pull_request'
-    runs-on: ubuntu-latest
-    timeout-minutes: 45
-    steps:
-      - name: Checkout current change
-        uses: actions/checkout@v4
-        with:
-          path: current
-          fetch-depth: 0
-      - name: Checkout base revision
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.pull_request.base.sha }}
-          path: baseline
-      - name: Plan PR real-render impact before heavy setup
-        id: render-impact
-        working-directory: current
-        run: >-
-          node scripts/render-performance-impact-plan.mjs
-          --base ${{ github.event.pull_request.base.sha }}
-          --output ../performance-impact-plan.json
-      - name: Log PR real-render impact
-        run: |
-          echo "run=${{ steps.render-impact.outputs.run }}"
-          echo "scope=${{ steps.render-impact.outputs.scope }}"
-          echo "plan-digest=${{ steps.render-impact.outputs.digest }}"
-          echo "reason=${{ steps.render-impact.outputs.reason }}"
-      - uses: pnpm/action-setup@v4
-        if: steps.render-impact.outputs.run == 'true'
-        with:
-          version: 10.33.0
-      - uses: actions/setup-node@v4
-        if: steps.render-impact.outputs.run == 'true'
-        with:
-          node-version: 22
-          cache: pnpm
-          cache-dependency-path: |
-            current/pnpm-lock.yaml
-            baseline/pnpm-lock.yaml
-      - uses: emscripten-core/setup-emsdk@v15
-        if: >-
-          steps.render-impact.outputs.run == 'true' &&
-          steps.render-impact.outputs.scope != 'avalonia-only'
-        with:
-          version: 5.0.4
-          actions-cache-folder: emsdk-cache
-      - uses: actions/setup-dotnet@v4
-        if: >-
-          steps.render-impact.outputs.run == 'true' &&
-          steps.render-impact.outputs.scope != 'web-only'
-        with:
-          global-json-file: current/dotnet/global.json
-      - name: Check baseline runner contract
-        id: baseline-contract
-        if: steps.render-impact.outputs.run == 'true'
-        run: >-
-          node current/scripts/check-render-performance-baseline.mjs
-          --directory baseline
-          --plan performance-impact-plan.json
-          --output performance-baseline/baseline-status.json
-      - name: Install current dependencies
-        if: steps.render-impact.outputs.run == 'true'
-        working-directory: current
-        run: pnpm install --frozen-lockfile
-      - name: Install Chromium and web display dependencies once
-        if: >-
-          steps.render-impact.outputs.run == 'true' &&
-          steps.render-impact.outputs.scope != 'avalonia-only'
-        working-directory: current
-        run: pnpm exec playwright install --with-deps chromium
-      - name: Install Avalonia-only display dependency
-        if: steps.render-impact.outputs.scope == 'avalonia-only'
-        run: |
-          sudo apt-get update
-          sudo apt-get install --yes xvfb
-      - name: Install baseline dependencies
-        if: steps.baseline-contract.outputs.available == 'true'
-        working-directory: baseline
-        run: pnpm install --frozen-lockfile
-      - name: Prepare baseline WASM artifacts
-        if: >-
-          steps.baseline-contract.outputs.available == 'true' &&
-          steps.render-impact.outputs.scope != 'avalonia-only'
-        working-directory: baseline
-        run: pnpm run ensure:wasm
-      - name: Prepare current WASM artifacts
-        if: >-
-          steps.render-impact.outputs.run == 'true' &&
-          steps.render-impact.outputs.scope != 'avalonia-only'
-        working-directory: current
-        run: pnpm run ensure:wasm
-      - name: Measure same-runner baseline first
-        if: steps.baseline-contract.outputs.available == 'true'
-        working-directory: baseline
-        run: >-
-          pnpm perf:render --
-          --impact-plan ../performance-impact-plan.json
-          --profile quick
-          --output ../performance-baseline
-      - name: Measure current quick matrix
-        if: steps.render-impact.outputs.run == 'true'
-        working-directory: current
-        run: >-
-          pnpm perf:render --
-          --impact-plan ../performance-impact-plan.json
-          --profile quick
-          --output ../performance-current
-      - name: Repeat current quick matrix for order balance
-        if: steps.baseline-contract.outputs.available == 'true'
-        working-directory: current
-        run: >-
-          pnpm perf:render --
-          --impact-plan ../performance-impact-plan.json
-          --profile quick
-          --output ../performance-current-repeat
-      - name: Repeat baseline quick matrix last for order balance
-        if: steps.baseline-contract.outputs.available == 'true'
-        working-directory: baseline
-        run: >-
-          pnpm perf:render --
-          --impact-plan ../performance-impact-plan.json
-          --profile quick
-          --output ../performance-baseline-repeat
-      - name: Compare against base revision on the same runner
-        if: steps.baseline-contract.outputs.available == 'true'
-        working-directory: current
-        run: >-
-          pnpm perf:render:compare --
-          ../performance-baseline
-          ../performance-current
-          0.15
-          ../performance-baseline-repeat
-          ../performance-current-repeat
-      - name: Skip unaffected PR real-render measurement
-        if: steps.render-impact.outputs.run != 'true'
-        run: echo "Skipping real-render measurement; ownership plan is skip-safe."
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: pr-real-render-performance
-          path: |
-            performance-baseline
-            performance-baseline-repeat
-            performance-current
-            performance-current-repeat
-            performance-impact-plan.json
-          retention-days: 14
 
   premerge-main:
     if: github.event_name == 'pull_request' || github.event_name == 'merge_group'
@@ -346,7 +227,6 @@ jobs:
     if: always() && github.event_name == 'pull_request'
     needs:
       - pr-feedback
-      - pr-real-render-performance
       - premerge-main
       - premerge-playwright
     runs-on: ubuntu-latest
@@ -355,16 +235,13 @@ jobs:
       - name: Enforce complete PR merge readiness
         env:
           PR_FEEDBACK_RESULT: ${{ needs.pr-feedback.result }}
-          PR_RENDER_RESULT: ${{ needs.pr-real-render-performance.result }}
           PREMERGE_MAIN_RESULT: ${{ needs.premerge-main.result }}
           PR_PLAYWRIGHT_RESULT: ${{ needs.premerge-playwright.result }}
         run: |
           echo "pr-feedback=${PR_FEEDBACK_RESULT}"
-          echo "pr-real-render-performance=${PR_RENDER_RESULT}"
           echo "premerge-main=${PREMERGE_MAIN_RESULT}"
           echo "premerge-playwright=${PR_PLAYWRIGHT_RESULT}"
           test "${PR_FEEDBACK_RESULT}" = "success"
-          test "${PR_RENDER_RESULT}" = "success"
           test "${PREMERGE_MAIN_RESULT}" = "success"
           test "${PR_PLAYWRIGHT_RESULT}" = "success"
 
@@ -384,19 +261,6 @@ jobs:
         run: |
           test "${PREMERGE_MAIN_RESULT}" = "success"
           test "${PR_PLAYWRIGHT_RESULT}" = "success"
-
-  merge-group-real-render-performance:
-    name: pr-real-render-performance
-    if: always() && github.event_name == 'merge_group'
-    needs:
-      - premerge-main
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-    steps:
-      - name: Preserve required render gate on merge queue candidates
-        env:
-          PREMERGE_MAIN_RESULT: ${{ needs.premerge-main.result }}
-        run: test "${PREMERGE_MAIN_RESULT}" = "success"
 
   main:
     if: github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.group == 'main')

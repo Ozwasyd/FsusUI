@@ -22,7 +22,7 @@ public class FsusCheckTagHeadlessTests
     });
     window.Show();
     window.UpdateLayout();
-    var before = checkTag.Bounds.Size;
+    var before = checkTag.Bounds;
 
     Assert.True(checkTag.Focus(NavigationMethod.Tab));
     Dispatcher.UIThread.RunJobs();
@@ -35,7 +35,17 @@ public class FsusCheckTagHeadlessTests
     Assert.True(window.TryFindResource("FsusThemeFocusBrush", out var focusBrush));
     Assert.Equal(focusBrush, focusRing.BorderBrush);
     Assert.Null(checkTag.FocusAdorner);
-    Assert.Equal(before, checkTag.Bounds.Size);
+    Assert.Equal(before, checkTag.Bounds);
+    checkTag.RaiseEvent(new KeyEventArgs
+    {
+      RoutedEvent = InputElement.KeyDownEvent,
+      Key = Key.Space,
+      Source = checkTag,
+    });
+    Dispatcher.UIThread.RunJobs();
+    window.UpdateLayout();
+    Assert.True(checkTag.Checked);
+    Assert.Equal(before, checkTag.Bounds);
     window.Close();
   }
 }

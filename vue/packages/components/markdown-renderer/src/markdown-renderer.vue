@@ -98,6 +98,9 @@ import { isFsusErr, toFsusError } from '@element-plus/utils'
 import {
   markdownRendererProps,
   resolveMarkdownWorkerScriptUrl,
+  type MarkdownFragmentLocateResult,
+  type MarkdownFragmentRevealOptions,
+  type MarkdownFragmentRevealResult,
 } from './markdown-renderer'
 import type { FsusRenderPipelineAdapter } from '@element-plus/hooks'
 import type {
@@ -112,6 +115,7 @@ import type {
   MarkdownFeatureActivationResult,
   MarkdownFeatureThemeTokens,
   MarkdownRuntimeChunkResult,
+  MarkdownRuntimeRenderResult,
   MarkdownRuntimeProfile,
   MarkdownSafeHtml,
   MarkdownSafeRenderAuthority,
@@ -136,23 +140,16 @@ const heavyLifecycle = createMarkdownHeavyFeatureLifecycle({
 const heavyThemeRevision = ref(0)
 let heavyThemeListenerInstalled = false
 const handleHeavyFeatureThemeChange = () => {
+  activationController?.abort()
   heavyThemeRevision.value += 1
 }
-const ensureHeavyFeatureThemeListener = () => {
-  if (heavyThemeListenerInstalled) return
-  document.documentElement.addEventListener(
+const setHeavyFeatureThemeListener = (enabled: boolean) => {
+  if (heavyThemeListenerInstalled === enabled) return
+  document.documentElement[enabled ? 'addEventListener' : 'removeEventListener'](
     'fsus:theme-change',
     handleHeavyFeatureThemeChange,
   )
-  heavyThemeListenerInstalled = true
-}
-const removeHeavyFeatureThemeListener = () => {
-  if (!heavyThemeListenerInstalled) return
-  document.documentElement.removeEventListener(
-    'fsus:theme-change',
-    handleHeavyFeatureThemeChange,
-  )
-  heavyThemeListenerInstalled = false
+  heavyThemeListenerInstalled = enabled
 }
 const emit = defineEmits<{
   (event: 'render-complete', result: MarkdownSafeRenderResult): void
@@ -359,14 +356,15 @@ const scheduleHeavyFeatureCommit = (input: {
   readonly signal: AbortSignal
 }) =>
   new Promise<HTMLElement | void>((resolve, reject) => {
+    const signal = input.signal
     let committed: HTMLElement | void
     let mutatePhaseRan = false
     const abort = () => reject(new DOMException('Aborted', 'AbortError'))
-    input.signal.addEventListener('abort', abort, { once: true })
+    signal.addEventListener('abort', abort, { once: true })
     const accepted = frameScheduler.schedule({
       key: input.key,
       mutate: () => {
-        if (!input.signal.aborted) {
+        if (!signal.aborted) {
           committed = input.run()
           mutatePhaseRan = true
           heavyFeatureMutateCommits += 1
@@ -374,14 +372,14 @@ const scheduleHeavyFeatureCommit = (input: {
       },
       postPaint: () => {
         if (mutatePhaseRan) heavyFeaturePostPaintCommits += 1
-        input.signal.removeEventListener('abort', abort)
-        if (input.signal.aborted) abort()
+        signal.removeEventListener('abort', abort)
+        if (signal.aborted) abort()
         else resolve(committed)
         recordHeavyLifecycleMetrics()
       },
     })
     if (!accepted) {
-      input.signal.removeEventListener('abort', abort)
+      signal.removeEventListener('abort', abort)
       reject(new DOMException('Frame scheduler unavailable', 'AbortError'))
     }
   })
@@ -890,9 +888,9 @@ const hasEnabledHeavyFeature = (
   (features.mermaid && result.features.includes('mermaid'))
 
 const resetFeatureActivation = () => {
-  removeHeavyFeatureThemeListener()
   activationController?.abort()
-  activationController = new AbortController()
+  const controller = new AbortController()
+  activationController = controller
   activationObserver?.disconnect()
   activationObserver = null
   activeChunkResult = null
@@ -906,6 +904,7 @@ const resetFeatureActivation = () => {
   heavyLifecycleProjectionNodeIds = {}
   if (rootEl.value) heavyLifecycle.unmountRoot(rootEl.value)
   recordHeavyLifecycleMetrics()
+  return controller.signal
 }
 
 const createHeavyFeatureIdentityResolver = async (
@@ -1044,6 +1043,8 @@ const activateRenderedFeatures = async (
   const activationStartedAt = readPerformanceNow()
   const features = resolveMarkdownFeatureOptions()
   const heavyFeaturesEnabled = hasEnabledHeavyFeature(result, features)
+  // Theme changes must invalidate pending imports and activation too.
+  setHeavyFeatureThemeListener(heavyFeaturesEnabled)
   const resolveHeavyFeatureIdentity = heavyFeaturesEnabled
     ? await createHeavyFeatureIdentityResolver(result)
     : () => null
@@ -1083,15 +1084,6 @@ const activateRenderedFeatures = async (
   )
   emit('features-activated', activation, result)
   recordHeavyLifecycleMetrics()
-  if (
-    heavyLifecycle.metrics().staticNodes > 0 ||
-    activation.activated.some(
-      ({ kind }) =>
-        kind === 'code-highlight' || kind === 'latex' || kind === 'mermaid',
-    )
-  ) {
-    ensureHeavyFeatureThemeListener()
-  }
 }
 
 async function activateChunkFeatures(
@@ -1168,7 +1160,32 @@ const activateMountedChunkFeatures = async (
 
 const performRender = async () => {
   const taskId = ++currentTaskId
-  resetFeatureActivation()
+  const signal = resetFeatureActivation()
+  const isCurrentRender = () => taskId === currentTaskId && !signal.aborted
+  const invalidAuthority = () =>
+    toFsusError(
+      'markdown_safe_result_authority_invalid',
+      'markdown_safe_result_authority_invalid',
+      'invariant',
+    )
+  const emitPlaceholders = (result: MarkdownSafeRenderResult) =>
+    emit('placeholders-ready', result.placeholders, result)
+  const commitAndActivate = async (result: MarkdownSafeRenderResult) => {
+    await commitRenderedContent(result.html, true)
+    if (!isCurrentRender()) return
+    emitPlaceholders(result)
+    await activateRenderedFeatures(result, rootEl.value, signal)
+  }
+  const emitRenderProfile = (
+    result: MarkdownRuntimeRenderResult,
+    phase: 'chunks' | 'full-result',
+  ) =>
+    emit('render-profile', {
+      engine: result.engine,
+      phase,
+      rendererVersion: result.rendererVersion,
+      timings: result.timings,
+    })
   commitDurationMs = 0
   rootEl.value?.removeAttribute('data-fsus-markdown-commit-ms')
   const source = normalizeMarkdownSource(props.content)
@@ -1181,7 +1198,7 @@ const performRender = async () => {
     if (strategy === 'chunked-main' || strategy === 'chunked-worker') {
       await renderPipelineRuntime.render()
 
-      if (taskId !== currentTaskId) {
+      if (!isCurrentRender()) {
         return
       }
 
@@ -1206,11 +1223,7 @@ const performRender = async () => {
         ? result
         : materializeMarkdownWorkerResult(request, result, document.units)
       if (!resolvedResult) {
-        throw toFsusError(
-          'markdown_safe_result_authority_invalid',
-          'markdown_safe_result_authority_invalid',
-          'invariant',
-        )
+        throw invalidAuthority()
       }
       const resolvedUnits = resolvedResult.chunks
       const initialCount = resolveInitialChunkCount(resolvedUnits)
@@ -1222,31 +1235,26 @@ const performRender = async () => {
       renderStrategy.value = renderPipelineRuntime.renderedStrategy.value as
         | 'chunked-main'
         | 'chunked-worker'
-      emit('render-profile', {
-        engine: resolvedResult.engine,
-        phase: 'chunks',
-        rendererVersion: resolvedResult.rendererVersion,
-        timings: resolvedResult.timings,
-      })
-      emit('placeholders-ready', resolvedResult.placeholders, resolvedResult)
+      emitRenderProfile(resolvedResult, 'chunks')
+      emitPlaceholders(resolvedResult)
       await nextTick()
       await settleRenderViewport('markdown-render-settle-initial')
       await afterFrame()
+      if (!isCurrentRender()) return
       if (initialCount < resolvedUnits.length) {
-        if (taskId !== currentTaskId) return
         await afterFrame()
-        if (taskId !== currentTaskId) return
+        if (!isCurrentRender()) return
         chunkUnits.value = resolvedUnits
         await nextTick()
         await settleRenderViewport('markdown-render-settle-full')
       }
       const initialFeatureActivation = activateMountedChunkFeatures(
         resolvedResult,
-        activationController?.signal,
+        signal,
       )
       observeMountedChunksForActivation()
       await initialFeatureActivation
-      if (taskId !== currentTaskId) return
+      if (!isCurrentRender()) return
       recordCommitDuration(commitStartedAt)
       emit('render-complete', resolvedResult)
       scheduleMeasurementWarmup()
@@ -1255,7 +1263,7 @@ const performRender = async () => {
 
     const result = await renderMarkdownResultWithRuntime(request)
 
-    if (taskId !== currentTaskId) {
+    if (!isCurrentRender()) {
       return
     }
 
@@ -1266,41 +1274,30 @@ const performRender = async () => {
       !hasMarkdownCommitAuthority(result.value) ||
       !matchesMarkdownRenderRequest(request, result.value)
     ) {
-      throw toFsusError(
-        'markdown_safe_result_authority_invalid',
-        'markdown_safe_result_authority_invalid',
-        'invariant',
-      )
+      throw invalidAuthority()
     }
 
     const resolvedResult = result.value
 
-    await commitRenderedContent(resolvedResult.html, true)
-    emit('placeholders-ready', resolvedResult.placeholders, resolvedResult)
-    await activateRenderedFeatures(resolvedResult)
-    emit('render-profile', {
-      engine: resolvedResult.engine,
-      phase: 'full-result',
-      rendererVersion: resolvedResult.rendererVersion,
-      timings: resolvedResult.timings,
-    })
+    await commitAndActivate(resolvedResult)
+    if (!isCurrentRender()) return
+    emitRenderProfile(resolvedResult, 'full-result')
     emit('render-complete', resolvedResult)
   } catch (error) {
-    if (taskId !== currentTaskId) {
+    if (!isCurrentRender()) {
       return
     }
 
     const fallback = renderMarkdownFallbackWithRuntime(request)
-    await commitRenderedContent(fallback.html, true)
-    emit('placeholders-ready', fallback.placeholders, fallback)
-    await activateRenderedFeatures(fallback)
+    await commitAndActivate(fallback)
+    if (!isCurrentRender()) return
     emit(
       'render-error',
       toFsusError(error, 'markdown_renderer_render_failed', 'infra'),
     )
     emit('render-complete', fallback)
   } finally {
-    if (taskId === currentTaskId) {
+    if (isCurrentRender()) {
       isRendering.value = false
     }
   }
@@ -1333,7 +1330,7 @@ watch(
 )
 
 onBeforeUnmount(() => {
-  removeHeavyFeatureThemeListener()
+  setHeavyFeatureThemeListener(false)
   if (debounceTimer) {
     clearTimeout(debounceTimer)
     debounceTimer = null
@@ -1350,7 +1347,214 @@ onBeforeUnmount(() => {
   heavyLifecycle.dispose()
 })
 
+const normalizeFragmentTarget = (
+  input: string,
+): { readonly id: string; readonly fragment: string } | null => {
+  const trimmed = input.trim()
+  if (!trimmed) return null
+  const rawId = trimmed.startsWith('#') ? trimmed.slice(1) : trimmed
+  if (!rawId) return null
+  let decoded = rawId
+  try {
+    decoded = decodeURIComponent(rawId)
+  } catch {
+    decoded = rawId
+  }
+  if (!decoded || /[\0\r\n]/.test(decoded)) return null
+  return {
+    id: decoded,
+    fragment: `#${decoded}`,
+  }
+}
+
+const escapeRegExpPattern = (value: string) =>
+  value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+
+const hasFragmentIdInHtml = (html: string, id: string) => {
+  if (!html.includes(id)) return false
+  return new RegExp(`(?:^|[\\s<])id=["']${escapeRegExpPattern(id)}["']`).test(
+    html,
+  )
+}
+
+const findMountedFragmentElement = (id: string): HTMLElement | null => {
+  const root = rootEl.value
+  if (!root) return null
+  return root.querySelector<HTMLElement>(
+    `[id="${escapeCssAttributeValue(id)}"]`,
+  )
+}
+
+const resolveElementChunkLocation = (element: HTMLElement) => {
+  const unitEl = element.closest<HTMLElement>('[data-fsus-render-unit-key]')
+  if (!unitEl) {
+    return {
+      chunkIndex: -1,
+      chunkKey: null as string | null,
+    }
+  }
+  const chunkKey = unitEl.dataset.fsusRenderUnitKey ?? null
+  const rawIndex = unitEl.dataset.fsusRenderUnitIndex
+  const parsedIndex =
+    rawIndex !== undefined && rawIndex !== '' ? Number(rawIndex) : Number.NaN
+  return {
+    chunkIndex: Number.isInteger(parsedIndex)
+      ? parsedIndex
+      : chunkKey
+        ? chunkUnits.value.findIndex((unit) => unit.key === chunkKey)
+        : -1,
+    chunkKey,
+  }
+}
+
+const locateFragment = (fragmentOrId: string): MarkdownFragmentLocateResult => {
+  const target = normalizeFragmentTarget(fragmentOrId)
+  if (!target) {
+    return {
+      found: false,
+      mounted: false,
+      id: '',
+      fragment: '',
+      chunkIndex: -1,
+      chunkKey: null,
+      element: null,
+    }
+  }
+
+  const mountedElement = findMountedFragmentElement(target.id)
+  if (mountedElement) {
+    const location = resolveElementChunkLocation(mountedElement)
+    return {
+      found: true,
+      mounted: true,
+      id: target.id,
+      fragment: target.fragment,
+      chunkIndex: location.chunkIndex,
+      chunkKey: location.chunkKey,
+      element: mountedElement,
+    }
+  }
+
+  const chunkIndex = chunkUnits.value.findIndex((unit) =>
+    hasFragmentIdInHtml(unit.html, target.id),
+  )
+  if (chunkIndex >= 0) {
+    return {
+      found: true,
+      mounted: false,
+      id: target.id,
+      fragment: target.fragment,
+      chunkIndex,
+      chunkKey: chunkUnits.value[chunkIndex]?.key ?? null,
+      element: null,
+    }
+  }
+
+  return {
+    found: false,
+    mounted: false,
+    id: target.id,
+    fragment: target.fragment,
+    chunkIndex: -1,
+    chunkKey: null,
+    element: null,
+  }
+}
+
+const scrollElementIntoFragmentView = (
+  element: HTMLElement,
+  options?: MarkdownFragmentRevealOptions,
+) => {
+  const behavior = options?.behavior ?? 'auto'
+  const block = options?.block ?? 'start'
+  if (typeof element.scrollIntoView === 'function') {
+    element.scrollIntoView({ behavior, block })
+    return
+  }
+  const viewport = findScrollContainer(rootEl.value)
+  if (viewport) {
+    const targetTop =
+      viewport.scrollTop +
+      (element.getBoundingClientRect().top -
+        viewport.getBoundingClientRect().top)
+    viewport.scrollTop = Math.max(0, targetTop)
+  }
+}
+
+const revealFragment = async (
+  fragmentOrId: string,
+  options?: MarkdownFragmentRevealOptions,
+): Promise<MarkdownFragmentRevealResult> => {
+  const initial = locateFragment(fragmentOrId)
+  if (!initial.found) {
+    return {
+      ok: false,
+      id: initial.id,
+      fragment: initial.fragment,
+      chunkIndex: -1,
+      chunkKey: null,
+      element: null,
+    }
+  }
+
+  if (initial.mounted && initial.element) {
+    scrollElementIntoFragmentView(initial.element, options)
+    return {
+      ok: true,
+      id: initial.id,
+      fragment: initial.fragment,
+      chunkIndex: initial.chunkIndex,
+      chunkKey: initial.chunkKey,
+      element: initial.element,
+    }
+  }
+
+  const root = rootEl.value
+  const viewport = findScrollContainer(root)
+  if (root && viewport && initial.chunkIndex >= 0) {
+    const isDocumentViewport =
+      viewport === document.documentElement ||
+      viewport === document.body ||
+      viewport === document.scrollingElement
+    const rootOffsetInViewport = isDocumentViewport
+      ? root.getBoundingClientRect().top + window.scrollY
+      : root.getBoundingClientRect().top -
+        viewport.getBoundingClientRect().top +
+        viewport.scrollTop
+    const estimatedChunkOffset = virtualWindow.offsetForIndex(
+      initial.chunkIndex,
+    )
+    const targetScrollTop = Math.max(
+      0,
+      rootOffsetInViewport + estimatedChunkOffset,
+    )
+    viewport.scrollTop = targetScrollTop
+    if (isDocumentViewport && typeof window.scrollTo === 'function') {
+      window.scrollTo({ top: targetScrollTop, behavior: 'auto' })
+    }
+    virtualWindow.readViewport()
+    await nextTick()
+    await settleRenderViewport('markdown-render-reveal-fragment')
+  }
+
+  const resolvedElement = findMountedFragmentElement(initial.id)
+  if (resolvedElement) {
+    scrollElementIntoFragmentView(resolvedElement, options)
+  }
+
+  return {
+    ok: resolvedElement !== null,
+    id: initial.id,
+    fragment: initial.fragment,
+    chunkIndex: initial.chunkIndex,
+    chunkKey: initial.chunkKey,
+    element: resolvedElement,
+  }
+}
+
 defineExpose({
+  locateFragment,
+  revealFragment,
   rootEl,
 })
 </script>

@@ -81,12 +81,10 @@ function check(publishPath) {
       'dotnet-package',
       'build-package',
       'consumer-install',
-      'real-render-performance',
     ],
     'release profile',
   )
   assert.equal(readinessSpec.execution.release.aggregator, 'release-readiness')
-  assert.equal(readinessSpec.execution.release.realRenderProfile, 'full')
   assert.equal(readinessSpec.execution.release.visualProfile, 'evidence')
   assert.equal(
     readinessSpec.execution.release.identityBinding,

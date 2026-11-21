@@ -85,6 +85,24 @@ for (const fragment of [
     workflow.toLowerCase().includes(fragment),
     `workflow must contain ${fragment}`,
   )
+assert.match(
+  workflow,
+  /^env:\n(?:[ \t]+[^\n]*\n)* {2}FSUSUI_COVERAGE_NODE_VERSION: '\d+\.\d+\.\d+'$/mu,
+  'coverage toolchain identity requires one shared exact Node patch version',
+)
+for (const jobName of ['coverage-shard', 'coverage-merge']) {
+  const job = workflow.split(`\n  ${jobName}:\n`)[1]?.split(/\n {2}\S/u)[0]
+  const setup = job
+    ?.split(/\n *- uses: actions\/setup-node@[^\n]+\n/u)[1]
+    ?.split(/\n *- /u)[0]
+  assert.ok(
+    setup?.split('\n').some((line) =>
+      line.trim() === 'node-version: ${{ env.FSUSUI_COVERAGE_NODE_VERSION }}',
+    ),
+    `${jobName} must use the shared exact Node patch version`,
+  )
+}
+
 assert.ok(
   !workflow.includes('FSUSUI_COVERAGE_SHARD_THRESHOLD_SECONDS: 180'),
   'Actions must not use one fixed runner duration as a correctness condition',

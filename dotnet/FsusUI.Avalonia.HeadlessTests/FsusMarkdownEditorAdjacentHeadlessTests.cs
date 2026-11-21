@@ -184,13 +184,22 @@ public class FsusMarkdownEditorAdjacentHeadlessTests
 
   private static string FindRepositoryRoot([CallerFilePath] string sourceFile = "")
   {
-    for (var directory = new DirectoryInfo(Path.GetDirectoryName(sourceFile)!);
-      directory is not null;
-      directory = directory.Parent)
-    {
-      if (File.Exists(Path.Combine(directory.FullName, "pnpm-workspace.yaml")))
+    foreach (var start in new[]
       {
-        return directory.FullName;
+        Path.GetDirectoryName(sourceFile) ?? string.Empty,
+        Environment.CurrentDirectory,
+        AppContext.BaseDirectory,
+      }.Where(static value => !string.IsNullOrWhiteSpace(value))
+        .Distinct(StringComparer.Ordinal))
+    {
+      for (var directory = new DirectoryInfo(start);
+        directory is not null;
+        directory = directory.Parent)
+      {
+        if (File.Exists(Path.Combine(directory.FullName, "pnpm-workspace.yaml")))
+        {
+          return directory.FullName;
+        }
       }
     }
     throw new InvalidOperationException("Could not find repository root.");

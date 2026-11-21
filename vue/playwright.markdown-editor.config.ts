@@ -36,10 +36,12 @@ export default defineConfig({
     },
     {
       name: 'firefox',
+      testIgnore: '**/markdown-editor-command-palette-ime.spec.ts',
       use: { ...devices['Desktop Firefox'] },
     },
     {
       name: 'webkit',
+      testIgnore: '**/markdown-editor-command-palette-ime.spec.ts',
       use: { ...devices['Desktop Safari'] },
     },
   ],

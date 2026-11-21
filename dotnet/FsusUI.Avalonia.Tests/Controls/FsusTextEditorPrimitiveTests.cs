@@ -69,7 +69,9 @@ public class FsusTextEditorPrimitiveTests
     Assert.Equal(FsusTextBlockKind.ListItem, editor.Preview.RenderedBlocks[1].Kind);
     Assert.Equal(AutomationControlType.Edit, AutomationProperties.GetControlTypeOverride(editor));
     Assert.Equal("Article editor", AutomationProperties.GetName(editor));
-    Assert.Equal("ready, 30 chars, selection 30-30, preview synced", AutomationProperties.GetItemStatus(editor));
+    Assert.Equal(
+      "30 chars, selection 30-30, preview synced, undo available, redo unavailable",
+      AutomationProperties.GetItemStatus(editor));
 
     Assert.True(await editor.PressAsync(Key.Z, KeyModifiers.Control));
     Assert.Equal("# Release notes", editor.Text);

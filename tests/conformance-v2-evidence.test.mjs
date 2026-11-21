@@ -10,6 +10,7 @@ import {
   deriveAlignment,
   validateCoverage,
   validateEvidence,
+  validateCheckTagTimingDiagnostics,
   loadCurrentCheckTagVisualReview,
   validateCurrentComparison,
   validateOverride,
@@ -29,6 +30,37 @@ import {
   validatePackageAlignmentBinding,
   validateNugetPackageAlignment,
 } from '../scripts/avalonia-stable-readiness-lib.mjs'
+
+test('CheckTag slow timings are diagnostic observations, not verdicts', () => {
+  const timing = {
+    timingQualification: 'diagnostic-only',
+    renderMilliseconds: 28,
+    interactionMilliseconds: 54.6335,
+  }
+  const observation = { actual: { ...timing } }
+  assert.doesNotThrow(() =>
+    validateCheckTagTimingDiagnostics(
+      { ...timing, budget: { renderMs: 8, interactionMs: 50 } },
+      observation,
+    ),
+  )
+  assert.throws(
+    () =>
+      validateCheckTagTimingDiagnostics(
+        { ...timing, passed: true },
+        observation,
+      ),
+    /must not claim a pass or failure/u,
+  )
+  assert.throws(
+    () =>
+      validateCheckTagTimingDiagnostics(
+        { ...timing, interactionMilliseconds: -1 },
+        observation,
+      ),
+    /must be finite and nonnegative/u,
+  )
+})
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 
@@ -50,10 +82,7 @@ const realManifests = () => ({
 const realCheckTagContract = () => {
   const registry = JSON.parse(
     fs.readFileSync(
-      path.join(
-        root,
-        'spec/components/contracts/v2/contract-v2.json',
-      ),
+      path.join(root, 'spec/components/contracts/v2/contract-v2.json'),
       'utf8',
     ),
   )
@@ -141,23 +170,32 @@ test('stable consumers derive scope from exact contract bindings and fail closed
   )
   const staleAlignment = structuredClone(alignment)
   staleAlignment.consumers.releaseScopeFamilies = ['alpha']
-  fs.writeFileSync(alignmentPath, `${JSON.stringify(staleAlignment, null, 2)}\n`)
+  fs.writeFileSync(
+    alignmentPath,
+    `${JSON.stringify(staleAlignment, null, 2)}\n`,
+  )
   assert.throws(
-    () => readStableConsumerAuthority({ registryPath, alignmentPath, expected }),
+    () =>
+      readStableConsumerAuthority({ registryPath, alignmentPath, expected }),
     /integrity hash is invalid/u,
   )
   staleAlignment.identity.alignmentHash =
     stableReadinessAlignmentHash(staleAlignment)
-  fs.writeFileSync(alignmentPath, `${JSON.stringify(staleAlignment, null, 2)}\n`)
+  fs.writeFileSync(
+    alignmentPath,
+    `${JSON.stringify(staleAlignment, null, 2)}\n`,
+  )
   assert.throws(
-    () => readStableConsumerAuthority({ registryPath, alignmentPath, expected }),
+    () =>
+      readStableConsumerAuthority({ registryPath, alignmentPath, expected }),
     /consumers do not match exact derived authority/u,
   )
   const staleRegistry = structuredClone(registry)
   staleRegistry.consumerBindings.releaseScopeFamilies = ['alpha']
   fs.writeFileSync(registryPath, `${JSON.stringify(staleRegistry, null, 2)}\n`)
   assert.throws(
-    () => readStableConsumerAuthority({ registryPath, alignmentPath, expected }),
+    () =>
+      readStableConsumerAuthority({ registryPath, alignmentPath, expected }),
     /generated release scope projection is stale/u,
   )
   fs.rmSync(temporary, { recursive: true, force: true })
@@ -186,7 +224,9 @@ test('stable readiness accepts governed product gaps but rejects leakage and for
     ],
     consumers: {
       alignmentGapCount: 1,
-      releaseFamilyGaps: [{ family: 'alpha', blockingContracts: ['component-v2.partial'] }],
+      releaseFamilyGaps: [
+        { family: 'alpha', blockingContracts: ['component-v2.partial'] },
+      ],
       conformanceIntegrityReady: true,
       stableSubsetEligible: true,
       fullSurfaceReleaseReady: false,
@@ -411,12 +451,7 @@ test('derive comparison validation rejects stale identity and tampered evidence'
   tamperedWeb.publicState.markdown.value = 'tampered after comparison'
   assert.throws(
     () =>
-      validateCurrentComparison(
-        comparison,
-        tamperedWeb,
-        avalonia,
-        expected,
-      ),
+      validateCurrentComparison(comparison, tamperedWeb, avalonia, expected),
     /comparison\.evidenceDigests\.web mismatch/,
   )
 
@@ -559,10 +594,7 @@ test('web-only contracts remain explicit without becoming Avalonia gaps', () => 
     ],
   )
   assert.deepEqual(alignment.stable, [])
-  assert.deepEqual(alignment.webOnly, [
-    'web-only-bound',
-    'web-only-unbound',
-  ])
+  assert.deepEqual(alignment.webOnly, ['web-only-bound', 'web-only-unbound'])
   assert.deepEqual(alignment.gaps, [])
   assert.equal(alignment.consumers.nugetStableEligible, true)
   assert.equal(alignment.consumers.releaseReady, true)
@@ -742,14 +774,13 @@ test('derived alignment re-validates receipt coverage claims against the contrac
   const checkTag = realCheckTagContract()
   const bindings = consumerBindingsFor('component-v2.el-check-tag')
   const registry = { contracts: [checkTag], consumerBindings: bindings }
-  assert.deepEqual(
-    deriveAlignment(registry, comparison).stable,
-    ['component-v2.el-check-tag'],
-  )
+  assert.deepEqual(deriveAlignment(registry, comparison).stable, [
+    'component-v2.el-check-tag',
+  ])
 
-  comparison.receipts['component-v2.el-check-tag'].coverage.requiredMembers.push(
-    'input.forged',
-  )
+  comparison.receipts[
+    'component-v2.el-check-tag'
+  ].coverage.requiredMembers.push('input.forged')
   assert.throws(
     () => deriveAlignment(registry, comparison),
     /coverage\.member\.input\.forged unexpected/u,

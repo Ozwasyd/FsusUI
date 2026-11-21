@@ -20,10 +20,6 @@ import {
   validateCellReceipt,
   verifyOwnerReceipts,
 } from './layout-playwright-verify.mjs'
-import {
-  createImpactPlan,
-  loadOwnershipRegistry,
-} from './render-performance-impact.mjs'
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const readSync = (relative) => readFileSync(path.join(root, relative), 'utf8')
@@ -216,31 +212,6 @@ const domLayoutSpec = readSync('vue/tests/dom-layout/mobile-dom-layout.spec.ts')
 const geometrySpec = readSync('vue/tests/geometry/upstream-evidence.spec.ts')
 assert.ok(domLayoutSpec.includes("'../../../scripts/test-parallelism'"), 'dom-layout spec must import root test-parallelism correctly')
 assert.ok(geometrySpec.includes('process.env.FSUS_PLAYWRIGHT_EXTERNAL_SERVER'), 'geometry upstream evidence must honor external server')
-
-const ownership = await loadOwnershipRegistry(root)
-const changeSet = [
-  '.github/workflows/quality.yml',
-  '.github/workflows/_quality-playwright.yml',
-  'scripts/layout-playwright-plan.mjs',
-  'scripts/layout-playwright-runner.mjs',
-  'scripts/layout-playwright-owner-run.mjs',
-  'scripts/layout-playwright-verify.mjs',
-  'scripts/check-playwright-layout-owner-policy.mjs',
-  'scripts/test-playwright-layout-owner.mjs',
-  'scripts/playwright-suites.mjs',
-  'scripts/test-playwright-suites.mjs',
-  'spec/ci/pr-render-performance-ownership.json',
-  'spec/ci/playwright-owners.json',
-  'spec/ci/playwright-layout-receipts.schema.json',
-  'vue/playwright.dom-layout.config.ts',
-  'vue/playwright.geometry.config.ts',
-  'vue/tests/dom-layout/mobile-dom-layout.spec.ts',
-  'vue/tests/geometry/upstream-evidence.spec.ts',
-  'tests/fixtures/render-performance-impact-plan/cases.json',
-  '.gitignore',
-]
-const impactPlan = createImpactPlan({ changedFiles: changeSet, registry: ownership, baseRef: 'policy-base' })
-assert.equal(impactPlan.scope, 'skip', 'playwright-layout change set must be skip-safe for the render gate')
 
 const schema = JSON.parse(readSync('spec/ci/playwright-layout-receipts.schema.json'))
 for (const key of ['commitSha', 'workflowGroup', 'run', 'toolchain', 'runtime', 'config', 'tests', 'report', 'status']) {

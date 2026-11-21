@@ -262,6 +262,8 @@ export const validateWorkflowContracts = ({
     'workflow_call:',
     'actions/download-artifact@v4',
     'FSUSUI_AOT_CANDIDATE_ROOT',
+    'FSUSUI_AOT_DEPENDENCY_LOCK',
+    'name: avalonia-aot-leaf-${{ inputs.group }}-${{ inputs.rid }}',
     'test-avalonia-aot-smoke.mjs',
     'validate-leaf',
     "inputs.rid == 'linux-x64'",
@@ -282,6 +284,7 @@ export const validateWorkflowContracts = ({
     'avalonia-aot:',
     'candidate-artifact: dotnet-nuget-candidate',
     'scripts/avalonia-aot-native.mjs aggregate',
+    'name: avalonia-aot-leaf-${{ inputs.group }}-linux-x64',
     '\n      - avalonia-aot\n',
   ])
     if (!quality.includes(term))

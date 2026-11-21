@@ -130,15 +130,17 @@ export const resolveDemoRoot = async (
 
   const performanceScenario = searchParams.get('performance')
 
-  if (performanceScenario) {
-    const { default: PerformanceFixture } =
-      await import('./PerformanceFixture.vue')
+  if (
+    performanceScenario === 'markdown-feature-activation' ||
+    performanceScenario === 'markdown-heavy-feature-lifecycle'
+  ) {
+    const { default: MarkdownFeatureFixture } =
+      await import('./MarkdownFeatureFixture.vue')
     return {
-      component: PerformanceFixture,
+      component: MarkdownFeatureFixture,
       themeMode,
       props: {
         scenario: performanceScenario,
-        size: Number(searchParams.get('size') || 1_000_000),
         motion: searchParams.get('motion') || 'enabled',
       },
     }

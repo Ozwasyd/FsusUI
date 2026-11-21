@@ -15,7 +15,7 @@ const defaultRoot = path.resolve(
   '..',
 )
 const UPDATE_TYPES = ['digest', 'major', 'minor', 'patch']
-const REQUIRED_CHECKS = ['pr-fast', 'pr-real-render-performance']
+const REQUIRED_CHECKS = ['pr-fast']
 const REJECTED_CONCLUSIONS = [
   'action_required',
   'cancelled',
@@ -119,7 +119,6 @@ export function auditRequiredChecks({
       'premerge-main',
       'premerge-playwright',
       'pr-feedback',
-      'pr-real-render-performance',
     ])
   ) {
     fail('pr-fast aggregate ownership is incomplete or contains extras')
@@ -133,13 +132,9 @@ export function auditRequiredChecks({
   if (
     !workflowJob(qualityWorkflow, 'merge-group-pr-fast').includes(
       'name: pr-fast',
-    ) ||
-    !workflowJob(
-      qualityWorkflow,
-      'merge-group-real-render-performance',
-    ).includes('name: pr-real-render-performance')
+    )
   ) {
-    fail('merge-group workflow must preserve both required check contexts')
+    fail('merge-group workflow must preserve the required pr-fast context')
   }
 
   const branchChecks = branchProtection?.required_status_checks

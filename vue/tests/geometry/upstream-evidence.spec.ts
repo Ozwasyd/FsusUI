@@ -52,13 +52,13 @@ const attach = async (
 }
 
 const expectNoPageOverflow = async (page: Page) => {
-  await page.waitForTimeout(120)
   await page.evaluate(
     () =>
       new Promise<void>((resolve) => {
         requestAnimationFrame(() => requestAnimationFrame(() => resolve()))
       }),
   )
+  await settleAnimations(page)
   const geometry = await page.evaluate(() => ({
     clientWidth: document.documentElement.clientWidth,
     scrollWidth: Math.max(

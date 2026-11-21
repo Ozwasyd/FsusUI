@@ -64,6 +64,26 @@ change app ownership of decoded content through `ImageLoader`,
 `IFsusImageLoader`, or `ContentFactory`, and they preserve Escape dismissal,
 Left/Right navigation, opener focus restoration, and image status automation.
 
+## Viewer lifecycle
+
+The default `Sources` collection notifies the viewer when it changes. A supplied
+collection must implement `INotifyCollectionChanged` for mutations to update the
+viewer automatically. When the collection shrinks, `ActiveIndex` is clamped to
+the remaining range, or zero when empty, so source selection and accessible image
+status use the same index.
+
+Clearing an observable source collection cancels and invalidates pending loads,
+clears `LoadedContent` and `Content`, disposes owned `IDisposable` content, and
+resets `Status` to `Idle` with no error. Late results cannot restore the cleared
+content; disposable results from invalidated loads are released. Closing during
+a pending load cancels it so reopening the same source starts a fresh load.
+
+Use `CloseAsync()` to dismiss the overlay. `Dispose()` releases owned content,
+cancels pending loads, and detaches source notifications; it is idempotent and
+does not itself dismiss the overlay. After disposal, `LoadActiveSourceAsync()`
+and `RefreshAsync()` complete with `false` without invoking a loader, and `Open()`
+throws `ObjectDisposedException`.
+
 ## Known Limitations
 
 Remote image fetching and cache policy are app concerns.

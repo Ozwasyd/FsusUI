@@ -335,3 +335,35 @@ describe('markdown runtime fast paths', () => {
     }
   })
 })
+
+describe('Markdown language availability without optional runtime loading', () => {
+  it('preserves canonical, alias, unknown, and inherited-name decisions', async () => {
+    const { resolveMarkdownCodeLanguageAvailability } =
+      await import('../markdown-runtime')
+    for (const [input, canonical, available] of [
+      [undefined, 'text', true],
+      ['', 'text', true],
+      [' text ', 'text', true],
+      ['bash', 'bash', true],
+      ['c#', 'c#', true],
+      ['cs', 'c#', true],
+      ['csharp', 'c#', true],
+      ['javascript', 'js', true],
+      ['js', 'js', true],
+      ['typescript', 'ts', true],
+      ['ts', 'ts', true],
+      ['shell', 'bash', true],
+      ['sh', 'bash', true],
+      ['unknown-language', 'text', false],
+      ['constructor', 'text', false],
+      ['__proto__', 'text', false],
+    ] as const) {
+      expect(resolveMarkdownCodeLanguageAvailability(input)).toEqual({
+        available,
+        canonical,
+        fallback: available ? 'none' : 'plain',
+        info: input ?? '',
+      })
+    }
+  })
+})

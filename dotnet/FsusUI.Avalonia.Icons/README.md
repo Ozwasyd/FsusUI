@@ -8,6 +8,12 @@ For adoption setup, package references, and clean sample verification, see
 
 ## Trimming and AOT
 
+This package is an AOT-compatible library and does not set `PublishAot`.
+Final RID-specific Native AOT publish and run remain consuming-application
+release gates. Application-owned reflection, runtime type or assembly loading,
+runtime code generation, and third-party plugins are outside this library
+support statement and require consumer verification.
+
 The generated dictionary stays on the normal package resource path; there is
 no AOT-only icon path or public API. For the shared analyzer boundary and
 consumer-owned Native AOT verification, see [Avalonia installation](../../docs/avalonia/installation.md#trimming-and-aot-library-boundary).

@@ -1,7 +1,10 @@
 {
   "schema": "fsusui-design-conformance.ui-ux-classification-receipt.v2",
   "ownerRepository": "Ozwasyd/FsusUI",
-  "affectedSurfaces": ["web-check-tag", "avalonia-check-tag"],
+  "affectedSurfaces": [
+    "web-check-tag",
+    "avalonia-check-tag"
+  ],
   "uiDecisionClass": "prescribed",
   "verificationClass": "ux-path",
   "requiredAuthorities": [
@@ -31,27 +34,11 @@
   ],
   "activeBaselineIdentity": {
     "repository": "Ozwasyd/FsusUI",
-    "revision": "d5581107db5ba6524ba50f060ba951ce5be86b7a",
+    "revision": "dc20d285f42d12f0013355cbd8b8e2179b939ec4",
     "skillDigest": "c88357a6ba0340000bae5839daeb67a3cd2722e8242cf7e0148006c3610a44fe",
     "authorityDigest": "0899bb73568e4e0430595ecce3c1d605d51c963e27e37250b6dcc0e1a6ff77a9",
     "dirtyFingerprint": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
   },
-  "candidateSha": "102c57cade8e1c53b946ed6a46633db77a494a4d",
-  "candidateDigest": "b049e4f6ad50e468bb8a729df4492f673632275cc36203987937ca0a9f5954ff",
-  "stateEvidenceMatrix": [
-    {
-      "state": "focused-unchecked-after-pointer-keyboard",
-      "viewport": "88x25",
-      "theme": "light",
-      "evidenceDigest": "ddd6712385f051a1950f30f1be7527740783996fd9cadd444d7ed0e251cf7f70"
-    },
-    {
-      "state": "focused-unchecked-after-pointer-keyboard",
-      "viewport": "960x720",
-      "theme": "light",
-      "evidenceDigest": "0049cc5dd7c175ace6d07507d1ddd40260a838ffd58b3b74c695ba5eae81fa7b"
-    }
-  ],
   "inScope": [
     "Existing CheckTag focus-visible behavior on Web and Avalonia",
     "Focused unchecked state after real pointer and keyboard activation",
@@ -62,8 +49,24 @@
     "Pixel equality between native renderers",
     "Adjacent component redesign"
   ],
-  "classificationEvidenceDigest": "bf1cf46ccbef62abbf4f30a6bb0a0031a8607149ead79dab2eabe35e983ab126",
   "domainPolicyDigest": "620c4f746c1f259e3b640044975ad2878b7913806038706f7991bee9d72104d3",
   "status": "frozen",
-  "receiptDigest": "b5fead5f15e2634a1074abfa3a93fbc11a72e448bdea73ca0719ca7bbb0e55b8"
+  "candidateSha": "dc20d285f42d12f0013355cbd8b8e2179b939ec4",
+  "candidateDigest": "df986d08da2dced48a3c6eb9455c3c5fd34660126d8f3870f3f855cf0a86db03",
+  "stateEvidenceMatrix": [
+    {
+      "viewport": "88x24",
+      "state": "focused-unchecked-after-pointer-keyboard",
+      "theme": "light",
+      "evidenceDigest": "cede06e2196173842ec99b1422f4242f3d54c3afdbfa8d8c35da70bad3e55277"
+    },
+    {
+      "viewport": "960x720",
+      "state": "focused-unchecked-after-pointer-keyboard",
+      "theme": "light",
+      "evidenceDigest": "3ae99ccd280405a7e7a0d1f622367ed017a4dc1819de8d3c59e427b6a2764cb0"
+    }
+  ],
+  "classificationEvidenceDigest": "1a012e637a86976e3e96d53773e298b188ae061649e5a6210d89993435324eff",
+  "receiptDigest": "81878079e3cc7d7c541e362c1434d6c581b39ff7c0489692922d413a8b648039"
 }

@@ -9,7 +9,7 @@ const directory = mkdtempSync(path.join(tmpdir(), 'fsusui-freshness-report-'))
 const report = {
   schemaVersion: 1,
   generatedAt: '2026-08-30T00:00:00.000Z',
-  requiredChecks: ['pr-fast', 'pr-real-render-performance'],
+  requiredChecks: ['pr-fast'],
   results: [
     {
       dependencyId: 'npm-vue',

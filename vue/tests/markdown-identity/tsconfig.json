@@ -1,0 +1,20 @@
+{
+  "extends": "../../tsconfig.web.json",
+  "compilerOptions": {
+    "types": ["node"],
+    "paths": {
+      "@element-plus/icons-vue": ["../../packages/icons-vue/src/index.ts"],
+      "@element-plus/icons-vue/*": ["../../packages/icons-vue/src/*"],
+      "@element-plus/*": ["../../packages/*"],
+      "@ozwasyd/element-plus/markdown-runtime": [
+        "../../packages/element-plus/markdown-runtime.ts"
+      ]
+    }
+  },
+  "include": [
+    "main.ts",
+    "identity.spec.ts",
+    "../../typings/env.d.ts",
+    "../../typings/vite-worker.d.ts"
+  ]
+}

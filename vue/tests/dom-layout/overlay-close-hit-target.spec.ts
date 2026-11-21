@@ -68,6 +68,14 @@ const measureClose = async (
     })
     .toBe(OVERLAY_CLOSE_PX)
   await settle(page)
+  await close.evaluate((button) => {
+    const panel = button.closest(
+      '.el-overlay, .el-overlay-message-box, .el-overlay-dialog, .el-dialog, .el-drawer, .el-message-box',
+    ) as HTMLElement | null
+    const animations = (panel ?? button).getAnimations({ subtree: true })
+    return Promise.allSettled(animations.map((animation) => animation.finished))
+  })
+  await settle(page)
 
   return close.evaluate(
     (button, opts) => {
@@ -295,7 +303,8 @@ test.describe('overlay close hit targets (#299)', () => {
         panelSelector: '.el-message-box',
       })
       expectCloseContract(metrics, `message-box@${viewport.width}`)
-      await page.keyboard.press('Escape')
+      await close.click()
+      await expect(page.locator('.el-message-box')).toBeHidden()
       await settle(page)
     }
   })

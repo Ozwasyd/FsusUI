@@ -51,8 +51,8 @@
   }
 
   @media (hover: none) and (pointer: coarse) {
-    .#{$namespace}-select-dropdown__option-item:hover::before,
-    .#{$namespace}-select-dropdown__option-item.hover::before {
+    .#{$namespace}-select-dropdown__option-item:not(.is-disabled):hover::before,
+    .#{$namespace}-select-dropdown__option-item.hover:not(.is-disabled)::before {
       background: transparent;
       box-shadow: none;
     }

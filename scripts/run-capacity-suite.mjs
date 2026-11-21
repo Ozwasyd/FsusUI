@@ -58,13 +58,18 @@ const suites = {
   ],
 }
 
+// CI runs dynamic readiness in the required governed package producer.
+suites['pr-fast-ci-static'] = suites['pr-fast'].map((task) =>
+  task === 'governance:check' ? 'governance:check:ci-static' : task,
+)
+
 const suiteArgument = process.argv.find((argument) =>
   argument.startsWith('--suite='),
 )
 const suiteName = suiteArgument?.slice('--suite='.length)
 if (!suiteName || !suites[suiteName]) {
   console.error(
-    'Usage: node scripts/run-capacity-suite.mjs --suite=pr-fast|full',
+    'Usage: node scripts/run-capacity-suite.mjs --suite=pr-fast|pr-fast-ci-static|full',
   )
   process.exit(1)
 }

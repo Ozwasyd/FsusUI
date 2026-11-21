@@ -256,13 +256,15 @@ export const createWasmSortController = (componentId: string) => {
           return new FsusRowIndexView(rows, result.value.indices)
         }
       }
+      // Learn the JS path's cost, not the preceding failed worker attempt.
+      const jsStarted = workerPath ? now() : started
       const values =
         classified.kind === 'number'
           ? Array.from(classified.numbers)
           : classified.strings
       const indices = await stableJsIndices(values, ascending, isStale)
       if (!indices || isStale()) return null
-      const totalMs = now() - started
+      const totalMs = now() - jsStarted
       fsusDataPipelineStrategy.record({
         commitMs: 0,
         computeMs: totalMs,

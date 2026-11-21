@@ -76,34 +76,9 @@ Other top-level or deep paths are not exposed by `package.exports`. Do not
 rewrite a removed broad import as an encoded path or direct build-directory
 lookup.
 
-## Release performance review
+## Browser regression coverage
 
-`markdown-feature-activation` is an independent real-render scenario and does
-not change `markdown-cold` or `markdown-hot`. It waits for Mermaid, KaTeX, and
-Shiki activation at initial ready and each `act()`, updates `content-version`
-and source for every sample, and rejects a repeated initial `activationMs`.
-
-Build the same Release shape in base and current worktrees and serve each on a
-fixed port:
-
-```bash
-pnpm run build:demo
-pnpm -C vue/packages/demo-app exec vite preview --host 127.0.0.1 --port 5188 --strictPort
-```
-
-`build:demo` owns the complete Release demo build: it first materializes the
-current-worktree Wasm artifacts through `ensure:wasm`, then builds the demo.
-Run it separately in base and current; do not copy, share, or link
-candidate/current Wasm artifacts into base.
-
-Run base before current:
-
-```bash
-node scripts/web-render-performance.mjs --no-server --port 5188 --scenario markdown-feature-activation --warmups 1 --samples 5 --output .tmp/performance/markdown-feature-activation
-```
-
-Current may pass `--baseline <base-summary.json>` from the same runner. The
-scenario checks activation p50 and p95; either regression above 5% versus base
-fails. It also records five real DOM-parser entry operations: every sample must
-be positive and stable, and current's maximum must not exceed baseline's.
-These commands consume local builds and do not publish a package.
+The Markdown feature activation visual fixture checks the rendered Shiki, KaTeX,
+and Mermaid output and reactivation after a document revision. The Markdown
+heavy-feature lifecycle suite also covers Trusted Types and resource cleanup.
+The former real-render timing comparison is no longer an active release check.

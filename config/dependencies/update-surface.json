@@ -1912,8 +1912,6 @@
         "dotnet/FsusUI.Avalonia.FormGenerator.Tests/packages.lock.json",
         "dotnet/FsusUI.Avalonia.HeadlessTests/FsusUI.Avalonia.HeadlessTests.csproj",
         "dotnet/FsusUI.Avalonia.HeadlessTests/packages.lock.json",
-        "dotnet/FsusUI.Avalonia.PerformanceTests/FsusUI.Avalonia.PerformanceTests.csproj",
-        "dotnet/FsusUI.Avalonia.PerformanceTests/packages.lock.json",
         "dotnet/FsusUI.Avalonia.Tests/FsusUI.Avalonia.Tests.csproj",
         "dotnet/FsusUI.Avalonia.Tests/packages.lock.json"
       ],
@@ -1930,8 +1928,6 @@
         "dotnet/Directory.Packages.props",
         "dotnet/FsusUI.Avalonia.FormGenerator.Tests/FsusUI.Avalonia.FormGenerator.Tests.csproj",
         "dotnet/FsusUI.Avalonia.FormGenerator.Tests/packages.lock.json",
-        "dotnet/FsusUI.Avalonia.PerformanceTests/FsusUI.Avalonia.PerformanceTests.csproj",
-        "dotnet/FsusUI.Avalonia.PerformanceTests/packages.lock.json",
         "dotnet/FsusUI.Avalonia.Tests/FsusUI.Avalonia.Tests.csproj",
         "dotnet/FsusUI.Avalonia.Tests/packages.lock.json"
       ],
@@ -1950,8 +1946,6 @@
         "dotnet/FsusUI.Avalonia.FormGenerator.Tests/packages.lock.json",
         "dotnet/FsusUI.Avalonia.HeadlessTests/FsusUI.Avalonia.HeadlessTests.csproj",
         "dotnet/FsusUI.Avalonia.HeadlessTests/packages.lock.json",
-        "dotnet/FsusUI.Avalonia.PerformanceTests/FsusUI.Avalonia.PerformanceTests.csproj",
-        "dotnet/FsusUI.Avalonia.PerformanceTests/packages.lock.json",
         "dotnet/FsusUI.Avalonia.Tests/FsusUI.Avalonia.Tests.csproj",
         "dotnet/FsusUI.Avalonia.Tests/packages.lock.json"
       ],

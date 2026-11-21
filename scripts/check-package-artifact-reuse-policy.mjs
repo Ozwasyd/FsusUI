@@ -70,8 +70,9 @@ for (const fragment of [
 for (const fragment of [
   'actions/download-artifact@v4',
   'name: fsusui-npm-candidate',
-  'Verify immutable npm candidate and package smoke',
-  'package:candidate:verify',
+  'Verify immutable npm candidate',
+  'node scripts/package-candidate.mjs verify',
+  'npm-candidate=.npm-candidate',
   'scripts/consumer-matrix-impact.mjs',
   'pnpm test:consumer-matrix:fixtures',
   'pnpm test:consumer-matrix --',
@@ -87,6 +88,23 @@ for (const fragment of [
     `consumer-install job must include ${fragment}`,
   )
 }
+const npmCandidateDownload = consumerInstallJob.match(
+  /^ {6}- uses: actions\/download-artifact@v4\n {8}with:\n {10}name: fsusui-npm-candidate\n {10}path: \.npm-candidate$/mu,
+)
+const npmCandidateVerify = consumerInstallJob.match(
+  /^ {6}- name: Verify immutable npm candidate\n {8}env:\n {10}EXPECTED_CANDIDATE_DIGEST:[^\n]*needs\.build-package\.outputs\.candidate-digest[^\n]*\n {8}run: \|\n {10}node scripts\/package-candidate\.mjs verify --tarball \.npm-candidate\/fsusui-npm-candidate\.tgz --commit "\$GITHUB_SHA"\n {10}digest=[^\n]+\n {10}test -n "\$EXPECTED_CANDIDATE_DIGEST"\n {10}test "\$digest" = "\$EXPECTED_CANDIDATE_DIGEST"$/mu,
+)
+assert(
+  npmCandidateDownload &&
+    npmCandidateVerify &&
+    npmCandidateDownload.index < npmCandidateVerify.index &&
+    npmCandidateVerify.index < consumerInstallJob.indexOf('pnpm/action-setup'),
+  'consumer-install must unconditionally download and verify the npm candidate before impact-gated dependencies',
+)
+assert(
+  buildPackageJob.includes('artifacts: npm-candidate=dist/npm-candidate'),
+  'build-package must record the same npm candidate in its readiness manifest',
+)
 for (const forbidden of [
   'pnpm run build:npm-package',
   'emscripten-core/setup-emsdk',

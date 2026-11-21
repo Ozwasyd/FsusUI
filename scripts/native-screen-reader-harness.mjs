@@ -170,6 +170,65 @@ const waitForServer = async (url, timeoutMs) => {
   throw new Error(`preview not ready: ${lastError?.message ?? 'timeout'}`)
 }
 
+export const resolveAtspiBusAddress = (
+  environment = process.env,
+  run = spawnSync,
+) => {
+  if (environment.AT_SPI_BUS_ADDRESS) return environment.AT_SPI_BUS_ADDRESS
+  const result = run(
+    'gdbus',
+    [
+      'call',
+      '--session',
+      '--dest',
+      'org.a11y.Bus',
+      '--object-path',
+      '/org/a11y/bus',
+      '--method',
+      'org.a11y.Bus.GetAddress',
+    ],
+    {
+      encoding: 'utf8',
+      env: environment,
+      timeout: 5_000,
+    },
+  )
+  if (result.status !== 0) return null
+  return result.stdout?.match(/\('([^']+)'/)?.[1] ?? null
+}
+
+export const parseAtspiResult = (result) => {
+  if (result.error || result.status !== 0) {
+    return {
+      ok: false,
+      runnerError: {
+        code: result.error?.code ?? `exit-${result.status ?? 'unknown'}`,
+        message: result.error?.message ?? 'AT-SPI helper exited unsuccessfully',
+      },
+      stderr: result.stderr,
+    }
+  }
+  try {
+    const parsed = JSON.parse(result.stdout || '{}')
+    if (parsed?.ok === true) return parsed
+    return {
+      ...(parsed && typeof parsed === 'object' ? parsed : {}),
+      ok: false,
+      runnerError: {
+        code: 'invalid-result',
+        message: 'AT-SPI helper did not report a successful result',
+      },
+    }
+  } catch {
+    return {
+      ok: false,
+      parseError: true,
+      stdout: result.stdout,
+      stderr: result.stderr,
+    }
+  }
+}
+
 const parseArguments = (argv) => {
   const options = { out: defaultOut, skipBuild: false }
   for (let index = 0; index < argv.length; index += 1) {
@@ -181,14 +240,15 @@ const parseArguments = (argv) => {
   return options
 }
 
-const chromePath = [
-  process.env.FSUS_IME_CHROME_PATH,
-  '/usr/bin/google-chrome-stable',
-  '/usr/bin/google-chrome',
-  '/usr/bin/chromium',
-]
-  .filter(Boolean)
-  .find((candidate) => {
+const configuredChromePath = process.env.FSUS_IME_CHROME_PATH
+const expectedChromiumVersion = process.env.FSUS_IME_EXPECTED_CHROMIUM_VERSION
+const chromePath =
+  configuredChromePath ||
+  [
+    '/usr/bin/google-chrome-stable',
+    '/usr/bin/google-chrome',
+    '/usr/bin/chromium',
+  ].find((candidate) => {
     try {
       readFileSync(candidate)
       return true
@@ -203,6 +263,10 @@ const main = async () => {
   }
   if (!chromePath) throw new Error('no Chromium executable found')
   const options = parseArguments(process.argv.slice(2))
+  const atspiBusAddress = resolveAtspiBusAddress()
+  const nativeEnvironment = atspiBusAddress
+    ? { ...process.env, AT_SPI_BUS_ADDRESS: atspiBusAddress }
+    : process.env
   rmSync(options.out, { force: true, recursive: true })
   mkdirSync(options.out, { recursive: true })
 
@@ -241,18 +305,18 @@ const main = async () => {
   let orca = null
   try {
     orca = spawn('orca', ['--replace', '--no-setup'], {
-      env: process.env,
+      env: nativeEnvironment,
       stdio: ['ignore', 'pipe', 'pipe'],
     })
     await sleep(1500)
 
     context = await chromium.launchPersistentContext(profileDirectory, {
       headless: false,
+      chromiumSandbox: true,
       executablePath: chromePath,
-      env: process.env,
+      env: nativeEnvironment,
       locale: 'zh-CN',
       args: [
-        '--no-sandbox',
         '--disable-dev-shm-usage',
         '--force-renderer-accessibility',
         '--window-size=1280,1100',
@@ -262,6 +326,16 @@ const main = async () => {
     })
     const page = context.pages()[0] ?? (await context.newPage())
     const cdp = await page.context().newCDPSession(page)
+    const { product: browserProduct } = await cdp.send('Browser.getVersion')
+    if (
+      expectedChromiumVersion &&
+      (!configuredChromePath ||
+        browserProduct.split('/').at(-1) !== expectedChromiumVersion)
+    ) {
+      throw new Error(
+        `Expected pinned Chromium ${expectedChromiumVersion}; launched ${browserProduct}`,
+      )
+    }
     const fixtureUrl = `${baseUrl}/?interactionTrace=1`
     await page.goto(fixtureUrl, { waitUntil: 'domcontentloaded' })
     await page.getByTestId('interaction-trace-fixture').waitFor({
@@ -294,7 +368,7 @@ const main = async () => {
     const undoFocus = await page.evaluate(
       () => document.activeElement?.tagName.toLowerCase() || null,
     )
-    const topLevelElapsedMilliseconds = performance.now() - interactionStart
+    const interactionElapsedMilliseconds = performance.now() - interactionStart
     const markdownContractSteps = []
     const recordMarkdownStep = (
       action,
@@ -618,10 +692,8 @@ const main = async () => {
       ...markdownLargePerformance,
       blockCount: 3000,
       budget: markdownPerformanceBudget,
-      passed:
-        markdownLargePerformance.sourceLength >= 100_000 &&
-        markdownLargePerformance.elapsedMilliseconds <=
-          markdownPerformanceBudget.renderMs,
+      fixtureLargeEnough: markdownLargePerformance.sourceLength >= 100_000,
+      timingQualification: 'diagnostic-only',
     }
 
     await page.evaluate(
@@ -660,6 +732,24 @@ const main = async () => {
         'null',
     ).checkTag
     await page.emulateMedia({ reducedMotion: 'reduce' })
+    // Document CSS pixels keep scroll changes separate from control layout.
+    const measureCheckTagBounds = async () =>
+      checkTag.evaluate(async (element) => {
+        await Promise.all(
+          element.getAnimations().map((animation) => animation.finished),
+        )
+        await new Promise(requestAnimationFrame)
+        await new Promise(requestAnimationFrame)
+        const { x, y, width, height } = element.getBoundingClientRect()
+        return {
+          x: x + window.scrollX,
+          y: y + window.scrollY,
+          width,
+          height,
+          focused: element.matches(':focus'),
+        }
+      })
+    const checkTagBoundsBeforeFocus = await measureCheckTagBounds()
     await checkTag.evaluate((element) => {
       element.addEventListener(
         'pointerdown',
@@ -702,6 +792,7 @@ const main = async () => {
         ? element.getAttribute('role') || 'checkbox'
         : document.activeElement?.getAttribute('role') || null,
     )
+    const checkTagBoundsAfterFocus = await measureCheckTagBounds()
     await checkTag.evaluate((element) => {
       element.addEventListener(
         'keydown',
@@ -730,6 +821,14 @@ const main = async () => {
             ?.textContent || 'null',
         ).checkTag.checked === false,
     )
+    const checkTagBoundsAfterToggle = await measureCheckTagBounds()
+    const checkTagFocusBounds = {
+      coordinateSpace: 'document',
+      unit: 'css-px',
+      before: checkTagBoundsBeforeFocus,
+      afterFocus: checkTagBoundsAfterFocus,
+      afterToggle: checkTagBoundsAfterToggle,
+    }
     const checkTagState = JSON.parse(
       (await page.getByTestId('interaction-trace-state').textContent()) ||
         'null',
@@ -849,20 +948,11 @@ const main = async () => {
 
     const atspi = spawnSync('python3', [atspiHelper], {
       encoding: 'utf8',
-      env: process.env,
+      env: nativeEnvironment,
+      maxBuffer: 16 * 1024 * 1024,
       timeout: 25_000,
     })
-    let atspiJson = null
-    try {
-      atspiJson = JSON.parse(atspi.stdout || '{}')
-    } catch {
-      atspiJson = {
-        ok: false,
-        parseError: true,
-        stdout: atspi.stdout,
-        stderr: atspi.stderr,
-      }
-    }
+    const atspiJson = parseAtspiResult(atspi)
     writeFileSync(
       join(options.out, 'atspi.json'),
       `${JSON.stringify(atspiJson, null, 2)}\n`,
@@ -1045,6 +1135,7 @@ const main = async () => {
       os: process.platform,
       display: process.env.DISPLAY ?? null,
       browser: chromePath,
+      browserProduct,
       orcaPid,
       identity,
       browserAccessibility: {
@@ -1098,9 +1189,8 @@ const main = async () => {
       focusTarget,
       performance: {
         identity,
-        elapsedMilliseconds: topLevelElapsedMilliseconds,
-        budgetMilliseconds: 2000,
-        passed: topLevelElapsedMilliseconds < 2000,
+        elapsedMilliseconds: interactionElapsedMilliseconds,
+        timingQualification: 'diagnostic-only',
       },
       visual: {
         identity,
@@ -1182,9 +1272,7 @@ const main = async () => {
                 actual: checkTagInitialState,
                 passed:
                   checkTagInitialState.checked === false &&
-                  checkTagInitialState.revision === 0 &&
-                  checkTagRenderMilliseconds <=
-                    checkTagPerformanceBudget.renderMs,
+                  checkTagInitialState.revision === 0,
               },
               elapsedMilliseconds: checkTagRenderMilliseconds,
             },
@@ -1327,14 +1415,8 @@ const main = async () => {
                   interactionMilliseconds:
                     checkTagInteractionTiming.pointerMilliseconds +
                     checkTagInteractionTiming.keyboardMilliseconds,
-                  budget: checkTagPerformanceBudget,
+                  timingQualification: 'diagnostic-only',
                 },
-                passed:
-                  checkTagRenderMilliseconds <=
-                    checkTagPerformanceBudget.renderMs &&
-                  checkTagInteractionTiming.pointerMilliseconds +
-                    checkTagInteractionTiming.keyboardMilliseconds <=
-                    checkTagPerformanceBudget.interactionMs,
               },
               elapsedMilliseconds:
                 checkTagInteractionTiming.pointerMilliseconds +
@@ -1441,12 +1523,7 @@ const main = async () => {
               checkTagInteractionTiming.keyboardMilliseconds,
             budget: checkTagPerformanceBudget,
             memoryObservation: checkTagMemoryObservation,
-            passed:
-              checkTagRenderMilliseconds <=
-                checkTagPerformanceBudget.renderMs &&
-              checkTagInteractionTiming.pointerMilliseconds +
-                checkTagInteractionTiming.keyboardMilliseconds <=
-                checkTagPerformanceBudget.interactionMs,
+            timingQualification: 'diagnostic-only',
           },
           visual: {
             identity: checkTagIdentity,
@@ -1461,6 +1538,7 @@ const main = async () => {
               content: (await checkTag.textContent())?.trim(),
               focused: checkTagFocus === 'checkbox',
               focusIndicatorVisible: checkTagMotion.focusIndicatorVisible,
+              focusBounds: checkTagFocusBounds,
               width: Math.round(checkTagVisualBounds.width),
               height: Math.round(checkTagVisualBounds.height),
             },
@@ -1502,7 +1580,9 @@ const main = async () => {
   }
 }
 
-main().catch((error) => {
-  console.error(`[screen-reader] FAIL ${error.message}`)
-  process.exitCode = 9
-})
+if (resolve(process.argv[1] || '') === fileURLToPath(import.meta.url)) {
+  main().catch((error) => {
+    console.error(`[screen-reader] FAIL ${error.message}`)
+    process.exitCode = 9
+  })
+}

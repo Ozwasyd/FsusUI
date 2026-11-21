@@ -60,6 +60,14 @@ const reportPath = path.join(temporaryRoot, 'reports/smoke.json')
 const leafManifestPath = path.join(temporaryRoot, 'reports/leaf-manifest.json')
 const missingDotnetRoot = path.join(temporaryRoot, 'no-dotnet-runtime')
 const dotnetInfo = spawnSync('dotnet', ['--info'], { encoding: 'utf8' })
+const sdkVersion = spawnSync('dotnet', ['--version'], { encoding: 'utf8' })
+assert.equal(sdkVersion.status, 0, sdkVersion.stderr)
+assert.match(sdkVersion.stdout.trim(), /^\d+\.\d+\.\d+$/u)
+writeFileSync(
+  path.join(temporaryRoot, 'global.json'),
+  JSON.stringify({ sdk: { version: sdkVersion.stdout.trim(), rollForward: 'disable' } }),
+  { flag: 'wx' },
+)
 const rid = dotnetInfo.stdout.match(/^\s*RID:\s*(\S+)\s*$/mu)?.[1]
 const commitSha = spawnSync('git', ['rev-parse', 'HEAD'], {
   cwd: root,
@@ -115,13 +123,14 @@ const execute = (command, arguments_, options = {}) => {
   return result
 }
 
-const globalPackagesOutput = execute(
-  'dotnet',
-  ['nuget', 'locals', 'global-packages', '--list'],
-  { label: 'resolve global NuGet cache' },
-).stdout.trim()
+const prewarmedPackages = process.env.NUGET_PACKAGES
 const globalPackages = realpathSync(
-  globalPackagesOutput.slice(globalPackagesOutput.indexOf(':') + 1).trim(),
+  prewarmedPackages
+    ? path.resolve(prewarmedPackages)
+    : execute('dotnet', ['nuget', 'locals', 'global-packages', '--list'], {
+        cwd: temporaryRoot,
+        label: 'resolve global NuGet cache',
+      }).stdout.trim().replace(/^[^:]+:\s*/u, ''),
 )
 const candidatePackagePattern =
   /^fsusui\.avalonia(?:\.themes|\.icons)?\..*\.nupkg$/iu
@@ -367,7 +376,18 @@ if (suppliedManifest) {
 cpSync(fixture, consumer, { recursive: true })
 writeFileSync(path.join(consumer, 'NuGet.Config'), configFor(feed))
 const consumerProject = path.join(consumer, 'FsusUI.Avalonia.AotSmoke.csproj')
-const publish = execute(
+const dependencyLock = process.env.FSUSUI_AOT_DEPENDENCY_LOCK
+if (dependencyLock) {
+  assert.ok(
+    suppliedCandidateRoot && suppliedManifest,
+    'dependency lock requires an immutable supplied candidate',
+  )
+  copyFileSync(
+    path.resolve(dependencyLock),
+    path.join(consumer, 'packages.lock.json'),
+  )
+}
+execute(
   isolatedDotnet,
   [
     'restore',
@@ -379,6 +399,7 @@ const publish = execute(
     path.join(consumer, 'NuGet.Config'),
     '--packages',
     consumerPackages,
+    ...(dependencyLock ? ['--locked-mode'] : []),
     '--no-cache',
     '--force',
   ],
@@ -387,12 +408,7 @@ const publish = execute(
     label: 'isolated local-only consumer restore no-external-sources',
   },
 )
-assert.doesNotMatch(
-  `${publish.stdout}\n${publish.stderr}`,
-  /warning\s+(?:IL\d+|AOT\d+|trim)/iu,
-  'Native AOT publish must not emit IL/AOT/trim warnings',
-)
-execute(
+const publish = execute(
   isolatedDotnet,
   [
     'publish',
@@ -411,6 +427,11 @@ execute(
     env: { ...process.env, LIBRARY_PATH: linkerRoot },
     label: `Native AOT publish ${rid}`,
   },
+)
+assert.doesNotMatch(
+  `${publish.stdout}\n${publish.stderr}`,
+  /warning\s+(?:IL\d+|AOT\d+|trim)/iu,
+  'Native AOT publish must not emit IL/AOT/trim warnings',
 )
 
 const nativeBinary = path.join(publishRoot, 'FsusUI.Avalonia.AotSmoke')
@@ -466,7 +487,16 @@ assert.ok(ready, `Xvfb ${display} did not become ready`)
 const sessionBus = execute(
   '/usr/bin/dbus-daemon',
   ['--session', '--fork', '--print-address=1', '--print-pid=1'],
-  { label: 'start isolated desktop session bus' },
+  {
+    env: {
+      ...process.env,
+      DISPLAY: display,
+      ...(inheritedDisplayReady && process.env.XAUTHORITY
+        ? { XAUTHORITY: process.env.XAUTHORITY }
+        : {}),
+    },
+    label: 'start isolated desktop session bus',
+  },
 )
   .stdout.trim()
   .split('\n')
@@ -579,6 +609,25 @@ const stopProcessId = async (pid, label) => {
 }
 
 try {
+  if (dependencyLock) {
+    const accessibilityBus = execute(
+      '/usr/bin/dbus-send',
+      [
+        `--bus=${sessionBusAddress}`,
+        '--reply-timeout=5000',
+        '--print-reply=literal',
+        '--dest=org.a11y.Bus',
+        '/org/a11y/bus',
+        'org.a11y.Bus.GetAddress',
+      ],
+      { label: 'resolve AT-SPI on the isolated session bus', timeout: 7000 },
+    ).stdout.trim()
+    assert.match(
+      accessibilityBus,
+      /^unix:/u,
+      'the isolated session returned no usable AT-SPI bus address',
+    )
+  }
   const positive = execute(nativeBinary, smokeArguments(reportPath), {
     cwd: temporaryRoot,
     env: runtimeFreeEnvironment,
@@ -701,6 +750,7 @@ try {
       '--force',
     ],
     {
+      cwd: consumer,
       expectFailure: true,
       label: 'missing local FsusUI package',
       timeout: negativeControlTimeout,

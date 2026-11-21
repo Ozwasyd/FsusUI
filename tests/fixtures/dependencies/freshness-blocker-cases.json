@@ -3,7 +3,7 @@
   "positive": {
     "schemaVersion": 1,
     "generatedAt": "2026-08-30T06:00:00.000Z",
-    "requiredChecks": ["pr-fast", "pr-real-render-performance"],
+    "requiredChecks": ["pr-fast"],
     "results": [
       {
         "dependencyId": "z-package",
@@ -35,11 +35,6 @@
                 "name": "pr-fast",
                 "conclusion": "success",
                 "completedAt": "2026-08-29T00:00:00Z"
-              },
-              {
-                "name": "pr-real-render-performance",
-                "conclusion": "success",
-                "completedAt": "2026-08-29T00:00:00Z"
               }
             ]
           }
@@ -59,7 +54,7 @@
       "report": {
         "schemaVersion": 1,
         "generatedAt": "2026-08-30T00:00:00.000Z",
-        "requiredChecks": ["pr-fast", "pr-real-render-performance"],
+        "requiredChecks": ["pr-fast"],
         "results": [],
         "errors": [
           {
@@ -75,7 +70,7 @@
       "report": {
         "schemaVersion": 1,
         "generatedAt": "2026-08-30T00:00:00.000Z",
-        "requiredChecks": ["pr-fast", "pr-real-render-performance"],
+        "requiredChecks": ["pr-fast"],
         "results": [],
         "errors": [
           {
@@ -91,7 +86,7 @@
       "report": {
         "schemaVersion": 1,
         "generatedAt": "2026-08-30T00:00:00.000Z",
-        "requiredChecks": ["pr-fast", "pr-real-render-performance"],
+        "requiredChecks": ["pr-fast"],
         "results": [
           {
             "dependencyId": "npm-a",

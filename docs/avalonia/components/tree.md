@@ -92,6 +92,14 @@ tree.RefreshView();
 file.InvalidatePresentation();
 ```
 
+For large default trees that are fully inside the viewport in a bounded,
+non-scrolling layout, FsusTree can attach only the row visuals needed to paint
+up to its own clipping edge, including rows that extend into the bottom
+padding. Logical flattened nodes and presentation APIs remain the same. Use
+those APIs rather than enumerating the internal `Content` host. Trees without
+their own bounds clip, scrollable or partially clipped layouts, custom row
+presenters, and active inline editors keep the full row layout.
+
 ## Inline editing
 
 `StartRename(key, initialValue)` replaces a visible node label with an editor,

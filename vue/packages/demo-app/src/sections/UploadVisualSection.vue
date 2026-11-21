@@ -117,6 +117,28 @@
           :file-list="pictureMultiFiles"
         />
       </div>
+      <div class="upload-fixture-row" data-upload-variant="picture-status">
+        <el-upload
+          action="#"
+          list-type="picture"
+          :auto-upload="false"
+          :file-list="pictureStatusFiles"
+          :on-preview="previewPicture"
+        />
+        <p data-testid="picture-preview">{{ previewedPicture }}</p>
+      </div>
+      <div
+        class="upload-fixture-row"
+        data-upload-variant="picture-status-disabled"
+      >
+        <el-upload
+          action="#"
+          list-type="picture"
+          :auto-upload="false"
+          :file-list="pictureFiles"
+          disabled
+        />
+      </div>
     </div>
 
     <!-- Picture-card list -->
@@ -151,7 +173,16 @@
 </template>
 
 <script setup lang="ts">
-import type { UploadUserFile } from '@element-plus/components/upload'
+import { ref } from 'vue'
+import type {
+  UploadFile,
+  UploadUserFile,
+} from '@element-plus/components/upload'
+
+const previewedPicture = ref('')
+const previewPicture = (file: UploadFile) => {
+  previewedPicture.value = file.name
+}
 
 const textReadyFiles: UploadUserFile[] = [
   { name: 'release-notes-v2.3.0.md', status: 'ready', uid: 1001 },
@@ -228,6 +259,23 @@ const pictureMultiFiles: UploadUserFile[] = [
     uid: 8004,
     url: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=',
   },
+]
+
+const pictureStatusFiles: UploadUserFile[] = [
+  {
+    ...pictureFiles[0],
+    uid: 8101,
+    name: '2026年度第四季度图片归档与审批记录-最终核定版本-封面图片.png',
+  },
+  { ...pictureFiles[0], uid: 8102, name: 'queued-cover.png', status: 'ready' },
+  {
+    ...pictureFiles[0],
+    uid: 8103,
+    name: 'draft-cover.png',
+    status: 'uploading',
+    percentage: 62,
+  },
+  { ...pictureFiles[0], uid: 8104, name: 'rejected-cover.png', status: 'fail' },
 ]
 
 const pictureCardFiles: UploadUserFile[] = [

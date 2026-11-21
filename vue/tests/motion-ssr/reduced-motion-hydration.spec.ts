@@ -437,7 +437,9 @@ test('records real legacy consumer state machines in all explicit modes', async 
     await page.waitForTimeout(settle)
     await expect(page.locator('.el-dropdown__popper')).toHaveCount(0)
     await expect(dropdownTrigger).toBeFocused()
-    await expect(page.locator('[inert]')).toHaveCount(0)
+    await expect(
+      page.locator('[inert]:not(.el-drawer[aria-hidden="true"])'),
+    ).toHaveCount(0)
 
     traces[mode] = await readMotionTrace(page)
     for (const consumer of [

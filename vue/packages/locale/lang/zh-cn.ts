@@ -59,6 +59,12 @@ export default {
         dec: '十二月',
       },
     },
+    metricPrimitives: {
+      copyDetail: '复制详情',
+      copied: '已复制',
+      copyFailed: '复制失败',
+      details: '详情',
+    },
     select: {
       loading: '加载中',
       noMatch: '无匹配数据',
@@ -125,6 +131,18 @@ export default {
       filterPlaceholder: '请输入搜索内容',
       noCheckedFormat: '共 {total} 项',
       hasCheckedFormat: '已选 {checked}/{total} 项',
+    },
+    imageViewer: {
+      close: '关闭',
+      previous: '上一张',
+      next: '下一张',
+      title: '图片预览',
+
+      zoomOut: '缩小',
+      zoomIn: '放大',
+      toggleMode: '切换图片尺寸',
+      rotateLeft: '向左旋转',
+      rotateRight: '向右旋转',
     },
     image: {
       error: '加载失败',

@@ -24,6 +24,12 @@ const visualViewports = {
   'metric-375': { width: 375, height: 900 },
   'metric-768': { width: 768, height: 1200 },
   'metric-1366': { width: 1366, height: 1200 },
+  'metric-detail-desktop': { width: 1280, height: 800 },
+  'metric-detail-mobile': { width: 375, height: 812 },
+  'upload-320': { width: 320, height: 1000 },
+  'upload-375': { width: 375, height: 1000 },
+  'upload-768': { width: 768, height: 1000 },
+  'upload-1366': { width: 1366, height: 1000 },
 } as const
 
 export type VisualViewportName = keyof typeof visualViewports

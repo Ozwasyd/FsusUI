@@ -36,7 +36,7 @@ function report(generatedAt, results, errors = []) {
   return {
     schemaVersion: 1,
     generatedAt,
-    requiredChecks: ['pr-fast', 'pr-real-render-performance'],
+    requiredChecks: ['pr-fast'],
     results,
     errors,
   }
@@ -181,11 +181,6 @@ async function overdueAndRecoveredRequiredChecks() {
       {
         name: 'pr-fast',
         conclusion: 'failure',
-        completedAt: '2026-08-28T01:00:00Z',
-      },
-      {
-        name: 'pr-real-render-performance',
-        conclusion: 'success',
         completedAt: '2026-08-28T01:00:00Z',
       },
     ],

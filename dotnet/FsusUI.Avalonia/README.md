@@ -11,6 +11,14 @@ workspace. It does not expose Web DOM structure, Element Plus internals, or
 product-specific FsusPanel/FsusBlog contracts. Its shared trimming and Native
 AOT boundary is defined in [Avalonia installation](../../docs/avalonia/installation.md#trimming-and-aot-library-boundary).
 
+## Trimming and AOT
+
+This package is an AOT-compatible library and does not set `PublishAot`.
+Final RID-specific Native AOT publish and run remain consuming-application
+release gates. Application-owned reflection, runtime type or assembly loading,
+runtime code generation, and third-party plugins are outside this library
+support statement and require consumer verification.
+
 ## Button Controls
 
 `FsusButton` is the stable command control for Avalonia. It exposes typed
