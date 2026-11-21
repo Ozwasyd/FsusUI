@@ -147,6 +147,27 @@ export const resolveDemoRoot = async (
   }
   const auditMode = searchParams.get('audit')
 
+  if (auditMode === 'drawer-safe-area') {
+    const { default: DrawerSafeAreaFixture } =
+      await import('./DrawerSafeAreaFixture.vue')
+    const rawDirection = searchParams.get('direction')
+    const direction =
+      rawDirection === 'rtl' ||
+      rawDirection === 'ttb' ||
+      rawDirection === 'btt'
+        ? rawDirection
+        : 'ltr'
+    return {
+      component: DrawerSafeAreaFixture,
+      themeMode,
+      props: {
+        direction,
+        size: searchParams.get('size') || 'min(86vw, 22rem)',
+        destroyOnClose: searchParams.get('destroy') === 'true',
+      },
+    }
+  }
+
   if (auditMode === 'ui-states' || auditMode === 'ui-boundaries') {
     const { default: AuditFixtures } = await import('./AuditFixtures.vue')
     return {

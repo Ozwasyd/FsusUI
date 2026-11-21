@@ -356,7 +356,10 @@ test('captures manual boundary layout screenshots and report', async ({
 
       if (state === 'interaction') {
         const interactionTarget = page.locator(component.interactionLocator).first()
-        if (await interactionTarget.count()) {
+        if (
+          (await interactionTarget.count()) &&
+          (await interactionTarget.isVisible())
+        ) {
           await interactionTarget.hover({ force: true, timeout: 1000 })
         } else {
           await componentCard.hover({ force: true, timeout: 1000 })
