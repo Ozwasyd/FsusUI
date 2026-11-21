@@ -8,8 +8,12 @@
 // do not need that, since this could introduce recalculation overhead for rendering.
 // https://lisilinhart.info/posts/css-variables-performance/
 
-// common
+// common & light
 :root {
+  color-scheme: light dark;
+
+  @include set-css-main-vars;
+
   @include set-css-var-value('color-white', $color-white);
   @include set-css-var-value('color-black', $color-black);
 
@@ -41,16 +45,6 @@
 
   // common component size
   @include set-component-css-var('component-size', $common-component-size);
-}
-
-// for light
-:root {
-  color-scheme: light;
-
-  @include set-css-main-vars;
-
-  @include set-css-var-value('color-white', $color-white);
-  @include set-css-var-value('color-black', $color-black);
 
   // --el-color-#{$type}
   // --el-color-#{$type}-light-{$i}
@@ -92,12 +86,14 @@
   @include css-var-from-global('svg-monochrome-grey', 'border-color');
 }
 
-// for dark
-.dark,
-:where(html:not(.light))[data-theme-resolved='dark'] {
+html.light {
+  color-scheme: light;
+}
+
+@mixin set-dark-css-vars {
   color-scheme: dark;
 
-  @include set-css-main-vars($color-scholarly-blue-dark);
+  @include set-css-var-value(('color', 'scholarly-blue'), $color-scholarly-blue-dark);
 
   @include set-css-var-value('color-white', map.get($colors-dark, 'white'));
   @include set-css-var-value('color-black', map.get($colors-dark, 'black'));
@@ -109,22 +105,56 @@
   }
 
   // Background --el-bg-color-#{$type}
-  @include set-component-css-var('bg-color', $bg-color-dark);
+  @include set-component-css-var-diff('bg-color', $bg-color-dark, $bg-color);
   // --el-text-color-#{$type}
-  @include set-component-css-var('text-color', $text-color-dark);
+  @include set-component-css-var-diff(
+    'text-color',
+    $text-color-dark,
+    $text-color
+  );
   // --el-border-color-#{$type}
-  @include set-component-css-var('border-color', $border-color-dark);
+  @include set-component-css-var-diff(
+    'border-color',
+    $border-color-dark,
+    $border-color
+  );
   // Fill --el-fill-color-#{$type}
-  @include set-component-css-var('fill-color', $fill-color-dark);
+  @include set-component-css-var-diff(
+    'fill-color',
+    $fill-color-dark,
+    $fill-color
+  );
 
   // Box-shadow
   // --el-box-shadow-#{$type}
-  @include set-component-css-var('box-shadow', $box-shadow-dark);
-
-  // Disable base
-  @include set-component-css-var('disabled', $disabled);
+  @include set-component-css-var-diff(
+    'box-shadow',
+    $box-shadow-dark,
+    $box-shadow
+  );
 
   // overlay & mask
-  @include set-component-css-var('overlay-color', $overlay-color-dark);
-  @include set-component-css-var('mask-color', $mask-color);
+  @include set-component-css-var-diff(
+    'overlay-color',
+    $overlay-color-dark,
+    $overlay-color
+  );
+  @include set-component-css-var-diff(
+    'mask-color',
+    $mask-color-dark,
+    $mask-color
+  );
+}
+
+// for dark
+.dark,
+html.dark,
+:where(html:not(.light))[data-theme-resolved='dark'] {
+  @include set-dark-css-vars;
+}
+
+@media (prefers-color-scheme: dark) {
+  html:not(.light) {
+    @include set-dark-css-vars;
+  }
 }

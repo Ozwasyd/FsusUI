@@ -436,6 +436,13 @@ test.describe('touch path', () => {
         container.scrollLeft = 0
       })
       await expect(trigger).toBeAttached()
+      await expect
+        .poll(async () =>
+          commands.evaluate(
+            (element) => element.scrollWidth <= element.clientWidth + 1,
+          ),
+        )
+        .toBe(true)
       triggerGeometry.push(
         await trigger.evaluate((element) => {
           const target = element as HTMLElement
@@ -446,6 +453,13 @@ test.describe('touch path', () => {
             '.el-markdown-editor__commands',
           )
           if (!container || !strip) throw new Error('Command strip is not mounted')
+          const badge = target.querySelector<HTMLElement>(
+            '.el-markdown-editor__command-more-count',
+          )
+          const overflowBadgeCount = Number.parseInt(
+            badge?.textContent?.trim() ?? '0',
+            10,
+          )
           const targetRect = target.getBoundingClientRect()
           const containerRect = container.getBoundingClientRect()
           const left = Math.max(targetRect.left, containerRect.left, 0)
@@ -471,6 +485,7 @@ test.describe('touch path', () => {
             clientWidth: strip.clientWidth,
             directlyTappable:
               hit === target || (hit !== null && target.contains(hit)),
+            overflowBadgeCount,
             scrollLeft: strip.scrollLeft,
             scrollWidth: strip.scrollWidth,
             targetHeight: targetRect.height,
@@ -490,7 +505,8 @@ test.describe('touch path', () => {
       triggerGeometry.every(
         (geometry) =>
           geometry.scrollLeft === 0 &&
-          geometry.scrollWidth > geometry.clientWidth &&
+          geometry.scrollWidth <= geometry.clientWidth + 1 &&
+          geometry.overflowBadgeCount > 0 &&
           geometry.targetHeight >= 44 &&
           geometry.targetWidth >= 44 &&
           geometry.visibleHeight >= 44 &&

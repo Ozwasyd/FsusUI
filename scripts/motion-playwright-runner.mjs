@@ -152,14 +152,19 @@ const expandFingerprintInputs = async (inputs) => {
         cwd: root,
         onlyFiles: true,
         dot: true,
-        ignore: ['**/node_modules/**', '**/dist/**', '**/.tmp/**'],
+        ignore: [
+          '**/node_modules/**',
+          '**/dist/**',
+          '**/.tmp/**',
+          '**/build/**',
+        ],
       })
       files.push(...matches.map((match) => `./${match}`))
     } else {
       files.push(input)
     }
   }
-  return files
+  return files.sort()
 }
 
 export async function computeCellRuntime(cell) {

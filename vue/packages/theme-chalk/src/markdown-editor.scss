@@ -36,12 +36,26 @@
     flex-wrap: nowrap;
     gap: 4px;
     min-width: 0;
-    overflow-x: auto;
+    overflow-x: hidden;
     scrollbar-width: none;
 
     &::-webkit-scrollbar {
       display: none;
     }
+  }
+
+  @include e(command-measure) {
+    position: absolute;
+    inset-block-start: 0;
+    inset-inline-start: 0;
+    inline-size: 100%;
+    block-size: 0;
+    overflow: hidden;
+    visibility: hidden;
+    pointer-events: none;
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: flex-start;
   }
 
   @include e(modes) {
@@ -186,7 +200,7 @@
     }
   }
 
-  @include e((command, command-more)) {
+  @include e((command, command-more, command-measure-item, command-measure-more)) {
     min-inline-size: 2rem;
     white-space: nowrap;
     flex-shrink: 0;
@@ -203,13 +217,15 @@
     }
   }
 
-  @include e(command-more) {
+  @include e((command-more, command-measure-more)) {
     display: inline-flex;
     align-items: center;
     gap: 6px;
     flex: 0 0 auto;
     min-height: 2.25rem;
+  }
 
+  @include e(command-more) {
     @include when(expanded) {
       background: getCssVar('fill-color', 'light');
       border-color: var(--fsus-state-focus-border);
@@ -249,6 +265,24 @@
     box-shadow: var(--fsus-shadow-subtle, 0 10px 24px rgb(0 0 0 / 8%));
     animation: markdown-editor-command-tray-in
       var(--fsus-motion-control-fast, 140ms) ease-out;
+  }
+
+  @include e((command-measure-item, command-measure-more)) {
+    display: inline-flex;
+    box-sizing: border-box;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid transparent;
+    border-radius: var(
+      --fsus-radius-control-small,
+      var(--el-border-radius-small)
+    );
+    font: inherit;
+    font-size: 12px;
+    line-height: 1.2;
+    padding: 7px 9px;
+    text-align: center;
+    vertical-align: middle;
   }
 
   @include e((command, command-more, mode, action)) {
@@ -323,7 +357,7 @@
       gap: 8px;
     }
 
-    @include e((command, command-more, mode, action)) {
+    @include e((command, command-more, command-measure-item, command-measure-more, mode, action)) {
       min-height: 44px;
       padding: 0 14px;
       font-size: 14px;
@@ -337,7 +371,7 @@
   }
 
   @include m(interaction-keyboard) {
-    @include e((command, command-more, mode, action)) {
+    @include e((command, command-more, command-measure-item, command-measure-more, mode, action)) {
       min-height: 2.25rem;
     }
   }
@@ -401,14 +435,16 @@
     }
   }
 
-  @include e(focus-layer) {
+  @include e((focus-layer, live-layer)) {
     position: absolute;
     z-index: 0;
     inset: 0;
     grid-area: 1 / 1;
+    max-width: 100%;
     min-width: 0;
     min-height: 100%;
     box-sizing: border-box;
+    border: 0;
     margin: 0;
     overflow-x: hidden;
     overflow-y: hidden;
@@ -416,6 +452,7 @@
     pointer-events: none;
     background: getCssVar('bg-color');
     color: getCssVar('text-color', 'primary');
+    scrollbar-gutter: stable;
     scrollbar-color: transparent transparent;
     font: inherit;
     font-family:
@@ -425,6 +462,10 @@
     white-space: pre-wrap;
     overflow-wrap: anywhere;
 
+    &::after {
+      content: '\200b';
+    }
+
     &::-webkit-scrollbar,
     &::-webkit-scrollbar-thumb,
     &::-webkit-scrollbar-track {
@@ -433,6 +474,161 @@
 
     @include when(dimmed) {
       opacity: 0.72;
+    }
+  }
+
+  @include e(live-token) {
+    &--heading {
+      color: getCssVar('text-color', 'primary');
+      font-weight: 700;
+      box-shadow: inset 0 -1px 0 getCssVar('border-color-lighter');
+    }
+
+    &--strong {
+      color: getCssVar('text-color', 'primary');
+      font-weight: 700;
+    }
+
+    &--emphasis {
+      color: getCssVar('text-color', 'primary');
+      font-style: italic;
+    }
+
+    &--strong-emphasis {
+      color: getCssVar('text-color', 'primary');
+      font-weight: 700;
+      font-style: italic;
+    }
+
+    &--inline-code {
+      color: getCssVar('text-color', 'primary');
+      background: getCssVar('fill-color', 'light');
+      border-radius: var(
+        --fsus-radius-control-small,
+        var(--el-border-radius-small)
+      );
+    }
+
+    &--link-label {
+      color: var(--fsus-scholarly-blue, getCssVar('color-primary'));
+      text-decoration: underline;
+      text-decoration-thickness: 1px;
+      text-underline-offset: 0.16em;
+    }
+
+    &--link-destination {
+      color: var(--fsus-color-text-quiet, getCssVar('text-color', 'secondary'));
+      opacity: 0.52;
+
+      @include when(revealed) {
+        opacity: 1;
+        color: var(--fsus-scholarly-blue, getCssVar('color-primary'));
+        background: color-mix(
+          in srgb,
+          var(--fsus-scholarly-blue, getCssVar('color-primary')) 10%,
+          transparent
+        );
+        border-radius: var(
+          --fsus-radius-control-small,
+          var(--el-border-radius-small)
+        );
+      }
+    }
+
+    &--image-alt {
+      color: var(--fsus-scholarly-blue, getCssVar('color-primary'));
+    }
+
+    &--list-marker {
+      color: var(--fsus-color-text-quiet, getCssVar('text-color', 'secondary'));
+    }
+
+    &--task-marker {
+      color: var(--fsus-scholarly-blue, getCssVar('color-primary'));
+    }
+
+    &--task-checked {
+      color: var(--fsus-color-text-quiet, getCssVar('text-color', 'secondary'));
+      text-decoration: line-through;
+    }
+
+    &--quote {
+      color: var(--fsus-color-text-quiet, getCssVar('text-color', 'regular'));
+      font-style: italic;
+    }
+
+    &--code-block {
+      color: getCssVar('text-color', 'regular');
+      background: getCssVar('fill-color', 'lighter');
+    }
+
+    &--code-language {
+      color: var(--fsus-scholarly-blue, getCssVar('color-primary'));
+      font-weight: 500;
+
+      @include when(revealed) {
+        opacity: 1;
+        background: color-mix(
+          in srgb,
+          var(--fsus-scholarly-blue, getCssVar('color-primary')) 10%,
+          transparent
+        );
+        border-radius: var(
+          --fsus-radius-control-small,
+          var(--el-border-radius-small)
+        );
+      }
+    }
+
+    &--table-header {
+      color: getCssVar('text-color', 'primary');
+      font-weight: 700;
+      background: getCssVar('fill-color', 'lighter');
+    }
+
+    &--table-marker {
+      color: var(--fsus-color-text-quiet, getCssVar('text-color', 'secondary'));
+      opacity: 0.55;
+    }
+
+    &--malformed {
+      color: getCssVar('color-danger');
+      text-decoration: underline wavy getCssVar('color-danger');
+      text-underline-offset: 0.16em;
+    }
+
+    &--plain {
+      color: inherit;
+    }
+
+    @include when(dimmed) {
+      opacity: 0.72;
+    }
+
+    @include when(marker) {
+      opacity: 0.36;
+      font-weight: 400;
+      font-style: normal;
+      text-decoration: none;
+      box-shadow: none;
+
+      @include when(dimmed) {
+        opacity: 0.28;
+      }
+
+      @include when(revealed) {
+        opacity: 1;
+        color: var(--fsus-scholarly-blue, getCssVar('color-primary'));
+        background: color-mix(
+          in srgb,
+          var(--fsus-scholarly-blue, getCssVar('color-primary')) 12%,
+          transparent
+        );
+        border-radius: var(
+          --fsus-radius-control-small,
+          var(--el-border-radius-small)
+        );
+      }
     }
   }
 
@@ -448,6 +644,30 @@
       &::selection {
         background: var(--fsus-state-selected-bg);
         color: getCssVar('text-color', 'primary');
+      }
+    }
+  }
+
+  @include when(live-visual) {
+    @include e(textarea) {
+      background: transparent;
+      color: transparent;
+      caret-color: var(
+        --fsus-state-focus-border,
+        getCssVar('text-color', 'primary')
+      );
+
+      &::placeholder {
+        color: getCssVar('text-color', 'placeholder');
+      }
+
+      &::selection {
+        background: var(--fsus-state-selected-bg);
+        color: getCssVar('text-color', 'primary');
+      }
+
+      &:focus-visible {
+        background: transparent;
       }
     }
   }
@@ -588,7 +808,7 @@
       }
     }
 
-    @include e(focus-layer) {
+    @include e((focus-layer, live-layer)) {
       justify-self: center;
       width: min(100%, 74ch);
       min-height: clamp(
@@ -607,6 +827,21 @@
       font-size: 18px;
       line-height: 1.84;
       letter-spacing: 0;
+    }
+
+    @include e(live-token) {
+      &--heading,
+      &--strong,
+      &--strong-emphasis,
+      &--table-header {
+        font-weight: inherit;
+        text-shadow: 0.018em 0 0 currentColor;
+      }
+
+      @include when(marker) {
+        font-weight: inherit;
+        text-shadow: none;
+      }
     }
 
     @include e(preview) {
@@ -628,6 +863,14 @@
     }
   }
 
+  @include when(live-visual) {
+    @include e(textarea) {
+      &:focus-visible {
+        background: transparent;
+      }
+    }
+  }
+
   @include m(mobile-compact) {
     @include e(mode) {
       &--split {
@@ -642,7 +885,7 @@
       align-items: center;
     }
 
-    @include e((command, command-more, mode, action)) {
+    @include e((command, command-more, command-measure-item, command-measure-more, mode, action)) {
       min-inline-size: 44px;
       min-height: 44px;
       padding: 0 14px;
@@ -693,7 +936,7 @@
       border-top: 1px solid getCssVar('border-color-lighter');
     }
 
-    @include e(textarea) {
+    @include e((textarea, focus-layer, live-layer)) {
       min-height: 20rem;
       padding: 14px;
       font-size: 16px;
@@ -707,19 +950,7 @@
         z-index: 2;
       }
 
-      @include e(textarea) {
-        width: 100%;
-        min-height: clamp(
-          24rem,
-          calc(var(--el-markdown-editor-visual-viewport-height, 100vh) - 15rem),
-          52rem
-        );
-        padding: 1.25rem 1rem 1.75rem;
-        font-size: 17px;
-        line-height: 1.78;
-      }
-
-      @include e(focus-layer) {
+      @include e((textarea, focus-layer, live-layer)) {
         width: 100%;
         min-height: clamp(
           24rem,
@@ -752,7 +983,7 @@
         gap: 8px;
       }
 
-      @include e((command, command-more, mode, action)) {
+      @include e((command, command-more, command-measure-item, command-measure-more, mode, action)) {
         min-height: 44px;
         padding: 0 14px;
         font-size: 14px;
@@ -1458,6 +1689,24 @@
 
     @include e(palette-list) {
       max-height: min(20rem, 50dvh);
+    }
+  }
+
+  @media (forced-colors: active) {
+    @include when(live-visual) {
+      @include e(textarea) {
+        background: Field;
+        color: FieldText;
+        caret-color: FieldText;
+      }
+
+      @include e((focus-layer, live-layer)) {
+        display: none;
+      }
+    }
+
+    @include e(live-layer) {
+      display: none;
     }
   }
 }
