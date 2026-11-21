@@ -1,5 +1,13 @@
 # element-plus
 
+## 1.6.0-preview.2
+
+### Preview Changes
+
+- Ship public-preview candidate `@ozwasyd/element-plus@1.6.0-preview.2` (`preview` dist-tag).
+- Hide detached fixed-column shadow pseudo-elements on un-pinned `ElTable` columns in compact responsive mode so the body scroll container stays aligned with the header without phantom horizontal overflow.
+- Fix release-tag Playwright checkout and prepared-preview boundary fixture serving (`?audit=drawer-safe-area`).
+
 ## 1.6.0-preview.1
 
 ### Preview Changes

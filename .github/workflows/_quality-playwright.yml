@@ -137,6 +137,11 @@ jobs:
       PLAYWRIGHT_BROWSERS_PATH: ${{ github.workspace }}/.tmp/playwright-browsers
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Ensure origin/main ref for tag checkouts
+        if: inputs.group != 'pr'
+        run: git rev-parse --verify origin/main >/dev/null 2>&1 || git fetch --no-tags origin +refs/heads/main:refs/remotes/origin/main
       - uses: pnpm/action-setup@v4
         with:
           version: 10.33.0
@@ -479,6 +484,11 @@ jobs:
       PLAYWRIGHT_BROWSERS_PATH: ${{ github.workspace }}/.tmp/playwright-browsers
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Ensure origin/main ref for tag checkouts
+        if: inputs.group != 'pr'
+        run: git rev-parse --verify origin/main >/dev/null 2>&1 || git fetch --no-tags origin +refs/heads/main:refs/remotes/origin/main
       - uses: pnpm/action-setup@v4
         with:
           version: 10.33.0

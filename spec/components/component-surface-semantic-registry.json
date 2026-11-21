@@ -34,7 +34,7 @@
       "path": "spec/components/contracts/v1/vue-public-contracts.json",
       "kind": "authority",
       "algorithm": "sha256",
-      "digest": "545921984c88ef0742195375e28770a5bc189a97264ee6fbc18f044d78df382a"
+      "digest": "f33bd85a187f250c2c3057b02ee80c60fcd8af41eb213d37451b2bd7f34cd529"
     },
     "component-motion": {
       "path": "docs/components/motion.md",
@@ -160,7 +160,7 @@
       "path": "vue/packages/theme-chalk/src/table.scss",
       "kind": "implementation",
       "algorithm": "sha256",
-      "digest": "256a634d4edafa5eca02e91eef81516e192e01c166f63e8e2714133562f0afd9"
+      "digest": "3462ef357bf8603b6c85c7757927a215842a4cc4ef160578db2a12f335ac3f71"
     },
     "implementation-20": {
       "path": "vue/packages/theme-chalk/src/common/transition.scss",

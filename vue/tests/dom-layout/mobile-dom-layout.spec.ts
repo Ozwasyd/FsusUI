@@ -852,14 +852,41 @@ test('time picker spinner scroll stays frame-coalesced and recovers', async ({
 
   const panel = page.locator('.el-time-panel').last()
   const spinner = panel.locator('.el-time-spinner__wrapper').first()
-  const scrollWrap = spinner.locator('.el-scrollbar__wrap').first()
   await expect(spinner).toBeVisible()
 
-  await scrollWrap.evaluate((element) => {
-    element.scrollTop = 88
-    element.dispatchEvent(new Event('scroll'))
+  const sawScrolling = await spinner.evaluate((element) => {
+    const wrap = element.querySelector<HTMLElement>('.el-scrollbar__wrap')
+    if (!wrap) {
+      throw new Error('TimePicker spinner wrap missing')
+    }
+    return new Promise<boolean>((resolve) => {
+      let seen = false
+      const observer = new MutationObserver(() => {
+        if (element.classList.contains('is-scrolling')) {
+          seen = true
+          observer.disconnect()
+          resolve(true)
+        }
+      })
+      observer.observe(element, {
+        attributes: true,
+        attributeFilter: ['class'],
+      })
+      wrap.scrollTop = 88
+      wrap.dispatchEvent(new Event('scroll'))
+      if (element.classList.contains('is-scrolling')) {
+        seen = true
+        observer.disconnect()
+        resolve(true)
+        return
+      }
+      setTimeout(() => {
+        observer.disconnect()
+        resolve(seen || element.classList.contains('is-scrolling'))
+      }, 1500)
+    })
   })
-  await expect(spinner).toHaveClass(/is-scrolling/)
+  expect(sawScrolling).toBe(true)
   await page.waitForTimeout(32)
 
   const metrics = await spinner.evaluate((element) => {
