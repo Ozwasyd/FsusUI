@@ -253,6 +253,7 @@ const getChunkUnitAttrs = (
 }
 
 let currentTaskId = 0
+let fragmentRevealController: AbortController | null = null
 let debounceTimer: ReturnType<typeof setTimeout> | null = null
 let activationController: AbortController | null = null
 let activationObserver: IntersectionObserver | null = null
@@ -1319,6 +1320,7 @@ watch(
     heavyDocumentContext?.revision(),
   ],
   () => {
+    fragmentRevealController?.abort()
     if (debounceTimer) {
       clearTimeout(debounceTimer)
     }
@@ -1330,6 +1332,7 @@ watch(
 )
 
 onBeforeUnmount(() => {
+  fragmentRevealController?.abort()
   setHeavyFeatureThemeListener(false)
   if (debounceTimer) {
     clearTimeout(debounceTimer)
@@ -1481,74 +1484,126 @@ const scrollElementIntoFragmentView = (
   }
 }
 
+// Each attempt waits for the virtualizer to apply a frame of measurements
+// before re-reading its size index. A first jump can land past the target
+// when previously estimated chunk sizes change around the destination.
+const MAX_FRAGMENT_REVEAL_ATTEMPTS = 4
+const fragmentRevealFrameKey = `${localDocumentKey}-reveal-fragment`
+const scheduleFragmentFrame = (
+  signal: AbortSignal,
+  measure: () => void,
+  mutate?: () => void,
+) =>
+  new Promise<void>((resolve) => {
+    if (signal.aborted) {
+      resolve()
+      return
+    }
+    const finish = () => {
+      signal.removeEventListener('abort', abort)
+      resolve()
+    }
+    const abort = () => {
+      frameScheduler.cancel(fragmentRevealFrameKey)
+      finish()
+    }
+    signal.addEventListener('abort', abort, { once: true })
+    if (
+      !frameScheduler.schedule({
+        key: fragmentRevealFrameKey,
+        measure,
+        mutate,
+        postPaint: finish,
+      })
+    ) {
+      finish()
+    }
+  })
+
 const revealFragment = async (
   fragmentOrId: string,
   options?: MarkdownFragmentRevealOptions,
 ): Promise<MarkdownFragmentRevealResult> => {
+  fragmentRevealController?.abort()
   const initial = locateFragment(fragmentOrId)
-  if (!initial.found) {
-    return {
-      ok: false,
-      id: initial.id,
-      fragment: initial.fragment,
-      chunkIndex: -1,
-      chunkKey: null,
-      element: null,
-    }
-  }
-
-  if (initial.mounted && initial.element) {
-    scrollElementIntoFragmentView(initial.element, options)
-    return {
-      ok: true,
-      id: initial.id,
-      fragment: initial.fragment,
-      chunkIndex: initial.chunkIndex,
-      chunkKey: initial.chunkKey,
-      element: initial.element,
-    }
-  }
-
-  const root = rootEl.value
-  const viewport = findScrollContainer(root)
-  if (root && viewport && initial.chunkIndex >= 0) {
-    const isDocumentViewport =
-      viewport === document.documentElement ||
-      viewport === document.body ||
-      viewport === document.scrollingElement
-    const rootOffsetInViewport = isDocumentViewport
-      ? root.getBoundingClientRect().top + window.scrollY
-      : root.getBoundingClientRect().top -
-        viewport.getBoundingClientRect().top +
-        viewport.scrollTop
-    const estimatedChunkOffset = virtualWindow.offsetForIndex(
-      initial.chunkIndex,
-    )
-    const targetScrollTop = Math.max(
-      0,
-      rootOffsetInViewport + estimatedChunkOffset,
-    )
-    viewport.scrollTop = targetScrollTop
-    if (isDocumentViewport && typeof window.scrollTo === 'function') {
-      window.scrollTo({ top: targetScrollTop, behavior: 'auto' })
-    }
-    virtualWindow.readViewport()
-    await nextTick()
-    await settleRenderViewport('markdown-render-reveal-fragment')
-  }
-
-  const resolvedElement = findMountedFragmentElement(initial.id)
-  if (resolvedElement) {
-    scrollElementIntoFragmentView(resolvedElement, options)
-  }
-
-  return {
-    ok: resolvedElement !== null,
+  const result = (element: HTMLElement | null) => ({
+    ok: element !== null,
     id: initial.id,
     fragment: initial.fragment,
     chunkIndex: initial.chunkIndex,
     chunkKey: initial.chunkKey,
-    element: resolvedElement,
+    element,
+  })
+
+  if (!initial.found) return result(null)
+
+  if (initial.mounted && initial.element) {
+    scrollElementIntoFragmentView(initial.element, options)
+    return result(initial.element)
+  }
+
+  const root = rootEl.value
+  if (!root || initial.chunkIndex < 0) return result(null)
+  const viewport = findScrollContainer(root)
+  const isDocumentViewport =
+    viewport === document.documentElement ||
+    viewport === document.body ||
+    viewport === document.scrollingElement
+  const controller = new AbortController()
+  fragmentRevealController = controller
+
+  try {
+    for (
+      let attempt = 0;
+      attempt < MAX_FRAGMENT_REVEAL_ATTEMPTS && !controller.signal.aborted;
+      attempt += 1
+    ) {
+      if (chunkUnits.value[initial.chunkIndex]?.key !== initial.chunkKey) break
+      let targetScrollTop = 0
+      await scheduleFragmentFrame(
+        controller.signal,
+        () => {
+          const rootOffsetInViewport = isDocumentViewport
+            ? root.getBoundingClientRect().top + window.scrollY
+            : root.getBoundingClientRect().top -
+              viewport.getBoundingClientRect().top +
+              viewport.scrollTop
+          const estimatedChunkOffset = virtualWindow.offsetForIndex(
+            initial.chunkIndex,
+          )
+          // Use the middle of the viewport to tolerate estimate drift on
+          // either side. The final element scroll honors the caller's options.
+          const viewportHeight = isDocumentViewport
+            ? window.innerHeight
+            : viewport.clientHeight
+          targetScrollTop = Math.max(
+            0,
+            rootOffsetInViewport + estimatedChunkOffset - viewportHeight / 2,
+          )
+        },
+        () => {
+          const scroller = isDocumentViewport ? window : viewport
+          if (typeof scroller.scrollTo === 'function') {
+            scroller.scrollTo({ top: targetScrollTop, behavior: 'instant' })
+          } else {
+            viewport.scrollTop = targetScrollTop
+          }
+        },
+      )
+      await scheduleFragmentFrame(controller.signal, virtualWindow.readViewport)
+      await nextTick()
+      if (controller.signal.aborted) break
+      const element = findMountedFragmentElement(initial.id)
+      if (element) {
+        scrollElementIntoFragmentView(element, options)
+        return result(element)
+      }
+    }
+    return result(null)
+  } finally {
+    if (fragmentRevealController === controller) {
+      fragmentRevealController = null
+    }
   }
 }
 

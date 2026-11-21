@@ -88,8 +88,17 @@ export function runIdentityScenario(id: string, revived: boolean) {
 declare global {
   interface Window {
     runIdentityScenario: typeof runIdentityScenario
+    mountFragmentFixture: (
+      smooth?: boolean,
+    ) => Promise<
+      ReturnType<typeof import('./fragment-fixture').mountFragmentFixture>
+    >
   }
 }
 
 window.runIdentityScenario = runIdentityScenario
+window.mountFragmentFixture = async (smooth = false) => {
+  const { mountFragmentFixture } = await import('./fragment-fixture')
+  return mountFragmentFixture(smooth)
+}
 document.querySelector('#ready')!.textContent = 'Public runtime ready'
