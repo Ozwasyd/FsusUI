@@ -1247,4 +1247,241 @@ describe('Dropdown', () => {
       expect(document.body.querySelector(selector.value)?.innerHTML).toBe('')
     })
   })
+
+  describe('single selection, dismissal, multiline, and viewport bounds (#830)', () => {
+    test('distinguishes menuitemradio from menuitem and keeps selection consumer-controlled', async () => {
+      const wrapper = _mount(
+        `
+        <el-dropdown trigger="click" :hide-on-click="false">
+          <button type="button" class="radio-trigger">Channel</button>
+          <template #dropdown>
+            <el-dropdown-menu>
+              <el-dropdown-item command="stable" :checked="selected === 'stable'">Stable</el-dropdown-item>
+              <el-dropdown-item command="preview" :checked="selected === 'preview'">Preview</el-dropdown-item>
+              <el-dropdown-item command="refresh">Refresh</el-dropdown-item>
+            </el-dropdown-menu>
+          </template>
+        </el-dropdown>
+        `,
+        () => ({ selected: 'stable' }),
+        undefined,
+        {
+          attachTo: document.body,
+          global: { stubs: { transition: false, teleport: false } },
+        },
+      )
+      await nextTick()
+      await wrapper.find('.radio-trigger').trigger('click')
+      await rAF()
+
+      const items = Array.from(
+        document.querySelectorAll<HTMLElement>('.el-dropdown-menu__item'),
+      )
+      expect(items).toHaveLength(3)
+      expect(items[0].getAttribute('role')).toBe('menuitemradio')
+      expect(items[0].getAttribute('aria-checked')).toBe('true')
+      expect(items[0].classList.contains('selected')).toBe(true)
+
+      expect(items[1].getAttribute('role')).toBe('menuitemradio')
+      expect(items[1].getAttribute('aria-checked')).toBe('false')
+      expect(items[1].classList.contains('selected')).toBe(false)
+
+      expect(items[2].getAttribute('role')).toBe('menuitem')
+      expect(items[2].hasAttribute('aria-checked')).toBe(false)
+
+      items[1].click()
+      await nextTick()
+      expect(wrapper.findComponent(Dropdown).emitted('command')?.[0]?.[0]).toBe(
+        'preview',
+      )
+      // Component never commits checked internally; consumer remains owner.
+      expect(items[0].getAttribute('aria-checked')).toBe('true')
+      expect(items[1].getAttribute('aria-checked')).toBe('false')
+
+      await wrapper.setData({ selected: 'preview' })
+      await nextTick()
+      expect(items[0].getAttribute('aria-checked')).toBe('false')
+      expect(items[1].getAttribute('aria-checked')).toBe('true')
+      wrapper.unmount()
+    })
+
+    test('Escape from open menu closes popup and returns focus to trigger', async () => {
+      vi.useFakeTimers()
+      const hasFocusSpy = vi.spyOn(document, 'hasFocus').mockReturnValue(true)
+      const wrapper = _mount(
+        `
+        <el-dropdown trigger="click" :hide-on-click="false">
+          <button type="button" class="esc-trigger">Open menu</button>
+          <template #dropdown>
+            <el-dropdown-menu>
+              <el-dropdown-item command="a" :checked="true">Alpha</el-dropdown-item>
+              <el-dropdown-item command="b" :checked="false">Beta</el-dropdown-item>
+            </el-dropdown-menu>
+          </template>
+        </el-dropdown>
+        `,
+        () => ({}),
+        undefined,
+        {
+          attachTo: document.body,
+          global: { stubs: { transition: false, teleport: false } },
+        },
+      )
+      try {
+        await nextTick()
+        const trigger = wrapper.find('.esc-trigger').element as HTMLButtonElement
+        trigger.focus()
+        await wrapper.find('.esc-trigger').trigger('keydown', {
+          key: EVENT_CODE.down,
+          code: EVENT_CODE.down,
+        })
+        await vi.advanceTimersByTimeAsync(100)
+        await nextTick()
+
+        const tooltip = wrapper.findComponent(ElTooltip).vm as InstanceType<
+          typeof ElTooltip
+        >
+        const items = document.querySelectorAll<HTMLElement>(
+          '.el-dropdown-menu__item',
+        )
+        expect(tooltip.open).toBe(true)
+        expect(document.activeElement).toBe(items[0])
+
+        items[0].dispatchEvent(
+          new KeyboardEvent('keydown', {
+            key: EVENT_CODE.esc,
+            code: EVENT_CODE.esc,
+            bubbles: true,
+            cancelable: true,
+          }),
+        )
+        await nextTick()
+        await vi.advanceTimersByTimeAsync(100)
+        await nextTick()
+
+        expect(tooltip.open).toBe(false)
+        expect(document.activeElement).toBe(trigger)
+      } finally {
+        wrapper.unmount()
+        hasFocusSpy.mockRestore()
+        vi.useRealTimers()
+      }
+    })
+
+    test('outside dismissal closes click-triggered menu without stealing outside focus', async () => {
+      vi.useFakeTimers()
+      const wrapper = _mount(
+        `
+        <div>
+          <button type="button" class="outside-btn">Outside</button>
+          <el-dropdown trigger="click" :hide-on-click="false">
+            <button type="button" class="dismiss-trigger">Options</button>
+            <template #dropdown>
+              <el-dropdown-menu>
+                <el-dropdown-item command="a" :checked="true">Alpha</el-dropdown-item>
+                <el-dropdown-item command="b" :checked="false">Beta</el-dropdown-item>
+              </el-dropdown-menu>
+            </template>
+          </el-dropdown>
+        </div>
+        `,
+        () => ({}),
+        undefined,
+        {
+          attachTo: document.body,
+          global: { stubs: { transition: false, teleport: false } },
+        },
+      )
+      try {
+        await nextTick()
+        const tooltip = wrapper.findComponent(ElTooltip).vm as InstanceType<
+          typeof ElTooltip
+        >
+        const outside = wrapper.find('.outside-btn').element as HTMLButtonElement
+        await wrapper.find('.dismiss-trigger').trigger('click')
+        await vi.advanceTimersByTimeAsync(100)
+        await nextTick()
+        expect(tooltip.open).toBe(true)
+
+        outside.focus()
+        outside.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }))
+        outside.dispatchEvent(new MouseEvent('mouseup', { bubbles: true }))
+        outside.dispatchEvent(new MouseEvent('click', { bubbles: true }))
+        await vi.advanceTimersByTimeAsync(100)
+        await nextTick()
+
+        expect(tooltip.open).toBe(false)
+        expect(document.activeElement).toBe(outside)
+      } finally {
+        wrapper.unmount()
+        vi.useRealTimers()
+      }
+    })
+
+    test('renders multiline description/suffix slots and applies viewport-bounded constraints', async () => {
+      const wrapper = _mount(
+        `
+        <el-dropdown trigger="click" viewport-bounded max-height="180px">
+          <button type="button" class="bounded-trigger">Profiles</button>
+          <template #dropdown>
+            <el-dropdown-menu>
+              <el-dropdown-item command="rich" :checked="true" multiline>
+                Primary profile
+                <template #description>Extended wrapping summary text</template>
+                <template #suffix>Active</template>
+              </el-dropdown-item>
+              <el-dropdown-item command="plain" :checked="false">
+                Plain profile
+                <template #description>Hidden without multiline</template>
+              </el-dropdown-item>
+            </el-dropdown-menu>
+          </template>
+        </el-dropdown>
+        `,
+        () => ({}),
+        undefined,
+        {
+          attachTo: document.body,
+          global: { stubs: { transition: false, teleport: false } },
+        },
+      )
+      await nextTick()
+      await wrapper.find('.bounded-trigger').trigger('click')
+      await rAF()
+
+      const popper = wrapper.findComponent({ name: 'ElPopperContent' }).element
+      expect(popper.classList.contains('is-viewport-bounded')).toBe(true)
+
+      const scrollbarWrap = wrapper
+        .findComponent(Dropdown)
+        .findComponent({ ref: 'scrollbar' })
+        .find('.el-scrollbar__wrap')
+      expect(scrollbarWrap.attributes('style')).toContain(
+        'min(180px, calc(var(--el-dropdown-viewport-height, 100dvh) - 24px))',
+      )
+
+      const items = Array.from(
+        document.querySelectorAll<HTMLElement>('.el-dropdown-menu__item'),
+      )
+      expect(items).toHaveLength(2)
+      expect(items[0].classList.contains('is-multiline')).toBe(true)
+      expect(
+        items[0].querySelector('.el-dropdown-menu__item-label')?.textContent?.trim(),
+      ).toBe('Primary profile')
+      expect(
+        items[0]
+          .querySelector('.el-dropdown-menu__item-description')
+          ?.textContent?.trim(),
+      ).toBe('Extended wrapping summary text')
+      expect(
+        items[0].querySelector('.el-dropdown-menu__item-suffix')?.textContent?.trim(),
+      ).toBe('Active')
+
+      expect(items[1].classList.contains('is-multiline')).toBe(false)
+      expect(
+        items[1].querySelector('.el-dropdown-menu__item-description'),
+      ).toBeNull()
+      wrapper.unmount()
+    })
+  })
 })

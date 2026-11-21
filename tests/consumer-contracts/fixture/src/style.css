@@ -1,0 +1,97 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  min-height: 100%;
+  background-color: var(--el-bg-color-page, #f7f7f8);
+  color: var(--el-text-color-primary, #0f0f11);
+  font-family:
+    system-ui,
+    -apple-system,
+    sans-serif;
+}
+
+.contract-shell {
+  padding: 16px;
+  max-width: 100%;
+}
+
+.contract-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.contract-status {
+  margin-top: 12px;
+  padding: 8px 12px;
+  border: 1px solid var(--el-border-color, #e4e4e7);
+  border-radius: 6px;
+  font-size: 13px;
+}
+
+.contract-spacer-tall {
+  height: 1800px;
+  padding-top: 480px;
+}
+
+.contract-compact-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border: 1px solid var(--el-border-color, #e4e4e7);
+  border-radius: 6px;
+  background: var(--el-bg-color, #ffffff);
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.contract-data-region {
+  width: 100%;
+  min-width: 0;
+}
+
+.contract-alert-box {
+  margin-bottom: 12px;
+}
+
+.contract-long-caption {
+  max-width: 640px;
+  margin: 0 auto;
+  text-align: left;
+}
+
+.contract-default-slot-badge {
+  position: fixed;
+  left: 16px;
+  top: 16px;
+  z-index: 2;
+  padding: 4px 10px;
+  border-radius: 6px;
+  background: rgba(15, 15, 17, 0.8);
+  color: #ffffff;
+  font-size: 12px;
+}
+
+.contract-ssr-root {
+  padding: 16px;
+}
+
+.contract-ssr-tall {
+  height: 1600px;
+  padding-top: 400px;
+}
+
+.contract-forced-neg-active *:focus-visible {
+  outline: none !important;
+}

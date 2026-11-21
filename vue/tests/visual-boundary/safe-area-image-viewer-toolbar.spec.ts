@@ -269,3 +269,40 @@ test('short ImageViewer chrome remains reachable and disjoint from the toolbar',
     }
   }
 })
+
+test('ImageViewer toolbar keeps >=44px targets and zero body horizontal overflow at 200% zoom', async ({
+  page,
+}) => {
+  for (const theme of ['light', 'dark'] as const) {
+    await page.emulateMedia({ colorScheme: theme, reducedMotion: 'reduce' })
+    const viewer = await openViewer(page, theme)
+    // 200% browser page zoom equivalent of a 1280x720 desktop viewport -> 640x360 CSS px.
+    const zoomedProfile = {
+      ...getSafeAreaProfile('no-inset'),
+      viewport: { width: 640, height: 360 },
+    }
+    await applySafeAreaProfile(page, zoomedProfile)
+
+    const actions = viewer.locator('.el-image-viewer__action')
+    await expect(actions).toHaveCount(5)
+    await expect(actions.locator('svg')).toHaveCount(5)
+
+    for (const control of await viewer.locator('[role="button"]').all()) {
+      const rect = await measureControl(control)
+      expect(rect.width).toBeGreaterThanOrEqual(44)
+      expect(rect.height).toBeGreaterThanOrEqual(44)
+      expect(rect.reachable).toBe(true)
+      expect(rect.x).toBeGreaterThanOrEqual(0)
+      expect(rect.y).toBeGreaterThanOrEqual(0)
+      expect(rect.right).toBeLessThanOrEqual(zoomedProfile.viewport.width)
+      expect(rect.bottom).toBeLessThanOrEqual(zoomedProfile.viewport.height)
+    }
+
+    const overflow = await page.evaluate(() => ({
+      docOverflow: document.documentElement.scrollWidth > window.innerWidth,
+      bodyOverflow: document.body.scrollWidth > window.innerWidth,
+    }))
+    expect(overflow.docOverflow).toBe(false)
+    expect(overflow.bodyOverflow).toBe(false)
+  }
+})
