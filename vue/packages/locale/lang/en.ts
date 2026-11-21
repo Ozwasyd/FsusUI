@@ -76,6 +76,12 @@ export default {
         dec: 'Dec',
       },
     },
+    metricPrimitives: {
+      copyDetail: 'Copy detail',
+      copied: 'Copied',
+      copyFailed: 'Copy failed',
+      details: 'Details',
+    },
     inputNumber: {
       decrease: 'decrease number',
       increase: 'increase number',

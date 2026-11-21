@@ -1,4 +1,10 @@
-import { mount } from '@vue/test-utils'
+import { createSSRApp, nextTick, ref } from 'vue'
+import { flushPromises, mount } from '@vue/test-utils'
+import { renderToString } from 'vue/server-renderer'
+import English from '@element-plus/locale/lang/en'
+import Chinese from '@element-plus/locale/lang/zh-cn'
+import French from '@element-plus/locale/lang/fr'
+import { ElConfigProvider } from '../../config-provider'
 import { describe, expect, test, vi } from 'vitest'
 import {
   ElCopyableDetail,
@@ -13,6 +19,8 @@ import {
   ElMetricList,
   ElStatusSummary,
 } from '..'
+
+import type { Language } from '@element-plus/locale'
 
 describe('metric primitives', () => {
   test('renders metric lists with stable label, value, secondary, and meta hierarchy', () => {
@@ -154,6 +162,148 @@ describe('metric primitives', () => {
     expect(writeText).toHaveBeenCalledWith('technical-detail-001')
     expect(wrapper.emitted('copy')?.[0]).toEqual(['technical-detail-001'])
     expect(wrapper.find('.el-copyable-detail__feedback').text()).toBe('Copied')
+  })
+
+  test('uses reactive provider labels for copy actions, feedback, and details', async () => {
+    const locale = ref<Language>(Chinese)
+    const clipboard = Object.getOwnPropertyDescriptor(navigator, 'clipboard')
+    const writeText = vi
+      .fn()
+      .mockResolvedValueOnce(undefined)
+      .mockRejectedValueOnce(new Error('Denied'))
+    Object.defineProperty(navigator, 'clipboard', {
+      configurable: true,
+      value: { writeText },
+    })
+
+    try {
+      const wrapper = mount(() => (
+        <ElConfigProvider locale={locale.value}>
+          <ElCopyableDetail value="payload" />
+          <ElDiagnosticsItem detail="technical detail" />
+        </ElConfigProvider>
+      ))
+      const button = wrapper.get('button')
+      const feedback = wrapper.get('[aria-live="polite"]')
+      expect(button.text()).toBe('复制详情')
+      expect(button.attributes('aria-label')).toBe('复制详情')
+      expect(wrapper.get('summary').text()).toBe('详情')
+
+      await button.trigger('click')
+      await flushPromises()
+      expect(feedback.text()).toBe('已复制')
+
+      await button.trigger('click')
+      await flushPromises()
+      expect(feedback.text()).toBe('复制失败')
+
+      locale.value = English
+      await nextTick()
+      expect(button.text()).toBe('Copy detail')
+      expect(button.attributes('aria-label')).toBe('Copy detail')
+      expect(feedback.text()).toBe('Copy failed')
+      expect(wrapper.get('summary').text()).toBe('Details')
+
+      locale.value = French
+      await nextTick()
+      expect(button.attributes('aria-label')).toBe('Copy detail')
+      expect(feedback.text()).toBe('Copy failed')
+      expect(wrapper.get('summary').text()).toBe('Details')
+    } finally {
+      if (clipboard) {
+        Object.defineProperty(navigator, 'clipboard', clipboard)
+      } else {
+        Reflect.deleteProperty(navigator, 'clipboard')
+      }
+    }
+  })
+
+  test('preserves literal custom translations and falls back per missing key', async () => {
+    const literalKey = 'el.metricPrimitives.copyDetail'
+    const locale = ref<Language>({
+      name: 'custom',
+      el: { metricPrimitives: { copyDetail: literalKey } },
+    })
+    const wrapper = mount(() => (
+      <ElConfigProvider locale={locale.value}>
+        <ElCopyableDetail value="payload" />
+        <ElDiagnosticsItem detail="technical detail" />
+      </ElConfigProvider>
+    ))
+    const button = wrapper.get('button')
+    expect(button.text()).toBe(literalKey)
+    expect(button.attributes('aria-label')).toBe(literalKey)
+    expect(wrapper.get('summary').text()).toBe('Details')
+
+    locale.value = {
+      name: 'custom',
+      el: { metricPrimitives: { copyDetail: '', details: 'Custom details' } },
+    }
+    await nextTick()
+    expect(button.text()).toBe('')
+    expect(button.attributes('aria-label')).toBe('')
+    expect(wrapper.get('summary').text()).toBe('Custom details')
+  })
+
+  test('preserves explicit copy labels, including an empty label', async () => {
+    const clipboard = Object.getOwnPropertyDescriptor(navigator, 'clipboard')
+    const writeText = vi
+      .fn()
+      .mockResolvedValueOnce(undefined)
+      .mockRejectedValueOnce(new Error('Denied'))
+    Object.defineProperty(navigator, 'clipboard', {
+      configurable: true,
+      value: { writeText },
+    })
+
+    try {
+      const wrapper = mount(() => (
+        <ElConfigProvider locale={Chinese}>
+          <ElCopyableDetail
+            value="payload"
+            label=""
+            copiedLabel="Saved"
+            errorLabel="Try again"
+          />
+          <ElDiagnosticsItem detail="technical detail" detailLabel="Expand" />
+        </ElConfigProvider>
+      ))
+      const button = wrapper.get('button')
+      const feedback = wrapper.get('[aria-live="polite"]')
+      expect(button.text()).toBe('')
+      expect(button.attributes('aria-label')).toBe('')
+      expect(wrapper.get('summary').text()).toBe('Expand')
+      await button.trigger('click')
+      await flushPromises()
+      expect(feedback.text()).toBe('Saved')
+      await button.trigger('click')
+      await flushPromises()
+      expect(feedback.text()).toBe('Try again')
+    } finally {
+      if (clipboard) {
+        Object.defineProperty(navigator, 'clipboard', clipboard)
+      } else {
+        Reflect.deleteProperty(navigator, 'clipboard')
+      }
+    }
+  })
+
+  test('server-renders localized accessible copy and diagnostics labels', async () => {
+    const html = await renderToString(
+      createSSRApp({
+        render: () => (
+          <ElConfigProvider locale={Chinese}>
+            <ElCopyableDetail value="payload" />
+            <ElDiagnosticsItem detail="technical detail" />
+          </ElConfigProvider>
+        ),
+      }),
+    )
+
+    expect(html).toContain('aria-label="复制详情"')
+    expect(html.replace(/<!--.*?-->/g, '')).toMatch(
+      /<summary[^>]*>详情<\/summary>/,
+    )
   })
 
   test('copyable detail preserves native disabled semantics and does not copy', async () => {

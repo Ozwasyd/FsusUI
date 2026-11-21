@@ -6,11 +6,11 @@
     <button
       type="button"
       :class="ns.e('button')"
-      :aria-label="label"
+      :aria-label="copyLabel"
       :disabled="disabled"
       @click="handleCopy"
     >
-      <slot name="button">{{ label }}</slot>
+      <slot name="button">{{ copyLabel }}</slot>
     </button>
     <span :class="ns.e('feedback')" aria-live="polite">
       <slot name="feedback" :state="copyState">
@@ -24,6 +24,7 @@
 import { computed, ref } from 'vue'
 import { useNamespace } from '@element-plus/hooks'
 import { copyableDetailEmits, copyableDetailProps } from './shared'
+import { useMetricPrimitiveLocale } from './use-metric-primitive-locale'
 
 defineOptions({
   name: 'ElCopyableDetail',
@@ -32,6 +33,8 @@ defineOptions({
 const props = defineProps(copyableDetailProps)
 const emit = defineEmits(copyableDetailEmits)
 const ns = useNamespace('copyable-detail')
+const translateLabel = useMetricPrimitiveLocale()
+const copyLabel = computed(() => props.label ?? translateLabel('copyDetail'))
 const copyState = ref<'idle' | 'copied' | 'error'>('idle')
 
 const detailKls = computed(() => [
@@ -41,8 +44,10 @@ const detailKls = computed(() => [
   ns.is('disabled', props.disabled),
 ])
 const feedbackText = computed(() => {
-  if (copyState.value === 'copied') return props.copiedLabel
-  if (copyState.value === 'error') return props.errorLabel
+  if (copyState.value === 'copied')
+    return props.copiedLabel ?? translateLabel('copied')
+  if (copyState.value === 'error')
+    return props.errorLabel ?? translateLabel('copyFailed')
   return ''
 })
 

@@ -22,7 +22,7 @@
       :open="defaultOpen || undefined"
     >
       <summary :class="ns.e('detail-toggle')">
-        <slot name="detail-label">{{ detailLabel }}</slot>
+        <slot name="detail-label">{{ resolvedDetailLabel }}</slot>
       </summary>
       <div :class="ns.e('detail-body')">
         <slot name="detail">{{ detail }}</slot>
@@ -35,6 +35,7 @@
 import { computed, useSlots } from 'vue'
 import { useNamespace } from '@element-plus/hooks'
 import { diagnosticsItemProps } from './shared'
+import { useMetricPrimitiveLocale } from './use-metric-primitive-locale'
 
 defineOptions({
   name: 'ElDiagnosticsItem',
@@ -43,6 +44,10 @@ defineOptions({
 const props = defineProps(diagnosticsItemProps)
 const slots = useSlots()
 const ns = useNamespace('diagnostics-item')
+const translateLabel = useMetricPrimitiveLocale()
+const resolvedDetailLabel = computed(
+  () => props.detailLabel ?? translateLabel('details'),
+)
 
 const hasTitle = computed(() => Boolean(props.title || slots.title))
 const hasMessage = computed(() => Boolean(props.message || slots.message))
