@@ -1,5 +1,15 @@
 # element-plus
 
+## 1.6.0-preview.3
+
+### Preview Changes
+
+- Ship public-preview candidate `@ozwasyd/element-plus@1.6.0-preview.3` (`preview` dist-tag).
+- Populate all 36 derived `--el-color-*` dark scale tokens, align `:root` `color-scheme: light dark` / `html.light`, and unify dark-token activation selectors across `var.scss` and `fsus-theme.scss` (#1107).
+- Suppress descendant CSS color transitions during `syncThemeMode` / `writeThemeMode` and `runViewTransition` snapshot capture so controls switch themes atomically without opposite-theme flashing (#1106).
+- Add the visible Live Preview visual projection layer and syntax-reveal highlighting for `ElMarkdownEditor` `live` mode (#1104), and move non-fitting toolbar commands into the overflow tray on narrow viewports so commands are never clipped beside the overflow trigger (#1103).
+- Constrain non-fullscreen `ElDialog` mobile `min-width` to `100%` of its container, harden Playwright runtime fingerprint determinism across multi-browser owner runs, and pin `interactionProfile=keyboard` on the multi-mode Markdown table matrix test.
+
 ## 1.6.0-preview.2
 
 ### Preview Changes

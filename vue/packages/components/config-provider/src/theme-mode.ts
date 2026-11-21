@@ -80,6 +80,43 @@ const setResolvedThemeMode = (root: HTMLElement, mode: ResolvedTheme) => {
 const resolveSystemThemeMode = (): ResolvedTheme =>
   getSystemThemeMedia()?.matches ? 'dark' : 'light'
 
+const getCurrentResolvedTheme = (root: HTMLElement): ResolvedTheme => {
+  if (root.classList.contains('dark')) return 'dark'
+  if (root.classList.contains('light')) return 'light'
+  if (
+    root.dataset.themeResolved === 'dark' ||
+    root.dataset.themeResolved === 'light'
+  ) {
+    return root.dataset.themeResolved
+  }
+  return resolveSystemThemeMode()
+}
+
+const withThemeTransitionSuppressed = (
+  root: HTMLElement,
+  shouldSuppress: boolean,
+  apply: () => void,
+) => {
+  if (!shouldSuppress) {
+    apply()
+    return
+  }
+
+  const ownsSuppression = root.dataset.fsusThemeSwitching === undefined
+  if (ownsSuppression) {
+    root.dataset.fsusThemeSwitching = 'true'
+  }
+
+  try {
+    apply()
+    void root.offsetHeight
+  } finally {
+    if (ownsSuppression) {
+      delete root.dataset.fsusThemeSwitching
+    }
+  }
+}
+
 export const clearThemeMode = (root = getThemeRoot()) => {
   if (!root) return
 
@@ -87,6 +124,7 @@ export const clearThemeMode = (root = getThemeRoot()) => {
   root.classList.remove('dark', 'light')
   delete root.dataset.themeMode
   delete root.dataset.themeResolved
+  delete root.dataset.fsusThemeSwitching
   root.style.removeProperty('color-scheme')
 }
 
@@ -109,35 +147,47 @@ export const syncThemeMode = (
   if (!root || typeof window === 'undefined') return fallbackResolved
 
   clearSystemThemeListener()
-  root.dataset.themeMode = normalized
 
   if (normalized === 'light') {
-    root.classList.add('light')
-    root.classList.remove('dark')
-    setResolvedThemeMode(root, 'light')
+    const shouldSuppress = getCurrentResolvedTheme(root) !== 'light'
+    withThemeTransitionSuppressed(root, shouldSuppress, () => {
+      root.dataset.themeMode = normalized
+      root.classList.add('light')
+      root.classList.remove('dark')
+      setResolvedThemeMode(root, 'light')
+    })
     emitThemeModeChange({ mode: normalized, resolved: 'light', root })
     return 'light'
   }
 
   if (normalized === 'dark') {
-    root.classList.add('dark')
-    root.classList.remove('light')
-    setResolvedThemeMode(root, 'dark')
+    const shouldSuppress = getCurrentResolvedTheme(root) !== 'dark'
+    withThemeTransitionSuppressed(root, shouldSuppress, () => {
+      root.dataset.themeMode = normalized
+      root.classList.add('dark')
+      root.classList.remove('light')
+      setResolvedThemeMode(root, 'dark')
+    })
     emitThemeModeChange({ mode: normalized, resolved: 'dark', root })
     return 'dark'
   }
 
-  root.classList.remove('dark', 'light')
-
   const media = getSystemThemeMedia()
-  const applyResolvedThemeMode = () => {
+  const applyResolvedThemeMode = (clearExplicitClasses = false) => {
     const resolved = resolveSystemThemeMode()
-    setResolvedThemeMode(root, resolved)
+    const shouldSuppress = getCurrentResolvedTheme(root) !== resolved
+    withThemeTransitionSuppressed(root, shouldSuppress, () => {
+      root.dataset.themeMode = normalized
+      if (clearExplicitClasses) {
+        root.classList.remove('dark', 'light')
+      }
+      setResolvedThemeMode(root, resolved)
+    })
     emitThemeModeChange({ mode: normalized, resolved, root })
     return resolved
   }
 
-  const resolved = applyResolvedThemeMode()
+  const resolved = applyResolvedThemeMode(true)
 
   if (!media) return resolved
 

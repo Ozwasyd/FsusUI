@@ -378,7 +378,7 @@ test('contains a 20 by 50 table and restores selection and scroll across modes',
   page,
 }, testInfo) => {
   await page.goto(
-    '/?audit=ui-states&markdownEditorTransaction=1&markdownEditorTable=1&markdownEditorTableEvidence=1&markdownEditorTableMatrix=20x50&markdownEditorModeMatrix=1&markdownEditorMode=split',
+    '/?audit=ui-states&markdownEditorTransaction=1&markdownEditorTable=1&markdownEditorTableEvidence=1&markdownEditorTableMatrix=20x50&markdownEditorModeMatrix=1&markdownEditorMode=split&markdownEditorInteractionProfile=keyboard',
     { waitUntil: 'domcontentloaded' },
   )
   const fixture = page.getByTestId('markdown-editor-transaction-fixture')

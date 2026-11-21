@@ -154,9 +154,18 @@ the renderer surface.
 only a real pane boundary; `preview` retains an accessible name and loading/error/capability
 state even without an editing surface. Live has one `source-textarea` as the input/selection/
 IME owner; projection decoration anchors to a `syn:` node range, is not editable, and never
-writes HTML back to source. Mode changes do not rebuild textarea, history, or document identity.
-Public modes are only `source` / `live` / `split` / `preview`; there is no `write` alias, and
-the visible copy for source mode is 「源码」.
+writes HTML back to source. While `live` mode is active and not composing, an `aria-hidden`
+metric-preserving mirror layer (`.el-markdown-editor__live-layer`, composed into the single
+`.el-markdown-editor__focus-layer` when prose Focus mode is also enabled) projects parser-backed
+semantic tokens strictly via Vue text interpolation so headings, emphasis, inline code, links,
+lists, tasks, quotes, code fences, tables, and malformed ranges stay visibly distinct while
+syntax markers quiet down until revealed by the caret, selection, or pointer (`Esc` clears
+reveal without mutating source). Active IME composition suspends the mirror layer so OS
+preedit underlines remain natively visible, `forced-colors: active` restores native `Field` /
+`FieldText` textarea rendering, and documents longer than `50,000` characters restrict
+decoration to the active virtual window (`liveWindow.mountedNodeIds`). Mode changes do not
+rebuild textarea, history, or document identity. Public modes are only `source` / `live` /
+`split` / `preview`; there is no `write` alias, and the visible copy for source mode is 「源码」.
 
 Live capability uses only these six frozen tokens: `supported`, `unsupported-platform`,
 `runtime-unavailable`、`projection-failed`、`feature-degraded`、`fatal`。
@@ -174,11 +183,16 @@ authority. See the [heavy-feature lifecycle contract](../api/markdown-heavy-feat
 
 ## Command registry
 
-The overflow trigger is a normal-flow sibling of the horizontal primary-command scroller.
-Scrolling primary commands keeps the trigger reachable without horizontal sticky positioning
-or covering a command. It follows the toolbar during page scrolling; only the existing compact
-`editor-profile="prose"` toolbar has vertical sticky behavior. The tray keeps its command/action
-count, expanded state, and Escape focus return to the trigger.
+The overflow trigger is a normal-flow sibling of the primary-command container. Primary
+command widths are measured through an off-flow `aria-hidden` probe under the single editor
+frame scheduler and `ResizeObserver`; commands that do not fit inside the available toolbar
+width (reserving the overflow trigger width at its worst-case badge count) move into the
+overflow tray instead of clipping or creating a horizontal scrollbar. The trigger stays
+reachable without horizontal sticky positioning or covering a command, follows the toolbar
+during page scrolling (only the existing compact `editor-profile="prose"` toolbar has vertical
+sticky behavior), preserves the total command/action count and expanded state, returns focus to
+the trigger on Escape, and restores focus to the first visible primary command (or textarea) if
+resizing wider collapses the overflow count to zero while focus is inside the tray.
 
 Every command surface consumes the same `MarkdownEditorCommand` registry. Commands use stable
 `key`, `label`, `group`, controlled icon tokens, shortcuts, and presentation targets;

@@ -1192,6 +1192,7 @@ body {
 }
 
 .audit-card .audit-floating-overlay .el-dialog {
+  min-width: 0;
   width: min(260px, calc(100% - var(--fsus-space-4))) !important;
   margin: 8px auto 0 !important;
 }

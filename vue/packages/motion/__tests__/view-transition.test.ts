@@ -61,12 +61,14 @@ describe('View Transitions progressive enhancement', () => {
   beforeEach(() => {
     document.documentElement.dataset.fsusMotion = 'enabled'
     delete document.documentElement.dataset.fsusViewTransition
+    delete document.documentElement.dataset.fsusViewTransitionSnapshotting
   })
 
   afterEach(() => {
     Reflect.deleteProperty(document, 'startViewTransition')
     delete document.documentElement.dataset.fsusMotion
     delete document.documentElement.dataset.fsusViewTransition
+    delete document.documentElement.dataset.fsusViewTransitionSnapshotting
     document.body.innerHTML = ''
     vi.restoreAllMocks()
   })
@@ -225,5 +227,197 @@ describe('View Transitions progressive enhancement', () => {
     await nextTick()
     expect(fallback.mode).toBe('fallback')
     expect(animate).toHaveBeenCalledTimes(1)
+  })
+
+  it('tracks data-fsus-view-transition-snapshotting across the native lifecycle until finished', async () => {
+    const manualFinished = deferred()
+    let seenInsideUpdate: string | undefined
+
+    Object.defineProperty(document, 'startViewTransition', {
+      configurable: true,
+      value: vi.fn((callback: () => void | Promise<void>) => {
+        const updateCallbackDone = Promise.resolve().then(callback)
+        return {
+          ready: Promise.resolve(),
+          updateCallbackDone,
+          finished: manualFinished.promise,
+          skipTransition: vi.fn(() => manualFinished.resolve()),
+        }
+      }),
+    })
+
+    const result = runViewTransition(() => {
+      seenInsideUpdate =
+        document.documentElement.dataset.fsusViewTransitionSnapshotting
+    })
+
+    // Old snapshot captures before callback runs
+    expect(
+      document.documentElement.dataset.fsusViewTransitionSnapshotting,
+    ).toBeUndefined()
+
+    await result.updateDone
+    expect(seenInsideUpdate).toBe('true')
+    // Stays active while view-transition pseudo-elements animate
+    expect(
+      document.documentElement.dataset.fsusViewTransitionSnapshotting,
+    ).toBe('true')
+
+    manualFinished.resolve()
+    await result.finished
+    expect(
+      document.documentElement.dataset.fsusViewTransitionSnapshotting,
+    ).toBeUndefined()
+  })
+
+  it('preserves snapshotting across native overlap, abort, skip, rejection, and sync platform throw', async () => {
+    const transitions: Array<{
+      finished: Deferred
+      skipTransition: ReturnType<typeof vi.fn>
+    }> = []
+
+    Object.defineProperty(document, 'startViewTransition', {
+      configurable: true,
+      value: vi.fn((callback: () => void | Promise<void>) => {
+        const finished = deferred()
+        const updateCallbackDone = Promise.resolve().then(callback)
+        const skipTransition = vi.fn(() => finished.resolve())
+        transitions.push({ finished, skipTransition })
+        return {
+          ready: Promise.resolve(),
+          updateCallbackDone,
+          finished: finished.promise,
+          skipTransition,
+        }
+      }),
+    })
+
+    document.documentElement.dataset.fsusViewTransitionSnapshotting =
+      'consumer-owned'
+    const first = runViewTransition(() => undefined, { name: 'first' })
+    await first.updateDone
+    expect(
+      document.documentElement.dataset.fsusViewTransitionSnapshotting,
+    ).toBe('true')
+
+    const controller = new AbortController()
+    const second = runViewTransition(() => undefined, {
+      name: 'second',
+      signal: controller.signal,
+    })
+    // First finishing must not prematurely restore while second is active
+    await first.finished
+    await second.updateDone
+    expect(
+      document.documentElement.dataset.fsusViewTransitionSnapshotting,
+    ).toBe('true')
+
+    controller.abort()
+    await second.finished
+    expect(
+      document.documentElement.dataset.fsusViewTransitionSnapshotting,
+    ).toBe('consumer-owned')
+
+    // Native update rejection still restores pre-existing attribute on finished
+    const err = new Error('native update rejected')
+    const rejected = runViewTransition(() => Promise.reject(err))
+    await expect(rejected.updateDone).rejects.toBe(err)
+    transitions[2].finished.resolve()
+    await rejected.finished
+    expect(
+      document.documentElement.dataset.fsusViewTransitionSnapshotting,
+    ).toBe('consumer-owned')
+
+    // Synchronous platform exception after invoking callback falls back without replaying update
+    delete document.documentElement.dataset.fsusViewTransitionSnapshotting
+    const syncThrowUpdate = vi.fn()
+    Object.defineProperty(document, 'startViewTransition', {
+      configurable: true,
+      value: (callback: () => void | Promise<void>) => {
+        void callback()
+        throw new Error('sync throw after callback')
+      },
+    })
+    const recovered = runViewTransition(syncThrowUpdate)
+    expect(recovered.mode).toBe('fallback')
+    expect(syncThrowUpdate).toHaveBeenCalledTimes(1)
+    await recovered.updateDone
+    expect(
+      document.documentElement.dataset.fsusViewTransitionSnapshotting,
+    ).toBeUndefined()
+  })
+
+  it('flushes and releases fallback snapshotting before updateDone resolves for sync, async, throw, and consumer values', async () => {
+    const root = document.documentElement
+    const flushes: Array<string | undefined> = []
+    const originalDescriptor = Object.getOwnPropertyDescriptor(
+      root,
+      'offsetHeight',
+    )
+    Object.defineProperty(root, 'offsetHeight', {
+      configurable: true,
+      get() {
+        flushes.push(root.dataset.fsusViewTransitionSnapshotting)
+        return 0
+      },
+    })
+
+    try {
+      // Sync fallback keeps attribute across microtask patch and releases before updateDone.then
+      let seenDuringSyncUpdate: string | undefined
+      let seenInUpdateDoneHandler: string | undefined
+      const syncResult = runViewTransition(() => {
+        seenDuringSyncUpdate = root.dataset.fsusViewTransitionSnapshotting
+      })
+      expect(syncResult.mode).toBe('fallback')
+      expect(seenDuringSyncUpdate).toBe('true')
+      expect(root.dataset.fsusViewTransitionSnapshotting).toBe('true')
+
+      await syncResult.updateDone.then(() => {
+        seenInUpdateDoneHandler = root.dataset.fsusViewTransitionSnapshotting
+      })
+      expect(seenInUpdateDoneHandler).toBeUndefined()
+      expect(flushes).toEqual(['true'])
+
+      // Async fallback holds until promise settles, then flushes and releases before updateDone
+      const pending = deferred()
+      const asyncResult = runViewTransition(() => pending.promise)
+      expect(root.dataset.fsusViewTransitionSnapshotting).toBe('true')
+      await Promise.resolve()
+      expect(root.dataset.fsusViewTransitionSnapshotting).toBe('true')
+      pending.resolve()
+      await asyncResult.updateDone
+      expect(root.dataset.fsusViewTransitionSnapshotting).toBeUndefined()
+      expect(flushes).toEqual(['true', 'true'])
+
+      // Synchronous throw releases immediately and preserves consumer-owned value
+      root.dataset.fsusViewTransitionSnapshotting = 'consumer-owned'
+      const syncError = new Error('sync fallback boom')
+      const thrownResult = runViewTransition(() => {
+        throw syncError
+      })
+      expect(root.dataset.fsusViewTransitionSnapshotting).toBe('consumer-owned')
+      await expect(thrownResult.updateDone).rejects.toBe(syncError)
+      await expect(thrownResult.finished).resolves.toBeUndefined()
+
+      // Overlapping async fallbacks settling out of order do not leak
+      delete root.dataset.fsusViewTransitionSnapshotting
+      const slow = deferred()
+      const fast = deferred()
+      const firstFallback = runViewTransition(() => slow.promise)
+      const secondFallback = runViewTransition(() => fast.promise)
+      fast.resolve()
+      await secondFallback.updateDone
+      expect(root.dataset.fsusViewTransitionSnapshotting).toBe('true')
+      slow.resolve()
+      await firstFallback.updateDone
+      expect(root.dataset.fsusViewTransitionSnapshotting).toBeUndefined()
+    } finally {
+      if (originalDescriptor) {
+        Object.defineProperty(root, 'offsetHeight', originalDescriptor)
+      } else {
+        Reflect.deleteProperty(root, 'offsetHeight')
+      }
+    }
   })
 })

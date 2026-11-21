@@ -131,8 +131,9 @@ html:where([data-theme-mode='system']:not(.light))[data-theme-resolved='dark']
   @include fsus-dark-tokens;
 }
 
-// Support manual toggle
-html.dark {
+// Support manual toggle and resolved dark state
+html.dark,
+:where(html:not(.light))[data-theme-resolved='dark'] {
   @include dark-mode-tokens;
 }
 
@@ -2931,7 +2932,8 @@ button.#{$namespace}-card:active {
   .#{$namespace}-dialog:not(.is-fullscreen) {
     min-width: min(
       var(--fsus-dialog-mobile-min-width),
-      var(--fsus-dialog-mobile-max-width)
+      var(--fsus-dialog-mobile-max-width),
+      100%
     );
     max-width: var(--fsus-dialog-mobile-max-width);
     margin-top: var(--fsus-space-6);

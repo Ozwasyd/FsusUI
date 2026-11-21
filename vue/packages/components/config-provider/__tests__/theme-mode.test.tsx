@@ -234,4 +234,122 @@ describe('theme-mode', () => {
     expect(document.documentElement.dataset.themeMode).toBeUndefined()
     expect(window.localStorage.getItem('fsus-test-theme')).toBeNull()
   })
+
+  it('suppresses transitions with data-fsus-theme-switching only on actual theme changes', () => {
+    const root = document.documentElement
+    const flushes: Array<{
+      switching: string | undefined
+      resolved: string | undefined
+      mode: string | undefined
+      hasDark: boolean
+      hasLight: boolean
+    }> = []
+
+    const originalDescriptor = Object.getOwnPropertyDescriptor(
+      root,
+      'offsetHeight',
+    )
+    Object.defineProperty(root, 'offsetHeight', {
+      configurable: true,
+      get() {
+        flushes.push({
+          switching: root.dataset.fsusThemeSwitching,
+          resolved: root.dataset.themeResolved,
+          mode: root.dataset.themeMode,
+          hasDark: root.classList.contains('dark'),
+          hasLight: root.classList.contains('light'),
+        })
+        return 0
+      },
+    })
+
+    try {
+      // Initial light on light OS is a no-op visually: no flush, no suppression
+      syncThemeMode('light', root)
+      expect(flushes).toHaveLength(0)
+      expect(root.dataset.fsusThemeSwitching).toBeUndefined()
+
+      // Actual switch light -> dark
+      syncThemeMode('dark', root)
+      expect(flushes).toHaveLength(1)
+      expect(flushes[0]).toEqual({
+        switching: 'true',
+        resolved: 'dark',
+        mode: 'dark',
+        hasDark: true,
+        hasLight: false,
+      })
+      expect(root.dataset.fsusThemeSwitching).toBeUndefined()
+
+      // No-op re-sync dark -> dark does not flush or suppress
+      syncThemeMode('dark', root)
+      expect(flushes).toHaveLength(1)
+      expect(root.dataset.fsusThemeSwitching).toBeUndefined()
+
+      // writeThemeMode inherits suppression on dark -> light
+      writeThemeMode('light', {
+        root,
+        storageKey: 'fsus-test-theme',
+      })
+      expect(flushes).toHaveLength(2)
+      expect(flushes[1]).toEqual({
+        switching: 'true',
+        resolved: 'light',
+        mode: 'light',
+        hasDark: false,
+        hasLight: true,
+      })
+      expect(root.dataset.fsusThemeSwitching).toBeUndefined()
+
+      // Switch light -> system (OS is light): no resolved theme change
+      syncThemeMode('system', root)
+      expect(flushes).toHaveLength(2)
+
+      // OS matchMedia change light -> dark suppresses during flush
+      matchMediaController.setMatches(true)
+      expect(flushes).toHaveLength(3)
+      expect(flushes[2]).toEqual({
+        switching: 'true',
+        resolved: 'dark',
+        mode: 'system',
+        hasDark: false,
+        hasLight: false,
+      })
+      expect(root.dataset.fsusThemeSwitching).toBeUndefined()
+
+      // Redundant OS change dark -> dark does not flush
+      matchMediaController.setMatches(true)
+      expect(flushes).toHaveLength(3)
+
+      // OS matchMedia change dark -> light suppresses during flush
+      matchMediaController.setMatches(false)
+      expect(flushes).toHaveLength(4)
+      expect(flushes[3]).toEqual({
+        switching: 'true',
+        resolved: 'light',
+        mode: 'system',
+        hasDark: false,
+        hasLight: false,
+      })
+      expect(root.dataset.fsusThemeSwitching).toBeUndefined()
+    } finally {
+      if (originalDescriptor) {
+        Object.defineProperty(root, 'offsetHeight', originalDescriptor)
+      } else {
+        Reflect.deleteProperty(root, 'offsetHeight')
+      }
+    }
+  })
+
+  it('preserves pre-existing data-fsus-theme-switching ownership and clears it in clearThemeMode', () => {
+    const root = document.documentElement
+    syncThemeMode('light', root)
+    root.dataset.fsusThemeSwitching = 'outer-owner'
+
+    syncThemeMode('dark', root)
+    expect(root.dataset.fsusThemeSwitching).toBe('outer-owner')
+
+    clearThemeMode(root)
+    expect(root.dataset.fsusThemeSwitching).toBeUndefined()
+  })
 })

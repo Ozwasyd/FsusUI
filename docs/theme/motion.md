@@ -80,6 +80,14 @@ When a named native transition is interrupted by another transition, the root
 `data-fsus-view-transition` attribute returns to its original value (including
 being absent), rather than retaining an interrupted transition's name.
 
+During View Transition snapshot and update capture, `runViewTransition` sets a
+CSP-safe `data-fsus-view-transition-snapshotting` attribute on `:root` so
+descendant CSS `transition` properties resolve target styles atomically without
+affecting `::view-transition-*` animations. Any pre-existing consumer attribute
+value is preserved across overlapping transitions, and the fallback path flushes
+and releases the attribute before `updateDone` settles so FLIP fallbacks retain
+normal transitions.
+
 ```vue
 <template>
   <el-config-provider :motion="{ mode: 'reduced' }">

@@ -76,9 +76,23 @@ $color-danger: map.get($colors, 'danger', 'base') !default;
 $color-error: map.get($colors, 'error', 'base') !default;
 $color-info: map.get($colors, 'info', 'base') !default;
 
+// Dark-mode mix targets matching dark --fsus-color-surface-base (#121214) and white ink
+$color-dark-mix-bg: #121214 !default;
+$color-dark-mix-ink: #ffffff !default;
+
 // Scholarly Blue for functional feedback
 $color-scholarly-blue: #2a599c !default;
 $color-scholarly-blue-dark: #4b79cc !default;
+
+@function round-rgb-color($value) {
+  @return color.change(
+    $value,
+    $red: math.round(color.channel($value, 'red', $space: rgb)),
+    $green: math.round(color.channel($value, 'green', $space: rgb)),
+    $blue: math.round(color.channel($value, 'blue', $space: rgb)),
+    $space: rgb
+  );
+}
 
 // https://sass-lang.com/documentation/values/maps#immutability
 // mix colors with white/black to generate light/dark level
@@ -91,14 +105,38 @@ $color-scholarly-blue-dark: #4b79cc !default;
   $colors: map.deep-merge(
     (
       $type: (
-        '#{$mode}-#{$number}': color.mix(
-            $mix-color,
-            map.get($colors, $type, 'base'),
-            math.percentage(math.div($number, 10))
+        '#{$mode}-#{$number}': round-rgb-color(
+            color.mix(
+              $mix-color,
+              map.get($colors, $type, 'base'),
+              math.percentage(math.div($number, 10))
+            )
           ),
       ),
     ),
     $colors
+  ) !global;
+}
+
+@mixin set-color-mix-level-dark(
+  $type,
+  $number,
+  $mode: 'light',
+  $mix-color: $color-dark-mix-bg
+) {
+  $colors-dark: map.deep-merge(
+    (
+      $type: (
+        '#{$mode}-#{$number}': round-rgb-color(
+            color.mix(
+              $mix-color,
+              map.get($colors-dark, $type, 'base'),
+              math.percentage(math.div($number, 10))
+            )
+          ),
+      ),
+    ),
+    $colors-dark
   ) !global;
 }
 
@@ -122,6 +160,19 @@ $color-scholarly-blue-dark: #4b79cc !default;
 // --el-color-primary-dark-2
 @each $type in $types {
   @include set-color-mix-level($type, 2, 'dark', $color-black);
+}
+
+// Dark mode scale:
+// light-1..9 mix toward dark surface (#121214) so light-9 stays subtle on dark canvas
+// dark-2 mixes toward white (#ffffff) so pressed/active states stay distinct on dark canvas
+@each $type in $types {
+  @for $i from 1 through 9 {
+    @include set-color-mix-level-dark($type, $i, 'light', $color-dark-mix-bg);
+  }
+}
+
+@each $type in $types {
+  @include set-color-mix-level-dark($type, 2, 'dark', $color-dark-mix-ink);
 }
 
 $text-color: () !default;
