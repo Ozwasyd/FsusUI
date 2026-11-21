@@ -330,7 +330,7 @@
     gap: 0;
     padding: 6px;
     border: 1px solid getCssVar('border-color-lighter');
-    border-radius: getCssVar('border-radius', 'small');
+    border-radius: var(--fsus-radius-popover, 10px);
     background: getCssVar('bg-color');
     box-shadow: var(--fsus-shadow-panel-light, none);
     box-sizing: border-box;
@@ -393,6 +393,11 @@
       border-color getCssVar('transition-duration-fast'),
       background-color getCssVar('transition-duration-fast'),
       color getCssVar('transition-duration-fast');
+
+    :where(.#{$namespace}-public-shell__mobile-nav-menu-panel) & {
+      border-color: transparent;
+      font-size: 14px;
+    }
 
     &:hover,
     &:focus-visible {
