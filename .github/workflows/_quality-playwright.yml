@@ -104,7 +104,7 @@ jobs:
           node scripts/layout-playwright-owner-run.mjs
           --owner playwright-layout
           --group ${{ inputs.group }}
-          --impact-plan ${{ inputs.group == 'pr' && '.tmp/playwright-impact/receipt.json' || '' }}
+          --impact-plan "${{ inputs.group == 'pr' && '.tmp/playwright-impact/receipt.json' || '' }}"
           --runtime-dir .tmp/visual-runtime-playwright
           --evidence-dir .tmp/playwright-layout
           --server-port 4181
@@ -194,7 +194,7 @@ jobs:
           node scripts/markdown-playwright-owner-run.mjs
           --owner playwright-markdown
           --group ${{ inputs.group }}
-          --impact-plan ${{ inputs.group == 'pr' && '.tmp/playwright-impact/receipt.json' || '' }}
+          --impact-plan "${{ inputs.group == 'pr' && '.tmp/playwright-impact/receipt.json' || '' }}"
           --evidence-dir .tmp/playwright-markdown
       - uses: actions/upload-artifact@v4
         if: always()
@@ -279,7 +279,7 @@ jobs:
           node scripts/motion-playwright-owner-run.mjs
           --owner playwright-motion
           --group ${{ inputs.group }}
-          --impact-plan ${{ inputs.group == 'pr' && '.tmp/playwright-impact/receipt.json' || '' }}
+          --impact-plan "${{ inputs.group == 'pr' && '.tmp/playwright-impact/receipt.json' || '' }}"
           --evidence-dir .tmp/playwright-motion
       - uses: actions/upload-artifact@v4
         if: always()
@@ -364,7 +364,7 @@ jobs:
           node scripts/boundary-playwright-owner-run.mjs
           --owner playwright-boundary
           --group ${{ inputs.group }}
-          --impact-plan ${{ inputs.group == 'pr' && '.tmp/playwright-impact/receipt.json' || '' }}
+          --impact-plan "${{ inputs.group == 'pr' && '.tmp/playwright-impact/receipt.json' || '' }}"
           --runtime-dir .tmp/visual-runtime-playwright
           --evidence-dir .tmp/playwright-boundary
           --server-port 4182
@@ -447,7 +447,7 @@ jobs:
           node scripts/visual-reuse-playwright-owner-run.mjs
           --owner visual-runtime-reuse
           --group ${{ inputs.group }}
-          --impact-plan ${{ inputs.group == 'pr' && '.tmp/playwright-impact/receipt.json' || '' }}
+          --impact-plan "${{ inputs.group == 'pr' && '.tmp/playwright-impact/receipt.json' || '' }}"
           --runtime-dir .tmp/visual-runtime-reuse-runtime
           --evidence-dir .tmp/visual-runtime-reuse
           --server-port 4182
@@ -522,7 +522,7 @@ jobs:
           node scripts/conformance-playwright-owner-run.mjs
           --owner playwright-conformance
           --group ${{ inputs.group }}
-          --impact-plan ${{ inputs.group == 'pr' && '.tmp/playwright-impact/receipt.json' || '' }}
+          --impact-plan "${{ inputs.group == 'pr' && '.tmp/playwright-impact/receipt.json' || '' }}"
           --evidence-dir .tmp/playwright-conformance
       - uses: actions/upload-artifact@v4
         if: always()
