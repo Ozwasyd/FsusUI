@@ -47,6 +47,16 @@ function useStyle<T>(
     display: 'inline-block',
     verticalAlign: 'middle',
   }
+  const measuredHorizontalOverflow = ref(false)
+  const scrollPositionClass = ref('is-scrolling-none')
+  const usesMeasuredHorizontalOverflow = computed(
+    () => props.responsive === 'auto' || props.responsive === 'priority',
+  )
+  const hasHorizontalOverflow = computed(() =>
+    usesMeasuredHorizontalOverflow.value
+      ? measuredHorizontalOverflow.value
+      : layout.scrollX.value,
+  )
   const tableWidth = ref()
   const tableScrollHeight = ref(0)
   const bodyScrollHeight = ref(0)
@@ -298,44 +308,29 @@ function useStyle<T>(
     })
     table.$ready = true
   })
-  const setScrollClassByEl = (el: HTMLElement, className: string) => {
-    if (!el) return
-    const classList = Array.from(el.classList).filter(
-      (item) => !item.startsWith('is-scrolling-'),
-    )
-    classList.push(layout.scrollX.value ? className : 'is-scrolling-none')
-    el.className = classList.join(' ')
-  }
-  const setScrollClass = (className: string) => {
-    const { tableWrapper } = table.refs
-    setScrollClassByEl(tableWrapper, className)
-  }
-  const hasScrollClass = (className: string) => {
-    const { tableWrapper } = table.refs
-    return !!(tableWrapper && tableWrapper.classList.contains(className))
-  }
   const syncPosition = function () {
-    if (!table.refs.scrollBarRef) return
-    if (!layout.scrollX.value) {
-      const scrollingNoneClass = 'is-scrolling-none'
-      if (!hasScrollClass(scrollingNoneClass)) {
-        setScrollClass(scrollingNoneClass)
-      }
+    const scrollContainer = table.refs.scrollBarRef?.wrapRef
+    if (!scrollContainer) return
+    const { scrollLeft, clientWidth, scrollWidth } = scrollContainer
+    if (usesMeasuredHorizontalOverflow.value) {
+      // Column layout still uses its intrinsic widths; the rendered scroll
+      // range must reflect the columns that CSS actually exposes.
+      measuredHorizontalOverflow.value = scrollWidth > clientWidth
+    }
+    if (!hasHorizontalOverflow.value) {
+      scrollPositionClass.value = 'is-scrolling-none'
       return
     }
-    const scrollContainer = table.refs.scrollBarRef.wrapRef
-    if (!scrollContainer) return
-    const { scrollLeft, offsetWidth, scrollWidth } = scrollContainer
     const { headerWrapper, footerWrapper } = table.refs
     if (headerWrapper) headerWrapper.scrollLeft = scrollLeft
     if (footerWrapper) footerWrapper.scrollLeft = scrollLeft
-    const maxScrollLeftPosition = scrollWidth - offsetWidth - 1
+    const maxScrollLeftPosition = scrollWidth - clientWidth - 1
     if (scrollLeft >= maxScrollLeftPosition) {
-      setScrollClass('is-scrolling-right')
+      scrollPositionClass.value = 'is-scrolling-right'
     } else if (scrollLeft === 0) {
-      setScrollClass('is-scrolling-left')
+      scrollPositionClass.value = 'is-scrolling-left'
     } else {
-      setScrollClass('is-scrolling-middle')
+      scrollPositionClass.value = 'is-scrolling-middle'
     }
   }
 
@@ -381,12 +376,14 @@ function useStyle<T>(
         resizeListener()
         if (pendingScrollbarUpdate) table.refs?.scrollBarRef?.update()
         pendingScrollbarUpdate = false
+        if (usesMeasuredHorizontalOverflow.value) scheduleSyncPositionFrame()
       },
       (frame) => {
         resizeFrame = frame
       },
     )
   }
+  watch(() => props.responsive, scheduleSyncPositionFrame, { flush: 'post' })
   const resizeListener = () => {
     const el = table.vnode.el
     if (disposed || !table.$ready || !el) return
@@ -545,6 +542,8 @@ function useStyle<T>(
     tableBodyStyles,
     tableLayout,
     scrollbarViewStyle,
+    hasHorizontalOverflow,
+    scrollPositionClass,
     tableInnerStyle,
     scrollbarStyle,
     refreshData,
