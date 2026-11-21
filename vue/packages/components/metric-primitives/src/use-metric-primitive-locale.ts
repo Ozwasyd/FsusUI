@@ -4,10 +4,13 @@ import English from '@element-plus/locale/lang/en'
 type MetricPrimitiveLocaleKey = keyof typeof English.el.metricPrimitives
 
 export const useMetricPrimitiveLocale = () => {
-  const { t } = useLocale()
+  const { locale } = useLocale()
   return (key: MetricPrimitiveLocaleKey) => {
-    const path = `el.metricPrimitives.${key}`
-    const value = t(path)
-    return value === path ? English.el.metricPrimitives[key] : value
+    const labels = locale.value.el.metricPrimitives
+    const value =
+      labels && typeof labels === 'object' && !Array.isArray(labels)
+        ? labels[key]
+        : undefined
+    return typeof value === 'string' ? value : English.el.metricPrimitives[key]
   }
 }

@@ -218,6 +218,33 @@ describe('metric primitives', () => {
     }
   })
 
+  test('preserves literal custom translations and falls back per missing key', async () => {
+    const literalKey = 'el.metricPrimitives.copyDetail'
+    const locale = ref<Language>({
+      name: 'custom',
+      el: { metricPrimitives: { copyDetail: literalKey } },
+    })
+    const wrapper = mount(() => (
+      <ElConfigProvider locale={locale.value}>
+        <ElCopyableDetail value="payload" />
+        <ElDiagnosticsItem detail="technical detail" />
+      </ElConfigProvider>
+    ))
+    const button = wrapper.get('button')
+    expect(button.text()).toBe(literalKey)
+    expect(button.attributes('aria-label')).toBe(literalKey)
+    expect(wrapper.get('summary').text()).toBe('Details')
+
+    locale.value = {
+      name: 'custom',
+      el: { metricPrimitives: { copyDetail: '', details: 'Custom details' } },
+    }
+    await nextTick()
+    expect(button.text()).toBe('')
+    expect(button.attributes('aria-label')).toBe('')
+    expect(wrapper.get('summary').text()).toBe('Custom details')
+  })
+
   test('preserves explicit copy labels, including an empty label', async () => {
     const clipboard = Object.getOwnPropertyDescriptor(navigator, 'clipboard')
     const writeText = vi
