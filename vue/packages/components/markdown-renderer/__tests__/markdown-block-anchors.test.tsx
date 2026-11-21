@@ -27,7 +27,9 @@ describe('issue #1082: MarkdownRenderer canonical block anchors and fragment loc
       fence,
       '^sample',
       '',
-      'Duplicate heading ^harbor',
+      'First duplicate ^collision',
+      '',
+      'Second duplicate ^collision',
       '',
       'Invalid marker ^Upper',
       '',
@@ -39,11 +41,9 @@ describe('issue #1082: MarkdownRenderer canonical block anchors and fragment loc
     ].join('\n')
 
     const anchors = collectMarkdownAnchorNodes(source)
-    expect(anchors.flatMap((node) => (node.ok ? [node.fragment] : []))).toEqual([
-      '#harbor',
-      '#detail',
-      '#sample',
-    ])
+    expect(anchors.flatMap((node) => (node.ok ? [node.fragment] : []))).toEqual(
+      ['#harbor', '#detail', '#sample'],
+    )
 
     const rendered = await renderMarkdownResultWithRuntime({
       source,
@@ -53,12 +53,16 @@ describe('issue #1082: MarkdownRenderer canonical block anchors and fragment loc
     expect(rendered.ok).toBe(true)
     if (!rendered.ok) return
     expect(rendered.value.rawSource).toBe(source)
-    expect(rendered.value.html).toContain('<h2 id="harbor">Heading witness</h2>')
+    expect(rendered.value.html).toContain(
+      '<h2 id="harbor">Heading witness</h2>',
+    )
     expect(rendered.value.html).toContain('id="detail"')
     expect(rendered.value.html).toContain('<pre id="sample"')
     expect(rendered.value.html).not.toContain('id="inside-fence"')
     expect(rendered.value.html).not.toContain('id="Upper"')
-    expect(rendered.value.html).not.toContain('id="harbor-2"')
+    expect(rendered.value.html).not.toContain('id="collision"')
+    expect(rendered.value.html).toContain('First duplicate ^collision')
+    expect(rendered.value.html).toContain('Second duplicate ^collision')
     expect(rendered.value.html).not.toContain('id="skipped"')
     expect(rendered.value.html).toContain('^skipped')
 
@@ -70,8 +74,13 @@ describe('issue #1082: MarkdownRenderer canonical block anchors and fragment loc
     expect(chunked.ok).toBe(true)
     if (!chunked.ok) return
     for (const id of ['harbor', 'detail', 'sample']) {
-      expect(chunked.value.chunks.some((chunk) => chunk.html.includes(`id="${id}"`))).toBe(true)
+      expect(
+        chunked.value.chunks.some((chunk) => chunk.html.includes(`id="${id}"`)),
+      ).toBe(true)
     }
+    expect(
+      chunked.value.chunks.map((chunk) => chunk.html).join(''),
+    ).not.toContain('id="collision"')
   })
 
   test('locateFragment and revealFragment reach regular mounted blocks cleanly', async () => {
@@ -139,8 +148,10 @@ describe('issue #1082: MarkdownRenderer canonical block anchors and fragment loc
 
   test('revealFragment mounts and locates targets inside unmounted chunked virtual units', async () => {
     const fence = '`'.repeat(3)
-    const blocks = Array.from({ length: 45 }, (_, idx) =>
-      `Paragraph block ${idx + 1} with extended prose so chunked rendering virtualizes offscreen blocks.`,
+    const blocks = Array.from(
+      { length: 45 },
+      (_, idx) =>
+        `Paragraph block ${idx + 1} with extended prose so chunked rendering virtualizes offscreen blocks.`,
     )
     blocks.push(`${fence}ts\nconst anchoredSample = true\n${fence}\n^sample`)
     const source = blocks.join('\n\n')
@@ -190,7 +201,9 @@ describe('issue #1082: MarkdownRenderer canonical block anchors and fragment loc
     }
 
     const renderer = wrapper.findComponent(MarkdownRenderer)
-    expect(renderer.attributes('data-fsus-render-strategy')).toBe('chunked-main')
+    expect(renderer.attributes('data-fsus-render-strategy')).toBe(
+      'chunked-main',
+    )
     const vm = renderer.vm as unknown as {
       locateFragment: (target: string) => {
         found: boolean
