@@ -34,8 +34,16 @@ export default defineConfig({
           : undefined,
       },
     },
-    { name: 'firefox', use: { ...devices['Desktop Firefox'] } },
-    { name: 'webkit', use: { ...devices['Desktop Safari'] } },
+    {
+      name: 'firefox',
+      grepInvert: /Chromium CPU profiles/,
+      use: { ...devices['Desktop Firefox'] },
+    },
+    {
+      name: 'webkit',
+      grepInvert: /Chromium CPU profiles/,
+      use: { ...devices['Desktop Safari'] },
+    },
   ],
   webServer: {
     command: `pnpm -C packages/demo-app dev --host 127.0.0.1 --port ${port} --strictPort`,
