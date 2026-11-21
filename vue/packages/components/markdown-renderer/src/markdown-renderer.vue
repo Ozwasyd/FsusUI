@@ -145,10 +145,9 @@ const handleHeavyFeatureThemeChange = () => {
 }
 const setHeavyFeatureThemeListener = (enabled: boolean) => {
   if (heavyThemeListenerInstalled === enabled) return
-  document.documentElement[enabled ? 'addEventListener' : 'removeEventListener'](
-    'fsus:theme-change',
-    handleHeavyFeatureThemeChange,
-  )
+  document.documentElement[
+    enabled ? 'addEventListener' : 'removeEventListener'
+  ]('fsus:theme-change', handleHeavyFeatureThemeChange)
   heavyThemeListenerInstalled = enabled
 }
 const emit = defineEmits<{
@@ -1494,43 +1493,6 @@ const scrollElementIntoFragmentView = (
   }
 }
 
-// Each attempt waits for the virtualizer to apply a frame of measurements
-// before re-reading its size index. A first jump can land past the target
-// when previously estimated chunk sizes change around the destination.
-const MAX_FRAGMENT_REVEAL_ATTEMPTS = 4
-const FRAGMENT_SETTLE_FRAMES = 2
-const fragmentRevealFrameKey = `${localDocumentKey}-reveal-fragment`
-const scheduleFragmentFrame = (
-  signal: AbortSignal,
-  measure: () => void,
-  mutate?: () => void,
-) =>
-  new Promise<void>((resolve) => {
-    if (signal.aborted) {
-      resolve()
-      return
-    }
-    const finish = () => {
-      signal.removeEventListener('abort', abort)
-      resolve()
-    }
-    const abort = () => {
-      frameScheduler.cancel(fragmentRevealFrameKey)
-      finish()
-    }
-    signal.addEventListener('abort', abort, { once: true })
-    if (
-      !frameScheduler.schedule({
-        key: fragmentRevealFrameKey,
-        measure,
-        mutate,
-        postPaint: finish,
-      })
-    ) {
-      finish()
-    }
-  })
-
 const revealFragment = async (
   fragmentOrId: string,
   options?: MarkdownFragmentRevealOptions,
@@ -1555,107 +1517,37 @@ const revealFragment = async (
 
   const root = rootEl.value
   if (!root || initial.chunkIndex < 0) return result(null)
-  const viewport = findScrollContainer(root)
-  const isDocumentViewport =
-    viewport === document.documentElement ||
-    viewport === document.body ||
-    viewport === document.scrollingElement
-  const usesSmoothScroll =
-    options?.behavior === 'smooth' ||
-    ((options?.behavior ?? 'auto') === 'auto' &&
-      window.getComputedStyle(viewport).scrollBehavior === 'smooth')
   const controller = new AbortController()
   fragmentRevealController = controller
-
   try {
-    for (
-      let attempt = 0;
-      attempt < MAX_FRAGMENT_REVEAL_ATTEMPTS && !controller.signal.aborted;
-      attempt += 1
-    ) {
-      if (chunkUnits.value[initial.chunkIndex]?.key !== initial.chunkKey) break
-      let targetScrollTop = 0
-      await scheduleFragmentFrame(
-        controller.signal,
-        () => {
-          const rootOffsetInViewport = isDocumentViewport
-            ? root.getBoundingClientRect().top + window.scrollY
-            : root.getBoundingClientRect().top -
-              viewport.getBoundingClientRect().top +
-              viewport.scrollTop
-          const estimatedChunkOffset = virtualWindow.offsetForIndex(
-            initial.chunkIndex,
-          )
-          // Use the middle of the viewport to tolerate estimate drift on
-          // either side. The final element scroll honors the caller's options.
-          const viewportHeight = isDocumentViewport
-            ? window.innerHeight
-            : viewport.clientHeight
-          targetScrollTop = Math.max(
-            0,
-            rootOffsetInViewport + estimatedChunkOffset - viewportHeight / 2,
-          )
+    const virtualReveal = await import('./markdown-fragment-reveal').catch(
+      () => null,
+    )
+    if (!virtualReveal || controller.signal.aborted) return result(null)
+    return result(
+      await virtualReveal.revealVirtualMarkdownFragment({
+        ...options,
+        root,
+        viewport: findScrollContainer(root),
+        frameScheduler,
+        frameKey: `${localDocumentKey}-reveal-fragment`,
+        signal: controller.signal,
+        getEstimatedOffset: () =>
+          virtualWindow.offsetForIndex(initial.chunkIndex),
+        readViewport: virtualWindow.readViewport,
+        isTargetCurrent: () =>
+          chunkUnits.value[initial.chunkIndex]?.key === initial.chunkKey,
+        findTarget: () => {
+          const element = findMountedFragmentElement(initial.id)
+          return element &&
+            resolveElementChunkLocation(element).chunkKey === initial.chunkKey
+            ? element
+            : null
         },
-        () => {
-          const scroller = isDocumentViewport ? window : viewport
-          if (typeof scroller.scrollTo === 'function') {
-            scroller.scrollTo({ top: targetScrollTop, behavior: 'instant' })
-          } else {
-            viewport.scrollTop = targetScrollTop
-          }
-        },
-      )
-      await scheduleFragmentFrame(controller.signal, virtualWindow.readViewport)
-      await nextTick()
-      if (controller.signal.aborted) break
-      let element = findMountedFragmentElement(initial.id)
-      // Use the actual element once it exists. One more alignment can absorb
-      // a measured-height adjustment without jumping back to an estimate.
-      for (let alignment = 0; alignment < 2 && element; alignment += 1) {
-        scrollElementIntoFragmentView(element, options)
-        for (
-          let frame = 0;
-          frame < FRAGMENT_SETTLE_FRAMES && !controller.signal.aborted;
-          frame += 1
-        ) {
-          await scheduleFragmentFrame(
-            controller.signal,
-            virtualWindow.readViewport,
-          )
-          await nextTick()
-        }
-        if (controller.signal.aborted) break
-
-        const confirmed = findMountedFragmentElement(initial.id)
-        if (
-          !confirmed ||
-          resolveElementChunkLocation(confirmed).chunkKey !== initial.chunkKey
-        ) {
-          break
-        }
-        if (usesSmoothScroll) return result(confirmed)
-
-        const viewportTop = isDocumentViewport
-          ? 0
-          : viewport.getBoundingClientRect().top + viewport.clientTop
-        const viewportBottom =
-          viewportTop +
-          (isDocumentViewport ? window.innerHeight : viewport.clientHeight)
-        const targetRect = confirmed.getBoundingClientRect()
-        const startsAboveViewport =
-          (options?.block ?? 'start') === 'start' &&
-          targetRect.top < viewportTop - 1
-        if (
-          !startsAboveViewport &&
-          targetRect.bottom > viewportTop &&
-          targetRect.top < viewportBottom
-        ) {
-          return result(confirmed)
-        }
-        element = confirmed
-      }
-    }
-    return result(null)
+        scrollTarget: (element) =>
+          scrollElementIntoFragmentView(element, options),
+      }),
+    )
   } finally {
     if (fragmentRevealController === controller) {
       fragmentRevealController = null
