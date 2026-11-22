@@ -1,7 +1,12 @@
 <template>
   <li
+    :id="id"
     ref="itemRef"
+    role="option"
     :aria-selected="selected"
+    :aria-disabled="disabled"
+    :aria-posinset="position"
+    :aria-setsize="total"
     :style="style"
     :class="[
       ns.be('dropdown', 'option-item'),
@@ -11,6 +16,8 @@
       { hover: hovering },
     ]"
     @mouseenter="hoverItem"
+    @pointerdown="handlePointerDown"
+    @pointercancel="handlePointerDown"
     @click.stop="selectOptionClick"
   >
     <slot :item="item" :index="index" :disabled="disabled">
@@ -20,7 +27,15 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, inject, onMounted, onUpdated, ref } from 'vue'
+import {
+  defineComponent,
+  inject,
+  onBeforeUnmount,
+  onMounted,
+  onUpdated,
+  ref,
+  watch,
+} from 'vue'
 import { useNamespace } from '@element-plus/hooks'
 import { useOption } from './useOption'
 import { useProps } from './useProps'
@@ -28,12 +43,22 @@ import { OptionProps } from './defaults'
 import { selectV2InjectionKey } from './token'
 
 export default defineComponent({
-  props: OptionProps,
-  emits: ['select', 'hover', 'resize'],
+  props: {
+    ...OptionProps,
+    id: String,
+    position: Number,
+    total: Number,
+  },
+  emits: ['select', 'hover', 'resize', 'rendered'],
   setup(props, { emit }) {
     const select = inject(selectV2InjectionKey)!
     const ns = useNamespace('select')
-    const { hoverItem, selectOptionClick } = useOption(props, { emit })
+    const { hoverItem, selectOptionClick, handlePointerDown } = useOption(
+      props,
+      {
+        emit,
+      },
+    )
     const { getLabel } = useProps(select.props)
     const itemRef = ref<HTMLElement | null>(null)
 
@@ -50,8 +75,18 @@ export default defineComponent({
     }
 
     onMounted(() => {
+      emit('rendered', props.index, true)
       emitHeight()
     })
+
+    watch(
+      () => props.index,
+      (index, previous) => {
+        emit('rendered', previous, false)
+        emit('rendered', index, true)
+      },
+    )
+    onBeforeUnmount(() => emit('rendered', props.index, false))
 
     onUpdated(() => {
       emitHeight()
@@ -60,6 +95,7 @@ export default defineComponent({
     return {
       ns,
       hoverItem,
+      handlePointerDown,
       selectOptionClick,
       getLabel,
       itemRef,

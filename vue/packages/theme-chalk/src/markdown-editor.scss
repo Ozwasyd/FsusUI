@@ -472,8 +472,10 @@
       background: transparent;
     }
 
-    @include when(dimmed) {
-      opacity: 0.72;
+    > span {
+      @include when(dimmed) {
+        opacity: 0.72;
+      }
     }
   }
 
@@ -752,8 +754,11 @@
 
   @include m(profile-prose) {
     border-color: getCssVar('border-color-lighter');
-    border-radius: var(--fsus-radius-panel, var(--el-border-radius-base));
     background: getCssVar('bg-color');
+
+    &.#{$namespace}-markdown-editor--chrome-framed {
+      border-radius: var(--fsus-radius-panel, var(--el-border-radius-base));
+    }
 
     @include e(toolbar) {
       gap: 10px;

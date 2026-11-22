@@ -1,6 +1,7 @@
 import type {
   CSSProperties,
   FunctionalComponent,
+  HTMLAttributes,
   RendererElement,
   RendererNode,
   VNode,
@@ -126,7 +127,7 @@ export type TableV2CustomizedHeaderSlotParam<T = any> = {
 }
 
 export type SimpleFunctionalComponentProps<T extends object> = {
-  class?: JSX.IntrinsicAttributes['class']
+  class?: HTMLAttributes['class']
   style?: CSSProperties
 } & T
 
