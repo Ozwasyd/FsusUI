@@ -34,7 +34,7 @@
   ],
   "activeBaselineIdentity": {
     "repository": "Ozwasyd/FsusUI",
-    "revision": "74c7f5dfb7c2735f031df896188cb6f4ddcd70a4",
+    "revision": "5a9d515ea2597db901347da7db12e186348977b5",
     "skillDigest": "c88357a6ba0340000bae5839daeb67a3cd2722e8242cf7e0148006c3610a44fe",
     "authorityDigest": "ff2e25cf5b8a3e890956cd640cf0b0c843d58801a406d4af2241fda984da4526",
     "dirtyFingerprint": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
@@ -51,8 +51,8 @@
   ],
   "domainPolicyDigest": "620c4f746c1f259e3b640044975ad2878b7913806038706f7991bee9d72104d3",
   "status": "frozen",
-  "candidateSha": "74c7f5dfb7c2735f031df896188cb6f4ddcd70a4",
-  "candidateDigest": "bdd9a6313bebc076b734a2f3de3aa8275479270db61aec90bd1debb371950868",
+  "candidateSha": "5a9d515ea2597db901347da7db12e186348977b5",
+  "candidateDigest": "0fe16f1855c15ebbe9d6b9a17558fd0e4eaedfaff427559c5e34b47e52623f62",
   "stateEvidenceMatrix": [
     {
       "viewport": "88x24",
@@ -68,5 +68,5 @@
     }
   ],
   "classificationEvidenceDigest": "5616c03b607c7ff5524289e3198abcf0a9d69da20296a9ceb009bdaa46ec90f6",
-  "receiptDigest": "d0c0ceffea8f136c12c6494ff840737ab2a67cf69c5f32b7eaaf8ac6e4aba3e5"
+  "receiptDigest": "0af33b59403826573dfc139ed5be2f0e1299e625a9b91360d375a4950d70ac46"
 }
