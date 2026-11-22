@@ -1,8 +1,8 @@
 {
   "schema": "fsusui-design-conformance.ux-acceptance-receipt.v2",
-  "classificationReceiptDigest": "a7b67b967791924909df1368da2364a0bbf66532512bec88f7e8b8a30203028f",
-  "candidateSha": "90ff1c48d8dca7b69172b4a3a6692213ba7fe2ac",
-  "candidateDigest": "a4b1a7c35f16cde2a75a5a4e3a32d1d3ee27eeaa83a3431a9b6bc1c7cfd5ba41",
+  "classificationReceiptDigest": "e5c95d8f02af707c7b7f253c8c4e9e18cc7279bf46ae5cd25d02d88ec44d0c24",
+  "candidateSha": "f7ceb199e6153d2ec911671a20f9affdee14a939",
+  "candidateDigest": "f7ced3de6f52c8a6127da7ffa82b5e249aef673543aebfc93209d07007d179a9",
   "verificationClass": "ux-path",
   "requiredSkillDigests": [
     "c88357a6ba0340000bae5839daeb67a3cd2722e8242cf7e0148006c3610a44fe"
@@ -13,9 +13,9 @@
     "c5d43303e89931346f9d634dd592ecb54418d15a74ae923f72e52795a115544e",
     "0bd20f9ae6997aa9b7daeb0cec2f558738565bd0932828617aea2f5b84626042"
   ],
-  "activeBaselineIdentityDigest": "844832b52d576182eb5a5e514c4426cd089023134775192396cebe7142d59046",
+  "activeBaselineIdentityDigest": "e591bca38354795455c93c88256141061b98fee5ba04ec6310e7c70d875fff08",
   "domainPolicyDigest": "620c4f746c1f259e3b640044975ad2878b7913806038706f7991bee9d72104d3",
-  "independenceEvidenceDigest": "9aac35aaea8083c1433a1adf448c0f54cfde0f7826f1d1877347ae5cf68b5b45",
+  "independenceEvidenceDigest": "7e283230988cfe1ad6e02ee2772eca69389b19c95f6776e274d22151b946d227",
   "modifiedPaths": [],
   "productionFixture": true,
   "viewportStateMatrix": [
@@ -63,5 +63,5 @@
   ],
   "blockers": [],
   "status": "accepted",
-  "receiptDigest": "9f67df1b7ff7a89259a76edbd176578c20a5808686b707e761671527e81e14cc"
+  "receiptDigest": "855d3d35e669383ab99cf54e05f5724227656e758f0d95ba31e8b26bf5a3ebaf"
 }
