@@ -1,19 +1,28 @@
 {
   "schema": "fsusui-independent-ux-review.v1",
   "issue": 285,
-  "candidateSha": "24aca9ce36b63a4158c912f18708a44102a144cb",
+  "candidateSha": "c2bd41be21d0dfd0adeb73f45367dcfbe6b39d51",
   "reviewMode": "read-only-rendered-evidence-inspection",
   "modifiedPaths": [],
   "productionFixture": true,
   "identity": {
-    "executionId": "conformance-v2-check-tag-24aca9ce36b63a4158c912f18708a44102a144cb",
+    "executionId": "conformance-v2-check-tag-c2bd41be21d0dfd0adeb73f45367dcfbe6b39d51",
     "checkpoint": "check-tag-after-pointer-keyboard",
     "contract": "component-v2.el-check-tag",
     "scenario": "scenario.v2.el-check-tag.real-interaction-trace",
     "contractHash": "4c04112ce8c8fcf06410e0f605e7f9e36167ff79710e957d173e832080e1da48",
     "webBaselineHash": "4ad6d19312b81a6f2b02d5d6ecb3a993ac7d6181a9fb046a3ce8cb4956a83d0c",
     "avaloniaBaselineHash": "64de07581d7126b5e6c9ec52782a041a67e697bc04f8b0bc2b1532f76f419ff7",
-    "runnerHash": "bad9abc8910c29bd5104e47fc7d693443a414d707776a55c043be5d1e0c0baf2"
+    "runnerHash": "bad9abc8910c29bd5104e47fc7d693443a414d707776a55c043be5d1e0c0baf2",
+    "candidate": "c2bd41be21d0dfd0adeb73f45367dcfbe6b39d51",
+    "documentId": "check-tag-state",
+    "documentEpoch": 1,
+    "sourceRevision": 2,
+    "theme": "light",
+    "density": "default",
+    "locale": "zh-CN",
+    "direction": "ltr",
+    "motion": "reduced"
   },
   "viewportStateMatrix": [
     {
@@ -119,5 +128,8 @@
     "AT-SPI and the Orca process are not spoken-output evidence. NVDA and VoiceOver were not tested. The Web CheckTag PNG is an element crop, not a visual inspection of the whole viewport."
   ],
   "blockers": [],
-  "status": "accepted"
+  "status": "accepted",
+  "classificationReceiptDigest": "fb29940ca7342d13ce147e54fdda1c24844ba1d32fe35d3d0a2368cac5f526fd",
+  "candidateDigest": "b2b5586245f5330858e2078e0beca62bcafb4a0721cae1acfcd1e7f6bd1b1849",
+  "receiptDigest": "b7b0eec2f23d45ad9e5a6fa645d76b98db5d3e9338822faa0dca99626b1ad7cd"
 }

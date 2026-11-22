@@ -272,18 +272,25 @@ export async function runMarkdownCell(ownerId, cellId, group, options = {}) {
   mkdirSync(dirname(reportPath), { recursive: true })
 
   try {
-    runtime =
-      options.precomputedRuntime ??
-      (await computeMarkdownCellRuntime(
+    if (
+      options.precomputedRuntime?.manifestDigest &&
+      !options.runtimeManifestId
+    ) {
+      runtime = options.precomputedRuntime
+    } else {
+      runtime =
+        options.precomputedRuntime ??
+        (await computeMarkdownCellRuntime(
+          cell,
+          options.fingerprintInputsBySuite ?? MARKDOWN_FINGERPRINT_INPUTS,
+        ))
+      runtime = writeMarkdownCellRuntimeManifest(
         cell,
-        options.fingerprintInputsBySuite ?? MARKDOWN_FINGERPRINT_INPUTS,
-      ))
-    runtime = writeMarkdownCellRuntimeManifest(
-      cell,
-      evidenceDir,
-      runtime,
-      options.runtimeManifestId?.(cell) ?? cell.suiteId,
-    )
+        evidenceDir,
+        runtime,
+        options.runtimeManifestId?.(cell) ?? cell.suiteId,
+      )
+    }
     const childEnv = {
       ...createMarkdownPlaywrightEnvironment(options.interactionIdentity),
       ...(options.externalServer ? { FSUS_PLAYWRIGHT_EXTERNAL_SERVER: '1' } : {}),
