@@ -1,5 +1,12 @@
 # element-plus
 
+## 1.6.0-preview.8
+
+### Preview Changes
+
+- Ship public-preview candidate `@ozwasyd/element-plus@1.6.0-preview.8` (`preview` dist-tag on GitHub Packages).
+- Run `package:candidate:verify` directly via Node built-ins (without `with-node-heap.mjs`/`fast-glob`) so zero-`node_modules` `preflight` and `publish` jobs verify the candidate artifact reliably, handle `--json` `E404` on both stdout/stderr in `npm-channel-state.mjs`, and pass `--config vite.config.mjs --ssr src/entry-ssr-server.ts` cleanly in the published consumer contract harness.
+
 ## 1.6.0-preview.7
 
 ### Preview Changes
