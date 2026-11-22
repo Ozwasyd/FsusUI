@@ -762,7 +762,7 @@ jobs:
       - name: Determine PR demo build path impact
         id: demo-build-path
         if: github.event_name == 'pull_request'
-        run: node ./scripts/with-node-heap.mjs node ./scripts/should-run-demo-build.mjs
+        run: node ./scripts/should-run-demo-build.mjs
       - name: Log PR demo build path decision
         if: github.event_name == 'pull_request'
         run: |
