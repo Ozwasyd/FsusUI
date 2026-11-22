@@ -3205,13 +3205,19 @@ button.#{$namespace}-card:active {
     -webkit-tap-highlight-color: transparent;
   }
 
-  .#{$namespace}-button:not(.is-disabled):hover,
-  .#{$namespace}-button:not(.is-disabled):focus:not(:focus-visible) {
+  .#{$namespace}-button:not(.is-disabled):not(:active):hover,
+  .#{$namespace}-button:not(.is-disabled):not(:active):focus:not(
+      :focus-visible
+    ) {
     transform: none;
   }
 
-  .#{$namespace}-button:not(.is-disabled):hover:not(:focus-visible),
-  .#{$namespace}-button:not(.is-disabled):focus:not(:focus-visible) {
+  .#{$namespace}-button:not(.is-disabled):not(:active):hover:not(
+      :focus-visible
+    ),
+  .#{$namespace}-button:not(.is-disabled):not(:active):focus:not(
+      :focus-visible
+    ) {
     box-shadow: none !important;
     outline: none;
   }
