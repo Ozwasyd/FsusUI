@@ -3870,22 +3870,44 @@ describe('Fsus theme visual baseline', () => {
     expectCssRule(css, '.el-inbox-layout__list', [
       'min-height: 0;',
       'overflow: auto;',
-      'overscroll-behavior: contain;',
     ])
     expectCssRule(css, '.el-inbox-layout__detail', [
       'min-height: 0;',
       'overflow: auto;',
-      'overscroll-behavior: contain;',
     ])
+    expectCssRule(
+      css,
+      '.el-inbox-layout__detail:has(> .el-thread-panel:only-child)',
+      ['display: flex;', 'flex-direction: column;', 'overflow: clip;'],
+    )
     expectCssRule(css, '.el-thread-panel', [
       'grid-template-rows: auto auto minmax(0, 1fr) auto;',
       'min-height: 100%;',
     ])
+    expectCssRule(css, '.el-thread-panel__header', [
+      'align-items: center;',
+      'align-items: safe center;',
+    ])
+    expectCssRule(css, '.el-thread-panel__actions', ['align-items: center;'])
     expectCssRule(css, '.el-thread-panel__messages', [
       'min-height: 0;',
       'overflow: auto;',
-      'overscroll-behavior: contain;',
     ])
+    // Issue #1115: unbounded inbox panes must not trap wheel scroll chaining
+    // with unconditional overscroll-behavior: contain or stack nested
+    // scrollbar-gutter: stable seams.
+    expect(css).not.toMatch(
+      /\.el-(?:inbox-layout|split-pane)__(?:list|detail)[^{]*\{[^}]*overscroll-behavior:\s*contain/s,
+    )
+    expect(css).not.toMatch(
+      /\.el-thread-panel__messages[^{]*\{[^}]*overscroll-behavior:\s*contain/s,
+    )
+    expect(css).not.toMatch(
+      /\.el-(?:inbox-layout|split-pane)__(?:list|detail)[^{]*\{[^}]*scrollbar-gutter:\s*stable/s,
+    )
+    expect(css).not.toMatch(
+      /\.el-thread-panel__messages[^{]*\{[^}]*scrollbar-gutter:\s*stable/s,
+    )
     expectCssRule(css, '.el-message-bubble__body', [
       'white-space: pre-wrap;',
       'overflow-wrap: anywhere;',
