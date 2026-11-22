@@ -252,7 +252,7 @@ jobs:
           echo "Verified candidate digest: ${{ needs.quality.outputs.npm-candidate-digest }}"
 
   verify-published-consumer-contracts:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 20
     needs: [plan, publish]
     if: always() && needs.plan.result == 'success' && needs.publish.result == 'success'
