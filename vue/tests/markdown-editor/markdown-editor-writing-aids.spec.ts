@@ -295,6 +295,16 @@ test('covers aid combinations across the 375/768/1366/1440 viewport matrix', asy
         for (let press = 0; press < 30; press += 1) {
           await textarea.press('ArrowUp')
         }
+        // Flush any queued scroll events from the final ArrowUp before
+        // snapshotting userScrollTop and sending the first restoring input.
+        await page.evaluate(
+          () =>
+            new Promise<void>((resolve) =>
+              requestAnimationFrame(() =>
+                requestAnimationFrame(() => resolve()),
+              ),
+            ),
+        )
         const userScrollTop = await textarea.evaluate(
           (element) => element.scrollTop,
         )
