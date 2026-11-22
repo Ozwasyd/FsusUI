@@ -968,5 +968,5 @@ if (strict) {
 }
 
 console.log(
-  `Prepared ${packageJson.name}@${packageJson.version} for npm public registry from ${repository.owner}/${repository.repo} with ${rewrittenSelfReferences.replacementCount} self-reference rewrites across ${rewrittenSelfReferences.updatedFiles} files, ${rewrittenBundledWorkspaceReferences.replacementCount} bundled workspace rewrites across ${rewrittenBundledWorkspaceReferences.updatedFiles} files, ${removedBundledWorkspaceDependencies} bundled workspace dependencies removed, ${rewrittenWorkerReferences} worker references rewritten, ${rewrittenWasmFallbackReferences} WASM fallback references rewritten, and ${prunedSourceMaps} source maps pruned.`,
+  `Prepared ${packageJson.name}@${packageJson.version} for GitHub Packages (${registryUrl}) from ${repository.owner}/${repository.repo} with ${rewrittenSelfReferences.replacementCount} self-reference rewrites across ${rewrittenSelfReferences.updatedFiles} files, ${rewrittenBundledWorkspaceReferences.replacementCount} bundled workspace rewrites across ${rewrittenBundledWorkspaceReferences.updatedFiles} files, ${removedBundledWorkspaceDependencies} bundled workspace dependencies removed, ${rewrittenWorkerReferences} worker references rewritten, ${rewrittenWasmFallbackReferences} WASM fallback references rewritten, and ${prunedSourceMaps} source maps pruned.`,
 )

@@ -28,26 +28,28 @@ documented compatibility contract and migration path. Internal packages under
 dependencies are not publishable. README install instructions must name the
 active package and registry.
 
-The npm public registry is canonical:
+The GitHub Packages npm registry is canonical:
 
 ```text
-https://registry.npmjs.org/
+https://npm.pkg.github.com/
 ```
 
-The retired package-registry automation is historical material under
-[`docs/archive/github-packages/`](../../archive/github-packages/); it is not a
-mirror or an active publishing path.
+The retired legacy branch-push workflow under
+[`docs/archive/github-packages/`](../../archive/github-packages/) remains
+historical material; active tag-triggered publishing runs through
+`.github/workflows/publish-npm.yml`.
 
-## Trusted publishing and provenance
+## Authentication and registry access
 
-- Publish public packages through npm trusted publishing with GitHub Actions
-  OIDC and npm provenance.
-- Maintainers require npm account 2FA. Do not use a long-lived automation token,
-  set `NODE_AUTH_TOKEN`, or print tokens, `.npmrc`, or auth headers in logs.
-- The npmjs.com trusted publisher must match owner `Ozwasyd`, repository `FsusUI`,
-  workflow `publish-npm.yml`, and the `npm publish` action.
+- Publish public packages from `.github/workflows/publish-npm.yml` using the
+  workflow-scoped `GITHUB_TOKEN` (`packages: write`) with `scope: '@ozwasyd'`
+  and `registry-url: https://npm.pkg.github.com/`.
+- Do not commit tokens, `.npmrc` credentials, or auth headers into the
+  repository or candidate tarball, and never print token values in CI logs.
+- GitHub Packages requires a GitHub token with `read:packages` when installing
+  or querying `@ozwasyd/element-plus`, even for public packages.
 
-Candidate provenance is recorded in
+Historical npmjs.com provenance notes are retained in
 `docs/releases/evidence/npm-public-preview/provenance.md`.
 
 ## Dist-tags and channel serialization

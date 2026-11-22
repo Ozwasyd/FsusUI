@@ -18,6 +18,7 @@ on:
 
 permissions:
   contents: read
+  packages: write
 
 jobs:
   plan:
@@ -62,9 +63,12 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22.14.0
-          registry-url: https://registry.npmjs.org/
+          registry-url: https://npm.pkg.github.com/
+          scope: '@ozwasyd'
       - name: Read locked npm channel state
         id: npm_state
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_RECOVERY_TOKEN }}
         run: |
           node scripts/npm-channel-state.mjs \
             --package '${{ needs.plan.outputs.package }}' \
@@ -93,11 +97,13 @@ jobs:
           npm dist-tag add \
             '${{ needs.plan.outputs.package }}@${{ needs.plan.outputs.version }}' \
             '${{ needs.plan.outputs.dist-tag }}' \
-            --registry=https://registry.npmjs.org/
+            --registry=https://npm.pkg.github.com/
       - name: Verify recovered dist-tag
         if: steps.recovery.outputs.action == 'recover'
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_RECOVERY_TOKEN }}
         run: |
-          actual="$(npm view '${{ needs.plan.outputs.package }}' 'dist-tags.${{ needs.plan.outputs.dist-tag }}' --json --registry=https://registry.npmjs.org/ | node -pe 'JSON.parse(require("node:fs").readFileSync(0, "utf8"))')"
+          actual="$(npm view '${{ needs.plan.outputs.package }}' 'dist-tags.${{ needs.plan.outputs.dist-tag }}' --json --registry=https://npm.pkg.github.com/ | node -pe 'JSON.parse(require("node:fs").readFileSync(0, "utf8"))')"
           test "${actual}" = '${{ needs.plan.outputs.version }}'
       - name: Report idempotent recovery
         if: steps.recovery.outputs.action == 'skip'

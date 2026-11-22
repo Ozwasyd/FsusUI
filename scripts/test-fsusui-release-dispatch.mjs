@@ -82,7 +82,7 @@ const createFixture = () => {
       commitSha: SOURCE_COMMIT,
       package: { name: PACKAGE_NAME, version: VERSION, distTag: 'latest' },
       artifact: { filename: 'candidate.tgz', sha256: candidateSha256 },
-      metadata: { registry: 'https://registry.npmjs.org/' },
+      metadata: { registry: 'https://npm.pkg.github.com/' },
     }),
   )
   const candidateManifestSha256 = sha256(readFileSync(candidateManifestPath))
