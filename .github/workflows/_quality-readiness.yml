@@ -1,0 +1,156 @@
+name: Reusable Readiness Aggregator
+
+on:
+  workflow_call:
+    inputs:
+      group:
+        description: Quality group to aggregate.
+        required: false
+        type: string
+        default: main
+      playwright_group:
+        description: Playwright evidence group to aggregate.
+        required: false
+        type: string
+        default: main
+      release_tag:
+        description: Expected v-prefixed package version for release identity binding.
+        required: false
+        type: string
+        default: ''
+    outputs:
+      release-readiness-digest:
+        description: SHA-256 of the release aggregator evidence bound to SHA, tag, and package.
+        value: ${{ jobs.release-readiness.outputs.evidence-digest }}
+
+jobs:
+  stable-readiness:
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: readiness-manifest-*
+          path: .readiness
+          merge-multiple: true
+      - name: Aggregate stable leaf evidence
+        run: |
+          node scripts/ci-readiness.mjs check \
+            --root .readiness \
+            --profile main \
+            --workflow-group '${{ inputs.group }}' \
+            --playwright-group '${{ inputs.playwright_group }}' \
+            --commit "$GITHUB_SHA" \
+            --run-id "$GITHUB_RUN_ID" \
+            --run-attempt "$GITHUB_RUN_ATTEMPT" \
+            --evidence .readiness/evidence/stable.json
+      - name: Pack stable evidence
+        run: |
+          tar -czf avalonia-stable-evidence.tgz .readiness docs/releases spec/components tests/conformance
+          sha256sum avalonia-stable-evidence.tgz | tee avalonia-stable-evidence.sha256
+      - uses: actions/upload-artifact@v4
+        with:
+          name: avalonia-stable-evidence
+          path: |
+            avalonia-stable-evidence.tgz
+            avalonia-stable-evidence.sha256
+          retention-days: 7
+      - uses: actions/upload-artifact@v4
+        with:
+          name: avalonia-generated-artifacts
+          path: |
+            generated
+            tests/conformance/**/artifacts
+            docs/releases
+          retention-days: 7
+
+  nightly-readiness:
+    if: always() && inputs.group == 'nightly'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs:
+      - stable-readiness
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: readiness-manifest-*
+          path: .readiness
+          merge-multiple: true
+      - name: Aggregate nightly leaf evidence
+        run: |
+          node scripts/ci-readiness.mjs check \
+            --root .readiness \
+            --profile nightly \
+            --workflow-group nightly \
+            --playwright-group nightly \
+            --commit "$GITHUB_SHA" \
+            --run-id "$GITHUB_RUN_ID" \
+            --run-attempt "$GITHUB_RUN_ATTEMPT" \
+            --evidence .readiness/evidence/nightly.json
+      - name: Pack nightly evidence
+        run: |
+          tar -czf avalonia-nightly-evidence.tgz .readiness docs/releases spec/ci
+          sha256sum avalonia-nightly-evidence.tgz | tee avalonia-nightly-evidence.sha256
+      - uses: actions/upload-artifact@v4
+        with:
+          name: avalonia-nightly-evidence
+          path: |
+            avalonia-nightly-evidence.tgz
+            avalonia-nightly-evidence.sha256
+          retention-days: 7
+
+  release-readiness:
+    if: always() && inputs.group == 'release'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    outputs:
+      evidence-digest: ${{ steps.release-evidence.outputs.digest }}
+    needs:
+      - stable-readiness
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: readiness-manifest-*
+          path: .readiness
+          merge-multiple: true
+      - uses: actions/download-artifact@v4
+        with:
+          name: fsusui-npm-candidate
+          path: .npm-candidate
+      - name: Aggregate release leaf evidence
+        id: release-evidence
+        env:
+          RELEASE_TAG_INPUT: ${{ inputs.release_tag }}
+        run: |
+          release_tag="$RELEASE_TAG_INPUT"
+          if [ -z "$release_tag" ]; then
+            release_tag="v$(node -p "require('./vue/packages/element-plus/package.json').version")"
+          fi
+          node scripts/ci-readiness.mjs check \
+            --root .readiness \
+            --profile release \
+            --workflow-group release \
+            --playwright-group release \
+            --commit "$GITHUB_SHA" \
+            --run-id "$GITHUB_RUN_ID" \
+            --run-attempt "$GITHUB_RUN_ATTEMPT" \
+            --release-tag "$release_tag" \
+            --candidate-manifest .npm-candidate/fsusui-npm-candidate.manifest.json \
+            --evidence .readiness/evidence/release.json
+          digest="$(sha256sum .readiness/evidence/release.json | cut -d ' ' -f 1)"
+          echo "digest=$digest" >> "$GITHUB_OUTPUT"
+      - name: Pack release evidence
+        run: |
+          tar -czf avalonia-release-evidence.tgz .readiness docs/releases spec/ci
+          sha256sum avalonia-release-evidence.tgz | tee avalonia-release-evidence.sha256
+      - uses: actions/upload-artifact@v4
+        with:
+          name: avalonia-release-evidence
+          path: |
+            avalonia-release-evidence.tgz
+            avalonia-release-evidence.sha256
+          retention-days: 7

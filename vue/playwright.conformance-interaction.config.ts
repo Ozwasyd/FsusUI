@@ -8,6 +8,7 @@ delete process.env.NO_COLOR
 
 const port = resolveTestPort('FSUS_CONFORMANCE_INTERACTION_PORT', 5192)
 const baseURL = `http://127.0.0.1:${port}`
+const useExternalServer = process.env.FSUS_PLAYWRIGHT_EXTERNAL_SERVER === '1'
 
 export default defineConfig({
   testDir: './tests/markdown-editor',
@@ -33,10 +34,14 @@ export default defineConfig({
     { name: 'firefox', use: { ...devices['Desktop Firefox'] } },
     { name: 'webkit', use: { ...devices['Desktop Safari'] } },
   ],
-  webServer: {
-    command: `pnpm -C .. run build:demo && pnpm -C packages/demo-app exec vite preview --host 127.0.0.1 --port ${port} --strictPort`,
-    url: baseURL,
-    reuseExistingServer: !process.env.CI,
-    timeout: 180_000,
-  },
+  ...(useExternalServer
+    ? {}
+    : {
+        webServer: {
+          command: `pnpm -C .. run build:demo && pnpm -C packages/demo-app exec vite preview --host 127.0.0.1 --port ${port} --strictPort`,
+          url: baseURL,
+          reuseExistingServer: !process.env.CI,
+          timeout: 180_000,
+        },
+      }),
 })

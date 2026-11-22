@@ -52,7 +52,8 @@ const run = () =>
 
 try {
   for (const file of requiredFiles) write(file)
-  write('.github/workflows/_quality.yml', 'docs/releases\n')
+  write('.github/workflows/_quality.yml', 'name: Reusable Quality Gates\n')
+  write('.github/workflows/_quality-readiness.yml', 'docs/releases\n')
   write('scripts/ci-readiness.mjs')
 
   const valid = run()

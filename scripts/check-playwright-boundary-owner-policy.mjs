@@ -54,14 +54,21 @@ const validateBoundaryWorkflowSource = (source) => {
   if (job.includes('pnpm audit:visual-boundaries')) {
     failures.push('playwright-boundary job must not invoke full-config suite commands')
   }
-  if (occurrences(job, 'playwright install --with-deps chromium') !== 1) {
-    failures.push('playwright-boundary job must install exactly one fixed Chromium')
+  if (!/^\s+if:\s*inputs\.group != 'pr'\s*$/mu.test(job)) {
+    failures.push('playwright-boundary job must be gated on inputs.group != pr')
   }
-  if (occurrences(job, 'playwright install --with-deps webkit') !== 1) {
-    failures.push('playwright-boundary job must install WebKit for non-PR groups')
-  }
-  if (occurrences(job, "inputs.group != 'pr'") !== 1) {
-    failures.push('WebKit install must be gated on group != pr')
+  const installCommands = [
+    ...job.matchAll(/playwright install --with-deps([^\n]+)/gu),
+  ].map((match) => match[1].trim().split(/\s+/u))
+  for (const browser of ['chromium', 'webkit']) {
+    const count = installCommands.filter((browsers) =>
+      browsers.includes(browser),
+    ).length
+    if (count !== 1) {
+      failures.push(
+        `playwright-boundary job must install ${browser} exactly once for non-PR groups`,
+      )
+    }
   }
   if (!job.includes('playwright-boundary-evidence-${{ inputs.group }}')) {
     failures.push('playwright-boundary job must upload per-group evidence')
@@ -136,20 +143,22 @@ expectFailure('missing tiny-dark cell must fail policy', () => {
 
 expectFailure('workflow with only chromium install must be rejected', () => {
   const mutated = reusableWorkflow.replace(
-    'playwright install --with-deps webkit',
+    'playwright install --with-deps chromium webkit',
     'playwright install --with-deps chromium',
   )
   const failures = validateBoundaryWorkflowSource(mutated)
   if (failures.length === 0) throw new Error('chromium-only boundary workflow fixture was accepted')
+  throw new Error(failures.join('; '))
 })
 
-expectFailure('unconditional webkit install must be rejected', () => {
+expectFailure('unconditional boundary job must be rejected', () => {
   const mutated = reusableWorkflow.replace(
-    "      - run: pnpm exec playwright install --with-deps webkit\n        if: ${{ inputs.group != 'pr' }}",
-    '      - run: pnpm exec playwright install --with-deps webkit',
+    "  playwright-boundary:\n    if: inputs.group != 'pr'",
+    '  playwright-boundary:',
   )
   const failures = validateBoundaryWorkflowSource(mutated)
-  if (failures.length === 0) throw new Error('unconditional webkit boundary workflow fixture was accepted')
+  if (failures.length === 0) throw new Error('unconditional boundary workflow fixture was accepted')
+  throw new Error(failures.join('; '))
 })
 
 function expectFailure(label, fn) {

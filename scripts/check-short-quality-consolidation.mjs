@@ -92,6 +92,7 @@ for (const fragment of [
 validateGovernanceStages({
   scripts,
   reusable: reusableQualityWorkflow,
+  readiness: readFileSync('.github/workflows/_quality-readiness.yml', 'utf8'),
   quality: readFileSync('.github/workflows/quality.yml', 'utf8'),
   capacity: readFileSync('scripts/run-capacity-suite.mjs', 'utf8'),
 })

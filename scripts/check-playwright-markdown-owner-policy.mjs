@@ -31,9 +31,6 @@ const workflowJob = (source, name) =>
     ),
   )?.[1] ?? ''
 
-const occurrences = (value, fragment) =>
-  value.split(fragment).length - 1
-
 const validateMarkdownWorkflowSource = (source) => {
   const failures = []
   if (!source.includes('playwright-markdown:')) {
@@ -54,17 +51,21 @@ const validateMarkdownWorkflowSource = (source) => {
   if (job.includes('pnpm test:markdown-editor:interaction')) {
     failures.push('playwright-markdown job must not invoke full-config suite commands')
   }
-  if (occurrences(job, 'playwright install --with-deps chromium') !== 1) {
-    failures.push('playwright-markdown job must install exactly one fixed Chromium')
+  if (!/^\s+if:\s*inputs\.group != 'pr'\s*$/mu.test(job)) {
+    failures.push('playwright-markdown job must be gated on inputs.group != pr')
   }
-  if (occurrences(job, 'playwright install --with-deps firefox') !== 1) {
-    failures.push('playwright-markdown job must install Firefox for non-PR groups')
-  }
-  if (occurrences(job, 'playwright install --with-deps webkit') !== 1) {
-    failures.push('playwright-markdown job must install WebKit for non-PR groups')
-  }
-  if (occurrences(job, "inputs.group != 'pr'") < 2) {
-    failures.push('Firefox/WebKit installs must be gated on group != pr')
+  const installCommands = [
+    ...job.matchAll(/playwright install --with-deps([^\n]+)/gu),
+  ].map((match) => match[1].trim().split(/\s+/u))
+  for (const browser of ['chromium', 'firefox', 'webkit']) {
+    const count = installCommands.filter((browsers) =>
+      browsers.includes(browser),
+    ).length
+    if (count !== 1) {
+      failures.push(
+        `playwright-markdown job must install ${browser} exactly once for non-PR groups`,
+      )
+    }
   }
   if (!job.includes('playwright-markdown-evidence-${{ inputs.group }}')) {
     failures.push('playwright-markdown job must upload per-group evidence')

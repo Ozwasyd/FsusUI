@@ -22,22 +22,22 @@ jobs:
       concurrency-group: ${{ steps.plan.outputs.concurrency_group }}
     steps:
       - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
         with:
-          version: 10.33.0
+          sparse-checkout: |
+            scripts
+            package.json
       - uses: actions/setup-node@v4
         with:
           node-version: 22.14.0
       - name: Resolve canonical release resource
         id: plan
         run: |
-          pnpm release:concurrency:plan \
+          node ./scripts/release-concurrency-plan.mjs \
             --package @ozwasyd/element-plus \
             --version "${GITHUB_REF_NAME#v}" \
             --github-output
 
   quality:
-    needs: quality-playwright
     uses: ./.github/workflows/_quality.yml
     with:
       group: release
@@ -47,6 +47,15 @@ jobs:
     uses: ./.github/workflows/_quality-playwright.yml
     with:
       group: release
+
+  quality-readiness:
+    if: always()
+    needs: [quality, quality-playwright]
+    uses: ./.github/workflows/_quality-readiness.yml
+    with:
+      group: release
+      playwright_group: release
+      release_tag: ${{ github.ref_name }}
 
   fsusblog-consumer:
     needs: [quality, plan]
@@ -65,10 +74,11 @@ jobs:
   preflight:
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    needs: [quality, plan, fsusblog-consumer]
+    needs: [quality, quality-readiness, plan, fsusblog-consumer]
     if: >-
       always() &&
       needs.quality.result == 'success' &&
+      needs.quality-readiness.result == 'success' &&
       needs.plan.result == 'success' &&
       (needs.plan.outputs.dist-tag != 'latest' || needs.fsusblog-consumer.result == 'success')
     steps:
@@ -92,7 +102,7 @@ jobs:
           path: .cross-gate
       - name: Verify candidate and release plan before lock
         run: |
-          test -n "${{ needs.quality.outputs.release-readiness-digest }}"
+          test -n "${{ needs.quality-readiness.outputs.release-readiness-digest }}"
           pnpm run package:candidate:verify -- --tarball .npm-candidate/fsusui-npm-candidate.tgz --tag-version "${GITHUB_REF_NAME}"
           digest="$(node -p "require('./.npm-candidate/fsusui-npm-candidate.manifest.json').artifact.sha256")"
           test "${digest}" = "${{ needs.quality.outputs.npm-candidate-digest }}"
@@ -132,10 +142,11 @@ jobs:
   publish:
     runs-on: ubuntu-latest
     timeout-minutes: 30
-    needs: [quality, plan, preflight, fsusblog-consumer]
+    needs: [quality, quality-readiness, plan, preflight, fsusblog-consumer]
     if: >-
       always() &&
       needs.quality.result == 'success' &&
+      needs.quality-readiness.result == 'success' &&
       needs.plan.result == 'success' &&
       needs.preflight.result == 'success' &&
       (needs.plan.outputs.dist-tag != 'latest' || needs.fsusblog-consumer.result == 'success')
@@ -152,8 +163,6 @@ jobs:
           node-version: 22.14.0
           registry-url: https://npm.pkg.github.com/
           scope: '@ozwasyd'
-          cache: pnpm
-          cache-dependency-path: pnpm-lock.yaml
       - name: Use npm 11.5.1+
         run: |
           npm install -g npm@^11.5.1 --registry=https://registry.npmjs.org/
@@ -170,7 +179,7 @@ jobs:
           path: .cross-gate
       - name: Verify locked candidate identity
         run: |
-          test -n "${{ needs.quality.outputs.release-readiness-digest }}"
+          test -n "${{ needs.quality-readiness.outputs.release-readiness-digest }}"
           pnpm run package:candidate:verify -- --tarball .npm-candidate/fsusui-npm-candidate.tgz --tag-version "${GITHUB_REF_NAME}"
           digest="$(node -p "require('./.npm-candidate/fsusui-npm-candidate.manifest.json').artifact.sha256")"
           test "${digest}" = "${{ needs.quality.outputs.npm-candidate-digest }}"
@@ -259,6 +268,8 @@ jobs:
     permissions:
       contents: read
       packages: read
+    env:
+      PLAYWRIGHT_BROWSERS_PATH: ${{ github.workspace }}/.tmp/playwright-browsers
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -271,7 +282,12 @@ jobs:
           scope: '@ozwasyd'
           cache: pnpm
           cache-dependency-path: pnpm-lock.yaml
-      - run: pnpm install --frozen-lockfile
+      - run: pnpm install --frozen-lockfile --ignore-scripts
+      - name: Restore Playwright Chromium cache
+        uses: actions/cache@v4
+        with:
+          path: .tmp/playwright-browsers
+          key: ${{ runner.os }}-playwright-chromium-${{ hashFiles('package.json', 'pnpm-lock.yaml') }}
       - run: pnpm exec playwright install --with-deps chromium
       - name: Verify published package metadata and run standalone consumer contracts
         env:

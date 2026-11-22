@@ -31,9 +31,10 @@ jobs:
       concurrency-group: ${{ steps.plan.outputs.concurrency_group }}
     steps:
       - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
         with:
-          version: 10.33.0
+          sparse-checkout: |
+            scripts
+            package.json
       - uses: actions/setup-node@v4
         with:
           node-version: 22.14.0
@@ -42,7 +43,7 @@ jobs:
         env:
           TARGET_VERSION: ${{ inputs.target_version }}
         run: |
-          pnpm release:concurrency:plan \
+          node ./scripts/release-concurrency-plan.mjs \
             --package @ozwasyd/element-plus \
             --version "${TARGET_VERSION}" \
             --github-output
@@ -57,9 +58,10 @@ jobs:
       cancel-in-progress: false
     steps:
       - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
         with:
-          version: 10.33.0
+          sparse-checkout: |
+            scripts
+            package.json
       - uses: actions/setup-node@v4
         with:
           node-version: 22.14.0
@@ -81,7 +83,7 @@ jobs:
           EXPECTED_CURRENT: ${{ inputs.expected_current }}
           RECOVERY_REASON: ${{ inputs.reason }}
         run: |
-          pnpm release:channel:check \
+          node ./scripts/release-channel-check.mjs \
             --candidate '${{ needs.plan.outputs.version }}' \
             --current '${{ steps.npm_state.outputs.current }}' \
             --candidate-exists '${{ steps.npm_state.outputs.candidate_exists }}' \

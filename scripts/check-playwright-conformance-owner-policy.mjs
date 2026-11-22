@@ -80,12 +80,15 @@ assert.ok(job, 'playwright-conformance workflow owner is required')
 assert.ok(!/\n\s+(?:strategy|matrix):/u.test(job), 'outer matrix is forbidden')
 assert.ok(job.includes('conformance-playwright-owner-run.mjs'))
 assert.ok(!job.includes('pnpm test:conformance:web-interaction'))
+const installCommands = [
+  ...job.matchAll(/playwright install --with-deps([^\n]+)/gu),
+].map((match) => match[1].trim().split(/\s+/u))
+assert.ok(installCommands.length >= 1, 'playwright install command is required')
 for (const browser of ['chromium', 'firefox', 'webkit']) {
-  assert.equal(
-    job.split(`playwright install --with-deps ${browser}`).length - 1,
-    1,
-    `${browser} must be installed exactly once`,
-  )
+  const count = installCommands.filter((browsers) =>
+    browsers.includes(browser),
+  ).length
+  assert.equal(count, 1, `${browser} must be installed exactly once`)
 }
 assert.ok(job.includes('uses: ./.github/actions/readiness-manifest'))
 assert.ok(job.includes('gate: playwright-conformance'))

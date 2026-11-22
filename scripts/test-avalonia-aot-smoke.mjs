@@ -1,12 +1,14 @@
 #!/usr/bin/env node
-/* global setTimeout */
+/* global clearTimeout, setTimeout */
 import assert from 'node:assert/strict'
+import { Buffer } from 'node:buffer'
 import { createHash } from 'node:crypto'
 import {
   copyFileSync,
   cpSync,
   chmodSync,
   existsSync,
+  linkSync,
   mkdirSync,
   mkdtempSync,
   readdirSync,
@@ -123,6 +125,90 @@ const execute = (command, arguments_, options = {}) => {
   return result
 }
 
+const linkOrCopyFile = (source, destination) => {
+  try {
+    linkSync(source, destination)
+  } catch {
+    copyFileSync(source, destination)
+  }
+}
+
+const cloneTreeWithHardlinks = (source, destination) => {
+  mkdirSync(destination, { recursive: true })
+  for (const entry of readdirSync(source, { withFileTypes: true })) {
+    const from = path.join(source, entry.name)
+    const to = path.join(destination, entry.name)
+    if (entry.isDirectory()) {
+      cloneTreeWithHardlinks(from, to)
+    } else if (entry.isSymbolicLink()) {
+      cpSync(from, to, { verbatimSymlinks: true })
+    } else if (entry.isFile()) {
+      linkOrCopyFile(from, to)
+    }
+  }
+}
+
+const executeAsync = (command, arguments_, options = {}) =>
+  new Promise((resolve, reject) => {
+    const stdoutChunks = []
+    const stderrChunks = []
+    const timeoutMs = options.timeout ?? 600_000
+    let timedOut = false
+    const child = spawn(command, arguments_, {
+      cwd: options.cwd ?? root,
+      env: options.env ?? process.env,
+      stdio: ['ignore', 'pipe', 'pipe'],
+    })
+    const timer = setTimeout(() => {
+      timedOut = true
+      child.kill('SIGKILL')
+    }, timeoutMs)
+    child.stdout.on('data', (chunk) => stdoutChunks.push(chunk))
+    child.stderr.on('data', (chunk) => stderrChunks.push(chunk))
+    child.once('error', (error) => {
+      clearTimeout(timer)
+      reject(error)
+    })
+    child.once('close', (status, signal) => {
+      clearTimeout(timer)
+      const stdout = Buffer.concat(stdoutChunks).toString('utf8')
+      const stderr = Buffer.concat(stderrChunks).toString('utf8')
+      try {
+        assert.equal(
+          timedOut,
+          false,
+          `${options.label ?? command} timed out after ${timeoutMs}ms\nstdout:\n${stdout}\nstderr:\n${stderr}`,
+        )
+        assert.equal(
+          signal,
+          null,
+          `${options.label ?? command} terminated by signal ${signal}\nstdout:\n${stdout}\nstderr:\n${stderr}`,
+        )
+        assert.notEqual(
+          status,
+          null,
+          `${options.label ?? command} exited without a status\nstdout:\n${stdout}\nstderr:\n${stderr}`,
+        )
+        if (options.expectFailure) {
+          assert.notEqual(
+            status,
+            0,
+            `${options.label ?? command} unexpectedly succeeded`,
+          )
+        } else {
+          assert.equal(
+            status,
+            0,
+            `${options.label ?? command} failed\nstdout:\n${stdout}\nstderr:\n${stderr}`,
+          )
+        }
+        resolve({ status, signal, stdout, stderr })
+      } catch (error) {
+        reject(error)
+      }
+    })
+  })
+
 const prewarmedPackages = process.env.NUGET_PACKAGES
 const globalPackages = realpathSync(
   prewarmedPackages
@@ -148,7 +234,11 @@ const seedLocalFeed = (
       (includeCandidatePackages ||
         !candidatePackagePattern.test(entry.name))
     ) {
-      copyFileSync(candidate, path.join(feed, entry.name))
+      const destination = path.join(feed, entry.name)
+      if (!existsSync(destination)) {
+        if (includeCandidatePackages) copyFileSync(candidate, destination)
+        else linkOrCopyFile(candidate, destination)
+      }
     }
   }
 }
@@ -167,10 +257,9 @@ chmodSync(path.join(isolatedSdkRoot, 'dotnet'), 0o755)
 for (const entry of readdirSync(systemDotnetRoot, { withFileTypes: true })) {
   if (entry.name === 'dotnet' || entry.name === 'packs') continue
   if (entry.name === 'sdk') {
-    cpSync(
+    cloneTreeWithHardlinks(
       path.join(systemDotnetRoot, entry.name),
       path.join(isolatedSdkRoot, entry.name),
-      { recursive: true },
     )
     continue
   }
@@ -675,49 +764,49 @@ try {
     },
   )
 
-  const resourceFailure = execute(
-    nativeBinary,
-    smokeArguments(path.join(temporaryRoot, 'reports/resource-failure.json'), [
-      '--fail',
-      'resource',
-    ]),
-    {
-      cwd: temporaryRoot,
-      env: runtimeFreeEnvironment,
-      expectFailure: true,
-      label: 'missing packaged resource',
-      timeout: negativeControlTimeout,
-    },
-  )
+  const [resourceFailure, loaderFailure] = await Promise.all([
+    executeAsync(
+      nativeBinary,
+      smokeArguments(path.join(temporaryRoot, 'reports/resource-failure.json'), [
+        '--fail',
+        'resource',
+      ]),
+      {
+        cwd: temporaryRoot,
+        env: runtimeFreeEnvironment,
+        expectFailure: true,
+        label: 'missing packaged resource',
+        timeout: negativeControlTimeout,
+      },
+    ),
+    executeAsync(
+      nativeBinary,
+      smokeArguments(path.join(temporaryRoot, 'reports/loader-failure.json')),
+      {
+        cwd: temporaryRoot,
+        env: { ...runtimeFreeEnvironment, DISPLAY: '' },
+        expectFailure: true,
+        label: 'missing Avalonia platform loader',
+        timeout: negativeControlTimeout,
+      },
+    ),
+    executeAsync(
+      nativeBinary,
+      smokeArguments(path.join(temporaryRoot, 'reports/ignored-log.json'), [
+        '--fail',
+        'ignored-log',
+      ]),
+      {
+        cwd: temporaryRoot,
+        env: runtimeFreeEnvironment,
+        expectFailure: true,
+        label: 'ignored binding log',
+        timeout: negativeControlTimeout,
+      },
+    ),
+  ])
   assert.match(resourceFailure.stderr, /resource failure|DefinitelyMissing/iu)
-
-  const loaderFailure = execute(
-    nativeBinary,
-    smokeArguments(path.join(temporaryRoot, 'reports/loader-failure.json')),
-    {
-      cwd: temporaryRoot,
-      env: { ...runtimeFreeEnvironment, DISPLAY: '' },
-      expectFailure: true,
-      label: 'missing Avalonia platform loader',
-      timeout: negativeControlTimeout,
-    },
-  )
   assert.match(loaderFailure.stderr, /loader failure|display|x11/iu)
-
-  execute(
-    nativeBinary,
-    smokeArguments(path.join(temporaryRoot, 'reports/ignored-log.json'), [
-      '--fail',
-      'ignored-log',
-    ]),
-    {
-      cwd: temporaryRoot,
-      env: runtimeFreeEnvironment,
-      expectFailure: true,
-      label: 'ignored binding log',
-      timeout: negativeControlTimeout,
-    },
-  )
   const ignoredLogReport = JSON.parse(
     readFileSync(path.join(temporaryRoot, 'reports/ignored-log.json'), 'utf8'),
   )

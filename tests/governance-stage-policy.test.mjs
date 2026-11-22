@@ -10,6 +10,7 @@ const assets = () => ({
   scripts: JSON.parse(readFileSync('package.json', 'utf8')).scripts,
   quality: readFileSync('.github/workflows/quality.yml', 'utf8'),
   reusable: readFileSync('.github/workflows/_quality.yml', 'utf8'),
+  readiness: readFileSync('.github/workflows/_quality-readiness.yml', 'utf8'),
   capacity: readFileSync('scripts/run-capacity-suite.mjs', 'utf8'),
 })
 
@@ -23,19 +24,16 @@ for (const mutation of [
   'reverse producer order',
   'optional producer',
   'drop PR dependency',
+  'drop PR readiness dependency',
   'shallow NuGet producer',
-  'shallow AOT producer',
   'missing checkout depth',
 ]) {
   test(`governance split rejects ${mutation}`, () => {
     const value = assets()
     if (mutation === 'shallow NuGet producer')
       value.reusable = value.reusable.replace('          fetch-depth: 0\n', '          fetch-depth: 3\n')
-    if (mutation === 'shallow AOT producer')
-      value.quality = value.quality.replace(
-        /(\n {2}pr-avalonia-aot-candidate:\n[\s\S]*?fetch-depth: )0\n/u,
-        (_match, prefix) => `${prefix}3\n`,
-      )
+    if (mutation === 'drop PR readiness dependency')
+      value.quality = value.quality.replaceAll('      - premerge-readiness\n', '')
     if (mutation === 'missing checkout depth')
       value.reusable = value.reusable.replace('          fetch-depth: 0\n', '')
     if (mutation === 'drop static gate')

@@ -79,6 +79,11 @@ inspectDocumentationFiles(docsRoot)
 const pathContracts = [
   {
     file: '.github/workflows/_quality.yml',
+    required: [],
+    forbidden: ['docs/release/', 'release-evidence/'],
+  },
+  {
+    file: '.github/workflows/_quality-readiness.yml',
     required: ['docs/releases'],
     forbidden: ['docs/release/', 'release-evidence/'],
   },

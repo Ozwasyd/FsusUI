@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+/* global AbortSignal, fetch */
 /**
  * pnpm deps:freshness — three-state dependency freshness check (#411).
  *
@@ -11,9 +12,10 @@
  */
 
 import { existsSync, readFileSync } from 'node:fs'
-import { execSync } from 'node:child_process'
+import { execFile } from 'node:child_process'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { promisify } from 'node:util'
 import {
   evaluateFreshnessEntry,
   selectRenovatePullRequests,
@@ -25,6 +27,7 @@ import {
 } from './dependency-freshness-adapters.mjs'
 import { writeFreshnessReport } from './deps-freshness-report.mjs'
 
+const execFileAsync = promisify(execFile)
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const repoRoot = path.resolve(__dirname, '..')
 
@@ -52,44 +55,109 @@ function readJson(relPath) {
   return JSON.parse(readFileSync(fullPath, 'utf-8'))
 }
 
-function npmLatest(name) {
+async function fetchJson(url, { headers = {}, timeoutMs = 10_000 } = {}) {
+  const response = await fetch(url, {
+    headers: {
+      accept: 'application/json',
+      ...headers,
+    },
+    signal: AbortSignal.timeout(timeoutMs),
+  })
+  if (!response.ok) {
+    throw new Error(`HTTP ${response.status} for ${url}`)
+  }
+  return response.json()
+}
+
+async function fetchNpmLatest(name) {
   try {
-    const r = execSync(`npm view "${name}" version 2>/dev/null`, {
-      encoding: 'utf-8',
-      timeout: 10_000,
-    }).trim()
-    return r || null
+    const encoded = encodeURIComponent(name)
+    const data = await fetchJson(
+      `https://registry.npmjs.org/${encoded}/latest`,
+      { timeoutMs: 10_000 },
+    )
+    const version = typeof data?.version === 'string' ? data.version.trim() : ''
+    return version || null
   } catch {
-    return operationalError('npm-registry', name)
+    try {
+      const { stdout } = await execFileAsync('npm', ['view', name, 'version'], {
+        encoding: 'utf-8',
+        timeout: 10_000,
+      })
+      return stdout.trim() || null
+    } catch {
+      return operationalError('npm-registry', name)
+    }
   }
 }
 
-function githubTags(repo) {
+async function fetchGithubTags(repo) {
+  const token = process.env.GH_TOKEN || process.env.GITHUB_TOKEN || ''
   try {
-    const r = execSync(
-      `gh api --paginate --slurp "repos/${repo}/tags?per_page=100" 2>/dev/null`,
-      { encoding: 'utf-8', timeout: 15_000 },
-    ).trim()
-    return r
-      ? JSON.parse(r)
-          .flat()
-          .map((entry) => entry.name)
-      : null
+    const headers = {
+      accept: 'application/vnd.github+json',
+      'user-agent': 'FsusUI-deps-freshness',
+      ...(token ? { authorization: `Bearer ${token}` } : {}),
+    }
+    const tags = []
+    let nextUrl = `https://api.github.com/repos/${repo}/tags?per_page=100`
+    while (nextUrl) {
+      const response = await fetch(nextUrl, {
+        headers,
+        signal: AbortSignal.timeout(15_000),
+      })
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`)
+      }
+      const page = await response.json()
+      if (Array.isArray(page)) {
+        for (const entry of page) {
+          if (typeof entry?.name === 'string') tags.push(entry.name)
+        }
+      }
+      const link = response.headers.get('link') ?? ''
+      const nextMatch = link.match(/<([^>]+)>;\s*rel="next"/u)
+      nextUrl = nextMatch ? nextMatch[1] : null
+    }
+    return tags
   } catch {
-    return operationalError('github-api', repo)
+    try {
+      const { stdout } = await execFileAsync(
+        'gh',
+        ['api', '--paginate', '--slurp', `repos/${repo}/tags?per_page=100`],
+        { encoding: 'utf-8', timeout: 15_000 },
+      )
+      const trimmed = stdout.trim()
+      return trimmed
+        ? JSON.parse(trimmed)
+            .flat()
+            .map((entry) => entry.name)
+        : null
+    } catch {
+      return operationalError('github-api', repo)
+    }
   }
 }
 
-let openRenovatePullRequests
-
-function loadOpenRenovatePullRequests() {
+async function loadOpenRenovatePullRequests() {
   try {
-    const r = execSync(
-      `gh pr list --state open --json title,headRefName,number,url,body,createdAt,statusCheckRollup,labels --limit 100 2>/dev/null`,
+    const { stdout } = await execFileAsync(
+      'gh',
+      [
+        'pr',
+        'list',
+        '--state',
+        'open',
+        '--json',
+        'title,headRefName,number,url,body,createdAt,statusCheckRollup,labels',
+        '--limit',
+        '100',
+      ],
       { encoding: 'utf-8', timeout: 15_000 },
-    ).trim()
-    if (!r || r === '[]') return []
-    const prs = JSON.parse(r)
+    )
+    const trimmed = stdout.trim()
+    if (!trimmed || trimmed === '[]') return []
+    const prs = JSON.parse(trimmed)
     if (prs.length >= 100) {
       operationalError(
         'github-api',
@@ -103,49 +171,34 @@ function loadOpenRenovatePullRequests() {
   }
 }
 
-function findRenovatePRs(entry) {
-  if (openRenovatePullRequests === undefined) {
-    openRenovatePullRequests = loadOpenRenovatePullRequests()
-  }
-  return selectRenovatePullRequests(openRenovatePullRequests ?? [], entry)
-}
-
-function curlJson(url) {
+async function fetchUpstreamJson(url) {
   try {
-    const r = execSync(`curl -sSL "${url}" 2>/dev/null`, {
-      encoding: 'utf-8',
-      timeout: 10_000,
-    }).trim()
-    return r ? JSON.parse(r) : null
+    return await fetchJson(url, { timeoutMs: 15_000 })
   } catch {
     return operationalError('upstream-registry', url)
   }
 }
 
-// ===== Version resolvers per datasource =====
-
-function resolveCurrent(entry) {
-  return resolveCurrentVersion(entry, repoRoot)
-}
-
-function nugetVersions(packageName) {
+async function fetchNugetVersions(packageName) {
   const id = encodeURIComponent(packageName.toLowerCase())
-  return curlJson(`https://api.nuget.org/v3-flatcontainer/${id}/index.json`)
-    ?.versions
+  const data = await fetchUpstreamJson(
+    `https://api.nuget.org/v3-flatcontainer/${id}/index.json`,
+  )
+  return data?.versions ?? null
 }
 
-function resolveLatest(entry, currentVersion) {
-  return resolveLatestVersion(entry, currentVersion, {
-    npm: npmLatest,
-    nuget: nugetVersions,
-    githubTags,
-    githubReleases: githubTags,
-    dotnet: () =>
-      curlJson(
-        'https://dotnetcli.blob.core.windows.net/dotnet/release-metadata/releases-index.json',
-      ),
-    node: () => curlJson('https://nodejs.org/dist/index.json'),
-  })
+async function runWithConcurrency(items, concurrency, task) {
+  let cursor = 0
+  async function worker() {
+    while (cursor < items.length) {
+      const index = cursor
+      cursor += 1
+      await task(items[index], index)
+    }
+  }
+  await Promise.all(
+    Array.from({ length: Math.min(concurrency, items.length) }, () => worker()),
+  )
 }
 
 // ===== Main =====
@@ -173,13 +226,82 @@ for (const error of exceptionRegistry.errors) {
   })
 }
 
+const entries = surface.surfaces || []
+const npmCache = new Map()
+const nugetCache = new Map()
+const githubTagsCache = new Map()
+let dotnetIndex = null
+let nodeIndex = null
+
+const uniqueJobs = []
+const seen = new Set()
+const enqueue = (key, fn) => {
+  if (seen.has(key)) return
+  seen.add(key)
+  uniqueJobs.push(fn)
+}
+
+for (const entry of entries) {
+  if (entry.datasource === 'npm') {
+    enqueue(`npm:${entry.packageName}`, async () => {
+      npmCache.set(entry.packageName, await fetchNpmLatest(entry.packageName))
+    })
+  } else if (entry.datasource === 'nuget') {
+    enqueue(`nuget:${entry.packageName}`, async () => {
+      nugetCache.set(
+        entry.packageName,
+        await fetchNugetVersions(entry.packageName),
+      )
+    })
+  } else if (
+    entry.datasource === 'github-tags' ||
+    entry.datasource === 'github-releases'
+  ) {
+    enqueue(`gh:${entry.packageName}`, async () => {
+      githubTagsCache.set(
+        entry.packageName,
+        await fetchGithubTags(entry.packageName),
+      )
+    })
+  } else if (entry.datasource === 'dotnet-version') {
+    enqueue('dotnet:index', async () => {
+      dotnetIndex = await fetchUpstreamJson(
+        'https://dotnetcli.blob.core.windows.net/dotnet/release-metadata/releases-index.json',
+      )
+    })
+  } else if (entry.datasource === 'node-version') {
+    enqueue('node:index', async () => {
+      nodeIndex = await fetchUpstreamJson('https://nodejs.org/dist/index.json')
+    })
+  }
+}
+
+const lookupConcurrency = Math.max(
+  1,
+  Number(process.env.FSUS_DEPS_FRESHNESS_CONCURRENCY) || 12,
+)
+const [openRenovatePullRequests] = await Promise.all([
+  entries.length > 0 ? loadOpenRenovatePullRequests() : Promise.resolve([]),
+  runWithConcurrency(uniqueJobs, lookupConcurrency, (job) => job()),
+])
+
 const results = []
 let failures = exceptionRegistry.errors.length > 0 ? 1 : 0
 
-for (const entry of surface.surfaces || []) {
-  const current = resolveCurrent(entry)
-  const latest = resolveLatest(entry, current)
-  const pullRequests = current && latest ? findRenovatePRs(entry) : []
+for (const entry of entries) {
+  const current = resolveCurrentVersion(entry, repoRoot)
+  const latest = resolveLatestVersion(entry, current, {
+    npm: (name) => npmCache.get(name) ?? null,
+    nuget: (name) => nugetCache.get(name) ?? null,
+    githubTags: (repo) => githubTagsCache.get(repo) ?? null,
+    githubReleases: (repo) => githubTagsCache.get(repo) ?? null,
+    dotnet: () => dotnetIndex,
+    node: () => nodeIndex,
+  })
+  const pullRequests =
+    current && latest
+      ? selectRenovatePullRequests(openRenovatePullRequests ?? [], entry)
+      : []
   const recordedExceptions = exceptionRegistry.byDependency.get(entry.id) ?? []
   const evaluated = evaluateFreshnessEntry({
     entry,

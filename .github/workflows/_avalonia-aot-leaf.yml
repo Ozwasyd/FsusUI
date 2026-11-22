@@ -90,11 +90,27 @@ jobs:
           writeFileSync('.tmp/conformance-v2/alignment.json', bytes, { flag: 'wx' })
           console.log('[avalonia-aot] Verified and restored canonical Contract V2 alignment')
           JS
+      - name: Restore Linux AOT warmup NuGet package cache
+        if: inputs.rid == 'linux-x64'
+        uses: actions/cache@v4
+        with:
+          path: ~/.nuget/aot-warmup-packages
+          key: ${{ runner.os }}-${{ runner.arch }}-fsusui-aot-nuget-${{ hashFiles('dotnet/global.json', 'tests/fixtures/avalonia-aot-smoke/FsusUI.Avalonia.AotSmoke.csproj') }}
+          restore-keys: |
+            ${{ runner.os }}-${{ runner.arch }}-fsusui-aot-nuget-${{ hashFiles('dotnet/global.json') }}-
       - name: Install Linux Native AOT prerequisites
         if: inputs.rid == 'linux-x64'
         run: |
-          sudo apt-get update
-          sudo apt-get install --yes clang zlib1g-dev xvfb xauth x11-utils dbus-daemon dbus-bin at-spi2-core
+          missing=()
+          for pkg in clang zlib1g-dev xvfb xauth x11-utils dbus-daemon dbus-bin at-spi2-core; do
+            dpkg-query -W -f='${Status}' "$pkg" 2>/dev/null | grep -q 'install ok installed' || missing+=("$pkg")
+          done
+          if [ "${#missing[@]}" -gt 0 ]; then
+            sudo apt-get update
+            sudo apt-get install --yes --no-install-recommends "${missing[@]}"
+          else
+            echo "[avalonia-aot] Linux Native AOT prerequisites already installed."
+          fi
       - name: Resolve exact Linux AOT fixture dependencies
         if: inputs.rid == 'linux-x64'
         timeout-minutes: 8
@@ -102,7 +118,9 @@ jobs:
           FSUSUI_AOT_CANDIDATE_ROOT: ${{ github.workspace }}/.dotnet-candidate/nuget
         run: |
           root="$(mktemp -d "$RUNNER_TEMP/fsusui-aot-leaf.XXXXXX")"
-          mkdir -p "$root/warmup" "$root/nuget"
+          nuget_cache="$HOME/.nuget/aot-warmup-packages"
+          mkdir -p "$root/warmup" "$nuget_cache"
+          rm -rf "$nuget_cache"/fsusui.avalonia*
           cp dotnet/global.json "$root/global.json"
           cp tests/fixtures/avalonia-aot-smoke/FsusUI.Avalonia.AotSmoke.csproj "$root/warmup/"
           cd "$root/warmup"
@@ -125,10 +143,11 @@ jobs:
           PY
           dotnet restore FsusUI.Avalonia.AotSmoke.csproj \
             --runtime linux-x64 -p:UseRidGraph=true \
-            --configfile NuGet.Config --packages "$root/nuget" --use-lock-file
+            --configfile NuGet.Config --packages "$nuget_cache" --use-lock-file
           test -s packages.lock.json
+          rm -rf "$nuget_cache"/fsusui.avalonia*
           {
-            printf 'NUGET_PACKAGES=%s/nuget\n' "$root"
+            printf 'NUGET_PACKAGES=%s\n' "$nuget_cache"
             printf 'FSUSUI_AOT_TMPDIR=%s\n' "$root"
             printf 'FSUSUI_AOT_DEPENDENCY_LOCK=%s/warmup/packages.lock.json\n' "$root"
           } >> "$GITHUB_ENV"

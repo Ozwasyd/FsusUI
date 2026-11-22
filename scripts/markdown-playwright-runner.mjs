@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 
+import { Buffer } from 'node:buffer'
 import { createHash } from 'node:crypto'
-import { spawnSync } from 'node:child_process'
+import { spawn, spawnSync } from 'node:child_process'
 import {
   existsSync,
   mkdirSync,
@@ -271,34 +272,61 @@ export async function runMarkdownCell(ownerId, cellId, group, options = {}) {
   mkdirSync(dirname(reportPath), { recursive: true })
 
   try {
-    runtime = await computeMarkdownCellRuntime(
-      cell,
-      options.fingerprintInputsBySuite ?? MARKDOWN_FINGERPRINT_INPUTS,
-    )
+    runtime =
+      options.precomputedRuntime ??
+      (await computeMarkdownCellRuntime(
+        cell,
+        options.fingerprintInputsBySuite ?? MARKDOWN_FINGERPRINT_INPUTS,
+      ))
     runtime = writeMarkdownCellRuntimeManifest(
       cell,
       evidenceDir,
       runtime,
       options.runtimeManifestId?.(cell) ?? cell.suiteId,
     )
-    const result = spawnSync(
-      'pnpm',
-      [
-        'exec',
-        'playwright',
-        'test',
-        `--config=${cell.config}`,
-        `--project=${cell.project}`,
-        '--reporter=json',
-        `--output=${outputDirectory}`,
-      ],
-      {
-        cwd: root,
-        env: createMarkdownPlaywrightEnvironment(options.interactionIdentity),
-        encoding: 'utf8',
-        maxBuffer: 256 * 1024 * 1024,
-      },
-    )
+    const childEnv = {
+      ...createMarkdownPlaywrightEnvironment(options.interactionIdentity),
+      ...(options.externalServer ? { FSUS_PLAYWRIGHT_EXTERNAL_SERVER: '1' } : {}),
+      ...(options.envOverrides ?? {}),
+    }
+    const result = await new Promise((resolveRun) => {
+      const stdoutChunks = []
+      const stderrChunks = []
+      const child = spawn(
+        'pnpm',
+        [
+          'exec',
+          'playwright',
+          'test',
+          `--config=${cell.config}`,
+          `--project=${cell.project}`,
+          '--reporter=json',
+          `--output=${outputDirectory}`,
+        ],
+        {
+          cwd: root,
+          env: childEnv,
+          stdio: ['ignore', 'pipe', 'pipe'],
+        },
+      )
+      child.stdout.on('data', (chunk) => stdoutChunks.push(chunk))
+      child.stderr.on('data', (chunk) => stderrChunks.push(chunk))
+      child.once('error', (error) => {
+        resolveRun({
+          error,
+          status: null,
+          stdout: Buffer.concat(stdoutChunks).toString('utf8'),
+          stderr: Buffer.concat(stderrChunks).toString('utf8'),
+        })
+      })
+      child.once('close', (status) => {
+        resolveRun({
+          status,
+          stdout: Buffer.concat(stdoutChunks).toString('utf8'),
+          stderr: Buffer.concat(stderrChunks).toString('utf8'),
+        })
+      })
+    })
     const stdout = result.stdout ?? ''
     const parsed = parseJsonReporterOutput(stdout)
     tests = testsFromStats(parsed?.stats)
