@@ -171,15 +171,13 @@ public class FsusNativeMenuHeadlessTests
     var palette = new FsusCommandPaletteModel([undoCommand, redoCommand]);
 
     // Search query
-    var results = palette.Search("und");
+    var results = palette.Search("und", FsusShortcutPlatform.Windows);
     Assert.Single(results);
     var result = results[0];
     Assert.Equal("edit.undo", result.CommandId);
     Assert.Equal("Undo", result.Label);
     Assert.True(result.IsEnabled);
-    Assert.Equal(
-      OperatingSystem.IsMacOS() ? "Command+Z" : "Ctrl+Z",
-      result.DisplayShortcut);
+    Assert.Equal("Ctrl+Z", result.DisplayShortcut);
 
     result.Execute();
     Assert.True(undoInvoked);

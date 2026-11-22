@@ -127,6 +127,7 @@
   --fsus-icon-target: var(--fsus-density-icon-target);
   --fsus-density-icon-target-small: 32px;
   --fsus-icon-target-small: var(--fsus-density-icon-target-small);
+  --fsus-component-collapse-content-min-height: 48px;
   --fsus-component-tag-height-large: 32px;
   --fsus-tag-height-large: var(--fsus-component-tag-height-large);
   --fsus-component-tag-height-default: 24px;

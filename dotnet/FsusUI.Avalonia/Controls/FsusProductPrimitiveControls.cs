@@ -334,6 +334,11 @@ public class FsusSettingsSectionNav : FsusProductPrimitiveControl
 
   protected ValueTask<bool> HandleKeyAsync(Key key)
   {
+    if (!IsEffectivelyEnabled)
+    {
+      return ValueTask.FromResult(false);
+    }
+
     var next = FsusProductPrimitiveKeyboard.Move(
       FocusedKey,
       Items.Select((item) => item.Key).ToList(),
@@ -345,6 +350,15 @@ public class FsusSettingsSectionNav : FsusProductPrimitiveControl
 
     SelectKey(next);
     return ValueTask.FromResult(true);
+  }
+
+  protected override void OnKeyDown(KeyEventArgs e)
+  {
+    base.OnKeyDown(e);
+    if (!e.Handled && HandleKeyAsync(e.Key).GetAwaiter().GetResult())
+    {
+      e.Handled = true;
+    }
   }
 }
 
@@ -471,9 +485,9 @@ public class FsusDiagnosticsList : FsusProductPrimitiveControl
 
   protected ValueTask<bool> HandleKeyAsync(Key key)
   {
-    if (string.IsNullOrWhiteSpace(FocusedKey) && Items.Count > 0)
+    if (!IsEffectivelyEnabled)
     {
-      FocusedKey = Items[0].Key;
+      return ValueTask.FromResult(false);
     }
 
     var next = FsusProductPrimitiveKeyboard.Move(
@@ -488,6 +502,15 @@ public class FsusDiagnosticsList : FsusProductPrimitiveControl
     FocusedKey = next;
     SyncState();
     return ValueTask.FromResult(true);
+  }
+
+  protected override void OnKeyDown(KeyEventArgs e)
+  {
+    base.OnKeyDown(e);
+    if (!e.Handled && HandleKeyAsync(e.Key).GetAwaiter().GetResult())
+    {
+      e.Handled = true;
+    }
   }
 }
 
@@ -582,6 +605,11 @@ public class FsusConversationList : FsusProductPrimitiveControl
 
   protected ValueTask<bool> HandleKeyAsync(Key key)
   {
+    if (!IsEffectivelyEnabled)
+    {
+      return ValueTask.FromResult(false);
+    }
+
     var enabledKeys = Items
       .Where((item) => !item.IsDisabled)
       .Select((item) => item.Key)
@@ -594,6 +622,15 @@ public class FsusConversationList : FsusProductPrimitiveControl
 
     SelectKey(next);
     return ValueTask.FromResult(true);
+  }
+
+  protected override void OnKeyDown(KeyEventArgs e)
+  {
+    base.OnKeyDown(e);
+    if (!e.Handled && HandleKeyAsync(e.Key).GetAwaiter().GetResult())
+    {
+      e.Handled = true;
+    }
   }
 }
 

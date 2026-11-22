@@ -269,6 +269,11 @@ public static class FsusAvaloniaGalleryRegistry
       case "upload-transfer":
         var upload = new FsusUpload { AccessibleName = "Gallery upload" };
         upload.AddItem("sample.pdf", 2048, "application/pdf");
+        var transfer = new FsusTransfer { AccessibleName = "Review assignments", IsFilterable = true };
+        transfer.Items.Add(new FsusTransferItem("draft", "Draft review"));
+        transfer.Items.Add(new FsusTransferItem("accessibility", "Accessibility review"));
+        transfer.Items.Add(new FsusTransferItem("release", "Release review") { IsDisabled = true });
+        transfer.RefreshLists();
         var dropZone = new FsusDropZone
         {
           AccessibleName = "Gallery drop zone",
@@ -277,6 +282,7 @@ public static class FsusAvaloniaGalleryRegistry
           Accepts = ".pdf, .png, .csv",
         };
         panel.Children.Add(upload);
+        panel.Children.Add(transfer);
         panel.Children.Add(dropZone);
         break;
       case "picker":

@@ -52,6 +52,11 @@ dropZone.FilesDropped += (sender, args) =>
 
 var upload = new FsusUpload { AccessibleName = "Attachments" };
 upload.Items.Add(new FsusUploadItem("report.csv", 42_000, "text/csv"));
+
+var transfer = new FsusTransfer { AccessibleName = "Review assignments", IsFilterable = true };
+transfer.Items.Add(new FsusTransferItem("draft", "Draft review"));
+transfer.Items.Add(new FsusTransferItem("release", "Release review") { IsDisabled = true });
+transfer.RefreshLists();
 ```
 
 `FilesDropped` and `FilesRejected` expose accepted and rejected storage items
@@ -74,6 +79,12 @@ events; the external state resets when the zone becomes disabled, enters
 loading, processes a drop, or detaches from the visual tree.
 
 ## Known Limitations
+
+When `FsusTransfer` has keyboard focus, Up/Down navigate enabled source items,
+Space toggles the highlighted source selection, and Enter moves selected source
+items to the target. Both move directions recheck item disabled state and the
+current filtered list when invoked. Selection and movement are blocked while
+the control or an ancestor has `IsEnabled = false`.
 
 The control does not perform network upload or file reading by itself; product
 apps own the file IO and network adapter. It does not open an operating-system

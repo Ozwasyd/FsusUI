@@ -22,19 +22,19 @@
       "path": "docs/design.md",
       "kind": "authority",
       "algorithm": "sha256",
-      "digest": "24c88676101dde43bb0907ed173f001b6e1659973caf19701ea57eddf0617039"
+      "digest": "545da692136467f396e2053b100e10e690f7880f34358998eca4827027522117"
     },
     "token-contract": {
       "path": "spec/tokens/tokens.json",
       "kind": "authority",
       "algorithm": "sha256",
-      "digest": "c97d4b2f3ffcf311fb060b21e12e13367763fb4ca9ba9c8fa4cacf6f72d381d1"
+      "digest": "0d147f1b5a7a31136da3e4f0a97b965bc68b850332ebab157abb28be0358e125"
     },
     "component-contracts": {
       "path": "spec/components/contracts/v1/vue-public-contracts.json",
       "kind": "authority",
       "algorithm": "sha256",
-      "digest": "b83b31c292391c7222eda593bc7ab482ec3b11954ca0a1ab8f2cff55f6079806"
+      "digest": "8c86ee62c07c8207fdb464369450917b473cc10e28a922b06d7263f2412996bb"
     },
     "component-select": {
       "path": "docs/components/select.md",
