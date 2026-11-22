@@ -4,11 +4,11 @@
   "source": {
     "toolVersion": "FsusUI.Avalonia.ApiTool@1.8.0",
     "assemblyVersion": "0.0.0.0",
-    "inputTreeHash": "0bd362b34f763d381601f8aa4b341b6ac86aa0c41e26275e7535f8800cced868",
+    "inputTreeHash": "0c3977bd2ef8bc9abe510eb5e2b38a817cb34f999aab19ccc4b7df909b0e9f0e",
     "compilerOptionsHash": "7e5271d568360ccb03852002c427b2d740466121049706513eb89a731476ad09",
     "dependencyVersionHash": "b0acaf728062500d48b252b58655a9fad423f83f197e79ddcdfff680a80ab71e",
     "contractSchemaVersion": "2.0.0",
-    "outputHash": "3d1f47169715d49555fecf1d3969f5944e41224ae8718abb16ccf62cc5fbbe64"
+    "outputHash": "07e02b062ead99047a5ed1d2bc821723fdaca270cccd799787427cfc535725c0"
   },
   "semanticTypes": [
     {
@@ -2490,6 +2490,24 @@
           "ComponentCascaderSuggestionMaxHeightName",
           "ComponentCascaderSuggestionMaxHeightResourceKey",
           "ComponentCascaderSuggestionMaxHeightValue"
+        ],
+        "declarationAuthority": "canonical-json\u002Broslyn-generated-constants\u002Bxml-generated-resources"
+      },
+      {
+        "canonicalName": "component.collapse.content.min-height",
+        "owner": "FsusUI component maintainers",
+        "generatedOutputs": [
+          "dotnet/FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml",
+          "dotnet/FsusUI.Avalonia/Generated/FsusTokens.g.cs"
+        ],
+        "resourceKeys": [
+          "FsusComponentCollapseContentMinHeight"
+        ],
+        "csharpMembers": [
+          "ComponentCollapseContentMinHeightDouble",
+          "ComponentCollapseContentMinHeightName",
+          "ComponentCollapseContentMinHeightResourceKey",
+          "ComponentCollapseContentMinHeightValue"
         ],
         "declarationAuthority": "canonical-json\u002Broslyn-generated-constants\u002Bxml-generated-resources"
       },
@@ -6288,6 +6306,18 @@
         "sourceMember": "fsus|FsusCollapseItem::Border.BorderBrush",
         "dependency": "FsusThemeBorderBrush",
         "resolved": false,
+        "ownerType": "FsusUI.Avalonia.Controls.FsusCollapseItem",
+        "ownership": "resolved",
+        "ownerExpression": "fsus|FsusCollapseItem"
+      },
+      {
+        "kind": "xaml-resource-reference",
+        "authority": "xml-xaml-resource-reference",
+        "sourceFile": "dotnet/FsusUI.Avalonia.Themes/Themes/Controls/Collapse.axaml",
+        "sourceMember": "fsus|FsusCollapseItem::Border.MinHeight",
+        "dependency": "FsusComponentCollapseContentMinHeight",
+        "canonicalName": "component.collapse.content.min-height",
+        "resolved": true,
         "ownerType": "FsusUI.Avalonia.Controls.FsusCollapseItem",
         "ownership": "resolved",
         "ownerExpression": "fsus|FsusCollapseItem"
@@ -14013,6 +14043,152 @@
         "resolved": false,
         "ownership": "partial",
         "ownerExpression": "fsus|FsusTreeV2.fsus-virtualized, fsus|FsusTreeTable.fsus-virtualized"
+      },
+      {
+        "kind": "xaml-resource-reference",
+        "authority": "xml-xaml-resource-reference",
+        "sourceFile": "dotnet/FsusUI.Avalonia.Themes/Themes/Controls/UploadTransfer.axaml",
+        "sourceMember": "CheckBox.fsus-transfer-row::Border.BorderBrush",
+        "dependency": "FsusThemeMutedTextBrush",
+        "resolved": false,
+        "ownership": "unbound",
+        "ownerExpression": "CheckBox.fsus-transfer-row"
+      },
+      {
+        "kind": "xaml-resource-reference",
+        "authority": "xml-xaml-resource-reference",
+        "sourceFile": "dotnet/FsusUI.Avalonia.Themes/Themes/Controls/UploadTransfer.axaml",
+        "sourceMember": "CheckBox.fsus-transfer-row::Border.BorderThickness",
+        "dependency": "FsusBorderControlWidth",
+        "canonicalName": "border.control.width",
+        "resolved": true,
+        "ownership": "unbound",
+        "ownerExpression": "CheckBox.fsus-transfer-row"
+      },
+      {
+        "kind": "xaml-resource-reference",
+        "authority": "xml-xaml-resource-reference",
+        "sourceFile": "dotnet/FsusUI.Avalonia.Themes/Themes/Controls/UploadTransfer.axaml",
+        "sourceMember": "CheckBox.fsus-transfer-row::Border.Height",
+        "dependency": "FsusIconSizeMd",
+        "canonicalName": "icon.size.md",
+        "resolved": true,
+        "ownership": "unbound",
+        "ownerExpression": "CheckBox.fsus-transfer-row"
+      },
+      {
+        "kind": "xaml-resource-reference",
+        "authority": "xml-xaml-resource-reference",
+        "sourceFile": "dotnet/FsusUI.Avalonia.Themes/Themes/Controls/UploadTransfer.axaml",
+        "sourceMember": "CheckBox.fsus-transfer-row::Border.Width",
+        "dependency": "FsusIconSizeMd",
+        "canonicalName": "icon.size.md",
+        "resolved": true,
+        "ownership": "unbound",
+        "ownerExpression": "CheckBox.fsus-transfer-row"
+      },
+      {
+        "kind": "xaml-resource-reference",
+        "authority": "xml-xaml-resource-reference",
+        "sourceFile": "dotnet/FsusUI.Avalonia.Themes/Themes/Controls/UploadTransfer.axaml",
+        "sourceMember": "CheckBox.fsus-transfer-row::TextBlock.Foreground",
+        "dependency": "FsusThemeTextBrush",
+        "resolved": false,
+        "ownership": "unbound",
+        "ownerExpression": "CheckBox.fsus-transfer-row"
+      },
+      {
+        "kind": "xaml-resource-reference",
+        "authority": "xml-xaml-resource-reference",
+        "sourceFile": "dotnet/FsusUI.Avalonia.Themes/Themes/Controls/UploadTransfer.axaml",
+        "sourceMember": "CheckBox.fsus-transfer-row::TextBlock.Margin",
+        "dependency": "FsusSpace2",
+        "canonicalName": "space.2",
+        "resolved": true,
+        "ownership": "unbound",
+        "ownerExpression": "CheckBox.fsus-transfer-row"
+      },
+      {
+        "kind": "xaml-resource-reference",
+        "authority": "xml-xaml-resource-reference",
+        "sourceFile": "dotnet/FsusUI.Avalonia.Themes/Themes/Controls/UploadTransfer.axaml",
+        "sourceMember": "CheckBox.fsus-transfer-row:checked::Setter.Background",
+        "dependency": "FsusThemeSurfaceRaisedBrush",
+        "resolved": false,
+        "ownership": "unbound",
+        "ownerExpression": "CheckBox.fsus-transfer-row:checked"
+      },
+      {
+        "kind": "xaml-resource-reference",
+        "authority": "xml-xaml-resource-reference",
+        "sourceFile": "dotnet/FsusUI.Avalonia.Themes/Themes/Controls/UploadTransfer.axaml",
+        "sourceMember": "CheckBox.fsus-transfer-row:focus::Setter.BorderBrush",
+        "dependency": "FsusThemeFocusBrush",
+        "resolved": false,
+        "ownership": "unbound",
+        "ownerExpression": "CheckBox.fsus-transfer-row:focus"
+      },
+      {
+        "kind": "xaml-resource-reference",
+        "authority": "xml-xaml-resource-reference",
+        "sourceFile": "dotnet/FsusUI.Avalonia.Themes/Themes/Controls/UploadTransfer.axaml",
+        "sourceMember": "CheckBox.fsus-transfer-row:focus::Setter.BorderThickness",
+        "dependency": "FsusThemeFocusBorderThickness",
+        "resolved": false,
+        "ownership": "unbound",
+        "ownerExpression": "CheckBox.fsus-transfer-row:focus"
+      },
+      {
+        "kind": "xaml-resource-reference",
+        "authority": "xml-xaml-resource-reference",
+        "sourceFile": "dotnet/FsusUI.Avalonia.Themes/Themes/Controls/UploadTransfer.axaml",
+        "sourceMember": "ListBox.fsus-transfer-list::Setter.Background",
+        "dependency": "FsusThemeSurfaceBrush",
+        "resolved": false,
+        "ownership": "unbound",
+        "ownerExpression": "ListBox.fsus-transfer-list"
+      },
+      {
+        "kind": "xaml-resource-reference",
+        "authority": "xml-xaml-resource-reference",
+        "sourceFile": "dotnet/FsusUI.Avalonia.Themes/Themes/Controls/UploadTransfer.axaml",
+        "sourceMember": "ListBox.fsus-transfer-list::Setter.BorderBrush",
+        "dependency": "FsusThemeBorderBrush",
+        "resolved": false,
+        "ownership": "unbound",
+        "ownerExpression": "ListBox.fsus-transfer-list"
+      },
+      {
+        "kind": "xaml-resource-reference",
+        "authority": "xml-xaml-resource-reference",
+        "sourceFile": "dotnet/FsusUI.Avalonia.Themes/Themes/Controls/UploadTransfer.axaml",
+        "sourceMember": "ListBox.fsus-transfer-list::Setter.BorderThickness",
+        "dependency": "FsusBorderControlWidth",
+        "canonicalName": "border.control.width",
+        "resolved": true,
+        "ownership": "unbound",
+        "ownerExpression": "ListBox.fsus-transfer-list"
+      },
+      {
+        "kind": "xaml-resource-reference",
+        "authority": "xml-xaml-resource-reference",
+        "sourceFile": "dotnet/FsusUI.Avalonia.Themes/Themes/Controls/UploadTransfer.axaml",
+        "sourceMember": "ListBox.fsus-transfer-list::Setter.CornerRadius",
+        "dependency": "FsusRadiusSurfaceMd",
+        "canonicalName": "radius.surface.md",
+        "resolved": true,
+        "ownership": "unbound",
+        "ownerExpression": "ListBox.fsus-transfer-list"
+      },
+      {
+        "kind": "xaml-resource-reference",
+        "authority": "xml-xaml-resource-reference",
+        "sourceFile": "dotnet/FsusUI.Avalonia.Themes/Themes/Controls/UploadTransfer.axaml",
+        "sourceMember": "TextBox.fsus-transfer-filter::Setter.PlaceholderForeground",
+        "dependency": "FsusThemeMutedTextBrush",
+        "resolved": false,
+        "ownership": "unbound",
+        "ownerExpression": "TextBox.fsus-transfer-filter"
       },
       {
         "kind": "xaml-resource-reference",

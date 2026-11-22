@@ -49,7 +49,7 @@
           </Border>
           <Border
             Name="PART_Content"
-            Height="48"
+            MinHeight="{DynamicResource FsusComponentCollapseContentMinHeight}"
             Padding="20,0,20,25"
             Background="{TemplateBinding Background}"
             BorderBrush="{DynamicResource FsusThemeBorderBrush}"

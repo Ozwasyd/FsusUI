@@ -623,6 +623,11 @@ public static class FsusTokens
     public const string DensityIconTargetSmallValue = "32px";
     public static double DensityIconTargetSmallDouble => 32d;
 
+    public const string ComponentCollapseContentMinHeightName = "component.collapse.content.min-height";
+    public const string ComponentCollapseContentMinHeightResourceKey = "FsusComponentCollapseContentMinHeight";
+    public const string ComponentCollapseContentMinHeightValue = "48px";
+    public static double ComponentCollapseContentMinHeightDouble => 48d;
+
     public const string ComponentTagHeightLargeName = "component.tag.height.large";
     public const string ComponentTagHeightLargeResourceKey = "FsusComponentTagHeightLarge";
     public const string ComponentTagHeightLargeValue = "32px";

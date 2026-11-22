@@ -245,6 +245,11 @@ FsusUI 默认使用 paper/document material、细边框和稳定留白表达层�
 
 ## 8. Component Implementation Rules
 
+Avalonia Collapse uses `component.collapse.content.min-height` for the expanded
+content region's minimum; larger content remains fully laid out. Web Collapse
+retains its natural content sizing. This token records the existing Avalonia
+short-content geometry rather than a shared fixed content height.
+
 ### Task Page Header
 
 - Task surfaces use `FsusTaskPageHeader` for the top-level page-heading role:
