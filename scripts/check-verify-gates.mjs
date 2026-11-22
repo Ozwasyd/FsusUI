@@ -122,8 +122,8 @@ assert(
   'hosted quality workflows must not run or require render benchmarks',
 )
 
-const prFeedbackJob = workflowJob('pr-feedback')
 const premergeMainJob = workflowJob('premerge-main')
+const premergeReadinessJob = workflowJob('premerge-readiness')
 const prFastJob = workflowJob('pr-fast')
 const mergeGroupPrFastJob = workflowJob('merge-group-pr-fast')
 const mainJob = workflowJob('main')
@@ -141,11 +141,6 @@ assert(
   'PR and merge-group quality runs must cancel superseded candidates',
 )
 assert(
-  prFeedbackJob.includes("github.event_name == 'pull_request'") &&
-    prFeedbackJob.includes('pnpm run verify:pr-fast'),
-  'PR workflow must keep verify:pr-fast as an early feedback job',
-)
-assert(
   premergeMainJob.includes(
     "github.event_name == 'pull_request' || github.event_name == 'merge_group'",
   ) &&
@@ -154,18 +149,26 @@ assert(
   'PR heads and merge-group candidates must run the complete main quality profile before merge',
 )
 assert(
+  premergeReadinessJob.includes('uses: ./.github/workflows/_quality-readiness.yml') &&
+    premergeReadinessJob.includes('- premerge-main') &&
+    premergeReadinessJob.includes('- premerge-playwright'),
+  'PR heads and merge-group candidates must aggregate readiness across premerge-main and premerge-playwright',
+)
+assert(
   prFastJob.includes('if: always()') &&
-    prFastJob.includes('pr-feedback') &&
     prFastJob.includes('premerge-playwright') &&
     prFastJob.includes('premerge-main') &&
+    prFastJob.includes('premerge-readiness') &&
     prFastJob.includes('PREMERGE_MAIN_RESULT') &&
+    prFastJob.includes('PREMERGE_READINESS_RESULT') &&
     !prFastJob.includes('pnpm run verify:pr-fast'),
-  'required pr-fast check must aggregate fast feedback, Playwright, and complete premerge main quality',
+  'required pr-fast check must aggregate premerge main quality, Playwright, and readiness evidence',
 )
 assert(
   mergeGroupPrFastJob.includes('name: pr-fast') &&
     mergeGroupPrFastJob.includes("github.event_name == 'merge_group'") &&
-    mergeGroupPrFastJob.includes('premerge-main'),
+    mergeGroupPrFastJob.includes('premerge-main') &&
+    mergeGroupPrFastJob.includes('premerge-readiness'),
   'merge-group candidates must preserve the existing required pr-fast check context',
 )
 assert(

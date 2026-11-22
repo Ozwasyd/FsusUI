@@ -33,184 +33,6 @@ concurrency:
   cancel-in-progress: ${{ github.event_name == 'pull_request' || github.event_name == 'merge_group' }}
 
 jobs:
-  pr-avalonia-aot-plan:
-    if: github.event_name == 'pull_request'
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-    outputs:
-      run: ${{ steps.plan.outputs.run }}
-      reason: ${{ steps.plan.outputs.reason }}
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          ref: ${{ github.event.pull_request.head.sha }}
-      - name: Plan Native AOT impact
-        id: plan
-        run: |
-          mkdir -p .tmp
-          git diff --name-only '${{ github.event.pull_request.base.sha }}...${{ github.event.pull_request.head.sha }}' > .tmp/avalonia-aot-paths.txt
-          node scripts/avalonia-aot-native.mjs affected --paths .tmp/avalonia-aot-paths.txt --out .tmp/avalonia-aot-impact.json --github-output "$GITHUB_OUTPUT"
-      - uses: actions/upload-artifact@v4
-        with:
-          name: avalonia-aot-impact-plan
-          path: .tmp/avalonia-aot-impact.json
-
-  pr-avalonia-aot-candidate:
-    if: needs.pr-avalonia-aot-plan.outputs.run == 'true'
-    needs: pr-avalonia-aot-plan
-    runs-on: ubuntu-22.04
-    timeout-minutes: 60
-    outputs:
-      candidate-digest: ${{ steps.candidate.outputs.digest }}
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          ref: ${{ github.event.pull_request.head.sha }}
-      - uses: pnpm/action-setup@v4
-        with:
-          version: 10.33.0
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: pnpm
-          cache-dependency-path: pnpm-lock.yaml
-      - uses: emscripten-core/setup-emsdk@v15
-        with:
-          version: 5.0.4
-          actions-cache-folder: emsdk-cache
-      - uses: actions/setup-dotnet@v4
-        with:
-          global-json-file: dotnet/global.json
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm exec playwright install --with-deps chromium
-      - name: Pin Chromium for native screen-reader evidence
-        run: node scripts/pin-render-browser.mjs .tmp/conformance-browser-selection.json
-      - name: Install native screen-reader prerequisites
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y orca at-spi2-core python3-pyatspi dbus-x11
-      - name: Build the immutable NuGet candidate once
-        id: candidate
-        env:
-          GITHUB_SHA: ${{ github.event.pull_request.head.sha }}
-        run: |
-          xvfb-run -a dbus-run-session -- pnpm run conformance:v2
-          pnpm run check:avalonia-stable-readiness
-          node scripts/dotnet-package-verify.mjs
-          digest="$(node -e '
-            const { candidateSha256 } = require("./dotnet/artifacts/package/manifest.json");
-            if (typeof candidateSha256 !== "string" || candidateSha256.length !== 64 || /[^0-9a-f]/u.test(candidateSha256)) {
-              throw new Error("Invalid NuGet candidateSha256");
-            }
-            process.stdout.write(candidateSha256);
-          ')"
-          printf 'digest=%s\n' "$digest" >> "$GITHUB_OUTPUT"
-      - name: Report workspace changes after candidate failure
-        if: failure()
-        run: git status --short --untracked-files=all
-      - name: Retain conformance evidence after candidate failure
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: pr-aot-conformance-failure
-          path: .tmp/conformance-v2
-          include-hidden-files: true
-          if-no-files-found: ignore
-          retention-days: 7
-      - uses: actions/upload-artifact@v4
-        with:
-          name: pr-dotnet-nuget-candidate
-          path: dotnet/artifacts
-          retention-days: 1
-
-  pr-avalonia-aot:
-    if: needs.pr-avalonia-aot-plan.outputs.run == 'true'
-    needs:
-      - pr-avalonia-aot-plan
-      - pr-avalonia-aot-candidate
-    uses: ./.github/workflows/_avalonia-aot-leaf.yml
-    with:
-      group: pr-fast
-      candidate-artifact: pr-dotnet-nuget-candidate
-      candidate-digest: ${{ needs.pr-avalonia-aot-candidate.outputs.candidate-digest }}
-      commit-sha: ${{ github.event.pull_request.head.sha }}
-      rid: linux-x64
-
-  pr-feedback:
-    if: github.event_name == 'pull_request'
-    runs-on: ubuntu-latest
-    timeout-minutes: 35
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - uses: pnpm/action-setup@v4
-        with:
-          version: 10.33.0
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: pnpm
-          cache-dependency-path: pnpm-lock.yaml
-      - uses: emscripten-core/setup-emsdk@v15
-        with:
-          version: 5.0.4
-          actions-cache-folder: emsdk-cache
-      - uses: actions/setup-dotnet@v4
-        with:
-          global-json-file: global.json
-      - run: pnpm install --frozen-lockfile
-      - name: Restore icons test artifact cache
-        id: icons-cache
-        uses: actions/cache@v4
-        with:
-          path: vue/packages/icons-vue/dist
-          key: ${{ runner.os }}-fsusui-test-artifacts-icons-${{ hashFiles('vue/packages/icons-vue/package.json', 'vue/packages/icons-vue/src/**', 'vue/packages/icons-vue/build/**', 'scripts/ensure-icons-artifacts.mjs', 'scripts/prepare-test-artifacts.mjs', 'scripts/test-artifact-cache.mjs') }}
-          restore-keys: |
-            ${{ runner.os }}-fsusui-test-artifacts-icons-
-      - name: Restore WASM test artifact cache
-        id: wasm-cache
-        uses: actions/cache@v4
-        with:
-          path: vue/packages/wasm/dist
-          key: ${{ runner.os }}-fsusui-test-artifacts-wasm-${{ hashFiles('vue/packages/wasm/package.json', 'vue/packages/wasm/build.config.ts', 'vue/packages/wasm/**/*.ts', 'vue/packages/wasm/**/*.cpp', 'vue/packages/wasm/**/*.hpp', 'vue/packages/wasm/**/*.h', 'vue/packages/wasm/**/CMakeLists.txt', 'vue/packages/wasm/build.sh', 'scripts/ensure-wasm-artifacts.mjs', 'scripts/run-wasm-build.mjs', 'scripts/prepare-test-artifacts.mjs', 'scripts/test-artifact-cache.mjs') }}
-          restore-keys: |
-            ${{ runner.os }}-fsusui-test-artifacts-wasm-
-      - name: Log test artifact cache status
-        run: |
-          echo "icons-cache-hit=${{ steps.icons-cache.outputs.cache-hit }}"
-          echo "wasm-cache-hit=${{ steps.wasm-cache.outputs.cache-hit }}"
-      - name: Restore TypeScript typecheck cache
-        id: typecheck-cache
-        uses: actions/cache@v4
-        with:
-          path: .tmp/typecheck-cache
-          key: ${{ runner.os }}-fsusui-typecheck-${{ hashFiles('pnpm-lock.yaml', 'package.json', 'vue/tsconfig*.json', 'vue/packages/**/*.ts', 'vue/packages/**/*.tsx', 'vue/packages/**/*.vue', 'vue/packages/**/*.json', 'vue/internal/**/*.ts', 'vue/internal/**/*.json', 'vue/typings/**/*.d.ts', 'scripts/run-typecheck.mjs') }}
-          restore-keys: |
-            ${{ runner.os }}-fsusui-typecheck-
-      - name: Log TypeScript typecheck cache status
-        run: |
-          echo "typecheck-cache-hit=${{ steps.typecheck-cache.outputs.cache-hit }}"
-          echo "cache-hit=${{ steps.typecheck-cache.outputs.cache-hit }}"
-          echo "cache-primary-key=${{ steps.typecheck-cache.outputs.cache-primary-key }}"
-      - run: pnpm run verify:pr-fast:ci-static
-      - name: Determine PR demo build path impact
-        id: demo-build-path
-        run: node ./scripts/with-node-heap.mjs node ./scripts/should-run-demo-build.mjs
-      - name: Log PR demo build path decision
-        run: |
-          echo "demo-build-run=${{ steps.demo-build-path.outputs.run }}"
-          echo "demo-build-reason=${{ steps.demo-build-path.outputs.reason }}"
-      - name: Run PR demo build
-        if: steps.demo-build-path.outputs.run == 'true'
-        run: pnpm run build:demo
-      - name: Skip PR demo build
-        if: steps.demo-build-path.outputs.run != 'true'
-        run: |
-          echo "Skipping demo build: ${{ steps.demo-build-path.outputs.reason }}"
-
   premerge-main:
     if: github.event_name == 'pull_request' || github.event_name == 'merge_group'
     uses: ./.github/workflows/_quality.yml
@@ -223,27 +45,37 @@ jobs:
     with:
       group: pr
 
+  premerge-readiness:
+    if: always() && (github.event_name == 'pull_request' || github.event_name == 'merge_group')
+    needs:
+      - premerge-main
+      - premerge-playwright
+    uses: ./.github/workflows/_quality-readiness.yml
+    with:
+      group: main
+      playwright_group: pr
+
   pr-fast:
     if: always() && github.event_name == 'pull_request'
     needs:
-      - pr-feedback
       - premerge-main
       - premerge-playwright
+      - premerge-readiness
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
       - name: Enforce complete PR merge readiness
         env:
-          PR_FEEDBACK_RESULT: ${{ needs.pr-feedback.result }}
           PREMERGE_MAIN_RESULT: ${{ needs.premerge-main.result }}
           PR_PLAYWRIGHT_RESULT: ${{ needs.premerge-playwright.result }}
+          PREMERGE_READINESS_RESULT: ${{ needs.premerge-readiness.result }}
         run: |
-          echo "pr-feedback=${PR_FEEDBACK_RESULT}"
           echo "premerge-main=${PREMERGE_MAIN_RESULT}"
           echo "premerge-playwright=${PR_PLAYWRIGHT_RESULT}"
-          test "${PR_FEEDBACK_RESULT}" = "success"
+          echo "premerge-readiness=${PREMERGE_READINESS_RESULT}"
           test "${PREMERGE_MAIN_RESULT}" = "success"
           test "${PR_PLAYWRIGHT_RESULT}" = "success"
+          test "${PREMERGE_READINESS_RESULT}" = "success"
 
   merge-group-pr-fast:
     name: pr-fast
@@ -251,6 +83,7 @@ jobs:
     needs:
       - premerge-main
       - premerge-playwright
+      - premerge-readiness
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
@@ -258,13 +91,14 @@ jobs:
         env:
           PREMERGE_MAIN_RESULT: ${{ needs.premerge-main.result }}
           PR_PLAYWRIGHT_RESULT: ${{ needs.premerge-playwright.result }}
+          PREMERGE_READINESS_RESULT: ${{ needs.premerge-readiness.result }}
         run: |
           test "${PREMERGE_MAIN_RESULT}" = "success"
           test "${PR_PLAYWRIGHT_RESULT}" = "success"
+          test "${PREMERGE_READINESS_RESULT}" = "success"
 
   main:
     if: github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.group == 'main')
-    needs: main-playwright
     uses: ./.github/workflows/_quality.yml
     with:
       group: main
@@ -275,9 +109,18 @@ jobs:
     with:
       group: main
 
+  main-readiness:
+    if: always() && (github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.group == 'main'))
+    needs:
+      - main
+      - main-playwright
+    uses: ./.github/workflows/_quality-readiness.yml
+    with:
+      group: main
+      playwright_group: main
+
   nightly:
     if: github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.group == 'nightly')
-    needs: nightly-playwright
     uses: ./.github/workflows/_quality.yml
     with:
       group: nightly
@@ -288,9 +131,18 @@ jobs:
     with:
       group: nightly
 
+  nightly-readiness:
+    if: always() && (github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.group == 'nightly'))
+    needs:
+      - nightly
+      - nightly-playwright
+    uses: ./.github/workflows/_quality-readiness.yml
+    with:
+      group: nightly
+      playwright_group: nightly
+
   release:
     if: github.event_name == 'workflow_dispatch' && inputs.group == 'release'
-    needs: release-playwright
     uses: ./.github/workflows/_quality.yml
     with:
       group: release
@@ -301,3 +153,14 @@ jobs:
     uses: ./.github/workflows/_quality-playwright.yml
     with:
       group: release
+
+  release-readiness:
+    if: always() && github.event_name == 'workflow_dispatch' && inputs.group == 'release'
+    needs:
+      - release
+      - release-playwright
+    uses: ./.github/workflows/_quality-readiness.yml
+    with:
+      group: release
+      playwright_group: release
+      release_tag: ${{ inputs.release_tag }}

@@ -145,13 +145,21 @@ async function runShard({ entry, runRoot, plan, identities, extraArgs }) {
   console.log(
     `[coverage] coverage-shard=${entry.shard} workers=${entry.workers}`,
   )
+  const shardCapacity =
+    entry.distributed && plan.capacity.vitestWorkersPerShard < entry.workers
+      ? {
+          ...plan.capacity,
+          unitShards: 1,
+          vitestWorkersPerShard: entry.workers,
+        }
+      : plan.capacity
   const exitCode = await command(
     'pnpm',
     vitestShardArgs(entry, absolute, extraArgs),
     {
       env: {
         ...process.env,
-        FSUS_CI_CAPACITY_PLAN: serializeCapacityPlan(plan.capacity),
+        FSUS_CI_CAPACITY_PLAN: serializeCapacityPlan(shardCapacity),
         FSUS_NODE_HEAP_PROFILE: 'coverage',
         FSUS_VITEST_WORKERS: String(entry.workers),
       },
@@ -312,11 +320,28 @@ function shardEntryFromEnvironment(plan) {
     throw new Error(
       `CI shard total ${total} does not match capacity plan ${plan.coverage.shardCount}`,
     )
+  const requestedWorkers = Number(process.env.FSUSUI_COVERAGE_WORKERS)
+  const memoryWorkerLimit = Math.max(
+    1,
+    Math.floor(
+      plan.capacity.budgets.allocatableMemoryMiB /
+        plan.coverage.capacity.shardMemoryMiB,
+    ),
+  )
+  const distributedLimit = Math.max(
+    1,
+    Math.min(plan.capacity.budgets.parallelLaneLimit, memoryWorkerLimit, 3),
+  )
+  const workers =
+    Number.isInteger(requestedWorkers) && requestedWorkers > 0
+      ? Math.min(requestedWorkers, distributedLimit)
+      : plan.coverage.workersPerShard
   return {
     index,
     total,
     shard: `${index}/${total}`,
-    workers: plan.coverage.workersPerShard,
+    workers,
+    distributed: true,
   }
 }
 

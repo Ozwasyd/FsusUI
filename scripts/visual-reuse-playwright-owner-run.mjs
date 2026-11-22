@@ -107,6 +107,29 @@ async function main(argv = process.argv.slice(2)) {
   }
 
   const commitSha = process.env.GITHUB_SHA ?? readRepositoryCommit()
+  if (cells.length === 0) {
+    const skipReceipt = {
+      schemaVersion: 1,
+      owner: ownerId,
+      gate: plan.gate,
+      group,
+      commitSha,
+      planDigest: plan.digest,
+      impactPlanDigest,
+      runtimeMode: plan.runtimeMode,
+      skipReason: 'no cells selected for profile',
+      status: 'success',
+      startedAt: new Date().toISOString(),
+      endedAt: new Date().toISOString(),
+    }
+    const evidencePath = resolve(root, evidenceDir, 'evidence.json')
+    mkdirSync(dirname(evidencePath), { recursive: true })
+    writeFileSync(evidencePath, `${JSON.stringify(skipReceipt, null, 2)}\n`)
+    console.log(
+      `[visual-runtime-reuse] owner=${ownerId} group=${group} status=success (skipped)`,
+    )
+    return
+  }
   console.log(
     `[visual-runtime-reuse] owner=${ownerId} group=${group} cells=${cells.length} commit=${commitSha} digest=${plan.digest}`,
   )

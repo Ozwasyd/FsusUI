@@ -8,13 +8,17 @@ runs:
       shell: bash
       run: |
         set -euo pipefail
-        # Use the runner's signed Ubuntu repositories and freeze this install's candidate.
-        sudo apt-get update
-        apt-cache policy poppler-utils
-        version=$(apt-cache policy poppler-utils | awk '/Candidate:/ { print $2 }')
-        test -n "$version" && test "$version" != '(none)'
-        sudo apt-get install --yes --no-install-recommends "poppler-utils=$version"
-        test "$(dpkg-query -W -f='${Version}' poppler-utils)" = "$version"
+        if command -v pdfinfo >/dev/null 2>&1 && command -v pdftotext >/dev/null 2>&1 && command -v pdftoppm >/dev/null 2>&1; then
+          echo "Poppler utilities already present on Linux runner."
+        else
+          # Use the runner's signed Ubuntu repositories and freeze this install's candidate.
+          sudo apt-get update
+          apt-cache policy poppler-utils
+          version=$(apt-cache policy poppler-utils | awk '/Candidate:/ { print $2 }')
+          test -n "$version" && test "$version" != '(none)'
+          sudo apt-get install --yes --no-install-recommends "poppler-utils=$version"
+          test "$(dpkg-query -W -f='${Version}' poppler-utils)" = "$version"
+        fi
         for tool in pdfinfo pdftotext pdftoppm; do
           test -x "/usr/bin/$tool"
           dpkg-query -S "/usr/bin/$tool"
@@ -29,20 +33,32 @@ runs:
         HOMEBREW_NO_AUTO_UPDATE: '1'
       run: |
         set -euo pipefail
-        # Homebrew verifies the source/bottle SHA-256 from its official core formula.
-        metadata="$RUNNER_TEMP/fsusui-poppler-homebrew.json"
-        brew info --json=v2 homebrew/core/poppler > "$metadata"
-        cat "$metadata"
-        version=$(node -e 'const f = require(process.argv[1]).formulae[0]; if (f.tap !== "homebrew/core" || !f.versions.stable) throw Error("Expected stable Homebrew core Poppler"); console.log(f.versions.stable)' "$metadata")
-        brew install homebrew/core/poppler
-        bin="$(brew --prefix homebrew/core/poppler)/bin"
-        for tool in pdfinfo pdftotext pdftoppm; do
-          test -x "$bin/$tool"
-          actual=$("$bin/$tool" -v 2>&1)
-          echo "$actual"
-          test "$(printf '%s\n' "$actual" | head -n 1)" = "$tool version $version"
-        done
+        if command -v pdfinfo >/dev/null 2>&1 && command -v pdftotext >/dev/null 2>&1 && command -v pdftoppm >/dev/null 2>&1; then
+          bin="$(dirname "$(command -v pdfinfo)")"
+          echo "Poppler utilities already present on macOS runner at $bin."
+        else
+          # Homebrew verifies the source/bottle SHA-256 from its official core formula.
+          metadata="$RUNNER_TEMP/fsusui-poppler-homebrew.json"
+          brew info --json=v2 homebrew/core/poppler > "$metadata"
+          cat "$metadata"
+          version=$(node -e 'const f = require(process.argv[1]).formulae[0]; if (f.tap !== "homebrew/core" || !f.versions.stable) throw Error("Expected stable Homebrew core Poppler"); console.log(f.versions.stable)' "$metadata")
+          brew install homebrew/core/poppler
+          bin="$(brew --prefix homebrew/core/poppler)/bin"
+          for tool in pdfinfo pdftotext pdftoppm; do
+            test -x "$bin/$tool"
+            actual=$("$bin/$tool" -v 2>&1)
+            echo "$actual"
+            test "$(printf '%s\n' "$actual" | head -n 1)" = "$tool version $version"
+          done
+        fi
         echo "$bin" >> "$GITHUB_PATH"
+
+    - name: Restore Windows Poppler package cache
+      if: runner.os == 'Windows'
+      uses: actions/cache@v4
+      with:
+        path: ${{ runner.temp }}/fsusui-poppler-cache
+        key: Windows-fsusui-poppler-26.9.0-08718647
 
     - name: Install Chocolatey Poppler
       if: runner.os == 'Windows'
@@ -52,14 +68,17 @@ runs:
         # Registry provenance and bundled archive SHA-256:
         # https://community.chocolatey.org/packages/poppler/26.9.0
         # conda-forge binaries packaged by oschwartz10612/poppler-windows v26.09.0-0.
-        $downloadRoot = Join-Path $env:RUNNER_TEMP 'fsusui-poppler'
-        New-Item -ItemType Directory -Path $downloadRoot -Force | Out-Null
-        $archive = Join-Path $downloadRoot 'poppler.26.9.0.nupkg'
-        Invoke-WebRequest -Uri 'https://community.chocolatey.org/api/v2/package/poppler/26.9.0' -OutFile $archive
-        if ((Get-FileHash $archive -Algorithm SHA256).Hash -ne '08718647EC0C314D8A229D601CBE920255E75B6FECF84952D59FAAD04248E706') {
+        $cacheRoot = Join-Path $env:RUNNER_TEMP 'fsusui-poppler-cache'
+        New-Item -ItemType Directory -Path $cacheRoot -Force | Out-Null
+        $archive = Join-Path $cacheRoot 'poppler.26.9.0.nupkg'
+        $expectedHash = '08718647EC0C314D8A229D601CBE920255E75B6FECF84952D59FAAD04248E706'
+        if (-not (Test-Path $archive -PathType Leaf) -or ((Get-FileHash $archive -Algorithm SHA256).Hash -ne $expectedHash)) {
+          Invoke-WebRequest -Uri 'https://community.chocolatey.org/api/v2/package/poppler/26.9.0' -OutFile $archive
+        }
+        if ((Get-FileHash $archive -Algorithm SHA256).Hash -ne $expectedHash) {
           throw 'Poppler registry package SHA-256 mismatch'
         }
-        choco install poppler --version=26.9.0 --source="$downloadRoot" --yes --no-progress --require-checksums
+        choco install poppler --version=26.9.0 --source="$cacheRoot" --yes --no-progress --require-checksums
         if ($LASTEXITCODE -ne 0) { throw "Chocolatey Poppler install failed: $LASTEXITCODE" }
         $packageRoot = Join-Path $env:ChocolateyInstall 'lib/poppler'
         [xml]$package = Get-Content (Join-Path $packageRoot 'poppler.nuspec')

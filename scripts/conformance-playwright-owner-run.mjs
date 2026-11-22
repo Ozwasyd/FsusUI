@@ -1,11 +1,16 @@
 #!/usr/bin/env node
+/* global fetch, setTimeout */
 
 import { mkdirSync, writeFileSync } from 'node:fs'
-import { spawnSync } from 'node:child_process'
+import { spawn, spawnSync } from 'node:child_process'
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 import { loadConformanceOwnerPlan } from './conformance-playwright-plan.mjs'
-import { runConformanceCell } from './conformance-playwright-runner.mjs'
+import {
+  CONFORMANCE_FINGERPRINT_INPUTS,
+  runConformanceCell,
+} from './conformance-playwright-runner.mjs'
+import { computeMarkdownCellRuntime } from './markdown-playwright-runner.mjs'
 import {
   loadConformanceReceiptsFromDirectory,
   verifyConformanceOwnerReceipts,
@@ -16,6 +21,32 @@ import {
 } from './playwright-impact-filter.mjs'
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..')
+
+const waitForServer = async (url, timeoutMs = 90_000) => {
+  const deadline = Date.now() + timeoutMs
+  let lastError
+  while (Date.now() < deadline) {
+    try {
+      const response = await fetch(url)
+      if (response.status === 200) return true
+      lastError = new Error(`server responded ${response.status}`)
+    } catch (error) {
+      lastError = error
+    }
+    await new Promise((resolvePromise) => setTimeout(resolvePromise, 500))
+  }
+  throw lastError ?? new Error(`server readiness timeout: ${url}`)
+}
+
+const buildDemoOnce = () => {
+  const result = spawnSync('pnpm', ['run', 'build:demo'], {
+    cwd: root,
+    stdio: 'inherit',
+  })
+  if (result.status !== 0) {
+    throw new Error(`demo build failed with status ${result.status ?? -1}`)
+  }
+}
 
 const option = (args, name, fallback) => {
   const index = args.indexOf(`--${name}`)
@@ -97,17 +128,71 @@ export async function runConformanceOwner(argv = process.argv.slice(2)) {
     return { status: 'success', dryRun: true }
   }
 
-  const results = []
-  let overallFailed = false
   const impactPlan =
     group === 'pr' ? loadPlaywrightImpactPlan(root, impactPlanPath) : null
-  for (const cell of cells) {
-    const result = await runConformanceCell(ownerId, cell.id, group, {
-      evidenceDir,
-      impactPlan,
-    })
-    results.push(result)
-    if (!result.ok) overallFailed = true
+  const serverPort = Number(
+    option(
+      argv,
+      'server-port',
+      process.env.FSUS_CONFORMANCE_INTERACTION_PORT ?? '5192',
+    ),
+  )
+  const serverUrl = `http://127.0.0.1:${serverPort}`
+  const precomputedRuntime = await computeMarkdownCellRuntime(
+    cells[0],
+    CONFORMANCE_FINGERPRINT_INPUTS,
+  )
+  buildDemoOnce()
+  const server = spawn(
+    'pnpm',
+    [
+      '-C',
+      'vue/packages/demo-app',
+      'exec',
+      'vite',
+      'preview',
+      '--host',
+      '127.0.0.1',
+      '--port',
+      String(serverPort),
+      '--strictPort',
+    ],
+    { cwd: root, stdio: 'ignore' },
+  )
+  let results = []
+  let overallFailed = false
+  try {
+    await waitForServer(serverUrl)
+    const concurrency = Math.max(
+      1,
+      Math.min(
+        cells.length,
+        Number(process.env.FSUS_PLAYWRIGHT_CELL_CONCURRENCY) || 3,
+      ),
+    )
+    results = new Array(cells.length)
+    let cursor = 0
+    async function cellWorker() {
+      while (cursor < cells.length) {
+        const index = cursor
+        cursor += 1
+        const cell = cells[index]
+        const result = await runConformanceCell(ownerId, cell.id, group, {
+          evidenceDir,
+          impactPlan,
+          externalServer: true,
+          precomputedRuntime,
+          envOverrides: {
+            FSUS_CONFORMANCE_INTERACTION_PORT: String(serverPort),
+          },
+        })
+        results[index] = result
+        if (!result.ok) overallFailed = true
+      }
+    }
+    await Promise.all(Array.from({ length: concurrency }, () => cellWorker()))
+  } finally {
+    server.kill('SIGTERM')
   }
 
   const receipts = loadConformanceReceiptsFromDirectory(

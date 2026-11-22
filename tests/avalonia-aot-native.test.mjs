@@ -289,7 +289,7 @@ test('workflow policy kills repack, allow-failure and missing required Linux wir
     () =>
       validateWorkflowContracts({
         ...files,
-        quality: files.quality.replaceAll('\n      - avalonia-aot\n', '\n'),
+        quality: files.quality.replaceAll('gate: avalonia-aot', 'gate: skipped'),
       }),
     /quality workflow missing/u,
   )
@@ -297,7 +297,7 @@ test('workflow policy kills repack, allow-failure and missing required Linux wir
     () =>
       validateWorkflowContracts({
         ...files,
-        caller: files.caller.replace('rid: linux-x64', 'rid: win-x64'),
+        caller: files.caller.replace('premerge-readiness:', 'pr-readiness-dropped:'),
       }),
     /PR workflow missing/u,
   )
@@ -306,7 +306,7 @@ test('workflow policy kills repack, allow-failure and missing required Linux wir
       validateWorkflowContracts({
         ...files,
         publish: files.publish.replace(
-          'needs: [quality, plan, preflight, fsusblog-consumer]',
+          'needs: [quality, quality-readiness, plan, preflight, fsusblog-consumer]',
           'needs: [plan, preflight, fsusblog-consumer]',
         ),
       }),

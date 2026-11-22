@@ -17,9 +17,6 @@ on:
       npm-candidate-digest:
         description: SHA-256 of the immutable npm candidate tested by quality.
         value: ${{ jobs.build-package.outputs.candidate-digest }}
-      release-readiness-digest:
-        description: SHA-256 of the release aggregator evidence bound to SHA, tag, and package.
-        value: ${{ jobs.release-readiness.outputs.evidence-digest }}
 
 env:
   # Coverage shards and the merger must hash an identical Node patch version.
@@ -47,6 +44,10 @@ jobs:
         run: |
           pnpm run check:consumer-contract
           pnpm run check:npm-dist-tag
+          pnpm run deps:baseline:verify
+          pnpm run check:ux-semantics
+          pnpm run check:design-source-drift
+          pnpm run check:foundation-style-boundary
       - name: Run lint
         run: pnpm lint
       - name: Run token checks
@@ -102,6 +103,7 @@ jobs:
         uses: ./.github/actions/setup-pdf-tools
       - name: Run platform-owned restore, build, tests, and smoke
         env:
+          FSUS_DOTNET_MAX_CPU_COUNT: '4'
           FSUS_WEBVIEW_CANDIDATE_SHA: ${{ github.sha }}
         run: node scripts/dotnet-platform-verify.mjs --output dotnet/artifacts/platform/${{ matrix.platform }}/manifest.json
       - uses: actions/upload-artifact@v4
@@ -125,6 +127,8 @@ jobs:
   dotnet-package:
     runs-on: ubuntu-22.04
     timeout-minutes: 60
+    env:
+      PLAYWRIGHT_BROWSERS_PATH: ${{ github.workspace }}/.tmp/playwright-browsers
     outputs:
       candidate-digest: ${{ steps.candidate.outputs.digest }}
     steps:
@@ -139,7 +143,25 @@ jobs:
           node-version: 22
           cache: pnpm
           cache-dependency-path: pnpm-lock.yaml
-      - uses: emscripten-core/setup-emsdk@v15
+      - name: Restore icons test artifact cache
+        id: icons-cache
+        uses: actions/cache@v4
+        with:
+          path: vue/packages/icons-vue/dist
+          key: ${{ runner.os }}-fsusui-test-artifacts-icons-${{ hashFiles('vue/packages/icons-vue/package.json', 'vue/packages/icons-vue/src/**', 'vue/packages/icons-vue/build/**', 'scripts/ensure-icons-artifacts.mjs', 'scripts/prepare-test-artifacts.mjs', 'scripts/test-artifact-cache.mjs') }}
+          restore-keys: |
+            ${{ runner.os }}-fsusui-test-artifacts-icons-
+      - name: Restore WASM test artifact cache
+        id: wasm-cache
+        uses: actions/cache@v4
+        with:
+          path: vue/packages/wasm/dist
+          key: ${{ runner.os }}-fsusui-test-artifacts-wasm-${{ hashFiles('vue/packages/wasm/package.json', 'vue/packages/wasm/build.config.ts', 'vue/packages/wasm/**/*.ts', 'vue/packages/wasm/**/*.cpp', 'vue/packages/wasm/**/*.hpp', 'vue/packages/wasm/**/*.h', 'vue/packages/wasm/**/CMakeLists.txt', 'vue/packages/wasm/build.sh', 'scripts/ensure-wasm-artifacts.mjs', 'scripts/run-wasm-build.mjs', 'scripts/prepare-test-artifacts.mjs', 'scripts/test-artifact-cache.mjs') }}
+          restore-keys: |
+            ${{ runner.os }}-fsusui-test-artifacts-wasm-
+      - name: Set up Emscripten when WASM cache misses
+        if: steps.wasm-cache.outputs.cache-hit != 'true'
+        uses: emscripten-core/setup-emsdk@v15
         with:
           version: 5.0.4
           actions-cache-folder: emsdk-cache
@@ -147,6 +169,11 @@ jobs:
         with:
           global-json-file: dotnet/global.json
       - run: pnpm install --frozen-lockfile
+      - name: Restore Playwright Chromium cache
+        uses: actions/cache@v4
+        with:
+          path: .tmp/playwright-browsers
+          key: ${{ runner.os }}-ubuntu-22.04-playwright-chromium-${{ hashFiles('package.json', 'pnpm-lock.yaml') }}
       - run: pnpm exec playwright install --with-deps chromium
       - name: Pin Chromium for native screen-reader evidence
         run: node scripts/pin-render-browser.mjs .tmp/conformance-browser-selection.json
@@ -319,11 +346,6 @@ jobs:
           node-version: 22
           cache: pnpm
           cache-dependency-path: pnpm-lock.yaml
-      - uses: emscripten-core/setup-emsdk@v15
-        with:
-          version: 5.0.4
-          actions-cache-folder: emsdk-cache
-      - run: pnpm install --frozen-lockfile
       - name: Restore icons test artifact cache
         id: icons-cache
         uses: actions/cache@v4
@@ -340,6 +362,13 @@ jobs:
           key: ${{ runner.os }}-fsusui-test-artifacts-wasm-${{ hashFiles('vue/packages/wasm/package.json', 'vue/packages/wasm/build.config.ts', 'vue/packages/wasm/**/*.ts', 'vue/packages/wasm/**/*.cpp', 'vue/packages/wasm/**/*.hpp', 'vue/packages/wasm/**/*.h', 'vue/packages/wasm/**/CMakeLists.txt', 'vue/packages/wasm/build.sh', 'scripts/ensure-wasm-artifacts.mjs', 'scripts/run-wasm-build.mjs', 'scripts/prepare-test-artifacts.mjs', 'scripts/test-artifact-cache.mjs') }}
           restore-keys: |
             ${{ runner.os }}-fsusui-test-artifacts-wasm-
+      - name: Set up Emscripten when WASM cache misses
+        if: steps.wasm-cache.outputs.cache-hit != 'true'
+        uses: emscripten-core/setup-emsdk@v15
+        with:
+          version: 5.0.4
+          actions-cache-folder: emsdk-cache
+      - run: pnpm install --frozen-lockfile
       - name: Log test artifact cache status
         run: |
           echo "icons-cache-hit=${{ steps.icons-cache.outputs.cache-hit }}"
@@ -386,6 +415,7 @@ jobs:
       - run: pnpm run check:test-artifacts-ready
       - name: Run capacity-planned Unit shard
         env:
+          FSUS_CI_UNIT_SHARDS: '1'
           FSUS_VITEST_WORKERS: ${{ matrix.workers }}
         run: node ./scripts/with-node-heap.mjs pnpm exec vitest run --config vue/vitest.config.ts --shard=${{ matrix.shard }}
       - name: Record Unit shard leaf result
@@ -422,7 +452,9 @@ jobs:
 
   coverage-single:
     if: needs.coverage-plan.outputs.mode == 'single'
-    needs: coverage-plan
+    needs:
+      - coverage-plan
+      - unit-artifacts
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
@@ -435,35 +467,20 @@ jobs:
           node-version: 22
           cache: pnpm
           cache-dependency-path: pnpm-lock.yaml
-      - uses: emscripten-core/setup-emsdk@v15
-        with:
-          version: 5.0.4
-          actions-cache-folder: emsdk-cache
       - run: pnpm install --frozen-lockfile
-      - name: Restore icons test artifact cache
-        id: icons-cache
-        uses: actions/cache@v4
+      - uses: actions/download-artifact@v4
         with:
-          path: vue/packages/icons-vue/dist
-          key: ${{ runner.os }}-fsusui-test-artifacts-icons-${{ hashFiles('vue/packages/icons-vue/package.json', 'vue/packages/icons-vue/src/**', 'vue/packages/icons-vue/build/**', 'scripts/ensure-icons-artifacts.mjs', 'scripts/prepare-test-artifacts.mjs', 'scripts/test-artifact-cache.mjs') }}
-          restore-keys: |
-            ${{ runner.os }}-fsusui-test-artifacts-icons-
-      - name: Restore WASM test artifact cache
-        id: wasm-cache
-        uses: actions/cache@v4
-        with:
-          path: vue/packages/wasm/dist
-          key: ${{ runner.os }}-fsusui-test-artifacts-wasm-${{ hashFiles('vue/packages/wasm/package.json', 'vue/packages/wasm/build.config.ts', 'vue/packages/wasm/**/*.ts', 'vue/packages/wasm/**/*.cpp', 'vue/packages/wasm/**/*.hpp', 'vue/packages/wasm/**/*.h', 'vue/packages/wasm/**/CMakeLists.txt', 'vue/packages/wasm/build.sh', 'scripts/ensure-wasm-artifacts.mjs', 'scripts/run-wasm-build.mjs', 'scripts/prepare-test-artifacts.mjs', 'scripts/test-artifact-cache.mjs') }}
-          restore-keys: |
-            ${{ runner.os }}-fsusui-test-artifacts-wasm-
-      - name: Log test artifact cache status
+          name: unit-test-artifacts
+          path: .unit-artifacts
+      - name: Unpack unit test artifacts
         run: |
-          echo "icons-cache-hit=${{ steps.icons-cache.outputs.cache-hit }}"
-          echo "wasm-cache-hit=${{ steps.wasm-cache.outputs.cache-hit }}"
+          sha256sum .unit-artifacts/unit-test-artifacts.tgz
+          tar -xzf .unit-artifacts/unit-test-artifacts.tgz
+      - run: pnpm run check:test-artifacts-ready
       - name: Run coverage
         env:
           FSUSUI_COVERAGE_SHARDS: 1
-        run: pnpm test:coverage
+        run: pnpm coverage:run
       - uses: actions/upload-artifact@v4
         if: always()
         continue-on-error: true
@@ -473,7 +490,9 @@ jobs:
 
   coverage-shard:
     if: needs.coverage-plan.outputs.mode == 'sharded'
-    needs: coverage-plan
+    needs:
+      - coverage-plan
+      - unit-artifacts
     runs-on: ubuntu-latest
     timeout-minutes: 30
     strategy:
@@ -489,28 +508,19 @@ jobs:
           node-version: ${{ env.FSUSUI_COVERAGE_NODE_VERSION }}
           cache: pnpm
           cache-dependency-path: pnpm-lock.yaml
-      - uses: emscripten-core/setup-emsdk@v15
-        with:
-          version: 5.0.4
-          actions-cache-folder: emsdk-cache
       - run: pnpm install --frozen-lockfile
-      - name: Restore icons test artifact cache
-        uses: actions/cache@v4
+      - uses: actions/download-artifact@v4
         with:
-          path: vue/packages/icons-vue/dist
-          key: ${{ runner.os }}-fsusui-test-artifacts-icons-${{ hashFiles('vue/packages/icons-vue/package.json', 'vue/packages/icons-vue/src/**', 'vue/packages/icons-vue/build/**', 'scripts/ensure-icons-artifacts.mjs', 'scripts/prepare-test-artifacts.mjs', 'scripts/test-artifact-cache.mjs') }}
-          restore-keys: |
-            ${{ runner.os }}-fsusui-test-artifacts-icons-
-      - name: Restore WASM test artifact cache
-        uses: actions/cache@v4
-        with:
-          path: vue/packages/wasm/dist
-          key: ${{ runner.os }}-fsusui-test-artifacts-wasm-${{ hashFiles('vue/packages/wasm/package.json', 'vue/packages/wasm/build.config.ts', 'vue/packages/wasm/**/*.ts', 'vue/packages/wasm/**/*.cpp', 'vue/packages/wasm/**/*.hpp', 'vue/packages/wasm/**/*.h', 'vue/packages/wasm/**/CMakeLists.txt', 'vue/packages/wasm/build.sh', 'scripts/ensure-wasm-artifacts.mjs', 'scripts/run-wasm-build.mjs', 'scripts/prepare-test-artifacts.mjs', 'scripts/test-artifact-cache.mjs') }}
-          restore-keys: |
-            ${{ runner.os }}-fsusui-test-artifacts-wasm-
-      - run: pnpm run prepare:test-artifacts
+          name: unit-test-artifacts
+          path: .unit-artifacts
+      - name: Unpack unit test artifacts
+        run: |
+          sha256sum .unit-artifacts/unit-test-artifacts.tgz
+          tar -xzf .unit-artifacts/unit-test-artifacts.tgz
+      - run: pnpm run check:test-artifacts-ready
       - name: Run one coverage shard
         env:
+          FSUS_CI_UNIT_SHARDS: '1'
           FSUSUI_COVERAGE_SHARDS: ${{ matrix.total }}
           FSUSUI_COVERAGE_WORKERS: ${{ matrix.workers }}
           FSUSUI_COVERAGE_SHARD_INDEX: ${{ matrix.index }}
@@ -611,13 +621,6 @@ jobs:
           node-version: 22.14.0
           cache: pnpm
           cache-dependency-path: pnpm-lock.yaml
-      - uses: emscripten-core/setup-emsdk@v15
-        with:
-          version: 5.0.4
-          actions-cache-folder: emsdk-cache
-      - run: pnpm install --frozen-lockfile
-      - name: Use release npm toolchain
-        run: npm install -g npm@^11.5.1
       - name: Restore icons test artifact cache
         id: icons-cache
         uses: actions/cache@v4
@@ -634,6 +637,15 @@ jobs:
           key: ${{ runner.os }}-fsusui-test-artifacts-wasm-${{ hashFiles('vue/packages/wasm/package.json', 'vue/packages/wasm/build.config.ts', 'vue/packages/wasm/**/*.ts', 'vue/packages/wasm/**/*.cpp', 'vue/packages/wasm/**/*.hpp', 'vue/packages/wasm/**/*.h', 'vue/packages/wasm/**/CMakeLists.txt', 'vue/packages/wasm/build.sh', 'scripts/ensure-wasm-artifacts.mjs', 'scripts/run-wasm-build.mjs', 'scripts/prepare-test-artifacts.mjs', 'scripts/test-artifact-cache.mjs') }}
           restore-keys: |
             ${{ runner.os }}-fsusui-test-artifacts-wasm-
+      - name: Set up Emscripten when WASM cache misses
+        if: steps.wasm-cache.outputs.cache-hit != 'true'
+        uses: emscripten-core/setup-emsdk@v15
+        with:
+          version: 5.0.4
+          actions-cache-folder: emsdk-cache
+      - run: pnpm install --frozen-lockfile
+      - name: Use release npm toolchain
+        run: npm install -g npm@^11.5.1
       - name: Log test artifact cache status
         run: |
           echo "icons-cache-hit=${{ steps.icons-cache.outputs.cache-hit }}"
@@ -745,21 +757,30 @@ jobs:
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: ${{ github.event_name == 'pull_request' && 0 || 1 }}
+      - name: Determine PR demo build path impact
+        id: demo-build-path
+        if: github.event_name == 'pull_request'
+        run: node ./scripts/with-node-heap.mjs node ./scripts/should-run-demo-build.mjs
+      - name: Log PR demo build path decision
+        if: github.event_name == 'pull_request'
+        run: |
+          echo "demo-build-run=${{ steps.demo-build-path.outputs.run }}"
+          echo "demo-build-reason=${{ steps.demo-build-path.outputs.reason }}"
       - uses: pnpm/action-setup@v4
+        if: github.event_name != 'pull_request' || steps.demo-build-path.outputs.run == 'true'
         with:
           version: 10.33.0
       - uses: actions/setup-node@v4
+        if: github.event_name != 'pull_request' || steps.demo-build-path.outputs.run == 'true'
         with:
           node-version: 22
           cache: pnpm
           cache-dependency-path: pnpm-lock.yaml
-      - uses: emscripten-core/setup-emsdk@v15
-        with:
-          version: 5.0.4
-          actions-cache-folder: emsdk-cache
-      - run: pnpm install --frozen-lockfile
       - name: Restore icons test artifact cache
         id: icons-cache
+        if: github.event_name != 'pull_request' || steps.demo-build-path.outputs.run == 'true'
         uses: actions/cache@v4
         with:
           path: vue/packages/icons-vue/dist
@@ -768,17 +789,33 @@ jobs:
             ${{ runner.os }}-fsusui-test-artifacts-icons-
       - name: Restore WASM test artifact cache
         id: wasm-cache
+        if: github.event_name != 'pull_request' || steps.demo-build-path.outputs.run == 'true'
         uses: actions/cache@v4
         with:
           path: vue/packages/wasm/dist
           key: ${{ runner.os }}-fsusui-test-artifacts-wasm-${{ hashFiles('vue/packages/wasm/package.json', 'vue/packages/wasm/build.config.ts', 'vue/packages/wasm/**/*.ts', 'vue/packages/wasm/**/*.cpp', 'vue/packages/wasm/**/*.hpp', 'vue/packages/wasm/**/*.h', 'vue/packages/wasm/**/CMakeLists.txt', 'vue/packages/wasm/build.sh', 'scripts/ensure-wasm-artifacts.mjs', 'scripts/run-wasm-build.mjs', 'scripts/prepare-test-artifacts.mjs', 'scripts/test-artifact-cache.mjs') }}
           restore-keys: |
             ${{ runner.os }}-fsusui-test-artifacts-wasm-
+      - name: Set up Emscripten when WASM cache misses
+        if: (github.event_name != 'pull_request' || steps.demo-build-path.outputs.run == 'true') && steps.wasm-cache.outputs.cache-hit != 'true'
+        uses: emscripten-core/setup-emsdk@v15
+        with:
+          version: 5.0.4
+          actions-cache-folder: emsdk-cache
+      - if: github.event_name != 'pull_request' || steps.demo-build-path.outputs.run == 'true'
+        run: pnpm install --frozen-lockfile
       - name: Log test artifact cache status
+        if: github.event_name != 'pull_request' || steps.demo-build-path.outputs.run == 'true'
         run: |
           echo "icons-cache-hit=${{ steps.icons-cache.outputs.cache-hit }}"
           echo "wasm-cache-hit=${{ steps.wasm-cache.outputs.cache-hit }}"
-      - run: pnpm run build:demo
+      - name: Run demo build
+        if: github.event_name != 'pull_request' || steps.demo-build-path.outputs.run == 'true'
+        run: pnpm run build:demo
+      - name: Skip PR demo build
+        if: github.event_name == 'pull_request' && steps.demo-build-path.outputs.run != 'true'
+        run: |
+          echo "Skipping demo build: ${{ steps.demo-build-path.outputs.reason }}"
       - name: Record demo build leaf result
         if: always()
         uses: ./.github/actions/readiness-manifest
@@ -804,16 +841,6 @@ jobs:
           node-version: 22
           cache: pnpm
           cache-dependency-path: pnpm-lock.yaml
-      - uses: emscripten-core/setup-emsdk@v15
-        with:
-          version: 5.0.4
-          actions-cache-folder: emsdk-cache
-      - run: pnpm install --frozen-lockfile
-      - name: Restore Playwright Chromium cache
-        uses: actions/cache@v4
-        with:
-          path: .tmp/playwright-browsers
-          key: ${{ runner.os }}-playwright-chromium-${{ hashFiles('package.json', 'pnpm-lock.yaml') }}
       - name: Restore icons test artifact cache
         id: icons-cache
         uses: actions/cache@v4
@@ -830,6 +857,18 @@ jobs:
           key: ${{ runner.os }}-fsusui-test-artifacts-wasm-${{ hashFiles('vue/packages/wasm/package.json', 'vue/packages/wasm/build.config.ts', 'vue/packages/wasm/**/*.ts', 'vue/packages/wasm/**/*.cpp', 'vue/packages/wasm/**/*.hpp', 'vue/packages/wasm/**/*.h', 'vue/packages/wasm/**/CMakeLists.txt', 'vue/packages/wasm/build.sh', 'scripts/ensure-wasm-artifacts.mjs', 'scripts/run-wasm-build.mjs', 'scripts/prepare-test-artifacts.mjs', 'scripts/test-artifact-cache.mjs') }}
           restore-keys: |
             ${{ runner.os }}-fsusui-test-artifacts-wasm-
+      - name: Set up Emscripten when WASM cache misses
+        if: steps.wasm-cache.outputs.cache-hit != 'true'
+        uses: emscripten-core/setup-emsdk@v15
+        with:
+          version: 5.0.4
+          actions-cache-folder: emsdk-cache
+      - run: pnpm install --frozen-lockfile
+      - name: Restore Playwright Chromium cache
+        uses: actions/cache@v4
+        with:
+          path: .tmp/playwright-browsers
+          key: ${{ runner.os }}-playwright-chromium-${{ hashFiles('package.json', 'pnpm-lock.yaml') }}
       - name: Log test artifact cache status
         run: |
           echo "icons-cache-hit=${{ steps.icons-cache.outputs.cache-hit }}"
@@ -873,168 +912,3 @@ jobs:
           group: ${{ inputs.group }}
           status: ${{ job.status }}
           dimensions: profile=${{ inputs.group == 'release' && 'evidence' || 'full' }}
-
-  stable-readiness:
-    if: always()
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    needs:
-      - static-quality
-      - dotnet-platform
-      - dotnet-package
-      - avalonia-aot
-      - typecheck
-      - unit
-      - coverage
-      - build-package
-      - consumer-install
-      - build-demo
-      - visual
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/download-artifact@v4
-        with:
-          pattern: readiness-manifest-*
-          path: .readiness
-          merge-multiple: true
-      - name: Aggregate stable leaf evidence
-        run: |
-          node scripts/ci-readiness.mjs check \
-            --root .readiness \
-            --profile main \
-            --workflow-group '${{ inputs.group }}' \
-            --playwright-group ${{ (github.event_name == 'pull_request' || github.event_name == 'merge_group') && 'pr' || 'main' }} \
-            --commit "$GITHUB_SHA" \
-            --run-id "$GITHUB_RUN_ID" \
-            --run-attempt "$GITHUB_RUN_ATTEMPT" \
-            --evidence .readiness/evidence/stable.json
-      - name: Pack stable evidence
-        run: |
-          tar -czf avalonia-stable-evidence.tgz .readiness docs/releases spec/components tests/conformance
-          sha256sum avalonia-stable-evidence.tgz | tee avalonia-stable-evidence.sha256
-      - uses: actions/upload-artifact@v4
-        with:
-          name: avalonia-stable-evidence
-          path: |
-            avalonia-stable-evidence.tgz
-            avalonia-stable-evidence.sha256
-          retention-days: 7
-      - uses: actions/upload-artifact@v4
-        with:
-          name: avalonia-generated-artifacts
-          path: |
-            generated
-            tests/conformance/**/artifacts
-            docs/releases
-          retention-days: 7
-
-  nightly-readiness:
-    if: always() && inputs.group == 'nightly'
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    needs:
-      - stable-readiness
-      - static-quality
-      - dotnet-platform
-      - dotnet-package
-      - avalonia-aot
-      - typecheck
-      - unit
-      - coverage
-      - build-package
-      - consumer-install
-      - build-demo
-      - visual
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/download-artifact@v4
-        with:
-          pattern: readiness-manifest-*
-          path: .readiness
-          merge-multiple: true
-      - name: Aggregate nightly leaf evidence
-        run: |
-          node scripts/ci-readiness.mjs check \
-            --root .readiness \
-            --profile nightly \
-            --workflow-group nightly \
-            --playwright-group nightly \
-            --commit "$GITHUB_SHA" \
-            --run-id "$GITHUB_RUN_ID" \
-            --run-attempt "$GITHUB_RUN_ATTEMPT" \
-            --evidence .readiness/evidence/nightly.json
-      - name: Pack nightly evidence
-        run: |
-          tar -czf avalonia-nightly-evidence.tgz .readiness docs/releases spec/ci
-          sha256sum avalonia-nightly-evidence.tgz | tee avalonia-nightly-evidence.sha256
-      - uses: actions/upload-artifact@v4
-        with:
-          name: avalonia-nightly-evidence
-          path: |
-            avalonia-nightly-evidence.tgz
-            avalonia-nightly-evidence.sha256
-          retention-days: 7
-
-  release-readiness:
-    if: always() && inputs.group == 'release'
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    outputs:
-      evidence-digest: ${{ steps.release-evidence.outputs.digest }}
-    needs:
-      - stable-readiness
-      - static-quality
-      - dotnet-platform
-      - dotnet-package
-      - avalonia-aot
-      - typecheck
-      - unit
-      - coverage
-      - build-package
-      - consumer-install
-      - build-demo
-      - visual
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/download-artifact@v4
-        with:
-          pattern: readiness-manifest-*
-          path: .readiness
-          merge-multiple: true
-      - uses: actions/download-artifact@v4
-        with:
-          name: fsusui-npm-candidate
-          path: .npm-candidate
-      - name: Aggregate release leaf evidence
-        id: release-evidence
-        env:
-          RELEASE_TAG_INPUT: ${{ inputs.release_tag }}
-        run: |
-          release_tag="$RELEASE_TAG_INPUT"
-          if [ -z "$release_tag" ]; then
-            release_tag="v$(node -p "require('./vue/packages/element-plus/package.json').version")"
-          fi
-          node scripts/ci-readiness.mjs check \
-            --root .readiness \
-            --profile release \
-            --workflow-group release \
-            --playwright-group release \
-            --commit "$GITHUB_SHA" \
-            --run-id "$GITHUB_RUN_ID" \
-            --run-attempt "$GITHUB_RUN_ATTEMPT" \
-            --release-tag "$release_tag" \
-            --candidate-manifest .npm-candidate/fsusui-npm-candidate.manifest.json \
-            --evidence .readiness/evidence/release.json
-          digest="$(sha256sum .readiness/evidence/release.json | cut -d ' ' -f 1)"
-          echo "digest=$digest" >> "$GITHUB_OUTPUT"
-      - name: Pack release evidence
-        run: |
-          tar -czf avalonia-release-evidence.tgz .readiness docs/releases spec/ci
-          sha256sum avalonia-release-evidence.tgz | tee avalonia-release-evidence.sha256
-      - uses: actions/upload-artifact@v4
-        with:
-          name: avalonia-release-evidence
-          path: |
-            avalonia-release-evidence.tgz
-            avalonia-release-evidence.sha256
-          retention-days: 7

@@ -309,45 +309,45 @@ async function buildSourceOrDistFixture(mode, tempDir) {
     },
   }
 
-  writeLine(`[consumer-contracts] Building client bundle (${mode})...`)
-  await build({
-    ...sharedConfig,
-    build: {
-      outDir: clientDistDir,
-      emptyOutDir: true,
-      manifest: true,
-      rollupOptions: {
-        input: {
-          spa: path.join(fixtureSourceDir, 'index.html'),
-          ssrClient: path.join(fixtureSourceDir, 'src', 'entry-ssr-client.ts'),
+  writeLine(`[consumer-contracts] Building client and SSR server bundles in parallel (${mode})...`)
+  await Promise.all([
+    build({
+      ...sharedConfig,
+      build: {
+        outDir: clientDistDir,
+        emptyOutDir: true,
+        manifest: true,
+        rollupOptions: {
+          input: {
+            spa: path.join(fixtureSourceDir, 'index.html'),
+            ssrClient: path.join(fixtureSourceDir, 'src', 'entry-ssr-client.ts'),
+          },
         },
       },
-    },
-  })
-
-  writeLine(`[consumer-contracts] Building SSR server bundle (${mode})...`)
-  await build({
-    ...sharedConfig,
-    ssr: {
-      noExternal: [
-        PACKAGE_NAME,
-        /^@ozwasyd\/element-plus/,
-        /^@element-plus\//,
-        'lodash-unified',
-      ],
-    },
-    build: {
-      outDir: serverDistDir,
-      emptyOutDir: true,
-      ssr: path.join(fixtureSourceDir, 'src', 'entry-ssr-server.ts'),
-      rollupOptions: {
-        output: {
-          format: 'esm',
-          entryFileNames: 'entry-ssr-server.mjs',
+    }),
+    build({
+      ...sharedConfig,
+      ssr: {
+        noExternal: [
+          PACKAGE_NAME,
+          /^@ozwasyd\/element-plus/,
+          /^@element-plus\//,
+          'lodash-unified',
+        ],
+      },
+      build: {
+        outDir: serverDistDir,
+        emptyOutDir: true,
+        ssr: path.join(fixtureSourceDir, 'src', 'entry-ssr-server.ts'),
+        rollupOptions: {
+          output: {
+            format: 'esm',
+            entryFileNames: 'entry-ssr-server.mjs',
+          },
         },
       },
-    },
-  })
+    }),
+  ])
 
   const sourcePkg = JSON.parse(
     readFileSync(
@@ -499,25 +499,35 @@ export default defineConfig(({ isSsrBuild }) => ({
     )
   }
 
-  writeLine(`[consumer-contracts] Verifying published tarball SHA-256 from ${resolvedUrl}...`)
-  const tarballSha256 = await downloadSha256(resolvedUrl, authToken)
+  const runViteBuild = (label, args) =>
+    new Promise((resolve, reject) => {
+      const child = spawn(viteBin, args, {
+        cwd: workDir,
+        stdio: 'inherit',
+      })
+      child.once('error', reject)
+      child.once('exit', (code, signal) => {
+        if (signal) reject(new Error(`${label} terminated by signal ${signal}`))
+        else if (code !== 0) reject(new Error(`${label} failed with exit code ${code}`))
+        else resolve()
+      })
+    })
 
   const viteBin = path.join(workDir, 'node_modules', '.bin', 'vite')
-  writeLine('[consumer-contracts] Building published consumer client bundle...')
-  execFileSync(viteBin, ['build', '--config', 'vite.config.mjs'], {
-    cwd: workDir,
-    stdio: 'inherit',
-  })
-
-  writeLine('[consumer-contracts] Building published consumer SSR server bundle...')
-  execFileSync(
-    viteBin,
-    ['build', '--config', 'vite.config.mjs', '--ssr', 'src/entry-ssr-server.ts'],
-    {
-      cwd: workDir,
-      stdio: 'inherit',
-    },
+  writeLine(
+    `[consumer-contracts] Verifying published tarball SHA-256 and building client + SSR bundles in parallel...`,
   )
+  const [tarballSha256] = await Promise.all([
+    downloadSha256(resolvedUrl, authToken),
+    runViteBuild('published client build', ['build', '--config', 'vite.config.mjs']),
+    runViteBuild('published SSR build', [
+      'build',
+      '--config',
+      'vite.config.mjs',
+      '--ssr',
+      'src/entry-ssr-server.ts',
+    ]),
+  ])
 
   return {
     clientDistDir: path.join(workDir, 'dist', 'client'),

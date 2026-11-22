@@ -1,4 +1,5 @@
-import { spawnSync } from 'node:child_process'
+import { Buffer } from 'node:buffer'
+import { spawn } from 'node:child_process'
 import {
   existsSync,
   mkdirSync,
@@ -83,67 +84,115 @@ const profileDigests = Object.fromEntries(
   ]),
 )
 
-const results = []
+const results = new Array(consumerProfiles.length)
 const consumerTempRoot =
   process.env.FSUS_CONSUMER_TMPDIR ??
   (process.platform === 'win32' ? os.tmpdir() : '/tmp')
 const consumerNodeOptions = `${process.env.NODE_OPTIONS ?? ''}`
   .replace(/(?:^|\s)--max[-_]old[-_]space[-_]size(?:=|\s+)\d+/gu, ' ')
   .trim()
-for (const profile of consumerProfiles) {
-  const receiptPath = path.join(outputRoot, `${profile}.json`)
-  console.log(`\n[consumer-matrix] running ${profile}`)
-  const child = spawnSync(
-    process.execPath,
-    [
-      path.join(repoRoot, 'scripts', 'test-consumer-install.mjs'),
-      '--profile',
-      profile,
-      '--candidate',
-      candidatePath,
-    ],
-    {
-      cwd: repoRoot,
-      env: {
-        ...process.env,
-        FSUS_CONSUMER_RESULT: receiptPath,
-        FSUS_CONSUMER_TMPDIR: consumerTempRoot,
-        NODE_OPTIONS: `${consumerNodeOptions} --max-old-space-size=2048`.trim(),
+
+function runProfile(profile) {
+  return new Promise((resolve) => {
+    const receiptPath = path.join(outputRoot, `${profile}.json`)
+    console.log(`\n[consumer-matrix] starting ${profile}`)
+    const chunks = []
+    const child = spawn(
+      process.execPath,
+      [
+        path.join(repoRoot, 'scripts', 'test-consumer-install.mjs'),
+        '--profile',
+        profile,
+        '--candidate',
+        candidatePath,
+      ],
+      {
+        cwd: repoRoot,
+        env: {
+          ...process.env,
+          FSUS_CONSUMER_RESULT: receiptPath,
+          FSUS_CONSUMER_TMPDIR: consumerTempRoot,
+          NODE_OPTIONS: `${consumerNodeOptions} --max-old-space-size=2048`.trim(),
+        },
+        stdio: ['ignore', 'pipe', 'pipe'],
       },
-      stdio: 'inherit',
-    },
-  )
-  if (child.error) {
-    results.push({ profile, status: 'failed', error: child.error.message })
-    continue
-  }
-  if (child.status !== 0 || !existsSync(receiptPath)) {
-    results.push({
-      profile,
-      status: 'failed',
-      error:
-        child.status === 0
-          ? 'profile receipt missing'
-          : `profile exited ${child.status ?? -1}`,
+    )
+    child.stdout.on('data', (chunk) => chunks.push(chunk))
+    child.stderr.on('data', (chunk) => chunks.push(chunk))
+    child.once('error', (error) => {
+      resolve({
+        profile,
+        status: 'failed',
+        error: error.message,
+        output: Buffer.concat(chunks).toString('utf8'),
+      })
     })
-    continue
-  }
-  try {
-    const receipt = JSON.parse(readFileSync(receiptPath, 'utf8'))
-    validateProfileReceipt(receipt, {
-      authorityDigest,
-      candidateSha256: candidate.sha256,
-      candidateName: candidate.name,
-      candidateVersion: candidate.version,
-      configDigest,
-      profile,
-      profileDigest: profileDigests[profile],
+    child.once('close', (status) => {
+      const output = Buffer.concat(chunks).toString('utf8')
+      if (status !== 0 || !existsSync(receiptPath)) {
+        resolve({
+          profile,
+          status: 'failed',
+          error:
+            status === 0
+              ? 'profile receipt missing'
+              : `profile exited ${status ?? -1}`,
+          output,
+        })
+        return
+      }
+      try {
+        const receipt = JSON.parse(readFileSync(receiptPath, 'utf8'))
+        validateProfileReceipt(receipt, {
+          authorityDigest,
+          candidateSha256: candidate.sha256,
+          candidateName: candidate.name,
+          candidateVersion: candidate.version,
+          configDigest,
+          profile,
+          profileDigest: profileDigests[profile],
+        })
+        resolve({ profile, receipt, status: 'passed', output })
+      } catch (error) {
+        resolve({ profile, status: 'failed', error: error.message, output })
+      }
     })
-    results.push({ profile, receipt, status: 'passed' })
-  } catch (error) {
-    results.push({ profile, status: 'failed', error: error.message })
+  })
+}
+
+const memoryConcurrency = Math.max(
+  1,
+  Math.floor(os.totalmem() / (1024 * 1024 * 1024) / 4),
+)
+const concurrency = Math.max(
+  1,
+  Math.min(
+    consumerProfiles.length,
+    Number(process.env.FSUS_CONSUMER_MATRIX_CONCURRENCY) || memoryConcurrency,
+  ),
+)
+console.log(
+  `[consumer-matrix] executing ${consumerProfiles.length} profiles with concurrency=${concurrency}`,
+)
+let profileCursor = 0
+async function profileWorker() {
+  while (profileCursor < consumerProfiles.length) {
+    const index = profileCursor
+    profileCursor += 1
+    const profile = consumerProfiles[index]
+    const outcome = await runProfile(profile)
+    if (outcome.output) {
+      console.log(`\n[consumer-matrix] --- ${profile} output ---`)
+      process.stdout.write(outcome.output)
+      if (!outcome.output.endsWith('\n')) process.stdout.write('\n')
+    }
+    const entry = { profile, status: outcome.status }
+    if (outcome.receipt) entry.receipt = outcome.receipt
+    if (outcome.error) entry.error = outcome.error
+    results[index] = entry
   }
 }
+await Promise.all(Array.from({ length: concurrency }, () => profileWorker()))
 
 let summary
 let failure

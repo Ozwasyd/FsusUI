@@ -1,9 +1,11 @@
 #!/usr/bin/env node
+import { Buffer } from 'node:buffer'
 import crypto from 'node:crypto'
 import fs from 'node:fs'
+import os from 'node:os'
 import path from 'node:path'
 import process from 'node:process'
-import { spawnSync } from 'node:child_process'
+import { spawn, spawnSync } from 'node:child_process'
 import { fileURLToPath } from 'node:url'
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
@@ -13,14 +15,20 @@ const out = path.resolve(
 )
 const checkoutRoot = path.join(root, '.tmp/conformance-v2/isolated-worktrees')
 fs.mkdirSync(checkoutRoot, { recursive: true })
-const checkout = fs.mkdtempSync(path.join(checkoutRoot, 'checkout-'))
+let checkout = ''
 const sha256 = (value) =>
   crypto.createHash('sha256').update(value).digest('hex')
 const run = (command, args, cwd = checkout) =>
   spawnSync(command, args, {
     cwd,
     encoding: 'utf8',
-    env: { ...process.env, CI: '1' },
+    env: {
+      ...process.env,
+      CI: '1',
+      DOTNET_CLI_TELEMETRY_OPTOUT: '1',
+      DOTNET_NOLOGO: '1',
+      MSBUILDDISABLENODEREUSE: '1',
+    },
   })
 const read = (file) => fs.readFileSync(path.join(checkout, file), 'utf8')
 const write = (file, value) => {
@@ -314,12 +322,12 @@ const cases = [
     inject: () =>
       mutateText(
         '.github/workflows/quality.yml',
-        '          xvfb-run -a dbus-run-session -- pnpm run conformance:v2\n',
-        '',
+        '    uses: ./.github/workflows/_quality.yml\n',
+        '    uses: ./.github/workflows/missing.yml\n',
       ),
     command: [process.execPath, ['scripts/check-dotnet-matrix-policy.mjs']],
     expected:
-      'quality.yml package caller must produce exact Contract V2 alignment before packaging',
+      'quality.yml package caller must route PRs through _quality.yml and _quality-readiness.yml',
   },
   {
     id: 'nuget-stable-evidence-doc-bypass-mutated',
@@ -1234,70 +1242,210 @@ if (selectedCases.length !== (requestedCaseIds.size || cases.length)) {
   throw new Error(`unknown mutation cases: ${missing.join(', ')}`)
 }
 
-try {
-  const clone = spawnSync(
-    'git',
-    ['clone', '--shared', '--no-hardlinks', root, checkout],
-    {
-      encoding: 'utf8',
-    },
+const requestedWorkers = Number(process.env.FSUSUI_MUTATION_WORKERS)
+const defaultWorkerCount = Math.max(
+  1,
+  Math.min(
+    3,
+    Math.max(1, (os.availableParallelism?.() ?? os.cpus().length ?? 2) - 1),
+  ),
+)
+const workerCount =
+  process.env.FSUSUI_MUTATION_WORKER === '1' || selectedCases.length <= 4
+    ? 1
+    : Math.max(
+        1,
+        Math.min(
+          selectedCases.length,
+          Number.isInteger(requestedWorkers) && requestedWorkers > 0
+            ? requestedWorkers
+            : defaultWorkerCount,
+        ),
+      )
+
+function seedPreparedTestArtifacts(targetCheckout) {
+  const prebuiltDirs = [
+    'vue/packages/icons-vue/dist',
+    'vue/packages/wasm/dist',
+  ]
+  const allExist = prebuiltDirs.every((relativeDir) =>
+    fs.existsSync(path.join(root, relativeDir)),
   )
-  if (clone.status !== 0) throw new Error(clone.stderr || clone.stdout)
-  // Reuse the package store, not the source checkout's workspace links.
-  // With the hoisted linker those links resolve back to the source tree,
-  // bypassing the clone's generated artifacts and potentially its mutations.
-  const installed = run('pnpm', ['install', '--offline', '--frozen-lockfile'])
-  if (installed.status !== 0) {
-    throw new Error(
-      `clone dependency installation failed: ${installed.stderr || installed.stdout || installed.error}`,
+  if (!allExist) return false
+  for (const relativeDir of prebuiltDirs) {
+    fs.cpSync(
+      path.join(root, relativeDir),
+      path.join(targetCheckout, relativeDir),
+      { recursive: true },
     )
   }
-  const prepared = spawnSync('pnpm', ['run', 'prepare:test-artifacts'], {
-    cwd: checkout,
+  const verify = spawnSync('pnpm', ['run', 'check:test-artifacts-ready'], {
+    cwd: targetCheckout,
     encoding: 'utf8',
     env: { ...process.env, CI: '1' },
   })
-  if (prepared.status !== 0) {
-    throw new Error(
-      `clone test artifacts failed: ${prepared.stderr || prepared.stdout}`,
-    )
-  }
-  const results = []
-  for (const entry of selectedCases) {
-    reset()
-    entry.inject()
-    const diff = run('git', ['diff', '--no-ext-diff', '--', entry.file])
-    const [command, args] = entry.command
-    const result = run(command, args)
-    const output = `${result.stdout ?? ''}${result.stderr ?? ''}`
-    const killed = result.status !== 0 && output.includes(entry.expected)
-    results.push({
-      id: entry.id,
-      injectedChange: diff.stdout || `${entry.file} created`,
-      expectedGate: `${command} ${args.join(' ')}`,
-      actualError: output.trim(),
-      exitCode: result.status,
-      artifactDigest: sha256(`${diff.stdout}\n${output}`),
-      killed,
+  return verify.status === 0
+}
+
+if (workerCount > 1) {
+  const shardDir = fs.mkdtempSync(path.join(checkoutRoot, 'shards-'))
+  try {
+    const shards = Array.from({ length: workerCount }, () => [])
+    selectedCases.forEach((entry, index) => {
+      shards[index % workerCount].push(entry.id)
     })
-  }
-  const survivors = results.filter((entry) => !entry.killed)
-  const receipt = {
-    schema: 'fsusui.conformance-isolated-mutations.v2',
-    checkout: { kind: 'git-shared-clone', source: root },
-    selection: requestedCaseIds.size ? [...requestedCaseIds].sort() : 'all',
-    positiveCandidate: run('git', ['rev-parse', 'HEAD']).stdout.trim(),
-    verdict: survivors.length === 0 ? 'pass' : 'fail',
-    results,
-  }
-  fs.mkdirSync(path.dirname(out), { recursive: true })
-  fs.writeFileSync(out, `${JSON.stringify(receipt, null, 2)}\n`)
-  if (survivors.length) {
-    throw new Error(
-      `mutation survivors: ${survivors.map((entry) => entry.id).join(', ')}`,
+    console.log(
+      `[conformance-v2:mutations] running ${selectedCases.length} isolated mutation cases across ${workerCount} parallel clones`,
     )
+    const workerReceipts = await Promise.all(
+      shards.map(
+        (caseIds, shardIndex) =>
+          new Promise((resolve, reject) => {
+            const shardOut = path.join(shardDir, `shard-${shardIndex}.json`)
+            const chunks = []
+            const child = spawn(
+              process.execPath,
+              [fileURLToPath(import.meta.url), shardOut],
+              {
+                cwd: root,
+                env: {
+                  ...process.env,
+                  FSUSUI_MUTATION_WORKER: '1',
+                  FSUSUI_MUTATION_CASES: caseIds.join(','),
+                },
+                stdio: ['ignore', 'pipe', 'pipe'],
+              },
+            )
+            child.stdout.on('data', (chunk) => chunks.push(chunk))
+            child.stderr.on('data', (chunk) => chunks.push(chunk))
+            child.once('error', reject)
+            child.once('close', (status) => {
+              const output = Buffer.concat(chunks).toString('utf8').trim()
+              if (output) {
+                console.log(
+                  `[conformance-v2:mutations][worker-${shardIndex + 1}] ${output}`,
+                )
+              }
+              if (fs.existsSync(shardOut)) {
+                resolve({
+                  status: status ?? 1,
+                  receipt: JSON.parse(fs.readFileSync(shardOut, 'utf8')),
+                })
+                return
+              }
+              reject(
+                new Error(
+                  `mutation worker ${shardIndex + 1} exited ${status ?? -1} without receipt:\n${output}`,
+                ),
+              )
+            })
+          }),
+      ),
+    )
+    const resultById = new Map()
+    let positiveCandidate = ''
+    for (const worker of workerReceipts) {
+      if (!positiveCandidate && worker.receipt.positiveCandidate) {
+        positiveCandidate = worker.receipt.positiveCandidate
+      }
+      for (const entry of worker.receipt.results ?? []) {
+        resultById.set(entry.id, entry)
+      }
+    }
+    const results = selectedCases.map((entry) => {
+      const result = resultById.get(entry.id)
+      if (!result) throw new Error(`missing mutation result for ${entry.id}`)
+      return result
+    })
+    const survivors = results.filter((entry) => !entry.killed)
+    const receipt = {
+      schema: 'fsusui.conformance-isolated-mutations.v2',
+      checkout: { kind: 'git-shared-clone', source: root },
+      selection: requestedCaseIds.size ? [...requestedCaseIds].sort() : 'all',
+      positiveCandidate,
+      verdict: survivors.length === 0 ? 'pass' : 'fail',
+      results,
+    }
+    fs.mkdirSync(path.dirname(out), { recursive: true })
+    fs.writeFileSync(out, `${JSON.stringify(receipt, null, 2)}\n`)
+    if (survivors.length) {
+      throw new Error(
+        `mutation survivors: ${survivors.map((entry) => entry.id).join(', ')}`,
+      )
+    }
+    console.log(`isolated mutations passed: ${results.length}/${results.length}`)
+  } finally {
+    fs.rmSync(shardDir, { recursive: true, force: true })
   }
-  console.log(`isolated mutations passed: ${results.length}/${results.length}`)
-} finally {
-  fs.rmSync(checkout, { recursive: true, force: true })
+} else {
+  checkout = fs.mkdtempSync(path.join(checkoutRoot, 'checkout-'))
+  try {
+    const clone = spawnSync(
+      'git',
+      ['clone', '--shared', '--no-hardlinks', root, checkout],
+      {
+        encoding: 'utf8',
+      },
+    )
+    if (clone.status !== 0) throw new Error(clone.stderr || clone.stdout)
+    // Reuse the package store, not the source checkout's workspace links.
+    // With the hoisted linker those links resolve back to the source tree,
+    // bypassing the clone's generated artifacts and potentially its mutations.
+    const installed = run('pnpm', ['install', '--offline', '--frozen-lockfile'])
+    if (installed.status !== 0) {
+      throw new Error(
+        `clone dependency installation failed: ${installed.stderr || installed.stdout || installed.error}`,
+      )
+    }
+    if (!seedPreparedTestArtifacts(checkout)) {
+      const prepared = spawnSync('pnpm', ['run', 'prepare:test-artifacts'], {
+        cwd: checkout,
+        encoding: 'utf8',
+        env: { ...process.env, CI: '1' },
+      })
+      if (prepared.status !== 0) {
+        throw new Error(
+          `clone test artifacts failed: ${prepared.stderr || prepared.stdout}`,
+        )
+      }
+    }
+    const results = []
+    for (const entry of selectedCases) {
+      reset()
+      entry.inject()
+      const diff = run('git', ['diff', '--no-ext-diff', '--', entry.file])
+      const [command, args] = entry.command
+      const result = run(command, args)
+      const output = `${result.stdout ?? ''}${result.stderr ?? ''}`
+      const killed = result.status !== 0 && output.includes(entry.expected)
+      results.push({
+        id: entry.id,
+        injectedChange: diff.stdout || `${entry.file} created`,
+        expectedGate: `${command} ${args.join(' ')}`,
+        actualError: output.trim(),
+        exitCode: result.status,
+        artifactDigest: sha256(`${diff.stdout}\n${output}`),
+        killed,
+      })
+    }
+    const survivors = results.filter((entry) => !entry.killed)
+    const receipt = {
+      schema: 'fsusui.conformance-isolated-mutations.v2',
+      checkout: { kind: 'git-shared-clone', source: root },
+      selection: requestedCaseIds.size ? [...requestedCaseIds].sort() : 'all',
+      positiveCandidate: run('git', ['rev-parse', 'HEAD']).stdout.trim(),
+      verdict: survivors.length === 0 ? 'pass' : 'fail',
+      results,
+    }
+    fs.mkdirSync(path.dirname(out), { recursive: true })
+    fs.writeFileSync(out, `${JSON.stringify(receipt, null, 2)}\n`)
+    if (survivors.length) {
+      throw new Error(
+        `mutation survivors: ${survivors.map((entry) => entry.id).join(', ')}`,
+      )
+    }
+    console.log(`isolated mutations passed: ${results.length}/${results.length}`)
+  } finally {
+    fs.rmSync(checkout, { recursive: true, force: true })
+  }
 }

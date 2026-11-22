@@ -239,7 +239,7 @@ try {
 
   validateWorkflow(
     read('.github/workflows/quality.yml'),
-    read('.github/workflows/_quality.yml'),
+    `${read('.github/workflows/_quality.yml')}\n${read('.github/workflows/_quality-readiness.yml')}`,
     spec,
     'quality workflow',
   )

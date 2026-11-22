@@ -172,6 +172,28 @@ function parseArguments(argv) {
   return options
 }
 
+export function createDistributedCoverageMatrix(plan, capacity) {
+  const memoryWorkerLimit = Math.max(
+    1,
+    Math.floor(
+      capacity.budgets.allocatableMemoryMiB /
+        DEFAULT_COVERAGE_POLICY.shardMemoryMiB,
+    ),
+  )
+  const perRunnerWorkers = Math.max(
+    1,
+    Math.min(
+      capacity.budgets.parallelLaneLimit,
+      memoryWorkerLimit,
+      Math.max(DEFAULT_COVERAGE_POLICY.maxWorkersPerShard, 3),
+    ),
+  )
+  return createCoverageMatrix(plan).map((entry) => ({
+    ...entry,
+    workers: perRunnerWorkers,
+  }))
+}
+
 export function runCoveragePlanCli(
   argv = process.argv.slice(2),
   env = process.env,
@@ -179,7 +201,11 @@ export function runCoveragePlanCli(
   const options = parseArguments(argv)
   if (!options.dryRun) throw new Error('coverage:plan requires --dry-run')
   const result = resolveCoveragePlan(env)
-  const matrix = { include: createCoverageMatrix(result.coverage) }
+  const matrix = {
+    include: options.githubOutput
+      ? createDistributedCoverageMatrix(result.coverage, result.capacity)
+      : createCoverageMatrix(result.coverage),
+  }
   process.stdout.write(
     `${JSON.stringify(result.coverage, null, 2)}\n${formatCapacitySummary(result.capacity)}\n`,
   )

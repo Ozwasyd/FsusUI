@@ -7,6 +7,10 @@ const scripts = packageJson.scripts ?? {}
 const sdk = JSON.parse(fs.readFileSync('dotnet/global.json', 'utf8')).sdk
 const rootSdk = JSON.parse(fs.readFileSync('global.json', 'utf8')).sdk
 const workflow = fs.readFileSync('.github/workflows/_quality.yml', 'utf8')
+const readinessWorkflow = fs.readFileSync(
+  '.github/workflows/_quality-readiness.yml',
+  'utf8',
+)
 const callerWorkflow = fs.readFileSync('.github/workflows/quality.yml', 'utf8')
 const stablePackageAudit = fs.readFileSync(
   'docs/releases/evidence/avalonia-stable/package-audit.md',
@@ -129,10 +133,6 @@ const validate = (source) => {
     )
   }
   assert(
-    stable.includes('dotnet-platform') && stable.includes('dotnet-package'),
-    'stable-readiness must aggregate both .NET jobs',
-  )
-  assert(
     stable.includes('node scripts/ci-readiness.mjs check') &&
       stable.includes('--profile main'),
     'stable-readiness must verify platform and package manifests through the readiness aggregator',
@@ -154,7 +154,7 @@ const validate = (source) => {
   return failures
 }
 
-const failures = validate(workflow)
+const failures = validate(`${workflow}\n${readinessWorkflow}`)
 if (JSON.stringify(rootSdk) !== JSON.stringify(sdk)) {
   failures.push('root and dotnet SDK selections must match')
 }
@@ -163,33 +163,29 @@ if (sdk?.rollForward !== 'disable') {
     'dotnet SDK must not roll forward beyond the locked restore inputs',
   )
 }
-const callerPackageJob = job(callerWorkflow, 'pr-avalonia-aot-candidate')
-if (!callerPackageJob.includes('runs-on: ubuntu-22.04')) {
-  failures.push('pr-avalonia-aot-candidate must use the canonical Ubuntu runner')
-}
-for (const [name, candidateJob] of [
-  ['dotnet-package', job(workflow, 'dotnet-package')],
-  ['pr-avalonia-aot-candidate', callerPackageJob],
-]) {
-  for (const requirement of [
-    'orca at-spi2-core python3-pyatspi dbus-x11',
-    'xvfb-run -a dbus-run-session -- pnpm run conformance:v2',
-  ]) {
-    if (!candidateJob.includes(requirement)) {
-      failures.push(
-        `${name} must provision and run native screen-reader evidence`,
-      )
-    }
-  }
-}
+const premergeMainJob = job(callerWorkflow, 'premerge-main')
+const premergeReadinessJob = job(callerWorkflow, 'premerge-readiness')
 if (
-  !callerPackageJob.includes('pnpm run conformance:v2') ||
-  callerPackageJob.indexOf('pnpm run conformance:v2') >
-    callerPackageJob.indexOf('node scripts/dotnet-package-verify.mjs')
+  !premergeMainJob.includes('uses: ./.github/workflows/_quality.yml') ||
+  !premergeReadinessJob.includes(
+    'uses: ./.github/workflows/_quality-readiness.yml',
+  ) ||
+  !premergeReadinessJob.includes('- premerge-main')
 ) {
   failures.push(
-    'quality.yml package caller must produce exact Contract V2 alignment before packaging',
+    'quality.yml package caller must route PRs through _quality.yml and _quality-readiness.yml',
   )
+}
+const packageJob = job(workflow, 'dotnet-package')
+for (const requirement of [
+  'orca at-spi2-core python3-pyatspi dbus-x11',
+  'xvfb-run -a dbus-run-session -- pnpm run conformance:v2',
+]) {
+  if (!packageJob.includes(requirement)) {
+    failures.push(
+      `dotnet-package must provision and run native screen-reader evidence`,
+    )
+  }
 }
 for (const [file, content] of [
   ['package-audit.md', stablePackageAudit],

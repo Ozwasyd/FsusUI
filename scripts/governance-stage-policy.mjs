@@ -29,6 +29,7 @@ export function validateGovernanceStages({
   scripts,
   quality,
   reusable,
+  readiness,
   capacity,
 }) {
   staticGovernanceArgs(scripts['governance:check'])
@@ -58,48 +59,38 @@ export function validateGovernanceStages({
     ),
   )
   assert.ok(
-    job(quality, 'pr-feedback').includes(
-      'run: pnpm run verify:pr-fast:ci-static\n',
-    ),
-  )
-  assert.ok(
     job(reusable, 'static-quality').includes(
       'run: pnpm run governance:check:ci-static\n',
     ),
   )
-  for (const consumer of [
+  assert.match(
     job(reusable, 'static-quality'),
-    job(quality, 'pr-feedback'),
-  ]) {
-    assert.match(
-      consumer,
-      /uses: actions\/setup-dotnet@v4\n\s+with:\n\s+global-json-file: global\.json/u,
-      'Static governance requires the repository-pinned SDK for source semantics',
-    )
-  }
-  for (const producer of [
-    job(reusable, 'dotnet-package'),
-    job(quality, 'pr-avalonia-aot-candidate'),
-  ]) {
-    assert.match(
-      producer,
-      /uses: actions\/checkout@v4\n\s+with:\n\s+fetch-depth: 0[ \t]*\n/u,
-      'Conformance must retain complete ancestry for the independently reviewed candidate',
-    )
-    assert.match(
-      producer,
-      /pnpm run conformance:v2\n\s+pnpm run check:avalonia-stable-readiness\n\s+node scripts\/dotnet-package-verify\.mjs/u,
-      'The unchanged readiness gate must run after governed production and before package success',
-    )
-  }
+    /uses: actions\/setup-dotnet@v4\n\s+with:\n\s+global-json-file: global\.json/u,
+    'Static governance requires the repository-pinned SDK for source semantics',
+  )
+  const producer = job(reusable, 'dotnet-package')
+  assert.match(
+    producer,
+    /uses: actions\/checkout@v4\n\s+with:\n\s+fetch-depth: 0[ \t]*\n/u,
+    'Conformance must retain complete ancestry for the independently reviewed candidate',
+  )
+  assert.match(
+    producer,
+    /pnpm run conformance:v2\n\s+pnpm run check:avalonia-stable-readiness\n\s+node scripts\/dotnet-package-verify\.mjs/u,
+    'The unchanged readiness gate must run after governed production and before package success',
+  )
   assert.ok(
-    !/^ {4}if:/mu.test(job(reusable, 'dotnet-package')),
+    !/^ {4}if:/mu.test(producer),
     'Required producer must not become conditional',
   )
+  const readinessSource = readiness ?? reusable
   assert.ok(
-    job(reusable, 'stable-readiness').includes('      - dotnet-package\n'),
+    job(readinessSource, 'stable-readiness').includes(
+      'node scripts/ci-readiness.mjs check',
+    ),
   )
   assert.ok(job(quality, 'pr-fast').includes('      - premerge-main\n'))
+  assert.ok(job(quality, 'pr-fast').includes('      - premerge-readiness\n'))
   assert.ok(
     job(quality, 'pr-fast').includes(
       'test "${PREMERGE_MAIN_RESULT}" = "success"',

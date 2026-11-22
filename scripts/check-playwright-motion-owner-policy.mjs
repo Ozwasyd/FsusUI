@@ -57,16 +57,26 @@ const validateMotionWorkflowSource = (source) => {
   ) {
     failures.push('playwright-motion job must not invoke full-config suite commands')
   }
-  if (occurrences(job, 'playwright install --with-deps chromium') !== 1) {
-    failures.push('playwright-motion job must install one fixed Chromium')
+  if (
+    occurrences(job, 'playwright install --with-deps chromium\n') !== 1
+  ) {
+    failures.push('playwright-motion job must install Chromium-only for PR runs')
   }
-  if (occurrences(job, 'playwright install --with-deps firefox') !== 1) {
-    failures.push('playwright-motion job must install Firefox for non-PR groups')
+  if (
+    occurrences(
+      job,
+      'playwright install --with-deps chromium firefox webkit',
+    ) !== 1
+  ) {
+    failures.push(
+      'playwright-motion job must install Chromium, Firefox, and WebKit in one step for non-PR groups',
+    )
   }
-  if (occurrences(job, 'playwright install --with-deps webkit') !== 1) {
-    failures.push('playwright-motion job must install WebKit for non-PR groups')
-  }
-  if (occurrences(job, "inputs.group != 'pr'") !== 2) {
+  if (
+    !/if:\s*inputs\.group != 'pr'\n\s+run:\s*pnpm exec playwright install --with-deps chromium firefox webkit/u.test(
+      job,
+    )
+  ) {
     failures.push('Firefox/WebKit installs must be gated on group != pr')
   }
   if (!job.includes('playwright-motion-evidence-${{ inputs.group }}')) {
@@ -140,21 +150,22 @@ expectFailure('missing webkit cell must fail policy', () => {
 
 expectFailure('workflow with only chromium install must be rejected', () => {
   const mutated = reusableWorkflow.replace(
-    'playwright install --with-deps firefox',
+    'playwright install --with-deps chromium firefox webkit',
     'playwright install --with-deps chromium',
   )
   const failures = validateMotionWorkflowSource(mutated)
-  assert.equal(failures.length, 0)
   if (failures.length === 0) throw new Error('chromium-only workflow fixture was accepted')
+  throw new Error(failures.join('; '))
 })
 
 expectFailure('unconditional firefox install must be rejected', () => {
   const mutated = reusableWorkflow.replace(
-    "      - run: pnpm exec playwright install --with-deps firefox\n        if: ${{ inputs.group != 'pr' }}",
-    '      - run: pnpm exec playwright install --with-deps firefox',
+    "        if: inputs.group != 'pr'\n        run: pnpm exec playwright install --with-deps chromium firefox webkit",
+    '        run: pnpm exec playwright install --with-deps chromium firefox webkit',
   )
   const failures = validateMotionWorkflowSource(mutated)
   if (failures.length === 0) throw new Error('unconditional firefox workflow fixture was accepted')
+  throw new Error(failures.join('; '))
 })
 
 function expectFailure(label, fn) {
