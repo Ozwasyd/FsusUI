@@ -11,7 +11,7 @@
     {
       "id": "design",
       "path": "docs/design.md",
-      "digest": "24c88676101dde43bb0907ed173f001b6e1659973caf19701ea57eddf0617039"
+      "digest": "545da692136467f396e2053b100e10e690f7880f34358998eca4827027522117"
     },
     {
       "id": "design-governance",
@@ -34,9 +34,9 @@
   ],
   "activeBaselineIdentity": {
     "repository": "Ozwasyd/FsusUI",
-    "revision": "0b70d6a9dac881995778ac2311283a3f7765f158",
+    "revision": "74c7f5dfb7c2735f031df896188cb6f4ddcd70a4",
     "skillDigest": "c88357a6ba0340000bae5839daeb67a3cd2722e8242cf7e0148006c3610a44fe",
-    "authorityDigest": "0899bb73568e4e0430595ecce3c1d605d51c963e27e37250b6dcc0e1a6ff77a9",
+    "authorityDigest": "ff2e25cf5b8a3e890956cd640cf0b0c843d58801a406d4af2241fda984da4526",
     "dirtyFingerprint": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
   },
   "inScope": [
@@ -51,8 +51,8 @@
   ],
   "domainPolicyDigest": "620c4f746c1f259e3b640044975ad2878b7913806038706f7991bee9d72104d3",
   "status": "frozen",
-  "candidateSha": "0b70d6a9dac881995778ac2311283a3f7765f158",
-  "candidateDigest": "cca430a40481e246ca39c2a38f356a7bebbf184f3214b9a1fcecf77555ba3b0f",
+  "candidateSha": "74c7f5dfb7c2735f031df896188cb6f4ddcd70a4",
+  "candidateDigest": "bdd9a6313bebc076b734a2f3de3aa8275479270db61aec90bd1debb371950868",
   "stateEvidenceMatrix": [
     {
       "viewport": "88x24",
@@ -68,5 +68,5 @@
     }
   ],
   "classificationEvidenceDigest": "5616c03b607c7ff5524289e3198abcf0a9d69da20296a9ceb009bdaa46ec90f6",
-  "receiptDigest": "01406a0bc866c5f27e492dd4d3e50f02ade12263c59539dd4040ea1ad41ff459"
+  "receiptDigest": "d0c0ceffea8f136c12c6494ff840737ab2a67cf69c5f32b7eaaf8ac6e4aba3e5"
 }

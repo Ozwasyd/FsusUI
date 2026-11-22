@@ -4,11 +4,11 @@
   "source": {
     "toolVersion": "FsusUI.Avalonia.ApiTool@1.8.0",
     "assemblyVersion": "0.0.0.0",
-    "inputTreeHash": "696454f4a802f77e7f17855afb60e638a9f67edc43820e40134aecda97691f10",
+    "inputTreeHash": "db8154a16cff441218fa2a4bde4aedf6ecc1ce6e40225760bb5e1175c8c371fb",
     "compilerOptionsHash": "7e5271d568360ccb03852002c427b2d740466121049706513eb89a731476ad09",
     "dependencyVersionHash": "b0acaf728062500d48b252b58655a9fad423f83f197e79ddcdfff680a80ab71e",
     "contractSchemaVersion": "2.0.0",
-    "outputHash": "cfe9e519eddaa1b3dd988048e0ca5bc1da277510e84eaed20bd0415621dd9063"
+    "outputHash": "6032daa21ee9e7f9bc5013223c8a8f3a8b63ce84c543e81ef24cc90077afebf5"
   },
   "semanticTypes": [
     {
@@ -55409,6 +55409,61 @@
             "semantic": "name",
             "provider": "AutomationProperties.SetName",
             "authority": "roslyn-automation-attached-property-write",
+            "targetKind": "owned-element-expression",
+            "targetExpression": "filter",
+            "valueKnown": true,
+            "value": "Filter items",
+            "publicDependencies": [],
+            "sourceMember": "FsusUI.Avalonia.Controls.FsusTransfer.InitializeDefaultView"
+          },
+          {
+            "semantic": "name",
+            "provider": "AutomationProperties.SetName",
+            "authority": "roslyn-automation-attached-property-write",
+            "targetKind": "owned-element-expression",
+            "targetExpression": "moveLeft",
+            "valueKnown": true,
+            "value": "Move selected left",
+            "publicDependencies": [],
+            "sourceMember": "FsusUI.Avalonia.Controls.FsusTransfer.InitializeDefaultView"
+          },
+          {
+            "semantic": "name",
+            "provider": "AutomationProperties.SetName",
+            "authority": "roslyn-automation-attached-property-write",
+            "targetKind": "owned-element-expression",
+            "targetExpression": "moveRight",
+            "valueKnown": true,
+            "value": "Move selected right",
+            "publicDependencies": [],
+            "sourceMember": "FsusUI.Avalonia.Controls.FsusTransfer.InitializeDefaultView"
+          },
+          {
+            "semantic": "name",
+            "provider": "AutomationProperties.SetName",
+            "authority": "roslyn-automation-attached-property-write",
+            "targetKind": "owned-element-expression",
+            "targetExpression": "sourceList",
+            "valueKnown": true,
+            "value": "Source items",
+            "publicDependencies": [],
+            "sourceMember": "FsusUI.Avalonia.Controls.FsusTransfer.InitializeDefaultView"
+          },
+          {
+            "semantic": "name",
+            "provider": "AutomationProperties.SetName",
+            "authority": "roslyn-automation-attached-property-write",
+            "targetKind": "owned-element-expression",
+            "targetExpression": "targetList",
+            "valueKnown": true,
+            "value": "Target items",
+            "publicDependencies": [],
+            "sourceMember": "FsusUI.Avalonia.Controls.FsusTransfer.InitializeDefaultView"
+          },
+          {
+            "semantic": "name",
+            "provider": "AutomationProperties.SetName",
+            "authority": "roslyn-automation-attached-property-write",
             "targetKind": "public-control-this",
             "targetExpression": "this",
             "valueKnown": false,
@@ -63216,6 +63271,17 @@
           "deprecated": false
         },
         {
+          "name": "ComponentCollapseContentMinHeightDouble",
+          "type": "System.Double",
+          "nullable": false,
+          "canRead": true,
+          "canWrite": false,
+          "isStatic": true,
+          "required": false,
+          "defaultKnown": false,
+          "deprecated": false
+        },
+        {
           "name": "ComponentDialogMinHeightDouble",
           "type": "System.Double",
           "nullable": false,
@@ -66466,6 +66532,24 @@
           "ComponentCascaderSuggestionMaxHeightName",
           "ComponentCascaderSuggestionMaxHeightResourceKey",
           "ComponentCascaderSuggestionMaxHeightValue"
+        ],
+        "declarationAuthority": "canonical-json\u002Broslyn-generated-constants\u002Bxml-generated-resources"
+      },
+      {
+        "canonicalName": "component.collapse.content.min-height",
+        "owner": "FsusUI component maintainers",
+        "generatedOutputs": [
+          "dotnet/FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml",
+          "dotnet/FsusUI.Avalonia/Generated/FsusTokens.g.cs"
+        ],
+        "resourceKeys": [
+          "FsusComponentCollapseContentMinHeight"
+        ],
+        "csharpMembers": [
+          "ComponentCollapseContentMinHeightDouble",
+          "ComponentCollapseContentMinHeightName",
+          "ComponentCollapseContentMinHeightResourceKey",
+          "ComponentCollapseContentMinHeightValue"
         ],
         "declarationAuthority": "canonical-json\u002Broslyn-generated-constants\u002Bxml-generated-resources"
       },

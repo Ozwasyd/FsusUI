@@ -623,7 +623,7 @@ public sealed class FsusNativeMenuBuilder : IDisposable
       IsEnabled = model.Command?.IsEnabled ?? true,
       IsChecked = model.Command?.IsChecked ?? false,
       ToggleType = (MenuItemToggleType)(int)(model.Command?.ToggleType ?? FsusMenuItemToggleType.None),
-      Gesture = model.Command?.Gesture?.ToKeyGesture(),
+      Gesture = model.Command?.Gesture?.ToNativeMenuKeyGesture(platform),
     };
 
     if (model.Command is not null)
@@ -650,7 +650,7 @@ public sealed class FsusNativeMenuBuilder : IDisposable
         item.IsEnabled = cmd.IsEnabled;
         item.IsChecked = cmd.IsChecked;
         item.ToggleType = (MenuItemToggleType)(int)cmd.ToggleType;
-        item.Gesture = cmd.Gesture?.ToKeyGesture();
+        item.Gesture = cmd.Gesture?.ToNativeMenuKeyGesture(platform);
         item.ToolTip = cmd.Description;
         FsusNativeMenuMetadata.Set(
           item,
@@ -1594,7 +1594,7 @@ public sealed class FsusDockMenuContract
           IsEnabled = cmd.IsEnabled,
           IsChecked = cmd.IsChecked,
           ToggleType = (MenuItemToggleType)(int)cmd.ToggleType,
-          Gesture = cmd.Gesture?.ToKeyGesture(),
+          Gesture = cmd.Gesture?.ToNativeMenuKeyGesture(platform),
           ToolTip = cmd.Description,
           Command = new ActionCommand(
             () => cmd.IsEnabled &&

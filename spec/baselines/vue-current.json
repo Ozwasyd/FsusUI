@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
   "source": {
-    "commitSha": "7f335680746250d13cdb177163f9dacffc94507c",
+    "commitSha": "f42c146e5634d794f52a153bf58154d1f02a028d",
     "packageName": "element-plus",
     "packageVersion": "1.6.0-preview.8",
-    "tokenHash": "f40182721e8a812c248cb0bc43de556cd7568c5a9de1bc8b2c099df9b78e47b0",
+    "tokenHash": "7c696c67987ededf327a97b44fa5de578cc4323b308297c763fbc26006712ed3",
     "iconHash": "6ae868b15cefc99ebec9d8a78c7602da1fb07b46ec172c43f6a3662af54be167",
     "toolVersion": "avalonia-vue-public-api-baseline@1.4.0+vue-semantic-baseline@1.4.0",
     "inputTreeHash": "ab2b689f24677fdac6882df1a11ee20cc77c8156682259c5d7619141396ae619",
@@ -12,7 +12,7 @@
     "dependencyVersionHash": "79ca1004d5204ee4ddc2de6b1d63f0946d36a42283d113ce8ad01ac4adaa7d27",
     "structuredOutputSelectionHash": "b4b7c00db1f817b08a1e7bec8a6af03a505f605d2dcf16fb2e52febbf830388f",
     "contractSchemaVersion": "2.0.0",
-    "outputHash": "79a9349c67d72153fdd5fc2984d06afdd630b1f1bed262bd452bf770bee6fa3e"
+    "outputHash": "702ecbde3aaee696703555903d99941fa8ab94cdc17e40d1a3f0650cbab7036b"
   },
   "summary": {
     "componentModules": 93,
@@ -21,7 +21,7 @@
     "directives": 3,
     "services": 4,
     "plugins": 7,
-    "cssVariables": 496,
+    "cssVariables": 497,
     "deprecatedApis": 21,
     "componentCountByClassification": {
       "portable": 126,
@@ -43743,6 +43743,11 @@
         "vue/packages/theme-chalk/src/generated/tokens.css",
         "vue/packages/theme-chalk/src/generated/tokens.scss"
       ],
+      "classification": "portable"
+    },
+    {
+      "name": "--fsus-component-collapse-content-min-height",
+      "files": ["vue/packages/theme-chalk/src/generated/tokens.css"],
       "classification": "portable"
     },
     {

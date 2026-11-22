@@ -170,7 +170,7 @@ test('Avalonia semantic baselines retain compiler and input freshness identity',
   assert.equal(
     properties.filter((property) => typeof property.required === 'boolean')
       .length,
-    2115,
+    2116,
   )
   assert.equal(properties.filter((property) => property.required).length, 15)
   assert.equal(
@@ -429,10 +429,10 @@ test('Avalonia automation baseline separates source observations from declared a
     ]),
   )
   assert.equal(automationTypes.length, 112)
-  assert.equal(mappings.length, 410)
+  assert.equal(mappings.length, 415)
   assert.deepEqual(semanticCounts, {
     role: 107,
-    name: 124,
+    name: 129,
     value: 4,
     state: 116,
     'help-text': 25,
@@ -680,23 +680,23 @@ test('automation mutations invalidate independent Contract V2 identities without
 test('Avalonia token/theme baseline retains generated authorities and honest dependency ownership', () => {
   const avalonia = avaloniaBaselines.avalonia.tokenThemeContract
   const themes = avaloniaBaselines.avaloniaThemes.tokenThemeContract
-  assert.equal(avalonia.definitions.length, 124)
-  assert.equal(themes.definitions.length, 124)
+  assert.equal(avalonia.definitions.length, 125)
+  assert.equal(themes.definitions.length, 125)
   assert.equal(avalonia.dependencies.length, 26)
-  assert.equal(themes.dependencies.length, 1000)
+  assert.equal(themes.dependencies.length, 1015)
   assert.equal(
     avalonia.dependencies.filter((dependency) => dependency.resolved).length,
     26,
   )
   assert.equal(
     themes.dependencies.filter((dependency) => dependency.resolved).length,
-    501,
+    508,
   )
   assert.equal(
     themes.dependencies.filter(
       (dependency) => dependency.ownership === 'resolved',
     ).length,
-    617,
+    618,
   )
   assert.ok(
     [avalonia, themes].every(
@@ -730,6 +730,32 @@ test('Avalonia token/theme baseline retains generated authorities and honest dep
       (dependency) =>
         dependency.dependency === 'FsusThemeTextBrush' &&
         dependency.resolved === false,
+    ),
+  )
+})
+
+test('Collapse content minimum token has generated authorities and a resolved theme consumer', () => {
+  const avalonia = avaloniaBaselines.avalonia.tokenThemeContract
+  const themes = avaloniaBaselines.avaloniaThemes.tokenThemeContract
+  assert.ok(
+    [avalonia, themes].every((contract) =>
+      contract.definitions.some(
+        (definition) =>
+          definition.canonicalName ===
+            'component.collapse.content.min-height' &&
+          definition.resourceKeys.includes(
+            'FsusComponentCollapseContentMinHeight',
+          ),
+      ),
+    ),
+  )
+  assert.ok(
+    themes.dependencies.some(
+      (dependency) =>
+        dependency.dependency === 'FsusComponentCollapseContentMinHeight' &&
+        dependency.canonicalName === 'component.collapse.content.min-height' &&
+        dependency.ownerType === 'FsusUI.Avalonia.Controls.FsusCollapseItem' &&
+        dependency.ownership === 'resolved',
     ),
   )
 })
