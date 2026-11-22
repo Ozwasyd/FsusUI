@@ -80,7 +80,7 @@
     "build:demo": "node ./scripts/with-node-heap.mjs pnpm run ensure:wasm && node ./scripts/with-node-heap.mjs pnpm run -C vue/packages/demo-app build",
     "build:npm-package": "node ./scripts/with-node-heap.mjs pnpm run build && node ./scripts/with-node-heap.mjs node ./scripts/prepare-npm-package.mjs --strict",
     "package:candidate:build": "node ./scripts/with-node-heap.mjs node ./scripts/package-candidate.mjs build",
-    "package:candidate:verify": "node ./scripts/with-node-heap.mjs node ./scripts/package-candidate.mjs verify",
+    "package:candidate:verify": "node ./scripts/package-candidate.mjs verify",
     "package:candidate:compare": "node ./scripts/with-node-heap.mjs node ./scripts/package-candidate.mjs compare",
     "test:package-candidate": "node ./scripts/with-node-heap.mjs node ./scripts/test-npm-candidate.mjs && pnpm run test:markdown-heavy-feature-package",
     "test:markdown-heavy-feature-package": "node ./scripts/with-node-heap.mjs node --import tsx --test ./scripts/markdown-heavy-feature-frame-rollup.test.mjs",

@@ -32,10 +32,14 @@ function npmView(spec, field) {
     ).trim()
   } catch (error) {
     const stderr = error.stderr?.toString() ?? ''
-    if (/E404|404 Not Found/u.test(stderr)) return undefined
-    throw new Error(`npm view failed for ${spec}: ${stderr.trim()}`, {
-      cause: error,
-    })
+    const stdout = error.stdout?.toString() ?? ''
+    if (/E404|404 Not Found/u.test(`${stderr}\n${stdout}`)) return undefined
+    throw new Error(
+      `npm view failed for ${spec}: ${(stderr || stdout).trim()}`,
+      {
+        cause: error,
+      },
+    )
   }
 }
 

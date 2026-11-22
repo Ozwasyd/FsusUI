@@ -4,8 +4,8 @@
   "createdAt": "2026-08-09T02:20:00.000Z",
   "files": {
     "pnpm-lock.yaml": "9160eda59f2ebd9e27701d9df9718ccb7b327ceb83d418310ef542b1651451d7",
-    "package.json": "084c7077f36269ee366142cb118958a130f12d76bff7c921d7b89d20689ad4c5",
-    "vue/packages/element-plus/package.json": "6fbf38b5b6126c2c60bdc992f042c2e084626280286eb37d3f45789dc6b3f78f",
+    "package.json": "07c2588be533c4c5f36febd8cae47ec23410172550651342c5b49db73cb8a806",
+    "vue/packages/element-plus/package.json": "17bede69847378bfd5a9fe81984339593d27aa360b6c6c03ee6131d9b5756f97",
     "config/dependencies/npm-authority.json": "cbbfc945c7fbc24bb65fe2c94074bb552494cc1e16c2f7ad0d087835fb14df13"
   },
   "installPackageCount": 94,
