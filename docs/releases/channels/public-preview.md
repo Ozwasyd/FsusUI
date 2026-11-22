@@ -36,8 +36,9 @@ Internal workspace packages under `vue/internal/*` are not public API.
 
 ## Installation
 
-Current public-preview distribution uses npm public registry:
-`https://registry.npmjs.org/`.
+Current public-preview distribution uses GitHub Packages:
+`https://npm.pkg.github.com/` (requires a token with `read:packages` and
+`@ozwasyd:registry=https://npm.pkg.github.com/`).
 
 ```bash
 pnpm install @ozwasyd/element-plus

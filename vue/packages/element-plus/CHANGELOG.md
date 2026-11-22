@@ -1,5 +1,11 @@
 # element-plus
 
+## 1.6.0-preview.7
+
+### Preview Changes
+
+- Switch canonical package registry for `@ozwasyd/element-plus` to GitHub Packages (`https://npm.pkg.github.com/`) using workflow-scoped `GITHUB_TOKEN` (`packages: write`), scope `fsusblog-consumer` cross-repo verification to stable `latest` releases, and run post-publish standalone consumer contract verification (`#830`–`#835`) automatically in `publish-npm.yml`.
+
 ## 1.6.0-preview.6
 
 ### Preview Changes

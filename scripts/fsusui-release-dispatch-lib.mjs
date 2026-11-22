@@ -13,7 +13,7 @@ import { setTimeout as wait } from 'node:timers/promises'
 import { URL } from 'node:url'
 
 export const EVENT_TYPE = 'fsusui-npm-published-v1'
-export const PUBLIC_REGISTRY = 'https://registry.npmjs.org/'
+export const PUBLIC_REGISTRY = 'https://npm.pkg.github.com/'
 export const SOURCE_REPOSITORY = 'Ozwasyd/FsusUI'
 export const TARGET_REPOSITORY = 'Ozwasyd/FsusBlog'
 export const PACKAGE_NAME = '@ozwasyd/element-plus'
@@ -395,16 +395,21 @@ export async function pollPublishedPackage({
   now = Date.now,
   sleep = wait,
   allowInsecureFixtureRegistry = false,
+  authToken = process.env.NODE_AUTH_TOKEN,
 }) {
   if (registry !== PUBLIC_REGISTRY && !allowInsecureFixtureRegistry)
     throw new Error('Only the canonical public npm registry is allowed.')
+  const requestHeaders = {
+    accept: 'application/json',
+    ...(authToken ? { authorization: `Bearer ${authToken}` } : {}),
+  }
   const deadline = now() + timeoutMs
   let lastStatus = 'not requested'
   while (now() <= deadline) {
     const response = await fetchFn(
       packageMetadataUrl(registry, packageName, version),
       {
-        headers: { accept: 'application/json' },
+        headers: requestHeaders,
         redirect: 'error',
       },
     )
@@ -417,7 +422,7 @@ export async function pollPublishedPackage({
       const rootResponse = await fetchFn(
         packageRootUrl(registry, packageName),
         {
-          headers: { accept: 'application/json' },
+          headers: requestHeaders,
           redirect: 'error',
         },
       )
@@ -473,6 +478,7 @@ export async function downloadAndVerifyPublishedTarball({
   candidateSha256,
   tarballPath,
   allowInsecureFixtureRegistry = false,
+  authToken = process.env.NODE_AUTH_TOKEN,
 }) {
   if (
     versionMetadata.name !== packageName ||
@@ -492,7 +498,12 @@ export async function downloadAndVerifyPublishedTarball({
   const tarballUrl = versionMetadata.dist?.tarball
   assertString(tarballUrl, 'npm dist.tarball')
   assertTarballRegistry({ tarballUrl, registry, allowInsecureFixtureRegistry })
-  const response = await fetchFn(tarballUrl, { redirect: 'error' })
+  const response = await fetchFn(tarballUrl, {
+    redirect: 'error',
+    ...(authToken
+      ? { headers: { authorization: `Bearer ${authToken}` } }
+      : {}),
+  })
   if (!response.ok)
     throw new Error(`npm tarball download failed (${response.status}).`)
   const bytes = Buffer.from(await response.arrayBuffer())

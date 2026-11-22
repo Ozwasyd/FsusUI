@@ -8,7 +8,7 @@ on:
 
 permissions:
   contents: read
-  id-token: write
+  packages: write
 
 jobs:
   plan:
@@ -50,6 +50,7 @@ jobs:
 
   fsusblog-consumer:
     needs: [quality, plan]
+    if: needs.plan.outputs.dist-tag == 'latest'
     uses: ./.github/workflows/_fsusblog-consumer-gate.yml
     with:
       candidate-artifact-name: fsusui-npm-candidate
@@ -65,6 +66,11 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     needs: [quality, plan, fsusblog-consumer]
+    if: >-
+      always() &&
+      needs.quality.result == 'success' &&
+      needs.plan.result == 'success' &&
+      (needs.plan.outputs.dist-tag != 'latest' || needs.fsusblog-consumer.result == 'success')
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -73,11 +79,14 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22.14.0
+          registry-url: https://npm.pkg.github.com/
+          scope: '@ozwasyd'
       - uses: actions/download-artifact@v4
         with:
           name: fsusui-npm-candidate
           path: .npm-candidate
       - uses: actions/download-artifact@v4
+        if: needs.plan.outputs.dist-tag == 'latest'
         with:
           name: fsusblog-consumer-gate
           path: .cross-gate
@@ -92,6 +101,9 @@ jobs:
             --version '${{ needs.plan.outputs.version }}' \
             --candidate-manifest .npm-candidate/fsusui-npm-candidate.manifest.json)"
           test "${candidate_group}" = "${{ needs.plan.outputs.concurrency-group }}"
+      - name: Verify FsusBlog consumer gate receipt before lock (stable latest only)
+        if: needs.plan.outputs.dist-tag == 'latest'
+        run: |
           test '${{ needs.fsusblog-consumer.outputs.receipt-status }}' = 'success'
           node scripts/verify-cross-repo-receipt.mjs \
             --receipt .cross-gate/fsusblog-consumer-gate.receipt.json \
@@ -102,6 +114,8 @@ jobs:
             --release-tag "$GITHUB_REF_NAME"
       - name: Read npm channel state before lock
         id: npm_state
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           node scripts/npm-channel-state.mjs \
             --package '${{ needs.plan.outputs.package }}' \
@@ -119,6 +133,12 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     needs: [quality, plan, preflight, fsusblog-consumer]
+    if: >-
+      always() &&
+      needs.quality.result == 'success' &&
+      needs.plan.result == 'success' &&
+      needs.preflight.result == 'success' &&
+      (needs.plan.outputs.dist-tag != 'latest' || needs.fsusblog-consumer.result == 'success')
     concurrency:
       group: ${{ needs.plan.outputs.concurrency-group }}
       cancel-in-progress: false
@@ -130,17 +150,20 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22.14.0
+          registry-url: https://npm.pkg.github.com/
+          scope: '@ozwasyd'
           cache: pnpm
           cache-dependency-path: pnpm-lock.yaml
       - name: Use npm 11.5.1+
         run: |
-          npm install -g npm@^11.5.1
+          npm install -g npm@^11.5.1 --registry=https://registry.npmjs.org/
           npm --version
       - uses: actions/download-artifact@v4
         with:
           name: fsusui-npm-candidate
           path: .npm-candidate
       - name: Download successful FsusBlog consumer gate receipt
+        if: needs.plan.outputs.dist-tag == 'latest'
         uses: actions/download-artifact@v4
         with:
           name: fsusblog-consumer-gate
@@ -171,6 +194,8 @@ jobs:
             --release-tag "$GITHUB_REF_NAME"
       - name: Read npm channel state after lock
         id: npm_state
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           node scripts/npm-channel-state.mjs \
             --package '${{ needs.plan.outputs.package }}' \
@@ -188,12 +213,15 @@ jobs:
       - name: Publish to npm
         id: publish
         if: steps.monotonicity.outputs.action == 'publish'
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          npm publish ./.npm-candidate/fsusui-npm-candidate.tgz --access public --tag '${{ needs.plan.outputs.dist-tag }}'
+          npm publish ./.npm-candidate/fsusui-npm-candidate.tgz --access public --tag '${{ needs.plan.outputs.dist-tag }}' --registry=https://npm.pkg.github.com/
           echo "published=true" >> "$GITHUB_OUTPUT"
       - name: Verify stable npm publication and dispatch the release event
         if: steps.publish.outputs.published == 'true' && needs.plan.outputs.dist-tag == 'latest'
         env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           FSUS_RELEASE_TRAIN_APP_ID: ${{ vars.FSUS_RELEASE_TRAIN_APP_ID }}
           FSUS_RELEASE_TRAIN_APP_PRIVATE_KEY: ${{ secrets.FSUS_RELEASE_TRAIN_APP_PRIVATE_KEY }}
         run: |
@@ -222,3 +250,44 @@ jobs:
         run: |
           echo "${{ needs.plan.outputs.package }}@${{ needs.plan.outputs.version }} already owns ${{ needs.plan.outputs.dist-tag }}. No publish was attempted."
           echo "Verified candidate digest: ${{ needs.quality.outputs.npm-candidate-digest }}"
+
+  verify-published-consumer-contracts:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    needs: [plan, publish]
+    if: needs.plan.result == 'success' && needs.publish.result == 'success'
+    permissions:
+      contents: read
+      packages: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.33.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22.14.0
+          registry-url: https://npm.pkg.github.com/
+          scope: '@ozwasyd'
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm exec playwright install --with-deps chromium
+      - name: Verify published package metadata and run standalone consumer contracts
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          mkdir -p .consumer-contracts
+          npm view "${{ needs.plan.outputs.package }}@${{ needs.plan.outputs.version }}" version dist.tarball dist.integrity --registry=https://npm.pkg.github.com/ --json | tee .consumer-contracts/npm-view.json
+          node tests/consumer-contracts/run-consumer-contracts.mjs \
+            --mode published \
+            --version "${{ needs.plan.outputs.version }}" \
+            --report-out .consumer-contracts/published-evidence.json
+      - name: Upload published consumer contracts evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: published-consumer-contracts-evidence
+          path: .consumer-contracts/
+          if-no-files-found: warn
+          retention-days: 30

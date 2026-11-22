@@ -1,6 +1,6 @@
 import { execFileSync } from 'node:child_process'
 
-export const registryUrl = 'https://registry.npmjs.org/'
+export const registryUrl = 'https://npm.pkg.github.com/'
 export const defaultPackageName = '@ozwasyd/element-plus'
 
 export function sanitizePackagePart(value) {

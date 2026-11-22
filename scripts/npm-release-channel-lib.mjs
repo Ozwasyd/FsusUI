@@ -2,7 +2,7 @@ import { appendFileSync, readFileSync } from 'node:fs'
 import { URL } from 'node:url'
 import { resolveNpmDistTag } from './resolve-npm-dist-tag.mjs'
 
-export const npmRegistry = 'https://registry.npmjs.org/'
+export const npmRegistry = 'https://npm.pkg.github.com/'
 
 const semverPattern =
   /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?$/u

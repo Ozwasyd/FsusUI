@@ -33,18 +33,12 @@ const consumerDocs = [
   'docs/components/form.md',
 ]
 
-const legacyRegistryHost = ['npm.pkg', 'github.com'].join('.')
-const legacyScope = ['@', 'ozwasyd', ':registry='].join('')
-
 const forbiddenSnippets = [
   "'element-plus'",
   '"element-plus"',
   "'element-plus/",
   '"element-plus/',
-  legacyRegistryHost,
-  legacyScope,
-  `@element-plus:registry=https://${legacyRegistryHost}`,
-  'GITHUB_TOKEN',
+  'https://registry.npmjs.org/',
   'pnpm install element-plus',
 ]
 

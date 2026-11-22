@@ -28,7 +28,7 @@
       "pattern": "^(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)$"
     },
     "distTag": { "const": "latest" },
-    "registry": { "const": "https://registry.npmjs.org/" },
+    "registry": { "const": "https://npm.pkg.github.com/" },
     "sourceRepository": { "const": "Ozwasyd/FsusUI" },
     "sourceCommit": { "$ref": "#/$defs/fullSha" },
     "releaseTag": {

@@ -22,7 +22,7 @@ for (const { version, channel } of fixtures.plans) {
   assert.equal(plan.distTag, channel)
   assert.equal(
     plan.concurrencyGroup,
-    `publish-npm-registry.npmjs.org-ozwasyd-element-plus-${channel}`,
+    `publish-npm-npm.pkg.github.com-ozwasyd-element-plus-${channel}`,
   )
 }
 assert.notEqual(
