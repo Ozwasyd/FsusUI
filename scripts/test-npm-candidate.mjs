@@ -71,7 +71,7 @@ function makePackage(directory, overrides = {}) {
         },
         publishConfig: {
           access: 'public',
-          registry: 'https://registry.npmjs.org/',
+          registry: 'https://npm.pkg.github.com/',
         },
         ...overrides,
       },

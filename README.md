@@ -40,18 +40,18 @@ public FsusUI API unless an FsusUI document explicitly says so.
 
 ## Install
 
-The public-preview package is `@ozwasyd/element-plus` on the npm public
-registry (`https://registry.npmjs.org/`). It is FsusUI’s compatibility build,
+The public-preview package is `@ozwasyd/element-plus` published on GitHub
+Packages (`https://npm.pkg.github.com/`). It is FsusUI’s compatibility build,
 not the upstream Element Plus package.
 
-Install:
+Configure the `@ozwasyd` scope registry (GitHub Packages requires a token with
+`read:packages` even for public packages), then install:
 
 ```bash
 pnpm install @ozwasyd/element-plus
 ```
 
-No package-specific `.npmrc` or GitHub package token is required. The npm
-registry policy is documented in
+The package registry policy is documented in
 [npm registry publishing policy](./docs/releases/policy/npm-registry.md).
 
 ## Basic Vue Usage

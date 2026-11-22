@@ -13,7 +13,7 @@ operations are summarized here and detailed in the [engineering handoff](../engi
 
 | Item | Current contract |
 | --- | --- |
-| Registry | npm public registry (`https://registry.npmjs.org/`) |
+| Registry | GitHub Packages npm registry (`https://npm.pkg.github.com/`) |
 | Package | `@ozwasyd/element-plus` (prepared from `vue/packages/element-plus`) |
 | Trigger | `vX.Y.Z` or `vX.Y.Z-*` tag |
 | `verify:pr-fast` | PR affected typecheck/unit, lint, governance, and package smoke |
@@ -165,11 +165,16 @@ Before publish, the workflow:
    dist-tag identity;
 3. checks channel monotonicity before and after the lock, failing closed on
    query errors; and
-4. uses npm Trusted Publishing/OIDC, never a long-lived npm token.
+4. authenticates against `https://npm.pkg.github.com/` via the workflow-scoped
+   `GITHUB_TOKEN` (`packages: write`), never a long-lived personal token.
 
 Only a newer absent version publishes. An exact version already assigned to the
 requested tag is an idempotent skip; an older candidate or a version assigned to
-another tag fails. Intentional tag recovery is restricted to
+another tag fails. Stable `latest` releases additionally require the
+`fsusblog-consumer` gate (`_fsusblog-consumer-gate.yml`) before publish;
+`preview` and `next` releases still enforce the full `quality-playwright`,
+`quality`, and `release-readiness` gates plus post-publish consumer-contract
+verification. Intentional tag recovery is restricted to
 `recover-npm-dist-tag.yml`, its protected `npm-recovery` environment, an
 expected-current value, and `NPM_RECOVERY_TOKEN`.
 

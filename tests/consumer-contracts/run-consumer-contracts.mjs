@@ -15,11 +15,13 @@ import {
 import https from 'node:https'
 import os from 'node:os'
 import path from 'node:path'
-import { fileURLToPath } from 'node:url'
+import { fileURLToPath, URL } from 'node:url'
 import { startContractServer } from './server.mjs'
 
-const REGISTRY_URL = 'https://registry.npmjs.org/'
+const REGISTRY_URL = 'https://npm.pkg.github.com/'
+const REGISTRY_HOST = 'npm.pkg.github.com'
 const PACKAGE_NAME = '@ozwasyd/element-plus'
+const PACKAGE_SCOPE = '@ozwasyd'
 const SUITE_SPECS = {
   '830': '830-dropdown.spec.ts',
   '831': '831-data-list.spec.ts',
@@ -43,6 +45,7 @@ function parseArgs(argv) {
     mode: 'source',
     version: '',
     suite: 'all',
+    reportOut: '',
     keepTemp: false,
   }
   for (let i = 0; i < argv.length; i += 1) {
@@ -59,6 +62,10 @@ function parseArgs(argv) {
       parsed.suite = argv[++i] || 'all'
     } else if (arg.startsWith('--suite=')) {
       parsed.suite = arg.slice('--suite='.length)
+    } else if (arg === '--report-out') {
+      parsed.reportOut = argv[++i] || ''
+    } else if (arg.startsWith('--report-out=')) {
+      parsed.reportOut = arg.slice('--report-out='.length)
     } else if (arg === '--keep-temp') {
       parsed.keepTemp = true
     } else if (arg === '--help' || arg === '-h') {
@@ -68,8 +75,9 @@ function parseArgs(argv) {
           '',
           'Options:',
           '  --mode <source|dist|published>  Target package mode (default: source)',
-          '  --version <ver>                 Published npm version (required for --mode published)',
+          '  --version <ver>                 Published package version (required for --mode published)',
           '  --suite <all|830|831|832|833|834|835>  Suite(s) to run, comma-separated (default: all)',
+          '  --report-out <path>             Write structured run metadata JSON to <path>',
           '  --keep-temp                     Keep temporary build/install directory for inspection',
         ].join('\n'),
       )
@@ -114,9 +122,14 @@ function resolveSpecFiles(suiteArg) {
   })
 }
 
-function downloadSha256(url) {
+function downloadSha256(url, authToken = '') {
   return new Promise((resolve, reject) => {
-    const request = https.get(url, (response) => {
+    const parsedUrl = new URL(url)
+    const headers =
+      authToken && parsedUrl.hostname === REGISTRY_HOST
+        ? { Authorization: `Bearer ${authToken}` }
+        : {}
+    const request = https.get(url, { headers }, (response) => {
       if (
         response.statusCode &&
         response.statusCode >= 300 &&
@@ -124,7 +137,10 @@ function downloadSha256(url) {
         response.headers.location
       ) {
         response.resume()
-        downloadSha256(response.headers.location).then(resolve, reject)
+        downloadSha256(
+          new URL(response.headers.location, url).href,
+          authToken,
+        ).then(resolve, reject)
         return
       }
       if (response.statusCode !== 200) {
@@ -424,6 +440,18 @@ export default defineConfig(({ isSsrBuild }) => ({
 `
   writeFileSync(path.join(workDir, 'vite.config.mjs'), viteConfigSource)
 
+  const authToken = process.env.NODE_AUTH_TOKEN?.trim() || ''
+  if (!authToken) {
+    throw new Error(
+      `NODE_AUTH_TOKEN (with read:packages scope) is required to install ${PACKAGE_NAME}@${version} from ${REGISTRY_URL}.`,
+    )
+  }
+
+  writeFileSync(
+    path.join(workDir, '.npmrc'),
+    `${PACKAGE_SCOPE}:registry=${REGISTRY_URL}\n//${REGISTRY_HOST}/:_authToken=\${NODE_AUTH_TOKEN}\n`,
+  )
+
   writeLine(
     `[consumer-contracts] Installing ${PACKAGE_NAME}@${version} from ${REGISTRY_URL} into ${workDir}...`,
   )
@@ -433,7 +461,6 @@ export default defineConfig(({ isSsrBuild }) => ({
       'install',
       '--no-audit',
       '--no-fund',
-      `--registry=${REGISTRY_URL}`,
       '--prefer-online',
     ],
     {
@@ -441,6 +468,7 @@ export default defineConfig(({ isSsrBuild }) => ({
       stdio: 'inherit',
       env: {
         ...process.env,
+        NODE_AUTH_TOKEN: authToken,
         NO_UPDATE_NOTIFIER: '1',
       },
     },
@@ -467,12 +495,12 @@ export default defineConfig(({ isSsrBuild }) => ({
 
   if (!resolvedUrl.startsWith(REGISTRY_URL)) {
     throw new Error(
-      `Refusing non-npmjs resolution for ${PACKAGE_NAME}@${version}: resolved="${resolvedUrl}"`,
+      `Refusing non-GitHub-Packages resolution for ${PACKAGE_NAME}@${version}: resolved="${resolvedUrl}"`,
     )
   }
 
   writeLine(`[consumer-contracts] Verifying published tarball SHA-256 from ${resolvedUrl}...`)
-  const tarballSha256 = await downloadSha256(resolvedUrl)
+  const tarballSha256 = await downloadSha256(resolvedUrl, authToken)
 
   const viteBin = path.join(workDir, 'node_modules', '.bin', 'vite')
   writeLine('[consumer-contracts] Building published consumer client bundle...')
@@ -554,6 +582,25 @@ async function main() {
         }
       })
     })
+
+    if (args.reportOut) {
+      const reportPath = path.resolve(repoRoot, args.reportOut)
+      mkdirSync(path.dirname(reportPath), { recursive: true })
+      writeFileSync(
+        reportPath,
+        `${JSON.stringify(
+          {
+            ...built.metadata,
+            exitCode,
+            suite: args.suite,
+            specCount: specFiles.length,
+            completedAt: new Date().toISOString(),
+          },
+          null,
+          2,
+        )}\n`,
+      )
+    }
 
     if (exitCode !== 0) {
       process.exitCode = exitCode

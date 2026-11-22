@@ -33,13 +33,19 @@ export default defineConfig({
 })
 ```
 
-## Install from npm
+## Install from GitHub Packages
 
-FsusUI public-preview packages are published to the npm public registry at
-`https://registry.npmjs.org/`.
+FsusUI public-preview packages are published to GitHub Packages at
+`https://npm.pkg.github.com/`.
 
-Install `@ozwasyd/element-plus`; no project `.npmrc`, scope registry, or GitHub
-package token is required.
+Configure the `@ozwasyd` scope in `.npmrc` with a GitHub token that has
+`read:packages` (GitHub Packages requires authentication even for public
+packages), then install `@ozwasyd/element-plus`:
+
+```ini
+@ozwasyd:registry=https://npm.pkg.github.com/
+//npm.pkg.github.com/:_authToken=${NODE_AUTH_TOKEN}
+```
 
 ```bash
 pnpm install @ozwasyd/element-plus

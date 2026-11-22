@@ -67,13 +67,22 @@ for (const forbidden of [
   'FSUS_RELEASE_TRAIN_TOKEN',
   'GH_TOKEN',
   'github.token',
-  'secrets.GITHUB_TOKEN',
 ]) {
   assert.ok(
     !publish.includes(forbidden),
     `publish workflow must not use ${forbidden} for cross-repository dispatch`,
   )
 }
+const dispatchStep = publish.slice(
+  publish.indexOf('Verify stable npm publication and dispatch the release event'),
+  publish.indexOf('Upload sanitized release dispatch receipt'),
+)
+assert.ok(
+  dispatchStep.includes('FSUS_RELEASE_TRAIN_APP_ID') &&
+    dispatchStep.includes('FSUS_RELEASE_TRAIN_APP_PRIVATE_KEY') &&
+    !dispatchStep.includes('GH_TOKEN'),
+  'release dispatch step must authenticate GitHub dispatch strictly via the release train App',
+)
 for (const forbidden of [
   'pnpm run package:candidate:build',
   'pnpm run build:npm-package',
@@ -94,7 +103,7 @@ assert.equal(payloadSchema.properties.schemaVersion.const, 1)
 assert.equal(payloadSchema.properties.distTag.const, 'latest')
 assert.equal(
   payloadSchema.properties.registry.const,
-  'https://registry.npmjs.org/',
+  'https://npm.pkg.github.com/',
 )
 assert.equal(receiptSchema.additionalProperties, false)
 assert.deepEqual(

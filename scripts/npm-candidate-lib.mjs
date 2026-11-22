@@ -144,7 +144,8 @@ function validatePackageShape(packageRoot, packageJson) {
   validateDependencyManifest(packageJson)
 }
 
-const PUBLIC_NPM_REGISTRY = 'https://registry.npmjs.org'
+const PUBLIC_NPM_REGISTRY = 'https://npm.pkg.github.com'
+const PUBLIC_DEPENDENCY_REGISTRY = 'https://registry.npmjs.org'
 const DEPENDENCY_FIELDS = [
   'dependencies',
   'devDependencies',
@@ -170,7 +171,11 @@ function validateDependencyManifest(packageJson) {
           `Candidate dependency '${name}' leaks a ${protocolMatch[1]} protocol reference: ${specifier}`,
         )
       }
-      if (/^https?:\/\//u.test(specifier) && !specifier.startsWith(`${PUBLIC_NPM_REGISTRY}/`)) {
+      if (
+        /^https?:\/\//u.test(specifier) &&
+        !specifier.startsWith(`${PUBLIC_NPM_REGISTRY}/`) &&
+        !specifier.startsWith(`${PUBLIC_DEPENDENCY_REGISTRY}/`)
+      ) {
         throw new Error(
           `Candidate dependency '${name}' references a non-public registry URL: ${specifier}`,
         )
@@ -287,12 +292,12 @@ export function createCandidate({
     metadata: {
       publishConfigPresent: Object.keys(publishConfig).length > 0,
       publicAccess: publishConfig.access === 'public',
-      registry: publishConfig.registry ?? 'https://registry.npmjs.org/',
+      registry: publishConfig.registry ?? 'https://npm.pkg.github.com/',
       provenanceEligible: Boolean(
         packageJson.repository &&
         publishConfig.access === 'public' &&
-        (publishConfig.registry ?? 'https://registry.npmjs.org/') ===
-          'https://registry.npmjs.org/',
+        (publishConfig.registry ?? 'https://npm.pkg.github.com/') ===
+          'https://npm.pkg.github.com/',
       ),
     },
   }
