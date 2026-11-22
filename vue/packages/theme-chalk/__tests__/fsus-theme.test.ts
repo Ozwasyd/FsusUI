@@ -4365,10 +4365,10 @@ describe('Fsus theme visual baseline', () => {
     const themeCss = compileThemeFile('fsus-theme.scss')
 
     expect(themeCss).toMatch(
-      /\.el-button:not\(\.is-disabled\):hover,\s*\.el-button:not\(\.is-disabled\):focus:not\(:focus-visible\)\s*\{\s*transform:\s*none;\s*\}/s,
+      /\.el-button:not\(\.is-disabled\):not\(:active\):hover,\s*\.el-button:not\(\.is-disabled\):not\(:active\):focus:not\(:focus-visible\)\s*\{\s*transform:\s*none;\s*\}/s,
     )
     expect(themeCss).toMatch(
-      /\.el-button:not\(\.is-disabled\):hover:not\(:focus-visible\),\s*\.el-button:not\(\.is-disabled\):focus:not\(:focus-visible\)\s*\{\s*box-shadow:\s*none\s*!important;\s*outline:\s*none;\s*\}/s,
+      /\.el-button:not\(\.is-disabled\):not\(:active\):hover:not\(:focus-visible\),\s*\.el-button:not\(\.is-disabled\):not\(:active\):focus:not\(:focus-visible\)\s*\{\s*box-shadow:\s*none\s*!important;\s*outline:\s*none;\s*\}/s,
     )
     expectCssRule(
       themeCss,

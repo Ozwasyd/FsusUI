@@ -118,7 +118,7 @@
       "path": "vue/packages/theme-chalk/src/fsus-theme.scss",
       "kind": "implementation",
       "algorithm": "sha256",
-      "digest": "22931d2132aa0475b6b9113b6b64b2ed9a5395e4629993cc44c16d5cd1bfab9b"
+      "digest": "a0106736c196a6c48f4bf903a423bd6611ec6dc9be72d2702a5272ce6a186dcb"
     },
     "implementation-13": {
       "path": "vue/packages/theme-chalk/src/collection-primitives.scss",
