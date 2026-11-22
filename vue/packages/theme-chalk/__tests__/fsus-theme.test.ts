@@ -4360,4 +4360,59 @@ describe('Fsus theme visual baseline', () => {
       /\.el-upload-dragger\.is-dragover\s*\{[^}]*border-width:\s*1px/s,
     )
   })
+
+  test('preserves coarse-pointer button focus-visible ring and danger-link colors', () => {
+    const themeCss = compileThemeFile('fsus-theme.scss')
+
+    expect(themeCss).toMatch(
+      /\.el-button:not\(\.is-disabled\):hover,\s*\.el-button:not\(\.is-disabled\):focus:not\(:focus-visible\)\s*\{\s*transform:\s*none;\s*\}/s,
+    )
+    expect(themeCss).toMatch(
+      /\.el-button:not\(\.is-disabled\):hover:not\(:focus-visible\),\s*\.el-button:not\(\.is-disabled\):focus:not\(:focus-visible\)\s*\{\s*box-shadow:\s*none\s*!important;\s*outline:\s*none;\s*\}/s,
+    )
+    expectCssRule(
+      themeCss,
+      '.el-button.el-button--danger.is-link:not(.is-disabled)',
+      ['color: var(--el-button-text-color);'],
+    )
+    expect(themeCss).toMatch(
+      /\.el-button\.el-button--danger\.is-link:not\(\.is-disabled\):hover,\s*\.el-button\.el-button--danger\.is-link:not\(\.is-disabled\):focus\s*\{\s*color:\s*var\(--el-button-hover-link-text-color\);\s*\}/s,
+    )
+    expectCssRule(
+      themeCss,
+      '.el-button.el-button--danger.is-link:not(.is-disabled):active',
+      ['color: var(--el-button-active-color);'],
+    )
+  })
+
+  test('targets dimmed Focus spans and scopes prose border-radius to framed chrome', () => {
+    const editorCss = compileThemeFile('markdown-editor.scss')
+
+    expectCssRule(
+      editorCss,
+      '.el-markdown-editor__focus-layer > span.is-dimmed',
+      ['opacity: 0.72;'],
+    )
+    expect(editorCss).not.toMatch(
+      /\.el-markdown-editor__focus-layer\.is-dimmed\s*\{/,
+    )
+    expectCssRule(
+      editorCss,
+      '.el-markdown-editor--profile-prose.el-markdown-editor--chrome-framed',
+      ['border-radius: var(--fsus-radius-panel, var(--el-border-radius-base));'],
+    )
+    expect(editorCss).not.toMatch(
+      /\.el-markdown-editor--profile-prose\s*\{[^}]*border-radius:/s,
+    )
+  })
+
+  test('uses primary text contrast for enabled active SegmentedControl options', () => {
+    const collectionCss = compileThemeFile('collection-primitives.scss')
+
+    expectCssRule(
+      collectionCss,
+      '.el-segmented-control__item.is-active:not(:disabled)',
+      ['color: var(--el-text-color-primary);'],
+    )
+  })
 })

@@ -8,7 +8,7 @@ import {
   watch,
 } from 'vue'
 import { get } from 'lodash-unified'
-import { isObject, isUndefined } from '@element-plus/utils'
+import { definePropType, isObject, isUndefined } from '@element-plus/utils'
 import {
   DynamicSizeList,
   FixedSizeList,
@@ -36,8 +36,9 @@ export default defineComponent({
   name: 'ElSelectDropdown',
 
   props: {
+    id: String,
     data: {
-      type: Array,
+      type: definePropType<Option[]>(Array),
       required: true,
     },
     hoveringIndex: Number,
@@ -51,6 +52,25 @@ export default defineComponent({
     const cachedHeights = ref<Array<number>>([])
 
     const listRef = ref<SelectListInstance | null>(null)
+    const renderedOptions = ref(new Set<number>())
+    const optionPositions = computed(() => {
+      let total = 0
+      const positions = props.data.map((item: Option) =>
+        item.type === 'Group' ? 0 : ++total,
+      )
+      return { positions, total }
+    })
+    const activeOptionId = computed(() => {
+      const index = props.hoveringIndex ?? -1
+      const item = props.data[index] as Option | undefined
+      return item && item.type !== 'Group' && renderedOptions.value.has(index)
+        ? `${props.id}-${index}`
+        : undefined
+    })
+    const onOptionRendered = (index: number, rendered: boolean) => {
+      if (rendered) renderedOptions.value.add(index)
+      else renderedOptions.value.delete(index)
+    }
 
     const size = computed(() => props.data.length)
     const estimatedOptionHeight = computed(
@@ -155,9 +175,9 @@ export default defineComponent({
     }
 
     const isItemDisabled = (modelValue: any[] | any, selected: boolean) => {
-      const { disabled, multiple, multipleLimit } = select.props
+      const { multiple, multipleLimit } = select.props
       return (
-        disabled ||
+        select.selectDisabled.value ||
         (!selected &&
           (multiple
             ? multipleLimit > 0 && modelValue.length >= multipleLimit
@@ -182,6 +202,7 @@ export default defineComponent({
     }
 
     expose({
+      activeOptionId,
       listRef,
       isSized,
 
@@ -217,6 +238,13 @@ export default defineComponent({
       return (
         <OptionItem
           {...itemProps}
+          class={ns.is(
+            'keyboard',
+            isHovering && select.keyboardNavigation.value,
+          )}
+          id={`${props.id}-${index}`}
+          position={optionPositions.value.positions[index]}
+          total={optionPositions.value.total}
           selected={isSelected}
           disabled={getDisabled(item) || isDisabled}
           created={!!item.created}
@@ -225,6 +253,7 @@ export default defineComponent({
           onSelect={onSelect}
           onHover={onHover}
           onResize={(height: number) => updateItemHeight(index, height)}
+          onRendered={onOptionRendered}
         >
           {{
             default: (props: OptionItemProps) =>
@@ -285,6 +314,10 @@ export default defineComponent({
       if (data.length === 0) {
         return (
           <div
+            id={props.id}
+            role="listbox"
+            aria-labelledby={select.props.label}
+            aria-multiselectable={multiple}
             class={ns.b('dropdown')}
             style={{
               width: `${width}px`,
@@ -298,7 +331,13 @@ export default defineComponent({
       const List = unref(isSized) ? FixedSizeList : DynamicSizeList
 
       return (
-        <div class={[ns.b('dropdown'), ns.is('multiple', multiple)]}>
+        <div
+          id={props.id}
+          role="listbox"
+          aria-labelledby={select.props.label}
+          aria-multiselectable={multiple}
+          class={[ns.b('dropdown'), ns.is('multiple', multiple)]}
+        >
           <List
             ref={listRef}
             {...unref(listProps)}
