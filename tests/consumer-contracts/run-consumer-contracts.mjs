@@ -510,10 +510,14 @@ export default defineConfig(({ isSsrBuild }) => ({
   })
 
   writeLine('[consumer-contracts] Building published consumer SSR server bundle...')
-  execFileSync(viteBin, ['build', '--ssr', '--config', 'vite.config.mjs'], {
-    cwd: workDir,
-    stdio: 'inherit',
-  })
+  execFileSync(
+    viteBin,
+    ['build', '--config', 'vite.config.mjs', '--ssr', 'src/entry-ssr-server.ts'],
+    {
+      cwd: workDir,
+      stdio: 'inherit',
+    },
+  )
 
   return {
     clientDistDir: path.join(workDir, 'dist', 'client'),

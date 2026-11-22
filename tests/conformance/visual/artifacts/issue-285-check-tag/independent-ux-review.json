@@ -1,17 +1,17 @@
 {
   "schema": "fsusui-independent-ux-review.v1",
   "issue": 285,
-  "candidateSha": "6b16639b4a29bb1343c7e48cf74e0696e6a673a5",
+  "candidateSha": "3d77c11e46a35ac4ffef798b8256fc92214d23b7",
   "reviewMode": "read-only-rendered-evidence-inspection",
   "modifiedPaths": [],
   "productionFixture": true,
   "identity": {
-    "executionId": "conformance-v2-check-tag-6b16639b4a29bb1343c7e48cf74e0696e6a673a5",
+    "executionId": "conformance-v2-check-tag-3d77c11e46a35ac4ffef798b8256fc92214d23b7",
     "checkpoint": "check-tag-after-pointer-keyboard",
     "contract": "component-v2.el-check-tag",
     "scenario": "scenario.v2.el-check-tag.real-interaction-trace",
-    "contractHash": "1ddeccdfef02b41ce759edbf09d960fbabff5fd01084f51844f1d1276c146abb",
-    "webBaselineHash": "670b9d1abe3ef7a1678b9b0bd28c19242217c09270cc31641a11b305de2b5f1d",
+    "contractHash": "c4a2fb41124c440a4c28b6a855076a2cc695ab2009fd1e0aabcbd1a133032f65",
+    "webBaselineHash": "aac08124cd4a3a7fd1676476b9cddf58834beeaee6a1880d542753fc79eb9708",
     "avaloniaBaselineHash": "3c7084d23f9897688cd6835761cde015e10766990ebc8082cc1c2ec8b6093687",
     "runnerHash": "bad9abc8910c29bd5104e47fc7d693443a414d707776a55c043be5d1e0c0baf2"
   },
@@ -106,12 +106,12 @@
     }
   ],
   "observations": [
-    "Read-only inspection opened both original rendered PNGs of official run 44977254669, job 137069808554, artifact 14736405909. ZIP SHA-256 2e7e0f1ba19fee3be2765ccb5d14306a4adc68dd2e8cf7f8246f112e60d9fcfc.",
-    "Official capture used genuine GitHub checkout 6b16639b4a29bb1343c7e48cf74e0696e6a673a5 with parents c9f15cba959b16ca80317219c9c91e80b5195ccd and 244dacb85bee3eaeda12d892c04d16c785f21d49; candidate and pull request head have identical tree 39e80750e2518020fdd092f7e49d6920d7c283d9.",
+    "Read-only inspection opened both original rendered PNGs of official run 44987163405, job 137100152222, artifact 14740237522. ZIP SHA-256 3cf1d0aabfcb22fe235b3172c72a4433cf933a81cd29cd63e2f3b52745bce353.",
+    "Official capture used genuine GitHub checkout 3d77c11e46a35ac4ffef798b8256fc92214d23b7 with parents 2e9cb096ff6d6f524470651ed817048cc26be916 and 5652e0958e846e102659782f8ece93b42dd93dd9; candidate and pull request head have identical tree a66b0ac2b8c65b585a87707b4d14401d9e4c272f.",
     "Web artifact is an 88×24 CheckTag element crop; Avalonia artifact is a 960×720 full window. Both tracked PNG bytes are equal to these inspected original PNGs.",
     "Nine functional observations pass in both executions; timing is diagnostic only.",
-    "web-a11y/manifest.json SHA-256 377221af77098994461a89ea7ae0ad0615d0a7a42865370e9fd3062fe17cdf09",
-    "avalonia.json SHA-256 4299f1d793177979b701681c2e4c38f5cf28497910220c716bc55f0776545752"
+    "web-a11y/manifest.json SHA-256 f8dcf69ea48a9e0b173eb03e73883cd34024cb768b84a7311c367a19f4e002b6",
+    "avalonia.json SHA-256 d3e3a0582e9b8bb4e432709e5b48e844960626cf7d25b74d7af821e60e01de26"
   ],
   "limitations": [
     "Only the light/default/zh-CN/ltr/reduced-motion CheckTag checkpoint was independently accepted, not full CI, AOT, package, cross-platform rendering equivalence or performance.",
