@@ -255,7 +255,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     needs: [plan, publish]
-    if: needs.plan.result == 'success' && needs.publish.result == 'success'
+    if: always() && needs.plan.result == 'success' && needs.publish.result == 'success'
     permissions:
       contents: read
       packages: read
