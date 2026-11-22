@@ -70,7 +70,8 @@
         ".github/workflows/dependency-freshness.yml",
         ".github/workflows/publish-npm.yml",
         ".github/workflows/quality.yml",
-        ".github/workflows/recover-npm-dist-tag.yml"
+        ".github/workflows/recover-npm-dist-tag.yml",
+        ".github/workflows/verify-published-consumer-contracts.yml"
       ],
       "versioning": "docker",
       "group": "github-actions",
@@ -130,7 +131,8 @@
         ".github/workflows/dependency-freshness.yml",
         ".github/workflows/publish-npm.yml",
         ".github/workflows/quality.yml",
-        ".github/workflows/recover-npm-dist-tag.yml"
+        ".github/workflows/recover-npm-dist-tag.yml",
+        ".github/workflows/verify-published-consumer-contracts.yml"
       ],
       "versioning": "docker",
       "group": "github-actions",
@@ -148,7 +150,8 @@
         ".github/workflows/_quality-playwright.yml",
         ".github/workflows/_quality.yml",
         ".github/workflows/publish-npm.yml",
-        ".github/workflows/quality.yml"
+        ".github/workflows/quality.yml",
+        ".github/workflows/verify-published-consumer-contracts.yml"
       ],
       "versioning": "docker",
       "group": "github-actions",
@@ -180,7 +183,8 @@
         ".github/workflows/dependency-freshness.yml",
         ".github/workflows/publish-npm.yml",
         ".github/workflows/quality.yml",
-        ".github/workflows/recover-npm-dist-tag.yml"
+        ".github/workflows/recover-npm-dist-tag.yml",
+        ".github/workflows/verify-published-consumer-contracts.yml"
       ],
       "versioning": "docker",
       "group": "github-actions",
@@ -198,7 +202,8 @@
         ".github/workflows/dependency-freshness.yml",
         ".github/workflows/publish-npm.yml",
         ".github/workflows/quality.yml",
-        ".github/workflows/recover-npm-dist-tag.yml"
+        ".github/workflows/recover-npm-dist-tag.yml",
+        ".github/workflows/verify-published-consumer-contracts.yml"
       ],
       "versioning": "node",
       "group": "node-dotnet-sdk-images",

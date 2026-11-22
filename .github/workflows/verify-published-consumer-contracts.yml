@@ -1,0 +1,52 @@
+name: Verify Published Consumer Contracts
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Published @ozwasyd/element-plus version on GitHub Packages (e.g. 1.6.0-preview.8)'
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  packages: read
+
+jobs:
+  verify-published-consumer-contracts:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.33.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22.14.0
+          registry-url: https://npm.pkg.github.com/
+          scope: '@ozwasyd'
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm exec playwright install --with-deps chromium
+      - name: Verify published package metadata and run standalone consumer contracts
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TARGET_PACKAGE: '@ozwasyd/element-plus'
+          TARGET_VERSION: ${{ inputs.version }}
+        run: |
+          mkdir -p .consumer-contracts
+          npm view "${TARGET_PACKAGE}@${TARGET_VERSION}" version dist.tarball dist.integrity --registry=https://npm.pkg.github.com/ --json | tee .consumer-contracts/npm-view.json
+          node tests/consumer-contracts/run-consumer-contracts.mjs \
+            --mode published \
+            --version "${TARGET_VERSION}" \
+            --report-out .consumer-contracts/published-evidence.json
+      - name: Upload published consumer contracts evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: published-consumer-contracts-evidence
+          path: .consumer-contracts/
+          if-no-files-found: warn
+          retention-days: 30
