@@ -36,8 +36,7 @@
       "customManager": "emsdk-version-input",
       "files": [
         ".github/workflows/_quality-playwright.yml",
-        ".github/workflows/_quality.yml",
-        ".github/workflows/quality.yml"
+        ".github/workflows/_quality.yml"
       ],
       "versioning": "semver-coerced",
       "group": "wasm-toolchain",
@@ -49,9 +48,13 @@
       "packageName": "actions/cache",
       "manager": "github-actions",
       "files": [
+        ".github/actions/setup-pdf-tools/action.yml",
+        ".github/workflows/_avalonia-aot-leaf.yml",
+        ".github/workflows/_fsusblog-consumer-gate.yml",
         ".github/workflows/_quality-playwright.yml",
         ".github/workflows/_quality.yml",
-        ".github/workflows/quality.yml"
+        ".github/workflows/publish-npm.yml",
+        ".github/workflows/verify-published-consumer-contracts.yml"
       ],
       "versioning": "docker",
       "group": "github-actions",
@@ -66,10 +69,10 @@
         ".github/workflows/_avalonia-aot-leaf.yml",
         ".github/workflows/_fsusblog-consumer-gate.yml",
         ".github/workflows/_quality-playwright.yml",
+        ".github/workflows/_quality-readiness.yml",
         ".github/workflows/_quality.yml",
         ".github/workflows/dependency-freshness.yml",
         ".github/workflows/publish-npm.yml",
-        ".github/workflows/quality.yml",
         ".github/workflows/recover-npm-dist-tag.yml",
         ".github/workflows/verify-published-consumer-contracts.yml"
       ],
@@ -98,6 +101,7 @@
         ".github/workflows/_avalonia-aot-leaf.yml",
         ".github/workflows/_fsusblog-consumer-gate.yml",
         ".github/workflows/_quality-playwright.yml",
+        ".github/workflows/_quality-readiness.yml",
         ".github/workflows/_quality.yml",
         ".github/workflows/publish-npm.yml"
       ],
@@ -112,8 +116,7 @@
       "manager": "github-actions",
       "files": [
         ".github/workflows/_avalonia-aot-leaf.yml",
-        ".github/workflows/_quality.yml",
-        ".github/workflows/quality.yml"
+        ".github/workflows/_quality.yml"
       ],
       "versioning": "docker",
       "group": "github-actions",
@@ -130,7 +133,6 @@
         ".github/workflows/_quality.yml",
         ".github/workflows/dependency-freshness.yml",
         ".github/workflows/publish-npm.yml",
-        ".github/workflows/quality.yml",
         ".github/workflows/recover-npm-dist-tag.yml",
         ".github/workflows/verify-published-consumer-contracts.yml"
       ],
@@ -148,9 +150,9 @@
         ".github/workflows/_avalonia-aot-leaf.yml",
         ".github/workflows/_fsusblog-consumer-gate.yml",
         ".github/workflows/_quality-playwright.yml",
+        ".github/workflows/_quality-readiness.yml",
         ".github/workflows/_quality.yml",
         ".github/workflows/publish-npm.yml",
-        ".github/workflows/quality.yml",
         ".github/workflows/verify-published-consumer-contracts.yml"
       ],
       "versioning": "docker",
@@ -164,8 +166,7 @@
       "manager": "github-actions",
       "files": [
         ".github/workflows/_quality-playwright.yml",
-        ".github/workflows/_quality.yml",
-        ".github/workflows/quality.yml"
+        ".github/workflows/_quality.yml"
       ],
       "versioning": "docker",
       "group": "wasm-toolchain",
@@ -182,8 +183,6 @@
         ".github/workflows/_quality.yml",
         ".github/workflows/dependency-freshness.yml",
         ".github/workflows/publish-npm.yml",
-        ".github/workflows/quality.yml",
-        ".github/workflows/recover-npm-dist-tag.yml",
         ".github/workflows/verify-published-consumer-contracts.yml"
       ],
       "versioning": "docker",
@@ -201,7 +200,6 @@
         ".github/workflows/_quality.yml",
         ".github/workflows/dependency-freshness.yml",
         ".github/workflows/publish-npm.yml",
-        ".github/workflows/quality.yml",
         ".github/workflows/recover-npm-dist-tag.yml",
         ".github/workflows/verify-published-consumer-contracts.yml"
       ],

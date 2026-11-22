@@ -26,11 +26,11 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: pnpm
-      - run: pnpm install --frozen-lockfile
       - name: Produce the unique structured freshness result
         id: freshness
         continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: pnpm deps:freshness -- --output .tmp/dependency-freshness.json
       - name: Reconcile the exact-one blocker issue and PR labels
         if: always() && steps.freshness.outcome != 'skipped'

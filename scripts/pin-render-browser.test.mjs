@@ -45,21 +45,19 @@ test('rejects other versions, malformed output, and failed or timed-out probes',
     /ETIMEDOUT/,
   )
 })
-test('both native evidence jobs select the pinned browser before capture', () => {
-  for (const file of ['quality.yml', '_quality.yml']) {
-    const workflow = readFileSync(
-      new URL(`../.github/workflows/${file}`, import.meta.url),
-      'utf8',
-    )
-    const pin = workflow.indexOf(
-      'node scripts/pin-render-browser.mjs .tmp/conformance-browser-selection.json',
-    )
-    assert.ok(pin > workflow.indexOf('playwright install --with-deps chromium'))
-    assert.ok(
-      pin <
-        workflow.indexOf(
-          'xvfb-run -a dbus-run-session -- pnpm run conformance:v2',
-        ),
-    )
-  }
+test('native evidence job selects the pinned browser before capture', () => {
+  const workflow = readFileSync(
+    new URL('../.github/workflows/_quality.yml', import.meta.url),
+    'utf8',
+  )
+  const pin = workflow.indexOf(
+    'node scripts/pin-render-browser.mjs .tmp/conformance-browser-selection.json',
+  )
+  assert.ok(pin > workflow.indexOf('playwright install --with-deps chromium'))
+  assert.ok(
+    pin <
+      workflow.indexOf(
+        'xvfb-run -a dbus-run-session -- pnpm run conformance:v2',
+      ),
+  )
 })

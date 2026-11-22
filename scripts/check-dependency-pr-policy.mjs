@@ -118,7 +118,7 @@ export function auditRequiredChecks({
     !same(contract.checks?.['pr-fast']?.aggregates, [
       'premerge-main',
       'premerge-playwright',
-      'pr-feedback',
+      'premerge-readiness',
     ])
   ) {
     fail('pr-fast aggregate ownership is incomplete or contains extras')

@@ -92,10 +92,17 @@ function check(publishPath) {
   )
 
   const reusable = read('.github/workflows/_quality.yml')
-  const releaseAggregator = job(reusable, 'release-readiness')
+  const readinessWorkflow = read('.github/workflows/_quality-readiness.yml')
+  const releaseAggregator = job(readinessWorkflow, 'release-readiness')
+  for (const gate of workflowGates) {
+    assert.ok(
+      job(reusable, gate),
+      `_quality.yml is missing release gate job ${gate}`,
+    )
+  }
   containsAll(
     releaseAggregator,
-    workflowGates.map((gate) => `- ${gate}`),
+    ['- stable-readiness'],
     'release-readiness needs',
   )
   assert.ok(
@@ -120,6 +127,7 @@ function check(publishPath) {
 
   const publish = read(publishPath)
   const quality = job(publish, 'quality')
+  const qualityReadiness = job(publish, 'quality-readiness')
   const preflight = job(publish, 'preflight')
   const publishJob = job(publish, 'publish')
   containsAll(
@@ -132,8 +140,22 @@ function check(publishPath) {
     'tag quality job',
   )
   containsAll(
+    qualityReadiness,
+    [
+      'needs: [quality, quality-playwright]',
+      'uses: ./.github/workflows/_quality-readiness.yml',
+      'group: release',
+      'playwright_group: release',
+      'release_tag: ${{ github.ref_name }}',
+    ],
+    'tag quality readiness job',
+  )
+  containsAll(
     `${preflight}\n${publishJob}`,
-    ['needs.quality.outputs.release-readiness-digest', 'needs: [quality, plan'],
+    [
+      'needs.quality-readiness.outputs.release-readiness-digest',
+      'needs: [quality, quality-readiness, plan',
+    ],
     'publish dependency chain',
   )
   assert.ok(
@@ -153,14 +175,24 @@ function check(publishPath) {
     'release playwright job',
   )
   containsAll(
-    job(qualityWorkflow, 'release'),
-    ['needs: release-playwright'],
-    'manual release job ordering',
+    job(qualityWorkflow, 'release-readiness'),
+    [
+      'uses: ./.github/workflows/_quality-readiness.yml',
+      '- release',
+      '- release-playwright',
+      'group: release',
+      'playwright_group: release',
+      'release_tag: ${{ inputs.release_tag }}',
+    ],
+    'manual release readiness ordering',
   )
-  containsAll(
-    job(publish, 'quality'),
-    ['needs: quality-playwright'],
-    'publish quality ordering',
+  assert.ok(
+    !job(qualityWorkflow, 'release').includes('needs: release-playwright'),
+    'manual release quality must run in parallel with release-playwright',
+  )
+  assert.ok(
+    !quality.includes('needs: quality-playwright'),
+    'publish quality must run in parallel with quality-playwright',
   )
   console.log(
     `[ci-profile] profiles=${Object.keys(readinessSpec.profiles).join(',')} publish=${publishPath} status=valid`,

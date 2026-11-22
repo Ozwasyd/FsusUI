@@ -16,6 +16,8 @@ jobs:
   verify-published-consumer-contracts:
     runs-on: ubuntu-24.04
     timeout-minutes: 20
+    env:
+      PLAYWRIGHT_BROWSERS_PATH: ${{ github.workspace }}/.tmp/playwright-browsers
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -28,7 +30,12 @@ jobs:
           scope: '@ozwasyd'
           cache: pnpm
           cache-dependency-path: pnpm-lock.yaml
-      - run: pnpm install --frozen-lockfile
+      - run: pnpm install --frozen-lockfile --ignore-scripts
+      - name: Restore Playwright Chromium cache
+        uses: actions/cache@v4
+        with:
+          path: .tmp/playwright-browsers
+          key: ${{ runner.os }}-playwright-chromium-${{ hashFiles('package.json', 'pnpm-lock.yaml') }}
       - run: pnpm exec playwright install --with-deps chromium
       - name: Verify published package metadata and run standalone consumer contracts
         env:

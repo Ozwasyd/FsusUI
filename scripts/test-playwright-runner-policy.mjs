@@ -3,13 +3,11 @@ import { readFileSync } from 'node:fs'
 import test from 'node:test'
 
 const workflows = [
-  '.github/workflows/quality.yml',
   '.github/workflows/_quality.yml',
   '.github/workflows/_quality-playwright.yml',
 ]
 
 const nativeUbuntu22Jobs = new Map([
-  ['.github/workflows/quality.yml', 'pr-avalonia-aot-candidate'],
   ['.github/workflows/_quality.yml', 'dotnet-package'],
 ])
 

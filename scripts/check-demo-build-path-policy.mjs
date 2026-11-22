@@ -3,7 +3,6 @@ import { resolveFsusViteManualChunk } from './vite-manual-chunks.mjs'
 
 const packageJson = JSON.parse(readFileSync('package.json', 'utf8'))
 const scripts = packageJson.scripts ?? {}
-const qualityWorkflow = readFileSync('.github/workflows/quality.yml', 'utf8')
 const reusableQualityWorkflow = readFileSync(
   '.github/workflows/_quality.yml',
   'utf8',
@@ -293,8 +292,8 @@ for (const fragment of [
   'demo-build-reason',
 ]) {
   assert(
-    qualityWorkflow.includes(fragment),
-    `PR workflow must include ${fragment}`,
+    reusableQualityWorkflow.includes(fragment),
+    `reusable quality workflow build-demo job must include ${fragment}`,
   )
 }
 

@@ -51,6 +51,24 @@ function parseArguments(argv) {
   return options
 }
 
+export function createDistributedUnitMatrix(plan) {
+  // Each GitHub Actions matrix shard runs on its own dedicated runner with the
+  // same CPU/memory envelope, so it can use the full per-runner worker budget
+  // instead of dividing a single runner across all shards.
+  const perRunnerWorkers = Math.max(
+    1,
+    Math.min(
+      plan.budgets.parallelLaneLimit,
+      plan.lanes.unit,
+      DEFAULT_CAPACITY_POLICY.maxVitestWorkersPerShard,
+    ),
+  )
+  return createUnitMatrix(plan).map((entry) => ({
+    ...entry,
+    workers: perRunnerWorkers,
+  }))
+}
+
 export function runCapacityCli(
   argv = process.argv.slice(2),
   env = process.env,
@@ -71,7 +89,7 @@ export function runCapacityCli(
   if (options.githubOutput) {
     appendFileSync(
       options.githubOutput,
-      `unit-matrix=${JSON.stringify({ include: createUnitMatrix(plan) })}\n`,
+      `unit-matrix=${JSON.stringify({ include: createDistributedUnitMatrix(plan) })}\n`,
     )
   }
   return plan

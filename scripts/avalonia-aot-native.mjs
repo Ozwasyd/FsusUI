@@ -285,24 +285,22 @@ export const validateWorkflowContracts = ({
     'candidate-artifact: dotnet-nuget-candidate',
     'scripts/avalonia-aot-native.mjs aggregate',
     'name: avalonia-aot-leaf-${{ inputs.group }}-linux-x64',
-    '\n      - avalonia-aot\n',
+    'gate: avalonia-aot',
+    'rid: linux-x64',
   ])
     if (!quality.includes(term))
       throw new Error(`quality workflow missing ${term.trim()}`)
   for (const term of [
-    'pr-avalonia-aot-plan:',
-    'pr-avalonia-aot-candidate:',
-    'pr-avalonia-aot:',
-    'scripts/avalonia-aot-native.mjs affected',
-    'rid: linux-x64',
-    'ref: ${{ github.event.pull_request.head.sha }}',
-    'GITHUB_SHA: ${{ github.event.pull_request.head.sha }}',
+    'premerge-main:',
+    'premerge-readiness:',
+    'uses: ./.github/workflows/_quality.yml',
+    'uses: ./.github/workflows/_quality-readiness.yml',
   ])
     if (!caller.includes(term)) throw new Error(`PR workflow missing ${term}`)
   if (
     !publish.includes('release-readiness-digest') ||
     !publish.includes(
-      'needs: [quality, plan, preflight, fsusblog-consumer]',
+      'needs: [quality, quality-readiness, plan, preflight, fsusblog-consumer]',
     )
   )
     throw new Error('publish workflow must remain bound to release readiness')

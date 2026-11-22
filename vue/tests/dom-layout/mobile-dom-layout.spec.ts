@@ -125,6 +125,20 @@ const expectNoStickyTouchSurface = async (
     await locator.evaluate((element) => element.classList.add('hover'))
   }
 
+  if (options.useTouchTap) {
+    // Wait for the button's :active release box-shadow transition to finish so
+    // we verify post-tap rest state instead of sampling mid-fade-out.
+    await expect
+      .poll(
+        async () => (await readTouchSurfaceMetrics(locator, options)).boxShadow,
+        {
+          message: `${options.name} retains sticky shadow after touch tap`,
+          timeout: 1000,
+        },
+      )
+      .toBe('none')
+  }
+
   const metrics = await readTouchSurfaceMetrics(locator, options)
   const maxBackgroundAlpha = options.maxBackgroundAlpha ?? 0.01
 
@@ -737,12 +751,17 @@ test('slider drag exposes smooth tokenized follow motion', async ({
     }
   })
 
+  const blurRadius = (filter: string) => {
+    const match = /blur\(([\d.]+)px\)/.exec(filter)
+    return match ? Number.parseFloat(match[1]) : 0
+  }
+
   expect(Math.max(...motion.barTransitionDurations)).toBeGreaterThan(0)
   expect(Math.max(...motion.wrapperTransitionDurations)).toBe(0)
   expect(motion.barTransform).not.toBe('none')
   expect(motion.wrapperTransform).not.toBe('none')
-  expect(motion.barFilter).not.toBe('none')
-  expect(motion.buttonFilter).not.toBe('none')
+  expect(blurRadius(motion.barFilter)).toBeLessThanOrEqual(0.05)
+  expect(blurRadius(motion.buttonFilter)).toBeLessThanOrEqual(0.05)
   expect(motion.interactiveBlur).toContain('px')
   expect(motion.interactiveGlow).toContain('px')
   expect(motion.interactiveStrength).toBeGreaterThan(0)

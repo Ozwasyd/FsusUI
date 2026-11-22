@@ -2,6 +2,7 @@ import fs from 'node:fs'
 
 const read = (file) => fs.readFileSync(file, 'utf8')
 const workflow = read('.github/workflows/_quality.yml')
+const readinessWorkflow = read('.github/workflows/_quality-readiness.yml')
 const playwrightWorkflow = read('.github/workflows/_quality-playwright.yml')
 const qualityWorkflow = read('.github/workflows/quality.yml')
 const publishWorkflow = read('.github/workflows/publish-npm.yml')
@@ -25,8 +26,12 @@ for (const name of [
   'nightly-readiness',
   'release-readiness',
 ]) {
-  const source = job(workflow, name)
-  assert(source, `${name} job is required`)
+  const source = job(readinessWorkflow, name)
+  assert(source, `${name} job is required in _quality-readiness.yml`)
+  assert(
+    !job(workflow, name),
+    `${name} must live in _quality-readiness.yml so core quality and Playwright run in parallel`,
+  )
   assert(
     source.includes('scripts/ci-readiness.mjs check'),
     `${name} must run the manifest aggregator`,
@@ -169,26 +174,53 @@ assert(
   'playwright-pr-readiness must fail closed without continue-on-error',
 )
 
-// Caller workflows must order playwright evidence before the aggregators.
+// Caller workflows must run core quality and Playwright in parallel, then wait for both in readiness aggregation.
 assert(
   qualityWorkflow.includes('uses: ./.github/workflows/_quality-playwright.yml'),
   'quality.yml must call the reusable playwright workflow',
 )
+assert(
+  qualityWorkflow.includes('uses: ./.github/workflows/_quality-readiness.yml'),
+  'quality.yml must call the reusable readiness aggregator workflow',
+)
+const premergeReadinessJob = job(qualityWorkflow, 'premerge-readiness')
+assert(
+  premergeReadinessJob &&
+    premergeReadinessJob.includes('uses: ./.github/workflows/_quality-readiness.yml') &&
+    premergeReadinessJob.includes('- premerge-main') &&
+    premergeReadinessJob.includes('- premerge-playwright') &&
+    premergeReadinessJob.includes('group: main') &&
+    premergeReadinessJob.includes('playwright_group: pr'),
+  'quality.yml premerge-readiness must wait for both premerge-main and premerge-playwright',
+)
 for (const group of ['main', 'nightly', 'release']) {
   const groupJob = job(qualityWorkflow, group)
   const playwrightJob = job(qualityWorkflow, `${group}-playwright`)
+  const readinessJob = job(qualityWorkflow, `${group}-readiness`)
   assert(groupJob, `quality.yml must call _quality.yml for ${group}`)
   assert(
     playwrightJob,
     `quality.yml must call playwright workflow for ${group}`,
   )
   assert(
-    groupJob.includes(`needs: ${group}-playwright`),
-    `quality.yml ${group} must wait for ${group}-playwright evidence`,
+    readinessJob,
+    `quality.yml must call _quality-readiness.yml for ${group}`,
+  )
+  assert(
+    !groupJob.includes(`needs: ${group}-playwright`),
+    `quality.yml ${group} must run in parallel with ${group}-playwright`,
   )
   assert(
     playwrightJob.includes(`group: ${group}`),
     `quality.yml ${group}-playwright must use group ${group}`,
+  )
+  assert(
+    readinessJob.includes('uses: ./.github/workflows/_quality-readiness.yml') &&
+      readinessJob.includes(`- ${group}`) &&
+      readinessJob.includes(`- ${group}-playwright`) &&
+      readinessJob.includes(`group: ${group}`) &&
+      readinessJob.includes(`playwright_group: ${group}`),
+    `quality.yml ${group}-readiness must aggregate both ${group} and ${group}-playwright`,
   )
 }
 assert(
@@ -196,12 +228,29 @@ assert(
   'publish-npm.yml must call the reusable playwright workflow for release',
 )
 assert(
+  publishWorkflow.includes('uses: ./.github/workflows/_quality-readiness.yml'),
+  'publish-npm.yml must call the reusable readiness aggregator workflow for release',
+)
+assert(
   job(publishWorkflow, 'quality-playwright').includes('group: release'),
   'publish-npm.yml playwright workflow must use group release',
 )
 assert(
-  job(publishWorkflow, 'quality').includes('needs: quality-playwright'),
-  'publish-npm.yml quality must wait for release playwright evidence',
+  !job(publishWorkflow, 'quality').includes('needs: quality-playwright'),
+  'publish-npm.yml quality must run in parallel with quality-playwright',
+)
+assert(
+  job(publishWorkflow, 'quality-readiness').includes(
+    'needs: [quality, quality-playwright]',
+  ) &&
+    job(publishWorkflow, 'quality-readiness').includes(
+      'uses: ./.github/workflows/_quality-readiness.yml',
+    ) &&
+    job(publishWorkflow, 'quality-readiness').includes('group: release') &&
+    job(publishWorkflow, 'quality-readiness').includes(
+      'playwright_group: release',
+    ),
+  'publish-npm.yml quality-readiness must wait for both quality and quality-playwright',
 )
 
 if (failures.length) {
