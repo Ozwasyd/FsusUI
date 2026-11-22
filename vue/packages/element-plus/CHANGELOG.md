@@ -1,5 +1,13 @@
 # element-plus
 
+## 1.6.0-preview.9
+
+### Preview Changes
+
+- Ship public-preview candidate `@ozwasyd/element-plus@1.6.0-preview.9` (`preview` dist-tag on GitHub Packages).
+- **Web / Vue (`#1117`, `#1118`)**: fix InboxPrimitives scroll-chaining/header alignment/scrollbar gutter (`#1115`), MarkdownRenderer native Worker UTF-8 byte-length validation, MarkdownEditor writing-aid reactivity/Focus half-open boundaries/dimmed span opacity/prose chrome radius, Button coarse-pointer `:focus-visible` ring and danger-link colors, Tabs `aria-label`/`aria-labelledby` forwarding and disabled keyboard guard, SegmentedControl selected contrast and disabled Tab entry, SelectV2 native focus/ARIA/disabled-form/touch-hover lifecycle, Input CSP-safe textarea `resize`, TableV2 portable Vue `HTMLAttributes['class']` types, and opt-in `ElTag` `multiline` mode.
+- **Avalonia / .NET & Tokens (`#1119`)**: fix VirtualList visible anchoring & external focus, Tabs collection mutation ordering & preselected additions, Transfer keyboard routing & disabled moves, Collapse pointer child synchronization & nested isolation with cross-platform `component.collapse.content.min-height` token, Stable39 native primitive keyboard routing, DesktopShell document-tab reorder focus & outgoing presenter retirement, and macOS `Command` primary accelerator mapping.
+
 ## 1.6.0-preview.8
 
 ### Preview Changes
