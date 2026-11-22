@@ -111,8 +111,9 @@ When `disabled` is set, the shell root keeps full opacity and only marks the sur
 
 ## Scroll Ownership
 
-- `FsusInboxLayout` and `FsusSplitPane` own the outer list/detail pane overflow.
+- `FsusInboxLayout` and `FsusSplitPane` own outer list/detail pane overflow when height-bounded; when `#detail` directly hosts a sole `FsusThreadPanel`, the detail wrapper clips (`overflow: clip`) and delegates vertical scrolling to `FsusThreadPanel__messages` so header, context bar, and composer stay flush and pinned without double scrollbars or nested gutters.
 - `FsusThreadPanel__messages` owns message-region overflow.
+- Default panes preserve normal page scroll chaining (`overscroll-behavior: auto`) so unbounded layouts in document-scrolling pages never trap wheel input.
 - Avoid wrapping panes in another native overflow container unless the surrounding page has a clear height contract.
 - Avoid placing a custom scrollbar around another custom scrollbar. Prefer a single scroll owner per pane.
 - These primitives use native overflow surfaces and cooperate with FsusUI pointer/touch scrollbar behavior.

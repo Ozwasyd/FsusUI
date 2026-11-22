@@ -284,6 +284,69 @@ test('issue primitives render in the demo route', async ({
     await expect(inboxLayout.locator('.el-inbox-empty-state')).toBeVisible()
   }
 
+  // Issue #1115: verify non-trapping scroll chaining, centered thread header,
+  // and absence of stacked scrollbar-gutter seams on unbounded inbox panes.
+  const inboxChecks = await inboxLayout.evaluate((layout) => {
+    const list = layout.querySelector('.el-inbox-layout__list')
+    const detail = layout.querySelector('.el-inbox-layout__detail')
+    const messages = layout.querySelector('.el-thread-panel__messages')
+    const header = layout.querySelector('.el-thread-panel__header')
+    const contextBar = layout.querySelector('.el-conversation-context-bar')
+    const backBtn = layout.querySelector('.el-thread-panel__back button')
+    const actionBtn = layout.querySelector('.el-thread-panel__actions button')
+    const heading = layout.querySelector('.el-thread-panel__heading')
+    const centerY = (el: Element) => {
+      const r = el.getBoundingClientRect()
+      return r.top + r.height / 2
+    }
+    return {
+      overscroll: [list, detail, messages].map((el) =>
+        el ? getComputedStyle(el).overscrollBehavior : '',
+      ),
+      gutters: [list, detail, messages].map((el) =>
+        el ? getComputedStyle(el).scrollbarGutter : '',
+      ),
+      headerAlign: header ? getComputedStyle(header).alignItems : '',
+      contextRightDelta:
+        detail && contextBar
+          ? Math.abs(
+              detail.getBoundingClientRect().right -
+                contextBar.getBoundingClientRect().right,
+            )
+          : 999,
+      headingVsBackDelta:
+        heading && backBtn
+          ? Math.abs(centerY(heading) - centerY(backBtn))
+          : 999,
+      headingVsActionDelta:
+        heading && actionBtn
+          ? Math.abs(centerY(heading) - centerY(actionBtn))
+          : 999,
+    }
+  })
+  expect(inboxChecks.overscroll).toEqual(['auto', 'auto', 'auto'])
+  expect(inboxChecks.gutters).toEqual(['auto', 'auto', 'auto'])
+  expect(inboxChecks.headerAlign).toMatch(/center/)
+  expect(inboxChecks.contextRightDelta).toBeLessThanOrEqual(1)
+  expect(inboxChecks.headingVsBackDelta).toBeLessThanOrEqual(2)
+  expect(inboxChecks.headingVsActionDelta).toBeLessThanOrEqual(2)
+
+  // Verify wheel scrolling over unbounded inbox panes chains to window.
+  await inboxLayout.scrollIntoViewIfNeeded()
+  const beforeWheelY = await page.evaluate(() => window.scrollY)
+  const messagesBox = await inboxLayout
+    .locator('.el-thread-panel__messages')
+    .boundingBox()
+  expect(messagesBox).not.toBeNull()
+  await page.mouse.move(
+    (messagesBox?.x ?? 0) + Math.min(40, (messagesBox?.width ?? 80) / 2),
+    (messagesBox?.y ?? 0) + Math.min(40, (messagesBox?.height ?? 80) / 2),
+  )
+  await page.mouse.wheel(0, -240)
+  await expect
+    .poll(() => page.evaluate(() => window.scrollY))
+    .toBeLessThan(beforeWheelY)
+
   const horizontalOverflow = await page.evaluate(() => {
     const root = document.documentElement
     return (

@@ -142,7 +142,7 @@
       "path": "vue/packages/theme-chalk/src/inbox-primitives.scss",
       "kind": "implementation",
       "algorithm": "sha256",
-      "digest": "daf45f5f074e4e0a1e1be0404f58a295cdc83c1237a5f0031492d91a6cacf914"
+      "digest": "bd9ce36f87152f20495a7fbba17690be29d8a5d6dc6589c0d8fa72aadf169473"
     },
     "implementation-17": {
       "path": "vue/packages/theme-chalk/src/settings-primitives.scss",
