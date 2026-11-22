@@ -40,6 +40,7 @@ type TouchSurfaceOptions = {
   preserveRestBackground?: boolean
   pseudo?: '::before'
   useHoverClass?: boolean
+  useTouchTap?: boolean
 }
 
 const readTouchSurfaceMetrics = async (
@@ -110,8 +111,15 @@ const expectNoStickyTouchSurface = async (
   const restBackgroundColor = options.preserveRestBackground
     ? await locator.evaluate((element) => getComputedStyle(element).backgroundColor)
     : null
-  await locator.hover({ force: true, timeout: 1000 }).catch(() => undefined)
-  await locator.focus({ timeout: 1000 }).catch(() => undefined)
+  if (options.useTouchTap) {
+    // Use a real touch tap so coarse-pointer controls enter non-keyboard :focus
+    // rather than programmatic :focus-visible (whose keyboard ring must remain).
+    await locator.tap({ timeout: 1000 })
+    await locator.hover({ force: true, timeout: 1000 }).catch(() => undefined)
+  } else {
+    await locator.hover({ force: true, timeout: 1000 }).catch(() => undefined)
+    await locator.focus({ timeout: 1000 }).catch(() => undefined)
+  }
 
   if (options.useHoverClass) {
     await locator.evaluate((element) => element.classList.add('hover'))
@@ -1178,7 +1186,7 @@ test('basic touch controls do not leave sticky hover or focus surfaces', async (
       .locator('.demo-block', { hasText: 'Button & ButtonGroup' })
       .getByRole('button', { name: 'Default' })
       .first(),
-    { name: 'Button' },
+    { name: 'Button', useTouchTap: true },
   )
   await expectTouchActiveFeedback(
     page,
