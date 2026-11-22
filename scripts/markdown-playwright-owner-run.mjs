@@ -9,6 +9,7 @@ import { loadMarkdownOwnerPlan } from './markdown-playwright-plan.mjs'
 import {
   computeMarkdownCellRuntime,
   runMarkdownCell,
+  writeMarkdownCellRuntimeManifest,
 } from './markdown-playwright-runner.mjs'
 import { filterOwnerPlanByImpact } from './playwright-impact-filter.mjs'
 import {
@@ -134,7 +135,16 @@ async function main(argv = process.argv.slice(2)) {
     ),
   )
   const serverUrl = `http://127.0.0.1:${serverPort}`
-  const precomputedRuntime = await computeMarkdownCellRuntime(cells[0])
+  const runtimeBySuite = new Map()
+  for (const cell of cells) {
+    if (!runtimeBySuite.has(cell.suiteId)) {
+      const computed = await computeMarkdownCellRuntime(cell)
+      runtimeBySuite.set(
+        cell.suiteId,
+        writeMarkdownCellRuntimeManifest(cell, evidenceDir, computed),
+      )
+    }
+  }
   buildDemoOnce()
   const server = spawn(
     'pnpm',
@@ -173,8 +183,7 @@ async function main(argv = process.argv.slice(2)) {
         const result = await runMarkdownCell(ownerId, cell.id, group, {
           evidenceDir,
           externalServer: true,
-          precomputedRuntime,
-          runtimeManifestId: (entry) => `${entry.suiteId}-${entry.project}`,
+          precomputedRuntime: runtimeBySuite.get(cell.suiteId),
           envOverrides: {
             FSUS_MARKDOWN_EDITOR_PORT: String(serverPort),
           },
