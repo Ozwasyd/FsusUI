@@ -10,7 +10,7 @@
   "baselines": {
     "web": {
       "path": "spec/baselines/vue-current.json",
-      "hash": "aac08124cd4a3a7fd1676476b9cddf58834beeaee6a1880d542753fc79eb9708",
+      "hash": "ab00a52d8a19e1357b75c4872998e9040544773ffd0dbe33b99f9174970cf32f",
       "packageVersion": "1.6.0-preview.8"
     },
     "avalonia": {
@@ -129366,6 +129366,52 @@
           }
         },
         {
+          "name": "multiline",
+          "kind": "input",
+          "web": {
+            "member": "multiline",
+            "baseline": "spec/baselines/vue-current.json",
+            "categories": [
+              "boolean"
+            ],
+            "runtimeType": "Boolean",
+            "semanticType": null,
+            "nullable": false,
+            "default": {
+              "kind": "missing"
+            },
+            "values": null,
+            "valuesKnown": false,
+            "required": false,
+            "readonly": false,
+            "deprecated": false,
+            "deprecationMessage": null
+          },
+          "avalonia": null,
+          "status": "missing",
+          "drift": {
+            "type": null,
+            "default": null,
+            "required": null,
+            "readWrite": null,
+            "nullability": null,
+            "eventPayload": null,
+            "operationSignature": null,
+            "contentRegion": null,
+            "enumValues": null,
+            "deprecated": null
+          },
+          "scenarioIds": [
+            "scenario.v2.el-tag.input.multiline"
+          ],
+          "governance": {
+            "reason": "No matching real Avalonia public member in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
           "name": "round",
           "kind": "input",
           "web": {
@@ -129716,6 +129762,17 @@
           }
         },
         {
+          "member": "multiline",
+          "kind": "input",
+          "status": "missing",
+          "governance": {
+            "reason": "No matching real Avalonia public member in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
           "member": "round",
           "kind": "input",
           "status": "missing",
@@ -129910,6 +129967,7 @@
         "scenario.v2.el-tag.input.disable-transitions",
         "scenario.v2.el-tag.input.effect",
         "scenario.v2.el-tag.input.hit",
+        "scenario.v2.el-tag.input.multiline",
         "scenario.v2.el-tag.input.round",
         "scenario.v2.el-tag.input.size",
         "scenario.v2.el-tag.input.type",
@@ -129926,10 +129984,10 @@
         "scenario.v2.el-tag.perf"
       ],
       "coverage": {
-        "total": 11,
+        "total": 12,
         "alignedCandidate": 0,
         "partial": 0,
-        "missing": 11,
+        "missing": 12,
         "webOnly": 0,
         "mappedPercent": 0
       }
@@ -190711,9 +190769,9 @@
   "coverage": {
     "aligned-candidate": 17,
     "partial": 192,
-    "missing": 2209,
+    "missing": 2210,
     "web-only": 62,
-    "total": 2480,
+    "total": 2481,
     "mappedPercent": 8.4
   }
 }

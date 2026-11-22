@@ -87,7 +87,7 @@ const Tabs = defineComponent({
   props: tabsProps,
   emits: tabsEmits,
 
-  setup(props, { emit, slots, expose }) {
+  setup(props, { attrs, emit, slots, expose }) {
     const ns = useNamespace('tabs')
 
     const {
@@ -208,6 +208,8 @@ const Tabs = defineComponent({
           {newButton}
           <TabNav
             ref={nav$}
+            aria-label={attrs['aria-label'] as string | undefined}
+            aria-labelledby={attrs['aria-labelledby'] as string | undefined}
             currentName={currentName.value}
             editable={props.editable}
             type={props.type}

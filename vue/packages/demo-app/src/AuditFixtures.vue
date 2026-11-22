@@ -484,6 +484,7 @@
         <el-markdown-editor
           ref="markdownWritingAidsEditor"
           v-model="markdownWritingAidsValue"
+          :chrome="markdownWritingAidsChrome"
           editor-profile="prose"
           :mode="markdownWritingAidsMode"
           :min-rows="12"
@@ -2244,6 +2245,17 @@ const markdownWritingAidsCombo =
     : new URLSearchParams(window.location.search).get(
         'markdownWritingAidsCombo',
       ) ?? 'both'
+const markdownWritingAidsChromeParam =
+  typeof window === 'undefined'
+    ? null
+    : new URLSearchParams(window.location.search).get(
+        'markdownWritingAidsChrome',
+      )
+const markdownWritingAidsChrome: 'framed' | 'embedded' | 'minimal' =
+  markdownWritingAidsChromeParam === 'embedded' ||
+  markdownWritingAidsChromeParam === 'minimal'
+    ? markdownWritingAidsChromeParam
+    : 'framed'
 const markdownWritingAidsOptions = {
   focus:
     markdownWritingAidsCombo === 'focus' || markdownWritingAidsCombo === 'both',

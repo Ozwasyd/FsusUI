@@ -24,6 +24,38 @@ Tag preserves the supplied text's case and letter spacing, which suits mixed-lan
 
 Set `closable` to `true` to show a close icon and emit `close` when clicked; set `disable-transitions` to disable animation.
 
+## Multiline Labels
+
+Set `multiline` to wrap the default slot's text within the containing block's
+available inline width. The Tag grows in height to show the entire label,
+including long unbroken identifiers, CJK, and RTL text. It does not clamp,
+truncate, or hide content. Without this prop, Tag keeps its existing fixed-height,
+single-line presentation.
+
+```vue
+<div style="inline-size: 160px; min-inline-size: 0">
+  <ElTag multiline size="small" type="warning">
+    定时发布等待索引同步 APIv2
+  </ElTag>
+</div>
+```
+
+Give the containing block a finite width; in flex or grid compositions, allow
+the containing item to shrink (for example, `min-inline-size: 0`). The mode
+bounds the Tag to that width rather than imposing a page-specific width. Slotted
+text and inline icons are supported; consumer-supplied fixed-width media or
+content that explicitly disables wrapping must fit its own available width.
+Consumers do not need to target private Tag selectors.
+
+The mode preserves `size`, `type`, `effect`, text case, motion, and `click`/`close`
+events. With `closable`, the close icon occupies a separate, nonshrinking native
+button, with the existing localized removal action (`Delete` in English, `删除`
+in Simplified Chinese) and the label as its accessible description.
+It supports Enter and Space and emits the existing `MouseEvent` close payload
+without also emitting `click`. The close target can make a short multiline Tag
+taller than its size's single-line height. Tag itself remains a label, not a
+selectable form control.
+
 ## Dynamic Editing
 
 Listen for `close` to add or remove tags dynamically.
@@ -50,16 +82,17 @@ For selectable tags, use `el-check-tag` and bind selection with `v-model:checked
 
 ### Tag Attributes
 
-| 属性名              | 说明           | 类型                                                        | 默认值    |
-| ------------------- | -------------- | ----------------------------------------------------------- | --------- |
-| type                | 类型           | `'primary' \| 'success' \| 'info' \| 'warning' \| 'danger'` | `primary` |
-| closable            | 是否可关闭     | `boolean`                                                   | `false`   |
-| disable-transitions | 是否禁用动画   | `boolean`                                                   | `false`   |
-| hit                 | 是否有高亮边框 | `boolean`                                                   | `false`   |
-| color               | 背景色         | `string`                                                    | —         |
-| size                | 尺寸           | `'large' \| 'default' \| 'small'`                           | —         |
-| effect              | 主题           | `'dark' \| 'light' \| 'plain'`                              | `light`   |
-| round               | 是否圆角       | `boolean`                                                   | `false`   |
+| 属性名              | 说明                                                    | 类型                                                        | 默认值    |
+| ------------------- | ------------------------------------------------------- | ----------------------------------------------------------- | --------- |
+| type                | 类型                                                    | `'primary' \| 'success' \| 'info' \| 'warning' \| 'danger'` | `primary` |
+| closable            | 是否可关闭                                              | `boolean`                                                   | `false`   |
+| disable-transitions | 是否禁用动画                                            | `boolean`                                                   | `false`   |
+| hit                 | 是否有高亮边框                                          | `boolean`                                                   | `false`   |
+| color               | 背景色                                                  | `string`                                                    | —         |
+| size                | 尺寸                                                    | `'large' \| 'default' \| 'small'`                           | —         |
+| effect              | 主题                                                    | `'dark' \| 'light' \| 'plain'`                              | `light`   |
+| round               | 是否圆角                                                | `boolean`                                                   | `false`   |
+| multiline           | Wrap text within available inline width and grow height | `boolean`                                                   | `false`   |
 
 ### Tag Events
 

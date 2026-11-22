@@ -69,7 +69,7 @@ const TabNav = defineComponent({
   name: COMPONENT_NAME,
   props: tabNavProps,
   emits: tabNavEmits,
-  setup(props, { expose, emit }) {
+  setup(props, { attrs, expose, emit }) {
     const vm = getCurrentInstance()!
 
     const rootTabs = inject(tabsRootContextKey)
@@ -220,6 +220,7 @@ const TabNav = defineComponent({
         )
       )
       const currentIndex = tabList.indexOf(e.target as HTMLDivElement)
+      if (currentIndex < 0) return
 
       let nextIndex: number
       if (code === left || code === up) {
@@ -392,6 +393,8 @@ const TabNav = defineComponent({
               ref={nav$}
               style={navStyle.value}
               role="tablist"
+              aria-label={attrs['aria-label'] as string | undefined}
+              aria-labelledby={attrs['aria-labelledby'] as string | undefined}
               onKeydown={changeTab}
             >
               {...[
