@@ -23,6 +23,8 @@ export {
   type MarkdownWebLanguageCoordinates,
   type MarkdownWebTextareaLike,
 } from './markdown-editor-language-web'
+import type { Language, TranslatePair } from '@element-plus/locale'
+import English from '@element-plus/locale/lang/en'
 import type {
   MarkdownNativeWritingToolsMode,
   MarkdownSpellcheckMode,
@@ -655,6 +657,29 @@ export type MarkdownEditorCommandPresentation =
  * duplicating command, mode, or status semantics. A partial value is merged
  * with this source; missing entries always fall back to the same locale.
  */
+export interface MarkdownEditorTableLocaleText {
+  readonly menuLabel: string
+  readonly actions: Readonly<{
+    'insert-row-above': string
+    'insert-row-below': string
+    'move-row-up': string
+    'move-row-down': string
+    'delete-row': string
+    'insert-col-left': string
+    'insert-col-right': string
+    'move-col-left': string
+    'move-col-right': string
+    'delete-col': string
+    'align-left': string
+    'align-left-title': string
+    'align-center': string
+    'align-center-title': string
+    'align-right': string
+    'align-right-title': string
+    'format-table': string
+  }>
+}
+
 export interface MarkdownEditorLocaleText {
   readonly modes: Readonly<Record<MarkdownEditorMode, string>>
   readonly commands: Readonly<Record<MarkdownEditorCommandIcon, string>>
@@ -846,6 +871,7 @@ export interface MarkdownEditorLocaleText {
     selected: string
     words: string
   }>
+  readonly table: MarkdownEditorTableLocaleText
 }
 
 type MarkdownEditorLocaleDeepPartial<T> = T extends (
@@ -859,216 +885,530 @@ type MarkdownEditorLocaleDeepPartial<T> = T extends (
 export type MarkdownEditorLocaleTextOverride =
   MarkdownEditorLocaleDeepPartial<MarkdownEditorLocaleText>
 
-export const defaultMarkdownEditorLocaleText: MarkdownEditorLocaleText =
-  Object.freeze({
-    modes: Object.freeze({
-      source: '源码',
-      live: '实时',
-      split: '分屏',
-      preview: '预览',
-    }),
-    commands: Object.freeze({
-      bold: '加粗',
-      code: '代码',
-      heading: '标题',
-      image: '插入图片',
-      italic: '斜体',
-      link: '链接',
-      quote: '引用',
-    }),
-    actions: Object.freeze({
-      image: '上传图片',
-      save: '保存',
-      submit: '提交',
-    }),
+const isLocaleRecord = (
+  value: unknown,
+): value is Record<string, string | string[] | TranslatePair | undefined> =>
+  Boolean(value) && typeof value === 'object' && !Array.isArray(value)
+
+const readLocaleSection = (
+  source: unknown,
+  key: string,
+): Record<string, string | string[] | TranslatePair | undefined> | undefined => {
+  if (!isLocaleRecord(source)) return undefined
+  const child = source[key]
+  return isLocaleRecord(child) ? child : undefined
+}
+
+const readLocaleString = (
+  source: unknown,
+  key: string,
+  fallback: string,
+): string => {
+  if (!isLocaleRecord(source)) return fallback
+  const value = source[key]
+  return typeof value === 'string' ? value : fallback
+}
+
+const formatLocaleTemplate = (
+  template: string,
+  params: Readonly<Record<string, string | number>>,
+): string =>
+  template.replace(/\{(\w+)\}/g, (match, token: string) =>
+    Object.prototype.hasOwnProperty.call(params, token)
+      ? String(params[token])
+      : match,
+  )
+
+const readLocaleRecordStrings = <T extends Readonly<Record<string, string>>>(
+  source: unknown,
+  fallback: T,
+): T => {
+  const result: Record<string, string> = {}
+  for (const key of Object.keys(fallback)) {
+    result[key] = readLocaleString(source, key, fallback[key]!)
+  }
+  return Object.freeze(result) as T
+}
+
+export const resolveMarkdownEditorLocaleFromLanguage = (
+  language?: Language,
+): MarkdownEditorLocaleText => {
+  const fallbackRoot = English.el.markdownEditor
+  const root = readLocaleSection(language?.el, 'markdownEditor')
+  const pasteRoot = readLocaleSection(root, 'pasteAsMarkdown')
+  const paletteRoot = readLocaleSection(root, 'commandPalette')
+  const searchRoot = readLocaleSection(root, 'search')
+  const attachmentsRoot = readLocaleSection(root, 'attachments')
+  const imagePropsRoot = readLocaleSection(root, 'imageProperties')
+  const embedsRoot = readLocaleSection(root, 'embeds')
+  const atomicRoot = readLocaleSection(root, 'atomic')
+  const commandGroupsRoot = readLocaleSection(root, 'commandGroups')
+  const tableRoot = readLocaleSection(root, 'table')
+
+  const paletteResultsTpl = readLocaleString(
+    paletteRoot,
+    'results',
+    fallbackRoot.commandPalette.results,
+  )
+  const searchResultsTpl = readLocaleString(
+    searchRoot,
+    'results',
+    fallbackRoot.search.results,
+  )
+  const searchTruncatedTpl = readLocaleString(
+    searchRoot,
+    'truncatedResults',
+    fallbackRoot.search.truncatedResults,
+  )
+  const attachmentUploadingTpl = readLocaleString(
+    attachmentsRoot,
+    'uploading',
+    fallbackRoot.attachments.uploading,
+  )
+  const attachmentResolvedTpl = readLocaleString(
+    attachmentsRoot,
+    'statusResolved',
+    fallbackRoot.attachments.statusResolved,
+  )
+  const attachmentRejectedTpl = readLocaleString(
+    attachmentsRoot,
+    'statusRejected',
+    fallbackRoot.attachments.statusRejected,
+  )
+  const attachmentCancelledTpl = readLocaleString(
+    attachmentsRoot,
+    'statusCancelled',
+    fallbackRoot.attachments.statusCancelled,
+  )
+  const attachmentProgressTpl = readLocaleString(
+    attachmentsRoot,
+    'statusUploading',
+    fallbackRoot.attachments.statusUploading,
+  )
+  const imageDestinationRejectedTpl = readLocaleString(
+    imagePropsRoot,
+    'destinationRejected',
+    fallbackRoot.imageProperties.destinationRejected,
+  )
+  const imageUpdateRejectedTpl = readLocaleString(
+    imagePropsRoot,
+    'updateRejected',
+    fallbackRoot.imageProperties.updateRejected,
+  )
+  const embedNameTpl = readLocaleString(
+    embedsRoot,
+    'name',
+    fallbackRoot.embeds.name,
+  )
+  const atomicActionsRegionTpl = readLocaleString(
+    atomicRoot,
+    'actionsRegion',
+    fallbackRoot.atomic.actionsRegion,
+  )
+  const atomicEditSourceTpl = readLocaleString(
+    atomicRoot,
+    'editSource',
+    fallbackRoot.atomic.editSource,
+  )
+  const atomicEnterAfterTpl = readLocaleString(
+    atomicRoot,
+    'enterAfter',
+    fallbackRoot.atomic.enterAfter,
+  )
+  const atomicEnterBeforeTpl = readLocaleString(
+    atomicRoot,
+    'enterBefore',
+    fallbackRoot.atomic.enterBefore,
+  )
+  const capabilityAnnouncementTpl = readLocaleString(
+    root,
+    'capabilityAnnouncement',
+    fallbackRoot.capabilityAnnouncement,
+  )
+  const overflowAriaTpl = readLocaleString(
+    root,
+    'overflowAria',
+    fallbackRoot.overflowAria,
+  )
+
+  const commandGroups: Record<string, string | undefined> = {
+    block: readLocaleString(
+      commandGroupsRoot,
+      'block',
+      fallbackRoot.commandGroups.block,
+    ),
+    format: readLocaleString(
+      commandGroupsRoot,
+      'format',
+      fallbackRoot.commandGroups.format,
+    ),
+    insert: readLocaleString(
+      commandGroupsRoot,
+      'insert',
+      fallbackRoot.commandGroups.insert,
+    ),
+  }
+  if (commandGroupsRoot) {
+    for (const [key, value] of Object.entries(commandGroupsRoot)) {
+      if (typeof value === 'string') {
+        commandGroups[key] = value
+      }
+    }
+  }
+
+  return Object.freeze({
+    modes: readLocaleRecordStrings(
+      readLocaleSection(root, 'modes'),
+      fallbackRoot.modes,
+    ),
+    commands: readLocaleRecordStrings(
+      readLocaleSection(root, 'commands'),
+      fallbackRoot.commands,
+    ),
+    actions: readLocaleRecordStrings(
+      readLocaleSection(root, 'actions'),
+      fallbackRoot.actions,
+    ),
     pasteAsMarkdown: Object.freeze({
-      cancel: '取消',
-      clipboardFailed: '无法读取剪贴板。',
-      clipboardUnavailable: '当前环境无法访问剪贴板。',
-      conversionWarnings: '转换警告',
-      description: '导入前检查转换后的 Markdown 与源码变更。',
-      disabledDescriptions: Object.freeze({
-        composition: '文字组合输入期间不可用。',
-        disabled: '编辑器已禁用。',
-        loading: '编辑器加载期间不可用。',
-        previewOnly: '仅预览模式下不可用。',
-        readonly: '编辑器为只读状态。',
-      }),
-      importMarkdown: '导入 Markdown',
-      markdownPreview: 'Markdown 预览',
-      pastePlainText: '粘贴纯文本',
-      sourceAfter: '变更后',
-      sourceBefore: '变更前',
-      sourceDiff: '源码差异',
-      stale: '文档或选区已变化，请重新检查剪贴板。',
-      title: '粘贴为 Markdown',
+      cancel: readLocaleString(
+        pasteRoot,
+        'cancel',
+        fallbackRoot.pasteAsMarkdown.cancel,
+      ),
+      clipboardFailed: readLocaleString(
+        pasteRoot,
+        'clipboardFailed',
+        fallbackRoot.pasteAsMarkdown.clipboardFailed,
+      ),
+      clipboardUnavailable: readLocaleString(
+        pasteRoot,
+        'clipboardUnavailable',
+        fallbackRoot.pasteAsMarkdown.clipboardUnavailable,
+      ),
+      conversionWarnings: readLocaleString(
+        pasteRoot,
+        'conversionWarnings',
+        fallbackRoot.pasteAsMarkdown.conversionWarnings,
+      ),
+      description: readLocaleString(
+        pasteRoot,
+        'description',
+        fallbackRoot.pasteAsMarkdown.description,
+      ),
+      disabledDescriptions: readLocaleRecordStrings(
+        readLocaleSection(pasteRoot, 'disabledDescriptions'),
+        fallbackRoot.pasteAsMarkdown.disabledDescriptions,
+      ),
+      importMarkdown: readLocaleString(
+        pasteRoot,
+        'importMarkdown',
+        fallbackRoot.pasteAsMarkdown.importMarkdown,
+      ),
+      markdownPreview: readLocaleString(
+        pasteRoot,
+        'markdownPreview',
+        fallbackRoot.pasteAsMarkdown.markdownPreview,
+      ),
+      pastePlainText: readLocaleString(
+        pasteRoot,
+        'pastePlainText',
+        fallbackRoot.pasteAsMarkdown.pastePlainText,
+      ),
+      sourceAfter: readLocaleString(
+        pasteRoot,
+        'sourceAfter',
+        fallbackRoot.pasteAsMarkdown.sourceAfter,
+      ),
+      sourceBefore: readLocaleString(
+        pasteRoot,
+        'sourceBefore',
+        fallbackRoot.pasteAsMarkdown.sourceBefore,
+      ),
+      sourceDiff: readLocaleString(
+        pasteRoot,
+        'sourceDiff',
+        fallbackRoot.pasteAsMarkdown.sourceDiff,
+      ),
+      stale: readLocaleString(
+        pasteRoot,
+        'stale',
+        fallbackRoot.pasteAsMarkdown.stale,
+      ),
+      title: readLocaleString(
+        pasteRoot,
+        'title',
+        fallbackRoot.pasteAsMarkdown.title,
+      ),
     }),
     commandPalette: Object.freeze({
-      empty: '没有匹配的命令',
-      results: (count: number) => `${count} 个命令`,
-      searchPlaceholder: '搜索命令',
-      title: '命令面板',
+      empty: readLocaleString(
+        paletteRoot,
+        'empty',
+        fallbackRoot.commandPalette.empty,
+      ),
+      results: (count: number) =>
+        formatLocaleTemplate(paletteResultsTpl, { count }),
+      searchPlaceholder: readLocaleString(
+        paletteRoot,
+        'searchPlaceholder',
+        fallbackRoot.commandPalette.searchPlaceholder,
+      ),
+      title: readLocaleString(
+        paletteRoot,
+        'title',
+        fallbackRoot.commandPalette.title,
+      ),
     }),
     search: Object.freeze({
-      close: '关闭搜索',
-      find: '查找',
-      findAndReplaceAria: '在文档中查找和替换',
-      findAria: '在文档中查找',
-      matchCase: '区分大小写',
-      nextMatch: '下一个匹配项',
-      noMatches: '无匹配项',
-      previousMatch: '上一个匹配项',
-      replace: '替换',
-      replaceAll: '全部替换',
-      replaceWithAria: '替换为',
-      results: (current: number, total: number) => `${current} / ${total}`,
-      toggleReplace: '切换替换',
+      close: readLocaleString(searchRoot, 'close', fallbackRoot.search.close),
+      find: readLocaleString(searchRoot, 'find', fallbackRoot.search.find),
+      findAndReplaceAria: readLocaleString(
+        searchRoot,
+        'findAndReplaceAria',
+        fallbackRoot.search.findAndReplaceAria,
+      ),
+      findAria: readLocaleString(
+        searchRoot,
+        'findAria',
+        fallbackRoot.search.findAria,
+      ),
+      matchCase: readLocaleString(
+        searchRoot,
+        'matchCase',
+        fallbackRoot.search.matchCase,
+      ),
+      nextMatch: readLocaleString(
+        searchRoot,
+        'nextMatch',
+        fallbackRoot.search.nextMatch,
+      ),
+      noMatches: readLocaleString(
+        searchRoot,
+        'noMatches',
+        fallbackRoot.search.noMatches,
+      ),
+      previousMatch: readLocaleString(
+        searchRoot,
+        'previousMatch',
+        fallbackRoot.search.previousMatch,
+      ),
+      replace: readLocaleString(
+        searchRoot,
+        'replace',
+        fallbackRoot.search.replace,
+      ),
+      replaceAll: readLocaleString(
+        searchRoot,
+        'replaceAll',
+        fallbackRoot.search.replaceAll,
+      ),
+      replaceWithAria: readLocaleString(
+        searchRoot,
+        'replaceWithAria',
+        fallbackRoot.search.replaceWithAria,
+      ),
+      results: (current: number, total: number) =>
+        formatLocaleTemplate(searchResultsTpl, { current, total }),
+      toggleReplace: readLocaleString(
+        searchRoot,
+        'toggleReplace',
+        fallbackRoot.search.toggleReplace,
+      ),
       truncatedResults: (count: number) =>
-        `${count.toLocaleString()}+ 个匹配项`,
-      useRegex: '使用正则表达式',
-      wholeWord: '全字匹配',
+        formatLocaleTemplate(searchTruncatedTpl, {
+          count: count.toLocaleString(),
+        }),
+      useRegex: readLocaleString(
+        searchRoot,
+        'useRegex',
+        fallbackRoot.search.useRegex,
+      ),
+      wholeWord: readLocaleString(
+        searchRoot,
+        'wholeWord',
+        fallbackRoot.search.wholeWord,
+      ),
     }),
     attachments: Object.freeze({
-      actions: Object.freeze({ cancel: '取消', remove: '移除', retry: '重试' }),
-      region: '附件',
-      unnamed: '附件',
-      uploading: (name: string) => `正在上传 ${name}…`,
+      actions: readLocaleRecordStrings(
+        readLocaleSection(attachmentsRoot, 'actions'),
+        fallbackRoot.attachments.actions,
+      ),
+      region: readLocaleString(
+        attachmentsRoot,
+        'region',
+        fallbackRoot.attachments.region,
+      ),
+      unnamed: readLocaleString(
+        attachmentsRoot,
+        'unnamed',
+        fallbackRoot.attachments.unnamed,
+      ),
+      uploading: (name: string) =>
+        formatLocaleTemplate(attachmentUploadingTpl, { name }),
       status: (name: string, status: string, percent: number) =>
         status === 'resolved'
-          ? `${name} 上传完成`
+          ? formatLocaleTemplate(attachmentResolvedTpl, { name, percent })
           : status === 'rejected'
-            ? `${name} 上传失败`
+            ? formatLocaleTemplate(attachmentRejectedTpl, { name, percent })
             : status === 'cancelled'
-              ? `${name} 上传已取消`
-              : `${name}：已上传 ${percent}%`,
+              ? formatLocaleTemplate(attachmentCancelledTpl, { name, percent })
+              : formatLocaleTemplate(attachmentProgressTpl, { name, percent }),
     }),
     imageProperties: Object.freeze({
-      alt: '替代文本',
-      apply: '应用',
-      caption: '题注',
-      copySource: '复制源码',
-      copyVisible: '复制可见内容',
-      destination: '目标地址',
-      destinationRejected: (code: string) => `目标地址被拒绝：${code}`,
-      open: '打开',
-      region: '图像属性',
-      removeCaption: '移除题注',
-      removeImage: '移除图像',
-      replace: '替换',
-      source: '源码',
-      title: '标题',
-      updateRejected: (code: string) => `图像属性变更被拒绝：${code}`,
+      alt: readLocaleString(
+        imagePropsRoot,
+        'alt',
+        fallbackRoot.imageProperties.alt,
+      ),
+      apply: readLocaleString(
+        imagePropsRoot,
+        'apply',
+        fallbackRoot.imageProperties.apply,
+      ),
+      caption: readLocaleString(
+        imagePropsRoot,
+        'caption',
+        fallbackRoot.imageProperties.caption,
+      ),
+      copySource: readLocaleString(
+        imagePropsRoot,
+        'copySource',
+        fallbackRoot.imageProperties.copySource,
+      ),
+      copyVisible: readLocaleString(
+        imagePropsRoot,
+        'copyVisible',
+        fallbackRoot.imageProperties.copyVisible,
+      ),
+      destination: readLocaleString(
+        imagePropsRoot,
+        'destination',
+        fallbackRoot.imageProperties.destination,
+      ),
+      destinationRejected: (code: string) =>
+        formatLocaleTemplate(imageDestinationRejectedTpl, { code }),
+      open: readLocaleString(
+        imagePropsRoot,
+        'open',
+        fallbackRoot.imageProperties.open,
+      ),
+      region: readLocaleString(
+        imagePropsRoot,
+        'region',
+        fallbackRoot.imageProperties.region,
+      ),
+      removeCaption: readLocaleString(
+        imagePropsRoot,
+        'removeCaption',
+        fallbackRoot.imageProperties.removeCaption,
+      ),
+      removeImage: readLocaleString(
+        imagePropsRoot,
+        'removeImage',
+        fallbackRoot.imageProperties.removeImage,
+      ),
+      replace: readLocaleString(
+        imagePropsRoot,
+        'replace',
+        fallbackRoot.imageProperties.replace,
+      ),
+      source: readLocaleString(
+        imagePropsRoot,
+        'source',
+        fallbackRoot.imageProperties.source,
+      ),
+      title: readLocaleString(
+        imagePropsRoot,
+        'title',
+        fallbackRoot.imageProperties.title,
+      ),
+      updateRejected: (code: string) =>
+        formatLocaleTemplate(imageUpdateRejectedTpl, { code }),
     }),
     embeds: Object.freeze({
-      actions: Object.freeze({
-        'source-reveal': '显示源码',
-        'open-source': '打开来源',
-        retry: '重试',
-        copy: '复制',
-        'caret-before': '将光标置于之前',
-        'caret-after': '将光标置于之后',
-        'select-node': '选择嵌入内容',
-        delete: '删除',
-      }),
-      modes: Object.freeze({
-        article: '文章',
-        heading: '标题',
-        block: '内容块',
-      }),
-      name: (target: string, mode: string) => `嵌入内容 ${target}（${mode}）`,
-      region: '嵌入内容',
-      statuses: Object.freeze({
-        idle: '空闲',
-        pending: '加载中',
-        resolved: '已加载',
-        rejected: '已拒绝',
-        error: '加载失败',
-        missing: '内容缺失',
-        forbidden: '无权访问',
-        cycle: '检测到循环引用',
-        'depth-exceeded': '超出嵌套深度',
-        'size-exceeded': '超出大小限制',
-        'time-exceeded': '超出时间限制',
-        'mode-mismatch': '模式不匹配',
-        stale: '内容已过期',
-      }),
+      actions: readLocaleRecordStrings(
+        readLocaleSection(embedsRoot, 'actions'),
+        fallbackRoot.embeds.actions,
+      ),
+      modes: readLocaleRecordStrings(
+        readLocaleSection(embedsRoot, 'modes'),
+        fallbackRoot.embeds.modes,
+      ),
+      name: (target: string, mode: string) =>
+        formatLocaleTemplate(embedNameTpl, { target, mode }),
+      region: readLocaleString(embedsRoot, 'region', fallbackRoot.embeds.region),
+      statuses: readLocaleRecordStrings(
+        readLocaleSection(embedsRoot, 'statuses'),
+        fallbackRoot.embeds.statuses,
+      ),
     }),
     atomic: Object.freeze({
-      actionsRegion: (kind: string) => `${kind} 原子 Markdown 操作`,
-      editSource: (kind: string) => `编辑 ${kind} 源码`,
-      enterAfter: (kind: string) => `在 ${kind} 之后输入`,
-      enterBefore: (kind: string) => `在 ${kind} 之前输入`,
+      actionsRegion: (kind: string) =>
+        formatLocaleTemplate(atomicActionsRegionTpl, { kind }),
+      editSource: (kind: string) =>
+        formatLocaleTemplate(atomicEditSourceTpl, { kind }),
+      enterAfter: (kind: string) =>
+        formatLocaleTemplate(atomicEnterAfterTpl, { kind }),
+      enterBefore: (kind: string) =>
+        formatLocaleTemplate(atomicEnterBeforeTpl, { kind }),
     }),
-    contextual: Object.freeze({
-      anchorId: '锚点 ID',
-      apply: '应用',
-      cancel: '取消',
-      copy: '复制',
-      destination: '目标地址',
-      editAnchor: '编辑块锚点',
-      editLink: '编辑链接',
-      invalidAnchor: '锚点 ID 无效或已存在',
-      insertAnchor: '插入块锚点',
-      label: '显示文本',
-      open: '打开',
-      removeAnchor: '移除锚点',
-      removeLink: '移除链接并保留文本',
-      sourceReveal: '在源码中显示',
-      title: '标题',
-      unsafeUrl: '链接地址不安全或不受支持',
-    }),
-    commandGroups: Object.freeze({
-      block: '块',
-      format: '格式',
-      insert: '插入',
-    }),
-    surfaces: Object.freeze({
-      selectionToolbar: '选区工具',
-      slashMenu: '块插入命令',
-      commandPending: '命令执行中',
-      commandRejected: '命令执行失败',
-    }),
-    textarea: Object.freeze({
-      live: 'Markdown 实时编辑区',
-      source: 'Markdown 源码编辑区',
-    }),
-    states: Object.freeze({
-      disabled: '已禁用',
-      empty: '空文档',
-      loading: '加载中',
-      readonly: '只读',
-    }),
-    results: Object.freeze({
-      pending: '执行中',
-      'resolved-current': '已完成',
-      rejected: '执行失败',
-      aborted: '已取消',
-      stale: '结果已过期',
-      deleted: '目标已删除',
-    }),
-    capabilities: Object.freeze({
-      supported: '完整支持',
-      'unsupported-platform': '当前平台不支持',
-      'runtime-unavailable': '运行时不可用',
-      'projection-failed': '语法投影失败',
-      'feature-degraded': '部分功能降级',
-      fatal: '编辑器不可用',
-    }),
-    capabilityAnnouncement: (capability: string) => `编辑器能力：${capability}`,
-    overflow: '格式工具',
-    overflowAria: (count: number) => `格式工具，${count} 个工具`,
-    editorAria: 'Markdown 编辑器',
-    modeSwitcherAria: 'Markdown 模式',
-    metrics: Object.freeze({
-      bytes: '字节',
-      characters: '字符',
-      column: '列',
-      line: '行',
-      lines: '行数',
-      selected: '已选',
-      words: '词',
+    contextual: readLocaleRecordStrings(
+      readLocaleSection(root, 'contextual'),
+      fallbackRoot.contextual,
+    ),
+    commandGroups: Object.freeze(commandGroups),
+    surfaces: readLocaleRecordStrings(
+      readLocaleSection(root, 'surfaces'),
+      fallbackRoot.surfaces,
+    ),
+    textarea: readLocaleRecordStrings(
+      readLocaleSection(root, 'textarea'),
+      fallbackRoot.textarea,
+    ),
+    states: readLocaleRecordStrings(
+      readLocaleSection(root, 'states'),
+      fallbackRoot.states,
+    ),
+    results: readLocaleRecordStrings(
+      readLocaleSection(root, 'results'),
+      fallbackRoot.results,
+    ),
+    capabilities: readLocaleRecordStrings(
+      readLocaleSection(root, 'capabilities'),
+      fallbackRoot.capabilities,
+    ),
+    capabilityAnnouncement: (capability: string) =>
+      formatLocaleTemplate(capabilityAnnouncementTpl, { capability }),
+    overflow: readLocaleString(root, 'overflow', fallbackRoot.overflow),
+    overflowAria: (count: number) =>
+      formatLocaleTemplate(overflowAriaTpl, { count }),
+    editorAria: readLocaleString(root, 'editorAria', fallbackRoot.editorAria),
+    modeSwitcherAria: readLocaleString(
+      root,
+      'modeSwitcherAria',
+      fallbackRoot.modeSwitcherAria,
+    ),
+    metrics: readLocaleRecordStrings(
+      readLocaleSection(root, 'metrics'),
+      fallbackRoot.metrics,
+    ),
+    table: Object.freeze({
+      menuLabel: readLocaleString(
+        tableRoot,
+        'menuLabel',
+        fallbackRoot.table.menuLabel,
+      ),
+      actions: readLocaleRecordStrings(
+        readLocaleSection(tableRoot, 'actions'),
+        fallbackRoot.table.actions,
+      ),
     }),
   })
+}
+
+export const defaultMarkdownEditorLocaleText: MarkdownEditorLocaleText =
+  resolveMarkdownEditorLocaleFromLanguage(English)
 
 export type MarkdownEditorLocaleMutationKind =
   | 'hardcoded-copy'
@@ -1078,100 +1418,107 @@ export type MarkdownEditorLocaleMutationKind =
 
 export const resolveMarkdownEditorLocaleText = (
   localeText?: MarkdownEditorLocaleTextOverride,
+  base: MarkdownEditorLocaleText = defaultMarkdownEditorLocaleText,
 ): MarkdownEditorLocaleText => ({
-  ...defaultMarkdownEditorLocaleText,
+  ...base,
   ...localeText,
   actions: {
-    ...defaultMarkdownEditorLocaleText.actions,
+    ...base.actions,
     ...localeText?.actions,
   },
   commands: {
-    ...defaultMarkdownEditorLocaleText.commands,
+    ...base.commands,
     ...localeText?.commands,
   },
   metrics: {
-    ...defaultMarkdownEditorLocaleText.metrics,
+    ...base.metrics,
     ...localeText?.metrics,
   },
   modes: {
-    ...defaultMarkdownEditorLocaleText.modes,
+    ...base.modes,
     ...localeText?.modes,
   },
   pasteAsMarkdown: {
-    ...defaultMarkdownEditorLocaleText.pasteAsMarkdown,
+    ...base.pasteAsMarkdown,
     ...localeText?.pasteAsMarkdown,
     disabledDescriptions: {
-      ...defaultMarkdownEditorLocaleText.pasteAsMarkdown.disabledDescriptions,
+      ...base.pasteAsMarkdown.disabledDescriptions,
       ...localeText?.pasteAsMarkdown?.disabledDescriptions,
     },
   },
   commandPalette: {
-    ...defaultMarkdownEditorLocaleText.commandPalette,
+    ...base.commandPalette,
     ...localeText?.commandPalette,
   },
-  search: { ...defaultMarkdownEditorLocaleText.search, ...localeText?.search },
+  search: { ...base.search, ...localeText?.search },
   attachments: {
-    ...defaultMarkdownEditorLocaleText.attachments,
+    ...base.attachments,
     ...localeText?.attachments,
     actions: {
-      ...defaultMarkdownEditorLocaleText.attachments.actions,
+      ...base.attachments.actions,
       ...localeText?.attachments?.actions,
     },
   },
   imageProperties: {
-    ...defaultMarkdownEditorLocaleText.imageProperties,
+    ...base.imageProperties,
     ...localeText?.imageProperties,
   },
   embeds: {
-    ...defaultMarkdownEditorLocaleText.embeds,
+    ...base.embeds,
     ...localeText?.embeds,
     actions: {
-      ...defaultMarkdownEditorLocaleText.embeds.actions,
+      ...base.embeds.actions,
       ...localeText?.embeds?.actions,
     },
     modes: {
-      ...defaultMarkdownEditorLocaleText.embeds.modes,
+      ...base.embeds.modes,
       ...localeText?.embeds?.modes,
     },
     statuses: {
-      ...defaultMarkdownEditorLocaleText.embeds.statuses,
+      ...base.embeds.statuses,
       ...localeText?.embeds?.statuses,
     },
   },
-  atomic: { ...defaultMarkdownEditorLocaleText.atomic, ...localeText?.atomic },
+  atomic: { ...base.atomic, ...localeText?.atomic },
   commandGroups: {
-    ...defaultMarkdownEditorLocaleText.commandGroups,
+    ...base.commandGroups,
     ...localeText?.commandGroups,
   },
   contextual: {
-    ...defaultMarkdownEditorLocaleText.contextual,
+    ...base.contextual,
     ...localeText?.contextual,
   },
   surfaces: {
-    ...defaultMarkdownEditorLocaleText.surfaces,
+    ...base.surfaces,
     ...localeText?.surfaces,
   },
   textarea: {
-    ...defaultMarkdownEditorLocaleText.textarea,
+    ...base.textarea,
     ...localeText?.textarea,
   },
   states: {
-    ...defaultMarkdownEditorLocaleText.states,
+    ...base.states,
     ...localeText?.states,
   },
   results: {
-    ...defaultMarkdownEditorLocaleText.results,
+    ...base.results,
     ...localeText?.results,
   },
   capabilities: {
-    ...defaultMarkdownEditorLocaleText.capabilities,
+    ...base.capabilities,
     ...localeText?.capabilities,
   },
+  table: {
+    ...base.table,
+    ...localeText?.table,
+    actions: {
+      ...base.table.actions,
+      ...localeText?.table?.actions,
+    },
+  },
   capabilityAnnouncement:
-    localeText?.capabilityAnnouncement ??
-    defaultMarkdownEditorLocaleText.capabilityAnnouncement,
-  overflowAria:
-    localeText?.overflowAria ?? defaultMarkdownEditorLocaleText.overflowAria,
+    localeText?.capabilityAnnouncement ?? base.capabilityAnnouncement,
+  overflowAria: localeText?.overflowAria ?? base.overflowAria,
 })
 
 export const resolveMarkdownEditorCommandCopy = (

@@ -1,5 +1,15 @@
 # element-plus
 
+## 1.6.0-preview.11
+
+### Preview Changes
+
+- Ship public-preview candidate `@ozwasyd/element-plus@1.6.0-preview.11` (`preview` dist-tag on GitHub Packages).
+- **Published Declarations & Packaging (`#1129`)**: Switch `.d.ts` emission to `vue-tsc`'s `@vue/language-core` + `@volar/typescript` `proxyCreateProgram` engine in an isolated subprocess so all 1,267 package `.d.ts` files (including `ElSelect`, `ElOption`, `ElCascader`, `ElSlider`, `ElTimeSelect`, `pagination/sizes.vue`, and `date-picker/panel-utils`) emit with zero dropped files, preserve `defineExpose` public instance types (e.g. `ButtonInstance['ref']`) without leaking internal bindings, ship complete `@ozwasyd/element-plus/icons-vue` declarations (`305` files) without self-cycles, and gate dangling/circular `.d.ts` references in `prepare-npm-package`, `npm-candidate`, `build:package-smoke`, and `test:consumer-install`.
+- **Wasm LaTeX MathML (`#1130`)**: Fail closed on unrecognized characters/commands in `markdown_latex.cpp` via `token_kind::invalid` so unsupported LaTeX falls back cleanly to KaTeX instead of silently truncating formulas, while natively rendering spacing commands (`\,`, `\:`, `\;`, `\!`, `\ `) and common punctuation (`,`, `:`, `;`, `[`, `]`, `|`).
+- **Wasm Mermaid Dark Mode & Marker IDs (`#1131`)**: Theme Wasm Mermaid SVGs via `--el-bg-color-overlay`, `--el-border-color`, `--el-text-color-primary`, and `--el-text-color-secondary` with semantic classes (`mermaid-node`, `mermaid-label`, `mermaid-edge`, `mermaid-arrow`) and collision-free deterministic per-diagram marker IDs (`mermaid-arrow-<hash>-<index>`).
+- **ElMarkdownEditor Locale (`#1132`)**: Resolve default `ElMarkdownEditor` UI copy (modes, toolbar commands, actions, overflow, search, command palette, attachments, embeds, contextual surfaces, table actions, and capability announcements) from `ElConfigProvider` via `useLocale()`, ship complete `en` and `zh-cn` `el.markdownEditor` dictionaries with per-key `en` fallback, and retain `localeText` as per-instance override.
+
 ## 1.6.0-preview.10
 
 ### Preview Changes

@@ -148,7 +148,7 @@ describe('MarkdownEditor toolbar overflow geometry (#825 & #1103)', () => {
       expect(commands.element.contains(more.element)).toBe(false)
       expect(commands.element.parentElement).toBe(more.element.parentElement)
       expect(commands.findAll('button').map((button) => button.text())).toEqual(
-        ['标题', '链接'],
+        ['Heading', 'Link'],
       )
       expect(more.text()).toContain('7')
       expect(more.attributes('aria-expanded')).toBe('false')

@@ -165,7 +165,7 @@ preedit underlines remain natively visible, `forced-colors: active` restores nat
 `FieldText` textarea rendering, and documents longer than `50,000` characters restrict
 decoration to the active virtual window (`liveWindow.mountedNodeIds`). Mode changes do not
 rebuild textarea, history, or document identity. Public modes are only `source` / `live` /
-`split` / `preview`; there is no `write` alias, and the visible copy for source mode is 「源码」.
+`split` / `preview`; there is no `write` alias, and the default visible copy for source mode resolves from the active `ElConfigProvider` locale via `useLocale()` (`Source` in `en`, `源码` in `zh-cn`).
 
 Live capability uses only these six frozen tokens: `supported`, `unsupported-platform`,
 `runtime-unavailable`、`projection-failed`、`feature-degraded`、`fatal`。
@@ -255,9 +255,9 @@ an external reset or component unmount aborts the pending session. `statusDensit
 only the visible footer and does not hide the `aria-live` announcement for degraded/fatal
 capability; that announcement is localized through `localeText.capabilityAnnouncement`.
 
-`localeText` is the sole override authority for editor-owned visible copy, including modes,
+Default editor-owned visible copy resolves from the nearest `ElConfigProvider` locale via `useLocale()` (`el.markdownEditor` ships complete `en` and `zh-cn` translations, with per-key fallback to `en` for locales without `el.markdownEditor`). `localeText` remains the per-instance override authority on top of the active provider locale, covering modes,
 built-in commands, command groups, actions, palette, search/replace, attachments, image
-properties, embeds, atomic actions, selection/slash/contextual surfaces, textarea names,
+properties, embeds, atomic actions, table actions, selection/slash/contextual surfaces, textarea names,
 capability/result states, and status metric labels. The provider returns only stable status/reason
 codes; the editor resolves them through `localeText` at the display and ARIA boundaries rather
 than matching error-message strings. Extensions continue to provide their own command `label`,

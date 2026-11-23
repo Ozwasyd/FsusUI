@@ -159,7 +159,7 @@ describe('MarkdownEditor', () => {
       wrapper
         .findAll('.el-markdown-editor__commands > .el-markdown-editor__command')
         .map((item) => item.text()),
-    ).toEqual(['标题', '链接'])
+    ).toEqual(['Heading', 'Link'])
 
     const more = wrapper.find('.el-markdown-editor__command-more')
     expect(more.text()).toContain('更多格式')
@@ -167,7 +167,7 @@ describe('MarkdownEditor', () => {
     expect(more.attributes('aria-label')).toContain('更多格式')
     expect(
       wrapper.findAll('.el-markdown-editor__mode').map((item) => item.text()),
-    ).toEqual(['源码', '预览'])
+    ).toEqual(['Source', 'Preview'])
 
     await more.trigger('click')
     const tray = wrapper.find('.el-markdown-editor__command-tray')
@@ -195,10 +195,10 @@ describe('MarkdownEditor', () => {
     const trayButtons = wrapper
       .find('.el-markdown-editor__command-tray')
       .findAll('.el-markdown-editor__command')
-    expect(trayButtons.map((button) => button.text())).toContain('上传图片')
+    expect(trayButtons.map((button) => button.text())).toContain('Upload image')
 
     const uploadButton = trayButtons.find(
-      (button) => button.text() === '上传图片',
+      (button) => button.text() === 'Upload image',
     )
     if (!uploadButton) throw new Error('missing upload action in command tray')
 
@@ -323,7 +323,7 @@ describe('MarkdownEditor', () => {
     )
     expect(
       wrapper.findAll('.el-markdown-editor__action').map((item) => item.text()),
-    ).toEqual(['上传图片', '保存', '提交'])
+    ).toEqual(['Upload image', 'Save', 'Submit'])
     await wrapper.findAll('.el-markdown-editor__action')[0].trigger('click')
     const picker = wrapper.find<HTMLInputElement>(
       '.el-markdown-editor__attachment-picker',
@@ -341,10 +341,10 @@ describe('MarkdownEditor', () => {
     })
     expect(wrapper.emitted('upload-image')).toHaveLength(1)
     expect(wrapper.emitted('save')?.[0]).toEqual([
-      '# Preview![正在上传 preview.png…]()',
+      '# Preview![Uploading preview.png…]()',
     ])
     expect(wrapper.emitted('submit')?.[0]).toEqual([
-      '# Preview![正在上传 preview.png…]()',
+      '# Preview![Uploading preview.png…]()',
     ])
   })
 
@@ -385,7 +385,7 @@ describe('MarkdownEditor', () => {
     ).toBe(true)
     await nextTick()
     expect(wrapper.find('.el-markdown-editor__attachment-status').text()).toBe(
-      'report.pdf：已上传 50%',
+      'report.pdf: 50% uploaded',
     )
 
     expect(
@@ -408,7 +408,7 @@ describe('MarkdownEditor', () => {
       'Draft: [report.pdf](https://cdn.example/report.pdf)',
     )
     expect(wrapper.find('.el-markdown-editor__attachment-status').text()).toBe(
-      'report.pdf 上传完成',
+      'report.pdf uploaded',
     )
   })
 
@@ -435,17 +435,17 @@ describe('MarkdownEditor', () => {
       return owner.find('input')
     }
 
-    await field('目标地址').setValue(
+    await field('Destination').setValue(
       getMarkdownXssSourceUrl('mxss-url-javascript-link'),
     )
     await properties.find('button[type="submit"]').trigger('submit')
     expect(properties.find('[role="alert"]').text()).toContain('blocked-scheme')
     expect(wrapper.emitted('update:modelValue')).toBeUndefined()
 
-    await field('替代文本').setValue('可访问 alt 😀')
-    await field('目标地址').setValue('/safe/new.png')
-    await field('标题').setValue('updated title')
-    await field('题注').setValue('更新说明 😀 RTL אב')
+    await field('Alt text').setValue('可访问 alt 😀')
+    await field('Destination').setValue('/safe/new.png')
+    await field('Title').setValue('updated title')
+    await field('Caption').setValue('更新说明 😀 RTL אב')
     await properties.find('button[type="submit"]').trigger('submit')
     await nextTick()
     const edited =
@@ -454,7 +454,7 @@ describe('MarkdownEditor', () => {
 
     const removeImage = properties
       .findAll('button')
-      .find((button) => button.text() === '移除图像')
+      .find((button) => button.text() === 'Remove image')
     if (!removeImage) throw new Error('missing remove image action')
     await removeImage.trigger('click')
     expect(wrapper.emitted('update:modelValue')?.at(-1)?.[0]).toBe('')
@@ -664,14 +664,14 @@ describe('MarkdownEditor', () => {
     expect(commandButton.attributes('disabled')).toBeDefined()
     const pendingDescription = commandButton.attributes('aria-describedby')
     expect(pendingDescription).toBeTruthy()
-    expect(wrapper.find(`#${pendingDescription}`).text()).toBe('执行中')
+    expect(wrapper.find(`#${pendingDescription}`).text()).toBe('Running')
 
     await wrapper.setProps({
       documentIdentity: { epoch: 1, id: 'document-b' },
       modelValue: 'A',
     })
     expect(commandSignal?.aborted).toBe(true)
-    expect(wrapper.find(`#${pendingDescription}`).text()).toBe('已取消')
+    expect(wrapper.find(`#${pendingDescription}`).text()).toBe('Cancelled')
     expect(wrapper.vm.undo()).toMatchObject({
       accepted: false,
       reason: 'no-history',
@@ -1047,7 +1047,7 @@ describe('MarkdownEditor', () => {
 
     expect(drop.defaultPrevented).toBe(true)
     expect(wrapper.emitted('update:modelValue')?.at(-1)?.[0]).toBe(
-      'ab![正在上传 drop.png…]()cd',
+      'ab![Uploading drop.png…]()cd',
     )
     Reflect.deleteProperty(document, 'caretPositionFromPoint')
   })
@@ -1140,7 +1140,7 @@ describe('MarkdownEditor', () => {
         `el-markdown-editor--chrome-${chrome}`,
       )
       expect(wrapper.findAll('[role="region"]')).toHaveLength(1)
-      expect(wrapper.find('[aria-label="Markdown 编辑器"]').exists()).toBe(true)
+      expect(wrapper.find('[aria-label="Markdown editor"]').exists()).toBe(true)
 
       if (chrome === 'minimal') {
         expect(wrapper.find('.el-markdown-editor__toolbar').exists()).toBe(
@@ -1178,11 +1178,11 @@ describe('MarkdownEditor', () => {
 
       const root = wrapper.element
       expect(wrapper.classes()).toContain(`el-markdown-editor--${mode}`)
-      expect(wrapper.find('[aria-label="Markdown 编辑器"]').exists()).toBe(true)
+      expect(wrapper.find('[aria-label="Markdown editor"]').exists()).toBe(true)
 
       await wrapper.setProps({ chrome: 'minimal' })
       expect(wrapper.element).toBe(root)
-      expect(wrapper.find('[aria-label="Markdown 编辑器"]').exists()).toBe(true)
+      expect(wrapper.find('[aria-label="Markdown editor"]').exists()).toBe(true)
 
       const textarea = wrapper.find('textarea')
       expect(textarea.exists()).toBe(true)
@@ -1337,7 +1337,7 @@ describe('MarkdownEditor', () => {
     await textarea.trigger('select')
     const sourceTab = wrapper
       .findAll('[role="tab"]')
-      .find((button) => button.text() === '源码')
+      .find((button) => button.text() === 'Source')
     expect(sourceTab).toBeTruthy()
     await sourceTab!.trigger('click')
     await nextTick()
@@ -1378,7 +1378,7 @@ describe('MarkdownEditor', () => {
         props: { chrome, modelValue: 'focus contract' },
       })
 
-      expect(wrapper.find('[aria-label="Markdown 编辑器"]').exists()).toBe(true)
+      expect(wrapper.find('[aria-label="Markdown editor"]').exists()).toBe(true)
       expect(wrapper.find('textarea').attributes('aria-label')).toBeTruthy()
       expect(wrapper.classes()).not.toContain(
         'el-markdown-editor--surface-card',

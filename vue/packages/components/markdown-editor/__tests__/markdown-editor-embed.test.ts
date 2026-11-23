@@ -301,11 +301,11 @@ describe('markdown embed safe presentation and atomic interaction', () => {
     expect(embed.text()).toContain('Safe summary')
     expect(embed.text()).not.toContain('__FSUS_XSS__')
     expect(wrapper.html()).not.toContain('<script>')
-    expect(embed.text()).toContain('打开来源')
+    expect(embed.text()).toContain('Open source')
 
     const sourceReveal = embed
       .findAll<HTMLButtonElement>('.el-markdown-embed__action')
-      .find((button) => button.text() === '显示源码')
+      .find((button) => button.text() === 'Reveal source')
     expect(sourceReveal).toBeTruthy()
     await sourceReveal!.trigger('click')
     await nextTick()

@@ -12,6 +12,7 @@ import {
   readlinkSync,
   renameSync,
   rmSync,
+  statSync,
   writeFileSync,
 } from 'node:fs'
 import os from 'node:os'
@@ -142,6 +143,119 @@ function validatePackageShape(packageRoot, packageJson) {
     )
   }
   validateDependencyManifest(packageJson)
+  validateDeclarationGraph(packageRoot, packageJson)
+}
+
+const stripDtsComments = (source) =>
+  source.replace(
+    /(["'`])(?:\\.|(?!\1)[^\\])*\1|\/\*[\s\S]*?\*\/|\/\/[^\n]*/gu,
+    (match, quote) => (quote ? match : ''),
+  )
+
+const isCandidateFile = (filePath) => {
+  try {
+    return statSync(filePath).isFile()
+  } catch {
+    return false
+  }
+}
+
+const resolveCandidateRelativeDts = (fromFile, specifier) => {
+  const base = path.resolve(path.dirname(fromFile), specifier)
+  const candidates = [
+    base,
+    `${base}.d.ts`,
+    `${base}.d.mts`,
+    `${base}.d.cts`,
+    path.join(base, 'index.d.ts'),
+    path.join(base, 'index.d.mts'),
+    path.join(base, 'index.d.cts'),
+  ]
+  if (/\.(?:mjs|cjs|js)$/u.test(base)) {
+    const stem = base.replace(/\.(?:mjs|cjs|js)$/u, '')
+    candidates.push(`${stem}.d.ts`, `${stem}.d.mts`, `${stem}.d.cts`)
+  }
+  return candidates.find(isCandidateFile) ?? null
+}
+
+function validateDeclarationGraph(packageRoot, packageJson) {
+  const dtsFiles = collectFiles(packageRoot).filter(
+    (filePath) =>
+      !lstatSync(filePath).isSymbolicLink() && /\.d\.[cm]?ts$/u.test(filePath),
+  )
+
+  const selfExportSpecifiersByTarget = new Map()
+  const recordSelfTarget = (exportKey, target) => {
+    if (typeof target !== 'string' || !target.startsWith('./') || target.includes('*')) {
+      return
+    }
+    const normalizedTarget = path.normalize(target).replace(/\\/gu, '/')
+    const specifier =
+      exportKey === '.'
+        ? packageJson.name
+        : `${packageJson.name}/${exportKey.replace(/^\.\//u, '')}`
+    const existing = selfExportSpecifiersByTarget.get(normalizedTarget) ?? new Set()
+    existing.add(specifier)
+    selfExportSpecifiersByTarget.set(normalizedTarget, existing)
+  }
+  if (packageJson.exports && typeof packageJson.exports === 'object') {
+    for (const [exportKey, value] of Object.entries(packageJson.exports)) {
+      if (typeof value === 'string') {
+        recordSelfTarget(exportKey, value)
+      } else if (value && typeof value === 'object') {
+        if (typeof value.types === 'string') {
+          recordSelfTarget(exportKey, value.types)
+        }
+        for (const nested of Object.values(value)) {
+          if (nested && typeof nested === 'object' && typeof nested.types === 'string') {
+            recordSelfTarget(exportKey, nested.types)
+          }
+        }
+      }
+    }
+  }
+
+  const broken = []
+  const selfCycles = []
+  const relPatterns = [
+    /\bfrom\s+['"](\.[^'"]+)['"]/gu,
+    /\bimport\s*\(\s*['"](\.[^'"]+)['"]\s*\)/gu,
+    /\bimport\s+['"](\.[^'"]+)['"]/gu,
+  ]
+  for (const filePath of dtsFiles) {
+    const cleaned = stripDtsComments(readFileSync(filePath, 'utf8'))
+    const relTarget = path.relative(packageRoot, filePath).replace(/\\/gu, '/')
+    for (const pattern of relPatterns) {
+      pattern.lastIndex = 0
+      for (const match of cleaned.matchAll(pattern)) {
+        const specifier = match[1]
+        if (!resolveCandidateRelativeDts(filePath, specifier)) {
+          broken.push(`${relTarget} -> ${specifier}`)
+        }
+      }
+    }
+    const ownSpecifiers = selfExportSpecifiersByTarget.get(relTarget)
+    if (ownSpecifiers) {
+      for (const match of cleaned.matchAll(/\bexport\s+\*\s+from\s+['"]([^'"]+)['"]/gu)) {
+        if (ownSpecifiers.has(match[1])) {
+          selfCycles.push(`${relTarget} -> ${match[1]}`)
+        }
+      }
+    }
+  }
+
+  if (broken.length > 0) {
+    throw new Error(
+      `Candidate declaration graph has dangling relative import(s): ${broken
+        .slice(0, 15)
+        .join(', ')}`,
+    )
+  }
+  if (selfCycles.length > 0) {
+    throw new Error(
+      `Candidate declaration graph has self-referencing export cycle(s): ${selfCycles.join(', ')}`,
+    )
+  }
 }
 
 const PUBLIC_NPM_REGISTRY = 'https://npm.pkg.github.com'

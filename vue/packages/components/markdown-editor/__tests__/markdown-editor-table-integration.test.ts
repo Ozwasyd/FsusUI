@@ -26,8 +26,10 @@ describe('MarkdownEditor table integration', () => {
     await textarea.setValue(source)
     const offset = source.indexOf('Column 1')
     await selectOffset(wrapper, offset)
-    expect(wrapper.find('button[aria-label="表格操作"]').exists()).toBe(true)
-    expect(wrapper.find('[role="menu"][aria-label="表格操作"]').exists()).toBe(false)
+    expect(wrapper.find('button[aria-label="Table actions"]').exists()).toBe(true)
+    expect(
+      wrapper.find('[role="menu"][aria-label="Table actions"]').exists(),
+    ).toBe(false)
   })
 
   it('anchors the active cell with source identity and renders contextual actions', async () => {
@@ -43,8 +45,10 @@ describe('MarkdownEditor table integration', () => {
     expect(identity).toMatchObject({ row: 2, column: 0, status: 'current' })
     expect(identity?.cellId).toContain(':cell:')
     expect(identity?.anchor).toEqual(expect.objectContaining({ start: expect.any(Number) }))
-    expect(wrapper.find('button[aria-label="表格操作"]').exists()).toBe(true)
-    expect(wrapper.find('[role="menu"][aria-label="表格操作"]').exists()).toBe(false)
+    expect(wrapper.find('button[aria-label="Table actions"]').exists()).toBe(true)
+    expect(
+      wrapper.find('[role="menu"][aria-label="Table actions"]').exists(),
+    ).toBe(false)
   })
 
   it('uses the selected row for contextual structure actions', async () => {
@@ -52,10 +56,10 @@ describe('MarkdownEditor table integration', () => {
     const offset = source.lastIndexOf('|  |  |') + 2
     await selectOffset(wrapper, offset)
 
-    await wrapper.get('button[aria-label="表格操作"]').trigger('click')
+    await wrapper.get('button[aria-label="Table actions"]').trigger('click')
     const button = wrapper
-      .findAll('[role="menu"][aria-label="表格操作"] button')
-      .find((item) => item.attributes('aria-label') === '在下方插入行')
+      .findAll('[role="menu"][aria-label="Table actions"] button')
+      .find((item) => item.attributes('aria-label') === 'Insert row below')
     if (!button) throw new Error('missing insert-row action')
     await button.trigger('click')
 
@@ -150,13 +154,13 @@ describe('MarkdownEditor table integration', () => {
   it('invalidates the active table cell on an external document reset', async () => {
     const wrapper = mount(MarkdownEditor, { props: { modelValue: source } })
     await selectOffset(wrapper, source.indexOf('Column 1'))
-    expect(wrapper.find('button[aria-label="表格操作"]').exists()).toBe(true)
+    expect(wrapper.find('button[aria-label="Table actions"]').exists()).toBe(true)
 
     await wrapper.setProps({
       modelValue: '| replacement |\n| --- |\n| document |\n',
     })
     await nextTick()
-    expect(wrapper.find('button[aria-label="表格操作"]').exists()).toBe(false)
+    expect(wrapper.find('button[aria-label="Table actions"]').exists()).toBe(false)
   })
 
   it('retains the same table cell selection through source, live, and split modes', async () => {
@@ -177,7 +181,9 @@ describe('MarkdownEditor table integration', () => {
       expect({ end: current.selectionEnd, start: current.selectionStart }).toEqual(
         initial,
       )
-      expect(wrapper.find('button[aria-label="表格操作"]').exists()).toBe(true)
+      expect(wrapper.find('button[aria-label="Table actions"]').exists()).toBe(
+        true,
+      )
     }
   })
 })

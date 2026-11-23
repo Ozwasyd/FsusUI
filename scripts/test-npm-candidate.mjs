@@ -282,6 +282,60 @@ try {
     'private registry fixture',
   )
 
+  const danglingDtsRoot = path.join(tempRoot, 'dangling-dts-package')
+  makePackage(danglingDtsRoot)
+  mkdirSync(path.join(danglingDtsRoot, 'es/components/select'), {
+    recursive: true,
+  })
+  writeFileSync(
+    path.join(danglingDtsRoot, 'es/index.d.ts'),
+    "export * from './components/select'\n",
+  )
+  assertThrows(
+    () =>
+      createCandidate({
+        repoRoot,
+        packageRoot: danglingDtsRoot,
+        outputDir: path.join(tempRoot, 'dangling-dts-candidate'),
+        commitSha,
+      }),
+    /dangling relative import/iu,
+    'dangling dts relative import fixture',
+  )
+
+  const circularDtsRoot = path.join(tempRoot, 'circular-dts-package')
+  makePackage(circularDtsRoot, {
+    exports: {
+      './icons-vue': {
+        types: './es/icons-vue.d.ts',
+        import: './es/icons-vue.mjs',
+      },
+      './es/icons-vue': {
+        types: './es/icons-vue.d.ts',
+        import: './es/icons-vue.mjs',
+      },
+    },
+  })
+  writeFileSync(
+    path.join(circularDtsRoot, 'es/icons-vue.mjs'),
+    'export const ArrowDown = {}\n',
+  )
+  writeFileSync(
+    path.join(circularDtsRoot, 'es/icons-vue.d.ts'),
+    "export * from '@ozwasyd/element-plus/es/icons-vue'\n",
+  )
+  assertThrows(
+    () =>
+      createCandidate({
+        repoRoot,
+        packageRoot: circularDtsRoot,
+        outputDir: path.join(tempRoot, 'circular-dts-candidate'),
+        commitSha,
+      }),
+    /self-referencing export cycle/iu,
+    'self-referencing dts export fixture',
+  )
+
   const tampered = createFixture('tampered')
   appendFileSync(tampered.tarball, 'tampered')
   assertThrows(

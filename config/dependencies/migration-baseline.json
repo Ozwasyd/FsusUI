@@ -5,7 +5,7 @@
   "files": {
     "pnpm-lock.yaml": "9160eda59f2ebd9e27701d9df9718ccb7b327ceb83d418310ef542b1651451d7",
     "package.json": "07c2588be533c4c5f36febd8cae47ec23410172550651342c5b49db73cb8a806",
-    "vue/packages/element-plus/package.json": "dfe9292f5256c5b482d30c53dac7afcc09f38865296d8970b561fe9490588682",
+    "vue/packages/element-plus/package.json": "6359d12da2aad96da2537d32c5b13e6e8a113a8efa5b30dbeaefa7f7da358ddb",
     "config/dependencies/npm-authority.json": "cbbfc945c7fbc24bb65fe2c94074bb552494cc1e16c2f7ad0d087835fb14df13"
   },
   "installPackageCount": 94,

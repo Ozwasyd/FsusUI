@@ -963,7 +963,136 @@ if (existsSync(distNpmrcPath)) {
   unlinkSync(distNpmrcPath)
 }
 
+const stripDeclarationComments = (source) =>
+  source.replace(
+    /(["'`])(?:\\.|(?!\1)[^\\])*\1|\/\*[\s\S]*?\*\/|\/\/[^\n]*/gu,
+    (match, quote) => (quote ? match : ''),
+  )
+
+const isRegularFile = (filePath) => {
+  try {
+    return statSync(filePath).isFile()
+  } catch {
+    return false
+  }
+}
+
+const resolveRelativeDeclarationFile = (fromFile, specifier) => {
+  const base = path.resolve(path.dirname(fromFile), specifier)
+  const candidates = [
+    base,
+    `${base}.d.ts`,
+    `${base}.d.mts`,
+    `${base}.d.cts`,
+    path.join(base, 'index.d.ts'),
+    path.join(base, 'index.d.mts'),
+    path.join(base, 'index.d.cts'),
+  ]
+  if (/\.(?:mjs|cjs|js)$/u.test(base)) {
+    const stem = base.replace(/\.(?:mjs|cjs|js)$/u, '')
+    candidates.push(`${stem}.d.ts`, `${stem}.d.mts`, `${stem}.d.cts`)
+  }
+  return candidates.find(isRegularFile) ?? null
+}
+
+function assertDeclarationIntegrity(distRoot, packageName) {
+  const roots = ['es', 'lib']
+    .map((dir) => path.join(distRoot, dir))
+    .filter((dir) => existsSync(dir))
+  const declarationFiles = []
+  const walk = (dir) => {
+    for (const entry of readdirSync(dir, { withFileTypes: true })) {
+      const full = path.join(dir, entry.name)
+      if (entry.isDirectory()) {
+        walk(full)
+      } else if (entry.isFile() && /\.d\.[cm]?ts$/u.test(entry.name)) {
+        declarationFiles.push(full)
+      }
+    }
+  }
+  roots.forEach(walk)
+
+  if (declarationFiles.length === 0) {
+    throw new Error('Published package contains no declaration files under es/ or lib/.')
+  }
+
+  const broken = []
+  const specifierPatterns = [
+    /\bfrom\s+['"](\.[^'"]+)['"]/gu,
+    /\bimport\s*\(\s*['"](\.[^'"]+)['"]\s*\)/gu,
+    /\bimport\s+['"](\.[^'"]+)['"]/gu,
+  ]
+  for (const filePath of declarationFiles) {
+    const cleaned = stripDeclarationComments(readFileSync(filePath, 'utf8'))
+    for (const pattern of specifierPatterns) {
+      pattern.lastIndex = 0
+      for (const match of cleaned.matchAll(pattern)) {
+        const specifier = match[1]
+        if (!resolveRelativeDeclarationFile(filePath, specifier)) {
+          broken.push(`${path.relative(distRoot, filePath)} -> ${specifier}`)
+        }
+      }
+    }
+  }
+  if (broken.length > 0) {
+    throw new Error(
+      `Published declaration graph has ${broken.length} dangling relative import(s):\n${broken.slice(0, 25).join('\n')}`,
+    )
+  }
+
+  for (const sub of ['es', 'lib']) {
+    const iconsWrapperPath = path.join(distRoot, sub, 'icons-vue.d.ts')
+    if (!isRegularFile(iconsWrapperPath)) {
+      throw new Error(`Published package is missing ${sub}/icons-vue.d.ts.`)
+    }
+    const iconsWrapper = readFileSync(iconsWrapperPath, 'utf8')
+    if (
+      iconsWrapper.includes(`${packageName}/es/icons-vue`) ||
+      iconsWrapper.includes(`${packageName}/lib/icons-vue`) ||
+      iconsWrapper.includes(`${packageName}/icons-vue`)
+    ) {
+      throw new Error(
+        `Published ${sub}/icons-vue.d.ts must not self-reference ${packageName}/icons-vue.`,
+      )
+    }
+    for (const requiredRel of [
+      `${sub}/icons-vue/index.d.ts`,
+      `${sub}/icons-vue/components/index.d.ts`,
+      `${sub}/components/select/index.d.ts`,
+      `${sub}/components/cascader/index.d.ts`,
+      `${sub}/components/slider/index.d.ts`,
+      `${sub}/components/time-select/index.d.ts`,
+      `${sub}/components/pagination/src/components/sizes.vue.d.ts`,
+      `${sub}/components/date-picker/src/panel-utils.d.ts`,
+      `${sub}/components/button/src/button.vue.d.ts`,
+    ]) {
+      if (!isRegularFile(path.join(distRoot, requiredRel))) {
+        throw new Error(`Published package is missing required declaration ${requiredRel}.`)
+      }
+    }
+    const iconsIndex = readFileSync(
+      path.join(distRoot, sub, 'icons-vue/components/index.d.ts'),
+      'utf8',
+    )
+    if (!/\bArrowDown\b/u.test(iconsIndex)) {
+      throw new Error(
+        `Published ${sub}/icons-vue/components/index.d.ts must export ArrowDown.`,
+      )
+    }
+    const buttonDts = readFileSync(
+      path.join(distRoot, sub, 'components/button/src/button.vue.d.ts'),
+      'utf8',
+    )
+    if (!/\bref\s*:/u.test(buttonDts) || /\b_ref\s*:/u.test(buttonDts)) {
+      throw new Error(
+        `Published ${sub}/components/button/src/button.vue.d.ts must expose defineExpose 'ref' and must not leak internal '_ref'.`,
+      )
+    }
+  }
+}
+
 if (strict) {
+  assertDeclarationIntegrity(distRoot, packageName)
   assertNoSecretsOrRawSources(distRoot)
 }
 
