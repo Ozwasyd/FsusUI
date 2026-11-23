@@ -79,6 +79,165 @@ const wasmPublicTypeExports = [
 
 const normalizeSlashes = (filePath: string) => filePath.replace(/\\/gu, '/')
 
+const VUE_PEER_FLOOR_SENTINEL =
+  /DefineComponent|CreateComponentPublicInstanceWithMixins|ComponentPublicInstance|ShallowRef|import\(["']vue["']\)\.(?:Attrs|ClassValue)/u
+
+const normalizeVuePeerFloorDeclarations = (
+  ts: typeof TsNamespace,
+  declaration: string,
+) => {
+  if (!VUE_PEER_FLOOR_SENTINEL.test(declaration)) {
+    return declaration
+  }
+
+  const sf = ts.createSourceFile(
+    'declaration.d.ts',
+    declaration,
+    ts.ScriptTarget.Latest,
+    true,
+    ts.ScriptKind.TS,
+  )
+
+  const vueLocalToExported = new Map<string, string>()
+  for (const stmt of sf.statements) {
+    if (
+      ts.isImportDeclaration(stmt) &&
+      ts.isStringLiteral(stmt.moduleSpecifier) &&
+      stmt.moduleSpecifier.text === 'vue'
+    ) {
+      const bindings = stmt.importClause?.namedBindings
+      if (bindings && ts.isNamedImports(bindings)) {
+        for (const el of bindings.elements) {
+          vueLocalToExported.set(
+            el.name.text,
+            (el.propertyName ?? el.name).text,
+          )
+        }
+      }
+    }
+  }
+
+  const edits: Array<{ start: number; end: number; replacement: string }> = []
+
+  const visit = (node: TsNamespace.Node) => {
+    let vueSymbol: string | undefined
+    let typeArgs: TsNamespace.NodeArray<TsNamespace.TypeNode> | undefined
+
+    if (
+      ts.isImportTypeNode(node) &&
+      node.qualifier &&
+      ts.isIdentifier(node.qualifier) &&
+      ts.isLiteralTypeNode(node.argument) &&
+      ts.isStringLiteral(node.argument.literal) &&
+      node.argument.literal.text === 'vue'
+    ) {
+      vueSymbol = node.qualifier.text
+      typeArgs = node.typeArguments
+      if (!typeArgs) {
+        if (vueSymbol === 'Attrs') {
+          edits.push({
+            start: node.getStart(sf),
+            end: node.getEnd(),
+            replacement: 'import("vue").ComponentPublicInstance["$attrs"]',
+          })
+          return
+        }
+        if (vueSymbol === 'ClassValue') {
+          edits.push({
+            start: node.getStart(sf),
+            end: node.getEnd(),
+            replacement: 'import("vue").HTMLAttributes["class"]',
+          })
+          return
+        }
+      }
+    } else if (
+      ts.isTypeReferenceNode(node) &&
+      ts.isIdentifier(node.typeName) &&
+      vueLocalToExported.has(node.typeName.text)
+    ) {
+      vueSymbol = vueLocalToExported.get(node.typeName.text)
+      typeArgs = node.typeArguments
+    }
+
+    if (vueSymbol && typeArgs) {
+      // Vue 3.5.14+ appended `TypeEl extends Element = any` to DefineComponent (20th),
+      // ComponentPublicInstance (15th), and CreateComponentPublicInstanceWithMixins (18th),
+      // and `S = T` to ShallowRef (2nd). Trim those redundant default args so published
+      // declarations remain valid across the entire `vue: ^3.5.0` peer range.
+      if (
+        vueSymbol === 'DefineComponent' &&
+        typeArgs.length === 20 &&
+        typeArgs[19].getText(sf).trim() === 'any'
+      ) {
+        edits.push({
+          start: typeArgs[18].end,
+          end: typeArgs[19].end,
+          replacement: '',
+        })
+      } else if (
+        vueSymbol === 'CreateComponentPublicInstanceWithMixins' &&
+        typeArgs.length === 26 &&
+        typeArgs[17].getText(sf).trim() === 'any' &&
+        typeArgs[18].getText(sf).trim() ===
+          'import("vue").ComponentProvideOptions'
+      ) {
+        edits.push({
+          start: typeArgs[16].end,
+          end: typeArgs[25].end,
+          replacement: '',
+        })
+      } else if (
+        vueSymbol === 'ComponentPublicInstance' &&
+        typeArgs.length === 15 &&
+        typeArgs[14].getText(sf).trim() === 'any'
+      ) {
+        edits.push({
+          start: typeArgs[13].end,
+          end: typeArgs[14].end,
+          replacement: '',
+        })
+      } else if (
+        vueSymbol === 'ShallowRef' &&
+        typeArgs.length === 2 &&
+        typeArgs[0].getText(sf).trim() === typeArgs[1].getText(sf).trim()
+      ) {
+        edits.push({
+          start: typeArgs[0].end,
+          end: typeArgs[1].end,
+          replacement: '',
+        })
+      }
+    }
+
+    ts.forEachChild(node, visit)
+  }
+
+  visit(sf)
+  if (edits.length === 0) {
+    return declaration
+  }
+
+  edits.sort((a, b) => a.start - b.start || b.end - a.end)
+  const nonOverlapping: typeof edits = []
+  let coveredEnd = -1
+  for (const edit of edits) {
+    if (edit.start < coveredEnd) {
+      continue
+    }
+    nonOverlapping.push(edit)
+    coveredEnd = edit.end
+  }
+
+  let output = declaration
+  for (let i = nonOverlapping.length - 1; i >= 0; i -= 1) {
+    const edit = nonOverlapping[i]
+    output =
+      output.slice(0, edit.start) + edit.replacement + output.slice(edit.end)
+  }
+  return output
+}
+
 const assertPortableDeclarationContent = (
   declaration: string,
   label: string,
@@ -148,7 +307,7 @@ const writeWasmDeclarationOwner = async () => {
   )
 }
 
-const writeIconsVueDeclarationOwner = async () => {
+const writeIconsVueDeclarationOwner = async (ts: typeof TsNamespace) => {
   const declarationFiles = await glob('**/*.d.ts', {
     cwd: iconsVueTypesDir,
     onlyFiles: true,
@@ -168,7 +327,10 @@ const writeIconsVueDeclarationOwner = async () => {
       const sourcePath = path.join(iconsVueTypesDir, relativeFile)
       const destinationPath = path.join(iconsVuePublishedTypesDir, relativeFile)
       const sourceDeclaration = await readFile(sourcePath, 'utf8')
-      const publishedDeclaration = pathRewriter('esm')(sourceDeclaration)
+      const publishedDeclaration = normalizeVuePeerFloorDeclarations(
+        ts,
+        pathRewriter('esm')(sourceDeclaration),
+      )
       assertPortableDeclarationContent(
         publishedDeclaration,
         `icons-vue published declaration (${relativeFile})`,
@@ -449,7 +611,11 @@ const runGenerateTypesDefinitions = async () => {
       recursive: true,
     })
 
-    await writeFile(filepath, pathRewriter('esm')(declaration), 'utf8')
+    await writeFile(
+      filepath,
+      normalizeVuePeerFloorDeclarations(ts, pathRewriter('esm')(declaration)),
+      'utf8',
+    )
   })
 
   await Promise.all(tasks)
@@ -458,7 +624,7 @@ const runGenerateTypesDefinitions = async () => {
   )
 
   await writeWasmDeclarationOwner()
-  await writeIconsVueDeclarationOwner()
+  await writeIconsVueDeclarationOwner(ts)
 }
 
 const runGenerateTypesDefinitionsInSubprocess = () =>
