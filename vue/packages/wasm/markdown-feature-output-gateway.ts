@@ -957,6 +957,8 @@ const sanitizeMermaidRoot = (
   return true
 }
 
+const CANONICAL_BLOCK_ANCHOR_ID = /^[a-z][a-z0-9-]{0,63}$/u
+
 export const commitMarkdownFeatureOutput = (
   target: HTMLElement,
   output: FeatureRenderOutput,
@@ -991,6 +993,10 @@ export const commitMarkdownFeatureOutput = (
       throw new Error('code-highlight_output_commit_mode_invalid')
     }
     const replacement = root as HTMLElement
+    const preservedId = target.getAttribute('id')
+    if (preservedId && CANONICAL_BLOCK_ANCHOR_ID.test(preservedId)) {
+      replacement.setAttribute('id', preservedId)
+    }
     target.replaceWith(replacement)
     return replacement
   }

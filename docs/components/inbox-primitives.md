@@ -66,6 +66,8 @@ These primitives cover the reusable display grammar for list/detail, inbox, tick
 
 Use `mobile-pane="list"` to show the list pane on narrow screens and `mobile-pane="detail"` to show the detail pane. FsusUI controls only visibility and layout. Downstream apps should provide the back action slot and decide when focus moves after a selection.
 
+On narrow containers (`<= 559px` via container query on `FsusThreadPanel`), the thread header automatically wraps `#back` and `#actions` onto a control row above the full-width heading (or places `#actions` below the full-width heading when `#back` is absent), preventing long button labels from squeezing the thread title into narrow columns.
+
 ```vue
 <FsusInboxLayout :selected="selected" :mobile-pane="mobilePane">
   <template #list>...</template>

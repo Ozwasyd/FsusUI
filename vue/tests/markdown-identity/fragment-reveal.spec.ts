@@ -76,3 +76,59 @@ test('a newer reveal cancels the older request and unmount settles a pending rev
   })
   expect(observed).toEqual({ old: false, latest: true, unmounted: false })
 })
+
+test('preserves explicit fenced-code fragment IDs after Shiki code highlighting activates', async ({
+  page,
+}) => {
+  const observed = await page.evaluate(async () => {
+    const inspect = async (codeHighlight: boolean) => {
+      const fixture =
+        await window.mountHighlightedCodeFragmentFixture(codeHighlight)
+      try {
+        await fixture.renderComplete
+        const pre = fixture.host.querySelector('pre')
+        const sampleMatches = fixture.host.querySelectorAll('#sample').length
+        const located = fixture.renderer.locateFragment('#sample')
+        const revealed = await fixture.renderer.revealFragment('#sample')
+        return {
+          highlighted: pre?.getAttribute('data-code-highlighted') ?? '',
+          codeId: pre?.id ?? '',
+          sampleMatches,
+          found: located.found,
+          mounted: located.mounted,
+          revealedOk: revealed.ok,
+          headingFound: fixture.renderer.locateFragment('#harbor').found,
+          paragraphFound: fixture.renderer.locateFragment('#detail').found,
+        }
+      } finally {
+        fixture.unmount()
+      }
+    }
+
+    return {
+      withoutHighlight: await inspect(false),
+      withHighlight: await inspect(true),
+    }
+  })
+
+  expect(observed.withoutHighlight).toEqual({
+    highlighted: '',
+    codeId: 'sample',
+    sampleMatches: 1,
+    found: true,
+    mounted: true,
+    revealedOk: true,
+    headingFound: true,
+    paragraphFound: true,
+  })
+  expect(observed.withHighlight).toEqual({
+    highlighted: 'shiki',
+    codeId: 'sample',
+    sampleMatches: 1,
+    found: true,
+    mounted: true,
+    revealedOk: true,
+    headingFound: true,
+    paragraphFound: true,
+  })
+})

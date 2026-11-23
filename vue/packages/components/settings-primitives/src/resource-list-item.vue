@@ -2,20 +2,20 @@
   <div :class="itemKls" role="listitem">
     <div :class="ns.e('content')">
       <div :class="ns.e('main')">
-        <div v-if="hasTitle || hasBadge" :class="ns.e('title-row')">
-          <strong v-if="hasTitle" :class="ns.e('title')">
+        <div v-if="hasTitle() || hasBadge()" :class="ns.e('title-row')">
+          <strong v-if="hasTitle()" :class="ns.e('title')">
             <slot name="title">{{ title }}</slot>
           </strong>
-          <span v-if="hasBadge" :class="ns.e('badge')">
+          <span v-if="hasBadge()" :class="ns.e('badge')">
             <slot name="badge" />
           </span>
         </div>
-        <div v-if="hasMeta" :class="ns.e('meta')">
+        <div v-if="hasMeta()" :class="ns.e('meta')">
           <slot name="meta">{{ description }}</slot>
         </div>
         <slot />
       </div>
-      <div v-if="hasActions" :class="ns.e('actions')">
+      <div v-if="hasActions()" :class="ns.e('actions')">
         <slot name="actions" />
       </div>
     </div>
@@ -35,9 +35,9 @@ const props = defineProps(resourceListItemProps)
 const slots = useSlots()
 const ns = useNamespace('resource-list-item')
 
-const hasTitle = computed(() => Boolean(props.title || slots.title))
-const hasMeta = computed(() => Boolean(props.description || slots.meta))
-const hasBadge = computed(() => Boolean(slots.badge))
-const hasActions = computed(() => Boolean(slots.actions))
+const hasTitle = () => Boolean(props.title || slots.title)
+const hasMeta = () => Boolean(props.description || slots.meta)
+const hasBadge = () => Boolean(slots.badge)
+const hasActions = () => Boolean(slots.actions)
 const itemKls = computed(() => [ns.b(), ns.m(props.density)])
 </script>

@@ -46,21 +46,24 @@ $checkbox-bordered-input-width: map.merge(
   cursor: pointer;
   display: inline-flex;
   align-items: center;
-  white-space: nowrap;
+  white-space: normal;
+  max-width: 100%;
+  box-sizing: border-box;
   user-select: none;
   margin-right: 30px;
-  height: getCssVarWithDefault(
+  min-height: getCssVarWithDefault(
     'checkbox-height',
     map.get($checkbox-height, 'default')
   );
+  height: auto;
 
   @include when(disabled) {
     cursor: not-allowed;
   }
 
   @include when(bordered) {
-    padding: 0 map.get($checkbox-bordered-padding-right, 'default')-$border-width
-      0 map.get($checkbox-bordered-padding-left, 'default')-$border-width;
+    padding: 4px map.get($checkbox-bordered-padding-right, 'default')-$border-width
+      4px map.get($checkbox-bordered-padding-left, 'default')-$border-width;
     border-radius: getCssVar('border-radius-base');
     border: getCssVar('border');
     box-sizing: border-box;
@@ -75,9 +78,9 @@ $checkbox-bordered-input-width: map.merge(
 
     @each $size in (large, small) {
       &.#{$namespace}-checkbox--#{$size} {
-        padding: 0
+        padding: 2px
           map.get($checkbox-bordered-padding-right, $size)-$border-width
-          0
+          2px
           map.get($checkbox-bordered-padding-left, $size)-$border-width;
 
         border-radius: map.get($button-border-radius, $size);
@@ -114,6 +117,7 @@ $checkbox-bordered-input-width: map.merge(
     cursor: pointer;
     outline: none;
     display: inline-flex;
+    flex-shrink: 0;
     position: relative;
 
     @include when(disabled) {
@@ -257,14 +261,18 @@ $checkbox-bordered-input-width: map.merge(
 
   @include e(label) {
     display: inline-block;
+    min-width: 0;
     padding-left: 8px;
-    line-height: 1;
+    line-height: 1.4;
+    white-space: normal;
+    overflow-wrap: break-word;
     font-size: getCssVar('checkbox-font-size');
   }
 
   @each $size in (large, small) {
     &.#{$namespace}-checkbox--#{$size} {
-      height: map.get($checkbox-height, $size);
+      min-height: map.get($checkbox-height, $size);
+      height: auto;
       @include e(label) {
         font-size: map.get($checkbox-font-size, $size);
       }

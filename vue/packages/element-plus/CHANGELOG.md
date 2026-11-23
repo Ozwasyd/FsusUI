@@ -1,5 +1,15 @@
 # element-plus
 
+## 1.6.0-preview.10
+
+### Preview Changes
+
+- Ship public-preview candidate `@ozwasyd/element-plus@1.6.0-preview.10` (`preview` dist-tag on GitHub Packages).
+- **MarkdownRenderer (`#1123`)**: Preserve canonical explicit block fragment IDs across Shiki code-highlight element replacement and error fallback so `locateFragment` / `revealFragment` continue to reach highlighted fenced code blocks.
+- **ElThreadPanel (`#1125`)**: Switch narrow headers (`<= 559px` container width) to responsive stacked rows so `#back` and `#actions` never crush the thread title into single-character lines.
+- **ElCheckbox (`#1126`)**: Allow long checkbox labels to wrap cleanly within narrow viewports (`320px`/`375px`) across enabled, disabled, bordered, and `ElCheckboxGroup` modes without horizontal overflow.
+- **Settings & Inbox Primitives (`#1127`)**: Remove non-reactive `computed(slots.*)` caching across `ElResourceListItem` and sibling `settings-primitives` / `inbox-primitives` so conditionally added or removed named slots render immediately.
+
 ## 1.6.0-preview.9
 
 ### Preview Changes

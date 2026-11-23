@@ -87,6 +87,7 @@ import IconsSection from './sections/IconsSection.vue'
 import IssuePrimitivesSection from './sections/IssuePrimitivesSection.vue'
 import MarkdownStressSection from './sections/MarkdownStressSection.vue'
 import MarkdownEditorChromeVisualSection from './sections/MarkdownEditorChromeVisualSection.vue'
+import NarrowLayoutRegressionSection from './sections/NarrowLayoutRegressionSection.vue'
 import NavigationSection from './sections/NavigationSection.vue'
 import OthersSection from './sections/OthersSection.vue'
 import PaginationMatrixSection from './sections/PaginationMatrixSection.vue'
@@ -192,6 +193,10 @@ const routeSections = new Map<string, DemoSection | { component: object }>([
   ['metric-visual', { component: markRaw(MetricCompositionSection) }],
   ['upload-visual', { component: markRaw(UploadVisualSection) }],
   ['pagination-matrix', { component: markRaw(PaginationMatrixSection) }],
+  [
+    'narrow-layout-regressions',
+    { component: markRaw(NarrowLayoutRegressionSection) },
+  ],
 ])
 
 const isDefaultGallery = computed(() => !props.mode)

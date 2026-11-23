@@ -749,6 +749,12 @@ html.dark,
   gap: 2px;
 }
 
+.#{$namespace}-checkbox-group:has(> .#{$namespace}-checkbox) {
+  flex-wrap: wrap;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
 .#{$namespace}-transfer-panel__list.#{$namespace}-checkbox-group {
   display: block;
   gap: 0;

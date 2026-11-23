@@ -9,18 +9,18 @@
       @click="handleSelect"
     >
       <span :class="ns.e('main')">
-        <span v-if="hasTitle" :class="ns.e('title')">
+        <span v-if="hasTitle()" :class="ns.e('title')">
           <slot name="title">{{ title }}</slot>
         </span>
-        <span v-if="hasPreview" :class="ns.e('preview')">
+        <span v-if="hasPreview()" :class="ns.e('preview')">
           <slot name="preview">{{ preview }}</slot>
         </span>
       </span>
       <span :class="ns.e('side')">
-        <span v-if="hasMeta" :class="ns.e('meta')">
+        <span v-if="hasMeta()" :class="ns.e('meta')">
           <slot name="meta">{{ meta }}</slot>
         </span>
-        <span v-if="hasBadges" :class="ns.e('badges')">
+        <span v-if="hasBadges()" :class="ns.e('badges')">
           <slot name="badges" />
         </span>
         <span
@@ -49,10 +49,10 @@ const emit = defineEmits(conversationListItemEmits)
 const slots = useSlots()
 const ns = useNamespace('conversation-list-item')
 
-const hasTitle = computed(() => Boolean(props.title || slots.title))
-const hasPreview = computed(() => Boolean(props.preview || slots.preview))
-const hasMeta = computed(() => Boolean(props.meta || slots.meta))
-const hasBadges = computed(() => Boolean(slots.badges))
+const hasTitle = () => Boolean(props.title || slots.title)
+const hasPreview = () => Boolean(props.preview || slots.preview)
+const hasMeta = () => Boolean(props.meta || slots.meta)
+const hasBadges = () => Boolean(slots.badges)
 const unreadAriaLabel = computed(
   () => `${props.unreadCount} ${props.unreadLabel}`,
 )

@@ -1,3 +1,4 @@
+import { nextTick, ref } from 'vue'
 import { mount } from '@vue/test-utils'
 import { describe, expect, test } from 'vitest'
 import {
@@ -155,5 +156,60 @@ describe('settings primitives', () => {
       'is-complete',
     )
     expect(input.attributes('aria-invalid')).toBe(undefined)
+  })
+
+  test('renders conditional slots added or removed after initial mount (#1127)', async () => {
+    const named = ref(false)
+    const showActions = ref(false)
+    const wrapper = mount({
+      components: { ElResourceList, ElResourceListItem, ElSettingsSection },
+      setup() {
+        return { named, showActions }
+      },
+      template: `
+        <ElSettingsSection title="Passkeys">
+          <template v-if="showActions" #actions>
+            <button type="button" class="section-action">Add</button>
+          </template>
+          <ElResourceList>
+            <ElResourceListItem :title="named ? 'Named device' : 'Current device'">
+              <template v-if="named" #badge>
+                <span class="current-badge">Current device</span>
+              </template>
+              <template v-if="showActions" #actions>
+                <button type="button" class="row-action">Rename</button>
+              </template>
+            </ElResourceListItem>
+          </ElResourceList>
+        </ElSettingsSection>
+      `,
+    })
+
+    expect(wrapper.find('.el-resource-list-item__title').text()).toBe(
+      'Current device',
+    )
+    expect(wrapper.find('.el-resource-list-item__badge').exists()).toBe(false)
+    expect(wrapper.find('.el-resource-list-item__actions').exists()).toBe(false)
+    expect(wrapper.find('.el-settings-section__actions').exists()).toBe(false)
+
+    named.value = true
+    showActions.value = true
+    await nextTick()
+
+    expect(wrapper.find('.el-resource-list-item__title').text()).toBe(
+      'Named device',
+    )
+    expect(wrapper.find('.el-resource-list-item__badge').exists()).toBe(true)
+    expect(wrapper.find('.current-badge').text()).toBe('Current device')
+    expect(wrapper.find('.row-action').text()).toBe('Rename')
+    expect(wrapper.find('.section-action').text()).toBe('Add')
+
+    named.value = false
+    showActions.value = false
+    await nextTick()
+
+    expect(wrapper.find('.el-resource-list-item__badge').exists()).toBe(false)
+    expect(wrapper.find('.el-resource-list-item__actions').exists()).toBe(false)
+    expect(wrapper.find('.el-settings-section__actions').exists()).toBe(false)
   })
 })

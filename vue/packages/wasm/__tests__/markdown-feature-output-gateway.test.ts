@@ -392,4 +392,44 @@ describe('Markdown feature output gateway', () => {
       }),
     ).toThrow('mermaid_output_root_invalid')
   })
+
+  it('preserves canonical explicit fragment IDs across code-highlight element replacement without trusting payload IDs', () => {
+    const host = document.createElement('div')
+    const target = document.createElement('pre')
+    target.id = 'sample'
+    target.innerHTML = '<code class="language-typescript">const a = 1</code>'
+    host.appendChild(target)
+
+    const committed = commitMarkdownFeatureOutput(
+      target,
+      {
+        kind: 'code-highlight',
+        payload:
+          '<pre id="injected" class="shiki github-light"><code><span class="line">const a = 1</span></code></pre>',
+      },
+      { mode: 'replace-element' },
+    )
+
+    expect(committed.id).toBe('sample')
+    expect(host.querySelectorAll('#sample')).toHaveLength(1)
+    expect(host.querySelector('#injected')).toBeNull()
+
+    const invalidHost = document.createElement('div')
+    const invalidTarget = document.createElement('pre')
+    invalidTarget.id = 'Invalid_ID'
+    invalidHost.appendChild(invalidTarget)
+
+    const invalidCommitted = commitMarkdownFeatureOutput(
+      invalidTarget,
+      {
+        kind: 'code-highlight',
+        payload:
+          '<pre id="injected-two" class="shiki github-dark"><code><span class="line">const b = 2</span></code></pre>',
+      },
+      { mode: 'replace-element' },
+    )
+
+    expect(invalidCommitted.hasAttribute('id')).toBe(false)
+    expect(invalidHost.querySelector('#injected-two')).toBeNull()
+  })
 })

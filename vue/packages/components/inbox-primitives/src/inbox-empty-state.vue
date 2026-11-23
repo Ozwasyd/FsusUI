@@ -1,12 +1,12 @@
 <template>
   <section :class="stateKls" role="status" aria-live="polite">
-    <strong v-if="hasTitle" :class="ns.e('title')">
+    <strong v-if="hasTitle()" :class="ns.e('title')">
       <slot name="title">{{ title }}</slot>
     </strong>
-    <p v-if="hasDescription" :class="ns.e('description')">
+    <p v-if="hasDescription()" :class="ns.e('description')">
       <slot name="description">{{ description }}</slot>
     </p>
-    <div v-if="hasActions" :class="ns.e('actions')">
+    <div v-if="hasActions()" :class="ns.e('actions')">
       <slot name="actions" />
     </div>
   </section>
@@ -25,10 +25,8 @@ const props = defineProps(inboxEmptyStateProps)
 const slots = useSlots()
 const ns = useNamespace('inbox-empty-state')
 
-const hasTitle = computed(() => Boolean(props.title || slots.title))
-const hasDescription = computed(() =>
-  Boolean(props.description || slots.description),
-)
-const hasActions = computed(() => Boolean(slots.actions))
+const hasTitle = () => Boolean(props.title || slots.title)
+const hasDescription = () => Boolean(props.description || slots.description)
+const hasActions = () => Boolean(slots.actions)
 const stateKls = computed(() => [ns.b(), ns.m(props.density)])
 </script>

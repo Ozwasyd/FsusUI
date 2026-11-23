@@ -223,6 +223,7 @@
   width: 100%;
   min-width: 0;
   min-height: 100%;
+  container-type: inline-size;
   background: getCssVar('bg-color');
 
   @include e(header) {
@@ -239,6 +240,8 @@
   @include e(back) {
     display: inline-flex;
     align-items: center;
+    min-width: 0;
+    max-width: 100%;
   }
 
   @include e(heading) {
@@ -253,7 +256,8 @@
     font-size: 18px;
     font-weight: 700;
     line-height: 1.35;
-    overflow-wrap: anywhere;
+    overflow-wrap: break-word;
+    text-wrap: balance;
   }
 
   @include e(status) {
@@ -272,6 +276,45 @@
     justify-content: flex-end;
     gap: 8px;
     min-width: 0;
+    max-width: 100%;
+  }
+
+  @container (max-width: 559px) {
+    @include e(header) {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px 12px;
+
+      &:has(> .#{$namespace}-thread-panel__back) {
+        .#{$namespace}-thread-panel__back {
+          order: 1;
+          flex: 0 1 auto;
+        }
+
+        .#{$namespace}-thread-panel__actions {
+          order: 2;
+          flex: 0 1 auto;
+          margin-inline-start: auto;
+        }
+
+        .#{$namespace}-thread-panel__heading {
+          order: 3;
+          flex: 1 0 100%;
+        }
+      }
+
+      &:not(:has(> .#{$namespace}-thread-panel__back)) {
+        .#{$namespace}-thread-panel__heading {
+          flex: 1 0 100%;
+        }
+
+        .#{$namespace}-thread-panel__actions {
+          flex: 1 0 100%;
+          justify-content: flex-start;
+        }
+      }
+    }
   }
 
   @include e(context) {

@@ -24,6 +24,7 @@ import {
   type MarkdownSafeRenderResult,
   type MarkdownRenderTimings,
 } from './markdown'
+import { MARKDOWN_ANCHOR_ID } from './markdown-anchor-grammar'
 import type {
   FeatureRenderOutput,
   MarkdownFeatureOutputCommitOptions,
@@ -1062,6 +1063,10 @@ const replaceWithFeatureError = (
     source,
     inline,
   )
+  const preservedId = element.getAttribute('id')
+  if (preservedId && MARKDOWN_ANCHOR_ID.test(preservedId)) {
+    errorElement.setAttribute('id', preservedId)
+  }
   element.replaceWith(errorElement)
 }
 
