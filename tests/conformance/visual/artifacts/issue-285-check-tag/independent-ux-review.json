@@ -1,12 +1,12 @@
 {
   "schema": "fsusui-independent-ux-review.v1",
   "issue": 285,
-  "candidateSha": "42f9eb7d36d4d8782c5259eceb00cc170d2f9ac7",
+  "candidateSha": "a038d12b5545636bc4f1d2174e1ac1a8e7eaccda",
   "reviewMode": "read-only-rendered-evidence-inspection",
   "modifiedPaths": [],
   "productionFixture": true,
   "identity": {
-    "executionId": "conformance-v2-check-tag-42f9eb7d36d4d8782c5259eceb00cc170d2f9ac7",
+    "executionId": "conformance-v2-check-tag-a038d12b5545636bc4f1d2174e1ac1a8e7eaccda",
     "checkpoint": "check-tag-after-pointer-keyboard",
     "contract": "component-v2.el-check-tag",
     "scenario": "scenario.v2.el-check-tag.real-interaction-trace",
@@ -14,7 +14,7 @@
     "webBaselineHash": "407ae614879ae1f2814ac9473cb1981de437571a63bb27b9c03139c46df3f482",
     "avaloniaBaselineHash": "64de07581d7126b5e6c9ec52782a041a67e697bc04f8b0bc2b1532f76f419ff7",
     "runnerHash": "bad9abc8910c29bd5104e47fc7d693443a414d707776a55c043be5d1e0c0baf2",
-    "candidate": "42f9eb7d36d4d8782c5259eceb00cc170d2f9ac7",
+    "candidate": "a038d12b5545636bc4f1d2174e1ac1a8e7eaccda",
     "documentId": "check-tag-state",
     "documentEpoch": 1,
     "sourceRevision": 2,
@@ -115,7 +115,7 @@
     }
   ],
   "observations": [
-    "Read-only inspection re-opened both tracked production CheckTag PNGs; this candidate (42f9eb7d36d4d8782c5259eceb00cc170d2f9ac7) makes zero changes to CheckTag, theme-chalk CSS, or Avalonia sources.",
+    "Read-only inspection re-opened both tracked production CheckTag PNGs; this candidate (a038d12b5545636bc4f1d2174e1ac1a8e7eaccda) makes zero changes to CheckTag, theme-chalk CSS, or Avalonia sources.",
     "Bound CheckTag receipt identity to v1.6.0-preview.11 contractHash 16db197e18c386130a3072dbb3fb25339d68d71a91936b5da86297944cfb7164 and webBaselineHash 407ae614879ae1f2814ac9473cb1981de437571a63bb27b9c03139c46df3f482.",
     "Web artifact is an 88x24 CheckTag element crop (cede06e2196173842ec99b1422f4242f3d54c3afdbfa8d8c35da70bad3e55277); Avalonia artifact is a 960x720 full window (3ae99ccd280405a7e7a0d1f622367ed017a4dc1819de8d3c59e427b6a2764cb0).",
     "Nine functional observations pass in both executions; timing is diagnostic only."
@@ -127,7 +127,7 @@
   ],
   "blockers": [],
   "status": "accepted",
-  "classificationReceiptDigest": "8af80093bc1a8f37dd0af72835b915f10160ff67fd6a14e0cd5d472f4a2ea912",
-  "candidateDigest": "ef33619ac5de67663591122b1f881cc808096fa78d864f6ef74a630c128503e4",
-  "receiptDigest": "454fc5183839e1ed98afa3042ebb3cf76b4c76c7e12c79f84ff15e074c960bb8"
+  "classificationReceiptDigest": "c212310a5c87f7bd5675bd649295030d56796cd4d73cdc167fb33f4a81bfa7d8",
+  "candidateDigest": "06c82ead49b0185ab8af97749d64626775e52f2c6d764fcffaafa3d359055020",
+  "receiptDigest": "57e41baa46a3082924ab97bc5f2ddd0942ca18fed1bb28065b0c9d256d853296"
 }
