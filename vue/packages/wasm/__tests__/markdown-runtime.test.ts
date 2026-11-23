@@ -334,6 +334,78 @@ describe('markdown runtime fast paths', () => {
       expect(result?.html).not.toContain('<svg>')
     }
   })
+  it('preserves full LaTeX formulas or falls back cleanly to KaTeX placeholder (#1130) and themes Mermaid SVGs with unique marker IDs (#1131)', async () => {
+    const { stdout } = await execFileAsync(
+      process.execPath,
+      [
+        '--input-type=module',
+        '-e',
+        `
+        const runtime = await import(${JSON.stringify(runtimeEntryUrl)});
+        const doc = [
+          '$$',
+          '\\\\int_{0}^{\\\\infty} e^{-x^2}\\\\,dx = \\\\frac{\\\\sqrt{\\\\pi}}{2}',
+          '$$',
+          '',
+          '$$',
+          "x' = x + 1",
+          '$$',
+          '',
+          'Inline \\\\(a_1, a_2, a_3\\\\) and \\\\(f(x, y)\\\\).',
+          '',
+          '\`\`\`mermaid',
+          'flowchart LR',
+          '  A[Author Draft] --> B[FsusUI Wasm Markdown]',
+          '\`\`\`',
+          '',
+          '\`\`\`mermaid',
+          'flowchart LR',
+          '  A[Author Draft] --> B[FsusUI Wasm Markdown]',
+          '\`\`\`',
+        ].join('\\n');
+        const full = await runtime.renderMarkdownResultWithRuntime({ source: doc });
+        const chunks = await runtime.renderMarkdownChunksWithRuntime({ source: doc });
+        console.log(JSON.stringify({
+          fullHtml: full.ok ? full.value.html : '',
+          chunksHtml: chunks.ok ? chunks.value.chunks.map((c) => c.html).join('') : '',
+        }));
+        `,
+      ],
+      { cwd: packageDir, encoding: 'utf8' },
+    )
+    const { fullHtml, chunksHtml } = JSON.parse(stdout.trim()) as {
+      fullHtml: string
+      chunksHtml: string
+    }
+
+    expect(chunksHtml).toBe(fullHtml)
+    expect(fullHtml).toContain('data-latex-rendered="mathml"')
+    expect(fullHtml).toContain('<mspace width="0.167em"></mspace>')
+    expect(fullHtml).toContain('<mi>dx</mi>')
+    expect(fullHtml).toContain('<mfrac>')
+    expect(fullHtml).toContain('<msub><mi>a</mi><mn>3</mn></msub>')
+    expect(fullHtml).toContain('data-latex-placeholder="true"')
+    expect(fullHtml).toContain("x&#39; = x + 1")
+
+    expect(fullHtml).not.toContain('id="arrow"')
+    expect(fullHtml).not.toContain('url(#arrow)')
+    expect(fullHtml).not.toContain('fill="#ffffff"')
+    expect(fullHtml).not.toContain('stroke="#d4d4d8"')
+    expect(fullHtml).not.toContain('fill="#18181b"')
+    expect(fullHtml).toContain('class="mermaid-node"')
+    expect(fullHtml).toContain('class="mermaid-label"')
+    expect(fullHtml).toContain('class="mermaid-edge"')
+    expect(fullHtml).toContain('class="mermaid-arrow"')
+
+    const markerIds = [
+      ...fullHtml.matchAll(/<marker id="(mermaid-arrow-[0-9a-f]{8}-\d+)"/g),
+    ].map((match) => match[1])
+    expect(markerIds).toHaveLength(2)
+    expect(new Set(markerIds).size).toBe(2)
+    for (const markerId of markerIds) {
+      expect(fullHtml).toContain(`marker-end="url(#${markerId})"`)
+    }
+  })
 })
 
 describe('Markdown language availability without optional runtime loading', () => {

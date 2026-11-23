@@ -490,7 +490,7 @@ describe('Issue #435: Status density none/minimal/detailed and stable slot paylo
     expect(detailedStatus.slotPayload.metrics.lineCount).toBe(3)
     expect(detailedStatus.slotPayload.state.mode).toBe('source')
     expect(detailedStatus.slotPayload.capability).toContain('synced-highlight')
-    expect(detailedStatus.ariaLiveMessage).toContain('编辑器能力')
+    expect(detailedStatus.ariaLiveMessage).toContain('Editor capability')
   })
 
   it('passes status mutation evaluation', () => {

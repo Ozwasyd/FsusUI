@@ -239,7 +239,7 @@ describe('Markdown editor command surface integration', () => {
     await selectRange(wrapper, 1, 5)
     const edit = wrapper
       .findAll('.el-markdown-editor__selection-toolbar button')
-      .find((button) => button.text() === '编辑链接')
+      .find((button) => button.text() === 'Edit link')
     expect(edit).toBeDefined()
     await edit!.trigger('click')
     await flushPromises()
@@ -269,7 +269,7 @@ describe('Markdown editor command surface integration', () => {
     await selectRange(wrapper, 12, 14)
     const edit = wrapper
       .findAll('.el-markdown-editor__selection-toolbar button')
-      .find((button) => button.text() === '编辑块锚点')
+      .find((button) => button.text() === 'Edit block anchor')
     expect(edit).toBeDefined()
     await edit!.trigger('click')
     await flushPromises()
@@ -300,7 +300,7 @@ describe('Markdown editor command surface integration', () => {
     await selectRange(wrapper, 1, 5)
     const edit = wrapper
       .findAll('.el-markdown-editor__selection-toolbar button')
-      .find((button) => button.text() === '编辑链接')
+      .find((button) => button.text() === 'Edit link')
     await edit!.trigger('click')
     await flushPromises()
 
@@ -326,7 +326,7 @@ describe('Markdown editor command surface integration', () => {
     await selectRange(wrapper, 1, 5)
     const edit = wrapper
       .findAll('.el-markdown-editor__selection-toolbar button')
-      .find((button) => button.text() === '编辑链接')
+      .find((button) => button.text() === 'Edit link')
     await edit!.trigger('click')
     await flushPromises()
     expect(wrapper.find('.el-markdown-editor__property-surface').exists()).toBe(

@@ -399,6 +399,15 @@ assert(
   'types definition generation must emit the package-local ./wasm/index declaration for packages/wasm.d.ts',
 )
 assert(
+  typesDefinitionsTask.includes(
+    `const iconsVuePublicDeclaration = "export * from './icons-vue/index'\\n"`,
+  ) &&
+    /relativePath === path\.join\('packages', 'icons-vue\.d\.ts'\)\s*\?\s*iconsVuePublicDeclaration\s*:/u.test(
+      typesDefinitionsTask,
+    ),
+  'types definition generation must emit the package-local ./icons-vue/index declaration for packages/icons-vue.d.ts',
+)
+assert(
   !/relativePath === path\.join\('packages', 'wasm\.d\.ts'\)[\s\S]{0,160}\?\s*await readFile\(wasmTypesEntry/u.test(
     typesDefinitionsTask,
   ),
@@ -744,6 +753,64 @@ if (existsSync(path.join(publishedDistRoot, 'package.json'))) {
         `published package ${targetRelativePath} final type export must include ${typeName}`,
       )
     }
+  }
+
+  for (const relativePath of [
+    'dist/element-plus/es/icons-vue.d.ts',
+    'dist/element-plus/lib/icons-vue.d.ts',
+  ]) {
+    const { declaration, targetRelativePath, wrapper } =
+      resolveExactRelativeDeclarationTarget(relativePath)
+    assert(
+      wrapper.trim() === "export * from './icons-vue/index'",
+      `published package ${relativePath} must reference the package-local icons-vue/index declaration`,
+    )
+    assertPortableDeclaration(
+      wrapper,
+      `published package ${relativePath} declaration wrapper`,
+    )
+    assertPortableDeclaration(
+      declaration,
+      `published package ${targetRelativePath} declaration target`,
+    )
+    const componentsIndexPath = path.join(
+      root,
+      path.dirname(targetRelativePath),
+      'components/index.d.ts',
+    )
+    assert(
+      existsSync(componentsIndexPath),
+      `published package is missing ${path.relative(root, componentsIndexPath)}`,
+    )
+    assert(
+      /\bArrowDown\b/u.test(readFileSync(componentsIndexPath, 'utf8')),
+      `published package ${path.relative(root, componentsIndexPath)} must export ArrowDown`,
+    )
+  }
+
+  for (const sub of ['es', 'lib']) {
+    for (const requiredDecl of [
+      `dist/element-plus/${sub}/components/select/index.d.ts`,
+      `dist/element-plus/${sub}/components/cascader/index.d.ts`,
+      `dist/element-plus/${sub}/components/slider/index.d.ts`,
+      `dist/element-plus/${sub}/components/time-select/index.d.ts`,
+      `dist/element-plus/${sub}/components/pagination/src/components/sizes.vue.d.ts`,
+      `dist/element-plus/${sub}/components/date-picker/src/panel-utils.d.ts`,
+      `dist/element-plus/${sub}/components/button/src/button.vue.d.ts`,
+    ]) {
+      assert(
+        existsSync(path.join(root, requiredDecl)),
+        `published package is missing required declaration ${requiredDecl}`,
+      )
+    }
+    const buttonDts = readFileSync(
+      path.join(root, `dist/element-plus/${sub}/components/button/src/button.vue.d.ts`),
+      'utf8',
+    )
+    assert(
+      /\bref\s*:/u.test(buttonDts) && !/\b_ref\s*:/u.test(buttonDts),
+      `published package ${sub}/components/button/src/button.vue.d.ts must preserve defineExpose contract`,
+    )
   }
 
   for (const [runtimePath, gatewayPath, importToken] of [

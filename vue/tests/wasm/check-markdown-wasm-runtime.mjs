@@ -524,13 +524,13 @@ async function renderNestedListWithKind(kind) {
   const alloc = pickExport(raw, 'markdown_alloc_buffer')
   const free = pickExport(raw, 'markdown_free_buffer')
 
-  function renderSource(source) {
+  function renderSource(source, { allowMermaid = 0, allowLatex = 0 } = {}) {
     const bytes = new TextEncoder().encode(source)
     const ptr = alloc(bytes.byteLength)
     assert(ptr > 0, `[markdown-wasm-runtime] alloc failed: ${kind}`)
     try {
       module.HEAPU8.set(bytes, ptr)
-      const ok = render(ptr, bytes.byteLength, 0, 0, 4)
+      const ok = render(ptr, bytes.byteLength, allowLatex, allowMermaid, 4)
       assert(ok === 1, `[markdown-wasm-runtime] render failed: ${kind}`)
       return readCString(module, getHtmlPtr(), getHtmlLen())
     } finally {
@@ -679,6 +679,103 @@ async function renderNestedListWithKind(kind) {
     deepHtml.includes('B.2.b.ii'),
     `[markdown-wasm-runtime] deep 4th-level item ii missing: ${kind}`,
   )
+
+  // #1130: Wasm LaTeX MathML must not silently truncate on spacing/punctuation or unsupported tokens
+  const integralHtml = renderSource(
+    '$$\n\\int_{0}^{\\infty} e^{-x^2}\\,dx = \\frac{\\sqrt{\\pi}}{2}\n$$\n',
+    { allowLatex: 1 },
+  )
+  assert(
+    integralHtml.includes('data-latex-rendered="mathml"') &&
+      integralHtml.includes('<mspace width="0.167em"></mspace>') &&
+      integralHtml.includes('<mi>dx</mi>') &&
+      integralHtml.includes('<mfrac>'),
+    `[markdown-wasm-runtime] #1130 integral formula truncated: ${kind}: ${integralHtml}`,
+  )
+
+  const commaListHtml = renderSource(
+    'Inline \\(a_1, a_2, a_3\\) and \\(f(x, y)\\) and \\([0, 1]\\) and \\(|x|\\).\n',
+    { allowLatex: 1 },
+  )
+  assert(
+    (commaListHtml.match(/data-latex-rendered="mathml"/g) ?? []).length === 4 &&
+      commaListHtml.includes('<msub><mi>a</mi><mn>3</mn></msub>') &&
+      commaListHtml.includes('<mi>y</mi>'),
+    `[markdown-wasm-runtime] #1130 punctuation math truncated: ${kind}: ${commaListHtml}`,
+  )
+
+  for (const fallbackExpr of [
+    "x' = x + 1",
+    '\\{a, b\\}',
+    'a \\\\ b',
+    'a & b',
+    '50\\%',
+    '\\sqrt[3]{x}',
+  ]) {
+    const fallbackHtml = renderSource(`$$\n${fallbackExpr}\n$$\n`, {
+      allowLatex: 1,
+    })
+    assert(
+      fallbackHtml.includes('data-latex-placeholder="true"') &&
+        !fallbackHtml.includes('data-latex-rendered="mathml"'),
+      `[markdown-wasm-runtime] #1130 unsupported LaTeX (${fallbackExpr}) did not fall back to placeholder: ${kind}: ${fallbackHtml}`,
+    )
+  }
+
+  // #1131: Wasm Mermaid SVGs use semantic theme tokens and unique deterministic marker IDs
+  const multiMermaidHtml = renderSource(
+    [
+      '```mermaid',
+      'flowchart LR',
+      '  A[Draft] --> B[Wasm]',
+      '```',
+      '',
+      '```mermaid',
+      'flowchart LR',
+      '  A[Draft] --> B[Wasm]',
+      '```',
+      '',
+      '```mermaid',
+      'flowchart TD',
+      '  C[Render] --> D[Read]',
+      '```',
+    ].join('\n'),
+    { allowMermaid: 1 },
+  )
+  assert(
+    !multiMermaidHtml.includes('id="arrow"') &&
+      !multiMermaidHtml.includes('url(#arrow)') &&
+      !multiMermaidHtml.includes('fill="#ffffff"') &&
+      !multiMermaidHtml.includes('stroke="#d4d4d8"') &&
+      !multiMermaidHtml.includes('fill="#18181b"') &&
+      !multiMermaidHtml.includes('fill="#71717a"') &&
+      !multiMermaidHtml.includes('stroke="#71717a"'),
+    `[markdown-wasm-runtime] #1131 Mermaid SVG leaked hardcoded colors or global arrow id: ${kind}`,
+  )
+  assert(
+    multiMermaidHtml.includes('class="mermaid-node"') &&
+      multiMermaidHtml.includes('class="mermaid-label"') &&
+      multiMermaidHtml.includes('class="mermaid-edge"') &&
+      multiMermaidHtml.includes('class="mermaid-arrow"') &&
+      multiMermaidHtml.includes('fill="var(--el-bg-color-overlay, #ffffff)"') &&
+      multiMermaidHtml.includes('stroke="var(--el-border-color, #d4d4d8)"') &&
+      multiMermaidHtml.includes('fill="var(--el-text-color-primary, #18181b)"') &&
+      multiMermaidHtml.includes('stroke="var(--el-text-color-secondary, #71717a)"'),
+    `[markdown-wasm-runtime] #1131 Mermaid SVG missing themed classes or token vars: ${kind}`,
+  )
+  const markerIds = [
+    ...multiMermaidHtml.matchAll(/<marker id="(mermaid-arrow-[0-9a-f]{8}-\d+)"/g),
+  ].map((m) => m[1])
+  assert(
+    markerIds.length === 3 && new Set(markerIds).size === 3,
+    `[markdown-wasm-runtime] #1131 expected 3 distinct mermaid marker IDs, got ${JSON.stringify(markerIds)}: ${kind}`,
+  )
+  for (const markerId of markerIds) {
+    assert(
+      multiMermaidHtml.includes(`marker-end="url(#${markerId})"`),
+      `[markdown-wasm-runtime] #1131 marker-end missing reference to ${markerId}: ${kind}`,
+    )
+  }
 }
 
 main().catch((error) => {

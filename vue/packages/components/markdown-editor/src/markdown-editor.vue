@@ -564,10 +564,10 @@
           aria-haspopup="menu"
           :aria-controls="tableMenuId"
           :aria-expanded="tableMenuOpen"
-          aria-label="表格操作"
+          :aria-label="localeText.table.menuLabel"
           @click="toggleTableMenu"
         >
-          表格操作
+          {{ localeText.table.menuLabel }}
         </button>
         <div
           v-if="tableMenuOpen"
@@ -575,7 +575,7 @@
           ref="tableMenuRef"
           :class="ns.e('table-menu')"
           role="menu"
-          aria-label="表格操作"
+          :aria-label="localeText.table.menuLabel"
           @keydown="handleTableMenuKeydown"
         >
           <button
@@ -1189,6 +1189,7 @@ import { ElMarkdownRenderer } from '@element-plus/components/markdown-renderer'
 import { CHANGE_EVENT, UPDATE_MODEL_EVENT } from '@element-plus/constants'
 import {
   provideMarkdownEditorFrameScheduler,
+  useLocale,
   useMarkdownEditorFrameScheduler,
   useNamespace,
 } from '@element-plus/hooks'
@@ -1207,6 +1208,7 @@ import {
   createMarkdownEditorMetricsSession,
   type MarkdownEditorMetricsChange,
   resolveMarkdownEditorCommandCopy,
+  resolveMarkdownEditorLocaleFromLanguage,
   resolveMarkdownEditorLocaleText,
   resolveMarkdownEditorOverflowCommands,
   resolveMarkdownEditorPrimaryCommands,
@@ -1545,10 +1547,21 @@ provideMarkdownHeavyFeatureDocumentContext({
 const editorRevision = ref(transactionStore.revision)
 const editorSelection = ref(transactionStore.selection)
 const editorValue = ref(transactionStore.value)
+const { locale } = useLocale()
+const providerLocaleText = computed(() =>
+  resolveMarkdownEditorLocaleFromLanguage(locale.value),
+)
+const localeText = computed(() =>
+  resolveMarkdownEditorLocaleText(props.localeText, providerLocaleText.value),
+)
 const currentTableCell = ref<MarkdownTableCellIdentity | null>(null)
 const tableAnnouncement = ref('')
 const tableContextActions = computed(() =>
-  resolveMarkdownTableContextActions().filter(
+  resolveMarkdownTableContextActions(
+    undefined,
+    undefined,
+    localeText.value.table,
+  ).filter(
     (action) => action.key !== 'delete-row' || currentTableCell.value?.row !== 0,
   ),
 )
@@ -2920,7 +2933,7 @@ const statusResolution = computed(() =>
   resolveMarkdownEditorStatus(
     editorValue.value,
     props.statusDensity,
-    props.localeText,
+    localeText.value,
     editorSelection.value,
     liveCapabilities.value,
     {
@@ -3424,9 +3437,6 @@ const gatedPasteAsMarkdownCommand = computed(() =>
         (command) => command.key === 'paste-as-markdown',
       )
     : undefined,
-)
-const localeText = computed(() =>
-  resolveMarkdownEditorLocaleText(props.localeText),
 )
 const commandCopy = (command: MarkdownEditorCommand) =>
   resolveMarkdownEditorCommandCopy(command, localeText.value)
