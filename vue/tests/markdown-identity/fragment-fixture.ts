@@ -74,3 +74,52 @@ export const mountFragmentFixture = (smooth = false) => {
     },
   }
 }
+
+const highlightedCodeSource = [
+  '## Heading witness ^harbor',
+  '',
+  'A *paragraph* ^detail',
+  '',
+  `${fence}typescript`,
+  'const answer = 42',
+  fence,
+  '^sample',
+].join('\n')
+
+export const mountHighlightedCodeFragmentFixture = (codeHighlight: boolean) => {
+  const host = document.createElement('div')
+  document.body.append(host)
+  const renderer = ref<InstanceType<typeof ElMarkdownRenderer>>()
+  let resolveComplete!: () => void
+  const renderComplete = new Promise<void>((resolve) => {
+    resolveComplete = resolve
+  })
+  const activatedKinds: string[] = []
+  const app = createApp({
+    render: () =>
+      h(ElMarkdownRenderer, {
+        ref: renderer,
+        content: highlightedCodeSource,
+        contentVersion: `code-highlight-fragment-${codeHighlight ? 'on' : 'off'}`,
+        mode: 'article',
+        features: { codeHighlight },
+        onFeaturesActivated(payload: { kind?: string }) {
+          if (payload?.kind) activatedKinds.push(payload.kind)
+        },
+        onRenderComplete() {
+          resolveComplete()
+        },
+      }),
+  })
+  app.mount(host)
+  return {
+    host,
+    renderer: renderer.value!,
+    renderComplete,
+    activatedKinds,
+    unmount() {
+      app.unmount()
+      host.remove()
+    },
+  }
+}

@@ -11,7 +11,7 @@ Select multiple values from a set of alternatives.
 
 ## Basic Usage
 
-Use a checkbox alone with a Boolean `v-model`.
+Use a checkbox alone with a Boolean `v-model`. Long labels wrap naturally inside narrow containers without horizontal page overflow while preserving single-line geometry when space permits.
 
 ## Disabled State
 

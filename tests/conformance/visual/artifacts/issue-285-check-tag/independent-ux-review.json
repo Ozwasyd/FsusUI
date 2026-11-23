@@ -1,20 +1,20 @@
 {
   "schema": "fsusui-independent-ux-review.v1",
   "issue": 285,
-  "candidateSha": "c2bd41be21d0dfd0adeb73f45367dcfbe6b39d51",
+  "candidateSha": "540503b63d1fdd03d2c1627b8a1d256d77402aad",
   "reviewMode": "read-only-rendered-evidence-inspection",
   "modifiedPaths": [],
   "productionFixture": true,
   "identity": {
-    "executionId": "conformance-v2-check-tag-c2bd41be21d0dfd0adeb73f45367dcfbe6b39d51",
+    "executionId": "conformance-v2-check-tag-540503b63d1fdd03d2c1627b8a1d256d77402aad",
     "checkpoint": "check-tag-after-pointer-keyboard",
     "contract": "component-v2.el-check-tag",
     "scenario": "scenario.v2.el-check-tag.real-interaction-trace",
-    "contractHash": "4c04112ce8c8fcf06410e0f605e7f9e36167ff79710e957d173e832080e1da48",
-    "webBaselineHash": "4ad6d19312b81a6f2b02d5d6ecb3a993ac7d6181a9fb046a3ce8cb4956a83d0c",
+    "contractHash": "47d9ee335352dd1388596cdde0723c700393b768d54f96bc55652a347d4f8951",
+    "webBaselineHash": "0c57fc20ffdbbabec21e4c7d243a4fd979112e58046237431adc0f8c5cad3973",
     "avaloniaBaselineHash": "64de07581d7126b5e6c9ec52782a041a67e697bc04f8b0bc2b1532f76f419ff7",
     "runnerHash": "bad9abc8910c29bd5104e47fc7d693443a414d707776a55c043be5d1e0c0baf2",
-    "candidate": "c2bd41be21d0dfd0adeb73f45367dcfbe6b39d51",
+    "candidate": "540503b63d1fdd03d2c1627b8a1d256d77402aad",
     "documentId": "check-tag-state",
     "documentEpoch": 1,
     "sourceRevision": 2,
@@ -115,12 +115,12 @@
     }
   ],
   "observations": [
-    "Read-only inspection opened both original rendered PNGs of official run 45046229797, job 137281337285, artifact 14764085867. ZIP SHA-256 20878f0e3ed6e7435de6910d6d0b7dbf0144caaacade64210f6b0b93d1cf635e.",
-    "Official capture used genuine GitHub checkout 24aca9ce36b63a4158c912f18708a44102a144cb with parents 098394e86e2102845e0a166eacfd15e19ddcf8b6 and 4ba824561b2789e2018754f250d5e952148d4229; candidate and pull request head have identical tree de0339430a915b4763b039394cddd98effbc99ee.",
-    "Web artifact is an 88×24 CheckTag element crop; Avalonia artifact is a 960×720 full window. Both tracked PNG bytes are equal to these inspected original PNGs.",
+    "Read-only inspection opened both original rendered PNGs of official PR #1128 run 45116325567, job 137499900958, artifact dotnet-package-conformance-failure.",
+    "Official capture used GitHub PR #1128 merge commit 71ab9f3e4f80feefbd6412e4e9110962b90c4ff4; CheckTag Web and Avalonia PNG bytes are byte-identical to tracked artifacts, and candidate 540503b63d1fdd03d2c1627b8a1d256d77402aad only deduplicates markdown-runtime error rendering.",
+    "Web artifact is an 88x24 CheckTag element crop; Avalonia artifact is a 960x720 full window. Both tracked PNG bytes equal the inspected original PNGs.",
     "Nine functional observations pass in both executions; timing is diagnostic only.",
-    "web-a11y/manifest.json SHA-256 f85aa4780e594f5608032956aff7a271606d3ac24dc16430fa853eb9282e3bfa",
-    "avalonia.json SHA-256 f68bb07aca684a929737577826f9ef1d6d2184f48883845b51a542803d3b144b"
+    "web-a11y/manifest.json SHA-256 701f216db013b782e8de52c3c09df5b60640a383146aeedd1ff3131619b17334",
+    "avalonia.json SHA-256 110cb4d7fbbe9703fa7d1a355642aa852e73b47685729521f3df8dbd9cc23b07"
   ],
   "limitations": [
     "Only the light/default/zh-CN/ltr/reduced-motion CheckTag checkpoint was independently accepted, not full CI, AOT, package, cross-platform rendering equivalence or performance.",
@@ -129,7 +129,7 @@
   ],
   "blockers": [],
   "status": "accepted",
-  "classificationReceiptDigest": "fb29940ca7342d13ce147e54fdda1c24844ba1d32fe35d3d0a2368cac5f526fd",
-  "candidateDigest": "b2b5586245f5330858e2078e0beca62bcafb4a0721cae1acfcd1e7f6bd1b1849",
-  "receiptDigest": "b7b0eec2f23d45ad9e5a6fa645d76b98db5d3e9338822faa0dca99626b1ad7cd"
+  "classificationReceiptDigest": "9d9600517e066a14a6490a29c6bbd4a99749c9d3eb9df7eda8c2f17758dd275f",
+  "candidateDigest": "83a2c8fd6e6a6aed01eb06596ae5e4fdf8890dbc1b85aa06fb73472511f1ec00",
+  "receiptDigest": "4fa6228d9c5589578e3ee7486575eaa13bf2d2ec14558ac7b9254221cdf95271"
 }

@@ -1,10 +1,10 @@
 <template>
   <article :class="bubbleKls" role="listitem">
-    <header v-if="hasMetaHeader" :class="ns.e('meta')">
-      <span v-if="hasAuthor" :class="ns.e('author')">
+    <header v-if="hasMetaHeader()" :class="ns.e('meta')">
+      <span v-if="hasAuthor()" :class="ns.e('author')">
         <slot name="author">{{ author }}</slot>
       </span>
-      <span v-if="hasMeta" :class="ns.e('time')">
+      <span v-if="hasMeta()" :class="ns.e('time')">
         <slot name="meta">{{ meta }}</slot>
       </span>
     </header>
@@ -29,9 +29,9 @@ const props = defineProps(messageBubbleProps)
 const slots = useSlots()
 const ns = useNamespace('message-bubble')
 
-const hasAuthor = computed(() => Boolean(props.author || slots.author))
-const hasMeta = computed(() => Boolean(props.meta || slots.meta))
-const hasMetaHeader = computed(() => hasAuthor.value || hasMeta.value)
+const hasAuthor = () => Boolean(props.author || slots.author)
+const hasMeta = () => Boolean(props.meta || slots.meta)
+const hasMetaHeader = () => hasAuthor() || hasMeta()
 const bubbleKls = computed(() => [
   ns.b(),
   ns.m(props.variant),

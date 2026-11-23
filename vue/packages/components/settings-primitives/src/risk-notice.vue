@@ -1,6 +1,6 @@
 <template>
   <div :class="noticeKls" :role="role">
-    <strong v-if="hasTitle" :class="ns.e('title')">
+    <strong v-if="hasTitle()" :class="ns.e('title')">
       <slot name="title">{{ title }}</slot>
     </strong>
     <div :class="ns.e('body')">
@@ -22,6 +22,6 @@ const props = defineProps(riskNoticeProps)
 const slots = useSlots()
 const ns = useNamespace('risk-notice')
 
-const hasTitle = computed(() => Boolean(props.title || slots.title))
+const hasTitle = () => Boolean(props.title || slots.title)
 const noticeKls = computed(() => [ns.b(), ns.m(props.type)])
 </script>

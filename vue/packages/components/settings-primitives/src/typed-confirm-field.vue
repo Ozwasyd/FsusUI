@@ -1,7 +1,7 @@
 <template>
   <div :class="fieldKls">
     <label :for="controlId" :class="ns.e('label')">{{ label }}</label>
-    <p v-if="hasDescription" :id="descriptionId" :class="ns.e('description')">
+    <p v-if="hasDescription()" :id="descriptionId" :class="ns.e('description')">
       <slot name="description">{{ description }}</slot>
     </p>
     <code :id="phraseId" :class="ns.e('phrase')">{{ phrase }}</code>
@@ -13,7 +13,7 @@
       :placeholder="placeholder"
       :disabled="disabled"
       :required="required"
-      :aria-describedby="describedby"
+      :aria-describedby="describedby()"
       :aria-invalid="isInvalid ? 'true' : undefined"
       autocomplete="off"
       spellcheck="false"
@@ -44,20 +44,17 @@ const fallbackId = useId()
 const controlId = computed(() => props.id || `${fallbackId}-input`)
 const phraseId = computed(() => `${controlId.value}-phrase`)
 const descriptionId = computed(() => `${controlId.value}-description`)
-const hasDescription = computed(() =>
-  Boolean(props.description || slots.description),
-)
+const hasDescription = () => Boolean(props.description || slots.description)
 const isComplete = computed(
   () => props.phrase.length > 0 && props.modelValue === props.phrase,
 )
 const isInvalid = computed(
   () => props.modelValue.length > 0 && !isComplete.value,
 )
-const describedby = computed(() =>
-  [phraseId.value, hasDescription.value ? descriptionId.value : '']
+const describedby = () =>
+  [phraseId.value, hasDescription() ? descriptionId.value : '']
     .filter(Boolean)
-    .join(' '),
-)
+    .join(' ')
 const fieldKls = computed(() => [
   ns.b(),
   ns.is('complete', isComplete.value),

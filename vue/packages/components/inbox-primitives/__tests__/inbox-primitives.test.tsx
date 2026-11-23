@@ -1,3 +1,4 @@
+import { nextTick, ref } from 'vue'
 import { mount } from '@vue/test-utils'
 import { describe, expect, test, vi } from 'vitest'
 import {
@@ -228,5 +229,57 @@ describe('inbox primitives', () => {
     )
     expect(wrapper.find('textarea').attributes('disabled')).toBeDefined()
     expect(wrapper.find('button').attributes('disabled')).toBeDefined()
+  })
+
+  test('updates conditional header and badge slots after initial mount', async () => {
+    const showControls = ref(false)
+    const wrapper = mount({
+      components: { ElThreadPanel, ElConversationListItem },
+      setup() {
+        return { showControls }
+      },
+      template: `
+        <div>
+          <ElConversationListItem title="Thread A">
+            <template v-if="showControls" #badges>
+              <span class="conv-badge">Pinned</span>
+            </template>
+          </ElConversationListItem>
+          <ElThreadPanel title="Inbox QA support case">
+            <template v-if="showControls" #back>
+              <button type="button" class="thread-back">Back</button>
+            </template>
+            <template v-if="showControls" #actions>
+              <button type="button" class="thread-reload">Reload</button>
+            </template>
+            <template #messages>
+              <p>Example message</p>
+            </template>
+          </ElThreadPanel>
+        </div>
+      `,
+    })
+
+    expect(wrapper.find('.el-conversation-list-item__badges').exists()).toBe(
+      false,
+    )
+    expect(wrapper.find('.el-thread-panel__back').exists()).toBe(false)
+    expect(wrapper.find('.el-thread-panel__actions').exists()).toBe(false)
+
+    showControls.value = true
+    await nextTick()
+
+    expect(wrapper.find('.conv-badge').text()).toBe('Pinned')
+    expect(wrapper.find('.thread-back').text()).toBe('Back')
+    expect(wrapper.find('.thread-reload').text()).toBe('Reload')
+
+    showControls.value = false
+    await nextTick()
+
+    expect(wrapper.find('.el-conversation-list-item__badges').exists()).toBe(
+      false,
+    )
+    expect(wrapper.find('.el-thread-panel__back').exists()).toBe(false)
+    expect(wrapper.find('.el-thread-panel__actions').exists()).toBe(false)
   })
 })

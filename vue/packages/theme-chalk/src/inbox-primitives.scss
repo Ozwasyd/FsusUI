@@ -226,9 +226,9 @@
   background: getCssVar('bg-color');
 
   @include e(header) {
-    display: grid;
-    grid-template-columns: auto minmax(0, 1fr) auto;
-    gap: 12px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 12px;
     align-items: center;
     align-items: safe center;
     min-width: 0;
@@ -239,11 +239,15 @@
   @include e(back) {
     display: inline-flex;
     align-items: center;
+    flex: 0 1 auto;
+    min-width: 0;
+    max-width: 100%;
   }
 
   @include e(heading) {
     display: grid;
     gap: 4px;
+    flex: 1 1 min(100%, 9rem);
     min-width: 0;
   }
 
@@ -253,7 +257,8 @@
     font-size: 18px;
     font-weight: 700;
     line-height: 1.35;
-    overflow-wrap: anywhere;
+    overflow-wrap: break-word;
+    text-wrap: balance;
   }
 
   @include e(status) {
@@ -270,8 +275,11 @@
     flex-wrap: wrap;
     align-items: center;
     justify-content: flex-end;
+    flex: 0 1 auto;
+    margin-inline-start: auto;
     gap: 8px;
     min-width: 0;
+    max-width: 100%;
   }
 
   @include e(context) {

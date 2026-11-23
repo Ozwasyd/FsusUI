@@ -1,4 +1,7 @@
-import type { mountFragmentFixture } from './fragment-fixture'
+import type {
+  mountFragmentFixture,
+  mountHighlightedCodeFragmentFixture,
+} from './fragment-fixture'
 
 import {
   createMarkdownAnchorMap,
@@ -93,6 +96,9 @@ declare global {
     mountFragmentFixture: (
       smooth?: boolean,
     ) => Promise<ReturnType<typeof mountFragmentFixture>>
+    mountHighlightedCodeFragmentFixture: (
+      codeHighlight: boolean,
+    ) => Promise<ReturnType<typeof mountHighlightedCodeFragmentFixture>>
   }
 }
 
@@ -100,5 +106,11 @@ window.runIdentityScenario = runIdentityScenario
 window.mountFragmentFixture = async (smooth = false) => {
   const { mountFragmentFixture } = await import('./fragment-fixture')
   return mountFragmentFixture(smooth)
+}
+window.mountHighlightedCodeFragmentFixture = async (codeHighlight: boolean) => {
+  const { mountHighlightedCodeFragmentFixture } = await import(
+    './fragment-fixture'
+  )
+  return mountHighlightedCodeFragmentFixture(codeHighlight)
 }
 document.querySelector('#ready')!.textContent = 'Public runtime ready'
