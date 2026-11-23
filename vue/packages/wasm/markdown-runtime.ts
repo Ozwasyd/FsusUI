@@ -1030,11 +1030,14 @@ const createFeatureErrorElement = (
   return element
 }
 
+const CANONICAL_BLOCK_ANCHOR_ID = /^[a-z][a-z0-9-]{0,63}$/u
+
 const renderFeatureError = (
   element: HTMLElement,
   kind: MarkdownFeatureActivationKind,
   error: unknown,
   source?: string,
+  replace = false,
 ) => {
   const inline = element.tagName === 'SPAN' || element.tagName === 'CODE'
   const errorElement = createFeatureErrorElement(
@@ -1044,31 +1047,16 @@ const renderFeatureError = (
     source,
     inline,
   )
+  if (replace) {
+    const preservedId = element.id
+    if (CANONICAL_BLOCK_ANCHOR_ID.test(preservedId)) {
+      errorElement.id = preservedId
+    }
+    element.replaceWith(errorElement)
+    return
+  }
   element.replaceChildren(errorElement)
   element.dataset.markdownFeatureError = kind
-}
-
-const CANONICAL_BLOCK_ANCHOR_ID = /^[a-z][a-z0-9-]{0,63}$/u
-
-const replaceWithFeatureError = (
-  element: HTMLElement,
-  kind: MarkdownFeatureActivationKind,
-  error: unknown,
-  source?: string,
-) => {
-  const inline = element.tagName === 'SPAN' || element.tagName === 'CODE'
-  const errorElement = createFeatureErrorElement(
-    element.ownerDocument,
-    kind,
-    error,
-    source,
-    inline,
-  )
-  const preservedId = element.getAttribute('id')
-  if (preservedId && CANONICAL_BLOCK_ANCHOR_ID.test(preservedId)) {
-    errorElement.setAttribute('id', preservedId)
-  }
-  element.replaceWith(errorElement)
 }
 
 const extractFeatureSource = (
@@ -1592,7 +1580,7 @@ const activateBuiltInFeature = async (
       },
     })
   } catch (error) {
-    replaceWithFeatureError(pre, 'code-highlight', error, source)
+    renderFeatureError(pre, 'code-highlight', error, source, true)
     throw error
   }
 }
