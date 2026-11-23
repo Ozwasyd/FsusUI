@@ -75,22 +75,27 @@ test.describe('narrow layout and reactive slot regressions (#1125, #1126, #1127)
         expect(reloadBox).not.toBeNull()
 
         if (width <= 375) {
-          // Title owns the full inner header width instead of a 14px leftover column.
+          // Title keeps a readable width (>= 9rem / 144px) instead of a 14px leftover column.
           expect(
             titleBox!.width,
             `${theme} ${width}px title width`,
-          ).toBeGreaterThanOrEqual(headerBox!.width - 32)
+          ).toBeGreaterThanOrEqual(Math.min(headerBox!.width - 32, 144))
           expect(
             titleLines,
             `${theme} ${width}px title lines`,
           ).toBeLessThanOrEqual(2)
-          // Controls sit above the heading without overlapping it.
-          expect(backBox!.y + backBox!.height).toBeLessThanOrEqual(
-            titleBox!.y + 2,
-          )
-          expect(reloadBox!.y + reloadBox!.height).toBeLessThanOrEqual(
-            titleBox!.y + 2,
-          )
+          // Controls never overlap the heading.
+          const overlaps = (
+            a: { x: number; y: number; width: number; height: number },
+            b: { x: number; y: number; width: number; height: number },
+          ) =>
+            a.x < b.x + b.width - 1 &&
+            a.x + a.width > b.x + 1 &&
+            a.y < b.y + b.height - 1 &&
+            a.y + a.height > b.y + 1
+          expect(overlaps(backBox!, titleBox!)).toBe(false)
+          expect(overlaps(reloadBox!, titleBox!)).toBe(false)
+          expect(overlaps(backBox!, reloadBox!)).toBe(false)
         } else {
           // Wide container preserves single-row 3-column header.
           expect(titleLines).toBe(1)

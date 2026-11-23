@@ -24,7 +24,6 @@ import {
   type MarkdownSafeRenderResult,
   type MarkdownRenderTimings,
 } from './markdown'
-import { MARKDOWN_ANCHOR_ID } from './markdown-anchor-grammar'
 import type {
   FeatureRenderOutput,
   MarkdownFeatureOutputCommitOptions,
@@ -1049,6 +1048,8 @@ const renderFeatureError = (
   element.dataset.markdownFeatureError = kind
 }
 
+const CANONICAL_BLOCK_ANCHOR_ID = /^[a-z][a-z0-9-]{0,63}$/u
+
 const replaceWithFeatureError = (
   element: HTMLElement,
   kind: MarkdownFeatureActivationKind,
@@ -1064,7 +1065,7 @@ const replaceWithFeatureError = (
     inline,
   )
   const preservedId = element.getAttribute('id')
-  if (preservedId && MARKDOWN_ANCHOR_ID.test(preservedId)) {
+  if (preservedId && CANONICAL_BLOCK_ANCHOR_ID.test(preservedId)) {
     errorElement.setAttribute('id', preservedId)
   }
   element.replaceWith(errorElement)

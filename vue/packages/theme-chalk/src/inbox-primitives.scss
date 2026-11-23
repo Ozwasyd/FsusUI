@@ -223,13 +223,12 @@
   width: 100%;
   min-width: 0;
   min-height: 100%;
-  container-type: inline-size;
   background: getCssVar('bg-color');
 
   @include e(header) {
-    display: grid;
-    grid-template-columns: auto minmax(0, 1fr) auto;
-    gap: 12px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 12px;
     align-items: center;
     align-items: safe center;
     min-width: 0;
@@ -240,6 +239,7 @@
   @include e(back) {
     display: inline-flex;
     align-items: center;
+    flex: 0 1 auto;
     min-width: 0;
     max-width: 100%;
   }
@@ -247,6 +247,7 @@
   @include e(heading) {
     display: grid;
     gap: 4px;
+    flex: 1 1 min(100%, 9rem);
     min-width: 0;
   }
 
@@ -274,47 +275,11 @@
     flex-wrap: wrap;
     align-items: center;
     justify-content: flex-end;
+    flex: 0 1 auto;
+    margin-inline-start: auto;
     gap: 8px;
     min-width: 0;
     max-width: 100%;
-  }
-
-  @container (max-width: 559px) {
-    @include e(header) {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      gap: 8px 12px;
-
-      &:has(> .#{$namespace}-thread-panel__back) {
-        .#{$namespace}-thread-panel__back {
-          order: 1;
-          flex: 0 1 auto;
-        }
-
-        .#{$namespace}-thread-panel__actions {
-          order: 2;
-          flex: 0 1 auto;
-          margin-inline-start: auto;
-        }
-
-        .#{$namespace}-thread-panel__heading {
-          order: 3;
-          flex: 1 0 100%;
-        }
-      }
-
-      &:not(:has(> .#{$namespace}-thread-panel__back)) {
-        .#{$namespace}-thread-panel__heading {
-          flex: 1 0 100%;
-        }
-
-        .#{$namespace}-thread-panel__actions {
-          flex: 1 0 100%;
-          justify-content: flex-start;
-        }
-      }
-    }
   }
 
   @include e(context) {
