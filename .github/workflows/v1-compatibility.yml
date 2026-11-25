@@ -1,0 +1,66 @@
+name: V1 Compatibility Foundation
+
+on:
+  pull_request:
+  merge_group:
+    types: [checks_requested]
+  push:
+    branches: [main, master]
+
+permissions:
+  contents: read
+
+defaults:
+  run:
+    shell: bash
+
+concurrency:
+  group: v1-compatibility-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  v1-runtime-contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Protect the frozen V1 authority
+        env:
+          V1_BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.merge_group.base_sha || github.event.before }}
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/v1-compatibility"
+          # Prefer the checker from the trusted base, not the candidate being checked.
+          if git cat-file -e "$V1_BASE_SHA:scripts/check-v1-authority.mjs" 2>/dev/null; then
+            git show "$V1_BASE_SHA:scripts/check-v1-authority.mjs" > "$RUNNER_TEMP/check-v1-authority.mjs"
+            checker="$RUNNER_TEMP/check-v1-authority.mjs"
+          else
+            checker="scripts/check-v1-authority.mjs"
+          fi
+          node "$checker" --root "$GITHUB_WORKSPACE" --base "$V1_BASE_SHA" | tee "$RUNNER_TEMP/v1-compatibility/authority.log"
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.33.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+      - run: pnpm install --frozen-lockfile
+      - name: Test fail-closed contract checks
+        run: |
+          set -euo pipefail
+          node --test scripts/v1-runtime-contract.test.mjs scripts/check-v1-authority.test.mjs | tee "$RUNNER_TEMP/v1-compatibility/negative-tests.log"
+      - run: pnpm run prepare:test-artifacts
+      - name: Compare source runtime against frozen V1
+        run: |
+          set -euo pipefail
+          pnpm exec vitest run --config vue/vitest.config.ts --maxWorkers=2 vue/tests/boundary/v1-runtime-compatibility.test.ts | tee "$RUNNER_TEMP/v1-compatibility/runtime.log"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: v1-compatibility-${{ github.sha }}
+          path: ${{ runner.temp }}/v1-compatibility
+          retention-days: 14
