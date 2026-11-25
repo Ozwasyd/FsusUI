@@ -96,3 +96,47 @@ Any Element Plus compatibility claim must have at least one of:
 - a release evidence document recording the command and result.
 
 Without one, the behavior should be described as best-effort or implementation detail.
+
+## V1-to-V2 Zero-Change Objective
+
+The V2 compatibility track permits a consumer to change only the dependency
+version and necessary dependency-resolution records. Application source,
+imports, templates, stylesheet imports, plugin registration, registry setup,
+build configuration, and runtime options must remain unchanged. Any adapter
+needed for this objective belongs inside the existing published package, not
+in a consumer-installed migration package or opt-in compatibility mode.
+This is a V2 release acceptance objective, not a claim that V2 is qualified.
+
+[`spec/baselines/vue-v1-runtime.json`](../spec/baselines/vue-v1-runtime.json)
+is a frozen **source-declaration** inventory of the V1 revision identified in
+its `source` record. It is separate from the regeneratable cross-platform
+semantic inventory in `vue-current.json`. The independent runtime gate covers
+component prop and event names, prop constructor order, requiredness, literal
+defaults, default-factory arity, validator presence, root export names/kinds,
+plugin registrations, package entry/peer contracts, and the documented Table
+instance operations. Hashes are canonicalized by
+[`scripts/v1-runtime-contract.mjs`](../scripts/v1-runtime-contract.mjs).
+The root-export fingerprint is intentionally conservative; it does not promote
+undocumented exports to stable public API.
+
+Run the additive source gate with:
+
+```bash
+node --test scripts/v1-runtime-contract.test.mjs
+pnpm exec vitest run --config vue/vitest.config.ts vue/tests/boundary/v1-runtime-compatibility.test.ts
+```
+
+Do not regenerate this V1 inventory to make a refactor pass. Investigate the
+change against the recorded V1 source instead. Existing semantic, component,
+consumer-install, and release checks remain required; this gate replaces none
+of them. In particular, the current semantic extractor's imported Options API
+props and constant-event omissions are not repaired by this runtime inventory.
+
+This source gate does not prove emitted payloads or ordering, TypeScript
+inference, factory/validator behavior, CSS equivalence, SSR/hydration, native
+input, security behavior, performance, or NuGet compatibility. It is not an
+old/new published-package comparison. Full qualification still requires an
+immutable V1/V2 artifact pair, unchanged generic and FsusBlog consumers,
+applicable Avalonia consumers, and the existing visual/security/performance
+acceptance lanes. The source version in the inventory must not be treated as
+proof of compatibility with every historical V1 package.
