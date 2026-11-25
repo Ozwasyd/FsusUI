@@ -53,7 +53,15 @@ jobs:
         run: |
           set -euo pipefail
           node --test scripts/v1-runtime-contract.test.mjs scripts/check-v1-authority.test.mjs | tee "$RUNNER_TEMP/v1-compatibility/negative-tests.log"
-      - run: pnpm run prepare:test-artifacts
+      - name: Set up pinned Emscripten
+        uses: emscripten-core/setup-emsdk@v15
+        with:
+          version: 5.0.4
+          actions-cache-folder: emsdk-cache
+      - name: Prepare real test artifacts
+        run: |
+          set -euo pipefail
+          pnpm run prepare:test-artifacts 2>&1 | tee "$RUNNER_TEMP/v1-compatibility/prepare-artifacts.log"
       - name: Compare source runtime against frozen V1
         run: |
           set -euo pipefail
