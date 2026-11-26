@@ -2,7 +2,7 @@
 import { nextTick } from 'vue'
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest'
 import makeMount from '@element-plus/test-utils/make-mount'
-import setupMock from '../setup-mock'
+import setupMock from './setup-mock'
 import {
   END_ALIGNMENT,
   HORIZONTAL,
