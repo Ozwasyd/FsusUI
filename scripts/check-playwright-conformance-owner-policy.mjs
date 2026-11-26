@@ -9,8 +9,7 @@ import {
   rmSync,
   writeFileSync,
 } from 'node:fs'
-import { dirname, relative, resolve } from 'node:path'
-import { fileURLToPath } from 'node:url'
+import { relative, resolve } from 'node:path'
 import {
   CONFORMANCE_FIXED_CELLS,
   CONFORMANCE_FIXED_NAMESPACES,
@@ -22,32 +21,21 @@ import {
   validateConformanceReceipt,
 } from './conformance-playwright-runner.mjs'
 import {
-  assertOwnerFixedCells,
-  loadPlaywrightOwners,
-  planOwnerCells,
-} from './layout-playwright-plan.mjs'
-import { loadPlaywrightSuiteRegistry } from './playwright-suites.mjs'
+  assertMissingCellRejected,
+  assertOwnerPlans,
+  deepClone,
+  expectThrows,
+  extractWorkflowJob,
+  loadPlaywrightPolicyContext,
+  repoRoot,
+  validatePlaywrightOwnerWorkflow,
+} from './lib/playwright-owner-policy-core.mjs'
 
-const root = resolve(dirname(fileURLToPath(import.meta.url)), '..')
-const read = (file) => readFileSync(resolve(root, file), 'utf8')
 const sha256 = (value) => createHash('sha256').update(value).digest('hex')
-const shaFile = (file) => sha256(readFileSync(resolve(root, file)))
-const clone = (value) => JSON.parse(JSON.stringify(value))
+const shaFile = (file) => sha256(readFileSync(resolve(repoRoot, file)))
 
-const workflowJob = (source, name) =>
-  source.match(
-    new RegExp(
-      `\\n  ${name}:\\n([\\s\\S]*?)(?=\\n  [a-zA-Z][\\w-]*:\\n|$)`,
-      'u',
-    ),
-  )?.[1] ?? ''
+const { registry, owners, reusableWorkflow } = loadPlaywrightPolicyContext()
 
-const expectFailure = (label, fn) => {
-  assert.throws(fn, undefined, label)
-}
-
-const registry = loadPlaywrightSuiteRegistry()
-const owners = loadPlaywrightOwners()
 const suite = registry.suites.find(
   (entry) => entry.id === 'web-interaction-conformance',
 )
@@ -57,65 +45,57 @@ assert.deepEqual(
   suite.cells.map((cell) => cell.id),
   [...CONFORMANCE_FIXED_CELLS],
 )
-for (const group of ['main', 'nightly', 'release']) {
-  const plan = loadConformanceOwnerPlan(group)
-  assert.deepEqual(
-    plan.cells.map((cell) => cell.id),
-    [...CONFORMANCE_FIXED_CELLS],
-  )
-  assert.deepEqual(
-    plan.cells.map((cell) => cell.artifactNamespace),
-    CONFORMANCE_FIXED_CELLS.map(
-      (cellId) => CONFORMANCE_FIXED_NAMESPACES[cellId],
-    ),
-  )
-  for (const cell of plan.cells) {
-    assert.equal((cell.command.match(/--project=\S+/gu) ?? []).length, 1)
-  }
-}
 
-const workflow = read('.github/workflows/_quality-playwright.yml')
-const job = workflowJob(workflow, CONFORMANCE_OWNER)
-assert.ok(job, 'playwright-conformance workflow owner is required')
-assert.ok(!/\n\s+(?:strategy|matrix):/u.test(job), 'outer matrix is forbidden')
-assert.ok(job.includes('conformance-playwright-owner-run.mjs'))
-assert.ok(!job.includes('pnpm test:conformance:web-interaction'))
-const installCommands = [
-  ...job.matchAll(/playwright install --with-deps([^\n]+)/gu),
-].map((match) => match[1].trim().split(/\s+/u))
-assert.ok(installCommands.length >= 1, 'playwright install command is required')
-for (const browser of ['chromium', 'firefox', 'webkit']) {
-  const count = installCommands.filter((browsers) =>
-    browsers.includes(browser),
-  ).length
-  assert.equal(count, 1, `${browser} must be installed exactly once`)
-}
-assert.ok(job.includes('uses: ./.github/actions/readiness-manifest'))
-assert.ok(job.includes('gate: playwright-conformance'))
-assert.ok(job.includes('playwright-receipts:'))
-assert.ok(job.includes('playwright-plan:'))
-assert.ok(job.includes('--impact-plan'))
-assert.ok(job.includes('needs: playwright-pr-impact-plan'))
-assert.ok(!job.includes('continue-on-error'))
-const prReadiness = workflowJob(workflow, 'playwright-pr-readiness')
-assert.ok(prReadiness.includes('playwright-conformance'))
-
-const mutatedRegistry = clone(registry)
-mutatedRegistry.suites.find(
-  (entry) => entry.id === 'web-interaction-conformance',
-).cells = suite.cells.filter((cell) => cell.project !== 'webkit')
-expectFailure('missing WebKit cell fails', () => {
-  const plan = planOwnerCells(
-    CONFORMANCE_OWNER,
-    'main',
-    mutatedRegistry,
-    owners,
-  )
-  assertOwnerFixedCells(plan, [...CONFORMANCE_FIXED_CELLS])
+assertOwnerPlans({
+  loadPlan: loadConformanceOwnerPlan,
+  fixedCells: CONFORMANCE_FIXED_CELLS,
+  fixedNamespaces: CONFORMANCE_FIXED_NAMESPACES,
 })
 
-mkdirSync(resolve(root, '.tmp'), { recursive: true })
-const scratch = mkdtempSync(resolve(root, '.tmp/conformance-policy-'))
+const workflowFailures = validatePlaywrightOwnerWorkflow(reusableWorkflow, {
+  jobName: CONFORMANCE_OWNER,
+  ownerScript: 'conformance-playwright-owner-run.mjs',
+  forbiddenCommands: ['pnpm test:conformance:web-interaction'],
+  requiredBrowsers: ['chromium', 'firefox', 'webkit'],
+  requireEvidenceUpload: false,
+  extraChecks: [
+    (job) =>
+      [
+        'uses: ./.github/actions/readiness-manifest',
+        'gate: playwright-conformance',
+        'playwright-receipts:',
+        'playwright-plan:',
+        '--impact-plan',
+        'needs: playwright-pr-impact-plan',
+      ]
+        .filter((fragment) => !job.includes(fragment))
+        .map((fragment) => `missing required conformance fragment: ${fragment}`)
+        .join('; ') || null,
+    (job) =>
+      job.includes('continue-on-error')
+        ? 'playwright-conformance must not continue-on-error'
+        : null,
+  ],
+})
+assert.deepEqual(workflowFailures, [], workflowFailures.join('; '))
+assert.ok(
+  extractWorkflowJob(reusableWorkflow, 'playwright-pr-readiness').includes(
+    'playwright-conformance',
+  ),
+)
+
+assertMissingCellRejected({
+  label: 'missing WebKit cell fails',
+  registry,
+  owners,
+  owner: CONFORMANCE_OWNER,
+  suiteId: 'web-interaction-conformance',
+  project: 'webkit',
+  fixedCells: CONFORMANCE_FIXED_CELLS,
+})
+
+mkdirSync(resolve(repoRoot, '.tmp'), { recursive: true })
+const scratch = mkdtempSync(resolve(repoRoot, '.tmp/conformance-policy-'))
 try {
   const commitSha = 'a'.repeat(40)
   const browser = 'chromium'
@@ -153,7 +133,7 @@ try {
   }
   const tracePath = resolve(scratch, 'trace.json')
   writeFileSync(tracePath, `${JSON.stringify(trace)}\n`)
-  const traceRelative = relative(root, tracePath)
+  const traceRelative = relative(repoRoot, tracePath)
   const traceSha = shaFile(traceRelative)
   const receipt = {
     commitSha,
@@ -201,8 +181,8 @@ try {
     ['synthetic IME', (value) => (value.conformance.nativeImeAutomated = true)],
     ['skip all', (value) => (value.tests.skipped = 1)],
   ]) {
-    expectFailure(label, () => {
-      const candidate = clone(receipt)
+    expectThrows(label, () => {
+      const candidate = deepClone(receipt)
       mutate(candidate)
       validateConformanceReceipt(candidate, cell)
     })
