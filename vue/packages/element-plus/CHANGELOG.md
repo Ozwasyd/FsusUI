@@ -1,5 +1,14 @@
 # element-plus
 
+## 1.6.0-preview.12
+
+### Preview Changes
+
+- Ship public-preview candidate `@ozwasyd/element-plus@1.6.0-preview.12` (`preview` dist-tag on GitHub Packages).
+- **Render Pipeline Modularization & Scoped Context (`#1135`)**: Split `use-render-pipeline` into 9 focused modules (`types`, `config`, `diagnostics`, `hardware-profile`, `registry`, `scheduler`, `virtual-window`, `runtime`, `index`) and expose tree-shakeable scoped dependency injection (`createFsusRenderPipelineContext`, `provideFsusRenderPipelineContext`, `useFsusRenderPipelineContext`, `FSUS_RENDER_PIPELINE_CONTEXT_KEY`) while preserving the consumer Markdown hydration bundle budget.
+- **Markdown Editor & WASM Runtime Decoupling (`#1135`)**: Extract the zero-Vue/zero-DOM `EditorKernel`, 12 domain composables, and 5 sub-surface SFCs from `markdown-editor.vue` (6,353 -> 2,390 LOC) and decompose `wasm/markdown-runtime.ts` (2,603 -> 551 LOC) into `markdown-result-authority`, `markdown-feature-activation`, and `markdown-wasm-engine` with deterministic export binding and preserved mobile viewport layout restore.
+- **Theme, Packaging & Cross-Platform Maintainability (`#1135`)**: Split `fsus-theme.scss` into 8 domain partials with byte-identical compiled CSS (`el-fsus-theme.css`, `el-fsus.css`, `index.css`), remove `@element-plus/test-utils` from production/workspace `dependencies`, eliminate build polling in `gulpfile.ts`, consolidate Playwright configs and contract/governance scripts, and decompose large Avalonia controls into responsibility folders while preserving all 528 public Avalonia types and Native AOT compliance.
+
 ## 1.6.0-preview.11
 
 ### Preview Changes
