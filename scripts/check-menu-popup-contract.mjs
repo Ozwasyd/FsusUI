@@ -2,6 +2,7 @@ import {
   extractBlockAfter,
   isMainModule,
   readRepoFile,
+  readScssBundle,
   reportContractResult,
   topLevelBlocks,
 } from './lib/scss-contract-utils.mjs'
@@ -71,7 +72,7 @@ export function checkMenuPopupContract() {
   }
 
   const themeFile = 'vue/packages/theme-chalk/src/fsus-theme.scss'
-  const themeSource = readRepoFile(themeFile)
+  const themeSource = readScssBundle(themeFile)
   let hasMenuPopupSurface = false
 
   for (const block of topLevelBlocks(themeSource)) {

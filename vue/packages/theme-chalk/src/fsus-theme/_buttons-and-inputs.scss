@@ -1,0 +1,828 @@
+@use '../mixins/mixins' as *;
+@use '../common/var' as *;
+@use '../common/fsus-tokens' as *;
+@use './mixins' as *;
+.#{$namespace}-button,
+.#{$namespace}-input__wrapper,
+.#{$namespace}-textarea__inner,
+.#{$namespace}-select-v2__wrapper,
+.#{$namespace}-pagination button,
+.#{$namespace}-pager li,
+.#{$namespace}-menu-item,
+.#{$namespace}-sub-menu__title,
+.#{$namespace}-tabs__item,
+.#{$namespace}-tree-node__content,
+.#{$namespace}-dropdown-menu__item,
+.#{$namespace}-select-dropdown__item,
+.#{$namespace}-cascader-node,
+.#{$namespace}-upload-dragger,
+.#{$namespace}-table__row,
+.#{$namespace}-table-v2__row,
+.#{$namespace}-tag,
+.#{$namespace}-check-tag,
+.#{$namespace}-timeline-item__node,
+.#{$namespace}-step__icon,
+.#{$namespace}-carousel__button,
+.#{$namespace}-backtop {
+  transition:
+    background-color getCssVar('transition-duration')
+      getCssVar('transition-function-ease-in-out-bezier'),
+    border-color getCssVar('transition-duration')
+      getCssVar('transition-function-ease-in-out-bezier'),
+    box-shadow getCssVar('transition-duration')
+      getCssVar('transition-function-ease-in-out-bezier'),
+    color getCssVar('transition-duration')
+      getCssVar('transition-function-ease-in-out-bezier'),
+    opacity getCssVar('transition-duration')
+      getCssVar('transition-function-ease-in-out-bezier'),
+    transform getCssVar('transition-duration')
+      getCssVar('transition-function-ease-in-out-bezier');
+}
+
+.#{$namespace}-table__row,
+.#{$namespace}-table-v2__row,
+.#{$namespace}-table .#{$namespace}-tag,
+.#{$namespace}-table .#{$namespace}-check-tag,
+.#{$namespace}-table .#{$namespace}-button,
+.#{$namespace}-table-v2 .#{$namespace}-tag,
+.#{$namespace}-table-v2 .#{$namespace}-check-tag,
+.#{$namespace}-table-v2 .#{$namespace}-button {
+  transition:
+    background-color getCssVar('transition-duration')
+      getCssVar('transition-function-ease-in-out-bezier'),
+    border-color getCssVar('transition-duration')
+      getCssVar('transition-function-ease-in-out-bezier'),
+    box-shadow getCssVar('transition-duration')
+      getCssVar('transition-function-ease-in-out-bezier'),
+    color getCssVar('transition-duration')
+      getCssVar('transition-function-ease-in-out-bezier'),
+    opacity getCssVar('transition-duration')
+      getCssVar('transition-function-ease-in-out-bezier');
+  transform: none;
+}
+
+.#{$namespace}-table .#{$namespace}-button:hover,
+.#{$namespace}-table .#{$namespace}-button:focus,
+.#{$namespace}-table .#{$namespace}-button:active,
+.#{$namespace}-table .#{$namespace}-tag:hover,
+.#{$namespace}-table .#{$namespace}-tag:active,
+.#{$namespace}-table .#{$namespace}-check-tag:hover,
+.#{$namespace}-table .#{$namespace}-check-tag:active,
+.#{$namespace}-table-v2 .#{$namespace}-button:hover,
+.#{$namespace}-table-v2 .#{$namespace}-button:focus,
+.#{$namespace}-table-v2 .#{$namespace}-button:active,
+.#{$namespace}-table-v2 .#{$namespace}-tag:hover,
+.#{$namespace}-table-v2 .#{$namespace}-tag:active,
+.#{$namespace}-table-v2 .#{$namespace}-check-tag:hover,
+.#{$namespace}-table-v2 .#{$namespace}-check-tag:active {
+  transform: none;
+}
+
+[data-fsus-motion-disabled='true'],
+[data-fsus-motion-disabled='true'] * {
+  transition-duration: 1ms !important;
+  animation-duration: 1ms !important;
+  animation-iteration-count: 1 !important;
+}
+
+[data-fsus-motion-disabled='true'],
+[data-fsus-motion-disabled='true']:hover,
+[data-fsus-motion-disabled='true']:focus,
+[data-fsus-motion-disabled='true']:active {
+  transform: none !important;
+  filter: none !important;
+}
+
+.#{$namespace}-table .#{$namespace}-button,
+.#{$namespace}-table-v2 .#{$namespace}-button {
+  flex-shrink: 0;
+  max-width: 100%;
+  overflow-wrap: normal;
+  white-space: nowrap;
+}
+
+.#{$namespace}-table .#{$namespace}-button > span,
+.#{$namespace}-table-v2 .#{$namespace}-button > span {
+  overflow-wrap: normal;
+  white-space: nowrap;
+}
+
+.#{$namespace}-table .#{$namespace}-button.is-inline-action,
+.#{$namespace}-table-v2 .#{$namespace}-button.is-inline-action {
+  min-height: 32px;
+  height: 32px;
+  padding-block: 0;
+  padding-inline: 6px;
+  vertical-align: middle;
+}
+
+.fsus-action-row,
+.fsus-table-actions,
+[data-fsus-action-row],
+[data-fsus-table-actions],
+.#{$namespace}-table .cell:has(.#{$namespace}-button),
+.#{$namespace}-table-v2__cell:has(.#{$namespace}-button) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--fsus-space-2);
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+  isolation: isolate;
+  transform: none;
+}
+
+.fsus-action-row > *,
+.fsus-table-actions > *,
+[data-fsus-action-row] > *,
+[data-fsus-table-actions] > *,
+.#{$namespace}-table .cell:has(.#{$namespace}-button) > *,
+.#{$namespace}-table-v2__cell:has(.#{$namespace}-button) > * {
+  flex: 0 0 auto;
+  transform: none;
+}
+
+.fsus-action-row .#{$namespace}-tag,
+.fsus-action-row .#{$namespace}-check-tag,
+.fsus-table-actions .#{$namespace}-tag,
+.fsus-table-actions .#{$namespace}-check-tag,
+[data-fsus-action-row] .#{$namespace}-tag,
+[data-fsus-action-row] .#{$namespace}-check-tag,
+[data-fsus-table-actions] .#{$namespace}-tag,
+[data-fsus-table-actions] .#{$namespace}-check-tag {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.fsus-action-row .#{$namespace}-button:hover,
+.fsus-action-row .#{$namespace}-button:focus,
+.fsus-action-row .#{$namespace}-button:active,
+.fsus-action-row .#{$namespace}-tag:hover,
+.fsus-action-row .#{$namespace}-tag:active,
+.fsus-table-actions .#{$namespace}-button:hover,
+.fsus-table-actions .#{$namespace}-button:focus,
+.fsus-table-actions .#{$namespace}-button:active,
+.fsus-table-actions .#{$namespace}-tag:hover,
+.fsus-table-actions .#{$namespace}-tag:active,
+[data-fsus-action-row] .#{$namespace}-button:hover,
+[data-fsus-action-row] .#{$namespace}-button:focus,
+[data-fsus-action-row] .#{$namespace}-button:active,
+[data-fsus-action-row] .#{$namespace}-tag:hover,
+[data-fsus-action-row] .#{$namespace}-tag:active,
+[data-fsus-table-actions] .#{$namespace}-button:hover,
+[data-fsus-table-actions] .#{$namespace}-button:focus,
+[data-fsus-table-actions] .#{$namespace}-button:active,
+[data-fsus-table-actions] .#{$namespace}-tag:hover,
+[data-fsus-table-actions] .#{$namespace}-tag:active {
+  transform: none;
+}
+
+.#{$namespace}-button {
+  @include fsus-control(control);
+  background: transparent;
+  color: var(--el-text-color-primary);
+  min-height: 44px;
+  padding: 0 var(--fsus-component-button-padding-x);
+  box-shadow: none;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+
+  &:hover,
+  &:focus {
+    background: var(--el-fill-color-light);
+    border-color: var(--fsus-scholarly-blue);
+    color: var(--fsus-scholarly-blue);
+    transform: translateY(-1px);
+  }
+
+  &:active {
+    transform: none;
+    background: var(--el-fill-color);
+  }
+
+  &:focus-visible {
+    @include a11y-focus-ring($radius: var(--fsus-radius-control));
+  }
+
+  &.is-disabled,
+  &.is-disabled:hover {
+    background: var(--el-disabled-bg-color);
+    border-color: var(--el-disabled-border-color);
+    color: var(--el-disabled-text-color);
+    transform: none;
+    opacity: 1;
+  }
+}
+
+.#{$namespace}-button--primary {
+  background: var(--fsus-component-state-button-primary-background-default);
+  border-color: var(--fsus-component-state-button-primary-background-default);
+  color: var(--el-bg-color);
+
+  &:hover,
+  &:focus {
+    background: var(--fsus-component-state-button-primary-background-hover);
+    border-color: var(--fsus-component-state-button-primary-background-hover);
+    color: #ffffff;
+  }
+}
+
+.#{$namespace}-button--success {
+  background: rgba(22, 163, 74, 0.08);
+  border-color: rgba(22, 163, 74, 0.18);
+  color: #166534;
+}
+
+.#{$namespace}-button--warning {
+  background: rgba(217, 119, 6, 0.08);
+  border-color: rgba(217, 119, 6, 0.18);
+  color: #92400e;
+}
+
+.#{$namespace}-button--danger {
+  background: rgba(220, 38, 38, 0.08);
+  border-color: rgba(220, 38, 38, 0.18);
+  color: #991b1b;
+}
+
+.#{$namespace}-button--info {
+  background: rgba(113, 113, 122, 0.08);
+  border-color: rgba(113, 113, 122, 0.16);
+  color: var(--el-text-color-regular);
+}
+
+.#{$namespace}-button.is-text,
+.#{$namespace}-button.is-link,
+.#{$namespace}-button--text {
+  background: transparent;
+  border-color: transparent;
+  color: var(--el-text-color-regular);
+  min-height: auto;
+  padding-inline: 8px;
+
+  &:hover,
+  &:focus {
+    background: transparent;
+    color: var(--el-text-color-primary);
+    transform: none;
+  }
+}
+
+.#{$namespace}-input__wrapper,
+.#{$namespace}-textarea__inner,
+.#{$namespace}-select-v2__wrapper,
+.#{$namespace}-select__wrapper,
+.#{$namespace}-date-editor.#{$namespace}-input__wrapper,
+.#{$namespace}-range-editor.#{$namespace}-input__wrapper,
+.#{$namespace}-input-number,
+.#{$namespace}-input-group__append,
+.#{$namespace}-input-group__prepend,
+.#{$namespace}-color-picker__trigger {
+  @include fsus-control(control);
+  background: var(--el-bg-color);
+  box-shadow: none !important;
+}
+
+.#{$namespace}-input__wrapper,
+.#{$namespace}-select-v2__wrapper,
+.#{$namespace}-select__wrapper,
+.#{$namespace}-date-editor.#{$namespace}-input__wrapper,
+.#{$namespace}-range-editor.#{$namespace}-input__wrapper,
+.#{$namespace}-input-number,
+.#{$namespace}-color-picker__trigger {
+  min-height: 44px;
+
+  &:hover {
+    background: var(--el-bg-color);
+    border-color: var(--fsus-scholarly-blue);
+  }
+
+  &.is-focus,
+  &:focus-within {
+    background: var(--el-bg-color);
+    border-color: var(--fsus-scholarly-blue);
+    box-shadow: inset 0 0 0 var(--fsus-focus-ring-width, 2px)
+      var(--fsus-scholarly-blue) !important;
+  }
+}
+
+.#{$namespace}-select:not(.is-disabled) .#{$namespace}-input__wrapper {
+  &.is-focus,
+  &:focus-within {
+    border-color: var(--fsus-scholarly-blue);
+    box-shadow: inset 0 0 0 var(--fsus-focus-ring-width, 2px)
+      var(--fsus-scholarly-blue) !important;
+  }
+}
+
+.#{$namespace}-textarea__inner {
+  min-height: 112px;
+  padding: 12px 14px;
+
+  &:hover,
+  &:focus {
+    background: var(--el-bg-color);
+    border-color: var(--fsus-scholarly-blue);
+  }
+
+  &:focus-visible {
+    box-shadow: inset 0 0 0 var(--fsus-focus-ring-width, 2px)
+      var(--fsus-scholarly-blue) !important;
+  }
+}
+
+.#{$namespace}-input__inner,
+.#{$namespace}-textarea__inner,
+.#{$namespace}-range-input,
+.#{$namespace}-select__placeholder,
+.#{$namespace}-select-v2__placeholder {
+  color: var(--el-text-color-primary);
+
+  &::placeholder {
+    color: var(--el-text-color-placeholder);
+  }
+}
+
+.#{$namespace}-form-item__label,
+.#{$namespace}-form-item__content > .#{$namespace}-form-item__error,
+.#{$namespace}-upload__tip {
+  color: var(--fsus-form-readable-text);
+}
+
+.#{$namespace}-form-item__error {
+  color: var(--el-color-danger);
+}
+
+.#{$namespace}-input__inner::placeholder,
+.#{$namespace}-textarea__inner::placeholder,
+.#{$namespace}-range-input::placeholder,
+.#{$namespace}-select__placeholder,
+.#{$namespace}-select-v2__placeholder {
+  color: var(--fsus-form-state-text);
+  opacity: 1;
+}
+
+.#{$namespace}-input.is-disabled .#{$namespace}-input__wrapper,
+.#{$namespace}-textarea.is-disabled .#{$namespace}-textarea__inner,
+.#{$namespace}-select .#{$namespace}-select__wrapper.is-disabled,
+.#{$namespace}-select-v2__wrapper.is-disabled,
+.#{$namespace}-date-editor.is-disabled,
+.#{$namespace}-input-number.is-disabled,
+.#{$namespace}-upload.is-disabled .#{$namespace}-upload-dragger {
+  background: var(--el-disabled-bg-color);
+  border-color: var(--el-disabled-border-color);
+  color: var(--el-disabled-text-color);
+  opacity: 1;
+}
+
+.#{$namespace}-input.is-disabled .#{$namespace}-input__inner,
+.#{$namespace}-textarea.is-disabled .#{$namespace}-textarea__inner,
+.#{$namespace}-select .#{$namespace}-select__wrapper.is-disabled,
+.#{$namespace}-select-v2__wrapper.is-disabled,
+.#{$namespace}-date-editor.is-disabled .#{$namespace}-input__inner {
+  color: var(--el-disabled-text-color);
+  -webkit-text-fill-color: var(--el-disabled-text-color);
+}
+
+.#{$namespace}-input-number {
+  @include fsus-control(control);
+  background: var(--el-bg-color);
+  // Shared action-size token (48/44/40 ladder). Both controls-position modes
+  // consume this token — no per-mode hardcoded widths.
+  --fsus-input-number-action-size: var(--fsus-control-height, 44px);
+  --fsus-input-number-icon-size: var(--fsus-icon-size-md, 16px);
+  overflow: hidden;
+  padding: 0;
+  display: inline-flex;
+  align-items: stretch;
+  min-height: var(--fsus-control-height, 44px);
+
+  &.#{$namespace}-input-number--large {
+    --fsus-input-number-action-size: var(--fsus-control-height-spacious, 48px);
+    min-height: var(--fsus-control-height-spacious, 48px);
+  }
+
+  &.#{$namespace}-input-number--small {
+    --fsus-input-number-action-size: var(--fsus-control-height-compact, 40px);
+    min-height: var(--fsus-control-height-compact, 40px);
+  }
+
+  .#{$namespace}-input {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .#{$namespace}-input__wrapper {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    flex: 1;
+    min-height: inherit;
+    // Reserve side strips for left/right decrease/increase hit targets.
+    padding-left: var(--fsus-input-number-action-size);
+    padding-right: var(--fsus-input-number-action-size);
+  }
+
+  .#{$namespace}-input-number__increase,
+  .#{$namespace}-input-number__decrease {
+    background: transparent;
+    color: var(--el-text-color-regular);
+    border: none;
+    box-shadow: none;
+    transform: none;
+    width: var(--fsus-input-number-action-size);
+    min-width: var(--fsus-input-number-action-size);
+    // Extend into the 1px control border so the hit box equals the full border-box
+    // control height (small 40 stays ≥40; no 38px collapse from inset).
+    top: -1px;
+    bottom: -1px;
+    height: auto;
+    min-height: var(--fsus-input-number-action-size);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition:
+      background-color var(--fsus-motion-control, 220ms),
+      color var(--fsus-motion-control, 220ms);
+
+    .#{$namespace}-icon {
+      font-size: var(--fsus-input-number-icon-size);
+      width: 1em;
+      height: 1em;
+      transform: none;
+    }
+
+    &:hover {
+      background: var(--el-fill-color);
+      color: var(--el-text-color-primary);
+      box-shadow: none;
+      transform: none;
+    }
+
+    &:active {
+      background: var(--el-fill-color-dark, var(--el-fill-color));
+      box-shadow: none;
+      transform: none;
+    }
+
+    &:focus-visible {
+      outline: none;
+      box-shadow: inset 0 0 0 var(--fsus-focus-ring-width, 2px)
+        var(--fsus-scholarly-blue);
+    }
+
+    &.is-disabled {
+      color: var(--el-disabled-text-color);
+      background: transparent;
+      opacity: 1;
+      cursor: not-allowed;
+
+      &:hover,
+      &:active {
+        color: var(--el-disabled-text-color);
+        background: transparent;
+        box-shadow: none;
+        transform: none;
+      }
+    }
+  }
+
+  .#{$namespace}-input-number__decrease {
+    border-right: 1px solid var(--el-border-color-lighter);
+  }
+
+  .#{$namespace}-input-number__increase {
+    border-left: 1px solid var(--el-border-color-lighter);
+  }
+
+  // controls-position="right" shares the same action-size token.
+  &.is-controls-right {
+    .#{$namespace}-input__wrapper {
+      padding-left: 12px;
+      padding-right: var(--fsus-input-number-action-size);
+    }
+
+    .#{$namespace}-input-number__increase,
+    .#{$namespace}-input-number__decrease {
+      width: var(--fsus-input-number-action-size);
+      min-width: var(--fsus-input-number-action-size);
+      // Stacked strip: each row is half the control; width still ≥40 via token.
+      min-height: 0;
+      height: 50%;
+      top: auto;
+      bottom: auto;
+
+      .#{$namespace}-icon {
+        transform: none;
+      }
+
+      &:hover {
+        box-shadow: none;
+        transform: none;
+      }
+    }
+
+    .#{$namespace}-input-number__increase {
+      top: 0;
+      bottom: auto;
+      border-bottom: 1px solid var(--el-border-color-lighter);
+      border-left: 1px solid var(--el-border-color-lighter);
+      border-radius: 0;
+    }
+
+    .#{$namespace}-input-number__decrease {
+      bottom: 0;
+      top: auto;
+      right: 0;
+      left: auto;
+      border-right: none;
+      border-left: 1px solid var(--el-border-color-lighter);
+      border-radius: 0;
+    }
+  }
+
+  &.is-disabled {
+    .#{$namespace}-input-number__increase,
+    .#{$namespace}-input-number__decrease {
+      color: var(--el-disabled-text-color);
+      opacity: 1;
+
+      &:hover {
+        color: var(--el-disabled-text-color);
+        background: transparent;
+      }
+    }
+  }
+}
+
+.#{$namespace}-checkbox-button__inner,
+.#{$namespace}-radio-button__inner {
+  @include fsus-control(control);
+  box-shadow: none !important; // override element plus default border logic
+  background: transparent;
+  border-color: transparent;
+  color: var(--el-text-color-regular);
+  min-height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 16px;
+  font-weight: 500;
+}
+
+.#{$namespace}-radio-group .#{$namespace}-radio-button__inner,
+.#{$namespace}-checkbox-group .#{$namespace}-checkbox-button__inner {
+  border-radius: 6px;
+}
+
+.#{$namespace}-radio-group
+  .#{$namespace}-radio-button:first-child
+  .#{$namespace}-radio-button__inner,
+.#{$namespace}-radio-group
+  .#{$namespace}-radio-button:last-child
+  .#{$namespace}-radio-button__inner,
+.#{$namespace}-checkbox-group
+  .#{$namespace}-checkbox-button:first-child
+  .#{$namespace}-checkbox-button__inner,
+.#{$namespace}-checkbox-group
+  .#{$namespace}-checkbox-button:last-child
+  .#{$namespace}-checkbox-button__inner {
+  border-radius: 6px;
+}
+
+.#{$namespace}-checkbox-button:first-child
+  .#{$namespace}-checkbox-button__inner,
+.#{$namespace}-radio-button:first-child .#{$namespace}-radio-button__inner {
+  border-left: none;
+}
+
+.#{$namespace}-checkbox-group,
+.#{$namespace}-radio-group {
+  background: var(--el-fill-color-light);
+  border-radius: 10px;
+  padding: 2px;
+  display: inline-flex;
+  gap: 2px;
+}
+
+.#{$namespace}-checkbox-group:has(> .#{$namespace}-checkbox) {
+  flex-wrap: wrap;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.#{$namespace}-transfer-panel__list.#{$namespace}-checkbox-group {
+  display: block;
+  gap: 0;
+  padding: 6px 0;
+  background: transparent;
+  border-radius: 0;
+
+  &.is-filterable {
+    padding-top: 0;
+  }
+}
+
+.#{$namespace}-checkbox-button.is-checked .#{$namespace}-checkbox-button__inner,
+.#{$namespace}-radio-button.is-active .#{$namespace}-radio-button__inner {
+  background: var(--el-bg-color);
+  color: var(--el-text-color-primary);
+  border-color: transparent;
+  box-shadow: var(--el-box-shadow-lighter) !important;
+}
+
+.#{$namespace}-checkbox-button.is-focus .#{$namespace}-checkbox-button__inner,
+.#{$namespace}-radio-button:focus-within .#{$namespace}-radio-button__inner {
+  border-color: var(--fsus-scholarly-blue) !important;
+  box-shadow: inset 0 0 0 2px var(--fsus-scholarly-blue, #2a599c) !important;
+  z-index: 2;
+}
+
+.#{$namespace}-checkbox-button.is-checked.is-focus
+  .#{$namespace}-checkbox-button__inner,
+.#{$namespace}-radio-button.is-active:focus-within
+  .#{$namespace}-radio-button__inner {
+  border-color: transparent !important;
+  box-shadow:
+    var(--el-box-shadow-lighter),
+    inset 0 0 0 2px
+      color-mix(in srgb, var(--fsus-scholarly-blue) 18%, transparent) !important;
+  z-index: 1;
+}
+
+.#{$namespace}-checkbox.is-bordered,
+.#{$namespace}-radio.is-bordered,
+.#{$namespace}-check-tag {
+  @include fsus-control(control);
+  box-shadow: none;
+}
+
+.#{$namespace}-tag {
+  box-shadow: none;
+}
+
+.#{$namespace}-checkbox__inner,
+.#{$namespace}-radio__inner {
+  border-color: var(--el-border-color-light);
+  background: var(--el-bg-color);
+}
+
+.#{$namespace}-checkbox__inner:hover,
+.#{$namespace}-radio__inner:hover {
+  border-color: var(--el-border-color);
+}
+
+.#{$namespace}-checkbox__input.is-checked .#{$namespace}-checkbox__inner,
+.#{$namespace}-checkbox__input.is-indeterminate .#{$namespace}-checkbox__inner,
+.#{$namespace}-check-tag.is-checked {
+  background: var(--fsus-scholarly-blue);
+  border-color: var(--fsus-scholarly-blue);
+  color: #fcfcfc;
+  box-shadow: none;
+}
+
+.#{$namespace}-checkbox__input.is-checked
+  .#{$namespace}-checkbox__inner::after {
+  border-color: #fcfcfc;
+}
+
+.#{$namespace}-checkbox__input.is-indeterminate
+  .#{$namespace}-checkbox__inner::before {
+  background-color: #fcfcfc;
+}
+
+// Radio: 「环 + 点」极简风格，不填充黑色背景
+.#{$namespace}-radio__input.is-checked .#{$namespace}-radio__inner {
+  background: var(--el-bg-color);
+  border-color: var(--fsus-scholarly-blue);
+  border-width: 2px;
+  box-shadow: none;
+}
+
+.#{$namespace}-radio__input.is-checked .#{$namespace}-radio__inner::after {
+  background-color: var(--fsus-scholarly-blue);
+  width: 6px;
+  height: 6px;
+}
+
+.#{$namespace}-checkbox__input.is-checked + .#{$namespace}-checkbox__label,
+.#{$namespace}-radio__input.is-checked + .#{$namespace}-radio__label {
+  color: var(--el-text-color-primary);
+  font-weight: 500;
+}
+
+.#{$namespace}-switch {
+  --fsus-switch-core-width: 40px;
+  --fsus-switch-action-size: 16px;
+  --fsus-switch-action-inset: 2px;
+  --fsus-switch-motion-thumb: 220ms;
+  --fsus-switch-ease-thumb: cubic-bezier(0.22, 1, 0.36, 1);
+  --fsus-switch-off-bg: color-mix(
+    in srgb,
+    var(--fsus-ink) 7%,
+    var(--fsus-color-surface-raised) 93%
+  );
+  --fsus-switch-off-border: color-mix(
+    in srgb,
+    var(--fsus-ink) 10%,
+    var(--fsus-color-surface-raised) 90%
+  );
+  --fsus-switch-action-bg: var(--fsus-color-surface-raised);
+  --fsus-switch-action-border: color-mix(
+    in srgb,
+    var(--fsus-border-light) 86%,
+    var(--fsus-ink) 14%
+  );
+  --fsus-switch-action-shadow: 0 1px 2px rgba(15, 15, 17, 0.08);
+}
+
+.#{$namespace}-switch--large {
+  --fsus-switch-core-width: 50px;
+  --fsus-switch-action-size: 20px;
+}
+
+.#{$namespace}-switch--small {
+  --fsus-switch-core-width: 30px;
+  --fsus-switch-action-size: 12px;
+}
+
+.#{$namespace}-switch__core {
+  background: var(--fsus-switch-off-bg);
+  border-color: var(--fsus-switch-off-border);
+  box-shadow: inset 0 0 0 1px
+    color-mix(in srgb, var(--fsus-ink) 4%, transparent);
+  transition:
+    background-color var(--fsus-motion-control-fast) var(--fsus-motion-standard),
+    border-color var(--fsus-motion-control-fast) var(--fsus-motion-standard),
+    box-shadow var(--fsus-motion-control-fast) var(--fsus-motion-standard);
+}
+
+.#{$namespace}-switch__action {
+  left: calc(var(--fsus-switch-action-inset) - 1px) !important;
+  box-sizing: border-box;
+  filter: blur(0);
+  transform: none;
+  transition:
+    left var(--fsus-switch-motion-thumb) var(--fsus-switch-ease-thumb),
+    box-shadow var(--fsus-motion-control-fast) var(--fsus-motion-standard),
+    background-color var(--fsus-motion-control-fast) var(--fsus-motion-standard),
+    border-color var(--fsus-motion-control-fast) var(--fsus-motion-standard),
+    color var(--fsus-motion-control-fast) var(--fsus-motion-standard);
+  will-change: left;
+  background-color: var(--fsus-switch-action-bg);
+  box-shadow: var(--fsus-switch-action-shadow);
+  border: 1px solid var(--fsus-switch-action-border);
+}
+
+html.dark .#{$namespace}-switch__action,
+html:where([data-theme-mode='system']:not(.light))[data-theme-resolved='dark']
+  .#{$namespace}-switch__action {
+  --fsus-switch-action-bg: color-mix(
+    in srgb,
+    var(--fsus-color-surface-base) 82%,
+    white 18%
+  );
+  --fsus-switch-action-border: color-mix(
+    in srgb,
+    var(--fsus-border-light) 56%,
+    white 44%
+  );
+  --fsus-switch-action-shadow: 0 1px 2px rgba(0, 0, 0, 0.28);
+}
+
+.#{$namespace}-switch.is-checked .#{$namespace}-switch__core {
+  background: var(--fsus-scholarly-blue);
+  border-color: var(--fsus-scholarly-blue);
+  box-shadow: none;
+}
+
+.#{$namespace}-switch.is-checked
+  .#{$namespace}-switch__core
+  .#{$namespace}-switch__action {
+  --fsus-switch-checked-action-bg: var(--el-color-white);
+  --fsus-switch-action-border: color-mix(
+    in srgb,
+    var(--fsus-scholarly-blue) 18%,
+    var(--el-color-white) 82%
+  );
+  --fsus-switch-action-shadow:
+    inset 0 0 0 1px
+      color-mix(in srgb, var(--fsus-scholarly-blue) 10%, transparent),
+    0 1px 2px rgba(15, 15, 17, 0.16);
+  background-color: var(--fsus-switch-checked-action-bg);
+  left: calc(
+    var(--fsus-switch-core-width) - var(--fsus-switch-action-size) - var(
+        --fsus-switch-action-inset
+      ) -
+      1px
+  ) !important;
+  transform: none;
+}
+
+.#{$namespace}-switch.is-sliding .#{$namespace}-switch__action,
+.#{$namespace}-switch:active .#{$namespace}-switch__action {
+  filter: blur(0);
+  box-shadow: var(--fsus-switch-action-shadow);
+}

@@ -1,12 +1,12 @@
 import { readFileSync } from 'node:fs'
 import path from 'node:path'
-import { fileURLToPath, pathToFileURL } from 'node:url'
-import { compile, compileString } from 'sass'
+import { fileURLToPath } from 'node:url'
+import { compile } from 'sass'
 import { describe, expect, test } from 'vitest'
+import { compileMutatedFsusTheme } from './fsus-theme-mutation-helper'
 
 const dirname = path.dirname(fileURLToPath(import.meta.url))
 const themeSourceDir = path.resolve(dirname, '../src')
-const fsusThemePath = path.join(themeSourceDir, 'fsus-theme.scss')
 const dialogPath = path.join(themeSourceDir, 'dialog.scss')
 const drawerPath = path.join(themeSourceDir, 'drawer.scss')
 const notificationPath = path.join(themeSourceDir, 'notification.scss')
@@ -246,18 +246,15 @@ describe('issue #298 overlay depth contract (Dialog/Drawer/Notification)', () =>
   test.each(fsusThemeMutations)(
     'mutation $id fails the overlay depth contract',
     ({ from, to, id }) => {
-      const shipped = readFileSync(fsusThemePath, 'utf8')
+      const { css, mutated, shipped } = compileMutatedFsusTheme(
+        themeSourceDir,
+        from,
+        to,
+      )
       expect(shipped, `${id}: mutation target must exist in source`).toContain(
         from,
       )
-      const mutated = shipped.replace(from, to)
       expect(mutated, `${id}: mutation must change source`).not.toBe(shipped)
-
-      const css = compileString(mutated, {
-        loadPaths: [themeSourceDir],
-        style: 'expanded',
-        url: pathToFileURL(fsusThemePath),
-      }).css
 
       expect(
         () => assertOverlayDepthContract(css, id),

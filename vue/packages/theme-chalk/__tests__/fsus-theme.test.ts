@@ -1,4 +1,4 @@
-import { readFileSync } from 'node:fs'
+import { readFileSync, readdirSync } from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { compile } from 'sass'
@@ -824,10 +824,14 @@ describe('Fsus theme visual baseline', () => {
 
   test('assigns root components to semantic surfaces instead of one panel mixin', () => {
     const css = compileThemeFile('fsus-theme.scss')
-    const source = readFileSync(
-      path.resolve(dirname, '../src/fsus-theme.scss'),
-      'utf8',
-    )
+    const fsusThemeDir = path.resolve(dirname, '../src/fsus-theme')
+    const source = [
+      readFileSync(path.resolve(dirname, '../src/fsus-theme.scss'), 'utf8'),
+      ...readdirSync(fsusThemeDir)
+        .filter((file) => file.endsWith('.scss'))
+        .sort()
+        .map((file) => readFileSync(path.join(fsusThemeDir, file), 'utf8')),
+    ].join('\n')
 
     for (const selector of [
       '.el-alert',

@@ -2,6 +2,7 @@ import {
   isMainModule,
   lineNumberAt,
   readRepoFile,
+  readScssBundle,
   reportContractResult,
   topLevelBlocks,
 } from './lib/scss-contract-utils.mjs'
@@ -61,7 +62,7 @@ export function checkPopoverSurfaceContract() {
   }
 
   const themeFile = 'vue/packages/theme-chalk/src/fsus-theme.scss'
-  for (const block of topLevelBlocks(readRepoFile(themeFile), {
+  for (const block of topLevelBlocks(readScssBundle(themeFile), {
     normalizeInterpolations: false,
   })) {
     if (

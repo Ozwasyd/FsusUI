@@ -2,6 +2,7 @@ import {
   isMainModule,
   lineNumberAt,
   readRepoFile,
+  readScssBundle,
   reportContractResult,
   selectorItems,
   topLevelBlocks,
@@ -56,7 +57,7 @@ export function checkNotificationContract() {
   }
 
   const themeFile = 'vue/packages/theme-chalk/src/fsus-theme.scss'
-  const themeSource = readRepoFile(themeFile)
+  const themeSource = readScssBundle(themeFile)
   const normalizedThemeSource = withoutLineComments(themeSource).replace(
     /#\{[^}]+\}/gu,
     'NS',

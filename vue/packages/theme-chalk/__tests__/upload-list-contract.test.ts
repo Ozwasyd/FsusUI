@@ -3,11 +3,11 @@ import path from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 import { compile, compileString } from 'sass'
 import { describe, expect, test } from 'vitest'
+import { compileMutatedFsusTheme } from './fsus-theme-mutation-helper'
 
 const dirname = path.dirname(fileURLToPath(import.meta.url))
 const themeSourceDir = path.resolve(dirname, '../src')
 const uploadSourcePath = path.join(themeSourceDir, 'upload.scss')
-const fsusThemePath = path.join(themeSourceDir, 'fsus-theme.scss')
 
 const compileThemeFile = (fileName: string) =>
   compile(path.resolve(themeSourceDir, fileName), {
@@ -356,16 +356,13 @@ describe('issue #456 upload-list flat row contract', () => {
   test.each(fsusThemeMutations)(
     'fsus-theme mutation $id reintroduces card panel and is rejected',
     ({ from, to, id }) => {
-      const shipped = readFileSync(fsusThemePath, 'utf8')
+      const { css, mutated, shipped } = compileMutatedFsusTheme(
+        themeSourceDir,
+        from,
+        to,
+      )
       expect(shipped, `${id}: mutation target must exist`).toContain(from)
-      const mutated = shipped.replace(from, to)
       expect(mutated).not.toBe(shipped)
-
-      const css = compileString(mutated, {
-        loadPaths: [themeSourceDir],
-        style: 'expanded',
-        url: pathToFileURL(fsusThemePath),
-      }).css
 
       expect(
         css,

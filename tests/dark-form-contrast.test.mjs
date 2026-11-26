@@ -2,6 +2,7 @@ import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 import test from 'node:test'
 import { URL } from 'node:url'
+import { readScssBundle } from '../scripts/lib/scss-contract-utils.mjs'
 
 const source = readFileSync(
   new URL(
@@ -10,10 +11,7 @@ const source = readFileSync(
   ),
   'utf8',
 )
-const themeSource = readFileSync(
-  new URL('../vue/packages/theme-chalk/src/fsus-theme.scss', import.meta.url),
-  'utf8',
-)
+const themeSource = readScssBundle('vue/packages/theme-chalk/src/fsus-theme.scss')
 
 const color = (name) => {
   const darkBlock = source.slice(source.indexOf('@mixin fsus-dark-tokens'))

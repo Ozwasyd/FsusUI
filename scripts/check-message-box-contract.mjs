@@ -1,6 +1,7 @@
 import {
   isMainModule,
   readRepoFile,
+  readScssBundle,
   reportContractResult,
   topLevelBlocks,
 } from './lib/scss-contract-utils.mjs'
@@ -40,7 +41,7 @@ export function checkMessageBoxContract() {
 
   const themeFile = 'vue/packages/theme-chalk/src/fsus-theme.scss'
   let hasMessageBoxPanel = false
-  for (const block of topLevelBlocks(readRepoFile(themeFile))) {
+  for (const block of topLevelBlocks(readScssBundle(themeFile))) {
     if (!block.selector.includes('.NS-message-box')) continue
     if (block.body.includes('@include fsus-floating')) {
       failures.push(

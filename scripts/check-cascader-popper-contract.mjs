@@ -3,6 +3,7 @@ import {
   extractMap,
   isMainModule,
   readRepoFile,
+  readScssBundle,
   reportContractResult,
 } from './lib/scss-contract-utils.mjs'
 
@@ -44,7 +45,7 @@ export function checkCascaderPopperContract() {
 
   const themeFile = 'vue/packages/theme-chalk/src/fsus-theme.scss'
   const dropdownBlock = extractBlock(
-    readRepoFile(themeFile),
+    readScssBundle(themeFile),
     '.#{$namespace}-cascader__dropdown',
   )
 

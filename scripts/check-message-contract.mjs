@@ -2,6 +2,7 @@ import {
   isMainModule,
   lineNumberAt,
   readRepoFile,
+  readScssBundle,
   reportContractResult,
   selectorItems,
   topLevelBlocks,
@@ -66,7 +67,7 @@ export function checkMessageContract() {
   }
 
   const themeFile = 'vue/packages/theme-chalk/src/fsus-theme.scss'
-  const themeSource = readRepoFile(themeFile)
+  const themeSource = readScssBundle(themeFile)
   const themeWithoutComments = withoutLineComments(themeSource)
   let hasMessageToastSurface = false
 

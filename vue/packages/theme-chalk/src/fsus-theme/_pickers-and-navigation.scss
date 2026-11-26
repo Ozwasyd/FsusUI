@@ -1,0 +1,698 @@
+@use '../mixins/mixins' as *;
+@use '../common/var' as *;
+@use '../common/fsus-tokens' as *;
+@use './mixins' as *;
+.#{$namespace}-select-dropdown,
+.#{$namespace}-dropdown-menu,
+.#{$namespace}-picker-panel,
+.#{$namespace}-time-panel,
+.#{$namespace}-autocomplete-suggestion,
+.#{$namespace}-cascader-menu,
+.#{$namespace}-cascader-panel,
+.#{$namespace}-color-dropdown,
+.#{$namespace}-color-picker__panel {
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+}
+
+.#{$namespace}-select-dropdown__list,
+.#{$namespace}-dropdown__list {
+  padding: 6px;
+}
+
+.#{$namespace}-picker-panel__shortcut,
+.#{$namespace}-time-panel__btn,
+.#{$namespace}-picker-panel__icon-btn {
+  min-height: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  line-height: normal;
+  border-radius: 12px; // Option rows stay inside the default panel radius budget.
+  color: var(--el-text-color-regular);
+  margin: 2px 0;
+  padding: 0 16px;
+  position: relative;
+  box-sizing: border-box;
+}
+
+.#{$namespace}-picker-panel__shortcut:hover,
+.#{$namespace}-time-panel__btn:hover,
+.#{$namespace}-picker-panel__icon-btn:hover {
+  background: var(--fsus-state-hover-bg);
+  color: var(--fsus-scholarly-blue);
+  outline: none;
+  box-shadow: inset 0 0 0 1px var(--fsus-state-focus-border);
+}
+
+
+@media (hover: none) and (pointer: coarse) {
+  .#{$namespace}-picker-panel__shortcut:hover,
+  .#{$namespace}-time-panel__btn:hover,
+  .#{$namespace}-picker-panel__icon-btn:hover {
+    background: transparent;
+    color: var(--el-text-color-regular);
+    box-shadow: none;
+    outline: none;
+  }
+
+  .#{$namespace}-picker-panel__shortcut:active,
+  .#{$namespace}-time-panel__btn:active,
+  .#{$namespace}-picker-panel__icon-btn:active {
+    background: var(--fsus-state-hover-bg);
+    color: var(--fsus-scholarly-blue);
+    box-shadow: inset 0 0 0 1px var(--fsus-state-focus-border);
+  }
+
+}
+
+.#{$namespace}-picker-panel__footer,
+.#{$namespace}-picker-panel__sidebar,
+.#{$namespace}-time-panel__footer,
+.#{$namespace}-cascader-panel,
+.#{$namespace}-transfer-panel__footer {
+  border-color: var(--el-border-color);
+}
+
+.#{$namespace}-picker__popper.#{$namespace}-popper {
+  border-radius: var(--fsus-radius-floating);
+  box-shadow: var(--fsus-shadow-floating);
+}
+
+.#{$namespace}-date-range-picker__content.is-left {
+  --fsus-datepicker-range-divider: color-mix(
+    in srgb,
+    var(--el-border-color) 56%,
+    transparent
+  );
+}
+
+.#{$namespace}-date-table td .#{$namespace}-date-table-cell__text,
+.#{$namespace}-month-table td .cell,
+.#{$namespace}-year-table td .cell,
+.#{$namespace}-time-spinner__item {
+  min-width: 40px;
+  min-height: 40px;
+  line-height: 40px;
+  border-radius: 0;
+}
+
+.#{$namespace}-date-table
+  td.available:hover
+  .#{$namespace}-date-table-cell__text,
+.#{$namespace}-month-table td .cell:hover,
+.#{$namespace}-year-table td .cell:hover,
+.#{$namespace}-time-spinner__item:hover:not(.disabled):not(.active) {
+  background: var(--fsus-state-hover-bg);
+  color: var(--fsus-scholarly-blue);
+}
+
+.#{$namespace}-date-table
+  td.current:not(.disabled)
+  .#{$namespace}-date-table-cell__text,
+.#{$namespace}-month-table td.current:not(.disabled) .cell,
+.#{$namespace}-year-table td.current:not(.disabled) .cell,
+.#{$namespace}-time-spinner__item.active:not(.disabled) {
+  background: var(--fsus-scholarly-blue);
+  color: var(--fsus-color-white, #ffffff);
+}
+
+.#{$namespace}-date-editor .#{$namespace}-input__inner::selection,
+.#{$namespace}-date-editor .#{$namespace}-range-input::selection {
+  background: var(--fsus-state-emphasis-bg);
+  color: var(--el-text-color-primary);
+}
+
+.#{$namespace}-date-picker .#{$namespace}-picker-panel__content,
+.#{$namespace}-date-range-picker__content {
+  position: relative;
+  overflow: hidden;
+}
+
+.#{$namespace}-date-picker__view,
+.#{$namespace}-date-range-picker__view {
+  width: 100%;
+  transform-origin: center top;
+  will-change: opacity, transform;
+
+  > .#{$namespace}-date-table,
+  > .#{$namespace}-month-table,
+  > .#{$namespace}-year-table {
+    width: 100%;
+  }
+}
+
+.#{$namespace}-date-picker-view-next {
+  animation: #{$namespace}-date-picker-view-next var(--fsus-motion-panel, 360ms)
+    var(--fsus-motion-emphasized, cubic-bezier(0.2, 0, 0, 1)) both;
+}
+
+.#{$namespace}-date-picker-view-prev {
+  animation: #{$namespace}-date-picker-view-prev var(--fsus-motion-panel, 360ms)
+    var(--fsus-motion-emphasized, cubic-bezier(0.2, 0, 0, 1)) both;
+}
+
+.#{$namespace}-date-picker-view-drill-in {
+  animation: #{$namespace}-date-picker-view-drill-in
+    var(--fsus-motion-panel, 360ms)
+    var(--fsus-motion-emphasized, cubic-bezier(0.2, 0, 0, 1)) both;
+}
+
+.#{$namespace}-date-picker-view-drill-out {
+  animation: #{$namespace}-date-picker-view-drill-out
+    var(--fsus-motion-panel, 360ms)
+    var(--fsus-motion-emphasized, cubic-bezier(0.2, 0, 0, 1)) both;
+}
+
+@keyframes #{$namespace}-date-picker-view-next {
+  from {
+    opacity: 0;
+    transform: translate3d(20px, 0, 0) scale(0.985);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+@keyframes #{$namespace}-date-picker-view-prev {
+  from {
+    opacity: 0;
+    transform: translate3d(-20px, 0, 0) scale(0.985);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+@keyframes #{$namespace}-date-picker-view-drill-in {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 10px, 0) scale(0.985);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+@keyframes #{$namespace}-date-picker-view-drill-out {
+  from {
+    opacity: 0;
+    transform: translate3d(0, -10px, 0) scale(0.985);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .#{$namespace}-date-picker-view-next,
+  .#{$namespace}-date-picker-view-prev,
+  .#{$namespace}-date-picker-view-drill-in,
+  .#{$namespace}-date-picker-view-drill-out {
+    animation: none;
+  }
+}
+
+.#{$namespace}-time-panel {
+  border-radius: var(--fsus-radius-popover);
+  overflow: hidden;
+}
+
+.#{$namespace}-time-panel__content {
+  border-radius: var(--fsus-radius-popover) var(--fsus-radius-popover) 0 0;
+  box-sizing: border-box;
+  mask-image: linear-gradient(
+    to bottom,
+    transparent 0,
+    #000 18%,
+    #000 82%,
+    transparent 100%
+  );
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent 0,
+    #000 18%,
+    #000 82%,
+    transparent 100%
+  );
+  padding: 6px 8px 4px;
+
+  &::before,
+  &::after {
+    display: none;
+  }
+}
+
+.#{$namespace}-time-spinner__wrapper .#{$namespace}-scrollbar__wrap {
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+    width: 0;
+    height: 0;
+  }
+}
+
+.#{$namespace}-time-spinner__wrapper .#{$namespace}-scrollbar__bar {
+  display: none;
+}
+
+.#{$namespace}-time-spinner__wrapper.#{$namespace}-scrollbar {
+  &.#{$namespace}-scrollbar.is-scrolling .#{$namespace}-scrollbar__view > * {
+    transform: none;
+    transition: none;
+  }
+
+  &::before,
+  &::after {
+    display: none;
+  }
+}
+
+.#{$namespace}-time-spinner__item {
+  height: 32px;
+  min-height: 32px;
+  min-width: 0;
+  line-height: 32px;
+  margin: 0 4px;
+  border-radius: 12px;
+  outline: none;
+  transition:
+    opacity var(--fsus-motion-control-fast) var(--fsus-motion-standard),
+    background-color var(--fsus-motion-control-fast) var(--fsus-motion-standard),
+    color var(--fsus-motion-control-fast) var(--fsus-motion-standard);
+}
+
+.#{$namespace}-time-spinner__wrapper.is-scrolling
+  .#{$namespace}-time-spinner__item:not(.is-active) {
+  opacity: 0.72;
+}
+
+.#{$namespace}-time-spinner__item:hover:not(.is-disabled):not(.is-active):not(
+    .disabled
+  ):not(.active) {
+  background: var(--fsus-state-emphasis-bg);
+  color: var(--fsus-scholarly-blue);
+}
+
+.#{$namespace}-time-spinner__item.is-active:not(.is-disabled),
+.#{$namespace}-time-spinner__item.active:not(.disabled) {
+  background: var(--el-fill-color);
+  box-shadow: none;
+  color: var(--el-text-color-primary);
+  font-weight: 700;
+}
+
+.#{$namespace}-time-panel__footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  height: 44px;
+  line-height: normal;
+  padding: 6px 10px;
+  box-sizing: border-box;
+}
+
+.#{$namespace}-time-panel__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 48px;
+  min-height: 32px;
+  height: 32px;
+  line-height: 32px;
+  margin: 0;
+  padding: 0 12px;
+  border-radius: var(--el-border-radius-base);
+  color: var(--el-text-color-regular);
+  font-weight: 500;
+}
+
+.#{$namespace}-time-panel__btn:hover {
+  background: var(--fsus-state-emphasis-bg);
+  color: var(--fsus-scholarly-blue);
+}
+
+.#{$namespace}-time-panel__btn.confirm {
+  color: var(--fsus-scholarly-blue);
+  font-weight: 700;
+}
+
+// Menu navigation density + state contract (issue #294 / docs/design.md):
+// - vertical item / SubMenu title: 56px via --fsus-menu-item-height
+// - horizontal top-level item / SubMenu title: 60px via --fsus-menu-horizontal-height
+// - active = Ink text + Scholarly Blue functional marker (side rail or bottom mark)
+// - not gray fill + font-weight 700 alone; hover/expanded/active/focus stay distinct
+.#{$namespace}-menu {
+  border-color: var(--el-border-color);
+}
+
+.#{$namespace}-menu.#{$namespace}-menu--horizontal {
+  align-items: stretch;
+  gap: 0;
+  // No vertical padding: padding would shrink the 60px track.
+  padding: 0;
+  height: var(--el-menu-horizontal-height, var(--fsus-menu-horizontal-height));
+  min-height: var(
+    --el-menu-horizontal-height,
+    var(--fsus-menu-horizontal-height)
+  );
+}
+
+.#{$namespace}-menu.#{$namespace}-menu--horizontal > .#{$namespace}-menu-item,
+.#{$namespace}-menu.#{$namespace}-menu--horizontal
+  > .#{$namespace}-sub-menu
+  > .#{$namespace}-sub-menu__title {
+  height: var(--el-menu-horizontal-height, var(--fsus-menu-horizontal-height));
+  min-height: var(
+    --el-menu-horizontal-height,
+    var(--fsus-menu-horizontal-height)
+  );
+  margin: 0;
+  // Preserve transparent bottom border so active can paint Scholarly Blue mark.
+  border-radius: 0;
+  background-clip: padding-box;
+  line-height: var(
+    --el-menu-horizontal-height,
+    var(--fsus-menu-horizontal-height)
+  );
+}
+
+.#{$namespace}-menu-item,
+.#{$namespace}-sub-menu__title {
+  height: var(--el-menu-item-height, var(--fsus-menu-item-height));
+  min-height: var(--el-menu-item-height, var(--fsus-menu-item-height));
+  line-height: var(--el-menu-item-height, var(--fsus-menu-item-height));
+  color: var(--el-text-color-regular);
+}
+
+.#{$namespace}-menu-item-group__title {
+  color: var(--el-text-color-secondary);
+}
+
+// Hover: weak fill / ink text only — no translate, scale, or shadow.
+.#{$namespace}-menu-item:hover,
+.#{$namespace}-sub-menu__title:hover,
+.#{$namespace}-menu--horizontal > .#{$namespace}-menu-item:hover,
+.#{$namespace}-menu--horizontal
+  > .#{$namespace}-sub-menu:hover
+  .#{$namespace}-sub-menu__title {
+  background: var(--fsus-state-hover-bg, var(--el-fill-color-light));
+  color: var(--el-text-color-primary);
+}
+
+// Vertical current page: Ink + Scholarly Blue side rail (not bold gray pill).
+.#{$namespace}-menu-item.is-active {
+  background: transparent;
+  color: var(--el-text-color-primary);
+  font-weight: 500;
+  box-shadow: inset 3px 0 0 var(--fsus-scholarly-blue);
+}
+
+// Expanded parent of an active child must not impersonate the current page rail.
+.#{$namespace}-sub-menu.is-active > .#{$namespace}-sub-menu__title {
+  background: transparent;
+  color: var(--el-text-color-primary);
+  font-weight: 500;
+  box-shadow: none;
+}
+
+// Horizontal current / active ancestor: Ink + Scholarly Blue bottom mark.
+.#{$namespace}-menu--horizontal > .#{$namespace}-menu-item.is-active,
+.#{$namespace}-menu--horizontal
+  > .#{$namespace}-sub-menu.is-active
+  .#{$namespace}-sub-menu__title {
+  background: transparent;
+  color: var(--el-text-color-primary);
+  font-weight: 500;
+  border-bottom: 2px solid var(--fsus-scholarly-blue) !important;
+  box-shadow: none;
+}
+
+// focus-visible must beat the active side-rail so keyboard ring stays distinct.
+.#{$namespace}-menu-item.is-active:focus-visible,
+.#{$namespace}-sub-menu.is-active > .#{$namespace}-sub-menu__title:focus-visible {
+  outline: none !important;
+  box-shadow: inset 0 0 0 2px
+    var(--fsus-scholarly-blue, var(--el-a11y-focus-color, Highlight)) !important;
+}
+
+// Tabs: desktop/task surface uses a stable 40px header. Active is Ink text +
+// Scholarly Blue indicator. Card/border-card share a continuous navigation
+// baseline — not a row of independent CTA buttons (gap + per-item border +
+// hover lift / active press). See docs/design.md §Tabs and issue #295.
+.#{$namespace}-tabs__header {
+  margin-bottom: 18px;
+}
+
+.#{$namespace}-tabs__nav-wrap::after,
+.#{$namespace}-tabs--card > .#{$namespace}-tabs__header,
+.#{$namespace}-tabs--border-card > .#{$namespace}-tabs__header {
+  border-color: var(--el-border-color);
+}
+
+.#{$namespace}-tabs__active-bar {
+  background-color: var(--fsus-scholarly-blue);
+  height: 2px;
+  border-radius: 0;
+}
+
+.#{$namespace}-tabs__item {
+  height: 40px;
+  padding: 0 14px;
+  @include fsus-geometry(navigation);
+  color: var(--el-text-color-regular);
+  // Geometry stays fixed across default / hover / active / disabled.
+  transform: none;
+}
+
+.#{$namespace}-tabs__item:hover {
+  background: var(--el-fill-color);
+  color: var(--fsus-scholarly-blue);
+}
+
+.#{$namespace}-tabs__item.is-active {
+  background: transparent;
+  color: var(--el-text-color-primary);
+  font-weight: 700;
+}
+
+// --- card / border-card: continuous strip ---------------------------------
+.#{$namespace}-tabs--card > .#{$namespace}-tabs__header,
+.#{$namespace}-tabs--border-card > .#{$namespace}-tabs__header {
+  height: var(--el-tabs-header-height, 40px);
+  border-bottom: 1px solid var(--el-border-color-light);
+}
+
+.#{$namespace}-tabs--card
+  > .#{$namespace}-tabs__header
+  .#{$namespace}-tabs__nav-wrap,
+.#{$namespace}-tabs--border-card
+  > .#{$namespace}-tabs__header
+  .#{$namespace}-tabs__nav-wrap {
+  margin-bottom: 0;
+}
+
+// Shared nav chrome — one control group, not spaced independent buttons.
+.#{$namespace}-tabs--card
+  > .#{$namespace}-tabs__header
+  .#{$namespace}-tabs__nav {
+  gap: 0;
+  border: 1px solid var(--el-border-color-light);
+  border-bottom: none;
+  border-radius: var(--fsus-radius-control-small)
+    var(--fsus-radius-control-small) 0 0;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.#{$namespace}-tabs--border-card
+  > .#{$namespace}-tabs__header
+  .#{$namespace}-tabs__nav {
+  gap: 0;
+  border: 0;
+  border-radius: 0;
+  overflow: hidden;
+}
+
+.#{$namespace}-tabs--card
+  > .#{$namespace}-tabs__header
+  .#{$namespace}-tabs__item,
+.#{$namespace}-tabs--border-card
+  > .#{$namespace}-tabs__header
+  .#{$namespace}-tabs__item {
+  height: var(--el-tabs-header-height, 40px);
+  margin: 0;
+  padding: 0 20px;
+  border-radius: 0;
+  background: transparent;
+  color: var(--el-text-color-regular);
+  box-shadow: none;
+  transform: none;
+  will-change: auto;
+  transition:
+    background-color var(--fsus-motion-control-fast) var(--fsus-motion-standard),
+    border-color var(--fsus-motion-control-fast) var(--fsus-motion-standard),
+    color var(--fsus-motion-control-fast) var(--fsus-motion-standard);
+}
+
+// Card items: vertical separators only (continuous strip).
+.#{$namespace}-tabs--card
+  > .#{$namespace}-tabs__header
+  .#{$namespace}-tabs__item {
+  border: none;
+  border-left: 1px solid var(--el-border-color-light);
+  border-bottom: 2px solid transparent;
+}
+
+.#{$namespace}-tabs--card
+  > .#{$namespace}-tabs__header
+  .#{$namespace}-tabs__item:first-child {
+  border-left: none;
+}
+
+// Border-card items stay on the header baseline; no per-item CTA border.
+.#{$namespace}-tabs--border-card
+  > .#{$namespace}-tabs__header
+  .#{$namespace}-tabs__item {
+  border: 1px solid transparent;
+  border-bottom: 2px solid transparent;
+  margin-top: -1px;
+  color: var(--el-text-color-secondary);
+}
+
+.#{$namespace}-tabs--border-card
+  > .#{$namespace}-tabs__header
+  .#{$namespace}-tabs__item:first-child {
+  margin-left: -1px;
+}
+
+.#{$namespace}-tabs--border-card
+  > .#{$namespace}-tabs__header
+  .#{$namespace}-tabs__item
+  + .#{$namespace}-tabs__item {
+  margin-left: -1px;
+}
+
+.#{$namespace}-tabs--card
+  > .#{$namespace}-tabs__header
+  .#{$namespace}-tabs__item:not(.is-disabled):hover,
+.#{$namespace}-tabs--border-card
+  > .#{$namespace}-tabs__header
+  .#{$namespace}-tabs__item:not(.is-disabled):hover {
+  background: var(--el-fill-color-lighter);
+  color: var(--fsus-scholarly-blue);
+  box-shadow: none;
+  transform: none;
+}
+
+// Active: Ink text + Scholarly Blue bottom marker (card has no active-bar).
+.#{$namespace}-tabs--card
+  > .#{$namespace}-tabs__header
+  .#{$namespace}-tabs__item.is-active {
+  background: var(--el-bg-color);
+  border-bottom-color: var(--fsus-scholarly-blue);
+  color: var(--el-text-color-primary);
+  font-weight: 700;
+  box-shadow: none;
+  transform: none;
+}
+
+.#{$namespace}-tabs--border-card
+  > .#{$namespace}-tabs__header
+  .#{$namespace}-tabs__item.is-active {
+  background: var(--el-bg-color-overlay);
+  border-left-color: var(--el-border-color);
+  border-right-color: var(--el-border-color);
+  border-bottom-color: var(--fsus-scholarly-blue);
+  color: var(--el-text-color-primary);
+  font-weight: 700;
+  box-shadow: none;
+  transform: none;
+}
+
+// Active press keeps color feedback only — no geometric press.
+.#{$namespace}-tabs--card
+  > .#{$namespace}-tabs__header
+  .#{$namespace}-tabs__item:not(.is-disabled):active,
+.#{$namespace}-tabs--border-card
+  > .#{$namespace}-tabs__header
+  .#{$namespace}-tabs__item:not(.is-disabled):active {
+  background: var(--el-fill-color-lighter);
+  color: var(--fsus-scholarly-blue);
+  box-shadow: none;
+  transform: none;
+}
+
+.#{$namespace}-tabs--card
+  > .#{$namespace}-tabs__header
+  .#{$namespace}-tabs__item.is-disabled,
+.#{$namespace}-tabs--border-card
+  > .#{$namespace}-tabs__header
+  .#{$namespace}-tabs__item.is-disabled {
+  background: transparent;
+  color: var(--el-disabled-text-color);
+  cursor: not-allowed;
+}
+
+.#{$namespace}-tabs--border-card {
+  background: var(--el-bg-color-overlay);
+  border: 1px solid var(--el-border-color-lighter);
+  border-radius: var(--fsus-radius-control);
+  box-shadow: none;
+}
+
+.#{$namespace}-tabs--border-card > .#{$namespace}-tabs__header {
+  background-color: var(--el-fill-color-light);
+  margin: 0;
+}
+
+.#{$namespace}-tabs--border-card > .#{$namespace}-tabs__content {
+  padding: 18px;
+}
+
+.#{$namespace}-pagination {
+  gap: 12px;
+  flex-wrap: wrap;
+  color: var(--el-text-color-regular);
+}
+
+.#{$namespace}-pager {
+  gap: 8px;
+}
+
+.#{$namespace}-pagination button,
+.#{$namespace}-pager li {
+  @include fsus-control(pill);
+  min-width: 44px;
+  height: 44px;
+  box-shadow: none;
+  border-color: transparent; // Minimalist: no border by default
+  background: transparent;
+  color: var(--el-text-color-regular);
+}
+
+.#{$namespace}-pagination button:hover,
+.#{$namespace}-pager li:hover {
+  background: var(--el-fill-color-light);
+  border-color: var(--el-border-color-lighter);
+  color: var(--el-text-color-primary);
+}
+
+.#{$namespace}-pager li.is-active {
+  background: var(--el-color-primary) !important;
+  border-color: var(--el-color-primary) !important;
+  color: var(--el-bg-color) !important;
+  font-weight: 700;
+  box-shadow: var(--el-box-shadow-lighter);
+}

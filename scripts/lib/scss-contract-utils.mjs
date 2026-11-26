@@ -11,6 +11,55 @@ export const repoRoot = path.resolve(
 export const readRepoFile = (relativePath, root = repoRoot) =>
   fs.readFileSync(path.join(root, relativePath), 'utf8')
 
+const resolveScssPartial = (baseDir, specifier) => {
+  const normalized = specifier.endsWith('.scss') ? specifier : `${specifier}.scss`
+  const direct = path.resolve(baseDir, normalized)
+  if (fs.existsSync(direct) && fs.statSync(direct).isFile()) return direct
+  const partial = path.resolve(
+    baseDir,
+    path.dirname(normalized),
+    `_${path.basename(normalized)}`,
+  )
+  if (fs.existsSync(partial) && fs.statSync(partial).isFile()) return partial
+  return null
+}
+
+export const readScssBundle = (
+  relativePath,
+  root = repoRoot,
+  visited = new Set(),
+) => {
+  const absPath = path.resolve(root, relativePath)
+  if (visited.has(absPath)) return ''
+  visited.add(absPath)
+
+  const source = fs.readFileSync(absPath, 'utf8')
+  const baseDir = path.dirname(absPath)
+  const localDirectivePattern =
+    /^\s*@(?:use|forward)\s+['"](\.\/[^'"]+)['"][^;]*;\s*$/gmu
+  const chunks = []
+  let hasLocalDirective = false
+
+  for (const match of source.matchAll(localDirectivePattern)) {
+    const resolved = resolveScssPartial(baseDir, match[1])
+    if (!resolved) continue
+    hasLocalDirective = true
+    const rel = path.relative(root, resolved)
+    chunks.push(
+      readScssBundle(rel, root, visited).replace(
+        /^\s*@(?:use|forward)\s+['"][^'"]+['"][^;]*;\s*$/gmu,
+        '',
+      ),
+    )
+  }
+
+  if (!hasLocalDirective) return source
+  const remainder = source.replace(localDirectivePattern, '').trim()
+  return [...chunks.filter(Boolean), ...(remainder ? [remainder] : [])].join(
+    '\n',
+  )
+}
+
 export const lineNumberAt = (source, index) =>
   source.slice(0, Math.max(0, index)).split(/\r?\n/u).length
 
