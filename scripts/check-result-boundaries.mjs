@@ -7,6 +7,9 @@ const root = process.cwd()
 const checkedFiles = [
   'vue/packages/wasm/index.ts',
   'vue/packages/wasm/markdown-runtime.ts',
+  'vue/packages/wasm/runtime/markdown-result-authority.ts',
+  'vue/packages/wasm/runtime/markdown-feature-activation.ts',
+  'vue/packages/wasm/runtime/markdown-wasm-engine.ts',
   'vue/packages/hooks/use-render-pipeline/index.ts',
   'vue/packages/hooks/use-render-pipeline/config.ts',
   'vue/packages/hooks/use-render-pipeline/diagnostics.ts',
