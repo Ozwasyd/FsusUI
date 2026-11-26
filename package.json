@@ -106,6 +106,7 @@
     "check:fsusui-design-conformance": "node ./scripts/with-node-heap.mjs node ./scripts/check-fsusui-design-conformance.mjs",
     "check:documentation-architecture": "node ./scripts/with-node-heap.mjs node ./scripts/check-documentation-architecture.mjs && node ./scripts/with-node-heap.mjs node ./scripts/test-documentation-architecture.mjs",
     "check:foundation-style-boundary": "node ./scripts/with-node-heap.mjs node ./scripts/check-foundation-style-boundary.mjs",
+    "check:theme-contracts": "node ./scripts/with-node-heap.mjs node ./scripts/check-theme-surface-contracts.mjs",
     "check:focus-ring-contract": "node ./scripts/with-node-heap.mjs node ./scripts/check-focus-ring-contract.mjs",
     "check:theme-scale-contract": "node ./scripts/with-node-heap.mjs node ./scripts/check-theme-scale-contract.mjs",
     "check:form-state-contract": "node ./scripts/with-node-heap.mjs node ./scripts/check-form-state-contract.mjs",
