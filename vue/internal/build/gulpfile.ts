@@ -1,14 +1,5 @@
 import path from 'path'
-import { existsSync } from 'node:fs'
-import {
-  copyFile,
-  mkdir,
-  readFile,
-  readdir,
-  stat,
-  writeFile,
-} from 'fs/promises'
-import { setTimeout as sleep } from 'timers/promises'
+import { copyFile, mkdir, readFile, stat, writeFile } from 'fs/promises'
 import { copy } from 'fs-extra'
 import { parallel, series } from 'gulp'
 import {
@@ -17,6 +8,10 @@ import {
   epPackage,
   projRoot,
 } from '@element-plus/build-utils'
+import {
+  rewriteBuildStageWorkerReferences,
+  rewriteBundledWorkspaceReferences,
+} from '../../../scripts/lib/package-artifact-rewriter.mjs'
 import {
   buildConfig,
   buildFullBundle,
@@ -29,30 +24,16 @@ import {
 import type { TaskFunction } from 'gulp'
 import type { Module } from './src'
 
-const waitForPath = async (target: string) => {
-  let lastError: unknown
-  for (let attempt = 0; attempt < 100; attempt += 1) {
-    try {
-      await stat(target)
-      return
-    } catch (error) {
-      lastError = error
-      await sleep(50)
-    }
+const assertArtifactReady = async (target: string, producerTask: string) => {
+  try {
+    await stat(target)
+  } catch (error) {
+    throw new Error(
+      `Expected build artifact "${target}" was not produced by upstream task "${producerTask}".`,
+      { cause: error },
+    )
   }
-
-  throw lastError
 }
-
-const bundledWorkspaceDependencyNames = ['@element-plus/motion']
-const packageReferenceExtensions = [
-  '.d.ts',
-  '.d.mts',
-  '.d.cts',
-  '.js',
-  '.mjs',
-  '.cjs',
-]
 
 const copyElementPlusPackageManifest = async () => {
   const packageJson = JSON.parse(await readFile(epPackage, 'utf8'))
@@ -65,210 +46,13 @@ const copyElementPlusPackageManifest = async () => {
   )
 }
 
-const toModuleSpecifier = (relativePath: string) => {
-  const normalized = relativePath.split(path.sep).join('/')
-  return normalized.startsWith('.') ? normalized : `./${normalized}`
-}
-
-const collectPackageReferenceCandidates = async (
-  rootDir: string,
-  currentDir = rootDir,
-) => {
-  const files: string[] = []
-  const entries = await readdir(currentDir, { withFileTypes: true })
-
-  for (const entry of entries) {
-    const absolutePath = path.join(currentDir, entry.name)
-
-    if (entry.isDirectory()) {
-      files.push(
-        ...(await collectPackageReferenceCandidates(rootDir, absolutePath)),
-      )
-      continue
-    }
-
-    if (
-      packageReferenceExtensions.some((extension) =>
-        absolutePath.endsWith(extension),
-      )
-    ) {
-      files.push(absolutePath)
-    }
-  }
-
-  return files
-}
-
-const resolveBundledWorkspaceRuntimeSpecifier = (
-  rootDir: string,
-  filePath: string,
-) => {
-  if (
-    filePath.endsWith('.d.ts') ||
-    filePath.endsWith('.d.mts') ||
-    filePath.endsWith('.d.cts')
-  ) {
-    return 'element-plus/es/motion'
-  }
-
-  const relativePath = path
-    .relative(rootDir, filePath)
-    .split(path.sep)
-    .join('/')
-  const extension = path.extname(filePath)
-
-  if (relativePath.startsWith('es/') && extension === '.mjs') {
-    return toModuleSpecifier(
-      path.relative(
-        path.dirname(filePath),
-        path.join(rootDir, 'es', 'motion', 'index.mjs'),
-      ),
-    )
-  }
-
-  if (
-    relativePath.startsWith('lib/') &&
-    (extension === '.js' || extension === '.cjs')
-  ) {
-    return toModuleSpecifier(
-      path.relative(
-        path.dirname(filePath),
-        path.join(rootDir, 'lib', 'motion', 'index.js'),
-      ),
-    )
-  }
-
-  return undefined
-}
-
 export const rewriteBuiltBundledWorkspaceDependencyReferences = async () => {
-  const candidates = await collectPackageReferenceCandidates(epOutput)
-  const bundledWorkerRuntimePaths = {
-    dataPipeline: {
-      esm: 'es/components/_internal/data-pipeline.worker.mjs',
-      cjs: 'lib/components/_internal/data-pipeline.worker.js',
-    },
-    markdownRenderer: {
-      esm: 'es/components/markdown-renderer/src/markdown-renderer.worker.mjs',
-      cjs: 'lib/components/markdown-renderer/src/markdown-renderer.worker.js',
-    },
-  }
-
-  await Promise.all(
-    candidates.map(async (filePath) => {
-      let rewritten = await readFile(filePath, 'utf8')
-      let changed = false
-
-      for (const dependencyName of bundledWorkspaceDependencyNames) {
-        if (!rewritten.includes(dependencyName)) continue
-
-        const replacement = resolveBundledWorkspaceRuntimeSpecifier(
-          epOutput,
-          filePath,
-        )
-        if (!replacement) continue
-
-        const pattern = new RegExp(
-          `(['"])${dependencyName.replace('/', '\\/')}\\1`,
-          'g',
-        )
-        rewritten = rewritten.replace(pattern, (_match, quote) => {
-          changed = true
-          return `${quote}${replacement}${quote}`
-        })
-      }
-
-      const relativeOutputPath = path.relative(epOutput, filePath)
-      const isEsmModule = relativeOutputPath.startsWith('es/')
-      const isCjsModule = relativeOutputPath.startsWith('lib/')
-      if (isEsmModule || isCjsModule) {
-        const extension = isEsmModule ? '.mjs' : '.js'
-        for (const workerName of [
-          'markdown-parser',
-          'markdown-renderer',
-          'data-pipeline',
-        ]) {
-          const next = rewritten
-            .replace(
-              new RegExp(`(['"])(\\./)?${workerName}\\.worker\\.ts\\1`, 'gu'),
-              (_match, quote: string) =>
-                `${quote}./${workerName}.worker${extension}${quote}`,
-            )
-            .replace(
-              new RegExp(
-                `(['"])components/.*?/${workerName}\\.worker\\.js\\1`,
-                'gu',
-              ),
-              (_match, quote: string) =>
-                `${quote}./${workerName}.worker.js${quote}`,
-            )
-          if (next !== rewritten) {
-            rewritten = next
-            changed = true
-          }
-        }
-      }
-
-      const isEsmBundle =
-        path.relative(epOutput, filePath).startsWith('dist') &&
-        filePath.endsWith('.mjs')
-      const isCjsBundle =
-        path.relative(epOutput, filePath).startsWith('dist') &&
-        (filePath.endsWith('.js') || filePath.endsWith('.cjs'))
-      if (isEsmBundle || isCjsBundle) {
-        const moduleKind = isEsmBundle ? 'esm' : 'cjs'
-        const markdownWorker =
-          bundledWorkerRuntimePaths.markdownRenderer[moduleKind]
-        const dataPipelineWorker =
-          bundledWorkerRuntimePaths.dataPipeline[moduleKind]
-        rewritten = rewritten
-          .replace(
-            /(['"])\.\/markdown-renderer\.worker\.ts\1/gu,
-            (_match, quote: string) =>
-              `${quote}${toModuleSpecifier(
-                path.relative(
-                  path.dirname(filePath),
-                  path.join(epOutput, markdownWorker),
-                ),
-              )}${quote}`,
-          )
-          .replace(
-            /(['"])\.\/data-pipeline\.worker\.ts\1/gu,
-            (_match, quote: string) =>
-              `${quote}${toModuleSpecifier(
-                path.relative(
-                  path.dirname(filePath),
-                  path.join(epOutput, dataPipelineWorker),
-                ),
-              )}${quote}`,
-          )
-      } else {
-        const workerPattern = /(['"])([^'"]*\.worker\.ts)\1/gu
-        rewritten = rewritten.replace(
-          workerPattern,
-          (_match, quote: string, specifier: string) => {
-            const extension = filePath.endsWith('.mjs') ? '.mjs' : '.js'
-            const runtimeSpecifier = specifier.replace(/\.ts$/u, extension)
-            const runtimePath = path.resolve(
-              path.dirname(filePath),
-              runtimeSpecifier,
-            )
-            if (!existsSync(runtimePath)) return `${quote}${specifier}${quote}`
-            return `${quote}${runtimeSpecifier}${quote}`
-          },
-        )
-      }
-      if (
-        isEsmBundle ||
-        isCjsBundle ||
-        changed ||
-        /[.]worker[.]ts(?:['"]|$)/u.test(rewritten)
-      ) {
-        const previous = await readFile(filePath, 'utf8')
-        if (previous !== rewritten) await writeFile(filePath, rewritten)
-      }
-    }),
-  )
+  rewriteBundledWorkspaceReferences(epOutput, {
+    packageName: 'element-plus',
+    dependencyNames: ['@element-plus/motion'],
+    strict: false,
+  })
+  rewriteBuildStageWorkerReferences(epOutput)
 }
 
 export const copyFiles = () =>
@@ -287,9 +71,10 @@ export const copyFiles = () =>
 export const copyTypesDefinitions: TaskFunction = (done) => {
   const src = path.resolve(buildOutput, 'types', 'packages')
   const copyTypes = (module: Module) =>
-    withTaskName(`copyTypes:${module}`, () =>
-      waitForPath(src).then(() => copy(src, buildConfig[module].output.path)),
-    )
+    withTaskName(`copyTypes:${module}`, async () => {
+      await assertArtifactReady(src, 'generateTypesDefinitions')
+      await copy(src, buildConfig[module].output.path)
+    })
 
   return parallel(copyTypes('esm'), copyTypes('cjs'))(done)
 }
@@ -307,10 +92,10 @@ export const copyFullStyle = async () => {
   )
 
   await Promise.all([
-    waitForPath(fullStyleSource),
-    waitForPath(fsusStyleSource),
-    waitForPath(criticalStyleSource),
-    waitForPath(fsusThemeSource),
+    assertArtifactReady(fullStyleSource, 'buildThemeChalk'),
+    assertArtifactReady(fsusStyleSource, 'buildThemeChalk'),
+    assertArtifactReady(criticalStyleSource, 'buildThemeChalk'),
+    assertArtifactReady(fsusThemeSource, 'buildThemeChalk'),
   ])
   await mkdir(path.resolve(epOutput, 'dist'), { recursive: true })
   await copyFile(fullStyleSource, path.resolve(epOutput, 'dist/index.css'))
@@ -396,13 +181,12 @@ const buildPackage: TaskFunction = series(
       copyFullStyle,
     ),
     withTaskName('buildFullBundle', buildFullBundle),
+    parallel(copyTypesDefinitions, copyFiles, copyWasmRuntimeAssets),
     withTaskName(
       'rewriteBuiltBundledWorkspaceDependencyReferences',
       rewriteBuiltBundledWorkspaceDependencyReferences,
     ),
   ),
-
-  parallel(copyTypesDefinitions, copyFiles, copyWasmRuntimeAssets),
 )
 
 export default buildPackage
