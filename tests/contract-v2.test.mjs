@@ -1945,8 +1945,8 @@ test('TypeScript checker extracts mapped exposed signatures and source mutations
   })
 
   const mutatedScript = scriptContent.replace(
-    "return 'not-found' as const",
-    'return false',
+    '  redo,\n  searchNavigate,',
+    '  redo,\n  searchNavigate: (direction: 1 | -1) => (direction === 1 ? searchNavigate(direction) : (false as const)),',
   )
   assert.notEqual(mutatedScript, scriptContent)
   const mutated = extractStructuredExposedSignatures({
