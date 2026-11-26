@@ -491,56 +491,56 @@ export function useEditorLiveViewport(options: UseEditorLiveViewportOptions) {
     const previous = visualViewportHeight.value
     visualViewportHeight.value =
       window.visualViewport?.height || window.innerHeight || 0
-    visualViewportOffsetTop.value = window.visualViewport?.offsetTop ?? 0
-    if (previous && visualViewportHeight.value !== previous) {
-      viewportHeightNext = visualViewportHeight.value
-      viewportTrigger =
-        previous > 0 && viewportHeightNext + 80 < previous
-          ? 'soft-keyboard'
-          : 'visual-viewport'
-      frameScheduler.schedule({
-        key: 'viewport-resize',
-        measure: () => {
-          viewportHeightNext =
-            window.visualViewport?.height || window.innerHeight || 0
-        },
-        mutate: () => {
-          if (viewportHeightNext !== null) {
-            visualViewportHeight.value = viewportHeightNext
-            if (viewportTrigger) applyLiveLayout(viewportTrigger)
-            applyTypewriterScroll('async-layout')
-          }
-          viewportHeightNext = null
-          viewportTrigger = null
-        },
-      })
-    }
+    visualViewportOffsetTop.value = window.visualViewport?.offsetTop || 0
+    const trigger: MarkdownLiveLayoutTrigger =
+      previous > 0 && visualViewportHeight.value + 80 < previous
+        ? 'soft-keyboard'
+        : 'visual-viewport'
+    applyLiveLayout(trigger)
+    applyTypewriterScroll('async-layout')
   }
 
   const refreshTypewriterResizeObserver = () => {
     typewriterResizeObserver?.disconnect()
     typewriterResizeObserver = null
+    const textarea = textareaRef.value
     if (
-      typeof ResizeObserver === 'undefined' ||
-      !resolvedWritingAids.value.typewriter
+      !resolvedWritingAids.value.typewriter ||
+      !textarea ||
+      typeof ResizeObserver === 'undefined'
     ) {
       return
     }
-    const textarea = textareaRef.value
-    if (!textarea) return
     textareaLayoutHeight = textarea.clientHeight
     textareaLayoutWidth = textarea.clientWidth
     typewriterResizeObserver = new ResizeObserver(() => {
-      if (!resolvedWritingAids.value.typewriter) return
-      const current = textareaRef.value
-      if (!current) return
-      const widthChanged = current.clientWidth !== textareaLayoutWidth
-      const heightChanged = current.clientHeight !== textareaLayoutHeight
-      if (!widthChanged && !heightChanged) return
+      textareaLayoutHeight = textarea.clientHeight
+      textareaLayoutWidth = textarea.clientWidth
+      applyTypewriterScroll('async-layout')
       settleTypewriterLayout()
     })
     typewriterResizeObserver.observe(textarea)
-    if (toolbarRef.value) typewriterResizeObserver.observe(toolbarRef.value)
+
+    frameScheduler.schedule({
+      key: 'visual-viewport-read',
+      measure: () => {
+        const height = window.visualViewport?.height || window.innerHeight || 0
+        const previous = visualViewportHeight.value
+        viewportHeightNext = height
+        viewportTrigger =
+          previous > 0 && height + 80 < previous
+            ? 'soft-keyboard'
+            : 'visual-viewport'
+      },
+      mutate: () => {
+        if (viewportHeightNext === null) return
+        visualViewportHeight.value = viewportHeightNext
+        const trigger = viewportTrigger ?? 'visual-viewport'
+        viewportHeightNext = null
+        viewportTrigger = null
+        applyLiveLayout(trigger)
+      },
+    })
   }
 
   watch(
