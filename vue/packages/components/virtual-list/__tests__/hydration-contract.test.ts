@@ -2,7 +2,7 @@ import { h, nextTick } from 'vue'
 import { mount } from '@vue/test-utils'
 import { afterAll, beforeAll, expect, it, vi } from 'vitest'
 import { DynamicSizeList } from '..'
-import setupMock from '../setup-mock'
+import setupMock from './setup-mock'
 import type { CSSProperties } from 'vue'
 
 const { pending, estimateRowHeights } = vi.hoisted(() => {

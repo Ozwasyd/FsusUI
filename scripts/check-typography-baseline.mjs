@@ -2,6 +2,7 @@ import fs from 'node:fs'
 import path from 'node:path'
 import process from 'node:process'
 import { fileURLToPath } from 'node:url'
+import { walkScssFiles } from './lib/scss-contract-utils.mjs'
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 
@@ -198,6 +199,7 @@ const scanStableFontFamilies = () => {
   const files = [
     'vue/packages/theme-chalk/src/common/var.scss',
     'vue/packages/theme-chalk/src/fsus-theme.scss',
+    ...walkScssFiles('vue/packages/theme-chalk/src/fsus-theme'),
     'vue/packages/theme-chalk/src/markdown-editor.scss',
     'vue/packages/theme-chalk/src/settings-primitives.scss',
     'vue/packages/wasm/markdown/src/markdown_mermaid.cpp',

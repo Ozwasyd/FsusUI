@@ -1,146 +1,54 @@
 #!/usr/bin/env node
 
 import assert from 'node:assert/strict'
-import { readFileSync } from 'node:fs'
-import { dirname, resolve } from 'node:path'
-import { fileURLToPath } from 'node:url'
-import {
-  assertOwnerFixedCells,
-  loadPlaywrightOwners,
-  planOwnerCells,
-} from './layout-playwright-plan.mjs'
-import {
-  loadPlaywrightSuiteRegistry,
-  validatePlaywrightSuiteRegistry,
-} from './playwright-suites.mjs'
 import {
   MARKDOWN_FIXED_CELLS,
   MARKDOWN_FIXED_NAMESPACES,
   MARKDOWN_OWNER,
   loadMarkdownOwnerPlan,
 } from './markdown-playwright-plan.mjs'
+import {
+  assertMissingCellRejected,
+  assertOwnerPlans,
+  assertTopWorkflowPlaywrightJobs,
+  loadPlaywrightPolicyContext,
+  validatePlaywrightOwnerWorkflow,
+} from './lib/playwright-owner-policy-core.mjs'
 
-const root = resolve(dirname(fileURLToPath(import.meta.url)), '..')
-const readSync = (relative) => readFileSync(resolve(root, relative), 'utf8')
+const { registry, owners, reusableWorkflow, topWorkflow } =
+  loadPlaywrightPolicyContext()
 
-const workflowJob = (source, name) =>
-  source.match(
-    new RegExp(
-      `\\n  ${name}:\\n([\\s\\S]*?)(?=\\n  [a-zA-Z][\\w-]*:\\n|$)`,
-      'u',
-    ),
-  )?.[1] ?? ''
+assertOwnerPlans({
+  loadPlan: loadMarkdownOwnerPlan,
+  fixedCells: MARKDOWN_FIXED_CELLS,
+  fixedNamespaces: MARKDOWN_FIXED_NAMESPACES,
+})
 
-const validateMarkdownWorkflowSource = (source) => {
-  const failures = []
-  if (!source.includes('playwright-markdown:')) {
-    failures.push('reusable workflow must define a playwright-markdown job')
-    return failures
-  }
-  const job = workflowJob(source, 'playwright-markdown')
-  if (!job) {
-    failures.push('cannot extract playwright-markdown job')
-    return failures
-  }
-  if (/\n\s+(?:strategy|matrix):/u.test(job)) {
-    failures.push('playwright-markdown job must not use strategy/matrix')
-  }
-  if (!job.includes('markdown-playwright-owner-run.mjs')) {
-    failures.push('playwright-markdown job must run markdown-playwright-owner-run.mjs')
-  }
-  if (job.includes('pnpm test:markdown-editor:interaction')) {
-    failures.push('playwright-markdown job must not invoke full-config suite commands')
-  }
-  if (!/^\s+if:\s*inputs\.group != 'pr'\s*$/mu.test(job)) {
-    failures.push('playwright-markdown job must be gated on inputs.group != pr')
-  }
-  const installCommands = [
-    ...job.matchAll(/playwright install --with-deps([^\n]+)/gu),
-  ].map((match) => match[1].trim().split(/\s+/u))
-  for (const browser of ['chromium', 'firefox', 'webkit']) {
-    const count = installCommands.filter((browsers) =>
-      browsers.includes(browser),
-    ).length
-    if (count !== 1) {
-      failures.push(
-        `playwright-markdown job must install ${browser} exactly once for non-PR groups`,
-      )
-    }
-  }
-  if (!job.includes('playwright-markdown-evidence-${{ inputs.group }}')) {
-    failures.push('playwright-markdown job must upload per-group evidence')
-  }
-  return failures
-}
-
-const deepClone = (value) => JSON.parse(JSON.stringify(value))
-
-const registry = loadPlaywrightSuiteRegistry()
-const owners = loadPlaywrightOwners()
-validatePlaywrightSuiteRegistry(registry)
-
-for (const group of ['main', 'nightly', 'release']) {
-  const plan = loadMarkdownOwnerPlan(group)
-  assert.deepEqual(plan.cells.map((cell) => cell.id), [...MARKDOWN_FIXED_CELLS])
-  assert.deepEqual(
-    plan.cells.map((cell) => cell.artifactNamespace),
-    MARKDOWN_FIXED_CELLS.map((cellId) => MARKDOWN_FIXED_NAMESPACES[cellId]),
-    `${group} artifact namespaces must match the fixed issue namespace`,
-  )
-  for (const cell of plan.cells) {
-    const projectFlags = cell.command.match(/--project=\S+/gu) ?? []
-    assert.equal(projectFlags.length, 1, `${cell.id} must target exactly one project`)
-    assert.ok(!/npm-run-all|\brun-[ps]\b/u.test(cell.command), `${cell.id} must not use npm-run-all passthrough`)
-    assert.equal(
-      cell.command.startsWith('pnpm exec playwright test --config='),
-      true,
-      `${cell.id} must invoke Playwright directly via pnpm exec`,
-    )
-  }
-}
-
-const reusableWorkflow = readSync('.github/workflows/_quality-playwright.yml')
-const topWorkflow = readSync('.github/workflows/quality.yml')
-const markdownWorkflowFailures = validateMarkdownWorkflowSource(reusableWorkflow)
+const workflowFailures = validatePlaywrightOwnerWorkflow(reusableWorkflow, {
+  jobName: 'playwright-markdown',
+  ownerScript: 'markdown-playwright-owner-run.mjs',
+  forbiddenCommands: ['pnpm test:markdown-editor:interaction'],
+  requiredBrowsers: ['chromium', 'firefox', 'webkit'],
+  requireNonPrGate: true,
+})
 assert.deepEqual(
-  markdownWorkflowFailures,
+  workflowFailures,
   [],
-  `_quality-playwright.yml markdown policy failures: ${markdownWorkflowFailures.join('; ')}`,
+  `_quality-playwright.yml markdown policy failures: ${workflowFailures.join('; ')}`,
 )
 
-for (const job of ['premerge-playwright', 'main-playwright', 'nightly-playwright', 'release-playwright']) {
-  assert.ok(topWorkflow.includes(`${job}:`), `quality.yml must define ${job}`)
-}
+assertTopWorkflowPlaywrightJobs(topWorkflow)
 
-// ---- Negative workflow fixtures ----
-
-expectFailure('missing firefox cell must fail policy', () => {
-  const mutated = deepClone(registry)
-  const suite = mutated.suites.find((entry) => entry.id === 'markdown-editor-interaction')
-  suite.cells = suite.cells.filter((cell) => cell.project !== 'firefox')
-  const plan = planOwnerCells(MARKDOWN_OWNER, 'main', mutated, owners)
-  assertOwnerFixedCells(plan, [...MARKDOWN_FIXED_CELLS])
-})
-
-expectFailure('missing webkit cell must fail policy', () => {
-  const mutated = deepClone(registry)
-  const suite = mutated.suites.find((entry) => entry.id === 'markdown-editor-interaction')
-  suite.cells = suite.cells.filter((cell) => cell.project !== 'webkit')
-  const plan = planOwnerCells(MARKDOWN_OWNER, 'main', mutated, owners)
-  assertOwnerFixedCells(plan, [...MARKDOWN_FIXED_CELLS])
-})
-
-function expectFailure(label, fn) {
-  let failed = false
-  let message = ''
-  try {
-    fn()
-  } catch (error) {
-    failed = true
-    message = error instanceof Error ? error.message : String(error)
-  }
-  assert.equal(failed, true, `${label}: expected failure`)
-  assert.ok(message.length > 0, `${label}: empty error`)
+for (const project of ['firefox', 'webkit']) {
+  assertMissingCellRejected({
+    label: `missing ${project} cell must fail policy`,
+    registry,
+    owners,
+    owner: MARKDOWN_OWNER,
+    suiteId: 'markdown-editor-interaction',
+    project,
+    fixedCells: MARKDOWN_FIXED_CELLS,
+  })
 }
 
 console.log('[check-playwright-markdown-owner-policy] passed')

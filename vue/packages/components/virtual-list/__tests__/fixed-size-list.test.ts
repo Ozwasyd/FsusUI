@@ -4,7 +4,7 @@ import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest'
 import makeMount from '@element-plus/test-utils/make-mount'
 import makeScroll from '@element-plus/test-utils/make-scroll'
 import { configProviderContextKey } from '@element-plus/components/config-provider'
-import setupMock from '../setup-mock'
+import setupMock from './setup-mock'
 import {
   CENTERED_ALIGNMENT,
   END_ALIGNMENT,

@@ -369,7 +369,7 @@
     [
       "web.theme-mode-toggle.segmented-item",
       "component.el-theme-mode-toggle",
-      "vue/packages/theme-chalk/src/fsus-theme.scss",
+      "vue/packages/theme-chalk/src/fsus-theme/_surfaces-and-feedback.scss",
       ".el-theme-mode-toggle",
       "segmentedNavigation"
     ],
@@ -404,7 +404,7 @@
     [
       "web.rate.filled-icon",
       "component.el-rate",
-      "vue/packages/theme-chalk/src/fsus-theme.scss",
+      "vue/packages/theme-chalk/src/fsus-theme/_data-and-controls.scss",
       ".el-rate__icon",
       "rateWarning"
     ],
@@ -474,14 +474,14 @@
     [
       "web.table.header-cell",
       "component.el-table",
-      "vue/packages/theme-chalk/src/fsus-theme.scss",
+      "vue/packages/theme-chalk/src/fsus-theme/_data-and-controls.scss",
       ".el-table th.el-table__cell",
       "tableHeader"
     ],
     [
       "web.table.small-header-cell",
       "component.el-table",
-      "vue/packages/theme-chalk/src/fsus-theme.scss",
+      "vue/packages/theme-chalk/src/fsus-theme/_data-and-controls.scss",
       ".el-table--small th.el-table__cell",
       "tableSmallHeader"
     ],

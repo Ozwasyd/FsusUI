@@ -22,6 +22,7 @@ import {
   loadVisualProfileRegistry,
 } from './visual-profiles.mjs'
 import { visualEvidencePolicy } from './visual-evidence-policy.mjs'
+import { collectConfigSources } from './playwright-suites.mjs'
 import { createDefaultVisualRuntimeConfig } from './visual-runtime-core.mjs'
 
 const packageJson = JSON.parse(readFileSync('package.json', 'utf8'))
@@ -29,8 +30,16 @@ const scripts = packageJson.scripts ?? {}
 const workflow = readFileSync('.github/workflows/_quality.yml', 'utf8')
 const gitIgnore = readFileSync('.gitignore', 'utf8')
 const eslintConfig = readFileSync('vue/eslint.config.mjs', 'utf8')
-const previewConfig = readFileSync('vue/playwright.config.ts', 'utf8')
-const devConfig = readFileSync('vue/playwright.dev.config.ts', 'utf8')
+const previewConfig = collectConfigSources(
+  process.cwd(),
+  'vue/playwright.config.ts',
+).join('\n')
+const devConfig = collectConfigSources(
+  process.cwd(),
+  'vue/playwright.dev.config.ts',
+).join('\n')
+const previewDirectConfig = readFileSync('vue/playwright.config.ts', 'utf8')
+const devDirectConfig = readFileSync('vue/playwright.dev.config.ts', 'utf8')
 const testParallelism = readFileSync('scripts/test-parallelism.ts', 'utf8')
 const auditSpec = readFileSync('vue/tests/visual/ui-audit-all.spec.ts', 'utf8')
 const auditRetrySpec = readFileSync(
@@ -301,18 +310,24 @@ assert(
     devConfig.includes("createPlaywrightReporter('dev')"),
   'dev results and report must use profile/suite/project/shard namespaces',
 )
-for (const [label, config, suite] of [
-  ['preview', previewConfig, 'preview'],
-  ['dev', devConfig, 'dev'],
+for (const [label, config, directConfig, suite] of [
+  ['preview', previewConfig, previewDirectConfig, 'preview'],
+  ['dev', devConfig, devDirectConfig, 'dev'],
 ]) {
   assert(
-    config.includes(`serve-visual-runtime.mjs --suite=${suite}`),
+    config.includes(`serve-visual-runtime.mjs --suite=${suite}`) ||
+      (directConfig.includes(`createVisualRuntimeWebServer('${suite}'`) &&
+        config.includes('serve-visual-runtime.mjs --suite=${suite}')),
     `${label} webServer must only serve a prepared visual runtime`,
   )
   assert(
     config.includes(
-      "reuseExistingServer: process.env.FSUS_VISUAL_REUSE_SERVER === '1'",
-    ) && !config.includes('reuseExistingServer: !process.env.CI'),
+      "reuseExistingServer = process.env.FSUS_VISUAL_REUSE_SERVER === '1'",
+    ) ||
+      (config.includes(
+        "reuseExistingServer: process.env.FSUS_VISUAL_REUSE_SERVER === '1'",
+      ) &&
+        !directConfig.includes('reuseExistingServer: !process.env.CI')),
     `${label} webServer reuse must be explicit so full/evidence cannot accept an unbound stale server`,
   )
   for (const forbidden of [
@@ -321,7 +336,7 @@ for (const [label, config, suite] of [
     'demo-app build',
   ]) {
     assert(
-      !config.includes(forbidden),
+      !directConfig.includes(forbidden),
       `${label} webServer must not execute ${forbidden}`,
     )
   }
@@ -332,7 +347,7 @@ for (const [label, config, suite] of [
     'trace: evidencePolicy.trace',
   ]) {
     assert(
-      config.includes(fragment),
+      directConfig.includes(fragment),
       `${label} config must include ${fragment}`,
     )
   }

@@ -2,6 +2,7 @@ import fs from 'node:fs'
 import path from 'node:path'
 import process from 'node:process'
 import { fileURLToPath } from 'node:url'
+import { readScssBundle } from './lib/scss-contract-utils.mjs'
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 
@@ -491,7 +492,7 @@ try {
     )
   }
 
-  const webTheme = read('vue/packages/theme-chalk/src/fsus-theme.scss')
+  const webTheme = readScssBundle('vue/packages/theme-chalk/src/fsus-theme.scss')
   for (const expected of [
     'padding: 0 var(--fsus-component-button-padding-x);',
     'background: var(--fsus-component-state-button-primary-background-default);',

@@ -20,6 +20,7 @@ const commandSources = [
   'markdown-editor-command-snapshot.ts',
   'markdown-editor-selection-toolbar.ts',
   'markdown-editor-surfaces.ts',
+  'kernel/editor-kernel.ts',
 ] as const
 
 const mutationFixtureMarker = /^export const evaluateMarkdown\w*Mutations\b/gmu
@@ -200,7 +201,11 @@ describe('Markdown editor command contract', () => {
   })
 
   it('requires command lifecycle ownership instead of creating a controller for each invocation', () => {
-    const component = readFileSync(resolve(editorRoot, 'src', 'markdown-editor.vue'), 'utf8')
+    const component = [
+      readEditorSource('markdown-editor.vue'),
+      readEditorSource('kernel/editor-kernel.ts'),
+      readEditorSource('composables/use-editor-toolbar-commands.ts'),
+    ].join('\n')
 
     expect(component).toMatch(/pending.*command|command.*pending/is)
     expect(component).toMatch(/abort\(/)
@@ -208,7 +213,10 @@ describe('Markdown editor command contract', () => {
   })
 
   it('keeps the command source shared by every command surface', () => {
-    const component = readFileSync(resolve(editorRoot, 'src', 'markdown-editor.vue'), 'utf8')
+    const component = [
+      readEditorSource('markdown-editor.vue'),
+      readEditorSource('composables/use-editor-toolbar-commands.ts'),
+    ].join('\n')
 
     expect(component).toMatch(/isMarkdownEditorCommandVisible/)
     expect(component).toMatch(/isMarkdownEditorCommandEnabled/)

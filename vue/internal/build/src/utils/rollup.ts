@@ -86,8 +86,15 @@ export const generateExternal = async (options: { full: boolean }) => {
   }
 }
 
-export function writeBundles(bundle: RollupBuild, options: OutputOptions[]) {
-  return Promise.all(options.map((option) => bundle.write(option)))
+export async function writeBundles(
+  bundle: RollupBuild,
+  options: OutputOptions[],
+) {
+  try {
+    return await Promise.all(options.map((option) => bundle.write(option)))
+  } finally {
+    await bundle.close()
+  }
 }
 
 export function formatBundleFilename(

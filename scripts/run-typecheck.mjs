@@ -28,8 +28,8 @@ function git(args) {
 }
 
 function sourceFiles() {
-  const tracked = git(['ls-files'])
-  return tracked
+  const files = git(['ls-files', '--cached', '--others', '--exclude-standard'])
+  return files
     .split(/\r?\n/u)
     .filter((file) =>
       /^(package\.json|pnpm-lock\.yaml|vue\/tsconfig[^/]*\.json|vue\/typings\/.*\.d\.ts|vue\/packages\/.*\.(ts|tsx|vue|json)|vue\/internal\/.*\.(ts|json)|scripts\/run-typecheck\.mjs)$/u.test(file),

@@ -131,6 +131,11 @@ describe('HTML and injection boundary surface', () => {
   it('keeps Markdown HTML construction inside its branded runtime boundary', () => {
     const markdownTypes = read('vue/packages/wasm/markdown.ts')
     const markdownRuntime = read('vue/packages/wasm/markdown-runtime.ts')
+    const markdownResultAuthority = read(
+      'vue/packages/wasm/runtime/markdown-result-authority.ts',
+    )
+    const wasmIndex = read('vue/packages/wasm/index.ts')
+    const publicRuntime = read('vue/packages/element-plus/markdown-runtime.ts')
     const rendererProps = read(
       'vue/packages/components/markdown-renderer/src/markdown-renderer.ts',
     )
@@ -155,13 +160,17 @@ describe('HTML and injection boundary surface', () => {
       `${['initial', 'Html'].join('')}|${['sanitize', 'Html'].join('')}`,
     )
     expect(markdownTypes).not.toMatch(removedBuilder)
-    expect(markdownRuntime).toMatch(/const authorizeMarkdownRuntimeResult/)
-    expect(markdownRuntime).toMatch(
+    expect(markdownResultAuthority).toMatch(
+      /const authorizeMarkdownRuntimeResult/,
+    )
+    expect(markdownResultAuthority).toMatch(
       /const markdownRuntimeAuthority = new WeakSet<object>\(\)/,
     )
-    expect(markdownRuntime).not.toMatch(
-      /export const (?:authorize|brand)Markdown/,
-    )
+    for (const surface of [markdownRuntime, wasmIndex, publicRuntime]) {
+      expect(surface).not.toMatch(
+        /export\s+(?:const|function)\s+(?:authorize|brand)Markdown|authorizeMarkdownRuntimeResult/,
+      )
+    }
     expect(rendererProps).toMatch(
       /MarkdownTrustedHtmlFactory = \(\s*safeHtml: MarkdownSafeHtml/,
     )
@@ -172,6 +181,7 @@ describe('HTML and injection boundary surface', () => {
     const featureSources = await fg(
       [
         'vue/packages/wasm/markdown*.ts',
+        'vue/packages/wasm/runtime/*.ts',
         'vue/packages/components/markdown-renderer/src/*.{ts,vue}',
       ],
       {
@@ -192,6 +202,9 @@ describe('HTML and injection boundary surface', () => {
 
     const gateway = read('vue/packages/wasm/markdown-feature-output-gateway.ts')
     const runtime = read('vue/packages/wasm/markdown-runtime.ts')
+    const featureActivation = read(
+      'vue/packages/wasm/runtime/markdown-feature-activation.ts',
+    )
     const wasmIndex = read('vue/packages/wasm/index.ts')
     const publicRuntime = read('vue/packages/element-plus/markdown-runtime.ts')
     const rendererProps = read(
@@ -216,57 +229,60 @@ describe('HTML and injection boundary surface', () => {
     expect(gateway).toMatch(/sanitizeMermaidRoot/)
     expect(wasmIndex).not.toMatch(/markdown-feature-output-gateway/)
     expect(publicRuntime).not.toMatch(/commitMarkdownFeatureOutput/)
+    expect(runtime).not.toMatch(/markdown-feature-output-gateway/)
 
-    const runtimeSource = ts.createSourceFile(
-      'markdown-runtime.ts',
-      runtime,
+    const activationSource = ts.createSourceFile(
+      'markdown-feature-activation.ts',
+      featureActivation,
       ts.ScriptTarget.Latest,
       true,
       ts.ScriptKind.TS,
     )
-    const staticGatewayImports = runtimeSource.statements.filter(
+    const staticGatewayImports = activationSource.statements.filter(
       (statement): statement is ts.ImportDeclaration =>
         ts.isImportDeclaration(statement) &&
         ts.isStringLiteral(statement.moduleSpecifier) &&
-        statement.moduleSpecifier.text === './markdown-feature-output-gateway',
+        statement.moduleSpecifier.text === '../markdown-feature-output-gateway',
     )
     expect(staticGatewayImports).toHaveLength(1)
     expect(staticGatewayImports[0]?.importClause?.isTypeOnly).toBe(true)
 
     const literalGatewayImports = Array.from(
-      runtime.matchAll(
-        /\bimport\(\s*(['"])\.\/markdown-feature-output-gateway\1\s*\)/gu,
+      featureActivation.matchAll(
+        /\bimport\(\s*(['"])\.\.\/markdown-feature-output-gateway\1\s*\)/gu,
       ),
     )
     expect(literalGatewayImports).toHaveLength(1)
-    const loaderStart = runtime.indexOf(
+    const loaderStart = featureActivation.indexOf(
       'let markdownFeatureOutputGatewayPromise:',
     )
-    const loaderEnd = runtime.indexOf(
+    const loaderEnd = featureActivation.indexOf(
       '\nconst defaultMarkdownFeatureOptions',
       loaderStart,
     )
-    const loader = runtime.slice(loaderStart, loaderEnd)
+    const loader = featureActivation.slice(loaderStart, loaderEnd)
     expect(loaderStart).toBeGreaterThanOrEqual(0)
     expect(loaderEnd).toBeGreaterThan(loaderStart)
     expect(loader).toMatch(
       /^let markdownFeatureOutputGatewayPromise:\s*Promise<MarkdownFeatureOutputGateway>\s*\|\s*null\s*=\s*null/u,
     )
     expect(loader).toMatch(
-      /const loadMarkdownFeatureOutputGateway = \(\) => \{\s*markdownFeatureOutputGatewayPromise \?\?=\s*import\(\s*['"]\.\/markdown-feature-output-gateway['"]\s*\)\s*return markdownFeatureOutputGatewayPromise\s*\}\s*$/u,
+      /const loadMarkdownFeatureOutputGateway = \(\) => \{\s*markdownFeatureOutputGatewayPromise \?\?=\s*import\(\s*['"]\.\.\/markdown-feature-output-gateway['"]\s*\)\s*return markdownFeatureOutputGatewayPromise\s*\}\s*$/u,
     )
-    expect(runtime).not.toMatch(
-      /export\s+(?:const|function|let|var)\s+(?:loadMarkdownFeatureOutputGateway|markdownFeatureOutputGatewayPromise|commitMarkdownFeatureOutput)\b/u,
-    )
+    for (const surface of [runtime, featureActivation]) {
+      expect(surface).not.toMatch(
+        /export\s+(?:const|function|let|var)\s+(?:loadMarkdownFeatureOutputGateway|markdownFeatureOutputGatewayPromise|commitMarkdownFeatureOutput)\b/u,
+      )
+    }
 
-    const activationStart = runtime.indexOf(
+    const activationStart = featureActivation.indexOf(
       'const activateBuiltInFeature = async',
     )
-    const activationEnd = runtime.indexOf(
+    const activationEnd = featureActivation.indexOf(
       '\ninterface MarkdownFeatureActivationWork',
       activationStart,
     )
-    const activation = runtime.slice(activationStart, activationEnd)
+    const activation = featureActivation.slice(activationStart, activationEnd)
     expect(activationStart).toBeGreaterThanOrEqual(0)
     expect(activationEnd).toBeGreaterThan(activationStart)
     expect(
@@ -293,14 +309,16 @@ describe('HTML and injection boundary surface', () => {
     expect(activation).toMatch(
       /const source = code\.textContent \?\? ''\s*if \(!source\) return false[\s\S]*?try \{[\s\S]*?loadMarkdownFeatureOutputGateway\(\)/u,
     )
-    expect(runtime).not.toMatch(
+    expect(featureActivation).not.toMatch(
       /sanitizeFeatureFragment|createSafeFeatureFragment/,
     )
-    expect(runtime).not.toMatch(/default(?:CodeHighlight|Latex|Mermaid)Adapter/)
-    expect(runtime).toMatch(
+    expect(featureActivation).not.toMatch(
+      /default(?:CodeHighlight|Latex|Mermaid)Adapter/,
+    )
+    expect(featureActivation).toMatch(
       /const toFeatureRenderContext[\s\S]*Object\.freeze\(\{[\s\S]*signal: context\.signal,[\s\S]*theme: context\.theme,[\s\S]*tokens: context\.resolveTokens\(element\)/,
     )
-    expect(runtime).toMatch(/code\.textContent = source/)
+    expect(featureActivation).toMatch(/code\.textContent = source/)
     expect(rendererProps).not.toMatch(
       /mermaidAdapter|latexAdapter|codeHighlightAdapter|MarkdownFeatureAdapter/,
     )

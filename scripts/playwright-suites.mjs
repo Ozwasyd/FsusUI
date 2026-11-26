@@ -96,7 +96,7 @@ const loadProjectContract = (repositoryRoot, relativePath) => {
  * Pure-data project contract is the authority for config project cells.
  * Config files must declare the same project names (structural presence).
  */
-const collectConfigSources = (
+export const collectConfigSources = (
   repositoryRoot,
   configRelative,
   seen = new Set(),

@@ -42,7 +42,18 @@ describe('markdown editor leftover command surfaces', () => {
 
   it('keeps toolbarDensity and opt-in surfaces on the shipped editor props', () => {
     const api = readFileSync(resolve(editorRoot, 'src', 'markdown-editor.ts'), 'utf8')
-    const surface = readFileSync(resolve(editorRoot, 'src', 'markdown-editor.vue'), 'utf8')
+    const surface = [
+      readFileSync(resolve(editorRoot, 'src', 'markdown-editor.vue'), 'utf8'),
+      readFileSync(
+        resolve(
+          editorRoot,
+          'src',
+          'composables',
+          'use-editor-toolbar-commands.ts',
+        ),
+        'utf8',
+      ),
+    ].join('\n')
 
     expect(api).toMatch(/toolbarDensity/)
     expect(api).toMatch(/commandPalette/)

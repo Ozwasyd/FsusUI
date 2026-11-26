@@ -1,40 +1,26 @@
-import { readFileSync } from 'node:fs'
+import {
+  assertIncludesAll,
+  assertRegisteredGovernanceScript,
+  createPolicyAssert,
+  loadGovernanceDocs,
+  loadScriptsMap,
+  readRepoText,
+} from './lib/ci-policy-utils.mjs'
 
-const packageJson = JSON.parse(readFileSync('package.json', 'utf8'))
-const scripts = packageJson.scripts ?? {}
-const qualityWorkflow = readFileSync('.github/workflows/quality.yml', 'utf8')
-const reusableQualityWorkflow = readFileSync(
-  '.github/workflows/_quality.yml',
-  'utf8',
-)
-const releaseGovernance = readFileSync('docs/releases/governance.md', 'utf8')
-const engineeringHandoff = readFileSync('docs/engineering-handoff.md', 'utf8')
-const capacityTypecheck = readFileSync(
-  'scripts/run-capacity-typecheck.mjs',
-  'utf8',
-)
-const capacityPlanner = readFileSync('scripts/ci-capacity.cjs', 'utf8')
-
-function assert(condition, message) {
-  if (!condition) {
-    console.error(`[typecheck-cache] ${message}`)
-    process.exit(1)
-  }
-}
-
-const workflows = `${qualityWorkflow}\n${reusableQualityWorkflow}`
-const docs = `${releaseGovernance}\n${engineeringHandoff}`.toLowerCase()
+const assert = createPolicyAssert('typecheck-cache')
+const scripts = loadScriptsMap()
+const workflows = `${readRepoText('.github/workflows/quality.yml')}\n${readRepoText('.github/workflows/_quality.yml')}`
+const docs = loadGovernanceDocs().toLowerCase()
+const capacityTypecheck = readRepoText('scripts/run-capacity-typecheck.mjs')
+const capacityPlanner = readRepoText('scripts/ci-capacity.cjs')
 const typecheckLanes = ['web', 'node', 'vite-config', 'vitest']
 
-assert(
-  scripts['check:typecheck-cache']?.includes(
-    'scripts/check-typecheck-cache-policy.mjs',
-  ),
-  'package.json must expose check:typecheck-cache',
-)
-assert(
-  scripts['governance:check']?.includes('check:typecheck-cache'),
-  'governance:check must include the typecheck cache policy guard',
+assertRegisteredGovernanceScript(
+  assert,
+  scripts,
+  'check:typecheck-cache',
+  'scripts/check-typecheck-cache-policy.mjs',
+  'the typecheck cache policy guard',
 )
 assert(
   scripts.typecheck?.includes('run-capacity-typecheck.mjs') &&
@@ -68,46 +54,36 @@ for (const lane of typecheckLanes) {
   )
 }
 
-assert(
-  workflows.includes('.tmp/typecheck-cache'),
-  'quality workflows must cache .tmp/typecheck-cache',
+assertIncludesAll(
+  assert,
+  workflows,
+  [
+    '.tmp/typecheck-cache',
+    'fsusui-typecheck-',
+    'pnpm-lock.yaml',
+    'package.json',
+    'vue/tsconfig*.json',
+    'vue/packages/**/*.ts',
+    'vue/packages/**/*.vue',
+    'vue/typings/**/*.d.ts',
+    'scripts/run-typecheck.mjs',
+    'typecheck-cache-hit',
+    'cache-hit',
+    'cache-primary-key',
+  ],
+  (fragment) => `quality workflows must include ${fragment}`,
 )
-assert(
-  workflows.includes('fsusui-typecheck-'),
-  'typecheck cache key must use the fsusui-typecheck prefix',
+assertIncludesAll(
+  assert,
+  docs,
+  [
+    'typecheck cache',
+    'cache hit',
+    'cache miss',
+    'typecheck:no-cache',
+    'typecheck:affected',
+  ],
+  (fragment) => `docs must describe ${fragment}`,
 )
-for (const fragment of [
-  'pnpm-lock.yaml',
-  'package.json',
-  'vue/tsconfig*.json',
-  'vue/packages/**/*.ts',
-  'vue/packages/**/*.vue',
-  'vue/typings/**/*.d.ts',
-  'scripts/run-typecheck.mjs',
-]) {
-  assert(
-    workflows.includes(fragment),
-    `typecheck cache key must include ${fragment}`,
-  )
-}
-for (const fragment of [
-  'typecheck-cache-hit',
-  'cache-hit',
-  'cache-primary-key',
-]) {
-  assert(
-    workflows.includes(fragment),
-    `quality workflow logs must expose ${fragment}`,
-  )
-}
-for (const fragment of [
-  'typecheck cache',
-  'cache hit',
-  'cache miss',
-  'typecheck:no-cache',
-  'typecheck:affected',
-]) {
-  assert(docs.includes(fragment), `docs must describe ${fragment}`)
-}
 
 console.log('[typecheck-cache] ok')

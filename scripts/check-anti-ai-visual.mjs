@@ -1,6 +1,12 @@
 #!/usr/bin/env node
 import { readFileSync, readdirSync } from 'node:fs'
 import { join, relative, resolve } from 'node:path'
+import { readScssBundle, walkScssFiles } from './lib/scss-contract-utils.mjs'
+
+const fsusThemeFiles = () => [
+  'vue/packages/theme-chalk/src/fsus-theme.scss',
+  ...walkScssFiles('vue/packages/theme-chalk/src/fsus-theme'),
+]
 
 const root = process.cwd()
 const violations = []
@@ -301,166 +307,170 @@ const checkCoreTokens = () => {
 }
 
 const checkGeometryMixinSemantics = () => {
-  const file = 'vue/packages/theme-chalk/src/fsus-theme.scss'
-  const source = read(file)
   const includePattern =
     /@include\s+fsus-(control|panel|floating|geometry)(?:\(([^;]*)\))?\s*;/g
 
-  for (const match of source.matchAll(includePattern)) {
-    const index = match.index ?? 0
-    const mixin = match[1]
-    const argument = (match[2] ?? (mixin === 'geometry' ? '' : 'panel')).trim()
-    const selector = selectorAt(source, index)
+  for (const file of fsusThemeFiles()) {
+    const source = read(file)
+    for (const match of source.matchAll(includePattern)) {
+      const index = match.index ?? 0
+      const mixin = match[1]
+      const argument = (match[2] ?? (mixin === 'geometry' ? '' : 'panel')).trim()
+      const selector = selectorAt(source, index)
 
-    if (argument.startsWith('$')) continue
-    if (!geometryCategories.has(argument)) {
-      addViolation(
-        file,
-        lineNumberOf(source, index),
-        `fsus-${mixin} must use a semantic geometry category; found ${argument || 'no category'}`,
-      )
-      continue
-    }
+      if (argument.startsWith('$')) continue
+      if (!geometryCategories.has(argument)) {
+        addViolation(
+          file,
+          lineNumberOf(source, index),
+          `fsus-${mixin} must use a semantic geometry category; found ${argument || 'no category'}`,
+        )
+        continue
+      }
 
-    if (
-      argument === 'expressive' &&
-      !selector.includes('.is-expressive-surface') &&
-      !selector.includes("[data-fsus-surface='expressive']")
-    ) {
-      addViolation(
-        file,
-        lineNumberOf(source, index),
-        'expressive geometry requires an explicit expressive surface selector',
-      )
-    }
+      if (
+        argument === 'expressive' &&
+        !selector.includes('.is-expressive-surface') &&
+        !selector.includes("[data-fsus-surface='expressive']")
+      ) {
+        addViolation(
+          file,
+          lineNumberOf(source, index),
+          'expressive geometry requires an explicit expressive surface selector',
+        )
+      }
 
-    if (
-      argument === 'pill' &&
-      !pillGeometryContexts.some((context) => selector.includes(context))
-    ) {
-      addViolation(
-        file,
-        lineNumberOf(source, index),
-        `pill geometry is limited to documented pill/circular controls; selector was ${selector}`,
-      )
-    }
+      if (
+        argument === 'pill' &&
+        !pillGeometryContexts.some((context) => selector.includes(context))
+      ) {
+        addViolation(
+          file,
+          lineNumberOf(source, index),
+          `pill geometry is limited to documented pill/circular controls; selector was ${selector}`,
+        )
+      }
 
-    if (
-      mixin === 'control' &&
-      argument === 'panel' &&
-      !selector.includes('-upload')
-    ) {
-      addViolation(
-        file,
-        lineNumberOf(source, index),
-        'panel geometry on a control requires an upload panel context',
-      )
+      if (
+        mixin === 'control' &&
+        argument === 'panel' &&
+        !selector.includes('-upload')
+      ) {
+        addViolation(
+          file,
+          lineNumberOf(source, index),
+          'panel geometry on a control requires an upload panel context',
+        )
+      }
     }
   }
 }
 
 const checkSurfaceTaxonomy = () => {
-  const file = 'vue/packages/theme-chalk/src/fsus-theme.scss'
-  const source = read(file)
   const forbiddenCrossRoleSelector =
     /\.#\{\$namespace\}-(?:alert|result|page-header|statistic)[\s\S]{0,500}@include\s+fsus-panel/u
 
-  if (forbiddenCrossRoleSelector.test(source)) {
-    addViolation(
-      file,
-      1,
-      'document components must stay flat and cannot share the panel mixin',
-    )
-  }
+  for (const file of fsusThemeFiles()) {
+    const source = read(file)
 
-  for (const match of source.matchAll(
-    /\/\*\s*fsus-surface:\s*([\w-]+)\s*\[([^\]]+)\]\s*\*\//gu,
-  )) {
-    const role = match[1]
-    const components = match[2]
-      .split(',')
-      .map((value) => value.trim())
-      .filter(Boolean)
-    if (!surfaceRoles.has(role) || components.length === 0) {
+    if (forbiddenCrossRoleSelector.test(source)) {
       addViolation(
         file,
-        lineNumberOf(source, match.index ?? 0),
-        'surface taxonomy comment must declare a valid role and component list',
+        1,
+        'document components must stay flat and cannot share the panel mixin',
       )
     }
-  }
 
-  for (const match of source.matchAll(
-    /@include\s+fsus-panel(?:\([^)]*\))?;/gu,
-  )) {
-    const index = match.index ?? 0
-    const selector = selectorAt(source, index)
-    const componentCount = new Set(
-      [...selector.matchAll(/#\{\$namespace\}-([\w-]+)/gu)].map(
-        (component) => component[1],
-      ),
-    ).size
-    if (componentCount < 2) continue
+    for (const match of source.matchAll(
+      /\/\*\s*fsus-surface:\s*([\w-]+)\s*\[([^\]]+)\]\s*\*\//gu,
+    )) {
+      const role = match[1]
+      const components = match[2]
+        .split(',')
+        .map((value) => value.trim())
+        .filter(Boolean)
+      if (!surfaceRoles.has(role) || components.length === 0) {
+        addViolation(
+          file,
+          lineNumberOf(source, match.index ?? 0),
+          'surface taxonomy comment must declare a valid role and component list',
+        )
+      }
+    }
 
-    const context = source.slice(Math.max(0, index - 600), index)
-    if (!/\/\*\s*fsus-surface:\s*[\w-]+\s*\[[^\]]+\]\s*\*\//u.test(context)) {
-      addViolation(
-        file,
-        lineNumberOf(source, index),
-        `broad panel selector requires a surface taxonomy comment and component list; selector was ${selector}`,
-      )
+    for (const match of source.matchAll(
+      /@include\s+fsus-panel(?:\([^)]*\))?;/gu,
+    )) {
+      const index = match.index ?? 0
+      const selector = selectorAt(source, index)
+      const componentCount = new Set(
+        [...selector.matchAll(/#\{\$namespace\}-([\w-]+)/gu)].map(
+          (component) => component[1],
+        ),
+      ).size
+      if (componentCount < 2) continue
+
+      const context = source.slice(Math.max(0, index - 600), index)
+      if (!/\/\*\s*fsus-surface:\s*[\w-]+\s*\[[^\]]+\]\s*\*\//u.test(context)) {
+        addViolation(
+          file,
+          lineNumberOf(source, index),
+          `broad panel selector requires a surface taxonomy comment and component list; selector was ${selector}`,
+        )
+      }
     }
   }
 }
 
 const checkDefaultInteractionEffects = () => {
-  const file = 'vue/packages/theme-chalk/src/fsus-theme.scss'
-  const source = read(file)
+  for (const file of fsusThemeFiles()) {
+    const source = read(file)
 
-  for (const match of source.matchAll(/:active/g)) {
-    const index = match.index ?? 0
-    const blockOpen = source.indexOf('{', index)
-    if (blockOpen < 0) continue
-    const selector = selectorBeforeBlock(source, blockOpen)
-    const blockClose = findMatchingBrace(source, blockOpen)
-    if (blockClose < 0 || !selector.includes(':active')) continue
-    const body = source.slice(blockOpen + 1, blockClose)
+    for (const match of source.matchAll(/:active/g)) {
+      const index = match.index ?? 0
+      const blockOpen = source.indexOf('{', index)
+      if (blockOpen < 0) continue
+      const selector = selectorBeforeBlock(source, blockOpen)
+      const blockClose = findMatchingBrace(source, blockOpen)
+      if (blockClose < 0 || !selector.includes(':active')) continue
+      const body = source.slice(blockOpen + 1, blockClose)
 
-    if (/\bscale(?:3d|X|Y)?\(/u.test(body)) {
-      addViolation(
-        file,
-        lineNumberOf(source, index),
-        `default active state must not scale; selector was ${selector}`,
-      )
+      if (/\bscale(?:3d|X|Y)?\(/u.test(body)) {
+        addViolation(
+          file,
+          lineNumberOf(source, index),
+          `default active state must not scale; selector was ${selector}`,
+        )
+      }
+      if (
+        body.includes('var(--fsus-motion-trail)') ||
+        body.includes('var(--fsus-motion-slider-trail)') ||
+        body.includes('var(--fsus-interactive-motion-glow') ||
+        /filter:\s*blur\((?!0(?:px)?\))/u.test(body)
+      ) {
+        addViolation(
+          file,
+          lineNumberOf(source, index),
+          `default active state must not use glow, trail, or blur; selector was ${selector}`,
+        )
+      }
     }
-    if (
-      body.includes('var(--fsus-motion-trail)') ||
-      body.includes('var(--fsus-motion-slider-trail)') ||
-      body.includes('var(--fsus-interactive-motion-glow') ||
-      /filter:\s*blur\((?!0(?:px)?\))/u.test(body)
-    ) {
-      addViolation(
-        file,
-        lineNumberOf(source, index),
-        `default active state must not use glow, trail, or blur; selector was ${selector}`,
-      )
-    }
-  }
 
-  for (const match of source.matchAll(
-    /var\(--fsus-(?:motion-trail|motion-slider-trail|interactive-motion-glow)/g,
-  )) {
-    const index = match.index ?? 0
-    const context = source.slice(Math.max(0, index - 900), index + 120)
-    if (
-      !context.includes('.is-expressive-surface') &&
-      !context.includes("[data-fsus-surface='expressive']")
-    ) {
-      addViolation(
-        file,
-        lineNumberOf(source, index),
-        'glow and trail effects require explicit expressive surface context',
-      )
+    for (const match of source.matchAll(
+      /var\(--fsus-(?:motion-trail|motion-slider-trail|interactive-motion-glow)/g,
+    )) {
+      const index = match.index ?? 0
+      const context = source.slice(Math.max(0, index - 900), index + 120)
+      if (
+        !context.includes('.is-expressive-surface') &&
+        !context.includes("[data-fsus-surface='expressive']")
+      ) {
+        addViolation(
+          file,
+          lineNumberOf(source, index),
+          'glow and trail effects require explicit expressive surface context',
+        )
+      }
     }
   }
 }
@@ -475,7 +485,7 @@ const checkBackdropFilters = () => {
     'vue/packages/theme-chalk/src/popover.scss',
     'vue/packages/theme-chalk/src/public-shell.scss',
     'vue/packages/theme-chalk/src/select-dropdown.scss',
-    'vue/packages/theme-chalk/src/fsus-theme.scss',
+    ...fsusThemeFiles(),
   ]
 
   for (const file of files) {
@@ -548,7 +558,7 @@ const checkHoverTransforms = () => {
 
 const checkReadingSurface = () => {
   const file = 'vue/packages/theme-chalk/src/fsus-theme.scss'
-  const source = read(file)
+  const source = readScssBundle(file)
 
   for (const expected of [
     "[data-fsus-surface='reading']",

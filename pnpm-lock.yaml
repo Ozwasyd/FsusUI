@@ -26,9 +26,6 @@ importers:
       '@element-plus/locale':
         specifier: workspace:*
         version: link:vue/packages/locale
-      '@element-plus/test-utils':
-        specifier: workspace:*
-        version: link:vue/packages/test-utils
       '@element-plus/theme-chalk':
         specifier: workspace:*
         version: link:vue/packages/theme-chalk
@@ -90,6 +87,9 @@ importers:
       '@element-plus/icons-svg':
         specifier: workspace:*
         version: link:vue/packages/icons-svg
+      '@element-plus/test-utils':
+        specifier: workspace:*
+        version: link:vue/packages/test-utils
       '@eslint/js':
         specifier: 10.0.1
         version: 10.0.1(eslint@10.2.0(jiti@2.6.1))

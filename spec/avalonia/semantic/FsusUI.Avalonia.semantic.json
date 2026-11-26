@@ -4,11 +4,11 @@
   "source": {
     "toolVersion": "FsusUI.Avalonia.ApiTool@1.8.0",
     "assemblyVersion": "0.0.0.0",
-    "inputTreeHash": "db8154a16cff441218fa2a4bde4aedf6ecc1ce6e40225760bb5e1175c8c371fb",
+    "inputTreeHash": "c60b185dafbf952eaf6365a1ac8f1aed6e60744d2fd995d14dfa125d645383bd",
     "compilerOptionsHash": "7e5271d568360ccb03852002c427b2d740466121049706513eb89a731476ad09",
     "dependencyVersionHash": "b0acaf728062500d48b252b58655a9fad423f83f197e79ddcdfff680a80ab71e",
     "contractSchemaVersion": "2.0.0",
-    "outputHash": "6032daa21ee9e7f9bc5013223c8a8f3a8b63ce84c543e81ef24cc90077afebf5"
+    "outputHash": "602ae00d6cf902b697e00f8765dcd1452868e1853a238d6c2153c7cb1e9e6a47"
   },
   "semanticTypes": [
     {
@@ -68201,7 +68201,7 @@
       {
         "kind": "csharp-token-member-reference",
         "authority": "roslyn-symbol-reference",
-        "sourceFile": "dotnet/FsusUI.Avalonia/Controls/FsusCommandPalette.cs",
+        "sourceFile": "dotnet/FsusUI.Avalonia/Controls/CommandPalette/FsusCommandPalette.Resolution.cs",
         "sourceMember": "FsusUI.Avalonia.Controls.FsusCommandPalette.BuildResultRow",
         "dependency": "Space1Thickness",
         "canonicalName": "space.1",
@@ -68213,7 +68213,7 @@
       {
         "kind": "csharp-token-member-reference",
         "authority": "roslyn-symbol-reference",
-        "sourceFile": "dotnet/FsusUI.Avalonia/Controls/FsusCommandPalette.cs",
+        "sourceFile": "dotnet/FsusUI.Avalonia/Controls/CommandPalette/FsusCommandPalette.Resolution.cs",
         "sourceMember": "FsusUI.Avalonia.Controls.FsusCommandPalette.BuildResultRow",
         "dependency": "Space2Thickness",
         "canonicalName": "space.2",
@@ -68225,7 +68225,7 @@
       {
         "kind": "csharp-token-member-reference",
         "authority": "roslyn-symbol-reference",
-        "sourceFile": "dotnet/FsusUI.Avalonia/Controls/FsusCommandPalette.cs",
+        "sourceFile": "dotnet/FsusUI.Avalonia/Controls/CommandPalette/FsusCommandPalette.Resolution.cs",
         "sourceMember": "FsusUI.Avalonia.Controls.FsusCommandPalette.BuildVisualTree",
         "dependency": "DensityMenuItemYDouble",
         "canonicalName": "density.menu.item.y",
@@ -68237,7 +68237,7 @@
       {
         "kind": "csharp-token-member-reference",
         "authority": "roslyn-symbol-reference",
-        "sourceFile": "dotnet/FsusUI.Avalonia/Controls/FsusCommandPalette.cs",
+        "sourceFile": "dotnet/FsusUI.Avalonia/Controls/CommandPalette/FsusCommandPalette.Resolution.cs",
         "sourceMember": "FsusUI.Avalonia.Controls.FsusCommandPalette.BuildVisualTree",
         "dependency": "DensityMenuItemYDouble",
         "canonicalName": "density.menu.item.y",
@@ -68249,7 +68249,7 @@
       {
         "kind": "csharp-token-member-reference",
         "authority": "roslyn-symbol-reference",
-        "sourceFile": "dotnet/FsusUI.Avalonia/Controls/FsusCommandPalette.cs",
+        "sourceFile": "dotnet/FsusUI.Avalonia/Controls/CommandPalette/FsusCommandPalette.Resolution.cs",
         "sourceMember": "FsusUI.Avalonia.Controls.FsusCommandPalette.BuildVisualTree",
         "dependency": "Space2Thickness",
         "canonicalName": "space.2",
@@ -68261,7 +68261,7 @@
       {
         "kind": "csharp-token-member-reference",
         "authority": "roslyn-symbol-reference",
-        "sourceFile": "dotnet/FsusUI.Avalonia/Controls/FsusCommandPalette.cs",
+        "sourceFile": "dotnet/FsusUI.Avalonia/Controls/CommandPalette/FsusCommandPalette.Resolution.cs",
         "sourceMember": "FsusUI.Avalonia.Controls.FsusCommandPalette.BuildVisualTree",
         "dependency": "Space2Thickness",
         "canonicalName": "space.2",
@@ -68273,7 +68273,7 @@
       {
         "kind": "csharp-token-member-reference",
         "authority": "roslyn-symbol-reference",
-        "sourceFile": "dotnet/FsusUI.Avalonia/Controls/FsusCommandPalette.cs",
+        "sourceFile": "dotnet/FsusUI.Avalonia/Controls/CommandPalette/FsusCommandPalette.cs",
         "sourceMember": "FsusUI.Avalonia.Controls.FsusCommandPalette.Open",
         "dependency": "DensityMenuItemYDouble",
         "canonicalName": "density.menu.item.y",
@@ -68377,7 +68377,7 @@
       {
         "kind": "csharp-token-member-reference",
         "authority": "roslyn-symbol-reference",
-        "sourceFile": "dotnet/FsusUI.Avalonia/Controls/FsusTreeControls.cs",
+        "sourceFile": "dotnet/FsusUI.Avalonia/Controls/Tree/FsusTree.Rendering.cs",
         "sourceMember": "FsusUI.Avalonia.Controls.FsusTree.ApplyRowState",
         "dependency": "Space2Thickness",
         "canonicalName": "space.2",
@@ -68389,7 +68389,7 @@
       {
         "kind": "csharp-token-member-reference",
         "authority": "roslyn-symbol-reference",
-        "sourceFile": "dotnet/FsusUI.Avalonia/Controls/FsusTreeControls.cs",
+        "sourceFile": "dotnet/FsusUI.Avalonia/Controls/Tree/FsusTree.Rendering.cs",
         "sourceMember": "FsusUI.Avalonia.Controls.FsusTree.BuildInlineEditContent",
         "dependency": "Space1Thickness",
         "canonicalName": "space.1",
@@ -68401,7 +68401,7 @@
       {
         "kind": "csharp-token-member-reference",
         "authority": "roslyn-symbol-reference",
-        "sourceFile": "dotnet/FsusUI.Avalonia/Controls/FsusTreeControls.cs",
+        "sourceFile": "dotnet/FsusUI.Avalonia/Controls/Tree/FsusTree.Rendering.cs",
         "sourceMember": "FsusUI.Avalonia.Controls.FsusTree.BuildRow",
         "dependency": "Space2Thickness",
         "canonicalName": "space.2",
@@ -68413,7 +68413,7 @@
       {
         "kind": "csharp-token-member-reference",
         "authority": "roslyn-symbol-reference",
-        "sourceFile": "dotnet/FsusUI.Avalonia/Controls/FsusTreeControls.cs",
+        "sourceFile": "dotnet/FsusUI.Avalonia/Controls/Tree/FsusTree.Rendering.cs",
         "sourceMember": "FsusUI.Avalonia.Controls.FsusTree.BuildRow",
         "dependency": "Space5Thickness",
         "canonicalName": "space.5",
@@ -68425,7 +68425,7 @@
       {
         "kind": "csharp-token-member-reference",
         "authority": "roslyn-symbol-reference",
-        "sourceFile": "dotnet/FsusUI.Avalonia/Controls/FsusTreeControls.cs",
+        "sourceFile": "dotnet/FsusUI.Avalonia/Controls/Tree/FsusTree.Rendering.cs",
         "sourceMember": "FsusUI.Avalonia.Controls.FsusTree.BuildTransientInlineEditRow",
         "dependency": "DensityControlDefaultYDouble",
         "canonicalName": "density.control.default.y",
@@ -68437,7 +68437,7 @@
       {
         "kind": "csharp-token-member-reference",
         "authority": "roslyn-symbol-reference",
-        "sourceFile": "dotnet/FsusUI.Avalonia/Controls/FsusTreeControls.cs",
+        "sourceFile": "dotnet/FsusUI.Avalonia/Controls/Tree/FsusTree.Rendering.cs",
         "sourceMember": "FsusUI.Avalonia.Controls.FsusTree.BuildTransientInlineEditRow",
         "dependency": "Space2Thickness",
         "canonicalName": "space.2",
@@ -68449,7 +68449,7 @@
       {
         "kind": "csharp-token-member-reference",
         "authority": "roslyn-symbol-reference",
-        "sourceFile": "dotnet/FsusUI.Avalonia/Controls/FsusTreeControls.cs",
+        "sourceFile": "dotnet/FsusUI.Avalonia/Controls/Tree/FsusTree.Rendering.cs",
         "sourceMember": "FsusUI.Avalonia.Controls.FsusTree.BuildTransientInlineEditRow",
         "dependency": "Space5Thickness",
         "canonicalName": "space.5",
@@ -68461,7 +68461,7 @@
       {
         "kind": "csharp-token-member-reference",
         "authority": "roslyn-symbol-reference",
-        "sourceFile": "dotnet/FsusUI.Avalonia/Controls/FsusTreeControls.cs",
+        "sourceFile": "dotnet/FsusUI.Avalonia/Controls/Tree/FsusTree.Rendering.cs",
         "sourceMember": "FsusUI.Avalonia.Controls.FsusTree.HandleRowPointerPressed",
         "dependency": "Space6Thickness",
         "canonicalName": "space.6",
@@ -68473,7 +68473,7 @@
       {
         "kind": "csharp-token-member-reference",
         "authority": "roslyn-symbol-reference",
-        "sourceFile": "dotnet/FsusUI.Avalonia/Controls/FsusTreeControls.cs",
+        "sourceFile": "dotnet/FsusUI.Avalonia/Controls/Tree/FsusTree.Rendering.cs",
         "sourceMember": "FsusUI.Avalonia.Controls.FsusTree.ResolveRowMinHeight",
         "dependency": "DensityControlDefaultYDouble",
         "canonicalName": "density.control.default.y",
@@ -68485,7 +68485,7 @@
       {
         "kind": "csharp-token-member-reference",
         "authority": "roslyn-symbol-reference",
-        "sourceFile": "dotnet/FsusUI.Avalonia/Controls/FsusTreeControls.cs",
+        "sourceFile": "dotnet/FsusUI.Avalonia/Controls/Tree/FsusTree.Rendering.cs",
         "sourceMember": "FsusUI.Avalonia.Controls.FsusTree.ResolveRowMinHeight",
         "dependency": "DensityControlDefaultYResourceKey",
         "canonicalName": "density.control.default.y",

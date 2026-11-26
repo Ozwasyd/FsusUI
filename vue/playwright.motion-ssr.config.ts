@@ -1,13 +1,13 @@
 import { defineConfig } from '@playwright/test'
+import { createPlaywrightReporter } from '../scripts/test-parallelism'
 import {
-  createPlaywrightReporter,
-  resolveTestPort,
-} from '../scripts/test-parallelism'
+  createBaseUse,
+  createChromiumDefaultProjects,
+  resolveChromiumLaunchOptions,
+  resolveServerEndpoint,
+} from './playwright.shared'
 
-delete process.env.NO_COLOR
-
-const port = resolveTestPort('FSUS_MOTION_SSR_PORT', 5183)
-const baseURL = `http://127.0.0.1:${port}`
+const { port, baseURL } = resolveServerEndpoint('FSUS_MOTION_SSR_PORT', 5183)
 
 export default defineConfig({
   testDir: './tests/motion-ssr',
@@ -17,28 +17,15 @@ export default defineConfig({
   reporter: createPlaywrightReporter('motion-ssr'),
   timeout: 180_000,
   expect: { timeout: 20_000 },
-  use: {
-    baseURL,
+  use: createBaseUse(baseURL, {
     browserName: 'chromium',
-    colorScheme: 'light',
-    locale: 'zh-CN',
-    timezoneId: 'Asia/Shanghai',
     viewport: { width: 1280, height: 1100 },
-    launchOptions: process.env.FSUS_PLAYWRIGHT_EXECUTABLE_PATH
-      ? { executablePath: process.env.FSUS_PLAYWRIGHT_EXECUTABLE_PATH }
-      : undefined,
+    launchOptions: resolveChromiumLaunchOptions(),
     screenshot: 'off',
     trace: 'off',
     video: 'off',
-  },
-  projects: [
-    {
-      name: 'default',
-      use: {
-        browserName: 'chromium',
-      },
-    },
-  ],
+  }),
+  projects: createChromiumDefaultProjects(),
   webServer: {
     command: `node tests/motion-ssr/serve-motion-ssr.mjs --port=${port}`,
     url: `${baseURL}/health`,

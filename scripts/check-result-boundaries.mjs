@@ -7,7 +7,17 @@ const root = process.cwd()
 const checkedFiles = [
   'vue/packages/wasm/index.ts',
   'vue/packages/wasm/markdown-runtime.ts',
+  'vue/packages/wasm/runtime/markdown-result-authority.ts',
+  'vue/packages/wasm/runtime/markdown-feature-activation.ts',
+  'vue/packages/wasm/runtime/markdown-wasm-engine.ts',
   'vue/packages/hooks/use-render-pipeline/index.ts',
+  'vue/packages/hooks/use-render-pipeline/config.ts',
+  'vue/packages/hooks/use-render-pipeline/diagnostics.ts',
+  'vue/packages/hooks/use-render-pipeline/hardware-profile.ts',
+  'vue/packages/hooks/use-render-pipeline/registry.ts',
+  'vue/packages/hooks/use-render-pipeline/scheduler.ts',
+  'vue/packages/hooks/use-render-pipeline/virtual-window.ts',
+  'vue/packages/hooks/use-render-pipeline/runtime.ts',
   'vue/packages/components/form/src/form.vue',
   'vue/packages/components/form/src/form-item.vue',
   'vue/packages/components/message-box/src/messageBox.ts',
@@ -41,11 +51,12 @@ const invariantThrowAllowlist = new Map([
     ],
   ],
   [
-    'vue/packages/hooks/use-render-pipeline/index.ts',
-    [
-      'fsus_render_pipeline_adapter_id_required',
-      'useFsusVirtualWindow requires unique keys',
-    ],
+    'vue/packages/hooks/use-render-pipeline/registry.ts',
+    ['fsus_render_pipeline_adapter_id_required'],
+  ],
+  [
+    'vue/packages/hooks/use-render-pipeline/virtual-window.ts',
+    ['useFsusVirtualWindow requires unique keys'],
   ],
 ])
 

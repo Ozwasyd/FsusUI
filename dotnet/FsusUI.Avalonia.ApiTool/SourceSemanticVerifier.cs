@@ -19,7 +19,7 @@ internal static class SourceSemanticVerifier
   private const string ThemeSource =
     "dotnet/FsusUI.Avalonia.Themes/FsusThemeManager.cs";
   private const string TreeSource =
-    "dotnet/FsusUI.Avalonia/Controls/FsusTreeControls.cs";
+    "dotnet/FsusUI.Avalonia/Controls/Tree/FsusTree.Rendering.cs";
   private const string MarkdownThemeSource =
     "dotnet/FsusUI.Avalonia.Themes/Themes/Controls/MarkdownEditor.axaml";
   private const string CanonicalTokensSource = "spec/tokens/tokens.json";

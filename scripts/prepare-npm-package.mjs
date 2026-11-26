@@ -13,6 +13,17 @@ import {
   loadAuthority,
   applyPublishedExternalFields,
 } from './npm-authority-lib.mjs'
+import {
+  BUNDLED_WORKSPACE_DEPENDENCY_NAMES,
+  collectDirectoryFiles,
+  collectPackageCodeFiles,
+  pruneSourceMaps,
+  rewriteBundledWorkspaceReferences,
+  rewriteEmscriptenWasmFallbackReferences,
+  rewritePublishedSelfReferences,
+  rewritePublishStageWorkerReferences,
+  stripSourceMappingUrlReferences,
+} from './lib/package-artifact-rewriter.mjs'
 
 const scriptDir = path.dirname(fileURLToPath(import.meta.url))
 const repoRoot = path.resolve(scriptDir, '..')
@@ -34,32 +45,7 @@ const installDependencyFields = [
   'peerDependencies',
   'optionalDependencies',
 ]
-const bundledWorkspaceDependencyNames = new Set([
-  '@element-plus/icons-vue',
-  '@element-plus/motion',
-])
-const bundledWorkspaceRuntimeEntries = new Map([
-  [
-    '@element-plus/icons-vue',
-    {
-      es: 'es/icons-vue/src/index.mjs',
-      lib: 'lib/icons-vue/src/index.js',
-      types: 'es/icons-vue',
-    },
-  ],
-  [
-    '@element-plus/motion',
-    {
-      es: 'es/motion/index.mjs',
-      lib: 'lib/motion/index.js',
-      types: 'es/motion',
-    },
-  ],
-])
-const unpublishedWorkspaceDependencyNames = new Set([
-  '@element-plus/motion',
-  '@element-plus/icons-vue',
-])
+const unpublishedWorkspaceDependencyNames = BUNDLED_WORKSPACE_DEPENDENCY_NAMES
 const wasmRuntimeArtifacts = [
   'dist/ep_wasm.wasm',
   'dist/markdown-heavy-feature-frame.mjs',
@@ -83,14 +69,6 @@ const wasmRuntimeArtifacts = [
   'lib/wasm/dist/markdown_basic.wasm',
   'lib/wasm/dist/markdown_simd.js',
   'lib/wasm/dist/markdown_simd.wasm',
-]
-const selfReferenceFileExtensions = [
-  '.d.ts',
-  '.d.mts',
-  '.d.cts',
-  '.js',
-  '.mjs',
-  '.cjs',
 ]
 const rawSourceExtensions = new Set([
   '.c',
@@ -226,109 +204,12 @@ function assertDistArtifactShape(rootDir) {
   }
 }
 
-function collectPublishFiles(rootDir, currentDir = rootDir) {
-  const files = []
-  const entries = readdirSync(currentDir, { withFileTypes: true })
-
-  for (const entry of entries) {
-    const absolutePath = path.join(currentDir, entry.name)
-
-    if (entry.isDirectory()) {
-      files.push(...collectPublishFiles(rootDir, absolutePath))
-      continue
-    }
-
-    files.push(absolutePath)
-  }
-
-  return files
-}
-
-function stripSourceMappingUrlReferences(rootDir) {
-  const candidates = collectPublishFiles(rootDir).filter((filePath) => {
-    return ['.css', '.js', '.mjs', '.cjs'].includes(path.extname(filePath))
-  })
-
-  for (const filePath of candidates) {
-    const original = readFileSync(filePath, 'utf8')
-    const stripped = original
-      .replace(/\n?\/\/# sourceMappingURL=.*$/gmu, '')
-      .replace(/\n?\/\*# sourceMappingURL=.*?\*\/\s*$/gmu, '')
-
-    if (stripped !== original) {
-      writeFileSync(filePath, stripped)
-    }
-  }
-}
-
-function pruneSourceMaps(rootDir) {
-  const maps = collectPublishFiles(rootDir).filter((filePath) =>
-    filePath.endsWith('.map'),
-  )
-
-  for (const filePath of maps) {
-    unlinkSync(filePath)
-  }
-
-  return maps.length
-}
-
-function rewriteWorkerRuntimeReferences(rootDir) {
-  const candidates = collectPublishFiles(rootDir).filter((filePath) => {
-    return ['.js', '.mjs', '.cjs'].includes(path.extname(filePath))
-  })
-  const workerRuntimePaths = new Map([
-    [
-      'data-pipeline.worker',
-      'es/components/_internal/data-pipeline.worker.mjs',
-    ],
-    [
-      'markdown-renderer.worker',
-      'es/components/markdown-renderer/src/markdown-renderer.worker.mjs',
-    ],
-    [
-      'markdown-parser.worker',
-      'es/components/markdown-renderer/src/markdown-parser.worker.mjs',
-    ],
-  ])
-  const workerReferencePattern =
-    /(['"])(?:[^'"]*\/)?(data-pipeline\.worker|markdown-renderer\.worker|markdown-parser\.worker)\.(?:ts|js|mjs)\1/g
-  let rewritten = 0
-
-  for (const filePath of candidates) {
-    const original = readFileSync(filePath, 'utf8')
-    const next = original.replace(
-      workerReferencePattern,
-      (_match, quote, workerName) => {
-        const targetPath = workerRuntimePaths.get(workerName)
-        if (!targetPath) return _match
-
-        const relativePath = path
-          .relative(path.dirname(filePath), path.join(rootDir, targetPath))
-          .split(path.sep)
-          .join('/')
-        const specifier = relativePath.startsWith('.')
-          ? relativePath
-          : `./${relativePath}`
-        rewritten += 1
-        return `${quote}${specifier}${quote}`
-      },
-    )
-
-    if (next !== original) {
-      writeFileSync(filePath, next)
-    }
-  }
-
-  return rewritten
-}
-
 function assertViteSafeWorkerRuntime(rootDir) {
   const violations = []
   const workerReferencePattern =
     /(['"])([^'"]*(?:data-pipeline\.worker|markdown-renderer\.worker|markdown-parser\.worker)\.(?:ts|js|mjs))\1/g
 
-  for (const filePath of collectPublishFiles(rootDir)) {
+  for (const filePath of collectDirectoryFiles(rootDir)) {
     if (!['.js', '.mjs', '.cjs'].includes(path.extname(filePath))) continue
 
     const relativePath = path.relative(rootDir, filePath)
@@ -359,30 +240,6 @@ function assertViteSafeWorkerRuntime(rootDir) {
   }
 }
 
-function rewriteEmscriptenWasmFallbackReferences(rootDir) {
-  const candidates = collectPublishFiles(rootDir).filter((filePath) => {
-    return ['.js', '.mjs', '.cjs'].includes(path.extname(filePath))
-  })
-  const wasmFallbackPattern =
-    /new URL\((['"])(ep_wasm|markdown_basic|markdown_simd)\.wasm\1,\s*import\.meta\.url\)/g
-  let rewritten = 0
-
-  for (const filePath of candidates) {
-    const original = readFileSync(filePath, 'utf8')
-    const next = original.replace(
-      wasmFallbackPattern,
-      'new URL(/* @vite-ignore */ $1$2.wasm$1, import.meta.url)',
-    )
-
-    if (next !== original) {
-      writeFileSync(filePath, next)
-      rewritten += 1
-    }
-  }
-
-  return rewritten
-}
-
 function assertViteSafeWasmRuntime(rootDir) {
   const violations = []
   const dynamicMarkdownResolverPatterns = [
@@ -394,7 +251,7 @@ function assertViteSafeWasmRuntime(rootDir) {
   const unhandledWasmFallbackPattern =
     /new URL\(\s*['"](?:ep_wasm|markdown_basic|markdown_simd)\.wasm['"]\s*,\s*import\.meta\.url\)/u
 
-  for (const filePath of collectPublishFiles(rootDir)) {
+  for (const filePath of collectDirectoryFiles(rootDir)) {
     if (!['.js', '.mjs', '.cjs'].includes(path.extname(filePath))) continue
 
     const relativePath = path.relative(rootDir, filePath)
@@ -425,7 +282,7 @@ function assertViteSafeWasmRuntime(rootDir) {
 function assertNoSecretsOrRawSources(rootDir) {
   const violations = []
 
-  for (const filePath of collectPublishFiles(rootDir)) {
+  for (const filePath of collectDirectoryFiles(rootDir)) {
     const relativePath = path.relative(rootDir, filePath)
     const basename = path.basename(filePath)
     const extension = path.extname(filePath)
@@ -581,66 +438,6 @@ function assertMarkdownHeavyFeatureFrameArtifacts(rootDir) {
   }
 }
 
-function isSelfReferenceCandidate(filePath) {
-  return selfReferenceFileExtensions.some((extension) => {
-    return filePath.endsWith(extension)
-  })
-}
-
-function collectSelfReferenceCandidates(rootDir, currentDir = rootDir) {
-  const files = []
-  const entries = readdirSync(currentDir, { withFileTypes: true })
-
-  for (const entry of entries) {
-    const absolutePath = path.join(currentDir, entry.name)
-
-    if (entry.isDirectory()) {
-      files.push(...collectSelfReferenceCandidates(rootDir, absolutePath))
-      continue
-    }
-
-    if (isSelfReferenceCandidate(absolutePath)) {
-      files.push(absolutePath)
-    }
-  }
-
-  return files
-}
-
-function rewritePublishedSelfReferences(rootDir, packageName) {
-  const candidates = collectSelfReferenceCandidates(rootDir)
-  const patterns = [
-    /(\bfrom\s+['"])element-plus(?=(?:\/[^'"]*)?['"])/g,
-    /(\bimport\s*\(\s*['"])element-plus(?=(?:\/[^'"]*)?['"])/g,
-    /(\brequire\s*\(\s*['"])element-plus(?=(?:\/[^'"]*)?['"])/g,
-    /(\bimport\s+['"])element-plus(?=(?:\/[^'"]*)?['"])/g,
-  ]
-
-  let updatedFiles = 0
-  let replacementCount = 0
-
-  for (const filePath of candidates) {
-    if (!existsSync(filePath)) continue
-
-    const original = readFileSync(filePath, 'utf8')
-    let rewritten = original
-
-    for (const pattern of patterns) {
-      rewritten = rewritten.replace(pattern, (_, prefix) => {
-        replacementCount += 1
-        return `${prefix}${packageName}`
-      })
-    }
-
-    if (rewritten !== original) {
-      writeFileSync(filePath, rewritten)
-      updatedFiles += 1
-    }
-  }
-
-  return { updatedFiles, replacementCount }
-}
-
 function collectWorkspaceVersions() {
   const versions = new Map()
 
@@ -686,19 +483,11 @@ function normalizeWorkspaceSpecifier(
     return resolvedVersion
   }
 
-  if (workspaceRange === '^') {
+  if (workspaceRange === '^' || workspaceRange.startsWith('^')) {
     return `^${resolvedVersion}`
   }
 
-  if (workspaceRange === '~') {
-    return `~${resolvedVersion}`
-  }
-
-  if (workspaceRange.startsWith('^')) {
-    return `^${resolvedVersion}`
-  }
-
-  if (workspaceRange.startsWith('~')) {
+  if (workspaceRange === '~' || workspaceRange.startsWith('~')) {
     return `~${resolvedVersion}`
   }
 
@@ -770,97 +559,6 @@ function assertNoWorkspaceProtocolsRemain(packageJson) {
   }
 }
 
-function toModuleSpecifier(relativePath) {
-  const normalized = relativePath.split(path.sep).join('/')
-  return normalized.startsWith('.') ? normalized : `./${normalized}`
-}
-
-function resolveBundledWorkspaceRuntimeSpecifier(
-  rootDir,
-  filePath,
-  packageName,
-  dependencyName,
-) {
-  const entries = bundledWorkspaceRuntimeEntries.get(dependencyName)
-  if (!entries) {
-    throw new Error(
-      `No bundled runtime entry mapping for workspace dependency "${dependencyName}".`,
-    )
-  }
-
-  if (
-    filePath.endsWith('.d.ts') ||
-    filePath.endsWith('.d.mts') ||
-    filePath.endsWith('.d.cts')
-  ) {
-    return `${packageName}/${entries.types}`
-  }
-
-  const relativePath = path
-    .relative(rootDir, filePath)
-    .split(path.sep)
-    .join('/')
-  const extension = path.extname(filePath)
-
-  if (relativePath.startsWith('es/') && extension === '.mjs') {
-    return toModuleSpecifier(
-      path.relative(path.dirname(filePath), path.join(rootDir, entries.es)),
-    )
-  }
-
-  if (
-    relativePath.startsWith('lib/') &&
-    (extension === '.js' || extension === '.cjs')
-  ) {
-    return toModuleSpecifier(
-      path.relative(path.dirname(filePath), path.join(rootDir, entries.lib)),
-    )
-  }
-
-  throw new Error(
-    `Unable to rewrite bundled workspace dependency reference in ${relativePath}.`,
-  )
-}
-
-function rewriteBundledWorkspaceDependencyReferences(rootDir, packageName) {
-  const candidates = collectSelfReferenceCandidates(rootDir)
-  let updatedFiles = 0
-  let replacementCount = 0
-
-  for (const filePath of candidates) {
-    if (!existsSync(filePath)) continue
-
-    const original = readFileSync(filePath, 'utf8')
-    let rewritten = original
-
-    for (const dependencyName of bundledWorkspaceDependencyNames) {
-      if (!rewritten.includes(dependencyName)) continue
-
-      const replacement = resolveBundledWorkspaceRuntimeSpecifier(
-        rootDir,
-        filePath,
-        packageName,
-        dependencyName,
-      )
-      const pattern = new RegExp(
-        `(['"])${dependencyName.replace('/', '\\/')}\\1`,
-        'g',
-      )
-      rewritten = rewritten.replace(pattern, (_match, quote) => {
-        replacementCount += 1
-        return `${quote}${replacement}${quote}`
-      })
-    }
-
-    if (rewritten !== original) {
-      writeFileSync(filePath, rewritten)
-      updatedFiles += 1
-    }
-  }
-
-  return { updatedFiles, replacementCount }
-}
-
 function assertNoBundledWorkspaceDependencyReferences(packageJson, rootDir) {
   const manifestLeaks = []
 
@@ -882,9 +580,9 @@ function assertNoBundledWorkspaceDependencyReferences(packageJson, rootDir) {
   }
 
   const contentLeaks = []
-  for (const filePath of collectSelfReferenceCandidates(rootDir)) {
+  for (const filePath of collectPackageCodeFiles(rootDir)) {
     const content = readFileSync(filePath, 'utf8')
-    for (const dependencyName of bundledWorkspaceDependencyNames) {
+    for (const dependencyName of BUNDLED_WORKSPACE_DEPENDENCY_NAMES) {
       if (content.includes(dependencyName)) {
         contentLeaks.push(path.relative(rootDir, filePath))
       }
@@ -921,7 +619,7 @@ if (strict) {
   assertMarkdownHeavyFeatureFrameArtifacts(distRoot)
   stripSourceMappingUrlReferences(distRoot)
   prunedSourceMaps = pruneSourceMaps(distRoot)
-  rewrittenWorkerReferences = rewriteWorkerRuntimeReferences(distRoot)
+  rewrittenWorkerReferences = rewritePublishStageWorkerReferences(distRoot)
   rewrittenWasmFallbackReferences =
     rewriteEmscriptenWasmFallbackReferences(distRoot)
   assertViteSafeWorkerRuntime(distRoot)
@@ -954,8 +652,14 @@ const rewrittenSelfReferences = rewritePublishedSelfReferences(
   distRoot,
   packageName,
 )
-const rewrittenBundledWorkspaceReferences =
-  rewriteBundledWorkspaceDependencyReferences(distRoot, packageName)
+const rewrittenBundledWorkspaceReferences = rewriteBundledWorkspaceReferences(
+  distRoot,
+  {
+    packageName,
+    dependencyNames: BUNDLED_WORKSPACE_DEPENDENCY_NAMES,
+    strict: true,
+  },
+)
 assertNoBundledWorkspaceDependencyReferences(packageJson, distRoot)
 
 writeFileSync(distPackagePath, `${JSON.stringify(packageJson, null, 2)}\n`)
@@ -1013,7 +717,9 @@ function assertDeclarationIntegrity(distRoot, packageName) {
   roots.forEach(walk)
 
   if (declarationFiles.length === 0) {
-    throw new Error('Published package contains no declaration files under es/ or lib/.')
+    throw new Error(
+      'Published package contains no declaration files under es/ or lib/.',
+    )
   }
 
   const broken = []
@@ -1067,7 +773,9 @@ function assertDeclarationIntegrity(distRoot, packageName) {
       `${sub}/components/button/src/button.vue.d.ts`,
     ]) {
       if (!isRegularFile(path.join(distRoot, requiredRel))) {
-        throw new Error(`Published package is missing required declaration ${requiredRel}.`)
+        throw new Error(
+          `Published package is missing required declaration ${requiredRel}.`,
+        )
       }
     }
     const iconsIndex = readFileSync(

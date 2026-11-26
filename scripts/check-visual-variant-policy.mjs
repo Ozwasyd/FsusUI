@@ -3,6 +3,7 @@ import { readdirSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { pathToFileURL } from 'node:url'
 
+import { collectConfigSources } from './playwright-suites.mjs'
 import {
   CROSS_THEME_CONTRACTS,
   VISUAL_PROJECT_NAMES,
@@ -130,7 +131,9 @@ export const validateVisualVariantOwnership = ({
 
   for (const projectName of VISUAL_PROJECT_NAMES) {
     const nameFragment = `name: '${projectName}'`
-    const selectionFragment = `testIgnore: visualProjectTestIgnore('${projectName}')`
+    const explicitSelection = `testIgnore: visualProjectTestIgnore('${projectName}')`
+    const sharedSelection =
+      'testIgnore: visualProjectTestIgnore(projectName)'
     if (previewConfig.split(nameFragment).length - 1 !== 1) {
       addViolation(
         violations,
@@ -138,14 +141,20 @@ export const validateVisualVariantOwnership = ({
         `${projectName} must be declared exactly once`,
       )
     }
-    if (!previewConfig.includes(selectionFragment)) {
+    if (
+      !previewConfig.includes(explicitSelection) &&
+      !previewConfig.includes(sharedSelection)
+    ) {
       addViolation(
         violations,
         'vue/playwright.config.ts',
         `${projectName} must use canonical spec ownership selection`,
       )
     }
-    if (!screenshotConfig.includes(selectionFragment)) {
+    if (
+      !screenshotConfig.includes(explicitSelection) &&
+      !screenshotConfig.includes(sharedSelection)
+    ) {
       addViolation(
         violations,
         'vue/playwright.screenshot.config.ts',
@@ -167,8 +176,14 @@ export const validateVisualVariantOwnership = ({
 
 export const readVisualVariantPolicyInputs = () => ({
   specs: readVisualSpecs(),
-  previewConfig: readFileSync('vue/playwright.config.ts', 'utf8'),
-  screenshotConfig: readFileSync('vue/playwright.screenshot.config.ts', 'utf8'),
+  previewConfig: collectConfigSources(
+    process.cwd(),
+    'vue/playwright.config.ts',
+  ).join('\n'),
+  screenshotConfig: collectConfigSources(
+    process.cwd(),
+    'vue/playwright.screenshot.config.ts',
+  ).join('\n'),
 })
 
 const isMain =

@@ -7,7 +7,9 @@ import {
   clearFsusRenderPipelineComponentPolicies,
   clearFsusRenderPipelineDiagnostics,
   clearFsusRenderPipelineStrategyResolvers,
+  createFsusRenderPipelineContext,
   createFsusWorkerExecutor,
+  provideFsusRenderPipelineContext,
   createFsusRafRefreshSampler,
   createFsusRenderStageHistory,
   createFsusRenderPipelineStrategyCache,
@@ -1685,5 +1687,70 @@ describe('use-render-pipeline', () => {
       ),
     ).toBe(true)
     wrapper.unmount()
+  })
+
+  it('isolates scoped render pipeline contexts across concurrent instances', async () => {
+    const ctxA = createFsusRenderPipelineContext()
+    const ctxB = createFsusRenderPipelineContext()
+    ctxA.registerStrategyResolver(() => 'chunked-main')
+    ctxB.registerStrategyResolver(() => 'disabled')
+
+    let strategyA: string | undefined
+    let strategyB: string | undefined
+    const Child = defineComponent({
+      props: {
+        target: { required: true, type: String },
+      },
+      setup(props) {
+        const runtime = useFsusRenderPipelineRuntime<string, string>({
+          adapter: {
+            id: `scoped-${props.target}`,
+            canUseWorker: () => false,
+            estimate: () => ({ items: 10 }),
+            estimateSize: () => 20,
+            fingerprint: (value) => value,
+            keyOf: (unit) => unit,
+            prepare: async (value) => ({ units: [value] }),
+          },
+          config: { mode: 'auto' },
+          source: 'scoped',
+        })
+        if (props.target === 'a') {
+          strategyA = runtime.strategy.value
+        } else {
+          strategyB = runtime.strategy.value
+        }
+        return () => h('div')
+      },
+    })
+
+    const Host = defineComponent({
+      props: {
+        ctx: { required: true, type: Object },
+        target: { required: true, type: String },
+      },
+      setup(props) {
+        provideFsusRenderPipelineContext(
+          props.ctx as ReturnType<typeof createFsusRenderPipelineContext>,
+        )
+        return () => h(Child, { target: props.target })
+      },
+    })
+
+    const wrapperA = mount(Host, { props: { ctx: ctxA, target: 'a' } })
+    const wrapperB = mount(Host, { props: { ctx: ctxB, target: 'b' } })
+    expect(strategyA).toBe('chunked-main')
+    expect(strategyB).toBe('disabled')
+    expect(
+      chooseFsusRenderPipelineStrategy(
+        { items: 10 },
+        resolveFsusRenderPipelineConfig(),
+        false,
+      ),
+    ).toBe('sync')
+    wrapperA.unmount()
+    wrapperB.unmount()
+    ctxA.clearStrategyResolvers()
+    ctxB.clearStrategyResolvers()
   })
 })
