@@ -148,112 +148,35 @@ export async function initMarkdownRuntimeModule(): Promise<{
 
       const raw = module as unknown as Record<string, unknown>
       runtimeModule = module
-      Object.assign(runtimeModule, {
-        _markdown_render: pickExport<
-          (
-            ptr: number,
-            len: number,
-            allowLatex: number,
-            allowMermaid: number,
-            argumentCount: number,
-          ) => number
-        >(raw, 'markdown_render', 'render_markdown'),
-        _markdown_render_profile: pickExport<
-          (
-            ptr: number,
-            len: number,
-            allowLatex: number,
-            allowMermaid: number,
-            payloadMode: number,
-            argumentCount: number,
-          ) => number
-        >(raw, 'markdown_render_profile'),
-        _markdown_get_last_html_ptr: pickExport<() => number>(
-          raw,
-          'markdown_get_last_html_ptr',
-          'get_last_html_ptr',
-        ),
-        _markdown_get_last_html_len: pickExport<() => number>(
-          raw,
-          'markdown_get_last_html_len',
-          'get_last_html_len',
-        ),
-        _markdown_get_last_error_ptr: pickExport<() => number>(
-          raw,
-          'markdown_get_last_error_ptr',
-          'get_last_error_ptr',
-        ),
-        _markdown_get_last_error_len: pickExport<() => number>(
-          raw,
-          'markdown_get_last_error_len',
-          'get_last_error_len',
-        ),
-        _markdown_get_last_error_code: pickExport<() => number>(
-          raw,
-          'markdown_get_last_error_code',
-          'get_last_error_code',
-        ),
-        _markdown_get_last_features_ptr: pickExport<() => number>(
-          raw,
-          'markdown_get_last_features_ptr',
-          'get_last_features_ptr',
-        ),
-        _markdown_get_last_features_len: pickExport<() => number>(
-          raw,
-          'markdown_get_last_features_len',
-          'get_last_features_len',
-        ),
-        _markdown_get_last_placeholders_ptr: pickExport<() => number>(
-          raw,
-          'markdown_get_last_placeholders_ptr',
-          'get_last_placeholders_ptr',
-        ),
-        _markdown_get_last_placeholders_len: pickExport<() => number>(
-          raw,
-          'markdown_get_last_placeholders_len',
-          'get_last_placeholders_len',
-        ),
-        _markdown_get_last_chunks_ptr: pickExport<() => number>(
-          raw,
-          'markdown_get_last_chunks_ptr',
-          'get_last_chunks_ptr',
-        ),
-        _markdown_get_last_chunks_len: pickExport<() => number>(
-          raw,
-          'markdown_get_last_chunks_len',
-          'get_last_chunks_len',
-        ),
-        _markdown_get_last_renderer_version_ptr: pickExport<() => number>(
-          raw,
-          'markdown_get_last_renderer_version_ptr',
-          'get_last_renderer_version_ptr',
-        ),
-        _markdown_get_last_renderer_version_len: pickExport<() => number>(
-          raw,
-          'markdown_get_last_renderer_version_len',
-          'get_last_renderer_version_len',
-        ),
-        _markdown_get_last_metadata_ptr: pickExport<() => number>(
-          raw,
-          'markdown_get_last_metadata_ptr',
-          'get_last_metadata_ptr',
-        ),
-        _markdown_get_last_metadata_len: pickExport<() => number>(
-          raw,
-          'markdown_get_last_metadata_len',
-          'get_last_metadata_len',
-        ),
-        _markdown_alloc_buffer: pickExport<(size: number) => number>(
-          raw,
-          'markdown_alloc_buffer',
-          'alloc_buffer',
-        ),
-        _markdown_free_buffer: pickExport<(ptr: number) => void>(
-          raw,
-          'markdown_free_buffer',
-          'free_buffer',
-        ),
-      })
+      const bindExport = (suffix: string, fallback?: string) => {
+        const primary = `markdown_${suffix}`
+        runtimeModule![`_${primary}`] = fallback
+          ? pickExport(raw, primary, fallback)
+          : pickExport(raw, primary)
+      }
+      bindExport('render', 'render_markdown')
+      bindExport('render_profile')
+      for (const name of [
+        'alloc_buffer',
+        'free_buffer',
+        'get_last_error_code',
+      ]) {
+        bindExport(name, name)
+      }
+      for (const field of [
+        'html',
+        'error',
+        'features',
+        'placeholders',
+        'chunks',
+        'renderer_version',
+        'metadata',
+      ]) {
+        for (const kind of ['ptr', 'len']) {
+          const getter = `get_last_${field}_${kind}`
+          bindExport(getter, getter)
+        }
+      }
       runtimeEngine = engine
 
       return { module: runtimeModule, engine }

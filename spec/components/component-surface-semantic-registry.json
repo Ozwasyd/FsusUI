@@ -34,7 +34,7 @@
       "path": "spec/components/contracts/v1/vue-public-contracts.json",
       "kind": "authority",
       "algorithm": "sha256",
-      "digest": "e1141f2967efa636982ca1ce3f281fc86a9d883678237c56344f592cb74fde76"
+      "digest": "10ac56dda604f9f7826319ab2035b521185b0d01e33e4cc5a6b6cdbe059dfc28"
     },
     "component-motion": {
       "path": "docs/components/motion.md",

@@ -26,6 +26,7 @@ import {
   readRenderPipelineNow,
   resolveFsusAdaptiveRenderPipelineConfig,
 } from './config'
+import { emitDefaultFsusRenderPipelineDiagnostic } from './diagnostics'
 import {
   resolveFsusRenderPipelineCompositorEnabled,
   resolveFsusRenderPipelineContentVisibilityEnabled,
@@ -33,8 +34,12 @@ import {
   useFsusRenderPipelineHardwareProfile,
 } from './hardware-profile'
 import {
+  chooseFsusRenderPipelineStrategy,
+  createDefaultRenderPipelineStrategyCacheKey,
+  defaultStrategyCache,
+  getFsusRenderPipelineAdapter,
+  injectFsusRenderPipelineContext,
   resolveFsusRenderPipelineComponentPolicy,
-  useFsusRenderPipelineContext,
 } from './registry'
 import {
   createFsusWorkerExecutor,
@@ -131,7 +136,22 @@ let renderPipelineRuntimeId = 0
 export const useFsusRenderPipelineRuntime = <TSource, TUnit>(
   options: FsusRenderPipelineRuntimeOptions<TSource, TUnit>,
 ): FsusRenderPipelineRuntimeState<TSource, TUnit> => {
-  const pipelineContext = useFsusRenderPipelineContext()
+  const injectedContext = injectFsusRenderPipelineContext()
+  const emitDiagnostic =
+    injectedContext?.emitDiagnostic ?? emitDefaultFsusRenderPipelineDiagnostic
+  const invalidateProfile =
+    injectedContext?.invalidateStrategyProfile ??
+    defaultStrategyCache.invalidateProfile
+  const getAdapter = injectedContext?.getAdapter ?? getFsusRenderPipelineAdapter
+  const chooseStrategy =
+    injectedContext?.chooseStrategy ?? chooseFsusRenderPipelineStrategy
+  const createCacheKey =
+    injectedContext?.createStrategyCacheKey ??
+    createDefaultRenderPipelineStrategyCacheKey
+  const getCached =
+    injectedContext?.getCachedStrategy ?? defaultStrategyCache.get
+  const setCached =
+    injectedContext?.setCachedStrategy ?? defaultStrategyCache.set
   const documentRef = shallowRef<FsusRenderPipelineDocument<TUnit> | null>(null)
   const error = shallowRef<FsusErrorDetail | null>(null)
   const diagnostics = shallowRef<readonly FsusRenderPipelineDiagnosticEvent[]>(
@@ -190,7 +210,7 @@ export const useFsusRenderPipelineRuntime = <TSource, TUnit>(
     }
     diagnostics.value = [...diagnostics.value.slice(-31), nextEvent]
     options.onDiagnostic?.(nextEvent)
-    pipelineContext.emitDiagnostic(nextEvent)
+    emitDiagnostic(nextEvent)
   }
 
   const sourceRef = computed(() => unref(options.source))
@@ -202,7 +222,7 @@ export const useFsusRenderPipelineRuntime = <TSource, TUnit>(
   watch(
     capabilityProfile,
     (profile) => {
-      pipelineContext.invalidateStrategyProfile(profile.version)
+      invalidateProfile(profile.version)
       adaptiveSignals.value = {
         ...adaptiveSignals.value,
         rafDriftMs: profile.refreshProfile.rafDriftMs,
@@ -259,7 +279,7 @@ export const useFsusRenderPipelineRuntime = <TSource, TUnit>(
     const adapterId = explicitAdapterId || policyAdapterId
     if (!adapterId) return null
 
-    return pipelineContext.getAdapter<TSource, TUnit>(adapterId) ?? null
+    return getAdapter<TSource, TUnit>(adapterId) ?? null
   })
 
   const estimate = computed<FsusRenderPipelineEstimate>(() => ({
@@ -283,14 +303,14 @@ export const useFsusRenderPipelineRuntime = <TSource, TUnit>(
       config.value,
       {
         canUseWorker: canUseWorker.value,
-        chooseStrategy: pipelineContext.chooseStrategy,
+        chooseStrategy,
         estimate: estimate.value,
       },
     )
   })
 
   const strategyCacheKey = computed(() =>
-    pipelineContext.createStrategyCacheKey({
+    createCacheKey({
       adapter: adapter.value,
       canUseWorker: canUseWorker.value,
       config: config.value,
@@ -299,17 +319,13 @@ export const useFsusRenderPipelineRuntime = <TSource, TUnit>(
   )
 
   const strategy = computed<FsusRenderPipelineStrategy>(() => {
-    const cached = pipelineContext.getCachedStrategy(
+    const cached = getCached(
       strategyCacheKey.value,
       capabilityProfile.value.version,
     )
     if (cached) return cached.strategy
     if (policy.value) return policy.value.strategy
-    return pipelineContext.chooseStrategy(
-      estimate.value,
-      config.value,
-      canUseWorker.value,
-    )
+    return chooseStrategy(estimate.value, config.value, canUseWorker.value)
   })
 
   const clearWorkerExecutor = () => {
@@ -516,7 +532,7 @@ export const useFsusRenderPipelineRuntime = <TSource, TUnit>(
     const activeAdapter = adapter.value
     const activeStrategy = strategy.value
     const activeStrategyCacheKey = strategyCacheKey.value
-    const activeStrategyCacheEntry = pipelineContext.getCachedStrategy(
+    const activeStrategyCacheEntry = getCached(
       activeStrategyCacheKey,
       capabilityProfile.value.version,
     )
@@ -588,12 +604,14 @@ export const useFsusRenderPipelineRuntime = <TSource, TUnit>(
         readRenderPipelineNow() - commitStartedAt,
         renderedStrategy.value,
       )
+      const nextFrame = () =>
+        new Promise<void>((resolve) => {
+          if (typeof requestAnimationFrame === 'function') {
+            requestAnimationFrame(() => resolve())
+          } else resolve()
+        })
       const layoutStartedAt = readRenderPipelineNow()
-      await new Promise<void>((resolve) => {
-        if (typeof requestAnimationFrame === 'function') {
-          requestAnimationFrame(() => resolve())
-        } else resolve()
-      })
+      await nextFrame()
       if (currentTaskId !== taskId || controller.signal.aborted) return
       recordStage(
         'style-layout',
@@ -601,11 +619,7 @@ export const useFsusRenderPipelineRuntime = <TSource, TUnit>(
         renderedStrategy.value,
       )
       const paintStartedAt = readRenderPipelineNow()
-      await new Promise<void>((resolve) => {
-        if (typeof requestAnimationFrame === 'function') {
-          requestAnimationFrame(() => resolve())
-        } else resolve()
-      })
+      await nextFrame()
       if (currentTaskId !== taskId || controller.signal.aborted) return
       recordStage(
         'next-paint',
@@ -614,7 +628,7 @@ export const useFsusRenderPipelineRuntime = <TSource, TUnit>(
       )
       const durationMs = readRenderPipelineNow() - startedAt
       recordStage('total', durationMs, renderedStrategy.value)
-      pipelineContext.setCachedStrategy(activeStrategyCacheKey, {
+      setCached(activeStrategyCacheKey, {
         durationMs,
         profileVersion: capabilityProfile.value.version,
         strategy: renderedStrategy.value,

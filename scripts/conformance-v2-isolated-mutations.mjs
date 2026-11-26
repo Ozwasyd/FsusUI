@@ -717,8 +717,8 @@ const cases = [
     inject: () =>
       mutateText(
         'vue/packages/components/markdown-editor/src/markdown-editor.vue',
-        '  dispatchTransaction,\n',
-        '  dispatchTransactionRemoved: dispatchTransaction,\n',
+        '  applyAttachmentResult,\n  dispatchTransaction,\n',
+        '  applyAttachmentResult,\n  dispatchTransactionRemoved: dispatchTransaction,\n',
       ),
     command: [process.execPath, ['scripts/conformance-v2-vue-public-gate.mjs']],
     expected: 'Vue public exposed drift',

@@ -128,6 +128,168 @@ type FsusRenderPipelineStrategyResolverEntry = {
   resolver: FsusRenderPipelineStrategyResolver
 }
 
+const stringifyPipelineConfigSignature = (
+  config: FsusResolvedRenderPipelineConfig,
+  canUseWorker: boolean,
+  resolverVersion: number,
+) =>
+  [
+    config.adaptive,
+    config.mode,
+    config.worker,
+    config.thresholds.htmlBytes,
+    config.thresholds.estimatedNodes,
+    config.thresholds.itemCount,
+    config.budget.dynamicFrameMs ? 'dynamic-frame' : 'fixed-frame',
+    config.budget.frameMs,
+    config.budget.overscanPx,
+    config.budget.measureBatch,
+    config.acceleration.mode,
+    config.acceleration.compositor,
+    config.acceleration.contentVisibility,
+    config.acceleration.layerBudget,
+    canUseWorker ? 'worker' : 'main',
+    resolverVersion,
+  ].join('|')
+
+const buildStrategyCacheKey = <TSource, TUnit>(
+  {
+    adapter,
+    canUseWorker,
+    config,
+    source,
+  }: {
+    adapter: FsusRenderPipelineAdapter<TSource, TUnit> | null
+    canUseWorker: boolean
+    config: FsusResolvedRenderPipelineConfig
+    source: TSource
+  },
+  resolverVersion: number,
+) => {
+  if (!adapter) return ''
+  const fingerprint = readAdapterFingerprint(adapter, source)
+  if (!fingerprint) return ''
+  return [
+    adapter.id,
+    fingerprint,
+    stringifyPipelineConfigSignature(config, canUseWorker, resolverVersion),
+  ].join('\u0000')
+}
+
+const defaultAdapters = new Map<
+  string,
+  FsusRenderPipelineAdapter<unknown, unknown>
+>()
+const defaultStrategyResolvers =
+  new Set<FsusRenderPipelineStrategyResolverEntry>()
+let defaultStrategyResolverOrder = 0
+let defaultStrategyResolverVersion = 0
+export const defaultStrategyCache =
+  /*#__PURE__*/ createFsusRenderPipelineStrategyCache()
+
+export const registerFsusRenderPipelineAdapter = <TSource, TUnit>(
+  adapter: FsusRenderPipelineAdapter<TSource, TUnit>,
+) => {
+  const adapterId = normalizeAdapterId(adapter.id)
+  if (!adapterId) {
+    throw new Error('fsus_render_pipeline_adapter_id_required')
+  }
+  const normalizedAdapter = {
+    ...adapter,
+    id: adapterId,
+  } as FsusRenderPipelineAdapter<unknown, unknown>
+  const previous = defaultAdapters.get(adapterId)
+  defaultAdapters.set(adapterId, normalizedAdapter)
+  return () => {
+    if (previous) {
+      defaultAdapters.set(adapterId, previous)
+    } else {
+      defaultAdapters.delete(adapterId)
+    }
+  }
+}
+
+export const getFsusRenderPipelineAdapter = <
+  TSource = unknown,
+  TUnit = unknown,
+>(
+  adapterId: string,
+) =>
+  defaultAdapters.get(normalizeAdapterId(adapterId)) as
+    | FsusRenderPipelineAdapter<TSource, TUnit>
+    | undefined
+
+export const listFsusRenderPipelineAdapters = () =>
+  Array.from(defaultAdapters.values())
+
+export const clearFsusRenderPipelineAdapters = () => {
+  defaultAdapters.clear()
+}
+
+export const registerFsusRenderPipelineStrategyResolver = (
+  resolver: FsusRenderPipelineStrategyResolver,
+  resolverOptions: FsusRenderPipelineStrategyResolverOptions = {},
+) => {
+  const entry: FsusRenderPipelineStrategyResolverEntry = {
+    order: defaultStrategyResolverOrder++,
+    priority:
+      typeof resolverOptions.priority === 'number' &&
+      Number.isFinite(resolverOptions.priority)
+        ? resolverOptions.priority
+        : 0,
+    resolver,
+  }
+  defaultStrategyResolvers.add(entry)
+  defaultStrategyResolverVersion += 1
+  defaultStrategyCache.clear()
+  return () => {
+    defaultStrategyResolvers.delete(entry)
+    defaultStrategyResolverVersion += 1
+    defaultStrategyCache.clear()
+  }
+}
+
+export const clearFsusRenderPipelineStrategyResolvers = () => {
+  defaultStrategyResolvers.clear()
+  defaultStrategyResolverVersion += 1
+  defaultStrategyCache.clear()
+}
+
+export const clearFsusRenderPipelineStrategyCache = () => {
+  defaultStrategyCache.clear()
+}
+
+export const inspectFsusRenderPipelineStrategyCache = (cacheKey: string) =>
+  defaultStrategyCache.get(cacheKey)
+
+export const chooseFsusRenderPipelineStrategy = (
+  estimate: FsusRenderEstimate,
+  config: FsusResolvedRenderPipelineConfig,
+  canUseWorker = false,
+): FsusRenderPipelineStrategy => {
+  const context = { canUseWorker, config, estimate }
+  if (defaultStrategyResolvers.size > 0) {
+    const resolvers = Array.from(defaultStrategyResolvers).sort(
+      (left, right) =>
+        right.priority - left.priority || left.order - right.order,
+    )
+    for (const { resolver } of resolvers) {
+      const resolved = resolver(context)
+      if (resolved) return resolved
+    }
+  }
+  return chooseDefaultFsusRenderPipelineStrategy(context)
+}
+
+export const createDefaultRenderPipelineStrategyCacheKey = <TSource, TUnit>(
+  input: {
+    adapter: FsusRenderPipelineAdapter<TSource, TUnit> | null
+    canUseWorker: boolean
+    config: FsusResolvedRenderPipelineConfig
+    source: TSource
+  },
+) => buildStrategyCacheKey(input, defaultStrategyResolverVersion)
+
 export const createFsusRenderPipelineContext = (options?: {
   diagnostics?: {
     clear: () => void
@@ -145,29 +307,6 @@ export const createFsusRenderPipelineContext = (options?: {
   const diagnostics =
     options?.diagnostics ?? createFsusRenderPipelineDiagnosticsHub()
   const parent = options?.parent ?? null
-
-  const stringifyConfigSignature = (
-    config: FsusResolvedRenderPipelineConfig,
-    canUseWorker: boolean,
-  ) =>
-    [
-      config.adaptive,
-      config.mode,
-      config.worker,
-      config.thresholds.htmlBytes,
-      config.thresholds.estimatedNodes,
-      config.thresholds.itemCount,
-      config.budget.dynamicFrameMs ? 'dynamic-frame' : 'fixed-frame',
-      config.budget.frameMs,
-      config.budget.overscanPx,
-      config.budget.measureBatch,
-      config.acceleration.mode,
-      config.acceleration.compositor,
-      config.acceleration.contentVisibility,
-      config.acceleration.layerBudget,
-      canUseWorker ? 'worker' : 'main',
-      strategyResolverVersion,
-    ].join('|')
 
   const registerAdapter = <TSource, TUnit>(
     adapter: FsusRenderPipelineAdapter<TSource, TUnit>,
@@ -251,26 +390,12 @@ export const createFsusRenderPipelineContext = (options?: {
     return chooseDefaultFsusRenderPipelineStrategy(context)
   }
 
-  const createStrategyCacheKey = <TSource, TUnit>({
-    adapter,
-    canUseWorker,
-    config,
-    source,
-  }: {
+  const createStrategyCacheKey = <TSource, TUnit>(input: {
     adapter: FsusRenderPipelineAdapter<TSource, TUnit> | null
     canUseWorker: boolean
     config: FsusResolvedRenderPipelineConfig
     source: TSource
-  }) => {
-    if (!adapter) return ''
-    const fingerprint = readAdapterFingerprint(adapter, source)
-    if (!fingerprint) return ''
-    return [
-      adapter.id,
-      fingerprint,
-      stringifyConfigSignature(config, canUseWorker),
-    ].join('\u0000')
-  }
+  }) => buildStrategyCacheKey(input, strategyResolverVersion)
 
   return {
     chooseStrategy,
@@ -296,21 +421,42 @@ export const createFsusRenderPipelineContext = (options?: {
   }
 }
 
-const defaultRenderPipelineContext = createFsusRenderPipelineContext({
-  diagnostics: {
-    clear: clearFsusRenderPipelineDiagnostics,
-    emit: emitDefaultFsusRenderPipelineDiagnostic,
-    registerSink: registerFsusRenderPipelineDiagnosticSink,
-    snapshot: getFsusRenderPipelineDiagnosticsSnapshot,
-  },
-})
+let defaultRenderPipelineContextInstance: FsusRenderPipelineContext | null =
+  null
+
+const getDefaultRenderPipelineContext = (): FsusRenderPipelineContext =>
+  (defaultRenderPipelineContextInstance ??= {
+    chooseStrategy: chooseFsusRenderPipelineStrategy,
+    clearAdapters: clearFsusRenderPipelineAdapters,
+    clearDiagnostics: clearFsusRenderPipelineDiagnostics,
+    clearStrategyCache: clearFsusRenderPipelineStrategyCache,
+    clearStrategyResolvers: clearFsusRenderPipelineStrategyResolvers,
+    createStrategyCacheKey: createDefaultRenderPipelineStrategyCacheKey,
+    emitDiagnostic: emitDefaultFsusRenderPipelineDiagnostic,
+    getAdapter: getFsusRenderPipelineAdapter,
+    getCachedStrategy: defaultStrategyCache.get,
+    getDiagnosticsSnapshot: getFsusRenderPipelineDiagnosticsSnapshot,
+    inspectStrategyCache: inspectFsusRenderPipelineStrategyCache,
+    invalidateStrategyProfile: defaultStrategyCache.invalidateProfile,
+    listAdapters: listFsusRenderPipelineAdapters,
+    registerAdapter: registerFsusRenderPipelineAdapter,
+    registerDiagnosticSink: registerFsusRenderPipelineDiagnosticSink,
+    registerStrategyResolver: registerFsusRenderPipelineStrategyResolver,
+    setCachedStrategy: defaultStrategyCache.set,
+  })
 
 export const FSUS_RENDER_PIPELINE_CONTEXT_KEY: FsusRenderPipelineContextInjectionKey =
-  Symbol('fsusRenderPipelineContext')
+  /*#__PURE__*/ Symbol('fsusRenderPipelineContext')
+
+export const injectFsusRenderPipelineContext =
+  (): FsusRenderPipelineContext | null =>
+    getCurrentInstance()
+      ? inject(FSUS_RENDER_PIPELINE_CONTEXT_KEY, null)
+      : null
 
 export const provideFsusRenderPipelineContext = (
   context: FsusRenderPipelineContext = createFsusRenderPipelineContext({
-    parent: defaultRenderPipelineContext,
+    parent: getDefaultRenderPipelineContext(),
   }),
 ) => {
   provide(FSUS_RENDER_PIPELINE_CONTEXT_KEY, context)
@@ -318,36 +464,7 @@ export const provideFsusRenderPipelineContext = (
 }
 
 export const useFsusRenderPipelineContext = (): FsusRenderPipelineContext =>
-  getCurrentInstance()
-    ? inject(FSUS_RENDER_PIPELINE_CONTEXT_KEY, defaultRenderPipelineContext)
-    : defaultRenderPipelineContext
-
-export const registerFsusRenderPipelineAdapter =
-  defaultRenderPipelineContext.registerAdapter
-
-export const getFsusRenderPipelineAdapter =
-  defaultRenderPipelineContext.getAdapter
-
-export const listFsusRenderPipelineAdapters =
-  defaultRenderPipelineContext.listAdapters
-
-export const clearFsusRenderPipelineAdapters =
-  defaultRenderPipelineContext.clearAdapters
-
-export const registerFsusRenderPipelineStrategyResolver =
-  defaultRenderPipelineContext.registerStrategyResolver
-
-export const clearFsusRenderPipelineStrategyResolvers =
-  defaultRenderPipelineContext.clearStrategyResolvers
-
-export const clearFsusRenderPipelineStrategyCache =
-  defaultRenderPipelineContext.clearStrategyCache
-
-export const inspectFsusRenderPipelineStrategyCache =
-  defaultRenderPipelineContext.inspectStrategyCache
-
-export const chooseFsusRenderPipelineStrategy =
-  defaultRenderPipelineContext.chooseStrategy
+  injectFsusRenderPipelineContext() ?? getDefaultRenderPipelineContext()
 
 export const resolveFsusRenderPipelineComponentPolicy = (
   componentName: string,
