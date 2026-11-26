@@ -813,16 +813,26 @@ if (existsSync(path.join(publishedDistRoot, 'package.json'))) {
     )
   }
 
-  for (const [runtimePath, gatewayPath, importToken] of [
+  for (const [
+    runtimePath,
+    activationImport,
+    activationPath,
+    gatewayPath,
+    gatewayImport,
+  ] of [
     [
       'dist/element-plus/es/wasm/markdown-runtime.mjs',
+      './runtime/markdown-feature-activation.mjs',
+      'dist/element-plus/es/wasm/runtime/markdown-feature-activation.mjs',
       'dist/element-plus/es/wasm/markdown-feature-output-gateway.mjs',
-      './markdown-feature-output-gateway.mjs',
+      '../markdown-feature-output-gateway.mjs',
     ],
     [
       'dist/element-plus/lib/wasm/markdown-runtime.js',
+      './runtime/markdown-feature-activation.js',
+      'dist/element-plus/lib/wasm/runtime/markdown-feature-activation.js',
       'dist/element-plus/lib/wasm/markdown-feature-output-gateway.js',
-      './markdown-feature-output-gateway.js',
+      '../markdown-feature-output-gateway.js',
     ],
   ]) {
     assert(
@@ -830,8 +840,16 @@ if (existsSync(path.join(publishedDistRoot, 'package.json'))) {
       `published package must retain internal gateway artifact ${gatewayPath}`,
     )
     assert(
-      read(runtimePath).includes(importToken),
-      `published package ${runtimePath} must retain its relative gateway import`,
+      existsSync(path.join(root, activationPath)),
+      `published package must retain internal feature activation artifact ${activationPath}`,
+    )
+    assert(
+      read(runtimePath).includes(activationImport),
+      `published package ${runtimePath} must retain its relative feature activation import`,
+    )
+    assert(
+      read(activationPath).includes(gatewayImport),
+      `published package ${activationPath} must retain its relative gateway import`,
     )
   }
 
