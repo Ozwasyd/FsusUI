@@ -1,14 +1,19 @@
 import { defineConfig } from '@playwright/test'
+import { createPlaywrightReporter } from '../scripts/test-parallelism'
 import {
-  createPlaywrightReporter,
-  resolveTestPort,
-} from '../scripts/test-parallelism'
+  FSUS_VISUAL_VIEWPORTS,
+  createBaseUse,
+  createChromiumDefaultProjects,
+  createDemoPreviewWebServer,
+  resolveChromiumLaunchOptions,
+  resolveServerEndpoint,
+} from './playwright.shared'
 
-delete process.env.NO_COLOR
-
-const port = resolveTestPort('FSUS_GEOMETRY_PORT', 5177)
-const externalServer = process.env.FSUS_PLAYWRIGHT_EXTERNAL_SERVER
-const baseURL = externalServer ?? `http://127.0.0.1:${port}`
+const { port, baseURL, useExternalServer } = resolveServerEndpoint(
+  'FSUS_GEOMETRY_PORT',
+  5177,
+  'url',
+)
 
 export default defineConfig({
   testDir: './tests/geometry',
@@ -18,32 +23,16 @@ export default defineConfig({
   reporter: createPlaywrightReporter('geometry'),
   timeout: 180_000,
   expect: { timeout: 20_000 },
-  use: {
-    baseURL,
+  use: createBaseUse(baseURL, {
     browserName: 'chromium',
-    colorScheme: 'light',
-    locale: 'zh-CN',
-    timezoneId: 'Asia/Shanghai',
-    viewport: { width: 1440, height: 1600 },
-    launchOptions: process.env.FSUS_PLAYWRIGHT_EXECUTABLE_PATH
-      ? { executablePath: process.env.FSUS_PLAYWRIGHT_EXECUTABLE_PATH }
-      : undefined,
+    viewport: FSUS_VISUAL_VIEWPORTS.desktop,
+    launchOptions: resolveChromiumLaunchOptions(),
     screenshot: 'off',
     trace: 'off',
     video: 'off',
-  },
-  projects: [
-    {
-      name: 'default',
-      use: {
-        browserName: 'chromium',
-      },
-    },
-  ],
-  ...(externalServer ? {} : { webServer: {
-    command: `pnpm -C .. run build:demo && pnpm -C packages/demo-app exec vite preview --host 127.0.0.1 --port ${port} --strictPort`,
-    url: baseURL,
-    reuseExistingServer: !process.env.CI,
-    timeout: 300_000,
-  } }),
+  }),
+  projects: createChromiumDefaultProjects(),
+  ...(useExternalServer
+    ? {}
+    : { webServer: createDemoPreviewWebServer(port, baseURL, 300_000) }),
 })

@@ -1,15 +1,18 @@
 import { defineConfig, devices } from '@playwright/test'
+import { createPlaywrightReporter } from '../scripts/test-parallelism'
 import {
-  createPlaywrightReporter,
-  resolveTestPort,
-} from '../scripts/test-parallelism'
+  FSUS_VISUAL_VIEWPORTS,
+  createBaseUse,
+  createDemoDevWebServer,
+  createViewportThemeMatrixProjects,
+  resolveServerEndpoint,
+} from './playwright.shared'
 
-delete process.env.NO_COLOR
-
-const boundaryAuditPort = resolveTestPort('FSUS_BOUNDARY_AUDIT_PORT', 5175)
-const externalServer = process.env.FSUS_PLAYWRIGHT_EXTERNAL_SERVER
-const boundaryAuditBaseUrl =
-  externalServer ?? `http://127.0.0.1:${boundaryAuditPort}`
+const { port, baseURL, useExternalServer } = resolveServerEndpoint(
+  'FSUS_BOUNDARY_AUDIT_PORT',
+  5175,
+  'url',
+)
 
 export default defineConfig({
   testDir: './tests/visual-boundary',
@@ -18,71 +21,13 @@ export default defineConfig({
   workers: 1,
   reporter: createPlaywrightReporter('visual-boundary'),
   timeout: 600_000,
-  expect: {
-    timeout: 20_000,
-  },
-  use: {
-    baseURL: boundaryAuditBaseUrl,
-    locale: 'zh-CN',
-    timezoneId: 'Asia/Shanghai',
-    colorScheme: 'light',
-    viewport: { width: 1440, height: 1600 },
-  },
+  expect: { timeout: 20_000 },
+  use: createBaseUse(baseURL, { viewport: FSUS_VISUAL_VIEWPORTS.desktop }),
   projects: [
-    {
-      name: 'desktop-light',
-      testIgnore: '**/safe-area-*.spec.ts',
-      use: {
-        ...devices['Desktop Chrome'],
-        colorScheme: 'light',
-        viewport: { width: 1440, height: 1600 },
-      },
-    },
-    {
-      name: 'mobile-light',
-      testIgnore: '**/safe-area-*.spec.ts',
-      use: {
-        ...devices['Pixel 7'],
-        colorScheme: 'light',
-        viewport: { width: 412, height: 1200 },
-      },
-    },
-    {
-      name: 'tiny-light',
-      testIgnore: '**/safe-area-*.spec.ts',
-      use: {
-        ...devices['Pixel 7'],
-        colorScheme: 'light',
-        viewport: { width: 320, height: 900 },
-      },
-    },
-    {
-      name: 'desktop-dark',
-      testIgnore: '**/safe-area-*.spec.ts',
-      use: {
-        ...devices['Desktop Chrome'],
-        colorScheme: 'dark',
-        viewport: { width: 1440, height: 1600 },
-      },
-    },
-    {
-      name: 'mobile-dark',
-      testIgnore: '**/safe-area-*.spec.ts',
-      use: {
-        ...devices['Pixel 7'],
-        colorScheme: 'dark',
-        viewport: { width: 412, height: 1200 },
-      },
-    },
-    {
-      name: 'tiny-dark',
-      testIgnore: '**/safe-area-*.spec.ts',
-      use: {
-        ...devices['Pixel 7'],
-        colorScheme: 'dark',
-        viewport: { width: 320, height: 900 },
-      },
-    },
+    ...createViewportThemeMatrixProjects({
+      includeTiny: true,
+      customize: () => ({ testIgnore: '**/safe-area-*.spec.ts' }),
+    }),
     // Issue #262: safe-area geometry matrix on Chromium + WebKit.
     // Profiles set viewport size at runtime; default here is portrait phone.
     {
@@ -91,7 +36,7 @@ export default defineConfig({
       use: {
         ...devices['Desktop Chrome'],
         colorScheme: 'light',
-        viewport: { width: 390, height: 844 },
+        viewport: FSUS_VISUAL_VIEWPORTS.safeArea,
       },
     },
     {
@@ -100,18 +45,11 @@ export default defineConfig({
       use: {
         ...devices['Desktop Safari'],
         colorScheme: 'light',
-        viewport: { width: 390, height: 844 },
+        viewport: FSUS_VISUAL_VIEWPORTS.safeArea,
       },
     },
   ],
-  ...(externalServer
+  ...(useExternalServer
     ? {}
-    : {
-        webServer: {
-          command: `pnpm -C .. run ensure:wasm && pnpm -C packages/demo-app exec vite --host 127.0.0.1 --port ${boundaryAuditPort} --strictPort`,
-          url: boundaryAuditBaseUrl,
-          reuseExistingServer: !process.env.CI,
-          timeout: 120_000,
-        },
-      }),
+    : { webServer: createDemoDevWebServer(port, baseURL) }),
 })

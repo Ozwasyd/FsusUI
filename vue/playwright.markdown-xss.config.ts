@@ -1,13 +1,11 @@
-import { defineConfig, devices } from '@playwright/test'
+import { defineConfig } from '@playwright/test'
+import { createPlaywrightReporter } from '../scripts/test-parallelism'
 import {
-  createPlaywrightReporter,
-  resolveTestPort,
-} from '../scripts/test-parallelism'
+  createDesktopBrowserProjects,
+  resolveServerEndpoint,
+} from './playwright.shared'
 
-delete process.env.NO_COLOR
-
-const port = resolveTestPort('FSUS_MARKDOWN_XSS_PORT', 5191)
-const baseURL = `http://127.0.0.1:${port}`
+const { port, baseURL } = resolveServerEndpoint('FSUS_MARKDOWN_XSS_PORT', 5191)
 
 export default defineConfig({
   testDir: './tests/markdown-xss',
@@ -26,11 +24,7 @@ export default defineConfig({
     trace: 'off',
     video: 'off',
   },
-  projects: [
-    { name: 'chromium', use: { ...devices['Desktop Chrome'] } },
-    { name: 'firefox', use: { ...devices['Desktop Firefox'] } },
-    { name: 'webkit', use: { ...devices['Desktop Safari'] } },
-  ],
+  projects: createDesktopBrowserProjects(),
   webServer: {
     command: `pnpm exec vite --config tests/markdown-xss/vite.config.ts --host 127.0.0.1 --port ${port}`,
     url: `${baseURL}/vue/tests/markdown-xss/`,

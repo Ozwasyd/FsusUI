@@ -1,8 +1,7 @@
-import { defineConfig, devices } from '@playwright/test'
+import { defineConfig } from '@playwright/test'
 import {
   createPlaywrightReporter,
   createVisualResultDirectory,
-  resolveTestPort,
   resolveVisualPreviewWorkers,
 } from '../scripts/test-parallelism'
 import { visualEvidencePolicy } from '../scripts/visual-evidence-policy.cjs'
@@ -10,12 +9,20 @@ import {
   visualProjectGrepInvert,
   visualProjectTestIgnore,
 } from '../scripts/visual-variant.mjs'
+import {
+  FSUS_VISUAL_VIEWPORTS,
+  createBaseUse,
+  createViewportThemeMatrixProjects,
+  createVisualRuntimeWebServer,
+  resolveChromiumLaunchOptions,
+  resolveServerEndpoint,
+} from './playwright.shared'
 
-delete process.env.NO_COLOR
-
-const previewPort = resolveTestPort('FSUS_VISUAL_PREVIEW_PORT', 4173)
-const externalServer = process.env.FSUS_PLAYWRIGHT_EXTERNAL_SERVER
-const previewBaseUrl = externalServer ?? `http://127.0.0.1:${previewPort}`
+const { port, baseURL, useExternalServer } = resolveServerEndpoint(
+  'FSUS_VISUAL_PREVIEW_PORT',
+  4173,
+  'url',
+)
 const evidencePolicy = visualEvidencePolicy()
 
 export default defineConfig({
@@ -36,69 +43,21 @@ export default defineConfig({
       maxDiffPixelRatio: 0.012,
     },
   },
-  use: {
+  use: createBaseUse(baseURL, {
     actionTimeout: 10_000,
-    baseURL: previewBaseUrl,
-    launchOptions: process.env.FSUS_PLAYWRIGHT_EXECUTABLE_PATH
-      ? { executablePath: process.env.FSUS_PLAYWRIGHT_EXECUTABLE_PATH }
-      : undefined,
-    locale: 'zh-CN',
+    launchOptions: resolveChromiumLaunchOptions(),
     screenshot: evidencePolicy.screenshot,
-    timezoneId: 'Asia/Shanghai',
     trace: evidencePolicy.trace,
-    colorScheme: 'light',
-    viewport: { width: 1440, height: 1600 },
-  },
-  projects: [
-    {
-      name: 'desktop-light',
-      outputDir: createVisualResultDirectory('preview', 'desktop-light'),
-      grepInvert: visualProjectGrepInvert('desktop-light'),
-      testIgnore: visualProjectTestIgnore('desktop-light'),
-      use: {
-        ...devices['Desktop Chrome'],
-        colorScheme: 'light',
-        viewport: { width: 1440, height: 1600 },
-      },
-    },
-    {
-      name: 'mobile-light',
-      outputDir: createVisualResultDirectory('preview', 'mobile-light'),
-      grepInvert: visualProjectGrepInvert('mobile-light'),
-      testIgnore: visualProjectTestIgnore('mobile-light'),
-      use: {
-        ...devices['Pixel 7'],
-        colorScheme: 'light',
-        viewport: { width: 412, height: 1200 },
-      },
-    },
-    {
-      name: 'desktop-dark',
-      outputDir: createVisualResultDirectory('preview', 'desktop-dark'),
-      grepInvert: visualProjectGrepInvert('desktop-dark'),
-      testIgnore: visualProjectTestIgnore('desktop-dark'),
-      use: {
-        ...devices['Desktop Chrome'],
-        colorScheme: 'dark',
-        viewport: { width: 1440, height: 1600 },
-      },
-    },
-    {
-      name: 'mobile-dark',
-      outputDir: createVisualResultDirectory('preview', 'mobile-dark'),
-      grepInvert: visualProjectGrepInvert('mobile-dark'),
-      testIgnore: visualProjectTestIgnore('mobile-dark'),
-      use: {
-        ...devices['Pixel 7'],
-        colorScheme: 'dark',
-        viewport: { width: 412, height: 1200 },
-      },
-    },
-  ],
-  ...(externalServer ? {} : { webServer: {
-    command: `node ../scripts/serve-visual-runtime.mjs --suite=preview --host=127.0.0.1 --port=${previewPort}`,
-    url: previewBaseUrl,
-    reuseExistingServer: process.env.FSUS_VISUAL_REUSE_SERVER === '1',
-    timeout: 240_000,
-  } }),
+    viewport: FSUS_VISUAL_VIEWPORTS.desktop,
+  }),
+  projects: createViewportThemeMatrixProjects({
+    customize: (projectName) => ({
+      outputDir: createVisualResultDirectory('preview', projectName),
+      grepInvert: visualProjectGrepInvert(projectName),
+      testIgnore: visualProjectTestIgnore(projectName),
+    }),
+  }),
+  ...(useExternalServer
+    ? {}
+    : { webServer: createVisualRuntimeWebServer('preview', port, baseURL) }),
 })

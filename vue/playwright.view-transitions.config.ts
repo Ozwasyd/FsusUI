@@ -1,12 +1,20 @@
-import { defineConfig, devices } from '@playwright/test'
+import { defineConfig } from '@playwright/test'
 import {
   createPlaywrightReporter,
   resolvePlaywrightWorkers,
-  resolveTestPort,
 } from '../scripts/test-parallelism'
+import {
+  createBaseUse,
+  createDemoDevWebServer,
+  createDesktopBrowserProjects,
+  resolveChromiumLaunchOptions,
+  resolveServerEndpoint,
+} from './playwright.shared'
 
-const port = resolveTestPort('FSUS_VIEW_TRANSITION_PORT', 4187)
-const baseURL = `http://127.0.0.1:${port}`
+const { port, baseURL } = resolveServerEndpoint(
+  'FSUS_VIEW_TRANSITION_PORT',
+  4187,
+)
 const detectedWorkers = resolvePlaywrightWorkers()
 
 export default defineConfig({
@@ -17,38 +25,14 @@ export default defineConfig({
   retries: process.env.CI ? 1 : 0,
   reporter: createPlaywrightReporter('view-transitions'),
   timeout: 90_000,
-  use: {
-    baseURL,
-    locale: 'zh-CN',
-    timezoneId: 'Asia/Shanghai',
+  use: createBaseUse(baseURL, {
     trace: 'retain-on-failure',
     screenshot: 'only-on-failure',
-  },
-  projects: [
-    {
-      name: 'chromium',
-      use: {
-        ...devices['Desktop Chrome'],
-        launchOptions: process.env.FSUS_PLAYWRIGHT_EXECUTABLE_PATH
-          ? { executablePath: process.env.FSUS_PLAYWRIGHT_EXECUTABLE_PATH }
-          : undefined,
-      },
-    },
-    {
-      name: 'firefox',
-      grepInvert: /Chromium CPU profiles/,
-      use: { ...devices['Desktop Firefox'] },
-    },
-    {
-      name: 'webkit',
-      grepInvert: /Chromium CPU profiles/,
-      use: { ...devices['Desktop Safari'] },
-    },
-  ],
-  webServer: {
-    command: `pnpm -C packages/demo-app dev --host 127.0.0.1 --port ${port} --strictPort`,
-    url: baseURL,
-    reuseExistingServer: !process.env.CI,
-    timeout: 120_000,
-  },
+  }),
+  projects: createDesktopBrowserProjects({
+    chromium: { use: { launchOptions: resolveChromiumLaunchOptions() } },
+    firefox: { grepInvert: /Chromium CPU profiles/ },
+    webkit: { grepInvert: /Chromium CPU profiles/ },
+  }),
+  webServer: createDemoDevWebServer(port, baseURL, { ensureWasm: false }),
 })

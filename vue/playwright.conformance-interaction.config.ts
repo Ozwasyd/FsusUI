@@ -1,14 +1,17 @@
-import { defineConfig, devices } from '@playwright/test'
+import { defineConfig } from '@playwright/test'
+import { createPlaywrightReporter } from '../scripts/test-parallelism'
 import {
-  createPlaywrightReporter,
-  resolveTestPort,
-} from '../scripts/test-parallelism'
+  createBaseUse,
+  createDemoPreviewWebServer,
+  createDesktopBrowserProjects,
+  resolveServerEndpoint,
+} from './playwright.shared'
 
-delete process.env.NO_COLOR
-
-const port = resolveTestPort('FSUS_CONFORMANCE_INTERACTION_PORT', 5192)
-const baseURL = `http://127.0.0.1:${port}`
-const useExternalServer = process.env.FSUS_PLAYWRIGHT_EXTERNAL_SERVER === '1'
+const { port, baseURL, useExternalServer } = resolveServerEndpoint(
+  'FSUS_CONFORMANCE_INTERACTION_PORT',
+  5192,
+  'flag',
+)
 
 export default defineConfig({
   testDir: './tests/markdown-editor',
@@ -19,29 +22,14 @@ export default defineConfig({
   reporter: createPlaywrightReporter('conformance-interaction'),
   timeout: 180_000,
   expect: { timeout: 20_000 },
-  use: {
-    baseURL,
-    colorScheme: 'light',
-    locale: 'zh-CN',
-    timezoneId: 'Asia/Shanghai',
+  use: createBaseUse(baseURL, {
     viewport: { width: 1280, height: 1100 },
     screenshot: 'only-on-failure',
     trace: 'retain-on-failure',
     video: 'off',
-  },
-  projects: [
-    { name: 'chromium', use: { ...devices['Desktop Chrome'] } },
-    { name: 'firefox', use: { ...devices['Desktop Firefox'] } },
-    { name: 'webkit', use: { ...devices['Desktop Safari'] } },
-  ],
+  }),
+  projects: createDesktopBrowserProjects(),
   ...(useExternalServer
     ? {}
-    : {
-        webServer: {
-          command: `pnpm -C .. run build:demo && pnpm -C packages/demo-app exec vite preview --host 127.0.0.1 --port ${port} --strictPort`,
-          url: baseURL,
-          reuseExistingServer: !process.env.CI,
-          timeout: 180_000,
-        },
-      }),
+    : { webServer: createDemoPreviewWebServer(port, baseURL) }),
 })
