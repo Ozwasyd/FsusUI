@@ -10,7 +10,7 @@
   "baselines": {
     "web": {
       "path": "spec/baselines/vue-current.json",
-      "hash": "9465b1b6e08e1ad6b3043f617bf999fa94d694df558c6a7f49bdf56bd938a115",
+      "hash": "80960f34669ce33ae242c62b4673fa0dd42ac0a25c4a69cc1c5714c0148c27bb",
       "packageVersion": "1.6.0-preview.11"
     },
     "avalonia": {
@@ -66056,14 +66056,7 @@
               "status": "syntax-only",
               "reason": null,
               "returnType": null,
-              "parameters": [
-                {
-                  "name": "replace",
-                  "type": null,
-                  "optional": true,
-                  "rest": false
-                }
-              ]
+              "parameters": []
             }
           },
           "avalonia": null,
@@ -66155,7 +66148,7 @@
                   "rest": false
                 },
                 {
-                  "name": "options",
+                  "name": "revealOptions",
                   "type": "MarkdownEditorRevealOptions | undefined",
                   "optional": true,
                   "rest": false
@@ -66229,7 +66222,7 @@
                   "rest": false
                 },
                 {
-                  "name": "options",
+                  "name": "revealOptions",
                   "type": "{ readonly expected?: { readonly documentIdentity: MarkdownDocumentIdentity; readonly revision: number; }; readonly actual?: { readonly documentIdentity: MarkdownDocumentIdentity; readonly revision: number; }; readonly mode?: string; readonly reducedMotion?: boolean; readonly sourceLength?: number; readonly anchorMap?: MarkdownAnchorMap; readonly projection?: MarkdownStableProjection; } | undefined",
                   "optional": true,
                   "rest": false

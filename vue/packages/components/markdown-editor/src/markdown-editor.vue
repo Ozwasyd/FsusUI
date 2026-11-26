@@ -756,27 +756,17 @@ import {
   stabilizeMarkdownEditorProjection,
 } from '../../../wasm/markdown-runtime'
 import {
-  isMarkdownEditorCommandEnabled,
-  isMarkdownEditorCommandVisible,
+  createMarkdownEditorMetricsSession,
   markdownEditorEmits,
   markdownEditorProps,
-  createMarkdownEditorMetricsSession,
-  type MarkdownEditorMetricsChange,
-  resolveMarkdownEditorCommandCopy,
   resolveMarkdownEditorLocaleFromLanguage,
   resolveMarkdownEditorLocaleText,
-  resolveMarkdownEditorOverflowCommands,
-  resolveMarkdownEditorPrimaryCommands,
-  resolveMarkdownEditorSyntaxContext,
-  resolveMarkdownEditorShortcut,
-  runMarkdownEditorCommand,
+  type MarkdownEditorActionItem,
+  type MarkdownEditorInsertOptions,
+  type MarkdownEditorMetricsChange,
+  type MarkdownEditorMode,
+  type MarkdownEditorSurfaceOptions,
 } from './markdown-editor'
-import {
-  createMarkdownEditorCommandSnapshot,
-  selectMarkdownEditorCommandSnapshot,
-  type MarkdownEditorCommandSnapshotItem,
-  type MarkdownEditorCommandRuntimeState,
-} from './markdown-editor-command-snapshot'
 import {
   captureMarkdownAttachmentInput,
   createMarkdownAttachmentAtomicPresentation,
@@ -797,54 +787,11 @@ import {
 } from './markdown-editor-attachment-lifecycle'
 import { resolveMarkdownEditorChromeRegions } from './markdown-editor-chrome'
 import {
-  composeMarkdownEditorPositionMapInstances,
-  createMarkdownEditorPositionMap,
   deriveMarkdownEditorChange,
-  MarkdownEditorTransactionStore,
-  toMarkdownEditorTransactionEvent,
+  type MarkdownEditorInputMergeDirection,
+  type MarkdownEditorSelection,
+  type MarkdownEditorTransaction,
 } from './markdown-editor-transaction'
-import type {
-  MarkdownEditorActionItem,
-  MarkdownEditorActionKey,
-  MarkdownEditorCommand,
-  MarkdownEditorInsertOptions,
-  MarkdownEditorMode,
-  MarkdownEditorSurfaceOptions,
-} from './markdown-editor'
-import type {
-  BeforeInputSnapshot,
-  MarkdownEditorDispatchResult,
-  MarkdownEditorHistoryState,
-  MarkdownEditorInputMergeDirection,
-  MarkdownEditorPositionMap,
-  MarkdownEditorSelection,
-  MarkdownEditorTransaction,
-  MarkdownEditorTransactionRejection,
-} from './markdown-editor-transaction'
-import {
-  resolveMarkdownBlockInputIntent,
-  type MarkdownBlockInputKey,
-} from './markdown-editor-input-intent'
-import {
-  MARKDOWN_PAIR_DEFAULTS,
-  resolveMarkdownPairInput,
-} from './markdown-editor-pair-input'
-import {
-  markdownClipboardItemsFromDataTransfer,
-  resolveMarkdownClipboardCopy,
-  resolveMarkdownClipboardCut,
-  resolveMarkdownClipboardPaste,
-  writeMarkdownClipboardPayload,
-} from './markdown-editor-clipboard'
-import { resolveMarkdownSelectionToolbarPlacement } from './markdown-editor-selection-toolbar'
-import {
-  abortMarkdownEditorCommandSessions,
-  createMarkdownEditorCommandSession,
-  rebaseMarkdownEditorCommandSession,
-  resolveMarkdownEditorCommandSession,
-  type MarkdownEditorCommandSession,
-} from './markdown-editor-command-async'
-import { planMarkdownSlashCommit } from './markdown-editor-surfaces'
 import { resolveMarkdownEditorStatus } from './markdown-editor-status'
 import { resolveMarkdownLanguageToolCapability } from './markdown-editor-language-tools'
 import {
@@ -853,12 +800,6 @@ import {
 } from './markdown-editor-language-web'
 import { createMarkdownEditorNativeEventMachine } from './markdown-editor-native-event'
 import { resolveMarkdownLiveSurface } from './markdown-editor-live-surface'
-import {
-  resolveMarkdownLiveSyntaxReveal,
-  type MarkdownLiveRevealIntent,
-} from './markdown-editor-live-reveal'
-import { createMarkdownLiveVisualSegments } from './markdown-editor-live-visual'
-import { resolveMarkdownEditorFittingCommandCount } from './markdown-editor-toolbar-overflow'
 import {
   MARKDOWN_ATOMIC_NODE_KINDS,
   resolveMarkdownAtomicNodeIntent,
@@ -869,49 +810,28 @@ import {
   type MarkdownLiveSelectionMotion,
 } from './markdown-editor-live-selection'
 import {
-  calculateMarkdownSourceAnchorY,
   createMarkdownFocusSegments,
   createWritingAidsController,
   type MarkdownEditorWritingAidsController,
 } from './markdown-editor-writing-aids'
 import {
-  createMarkdownOutlineModelFromProjection,
-  revealHeading as revealHeadingOutline,
-  revealSourceRange as revealSourceRangeOutline,
-} from './markdown-editor-outline'
-import { planMarkdownOutlineReveal } from './markdown-editor-outline-active'
-import {
-  resolveMarkdownLiveLayoutStability,
-  resolveMarkdownLiveVirtualWindow,
-  type MarkdownLiveLayoutGesture,
-  type MarkdownLiveLayoutPlan,
-  type MarkdownLiveLayoutTrigger,
-  type MarkdownLiveVirtualWindow,
-} from './markdown-editor-live-layout'
-import {
-  dispatchMarkdownSearchKeydown,
-  executeMarkdownSearchSession,
-  resolveMarkdownSearchNavigation,
-  resolveMarkdownSearchUi,
-  revealMarkdownSearchMatch,
-  type MarkdownSearchUiState,
-} from './markdown-editor-search-ui'
-import {
-  planMarkdownReplaceAll,
-  planMarkdownReplaceCurrentInSet,
-} from '../../../wasm/markdown-replace'
-import type {
-  MarkdownSearchMatch,
-  MarkdownSearchMode,
-} from '../../../wasm/markdown-search-model'
-import type { MarkdownSearchTask } from '../../../wasm/markdown-search-worker'
+  MarkdownEditorKernel,
+  type MarkdownEditorKernelOperation,
+} from './kernel/editor-kernel'
 import { useEditorCommandPalette } from './composables/use-editor-command-palette'
 import { useEditorContextualSurfaces } from './composables/use-editor-contextual-surfaces'
 import { useEditorEmbeds } from './composables/use-editor-embeds'
+import { useEditorInputPipeline } from './composables/use-editor-input-pipeline'
+import {
+  reducedMotionRequested,
+  useEditorLiveViewport,
+} from './composables/use-editor-live-viewport'
 import { useEditorMediaProperties } from './composables/use-editor-media-properties'
+import { useEditorOutlineReveal } from './composables/use-editor-outline-reveal'
 import { useEditorPasteSurface } from './composables/use-editor-paste-surface'
-import { useEditorSearchHighlights } from './composables/use-editor-search-highlights'
+import { useEditorSearchController } from './composables/use-editor-search-controller'
 import { useEditorTableController } from './composables/use-editor-table-controller'
+import { useEditorToolbarCommands } from './composables/use-editor-toolbar-commands'
 import MarkdownEditorContextualPopover from './surfaces/markdown-editor-contextual-popover.vue'
 import MarkdownEditorEmbedCard from './surfaces/markdown-editor-embed-card.vue'
 import MarkdownEditorMediaPanel from './surfaces/markdown-editor-media-panel.vue'
@@ -979,14 +899,13 @@ const pasteAsMarkdownTitleId = `${useId()}-paste-as-markdown-title`
 const pasteAsMarkdownHelpId = `${useId()}-paste-as-markdown-help`
 const tableMenuId = `${useId()}-table-menu`
 const commandsExpanded = ref(false)
-const retainedPreviewScrollLeft = ref(0)
-const visualViewportHeight = ref(0)
-const visualViewportOffsetTop = ref(0)
 const commandGroupRef = ref<HTMLElement | null>(null)
 const commandsRef = ref<HTMLElement | null>(null)
 const commandMeasureRef = ref<HTMLElement | null>(null)
 const toolbarRef = ref<HTMLElement | null>(null)
 const previewRendererRef = ref<HTMLElement | { $el?: HTMLElement } | null>(null)
+const focusLayerRef = ref<HTMLElement | null>(null)
+const liveLayerRef = ref<HTMLElement | null>(null)
 
 const inputDisabled = computed(() => props.disabled || props.loading)
 const editingBlocked = computed(() => props.readonly || inputDisabled.value)
@@ -1020,34 +939,40 @@ const normalizeModeForLayout = (
 const currentMode = ref<MarkdownEditorMode>(
   normalizeModeForLayout(props.mode ?? props.defaultMode),
 )
+const visibleModes = computed(() =>
+  compactMode.value
+    ? modes.filter((mode) => mode !== 'split' && mode !== 'live')
+    : modes,
+)
 const textareaAriaLabel = computed(() =>
   currentMode.value === 'live'
     ? localeText.value.textarea.live
     : localeText.value.textarea.source,
 )
-const initialSelection: MarkdownEditorSelection = {
-  direction: 'none',
-  end: props.modelValue.length,
-  start: props.modelValue.length,
-}
+
 const documentIdentity = reactive({
   epoch: props.documentIdentity?.epoch ?? 0,
   id: props.documentIdentity?.id ?? commandTrayId,
 })
-const transactionStore = new MarkdownEditorTransactionStore(
-  props.modelValue,
-  initialSelection,
+const kernel = new MarkdownEditorKernel({
   documentIdentity,
-)
-provideMarkdownHeavyFeatureDocumentContext({
-  documentEpoch: () => transactionStore.documentIdentity.epoch,
-  documentKey: () => transactionStore.documentIdentity.id,
-  revision: () => transactionStore.revision,
+  initialValue: props.modelValue,
 })
-const editorRevision = ref(transactionStore.revision)
-const editorSelection = ref(transactionStore.selection)
-const editorValue = ref(transactionStore.value)
-const nativeCompositionValue = ref(transactionStore.value)
+const commandRuntimeVersion = ref(0)
+kernel.onCommandStateChange(() => {
+  commandRuntimeVersion.value += 1
+})
+
+provideMarkdownHeavyFeatureDocumentContext({
+  documentEpoch: () => kernel.store.documentIdentity.epoch,
+  documentKey: () => kernel.store.documentIdentity.id,
+  revision: () => kernel.revision,
+})
+
+const editorRevision = ref(kernel.revision)
+const editorSelection = ref(kernel.selection)
+const editorValue = ref(kernel.value)
+const nativeCompositionValue = ref(kernel.value)
 const isComposing = ref(false)
 const selectionTick = ref(0)
 
@@ -1057,8 +982,8 @@ const writingAidsController: MarkdownEditorWritingAidsController =
     editorProfile: props.editorProfile,
     readonly: props.readonly,
     disabled: props.disabled,
-    source: transactionStore.value,
-    selection: transactionStore.selection,
+    source: kernel.value,
+    selection: kernel.selection,
   })
 const resolvedWritingAids = ref(writingAidsController.options)
 const writingAidsState = ref(writingAidsController.state)
@@ -1072,18 +997,6 @@ const writingAidsDataAttrs = computed(() => ({
   'data-markdown-writing-aids-state': writingAidsState.value,
 }))
 const rootAttrs = computed(() => ({ ...attrs, ...writingAidsDataAttrs.value }))
-const focusLayerRef = ref<HTMLElement | null>(null)
-const liveLayerRef = ref<HTMLElement | null>(null)
-const syncMirrorLayerScroll = (scrollTop: number, scrollLeft = 0) => {
-  if (focusLayerRef.value) {
-    focusLayerRef.value.scrollTop = scrollTop
-    focusLayerRef.value.scrollLeft = scrollLeft
-  }
-  if (liveLayerRef.value) {
-    liveLayerRef.value.scrollTop = scrollTop
-    liveLayerRef.value.scrollLeft = scrollLeft
-  }
-}
 const focusSegments = computed(() =>
   createMarkdownFocusSegments(editorValue.value, writingAidsFocusState.value),
 )
@@ -1154,7 +1067,7 @@ const refreshWritingAidsDocument = () => {
       projection = undefined
     }
   }
-  const selection = transactionStore.selection
+  const selection = kernel.selection
   const caret =
     selection.direction === 'backward' ? selection.start : selection.end
   const currentBlock = projection?.nodes.find(
@@ -1173,9 +1086,9 @@ const refreshWritingAidsDocument = () => {
     mode: currentMode.value,
     projection,
     readonly: props.readonly,
-    revision: transactionStore.revision,
+    revision: kernel.revision,
     selection,
-    source: transactionStore.value,
+    source: kernel.value,
     writingAids: props.writingAids,
   })
   resolvedWritingAids.value = writingAidsController.options
@@ -1213,45 +1126,11 @@ const liveSurface = computed(() =>
     mode: currentMode.value,
     projection: editorProjection.value,
     projectionError: !editorProjection.value,
-    revision: transactionStore.revision,
+    revision: kernel.revision,
     source: editorValue.value,
   }),
 )
-const commandRevisionMaps = new Map<number, MarkdownEditorPositionMap>()
-const refreshEditorProjection = (previousValue: string, nextValue: string) => {
-  const change = deriveMarkdownEditorChange(previousValue, nextValue)
-  previousEditorProjection = editorProjection.value
-  previousEditorProjectionSource = previousValue
-  return change
-}
-const positionMapFromRevision = (
-  fromRevision: number,
-  toRevision: number,
-): MarkdownEditorPositionMap | undefined => {
-  if (fromRevision === toRevision) {
-    return createMarkdownEditorPositionMap([], {
-      documentIdentity,
-      projection: editorProjection.value,
-      source: editorValue.value,
-    })
-  }
-  const maps: MarkdownEditorPositionMap[] = []
-  for (let revision = fromRevision; revision < toRevision; revision += 1) {
-    const map = commandRevisionMaps.get(revision)
-    if (!map) return undefined
-    maps.push(map)
-  }
-  return composeMarkdownEditorPositionMapInstances(maps)
-}
-const liveReveal = ref(
-  resolveMarkdownLiveSyntaxReveal({
-    documentIdentity,
-    mode: currentMode.value,
-    projection: editorProjection.value,
-    selection: transactionStore.selection,
-    source: editorValue.value,
-  }),
-)
+const inputVisible = computed(() => liveSurface.value.inputVisible)
 const languageCapability = computed(() =>
   resolveMarkdownLanguageToolCapability({
     lang: props.lang,
@@ -1268,9 +1147,6 @@ const languageToolsConfig = () => ({
 const nativeMachine = createMarkdownEditorNativeEventMachine({
   documentIdentity,
 })
-let beforeInputSnapshot: BeforeInputSnapshot | undefined
-let pendingClipboardIdentity: string | undefined
-let pendingInputOrigin: 'drop' | 'paste' | undefined
 let restoringSelection = false
 
 const syncNativeComposing = () => {
@@ -1283,20 +1159,20 @@ const syncLanguageToolsState = () => {
   const config = languageToolsConfig()
   const configKey = JSON.stringify(config)
   if (
-    languageToolsRevision !== transactionStore.revision ||
-    languageToolsSource !== transactionStore.value ||
+    languageToolsRevision !== kernel.revision ||
+    languageToolsSource !== kernel.value ||
     languageToolsConfigKey !== configKey
   ) {
     controller.updateState({
       anchorMap: editorAnchorMap.value,
       config,
       projection: editorProjection.value,
-      projectionRevision: transactionStore.revision,
-      revision: transactionStore.revision,
-      source: transactionStore.value,
+      projectionRevision: kernel.revision,
+      revision: kernel.revision,
+      source: kernel.value,
     })
-    languageToolsRevision = transactionStore.revision
-    languageToolsSource = transactionStore.value
+    languageToolsRevision = kernel.revision
+    languageToolsSource = kernel.value
     languageToolsConfigKey = configKey
   }
   controller.switchMode(currentMode.value)
@@ -1305,7 +1181,7 @@ const syncLanguageToolsState = () => {
     isComposing: nativeMachine.composing,
     mode: currentMode.value,
     readonly: props.readonly,
-    selection: transactionStore.selection,
+    selection: kernel.selection,
   })
 }
 
@@ -1334,7 +1210,7 @@ const restoreTextareaSelection = async (
 const readSelectionFrom = (
   textarea: HTMLTextAreaElement | null,
 ): MarkdownEditorSelection => {
-  if (!textarea) return transactionStore.selection
+  if (!textarea) return kernel.selection
   return {
     direction: textarea.selectionDirection,
     end: textarea.selectionEnd,
@@ -1343,12 +1219,9 @@ const readSelectionFrom = (
 }
 
 const captureSelection = (breakMerge = true) => {
-  const previous = transactionStore.selection
-  transactionStore.setSelection(
-    readSelectionFrom(textareaRef.value),
-    breakMerge,
-  )
-  const selection = transactionStore.selection
+  const previous = kernel.selection
+  kernel.store.setSelection(readSelectionFrom(textareaRef.value), breakMerge)
+  const selection = kernel.selection
   editorSelection.value = selection
   if (
     selection.start !== previous.start ||
@@ -1358,7 +1231,7 @@ const captureSelection = (breakMerge = true) => {
     emit(
       'selection-change',
       Object.freeze({
-        revision: transactionStore.revision,
+        revision: kernel.revision,
         selection,
       }),
     )
@@ -1371,11 +1244,12 @@ const setStoreSelection = (
   selection: MarkdownEditorSelection,
   breakMerge = false,
 ) => {
-  transactionStore.setSelection(selection, breakMerge)
-  editorSelection.value = transactionStore.selection
+  kernel.store.setSelection(selection, breakMerge)
+  editorSelection.value = kernel.selection
 }
 
 const contextualRevisionBridge: { notify?: (revision: number) => void } = {}
+const pasteIdentityBridge: { record?: (identity: string) => void } = {}
 
 const atomicSession = ref<MarkdownAtomicNodeSession | null>(null)
 const liveAtomic = ref<MarkdownAtomicNodePlan | null>(null)
@@ -1387,8 +1261,8 @@ const atomicActionNodes = computed(() => {
       documentIdentity,
       kind,
       mode: currentMode.value,
-      revision: transactionStore.revision,
-      selection: transactionStore.selection,
+      revision: kernel.revision,
+      selection: kernel.selection,
       source: editorValue.value,
     }),
   )
@@ -1404,551 +1278,88 @@ const atomicActionNodes = computed(() => {
     )
     .map((plan) => ({ id: plan.nodeId, kind: plan.kind }))
 })
-const layoutGesture = ref<MarkdownLiveLayoutGesture | null>(null)
-const liveWindow = ref<MarkdownLiveVirtualWindow | null>(null)
-const liveLayout = ref<MarkdownLiveLayoutPlan>(
-  resolveMarkdownLiveLayoutStability({
-    documentIdentity,
-    revision: transactionStore.revision,
-    selection: transactionStore.selection,
-    source: editorValue.value,
-    trigger: 'block-height-change',
-  }),
-)
-let layoutGestureTimer: ReturnType<typeof setTimeout> | undefined
-let restoringViewport = false
-let restoringTypewriter = false
-let typewriterScrollTarget: number | null = null
-let typewriterScrollSmooth = false
-let typewriterLayoutAdjustment = false
-let typewriterLayoutFrame: number | undefined
-let textareaLayoutHeight = 0
-let textareaLayoutWidth = 0
-let viewportRestoreCurrentScrollTop = 0
-let viewportRestoreCurrentScrollLeft = 0
-let viewportRestoreNextScrollTop: number | null = null
 
-const liveDecorations = computed(() => {
-  const decorations = liveSurface.value.decorations
-  if (currentMode.value !== 'live' || !liveWindow.value) return decorations
-  const mounted = new Set(liveWindow.value.mountedNodeIds)
-  return decorations.filter((decoration) => mounted.has(decoration.nodeId))
+const {
+  applyLiveLayout,
+  applyTypewriterScroll,
+  capturePreviewScrollLeft,
+  clearTypewriterScrollTarget,
+  disposeViewport,
+  editorStyle,
+  handleLayoutScroll,
+  handleLayoutTouch,
+  handleLayoutWheel,
+  handlePreviewScroll,
+  liveDecorations,
+  liveLayout,
+  liveReveal,
+  liveVisualActive,
+  liveVisualSegments,
+  markLayoutGesture,
+  mountViewportListeners,
+  refreshLiveReveal,
+  refreshLiveWindow,
+  restorePreviewScroll,
+  suspendTypewriterForUserScroll,
+  syncMirrorLayerScroll,
+} = useEditorLiveViewport({
+  currentMode,
+  documentIdentity,
+  editorProjection,
+  editorValue,
+  focusLayerRef,
+  frameScheduler,
+  getRevision: () => kernel.revision,
+  getSelection: () => kernel.selection,
+  getSource: () => kernel.value,
+  isComposing,
+  isRestoringSelection: () => restoringSelection,
+  liveLayerRef,
+  liveSurface,
+  previewRendererRef,
+  resolvedWritingAids,
+  textareaRef,
+  toolbarRef,
+  writingAidsController,
+  writingAidsFocusState,
+  writingAidsState,
 })
-const liveVisualActive = computed(
-  () =>
-    currentMode.value === 'live' &&
-    liveSurface.value.fallbackMode === 'live' &&
-    liveSurface.value.inputVisible &&
-    !isComposing.value,
-)
-const liveVisualSegments = computed(() => {
-  if (!liveVisualActive.value) return []
-  return createMarkdownLiveVisualSegments({
-    activeNodeIds: liveWindow.value?.mountedNodeIds,
-    focusState: writingAidsFocusState.value.enabled
-      ? writingAidsFocusState.value
-      : null,
-    projection: editorProjection.value,
-    reveal: liveReveal.value,
-    source: editorValue.value,
-  })
-})
-watch(liveVisualActive, (active) => {
-  if (!active) return
-  void nextTick(() => {
-    const textarea = textareaRef.value
-    if (textarea) {
-      syncMirrorLayerScroll(textarea.scrollTop, textarea.scrollLeft)
-    }
-  })
-})
-
-const restoreTextareaViewport = (plan: MarkdownLiveLayoutPlan) => {
-  const textarea = textareaRef.value
-  if (!textarea || plan.action !== 'restore' || !plan.anchor) return
-  const anchor = plan.anchor
-  const line =
-    transactionStore.value.slice(0, anchor.sourceOffset).split('\n').length - 1
-  frameScheduler.schedule({
-    guard: () => liveLayout.value === plan,
-    key: 'viewport-restore',
-    measure: () => {
-      const target = textareaRef.value
-      if (!target) {
-        viewportRestoreNextScrollTop = null
-        return
-      }
-      const lineHeight =
-        Number.parseFloat(window.getComputedStyle(target).lineHeight) || 20
-      viewportRestoreNextScrollTop = Math.max(
-        0,
-        line * lineHeight - target.clientHeight / 3,
-      )
-      viewportRestoreCurrentScrollTop = target.scrollTop
-      viewportRestoreCurrentScrollLeft = target.scrollLeft
-    },
-    mutate: () => {
-      const target = textareaRef.value
-      if (
-        !target ||
-        viewportRestoreNextScrollTop === null ||
-        Math.abs(
-          viewportRestoreCurrentScrollTop - viewportRestoreNextScrollTop,
-        ) <= 1
-      ) {
-        viewportRestoreNextScrollTop = null
-        return
-      }
-      restoringViewport = true
-      const nextScrollTop = viewportRestoreNextScrollTop
-      target.scrollTop = nextScrollTop
-      syncMirrorLayerScroll(nextScrollTop, viewportRestoreCurrentScrollLeft)
-      viewportRestoreNextScrollTop = null
-      queueMicrotask(() => {
-        restoringViewport = false
-      })
-    },
-  })
-}
-
-const applyLiveLayout = (
-  trigger: MarkdownLiveLayoutTrigger,
-  extras: {
-    readonly gesture?: MarkdownLiveLayoutGesture | null
-    readonly reducedMotion?: boolean
-  } = {},
-) => {
-  const plan = resolveMarkdownLiveLayoutStability({
-    composing: isComposing.value,
-    documentIdentity,
-    gesture: extras.gesture ?? layoutGesture.value,
-    previousAnchor: liveLayout.value.anchor,
-    reducedMotion: extras.reducedMotion,
-    revision: transactionStore.revision,
-    selection: transactionStore.selection,
-    source: transactionStore.value,
-    trigger,
-  })
-  liveLayout.value = plan
-  if (plan.action === 'restore') restoreTextareaViewport(plan)
-  return plan
-}
-
-let virtualWindowNext: MarkdownLiveVirtualWindow | null = null
-const refreshLiveWindow = (
-  origin: 'input' | 'document-switch' | 'mode-switch' | 'feature' | 'initial',
-) => {
-  frameScheduler.schedule({
-    key: 'virtual-window',
-    measure: () => {
-      virtualWindowNext = resolveMarkdownLiveVirtualWindow({
-        documentIdentity,
-        origin,
-        previousMountedNodeIds: liveWindow.value?.mountedNodeIds,
-        selection: transactionStore.selection,
-        source: transactionStore.value,
-      })
-    },
-    mutate: () => {
-      if (virtualWindowNext) liveWindow.value = virtualWindowNext
-      virtualWindowNext = null
-    },
-  })
-}
-
-const markLayoutGesture = (gesture: MarkdownLiveLayoutGesture) => {
-  layoutGesture.value = gesture
-  applyLiveLayout('block-height-change', { gesture })
-  if (layoutGestureTimer) clearTimeout(layoutGestureTimer)
-  layoutGestureTimer = setTimeout(() => {
-    layoutGesture.value = null
-  }, 200)
-}
-const suspendTypewriterForUserScroll = () => {
-  typewriterScrollTarget = null
-  writingAidsController.handleUserScroll()
-  writingAidsState.value = writingAidsController.state
-}
-const reducedMotionRequested = () =>
-  typeof window !== 'undefined' &&
-  window.matchMedia?.('(prefers-reduced-motion: reduce)').matches === true
-
-const cssLength = (element: HTMLElement, property: string) => {
-  const value = Number.parseFloat(
-    window.getComputedStyle(element).getPropertyValue(property),
-  )
-  return Number.isFinite(value) ? value : 0
-}
-let typewriterTextContext:
-  | OffscreenCanvasRenderingContext2D
-  | null
-  | undefined
-const sourceAnchorY = (textarea: HTMLTextAreaElement, lineHeight: number) => {
-  if (typeof OffscreenCanvas === 'undefined') return undefined
-  if (typewriterTextContext === undefined) {
-    typewriterTextContext = new OffscreenCanvas(1, 1).getContext('2d')
-  }
-  if (!typewriterTextContext) return undefined
-  const style = window.getComputedStyle(textarea)
-  typewriterTextContext.font = style.font
-  const inlineSize =
-    textarea.clientWidth -
-    cssLength(textarea, 'padding-inline-start') -
-    cssLength(textarea, 'padding-inline-end')
-  return calculateMarkdownSourceAnchorY({
-    caretSourceOffset: transactionStore.selection.end,
-    inlineSize,
-    lineHeight,
-    measureTextWidth: (text) =>
-      typewriterTextContext?.measureText(text).width ?? 0,
-    paddingBlockStart: cssLength(textarea, 'padding-block-start'),
-    source: transactionStore.value,
-  })
-}
-const applyTypewriterScroll = (
-  trigger: 'input' | 'explicit-navigation' | 'async-layout' = 'input',
-) => {
-  if (!resolvedWritingAids.value.typewriter || isComposing.value) return
-  const textarea = textareaRef.value
-  if (!textarea) return
-  const response =
-    trigger === 'explicit-navigation'
-      ? writingAidsController.handleExplicitNavigation()
-      : trigger === 'async-layout'
-        ? writingAidsController.handleAsyncLayoutChange()
-        : writingAidsController.handleInput()
-  writingAidsState.value = writingAidsController.state
-  if (response.scroll !== true) return
-  const lineHeight =
-    Number.parseFloat(window.getComputedStyle(textarea).lineHeight) || 20
-  const target = writingAidsController.calculateScroll({
-    caretSourceOffset: transactionStore.selection.end,
-    lineHeight,
-    source: transactionStore.value,
-    stickyToolbarHeight: toolbarRef.value?.getBoundingClientRect().height,
-    safeAreaInsetBottom: cssLength(
-      textarea,
-      '--el-markdown-editor-safe-area-inset-bottom',
-    ),
-    safeAreaInsetTop: cssLength(
-      textarea,
-      '--el-markdown-editor-safe-area-inset-top',
-    ),
-    sourceAnchorY: sourceAnchorY(textarea, lineHeight),
-    reducedMotion: reducedMotionRequested(),
-    viewportHeight: textarea.clientHeight,
-    visualViewportHeight: visualViewportHeight.value || undefined,
-    visualViewportOffsetTop: visualViewportOffsetTop.value || undefined,
-  })
-  restoringTypewriter = true
-  if (typeof textarea.scrollTo === 'function') {
-    const scrollTop = Math.min(
-      target.scrollTop,
-      Math.max(0, textarea.scrollHeight - textarea.clientHeight),
-    )
-    typewriterScrollTarget = scrollTop
-    typewriterScrollSmooth = trigger !== 'async-layout' && target.smooth
-    textarea.scrollTo({
-      behavior:
-        trigger === 'async-layout' ? 'auto' : target.smooth ? 'smooth' : 'auto',
-      top: scrollTop,
-    })
-    requestAnimationFrame(() => {
-      syncMirrorLayerScroll(textarea.scrollTop, textarea.scrollLeft)
-    })
-  } else {
-    typewriterScrollTarget = target.scrollTop
-    typewriterScrollSmooth = false
-    textarea.scrollTop = target.scrollTop
-    syncMirrorLayerScroll(target.scrollTop, textarea.scrollLeft)
-  }
-  requestAnimationFrame(() => {
-    requestAnimationFrame(() => {
-      restoringTypewriter = false
-    })
-  })
-}
-const settleTypewriterLayout = () => {
-  if (typewriterLayoutFrame !== undefined) {
-    cancelAnimationFrame(typewriterLayoutFrame)
-  }
-  typewriterLayoutAdjustment = true
-  let remainingFrames = 3
-  const settle = () => {
-    const textarea = textareaRef.value
-    if (!textarea || !resolvedWritingAids.value.typewriter) {
-      typewriterLayoutAdjustment = false
-      typewriterLayoutFrame = undefined
-      return
-    }
-    textareaLayoutHeight = textarea.clientHeight
-    textareaLayoutWidth = textarea.clientWidth
-    applyTypewriterScroll('async-layout')
-    remainingFrames -= 1
-    if (remainingFrames > 0) {
-      typewriterLayoutFrame = requestAnimationFrame(settle)
-      return
-    }
-    typewriterLayoutAdjustment = false
-    typewriterLayoutFrame = undefined
-  }
-  typewriterLayoutFrame = requestAnimationFrame(settle)
-}
-const handleLayoutWheel = () => {
-  suspendTypewriterForUserScroll()
-  markLayoutGesture('wheel')
-}
-const handleLayoutTouch = () => {
-  suspendTypewriterForUserScroll()
-  markLayoutGesture('touch')
-}
-const handleLayoutScroll = () => {
-  const textarea = textareaRef.value
-  if (textarea) syncMirrorLayerScroll(textarea.scrollTop, textarea.scrollLeft)
-  if (restoringSelection || restoringViewport || restoringTypewriter) return
-  if (textarea && typewriterScrollTarget !== null) {
-    const reachedTarget =
-      Math.abs(textarea.scrollTop - typewriterScrollTarget) <= 1
-    if (reachedTarget) typewriterScrollTarget = null
-    if (reachedTarget || typewriterScrollSmooth) return
-    typewriterScrollTarget = null
-  }
-  if (
-    textarea &&
-    (textarea.clientHeight !== textareaLayoutHeight ||
-      textarea.clientWidth !== textareaLayoutWidth)
-  ) {
-    textareaLayoutHeight = textarea.clientHeight
-    textareaLayoutWidth = textarea.clientWidth
-    settleTypewriterLayout()
-    return
-  }
-  if (typewriterLayoutAdjustment) return
-  suspendTypewriterForUserScroll()
-  markLayoutGesture('scrollbar')
-}
-const previewElement = () => {
-  const current = previewRendererRef.value
-  if (!current) return null
-  return current instanceof HTMLElement ? current : (current.$el ?? null)
-}
-const handlePreviewScroll = () => {
-  retainedPreviewScrollLeft.value = previewElement()?.scrollLeft ?? 0
-}
-const restorePreviewScroll = () => {
-  void nextTick(() => {
-    const preview = previewElement()
-    if (preview) preview.scrollLeft = retainedPreviewScrollLeft.value
-  })
-}
-
-const refreshLiveReveal = (
-  extras: {
-    readonly intent?: MarkdownLiveRevealIntent
-    readonly pointerOffset?: number
-  } = {},
-) => {
-  const previousState = liveReveal.value.state
-  liveReveal.value = resolveMarkdownLiveSyntaxReveal({
-    composing: isComposing.value,
-    documentIdentity,
-    intent: extras.intent,
-    mode: currentMode.value,
-    pointerOffset: extras.pointerOffset,
-    previous: liveReveal.value,
-    projection: editorProjection.value,
-    selection: transactionStore.selection,
-    source: transactionStore.value,
-  })
-  if (previousState === 'inactive' && liveReveal.value.state !== 'inactive') {
-    applyLiveLayout('marker-reveal')
-  } else if (
-    previousState !== 'inactive' &&
-    liveReveal.value.state === 'inactive'
-  ) {
-    applyLiveLayout('marker-hide')
-  }
-}
-
-const commandSessions = new Map<string, MarkdownEditorCommandSession>()
-const commandRuntimeStates = ref(
-  new Map<string, MarkdownEditorCommandRuntimeState>(),
-)
-const commandContextSignal = new AbortController().signal
-
-const abortPendingCommands = () => {
-  for (const session of commandSessions.values()) {
-    session.abort.abort('editor-reset')
-    commandRuntimeStates.value.set(session.key, {
-      state: 'aborted',
-    })
-  }
-  abortMarkdownEditorCommandSessions(commandSessions.values(), 'editor-reset')
-  commandSessions.clear()
-  triggerRef(commandRuntimeStates)
-}
-
-type EditorOperation =
-  | {
-      readonly allowBlocked?: boolean
-      readonly emitValue?: boolean
-      readonly internalPropReset?: boolean
-      readonly kind: 'transaction'
-      readonly mergeDirection?: MarkdownEditorInputMergeDirection
-      readonly restoreSelection?: boolean
-      readonly transaction: MarkdownEditorTransaction
-    }
-  | {
-      readonly kind: 'undo' | 'redo'
-      readonly restoreSelection?: boolean
-    }
-
-const historiesEqual = (
-  first: MarkdownEditorHistoryState,
-  second: MarkdownEditorHistoryState,
-) =>
-  first.undoDepth === second.undoDepth &&
-  first.redoDepth === second.redoDepth &&
-  first.retainedUnits === second.retainedUnits &&
-  first.canUndo === second.canUndo &&
-  first.canRedo === second.canRedo
-
-const rejectedResult = (
-  reason: MarkdownEditorTransactionRejection,
-): MarkdownEditorDispatchResult =>
-  Object.freeze({
-    accepted: false,
-    beforeRevision: transactionStore.revision,
-    documentIdentity: transactionStore.documentIdentity,
-    history: transactionStore.history,
-    reason,
-    revision: transactionStore.revision,
-    selection: transactionStore.selection,
-    value: transactionStore.value,
-  })
-
-const operationTransaction = (
-  operation: EditorOperation,
-): MarkdownEditorTransaction => {
-  if (operation.kind === 'transaction') return operation.transaction
-  return Object.freeze({
-    changes: [],
-    history: 'skip',
-    metadata: Object.freeze({ action: operation.kind }),
-    origin: 'command',
-  })
-}
 
 let pendingMetricsChange: MarkdownEditorMetricsChange | undefined
 
-const dispatchEditorOperation = (
-  operation: EditorOperation,
-): MarkdownEditorDispatchResult => {
-  const transaction = operationTransaction(
-    operation.kind === 'transaction'
-      ? {
-          ...operation,
-          transaction: Object.freeze({
-            ...operation.transaction,
-            documentIdentity:
-              operation.transaction.documentIdentity ?? documentIdentity,
-          }),
-        }
-      : operation,
-  )
-  const blocked =
-    operation.kind === 'transaction'
-      ? !operation.allowBlocked && editingBlocked.value
-      : editingBlocked.value
-  const compositionBlocked =
-    isComposing.value &&
-    !(operation.kind === 'transaction' && operation.internalPropReset)
-  if (blocked || compositionBlocked) {
-    const result = rejectedResult(blocked ? 'disabled' : 'composition-active')
-    emit('transaction', toMarkdownEditorTransactionEvent(transaction, result))
-    return result
-  }
-
-  const previousValue = transactionStore.value
-  const previousProjection = editorProjection.value
-  const previousRevision = transactionStore.revision
-  const previousSelection = transactionStore.selection
-  const previousHistory = transactionStore.history
-  const result =
-    operation.kind === 'transaction'
-      ? transactionStore.dispatch(transaction, {
-          mergeDirection: operation.mergeDirection,
-          now: Date.now(),
-        })
-      : operation.kind === 'undo'
-        ? transactionStore.undo()
-        : transactionStore.redo()
-
-  if (result.accepted && result.value !== previousValue) {
-    pendingMetricsChange =
-      operation.kind === 'transaction' &&
-      operation.transaction.changes.length === 1
-        ? operation.transaction.changes[0]
-        : deriveMarkdownEditorChange(previousValue, result.value)
-  }
-
-  if (result.accepted && result.value !== previousValue) {
-    const change = deriveMarkdownEditorChange(previousValue, result.value)
-    if (change) {
-      commandRevisionMaps.set(
-        previousRevision,
-        previousProjection
-          ? createMarkdownEditorPositionMap([change], {
-              documentIdentity,
-              projection: previousProjection,
-              source: previousValue,
-            })
-          : createMarkdownEditorPositionMap([change], {
-              documentIdentity,
-              source: previousValue,
-            }),
-      )
-      while (commandRevisionMaps.size > 128) {
-        const oldest = commandRevisionMaps.keys().next().value
-        if (oldest === undefined) break
-        commandRevisionMaps.delete(oldest)
-      }
-      refreshEditorProjection(previousValue, result.value)
-    }
+const dispatchEditorOperation = (operation: MarkdownEditorKernelOperation) => {
+  const outcome = kernel.dispatchOperation(operation, {
+    blocked: editingBlocked.value,
+    composing: isComposing.value,
+    currentProjection: editorProjection.value,
+  })
+  const { result } = outcome
+  if (outcome.valueChanged) {
+    pendingMetricsChange = outcome.metricsChange
+    previousEditorProjection = editorProjection.value
+    previousEditorProjectionSource = outcome.previousValue
   }
   editorValue.value = result.value
   editorRevision.value = result.revision
   editorSelection.value = result.selection
   contextualRevisionBridge.notify?.(result.revision)
-  emit('transaction', toMarkdownEditorTransactionEvent(transaction, result))
+  emit('transaction', outcome.event)
 
-  if (result.accepted && result.value !== previousValue) {
-    const appliedChanges =
-      operation.kind === 'transaction'
-        ? operation.transaction.changes
-        : (() => {
-            const change = deriveMarkdownEditorChange(
-              previousValue,
-              result.value,
-            )
-            return change ? [change] : []
-          })()
-    const ownedItemId =
-      operation.kind === 'transaction'
-        ? operation.transaction.metadata?.attachmentItemId
-        : undefined
+  if (outcome.valueChanged) {
     for (const job of attachmentJobs.value) {
-      if (job.itemId === ownedItemId || job.phase === 'deleted') continue
-      rebaseMarkdownAttachmentJob(job, appliedChanges, previousValue)
+      if (job.itemId === outcome.ownedAttachmentItemId || job.phase === 'deleted') {
+        continue
+      }
+      rebaseMarkdownAttachmentJob(
+        job,
+        outcome.appliedChanges,
+        outcome.previousValue,
+      )
     }
     triggerRef(attachmentJobs)
   }
 
-  if (
-    result.accepted &&
-    result.value !== previousValue &&
-    (operation.kind !== 'transaction' || operation.emitValue !== false)
-  ) {
+  if (outcome.emitValue) {
     emit(UPDATE_MODEL_EVENT, result.value)
     emit(CHANGE_EVENT, result.value)
     refreshLiveWindow('input')
@@ -1956,15 +1367,10 @@ const dispatchEditorOperation = (
   if (result.accepted) {
     refreshWritingAidsDocument()
     if (currentMode.value === 'live') refreshLiveReveal()
-    if (result.value !== previousValue) applyTypewriterScroll()
+    if (outcome.valueChanged) applyTypewriterScroll()
     syncLanguageToolsState()
   }
-  if (
-    result.accepted &&
-    (result.selection.start !== previousSelection.start ||
-      result.selection.end !== previousSelection.end ||
-      result.selection.direction !== previousSelection.direction)
-  ) {
+  if (outcome.selectionChanged) {
     emit(
       'selection-change',
       Object.freeze({
@@ -1973,10 +1379,10 @@ const dispatchEditorOperation = (
       }),
     )
   }
-  if (result.accepted && !historiesEqual(previousHistory, result.history)) {
+  if (outcome.historyChanged) {
     emit('history-change', result.history)
   }
-  if (result.accepted && operation.restoreSelection !== false) {
+  if (outcome.restoreSelection) {
     void restoreTextareaSelection(result.selection)
   }
   return result
@@ -1991,20 +1397,36 @@ const dispatchTransaction = (transaction: MarkdownEditorTransaction) => {
   return result
 }
 
+const dispatchReplacement = (
+  nextValue: string,
+  selection: MarkdownEditorSelection,
+  options: Omit<MarkdownEditorTransaction, 'changes' | 'selection'>,
+  mergeDirection: MarkdownEditorInputMergeDirection = 'none',
+) => {
+  const change = deriveMarkdownEditorChange(kernel.value, nextValue)
+  return dispatchEditorOperation({
+    kind: 'transaction',
+    mergeDirection,
+    transaction: {
+      ...options,
+      changes: change ? [change] : [],
+      selection,
+    },
+  })
+}
+
 const setMode = (mode: MarkdownEditorMode) => {
   if (editingBlocked.value || isComposing.value) return
-
-  const preview = previewElement()
-  if (preview) retainedPreviewScrollLeft.value = preview.scrollLeft
-  transactionStore.breakMergeGroup()
+  capturePreviewScrollLeft()
+  kernel.store.breakMergeGroup()
   const nextMode = normalizeModeForLayout(mode)
   const retained = retainMarkdownLiveSelection({
     documentIdentity,
     mode: nextMode,
     selection: captureSelection(false),
-    source: transactionStore.value,
+    source: kernel.value,
   })
-  transactionStore.setSelection(retained.selection, false)
+  kernel.store.setSelection(retained.selection, false)
   currentMode.value = nextMode
   refreshWritingAidsDocument()
   emit('mode-change', nextMode)
@@ -2046,9 +1468,9 @@ const {
   documentIdentity,
   editingBlocked,
   editorValue,
-  getRevision: () => transactionStore.revision,
-  getSelection: () => transactionStore.selection,
-  getSource: () => transactionStore.value,
+  getRevision: () => kernel.revision,
+  getSelection: () => kernel.selection,
+  getSource: () => kernel.value,
   isComposing,
   localeText,
   restoreTextareaSelection,
@@ -2115,21 +1537,13 @@ const {
   dispatchTransaction,
   documentIdentity,
   editingBlocked,
-  getRevision: () => transactionStore.revision,
-  getSelection: () => transactionStore.selection,
-  getSource: () => transactionStore.value,
+  getRevision: () => kernel.revision,
+  getSelection: () => kernel.selection,
+  getSource: () => kernel.value,
   isComposing,
   localeText,
   recordPasteIdentity: (identity) => {
-    pendingClipboardIdentity = identity
-    pendingInputOrigin = 'paste'
-    nativeMachine.apply({
-      clipboardIdentity: identity,
-      documentIdentity,
-      kind: 'paste',
-      origin: 'paste',
-      revision: transactionStore.revision,
-    })
+    pasteIdentityBridge.record?.(identity)
   },
   restoreTextareaSelection,
   setSelection: setStoreSelection,
@@ -2156,8 +1570,8 @@ const {
     editorOverlaysRef.value?.focusPastePrimaryAction(),
   getDialogElement: () =>
     editorOverlaysRef.value?.getPasteDialogElement() ?? null,
-  getRevision: () => transactionStore.revision,
-  getSource: () => transactionStore.value,
+  getRevision: () => kernel.revision,
+  getSource: () => kernel.value,
   isComposing,
   loading: () => props.loading,
   localeText,
@@ -2180,8 +1594,8 @@ const {
   editorRevision,
   editorValue,
   embedProvider: () => props.embedProvider,
-  getRevision: () => transactionStore.revision,
-  getSource: () => transactionStore.value,
+  getRevision: () => kernel.revision,
+  getSource: () => kernel.value,
   localeText,
   onOpenSource: (target, mode) => emit('embed-open-source', target, mode),
   onRetry: (target, mode) => emit('embed-retry', target, mode),
@@ -2205,11 +1619,11 @@ const applyLiveSelectionMotion = (
     mode: currentMode.value,
     motion,
     pointerOffset: extras.pointerOffset,
-    revision: transactionStore.revision,
+    revision: kernel.revision,
     selection: captureSelection(false),
     session: atomicSession.value,
     shift: extras.shift,
-    source: transactionStore.value,
+    source: kernel.value,
   })
   liveAtomic.value = plan.atomic
   atomicSession.value = plan.atomic?.session ?? null
@@ -2227,10 +1641,10 @@ const applyAtomicIntent = (
     composing: isComposing.value,
     documentIdentity,
     mode: currentMode.value,
-    revision: transactionStore.revision,
+    revision: kernel.revision,
     selection: captureSelection(),
     session: atomicSession.value,
-    source: transactionStore.value,
+    source: kernel.value,
   })
   liveAtomic.value = plan.state === 'unsupported' ? null : plan
   atomicSession.value = plan.session
@@ -2249,9 +1663,9 @@ const invokeAtomicNodeAction = (
     documentIdentity,
     mode: currentMode.value,
     nodeId,
-    revision: transactionStore.revision,
+    revision: kernel.revision,
     selection: captureSelection(),
-    source: transactionStore.value,
+    source: kernel.value,
   })
   liveAtomic.value = plan.state === 'unsupported' ? null : plan
   atomicSession.value = plan.session
@@ -2270,7 +1684,7 @@ const captureAttachmentFiles = (
   const captured = captureMarkdownAttachmentInput({
     sourceKind,
     documentIdentity,
-    revision: transactionStore.revision,
+    revision: kernel.revision,
     anchor: { range: selection, nodeId },
     files: files.map((file) => ({
       name: file.name,
@@ -2282,7 +1696,7 @@ const captureAttachmentFiles = (
       disabled: inputDisabled.value,
       mode: currentMode.value,
       isComposing: isComposing.value,
-      currentRevision: transactionStore.revision,
+      currentRevision: kernel.revision,
     },
     eventFingerprint,
     session: attachmentCaptureSession,
@@ -2290,7 +1704,7 @@ const captureAttachmentFiles = (
   if (!captured.ok) return captured
 
   const planned = planMarkdownAttachmentInsert(
-    transactionStore.value,
+    kernel.value,
     captured.batch.anchor,
     captured.batch,
     localeText.value.attachments.uploading,
@@ -2304,66 +1718,6 @@ const captureAttachmentFiles = (
   attachmentJobs.value = [...attachmentJobs.value, ...planned.jobs]
   emit('upload-image', captured.batch)
   return captured
-}
-
-const resolveDropSelection = (
-  event: DragEvent,
-): MarkdownEditorSelection | null => {
-  const textarea = textareaRef.value
-  if (!textarea || typeof document === 'undefined') return null
-  const caretDocument = document as Document & {
-    caretPositionFromPoint?: (
-      x: number,
-      y: number,
-    ) => { readonly offset: number; readonly offsetNode: Node } | null
-    caretRangeFromPoint?: (x: number, y: number) => Range | null
-  }
-  const position = caretDocument.caretPositionFromPoint?.(
-    event.clientX,
-    event.clientY,
-  )
-  const range = position
-    ? null
-    : caretDocument.caretRangeFromPoint?.(event.clientX, event.clientY)
-  const offset =
-    position?.offsetNode === textarea
-      ? position.offset
-      : range?.startContainer === textarea
-        ? range.startOffset
-        : null
-  if (offset === null) return null
-
-  const bounded = Math.max(0, Math.min(transactionStore.value.length, offset))
-  const anchorMap = createMarkdownAnchorMap({
-    identity: documentIdentity,
-    source: transactionStore.value,
-  })
-  const mapped = anchorMap.visualAnchorToSourceSelection(
-    anchorMap.sourceRangeToVisual({ start: bounded, end: bounded }),
-  )
-  return Object.freeze({
-    direction: 'none' as const,
-    start: mapped.anchor,
-    end: mapped.focus,
-  })
-}
-
-const dispatchReplacement = (
-  nextValue: string,
-  selection: MarkdownEditorSelection,
-  options: Omit<MarkdownEditorTransaction, 'changes' | 'selection'>,
-  mergeDirection: MarkdownEditorInputMergeDirection = 'none',
-) => {
-  const change = deriveMarkdownEditorChange(transactionStore.value, nextValue)
-  return dispatchEditorOperation({
-    kind: 'transaction',
-    mergeDirection,
-    transaction: {
-      ...options,
-      changes: change ? [change] : [],
-      selection,
-    },
-  })
 }
 
 const metricsSession = createMarkdownEditorMetricsSession(props.metrics)
@@ -2405,7 +1759,6 @@ watch(
 const liveCapabilities = computed(() => [
   liveSurface.value.capability.capability,
 ])
-
 const statusResolution = computed(() =>
   resolveMarkdownEditorStatus(
     editorValue.value,
@@ -2422,317 +1775,77 @@ const statusResolution = computed(() =>
     editorMetrics.value,
   ),
 )
-
 const characterCount = computed(() => editorMetrics.value.graphemeCount)
 const wordCount = computed(() => editorMetrics.value.wordCount)
 const effectivePlaceholder = computed(
   () => props.writingPlaceholder || props.placeholder,
 )
-const editorStyle = computed<Record<string, string> | undefined>(() =>
-  visualViewportHeight.value > 0
-    ? {
-        '--el-markdown-editor-visual-viewport-height': `${visualViewportHeight.value}px`,
-      }
-    : undefined,
-)
 
-const commandContext = computed(() => ({
-  dispatch: {
-    dispatch: (transaction: MarkdownEditorTransaction) =>
-      dispatchEditorOperation({ kind: 'transaction', transaction }),
-  },
+const {
+  activateCommand,
+  activateOverflowCommand,
+  closeCommandOverflow,
+  closeSelectionToolbar,
+  commandDescriptionId,
+  commandGroupName,
+  commandName,
+  commandOverflowAriaLabel,
+  commandSnapshot,
+  commandStateId,
+  commandStateText,
+  configuredPrimaryCommands,
+  disposeToolbarOverflow,
+  gatedPasteAsMarkdownCommand,
+  isCommandDisabled,
+  mountToolbarOverflow,
+  overflowActions,
+  overflowCommands,
+  overflowItemCount,
+  primaryActions,
+  primaryCommands,
+  resolvedCommandOverflowLabel,
+  runCommand,
+  selectionToolbarAnchorId,
+  selectionToolbarCommands,
+  selectionToolbarPlacement,
+  selectionToolbarVisible,
+  toggleCommands,
+  worstCaseOverflowCount,
+} = useEditorToolbarCommands({
+  captureSelection,
+  commandGroupRef,
+  commandMeasureRef,
+  commandOverflowRef,
+  commandRuntimeVersion,
+  commandsExpanded,
+  commandsRef,
+  commandTrayId,
+  commandTrayRef,
+  currentMode,
+  dispatchTransaction,
   documentIdentity,
-  mode: currentMode.value,
-  ...(editorProjection.value
-    ? {
-        positionMap: createMarkdownEditorPositionMap([], {
-          documentIdentity,
-          projection: editorProjection.value,
-          source: editorValue.value,
-        }),
-        projection: editorProjection.value,
-      }
-    : {}),
-  readonly: editingBlocked.value,
-  revision: editorRevision.value,
-  selection: editorSelection.value,
-  signal: commandContextSignal,
-  syntax: editorProjection.value
-    ? resolveMarkdownEditorSyntaxContext(
-        editorProjection.value,
-        editorSelection.value,
-      )
-    : undefined,
-  value: transactionStore.value,
-}))
-
-const commandSnapshot = computed(() =>
-  createMarkdownEditorCommandSnapshot(
-    props.commands,
-    commandContext.value,
-    commandRuntimeStates.value,
-  ),
-)
-const toolbarCommands = computed(() =>
-  selectMarkdownEditorCommandSnapshot(commandSnapshot.value, 'toolbar').map(
-    (item) => item.command,
-  ),
-)
-const selectionToolbarCommands = computed(() =>
-  selectMarkdownEditorCommandSnapshot(commandSnapshot.value, 'selection').map(
-    (item) => item.command,
-  ),
-)
-const selectionToolbarPlacement = computed(() =>
-  resolveMarkdownSelectionToolbarPlacement(
-    editorSelection.value,
-    editorRevision.value,
-    editorRevision.value,
-    {
-      anchorMap: editorAnchorMap.value,
-      documentEpoch: documentIdentity.epoch,
-      expectedEpoch: documentIdentity.epoch,
-    },
-  ),
-)
-const dismissedSelectionRevision = ref<number | null>(null)
-const selectionToolbarVisible = computed(
-  () =>
-    selectionToolbarPlacement.value.visible &&
-    dismissedSelectionRevision.value !== editorRevision.value,
-)
-const selectionToolbarAnchorId = computed(
-  () => selectionToolbarPlacement.value.visual?.anchor.anchorId ?? '',
-)
-const closeSelectionToolbar = () => {
-  dismissedSelectionRevision.value = editorRevision.value
-  textareaRef.value?.focus()
-}
-
-const gatedPasteAsMarkdownCommand = computed(() =>
-  pasteAsMarkdownGate.value &&
-  !resolveMarkdownEditorPrimaryCommands(
-    toolbarCommands.value,
-    effectiveToolbarDensity.value,
-    props.primaryCommandKeys,
-  ).some((command) => command.key === 'paste-as-markdown')
-    ? toolbarCommands.value.find(
-        (command) => command.key === 'paste-as-markdown',
-      )
-    : undefined,
-)
-const commandCopy = (command: MarkdownEditorCommand) =>
-  resolveMarkdownEditorCommandCopy(command, localeText.value)
-const commandName = (command: MarkdownEditorCommand) =>
-  commandCopy(command).name
-const commandGroupName = (group: string) =>
-  localeText.value.commandGroups[group] ?? group
-
-const isPasteAsMarkdownCommand = (command: MarkdownEditorCommand) =>
-  command.key === 'paste-as-markdown'
-const commandSnapshotItem = (command: MarkdownEditorCommand) =>
-  commandSnapshot.value.find((item) => item.key === command.key)
-const isCommandDisabled = (command: MarkdownEditorCommand) => {
-  const item = commandSnapshotItem(command)
-  return (
-    editingBlocked.value ||
-    item?.enabled === false ||
-    (isPasteAsMarkdownCommand(command) &&
-      (Boolean(pasteAsMarkdownGate.value) || pasteAsMarkdownBusy.value))
-  )
-}
-const commandStateId = (key: string) =>
-  `${commandTrayId}-command-state-${key.replace(/[^a-zA-Z0-9_-]/gu, '-')}`
-const commandStateText = (item: MarkdownEditorCommandSnapshotItem) => {
-  if (item.disabledReason && item.state === 'idle') return item.disabledReason
-  if (item.state === 'idle') return ''
-  return localeText.value.results[item.state]
-}
-const commandDescriptionId = (command: MarkdownEditorCommand) => {
-  if (isPasteAsMarkdownCommand(command) && pasteAsMarkdownGate.value) {
-    return pasteAsMarkdownDescriptionId
-  }
-  const item = commandSnapshotItem(command)
-  return item && commandStateText(item)
-    ? commandStateId(command.key)
-    : undefined
-}
-
-const rebaseCommandTransaction = (
-  transaction: MarkdownEditorTransaction,
-  positionMap: MarkdownEditorPositionMap | undefined,
-) => {
-  if (!positionMap) return transaction
-  const changes = transaction.changes.map((change) => {
-    const rebased = positionMap.rebase({
-      start: change.from,
-      end: change.to,
-    })
-    if (rebased.status !== 'mapped') return undefined
-    return Object.freeze({
-      from: rebased.start,
-      to: rebased.end,
-      insert: change.insert,
-    })
-  })
-  if (changes.some((change) => change === undefined)) return undefined
-  const selection = transaction.selection
-    ? positionMap.rebase({
-        start: transaction.selection.start,
-        end: transaction.selection.end,
-      })
-    : undefined
-  if (selection?.status === 'deleted') return undefined
-  return Object.freeze({
-    ...transaction,
-    changes: changes as MarkdownEditorTransaction['changes'],
-    ...(selection
-      ? {
-          selection: {
-            direction: transaction.selection?.direction,
-            start: selection.start,
-            end: selection.end,
-          },
-        }
-      : {}),
-  })
-}
-
-const runCommand = async (
-  command: MarkdownEditorCommand,
-  slashRange?: Readonly<{ start: number; end: number }>,
-) => {
-  if (editingBlocked.value || nativeMachine.freezeSmartInput) return
-  const activeSession = commandSessions.get(command.key)
-  if (activeSession?.state === 'pending' && !command.concurrent) return
-
-  const selection = captureSelection()
-  const projection = editorProjection.value
-  const initialContext = {
-    ...commandContext.value,
-    selection,
-    syntax: projection
-      ? resolveMarkdownEditorSyntaxContext(projection, selection)
-      : undefined,
-  }
-  const session = createMarkdownEditorCommandSession(
-    command.key,
-    initialContext,
-    {
-      activeSessions: commandSessions,
-      anchor: {
-        ...(slashRange ?? selection),
-        nodeId: initialContext.syntax?.nodeId,
-      },
-      concurrent: command.concurrent,
-    },
-  )
-  commandSessions.set(command.key, session)
-  commandRuntimeStates.value.set(command.key, { state: 'pending' })
-  triggerRef(commandRuntimeStates)
-  try {
-    const context = {
-      ...initialContext,
-      signal: session.abort.signal,
-    }
-    if (
-      !isMarkdownEditorCommandVisible(command, context) ||
-      !isMarkdownEditorCommandEnabled(command, context)
-    )
-      return
-    const result = await runMarkdownEditorCommand(command, context)
-    if (commandSessions.get(command.key) !== session) return
-    const currentContext = commandContext.value
-    const positionMap = positionMapFromRevision(
-      session.revision,
-      currentContext.revision,
-    )
-    const rebasedState = rebaseMarkdownEditorCommandSession(
-      session,
-      currentContext,
-      positionMap,
-    )
-    if (rebasedState !== 'pending') {
-      commandRuntimeStates.value.set(command.key, { state: rebasedState })
-      triggerRef(commandRuntimeStates)
-      return
-    }
-    const resolvedState = resolveMarkdownEditorCommandSession(
-      session,
-      currentContext,
-      'resolved-current',
-    )
-    commandRuntimeStates.value.set(command.key, { state: resolvedState })
-    triggerRef(commandRuntimeStates)
-    if (resolvedState !== 'resolved-current') return
-    if (result?.surface) {
-      await openContextualSurface(result.surface)
-      return
-    }
-    if (!result?.transaction) {
-      if (result?.focus !== 'surface' && result?.focus !== 'none') {
-        await restoreTextareaSelection(selection)
-      }
-      return
-    }
-    const rebasedTransaction = rebaseCommandTransaction(
-      result.transaction,
-      positionMap,
-    )
-    if (!rebasedTransaction) {
-      session.state = 'stale'
-      commandRuntimeStates.value.set(command.key, { state: 'stale' })
-      triggerRef(commandRuntimeStates)
-      return
-    }
-    const transaction =
-      slashRange && session.anchor
-        ? planMarkdownSlashCommit(session.anchor, rebasedTransaction)
-        : rebasedTransaction
-    const dispatchResult = dispatchTransaction({
-      ...transaction,
-      expectedRevision: currentContext.revision,
-      history: transaction.history ?? 'separate',
-      metadata: Object.freeze({ command: command.key }),
-      origin: 'command',
-    })
-    if (dispatchResult.accepted) emit('command', command)
-    if (
-      !dispatchResult.accepted &&
-      result.focus !== 'surface' &&
-      result.focus !== 'none'
-    ) {
-      await restoreTextareaSelection(selection)
-    }
-  } catch (error) {
-    const state = resolveMarkdownEditorCommandSession(
-      session,
-      commandContext.value,
-      'rejected',
-      error,
-    )
-    commandRuntimeStates.value.set(command.key, { error, state })
-    triggerRef(commandRuntimeStates)
-    await restoreTextareaSelection(selection)
-  } finally {
-    if (commandSessions.get(command.key) === session) {
-      commandSessions.delete(command.key)
-    }
-  }
-}
-
-const activateCommand = (command: MarkdownEditorCommand) => {
-  if (isPasteAsMarkdownCommand(command)) {
-    void openPasteAsMarkdownSurface()
-    return
-  }
-  void runCommand(command)
-}
-
-const activateOverflowCommand = (command: MarkdownEditorCommand) => {
-  activateCommand(command)
-  commandsExpanded.value = false
-}
+  editingBlocked,
+  editorAnchorMap,
+  editorProjection,
+  editorRevision,
+  editorSelection,
+  editorValue,
+  effectiveToolbarDensity,
+  frameScheduler,
+  isComposing,
+  isFreezeSmartInput: () => nativeMachine.freezeSmartInput,
+  kernel,
+  localeText,
+  onCommandExecuted: (command) => emit('command', command),
+  openContextualSurface,
+  openPasteAsMarkdownSurface,
+  pasteAsMarkdownBusy,
+  pasteAsMarkdownDescriptionId,
+  pasteAsMarkdownGate,
+  props,
+  restoreTextareaSelection,
+  textareaRef,
+})
 
 const {
   activePaletteCommand,
@@ -2783,92 +1896,290 @@ const {
   surfaceOptions,
 })
 
-const configuredPrimaryCommands = computed(() =>
-  resolveMarkdownEditorPrimaryCommands(
-    toolbarCommands.value,
-    effectiveToolbarDensity.value,
-    props.primaryCommandKeys,
-  ),
-)
-const configuredOverflowCommands = computed(() =>
-  resolveMarkdownEditorOverflowCommands(
-    toolbarCommands.value,
-    effectiveToolbarDensity.value,
-    props.primaryCommandKeys,
-  ),
-)
-const responsivePrimaryLimit = ref<number | null>(null)
-const primaryCommands = computed(() => {
-  const configured = configuredPrimaryCommands.value
-  const limit = responsivePrimaryLimit.value
-  if (limit === null || limit >= configured.length) return configured
-  return configured.slice(0, Math.max(0, limit))
+const {
+  clearRenderedSearchHighlights,
+  closeSearch,
+  handleSearchInputKeydown,
+  handleSearchQueryInput,
+  handleSearchReplaceKeydown,
+  openSearch,
+  searchHighlightStyle,
+  searchMatches,
+  searchMode,
+  searchNavigate,
+  searchQuery,
+  searchReplaceAll,
+  searchReplaceCurrent,
+  searchReplaceText,
+  searchUiState,
+  syncRenderedSearchHighlights,
+  toggleSearchMode,
+  toggleSearchReplace,
+  visibleSearchHighlights,
+} = useEditorSearchController({
+  currentMode,
+  dispatchTransaction,
+  documentIdentity,
+  editorRevision,
+  editorValue,
+  focusSearchInput: (replace) => searchBarRef.value?.focusInput(replace),
+  getRevision: () => kernel.revision,
+  getSource: () => kernel.value,
+  inputVisible,
+  localeText,
+  previewRendererRef,
+  restoreTextareaSelection,
+  rootElementRef,
+  textareaRef,
 })
-const overflowCommands = computed(() => {
-  const configuredPrimary = configuredPrimaryCommands.value
-  const configuredOverflow = configuredOverflowCommands.value
-  const limit = responsivePrimaryLimit.value
-  if (limit === null || limit >= configuredPrimary.length) {
-    return configuredOverflow
-  }
-  return [
-    ...configuredPrimary.slice(Math.max(0, limit)),
-    ...configuredOverflow,
-  ]
-})
-const visibleActions = computed<MarkdownEditorActionItem[]>(() => {
-  if (!props.showActions) return []
 
-  const actions: MarkdownEditorActionItem[] = []
-  if (props.showImageAction) {
-    actions.push({
-      key: 'image',
-      label: props.imageActionLabel ?? localeText.value.actions.image,
-    })
+const modeLabel = (mode: MarkdownEditorMode) => localeText.value.modes[mode]
+const emitSave = () => {
+  if (editingBlocked.value || isComposing.value) return
+  emit('save', editorValue.value)
+}
+const emitSubmit = () => {
+  if (editingBlocked.value || isComposing.value) return
+  emit('submit', editorValue.value)
+}
+const emitUploadImage = () => {
+  if (editingBlocked.value || isComposing.value) return
+  attachmentInputRef.value?.click()
+}
+const runAction = (action: MarkdownEditorActionItem) => {
+  if (action.key === 'image') {
+    emitUploadImage()
+    return
   }
-  if (props.showSaveAction) {
-    actions.push({
-      key: 'save',
-      label: props.saveActionLabel ?? localeText.value.actions.save,
-    })
+  if (action.key === 'save') {
+    emitSave()
+    return
   }
-  if (props.showSubmitAction) {
-    actions.push({
-      key: 'submit',
-      label: props.submitActionLabel ?? localeText.value.actions.submit,
-    })
-  }
-  return actions
+  emitSubmit()
+}
+const runOverflowAction = (action: MarkdownEditorActionItem) => {
+  runAction(action)
+  commandsExpanded.value = false
+}
+
+function undo() {
+  const result = dispatchEditorOperation({ kind: 'undo' })
+  selectionTick.value += 1
+  return result
+}
+
+function redo() {
+  const result = dispatchEditorOperation({ kind: 'redo' })
+  selectionTick.value += 1
+  return result
+}
+
+const insertMarkdownAtCursor = (
+  markdown: string,
+  options: MarkdownEditorInsertOptions = {},
+) => {
+  const selection = options.selection ?? captureSelection()
+  return dispatchEditorOperation({
+    kind: 'transaction',
+    transaction: kernel.createInsertTransaction(markdown, selection, options),
+  }).accepted
+}
+
+const {
+  handleBeforeInput,
+  handleBlur,
+  handleCompositionEnd,
+  handleCompositionStart,
+  handleCopy,
+  handleCut,
+  handleDrop,
+  handleInput,
+  handleKeydown,
+  handlePaste,
+  handlePointerReveal,
+  handleSelectionDragEnd,
+  handleSelectionDragStart,
+  handleSelectionKeyup,
+  handleSelectionMove,
+  recordPasteIdentity,
+  resetPendingInputState,
+} = useEditorInputPipeline({
+  activeSlashIndex,
+  activeSlashTrigger,
+  applyAtomicIntent,
+  applyLiveSelectionMotion,
+  atomicSession,
+  captureAttachmentFiles,
+  captureSelection,
+  clearTypewriterScrollTarget,
+  closeSearch,
+  closeSlashMenu,
+  commands: computed(() => props.commands),
+  currentMode,
+  disabled: computed(() => props.disabled),
+  dispatchReplacement,
+  dispatchTransaction,
+  documentIdentity,
+  editingBlocked,
+  editorValue,
+  emitSave,
+  emitSubmit,
+  executeSlashCommand,
+  getLanguageToolsController: () => languageToolsController,
+  isComposing,
+  isRestoringSelection: () => restoringSelection,
+  isSearchOpen: () => searchUiState.value.open,
+  kernel,
+  liveRevealState: () => liveReveal.value.state,
+  markLayoutGesture,
+  moveSlashIndex,
+  nativeCompositionValue,
+  nativeMachine,
+  openSearch,
+  readSelectionFrom,
+  redo,
+  refreshCurrentTableCell,
+  refreshLiveReveal,
+  refreshWritingAidsDocument,
+  restoreTextareaSelection,
+  runCommand,
+  slashCommands,
+  suspendTypewriterForUserScroll,
+  syncLanguageToolsState,
+  syncNativeComposing,
+  textareaRef,
+  tryHandleTableClipboardPaste,
+  tryHandleTableKeydown,
+  undo,
+  writingAidsController,
+  writingAidsState,
 })
-const actionOverflowKeySet = computed(
-  () => new Set<MarkdownEditorActionKey>(props.actionOverflowKeys),
-)
-const primaryActions = computed(() =>
-  visibleActions.value.filter(
-    (action) => !actionOverflowKeySet.value.has(action.key),
-  ),
-)
-const overflowActions = computed(() =>
-  visibleActions.value.filter((action) =>
-    actionOverflowKeySet.value.has(action.key),
-  ),
-)
-const overflowItemCount = computed(
-  () => overflowCommands.value.length + overflowActions.value.length,
-)
-const worstCaseOverflowCount = computed(() =>
-  Math.max(
-    1,
-    configuredPrimaryCommands.value.length +
-      configuredOverflowCommands.value.length +
-      overflowActions.value.length,
-  ),
-)
+pasteIdentityBridge.record = recordPasteIdentity
+
+const { revealHeading, revealSourceRange } = useEditorOutlineReveal({
+  applyTypewriterScroll,
+  currentMode,
+  documentIdentity,
+  editorProjection,
+  getRevision: () => kernel.revision,
+  getSource: () => kernel.value,
+  reducedMotionRequested,
+  refreshLiveWindow,
+  refreshWritingAidsDocument,
+  resolvedWritingAids,
+  restoreTextareaSelection,
+  setStoreSelection,
+  syncMirrorLayerScroll,
+  textareaRef,
+})
+
+const handleAttachmentPickerChange = (event: Event) => {
+  const input = event.currentTarget
+  if (!(input instanceof HTMLInputElement)) return
+  const files = Array.from(input.files ?? [])
+  if (files.length > 0) {
+    const replacement = attachmentReplaceRange.value
+    captureAttachmentFiles(
+      'pick',
+      files,
+      replacement
+        ? {
+            direction: 'none',
+            end: replacement.end,
+            start: replacement.start,
+          }
+        : captureSelection(),
+      `pick:${event.timeStamp}:${files.map((file) => `${file.name}:${file.size}:${file.lastModified}`).join('|')}`,
+      replacement?.nodeId ?? null,
+    )
+  }
+  attachmentReplaceRange.value = null
+  input.value = ''
+}
+
+const applyAttachmentResult = (result: MarkdownAttachmentProviderResult) => {
+  const job = attachmentJobs.value.find(
+    (candidate) => candidate.itemId === result.itemId,
+  )
+  if (!job) return false
+  if (result.status === 'progress') {
+    const ratio = result.ratio ?? 0
+    progressMarkdownAttachmentJob(job, ratio <= 1 ? ratio * 100 : ratio)
+    triggerRef(attachmentJobs)
+    return true
+  }
+  const planned = planMarkdownAttachmentResolve(kernel.value, job, result)
+  triggerRef(attachmentJobs)
+  if (!planned.transaction) return planned.accepted
+  return dispatchTransaction({
+    ...planned.transaction,
+    metadata: Object.freeze({ attachmentItemId: job.itemId }),
+  }).accepted
+}
+
+const runAttachmentAction = (
+  itemId: string,
+  action: 'cancel' | 'retry' | 'remove',
+) => {
+  const job = attachmentJobs.value.find(
+    (candidate) => candidate.itemId === itemId,
+  )
+  if (!job) return
+  if (action === 'cancel') {
+    cancelMarkdownAttachmentJob(job)
+  } else if (action === 'retry') {
+    retryMarkdownAttachmentJob(job)
+    const batch = job.batchId ? attachmentBatches.get(job.batchId) : undefined
+    const item = attachmentItems.get(itemId)
+    if (batch && item) {
+      emit(
+        'upload-image',
+        Object.freeze({ ...batch, items: Object.freeze([item]) }),
+      )
+    }
+  } else {
+    const planned = planMarkdownAttachmentRemove(kernel.value, job)
+    dispatchTransaction({
+      ...planned.transaction,
+      metadata: Object.freeze({ attachmentItemId: job.itemId }),
+    })
+  }
+  triggerRef(attachmentJobs)
+  applyLiveLayout('block-height-change')
+}
+
+const emitRenderEvent = (
+  event: 'features-activated' | 'render-complete' | 'render-error',
+  payload: unknown,
+) => {
+  if (event === 'features-activated') {
+    emit('features-activated', payload)
+    applyTypewriterScroll('async-layout')
+    return
+  }
+  if (event === 'render-complete') {
+    emit('render-complete', payload)
+    applyTypewriterScroll('async-layout')
+    return
+  }
+  emit('render-error', payload)
+}
+
+const handlePreviewRenderComplete = (payload: unknown) => {
+  emitRenderEvent('render-complete', payload)
+  restorePreviewScroll()
+  void nextTick(syncRenderedSearchHighlights)
+}
+
+const handleRendererComplete = (payload: unknown) => {
+  emitRenderEvent('render-complete', payload)
+  void nextTick(syncRenderedSearchHighlights)
+}
 
 watch(
   [() => props.mode, () => props.defaultMode, () => props.mobileLayout],
   ([mode, defaultMode]) => {
-    transactionStore.breakMergeGroup()
+    kernel.store.breakMergeGroup()
     currentMode.value = normalizeModeForLayout(mode ?? defaultMode)
     refreshWritingAidsDocument()
     refreshLiveReveal()
@@ -2892,21 +2203,18 @@ watch(
 watch(
   () => props.modelValue,
   (value) => {
-    if (value === transactionStore.value) return
-
-    abortPendingCommands()
+    if (value === kernel.value) return
+    kernel.abortPendingCommands()
     frameScheduler.cancelAll()
     frameScheduler.schedulePostPaint('frame-metrics-settle', () => undefined)
     nativeMachine.apply({
       documentIdentity,
       kind: 'external-reset',
-      revision: transactionStore.revision,
+      revision: kernel.revision,
       value,
     })
     syncNativeComposing()
-    beforeInputSnapshot = undefined
-    pendingClipboardIdentity = undefined
-    pendingInputOrigin = undefined
+    resetPendingInputState()
     const result = dispatchEditorOperation({
       allowBlocked: true,
       emitValue: false,
@@ -2914,27 +2222,19 @@ watch(
       kind: 'transaction',
       restoreSelection: false,
       transaction: {
-        changes: [
-          {
-            from: 0,
-            insert: value,
-            to: transactionStore.value.length,
-          },
-        ],
-        history: 'skip',
+        changes: [{ from: 0, insert: value, to: kernel.value.length }],
         externalUpdate: 'reset',
+        history: 'skip',
         metadata: Object.freeze({ kind: 'external-reset' }),
         origin: 'external',
         selection: {
-          direction: transactionStore.selection.direction,
+          direction: kernel.selection.direction,
           end: value.length,
           start: value.length,
         },
       },
     })
-    if (result.accepted) {
-      resetTableState()
-    }
+    if (result.accepted) resetTableState()
   },
 )
 
@@ -2980,17 +2280,15 @@ watch([editingBlocked, overflowItemCount], ([blocked, itemCount]) => {
   }
   if (!blocked) return
 
-  transactionStore.breakMergeGroup()
+  kernel.store.breakMergeGroup()
   if (isComposing.value) {
     nativeMachine.apply({
       documentIdentity,
       kind: 'external-reset',
-      revision: transactionStore.revision,
+      revision: kernel.revision,
     })
     syncNativeComposing()
-    beforeInputSnapshot = undefined
-    pendingClipboardIdentity = undefined
-    pendingInputOrigin = undefined
+    resetPendingInputState()
     triggerRef(editorValue)
   }
 })
@@ -3002,525 +2300,39 @@ watch(
     const nextEpoch = epoch ?? 0
     if (nextId === previousId && nextEpoch === previousEpoch) return
 
-    const previousHistory = transactionStore.history
-    abortPendingCommands()
     resetPaletteAndSlash()
     resetContextualSurface()
     resetPasteSurface()
     resetTableState()
     commandsExpanded.value = false
-    beforeInputSnapshot = undefined
-    pendingClipboardIdentity = undefined
-    pendingInputOrigin = undefined
+    resetPendingInputState()
     atomicSession.value = null
     liveAtomic.value = null
 
     documentIdentity.id = nextId
     documentIdentity.epoch = nextEpoch
-    commandRevisionMaps.clear()
     nativeMachine.apply({
       documentIdentity,
       kind: 'external-reset',
-      revision: transactionStore.revision,
+      revision: kernel.revision,
       value: props.modelValue,
     })
     syncNativeComposing()
 
-    transactionStore.switchDocument(documentIdentity, props.modelValue)
-    const result = {
-      history: transactionStore.history,
-      revision: transactionStore.revision,
-      selection: transactionStore.selection,
-      value: transactionStore.value,
-    }
+    const switched = kernel.switchDocument(documentIdentity, props.modelValue)
     previousEditorProjection = undefined
     previousEditorProjectionSource = ''
-    editorValue.value = result.value
-    editorRevision.value = result.revision
-    editorSelection.value = result.selection
+    editorValue.value = switched.value
+    editorRevision.value = switched.revision
+    editorSelection.value = switched.selection
     refreshLiveWindow('input')
     refreshLiveReveal()
-    void restoreTextareaSelection(result.selection)
-    if (!historiesEqual(previousHistory, result.history)) {
-      emit('history-change', result.history)
+    void restoreTextareaSelection(switched.selection)
+    if (switched.historyChanged) {
+      emit('history-change', switched.history)
     }
   },
 )
-
-const resolvedCommandOverflowLabel = computed(
-  () => props.commandOverflowLabel ?? localeText.value.overflow,
-)
-const commandOverflowAriaLabel = computed(() =>
-  props.commandOverflowLabel
-    ? `${props.commandOverflowLabel} (${overflowItemCount.value})`
-    : localeText.value.overflowAria(overflowItemCount.value),
-)
-const toolbarMeasureSignature = computed(() =>
-  [
-    effectiveToolbarDensity.value,
-    props.interactionProfile,
-    props.mobileLayout,
-    props.editorProfile,
-    resolvedCommandOverflowLabel.value,
-    overflowActions.value.length,
-    configuredOverflowCommands.value.length,
-    gatedPasteAsMarkdownCommand.value
-      ? commandName(gatedPasteAsMarkdownCommand.value)
-      : '',
-    configuredPrimaryCommands.value
-      .map((command) => `${command.key}:${commandName(command)}`)
-      .join('|'),
-  ].join('\u0000'),
-)
-let toolbarResizeObserver: ResizeObserver | undefined
-let pendingToolbarPrimaryLimit: number | null | undefined
-let lastCommandGroupWidth = -1
-let editorUnmounted = false
-
-const measureToolbarOverflow = () => {
-  const group = commandGroupRef.value
-  const probe = commandMeasureRef.value
-  if (!group || !probe || typeof window === 'undefined') {
-    pendingToolbarPrimaryLimit = null
-    return
-  }
-  const availableWidth = group.clientWidth
-  const commandsElement = commandsRef.value
-  const groupStyle = window.getComputedStyle(group)
-  const groupGap = Number.parseFloat(groupStyle.columnGap || groupStyle.gap) || 0
-  const commandsStyle = commandsElement
-    ? window.getComputedStyle(commandsElement)
-    : groupStyle
-  const commandsGap =
-    Number.parseFloat(commandsStyle.columnGap || commandsStyle.gap) || 0
-
-  const commandWidths = Array.from(
-    probe.querySelectorAll<HTMLElement>('[data-measure-role="command"]'),
-    (node) => node.getBoundingClientRect().width,
-  )
-  const reservedEndNode = probe.querySelector<HTMLElement>(
-    '[data-measure-role="reserved-end"]',
-  )
-  const reservedEndWidth = reservedEndNode
-    ? reservedEndNode.getBoundingClientRect().width
-    : 0
-  const moreNode = probe.querySelector<HTMLElement>(
-    '[data-measure-role="more"]',
-  )
-  const overflowTriggerWidth = moreNode
-    ? moreNode.getBoundingClientRect().width
-    : 0
-
-  pendingToolbarPrimaryLimit = resolveMarkdownEditorFittingCommandCount({
-    availableWidth,
-    commandWidths,
-    commandsGap,
-    groupGap,
-    hasBaseOverflow:
-      configuredOverflowCommands.value.length + overflowActions.value.length > 0,
-    overflowTriggerWidth,
-    reservedEndWidth,
-  })
-}
-
-const mutateToolbarOverflow = () => {
-  if (pendingToolbarPrimaryLimit === undefined) return
-  const nextLimit = pendingToolbarPrimaryLimit
-  pendingToolbarPrimaryLimit = undefined
-  if (responsivePrimaryLimit.value !== nextLimit) {
-    responsivePrimaryLimit.value = nextLimit
-  }
-}
-
-const scheduleToolbarOverflowMeasure = () => {
-  if (editorUnmounted || typeof window === 'undefined') return
-  if (!commandGroupRef.value || !commandMeasureRef.value) return
-  frameScheduler.schedule({
-    guard: () =>
-      !editorUnmounted &&
-      Boolean(commandGroupRef.value && commandMeasureRef.value),
-    key: 'toolbar-overflow',
-    measure: measureToolbarOverflow,
-    mutate: mutateToolbarOverflow,
-  })
-}
-
-const disconnectToolbarResizeObserver = () => {
-  toolbarResizeObserver?.disconnect()
-  toolbarResizeObserver = undefined
-  lastCommandGroupWidth = -1
-}
-
-const attachToolbarResizeObserver = (element: HTMLElement | null) => {
-  disconnectToolbarResizeObserver()
-  if (!element) {
-    responsivePrimaryLimit.value = null
-    return
-  }
-  if (typeof ResizeObserver !== 'undefined') {
-    toolbarResizeObserver = new ResizeObserver((entries) => {
-      const entry = entries[0]
-      const nextWidth = entry ? entry.contentRect.width : element.clientWidth
-      if (
-        lastCommandGroupWidth >= 0 &&
-        Math.abs(nextWidth - lastCommandGroupWidth) <= 0.5
-      ) {
-        return
-      }
-      lastCommandGroupWidth = nextWidth
-      scheduleToolbarOverflowMeasure()
-    })
-    toolbarResizeObserver.observe(element)
-  }
-  scheduleToolbarOverflowMeasure()
-}
-
-watch(commandGroupRef, (element) => {
-  attachToolbarResizeObserver(element)
-})
-
-watch(toolbarMeasureSignature, () => {
-  void nextTick(() => {
-    scheduleToolbarOverflowMeasure()
-  })
-})
-const visibleModes = computed(() =>
-  compactMode.value
-    ? modes.filter((mode) => mode !== 'split' && mode !== 'live')
-    : modes,
-)
-
-let viewportHeightNext: number | null = null
-let viewportTrigger: MarkdownLiveLayoutTrigger | null = null
-const updateVisualViewportHeight = () => {
-  if (typeof window === 'undefined') return
-
-  const previous = visualViewportHeight.value
-  visualViewportHeight.value =
-    window.visualViewport?.height || window.innerHeight || 0
-  visualViewportOffsetTop.value = window.visualViewport?.offsetTop || 0
-  const trigger =
-    previous > 0 && visualViewportHeight.value + 80 < previous
-      ? 'soft-keyboard'
-      : 'visual-viewport'
-  applyLiveLayout(trigger)
-  applyTypewriterScroll('async-layout')
-}
-
-let typewriterResizeObserver: ResizeObserver | undefined
-const refreshTypewriterResizeObserver = () => {
-  typewriterResizeObserver?.disconnect()
-  typewriterResizeObserver = undefined
-  const textarea = textareaRef.value
-  if (
-    props.writingAids?.typewriter !== true ||
-    !textarea ||
-    typeof ResizeObserver === 'undefined'
-  )
-    return
-  textareaLayoutHeight = textarea.clientHeight
-  textareaLayoutWidth = textarea.clientWidth
-  typewriterResizeObserver = new ResizeObserver(() => {
-    textareaLayoutHeight = textarea.clientHeight
-    textareaLayoutWidth = textarea.clientWidth
-    applyTypewriterScroll('async-layout')
-    settleTypewriterLayout()
-  })
-  typewriterResizeObserver.observe(textarea)
-
-  frameScheduler.schedule({
-    key: 'visual-viewport-read',
-    measure: () => {
-      const height = window.visualViewport?.height || window.innerHeight || 0
-      const previous = visualViewportHeight.value
-      viewportHeightNext = height
-      viewportTrigger =
-        previous > 0 && height + 80 < previous
-          ? 'soft-keyboard'
-          : 'visual-viewport'
-    },
-    mutate: () => {
-      if (viewportHeightNext === null) return
-      visualViewportHeight.value = viewportHeightNext
-      const trigger = viewportTrigger ?? 'visual-viewport'
-      viewportHeightNext = null
-      viewportTrigger = null
-      applyLiveLayout(trigger)
-    },
-  })
-}
-
-watch(
-  () => props.writingAids?.typewriter,
-  () => refreshTypewriterResizeObserver(),
-)
-
-const searchUiState = ref<MarkdownSearchUiState>(
-  resolveMarkdownSearchUi(false, '', 0),
-)
-const searchQuery = ref('')
-const searchReplaceText = ref('')
-const searchMatches = ref<readonly MarkdownSearchMatch[]>([])
-const searchCurrentIndex = ref<number | null>(null)
-const searchMode = ref<MarkdownSearchMode>('plain')
-const searchTask = ref<MarkdownSearchTask | null>(null)
-const inputVisible = computed(() => liveSurface.value.inputVisible)
-
-const {
-  clearRenderedSearchHighlights,
-  searchHighlightStyle,
-  syncRenderedSearchHighlights,
-  visibleSearchHighlights,
-} = useEditorSearchHighlights({
-  currentMode,
-  editorValue,
-  inputVisible,
-  previewRendererRef,
-  searchCurrentIndex,
-  searchMatches,
-  searchUiState,
-})
-
-const updateSearchState = () => {
-  searchUiState.value = resolveMarkdownSearchUi(
-    searchUiState.value.open,
-    searchQuery.value,
-    searchMatches.value.length,
-    {
-      currentIndex: searchCurrentIndex.value,
-      mode: searchMode.value,
-      replaceOpen: searchUiState.value.replaceOpen,
-      replaceText: searchReplaceText.value,
-      copy: localeText.value.search,
-    },
-  )
-}
-
-const runSearch = () => {
-  if (!searchQuery.value) {
-    searchMatches.value = []
-    searchCurrentIndex.value = null
-    updateSearchState()
-    return
-  }
-  const session = executeMarkdownSearchSession({
-    documentEpoch: documentIdentity.epoch,
-    documentId: documentIdentity.id,
-    mode: searchMode.value,
-    previousTask: searchTask.value ?? undefined,
-    queryText: searchQuery.value,
-    revision: transactionStore.revision,
-    source: transactionStore.value,
-  })
-  searchTask.value = session.task
-  searchMatches.value = session.execution.matches
-  searchCurrentIndex.value = session.execution.matches.length > 0 ? 0 : null
-  updateSearchState()
-}
-
-const openSearch = (replace = false) => {
-  searchUiState.value = resolveMarkdownSearchUi(
-    true,
-    searchQuery.value,
-    searchMatches.value.length,
-    {
-      currentIndex: searchCurrentIndex.value,
-      mode: searchMode.value,
-      replaceOpen: replace,
-      replaceText: searchReplaceText.value,
-      copy: localeText.value.search,
-    },
-  )
-  if (searchQuery.value) {
-    runSearch()
-  }
-  void nextTick(() => {
-    searchBarRef.value?.focusInput(replace)
-  })
-}
-
-const closeSearch = () => {
-  searchUiState.value = resolveMarkdownSearchUi(
-    false,
-    searchQuery.value,
-    searchMatches.value.length,
-    {
-      currentIndex: searchCurrentIndex.value,
-      mode: searchMode.value,
-      replaceOpen: false,
-      replaceText: searchReplaceText.value,
-      copy: localeText.value.search,
-    },
-  )
-  if (currentMode.value === 'preview') {
-    rootElementRef.value?.focus()
-  } else if (textareaRef.value) {
-    textareaRef.value.focus()
-  }
-}
-
-const toggleSearchMode = (mode: MarkdownSearchMode) => {
-  searchMode.value = searchMode.value === mode ? 'plain' : mode
-  runSearch()
-}
-
-const toggleSearchReplace = () => {
-  searchUiState.value = resolveMarkdownSearchUi(
-    searchUiState.value.open,
-    searchQuery.value,
-    searchMatches.value.length,
-    {
-      currentIndex: searchCurrentIndex.value,
-      mode: searchMode.value,
-      replaceOpen: !searchUiState.value.replaceOpen,
-      replaceText: searchReplaceText.value,
-      copy: localeText.value.search,
-    },
-  )
-}
-
-const searchNavigate = (direction: 'next' | 'previous') => {
-  const result = resolveMarkdownSearchNavigation(
-    searchMatches.value,
-    searchCurrentIndex.value,
-    direction,
-  )
-  if (result.match) {
-    const reveal = revealMarkdownSearchMatch({
-      currentMode: currentMode.value,
-      documentIdentity,
-      match: result.match,
-      revision: transactionStore.revision,
-      source: transactionStore.value,
-    })
-    if (reveal.status === 'stale' || reveal.status === 'deleted') {
-      runSearch()
-      return reveal.status
-    }
-    if (reveal.status !== 'success') return reveal.status
-    searchCurrentIndex.value = result.nextIndex
-    updateSearchState()
-    if (!reveal.suspended && currentMode.value !== 'preview') {
-      void restoreTextareaSelection({
-        direction: 'none',
-        end: result.match.range.end,
-        start: result.match.range.start,
-      })
-    }
-    void nextTick(syncRenderedSearchHighlights)
-    return reveal.status
-  }
-  return 'not-found' as const
-}
-
-const handleSearchQueryInput = () => {
-  runSearch()
-}
-
-const handleSearchInputKeydown = (event: KeyboardEvent) => {
-  const action = dispatchMarkdownSearchKeydown({
-    altKey: event.altKey,
-    ctrlKey: event.ctrlKey,
-    key: event.key,
-    metaKey: event.metaKey,
-    shiftKey: event.shiftKey,
-    targetIsInput: true,
-  })
-  if (action === 'next-match') {
-    event.preventDefault()
-    searchNavigate('next')
-  } else if (action === 'prev-match') {
-    event.preventDefault()
-    searchNavigate('previous')
-  } else if (action === 'close') {
-    event.preventDefault()
-    closeSearch()
-  }
-}
-
-const handleSearchReplaceKeydown = (event: KeyboardEvent) => {
-  const action = dispatchMarkdownSearchKeydown({
-    altKey: event.altKey,
-    ctrlKey: event.ctrlKey,
-    key: event.key,
-    metaKey: event.metaKey,
-    shiftKey: event.shiftKey,
-    targetIsReplaceInput: true,
-  })
-  if (action === 'replace-current') {
-    event.preventDefault()
-    searchReplaceCurrent()
-  } else if (action === 'replace-all') {
-    event.preventDefault()
-    searchReplaceAll()
-  } else if (action === 'close') {
-    event.preventDefault()
-    closeSearch()
-  }
-}
-
-const searchReplaceCurrent = () => {
-  if (searchCurrentIndex.value === null || !searchMatches.value.length) return
-  const plan = planMarkdownReplaceCurrentInSet(
-    {
-      documentEpoch: documentIdentity.epoch,
-      documentId: documentIdentity.id,
-      query: {
-        mode: searchMode.value,
-        queryVersion: 1,
-        text: searchQuery.value,
-      },
-      revision: transactionStore.revision,
-      source: transactionStore.value,
-    },
-    searchMatches.value,
-    searchCurrentIndex.value,
-    searchReplaceText.value,
-  )
-  if ('changes' in plan) {
-    dispatchTransaction({
-      changes: [...plan.changes],
-      expectedRevision: transactionStore.revision,
-      history: 'separate',
-      origin: 'command',
-      selection: plan.selection,
-    })
-    runSearch()
-  }
-}
-
-const searchReplaceAll = () => {
-  if (!searchMatches.value.length) return
-  const plan = planMarkdownReplaceAll(
-    {
-      documentEpoch: documentIdentity.epoch,
-      documentId: documentIdentity.id,
-      query: {
-        mode: searchMode.value,
-        queryVersion: 1,
-        text: searchQuery.value,
-      },
-      revision: transactionStore.revision,
-      source: transactionStore.value,
-    },
-    searchMatches.value,
-    searchReplaceText.value,
-  )
-  if ('changes' in plan) {
-    dispatchTransaction({
-      changes: [...plan.changes],
-      expectedRevision: transactionStore.revision,
-      history: 'separate',
-      origin: 'command',
-      selection: plan.selection,
-    })
-    runSearch()
-  }
-}
-
-watch([editorValue, editorRevision, currentMode], () => {
-  if (searchUiState.value.open && searchQuery.value) runSearch()
-})
 
 onMounted(() => {
   const textarea = textareaRef.value
@@ -3531,1033 +2343,31 @@ onMounted(() => {
       documentIdentity,
       mode: currentMode.value,
       projection: editorProjection.value,
-      projectionRevision: transactionStore.revision,
-      revision: transactionStore.revision,
-      source: transactionStore.value,
+      projectionRevision: kernel.revision,
+      revision: kernel.revision,
+      source: kernel.value,
     })
-    languageToolsRevision = transactionStore.revision
-    languageToolsSource = transactionStore.value
+    languageToolsRevision = kernel.revision
+    languageToolsSource = kernel.value
     languageToolsConfigKey = JSON.stringify(languageToolsConfig())
     syncLanguageToolsState()
   }
-  refreshLiveWindow('initial')
+  mountViewportListeners()
   refreshWritingAidsDocument()
-  updateVisualViewportHeight()
-  refreshTypewriterResizeObserver()
-  attachToolbarResizeObserver(commandGroupRef.value)
-  if (typeof document !== 'undefined' && document.fonts?.ready) {
-    void document.fonts.ready.then(() => {
-      if (!editorUnmounted && commandGroupRef.value && commandMeasureRef.value) {
-        scheduleToolbarOverflowMeasure()
-      }
-    })
-  }
-  window.visualViewport?.addEventListener('resize', updateVisualViewportHeight)
-  window.visualViewport?.addEventListener('scroll', updateVisualViewportHeight)
-  window.addEventListener('resize', updateVisualViewportHeight)
+  mountToolbarOverflow()
 })
 
 onBeforeUnmount(() => {
-  editorUnmounted = true
-  disconnectToolbarResizeObserver()
+  disposeToolbarOverflow()
   languageToolsController = null
-  abortPendingCommands()
+  kernel.abortPendingCommands()
   attachmentCaptureSession.clear()
   attachmentBatches.clear()
   attachmentItems.clear()
-  if (layoutGestureTimer) clearTimeout(layoutGestureTimer)
-  if (typewriterLayoutFrame !== undefined) {
-    cancelAnimationFrame(typewriterLayoutFrame)
-  }
-  typewriterResizeObserver?.disconnect()
+  disposeViewport()
   clearRenderedSearchHighlights()
   disposeEmbeds()
-  if (typeof window === 'undefined') return
-
-  window.visualViewport?.removeEventListener(
-    'resize',
-    updateVisualViewportHeight,
-  )
-  window.visualViewport?.removeEventListener(
-    'scroll',
-    updateVisualViewportHeight,
-  )
-  window.removeEventListener('resize', updateVisualViewportHeight)
 })
-
-const handleBeforeInput = (event: InputEvent) => {
-  syncLanguageToolsState()
-  if (event.inputType === 'insertReplacementText' && languageToolsController) {
-    const replacement = languageToolsController.handleBeforeInput(event)
-    if (replacement.handled && replacement.transaction) {
-      dispatchTransaction(replacement.transaction)
-      beforeInputSnapshot = undefined
-      pendingClipboardIdentity = undefined
-      pendingInputOrigin = undefined
-      return
-    }
-    if (replacement.handled) {
-      beforeInputSnapshot = undefined
-      pendingClipboardIdentity = undefined
-      pendingInputOrigin = undefined
-      return
-    }
-  }
-  const plan = nativeMachine.apply({
-    clipboardIdentity: pendingClipboardIdentity,
-    data: event.data,
-    disabled: editingBlocked.value,
-    documentIdentity,
-    inputType: event.inputType,
-    isComposing: event.isComposing,
-    kind: 'beforeinput',
-    origin: pendingInputOrigin,
-    previousValue: transactionStore.value,
-    revision: transactionStore.revision,
-    selection: captureSelection(!nativeMachine.composing),
-  })
-  syncNativeComposing()
-  if (plan.snapshot) beforeInputSnapshot = plan.snapshot
-  if (plan.preventDefault) event.preventDefault()
-  if (plan.restoreDisplay) triggerRef(editorValue)
-  if (plan.action === 'undo') {
-    undo()
-    return
-  }
-  if (plan.action === 'redo') {
-    redo()
-    return
-  }
-}
-
-const handleInput = (event: Event) => {
-  const target = event.target
-  if (!(target instanceof HTMLTextAreaElement)) return
-  const inputEvent = event instanceof InputEvent ? event : undefined
-  if (nativeMachine.composing || inputEvent?.isComposing) {
-    nativeCompositionValue.value = target.value
-  }
-  const snapshot =
-    beforeInputSnapshot?.value === transactionStore.value
-      ? beforeInputSnapshot
-      : nativeMachine.snapshot
-  const plan = nativeMachine.apply({
-    clipboardIdentity: pendingClipboardIdentity,
-    data: inputEvent?.data ?? snapshot?.data ?? null,
-    disabled: editingBlocked.value,
-    documentIdentity,
-    inputType: inputEvent?.inputType ?? snapshot?.inputType,
-    isComposing: inputEvent?.isComposing,
-    kind: 'input',
-    origin: pendingInputOrigin,
-    previousValue: transactionStore.value,
-    revision: transactionStore.revision,
-    selection: readSelectionFrom(target),
-    value: target.value,
-  })
-  syncNativeComposing()
-  beforeInputSnapshot = undefined
-  if (
-    plan.action === 'dedup' ||
-    plan.action === 'prevent' ||
-    plan.action === 'ignore'
-  ) {
-    pendingClipboardIdentity = undefined
-    pendingInputOrigin = undefined
-    if (plan.restoreDisplay && target.value !== transactionStore.value) {
-      triggerRef(editorValue)
-      void restoreTextareaSelection(transactionStore.selection)
-    } else if (plan.restoreDisplay) {
-      triggerRef(editorValue)
-    }
-    return
-  }
-  if (plan.action !== 'dispatch' && plan.action !== 'commit') {
-    pendingClipboardIdentity = undefined
-    pendingInputOrigin = undefined
-    return
-  }
-
-  dispatchReplacement(
-    target.value,
-    readSelectionFrom(target),
-    {
-      history: plan.history,
-      metadata: Object.freeze({
-        ...(plan.composition ? { composition: true } : {}),
-        data: snapshot?.data ?? inputEvent?.data ?? null,
-        identity: plan.identity,
-        inputType: snapshot?.inputType ?? inputEvent?.inputType ?? 'insertText',
-      }),
-      origin: plan.origin,
-    },
-    plan.mergeDirection,
-  )
-  pendingClipboardIdentity = undefined
-  pendingInputOrigin = undefined
-}
-
-const handleCompositionStart = (event: CompositionEvent) => {
-  const target = event.target
-  nativeCompositionValue.value =
-    target instanceof HTMLTextAreaElement ? target.value : transactionStore.value
-  nativeMachine.apply({
-    disabled: editingBlocked.value,
-    documentIdentity,
-    kind: 'compositionstart',
-    revision: transactionStore.revision,
-  })
-  syncNativeComposing()
-  if (editingBlocked.value || !nativeMachine.composing) return
-  writingAidsController.handleCompositionStart()
-  writingAidsState.value = writingAidsController.state
-  transactionStore.breakMergeGroup()
-  captureSelection()
-  beforeInputSnapshot = undefined
-  pendingClipboardIdentity = undefined
-  pendingInputOrigin = undefined
-  refreshLiveReveal()
-}
-
-const handleCompositionEnd = (event: CompositionEvent) => {
-  const target = event.target
-  if (!(target instanceof HTMLTextAreaElement)) return
-  const plan = nativeMachine.apply({
-    data: event.data,
-    disabled: editingBlocked.value,
-    documentIdentity,
-    kind: 'compositionend',
-    previousValue: transactionStore.value,
-    revision: transactionStore.revision,
-    selection: readSelectionFrom(target),
-    value: target.value,
-  })
-  syncNativeComposing()
-  writingAidsController.handleCompositionEnd()
-  writingAidsState.value = writingAidsController.state
-  beforeInputSnapshot = undefined
-  pendingClipboardIdentity = undefined
-  pendingInputOrigin = undefined
-  if (plan.action !== 'commit') {
-    if (plan.restoreDisplay) triggerRef(editorValue)
-    refreshLiveReveal()
-    return
-  }
-  const laggedComposition =
-    target.value === transactionStore.value && event.data
-      ? `${transactionStore.value}${event.data}`
-      : target.value
-  const laggedSelection = {
-    direction: 'forward' as const,
-    end: laggedComposition.length,
-    start: laggedComposition.length,
-  }
-  dispatchReplacement(
-    laggedComposition,
-    target.value === transactionStore.value && event.data
-      ? laggedSelection
-      : readSelectionFrom(target),
-    {
-      history: plan.history,
-      metadata: Object.freeze({
-        composition: true,
-        data: event.data,
-        identity: plan.identity,
-        inputType: 'insertCompositionText',
-      }),
-      origin: 'input',
-    },
-  )
-  refreshLiveReveal()
-}
-
-const applyClipboardTransfer = (
-  event: { preventDefault(): void; dataTransfer?: DataTransfer | null },
-  origin: 'paste' | 'drop',
-  data: DataTransfer | null | undefined,
-  attachmentSelection?: MarkdownEditorSelection | null,
-) => {
-  const transfer = markdownClipboardItemsFromDataTransfer(data ?? null)
-  const hasTransfer = transfer.items.length > 0 || transfer.files.length > 0
-  if (!hasTransfer) {
-    if (!editingBlocked.value && !nativeMachine.freezeSmartInput) {
-      pendingInputOrigin = origin
-    }
-    return
-  }
-
-  const plan = resolveMarkdownClipboardPaste({
-    composing: isComposing.value,
-    disabled: editingBlocked.value,
-    documentIdentity,
-    files: transfer.files,
-    items: transfer.items,
-    mode: currentMode.value,
-    origin,
-    revision: transactionStore.revision,
-    selection: attachmentSelection ?? captureSelection(),
-    source: transactionStore.value,
-  })
-
-  if (
-    plan.rejected === 'composition-active' ||
-    plan.rejected === 'disabled' ||
-    plan.rejected === 'preview' ||
-    plan.rejected === 'readonly' ||
-    plan.rejected === 'stale-document' ||
-    plan.rejected === 'budget-exceeded' ||
-    plan.rejected === 'cancelled'
-  ) {
-    event.preventDefault()
-    return
-  }
-
-  if (plan.action === 'attachment-intent' || plan.transaction) {
-    event.preventDefault()
-    pendingClipboardIdentity = plan.identity
-    pendingInputOrigin = origin
-    nativeMachine.apply({
-      clipboardIdentity: plan.identity,
-      documentIdentity,
-      kind: origin,
-      origin,
-      revision: transactionStore.revision,
-    })
-    if (plan.action === 'attachment-intent') {
-      if (origin === 'drop' && !attachmentSelection) return
-      captureAttachmentFiles(
-        origin,
-        Array.from(data?.files ?? []),
-        attachmentSelection ?? captureSelection(),
-        plan.identity,
-      )
-    }
-    if (plan.transaction) dispatchTransaction(plan.transaction)
-    return
-  }
-
-  event.preventDefault()
-}
-
-const handlePaste = (event: ClipboardEvent) => {
-  if (tryHandleTableClipboardPaste(event)) return
-  applyClipboardTransfer(event, 'paste', event.clipboardData)
-}
-
-const handleDrop = (event: DragEvent) => {
-  event.preventDefault()
-  applyClipboardTransfer(
-    event,
-    'drop',
-    event.dataTransfer,
-    resolveDropSelection(event),
-  )
-}
-
-const handleCopy = (event: ClipboardEvent) => {
-  if (
-    currentMode.value === 'live' &&
-    atomicSession.value?.phase === 'selected'
-  ) {
-    const atomic = applyAtomicIntent('copy-source')
-    if (atomic.copy && 'payload' in atomic.copy) {
-      event.preventDefault()
-      writeMarkdownClipboardPayload(event.clipboardData, atomic.copy.payload)
-      return
-    }
-  }
-  const plan = resolveMarkdownClipboardCopy({
-    composing: isComposing.value,
-    disabled: editingBlocked.value,
-    documentIdentity,
-    mode: currentMode.value,
-    revision: transactionStore.revision,
-    selection: captureSelection(false),
-    source: transactionStore.value,
-  })
-  if (plan.rejected) {
-    event.preventDefault()
-    return
-  }
-  event.preventDefault()
-  writeMarkdownClipboardPayload(event.clipboardData, plan.payload)
-}
-
-const handleCut = (event: ClipboardEvent) => {
-  if (
-    currentMode.value === 'live' &&
-    atomicSession.value?.phase === 'selected'
-  ) {
-    const atomic = applyAtomicIntent('cut')
-    if (atomic.copy && 'payload' in atomic.copy) {
-      event.preventDefault()
-      writeMarkdownClipboardPayload(event.clipboardData, atomic.copy.payload)
-      return
-    }
-    if (atomic.copy && 'copy' in atomic.copy) {
-      event.preventDefault()
-      writeMarkdownClipboardPayload(
-        event.clipboardData,
-        atomic.copy.copy.payload,
-      )
-      return
-    }
-  }
-  const plan = resolveMarkdownClipboardCut({
-    composing: isComposing.value,
-    disabled: editingBlocked.value,
-    documentIdentity,
-    mode: currentMode.value,
-    revision: transactionStore.revision,
-    selection: captureSelection(),
-    source: transactionStore.value,
-  })
-  if (plan.rejected || !plan.transaction) {
-    event.preventDefault()
-    return
-  }
-  event.preventDefault()
-  writeMarkdownClipboardPayload(event.clipboardData, plan.copy.payload)
-  dispatchTransaction(plan.transaction)
-}
-
-const handleSelectionMove = () => {
-  if (restoringSelection || isComposing.value) return
-  captureSelection()
-  refreshCurrentTableCell()
-  refreshWritingAidsDocument()
-  writingAidsController.handleSelectionChange()
-  writingAidsState.value = writingAidsController.state
-  syncLanguageToolsState()
-  if (currentMode.value === 'live') {
-    const selection = transactionStore.selection
-    if (selection.start !== selection.end) {
-      markLayoutGesture('selection-drag')
-      applyLiveSelectionMotion('pointer-drag', {
-        dragOffset:
-          selection.direction === 'backward' ? selection.start : selection.end,
-      })
-      return
-    }
-  }
-  refreshLiveReveal()
-}
-
-const handleSelectionKeyup = (event: KeyboardEvent) => {
-  if (
-    currentMode.value !== 'live' ||
-    isComposing.value ||
-    restoringSelection
-  ) {
-    return
-  }
-  if (event.key !== 'ArrowUp' && event.key !== 'ArrowDown') return
-  const textarea = textareaRef.value
-  if (!textarea) return
-  if (
-    textarea.selectionStart !== transactionStore.selection.start ||
-    textarea.selectionEnd !== transactionStore.selection.end
-  ) {
-    handleSelectionMove()
-  }
-}
-
-const handleSelectionDragStart = () => {
-  if (isComposing.value) return
-  typewriterScrollTarget = null
-  writingAidsController.handleSelectionDragStart()
-  writingAidsState.value = writingAidsController.state
-}
-
-const handleSelectionDragEnd = () => {
-  writingAidsController.handleSelectionDragEnd()
-  writingAidsState.value = writingAidsController.state
-}
-
-const handlePointerReveal = () => {
-  if (restoringSelection || isComposing.value) return
-  captureSelection()
-  refreshCurrentTableCell()
-  refreshWritingAidsDocument()
-  if (currentMode.value === 'live') {
-    applyLiveSelectionMotion('pointer-click', {
-      pointerOffset: transactionStore.selection.start,
-    })
-  }
-  refreshLiveReveal({
-    intent: 'pointer',
-    pointerOffset: transactionStore.selection.start,
-  })
-}
-
-const handleBlur = () => {
-  transactionStore.breakMergeGroup()
-}
-
-const runAction = (action: MarkdownEditorActionItem) => {
-  if (action.key === 'image') {
-    emitUploadImage()
-    return
-  }
-  if (action.key === 'save') {
-    emitSave()
-    return
-  }
-  emitSubmit()
-}
-
-const runOverflowAction = (action: MarkdownEditorActionItem) => {
-  runAction(action)
-  commandsExpanded.value = false
-}
-
-const closeCommandOverflow = (restoreFocus = false) => {
-  commandsExpanded.value = false
-  if (restoreFocus) void nextTick(() => commandOverflowRef.value?.focus())
-}
-
-const toggleCommands = async () => {
-  if (editingBlocked.value || isComposing.value) return
-  commandsExpanded.value = !commandsExpanded.value
-  if (!commandsExpanded.value) return
-  await nextTick()
-  commandTrayRef.value
-    ?.querySelector<HTMLButtonElement>('button:not(:disabled)')
-    ?.focus()
-}
-
-const modeLabel = (mode: MarkdownEditorMode) => localeText.value.modes[mode]
-
-const emitSave = () => {
-  if (editingBlocked.value || isComposing.value) return
-  emit('save', editorValue.value)
-}
-
-const emitSubmit = () => {
-  if (editingBlocked.value || isComposing.value) return
-  emit('submit', editorValue.value)
-}
-
-const emitUploadImage = () => {
-  if (editingBlocked.value || isComposing.value) return
-  attachmentInputRef.value?.click()
-}
-
-const handleAttachmentPickerChange = (event: Event) => {
-  const input = event.currentTarget
-  if (!(input instanceof HTMLInputElement)) return
-  const files = Array.from(input.files ?? [])
-  if (files.length > 0) {
-    const replacement = attachmentReplaceRange.value
-    captureAttachmentFiles(
-      'pick',
-      files,
-      replacement
-        ? {
-            direction: 'none',
-            end: replacement.end,
-            start: replacement.start,
-          }
-        : captureSelection(),
-      `pick:${event.timeStamp}:${files.map((file) => `${file.name}:${file.size}:${file.lastModified}`).join('|')}`,
-      replacement?.nodeId ?? null,
-    )
-  }
-  attachmentReplaceRange.value = null
-  input.value = ''
-}
-
-const applyAttachmentResult = (result: MarkdownAttachmentProviderResult) => {
-  const job = attachmentJobs.value.find(
-    (candidate) => candidate.itemId === result.itemId,
-  )
-  if (!job) return false
-  if (result.status === 'progress') {
-    const ratio = result.ratio ?? 0
-    progressMarkdownAttachmentJob(job, ratio <= 1 ? ratio * 100 : ratio)
-    triggerRef(attachmentJobs)
-    return true
-  }
-
-  const planned = planMarkdownAttachmentResolve(
-    transactionStore.value,
-    job,
-    result,
-  )
-  triggerRef(attachmentJobs)
-  if (!planned.transaction) return planned.accepted
-  return dispatchTransaction({
-    ...planned.transaction,
-    metadata: Object.freeze({ attachmentItemId: job.itemId }),
-  }).accepted
-}
-
-const runAttachmentAction = (
-  itemId: string,
-  action: 'cancel' | 'retry' | 'remove',
-) => {
-  const job = attachmentJobs.value.find(
-    (candidate) => candidate.itemId === itemId,
-  )
-  if (!job) return
-  if (action === 'cancel') {
-    cancelMarkdownAttachmentJob(job)
-  } else if (action === 'retry') {
-    retryMarkdownAttachmentJob(job)
-    const batch = job.batchId ? attachmentBatches.get(job.batchId) : undefined
-    const item = attachmentItems.get(itemId)
-    if (batch && item) {
-      emit(
-        'upload-image',
-        Object.freeze({ ...batch, items: Object.freeze([item]) }),
-      )
-    }
-  } else {
-    const planned = planMarkdownAttachmentRemove(transactionStore.value, job)
-    dispatchTransaction({
-      ...planned.transaction,
-      metadata: Object.freeze({ attachmentItemId: job.itemId }),
-    })
-  }
-  triggerRef(attachmentJobs)
-  applyLiveLayout('block-height-change')
-}
-
-const emitRenderEvent = (
-  event: 'features-activated' | 'render-complete' | 'render-error',
-  payload: unknown,
-) => {
-  if (event === 'features-activated') {
-    emit('features-activated', payload)
-    applyTypewriterScroll('async-layout')
-    return
-  }
-  if (event === 'render-complete') {
-    emit('render-complete', payload)
-    applyTypewriterScroll('async-layout')
-    return
-  }
-  emit('render-error', payload)
-}
-
-const handlePreviewRenderComplete = (payload: unknown) => {
-  emitRenderEvent('render-complete', payload)
-  restorePreviewScroll()
-  void nextTick(syncRenderedSearchHighlights)
-}
-
-const handleRendererComplete = (payload: unknown) => {
-  emitRenderEvent('render-complete', payload)
-  void nextTick(syncRenderedSearchHighlights)
-}
-
-const handleKeydown = (event: KeyboardEvent) => {
-  if (event.key === 'Escape' && searchUiState.value.open) {
-    event.preventDefault()
-    closeSearch()
-    return
-  }
-  const searchAction = dispatchMarkdownSearchKeydown({
-    ctrlKey: event.ctrlKey,
-    key: event.key,
-    metaKey: event.metaKey,
-    shiftKey: event.shiftKey,
-  })
-  if (searchAction === 'open-find' || searchAction === 'open-replace') {
-    event.preventDefault()
-    openSearch(searchAction === 'open-replace')
-    return
-  }
-  if (
-    event.key === 'PageUp' ||
-    event.key === 'PageDown' ||
-    ((event.ctrlKey || event.metaKey) &&
-      (event.key === 'Home' || event.key === 'End'))
-  ) {
-    suspendTypewriterForUserScroll()
-  }
-
-  if (editingBlocked.value || nativeMachine.freezeSmartInput) return
-  if (activeSlashTrigger.value && slashCommands.value.length) {
-    if (event.key === 'Escape') {
-      event.preventDefault()
-      closeSlashMenu()
-      return
-    }
-    if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
-      event.preventDefault()
-      moveSlashIndex(event.key === 'ArrowDown' ? 1 : -1)
-      return
-    }
-    if (event.key === 'Enter') {
-      const command = slashCommands.value[activeSlashIndex.value]
-      if (command) {
-        event.preventDefault()
-        executeSlashCommand(command)
-      }
-      return
-    }
-  }
-
-  if (tryHandleTableKeydown(event)) return
-
-  if (event.key === 'Escape' && currentMode.value === 'live') {
-    if (atomicSession.value) {
-      event.preventDefault()
-      applyAtomicIntent('escape')
-      return
-    }
-    if (liveReveal.value.state !== 'inactive') {
-      event.preventDefault()
-      refreshLiveReveal({ intent: 'escape' })
-      return
-    }
-  }
-
-  if (currentMode.value === 'live') {
-    const motionKey =
-      event.key === 'ArrowLeft'
-        ? event.ctrlKey || event.altKey
-          ? 'word-left'
-          : 'left'
-        : event.key === 'ArrowRight'
-          ? event.ctrlKey || event.altKey
-            ? 'word-right'
-            : 'right'
-          : event.key === 'Home'
-            ? 'home'
-            : event.key === 'End'
-              ? 'end'
-              : event.key === 'PageUp'
-                ? 'page-up'
-                : event.key === 'PageDown'
-                  ? 'page-down'
-                  : null
-    if (motionKey) {
-      event.preventDefault()
-      applyLiveSelectionMotion(motionKey, { shift: event.shiftKey })
-      return
-    }
-    if (
-      event.key === 'Enter' &&
-      !event.altKey &&
-      !event.ctrlKey &&
-      !event.metaKey
-    ) {
-      const atomic = resolveMarkdownAtomicNodeIntent({
-        action: 'caret-before',
-        composing: isComposing.value,
-        documentIdentity,
-        mode: currentMode.value,
-        revision: transactionStore.revision,
-        selection: captureSelection(),
-        session: atomicSession.value,
-        source: transactionStore.value,
-      })
-      if (atomic.state === 'current') {
-        event.preventDefault()
-        applyAtomicIntent(event.shiftKey ? 'enter-source' : 'enter')
-        return
-      }
-    }
-    if (
-      (event.key === 'Backspace' || event.key === 'Delete') &&
-      !event.altKey &&
-      !event.ctrlKey &&
-      !event.metaKey
-    ) {
-      const selection = captureSelection()
-      const atomic = resolveMarkdownAtomicNodeIntent({
-        action: event.key === 'Backspace' ? 'backspace' : 'delete',
-        composing: isComposing.value,
-        documentIdentity,
-        mode: currentMode.value,
-        revision: transactionStore.revision,
-        selection,
-        session: atomicSession.value,
-        source: transactionStore.value,
-      })
-      if (atomic.state === 'current' && atomic.nodeId) {
-        const before = resolveMarkdownAtomicNodeIntent({
-          action: 'caret-before',
-          documentIdentity,
-          mode: currentMode.value,
-          nodeId: atomic.nodeId,
-          revision: transactionStore.revision,
-          selection,
-          source: transactionStore.value,
-        })
-        const after = resolveMarkdownAtomicNodeIntent({
-          action: 'caret-after',
-          documentIdentity,
-          mode: currentMode.value,
-          nodeId: atomic.nodeId,
-          revision: transactionStore.revision,
-          selection,
-          source: transactionStore.value,
-        })
-        const caret = selection.start
-        const shouldDelete =
-          atomicSession.value?.phase === 'selected' ||
-          (event.key === 'Delete' && caret === before.selection.start) ||
-          (event.key === 'Backspace' && caret === after.selection.start)
-        if (shouldDelete) {
-          event.preventDefault()
-          applyAtomicIntent(event.key === 'Backspace' ? 'backspace' : 'delete')
-          return
-        }
-      }
-    }
-  }
-
-  const isMod = event.metaKey || event.ctrlKey
-  const key = event.key.toLowerCase()
-  if (isMod && !event.shiftKey && key === 'z') {
-    event.preventDefault()
-    undo()
-    return
-  }
-  if (
-    isMod &&
-    ((event.shiftKey && key === 'z') || (!event.shiftKey && key === 'y'))
-  ) {
-    event.preventDefault()
-    redo()
-    return
-  }
-
-  const pairChars = new Set<string>(
-    MARKDOWN_PAIR_DEFAULTS.flatMap(([open, close]) => [open, close]),
-  )
-  if (
-    !event.altKey &&
-    !event.ctrlKey &&
-    !event.metaKey &&
-    (event.key === 'Backspace' || pairChars.has(event.key))
-  ) {
-    const pairPlan = resolveMarkdownPairInput({
-      source: transactionStore.value,
-      selection: captureSelection(),
-      inserted: event.key === 'Backspace' ? undefined : event.key,
-      key: event.key === 'Backspace' ? 'backspace' : undefined,
-      composing: isComposing.value,
-      readonly: props.disabled,
-      mode: currentMode.value,
-      documentIdentity,
-    })
-    if (pairPlan.transaction) {
-      event.preventDefault()
-      dispatchTransaction(pairPlan.transaction)
-      return
-    }
-  }
-
-  const blockKey =
-    event.key === 'Tab'
-      ? event.shiftKey
-        ? 'shift-tab'
-        : 'tab'
-      : event.key === 'Enter'
-        ? event.shiftKey
-          ? 'shift-enter'
-          : 'enter'
-        : event.key === 'Backspace'
-          ? 'backspace'
-          : event.key === 'Delete'
-            ? 'delete'
-            : null
-  if (blockKey && !event.altKey && !event.ctrlKey && !event.metaKey) {
-    const plan = resolveMarkdownBlockInputIntent({
-      source: transactionStore.value,
-      selection: captureSelection(),
-      key: blockKey as MarkdownBlockInputKey,
-      composing: isComposing.value,
-      documentIdentity,
-    })
-    if (plan.rejected === 'composition-active') return
-    if (!plan.transaction) return
-    event.preventDefault()
-    dispatchTransaction(plan.transaction)
-    return
-  }
-
-  if (!isMod) return
-
-  if (key === 's') {
-    event.preventDefault()
-    emitSave()
-    return
-  }
-  if (key === 'enter') {
-    event.preventDefault()
-    emitSubmit()
-    return
-  }
-
-  const command = resolveMarkdownEditorShortcut(props.commands, `mod+${key}`)
-
-  if (command) {
-    event.preventDefault()
-    void runCommand(command)
-  }
-}
-
-function undo() {
-  const result = dispatchEditorOperation({ kind: 'undo' })
-  selectionTick.value += 1
-  return result
-}
-
-function redo() {
-  const result = dispatchEditorOperation({ kind: 'redo' })
-  selectionTick.value += 1
-  return result
-}
-
-const insertMarkdownAtCursor = (
-  markdown: string,
-  options: MarkdownEditorInsertOptions = {},
-) => {
-  const selection = options.selection ?? captureSelection()
-  const cursor = selection.start + markdown.length
-  return dispatchEditorOperation({
-    kind: 'transaction',
-    transaction: {
-      changes: [
-        {
-          from: selection.start,
-          insert: markdown,
-          to: selection.end,
-        },
-      ],
-      expectedRevision: options.expectedRevision,
-      history: 'separate',
-      metadata: options.metadata,
-      origin: 'programmatic',
-      selection: {
-        direction: 'none',
-        end: cursor,
-        start: cursor,
-      },
-    },
-  }).accepted
-}
-
-const commitRevealSelection = async (
-  range: { start: number; end: number },
-  smooth: boolean,
-) => {
-  const selection = Object.freeze({
-    direction: 'none' as const,
-    end: range.start,
-    start: range.start,
-  })
-  transactionStore.setSelection(selection, true)
-  refreshLiveWindow('feature')
-  refreshWritingAidsDocument()
-  await restoreTextareaSelection(selection)
-  const textarea = textareaRef.value
-  if (!textarea) return
-  textarea.focus()
-  if (resolvedWritingAids.value.typewriter) {
-    applyTypewriterScroll('explicit-navigation')
-    return
-  }
-  const lineHeight =
-    Number.parseFloat(window.getComputedStyle(textarea).lineHeight) || 20
-  const line =
-    transactionStore.value.slice(0, range.start).split('\n').length - 1
-  const top = Math.max(0, line * lineHeight - textarea.clientHeight / 3)
-  if (typeof textarea.scrollTo === 'function') {
-    const scrollTop = Math.min(
-      top,
-      Math.max(0, textarea.scrollHeight - textarea.clientHeight),
-    )
-    textarea.scrollTo({ behavior: smooth ? 'smooth' : 'auto', top: scrollTop })
-    requestAnimationFrame(() => {
-      syncMirrorLayerScroll(textarea.scrollTop, textarea.scrollLeft)
-    })
-  } else {
-    textarea.scrollTop = top
-    syncMirrorLayerScroll(top, textarea.scrollLeft)
-  }
-}
-
-const currentOutlineContext = () => {
-  const projection = editorProjection.value
-  return {
-    anchorMap: createMarkdownAnchorMap({
-      identity: documentIdentity,
-      projection,
-      source: transactionStore.value,
-    }),
-    model: projection
-      ? createMarkdownOutlineModelFromProjection(
-          transactionStore.value,
-          projection,
-        )
-      : { items: [], projection: undefined },
-  }
-}
-
-const revealHeading = (
-  nodeId: string,
-  options?: Parameters<typeof revealHeadingOutline>[4],
-) => {
-  const { anchorMap, model } = currentOutlineContext()
-  const actual = {
-    documentIdentity,
-    revision: transactionStore.revision,
-  }
-  const expected = options?.expected ?? actual
-  const status = revealHeadingOutline(model.items, nodeId, expected, actual, {
-    ...options,
-    anchorMap,
-    projection: model.projection,
-  })
-  if (status !== 'success') return status
-  const plan = planMarkdownOutlineReveal(model.items, nodeId, {
-    ...options,
-    actual,
-    anchorMap,
-    expected,
-    mode: currentMode.value,
-    reducedMotion: options?.reducedMotion ?? reducedMotionRequested(),
-  })
-  if (plan.status !== 'success' || !plan.range) return plan.status
-  void commitRevealSelection(plan.range, plan.smooth)
-  return 'success'
-}
-
-const revealSourceRange = (
-  range: { start: number; end: number },
-  options?: Parameters<typeof revealSourceRangeOutline>[2],
-) => {
-  if (
-    range.start < 0 ||
-    range.end < range.start ||
-    range.end > transactionStore.value.length
-  ) {
-    return 'not-found'
-  }
-  const { anchorMap, model } = currentOutlineContext()
-  const actual = {
-    documentIdentity,
-    revision: transactionStore.revision,
-  }
-  const guarded = revealSourceRangeOutline(model.items, range, {
-    ...options,
-    actual,
-    anchorMap,
-    expected: options?.expected ?? actual,
-    mode: options?.mode ?? currentMode.value,
-    sourceLength: transactionStore.value.length,
-  })
-  if (guarded !== 'success') return guarded
-  const smooth = !(options?.reducedMotion ?? reducedMotionRequested())
-  void commitRevealSelection(range, smooth)
-  return 'success'
-}
 
 defineExpose({
   closeSearch,
