@@ -34,7 +34,7 @@
       "path": "spec/components/contracts/v1/vue-public-contracts.json",
       "kind": "authority",
       "algorithm": "sha256",
-      "digest": "10ac56dda604f9f7826319ab2035b521185b0d01e33e4cc5a6b6cdbe059dfc28"
+      "digest": "231edc7fd44d8b53f44e9223db91e7d4132c04b0552246a679b21c15c22a1cd4"
     },
     "implementation-tokens": {
       "path": "source/_tokens.scss",
