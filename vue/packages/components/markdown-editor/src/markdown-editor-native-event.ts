@@ -203,10 +203,20 @@ const planOf = (
     snapshot: extras.snapshot,
   })
 
-export const createMarkdownEditorNativeEventMachine = (options: {
-  readonly documentIdentity?: MarkdownEditorDocumentIdentity
-  readonly revision?: number
-} = {}): MarkdownEditorNativeEventMachine => {
+const compositionCommit = (phase: MarkdownNativePhase, identity: string) =>
+  planOf('commit', phase, {
+    composition: true,
+    freezeSmartInput: false,
+    history: 'separate',
+    identity,
+  })
+
+export const createMarkdownEditorNativeEventMachine = (
+  options: {
+    readonly documentIdentity?: MarkdownEditorDocumentIdentity
+    readonly revision?: number
+  } = {},
+): MarkdownEditorNativeEventMachine => {
   let documentIdentity = options.documentIdentity
   let lastClipboardIdentity: string | undefined
   let lastCommitValue: string | undefined
@@ -215,10 +225,273 @@ export const createMarkdownEditorNativeEventMachine = (options: {
   let snapshot: BeforeInputSnapshot | undefined
   const trace: MarkdownNativeTraceEntry[] = []
 
-  const pushTrace = (
-    event: MarkdownNativeEventInput,
-    next: MarkdownNativeEventPlan,
-  ) => {
+  const plan = (event: MarkdownNativeEventInput): MarkdownNativeEventPlan => {
+    const identity = markdownNativeEventIdentity(event)
+
+    if (
+      event.kind !== 'document-switch' &&
+      event.kind !== 'external-reset' &&
+      (!matchesMarkdownEditorDocument(
+        event.documentIdentity,
+        documentIdentity,
+      ) ||
+        !matchesMarkdownEditorDocument(
+          event.currentIdentity,
+          documentIdentity,
+        ) ||
+        (event.expectedRevision !== undefined &&
+          event.revision !== undefined &&
+          event.expectedRevision !== event.revision))
+    ) {
+      return planOf('prevent', phase, {
+        identity,
+        rejected: 'stale-document',
+      })
+    }
+
+    if (event.kind === 'document-switch' || event.kind === 'external-reset') {
+      if (event.documentIdentity) documentIdentity = event.documentIdentity
+      lastClipboardIdentity = undefined
+      lastCommitValue = undefined
+      lastIdentity = null
+      snapshot = undefined
+      const wasLive = phase === 'composing' || phase === 'committing'
+      phase = wasLive ? 'aborted' : 'idle'
+      return planOf(wasLive ? 'abort' : 'ignore', phase, {
+        freezeSmartInput: false,
+        identity,
+        restoreDisplay: wasLive,
+      })
+    }
+
+    if (event.disabled) {
+      return planOf('prevent', phase, {
+        identity,
+        rejected: 'disabled',
+      })
+    }
+
+    if (event.kind === 'compositionstart') {
+      phase = 'composing'
+      lastCommitValue = undefined
+      snapshot = undefined
+      return planOf('ignore', phase, {
+        freezeSmartInput: true,
+        identity,
+      })
+    }
+
+    if (event.kind === 'compositionupdate') {
+      if (phase !== 'composing') {
+        return planOf('prevent', phase, {
+          identity,
+          rejected: 'orphaned-composition',
+        })
+      }
+      return planOf('ignore', phase, {
+        freezeSmartInput: true,
+        identity,
+      })
+    }
+
+    if (event.kind === 'compositionend') {
+      if (phase === 'aborted') {
+        phase = 'draining'
+        return planOf('prevent', phase, {
+          freezeSmartInput: false,
+          identity,
+          rejected: 'orphaned-composition',
+        })
+      }
+      if (phase !== 'composing') {
+        const value = event.value ?? ''
+        const previous = event.previousValue ?? ''
+        if (
+          lastCommitValue !== undefined &&
+          value === lastCommitValue &&
+          previous === lastCommitValue
+        ) {
+          lastCommitValue = undefined
+          snapshot = undefined
+          return planOf('dedup', phase, {
+            composition: true,
+            freezeSmartInput: false,
+            identity: lastIdentity,
+          })
+        }
+        if (event.data) {
+          phase = 'idle'
+          lastCommitValue = (event.previousValue ?? '') + event.data
+          lastIdentity = identity
+          return compositionCommit(phase, identity)
+        }
+        return planOf('prevent', phase, {
+          identity,
+          rejected: 'orphaned-composition',
+        })
+      }
+      const value = event.value ?? ''
+      const previous = event.previousValue ?? ''
+      if (value === previous) {
+        if (event.data) {
+          // WebKit hangul: compositionend.data holds the committed text
+          // before the textarea value updates.
+          phase = 'idle'
+          lastCommitValue = previous + event.data
+          lastIdentity = identity
+          return compositionCommit(phase, identity)
+        }
+        phase = 'committing'
+        return planOf('ignore', phase, {
+          freezeSmartInput: true,
+          identity,
+        })
+      }
+      phase = 'idle'
+      lastCommitValue = value
+      lastIdentity = identity
+      return compositionCommit(phase, identity)
+    }
+
+    if (event.kind === 'paste' || event.kind === 'drop') {
+      if (phase === 'composing' || phase === 'committing') {
+        return planOf('prevent', phase, {
+          freezeSmartInput: true,
+          identity,
+          rejected: 'composition-active',
+        })
+      }
+      lastClipboardIdentity = event.clipboardIdentity ?? identity
+      lastIdentity = lastClipboardIdentity
+      return planOf('ignore', phase, {
+        identity: lastClipboardIdentity,
+        origin: event.kind,
+      })
+    }
+
+    if (event.kind === 'beforeinput') {
+      if (event.inputType === 'historyUndo') {
+        return planOf('undo', phase, {
+          identity,
+          rejected: 'native-undo',
+        })
+      }
+      if (event.inputType === 'historyRedo') {
+        return planOf('redo', phase, { identity })
+      }
+      if (phase === 'draining') {
+        return planOf('prevent', phase, { identity })
+      }
+      if (
+        (phase === 'aborted' || phase === 'idle') &&
+        isCompositionInputType(event.inputType, event.isComposing)
+      ) {
+        return planOf('prevent', phase, {
+          identity,
+          rejected: 'orphaned-composition',
+        })
+      }
+      if (
+        lastClipboardIdentity &&
+        (event.inputType === 'insertFromPaste' ||
+          event.inputType === 'insertFromDrop')
+      ) {
+        return planOf('dedup', phase, {
+          identity: lastClipboardIdentity,
+          origin: inferOrigin(event.inputType),
+        })
+      }
+      snapshot = Object.freeze({
+        data: event.data ?? null,
+        inputType: event.inputType ?? 'insertText',
+        selection: event.selection ?? { start: 0, end: 0 },
+        value: event.previousValue ?? event.value ?? '',
+      })
+      return planOf('snapshot', phase, {
+        identity,
+        snapshot,
+      })
+    }
+
+    if (
+      lastClipboardIdentity &&
+      (event.inputType === 'insertFromPaste' ||
+        event.inputType === 'insertFromDrop' ||
+        event.origin === 'paste' ||
+        event.origin === 'drop')
+    ) {
+      const owned = lastClipboardIdentity
+      lastClipboardIdentity = undefined
+      return planOf('dedup', phase, {
+        identity: owned,
+        origin: inferOrigin(event.inputType, event.origin),
+        restoreDisplay: true,
+      })
+    }
+
+    if (phase === 'draining') {
+      phase = 'idle'
+      snapshot = undefined
+      return planOf('prevent', phase, { identity })
+    }
+
+    if (phase === 'aborted') {
+      if (isCompositionInputType(event.inputType, event.isComposing)) {
+        return planOf('prevent', phase, {
+          identity,
+          rejected: 'orphaned-composition',
+        })
+      }
+      phase = 'idle'
+    }
+
+    if (phase === 'composing') {
+      return planOf('ignore', phase, {
+        freezeSmartInput: true,
+        identity,
+      })
+    }
+
+    const value = event.value ?? ''
+    if (lastCommitValue !== undefined && value === lastCommitValue) {
+      lastCommitValue = undefined
+      snapshot = undefined
+      return planOf('dedup', phase, {
+        composition: true,
+        identity: lastIdentity,
+      })
+    }
+
+    if (phase === 'committing') {
+      phase = 'idle'
+      lastCommitValue = value
+      lastIdentity = identity
+      snapshot = undefined
+      return compositionCommit(phase, identity)
+    }
+
+    if (identity === lastIdentity && lastIdentity) {
+      return planOf('dedup', phase, {
+        identity,
+        restoreDisplay: true,
+      })
+    }
+
+    const origin = inferOrigin(event.inputType, event.origin)
+    const inputType = event.inputType ?? snapshot?.inputType
+    lastIdentity = identity
+    lastCommitValue = undefined
+    snapshot = undefined
+    return planOf('dispatch', phase, {
+      history: origin === 'input' ? 'merge' : 'separate',
+      identity,
+      mergeDirection: mergeDirectionFor(inputType, event.selection),
+      origin,
+    })
+  }
+
+  const apply = (event: MarkdownNativeEventInput): MarkdownNativeEventPlan => {
+    const next = plan(event)
     trace.push(
       Object.freeze({
         action: next.action,
@@ -234,377 +507,6 @@ export const createMarkdownEditorNativeEventMachine = (options: {
     if (trace.length > MARKDOWN_NATIVE_TRACE_LIMIT) {
       trace.splice(0, trace.length - MARKDOWN_NATIVE_TRACE_LIMIT)
     }
-  }
-
-  const apply = (event: MarkdownNativeEventInput): MarkdownNativeEventPlan => {
-    const identity = markdownNativeEventIdentity(event)
-    const freeze = () => phase === 'composing' || phase === 'committing'
-
-    if (
-      event.kind !== 'document-switch' &&
-      event.kind !== 'external-reset' &&
-      (!matchesMarkdownEditorDocument(event.documentIdentity, documentIdentity) ||
-        !matchesMarkdownEditorDocument(event.currentIdentity, documentIdentity) ||
-        (event.expectedRevision !== undefined &&
-          event.revision !== undefined &&
-          event.expectedRevision !== event.revision))
-    ) {
-      const next = planOf('prevent', phase, {
-        freezeSmartInput: freeze(),
-        identity,
-        rejected: 'stale-document',
-        restoreDisplay: true,
-      })
-      pushTrace(event, next)
-      return next
-    }
-
-    if (event.kind === 'document-switch' || event.kind === 'external-reset') {
-      if (event.documentIdentity) documentIdentity = event.documentIdentity
-      lastClipboardIdentity = undefined
-      lastCommitValue = undefined
-      lastIdentity = null
-      snapshot = undefined
-      const wasLive = phase === 'composing' || phase === 'committing'
-      phase = wasLive ? 'aborted' : 'idle'
-      const next = planOf(wasLive ? 'abort' : 'ignore', phase, {
-        freezeSmartInput: false,
-        identity,
-        restoreDisplay: wasLive,
-      })
-      pushTrace(event, next)
-      return next
-    }
-
-    if (event.disabled) {
-      const next = planOf('prevent', phase, {
-        freezeSmartInput: freeze(),
-        identity,
-        rejected: 'disabled',
-      })
-      pushTrace(event, next)
-      return next
-    }
-
-    if (event.kind === 'compositionstart') {
-      phase = 'composing'
-      lastCommitValue = undefined
-      snapshot = undefined
-      const next = planOf('ignore', phase, {
-        freezeSmartInput: true,
-        identity,
-      })
-      pushTrace(event, next)
-      return next
-    }
-
-    if (event.kind === 'compositionupdate') {
-      if (phase !== 'composing') {
-        const next = planOf('prevent', phase, {
-          identity,
-          rejected: 'orphaned-composition',
-          restoreDisplay: true,
-        })
-        pushTrace(event, next)
-        return next
-      }
-      const next = planOf('ignore', phase, {
-        freezeSmartInput: true,
-        identity,
-      })
-      pushTrace(event, next)
-      return next
-    }
-
-    if (event.kind === 'compositionend') {
-      if (phase === 'aborted') {
-        phase = 'draining'
-        const next = planOf('prevent', phase, {
-          freezeSmartInput: false,
-          identity,
-          rejected: 'orphaned-composition',
-          restoreDisplay: true,
-        })
-        pushTrace(event, next)
-        return next
-      }
-      if (phase !== 'composing') {
-        const value = event.value ?? ''
-        const previous = event.previousValue ?? ''
-        if (
-          lastCommitValue !== undefined &&
-          value === lastCommitValue &&
-          previous === lastCommitValue
-        ) {
-          lastCommitValue = undefined
-          snapshot = undefined
-          const next = planOf('dedup', phase, {
-            composition: true,
-            freezeSmartInput: false,
-            identity: lastIdentity,
-          })
-          pushTrace(event, next)
-          return next
-        }
-        if (event.data) {
-          phase = 'idle'
-          lastCommitValue = (event.previousValue ?? '') + event.data
-          lastIdentity = identity
-          const next = planOf('commit', phase, {
-            composition: true,
-            freezeSmartInput: false,
-            history: 'separate',
-            identity,
-            origin: 'input',
-          })
-          pushTrace(event, next)
-          return next
-        }
-        const next = planOf('prevent', phase, {
-          identity,
-          rejected: 'orphaned-composition',
-          restoreDisplay: true,
-        })
-        pushTrace(event, next)
-        return next
-      }
-      const value = event.value ?? ''
-      const previous = event.previousValue ?? ''
-      if (value === previous) {
-        if (event.data) {
-          // WebKit hangul: compositionend.data holds the committed text
-          // before the textarea value updates.
-          phase = 'idle'
-          lastCommitValue = previous + event.data
-          lastIdentity = identity
-          const next = planOf('commit', phase, {
-            composition: true,
-            freezeSmartInput: false,
-            history: 'separate',
-            identity,
-            origin: 'input',
-          })
-          pushTrace(event, next)
-          return next
-        }
-        phase = 'committing'
-        const next = planOf('ignore', phase, {
-          freezeSmartInput: true,
-          identity,
-        })
-        pushTrace(event, next)
-        return next
-      }
-      phase = 'idle'
-      lastCommitValue = value
-      lastIdentity = identity
-      const next = planOf('commit', phase, {
-        composition: true,
-        freezeSmartInput: false,
-        history: 'separate',
-        identity,
-        origin: 'input',
-      })
-      pushTrace(event, next)
-      return next
-    }
-
-    if (event.kind === 'paste' || event.kind === 'drop') {
-      if (phase === 'composing' || phase === 'committing') {
-        const next = planOf('prevent', phase, {
-          freezeSmartInput: true,
-          identity,
-          rejected: 'composition-active',
-        })
-        pushTrace(event, next)
-        return next
-      }
-      lastClipboardIdentity = event.clipboardIdentity ?? identity
-      lastIdentity = lastClipboardIdentity
-      const next = planOf('ignore', phase, {
-        identity: lastClipboardIdentity,
-        origin: event.kind,
-      })
-      pushTrace(event, next)
-      return next
-    }
-
-    if (event.kind === 'beforeinput') {
-      if (event.inputType === 'historyUndo') {
-        const next = planOf('undo', phase, {
-          freezeSmartInput: freeze(),
-          identity,
-          preventDefault: true,
-          rejected: 'native-undo',
-        })
-        pushTrace(event, next)
-        return next
-      }
-      if (event.inputType === 'historyRedo') {
-        const next = planOf('redo', phase, {
-          freezeSmartInput: freeze(),
-          identity,
-          preventDefault: true,
-        })
-        pushTrace(event, next)
-        return next
-      }
-      if (phase === 'draining') {
-        const next = planOf('prevent', phase, {
-          identity,
-          restoreDisplay: true,
-        })
-        pushTrace(event, next)
-        return next
-      }
-      if (
-        (phase === 'aborted' || phase === 'idle') &&
-        isCompositionInputType(event.inputType, event.isComposing)
-      ) {
-        const next = planOf('prevent', phase, {
-          identity,
-          rejected: 'orphaned-composition',
-          restoreDisplay: true,
-        })
-        pushTrace(event, next)
-        return next
-      }
-      if (
-        lastClipboardIdentity &&
-        (event.inputType === 'insertFromPaste' ||
-          event.inputType === 'insertFromDrop')
-      ) {
-        const next = planOf('dedup', phase, {
-          identity: lastClipboardIdentity,
-          origin: inferOrigin(event.inputType),
-          preventDefault: true,
-        })
-        pushTrace(event, next)
-        return next
-      }
-      snapshot = Object.freeze({
-        data: event.data ?? null,
-        inputType: event.inputType ?? 'insertText',
-        selection: event.selection ?? { start: 0, end: 0 },
-        value: event.previousValue ?? event.value ?? '',
-      })
-      const next = planOf('snapshot', phase, {
-        freezeSmartInput: freeze(),
-        identity,
-        preventDefault: false,
-        snapshot,
-      })
-      pushTrace(event, next)
-      return next
-    }
-
-    if (
-      lastClipboardIdentity &&
-      (event.inputType === 'insertFromPaste' ||
-        event.inputType === 'insertFromDrop' ||
-        event.origin === 'paste' ||
-        event.origin === 'drop')
-    ) {
-      const owned = lastClipboardIdentity
-      lastClipboardIdentity = undefined
-      const next = planOf('dedup', phase, {
-        identity: owned,
-        origin: inferOrigin(event.inputType, event.origin),
-        restoreDisplay: true,
-      })
-      pushTrace(event, next)
-      return next
-    }
-
-    if (phase === 'draining') {
-      phase = 'idle'
-      snapshot = undefined
-      const next = planOf('prevent', phase, {
-        identity,
-        restoreDisplay: true,
-      })
-      pushTrace(event, next)
-      return next
-    }
-
-    if (phase === 'aborted') {
-      if (isCompositionInputType(event.inputType, event.isComposing)) {
-        const next = planOf('prevent', phase, {
-          identity,
-          rejected: 'orphaned-composition',
-          restoreDisplay: true,
-        })
-        pushTrace(event, next)
-        return next
-      }
-      phase = 'idle'
-    }
-
-    if (phase === 'composing') {
-      const next = planOf('ignore', phase, {
-        freezeSmartInput: true,
-        identity,
-        preventDefault: false,
-        restoreDisplay: false,
-      })
-      pushTrace(event, next)
-      return next
-    }
-
-    const value = event.value ?? ''
-    if (lastCommitValue !== undefined && value === lastCommitValue) {
-      lastCommitValue = undefined
-      snapshot = undefined
-      const next = planOf('dedup', phase, {
-        composition: true,
-        identity: lastIdentity,
-        restoreDisplay: false,
-      })
-      pushTrace(event, next)
-      return next
-    }
-
-    if (phase === 'committing') {
-      phase = 'idle'
-      lastCommitValue = value
-      lastIdentity = identity
-      snapshot = undefined
-      const next = planOf('commit', phase, {
-        composition: true,
-        freezeSmartInput: false,
-        history: 'separate',
-        identity,
-        origin: 'input',
-      })
-      pushTrace(event, next)
-      return next
-    }
-
-    if (identity === lastIdentity && lastIdentity) {
-      const next = planOf('dedup', phase, {
-        identity,
-        restoreDisplay: true,
-      })
-      pushTrace(event, next)
-      return next
-    }
-
-    const origin = inferOrigin(event.inputType, event.origin)
-    const inputType = event.inputType ?? snapshot?.inputType
-    const composition = false
-    lastIdentity = identity
-    lastCommitValue = undefined
-    snapshot = undefined
-    const next = planOf('dispatch', phase, {
-      composition,
-      history: origin === 'input' ? 'merge' : 'separate',
-      identity,
-      mergeDirection: mergeDirectionFor(inputType, event.selection),
-      origin,
-      preventDefault: false,
-      restoreDisplay: false,
-    })
-    pushTrace(event, next)
     return next
   }
 
