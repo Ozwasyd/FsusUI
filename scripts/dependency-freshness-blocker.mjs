@@ -11,39 +11,57 @@ function argument(name) {
   return index < 0 ? null : process.argv[index + 1]
 }
 
-function api(args, options = {}) {
-  const output = execFileSync('gh', ['api', ...args], {
+const GH_API_MAX_BUFFER_BYTES = 64 * 1024 * 1024
+
+function runGhApi(args, options = {}) {
+  return execFileSync('gh', ['api', ...args], {
     encoding: 'utf8',
+    maxBuffer: GH_API_MAX_BUFFER_BYTES,
     stdio: ['ignore', 'pipe', 'pipe'],
     ...options,
   })
+}
+
+function api(args, options = {}) {
+  const output = runGhApi(args, options)
   return output.trim() ? JSON.parse(output) : null
+}
+
+function apiNdjson(args, options = {}) {
+  const output = runGhApi(args, options)
+  return output
+    .split('\n')
+    .map((line) => line.trim())
+    .filter(Boolean)
+    .map((line) => JSON.parse(line))
 }
 
 function githubClient(repository) {
   const endpoint = `repos/${repository}`
   const listIssuesByTitle = async (title) => {
-    const pages = api([
+    const summaries = apiNdjson([
       '--method',
       'GET',
       '--paginate',
-      '--slurp',
       `${endpoint}/issues`,
       '-f',
       'state=all',
       '-f',
       'per_page=100',
+      '--jq',
+      '.[] | select(.pull_request == null) | {number, state, title, updated_at}',
     ])
-    return pages
-      .flat()
-      .filter((issue) => !issue.pull_request && issue.title === title)
-      .map((issue) => ({
-        number: issue.number,
-        state: issue.state,
-        title: issue.title,
-        body: issue.body ?? '',
-        updatedAt: issue.updated_at,
-      }))
+    const matches = summaries.filter((issue) => issue.title === title)
+    return matches.map((match) => {
+      const full = api(['--method', 'GET', `${endpoint}/issues/${match.number}`])
+      return {
+        number: full.number,
+        state: full.state,
+        title: full.title,
+        body: full.body ?? '',
+        updatedAt: full.updated_at,
+      }
+    })
   }
 
   return {
@@ -79,16 +97,11 @@ function githubClient(repository) {
           `labels[]=${label}`,
         ])
       }
-      execFileSync(
-        'gh',
-        [
-          'api',
-          '--method',
-          'DELETE',
-          `${endpoint}/issues/${number}/labels/${encodeURIComponent(label)}`,
-        ],
-        { stdio: ['ignore', 'pipe', 'pipe'] },
-      )
+      runGhApi([
+        '--method',
+        'DELETE',
+        `${endpoint}/issues/${number}/labels/${encodeURIComponent(label)}`,
+      ])
     },
   }
 }

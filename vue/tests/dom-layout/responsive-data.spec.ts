@@ -1,6 +1,11 @@
 import { expect, test } from '@playwright/test'
 import type { Page } from '@playwright/test'
 
+// Blink subpixel quantization at non-integer DPR (e.g. Pixel 7 2.625) can
+// report a 40px box as 39.99993896484375 (40 - 2^-14). Keep tolerance
+// strictly sub-0.05px so real hit-target regressions still fail.
+const MIN_HIT_TARGET_PX = 40 - 0.05
+
 const openDataSection = async (page: Page) => {
   await page.goto('/?visual=data', { waitUntil: 'domcontentloaded' })
   await expect(page.locator('[data-testid="section-data"]')).toBeVisible()
@@ -86,8 +91,8 @@ test('Table priority projection preserves every column and explicit scroll is ke
       ).toBeHidden()
       const toggle = table.locator('.el-table__responsive-toggle').first()
       const toggleBox = await toggle.boundingBox()
-      expect(toggleBox?.width ?? 0).toBeGreaterThanOrEqual(40)
-      expect(toggleBox?.height ?? 0).toBeGreaterThanOrEqual(40)
+      expect(toggleBox?.width ?? 0).toBeGreaterThanOrEqual(MIN_HIT_TARGET_PX)
+      expect(toggleBox?.height ?? 0).toBeGreaterThanOrEqual(MIN_HIT_TARGET_PX)
       if ((await toggle.getAttribute('aria-expanded')) === 'false') {
         await toggle.click()
       }
@@ -104,8 +109,10 @@ test('Table priority projection preserves every column and explicit scroll is ke
 
       const operation = table.locator('button', { hasText: '打开' }).first()
       const operationBox = await operation.boundingBox()
-      expect(operationBox?.width ?? 0).toBeGreaterThanOrEqual(40)
-      expect(operationBox?.height ?? 0).toBeGreaterThanOrEqual(40)
+      expect(operationBox?.width ?? 0).toBeGreaterThanOrEqual(MIN_HIT_TARGET_PX)
+      expect(operationBox?.height ?? 0).toBeGreaterThanOrEqual(
+        MIN_HIT_TARGET_PX,
+      )
     } else {
       await expect(
         table.locator('th[data-responsive-priority="secondary"]').first(),
@@ -163,8 +170,8 @@ test('Pagination converges in stable semantic zones without page overflow', asyn
     const next = pagination.locator('.btn-next')
     for (const action of [prev, next]) {
       const box = await action.boundingBox()
-      expect(box?.width ?? 0).toBeGreaterThanOrEqual(40)
-      expect(box?.height ?? 0).toBeGreaterThanOrEqual(40)
+      expect(box?.width ?? 0).toBeGreaterThanOrEqual(MIN_HIT_TARGET_PX)
+      expect(box?.height ?? 0).toBeGreaterThanOrEqual(MIN_HIT_TARGET_PX)
     }
 
     if (availableWidth < 360) {
@@ -251,8 +258,8 @@ test('Calendar keeps title, navigation, and date grid aligned without collisions
 
     for (const button of await actions.locator('button').all()) {
       const box = await button.boundingBox()
-      expect(box?.width ?? 0).toBeGreaterThanOrEqual(40)
-      expect(box?.height ?? 0).toBeGreaterThanOrEqual(40)
+      expect(box?.width ?? 0).toBeGreaterThanOrEqual(MIN_HIT_TARGET_PX)
+      expect(box?.height ?? 0).toBeGreaterThanOrEqual(MIN_HIT_TARGET_PX)
     }
 
     if (availableWidth < 560) {
@@ -314,7 +321,7 @@ test('Calendar keeps title, navigation, and date grid aligned without collisions
 
     const firstDay = calendar.locator('.el-calendar-day').first()
     const dayBox = await firstDay.boundingBox()
-    expect(dayBox?.height ?? 0).toBeGreaterThanOrEqual(40)
+    expect(dayBox?.height ?? 0).toBeGreaterThanOrEqual(MIN_HIT_TARGET_PX)
 
     const pageOverflow = await page.evaluate(
       () =>
