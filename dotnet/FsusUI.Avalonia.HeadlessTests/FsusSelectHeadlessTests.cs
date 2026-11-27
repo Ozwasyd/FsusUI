@@ -8,7 +8,6 @@ using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
 using Avalonia.Input;
 using Avalonia.Layout;
-using Avalonia.Markup.Xaml.Styling;
 using Avalonia.Media;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
@@ -425,11 +424,7 @@ public class FsusSelectHeadlessTests
       Content = content,
       ShowInTaskbar = false,
     };
-    window.Styles.Add(
-      new StyleInclude(new Uri("avares://FsusUI.Avalonia.HeadlessTests"))
-      {
-        Source = new Uri("avares://FsusUI.Avalonia.Themes/Themes/FsusTheme.axaml"),
-      });
+    window.Styles.Add(HeadlessTheme.CreateInclude());
     return window;
   }
 

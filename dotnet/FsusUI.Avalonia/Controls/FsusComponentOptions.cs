@@ -129,17 +129,17 @@ internal static class FsusComponentClasses
 
 internal static class FsusControlAvailability
 {
-  public static void SyncLoading(Control control, bool isLoading, ref bool? enabledBeforeLoading)
+  public static void SyncDisabled(Control control, bool isDisabled, ref bool? enabledBeforeDisabled)
   {
-    if (isLoading)
+    if (isDisabled)
     {
-      enabledBeforeLoading ??= control.IsEnabled;
+      enabledBeforeDisabled ??= control.IsEnabled;
       control.IsEnabled = false;
     }
-    else if (enabledBeforeLoading.HasValue)
+    else if (enabledBeforeDisabled.HasValue)
     {
-      control.IsEnabled = enabledBeforeLoading.Value;
-      enabledBeforeLoading = null;
+      control.IsEnabled = enabledBeforeDisabled.Value;
+      enabledBeforeDisabled = null;
     }
   }
 

@@ -240,7 +240,7 @@ public class FsusButton : Button
     FsusComponentClasses.Ensure(this, "fsus-motionless", !MotionHooksEnabled);
     FsusComponentClasses.SyncIconPlacement(this, IconPlacement);
 
-    FsusControlAvailability.SyncLoading(this, IsLoading, ref enabledBeforeLoading);
+    FsusControlAvailability.SyncDisabled(this, IsLoading, ref enabledBeforeLoading);
   }
 
   private void SyncAutomation()

@@ -1,7 +1,9 @@
 import type { MarkdownDocumentIdentity } from '../../../wasm/markdown-runtime'
 import type { MarkdownLiveLayoutPlan } from './markdown-editor-live-layout'
 import {
-  commitMarkdownTechnicalFeatureResult,
+  commitMarkdownTechnicalPreview,
+  markdownTechnicalUnsafeFragmentIndex,
+  markdownTechnicalUnsafeFragmentRange,
   planMarkdownTechnicalPreview,
   type MarkdownTechnicalDiagnostic,
   type MarkdownTechnicalFeatureCommit,
@@ -91,23 +93,26 @@ const UNSAFE_FRAGMENTS = Object.freeze([
 ])
 
 const firstToken = (body: string) => {
-  const line = body
-    .split(/\r\n|\n|\r/)
-    .map((item) => item.trim())
-    .find((item) => item.length > 0)
-  if (!line) return ''
-  return line.split(/[\s{]/, 1)[0]!.toLowerCase()
+  const first = body.trimStart()
+  const end = first.search(/[\s{]/)
+  return (end < 0 ? first : first.slice(0, end)).toLowerCase()
 }
 
-const unsafeIndex = (value: string) => {
-  const lower = value.toLowerCase()
-  let found = -1
-  for (const fragment of UNSAFE_FRAGMENTS) {
-    const index = lower.indexOf(fragment)
-    if (index >= 0 && (found === -1 || index < found)) found = index
-  }
-  return found
-}
+const mermaidClassification = (
+  input: Pick<MarkdownMermaidClassification, 'range'>,
+  verdict: MarkdownMermaidVerdict,
+  diagnosticCode: string | null,
+  unsafeAt?: number,
+): MarkdownMermaidClassification =>
+  Object.freeze({
+    diagnosticCode,
+    range:
+      unsafeAt === undefined
+        ? input.range
+        : markdownTechnicalUnsafeFragmentRange(input, unsafeAt),
+    rewrite: false,
+    verdict,
+  })
 
 export const classifyMarkdownMermaidBody = (input: {
   readonly body: string
@@ -115,52 +120,27 @@ export const classifyMarkdownMermaidBody = (input: {
 }): MarkdownMermaidClassification => {
   const trimmed = input.body.trim()
   if (!trimmed) {
-    return Object.freeze({
-      diagnosticCode: 'empty-body',
-      range: input.range,
-      rewrite: false,
-      verdict: 'invalid',
-    })
+    return mermaidClassification(input, 'invalid', 'empty-body')
   }
-  const attack = unsafeIndex(input.body)
+  const attack = markdownTechnicalUnsafeFragmentIndex(
+    input.body,
+    UNSAFE_FRAGMENTS,
+  )
   if (attack >= 0) {
-    return Object.freeze({
-      diagnosticCode: 'unsafe-output',
-      range: Object.freeze({
-        end: Math.min(input.range.end, input.range.start + attack + 8),
-        start: input.range.start + attack,
-      }),
-      rewrite: false,
-      verdict: 'unsafe',
-    })
+    return mermaidClassification(input, 'unsafe', 'unsafe-output', attack)
   }
   const lines = input.body.split(/\r\n|\n|\r/).length
   if (
     input.body.length > MARKDOWN_MERMAID_BUDGET.maxBodyBytes ||
     lines > MARKDOWN_MERMAID_BUDGET.maxBodyLines
   ) {
-    return Object.freeze({
-      diagnosticCode: 'budget-exceeded',
-      range: input.range,
-      rewrite: false,
-      verdict: 'large',
-    })
+    return mermaidClassification(input, 'large', 'budget-exceeded')
   }
   const token = firstToken(input.body)
   if (!DIAGRAM_STARTS.includes(token)) {
-    return Object.freeze({
-      diagnosticCode: 'invalid-diagram',
-      range: input.range,
-      rewrite: false,
-      verdict: 'invalid',
-    })
+    return mermaidClassification(input, 'invalid', 'invalid-diagram')
   }
-  return Object.freeze({
-    diagnosticCode: null,
-    range: input.range,
-    rewrite: false,
-    verdict: 'valid',
-  })
+  return mermaidClassification(input, 'valid', null)
 }
 
 export const planMarkdownMermaidPreview = (
@@ -191,7 +171,9 @@ const payloadLooksUnsafe = (value: unknown) => {
   const record = value as { kind?: string; payload?: string; rootId?: string }
   if (record.kind !== 'mermaid' || typeof record.payload !== 'string') return true
   if (typeof record.rootId !== 'string') return true
-  return unsafeIndex(record.payload) >= 0
+  return (
+    markdownTechnicalUnsafeFragmentIndex(record.payload, UNSAFE_FRAGMENTS) >= 0
+  )
 }
 
 export const commitMarkdownMermaidPreview = (input: {
@@ -206,52 +188,13 @@ export const commitMarkdownMermaidPreview = (input: {
   readonly source: string
 }): MarkdownTechnicalFeatureCommit & {
   readonly rewrite: false
-} => {
-  if (!input.plan.request) {
-    return Object.freeze({
-      accepted: false,
-      diagnostic: input.plan.diagnostic,
-      editorCapability: 'supported',
-      reason: 'stale-node',
-      rewrite: false,
-      sourceUnchanged: true,
-      state: 'deleted',
-      visualUnchanged: true,
-    })
-  }
-  if (
-    input.consumerSvg !== undefined ||
-    input.innerHTML ||
-    (input.output !== undefined && payloadLooksUnsafe(input.output))
-  ) {
-    return Object.freeze({
-      ...commitMarkdownTechnicalFeatureResult({
-        consumerHtml: input.consumerSvg ?? '<svg></svg>',
-        currentIdentity: input.currentIdentity,
-        currentRevision: input.currentRevision,
-        documentIdentity: input.documentIdentity,
-        innerHTML: true,
-        request: input.plan.request,
-        source: input.source,
-      }),
-      rewrite: false,
-    })
-  }
-  const committed = commitMarkdownTechnicalFeatureResult({
-    aborted: input.aborted,
-    currentIdentity: input.currentIdentity,
-    currentRevision: input.currentRevision,
-    documentIdentity: input.documentIdentity,
-    innerHTML: input.innerHTML,
-    output: input.output,
-    request: input.plan.request,
-    source: input.source,
-  })
-  return Object.freeze({
-    ...committed,
-    rewrite: false,
-  })
-}
+} =>
+  commitMarkdownTechnicalPreview(
+    input,
+    'consumerSvg',
+    '<svg></svg>',
+    payloadLooksUnsafe,
+  )
 
 export const evaluateMarkdownMermaidMutations = () => {
   const identity = Object.freeze({ epoch: 1, id: 'mermaid-doc' })

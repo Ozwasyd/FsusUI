@@ -1,7 +1,9 @@
 import type { MarkdownDocumentIdentity } from '../../../wasm/markdown-runtime'
 import type { MarkdownLiveLayoutPlan } from './markdown-editor-live-layout'
 import {
-  commitMarkdownTechnicalFeatureResult,
+  commitMarkdownTechnicalPreview,
+  markdownTechnicalUnsafeFragmentIndex,
+  markdownTechnicalUnsafeFragmentRange,
   planMarkdownTechnicalPreview,
   type MarkdownTechnicalDiagnostic,
   type MarkdownTechnicalFeatureCommit,
@@ -72,21 +74,30 @@ const UNSAFE_FRAGMENTS = Object.freeze([
   '\\special{',
 ])
 
-const unsafeIndex = (value: string) => {
-  const lower = value.toLowerCase()
-  let found = -1
-  for (const fragment of UNSAFE_FRAGMENTS) {
-    const index = lower.indexOf(fragment)
-    if (index >= 0 && (found === -1 || index < found)) found = index
-  }
-  return found
-}
-
 const displayOf = (node: MarkdownTechnicalNodePlan, source: string): MarkdownLatexDisplay => {
   const opening = source.slice(node.ranges.opening.raw.start, node.ranges.opening.raw.end)
   if (opening.includes('$$') || opening.includes('\\[')) return 'block'
   return 'inline'
 }
+
+const latexClassification = (
+  input: Pick<MarkdownLatexClassification, 'display' | 'range'>,
+  wraps: boolean,
+  verdict: MarkdownLatexVerdict,
+  diagnosticCode: string | null,
+  unsafeAt?: number,
+): MarkdownLatexClassification =>
+  Object.freeze({
+    diagnosticCode,
+    display: input.display,
+    range:
+      unsafeAt === undefined
+        ? input.range
+        : markdownTechnicalUnsafeFragmentRange(input, unsafeAt),
+    rewrite: false,
+    wraps,
+    verdict,
+  })
 
 export const classifyMarkdownLatexBody = (input: {
   readonly body: string
@@ -96,42 +107,21 @@ export const classifyMarkdownLatexBody = (input: {
   const wraps = input.display === 'inline'
   const trimmed = input.body.trim()
   if (!trimmed) {
-    return Object.freeze({
-      diagnosticCode: 'empty-body',
-      display: input.display,
-      range: input.range,
-      rewrite: false,
-      wraps,
-      verdict: 'invalid',
-    })
+    return latexClassification(input, wraps, 'invalid', 'empty-body')
   }
-  const attack = unsafeIndex(input.body)
+  const attack = markdownTechnicalUnsafeFragmentIndex(
+    input.body,
+    UNSAFE_FRAGMENTS,
+  )
   if (attack >= 0) {
-    return Object.freeze({
-      diagnosticCode: 'unsafe-output',
-      display: input.display,
-      range: Object.freeze({
-        end: Math.min(input.range.end, input.range.start + attack + 8),
-        start: input.range.start + attack,
-      }),
-      rewrite: false,
-      wraps,
-      verdict: 'unsafe',
-    })
+    return latexClassification(input, wraps, 'unsafe', 'unsafe-output', attack)
   }
   const lines = input.body.split(/\r\n|\n|\r/).length
   if (
     input.body.length > MARKDOWN_LATEX_BUDGET.maxBodyBytes ||
     lines > MARKDOWN_LATEX_BUDGET.maxBodyLines
   ) {
-    return Object.freeze({
-      diagnosticCode: 'budget-exceeded',
-      display: input.display,
-      range: input.range,
-      rewrite: false,
-      wraps,
-      verdict: 'large',
-    })
+    return latexClassification(input, wraps, 'large', 'budget-exceeded')
   }
   let depth = 0
   for (const char of input.body) {
@@ -140,23 +130,9 @@ export const classifyMarkdownLatexBody = (input: {
     if (depth < 0) break
   }
   if (depth !== 0) {
-    return Object.freeze({
-      diagnosticCode: 'unbalanced-braces',
-      display: input.display,
-      range: input.range,
-      rewrite: false,
-      wraps,
-      verdict: 'invalid',
-    })
+    return latexClassification(input, wraps, 'invalid', 'unbalanced-braces')
   }
-  return Object.freeze({
-    diagnosticCode: null,
-    display: input.display,
-    range: input.range,
-    rewrite: false,
-    wraps,
-    verdict: 'valid',
-  })
+  return latexClassification(input, wraps, 'valid', null)
 }
 
 export const planMarkdownLatexPreview = (
@@ -191,7 +167,9 @@ const payloadLooksUnsafe = (value: unknown) => {
   if (!value || typeof value !== 'object') return true
   const record = value as { kind?: string; payload?: string }
   if (record.kind !== 'latex' || typeof record.payload !== 'string') return true
-  return unsafeIndex(record.payload) >= 0
+  return (
+    markdownTechnicalUnsafeFragmentIndex(record.payload, UNSAFE_FRAGMENTS) >= 0
+  )
 }
 
 export const commitMarkdownLatexPreview = (input: {
@@ -206,51 +184,13 @@ export const commitMarkdownLatexPreview = (input: {
   readonly source: string
 }): MarkdownTechnicalFeatureCommit & {
   readonly rewrite: false
-} => {
-  if (!input.plan.request) {
-    return Object.freeze({
-      accepted: false,
-      diagnostic: input.plan.diagnostic,
-      editorCapability: 'supported',
-      reason: 'stale-node',
-      rewrite: false,
-      sourceUnchanged: true,
-      state: 'deleted',
-      visualUnchanged: true,
-    })
-  }
-  if (
-    input.consumerHtml !== undefined ||
-    input.innerHTML ||
-    (input.output !== undefined && payloadLooksUnsafe(input.output))
-  ) {
-    return Object.freeze({
-      ...commitMarkdownTechnicalFeatureResult({
-        consumerHtml: input.consumerHtml ?? '<span class="katex"></span>',
-        currentIdentity: input.currentIdentity,
-        currentRevision: input.currentRevision,
-        documentIdentity: input.documentIdentity,
-        innerHTML: true,
-        request: input.plan.request,
-        source: input.source,
-      }),
-      rewrite: false,
-    })
-  }
-  const committed = commitMarkdownTechnicalFeatureResult({
-    aborted: input.aborted,
-    currentIdentity: input.currentIdentity,
-    currentRevision: input.currentRevision,
-    documentIdentity: input.documentIdentity,
-    output: input.output,
-    request: input.plan.request,
-    source: input.source,
-  })
-  return Object.freeze({
-    ...committed,
-    rewrite: false,
-  })
-}
+} =>
+  commitMarkdownTechnicalPreview(
+    input,
+    'consumerHtml',
+    '<span class="katex"></span>',
+    payloadLooksUnsafe,
+  )
 
 export const evaluateMarkdownLatexMutations = () => {
   const identity = Object.freeze({ epoch: 1, id: 'latex-doc' })

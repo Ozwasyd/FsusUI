@@ -113,8 +113,7 @@ public class FsusCalendar : ContentControl
 
   public bool SelectRange(DateOnly start, DateOnly end)
   {
-    var rangeStart = start <= end ? start : end;
-    var rangeEnd = start <= end ? end : start;
+    var (rangeStart, rangeEnd) = start <= end ? (start, end) : (end, start);
     for (var date = rangeStart; date <= rangeEnd; date = date.AddDays(1))
     {
       if (IsDisabled(date))
@@ -134,14 +133,7 @@ public class FsusCalendar : ContentControl
 
   protected ValueTask<bool> HandleKeyAsync(Key key)
   {
-    FocusedDate = key switch
-    {
-      Key.Right => FocusedDate.AddDays(1),
-      Key.Left => FocusedDate.AddDays(-1),
-      Key.Down => FocusedDate.AddDays(7),
-      Key.Up => FocusedDate.AddDays(-7),
-      _ => FocusedDate,
-    };
+    FocusedDate = FsusDateNavigation.MoveFocus(FocusedDate, key);
 
     if (key == Key.Enter)
     {
@@ -184,6 +176,18 @@ public class FsusCalendar : ContentControl
   }
 }
 
+file static class FsusDateNavigation
+{
+  public static DateOnly MoveFocus(DateOnly date, Key key) => key switch
+  {
+    Key.Right => date.AddDays(1),
+    Key.Left => date.AddDays(-1),
+    Key.Down => date.AddDays(7),
+    Key.Up => date.AddDays(-7),
+    _ => date,
+  };
+}
+
 public class FsusDatePicker : ContentControl
 {
   public FsusDatePicker()
@@ -220,18 +224,13 @@ public class FsusDatePicker : ContentControl
       return false;
     }
 
-    Value = date;
-    FocusedDate = date;
-    RangeStart = null;
-    RangeEnd = null;
-    SyncState();
+    SetSelection(date);
     return true;
   }
 
   public bool SelectRange(DateOnly start, DateOnly end)
   {
-    var rangeStart = start <= end ? start : end;
-    var rangeEnd = start <= end ? end : start;
+    var (rangeStart, rangeEnd) = start <= end ? (start, end) : (end, start);
     for (var date = rangeStart; date <= rangeEnd; date = date.AddDays(1))
     {
       if (DisabledDate?.Invoke(date) == true)
@@ -240,11 +239,7 @@ public class FsusDatePicker : ContentControl
       }
     }
 
-    RangeStart = rangeStart;
-    RangeEnd = rangeEnd;
-    Value = rangeStart;
-    FocusedDate = rangeStart;
-    SyncState();
+    SetSelection(rangeStart, rangeEnd);
     return true;
   }
 
@@ -261,26 +256,23 @@ public class FsusDatePicker : ContentControl
       return;
     }
 
-    Value = null;
-    RangeStart = null;
-    RangeEnd = null;
-    SyncState();
+    SetSelection(null);
   }
 
   protected ValueTask<bool> HandleKeyAsync(Key key)
   {
-    FocusedDate = key switch
-    {
-      Key.Right => FocusedDate.AddDays(1),
-      Key.Left => FocusedDate.AddDays(-1),
-      Key.Down => FocusedDate.AddDays(7),
-      Key.Up => FocusedDate.AddDays(-7),
-      _ => FocusedDate,
-    };
+    FocusedDate = FsusDateNavigation.MoveFocus(FocusedDate, key);
 
     return key == Key.Enter
       ? ValueTask.FromResult(SelectDate(FocusedDate))
       : ValueTask.FromResult(key is Key.Right or Key.Left or Key.Down or Key.Up);
+  }
+
+  private void SetSelection(DateOnly? value, DateOnly? rangeEnd = null)
+  {
+    (Value, RangeStart, RangeEnd) = (value, rangeEnd.HasValue ? value : null, rangeEnd);
+    FocusedDate = value.GetValueOrDefault(FocusedDate);
+    SyncState();
   }
 
   private string FormatDate(DateOnly date) =>
@@ -337,28 +329,19 @@ public class FsusTimePicker : ContentControl
       return false;
     }
 
-    Value = time;
-    FocusedTime = time;
-    RangeStart = null;
-    RangeEnd = null;
-    SyncState();
+    SetSelection(time);
     return true;
   }
 
   public bool SelectRange(TimeOnly start, TimeOnly end)
   {
-    var rangeStart = start <= end ? start : end;
-    var rangeEnd = start <= end ? end : start;
+    var (rangeStart, rangeEnd) = start <= end ? (start, end) : (end, start);
     if (DisabledTime?.Invoke(rangeStart) == true || DisabledTime?.Invoke(rangeEnd) == true)
     {
       return false;
     }
 
-    RangeStart = rangeStart;
-    RangeEnd = rangeEnd;
-    Value = rangeStart;
-    FocusedTime = rangeStart;
-    SyncState();
+    SetSelection(rangeStart, rangeEnd);
     return true;
   }
 
@@ -369,10 +352,7 @@ public class FsusTimePicker : ContentControl
       return;
     }
 
-    Value = null;
-    RangeStart = null;
-    RangeEnd = null;
-    SyncState();
+    SetSelection(null);
   }
 
   protected ValueTask<bool> HandleKeyAsync(Key key)
@@ -392,6 +372,13 @@ public class FsusTimePicker : ContentControl
     return key == Key.Enter
       ? ValueTask.FromResult(SelectTime(FocusedTime))
       : ValueTask.FromResult(false);
+  }
+
+  private void SetSelection(TimeOnly? value, TimeOnly? rangeEnd = null)
+  {
+    (Value, RangeStart, RangeEnd) = (value, rangeEnd.HasValue ? value : null, rangeEnd);
+    FocusedTime = value.GetValueOrDefault(FocusedTime);
+    SyncState();
   }
 
   private string FormatTime(TimeOnly time) =>

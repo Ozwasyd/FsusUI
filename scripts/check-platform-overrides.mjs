@@ -2,6 +2,10 @@ import fs from 'node:fs'
 import path from 'node:path'
 import process from 'node:process'
 import { fileURLToPath } from 'node:url'
+import {
+  readPlatformOverrideFile,
+  readPlatformOverrides,
+} from './lib/platform-overrides.mjs'
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 
@@ -37,63 +41,6 @@ const read = (file) => fs.readFileSync(file, 'utf8')
 const exists = (file) => fs.existsSync(file)
 
 const toPosix = (value) => value.split(path.sep).join('/')
-
-const parseValue = (value) => {
-  const trimmed = value.trim()
-  if (trimmed.startsWith('[') && trimmed.endsWith(']')) {
-    return trimmed
-      .slice(1, -1)
-      .split(',')
-      .map((item) => item.trim())
-      .filter(Boolean)
-  }
-  return trimmed.replace(/^['"]|['"]$/g, '')
-}
-
-const parseOverrideFile = (file) => {
-  const entries = []
-  let current
-  let pendingKey
-  const lines = read(file).split('\n')
-  for (const line of lines) {
-    const start = line.match(/^ {2}- id:\s*(.+)$/)
-    if (start) {
-      pendingKey = undefined
-      current = {
-        id: parseValue(start[1]),
-        file: toPosix(path.relative(root, file)),
-      }
-      entries.push(current)
-      continue
-    }
-    if (!current) continue
-    if (pendingKey) {
-      const continuation = line.match(/^ {6,}(.+)$/)
-      if (continuation) {
-        current[pendingKey] = parseValue(continuation[1])
-        pendingKey = undefined
-        continue
-      }
-    }
-    const field = line.match(/^ {4}([A-Za-z][A-Za-z0-9]*):\s*(.*)$/)
-    if (field) {
-      if (field[2].trim() === '') {
-        pendingKey = field[1]
-      } else {
-        current[field[1]] = parseValue(field[2])
-        pendingKey = undefined
-      }
-    }
-  }
-  return entries
-}
-
-const collectOverrideFiles = () =>
-  fs
-    .readdirSync(path.join(root, 'spec/platform-overrides'))
-    .filter((file) => file.endsWith('.yaml'))
-    .map((file) => path.join(root, 'spec/platform-overrides', file))
-    .sort()
 
 const loadContractIds = () => {
   const registryPath = path.join(
@@ -203,8 +150,14 @@ const validateReleaseEvidence = (entries) => {
 
 const runFixtureAssertions = () => {
   const fixtureRoot = path.join(root, 'tests/fixtures/platform-overrides')
-  const valid = parseOverrideFile(path.join(fixtureRoot, 'valid.yaml'))
-  const invalid = parseOverrideFile(path.join(fixtureRoot, 'invalid.yaml'))
+  const valid = readPlatformOverrideFile(
+    root,
+    path.join(fixtureRoot, 'valid.yaml'),
+  )
+  const invalid = readPlatformOverrideFile(
+    root,
+    path.join(fixtureRoot, 'invalid.yaml'),
+  )
   const fixtureContracts = new Set(['component.el-button'])
   const validErrors = validateOverrides(valid, fixtureContracts, {
     today: new Date('2026-06-21T00:00:00Z'),
@@ -234,7 +187,7 @@ const runFixtureAssertions = () => {
 try {
   runFixtureAssertions()
   const contractIds = loadContractIds()
-  const entries = collectOverrideFiles().flatMap(parseOverrideFile)
+  const entries = readPlatformOverrides(root)
   const errors = [
     ...validateOverrides(entries, contractIds),
     ...scanForUnregisteredMarkers(),

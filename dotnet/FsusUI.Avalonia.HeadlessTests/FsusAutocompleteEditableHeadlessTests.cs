@@ -5,7 +5,6 @@ using Avalonia.Data;
 using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
 using Avalonia.Input;
-using Avalonia.Markup.Xaml.Styling;
 using Avalonia.VisualTree;
 using FsusUI.Avalonia.Controls;
 using FsusUI.Avalonia.Themes;
@@ -221,17 +220,8 @@ public class FsusAutocompleteEditableHeadlessTests
     return window;
   }
 
-  private static void AttachFsusTheme(Window window)
-  {
-    var resources = new ResourceDictionary();
-    new FsusThemeManager().Apply(resources, new FsusThemeOptions { Variant = FsusThemeVariant.Light });
-    window.Resources.MergedDictionaries.Add(resources);
-    window.Styles.Add(
-      new StyleInclude(new Uri("avares://FsusUI.Avalonia.HeadlessTests"))
-      {
-        Source = new Uri("avares://FsusUI.Avalonia.Themes/Themes/FsusTheme.axaml"),
-      });
-  }
+  private static void AttachFsusTheme(Window window) =>
+    HeadlessTheme.Attach(window, new FsusThemeOptions { Variant = FsusThemeVariant.Light });
 
   private static void ClickControl(Window window, Control control)
   {

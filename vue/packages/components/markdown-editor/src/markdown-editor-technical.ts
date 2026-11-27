@@ -630,6 +630,69 @@ export const commitMarkdownTechnicalFeatureResult = (input: {
   })
 }
 
+type MarkdownTechnicalPreviewCommitInput = Omit<
+  Parameters<typeof commitMarkdownTechnicalFeatureResult>[0],
+  'projection' | 'request'
+> & {
+  readonly consumerSvg?: string
+  readonly plan: {
+    readonly diagnostic: MarkdownTechnicalDiagnostic | null
+    readonly request: MarkdownTechnicalFeatureRequest | null
+  }
+}
+
+export const commitMarkdownTechnicalPreview = (
+  input: MarkdownTechnicalPreviewCommitInput,
+  consumerKey: 'consumerHtml' | 'consumerSvg',
+  emptyConsumerOutput: string,
+  payloadLooksUnsafe: (value: unknown) => boolean,
+): MarkdownTechnicalFeatureCommit & { readonly rewrite: false } => {
+  if (!input.plan.request) {
+    return Object.freeze({
+      accepted: false,
+      diagnostic: input.plan.diagnostic,
+      editorCapability: 'supported',
+      reason: 'stale-node',
+      rewrite: false,
+      sourceUnchanged: true,
+      state: 'deleted',
+      visualUnchanged: true,
+    })
+  }
+  if (
+    input[consumerKey] !== undefined ||
+    input.innerHTML ||
+    (input.output !== undefined && payloadLooksUnsafe(input.output))
+  ) {
+    return Object.freeze({
+      ...commitMarkdownTechnicalFeatureResult({
+        consumerHtml: input[consumerKey] ?? emptyConsumerOutput,
+        currentIdentity: input.currentIdentity,
+        currentRevision: input.currentRevision,
+        documentIdentity: input.documentIdentity,
+        request: input.plan.request,
+        source: input.source,
+      }),
+      rewrite: false,
+    })
+  }
+  const { aborted, currentIdentity, currentRevision, documentIdentity } = input
+  const innerHTML = consumerKey === 'consumerSvg' && input.innerHTML
+  return Object.freeze({
+    ...commitMarkdownTechnicalFeatureResult({
+      aborted,
+      currentIdentity,
+      currentRevision,
+      documentIdentity,
+      innerHTML,
+      output: input.output,
+      request: input.plan.request,
+      source: input.source,
+    }),
+    rewrite: false,
+  })
+}
+
 export const resolveMarkdownTechnicalAtomic = (input: {
   readonly action: MarkdownAtomicNodeAction
   readonly documentIdentity?: MarkdownDocumentIdentity
@@ -727,6 +790,28 @@ type MarkdownTechnicalPreviewClassification = {
   readonly range: Readonly<{ end: number; start: number }>
   readonly verdict: MarkdownTechnicalPreviewVerdict
 }
+
+export const markdownTechnicalUnsafeFragmentIndex = (
+  value: string,
+  fragments: readonly string[],
+): number => {
+  const lower = value.toLowerCase()
+  let found = -1
+  for (const fragment of fragments) {
+    const index = lower.indexOf(fragment)
+    if (index >= 0 && (found === -1 || index < found)) found = index
+  }
+  return found
+}
+
+export const markdownTechnicalUnsafeFragmentRange = (
+  input: Pick<MarkdownTechnicalPreviewClassification, 'range'>,
+  offset: number,
+): MarkdownTechnicalPreviewClassification['range'] =>
+  Object.freeze({
+    end: Math.min(input.range.end, input.range.start + offset + 8),
+    start: input.range.start + offset,
+  })
 
 const previewActionFor = (
   intent: MarkdownTechnicalPreviewAction | undefined,

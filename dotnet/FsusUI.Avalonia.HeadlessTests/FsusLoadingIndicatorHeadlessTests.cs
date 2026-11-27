@@ -7,7 +7,6 @@ using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
 using Avalonia.Input;
 using Avalonia.Layout;
-using Avalonia.Markup.Xaml.Styling;
 using Avalonia.Media;
 using Avalonia.Styling;
 using Avalonia.Themes.Fluent;
@@ -147,10 +146,7 @@ public class FsusLoadingIndicatorHeadlessTests
         : ThemeVariant.Light,
     };
     window.Styles.Add(new FluentTheme());
-    window.Styles.Add(new StyleInclude(new Uri("avares://FsusUI.Avalonia.HeadlessTests"))
-    {
-      Source = new Uri("avares://FsusUI.Avalonia.Themes/Themes/FsusTheme.axaml"),
-    });
+    window.Styles.Add(HeadlessTheme.CreateInclude());
     if (motionMode is not null)
     {
       Application.Current!.Resources[FsusThemeResourceKeys.MotionModeCurrent] = motionMode;

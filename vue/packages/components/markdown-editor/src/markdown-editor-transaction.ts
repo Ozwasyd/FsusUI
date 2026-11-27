@@ -890,69 +890,44 @@ export class MarkdownEditorTransactionStore {
   }
 
   undo(): MarkdownEditorStoreMutation {
-    const beforeRevision = this.#revision
-    const entry = this.#undo.pop()
-    if (!entry) return this.#result(false, 'no-history', beforeRevision)
-
-    let nextValue = this.#value
-    const stages: MarkdownEditorChange[][] = []
-    for (const step of [...entry.steps].reverse()) {
-      const applied = applyMarkdownEditorChanges(nextValue, step.inverse)
-      if (!applied) {
-        this.#undo.push(entry)
-        return this.#result(false, 'invalid-change', beforeRevision)
-      }
-      stages.push([...step.inverse])
-      nextValue = applied.value
-    }
-
-    const selectionChanged = !selectionsEqual(
-      this.#selection,
-      entry.beforeSelection,
-    )
-    this.#value = nextValue
-    this.#selection = entry.beforeSelection
-    this.#revision += 1
-    this.#redo.push(entry)
-    this.breakMergeGroup()
-    return {
-      ...this.#result(
-        true,
-        undefined,
-        beforeRevision,
-        composeMarkdownEditorPositionMaps(stages),
-      ),
-      historyChanged: true,
-      selectionChanged,
-      valueChanged: true,
-    }
+    return this.#replayHistory(true)
   }
 
   redo(): MarkdownEditorStoreMutation {
+    return this.#replayHistory(false)
+  }
+
+  #replayHistory(undo: boolean): MarkdownEditorStoreMutation {
     const beforeRevision = this.#revision
-    const entry = this.#redo.pop()
+    const entry = (undo ? this.#undo : this.#redo).pop()
     if (!entry) return this.#result(false, 'no-history', beforeRevision)
 
     let nextValue = this.#value
-    const stages: MarkdownEditorChange[][] = []
-    for (const step of entry.steps) {
-      const applied = applyMarkdownEditorChanges(nextValue, step.changes)
+    const stages: (readonly MarkdownEditorChange[])[] = []
+    const start = undo ? entry.steps.length - 1 : 0
+    const end = undo ? -1 : entry.steps.length
+    const direction = undo ? -1 : 1
+    for (let index = start; index !== end; index += direction) {
+      const step = entry.steps[index]!
+      const changes = undo ? step.inverse : step.changes
+      const applied = applyMarkdownEditorChanges(nextValue, changes)
       if (!applied) {
-        this.#redo.push(entry)
+        const source = undo ? this.#undo : this.#redo
+        source.push(entry)
         return this.#result(false, 'invalid-change', beforeRevision)
       }
-      stages.push([...step.changes])
+      // Position-map creation snapshots these already-frozen history changes.
+      stages.push(changes)
       nextValue = applied.value
     }
 
-    const selectionChanged = !selectionsEqual(
-      this.#selection,
-      entry.afterSelection,
-    )
+    const nextSelection = undo ? entry.beforeSelection : entry.afterSelection
+    const selectionChanged = !selectionsEqual(this.#selection, nextSelection)
     this.#value = nextValue
-    this.#selection = entry.afterSelection
+    this.#selection = nextSelection
     this.#revision += 1
-    this.#undo.push(entry)
+    const destination = undo ? this.#redo : this.#undo
+    destination.push(entry)
     this.breakMergeGroup()
     return {
       ...this.#result(

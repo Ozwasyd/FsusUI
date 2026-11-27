@@ -2,7 +2,6 @@ using Avalonia.Automation;
 using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
 using Avalonia.Input;
-using Avalonia.Markup.Xaml.Styling;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 using FsusUI.Avalonia.Controls;
@@ -103,10 +102,7 @@ public class FsusTabsMutationOrderingHeadlessTests(ITestOutputHelper output)
   private static Window Mount(Control content)
   {
     var window = new Window { Content = content, Width = 400, Height = 200 };
-    window.Styles.Add(new StyleInclude(new Uri("avares://FsusUI.Avalonia.HeadlessTests"))
-    {
-      Source = new Uri("avares://FsusUI.Avalonia.Themes/Themes/FsusTheme.axaml"),
-    });
+    window.Styles.Add(HeadlessTheme.CreateInclude());
     new FsusThemeManager().Apply(window.Resources, new FsusThemeOptions
     {
       MotionMode = FsusMotionMode.Reduced,

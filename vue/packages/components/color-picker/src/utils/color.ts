@@ -168,6 +168,16 @@ const hsv2rgb = function (h: number, s: number, v: number) {
   }
 }
 
+const hslSyntax = /hsla?|[()]/gm
+const hsvSyntax = /hsva?|[()]/gm
+const rgbSyntax = /rgba?|[()]/gm
+
+const getFunctionalSyntax = (value: string) => {
+  if (value.includes('hsl')) return hslSyntax
+  if (value.includes('hsv')) return hsvSyntax
+  if (value.includes('rgb')) return rgbSyntax
+}
+
 interface ColorOptions {
   enableAlpha: boolean
   format: string
@@ -241,60 +251,26 @@ export default class Color {
       this.doOnChange()
     }
 
-    if (value.includes('hsl')) {
-      const parts = value
-        .replace(/hsla|hsl|\(|\)/gm, '')
-        .split(/\s|,/g)
-        .filter((val) => val !== '')
-        .map((val, index) =>
-          index > 2 ? Number.parseFloat(val) : Number.parseInt(val, 10)
-        )
+    const syntax = getFunctionalSyntax(value)
+    if (syntax) {
+      const parts = value.replace(syntax, '').match(/[^\s,]+/g)
+      if (!parts || parts.length < 3) return
 
+      const first = Number.parseInt(parts[0], 10)
+      const second = Number.parseInt(parts[1], 10)
+      const third = Number.parseInt(parts[2], 10)
       if (parts.length === 4) {
-        // @ts-expect-error
-        this._alpha = Number.parseFloat(parts[3]) * 100
+        const alpha = Number.parseFloat(parts[3])
+        this._alpha = (alpha === 0 ? 0 : alpha) * 100
       } else if (parts.length === 3) {
         this._alpha = 100
       }
-      if (parts.length >= 3) {
-        const { h, s, v } = hsl2hsv(parts[0], parts[1], parts[2])
-        fromHSV(h, s, v)
-      }
-    } else if (value.includes('hsv')) {
-      const parts = value
-        .replace(/hsva|hsv|\(|\)/gm, '')
-        .split(/\s|,/g)
-        .filter((val) => val !== '')
-        .map((val, index) =>
-          index > 2 ? Number.parseFloat(val) : Number.parseInt(val, 10)
-        )
 
-      if (parts.length === 4) {
-        // @ts-expect-error
-        this._alpha = Number.parseFloat(parts[3]) * 100
-      } else if (parts.length === 3) {
-        this._alpha = 100
-      }
-      if (parts.length >= 3) {
-        fromHSV(parts[0], parts[1], parts[2])
-      }
-    } else if (value.includes('rgb')) {
-      const parts = value
-        .replace(/rgba|rgb|\(|\)/gm, '')
-        .split(/\s|,/g)
-        .filter((val) => val !== '')
-        .map((val, index) =>
-          index > 2 ? Number.parseFloat(val) : Number.parseInt(val, 10)
-        )
-
-      if (parts.length === 4) {
-        // @ts-expect-error
-        this._alpha = Number.parseFloat(parts[3]) * 100
-      } else if (parts.length === 3) {
-        this._alpha = 100
-      }
-      if (parts.length >= 3) {
-        const { h, s, v } = rgb2hsv(parts[0], parts[1], parts[2])
+      if (syntax === hsvSyntax) {
+        fromHSV(first, second, third)
+      } else {
+        const convert = syntax === hslSyntax ? hsl2hsv : rgb2hsv
+        const { h, s, v } = convert(first, second, third)
         fromHSV(h, s, v)
       }
     } else if (value.includes('#')) {
@@ -336,56 +312,36 @@ export default class Color {
   doOnChange() {
     const { _hue, _saturation, _value, _alpha, format } = this
 
-    if (this.enableAlpha) {
-      switch (format) {
-        case 'hsl': {
-          const hsl = hsv2hsl(_hue, _saturation / 100, _value / 100)
-          this.value = `hsla(${_hue}, ${Math.round(
-            hsl[1] * 100
-          )}%, ${Math.round(hsl[2] * 100)}%, ${this.get('alpha') / 100})`
-          break
-        }
-        case 'hsv': {
-          this.value = `hsva(${_hue}, ${Math.round(_saturation)}%, ${Math.round(
-            _value
-          )}%, ${this.get('alpha') / 100})`
-          break
-        }
-        case 'hex': {
-          this.value = `${toHex(hsv2rgb(_hue, _saturation, _value))}${hexOne(
-            (_alpha * 255) / 100
-          )}`
-          break
-        }
-        default: {
-          const { r, g, b } = hsv2rgb(_hue, _saturation, _value)
-          this.value = `rgba(${r}, ${g}, ${b}, ${this.get('alpha') / 100})`
-        }
+    const enableAlpha = this.enableAlpha
+    let name: string
+    let channels: string
+
+    switch (format) {
+      case 'hsl': {
+        const hsl = hsv2hsl(_hue, _saturation / 100, _value / 100)
+        name = format
+        channels = `${_hue}, ${Math.round(hsl[1] * 100)}%, ${Math.round(hsl[2] * 100)}%`
+        break
       }
-    } else {
-      switch (format) {
-        case 'hsl': {
-          const hsl = hsv2hsl(_hue, _saturation / 100, _value / 100)
-          this.value = `hsl(${_hue}, ${Math.round(hsl[1] * 100)}%, ${Math.round(
-            hsl[2] * 100
-          )}%)`
-          break
+      case 'hsv': {
+        name = format
+        channels = `${_hue}, ${Math.round(_saturation)}%, ${Math.round(_value)}%`
+        break
+      }
+      default: {
+        const rgb = hsv2rgb(_hue, _saturation, _value)
+        if (format === 'hex' || (!enableAlpha && format !== 'rgb')) {
+          const hex = toHex(rgb)
+          this.value = enableAlpha ? `${hex}${hexOne((_alpha * 255) / 100)}` : hex
+          return
         }
-        case 'hsv': {
-          this.value = `hsv(${_hue}, ${Math.round(_saturation)}%, ${Math.round(
-            _value
-          )}%)`
-          break
-        }
-        case 'rgb': {
-          const { r, g, b } = hsv2rgb(_hue, _saturation, _value)
-          this.value = `rgb(${r}, ${g}, ${b})`
-          break
-        }
-        default: {
-          this.value = toHex(hsv2rgb(_hue, _saturation, _value))
-        }
+        name = 'rgb'
+        channels = `${rgb.r}, ${rgb.g}, ${rgb.b}`
       }
     }
+
+    this.value = enableAlpha
+      ? `${name}a(${channels}, ${this.get('alpha') / 100})`
+      : `${name}(${channels})`
   }
 }

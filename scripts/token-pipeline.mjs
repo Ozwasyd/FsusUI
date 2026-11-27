@@ -3,6 +3,10 @@ import fs from 'node:fs'
 import path from 'node:path'
 import process from 'node:process'
 import { fileURLToPath } from 'node:url'
+import {
+  checkGeneratedArtifacts,
+  writeGeneratedArtifacts,
+} from './lib/generated-artifacts.mjs'
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const sourcePath = path.join(root, 'spec/tokens/tokens.json')
@@ -992,36 +996,6 @@ const renderAll = () => {
   return files
 }
 
-const writeFiles = (files) => {
-  for (const [relativePath, content] of Object.entries(files)) {
-    const absolutePath = path.join(root, relativePath)
-    fs.mkdirSync(path.dirname(absolutePath), { recursive: true })
-    fs.writeFileSync(absolutePath, content)
-    console.log(`wrote ${relativePath}`)
-  }
-}
-
-const checkFiles = (files) => {
-  const failures = []
-  for (const [relativePath, expected] of Object.entries(files)) {
-    const absolutePath = path.join(root, relativePath)
-    if (!fs.existsSync(absolutePath)) {
-      failures.push(`${relativePath} is missing`)
-      continue
-    }
-    const actual = fs.readFileSync(absolutePath, 'utf8')
-    if (actual !== expected) {
-      failures.push(`${relativePath} is stale`)
-    }
-  }
-
-  if (failures.length > 0) {
-    throw new Error(`Token artifacts are not current:\n${failures.join('\n')}`)
-  }
-
-  console.log('Token artifacts are current.')
-}
-
 const lintGeneratedHeaders = () => {
   const generatedFiles = Object.values(outputPaths).map((relativePath) =>
     path.join(root, relativePath),
@@ -1373,9 +1347,10 @@ if (isDirectExecution) {
 
   try {
     if (command === 'generate') {
-      writeFiles(renderAll())
+      writeGeneratedArtifacts(root, renderAll())
     } else if (command === 'check') {
-      checkFiles(renderAll())
+      checkGeneratedArtifacts(root, renderAll(), 'Token')
+      console.log('Token artifacts are current.')
     } else if (command === 'lint') {
       lint()
     } else {

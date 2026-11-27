@@ -1,74 +1,9 @@
 @use 'mixins/mixins' as *;
 @use 'mixins/public-shell' as shell;
+@use 'mixins/bottom-tab-bar' as bottom-tab;
 @use 'mixins/var' as *;
 
-.fsu-mobile-dock[data-fsus-mobile-dock='bottom'] {
-  position: fixed;
-  inset-inline: 0;
-  inset-block-end: 0;
-  z-index: var(--fsus-z-mobile-dock, 40);
-}
-
-.fsu-bottom-tab-bar {
-  align-items: stretch;
-  inline-size: 100%;
-  min-block-size: var(--fsus-bottom-tab-height, 56px);
-  background: var(
-    --fsus-bottom-tab-bg,
-    var(--fsus-color-surface-base, var(--fsus-paper, #fff))
-  );
-  border-block-start: 1px solid
-    var(--fsus-bottom-tab-border, var(--fsus-border, #e4e4e7));
-}
-
-.fsu-bottom-tab-bar__item {
-  position: relative;
-  flex: 1 1 0;
-  display: inline-flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-block-size: var(--fsus-bottom-tab-height, 56px);
-  min-inline-size: 0;
-  padding: var(--fsus-space-1, 4px) var(--fsus-space-2, 8px);
-  color: var(--fsus-bottom-tab-color, var(--fsus-text-regular, #5f5f68));
-  font-size: var(--fsus-bottom-tab-font-size, 13px);
-  font-weight: 500;
-  line-height: 1.15;
-  text-align: center;
-  text-decoration: none;
-}
-
-.fsu-bottom-tab-bar__item.is-active {
-  color: var(--fsus-bottom-tab-active-color, var(--fsus-ink, #0f0f11));
-  font-weight: 700;
-}
-
-.fsu-bottom-tab-bar__indicator {
-  position: absolute;
-  inset-block-start: 0;
-  inset-inline-start: 50%;
-  inline-size: var(--fsus-bottom-tab-indicator-width, 32px);
-  block-size: var(--fsus-bottom-tab-indicator-height, 2px);
-  border-radius: var(--fsus-radius-pill, 999px);
-  background: transparent;
-  transform: translateX(-50%);
-}
-
-.fsu-bottom-tab-bar__item.is-active .fsu-bottom-tab-bar__indicator {
-  background: var(--fsus-bottom-tab-indicator, var(--fsus-scholarly-blue));
-}
-
-.fsu-bottom-tab-bar__icon:empty {
-  display: none;
-}
-
-.fsu-bottom-tab-bar__label {
-  overflow: hidden;
-  max-inline-size: 100%;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
+@include bottom-tab.bottom-tab-bar($critical: true);
 
 @include shell.bottom-tab-overflow;
 

@@ -349,34 +349,54 @@ public class FsusDropZone : ContentControl
 
   public void HandleDrop(IEnumerable<IStorageItem> items)
   {
-    if (IsDisabled || !IsEnabled || IsLoading)
-    {
+    if (items is null or IStorageItem[] { Length: 0 } || !CanHandleDrop())
       return;
-    }
 
-    var itemList = items?.ToList() ?? [];
+    var itemList = items.ToList();
     if (itemList.Count == 0)
-    {
       return;
-    }
 
     ResetDropResult();
-
     var accepted = new List<IStorageItem>();
     var rejected = new List<IStorageItem>();
-
     foreach (var item in itemList)
-    {
-      if (IsItemAccepted(item))
-      {
-        accepted.Add(item);
-      }
-      else
-      {
-        rejected.Add(item);
-      }
-    }
+      (IsItemAccepted(item) ? accepted : rejected).Add(item);
 
+    CompleteDrop(
+      accepted, rejected, static item => item.Name,
+      static (zone, routedEvent, valid, invalid) =>
+        zone.CreateStorageDropEventArgs(routedEvent, valid, invalid));
+  }
+
+  public void HandleDrop(IEnumerable<string> filePaths)
+  {
+    if (filePaths is null or string[] { Length: 0 } || !CanHandleDrop())
+      return;
+
+    var pathList = filePaths.Where(path => !string.IsNullOrWhiteSpace(path)).ToList();
+    if (pathList.Count == 0)
+      return;
+
+    ResetDropResult();
+    var accepted = new List<string>();
+    var rejected = new List<string>();
+    foreach (var path in pathList)
+      (IsPathAccepted(path) ? accepted : rejected).Add(path);
+
+    CompleteDrop(
+      accepted, rejected, System.IO.Path.GetFileName,
+      static (zone, routedEvent, valid, invalid) => new FsusFileDropEventArgs(
+        routedEvent, zone, valid.AsReadOnly(), invalid.AsReadOnly()));
+  }
+
+  private bool CanHandleDrop() => !IsDisabled && IsEnabled && !IsLoading;
+
+  private void CompleteDrop<T>(
+    List<T> accepted,
+    List<T> rejected,
+    Func<T, string?> getName,
+    Func<FsusDropZone, RoutedEvent<FsusFileDropEventArgs>, List<T>, List<T>, FsusFileDropEventArgs> createArgs)
+  {
     if (!AllowMultiple && accepted.Count > 1)
     {
       for (var index = 1; index < accepted.Count; index++)
@@ -394,34 +414,16 @@ public class FsusDropZone : ContentControl
       HasFilterError = true;
       if (string.IsNullOrEmpty(FilterErrorMessage))
       {
-        var rejectedNames = string.Join(", ", rejected.Select(r => r.Name));
+        var rejectedNames = string.Join(", ", rejected.Select(getName));
         FilterErrorMessage = $"Files [{rejectedNames}] were rejected. Accepted formats: {Accepts ?? "All"}.";
       }
 
-      var rejectedFiles = rejected.Select(GetStorageItemPath).ToList().AsReadOnly();
-      var acceptedFiles = accepted.Select(GetStorageItemPath).ToList().AsReadOnly();
-      var rejectedArgs = new FsusFileDropEventArgs(
-        FilesRejectedEvent,
-        this,
-        accepted.AsReadOnly(),
-        acceptedFiles,
-        rejected.AsReadOnly(),
-        rejectedFiles);
-      RaiseEvent(rejectedArgs);
+      RaiseEvent(createArgs(this, FilesRejectedEvent, accepted, rejected));
     }
 
     if (accepted.Count > 0)
     {
-      var acceptedFiles = accepted.Select(GetStorageItemPath).ToList().AsReadOnly();
-      var rejectedFiles = rejected.Select(GetStorageItemPath).ToList().AsReadOnly();
-      var dropArgs = new FsusFileDropEventArgs(
-        FilesDroppedEvent,
-        this,
-        accepted.AsReadOnly(),
-        acceptedFiles,
-        rejected.AsReadOnly(),
-        rejectedFiles);
-      RaiseEvent(dropArgs);
+      RaiseEvent(createArgs(this, FilesDroppedEvent, accepted, rejected));
     }
 
     SetDropResult(accepted.Count, rejected.Count);
@@ -430,81 +432,20 @@ public class FsusDropZone : ContentControl
     SyncAutomation();
   }
 
-  public void HandleDrop(IEnumerable<string> filePaths)
+  private FsusFileDropEventArgs CreateStorageDropEventArgs(
+    RoutedEvent<FsusFileDropEventArgs> routedEvent,
+    List<IStorageItem> accepted,
+    List<IStorageItem> rejected)
   {
-    if (IsDisabled || !IsEnabled || IsLoading)
-    {
-      return;
-    }
+    // Preserve the order in which path properties are read for each event.
+    var rejectedFiles = routedEvent == FilesRejectedEvent ? Paths(rejected) : null;
+    var acceptedFiles = Paths(accepted);
+    rejectedFiles ??= Paths(rejected);
+    return new FsusFileDropEventArgs(
+      routedEvent, this, accepted.AsReadOnly(), acceptedFiles, rejected.AsReadOnly(), rejectedFiles);
 
-    var pathList = (filePaths ?? [])
-      .Where(path => !string.IsNullOrWhiteSpace(path))
-      .ToList();
-    if (pathList.Count == 0)
-    {
-      return;
-    }
-
-    ResetDropResult();
-
-    var accepted = new List<string>();
-    var rejected = new List<string>();
-
-    foreach (var path in pathList)
-    {
-      if (IsPathAccepted(path))
-      {
-        accepted.Add(path);
-      }
-      else
-      {
-        rejected.Add(path);
-      }
-    }
-
-    if (!AllowMultiple && accepted.Count > 1)
-    {
-      for (var index = 1; index < accepted.Count; index++)
-      {
-        rejected.Add(accepted[index]);
-      }
-
-      accepted.RemoveRange(1, accepted.Count - 1);
-      HasFilterError = true;
-      FilterErrorMessage = "Only a single file is accepted.";
-    }
-
-    if (rejected.Count > 0)
-    {
-      HasFilterError = true;
-      if (string.IsNullOrEmpty(FilterErrorMessage))
-      {
-        var rejectedNames = string.Join(", ", rejected.Select(System.IO.Path.GetFileName));
-        FilterErrorMessage = $"Files [{rejectedNames}] were rejected. Accepted formats: {Accepts ?? "All"}.";
-      }
-
-      var rejectedArgs = new FsusFileDropEventArgs(
-        FilesRejectedEvent,
-        this,
-        accepted.AsReadOnly(),
-        rejected.AsReadOnly());
-      RaiseEvent(rejectedArgs);
-    }
-
-    if (accepted.Count > 0)
-    {
-      var dropArgs = new FsusFileDropEventArgs(
-        FilesDroppedEvent,
-        this,
-        accepted.AsReadOnly(),
-        rejected.AsReadOnly());
-      RaiseEvent(dropArgs);
-    }
-
-    SetDropResult(accepted.Count, rejected.Count);
-    IsDragOver = false;
-    SyncClasses();
-    SyncAutomation();
+    static IReadOnlyList<string> Paths(List<IStorageItem> items) =>
+      items.Select(GetStorageItemPath).ToList().AsReadOnly();
   }
 
   public static string GetStorageItemPath(IStorageItem item)

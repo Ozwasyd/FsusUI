@@ -4,7 +4,12 @@ import path from 'node:path'
 import process from 'node:process'
 import { execFileSync } from 'node:child_process'
 import { fileURLToPath } from 'node:url'
-import { format, resolveConfig } from 'prettier'
+import { createArtifactFormatter } from './lib/format-generated-artifacts.mjs'
+import {
+  checkGeneratedArtifacts,
+  writeGeneratedArtifacts,
+} from './lib/generated-artifacts.mjs'
+import { readPlatformOverrides } from './lib/platform-overrides.mjs'
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const generatedBy = 'scripts/accessibility-conformance.mjs'
@@ -48,70 +53,8 @@ const readJson = (relativePath) => JSON.parse(read(relativePath))
 const sha256 = (content) =>
   crypto.createHash('sha256').update(content).digest('hex')
 
-const toPosix = (value) => value.split(path.sep).join('/')
-
-const parseValue = (value) => {
-  const trimmed = value.trim()
-  if (trimmed.startsWith('[') && trimmed.endsWith(']')) {
-    return trimmed
-      .slice(1, -1)
-      .split(',')
-      .map((item) => item.trim())
-      .filter(Boolean)
-  }
-  return trimmed.replace(/^['"]|['"]$/g, '')
-}
-
-const parseOverrideFile = (relativePath) => {
-  const entries = []
-  let current
-  let pendingKey
-  const absolutePath = path.join(root, relativePath)
-  for (const line of fs.readFileSync(absolutePath, 'utf8').split('\n')) {
-    const start = line.match(/^ {2}- id:\s*(.+)$/)
-    if (start) {
-      pendingKey = undefined
-      current = {
-        id: parseValue(start[1]),
-        file: toPosix(path.relative(root, absolutePath)),
-      }
-      entries.push(current)
-      continue
-    }
-    if (!current) continue
-    if (pendingKey) {
-      const continuation = line.match(/^ {6,}(.+)$/)
-      if (continuation) {
-        current[pendingKey] = parseValue(continuation[1])
-        pendingKey = undefined
-        continue
-      }
-    }
-    const field = line.match(/^ {4}([A-Za-z][A-Za-z0-9]*):\s*(.*)$/)
-    if (field) {
-      if (field[2].trim() === '') {
-        pendingKey = field[1]
-      } else {
-        current[field[1]] = parseValue(field[2])
-        pendingKey = undefined
-      }
-    }
-  }
-  return entries
-}
-
-const collectAccessibilityOverrides = () => {
-  const overrideRoot = path.join(root, 'spec/platform-overrides')
-  return fs
-    .readdirSync(overrideRoot)
-    .filter((file) => file.endsWith('.yaml'))
-    .sort()
-    .flatMap((file) =>
-      parseOverrideFile(`spec/platform-overrides/${file}`).filter(
-        (entry) => entry.area === 'accessibility',
-      ),
-    )
-}
+const collectAccessibilityOverrides = () =>
+  readPlatformOverrides(root).filter((entry) => entry.area === 'accessibility')
 
 const csString = (value) =>
   `"${String(value)
@@ -897,54 +840,13 @@ const renderAll = () => {
   return files
 }
 
-const prettierConfig = await resolveConfig(path.join(root, 'package.json'))
-
-const formatGeneratedContent = async (relativePath, content) => {
-  if (relativePath.endsWith('.cs')) return content
-  return format(content, {
-    ...(prettierConfig ?? {}),
-    filepath: path.join(root, relativePath),
-  })
-}
-
-const renderFormatted = async () => {
-  const files = renderAll()
-  return Object.fromEntries(
-    await Promise.all(
-      Object.entries(files).map(async ([relativePath, content]) => [
-        relativePath,
-        await formatGeneratedContent(relativePath, content),
-      ]),
-    ),
-  )
-}
-
-const writeFiles = (files) => {
-  for (const [relativePath, content] of Object.entries(files)) {
-    const absolutePath = path.join(root, relativePath)
-    fs.mkdirSync(path.dirname(absolutePath), { recursive: true })
-    fs.writeFileSync(absolutePath, content)
-    console.log(`wrote ${relativePath}`)
-  }
-}
+const formatArtifacts = await createArtifactFormatter(
+  root,
+  (relativePath) => !relativePath.endsWith('.cs'),
+)
 
 const checkFiles = (files) => {
-  const failures = []
-  for (const [relativePath, expected] of Object.entries(files)) {
-    const absolutePath = path.join(root, relativePath)
-    if (!fs.existsSync(absolutePath)) {
-      failures.push(`${relativePath} is missing`)
-      continue
-    }
-    if (fs.readFileSync(absolutePath, 'utf8') !== expected) {
-      failures.push(`${relativePath} is stale`)
-    }
-  }
-  if (failures.length > 0) {
-    throw new Error(
-      `Accessibility conformance artifacts are not current:\n${failures.join('\n')}`,
-    )
-  }
+  checkGeneratedArtifacts(root, files, 'Accessibility conformance')
   console.log('Accessibility conformance automation evidence passed.')
 }
 
@@ -955,6 +857,9 @@ const runtimeRunnerHash = () => {
   const hash = crypto.createHash('sha256')
   for (const relativePath of [
     generatedBy,
+    'scripts/lib/format-generated-artifacts.mjs',
+    'scripts/lib/generated-artifacts.mjs',
+    'scripts/lib/platform-overrides.mjs',
     outputPaths.avaloniaTests,
     runtimeHelperPath,
     runtimeScenarioPath,
@@ -1579,7 +1484,7 @@ const verifyRuntimeEvidence = () => {
   for (const [name, mutate, expected] of mutations) {
     assertRuntimeMutation(name, evidence, mutate, expected)
   }
-  writeFiles({
+  writeGeneratedArtifacts(root, {
     [runtimeVerificationPath]: `${JSON.stringify(
       {
         schema: 'fsusui.accessibility-verification.v2',
@@ -1606,8 +1511,8 @@ const verifyRuntimeEvidence = () => {
 const command = process.argv[2] ?? 'check'
 
 try {
-  const files = await renderFormatted()
-  if (command === 'generate') writeFiles(files)
+  const files = await formatArtifacts(renderAll())
+  if (command === 'generate') writeGeneratedArtifacts(root, files)
   else if (command === 'check') checkFiles(files)
   else if (command === 'runtime-check') {
     checkFiles(files)

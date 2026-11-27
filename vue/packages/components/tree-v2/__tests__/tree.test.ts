@@ -51,6 +51,30 @@ const createData = (
 
 const data = createData(4, 30, NODE_NUMBER)
 
+const createNestedTreeData = () => [
+  {
+    id: '1',
+    label: 'node-1',
+    children: [
+      {
+        id: '1-1',
+        label: 'node-1-1',
+        children: [
+          { id: '1-1-1', label: 'node-1-1-1' },
+          { id: '1-1-2', label: 'node-1-1-2' },
+        ],
+      },
+      {
+        id: '1-2',
+        label: 'node-1-2',
+        children: [{ id: '1-2-1', label: 'node-1-2-1' }],
+      },
+      { id: '1-3', label: 'node-1-3' },
+    ],
+  },
+  { id: '2', label: 'node-2' },
+]
+
 const _mount = makeMountFunc({
   components: {
     'el-tree': Tree,
@@ -376,46 +400,7 @@ describe('Virtual Tree', () => {
       data() {
         return {
           height: 400,
-          data: [
-            {
-              id: '1',
-              label: 'node-1',
-              children: [
-                {
-                  id: '1-1',
-                  label: 'node-1-1',
-                  children: [
-                    {
-                      id: '1-1-1',
-                      label: 'node-1-1-1',
-                    },
-                    {
-                      id: '1-1-2',
-                      label: 'node-1-1-2',
-                    },
-                  ],
-                },
-                {
-                  id: '1-2',
-                  label: 'node-1-2',
-                  children: [
-                    {
-                      id: '1-2-1',
-                      label: 'node-1-2-1',
-                    },
-                  ],
-                },
-                {
-                  id: '1-3',
-                  label: 'node-1-3',
-                },
-              ],
-            },
-            {
-              id: '2',
-              label: 'node-2',
-            },
-          ],
+          data: createNestedTreeData(),
           showCheckbox: true,
         }
       },
@@ -478,46 +463,7 @@ describe('Virtual Tree', () => {
       data() {
         return {
           height: 400,
-          data: [
-            {
-              id: '1',
-              label: 'node-1',
-              children: [
-                {
-                  id: '1-1',
-                  label: 'node-1-1',
-                  children: [
-                    {
-                      id: '1-1-1',
-                      label: 'node-1-1-1',
-                    },
-                    {
-                      id: '1-1-2',
-                      label: 'node-1-1-2',
-                    },
-                  ],
-                },
-                {
-                  id: '1-2',
-                  label: 'node-1-2',
-                  children: [
-                    {
-                      id: '1-2-1',
-                      label: 'node-1-2-1',
-                    },
-                  ],
-                },
-                {
-                  id: '1-3',
-                  label: 'node-1-3',
-                },
-              ],
-            },
-            {
-              id: '2',
-              label: 'node-2',
-            },
-          ],
+          data: createNestedTreeData(),
           defaultCheckedKeys: ['1-1-1', '1-1-2'],
           showCheckbox: true,
         }
@@ -535,46 +481,7 @@ describe('Virtual Tree', () => {
       data() {
         return {
           height: 400,
-          data: [
-            {
-              id: '1',
-              label: 'node-1',
-              children: [
-                {
-                  id: '1-1',
-                  label: 'node-1-1',
-                  children: [
-                    {
-                      id: '1-1-1',
-                      label: 'node-1-1-1',
-                    },
-                    {
-                      id: '1-1-2',
-                      label: 'node-1-1-2',
-                    },
-                  ],
-                },
-                {
-                  id: '1-2',
-                  label: 'node-1-2',
-                  children: [
-                    {
-                      id: '1-2-1',
-                      label: 'node-1-2-1',
-                    },
-                  ],
-                },
-                {
-                  id: '1-3',
-                  label: 'node-1-3',
-                },
-              ],
-            },
-            {
-              id: '2',
-              label: 'node-2',
-            },
-          ],
+          data: createNestedTreeData(),
           defaultCheckedKeys: ['1-1-1', '1-1-2'],
           showCheckbox: true,
           checkStrictly: true,
@@ -597,46 +504,7 @@ describe('Virtual Tree', () => {
       data() {
         return {
           height: 400,
-          data: [
-            {
-              id: '1',
-              label: 'node-1',
-              children: [
-                {
-                  id: '1-1',
-                  label: 'node-1-1',
-                  children: [
-                    {
-                      id: '1-1-1',
-                      label: 'node-1-1-1',
-                    },
-                    {
-                      id: '1-1-2',
-                      label: 'node-1-1-2',
-                    },
-                  ],
-                },
-                {
-                  id: '1-2',
-                  label: 'node-1-2',
-                  children: [
-                    {
-                      id: '1-2-1',
-                      label: 'node-1-2-1',
-                    },
-                  ],
-                },
-                {
-                  id: '1-3',
-                  label: 'node-1-3',
-                },
-              ],
-            },
-            {
-              id: '2',
-              label: 'node-2',
-            },
-          ],
+          data: createNestedTreeData(),
           defaultExpandedKeys: ['1'],
         }
       },
@@ -651,46 +519,7 @@ describe('Virtual Tree', () => {
       data() {
         return {
           indent: 20,
-          data: [
-            {
-              id: '1',
-              label: 'node-1',
-              children: [
-                {
-                  id: '1-1',
-                  label: 'node-1-1',
-                  children: [
-                    {
-                      id: '1-1-1',
-                      label: 'node-1-1-1',
-                    },
-                    {
-                      id: '1-1-2',
-                      label: 'node-1-1-2',
-                    },
-                  ],
-                },
-                {
-                  id: '1-2',
-                  label: 'node-1-2',
-                  children: [
-                    {
-                      id: '1-2-1',
-                      label: 'node-1-2-1',
-                    },
-                  ],
-                },
-                {
-                  id: '1-3',
-                  label: 'node-1-3',
-                },
-              ],
-            },
-            {
-              id: '2',
-              label: 'node-2',
-            },
-          ],
+          data: createNestedTreeData(),
           defaultExpandedKeys: ['1'],
         }
       },
@@ -745,46 +574,7 @@ describe('Virtual Tree', () => {
       data() {
         return {
           currentNodeKey: '2',
-          data: [
-            {
-              id: '1',
-              label: 'node-1',
-              children: [
-                {
-                  id: '1-1',
-                  label: 'node-1-1',
-                  children: [
-                    {
-                      id: '1-1-1',
-                      label: 'node-1-1-1',
-                    },
-                    {
-                      id: '1-1-2',
-                      label: 'node-1-1-2',
-                    },
-                  ],
-                },
-                {
-                  id: '1-2',
-                  label: 'node-1-2',
-                  children: [
-                    {
-                      id: '1-2-1',
-                      label: 'node-1-2-1',
-                    },
-                  ],
-                },
-                {
-                  id: '1-3',
-                  label: 'node-1-3',
-                },
-              ],
-            },
-            {
-              id: '2',
-              label: 'node-2',
-            },
-          ],
+          data: createNestedTreeData(),
         }
       },
     })
@@ -808,46 +598,7 @@ describe('Virtual Tree', () => {
       data() {
         return {
           currentNodeKey: '2',
-          data: [
-            {
-              id: '1',
-              label: 'node-1',
-              children: [
-                {
-                  id: '1-1',
-                  label: 'node-1-1',
-                  children: [
-                    {
-                      id: '1-1-1',
-                      label: 'node-1-1-1',
-                    },
-                    {
-                      id: '1-1-2',
-                      label: 'node-1-1-2',
-                    },
-                  ],
-                },
-                {
-                  id: '1-2',
-                  label: 'node-1-2',
-                  children: [
-                    {
-                      id: '1-2-1',
-                      label: 'node-1-2-1',
-                    },
-                  ],
-                },
-                {
-                  id: '1-3',
-                  label: 'node-1-3',
-                },
-              ],
-            },
-            {
-              id: '2',
-              label: 'node-2',
-            },
-          ],
+          data: createNestedTreeData(),
           filterMethod(query: string, node: TreeNodeData) {
             return node.label.includes(query)
           },
@@ -931,46 +682,7 @@ describe('Virtual Tree', () => {
           return {
             showCheckbox: true,
             defaultExpandedKeys: ['1-1', '1'],
-            data: [
-              {
-                id: '1',
-                label: 'node-1',
-                children: [
-                  {
-                    id: '1-1',
-                    label: 'node-1-1',
-                    children: [
-                      {
-                        id: '1-1-1',
-                        label: 'node-1-1-1',
-                      },
-                      {
-                        id: '1-1-2',
-                        label: 'node-1-1-2',
-                      },
-                    ],
-                  },
-                  {
-                    id: '1-2',
-                    label: 'node-1-2',
-                    children: [
-                      {
-                        id: '1-2-1',
-                        label: 'node-1-2-1',
-                      },
-                    ],
-                  },
-                  {
-                    id: '1-3',
-                    label: 'node-1-3',
-                  },
-                ],
-              },
-              {
-                id: '2',
-                label: 'node-2',
-              },
-            ],
+            data: createNestedTreeData(),
           }
         },
         methods: {
@@ -1040,46 +752,7 @@ describe('Virtual Tree', () => {
           return {
             showCheckbox: true,
             defaultCheckedKeys: ['1-1-2'],
-            data: [
-              {
-                id: '1',
-                label: 'node-1',
-                children: [
-                  {
-                    id: '1-1',
-                    label: 'node-1-1',
-                    children: [
-                      {
-                        id: '1-1-1',
-                        label: 'node-1-1-1',
-                      },
-                      {
-                        id: '1-1-2',
-                        label: 'node-1-1-2',
-                      },
-                    ],
-                  },
-                  {
-                    id: '1-2',
-                    label: 'node-1-2',
-                    children: [
-                      {
-                        id: '1-2-1',
-                        label: 'node-1-2-1',
-                      },
-                    ],
-                  },
-                  {
-                    id: '1-3',
-                    label: 'node-1-3',
-                  },
-                ],
-              },
-              {
-                id: '2',
-                label: 'node-2',
-              },
-            ],
+            data: createNestedTreeData(),
           }
         },
       })
@@ -1103,46 +776,7 @@ describe('Virtual Tree', () => {
         data() {
           return {
             showCheckbox: true,
-            data: [
-              {
-                id: '1',
-                label: 'node-1',
-                children: [
-                  {
-                    id: '1-1',
-                    label: 'node-1-1',
-                    children: [
-                      {
-                        id: '1-1-1',
-                        label: 'node-1-1-1',
-                      },
-                      {
-                        id: '1-1-2',
-                        label: 'node-1-1-2',
-                      },
-                    ],
-                  },
-                  {
-                    id: '1-2',
-                    label: 'node-1-2',
-                    children: [
-                      {
-                        id: '1-2-1',
-                        label: 'node-1-2-1',
-                      },
-                    ],
-                  },
-                  {
-                    id: '1-3',
-                    label: 'node-1-3',
-                  },
-                ],
-              },
-              {
-                id: '2',
-                label: 'node-2',
-              },
-            ],
+            data: createNestedTreeData(),
           }
         },
       })
@@ -1160,46 +794,7 @@ describe('Virtual Tree', () => {
         data() {
           return {
             showCheckbox: true,
-            data: [
-              {
-                id: '1',
-                label: 'node-1',
-                children: [
-                  {
-                    id: '1-1',
-                    label: 'node-1-1',
-                    children: [
-                      {
-                        id: '1-1-1',
-                        label: 'node-1-1-1',
-                      },
-                      {
-                        id: '1-1-2',
-                        label: 'node-1-1-2',
-                      },
-                    ],
-                  },
-                  {
-                    id: '1-2',
-                    label: 'node-1-2',
-                    children: [
-                      {
-                        id: '1-2-1',
-                        label: 'node-1-2-1',
-                      },
-                    ],
-                  },
-                  {
-                    id: '1-3',
-                    label: 'node-1-3',
-                  },
-                ],
-              },
-              {
-                id: '2',
-                label: 'node-2',
-              },
-            ],
+            data: createNestedTreeData(),
           }
         },
       })
@@ -1216,46 +811,7 @@ describe('Virtual Tree', () => {
         data() {
           return {
             defaultExpandedKeys: ['1', '1-1'],
-            data: [
-              {
-                id: '1',
-                label: 'node-1',
-                children: [
-                  {
-                    id: '1-1',
-                    label: 'node-1-1',
-                    children: [
-                      {
-                        id: '1-1-1',
-                        label: 'node-1-1-1',
-                      },
-                      {
-                        id: '1-1-2',
-                        label: 'node-1-1-2',
-                      },
-                    ],
-                  },
-                  {
-                    id: '1-2',
-                    label: 'node-1-2',
-                    children: [
-                      {
-                        id: '1-2-1',
-                        label: 'node-1-2-1',
-                      },
-                    ],
-                  },
-                  {
-                    id: '1-3',
-                    label: 'node-1-3',
-                  },
-                ],
-              },
-              {
-                id: '2',
-                label: 'node-2',
-              },
-            ],
+            data: createNestedTreeData(),
           }
         },
       })
@@ -1279,50 +835,7 @@ describe('Virtual Tree', () => {
       const { treeRef, wrapper } = createTree({
         data() {
           return {
-            data: [
-              {
-                id: 0,
-                label: 'node-0',
-              },
-              {
-                id: '1',
-                label: 'node-1',
-                children: [
-                  {
-                    id: '1-1',
-                    label: 'node-1-1',
-                    children: [
-                      {
-                        id: '1-1-1',
-                        label: 'node-1-1-1',
-                      },
-                      {
-                        id: '1-1-2',
-                        label: 'node-1-1-2',
-                      },
-                    ],
-                  },
-                  {
-                    id: '1-2',
-                    label: 'node-1-2',
-                    children: [
-                      {
-                        id: '1-2-1',
-                        label: 'node-1-2-1',
-                      },
-                    ],
-                  },
-                  {
-                    id: '1-3',
-                    label: 'node-1-3',
-                  },
-                ],
-              },
-              {
-                id: '2',
-                label: 'node-2',
-              },
-            ],
+            data: [{ id: 0, label: 'node-0' }, ...createNestedTreeData()],
           }
         },
       })

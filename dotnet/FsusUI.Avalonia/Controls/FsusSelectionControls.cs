@@ -222,7 +222,7 @@ public class FsusCheckbox : CheckBox
     FsusComponentClasses.Ensure(this, "fsus-loading", IsLoading);
     FsusComponentClasses.Ensure(this, "fsus-focus-visible", IsKeyboardFocusWithin);
 
-    FsusControlAvailability.SyncLoading(this, IsLoading, ref enabledBeforeLoading);
+    FsusControlAvailability.SyncDisabled(this, IsLoading, ref enabledBeforeLoading);
   }
 
   private void SyncAutomation()
@@ -542,7 +542,7 @@ public class FsusRadio : RadioButton
     FsusComponentClasses.Ensure(this, "fsus-loading", IsLoading);
     FsusComponentClasses.Ensure(this, "fsus-focus-visible", IsKeyboardFocusWithin);
 
-    FsusControlAvailability.SyncLoading(this, IsLoading, ref enabledBeforeLoading);
+    FsusControlAvailability.SyncDisabled(this, IsLoading, ref enabledBeforeLoading);
   }
 
   private void SyncAutomation()
@@ -819,7 +819,7 @@ public class FsusSwitch : ToggleSwitch
     FsusComponentClasses.Ensure(this, "fsus-loading", IsLoading);
     FsusComponentClasses.Ensure(this, "fsus-focus-visible", IsKeyboardFocusWithin);
 
-    FsusControlAvailability.SyncLoading(this, IsLoading, ref enabledBeforeLoading);
+    FsusControlAvailability.SyncDisabled(this, IsLoading, ref enabledBeforeLoading);
   }
 
   private void SyncAutomation()

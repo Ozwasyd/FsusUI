@@ -7,14 +7,12 @@ using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
 using Avalonia.Input;
 using Avalonia.Layout;
-using Avalonia.Markup.Xaml.Styling;
 using Avalonia.Media;
 using Avalonia.Threading;
 using Avalonia.Themes.Fluent;
 using Avalonia.VisualTree;
 using FsusUI.Avalonia.Controls;
 using FsusUI.Avalonia.Overlay;
-using FsusUI.Avalonia.Themes;
 
 namespace FsusUI.Avalonia.HeadlessTests;
 
@@ -296,10 +294,7 @@ public class FsusDialogHeadlessTests
       ShowInTaskbar = false,
     };
     window.Styles.Add(new FluentTheme());
-    window.Styles.Add(new StyleInclude(new Uri("avares://FsusUI.Avalonia.HeadlessTests"))
-    {
-      Source = new Uri("avares://FsusUI.Avalonia.Themes/Themes/FsusTheme.axaml"),
-    });
+    window.Styles.Add(HeadlessTheme.CreateInclude());
     return window;
   }
 

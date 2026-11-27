@@ -1,3 +1,5 @@
+using static FsusUI.Avalonia.Controls.FsusMarkdownInputHelpers;
+
 namespace FsusUI.Avalonia.Controls;
 
 /// <summary>
@@ -119,9 +121,8 @@ public static class FsusMarkdownEditorPairInput
       return new("passthrough", null);
     }
 
-    var lineStart = LineStartAt(source, start);
+    var (lineStart, lineEnd) = LineBoundsAt(source, start);
     var beforeCaret = source[lineStart..start];
-    var lineEnd = LineEndAt(source, start);
     if (inserted == "`" &&
       collapsed &&
       beforeCaret == "``" &&
@@ -177,34 +178,6 @@ public static class FsusMarkdownEditorPairInput
     }
 
     return new("passthrough", null);
-  }
-
-  /// <summary>
-  /// Mirror of the Web <c>transactionOf</c>: every pair transaction uses
-  /// history "separate" and origin "input".
-  /// </summary>
-  private static FsusMarkdownEditorTransaction TransactionOf(
-    int from,
-    int to,
-    string insert,
-    int selectionStart,
-    int? selectionEnd = null,
-    string direction = "none") =>
-    new(
-      [new FsusMarkdownEditorChange(from, to, insert)],
-      History: "separate",
-      Origin: "input",
-      Selection: new FsusMarkdownEditorSelection(selectionStart, selectionEnd ?? selectionStart, direction));
-
-  /// <summary>Mirror of the Web <c>lineStartAt</c>.</summary>
-  private static int LineStartAt(string source, int offset)
-  {
-    if (source.Length == 0)
-    {
-      return 0;
-    }
-    var probe = Math.Clamp(offset - 1, 0, source.Length - 1);
-    return source.LastIndexOf('\n', probe) + 1;
   }
 
   private static int LineEndAt(string source, int offset)

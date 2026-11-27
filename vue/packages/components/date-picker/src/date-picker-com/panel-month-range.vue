@@ -22,68 +22,46 @@
         </button>
       </div>
       <div :class="ppNs.e('body')">
-        <div :class="[ppNs.e('content'), drpNs.e('content')]" class="is-left">
+        <div
+          v-for="panel in calendarPanels"
+          :key="panel.side"
+          :class="[ppNs.e('content'), drpNs.e('content'), `is-${panel.side}`]"
+        >
           <div :class="drpNs.e('header')">
             <button
+              v-if="panel.side === 'left' || unlinkPanels"
               type="button"
-              :class="ppNs.e('icon-btn')"
-              class="d-arrow-left"
-              @click="leftPrevYear"
-            >
-              <el-icon><d-arrow-left /></el-icon>
-            </button>
-            <button
-              v-if="unlinkPanels"
-              type="button"
-              :disabled="!enableYearArrow"
+              :disabled="panel.side === 'right' ? !enableYearArrow : undefined"
               :class="[
                 ppNs.e('icon-btn'),
-                { [ppNs.is('disabled')]: !enableYearArrow },
+                { 'is-disabled': panel.side === 'right' && !enableYearArrow },
+                'd-arrow-left',
               ]"
-              class="d-arrow-right"
-              @click="leftNextYear"
-            >
-              <el-icon><d-arrow-right /></el-icon>
-            </button>
-            <div>{{ leftLabel }}</div>
-          </div>
-          <month-table
-            selection-mode="range"
-            :date="leftDate"
-            :min-date="minDate"
-            :max-date="maxDate"
-            :range-state="rangeState"
-            :disabled-date="disabledDate"
-            @changerange="handleChangeRange"
-            @pick="handleRangePick"
-            @select="onSelect"
-          />
-        </div>
-        <div :class="[ppNs.e('content'), drpNs.e('content')]" class="is-right">
-          <div :class="drpNs.e('header')">
-            <button
-              v-if="unlinkPanels"
-              type="button"
-              :disabled="!enableYearArrow"
-              :class="[ppNs.e('icon-btn'), { 'is-disabled': !enableYearArrow }]"
-              class="d-arrow-left"
-              @click="rightPrevYear"
+              @click="panel.prev"
             >
               <el-icon><d-arrow-left /></el-icon>
             </button>
             <button
+              v-if="panel.side === 'right' || unlinkPanels"
               type="button"
-              :class="ppNs.e('icon-btn')"
-              class="d-arrow-right"
-              @click="rightNextYear"
+              :disabled="panel.side === 'left' ? !enableYearArrow : undefined"
+              :class="[
+                ppNs.e('icon-btn'),
+                {
+                  [ppNs.is('disabled')]:
+                    panel.side === 'left' && !enableYearArrow,
+                },
+                'd-arrow-right',
+              ]"
+              @click="panel.next"
             >
               <el-icon><d-arrow-right /></el-icon>
             </button>
-            <div>{{ rightLabel }}</div>
+            <div>{{ panel.label.value }}</div>
           </div>
           <month-table
             selection-mode="range"
-            :date="rightDate"
+            :date="panel.date.value"
             :min-date="minDate"
             :max-date="maxDate"
             :range-state="rangeState"
@@ -169,6 +147,23 @@ const enableYearArrow = computed(() => {
   return props.unlinkPanels && rightYear.value > leftYear.value + 1
 })
 
+const calendarPanels = [
+  {
+    side: 'left',
+    date: leftDate,
+    label: leftLabel,
+    prev: leftPrevYear,
+    next: leftNextYear,
+  },
+  {
+    side: 'right',
+    date: rightDate,
+    label: rightLabel,
+    prev: rightPrevYear,
+    next: rightNextYear,
+  },
+] as const
+
 type RangePickValue = {
   minDate: Dayjs
   maxDate: Dayjs
@@ -198,7 +193,7 @@ const formatToString = (days: Dayjs[]) => {
 
 function onParsedValueChanged(
   minDate: Dayjs | undefined,
-  maxDate: Dayjs | undefined
+  maxDate: Dayjs | undefined,
 ) {
   if (props.unlinkPanels && maxDate) {
     const minDateYear = minDate?.year() || 0

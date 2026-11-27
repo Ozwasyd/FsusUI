@@ -825,10 +825,7 @@ public class FsusCommandPaletteHeadlessTests
       ShowInTaskbar = false,
     };
     window.Styles.Add(new FluentTheme());
-    window.Styles.Add(new StyleInclude(new Uri("avares://FsusUI.Avalonia.HeadlessTests"))
-    {
-      Source = new Uri("avares://FsusUI.Avalonia.Themes/Themes/FsusTheme.axaml"),
-    });
+    window.Styles.Add(HeadlessTheme.CreateInclude());
     window.Resources.MergedDictionaries.Add(
       new ResourceInclude(new Uri("avares://FsusUI.Avalonia.HeadlessTests"))
       {

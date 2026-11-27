@@ -46,32 +46,11 @@
 
       <template #desktop-actions>
         <slot name="desktop-search">
-          <form
+          <SearchForm
             v-if="showDesktopInlineSearch"
-            :class="[ns.e('search'), ns.em('search', 'desktop')]"
-            :action="searchAction"
-            method="get"
-            @submit="handleSearchSubmit"
-          >
-            <el-input
-              :model-value="searchValue"
-              :placeholder="searchPlaceholder"
-              :label="searchAriaLabel"
-              size="small"
-              :class="ns.e('search-input')"
-              :csp-safe="cspSafe"
-              clearable
-              @focus="emit('search-focus')"
-              @input="handleSearchInput"
-              @keydown.enter="handleSearchEnter"
-            />
-            <input
-              v-if="searchName"
-              type="hidden"
-              :name="searchName"
-              :value="searchValue"
-            />
-          </form>
+            mode="desktop"
+            :csp-safe="cspSafe"
+          />
           <div
             v-else-if="showDesktopSearchTrigger"
             ref="desktopSearchDisclosureRef"
@@ -104,32 +83,7 @@
                 :aria-hidden="!desktopSearchExpanded"
                 :inert="!desktopSearchExpanded || undefined"
               >
-                <form
-                  :class="[ns.e('search'), ns.em('search', 'desktop-trigger')]"
-                  :action="searchAction"
-                  method="get"
-                  @submit="handleSearchSubmit"
-                  @keydown.esc="handleDesktopSearchEscape"
-                >
-                  <el-input
-                    :model-value="searchValue"
-                    :placeholder="searchPlaceholder"
-                    :label="searchAriaLabel"
-                    size="small"
-                    :class="ns.e('search-input')"
-                    :csp-safe="cspSafe"
-                    clearable
-                    @focus="emit('search-focus')"
-                    @input="handleSearchInput"
-                    @keydown.enter="handleSearchEnter"
-                  />
-                  <input
-                    v-if="searchName"
-                    type="hidden"
-                    :name="searchName"
-                    :value="searchValue"
-                  />
-                </form>
+                <SearchForm mode="desktop-trigger" :csp-safe="cspSafe" />
               </div>
               <div
                 v-else
@@ -143,31 +97,7 @@
                 :aria-hidden="!desktopSearchExpanded"
                 :inert="!desktopSearchExpanded || undefined"
               >
-                <form
-                  :class="[ns.e('search'), ns.em('search', 'desktop-trigger')]"
-                  :action="searchAction"
-                  method="get"
-                  @submit="handleSearchSubmit"
-                  @keydown.esc="handleDesktopSearchEscape"
-                >
-                  <el-input
-                    :model-value="searchValue"
-                    :placeholder="searchPlaceholder"
-                    :label="searchAriaLabel"
-                    size="small"
-                    :class="ns.e('search-input')"
-                    clearable
-                    @focus="emit('search-focus')"
-                    @input="handleSearchInput"
-                    @keydown.enter="handleSearchEnter"
-                  />
-                  <input
-                    v-if="searchName"
-                    type="hidden"
-                    :name="searchName"
-                    :value="searchValue"
-                  />
-                </form>
+                <SearchForm mode="desktop-trigger" />
               </div>
             </Transition>
           </div>
@@ -377,32 +307,11 @@
             @keydown.esc="handleMobileSearchEscape"
           >
             <slot name="mobile-search">
-              <form
+              <SearchForm
                 v-if="showSearch"
-                :class="[ns.e('search'), ns.em('search', 'trigger')]"
-                :action="searchAction"
-                method="get"
-                @submit="handleSearchSubmit"
-              >
-                <el-input
-                  :model-value="searchValue"
-                  :placeholder="searchPlaceholder"
-                  :label="searchAriaLabel"
-                  size="small"
-                  :class="ns.e('search-input')"
-                  :csp-safe="cspSafe"
-                  clearable
-                  @focus="emit('search-focus')"
-                  @input="handleSearchInput"
-                  @keydown.enter="handleSearchEnter"
-                />
-                <input
-                  v-if="searchName"
-                  type="hidden"
-                  :name="searchName"
-                  :value="searchValue"
-                />
-              </form>
+                mode="trigger"
+                :csp-safe="cspSafe"
+              />
             </slot>
           </div>
         </div>
@@ -421,31 +330,7 @@
             @keydown.esc="handleMobileSearchEscape"
           >
             <slot name="mobile-search">
-              <form
-                v-if="showSearch"
-                :class="[ns.e('search'), ns.em('search', 'trigger')]"
-                :action="searchAction"
-                method="get"
-                @submit="handleSearchSubmit"
-              >
-                <el-input
-                  :model-value="searchValue"
-                  :placeholder="searchPlaceholder"
-                  :label="searchAriaLabel"
-                  size="small"
-                  :class="ns.e('search-input')"
-                  clearable
-                  @focus="emit('search-focus')"
-                  @input="handleSearchInput"
-                  @keydown.enter="handleSearchEnter"
-                />
-                <input
-                  v-if="searchName"
-                  type="hidden"
-                  :name="searchName"
-                  :value="searchValue"
-                />
-              </form>
+              <SearchForm v-if="showSearch" mode="trigger" />
             </slot>
           </div>
         </Transition>
@@ -453,31 +338,7 @@
         <div :class="ns.e('mobile-actions')">
           <template v-if="showMobileInlineSearch">
             <slot name="mobile-search">
-              <form
-                :class="[ns.e('search'), ns.em('search', 'mobile')]"
-                :action="searchAction"
-                method="get"
-                @submit="handleSearchSubmit"
-              >
-                <el-input
-                  :model-value="searchValue"
-                  :placeholder="searchPlaceholder"
-                  :label="searchAriaLabel"
-                  size="small"
-                  :class="ns.e('search-input')"
-                  :csp-safe="cspSafe"
-                  clearable
-                  @focus="emit('search-focus')"
-                  @input="handleSearchInput"
-                  @keydown.enter="handleSearchEnter"
-                />
-                <input
-                  v-if="searchName"
-                  type="hidden"
-                  :name="searchName"
-                  :value="searchValue"
-                />
-              </form>
+              <SearchForm mode="mobile" :csp-safe="cspSafe" />
             </slot>
           </template>
           <slot name="mobile-actions" />
@@ -510,6 +371,7 @@
 <script lang="ts" setup>
 import {
   computed,
+  h,
   nextTick,
   onBeforeMount,
   onBeforeUnmount,
@@ -517,6 +379,7 @@ import {
   ref,
   useSlots,
   watch,
+  withKeys,
 } from 'vue'
 import {
   autoUpdate,
@@ -533,7 +396,7 @@ import { useId, useNamespace } from '@element-plus/hooks'
 import FsuBottomTabBar from '../../../motion/components/FsuBottomTabBar.vue'
 import { publicShellEmits, publicShellProps } from './public-shell'
 
-import type { CSSProperties } from 'vue'
+import type { CSSProperties, FunctionalComponent } from 'vue'
 
 defineOptions({
   name: 'ElPublicShell',
@@ -1241,6 +1104,46 @@ const handleSearchSubmit = (event: Event) => {
 const handleSearchEnter = (event: Event | KeyboardEvent) => {
   submitSearch(event)
 }
+
+const SearchForm: FunctionalComponent<{
+  mode: 'desktop' | 'desktop-trigger' | 'mobile' | 'trigger'
+  cspSafe?: boolean
+}> = ({ mode, cspSafe }) =>
+  h(
+    'form',
+    {
+      class: [ns.e('search'), ns.em('search', mode)],
+      action: props.searchAction,
+      method: 'get',
+      onSubmit: handleSearchSubmit,
+      onKeydown:
+        mode === 'desktop-trigger'
+          ? withKeys(handleDesktopSearchEscape, ['esc'])
+          : undefined,
+    },
+    [
+      h(ElInput, {
+        modelValue: searchValue.value,
+        placeholder: props.searchPlaceholder,
+        label: props.searchAriaLabel,
+        size: 'small',
+        class: ns.e('search-input'),
+        ...(cspSafe === undefined ? {} : { cspSafe }),
+        clearable: true,
+        onFocus: () => emit('search-focus'),
+        onInput: handleSearchInput,
+        onKeydown: withKeys(handleSearchEnter, ['enter']),
+      }),
+      props.searchName
+        ? h('input', {
+            type: 'hidden',
+            name: props.searchName,
+            value: searchValue.value,
+          })
+        : null,
+    ],
+  )
+SearchForm.props = ['mode', 'cspSafe']
 
 watch(
   () => props.desktopSearchMode,

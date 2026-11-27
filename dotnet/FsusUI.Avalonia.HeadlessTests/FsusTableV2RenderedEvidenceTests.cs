@@ -271,22 +271,12 @@ public class FsusTableV2RenderedEvidenceTests
     return table;
   }
 
-  private static void AttachTheme(Window window)
-  {
-    var resources = new ResourceDictionary();
-    new FsusThemeManager().Apply(resources, new FsusThemeOptions
+  private static void AttachTheme(Window window) =>
+    HeadlessTheme.Attach(window, new FsusThemeOptions
     {
       Variant = FsusThemeVariant.Light,
       MotionMode = FsusMotionMode.Reduced,
     });
-    window.Resources.MergedDictionaries.Add(resources);
-    window.Styles.Add(
-      new global::Avalonia.Markup.Xaml.Styling.StyleInclude(
-        new Uri("avares://FsusUI.Avalonia.HeadlessTests"))
-      {
-        Source = new Uri("avares://FsusUI.Avalonia.Themes/Themes/FsusTheme.axaml"),
-      });
-  }
 
   private static Control CreateRowVisual(FsusTableV2RowContext? context)
   {

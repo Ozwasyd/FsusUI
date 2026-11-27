@@ -15,8 +15,6 @@ public class FsusAvatarRenderedEvidenceTests
   [AvaloniaFact]
   public void RendersCircleAndSquareAvatarsToPng()
   {
-    ApplyTheme(FsusThemeVariant.Light);
-
     var circleAvatar = new FsusAvatar { Size = 64, Shape = FsusAvatarShape.Circle, FallbackText = "A" };
     var squareAvatar = new FsusAvatar { Size = 64, Shape = FsusAvatarShape.Square, FallbackText = "B" };
 
@@ -44,7 +42,11 @@ public class FsusAvatarRenderedEvidenceTests
       Content = surface,
       ShowInTaskbar = false,
     };
-    AttachFsusTheme(window);
+    HeadlessTheme.Attach(window, new FsusThemeOptions
+    {
+      Variant = FsusThemeVariant.Light,
+      MotionMode = FsusMotionMode.Enabled,
+    });
     window.Show();
 
     window.Measure(new Size(240, 160));
@@ -73,29 +75,5 @@ public class FsusAvatarRenderedEvidenceTests
     Assert.Contains("fsus-circle", circleAvatar.Classes);
     Assert.Contains("fsus-square", squareAvatar.Classes);
     window.Close();
-  }
-
-  private static FsusThemeOptions themeOptions = new();
-
-  private static void ApplyTheme(FsusThemeVariant variant)
-  {
-    themeOptions = new FsusThemeOptions
-    {
-      Variant = variant,
-      MotionMode = FsusMotionMode.Enabled,
-    };
-  }
-
-  private static void AttachFsusTheme(Window window)
-  {
-    var resources = new ResourceDictionary();
-    new FsusThemeManager().Apply(resources, themeOptions);
-    window.Resources.MergedDictionaries.Add(resources);
-    window.Styles.Add(
-      new global::Avalonia.Markup.Xaml.Styling.StyleInclude(
-        new Uri("avares://FsusUI.Avalonia.HeadlessTests"))
-      {
-        Source = new Uri("avares://FsusUI.Avalonia.Themes/Themes/FsusTheme.axaml"),
-      });
   }
 }

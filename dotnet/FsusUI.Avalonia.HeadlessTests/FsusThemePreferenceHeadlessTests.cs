@@ -2,7 +2,6 @@ using System;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
-using Avalonia.Markup.Xaml.Styling;
 using Avalonia.Styling;
 using FsusUI.Avalonia.Controls;
 using Xunit;
@@ -25,10 +24,7 @@ public class FsusThemePreferenceHeadlessTests
       RequestedThemeVariant = ThemeVariant.Light,
       Content = new Grid { Width = 1120, Height = 700, Children = { button } },
     };
-    window.Styles.Add(new StyleInclude(new Uri("avares://FsusUI.Avalonia.HeadlessTests"))
-    {
-      Source = new Uri("avares://FsusUI.Avalonia.Themes/Themes/FsusTheme.axaml"),
-    });
+    window.Styles.Add(HeadlessTheme.CreateInclude());
     try
     {
       window.Show();

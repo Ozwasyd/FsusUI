@@ -394,10 +394,7 @@ public class FsusTreeInlineEditingHeadlessTests
     if (!application.Styles.OfType<StyleInclude>().Any(style =>
       style.Source?.ToString().EndsWith("/Themes/FsusTheme.axaml", StringComparison.Ordinal) == true))
     {
-      application.Styles.Add(new StyleInclude(new Uri("avares://FsusUI.Avalonia.HeadlessTests"))
-      {
-        Source = new Uri("avares://FsusUI.Avalonia.Themes/Themes/FsusTheme.axaml"),
-      });
+      application.Styles.Add(HeadlessTheme.CreateInclude());
     }
   }
 
@@ -418,10 +415,7 @@ public class FsusTreeInlineEditingHeadlessTests
     FsusDensity density)
   {
     window.Styles.Add(new FluentTheme());
-    window.Styles.Add(new StyleInclude(new Uri("avares://FsusUI.Avalonia.HeadlessTests"))
-    {
-      Source = new Uri("avares://FsusUI.Avalonia.Themes/Themes/FsusTheme.axaml"),
-    });
+    window.Styles.Add(HeadlessTheme.CreateInclude());
     new FsusThemeManager().Apply(window.Resources, new FsusThemeOptions
     {
       Variant = theme,

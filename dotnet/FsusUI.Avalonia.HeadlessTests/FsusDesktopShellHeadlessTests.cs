@@ -9,7 +9,6 @@ using Avalonia.Controls.Templates;
 using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
 using Avalonia.Input;
-using Avalonia.Markup.Xaml.Styling;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using Avalonia.Styling;
@@ -350,10 +349,7 @@ public class FsusDesktopShellHeadlessTests
   public void DocumentContentKeepsSingleVisualParentAcrossThemeRemovalAndRemount(bool useRecyclingTemplate)
   {
     var application = Assert.IsType<HeadlessTestApplication>(Application.Current);
-    var theme = new StyleInclude(new Uri("avares://FsusUI.Avalonia.HeadlessTests"))
-    {
-      Source = new Uri("avares://FsusUI.Avalonia.Themes/Themes/FsusTheme.axaml"),
-    };
+    var theme = HeadlessTheme.CreateInclude();
     var body = new Grid
     {
       Children = { new Border { Background = Brushes.Blue, Width = 160, Height = 80 } },
@@ -845,10 +841,7 @@ public class FsusDesktopShellHeadlessTests
       Content = content,
     };
     window.Styles.Add(new FluentTheme());
-    window.Styles.Add(new StyleInclude(new Uri("avares://FsusUI.Avalonia.HeadlessTests"))
-    {
-      Source = new Uri("avares://FsusUI.Avalonia.Themes/Themes/FsusTheme.axaml"),
-    });
+    window.Styles.Add(HeadlessTheme.CreateInclude());
     new FsusThemeManager().Apply(
       window.Resources,
       new FsusThemeOptions

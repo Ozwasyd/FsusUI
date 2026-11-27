@@ -7,7 +7,6 @@ using Avalonia.Headless.XUnit;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 using Avalonia.Media.Imaging;
-using Avalonia.Markup.Xaml.Styling;
 using FsusUI.Avalonia.Controls;
 using System.Runtime.InteropServices;
 namespace FsusUI.Avalonia.HeadlessTests;
@@ -16,10 +15,7 @@ public class FsusTreeBoundedViewportHeadlessTests(ITestOutputHelper output)
 {
   static void Show(Window window)
   {
-    window.Styles.Add(new StyleInclude(new Uri("avares://FsusUI.Avalonia.HeadlessTests"))
-    {
-      Source = new Uri("avares://FsusUI.Avalonia.Themes/Themes/FsusTheme.axaml"),
-    });
+    window.Styles.Add(HeadlessTheme.CreateInclude());
     window.Show();
   }
   static void Layout(Window w) { for (int i = 0; i < 4; i++) { w.UpdateLayout(); Dispatcher.UIThread.RunJobs(); } w.UpdateLayout(); }

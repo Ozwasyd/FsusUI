@@ -1,10 +1,9 @@
-import path from 'node:path'
 import ts from 'typescript'
 
-const hasTypeFlag = (type, flag) =>
-  type.isUnion()
-    ? type.types.some((part) => (part.flags & flag) !== 0)
-    : (type.flags & flag) !== 0
+import {
+  hasTypeFlag,
+  loadStructuredTypeScript,
+} from './lib/structured-typescript.mjs'
 
 const unknownType = (type) =>
   hasTypeFlag(type, ts.TypeFlags.Any) || hasTypeFlag(type, ts.TypeFlags.Unknown)
@@ -40,63 +39,13 @@ export const extractStructuredExposedSignatures = ({
   const requested = new Set(memberNames ?? [])
   if (requested.size === 0) return new Map()
 
-  const configPath = path.join(root, 'vue/tsconfig.web.json')
-  const config = ts.readConfigFile(configPath, ts.sys.readFile)
-  if (config.error) {
-    throw new Error(
-      `TypeScript config failed for structured exposed extraction: ${ts.flattenDiagnosticMessageText(config.error.messageText, '\n')}`,
-    )
-  }
-  const parsed = ts.parseJsonConfigFileContent(
-    config.config,
-    ts.sys,
-    path.dirname(configPath),
-  )
-  const sourcePath = path.resolve(root, sourceRelativePath)
-  // Keep the virtual file adjacent to the SFC so its relative imports resolve
-  // exactly as they do in the source module.
-  const entryPath = `${sourcePath}.ts`
-  const overrides = new Map(
-    [...sourceOverrides].map(([file, content]) => [
-      path.resolve(root, file),
-      content,
-    ]),
-  )
-  overrides.set(entryPath, scriptContent)
-
-  const host = ts.createCompilerHost(parsed.options)
-  const readSource = (fileName) =>
-    overrides.get(path.resolve(fileName)) ?? ts.sys.readFile(fileName)
-  host.readFile = readSource
-  host.fileExists = (fileName) =>
-    overrides.has(path.resolve(fileName)) || ts.sys.fileExists(fileName)
-  host.getSourceFile = (fileName, languageVersion, onError) => {
-    const content = readSource(fileName)
-    if (content === undefined) {
-      onError?.(`Cannot read ${fileName}`)
-      return undefined
-    }
-    return ts.createSourceFile(
-      fileName,
-      content,
-      languageVersion,
-      true,
-      ts.getScriptKindFromFileName(fileName),
-    )
-  }
-
-  const program = ts.createProgram({
-    rootNames: [entryPath],
-    options: parsed.options,
-    host,
+  const { checker, sourceFile } = loadStructuredTypeScript({
+    root,
+    sourceRelativePath,
+    sourceOverrides,
+    extraction: 'exposed',
+    virtualSource: { content: scriptContent },
   })
-  const checker = program.getTypeChecker()
-  const sourceFile = program.getSourceFile(entryPath)
-  if (!sourceFile) {
-    throw new Error(
-      `TypeScript source missing for structured exposed extraction: ${sourceRelativePath}`,
-    )
-  }
 
   let exposeObject = null
   let exposeObjectCount = 0

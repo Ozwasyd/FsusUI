@@ -4,7 +4,6 @@ using Avalonia.Controls;
 using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
 using Avalonia.Input;
-using Avalonia.Markup.Xaml.Styling;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using Avalonia.Threading;
@@ -304,11 +303,7 @@ public class FsusShortcutRecorderHeadlessTests
     var resources = new ResourceDictionary();
     new FsusThemeManager().Apply(resources, new FsusThemeOptions { Variant = variant });
     window.Resources.MergedDictionaries.Add(resources);
-    window.Styles.Add(
-      new StyleInclude(new Uri("avares://FsusUI.Avalonia.HeadlessTests"))
-      {
-        Source = new Uri("avares://FsusUI.Avalonia.Themes/Themes/FsusTheme.axaml"),
-      });
+    window.Styles.Add(HeadlessTheme.CreateInclude());
 
     return window;
   }
@@ -425,11 +420,7 @@ public class FsusShortcutRecorderHeadlessTests
         MotionMode = FsusMotionMode.Reduced,
       });
     window.Resources.MergedDictionaries.Add(resources);
-    window.Styles.Add(
-      new StyleInclude(new Uri("avares://FsusUI.Avalonia.HeadlessTests"))
-      {
-        Source = new Uri("avares://FsusUI.Avalonia.Themes/Themes/FsusTheme.axaml"),
-      });
+    window.Styles.Add(HeadlessTheme.CreateInclude());
     var textBrush = Assert.IsAssignableFrom<IBrush>(
       resources[FsusThemeResourceKeys.TextBrush]);
     foreach (var text in content.Children.OfType<TextBlock>())

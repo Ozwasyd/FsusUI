@@ -5,7 +5,12 @@ import path from 'node:path'
 import process from 'node:process'
 import zlib from 'node:zlib'
 import { fileURLToPath } from 'node:url'
-import { format, resolveConfig } from 'prettier'
+import { createArtifactFormatter } from './lib/format-generated-artifacts.mjs'
+import {
+  checkGeneratedArtifacts,
+  writeGeneratedArtifacts,
+} from './lib/generated-artifacts.mjs'
+import { readPlatformOverrides } from './lib/platform-overrides.mjs'
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const generatedBy = 'scripts/visual-conformance.mjs'
@@ -197,70 +202,10 @@ const inspectPng = (relativePath) => {
   }
 }
 
-const toPosix = (value) => value.split(path.sep).join('/')
-
-const parseValue = (value) => {
-  const trimmed = value.trim()
-  if (trimmed.startsWith('[') && trimmed.endsWith(']')) {
-    return trimmed
-      .slice(1, -1)
-      .split(',')
-      .map((item) => item.trim())
-      .filter(Boolean)
-  }
-  return trimmed.replace(/^['"]|['"]$/g, '')
-}
-
-const parseOverrideFile = (relativePath) => {
-  const entries = []
-  let current
-  let pendingKey
-  const absolutePath = path.join(root, relativePath)
-  for (const line of fs.readFileSync(absolutePath, 'utf8').split('\n')) {
-    const start = line.match(/^ {2}- id:\s*(.+)$/)
-    if (start) {
-      pendingKey = undefined
-      current = {
-        id: parseValue(start[1]),
-        file: toPosix(path.relative(root, absolutePath)),
-      }
-      entries.push(current)
-      continue
-    }
-    if (!current) continue
-    if (pendingKey) {
-      const continuation = line.match(/^ {6,}(.+)$/)
-      if (continuation) {
-        current[pendingKey] = parseValue(continuation[1])
-        pendingKey = undefined
-        continue
-      }
-    }
-    const field = line.match(/^ {4}([A-Za-z][A-Za-z0-9]*):\s*(.*)$/)
-    if (field) {
-      if (field[2].trim() === '') {
-        pendingKey = field[1]
-      } else {
-        current[field[1]] = parseValue(field[2])
-        pendingKey = undefined
-      }
-    }
-  }
-  return entries
-}
-
-const collectVisualOverrides = () => {
-  const overrideRoot = path.join(root, 'spec/platform-overrides')
-  return fs
-    .readdirSync(overrideRoot)
-    .filter((file) => file.endsWith('.yaml'))
-    .sort()
-    .flatMap((file) =>
-      parseOverrideFile(`spec/platform-overrides/${file}`).filter((entry) =>
-        ['visual', 'typography'].includes(entry.area),
-      ),
-    )
-}
+const collectVisualOverrides = () =>
+  readPlatformOverrides(root).filter((entry) =>
+    ['visual', 'typography'].includes(entry.area),
+  )
 
 const maxAbsDelta = (a, b, keys) =>
   keys.reduce(
@@ -732,62 +677,17 @@ const renderAll = () => {
   return files
 }
 
-const prettierConfig = await resolveConfig(path.join(root, 'package.json'))
-
-const formatGeneratedContent = async (relativePath, content) =>
-  format(content, {
-    ...(prettierConfig ?? {}),
-    filepath: path.join(root, relativePath),
-  })
-
-const renderFormatted = async () => {
-  const files = renderAll()
-  return Object.fromEntries(
-    await Promise.all(
-      Object.entries(files).map(async ([relativePath, content]) => [
-        relativePath,
-        await formatGeneratedContent(relativePath, content),
-      ]),
-    ),
-  )
-}
-
-const writeFiles = (files) => {
-  for (const [relativePath, content] of Object.entries(files)) {
-    const absolutePath = path.join(root, relativePath)
-    fs.mkdirSync(path.dirname(absolutePath), { recursive: true })
-    fs.writeFileSync(absolutePath, content)
-    console.log(`wrote ${relativePath}`)
-  }
-}
-
-const checkFiles = (files) => {
-  const failures = []
-  for (const [relativePath, expected] of Object.entries(files)) {
-    const absolutePath = path.join(root, relativePath)
-    if (!fs.existsSync(absolutePath)) {
-      failures.push(`${relativePath} is missing`)
-      continue
-    }
-    if (fs.readFileSync(absolutePath, 'utf8') !== expected) {
-      failures.push(`${relativePath} is stale`)
-    }
-  }
-  if (failures.length > 0) {
-    throw new Error(
-      `Visual conformance artifacts are not current:\n${failures.join('\n')}`,
-    )
-  }
-  console.log('Visual conformance comparisons passed.')
-}
+const formatArtifacts = await createArtifactFormatter(root)
 
 const command = process.argv[2] ?? 'check'
 
 try {
-  const files = await renderFormatted()
-  if (command === 'generate') writeFiles(files)
-  else if (command === 'check') checkFiles(files)
-  else
+  const files = await formatArtifacts(renderAll())
+  if (command === 'generate') writeGeneratedArtifacts(root, files)
+  else if (command === 'check') {
+    checkGeneratedArtifacts(root, files, 'Visual conformance')
+    console.log('Visual conformance comparisons passed.')
+  } else
     throw new Error(
       'Usage: node scripts/visual-conformance.mjs <generate|check>',
     )

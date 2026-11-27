@@ -325,40 +325,7 @@ public static class FsusMarkdownEditorClipboardInput
     int? revision,
     string body) =>
     string.Create(CultureInfo.InvariantCulture,
-      $"clipboard:{origin}:{action}:{mime ?? "none"}:{selection.Start}:{selection.End}:{revision ?? 0}:{HashText(body)}");
-
-  /// <summary>
-  /// FNV-1a 32-bit over UTF-16 code units, rendered as unsigned base36. Mirrors
-  /// the Web hashText exactly, including Math.imul wrap-around semantics.
-  /// </summary>
-  private static string HashText(string value)
-  {
-    var hash = 2166136261u;
-    foreach (var unit in value)
-    {
-      hash ^= unit;
-      hash = unchecked(hash * 16777619u);
-    }
-    return ToBase36(hash);
-  }
-
-  private static string ToBase36(uint value)
-  {
-    if (value == 0)
-    {
-      return "0";
-    }
-    var digits = new char[7];
-    var index = digits.Length;
-    while (value > 0)
-    {
-      index -= 1;
-      var digit = (int)(value % 36);
-      digits[index] = (char)(digit < 10 ? '0' + digit : 'a' + digit - 10);
-      value /= 36;
-    }
-    return new string(digits, index, digits.Length - index);
-  }
+      $"clipboard:{origin}:{action}:{mime ?? "none"}:{selection.Start}:{selection.End}:{revision ?? 0}:{FsusMarkdownInputHelpers.HashText(body)}");
 
   private static string DecodeEntity(string body)
   {

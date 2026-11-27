@@ -311,10 +311,7 @@ public class FsusTreeRowPresenterHeadlessTests
     if (!application.Styles.OfType<StyleInclude>().Any(style =>
       style.Source?.ToString().EndsWith("/Themes/FsusTheme.axaml", StringComparison.Ordinal) == true))
     {
-      application.Styles.Add(new StyleInclude(new Uri("avares://FsusUI.Avalonia.HeadlessTests"))
-      {
-        Source = new Uri("avares://FsusUI.Avalonia.Themes/Themes/FsusTheme.axaml"),
-      });
+      application.Styles.Add(HeadlessTheme.CreateInclude());
     }
     if (!application.Resources.MergedDictionaries.OfType<ResourceInclude>().Any(resource =>
       resource.Source?.ToString().EndsWith("/Generated/FsusIcons.axaml", StringComparison.Ordinal) == true))
@@ -340,10 +337,7 @@ public class FsusTreeRowPresenterHeadlessTests
   private static void ConfigureWindow(Window window, FsusThemeVariant theme)
   {
     window.Styles.Add(new FluentTheme());
-    window.Styles.Add(new StyleInclude(new Uri("avares://FsusUI.Avalonia.HeadlessTests"))
-    {
-      Source = new Uri("avares://FsusUI.Avalonia.Themes/Themes/FsusTheme.axaml"),
-    });
+    window.Styles.Add(HeadlessTheme.CreateInclude());
     window.Resources.MergedDictionaries.Add(new ResourceInclude(new Uri("avares://FsusUI.Avalonia.HeadlessTests"))
     {
       Source = new Uri("avares://FsusUI.Avalonia.Icons/Generated/FsusIcons.axaml"),

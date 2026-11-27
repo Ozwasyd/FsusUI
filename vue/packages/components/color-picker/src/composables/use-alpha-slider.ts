@@ -51,27 +51,16 @@ export const useAlphaSlider = (props: AlphaSliderProps) => {
     const { rect, thumbHeight, thumbWidth } = metrics
     const { clientX, clientY } = getClientXY(event)
 
-    if (!props.vertical) {
-      let left = clientX - rect.left
-      left = Math.max(thumbWidth / 2, left)
-      left = Math.min(left, rect.width - thumbWidth / 2)
-
-      props.color.set(
-        'alpha',
-        Math.round(((left - thumbWidth / 2) / (rect.width - thumbWidth)) * 100),
-      )
-    } else {
-      let top = clientY - rect.top
-      top = Math.max(thumbHeight / 2, top)
-      top = Math.min(top, rect.height - thumbHeight / 2)
-
-      props.color.set(
-        'alpha',
-        Math.round(
-          ((top - thumbHeight / 2) / (rect.height - thumbHeight)) * 100,
-        ),
-      )
-    }
+    const vertical = props.vertical
+    const size = vertical ? rect.height : rect.width
+    const thumbSize = vertical ? thumbHeight : thumbWidth
+    const halfThumb = thumbSize / 2
+    const offset = vertical ? clientY - rect.top : clientX - rect.left
+    const position = Math.min(Math.max(halfThumb, offset), size - halfThumb)
+    props.color.set(
+      'alpha',
+      Math.round(((position - halfThumb) / (size - thumbSize)) * 100),
+    )
   }
 
   return {

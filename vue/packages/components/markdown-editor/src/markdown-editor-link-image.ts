@@ -10,6 +10,10 @@ import {
 } from '../../../wasm/markdown-runtime'
 import type { MarkdownEditorTransaction } from './markdown-editor-transaction'
 import {
+  freezeMarkdownCommandEdit,
+  freezeMarkdownCommandTransaction,
+} from './markdown-editor-command-edit'
+import {
   commitMarkdownAttachmentResult,
   createMarkdownAttachmentBatch,
   type MarkdownAttachmentBatchIntent,
@@ -445,17 +449,11 @@ export const planMarkdownImageAltEdit = (
       newAlt,
     )
   }
-  return Object.freeze({
-    changes: Object.freeze([
-      Object.freeze({
-        from: decomposed.alt.start,
-        to: decomposed.alt.end,
-        insert: escapeAltText(newAlt),
-      }),
-    ]),
-    history: 'separate',
-    origin: 'command',
-  })
+  return freezeMarkdownCommandEdit(
+    decomposed.alt.start,
+    decomposed.alt.end,
+    escapeAltText(newAlt),
+  )
 }
 
 export const planMarkdownImageAltChange = (
@@ -467,11 +465,7 @@ export const planMarkdownImageAltChange = (
   const slice = source.slice(start, end)
   const match = /^!\[([^\]]*)\]\(([^)]+)\)$/.exec(slice)
   const insert = match ? `![${alt}](${match[2]})` : slice
-  return Object.freeze({
-    changes: Object.freeze([{ from: start, to: end, insert }]),
-    history: 'separate',
-    origin: 'command',
-  })
+  return freezeMarkdownCommandTransaction([{ from: start, to: end, insert }])
 }
 
 export const planMarkdownImageDestinationEdit = (
@@ -480,24 +474,12 @@ export const planMarkdownImageDestinationEdit = (
   newDestination: string,
 ): MarkdownEditorTransaction => {
   const decomposed = decomposeMarkdownImageNode(source, imageRange)
-  if (!decomposed) {
-    return Object.freeze({
-      changes: Object.freeze([]),
-      history: 'separate',
-      origin: 'command',
-    })
-  }
-  return Object.freeze({
-    changes: Object.freeze([
-      Object.freeze({
-        from: decomposed.destination.start,
-        to: decomposed.destination.end,
-        insert: newDestination,
-      }),
-    ]),
-    history: 'separate',
-    origin: 'command',
-  })
+  if (!decomposed) return freezeMarkdownCommandTransaction([])
+  return freezeMarkdownCommandEdit(
+    decomposed.destination.start,
+    decomposed.destination.end,
+    newDestination,
+  )
 }
 
 export const planMarkdownImageTitleEdit = (
@@ -506,13 +488,7 @@ export const planMarkdownImageTitleEdit = (
   newTitle: string | null,
 ): MarkdownEditorTransaction => {
   const decomposed = decomposeMarkdownImageNode(source, imageRange)
-  if (!decomposed) {
-    return Object.freeze({
-      changes: Object.freeze([]),
-      history: 'separate',
-      origin: 'command',
-    })
-  }
+  if (!decomposed) return freezeMarkdownCommandTransaction([])
 
   if (decomposed.title) {
     if (newTitle === null) {
@@ -524,52 +500,26 @@ export const planMarkdownImageTitleEdit = (
       ) {
         removeStart -= 1
       }
-      return Object.freeze({
-        changes: Object.freeze([
-          Object.freeze({
-            from: removeStart,
-            to: decomposed.title.end,
-            insert: '',
-          }),
-        ]),
-        history: 'separate',
-        origin: 'command',
-      })
+      return freezeMarkdownCommandEdit(removeStart, decomposed.title.end, '')
     }
-    return Object.freeze({
-      changes: Object.freeze([
-        Object.freeze({
-          from: decomposed.title.start,
-          to: decomposed.title.end,
-          insert: `"${newTitle.replace(/"/g, '\\"')}"`,
-        }),
-      ]),
-      history: 'separate',
-      origin: 'command',
-    })
+    return freezeMarkdownCommandEdit(
+      decomposed.title.start,
+      decomposed.title.end,
+      `"${newTitle.replace(/"/g, '\\"')}"`,
+    )
   }
 
   if (newTitle !== null) {
     // insert title before ")"
     const insertPos = decomposed.full.end - 1
-    return Object.freeze({
-      changes: Object.freeze([
-        Object.freeze({
-          from: insertPos,
-          to: insertPos,
-          insert: ` "${newTitle.replace(/"/g, '\\"')}"`,
-        }),
-      ]),
-      history: 'separate',
-      origin: 'command',
-    })
+    return freezeMarkdownCommandEdit(
+      insertPos,
+      insertPos,
+      ` "${newTitle.replace(/"/g, '\\"')}"`,
+    )
   }
 
-  return Object.freeze({
-    changes: Object.freeze([]),
-    history: 'separate',
-    origin: 'command',
-  })
+  return freezeMarkdownCommandTransaction([])
 }
 
 export const planMarkdownImageRemove = (
@@ -579,17 +529,7 @@ export const planMarkdownImageRemove = (
 ): MarkdownEditorTransaction => {
   const decomposed = decomposeMarkdownImageNode(source, imageRange)
   const insert = options?.keepAltText && decomposed ? decomposed.alt.value : ''
-  return Object.freeze({
-    changes: Object.freeze([
-      Object.freeze({
-        from: imageRange.start,
-        to: imageRange.end,
-        insert,
-      }),
-    ]),
-    history: 'separate',
-    origin: 'command',
-  })
+  return freezeMarkdownCommandEdit(imageRange.start, imageRange.end, insert)
 }
 
 export const planMarkdownImageAttachmentReplace = (input: {

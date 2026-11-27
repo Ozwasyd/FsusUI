@@ -5,7 +5,6 @@ using Avalonia.Controls;
 using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
 using Avalonia.Input;
-using Avalonia.Markup.Xaml.Styling;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using FsusUI.Avalonia.Controls;
@@ -434,11 +433,7 @@ public class FsusWebViewAdapterHeadlessTests
   private static void EnsureFullTheme()
   {
     var application = Assert.IsAssignableFrom<Application>(Application.Current);
-    application.Styles.Add(new StyleInclude(
-      new Uri("avares://FsusUI.Avalonia.HeadlessTests"))
-    {
-      Source = new Uri("avares://FsusUI.Avalonia.Themes/Themes/FsusTheme.axaml"),
-    });
+    application.Styles.Add(HeadlessTheme.CreateInclude());
   }
 
   private static string FindRepositoryRoot()
