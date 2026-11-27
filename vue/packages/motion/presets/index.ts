@@ -86,7 +86,10 @@ export const motionPresetAliases = {
 // resolves the bundle (`duration`, `easing`, `distance`, `stagger`,
 // `intensity`) from `motionTokens.patterns[pattern][tier]` so the 5-axis
 // concern no longer leaks into the preset layer.
-export const motionPresets: Record<MotionPresetName, MotionPresetDefinition> = {
+const createMotionPresets = (): Record<
+  MotionPresetName,
+  MotionPresetDefinition
+> => ({
   'surface-settle': {
     name: 'surface-settle',
     pattern: 'standard',
@@ -278,7 +281,10 @@ export const motionPresets: Record<MotionPresetName, MotionPresetDefinition> = {
     surfaces: ['reading-surface', 'toast-banner-surface'],
     ...opacityStates('0.88'),
   },
-}
+})
+
+// Consumers that only use the legacy aliases can omit the preset table.
+export const motionPresets = /* @__PURE__ */ createMotionPresets()
 
 export const readingMotionPresetNames = [
   'reading-title-settle',
