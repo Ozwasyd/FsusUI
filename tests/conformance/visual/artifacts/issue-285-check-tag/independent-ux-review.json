@@ -1,20 +1,19 @@
 {
   "schema": "fsusui-independent-ux-review.v1",
   "issue": 285,
-  "candidateSha": "4c976e0016729a9683fa94b58d107218f76f6523",
+  "candidateSha": "85161c371dd966210324322bad5c1b918941d0da",
   "reviewMode": "read-only-rendered-evidence-inspection",
   "modifiedPaths": [],
   "productionFixture": true,
   "identity": {
-    "executionId": "conformance-v2-check-tag-4c976e0016729a9683fa94b58d107218f76f6523",
+    "executionId": "conformance-v2-check-tag-efd61898bc265a46766322722079bfebd346c849",
     "checkpoint": "check-tag-after-pointer-keyboard",
-    "contract": "component-v2.el-check-tag",
+    "candidate": "efd61898bc265a46766322722079bfebd346c849",
+    "contractHash": "ff3128d8bb268ff257b7859ddd183a301454745b245f27ad0482ece19406fdaf",
+    "webBaselineHash": "1a9f36ec00e4fc0952c1f7d78c353b6efd83a86f068b7022738b80b674bf69c7",
+    "avaloniaBaselineHash": "85cb6a01862b7625a5175751a1e1049dc31d35febfcdda18c191e05e52c7af3b",
     "scenario": "scenario.v2.el-check-tag.real-interaction-trace",
-    "contractHash": "5607f675df5a48d68b61e6ca8f29725e5d2141e20f2e6f6c9843d1f3185779c9",
-    "webBaselineHash": "8b9f89a6aefd2afa633f95148c07631d702681421c472b00d2594ad648c17650",
-    "avaloniaBaselineHash": "a8008e3e1023ab9123817a0b4dfcbe4befa6f7ff8c09c71908bb33e3f5e640b9",
-    "runnerHash": "bad9abc8910c29bd5104e47fc7d693443a414d707776a55c043be5d1e0c0baf2",
-    "candidate": "4c976e0016729a9683fa94b58d107218f76f6523",
+    "contract": "component-v2.el-check-tag",
     "documentId": "check-tag-state",
     "documentEpoch": 1,
     "sourceRevision": 2,
@@ -22,7 +21,8 @@
     "density": "default",
     "locale": "zh-CN",
     "direction": "ltr",
-    "motion": "reduced"
+    "motion": "reduced",
+    "runnerHash": "bad9abc8910c29bd5104e47fc7d693443a414d707776a55c043be5d1e0c0baf2"
   },
   "viewportStateMatrix": [
     {
@@ -96,29 +96,29 @@
     {
       "id": "blue-focus-ring-visible",
       "status": "accepted",
-      "observation": "I opened both original production PNGs and saw the blue focus ring in both. The Avalonia perimeter probe matched the blue sample on 192 of 192 pixels."
+      "observation": "Independent review inspected both fresh Linux production captures. Both show the blue ring. The Avalonia perimeter probe matched all 192 blue samples."
     },
     {
       "id": "no-black-default-adorner",
       "status": "accepted",
-      "observation": "Neither inspected PNG shows a black default focus adorner. The native perimeter probe recorded zero unexpected dark pixels."
+      "observation": "Both captures show the expected focus indicator. The Avalonia perimeter probe counted zero unexpected dark pixels."
     },
     {
       "id": "unchecked-label-state-match",
       "status": "accepted",
-      "observation": "Both inspected captures show the Check tag label in the unchecked appearance. The archived real checkpoint is focused and unchecked following pointer and keyboard interaction."
+      "observation": "Both captures show the Check tag label in the unchecked appearance after pointer and keyboard interaction."
     },
     {
       "id": "focus-no-bounds-shift",
       "status": "accepted",
-      "observation": "The recorded before-focus, after-focus and after-toggle geometry is identical per platform: Web 0,136,87.625,24 CSS px; Avalonia 24,136,96,24 DIP. This does not establish intermediate-frame geometry."
+      "observation": "The recorded bounds match before focus, after focus and after toggle on each platform. Web measures 0,136,87.625,24 CSS px and Avalonia measures 24,136,96,24 DIP."
     }
   ],
   "observations": [
-    "Read-only inspection re-opened both tracked production CheckTag PNGs; this candidate (4c976e0016729a9683fa94b58d107218f76f6523) only updates responsive-data.spec.ts subpixel hit-target tolerance and dependency-freshness-blocker.mjs GitHub API pagination, with zero changes to CheckTag, theme-chalk CSS, or Avalonia sources.",
-    "Bound CheckTag receipt identity to v1.6.0-preview.12 contractHash 5607f675df5a48d68b61e6ca8f29725e5d2141e20f2e6f6c9843d1f3185779c9, webBaselineHash 8b9f89a6aefd2afa633f95148c07631d702681421c472b00d2594ad648c17650, and avaloniaBaselineHash a8008e3e1023ab9123817a0b4dfcbe4befa6f7ff8c09c71908bb33e3f5e640b9.",
-    "Web artifact is an 88x24 CheckTag element crop (cede06e2196173842ec99b1422f4242f3d54c3afdbfa8d8c35da70bad3e55277); Avalonia artifact is a 960x720 full window (3ae99ccd280405a7e7a0d1f622367ed017a4dc1819de8d3c59e427b6a2764cb0).",
-    "Nine functional observations pass in both executions; timing is diagnostic only."
+    "Independent review inspected both fresh Linux production captures from GitHub Actions run 45968069796. Rendered merge efd61898bc265a46766322722079bfebd346c849 and source candidate 85161c371dd966210324322bad5c1b918941d0da share tree 3e6f5d2deda2c75395ef9e136fa4a67a9cceb58e.",
+    "The candidate manifest binds contract ff3128d8bb268ff257b7859ddd183a301454745b245f27ad0482ece19406fdaf, Web baseline 1a9f36ec00e4fc0952c1f7d78c353b6efd83a86f068b7022738b80b674bf69c7, Avalonia baseline 85cb6a01862b7625a5175751a1e1049dc31d35febfcdda18c191e05e52c7af3b, and runner bad9abc8910c29bd5104e47fc7d693443a414d707776a55c043be5d1e0c0baf2.",
+    "Both fresh PNGs match the tracked comparator PNGs byte for byte and have the verified crop and window dimensions.",
+    "Nine functional observations pass on each platform. Timing observations are diagnostic."
   ],
   "limitations": [
     "Only the light/default/zh-CN/ltr/reduced-motion CheckTag checkpoint was independently accepted, not full CI, AOT, package, cross-platform rendering equivalence or performance.",
@@ -127,7 +127,7 @@
   ],
   "blockers": [],
   "status": "accepted",
-  "classificationReceiptDigest": "674f9a6cab763c50b46ba8d4cb831bc17a60cb12037e6b173043e780c9f5f593",
-  "candidateDigest": "7c744fcde23c5c269a58dc5264b0ff0ac4942d8fb20599818fe5cc16a1763521",
-  "receiptDigest": "fe7118c245d8eeb8d867818fb6e227628b24ca2b14bc8c28054ce705499d18d3"
+  "classificationReceiptDigest": "d8eff2e78304459bfb51fdb77d2f658eb46cb5f5393a93568139c40b1d4132e6",
+  "candidateDigest": "28ba42e6cde39df41fd85631b44e317a98d60f5c8b510e73d661e407aa6feb8b",
+  "receiptDigest": "fa445bbd48b44a45296fcf6788436e964e3c76c6c240c37d71fb29bcaef31f86"
 }
