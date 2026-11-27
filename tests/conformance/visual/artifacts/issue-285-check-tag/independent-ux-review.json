@@ -1,17 +1,17 @@
 {
   "schema": "fsusui-independent-ux-review.v1",
   "issue": 285,
-  "candidateSha": "85161c371dd966210324322bad5c1b918941d0da",
+  "candidateSha": "afbd9d28924a0677b4a87469a2fb48e874bcb081",
   "reviewMode": "read-only-rendered-evidence-inspection",
   "modifiedPaths": [],
   "productionFixture": true,
   "identity": {
-    "executionId": "conformance-v2-check-tag-efd61898bc265a46766322722079bfebd346c849",
+    "executionId": "conformance-v2-check-tag-af1db5f929298e45ca8588cce23e59feed4d57cd",
     "checkpoint": "check-tag-after-pointer-keyboard",
-    "candidate": "efd61898bc265a46766322722079bfebd346c849",
-    "contractHash": "ff3128d8bb268ff257b7859ddd183a301454745b245f27ad0482ece19406fdaf",
-    "webBaselineHash": "1a9f36ec00e4fc0952c1f7d78c353b6efd83a86f068b7022738b80b674bf69c7",
-    "avaloniaBaselineHash": "85cb6a01862b7625a5175751a1e1049dc31d35febfcdda18c191e05e52c7af3b",
+    "candidate": "af1db5f929298e45ca8588cce23e59feed4d57cd",
+    "contractHash": "198c14d85deb4668e343ebc82e8c01657cd76cfb73bce69b5285e421d5790073",
+    "webBaselineHash": "96cccc58f3a11038bb1cb723a680bdbe0622c6dae584fcb53be6e4335e4f2b1c",
+    "avaloniaBaselineHash": "295787beb93a551ab419e98f558e17f0eeab4b7c4defb9e2911cb7c0f5891dda",
     "scenario": "scenario.v2.el-check-tag.real-interaction-trace",
     "contract": "component-v2.el-check-tag",
     "documentId": "check-tag-state",
@@ -96,29 +96,29 @@
     {
       "id": "blue-focus-ring-visible",
       "status": "accepted",
-      "observation": "Independent review inspected both fresh Linux production captures. Both show the blue ring. The Avalonia perimeter probe matched all 192 blue samples."
+      "observation": "Both current Linux production captures show the blue focus ring. The Avalonia perimeter probe matched all 192 samples."
     },
     {
       "id": "no-black-default-adorner",
       "status": "accepted",
-      "observation": "Both captures show the expected focus indicator. The Avalonia perimeter probe counted zero unexpected dark pixels."
+      "observation": "Both current captures show the expected focus indicator. The Avalonia perimeter probe found zero unexpected dark pixels."
     },
     {
       "id": "unchecked-label-state-match",
       "status": "accepted",
-      "observation": "Both captures show the Check tag label in the unchecked appearance after pointer and keyboard interaction."
+      "observation": "Both current captures show the Check tag label in the unchecked appearance after pointer and keyboard activation."
     },
     {
       "id": "focus-no-bounds-shift",
       "status": "accepted",
-      "observation": "The recorded bounds match before focus, after focus and after toggle on each platform. Web measures 0,136,87.625,24 CSS px and Avalonia measures 24,136,96,24 DIP."
+      "observation": "The recorded bounds agree before focus, after focus, and after toggle. Web bounds are 0,136,87.625,24 CSS px. Avalonia bounds are 24,136,96,24 DIP."
     }
   ],
   "observations": [
-    "Independent review inspected both fresh Linux production captures from GitHub Actions run 45968069796. Rendered merge efd61898bc265a46766322722079bfebd346c849 and source candidate 85161c371dd966210324322bad5c1b918941d0da share tree 3e6f5d2deda2c75395ef9e136fa4a67a9cceb58e.",
-    "The candidate manifest binds contract ff3128d8bb268ff257b7859ddd183a301454745b245f27ad0482ece19406fdaf, Web baseline 1a9f36ec00e4fc0952c1f7d78c353b6efd83a86f068b7022738b80b674bf69c7, Avalonia baseline 85cb6a01862b7625a5175751a1e1049dc31d35febfcdda18c191e05e52c7af3b, and runner bad9abc8910c29bd5104e47fc7d693443a414d707776a55c043be5d1e0c0baf2.",
-    "Both fresh PNGs match the tracked comparator PNGs byte for byte and have the verified crop and window dimensions.",
-    "Nine functional observations pass on each platform. Timing observations are diagnostic."
+    "Independent review inspected both Linux production captures from GitHub Actions run 45991368007, attempt 1, artifact 15194895208. Rendered merge af1db5f929298e45ca8588cce23e59feed4d57cd and source candidate afbd9d28924a0677b4a87469a2fb48e874bcb081 share tree 247b1fa30827c072d1fe88f1ea3522c388e38c75.",
+    "The candidate manifests bind contract 198c14d85deb4668e343ebc82e8c01657cd76cfb73bce69b5285e421d5790073, Web baseline 96cccc58f3a11038bb1cb723a680bdbe0622c6dae584fcb53be6e4335e4f2b1c, Avalonia baseline 295787beb93a551ab419e98f558e17f0eeab4b7c4defb9e2911cb7c0f5891dda, and runner bad9abc8910c29bd5104e47fc7d693443a414d707776a55c043be5d1e0c0baf2.",
+    "Both current PNGs match the tracked comparator images byte for byte, including the verified crop and window sizes.",
+    "The functional cross-platform conformance comparison passes. Timing observations are diagnostic."
   ],
   "limitations": [
     "Only the light/default/zh-CN/ltr/reduced-motion CheckTag checkpoint was independently accepted, not full CI, AOT, package, cross-platform rendering equivalence or performance.",
@@ -127,7 +127,7 @@
   ],
   "blockers": [],
   "status": "accepted",
-  "classificationReceiptDigest": "d8eff2e78304459bfb51fdb77d2f658eb46cb5f5393a93568139c40b1d4132e6",
-  "candidateDigest": "28ba42e6cde39df41fd85631b44e317a98d60f5c8b510e73d661e407aa6feb8b",
-  "receiptDigest": "fa445bbd48b44a45296fcf6788436e964e3c76c6c240c37d71fb29bcaef31f86"
+  "classificationReceiptDigest": "07f3dde2ace56660bcbed2003a0af2a311b3a58a9ff46352dd8a3f8c6f3543bb",
+  "candidateDigest": "716092b774f8bd0ca7d9aee28138b144456aeb1dafbaab6cbd6a7a78d38886cf",
+  "receiptDigest": "20573eb5d2a726ee157097175d5ba564733357cb373a67f3e597564412f78d97"
 }
