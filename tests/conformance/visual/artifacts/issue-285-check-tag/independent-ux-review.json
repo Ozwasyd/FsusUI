@@ -1,12 +1,12 @@
 {
   "schema": "fsusui-independent-ux-review.v1",
   "issue": 285,
-  "candidateSha": "53335a0aa7de842c5762d5ccbe00bcbf8355d9a9",
+  "candidateSha": "4c976e0016729a9683fa94b58d107218f76f6523",
   "reviewMode": "read-only-rendered-evidence-inspection",
   "modifiedPaths": [],
   "productionFixture": true,
   "identity": {
-    "executionId": "conformance-v2-check-tag-53335a0aa7de842c5762d5ccbe00bcbf8355d9a9",
+    "executionId": "conformance-v2-check-tag-4c976e0016729a9683fa94b58d107218f76f6523",
     "checkpoint": "check-tag-after-pointer-keyboard",
     "contract": "component-v2.el-check-tag",
     "scenario": "scenario.v2.el-check-tag.real-interaction-trace",
@@ -14,7 +14,7 @@
     "webBaselineHash": "8b9f89a6aefd2afa633f95148c07631d702681421c472b00d2594ad648c17650",
     "avaloniaBaselineHash": "a8008e3e1023ab9123817a0b4dfcbe4befa6f7ff8c09c71908bb33e3f5e640b9",
     "runnerHash": "bad9abc8910c29bd5104e47fc7d693443a414d707776a55c043be5d1e0c0baf2",
-    "candidate": "53335a0aa7de842c5762d5ccbe00bcbf8355d9a9",
+    "candidate": "4c976e0016729a9683fa94b58d107218f76f6523",
     "documentId": "check-tag-state",
     "documentEpoch": 1,
     "sourceRevision": 2,
@@ -115,7 +115,7 @@
     }
   ],
   "observations": [
-    "Read-only inspection re-opened both tracked production CheckTag PNGs; this candidate (53335a0aa7de842c5762d5ccbe00bcbf8355d9a9) only bumps package metadata to v1.6.0-preview.12 and makes zero changes to CheckTag, theme-chalk CSS, or Avalonia sources.",
+    "Read-only inspection re-opened both tracked production CheckTag PNGs; this candidate (4c976e0016729a9683fa94b58d107218f76f6523) only updates responsive-data.spec.ts subpixel hit-target tolerance and dependency-freshness-blocker.mjs GitHub API pagination, with zero changes to CheckTag, theme-chalk CSS, or Avalonia sources.",
     "Bound CheckTag receipt identity to v1.6.0-preview.12 contractHash 5607f675df5a48d68b61e6ca8f29725e5d2141e20f2e6f6c9843d1f3185779c9, webBaselineHash 8b9f89a6aefd2afa633f95148c07631d702681421c472b00d2594ad648c17650, and avaloniaBaselineHash a8008e3e1023ab9123817a0b4dfcbe4befa6f7ff8c09c71908bb33e3f5e640b9.",
     "Web artifact is an 88x24 CheckTag element crop (cede06e2196173842ec99b1422f4242f3d54c3afdbfa8d8c35da70bad3e55277); Avalonia artifact is a 960x720 full window (3ae99ccd280405a7e7a0d1f622367ed017a4dc1819de8d3c59e427b6a2764cb0).",
     "Nine functional observations pass in both executions; timing is diagnostic only."
@@ -127,7 +127,7 @@
   ],
   "blockers": [],
   "status": "accepted",
-  "classificationReceiptDigest": "f399a88a70bc639eab78d226e502c5775738ad246e697cbaa10a12a39a34efe7",
-  "candidateDigest": "b86ecb5557e7071b762c9b35439c1cefbc2a6606f7e0b1a1f65f18db81398e7c",
-  "receiptDigest": "f63a22f67ab6493093e15dbad80cd9d788ab3b8a33c8a4c8e10d42bc46b5965f"
+  "classificationReceiptDigest": "674f9a6cab763c50b46ba8d4cb831bc17a60cb12037e6b173043e780c9f5f593",
+  "candidateDigest": "7c744fcde23c5c269a58dc5264b0ff0ac4942d8fb20599818fe5cc16a1763521",
+  "receiptDigest": "fe7118c245d8eeb8d867818fb6e227628b24ca2b14bc8c28054ce705499d18d3"
 }
