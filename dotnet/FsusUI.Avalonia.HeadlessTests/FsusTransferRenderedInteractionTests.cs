@@ -47,7 +47,7 @@ public class FsusTransferRenderedInteractionTests
     var resources = new ResourceDictionary();
     new FsusThemeManager().Apply(resources, new FsusThemeOptions { Variant = variant });
     window.Resources.MergedDictionaries.Add(resources);
-    window.Styles.Add(new global::Avalonia.Markup.Xaml.Styling.StyleInclude(new Uri("avares://FsusUI.Avalonia.HeadlessTests")) { Source = new Uri("avares://FsusUI.Avalonia.Themes/Themes/FsusTheme.axaml") });
+    window.Styles.Add(HeadlessTheme.CreateInclude());
     window.Show();
     try
     {
@@ -308,11 +308,6 @@ public class FsusTransferRenderedInteractionTests
     window.MouseUp(point.Value, MouseButton.Left);
   }
 
-  private static void AttachTheme(Window window)
-  {
-    var resources = new ResourceDictionary();
-    new FsusThemeManager().Apply(resources, new FsusThemeOptions { Variant = FsusThemeVariant.Light });
-    window.Resources.MergedDictionaries.Add(resources);
-    window.Styles.Add(new global::Avalonia.Markup.Xaml.Styling.StyleInclude(new Uri("avares://FsusUI.Avalonia.HeadlessTests")) { Source = new Uri("avares://FsusUI.Avalonia.Themes/Themes/FsusTheme.axaml") });
-  }
+  private static void AttachTheme(Window window) =>
+    HeadlessTheme.Attach(window, new FsusThemeOptions { Variant = FsusThemeVariant.Light });
 }

@@ -473,9 +473,12 @@ public class FsusCollapseRenderedEvidenceTests
 
   private static Window MountCollapse(FsusCollapse collapse, FsusThemeVariant variant)
   {
-    ApplyTheme(variant);
     var window = new Window { Width = 560, Height = 440, Content = collapse, ShowInTaskbar = false };
-    AttachFsusTheme(window);
+    HeadlessTheme.Attach(window, new FsusThemeOptions
+    {
+      Variant = variant,
+      MotionMode = FsusMotionMode.Enabled,
+    });
     window.Show();
     window.UpdateLayout();
     return window;
@@ -512,8 +515,6 @@ public class FsusCollapseRenderedEvidenceTests
   [AvaloniaFact]
   public void RendersCollapseStateMatrixToPng()
   {
-    ApplyTheme(FsusThemeVariant.Light);
-
     var item1 = new FsusCollapseItem
     {
       Title = "Options",
@@ -558,7 +559,11 @@ public class FsusCollapseRenderedEvidenceTests
       Content = surface,
       ShowInTaskbar = false,
     };
-    AttachFsusTheme(window);
+    HeadlessTheme.Attach(window, new FsusThemeOptions
+    {
+      Variant = FsusThemeVariant.Light,
+      MotionMode = FsusMotionMode.Enabled,
+    });
     window.Show();
 
     window.Measure(new Size(560, 440));
@@ -595,29 +600,5 @@ public class FsusCollapseRenderedEvidenceTests
     Assert.DoesNotContain("fsus-active", item2.Classes);
     Assert.Contains("fsus-disabled", item3.Classes);
     window.Close();
-  }
-
-  private static FsusThemeOptions themeOptions = new();
-
-  private static void ApplyTheme(FsusThemeVariant variant)
-  {
-    themeOptions = new FsusThemeOptions
-    {
-      Variant = variant,
-      MotionMode = FsusMotionMode.Enabled,
-    };
-  }
-
-  private static void AttachFsusTheme(Window window)
-  {
-    var resources = new ResourceDictionary();
-    new FsusThemeManager().Apply(resources, themeOptions);
-    window.Resources.MergedDictionaries.Add(resources);
-    window.Styles.Add(
-      new global::Avalonia.Markup.Xaml.Styling.StyleInclude(
-        new Uri("avares://FsusUI.Avalonia.HeadlessTests"))
-      {
-        Source = new Uri("avares://FsusUI.Avalonia.Themes/Themes/FsusTheme.axaml"),
-      });
   }
 }

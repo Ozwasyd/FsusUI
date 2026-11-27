@@ -7,7 +7,6 @@ using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
 using Avalonia.Input;
 using Avalonia.LogicalTree;
-using Avalonia.Markup.Xaml.Styling;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using Avalonia.VisualTree;
@@ -386,17 +385,8 @@ public class FsusSwitchTemplateHeadlessTests
     };
   }
 
-  private static void AttachFsusTheme(Window window)
-  {
-    var resources = new ResourceDictionary();
-    new FsusThemeManager().Apply(resources, themeOptions);
-    window.Resources.MergedDictionaries.Add(resources);
-    window.Styles.Add(
-      new StyleInclude(new Uri("avares://FsusUI.Avalonia.HeadlessTests"))
-      {
-        Source = new Uri("avares://FsusUI.Avalonia.Themes/Themes/FsusTheme.axaml"),
-      });
-  }
+  private static void AttachFsusTheme(Window window) =>
+    HeadlessTheme.Attach(window, themeOptions);
 
   private static Window MountWindow(
     (string name, Control content)[] children,

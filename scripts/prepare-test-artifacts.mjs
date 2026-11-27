@@ -1,8 +1,7 @@
-import { spawn } from 'node:child_process'
 import {
   artifactGroups,
   inspectArtifactGroup,
-  root,
+  runArtifactCommand,
 } from './test-artifact-cache.mjs'
 
 const force =
@@ -13,27 +12,7 @@ function runEnsure(group) {
   const args = [group.scriptPath]
   if (force) args.push('--force')
 
-  return new Promise((resolve, reject) => {
-    const child = spawn(process.execPath, args, {
-      cwd: root,
-      stdio: 'inherit',
-    })
-
-    child.on('error', reject)
-    child.on('exit', (code) => {
-      if (code === 0) {
-        resolve()
-        return
-      }
-      reject(
-        new Error(
-          `${process.execPath} ${args.join(' ')} exited with code ${
-            code ?? -1
-          }`,
-        ),
-      )
-    })
-  })
+  return runArtifactCommand(process.execPath, args)
 }
 
 const groups = [artifactGroups.icons, artifactGroups.wasm]

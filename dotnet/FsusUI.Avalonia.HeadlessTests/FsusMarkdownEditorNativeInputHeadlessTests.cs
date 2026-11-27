@@ -540,11 +540,7 @@ public class FsusMarkdownEditorNativeInputHeadlessTests
         Source = new Uri(
           "avares://FsusUI.Avalonia.Themes/Themes/FsusLight.axaml"),
       });
-    window.Styles.Add(
-      new StyleInclude(new Uri("avares://FsusUI.Avalonia.HeadlessTests"))
-      {
-        Source = new Uri("avares://FsusUI.Avalonia.Themes/Themes/FsusTheme.axaml"),
-      });
+    window.Styles.Add(HeadlessTheme.CreateInclude());
     window.Show();
     window.Measure(new Size(window.Width, window.Height));
     window.Arrange(new Rect(0, 0, window.Width, window.Height));

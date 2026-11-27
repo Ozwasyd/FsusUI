@@ -257,6 +257,18 @@ const sameDocumentIdentity = (
   right: { readonly id: string; readonly epoch: number },
 ) => left.id === right.id && left.epoch === right.epoch
 
+const failurePlan = (
+  status: Exclude<MarkdownOutlineRevealPlan['status'], 'success'>,
+): MarkdownOutlineRevealPlan =>
+  Object.freeze({
+    status,
+    scroll: false,
+    smooth: false,
+    virtualTargetMounted: false,
+    navigationOwner: 'none',
+    historyMutated: false,
+  })
+
 const successPlan = (
   range: { readonly start: number; readonly end: number },
   options: MarkdownOutlineRevealPlanOptions | undefined,
@@ -291,51 +303,23 @@ export const planMarkdownOutlineReveal = (
       ) ||
       options.expected.revision !== options.actual.revision
     ) {
-      return Object.freeze({
-        status: 'stale',
-        scroll: false,
-        smooth: false,
-        virtualTargetMounted: false,
-        navigationOwner: 'none',
-        historyMutated: false,
-      })
+      return failurePlan('stale')
     }
   }
 
   if (options?.mode === 'unsupported') {
-    return Object.freeze({
-      status: 'unsupported',
-      scroll: false,
-      smooth: false,
-      virtualTargetMounted: false,
-      navigationOwner: 'none',
-      historyMutated: false,
-    })
+    return failurePlan('unsupported')
   }
 
   if (options?.deletedNodeIds?.includes(nodeId)) {
-    return Object.freeze({
-      status: 'deleted',
-      scroll: false,
-      smooth: false,
-      virtualTargetMounted: false,
-      navigationOwner: 'none',
-      historyMutated: false,
-    })
+    return failurePlan('deleted')
   }
 
   if (
     options?.previousOutline?.some((item) => item.nodeId === nodeId) &&
     !items.some((item) => item.nodeId === nodeId)
   ) {
-    return Object.freeze({
-      status: 'deleted',
-      scroll: false,
-      smooth: false,
-      virtualTargetMounted: false,
-      navigationOwner: 'none',
-      historyMutated: false,
-    })
+    return failurePlan('deleted')
   }
 
   const item = items.find((entry) => entry.nodeId === nodeId)
@@ -381,14 +365,7 @@ export const planMarkdownOutlineReveal = (
     return successPlan(virtualTarget.range, options, true)
   }
 
-  return Object.freeze({
-    status: 'not-found',
-    scroll: false,
-    smooth: false,
-    virtualTargetMounted: false,
-    navigationOwner: 'none',
-    historyMutated: false,
-  })
+  return failurePlan('not-found')
 }
 
 export type MarkdownOutlineActiveMutationKind =

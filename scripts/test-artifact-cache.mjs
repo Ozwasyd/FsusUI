@@ -1,3 +1,4 @@
+import { spawn } from 'node:child_process'
 import { constants } from 'node:fs'
 import { access, mkdir, readFile, writeFile } from 'node:fs/promises'
 import { createHash } from 'node:crypto'
@@ -6,6 +7,22 @@ import { fileURLToPath } from 'node:url'
 import fg from 'fast-glob'
 
 export const root = resolve(dirname(fileURLToPath(import.meta.url)), '..')
+
+export function runArtifactCommand(command, args, { shell = false } = {}) {
+  return new Promise((resolvePromise, reject) => {
+    const child = spawn(command, args, { cwd: root, stdio: 'inherit', shell })
+    child.on('error', reject)
+    child.on('exit', (code) => {
+      if (code === 0) resolvePromise()
+      else
+        reject(
+          new Error(
+            `${command} ${args.join(' ')} exited with code ${code ?? -1}`,
+          ),
+        )
+    })
+  })
+}
 
 const posixPath = (value) => value.replaceAll('\\', '/')
 

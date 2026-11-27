@@ -5,41 +5,52 @@ import { clickActionButton } from '../../../test-utils/dom'
 import Collapse from '../src/collapse.vue'
 import CollapseItem from '../src/collapse-item.vue'
 import type { VueWrapper } from '@vue/test-utils'
+import type { CollapseModelValue } from '../src/collapse'
 import type { CollapseItemInstance } from '../src/instance'
+
+const mountCollapse = (
+  props: {
+    accordion?: boolean
+    onChange?: (value: CollapseModelValue) => void
+  } = {},
+  mounted?: (this: { activeNames: string[] }) => void
+) =>
+  mount({
+    data() {
+      return { activeNames: ['1'] }
+    },
+    ...(mounted && { mounted }),
+    render() {
+      return (
+        <Collapse v-model={(this as any).activeNames} {...props}>
+          <CollapseItem title="title1" name="1">
+            <div class="content">111</div>
+          </CollapseItem>
+          <CollapseItem title="title2" name="2">
+            <div class="content">222</div>
+          </CollapseItem>
+          <CollapseItem title="title3" name="3">
+            <div class="content">333</div>
+          </CollapseItem>
+          <CollapseItem title="title4" name="4">
+            <div class="content">444</div>
+          </CollapseItem>
+        </Collapse>
+      )
+    },
+  })
+
+const findCollapseItems = (wrapper: ReturnType<typeof mountCollapse>) =>
+  wrapper.findComponent(Collapse).findAllComponents(
+    CollapseItem
+  ) as VueWrapper<CollapseItemInstance>[]
 
 describe('Collapse.vue', () => {
   test('create', async () => {
-    const wrapper = mount({
-      data() {
-        return {
-          activeNames: ['1'],
-        }
-      },
-      render() {
-        return (
-          <Collapse v-model={(this as any).activeNames}>
-            <CollapseItem title="title1" name="1">
-              <div class="content">111</div>
-            </CollapseItem>
-            <CollapseItem title="title2" name="2">
-              <div class="content">222</div>
-            </CollapseItem>
-            <CollapseItem title="title3" name="3">
-              <div class="content">333</div>
-            </CollapseItem>
-            <CollapseItem title="title4" name="4">
-              <div class="content">444</div>
-            </CollapseItem>
-          </Collapse>
-        )
-      },
-    })
+    const wrapper = mountCollapse()
 
     const vm = wrapper.vm as any
-    const collapseWrapper = wrapper.findComponent(Collapse)
-    const collapseItemWrappers = collapseWrapper.findAllComponents(
-      CollapseItem
-    ) as VueWrapper<CollapseItemInstance>[]
+    const collapseItemWrappers = findCollapseItems(wrapper)
     const collapseItemHeaderEls = vm.$el.querySelectorAll(
       '.el-collapse-item__header'
     )
@@ -55,37 +66,10 @@ describe('Collapse.vue', () => {
   })
 
   test('accordion', async () => {
-    const wrapper = mount({
-      data() {
-        return {
-          activeNames: ['1'],
-        }
-      },
-      render() {
-        return (
-          <Collapse accordion v-model={(this as any).activeNames}>
-            <CollapseItem title="title1" name="1">
-              <div class="content">111</div>
-            </CollapseItem>
-            <CollapseItem title="title2" name="2">
-              <div class="content">222</div>
-            </CollapseItem>
-            <CollapseItem title="title3" name="3">
-              <div class="content">333</div>
-            </CollapseItem>
-            <CollapseItem title="title4" name="4">
-              <div class="content">444</div>
-            </CollapseItem>
-          </Collapse>
-        )
-      },
-    })
+    const wrapper = mountCollapse({ accordion: true })
 
     const vm = wrapper.vm as any
-    const collapseWrapper = wrapper.findComponent(Collapse)
-    const collapseItemWrappers = collapseWrapper.findAllComponents(
-      CollapseItem
-    ) as VueWrapper<CollapseItemInstance>[]
+    const collapseItemWrappers = findCollapseItems(wrapper)
     const collapseItemHeaderEls = vm.$el.querySelectorAll(
       '.el-collapse-item__header'
     )
@@ -103,37 +87,10 @@ describe('Collapse.vue', () => {
 
   test('event:change', async () => {
     const onChange = vi.fn()
-    const wrapper = mount({
-      data() {
-        return {
-          activeNames: ['1'],
-        }
-      },
-      render() {
-        return (
-          <Collapse v-model={(this as any).activeNames} onChange={onChange}>
-            <CollapseItem title="title1" name="1">
-              <div class="content">111</div>
-            </CollapseItem>
-            <CollapseItem title="title2" name="2">
-              <div class="content">222</div>
-            </CollapseItem>
-            <CollapseItem title="title3" name="3">
-              <div class="content">333</div>
-            </CollapseItem>
-            <CollapseItem title="title4" name="4">
-              <div class="content">444</div>
-            </CollapseItem>
-          </Collapse>
-        )
-      },
-    })
+    const wrapper = mountCollapse({ onChange })
 
     const vm = wrapper.vm as any
-    const collapseWrapper = wrapper.findComponent(Collapse)
-    const collapseItemWrappers = collapseWrapper.findAllComponents(
-      CollapseItem
-    ) as VueWrapper<CollapseItemInstance>[]
+    const collapseItemWrappers = findCollapseItems(wrapper)
     const collapseItemHeaderEls = vm.$el.querySelectorAll(
       '.el-collapse-item__header'
     )
@@ -154,40 +111,12 @@ describe('Collapse.vue', () => {
   })
 
   test('deep watch modelValue', async () => {
-    const wrapper = mount({
-      data() {
-        return {
-          activeNames: ['1'],
-        }
-      },
-      mounted() {
-        ;(this as any).activeNames.push('2')
-      },
-      render() {
-        return (
-          <Collapse v-model={(this as any).activeNames}>
-            <CollapseItem title="title1" name="1">
-              <div class="content">111</div>
-            </CollapseItem>
-            <CollapseItem title="title2" name="2">
-              <div class="content">222</div>
-            </CollapseItem>
-            <CollapseItem title="title3" name="3">
-              <div class="content">333</div>
-            </CollapseItem>
-            <CollapseItem title="title4" name="4">
-              <div class="content">444</div>
-            </CollapseItem>
-          </Collapse>
-        )
-      },
+    const wrapper = mountCollapse({}, function () {
+      this.activeNames.push('2')
     })
 
     await nextTick()
-    const collapseWrapper = wrapper.findComponent(Collapse)
-    const collapseItemWrappers = collapseWrapper.findAllComponents(
-      CollapseItem
-    ) as VueWrapper<CollapseItemInstance>[]
+    const collapseItemWrappers = findCollapseItems(wrapper)
     expect(collapseItemWrappers[0].vm.isActive).toBe(true)
     expect(collapseItemWrappers[1].vm.isActive).toBe(true)
   })

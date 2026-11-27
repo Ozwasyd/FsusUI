@@ -6,7 +6,6 @@ using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
 using Avalonia.Input;
 using Avalonia.LogicalTree;
-using Avalonia.Markup.Xaml.Styling;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using Avalonia.VisualTree;
@@ -700,12 +699,7 @@ public class FsusTreeContextMenuHeadlessTests
   private static void EnsureFullTheme()
   {
     var application = Assert.IsType<HeadlessTestApplication>(Application.Current);
-    application.Styles.Add(new StyleInclude(
-      new Uri("avares://FsusUI.Avalonia.HeadlessTests"))
-    {
-      Source = new Uri(
-        "avares://FsusUI.Avalonia.Themes/Themes/FsusTheme.axaml"),
-    });
+    application.Styles.Add(HeadlessTheme.CreateInclude());
   }
 
   private static void Arrange(Control control, double width, double height)

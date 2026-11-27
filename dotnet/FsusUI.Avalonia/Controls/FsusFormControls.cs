@@ -97,12 +97,23 @@ public class FsusForm : StackPanel
 
   public FsusFormItem? LastScrollTarget { get; private set; }
 
-  public async Task<FsusFormValidationResult> ValidateAsync()
+  public Task<FsusFormValidationResult> ValidateAsync() =>
+    ValidateFieldsAsync(null, validateAll: true);
+
+  public Task<FsusFormValidationResult> ValidateFieldAsync(string fieldName) =>
+    ValidateFieldsAsync(fieldName, validateAll: false);
+
+  private async Task<FsusFormValidationResult> ValidateFieldsAsync(string? fieldName, bool validateAll)
   {
     RefreshFormState();
     var errors = new List<FsusFormValidationError>();
     foreach (var field in fields)
     {
+      if (!validateAll && field.FieldName != fieldName)
+      {
+        continue;
+      }
+
       var error = await field.ValidateAsync();
       if (error is not null)
       {
@@ -110,25 +121,9 @@ public class FsusForm : StackPanel
       }
     }
 
-    if (ScrollToError && errors.Count > 0)
+    if (validateAll && ScrollToError && errors.Count > 0)
     {
       ScrollToFirstError();
-    }
-
-    return new FsusFormValidationResult(errors.Count == 0, errors);
-  }
-
-  public async Task<FsusFormValidationResult> ValidateFieldAsync(string fieldName)
-  {
-    RefreshFormState();
-    var errors = new List<FsusFormValidationError>();
-    foreach (var field in fields.Where(field => field.FieldName == fieldName))
-    {
-      var error = await field.ValidateAsync();
-      if (error is not null)
-      {
-        errors.Add(error);
-      }
     }
 
     return new FsusFormValidationResult(errors.Count == 0, errors);
@@ -247,18 +242,15 @@ public class FsusForm : StackPanel
       }
     }
 
-    if (control is ContentControl contentControl &&
-      contentControl.Content is Control content)
+    var singleChild = control switch
     {
-      foreach (var field in CollectFields(content))
-      {
-        yield return field;
-      }
-    }
-
-    if (control is Decorator decorator && decorator.Child is Control decoratedChild)
+      ContentControl { Content: Control content } => content,
+      Decorator decorator => decorator.Child,
+      _ => null,
+    };
+    if (singleChild is not null)
     {
-      foreach (var field in CollectFields(decoratedChild))
+      foreach (var field in CollectFields(singleChild))
       {
         yield return field;
       }
@@ -454,22 +446,15 @@ public class FsusFormItem : ContentControl
       message = await OnUiThreadAsync(async () => await AsyncValidator(this));
     }
 
-    if (!string.IsNullOrWhiteSpace(message))
-    {
-      await OnUiThreadAsync(() =>
-      {
-        SetValidationState(FsusFormValidationState.Error, message!);
-        OwnerForm?.NotifyFieldValidated(this);
-      });
-      return new FsusFormValidationError(fieldName, message!);
-    }
-
+    message = string.IsNullOrWhiteSpace(message) ? null : message;
     await OnUiThreadAsync(() =>
     {
-      SetValidationState(FsusFormValidationState.Success, string.Empty);
+      SetValidationState(
+        message is null ? FsusFormValidationState.Success : FsusFormValidationState.Error,
+        message ?? string.Empty);
       OwnerForm?.NotifyFieldValidated(this);
     });
-    return null;
+    return message is null ? null : new FsusFormValidationError(fieldName, message);
   }
 
   public void ResetField()
@@ -664,30 +649,10 @@ public class FsusFormItem : ContentControl
   private void ApplyDisabledState(bool disabledByForm)
   {
     var fieldControl = FieldControl;
-    if (disabledByForm)
+    FsusControlAvailability.SyncDisabled(this, disabledByForm, ref enabledBeforeFormDisabled);
+    if (fieldControl is not null)
     {
-      enabledBeforeFormDisabled ??= IsEnabled;
-      IsEnabled = false;
-      if (fieldControl is not null)
-      {
-        fieldEnabledBeforeFormDisabled ??= fieldControl.IsEnabled;
-        fieldControl.IsEnabled = false;
-      }
-      return;
-    }
-
-    if (enabledBeforeFormDisabled.HasValue)
-    {
-      IsEnabled = enabledBeforeFormDisabled.Value;
-      enabledBeforeFormDisabled = null;
-    }
-
-    if (
-      fieldControl is not null &&
-      fieldEnabledBeforeFormDisabled.HasValue)
-    {
-      fieldControl.IsEnabled = fieldEnabledBeforeFormDisabled.Value;
-      fieldEnabledBeforeFormDisabled = null;
+      FsusControlAvailability.SyncDisabled(fieldControl, disabledByForm, ref fieldEnabledBeforeFormDisabled);
     }
   }
 

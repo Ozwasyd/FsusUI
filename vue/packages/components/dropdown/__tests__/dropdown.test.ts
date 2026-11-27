@@ -50,6 +50,58 @@ const _mount = (
     mountOptions,
   )
 
+const dropdownLink = `
+  <span class="el-dropdown-link" ref="a">
+    dropdown<i class="el-icon-arrow-down el-icon--right"></i>
+  </span>
+`
+
+const mountCommandDropdown = (
+  attributes: string,
+  options?: MountExtraOptions,
+  triggerContent = dropdownLink,
+) =>
+  _mount(
+    `
+      <el-dropdown ${attributes} ref="b" placement="right">
+        ${triggerContent}
+        <template #dropdown>
+          <el-dropdown-menu>
+            <el-dropdown-item command="a">Apple</el-dropdown-item>
+            <el-dropdown-item command="b">Orange</el-dropdown-item>
+            <el-dropdown-item ref="c" :command="myCommandObject">Cherry</el-dropdown-item>
+            <el-dropdown-item command="d">Peach</el-dropdown-item>
+            <el-dropdown-item command="e">Pear</el-dropdown-item>
+          </el-dropdown-menu>
+        </template>
+      </el-dropdown>
+    `,
+    () => ({
+      myCommandObject: { name: 'CommandC' },
+      name: '',
+    }),
+    options,
+  )
+
+const mountKeepOpenDropdown = () =>
+  _mount(
+    `
+      <el-dropdown ref="b" placement="right" :hide-on-click="false">
+        ${dropdownLink}
+        <template #dropdown>
+          <el-dropdown-menu>
+            <el-dropdown-item>Apple</el-dropdown-item>
+            <el-dropdown-item>Orange</el-dropdown-item>
+            <el-dropdown-item ref="c">Cherry</el-dropdown-item>
+            <el-dropdown-item disabled>Peach</el-dropdown-item>
+            <el-dropdown-item divided>Pear</el-dropdown-item>
+          </el-dropdown-menu>
+        </template>
+      </el-dropdown>
+    `,
+    () => ({}),
+  )
+
 describe('Dropdown', () => {
   afterEach(() => {
     document.body.innerHTML = ''
@@ -127,33 +179,9 @@ describe('Dropdown', () => {
 
   test('menu click', async () => {
     const commandHandler = vi.fn()
-    const wrapper = _mount(
-      `
-      <el-dropdown ref="b" @command="commandHandler" placement="right">
-        <span class="el-dropdown-link" ref="a">
-          dropdown<i class="el-icon-arrow-down el-icon--right"></i>
-        </span>
-        <template #dropdown>
-          <el-dropdown-menu>
-            <el-dropdown-item command="a">Apple</el-dropdown-item>
-            <el-dropdown-item command="b">Orange</el-dropdown-item>
-            <el-dropdown-item ref="c" :command="myCommandObject">Cherry</el-dropdown-item>
-            <el-dropdown-item command="d">Peach</el-dropdown-item>
-            <el-dropdown-item command="e">Pear</el-dropdown-item>
-          </el-dropdown-menu>
-        </template>
-      </el-dropdown>
-      `,
-      () => ({
-        myCommandObject: { name: 'CommandC' },
-        name: '',
-      }),
-      {
-        methods: {
-          commandHandler,
-        },
-      },
-    )
+    const wrapper = mountCommandDropdown('@command="commandHandler"', {
+      methods: { commandHandler },
+    })
     await nextTick()
     // const content = wrapper.findComponent({ ref: 'b' }).vm as any
     const triggerElm = wrapper.find('.el-tooltip__trigger')
@@ -171,28 +199,7 @@ describe('Dropdown', () => {
   })
 
   test('trigger', async () => {
-    const wrapper = _mount(
-      `
-      <el-dropdown trigger="click" ref="b" placement="right">
-        <span class="el-dropdown-link" ref="a">
-          dropdown<i class="el-icon-arrow-down el-icon--right"></i>
-        </span>
-        <template #dropdown>
-          <el-dropdown-menu>
-            <el-dropdown-item command="a">Apple</el-dropdown-item>
-            <el-dropdown-item command="b">Orange</el-dropdown-item>
-            <el-dropdown-item ref="c" :command="myCommandObject">Cherry</el-dropdown-item>
-            <el-dropdown-item command="d">Peach</el-dropdown-item>
-            <el-dropdown-item command="e">Pear</el-dropdown-item>
-          </el-dropdown-menu>
-        </template>
-      </el-dropdown>
-      `,
-      () => ({
-        myCommandObject: { name: 'CommandC' },
-        name: '',
-      }),
-    )
+    const wrapper = mountCommandDropdown('trigger="click"')
     await nextTick()
     const content = wrapper.findComponent(ElTooltip).vm as InstanceType<
       typeof ElTooltip
@@ -209,28 +216,7 @@ describe('Dropdown', () => {
   })
 
   test('trigger contextmenu', async () => {
-    const wrapper = _mount(
-      `
-      <el-dropdown trigger="contextmenu" ref="b" placement="right">
-        <span class="el-dropdown-link" ref="a">
-          dropdown<i class="el-icon-arrow-down el-icon--right"></i>
-        </span>
-        <template #dropdown>
-          <el-dropdown-menu>
-            <el-dropdown-item command="a">Apple</el-dropdown-item>
-            <el-dropdown-item command="b">Orange</el-dropdown-item>
-            <el-dropdown-item ref="c" :command="myCommandObject">Cherry</el-dropdown-item>
-            <el-dropdown-item command="d">Peach</el-dropdown-item>
-            <el-dropdown-item command="e">Pear</el-dropdown-item>
-          </el-dropdown-menu>
-        </template>
-      </el-dropdown>
-      `,
-      () => ({
-        myCommandObject: { name: 'CommandC' },
-        name: '',
-      }),
-    )
+    const wrapper = mountCommandDropdown('trigger="contextmenu"')
     await nextTick()
     const content = wrapper.findComponent(ElTooltip).vm as InstanceType<
       typeof ElTooltip
@@ -284,30 +270,10 @@ describe('Dropdown', () => {
 
   test('split button', async () => {
     const handleClick = vi.fn()
-    const wrapper = _mount(
-      `
-      <el-dropdown  @click="handleClick" split-button type="primary" ref="b" placement="right">
-        dropdown
-        <template #dropdown>
-          <el-dropdown-menu>
-            <el-dropdown-item command="a">Apple</el-dropdown-item>
-            <el-dropdown-item command="b">Orange</el-dropdown-item>
-            <el-dropdown-item ref="c" :command="myCommandObject">Cherry</el-dropdown-item>
-            <el-dropdown-item command="d">Peach</el-dropdown-item>
-            <el-dropdown-item command="e">Pear</el-dropdown-item>
-          </el-dropdown-menu>
-        </template>
-      </el-dropdown>
-      `,
-      () => ({
-        myCommandObject: { name: 'CommandC' },
-        name: '',
-      }),
-      {
-        methods: {
-          handleClick,
-        },
-      },
+    const wrapper = mountCommandDropdown(
+      '@click="handleClick" split-button type="primary"',
+      { methods: { handleClick } },
+      'dropdown',
     )
     await nextTick()
     const content = wrapper.findComponent(ElTooltip).vm as InstanceType<
@@ -326,25 +292,7 @@ describe('Dropdown', () => {
   })
 
   test('hide on click', async () => {
-    const wrapper = _mount(
-      `
-      <el-dropdown ref="b" placement="right" :hide-on-click="false">
-        <span class="el-dropdown-link" ref="a">
-          dropdown<i class="el-icon-arrow-down el-icon--right"></i>
-        </span>
-        <template #dropdown>
-          <el-dropdown-menu>
-            <el-dropdown-item>Apple</el-dropdown-item>
-            <el-dropdown-item>Orange</el-dropdown-item>
-            <el-dropdown-item ref="c">Cherry</el-dropdown-item>
-            <el-dropdown-item disabled>Peach</el-dropdown-item>
-            <el-dropdown-item divided>Pear</el-dropdown-item>
-          </el-dropdown-menu>
-        </template>
-      </el-dropdown>
-      `,
-      () => ({}),
-    )
+    const wrapper = mountKeepOpenDropdown()
     await nextTick()
     const content = wrapper.findComponent(ElTooltip).vm as InstanceType<
       typeof ElTooltip
@@ -367,25 +315,7 @@ describe('Dropdown', () => {
   })
 
   test('triggerElm keydown', async () => {
-    const wrapper = _mount(
-      `
-      <el-dropdown ref="b" placement="right" :hide-on-click="false">
-        <span class="el-dropdown-link" ref="a">
-          dropdown<i class="el-icon-arrow-down el-icon--right"></i>
-        </span>
-        <template #dropdown>
-          <el-dropdown-menu>
-            <el-dropdown-item>Apple</el-dropdown-item>
-            <el-dropdown-item>Orange</el-dropdown-item>
-            <el-dropdown-item ref="c">Cherry</el-dropdown-item>
-            <el-dropdown-item disabled>Peach</el-dropdown-item>
-            <el-dropdown-item divided>Pear</el-dropdown-item>
-          </el-dropdown-menu>
-        </template>
-      </el-dropdown>
-      `,
-      () => ({}),
-    )
+    const wrapper = mountKeepOpenDropdown()
     await nextTick()
     const content = wrapper.findComponent(ElTooltip).vm as InstanceType<
       typeof ElTooltip

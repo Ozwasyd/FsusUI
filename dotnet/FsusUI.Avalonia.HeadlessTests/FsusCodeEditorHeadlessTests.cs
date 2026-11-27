@@ -7,7 +7,6 @@ using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
 using Avalonia.Input;
 using Avalonia.Input.Platform;
-using Avalonia.Markup.Xaml.Styling;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using Avalonia.Themes.Fluent;
@@ -335,10 +334,7 @@ public class FsusCodeEditorHeadlessTests
       ShowInTaskbar = false,
     };
     window.Styles.Add(new FluentTheme());
-    window.Styles.Add(new StyleInclude(new Uri("avares://FsusUI.Avalonia.HeadlessTests"))
-    {
-      Source = new Uri("avares://FsusUI.Avalonia.Themes/Themes/FsusTheme.axaml"),
-    });
+    window.Styles.Add(HeadlessTheme.CreateInclude());
     new FsusThemeManager().Apply(window.Resources, new FsusThemeOptions
     {
       Variant = theme,

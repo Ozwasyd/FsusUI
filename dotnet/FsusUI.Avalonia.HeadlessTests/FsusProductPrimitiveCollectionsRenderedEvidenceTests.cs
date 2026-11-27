@@ -18,8 +18,6 @@ public class FsusProductPrimitiveCollectionsRenderedEvidenceTests
   [InlineData(FsusThemeVariant.Dark)]
   public void RendersMetricAndDescriptionCollectionsInResponsiveLayouts(FsusThemeVariant variant)
   {
-    ApplyTheme(variant);
-
     var kpis = new FsusKpiGroup { AccessibleName = "Document metrics" };
     kpis.Items.Add(new FsusMetricItem("words", "Words", "12"));
     kpis.Items.Add(new FsusMetricItem("characters", "Characters", "8,420"));
@@ -47,7 +45,11 @@ public class FsusProductPrimitiveCollectionsRenderedEvidenceTests
       Content = body,
       ShowInTaskbar = false,
     };
-    AttachFsusTheme(window);
+    HeadlessTheme.Attach(window, new FsusThemeOptions
+    {
+      Variant = variant,
+      MotionMode = FsusMotionMode.Enabled,
+    });
     window.Show();
     descriptions.RefreshLayout(window.Bounds.Width);
     kpis.ApplyViewport(window.Bounds.Width);
@@ -89,29 +91,5 @@ public class FsusProductPrimitiveCollectionsRenderedEvidenceTests
     using var stream = File.Create(outputPath);
     bitmap.Save(stream);
     Assert.True(new FileInfo(outputPath).Length > 1_000);
-  }
-
-  private static FsusThemeOptions themeOptions = new();
-
-  private static void ApplyTheme(FsusThemeVariant variant)
-  {
-    themeOptions = new FsusThemeOptions
-    {
-      Variant = variant,
-      MotionMode = FsusMotionMode.Enabled,
-    };
-  }
-
-  private static void AttachFsusTheme(Window window)
-  {
-    var resources = new ResourceDictionary();
-    new FsusThemeManager().Apply(resources, themeOptions);
-    window.Resources.MergedDictionaries.Add(resources);
-    window.Styles.Add(
-      new global::Avalonia.Markup.Xaml.Styling.StyleInclude(
-        new Uri("avares://FsusUI.Avalonia.HeadlessTests"))
-      {
-        Source = new Uri("avares://FsusUI.Avalonia.Themes/Themes/FsusTheme.axaml"),
-      });
   }
 }

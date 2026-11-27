@@ -38,84 +38,47 @@ type TreeInstance = InstanceType<typeof Tree> & {
   data: TreeTestNode[]
 }
 
-const getTreeVm = (props = '', options = {}) => {
-  const wrapper = mount(
-    Object.assign(
+const createTreeData = (
+  { disableLeaf = false, disableSecondRoot = false } = {}
+): TreeTestNode[] => [
+  {
+    id: 1,
+    label: '一级 1',
+    children: [
       {
-        components: {
-          'el-tree': Tree,
-        },
-        template: `
-      <el-tree ref="tree" :data="data" ${props}></el-tree>
-    `,
-        data() {
-          return {
-            currentNode: null,
-            nodeExpended: false,
-            defaultExpandedKeys: [],
-            defaultCheckedKeys: [],
-            clickedNode: null,
-            count: 1,
-            data: [
-              {
-                id: 1,
-                label: '一级 1',
-                children: [
-                  {
-                    id: 11,
-                    label: '二级 1-1',
-                    children: [
-                      {
-                        id: 111,
-                        label: '三级 1-1',
-                      },
-                    ],
-                  },
-                ],
-              },
-              {
-                id: 2,
-                label: '一级 2',
-                children: [
-                  {
-                    id: 21,
-                    label: '二级 2-1',
-                  },
-                  {
-                    id: 22,
-                    label: '二级 2-2',
-                  },
-                ],
-              },
-              {
-                id: 3,
-                label: '一级 3',
-                children: [
-                  {
-                    id: 31,
-                    label: '二级 3-1',
-                  },
-                  {
-                    id: 32,
-                    label: '二级 3-2',
-                  },
-                ],
-              },
-            ],
-            defaultProps: {
-              children: 'children',
-              label: 'label',
-            },
-          }
-        },
+        id: 11,
+        label: '二级 1-1',
+        children: [
+          { id: 111, label: '三级 1-1', ...(disableLeaf && { disabled: true }) },
+        ],
       },
-      options
-    )
-  )
-  return { wrapper, vm: wrapper.vm as unknown as TreeTestVm }
-}
+    ],
+  },
+  {
+    id: 2,
+    label: '一级 2',
+    ...(disableSecondRoot && { disabled: true }),
+    children: [
+      { id: 21, label: '二级 2-1' },
+      { id: 22, label: '二级 2-2' },
+    ],
+  },
+  {
+    id: 3,
+    label: '一级 3',
+    children: [
+      { id: 31, label: '二级 3-1' },
+      { id: 32, label: '二级 3-2' },
+    ],
+  },
+]
 
-const getDisableTreeVm = (props = '', options = {}) => {
+const getTreeVm = (
+  props = '',
+  options = {},
+  mode: 'default' | 'disabled' = 'default'
+) => {
+  const disabled = mode === 'disabled'
   const wrapper = mount(
     Object.assign(
       {
@@ -127,61 +90,16 @@ const getDisableTreeVm = (props = '', options = {}) => {
     `,
         data() {
           return {
+            ...(!disabled && { currentNode: null, nodeExpended: false }),
             defaultExpandedKeys: [],
             defaultCheckedKeys: [],
             clickedNode: null,
             count: 1,
-            data: [
-              {
-                id: 1,
-                label: '一级 1',
-                children: [
-                  {
-                    id: 11,
-                    label: '二级 1-1',
-                    children: [
-                      {
-                        id: 111,
-                        label: '三级 1-1',
-                        disabled: true,
-                      },
-                    ],
-                  },
-                ],
-              },
-              {
-                id: 2,
-                label: '一级 2',
-                children: [
-                  {
-                    id: 21,
-                    label: '二级 2-1',
-                  },
-                  {
-                    id: 22,
-                    label: '二级 2-2',
-                  },
-                ],
-              },
-              {
-                id: 3,
-                label: '一级 3',
-                children: [
-                  {
-                    id: 31,
-                    label: '二级 3-1',
-                  },
-                  {
-                    id: 32,
-                    label: '二级 3-2',
-                  },
-                ],
-              },
-            ],
+            data: createTreeData({ disableLeaf: disabled }),
             defaultProps: {
               children: 'children',
               label: 'label',
-              disabled: 'disabled',
+              ...(disabled && { disabled: 'disabled' }),
             },
           }
         },
@@ -795,8 +713,10 @@ describe('Tree.vue', () => {
   })
 
   test('set disabled checkbox', async () => {
-    const { wrapper } = getDisableTreeVm(
-      `:props="defaultProps" show-checkbox node-key="id" default-expand-all`
+    const { wrapper } = getTreeVm(
+      `:props="defaultProps" show-checkbox node-key="id" default-expand-all`,
+      {},
+      'disabled'
     )
     const nodeWrapper = wrapper.findAll('.el-tree-node__content')[2]
     const checkboxWrapper = nodeWrapper.find('.el-checkbox input')
@@ -1263,54 +1183,7 @@ describe('Tree.vue', () => {
       },
       data() {
         return {
-          data: [
-            {
-              id: 1,
-              label: '一级 1',
-              children: [
-                {
-                  id: 11,
-                  label: '二级 1-1',
-                  children: [
-                    {
-                      id: 111,
-                      label: '三级 1-1',
-                      disabled: true,
-                    },
-                  ],
-                },
-              ],
-            },
-            {
-              id: 2,
-              label: '一级 2',
-              disabled: true,
-              children: [
-                {
-                  id: 21,
-                  label: '二级 2-1',
-                },
-                {
-                  id: 22,
-                  label: '二级 2-2',
-                },
-              ],
-            },
-            {
-              id: 3,
-              label: '一级 3',
-              children: [
-                {
-                  id: 31,
-                  label: '二级 3-1',
-                },
-                {
-                  id: 32,
-                  label: '二级 3-2',
-                },
-              ],
-            },
-          ],
+          data: createTreeData({ disableLeaf: true, disableSecondRoot: true }),
           defaultProps: {
             children: 'children',
             label: 'label',

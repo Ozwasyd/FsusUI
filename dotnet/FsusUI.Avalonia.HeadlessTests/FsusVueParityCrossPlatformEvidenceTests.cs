@@ -266,10 +266,6 @@ public class FsusVueParityCrossPlatformEvidenceTests
     window.RequestedThemeVariant = variant == FsusThemeVariant.Dark
       ? ThemeVariant.Dark
       : ThemeVariant.Light;
-    window.Styles.Add(
-      new StyleInclude(new Uri("avares://FsusUI.Avalonia.HeadlessTests"))
-      {
-        Source = new Uri("avares://FsusUI.Avalonia.Themes/Themes/FsusTheme.axaml"),
-      });
+    window.Styles.Add(HeadlessTheme.CreateInclude());
   }
 }

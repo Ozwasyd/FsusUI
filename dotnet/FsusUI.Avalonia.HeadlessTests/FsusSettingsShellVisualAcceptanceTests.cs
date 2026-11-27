@@ -7,7 +7,6 @@ using Avalonia.Controls.Primitives;
 using Avalonia.Headless.XUnit;
 using Avalonia.Input;
 using Avalonia.Layout;
-using Avalonia.Markup.Xaml.Styling;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using Avalonia.Styling;
@@ -98,10 +97,7 @@ public class FsusSettingsShellVisualAcceptanceTests
       FlowDirection = FlowDirection.LeftToRight,
     };
     window.Styles.Add(new FluentTheme());
-    window.Styles.Add(new StyleInclude(new Uri("avares://FsusUI.Avalonia.HeadlessTests"))
-    {
-      Source = new Uri("avares://FsusUI.Avalonia.Themes/Themes/FsusTheme.axaml"),
-    });
+    window.Styles.Add(HeadlessTheme.CreateInclude());
     new FsusThemeManager().Apply(
       window.Resources,
       new FsusThemeOptions

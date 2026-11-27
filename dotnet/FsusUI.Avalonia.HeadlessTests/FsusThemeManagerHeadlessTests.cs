@@ -93,11 +93,7 @@ public class FsusThemeManagerHeadlessTests
   {
     var application = Assert.IsType<HeadlessTestApplication>(Application.Current);
     var manager = new FsusThemeManager();
-    var themeStyles = new StyleInclude(
-      new Uri("avares://FsusUI.Avalonia.HeadlessTests"))
-    {
-      Source = new Uri("avares://FsusUI.Avalonia.Themes/Themes/FsusTheme.axaml"),
-    };
+    var themeStyles = HeadlessTheme.CreateInclude();
     application.Styles.Add(themeStyles);
     var outputRoot = Path.Combine(
       FindRepositoryRoot(),
