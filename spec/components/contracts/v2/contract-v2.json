@@ -10,8 +10,8 @@
   "baselines": {
     "web": {
       "path": "spec/baselines/vue-current.json",
-      "hash": "bb90ada88ddc1c34a78b6df93abd99c0ca8548aa232a4f9681bef8894bb5bdd0",
-      "packageVersion": "1.6.0-preview.13"
+      "hash": "e7bbf196545b0362fc4033898fe615adc2b50fd12d1805ef027dbe6f94d43844",
+      "packageVersion": "1.6.0"
     },
     "avalonia": {
       "path": "spec/avalonia/semantic/FsusUI.Avalonia.semantic.json",

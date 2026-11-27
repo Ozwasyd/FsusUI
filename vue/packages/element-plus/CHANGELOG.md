@@ -1,5 +1,16 @@
 # element-plus
 
+## 1.6.0
+
+### Release Highlights
+
+- Promote `@ozwasyd/element-plus@1.6.0` to the GitHub Packages `latest` dist-tag (`https://npm.pkg.github.com/`), graduating the `1.6.0-preview.1` through `1.6.0-preview.13` release series.
+- **Breaking Changes since `1.5.1`**:
+  - Remove DOM-mutating Markdown feature adapters (`mermaidAdapter`, `latexAdapter`, `codeHighlightAdapter`) in favor of the FsusUI-owned discriminated feature output gateway, and narrow package deep exports to documented compatibility paths (see `docs/migration/markdown-feature-output-gateway.md`).
+  - Remove raw HTML rendering (`allowHtml`), `initialHtml`, and `sanitizeHtml` escape hatches from `ElMarkdownRenderer` / `ElMarkdownEditor` and the Markdown WASM ABI; raw HTML is always escaped and pre-rendered content must pass through runtime-authorized `initialRender`.
+- **Theme, Motion & Component Convergence**: Complete Intellectual Minimalist light/dark/system token parity (36 derived dark scale variables, atomic View Transition theme switching), complete `vue-tsc`-generated `.d.ts` declarations (`1,267` files + `305` icon declarations), WASM LaTeX MathML fail-closed fallback and theme-aware Mermaid SVGs, `ElMarkdownEditor` `live` projection and locale support, responsive `ElTable`/`ElDrawer`/`ElPublicShell`/`ElThreadPanel`/`ElCheckbox` fixes, and tree-shakeable render pipeline & motion presets.
+- **Release Pipeline Simplification**: Remove external GitHub App and cross-repository FsusBlog consumer gate / release-train dispatch dependencies from `publish-npm.yml`; all release channels now rely solely on repository quality/Playwright/readiness gates, immutable candidate checks, channel monotonicity, and standalone post-publish consumer-contract verification.
+
 ## 1.6.0-preview.13
 
 ### Preview Changes

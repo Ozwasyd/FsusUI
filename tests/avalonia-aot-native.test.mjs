@@ -306,8 +306,8 @@ test('workflow policy kills repack, allow-failure and missing required Linux wir
       validateWorkflowContracts({
         ...files,
         publish: files.publish.replace(
-          'needs: [quality, quality-readiness, plan, preflight, fsusblog-consumer]',
-          'needs: [plan, preflight, fsusblog-consumer]',
+          'needs: [quality, quality-readiness, plan, preflight]',
+          'needs: [plan, preflight]',
         ),
       }),
     /release readiness/u,

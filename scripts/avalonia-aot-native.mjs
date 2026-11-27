@@ -300,7 +300,7 @@ export const validateWorkflowContracts = ({
   if (
     !publish.includes('release-readiness-digest') ||
     !publish.includes(
-      'needs: [quality, quality-readiness, plan, preflight, fsusblog-consumer]',
+      'needs: [quality, quality-readiness, plan, preflight]',
     )
   )
     throw new Error('publish workflow must remain bound to release readiness')

@@ -78,12 +78,12 @@ before and after the lock and fails closed on query errors. A newer, absent
 version may publish; an exact version/tag match is an idempotent skip; an older
 candidate or an existing version assigned to another tag fails.
 
-Stable `latest` additionally requires the successful FsusBlog consumer-gate
-receipt for the same candidate. After an actual publish, the workflow polls the
-canonical registry, downloads its tarball, verifies integrity, SHA-256,
-name/version, and the `latest` tag, then sends the strict
-`fsusui-npm-published-v1` dispatch. Preview/next releases, idempotent skips,
-verification failures, and App permission failures send no event.
+All channels (`latest`, `preview`, and `next`) pass the same immutable
+candidate, quality, Playwright, readiness, and monotonicity gates before
+publish, followed by standalone post-publish consumer-contract verification
+(`verify-published-consumer-contracts`) against `https://npm.pkg.github.com/`.
+Publishing does not depend on external GitHub Apps or cross-repository
+dispatch.
 
 An intentional tag move uses only `recover-npm-dist-tag.yml`. It requires the
 target version, expected current value, and reason; runs in the protected
