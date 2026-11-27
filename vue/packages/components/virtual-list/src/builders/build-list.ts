@@ -4,47 +4,39 @@ import {
   getCurrentInstance,
   h,
   onMounted,
-  onBeforeUnmount,
   onUpdated,
   ref,
   resolveDynamicComponent,
   unref,
 } from 'vue'
 import { hasOwn, isClient, isNumber, isString } from '@element-plus/utils'
-import {
-  applyFsusInteractiveMotionVars,
-  resolveFsusInteractiveMotion,
-  resolveFsusRenderPipelineCache,
-  resolveFsusRenderPipelineUnitAttrs,
-  useFsusRenderPipelineRuntime,
-  useFsusMotionRuntime,
-  useNamespace,
-} from '@element-plus/hooks'
+import { useFsusMotionRuntime, useNamespace } from '@element-plus/hooks'
 import { useGlobalConfig } from '@element-plus/components/config-provider'
-import { resolveVirtualLayerBudget, useCache } from '../hooks/use-cache'
+import { useCache } from '../hooks/use-cache'
+import { useVirtualRenderPipeline } from '../hooks/use-render-pipeline'
+import { useVirtualScroll } from '../hooks/use-scroll'
 import useWheel from '../hooks/use-wheel'
 import Scrollbar from '../components/scrollbar'
-import { getRTLOffsetType, getScrollDir, isHorizontal } from '../utils'
+import {
+  estimateVirtualItemSize,
+  getLogicalRTLScrollLeft,
+  getScrollDir,
+  getVirtualRange,
+  isHorizontal,
+  setLogicalRTLScrollLeft,
+} from '../utils'
 import { virtualizedListProps } from '../props'
 import {
   AUTO_ALIGNMENT,
-  BACKWARD,
-  DEFAULT_DYNAMIC_LIST_ITEM_SIZE,
-  FORWARD,
   HORIZONTAL,
   ITEM_RENDER_EVT,
   RTL,
-  RTL_OFFSET_NAG,
-  RTL_OFFSET_POS_ASC,
-  RTL_OFFSET_POS_DESC,
   SCROLL_EVT,
 } from '../defaults'
 
 import type { CSSProperties, Slot, VNode, VNodeChild } from 'vue'
 import type { Alignment, ListConstructorProps } from '../types'
 import type { VirtualizedListProps } from '../props'
-
-const SCROLL_MOTION_IDLE_MS = 320
 
 const createList = ({
   name,
@@ -72,9 +64,6 @@ const createList = ({
       const dynamicSizeCache = ref(initCache(props, instance))
 
       const getItemStyleCache = useCache()
-      let resetTimer: ReturnType<typeof setTimeout> | undefined
-      let scrollFrame = 0
-      let pendingScrollElement: HTMLElement | null = null
       // refs
       // here windowRef and innerRef can be type of HTMLElement
       // or user defined component type, depends on the type passed
@@ -96,7 +85,11 @@ const createList = ({
       })
 
       // computed
-      const renderPipelineRuntime = useFsusRenderPipelineRuntime({
+      const {
+        runtime: renderPipelineRuntime,
+        resolveCache,
+        resolveHardwareAttrs,
+      } = useVirtualRenderPipeline({
         componentName: name ?? 'ElVirtualList',
         config: renderPipelineConfig,
         estimate: computed(() => ({
@@ -105,30 +98,12 @@ const createList = ({
         })),
         source: computed(() => props.total ?? 0),
       })
-      const resolvedRenderPipelineConfig = renderPipelineRuntime.config
-      const baseRenderPipelineHardwareAttrs =
-        renderPipelineRuntime.hardwareAttrs
-
       const estimatedItemPixelSize = computed(() =>
-        Math.max(
-          1,
-          props.estimatedItemSize ??
-            (isNumber(props.itemSize)
-              ? props.itemSize
-              : DEFAULT_DYNAMIC_LIST_ITEM_SIZE),
-        ),
+        estimateVirtualItemSize(props.estimatedItemSize, props.itemSize),
       )
-
       const renderPipelineStrategy = renderPipelineRuntime.strategy
-
       const effectiveCache = computed(() =>
-        resolveFsusRenderPipelineCache({
-          budgeted: renderPipelineConfig.value !== undefined,
-          config: resolvedRenderPipelineConfig.value,
-          estimatedItemSize: estimatedItemPixelSize.value,
-          explicitCache: props.cache,
-          strategy: renderPipelineStrategy.value,
-        }),
+        resolveCache(estimatedItemPixelSize.value, props.cache),
       )
 
       const itemsToRender = computed(() => {
@@ -151,24 +126,19 @@ const createList = ({
           unref(dynamicSizeCache),
         )
 
-        const cache = effectiveCache.value
-        const cacheBackward =
-          !isScrolling || scrollDir === BACKWARD ? Math.max(1, cache) : 1
-        const cacheForward =
-          !isScrolling || scrollDir === FORWARD ? Math.max(1, cache) : 1
-
-        return [
-          Math.max(0, startIndex - cacheBackward),
-          Math.max(0, Math.min(total! - 1, stopIndex + cacheForward)),
+        return getVirtualRange(
           startIndex,
           stopIndex,
-        ]
+          total!,
+          effectiveCache.value,
+          isScrolling,
+          scrollDir,
+        )
       })
 
       const renderPipelineHardwareAttrs = computed(() => {
         const [start, end] = itemsToRender.value
         const renderedCount = end >= start ? end - start + 1 : 0
-        const dpr = typeof window === 'undefined' ? 1 : window.devicePixelRatio
         const crossSize = Number(
           unref(_isHorizontal) ? props.height : props.width,
         )
@@ -177,23 +147,7 @@ const createList = ({
           (Number.isFinite(crossSize) && crossSize > 0
             ? crossSize
             : estimatedItemPixelSize.value)
-        const layerBudget = resolveVirtualLayerBudget({
-          configuredBudget:
-            resolvedRenderPipelineConfig.value.acceleration.layerBudget,
-          devicePixelRatio: dpr,
-          unitArea,
-        })
-        return {
-          ...resolveFsusRenderPipelineUnitAttrs({
-            baseAttrs: baseRenderPipelineHardwareAttrs.value,
-            disableContentVisibilityOnOverflow: true,
-            layerBudget,
-            renderedCount,
-          }),
-          'data-fsus-render-layer-pixels': String(
-            Math.round(unitArea * renderedCount * Math.max(1, dpr) ** 2),
-          ),
-        }
+        return resolveHardwareAttrs(renderedCount, unitArea)
       })
 
       const estimatedTotalSize = computed(() =>
@@ -305,30 +259,13 @@ const createList = ({
           return
         }
 
-        const { direction } = props
-
-        let scrollOffset = scrollLeft
-
-        if (direction === RTL) {
-          // TRICKY According to the spec, scrollLeft should be negative for RTL aligned elements.
-          // This is not the case for all browsers though (e.g. Chrome reports values as positive, measured relative to the left).
-          // It's also easier for this component if we convert offsets to the same format as they would be in for ltr.
-          // So the simplest solution is to determine which browser behavior we're dealing with, and convert based on it.
-          switch (getRTLOffsetType()) {
-            case RTL_OFFSET_NAG: {
-              scrollOffset = -scrollLeft
-              break
-            }
-            case RTL_OFFSET_POS_DESC: {
-              scrollOffset = scrollWidth - clientWidth - scrollLeft
-              break
-            }
-          }
-        }
-
-        scrollOffset = Math.max(
+        const logicalOffset =
+          props.direction === RTL
+            ? getLogicalRTLScrollLeft(scrollLeft, scrollWidth, clientWidth)
+            : scrollLeft
+        const scrollOffset = Math.max(
           0,
-          Math.min(scrollOffset, scrollWidth - clientWidth),
+          Math.min(logicalOffset, scrollWidth - clientWidth),
         )
         const delta = scrollOffset - _states.scrollOffset
 
@@ -344,26 +281,11 @@ const createList = ({
         )
       }
 
-      const flushScroll = () => {
-        scrollFrame = 0
-        const element = pendingScrollElement
-        pendingScrollElement = null
-        if (!element) return
-
+      const flushScroll = (element: HTMLElement) => {
         unref(_isHorizontal)
           ? scrollHorizontally(element)
           : scrollVertically(element)
         emitEvents()
-      }
-
-      const onScroll = (e: Event) => {
-        pendingScrollElement = e.currentTarget as HTMLElement
-        if (scrollFrame) return
-        if (typeof requestAnimationFrame !== 'function') {
-          flushScroll()
-          return
-        }
-        scrollFrame = requestAnimationFrame(flushScroll)
       }
 
       const onScrollbarScroll = (distanceToGo: number, totalSteps: number) => {
@@ -378,27 +300,6 @@ const createList = ({
             offset,
           ),
         )
-      }
-
-      const onScrollbarStartMove = () => {
-        states.value = {
-          ...unref(states),
-          isScrollbarDragging: true,
-          isScrolling: true,
-        }
-        if (resetTimer) {
-          clearTimeout(resetTimer)
-          resetTimer = undefined
-        }
-      }
-
-      const onScrollbarStopMove = () => {
-        states.value = {
-          ...unref(states),
-          isScrollbarDragging: false,
-        }
-        scheduleResetIsScrolling()
-        scheduleScrollMotionEnd()
       }
 
       const scrollTo = (offset: number) => {
@@ -471,17 +372,7 @@ const createList = ({
         return style
       }
 
-      // TODO:
-      // perf optimization here, reset isScrolling with debounce.
-      let scrollMotionTimer: ReturnType<typeof setTimeout> | undefined
-      let scrollMotionFrame = 0
-      let lastScrollMotionAt = 0
       let lastScrollMotionClass = ''
-
-      const scheduleResetIsScrolling = () => {
-        if (resetTimer) clearTimeout(resetTimer)
-        resetTimer = setTimeout(resetIsScrolling, 120)
-      }
 
       const syncScrollMotionClasses = (active: boolean) => {
         const wrapper = wrapperRef.value
@@ -503,70 +394,23 @@ const createList = ({
         )
       }
 
-      const clearScrollMotionSchedule = () => {
-        if (scrollMotionTimer) {
-          clearTimeout(scrollMotionTimer)
-          scrollMotionTimer = undefined
-        }
-        if (scrollMotionFrame) {
-          cancelAnimationFrame(scrollMotionFrame)
-          scrollMotionFrame = 0
-        }
-      }
-
-      const clearScrollMotionState = () => {
-        states.value.isScrollMotion = false
-        syncScrollMotionClasses(false)
-      }
-
-      const scheduleScrollMotionEnd = () => {
-        clearScrollMotionSchedule()
-        if (states.value.isScrollbarDragging) return
-        const armTimer = () => {
-          scrollMotionFrame = 0
-          scrollMotionTimer = setTimeout(
-            clearScrollMotionState,
-            motionRuntime.value.scrollIdleMs || SCROLL_MOTION_IDLE_MS,
-          )
-        }
-
-        if (typeof requestAnimationFrame !== 'function') {
-          armTimer()
-          return
-        }
-
-        scrollMotionFrame = requestAnimationFrame(() => {
-          scrollMotionFrame = requestAnimationFrame(armTimer)
-        })
-      }
-
-      const triggerScrollMotion = (deltaX = 0, deltaY = 0) => {
-        if (!motionRuntime.value.enabled) return
-        const now =
-          typeof performance !== 'undefined' ? performance.now() : Date.now()
-        applyFsusInteractiveMotionVars(
-          wrapperRef.value,
-          resolveFsusInteractiveMotion({
-            deltaX,
-            deltaY,
-            elapsedMs: lastScrollMotionAt ? now - lastScrollMotionAt : 16,
-            runtime: motionRuntime.value,
-          }),
-        )
-        lastScrollMotionAt = now
-        states.value.isScrollMotion = true
-        syncScrollMotionClasses(true)
-        scheduleScrollMotionEnd()
-      }
-
-      const resetIsScrolling = () => {
-        resetTimer = undefined
-        states.value.isScrolling = false
-      }
-      const onScrollEnd = () => {
-        if (resetTimer) clearTimeout(resetTimer)
-        resetIsScrolling()
-      }
+      const {
+        onScroll,
+        onScrollEnd,
+        onScrollbarStartMove,
+        onScrollbarStopMove,
+        scheduleResetIsScrolling,
+        triggerScrollMotion,
+      } = useVirtualScroll({
+        states,
+        wrapperRef,
+        motionRuntime,
+        flushScroll,
+        setScrollMotion: (active) => {
+          states.value.isScrollMotion = active
+        },
+        syncScrollMotionClasses,
+      })
 
       const resetScrollTop = () => {
         const window = windowRef.value
@@ -596,20 +440,6 @@ const createList = ({
         emitEvents()
       })
 
-      onBeforeUnmount(() => {
-        if (scrollFrame) {
-          cancelAnimationFrame(scrollFrame)
-          scrollFrame = 0
-        }
-        pendingScrollElement = null
-        if (resetTimer) {
-          clearTimeout(resetTimer)
-          resetTimer = undefined
-        }
-        clearScrollMotionSchedule()
-        lastScrollMotionClass = ''
-      })
-
       onUpdated(() => {
         const { direction, layout } = props
         const { scrollOffset, updateRequested } = unref(states)
@@ -618,25 +448,7 @@ const createList = ({
         if (updateRequested && windowElement) {
           if (layout === HORIZONTAL) {
             if (direction === RTL) {
-              // TRICKY According to the spec, scrollLeft should be negative for RTL aligned elements.
-              // This is not the case for all browsers though (e.g. Chrome reports values as positive, measured relative to the left).
-              // So we need to determine which browser behavior we're dealing with, and mimic it.
-              switch (getRTLOffsetType()) {
-                case RTL_OFFSET_NAG: {
-                  windowElement.scrollLeft = -scrollOffset
-                  break
-                }
-                case RTL_OFFSET_POS_ASC: {
-                  windowElement.scrollLeft = scrollOffset
-                  break
-                }
-                default: {
-                  const { clientWidth, scrollWidth } = windowElement
-                  windowElement.scrollLeft =
-                    scrollWidth - clientWidth - scrollOffset
-                  break
-                }
-              }
+              setLogicalRTLScrollLeft(windowElement, scrollOffset)
             } else {
               windowElement.scrollLeft = scrollOffset
             }

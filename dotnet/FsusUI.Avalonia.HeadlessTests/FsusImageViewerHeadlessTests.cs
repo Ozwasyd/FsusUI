@@ -588,7 +588,7 @@ public class FsusImageViewerHeadlessTests
     Assert.NotEqual(capturedTranslation, viewer.Translation);
 
     var reportPath = Path.Combine(
-      FindRepositoryRoot(),
+      HeadlessRepositoryRoot.FindByWorkspace(),
       "tests", "conformance", "visual", "artifacts",
       "issue-699-avalonia-image-viewer-automation-report.json");
     File.WriteAllText(
@@ -654,7 +654,7 @@ public class FsusImageViewerHeadlessTests
   [AvaloniaFact]
   public async Task ImageViewerRealHeadlessSkiaRendersLightDarkDpiAndZoomStates()
   {
-    var repositoryRoot = FindRepositoryRoot();
+    var repositoryRoot = HeadlessRepositoryRoot.FindByWorkspace();
     var outputRoot = HeadlessVisualEvidenceOutput.ResolveOutputRoot(
       repositoryRoot,
       "issue-699-image-viewer-render");
@@ -881,21 +881,6 @@ public class FsusImageViewerHeadlessTests
     window.Measure(new Size(window.Width, window.Height));
     window.Arrange(new Rect(0, 0, window.Width, window.Height));
     Dispatcher.UIThread.RunJobs();
-  }
-
-  private static string FindRepositoryRoot()
-  {
-    for (var directory = new DirectoryInfo(AppContext.BaseDirectory);
-      directory is not null;
-      directory = directory.Parent)
-    {
-      if (File.Exists(Path.Combine(directory.FullName, "pnpm-workspace.yaml")))
-      {
-        return directory.FullName;
-      }
-    }
-
-    throw new DirectoryNotFoundException("Could not locate the FsusUI repository root.");
   }
 
   private sealed record PixelDimension(int Width, int Height);

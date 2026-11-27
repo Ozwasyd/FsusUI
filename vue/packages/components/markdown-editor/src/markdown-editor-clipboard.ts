@@ -2,7 +2,10 @@ import {
   collectMarkdownAnchorNodes,
   type MarkdownAnchorValidNode,
 } from '../../../wasm/markdown-anchor-grammar'
-import type { MarkdownEditorMode } from './markdown-editor-live-contract'
+import {
+  matchesMarkdownEditorDocument,
+  type MarkdownEditorMode,
+} from './markdown-editor-live-contract'
 import type {
   MarkdownEditorDocumentIdentity,
   MarkdownEditorSelection,
@@ -104,14 +107,6 @@ export type MarkdownClipboardMutationKind =
   | 'data-url'
   | 'internal-state-leak'
   | 'consumer-pipeline'
-
-const sameDocument = (
-  left?: MarkdownEditorDocumentIdentity,
-  right?: MarkdownEditorDocumentIdentity,
-) => {
-  if (!left || !right) return true
-  return left.id === right.id && left.epoch === right.epoch
-}
 
 const hashText = (value: string) => {
   let hash = 2166136261
@@ -355,7 +350,7 @@ const gateClipboard = (input: {
   ) {
     return 'stale-document'
   }
-  if (!sameDocument(input.documentIdentity, input.currentIdentity)) {
+  if (!matchesMarkdownEditorDocument(input.documentIdentity, input.currentIdentity)) {
     return 'stale-document'
   }
   return undefined

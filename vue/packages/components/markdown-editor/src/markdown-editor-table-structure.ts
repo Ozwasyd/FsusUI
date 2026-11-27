@@ -6,11 +6,14 @@ import {
   type MarkdownStableSyntaxNode,
   type MarkdownEditorTableSyntaxRow,
 } from '../../../wasm/markdown-runtime'
-import type { MarkdownEditorTransaction } from './markdown-editor-transaction'
+import type {
+  MarkdownEditorSelection,
+  MarkdownEditorTransaction,
+} from './markdown-editor-transaction'
 import {
   insertMarkdownTable,
   parseMarkdownTableBlock,
-  serializeMarkdownTable,
+  serializeMarkdownTableWithLineEnding,
   type MarkdownTableAlignment,
   type ParsedMarkdownTable,
 } from './markdown-editor-table'
@@ -50,17 +53,16 @@ export const resolveMarkdownTableEntry = (
   source: string,
   documentIdentity: MarkdownDocumentIdentity,
   tableId: string,
-) =>
-  (() => {
-    const node = resolveTableAuthority(source, documentIdentity, tableId)
-    return node
-      ? Object.freeze({
-          id: node.id,
-          kind: 'table' as const,
-          range: Object.freeze({ ...node.rawRange }),
-        })
-      : null
-  })()
+) => {
+  const node = resolveTableAuthority(source, documentIdentity, tableId)
+  return node
+    ? Object.freeze({
+        id: node.id,
+        kind: 'table' as const,
+        range: Object.freeze({ ...node.rawRange }),
+      })
+    : null
+}
 
 export const resolveMarkdownTableIdentityStatus = (
   source: string,
@@ -203,48 +205,73 @@ export type MarkdownTableStructuralOp =
 
 export type MarkdownTableRejection = 'malformed' | 'stale' | 'missing'
 
-const resolveTableEntry = (
+type TablePlan =
+  | MarkdownEditorTransaction
+  | { readonly rejected: MarkdownTableRejection }
+
+const resolveParsedTable = (
   source: string,
   documentIdentity: MarkdownDocumentIdentity,
   tableId: string,
-) => {
-  return resolveMarkdownTableEntry(source, documentIdentity, tableId)
+  expectedRevision?: number,
+): {
+  readonly range: { start: number; end: number }
+  readonly slice: string
+  readonly parsed: ParsedMarkdownTable
+} | { readonly rejected: MarkdownTableRejection } => {
+  if (expectedRevision !== undefined && expectedRevision < 0) {
+    return { rejected: 'stale' }
+  }
+  const table = resolveMarkdownTableEntry(source, documentIdentity, tableId)
+  if (!table) return { rejected: 'missing' }
+  const { range } = table
+  const slice = source.slice(range.start, range.end)
+  const parsed = parseMarkdownTableBlock(slice)
+  return parsed ? { range, slice, parsed } : { rejected: 'malformed' }
 }
 
-const buildTransaction = (
-  tableRange: { start: number; end: number },
-  slice: string,
-  parsed: ParsedMarkdownTable,
-  expectedRevision?: number,
-  pad = false,
-  targetCell?: Readonly<{ row: number; column: number }>,
-): MarkdownEditorTransaction => {
-  let serialized = serializeMarkdownTable(parsed, pad)
-  if (slice.endsWith('\n') && !serialized.endsWith('\n')) {
-    serialized += '\n'
-  } else if (!slice.endsWith('\n') && serialized.endsWith('\n')) {
-    serialized = serialized.slice(0, -1)
-  }
-  const projectedTable = createMarkdownEditorProjection(serialized).nodes.find(
+export const resolveSerializedMarkdownTableSelection = (
+  serialized: string,
+  tableStart: number,
+  row: number,
+  column: number,
+): MarkdownEditorSelection | undefined => {
+  const table = createMarkdownEditorProjection(serialized).nodes.find(
     (node) =>
       node.kind === 'table' &&
       node.status === 'valid' &&
       node.table !== undefined,
-  )
-  const targetRow =
-    targetCell && projectedTable?.table
-      ? projectedTable.table.rows.filter(
-          (_, index) => index !== projectedTable.table!.separatorRow,
-        )[targetCell.row]
-      : undefined
-  const targetRange = targetCell
-    ? targetRow?.rawCellRanges[targetCell.column]
+  )?.table
+  const range = table?.rows.filter((_, index) => index !== table.separatorRow)[
+    row
+  ]?.rawCellRanges[column]
+  return range
+    ? Object.freeze({
+        direction: 'none' as const,
+        end: tableStart + range.end,
+        start: tableStart + range.start,
+      })
     : undefined
+}
+
+const buildTransaction = (
+  { range, slice }: { range: { start: number; end: number }; slice: string },
+  parsed: ParsedMarkdownTable,
+  expectedRevision: number | undefined,
+  targetCell: Readonly<{ row: number; column: number }>,
+): MarkdownEditorTransaction => {
+  const serialized = serializeMarkdownTableWithLineEnding(parsed, slice)
+  const selection = resolveSerializedMarkdownTableSelection(
+    serialized,
+    range.start,
+    targetCell.row,
+    targetCell.column,
+  )
   return {
     changes: [
       {
-        from: tableRange.start,
-        to: tableRange.end,
+        from: range.start,
+        to: range.end,
         insert: serialized,
       },
     ],
@@ -252,20 +279,12 @@ const buildTransaction = (
     history: 'separate',
     metadata: Object.freeze({
       markdownTable: Object.freeze({
-        range: Object.freeze({ ...tableRange }),
-        ...(targetCell ? { targetCell: Object.freeze({ ...targetCell }) } : {}),
+        range: Object.freeze({ ...range }),
+        targetCell: Object.freeze({ ...targetCell }),
       }),
     }),
     origin: 'command',
-    ...(targetRange
-      ? {
-          selection: Object.freeze({
-            direction: 'none' as const,
-            end: tableRange.start + targetRange.end,
-            start: tableRange.start + targetRange.start,
-          }),
-        }
-      : {}),
+    ...(selection ? { selection } : {}),
   }
 }
 
@@ -285,6 +304,41 @@ export const planMarkdownTableInsert = (
   }
 }
 
+const insertAt = <T>(items: readonly T[], index: number, item: T): T[] => [
+  ...items.slice(0, index),
+  item,
+  ...items.slice(index),
+]
+
+const deleteAt = <T>(items: readonly T[], index: number): T[] => [
+  ...items.slice(0, index),
+  ...items.slice(index + 1),
+]
+
+const moveAt = <T>(items: readonly T[], from: number, to: number): T[] => {
+  const moved = [...items]
+  const [item] = moved.splice(from, 1)
+  moved.splice(to, 0, item!)
+  return moved
+}
+
+const freezeRows = (rows: readonly (readonly string[])[]) =>
+  Object.freeze(rows.map((row) => Object.freeze(row)))
+
+const updateColumns = (
+  table: ParsedMarkdownTable,
+  header: string[],
+  alignments: (MarkdownTableAlignment | null)[],
+  rows: string[][],
+  columnCount = table.columnCount,
+): ParsedMarkdownTable => ({
+  header: Object.freeze(header),
+  alignments: Object.freeze(alignments),
+  rows: freezeRows(rows),
+  columnCount,
+  newline: table.newline,
+})
+
 export const planMarkdownTableInsertRow = (
   source: string,
   documentIdentity: MarkdownDocumentIdentity,
@@ -293,16 +347,15 @@ export const planMarkdownTableInsertRow = (
   position: 'above' | 'below',
   expectedRevision?: number,
   currentColumn = 0,
-): MarkdownEditorTransaction | { readonly rejected: MarkdownTableRejection } => {
-  if (expectedRevision !== undefined && expectedRevision < 0) {
-    return { rejected: 'stale' }
-  }
-  const table = resolveTableEntry(source, documentIdentity, tableId)
-  if (!table) return { rejected: 'missing' }
-
-  const slice = source.slice(table.range.start, table.range.end)
-  const parsed = parseMarkdownTableBlock(slice)
-  if (!parsed) return { rejected: 'malformed' }
+): TablePlan => {
+  const table = resolveParsedTable(
+    source,
+    documentIdentity,
+    tableId,
+    expectedRevision,
+  )
+  if ('rejected' in table) return table
+  const { parsed } = table
 
   // rowIndex: 0 is header, >= 1 are body rows
   let insertAtBodyIndex: number
@@ -313,26 +366,20 @@ export const planMarkdownTableInsertRow = (
     const bodyIndex = rowIndex - 1
     insertAtBodyIndex = position === 'above' ? bodyIndex : bodyIndex + 1
   }
-  insertAtBodyIndex = Math.max(0, Math.min(insertAtBodyIndex, parsed.rows.length))
+  insertAtBodyIndex = Math.max(
+    0,
+    Math.min(insertAtBodyIndex, parsed.rows.length),
+  )
 
   const newRow = Array.from({ length: parsed.columnCount }, () => '')
-  const nextRows = [
-    ...parsed.rows.slice(0, insertAtBodyIndex),
-    newRow,
-    ...parsed.rows.slice(insertAtBodyIndex),
-  ]
+  const nextRows = insertAt(parsed.rows, insertAtBodyIndex, newRow)
 
   const nextTable: ParsedMarkdownTable = {
     ...parsed,
-    rows: Object.freeze(nextRows.map((r) => Object.freeze(r))),
+    rows: freezeRows(nextRows),
   }
-  return buildTransaction(table.range, slice, nextTable, expectedRevision, false, {
-    row:
-      rowIndex <= 0
-        ? 0
-        : position === 'above'
-          ? rowIndex + 1
-          : rowIndex,
+  return buildTransaction(table, nextTable, expectedRevision, {
+    row: rowIndex <= 0 ? 0 : position === 'above' ? rowIndex + 1 : rowIndex,
     column: currentColumn,
   })
 }
@@ -344,16 +391,15 @@ export const planMarkdownTableDeleteRow = (
   rowIndex: number,
   expectedRevision?: number,
   currentColumn = 0,
-): MarkdownEditorTransaction | { readonly rejected: MarkdownTableRejection } => {
-  if (expectedRevision !== undefined && expectedRevision < 0) {
-    return { rejected: 'stale' }
-  }
-  const table = resolveTableEntry(source, documentIdentity, tableId)
-  if (!table) return { rejected: 'missing' }
-
-  const slice = source.slice(table.range.start, table.range.end)
-  const parsed = parseMarkdownTableBlock(slice)
-  if (!parsed) return { rejected: 'malformed' }
+): TablePlan => {
+  const table = resolveParsedTable(
+    source,
+    documentIdentity,
+    tableId,
+    expectedRevision,
+  )
+  if ('rejected' in table) return table
+  const { parsed } = table
 
   // GFM table must have a header row; cannot delete header row
   if (rowIndex <= 0) return { rejected: 'malformed' }
@@ -362,16 +408,13 @@ export const planMarkdownTableDeleteRow = (
     return { rejected: 'malformed' }
   }
 
-  const nextRows = [
-    ...parsed.rows.slice(0, bodyIndex),
-    ...parsed.rows.slice(bodyIndex + 1),
-  ]
+  const nextRows = deleteAt(parsed.rows, bodyIndex)
 
   const nextTable: ParsedMarkdownTable = {
     ...parsed,
-    rows: Object.freeze(nextRows.map((r) => Object.freeze(r))),
+    rows: freezeRows(nextRows),
   }
-  return buildTransaction(table.range, slice, nextTable, expectedRevision, false, {
+  return buildTransaction(table, nextTable, expectedRevision, {
     row: Math.min(rowIndex, nextRows.length),
     column: currentColumn,
   })
@@ -385,16 +428,15 @@ export const planMarkdownTableMoveRow = (
   direction: 'up' | 'down',
   expectedRevision?: number,
   currentColumn = 0,
-): MarkdownEditorTransaction | { readonly rejected: MarkdownTableRejection } => {
-  if (expectedRevision !== undefined && expectedRevision < 0) {
-    return { rejected: 'stale' }
-  }
-  const table = resolveTableEntry(source, documentIdentity, tableId)
-  if (!table) return { rejected: 'missing' }
-
-  const slice = source.slice(table.range.start, table.range.end)
-  const parsed = parseMarkdownTableBlock(slice)
-  if (!parsed) return { rejected: 'malformed' }
+): TablePlan => {
+  const table = resolveParsedTable(
+    source,
+    documentIdentity,
+    tableId,
+    expectedRevision,
+  )
+  if ('rejected' in table) return table
+  const { parsed } = table
 
   // Cannot move header row
   if (rowIndex <= 0) return { rejected: 'malformed' }
@@ -404,15 +446,13 @@ export const planMarkdownTableMoveRow = (
     return { rejected: 'malformed' }
   }
 
-  const nextRows = [...parsed.rows]
-  const [removed] = nextRows.splice(bodyIndex, 1)
-  nextRows.splice(targetIndex, 0, removed!)
+  const nextRows = moveAt(parsed.rows, bodyIndex, targetIndex)
 
   const nextTable: ParsedMarkdownTable = {
     ...parsed,
-    rows: Object.freeze(nextRows.map((r) => Object.freeze(r))),
+    rows: freezeRows(nextRows),
   }
-  return buildTransaction(table.range, slice, nextTable, expectedRevision, false, {
+  return buildTransaction(table, nextTable, expectedRevision, {
     row: targetIndex + 1,
     column: currentColumn,
   })
@@ -426,46 +466,29 @@ export const planMarkdownTableInsertColumn = (
   position: 'left' | 'right',
   expectedRevision?: number,
   currentRow = 0,
-): MarkdownEditorTransaction | { readonly rejected: MarkdownTableRejection } => {
-  if (expectedRevision !== undefined && expectedRevision < 0) {
-    return { rejected: 'stale' }
-  }
-  const table = resolveTableEntry(source, documentIdentity, tableId)
-  if (!table) return { rejected: 'missing' }
-
-  const slice = source.slice(table.range.start, table.range.end)
-  const parsed = parseMarkdownTableBlock(slice)
-  if (!parsed) return { rejected: 'malformed' }
+): TablePlan => {
+  const table = resolveParsedTable(
+    source,
+    documentIdentity,
+    tableId,
+    expectedRevision,
+  )
+  if ('rejected' in table) return table
+  const { parsed } = table
 
   if (columnIndex < 0 || columnIndex > parsed.columnCount) {
     return { rejected: 'malformed' }
   }
   const insertIndex = position === 'left' ? columnIndex : columnIndex + 1
 
-  const nextHeader = [
-    ...parsed.header.slice(0, insertIndex),
-    `Column ${insertIndex + 1}`,
-    ...parsed.header.slice(insertIndex),
-  ]
-  const nextAlignments = [
-    ...parsed.alignments.slice(0, insertIndex),
-    null,
-    ...parsed.alignments.slice(insertIndex),
-  ]
-  const nextRows = parsed.rows.map((row) => [
-    ...row.slice(0, insertIndex),
-    '',
-    ...row.slice(insertIndex),
-  ])
-
-  const nextTable: ParsedMarkdownTable = {
-    header: Object.freeze(nextHeader),
-    alignments: Object.freeze(nextAlignments),
-    rows: Object.freeze(nextRows.map((r) => Object.freeze(r))),
-    columnCount: parsed.columnCount + 1,
-    newline: parsed.newline,
-  }
-  return buildTransaction(table.range, slice, nextTable, expectedRevision, false, {
+  const nextTable = updateColumns(
+    parsed,
+    insertAt(parsed.header, insertIndex, `Column ${insertIndex + 1}`),
+    insertAt(parsed.alignments, insertIndex, null),
+    parsed.rows.map((row) => insertAt(row, insertIndex, '')),
+    parsed.columnCount + 1,
+  )
+  return buildTransaction(table, nextTable, expectedRevision, {
     row: currentRow,
     column: position === 'left' ? columnIndex + 1 : columnIndex,
   })
@@ -478,42 +501,32 @@ export const planMarkdownTableDeleteColumn = (
   columnIndex: number,
   expectedRevision?: number,
   currentRow = 0,
-): MarkdownEditorTransaction | { readonly rejected: MarkdownTableRejection } => {
-  if (expectedRevision !== undefined && expectedRevision < 0) {
-    return { rejected: 'stale' }
-  }
-  const table = resolveTableEntry(source, documentIdentity, tableId)
-  if (!table) return { rejected: 'missing' }
+): TablePlan => {
+  const table = resolveParsedTable(
+    source,
+    documentIdentity,
+    tableId,
+    expectedRevision,
+  )
+  if ('rejected' in table) return table
+  const { parsed } = table
 
-  const slice = source.slice(table.range.start, table.range.end)
-  const parsed = parseMarkdownTableBlock(slice)
-  if (!parsed) return { rejected: 'malformed' }
-
-  if (parsed.columnCount <= 1 || columnIndex < 0 || columnIndex >= parsed.columnCount) {
+  if (
+    parsed.columnCount <= 1 ||
+    columnIndex < 0 ||
+    columnIndex >= parsed.columnCount
+  ) {
     return { rejected: 'malformed' }
   }
 
-  const nextHeader = [
-    ...parsed.header.slice(0, columnIndex),
-    ...parsed.header.slice(columnIndex + 1),
-  ]
-  const nextAlignments = [
-    ...parsed.alignments.slice(0, columnIndex),
-    ...parsed.alignments.slice(columnIndex + 1),
-  ]
-  const nextRows = parsed.rows.map((row) => [
-    ...row.slice(0, columnIndex),
-    ...row.slice(columnIndex + 1),
-  ])
-
-  const nextTable: ParsedMarkdownTable = {
-    header: Object.freeze(nextHeader),
-    alignments: Object.freeze(nextAlignments),
-    rows: Object.freeze(nextRows.map((r) => Object.freeze(r))),
-    columnCount: parsed.columnCount - 1,
-    newline: parsed.newline,
-  }
-  return buildTransaction(table.range, slice, nextTable, expectedRevision, false, {
+  const nextTable = updateColumns(
+    parsed,
+    deleteAt(parsed.header, columnIndex),
+    deleteAt(parsed.alignments, columnIndex),
+    parsed.rows.map((row) => deleteAt(row, columnIndex)),
+    parsed.columnCount - 1,
+  )
+  return buildTransaction(table, nextTable, expectedRevision, {
     row: currentRow,
     column: Math.min(columnIndex, nextTable.columnCount - 1),
   })
@@ -527,16 +540,15 @@ export const planMarkdownTableMoveColumn = (
   direction: 'left' | 'right',
   expectedRevision?: number,
   currentRow = 0,
-): MarkdownEditorTransaction | { readonly rejected: MarkdownTableRejection } => {
-  if (expectedRevision !== undefined && expectedRevision < 0) {
-    return { rejected: 'stale' }
-  }
-  const table = resolveTableEntry(source, documentIdentity, tableId)
-  if (!table) return { rejected: 'missing' }
-
-  const slice = source.slice(table.range.start, table.range.end)
-  const parsed = parseMarkdownTableBlock(slice)
-  if (!parsed) return { rejected: 'malformed' }
+): TablePlan => {
+  const table = resolveParsedTable(
+    source,
+    documentIdentity,
+    tableId,
+    expectedRevision,
+  )
+  if ('rejected' in table) return table
+  const { parsed } = table
 
   const targetIndex = direction === 'left' ? columnIndex - 1 : columnIndex + 1
   if (
@@ -548,29 +560,13 @@ export const planMarkdownTableMoveColumn = (
     return { rejected: 'malformed' }
   }
 
-  const nextHeader = [...parsed.header]
-  const [removedHeader] = nextHeader.splice(columnIndex, 1)
-  nextHeader.splice(targetIndex, 0, removedHeader!)
-
-  const nextAlignments = [...parsed.alignments]
-  const [removedAlign] = nextAlignments.splice(columnIndex, 1)
-  nextAlignments.splice(targetIndex, 0, removedAlign!)
-
-  const nextRows = parsed.rows.map((row) => {
-    const r = [...row]
-    const [removedCell] = r.splice(columnIndex, 1)
-    r.splice(targetIndex, 0, removedCell!)
-    return r
-  })
-
-  const nextTable: ParsedMarkdownTable = {
-    header: Object.freeze(nextHeader),
-    alignments: Object.freeze(nextAlignments),
-    rows: Object.freeze(nextRows.map((r) => Object.freeze(r))),
-    columnCount: parsed.columnCount,
-    newline: parsed.newline,
-  }
-  return buildTransaction(table.range, slice, nextTable, expectedRevision, false, {
+  const nextTable = updateColumns(
+    parsed,
+    moveAt(parsed.header, columnIndex, targetIndex),
+    moveAt(parsed.alignments, columnIndex, targetIndex),
+    parsed.rows.map((row) => moveAt(row, columnIndex, targetIndex)),
+  )
+  return buildTransaction(table, nextTable, expectedRevision, {
     row: currentRow,
     column: targetIndex,
   })
@@ -584,16 +580,15 @@ export const planMarkdownTableAlignColumn = (
   alignment: MarkdownTableAlignment,
   expectedRevision?: number,
   currentRow = 0,
-): MarkdownEditorTransaction | { readonly rejected: MarkdownTableRejection } => {
-  if (expectedRevision !== undefined && expectedRevision < 0) {
-    return { rejected: 'stale' }
-  }
-  const table = resolveTableEntry(source, documentIdentity, tableId)
-  if (!table) return { rejected: 'missing' }
-
-  const slice = source.slice(table.range.start, table.range.end)
-  const parsed = parseMarkdownTableBlock(slice)
-  if (!parsed) return { rejected: 'malformed' }
+): TablePlan => {
+  const table = resolveParsedTable(
+    source,
+    documentIdentity,
+    tableId,
+    expectedRevision,
+  )
+  if ('rejected' in table) return table
+  const { parsed } = table
 
   if (column < 0 || column >= parsed.columnCount) {
     return { rejected: 'malformed' }
@@ -606,7 +601,7 @@ export const planMarkdownTableAlignColumn = (
     ...parsed,
     alignments: Object.freeze(nextAlignments),
   }
-  return buildTransaction(table.range, slice, nextTable, expectedRevision, false, {
+  return buildTransaction(table, nextTable, expectedRevision, {
     row: currentRow,
     column,
   })
@@ -621,7 +616,7 @@ export const planMarkdownTableDelete = (
   if (expectedRevision !== undefined && expectedRevision < 0) {
     return { rejected: 'stale' }
   }
-  const table = resolveTableEntry(source, documentIdentity, tableId)
+  const table = resolveMarkdownTableEntry(source, documentIdentity, tableId)
   if (!table) return { rejected: 'missing' }
 
   return {
@@ -636,6 +631,13 @@ export const planMarkdownTableDelete = (
     history: 'separate',
     origin: 'command',
   }
+}
+
+const moveIndex = (index: number, from: number, to: number): number => {
+  if (index === from) return to
+  if (from < to && index > from && index <= to) return index - 1
+  if (from > to && index >= to && index < from) return index + 1
+  return index
 }
 
 export const resolveMarkdownTableCell = (
@@ -679,21 +681,7 @@ export const resolveMarkdownTableCell = (
         }
         break
       case 'move-row':
-        if (row === operation.fromIndex) {
-          row = operation.toIndex
-        } else if (
-          operation.fromIndex < operation.toIndex &&
-          row > operation.fromIndex &&
-          row <= operation.toIndex
-        ) {
-          row -= 1
-        } else if (
-          operation.fromIndex > operation.toIndex &&
-          row >= operation.toIndex &&
-          row < operation.fromIndex
-        ) {
-          row += 1
-        }
+        row = moveIndex(row, operation.fromIndex, operation.toIndex)
         break
       case 'delete-column':
         if (column === operation.index) {
@@ -709,27 +697,18 @@ export const resolveMarkdownTableCell = (
         }
         break
       case 'move-column':
-        if (column === operation.fromIndex) {
-          column = operation.toIndex
-        } else if (
-          operation.fromIndex < operation.toIndex &&
-          column > operation.fromIndex &&
-          column <= operation.toIndex
-        ) {
-          column -= 1
-        } else if (
-          operation.fromIndex > operation.toIndex &&
-          column >= operation.toIndex &&
-          column < operation.fromIndex
-        ) {
-          column += 1
-        }
+        column = moveIndex(column, operation.fromIndex, operation.toIndex)
         break
     }
   }
 
   const totalRows = 1 + parsed.rows.length
-  if (row < 0 || row >= totalRows || column < 0 || column >= parsed.columnCount) {
+  if (
+    row < 0 ||
+    row >= totalRows ||
+    column < 0 ||
+    column >= parsed.columnCount
+  ) {
     return { ...previous, tableId: table.id, row, column, status: 'invalid' }
   }
 

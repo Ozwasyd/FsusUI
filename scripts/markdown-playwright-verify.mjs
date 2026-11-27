@@ -1,12 +1,10 @@
 #!/usr/bin/env node
 
-import { pathToFileURL } from 'node:url'
 import { loadMarkdownOwnerPlan } from './markdown-playwright-plan.mjs'
 import {
   loadReceiptsFromDirectory,
-  option,
   runOwnerVerifyCli,
-  validateCellReceipt,
+  runPlaywrightCli,
   verifyOwnerReceiptsCore,
 } from './lib/playwright-owner-core.mjs'
 
@@ -32,27 +30,17 @@ export async function verifyMarkdownOwnerReceipts(
     resolveRuntimeManifestPath: (cell) =>
       `${evidenceDir}/runtime-manifests/${options.runtimeManifestId?.(cell) ?? cell.suiteId}.json`,
     checkFingerprintInputs: true,
-    validateCellReceiptFn: validateCellReceipt,
     extraReceiptCheck: options.validateReceipt,
   })
 }
 
-if (import.meta.url === pathToFileURL(process.argv[1] ?? '').href) {
-  try {
-    await runOwnerVerifyCli({
-      usage:
-        'Usage: markdown-playwright-verify.mjs owner-verify --owner <id> --group <g> --receipts-dir <dir> [--evidence-dir <dir>] [--commit-sha <sha>] [--evidence-out <path>]',
-      logPrefix: 'playwright-markdown',
-      loadPlan: (group) => loadMarkdownOwnerPlan(group),
-      loadReceipts: loadMarkdownReceiptsFromDirectory,
-      verifyReceipts: (ownerId, group, receipts, plan, argv) =>
-        verifyMarkdownOwnerReceipts(ownerId, group, receipts, plan, {
-          evidenceDir: option(argv, 'evidence-dir'),
-          expectedCommitSha: option(argv, 'commit-sha'),
-        }),
-    })
-  } catch (error) {
-    console.error(error instanceof Error ? error.message : error)
-    process.exitCode = 1
-  }
-}
+await runPlaywrightCli(import.meta.url, () =>
+  runOwnerVerifyCli({
+    usage:
+      'Usage: markdown-playwright-verify.mjs owner-verify --owner <id> --group <g> --receipts-dir <dir> [--evidence-dir <dir>] [--commit-sha <sha>] [--evidence-out <path>]',
+    logPrefix: 'playwright-markdown',
+    loadPlan: (group) => loadMarkdownOwnerPlan(group),
+    loadReceipts: loadMarkdownReceiptsFromDirectory,
+    verifyReceipts: verifyMarkdownOwnerReceipts,
+  }),
+)

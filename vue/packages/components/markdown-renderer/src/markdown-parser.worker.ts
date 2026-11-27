@@ -11,12 +11,12 @@ type ParserRequest = {
   request: MarkdownRenderRequest
 }
 
-type ParserDocument = {
+export type ParserDocument = {
   metadata: MarkdownRuntimeChunkResult
   units: readonly MarkdownRenderChunk[]
 }
 
-type ParserResponse =
+export type ParserResponse =
   | { id: number; result: ParserDocument }
   | {
       error: { code?: string; message: string; name: string }
@@ -28,10 +28,10 @@ const scope = self as unknown as {
   postMessage: (message: ParserResponse) => void
 }
 
-const cache = new Map<string, { bytes: number; value: ParserDocument }>()
+const cache = new Map<string, ParserDocument>()
+// Together these limits also cap the total cached HTML length.
 const MAX_CACHE_ENTRIES = 2
-const MAX_CACHE_BYTES = 6 * 1024 * 1024
-const MAX_CACHE_ENTRY_BYTES = 3 * 1024 * 1024
+const MAX_CACHE_ENTRY_LENGTH = 3 * 1024 * 1024
 
 const hashSource = (request: MarkdownRenderRequest) => {
   if (request.contentVersion !== null && request.contentVersion !== undefined) {
@@ -56,26 +56,15 @@ const requestKey = (request: MarkdownRenderRequest) =>
   ].join('\u0000')
 
 const cacheDocument = (key: string, value: ParserDocument) => {
-  const bytes =
+  const length =
     value.metadata.html.length +
     value.units.reduce((sum, chunk) => sum + chunk.html.length, 0)
-  if (bytes <= 0 || bytes > MAX_CACHE_ENTRY_BYTES) return
+  if (length <= 0 || length > MAX_CACHE_ENTRY_LENGTH) return
   cache.delete(key)
-  cache.set(key, { bytes, value })
-  while (cache.size > MAX_CACHE_ENTRIES) {
-    const oldest = cache.keys().next().value
-    if (!oldest) break
-    cache.delete(oldest)
-  }
-  let total = Array.from(cache.values()).reduce(
-    (sum, entry) => sum + entry.bytes,
-    0,
-  )
-  while (total > MAX_CACHE_BYTES && cache.size > 0) {
-    const oldest = cache.keys().next().value
-    if (!oldest) break
-    total -= cache.get(oldest)?.bytes ?? 0
-    cache.delete(oldest)
+  cache.set(key, value)
+  if (cache.size > MAX_CACHE_ENTRIES) {
+    const oldest = cache.keys().next()
+    if (!oldest.done) cache.delete(oldest.value)
   }
 }
 
@@ -86,7 +75,7 @@ scope.onmessage = (event) => {
   if (cached) {
     cache.delete(key)
     cache.set(key, cached)
-    scope.postMessage({ id, result: cached.value })
+    scope.postMessage({ id, result: cached })
     return
   }
 
@@ -120,5 +109,3 @@ scope.onmessage = (event) => {
       })
     })
 }
-
-export {}

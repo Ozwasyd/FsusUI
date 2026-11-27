@@ -1,6 +1,4 @@
 import {
-  createMarkdownEditorProjection,
-  stabilizeMarkdownEditorProjection,
   type MarkdownDocumentIdentity,
   type MarkdownStableProjection,
   type MarkdownStableSyntaxNode,
@@ -10,7 +8,10 @@ import {
   type MarkdownAnchorMap,
   type MarkdownVisualSelection,
 } from './markdown-editor-anchor-map'
-import type { MarkdownEditorMode } from './markdown-editor-live-contract'
+import {
+  matchesMarkdownEditorDocument,
+  type MarkdownEditorMode,
+} from './markdown-editor-live-contract'
 import {
   resolveMarkdownClipboardCopy,
   resolveMarkdownClipboardCut,
@@ -18,6 +19,10 @@ import {
   type MarkdownClipboardCopyPlan,
   type MarkdownClipboardCutPlan,
 } from './markdown-editor-clipboard'
+import {
+  findNarrowestMarkdownSyntaxNode,
+  resolveMarkdownEditorProjection,
+} from './markdown-editor-syntax'
 import type {
   MarkdownEditorSelection,
   MarkdownEditorTransaction,
@@ -121,14 +126,6 @@ export type MarkdownLiveSelectionMutationKind =
 const ATOMIC_KIND_SET = new Set<string>(MARKDOWN_ATOMIC_NODE_KINDS)
 const PAGE_LINES = 10
 
-const sameDocument = (
-  left?: MarkdownDocumentIdentity,
-  right?: MarkdownDocumentIdentity,
-) => {
-  if (!left || !right) return true
-  return left.id === right.id && left.epoch === right.epoch
-}
-
 const toSourceSelection = (selection: MarkdownEditorSelection) => {
   if (selection.start === selection.end) {
     return { anchor: selection.start, focus: selection.end }
@@ -211,12 +208,11 @@ export const createMarkdownLiveAnchorMap = (input: {
 }): MarkdownAnchorMap =>
   createMarkdownAnchorMap({
     identity: input.documentIdentity,
-    projection:
-      input.projection ??
-      stabilizeMarkdownEditorProjection(
-        createMarkdownEditorProjection(input.source),
-        input.documentIdentity,
-      ),
+    projection: resolveMarkdownEditorProjection(
+      input.source,
+      input.documentIdentity,
+      input.projection,
+    ),
     source: input.source,
   })
 
@@ -240,36 +236,17 @@ export const roundTripMarkdownLiveSelection = (input: {
   })
 }
 
-const projectionOf = (
-  source: string,
-  identity: MarkdownDocumentIdentity,
-  projection?: MarkdownStableProjection,
-) =>
-  projection ??
-  stabilizeMarkdownEditorProjection(
-    createMarkdownEditorProjection(source),
-    identity,
-  )
-
 const coveringAtomicNode = (
   projection: MarkdownStableProjection,
   offset: number,
 ): MarkdownStableSyntaxNode | null => {
-  const covering = projection.nodes.filter(
+  return findNarrowestMarkdownSyntaxNode(
+    projection.nodes,
     (node) =>
       ATOMIC_KIND_SET.has(node.kind) &&
       node.rawRange.start <= offset &&
       offset <= node.rawRange.end,
   )
-  if (covering.length === 0) return null
-  return [...covering].sort((left, right) => {
-    const span =
-      left.rawRange.end -
-      left.rawRange.start -
-      (right.rawRange.end - right.rawRange.start)
-    if (span !== 0) return span
-    return left.id.localeCompare(right.id)
-  })[0]!
 }
 
 const snapOffset = (
@@ -416,14 +393,14 @@ export const resolveMarkdownAtomicNodeIntent = (input: {
     (input.expectedRevision !== undefined &&
       input.revision !== undefined &&
       input.expectedRevision !== input.revision) ||
-    !sameDocument(input.documentIdentity, input.currentIdentity)
+    !matchesMarkdownEditorDocument(input.documentIdentity, input.currentIdentity)
   ) {
     return empty('stale', 'stale-document')
   }
   if (input.pending) return empty('pending')
   if (input.error) return empty('error')
 
-  const projection = projectionOf(input.source, identity, input.projection)
+  const projection = resolveMarkdownEditorProjection(input.source, identity, input.projection)
   const located =
     input.nodeId && !input.nodeId.startsWith('atomic:')
       ? projection.nodes.find((item) => item.id === input.nodeId)
@@ -629,7 +606,7 @@ export const resolveMarkdownLiveSelectionMotion = (input: {
     (input.expectedRevision !== undefined &&
       input.revision !== undefined &&
       input.expectedRevision !== input.revision) ||
-    !sameDocument(input.documentIdentity, input.currentIdentity)
+    !matchesMarkdownEditorDocument(input.documentIdentity, input.currentIdentity)
   ) {
     return Object.freeze({
       action: 'noop',
@@ -641,7 +618,7 @@ export const resolveMarkdownLiveSelectionMotion = (input: {
     })
   }
 
-  const projection = projectionOf(input.source, identity, input.projection)
+  const projection = resolveMarkdownEditorProjection(input.source, identity, input.projection)
   const map = createMarkdownLiveAnchorMap({
     documentIdentity: identity,
     projection,

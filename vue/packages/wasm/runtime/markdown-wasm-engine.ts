@@ -414,12 +414,14 @@ const finalizeTimings = (
   return timings
 }
 
-export type MarkdownPayloadMode =
-  | 'html-only'
-  | 'summary'
-  | 'full-result'
-  | 'chunks'
+type MarkdownResultByMode = {
+  'html-only': MarkdownRuntimeHtmlResult
+  summary: MarkdownRuntimeSummaryResult
+  'full-result': MarkdownRuntimeRenderResult
+  chunks: MarkdownRuntimeChunkResult
+}
 
+type MarkdownPayloadMode = keyof MarkdownResultByMode
 const payloadModeToWasmMode = (mode: MarkdownPayloadMode) => {
   if (mode === 'chunks') return 3
   if (mode === 'html-only') return 2
@@ -444,16 +446,16 @@ const buildDefaultMetadata = (
   rendererVersion,
 })
 
-export type MarkdownRuntimePayloadResult =
-  | MarkdownRuntimeHtmlResult
-  | MarkdownRuntimeSummaryResult
-  | MarkdownRuntimeRenderResult
-  | MarkdownRuntimeChunkResult
-
+export function renderMarkdownPayloadWithRuntime<
+  Mode extends MarkdownPayloadMode,
+>(
+  request: MarkdownRenderRequest | string,
+  payloadMode: Mode,
+): Promise<MarkdownResultByMode[Mode] | null>
 export async function renderMarkdownPayloadWithRuntime(
   request: MarkdownRenderRequest | string,
   payloadMode: MarkdownPayloadMode,
-): Promise<MarkdownRuntimePayloadResult | null> {
+): Promise<MarkdownResultByMode[MarkdownPayloadMode] | null> {
   const startedAt = now()
   const timings = createTimings()
   const payload = typeof request === 'string' ? { source: request } : request
@@ -565,13 +567,16 @@ export async function renderMarkdownPayloadWithRuntime(
       MARKDOWN_RENDERER_VERSION
     timings.readMetadataMs = now() - metadataStartedAt
 
+    const renderResultBase = () => ({
+      html: html as MarkdownSafeHtml,
+      parser: MARKDOWN_RENDER_PARSER,
+      rawSource: payload.source,
+      normalizedSource: source,
+      sourceIdentity: resolveMarkdownSourceIdentity(payload),
+    })
     if (payloadMode === 'html-only') {
       return authorizeMarkdownRuntimeResult({
-        html: html as MarkdownSafeHtml,
-        parser: MARKDOWN_RENDER_PARSER,
-        rawSource: payload.source,
-        normalizedSource: source,
-        sourceIdentity: resolveMarkdownSourceIdentity(payload),
+        ...renderResultBase(),
         engine,
         rendererVersion,
         timings: finalizeTimings(timings, startedAt),
@@ -598,11 +603,7 @@ export async function renderMarkdownPayloadWithRuntime(
 
     if (payloadMode === 'summary') {
       return authorizeMarkdownRuntimeResult({
-        html: html as MarkdownSafeHtml,
-        parser: MARKDOWN_RENDER_PARSER,
-        rawSource: payload.source,
-        normalizedSource: source,
-        sourceIdentity: resolveMarkdownSourceIdentity(payload),
+        ...renderResultBase(),
         engine,
         features,
         metadata,
@@ -621,11 +622,7 @@ export async function renderMarkdownPayloadWithRuntime(
     timings.readPlaceholdersMs = now() - placeholdersStartedAt
 
     const safeResult = {
-      html: html as MarkdownSafeHtml,
-      parser: MARKDOWN_RENDER_PARSER,
-      rawSource: payload.source,
-      normalizedSource: source,
-      sourceIdentity: resolveMarkdownSourceIdentity(payload),
+      ...renderResultBase(),
       features,
       placeholders,
       rendererVersion,

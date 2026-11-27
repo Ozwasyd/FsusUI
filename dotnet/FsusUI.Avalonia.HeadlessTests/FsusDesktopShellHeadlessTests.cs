@@ -535,7 +535,7 @@ public class FsusDesktopShellHeadlessTests
   public void ProductionFixtureRendersDesktopLightDarkAndNarrowEvidence()
   {
     var outputRoot = Path.Combine(
-      FindRepositoryRoot(),
+      HeadlessRepositoryRoot.FindByWorkspace(),
       "dotnet",
       "FsusUI.Avalonia.HeadlessTests",
       "TestResults",
@@ -553,8 +553,8 @@ public class FsusDesktopShellHeadlessTests
     Assert.Equal(3, captures.Length);
     Assert.All(captures, (capture) =>
     {
-      Assert.True(File.Exists(Path.Combine(FindRepositoryRoot(), capture.File)));
-      Assert.True(File.Exists(Path.Combine(FindRepositoryRoot(), capture.AutomationFile)));
+      Assert.True(File.Exists(Path.Combine(HeadlessRepositoryRoot.FindByWorkspace(), capture.File)));
+      Assert.True(File.Exists(Path.Combine(HeadlessRepositoryRoot.FindByWorkspace(), capture.AutomationFile)));
       Assert.Equal(64, capture.Sha256.Length);
       Assert.Equal(64, capture.AutomationSha256.Length);
     });
@@ -718,9 +718,9 @@ public class FsusDesktopShellHeadlessTests
 
     window.Close();
     return new RenderCapture(
-      Path.GetRelativePath(FindRepositoryRoot(), imagePath).Replace('\\', '/'),
+      Path.GetRelativePath(HeadlessRepositoryRoot.FindByWorkspace(), imagePath).Replace('\\', '/'),
       Convert.ToHexStringLower(SHA256.HashData(File.ReadAllBytes(imagePath))),
-      Path.GetRelativePath(FindRepositoryRoot(), automationPath).Replace('\\', '/'),
+      Path.GetRelativePath(HeadlessRepositoryRoot.FindByWorkspace(), automationPath).Replace('\\', '/'),
       Convert.ToHexStringLower(SHA256.HashData(File.ReadAllBytes(automationPath))),
       scenario.Name,
       scenario.Variant.ToString(),
@@ -927,20 +927,6 @@ public class FsusDesktopShellHeadlessTests
     return new Point(
       origin.X + (control.Bounds.Width / 2d),
       origin.Y + (control.Bounds.Height / 2d));
-  }
-
-  private static string FindRepositoryRoot()
-  {
-    for (var directory = new DirectoryInfo(AppContext.BaseDirectory);
-      directory is not null;
-      directory = directory.Parent)
-    {
-      if (File.Exists(Path.Combine(directory.FullName, "pnpm-workspace.yaml")))
-      {
-        return directory.FullName;
-      }
-    }
-    throw new DirectoryNotFoundException("Could not locate the FsusUI repository root.");
   }
 
   private sealed record RenderScenario(

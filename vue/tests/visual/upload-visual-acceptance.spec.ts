@@ -1,8 +1,10 @@
 import type { Page } from '@playwright/test'
-import { attachPageDiagnostics } from '../support/page-diagnostics'
 import { collectCssRules } from '../support/css-scan'
 import {
   expect,
+  openStableVisualPage,
+  registerStableVisualHooks,
+  waitForFontsAndLayout,
   test,
   type VisualViewportName,
 } from '../support/visual-variant-fixture'
@@ -11,38 +13,10 @@ import {
   resolveVisualVariant,
 } from '../../../scripts/visual-variant.mjs'
 
-const diagnostics = new WeakMap<Page, string[]>()
+registerStableVisualHooks(test)
 
-const stabilizePage = async (page: Page) => {
-  await page.addStyleTag({
-    content: `
-      *, *::before, *::after {
-        transition-duration: 0s !important;
-        animation-duration: 0s !important;
-        animation-delay: 0s !important;
-        scroll-behavior: auto !important;
-      }
-    `,
-  })
-}
-
-const waitForFontsAndLayout = async (page: Page) => {
-  await page.evaluate(async () => {
-    await document.fonts.ready
-    await new Promise<void>((resolve) => {
-      requestAnimationFrame(() => requestAnimationFrame(() => resolve()))
-    })
-  })
-}
-
-test.beforeEach(async ({ page }) => {
-  diagnostics.set(page, attachPageDiagnostics(page))
-  await page.emulateMedia({ reducedMotion: 'reduce' })
-})
-
-test.afterEach(async ({ page }) => {
-  expect(diagnostics.get(page) ?? []).toEqual([])
-})
+const openUploadFixtures = (page: Page, projectName: string) =>
+  openStableVisualPage(page, buildVisualUrl('upload-visual', projectName))
 
 // ============================================================
 // CSS Gate: no legacy classes/patterns in production stylesheet
@@ -51,10 +25,7 @@ test.afterEach(async ({ page }) => {
 test('production CSS contains no legacy motion tokens (500ms, 30px)', async ({
   page,
 }, testInfo) => {
-  await page.goto(buildVisualUrl('upload-visual', testInfo.project.name), {
-    waitUntil: 'domcontentloaded',
-  })
-  await stabilizePage(page)
+  await openUploadFixtures(page, testInfo.project.name)
   await expect(page.getByTestId('upload-visual-fixtures')).toBeVisible()
 
   // Selector-scoped gate: legacy motion values only count when the rule that
@@ -90,10 +61,7 @@ test('production CSS contains no legacy motion tokens (500ms, 30px)', async ({
 test('production CSS contains no giant-upload-icon (67px)', async ({
   page,
 }, testInfo) => {
-  await page.goto(buildVisualUrl('upload-visual', testInfo.project.name), {
-    waitUntil: 'domcontentloaded',
-  })
-  await stabilizePage(page)
+  await openUploadFixtures(page, testInfo.project.name)
   await expect(page.getByTestId('upload-visual-fixtures')).toBeVisible()
 
   // The dragger icon should be 16–24px, never 67px
@@ -124,10 +92,7 @@ test('production CSS contains no giant-upload-icon (67px)', async ({
 test('dragger renders with Paper radius and thin dashed border', async ({
   page,
 }, testInfo) => {
-  await page.goto(buildVisualUrl('upload-visual', testInfo.project.name), {
-    waitUntil: 'domcontentloaded',
-  })
-  await stabilizePage(page)
+  await openUploadFixtures(page, testInfo.project.name)
 
   const dragger = page
     .locator('[data-upload-variant="dragger-default"] .el-upload-dragger')
@@ -156,10 +121,7 @@ test('dragger renders with Paper radius and thin dashed border', async ({
 test('dragger renders CJK text without cutoff', async ({
   page,
 }, testInfo) => {
-  await page.goto(buildVisualUrl('upload-visual', testInfo.project.name), {
-    waitUntil: 'domcontentloaded',
-  })
-  await stabilizePage(page)
+  await openUploadFixtures(page, testInfo.project.name)
 
   const cjkText = page.locator(
     '[data-upload-variant="dragger-cjk"] .el-upload__text',
@@ -177,10 +139,7 @@ test('dragger renders CJK text without cutoff', async ({
 test('dragger renders RTL text without layout break', async ({
   page,
 }, testInfo) => {
-  await page.goto(buildVisualUrl('upload-visual', testInfo.project.name), {
-    waitUntil: 'domcontentloaded',
-  })
-  await stabilizePage(page)
+  await openUploadFixtures(page, testInfo.project.name)
 
   const rtlDragger = page.locator(
     '[data-upload-variant="dragger-rtl"] .el-upload-dragger',
@@ -197,10 +156,7 @@ test('dragger renders RTL text without layout break', async ({
 test('dragger disabled state is not interactive', async ({
   page,
 }, testInfo) => {
-  await page.goto(buildVisualUrl('upload-visual', testInfo.project.name), {
-    waitUntil: 'domcontentloaded',
-  })
-  await stabilizePage(page)
+  await openUploadFixtures(page, testInfo.project.name)
 
   const disabledUpload = page.locator(
     '[data-upload-variant="dragger-disabled"] .el-upload',
@@ -216,10 +172,7 @@ test('dragger disabled state is not interactive', async ({
 test('dragger focus-visible applies inset ring, not outline glow', async ({
   page,
 }, testInfo) => {
-  await page.goto(buildVisualUrl('upload-visual', testInfo.project.name), {
-    waitUntil: 'domcontentloaded',
-  })
-  await stabilizePage(page)
+  await openUploadFixtures(page, testInfo.project.name)
 
   const uploadEl = page.locator(
     '[data-upload-variant="dragger-default"] .el-upload.is-drag',
@@ -242,10 +195,7 @@ test('dragger focus-visible applies inset ring, not outline glow', async ({
 // ============================================================
 
 test('text list has no success ribbon', async ({ page }, testInfo) => {
-  await page.goto(buildVisualUrl('upload-visual', testInfo.project.name), {
-    waitUntil: 'domcontentloaded',
-  })
-  await stabilizePage(page)
+  await openUploadFixtures(page, testInfo.project.name)
 
   // Check that no .el-upload-list__item-status-label has rotated ribbon geometry
   const labels = page.locator(
@@ -275,10 +225,7 @@ test('text list has no success ribbon', async ({ page }, testInfo) => {
 test('text list items are flat rows with divider, no card surface', async ({
   page,
 }, testInfo) => {
-  await page.goto(buildVisualUrl('upload-visual', testInfo.project.name), {
-    waitUntil: 'domcontentloaded',
-  })
-  await stabilizePage(page)
+  await openUploadFixtures(page, testInfo.project.name)
 
   const item = page.locator(
     '[data-upload-variant="text-success"] .el-upload-list__item',
@@ -305,10 +252,7 @@ test('text list items are flat rows with divider, no card surface', async ({
 test('text list actions are always visible, not hover-only', async ({
   page,
 }, testInfo) => {
-  await page.goto(buildVisualUrl('upload-visual', testInfo.project.name), {
-    waitUntil: 'domcontentloaded',
-  })
-  await stabilizePage(page)
+  await openUploadFixtures(page, testInfo.project.name)
 
   // The actions container should exist and be visible
   const actionsContainer = page.locator(
@@ -328,10 +272,7 @@ test('text list actions are always visible, not hover-only', async ({
 test('text list shows status text for all states', async ({
   page,
 }, testInfo) => {
-  await page.goto(buildVisualUrl('upload-visual', testInfo.project.name), {
-    waitUntil: 'domcontentloaded',
-  })
-  await stabilizePage(page)
+  await openUploadFixtures(page, testInfo.project.name)
 
   // Success state has status label with success icon
   const successLabel = page.locator(
@@ -356,10 +297,7 @@ test('text list shows status text for all states', async ({
 test('text list items are keyboard reachable', async ({
   page,
 }, testInfo) => {
-  await page.goto(buildVisualUrl('upload-visual', testInfo.project.name), {
-    waitUntil: 'domcontentloaded',
-  })
-  await stabilizePage(page)
+  await openUploadFixtures(page, testInfo.project.name)
 
   const item = page.locator(
     '[data-upload-variant="text-success"] .el-upload-list__item',
@@ -377,10 +315,7 @@ test('text list items are keyboard reachable', async ({
 test('text list long filenames do not overflow or overlap actions', async ({
   page,
 }, testInfo) => {
-  await page.goto(buildVisualUrl('upload-visual', testInfo.project.name), {
-    waitUntil: 'domcontentloaded',
-  })
-  await stabilizePage(page)
+  await openUploadFixtures(page, testInfo.project.name)
 
   const item = page.locator(
     '[data-upload-variant="text-long-filename"] .el-upload-list__item',
@@ -410,10 +345,7 @@ test('text list long filenames do not overflow or overlap actions', async ({
 test('text list handles mixed states without layout jump', async ({
   page,
 }, testInfo) => {
-  await page.goto(buildVisualUrl('upload-visual', testInfo.project.name), {
-    waitUntil: 'domcontentloaded',
-  })
-  await stabilizePage(page)
+  await openUploadFixtures(page, testInfo.project.name)
 
   const items = page.locator(
     '[data-upload-variant="text-mixed"] .el-upload-list__item',
@@ -433,10 +365,7 @@ test('text list handles mixed states without layout jump', async ({
 test('text list disabled items use tokens, not ancestor opacity', async ({
   page,
 }, testInfo) => {
-  await page.goto(buildVisualUrl('upload-visual', testInfo.project.name), {
-    waitUntil: 'domcontentloaded',
-  })
-  await stabilizePage(page)
+  await openUploadFixtures(page, testInfo.project.name)
 
   const item = page.locator(
     '[data-upload-variant="text-disabled"] .el-upload-list__item',
@@ -457,10 +386,7 @@ test('text list disabled items use tokens, not ancestor opacity', async ({
 test('picture list items render with thumbnail and file info', async ({
   page,
 }, testInfo) => {
-  await page.goto(buildVisualUrl('upload-visual', testInfo.project.name), {
-    waitUntil: 'domcontentloaded',
-  })
-  await stabilizePage(page)
+  await openUploadFixtures(page, testInfo.project.name)
 
   const pictureItem = page.locator(
     '[data-upload-variant="picture-default"] .el-upload-list__item',
@@ -483,10 +409,7 @@ test('picture list items render with thumbnail and file info', async ({
 test('picture-card items have always-visible action bar, not deep hover overlay', async ({
   page,
 }, testInfo) => {
-  await page.goto(buildVisualUrl('upload-visual', testInfo.project.name), {
-    waitUntil: 'domcontentloaded',
-  })
-  await stabilizePage(page)
+  await openUploadFixtures(page, testInfo.project.name)
 
   const cardItem = page.locator(
     '[data-upload-variant="picture-card-default"] .el-upload-list__item',
@@ -512,10 +435,7 @@ test('picture-card items have always-visible action bar, not deep hover overlay'
 test('picture-card has no giant centered success check overlay', async ({
   page,
 }, testInfo) => {
-  await page.goto(buildVisualUrl('upload-visual', testInfo.project.name), {
-    waitUntil: 'domcontentloaded',
-  })
-  await stabilizePage(page)
+  await openUploadFixtures(page, testInfo.project.name)
 
   // The status label in picture-card should be compact, not a giant rotated 45deg ribbon
   const statusLabel = page.locator(
@@ -533,10 +453,7 @@ test('picture-card has no giant centered success check overlay', async ({
 test('picture-card renders per-status indicators and retains visibility on hover/focus', async ({
   page,
 }, testInfo) => {
-  await page.goto(buildVisualUrl('upload-visual', testInfo.project.name), {
-    waitUntil: 'domcontentloaded',
-  })
-  await stabilizePage(page)
+  await openUploadFixtures(page, testInfo.project.name)
 
   const list = page.locator('[data-upload-variant="picture-card-default"]')
 
@@ -579,10 +496,7 @@ test('picture-card renders per-status indicators and retains visibility on hover
 test('picture-card focus-within shows inset ring on card', async ({
   page,
 }, testInfo) => {
-  await page.goto(buildVisualUrl('upload-visual', testInfo.project.name), {
-    waitUntil: 'domcontentloaded',
-  })
-  await stabilizePage(page)
+  await openUploadFixtures(page, testInfo.project.name)
 
   const cardItem = page.locator(
     '[data-upload-variant="picture-card-default"] .el-upload-list__item',
@@ -597,10 +511,7 @@ test('picture-card focus-within shows inset ring on card', async ({
 test('picture-card disabled items show reduced actions', async ({
   page,
 }, testInfo) => {
-  await page.goto(buildVisualUrl('upload-visual', testInfo.project.name), {
-    waitUntil: 'domcontentloaded',
-  })
-  await stabilizePage(page)
+  await openUploadFixtures(page, testInfo.project.name)
 
   const disabledItem = page.locator(
     '[data-upload-variant="picture-card-disabled"] .el-upload-list__item',
@@ -619,10 +530,7 @@ test('picture-card disabled items show reduced actions', async ({
 test('upload list transitions use 140/220ms tokens, not 500ms', async ({
   page,
 }, testInfo) => {
-  await page.goto(buildVisualUrl('upload-visual', testInfo.project.name), {
-    waitUntil: 'domcontentloaded',
-  })
-  await stabilizePage(page)
+  await openUploadFixtures(page, testInfo.project.name)
 
   const rules = await collectCssRules(page)
   const durations: string[] = []
@@ -645,10 +553,7 @@ test('upload list transitions use 140/220ms tokens, not 500ms', async ({
 test('upload list enter transition uses ≤8px displacement', async ({
   page,
 }, testInfo) => {
-  await page.goto(buildVisualUrl('upload-visual', testInfo.project.name), {
-    waitUntil: 'domcontentloaded',
-  })
-  await stabilizePage(page)
+  await openUploadFixtures(page, testInfo.project.name)
 
   const rules = await collectCssRules(page)
   const displacements: string[] = []
@@ -677,10 +582,7 @@ test('text list delete button has compliant hit target (≥32px desktop)', async
   page,
 }, testInfo) => {
   const { viewportClass } = resolveVisualVariant(testInfo.project.name)
-  await page.goto(buildVisualUrl('upload-visual', testInfo.project.name), {
-    waitUntil: 'domcontentloaded',
-  })
-  await stabilizePage(page)
+  await openUploadFixtures(page, testInfo.project.name)
 
   const deleteBtn = page.locator(
     '[data-upload-variant="text-success"] .el-upload-list__item-actions button',
@@ -698,10 +600,7 @@ test('text list delete button has compliant hit target (≥32px desktop)', async
 test('picture-card action buttons have compliant hit target', async ({
   page,
 }, testInfo) => {
-  await page.goto(buildVisualUrl('upload-visual', testInfo.project.name), {
-    waitUntil: 'domcontentloaded',
-  })
-  await stabilizePage(page)
+  await openUploadFixtures(page, testInfo.project.name)
 
   const card = page
     .locator('[data-upload-variant="picture-card-default"] .el-upload-list__item.is-success')
@@ -735,10 +634,7 @@ test('picture-card action buttons have compliant hit target', async ({
 test('dragger drag-over changes border and background only, no glow/scale', async ({
   page,
 }, testInfo) => {
-  await page.goto(buildVisualUrl('upload-visual', testInfo.project.name), {
-    waitUntil: 'domcontentloaded',
-  })
-  await stabilizePage(page)
+  await openUploadFixtures(page, testInfo.project.name)
 
   const dragger = page.locator(
     '[data-upload-variant="dragger-default"] .el-upload-dragger',
@@ -793,10 +689,7 @@ test('dragger drag-over changes border and background only, no glow/scale', asyn
 test('media field wrapper has aspect-ratio support', async ({
   page,
 }, testInfo) => {
-  await page.goto(buildVisualUrl('upload-visual', testInfo.project.name), {
-    waitUntil: 'domcontentloaded',
-  })
-  await stabilizePage(page)
+  await openUploadFixtures(page, testInfo.project.name)
 
   // Verify the upload-field CSS class exists in the stylesheet
   const rules = await collectCssRules(page)
@@ -815,10 +708,7 @@ test('media field wrapper has aspect-ratio support', async ({
 test('upload variants render without visual break in current theme', async ({
   page,
 }, testInfo) => {
-  await page.goto(buildVisualUrl('upload-visual', testInfo.project.name), {
-    waitUntil: 'domcontentloaded',
-  })
-  await stabilizePage(page)
+  await openUploadFixtures(page, testInfo.project.name)
 
   // All fixture blocks should be visible
   const fixtures = [
@@ -860,10 +750,7 @@ test('dragger, text, and picture-card have no overflow or clipping across 320/37
   page,
   useVisualViewport,
 }, testInfo) => {
-  await page.goto(buildVisualUrl('upload-visual', testInfo.project.name), {
-    waitUntil: 'domcontentloaded',
-  })
-  await stabilizePage(page)
+  await openUploadFixtures(page, testInfo.project.name)
   await expect(page.getByTestId('upload-visual-fixtures')).toBeVisible()
   await waitForFontsAndLayout(page)
 

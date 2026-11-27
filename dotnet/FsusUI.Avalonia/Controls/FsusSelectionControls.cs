@@ -222,18 +222,7 @@ public class FsusCheckbox : CheckBox
     FsusComponentClasses.Ensure(this, "fsus-loading", IsLoading);
     FsusComponentClasses.Ensure(this, "fsus-focus-visible", IsKeyboardFocusWithin);
 
-    if (IsLoading)
-    {
-      enabledBeforeLoading ??= IsEnabled;
-      IsEnabled = false;
-      return;
-    }
-
-    if (enabledBeforeLoading.HasValue)
-    {
-      IsEnabled = enabledBeforeLoading.Value;
-      enabledBeforeLoading = null;
-    }
+    FsusControlAvailability.SyncLoading(this, IsLoading, ref enabledBeforeLoading);
   }
 
   private void SyncAutomation()
@@ -373,27 +362,7 @@ public class FsusCheckboxGroup : StackPanel
       checkbox.Size = Size;
       checkbox.SetCheckedFromGroup(
         SelectedValues.Any(value => Equals(value, checkbox.ItemValue)));
-      FsusComponentClasses.Ensure(checkbox, "fsus-grouped", true);
-      FsusComponentClasses.Ensure(checkbox, "fsus-group-first", index == 0);
-      FsusComponentClasses.Ensure(
-        checkbox,
-        "fsus-group-last",
-        index == checkboxes.Length - 1);
-      FsusComponentClasses.Ensure(
-        checkbox,
-        "fsus-disabled",
-        !IsEnabled || !checkbox.IsEnabled);
-      if (!IsEnabled)
-      {
-        enabledBeforeGroupDisabled.TryAdd(checkbox, checkbox.IsEnabled);
-        checkbox.IsEnabled = false;
-      }
-      else if (enabledBeforeGroupDisabled.Remove(checkbox, out var wasEnabled))
-      {
-        checkbox.IsEnabled = wasEnabled;
-      }
-      AutomationProperties.SetPositionInSet(checkbox, index + 1);
-      AutomationProperties.SetSizeOfSet(checkbox, checkboxes.Length);
+      FsusSelectionGroupState.SyncChild(this, checkbox, index, checkboxes.Length, enabledBeforeGroupDisabled);
     }
     isSyncingChildren = false;
   }
@@ -573,18 +542,7 @@ public class FsusRadio : RadioButton
     FsusComponentClasses.Ensure(this, "fsus-loading", IsLoading);
     FsusComponentClasses.Ensure(this, "fsus-focus-visible", IsKeyboardFocusWithin);
 
-    if (IsLoading)
-    {
-      enabledBeforeLoading ??= IsEnabled;
-      IsEnabled = false;
-      return;
-    }
-
-    if (enabledBeforeLoading.HasValue)
-    {
-      IsEnabled = enabledBeforeLoading.Value;
-      enabledBeforeLoading = null;
-    }
+    FsusControlAvailability.SyncLoading(this, IsLoading, ref enabledBeforeLoading);
   }
 
   private void SyncAutomation()
@@ -717,27 +675,7 @@ public class FsusRadioGroup : StackPanel
       radio.Size = Size;
       radio.GroupName = $"fsus-radio-group-{GetHashCode()}";
       radio.SetCheckedFromGroup(Equals(SelectedValue, radio.ItemValue));
-      FsusComponentClasses.Ensure(radio, "fsus-grouped", true);
-      FsusComponentClasses.Ensure(radio, "fsus-group-first", index == 0);
-      FsusComponentClasses.Ensure(
-        radio,
-        "fsus-group-last",
-        index == radios.Length - 1);
-      FsusComponentClasses.Ensure(
-        radio,
-        "fsus-disabled",
-        !IsEnabled || !radio.IsEnabled);
-      if (!IsEnabled)
-      {
-        enabledBeforeGroupDisabled.TryAdd(radio, radio.IsEnabled);
-        radio.IsEnabled = false;
-      }
-      else if (enabledBeforeGroupDisabled.Remove(radio, out var wasEnabled))
-      {
-        radio.IsEnabled = wasEnabled;
-      }
-      AutomationProperties.SetPositionInSet(radio, index + 1);
-      AutomationProperties.SetSizeOfSet(radio, radios.Length);
+      FsusSelectionGroupState.SyncChild(this, radio, index, radios.Length, enabledBeforeGroupDisabled);
     }
     isSyncingChildren = false;
   }
@@ -881,18 +819,7 @@ public class FsusSwitch : ToggleSwitch
     FsusComponentClasses.Ensure(this, "fsus-loading", IsLoading);
     FsusComponentClasses.Ensure(this, "fsus-focus-visible", IsKeyboardFocusWithin);
 
-    if (IsLoading)
-    {
-      enabledBeforeLoading ??= IsEnabled;
-      IsEnabled = false;
-      return;
-    }
-
-    if (enabledBeforeLoading.HasValue)
-    {
-      IsEnabled = enabledBeforeLoading.Value;
-      enabledBeforeLoading = null;
-    }
+    FsusControlAvailability.SyncLoading(this, IsLoading, ref enabledBeforeLoading);
   }
 
   private void SyncAutomation()
@@ -911,4 +838,24 @@ public class FsusSwitch : ToggleSwitch
   }
 
   private static bool ToBool(object? value) => value is bool boolValue && boolValue;
+}
+
+file static class FsusSelectionGroupState
+{
+  public static void SyncChild<TControl>(
+    Control group,
+    TControl child,
+    int index,
+    int count,
+    Dictionary<TControl, bool> enabledBeforeGroupDisabled)
+    where TControl : Control
+  {
+    FsusComponentClasses.Ensure(child, "fsus-grouped", true);
+    FsusComponentClasses.Ensure(child, "fsus-group-first", index == 0);
+    FsusComponentClasses.Ensure(child, "fsus-group-last", index == count - 1);
+    FsusComponentClasses.Ensure(child, "fsus-disabled", !group.IsEnabled || !child.IsEnabled);
+    FsusControlAvailability.SyncGroupChild(child, group.IsEnabled, enabledBeforeGroupDisabled);
+    AutomationProperties.SetPositionInSet(child, index + 1);
+    AutomationProperties.SetSizeOfSet(child, count);
+  }
 }

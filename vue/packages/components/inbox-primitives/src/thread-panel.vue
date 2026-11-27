@@ -1,7 +1,7 @@
 <template>
   <section :class="panelKls" :aria-labelledby="panelLabelledBy()">
     <header v-if="hasHeader()" :class="ns.e('header')">
-      <div v-if="hasBack()" :class="ns.e('back')">
+      <div v-if="$slots.back" :class="ns.e('back')">
         <slot name="back" />
       </div>
       <div :class="ns.e('heading')">
@@ -13,15 +13,15 @@
         >
           <slot name="title">{{ title }}</slot>
         </component>
-        <div v-if="hasStatus()" :class="ns.e('status')">
+        <div v-if="$slots.status" :class="ns.e('status')">
           <slot name="status" />
         </div>
       </div>
-      <div v-if="hasActions()" :class="ns.e('actions')">
+      <div v-if="$slots.actions" :class="ns.e('actions')">
         <slot name="actions" />
       </div>
     </header>
-    <div v-if="hasContext()" :class="ns.e('context')">
+    <div v-if="$slots.context" :class="ns.e('context')">
       <slot name="context" />
     </div>
     <div :class="ns.e('messages')">
@@ -29,7 +29,7 @@
         <slot name="empty" />
       </slot>
     </div>
-    <div v-if="hasComposer()" :class="ns.e('composer')">
+    <div v-if="$slots.composer" :class="ns.e('composer')">
       <slot name="composer" />
     </div>
   </section>
@@ -50,12 +50,8 @@ const ns = useNamespace('thread-panel')
 const titleId = useId()
 
 const hasTitle = () => Boolean(props.title || slots.title)
-const hasBack = () => Boolean(slots.back)
-const hasStatus = () => Boolean(slots.status)
-const hasActions = () => Boolean(slots.actions)
-const hasHeader = () => hasTitle() || hasBack() || hasStatus() || hasActions()
-const hasContext = () => Boolean(slots.context)
-const hasComposer = () => Boolean(slots.composer)
+const hasHeader = () =>
+  hasTitle() || slots.back || slots.status || slots.actions
 const panelKls = computed(() => [ns.b(), ns.m(props.density)])
 const panelLabelledBy = () => (hasTitle() ? titleId : undefined)
 </script>

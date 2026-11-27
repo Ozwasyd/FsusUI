@@ -13,6 +13,7 @@ import {
 } from '../src/markdown-editor-live-visual'
 import { resolveFocusState } from '../src/markdown-editor-writing-aids'
 import MarkdownEditor from '../src/markdown-editor.vue'
+import { getMarkdownXssSourceAttackFragment } from '../../../../tests/support/markdown-xss-corpus'
 
 const identity = Object.freeze({ epoch: 1, id: 'live-visual-doc' })
 
@@ -369,8 +370,8 @@ describe('createMarkdownLiveVisualSegments (#1104)', () => {
 
 describe('MarkdownEditor live visual projection integration (#1104)', () => {
   it('renders live visual mirror layer in live mode, escapes HTML strictly as text, handles reveal + Escape, IME suspend, and scroll sync', async () => {
-    const source =
-      '# Title\n\nSee **bold** and <img src=x onerror=alert(1)> here.\n'
+    const image = getMarkdownXssSourceAttackFragment('mxss-raw-img-onerror')
+    const source = `# Title\n\nSee **bold** and ${image} here.\n`
     const wrapper = mount(MarkdownEditor, {
       attachTo: document.body,
       props: {

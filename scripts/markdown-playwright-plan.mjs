@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 
-import { pathToFileURL } from 'node:url'
 import {
   createFixedOwnerPlanLoader,
   runOwnerPlanCli,
+  runPlaywrightCli,
 } from './lib/playwright-owner-core.mjs'
 
 export const MARKDOWN_OWNER = 'playwright-markdown'
@@ -26,15 +26,10 @@ export const loadMarkdownOwnerPlan = createFixedOwnerPlanLoader({
   label: 'markdown',
 })
 
-if (import.meta.url === pathToFileURL(process.argv[1] ?? '').href) {
-  try {
-    runOwnerPlanCli({
-      loadOwnerPlan: loadMarkdownOwnerPlan,
-      scriptName: 'markdown-playwright-plan.mjs',
-      label: 'markdown',
-    })
-  } catch (error) {
-    console.error(error instanceof Error ? error.message : error)
-    process.exitCode = 1
-  }
-}
+runPlaywrightCli(import.meta.url, () =>
+  runOwnerPlanCli({
+    loadOwnerPlan: loadMarkdownOwnerPlan,
+    scriptName: 'markdown-playwright-plan.mjs',
+    label: 'markdown',
+  }),
+)

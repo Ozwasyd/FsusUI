@@ -3,7 +3,6 @@ import {
   defineComponent,
   getCurrentInstance,
   h,
-  onBeforeUnmount,
   onMounted,
   ref,
   resolveDynamicComponent,
@@ -16,31 +15,28 @@ import {
   isNumber,
   isString,
 } from '@element-plus/utils'
-import {
-  applyFsusInteractiveMotionVars,
-  resolveFsusInteractiveMotion,
-  resolveFsusRenderPipelineCache,
-  resolveFsusRenderPipelineUnitAttrs,
-  useFsusRenderPipelineRuntime,
-  useFsusMotionRuntime,
-  useNamespace,
-} from '@element-plus/hooks'
+import { useFsusMotionRuntime, useNamespace } from '@element-plus/hooks'
 import { useGlobalConfig } from '@element-plus/components/config-provider'
 import Scrollbar from '../components/scrollbar'
 import { useGridWheel } from '../hooks/use-grid-wheel'
-import { resolveVirtualLayerBudget, useCache } from '../hooks/use-cache'
+import { useCache } from '../hooks/use-cache'
+import { useVirtualRenderPipeline } from '../hooks/use-render-pipeline'
+import { useVirtualScroll } from '../hooks/use-scroll'
 import { virtualizedGridProps } from '../props'
-import { getRTLOffsetType, getScrollDir, isRTL } from '../utils'
+import {
+  estimateVirtualItemSize,
+  getLogicalRTLScrollLeft,
+  getScrollDir,
+  getVirtualRange,
+  isRTL,
+  setLogicalRTLScrollLeft,
+} from '../utils'
 import {
   AUTO_ALIGNMENT,
-  BACKWARD,
   DEFAULT_DYNAMIC_LIST_ITEM_SIZE,
   FORWARD,
   ITEM_RENDER_EVT,
   RTL,
-  RTL_OFFSET_NAG,
-  RTL_OFFSET_POS_ASC,
-  RTL_OFFSET_POS_DESC,
   SCROLL_EVT,
 } from '../defaults'
 import type {
@@ -58,8 +54,6 @@ import type {
   ScrollbarExpose,
 } from '../types'
 import type { VirtualizedGridProps } from '../props'
-
-const SCROLL_MOTION_IDLE_MS = 320
 
 const createGrid = ({
   name,
@@ -114,9 +108,6 @@ const createGrid = ({
       })
 
       const getItemStyleCache = useCache()
-      let resetTimer: ReturnType<typeof setTimeout> | undefined
-      let scrollFrame = 0
-      let pendingScrollElement: HTMLElement | null = null
 
       // computed
       const parsedHeight = computed(() =>
@@ -124,7 +115,11 @@ const createGrid = ({
       )
       const parsedWidth = computed(() => Number.parseInt(`${props.width}`, 10))
 
-      const renderPipelineRuntime = useFsusRenderPipelineRuntime({
+      const {
+        runtime: renderPipelineRuntime,
+        resolveCache,
+        resolveHardwareAttrs,
+      } = useVirtualRenderPipeline({
         componentName: name ?? 'ElVirtualGrid',
         config: renderPipelineConfig,
         estimate: computed(() => ({
@@ -136,50 +131,21 @@ const createGrid = ({
           totalRow: props.totalRow ?? 0,
         })),
       })
-      const resolvedRenderPipelineConfig = renderPipelineRuntime.config
-      const baseRenderPipelineHardwareAttrs =
-        renderPipelineRuntime.hardwareAttrs
-
-      const estimatedColumnPixelSize = computed(() =>
-        Math.max(
-          1,
-          props.estimatedColumnWidth ??
-            (isNumber(props.columnWidth)
-              ? props.columnWidth
-              : DEFAULT_DYNAMIC_LIST_ITEM_SIZE),
-        ),
-      )
-
-      const estimatedRowPixelSize = computed(() =>
-        Math.max(
-          1,
-          props.estimatedRowHeight ??
-            (isNumber(props.rowHeight)
-              ? props.rowHeight
-              : DEFAULT_DYNAMIC_LIST_ITEM_SIZE),
-        ),
-      )
-
       const renderPipelineStrategy = renderPipelineRuntime.strategy
-
       const effectiveColumnCache = computed(() =>
-        resolveFsusRenderPipelineCache({
-          budgeted: renderPipelineConfig.value !== undefined,
-          config: resolvedRenderPipelineConfig.value,
-          estimatedItemSize: estimatedColumnPixelSize.value,
-          explicitCache: props.columnCache,
-          strategy: renderPipelineStrategy.value,
-        }),
+        resolveCache(
+          estimateVirtualItemSize(
+            props.estimatedColumnWidth,
+            props.columnWidth,
+          ),
+          props.columnCache,
+        ),
       )
-
       const effectiveRowCache = computed(() =>
-        resolveFsusRenderPipelineCache({
-          budgeted: renderPipelineConfig.value !== undefined,
-          config: resolvedRenderPipelineConfig.value,
-          estimatedItemSize: estimatedRowPixelSize.value,
-          explicitCache: props.rowCache,
-          strategy: renderPipelineStrategy.value,
-        }),
+        resolveCache(
+          estimateVirtualItemSize(props.estimatedRowHeight, props.rowHeight),
+          props.rowCache,
+        ),
       )
 
       const columnsToRender = computed(() => {
@@ -202,22 +168,14 @@ const createGrid = ({
           unref(cache),
         )
 
-        const columnCache = effectiveColumnCache.value
-        const cacheBackward =
-          !isScrolling || xAxisScrollDir === BACKWARD
-            ? Math.max(1, columnCache)
-            : 1
-        const cacheForward =
-          !isScrolling || xAxisScrollDir === FORWARD
-            ? Math.max(1, columnCache)
-            : 1
-
-        return [
-          Math.max(0, startIndex - cacheBackward),
-          Math.max(0, Math.min(totalColumn! - 1, stopIndex + cacheForward)),
+        return getVirtualRange(
           startIndex,
           stopIndex,
-        ]
+          totalColumn!,
+          effectiveColumnCache.value,
+          isScrolling,
+          xAxisScrollDir,
+        )
       })
 
       const rowsToRender = computed(() => {
@@ -240,20 +198,14 @@ const createGrid = ({
           unref(cache),
         )
 
-        const rowCache = effectiveRowCache.value
-        const cacheBackward =
-          !isScrolling || yAxisScrollDir === BACKWARD
-            ? Math.max(1, rowCache)
-            : 1
-        const cacheForward =
-          !isScrolling || yAxisScrollDir === FORWARD ? Math.max(1, rowCache) : 1
-
-        return [
-          Math.max(0, startIndex - cacheBackward),
-          Math.max(0, Math.min(totalRow! - 1, stopIndex + cacheForward)),
+        return getVirtualRange(
           startIndex,
           stopIndex,
-        ]
+          totalRow!,
+          effectiveRowCache.value,
+          isScrolling,
+          yAxisScrollDir,
+        )
       })
 
       const renderPipelineHardwareAttrs = computed(() => {
@@ -262,7 +214,6 @@ const createGrid = ({
         const renderedColumnCount =
           columnEnd >= columnStart ? columnEnd - columnStart + 1 : 0
         const renderedRowCount = rowEnd >= rowStart ? rowEnd - rowStart + 1 : 0
-        const dpr = typeof window === 'undefined' ? 1 : window.devicePixelRatio
         const columnWidth = isNumber(props.columnWidth)
           ? props.columnWidth
           : DEFAULT_DYNAMIC_LIST_ITEM_SIZE
@@ -271,23 +222,7 @@ const createGrid = ({
           : DEFAULT_DYNAMIC_LIST_ITEM_SIZE
         const unitArea = columnWidth * rowHeight
         const renderedCount = renderedColumnCount * renderedRowCount
-        const layerBudget = resolveVirtualLayerBudget({
-          configuredBudget:
-            resolvedRenderPipelineConfig.value.acceleration.layerBudget,
-          devicePixelRatio: dpr,
-          unitArea,
-        })
-        return {
-          ...resolveFsusRenderPipelineUnitAttrs({
-            baseAttrs: baseRenderPipelineHardwareAttrs.value,
-            disableContentVisibilityOnOverflow: true,
-            layerBudget,
-            renderedCount,
-          }),
-          'data-fsus-render-layer-pixels': String(
-            Math.round(unitArea * renderedCount * Math.max(1, dpr) ** 2),
-          ),
-        }
+        return resolveHardwareAttrs(renderedCount, unitArea)
       })
 
       const estimatedTotalHeight = computed(() =>
@@ -371,12 +306,7 @@ const createGrid = ({
         })
       }
 
-      const flushScroll = () => {
-        scrollFrame = 0
-        const element = pendingScrollElement
-        pendingScrollElement = null
-        if (!element) return
-
+      const flushScroll = (element: HTMLElement) => {
         const {
           clientHeight,
           clientWidth,
@@ -395,50 +325,33 @@ const createGrid = ({
           return
         }
 
-        let _scrollLeft = scrollLeft
-
-        if (isRTL(props.direction)) {
-          switch (getRTLOffsetType()) {
-            case RTL_OFFSET_NAG:
-              _scrollLeft = -scrollLeft
-              break
-            case RTL_OFFSET_POS_DESC:
-              _scrollLeft = scrollWidth - clientWidth - scrollLeft
-              break
-          }
-        }
-
+        const nextScrollLeft = isRTL(props.direction)
+          ? getLogicalRTLScrollLeft(scrollLeft, scrollWidth, clientWidth)
+          : scrollLeft
         const nextScrollTop = Math.max(
           0,
           Math.min(scrollTop, scrollHeight - clientHeight),
         )
-        const isScrollingX = _states.scrollLeft !== _scrollLeft
+        const isScrollingX = _states.scrollLeft !== nextScrollLeft
         const isScrollingY = _states.scrollTop !== nextScrollTop
-        const deltaX = _scrollLeft - _states.scrollLeft
+        const deltaX = nextScrollLeft - _states.scrollLeft
         const deltaY = nextScrollTop - _states.scrollTop
 
         _states.isScrolling = true
-        _states.xAxisScrollDir = getScrollDir(_states.scrollLeft, _scrollLeft)
+        _states.xAxisScrollDir = getScrollDir(
+          _states.scrollLeft,
+          nextScrollLeft,
+        )
         _states.yAxisScrollDir = getScrollDir(_states.scrollTop, nextScrollTop)
-        _states.scrollLeft = _scrollLeft
+        _states.scrollLeft = nextScrollLeft
         _states.scrollTop = nextScrollTop
         _states.updateRequested = true
 
         scheduleResetIsScrolling()
-        triggerScrollMotion(isScrollingX, isScrollingY, deltaX, deltaY)
+        triggerScrollMotion(deltaX, deltaY, isScrollingX, isScrollingY)
 
         onUpdated()
         emitEvents()
-      }
-
-      const onScroll = (e: Event) => {
-        pendingScrollElement = e.currentTarget as HTMLElement
-        if (scrollFrame) return
-        if (typeof requestAnimationFrame !== 'function') {
-          flushScroll()
-          return
-        }
-        scrollFrame = requestAnimationFrame(flushScroll)
       }
 
       const onVerticalScroll = (distance: number, totalSteps: number) => {
@@ -521,7 +434,7 @@ const createGrid = ({
         _states.updateRequested = true
 
         scheduleResetIsScrolling()
-        triggerScrollMotion(isScrollingX, isScrollingY, deltaX, deltaY)
+        triggerScrollMotion(deltaX, deltaY, isScrollingX, isScrollingY)
 
         onUpdated()
         emitEvents()
@@ -598,16 +511,7 @@ const createGrid = ({
         }
       }
 
-      // TODO: debounce setting is scrolling.
-      let scrollMotionTimer: ReturnType<typeof setTimeout> | undefined
-      let scrollMotionFrame = 0
-      let lastScrollMotionAt = 0
       let lastScrollMotionClass = ''
-
-      const scheduleResetIsScrolling = () => {
-        if (resetTimer) clearTimeout(resetTimer)
-        resetTimer = setTimeout(resetIsScrolling, 120)
-      }
 
       const syncScrollMotionClasses = (active: boolean) => {
         const wrapper = wrapperRef.value
@@ -644,98 +548,24 @@ const createGrid = ({
         }
       }
 
-      const clearScrollMotionSchedule = () => {
-        if (scrollMotionTimer) {
-          clearTimeout(scrollMotionTimer)
-          scrollMotionTimer = undefined
-        }
-        if (scrollMotionFrame) {
-          cancelAnimationFrame(scrollMotionFrame)
-          scrollMotionFrame = 0
-        }
-      }
-
-      const clearScrollMotionState = () => {
-        states.value.isScrollMotionX = false
-        states.value.isScrollMotionY = false
-        syncScrollMotionClasses(false)
-      }
-
-      const scheduleScrollMotionEnd = () => {
-        clearScrollMotionSchedule()
-        if (states.value.isScrollbarDragging) return
-        const armTimer = () => {
-          scrollMotionFrame = 0
-          scrollMotionTimer = setTimeout(
-            clearScrollMotionState,
-            motionRuntime.value.scrollIdleMs || SCROLL_MOTION_IDLE_MS,
-          )
-        }
-
-        if (typeof requestAnimationFrame !== 'function') {
-          armTimer()
-          return
-        }
-
-        scrollMotionFrame = requestAnimationFrame(() => {
-          scrollMotionFrame = requestAnimationFrame(armTimer)
-        })
-      }
-
-      const triggerScrollMotion = (
-        x: boolean,
-        y: boolean,
-        deltaX = 0,
-        deltaY = 0,
-      ) => {
-        if (!motionRuntime.value.enabled) return
-        const now =
-          typeof performance !== 'undefined' ? performance.now() : Date.now()
-        applyFsusInteractiveMotionVars(
-          wrapperRef.value,
-          resolveFsusInteractiveMotion({
-            deltaX,
-            deltaY,
-            elapsedMs: lastScrollMotionAt ? now - lastScrollMotionAt : 16,
-            runtime: motionRuntime.value,
-          }),
-        )
-        lastScrollMotionAt = now
-        if (x) states.value.isScrollMotionX = true
-        if (y) states.value.isScrollMotionY = true
-        syncScrollMotionClasses(true)
-        scheduleScrollMotionEnd()
-      }
-
-      const resetIsScrolling = () => {
-        resetTimer = undefined
-        states.value.isScrolling = false
-      }
-      const onScrollEnd = () => {
-        if (resetTimer) clearTimeout(resetTimer)
-        resetIsScrolling()
-      }
-
-      const onScrollbarStartMove = () => {
-        states.value = {
-          ...unref(states),
-          isScrollbarDragging: true,
-          isScrolling: true,
-        }
-        if (resetTimer) {
-          clearTimeout(resetTimer)
-          resetTimer = undefined
-        }
-      }
-
-      const onScrollbarStopMove = () => {
-        states.value = {
-          ...unref(states),
-          isScrollbarDragging: false,
-        }
-        scheduleResetIsScrolling()
-        scheduleScrollMotionEnd()
-      }
+      const {
+        onScroll,
+        onScrollEnd,
+        onScrollbarStartMove,
+        onScrollbarStopMove,
+        scheduleResetIsScrolling,
+        triggerScrollMotion,
+      } = useVirtualScroll({
+        states,
+        wrapperRef,
+        motionRuntime,
+        flushScroll,
+        setScrollMotion: (active, x, y) => {
+          if (!active || x) states.value.isScrollMotionX = active
+          if (!active || y) states.value.isScrollMotionY = active
+        },
+        syncScrollMotionClasses,
+      })
 
       // life cycles
       onMounted(() => {
@@ -754,20 +584,6 @@ const createGrid = ({
         emitEvents()
       })
 
-      onBeforeUnmount(() => {
-        if (scrollFrame) {
-          cancelAnimationFrame(scrollFrame)
-          scrollFrame = 0
-        }
-        pendingScrollElement = null
-        if (resetTimer) {
-          clearTimeout(resetTimer)
-          resetTimer = undefined
-        }
-        clearScrollMotionSchedule()
-        lastScrollMotionClass = ''
-      })
-
       const onUpdated = () => {
         const { direction } = props
         const { scrollLeft, scrollTop, updateRequested } = unref(states)
@@ -775,22 +591,7 @@ const createGrid = ({
         const windowElement = unref(windowRef)
         if (updateRequested && windowElement) {
           if (direction === RTL) {
-            switch (getRTLOffsetType()) {
-              case RTL_OFFSET_NAG: {
-                windowElement.scrollLeft = -scrollLeft
-                break
-              }
-              case RTL_OFFSET_POS_ASC: {
-                windowElement.scrollLeft = scrollLeft
-                break
-              }
-              default: {
-                const { clientWidth, scrollWidth } = windowElement
-                windowElement.scrollLeft =
-                  scrollWidth - clientWidth - scrollLeft
-                break
-              }
-            }
+            setLogicalRTLScrollLeft(windowElement, scrollLeft)
           } else {
             windowElement.scrollLeft = Math.max(0, scrollLeft)
           }
@@ -986,7 +787,7 @@ const createGrid = ({
 
 export default createGrid
 
-type Dir = typeof FORWARD | typeof BACKWARD
+type Dir = ReturnType<typeof getScrollDir>
 
 export type GridInstance = InstanceType<ReturnType<typeof createGrid>> &
   UnwrapRef<{

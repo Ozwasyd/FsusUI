@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 
-import { pathToFileURL } from 'node:url'
 import {
   createFixedOwnerPlanLoader,
   option,
   runOwnerPlanCli,
+  runPlaywrightCli,
 } from './lib/playwright-owner-core.mjs'
 
 export const BOUNDARY_OWNER = 'playwright-boundary'
@@ -39,17 +39,12 @@ export const loadBoundaryOwnerPlan = createFixedOwnerPlanLoader({
   label: 'boundary',
 })
 
-if (import.meta.url === pathToFileURL(process.argv[1] ?? '').href) {
-  try {
-    runOwnerPlanCli({
-      loadOwnerPlan: loadBoundaryOwnerPlan,
-      scriptName: 'boundary-playwright-plan.mjs',
-      label: 'boundary',
-      formatCellCommand: (cell, argv) =>
-        `FSUS_BOUNDARY_AUDIT_PORT=${option(argv, 'port', '4181')} ${cell.command}`,
-    })
-  } catch (error) {
-    console.error(error instanceof Error ? error.message : error)
-    process.exitCode = 1
-  }
-}
+runPlaywrightCli(import.meta.url, () =>
+  runOwnerPlanCli({
+    loadOwnerPlan: loadBoundaryOwnerPlan,
+    scriptName: 'boundary-playwright-plan.mjs',
+    label: 'boundary',
+    formatCellCommand: (cell, argv) =>
+      `FSUS_BOUNDARY_AUDIT_PORT=${option(argv, 'port', '4181')} ${cell.command}`,
+  }),
+)

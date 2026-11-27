@@ -74,7 +74,7 @@ public class FsusTabsPanesRebuildHeadlessTests
     Assert.True(tabs.Bounds.Height > 0);
 
     var outputRoot = Path.Combine(
-      FindRepositoryRoot(),
+      HeadlessRepositoryRoot.FindByWorkspace(),
       "dotnet",
       "FsusUI.Avalonia.HeadlessTests",
       "TestResults",
@@ -92,20 +92,5 @@ public class FsusTabsPanesRebuildHeadlessTests
     Assert.True(new FileInfo(outputPath).Length > 1_000);
 
     window.Close();
-  }
-
-  private static string FindRepositoryRoot()
-  {
-    for (var directory = new DirectoryInfo(AppContext.BaseDirectory);
-      directory is not null;
-      directory = directory.Parent)
-    {
-      if (File.Exists(Path.Combine(directory.FullName, "pnpm-workspace.yaml")))
-      {
-        return directory.FullName;
-      }
-    }
-
-    throw new DirectoryNotFoundException("Could not locate the FsusUI repository root.");
   }
 }

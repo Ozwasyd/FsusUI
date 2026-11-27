@@ -1,6 +1,8 @@
 // @ts-nocheck
+import { isNumber } from '@element-plus/utils'
 import {
   BACKWARD,
+  DEFAULT_DYNAMIC_LIST_ITEM_SIZE,
   FORWARD,
   HORIZONTAL,
   LTR,
@@ -59,6 +61,69 @@ export function getRTLOffsetType(recalculate = false): RTLOffsetType {
   }
 
   return cachedRTLResult
+}
+
+// Normalize browser-specific RTL offsets to the positive list and grid space.
+export const getLogicalRTLScrollLeft = (
+  scrollLeft: number,
+  scrollWidth: number,
+  clientWidth: number,
+) => {
+  switch (getRTLOffsetType()) {
+    case RTL_OFFSET_NAG:
+      return -scrollLeft
+    case RTL_OFFSET_POS_DESC:
+      return scrollWidth - clientWidth - scrollLeft
+    default:
+      return scrollLeft
+  }
+}
+
+export const setLogicalRTLScrollLeft = (
+  element: HTMLElement,
+  offset: number,
+) => {
+  switch (getRTLOffsetType()) {
+    case RTL_OFFSET_NAG:
+      element.scrollLeft = -offset
+      break
+    case RTL_OFFSET_POS_ASC:
+      element.scrollLeft = offset
+      break
+    default: {
+      const { clientWidth, scrollWidth } = element
+      element.scrollLeft = scrollWidth - clientWidth - offset
+    }
+  }
+}
+
+export const estimateVirtualItemSize = (
+  estimatedSize: number | undefined,
+  itemSize: unknown,
+) =>
+  Math.max(
+    1,
+    estimatedSize ??
+      (isNumber(itemSize) ? itemSize : DEFAULT_DYNAMIC_LIST_ITEM_SIZE),
+  )
+
+export const getVirtualRange = (
+  startIndex: number,
+  stopIndex: number,
+  total: number,
+  cache: number,
+  isScrolling: boolean,
+  direction: string,
+) => {
+  const backward =
+    !isScrolling || direction === BACKWARD ? Math.max(1, cache) : 1
+  const forward = !isScrolling || direction === FORWARD ? Math.max(1, cache) : 1
+  return [
+    Math.max(0, startIndex - backward),
+    Math.max(0, Math.min(total - 1, stopIndex + forward)),
+    startIndex,
+    stopIndex,
+  ]
 }
 
 export const getRelativePos = (

@@ -210,7 +210,7 @@ public class FsusSelectHeadlessTests
       $"Popup {popupTopLeft.Value} {popup.Bounds} should precede select {selectTopLeft.Value} {select.Bounds}.");
 
     var outputRoot = Path.Combine(
-      FindRepositoryRoot(),
+      HeadlessRepositoryRoot.FindByWorkspace(),
       "dotnet",
       "FsusUI.Avalonia.HeadlessTests",
       "TestResults",
@@ -230,7 +230,7 @@ public class FsusSelectHeadlessTests
   public void RealHeadlessSkiaRendersLightDarkAndSystemThemeDensityEvidence()
   {
     var outputRoot = Path.Combine(
-      FindRepositoryRoot(),
+      HeadlessRepositoryRoot.FindByWorkspace(),
       "dotnet",
       "FsusUI.Avalonia.HeadlessTests",
       "TestResults",
@@ -431,21 +431,6 @@ public class FsusSelectHeadlessTests
         Source = new Uri("avares://FsusUI.Avalonia.Themes/Themes/FsusTheme.axaml"),
       });
     return window;
-  }
-
-  private static string FindRepositoryRoot()
-  {
-    for (var directory = new DirectoryInfo(AppContext.BaseDirectory);
-      directory is not null;
-      directory = directory.Parent)
-    {
-      if (File.Exists(Path.Combine(directory.FullName, "pnpm-workspace.yaml")))
-      {
-        return directory.FullName;
-      }
-    }
-
-    throw new DirectoryNotFoundException("Could not locate the FsusUI repository root.");
   }
 
   private sealed record ZoomOption(int Value, string Label);

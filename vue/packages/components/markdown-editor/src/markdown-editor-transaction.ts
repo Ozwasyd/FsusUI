@@ -93,6 +93,25 @@ export interface MarkdownEditorDocumentIdentity {
   readonly id: string
 }
 
+export const createMarkdownEditorInputTransaction = (
+  from: number,
+  to: number,
+  insert: string,
+  selectionStart: number,
+  selectionEnd = selectionStart,
+  direction: MarkdownEditorSelection['direction'] = 'none',
+): MarkdownEditorTransaction =>
+  Object.freeze({
+    changes: Object.freeze([{ from, to, insert }]),
+    history: 'separate' as const,
+    origin: 'input' as const,
+    selection: Object.freeze({
+      direction,
+      start: selectionStart,
+      end: selectionEnd,
+    }),
+  })
+
 export interface MarkdownEditorCommandAnchor {
   readonly end: number
   readonly start: number

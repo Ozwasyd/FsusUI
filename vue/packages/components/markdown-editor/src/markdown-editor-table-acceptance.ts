@@ -2,6 +2,7 @@ import English from '@element-plus/locale/lang/en'
 import type {
   MarkdownEditorCommand,
   MarkdownEditorCommandContext,
+  MarkdownEditorCommandResult,
   MarkdownEditorTableLocaleText,
 } from './markdown-editor'
 import {
@@ -50,402 +51,183 @@ const findCurrentCell = (context: MarkdownEditorCommandContext) =>
     context.selection.start,
   )
 
-export const createMarkdownTableCommands = (): readonly MarkdownEditorCommand[] =>
-  Object.freeze([
-    {
-      key: 'table-insert',
-      label: 'Table',
-      group: 'insert',
-      title: 'Insert table',
-      presentation: ['palette', 'slash'],
-      when: (context) => !context.readonly,
-      enabled: (context) => !context.readonly,
-      run: (context) => ({
-        transaction: planMarkdownTableInsert(
-          context.value,
-          context.selection.start,
-          3,
-          3,
-        ),
-      }),
-    },
-    {
-      key: 'table-insert-row-above',
-      label: 'Insert row above',
-      group: 'table',
-      title: 'Insert row above current cell',
-      presentation: ['palette'],
-      when: (context) => Boolean(findCurrentCell(context)),
-      enabled: (context) => Boolean(findCurrentCell(context)),
-      run: (context) => {
-        const cell = findCurrentCell(context)
-        if (!cell) return {}
-        const plan = planMarkdownTableInsertRow(
-          context.value,
-          context.documentIdentity,
-          cell.tableId,
-          cell.row,
-          'above',
-          context.revision,
-        )
-        return 'changes' in plan ? { transaction: plan } : {}
+type TableCommandPlanner = (
+  table: [
+    source: string,
+    identity: MarkdownEditorCommandContext['documentIdentity'],
+    tableId: string,
+  ],
+  cell: MarkdownTableCellIdentity,
+  revision: number,
+) => ReturnType<typeof planMarkdownTableAlignColumn>
+
+const createTableCommand = (
+  key: string,
+  label: string,
+  title: string,
+  plan: TableCommandPlanner,
+  availability: 'cell' | 'body-row' | 'valid-plan' = 'cell',
+): MarkdownEditorCommand => {
+  const resolveCell = (context: MarkdownEditorCommandContext) => {
+    const cell = findCurrentCell(context)
+    return cell && (availability !== 'body-row' || cell.row > 0) ? cell : null
+  }
+  const run = (
+    context: MarkdownEditorCommandContext,
+  ): MarkdownEditorCommandResult => {
+    const cell = resolveCell(context)
+    if (!cell) return {}
+    const result = plan(
+      [context.value, context.documentIdentity, cell.tableId],
+      cell,
+      context.revision,
+    )
+    return 'changes' in result ? { transaction: result } : {}
+  }
+  return {
+    key,
+    label,
+    group: 'table',
+    title,
+    presentation: ['palette'],
+    when: (context) => Boolean(resolveCell(context)),
+    enabled: (context) =>
+      availability === 'valid-plan'
+        ? Boolean(run(context).transaction)
+        : Boolean(resolveCell(context)),
+    run,
+  }
+}
+
+export const createMarkdownTableCommands =
+  (): readonly MarkdownEditorCommand[] =>
+    Object.freeze([
+      {
+        key: 'table-insert',
+        label: 'Table',
+        group: 'insert',
+        title: 'Insert table',
+        presentation: ['palette', 'slash'],
+        when: (context) => !context.readonly,
+        enabled: (context) => !context.readonly,
+        run: (context) => ({
+          transaction: planMarkdownTableInsert(
+            context.value,
+            context.selection.start,
+            3,
+            3,
+          ),
+        }),
       },
-    },
-    {
-      key: 'table-insert-row-below',
-      label: 'Insert row below',
-      group: 'table',
-      title: 'Insert row below current cell',
-      presentation: ['palette'],
-      when: (context) => Boolean(findCurrentCell(context)),
-      enabled: (context) => Boolean(findCurrentCell(context)),
-      run: (context) => {
-        const cell = findCurrentCell(context)
-        if (!cell) return {}
-        const plan = planMarkdownTableInsertRow(
-          context.value,
-          context.documentIdentity,
-          cell.tableId,
-          cell.row,
-          'below',
-          context.revision,
-        )
-        return 'changes' in plan ? { transaction: plan } : {}
-      },
-    },
-    {
-      key: 'table-delete-row',
-      label: 'Delete row',
-      group: 'table',
-      title: 'Delete current row',
-      presentation: ['palette'],
-      when: (context) => Boolean(findCurrentCell(context) && findCurrentCell(context)!.row > 0),
-      enabled: (context) => Boolean(findCurrentCell(context) && findCurrentCell(context)!.row > 0),
-      run: (context) => {
-        const cell = findCurrentCell(context)
-        if (!cell || cell.row === 0) return {}
-        const plan = planMarkdownTableDeleteRow(
-          context.value,
-          context.documentIdentity,
-          cell.tableId,
-          cell.row,
-          context.revision,
-        )
-        return 'changes' in plan ? { transaction: plan } : {}
-      },
-    },
-    {
-      key: 'table-move-row-up',
-      label: 'Move row up',
-      group: 'table',
-      title: 'Move current row up',
-      presentation: ['palette'],
-      when: (context) => Boolean(findCurrentCell(context)),
-      enabled: (context) => {
-        const cell = findCurrentCell(context)
-        if (!cell) return false
-        return 'changes' in planMarkdownTableMoveRow(
-          context.value,
-          context.documentIdentity,
-          cell.tableId,
-          cell.row,
-          'up',
-          context.revision,
-          cell.column,
-        )
-      },
-      run: (context) => {
-        const cell = findCurrentCell(context)
-        if (!cell) return {}
-        const plan = planMarkdownTableMoveRow(
-          context.value,
-          context.documentIdentity,
-          cell.tableId,
-          cell.row,
-          'up',
-          context.revision,
-          cell.column,
-        )
-        return 'changes' in plan ? { transaction: plan } : {}
-      },
-    },
-    {
-      key: 'table-move-row-down',
-      label: 'Move row down',
-      group: 'table',
-      title: 'Move current row down',
-      presentation: ['palette'],
-      when: (context) => Boolean(findCurrentCell(context)),
-      enabled: (context) => {
-        const cell = findCurrentCell(context)
-        if (!cell) return false
-        return 'changes' in planMarkdownTableMoveRow(
-          context.value,
-          context.documentIdentity,
-          cell.tableId,
-          cell.row,
-          'down',
-          context.revision,
-          cell.column,
-        )
-      },
-      run: (context) => {
-        const cell = findCurrentCell(context)
-        if (!cell) return {}
-        const plan = planMarkdownTableMoveRow(
-          context.value,
-          context.documentIdentity,
-          cell.tableId,
-          cell.row,
-          'down',
-          context.revision,
-          cell.column,
-        )
-        return 'changes' in plan ? { transaction: plan } : {}
-      },
-    },
-    {
-      key: 'table-insert-col-left',
-      label: 'Insert column left',
-      group: 'table',
-      title: 'Insert column left of current cell',
-      presentation: ['palette'],
-      when: (context) => Boolean(findCurrentCell(context)),
-      enabled: (context) => Boolean(findCurrentCell(context)),
-      run: (context) => {
-        const cell = findCurrentCell(context)
-        if (!cell) return {}
-        const plan = planMarkdownTableInsertColumn(
-          context.value,
-          context.documentIdentity,
-          cell.tableId,
-          cell.column,
-          'left',
-          context.revision,
-        )
-        return 'changes' in plan ? { transaction: plan } : {}
-      },
-    },
-    {
-      key: 'table-insert-col-right',
-      label: 'Insert column right',
-      group: 'table',
-      title: 'Insert column right of current cell',
-      presentation: ['palette'],
-      when: (context) => Boolean(findCurrentCell(context)),
-      enabled: (context) => Boolean(findCurrentCell(context)),
-      run: (context) => {
-        const cell = findCurrentCell(context)
-        if (!cell) return {}
-        const plan = planMarkdownTableInsertColumn(
-          context.value,
-          context.documentIdentity,
-          cell.tableId,
-          cell.column,
-          'right',
-          context.revision,
-        )
-        return 'changes' in plan ? { transaction: plan } : {}
-      },
-    },
-    {
-      key: 'table-delete-col',
-      label: 'Delete column',
-      group: 'table',
-      title: 'Delete current column',
-      presentation: ['palette'],
-      when: (context) => Boolean(findCurrentCell(context)),
-      enabled: (context) => Boolean(findCurrentCell(context)),
-      run: (context) => {
-        const cell = findCurrentCell(context)
-        if (!cell) return {}
-        const plan = planMarkdownTableDeleteColumn(
-          context.value,
-          context.documentIdentity,
-          cell.tableId,
-          cell.column,
-          context.revision,
-        )
-        return 'changes' in plan ? { transaction: plan } : {}
-      },
-    },
-    {
-      key: 'table-move-col-left',
-      label: 'Move column left',
-      group: 'table',
-      title: 'Move current column left',
-      presentation: ['palette'],
-      when: (context) => Boolean(findCurrentCell(context)),
-      enabled: (context) => {
-        const cell = findCurrentCell(context)
-        if (!cell) return false
-        return 'changes' in planMarkdownTableMoveColumn(
-          context.value,
-          context.documentIdentity,
-          cell.tableId,
-          cell.column,
-          'left',
-          context.revision,
-          cell.row,
-        )
-      },
-      run: (context) => {
-        const cell = findCurrentCell(context)
-        if (!cell) return {}
-        const plan = planMarkdownTableMoveColumn(
-          context.value,
-          context.documentIdentity,
-          cell.tableId,
-          cell.column,
-          'left',
-          context.revision,
-          cell.row,
-        )
-        return 'changes' in plan ? { transaction: plan } : {}
-      },
-    },
-    {
-      key: 'table-move-col-right',
-      label: 'Move column right',
-      group: 'table',
-      title: 'Move current column right',
-      presentation: ['palette'],
-      when: (context) => Boolean(findCurrentCell(context)),
-      enabled: (context) => {
-        const cell = findCurrentCell(context)
-        if (!cell) return false
-        return 'changes' in planMarkdownTableMoveColumn(
-          context.value,
-          context.documentIdentity,
-          cell.tableId,
-          cell.column,
-          'right',
-          context.revision,
-          cell.row,
-        )
-      },
-      run: (context) => {
-        const cell = findCurrentCell(context)
-        if (!cell) return {}
-        const plan = planMarkdownTableMoveColumn(
-          context.value,
-          context.documentIdentity,
-          cell.tableId,
-          cell.column,
-          'right',
-          context.revision,
-          cell.row,
-        )
-        return 'changes' in plan ? { transaction: plan } : {}
-      },
-    },
-    {
-      key: 'table-align-left',
-      label: 'Align left',
-      group: 'table',
-      title: 'Align column left',
-      presentation: ['palette'],
-      when: (context) => Boolean(findCurrentCell(context)),
-      enabled: (context) => Boolean(findCurrentCell(context)),
-      run: (context) => {
-        const cell = findCurrentCell(context)
-        if (!cell) return {}
-        const plan = planMarkdownTableAlignColumn(
-          context.value,
-          context.documentIdentity,
-          cell.tableId,
-          cell.column,
-          'left',
-          context.revision,
-        )
-        return 'changes' in plan ? { transaction: plan } : {}
-      },
-    },
-    {
-      key: 'table-align-center',
-      label: 'Align center',
-      group: 'table',
-      title: 'Align column center',
-      presentation: ['palette'],
-      when: (context) => Boolean(findCurrentCell(context)),
-      enabled: (context) => Boolean(findCurrentCell(context)),
-      run: (context) => {
-        const cell = findCurrentCell(context)
-        if (!cell) return {}
-        const plan = planMarkdownTableAlignColumn(
-          context.value,
-          context.documentIdentity,
-          cell.tableId,
-          cell.column,
-          'center',
-          context.revision,
-        )
-        return 'changes' in plan ? { transaction: plan } : {}
-      },
-    },
-    {
-      key: 'table-align-right',
-      label: 'Align right',
-      group: 'table',
-      title: 'Align column right',
-      presentation: ['palette'],
-      when: (context) => Boolean(findCurrentCell(context)),
-      enabled: (context) => Boolean(findCurrentCell(context)),
-      run: (context) => {
-        const cell = findCurrentCell(context)
-        if (!cell) return {}
-        const plan = planMarkdownTableAlignColumn(
-          context.value,
-          context.documentIdentity,
-          cell.tableId,
-          cell.column,
-          'right',
-          context.revision,
-        )
-        return 'changes' in plan ? { transaction: plan } : {}
-      },
-    },
-    {
-      key: 'table-format',
-      label: 'Format table',
-      group: 'table',
-      title: 'Format and align table cells',
-      presentation: ['palette'],
-      when: (context) => Boolean(findCurrentCell(context)),
-      enabled: (context) => Boolean(findCurrentCell(context)),
-      run: (context) => {
-        const cell = findCurrentCell(context)
-        if (!cell) return {}
-        const plan = planMarkdownTableFormat(
-          context.value,
-          context.documentIdentity,
-          cell.tableId,
-          context.revision,
-        )
-        return 'changes' in plan ? { transaction: plan } : {}
-      },
-    },
-    {
-      key: 'table-delete',
-      label: 'Delete table',
-      group: 'table',
-      title: 'Delete current table',
-      presentation: ['palette'],
-      when: (context) => Boolean(findCurrentCell(context)),
-      enabled: (context) => Boolean(findCurrentCell(context)),
-      run: (context) => {
-        const cell = findCurrentCell(context)
-        if (!cell) return {}
-        const plan = planMarkdownTableDelete(
-          context.value,
-          context.documentIdentity,
-          cell.tableId,
-          context.revision,
-        )
-        return 'changes' in plan ? { transaction: plan } : {}
-      },
-    },
-  ])
+      createTableCommand(
+        'table-insert-row-above',
+        'Insert row above',
+        'Insert row above current cell',
+        (table, { row }, revision) =>
+          planMarkdownTableInsertRow(...table, row, 'above', revision),
+      ),
+      createTableCommand(
+        'table-insert-row-below',
+        'Insert row below',
+        'Insert row below current cell',
+        (table, { row }, revision) =>
+          planMarkdownTableInsertRow(...table, row, 'below', revision),
+      ),
+      createTableCommand(
+        'table-delete-row',
+        'Delete row',
+        'Delete current row',
+        (table, { row }, revision) =>
+          planMarkdownTableDeleteRow(...table, row, revision),
+        'body-row',
+      ),
+      createTableCommand(
+        'table-move-row-up',
+        'Move row up',
+        'Move current row up',
+        (table, { row, column }, revision) =>
+          planMarkdownTableMoveRow(...table, row, 'up', revision, column),
+        'valid-plan',
+      ),
+      createTableCommand(
+        'table-move-row-down',
+        'Move row down',
+        'Move current row down',
+        (table, { row, column }, revision) =>
+          planMarkdownTableMoveRow(...table, row, 'down', revision, column),
+        'valid-plan',
+      ),
+      createTableCommand(
+        'table-insert-col-left',
+        'Insert column left',
+        'Insert column left of current cell',
+        (table, { column }, revision) =>
+          planMarkdownTableInsertColumn(...table, column, 'left', revision),
+      ),
+      createTableCommand(
+        'table-insert-col-right',
+        'Insert column right',
+        'Insert column right of current cell',
+        (table, { column }, revision) =>
+          planMarkdownTableInsertColumn(...table, column, 'right', revision),
+      ),
+      createTableCommand(
+        'table-delete-col',
+        'Delete column',
+        'Delete current column',
+        (table, { column }, revision) =>
+          planMarkdownTableDeleteColumn(...table, column, revision),
+      ),
+      createTableCommand(
+        'table-move-col-left',
+        'Move column left',
+        'Move current column left',
+        (table, { row, column }, revision) =>
+          planMarkdownTableMoveColumn(...table, column, 'left', revision, row),
+        'valid-plan',
+      ),
+      createTableCommand(
+        'table-move-col-right',
+        'Move column right',
+        'Move current column right',
+        (table, { row, column }, revision) =>
+          planMarkdownTableMoveColumn(...table, column, 'right', revision, row),
+        'valid-plan',
+      ),
+      createTableCommand(
+        'table-align-left',
+        'Align left',
+        'Align column left',
+        (table, { column }, revision) =>
+          planMarkdownTableAlignColumn(...table, column, 'left', revision),
+      ),
+      createTableCommand(
+        'table-align-center',
+        'Align center',
+        'Align column center',
+        (table, { column }, revision) =>
+          planMarkdownTableAlignColumn(...table, column, 'center', revision),
+      ),
+      createTableCommand(
+        'table-align-right',
+        'Align right',
+        'Align column right',
+        (table, { column }, revision) =>
+          planMarkdownTableAlignColumn(...table, column, 'right', revision),
+      ),
+      createTableCommand(
+        'table-format',
+        'Format table',
+        'Format and align table cells',
+        (table, _cell, revision) => planMarkdownTableFormat(...table, revision),
+      ),
+      createTableCommand(
+        'table-delete',
+        'Delete table',
+        'Delete current table',
+        (table, _cell, revision) => planMarkdownTableDelete(...table, revision),
+      ),
+    ])
 
 export const resolveMarkdownTableContextActions = (
   _context?: MarkdownEditorCommandContext,
@@ -453,104 +235,31 @@ export const resolveMarkdownTableContextActions = (
   tableLocale: MarkdownEditorTableLocaleText = English.el.markdownEditor.table,
 ): readonly MarkdownTableContextAction[] => {
   const actions = tableLocale.actions
+  const action = (
+    key: keyof typeof actions,
+    group: MarkdownTableContextAction['group'],
+    titleKey = key,
+  ): MarkdownTableContextAction => ({
+    key,
+    label: actions[key],
+    title: actions[titleKey],
+    group,
+    minTouchTarget: MARKDOWN_TABLE_TOUCH_TARGET_MIN,
+  })
   return Object.freeze([
-    {
-      key: 'insert-row-above',
-      label: actions['insert-row-above'],
-      title: actions['insert-row-above'],
-      group: 'row',
-      minTouchTarget: MARKDOWN_TABLE_TOUCH_TARGET_MIN,
-    },
-    {
-      key: 'insert-row-below',
-      label: actions['insert-row-below'],
-      title: actions['insert-row-below'],
-      group: 'row',
-      minTouchTarget: MARKDOWN_TABLE_TOUCH_TARGET_MIN,
-    },
-    {
-      key: 'move-row-up',
-      label: actions['move-row-up'],
-      title: actions['move-row-up'],
-      group: 'row',
-      minTouchTarget: MARKDOWN_TABLE_TOUCH_TARGET_MIN,
-    },
-    {
-      key: 'move-row-down',
-      label: actions['move-row-down'],
-      title: actions['move-row-down'],
-      group: 'row',
-      minTouchTarget: MARKDOWN_TABLE_TOUCH_TARGET_MIN,
-    },
-    {
-      key: 'delete-row',
-      label: actions['delete-row'],
-      title: actions['delete-row'],
-      group: 'row',
-      minTouchTarget: MARKDOWN_TABLE_TOUCH_TARGET_MIN,
-    },
-    {
-      key: 'insert-col-left',
-      label: actions['insert-col-left'],
-      title: actions['insert-col-left'],
-      group: 'column',
-      minTouchTarget: MARKDOWN_TABLE_TOUCH_TARGET_MIN,
-    },
-    {
-      key: 'insert-col-right',
-      label: actions['insert-col-right'],
-      title: actions['insert-col-right'],
-      group: 'column',
-      minTouchTarget: MARKDOWN_TABLE_TOUCH_TARGET_MIN,
-    },
-    {
-      key: 'move-col-left',
-      label: actions['move-col-left'],
-      title: actions['move-col-left'],
-      group: 'column',
-      minTouchTarget: MARKDOWN_TABLE_TOUCH_TARGET_MIN,
-    },
-    {
-      key: 'move-col-right',
-      label: actions['move-col-right'],
-      title: actions['move-col-right'],
-      group: 'column',
-      minTouchTarget: MARKDOWN_TABLE_TOUCH_TARGET_MIN,
-    },
-    {
-      key: 'delete-col',
-      label: actions['delete-col'],
-      title: actions['delete-col'],
-      group: 'column',
-      minTouchTarget: MARKDOWN_TABLE_TOUCH_TARGET_MIN,
-    },
-    {
-      key: 'align-left',
-      label: actions['align-left'],
-      title: actions['align-left-title'],
-      group: 'align',
-      minTouchTarget: MARKDOWN_TABLE_TOUCH_TARGET_MIN,
-    },
-    {
-      key: 'align-center',
-      label: actions['align-center'],
-      title: actions['align-center-title'],
-      group: 'align',
-      minTouchTarget: MARKDOWN_TABLE_TOUCH_TARGET_MIN,
-    },
-    {
-      key: 'align-right',
-      label: actions['align-right'],
-      title: actions['align-right-title'],
-      group: 'align',
-      minTouchTarget: MARKDOWN_TABLE_TOUCH_TARGET_MIN,
-    },
-    {
-      key: 'format-table',
-      label: actions['format-table'],
-      title: actions['format-table'],
-      group: 'format',
-      minTouchTarget: MARKDOWN_TABLE_TOUCH_TARGET_MIN,
-    },
+    action('insert-row-above', 'row'),
+    action('insert-row-below', 'row'),
+    action('move-row-up', 'row'),
+    action('move-row-down', 'row'),
+    action('delete-row', 'row'),
+    action('insert-col-left', 'column'),
+    action('insert-col-right', 'column'),
+    action('move-col-left', 'column'),
+    action('move-col-right', 'column'),
+    action('delete-col', 'column'),
+    action('align-left', 'align', 'align-left-title'),
+    action('align-center', 'align', 'align-center-title'),
+    action('align-right', 'align', 'align-right-title'),
+    action('format-table', 'format'),
   ])
 }

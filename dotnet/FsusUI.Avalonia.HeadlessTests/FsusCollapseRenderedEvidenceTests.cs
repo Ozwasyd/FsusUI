@@ -282,7 +282,7 @@ public class FsusCollapseRenderedEvidenceTests
       window.UpdateLayout();
       using var frame = window.CaptureRenderedFrame();
       Assert.NotNull(frame);
-      var output = HeadlessVisualEvidenceOutput.ResolveOutputRoot(FindRepositoryRoot(), "fsus-collapse-inner-pointer");
+      var output = HeadlessVisualEvidenceOutput.ResolveOutputRoot(HeadlessRepositoryRoot.FindBySolution(), "fsus-collapse-inner-pointer");
       frame.Save(Path.Combine(output, $"{variant}-before.png"));
       var header = Assert.Single(innerItem.GetVisualDescendants().OfType<Border>(), border => border.Name == "PART_Header");
       var point = Assert.NotNull(header.TranslatePoint(new Point(30, 8), window));
@@ -465,7 +465,7 @@ public class FsusCollapseRenderedEvidenceTests
   private static void SaveNestedFrame(Window window, FsusThemeVariant variant, string phase)
   {
     var outputRoot = HeadlessVisualEvidenceOutput.ResolveOutputRoot(
-      FindRepositoryRoot(), "fsus-collapse-nested-owner");
+      HeadlessRepositoryRoot.FindBySolution(), "fsus-collapse-nested-owner");
     using var frame = window.CaptureRenderedFrame();
     Assert.NotNull(frame);
     frame.Save(Path.Combine(outputRoot, $"nested-{variant}-{phase}.png"));
@@ -566,7 +566,7 @@ public class FsusCollapseRenderedEvidenceTests
     surface.Arrange(new Rect(0, 0, 560, 440));
 
     var outputRoot = Path.Combine(
-      FindRepositoryRoot(),
+      HeadlessRepositoryRoot.FindBySolution(),
       "dotnet",
       "FsusUI.Avalonia.HeadlessTests",
       "TestResults",
@@ -619,18 +619,5 @@ public class FsusCollapseRenderedEvidenceTests
       {
         Source = new Uri("avares://FsusUI.Avalonia.Themes/Themes/FsusTheme.axaml"),
       });
-  }
-
-  private static string FindRepositoryRoot()
-  {
-    var dir = new DirectoryInfo(AppContext.BaseDirectory);
-    while (dir is not null &&
-           !File.Exists(Path.Combine(dir.FullName, "dotnet", "FsusUI.Avalonia.slnx")))
-    {
-      dir = dir.Parent;
-    }
-
-    return dir?.FullName
-      ?? throw new InvalidOperationException("Unable to locate repository root.");
   }
 }

@@ -136,61 +136,31 @@ public sealed class FsusMotionService
     var contract = GetPresetContract(request.Preset);
     var terminal = FsusMotionVisualState.Terminal;
     var mode = EffectiveMode;
-    var delay = request.Preset == FsusMotionPreset.ListItemAppearance
+    var usePresetMotion = mode == FsusResolvedMotionMode.Enabled;
+    var leaving = request.Phase == FsusMotionPhase.Leave;
+    var duration = mode switch
+    {
+      FsusResolvedMotionMode.Disabled => TimeSpan.Zero,
+      FsusResolvedMotionMode.Reduced => TimeSpan.FromMilliseconds(1),
+      _ => contract.Duration,
+    };
+    var delay = usePresetMotion && request.Preset == FsusMotionPreset.ListItemAppearance
       ? FsusTokens.MotionStaggerDefaultTimeSpan * Math.Clamp(request.Index, 0, MaxStaggerIndex)
       : TimeSpan.Zero;
 
-    if (mode == FsusResolvedMotionMode.Disabled)
-    {
-      return new FsusMotionPlan(
-        request.Preset,
-        request.Phase,
-        mode,
-        TimeSpan.Zero,
-        TimeSpan.Zero,
-        contract.Easing,
-        contract.DurationToken,
-        contract.EasingToken,
-        terminal,
-        terminal,
-        terminal,
-        false,
-        contract.PreservesFocus);
-    }
-
-    if (mode == FsusResolvedMotionMode.Reduced)
-    {
-      return new FsusMotionPlan(
-        request.Preset,
-        request.Phase,
-        mode,
-        TimeSpan.FromMilliseconds(1),
-        TimeSpan.Zero,
-        contract.Easing,
-        contract.DurationToken,
-        contract.EasingToken,
-        terminal,
-        terminal,
-        terminal,
-        true,
-        contract.PreservesFocus);
-    }
-
-    var from = request.Phase == FsusMotionPhase.Leave ? terminal : contract.From;
-    var to = request.Phase == FsusMotionPhase.Leave ? contract.LeaveTo : terminal;
     return new FsusMotionPlan(
       request.Preset,
       request.Phase,
       mode,
-      contract.Duration,
+      duration,
       delay,
       contract.Easing,
       contract.DurationToken,
       contract.EasingToken,
-      from,
-      to,
+      usePresetMotion && !leaving ? contract.From : terminal,
+      usePresetMotion && leaving ? contract.LeaveTo : terminal,
       terminal,
-      true,
+      mode != FsusResolvedMotionMode.Disabled,
       contract.PreservesFocus);
   }
 

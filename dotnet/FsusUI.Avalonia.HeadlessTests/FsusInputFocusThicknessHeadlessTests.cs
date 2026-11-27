@@ -115,7 +115,7 @@ public class FsusInputFocusThicknessHeadlessTests
   [AvaloniaFact]
   public void RealHeadlessSkiaRenderCapturesInputSelectionAndScrollbarFocusStates()
   {
-    var repositoryRoot = FindRepositoryRoot();
+    var repositoryRoot = HeadlessRepositoryRoot.FindByWorkspace();
     var outputRoot = HeadlessVisualEvidenceOutput.ResolveOutputRoot(
       repositoryRoot,
       "issue-656-input-focus");
@@ -361,7 +361,7 @@ public class FsusInputFocusThicknessHeadlessTests
     window.Close();
 
     return new FocusRenderCapture(
-      HeadlessVisualEvidenceOutput.RecordPath(FindRepositoryRoot(), outputPath),
+      HeadlessVisualEvidenceOutput.RecordPath(HeadlessRepositoryRoot.FindByWorkspace(), outputPath),
       Convert.ToHexStringLower(SHA256.HashData(File.ReadAllBytes(outputPath))),
       new PixelDimension(bitmap.PixelSize.Width, bitmap.PixelSize.Height),
       themeName,
@@ -387,21 +387,6 @@ public class FsusInputFocusThicknessHeadlessTests
         return movingKnobs;
       });
     return toggleSwitch;
-  }
-
-  private static string FindRepositoryRoot()
-  {
-    for (var directory = new DirectoryInfo(AppContext.BaseDirectory);
-      directory is not null;
-      directory = directory.Parent)
-    {
-      if (File.Exists(Path.Combine(directory.FullName, "pnpm-workspace.yaml")))
-      {
-        return directory.FullName;
-      }
-    }
-
-    throw new DirectoryNotFoundException("Could not locate the FsusUI repository root.");
   }
 
   private sealed record PixelDimension(int Width, int Height);

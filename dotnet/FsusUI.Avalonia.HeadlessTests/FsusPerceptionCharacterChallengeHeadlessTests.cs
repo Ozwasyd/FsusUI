@@ -114,7 +114,7 @@ public class FsusPerceptionCharacterChallengeHeadlessTests
 
   private static void GenerateRealHeadlessSkiaEvidence()
   {
-    var repositoryRoot = FindRepositoryRoot();
+    var repositoryRoot = HeadlessRepositoryRoot.FindByWorkspace();
     var outputRoot = HeadlessVisualEvidenceOutput.ResolveOutputRoot(
       repositoryRoot,
       "perception-character-challenge");
@@ -160,7 +160,7 @@ public class FsusPerceptionCharacterChallengeHeadlessTests
     Assert.Equal(13, captures[1].CriticalControls.Count);
 
     var webPath = Path.Combine(
-      FindRepositoryRoot(),
+      HeadlessRepositoryRoot.FindByWorkspace(),
       "tests",
       "conformance",
       "visual",
@@ -361,7 +361,7 @@ public class FsusPerceptionCharacterChallengeHeadlessTests
     }
     window.Close();
 
-    var repositoryRoot = FindRepositoryRoot();
+    var repositoryRoot = HeadlessRepositoryRoot.FindByWorkspace();
     var relativePath = HeadlessVisualEvidenceOutput.RecordPath(repositoryRoot, outputPath);
     return new RenderCapture(
       Path.GetFileNameWithoutExtension(outputPath),
@@ -555,19 +555,6 @@ public class FsusPerceptionCharacterChallengeHeadlessTests
 
   private static Control Find(IEnumerable<Control> controls, string automationId) =>
     Assert.Single(controls, control => AutomationProperties.GetAutomationId(control) == automationId);
-
-  private static string FindRepositoryRoot()
-  {
-    for (var directory = new DirectoryInfo(AppContext.BaseDirectory); directory is not null; directory = directory.Parent)
-    {
-      if (File.Exists(Path.Combine(directory.FullName, "pnpm-workspace.yaml")))
-      {
-        return directory.FullName;
-      }
-    }
-
-    throw new DirectoryNotFoundException("Could not locate the FsusUI repository root.");
-  }
 
   private sealed record Dimension(int Width, int Height);
 

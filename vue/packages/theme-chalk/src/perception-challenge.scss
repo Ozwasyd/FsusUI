@@ -225,7 +225,7 @@
   }
 }
 
-@include b(text-task-challenge) {
+@mixin -challenge-prompt {
   display: grid;
   gap: var(--fsus-space-3, 12px);
   min-width: 0;
@@ -252,6 +252,10 @@
     line-height: 1.5;
     overflow-wrap: anywhere;
   }
+}
+
+@include b(text-task-challenge) {
+  @include -challenge-prompt;
 
   @include e(form) {
     display: grid;
@@ -270,32 +274,7 @@
 }
 
 @include b(localization-challenge) {
-  display: grid;
-  gap: var(--fsus-space-3, 12px);
-  min-width: 0;
-
-  @include e(copy) {
-    display: grid;
-    gap: var(--fsus-space-1, 4px);
-    min-width: 0;
-  }
-
-  @include e(prompt) {
-    margin: 0;
-    color: getCssVar('text-color-primary');
-    font-size: getCssVar('font-size-base');
-    font-weight: 700;
-    line-height: 1.45;
-    overflow-wrap: anywhere;
-  }
-
-  @include e(description) {
-    margin: 0;
-    color: getCssVar('text-color-secondary');
-    font-size: getCssVar('font-size-small');
-    line-height: 1.5;
-    overflow-wrap: anywhere;
-  }
+  @include -challenge-prompt;
 
   @include e(target) {
     position: relative;

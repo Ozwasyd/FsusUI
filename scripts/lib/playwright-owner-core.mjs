@@ -11,7 +11,7 @@ import {
 } from 'node:fs'
 import { dirname, resolve } from 'node:path'
 import { setTimeout as delay } from 'node:timers/promises'
-import { fileURLToPath } from 'node:url'
+import { fileURLToPath, pathToFileURL } from 'node:url'
 import fg from 'fast-glob'
 import {
   assertOwnerFixedCells,
@@ -20,8 +20,11 @@ import {
   validatePlanIsolation,
 } from '../layout-playwright-plan.mjs'
 import { filterOwnerPlanByImpact } from '../playwright-impact-filter.mjs'
+import { stableStringify } from '../playwright-registry.mjs'
 import { loadPlaywrightSuiteRegistry } from '../playwright-suites.mjs'
 import { fingerprintPaths } from '../visual-runtime-core.mjs'
+
+export { stableStringify }
 
 export const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), '../..')
 
@@ -62,17 +65,24 @@ export const option = (args, name, fallback) => {
 
 export const hasFlag = (args, name) => args.includes(`--${name}`)
 
-export const stableStringify = (value) => {
-  if (Array.isArray(value)) {
-    return `[${value.map((entry) => stableStringify(entry)).join(',')}]`
+function reportPlaywrightCliError(error) {
+  console.error(error instanceof Error ? error.message : error)
+  process.exitCode = 1
+}
+
+export function runPlaywrightCli(moduleUrl, run) {
+  if (moduleUrl !== pathToFileURL(process.argv[1] ?? '').href) return
+  try {
+    const result = run()
+    if (result instanceof Promise) return result.catch(reportPlaywrightCliError)
+  } catch (error) {
+    reportPlaywrightCliError(error)
   }
-  if (value && typeof value === 'object') {
-    return `{${Object.keys(value)
-      .sort()
-      .map((key) => `${JSON.stringify(key)}:${stableStringify(value[key])}`)
-      .join(',')}}`
-  }
-  return JSON.stringify(value)
+}
+
+function writeEvidenceJson(file, value) {
+  mkdirSync(dirname(file), { recursive: true })
+  writeFileSync(file, `${JSON.stringify(value, null, 2)}\n`)
 }
 
 export const sha256Text = (value) =>
@@ -340,11 +350,11 @@ export function writeSuiteRuntimeManifest(
     'runtime-manifests',
     `${manifestId}.json`,
   )
-  mkdirSync(dirname(manifestPath), { recursive: true })
-  writeFileSync(
-    manifestPath,
-    `${JSON.stringify({ schemaVersion: 1, suiteId: cell.suiteId, ...runtime }, null, 2)}\n`,
-  )
+  writeEvidenceJson(manifestPath, {
+    schemaVersion: 1,
+    suiteId: cell.suiteId,
+    ...runtime,
+  })
   return {
     ...runtime,
     manifestDigest: sha256File(manifestPath),
@@ -362,21 +372,35 @@ export function createFixedOwnerPlanLoader({
     registry = loadPlaywrightSuiteRegistry(),
     owners = loadPlaywrightOwners(),
   ) {
-    const plan = planOwnerCells(ownerId, group, registry, owners)
-    if (
-      group === 'main' ||
-      group === 'nightly' ||
-      group === 'release' ||
-      (enforcePrFixedCells && group === 'pr')
-    ) {
-      assertOwnerFixedCells(plan, [...fixedCells])
-    }
-    const isolation = validatePlanIsolation(plan)
-    if (isolation.length > 0) {
-      fail(`${label} owner plan isolation failed for ${group}: ${isolation.join('; ')}`)
-    }
-    return plan
+    return validateFixedOwnerPlan(
+      planOwnerCells(ownerId, group, registry, owners),
+      fixedCells,
+      `${label} owner plan isolation failed for ${group}`,
+      enforcePrFixedCells,
+    )
   }
+}
+
+function validateFixedOwnerPlan(
+  plan,
+  fixedCells,
+  isolationError,
+  enforcePr = false,
+) {
+  if (plan.group !== 'pr' || enforcePr) {
+    assertOwnerFixedCells(plan, [...fixedCells])
+  }
+  const isolation = validatePlanIsolation(plan)
+  if (isolation.length > 0) fail(`${isolationError}: ${isolation.join('; ')}`)
+  return plan
+}
+
+export function loadOwnerRunPlan(ownerId, group, fixedCells, isolationError) {
+  return validateFixedOwnerPlan(
+    planOwnerCells(ownerId, group),
+    fixedCells,
+    isolationError,
+  )
 }
 
 export function runOwnerPlanCli({
@@ -548,6 +572,7 @@ export async function runOwnerVerifyCli({
   loadPlan,
   loadReceipts,
   verifyReceipts,
+  readVerifyOptions,
   requireSubcommand = true,
   root = repoRoot,
 }) {
@@ -567,13 +592,15 @@ export async function runOwnerVerifyCli({
     group,
     receipts,
     plan,
-    argv,
+    {
+      evidenceDir: option(argv, 'evidence-dir'),
+      expectedCommitSha: option(argv, 'commit-sha'),
+      ...readVerifyOptions?.(argv),
+    },
   )
   const evidenceOut = option(argv, 'evidence-out')
   if (evidenceOut) {
-    const absolute = resolve(root, evidenceOut)
-    mkdirSync(dirname(absolute), { recursive: true })
-    writeFileSync(absolute, `${JSON.stringify(summary, null, 2)}\n`)
+    writeEvidenceJson(resolve(root, evidenceOut), summary)
   }
   console.log(
     `[${logPrefix}] owner=${ownerId} group=${group} status=${summary.status} cells=${summary.cells.length}`,
@@ -766,9 +793,7 @@ export async function executeCellWithReceipt({
     validateReceipt?.(receipt, cell)
 
     const receiptRelative = cell.receiptPath
-    const receiptPath = resolve(root, receiptRelative)
-    mkdirSync(dirname(receiptPath), { recursive: true })
-    writeFileSync(receiptPath, `${JSON.stringify(receipt, null, 2)}\n`)
+    writeEvidenceJson(resolve(root, receiptRelative), receipt)
     console.log(
       `[${logPrefix}] ${cell.id} status=${status} passed=${tests.passed} failed=${tests.failed} skipped=${tests.skipped} receipt=${receiptRelative}`,
     )
@@ -812,9 +837,7 @@ export async function executeCellWithReceipt({
         startedAt,
         endedAt: new Date().toISOString(),
       }
-      const receiptPath = resolve(root, cell.receiptPath)
-      mkdirSync(dirname(receiptPath), { recursive: true })
-      writeFileSync(receiptPath, `${JSON.stringify(receipt, null, 2)}\n`)
+      writeEvidenceJson(resolve(root, cell.receiptPath), receipt)
       return {
         ok: false,
         cellId: cell.id,
@@ -882,6 +905,70 @@ export async function withSpawnedServer(
   }
 }
 
+export function prepareOwnerVisualRuntime(
+  argv,
+  runtimeDir,
+  logPrefix,
+  { logCheck = false } = {},
+) {
+  if (!hasFlag(argv, 'skip-prepare')) {
+    runVisualRuntimePrepare(runtimeDir, { logPrefix })
+  }
+  runVisualRuntimePrepare(runtimeDir, {
+    checkOnly: true,
+    logPrefix: logCheck ? logPrefix : undefined,
+  })
+}
+
+export function runPreparedVisualCells(
+  runtimeDir,
+  serverPort,
+  { ownerId, group, cells, evidenceDir },
+  runCell,
+) {
+  return withSpawnedServer(
+    {
+      command: process.execPath,
+      args: [
+        'scripts/serve-visual-runtime.mjs',
+        '--suite=preview',
+        '--host=127.0.0.1',
+        `--port=${serverPort}`,
+        `--runtime-dir=${runtimeDir}`,
+      ],
+      serverUrl: `http://127.0.0.1:${serverPort}`,
+    },
+    (serverUrl) =>
+      runCellsWithConcurrency(cells, 1, (cell) =>
+        runCell(ownerId, cell.id, group, { runtimeDir, evidenceDir, serverUrl }),
+      ),
+  )
+}
+
+export function runDemoPreviewCells(serverPort, cells, runCell) {
+  buildDemoOnce()
+  const concurrency = Number(process.env.FSUS_PLAYWRIGHT_CELL_CONCURRENCY) || 3
+  return withSpawnedServer(
+    {
+      command: 'pnpm',
+      args: [
+        '-C',
+        'vue/packages/demo-app',
+        'exec',
+        'vite',
+        'preview',
+        '--host',
+        '127.0.0.1',
+        '--port',
+        String(serverPort),
+        '--strictPort',
+      ],
+      serverUrl: `http://127.0.0.1:${serverPort}`,
+    },
+    () => runCellsWithConcurrency(cells, concurrency, runCell),
+  )
+}
+
 export async function runCellsWithConcurrency(cells, concurrency, workerFn) {
   const limit = Math.max(1, Math.min(cells.length, concurrency))
   const results = new Array(cells.length)
@@ -925,8 +1012,7 @@ export function writeSkipOwnerEvidence({
     endedAt: new Date().toISOString(),
   }
   const evidencePath = resolve(root, evidenceDir, 'evidence.json')
-  mkdirSync(dirname(evidencePath), { recursive: true })
-  writeFileSync(evidencePath, `${JSON.stringify(skipReceipt, null, 2)}\n`)
+  writeEvidenceJson(evidencePath, skipReceipt)
   console.log(`[${logPrefix}] owner=${ownerId} group=${group} status=success (skipped)`)
   return { status: 'success', skipped: true, evidencePath }
 }
@@ -940,6 +1026,7 @@ export async function runPlaywrightOwner({
   executeCells,
   loadReceipts,
   verifyReceipts,
+  verifyOptions,
   buildEvidenceExtra,
   includeStatusInEvidence = false,
   omitRuntimeModeInEvidence = false,
@@ -1001,16 +1088,13 @@ export async function runPlaywrightOwner({
   })
 
   const receipts = loadReceipts(resolve(root, selectedPlan.receiptDirectory))
-  const { summary, failed } = await verifyReceipts({
-    argv,
+  const { summary, failed } = await verifyReceipts(
     ownerId,
     group,
     receipts,
     selectedPlan,
-    evidenceDir,
-    commitSha,
-    execution,
-  })
+    { evidenceDir, expectedCommitSha: commitSha || undefined, ...verifyOptions },
+  )
 
   const finalStatus =
     execution.overallFailed || failed ? 'failure' : 'success'
@@ -1030,8 +1114,7 @@ export async function runPlaywrightOwner({
     ...(includeStatusInEvidence ? { status: finalStatus } : {}),
   }
   const evidencePath = resolve(root, evidenceDir, 'evidence.json')
-  mkdirSync(dirname(evidencePath), { recursive: true })
-  writeFileSync(evidencePath, `${JSON.stringify(evidence, null, 2)}\n`)
+  writeEvidenceJson(evidencePath, evidence)
 
   console.log(
     `[${logPrefix}] owner=${ownerId} group=${group} status=${finalStatus} cells=${summary.cells.length} evidence=${evidencePath.slice(root.length + 1)}`,

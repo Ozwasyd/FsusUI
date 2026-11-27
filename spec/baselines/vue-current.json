@@ -1,18 +1,18 @@
 {
   "schemaVersion": 1,
   "source": {
-    "commitSha": "e478a19ebb3ff1db70b72ad26da1ee7e1a64c993",
+    "commitSha": "6242126583b13f3b8f7b3372b125c202f77073d0",
     "packageName": "element-plus",
     "packageVersion": "1.6.0-preview.12",
     "tokenHash": "7c696c67987ededf327a97b44fa5de578cc4323b308297c763fbc26006712ed3",
     "iconHash": "6ae868b15cefc99ebec9d8a78c7602da1fb07b46ec172c43f6a3662af54be167",
     "toolVersion": "avalonia-vue-public-api-baseline@1.4.0+vue-semantic-baseline@1.4.0",
-    "inputTreeHash": "d52bfc0efad9cb64d5ffc238cc61f45aab1cdbc5f4db87e44fa2e44bb4c367f4",
+    "inputTreeHash": "7565cf638f6ce491e8354466b72f44795fbd8cf82f778c667d5906858a160bbf",
     "compilerOptionsHash": "919b1f4f85e411ccb762efdc5a2d646f412fd73928c05ad302bbfdda0ab731e4",
     "dependencyVersionHash": "79ca1004d5204ee4ddc2de6b1d63f0946d36a42283d113ce8ad01ac4adaa7d27",
     "structuredOutputSelectionHash": "b4b7c00db1f817b08a1e7bec8a6af03a505f605d2dcf16fb2e52febbf830388f",
     "contractSchemaVersion": "2.0.0",
-    "outputHash": "caf2c9cc164772d3ee32425ffc5793e98f7c7622605389f04abfeddbb10e93fc"
+    "outputHash": "bbaf8b808942af558db6d1d0368ee3dbd51467613f037ae11e0b7ae4d9d927f8"
   },
   "summary": {
     "componentModules": 93,
@@ -43268,9 +43268,9 @@
     {
       "name": "--fsus-bottom-tab-height",
       "files": [
+        "vue/packages/theme-chalk/src/mixins/_public-shell.scss",
         "vue/packages/theme-chalk/src/motion.scss",
-        "vue/packages/theme-chalk/src/public-shell-critical.scss",
-        "vue/packages/theme-chalk/src/public-shell.scss"
+        "vue/packages/theme-chalk/src/public-shell-critical.scss"
       ],
       "classification": "portable"
     },
@@ -45250,6 +45250,7 @@
       "files": [
         "vue/packages/theme-chalk/src/common/fsus-tokens.scss",
         "vue/packages/theme-chalk/src/common/var.scss",
+        "vue/packages/theme-chalk/src/mixins/_public-shell.scss",
         "vue/packages/theme-chalk/src/mixins/segmented-visual-primitive.scss",
         "vue/packages/theme-chalk/src/motion.scss",
         "vue/packages/theme-chalk/src/public-shell-critical.scss",
@@ -45339,6 +45340,7 @@
     {
       "name": "--fsus-public-shell-action-height",
       "files": [
+        "vue/packages/theme-chalk/src/mixins/_public-shell.scss",
         "vue/packages/theme-chalk/src/public-shell-critical.scss",
         "vue/packages/theme-chalk/src/public-shell.scss"
       ],
@@ -45347,6 +45349,7 @@
     {
       "name": "--fsus-public-shell-mobile-action-height",
       "files": [
+        "vue/packages/theme-chalk/src/mixins/_public-shell.scss",
         "vue/packages/theme-chalk/src/public-shell-critical.scss",
         "vue/packages/theme-chalk/src/public-shell.scss"
       ],
@@ -45375,6 +45378,7 @@
         "vue/packages/theme-chalk/src/inbox-primitives.scss",
         "vue/packages/theme-chalk/src/markdown-editor.scss",
         "vue/packages/theme-chalk/src/markdown-renderer.scss",
+        "vue/packages/theme-chalk/src/mixins/_public-shell.scss",
         "vue/packages/theme-chalk/src/mixins/segmented-visual-primitive.scss",
         "vue/packages/theme-chalk/src/perception-challenge.scss",
         "vue/packages/theme-chalk/src/public-shell-critical.scss",
@@ -45517,6 +45521,7 @@
         "vue/packages/theme-chalk/src/generated/tokens.css",
         "vue/packages/theme-chalk/src/generated/tokens.scss",
         "vue/packages/theme-chalk/src/markdown-editor.scss",
+        "vue/packages/theme-chalk/src/mixins/_public-shell.scss",
         "vue/packages/theme-chalk/src/public-shell-critical.scss",
         "vue/packages/theme-chalk/src/public-shell.scss",
         "vue/packages/theme-chalk/src/select-dropdown-v2.scss"
@@ -45613,6 +45618,7 @@
         "vue/packages/theme-chalk/src/link.scss",
         "vue/packages/theme-chalk/src/markdown-editor.scss",
         "vue/packages/theme-chalk/src/metric-primitives.scss",
+        "vue/packages/theme-chalk/src/mixins/_public-shell.scss",
         "vue/packages/theme-chalk/src/mixins/calendar-cell-primitive.scss",
         "vue/packages/theme-chalk/src/mixins/mixins.scss",
         "vue/packages/theme-chalk/src/mixins/overlay-option-row-primitive.scss",
@@ -45736,8 +45742,7 @@
         "vue/packages/theme-chalk/src/fsus-theme/_pickers-and-navigation.scss",
         "vue/packages/theme-chalk/src/generated/tokens.css",
         "vue/packages/theme-chalk/src/markdown-editor.scss",
-        "vue/packages/theme-chalk/src/public-shell-critical.scss",
-        "vue/packages/theme-chalk/src/public-shell.scss",
+        "vue/packages/theme-chalk/src/mixins/_public-shell.scss",
         "vue/packages/theme-chalk/src/tree-select.scss"
       ],
       "classification": "portable"
@@ -45845,11 +45850,11 @@
         "vue/packages/theme-chalk/src/descriptions.scss",
         "vue/packages/theme-chalk/src/generated/tokens.css",
         "vue/packages/theme-chalk/src/markdown-editor.scss",
+        "vue/packages/theme-chalk/src/mixins/_public-shell.scss",
         "vue/packages/theme-chalk/src/mixins/segmented-visual-primitive.scss",
         "vue/packages/theme-chalk/src/motion.scss",
         "vue/packages/theme-chalk/src/perception-challenge.scss",
         "vue/packages/theme-chalk/src/public-shell-critical.scss",
-        "vue/packages/theme-chalk/src/public-shell.scss",
         "vue/packages/theme-chalk/src/scrollbar.scss",
         "vue/packages/theme-chalk/src/site-header.scss",
         "vue/packages/theme-chalk/src/task-page-header.scss",
@@ -45868,11 +45873,11 @@
         "vue/packages/theme-chalk/src/generated/tokens.css",
         "vue/packages/theme-chalk/src/markdown-editor.scss",
         "vue/packages/theme-chalk/src/markdown-renderer.scss",
+        "vue/packages/theme-chalk/src/mixins/_public-shell.scss",
         "vue/packages/theme-chalk/src/mixins/segmented-visual-primitive.scss",
         "vue/packages/theme-chalk/src/motion.scss",
         "vue/packages/theme-chalk/src/perception-challenge.scss",
         "vue/packages/theme-chalk/src/public-shell-critical.scss",
-        "vue/packages/theme-chalk/src/public-shell.scss",
         "vue/packages/theme-chalk/src/scrollbar.scss",
         "vue/packages/theme-chalk/src/task-page-header.scss",
         "vue/packages/theme-chalk/src/upload.scss"
@@ -45887,10 +45892,9 @@
         "vue/packages/theme-chalk/src/generated/tokens.css",
         "vue/packages/theme-chalk/src/markdown-editor.scss",
         "vue/packages/theme-chalk/src/markdown-renderer.scss",
+        "vue/packages/theme-chalk/src/mixins/_public-shell.scss",
         "vue/packages/theme-chalk/src/notification.scss",
-        "vue/packages/theme-chalk/src/perception-challenge.scss",
-        "vue/packages/theme-chalk/src/public-shell-critical.scss",
-        "vue/packages/theme-chalk/src/public-shell.scss"
+        "vue/packages/theme-chalk/src/perception-challenge.scss"
       ],
       "classification": "portable"
     },
@@ -45906,9 +45910,8 @@
         "vue/packages/theme-chalk/src/generated/tokens.css",
         "vue/packages/theme-chalk/src/markdown-editor.scss",
         "vue/packages/theme-chalk/src/markdown-renderer.scss",
+        "vue/packages/theme-chalk/src/mixins/_public-shell.scss",
         "vue/packages/theme-chalk/src/perception-challenge.scss",
-        "vue/packages/theme-chalk/src/public-shell-critical.scss",
-        "vue/packages/theme-chalk/src/public-shell.scss",
         "vue/packages/theme-chalk/src/task-page-header.scss"
       ],
       "classification": "portable"
@@ -45931,8 +45934,7 @@
         "vue/packages/theme-chalk/src/fsus-theme/_responsive-and-specialized.scss",
         "vue/packages/theme-chalk/src/generated/tokens.css",
         "vue/packages/theme-chalk/src/markdown-editor.scss",
-        "vue/packages/theme-chalk/src/public-shell-critical.scss",
-        "vue/packages/theme-chalk/src/public-shell.scss",
+        "vue/packages/theme-chalk/src/mixins/_public-shell.scss",
         "vue/packages/theme-chalk/src/task-page-header.scss"
       ],
       "classification": "portable"
@@ -46060,8 +46062,7 @@
         "vue/packages/theme-chalk/src/generated/tokens.scss",
         "vue/packages/theme-chalk/src/loading.scss",
         "vue/packages/theme-chalk/src/markdown-editor.scss",
-        "vue/packages/theme-chalk/src/public-shell-critical.scss",
-        "vue/packages/theme-chalk/src/public-shell.scss"
+        "vue/packages/theme-chalk/src/mixins/_public-shell.scss"
       ],
       "classification": "portable"
     },

@@ -184,6 +184,18 @@ export const serializeMarkdownTable = (
   return [headerRow, sepRow, ...bodyRows].join(nl)
 }
 
+export const serializeMarkdownTableWithLineEnding = (
+  table: ParsedMarkdownTable,
+  original: string,
+  pad = false,
+): string => {
+  const serialized = serializeMarkdownTable(table, pad)
+  if (original.endsWith('\n')) {
+    return serialized.endsWith('\n') ? serialized : `${serialized}\n`
+  }
+  return serialized.endsWith('\n') ? serialized.slice(0, -1) : serialized
+}
+
 export const formatMarkdownTableBlock = (
   tableBlock: string,
   pad = false,

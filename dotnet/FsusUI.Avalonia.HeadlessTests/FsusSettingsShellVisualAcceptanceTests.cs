@@ -27,7 +27,7 @@ public class FsusSettingsShellVisualAcceptanceTests
   public void RealHeadlessSkiaRenderProducesSettingsShellEvidenceMatrix()
   {
     var outputRoot = Path.Combine(
-      FindRepositoryRoot(),
+      HeadlessRepositoryRoot.FindByWorkspace(),
       "dotnet",
       "FsusUI.Avalonia.HeadlessTests",
       "TestResults",
@@ -53,7 +53,7 @@ public class FsusSettingsShellVisualAcceptanceTests
       Assert.Equal(64, capture.Sha256.Length);
       Assert.True(capture.PixelSize.Width > 0);
       Assert.True(capture.PixelSize.Height > 0);
-      Assert.True(File.Exists(Path.Combine(FindRepositoryRoot(), capture.File)));
+      Assert.True(File.Exists(Path.Combine(HeadlessRepositoryRoot.FindByWorkspace(), capture.File)));
     });
 
     var manifestPath = Path.Combine(outputRoot, "settings-shell-render-manifest.json");
@@ -251,9 +251,9 @@ public class FsusSettingsShellVisualAcceptanceTests
     window.Close();
 
     return new SettingsShellCapture(
-      Path.GetRelativePath(FindRepositoryRoot(), outputPath).Replace('\\', '/'),
+      Path.GetRelativePath(HeadlessRepositoryRoot.FindByWorkspace(), outputPath).Replace('\\', '/'),
       Convert.ToHexStringLower(SHA256.HashData(File.ReadAllBytes(outputPath))),
-      Path.GetRelativePath(FindRepositoryRoot(), automationPath).Replace('\\', '/'),
+      Path.GetRelativePath(HeadlessRepositoryRoot.FindByWorkspace(), automationPath).Replace('\\', '/'),
       Convert.ToHexStringLower(SHA256.HashData(File.ReadAllBytes(automationPath))),
       new PixelDimension(bitmap.PixelSize.Width, bitmap.PixelSize.Height),
       scenario.Name,
@@ -366,21 +366,6 @@ public class FsusSettingsShellVisualAcceptanceTests
       });
     }
     return content;
-  }
-
-  private static string FindRepositoryRoot()
-  {
-    for (var directory = new DirectoryInfo(AppContext.BaseDirectory);
-      directory is not null;
-      directory = directory.Parent)
-    {
-      if (File.Exists(Path.Combine(directory.FullName, "pnpm-workspace.yaml")))
-      {
-        return directory.FullName;
-      }
-    }
-
-    throw new DirectoryNotFoundException("Could not locate the FsusUI repository root.");
   }
 
   private sealed record RenderScenario(

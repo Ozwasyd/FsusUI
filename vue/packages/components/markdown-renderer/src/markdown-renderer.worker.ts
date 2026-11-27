@@ -1,8 +1,5 @@
-import type {
-  MarkdownRenderChunk,
-  MarkdownRenderRequest,
-  MarkdownRuntimeChunkResult,
-} from '@element-plus/wasm'
+import type { MarkdownRenderRequest } from '@element-plus/wasm'
+import type { ParserDocument, ParserResponse } from './markdown-parser.worker'
 
 type MarkdownWorkerRunRequest = {
   generation: number
@@ -23,16 +20,11 @@ type MarkdownWorkerRequest =
   | MarkdownWorkerRunRequest
   | MarkdownWorkerCancelRequest
 
-type MarkdownWorkerDocument = {
-  metadata: MarkdownRuntimeChunkResult
-  units: readonly MarkdownRenderChunk[]
-} | null
-
 type MarkdownWorkerResponse =
   | {
       generation: number
       id: number
-      result: MarkdownWorkerDocument
+      result: ParserDocument | null
       status?: 'complete'
       timings?: { computeDurationMs?: number }
     }
@@ -42,13 +34,6 @@ type MarkdownWorkerResponse =
       id: number
     }
   | { generation: number; id: number; status: 'aborted' }
-
-type ParserResponse =
-  | { id: number; result: Exclude<MarkdownWorkerDocument, null> }
-  | {
-      error: { code?: string; message: string; name: string }
-      id: number
-    }
 
 const workerScope = self as unknown as {
   onmessage: ((event: MessageEvent<MarkdownWorkerRequest>) => void) | null
@@ -135,5 +120,3 @@ workerScope.onmessage = (event) => {
   active = { generation, id: message.id }
   ensureParser().postMessage({ id: message.id, request: message.request })
 }
-
-export {}

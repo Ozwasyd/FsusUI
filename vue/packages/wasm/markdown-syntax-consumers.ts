@@ -2,7 +2,6 @@ import { MarkdownRuntimeError } from './markdown-runtime-error'
 import type {
   MarkdownStableProjection,
   MarkdownStableSyntaxNode,
-  MarkdownSyntaxIdentityStatus,
 } from './markdown-syntax-identity'
 
 export interface MarkdownIdentityConsumerEntry {
@@ -62,13 +61,17 @@ const requireStableProjection = (projection: MarkdownStableProjection) => {
   return projection
 }
 
-const resolveThrough = (
-  projection: MarkdownStableProjection,
-  id: string,
-): {
-  readonly status: MarkdownSyntaxIdentityStatus
-  readonly node?: MarkdownStableSyntaxNode
-} => projection.resolve(id)
+const entryFromNode = <Kind extends string>(
+  node: MarkdownStableSyntaxNode,
+  kind: Kind,
+) => ({
+  id: node.id,
+  kind,
+  range: Object.freeze({
+    start: node.rawRange.start,
+    end: node.rawRange.end,
+  }),
+})
 
 export const createMarkdownOutlineEntries = (
   projection: MarkdownStableProjection,
@@ -80,12 +83,7 @@ export const createMarkdownOutlineEntries = (
       .map((node) => {
         const heading = headingTitleOf(stable.normalizedSource, node)
         return Object.freeze({
-          id: node.id,
-          kind: 'heading' as const,
-          range: Object.freeze({
-            start: node.rawRange.start,
-            end: node.rawRange.end,
-          }),
+          ...entryFromNode(node, 'heading'),
           title: heading.title,
           level: heading.level,
         })
@@ -100,16 +98,7 @@ export const createMarkdownTableEntries = (
   return Object.freeze(
     stable.nodes
       .filter((node) => node.kind === 'table')
-      .map((node) =>
-        Object.freeze({
-          id: node.id,
-          kind: 'table' as const,
-          range: Object.freeze({
-            start: node.rawRange.start,
-            end: node.rawRange.end,
-          }),
-        }),
-      ),
+      .map((node) => Object.freeze(entryFromNode(node, 'table'))),
   )
 }
 
@@ -134,12 +123,7 @@ export const searchMarkdownStableProjection = (
       )
       .map((node) =>
         Object.freeze({
-          id: node.id,
-          kind: node.kind,
-          range: Object.freeze({
-            start: node.rawRange.start,
-            end: node.rawRange.end,
-          }),
+          ...entryFromNode(node, node.kind),
           query: normalizedQuery,
         }),
       ),
@@ -182,19 +166,7 @@ export const evaluateMarkdownSearchMutations = (
 export const resolveMarkdownConsumerIdentity = (
   projection: MarkdownStableProjection,
   id: string,
-) => resolveThrough(requireStableProjection(projection), id)
-
-const entryFromNode = (
-  node: MarkdownStableSyntaxNode,
-): MarkdownIdentityConsumerEntry =>
-  Object.freeze({
-    id: node.id,
-    kind: node.kind,
-    range: Object.freeze({
-      start: node.rawRange.start,
-      end: node.rawRange.end,
-    }),
-  })
+) => requireStableProjection(projection).resolve(id)
 
 export const createMarkdownTechnicalEntries = (
   projection: MarkdownStableProjection,
@@ -208,12 +180,7 @@ export const createMarkdownTechnicalEntries = (
         } =>
           node.kind === 'code' || node.kind === 'latex' || node.kind === 'mermaid',
       )
-      .map((node) =>
-        Object.freeze({
-          ...entryFromNode(node),
-          kind: node.kind,
-        }),
-      ),
+      .map((node) => Object.freeze(entryFromNode(node, node.kind))),
   )
 }
 
@@ -228,11 +195,6 @@ export const createMarkdownPropertyEntries = (
           kind: MarkdownPropertyEntry['kind']
         } => node.kind === 'link' || node.kind === 'image',
       )
-      .map((node) =>
-        Object.freeze({
-          ...entryFromNode(node),
-          kind: node.kind,
-        }),
-      ),
+      .map((node) => Object.freeze(entryFromNode(node, node.kind))),
   )
 }

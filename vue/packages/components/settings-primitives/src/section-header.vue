@@ -1,5 +1,5 @@
 <template>
-  <header :class="headerKls">
+  <header :class="sectionKls">
     <div :class="ns.e('heading')">
       <component :is="titleTag" v-if="hasTitle()" :class="ns.e('title')">
         <slot name="title">{{ title }}</slot>
@@ -15,8 +15,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, useSlots } from 'vue'
-import { useNamespace } from '@element-plus/hooks'
+import { useSectionHeading } from './section-heading'
 import { sectionHeaderProps } from './shared'
 
 defineOptions({
@@ -24,15 +23,6 @@ defineOptions({
 })
 
 const props = defineProps(sectionHeaderProps)
-const slots = useSlots()
-const ns = useNamespace('section-header')
-
-const hasTitle = () => Boolean(props.title || slots.title)
-const hasDescription = () => Boolean(props.description || slots.description)
-const hasActions = () => Boolean(slots.actions)
-const headerKls = computed(() => [
-  ns.b(),
-  ns.m(props.density),
-  ns.is('danger', props.danger),
-])
+const { ns, hasTitle, hasDescription, hasActions, sectionKls } =
+  useSectionHeading('section-header', props)
 </script>

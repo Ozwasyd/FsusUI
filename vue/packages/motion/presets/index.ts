@@ -15,6 +15,28 @@ const terminal: MotionStyleState = {
   filter: 'none',
 }
 const opacityTerminal: MotionStyleState = { opacity: '1' }
+// Keep enter and leave states independent even when their values are mirrored.
+const reversibleStates = (
+  from: MotionStyleState,
+  to: MotionStyleState,
+  reduced = terminal,
+) => ({
+  from,
+  to,
+  reduced,
+  leaveFrom: { ...to },
+  leaveTo: { ...from },
+})
+
+const opacityStates = (opacity: string) =>
+  reversibleStates({ opacity }, { opacity: '1' }, opacityTerminal)
+
+const verticalStates = (distance: string, opacity = '0') =>
+  reversibleStates(
+    { opacity, transform: `translate3d(0, ${distance}, 0)` },
+    { opacity: '1', transform: none },
+  )
+
 const quietSurfaces = [
   'ordinary-content',
   'reading-surface',
@@ -64,17 +86,16 @@ export const motionPresetAliases = {
 // resolves the bundle (`duration`, `easing`, `distance`, `stagger`,
 // `intensity`) from `motionTokens.patterns[pattern][tier]` so the 5-axis
 // concern no longer leaks into the preset layer.
-export const motionPresets: Record<MotionPresetName, MotionPresetDefinition> = {
+const createMotionPresets = (): Record<
+  MotionPresetName,
+  MotionPresetDefinition
+> => ({
   'surface-settle': {
     name: 'surface-settle',
     pattern: 'standard',
     tier: 'short',
     surfaces: quietSurfaces,
-    from: { opacity: '0.94' },
-    to: { opacity: '1' },
-    reduced: opacityTerminal,
-    leaveFrom: { opacity: '1' },
-    leaveTo: { opacity: '0.94' },
+    ...opacityStates('0.94'),
   },
   'paper-settle': {
     name: 'paper-settle',
@@ -82,39 +103,24 @@ export const motionPresets: Record<MotionPresetName, MotionPresetDefinition> = {
     tier: 'short',
     surfaces: ['ordinary-content', 'admin-operation-surface'],
     forbiddenSurfaces: ['reading-surface'],
-    from: {
-      opacity: '0.96',
-      transform: `translate3d(0, ${motionCssVars.patterns.standard.short.distance}, 0)`,
-    },
-    to: { opacity: '1', transform: none },
-    reduced: terminal,
-    leaveFrom: { opacity: '1', transform: none },
-    leaveTo: {
-      opacity: '0.96',
-      transform: `translate3d(0, ${motionCssVars.patterns.standard.short.distance}, 0)`,
-    },
+    ...verticalStates(motionCssVars.patterns.standard.short.distance, '0.96'),
   },
   'route-settle': {
     name: 'route-settle',
     pattern: 'decel',
     tier: 'short',
     surfaces: ['route-surface', 'reading-surface'],
-    from: { opacity: '0.72', filter: 'none' },
-    to: { opacity: '1', filter: 'none' },
-    reduced: terminal,
-    leaveFrom: { opacity: '1', filter: 'none' },
-    leaveTo: { opacity: '0.72', filter: 'none' },
+    ...reversibleStates(
+      { opacity: '0.72', filter: 'none' },
+      { opacity: '1', filter: 'none' },
+    ),
   },
   'ownership-transfer-snapshot': {
     name: 'ownership-transfer-snapshot',
     pattern: 'decel',
     tier: 'long',
     surfaces: ['ownership-transfer-surface', 'route-surface'],
-    from: { opacity: '0' },
-    to: { opacity: '1' },
-    reduced: opacityTerminal,
-    leaveFrom: { opacity: '1' },
-    leaveTo: { opacity: '0' },
+    ...opacityStates('0'),
   },
   'dialog-settle': {
     name: 'dialog-settle',
@@ -122,17 +128,7 @@ export const motionPresets: Record<MotionPresetName, MotionPresetDefinition> = {
     tier: 'short',
     surfaces: overlaySurfaces,
     forbiddenSurfaces: ['ordinary-content', 'reading-surface'],
-    from: {
-      opacity: '0',
-      transform: `translate3d(0, ${motionCssVars.patterns.emphasized.short.distance}, 0)`,
-    },
-    to: { opacity: '1', transform: none },
-    reduced: terminal,
-    leaveFrom: { opacity: '1', transform: none },
-    leaveTo: {
-      opacity: '0',
-      transform: `translate3d(0, ${motionCssVars.patterns.emphasized.short.distance}, 0)`,
-    },
+    ...verticalStates(motionCssVars.patterns.emphasized.short.distance),
   },
   'sheet-settle': {
     name: 'sheet-settle',
@@ -140,17 +136,7 @@ export const motionPresets: Record<MotionPresetName, MotionPresetDefinition> = {
     tier: 'long',
     surfaces: ['overlay-sheet-dialog-surface', 'mobile-dock-surface'],
     forbiddenSurfaces: ['reading-surface', 'ordinary-content'],
-    from: {
-      opacity: '0',
-      transform: `translate3d(0, ${motionCssVars.patterns.emphasized.long.distance}, 0)`,
-    },
-    to: { opacity: '1', transform: none },
-    reduced: terminal,
-    leaveFrom: { opacity: '1', transform: none },
-    leaveTo: {
-      opacity: '0',
-      transform: `translate3d(0, ${motionCssVars.patterns.emphasized.long.distance}, 0)`,
-    },
+    ...verticalStates(motionCssVars.patterns.emphasized.long.distance),
   },
   'overlay-settle': {
     name: 'overlay-settle',
@@ -158,11 +144,7 @@ export const motionPresets: Record<MotionPresetName, MotionPresetDefinition> = {
     tier: 'long',
     surfaces: ['overlay-sheet-dialog-surface'],
     forbiddenSurfaces: ['reading-surface', 'ordinary-content'],
-    from: { opacity: '0' },
-    to: { opacity: '1' },
-    reduced: opacityTerminal,
-    leaveFrom: { opacity: '1' },
-    leaveTo: { opacity: '0' },
+    ...opacityStates('0'),
   },
   'dock-settle': {
     name: 'dock-settle',
@@ -170,17 +152,7 @@ export const motionPresets: Record<MotionPresetName, MotionPresetDefinition> = {
     tier: 'short',
     surfaces: ['mobile-dock-surface'],
     forbiddenSurfaces: ['reading-surface', 'ordinary-content'],
-    from: {
-      opacity: '0',
-      transform: `translate3d(0, ${motionCssVars.patterns.standard.short.distance}, 0)`,
-    },
-    to: { opacity: '1', transform: none },
-    reduced: terminal,
-    leaveFrom: { opacity: '1', transform: none },
-    leaveTo: {
-      opacity: '0',
-      transform: `translate3d(0, ${motionCssVars.patterns.standard.short.distance}, 0)`,
-    },
+    ...verticalStates(motionCssVars.patterns.standard.short.distance),
   },
   'toast-receipt': {
     name: 'toast-receipt',
@@ -201,11 +173,7 @@ export const motionPresets: Record<MotionPresetName, MotionPresetDefinition> = {
     pattern: 'accel',
     tier: 'short',
     surfaces: receiptSurfaces,
-    from: { opacity: '0.92' },
-    to: { opacity: '1' },
-    reduced: opacityTerminal,
-    leaveFrom: { opacity: '1' },
-    leaveTo: { opacity: '0.92' },
+    ...opacityStates('0.92'),
   },
   'lightbox-focus': {
     name: 'lightbox-focus',
@@ -225,17 +193,7 @@ export const motionPresets: Record<MotionPresetName, MotionPresetDefinition> = {
     tier: 'short',
     surfaces: ['list-table-surface', 'admin-operation-surface'],
     forbiddenSurfaces: ['reading-surface'],
-    from: {
-      opacity: '0',
-      transform: `translate3d(0, ${motionCssVars.patterns.standard.short.distance}, 0)`,
-    },
-    to: { opacity: '1', transform: none },
-    reduced: terminal,
-    leaveFrom: { opacity: '1', transform: none },
-    leaveTo: {
-      opacity: '0',
-      transform: `translate3d(0, ${motionCssVars.patterns.standard.short.distance}, 0)`,
-    },
+    ...verticalStates(motionCssVars.patterns.standard.short.distance),
   },
   'index-list-settle': {
     name: 'index-list-settle',
@@ -244,105 +202,66 @@ export const motionPresets: Record<MotionPresetName, MotionPresetDefinition> = {
     stagger: motionCssVars.patterns.standard.short.stagger,
     surfaces: ['list-table-surface', 'admin-operation-surface'],
     forbiddenSurfaces: ['reading-surface'],
-    from: {
-      opacity: '0',
-      transform: `translate3d(0, ${motionCssVars.patterns.standard.short.distance}, 0)`,
-    },
-    to: { opacity: '1', transform: none },
-    reduced: terminal,
-    leaveFrom: { opacity: '1', transform: none },
-    leaveTo: {
-      opacity: '0',
-      transform: `translate3d(0, ${motionCssVars.patterns.standard.short.distance}, 0)`,
-    },
+    ...verticalStates(motionCssVars.patterns.standard.short.distance),
   },
   'reading-title-settle': {
     name: 'reading-title-settle',
     pattern: 'standard',
     tier: 'long',
     surfaces: ['reading-surface'],
-    from: { opacity: '0.92' },
-    to: { opacity: '1' },
-    reduced: opacityTerminal,
-    leaveFrom: { opacity: '1' },
-    leaveTo: { opacity: '0.92' },
+    ...opacityStates('0.92'),
   },
   'media-develop': {
     name: 'media-develop',
     pattern: 'standard',
     tier: 'long',
     surfaces: ['reading-surface', 'media-preview-surface'],
-    from: { opacity: '0', filter: 'none' },
-    to: { opacity: '1', filter: 'none' },
-    reduced: terminal,
-    leaveFrom: { opacity: '1', filter: 'none' },
-    leaveTo: { opacity: '0', filter: 'none' },
+    ...reversibleStates(
+      { opacity: '0', filter: 'none' },
+      { opacity: '1', filter: 'none' },
+    ),
   },
   'media-focus': {
     name: 'media-focus',
     pattern: 'standard',
     tier: 'short',
     surfaces: ['reading-surface', 'media-preview-surface'],
-    from: { opacity: '0.96' },
-    to: { opacity: '1' },
-    reduced: opacityTerminal,
-    leaveFrom: { opacity: '1' },
-    leaveTo: { opacity: '0.96' },
+    ...opacityStates('0.96'),
   },
   'code-ready': {
     name: 'code-ready',
     pattern: 'standard',
     tier: 'short',
     surfaces: ['reading-surface'],
-    from: { opacity: '0.9' },
-    to: { opacity: '1' },
-    reduced: opacityTerminal,
-    leaveFrom: { opacity: '1' },
-    leaveTo: { opacity: '0.9' },
+    ...opacityStates('0.9'),
   },
   'grid-settle': {
     name: 'grid-settle',
     pattern: 'standard',
     tier: 'short',
     surfaces: ['reading-surface', 'list-table-surface'],
-    from: { opacity: '0.94' },
-    to: { opacity: '1' },
-    reduced: opacityTerminal,
-    leaveFrom: { opacity: '1' },
-    leaveTo: { opacity: '0.94' },
+    ...opacityStates('0.94'),
   },
   'quote-line': {
     name: 'quote-line',
     pattern: 'standard',
     tier: 'short',
     surfaces: ['reading-surface'],
-    from: { opacity: '0.88' },
-    to: { opacity: '1' },
-    reduced: opacityTerminal,
-    leaveFrom: { opacity: '1' },
-    leaveTo: { opacity: '0.88' },
+    ...opacityStates('0.88'),
   },
   'toc-anchor': {
     name: 'toc-anchor',
     pattern: 'standard',
     tier: 'short',
     surfaces: ['reading-surface'],
-    from: { opacity: '0.86' },
-    to: { opacity: '1' },
-    reduced: opacityTerminal,
-    leaveFrom: { opacity: '1' },
-    leaveTo: { opacity: '0.86' },
+    ...opacityStates('0.86'),
   },
   'anchor-mark': {
     name: 'anchor-mark',
     pattern: 'standard',
     tier: 'short',
     surfaces: ['reading-surface'],
-    from: { opacity: '0.82' },
-    to: { opacity: '1' },
-    reduced: opacityTerminal,
-    leaveFrom: { opacity: '1' },
-    leaveTo: { opacity: '0.82' },
+    ...opacityStates('0.82'),
   },
   'reading-progress-transform': {
     name: 'reading-progress-transform',
@@ -360,13 +279,12 @@ export const motionPresets: Record<MotionPresetName, MotionPresetDefinition> = {
     pattern: 'standard',
     tier: 'short',
     surfaces: ['reading-surface', 'toast-banner-surface'],
-    from: { opacity: '0.88' },
-    to: { opacity: '1' },
-    reduced: opacityTerminal,
-    leaveFrom: { opacity: '1' },
-    leaveTo: { opacity: '0.88' },
+    ...opacityStates('0.88'),
   },
-}
+})
+
+// Consumers that only use the legacy aliases can omit the preset table.
+export const motionPresets = /* @__PURE__ */ createMotionPresets()
 
 export const readingMotionPresetNames = [
   'reading-title-settle',

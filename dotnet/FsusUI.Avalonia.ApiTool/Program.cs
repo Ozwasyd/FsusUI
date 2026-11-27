@@ -98,8 +98,7 @@ internal static class Program
         ContractSchemaVersion = "2.0.0",
       },
       SemanticTypes = types,
-      TokenThemeContract = ExtractTokenThemeContract(
-        sourceSemantics.TokenThemeContract),
+      TokenThemeContract = sourceSemantics.TokenThemeContract,
     };
   }
 
@@ -109,47 +108,6 @@ internal static class Program
     var payload = $"{JsonSerializer.Serialize(baseline, JsonOptions)}\n";
     return Convert.ToHexString(
       SHA256.HashData(Encoding.UTF8.GetBytes(payload))).ToLowerInvariant();
-  }
-
-  private static SemanticTokenThemeContract? ExtractTokenThemeContract(
-    SourceTokenThemeContract? source)
-  {
-    if (source is null) return null;
-    return new SemanticTokenThemeContract
-    {
-      CanonicalAuthority = source.CanonicalAuthority,
-      GeneratedMetadataAuthority = source.GeneratedMetadataAuthority,
-      GeneratedXamlAuthority = source.GeneratedXamlAuthority,
-      GeneratedCsharpAuthority = source.GeneratedCsharpAuthority,
-      ContractDeclared = source.ContractDeclared,
-      RenderedEvidenceVerified = source.RenderedEvidenceVerified,
-      Definitions = source.Definitions
-        .Select(definition => new SemanticTokenDefinition
-        {
-          CanonicalName = definition.CanonicalName,
-          Owner = definition.Owner,
-          GeneratedOutputs = definition.GeneratedOutputs,
-          ResourceKeys = definition.ResourceKeys,
-          CsharpMembers = definition.CsharpMembers,
-          DeclarationAuthority = definition.DeclarationAuthority,
-        })
-        .ToList(),
-      Dependencies = source.Dependencies
-        .Select(dependency => new SemanticTokenDependency
-        {
-          Kind = dependency.Kind,
-          Authority = dependency.Authority,
-          SourceFile = dependency.SourceFile,
-          SourceMember = dependency.SourceMember,
-          Dependency = dependency.Dependency,
-          CanonicalName = dependency.CanonicalName,
-          Resolved = dependency.Resolved,
-          OwnerType = dependency.OwnerType,
-          Ownership = dependency.Ownership,
-          OwnerExpression = dependency.OwnerExpression,
-        })
-        .ToList(),
-    };
   }
 
   private static SemanticType ExtractType(
@@ -189,23 +147,8 @@ internal static class Program
       Deprecated = obsolete is not null,
       DeprecationMessage = obsolete?.Message,
       GenericParameters =
-        sourceTypeSemantics?.GenericParameters.Count > 0
-          ? sourceTypeSemantics.GenericParameters
-            .Select(parameter => new SemanticGenericParameter
-            {
-              Name = parameter.Name,
-              Position = parameter.Position,
-              Variance = parameter.Variance,
-              ReferenceTypeConstraint = parameter.ReferenceTypeConstraint,
-              ReferenceTypeConstraintNullable =
-                parameter.ReferenceTypeConstraintNullable,
-              ValueTypeConstraint = parameter.ValueTypeConstraint,
-              UnmanagedTypeConstraint = parameter.UnmanagedTypeConstraint,
-              NotNullConstraint = parameter.NotNullConstraint,
-              ConstructorConstraint = parameter.ConstructorConstraint,
-              TypeConstraints = parameter.TypeConstraints,
-            })
-            .ToList()
+        sourceTypeSemantics?.GenericParameters is { Count: > 0 } genericParameters
+          ? genericParameters
           : null,
       ContentProperty =
         contentRegions.Count == 1
@@ -234,15 +177,9 @@ internal static class Program
       return null;
     }
 
-    var declaredPseudoClasses = sourceSemantics.DeclaredPseudoClasses
-      .OrderBy(name => name, StringComparer.Ordinal)
-      .ToList();
-    var pseudoClassBindings = sourceSemantics.PseudoClassBindings
-      .Select(StateBinding)
-      .ToList();
-    var classBindings = sourceSemantics.ClassBindings
-      .Select(StateBinding)
-      .ToList();
+    var declaredPseudoClasses = sourceSemantics.DeclaredPseudoClasses;
+    var pseudoClassBindings = sourceSemantics.PseudoClassBindings;
+    var classBindings = sourceSemantics.ClassBindings;
     var boundPseudoClasses = pseudoClassBindings
       .Where(binding => binding.NameKnown)
       .Select(binding => binding.Name!)
@@ -271,21 +208,6 @@ internal static class Program
     };
   }
 
-  private static SemanticStateBinding StateBinding(
-    SourceStateBindingSemantics binding) =>
-    new()
-    {
-      Kind = binding.Kind,
-      Action = binding.Action,
-      NameKnown = binding.NameKnown,
-      Name = binding.Name,
-      NameExpression = binding.NameExpression,
-      ConditionExpression = binding.ConditionExpression,
-      PublicDependencies = binding.PublicDependencies,
-      SourceMember = binding.SourceMember,
-      Provider = binding.Provider,
-    };
-
   private static SemanticAutomationContract? ExtractAutomationContract(
     SourceTypeSemantics? sourceSemantics)
   {
@@ -294,21 +216,7 @@ internal static class Program
       return null;
     }
 
-    var mappings = sourceSemantics.AutomationMappings
-      .Select(mapping => new SemanticAutomationMapping
-      {
-        Semantic = mapping.Semantic,
-        Provider = mapping.Provider,
-        Authority = mapping.Authority,
-        TargetKind = mapping.TargetKind,
-        TargetExpression = mapping.TargetExpression,
-        ValueKnown = mapping.ValueKnown,
-        Value = mapping.Value,
-        ValueExpression = mapping.ValueExpression,
-        PublicDependencies = mapping.PublicDependencies,
-        SourceMember = mapping.SourceMember,
-      })
-      .ToList();
+    var mappings = sourceSemantics.AutomationMappings;
     return new SemanticAutomationContract
     {
       ObservationAuthorities = mappings
@@ -698,43 +606,7 @@ internal sealed class SemanticBaseline
 
   public List<SemanticType> SemanticTypes { get; init; } = [];
 
-  public SemanticTokenThemeContract? TokenThemeContract { get; init; }
-}
-
-internal sealed class SemanticTokenThemeContract
-{
-  public string CanonicalAuthority { get; init; } = "";
-  public string GeneratedMetadataAuthority { get; init; } = "";
-  public string GeneratedXamlAuthority { get; init; } = "";
-  public string GeneratedCsharpAuthority { get; init; } = "";
-  public bool ContractDeclared { get; init; }
-  public bool RenderedEvidenceVerified { get; init; }
-  public List<SemanticTokenDefinition> Definitions { get; init; } = [];
-  public List<SemanticTokenDependency> Dependencies { get; init; } = [];
-}
-
-internal sealed class SemanticTokenDefinition
-{
-  public string CanonicalName { get; init; } = "";
-  public string Owner { get; init; } = "";
-  public List<string> GeneratedOutputs { get; init; } = [];
-  public List<string> ResourceKeys { get; init; } = [];
-  public List<string> CsharpMembers { get; init; } = [];
-  public string DeclarationAuthority { get; init; } = "";
-}
-
-internal sealed class SemanticTokenDependency
-{
-  public string Kind { get; init; } = "";
-  public string Authority { get; init; } = "";
-  public string SourceFile { get; init; } = "";
-  public string SourceMember { get; init; } = "";
-  public string Dependency { get; init; } = "";
-  public string? CanonicalName { get; init; }
-  public bool Resolved { get; init; }
-  public string? OwnerType { get; init; }
-  public string Ownership { get; init; } = "";
-  public string? OwnerExpression { get; init; }
+  public SourceTokenThemeContract? TokenThemeContract { get; init; }
 }
 
 internal sealed class BaselineSource
@@ -770,7 +642,7 @@ internal sealed class SemanticType
 
   public string? DeprecationMessage { get; init; }
 
-  public List<SemanticGenericParameter>? GenericParameters { get; init; }
+  public List<SourceGenericParameterSemantics>? GenericParameters { get; init; }
 
   public string? ContentProperty { get; init; }
 
@@ -791,29 +663,6 @@ internal sealed class SemanticType
   public List<SemanticMethod> Methods { get; init; } = [];
 
   public List<SemanticEnumMember>? EnumMembers { get; init; }
-}
-
-internal sealed class SemanticGenericParameter
-{
-  public string Name { get; init; } = "";
-
-  public int Position { get; init; }
-
-  public string Variance { get; init; } = "";
-
-  public bool ReferenceTypeConstraint { get; init; }
-
-  public bool? ReferenceTypeConstraintNullable { get; init; }
-
-  public bool ValueTypeConstraint { get; init; }
-
-  public bool UnmanagedTypeConstraint { get; init; }
-
-  public bool NotNullConstraint { get; init; }
-
-  public bool ConstructorConstraint { get; init; }
-
-  public List<string> TypeConstraints { get; init; } = [];
 }
 
 internal sealed class SemanticCommand
@@ -847,7 +696,7 @@ internal sealed class SemanticStateContract
 
   public List<string> DeclaredPseudoClasses { get; init; } = [];
 
-  public List<SemanticStateBinding> PseudoClassBindings { get; init; } = [];
+  public List<SourceStateBindingSemantics> PseudoClassBindings { get; init; } = [];
 
   public bool PseudoClassContractKnown { get; init; }
 
@@ -857,30 +706,9 @@ internal sealed class SemanticStateContract
 
   public bool ClassContractDeclared { get; init; }
 
-  public List<SemanticStateBinding> ClassBindings { get; init; } = [];
+  public List<SourceStateBindingSemantics> ClassBindings { get; init; } = [];
 
   public bool ClassNamesResolved { get; init; }
-}
-
-internal sealed class SemanticStateBinding
-{
-  public string Kind { get; init; } = "";
-
-  public string Action { get; init; } = "";
-
-  public bool NameKnown { get; init; }
-
-  public string? Name { get; init; }
-
-  public string? NameExpression { get; init; }
-
-  public string? ConditionExpression { get; init; }
-
-  public List<string> PublicDependencies { get; init; } = [];
-
-  public string SourceMember { get; init; } = "";
-
-  public string Provider { get; init; } = "";
 }
 
 internal sealed class SemanticAutomationContract
@@ -895,30 +723,7 @@ internal sealed class SemanticAutomationContract
 
   public List<string> ObservedSemantics { get; init; } = [];
 
-  public List<SemanticAutomationMapping> Mappings { get; init; } = [];
-}
-
-internal sealed class SemanticAutomationMapping
-{
-  public string Semantic { get; init; } = "";
-
-  public string Provider { get; init; } = "";
-
-  public string Authority { get; init; } = "";
-
-  public string TargetKind { get; init; } = "";
-
-  public string? TargetExpression { get; init; }
-
-  public bool ValueKnown { get; init; }
-
-  public object? Value { get; init; }
-
-  public string? ValueExpression { get; init; }
-
-  public List<string> PublicDependencies { get; init; } = [];
-
-  public string SourceMember { get; init; } = "";
+  public List<SourceAutomationMappingSemantics> Mappings { get; init; } = [];
 }
 
 internal sealed class SemanticContentRegion

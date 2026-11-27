@@ -1,14 +1,11 @@
-import {
-  createMarkdownEditorProjection,
-  type MarkdownDocumentIdentity,
-} from '../../../wasm/markdown-runtime'
+import type { MarkdownDocumentIdentity } from '../../../wasm/markdown-runtime'
 import type {
   MarkdownEditorSelection,
   MarkdownEditorTransaction,
 } from './markdown-editor-transaction'
 import {
   parseMarkdownTableBlock,
-  serializeMarkdownTable,
+  serializeMarkdownTableWithLineEnding,
   type ParsedMarkdownTable,
 } from './markdown-editor-table'
 import {
@@ -18,9 +15,11 @@ import {
   planMarkdownTableInsertRow,
   resolveMarkdownTableEntry,
   resolveMarkdownTableIdentityStatus,
+  resolveSerializedMarkdownTableSelection,
   resolveMarkdownTableCellAtOffset,
   resolveMarkdownTableCellCoordinates,
   type MarkdownTableCellIdentity,
+  type MarkdownTableRejection,
 } from './markdown-editor-table-structure'
 
 export type MarkdownTableNavKey =
@@ -106,6 +105,18 @@ export const moveMarkdownTableCell = (
   return { ...cell, row, column, status: 'current' }
 }
 
+const matchesCellAnchor = (
+  cell: MarkdownTableCellIdentity,
+  resolvedCell: MarkdownTableCellIdentity | null,
+): boolean =>
+  Boolean(
+    cell.cellId &&
+    cell.anchor &&
+    resolvedCell?.anchor &&
+    resolvedCell.anchor.start === cell.anchor.start &&
+    resolvedCell.anchor.end === cell.anchor.end,
+  )
+
 export const resolveMarkdownTableInputIntent = (
   context: MarkdownTableInputContext,
 ): MarkdownTableInputResult => {
@@ -121,35 +132,33 @@ export const resolveMarkdownTableInputIntent = (
     structuredSelection,
   } = context
 
+  const withoutTransaction = (
+    action: MarkdownTableInputAction = 'noop',
+    nextCell = cell,
+    screenReaderText = '',
+  ): MarkdownTableInputResult => ({
+    action,
+    transaction: null,
+    nextCell,
+    screenReaderText,
+  })
+  const reject = (
+    rejected: NonNullable<MarkdownTableInputResult['rejected']>,
+    nextCell = cell,
+  ): MarkdownTableInputResult => ({
+    ...withoutTransaction('noop', nextCell),
+    rejected,
+  })
+
   if (compositionActive) {
     return {
-      action: 'composition',
-      transaction: null,
-      nextCell: cell,
-      screenReaderText: '',
+      ...withoutTransaction('composition'),
       rejected: 'composition-active',
     }
   }
-
-  if (cell.status !== 'current') {
-    return {
-      action: 'noop',
-      transaction: null,
-      nextCell: cell,
-      screenReaderText: '',
-      rejected: 'invalid-cell',
-    }
-  }
-
-  if (expectedRevision !== undefined && expectedRevision < 0) {
-    return {
-      action: 'noop',
-      transaction: null,
-      nextCell: cell,
-      screenReaderText: '',
-      rejected: 'stale',
-    }
-  }
+  if (cell.status !== 'current') return reject('invalid-cell')
+  if (expectedRevision !== undefined && expectedRevision < 0)
+    return reject('stale')
 
   const tableIdentityStatus = resolveMarkdownTableIdentityStatus(
     source,
@@ -157,25 +166,15 @@ export const resolveMarkdownTableInputIntent = (
     cell.tableId,
   )
   if (tableIdentityStatus !== 'current') {
-    return {
-      action: 'noop',
-      transaction: null,
-      nextCell: { ...cell, status: 'deleted' },
-      screenReaderText: '',
-      rejected: 'stale',
-    }
+    return reject('stale', { ...cell, status: 'deleted' })
   }
 
-  const table = resolveMarkdownTableEntry(source, documentIdentity, cell.tableId)
-  if (!table) {
-    return {
-      action: 'noop',
-      transaction: null,
-      nextCell: { ...cell, status: 'deleted' },
-      screenReaderText: '',
-      rejected: 'missing',
-    }
-  }
+  const table = resolveMarkdownTableEntry(
+    source,
+    documentIdentity,
+    cell.tableId,
+  )
+  if (!table) return reject('missing', { ...cell, status: 'deleted' })
 
   const resolvedCell = resolveMarkdownTableCellCoordinates(
     source,
@@ -184,33 +183,13 @@ export const resolveMarkdownTableInputIntent = (
     cell.row,
     cell.column,
   )
-  if (
-    !cell.cellId ||
-    !cell.anchor ||
-    !resolvedCell?.anchor ||
-    resolvedCell.anchor.start !== cell.anchor.start ||
-    resolvedCell.anchor.end !== cell.anchor.end
-  ) {
-    return {
-      action: 'noop',
-      transaction: null,
-      nextCell: { ...cell, status: 'invalid' },
-      screenReaderText: '',
-      rejected: 'stale',
-    }
+  if (!matchesCellAnchor(cell, resolvedCell)) {
+    return reject('stale', { ...cell, status: 'invalid' })
   }
 
   const slice = source.slice(table.range.start, table.range.end)
   const parsed = parseMarkdownTableBlock(slice)
-  if (!parsed) {
-    return {
-      action: 'noop',
-      transaction: null,
-      nextCell: { ...cell, status: 'invalid' },
-      screenReaderText: '',
-      rejected: 'malformed',
-    }
-  }
+  if (!parsed) return reject('malformed', { ...cell, status: 'invalid' })
 
   const totalRows = 1 + parsed.rows.length
   const totalColumns = parsed.columnCount
@@ -231,7 +210,8 @@ export const resolveMarkdownTableInputIntent = (
     action: 'exit-backward' | 'exit-forward',
     message: string,
   ): MarkdownTableInputResult => {
-    const selection = action === 'exit-backward' ? beforeSelection : afterSelection
+    const selection =
+      action === 'exit-backward' ? beforeSelection : afterSelection
     return {
       action,
       transaction: {
@@ -253,125 +233,69 @@ export const resolveMarkdownTableInputIntent = (
       ? `Header, Column ${colIdx + 1}`
       : `Row ${rowIdx + 1}, Column ${colIdx + 1}`
 
+  const navigate = (row: number, column: number) =>
+    withoutTransaction(
+      'navigate',
+      { ...cell, row, column },
+      cellAria(row, column),
+    )
+
+  const navigateForward = () => {
+    if (c + 1 < totalColumns) return navigate(r, c + 1)
+    if (r + 1 < totalRows) return navigate(r + 1, 0)
+    return null
+  }
+
+  const navigateBackward = () => {
+    if (c > 0) return navigate(r, c - 1)
+    if (r > 0) return navigate(r - 1, totalColumns - 1)
+    return null
+  }
+
+  const appendRow = (column: number): MarkdownTableInputResult => {
+    const plan = planMarkdownTableInsertRow(
+      source,
+      documentIdentity,
+      cell.tableId,
+      r,
+      'below',
+      expectedRevision,
+    )
+    if ('rejected' in plan) return withoutTransaction()
+    return {
+      action: 'append-row',
+      transaction: plan,
+      nextCell: { ...cell, row: r + 1, column, status: 'current' },
+      screenReaderText: `Inserted row ${r + 2}. ${cellAria(r + 1, column)}`,
+    }
+  }
+
+  const deletePlan = (
+    action: 'delete-table' | 'delete-row' | 'delete-column',
+    plan:
+      | MarkdownEditorTransaction
+      | { readonly rejected: MarkdownTableRejection },
+    screenReaderText: string,
+    selection?: MarkdownEditorSelection,
+  ): MarkdownTableInputResult => {
+    if ('rejected' in plan) return reject(plan.rejected)
+    return {
+      action,
+      transaction: selection ? { ...plan, selection } : plan,
+      nextCell: { ...cell, status: 'deleted' },
+      screenReaderText,
+    }
+  }
+
   switch (key) {
-    case 'Tab': {
-      if (c + 1 < totalColumns) {
-        const nextCell: MarkdownTableCellIdentity = { ...cell, column: c + 1 }
-        return {
-          action: 'navigate',
-          transaction: null,
-          nextCell,
-          screenReaderText: cellAria(r, c + 1),
-        }
-      }
-      if (r + 1 < totalRows) {
-        const nextCell: MarkdownTableCellIdentity = { ...cell, row: r + 1, column: 0 }
-        return {
-          action: 'navigate',
-          transaction: null,
-          nextCell,
-          screenReaderText: cellAria(r + 1, 0),
-        }
-      }
-      // At last cell: append row below (avoid Tab trap!)
-      const insertPlan = planMarkdownTableInsertRow(
-        source,
-        documentIdentity,
-        cell.tableId,
-        r,
-        'below',
-        expectedRevision,
+    case 'Tab':
+      return navigateForward() ?? appendRow(0)
+    case 'Shift+Tab':
+      return (
+        navigateBackward() ?? exitPlan('exit-backward', 'Exited table backward')
       )
-      if ('changes' in insertPlan) {
-        const nextCell: MarkdownTableCellIdentity = {
-          ...cell,
-          row: r + 1,
-          column: 0,
-          status: 'current',
-        }
-        return {
-          action: 'append-row',
-          transaction: insertPlan,
-          nextCell,
-          screenReaderText: `Inserted row ${r + 2}. ${cellAria(r + 1, 0)}`,
-        }
-      }
-      return {
-        action: 'noop',
-        transaction: null,
-        nextCell: cell,
-        screenReaderText: '',
-      }
-    }
-
-    case 'Shift+Tab': {
-      if (c > 0) {
-        const nextCell: MarkdownTableCellIdentity = { ...cell, column: c - 1 }
-        return {
-          action: 'navigate',
-          transaction: null,
-          nextCell,
-          screenReaderText: cellAria(r, c - 1),
-        }
-      }
-      if (r > 0) {
-        const nextCell: MarkdownTableCellIdentity = {
-          ...cell,
-          row: r - 1,
-          column: totalColumns - 1,
-        }
-        return {
-          action: 'navigate',
-          transaction: null,
-          nextCell,
-          screenReaderText: cellAria(r - 1, totalColumns - 1),
-        }
-      }
-      // Top-left cell: exit backward
-      return exitPlan('exit-backward', 'Exited table backward')
-    }
-
-    case 'Enter': {
-      if (r + 1 < totalRows) {
-        const nextCell: MarkdownTableCellIdentity = { ...cell, row: r + 1 }
-        return {
-          action: 'navigate',
-          transaction: null,
-          nextCell,
-          screenReaderText: cellAria(r + 1, c),
-        }
-      }
-      // At bottom row: append new row below
-      const insertPlan = planMarkdownTableInsertRow(
-        source,
-        documentIdentity,
-        cell.tableId,
-        r,
-        'below',
-        expectedRevision,
-      )
-      if ('changes' in insertPlan) {
-        const nextCell: MarkdownTableCellIdentity = {
-          ...cell,
-          row: r + 1,
-          column: c,
-          status: 'current',
-        }
-        return {
-          action: 'append-row',
-          transaction: insertPlan,
-          nextCell,
-          screenReaderText: `Inserted row ${r + 2}. ${cellAria(r + 1, c)}`,
-        }
-      }
-      return {
-        action: 'noop',
-        transaction: null,
-        nextCell: cell,
-        screenReaderText: '',
-      }
-    }
-
+    case 'Enter':
+      return r + 1 < totalRows ? navigate(r + 1, c) : appendRow(c)
     case 'Shift+Enter': {
       // Standard Markdown does not support multiline in cells; insert <br>
       const sel = context.selection
@@ -382,132 +306,43 @@ export const resolveMarkdownTableInputIntent = (
           expectedRevision,
           history: 'separate',
           origin: 'input',
-          selection: { start: sel.start + 4, end: sel.start + 4, direction: 'none' },
+          selection: {
+            start: sel.start + 4,
+            end: sel.start + 4,
+            direction: 'none',
+          },
         },
         nextCell: cell,
         screenReaderText: 'Inserted line break',
       }
     }
 
-    case 'ArrowUp': {
-      if (r > 0) {
-        const nextCell: MarkdownTableCellIdentity = { ...cell, row: r - 1 }
-        return {
-          action: 'navigate',
-          transaction: null,
-          nextCell,
-          screenReaderText: cellAria(r - 1, c),
-        }
-      }
-      return exitPlan('exit-backward', 'Exited table upward')
-    }
-
-    case 'ArrowDown': {
-      if (r + 1 < totalRows) {
-        const nextCell: MarkdownTableCellIdentity = { ...cell, row: r + 1 }
-        return {
-          action: 'navigate',
-          transaction: null,
-          nextCell,
-          screenReaderText: cellAria(r + 1, c),
-        }
-      }
-      return exitPlan('exit-forward', 'Exited table downward')
-    }
-
-    case 'ArrowLeft': {
-      if (cellOffset > 0) {
-        return {
-          action: 'navigate',
-          transaction: null,
-          nextCell: cell,
-          screenReaderText: '',
-        }
-      }
-      if (c > 0) {
-        const nextCell: MarkdownTableCellIdentity = { ...cell, column: c - 1 }
-        return {
-          action: 'navigate',
-          transaction: null,
-          nextCell,
-          screenReaderText: cellAria(r, c - 1),
-        }
-      }
-      if (r > 0) {
-        const nextCell: MarkdownTableCellIdentity = {
-          ...cell,
-          row: r - 1,
-          column: totalColumns - 1,
-        }
-        return {
-          action: 'navigate',
-          transaction: null,
-          nextCell,
-          screenReaderText: cellAria(r - 1, totalColumns - 1),
-        }
-      }
-      return exitPlan('exit-backward', 'Exited table backward')
-    }
-
-    case 'ArrowRight': {
-      if (cellOffset < cellText.length) {
-        return {
-          action: 'navigate',
-          transaction: null,
-          nextCell: cell,
-          screenReaderText: '',
-        }
-      }
-      if (c + 1 < totalColumns) {
-        const nextCell: MarkdownTableCellIdentity = { ...cell, column: c + 1 }
-        return {
-          action: 'navigate',
-          transaction: null,
-          nextCell,
-          screenReaderText: cellAria(r, c + 1),
-        }
-      }
-      if (r + 1 < totalRows) {
-        const nextCell: MarkdownTableCellIdentity = { ...cell, row: r + 1, column: 0 }
-        return {
-          action: 'navigate',
-          transaction: null,
-          nextCell,
-          screenReaderText: cellAria(r + 1, 0),
-        }
-      }
-      return exitPlan('exit-forward', 'Exited table forward')
-    }
-
-    case 'Home': {
-      if (cellOffset > 0) {
-        return { action: 'navigate', transaction: null, nextCell: cell, screenReaderText: '' }
-      }
-      const nextCell: MarkdownTableCellIdentity = { ...cell, column: 0 }
-      return {
-        action: 'navigate',
-        transaction: null,
-        nextCell,
-        screenReaderText: cellAria(r, 0),
-      }
-    }
-
-    case 'End': {
-      if (cellOffset < cellText.length) {
-        return { action: 'navigate', transaction: null, nextCell: cell, screenReaderText: '' }
-      }
-      const nextCell: MarkdownTableCellIdentity = { ...cell, column: totalColumns - 1 }
-      return {
-        action: 'navigate',
-        transaction: null,
-        nextCell,
-        screenReaderText: cellAria(r, totalColumns - 1),
-      }
-    }
-
-    case 'Escape': {
+    case 'ArrowUp':
+      return r > 0
+        ? navigate(r - 1, c)
+        : exitPlan('exit-backward', 'Exited table upward')
+    case 'ArrowDown':
+      return r + 1 < totalRows
+        ? navigate(r + 1, c)
+        : exitPlan('exit-forward', 'Exited table downward')
+    case 'ArrowLeft':
+      if (cellOffset > 0) return withoutTransaction('navigate')
+      return (
+        navigateBackward() ?? exitPlan('exit-backward', 'Exited table backward')
+      )
+    case 'ArrowRight':
+      if (cellOffset < cellText.length) return withoutTransaction('navigate')
+      return (
+        navigateForward() ?? exitPlan('exit-forward', 'Exited table forward')
+      )
+    case 'Home':
+      return cellOffset > 0 ? withoutTransaction('navigate') : navigate(r, 0)
+    case 'End':
+      return cellOffset < cellText.length
+        ? withoutTransaction('navigate')
+        : navigate(r, totalColumns - 1)
+    case 'Escape':
       return exitPlan('exit-forward', 'Exited table')
-    }
 
     case 'Delete': {
       if (
@@ -521,23 +356,12 @@ export const resolveMarkdownTableInputIntent = (
           cell.tableId,
           expectedRevision,
         )
-        return 'changes' in plan
-          ? {
-              action: 'delete-table',
-              transaction: {
-                ...plan,
-                selection: beforeSelection,
-              },
-              nextCell: { ...cell, status: 'deleted' },
-              screenReaderText: 'Deleted table',
-            }
-          : {
-              action: 'noop',
-              transaction: null,
-              nextCell: cell,
-              screenReaderText: '',
-              rejected: plan.rejected,
-            }
+        return deletePlan(
+          'delete-table',
+          plan,
+          'Deleted table',
+          beforeSelection,
+        )
       }
       if (structuredSelection?.kind === 'row') {
         const selectedRow = structuredSelection.index ?? r
@@ -548,20 +372,7 @@ export const resolveMarkdownTableInputIntent = (
           selectedRow,
           expectedRevision,
         )
-        return 'changes' in plan
-          ? {
-              action: 'delete-row',
-              transaction: plan,
-              nextCell: { ...cell, status: 'deleted' },
-              screenReaderText: `Deleted row ${selectedRow + 1}`,
-            }
-          : {
-              action: 'noop',
-              transaction: null,
-              nextCell: cell,
-              screenReaderText: '',
-              rejected: plan.rejected,
-            }
+        return deletePlan('delete-row', plan, `Deleted row ${selectedRow + 1}`)
       }
       if (structuredSelection?.kind === 'column') {
         const selectedColumn = structuredSelection.index ?? c
@@ -572,46 +383,19 @@ export const resolveMarkdownTableInputIntent = (
           selectedColumn,
           expectedRevision,
         )
-        return 'changes' in plan
-          ? {
-              action: 'delete-column',
-              transaction: plan,
-              nextCell: { ...cell, status: 'deleted' },
-              screenReaderText: `Deleted column ${selectedColumn + 1}`,
-            }
-          : {
-              action: 'noop',
-              transaction: null,
-              nextCell: cell,
-              screenReaderText: '',
-              rejected: plan.rejected,
-            }
+        return deletePlan(
+          'delete-column',
+          plan,
+          `Deleted column ${selectedColumn + 1}`,
+        )
       }
       if (collapsed && cellText.length === 0) {
-        if (c + 1 < totalColumns) {
-          return {
-            action: 'navigate',
-            transaction: null,
-            nextCell: { ...cell, column: c + 1 },
-            screenReaderText: cellAria(r, c + 1),
-          }
-        }
-        if (r + 1 < totalRows) {
-          return {
-            action: 'navigate',
-            transaction: null,
-            nextCell: { ...cell, row: r + 1, column: 0 },
-            screenReaderText: cellAria(r + 1, 0),
-          }
-        }
-        return exitPlan('exit-forward', 'Exited empty final table cell')
+        return (
+          navigateForward() ??
+          exitPlan('exit-forward', 'Exited empty final table cell')
+        )
       }
-      return {
-        action: 'delete-content',
-        transaction: null,
-        nextCell: cell,
-        screenReaderText: '',
-      }
+      return withoutTransaction('delete-content')
     }
 
     case 'Backspace': {
@@ -623,43 +407,16 @@ export const resolveMarkdownTableInputIntent = (
         return resolveMarkdownTableInputIntent({ ...context, key: 'Delete' })
       }
       if (collapsed && cellText.length === 0) {
-        if (c > 0) {
-          return {
-            action: 'navigate',
-            transaction: null,
-            nextCell: { ...cell, column: c - 1 },
-            screenReaderText: cellAria(r, c - 1),
-          }
-        }
-        if (r > 0) {
-          return {
-            action: 'navigate',
-            transaction: null,
-            nextCell: {
-              ...cell,
-              row: r - 1,
-              column: totalColumns - 1,
-            },
-            screenReaderText: cellAria(r - 1, totalColumns - 1),
-          }
-        }
-        return exitPlan('exit-backward', 'Exited empty first table cell')
+        return (
+          navigateBackward() ??
+          exitPlan('exit-backward', 'Exited empty first table cell')
+        )
       }
-      return {
-        action: 'delete-content',
-        transaction: null,
-        nextCell: cell,
-        screenReaderText: '',
-      }
+      return withoutTransaction('delete-content')
     }
 
     default:
-      return {
-        action: 'noop',
-        transaction: null,
-        nextCell: cell,
-        screenReaderText: '',
-      }
+      return withoutTransaction()
   }
 }
 
@@ -850,31 +607,6 @@ const escapeMarkdownTableDataCell = (value: string) => {
   return escaped
 }
 
-const tableCellSelection = (
-  serialized: string,
-  tableStart: number,
-  row: number,
-  column: number,
-) => {
-  const table = createMarkdownEditorProjection(serialized).nodes.find(
-    (node) =>
-      node.kind === 'table' &&
-      node.status === 'valid' &&
-      node.table !== undefined,
-  )?.table
-  const editableRows = table?.rows.filter(
-    (_, index) => index !== table.separatorRow,
-  )
-  const range = editableRows?.[row]?.rawCellRanges[column]
-  return range
-    ? Object.freeze({
-        direction: 'none' as const,
-        end: tableStart + range.end,
-        start: tableStart + range.start,
-      })
-    : undefined
-}
-
 export const planMarkdownTablePaste = (
   source: string,
   documentIdentity: MarkdownDocumentIdentity,
@@ -884,19 +616,15 @@ export const planMarkdownTablePaste = (
   mime?: string,
   expectedRevision?: number,
   options: MarkdownTableDataParseOptions = {},
-): MarkdownEditorTransaction | {
-  readonly rejected:
-    | MarkdownTableDataRejection
-    | 'stale'
-    | 'missing'
-} => {
+):
+  | MarkdownEditorTransaction
+  | {
+      readonly rejected: MarkdownTableDataRejection | 'stale' | 'missing'
+    } => {
   if (expectedRevision !== undefined && expectedRevision < 0) {
     return { rejected: 'stale' }
   }
-  if (
-    currentCell.status !== 'current' ||
-    currentCell.tableId !== tableId
-  ) {
+  if (currentCell.status !== 'current' || currentCell.tableId !== tableId) {
     return { rejected: 'stale' }
   }
 
@@ -906,11 +634,8 @@ export const planMarkdownTablePaste = (
   }
 
   if (
-    resolveMarkdownTableIdentityStatus(
-      source,
-      documentIdentity,
-      tableId,
-    ) !== 'current'
+    resolveMarkdownTableIdentityStatus(source, documentIdentity, tableId) !==
+    'current'
   ) {
     return { rejected: 'stale' }
   }
@@ -923,15 +648,8 @@ export const planMarkdownTablePaste = (
     currentCell.row,
     currentCell.column,
   )
-  if (
-    !currentCell.cellId ||
-    !currentCell.anchor ||
-    !resolvedCell?.anchor ||
-    resolvedCell.anchor?.start !== currentCell.anchor.start ||
-    resolvedCell.anchor.end !== currentCell.anchor.end
-  ) {
+  if (!matchesCellAnchor(currentCell, resolvedCell))
     return { rejected: 'stale' }
-  }
 
   const slice = source.slice(table.range.start, table.range.end)
   const parsedTable = parseMarkdownTableBlock(slice)
@@ -940,7 +658,10 @@ export const planMarkdownTablePaste = (
   const startCol = Math.max(0, currentCell.column)
   const startRow = Math.max(0, currentCell.row)
 
-  const neededCols = Math.max(parsedTable.columnCount, startCol + parsedData.columns)
+  const neededCols = Math.max(
+    parsedTable.columnCount,
+    startCol + parsedData.columns,
+  )
   const neededBodyRows = Math.max(
     parsedTable.rows.length,
     startRow === 0
@@ -996,12 +717,13 @@ export const planMarkdownTablePaste = (
     newline: parsedTable.newline,
   }
 
-  let serialized = serializeMarkdownTable(updatedTable, false)
-  if (slice.endsWith('\n') && !serialized.endsWith('\n')) {
-    serialized += '\n'
-  } else if (!slice.endsWith('\n') && serialized.endsWith('\n')) {
-    serialized = serialized.slice(0, -1)
-  }
+  const serialized = serializeMarkdownTableWithLineEnding(updatedTable, slice)
+  const selection = resolveSerializedMarkdownTableSelection(
+    serialized,
+    table.range.start,
+    currentCell.row,
+    currentCell.column,
+  )
 
   return {
     changes: [
@@ -1021,21 +743,7 @@ export const planMarkdownTablePaste = (
       }),
     }),
     origin: 'paste',
-    ...(tableCellSelection(
-      serialized,
-      table.range.start,
-      currentCell.row,
-      currentCell.column,
-    )
-      ? {
-          selection: tableCellSelection(
-            serialized,
-            table.range.start,
-            currentCell.row,
-            currentCell.column,
-          ),
-        }
-      : {}),
+    ...(selection ? { selection } : {}),
   }
 }
 
@@ -1045,16 +753,15 @@ export const planMarkdownTableFormat = (
   tableId: string,
   expectedRevision?: number,
   currentCell?: MarkdownTableCellIdentity,
-): MarkdownEditorTransaction | { readonly rejected: 'stale' | 'malformed' | 'missing' } => {
+):
+  | MarkdownEditorTransaction
+  | { readonly rejected: 'stale' | 'malformed' | 'missing' } => {
   if (expectedRevision !== undefined && expectedRevision < 0) {
     return { rejected: 'stale' }
   }
   if (
-    resolveMarkdownTableIdentityStatus(
-      source,
-      documentIdentity,
-      tableId,
-    ) !== 'current'
+    resolveMarkdownTableIdentityStatus(source, documentIdentity, tableId) !==
+    'current'
   ) {
     return { rejected: 'stale' }
   }
@@ -1071,11 +778,7 @@ export const planMarkdownTableFormat = (
     )
     if (
       currentCell.tableId !== tableId ||
-      !currentCell.cellId ||
-      !currentCell.anchor ||
-      !resolvedCell?.anchor ||
-      resolvedCell.anchor?.start !== currentCell.anchor.start ||
-      resolvedCell.anchor.end !== currentCell.anchor.end
+      !matchesCellAnchor(currentCell, resolvedCell)
     ) {
       return { rejected: 'stale' }
     }
@@ -1085,12 +788,7 @@ export const planMarkdownTableFormat = (
   const parsed = parseMarkdownTableBlock(slice)
   if (!parsed) return { rejected: 'malformed' }
 
-  let formatted = serializeMarkdownTable(parsed, true)
-  if (slice.endsWith('\n') && !formatted.endsWith('\n')) {
-    formatted += '\n'
-  } else if (!slice.endsWith('\n') && formatted.endsWith('\n')) {
-    formatted = formatted.slice(0, -1)
-  }
+  const formatted = serializeMarkdownTableWithLineEnding(parsed, slice, true)
 
   return {
     changes: [
@@ -1112,7 +810,7 @@ export const planMarkdownTableFormat = (
     origin: 'command',
     ...(currentCell
       ? {
-          selection: tableCellSelection(
+          selection: resolveSerializedMarkdownTableSelection(
             formatted,
             table.range.start,
             currentCell.row,

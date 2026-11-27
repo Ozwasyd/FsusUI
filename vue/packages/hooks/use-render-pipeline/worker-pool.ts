@@ -374,6 +374,12 @@ export const createFsusWorkerExecutor = <TRequest, TResponse>(
     backgroundTimer = null
   }
 
+  const clearCanceledSlotTimer = (taskId: number) => {
+    const cancelTimer = canceledSlotTimers.get(taskId)
+    if (cancelTimer) clearTimeout(cancelTimer)
+    canceledSlotTimers.delete(taskId)
+  }
+
   const terminateSlot = (
     slot: WorkerSlot,
     type: FsusWorkerExecutorEventType = 'worker-disposed',
@@ -382,15 +388,20 @@ export const createFsusWorkerExecutor = <TRequest, TResponse>(
     if (!slot.alive) return
     slot.alive = false
     if (slot.activeTaskId !== null) {
-      const cancelTimer = canceledSlotTimers.get(slot.activeTaskId)
-      if (cancelTimer) clearTimeout(cancelTimer)
-      canceledSlotTimers.delete(slot.activeTaskId)
+      clearCanceledSlotTimer(slot.activeTaskId)
       canceledIds.delete(slot.activeTaskId)
     }
     slot.worker.terminate()
     const index = slots.indexOf(slot)
     if (index >= 0) slots.splice(index, 1)
     emit(type, { error, workerId: slot.id })
+  }
+
+  const terminateIdleSlots = () => {
+    for (const slot of [...slots]) {
+      terminateSlot(slot, 'worker-idle-terminate')
+    }
+    emit('pool-idle-terminate')
   }
 
   const scheduleIdleTerminate = () => {
@@ -400,10 +411,7 @@ export const createFsusWorkerExecutor = <TRequest, TResponse>(
     idleTerminateTimer = setTimeout(() => {
       idleTerminateTimer = null
       if (retainCount > 0 || pending.size > 0) return
-      for (const slot of [...slots]) {
-        terminateSlot(slot, 'worker-idle-terminate')
-      }
-      emit('pool-idle-terminate')
+      terminateIdleSlots()
     }, idleTerminateMs)
   }
 
@@ -424,7 +432,6 @@ export const createFsusWorkerExecutor = <TRequest, TResponse>(
     task: WorkerTask<TRequest, TResponse>,
     result: FsusResult<TResponse>,
     type: FsusWorkerExecutorEventType,
-    error?: FsusErrorDetail,
     timings?: { computeDurationMs?: number },
     releaseSlot = true,
   ) => {
@@ -445,7 +452,7 @@ export const createFsusWorkerExecutor = <TRequest, TResponse>(
       cloneBytes: task.cloneBytes,
       computeDurationMs: timings?.computeDurationMs,
       durationMs,
-      error,
+      error: result.ok === false ? result.error : undefined,
       generation: task.generation,
       id: task.id,
       key: task.key,
@@ -501,14 +508,7 @@ export const createFsusWorkerExecutor = <TRequest, TResponse>(
       rememberCanceledId(task.id)
       if (task.hardCancel) terminateSlot(slot)
     }
-    settleTask(
-      task,
-      fsusErr(error),
-      type,
-      error,
-      undefined,
-      !slot || task.hardCancel,
-    )
+    settleTask(task, fsusErr(error), type, undefined, !slot || task.hardCancel)
     if (slot && !task.hardCancel && slot.activeTaskId === task.id) {
       canceledSlotTimers.set(
         task.id,
@@ -533,9 +533,7 @@ export const createFsusWorkerExecutor = <TRequest, TResponse>(
     const task = pending.get(payload?.id)
     if (!task || task.slotId !== slot.id) {
       if (canceledIds.delete(payload?.id)) {
-        const cancelTimer = canceledSlotTimers.get(payload.id)
-        if (cancelTimer) clearTimeout(cancelTimer)
-        canceledSlotTimers.delete(payload.id)
+        clearCanceledSlotTimer(payload.id)
         if (slot.activeTaskId === payload.id) slot.activeTaskId = null
         pump()
         scheduleIdleTerminate()
@@ -562,7 +560,7 @@ export const createFsusWorkerExecutor = <TRequest, TResponse>(
         id: task.id,
         workerId: slot.id,
       })
-      settleTask(task, fsusErr(error), 'request-reject', error)
+      settleTask(task, fsusErr(error), 'request-reject')
       return
     }
     if (
@@ -571,19 +569,18 @@ export const createFsusWorkerExecutor = <TRequest, TResponse>(
         (latestGenerations.get(task.key) ?? task.generation) > task.generation)
     ) {
       const error = createAbortErrorDetail('fsus_worker_generation_superseded')
-      settleTask(task, fsusErr(error), 'request-cancel', error)
+      settleTask(task, fsusErr(error), 'request-cancel')
       return
     }
     if (payload.error) {
       const error = normalizeWorkerError(payload.error, options.serializeError)
-      settleTask(task, fsusErr(error), 'request-reject', error)
+      settleTask(task, fsusErr(error), 'request-reject')
       return
     }
     settleTask(
       task,
       fsusOk(payload.result as TResponse),
       'request-resolve',
-      undefined,
       payload.timings,
     )
   }
@@ -613,7 +610,7 @@ export const createFsusWorkerExecutor = <TRequest, TResponse>(
       pump()
       return
     }
-    if (task) settleTask(task, fsusErr(error), 'request-reject', error)
+    if (task) settleTask(task, fsusErr(error), 'request-reject')
     pump()
   }
 
@@ -714,7 +711,7 @@ export const createFsusWorkerExecutor = <TRequest, TResponse>(
         'fsus_worker_post_message_failed',
         'infra',
       )
-      settleTask(task, fsusErr(detail), 'request-reject', detail)
+      settleTask(task, fsusErr(detail), 'request-reject')
     }
   }
 
@@ -736,7 +733,7 @@ export const createFsusWorkerExecutor = <TRequest, TResponse>(
             'fsus_worker_create_failed',
             'infra',
           )
-          settleTask(task, fsusErr(detail), 'request-reject', detail)
+          settleTask(task, fsusErr(detail), 'request-reject')
           continue
         }
       }
@@ -749,7 +746,7 @@ export const createFsusWorkerExecutor = <TRequest, TResponse>(
 
   const dropTask = (task: WorkerTask<TRequest, TResponse>, message: string) => {
     const error = createFsusError('infra', message)
-    settleTask(task, fsusErr(error), 'request-drop', error)
+    settleTask(task, fsusErr(error), 'request-drop')
   }
 
   const enqueue = (task: WorkerTask<TRequest, TResponse>) => {
@@ -820,7 +817,7 @@ export const createFsusWorkerExecutor = <TRequest, TResponse>(
     canceledSlotTimers.clear()
     const error = createFsusError('infra', 'fsus_worker_disposed')
     for (const task of [...pending.values()]) {
-      settleTask(task, fsusErr(error), 'request-reject', error)
+      settleTask(task, fsusErr(error), 'request-reject')
     }
     for (const slot of [...slots]) terminateSlot(slot)
   }
@@ -925,7 +922,7 @@ export const createFsusWorkerExecutor = <TRequest, TResponse>(
         const error = createFsusError('timeout', 'fsus_worker_request_timeout')
         const slot = slots.find((candidate) => candidate.id === task.slotId)
         if (slot) terminateSlot(slot, 'worker-error', error)
-        settleTask(task, fsusErr(error), 'request-timeout', error)
+        settleTask(task, fsusErr(error), 'request-timeout')
       }, requestTimeoutMs)
       if (runOptions.signal) {
         const abort = () =>
@@ -946,10 +943,7 @@ export const createFsusWorkerExecutor = <TRequest, TResponse>(
       pending.size === 0 &&
       retainCount === 0
     ) {
-      for (const slot of [...slots]) {
-        terminateSlot(slot, 'worker-idle-terminate')
-      }
-      emit('pool-idle-terminate')
+      terminateIdleSlots()
     }
   }
   if (typeof document !== 'undefined') {

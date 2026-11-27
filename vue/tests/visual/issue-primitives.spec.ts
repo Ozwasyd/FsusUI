@@ -1,34 +1,14 @@
 import { expect, test } from '@playwright/test'
-import type { Page } from '@playwright/test'
-import { attachPageDiagnostics } from '../support/page-diagnostics'
 import {
   buildVisualUrl,
   resolveVisualVariant,
 } from '../../../scripts/visual-variant.mjs'
+import {
+  openStableVisualPage,
+  registerStableVisualHooks,
+} from '../support/visual-variant-fixture'
 
-const diagnostics = new WeakMap<Page, string[]>()
-
-const stabilizePage = async (page: Page) => {
-  await page.addStyleTag({
-    content: `
-      *, *::before, *::after {
-        transition-duration: 0s !important;
-        animation-duration: 0s !important;
-        animation-delay: 0s !important;
-        scroll-behavior: auto !important;
-      }
-    `,
-  })
-}
-
-test.beforeEach(async ({ page }) => {
-  diagnostics.set(page, attachPageDiagnostics(page))
-  await page.emulateMedia({ reducedMotion: 'reduce' })
-})
-
-test.afterEach(async ({ page }) => {
-  expect(diagnostics.get(page) ?? []).toEqual([])
-})
+registerStableVisualHooks(test)
 
 test('issue primitives render in the demo route', async ({
   page,
@@ -39,10 +19,10 @@ test('issue primitives render in the demo route', async ({
     viewportClass: viewport,
   } = resolveVisualVariant(testInfo.project.name)
 
-  await page.goto(buildVisualUrl('issue-primitives', testInfo.project.name), {
-    waitUntil: 'domcontentloaded',
-  })
-  await stabilizePage(page)
+  await openStableVisualPage(
+    page,
+    buildVisualUrl('issue-primitives', testInfo.project.name),
+  )
 
   await expect(page.locator('.el-public-shell')).toBeVisible()
   await expect(page.locator('.issue-primitives')).toBeVisible()

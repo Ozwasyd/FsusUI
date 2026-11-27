@@ -20,8 +20,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, useSlots } from 'vue'
-import { useNamespace } from '@element-plus/hooks'
+import { useSectionHeading } from './section-heading'
 import { settingsSectionProps } from './shared'
 
 defineOptions({
@@ -29,16 +28,7 @@ defineOptions({
 })
 
 const props = defineProps(settingsSectionProps)
-const slots = useSlots()
-const ns = useNamespace('settings-section')
-
-const hasTitle = () => Boolean(props.title || slots.title)
-const hasDescription = () => Boolean(props.description || slots.description)
-const hasActions = () => Boolean(slots.actions)
+const { ns, hasTitle, hasDescription, hasActions, sectionKls } =
+  useSectionHeading('settings-section', props)
 const hasHeader = () => hasTitle() || hasDescription() || hasActions()
-const sectionKls = computed(() => [
-  ns.b(),
-  ns.m(props.density),
-  ns.is('danger', props.danger),
-])
 </script>

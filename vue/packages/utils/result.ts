@@ -33,20 +33,6 @@ export type FsusResult<T, E extends FsusErrorDetail = FsusErrorDetail> =
   | { ok: true; value: T }
   | { ok: false; error: E }
 
-const fsusErrorCodes = new Set<FsusErrorCode>([
-  'validation',
-  'not-found',
-  'conflict',
-  'unauthorized',
-  'forbidden',
-  'infra',
-  'protocol',
-  'timeout',
-  'aborted',
-  'invariant',
-  'unknown',
-])
-
 const categoryByCode: Record<FsusErrorCode, FsusErrorCategory> = {
   aborted: 'runtime',
   conflict: 'conflict',
@@ -62,7 +48,8 @@ const categoryByCode: Record<FsusErrorCode, FsusErrorCategory> = {
 }
 
 const isFsusErrorCode = (code: unknown): code is FsusErrorCode =>
-  typeof code === 'string' && fsusErrorCodes.has(code as FsusErrorCode)
+  typeof code === 'string' &&
+  Object.prototype.hasOwnProperty.call(categoryByCode, code)
 
 const isAbortLike = (error: unknown) => {
   if (!error || typeof error !== 'object') return false

@@ -1,86 +1,19 @@
 #!/usr/bin/env node
 
-import { pathToFileURL } from 'node:url'
-import { readFileSync } from 'node:fs'
-import { fileURLToPath } from 'node:url'
-import { TextDecoder, TextEncoder } from 'node:util'
+import { TextEncoder } from 'node:util'
 import {
   getMarkdownXssSource,
   getMarkdownXssSourceAttackFragment,
   loadMarkdownXssCorpus,
 } from '../../../scripts/markdown-xss-corpus.mjs'
+import {
+  assert,
+  createMarkdownWasmCheck,
+  pickExport,
+} from './markdown-wasm-check-support.mjs'
 
-function assert(condition, message) {
-  if (!condition) {
-    throw new Error(message)
-  }
-}
-
-function readCString(module, ptr, len) {
-  if (ptr <= 0 || len <= 0) {
-    return ''
-  }
-
-  const memory =
-    module.memory ?? (module.HEAPU8 ? { buffer: module.HEAPU8.buffer } : null)
-  if (!memory) {
-    throw new Error('[markdown-wasm-runtime] module memory unavailable')
-  }
-
-  const view = new Uint8Array(memory.buffer, ptr, len)
-  return new TextDecoder().decode(view)
-}
-
-function pickExport(raw, name) {
-  const direct = raw[name]
-  if (direct) {
-    return direct
-  }
-
-  const underscored = raw[`_${name}`]
-  if (underscored) {
-    return underscored
-  }
-
-  throw new Error(`wasm_export_missing:${name}`)
-}
-
-function resolveMarkdownAsset(kind) {
-  const fileBase = kind === 'simd' ? 'markdown_simd' : 'markdown_basic'
-  const cwd = process.cwd().replace(/\\/g, '/').replace(/\/+$/, '')
-  return {
-    moduleUrl: pathToFileURL(`${cwd}/vue/packages/wasm/dist/${fileBase}.js`)
-      .href,
-    wasmUrl: pathToFileURL(`${cwd}/vue/packages/wasm/dist/${fileBase}.wasm`)
-      .href,
-  }
-}
-
-async function loadMarkdownModule(kind) {
-  const asset = resolveMarkdownAsset(kind)
-  const wasmBinary = readFileSync(fileURLToPath(asset.wasmUrl))
-  const moduleRef = await import(asset.moduleUrl)
-  const factory = moduleRef.default ?? moduleRef.createMarkdownModule
-  assert(
-    typeof factory === 'function',
-    `[markdown-wasm-runtime] missing factory: ${kind}`,
-  )
-  // Emscripten modules compiled with mixed ESM/CJS output may still reference
-  // __dirname during Node.js environment setup. Inject it temporarily so the
-  // factory can initialise; the wasm binary is pre-loaded via wasmBinary so
-  // no filesystem look-up occurs at load time.
-  const savedDirname = globalThis.__dirname
-  globalThis.__dirname = fileURLToPath(asset.moduleUrl).replace(/\/[^/]+$/, '')
-  try {
-    return await factory({ wasmBinary, print: () => {}, printErr: () => {} })
-  } finally {
-    if (savedDirname === undefined) {
-      delete globalThis.__dirname
-    } else {
-      globalThis.__dirname = savedDirname
-    }
-  }
-}
+const { loadMarkdownModule, readCString } =
+  createMarkdownWasmCheck('markdown-wasm-runtime')
 
 async function renderWithKind(kind) {
   const xssCorpus = await loadMarkdownXssCorpus()

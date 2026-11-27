@@ -1,18 +1,21 @@
 import {
-  createMarkdownEditorProjection,
   createMarkdownProjectionTask,
   planMarkdownProjectionInvalidation,
-  stabilizeMarkdownEditorProjection,
   type MarkdownDocumentIdentity,
   type MarkdownStableProjection,
   type MarkdownStableSyntaxNode,
 } from '../../../wasm/markdown-runtime'
 import type { MarkdownVisualPoint } from './markdown-editor-anchor-map'
-import type { MarkdownEditorMode } from './markdown-editor-live-contract'
+import {
+  matchesMarkdownEditorDocument,
+  type MarkdownEditorMode,
+} from './markdown-editor-live-contract'
 import { createMarkdownLiveAnchorMap } from './markdown-editor-live-selection'
-import type {
-  MarkdownEditorSelection,
-} from './markdown-editor-transaction'
+import {
+  findNarrowestMarkdownSyntaxNode,
+  resolveMarkdownEditorProjection,
+} from './markdown-editor-syntax'
+import type { MarkdownEditorSelection } from './markdown-editor-transaction'
 
 export const MARKDOWN_LIVE_LAYOUT_TRIGGERS = Object.freeze([
   'marker-reveal',
@@ -124,48 +127,11 @@ export type MarkdownLiveLayoutMutationKind =
   | 'stale-commit'
   | 'full-mount-input'
 
-const sameDocument = (
-  left?: MarkdownDocumentIdentity,
-  right?: MarkdownDocumentIdentity,
-) => {
-  if (!left || !right) return true
-  return left.id === right.id && left.epoch === right.epoch
-}
-
 const clampOffset = (source: string, offset: number) =>
   Math.max(0, Math.min(source.length, offset))
 
 const caretOf = (selection: MarkdownEditorSelection) =>
   selection.direction === 'backward' ? selection.start : selection.end
-
-const projectionOf = (
-  source: string,
-  identity: MarkdownDocumentIdentity,
-  projection?: MarkdownStableProjection,
-) =>
-  projection ??
-  stabilizeMarkdownEditorProjection(
-    createMarkdownEditorProjection(source),
-    identity,
-  )
-
-const coveringNode = (
-  projection: MarkdownStableProjection,
-  offset: number,
-): MarkdownStableSyntaxNode | null => {
-  const covering = projection.nodes.filter(
-    (node) => node.rawRange.start <= offset && offset <= node.rawRange.end,
-  )
-  if (covering.length === 0) return null
-  return [...covering].sort((left, right) => {
-    const span =
-      left.rawRange.end -
-      left.rawRange.start -
-      (right.rawRange.end - right.rawRange.start)
-    if (span !== 0) return span
-    return left.id.localeCompare(right.id)
-  })[0]!
-}
 
 export const captureMarkdownLiveLayoutAnchor = (input: {
   readonly documentIdentity: MarkdownDocumentIdentity
@@ -174,7 +140,7 @@ export const captureMarkdownLiveLayoutAnchor = (input: {
   readonly selection: MarkdownEditorSelection
   readonly source: string
 }): MarkdownLiveLayoutAnchor => {
-  const projection = projectionOf(
+  const projection = resolveMarkdownEditorProjection(
     input.source,
     input.documentIdentity,
     input.projection,
@@ -188,7 +154,10 @@ export const captureMarkdownLiveLayoutAnchor = (input: {
   const affinity =
     input.selection.direction === 'backward' ? 'before' : 'after'
   const visual = map.sourcePositionToVisual({ affinity, offset })
-  const node = coveringNode(projection, offset)
+  const node = findNarrowestMarkdownSyntaxNode(
+    projection.nodes,
+    (node) => node.rawRange.start <= offset && offset <= node.rawRange.end,
+  )
   return Object.freeze({
     affinity,
     documentIdentity: input.documentIdentity,
@@ -242,7 +211,7 @@ export const resolveMarkdownLiveLayoutStability = (input: {
     (input.expectedRevision !== undefined &&
       input.revision !== undefined &&
       input.expectedRevision !== input.revision) ||
-    !sameDocument(input.documentIdentity, input.currentIdentity)
+    !matchesMarkdownEditorDocument(input.documentIdentity, input.currentIdentity)
   ) {
     return empty('reject-stale', 'stale-document')
   }
@@ -344,7 +313,7 @@ export const commitMarkdownLiveFeatureResult = (input: {
     })
   }
   if (
-    !sameDocument(
+    !matchesMarkdownEditorDocument(
       input.expected.documentIdentity,
       input.incoming.documentIdentity,
     )
@@ -413,7 +382,7 @@ export const resolveMarkdownLiveVirtualWindow = (input: {
   readonly selection: MarkdownEditorSelection
   readonly source: string
 }): MarkdownLiveVirtualWindow => {
-  const projection = projectionOf(
+  const projection = resolveMarkdownEditorProjection(
     input.source,
     input.documentIdentity,
     input.projection,

@@ -5,7 +5,10 @@ import {
   resolveVisualVariant,
 } from '../../../scripts/visual-variant.mjs'
 import { createVisualCaptureTestTitle } from '../../../scripts/visual-profiles.mjs'
-import { attachPageDiagnostics } from '../support/page-diagnostics'
+import {
+  openStableVisualPage,
+  registerStableVisualHooks,
+} from '../support/visual-variant-fixture'
 
 type VisualSection = {
   name: string
@@ -13,29 +16,7 @@ type VisualSection = {
   action?: (page: Page) => Promise<void>
 }
 
-const diagnostics = new WeakMap<Page, string[]>()
-
-const stabilizePage = async (page: Page) => {
-  await page.addStyleTag({
-    content: `
-      *, *::before, *::after {
-        transition-duration: 0s !important;
-        animation-duration: 0s !important;
-        animation-delay: 0s !important;
-        scroll-behavior: auto !important;
-      }
-    `,
-  })
-}
-
-test.beforeEach(async ({ page }) => {
-  diagnostics.set(page, attachPageDiagnostics(page))
-  await page.emulateMedia({ reducedMotion: 'reduce' })
-})
-
-test.afterEach(async ({ page }) => {
-  expect(diagnostics.get(page) ?? []).toEqual([])
-})
+registerStableVisualHooks(test)
 
 const sections: VisualSection[] = [
   { name: 'basic', testId: 'section-basic' },
@@ -68,10 +49,10 @@ for (const section of sections) {
     createVisualCaptureTestTitle(section.name),
     async ({ page }, testInfo) => {
       const variant = resolveVisualVariant(testInfo.project.name)
-      await page.goto(buildVisualUrl(section.name, testInfo.project.name), {
-        waitUntil: 'domcontentloaded',
-      })
-      await stabilizePage(page)
+      await openStableVisualPage(
+        page,
+        buildVisualUrl(section.name, testInfo.project.name),
+      )
 
       const locator = page.locator(`[data-testid="${section.testId}"]`)
       await expect(locator).toBeVisible()

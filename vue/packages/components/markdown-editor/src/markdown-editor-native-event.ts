@@ -1,3 +1,4 @@
+import { matchesMarkdownEditorDocument } from './markdown-editor-live-contract'
 import type {
   BeforeInputSnapshot,
   MarkdownEditorDocumentIdentity,
@@ -111,14 +112,6 @@ export interface MarkdownEditorNativeEventMachine {
   readonly phase: MarkdownNativePhase
   readonly snapshot: BeforeInputSnapshot | undefined
   readonly trace: readonly MarkdownNativeTraceEntry[]
-}
-
-const sameDocument = (
-  left?: MarkdownEditorDocumentIdentity,
-  right?: MarkdownEditorDocumentIdentity,
-) => {
-  if (!left || !right) return true
-  return left.id === right.id && left.epoch === right.epoch
 }
 
 const isCompositionInputType = (inputType?: string, isComposing?: boolean) =>
@@ -250,8 +243,8 @@ export const createMarkdownEditorNativeEventMachine = (options: {
     if (
       event.kind !== 'document-switch' &&
       event.kind !== 'external-reset' &&
-      (!sameDocument(event.documentIdentity, documentIdentity) ||
-        !sameDocument(event.currentIdentity, documentIdentity) ||
+      (!matchesMarkdownEditorDocument(event.documentIdentity, documentIdentity) ||
+        !matchesMarkdownEditorDocument(event.currentIdentity, documentIdentity) ||
         (event.expectedRevision !== undefined &&
           event.revision !== undefined &&
           event.expectedRevision !== event.revision))
