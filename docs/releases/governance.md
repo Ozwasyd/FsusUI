@@ -170,62 +170,31 @@ Before publish, the workflow:
 
 Only a newer absent version publishes. An exact version already assigned to the
 requested tag is an idempotent skip; an older candidate or a version assigned to
-another tag fails. Stable `latest` releases additionally require the
-`fsusblog-consumer` gate (`_fsusblog-consumer-gate.yml`) before publish;
-`preview` and `next` releases still enforce the full `quality-playwright`,
-`quality`, and `release-readiness` gates plus post-publish consumer-contract
-verification. Intentional tag recovery is restricted to
-`recover-npm-dist-tag.yml`, its protected `npm-recovery` environment, an
-expected-current value, and `NPM_RECOVERY_TOKEN`.
+another tag fails. All release channels (`latest`, `preview`, and `next`)
+enforce the full `quality-playwright`, `quality`, and `release-readiness` gates
+before publish and run post-publish standalone consumer-contract verification
+against the published GitHub Packages artifact. Intentional tag recovery is
+restricted to `recover-npm-dist-tag.yml`, its protected `npm-recovery`
+environment, an expected-current value, and `NPM_RECOVERY_TOKEN`.
 
-## 5. Stable post-publish verification
+## 5. Post-publish verification
 
-Stable `latest` publication additionally consumes the successful FsusBlog
-consumer-gate receipt for the same candidate. After a real publish (never an
-idempotent skip), it polls npm, downloads the registry tarball, verifies
-SHA-512 integrity, candidate SHA-256, package name/version, and the `latest`
-tag, then emits `fsusui-npm-published-v1`. Preview/next channels and any
-verification or App-permission failure emit no event.
+After publishing (or verifying an idempotent match), `publish-npm.yml` runs
+`verify-published-consumer-contracts` using the workflow-scoped `GITHUB_TOKEN`
+(`packages: read`): it queries `npm view` for the published package version,
+tarball URL, and integrity metadata on `https://npm.pkg.github.com/`, executes
+`tests/consumer-contracts/run-consumer-contracts.mjs --mode published`, and
+uploads the resulting evidence bundle. Publishing does not depend on any
+external GitHub App or cross-repository consumer workflow.
 
-The payload contracts are:
-
-- [`fsusui-npm-published-v1.schema.json`](../../spec/releases/fsusui-npm-published-v1.schema.json)
-- [`fsusui-release-dispatch-receipt.schema.json`](../../spec/releases/fsusui-release-dispatch-receipt.schema.json)
-- [`fsus-cross-repo-app-evidence.schema.json`](../../spec/releases/fsus-cross-repo-app-evidence.schema.json)
-
-The sender uses `FSUS_RELEASE_TRAIN_APP_ID` and
-`FSUS_RELEASE_TRAIN_APP_PRIVATE_KEY` to mint a metadata-only FsusUI token and a
-separate FsusBlog token with metadata-read, contents-write, and pull-request-
-write permissions. Missing, insufficient, or extra permissions fail closed;
-PATs and `GITHUB_TOKEN` are not cross-repository dispatch credentials.
-
-The #318 pre-publish App uses `FSUS_CROSS_REPO_APP_ID` and
-`FSUS_CROSS_REPO_APP_PRIVATE_KEY`, restricted to metadata/contents read for
-FsusUI and FsusBlog. Its verifier emits only the sanitized evidence defined by
-`fsus-cross-repo-app-evidence.schema.json`; real installation and administrator
-evidence are external and must not be inferred from a local simulator pass.
-
-The trusted `_fsusblog-consumer-gate.yml` runs only from a release-tag context.
-It resolves the FsusBlog default branch once, freezes its full 40-character SHA,
-checks out with credentials disabled after checkout, and runs
-`verify:fsusui-candidate` against the absolute downloaded tarball. It records
-exact Node/npm/Vue/Vite/TypeScript/`vue-tsc` versions and requires a clean tree
-before and after. Its exact five-gate record, candidate SHA-256, workflow
-identity, and pinned FsusBlog SHA are schema-validated; missing, skipped,
-failed, stale, tampered, substituted, or mismatched records fail closed.
-The workflow is `.github/workflows/_fsusblog-consumer-gate.yml`; its
-`fsusblog-consumer-gate.receipt.json` is the receipt binding the downstream
-candidate. The evidence path is supplied through
-`FSUSBLOG_FSUSUI_CANDIDATE_EVIDENCE`.
-
-The local deterministic App/dispatch matrix is:
+The local deterministic release-workflow check is:
 
 ```bash
 pnpm check:npm-release-workflow
 ```
 
-This proves repository configuration only; it does not claim a real npm
-publication, App installation, dispatch, or downstream migration.
+This proves repository workflow configuration only; it does not claim a real npm
+publication.
 
 After publishing, confirm the Actions run, npm version, provenance, absence of
 `workspace:` in the manifest, consumer dependency resolution, and remote visual

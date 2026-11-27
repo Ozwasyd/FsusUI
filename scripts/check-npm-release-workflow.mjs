@@ -6,35 +6,22 @@ const recovery = readFileSync(
   '.github/workflows/recover-npm-dist-tag.yml',
   'utf8',
 )
-const payloadSchema = JSON.parse(
-  readFileSync('spec/releases/fsusui-npm-published-v1.schema.json', 'utf8'),
-)
-const receiptSchema = JSON.parse(
-  readFileSync(
-    'spec/releases/fsusui-release-dispatch-receipt.schema.json',
-    'utf8',
-  ),
-)
 
 for (const fragment of [
   'release:concurrency:plan',
-  'needs: [quality, plan]',
   'needs: [quality, quality-playwright]',
   'uses: ./.github/workflows/_quality-readiness.yml',
+  'needs: [quality, quality-readiness, plan]',
+  'needs: [quality, quality-readiness, plan, preflight]',
   'group: ${{ needs.plan.outputs.concurrency-group }}',
   '--candidate-manifest .npm-candidate/fsusui-npm-candidate.manifest.json',
   'Check channel monotonicity before lock',
   'Check channel monotonicity after lock',
   "if: steps.monotonicity.outputs.action == 'publish'",
-  'fsusblog-consumer:',
-  'uses: ./.github/workflows/_fsusblog-consumer-gate.yml',
-  'matrix-artifact-name: consumer-matrix-release',
-  'candidate-digest: ${{ needs.quality.outputs.npm-candidate-digest }}',
-  'needs: [quality, quality-readiness, plan, fsusblog-consumer]',
-  'needs: [quality, quality-readiness, plan, preflight, fsusblog-consumer]',
-  "test '${{ needs.fsusblog-consumer.outputs.receipt-status }}' = 'success'",
-  'verify-cross-repo-receipt.mjs',
-  "--receipt-digest '${{ needs.fsusblog-consumer.outputs.receipt-sha256 }}'",
+  'id: publish',
+  'echo "published=true" >> "$GITHUB_OUTPUT"',
+  'verify-published-consumer-contracts:',
+  'tests/consumer-contracts/run-consumer-contracts.mjs',
 ]) {
   assert.ok(
     publish.includes(fragment),
@@ -44,47 +31,25 @@ for (const fragment of [
 assert.ok(!publish.includes('publish-npm-${{ github.ref }}'))
 assert.ok(!publish.includes('NPM_RECOVERY_TOKEN'))
 
-for (const fragment of [
-  'name: fsusblog-consumer-gate',
-  'Verify stable release against the #318 receipt',
-  'fsusblog-consumer-gate.receipt.sha256',
-  'fsusui-release-dispatch.mjs verify',
-  'id: publish',
-  'echo "published=true" >> "$GITHUB_OUTPUT"',
-  "if: steps.publish.outputs.published == 'true' && needs.plan.outputs.dist-tag == 'latest'",
-  'FSUS_RELEASE_TRAIN_APP_ID: ${{ vars.FSUS_RELEASE_TRAIN_APP_ID }}',
-  'FSUS_RELEASE_TRAIN_APP_PRIVATE_KEY: ${{ secrets.FSUS_RELEASE_TRAIN_APP_PRIVATE_KEY }}',
-  'fsusui-release-dispatch.mjs dispatch',
-  '--publish-run-id "$GITHUB_RUN_ID"',
-  'name: fsusui-release-dispatch-${{ github.run_id }}',
-  'if-no-files-found: error',
-]) {
-  assert.ok(
-    publish.includes(fragment),
-    `publish workflow is missing release dispatch contract: ${fragment}`,
-  )
-}
 for (const forbidden of [
   'PERSONAL_ACCESS_TOKEN',
   'FSUS_RELEASE_TRAIN_TOKEN',
+  'FSUS_RELEASE_TRAIN_APP_ID',
+  'FSUS_RELEASE_TRAIN_APP_PRIVATE_KEY',
+  'FSUS_CROSS_REPO_APP_ID',
+  'FSUS_CROSS_REPO_APP_PRIVATE_KEY',
+  '_fsusblog-consumer-gate.yml',
+  'fsusblog-consumer',
+  'fsusui-release-dispatch',
   'GH_TOKEN',
   'github.token',
 ]) {
   assert.ok(
     !publish.includes(forbidden),
-    `publish workflow must not use ${forbidden} for cross-repository dispatch`,
+    `publish workflow must not contain ${forbidden}`,
   )
 }
-const dispatchStep = publish.slice(
-  publish.indexOf('Verify stable npm publication and dispatch the release event'),
-  publish.indexOf('Upload sanitized release dispatch receipt'),
-)
-assert.ok(
-  dispatchStep.includes('FSUS_RELEASE_TRAIN_APP_ID') &&
-    dispatchStep.includes('FSUS_RELEASE_TRAIN_APP_PRIVATE_KEY') &&
-    !dispatchStep.includes('GH_TOKEN'),
-  'release dispatch step must authenticate GitHub dispatch strictly via the release train App',
-)
+
 for (const forbidden of [
   'pnpm run package:candidate:build',
   'pnpm run build:npm-package',
@@ -96,22 +61,6 @@ for (const forbidden of [
     `publish workflow must not rebuild/repack the candidate with ${forbidden}`,
   )
 }
-assert.equal(payloadSchema.additionalProperties, false)
-assert.deepEqual(
-  [...payloadSchema.required].sort(),
-  Object.keys(payloadSchema.properties).sort(),
-)
-assert.equal(payloadSchema.properties.schemaVersion.const, 1)
-assert.equal(payloadSchema.properties.distTag.const, 'latest')
-assert.equal(
-  payloadSchema.properties.registry.const,
-  'https://npm.pkg.github.com/',
-)
-assert.equal(receiptSchema.additionalProperties, false)
-assert.deepEqual(
-  [...receiptSchema.required].sort(),
-  Object.keys(receiptSchema.properties).sort(),
-)
 
 for (const fragment of [
   'workflow_dispatch:',
@@ -131,9 +80,3 @@ for (const fragment of [
 assert.ok(!recovery.includes('npm publish'))
 
 console.log('npm release workflow lock and recovery policy passed.')
-
-await import('./check-fsusblog-consumer-workflow.mjs')
-await import('./test-fsusui-release-dispatch.mjs')
-await import('./test-cross-repo-app-verifier.mjs')
-await import('./test-cross-repo-candidate-binding.mjs')
-await import('./test-cross-repo-receipt.mjs')
