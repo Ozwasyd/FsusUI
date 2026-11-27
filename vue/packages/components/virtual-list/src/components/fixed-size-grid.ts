@@ -2,14 +2,36 @@ import { isNumber, throwError } from '@element-plus/utils'
 import createGrid from '../builders/build-grid'
 
 import {
-  AUTO_ALIGNMENT,
-  CENTERED_ALIGNMENT,
-  END_ALIGNMENT,
-  SMART_ALIGNMENT,
-  START_ALIGNMENT,
-} from '../defaults'
+  alignItemOffset,
+  getFixedStartIndex,
+  getFixedStopIndex,
+} from './sizing'
+
+import type { Alignment } from '../types'
 
 const SCOPE = 'ElFixedSizeGrid'
+
+const getAxisOffset = (
+  total: number,
+  itemSize: number,
+  viewportSize: string | number | undefined,
+  index: number,
+  alignment: Alignment,
+  scrollOffset: number,
+  scrollBarWidth: number,
+) => {
+  const size = Number(viewportSize)
+  const lastOffset = Math.max(0, total * itemSize - size)
+  const offset = index * itemSize
+  return alignItemOffset(
+    alignment,
+    scrollOffset,
+    size,
+    Math.max(0, offset - size + scrollBarWidth + itemSize),
+    Math.min(lastOffset, offset),
+    { lastOffset, preferEndWhenBoundsCross: true },
+  )
+}
 
 const FixedSizeGrid = createGrid({
   name: 'ElFixedSizeGrid',
@@ -31,172 +53,72 @@ const FixedSizeGrid = createGrid({
 
   getColumnOffset: (
     { totalColumn, columnWidth, width },
-    columnIndex,
+    index,
     alignment,
     scrollLeft,
     _,
-    scrollBarWidth
-  ) => {
-    width = Number(width)
-    const lastColumnOffset = Math.max(
-      0,
-      totalColumn * (columnWidth as number) - width
-    )
-    const maxOffset = Math.min(
-      lastColumnOffset,
-      columnIndex * (columnWidth as number)
-    )
-    const minOffset = Math.max(
-      0,
-      columnIndex * (columnWidth as number) -
-        width +
-        scrollBarWidth +
-        (columnWidth as number)
-    )
-
-    if (alignment === 'smart') {
-      if (scrollLeft >= minOffset - width && scrollLeft <= maxOffset + width) {
-        alignment = AUTO_ALIGNMENT
-      } else {
-        alignment = CENTERED_ALIGNMENT
-      }
-    }
-
-    switch (alignment) {
-      case START_ALIGNMENT:
-        return maxOffset
-      case END_ALIGNMENT:
-        return minOffset
-      case CENTERED_ALIGNMENT: {
-        const middleOffset = Math.round(minOffset + (maxOffset - minOffset) / 2)
-        if (middleOffset < Math.ceil(width / 2)) {
-          return 0
-        } else if (middleOffset > lastColumnOffset + Math.floor(width / 2)) {
-          return lastColumnOffset
-        } else {
-          return middleOffset
-        }
-      }
-      case AUTO_ALIGNMENT:
-      default:
-        if (scrollLeft >= minOffset && scrollLeft <= maxOffset) {
-          return scrollLeft
-        } else if (minOffset > maxOffset) {
-          return minOffset
-        } else if (scrollLeft < minOffset) {
-          return minOffset
-        } else {
-          return maxOffset
-        }
-    }
-  },
+    scrollBarWidth,
+  ) =>
+    getAxisOffset(
+      totalColumn,
+      columnWidth as number,
+      width,
+      index,
+      alignment,
+      scrollLeft,
+      scrollBarWidth,
+    ),
 
   getRowOffset: (
-    { rowHeight, height, totalRow },
-    rowIndex,
-    align,
+    { totalRow, rowHeight, height },
+    index,
+    alignment,
     scrollTop,
     _,
-    scrollBarWidth
-  ): number => {
-    height = Number(height)
-    const lastRowOffset = Math.max(0, totalRow * (rowHeight as number) - height)
-    const maxOffset = Math.min(lastRowOffset, rowIndex * (rowHeight as number))
-    const minOffset = Math.max(
-      0,
-      rowIndex * (rowHeight as number) -
-        height +
-        scrollBarWidth +
-        (rowHeight as number)
-    )
-
-    if (align === SMART_ALIGNMENT) {
-      if (scrollTop >= minOffset - height && scrollTop <= maxOffset + height) {
-        align = AUTO_ALIGNMENT
-      } else {
-        align = CENTERED_ALIGNMENT
-      }
-    }
-
-    switch (align) {
-      case START_ALIGNMENT:
-        return maxOffset
-      case END_ALIGNMENT:
-        return minOffset
-      case CENTERED_ALIGNMENT: {
-        const middleOffset = Math.round(minOffset + (maxOffset - minOffset) / 2)
-        if (middleOffset < Math.ceil(height / 2)) {
-          return 0
-        } else if (middleOffset > lastRowOffset + Math.floor(height / 2)) {
-          return lastRowOffset
-        } else {
-          return middleOffset
-        }
-      }
-      case AUTO_ALIGNMENT:
-      default:
-        if (scrollTop >= minOffset && scrollTop <= maxOffset) {
-          return scrollTop
-        } else if (minOffset > maxOffset) {
-          return minOffset
-        } else if (scrollTop < minOffset) {
-          return minOffset
-        } else {
-          return maxOffset
-        }
-    }
-  },
+    scrollBarWidth,
+  ) =>
+    getAxisOffset(
+      totalRow,
+      rowHeight as number,
+      height,
+      index,
+      alignment,
+      scrollTop,
+      scrollBarWidth,
+    ),
 
   getColumnStartIndexForOffset: ({ columnWidth, totalColumn }, scrollLeft) =>
-    Math.max(
-      0,
-      Math.min(
-        totalColumn - 1,
-        Math.floor(scrollLeft / (columnWidth as number))
-      )
-    ),
+    getFixedStartIndex(totalColumn, columnWidth as number, scrollLeft),
 
   getColumnStopIndexForStartIndex: (
     { columnWidth, totalColumn, width },
-    startIndex: number,
-    scrollLeft: number
-  ): number => {
-    const left = startIndex * (columnWidth as number)
-    const visibleColumnsCount = Math.ceil(
-      ((width as number) + scrollLeft - left) / (columnWidth as number)
-    )
-    return Math.max(
-      0,
-      Math.min(totalColumn - 1, startIndex + visibleColumnsCount - 1)
-    )
-  },
-
-  getRowStartIndexForOffset: (
-    { rowHeight, totalRow },
-    scrollTop: number
-  ): number =>
-    Math.max(
-      0,
-      Math.min(totalRow - 1, Math.floor(scrollTop / (rowHeight as number)))
+    startIndex,
+    scrollLeft,
+  ) =>
+    getFixedStopIndex(
+      totalColumn,
+      columnWidth as number,
+      width as number,
+      startIndex,
+      scrollLeft,
     ),
+
+  getRowStartIndexForOffset: ({ rowHeight, totalRow }, scrollTop) =>
+    getFixedStartIndex(totalRow, rowHeight as number, scrollTop),
 
   getRowStopIndexForStartIndex: (
     { rowHeight, totalRow, height },
-    startIndex: number,
-    scrollTop: number
-  ): number => {
-    const top = startIndex * (rowHeight as number)
-    const numVisibleRows = Math.ceil(
-      ((height as number) + scrollTop - top) / (rowHeight as number)
-    )
-    return Math.max(
-      0,
-      Math.min(
-        totalRow - 1,
-        startIndex + numVisibleRows - 1 // -1 is because stop index is inclusive
-      )
-    )
-  },
+    startIndex,
+    scrollTop,
+  ) =>
+    getFixedStopIndex(
+      totalRow,
+      rowHeight as number,
+      height as number,
+      startIndex,
+      scrollTop,
+    ),
+
   /**
    * Fixed size grid does not need this cache
    * Using any to bypass it, TODO: Using type inference to fix this.

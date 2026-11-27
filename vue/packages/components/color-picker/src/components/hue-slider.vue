@@ -93,26 +93,16 @@ export default defineComponent({
 
       const { rect, thumbHeight, thumbWidth } = metrics
       const { clientX, clientY } = getClientXY(event)
-      let hue
-
-      if (!props.vertical) {
-        let left = clientX - rect.left
-        left = Math.min(left, rect.width - thumbWidth / 2)
-        left = Math.max(thumbWidth / 2, left)
-
-        hue = Math.round(
-          ((left - thumbWidth / 2) / (rect.width - thumbWidth)) * 360,
-        )
-      } else {
-        let top = clientY - rect.top
-
-        top = Math.min(top, rect.height - thumbHeight / 2)
-        top = Math.max(thumbHeight / 2, top)
-        hue = Math.round(
-          ((top - thumbHeight / 2) / (rect.height - thumbHeight)) * 360,
-        )
-      }
-      props.color.set('hue', hue)
+      const vertical = props.vertical
+      const size = vertical ? rect.height : rect.width
+      const thumbSize = vertical ? thumbHeight : thumbWidth
+      const halfThumb = thumbSize / 2
+      const offset = vertical ? clientY - rect.top : clientX - rect.left
+      const position = Math.max(halfThumb, Math.min(offset, size - halfThumb))
+      props.color.set(
+        'hue',
+        Math.round(((position - halfThumb) / (size - thumbSize)) * 360),
+      )
     }
 
     function getThumbLeft() {

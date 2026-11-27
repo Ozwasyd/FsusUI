@@ -129,6 +129,7 @@ public class FsusDropZoneTests
     var dropZone = new FsusDropZone
     {
       AllowMultiple = false,
+      Accepts = ".pdf",
     };
 
     Assert.Contains("fsus-single", dropZone.Classes);
@@ -136,19 +137,27 @@ public class FsusDropZoneTests
 
     FsusFileDropEventArgs? dropped = null;
     FsusFileDropEventArgs? rejected = null;
-    dropZone.FilesDropped += (_, e) => dropped = e;
-    dropZone.FilesRejected += (_, e) => rejected = e;
+    var events = new List<string>();
+    dropZone.FilesDropped += (_, e) =>
+    {
+      dropped = e;
+      events.Add(nameof(FsusDropZone.FilesDropped));
+    };
+    dropZone.FilesRejected += (_, e) =>
+    {
+      rejected = e;
+      events.Add(nameof(FsusDropZone.FilesRejected));
+    };
 
-    dropZone.HandleDrop(new[] { "first.pdf", "second.pdf", "third.pdf" });
+    dropZone.HandleDrop(new[] { "first.pdf", "second.pdf", "blocked.txt", "third.pdf" });
 
     Assert.NotNull(dropped);
     Assert.Single(dropped!.Files);
     Assert.Equal("first.pdf", dropped.Files[0]);
 
     Assert.NotNull(rejected);
-    Assert.Equal(2, rejected!.RejectedFiles.Count);
-    Assert.Contains("second.pdf", rejected.RejectedFiles);
-    Assert.Contains("third.pdf", rejected.RejectedFiles);
+    Assert.Equal(new[] { "blocked.txt", "second.pdf", "third.pdf" }, rejected.RejectedFiles);
+    Assert.Equal(new[] { nameof(FsusDropZone.FilesRejected), nameof(FsusDropZone.FilesDropped) }, events);
 
     Assert.True(dropZone.HasFilterError);
     Assert.Equal("Only a single file is accepted.", dropZone.FilterErrorMessage);

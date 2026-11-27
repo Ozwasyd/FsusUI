@@ -378,15 +378,7 @@ public partial class FsusMarkdownEditor : TemplatedControl
       archivedHistoryOrder.Remove(identity);
     }
     store = next;
-    nativeMachine.Apply(new FsusMarkdownNativeEventInput
-    {
-      Kind = FsusMarkdownNativeEventKind.DocumentSwitch,
-      DocumentIdentity = identity,
-      CurrentIdentity = identity,
-      Revision = store.Revision,
-      Value = store.Value,
-      Selection = store.Selection,
-    });
+    ApplyNativeEvent(FsusMarkdownNativeEventKind.DocumentSwitch);
     imeClient?.RequestImeReset();
   }
 

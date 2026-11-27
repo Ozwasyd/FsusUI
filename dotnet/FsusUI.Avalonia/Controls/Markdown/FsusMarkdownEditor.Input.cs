@@ -60,18 +60,9 @@ public partial class FsusMarkdownEditor
       inputOwner.SelectionStart,
       inputOwner.SelectionEnd);
     var inserted = next[prefix..newSuffix];
-    var plan = nativeMachine.Apply(new FsusMarkdownNativeEventInput
-    {
-      Kind = FsusMarkdownNativeEventKind.Input,
-      InputType = "insertText",
-      Data = inserted,
-      Value = next,
-      PreviousValue = previous,
-      Revision = store.Revision,
-      Selection = selection,
-      DocumentIdentity = store.Identity,
-      CurrentIdentity = store.Identity,
-    });
+    var plan = ApplyNativeEvent(
+      FsusMarkdownNativeEventKind.Input, inserted, "insertText",
+      value: next, previousValue: previous, selection: selection);
     if (plan.Action is not (FsusMarkdownNativeAction.Dispatch or FsusMarkdownNativeAction.Commit))
     {
       // Dedup, freeze, and rejections never dispatch: one pipeline, one
@@ -149,7 +140,7 @@ public partial class FsusMarkdownEditor
       // pending end so its late commit is rejected as orphaned.
       if (nativeMachine.Composing)
       {
-        ApplyNativeEvent(FsusMarkdownNativeEventKind.CompositionEnd, null);
+        ApplyNativeEvent(FsusMarkdownNativeEventKind.CompositionEnd);
         pendingCompositionEnd = true;
       }
       else if (nativeMachine.Phase is FsusMarkdownNativePhase.Aborted or FsusMarkdownNativePhase.Draining)
@@ -165,20 +156,30 @@ public partial class FsusMarkdownEditor
     ApplyNativeEvent(FsusMarkdownNativeEventKind.CompositionUpdate, text);
   }
 
-  private void ApplyNativeEvent(FsusMarkdownNativeEventKind kind, string? data)
-  {
-    nativeMachine.Apply(new FsusMarkdownNativeEventInput
+  private FsusMarkdownNativeEventPlan ApplyNativeEvent(
+    FsusMarkdownNativeEventKind kind,
+    string? data = null,
+    string? inputType = null,
+    string? value = null,
+    string? previousValue = null,
+    int? revision = null,
+    FsusMarkdownEditorSelection? selection = null,
+    string? clipboardIdentity = null,
+    string? origin = null) =>
+    nativeMachine.Apply(new()
     {
       Kind = kind,
       Data = data,
-      Value = store.Value,
-      PreviousValue = store.Value,
-      Revision = store.Revision,
-      Selection = store.Selection,
+      InputType = inputType,
+      Value = value ?? store.Value,
+      PreviousValue = kind == FsusMarkdownNativeEventKind.DocumentSwitch ? null : previousValue ?? store.Value,
+      Revision = revision ?? store.Revision,
+      Selection = selection ?? store.Selection,
+      ClipboardIdentity = clipboardIdentity,
+      Origin = origin,
       DocumentIdentity = store.Identity,
       CurrentIdentity = store.Identity,
     });
-  }
 
   private void FlushPendingCompositionEnd()
   {
@@ -189,21 +190,11 @@ public partial class FsusMarkdownEditor
     pendingCompositionEnd = false;
     if (nativeMachine.Composing)
     {
-      ApplyNativeEvent(FsusMarkdownNativeEventKind.CompositionEnd, null);
+      ApplyNativeEvent(FsusMarkdownNativeEventKind.CompositionEnd);
     }
     if (nativeMachine.Phase == FsusMarkdownNativePhase.Committing)
     {
-      _ = nativeMachine.Apply(new FsusMarkdownNativeEventInput
-      {
-        Kind = FsusMarkdownNativeEventKind.Input,
-        InputType = "insertCompositionText",
-        Value = store.Value,
-        PreviousValue = store.Value,
-        Revision = store.Revision,
-        Selection = store.Selection,
-        DocumentIdentity = store.Identity,
-        CurrentIdentity = store.Identity,
-      });
+      ApplyNativeEvent(FsusMarkdownNativeEventKind.Input, inputType: "insertCompositionText");
     }
   }
 
@@ -271,42 +262,12 @@ public partial class FsusMarkdownEditor
       pendingCompositionEnd = false;
       if (nativeMachine.Phase is FsusMarkdownNativePhase.Aborted or FsusMarkdownNativePhase.Draining)
       {
-        nativeMachine.Apply(new FsusMarkdownNativeEventInput
-        {
-          Kind = FsusMarkdownNativeEventKind.CompositionEnd,
-          Data = inserted,
-          Value = store.Value,
-          PreviousValue = store.Value,
-          Revision = store.Revision,
-          Selection = store.Selection,
-          DocumentIdentity = store.Identity,
-          CurrentIdentity = store.Identity,
-        });
-        _ = nativeMachine.Apply(new FsusMarkdownNativeEventInput
-        {
-          Kind = FsusMarkdownNativeEventKind.Input,
-          InputType = "insertCompositionText",
-          Value = store.Value,
-          PreviousValue = store.Value,
-          Revision = store.Revision,
-          Selection = store.Selection,
-          DocumentIdentity = store.Identity,
-          CurrentIdentity = store.Identity,
-        });
+        ApplyNativeEvent(FsusMarkdownNativeEventKind.CompositionEnd, inserted);
+        ApplyNativeEvent(FsusMarkdownNativeEventKind.Input, inputType: "insertCompositionText");
         args.Handled = true;
         return;
       }
-      var endPlan = nativeMachine.Apply(new FsusMarkdownNativeEventInput
-      {
-        Kind = FsusMarkdownNativeEventKind.CompositionEnd,
-        Data = inserted,
-        Value = store.Value,
-        PreviousValue = store.Value,
-        Revision = store.Revision,
-        Selection = store.Selection,
-        DocumentIdentity = store.Identity,
-        CurrentIdentity = store.Identity,
-      });
+      var endPlan = ApplyNativeEvent(FsusMarkdownNativeEventKind.CompositionEnd, inserted);
       // Avalonia's TextBox selection can temporarily include the native
       // preedit span even though that span is not part of the source document.
       // The transaction must use the frozen source selection captured by the
@@ -317,18 +278,9 @@ public partial class FsusMarkdownEditor
       var postSelection = new FsusMarkdownEditorSelection(
         caretStart + inserted.Length,
         caretStart + inserted.Length);
-      _ = nativeMachine.Apply(new FsusMarkdownNativeEventInput
-      {
-        Kind = FsusMarkdownNativeEventKind.Input,
-        InputType = "insertCompositionText",
-        Data = inserted,
-        Value = postValue,
-        PreviousValue = store.Value,
-        Revision = store.Revision,
-        Selection = postSelection,
-        DocumentIdentity = store.Identity,
-        CurrentIdentity = store.Identity,
-      });
+      ApplyNativeEvent(
+        FsusMarkdownNativeEventKind.Input, inserted, "insertCompositionText",
+        value: postValue, selection: postSelection);
       if (endPlan.Action is FsusMarkdownNativeAction.Commit or FsusMarkdownNativeAction.Ignore &&
         !IsReadOnly &&
         Mode != FsusMarkdownEditorMode.Preview)
@@ -483,18 +435,9 @@ public partial class FsusMarkdownEditor
       ExpectedRevision: snapshot.Revision,
       CurrentIdentity: store.Identity,
       DocumentIdentity: snapshot.DocumentIdentity));
-    nativeMachine.Apply(new FsusMarkdownNativeEventInput
-    {
-      Kind = origin == "drop" ? FsusMarkdownNativeEventKind.Drop : FsusMarkdownNativeEventKind.Paste,
-      ClipboardIdentity = plan.Identity,
-      Origin = origin,
-      Value = store.Value,
-      PreviousValue = store.Value,
-      Revision = store.Revision,
-      Selection = store.Selection,
-      DocumentIdentity = store.Identity,
-      CurrentIdentity = store.Identity,
-    });
+    ApplyNativeEvent(
+      origin == "drop" ? FsusMarkdownNativeEventKind.Drop : FsusMarkdownNativeEventKind.Paste,
+      clipboardIdentity: plan.Identity, origin: origin);
     if (plan.Rejected is not null || plan.Transaction is null)
     {
       return;
@@ -504,19 +447,12 @@ public partial class FsusMarkdownEditor
     var result = Execute(transaction, () => store.Dispatch(transaction));
     if (result.Accepted)
     {
-      nativeMachine.Apply(new FsusMarkdownNativeEventInput
-      {
-        Kind = FsusMarkdownNativeEventKind.Input,
-        InputType = origin == "drop" ? "insertFromDrop" : "insertFromPaste",
-        Data = plan.Insert,
-        Value = result.Value,
-        PreviousValue = previousValue,
-        Revision = result.Revision,
-        Selection = result.Selection,
-        Origin = origin,
-        DocumentIdentity = store.Identity,
-        CurrentIdentity = store.Identity,
-      });
+      ApplyNativeEvent(
+        FsusMarkdownNativeEventKind.Input,
+        plan.Insert,
+        origin == "drop" ? "insertFromDrop" : "insertFromPaste",
+        value: result.Value, previousValue: previousValue,
+        revision: result.Revision, selection: result.Selection, origin: origin);
     }
   }
 

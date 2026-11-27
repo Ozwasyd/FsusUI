@@ -282,6 +282,7 @@ import { useRangePicker } from '../composables/use-range-picker'
 import { getDefaultValue, isValidRange } from '../utils'
 import DateTable from './basic-date-table.vue'
 
+import type { ComputedRef, Ref } from 'vue'
 import type { Dayjs } from 'dayjs'
 
 type ChangeType = 'min' | 'max'
@@ -388,32 +389,6 @@ const rightViewKey = computed(
   () => `right-${rightDate.value.year()}-${rightDate.value.month()}`
 )
 
-const minVisibleDate = computed(() => {
-  if (dateUserInput.value.min !== null) return dateUserInput.value.min
-  if (minDate.value) return minDate.value.format(dateFormat.value)
-  return ''
-})
-
-const maxVisibleDate = computed(() => {
-  if (dateUserInput.value.max !== null) return dateUserInput.value.max
-  if (maxDate.value || minDate.value)
-    return (maxDate.value || minDate.value)!.format(dateFormat.value)
-  return ''
-})
-
-const minVisibleTime = computed(() => {
-  if (timeUserInput.value.min !== null) return timeUserInput.value.min
-  if (minDate.value) return minDate.value.format(timeFormat.value)
-  return ''
-})
-
-const maxVisibleTime = computed(() => {
-  if (timeUserInput.value.max !== null) return timeUserInput.value.max
-  if (maxDate.value || minDate.value)
-    return (maxDate.value || minDate.value)!.format(timeFormat.value)
-  return ''
-})
-
 const timeFormat = computed(() => {
   return props.timeFormat || extractTimeFormat(format)
 })
@@ -421,6 +396,23 @@ const timeFormat = computed(() => {
 const dateFormat = computed(() => {
   return props.dateFormat || extractDateFormat(format)
 })
+
+const visibleValue = (
+  input: Ref<UserInput>,
+  type: ChangeType,
+  inputFormat: ComputedRef<string>
+) =>
+  computed(() => {
+    const draft = input.value[type]
+    if (draft !== null) return draft
+    const date = type === 'min' ? minDate.value : maxDate.value || minDate.value
+    return date?.format(inputFormat.value) ?? ''
+  })
+
+const minVisibleDate = visibleValue(dateUserInput, 'min', dateFormat)
+const maxVisibleDate = visibleValue(dateUserInput, 'max', dateFormat)
+const minVisibleTime = visibleValue(timeUserInput, 'min', timeFormat)
+const maxVisibleTime = visibleValue(timeUserInput, 'max', timeFormat)
 
 const isValidValue = (date: [Dayjs, Dayjs]) => {
   return (
@@ -431,77 +423,43 @@ const isValidValue = (date: [Dayjs, Dayjs]) => {
   )
 }
 
-const leftPrevYear = () => {
-  dateRangeViewMotion.value = 'prev'
-  leftDate.value = leftDate.value.subtract(1, 'year')
-  if (!props.unlinkPanels) {
-    rightDate.value = leftDate.value.add(1, 'month')
-  }
-  handlePanelChange('year')
-}
+const navigatePanel = (
+  panel: 'left' | 'right',
+  direction: DateRangeViewMotion,
+  mode: 'month' | 'year'
+) => {
+  dateRangeViewMotion.value = direction
+  const move = (date: Dayjs) =>
+    direction === 'next' ? date.add(1, mode) : date.subtract(1, mode)
 
-const leftPrevMonth = () => {
-  dateRangeViewMotion.value = 'prev'
-  leftDate.value = leftDate.value.subtract(1, 'month')
-  if (!props.unlinkPanels) {
-    rightDate.value = leftDate.value.add(1, 'month')
-  }
-  handlePanelChange('month')
-}
-
-const rightNextYear = () => {
-  dateRangeViewMotion.value = 'next'
-  if (!props.unlinkPanels) {
-    leftDate.value = leftDate.value.add(1, 'year')
-    rightDate.value = leftDate.value.add(1, 'month')
+  if (panel === 'left') {
+    leftDate.value = move(leftDate.value)
+    if (direction === 'prev' && !props.unlinkPanels) {
+      rightDate.value = leftDate.value.add(1, unit)
+    }
+  } else if (direction === 'next' && !props.unlinkPanels) {
+    // The moved left date carries any month-end clamping to the right.
+    leftDate.value = move(leftDate.value)
+    rightDate.value = leftDate.value.add(1, unit)
   } else {
-    rightDate.value = rightDate.value.add(1, 'year')
+    rightDate.value = move(rightDate.value)
   }
-  handlePanelChange('year')
-}
 
-const rightNextMonth = () => {
-  dateRangeViewMotion.value = 'next'
-  if (!props.unlinkPanels) {
-    leftDate.value = leftDate.value.add(1, 'month')
-    rightDate.value = leftDate.value.add(1, 'month')
-  } else {
-    rightDate.value = rightDate.value.add(1, 'month')
-  }
-  handlePanelChange('month')
-}
-
-const leftNextYear = () => {
-  dateRangeViewMotion.value = 'next'
-  leftDate.value = leftDate.value.add(1, 'year')
-  handlePanelChange('year')
-}
-
-const leftNextMonth = () => {
-  dateRangeViewMotion.value = 'next'
-  leftDate.value = leftDate.value.add(1, 'month')
-  handlePanelChange('month')
-}
-
-const rightPrevYear = () => {
-  dateRangeViewMotion.value = 'prev'
-  rightDate.value = rightDate.value.subtract(1, 'year')
-  handlePanelChange('year')
-}
-
-const rightPrevMonth = () => {
-  dateRangeViewMotion.value = 'prev'
-  rightDate.value = rightDate.value.subtract(1, 'month')
-  handlePanelChange('month')
-}
-
-const handlePanelChange = (mode: 'month' | 'year') => {
   emit(
     'panel-change',
     [leftDate.value.toDate(), rightDate.value.toDate()],
     mode
   )
 }
+
+const leftPrevYear = () => navigatePanel('left', 'prev', 'year')
+const leftPrevMonth = () => navigatePanel('left', 'prev', 'month')
+const rightNextYear = () => navigatePanel('right', 'next', 'year')
+const rightNextMonth = () => navigatePanel('right', 'next', 'month')
+const leftNextYear = () => navigatePanel('left', 'next', 'year')
+const leftNextMonth = () => navigatePanel('left', 'next', 'month')
+const rightPrevYear = () => navigatePanel('right', 'prev', 'year')
+const rightPrevMonth = () => navigatePanel('right', 'prev', 'month')
 
 const enableMonthArrow = computed(() => {
   const nextMonth = (leftMonth.value + 1) % 12

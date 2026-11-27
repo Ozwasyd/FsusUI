@@ -3,20 +3,21 @@ import { isFunction } from '@vue/shared'
 import { isNumber, isUndefined, throwError } from '@element-plus/utils'
 import createGrid from '../builders/build-grid'
 
+import { DEFAULT_DYNAMIC_LIST_ITEM_SIZE } from '../defaults'
 import {
-  AUTO_ALIGNMENT,
-  CENTERED_ALIGNMENT,
-  DEFAULT_DYNAMIC_LIST_ITEM_SIZE,
-  END_ALIGNMENT,
-  SMART_ALIGNMENT,
-  START_ALIGNMENT,
-} from '../defaults'
+  alignItemOffset,
+  findVariableStartIndex,
+  getEstimatedAxisSize,
+  getVariableStopIndex,
+  measureItemsThrough,
+} from './sizing'
+
 import type { GridInstance } from '../builders/build-grid'
 import type { VirtualizedGridProps } from '../props'
 
 import type { Alignment, GridCache, ItemSize, ListItem } from '../types'
 
-const { max, min, floor } = Math
+const { max, min } = Math
 const SCOPE = 'ElDynamicSizeGrid'
 
 type Props = VirtualizedGridProps
@@ -51,73 +52,11 @@ const getItemFromCache = (
   ] as [Record<string, ListItem>, ItemSize, number]
 
   if (index > lastVisited) {
-    let offset = 0
-    if (lastVisited >= 0) {
-      const item = cachedItems[lastVisited]
-      offset = item.offset + item.size
-    }
-
-    for (let i = lastVisited + 1; i <= index; i++) {
-      // console.log(i, sizer(i))
-      const size = sizer(i)
-
-      cachedItems[i] = {
-        offset,
-        size,
-      }
-
-      offset += size
-    }
-
+    measureItemsThrough(cachedItems, sizer, lastVisited, index)
     gridCache[ACCESS_LAST_VISITED_KEY_MAP[type]] = index
   }
 
   return cachedItems[index]
-}
-
-const bs = (
-  props: Props,
-  gridCache: GridCache,
-  low: number,
-  high: number,
-  offset: number,
-  type: CacheItemType,
-) => {
-  while (low <= high) {
-    const mid = low + floor((high - low) / 2)
-    const currentOffset = getItemFromCache(props, mid, gridCache, type).offset
-
-    if (currentOffset === offset) {
-      return mid
-    } else if (currentOffset < offset) {
-      low = mid + 1
-    } else {
-      high = mid - 1
-    }
-  }
-
-  return max(0, low - 1)
-}
-
-const es = (
-  props: Props,
-  gridCache: GridCache,
-  idx: number,
-  offset: number,
-  type: CacheItemType,
-) => {
-  const total = type === 'column' ? props.totalColumn : props.totalRow
-  let exponent = 1
-
-  while (
-    idx < total &&
-    getItemFromCache(props, idx, gridCache, type).offset < offset
-  ) {
-    idx += exponent
-    exponent *= 2
-  }
-
-  return bs(props, gridCache, floor(idx / 2), min(idx, total - 1), offset, type)
 }
 
 const findItem = (
@@ -125,62 +64,39 @@ const findItem = (
   gridCache: GridCache,
   offset: number,
   type: CacheItemType,
-) => {
-  const [cache, lastVisitedIndex] = [
+) =>
+  findVariableStartIndex(
     gridCache[type],
+    (index) => getItemFromCache(props, index, gridCache, type),
     gridCache[ACCESS_LAST_VISITED_KEY_MAP[type]],
-  ] as [Record<string, ListItem>, number]
-
-  const lastVisitedItemOffset =
-    lastVisitedIndex > 0 ? cache[lastVisitedIndex].offset : 0
-
-  if (lastVisitedItemOffset >= offset) {
-    return bs(props, gridCache, 0, lastVisitedIndex, offset, type)
-  }
-
-  return es(props, gridCache, max(0, lastVisitedIndex), offset, type)
-}
+    type === 'column' ? props.totalColumn : props.totalRow,
+    offset,
+    true,
+  )
 
 const getEstimatedTotalHeight = (
   { totalRow }: Props,
   { estimatedRowHeight, lastVisitedRowIndex, row }: GridCache,
-) => {
-  let sizeOfVisitedRows = 0
+) =>
+  getEstimatedAxisSize(
+    row,
+    estimatedRowHeight,
+    lastVisitedRowIndex >= totalRow ? totalRow - 1 : lastVisitedRowIndex,
+    totalRow,
+  )
 
-  if (lastVisitedRowIndex >= totalRow) {
-    lastVisitedRowIndex = totalRow - 1
-  }
-
-  if (lastVisitedRowIndex >= 0) {
-    const item = row[lastVisitedRowIndex]
-    sizeOfVisitedRows = item.offset + item.size
-  }
-
-  const unvisitedItems = totalRow - lastVisitedRowIndex - 1
-  const sizeOfUnvisitedItems = unvisitedItems * estimatedRowHeight
-
-  return sizeOfVisitedRows + sizeOfUnvisitedItems
-}
 const getEstimatedTotalWidth = (
   { totalColumn }: Props,
   { column, estimatedColumnWidth, lastVisitedColumnIndex }: GridCache,
-) => {
-  let sizeOfVisitedColumns = 0
-
-  if (lastVisitedColumnIndex > totalColumn) {
-    lastVisitedColumnIndex = totalColumn - 1
-  }
-
-  if (lastVisitedColumnIndex >= 0) {
-    const item = column[lastVisitedColumnIndex]
-    sizeOfVisitedColumns = item.offset + item.size
-  }
-
-  const unvisitedItems = totalColumn - lastVisitedColumnIndex - 1
-  const sizeOfUnvisitedItems = unvisitedItems * estimatedColumnWidth
-
-  return sizeOfVisitedColumns + sizeOfUnvisitedItems
-}
+) =>
+  getEstimatedAxisSize(
+    column,
+    estimatedColumnWidth,
+    lastVisitedColumnIndex > totalColumn
+      ? totalColumn - 1
+      : lastVisitedColumnIndex,
+    totalColumn,
+  )
 
 const ACCESS_ESTIMATED_SIZE_KEY_MAP = {
   column: getEstimatedTotalWidth,
@@ -207,37 +123,9 @@ const getOffset = (
   const maxOffset = max(0, min(estimatedSize - size, item.offset))
   const minOffset = max(0, item.offset - size + scrollBarWidth + item.size)
 
-  if (alignment === SMART_ALIGNMENT) {
-    if (scrollOffset >= minOffset - size && scrollOffset <= maxOffset + size) {
-      alignment = AUTO_ALIGNMENT
-    } else {
-      alignment = CENTERED_ALIGNMENT
-    }
-  }
-
-  switch (alignment) {
-    case START_ALIGNMENT: {
-      return maxOffset
-    }
-    case END_ALIGNMENT: {
-      return minOffset
-    }
-    case CENTERED_ALIGNMENT: {
-      return Math.round(minOffset + (maxOffset - minOffset) / 2)
-    }
-    case AUTO_ALIGNMENT:
-    default: {
-      if (scrollOffset >= minOffset && scrollOffset <= maxOffset) {
-        return scrollOffset
-      } else if (minOffset > maxOffset) {
-        return minOffset
-      } else if (scrollOffset < minOffset) {
-        return minOffset
-      } else {
-        return maxOffset
-      }
-    }
-  }
+  return alignItemOffset(alignment, scrollOffset, size, minOffset, maxOffset, {
+    preferEndWhenBoundsCross: true,
+  })
 }
 
 const DynamicSizeGrid = createGrid({
@@ -293,16 +181,14 @@ const DynamicSizeGrid = createGrid({
 
   getColumnStopIndexForStartIndex: (props, startIndex, scrollLeft, cache) => {
     const item = getItemFromCache(props, startIndex, cache, 'column')
-
     const maxOffset = scrollLeft + (props.width as number)
-
-    let offset = item.offset + item.size
-    let stopIndex = startIndex
-    while (stopIndex < props.totalColumn - 1 && offset < maxOffset) {
-      stopIndex++
-      offset += getItemFromCache(props, stopIndex, cache, 'column').size
-    }
-    return stopIndex
+    return getVariableStopIndex(
+      props.totalColumn,
+      startIndex,
+      item.offset + item.size,
+      maxOffset,
+      (index) => getItemFromCache(props, index, cache, 'column'),
+    )
   },
 
   getEstimatedTotalHeight,
@@ -314,17 +200,13 @@ const DynamicSizeGrid = createGrid({
   getRowStopIndexForStartIndex: (props, startIndex, scrollTop, cache) => {
     const { totalRow, height } = props
     const item = getItemFromCache(props, startIndex, cache, 'row')
-    const maxOffset = scrollTop + (height as number)
-
-    let offset = item.size + item.offset
-    let stopIndex = startIndex
-
-    while (stopIndex < totalRow - 1 && offset < maxOffset) {
-      stopIndex++
-      offset += getItemFromCache(props, stopIndex, cache, 'row').size
-    }
-
-    return stopIndex
+    return getVariableStopIndex(
+      totalRow,
+      startIndex,
+      item.size + item.offset,
+      scrollTop + (height as number),
+      (index) => getItemFromCache(props, index, cache, 'row'),
+    )
   },
   injectToInstance: (instance, cache) => {
     const resetAfter = (
