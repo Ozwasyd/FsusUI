@@ -10,6 +10,7 @@ import {
   clickOptionItem,
   clickTagCloseButton,
 } from '../../../test-utils/dom'
+import { createSelectOptions } from '../../../test-utils/select-options'
 import { CircleClose } from '@element-plus/icons-vue'
 import { usePopperContainerId } from '@element-plus/hooks'
 import Select from '../src/select.vue'
@@ -1679,30 +1680,7 @@ describe('Select', () => {
     const wrapper = createSelect({
       data() {
         return {
-          options: [
-            {
-              value: '选项1',
-              label:
-                '黄金糕黄金糕黄金糕黄金糕黄金糕黄金糕黄金糕黄金糕黄金糕黄金糕黄金糕黄金糕黄金糕黄金糕黄金糕黄金糕黄金糕黄金糕黄金糕黄金糕',
-            },
-            {
-              value: '选项2',
-              label:
-                '双皮奶双皮奶双皮奶双皮奶双皮奶双皮奶双皮奶双皮奶双皮奶双皮奶双皮奶双皮奶双皮奶',
-            },
-            {
-              value: '选项3',
-              label: '蚵仔煎蚵仔煎蚵仔煎蚵仔煎蚵仔煎蚵仔煎',
-            },
-            {
-              value: '选项4',
-              label: '龙须面',
-            },
-            {
-              value: '选项5',
-              label: '北京烤鸭',
-            },
-          ],
+          options: createSelectOptions('long-labels'),
         }
       },
     })
@@ -1771,30 +1749,7 @@ describe('Select', () => {
       createSelect({
         data() {
           return {
-            options: [
-              {
-                value: '选项1',
-                label:
-                  '黄金糕黄金糕黄金糕黄金糕黄金糕黄金糕黄金糕黄金糕黄金糕黄金糕黄金糕黄金糕黄金糕黄金糕黄金糕黄金糕黄金糕黄金糕黄金糕黄金糕',
-              },
-              {
-                value: '选项2',
-                label:
-                  '双皮奶双皮奶双皮奶双皮奶双皮奶双皮奶双皮奶双皮奶双皮奶双皮奶双皮奶双皮奶双皮奶',
-              },
-              {
-                value: '选项3',
-                label: '蚵仔煎蚵仔煎蚵仔煎蚵仔煎蚵仔煎蚵仔煎',
-              },
-              {
-                value: '选项4',
-                label: '龙须面',
-              },
-              {
-                value: '选项5',
-                label: '北京烤鸭',
-              },
-            ],
+            options: createSelectOptions('long-labels'),
           }
         },
       })
@@ -1812,30 +1767,7 @@ describe('Select', () => {
         data() {
           return {
             teleported: false,
-            options: [
-              {
-                value: '选项1',
-                label:
-                  '黄金糕黄金糕黄金糕黄金糕黄金糕黄金糕黄金糕黄金糕黄金糕黄金糕黄金糕黄金糕黄金糕黄金糕黄金糕黄金糕黄金糕黄金糕黄金糕黄金糕',
-              },
-              {
-                value: '选项2',
-                label:
-                  '双皮奶双皮奶双皮奶双皮奶双皮奶双皮奶双皮奶双皮奶双皮奶双皮奶双皮奶双皮奶双皮奶',
-              },
-              {
-                value: '选项3',
-                label: '蚵仔煎蚵仔煎蚵仔煎蚵仔煎蚵仔煎蚵仔煎',
-              },
-              {
-                value: '选项4',
-                label: '龙须面',
-              },
-              {
-                value: '选项5',
-                label: '北京烤鸭',
-              },
-            ],
+            options: createSelectOptions('long-labels'),
           }
         },
       })

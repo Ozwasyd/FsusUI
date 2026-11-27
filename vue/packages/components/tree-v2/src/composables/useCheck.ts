@@ -108,76 +108,55 @@ export function useCheck(props: TreeProps, tree: Ref<Tree | undefined>) {
   }
 
   const afterNodeCheck = (node: TreeNode, checked: CheckboxValueType) => {
-    const { checkedNodes, checkedKeys } = getChecked()
-    const { halfCheckedNodes, halfCheckedKeys } = getHalfChecked()
+    const selection = collectChecked(checkedKeys)
+    const halfChecked = collectChecked(indeterminateKeys)
     emit(NODE_CHECK, node.data, {
-      checkedKeys,
-      checkedNodes,
-      halfCheckedKeys,
-      halfCheckedNodes,
+      checkedKeys: selection.keys,
+      checkedNodes: selection.nodes,
+      halfCheckedKeys: halfChecked.keys,
+      halfCheckedNodes: halfChecked.nodes,
     })
     emit(NODE_CHECK_CHANGE, node.data, checked)
   }
 
   // expose
   function getCheckedKeys(leafOnly = false): TreeKey[] {
-    return getChecked(leafOnly).checkedKeys
+    return collectChecked(checkedKeys, leafOnly, 'keys').keys
   }
 
   function getCheckedNodes(leafOnly = false): TreeNodeData[] {
-    return getChecked(leafOnly).checkedNodes
+    return collectChecked(checkedKeys, leafOnly, 'nodes').nodes
   }
 
   function getHalfCheckedKeys(): TreeKey[] {
-    return getHalfChecked().halfCheckedKeys
+    return collectChecked(indeterminateKeys, false, 'keys').keys
   }
 
   function getHalfCheckedNodes(): TreeNodeData[] {
-    return getHalfChecked().halfCheckedNodes
+    return collectChecked(indeterminateKeys, false, 'nodes').nodes
   }
 
-  function getChecked(leafOnly = false): {
-    checkedKeys: TreeKey[]
-    checkedNodes: TreeNodeData[]
-  } {
-    const checkedNodes: TreeNodeData[] = []
+  function collectChecked(
+    keysToCollect: Ref<Set<TreeKey>>,
+    leafOnly = false,
+    output: 'keys' | 'nodes' | 'both' = 'both',
+  ) {
+    const includeKeys = output !== 'nodes'
+    const includeNodes = output !== 'keys'
     const keys: TreeKey[] = []
+    const nodes: TreeNodeData[] = []
     if (tree?.value && props.showCheckbox) {
       const { treeNodeMap } = tree.value
-      checkedKeys.value.forEach((key) => {
+      keysToCollect.value.forEach((key) => {
         const node = treeNodeMap.get(key)
-        if (node && (!leafOnly || (leafOnly && node.isLeaf))) {
-          keys.push(key)
-          checkedNodes.push(node.data)
+        if (node && (!leafOnly || node.isLeaf)) {
+          if (includeKeys) keys.push(key)
+          const data = node.data
+          if (includeNodes) nodes.push(data)
         }
       })
     }
-    return {
-      checkedKeys: keys,
-      checkedNodes,
-    }
-  }
-
-  function getHalfChecked(): {
-    halfCheckedKeys: TreeKey[]
-    halfCheckedNodes: TreeNodeData[]
-  } {
-    const halfCheckedNodes: TreeNodeData[] = []
-    const halfCheckedKeys: TreeKey[] = []
-    if (tree?.value && props.showCheckbox) {
-      const { treeNodeMap } = tree.value
-      indeterminateKeys.value.forEach((key) => {
-        const node = treeNodeMap.get(key)
-        if (node) {
-          halfCheckedKeys.push(key)
-          halfCheckedNodes.push(node.data)
-        }
-      })
-    }
-    return {
-      halfCheckedNodes,
-      halfCheckedKeys,
-    }
+    return { keys, nodes }
   }
 
   function setCheckedKeys(keys: TreeKey[]) {

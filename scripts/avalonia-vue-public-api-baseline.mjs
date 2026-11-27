@@ -96,14 +96,13 @@ const getGitSha = (root) => {
   }
 }
 
-const findMatchingBrace = (source, openIndex) => {
-  let depth = 0
+const scanDelimiters = (source, start, visit) => {
   let quote = ''
   let escaped = false
   let lineComment = false
   let blockComment = false
 
-  for (let index = openIndex; index < source.length; index += 1) {
+  for (let index = start; index < source.length; index += 1) {
     const char = source[index]
     const next = source[index + 1]
 
@@ -142,70 +141,32 @@ const findMatchingBrace = (source, openIndex) => {
       quote = char
       continue
     }
-    if (char === '{') depth += 1
-    if (char === '}') {
-      depth -= 1
-      if (depth === 0) return index
-    }
+    if ('{}[](),'.includes(char) && visit(char, index)) return index
   }
   return -1
+}
+
+const findMatchingBrace = (source, openIndex) => {
+  let depth = 0
+  return scanDelimiters(source, openIndex, (char) => {
+    if (char === '{') depth += 1
+    if (char === '}') depth -= 1
+    return char === '}' && depth === 0
+  })
 }
 
 const splitTopLevel = (source) => {
   const parts = []
   let start = 0
   let depth = 0
-  let quote = ''
-  let escaped = false
-  let lineComment = false
-  let blockComment = false
-
-  for (let index = 0; index < source.length; index += 1) {
-    const char = source[index]
-    const next = source[index + 1]
-
-    if (lineComment) {
-      if (char === '\n') lineComment = false
-      continue
-    }
-    if (blockComment) {
-      if (char === '*' && next === '/') {
-        blockComment = false
-        index += 1
-      }
-      continue
-    }
-    if (quote) {
-      if (escaped) {
-        escaped = false
-      } else if (char === '\\') {
-        escaped = true
-      } else if (char === quote) {
-        quote = ''
-      }
-      continue
-    }
-    if (char === '/' && next === '/') {
-      lineComment = true
-      index += 1
-      continue
-    }
-    if (char === '/' && next === '*') {
-      blockComment = true
-      index += 1
-      continue
-    }
-    if (char === '"' || char === "'" || char === '`') {
-      quote = char
-      continue
-    }
+  scanDelimiters(source, 0, (char, index) => {
     if ('{[('.includes(char)) depth += 1
     if ('}])'.includes(char)) depth -= 1
     if (char === ',' && depth === 0) {
       parts.push(source.slice(start, index))
       start = index + 1
     }
-  }
+  })
   parts.push(source.slice(start))
   return parts
 }

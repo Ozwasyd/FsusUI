@@ -6,6 +6,7 @@ import {
   clickOptionItem,
   clickTagCloseButton,
 } from '../../../test-utils/dom'
+import { createSelectOptions } from '../../../test-utils/select-options'
 import { EVENT_CODE } from '@element-plus/constants'
 import { ArrowDown, CaretTop, CircleClose } from '@element-plus/icons-vue'
 import { usePopperContainerId } from '@element-plus/hooks'
@@ -94,14 +95,17 @@ function getOptions(): HTMLElement[] {
   )
 }
 
-const getSelectVm = (
-  configs: SelectProps = {},
-  options?: SelectTestOption[],
+const mountOptionsSelect = (
+  mode: 'flat' | 'grouped',
+  configs: SelectProps,
+  options: SelectTestOption[],
+  optionTemplate: string,
 ) => {
+  const flat = mode === 'flat'
   ;[
     'multiple',
     'clearable',
-    'defaultFirstOption',
+    ...(flat ? ['defaultFirstOption'] : []),
     'filterable',
     'allowCreate',
     'remote',
@@ -112,35 +116,6 @@ const getSelectVm = (
     configs[config] = configs[config] || false
   })
   configs.multipleLimit = configs.multipleLimit || 0
-  if (!options) {
-    options = [
-      {
-        value: '选项1',
-        label: '黄金糕',
-        disabled: false,
-      },
-      {
-        value: '选项2',
-        label: '双皮奶',
-        disabled: false,
-      },
-      {
-        value: '选项3',
-        label: '蚵仔煎',
-        disabled: false,
-      },
-      {
-        value: '选项4',
-        label: '龙须面',
-        disabled: false,
-      },
-      {
-        value: '选项5',
-        label: '北京烤鸭',
-        disabled: false,
-      },
-    ]
-  }
 
   return _mount(
     `
@@ -151,7 +126,7 @@ const getSelectVm = (
       :multiple-limit="multipleLimit"
       :popper-class="popperClass"
       :clearable="clearable"
-      :default-first-option="defaultFirstOption"
+      ${flat ? ':default-first-option="defaultFirstOption"' : ''}
       :filterable="filterable"
       :collapse-tags="collapseTags"
       :allow-create="allowCreate"
@@ -160,15 +135,9 @@ const getSelectVm = (
       :loading="loading"
       :remoteMethod="remoteMethod"
       :automatic-dropdown="automaticDropdown"
-      :size="size"
+      ${flat ? ':size="size"' : ''}
       :fit-input-width="fitInputWidth">
-      <el-option
-        v-for="item in options"
-        :label="item.label"
-        :key="item.value"
-        :disabled="item.disabled"
-        :value="item.value">
-      </el-option>
+      ${optionTemplate}
     </el-select>
   `,
     () => ({
@@ -176,7 +145,6 @@ const getSelectVm = (
       multiple: configs.multiple,
       multipleLimit: configs.multipleLimit,
       clearable: configs.clearable,
-      defaultFirstOption: configs.defaultFirstOption,
       filterable: configs.filterable,
       collapseTags: configs.collapseTags,
       allowCreate: configs.allowCreate,
@@ -188,30 +156,42 @@ const getSelectVm = (
       remote: configs.remote,
       remoteMethod: configs.remoteMethod,
       value: configs.multiple ? [] : '',
-      size: configs.size || 'default',
+      ...(flat && {
+        defaultFirstOption: configs.defaultFirstOption,
+        size: configs.size || 'default',
+      }),
     }),
   )
 }
 
+const getSelectVm = (
+  configs: SelectProps = {},
+  options?: SelectTestOption[],
+) =>
+  mountOptionsSelect(
+    'flat',
+    configs,
+    options ||
+      createSelectOptions().map((option) => ({ ...option, disabled: false })),
+    `
+      <el-option
+        v-for="item in options"
+        :label="item.label"
+        :key="item.value"
+        :disabled="item.disabled"
+        :value="item.value">
+      </el-option>
+    `,
+  )
+
 const getGroupSelectVm = (
   configs: SelectProps = {},
   options?: SelectTestOption[],
-) => {
-  ;[
-    'multiple',
-    'clearable',
-    'filterable',
-    'allowCreate',
-    'remote',
-    'collapseTags',
-    'automaticDropdown',
-    'fitInputWidth',
-  ].forEach((config) => {
-    configs[config] = configs[config] || false
-  })
-  configs.multipleLimit = configs.multipleLimit || 0
-  if (!options) {
-    options = [
+) =>
+  mountOptionsSelect(
+    'grouped',
+    configs,
+    options || [
       {
         label: 'Australia',
         options: [
@@ -276,26 +256,8 @@ const getGroupSelectVm = (
           },
         ],
       },
-    ]
-  }
-  return _mount(
+    ],
     `
-    <el-select
-      ref="select"
-      v-model="value"
-      :multiple="multiple"
-      :multiple-limit="multipleLimit"
-      :popper-class="popperClass"
-      :clearable="clearable"
-      :filterable="filterable"
-      :collapse-tags="collapseTags"
-      :allow-create="allowCreate"
-      :filterMethod="filterMethod"
-      :remote="remote"
-      :loading="loading"
-      :remoteMethod="remoteMethod"
-      :automatic-dropdown="automaticDropdown"
-      :fit-input-width="fitInputWidth">
      <el-group-option
         v-for="group in options"
         :key="group.label"
@@ -307,27 +269,8 @@ const getGroupSelectVm = (
           :label="item.label"
           :value="item.value"/>
       </el-group-option>
-    </el-select>
-`,
-    () => ({
-      options,
-      multiple: configs.multiple,
-      multipleLimit: configs.multipleLimit,
-      clearable: configs.clearable,
-      filterable: configs.filterable,
-      collapseTags: configs.collapseTags,
-      allowCreate: configs.allowCreate,
-      popperClass: configs.popperClass,
-      automaticDropdown: configs.automaticDropdown,
-      fitInputWidth: configs.fitInputWidth,
-      loading: false,
-      filterMethod: configs.filterMethod,
-      remote: configs.remote,
-      remoteMethod: configs.remoteMethod,
-      value: configs.multiple ? [] : '',
-    }),
+    `,
   )
-}
 
 describe('Select', () => {
   let wrapper: ReturnType<typeof _mount>
@@ -577,28 +520,7 @@ describe('Select', () => {
       </el-select>
     `,
       () => ({
-        options: [
-          {
-            value: '选项1',
-            label: '黄金糕',
-          },
-          {
-            value: '选项2',
-            label: '双皮奶',
-          },
-          {
-            value: '选项3',
-            label: '蚵仔煎',
-          },
-          {
-            value: '选项4',
-            label: '龙须面',
-          },
-          {
-            value: '选项5',
-            label: '北京烤鸭',
-          },
-        ],
+        options: createSelectOptions(),
         value: '',
         count: 0,
       }),
@@ -1009,30 +931,7 @@ describe('Select', () => {
       </el-select>
     `,
       () => ({
-        options: [
-          {
-            value: '选项1',
-            label:
-              '黄金糕黄金糕黄金糕黄金糕黄金糕黄金糕黄金糕黄金糕黄金糕黄金糕黄金糕黄金糕黄金糕黄金糕黄金糕黄金糕黄金糕黄金糕黄金糕黄金糕',
-          },
-          {
-            value: '选项2',
-            label:
-              '双皮奶双皮奶双皮奶双皮奶双皮奶双皮奶双皮奶双皮奶双皮奶双皮奶双皮奶双皮奶双皮奶',
-          },
-          {
-            value: '选项3',
-            label: '蚵仔煎蚵仔煎蚵仔煎蚵仔煎蚵仔煎蚵仔煎',
-          },
-          {
-            value: '选项4',
-            label: '龙须面',
-          },
-          {
-            value: '选项5',
-            label: '北京烤鸭',
-          },
-        ],
+        options: createSelectOptions('long-labels'),
         selectedList: [],
       }),
     )
@@ -1070,30 +969,7 @@ describe('Select', () => {
       </el-select>
     `,
       () => ({
-        options: [
-          {
-            value: '选项1',
-            label:
-              '黄金糕黄金糕黄金糕黄金糕黄金糕黄金糕黄金糕黄金糕黄金糕黄金糕黄金糕黄金糕黄金糕黄金糕黄金糕黄金糕黄金糕黄金糕黄金糕黄金糕',
-          },
-          {
-            value: '选项2',
-            label:
-              '双皮奶双皮奶双皮奶双皮奶双皮奶双皮奶双皮奶双皮奶双皮奶双皮奶双皮奶双皮奶双皮奶',
-          },
-          {
-            value: '选项3',
-            label: '蚵仔煎蚵仔煎蚵仔煎蚵仔煎蚵仔煎蚵仔煎',
-          },
-          {
-            value: '选项4',
-            label: '龙须面',
-          },
-          {
-            value: '选项5',
-            label: '北京烤鸭',
-          },
-        ],
+        options: createSelectOptions('long-labels'),
         selectedList: [],
       }),
     )
@@ -1132,28 +1008,7 @@ describe('Select', () => {
       </el-select>
     `,
       () => ({
-        options: [
-          {
-            value: '选项1',
-            label: '黄金糕',
-          },
-          {
-            value: '选项2',
-            label: '双皮奶',
-          },
-          {
-            value: '选项3',
-            label: '蚵仔煎',
-          },
-          {
-            value: '选项4',
-            label: '龙须面',
-          },
-          {
-            value: '选项5',
-            label: '北京烤鸭',
-          },
-        ],
+        options: createSelectOptions(),
         selectedList: [],
       }),
     )
@@ -1182,28 +1037,7 @@ describe('Select', () => {
       </el-select>
     `,
       () => ({
-        options: [
-          {
-            value: '选项1',
-            label: '黄金糕',
-          },
-          {
-            value: '选项2',
-            label: '双皮奶',
-          },
-          {
-            value: '选项3',
-            label: '蚵仔煎',
-          },
-          {
-            value: '选项4',
-            label: '龙须面',
-          },
-          {
-            value: '选项5',
-            label: '北京烤鸭',
-          },
-        ],
+        options: createSelectOptions(),
         selectedList: [],
       }),
     )
@@ -1236,28 +1070,7 @@ describe('Select', () => {
       </el-select>
     `,
       () => ({
-        options: [
-          {
-            value: '选项1',
-            label: '黄金糕',
-          },
-          {
-            value: '选项2',
-            label: '双皮奶',
-          },
-          {
-            value: '选项3',
-            label: '蚵仔煎',
-          },
-          {
-            value: '选项4',
-            label: '龙须面',
-          },
-          {
-            value: '选项5',
-            label: '北京烤鸭',
-          },
-        ],
+        options: createSelectOptions(),
         value: ['选项1', '选项2'],
       }),
       {
@@ -1426,28 +1239,7 @@ describe('Select', () => {
         </el-option>
       </el-select>`,
       () => ({
-        options: [
-          {
-            value: '选项1',
-            label: '黄金糕',
-          },
-          {
-            value: '选项2',
-            label: '双皮奶',
-          },
-          {
-            value: '选项3',
-            label: '蚵仔煎',
-          },
-          {
-            value: '选项4',
-            label: '龙须面',
-          },
-          {
-            value: '选项5',
-            label: '北京烤鸭',
-          },
-        ],
+        options: createSelectOptions(),
         value: ['选项1', '选项2'],
         handleFocus,
         handleBlur,
@@ -2151,11 +1943,10 @@ describe('Select', () => {
   })
 
   describe('teleported API', () => {
-    it('should mount on popper container', async () => {
-      expect(document.body.innerHTML).toBe('')
-      wrapper = _mount(
+    const mountSelect = (teleported?: false) =>
+      _mount(
         `
-      <el-select v-model="modelValue" multiple>
+      <el-select v-model="modelValue" multiple ${teleported === false ? ':teleported="false"' : ''}>
         <el-option
           v-for="option in options"
           :key="option.value"
@@ -2174,6 +1965,10 @@ describe('Select', () => {
           ],
         }),
       )
+
+    it('should mount on popper container', async () => {
+      expect(document.body.innerHTML).toBe('')
+      wrapper = mountSelect()
 
       await nextTick()
       const { selector } = wrapper.vm as unknown as { selector: string }
@@ -2182,27 +1977,7 @@ describe('Select', () => {
 
     it('should not mount on the popper container', async () => {
       expect(document.body.innerHTML).toBe('')
-      wrapper = _mount(
-        `
-      <el-select v-model="modelValue" multiple :teleported="false">
-        <el-option
-          v-for="option in options"
-          :key="option.value"
-          :value="option.value"
-          :label="option.label"
-        >
-        </el-option>
-      </el-select>`,
-        () => ({
-          modelValue: [1],
-          options: [
-            { label: 'Test 1', value: 1 },
-            { label: 'Test 2', value: 2 },
-            { label: 'Test 3', value: 3 },
-            { label: 'Test 4', value: 4 },
-          ],
-        }),
-      )
+      wrapper = mountSelect(false)
 
       await nextTick()
       const { selector } = wrapper.vm as unknown as { selector: string }

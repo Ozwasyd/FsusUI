@@ -1,10 +1,10 @@
 import path from 'node:path'
 import ts from 'typescript'
 
-const hasTypeFlag = (type, flag) =>
-  type.isUnion()
-    ? type.types.some((part) => (part.flags & flag) !== 0)
-    : (type.flags & flag) !== 0
+import {
+  hasTypeFlag,
+  loadStructuredTypeScript,
+} from './lib/structured-typescript.mjs'
 
 const sourceObjectShape = ({ checker, type, root, location }) => {
   const nonNullable = checker.getNonNullableType(type)
@@ -82,55 +82,12 @@ export const extractStructuredEmitPayloads = ({
   const requested = new Set(eventNames ?? [])
   if (requested.size === 0) return new Map()
 
-  const configPath = path.join(root, 'vue/tsconfig.web.json')
-  const config = ts.readConfigFile(configPath, ts.sys.readFile)
-  if (config.error) {
-    throw new Error(
-      `TypeScript config failed for structured emit extraction: ${ts.flattenDiagnosticMessageText(config.error.messageText, '\n')}`,
-    )
-  }
-  const parsed = ts.parseJsonConfigFileContent(
-    config.config,
-    ts.sys,
-    path.dirname(configPath),
-  )
-  const entryPath = path.resolve(root, sourceRelativePath)
-  const overrides = new Map(
-    [...sourceOverrides].map(([file, content]) => [
-      path.resolve(root, file),
-      content,
-    ]),
-  )
-  const host = ts.createCompilerHost(parsed.options)
-  const readSource = (fileName) =>
-    overrides.get(path.resolve(fileName)) ?? ts.sys.readFile(fileName)
-  host.readFile = readSource
-  host.getSourceFile = (fileName, languageVersion, onError) => {
-    const content = readSource(fileName)
-    if (content === undefined) {
-      onError?.(`Cannot read ${fileName}`)
-      return undefined
-    }
-    return ts.createSourceFile(
-      fileName,
-      content,
-      languageVersion,
-      true,
-      ts.getScriptKindFromFileName(fileName),
-    )
-  }
-  const program = ts.createProgram({
-    rootNames: [entryPath],
-    options: parsed.options,
-    host,
+  const { checker, sourceFile } = loadStructuredTypeScript({
+    root,
+    sourceRelativePath,
+    sourceOverrides,
+    extraction: 'emit',
   })
-  const checker = program.getTypeChecker()
-  const sourceFile = program.getSourceFile(entryPath)
-  if (!sourceFile) {
-    throw new Error(
-      `TypeScript source missing for structured emit extraction: ${sourceRelativePath}`,
-    )
-  }
 
   let objectNode = null
   const visit = (node) => {

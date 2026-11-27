@@ -47,6 +47,30 @@ const applyWasmFilter = (
   traverse(store)
 }
 
+type CheckedNodeMode = 'checked' | 'half' | 'checked-or-half'
+
+const collectCheckedNodes = (
+  store: TreeStore,
+  mode: CheckedNodeMode,
+  leafOnly = false,
+): TreeNodeData[] => {
+  const nodes: TreeNodeData[] = []
+  const includeChecked = mode !== 'half'
+  const includeHalfChecked = mode !== 'checked'
+  const visit = (child: Node) => {
+    if (
+      ((includeChecked && child.checked) ||
+        (includeHalfChecked && child.indeterminate)) &&
+      (!leafOnly || child.isLeaf)
+    ) {
+      nodes.push(child.data)
+    }
+    child.childNodes.forEach(visit)
+  }
+  store.root.childNodes.forEach(visit)
+  return nodes
+}
+
 export default class TreeStore {
   currentNode: Node
   currentNodeKey: TreeKey
@@ -249,27 +273,11 @@ export default class TreeStore {
     leafOnly = false,
     includeHalfChecked = false,
   ): TreeNodeData[] {
-    const checkedNodes: TreeNodeData[] = []
-    const traverse = function (node: TreeStore | Node) {
-      const childNodes = (node as TreeStore).root
-        ? (node as TreeStore).root.childNodes
-        : (node as Node).childNodes
-
-      childNodes.forEach((child) => {
-        if (
-          (child.checked || (includeHalfChecked && child.indeterminate)) &&
-          (!leafOnly || (leafOnly && child.isLeaf))
-        ) {
-          checkedNodes.push(child.data)
-        }
-
-        traverse(child)
-      })
-    }
-
-    traverse(this)
-
-    return checkedNodes
+    return collectCheckedNodes(
+      this,
+      includeHalfChecked ? 'checked-or-half' : 'checked',
+      leafOnly,
+    )
   }
 
   getCheckedKeys(leafOnly = false): TreeKey[] {
@@ -277,24 +285,7 @@ export default class TreeStore {
   }
 
   getHalfCheckedNodes(): TreeNodeData[] {
-    const nodes: TreeNodeData[] = []
-    const traverse = function (node: TreeStore | Node) {
-      const childNodes = (node as TreeStore).root
-        ? (node as TreeStore).root.childNodes
-        : (node as Node).childNodes
-
-      childNodes.forEach((child) => {
-        if (child.indeterminate) {
-          nodes.push(child.data)
-        }
-
-        traverse(child)
-      })
-    }
-
-    traverse(this)
-
-    return nodes
+    return collectCheckedNodes(this, 'half')
   }
 
   getHalfCheckedKeys(): TreeKey[] {

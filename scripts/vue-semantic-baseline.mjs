@@ -274,6 +274,47 @@ export const extractTemplateSlots = (templateAst) => {
   )
 }
 
+const collectScriptBindings = (statements, unwrapExports = false) => {
+  const consts = new Map()
+  const functions = new Map()
+  const imports = new Map()
+  for (const statement of statements) {
+    if (statement.type === 'ImportDeclaration') {
+      for (const spec of statement.specifiers ?? []) {
+        if (spec.type === 'ImportSpecifier') {
+          imports.set(spec.local.name, {
+            spec: statement.source.value,
+            imported:
+              spec.imported.type === 'Identifier'
+                ? spec.imported.name
+                : spec.imported.value,
+          })
+        } else if (
+          spec.type === 'ImportDefaultSpecifier' ||
+          spec.type === 'ImportNamespaceSpecifier'
+        ) {
+          imports.set(spec.local.name, {
+            spec: statement.source.value,
+            imported: null,
+          })
+        }
+      }
+    }
+    const declaration =
+      unwrapExports && statement.type === 'ExportNamedDeclaration'
+        ? statement.declaration
+        : statement
+    if (declaration?.type === 'VariableDeclaration') {
+      for (const decl of declaration.declarations) {
+        if (decl.id.type === 'Identifier') consts.set(decl.id.name, decl.init)
+      }
+    }
+    if (declaration?.type === 'FunctionDeclaration' && declaration.id)
+      functions.set(declaration.id.name, declaration)
+  }
+  return { consts, functions, imports }
+}
+
 class SemanticResolver {
   constructor(root, moduleSources) {
     this.root = root
@@ -325,54 +366,12 @@ class SemanticResolver {
     } catch {
       return null
     }
-    const consts = new Map()
-    const functions = new Map()
-    const imports = new Map()
-    for (const node of ast.program.body) {
-      if (node.type === 'ImportDeclaration') {
-        for (const spec of node.specifiers || []) {
-          if (spec.type === 'ImportSpecifier') {
-            const local = spec.local.name
-            const imported =
-              spec.imported.type === 'Identifier'
-                ? spec.imported.name
-                : spec.imported.value
-            imports.set(local, { spec: node.source.value, imported })
-          } else if (
-            spec.type === 'ImportDefaultSpecifier' ||
-            spec.type === 'ImportNamespaceSpecifier'
-          ) {
-            imports.set(spec.local.name, {
-              spec: node.source.value,
-              imported: null,
-            })
-          }
-        }
-      }
-      if (node.type === 'ExportNamedDeclaration' && node.declaration) {
-        if (node.declaration.type === 'VariableDeclaration') {
-          for (const decl of node.declaration.declarations) {
-            if (decl.id.type === 'Identifier')
-              consts.set(decl.id.name, decl.init)
-          }
-        }
-        if (
-          node.declaration.type === 'FunctionDeclaration' &&
-          node.declaration.id
-        ) {
-          functions.set(node.declaration.id.name, node.declaration)
-        }
-      }
-      if (node.type === 'VariableDeclaration') {
-        for (const decl of node.declarations) {
-          if (decl.id.type === 'Identifier') consts.set(decl.id.name, decl.init)
-        }
-      }
-      if (node.type === 'FunctionDeclaration' && node.id) {
-        functions.set(node.id.name, node)
-      }
+    return {
+      ast,
+      ...collectScriptBindings(ast.program.body, true),
+      content,
+      relPath,
     }
-    return { ast, consts, functions, imports, content, relPath }
   }
 
   parseVueModule(relPath) {
@@ -386,49 +385,17 @@ class SemanticResolver {
       })
       const setup = descriptor.scriptSetup?.content
       const plain = descriptor.script?.content
-      const scriptAst = setup ? null : plain || null
-      const consts = new Map()
-      const functions = new Map()
-      const imports = new Map()
-      let macroCalls = []
+      const script = setup || plain
+      const statements = script
+        ? babelParse(script, {
+            sourceType: 'module',
+            plugins: ['typescript', 'jsx', 'importAttributes', 'topLevelAwait'],
+            errorRecovery: true,
+          }).program.body
+        : []
+      const bindings = collectScriptBindings(statements)
+      const macroCalls = []
       if (setup) {
-        const parsed = babelParse(setup, {
-          sourceType: 'module',
-          plugins: ['typescript', 'jsx', 'importAttributes', 'topLevelAwait'],
-          errorRecovery: true,
-        })
-        const statements = parsed.program.body
-        for (const node of statements) {
-          if (node.type === 'ImportDeclaration') {
-            for (const spec of node.specifiers || []) {
-              if (spec.type === 'ImportSpecifier') {
-                imports.set(spec.local.name, {
-                  spec: node.source.value,
-                  imported:
-                    spec.imported.type === 'Identifier'
-                      ? spec.imported.name
-                      : spec.imported.value,
-                })
-              } else if (
-                spec.type === 'ImportDefaultSpecifier' ||
-                spec.type === 'ImportNamespaceSpecifier'
-              ) {
-                imports.set(spec.local.name, {
-                  spec: node.source.value,
-                  imported: null,
-                })
-              }
-            }
-          }
-          if (node.type === 'VariableDeclaration') {
-            for (const decl of node.declarations) {
-              if (decl.id.type === 'Identifier')
-                consts.set(decl.id.name, decl.init)
-            }
-          }
-          if (node.type === 'FunctionDeclaration' && node.id)
-            functions.set(node.id.name, node)
-        }
         walkNodes(statements, (node) => {
           if (
             node.type === 'CallExpression' &&
@@ -440,53 +407,13 @@ class SemanticResolver {
             macroCalls.push(node)
           }
         })
-      } else if (plain) {
-        const parsed = babelParse(plain, {
-          sourceType: 'module',
-          plugins: ['typescript', 'jsx', 'importAttributes', 'topLevelAwait'],
-          errorRecovery: true,
-        })
-        for (const node of parsed.program.body) {
-          if (node.type === 'ImportDeclaration') {
-            for (const spec of node.specifiers || []) {
-              if (spec.type === 'ImportSpecifier') {
-                imports.set(spec.local.name, {
-                  spec: node.source.value,
-                  imported:
-                    spec.imported.type === 'Identifier'
-                      ? spec.imported.name
-                      : spec.imported.value,
-                })
-              } else if (
-                spec.type === 'ImportDefaultSpecifier' ||
-                spec.type === 'ImportNamespaceSpecifier'
-              ) {
-                imports.set(spec.local.name, {
-                  spec: node.source.value,
-                  imported: null,
-                })
-              }
-            }
-          }
-          if (node.type === 'VariableDeclaration') {
-            for (const decl of node.declarations) {
-              if (decl.id.type === 'Identifier')
-                consts.set(decl.id.name, decl.init)
-            }
-          }
-          if (node.type === 'FunctionDeclaration' && node.id)
-            functions.set(node.id.name, node)
-        }
-        macroCalls = []
       }
       result = {
         content,
-        consts,
-        functions,
-        imports,
+        ...bindings,
         macroCalls,
         setup,
-        scriptAst,
+        scriptAst: setup ? null : plain || null,
         templateAst: descriptor.template?.ast ?? null,
       }
     } catch {
