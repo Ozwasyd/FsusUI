@@ -363,6 +363,14 @@ function workflowContract() {
   assert.equal(workflow.match(/pnpm deps:freshness/gu)?.length, 1)
   assert.match(workflow, /dependency-freshness-blocker\.mjs/u)
   assert.doesNotMatch(workflow, /automerge|ignoreDeps|exceptions\.json|grep/u)
+
+  const cli = readFileSync(
+    path.join(root, 'scripts/dependency-freshness-blocker.mjs'),
+    'utf8',
+  )
+  assert.match(cli, /maxBuffer:\s*GH_API_MAX_BUFFER_BYTES/u)
+  assert.doesNotMatch(cli, /'--slurp'/u)
+  assert.match(cli, /select\(\.pull_request == null\)/u)
 }
 
 await lifecycleTransitions()
