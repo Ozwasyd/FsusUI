@@ -1,5 +1,14 @@
 # element-plus
 
+## 1.6.0-preview.13
+
+### Preview Changes
+
+- Ship `@ozwasyd/element-plus@1.6.0-preview.13` on GitHub Packages with the `preview` dist-tag.
+- Consolidate Vue and Avalonia internals for virtual scrolling, tree selection, date-range panels, color parsing, and form validation while preserving public APIs and tested rendering and interaction behavior (#1138, #1140).
+- Share Markdown editor input, undo and redo, and LaTeX and Mermaid preview logic. Preserve tree shaking for motion presets and the render pipeline, and keep startup and Markdown hydration within budget in all three consumer profiles (#1138, #1140).
+- Reuse test fixtures, artifact-cache checks, and conformance helpers while preserving existing test scenarios (#1138, #1140).
+
 ## 1.6.0-preview.12
 
 ### Preview Changes

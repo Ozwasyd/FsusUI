@@ -1,16 +1,16 @@
 {
   "schema": "fsusui-independent-ux-review.v1",
   "issue": 285,
-  "candidateSha": "afbd9d28924a0677b4a87469a2fb48e874bcb081",
+  "candidateSha": "c04fcedf3a095d3302160f102648cb2ae7ff0e4a",
   "reviewMode": "read-only-rendered-evidence-inspection",
   "modifiedPaths": [],
   "productionFixture": true,
   "identity": {
-    "executionId": "conformance-v2-check-tag-af1db5f929298e45ca8588cce23e59feed4d57cd",
+    "executionId": "conformance-v2-check-tag-2e2ce0d05d58f50a1748442e98691c8933a1e760",
     "checkpoint": "check-tag-after-pointer-keyboard",
-    "candidate": "af1db5f929298e45ca8588cce23e59feed4d57cd",
-    "contractHash": "198c14d85deb4668e343ebc82e8c01657cd76cfb73bce69b5285e421d5790073",
-    "webBaselineHash": "96cccc58f3a11038bb1cb723a680bdbe0622c6dae584fcb53be6e4335e4f2b1c",
+    "candidate": "2e2ce0d05d58f50a1748442e98691c8933a1e760",
+    "contractHash": "dae6787cb3bc43c317dd8e2bace1f947b66f5474087c5d09d30230b9d6eaf69c",
+    "webBaselineHash": "bb90ada88ddc1c34a78b6df93abd99c0ca8548aa232a4f9681bef8894bb5bdd0",
     "avaloniaBaselineHash": "295787beb93a551ab419e98f558e17f0eeab4b7c4defb9e2911cb7c0f5891dda",
     "scenario": "scenario.v2.el-check-tag.real-interaction-trace",
     "contract": "component-v2.el-check-tag",
@@ -115,8 +115,8 @@
     }
   ],
   "observations": [
-    "Independent review inspected both Linux production captures from GitHub Actions run 45991368007, attempt 1, artifact 15194895208. Rendered merge af1db5f929298e45ca8588cce23e59feed4d57cd and source candidate afbd9d28924a0677b4a87469a2fb48e874bcb081 share tree 247b1fa30827c072d1fe88f1ea3522c388e38c75.",
-    "The candidate manifests bind contract 198c14d85deb4668e343ebc82e8c01657cd76cfb73bce69b5285e421d5790073, Web baseline 96cccc58f3a11038bb1cb723a680bdbe0622c6dae584fcb53be6e4335e4f2b1c, Avalonia baseline 295787beb93a551ab419e98f558e17f0eeab4b7c4defb9e2911cb7c0f5891dda, and runner bad9abc8910c29bd5104e47fc7d693443a414d707776a55c043be5d1e0c0baf2.",
+    "Independent review inspected both Linux production captures from GitHub Actions run 45999446700, attempt 1, artifact 15197159107. Rendered merge 2e2ce0d05d58f50a1748442e98691c8933a1e760 and source candidate c04fcedf3a095d3302160f102648cb2ae7ff0e4a share tree f9615863f56fbee875c56079e5e82377873709cd.",
+    "The candidate manifests bind contract dae6787cb3bc43c317dd8e2bace1f947b66f5474087c5d09d30230b9d6eaf69c, Web baseline bb90ada88ddc1c34a78b6df93abd99c0ca8548aa232a4f9681bef8894bb5bdd0, Avalonia baseline 295787beb93a551ab419e98f558e17f0eeab4b7c4defb9e2911cb7c0f5891dda, and runner bad9abc8910c29bd5104e47fc7d693443a414d707776a55c043be5d1e0c0baf2.",
     "Both current PNGs match the tracked comparator images byte for byte, including the verified crop and window sizes.",
     "The functional cross-platform conformance comparison passes. Timing observations are diagnostic."
   ],
@@ -127,7 +127,7 @@
   ],
   "blockers": [],
   "status": "accepted",
-  "classificationReceiptDigest": "07f3dde2ace56660bcbed2003a0af2a311b3a58a9ff46352dd8a3f8c6f3543bb",
-  "candidateDigest": "716092b774f8bd0ca7d9aee28138b144456aeb1dafbaab6cbd6a7a78d38886cf",
-  "receiptDigest": "20573eb5d2a726ee157097175d5ba564733357cb373a67f3e597564412f78d97"
+  "classificationReceiptDigest": "002f83dcf14d6eaacd7d04fba3b59e96231f25a2ece8d8f2531b719a7262dc52",
+  "candidateDigest": "e121a833a85abae71b98be82ec5a81c23a7bc0afafee37f6e55e024304388046",
+  "receiptDigest": "37b56f8adf62fae101ae2d91f17754c6f1f3f2256881a8e795ddd524f4b004ab"
 }
