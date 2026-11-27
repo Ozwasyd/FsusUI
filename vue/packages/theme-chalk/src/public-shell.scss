@@ -1,4 +1,5 @@
 @use 'mixins/mixins' as *;
+@use 'mixins/public-shell' as shell;
 @use 'mixins/var' as *;
 @use 'common/var' as *;
 
@@ -11,22 +12,7 @@
   --fsus-public-shell-mobile-action-height: 44px;
   --fsus-public-shell-action-height: 44px;
 
-  .is-csp-hidden {
-    display: none !important;
-  }
-
-  @include e(search-input) {
-    --#{$namespace}-input-height: var(
-      --#{$namespace}-public-shell-control-height,
-      40px
-    );
-
-    .#{$namespace}-input__wrapper {
-      height: var(--fsus-public-shell-action-height, 44px);
-      min-height: var(--fsus-public-shell-action-height, 44px);
-      box-sizing: border-box;
-    }
-  }
+  @include shell.search-input;
 
   @include e(header) {
     width: 100%;
@@ -58,20 +44,7 @@
     box-sizing: border-box;
   }
 
-  @include e(primary-row) {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
-    align-items: center;
-    gap: 24px;
-    min-width: 0;
-  }
-
-  @include e(brand-nav) {
-    display: flex;
-    align-items: baseline;
-    gap: var(--#{$namespace}-public-shell-nav-gap, 2rem);
-    min-width: 0;
-  }
+  @include shell.header-layout;
 
   @include e(brand) {
     flex: 0 0 auto;
@@ -132,19 +105,7 @@
     }
   }
 
-  @include e(actions) {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    min-height: var(--fsus-public-shell-action-height, 44px);
-    min-width: max-content;
-  }
-
-  @include e(desktop-search-disclosure) {
-    position: relative;
-    flex: 0 0 auto;
-    min-width: 0;
-  }
+  @include shell.desktop-actions;
 
   @include e(desktop-search-trigger) {
     display: inline-flex;
@@ -186,91 +147,7 @@
     }
   }
 
-  @include e(desktop-search-panel) {
-    position: absolute;
-    inset-block-start: calc(100% + 8px);
-    inset-inline-end: 0;
-    z-index: 60;
-    width: min(20rem, calc(100vw - 48px));
-    max-width: calc(100vw - 48px);
-    padding: 12px;
-    border: 1px solid getCssVar('border-color-lighter');
-    border-radius: var(--fsus-radius-popover, 10px);
-    background: var(--fsus-surface-overlay, #{getCssVar('bg-color')});
-    box-shadow: var(--fsus-shadow-floating, none);
-    box-sizing: border-box;
-  }
-
-  &-desktop-search-enter-active,
-  &-desktop-search-leave-active {
-    transition:
-      opacity getCssVar('transition-duration-fast')
-        getCssVar('transition-function-ease-in-out-bezier'),
-      transform getCssVar('transition-duration-fast')
-        getCssVar('transition-function-ease-in-out-bezier');
-  }
-
-  &-desktop-search-enter-from,
-  &-desktop-search-leave-to {
-    opacity: 0;
-    transform: translateY(-4px);
-  }
-
-  @include e(mobile-primary-actions) {
-    position: relative;
-    display: none;
-    min-width: 0;
-  }
-
-  @include e(mobile-search-trigger) {
-    display: inline-flex;
-    min-width: var(--fsus-public-shell-mobile-action-height, 44px);
-    min-height: var(--fsus-public-shell-mobile-action-height, 44px);
-    align-items: center;
-    justify-content: center;
-    box-sizing: border-box;
-    border: 1px solid getCssVar('border-color-lighter');
-    border-radius: var(--fsus-radius-control, 6px);
-    padding: 0 12px;
-    background: getCssVar('bg-color');
-    color: getCssVar('text-color', 'secondary');
-    font: inherit;
-    font-size: 14px;
-    font-weight: 500;
-    line-height: 1;
-    overflow: hidden;
-    text-decoration: none;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    cursor: pointer;
-    outline: none;
-    transition:
-      border-color getCssVar('transition-duration-fast'),
-      background-color getCssVar('transition-duration-fast'),
-      color getCssVar('transition-duration-fast');
-
-    &:hover,
-    &:focus-visible {
-      border-color: var(--fsus-scholarly-blue);
-      background: getCssVar('fill-color', 'light');
-      color: getCssVar('text-color', 'primary');
-      text-decoration: none;
-    }
-
-    &:focus-visible {
-      @include a11y-focus-ring(2px, var(--fsus-radius-control, 6px));
-    }
-  }
-
-  @include e(mobile-nav-menu) {
-    position: static;
-    flex: 0 1 auto;
-    min-width: var(--fsus-public-shell-mobile-action-height, 44px);
-
-    &:not([open]) > .#{$namespace}-public-shell__mobile-nav-menu-panel {
-      display: none;
-    }
-  }
+  @include shell.disclosures;
 
   @include e(mobile-nav-menu-trigger) {
     display: inline-flex;
@@ -338,28 +215,7 @@
     box-sizing: border-box;
   }
 
-  @include e(mobile-nav-menu) {
-    @include when(closing) {
-      .#{$namespace}-public-shell__mobile-nav-menu-panel {
-        pointer-events: none;
-      }
-    }
-  }
-
-  &-mobile-nav-menu-enter-active,
-  &-mobile-nav-menu-leave-active {
-    transition:
-      opacity getCssVar('transition-duration-fast')
-        getCssVar('transition-function-ease-in-out-bezier'),
-      transform getCssVar('transition-duration-fast')
-        getCssVar('transition-function-ease-in-out-bezier');
-  }
-
-  &-mobile-nav-menu-enter-from,
-  &-mobile-nav-menu-leave-to {
-    opacity: 0;
-    transform: translateY(-4px);
-  }
+  @include shell.mobile-menu-transitions;
 
   @include e(mobile-nav) {
     display: none;
@@ -373,158 +229,11 @@
     }
   }
 
-  @include e(mobile-nav-link) {
-    display: inline-flex;
-    width: 100%;
-    min-height: var(--fsus-public-shell-mobile-action-height, 44px);
-    align-items: center;
-    justify-content: flex-start;
-    box-sizing: border-box;
-    border: 1px solid getCssVar('border-color-lighter');
-    border-radius: var(--fsus-radius-control, 6px);
-    padding-inline: 16px;
-    color: getCssVar('text-color', 'secondary');
-    font-size: 13px;
-    font-weight: 500;
-    line-height: 1.3;
-    text-align: start;
-    text-decoration: none;
-    white-space: nowrap;
-    outline: none;
-    transition:
-      border-color getCssVar('transition-duration-fast'),
-      background-color getCssVar('transition-duration-fast'),
-      color getCssVar('transition-duration-fast');
+  @include shell.mobile-menu-links;
 
-    :where(.#{$namespace}-public-shell__mobile-nav-menu-panel) & {
-      border-color: transparent;
-      font-size: 14px;
-    }
+  @include shell.mobile-search-layout;
 
-    &:hover,
-    &:focus-visible {
-      border-color: var(--fsus-scholarly-blue);
-      background: getCssVar('fill-color', 'light');
-      color: getCssVar('text-color', 'primary');
-    }
-
-    @include when(active) {
-      border-color: var(--fsus-scholarly-blue);
-      background: getCssVar('fill-color', 'light');
-      color: getCssVar('text-color', 'primary');
-      font-weight: 700;
-    }
-
-    &:focus-visible {
-      @include a11y-focus-ring(2px, var(--fsus-radius-control, 6px));
-    }
-  }
-
-  @include e(mobile-nav-menu-actions) {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr);
-    min-width: 0;
-    margin-top: 4px;
-    padding-top: 6px;
-    border-top: 1px solid getCssVar('border-color-lighter');
-
-    > :where(a, button, [role='button']) {
-      display: inline-flex;
-      width: 100%;
-      min-height: var(--fsus-public-shell-mobile-action-height, 44px);
-      align-items: center;
-      justify-content: flex-start;
-      box-sizing: border-box;
-      border: 1px solid transparent;
-      border-radius: var(--fsus-radius-control, 6px);
-      padding: 0 16px;
-      background: transparent;
-      color: getCssVar('text-color', 'secondary');
-      font: inherit;
-      font-size: 14px;
-      font-weight: 500;
-      line-height: 1;
-      text-align: start;
-    }
-
-    > :where(a, button, [role='button'])[aria-label]:empty {
-      min-width: var(--fsus-public-shell-mobile-action-height, 44px);
-    }
-
-    > :where(a, button, [role='button']):focus-visible {
-      @include a11y-focus-ring(2px, var(--fsus-radius-control, 6px));
-    }
-
-    svg {
-      width: 16px;
-      height: 16px;
-    }
-  }
-
-  @include e(mobile-search-host) {
-    display: block;
-    min-width: 0;
-    margin: 0;
-    padding: 0;
-    border: 0;
-    background: transparent;
-
-    &[hidden] {
-      display: none;
-    }
-  }
-
-  @include e(mobile-search-row) {
-    display: none;
-    min-width: 0;
-    margin-top: 12px;
-    margin-bottom: 12px;
-
-    @include when(expanded) {
-      display: block;
-    }
-
-    .#{$namespace}-public-shell__search--trigger {
-      width: 100%;
-    }
-  }
-
-  &-mobile-search-enter-active,
-  &-mobile-search-leave-active {
-    transition:
-      opacity var(--#{$namespace}-transition-duration-fast),
-      transform var(--#{$namespace}-transition-duration-fast);
-  }
-
-  &-mobile-search-enter-from,
-  &-mobile-search-leave-to {
-    opacity: 0;
-    transform: translateY(-4px);
-  }
-
-  @include e(search) {
-    --#{$namespace}-input-height: var(
-      --#{$namespace}-public-shell-control-height,
-      40px
-    );
-    margin: 0;
-
-    @include m(desktop) {
-      width: 11rem;
-    }
-
-    @include m(desktop-trigger) {
-      width: 100%;
-    }
-
-    @include m(mobile) {
-      width: var(--#{$namespace}-public-shell-mobile-search-width, 7rem);
-    }
-
-    @include m(trigger) {
-      width: 100%;
-    }
-  }
+  @include shell.mobile-search;
 
   @include e(action-link) {
     display: inline-flex;
@@ -571,18 +280,7 @@
     }
   }
 
-  @include e(mobile-toolbar) {
-    display: none;
-    min-width: 0;
-    margin-top: 18px;
-    touch-action: pan-x pan-y;
-    overscroll-behavior-x: contain;
-    overscroll-behavior-y: auto;
-  }
-
-  @include e(bottom-tab) {
-    display: none;
-  }
+  @include shell.mobile-controls;
 
   @include e(desktop-nav) {
     @include when(indicator-motion) {
@@ -621,27 +319,7 @@
     will-change: transform, opacity;
   }
 
-  @include e(mobile-actions) {
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 12px;
-    min-width: 0;
-    margin-top: 12px;
-  }
-
-  @include e(main) {
-    flex: 1 1 auto;
-    width: min(100%, var(--#{$namespace}-public-shell-max-width, 64rem));
-    margin-inline: auto;
-    padding: 40px 24px 96px;
-    box-sizing: border-box;
-
-    &[data-content-flow='content-driven'] {
-      flex: 0 0 auto;
-      padding-bottom: 0;
-    }
-  }
+  @include shell.main-layout;
 
   @include e(footer) {
     width: min(100%, var(--#{$namespace}-public-shell-max-width, 64rem));
@@ -657,274 +335,9 @@
     font-weight: 700;
   }
 
-  @media (max-width: 767px), (max-height: 520px) and (orientation: landscape) {
-    @include when(mobile-nav-bottom) {
-      padding-bottom: calc(
-        var(--fsus-bottom-tab-height, 56px) + #{fsus-safe-area-inset(bottom)}
-      );
-    }
+  @include shell.responsive-layout;
 
-    @include e(bottom-tab) {
-      display: flex;
-    }
-
-    @include e(inner) {
-      padding-block: 20px;
-    }
-
-    @include e(primary-row) {
-      align-items: center;
-      gap: 8px;
-    }
-
-    @include e(brand-nav) {
-      overflow: hidden;
-    }
-
-    @include e(brand) {
-      display: inline-flex;
-      align-items: center;
-      box-sizing: border-box;
-      max-width: 100%;
-      min-width: 0;
-      min-height: var(--fsus-public-shell-mobile-action-height, 44px);
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .#{$namespace}-site-header__desktop-nav {
-      display: none;
-    }
-
-    @include e(desktop-nav) {
-      display: none;
-    }
-
-    @include e(actions) {
-      display: none;
-    }
-
-    @include e(mobile-primary-actions) {
-      display: inline-flex;
-      max-width: 100%;
-      align-items: center;
-      justify-content: flex-end;
-      flex-wrap: nowrap;
-      gap: 8px;
-
-      > :where(a, button, [role='button']) {
-        flex: 0 1 auto;
-        min-width: var(--fsus-public-shell-mobile-action-height, 44px);
-        min-height: var(--fsus-public-shell-mobile-action-height, 44px);
-        box-sizing: border-box;
-      }
-
-      > :where(a, button, [role='button'])[aria-label]:empty {
-        min-width: var(--fsus-public-shell-mobile-action-height, 44px);
-      }
-
-      svg {
-        width: 16px;
-        height: 16px;
-      }
-    }
-
-    @include e(mobile-toolbar) {
-      display: block;
-
-      @include when(collapsed) {
-        display: none;
-        margin-top: 0;
-      }
-    }
-
-    @include e(mobile-nav) {
-      @include m(inline) {
-        display: flex;
-      }
-    }
-
-    @include e(mobile-actions) {
-      justify-content: flex-start;
-      min-width: 0;
-    }
-  }
-
-  @media (max-height: 520px) and (orientation: landscape) {
-    @include e(inner) {
-      position: relative;
-      padding-block: var(--fsus-space-1, 4px);
-    }
-
-    @include e(mobile-toolbar) {
-      @include when(search-only) {
-        margin-top: 0;
-
-        .#{$namespace}-public-shell__mobile-actions {
-          margin-top: 0;
-        }
-      }
-    }
-
-    @include e(mobile-search-row) {
-      position: absolute;
-      inset-block-start: 100%;
-      inset-inline-end: 0;
-      z-index: 60;
-      inline-size: min(
-        20rem,
-        calc(100% - var(--fsus-space-6, 24px) - var(--fsus-space-6, 24px))
-      );
-      max-block-size: fsus-viewport-safe-block-size(var(--fsus-space-2, 8px));
-      overflow: auto;
-      margin-block: 0;
-      margin-block-start: fsus-safe-area-max(var(--fsus-space-2, 8px), top);
-      margin-block-end: fsus-safe-area-max(var(--fsus-space-2, 8px), bottom);
-      margin-inline-end: var(--fsus-space-6, 24px);
-      padding: var(--fsus-space-3, 12px);
-      border: 1px solid getCssVar('border-color-lighter');
-      border-radius: var(--fsus-radius-popover, 10px);
-      background: var(--fsus-surface-overlay, #{getCssVar('bg-color')});
-      box-shadow: var(--fsus-shadow-floating, none);
-      box-sizing: border-box;
-    }
-
-    @include e(mobile-search-host) {
-      display: none;
-
-      &:popover-open {
-        @include fsus-viewport-safe-overlay-host(var(--fsus-space-2, 8px));
-        z-index: 60;
-        display: flex;
-        inline-size: auto;
-        block-size: auto;
-        margin: 0;
-        border: 0;
-        padding-block-start: max(
-          calc(
-            var(--fsus-public-shell-mobile-action-height, 44px) +
-              var(--fsus-space-4, 16px)
-          ),
-          #{fsus-safe-area-inset(top)}
-        );
-        padding-inline-end: max(
-          var(--fsus-space-6, 24px),
-          #{fsus-safe-area-inset(right)}
-        );
-        background: transparent;
-        color: inherit;
-        align-items: flex-start;
-        justify-content: flex-end;
-        pointer-events: auto;
-
-        &::backdrop {
-          background: transparent;
-          pointer-events: none;
-        }
-
-        .#{$namespace}-public-shell__mobile-search-row.is-expanded {
-          position: static;
-          inset: auto;
-          display: block;
-          inline-size: min(20rem, 100%);
-          min-block-size: 0;
-          max-block-size: 100%;
-          overflow: auto;
-          margin: 0;
-          padding: var(--fsus-space-3, 12px);
-          border: 1px solid getCssVar('border-color-lighter');
-          border-radius: var(--fsus-radius-popover, 10px);
-          background: var(
-            --fsus-paper,
-            var(--#{$namespace}-bg-color-overlay, #ffffff)
-          );
-          box-shadow: var(--fsus-shadow-floating, none);
-          box-sizing: border-box;
-          pointer-events: auto;
-        }
-      }
-    }
-  }
-
-  @media (max-width: 767px) {
-    @include e(footer) {
-      padding-bottom: max(40px, calc(24px + #{fsus-safe-area-inset(bottom)}));
-    }
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    @include e(brand) {
-      transition: none;
-    }
-
-    @include e(nav-link) {
-      transition: none;
-    }
-
-    @include e(active-nav-indicator) {
-      transition: none;
-    }
-
-    @include e(mobile-search-trigger) {
-      transition: none;
-    }
-
-    @include e(mobile-nav-menu-trigger) {
-      transition: none;
-    }
-
-    @include e(mobile-nav-link) {
-      transition: none;
-    }
-
-    @include e(mobile-nav-menu-panel) {
-      transition: none;
-    }
-
-    // Vue enter/leave state machines must keep a 1ms duration so after-leave,
-    // closing cleanup, focus return, and DOM removal stay ordered.
-    &-mobile-nav-menu-enter-active,
-    &-mobile-nav-menu-leave-active,
-    &-mobile-search-enter-active,
-    &-mobile-search-leave-active,
-    &-desktop-search-enter-active,
-    &-desktop-search-leave-active {
-      transition-duration: 1ms !important;
-      transition-delay: 0ms !important;
-    }
-
-    &-mobile-nav-menu-enter-from,
-    &-mobile-nav-menu-leave-to,
-    &-mobile-search-enter-from,
-    &-mobile-search-leave-to,
-    &-desktop-search-enter-from,
-    &-desktop-search-leave-to {
-      transform: none;
-    }
-  }
+  @include shell.reduced-motion;
 }
 
-.fsu-bottom-tab-bar__overflow.el-public-shell__mobile-nav-menu {
-  position: relative;
-  flex: 1 1 0;
-  min-inline-size: 0;
-
-  > summary {
-    inline-size: 100%;
-    list-style: none;
-
-    &::-webkit-details-marker {
-      display: none;
-    }
-
-    &::marker {
-      content: '';
-    }
-  }
-}
-
-.fsu-bottom-tab-bar__overflow-panel.el-public-shell__mobile-nav-menu-panel {
-  inset-block-start: auto;
-  inset-block-end: calc(100% + 6px);
-  inset-inline-end: 0;
-}
+@include shell.bottom-tab-overflow;

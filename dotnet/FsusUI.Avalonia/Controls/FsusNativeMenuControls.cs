@@ -684,25 +684,7 @@ public sealed class FsusNativeMenuBuilder : IDisposable
       return null;
     }
 
-    var copy = new FsusNativeMenuItemModel
-    {
-      Id = source.Id,
-      Header = source.Header,
-      AccessibleName = source.AccessibleName,
-      AccessibleDescription = source.AccessibleDescription,
-      Command = source.Command,
-      Role = source.Role,
-      IsSeparator = source.IsSeparator,
-      IsRecentGroup = source.IsRecentGroup,
-      OpenRecentAction = source.OpenRecentAction,
-      ClearRecentAction = source.ClearRecentAction,
-    };
-
-    foreach (var recent in source.RecentItems)
-    {
-      copy.RecentItems.Add(recent);
-    }
-
+    var copy = CopyWithoutChildren(source);
     foreach (var item in source.Items)
     {
       var filtered = FilterMenu(
@@ -800,60 +782,32 @@ public sealed class FsusNativeMenuBuilder : IDisposable
     bool createCommand = true)
   {
     var existing = items.FirstOrDefault(item => item.Role == role);
-    if (existing is not null)
+    if (existing is null && createCommand)
     {
-      existing.AccessibleName ??= existing.Header ?? existing.Command?.Label ?? label;
-      if (role == FsusPlatformRole.Services && existing.Items.Count == 0)
-      {
-        existing.Items.Add(new FsusNativeMenuItemModel
-        {
-          Header = "No Services",
-          AccessibleName = "No Services",
-          Command = new FsusPlatformCommand(
-            "app.services.empty",
-            "No Services",
-            FsusPlatformRole.Services)
-          {
-            IsEnabled = false,
-          },
-          Role = FsusPlatformRole.Services,
-        });
-      }
-      return existing;
+      return FsusNativeMenuItemModel.Action(
+        new FsusPlatformCommand(commandId, label, role) { Gesture = gesture });
     }
 
-    if (!createCommand)
+    var model = existing ?? new FsusNativeMenuItemModel { Header = label, Role = role };
+    model.AccessibleName ??= model.Header ?? model.Command?.Label ?? label;
+    if (role == FsusPlatformRole.Services && model.Items.Count == 0)
     {
-      var model = new FsusNativeMenuItemModel
+      model.Items.Add(new FsusNativeMenuItemModel
       {
-        Header = label,
-        AccessibleName = label,
-        Role = role,
-      };
-      if (role == FsusPlatformRole.Services)
-      {
-        model.Items.Add(new FsusNativeMenuItemModel
+        Header = "No Services",
+        AccessibleName = "No Services",
+        Command = new FsusPlatformCommand(
+          "app.services.empty",
+          "No Services",
+          FsusPlatformRole.Services)
         {
-          Header = "No Services",
-          AccessibleName = "No Services",
-          Command = new FsusPlatformCommand(
-            "app.services.empty",
-            "No Services",
-            FsusPlatformRole.Services)
-          {
-            IsEnabled = false,
-          },
-          Role = FsusPlatformRole.Services,
-        });
-      }
-      return model;
-    }
-
-    return FsusNativeMenuItemModel.Action(
-      new FsusPlatformCommand(commandId, label, role)
-      {
-        Gesture = gesture,
+          IsEnabled = false,
+        },
+        Role = FsusPlatformRole.Services,
       });
+    }
+
+    return model;
   }
 
   private static void AppendSeparated(
@@ -1019,6 +973,17 @@ public sealed class FsusNativeMenuBuilder : IDisposable
   private static FsusNativeMenuItemModel CloneModel(
     FsusNativeMenuItemModel source)
   {
+    var copy = CopyWithoutChildren(source);
+    foreach (var item in source.Items)
+    {
+      copy.Items.Add(CloneModel(item));
+    }
+    return copy;
+  }
+
+  private static FsusNativeMenuItemModel CopyWithoutChildren(
+    FsusNativeMenuItemModel source)
+  {
     var copy = new FsusNativeMenuItemModel
     {
       Id = source.Id,
@@ -1035,10 +1000,6 @@ public sealed class FsusNativeMenuBuilder : IDisposable
     foreach (var recent in source.RecentItems)
     {
       copy.RecentItems.Add(recent);
-    }
-    foreach (var item in source.Items)
-    {
-      copy.Items.Add(CloneModel(item));
     }
     return copy;
   }

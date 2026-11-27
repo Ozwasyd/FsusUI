@@ -6,29 +6,19 @@ import { dirname, resolve } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 import { devices } from '@playwright/test'
 import {
+  PLAYWRIGHT_OWNERS_PATH as OWNERS_PATH,
+  stableStringify,
+} from './playwright-registry.mjs'
+import {
   loadPlaywrightSuiteRegistry,
   validatePlaywrightSuiteRegistry,
 } from './playwright-suites.mjs'
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..')
-const OWNERS_PATH = 'spec/ci/playwright-owners.json'
 const GROUP_NAMES = Object.freeze(['pr', 'main', 'nightly', 'release'])
 
 const fail = (message) => {
   throw new Error(message)
-}
-
-const stableStringify = (value) => {
-  if (Array.isArray(value)) {
-    return `[${value.map((entry) => stableStringify(entry)).join(',')}]`
-  }
-  if (value && typeof value === 'object') {
-    return `{${Object.keys(value)
-      .sort()
-      .map((key) => `${JSON.stringify(key)}:${stableStringify(value[key])}`)
-      .join(',')}}`
-  }
-  return JSON.stringify(value)
 }
 
 const digestOf = (value) =>

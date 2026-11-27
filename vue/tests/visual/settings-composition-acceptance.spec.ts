@@ -1,30 +1,20 @@
 import { expect, test } from '@playwright/test'
 import type { Page } from '@playwright/test'
-import { attachPageDiagnostics } from '../support/page-diagnostics'
 import { collectCssRules } from '../support/css-scan'
 import { buildVisualUrl } from '../../../scripts/visual-variant.mjs'
+import {
+  openStableVisualPage,
+  registerStableVisualHooks,
+} from '../support/visual-variant-fixture'
 
-const diagnostics = new WeakMap<Page, string[]>()
+registerStableVisualHooks(test)
 
-const stabilizePage = async (page: Page) => {
-  await page.addStyleTag({
-    content: `*,*::before,*::after{transition-duration:0s!important;animation-duration:0s!important;animation-delay:0s!important;scroll-behavior:auto!important}`,
-  })
-}
-
-test.beforeEach(async ({ page }) => {
-  diagnostics.set(page, attachPageDiagnostics(page))
-  await page.emulateMedia({ reducedMotion: 'reduce' })
-})
-
-test.afterEach(async ({ page }) => {
-  expect(diagnostics.get(page) ?? []).toEqual([])
-})
+const openSettingsFixtures = (page: Page, projectName: string) =>
+  openStableVisualPage(page, buildVisualUrl('settings-visual', projectName))
 
 // CSS gate
 test('production CSS has no card-on-card in settings', async ({ page }, testInfo) => {
-  await page.goto(buildVisualUrl('settings-visual', testInfo.project.name), { waitUntil: 'domcontentloaded' })
-  await stabilizePage(page)
+  await openSettingsFixtures(page, testInfo.project.name)
   await expect(page.getByTestId('settings-visual-fixtures')).toBeVisible()
 
   // Selector-scoped gate: card patterns only count when the rule that targets
@@ -56,16 +46,14 @@ test('production CSS has no card-on-card in settings', async ({ page }, testInfo
 
 // SectionNav geometry
 test('SectionNav link min-height >= 40px', async ({ page }, testInfo) => {
-  await page.goto(buildVisualUrl('settings-visual', testInfo.project.name), { waitUntil: 'domcontentloaded' })
-  await stabilizePage(page)
+  await openSettingsFixtures(page, testInfo.project.name)
   const link = page.locator('[data-settings-variant="default"] .el-section-nav__link').first()
   const minH = await link.evaluate((el) => getComputedStyle(el).minHeight)
   expect(parseFloat(minH)).toBeGreaterThanOrEqual(40)
 })
 
 test('SectionNav disabled has opacity 1', async ({ page }, testInfo) => {
-  await page.goto(buildVisualUrl('settings-visual', testInfo.project.name), { waitUntil: 'domcontentloaded' })
-  await stabilizePage(page)
+  await openSettingsFixtures(page, testInfo.project.name)
   const disabled = page.locator('[data-settings-variant="default"] .el-section-nav__link.is-disabled')
   const opacity = await disabled.evaluate((el) => getComputedStyle(el).opacity)
   expect(parseFloat(opacity)).toBe(1)
@@ -73,8 +61,7 @@ test('SectionNav disabled has opacity 1', async ({ page }, testInfo) => {
 
 // ResourceList flat
 test('ResourceList has no card surface', async ({ page }, testInfo) => {
-  await page.goto(buildVisualUrl('settings-visual', testInfo.project.name), { waitUntil: 'domcontentloaded' })
-  await stabilizePage(page)
+  await openSettingsFixtures(page, testInfo.project.name)
   const list = page.locator('[data-settings-variant="resource-default"] .el-resource-list')
   const borderRadius = await list.evaluate((el) => getComputedStyle(el).borderRadius)
   expect(borderRadius).toBe('0px')
@@ -84,8 +71,7 @@ test('ResourceList has no card surface', async ({ page }, testInfo) => {
 
 // DangerZone toned down
 test('DestructiveActionPanel has reduced danger emphasis', async ({ page }, testInfo) => {
-  await page.goto(buildVisualUrl('settings-visual', testInfo.project.name), { waitUntil: 'domcontentloaded' })
-  await stabilizePage(page)
+  await openSettingsFixtures(page, testInfo.project.name)
   const panel = page.locator('[data-settings-variant="danger-default"] .el-destructive-action-panel')
   const bg = await panel.evaluate((el) => getComputedStyle(el).backgroundColor)
   // Should not be danger-tinted
@@ -93,8 +79,7 @@ test('DestructiveActionPanel has reduced danger emphasis', async ({ page }, test
 })
 
 test('RiskNotice radius is small (6px)', async ({ page }, testInfo) => {
-  await page.goto(buildVisualUrl('settings-visual', testInfo.project.name), { waitUntil: 'domcontentloaded' })
-  await stabilizePage(page)
+  await openSettingsFixtures(page, testInfo.project.name)
   const notice = page.locator('[data-settings-variant="danger-default"] .el-risk-notice')
   const radius = await notice.evaluate((el) => getComputedStyle(el).borderRadius)
   expect(parseFloat(radius)).toBe(6)
@@ -102,16 +87,14 @@ test('RiskNotice radius is small (6px)', async ({ page }, testInfo) => {
 
 // TypedConfirmField
 test('TypedConfirmField input min-height >= 40px', async ({ page }, testInfo) => {
-  await page.goto(buildVisualUrl('settings-visual', testInfo.project.name), { waitUntil: 'domcontentloaded' })
-  await stabilizePage(page)
+  await openSettingsFixtures(page, testInfo.project.name)
   const input = page.locator('[data-settings-variant="typed-default"] .el-typed-confirm-field__input')
   const minH = await input.evaluate((el) => getComputedStyle(el).minHeight)
   expect(parseFloat(minH)).toBeGreaterThanOrEqual(40)
 })
 
 test('TypedConfirmField focus uses inset ring, not outer glow', async ({ page }, testInfo) => {
-  await page.goto(buildVisualUrl('settings-visual', testInfo.project.name), { waitUntil: 'domcontentloaded' })
-  await stabilizePage(page)
+  await openSettingsFixtures(page, testInfo.project.name)
   const input = page.locator('[data-settings-variant="typed-default"] .el-typed-confirm-field__input')
   await input.focus()
   const boxShadow = await input.evaluate((el) => getComputedStyle(el).boxShadow)
@@ -119,8 +102,7 @@ test('TypedConfirmField focus uses inset ring, not outer glow', async ({ page },
 })
 
 test('TypedConfirmField invalid focus uses danger ring', async ({ page }, testInfo) => {
-  await page.goto(buildVisualUrl('settings-visual', testInfo.project.name), { waitUntil: 'domcontentloaded' })
-  await stabilizePage(page)
+  await openSettingsFixtures(page, testInfo.project.name)
   const invalid = page.locator('[data-settings-variant="typed-invalid"] .el-typed-confirm-field__input')
   const borderColor = await invalid.evaluate((el) => getComputedStyle(el).borderColor)
   expect(borderColor).toBeTruthy()
@@ -128,8 +110,7 @@ test('TypedConfirmField invalid focus uses danger ring', async ({ page }, testIn
 
 // Full-page screenshot
 test('settings variants render without visual break', async ({ page }, testInfo) => {
-  await page.goto(buildVisualUrl('settings-visual', testInfo.project.name), { waitUntil: 'domcontentloaded' })
-  await stabilizePage(page)
+  await openSettingsFixtures(page, testInfo.project.name)
   for (const v of ['default', 'form-default', 'resource-default', 'danger-default', 'typed-default', 'typed-invalid']) {
     await expect(page.locator(`[data-settings-variant="${  v  }"]`)).toBeVisible()
   }

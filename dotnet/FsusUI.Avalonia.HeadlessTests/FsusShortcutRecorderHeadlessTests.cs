@@ -217,7 +217,7 @@ public class FsusShortcutRecorderHeadlessTests
     var outputRoot =
       Environment.GetEnvironmentVariable("FSUS_PR675_EVIDENCE_ROOT")
       ?? Path.Combine(
-        FindRepositoryRoot(),
+        HeadlessRepositoryRoot.FindByWorkspace(),
         "dotnet",
         "FsusUI.Avalonia.HeadlessTests",
         "TestResults",
@@ -474,22 +474,6 @@ public class FsusShortcutRecorderHeadlessTests
         AutomationProperties.GetName(item.Control) ?? string.Empty,
         AutomationProperties.GetItemStatus(item.Control) ?? string.Empty))
         .ToArray());
-  }
-
-  private static string FindRepositoryRoot()
-  {
-    for (var directory = new DirectoryInfo(AppContext.BaseDirectory);
-      directory is not null;
-      directory = directory.Parent)
-    {
-      if (File.Exists(Path.Combine(directory.FullName, "pnpm-workspace.yaml")))
-      {
-        return directory.FullName;
-      }
-    }
-
-    throw new DirectoryNotFoundException(
-      "Could not locate the FsusUI repository root.");
   }
 
   private sealed record ShortcutRecorderStateEvidence(

@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 
-import { pathToFileURL } from 'node:url'
 import {
   createFixedOwnerPlanLoader,
   runOwnerPlanCli,
+  runPlaywrightCli,
 } from './lib/playwright-owner-core.mjs'
 
 export const MOTION_OWNER = 'playwright-motion'
@@ -28,15 +28,10 @@ export const loadMotionOwnerPlan = createFixedOwnerPlanLoader({
   label: 'motion',
 })
 
-if (import.meta.url === pathToFileURL(process.argv[1] ?? '').href) {
-  try {
-    runOwnerPlanCli({
-      loadOwnerPlan: loadMotionOwnerPlan,
-      scriptName: 'motion-playwright-plan.mjs',
-      label: 'motion',
-    })
-  } catch (error) {
-    console.error(error instanceof Error ? error.message : error)
-    process.exitCode = 1
-  }
-}
+runPlaywrightCli(import.meta.url, () =>
+  runOwnerPlanCli({
+    loadOwnerPlan: loadMotionOwnerPlan,
+    scriptName: 'motion-playwright-plan.mjs',
+    label: 'motion',
+  }),
+)

@@ -167,14 +167,15 @@ const emit = defineEmits<{
 }>()
 
 const rootEl = ref<HTMLElement | null>(null)
-const initialRequest: MarkdownRenderRequest = {
+const createMarkdownRenderRequest = (): MarkdownRenderRequest => ({
   source: normalizeMarkdownSource(props.content),
   baseUrl: props.baseUrl,
   mode: props.mode,
   allowLatex: props.allowLatex,
   allowMermaid: props.allowMermaid,
   contentVersion: props.contentVersion,
-}
+})
+const initialRequest = createMarkdownRenderRequest()
 const initialRenderCandidate = props.initialRender
   ? toRaw(props.initialRender)
   : undefined
@@ -205,12 +206,8 @@ const resolveInitialChunkCount = (units: readonly MarkdownRenderChunk[]) => {
   )
   return Math.min(
     units.length,
-    firstSectionHeadingIndex < 0
-      ? MIN_INITIAL_MARKDOWN_CHUNKS
-      : Math.min(
-          MAX_INITIAL_MARKDOWN_CHUNKS,
-          Math.max(MIN_INITIAL_MARKDOWN_CHUNKS, firstSectionHeadingIndex + 1),
-        ),
+    MAX_INITIAL_MARKDOWN_CHUNKS,
+    Math.max(MIN_INITIAL_MARKDOWN_CHUNKS, firstSectionHeadingIndex + 1),
   )
 }
 const initialVisibleChunkCount = computed(() =>
@@ -335,8 +332,6 @@ function recordHeavyLifecycleMetrics() {
 }
 
 type RenderAnchor = {
-  htmlEndOffset?: number
-  htmlStartOffset?: number
   path: number[]
   offset: number
   scrollContainer: HTMLElement
@@ -495,18 +490,6 @@ const captureRenderAnchor = (): RenderAnchor | null => {
   if (!path.length) return null
 
   return {
-    htmlEndOffset:
-      Number(
-        anchor
-          .closest('.markdown-renderer__virtual-unit')
-          ?.getAttribute('data-fsus-render-html-end'),
-      ) || undefined,
-    htmlStartOffset:
-      Number(
-        anchor
-          .closest('.markdown-renderer__virtual-unit')
-          ?.getAttribute('data-fsus-render-html-start'),
-      ) || undefined,
     path,
     offset: anchor.getBoundingClientRect().top - containerRect.top,
     scrollContainer,
@@ -555,20 +538,16 @@ const restoreRenderAnchor = async (anchor: RenderAnchor | null) => {
   })
 }
 
-const commitRenderedContent = async (
-  html: MarkdownSafeHtml,
-  preserveAnchor = false,
-) => {
-  if (renderedContent.value === html) return false
+const commitRenderedContent = async (html: MarkdownSafeHtml) => {
+  if (renderedContent.value === html) return
 
   const startedAt = readPerformanceNow()
-  const anchor = preserveAnchor ? captureRenderAnchor() : null
+  const anchor = captureRenderAnchor()
   chunkUnits.value = []
   renderStrategy.value = 'sync'
   renderedContent.value = html
   await restoreRenderAnchor(anchor)
   recordCommitDuration(startedAt)
-  return true
 }
 
 const virtualWindow = useFsusVirtualWindow<MarkdownRenderChunk>({
@@ -585,7 +564,11 @@ const virtualWindow = useFsusVirtualWindow<MarkdownRenderChunk>({
   units: chunkUnits,
 })
 
-const setChunkUnitRef = (key: string, element: Element | null) => {
+const setChunkUnitTemplateRef = (
+  key: string,
+  target: Element | ComponentPublicInstance | null,
+) => {
+  const element = target instanceof Element ? target : null
   virtualWindow.setUnitRef(key, element)
   const previous = chunkActivationElements.get(key)
   if (previous && previous !== element) {
@@ -598,13 +581,6 @@ const setChunkUnitRef = (key: string, element: Element | null) => {
   if (!(element instanceof HTMLElement)) return
   chunkActivationElements.set(key, element)
   observeChunkForActivation(key, element)
-}
-
-const setChunkUnitTemplateRef = (
-  key: string,
-  element: Element | ComponentPublicInstance | null,
-) => {
-  setChunkUnitRef(key, element instanceof Element ? element : null)
 }
 
 const vMarkdownHeavyLifecycleUnmount = {
@@ -636,19 +612,8 @@ const countMarkdownParagraphBreaks = (source: string) => {
 
 const estimateMarkdownRender = (source: string) => ({
   htmlBytes: source.length * 2,
-  items: Math.max(1, countMarkdownParagraphBreaks(source)),
+  items: countMarkdownParagraphBreaks(source),
   nodes: Math.max(1, Math.ceil(source.length / 180)),
-})
-
-const createMarkdownRenderRequest = (
-  source: string,
-): MarkdownRenderRequest => ({
-  source,
-  baseUrl: props.baseUrl,
-  mode: props.mode,
-  allowLatex: props.allowLatex,
-  allowMermaid: props.allowMermaid,
-  contentVersion: props.contentVersion,
 })
 
 const sampleMarkdownSource = (source: string) => {
@@ -856,9 +821,7 @@ const markdownRenderPipelineAdapter: FsusRenderPipelineAdapter<
   },
 }
 
-const markdownRenderRequest = computed(() =>
-  createMarkdownRenderRequest(normalizeMarkdownSource(props.content)),
-)
+const markdownRenderRequest = computed(createMarkdownRenderRequest)
 
 const renderPipelineRuntime = useFsusRenderPipelineRuntime<
   MarkdownRenderRequest,
@@ -1182,7 +1145,7 @@ const performRender = async () => {
   const emitPlaceholders = (result: MarkdownSafeRenderResult) =>
     emit('placeholders-ready', result.placeholders, result)
   const commitAndActivate = async (result: MarkdownSafeRenderResult) => {
-    await commitRenderedContent(result.html, true)
+    await commitRenderedContent(result.html)
     if (!isCurrentRender()) return
     emitPlaceholders(result)
     await activateRenderedFeatures(result, rootEl.value, signal)
@@ -1199,9 +1162,8 @@ const performRender = async () => {
     })
   commitDurationMs = 0
   rootEl.value?.removeAttribute('data-fsus-markdown-commit-ms')
-  const source = normalizeMarkdownSource(props.content)
-  const request = createMarkdownRenderRequest(source)
-  isRendering.value = source.length > 0
+  const request = createMarkdownRenderRequest()
+  isRendering.value = request.source.length > 0
 
   try {
     const strategy = renderPipelineRuntime.strategy.value
@@ -1360,24 +1322,17 @@ onBeforeUnmount(() => {
   heavyLifecycle.dispose()
 })
 
-const normalizeFragmentTarget = (
-  input: string,
-): { readonly id: string; readonly fragment: string } | null => {
+const normalizeFragmentId = (input: string) => {
   const trimmed = input.trim()
-  if (!trimmed) return null
   const rawId = trimmed.startsWith('#') ? trimmed.slice(1) : trimmed
-  if (!rawId) return null
-  let decoded = rawId
+  if (!rawId) return ''
+  let id: string
   try {
-    decoded = decodeURIComponent(rawId)
+    id = decodeURIComponent(rawId)
   } catch {
-    decoded = rawId
+    id = rawId
   }
-  if (!decoded || /[\0\r\n]/.test(decoded)) return null
-  return {
-    id: decoded,
-    fragment: `#${decoded}`,
-  }
+  return /[\0\r\n]/.test(id) ? '' : id
 }
 
 const escapeRegExpPattern = (value: string) =>
@@ -1421,55 +1376,31 @@ const resolveElementChunkLocation = (element: HTMLElement) => {
 }
 
 const locateFragment = (fragmentOrId: string): MarkdownFragmentLocateResult => {
-  const target = normalizeFragmentTarget(fragmentOrId)
-  if (!target) {
-    return {
-      found: false,
-      mounted: false,
-      id: '',
-      fragment: '',
-      chunkIndex: -1,
-      chunkKey: null,
-      element: null,
-    }
-  }
-
-  const mountedElement = findMountedFragmentElement(target.id)
-  if (mountedElement) {
-    const location = resolveElementChunkLocation(mountedElement)
+  const id = normalizeFragmentId(fragmentOrId)
+  const fragment = id ? `#${id}` : ''
+  const element = id ? findMountedFragmentElement(id) : null
+  if (element) {
     return {
       found: true,
       mounted: true,
-      id: target.id,
-      fragment: target.fragment,
-      chunkIndex: location.chunkIndex,
-      chunkKey: location.chunkKey,
-      element: mountedElement,
+      id,
+      fragment,
+      ...resolveElementChunkLocation(element),
+      element,
     }
   }
 
-  const chunkIndex = chunkUnits.value.findIndex((unit) =>
-    hasFragmentIdInHtml(unit.html, target.id),
-  )
-  if (chunkIndex >= 0) {
-    return {
-      found: true,
-      mounted: false,
-      id: target.id,
-      fragment: target.fragment,
-      chunkIndex,
-      chunkKey: chunkUnits.value[chunkIndex]?.key ?? null,
-      element: null,
-    }
-  }
-
+  const chunkIndex = id
+    ? chunkUnits.value.findIndex((unit) => hasFragmentIdInHtml(unit.html, id))
+    : -1
   return {
-    found: false,
+    found: chunkIndex >= 0,
     mounted: false,
-    id: target.id,
-    fragment: target.fragment,
-    chunkIndex: -1,
-    chunkKey: null,
+    id,
+    fragment,
+    chunkIndex,
+    chunkKey:
+      chunkIndex >= 0 ? (chunkUnits.value[chunkIndex]?.key ?? null) : null,
     element: null,
   }
 }

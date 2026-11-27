@@ -282,7 +282,7 @@ public class FsusCommandPaletteHeadlessTests
   public void RealHeadlessSkiaRenderProducesCommandPaletteEvidenceMatrix()
   {
     var outputRoot = Path.Combine(
-      FindRepositoryRoot(),
+      HeadlessRepositoryRoot.FindByWorkspace(),
       "dotnet",
       "FsusUI.Avalonia.HeadlessTests",
       "TestResults",
@@ -306,8 +306,8 @@ public class FsusCommandPaletteHeadlessTests
     Assert.All(captures, capture =>
     {
       Assert.Equal(64, capture.Sha256.Length);
-      Assert.True(File.Exists(Path.Combine(FindRepositoryRoot(), capture.File)));
-      Assert.True(File.Exists(Path.Combine(FindRepositoryRoot(), capture.AutomationFile)));
+      Assert.True(File.Exists(Path.Combine(HeadlessRepositoryRoot.FindByWorkspace(), capture.File)));
+      Assert.True(File.Exists(Path.Combine(HeadlessRepositoryRoot.FindByWorkspace(), capture.AutomationFile)));
     });
 
     var manifestPath = Path.Combine(outputRoot, "command-palette-render-manifest.json");
@@ -345,7 +345,7 @@ public class FsusCommandPaletteHeadlessTests
   public async Task RealHeadlessSkiaRenderProducesIssue815SelectionEvidenceMatrix()
   {
     var outputRoot = Path.Combine(
-      FindRepositoryRoot(),
+      HeadlessRepositoryRoot.FindByWorkspace(),
       "tests",
       "conformance",
       "visual",
@@ -382,8 +382,8 @@ public class FsusCommandPaletteHeadlessTests
     {
       Assert.Equal(64, capture.Sha256.Length);
       Assert.Equal(64, capture.AutomationSha256.Length);
-      Assert.True(File.Exists(Path.Combine(FindRepositoryRoot(), capture.File)));
-      Assert.True(File.Exists(Path.Combine(FindRepositoryRoot(), capture.AutomationFile)));
+      Assert.True(File.Exists(Path.Combine(HeadlessRepositoryRoot.FindByWorkspace(), capture.File)));
+      Assert.True(File.Exists(Path.Combine(HeadlessRepositoryRoot.FindByWorkspace(), capture.AutomationFile)));
     });
 
     var manifestPath = Path.Combine(outputRoot, "command-palette-render-manifest.json");
@@ -563,9 +563,9 @@ public class FsusCommandPaletteHeadlessTests
 
     window.Close();
     return new Issue815CommandPaletteCapture(
-      Path.GetRelativePath(FindRepositoryRoot(), outputPath).Replace('\\', '/'),
+      Path.GetRelativePath(HeadlessRepositoryRoot.FindByWorkspace(), outputPath).Replace('\\', '/'),
       Convert.ToHexStringLower(SHA256.HashData(File.ReadAllBytes(outputPath))),
-      Path.GetRelativePath(FindRepositoryRoot(), automationPath).Replace('\\', '/'),
+      Path.GetRelativePath(HeadlessRepositoryRoot.FindByWorkspace(), automationPath).Replace('\\', '/'),
       Convert.ToHexStringLower(SHA256.HashData(File.ReadAllBytes(automationPath))),
       new PixelDimension(bitmap.PixelSize.Width, bitmap.PixelSize.Height),
       scenario.Name,
@@ -694,9 +694,9 @@ public class FsusCommandPaletteHeadlessTests
     window.Close();
 
     return new CommandPaletteCapture(
-      Path.GetRelativePath(FindRepositoryRoot(), outputPath).Replace('\\', '/'),
+      Path.GetRelativePath(HeadlessRepositoryRoot.FindByWorkspace(), outputPath).Replace('\\', '/'),
       Convert.ToHexStringLower(SHA256.HashData(File.ReadAllBytes(outputPath))),
-      Path.GetRelativePath(FindRepositoryRoot(), automationPath).Replace('\\', '/'),
+      Path.GetRelativePath(HeadlessRepositoryRoot.FindByWorkspace(), automationPath).Replace('\\', '/'),
       Convert.ToHexStringLower(SHA256.HashData(File.ReadAllBytes(automationPath))),
       new PixelDimension(bitmap.PixelSize.Width, bitmap.PixelSize.Height),
       scenario.Name,
@@ -890,20 +890,6 @@ public class FsusCommandPaletteHeadlessTests
     target.RaiseEvent(args);
     Dispatcher.UIThread.RunJobs();
     return args;
-  }
-
-  private static string FindRepositoryRoot()
-  {
-    for (var directory = new DirectoryInfo(AppContext.BaseDirectory);
-      directory is not null;
-      directory = directory.Parent)
-    {
-      if (File.Exists(Path.Combine(directory.FullName, "pnpm-workspace.yaml")))
-      {
-        return directory.FullName;
-      }
-    }
-    throw new DirectoryNotFoundException("Could not locate the FsusUI repository root.");
   }
 
   private sealed record RenderScenario(

@@ -71,41 +71,17 @@ export const createFsusRenderPipelineDiagnosticsHub = (
   }
 }
 
-const defaultDiagnosticEvents: FsusRenderPipelineDiagnosticEvent[] = []
-const defaultDiagnosticSinks = new Set<FsusRenderPipelineDiagnosticSink>()
+const defaultHub = /*#__PURE__*/ createFsusRenderPipelineDiagnosticsHub()
 
 export const emitDefaultFsusRenderPipelineDiagnostic = (
   event: FsusRenderPipelineDiagnosticEvent,
-) => {
-  const normalized = {
-    timestamp: readRenderPipelineNow(),
-    ...event,
-  }
-  defaultDiagnosticEvents.push(normalized)
-  if (defaultDiagnosticEvents.length > DEFAULT_DIAGNOSTICS_BUFFER_LIMIT) {
-    defaultDiagnosticEvents.splice(
-      0,
-      defaultDiagnosticEvents.length - DEFAULT_DIAGNOSTICS_BUFFER_LIMIT,
-    )
-  }
-  for (const sink of Array.from(defaultDiagnosticSinks)) {
-    sink(normalized)
-  }
-}
+) => defaultHub.emit(event)
 
 export const registerFsusRenderPipelineDiagnosticSink = (
   sink: FsusRenderPipelineDiagnosticSink,
-) => {
-  defaultDiagnosticSinks.add(sink)
-  return () => {
-    defaultDiagnosticSinks.delete(sink)
-  }
-}
+) => defaultHub.registerSink(sink)
 
 export const getFsusRenderPipelineDiagnosticsSnapshot = () =>
-  defaultDiagnosticEvents.slice()
+  defaultHub.snapshot()
 
-export const clearFsusRenderPipelineDiagnostics = () => {
-  defaultDiagnosticEvents.length = 0
-  defaultDiagnosticSinks.clear()
-}
+export const clearFsusRenderPipelineDiagnostics = () => defaultHub.clear()

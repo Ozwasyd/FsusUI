@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 
-import { pathToFileURL } from 'node:url'
 import {
   createFixedOwnerPlanLoader,
   runOwnerPlanCli,
+  runPlaywrightCli,
 } from './lib/playwright-owner-core.mjs'
 
 export const CONFORMANCE_OWNER = 'playwright-conformance'
@@ -26,15 +26,10 @@ export const loadConformanceOwnerPlan = createFixedOwnerPlanLoader({
   label: 'conformance',
 })
 
-if (import.meta.url === pathToFileURL(process.argv[1] ?? '').href) {
-  try {
-    runOwnerPlanCli({
-      loadOwnerPlan: loadConformanceOwnerPlan,
-      scriptName: 'conformance-playwright-plan.mjs',
-      label: 'conformance',
-    })
-  } catch (error) {
-    console.error(error instanceof Error ? error.message : error)
-    process.exitCode = 1
-  }
-}
+runPlaywrightCli(import.meta.url, () =>
+  runOwnerPlanCli({
+    loadOwnerPlan: loadConformanceOwnerPlan,
+    scriptName: 'conformance-playwright-plan.mjs',
+    label: 'conformance',
+  }),
+)

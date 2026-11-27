@@ -88,7 +88,7 @@
       "path": "vue/packages/theme-chalk/src/metric-primitives.scss",
       "kind": "implementation",
       "algorithm": "sha256",
-      "digest": "ccbcd378804688ae116ad6752aa37459d6aac4f5e42ffdf1ed20022c6e5cafbd"
+      "digest": "312200364833df1162d48bb8538f2e50644f138b8f4cfd492075117c1ae45bda"
     },
     "implementation-08": {
       "path": "vue/packages/theme-chalk/src/tabs.scss",
@@ -148,7 +148,7 @@
       "path": "vue/packages/theme-chalk/src/settings-primitives.scss",
       "kind": "implementation",
       "algorithm": "sha256",
-      "digest": "6b80611b3f9cb697af44bfa26fdead221b3109361a999a5b4fd8a3cef81c61ec"
+      "digest": "295364141a025ddfa85656e3bea7650d2977505432a035a6af62130e9ccc922f"
     },
     "implementation-18": {
       "path": "vue/packages/theme-chalk/src/loading.scss",
@@ -172,7 +172,7 @@
       "path": "vue/packages/theme-chalk/src/public-shell.scss",
       "kind": "implementation",
       "algorithm": "sha256",
-      "digest": "daf2f822ec7103fa9b2b2c2d013dbc751e8b05e4cb0e1de33f10550f16908885"
+      "digest": "1e895a917fe6506f835c4cc1dc3d4ecebfd7564ddcfff33899df49d0e63da5a0"
     },
     "implementation-22": {
       "path": "vue/packages/theme-chalk/src/drawer.scss",

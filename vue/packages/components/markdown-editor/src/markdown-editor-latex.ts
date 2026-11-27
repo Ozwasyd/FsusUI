@@ -1,20 +1,18 @@
 import type { MarkdownDocumentIdentity } from '../../../wasm/markdown-runtime'
-import type { MarkdownEditorMode } from './markdown-editor-live-contract'
 import type { MarkdownLiveLayoutPlan } from './markdown-editor-live-layout'
 import {
   commitMarkdownTechnicalFeatureResult,
-  createMarkdownTechnicalFeatureRequest,
-  resolveMarkdownTechnicalAtomic,
-  resolveMarkdownTechnicalDiagnostic,
-  resolveMarkdownTechnicalHeight,
-  resolveMarkdownTechnicalNode,
+  planMarkdownTechnicalPreview,
   type MarkdownTechnicalDiagnostic,
   type MarkdownTechnicalFeatureCommit,
   type MarkdownTechnicalFeatureRequest,
   type MarkdownTechnicalNodePlan,
   type MarkdownTechnicalNodeState,
+  type MarkdownTechnicalPreviewAction,
+  type MarkdownTechnicalPreviewInput,
+  type MarkdownTechnicalPreviewPresentation,
+  type MarkdownTechnicalPreviewVerdict,
 } from './markdown-editor-technical'
-import type { MarkdownEditorSelection } from './markdown-editor-transaction'
 
 export const MARKDOWN_LATEX_BUDGET = Object.freeze({
   maxBodyBytes: 8192,
@@ -23,18 +21,9 @@ export const MARKDOWN_LATEX_BUDGET = Object.freeze({
 
 export type MarkdownLatexDisplay = 'inline' | 'block'
 
-export type MarkdownLatexVerdict = 'valid' | 'invalid' | 'large' | 'unsafe'
-
-export type MarkdownLatexPreviewAction =
-  | 'pending'
-  | 'preview'
-  | 'error'
-  | 'retry'
-  | 'cancel'
-  | 'source-reveal'
-  | 'degraded'
-
-export type MarkdownLatexPresentation = 'preview' | 'source-only' | 'degraded'
+export type MarkdownLatexVerdict = MarkdownTechnicalPreviewVerdict
+export type MarkdownLatexPreviewAction = MarkdownTechnicalPreviewAction
+export type MarkdownLatexPresentation = MarkdownTechnicalPreviewPresentation
 
 export interface MarkdownLatexClassification {
   readonly diagnosticCode: string | null
@@ -82,13 +71,6 @@ const UNSAFE_FRAGMENTS = Object.freeze([
   '\\write18',
   '\\special{',
 ])
-
-const selectionOf = (start: number, end = start): MarkdownEditorSelection =>
-  Object.freeze({
-    direction: start === end ? ('none' as const) : ('forward' as const),
-    end,
-    start,
-  })
 
 const unsafeIndex = (value: string) => {
   const lower = value.toLowerCase()
@@ -177,127 +159,29 @@ export const classifyMarkdownLatexBody = (input: {
   })
 }
 
-const presentationOf = (
-  verdict: MarkdownLatexVerdict,
-  action: MarkdownLatexPreviewAction,
-): MarkdownLatexPresentation => {
-  if (action === 'preview' && verdict === 'valid') return 'preview'
-  if (verdict === 'large' || action === 'degraded') return 'degraded'
-  return 'source-only'
-}
-
-const actionFor = (
-  intent: MarkdownLatexPreviewAction | undefined,
-  verdict: MarkdownLatexVerdict,
-): MarkdownLatexPreviewAction => {
-  if (intent === 'retry') return 'pending'
-  if (intent === 'cancel') return 'cancel'
-  if (intent === 'source-reveal') return 'source-reveal'
-  if (verdict === 'valid') return intent ?? 'pending'
-  if (verdict === 'large') return 'degraded'
-  return 'error'
-}
-
-export const planMarkdownLatexPreview = (input: {
-  readonly abortSignal?: AbortSignal | null
-  readonly config?: Readonly<Record<string, unknown>>
-  readonly documentIdentity?: MarkdownDocumentIdentity
-  readonly intent?: MarkdownLatexPreviewAction
-  readonly mode?: MarkdownEditorMode
-  readonly nodeId?: string
-  readonly revision?: number
-  readonly selection?: MarkdownEditorSelection
-  readonly source: string
-  readonly theme?: string | null
-}): MarkdownLatexPreviewPlan => {
-  const identity = input.documentIdentity ?? { epoch: 0, id: 'latex' }
-  const node = resolveMarkdownTechnicalNode({
-    documentIdentity: identity,
-    kind: 'latex',
-    nodeId: input.nodeId,
-    revision: input.revision,
-    selection: input.selection,
-    source: input.source,
-  })
-  const display = node ? displayOf(node, input.source) : 'block'
-  const body = node
-    ? input.source.slice(node.ranges.body.raw.start, node.ranges.body.raw.end)
-    : ''
-  const classification = classifyMarkdownLatexBody({
-    body,
-    display,
-    range: node?.ranges.body.raw ?? { end: 0, start: 0 },
-  })
-  const action = actionFor(input.intent, classification.verdict)
-  const request =
-    node && action !== 'cancel'
-      ? createMarkdownTechnicalFeatureRequest({
-          abortSignal: input.abortSignal,
-          config: { ...input.config, display },
-          documentIdentity: identity,
-          kind: 'latex',
-          mode: input.mode,
-          nodeId: node.nodeId,
-          revision: input.revision,
-          source: input.source,
-          theme: input.theme,
-        })
-      : null
-  const diagnostic =
-    classification.verdict === 'valid'
-      ? null
-      : resolveMarkdownTechnicalDiagnostic({
-          code: classification.diagnosticCode ?? 'technical-error',
-          documentIdentity: identity,
-          kind: 'latex',
-          nodeId: node?.nodeId,
-          selection: selectionOf(classification.range.start),
-          source: input.source,
-        })
-  const atomic = resolveMarkdownTechnicalAtomic({
-    action: action === 'source-reveal' ? 'enter-source' : 'caret-before',
-    documentIdentity: identity,
-    kind: 'latex',
-    mode: input.mode,
-    nodeId: node?.nodeId,
-    revision: input.revision,
-    selection: input.selection ?? selectionOf(node?.rawRange.start ?? 0),
-    source: input.source,
-  })
-  const height = resolveMarkdownTechnicalHeight({
-    documentIdentity: identity,
-    kind: 'latex',
-    revision: input.revision,
-    selection: input.selection ?? selectionOf(node?.rawRange.start ?? 0),
-    source: input.source,
-  })
-  const status: MarkdownTechnicalNodeState =
-    action === 'pending'
-      ? 'pending'
-      : action === 'preview'
-        ? 'resolved'
-        : action === 'degraded'
-          ? 'degraded'
-          : action === 'cancel'
-            ? 'error'
-            : 'error'
+export const planMarkdownLatexPreview = (
+  input: MarkdownTechnicalPreviewInput,
+): MarkdownLatexPreviewPlan => {
+  const { accessibility, action, classification, diagnostic, ...layout } =
+    planMarkdownTechnicalPreview(
+      'latex',
+      input,
+      (body, range, node) =>
+        classifyMarkdownLatexBody({
+          body,
+          display: node ? displayOf(node, input.source) : 'block',
+          range,
+        }),
+      ({ display }) => ({ ...input.config, display }),
+    )
   return Object.freeze({
-    accessibility: Object.freeze({
-      kind: 'latex' as const,
-      name: atomic.accessibility.name,
-      status,
-      tabStop: false,
-      value: diagnostic?.message ?? atomic.accessibility.value,
-    }),
+    accessibility,
     action,
     classification,
     diagnostic,
-    display,
+    display: classification.display,
     editorCapability: 'supported',
-    height,
-    node,
-    presentation: presentationOf(classification.verdict, action),
-    request,
+    ...layout,
     sourceUnchanged: true,
     wraps: classification.wraps,
   })

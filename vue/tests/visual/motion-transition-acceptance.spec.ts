@@ -1,30 +1,20 @@
 import { expect, test } from '@playwright/test'
 import type { Page } from '@playwright/test'
-import { attachPageDiagnostics } from '../support/page-diagnostics'
 import { collectCssRules } from '../support/css-scan'
 import { buildVisualUrl } from '../../../scripts/visual-variant.mjs'
+import {
+  openStableVisualPage,
+  registerStableVisualHooks,
+} from '../support/visual-variant-fixture'
 
-const diagnostics = new WeakMap<Page, string[]>()
+registerStableVisualHooks(test)
 
-const stabilizePage = async (page: Page) => {
-  await page.addStyleTag({
-    content: `*,*::before,*::after{transition-duration:0s!important;animation-duration:0s!important;animation-delay:0s!important;scroll-behavior:auto!important}`,
-  })
-}
-
-test.beforeEach(async ({ page }) => {
-  diagnostics.set(page, attachPageDiagnostics(page))
-  await page.emulateMedia({ reducedMotion: 'reduce' })
-})
-
-test.afterEach(async ({ page }) => {
-  expect(diagnostics.get(page) ?? []).toEqual([])
-})
+const openMotionFixtures = (page: Page, projectName: string) =>
+  openStableVisualPage(page, buildVisualUrl('', projectName))
 
 // Check compiled CSS for all zoom-in-* transitions
 test('zoom-in transitions use opacity+translate, no axis scale', async ({ page }, testInfo) => {
-  await page.goto(buildVisualUrl('', testInfo.project.name), { waitUntil: 'domcontentloaded' })
-  await stabilizePage(page)
+  await openMotionFixtures(page, testInfo.project.name)
 
   // Selector-scoped gate: evaluate each rule against its own selector and
   // declarations, not joined whole-sheet text (cross-rule joins false-positive
@@ -48,8 +38,7 @@ test('zoom-in transitions use opacity+translate, no axis scale', async ({ page }
 
 // List displacement <= 8px
 test('list transitions use <=8px displacement', async ({ page }, testInfo) => {
-  await page.goto(buildVisualUrl('', testInfo.project.name), { waitUntil: 'domcontentloaded' })
-  await stabilizePage(page)
+  await openMotionFixtures(page, testInfo.project.name)
 
   const rules = await collectCssRules(page)
   const displacements: string[] = []
@@ -70,8 +59,7 @@ test('list transitions use <=8px displacement', async ({ page }, testInfo) => {
 
 // Overlay transitions have scale >= 0.98
 test('zoom-in overlay transitions have scale >= 0.98', async ({ page }, testInfo) => {
-  await page.goto(buildVisualUrl('', testInfo.project.name), { waitUntil: 'domcontentloaded' })
-  await stabilizePage(page)
+  await openMotionFixtures(page, testInfo.project.name)
 
   const rules = await collectCssRules(page)
   const scales: string[] = []
@@ -92,8 +80,7 @@ test('zoom-in overlay transitions have scale >= 0.98', async ({ page }, testInfo
 
 // No legacy 500ms motion
 test('no transition uses 500ms', async ({ page }, testInfo) => {
-  await page.goto(buildVisualUrl('', testInfo.project.name), { waitUntil: 'domcontentloaded' })
-  await stabilizePage(page)
+  await openMotionFixtures(page, testInfo.project.name)
 
   const rules = await collectCssRules(page)
   const has500ms = rules.some((rule) =>

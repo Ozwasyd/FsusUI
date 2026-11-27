@@ -11,350 +11,165 @@ internal sealed class FsusFormFieldAdapterForAttribute : Attribute
   public Type ControlType { get; }
 }
 
-internal abstract class FsusBuiltInFieldAdapter<TControl>(TControl control) : IFsusFormFieldAdapter
+internal abstract class FsusBuiltInFieldAdapter<TControl>(
+  TControl control,
+  Action<TControl, FsusComponentSize>? applySize = null,
+  Action<TControl, bool>? applyInvalidState = null) : IFsusFormFieldAdapter
   where TControl : Control
 {
   protected TControl Control { get; } = control;
 
-  public abstract FsusFormFieldAdapterCapabilities Capabilities { get; }
+  public FsusFormFieldAdapterCapabilities Capabilities =>
+    FsusFormFieldAdapterCapabilities.ReadValue |
+    FsusFormFieldAdapterCapabilities.WriteValue |
+    FsusFormFieldAdapterCapabilities.ResetValue |
+    (applySize is null ? FsusFormFieldAdapterCapabilities.None : FsusFormFieldAdapterCapabilities.ApplySize) |
+    (applyInvalidState is null ? FsusFormFieldAdapterCapabilities.None : FsusFormFieldAdapterCapabilities.ApplyInvalidState);
 
   public abstract FsusFormFieldReadResult ReadValue();
 
-  public abstract FsusFormFieldAdapterResult TryWriteValue(object? value);
+  public FsusFormFieldAdapterResult TryWriteValue(object? value) => TryResetValue(value);
 
   public abstract FsusFormFieldAdapterResult TryResetValue(object? initialValue);
 
-  public virtual FsusFormFieldAdapterResult TryApplySize(FsusComponentSize size) =>
-    Missing(nameof(TryApplySize), "apply size");
+  public FsusFormFieldAdapterResult TryApplySize(FsusComponentSize size)
+  {
+    if (applySize is null)
+    {
+      return Missing(nameof(TryApplySize), "apply size");
+    }
 
-  public virtual FsusFormFieldAdapterResult TryApplyInvalidState(bool isInvalid) =>
-    Missing(nameof(TryApplyInvalidState), "apply invalid state");
+    applySize(Control, size);
+    return Success;
+  }
+
+  public FsusFormFieldAdapterResult TryApplyInvalidState(bool isInvalid)
+  {
+    if (applyInvalidState is null)
+    {
+      return Missing(nameof(TryApplyInvalidState), "apply invalid state");
+    }
+
+    applyInvalidState(Control, isInvalid);
+    return Success;
+  }
 
   protected FsusFormFieldAdapterResult Mismatch(object? value, string member, string expected) =>
-    FsusFormFieldAdapterResult.Failure(
-      new FsusFormFieldAdapterError(
-        FsusFormFieldAdapterErrorKind.TypeMismatch,
-        $"Expected {expected} but received {(value is null ? "null" : value.GetType().Name)}.",
-        typeof(TControl),
-        member));
+    Failure(
+      FsusFormFieldAdapterErrorKind.TypeMismatch,
+      $"Expected {expected} but received {(value is null ? "null" : value.GetType().Name)}.",
+      member);
 
-  protected FsusFormFieldAdapterResult Missing(string member, string operation) =>
-    FsusFormFieldAdapterResult.Failure(
-      new FsusFormFieldAdapterError(
-        FsusFormFieldAdapterErrorKind.MissingCapability,
-        $"{typeof(TControl).Name} does not support {operation}.",
-        typeof(TControl),
-        member));
+  private FsusFormFieldAdapterResult Missing(string member, string operation) =>
+    Failure(
+      FsusFormFieldAdapterErrorKind.MissingCapability,
+      $"{typeof(TControl).Name} does not support {operation}.",
+      member);
+
+  protected static FsusFormFieldAdapterResult Failure(
+    FsusFormFieldAdapterErrorKind kind,
+    string message,
+    string member) =>
+    FsusFormFieldAdapterResult.Failure(new FsusFormFieldAdapterError(kind, message, typeof(TControl), member));
 
   protected FsusFormFieldAdapterResult Success => FsusFormFieldAdapterResult.Success;
 }
 
-[FsusFormFieldAdapterFor(typeof(FsusInput))]
-internal sealed class FsusInputFieldAdapter(FsusInput control) : FsusBuiltInFieldAdapter<FsusInput>(control)
+internal abstract class FsusPropertyFieldAdapter<TControl, TValue>(
+  TControl control,
+  string member,
+  string expected,
+  Func<TControl, TValue> read,
+  Action<TControl, TValue> write,
+  Action<TControl, FsusComponentSize>? applySize = null,
+  Action<TControl, bool>? applyInvalidState = null)
+  : FsusBuiltInFieldAdapter<TControl>(control, applySize, applyInvalidState)
+  where TControl : Control
 {
-  public override FsusFormFieldAdapterCapabilities Capabilities =>
-    FsusFormFieldAdapterCapabilities.ReadValue |
-    FsusFormFieldAdapterCapabilities.WriteValue |
-    FsusFormFieldAdapterCapabilities.ResetValue |
-    FsusFormFieldAdapterCapabilities.ApplySize |
-    FsusFormFieldAdapterCapabilities.ApplyInvalidState;
-
   public override FsusFormFieldReadResult ReadValue() =>
-    FsusFormFieldReadResult.Success(Control.Text);
-
-  public override FsusFormFieldAdapterResult TryWriteValue(object? value) =>
-    TryResetValue(value);
+    FsusFormFieldReadResult.Success(read(Control));
 
   public override FsusFormFieldAdapterResult TryResetValue(object? initialValue)
   {
-    if (initialValue is not null && initialValue is not string)
+    if (initialValue is not null && initialValue is not TValue)
     {
-      return Mismatch(initialValue, nameof(FsusInput.Text), "a string value");
+      return Mismatch(initialValue, member, expected);
     }
 
-    Control.Text = (string?)initialValue;
-    return Success;
-  }
-
-  public override FsusFormFieldAdapterResult TryApplySize(FsusComponentSize size)
-  {
-    Control.Size = size;
-    return Success;
-  }
-
-  public override FsusFormFieldAdapterResult TryApplyInvalidState(bool isInvalid)
-  {
-    Control.IsInvalid = isInvalid;
+    write(Control, (TValue)initialValue!);
     return Success;
   }
 }
+
+[FsusFormFieldAdapterFor(typeof(FsusInput))]
+internal sealed class FsusInputFieldAdapter(FsusInput control)
+  : FsusPropertyFieldAdapter<FsusInput, string?>(
+    control, nameof(FsusInput.Text), "a string value",
+    static field => field.Text, static (field, value) => field.Text = value,
+    static (field, size) => field.Size = size,
+    static (field, isInvalid) => field.IsInvalid = isInvalid);
 
 [FsusFormFieldAdapterFor(typeof(FsusTextarea))]
-internal sealed class FsusTextareaFieldAdapter(FsusTextarea control) : FsusBuiltInFieldAdapter<FsusTextarea>(control)
-{
-  public override FsusFormFieldAdapterCapabilities Capabilities =>
-    FsusFormFieldAdapterCapabilities.ReadValue |
-    FsusFormFieldAdapterCapabilities.WriteValue |
-    FsusFormFieldAdapterCapabilities.ResetValue |
-    FsusFormFieldAdapterCapabilities.ApplySize |
-    FsusFormFieldAdapterCapabilities.ApplyInvalidState;
-
-  public override FsusFormFieldReadResult ReadValue() =>
-    FsusFormFieldReadResult.Success(Control.Text);
-
-  public override FsusFormFieldAdapterResult TryWriteValue(object? value) =>
-    TryResetValue(value);
-
-  public override FsusFormFieldAdapterResult TryResetValue(object? initialValue)
-  {
-    if (initialValue is not null && initialValue is not string)
-    {
-      return Mismatch(initialValue, nameof(FsusTextarea.Text), "a string value");
-    }
-
-    Control.Text = (string?)initialValue;
-    return Success;
-  }
-
-  public override FsusFormFieldAdapterResult TryApplySize(FsusComponentSize size)
-  {
-    Control.Size = size;
-    return Success;
-  }
-
-  public override FsusFormFieldAdapterResult TryApplyInvalidState(bool isInvalid)
-  {
-    Control.IsInvalid = isInvalid;
-    return Success;
-  }
-}
+internal sealed class FsusTextareaFieldAdapter(FsusTextarea control)
+  : FsusPropertyFieldAdapter<FsusTextarea, string?>(
+    control, nameof(FsusTextarea.Text), "a string value",
+    static field => field.Text, static (field, value) => field.Text = value,
+    static (field, size) => field.Size = size,
+    static (field, isInvalid) => field.IsInvalid = isInvalid);
 
 [FsusFormFieldAdapterFor(typeof(FsusInputNumber))]
-internal sealed class FsusInputNumberFieldAdapter(FsusInputNumber control) : FsusBuiltInFieldAdapter<FsusInputNumber>(control)
-{
-  public override FsusFormFieldAdapterCapabilities Capabilities =>
-    FsusFormFieldAdapterCapabilities.ReadValue |
-    FsusFormFieldAdapterCapabilities.WriteValue |
-    FsusFormFieldAdapterCapabilities.ResetValue |
-    FsusFormFieldAdapterCapabilities.ApplySize |
-    FsusFormFieldAdapterCapabilities.ApplyInvalidState;
-
-  public override FsusFormFieldReadResult ReadValue() =>
-    FsusFormFieldReadResult.Success(Control.Value);
-
-  public override FsusFormFieldAdapterResult TryWriteValue(object? value) =>
-    TryResetValue(value);
-
-  public override FsusFormFieldAdapterResult TryResetValue(object? initialValue)
-  {
-    if (initialValue is not null && initialValue is not decimal)
-    {
-      return Mismatch(initialValue, nameof(FsusInputNumber.Value), "a decimal value");
-    }
-
-    Control.Value = (decimal?)initialValue;
-    return Success;
-  }
-
-  public override FsusFormFieldAdapterResult TryApplySize(FsusComponentSize size)
-  {
-    Control.Size = size;
-    return Success;
-  }
-
-  public override FsusFormFieldAdapterResult TryApplyInvalidState(bool isInvalid)
-  {
-    Control.IsInvalid = isInvalid;
-    return Success;
-  }
-}
+internal sealed class FsusInputNumberFieldAdapter(FsusInputNumber control)
+  : FsusPropertyFieldAdapter<FsusInputNumber, decimal?>(
+    control, nameof(FsusInputNumber.Value), "a decimal value",
+    static field => field.Value, static (field, value) => field.Value = value,
+    static (field, size) => field.Size = size,
+    static (field, isInvalid) => field.IsInvalid = isInvalid);
 
 [FsusFormFieldAdapterFor(typeof(TextBox))]
-internal sealed class TextBoxFieldAdapter(TextBox control) : FsusBuiltInFieldAdapter<TextBox>(control)
-{
-  public override FsusFormFieldAdapterCapabilities Capabilities =>
-    FsusFormFieldAdapterCapabilities.ReadValue |
-    FsusFormFieldAdapterCapabilities.WriteValue |
-    FsusFormFieldAdapterCapabilities.ResetValue;
-
-  public override FsusFormFieldReadResult ReadValue() =>
-    FsusFormFieldReadResult.Success(Control.Text);
-
-  public override FsusFormFieldAdapterResult TryWriteValue(object? value) =>
-    TryResetValue(value);
-
-  public override FsusFormFieldAdapterResult TryResetValue(object? initialValue)
-  {
-    if (initialValue is not null && initialValue is not string)
-    {
-      return Mismatch(initialValue, nameof(TextBox.Text), "a string value");
-    }
-
-    Control.Text = (string?)initialValue;
-    return Success;
-  }
-}
+internal sealed class TextBoxFieldAdapter(TextBox control)
+  : FsusPropertyFieldAdapter<TextBox, string?>(
+    control, nameof(TextBox.Text), "a string value",
+    static field => field.Text, static (field, value) => field.Text = value);
 
 [FsusFormFieldAdapterFor(typeof(FsusCheckbox))]
-internal sealed class FsusCheckboxFieldAdapter(FsusCheckbox control) : FsusBuiltInFieldAdapter<FsusCheckbox>(control)
-{
-  public override FsusFormFieldAdapterCapabilities Capabilities =>
-    FsusFormFieldAdapterCapabilities.ReadValue |
-    FsusFormFieldAdapterCapabilities.WriteValue |
-    FsusFormFieldAdapterCapabilities.ResetValue |
-    FsusFormFieldAdapterCapabilities.ApplySize;
-
-  public override FsusFormFieldReadResult ReadValue() =>
-    FsusFormFieldReadResult.Success(Control.IsChecked);
-
-  public override FsusFormFieldAdapterResult TryWriteValue(object? value) =>
-    TryResetValue(value);
-
-  public override FsusFormFieldAdapterResult TryResetValue(object? initialValue)
-  {
-    if (initialValue is not null && initialValue is not bool)
-    {
-      return Mismatch(initialValue, nameof(FsusCheckbox.IsChecked), "a boolean value");
-    }
-
-    Control.IsChecked = (bool?)initialValue;
-    return Success;
-  }
-
-  public override FsusFormFieldAdapterResult TryApplySize(FsusComponentSize size)
-  {
-    Control.Size = size;
-    return Success;
-  }
-}
+internal sealed class FsusCheckboxFieldAdapter(FsusCheckbox control)
+  : FsusPropertyFieldAdapter<FsusCheckbox, bool?>(
+    control, nameof(FsusCheckbox.IsChecked), "a boolean value",
+    static field => field.IsChecked, static (field, value) => field.IsChecked = value,
+    static (field, size) => field.Size = size);
 
 [FsusFormFieldAdapterFor(typeof(FsusRadio))]
-internal sealed class FsusRadioFieldAdapter(FsusRadio control) : FsusBuiltInFieldAdapter<FsusRadio>(control)
-{
-  public override FsusFormFieldAdapterCapabilities Capabilities =>
-    FsusFormFieldAdapterCapabilities.ReadValue |
-    FsusFormFieldAdapterCapabilities.WriteValue |
-    FsusFormFieldAdapterCapabilities.ResetValue |
-    FsusFormFieldAdapterCapabilities.ApplySize;
-
-  public override FsusFormFieldReadResult ReadValue() =>
-    FsusFormFieldReadResult.Success(Control.IsChecked);
-
-  public override FsusFormFieldAdapterResult TryWriteValue(object? value) =>
-    TryResetValue(value);
-
-  public override FsusFormFieldAdapterResult TryResetValue(object? initialValue)
-  {
-    if (initialValue is not null && initialValue is not bool)
-    {
-      return Mismatch(initialValue, nameof(FsusRadio.IsChecked), "a boolean value");
-    }
-
-    Control.IsChecked = (bool?)initialValue;
-    return Success;
-  }
-
-  public override FsusFormFieldAdapterResult TryApplySize(FsusComponentSize size)
-  {
-    Control.Size = size;
-    return Success;
-  }
-}
+internal sealed class FsusRadioFieldAdapter(FsusRadio control)
+  : FsusPropertyFieldAdapter<FsusRadio, bool?>(
+    control, nameof(FsusRadio.IsChecked), "a boolean value",
+    static field => field.IsChecked, static (field, value) => field.IsChecked = value,
+    static (field, size) => field.Size = size);
 
 [FsusFormFieldAdapterFor(typeof(FsusSwitch))]
-internal sealed class FsusSwitchFieldAdapter(FsusSwitch control) : FsusBuiltInFieldAdapter<FsusSwitch>(control)
-{
-  public override FsusFormFieldAdapterCapabilities Capabilities =>
-    FsusFormFieldAdapterCapabilities.ReadValue |
-    FsusFormFieldAdapterCapabilities.WriteValue |
-    FsusFormFieldAdapterCapabilities.ResetValue |
-    FsusFormFieldAdapterCapabilities.ApplySize;
-
-  public override FsusFormFieldReadResult ReadValue() =>
-    FsusFormFieldReadResult.Success(Control.IsChecked);
-
-  public override FsusFormFieldAdapterResult TryWriteValue(object? value) =>
-    TryResetValue(value);
-
-  public override FsusFormFieldAdapterResult TryResetValue(object? initialValue)
-  {
-    if (initialValue is not null && initialValue is not bool)
-    {
-      return Mismatch(initialValue, nameof(FsusSwitch.IsChecked), "a boolean value");
-    }
-
-    Control.IsChecked = (bool?)initialValue;
-    return Success;
-  }
-
-  public override FsusFormFieldAdapterResult TryApplySize(FsusComponentSize size)
-  {
-    Control.Size = size;
-    return Success;
-  }
-}
+internal sealed class FsusSwitchFieldAdapter(FsusSwitch control)
+  : FsusPropertyFieldAdapter<FsusSwitch, bool?>(
+    control, nameof(FsusSwitch.IsChecked), "a boolean value",
+    static field => field.IsChecked, static (field, value) => field.IsChecked = value,
+    static (field, size) => field.Size = size);
 
 [FsusFormFieldAdapterFor(typeof(ToggleButton))]
-internal sealed class ToggleButtonFieldAdapter(ToggleButton control) : FsusBuiltInFieldAdapter<ToggleButton>(control)
-{
-  public override FsusFormFieldAdapterCapabilities Capabilities =>
-    FsusFormFieldAdapterCapabilities.ReadValue |
-    FsusFormFieldAdapterCapabilities.WriteValue |
-    FsusFormFieldAdapterCapabilities.ResetValue;
-
-  public override FsusFormFieldReadResult ReadValue() =>
-    FsusFormFieldReadResult.Success(Control.IsChecked);
-
-  public override FsusFormFieldAdapterResult TryWriteValue(object? value) =>
-    TryResetValue(value);
-
-  public override FsusFormFieldAdapterResult TryResetValue(object? initialValue)
-  {
-    if (initialValue is not null && initialValue is not bool)
-    {
-      return Mismatch(initialValue, nameof(ToggleButton.IsChecked), "a boolean value");
-    }
-
-    Control.IsChecked = (bool?)initialValue;
-    return Success;
-  }
-}
+internal sealed class ToggleButtonFieldAdapter(ToggleButton control)
+  : FsusPropertyFieldAdapter<ToggleButton, bool?>(
+    control, nameof(ToggleButton.IsChecked), "a boolean value",
+    static field => field.IsChecked, static (field, value) => field.IsChecked = value);
 
 [FsusFormFieldAdapterFor(typeof(ComboBox))]
-internal sealed class ComboBoxFieldAdapter(ComboBox control) : FsusBuiltInFieldAdapter<ComboBox>(control)
-{
-  public override FsusFormFieldAdapterCapabilities Capabilities =>
-    FsusFormFieldAdapterCapabilities.ReadValue |
-    FsusFormFieldAdapterCapabilities.WriteValue |
-    FsusFormFieldAdapterCapabilities.ResetValue;
-
-  public override FsusFormFieldReadResult ReadValue() =>
-    FsusFormFieldReadResult.Success(Control.SelectedItem);
-
-  public override FsusFormFieldAdapterResult TryWriteValue(object? value) =>
-    TryResetValue(value);
-
-  public override FsusFormFieldAdapterResult TryResetValue(object? initialValue)
-  {
-    Control.SelectedItem = initialValue;
-    return Success;
-  }
-}
+internal sealed class ComboBoxFieldAdapter(ComboBox control)
+  : FsusPropertyFieldAdapter<ComboBox, object?>(
+    control, nameof(ComboBox.SelectedItem), "an object value",
+    static field => field.SelectedItem, static (field, value) => field.SelectedItem = value);
 
 [FsusFormFieldAdapterFor(typeof(FsusAutocomplete))]
-internal sealed class FsusAutocompleteFieldAdapter(FsusAutocomplete control) : FsusBuiltInFieldAdapter<FsusAutocomplete>(control)
+internal sealed class FsusAutocompleteFieldAdapter(FsusAutocomplete control)
+  : FsusBuiltInFieldAdapter<FsusAutocomplete>(control, static (field, size) => field.Size = size)
 {
-  public override FsusFormFieldAdapterCapabilities Capabilities =>
-    FsusFormFieldAdapterCapabilities.ReadValue |
-    FsusFormFieldAdapterCapabilities.WriteValue |
-    FsusFormFieldAdapterCapabilities.ResetValue |
-    FsusFormFieldAdapterCapabilities.ApplySize;
-
   public override FsusFormFieldReadResult ReadValue() =>
     FsusFormFieldReadResult.Success(Control.SelectedValue ?? Control.Text);
-
-  public override FsusFormFieldAdapterResult TryWriteValue(object? value) =>
-    TryResetValue(value);
 
   public override FsusFormFieldAdapterResult TryResetValue(object? initialValue)
   {
@@ -374,145 +189,66 @@ internal sealed class FsusAutocompleteFieldAdapter(FsusAutocomplete control) : F
 
     return Success;
   }
+}
 
-  public override FsusFormFieldAdapterResult TryApplySize(FsusComponentSize size)
+internal abstract class FsusDateTimeFieldAdapter<TControl, TValue>(
+  TControl control,
+  string member,
+  string expected,
+  Func<TControl, TValue?> read,
+  Action<TControl> clear,
+  Func<TControl, TValue, bool> select,
+  Func<TValue, string> unavailableMessage,
+  Action<TControl, FsusComponentSize> applySize)
+  : FsusBuiltInFieldAdapter<TControl>(control, applySize)
+  where TControl : Control
+  where TValue : struct
+{
+  public override FsusFormFieldReadResult ReadValue() =>
+    FsusFormFieldReadResult.Success(read(Control));
+
+  public override FsusFormFieldAdapterResult TryResetValue(object? initialValue)
   {
-    Control.Size = size;
-    return Success;
+    if (initialValue is null)
+    {
+      clear(Control);
+      return Success;
+    }
+
+    if (initialValue is not TValue value)
+    {
+      return Mismatch(initialValue, member, expected);
+    }
+
+    return select(Control, value)
+      ? Success
+      : Failure(FsusFormFieldAdapterErrorKind.InvalidOperation, unavailableMessage(value), member);
   }
 }
 
 [FsusFormFieldAdapterFor(typeof(FsusDatePicker))]
-internal sealed class FsusDatePickerFieldAdapter(FsusDatePicker control) : FsusBuiltInFieldAdapter<FsusDatePicker>(control)
-{
-  public override FsusFormFieldAdapterCapabilities Capabilities =>
-    FsusFormFieldAdapterCapabilities.ReadValue |
-    FsusFormFieldAdapterCapabilities.WriteValue |
-    FsusFormFieldAdapterCapabilities.ResetValue |
-    FsusFormFieldAdapterCapabilities.ApplySize;
-
-  public override FsusFormFieldReadResult ReadValue() =>
-    FsusFormFieldReadResult.Success(Control.Value);
-
-  public override FsusFormFieldAdapterResult TryWriteValue(object? value) =>
-    TryResetValue(value);
-
-  public override FsusFormFieldAdapterResult TryResetValue(object? initialValue)
-  {
-    if (initialValue is null)
-    {
-      Control.ClearSelection();
-      return Success;
-    }
-
-    if (initialValue is not DateOnly date)
-    {
-      return Mismatch(initialValue, nameof(FsusDatePicker.Value), "a DateOnly value");
-    }
-
-    return Control.SelectDate(date)
-      ? Success
-      : FsusFormFieldAdapterResult.Failure(
-          new FsusFormFieldAdapterError(
-            FsusFormFieldAdapterErrorKind.InvalidOperation,
-            $"The date {date:yyyy-MM-dd} is disabled and cannot be selected.",
-            typeof(FsusDatePicker),
-            nameof(FsusDatePicker.Value)));
-  }
-
-  public override FsusFormFieldAdapterResult TryApplySize(FsusComponentSize size)
-  {
-    Control.Size = size;
-    return Success;
-  }
-}
+internal sealed class FsusDatePickerFieldAdapter(FsusDatePicker control)
+  : FsusDateTimeFieldAdapter<FsusDatePicker, DateOnly>(
+    control, nameof(FsusDatePicker.Value), "a DateOnly value",
+    static field => field.Value, static field => field.ClearSelection(),
+    static (field, value) => field.SelectDate(value),
+    static date => $"The date {date:yyyy-MM-dd} is disabled and cannot be selected.",
+    static (field, size) => field.Size = size);
 
 [FsusFormFieldAdapterFor(typeof(FsusTimePicker))]
-internal sealed class FsusTimePickerFieldAdapter(FsusTimePicker control) : FsusBuiltInFieldAdapter<FsusTimePicker>(control)
-{
-  public override FsusFormFieldAdapterCapabilities Capabilities =>
-    FsusFormFieldAdapterCapabilities.ReadValue |
-    FsusFormFieldAdapterCapabilities.WriteValue |
-    FsusFormFieldAdapterCapabilities.ResetValue |
-    FsusFormFieldAdapterCapabilities.ApplySize;
-
-  public override FsusFormFieldReadResult ReadValue() =>
-    FsusFormFieldReadResult.Success(Control.Value);
-
-  public override FsusFormFieldAdapterResult TryWriteValue(object? value) =>
-    TryResetValue(value);
-
-  public override FsusFormFieldAdapterResult TryResetValue(object? initialValue)
-  {
-    if (initialValue is null)
-    {
-      Control.ClearSelection();
-      return Success;
-    }
-
-    if (initialValue is not TimeOnly time)
-    {
-      return Mismatch(initialValue, nameof(FsusTimePicker.Value), "a TimeOnly value");
-    }
-
-    return Control.SelectTime(time)
-      ? Success
-      : FsusFormFieldAdapterResult.Failure(
-          new FsusFormFieldAdapterError(
-            FsusFormFieldAdapterErrorKind.InvalidOperation,
-            $"The time {time:HH:mm} is disabled and cannot be selected.",
-            typeof(FsusTimePicker),
-            nameof(FsusTimePicker.Value)));
-  }
-
-  public override FsusFormFieldAdapterResult TryApplySize(FsusComponentSize size)
-  {
-    Control.Size = size;
-    return Success;
-  }
-}
+internal sealed class FsusTimePickerFieldAdapter(FsusTimePicker control)
+  : FsusDateTimeFieldAdapter<FsusTimePicker, TimeOnly>(
+    control, nameof(FsusTimePicker.Value), "a TimeOnly value",
+    static field => field.Value, static field => field.ClearSelection(),
+    static (field, value) => field.SelectTime(value),
+    static time => $"The time {time:HH:mm} is disabled and cannot be selected.",
+    static (field, size) => field.Size = size);
 
 [FsusFormFieldAdapterFor(typeof(FsusTimeSelect))]
-internal sealed class FsusTimeSelectFieldAdapter(FsusTimeSelect control) : FsusBuiltInFieldAdapter<FsusTimeSelect>(control)
-{
-  public override FsusFormFieldAdapterCapabilities Capabilities =>
-    FsusFormFieldAdapterCapabilities.ReadValue |
-    FsusFormFieldAdapterCapabilities.WriteValue |
-    FsusFormFieldAdapterCapabilities.ResetValue |
-    FsusFormFieldAdapterCapabilities.ApplySize;
-
-  public override FsusFormFieldReadResult ReadValue() =>
-    FsusFormFieldReadResult.Success(Control.Value);
-
-  public override FsusFormFieldAdapterResult TryWriteValue(object? value) =>
-    TryResetValue(value);
-
-  public override FsusFormFieldAdapterResult TryResetValue(object? initialValue)
-  {
-    if (initialValue is null)
-    {
-      Control.ClearSelection();
-      return Success;
-    }
-
-    if (initialValue is not TimeOnly time)
-    {
-      return Mismatch(initialValue, nameof(FsusTimeSelect.Value), "a TimeOnly value");
-    }
-
-    return Control.SelectTime(time)
-      ? Success
-      : FsusFormFieldAdapterResult.Failure(
-          new FsusFormFieldAdapterError(
-            FsusFormFieldAdapterErrorKind.InvalidOperation,
-            $"The time {time:HH:mm} is not available and cannot be selected.",
-            typeof(FsusTimeSelect),
-            nameof(FsusTimeSelect.Value)));
-  }
-
-  public override FsusFormFieldAdapterResult TryApplySize(FsusComponentSize size)
-  {
-    Control.Size = size;
-    return Success;
-  }
-}
+internal sealed class FsusTimeSelectFieldAdapter(FsusTimeSelect control)
+  : FsusDateTimeFieldAdapter<FsusTimeSelect, TimeOnly>(
+    control, nameof(FsusTimeSelect.Value), "a TimeOnly value",
+    static field => field.Value, static field => field.ClearSelection(),
+    static (field, value) => field.SelectTime(value),
+    static time => $"The time {time:HH:mm} is not available and cannot be selected.",
+    static (field, size) => field.Size = size);

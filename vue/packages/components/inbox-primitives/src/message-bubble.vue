@@ -1,10 +1,13 @@
 <template>
   <article :class="bubbleKls" role="listitem">
-    <header v-if="hasMetaHeader()" :class="ns.e('meta')">
-      <span v-if="hasAuthor()" :class="ns.e('author')">
+    <header
+      v-if="author || $slots.author || meta || $slots.meta"
+      :class="ns.e('meta')"
+    >
+      <span v-if="author || $slots.author" :class="ns.e('author')">
         <slot name="author">{{ author }}</slot>
       </span>
-      <span v-if="hasMeta()" :class="ns.e('time')">
+      <span v-if="meta || $slots.meta" :class="ns.e('time')">
         <slot name="meta">{{ meta }}</slot>
       </span>
     </header>
@@ -17,7 +20,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, useSlots } from 'vue'
+import { computed } from 'vue'
 import { useNamespace } from '@element-plus/hooks'
 import { messageBubbleProps } from './shared'
 
@@ -26,12 +29,8 @@ defineOptions({
 })
 
 const props = defineProps(messageBubbleProps)
-const slots = useSlots()
 const ns = useNamespace('message-bubble')
 
-const hasAuthor = () => Boolean(props.author || slots.author)
-const hasMeta = () => Boolean(props.meta || slots.meta)
-const hasMetaHeader = () => hasAuthor() || hasMeta()
 const bubbleKls = computed(() => [
   ns.b(),
   ns.m(props.variant),

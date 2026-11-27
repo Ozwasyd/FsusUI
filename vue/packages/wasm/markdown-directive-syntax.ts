@@ -40,18 +40,6 @@ const utf16ToUtf8 = (source: string, utf16: number): number => {
   return utf8
 }
 
-const exclusiveUtf8End = (
-  source: string,
-  lineStart: number,
-  lineEnd: number,
-): number => {
-  const utf8End = utf16ToUtf8(source, lineEnd)
-  if (lineEnd < source.length && source[lineEnd] === '\n') {
-    return utf8End + 1
-  }
-  return utf8End
-}
-
 const overlaps = (
   node: MarkdownParserSyntaxNode,
   start: number,
@@ -83,9 +71,9 @@ export const mergeMarkdownDirectiveSyntax = (
     const start = utf16ToUtf8(normalizedSource, lineStart)
     const atLineStart =
       lineStart === 0 || normalizedSource[lineStart - 1] === '\n'
-    const end = atLineStart
-      ? exclusiveUtf8End(normalizedSource, lineStart, lineEnd)
-      : utf16ToUtf8(normalizedSource, lineEnd)
+    const end =
+      utf16ToUtf8(normalizedSource, lineEnd) +
+      (atLineStart && normalizedSource[lineEnd] === '\n' ? 1 : 0)
     const mapRanges = (
       ranges: readonly { readonly start: number; readonly end: number }[],
     ) =>
@@ -116,72 +104,30 @@ export const mergeMarkdownDirectiveSyntax = (
     }
   }
 
-  for (const embed of embeds) {
-    if ('ranges' in embed) {
+  for (const group of [embeds, captions, anchors]) {
+    for (const directive of group) {
+      if (directive.ok === false) {
+        pushDirective(
+          'malformed',
+          directive.range.start,
+          directive.range.end,
+          [directive.range],
+          [],
+          { code: directive.code, message: directive.message },
+        )
+        continue
+      }
+      const { kind, ranges } = directive
+      const contentRanges =
+        kind === 'embed'
+          ? [ranges.target, ranges.mode]
+          : [kind === 'caption' ? ranges.text : ranges.id]
       pushDirective(
-        'embed',
-        embed.ranges.full.start,
-        embed.ranges.full.end,
-        [embed.ranges.target, embed.ranges.mode],
-        [embed.ranges.marker],
-      )
-    } else {
-      pushDirective(
-        'malformed',
-        embed.range.start,
-        embed.range.end,
-        [embed.range],
-        [],
-        {
-          code: embed.code,
-          message: embed.message,
-        },
-      )
-    }
-  }
-  for (const caption of captions) {
-    if ('ranges' in caption) {
-      pushDirective(
-        'caption',
-        caption.ranges.full.start,
-        caption.ranges.full.end,
-        [caption.ranges.text],
-        [caption.ranges.marker],
-      )
-    } else {
-      pushDirective(
-        'malformed',
-        caption.range.start,
-        caption.range.end,
-        [caption.range],
-        [],
-        {
-          code: caption.code,
-          message: caption.message,
-        },
-      )
-    }
-  }
-  for (const anchor of anchors) {
-    if ('ranges' in anchor) {
-      pushDirective(
-        'anchor',
-        anchor.ranges.full.start,
-        anchor.ranges.full.end,
-        [anchor.ranges.id],
-        [anchor.ranges.marker],
-      )
-    } else {
-      pushDirective(
-        'malformed',
-        anchor.range.start,
-        anchor.range.end,
-        [anchor.range],
-        [],
-        {
-          code: anchor.code,
-          message: anchor.message,
-        },
+        kind,
+        ranges.full.start,
+        ranges.full.end,
+        contentRanges,
+        [ranges.marker],
       )
     }
   }

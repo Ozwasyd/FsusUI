@@ -1,38 +1,27 @@
 import type { MarkdownDocumentIdentity } from '../../../wasm/markdown-runtime'
-import type { MarkdownEditorMode } from './markdown-editor-live-contract'
 import type { MarkdownLiveLayoutPlan } from './markdown-editor-live-layout'
 import {
   commitMarkdownTechnicalFeatureResult,
-  createMarkdownTechnicalFeatureRequest,
-  resolveMarkdownTechnicalAtomic,
-  resolveMarkdownTechnicalDiagnostic,
-  resolveMarkdownTechnicalHeight,
-  resolveMarkdownTechnicalNode,
+  planMarkdownTechnicalPreview,
   type MarkdownTechnicalDiagnostic,
   type MarkdownTechnicalFeatureCommit,
   type MarkdownTechnicalFeatureRequest,
   type MarkdownTechnicalNodePlan,
   type MarkdownTechnicalNodeState,
+  type MarkdownTechnicalPreviewAction,
+  type MarkdownTechnicalPreviewInput,
+  type MarkdownTechnicalPreviewPresentation,
+  type MarkdownTechnicalPreviewVerdict,
 } from './markdown-editor-technical'
-import type { MarkdownEditorSelection } from './markdown-editor-transaction'
 
 export const MARKDOWN_MERMAID_BUDGET = Object.freeze({
   maxBodyBytes: 16_384,
   maxBodyLines: 200,
 })
 
-export type MarkdownMermaidVerdict = 'valid' | 'invalid' | 'large' | 'unsafe'
-
-export type MarkdownMermaidPreviewAction =
-  | 'pending'
-  | 'preview'
-  | 'error'
-  | 'retry'
-  | 'cancel'
-  | 'source-reveal'
-  | 'degraded'
-
-export type MarkdownMermaidPresentation = 'preview' | 'source-only' | 'degraded'
+export type MarkdownMermaidVerdict = MarkdownTechnicalPreviewVerdict
+export type MarkdownMermaidPreviewAction = MarkdownTechnicalPreviewAction
+export type MarkdownMermaidPresentation = MarkdownTechnicalPreviewPresentation
 
 export interface MarkdownMermaidClassification {
   readonly diagnosticCode: string | null
@@ -100,13 +89,6 @@ const UNSAFE_FRAGMENTS = Object.freeze([
   'href="https://',
   "href='https://",
 ])
-
-const selectionOf = (start: number, end = start): MarkdownEditorSelection =>
-  Object.freeze({
-    direction: start === end ? ('none' as const) : ('forward' as const),
-    end,
-    start,
-  })
 
 const firstToken = (body: string) => {
   const line = body
@@ -181,116 +163,15 @@ export const classifyMarkdownMermaidBody = (input: {
   })
 }
 
-const presentationOf = (
-  verdict: MarkdownMermaidVerdict,
-  action: MarkdownMermaidPreviewAction,
-): MarkdownMermaidPresentation => {
-  if (action === 'preview' && verdict === 'valid') return 'preview'
-  if (verdict === 'large' || action === 'degraded') return 'degraded'
-  return 'source-only'
-}
-
-const actionFor = (
-  intent: MarkdownMermaidPreviewAction | undefined,
-  verdict: MarkdownMermaidVerdict,
-): MarkdownMermaidPreviewAction => {
-  if (intent === 'retry') return 'pending'
-  if (intent === 'cancel') return 'cancel'
-  if (intent === 'source-reveal') return 'source-reveal'
-  if (verdict === 'valid') return intent ?? 'pending'
-  if (verdict === 'large') return 'degraded'
-  return 'error'
-}
-
-export const planMarkdownMermaidPreview = (input: {
-  readonly abortSignal?: AbortSignal | null
-  readonly config?: Readonly<Record<string, unknown>>
-  readonly documentIdentity?: MarkdownDocumentIdentity
-  readonly intent?: MarkdownMermaidPreviewAction
-  readonly mode?: MarkdownEditorMode
-  readonly nodeId?: string
-  readonly revision?: number
-  readonly selection?: MarkdownEditorSelection
-  readonly source: string
-  readonly theme?: string | null
-}): MarkdownMermaidPreviewPlan => {
-  const identity = input.documentIdentity ?? { epoch: 0, id: 'mermaid' }
-  const node = resolveMarkdownTechnicalNode({
-    documentIdentity: identity,
-    kind: 'mermaid',
-    nodeId: input.nodeId,
-    revision: input.revision,
-    selection: input.selection,
-    source: input.source,
-  })
-  const body = node
-    ? input.source.slice(node.ranges.body.raw.start, node.ranges.body.raw.end)
-    : ''
-  const classification = classifyMarkdownMermaidBody({
-    body,
-    range: node?.ranges.body.raw ?? { end: 0, start: 0 },
-  })
-  const action = actionFor(input.intent, classification.verdict)
-  const request =
-    node && action !== 'cancel'
-      ? createMarkdownTechnicalFeatureRequest({
-          abortSignal: input.abortSignal,
-          config: input.config,
-          documentIdentity: identity,
-          kind: 'mermaid',
-          mode: input.mode,
-          nodeId: node.nodeId,
-          revision: input.revision,
-          source: input.source,
-          theme: input.theme,
-        })
-      : null
-  const diagnostic =
-    classification.verdict === 'valid'
-      ? null
-      : resolveMarkdownTechnicalDiagnostic({
-          code: classification.diagnosticCode ?? 'technical-error',
-          documentIdentity: identity,
-          kind: 'mermaid',
-          nodeId: node?.nodeId,
-          selection: selectionOf(classification.range.start),
-          source: input.source,
-        })
-  const atomic = resolveMarkdownTechnicalAtomic({
-    action: action === 'source-reveal' ? 'enter-source' : 'caret-before',
-    documentIdentity: identity,
-    kind: 'mermaid',
-    mode: input.mode,
-    nodeId: node?.nodeId,
-    revision: input.revision,
-    selection: input.selection ?? selectionOf(node?.rawRange.start ?? 0),
-    source: input.source,
-  })
-  const height = resolveMarkdownTechnicalHeight({
-    documentIdentity: identity,
-    kind: 'mermaid',
-    revision: input.revision,
-    selection: input.selection ?? selectionOf(node?.rawRange.start ?? 0),
-    source: input.source,
-  })
-  const status: MarkdownTechnicalNodeState =
-    action === 'pending'
-      ? 'pending'
-      : action === 'preview'
-        ? 'resolved'
-        : action === 'degraded'
-          ? 'degraded'
-          : action === 'cancel'
-            ? 'error'
-            : 'error'
+export const planMarkdownMermaidPreview = (
+  input: MarkdownTechnicalPreviewInput,
+): MarkdownMermaidPreviewPlan => {
+  const { accessibility, action, classification, diagnostic, ...layout } =
+    planMarkdownTechnicalPreview('mermaid', input, (body, range) =>
+      classifyMarkdownMermaidBody({ body, range }),
+    )
   return Object.freeze({
-    accessibility: Object.freeze({
-      kind: 'mermaid' as const,
-      name: atomic.accessibility.name,
-      status,
-      tabStop: false,
-      value: diagnostic?.message ?? atomic.accessibility.value,
-    }),
+    accessibility,
     action,
     chrome: Object.freeze({
       card: false,
@@ -300,10 +181,7 @@ export const planMarkdownMermaidPreview = (input: {
     classification,
     diagnostic,
     editorCapability: 'supported',
-    height,
-    node,
-    presentation: presentationOf(classification.verdict, action),
-    request,
+    ...layout,
     sourceUnchanged: true,
   })
 }

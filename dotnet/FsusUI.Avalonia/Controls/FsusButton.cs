@@ -240,18 +240,7 @@ public class FsusButton : Button
     FsusComponentClasses.Ensure(this, "fsus-motionless", !MotionHooksEnabled);
     FsusComponentClasses.SyncIconPlacement(this, IconPlacement);
 
-    if (IsLoading)
-    {
-      enabledBeforeLoading ??= IsEnabled;
-      IsEnabled = false;
-      return;
-    }
-
-    if (enabledBeforeLoading.HasValue)
-    {
-      IsEnabled = enabledBeforeLoading.Value;
-      enabledBeforeLoading = null;
-    }
+    FsusControlAvailability.SyncLoading(this, IsLoading, ref enabledBeforeLoading);
   }
 
   private void SyncAutomation()
@@ -347,17 +336,7 @@ public class FsusButtonGroup : StackPanel
         "fsus-group-last",
         buttons.Length > 1 && index == buttons.Length - 1);
 
-      if (!IsEnabled)
-      {
-        enabledBeforeGroupDisabled.TryAdd(button, button.IsEnabled);
-        button.IsEnabled = false;
-        continue;
-      }
-
-      if (enabledBeforeGroupDisabled.Remove(button, out var wasEnabled))
-      {
-        button.IsEnabled = wasEnabled;
-      }
+      FsusControlAvailability.SyncGroupChild(button, IsEnabled, enabledBeforeGroupDisabled);
     }
   }
 

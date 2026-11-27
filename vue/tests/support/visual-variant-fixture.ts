@@ -1,5 +1,6 @@
 import { expect, test as base } from '@playwright/test'
 import type { Page, TestInfo } from '@playwright/test'
+import { attachPageDiagnostics } from './page-diagnostics'
 
 const visualViewports = {
   'empty-breakpoint-above': { width: 420, height: 900 },
@@ -47,6 +48,43 @@ export const test = base.extend<VisualVariantFixtures>({
 })
 
 export { expect }
+
+export const registerStableVisualHooks = (
+  tests: Pick<typeof base, 'beforeEach' | 'afterEach'>,
+) => {
+  const diagnostics = new WeakMap<Page, string[]>()
+
+  tests.beforeEach(async ({ page }) => {
+    diagnostics.set(page, attachPageDiagnostics(page))
+    await page.emulateMedia({ reducedMotion: 'reduce' })
+  })
+
+  tests.afterEach(async ({ page }) => {
+    expect(diagnostics.get(page) ?? []).toEqual([])
+  })
+}
+
+export const openStableVisualPage = async (page: Page, url: string) => {
+  await page.goto(url, { waitUntil: 'domcontentloaded' })
+  await page.addStyleTag({
+    content: `
+      *, *::before, *::after {
+        transition-duration: 0s !important;
+        animation-duration: 0s !important;
+        animation-delay: 0s !important;
+        scroll-behavior: auto !important;
+      }
+    `,
+  })
+}
+
+export const waitForFontsAndLayout = (page: Page) =>
+  page.evaluate(async () => {
+    await document.fonts.ready
+    await new Promise<void>((resolve) => {
+      requestAnimationFrame(() => requestAnimationFrame(() => resolve()))
+    })
+  })
 
 export const screenshotPath = (testInfo: TestInfo, name: string) =>
   testInfo.outputPath(name)

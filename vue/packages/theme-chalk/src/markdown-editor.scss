@@ -1,6 +1,23 @@
 @use 'mixins/mixins' as *;
 @use 'common/var' as *;
 
+@mixin -editor-control-appearance($color: 'regular') {
+  border: 1px solid getCssVar('border-color');
+  border-radius: var(--fsus-radius-control, var(--el-border-radius-base));
+  background: getCssVar('fill-color', 'blank');
+  color: getCssVar('text-color', $color);
+  font: inherit;
+}
+
+@mixin -editor-control-focus {
+  &:focus-visible {
+    @include a11y-focus-ring(
+      2px,
+      var(--fsus-radius-control, var(--el-border-radius-base))
+    );
+  }
+}
+
 @include b(markdown-editor) {
   position: relative;
   display: grid;
@@ -118,18 +135,9 @@
       min-inline-size: 44px;
       min-block-size: 44px;
       padding-inline: var(--fsus-space-2, 8px);
-      border: 1px solid getCssVar('border-color');
-      border-radius: var(--fsus-radius-control, var(--el-border-radius-base));
-      background: getCssVar('fill-color', 'blank');
-      color: getCssVar('text-color', 'regular');
-      font: inherit;
+      @include -editor-control-appearance;
 
-      &:focus-visible {
-        @include a11y-focus-ring(
-          2px,
-          var(--fsus-radius-control, var(--el-border-radius-base))
-        );
-      }
+      @include -editor-control-focus;
     }
   }
 
@@ -153,18 +161,9 @@
       min-width: 0;
       min-height: 44px;
       padding-inline: var(--fsus-space-2, 8px);
-      border: 1px solid getCssVar('border-color');
-      border-radius: var(--fsus-radius-control, var(--el-border-radius-base));
-      background: getCssVar('fill-color', 'blank');
-      color: getCssVar('text-color', 'primary');
-      font: inherit;
+      @include -editor-control-appearance('primary');
 
-      &:focus-visible {
-        @include a11y-focus-ring(
-          2px,
-          var(--fsus-radius-control, var(--el-border-radius-base))
-        );
-      }
+      @include -editor-control-focus;
     }
 
     [role='alert'] {
@@ -185,18 +184,9 @@
       min-width: 44px;
       min-height: 44px;
       padding-inline: var(--fsus-space-2, 8px);
-      border: 1px solid getCssVar('border-color');
-      border-radius: var(--fsus-radius-control, var(--el-border-radius-base));
-      background: getCssVar('fill-color', 'blank');
-      color: getCssVar('text-color', 'regular');
-      font: inherit;
+      @include -editor-control-appearance;
 
-      &:focus-visible {
-        @include a11y-focus-ring(
-          2px,
-          var(--fsus-radius-control, var(--el-border-radius-base))
-        );
-      }
+      @include -editor-control-focus;
     }
   }
 
@@ -1163,11 +1153,7 @@
       max-width: 100%;
       min-height: 44px;
       padding: 0 var(--fsus-space-4, 16px);
-      border: 1px solid getCssVar('border-color');
-      border-radius: var(--fsus-radius-control, var(--el-border-radius-base));
-      background: getCssVar('fill-color', 'blank');
-      color: getCssVar('text-color', 'regular');
-      font: inherit;
+      @include -editor-control-appearance;
       font-size: 14px;
       cursor: pointer;
 
@@ -1177,12 +1163,7 @@
         color: getCssVar('text-color', 'primary');
       }
 
-      &:focus-visible {
-        @include a11y-focus-ring(
-          2px,
-          var(--fsus-radius-control, var(--el-border-radius-base))
-        );
-      }
+      @include -editor-control-focus;
     }
   }
 
@@ -1419,18 +1400,9 @@
       width: 100%;
       min-height: var(--fsus-control-height, 40px);
       padding-inline: var(--fsus-space-3, 12px);
-      border: 1px solid getCssVar('border-color');
-      border-radius: var(--fsus-radius-control, var(--el-border-radius-base));
-      background: getCssVar('fill-color', 'blank');
-      color: getCssVar('text-color', 'primary');
-      font: inherit;
+      @include -editor-control-appearance('primary');
 
-      &:focus-visible {
-        @include a11y-focus-ring(
-          2px,
-          var(--fsus-radius-control, var(--el-border-radius-base))
-        );
-      }
+      @include -editor-control-focus;
     }
   }
 
@@ -1442,19 +1414,10 @@
     button {
       min-height: var(--fsus-control-height-compact, 40px);
       padding-inline: var(--fsus-space-3, 12px);
-      border: 1px solid getCssVar('border-color');
-      border-radius: var(--fsus-radius-control, var(--el-border-radius-base));
-      background: getCssVar('fill-color', 'blank');
-      color: getCssVar('text-color', 'regular');
-      font: inherit;
+      @include -editor-control-appearance;
       cursor: pointer;
 
-      &:focus-visible {
-        @include a11y-focus-ring(
-          2px,
-          var(--fsus-radius-control, var(--el-border-radius-base))
-        );
-      }
+      @include -editor-control-focus;
     }
   }
 
@@ -1531,12 +1494,7 @@
     font-size: 14px;
     outline: none;
 
-    &:focus-visible {
-      @include a11y-focus-ring(
-        2px,
-        var(--fsus-radius-control, var(--el-border-radius-base))
-      );
-    }
+    @include -editor-control-focus;
   }
 
   @include e(palette-search-label) {
@@ -1814,12 +1772,7 @@
       cursor: not-allowed;
     }
 
-    &:focus-visible {
-      @include a11y-focus-ring(
-        2px,
-        var(--fsus-radius-control, var(--el-border-radius-base))
-      );
-    }
+    @include -editor-control-focus;
 
     @include when(active) {
       background: getCssVar('fill-color', 'light');
@@ -1901,12 +1854,7 @@
       color: getCssVar('text-color', 'primary');
     }
 
-    &:focus-visible {
-      @include a11y-focus-ring(
-        2px,
-        var(--fsus-radius-control, var(--el-border-radius-base))
-      );
-    }
+    @include -editor-control-focus;
   }
 }
 

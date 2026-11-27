@@ -1,51 +1,24 @@
 import { expect, test } from '@playwright/test'
 import type { Locator, Page } from '@playwright/test'
-import { attachPageDiagnostics } from '../support/page-diagnostics'
 import { collectCssRules } from '../support/css-scan'
 import { buildVisualUrl } from '../../../scripts/visual-variant.mjs'
+import {
+  openStableVisualPage,
+  registerStableVisualHooks,
+  waitForFontsAndLayout,
+} from '../support/visual-variant-fixture'
 
-const diagnostics = new WeakMap<Page, string[]>()
+registerStableVisualHooks(test)
 
-const stabilizePage = async (page: Page) => {
-  await page.addStyleTag({
-    content: `
-      *, *::before, *::after {
-        transition-duration: 0s !important;
-        animation-duration: 0s !important;
-        animation-delay: 0s !important;
-        scroll-behavior: auto !important;
-      }
-    `,
-  })
-}
-
-const waitForFontsAndLayout = async (page: Page) => {
-  await page.evaluate(async () => {
-    await document.fonts.ready
-    await new Promise<void>((resolve) => {
-      requestAnimationFrame(() => requestAnimationFrame(() => resolve()))
-    })
-  })
-}
-
-test.beforeEach(async ({ page }) => {
-  diagnostics.set(page, attachPageDiagnostics(page))
-  await page.emulateMedia({ reducedMotion: 'reduce' })
-})
-
-test.afterEach(async ({ page }) => {
-  expect(diagnostics.get(page) ?? []).toEqual([])
-})
+const openSegmentedFixtures = (page: Page, projectName: string) =>
+  openStableVisualPage(page, buildVisualUrl('segmented-visual', projectName))
 
 // ============================================================
 // CSS Gate: no legacy segmented patterns
 // ============================================================
 
 test('production CSS has no legacy segmented tokens', async ({ page }, testInfo) => {
-  await page.goto(buildVisualUrl('segmented-visual', testInfo.project.name), {
-    waitUntil: 'domcontentloaded',
-  })
-  await stabilizePage(page)
+  await openSegmentedFixtures(page, testInfo.project.name)
   await expect(page.getByTestId('segmented-visual-fixtures')).toBeVisible()
 
   // Selector-scoped gate: legacy patterns only count when the rule that
@@ -73,8 +46,7 @@ test('production CSS has no legacy segmented tokens', async ({ page }, testInfo)
 // ============================================================
 
 test('RadioButton shell radius is 6px', async ({ page }, testInfo) => {
-  await page.goto(buildVisualUrl('segmented-visual', testInfo.project.name), { waitUntil: 'domcontentloaded' })
-  await stabilizePage(page)
+  await openSegmentedFixtures(page, testInfo.project.name)
   const item = page.locator('[data-segmented-variant="radio-default"] .el-radio-button__inner').first()
   await expect(item).toBeVisible()
   const radius = await item.evaluate((el) => getComputedStyle(el).borderRadius)
@@ -82,8 +54,7 @@ test('RadioButton shell radius is 6px', async ({ page }, testInfo) => {
 })
 
 test('RadioButton item height is 36-40px', async ({ page }, testInfo) => {
-  await page.goto(buildVisualUrl('segmented-visual', testInfo.project.name), { waitUntil: 'domcontentloaded' })
-  await stabilizePage(page)
+  await openSegmentedFixtures(page, testInfo.project.name)
   const item = page.locator('[data-segmented-variant="radio-default"] .el-radio-button__inner').first()
   const height = await item.evaluate((el) => getComputedStyle(el).height)
   const h = parseFloat(height)
@@ -92,8 +63,7 @@ test('RadioButton item height is 36-40px', async ({ page }, testInfo) => {
 })
 
 test('CheckboxButton item height is 36-40px', async ({ page }, testInfo) => {
-  await page.goto(buildVisualUrl('segmented-visual', testInfo.project.name), { waitUntil: 'domcontentloaded' })
-  await stabilizePage(page)
+  await openSegmentedFixtures(page, testInfo.project.name)
   const item = page.locator('[data-segmented-variant="checkbox-default"] .el-checkbox-button__inner').first()
   const height = await item.evaluate((el) => getComputedStyle(el).height)
   const h = parseFloat(height)
@@ -102,8 +72,7 @@ test('CheckboxButton item height is 36-40px', async ({ page }, testInfo) => {
 })
 
 test('Collection segmented item height >= 36px', async ({ page }, testInfo) => {
-  await page.goto(buildVisualUrl('segmented-visual', testInfo.project.name), { waitUntil: 'domcontentloaded' })
-  await stabilizePage(page)
+  await openSegmentedFixtures(page, testInfo.project.name)
   const item = page.locator('[data-segmented-variant="collection-default"] .el-segmented-control__item').first()
   const minHeight = await item.evaluate((el) => getComputedStyle(el).minHeight)
   expect(parseFloat(minHeight)).toBeGreaterThanOrEqual(36)
@@ -114,8 +83,7 @@ test('Collection segmented item height >= 36px', async ({ page }, testInfo) => {
 // ============================================================
 
 test('RadioButton selected has non-neutral background', async ({ page }, testInfo) => {
-  await page.goto(buildVisualUrl('segmented-visual', testInfo.project.name), { waitUntil: 'domcontentloaded' })
-  await stabilizePage(page)
+  await openSegmentedFixtures(page, testInfo.project.name)
   const checkedItem = page.locator('[data-segmented-variant="radio-default"] .is-active .el-radio-button__inner')
   await expect(checkedItem).toBeVisible()
   const bg = await checkedItem.evaluate((el) => getComputedStyle(el).backgroundColor)
@@ -128,8 +96,7 @@ test('RadioButton selected has non-neutral background', async ({ page }, testInf
 // ============================================================
 
 test('RadioButton focus-visible uses 2px inset ring', async ({ page }, testInfo) => {
-  await page.goto(buildVisualUrl('segmented-visual', testInfo.project.name), { waitUntil: 'domcontentloaded' })
-  await stabilizePage(page)
+  await openSegmentedFixtures(page, testInfo.project.name)
   const input = page.locator('[data-segmented-variant="radio-default"] .el-radio-button__original-radio').first()
   await input.focus()
   await expect(input).toBeFocused()
@@ -140,8 +107,7 @@ test('RadioButton focus-visible uses 2px inset ring', async ({ page }, testInfo)
 })
 
 test('Collection segmented focus-visible uses inset ring', async ({ page }, testInfo) => {
-  await page.goto(buildVisualUrl('segmented-visual', testInfo.project.name), { waitUntil: 'domcontentloaded' })
-  await stabilizePage(page)
+  await openSegmentedFixtures(page, testInfo.project.name)
   const item = page.locator('[data-segmented-variant="collection-default"] .el-segmented-control__item').first()
   await item.focus()
   await expect(item).toBeFocused()
@@ -154,16 +120,14 @@ test('Collection segmented focus-visible uses inset ring', async ({ page }, test
 // ============================================================
 
 test('RadioButton disabled has opacity 1', async ({ page }, testInfo) => {
-  await page.goto(buildVisualUrl('segmented-visual', testInfo.project.name), { waitUntil: 'domcontentloaded' })
-  await stabilizePage(page)
+  await openSegmentedFixtures(page, testInfo.project.name)
   const item = page.locator('[data-segmented-variant="radio-disabled"] .el-radio-button__inner').first()
   const opacity = await item.evaluate((el) => getComputedStyle(el).opacity)
   expect(parseFloat(opacity)).toBe(1)
 })
 
 test('CheckboxButton disabled has opacity 1', async ({ page }, testInfo) => {
-  await page.goto(buildVisualUrl('segmented-visual', testInfo.project.name), { waitUntil: 'domcontentloaded' })
-  await stabilizePage(page)
+  await openSegmentedFixtures(page, testInfo.project.name)
   const item = page.locator('[data-segmented-variant="checkbox-disabled"] .el-checkbox-button__inner').first()
   const opacity = await item.evaluate((el) => getComputedStyle(el).opacity)
   expect(parseFloat(opacity)).toBe(1)
@@ -174,16 +138,14 @@ test('CheckboxButton disabled has opacity 1', async ({ page }, testInfo) => {
 // ============================================================
 
 test('RadioButton uses role=radio', async ({ page }, testInfo) => {
-  await page.goto(buildVisualUrl('segmented-visual', testInfo.project.name), { waitUntil: 'domcontentloaded' })
-  await stabilizePage(page)
+  await openSegmentedFixtures(page, testInfo.project.name)
   const input = page.locator('[data-segmented-variant="radio-default"] .el-radio-button__original-radio').first()
   const role = await input.getAttribute('role')
   expect(role).toBe('radio')
 })
 
 test('CheckboxButton uses role=checkbox', async ({ page }, testInfo) => {
-  await page.goto(buildVisualUrl('segmented-visual', testInfo.project.name), { waitUntil: 'domcontentloaded' })
-  await stabilizePage(page)
+  await openSegmentedFixtures(page, testInfo.project.name)
   const input = page.locator('[data-segmented-variant="checkbox-default"] .el-checkbox-button__original').first()
   const role = await input.getAttribute('role')
   expect(role).toBe('checkbox')
@@ -213,8 +175,7 @@ test('Collection segmented exposes the public named radiogroup and checked radio
 // ============================================================
 
 test('RadioButton supports arrow key navigation', async ({ page }, testInfo) => {
-  await page.goto(buildVisualUrl('segmented-visual', testInfo.project.name), { waitUntil: 'domcontentloaded' })
-  await stabilizePage(page)
+  await openSegmentedFixtures(page, testInfo.project.name)
   const firstInput = page.locator('[data-segmented-variant="radio-default"] .el-radio-button__original-radio').first()
   await firstInput.focus()
   await expect(firstInput).toBeFocused()
@@ -228,8 +189,7 @@ test('RadioButton supports arrow key navigation', async ({ page }, testInfo) => 
 // ============================================================
 
 test('RadioButton renders correctly in RTL', async ({ page }, testInfo) => {
-  await page.goto(buildVisualUrl('segmented-visual', testInfo.project.name), { waitUntil: 'domcontentloaded' })
-  await stabilizePage(page)
+  await openSegmentedFixtures(page, testInfo.project.name)
   const rtlContainer = page.locator('[data-segmented-variant="radio-rtl"]')
   const dir = await rtlContainer.getAttribute('dir')
   expect(dir).toBe('rtl')
@@ -242,8 +202,7 @@ test('RadioButton renders correctly in RTL', async ({ page }, testInfo) => {
 // ============================================================
 
 test('CheckboxButton supports multi-selection', async ({ page }, testInfo) => {
-  await page.goto(buildVisualUrl('segmented-visual', testInfo.project.name), { waitUntil: 'domcontentloaded' })
-  await stabilizePage(page)
+  await openSegmentedFixtures(page, testInfo.project.name)
   const items = page.locator('[data-segmented-variant="checkbox-multi"] .el-checkbox-button')
   // is-checked is applied to the button label itself, so :scope is required;
   // toHaveCount auto-waits for Vue to flush the pre-selected state. The
@@ -256,15 +215,13 @@ test('CheckboxButton supports multi-selection', async ({ page }, testInfo) => {
 // ============================================================
 
 test('ThemeModeToggle renders in segmented mode', async ({ page }, testInfo) => {
-  await page.goto(buildVisualUrl('segmented-visual', testInfo.project.name), { waitUntil: 'domcontentloaded' })
-  await stabilizePage(page)
+  await openSegmentedFixtures(page, testInfo.project.name)
   const toggle = page.locator('[data-segmented-variant="toggle-default"] .el-theme-mode-toggle')
   await expect(toggle).toBeVisible()
 })
 
 test('ThemeModeToggle focus-visible uses inset ring', async ({ page }, testInfo) => {
-  await page.goto(buildVisualUrl('segmented-visual', testInfo.project.name), { waitUntil: 'domcontentloaded' })
-  await stabilizePage(page)
+  await openSegmentedFixtures(page, testInfo.project.name)
   const input = page.locator('[data-segmented-variant="toggle-default"] .el-radio-button__original-radio').first()
   await input.focus()
   const inner = page.locator('[data-segmented-variant="toggle-default"] .el-radio-button__inner').first()
@@ -277,8 +234,7 @@ test('ThemeModeToggle focus-visible uses inset ring', async ({ page }, testInfo)
 // ============================================================
 
 test('RadioButton renders CJK without cutoff', async ({ page }, testInfo) => {
-  await page.goto(buildVisualUrl('segmented-visual', testInfo.project.name), { waitUntil: 'domcontentloaded' })
-  await stabilizePage(page)
+  await openSegmentedFixtures(page, testInfo.project.name)
   const cjkItem = page.locator('[data-segmented-variant="radio-cjk"] .el-radio-button').first()
   await expect(cjkItem).toBeVisible()
   await expect(cjkItem).toContainText('简体中文')
@@ -289,8 +245,7 @@ test('RadioButton renders CJK without cutoff', async ({ page }, testInfo) => {
 // ============================================================
 
 test('segmented variants render without visual break', async ({ page }, testInfo) => {
-  await page.goto(buildVisualUrl('segmented-visual', testInfo.project.name), { waitUntil: 'domcontentloaded' })
-  await stabilizePage(page)
+  await openSegmentedFixtures(page, testInfo.project.name)
   const fixtures = [
     'radio-default', 'radio-disabled', 'radio-six', 'radio-cjk', 'radio-rtl',
     'checkbox-default', 'checkbox-disabled', 'checkbox-multi',
@@ -310,10 +265,7 @@ test('segmented variants render without visual break', async ({ page }, testInfo
 // These probes observe only public props, accessible output and emitted values.
 // A CSS-shaped tab substitute cannot satisfy the same contract.
 const openCollectionFixture = async (page: Page, projectName: string) => {
-  await page.goto(buildVisualUrl('segmented-visual', projectName), {
-    waitUntil: 'domcontentloaded',
-  })
-  await stabilizePage(page)
+  await openSegmentedFixtures(page, projectName)
   await expect(page).toHaveTitle('FsusUI Demo')
   await expect(page.getByTestId('segmented-visual-fixtures')).toBeVisible()
   await expect(page.locator('vite-error-overlay')).toHaveCount(0)

@@ -1,10 +1,8 @@
 #!/usr/bin/env node
 
-import { readFileSync } from 'node:fs'
 import { Buffer } from 'node:buffer'
 import { performance } from 'node:perf_hooks'
-import { TextDecoder, TextEncoder } from 'node:util'
-import { fileURLToPath, pathToFileURL } from 'node:url'
+import { TextEncoder } from 'node:util'
 import {
   buildMarkdownExtremeCorpus,
   describeMarkdownExtremeCorpus,
@@ -12,6 +10,11 @@ import {
   normalizeMarkdownSource,
   normalizeMarkdownExtremeSize,
 } from '../support/markdown-extreme-corpus.mjs'
+import {
+  assert,
+  createMarkdownWasmCheck,
+  pickExport,
+} from './markdown-wasm-check-support.mjs'
 
 const renderBudgetMs = Number(
   process.env.FSUSUI_MARKDOWN_EXTREME_RENDER_MS || '20000',
@@ -19,26 +22,8 @@ const renderBudgetMs = Number(
 const targetSize = normalizeMarkdownExtremeSize(
   process.env.FSUSUI_MARKDOWN_EXTREME_SIZE,
 )
-
-function assert(condition, message) {
-  if (!condition) {
-    throw new Error(message)
-  }
-}
-
-function readCString(module, ptr, len) {
-  if (ptr <= 0 || len <= 0) {
-    return ''
-  }
-
-  const memory =
-    module.memory ?? (module.HEAPU8 ? { buffer: module.HEAPU8.buffer } : null)
-  if (!memory) {
-    throw new Error('[markdown-extreme] module memory unavailable')
-  }
-
-  return new TextDecoder().decode(new Uint8Array(memory.buffer, ptr, len))
-}
+const { loadMarkdownModule, readCString } =
+  createMarkdownWasmCheck('markdown-extreme')
 
 function readStructured(raw, fallback, label) {
   if (!raw) {
@@ -187,57 +172,6 @@ function deepEqual(left, right) {
     )
   }
   return false
-}
-
-function pickExport(raw, name) {
-  const direct = raw[name]
-  if (direct) {
-    return direct
-  }
-
-  const underscored = raw[`_${name}`]
-  if (underscored) {
-    return underscored
-  }
-
-  throw new Error(`wasm_export_missing:${name}`)
-}
-
-function resolveMarkdownAsset(kind) {
-  const fileBase = kind === 'simd' ? 'markdown_simd' : 'markdown_basic'
-  const cwd = process.cwd().replace(/\\/g, '/').replace(/\/+$/, '')
-  return {
-    moduleUrl: pathToFileURL(`${cwd}/vue/packages/wasm/dist/${fileBase}.js`)
-      .href,
-    wasmUrl: pathToFileURL(`${cwd}/vue/packages/wasm/dist/${fileBase}.wasm`)
-      .href,
-  }
-}
-
-async function loadMarkdownModule(kind) {
-  const asset = resolveMarkdownAsset(kind)
-  const wasmBinary = readFileSync(fileURLToPath(asset.wasmUrl))
-  const moduleRef = await import(asset.moduleUrl)
-  const factory = moduleRef.default ?? moduleRef.createMarkdownModule
-  assert(
-    typeof factory === 'function',
-    `[markdown-extreme] missing factory: ${kind}`,
-  )
-  const savedDirname = globalThis.__dirname
-  globalThis.__dirname = fileURLToPath(asset.moduleUrl).replace(/\/[^/]+$/, '')
-  try {
-    return await factory({
-      wasmBinary,
-      print: () => {},
-      printErr: () => {},
-    })
-  } finally {
-    if (savedDirname === undefined) {
-      delete globalThis.__dirname
-    } else {
-      globalThis.__dirname = savedDirname
-    }
-  }
 }
 
 async function renderSnapshot(module, kind, source, flags) {

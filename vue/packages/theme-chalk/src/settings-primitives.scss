@@ -58,89 +58,7 @@
   }
 }
 
-@mixin section-shell($block) {
-  @include b($block) {
-    display: grid;
-    gap: 16px;
-    min-width: 0;
-    padding: 18px 0;
-    border-top: 1px solid getCssVar('border-color-lighter');
-
-    @include m(compact) {
-      gap: 12px;
-      padding-block: 14px;
-    }
-
-    @include when(danger) {
-      border-color: color-mix(
-        in srgb,
-        getCssVar('color-danger') 36%,
-        getCssVar('border-color-lighter')
-      );
-    }
-
-    @include e(header) {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) auto;
-      gap: 12px;
-      align-items: start;
-      min-width: 0;
-    }
-
-    @include e(heading) {
-      display: grid;
-      gap: 4px;
-      min-width: 0;
-    }
-
-    @include e(title) {
-      margin: 0;
-      color: getCssVar('text-color', 'primary');
-      font-size: 16px;
-      font-weight: 700;
-      line-height: 1.35;
-      letter-spacing: 0;
-    }
-
-    @include e(description) {
-      max-width: 58rem;
-      margin: 0;
-      color: getCssVar('text-color', 'secondary');
-      font-size: 14px;
-      line-height: 1.65;
-      overflow-wrap: anywhere;
-    }
-
-    @include e(actions) {
-      display: inline-flex;
-      flex-wrap: wrap;
-      justify-content: flex-end;
-      gap: 8px;
-      min-width: 0;
-    }
-
-    @include e(body) {
-      display: grid;
-      gap: 12px;
-      min-width: 0;
-    }
-  }
-}
-
-@include section-shell(settings-section);
-@include section-shell(form-section);
-
-@include b(section-header) {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  gap: 12px;
-  align-items: start;
-  min-width: 0;
-
-  @include m(compact) {
-    gap: 8px;
-  }
-
+@mixin -section-heading {
   @include e(heading) {
     display: grid;
     gap: 4px;
@@ -172,6 +90,62 @@
     gap: 8px;
     min-width: 0;
   }
+}
+
+@mixin section-shell($block) {
+  @include b($block) {
+    display: grid;
+    gap: 16px;
+    min-width: 0;
+    padding: 18px 0;
+    border-top: 1px solid getCssVar('border-color-lighter');
+
+    @include m(compact) {
+      gap: 12px;
+      padding-block: 14px;
+    }
+
+    @include when(danger) {
+      border-color: color-mix(
+        in srgb,
+        getCssVar('color-danger') 36%,
+        getCssVar('border-color-lighter')
+      );
+    }
+
+    @include e(header) {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 12px;
+      align-items: start;
+      min-width: 0;
+    }
+
+    @include -section-heading;
+
+    @include e(body) {
+      display: grid;
+      gap: 12px;
+      min-width: 0;
+    }
+  }
+}
+
+@include section-shell(settings-section);
+@include section-shell(form-section);
+
+@include b(section-header) {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: start;
+  min-width: 0;
+
+  @include m(compact) {
+    gap: 8px;
+  }
+
+  @include -section-heading;
 
   @include when(danger) {
     .#{$namespace}-section-header__title {

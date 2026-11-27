@@ -3,10 +3,11 @@ import {
   writeIssue468ScreenshotEvidence,
   writeIssue468TextEvidence,
 } from '../support/issue-468-conformance-evidence'
-import { attachPageDiagnostics } from '../support/page-diagnostics'
 import { collectCssRules } from '../support/css-scan'
 import {
   expect,
+  openStableVisualPage,
+  registerStableVisualHooks,
   test,
   type VisualViewportName,
 } from '../support/visual-variant-fixture'
@@ -15,30 +16,16 @@ import {
   resolveVisualVariant,
 } from '../../../scripts/visual-variant.mjs'
 
-const diagnostics = new WeakMap<Page, string[]>()
-const stabilizePage = async (page: Page) => {
-  await page.addStyleTag({
-    content: `*,*::before,*::after{transition-duration:0s!important;animation-duration:0s!important;animation-delay:0s!important;scroll-behavior:auto!important}`,
-  })
-}
+registerStableVisualHooks(test)
 
-test.beforeEach(async ({ page }) => {
-  diagnostics.set(page, attachPageDiagnostics(page))
-  await page.emulateMedia({ reducedMotion: 'reduce' })
-})
-
-test.afterEach(async ({ page }) => {
-  expect(diagnostics.get(page) ?? []).toEqual([])
-})
+const openMetricFixtures = (page: Page, projectName: string) =>
+  openStableVisualPage(page, buildVisualUrl('metric-visual', projectName))
 
 // CSS gate: no card surfaces on metric primitives
 test('production CSS has no card surfaces on metric primitives', async ({
   page,
 }, testInfo) => {
-  await page.goto(buildVisualUrl('metric-visual', testInfo.project.name), {
-    waitUntil: 'domcontentloaded',
-  })
-  await stabilizePage(page)
+  await openMetricFixtures(page, testInfo.project.name)
   await expect(page.getByTestId('metric-visual-fixtures')).toBeVisible()
 
   // Selector-scoped gate: a card surface only counts when a rule that targets
@@ -75,10 +62,7 @@ test('production CSS has no card surfaces on metric primitives', async ({
 
 // Typography: 12/14/16px ladder
 test('KPI primary value uses 16px', async ({ page }, testInfo) => {
-  await page.goto(buildVisualUrl('metric-visual', testInfo.project.name), {
-    waitUntil: 'domcontentloaded',
-  })
-  await stabilizePage(page)
+  await openMetricFixtures(page, testInfo.project.name)
   const primary = page
     .locator('[data-metric-variant="metric-default"] .el-metric-item__primary')
     .first()
@@ -87,10 +71,7 @@ test('KPI primary value uses 16px', async ({ page }, testInfo) => {
 })
 
 test('KeyValue label uses 12px', async ({ page }, testInfo) => {
-  await page.goto(buildVisualUrl('metric-visual', testInfo.project.name), {
-    waitUntil: 'domcontentloaded',
-  })
-  await stabilizePage(page)
+  await openMetricFixtures(page, testInfo.project.name)
   const label = page
     .locator('[data-metric-variant="kv-default"] .el-key-value-item__label')
     .first()
@@ -101,10 +82,7 @@ test('KeyValue label uses 12px', async ({ page }, testInfo) => {
 test('ordinary metric labels and values stay within the approved typography budget', async ({
   page,
 }, testInfo) => {
-  await page.goto(buildVisualUrl('metric-visual', testInfo.project.name), {
-    waitUntil: 'domcontentloaded',
-  })
-  await stabilizePage(page)
+  await openMetricFixtures(page, testInfo.project.name)
 
   const selectors = [
     '.el-distribution-bar-row__value',
@@ -141,10 +119,7 @@ test('ordinary metric labels and values stay within the approved typography budg
 test('single production composition contains twenty-plus realistic entries across all seven primitives and required states', async ({
   page,
 }, testInfo) => {
-  await page.goto(buildVisualUrl('metric-visual', testInfo.project.name), {
-    waitUntil: 'domcontentloaded',
-  })
-  await stabilizePage(page)
+  await openMetricFixtures(page, testInfo.project.name)
 
   const root = page.getByTestId('metric-visual-fixtures')
   const requiredPrimitives = [
@@ -201,10 +176,7 @@ test('single production composition contains twenty-plus realistic entries acros
 test('default key labels omit punctuation and the explicit motif remains decorative gray', async ({
   page,
 }, testInfo) => {
-  await page.goto(buildVisualUrl('metric-visual', testInfo.project.name), {
-    waitUntil: 'domcontentloaded',
-  })
-  await stabilizePage(page)
+  await openMetricFixtures(page, testInfo.project.name)
 
   const labels = page.locator('.el-key-value-item__label')
   const pseudoContent = await labels.evaluateAll((elements) =>
@@ -237,10 +209,7 @@ test('default key labels omit punctuation and the explicit motif remains decorat
 test('CJK and RTL metric content preserve hierarchy and direction', async ({
   page,
 }, testInfo) => {
-  await page.goto(buildVisualUrl('metric-visual', testInfo.project.name), {
-    waitUntil: 'domcontentloaded',
-  })
-  await stabilizePage(page)
+  await openMetricFixtures(page, testInfo.project.name)
 
   const cjk = page.locator('[data-metric-typography="cjk"]')
   const rtl = page.locator('[data-metric-typography="rtl"]')
@@ -260,10 +229,7 @@ test('CJK and RTL metric content preserve hierarchy and direction', async ({
 test('long and RTL metric content reflows at 200 percent zoom', async ({
   page,
 }, testInfo) => {
-  await page.goto(buildVisualUrl('metric-visual', testInfo.project.name), {
-    waitUntil: 'domcontentloaded',
-  })
-  await stabilizePage(page)
+  await openMetricFixtures(page, testInfo.project.name)
   await page.evaluate(() => {
     document.documentElement.style.zoom = '200%'
   })
@@ -284,10 +250,7 @@ test('long and RTL metric content reflows at 200 percent zoom', async ({
 
 // MetricList flat
 test('MetricList has no card surface', async ({ page }, testInfo) => {
-  await page.goto(buildVisualUrl('metric-visual', testInfo.project.name), {
-    waitUntil: 'domcontentloaded',
-  })
-  await stabilizePage(page)
+  await openMetricFixtures(page, testInfo.project.name)
   const list = page.locator(
     '[data-metric-variant="metric-default"] .el-metric-list',
   )
@@ -299,10 +262,7 @@ test('MetricList has no card surface', async ({ page }, testInfo) => {
 
 // KeyValueGrid flat
 test('KeyValueGrid has no card surface', async ({ page }, testInfo) => {
-  await page.goto(buildVisualUrl('metric-visual', testInfo.project.name), {
-    waitUntil: 'domcontentloaded',
-  })
-  await stabilizePage(page)
+  await openMetricFixtures(page, testInfo.project.name)
   const grid = page.locator(
     '[data-metric-variant="kv-default"] .el-key-value-grid',
   )
@@ -316,10 +276,7 @@ test('KeyValueGrid has no card surface', async ({ page }, testInfo) => {
 test('DiagnosticsItem warning uses 3px left border', async ({
   page,
 }, testInfo) => {
-  await page.goto(buildVisualUrl('metric-visual', testInfo.project.name), {
-    waitUntil: 'domcontentloaded',
-  })
-  await stabilizePage(page)
+  await openMetricFixtures(page, testInfo.project.name)
   const item = page.locator(
     '[data-metric-variant="diag-mixed"] .el-diagnostics-item.is-warning',
   )
@@ -430,10 +387,7 @@ test('narrow desktop key-value grid keeps labels and copy actions readable', asy
 
 // CopyableDetail: 40px button
 test('CopyableDetail button min-height >= 40px', async ({ page }, testInfo) => {
-  await page.goto(buildVisualUrl('metric-visual', testInfo.project.name), {
-    waitUntil: 'domcontentloaded',
-  })
-  await stabilizePage(page)
+  await openMetricFixtures(page, testInfo.project.name)
   const btn = page.locator(
     '[data-metric-variant="copy-default"] .el-copyable-detail__button',
   )
@@ -442,10 +396,7 @@ test('CopyableDetail button min-height >= 40px', async ({ page }, testInfo) => {
 })
 
 test('CopyableDetail focus uses inset ring', async ({ page }, testInfo) => {
-  await page.goto(buildVisualUrl('metric-visual', testInfo.project.name), {
-    waitUntil: 'domcontentloaded',
-  })
-  await stabilizePage(page)
+  await openMetricFixtures(page, testInfo.project.name)
   const btn = page.locator(
     '[data-metric-variant="copy-default"] .el-copyable-detail__button',
   )
@@ -457,10 +408,7 @@ test('CopyableDetail focus uses inset ring', async ({ page }, testInfo) => {
 test('inline action focus, hover, selected and disabled states use standard tokens without ancestor fading', async ({
   page,
 }, testInfo) => {
-  await page.goto(buildVisualUrl('metric-visual', testInfo.project.name), {
-    waitUntil: 'domcontentloaded',
-  })
-  await stabilizePage(page)
+  await openMetricFixtures(page, testInfo.project.name)
 
   for (const selector of [
     '[data-metric-variant="copy-default"] .el-copyable-detail__button',
@@ -570,10 +518,7 @@ test('inline action focus, hover, selected and disabled states use standard toke
 test('nested, mixed, empty, loading, long, RTL and zoom states remain stable', async ({
   page,
 }, testInfo) => {
-  await page.goto(buildVisualUrl('metric-visual', testInfo.project.name), {
-    waitUntil: 'domcontentloaded',
-  })
-  await stabilizePage(page)
+  await openMetricFixtures(page, testInfo.project.name)
 
   const mixed = page.locator(
     '[data-metric-variant="diag-mixed"] > .el-diagnostics-list',
@@ -722,10 +667,7 @@ test('required responsive and zoom cells retain production rendered evidence', a
 test('metric variants render without visual break', async ({
   page,
 }, testInfo) => {
-  await page.goto(buildVisualUrl('metric-visual', testInfo.project.name), {
-    waitUntil: 'domcontentloaded',
-  })
-  await stabilizePage(page)
+  await openMetricFixtures(page, testInfo.project.name)
   for (const v of [
     'metric-default',
     'kpi-default',
@@ -961,13 +903,6 @@ const collectMetricSurfaceIssues = async (
       consumerOverrides,
     }
   }, minTargetSide)
-
-const openMetricFixtures = async (page: Page, projectName: string) => {
-  await page.goto(buildVisualUrl('metric-visual', projectName), {
-    waitUntil: 'domcontentloaded',
-  })
-  await stabilizePage(page)
-}
 
 // Row flatness: internal item rows stay transparent, square, and divider-only.
 // Kills "per-item panel" and "diagnostic card" regressions at rendered level.

@@ -4,9 +4,12 @@ import { createHash } from 'node:crypto'
 import { existsSync, readFileSync } from 'node:fs'
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
+import {
+  PLAYWRIGHT_SUITES_PATH as REGISTRY_PATH,
+  stableStringify,
+} from './playwright-registry.mjs'
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..')
-const REGISTRY_PATH = 'spec/ci/playwright-suites.json'
 const SCHEMA_PATH = 'spec/ci/playwright-suites.schema.json'
 const FIXED_SUITE_IDS = Object.freeze([
   'view-transitions',
@@ -31,19 +34,6 @@ export const PLAYWRIGHT_SUITE_REGISTRY_PATH = REGISTRY_PATH
 
 const fail = (message) => {
   throw new Error(message)
-}
-
-const stableStringify = (value) => {
-  if (Array.isArray(value)) {
-    return `[${value.map((entry) => stableStringify(entry)).join(',')}]`
-  }
-  if (value && typeof value === 'object') {
-    return `{${Object.keys(value)
-      .sort()
-      .map((key) => `${JSON.stringify(key)}:${stableStringify(value[key])}`)
-      .join(',')}}`
-  }
-  return JSON.stringify(value)
 }
 
 /** Minimal schema checks without external ajv (keeps check install-free). */

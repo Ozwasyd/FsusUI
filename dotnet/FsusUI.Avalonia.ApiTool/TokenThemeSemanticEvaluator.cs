@@ -319,7 +319,7 @@ internal static class TokenThemeSemanticEvaluator
           Dependency = symbol.Name,
           CanonicalName = canonicalName,
           Resolved = canonicalName is not null,
-          OwnerType = owner is null ? null : ReflectionTypeName(owner),
+          OwnerType = owner is null ? null : SourceSemanticEvaluator.ReflectionTypeName(owner),
           Ownership = owner is null ? "unbound" : "resolved",
           OwnerExpression = enclosing?.ContainingType?.ToDisplayString(
             SymbolDisplayFormat.CSharpErrorMessageFormat),
@@ -543,22 +543,7 @@ internal static class TokenThemeSemanticEvaluator
   private static string SourceMember(ISymbol? symbol) =>
     symbol is null
       ? "<unknown>"
-      : $"{ReflectionTypeName(symbol.ContainingType)}.{symbol.Name}";
-
-  private static string ReflectionTypeName(INamedTypeSymbol type)
-  {
-    var containingTypes = new Stack<string>();
-    for (var current = type; current is not null; current = current.ContainingType)
-    {
-      containingTypes.Push(current.MetadataName);
-    }
-    var namespaceName = type.ContainingNamespace.IsGlobalNamespace
-      ? string.Empty
-      : type.ContainingNamespace.ToDisplayString();
-    return namespaceName.Length == 0
-      ? string.Join("+", containingTypes)
-      : $"{namespaceName}.{string.Join("+", containingTypes)}";
-  }
+      : $"{SourceSemanticEvaluator.ReflectionTypeName(symbol.ContainingType)}.{symbol.Name}";
 
   private static string DependencySortKey(SourceTokenDependencySemantics item) =>
     string.Join(

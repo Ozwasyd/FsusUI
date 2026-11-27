@@ -50,7 +50,7 @@ public class FsusCheckTagRenderedEvidenceTests
     surface.Arrange(new Rect(0, 0, 320, 220));
 
     var outputRoot = Path.Combine(
-      FindRepositoryRoot(),
+      HeadlessRepositoryRoot.FindBySolution(),
       "dotnet",
       "FsusUI.Avalonia.HeadlessTests",
       "TestResults",
@@ -99,18 +99,5 @@ public class FsusCheckTagRenderedEvidenceTests
       {
         Source = new Uri("avares://FsusUI.Avalonia.Themes/Themes/FsusTheme.axaml"),
       });
-  }
-
-  private static string FindRepositoryRoot()
-  {
-    var dir = new DirectoryInfo(AppContext.BaseDirectory);
-    while (dir is not null &&
-           !File.Exists(Path.Combine(dir.FullName, "dotnet", "FsusUI.Avalonia.slnx")))
-    {
-      dir = dir.Parent;
-    }
-
-    return dir?.FullName
-      ?? throw new InvalidOperationException("Unable to locate repository root.");
   }
 }

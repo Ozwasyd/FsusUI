@@ -987,7 +987,7 @@ internal sealed class SourceSemanticEvaluator
       mapping.ValueKnown ? mapping.Value : mapping.ValueExpression,
       mapping.SourceMember);
 
-  private static string ReflectionTypeName(INamedTypeSymbol type)
+  internal static string ReflectionTypeName(INamedTypeSymbol type)
   {
     var containingTypes = new Stack<string>();
     for (var current = type; current is not null; current = current.ContainingType)

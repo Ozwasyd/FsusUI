@@ -430,7 +430,7 @@ public class FsusDropZoneHeadlessTests
   [AvaloniaFact]
   public void RealHeadlessSkiaRendersDropZoneVisualStatesAndSavesArtifacts()
   {
-    var repositoryRoot = FindRepositoryRoot();
+    var repositoryRoot = HeadlessRepositoryRoot.FindByWorkspace();
     var outputRoot = HeadlessVisualEvidenceOutput.ResolveOutputRoot(
       repositoryRoot,
       "issue-655-drop-zone");
@@ -656,7 +656,7 @@ public class FsusDropZoneHeadlessTests
     window.Close();
 
     return new DropZoneRenderCapture(
-      HeadlessVisualEvidenceOutput.RecordPath(FindRepositoryRoot(), outputPath),
+      HeadlessVisualEvidenceOutput.RecordPath(HeadlessRepositoryRoot.FindByWorkspace(), outputPath),
       Convert.ToHexStringLower(SHA256.HashData(File.ReadAllBytes(outputPath))),
       new PixelDimension(bitmap.PixelSize.Width, bitmap.PixelSize.Height),
       themeName,
@@ -727,7 +727,7 @@ public class FsusDropZoneHeadlessTests
     Assert.Equal(1, browseRequestedCount);
 
     var reportPath = Path.Combine(
-      FindRepositoryRoot(),
+      HeadlessRepositoryRoot.FindByWorkspace(),
       "tests",
       "conformance",
       "visual",
@@ -881,21 +881,6 @@ public class FsusDropZoneHeadlessTests
         Density = FsusDensity.Default,
         MotionMode = FsusMotionMode.Reduced,
       });
-  }
-
-  private static string FindRepositoryRoot()
-  {
-    for (var directory = new DirectoryInfo(AppContext.BaseDirectory);
-      directory is not null;
-      directory = directory.Parent)
-    {
-      if (File.Exists(Path.Combine(directory.FullName, "pnpm-workspace.yaml")))
-      {
-        return directory.FullName;
-      }
-    }
-
-    throw new DirectoryNotFoundException("Could not locate the FsusUI repository root.");
   }
 
   private sealed class TestCommand(Action<object?> execute) : ICommand

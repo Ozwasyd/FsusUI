@@ -64,6 +64,20 @@ export interface MarkdownSearchExecution {
   readonly code?: string
 }
 
+const emptySearchExecution = (
+  requestId: string,
+  status: 'aborted' | 'rejected',
+  code?: string,
+): MarkdownSearchExecution =>
+  Object.freeze({
+    requestId,
+    status,
+    matches: Object.freeze([]),
+    total: null,
+    truncated: false,
+    ...(code === undefined ? {} : { code }),
+  })
+
 export const runMarkdownSearchTask = (input: {
   readonly requestId: string
   readonly source: string
@@ -78,35 +92,15 @@ export const runMarkdownSearchTask = (input: {
   const budget = input.budget ?? MARKDOWN_SEARCH_BUDGET
   const started = (input.now ?? Date.now)()
   if (input.task?.cancelled) {
-    return Object.freeze({
-      requestId: input.requestId,
-      status: 'aborted',
-      matches: Object.freeze([]),
-      total: null,
-      truncated: false,
-    })
+    return emptySearchExecution(input.requestId, 'aborted')
   }
   const sourceBytes = input.source.length * 2
   if (sourceBytes > budget.maxSourceBytes) {
-    return Object.freeze({
-      requestId: input.requestId,
-      status: 'rejected',
-      matches: Object.freeze([]),
-      total: null,
-      truncated: false,
-      code: 'source-budget',
-    })
+    return emptySearchExecution(input.requestId, 'rejected', 'source-budget')
   }
   if (input.query.mode === 'regex') {
     if (input.query.text.length > budget.maxRegexLength || looksCatastrophic(input.query.text)) {
-      return Object.freeze({
-        requestId: input.requestId,
-        status: 'rejected',
-        matches: Object.freeze([]),
-        total: null,
-        truncated: false,
-        code: 'regex-budget',
-      })
+      return emptySearchExecution(input.requestId, 'rejected', 'regex-budget')
     }
   }
   const found = searchMarkdownRawSource({
@@ -117,23 +111,10 @@ export const runMarkdownSearchTask = (input: {
     revision: input.revision,
   })
   if (input.task?.cancelled) {
-    return Object.freeze({
-      requestId: input.requestId,
-      status: 'aborted',
-      matches: Object.freeze([]),
-      total: null,
-      truncated: false,
-    })
+    return emptySearchExecution(input.requestId, 'aborted')
   }
   if (found.ok === false) {
-    return Object.freeze({
-      requestId: input.requestId,
-      status: 'rejected',
-      matches: Object.freeze([]),
-      total: null,
-      truncated: false,
-      code: found.code,
-    })
+    return emptySearchExecution(input.requestId, 'rejected', found.code)
   }
   const elapsed = (input.now ?? Date.now)() - started
   const truncated =

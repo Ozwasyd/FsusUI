@@ -1,5 +1,13 @@
 import type { MarkdownEditorDocumentIdentity } from './markdown-editor-transaction'
 
+export const matchesMarkdownEditorDocument = (
+  left?: MarkdownEditorDocumentIdentity,
+  right?: MarkdownEditorDocumentIdentity,
+) => {
+  if (!left || !right) return true
+  return left.id === right.id && left.epoch === right.epoch
+}
+
 export type MarkdownEditorMode = 'source' | 'live' | 'split' | 'preview'
 export const markdownEditorModes = ['source', 'live', 'split', 'preview'] as const
 

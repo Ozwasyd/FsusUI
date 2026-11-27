@@ -126,3 +126,37 @@ internal static class FsusComponentClasses
       ? variant
       : FsusComponentVariant.Default;
 }
+
+internal static class FsusControlAvailability
+{
+  public static void SyncLoading(Control control, bool isLoading, ref bool? enabledBeforeLoading)
+  {
+    if (isLoading)
+    {
+      enabledBeforeLoading ??= control.IsEnabled;
+      control.IsEnabled = false;
+    }
+    else if (enabledBeforeLoading.HasValue)
+    {
+      control.IsEnabled = enabledBeforeLoading.Value;
+      enabledBeforeLoading = null;
+    }
+  }
+
+  public static void SyncGroupChild<TControl>(
+    TControl child,
+    bool isGroupEnabled,
+    Dictionary<TControl, bool> enabledBeforeGroupDisabled)
+    where TControl : Control
+  {
+    if (!isGroupEnabled)
+    {
+      enabledBeforeGroupDisabled.TryAdd(child, child.IsEnabled);
+      child.IsEnabled = false;
+    }
+    else if (enabledBeforeGroupDisabled.Remove(child, out var wasEnabled))
+    {
+      child.IsEnabled = wasEnabled;
+    }
+  }
+}

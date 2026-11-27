@@ -188,7 +188,7 @@ public class FsusSliderHeadlessTests
   [AvaloniaFact]
   public void RealHeadlessSkiaRendersIssue659ProductionStateMatrix()
   {
-    var repositoryRoot = FindRepositoryRoot();
+    var repositoryRoot = HeadlessRepositoryRoot.FindByWorkspace();
     var outputRoot = HeadlessVisualEvidenceOutput.ResolveOutputRoot(
       repositoryRoot,
       "issue-659-slider-render");
@@ -277,7 +277,7 @@ public class FsusSliderHeadlessTests
       ControlAutomationPeer.CreatePeerForElement(disabled));
 
     var reportPath = Path.Combine(
-      FindRepositoryRoot(),
+      HeadlessRepositoryRoot.FindByWorkspace(),
       "tests", "conformance", "visual", "artifacts",
       "issue-659-avalonia-slider-automation-report.json");
     File.WriteAllText(
@@ -424,7 +424,7 @@ public class FsusSliderHeadlessTests
 
     window.Close();
     return new SliderRenderCapture(
-      HeadlessVisualEvidenceOutput.RecordPath(FindRepositoryRoot(), output),
+      HeadlessVisualEvidenceOutput.RecordPath(HeadlessRepositoryRoot.FindByWorkspace(), output),
       Convert.ToHexStringLower(SHA256.HashData(File.ReadAllBytes(output))),
       new PixelDimension(bitmap.PixelSize.Width, bitmap.PixelSize.Height),
       themeName,
@@ -514,21 +514,6 @@ public class FsusSliderHeadlessTests
 
     throw new Xunit.Sdk.XunitException(
       $"Template part '{name}' was not found for '{control.Name}'.");
-  }
-
-  private static string FindRepositoryRoot()
-  {
-    for (var directory = new DirectoryInfo(AppContext.BaseDirectory);
-      directory is not null;
-      directory = directory.Parent)
-    {
-      if (File.Exists(Path.Combine(directory.FullName, "pnpm-workspace.yaml")))
-      {
-        return directory.FullName;
-      }
-    }
-
-    throw new DirectoryNotFoundException("Could not locate the FsusUI repository root.");
   }
 
   private sealed record PixelDimension(int Width, int Height);

@@ -1,13 +1,11 @@
 #!/usr/bin/env node
 
-import { pathToFileURL } from 'node:url'
 import { loadBoundaryOwnerPlan } from './boundary-playwright-plan.mjs'
 import {
   fail,
   loadReceiptsFromDirectory,
-  option,
   runOwnerVerifyCli,
-  validateCellReceipt,
+  runPlaywrightCli,
   verifyOwnerReceiptsCore,
 } from './lib/playwright-owner-core.mjs'
 
@@ -32,7 +30,6 @@ export async function verifyBoundaryOwnerReceipts(
     expectedCommitSha: options.expectedCommitSha,
     resolveRuntimeManifestPath: (cell) =>
       `${evidenceDir}/runtime-manifests/${cell.suiteId}.json`,
-    validateCellReceiptFn: validateCellReceipt,
     extraReceiptCheck: (receipt, cell) => {
       if (
         cell.project.startsWith('safe-area') &&
@@ -45,22 +42,13 @@ export async function verifyBoundaryOwnerReceipts(
   })
 }
 
-if (import.meta.url === pathToFileURL(process.argv[1] ?? '').href) {
-  try {
-    await runOwnerVerifyCli({
-      usage:
-        'Usage: boundary-playwright-verify.mjs owner-verify --owner <id> --group <g> --receipts-dir <dir> [--evidence-dir <dir>] [--commit-sha <sha>] [--evidence-out <path>]',
-      logPrefix: 'playwright-boundary',
-      loadPlan: (group) => loadBoundaryOwnerPlan(group),
-      loadReceipts: loadBoundaryReceiptsFromDirectory,
-      verifyReceipts: (ownerId, group, receipts, plan, argv) =>
-        verifyBoundaryOwnerReceipts(ownerId, group, receipts, plan, {
-          evidenceDir: option(argv, 'evidence-dir'),
-          expectedCommitSha: option(argv, 'commit-sha'),
-        }),
-    })
-  } catch (error) {
-    console.error(error instanceof Error ? error.message : error)
-    process.exitCode = 1
-  }
-}
+await runPlaywrightCli(import.meta.url, () =>
+  runOwnerVerifyCli({
+    usage:
+      'Usage: boundary-playwright-verify.mjs owner-verify --owner <id> --group <g> --receipts-dir <dir> [--evidence-dir <dir>] [--commit-sha <sha>] [--evidence-out <path>]',
+    logPrefix: 'playwright-boundary',
+    loadPlan: (group) => loadBoundaryOwnerPlan(group),
+    loadReceipts: loadBoundaryReceiptsFromDirectory,
+    verifyReceipts: verifyBoundaryOwnerReceipts,
+  }),
+)

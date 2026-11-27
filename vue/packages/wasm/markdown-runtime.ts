@@ -443,21 +443,23 @@ export {
   type SourceSelection,
 } from './markdown-anchor-map'
 
+const markdownRuntimeUnavailable = () =>
+  fsusErr(createFsusRuntimeError('infra', 'markdown_wasm_runtime_unavailable'))
+
+const markdownRuntimeFailure = (error: unknown, phase: string) =>
+  fsusErr(markdownErrorToFsusError(error, `markdown_wasm_${phase}_failed`))
+
+const toMarkdownRuntimeResult = <Result>(result: Result | null) =>
+  result ? fsusOk(result) : markdownRuntimeUnavailable()
+
 export async function initMarkdownRuntime(): Promise<
   FsusResult<MarkdownRuntimeKind>
 > {
   try {
     const result = await initMarkdownRuntimeModule()
-    if (!result.module) {
-      return fsusErr(
-        createFsusRuntimeError('infra', 'markdown_wasm_runtime_unavailable'),
-      )
-    }
-    return fsusOk(result.engine)
+    return result.module ? fsusOk(result.engine) : markdownRuntimeUnavailable()
   } catch (error) {
-    return fsusErr(
-      markdownErrorToFsusError(error, 'markdown_wasm_runtime_init_failed'),
-    )
+    return markdownRuntimeFailure(error, 'runtime_init')
   }
 }
 
@@ -465,19 +467,10 @@ export async function renderMarkdownHtmlWithRuntime(
   request: MarkdownRenderRequest | string,
 ): Promise<FsusResult<MarkdownRuntimeHtmlResult>> {
   try {
-    const result = (await renderMarkdownPayloadWithRuntime(
-      request,
-      'html-only',
-    )) as MarkdownRuntimeHtmlResult | null
-    return result
-      ? fsusOk(result)
-      : fsusErr(
-          createFsusRuntimeError('infra', 'markdown_wasm_runtime_unavailable'),
-        )
+    const result = await renderMarkdownPayloadWithRuntime(request, 'html-only')
+    return toMarkdownRuntimeResult(result)
   } catch (error) {
-    return fsusErr(
-      markdownErrorToFsusError(error, 'markdown_wasm_html_render_failed'),
-    )
+    return markdownRuntimeFailure(error, 'html_render')
   }
 }
 
@@ -485,19 +478,10 @@ export async function renderMarkdownSummaryWithRuntime(
   request: MarkdownRenderRequest | string,
 ): Promise<FsusResult<MarkdownRuntimeSummaryResult>> {
   try {
-    const result = (await renderMarkdownPayloadWithRuntime(
-      request,
-      'summary',
-    )) as MarkdownRuntimeSummaryResult | null
-    return result
-      ? fsusOk(result)
-      : fsusErr(
-          createFsusRuntimeError('infra', 'markdown_wasm_runtime_unavailable'),
-        )
+    const result = await renderMarkdownPayloadWithRuntime(request, 'summary')
+    return toMarkdownRuntimeResult(result)
   } catch (error) {
-    return fsusErr(
-      markdownErrorToFsusError(error, 'markdown_wasm_summary_render_failed'),
-    )
+    return markdownRuntimeFailure(error, 'summary_render')
   }
 }
 
@@ -512,19 +496,10 @@ export async function renderMarkdownResultWithRuntime(
   request: MarkdownRenderRequest | string,
 ): Promise<FsusResult<MarkdownRuntimeRenderResult>> {
   try {
-    const result = (await renderMarkdownPayloadWithRuntime(
-      request,
-      'full-result',
-    )) as MarkdownRuntimeRenderResult | null
-    return result
-      ? fsusOk(result)
-      : fsusErr(
-          createFsusRuntimeError('infra', 'markdown_wasm_runtime_unavailable'),
-        )
+    const result = await renderMarkdownPayloadWithRuntime(request, 'full-result')
+    return toMarkdownRuntimeResult(result)
   } catch (error) {
-    return fsusErr(
-      markdownErrorToFsusError(error, 'markdown_wasm_full_render_failed'),
-    )
+    return markdownRuntimeFailure(error, 'full_render')
   }
 }
 
@@ -532,19 +507,10 @@ export async function renderMarkdownChunksWithRuntime(
   request: MarkdownRenderRequest | string,
 ): Promise<FsusResult<MarkdownRuntimeChunkResult>> {
   try {
-    const result = (await renderMarkdownPayloadWithRuntime(
-      request,
-      'chunks',
-    )) as MarkdownRuntimeChunkResult | null
-    return result
-      ? fsusOk(result)
-      : fsusErr(
-          createFsusRuntimeError('infra', 'markdown_wasm_runtime_unavailable'),
-        )
+    const result = await renderMarkdownPayloadWithRuntime(request, 'chunks')
+    return toMarkdownRuntimeResult(result)
   } catch (error) {
-    return fsusErr(
-      markdownErrorToFsusError(error, 'markdown_wasm_chunks_render_failed'),
-    )
+    return markdownRuntimeFailure(error, 'chunks_render')
   }
 }
 

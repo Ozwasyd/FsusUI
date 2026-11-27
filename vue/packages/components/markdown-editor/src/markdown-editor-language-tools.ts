@@ -4,6 +4,7 @@ import {
   type MarkdownStableSyntaxNode,
 } from '../../../wasm/markdown-runtime'
 import type { MarkdownEditorMode } from './markdown-editor-live-contract'
+import { findNarrowestMarkdownSyntaxNode } from './markdown-editor-syntax'
 import type {
   MarkdownEditorDocumentIdentity,
   MarkdownEditorSelection,
@@ -183,25 +184,6 @@ const protectedReasonForRange = (
   return undefined
 }
 
-const smallestContainingNode = (
-  nodes: readonly MarkdownStableSyntaxNode[],
-  offset: number,
-  sourceLength: number,
-): MarkdownStableSyntaxNode | null => {
-  const containing = nodes.filter((node) =>
-    containsOffset(node.rawRange, offset, sourceLength),
-  )
-  if (containing.length === 0) return null
-  return [...containing].sort((left, right) => {
-    const span =
-      left.rawRange.end -
-      left.rawRange.start -
-      (right.rawRange.end - right.rawRange.start)
-    if (span !== 0) return span
-    return left.id.localeCompare(right.id)
-  })[0]!
-}
-
 export interface MarkdownLanguageToolInput {
   readonly autocorrect?: boolean
   readonly dictation?: boolean
@@ -379,10 +361,8 @@ export const resolveMarkdownLanguageToolContextCapability = (input: {
     })
   }
 
-  const node = smallestContainingNode(
-    projection.nodes,
-    offset,
-    input.source.length,
+  const node = findNarrowestMarkdownSyntaxNode(projection.nodes, (node) =>
+    containsOffset(node.rawRange, offset, input.source.length),
   )
   if (node) {
     const protectedReason = protectedReasonForRange(projection, offset, offset)

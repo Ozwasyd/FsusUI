@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 
 import { resolve } from 'node:path'
-import { pathToFileURL } from 'node:url'
 import { loadVisualReuseOwnerPlan } from './visual-reuse-playwright-plan.mjs'
 import { runVisualReuseCell } from './visual-reuse-playwright-runner.mjs'
 import {
@@ -9,13 +8,13 @@ import {
   verifyVisualReuseOwnerReceipts,
 } from './visual-reuse-playwright-verify.mjs'
 import {
-  hasFlag,
   option,
+  prepareOwnerVisualRuntime,
   repoRoot,
+  runPlaywrightCli,
   runPlaywrightOwner,
-  runVisualRuntimePrepare,
+  runPreparedVisualCells,
   sha256File,
-  withSpawnedServer,
 } from './lib/playwright-owner-core.mjs'
 
 async function main(argv = process.argv.slice(2)) {
@@ -31,47 +30,20 @@ async function main(argv = process.argv.slice(2)) {
     defaultOwnerId: 'visual-runtime-reuse',
     defaultEvidenceDir: '.tmp/visual-runtime-reuse',
     loadPlan: (group) => loadVisualReuseOwnerPlan(group),
-    executeCells: async ({ ownerId, group, cells, evidenceDir }) => {
-      if (!hasFlag(argv, 'skip-prepare')) {
-        runVisualRuntimePrepare(runtimeDir, {
-          logPrefix: 'visual-runtime-reuse',
-        })
-      }
-      runVisualRuntimePrepare(runtimeDir, {
-        checkOnly: true,
-        logPrefix: 'visual-runtime-reuse',
+    executeCells: async (context) => {
+      prepareOwnerVisualRuntime(argv, runtimeDir, 'visual-runtime-reuse', {
+        logCheck: true,
       })
       const manifestAbsPath = resolve(repoRoot, runtimeDir, 'manifest.json')
       const beforeManifestDigest = sha256File(manifestAbsPath)
-      const serverUrl = `http://127.0.0.1:${serverPort}`
 
-      const { results, overallFailed: cellFailed } = await withSpawnedServer(
-        {
-          command: process.execPath,
-          args: [
-            'scripts/serve-visual-runtime.mjs',
-            '--suite=preview',
-            '--host=127.0.0.1',
-            `--port=${serverPort}`,
-            `--runtime-dir=${runtimeDir}`,
-          ],
-          serverUrl,
-        },
-        async () => {
-          const cellResults = []
-          let failedAny = false
-          for (const cell of cells) {
-            const result = await runVisualReuseCell(ownerId, cell.id, group, {
-              runtimeDir,
-              evidenceDir,
-              serverUrl,
-            })
-            cellResults.push(result)
-            if (!result.ok) failedAny = true
-          }
-          return { results: cellResults, overallFailed: failedAny }
-        },
-      )
+      const { results, overallFailed: cellFailed } =
+        await runPreparedVisualCells(
+          runtimeDir,
+          serverPort,
+          context,
+          runVisualReuseCell,
+        )
 
       const afterManifestDigest = sha256File(manifestAbsPath)
       let overallFailed = cellFailed
@@ -89,11 +61,8 @@ async function main(argv = process.argv.slice(2)) {
       }
     },
     loadReceipts: loadVisualReuseReceiptsFromDirectory,
-    verifyReceipts: ({ ownerId, group, receipts, selectedPlan, commitSha }) =>
-      verifyVisualReuseOwnerReceipts(ownerId, group, receipts, selectedPlan, {
-        runtimeDir,
-        expectedCommitSha: commitSha || undefined,
-      }),
+    verifyReceipts: verifyVisualReuseOwnerReceipts,
+    verifyOptions: { runtimeDir },
     buildEvidenceExtra: ({ execution }) => ({
       runtimeIntegrity: {
         beforeManifestDigest: execution.beforeManifestDigest,
@@ -105,11 +74,4 @@ async function main(argv = process.argv.slice(2)) {
   })
 }
 
-if (import.meta.url === pathToFileURL(process.argv[1] ?? '').href) {
-  try {
-    await main()
-  } catch (error) {
-    console.error(error instanceof Error ? error.message : error)
-    process.exitCode = 1
-  }
-}
+await runPlaywrightCli(import.meta.url, main)

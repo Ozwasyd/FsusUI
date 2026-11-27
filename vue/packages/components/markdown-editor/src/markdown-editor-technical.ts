@@ -1,13 +1,14 @@
 import {
-  createMarkdownEditorProjection,
   createMarkdownSourceCoordinateMap,
-  stabilizeMarkdownEditorProjection,
   type MarkdownDocumentIdentity,
   type MarkdownSourceCoordinateMap,
   type MarkdownStableProjection,
   type MarkdownStableSyntaxNode,
 } from '../../../wasm/markdown-runtime'
-import type { MarkdownEditorMode } from './markdown-editor-live-contract'
+import {
+  matchesMarkdownEditorDocument,
+  type MarkdownEditorMode,
+} from './markdown-editor-live-contract'
 import {
   commitMarkdownLiveFeatureResult,
   resolveMarkdownLiveLayoutStability,
@@ -20,6 +21,10 @@ import {
   type MarkdownAtomicNodeAction,
   type MarkdownAtomicNodePlan,
 } from './markdown-editor-live-selection'
+import {
+  findNarrowestMarkdownSyntaxNode,
+  resolveMarkdownEditorProjection,
+} from './markdown-editor-syntax'
 import type { MarkdownEditorSelection } from './markdown-editor-transaction'
 
 export const MARKDOWN_TECHNICAL_NODE_KINDS = Object.freeze([
@@ -130,25 +135,6 @@ const technicalKindOf = (
     : null
 }
 
-const sameDocument = (
-  left?: MarkdownDocumentIdentity,
-  right?: MarkdownDocumentIdentity,
-) => {
-  if (!left || !right) return true
-  return left.id === right.id && left.epoch === right.epoch
-}
-
-const projectionOf = (
-  source: string,
-  identity: MarkdownDocumentIdentity,
-  projection?: MarkdownStableProjection,
-) =>
-  projection ??
-  stabilizeMarkdownEditorProjection(
-    createMarkdownEditorProjection(source),
-    identity,
-  )
-
 const emptyMapped = (
   coordinates: MarkdownSourceCoordinateMap,
   at: number,
@@ -233,7 +219,8 @@ const coveringTechnical = (
   offset: number,
   kind?: string,
 ): MarkdownStableSyntaxNode | null => {
-  const covering = projection.nodes.filter(
+  const covering = findNarrowestMarkdownSyntaxNode(
+    projection.nodes,
     (node) => {
       const technicalKind = technicalKindOf(node)
       return (
@@ -244,16 +231,7 @@ const coveringTechnical = (
       )
     },
   )
-  if (covering.length > 0) {
-    return [...covering].sort((left, right) => {
-      const span =
-        left.rawRange.end -
-        left.rawRange.start -
-        (right.rawRange.end - right.rawRange.start)
-      if (span !== 0) return span
-      return left.id.localeCompare(right.id)
-    })[0]!
-  }
+  if (covering) return covering
   if (kind) {
     return (
       projection.nodes.find((node) => technicalKindOf(node) === kind) ?? null
@@ -377,7 +355,7 @@ export const resolveMarkdownTechnicalNode = (input: {
   readonly source: string
 }): MarkdownTechnicalNodePlan | null => {
   const identity = input.documentIdentity ?? { epoch: 0, id: 'technical' }
-  const projection = projectionOf(input.source, identity, input.projection)
+  const projection = resolveMarkdownEditorProjection(input.source, identity, input.projection)
   const located =
     input.nodeId && !input.nodeId.startsWith('regex:')
       ? projection.nodes.find((node) => node.id === input.nodeId)
@@ -438,7 +416,7 @@ export const createMarkdownTechnicalFeatureRequest = (input: {
   })
   if (!node) return null
   let state: MarkdownTechnicalNodeState = 'pending'
-  if (!sameDocument(identity, input.currentIdentity)) {
+  if (!matchesMarkdownEditorDocument(identity, input.currentIdentity)) {
     state = 'document-switched'
   } else if (
     input.expectedRevision !== undefined &&
@@ -584,7 +562,7 @@ export const commitMarkdownTechnicalFeatureResult = (input: {
       ),
     )
   }
-  if (!sameDocument(identity, input.currentIdentity ?? input.request.documentIdentity)) {
+  if (!matchesMarkdownEditorDocument(identity, input.currentIdentity ?? input.request.documentIdentity)) {
     return failed('document-switched', 'stale-document')
   }
   const present = resolveMarkdownTechnicalNode({
@@ -709,6 +687,149 @@ export const resolveMarkdownTechnicalHeight = (input: {
     source: input.source,
     trigger,
   })
+}
+
+export type MarkdownTechnicalPreviewVerdict =
+  | 'valid'
+  | 'invalid'
+  | 'large'
+  | 'unsafe'
+
+export type MarkdownTechnicalPreviewAction =
+  | 'pending'
+  | 'preview'
+  | 'error'
+  | 'retry'
+  | 'cancel'
+  | 'source-reveal'
+  | 'degraded'
+
+export type MarkdownTechnicalPreviewPresentation =
+  | 'preview'
+  | 'source-only'
+  | 'degraded'
+
+export interface MarkdownTechnicalPreviewInput {
+  readonly abortSignal?: AbortSignal | null
+  readonly config?: Readonly<Record<string, unknown>>
+  readonly documentIdentity?: MarkdownDocumentIdentity
+  readonly intent?: MarkdownTechnicalPreviewAction
+  readonly mode?: MarkdownEditorMode
+  readonly nodeId?: string
+  readonly revision?: number
+  readonly selection?: MarkdownEditorSelection
+  readonly source: string
+  readonly theme?: string | null
+}
+
+type MarkdownTechnicalPreviewClassification = {
+  readonly diagnosticCode: string | null
+  readonly range: Readonly<{ end: number; start: number }>
+  readonly verdict: MarkdownTechnicalPreviewVerdict
+}
+
+const previewActionFor = (
+  intent: MarkdownTechnicalPreviewAction | undefined,
+  verdict: MarkdownTechnicalPreviewVerdict,
+): MarkdownTechnicalPreviewAction => {
+  if (intent === 'retry') return 'pending'
+  if (intent === 'cancel' || intent === 'source-reveal') return intent
+  if (verdict === 'valid') return intent ?? 'pending'
+  return verdict === 'large' ? 'degraded' : 'error'
+}
+
+const previewPresentationFor = (
+  verdict: MarkdownTechnicalPreviewVerdict,
+  action: MarkdownTechnicalPreviewAction,
+): MarkdownTechnicalPreviewPresentation => {
+  if (action === 'preview' && verdict === 'valid') return 'preview'
+  if (verdict === 'large' || action === 'degraded') return 'degraded'
+  return 'source-only'
+}
+
+const previewCaretAt = (offset: number): MarkdownEditorSelection =>
+  Object.freeze({ direction: 'none', end: offset, start: offset })
+
+export const planMarkdownTechnicalPreview = <
+  Kind extends 'latex' | 'mermaid',
+  Classification extends MarkdownTechnicalPreviewClassification,
+>(
+  kind: Kind,
+  input: MarkdownTechnicalPreviewInput,
+  classify: (
+    body: string,
+    range: MarkdownTechnicalPreviewClassification['range'],
+    node: MarkdownTechnicalNodePlan | null,
+  ) => Classification,
+  configure?: (
+    classification: Classification,
+  ) => Readonly<Record<string, unknown>>,
+) => {
+  const scope = {
+    documentIdentity: input.documentIdentity ?? { epoch: 0, id: kind },
+    kind,
+    revision: input.revision,
+    source: input.source,
+  }
+  const node = resolveMarkdownTechnicalNode({
+    ...scope,
+    nodeId: input.nodeId,
+    selection: input.selection,
+  })
+  const range = node?.ranges.body.raw ?? { end: 0, start: 0 }
+  const body = node ? input.source.slice(range.start, range.end) : ''
+  const classification = classify(body, range, node)
+  const action = previewActionFor(input.intent, classification.verdict)
+  const request =
+    node && action !== 'cancel'
+      ? createMarkdownTechnicalFeatureRequest({
+          ...scope,
+          abortSignal: input.abortSignal,
+          config: configure ? configure(classification) : input.config,
+          mode: input.mode,
+          nodeId: node.nodeId,
+          theme: input.theme,
+        })
+      : null
+  const diagnostic =
+    classification.verdict === 'valid'
+      ? null
+      : resolveMarkdownTechnicalDiagnostic({
+          ...scope,
+          code: classification.diagnosticCode ?? 'technical-error',
+          nodeId: node?.nodeId,
+          selection: previewCaretAt(classification.range.start),
+        })
+  const selection = input.selection ?? previewCaretAt(node?.rawRange.start ?? 0)
+  const atomic = resolveMarkdownTechnicalAtomic({
+    ...scope,
+    action: action === 'source-reveal' ? 'enter-source' : 'caret-before',
+    mode: input.mode,
+    nodeId: node?.nodeId,
+    selection,
+  })
+  const status: MarkdownTechnicalNodeState =
+    action === 'preview'
+      ? 'resolved'
+      : action === 'pending' || action === 'degraded'
+        ? action
+        : 'error'
+  return {
+    accessibility: Object.freeze({
+      kind,
+      name: atomic.accessibility.name,
+      status,
+      tabStop: false as const,
+      value: diagnostic?.message ?? atomic.accessibility.value,
+    }),
+    action,
+    classification,
+    diagnostic,
+    height: resolveMarkdownTechnicalHeight({ ...scope, selection }),
+    node,
+    presentation: previewPresentationFor(classification.verdict, action),
+    request,
+  }
 }
 
 export const evaluateMarkdownTechnicalMutations = () => {

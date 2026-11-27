@@ -252,16 +252,17 @@ export interface UseResizeObserverReturn {
   stop: Fn
 }
 
-export const useResizeObserver = (
+const useElementObserver = <Options>(
   target: MaybeElementRef | MaybeElementRef[],
-  callback: ResizeObserverCallback,
-  options?: ResizeObserverOptions,
+  supported: boolean,
+  createObserver: () => {
+    disconnect: Fn
+    observe: (element: Element, options?: Options) => void
+  },
+  options?: Options,
 ): UseResizeObserverReturn => {
-  const isSupported = ref(
-    typeof window !== 'undefined' &&
-      typeof window.ResizeObserver === 'function',
-  )
-  let observer: ResizeObserver | undefined
+  const isSupported = ref(supported)
+  let observer: ReturnType<typeof createObserver> | undefined
   let stopWatch: WatchStopHandle | undefined
 
   const cleanup = () => {
@@ -274,7 +275,7 @@ export const useResizeObserver = (
     if (!isSupported.value) return
     const elements = toElements(target)
     if (elements.length === 0) return
-    observer = new ResizeObserver(callback)
+    observer = createObserver()
     for (const element of elements) observer.observe(element, options)
   }
 
@@ -298,53 +299,32 @@ export const useResizeObserver = (
     stop,
   }
 }
+
+export const useResizeObserver = (
+  target: MaybeElementRef | MaybeElementRef[],
+  callback: ResizeObserverCallback,
+  options?: ResizeObserverOptions,
+): UseResizeObserverReturn =>
+  useElementObserver(
+    target,
+    typeof window !== 'undefined' &&
+      typeof window.ResizeObserver === 'function',
+    () => new ResizeObserver(callback),
+    options,
+  )
 
 export const useMutationObserver = (
   target: MaybeElementRef | MaybeElementRef[],
   callback: MutationCallback,
   options?: MutationObserverInit,
-) => {
-  const isSupported = ref(
+) =>
+  useElementObserver(
+    target,
     typeof window !== 'undefined' &&
       typeof window.MutationObserver === 'function',
+    () => new MutationObserver(callback),
+    options,
   )
-  let observer: MutationObserver | undefined
-  let stopWatch: WatchStopHandle | undefined
-
-  const cleanup = () => {
-    observer?.disconnect()
-    observer = undefined
-  }
-
-  const observe = () => {
-    cleanup()
-    if (!isSupported.value) return
-    const elements = toElements(target)
-    if (elements.length === 0) return
-    observer = new MutationObserver(callback)
-    for (const element of elements) observer.observe(element, options)
-  }
-
-  if (isRef(target) || typeof target === 'function' || Array.isArray(target)) {
-    stopWatch = watch(() => toElements(target), observe, {
-      immediate: true,
-      flush: 'post',
-    })
-  } else {
-    observe()
-  }
-
-  const stop = () => {
-    cleanup()
-    stopWatch?.()
-  }
-  tryOnScopeDispose(stop)
-
-  return {
-    isSupported,
-    stop,
-  }
-}
 
 export const useTimeoutFn = <CallbackArgs extends unknown[]>(
   callback: (...args: CallbackArgs) => void,

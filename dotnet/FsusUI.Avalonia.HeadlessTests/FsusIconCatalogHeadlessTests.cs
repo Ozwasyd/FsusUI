@@ -132,7 +132,7 @@ public class FsusIconCatalogHeadlessTests
   {
     var application = Assert.IsType<HeadlessTestApplication>(Application.Current);
     var outputRoot = Path.Combine(
-      FindRepositoryRoot(),
+      HeadlessRepositoryRoot.FindByWorkspace(),
       "tests",
       "conformance",
       "visual",
@@ -172,7 +172,7 @@ public class FsusIconCatalogHeadlessTests
       item =>
       {
         Assert.True(
-          File.Exists(Path.Combine(FindRepositoryRoot(), item.File)),
+          File.Exists(Path.Combine(HeadlessRepositoryRoot.FindByWorkspace(), item.File)),
           $"{item.File} must be written as rendered evidence.");
         Assert.Equal(64, item.Sha256.Length);
         Assert.True(item.PixelWidth > 0);
@@ -351,7 +351,7 @@ public class FsusIconCatalogHeadlessTests
 
     window.Close();
 
-    var repositoryRoot = FindRepositoryRoot();
+    var repositoryRoot = HeadlessRepositoryRoot.FindByWorkspace();
     var icons = renderedIcons
       .Select(item => new IconPixelEvidence(
         item.IconKey!,
@@ -482,22 +482,6 @@ public class FsusIconCatalogHeadlessTests
     {
       Source = new Uri("avares://FsusUI.Avalonia.Themes/Themes/Controls/IconText.axaml"),
     });
-  }
-
-  private static string FindRepositoryRoot()
-  {
-    for (
-      var directory = new DirectoryInfo(AppContext.BaseDirectory);
-      directory is not null;
-      directory = directory.Parent)
-    {
-      if (File.Exists(Path.Combine(directory.FullName, "pnpm-workspace.yaml")))
-      {
-        return directory.FullName;
-      }
-    }
-
-    throw new DirectoryNotFoundException("Could not locate the FsusUI repository root.");
   }
 
   private sealed record CatalogVariant(

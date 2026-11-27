@@ -6,7 +6,8 @@ const productionExtensions = new Set(['.ts', '.tsx', '.vue'])
 const listProductionFiles = (directory) =>
   readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
     const absolute = path.join(directory, entry.name)
-    if (entry.isDirectory()) return listProductionFiles(absolute)
+    if (entry.isDirectory())
+      return entry.name === '__tests__' ? [] : listProductionFiles(absolute)
     if (
       !entry.isFile() ||
       !productionExtensions.has(path.extname(entry.name))

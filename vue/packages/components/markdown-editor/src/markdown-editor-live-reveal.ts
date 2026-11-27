@@ -1,12 +1,11 @@
 import {
-  createMarkdownEditorProjection,
-  stabilizeMarkdownEditorProjection,
   type MarkdownDocumentIdentity,
   type MarkdownStableProjection,
   type MarkdownStableSyntaxNode,
 } from '../../../wasm/markdown-runtime'
 
 import type { MarkdownEditorMode } from './markdown-editor-live-contract'
+import { resolveMarkdownEditorProjection } from './markdown-editor-syntax'
 import type { MarkdownEditorSelection } from './markdown-editor-transaction'
 
 export const MARKDOWN_LIVE_REVEAL_STATES = Object.freeze([
@@ -650,12 +649,11 @@ export const resolveMarkdownLiveSyntaxReveal = (input: {
   }
 
   const identity = input.documentIdentity ?? { epoch: 0, id: 'reveal' }
-  const projection =
-    input.projection ??
-    stabilizeMarkdownEditorProjection(
-      createMarkdownEditorProjection(input.source),
-      identity,
-    )
+  const projection = resolveMarkdownEditorProjection(
+    input.source,
+    identity,
+    input.projection,
+  )
   const candidates = collectCandidates(input.source, projection)
 
   if (input.intent === 'property-editor') {

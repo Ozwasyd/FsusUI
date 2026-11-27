@@ -1,14 +1,14 @@
 import {
-  createMarkdownEditorProjection,
-  stabilizeMarkdownEditorProjection,
   type MarkdownDocumentIdentity,
   type MarkdownStableProjection,
 } from '../../../wasm/markdown-runtime'
 
 import type { MarkdownEditorMode } from './markdown-editor-live-contract'
-import type {
-  MarkdownEditorSelection,
-  MarkdownEditorTransaction,
+import { resolveMarkdownEditorProjection } from './markdown-editor-syntax'
+import {
+  createMarkdownEditorInputTransaction,
+  type MarkdownEditorSelection,
+  type MarkdownEditorTransaction,
 } from './markdown-editor-transaction'
 
 export const MARKDOWN_PAIR_DEFAULTS = Object.freeze([
@@ -52,25 +52,6 @@ const OPEN_TO_CLOSE = new Map<string, string>(MARKDOWN_PAIR_DEFAULTS.map(([open,
 const CLOSE_TO_OPEN = new Map<string, string>(MARKDOWN_PAIR_DEFAULTS.map(([open, close]) => [close, open]))
 
 const isWordChar = (value: string) => /[0-9A-Za-z\u00c0-\u024f]/.test(value)
-
-const transactionOf = (
-  from: number,
-  to: number,
-  insert: string,
-  selectionStart: number,
-  selectionEnd = selectionStart,
-  direction: MarkdownEditorSelection['direction'] = 'none',
-): MarkdownEditorTransaction =>
-  Object.freeze({
-    changes: Object.freeze([{ from, to, insert }]),
-    history: 'separate' as const,
-    origin: 'input' as const,
-    selection: Object.freeze({
-      direction,
-      start: selectionStart,
-      end: selectionEnd,
-    }),
-  })
 
 const lineStartAt = (source: string, offset: number) =>
   source.lastIndexOf('\n', Math.max(0, offset - 1)) + 1
@@ -147,12 +128,11 @@ export const resolveMarkdownPairInput = (input: {
   }
 
   const identity = input.documentIdentity ?? { id: 'editor', epoch: 0 }
-  const projection =
-    input.projection ??
-    stabilizeMarkdownEditorProjection(
-      createMarkdownEditorProjection(source),
-      identity,
-    )
+  const projection = resolveMarkdownEditorProjection(
+    source,
+    identity,
+    input.projection,
+  )
 
   if (contextDisablesPairing(projection, start) || isEscaped(source, start)) {
     return Object.freeze({
@@ -168,7 +148,7 @@ export const resolveMarkdownPairInput = (input: {
     if (OPEN_TO_CLOSE.get(before) === after) {
       return Object.freeze({
         action: 'delete-pair' as const,
-        transaction: transactionOf(start - 1, start + 1, '', start - 1),
+        transaction: createMarkdownEditorInputTransaction(start - 1, start + 1, '', start - 1),
       })
     }
   }
@@ -188,7 +168,7 @@ export const resolveMarkdownPairInput = (input: {
   ) {
     return Object.freeze({
       action: 'insert-fence' as const,
-      transaction: transactionOf(start, end, '`\n\n```', start + 2),
+      transaction: createMarkdownEditorInputTransaction(start, end, '`\n\n```', start + 2),
     })
   }
 
@@ -202,7 +182,7 @@ export const resolveMarkdownPairInput = (input: {
     }
     return Object.freeze({
       action: 'insert-pair' as const,
-      transaction: transactionOf(start, end, '()', start + 1),
+      transaction: createMarkdownEditorInputTransaction(start, end, '()', start + 1),
     })
   }
 
@@ -226,7 +206,7 @@ export const resolveMarkdownPairInput = (input: {
   if (CLOSE_TO_OPEN.has(inserted) && collapsed && source[start] === inserted) {
     return Object.freeze({
       action: 'skip-close' as const,
-      transaction: transactionOf(start, start, '', start + 1),
+      transaction: createMarkdownEditorInputTransaction(start, start, '', start + 1),
     })
   }
 
@@ -236,7 +216,7 @@ export const resolveMarkdownPairInput = (input: {
       const selected = source.slice(start, end)
       return Object.freeze({
         action: 'wrap' as const,
-        transaction: transactionOf(
+        transaction: createMarkdownEditorInputTransaction(
           start,
           end,
           `${inserted}${selected}${close}`,
@@ -248,7 +228,7 @@ export const resolveMarkdownPairInput = (input: {
     }
     return Object.freeze({
       action: 'insert-pair' as const,
-      transaction: transactionOf(start, end, `${inserted}${close}`, start + 1),
+      transaction: createMarkdownEditorInputTransaction(start, end, `${inserted}${close}`, start + 1),
     })
   }
 

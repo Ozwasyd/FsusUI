@@ -98,7 +98,7 @@ public class FsusTreeRowPresenterHeadlessTests
 
       captures.Add(new
       {
-        path = HeadlessVisualEvidenceOutput.RecordPath(FindRepositoryRoot(), path),
+        path = HeadlessVisualEvidenceOutput.RecordPath(HeadlessRepositoryRoot.FindByWorkspace(), path),
         theme = theme.ToString().ToLowerInvariant(),
         density = "compact",
         zoomPercent = zoom,
@@ -363,20 +363,6 @@ public class FsusTreeRowPresenterHeadlessTests
     control.Measure(new Size(960, 480));
     control.Arrange(new Rect(0, 0, 960, 480));
     AvaloniaHeadlessPlatform.ForceRenderTimerTick();
-  }
-
-  private static string FindRepositoryRoot()
-  {
-    for (var directory = new DirectoryInfo(AppContext.BaseDirectory);
-      directory is not null;
-      directory = directory.Parent)
-    {
-      if (File.Exists(Path.Combine(directory.FullName, "pnpm-workspace.yaml")))
-      {
-        return directory.FullName;
-      }
-    }
-    throw new DirectoryNotFoundException("Could not locate the FsusUI repository root.");
   }
 
   private sealed record WorkspaceMetadata(

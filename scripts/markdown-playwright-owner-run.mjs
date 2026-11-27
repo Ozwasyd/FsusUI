@@ -1,6 +1,5 @@
 #!/usr/bin/env node
 
-import { pathToFileURL } from 'node:url'
 import { loadMarkdownOwnerPlan } from './markdown-playwright-plan.mjs'
 import {
   computeMarkdownCellRuntime,
@@ -12,16 +11,19 @@ import {
   verifyMarkdownOwnerReceipts,
 } from './markdown-playwright-verify.mjs'
 import {
-  buildDemoOnce,
   option,
-  runCellsWithConcurrency,
+  runDemoPreviewCells,
+  runPlaywrightCli,
   runPlaywrightOwner,
-  withSpawnedServer,
 } from './lib/playwright-owner-core.mjs'
 
 async function main(argv = process.argv.slice(2)) {
   const serverPort = Number(
-    option(argv, 'server-port', process.env.FSUS_MARKDOWN_EDITOR_PORT ?? '5191'),
+    option(
+      argv,
+      'server-port',
+      process.env.FSUS_MARKDOWN_EDITOR_PORT ?? '5191',
+    ),
   )
 
   await runPlaywrightOwner({
@@ -40,60 +42,20 @@ async function main(argv = process.argv.slice(2)) {
           )
         }
       }
-      buildDemoOnce()
-      const concurrency =
-        Number(process.env.FSUS_PLAYWRIGHT_CELL_CONCURRENCY) || 3
-      return withSpawnedServer(
-        {
-          command: 'pnpm',
-          args: [
-            '-C',
-            'vue/packages/demo-app',
-            'exec',
-            'vite',
-            'preview',
-            '--host',
-            '127.0.0.1',
-            '--port',
-            String(serverPort),
-            '--strictPort',
-          ],
-          serverUrl: `http://127.0.0.1:${serverPort}`,
-        },
-        () =>
-          runCellsWithConcurrency(cells, concurrency, (cell) =>
-            runMarkdownCell(ownerId, cell.id, group, {
-              evidenceDir,
-              externalServer: true,
-              precomputedRuntime: runtimeBySuite.get(cell.suiteId),
-              envOverrides: {
-                FSUS_MARKDOWN_EDITOR_PORT: String(serverPort),
-              },
-            }),
-          ),
+      return runDemoPreviewCells(serverPort, cells, (cell) =>
+        runMarkdownCell(ownerId, cell.id, group, {
+          evidenceDir,
+          externalServer: true,
+          precomputedRuntime: runtimeBySuite.get(cell.suiteId),
+          envOverrides: {
+            FSUS_MARKDOWN_EDITOR_PORT: String(serverPort),
+          },
+        }),
       )
     },
     loadReceipts: loadMarkdownReceiptsFromDirectory,
-    verifyReceipts: ({
-      ownerId,
-      group,
-      receipts,
-      selectedPlan,
-      evidenceDir,
-      commitSha,
-    }) =>
-      verifyMarkdownOwnerReceipts(ownerId, group, receipts, selectedPlan, {
-        evidenceDir,
-        expectedCommitSha: commitSha || undefined,
-      }),
+    verifyReceipts: verifyMarkdownOwnerReceipts,
   })
 }
 
-if (import.meta.url === pathToFileURL(process.argv[1] ?? '').href) {
-  try {
-    await main()
-  } catch (error) {
-    console.error(error instanceof Error ? error.message : error)
-    process.exitCode = 1
-  }
-}
+await runPlaywrightCli(import.meta.url, main)

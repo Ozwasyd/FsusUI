@@ -164,7 +164,7 @@ public class FsusCodeEditorHeadlessTests
   [AvaloniaFact]
   public void HeadlessSkiaRendersThemeAndViewMatrixAndWritesManifest()
   {
-    var root = FindRepositoryRoot();
+    var root = HeadlessRepositoryRoot.FindByWorkspace();
     var outputRoot = HeadlessVisualEvidenceOutput.ResolveOutputRoot(
       root,
       "issue-645-code-editor-render");
@@ -247,7 +247,7 @@ public class FsusCodeEditorHeadlessTests
   [AvaloniaFact]
   public void LocalAutomationAndCompositionSimulationWritesAccurateReceipt()
   {
-    var root = FindRepositoryRoot();
+    var root = HeadlessRepositoryRoot.FindByWorkspace();
     var editor = CreateEditor();
     editor.LoadDocument(new("automation", 1), Source);
     var window = Mount(editor, FsusThemeVariant.Light);
@@ -365,20 +365,6 @@ public class FsusCodeEditorHeadlessTests
     surface.Arrange(new Rect(0, 0, 760, 400));
     Dispatcher.UIThread.RunJobs();
     return window;
-  }
-
-  private static string FindRepositoryRoot()
-  {
-    for (var directory = new DirectoryInfo(AppContext.BaseDirectory);
-      directory is not null;
-      directory = directory.Parent)
-    {
-      if (File.Exists(Path.Combine(directory.FullName, "pnpm-workspace.yaml")))
-      {
-        return directory.FullName;
-      }
-    }
-    throw new DirectoryNotFoundException("Could not locate the FsusUI repository root.");
   }
 
   private sealed record RenderCapture(

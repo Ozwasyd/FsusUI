@@ -1,13 +1,12 @@
 #!/usr/bin/env node
 
-import { pathToFileURL } from 'node:url'
 import { loadConformanceOwnerPlan } from './conformance-playwright-plan.mjs'
 import { validateConformanceReceipt } from './conformance-playwright-runner.mjs'
 import { verifyMarkdownOwnerReceipts } from './markdown-playwright-verify.mjs'
 import {
   loadReceiptsFromDirectory,
-  option,
   runOwnerVerifyCli,
+  runPlaywrightCli,
 } from './lib/playwright-owner-core.mjs'
 
 export const loadConformanceReceiptsFromDirectory = (directory) =>
@@ -62,24 +61,15 @@ export async function verifyConformanceOwnerReceipts(
   return { summary, failed }
 }
 
-if (import.meta.url === pathToFileURL(process.argv[1] ?? '').href) {
-  try {
-    await runOwnerVerifyCli({
-      usage:
-        'Usage: conformance-playwright-verify.mjs --receipts-dir <dir> [--owner <id>] [--group <g>]',
-      defaultOwnerId: 'playwright-conformance',
-      requireSubcommand: false,
-      logPrefix: 'playwright-conformance',
-      loadPlan: (group) => loadConformanceOwnerPlan(group),
-      loadReceipts: loadConformanceReceiptsFromDirectory,
-      verifyReceipts: (ownerId, group, receipts, plan, argv) =>
-        verifyConformanceOwnerReceipts(ownerId, group, receipts, plan, {
-          evidenceDir: option(argv, 'evidence-dir'),
-          expectedCommitSha: option(argv, 'commit-sha'),
-        }),
-    })
-  } catch (error) {
-    console.error(error instanceof Error ? error.message : error)
-    process.exitCode = 1
-  }
-}
+await runPlaywrightCli(import.meta.url, () =>
+  runOwnerVerifyCli({
+    usage:
+      'Usage: conformance-playwright-verify.mjs --receipts-dir <dir> [--owner <id>] [--group <g>]',
+    defaultOwnerId: 'playwright-conformance',
+    requireSubcommand: false,
+    logPrefix: 'playwright-conformance',
+    loadPlan: (group) => loadConformanceOwnerPlan(group),
+    loadReceipts: loadConformanceReceiptsFromDirectory,
+    verifyReceipts: verifyConformanceOwnerReceipts,
+  }),
+)

@@ -1,15 +1,18 @@
 import {
-  createMarkdownEditorProjection,
   createMarkdownSourceCoordinateMap,
-  stabilizeMarkdownEditorProjection,
   type MarkdownDocumentIdentity,
   type MarkdownStableProjection,
   type MarkdownStableSyntaxNode,
 } from '../../../wasm/markdown-runtime'
 
-import type {
-  MarkdownEditorSelection,
-  MarkdownEditorTransaction,
+import {
+  findNarrowestMarkdownSyntaxNode,
+  resolveMarkdownEditorProjection,
+} from './markdown-editor-syntax'
+import {
+  createMarkdownEditorInputTransaction,
+  type MarkdownEditorSelection,
+  type MarkdownEditorTransaction,
 } from './markdown-editor-transaction'
 
 export type MarkdownBlockInputKey =
@@ -190,24 +193,6 @@ const mapContextKind = (kind: string): MarkdownBlockInputContextKind => {
   return 'ordinary'
 }
 
-const smallestContainingNode = (
-  nodes: readonly MarkdownStableSyntaxNode[],
-  offset: number,
-) => {
-  const containing = nodes.filter(
-    (node) => node.rawRange.start <= offset && offset <= node.rawRange.end,
-  )
-  if (containing.length === 0) return null
-  return [...containing].sort((left, right) => {
-    const span =
-      left.rawRange.end -
-      left.rawRange.start -
-      (right.rawRange.end - right.rawRange.start)
-    if (span !== 0) return span
-    return left.id.localeCompare(right.id)
-  })[0]!
-}
-
 const listMarkerOf = (line: string, kind: 'list' | 'task') => {
   let index = 0
   while (line[index] === ' ' || line[index] === '\t') index += 1
@@ -264,25 +249,6 @@ const quotePrefixOf = (line: string) => {
   return { prefix, contentStart: prefix.length }
 }
 
-const transactionOf = (
-  from: number,
-  to: number,
-  insert: string,
-  selectionStart: number,
-  selectionEnd = selectionStart,
-  direction: MarkdownEditorSelection['direction'] = 'none',
-): MarkdownEditorTransaction =>
-  Object.freeze({
-    changes: Object.freeze([{ from, to, insert }]),
-    history: 'separate' as const,
-    origin: 'input' as const,
-    selection: Object.freeze({
-      direction,
-      start: selectionStart,
-      end: selectionEnd,
-    }),
-  })
-
 const contentStartOf = (
   source: string,
   offset: number,
@@ -335,7 +301,11 @@ export const resolveMarkdownBlockInputContext = (input: {
   readonly kind: MarkdownBlockInputContextKind
   readonly node: MarkdownStableSyntaxNode | null
 } => {
-  const node = smallestContainingNode(input.projection.nodes, input.offset)
+  const { offset, projection } = input
+  const node = findNarrowestMarkdownSyntaxNode(
+    projection.nodes,
+    (node) => node.rawRange.start <= offset && offset <= node.rawRange.end,
+  )
   if (!node) return { kind: 'ordinary', node: null }
   return { kind: mapContextKind(node.kind), node }
 }
@@ -349,11 +319,11 @@ const deleteGrapheme = (
   if (direction === 'backward') {
     if (offset <= 0) return null
     const boundary = map.graphemeBoundaryAt(offset - 1)
-    return transactionOf(boundary.start, offset, '', boundary.start)
+    return createMarkdownEditorInputTransaction(boundary.start, offset, '', boundary.start)
   }
   if (offset >= source.length) return null
   const boundary = map.graphemeBoundaryAt(offset)
-  return transactionOf(offset, boundary.end, '', offset)
+  return createMarkdownEditorInputTransaction(offset, boundary.end, '', offset)
 }
 
 const mergeAcross = (
@@ -366,14 +336,14 @@ const mergeAcross = (
     const previous = source[offset - 1] === '\n' ? offset - 1 : offset
     const from = source[previous - 1] === '\r' ? previous - 1 : previous
     if (source[from] !== '\n' && source[from] !== '\r') return null
-    return transactionOf(from, offset, '', from)
+    return createMarkdownEditorInputTransaction(from, offset, '', from)
   }
   if (offset >= source.length) return null
   let to = offset
   if (source[to] === '\r') to += 1
   if (source[to] === '\n') to += 1
   if (to === offset) return null
-  return transactionOf(offset, to, '', offset)
+  return createMarkdownEditorInputTransaction(offset, to, '', offset)
 }
 
 const indentLines = (
@@ -407,7 +377,7 @@ const indentLines = (
     walked += line.length + 1
     return removable > 0 ? line.slice(removable) : line
   })
-  return transactionOf(
+  return createMarkdownEditorInputTransaction(
     blockStart,
     blockEnd,
     next.join('\n'),
@@ -425,12 +395,12 @@ const planListEnter = (
   const line = lineBoundsAt(source, caret)
   const text = source.slice(line.start, line.end)
   const marker = listMarkerOf(text, kind)
-  if (!marker) return { action: 'insert-break' as const, transaction: transactionOf(caret, caret, '\n', caret + 1) }
+  if (!marker) return { action: 'insert-break' as const, transaction: createMarkdownEditorInputTransaction(caret, caret, '\n', caret + 1) }
   const content = text.slice(marker.contentStart)
   if (!content.trim()) {
     return {
       action: 'exit-list' as const,
-      transaction: transactionOf(
+      transaction: createMarkdownEditorInputTransaction(
         line.start,
         caret,
         marker.indent,
@@ -445,7 +415,7 @@ const planListEnter = (
       : marker.prefix
   return {
     action: 'continue-list' as const,
-    transaction: transactionOf(caret, caret, `\n${nextPrefix}`, caret + 1 + nextPrefix.length),
+    transaction: createMarkdownEditorInputTransaction(caret, caret, `\n${nextPrefix}`, caret + 1 + nextPrefix.length),
   }
 }
 
@@ -453,17 +423,17 @@ const planQuoteEnter = (source: string, caret: number) => {
   const line = lineBoundsAt(source, caret)
   const text = source.slice(line.start, line.end)
   const quote = quotePrefixOf(text)
-  if (!quote) return { action: 'insert-break' as const, transaction: transactionOf(caret, caret, '\n', caret + 1) }
+  if (!quote) return { action: 'insert-break' as const, transaction: createMarkdownEditorInputTransaction(caret, caret, '\n', caret + 1) }
   const content = text.slice(quote.contentStart)
   if (!content.trim()) {
     return {
       action: 'exit-quote' as const,
-      transaction: transactionOf(line.start, caret, '', line.start),
+      transaction: createMarkdownEditorInputTransaction(line.start, caret, '', line.start),
     }
   }
   return {
     action: 'continue-quote' as const,
-    transaction: transactionOf(
+    transaction: createMarkdownEditorInputTransaction(
       caret,
       caret,
       `\n${quote.prefix}`,
@@ -482,11 +452,11 @@ const planStripMarker = (
   if (kind === 'quote') {
     const quote = quotePrefixOf(text)
     if (!quote || caret !== line.start + quote.contentStart) return null
-    return transactionOf(line.start, line.start + quote.contentStart, '', line.start)
+    return createMarkdownEditorInputTransaction(line.start, line.start + quote.contentStart, '', line.start)
   }
   const marker = listMarkerOf(text, kind)
   if (!marker || caret !== line.start + marker.contentStart) return null
-  return transactionOf(line.start, line.start + marker.contentStart, marker.indent, line.start + marker.indent.length)
+  return createMarkdownEditorInputTransaction(line.start, line.start + marker.contentStart, marker.indent, line.start + marker.indent.length)
 }
 
 export const resolveMarkdownBlockInputIntent = (input: {
@@ -503,12 +473,7 @@ export const resolveMarkdownBlockInputIntent = (input: {
   const caret = selection.start
   const collapsed = selection.start === selection.end
   const identity = input.documentIdentity ?? { id: 'editor', epoch: 0 }
-  const projection =
-    input.projection ??
-    stabilizeMarkdownEditorProjection(
-      createMarkdownEditorProjection(source),
-      identity,
-    )
+  const projection = resolveMarkdownEditorProjection(source, identity, input.projection)
   const context = resolveMarkdownBlockInputContext({
     source,
     offset: caret,
@@ -558,12 +523,12 @@ export const resolveMarkdownBlockInputIntent = (input: {
     if (input.key === 'enter' || input.key === 'shift-enter') {
       return finish(
         'insert-break',
-        transactionOf(selection.start, selection.end, '\n', selection.start + 1),
+        createMarkdownEditorInputTransaction(selection.start, selection.end, '\n', selection.start + 1),
       )
     }
     return finish(
       input.key === 'backspace' ? 'delete-backward' : 'delete-forward',
-      transactionOf(selection.start, selection.end, '', selection.start),
+      createMarkdownEditorInputTransaction(selection.start, selection.end, '', selection.start),
     )
   }
 
@@ -587,7 +552,7 @@ export const resolveMarkdownBlockInputIntent = (input: {
     return finish(action, indentLines(source, selection, true))
   }
   if (action === 'insert-spaces') {
-    return finish(action, transactionOf(caret, caret, '  ', caret + 2))
+    return finish(action, createMarkdownEditorInputTransaction(caret, caret, '  ', caret + 2))
   }
   if (action === 'passthrough-tab' || action === 'noop') {
     return finish(action, null)
@@ -605,7 +570,7 @@ export const resolveMarkdownBlockInputIntent = (input: {
     return finish(action, planned.transaction)
   }
   if (action === 'insert-break') {
-    return finish(action, transactionOf(caret, caret, '\n', caret + 1))
+    return finish(action, createMarkdownEditorInputTransaction(caret, caret, '\n', caret + 1))
   }
   if (action === 'strip-marker') {
     const stripped = planStripMarker(
@@ -643,7 +608,7 @@ export const evaluateMarkdownBlockInputMutations = (source = '```\n- not a list\
   )
   const regexThinksList = /^(\s*)([-*+])\s+/.test(line)
   const regexTransaction = regexThinksList
-    ? transactionOf(
+    ? createMarkdownEditorInputTransaction(
         source.indexOf('-') + 12,
         source.indexOf('-') + 12,
         '\n- ',
