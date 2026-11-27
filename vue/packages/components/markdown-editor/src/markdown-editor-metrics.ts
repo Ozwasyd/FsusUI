@@ -65,21 +65,26 @@ const caretOffset = (source: string, selection?: MarkdownEditorMetricsSelection)
   return selection.direction === 'backward' ? start : end
 }
 
-const lineStartsInRaw = (raw: string) => {
-  const starts = [0]
-  for (let index = 0; index < raw.length; index += 1) {
-    if (raw[index] === '\n') {
-      starts.push(index + 1)
-      continue
+const scanLineStarts = (
+  source: string,
+  starts: number[],
+  from = 0,
+  to = source.length,
+) => {
+  for (let index = from; index < to; index += 1) {
+    const character = source[index]
+    if (character !== '\r' && character !== '\n') continue
+    if (character === '\r' && source[index + 1] === '\n') {
+      // A CRLF straddling this window ends outside the scan.
+      if (index + 1 === to) break
+      index += 1
     }
-    if (raw[index] === '\r') {
-      const next = raw[index + 1] === '\n' ? index + 2 : index + 1
-      starts.push(next)
-      if (raw[index + 1] === '\n') index += 1
-    }
+    starts.push(index + 1)
   }
   return starts
 }
+
+const lineStartsInRaw = (source: string) => scanLineStarts(source, [0])
 
 const lineColumnAt = (starts: readonly number[], offset: number) => {
   let low = 0
@@ -205,26 +210,6 @@ const isUsableIncrementalChange = (
   return prefixMatches && suffixMatches
 }
 
-const newlineEndsInRaw = (raw: string, base: number, source: string) => {
-  const starts: number[] = []
-  for (let index = 0; index < raw.length; index += 1) {
-    if (raw[index] === '\n') {
-      starts.push(base + index + 1)
-      continue
-    }
-    if (raw[index] === '\r') {
-      if (
-        index + 1 === raw.length &&
-        source[base + index + 1] === '\n'
-      ) continue
-      const next = raw[index + 1] === '\n' ? index + 2 : index + 1
-      starts.push(base + next)
-      if (raw[index + 1] === '\n') index += 1
-    }
-  }
-  return starts
-}
-
 const updateLineStarts = (
   previous: readonly number[],
   oldSource: string,
@@ -240,11 +225,7 @@ const updateLineStarts = (
   )
   const starts = [
     ...previous.filter((start) => start <= scanStart),
-    ...newlineEndsInRaw(
-      nextSource.slice(scanStart, newScanEnd),
-      scanStart,
-      nextSource,
-    ),
+    ...scanLineStarts(nextSource, [], scanStart, newScanEnd),
     ...previous
       .filter((start) => start > oldScanEnd)
       .map((start) => start + delta),

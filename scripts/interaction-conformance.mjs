@@ -4,7 +4,11 @@ import path from 'node:path'
 import process from 'node:process'
 import { execFileSync } from 'node:child_process'
 import { fileURLToPath } from 'node:url'
-import { format, resolveConfig } from 'prettier'
+import { createArtifactFormatter } from './lib/format-generated-artifacts.mjs'
+import {
+  checkGeneratedArtifacts,
+  writeGeneratedArtifacts,
+} from './lib/generated-artifacts.mjs'
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const generatedHeader =
@@ -185,15 +189,9 @@ const validateScenario = (scenario) => {
 
 const readScenarios = () => scenarioFiles.flatMap(parseScenarioFile)
 
-const prettierConfig = await resolveConfig(path.join(root, 'package.json'))
-
-const formatGeneratedContent = async (relativePath, content) => {
-  if (!/\.(json|mjs|ts)$/.test(relativePath)) return content
-  return format(content, {
-    ...(prettierConfig ?? {}),
-    filepath: path.join(root, relativePath),
-  })
-}
+const formatArtifacts = await createArtifactFormatter(root, (relativePath) =>
+  /\.(json|mjs|ts)$/.test(relativePath),
+)
 
 const renderTraces = (scenarios) =>
   `${JSON.stringify(
@@ -232,49 +230,17 @@ assert.equal(traces.coveragePolicy, 'planning-only-not-executable-coverage')
 
 `
 
-const renderAll = async () => {
+const renderAll = () => {
   const scenarios = readScenarios()
   runInvalidFixtures()
-  const files = {
+  return {
     [outputPaths.traces]: renderTraces(scenarios),
     [outputPaths.runner]: renderRunner(),
-  }
-  return Object.fromEntries(
-    await Promise.all(
-      Object.entries(files).map(async ([relativePath, content]) => [
-        relativePath,
-        await formatGeneratedContent(relativePath, content),
-      ]),
-    ),
-  )
-}
-
-const writeFiles = (files) => {
-  for (const [relativePath, content] of Object.entries(files)) {
-    const absolutePath = path.join(root, relativePath)
-    fs.mkdirSync(path.dirname(absolutePath), { recursive: true })
-    fs.writeFileSync(absolutePath, content)
-    console.log(`wrote ${relativePath}`)
   }
 }
 
 const checkFiles = (files) => {
-  const failures = []
-  for (const [relativePath, expected] of Object.entries(files)) {
-    const absolutePath = path.join(root, relativePath)
-    if (!fs.existsSync(absolutePath)) {
-      failures.push(`${relativePath} is missing`)
-      continue
-    }
-    if (fs.readFileSync(absolutePath, 'utf8') !== expected) {
-      failures.push(`${relativePath} is stale`)
-    }
-  }
-  if (failures.length > 0) {
-    throw new Error(
-      `Interaction conformance artifacts are not current:\n${failures.join('\n')}`,
-    )
-  }
+  checkGeneratedArtifacts(root, files, 'Interaction conformance')
   execFileSync(process.execPath, [path.join(root, outputPaths.runner)], {
     cwd: root,
     stdio: 'inherit',
@@ -302,8 +268,8 @@ const runInvalidFixtures = () => {
 const command = process.argv[2] ?? 'check'
 
 try {
-  const files = await renderAll()
-  if (command === 'generate') writeFiles(files)
+  const files = await formatArtifacts(renderAll())
+  if (command === 'generate') writeGeneratedArtifacts(root, files)
   else if (command === 'check') checkFiles(files)
   else
     throw new Error(

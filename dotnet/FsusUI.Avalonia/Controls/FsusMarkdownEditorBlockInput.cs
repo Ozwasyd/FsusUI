@@ -1,4 +1,5 @@
 using System.Globalization;
+using static FsusUI.Avalonia.Controls.FsusMarkdownInputHelpers;
 
 namespace FsusUI.Avalonia.Controls;
 
@@ -210,19 +211,6 @@ public static class FsusMarkdownEditorBlockInput
       .First();
   }
 
-  private static (int Start, int End) LineBoundsAt(string source, int offset)
-  {
-    var start = 0;
-    if (source.Length > 0)
-    {
-      var probe = Math.Clamp(offset - 1, 0, source.Length - 1);
-      start = source.LastIndexOf('\n', probe) + 1;
-    }
-    var newline = source.IndexOf('\n', Math.Clamp(offset, 0, source.Length));
-    var end = newline == -1 ? source.Length : newline;
-    return (start, end);
-  }
-
   private static int LineBoundsContentStart(int indentLength, int parsedEnd, string line) =>
     Math.Min(Math.Max(indentLength, parsedEnd), line.Length);
 
@@ -385,22 +373,6 @@ public static class FsusMarkdownEditorBlockInput
     }
     return "middle";
   }
-
-  private static FsusMarkdownEditorTransaction TransactionOf(
-    int from,
-    int to,
-    string insert,
-    int selectionStart,
-    int? selectionEnd = null,
-    string direction = "none") =>
-    new(
-      [new FsusMarkdownEditorChange(from, to, insert)],
-      History: "separate",
-      Origin: "input",
-      Selection: new FsusMarkdownEditorSelection(
-        selectionStart,
-        selectionEnd ?? selectionStart,
-        direction));
 
   private static FsusMarkdownEditorTransaction? DeleteGrapheme(
     string source,

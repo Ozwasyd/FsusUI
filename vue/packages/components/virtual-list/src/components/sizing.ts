@@ -68,7 +68,12 @@ export const getFixedStopIndex = (
 }
 
 type MeasuredItems = Record<string, ListItem>
-type GetMeasuredItem = (index: number) => ListItem
+type GetMeasuredItem<Props, Cache, Axis> = (
+  props: Props,
+  index: number,
+  cache: Cache,
+  axis: Axis,
+) => ListItem
 
 const getMeasuredEnd = (items: MeasuredItems, index: number) => {
   if (index >= 0) {
@@ -101,56 +106,69 @@ export const getEstimatedAxisSize = (
   getMeasuredEnd(items, lastVisitedIndex) +
   (total - lastVisitedIndex - 1) * estimatedItemSize
 
-export const findVariableStartIndex = (
-  items: MeasuredItems,
-  getItem: GetMeasuredItem,
-  lastVisitedIndex: number,
-  total: number,
-  offset: number,
+export const createVariableSizeSearch = <Props, Cache, Axis>(
+  getItem: GetMeasuredItem<Props, Cache, Axis>,
   treatUnorderedOffsetAsGreater = false,
 ) => {
-  const lastVisitedOffset =
-    lastVisitedIndex > 0 ? items[lastVisitedIndex].offset : 0
-  let low = 0
-  let high = lastVisitedIndex
+  const findVariableStartIndex = (
+    items: MeasuredItems,
+    lastVisitedIndex: number,
+    total: number,
+    offset: number,
+    props: Props,
+    cache: Cache,
+    axis: Axis,
+  ) => {
+    const lastVisitedOffset =
+      lastVisitedIndex > 0 ? items[lastVisitedIndex].offset : 0
+    let low = 0
+    let high = lastVisitedIndex
 
-  if (!(lastVisitedOffset >= offset)) {
-    let index = Math.max(0, lastVisitedIndex)
-    let step = 1
-    while (index < total && getItem(index).offset < offset) {
-      index += step
-      step *= 2
+    if (!(lastVisitedOffset >= offset)) {
+      let index = Math.max(0, lastVisitedIndex)
+      let step = 1
+      while (
+        index < total &&
+        getItem(props, index, cache, axis).offset < offset
+      ) {
+        index += step
+        step *= 2
+      }
+      low = Math.floor(index / 2)
+      high = Math.min(index, total - 1)
     }
-    low = Math.floor(index / 2)
-    high = Math.min(index, total - 1)
-  }
 
-  while (low <= high) {
-    const mid = low + Math.floor((high - low) / 2)
-    const currentOffset = getItem(mid).offset
-    if (currentOffset === offset) return mid
-    if (currentOffset < offset) {
-      low = mid + 1
-    } else if (treatUnorderedOffsetAsGreater || currentOffset > offset) {
-      high = mid - 1
+    while (low <= high) {
+      const mid = low + Math.floor((high - low) / 2)
+      const currentOffset = getItem(props, mid, cache, axis).offset
+      if (currentOffset === offset) return mid
+      if (currentOffset < offset) {
+        low = mid + 1
+      } else if (treatUnorderedOffsetAsGreater || currentOffset > offset) {
+        high = mid - 1
+      }
     }
+
+    return Math.max(0, low - 1)
   }
 
-  return Math.max(0, low - 1)
-}
-
-export const getVariableStopIndex = (
-  total: number,
-  startIndex: number,
-  startItemEnd: number,
-  maxOffset: number,
-  getItem: GetMeasuredItem,
-) => {
-  let stopIndex = startIndex
-  let offset = startItemEnd
-  while (stopIndex < total - 1 && offset < maxOffset) {
-    stopIndex++
-    offset += getItem(stopIndex).size
+  const getVariableStopIndex = (
+    total: number,
+    startIndex: number,
+    startItemEnd: number,
+    maxOffset: number,
+    props: Props,
+    cache: Cache,
+    axis: Axis,
+  ) => {
+    let stopIndex = startIndex
+    let offset = startItemEnd
+    while (stopIndex < total - 1 && offset < maxOffset) {
+      stopIndex++
+      offset += getItem(props, stopIndex, cache, axis).size
+    }
+    return stopIndex
   }
-  return stopIndex
+
+  return { findVariableStartIndex, getVariableStopIndex }
 }

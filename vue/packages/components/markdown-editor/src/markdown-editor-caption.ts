@@ -4,6 +4,10 @@ import {
   type MarkdownCaptionValidNode,
 } from '../../../wasm/markdown-caption-directive'
 import { renderMarkdownCaptionFigure } from '../../../wasm/markdown-caption-renderer'
+import {
+  freezeMarkdownCommandEdit,
+  freezeMarkdownCommandTransaction,
+} from './markdown-editor-command-edit'
 import type { MarkdownEditorTransaction } from './markdown-editor-transaction'
 
 export interface MarkdownFigure {
@@ -52,19 +56,11 @@ export const planMarkdownCaptionInsert = (
 ): MarkdownEditorTransaction => {
   const insertOffset = mediaRange.end
   const escaped = escapeCaptionText(captionText)
-  const insertText = `\n::caption[${escaped}]`
-
-  return Object.freeze({
-    changes: Object.freeze([
-      Object.freeze({
-        from: insertOffset,
-        to: insertOffset,
-        insert: insertText,
-      }),
-    ]),
-    history: 'separate',
-    origin: 'command',
-  })
+  return freezeMarkdownCommandEdit(
+    insertOffset,
+    insertOffset,
+    `\n::caption[${escaped}]`,
+  )
 }
 
 export const planMarkdownCaptionEdit = (
@@ -73,17 +69,11 @@ export const planMarkdownCaptionEdit = (
   newText: string,
 ): MarkdownEditorTransaction => {
   const escaped = escapeCaptionText(newText)
-  return Object.freeze({
-    changes: Object.freeze([
-      Object.freeze({
-        from: captionNode.ranges.text.start,
-        to: captionNode.ranges.text.end,
-        insert: escaped,
-      }),
-    ]),
-    history: 'separate',
-    origin: 'command',
-  })
+  return freezeMarkdownCommandEdit(
+    captionNode.ranges.text.start,
+    captionNode.ranges.text.end,
+    escaped,
+  )
 }
 
 export const planMarkdownCaptionRemove = (
@@ -98,19 +88,7 @@ export const planMarkdownCaptionRemove = (
       from -= 1
     }
   }
-  const to = captionNode.ranges.full.end
-
-  return Object.freeze({
-    changes: Object.freeze([
-      Object.freeze({
-        from,
-        to,
-        insert: '',
-      }),
-    ]),
-    history: 'separate',
-    origin: 'command',
-  })
+  return freezeMarkdownCommandEdit(from, captionNode.ranges.full.end, '')
 }
 
 export const planMarkdownFigureDelete = (
@@ -134,17 +112,7 @@ export const planMarkdownFigureDelete = (
     to += 2
   }
 
-  return Object.freeze({
-    changes: Object.freeze([
-      Object.freeze({
-        from,
-        to,
-        insert: '',
-      }),
-    ]),
-    history: 'separate',
-    origin: 'command',
-  })
+  return freezeMarkdownCommandEdit(from, to, '')
 }
 
 export const planMarkdownFigureMove = (
@@ -160,40 +128,19 @@ export const planMarkdownFigureMove = (
   const figureText = source.slice(from, to)
 
   if (targetOffset >= from && targetOffset <= to) {
-    return Object.freeze({
-      changes: Object.freeze([]),
-      history: 'separate',
-      origin: 'command',
-    })
+    return freezeMarkdownCommandTransaction([])
   }
 
-  if (targetOffset < from) {
-    return Object.freeze({
-      changes: Object.freeze([
-        Object.freeze({
-          from: targetOffset,
-          to: targetOffset,
-          insert: `${figureText}\n`,
-        }),
-        Object.freeze({ from, to, insert: '' }),
-      ]),
-      history: 'separate',
-      origin: 'command',
-    })
-  }
-
-  return Object.freeze({
-    changes: Object.freeze([
-      Object.freeze({ from, to, insert: '' }),
-      Object.freeze({
-        from: targetOffset,
-        to: targetOffset,
-        insert: `\n${figureText}`,
-      }),
-    ]),
-    history: 'separate',
-    origin: 'command',
+  const movingEarlier = targetOffset < from
+  const removal = Object.freeze({ from, to, insert: '' })
+  const insertion = Object.freeze({
+    from: targetOffset,
+    to: targetOffset,
+    insert: movingEarlier ? `${figureText}\n` : `\n${figureText}`,
   })
+  return freezeMarkdownCommandTransaction(
+    movingEarlier ? [insertion, removal] : [removal, insertion],
+  )
 }
 
 export const planMarkdownFigureCut = (

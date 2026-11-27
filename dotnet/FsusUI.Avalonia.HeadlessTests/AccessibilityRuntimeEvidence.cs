@@ -87,6 +87,9 @@ internal static class AccessibilityRuntimeEvidence
     var runnerHash = CombinedFileHash(
       repositoryRoot,
       GeneratorPath,
+      "scripts/lib/format-generated-artifacts.mjs",
+      "scripts/lib/generated-artifacts.mjs",
+      "scripts/lib/platform-overrides.mjs",
       GeneratedTestPath,
       RuntimeHelperPath,
       RuntimeScenariosPath,

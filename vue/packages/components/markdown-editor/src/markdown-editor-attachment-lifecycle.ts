@@ -7,6 +7,7 @@ import type {
   MarkdownAttachmentRange,
 } from './markdown-editor-attachment'
 import { commitMarkdownAttachmentResult } from './markdown-editor-attachment'
+import { freezeMarkdownCommandEdit } from './markdown-editor-command-edit'
 import type {
   MarkdownEditorChange,
   MarkdownEditorTransaction,
@@ -112,17 +113,11 @@ export const planMarkdownAttachmentInsert = (
   }
 
   const inserted = pieces.join('')
-  const transaction: MarkdownEditorTransaction = Object.freeze({
-    changes: Object.freeze([
-      Object.freeze({
-        from: anchor.range.start,
-        to: anchor.range.end,
-        insert: inserted,
-      }),
-    ]),
-    history: 'separate',
-    origin: 'command',
-  })
+  const transaction = freezeMarkdownCommandEdit(
+    anchor.range.start,
+    anchor.range.end,
+    inserted,
+  )
 
   return Object.freeze({
     transaction,
@@ -218,17 +213,11 @@ export const planMarkdownAttachmentResolve = (
     return Object.freeze({ accepted: false, status: 'deleted' as const })
   }
 
-  const transaction: MarkdownEditorTransaction = Object.freeze({
-    changes: Object.freeze([
-      Object.freeze({
-        from: job.range.start,
-        to: job.range.end,
-        insert: committed.markdown,
-      }),
-    ]),
-    history: 'separate',
-    origin: 'command',
-  })
+  const transaction = freezeMarkdownCommandEdit(
+    job.range.start,
+    job.range.end,
+    committed.markdown,
+  )
 
   job.phase = 'resolved'
   job.progress = 100
@@ -258,17 +247,7 @@ export const planMarkdownAttachmentRemove = (
   job.range = Object.freeze({ start: from, end: from })
 
   return Object.freeze({
-    transaction: Object.freeze({
-      changes: Object.freeze([
-        Object.freeze({
-          from,
-          to,
-          insert: '',
-        }),
-      ]),
-      history: 'separate',
-      origin: 'command',
-    }),
+    transaction: freezeMarkdownCommandEdit(from, to, ''),
   })
 }
 

@@ -349,49 +349,54 @@ public class FsusDropZone : ContentControl
 
   public void HandleDrop(IEnumerable<IStorageItem> items)
   {
-    if (CanHandleDrop())
-    {
-      ProcessDrop(
-        items?.ToList() ?? [], IsItemAccepted, item => item.Name, CreateStorageDropEventArgs);
-    }
+    if (items is null or IStorageItem[] { Length: 0 } || !CanHandleDrop())
+      return;
+
+    var itemList = items.ToList();
+    if (itemList.Count == 0)
+      return;
+
+    ResetDropResult();
+    var accepted = new List<IStorageItem>();
+    var rejected = new List<IStorageItem>();
+    foreach (var item in itemList)
+      (IsItemAccepted(item) ? accepted : rejected).Add(item);
+
+    CompleteDrop(
+      accepted, rejected, static item => item.Name,
+      static (zone, routedEvent, valid, invalid) =>
+        zone.CreateStorageDropEventArgs(routedEvent, valid, invalid));
   }
 
   public void HandleDrop(IEnumerable<string> filePaths)
   {
-    if (CanHandleDrop())
-    {
-      ProcessDrop(
-        (filePaths ?? []).Where(path => !string.IsNullOrWhiteSpace(path)).ToList(),
-        IsPathAccepted,
-        System.IO.Path.GetFileName,
-        (routedEvent, accepted, rejected) => new FsusFileDropEventArgs(
-          routedEvent, this, accepted.AsReadOnly(), rejected.AsReadOnly()));
-    }
+    if (filePaths is null or string[] { Length: 0 } || !CanHandleDrop())
+      return;
+
+    var pathList = filePaths.Where(path => !string.IsNullOrWhiteSpace(path)).ToList();
+    if (pathList.Count == 0)
+      return;
+
+    ResetDropResult();
+    var accepted = new List<string>();
+    var rejected = new List<string>();
+    foreach (var path in pathList)
+      (IsPathAccepted(path) ? accepted : rejected).Add(path);
+
+    CompleteDrop(
+      accepted, rejected, System.IO.Path.GetFileName,
+      static (zone, routedEvent, valid, invalid) => new FsusFileDropEventArgs(
+        routedEvent, zone, valid.AsReadOnly(), invalid.AsReadOnly()));
   }
 
   private bool CanHandleDrop() => !IsDisabled && IsEnabled && !IsLoading;
 
-  private void ProcessDrop<T>(
-    List<T> items,
-    Func<T, bool> accepts,
+  private void CompleteDrop<T>(
+    List<T> accepted,
+    List<T> rejected,
     Func<T, string?> getName,
-    Func<RoutedEvent<FsusFileDropEventArgs>, List<T>, List<T>, FsusFileDropEventArgs> createArgs)
+    Func<FsusDropZone, RoutedEvent<FsusFileDropEventArgs>, List<T>, List<T>, FsusFileDropEventArgs> createArgs)
   {
-    if (items.Count == 0)
-    {
-      return;
-    }
-
-    ResetDropResult();
-
-    var accepted = new List<T>();
-    var rejected = new List<T>();
-
-    foreach (var item in items)
-    {
-      (accepts(item) ? accepted : rejected).Add(item);
-    }
-
     if (!AllowMultiple && accepted.Count > 1)
     {
       for (var index = 1; index < accepted.Count; index++)
@@ -413,12 +418,12 @@ public class FsusDropZone : ContentControl
         FilterErrorMessage = $"Files [{rejectedNames}] were rejected. Accepted formats: {Accepts ?? "All"}.";
       }
 
-      RaiseEvent(createArgs(FilesRejectedEvent, accepted, rejected));
+      RaiseEvent(createArgs(this, FilesRejectedEvent, accepted, rejected));
     }
 
     if (accepted.Count > 0)
     {
-      RaiseEvent(createArgs(FilesDroppedEvent, accepted, rejected));
+      RaiseEvent(createArgs(this, FilesDroppedEvent, accepted, rejected));
     }
 
     SetDropResult(accepted.Count, rejected.Count);

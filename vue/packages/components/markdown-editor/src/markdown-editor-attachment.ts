@@ -522,66 +522,58 @@ export type MarkdownAttachmentCaptureResult =
       readonly message: string
     }
 
+const rejectAttachmentCapture = (
+  rejected: MarkdownAttachmentCaptureRejection,
+  reason: string,
+): MarkdownAttachmentCaptureResult =>
+  Object.freeze({
+    ok: false,
+    rejected,
+    message: `Attachment input rejected: ${reason}`,
+  })
+
 export const captureMarkdownAttachmentInput = (
   input: MarkdownAttachmentCaptureInput,
 ): MarkdownAttachmentCaptureResult => {
   if (input.context?.readonly) {
-    return Object.freeze({
-      ok: false,
-      rejected: 'readonly' as const,
-      message: 'Attachment input rejected: editor is readonly',
-    })
+    return rejectAttachmentCapture('readonly', 'editor is readonly')
   }
   if (input.context?.disabled) {
-    return Object.freeze({
-      ok: false,
-      rejected: 'disabled' as const,
-      message: 'Attachment input rejected: editor is disabled',
-    })
+    return rejectAttachmentCapture('disabled', 'editor is disabled')
   }
   if (input.context?.mode === 'preview') {
-    return Object.freeze({
-      ok: false,
-      rejected: 'preview' as const,
-      message:
-        'Attachment input rejected: preview mode does not accept attachments',
-    })
+    return rejectAttachmentCapture(
+      'preview',
+      'preview mode does not accept attachments',
+    )
   }
   if (input.context?.isComposing) {
-    return Object.freeze({
-      ok: false,
-      rejected: 'composition-active' as const,
-      message: 'Attachment input rejected: IME composition active',
-    })
+    return rejectAttachmentCapture(
+      'composition-active',
+      'IME composition active',
+    )
   }
   if (
     typeof input.context?.currentRevision === 'number' &&
     input.context.currentRevision !== input.revision
   ) {
-    return Object.freeze({
-      ok: false,
-      rejected: 'stale-document' as const,
-      message: 'Attachment input rejected: stale document revision',
-    })
+    return rejectAttachmentCapture('stale-document', 'stale document revision')
   }
 
-  if (input.eventFingerprint && input.session) {
-    if (!input.session.claim(input.eventFingerprint)) {
-      return Object.freeze({
-        ok: false,
-        rejected: 'duplicate-event' as const,
-        message: 'Attachment input rejected: duplicate event detected',
-      })
-    }
+  if (
+    input.eventFingerprint &&
+    input.session &&
+    !input.session.claim(input.eventFingerprint)
+  ) {
+    return rejectAttachmentCapture(
+      'duplicate-event',
+      'duplicate event detected',
+    )
   }
 
   const rawFiles = input.files ?? []
   if (rawFiles.length === 0) {
-    return Object.freeze({
-      ok: false,
-      rejected: 'empty-files' as const,
-      message: 'Attachment input rejected: empty files list',
-    })
+    return rejectAttachmentCapture('empty-files', 'empty files list')
   }
 
   const normalizedItems = rawFiles.map((file, order) => {
@@ -602,11 +594,7 @@ export const captureMarkdownAttachmentInput = (
     (item) => item.byteLength === 0 && !item.name,
   )
   if (allEmpty) {
-    return Object.freeze({
-      ok: false,
-      rejected: 'empty-files' as const,
-      message: 'Attachment input rejected: all files are empty',
-    })
+    return rejectAttachmentCapture('empty-files', 'all files are empty')
   }
 
   const batch = createMarkdownAttachmentBatch({

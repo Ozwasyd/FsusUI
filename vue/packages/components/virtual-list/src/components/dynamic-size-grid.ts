@@ -6,16 +6,15 @@ import createGrid from '../builders/build-grid'
 import { DEFAULT_DYNAMIC_LIST_ITEM_SIZE } from '../defaults'
 import {
   alignItemOffset,
-  findVariableStartIndex,
+  createVariableSizeSearch,
   getEstimatedAxisSize,
-  getVariableStopIndex,
   measureItemsThrough,
 } from './sizing'
 
 import type { GridInstance } from '../builders/build-grid'
 import type { VirtualizedGridProps } from '../props'
 
-import type { Alignment, GridCache, ItemSize, ListItem } from '../types'
+import type { Alignment, GridCache, ItemSize } from '../types'
 
 const { max, min } = Math
 const SCOPE = 'ElDynamicSizeGrid'
@@ -45,19 +44,21 @@ const getItemFromCache = (
   gridCache: GridCache,
   type: CacheItemType,
 ) => {
-  const [cachedItems, sizer, lastVisited] = [
-    gridCache[type],
-    props[ACCESS_SIZER_KEY_MAP[type]],
-    gridCache[ACCESS_LAST_VISITED_KEY_MAP[type]],
-  ] as [Record<string, ListItem>, ItemSize, number]
+  const cachedItems = gridCache[type]
+  const sizer = props[ACCESS_SIZER_KEY_MAP[type]] as ItemSize
+  const lastVisitedKey = ACCESS_LAST_VISITED_KEY_MAP[type]
+  const lastVisited = gridCache[lastVisitedKey]
 
   if (index > lastVisited) {
     measureItemsThrough(cachedItems, sizer, lastVisited, index)
-    gridCache[ACCESS_LAST_VISITED_KEY_MAP[type]] = index
+    gridCache[lastVisitedKey] = index
   }
 
   return cachedItems[index]
 }
+
+const { findVariableStartIndex, getVariableStopIndex } =
+  /*#__PURE__*/ createVariableSizeSearch(getItemFromCache, true)
 
 const findItem = (
   props: Props,
@@ -67,11 +68,12 @@ const findItem = (
 ) =>
   findVariableStartIndex(
     gridCache[type],
-    (index) => getItemFromCache(props, index, gridCache, type),
     gridCache[ACCESS_LAST_VISITED_KEY_MAP[type]],
     type === 'column' ? props.totalColumn : props.totalRow,
     offset,
-    true,
+    props,
+    gridCache,
+    type,
   )
 
 const getEstimatedTotalHeight = (
@@ -187,7 +189,9 @@ const DynamicSizeGrid = createGrid({
       startIndex,
       item.offset + item.size,
       maxOffset,
-      (index) => getItemFromCache(props, index, cache, 'column'),
+      props,
+      cache,
+      'column',
     )
   },
 
@@ -205,7 +209,9 @@ const DynamicSizeGrid = createGrid({
       startIndex,
       item.size + item.offset,
       scrollTop + (height as number),
-      (index) => getItemFromCache(props, index, cache, 'row'),
+      props,
+      cache,
+      'row',
     )
   },
   injectToInstance: (instance, cache) => {

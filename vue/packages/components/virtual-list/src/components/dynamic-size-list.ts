@@ -8,9 +8,8 @@ import { isHorizontal } from '../utils'
 import { DEFAULT_DYNAMIC_LIST_ITEM_SIZE } from '../defaults'
 import {
   alignItemOffset,
-  findVariableStartIndex,
+  createVariableSizeSearch,
   getEstimatedAxisSize,
-  getVariableStopIndex,
   measureItemsThrough,
 } from './sizing'
 
@@ -158,6 +157,9 @@ const getItemFromCache = (
   return items[index]
 }
 
+const { findVariableStartIndex } =
+  /*#__PURE__*/ createVariableSizeSearch(getItemFromCache)
+
 const getEstimatedTotalSize = (
   { total }: Props,
   { items, estimatedItemSize, lastVisitedIndex }: ListCache,
@@ -198,10 +200,12 @@ const DynamicSizeList = createList({
   getStartIndexForOffset: (props, offset, listCache) =>
     findVariableStartIndex(
       listCache.items,
-      (index) => getItemFromCache(props, index, listCache),
       listCache.lastVisitedIndex,
       props.total,
       offset,
+      props,
+      listCache,
+      undefined,
     ),
 
   getStopIndexForStartIndex: (props, startIndex, scrollOffset, listCache) => {
@@ -209,13 +213,14 @@ const DynamicSizeList = createList({
 
     const size = (isHorizontal(layout) ? width : height) as number
     const item = getItemFromCache(props, startIndex, listCache)
-    return getVariableStopIndex(
-      total,
-      startIndex,
-      item.offset + item.size,
-      scrollOffset + size,
-      (index) => getItemFromCache(props, index, listCache),
-    )
+    const maxOffset = scrollOffset + size
+    let offset = item.offset + item.size
+    let stopIndex = startIndex
+    while (stopIndex < total - 1 && offset < maxOffset) {
+      stopIndex++
+      offset += getItemFromCache(props, stopIndex, listCache).size
+    }
+    return stopIndex
   },
 
   initCache(props, instance) {

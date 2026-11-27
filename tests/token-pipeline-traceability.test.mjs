@@ -13,19 +13,21 @@ const readJson = (relativePath) =>
 
 const renderTokenFixture = (tokens) => {
   const fixtureRoot = fs.mkdtempSync(
-    path.join(os.tmpdir(), 'fsus-token-color-format-'),
+    path.join(fs.realpathSync(os.tmpdir()), 'fsus-token-color-format-'),
   )
   try {
     const fixture = readJson('tests/fixtures/token-v2/schema-cases.json').valid
     fixture.layers.semantic.push('shadow.*')
     fixture.tokens.push(...tokens)
 
-    fs.mkdirSync(path.join(fixtureRoot, 'scripts'), { recursive: true })
+    fs.mkdirSync(path.join(fixtureRoot, 'scripts/lib'), { recursive: true })
     fs.mkdirSync(path.join(fixtureRoot, 'spec/tokens'), { recursive: true })
-    fs.copyFileSync(
-      path.join(root, 'scripts/token-pipeline.mjs'),
-      path.join(fixtureRoot, 'scripts/token-pipeline.mjs'),
-    )
+    for (const script of [
+      'scripts/token-pipeline.mjs',
+      'scripts/lib/generated-artifacts.mjs',
+    ]) {
+      fs.copyFileSync(path.join(root, script), path.join(fixtureRoot, script))
+    }
     fs.writeFileSync(
       path.join(fixtureRoot, 'spec/tokens/tokens.json'),
       `${JSON.stringify(fixture, null, 2)}\n`,

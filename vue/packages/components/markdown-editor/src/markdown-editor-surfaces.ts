@@ -6,7 +6,10 @@ import {
   type MarkdownEditorCommandContext,
 } from './markdown-editor'
 import type { MarkdownEditorTransaction } from './markdown-editor-transaction'
-import type { MarkdownEditorCommandSnapshotItem } from './markdown-editor-command-snapshot'
+import {
+  selectMarkdownEditorCommandSnapshot,
+  type MarkdownEditorCommandSnapshotItem,
+} from './markdown-editor-command-snapshot'
 import {
   createMarkdownEditorProjection,
   stabilizeMarkdownEditorProjection,
@@ -65,6 +68,28 @@ const scoreMarkdownCommandSearchFields = (
   return best
 }
 
+const rankMarkdownCommands = <
+  T extends { readonly label: string; readonly description?: string },
+>(
+  items: readonly T[],
+  needle: string,
+  keywordsOf: (item: T) => readonly string[],
+): readonly T[] => {
+  if (!needle) return items
+
+  const ranked: { item: T; index: number; score: number }[] = []
+  items.forEach((item, index) => {
+    const score = scoreMarkdownCommandSearchFields(
+      [item.label, item.description, ...keywordsOf(item)],
+      needle,
+    )
+    if (score !== null) ranked.push({ item, index, score })
+  })
+  return ranked
+    .sort((left, right) => left.score - right.score || left.index - right.index)
+    .map(({ item }) => item)
+}
+
 export const searchMarkdownEditorCommands = (
   commands: readonly MarkdownEditorCommand[],
   context: MarkdownEditorCommandContext,
@@ -72,28 +97,11 @@ export const searchMarkdownEditorCommands = (
 ): readonly MarkdownEditorCommand[] => {
   const visible = filterMarkdownEditorCommands(commands, context, 'palette')
   const needle = query.trim().toLowerCase()
-  if (!needle) return visible
-
-  return visible
-    .map((command, index) => ({
-      command,
-      index,
-      score: scoreMarkdownCommandSearchFields(
-        [command.label, command.description, ...(command.keywords ?? [])],
-        needle,
-      ),
-    }))
-    .filter(
-      (
-        item,
-      ): item is {
-        command: MarkdownEditorCommand
-        index: number
-        score: number
-      } => item.score !== null,
-    )
-    .sort((left, right) => left.score - right.score || left.index - right.index)
-    .map(({ command }) => command)
+  return rankMarkdownCommands(
+    visible,
+    needle,
+    (command) => command.keywords ?? [],
+  )
 }
 
 export const searchMarkdownEditorCommandSnapshot = (
@@ -102,58 +110,32 @@ export const searchMarkdownEditorCommandSnapshot = (
   presentation: 'palette' | 'slash' = 'palette',
 ): readonly MarkdownEditorCommandSnapshotItem[] => {
   const needle = query.trim().toLowerCase()
-  const palette = snapshot.filter(
-    (item) => item.visible && item.presentation.includes(presentation),
-  )
-  if (!needle) return palette
-
-  return palette
-    .map((item, index) => ({
-      index,
-      item,
-      score: scoreMarkdownCommandSearchFields(
-        [item.label, item.description, ...item.keywords],
-        needle,
-      ),
-    }))
-    .filter(
-      (
-        entry,
-      ): entry is {
-        index: number
-        item: MarkdownEditorCommandSnapshotItem
-        score: number
-      } => entry.score !== null,
-    )
-    .sort((left, right) => left.score - right.score || left.index - right.index)
-    .map(({ item }) => item)
+  const visible = selectMarkdownEditorCommandSnapshot(snapshot, presentation)
+  return rankMarkdownCommands(visible, needle, (item) => item.keywords)
 }
 
-export const groupMarkdownEditorCommandSnapshot = (
-  snapshot: readonly MarkdownEditorCommandSnapshotItem[],
+const groupCommands = <T extends { readonly group: string }>(
+  items: readonly T[],
 ) => {
-  const groups = new Map<string, MarkdownEditorCommandSnapshotItem[]>()
-  for (const item of snapshot) {
+  const groups = new Map<string, T[]>()
+  for (const item of items) {
     const list = groups.get(item.group) ?? []
     list.push(item)
     groups.set(item.group, list)
   }
-  return [...groups.entries()].map(([key, commands]) =>
+  return groups
+}
+
+export const groupMarkdownEditorCommandSnapshot = (
+  snapshot: readonly MarkdownEditorCommandSnapshotItem[],
+) =>
+  [...groupCommands(snapshot).entries()].map(([key, commands]) =>
     Object.freeze({ key, commands: Object.freeze(commands) }),
   )
-}
 
 export const groupMarkdownEditorCommands = (
   commands: readonly MarkdownEditorCommand[],
-): Map<string, MarkdownEditorCommand[]> => {
-  const groups = new Map<string, MarkdownEditorCommand[]>()
-  for (const command of commands) {
-    const list = groups.get(command.group) ?? []
-    list.push(command)
-    groups.set(command.group, list)
-  }
-  return groups
-}
+): Map<string, MarkdownEditorCommand[]> => groupCommands(commands)
 
 export const resolveMarkdownSlashTrigger = (
   value: string,

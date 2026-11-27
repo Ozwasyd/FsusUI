@@ -18,6 +18,72 @@
   }
 }
 
+$-toolbar-controls: (
+  command,
+  command-more,
+  command-measure-item,
+  command-measure-more,
+  mode,
+  action
+);
+
+@mixin -touch-toolbar {
+  @include e(toolbar) {
+    gap: 10px;
+    padding: 10px;
+  }
+
+  @include e((command-group, commands)) {
+    gap: 8px;
+  }
+
+  @include e(actions) {
+    gap: 8px;
+  }
+
+  @include e($-toolbar-controls) {
+    min-height: 44px;
+    padding: 0 14px;
+    font-size: 14px;
+  }
+}
+
+@mixin -prose-editor-text($resizable: false) {
+  justify-self: center;
+  width: min(100%, 74ch);
+  min-height: clamp(
+    30rem,
+    calc(var(--el-markdown-editor-visual-viewport-height, 100vh) - 18rem),
+    68rem
+  );
+  padding: clamp(1.35rem, 3vw, 2.75rem) clamp(1.1rem, 4vw, 3rem);
+  @if $resizable {
+    resize: vertical;
+  }
+  background: getCssVar('fill-color', 'blank');
+  font-family:
+    getCssVar('font-family'),
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    sans-serif;
+  font-size: 18px;
+  line-height: 1.84;
+  letter-spacing: 0;
+}
+
+@mixin -revealed-token-surface($tint) {
+  background: color-mix(
+    in srgb,
+    var(--fsus-scholarly-blue, getCssVar('color-primary')) $tint,
+    transparent
+  );
+  border-radius: var(
+    --fsus-radius-control-small,
+    var(--el-border-radius-small)
+  );
+}
+
 @include b(markdown-editor) {
   position: relative;
   display: grid;
@@ -334,24 +400,7 @@
   }
 
   @include m(interaction-touch) {
-    @include e(toolbar) {
-      gap: 10px;
-      padding: 10px;
-    }
-
-    @include e((command-group, commands)) {
-      gap: 8px;
-    }
-
-    @include e(actions) {
-      gap: 8px;
-    }
-
-    @include e((command, command-more, command-measure-item, command-measure-more, mode, action)) {
-      min-height: 44px;
-      padding: 0 14px;
-      font-size: 14px;
-    }
+    @include -touch-toolbar;
 
     @include e(command-more-count) {
       min-width: 1.375rem;
@@ -361,7 +410,7 @@
   }
 
   @include m(interaction-keyboard) {
-    @include e((command, command-more, command-measure-item, command-measure-more, mode, action)) {
+    @include e($-toolbar-controls) {
       min-height: 2.25rem;
     }
   }
@@ -515,15 +564,7 @@
       @include when(revealed) {
         opacity: 1;
         color: var(--fsus-scholarly-blue, getCssVar('color-primary'));
-        background: color-mix(
-          in srgb,
-          var(--fsus-scholarly-blue, getCssVar('color-primary')) 10%,
-          transparent
-        );
-        border-radius: var(
-          --fsus-radius-control-small,
-          var(--el-border-radius-small)
-        );
+        @include -revealed-token-surface(10%);
       }
     }
 
@@ -560,15 +601,7 @@
 
       @include when(revealed) {
         opacity: 1;
-        background: color-mix(
-          in srgb,
-          var(--fsus-scholarly-blue, getCssVar('color-primary')) 10%,
-          transparent
-        );
-        border-radius: var(
-          --fsus-radius-control-small,
-          var(--el-border-radius-small)
-        );
+        @include -revealed-token-surface(10%);
       }
     }
 
@@ -611,15 +644,7 @@
       @include when(revealed) {
         opacity: 1;
         color: var(--fsus-scholarly-blue, getCssVar('color-primary'));
-        background: color-mix(
-          in srgb,
-          var(--fsus-scholarly-blue, getCssVar('color-primary')) 12%,
-          transparent
-        );
-        border-radius: var(
-          --fsus-radius-control-small,
-          var(--el-border-radius-small)
-        );
+        @include -revealed-token-surface(12%);
       }
     }
   }
@@ -766,25 +791,7 @@
     }
 
     @include e(textarea) {
-      justify-self: center;
-      width: min(100%, 74ch);
-      min-height: clamp(
-        30rem,
-        calc(var(--el-markdown-editor-visual-viewport-height, 100vh) - 18rem),
-        68rem
-      );
-      padding: clamp(1.35rem, 3vw, 2.75rem) clamp(1.1rem, 4vw, 3rem);
-      resize: vertical;
-      background: getCssVar('fill-color', 'blank');
-      font-family:
-        getCssVar('font-family'),
-        -apple-system,
-        BlinkMacSystemFont,
-        'Segoe UI',
-        sans-serif;
-      font-size: 18px;
-      line-height: 1.84;
-      letter-spacing: 0;
+      @include -prose-editor-text($resizable: true);
       caret-color: var(--fsus-state-focus-border);
       transition:
         background-color getCssVar('transition-duration-fast') ease,
@@ -804,24 +811,7 @@
     }
 
     @include e((focus-layer, live-layer)) {
-      justify-self: center;
-      width: min(100%, 74ch);
-      min-height: clamp(
-        30rem,
-        calc(var(--el-markdown-editor-visual-viewport-height, 100vh) - 18rem),
-        68rem
-      );
-      padding: clamp(1.35rem, 3vw, 2.75rem) clamp(1.1rem, 4vw, 3rem);
-      background: getCssVar('fill-color', 'blank');
-      font-family:
-        getCssVar('font-family'),
-        -apple-system,
-        BlinkMacSystemFont,
-        'Segoe UI',
-        sans-serif;
-      font-size: 18px;
-      line-height: 1.84;
-      letter-spacing: 0;
+      @include -prose-editor-text;
     }
 
     @include e(live-token) {
@@ -850,18 +840,12 @@
     }
   }
 
-  @include when(focus-mode) {
-    @include e(textarea) {
-      &:focus-visible {
-        background: transparent;
-      }
-    }
-  }
-
-  @include when(live-visual) {
-    @include e(textarea) {
-      &:focus-visible {
-        background: transparent;
+  @each $mode in (focus-mode, live-visual) {
+    @include when($mode) {
+      @include e(textarea) {
+        &:focus-visible {
+          background: transparent;
+        }
       }
     }
   }
@@ -880,7 +864,7 @@
       align-items: center;
     }
 
-    @include e((command, command-more, command-measure-item, command-measure-more, mode, action)) {
+    @include e($-toolbar-controls) {
       min-inline-size: 44px;
       min-height: 44px;
       padding: 0 14px;
@@ -965,24 +949,7 @@
 
   @media (hover: none), (pointer: coarse) {
     @include m(interaction-auto) {
-      @include e(toolbar) {
-        gap: 10px;
-        padding: 10px;
-      }
-
-      @include e((command-group, commands)) {
-        gap: 8px;
-      }
-
-      @include e(actions) {
-        gap: 8px;
-      }
-
-      @include e((command, command-more, command-measure-item, command-measure-more, mode, action)) {
-        min-height: 44px;
-        padding: 0 14px;
-        font-size: 14px;
-      }
+      @include -touch-toolbar;
 
       @include e(mode) {
         &--split {

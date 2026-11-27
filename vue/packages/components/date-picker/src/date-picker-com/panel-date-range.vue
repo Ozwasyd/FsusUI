@@ -104,125 +104,44 @@
             </span>
           </span>
         </div>
-        <div :class="[ppNs.e('content'), drpNs.e('content')]" class="is-left">
+        <div
+          v-for="panel in calendarPanels"
+          :key="panel.side"
+          :class="[ppNs.e('content'), drpNs.e('content'), panel.className]"
+        >
           <div :class="drpNs.e('header')">
             <button
+              v-for="button in panel.buttons.value"
+              :key="button.label"
               type="button"
-              :class="ppNs.e('icon-btn')"
-              :aria-label="t(`el.datepicker.prevYear`)"
-              class="d-arrow-left"
-              @click="leftPrevYear"
-            >
-              <el-icon><d-arrow-left /></el-icon>
-            </button>
-            <button
-              type="button"
-              :class="ppNs.e('icon-btn')"
-              :aria-label="t(`el.datepicker.prevMonth`)"
-              class="arrow-left"
-              @click="leftPrevMonth"
-            >
-              <el-icon><arrow-left /></el-icon>
-            </button>
-            <button
-              v-if="unlinkPanels"
-              type="button"
-              :disabled="!enableYearArrow"
-              :class="[ppNs.e('icon-btn'), { 'is-disabled': !enableYearArrow }]"
-              :aria-label="t(`el.datepicker.nextYear`)"
-              class="d-arrow-right"
-              @click="leftNextYear"
-            >
-              <el-icon><d-arrow-right /></el-icon>
-            </button>
-            <button
-              v-if="unlinkPanels"
-              type="button"
-              :disabled="!enableMonthArrow"
+              :disabled="
+                button.unlinkSide === panel.side
+                  ? !button.enabled.value
+                  : undefined
+              "
               :class="[
                 ppNs.e('icon-btn'),
-                { 'is-disabled': !enableMonthArrow },
+                {
+                  'is-disabled':
+                    button.unlinkSide === panel.side && !button.enabled.value,
+                },
+                button.className,
               ]"
-              :aria-label="t(`el.datepicker.nextMonth`)"
-              class="arrow-right"
-              @click="leftNextMonth"
+              :aria-label="t(button.label)"
+              @click="button[panel.side]"
             >
-              <el-icon><arrow-right /></el-icon>
+              <el-icon><component :is="button.icon" /></el-icon>
             </button>
-            <div>{{ leftLabel }}</div>
+            <div>{{ panel.label.value }}</div>
           </div>
           <div
-            :key="leftViewKey"
+            :key="panel.viewKey.value"
             :class="[drpNs.e('view'), dateRangeViewMotionClass]"
             v-bind="dateRangeViewAuditAttrs"
           >
             <date-table
               selection-mode="range"
-              :date="leftDate"
-              :min-date="minDate"
-              :max-date="maxDate"
-              :range-state="rangeState"
-              :disabled-date="disabledDate"
-              :cell-class-name="cellClassName"
-              v-on="dateTableEvents"
-            />
-          </div>
-        </div>
-        <div :class="[ppNs.e('content'), drpNs.e('content')]" class="is-right">
-          <div :class="drpNs.e('header')">
-            <button
-              v-if="unlinkPanels"
-              type="button"
-              :disabled="!enableYearArrow"
-              :class="[ppNs.e('icon-btn'), { 'is-disabled': !enableYearArrow }]"
-              :aria-label="t(`el.datepicker.prevYear`)"
-              class="d-arrow-left"
-              @click="rightPrevYear"
-            >
-              <el-icon><d-arrow-left /></el-icon>
-            </button>
-            <button
-              v-if="unlinkPanels"
-              type="button"
-              :disabled="!enableMonthArrow"
-              :class="[
-                ppNs.e('icon-btn'),
-                { 'is-disabled': !enableMonthArrow },
-              ]"
-              :aria-label="t(`el.datepicker.prevMonth`)"
-              class="arrow-left"
-              @click="rightPrevMonth"
-            >
-              <el-icon><arrow-left /></el-icon>
-            </button>
-            <button
-              type="button"
-              :aria-label="t(`el.datepicker.nextYear`)"
-              :class="ppNs.e('icon-btn')"
-              class="d-arrow-right"
-              @click="rightNextYear"
-            >
-              <el-icon><d-arrow-right /></el-icon>
-            </button>
-            <button
-              type="button"
-              :class="ppNs.e('icon-btn')"
-              :aria-label="t(`el.datepicker.nextMonth`)"
-              class="arrow-right"
-              @click="rightNextMonth"
-            >
-              <el-icon><arrow-right /></el-icon>
-            </button>
-            <div>{{ rightLabel }}</div>
-          </div>
-          <div
-            :key="rightViewKey"
-            :class="[drpNs.e('view'), dateRangeViewMotionClass]"
-            v-bind="dateRangeViewAuditAttrs"
-          >
-            <date-table
-              selection-mode="range"
-              :date="rightDate"
+              :date="panel.date.value"
               :min-date="minDate"
               :max-date="maxDate"
               :range-state="rangeState"
@@ -342,52 +261,42 @@ const timeUserInput = ref<UserInput>({
   max: null,
 })
 
-const leftLabel = computed(() => {
-  return `${leftDate.value.year()} ${t('el.datepicker.year')} ${t(
-    `el.datepicker.month${leftDate.value.month() + 1}`
-  )}`
-})
-
-const rightLabel = computed(() => {
-  return `${rightDate.value.year()} ${t('el.datepicker.year')} ${t(
-    `el.datepicker.month${rightDate.value.month() + 1}`
-  )}`
-})
-
-const leftYear = computed(() => {
-  return leftDate.value.year()
-})
-
-const leftMonth = computed(() => {
-  return leftDate.value.month()
-})
-
-const rightYear = computed(() => {
-  return rightDate.value.year()
-})
-
-const rightMonth = computed(() => {
-  return rightDate.value.month()
-})
+const createCalendarPanel = (side: 'left' | 'right', date: Ref<Dayjs>) => {
+  const year = computed(() => date.value.year())
+  const month = computed(() => date.value.month())
+  return {
+    side,
+    className: `is-${side}`,
+    date,
+    year,
+    month,
+    buttons: computed(() =>
+      props.unlinkPanels
+        ? calendarButtons
+        : calendarButtons.filter((button) => button.unlinkSide !== side),
+    ),
+    label: computed(
+      () =>
+        `${year.value} ${t('el.datepicker.year')} ${t(`el.datepicker.month${month.value + 1}`)}`,
+    ),
+    viewKey: computed(() => `${side}-${year.value}-${month.value}`),
+  }
+}
+const leftPanel = createCalendarPanel('left', leftDate)
+const rightPanel = createCalendarPanel('right', rightDate)
+const { year: leftYear, month: leftMonth } = leftPanel
+const { year: rightYear, month: rightMonth } = rightPanel
+const calendarPanels = [leftPanel, rightPanel]
 
 const hasShortcuts = computed(() => !!shortcuts.value.length)
 
 const dateRangeViewMotionClass = computed(
-  () =>
-    `${ppNs.namespace.value}-date-picker-view-${dateRangeViewMotion.value}`
+  () => `${ppNs.namespace.value}-date-picker-view-${dateRangeViewMotion.value}`,
 )
 
 const dateRangeViewAuditAttrs = computed(() => ({
   'data-fsus-date-view-motion': dateRangeViewMotion.value,
 }))
-
-const leftViewKey = computed(
-  () => `left-${leftDate.value.year()}-${leftDate.value.month()}`
-)
-
-const rightViewKey = computed(
-  () => `right-${rightDate.value.year()}-${rightDate.value.month()}`
-)
 
 const timeFormat = computed(() => {
   return props.timeFormat || extractTimeFormat(format)
@@ -400,7 +309,7 @@ const dateFormat = computed(() => {
 const visibleValue = (
   input: Ref<UserInput>,
   type: ChangeType,
-  inputFormat: ComputedRef<string>
+  inputFormat: ComputedRef<string>,
 ) =>
   computed(() => {
     const draft = input.value[type]
@@ -426,7 +335,7 @@ const isValidValue = (date: [Dayjs, Dayjs]) => {
 const navigatePanel = (
   panel: 'left' | 'right',
   direction: DateRangeViewMotion,
-  mode: 'month' | 'year'
+  mode: 'month' | 'year',
 ) => {
   dateRangeViewMotion.value = direction
   const move = (date: Dayjs) =>
@@ -448,20 +357,11 @@ const navigatePanel = (
   emit(
     'panel-change',
     [leftDate.value.toDate(), rightDate.value.toDate()],
-    mode
+    mode,
   )
 }
 
-const leftPrevYear = () => navigatePanel('left', 'prev', 'year')
-const leftPrevMonth = () => navigatePanel('left', 'prev', 'month')
-const rightNextYear = () => navigatePanel('right', 'next', 'year')
-const rightNextMonth = () => navigatePanel('right', 'next', 'month')
-const leftNextYear = () => navigatePanel('left', 'next', 'year')
-const leftNextMonth = () => navigatePanel('left', 'next', 'month')
-const rightPrevYear = () => navigatePanel('right', 'prev', 'year')
-const rightPrevMonth = () => navigatePanel('right', 'prev', 'month')
-
-const enableMonthArrow = computed(() => {
+const enableMonthArrow: ComputedRef<boolean> = computed(() => {
   const nextMonth = (leftMonth.value + 1) % 12
   const yearOffset = leftMonth.value + 1 >= 12 ? 1 : 0
   return (
@@ -471,7 +371,7 @@ const enableMonthArrow = computed(() => {
   )
 })
 
-const enableYearArrow = computed(() => {
+const enableYearArrow: ComputedRef<boolean> = computed(() => {
   return (
     props.unlinkPanels &&
     rightYear.value * 12 +
@@ -479,6 +379,27 @@ const enableYearArrow = computed(() => {
       (leftYear.value * 12 + leftMonth.value + 1) >=
       12
   )
+})
+
+const calendarButtons = (
+  [
+    { direction: 'prev', unit: 'year', icon: DArrowLeft },
+    { direction: 'prev', unit: 'month', icon: ArrowLeft },
+    { direction: 'next', unit: 'year', icon: DArrowRight },
+    { direction: 'next', unit: 'month', icon: ArrowRight },
+  ] as const
+).map(({ direction, unit, icon }) => {
+  const previous = direction === 'prev'
+  const yearly = unit === 'year'
+  return {
+    icon,
+    label: `el.datepicker.${direction}${yearly ? 'Year' : 'Month'}`,
+    className: `${yearly ? 'd-' : ''}arrow-${previous ? 'left' : 'right'}`,
+    unlinkSide: previous ? 'right' : 'left',
+    enabled: yearly ? enableYearArrow : enableMonthArrow,
+    left: () => navigatePanel('left', direction, unit),
+    right: () => navigatePanel('right', direction, unit),
+  }
 })
 
 const btnDisabled = computed(() => {
@@ -491,14 +412,14 @@ const btnDisabled = computed(() => {
 })
 
 const showTime = computed(
-  () => props.type === 'datetime' || props.type === 'datetimerange'
+  () => props.type === 'datetime' || props.type === 'datetimerange',
 )
 
 const formatEmit = (emitDayjs: Dayjs | null, index?: number) => {
   if (!emitDayjs) return
   if (defaultTime) {
     const defaultTimeD = dayjs(
-      defaultTime[index as number] || defaultTime
+      defaultTime[index as number] || defaultTime,
     ).locale(lang.value)
     return defaultTimeD
       .year(emitDayjs.year())
@@ -513,7 +434,7 @@ const handleRangePick = (
     minDate: Dayjs
     maxDate: Dayjs | null
   },
-  close = true
+  close = true,
 ) => {
   const min_ = val.minDate
   const max_ = val.maxDate
@@ -651,7 +572,7 @@ const handleMinTimePick = (value: Dayjs, visible: boolean, first: boolean) => {
 const handleMaxTimePick = (
   value: Dayjs | null,
   visible: boolean,
-  first: boolean
+  first: boolean,
 ) => {
   if (timeUserInput.value.max) return
   if (value) {
@@ -695,7 +616,7 @@ const parseUserInput = (value: Dayjs | Dayjs[]) => {
 
 function onParsedValueChanged(
   minDate: Dayjs | undefined,
-  maxDate: Dayjs | undefined
+  maxDate: Dayjs | undefined,
 ) {
   if (props.unlinkPanels && maxDate) {
     const minDateYear = minDate?.year() || 0

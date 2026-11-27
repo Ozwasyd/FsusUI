@@ -3,6 +3,10 @@ import fs from 'node:fs'
 import path from 'node:path'
 import process from 'node:process'
 import { fileURLToPath } from 'node:url'
+import {
+  checkGeneratedArtifacts,
+  writeGeneratedArtifacts,
+} from './lib/generated-artifacts.mjs'
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const registryPath = path.join(root, 'spec/icons/registry.yaml')
@@ -400,33 +404,6 @@ const renderAll = () => {
   return files
 }
 
-const writeFiles = (files) => {
-  for (const [relativePath, content] of Object.entries(files)) {
-    const absolutePath = path.join(root, relativePath)
-    fs.mkdirSync(path.dirname(absolutePath), { recursive: true })
-    fs.writeFileSync(absolutePath, content)
-    console.log(`wrote ${relativePath}`)
-  }
-}
-
-const checkFiles = (files) => {
-  const failures = []
-  for (const [relativePath, expected] of Object.entries(files)) {
-    const absolutePath = path.join(root, relativePath)
-    if (!fs.existsSync(absolutePath)) {
-      failures.push(`${relativePath} is missing`)
-      continue
-    }
-    if (fs.readFileSync(absolutePath, 'utf8') !== expected) {
-      failures.push(`${relativePath} is stale`)
-    }
-  }
-  if (failures.length > 0) {
-    throw new Error(`Icon artifacts are not current:\n${failures.join('\n')}`)
-  }
-  console.log('Icon artifacts are current.')
-}
-
 const lint = () => {
   const { icons } = readRegistry()
   const aliases = new Set()
@@ -468,9 +445,11 @@ const runInvalidFixtures = () => {
 const command = process.argv[2]
 
 try {
-  if (command === 'generate') writeFiles(renderAll())
-  else if (command === 'check') checkFiles(renderAll())
-  else if (command === 'lint') lint()
+  if (command === 'generate') writeGeneratedArtifacts(root, renderAll())
+  else if (command === 'check') {
+    checkGeneratedArtifacts(root, renderAll(), 'Icon')
+    console.log('Icon artifacts are current.')
+  } else if (command === 'lint') lint()
   else
     throw new Error(
       'Usage: node scripts/icon-pipeline.mjs <generate|check|lint>',

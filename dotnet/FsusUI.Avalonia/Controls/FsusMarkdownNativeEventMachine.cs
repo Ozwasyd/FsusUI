@@ -1,5 +1,4 @@
 using System.Globalization;
-using System.Text;
 
 namespace FsusUI.Avalonia.Controls;
 
@@ -177,7 +176,7 @@ public sealed class FsusMarkdownNativeEventMachine
       selection is null ? string.Empty : selection.Start.ToString(CultureInfo.InvariantCulture),
       selection is null ? string.Empty : selection.End.ToString(CultureInfo.InvariantCulture),
       input.Value ?? string.Empty);
-    return "native:" + HashText(body);
+    return "native:" + FsusMarkdownInputHelpers.HashText(body);
   }
 
   public FsusMarkdownNativeEventPlan Apply(FsusMarkdownNativeEventInput input)
@@ -513,39 +512,6 @@ public sealed class FsusMarkdownNativeEventMachine
       return "forward";
     }
     return "none";
-  }
-
-  private static string HashText(string value)
-  {
-    unchecked
-    {
-      var hash = (uint)2166136261;
-      foreach (var ch in value)
-      {
-        hash ^= ch;
-        hash *= 16777619;
-      }
-      return ToBase36(hash);
-    }
-  }
-
-  private static string ToBase36(uint value)
-  {
-    if (value == 0)
-    {
-      return "0";
-    }
-    var builder = new StringBuilder();
-    var remaining = value;
-    while (remaining > 0)
-    {
-      var digit = (int)(remaining % 36);
-      builder.Append((char)(digit < 10 ? '0' + digit : 'a' + digit - 10));
-      remaining /= 36;
-    }
-    var chars = builder.ToString().ToCharArray();
-    Array.Reverse(chars);
-    return new string(chars);
   }
 
   public static string KindToken(FsusMarkdownNativeEventKind kind) => kind switch
