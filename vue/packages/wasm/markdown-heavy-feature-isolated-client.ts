@@ -1,6 +1,7 @@
 import MarkdownHeavyFeatureFrameUrl from './markdown-heavy-feature-frame.ts?worker&url'
 import {
   MARKDOWN_HEAVY_FEATURE_FRAME_SCOPE,
+  MARKDOWN_HEAVY_RUNTIME_LOADERS_BRIDGE_KEY,
   registerMarkdownHeavyFeatureIsolatedRenderFactory,
   type MarkdownHeavyFeatureAdapterResources,
   type MarkdownHeavyFeatureIsolatedRenderRequest,
@@ -9,6 +10,10 @@ import {
 } from './markdown-heavy-feature-resource'
 import type { FeatureRenderOutput } from './markdown-feature-output-gateway'
 import { toMarkdownFeatureParsingHtml } from './markdown-feature-output-gateway'
+import type {
+  MarkdownFeatureRenderContext,
+  MarkdownHeavyRuntimeLoadersOverride,
+} from './markdown-runtime'
 import {
   scheduleMarkdownHeavyFeatureFrameContinue,
   type MarkdownHeavyFeatureFrameContinueScheduler,
@@ -96,11 +101,24 @@ export const createMarkdownHeavyFeatureIsolatedRender = <
     rejectPromise = reject
   })
 
+  const clearHostLoadersBridge = () => {
+    try {
+      const frameWindow = iframe.contentWindow as
+        | (Window & Record<PropertyKey, unknown>)
+        | null
+      if (frameWindow && MARKDOWN_HEAVY_RUNTIME_LOADERS_BRIDGE_KEY in frameWindow) {
+        delete frameWindow[MARKDOWN_HEAVY_RUNTIME_LOADERS_BRIDGE_KEY]
+      }
+    } catch {
+      // Ignore detached or cross-origin frames during cleanup
+    }
+  }
   const removeReadyListener = () => window.removeEventListener('message', ready)
   const cleanup = () => {
     cancelScheduledContinue?.()
     cancelScheduledContinue = null
     removeReadyListener()
+    clearHostLoadersBridge()
     if (script) script.onerror = null
     script = null
     port?.close()
@@ -212,6 +230,36 @@ export const createMarkdownHeavyFeatureIsolatedRender = <
       capability
     frameDocument.documentElement.dataset.fsusMarkdownParentOrigin =
       expectedOrigin
+    const frameWindow = iframe.contentWindow as
+      | (Window & Record<PropertyKey, unknown>)
+      | null
+    if (frameWindow) {
+      Object.defineProperty(frameWindow, MARKDOWN_HEAVY_RUNTIME_LOADERS_BRIDGE_KEY, {
+        configurable: true,
+        enumerable: false,
+        writable: false,
+        value: (token: string): MarkdownHeavyRuntimeLoadersOverride => {
+          if (!active || token !== capability) {
+            throw new Error('markdown_heavy_feature_frame_authority_invalid')
+          }
+          clearHostLoadersBridge()
+          return Object.freeze({
+            loadKatexRuntime: async () =>
+              (await import('./markdown-heavy-runtime-loaders')).loadKatexRuntime(),
+            loadMermaidRuntime: async () =>
+              (await import('./markdown-heavy-runtime-loaders')).loadMermaidRuntime(),
+            renderCodeHighlightFeature: async (
+              source: string,
+              language: string,
+              context: MarkdownFeatureRenderContext,
+            ) =>
+              (
+                await import('./markdown-heavy-runtime-loaders')
+              ).renderCodeHighlightFeature(source, language, context),
+          })
+        },
+      })
+    }
     script = frameDocument.createElement('script')
     script.type = 'module'
     const moduleUrl = new URL(

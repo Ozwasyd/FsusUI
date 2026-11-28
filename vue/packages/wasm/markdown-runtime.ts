@@ -50,6 +50,7 @@ export {
   activateMarkdownFeatures,
   normalizeMarkdownCodeLanguage,
   resolveMarkdownCodeLanguageAvailability,
+  setMarkdownHeavyRuntimeLoadersOverride,
   type FeatureRenderOutput,
   type MarkdownCodeLanguage,
   type MarkdownFeatureActivationError,
@@ -61,6 +62,7 @@ export {
   type MarkdownFeatureActivationTheme,
   type MarkdownFeatureRenderContext,
   type MarkdownFeatureThemeTokens,
+  type MarkdownHeavyRuntimeLoadersOverride,
 } from './runtime/markdown-feature-activation'
 export {
   MARKDOWN_EMBED_DIAGNOSTIC_CODES,

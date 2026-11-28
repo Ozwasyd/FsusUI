@@ -6,6 +6,7 @@ import {
 import { createLazyMarkdownHeavyFeatureIsolatedRender } from '../markdown-heavy-feature-isolated-lazy'
 import {
   MARKDOWN_HEAVY_FEATURE_FRAME_SCOPE,
+  MARKDOWN_HEAVY_RUNTIME_LOADERS_BRIDGE_KEY,
   validateMarkdownHeavyFeatureFrameContinueMessage,
   validateMarkdownHeavyFeatureIsolatedRenderOutput,
   validateMarkdownHeavyFeatureIsolatedRenderRequest,
@@ -589,5 +590,46 @@ describe('markdown heavy feature isolated client', () => {
       tasks: 0,
     })
     expect(trustedScriptUrlFactory).toHaveBeenCalledOnce()
+  })
+
+  it('#1157: attaches a single-use capability-gated runtime loader bridge on the isolated frame window and removes it on claim or teardown', async () => {
+    const handle = createMarkdownHeavyFeatureIsolatedRender(
+      validRequest,
+      (moduleUrl) => moduleUrl.toString(),
+    )
+    const rejection = handle.promise.catch((error: unknown) => error)
+    const frame = document.querySelector('iframe')!
+    const frameWindow = frame.contentWindow as Window & Record<PropertyKey, unknown>
+    const capability =
+      frame.contentDocument!.documentElement.dataset.fsusMarkdownFrameCapability!
+
+    const bridge = frameWindow[MARKDOWN_HEAVY_RUNTIME_LOADERS_BRIDGE_KEY] as
+      | ((token: string) => {
+          loadKatexRuntime: () => Promise<unknown>
+          loadMermaidRuntime: () => Promise<unknown>
+          renderCodeHighlightFeature: (
+            source: string,
+            language: string,
+            context: unknown,
+          ) => Promise<unknown>
+        })
+      | undefined
+    expect(typeof bridge).toBe('function')
+
+    // Wrong capability is rejected and does not expose loaders
+    expect(() => bridge!('wrong-capability')).toThrow(
+      'markdown_heavy_feature_frame_authority_invalid',
+    )
+    expect(MARKDOWN_HEAVY_RUNTIME_LOADERS_BRIDGE_KEY in frameWindow).toBe(true)
+
+    // Valid capability returns lazy loaders and deletes the single-use bridge
+    const loaders = bridge!(capability)
+    expect(typeof loaders.loadKatexRuntime).toBe('function')
+    expect(typeof loaders.loadMermaidRuntime).toBe('function')
+    expect(typeof loaders.renderCodeHighlightFeature).toBe('function')
+    expect(MARKDOWN_HEAVY_RUNTIME_LOADERS_BRIDGE_KEY in frameWindow).toBe(false)
+
+    handle.teardown()
+    await expect(rejection).resolves.toMatchObject({ name: 'AbortError' })
   })
 })

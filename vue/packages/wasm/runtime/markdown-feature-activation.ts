@@ -1,4 +1,4 @@
-import type { MermaidRuntime } from '../markdown-heavy-runtime-loaders'
+import type { KatexRuntime, MermaidRuntime } from '../markdown-heavy-runtime-loaders'
 import type {
   FeatureRenderOutput,
   MarkdownFeatureOutputCommitOptions,
@@ -524,16 +524,42 @@ const resolveDefaultModule = <T>(module: T | { default?: T }) =>
     ? (module as { default: T }).default
     : (module as T)
 
+export interface MarkdownHeavyRuntimeLoadersOverride {
+  readonly loadKatexRuntime?: () => Promise<KatexRuntime>
+  readonly loadMermaidRuntime?: () => Promise<MermaidRuntime>
+  readonly renderCodeHighlightFeature?: (
+    source: string,
+    language: string,
+    context: MarkdownFeatureRenderContext,
+  ) => Promise<FeatureRenderOutput>
+}
+
+let heavyRuntimeLoadersOverride: MarkdownHeavyRuntimeLoadersOverride | null =
+  null
+
+export const setMarkdownHeavyRuntimeLoadersOverride = (
+  override: MarkdownHeavyRuntimeLoadersOverride | null,
+) => {
+  heavyRuntimeLoadersOverride = override
+}
+
 // Loader caches and optional-runtime setup are needed only by heavy features,
 // never by initial Markdown hydration or the synchronous DOM safety pass.
 const loadMermaidRuntime = async () => {
   const globalMermaid = (globalThis as GlobalMermaidRuntime).mermaid
   if (globalMermaid) return resolveDefaultModule<MermaidRuntime>(globalMermaid)
+  if (heavyRuntimeLoadersOverride?.loadMermaidRuntime) {
+    return heavyRuntimeLoadersOverride.loadMermaidRuntime()
+  }
   return (await import('../markdown-heavy-runtime-loaders')).loadMermaidRuntime()
 }
 
-const loadKatexRuntime = async () =>
-  (await import('../markdown-heavy-runtime-loaders')).loadKatexRuntime()
+const loadKatexRuntime = async () => {
+  if (heavyRuntimeLoadersOverride?.loadKatexRuntime) {
+    return heavyRuntimeLoadersOverride.loadKatexRuntime()
+  }
+  return (await import('../markdown-heavy-runtime-loaders')).loadKatexRuntime()
+}
 
 let markdownMermaidRenderId = 0
 
@@ -713,12 +739,18 @@ const renderCodeHighlightFeature = async (
   source: string,
   language: string,
   context: MarkdownFeatureRenderContext,
-): Promise<FeatureRenderOutput> =>
-  (await import('../markdown-heavy-runtime-loaders')).renderCodeHighlightFeature(
-    source,
-    language,
-    context,
-  )
+): Promise<FeatureRenderOutput> => {
+  if (heavyRuntimeLoadersOverride?.renderCodeHighlightFeature) {
+    return heavyRuntimeLoadersOverride.renderCodeHighlightFeature(
+      source,
+      language,
+      context,
+    )
+  }
+  return (
+    await import('../markdown-heavy-runtime-loaders')
+  ).renderCodeHighlightFeature(source, language, context)
+}
 
 interface MarkdownFeatureActivationContext
   extends Omit<MarkdownFeatureRenderContext, 'tokens'> {

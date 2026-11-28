@@ -1,7 +1,12 @@
-import { activateMarkdownFeatures } from './markdown-runtime'
-import type { FeatureRenderOutput } from './markdown-runtime'
+import {
+  activateMarkdownFeatures,
+  setMarkdownHeavyRuntimeLoadersOverride,
+  type FeatureRenderOutput,
+  type MarkdownHeavyRuntimeLoadersOverride,
+} from './markdown-runtime'
 import {
   MARKDOWN_HEAVY_FEATURE_FRAME_SCOPE,
+  MARKDOWN_HEAVY_RUNTIME_LOADERS_BRIDGE_KEY,
   validateMarkdownHeavyFeatureFrameContinueMessage,
   validateMarkdownHeavyFeatureIsolatedRenderRequest,
   type MarkdownHeavyFeatureIsolatedRenderRequest,
@@ -13,6 +18,19 @@ const parentOrigin = document.documentElement.dataset.fsusMarkdownParentOrigin
 
 if (!capability || !parentOrigin || parentOrigin === 'null') {
   throw new Error('markdown_heavy_feature_frame_authority_invalid')
+}
+
+const claimHostRuntimeLoaders = (
+  frameWindow as unknown as Record<PropertyKey, unknown>
+)[MARKDOWN_HEAVY_RUNTIME_LOADERS_BRIDGE_KEY]
+if (typeof claimHostRuntimeLoaders === 'function') {
+  setMarkdownHeavyRuntimeLoadersOverride(
+    (
+      claimHostRuntimeLoaders as (
+        token: string,
+      ) => MarkdownHeavyRuntimeLoadersOverride
+    )(capability),
+  )
 }
 
 const applyTokens = (

@@ -7,6 +7,10 @@ const MAX_ISOLATED_TOKEN_COUNT = 32
 export const MARKDOWN_HEAVY_FEATURE_FRAME_SCOPE =
   'fsus-markdown-heavy-feature-frame@1'
 
+export const MARKDOWN_HEAVY_RUNTIME_LOADERS_BRIDGE_KEY = Symbol.for(
+  'fsusui.markdown-heavy-runtime-loaders@1',
+)
+
 const boundedString = (value: unknown, maxLength: number) =>
   typeof value === 'string' && value.length <= maxLength
 

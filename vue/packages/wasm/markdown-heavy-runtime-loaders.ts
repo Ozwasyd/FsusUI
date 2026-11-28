@@ -13,7 +13,7 @@ export type MermaidRuntime = {
   ) => Promise<{ svg: string }> | { svg: string } | string
 }
 
-type KatexRuntime = {
+export type KatexRuntime = {
   renderToString?: (source: string, options: Record<string, unknown>) => string
 }
 
@@ -62,11 +62,16 @@ const resolveDefaultModule = <T>(module: T | { default?: T }) =>
 let mermaidRuntimePromise: Promise<MermaidRuntime> | null = null
 
 export const loadMermaidRuntime = async () => {
-  mermaidRuntimePromise ??= import('mermaid').then((module) =>
-    resolveDefaultModule<MermaidRuntime>(
-      module as unknown as MermaidRuntime | { default?: MermaidRuntime },
-    ),
-  )
+  mermaidRuntimePromise ??= import('mermaid')
+    .then((module) =>
+      resolveDefaultModule<MermaidRuntime>(
+        module as unknown as MermaidRuntime | { default?: MermaidRuntime },
+      ),
+    )
+    .catch((error) => {
+      mermaidRuntimePromise = null
+      throw error
+    })
 
   return mermaidRuntimePromise
 }
@@ -94,7 +99,7 @@ const shikiThemeLoaders: Record<string, () => Promise<unknown>> = {
 let shikiRuntimePromise: Promise<ShikiRuntime> | null = null
 
 export const loadShikiRuntime = async () => {
-  shikiRuntimePromise ??= (async () => {
+  shikiRuntimePromise ??= (async (): Promise<ShikiRuntime> => {
     const [coreModule, engineModule] = await Promise.all([
       import('shiki/core'),
       import('shiki/engine/javascript'),
@@ -169,7 +174,10 @@ export const loadShikiRuntime = async () => {
         ])
       },
     }
-  })()
+  })().catch((error) => {
+    shikiRuntimePromise = null
+    throw error
+  })
 
   return shikiRuntimePromise
 }
