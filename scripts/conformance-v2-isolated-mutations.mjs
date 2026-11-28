@@ -142,8 +142,8 @@ const cases = [
     inject: () =>
       mutateText(
         'scripts/vue-semantic-baseline.mjs',
-        'const sub = this.parseFromNode(resolved.node, name, resolved.relPath)',
-        'const sub = null && this.parseFromNode(resolved.node, name, resolved.relPath)',
+        "    if (valueNode.type === 'ObjectExpression') {",
+        "    if (valueNode.type === 'MissingObjectExpression') {",
       ),
     command: ['pnpm', ['run', 'avalonia:baseline:check']],
     expected: 'Avalonia Vue public API baseline is stale',
