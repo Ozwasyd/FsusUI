@@ -322,6 +322,27 @@ assert.deepEqual(
   '#1151: createFsusUI must isolate configuration across independent Vue apps',
 )
 
+// #1152: Verify app-bound FsusMessage service exports & SSR non-durable behavior
+assert.equal(typeof main.useFsusMessage, 'function', '#1152: missing useFsusMessage export')
+assert.equal(typeof main.createFsusMessageService, 'function', '#1152: missing createFsusMessageService export')
+assert.ok(main.FSUS_MESSAGE_KEY, '#1152: missing FSUS_MESSAGE_KEY export')
+const msgA = appA.runWithContext(() => main.useFsusMessage())
+const msgB = appB.runWithContext(() => main.useFsusMessage())
+assert.notEqual(msgA, msgB, '#1152: independent Vue apps must receive distinct FsusMessageService instances')
+let ssrCloseCount = 0
+const ssrHandle = msgA.info({
+  message: 'SSR message check',
+  duration: 3000,
+  onClose: () => {
+    ssrCloseCount += 1
+  },
+})
+ssrHandle.close()
+ssrHandle.close()
+assert.equal(ssrCloseCount, 1, '#1152: SSR handle close() must invoke onClose at most once')
+msgA.closeAll()
+msgB.closeAll()
+
 // #1148: Verify canonical FsusMarkdownRenderer policy
 const rpMod = await import('@ozwasyd/fsusui/render-pipeline')
 const mdPolicy = rpMod.createFsusRenderPipelineComponentPolicy('FsusMarkdownRenderer')

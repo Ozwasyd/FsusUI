@@ -306,7 +306,19 @@ export type {
 } from './date-picker/FsusDatePicker.vue'
 export type { FsusColorFormat } from './color-picker/color-math'
 export type { FsusAutocompleteItem } from './autocomplete/FsusAutocomplete.vue'
-export type { FsusMessageHandle, FsusMessageOptions } from './message'
+export {
+  FSUS_MESSAGE_KEY,
+  createFsusMessageService,
+  installFsusMessage,
+  useFsusMessage,
+} from './message'
+export type {
+  FsusMessageHandle,
+  FsusMessageOptions,
+  FsusMessageService,
+  FsusMessageServiceController,
+  FsusMessageServiceOptions,
+} from './message'
 export type { FsusNotificationHandle, FsusNotificationOptions } from './notification'
 export type { FsusMessageBoxOptions, FsusMessageBoxOutcome } from './message-box'
 export type {

@@ -13,3 +13,5 @@ Fix all preview.1 consumer-reported issues:
 - Update `docs/migration/v1-to-v2.md` for `virtualThreshold` automatic virtualization and `FsusTabs` inactive-pane unmount lifecycle (#1147, #1149)
 - Associate `FsusTabs` tabs and panels with unique `id`, `aria-controls`, and `aria-labelledby` attributes (#1149)
 - Guard missing or failing `navigator.clipboard.writeText` in `FsusCopyableDetail` with localized status announcements (`role="status"`), `copy`/`copyError` emits, and explicit error feedback (#1150)
+- Isolate `createFsusUI()` configuration per Vue application via `installFsusConfig()` / `FSUS_CONFIG_KEY` without mutating module-global defaults (#1151)
+- Scope `FsusMessage` per Vue application via `useFsusMessage()`, `createFsusMessageService()`, `installFsusMessage()`, and `FSUS_MESSAGE_KEY` with `AppContext` propagation, idempotent `onClose`, SSR safety, and automatic `app.onUnmount()` teardown (#1152)

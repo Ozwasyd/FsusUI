@@ -10,6 +10,7 @@ import { FsusIcon } from '@fsusui/icons'
 import { FsusMotionPlugin } from '@fsusui/motion'
 import {
   fsusComponents,
+  installFsusMessage,
   vFsusInfiniteScroll,
   vFsusLoading,
 } from '@fsusui/components'
@@ -33,6 +34,7 @@ export const createFsusUI = (defaultOptions: FsusUIPluginOptions = {}): Plugin =
     const { components = fsusComponents, ...config } = merged
 
     installFsusConfig(app, config)
+    installFsusMessage(app)
     if (config.themeMode && isClient) {
       syncThemeMode(config.themeMode)
     }

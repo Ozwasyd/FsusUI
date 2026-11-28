@@ -1,6 +1,18 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
 import {
+  computed,
+  createApp,
+  defineComponent,
+  h,
+  inject,
+  onBeforeUnmount,
+  onMounted,
+  ref,
+  type App,
+  type InjectionKey,
+} from 'vue'
+import {
+  createFsusUI,
   FsusAlert,
   FsusButton,
   FsusButtonGroup,
@@ -18,11 +30,16 @@ import {
   FsusIcon,
   FsusImageViewer,
   FsusInput,
+  FsusMessage,
   FsusSegmentedControl,
   FsusSelect,
   FsusTabPane,
   FsusTabs,
   FsusTag,
+  useFsusConfig,
+  useFsusLocale,
+  useFsusMessage,
+  type FsusMessageService,
 } from '@ozwasyd/fsusui'
 import { FsusMarkdownRenderer } from '@ozwasyd/fsusui/markdown'
 import {
@@ -44,6 +61,7 @@ const activeRoute = computed(() => {
   if (pathname.startsWith('/core')) return 'core'
   if (pathname.startsWith('/overlays')) return 'overlays'
   if (pathname.startsWith('/markdown')) return 'markdown'
+  if (pathname.startsWith('/isolation')) return 'isolation'
   return 'home'
 })
 
@@ -61,6 +79,112 @@ const viewerCloseCount = ref(0)
 const wasmProbeStatus = ref('pending')
 const wasmProbeHtml = ref('')
 const wasmProbeEngine = ref('')
+
+// #1151 & #1152 browser isolation harness (two independently installed Vue apps)
+const ISOLATION_TENANT_KEY: InjectionKey<string> = Symbol('isolation-tenant')
+const isoMountA = ref<HTMLElement | null>(null)
+const isoMountB = ref<HTMLElement | null>(null)
+const isoSummary = ref('')
+const isoReproHostCountAfterUnmount = ref(-1)
+let isoAppA: App | null = null
+let isoAppB: App | null = null
+let isoMsgA: FsusMessageService | null = null
+let isoMsgB: FsusMessageService | null = null
+
+const IsoMessageVNode = defineComponent({
+  name: 'IsoMessageVNode',
+  props: { label: { type: String, required: true } },
+  setup(props) {
+    const tenant = inject(ISOLATION_TENANT_KEY, 'missing')
+    const cfg = useFsusConfig()
+    const { t } = useFsusLocale()
+    return () =>
+      h(
+        'span',
+        { 'data-testid': `iso-msg-${tenant}` },
+        `${props.label}|${tenant}|${cfg.value.size ?? 'none'}|${t('common.confirm')}`,
+      )
+  },
+})
+
+const mountIsolationApps = () => {
+  if (!isoMountA.value || !isoMountB.value) return
+  const RootProbe = defineComponent({
+    name: 'IsoRootProbe',
+    setup() {
+      const tenant = inject(ISOLATION_TENANT_KEY, 'missing')
+      const cfg = useFsusConfig()
+      const { t } = useFsusLocale()
+      return () =>
+        h(
+          'div',
+          { 'data-testid': `iso-app-${tenant}` },
+          `${tenant}:${cfg.value.size ?? 'none'}:${t('common.confirm')}`,
+        )
+    },
+  })
+
+  isoAppA = createApp(RootProbe)
+  isoAppA.use(createFsusUI({ components: [], size: 'sm', locale: en }))
+  isoAppA.provide(ISOLATION_TENANT_KEY, 'alpha')
+  isoAppA.mount(isoMountA.value)
+  isoMsgA = isoAppA.runWithContext(() => useFsusMessage())
+
+  isoAppB = createApp(RootProbe)
+  isoAppB.use(createFsusUI({ components: [], size: 'lg', locale: zhCN }))
+  isoAppB.provide(ISOLATION_TENANT_KEY, 'beta')
+  isoAppB.mount(isoMountB.value)
+  isoMsgB = isoAppB.runWithContext(() => useFsusMessage())
+
+  const cfgA = isoAppA.runWithContext(() => useFsusConfig())
+  const cfgB = isoAppB.runWithContext(() => useFsusConfig())
+  isoSummary.value = `${cfgA.value.size ?? 'none'}/${cfgB.value.size ?? 'none'}`
+}
+
+const isoShowA = () => {
+  isoMsgA?.info({ message: h(IsoMessageVNode, { label: 'FromA' }), duration: 0 })
+}
+
+const isoShowB = () => {
+  isoMsgB?.success({ message: h(IsoMessageVNode, { label: 'FromB' }), duration: 0 })
+}
+
+const isoCloseAllA = () => {
+  isoMsgA?.closeAll()
+}
+
+const isoUnmountA = () => {
+  isoAppA?.unmount()
+  isoAppA = null
+}
+
+const isoUnmountB = () => {
+  isoAppB?.unmount()
+  isoAppB = null
+}
+
+const runIssue1152ReproCycle = () => {
+  const mp = document.createElement('div')
+  document.body.appendChild(mp)
+  const tempApp = createApp({
+    setup() {
+      onMounted(() => {
+        FsusMessage({ message: 'Message from application A', duration: 0 })
+      })
+      return () => null
+    },
+  })
+  tempApp.use(createFsusUI({ components: [] }))
+  tempApp.mount(mp)
+  tempApp.unmount()
+  mp.remove()
+  isoReproHostCountAfterUnmount.value = document.querySelectorAll('[data-fsus-message-host]').length
+}
+
+onBeforeUnmount(() => {
+  isoAppA?.unmount()
+  isoAppB?.unmount()
+})
 const markdownContent = [
   '# Draft milestone',
   '',
@@ -97,6 +221,10 @@ onMounted(async () => {
   root.dataset.fsusTheme = themeParam
   root.classList.toggle('dark', themeParam === 'dark')
   root.classList.toggle('light', themeParam === 'light')
+
+  if (activeRoute.value === 'isolation') {
+    mountIsolationApps()
+  }
 
   if (activeRoute.value === 'markdown') {
     const core = await ensureWasmReady()
@@ -238,6 +366,21 @@ onMounted(async () => {
         <div data-testid="wasm-probe-engine">{{ wasmProbeEngine }}</div>
         <div data-testid="wasm-probe-html">{{ wasmProbeHtml }}</div>
         <FsusMarkdownRenderer :content="markdownContent" data-testid="markdown-renderer" />
+      </section>
+
+      <section v-else-if="activeRoute === 'isolation'" data-testid="isolation-contract">
+        <div ref="isoMountA"></div>
+        <div ref="isoMountB"></div>
+        <div data-testid="iso-config-summary">{{ isoSummary }}</div>
+        <div data-testid="iso-repro-hosts">{{ isoReproHostCountAfterUnmount }}</div>
+        <div class="contract-toolbar">
+          <FsusButton data-testid="iso-show-a" @click="isoShowA">Show A</FsusButton>
+          <FsusButton data-testid="iso-show-b" @click="isoShowB">Show B</FsusButton>
+          <FsusButton data-testid="iso-close-all-a" @click="isoCloseAllA">Close All A</FsusButton>
+          <FsusButton data-testid="iso-unmount-a" @click="isoUnmountA">Unmount A</FsusButton>
+          <FsusButton data-testid="iso-unmount-b" @click="isoUnmountB">Unmount B</FsusButton>
+          <FsusButton data-testid="iso-run-repro" @click="runIssue1152ReproCycle">Run Repro</FsusButton>
+        </div>
       </section>
 
       <section v-else>
