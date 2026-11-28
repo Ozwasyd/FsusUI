@@ -171,5 +171,7 @@ test('markdown stress route renders long WASM content without diagnostics', asyn
   await expect(section).toBeVisible()
   const renderer = section.locator('.markdown-stress-renderer').first()
   await expect(renderer).toBeVisible()
-  expect(await renderer.locator('h1, h2, h3').count()).toBeGreaterThan(0)
+  await expect(renderer.locator('h1, h2, h3').first()).toBeVisible({
+    timeout: 20_000,
+  })
 })
