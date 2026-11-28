@@ -1,16 +1,16 @@
 {
   "schema": "fsusui-independent-ux-review.v1",
   "issue": 285,
-  "candidateSha": "c9e22cd21427ac38b524e11740c49dc2114c2886",
+  "candidateSha": "f476fa535fc9ddd47a4a2b2375359a4dedd7f6de",
   "reviewMode": "read-only-rendered-evidence-inspection",
   "modifiedPaths": [],
   "productionFixture": true,
   "identity": {
-    "executionId": "conformance-v2-check-tag-c1c96ca439393a75300a12ea0a8bef81602ea54c",
+    "executionId": "conformance-v2-check-tag-f476fa535fc9ddd47a4a2b2375359a4dedd7f6de",
     "checkpoint": "check-tag-after-pointer-keyboard",
-    "candidate": "c1c96ca439393a75300a12ea0a8bef81602ea54c",
-    "contractHash": "199b2ad9d59a03a6106e37bdca6b8dff79307c072ebfba56e6aaf39921c39408",
-    "webBaselineHash": "cc8ab81f4246153351f9477a56122f716fb23b2a8ec494232b03768a2c968863",
+    "candidate": "f476fa535fc9ddd47a4a2b2375359a4dedd7f6de",
+    "contractHash": "1d40900bfc64dd0ddc4fcb05d77e178abfbb69d923732d0b49d33b840086f2a6",
+    "webBaselineHash": "a5e77eff884a694e12f29d80a2c66849b13c4df161730e4402ee4c3da3172b45",
     "avaloniaBaselineHash": "fbf55ff00179b0705c80a395b9cc7b5db31e759ca0729d107f02d2b7f86614a9",
     "scenario": "scenario.v2.fsus-check-tag.real-interaction-trace",
     "contract": "component-v2.fsus-check-tag",
@@ -27,10 +27,7 @@
   "viewportStateMatrix": [
     {
       "platform": "web",
-      "viewport": {
-        "width": 75,
-        "height": 24
-      },
+      "viewport": {},
       "state": "focused-unchecked-after-pointer-keyboard",
       "theme": "light",
       "density": "default",
@@ -47,10 +44,7 @@
     },
     {
       "platform": "avalonia",
-      "viewport": {
-        "width": 960,
-        "height": 720
-      },
+      "viewport": {},
       "state": "focused-unchecked-after-pointer-keyboard",
       "theme": "light",
       "density": "default",
@@ -74,8 +68,6 @@
       "path": "tests/conformance/visual/artifacts/issue-285-check-tag/check-tag-web-focused-unchecked.png",
       "digest": "9be952350bc885ddc2ba857c05179f9d9336e491eb1085ed000f7d49bd25334b",
       "bytes": 1216,
-      "width": 75,
-      "height": 24,
       "inspected": true,
       "fixtureClass": "production"
     },
@@ -86,8 +78,6 @@
       "path": "tests/conformance/visual/artifacts/issue-285-check-tag/check-tag-avalonia-focused-unchecked.png",
       "digest": "3ae99ccd280405a7e7a0d1f622367ed017a4dc1819de8d3c59e427b6a2764cb0",
       "bytes": 9661,
-      "width": 960,
-      "height": 720,
       "inspected": true,
       "fixtureClass": "production"
     }
@@ -115,10 +105,11 @@
     }
   ],
   "observations": [
-    "Inspected both Linux production captures from GitHub Actions run 46131173958, attempt 1, artifact 15258550236 (commit c1c96ca439393a75300a12ea0a8bef81602ea54c, with DateTime unit-test-only ancestor commit c9e22cd21427ac38b524e11740c49dc2114c2886).",
-    "The candidate manifests bind contract 199b2ad9d59a03a6106e37bdca6b8dff79307c072ebfba56e6aaf39921c39408, Web baseline cc8ab81f4246153351f9477a56122f716fb23b2a8ec494232b03768a2c968863, Avalonia baseline fbf55ff00179b0705c80a395b9cc7b5db31e759ca0729d107f02d2b7f86614a9, and runner 9119613272fffd8fd3de38e9d8eb3b51891a3681b4286ab59f8b6ef87e583b13.",
+    "Inspected both Linux production captures from GitHub Actions run 46137337830, job 140955471405, artifact 15260665218 (ZIP SHA-256 40e7c655663c529c20625d3191da06a2abf67ed9e04a4e0f15fe1c027fdd3d26, commit f476fa535fc9ddd47a4a2b2375359a4dedd7f6de).",
+    "The candidate manifests bind contract 1d40900bfc64dd0ddc4fcb05d77e178abfbb69d923732d0b49d33b840086f2a6, Web baseline a5e77eff884a694e12f29d80a2c66849b13c4df161730e4402ee4c3da3172b45, Avalonia baseline fbf55ff00179b0705c80a395b9cc7b5db31e759ca0729d107f02d2b7f86614a9, and runner 9119613272fffd8fd3de38e9d8eb3b51891a3681b4286ab59f8b6ef87e583b13.",
     "Both current PNGs match the tracked comparator images byte for byte, including the verified crop and window sizes.",
-    "The functional cross-platform conformance comparison passes. Timing observations are diagnostic."
+    "web-a11y/manifest.json SHA-256 b550922bbb042f416937ce58b598765f177cbf2a8443a6b2fb0d37e822648bc6",
+    "avalonia.json SHA-256 83db21ac08fce73d24dd7180e6ba749a057520007f2189cf8f52e8edeea1ed1e"
   ],
   "limitations": [
     "Only the light/default/zh-CN/ltr/reduced-motion CheckTag checkpoint was independently accepted, not full CI, AOT, package, cross-platform rendering equivalence or performance.",
@@ -127,7 +118,7 @@
   ],
   "blockers": [],
   "status": "accepted",
-  "classificationReceiptDigest": "ed78365772f27d64bb3744f748b87f3ac3e6c7c8377e3989c9c785a20dfd276f",
-  "candidateDigest": "64ed3a1582f0ec54c5a99076ed2d7ee348eee95e063edc8d500d230abbf0f2b1",
-  "receiptDigest": "c202b73cb76776e89a952230bdc4e228b45b94119a9344c0ae90ef995a40a980"
+  "classificationReceiptDigest": "3bf2ddd057ebba5d8fd036d43f7b9385688e5aae3fe1f5216555d60d1ff28851",
+  "candidateDigest": "6a7868aafe09a2ca1318716bc942589a5f934738b1f04bfefc10609696210816",
+  "receiptDigest": "ea63d8ef97e38b3daad27ee4760c53293398c062515b7231168278b0ff8b596e"
 }

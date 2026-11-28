@@ -34,7 +34,7 @@
   ],
   "activeBaselineIdentity": {
     "repository": "Ozwasyd/FsusUI",
-    "revision": "450a65f5459ffd61739c4a1f30ef5378abc355ab",
+    "revision": "f476fa535fc9ddd47a4a2b2375359a4dedd7f6de",
     "skillDigest": "c88357a6ba0340000bae5839daeb67a3cd2722e8242cf7e0148006c3610a44fe",
     "authorityDigest": "ff2e25cf5b8a3e890956cd640cf0b0c843d58801a406d4af2241fda984da4526",
     "dirtyFingerprint": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
@@ -51,22 +51,22 @@
   ],
   "domainPolicyDigest": "620c4f746c1f259e3b640044975ad2878b7913806038706f7991bee9d72104d3",
   "status": "frozen",
-  "candidateSha": "c9e22cd21427ac38b524e11740c49dc2114c2886",
-  "candidateDigest": "64ed3a1582f0ec54c5a99076ed2d7ee348eee95e063edc8d500d230abbf0f2b1",
+  "candidateSha": "f476fa535fc9ddd47a4a2b2375359a4dedd7f6de",
+  "candidateDigest": "6a7868aafe09a2ca1318716bc942589a5f934738b1f04bfefc10609696210816",
   "stateEvidenceMatrix": [
     {
-      "viewport": "75x24",
+      "viewport": "undefinedxundefined",
       "state": "focused-unchecked-after-pointer-keyboard",
       "theme": "light",
       "evidenceDigest": "9be952350bc885ddc2ba857c05179f9d9336e491eb1085ed000f7d49bd25334b"
     },
     {
-      "viewport": "960x720",
+      "viewport": "undefinedxundefined",
       "state": "focused-unchecked-after-pointer-keyboard",
       "theme": "light",
       "evidenceDigest": "3ae99ccd280405a7e7a0d1f622367ed017a4dc1819de8d3c59e427b6a2764cb0"
     }
   ],
-  "classificationEvidenceDigest": "5616c03b607c7ff5524289e3198abcf0a9d69da20296a9ceb009bdaa46ec90f6",
-  "receiptDigest": "ed78365772f27d64bb3744f748b87f3ac3e6c7c8377e3989c9c785a20dfd276f"
+  "classificationEvidenceDigest": "fd7854a89e00c6c21536b02274bd1aa12b55294ef62cc58fe91147edf9a47c36",
+  "receiptDigest": "3bf2ddd057ebba5d8fd036d43f7b9385688e5aae3fe1f5216555d60d1ff28851"
 }

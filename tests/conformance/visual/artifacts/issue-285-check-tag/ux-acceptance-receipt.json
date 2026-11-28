@@ -1,8 +1,8 @@
 {
   "schema": "fsusui-design-conformance.ux-acceptance-receipt.v2",
-  "classificationReceiptDigest": "ed78365772f27d64bb3744f748b87f3ac3e6c7c8377e3989c9c785a20dfd276f",
-  "candidateSha": "c9e22cd21427ac38b524e11740c49dc2114c2886",
-  "candidateDigest": "64ed3a1582f0ec54c5a99076ed2d7ee348eee95e063edc8d500d230abbf0f2b1",
+  "classificationReceiptDigest": "3bf2ddd057ebba5d8fd036d43f7b9385688e5aae3fe1f5216555d60d1ff28851",
+  "candidateSha": "f476fa535fc9ddd47a4a2b2375359a4dedd7f6de",
+  "candidateDigest": "6a7868aafe09a2ca1318716bc942589a5f934738b1f04bfefc10609696210816",
   "verificationClass": "ux-path",
   "requiredSkillDigests": [
     "c88357a6ba0340000bae5839daeb67a3cd2722e8242cf7e0148006c3610a44fe"
@@ -13,14 +13,14 @@
     "c5d43303e89931346f9d634dd592ecb54418d15a74ae923f72e52795a115544e",
     "0bd20f9ae6997aa9b7daeb0cec2f558738565bd0932828617aea2f5b84626042"
   ],
-  "activeBaselineIdentityDigest": "1b76db6814c49aa483d3b4dacc2f0bdaf483c21e79388e8b7b6d91102fefeccb",
+  "activeBaselineIdentityDigest": "f26204f3145bb1c754f36ff946879d4bb68f44cc629027a4330879edff3b557f",
   "domainPolicyDigest": "620c4f746c1f259e3b640044975ad2878b7913806038706f7991bee9d72104d3",
-  "independenceEvidenceDigest": "ab31765a537177d32bb72738fbc4ae7d49113829fc26f462fbff60c2c96c701f",
+  "independenceEvidenceDigest": "9c05a8229d1759d3e8f86d3e253b822bbdba58c3857d1a115b1e363929c48445",
   "modifiedPaths": [],
   "productionFixture": true,
   "viewportStateMatrix": [
     {
-      "viewport": "75x24",
+      "viewport": "undefinedxundefined",
       "state": "focused-unchecked-after-pointer-keyboard",
       "theme": "light",
       "inputModes": [
@@ -32,7 +32,7 @@
       "evidenceDigest": "9be952350bc885ddc2ba857c05179f9d9336e491eb1085ed000f7d49bd25334b"
     },
     {
-      "viewport": "960x720",
+      "viewport": "undefinedxundefined",
       "state": "focused-unchecked-after-pointer-keyboard",
       "theme": "light",
       "inputModes": [
@@ -63,5 +63,5 @@
   ],
   "blockers": [],
   "status": "accepted",
-  "receiptDigest": "1f3cf409a516a5ad89cf62902124f94bac5a75de4d839b7868a4090d99ddebb0"
+  "receiptDigest": "b49ecb7d12800447432b7b53683b5f510128bc204094ec6779b408d5794267ae"
 }
