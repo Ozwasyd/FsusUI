@@ -989,7 +989,7 @@ const runFixtureAssertions = () => {
   if (!tsxWidget) throw new Error('fixture TSX widget missing from baseline')
   if (
     tsxWidget.source !==
-    'vue/packages/components/src/fixture-tsx-widget/FsusFixtureTsxWidget.tsx'
+    'vue/packages/components/src/fixture-tsx-widget/fixture-tsx-surface.tsx'
   ) {
     throw new Error('fixture TSX widget source identity was not exact')
   }
