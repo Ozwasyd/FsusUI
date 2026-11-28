@@ -1,11 +1,11 @@
 <template>
   <div class="consumer-smoke-app">
-    <el-button type="primary">FsusUI Consumer Smoke</el-button>
-    <el-markdown-renderer
+    <FsusButton type="primary">FsusUI Consumer Smoke</FsusButton>
+    <FsusMarkdownRenderer
       content="# Consumer Markdown&#10;&#10;This render path validates packaged WASM assets."
       mode="preview"
     />
-    <el-empty-state
+    <FsusEmptyState
       title="EmptyState package export"
       description="This validates the packed component and global types."
       size="compact"

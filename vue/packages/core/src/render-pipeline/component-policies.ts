@@ -27,43 +27,43 @@ export type FsusRenderPipelineComponentPolicy = {
 
 const virtualListComponents = new Set([
   'DynamicSizeList',
-  'ElDynamicSizeList',
-  'ElFixedSizeList',
+  'FsusDynamicSizeList',
+  'FsusFixedSizeList',
   'FixedSizeList',
 ])
 
 const virtualGridComponents = new Set([
   'DynamicSizeGrid',
-  'ElDynamicSizeGrid',
-  'ElFixedSizeGrid',
+  'FsusDynamicSizeGrid',
+  'FsusFixedSizeGrid',
   'FixedSizeGrid',
 ])
 
 const inheritedVirtualComponents = new Map([
-  ['ElSelectV2', 'ElFixedSizeList'],
-  ['ElTableV2', 'ElFixedSizeGrid'],
-  ['ElTreeV2', 'ElFixedSizeList'],
+  ['FsusSelect', 'FsusFixedSizeList'],
+  ['FsusTable', 'FsusFixedSizeGrid'],
+  ['FsusTree', 'FsusFixedSizeList'],
 ])
 
-const viewportProviderComponents = new Set(['ElScrollbar'])
+const viewportProviderComponents = new Set(['FsusScrollbar'])
 
 const chunkAdapterComponents = new Map([
-  ['ElMarkdownRenderer', 'markdown-renderer'],
+  ['FsusMarkdownRenderer', 'markdown-renderer'],
 ])
 
 const serviceComponents = new Set([
-  'ElLoading',
-  'ElMessage',
-  'ElMessageBox',
-  'ElNotification',
+  'FsusLoadingService',
+  'FsusMessage',
+  'FsusMessageBox',
+  'FsusNotification',
 ])
 
-const directiveComponents = new Set(['ElInfiniteScroll', 'ElPopoverDirective'])
+const directiveComponents = new Set(['FsusInfiniteScroll', 'FsusLoading'])
 
 const componentPolicies = new Map<string, FsusRenderPipelineComponentPolicy>()
 const installNameComponentAliases = new Map([
-  ['$message', 'ElMessage'],
-  ['$notify', 'ElNotification'],
+  ['$message', 'FsusMessage'],
+  ['$notify', 'FsusNotification'],
 ])
 
 const normalizeComponentName = (name: string) => name.trim()
@@ -83,8 +83,8 @@ export const resolveFsusInstallComponentName = (
   const normalized = normalizeComponentName(name)
   const aliased = installNameComponentAliases.get(normalized)
   if (aliased) return aliased
-  if (normalized.startsWith('El')) return normalized
-  return `El${pascalize(normalized)}${suffix}`
+  if (normalized.startsWith('Fsus')) return normalized
+  return `Fsus${pascalize(normalized)}${suffix}`
 }
 
 export const getFsusComponentName = (component: unknown) => {

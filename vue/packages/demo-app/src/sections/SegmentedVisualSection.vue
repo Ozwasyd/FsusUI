@@ -170,7 +170,7 @@ const checkbox1 = ref<CheckboxGroupValueType>(['a'])
 const checkbox2 = ref<CheckboxGroupValueType>(['a'])
 const checkbox3 = ref<CheckboxGroupValueType>(['a', 'c'])
 
-// Use the same public local entry as the demo's element-plus Vite alias.
+// Use the same public local entry as the demo's @ozwasyd/fsusui Vite alias.
 // No private component import or hand-authored radio/tab DOM is used here.
 const collectionActive = ref<SegmentedControlValue>('all')
 const collectionItems: SegmentedControlItem[] = [

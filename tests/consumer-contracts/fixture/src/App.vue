@@ -7,16 +7,29 @@ import {
   FsusCard,
   FsusCheckTag,
   FsusConfigProvider,
+  FsusCopyableDetail,
   FsusDataList,
   FsusDialog,
   FsusDropdown,
   FsusDropdownItem,
   FsusDropdownMenu,
+  FsusForm,
+  FsusFormItem,
   FsusIcon,
   FsusImageViewer,
+  FsusInput,
   FsusSegmentedControl,
+  FsusSelect,
+  FsusTabPane,
+  FsusTabs,
   FsusTag,
 } from '@ozwasyd/fsusui'
+import { FsusMarkdownRenderer } from '@ozwasyd/fsusui/markdown'
+import {
+  ensureWasmReady,
+  initMarkdownRuntime,
+  renderMarkdownResultWithRuntime,
+} from '@ozwasyd/fsusui/wasm'
 import { FsusIconArrowDown, FsusIconArrowLeft, FsusIconArrowRight } from '@ozwasyd/fsusui/icons'
 import { en, zhCN } from '@ozwasyd/fsusui/locale'
 
@@ -30,16 +43,37 @@ const activeLocale = computed(() => (localeParam === 'zh-cn' ? zhCN : en))
 const activeRoute = computed(() => {
   if (pathname.startsWith('/core')) return 'core'
   if (pathname.startsWith('/overlays')) return 'overlays'
+  if (pathname.startsWith('/markdown')) return 'markdown'
   return 'home'
 })
 
 const selectedCommand = ref('stable')
 const checkTagActive = ref(false)
 const segmentValue = ref('all')
+const selectedLanguage = ref<string | null>('en')
+const emailValue = ref('')
+const activeTab = ref('overview')
 const dialogOpen = ref(false)
 const viewerOpen = ref(false)
 const viewerIndex = ref(0)
 const viewerCloseCount = ref(0)
+
+const wasmProbeStatus = ref('pending')
+const wasmProbeHtml = ref('')
+const wasmProbeEngine = ref('')
+const markdownContent = [
+  '# Draft milestone',
+  '',
+  'Native Markdown rendering and packaged worker verification.',
+  '',
+  ...Array.from({ length: 1800 }, (_, i) => `- Section ${i + 1}: FsusUI preview 2 packaged worker verification payload line with steady prose.`),
+].join('\n')
+
+const languageOptions = [
+  { value: 'en', label: 'English' },
+  { value: 'zh', label: '中文' },
+  { value: 'ja', label: '日本語' },
+]
 
 const galleryImages = ['/images/fig-1.svg', '/images/fig-2.svg', '/images/fig-3.svg']
 const segmentOptions = [
@@ -57,12 +91,25 @@ const handleViewerClose = () => {
   viewerCloseCount.value += 1
 }
 
-onMounted(() => {
+onMounted(async () => {
   const root = document.documentElement
   root.dir = dirParam
   root.dataset.fsusTheme = themeParam
   root.classList.toggle('dark', themeParam === 'dark')
   root.classList.toggle('light', themeParam === 'light')
+
+  if (activeRoute.value === 'markdown') {
+    const core = await ensureWasmReady()
+    const md = await initMarkdownRuntime()
+    const rendered = await renderMarkdownResultWithRuntime('# Preview baseline')
+    if (core.ok && md.ok && rendered.ok) {
+      wasmProbeStatus.value = 'ok'
+      wasmProbeEngine.value = rendered.value.engine
+      wasmProbeHtml.value = rendered.value.html
+    } else {
+      wasmProbeStatus.value = `error:${JSON.stringify({ core, md, rendered })}`
+    }
+  }
 })
 </script>
 
@@ -113,6 +160,36 @@ onMounted(() => {
           </FsusCard>
         </FsusDataList>
 
+        <FsusForm data-testid="a11y-form">
+          <FsusFormItem label="Language">
+            <FsusSelect v-model="selectedLanguage" :options="languageOptions" data-testid="language-select" />
+          </FsusFormItem>
+          <FsusFormItem label="Contact Email">
+            <FsusInput
+              id="contact-email"
+              v-model="emailValue"
+              aria-describedby="email-hint"
+              required
+              inputmode="email"
+              data-testid="contact-email-input"
+            />
+            <template #help>
+              <span id="email-hint">Work email</span>
+            </template>
+          </FsusFormItem>
+        </FsusForm>
+
+        <FsusTabs v-model="activeTab" data-testid="a11y-tabs">
+          <FsusTabPane name="overview" label="Overview">
+            <p data-testid="tab-overview-body">Overview content</p>
+          </FsusTabPane>
+          <FsusTabPane name="details" label="Details">
+            <p data-testid="tab-details-body">Details content</p>
+          </FsusTabPane>
+        </FsusTabs>
+
+        <FsusCopyableDetail label="API Token" value="fsus-preview-token" data-testid="copyable-detail" />
+
         <div class="contract-status">
           <span data-testid="selected-command">{{ selectedCommand }}</span>
           <span data-testid="check-tag-state">{{ String(checkTagActive) }}</span>
@@ -154,6 +231,13 @@ onMounted(() => {
           <span data-testid="viewer-index-state">{{ viewerIndex }}</span>
           <span data-testid="viewer-close-count">{{ viewerCloseCount }}</span>
         </div>
+      </section>
+
+      <section v-else-if="activeRoute === 'markdown'" data-testid="markdown-contract">
+        <div data-testid="wasm-probe-status">{{ wasmProbeStatus }}</div>
+        <div data-testid="wasm-probe-engine">{{ wasmProbeEngine }}</div>
+        <div data-testid="wasm-probe-html">{{ wasmProbeHtml }}</div>
+        <FsusMarkdownRenderer :content="markdownContent" data-testid="markdown-renderer" />
       </section>
 
       <section v-else>

@@ -1,14 +1,20 @@
-import { renderMarkdownChunksWithRuntime } from '@fsusui/wasm'
+import {
+  renderMarkdownChunksWithRuntime,
+  setMarkdownRuntimeAssetOverrides,
+} from '@fsusui/wasm'
 
 import type {
+  MarkdownAssetKind,
   MarkdownRenderChunk,
   MarkdownRenderRequest,
   MarkdownRuntimeChunkResult,
+  WasmAssetUrlPair,
 } from '@fsusui/wasm'
 
 type ParserRequest = {
   id: number
   request: MarkdownRenderRequest
+  markdownAssets?: Partial<Record<MarkdownAssetKind, WasmAssetUrlPair>>
 }
 
 export type ParserDocument = {
@@ -69,7 +75,10 @@ const cacheDocument = (key: string, value: ParserDocument) => {
 }
 
 scope.onmessage = (event) => {
-  const { id, request } = event.data
+  const { id, request, markdownAssets } = event.data
+  if (markdownAssets) {
+    setMarkdownRuntimeAssetOverrides(markdownAssets)
+  }
   const key = requestKey(request)
   const cached = cache.get(key)
   if (cached) {

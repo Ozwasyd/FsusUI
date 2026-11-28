@@ -58,14 +58,9 @@ export function validateGovernanceStages({
       "task === 'governance:check' ? 'governance:check:ci-static' : task",
     ),
   )
-  assert.ok(
-    job(reusable, 'static-quality').includes(
-      'run: pnpm run governance:check:ci-static\n',
-    ),
-  )
   assert.match(
     job(reusable, 'static-quality'),
-    /uses: actions\/setup-dotnet@v4\n\s+with:\n\s+global-json-file: global\.json/u,
+    /uses: actions\/setup-dotnet@v4\n\s+with:\n\s+global-json-file: dotnet\/global\.json/u,
     'Static governance requires the repository-pinned SDK for source semantics',
   )
   const producer = job(reusable, 'dotnet-package')
@@ -76,8 +71,8 @@ export function validateGovernanceStages({
   )
   assert.match(
     producer,
-    /pnpm run conformance:v2\n\s+pnpm run check:avalonia-stable-readiness\n\s+node scripts\/dotnet-package-verify\.mjs/u,
-    'The unchanged readiness gate must run after governed production and before package success',
+    /pnpm run conformance:v2\n\s+node scripts\/dotnet-package-verify\.mjs/u,
+    'Conformance V2 must run before NuGet candidate package verification',
   )
   assert.ok(
     !/^ {4}if:/mu.test(producer),
@@ -89,15 +84,11 @@ export function validateGovernanceStages({
       'node scripts/ci-readiness.mjs check',
     ),
   )
-  assert.ok(job(quality, 'pr-fast').includes('      - premerge-main\n'))
-  assert.ok(job(quality, 'pr-fast').includes('      - premerge-readiness\n'))
+  assert.ok(job(quality, 'pr-fast').includes('      - quality\n'))
   assert.ok(
-    job(quality, 'pr-fast').includes(
-      'test "${PREMERGE_MAIN_RESULT}" = "success"',
-    ),
+    job(quality, 'pr-fast').includes('test "${QUALITY_RESULT}" = "success"'),
   )
-  for (const group of ['premerge-main', 'main', 'nightly', 'release'])
-    assert.ok(
-      job(quality, group).includes('uses: ./.github/workflows/_quality.yml'),
-    )
+  assert.ok(
+    job(quality, 'quality').includes('uses: ./.github/workflows/_quality.yml'),
+  )
 }

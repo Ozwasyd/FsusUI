@@ -1,6 +1,6 @@
 {
   "name": "@fsusui/wasm",
-  "version": "2.0.0-preview.1",
+  "version": "2.0.0-preview.2",
   "private": true,
   "type": "module",
   "description": "WebAssembly acceleration layer for FsusUI (C++23 / Emscripten)",

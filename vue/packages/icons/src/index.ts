@@ -32,9 +32,17 @@ export interface FsusIconProps {
   viewBox?: string
 }
 
+const CANONICAL_ICON_SIZES = new Set(['10', '12', '14', '16', '18', '20', '24'])
+
 const toCssSize = (size?: number | string): string | undefined => {
   if (size === undefined || size === '') return undefined
   return typeof size === 'number' || /^\d+(?:\.\d+)?$/.test(size) ? `${size}px` : size
+}
+
+const toCanonicalSizeToken = (size?: number | string): string | undefined => {
+  if (size === undefined || size === '') return undefined
+  const raw = typeof size === 'number' ? String(size) : size.trim().replace(/px$/u, '')
+  return CANONICAL_ICON_SIZES.has(raw) ? raw : undefined
 }
 
 export const FsusIcon = defineComponent({
@@ -54,7 +62,8 @@ export const FsusIcon = defineComponent({
     return () => {
       const resolvedPath = props.path ?? resolveFsusIconPath(props.name)
       const isDecorative = props.decorative ?? !props.label
-      const fontSize = toCssSize(props.size)
+      const canonicalSize = toCanonicalSizeToken(props.size)
+      const fontSize = canonicalSize ? undefined : toCssSize(props.size)
       const style: Record<string, string> = {}
       if (fontSize) style.fontSize = fontSize
       if (props.color) style.color = props.color
@@ -63,6 +72,7 @@ export const FsusIcon = defineComponent({
         'span',
         {
           class: 'fsus-icon',
+          'data-size': canonicalSize,
           'data-spin': props.spin ? '' : undefined,
           'data-variant': props.variant === 'linear' ? 'linear' : undefined,
           'aria-hidden': isDecorative ? 'true' : undefined,

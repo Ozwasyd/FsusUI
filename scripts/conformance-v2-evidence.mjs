@@ -215,9 +215,6 @@ export async function loadCurrentCheckTagVisualReview(web, avalonia) {
         !file.startsWith('spec/components/contracts/v2/') &&
         !file.startsWith('spec/baselines/') &&
         !file.startsWith('docs/avalonia/vue-public-api-baseline.md') &&
-        !file.startsWith(
-          'spec/components/component-surface-semantic-registry.json',
-        ) &&
         !file.startsWith('generated/') &&
         !file.startsWith('vue/packages/theme/src/generated/') &&
         !file.startsWith('docs/avalonia/generated/') &&

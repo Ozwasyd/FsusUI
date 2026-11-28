@@ -177,7 +177,7 @@ const EXCLUSIONS = [
   },
   {
     id: 'vue-public-api-package-fixture',
-    path: 'tests/fixtures/vue-public-api-baseline/vue/packages/element-plus/package.json',
+    path: 'tests/fixtures/vue-public-api-baseline/vue/packages/fsusui/package.json',
     field: '*',
     reason:
       'Frozen input fixture for public API baseline mutation tests, not a consumable manifest.',

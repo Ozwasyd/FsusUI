@@ -133,6 +133,6 @@
     "install": "Exact versions installed in the monorepo for build/test/tools.",
     "publishedRangeContainment": "Each published.dependencies/optional range MUST include the corresponding install exact version (semver.satisfies).",
     "peerFloorLatest": "peerDependencies ranges are public contracts; consumerProfiles npm-peer-floor tests the lower bound and npm-latest/pnpm-latest test current install pins.",
-    "internalWorkspace": "Packages under workspace: protocol and @element-plus/* workspace packages are excluded from external authority."
+    "internalWorkspace": "Packages under workspace: protocol and @fsusui/* workspace packages are excluded from external authority."
   }
 }

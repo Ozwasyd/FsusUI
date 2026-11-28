@@ -84,6 +84,43 @@ test.describe('FsusUI 2.0 core & dropdown consumer contract', () => {
       .click()
     await expect(page.getByTestId('segment-state')).toHaveText('published')
 
+    // #1145: FsusFormItem label names FsusSelect combobox & Space opens it
+    const langCombo = page.getByRole('combobox', { name: 'Language' })
+    await expect(langCombo).toBeVisible()
+    await langCombo.focus()
+    await page.keyboard.press('Space')
+    await expect(langCombo).toHaveAttribute('aria-expanded', 'true')
+    await page.keyboard.press('Escape')
+    await expect(langCombo).toHaveAttribute('aria-expanded', 'false')
+
+    // #1146: FsusInput forwards id, required, inputmode, aria-describedby onto native <input>
+    const emailInput = page.locator('input#contact-email')
+    await expect(emailInput).toBeVisible()
+    await expect(emailInput).toHaveAttribute('required', '')
+    await expect(emailInput).toHaveAttribute('inputmode', 'email')
+    await expect(emailInput).toHaveAttribute('aria-describedby', 'email-hint')
+
+    // #1149: FsusTabs associates active tab with tabpanel via id / aria-controls / aria-labelledby
+    const overviewTab = page.getByRole('tab', { name: 'Overview' })
+    const overviewPanel = page.getByRole('tabpanel', { name: 'Overview' })
+    await expect(overviewTab).toBeVisible()
+    await expect(overviewPanel).toBeVisible()
+    const controlsId = await overviewTab.getAttribute('aria-controls')
+    expect(controlsId).toBeTruthy()
+    await expect(overviewPanel).toHaveAttribute('id', controlsId!)
+
+    // #1150: FsusCopyableDetail fails cleanly when Clipboard API is missing (never reports copied)
+    await page.evaluate(() => {
+      Object.defineProperty(navigator, 'clipboard', {
+        configurable: true,
+        value: undefined,
+      })
+    })
+    const copyDetail = page.getByTestId('copyable-detail')
+    await copyDetail.locator('button.fsus-copyable-detail__btn').click()
+    await expect(copyDetail).toHaveAttribute('data-status', 'error')
+    await expect(copyDetail.locator('[role="status"]')).toContainText('Copy failed')
+
     // Canonical --fsus-* tokens active with zero retired --el-* leakage
     const cssHealth = await page.evaluate(() => {
       const style = getComputedStyle(document.documentElement)

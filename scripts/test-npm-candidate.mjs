@@ -306,23 +306,23 @@ try {
   const circularDtsRoot = path.join(tempRoot, 'circular-dts-package')
   makePackage(circularDtsRoot, {
     exports: {
-      './icons-vue': {
-        types: './es/icons-vue.d.ts',
-        import: './es/icons-vue.mjs',
+      './icons': {
+        types: './es/icons.d.ts',
+        import: './es/icons.mjs',
       },
-      './es/icons-vue': {
-        types: './es/icons-vue.d.ts',
-        import: './es/icons-vue.mjs',
+      './es/icons': {
+        types: './es/icons.d.ts',
+        import: './es/icons.mjs',
       },
     },
   })
   writeFileSync(
-    path.join(circularDtsRoot, 'es/icons-vue.mjs'),
+    path.join(circularDtsRoot, 'es/icons.mjs'),
     'export const ArrowDown = {}\n',
   )
   writeFileSync(
-    path.join(circularDtsRoot, 'es/icons-vue.d.ts'),
-    "export * from '@ozwasyd/fsusui/es/icons-vue'\n",
+    path.join(circularDtsRoot, 'es/icons.d.ts'),
+    "export * from '@ozwasyd/fsusui/es/icons'\n",
   )
   assertThrows(
     () =>

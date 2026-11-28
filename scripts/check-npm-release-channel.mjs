@@ -16,27 +16,27 @@ const fixtures = JSON.parse(readFileSync(new URL('cases.json', fixtureRoot)))
 
 for (const { version, channel } of fixtures.plans) {
   const plan = createReleasePlan({
-    packageName: '@ozwasyd/element-plus',
+    packageName: '@ozwasyd/fsusui',
     version,
   })
   assert.equal(plan.distTag, channel)
   assert.equal(
     plan.concurrencyGroup,
-    `publish-npm-npm.pkg.github.com-ozwasyd-element-plus-${channel}`,
+    `publish-npm-npm.pkg.github.com-ozwasyd-fsusui-${channel}`,
   )
 }
 assert.notEqual(
-  createReleasePlan({ packageName: '@ozwasyd/element-plus', version: '1.5.1' })
+  createReleasePlan({ packageName: '@ozwasyd/fsusui', version: '2.0.0' })
     .concurrencyGroup,
   createReleasePlan({
-    packageName: '@ozwasyd/element-plus',
-    version: '1.6.0-preview.1',
+    packageName: '@ozwasyd/fsusui',
+    version: '2.0.0-preview.1',
   }).concurrencyGroup,
 )
 
-assert.equal(compareReleaseVersions('1.6.0-beta.10', '1.6.0-beta.2'), 1)
-assert.equal(compareReleaseVersions('1.6.0-rc.1', '1.6.0-beta.9'), 1)
-assert.equal(compareReleaseVersions('1.6.0', '1.6.0-rc.9'), 1)
+assert.equal(compareReleaseVersions('2.0.0-beta.10', '2.0.0-beta.2'), 1)
+assert.equal(compareReleaseVersions('2.0.0-rc.1', '2.0.0-beta.9'), 1)
+assert.equal(compareReleaseVersions('2.0.0', '2.0.0-rc.9'), 1)
 
 const automaticCases = [
   ...fixtures.automatic.map(({ action, ...input }) => [input, action]),
@@ -48,8 +48,8 @@ for (const input of fixtures.rejected)
   assert.throws(() => checkChannelMonotonicity(input))
 
 const stablePlan = createReleasePlan({
-  packageName: '@ozwasyd/element-plus',
-  version: '1.5.1',
+  packageName: '@ozwasyd/fsusui',
+  version: '2.0.0',
 })
 assert.doesNotThrow(() =>
   assertCandidateMatchesPlan(

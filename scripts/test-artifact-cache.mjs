@@ -143,7 +143,6 @@ export async function expandInputPatterns(patterns) {
     dot: true,
     ignore: [
       '**/node_modules/**',
-      'vue/packages/icons-vue/dist/**',
       'vue/packages/wasm/build/**',
       'vue/packages/wasm/dist/**',
     ],

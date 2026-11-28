@@ -10,17 +10,17 @@
   "baselines": {
     "web": {
       "path": "spec/baselines/vue-current.json",
-      "hash": "a5e77eff884a694e12f29d80a2c66849b13c4df161730e4402ee4c3da3172b45",
-      "packageVersion": "2.0.0-preview.1"
+      "hash": "c82efcb5f06df57265a05766c34aa976d8df9226e5e97a54f262ac77ed394cfe",
+      "packageVersion": "2.0.0-preview.2"
     },
     "avalonia": {
       "path": "spec/avalonia/semantic/FsusUI.Avalonia.semantic.json",
-      "hash": "fbf55ff00179b0705c80a395b9cc7b5db31e759ca0729d107f02d2b7f86614a9",
+      "hash": "f4b653980b92ba5f1d2b2bbdd2fc46c5fcac5ef8dc8c0ca83fa4b7e61b208082",
       "packageId": "FsusUI.Avalonia"
     },
     "avaloniaThemes": {
       "path": "spec/avalonia/semantic/FsusUI.Avalonia.Themes.semantic.json",
-      "hash": "dbbb4244c455edb8c2f460bfa923ca41485c8bba3d167c46e24196addd868d40",
+      "hash": "ef24ad929cece273e2d7ae229d06e0f14925ff0735166608414c739ebf4713df",
       "packageId": "FsusUI.Avalonia.Themes"
     },
     "avaloniaIcons": {
@@ -20559,6 +20559,144 @@
       },
       "inputs": [
         {
+          "name": "copiedLabel",
+          "kind": "input",
+          "web": {
+            "member": "copiedLabel",
+            "baseline": "spec/baselines/vue-current.json",
+            "categories": [
+              "string"
+            ],
+            "runtimeType": "String",
+            "semanticType": null,
+            "nullable": false,
+            "default": {
+              "kind": "undefined"
+            },
+            "values": null,
+            "valuesKnown": false,
+            "required": false,
+            "readonly": false,
+            "deprecated": false,
+            "deprecationMessage": null
+          },
+          "avalonia": null,
+          "status": "missing",
+          "drift": {
+            "type": null,
+            "default": null,
+            "required": null,
+            "readWrite": null,
+            "nullability": null,
+            "eventPayload": null,
+            "operationSignature": null,
+            "contentRegion": null,
+            "enumValues": null,
+            "deprecated": null
+          },
+          "scenarioIds": [
+            "scenario.v2.fsus-copyable-detail.input.copied-label"
+          ],
+          "governance": {
+            "reason": "No matching real Avalonia public member in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
+          "name": "copyErrorLabel",
+          "kind": "input",
+          "web": {
+            "member": "copyErrorLabel",
+            "baseline": "spec/baselines/vue-current.json",
+            "categories": [
+              "string"
+            ],
+            "runtimeType": "String",
+            "semanticType": null,
+            "nullable": false,
+            "default": {
+              "kind": "undefined"
+            },
+            "values": null,
+            "valuesKnown": false,
+            "required": false,
+            "readonly": false,
+            "deprecated": false,
+            "deprecationMessage": null
+          },
+          "avalonia": null,
+          "status": "missing",
+          "drift": {
+            "type": null,
+            "default": null,
+            "required": null,
+            "readWrite": null,
+            "nullability": null,
+            "eventPayload": null,
+            "operationSignature": null,
+            "contentRegion": null,
+            "enumValues": null,
+            "deprecated": null
+          },
+          "scenarioIds": [
+            "scenario.v2.fsus-copyable-detail.input.copy-error-label"
+          ],
+          "governance": {
+            "reason": "No matching real Avalonia public member in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
+          "name": "copyLabel",
+          "kind": "input",
+          "web": {
+            "member": "copyLabel",
+            "baseline": "spec/baselines/vue-current.json",
+            "categories": [
+              "string"
+            ],
+            "runtimeType": "String",
+            "semanticType": null,
+            "nullable": false,
+            "default": {
+              "kind": "undefined"
+            },
+            "values": null,
+            "valuesKnown": false,
+            "required": false,
+            "readonly": false,
+            "deprecated": false,
+            "deprecationMessage": null
+          },
+          "avalonia": null,
+          "status": "missing",
+          "drift": {
+            "type": null,
+            "default": null,
+            "required": null,
+            "readWrite": null,
+            "nullability": null,
+            "eventPayload": null,
+            "operationSignature": null,
+            "contentRegion": null,
+            "enumValues": null,
+            "deprecated": null
+          },
+          "scenarioIds": [
+            "scenario.v2.fsus-copyable-detail.input.copy-label"
+          ],
+          "governance": {
+            "reason": "No matching real Avalonia public member in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
           "name": "label",
           "kind": "input",
           "web": {
@@ -20686,7 +20824,76 @@
           }
         }
       ],
-      "outputs": [],
+      "outputs": [
+        {
+          "name": "copy",
+          "kind": "output",
+          "web": {
+            "member": "copy",
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
+          },
+          "avalonia": null,
+          "status": "missing",
+          "drift": {
+            "type": null,
+            "default": null,
+            "required": null,
+            "readWrite": null,
+            "nullability": null,
+            "eventPayload": null,
+            "operationSignature": null,
+            "contentRegion": null,
+            "enumValues": null,
+            "deprecated": null
+          },
+          "scenarioIds": [
+            "scenario.v2.fsus-copyable-detail.output.copy"
+          ],
+          "governance": {
+            "reason": "No matching real Avalonia public event in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
+          "name": "copyError",
+          "kind": "output",
+          "web": {
+            "member": "copyError",
+            "baseline": "spec/baselines/vue-current.json",
+            "payload": null,
+            "payloadShapeStatus": null,
+            "payloadShapeReason": null
+          },
+          "avalonia": null,
+          "status": "missing",
+          "drift": {
+            "type": null,
+            "default": null,
+            "required": null,
+            "readWrite": null,
+            "nullability": null,
+            "eventPayload": null,
+            "operationSignature": null,
+            "contentRegion": null,
+            "enumValues": null,
+            "deprecated": null
+          },
+          "scenarioIds": [
+            "scenario.v2.fsus-copyable-detail.output.copy-error"
+          ],
+          "governance": {
+            "reason": "No matching real Avalonia public event in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        }
+      ],
       "operations": [],
       "contentRegions": [],
       "states": {
@@ -20703,11 +20910,15 @@
         "keyboard": [
           "All public operations must be keyboard reachable and activatable."
         ],
-        "pointer": [],
+        "pointer": [
+          "Pointer/tap activation must raise the corresponding public output."
+        ],
         "focus": [
           "Focus entry must surface the same public focus state on both platforms."
         ],
-        "a11y": [],
+        "a11y": [
+          "Interactive surfaces must expose an accessible name and role."
+        ],
         "motion": [
           "Honor user reduced-motion preference."
         ],
@@ -20721,6 +20932,39 @@
         "memory": "no retained unbounded per-item state without virtualization budget"
       },
       "platformDifferences": [
+        {
+          "member": "copiedLabel",
+          "kind": "input",
+          "status": "missing",
+          "governance": {
+            "reason": "No matching real Avalonia public member in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
+          "member": "copyErrorLabel",
+          "kind": "input",
+          "status": "missing",
+          "governance": {
+            "reason": "No matching real Avalonia public member in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
+          "member": "copyLabel",
+          "kind": "input",
+          "status": "missing",
+          "governance": {
+            "reason": "No matching real Avalonia public member in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
         {
           "member": "label",
           "kind": "input",
@@ -20738,6 +20982,28 @@
           "status": "partial",
           "governance": {
             "reason": "Real member exists on both sides but semantic drift was detected.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
+          "member": "copy",
+          "kind": "output",
+          "status": "missing",
+          "governance": {
+            "reason": "No matching real Avalonia public event in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
+          "member": "copyError",
+          "kind": "output",
+          "status": "missing",
+          "governance": {
+            "reason": "No matching real Avalonia public event in the semantic baseline.",
             "owner": "FsusUI Core",
             "testPolicy": "contract",
             "reviewPolicy": "pr-review"
@@ -20807,21 +21073,28 @@
         }
       ],
       "scenarioIds": [
+        "scenario.v2.fsus-copyable-detail.input.copied-label",
+        "scenario.v2.fsus-copyable-detail.input.copy-error-label",
+        "scenario.v2.fsus-copyable-detail.input.copy-label",
         "scenario.v2.fsus-copyable-detail.input.label",
         "scenario.v2.fsus-copyable-detail.input.value",
+        "scenario.v2.fsus-copyable-detail.output.copy",
+        "scenario.v2.fsus-copyable-detail.output.copy-error",
         "scenario.v2.fsus-copyable-detail.state.default",
         "scenario.v2.fsus-copyable-detail.keyboard",
+        "scenario.v2.fsus-copyable-detail.pointer",
         "scenario.v2.fsus-copyable-detail.focus",
+        "scenario.v2.fsus-copyable-detail.a11y",
         "scenario.v2.fsus-copyable-detail.motion",
         "scenario.v2.fsus-copyable-detail.perf"
       ],
       "coverage": {
-        "total": 2,
+        "total": 7,
         "alignedCandidate": 0,
         "partial": 2,
-        "missing": 0,
+        "missing": 5,
         "webOnly": 0,
-        "mappedPercent": 100
+        "mappedPercent": 28.6
       }
     },
     {
@@ -100722,9 +100995,9 @@
   "coverage": {
     "aligned-candidate": 27,
     "partial": 123,
-    "missing": 894,
+    "missing": 899,
     "web-only": 16,
-    "total": 1060,
-    "mappedPercent": 14.2
+    "total": 1065,
+    "mappedPercent": 14.1
   }
 }

@@ -20,35 +20,29 @@ test('static/dynamic governance preserves the full union and required producer o
 
 for (const mutation of [
   'drop static gate',
-  'drop dynamic gate',
   'reverse producer order',
   'optional producer',
   'drop PR dependency',
-  'drop PR readiness dependency',
   'shallow NuGet producer',
   'missing checkout depth',
 ]) {
   test(`governance split rejects ${mutation}`, () => {
     const value = assets()
     if (mutation === 'shallow NuGet producer')
-      value.reusable = value.reusable.replace('          fetch-depth: 0\n', '          fetch-depth: 3\n')
-    if (mutation === 'drop PR readiness dependency')
-      value.quality = value.quality.replaceAll('      - premerge-readiness\n', '')
+      value.reusable = value.reusable.replace(
+        '          fetch-depth: 0\n',
+        '          fetch-depth: 3\n',
+      )
     if (mutation === 'missing checkout depth')
       value.reusable = value.reusable.replace('          fetch-depth: 0\n', '')
     if (mutation === 'drop static gate')
       value.scripts['governance:check:ci-static'] = value.scripts[
         'governance:check:ci-static'
       ].replace('run-ci-static-governance.mjs', 'skip-governance.mjs')
-    if (mutation === 'drop dynamic gate')
-      value.reusable = value.reusable.replace(
-        '          pnpm run check:avalonia-stable-readiness\n',
-        '',
-      )
     if (mutation === 'reverse producer order')
       value.reusable = value.reusable.replace(
-        'pnpm run conformance:v2\n          pnpm run check:avalonia-stable-readiness',
-        'pnpm run check:avalonia-stable-readiness\n          pnpm run conformance:v2',
+        'xvfb-run -a dbus-run-session -- pnpm run conformance:v2\n          node scripts/dotnet-package-verify.mjs',
+        'node scripts/dotnet-package-verify.mjs\n          xvfb-run -a dbus-run-session -- pnpm run conformance:v2',
       )
     if (mutation === 'optional producer')
       value.reusable = value.reusable.replace(
@@ -56,7 +50,7 @@ for (const mutation of [
         '  dotnet-package:\n    if: false\n',
       )
     if (mutation === 'drop PR dependency')
-      value.quality = value.quality.replaceAll('      - premerge-main\n', '')
+      value.quality = value.quality.replaceAll('      - quality\n', '')
     assert.throws(() => validateGovernanceStages(value))
   })
 }

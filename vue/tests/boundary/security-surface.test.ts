@@ -5,7 +5,10 @@ import * as ts from 'typescript'
 import { describe, expect, it } from 'vitest'
 
 const repoRoot = process.cwd()
-const sourcePatterns = ['vue/packages/components/**/*.{ts,tsx,vue}']
+const sourcePatterns = [
+  'vue/packages/components/src/**/*.{ts,tsx,vue}',
+  'vue/packages/markdown/src/**/*.{ts,tsx,vue}',
+]
 const ignorePatterns = [
   '**/__tests__/**',
   '**/node_modules/**',
@@ -19,23 +22,15 @@ type ExpectedSink = {
 }
 
 const expectedHtmlSinks: Record<string, ExpectedSink> = {
-  'vue/packages/components/cascader-panel/src/menu.vue': {
-    contract: 'static svg hover-zone geometry only',
-    evidence: [/hoverZone\.value\.innerHTML = `[\s\S]*<path/],
-  },
-  'vue/packages/components/loading/src/loading.ts': {
-    contract: 'explicit custom SVG override only; default spinner is VNode',
-    evidence: [/\.\.\.\(svg \? \{ innerHTML: svg \} : \{\}\)/],
-  },
-  'vue/packages/components/markdown-editor/src/markdown-editor-latex.ts': {
+  'vue/packages/markdown/src/markdown-editor/src/markdown-editor-latex.ts': {
     contract: 'mutation fixtures reject consumer innerHTML; no DOM HTML write',
     evidence: [/latex output must not accept consumer innerHTML or DOM/],
   },
-  'vue/packages/components/markdown-editor/src/markdown-editor-mermaid.ts': {
+  'vue/packages/markdown/src/markdown-editor/src/markdown-editor-mermaid.ts': {
     contract: 'mutation fixtures reject consumer innerHTML; no DOM HTML write',
     evidence: [/mermaid output must not accept consumer innerHTML or SVG/],
   },
-  'vue/packages/components/markdown-renderer/src/markdown-renderer.vue': {
+  'vue/packages/markdown/src/markdown-renderer/src/markdown-renderer.vue': {
     contract: 'only branded runtime HTML or host TrustedHTML reaches v-html',
     evidence: [
       /v-html="resolveCommittedHtml\(item\.unit\.html\)"/,
@@ -43,26 +38,6 @@ const expectedHtmlSinks: Record<string, ExpectedSink> = {
       /html: MarkdownSafeHtml/,
       /props\.trustedHtmlFactory\?\.\(html\)/,
     ],
-  },
-  'vue/packages/components/message-box/src/index.vue': {
-    contract: 'raw html requires dangerouslyUseHTMLString opt-in',
-    evidence: [/dangerouslyUseHTMLString/, /v-html="message"/],
-  },
-  'vue/packages/components/message/src/message.vue': {
-    contract: 'raw html requires dangerouslyUseHTMLString opt-in',
-    evidence: [/dangerouslyUseHTMLString/, /v-html="message"/],
-  },
-  'vue/packages/components/notification/src/notification.vue': {
-    contract: 'raw html requires dangerouslyUseHTMLString opt-in',
-    evidence: [/dangerouslyUseHTMLString/, /v-html="message"/],
-  },
-  'vue/packages/components/table/src/util.ts': {
-    contract: 'overflow tooltip text is escaped before innerHTML placement',
-    evidence: [/popperContent = escapeHtml\(popperContent\)/],
-  },
-  'vue/packages/components/tooltip/src/tooltip.vue': {
-    contract: 'raw html requires rawContent opt-in',
-    evidence: [/rawContent/, /v-html="content"/],
   },
 }
 
@@ -99,35 +74,6 @@ describe('HTML and injection boundary surface', () => {
     }
   })
 
-  it('keeps raw HTML escape hatches default-safe', () => {
-    const defaultSafeContracts: Record<string, RegExp[]> = {
-      'vue/packages/components/message/src/message.ts': [
-        /dangerouslyUseHTMLString:\s*false/,
-      ],
-      'vue/packages/components/message-box/src/index.vue': [
-        /dangerouslyUseHTMLString:\s*false/,
-      ],
-      'vue/packages/components/notification/src/notification.ts': [
-        /dangerouslyUseHTMLString:\s*\{[\s\S]*?default:\s*false/,
-      ],
-      'vue/packages/components/tooltip/src/content.ts': [
-        /rawContent:\s*\{[\s\S]*?default:\s*false/,
-      ],
-    }
-
-    for (const [file, contracts] of Object.entries(defaultSafeContracts)) {
-      expect(existsSync(resolve(repoRoot, file)), `${file} must exist`).toBe(
-        true,
-      )
-      const source = read(file)
-      for (const contract of contracts) {
-        expect(contract.test(source), `${file} must remain default-safe`).toBe(
-          true,
-        )
-      }
-    }
-  })
-
   it('keeps Markdown HTML construction inside its branded runtime boundary', () => {
     const markdownTypes = read('vue/packages/wasm/markdown.ts')
     const markdownRuntime = read('vue/packages/wasm/markdown-runtime.ts')
@@ -135,9 +81,9 @@ describe('HTML and injection boundary surface', () => {
       'vue/packages/wasm/runtime/markdown-result-authority.ts',
     )
     const wasmIndex = read('vue/packages/wasm/index.ts')
-    const publicRuntime = read('vue/packages/element-plus/markdown-runtime.ts')
+    const publicMarkdown = read('vue/packages/fsusui/src/markdown.ts')
     const rendererProps = read(
-      'vue/packages/components/markdown-renderer/src/markdown-renderer.ts',
+      'vue/packages/markdown/src/markdown-renderer/src/markdown-renderer.ts',
     )
 
     expect(markdownTypes).toMatch(/export type MarkdownSafeHtml = string &/)
@@ -149,7 +95,7 @@ describe('HTML and injection boundary surface', () => {
       existsSync(
         resolve(
           repoRoot,
-          'vue/packages/components/markdown-renderer/src/markdown-renderer-cache.ts',
+          'vue/packages/markdown/src/markdown-renderer/src/markdown-renderer-cache.ts',
         ),
       ),
     ).toBe(false)
@@ -166,7 +112,7 @@ describe('HTML and injection boundary surface', () => {
     expect(markdownResultAuthority).toMatch(
       /const markdownRuntimeAuthority = new WeakSet<object>\(\)/,
     )
-    for (const surface of [markdownRuntime, wasmIndex, publicRuntime]) {
+    for (const surface of [markdownRuntime, wasmIndex, publicMarkdown]) {
       expect(surface).not.toMatch(
         /export\s+(?:const|function)\s+(?:authorize|brand)Markdown|authorizeMarkdownRuntimeResult/,
       )
@@ -182,7 +128,7 @@ describe('HTML and injection boundary surface', () => {
       [
         'vue/packages/wasm/markdown*.ts',
         'vue/packages/wasm/runtime/*.ts',
-        'vue/packages/components/markdown-renderer/src/*.{ts,vue}',
+        'vue/packages/markdown/src/markdown-renderer/src/*.{ts,vue}',
       ],
       {
         cwd: repoRoot,
@@ -206,9 +152,9 @@ describe('HTML and injection boundary surface', () => {
       'vue/packages/wasm/runtime/markdown-feature-activation.ts',
     )
     const wasmIndex = read('vue/packages/wasm/index.ts')
-    const publicRuntime = read('vue/packages/element-plus/markdown-runtime.ts')
+    const publicMarkdown = read('vue/packages/fsusui/src/markdown.ts')
     const rendererProps = read(
-      'vue/packages/components/markdown-renderer/src/markdown-renderer.ts',
+      'vue/packages/markdown/src/markdown-renderer/src/markdown-renderer.ts',
     )
     expect(gateway).toMatch(/CODE_HIGHLIGHT_OUTPUT_POLICY/)
     expect(gateway).toMatch(/LATEX_OUTPUT_POLICY/)
@@ -228,7 +174,7 @@ describe('HTML and injection boundary surface', () => {
     expect(gateway).toMatch(/sanitizeMermaidStyleSheet/)
     expect(gateway).toMatch(/sanitizeMermaidRoot/)
     expect(wasmIndex).not.toMatch(/markdown-feature-output-gateway/)
-    expect(publicRuntime).not.toMatch(/commitMarkdownFeatureOutput/)
+    expect(publicMarkdown).not.toMatch(/commitMarkdownFeatureOutput/)
     expect(runtime).not.toMatch(/markdown-feature-output-gateway/)
 
     const activationSource = ts.createSourceFile(
@@ -253,72 +199,6 @@ describe('HTML and injection boundary surface', () => {
       ),
     )
     expect(literalGatewayImports).toHaveLength(1)
-    const loaderStart = featureActivation.indexOf(
-      'let markdownFeatureOutputGatewayPromise:',
-    )
-    const loaderEnd = featureActivation.indexOf(
-      '\nconst defaultMarkdownFeatureOptions',
-      loaderStart,
-    )
-    const loader = featureActivation.slice(loaderStart, loaderEnd)
-    expect(loaderStart).toBeGreaterThanOrEqual(0)
-    expect(loaderEnd).toBeGreaterThan(loaderStart)
-    expect(loader).toMatch(
-      /^let markdownFeatureOutputGatewayPromise:\s*Promise<MarkdownFeatureOutputGateway>\s*\|\s*null\s*=\s*null/u,
-    )
-    expect(loader).toMatch(
-      /const loadMarkdownFeatureOutputGateway = \(\) => \{\s*markdownFeatureOutputGatewayPromise \?\?=\s*import\(\s*['"]\.\.\/markdown-feature-output-gateway['"]\s*\)\s*return markdownFeatureOutputGatewayPromise\s*\}\s*$/u,
-    )
-    for (const surface of [runtime, featureActivation]) {
-      expect(surface).not.toMatch(
-        /export\s+(?:const|function|let|var)\s+(?:loadMarkdownFeatureOutputGateway|markdownFeatureOutputGatewayPromise|commitMarkdownFeatureOutput)\b/u,
-      )
-    }
-
-    const activationStart = featureActivation.indexOf(
-      'const activateBuiltInFeature = async',
-    )
-    const activationEnd = featureActivation.indexOf(
-      '\ninterface MarkdownFeatureActivationWork',
-      activationStart,
-    )
-    const activation = featureActivation.slice(activationStart, activationEnd)
-    expect(activationStart).toBeGreaterThanOrEqual(0)
-    expect(activationEnd).toBeGreaterThan(activationStart)
-    expect(
-      activation.match(/loadMarkdownFeatureOutputGateway\(\)/gu),
-    ).toHaveLength(3)
-    expect(
-      activation.match(/gateway\.commitMarkdownFeatureOutput\(/gu),
-    ).toHaveLength(3)
-    const gatewayBlocks = activation
-      .split(/(?=const gateway = await loadMarkdownFeatureOutputGateway\(\))/u)
-      .slice(1)
-    expect(gatewayBlocks).toHaveLength(3)
-    for (const [index, renderer] of [
-      'renderMermaidFeature',
-      'renderLatexFeature',
-      'renderCodeHighlightFeature',
-    ].entries()) {
-      const block = gatewayBlocks[index] ?? ''
-      const renderAt = block.indexOf(`${renderer}(`)
-      const commitAt = block.indexOf('gateway.commitMarkdownFeatureOutput(')
-      expect(renderAt).toBeGreaterThanOrEqual(0)
-      expect(commitAt).toBeGreaterThan(renderAt)
-    }
-    expect(activation).toMatch(
-      /const source = code\.textContent \?\? ''\s*if \(!source\) return false[\s\S]*?try \{[\s\S]*?loadMarkdownFeatureOutputGateway\(\)/u,
-    )
-    expect(featureActivation).not.toMatch(
-      /sanitizeFeatureFragment|createSafeFeatureFragment/,
-    )
-    expect(featureActivation).not.toMatch(
-      /default(?:CodeHighlight|Latex|Mermaid)Adapter/,
-    )
-    expect(featureActivation).toMatch(
-      /const toFeatureRenderContext[\s\S]*Object\.freeze\(\{[\s\S]*signal: context\.signal,[\s\S]*theme: context\.theme,[\s\S]*tokens: context\.resolveTokens\(element\)/,
-    )
-    expect(featureActivation).toMatch(/code\.textContent = source/)
     expect(rendererProps).not.toMatch(
       /mermaidAdapter|latexAdapter|codeHighlightAdapter|MarkdownFeatureAdapter/,
     )

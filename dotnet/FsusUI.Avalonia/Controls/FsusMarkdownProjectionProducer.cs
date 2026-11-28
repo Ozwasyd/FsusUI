@@ -58,7 +58,7 @@ public static class FsusMarkdownProjectionProducerContract
   public const string Version = "1";
 
   public const string CanonicalRuntimeIdentity =
-    "@ozwasyd/element-plus/markdown-runtime";
+    "@ozwasyd/fsusui/markdown";
 
   private static readonly string[] semanticKinds =
   [

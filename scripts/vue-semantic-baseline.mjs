@@ -361,10 +361,6 @@ class SemanticResolver {
       'vue/packages/icons/src',
       'vue/packages/motion/src',
       'vue/packages/wasm',
-      'vue/packages/hooks',
-      'vue/packages/constants',
-      'vue/packages/utils',
-      'vue/packages/components/motion.ts',
       'vue/packages/components',
     ]
   }
@@ -481,7 +477,6 @@ class SemanticResolver {
       }
       return null
     }
-    if (spec === '@element-plus/icons-vue') return null
     if (spec.startsWith('@fsusui/')) {
       const rest = spec.slice('@fsusui/'.length)
       const [pkg, ...sub] = rest.split('/')
@@ -497,30 +492,6 @@ class SemanticResolver {
             `vue/packages/${pkg}/src/index.ts`,
             `vue/packages/${pkg}/index.ts`,
           ]
-      for (const candidate of candidates) {
-        if (this.readSource(candidate) !== null) return candidate
-      }
-      return null
-    }
-    if (spec.startsWith('@element-plus/components/')) {
-      const name = spec.slice('@element-plus/components/'.length)
-      const candidates = [
-        `vue/packages/components/${name}/index.ts`,
-        `vue/packages/components/${name}.ts`,
-        `vue/packages/components/${name}/src/index.ts`,
-      ]
-      for (const candidate of candidates) {
-        if (this.readSource(candidate) !== null) return candidate
-      }
-      return null
-    }
-    if (spec.startsWith('@element-plus/')) {
-      const name = spec.slice('@element-plus/'.length)
-      const candidates = [
-        `vue/packages/${name}/index.ts`,
-        `vue/packages/${name}.ts`,
-        `vue/packages/${name}/index.js`,
-      ]
       for (const candidate of candidates) {
         if (this.readSource(candidate) !== null) return candidate
       }
@@ -872,8 +843,9 @@ class PropDescriptorParser {
           property.argument?.name,
           this.fromRelPath,
         )
-        if (resolved?.node?.type === 'ObjectExpression') {
-          result.push(...this.parseBuildPropsObject(resolved.node))
+        const spreadTarget = unwrapExpression(resolved?.node)
+        if (spreadTarget?.type === 'ObjectExpression') {
+          result.push(...this.parseBuildPropsObject(spreadTarget))
         }
         continue
       }
@@ -1208,16 +1180,17 @@ export const extractComponentSemantics = ({
       const resolved = resolver.resolveIdentifier(unwrapped.name, fromRel)
       if (!resolved?.node) return null
       const source = resolver.readSource(resolved.relPath) || ''
-      if (resolved.node.type === 'ObjectExpression')
-        return { object: resolved.node, source, sourceRel: resolved.relPath }
-      if (resolved.node.type === 'ArrayExpression')
-        return { array: resolved.node, source, sourceRel: resolved.relPath }
+      const targetNode = unwrapExpression(resolved.node)
+      if (targetNode.type === 'ObjectExpression')
+        return { object: targetNode, source, sourceRel: resolved.relPath }
+      if (targetNode.type === 'ArrayExpression')
+        return { array: targetNode, source, sourceRel: resolved.relPath }
       if (
-        resolved.node.type === 'CallExpression' &&
-        resolved.node.callee?.type === 'Identifier' &&
-        resolved.node.callee.name === 'buildProps'
+        targetNode.type === 'CallExpression' &&
+        targetNode.callee?.type === 'Identifier' &&
+        targetNode.callee.name === 'buildProps'
       ) {
-        const arg = unwrapExpression(resolved.node.arguments?.[0])
+        const arg = unwrapExpression(targetNode.arguments?.[0])
         if (arg?.type === 'ObjectExpression')
           return { object: arg, source, sourceRel: resolved.relPath }
       }

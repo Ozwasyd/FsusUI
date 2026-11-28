@@ -118,7 +118,7 @@ declared variable font supplies the requested axis.
 ## Web Radius Usage
 
 Literal fallbacks for `var(--fsus-radius-*, <fallback>)` in
-`vue/packages/theme-chalk/src` must use the canonical radius scale:
+`vue/packages/theme/src` must use the canonical radius scale:
 `4px`, `6px`, `10px`, `12px`, `24px`, or `999px`. Token-to-token and SCSS
 fallback expressions remain valid because their resolved value is governed by
 the token pipeline. The obsolete naked declaration `border-radius: 8px` is also

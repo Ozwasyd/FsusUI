@@ -86,8 +86,8 @@ function ok(message) {
     authority.published.peerDependencies.vue,
   )
   assert.equal(
-    published.dependencies.dayjs,
-    authority.published.dependencies.dayjs,
+    published.dependencies['@floating-ui/dom'],
+    authority.published.dependencies['@floating-ui/dom'],
   )
 
   // Mutated authority must change projection (kills hardcoded fallback)
@@ -148,10 +148,10 @@ function ok(message) {
 {
   const authority = loadAuthority()
   const source = {
-    name: 'element-plus',
+    name: '@ozwasyd/fsusui',
     dependencies: {
-      '@element-plus/icons-vue': 'workspace:*',
-      dayjs: '0.0.0',
+      '@fsusui/icons': 'workspace:*',
+      '@floating-ui/dom': '0.0.0',
     },
     peerDependencies: { vue: '^1.0.0' },
     devDependencies: { vue: '0.0.0', '@types/node': '*' },
@@ -162,13 +162,10 @@ function ok(message) {
     'published-source',
   )
   assert.equal(
-    projected.dependencies.dayjs,
-    authority.published.dependencies.dayjs,
+    projected.dependencies['@floating-ui/dom'],
+    authority.published.dependencies['@floating-ui/dom'],
   )
-  assert.equal(
-    projected.dependencies['@element-plus/icons-vue'],
-    'workspace:*',
-  )
+  assert.equal(projected.dependencies['@fsusui/icons'], 'workspace:*')
   assert.equal(
     projected.peerDependencies.vue,
     authority.published.peerDependencies.vue,
@@ -177,11 +174,6 @@ function ok(message) {
   assert.equal(
     projected.devDependencies['@types/node'],
     authority.install['@types/node'],
-  )
-  // npm alias install form for workspace, published keeps range
-  assert.equal(
-    projected.dependencies['@popperjs/core'],
-    authority.published.dependencies['@popperjs/core'],
   )
   ok('published-source projection (ranges + workspace + exact dev)')
 }
@@ -236,7 +228,7 @@ function ok(message) {
     const authority = loadAuthority()
     const fixtures = [
       'package.json',
-      'vue/packages/element-plus/package.json',
+      'vue/packages/fsusui/package.json',
       'vue/tests/consumer-install/template/package.json',
       'vue/packages/components/package.json',
       'vue/internal/build/package.json',
@@ -259,7 +251,7 @@ function ok(message) {
       const role =
         rel === 'package.json'
           ? 'root'
-          : rel === 'vue/packages/element-plus/package.json'
+          : rel === 'vue/packages/fsusui/package.json'
             ? 'published-source'
             : rel.includes('consumer-install')
               ? 'consumer-fixture'
@@ -301,7 +293,7 @@ function ok(message) {
   assert.ok(entries.some((entry) => entry.relative === 'package.json'))
   assert.ok(
     entries.some(
-      (entry) => entry.relative === 'vue/packages/element-plus/package.json',
+      (entry) => entry.relative === 'vue/packages/fsusui/package.json',
     ),
   )
   ok('controlled manifest coverage')

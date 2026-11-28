@@ -25,13 +25,32 @@ tree shaking, and faster build/runtime performance.
 
 | Removed v1 component | v2 replacement |
 | --- | --- |
-| `ElTable` + `ElTableV2` | `FsusTable` (built-in virtualization via `virtual` prop) |
-| `ElSelect` + `ElSelectV2` | `FsusSelect` (built-in virtualization via `options` + `virtual`) |
-| `ElTree` + `ElTreeV2` | `FsusTree` (built-in virtualization) |
+| `ElTable` + `ElTableV2` | `FsusTable` (automatic window virtualization when `height` is set, `!expandable`, `!spanMethod`, and row count exceeds `virtualThreshold`, default `100`) |
+| `ElSelect` + `ElSelectV2` | `FsusSelect` (automatic dropdown list virtualization when using data-driven `options` / `allowCreate` and filtered count exceeds `virtualThreshold`, default `80`) |
+| `ElTree` + `ElTreeV2` | `FsusTree` (automatic window virtualization when `height` is set and flattened node count exceeds `virtualThreshold`, default `120`) |
 | `ElPopper` + `ElTooltip` + `ElTooltipV2` | `FsusTooltip` / `FsusPopover` (powered by `@floating-ui/dom`) |
 | `ElEmpty` + `ElEmptyState` | `FsusEmptyState` |
 | `ElPageHeader` + `FsusTaskPageHeader` | `FsusPageHeader` |
 | `FsuMotion` / `FsuTransition` / `FsuSharedElement` | `FsusMotion` / `FsusTransition` / `FsusSharedElement` |
+
+### Automatic Virtualization Notes
+
+FsusUI 2.0 does **not** use a boolean `virtual` prop. Instead, virtualization activates automatically once the visible dataset exceeds `virtualThreshold`:
+
+```vue
+<!-- FsusTable: requires height (and neither expandable nor spanMethod) -->
+<FsusTable :data="rows" :columns="columns" :height="400" :virtual-threshold="100" />
+
+<!-- FsusSelect: requires data-driven options (or allowCreate) -->
+<FsusSelect v-model="selected" :options="largeOptions" :virtual-threshold="80" />
+
+<!-- FsusTree: requires height -->
+<FsusTree :data="nodes" :height="360" :virtual-threshold="120" />
+```
+
+### Tabs Inactive-Pane Lifecycle
+
+In v2, `FsusTabPane` mounts only the active tab panel (`v-if`-equivalent rendering) and unmounts inactive panels when switching tabs, rather than keeping inactive panels mounted with `display: none`. If a tab pane holds local UI state that must survive tab switches, lift that state into the parent component or store, or wrap the pane content in `<KeepAlive>`.
 
 ## Directives & Services
 

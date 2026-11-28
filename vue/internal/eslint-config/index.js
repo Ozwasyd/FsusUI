@@ -1,4 +1,4 @@
-// @element-plus/eslint-config — ESLint 10 Flat Config
+// @fsusui/eslint-config — ESLint 10 Flat Config
 import js from '@eslint/js'
 import tseslint from 'typescript-eslint'
 import pluginVue from 'eslint-plugin-vue'

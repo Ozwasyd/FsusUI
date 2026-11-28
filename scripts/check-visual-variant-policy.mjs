@@ -3,7 +3,7 @@ import { readdirSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { pathToFileURL } from 'node:url'
 
-import { collectConfigSources } from './playwright-suites.mjs'
+import { collectConfigSources } from './lib/playwright-config-sources.mjs'
 import {
   CROSS_THEME_CONTRACTS,
   VISUAL_PROJECT_NAMES,

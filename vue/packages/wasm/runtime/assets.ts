@@ -27,6 +27,21 @@ const createMarkdownAsset = (kind: MarkdownAssetKind) => {
 
 let epWasmAsset: WasmAssetUrlPair | undefined
 const markdownAssets: Partial<Record<MarkdownAssetKind, WasmAssetUrlPair>> = {}
+const markdownAssetOverrides: Partial<Record<MarkdownAssetKind, WasmAssetUrlPair>> = {}
+
+export function setMarkdownRuntimeAssetOverrides(
+  overrides?: Partial<Record<MarkdownAssetKind, WasmAssetUrlPair>>,
+): void {
+  delete markdownAssetOverrides.basic
+  delete markdownAssetOverrides.simd
+  if (!overrides) return
+  if (overrides.basic?.moduleUrl && overrides.basic?.wasmUrl) {
+    markdownAssetOverrides.basic = { ...overrides.basic }
+  }
+  if (overrides.simd?.moduleUrl && overrides.simd?.wasmUrl) {
+    markdownAssetOverrides.simd = { ...overrides.simd }
+  }
+}
 
 export function resolveEpWasmAsset(): WasmAssetUrlPair {
   return (epWasmAsset ??= createEpWasmAsset())
@@ -35,5 +50,5 @@ export function resolveEpWasmAsset(): WasmAssetUrlPair {
 export function resolveMarkdownAsset(
   kind: MarkdownAssetKind,
 ): WasmAssetUrlPair {
-  return (markdownAssets[kind] ??= createMarkdownAsset(kind))
+  return markdownAssetOverrides[kind] ?? (markdownAssets[kind] ??= createMarkdownAsset(kind))
 }

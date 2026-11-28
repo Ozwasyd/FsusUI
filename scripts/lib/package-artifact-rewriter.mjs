@@ -168,7 +168,7 @@ export function resolveBundledWorkspaceRuntimeSpecifier(
 export function rewriteBundledWorkspaceReferences(
   rootDir,
   {
-    packageName = 'element-plus',
+    packageName = '@ozwasyd/fsusui',
     dependencyNames = BUNDLED_WORKSPACE_DEPENDENCY_NAMES,
     strict = true,
   } = {},
@@ -325,10 +325,9 @@ export function rewritePublishStageWorkerReferences(rootDir) {
 export function rewritePublishedSelfReferences(rootDir, packageName) {
   const candidates = collectPackageCodeFiles(rootDir)
   const patterns = [
-    /(\bfrom\s+['"])element-plus(?=(?:\/[^'"]*)?['"])/g,
-    /(\bimport\s*\(\s*['"])element-plus(?=(?:\/[^'"]*)?['"])/g,
-    /(\brequire\s*\(\s*['"])element-plus(?=(?:\/[^'"]*)?['"])/g,
-    /(\bimport\s+['"])element-plus(?=(?:\/[^'"]*)?['"])/g,
+    /(\bfrom\s+['"])@fsusui\/fsusui(?=(?:\/[^'"]*)?['"])/g,
+    /(\bimport\s*\(\s*['"])@fsusui\/fsusui(?=(?:\/[^'"]*)?['"])/g,
+    /(\bimport\s+['"])@fsusui\/fsusui(?=(?:\/[^'"]*)?['"])/g,
   ]
 
   let updatedFiles = 0

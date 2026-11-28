@@ -8,22 +8,20 @@ const pathGroups = {
     /^scripts\//,
     /^vue\/internal\//,
     /^vue\/packages\/wasm\/build\.config\.ts$/,
-    /^vue\/packages\/theme-chalk\/[^/]+$/,
-    /^vue\/packages\/element-plus\/version\.ts$/,
-    /^vue\/packages\/element-plus\/package\.json$/,
+    /^vue\/packages\/theme\/[^/]+$/,
+    /^vue\/packages\/fsusui\/package\.json$/,
     /^vue\/tsconfig\.node\.json$/,
     /^package\.json$/,
     /^pnpm-lock\.yaml$/,
   ],
   web: [
     /^vue\/packages\/components\//,
-    /^vue\/packages\/hooks\//,
-    /^vue\/packages\/directives\//,
-    /^vue\/packages\/utils\//,
-    /^vue\/packages\/element-plus\//,
-    /^vue\/packages\/theme-chalk\//,
-    /^vue\/packages\/locale\//,
-    /^vue\/packages\/constants\//,
+    /^vue\/packages\/core\//,
+    /^vue\/packages\/icons\//,
+    /^vue\/packages\/markdown\//,
+    /^vue\/packages\/motion\//,
+    /^vue\/packages\/fsusui\//,
+    /^vue\/packages\/theme\//,
     /^vue\/packages\/test-utils\//,
     /^vue\/packages\/wasm\//,
     /^vue\/typings\//,
@@ -35,10 +33,12 @@ const pathGroups = {
   ],
   unit: [
     /^vue\/packages\/components\//,
-    /^vue\/packages\/hooks\//,
-    /^vue\/packages\/directives\//,
-    /^vue\/packages\/utils\//,
-    /^vue\/packages\/theme-chalk\//,
+    /^vue\/packages\/core\//,
+    /^vue\/packages\/icons\//,
+    /^vue\/packages\/markdown\//,
+    /^vue\/packages\/motion\//,
+    /^vue\/packages\/fsusui\//,
+    /^vue\/packages\/theme\//,
     /^vue\/packages\/wasm\//,
     /^vue\/tests\/boundary\//,
     /^vue\/vitest\.config\./,
@@ -125,14 +125,15 @@ function typecheckScripts(files) {
 function unitArgs(files) {
   const targets = []
   if (files.some((file) => /^vue\/packages\/components\//.test(file))) targets.push('vue/packages/components')
-  if (files.some((file) => /^vue\/packages\/hooks\//.test(file))) targets.push('vue/packages/hooks')
-  if (files.some((file) => /^vue\/packages\/directives\//.test(file))) targets.push('vue/packages/directives')
-  if (files.some((file) => /^vue\/packages\/utils\//.test(file))) targets.push('vue/packages/utils')
-  if (files.some((file) => /^vue\/packages\/theme-chalk\//.test(file))) targets.push('vue/packages/theme-chalk')
+  if (files.some((file) => /^vue\/packages\/core\//.test(file))) targets.push('vue/packages/core')
+  if (files.some((file) => /^vue\/packages\/icons\//.test(file))) targets.push('vue/packages/icons')
+  if (files.some((file) => /^vue\/packages\/markdown\//.test(file))) targets.push('vue/packages/markdown')
+  if (files.some((file) => /^vue\/packages\/motion\//.test(file))) targets.push('vue/packages/motion')
+  if (files.some((file) => /^vue\/packages\/theme\//.test(file))) targets.push('vue/packages/theme')
   if (files.some((file) => /^vue\/packages\/wasm\//.test(file))) targets.push('vue/packages/wasm')
   if (files.some((file) => /^vue\/tests\/boundary\//.test(file))) targets.push('vue/tests/boundary')
   if (files.some((file) => /^vue\/vitest\.config\.|^vue\/tsconfig\.vitest\.json$/.test(file))) {
-    return ['vue/packages/components', 'vue/packages/hooks', 'vue/packages/directives', 'vue/packages/utils', 'vue/tests/boundary']
+    return ['vue/packages/components', 'vue/packages/core', 'vue/packages/icons', 'vue/packages/markdown', 'vue/packages/motion', 'vue/packages/wasm', 'vue/tests/boundary']
   }
   return [...new Set(targets)]
 }

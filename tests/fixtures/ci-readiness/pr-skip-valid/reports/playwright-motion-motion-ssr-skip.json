@@ -1,6 +1,0 @@
-{
-  "gate": "playwright-motion",
-  "status": "success",
-  "suiteId": "motion-ssr",
-  "skip": true
-}

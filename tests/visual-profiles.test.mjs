@@ -222,7 +222,7 @@ test('explicit local base selects committed, staged, working, and untracked chan
       'diff --name-only merge123...HEAD',
       'vue/packages/components/button/index.ts\n',
     ],
-    ['diff --name-only HEAD', 'vue/packages/theme-chalk/src/input.scss\n'],
+    ['diff --name-only HEAD', 'vue/packages/theme/src/components/form.scss\n'],
     [
       'diff --cached --name-only',
       'vue/packages/demo-app/src/sections/FormSection.vue\n',
@@ -243,7 +243,7 @@ test('explicit local base selects committed, staged, working, and untracked chan
     'docs/local.md',
     'vue/packages/components/button/index.ts',
     'vue/packages/demo-app/src/sections/FormSection.vue',
-    'vue/packages/theme-chalk/src/input.scss',
+    'vue/packages/theme/src/components/form.scss',
   ])
 })
 

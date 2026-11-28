@@ -431,11 +431,9 @@ export const FsusCascader = defineComponent({
             ]),
           ],
         ),
-        h(
-          Teleport as any,
-          { to: 'body', disabled: !props.teleported },
-          open.value && !props.disabled
-            ? h(
+        open.value && !props.disabled
+          ? h(Teleport as any, { to: 'body', disabled: !props.teleported }, [
+              h(
                 'div',
                 {
                   ref: floatRef,
@@ -500,9 +498,9 @@ export const FsusCascader = defineComponent({
                         },
                       }),
                 ],
-              )
-            : undefined,
-        ),
+              ),
+            ])
+          : null,
       ]
     }
   },

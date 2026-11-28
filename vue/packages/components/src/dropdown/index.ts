@@ -139,11 +139,9 @@ export const FsusDropdown = defineComponent({
         },
         slots.default?.(),
       ),
-      h(
-        Teleport as any,
-        { to: 'body', disabled: !props.teleported },
-        open.value && !props.disabled
-          ? h(
+      open.value && !props.disabled
+        ? h(Teleport as any, { to: 'body', disabled: !props.teleported }, [
+            h(
               'div',
               {
                 ref: floatEl,
@@ -153,9 +151,9 @@ export const FsusDropdown = defineComponent({
                 onMouseleave: () => props.trigger === 'hover' && onClose(),
               },
               slots.dropdown?.(),
-            )
-          : undefined,
-      ),
+            ),
+          ])
+        : null,
     ]
   },
 })

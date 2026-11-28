@@ -1,0 +1,11 @@
+{
+  "gate": "build-package",
+  "status": "success",
+  "artifacts": [
+    {
+      "name": "npm-candidate",
+      "path": "artifacts/fsusui-npm-candidate.tgz",
+      "sha256": "82bf71e3ecf9234a1eecca39c474db0d01f15f7f148b5a4898650dd8f98d0491"
+    }
+  ]
+}

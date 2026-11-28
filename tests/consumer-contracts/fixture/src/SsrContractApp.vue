@@ -8,8 +8,11 @@ import {
   FsusCheckTag,
   FsusConfigProvider,
   FsusDataList,
+  FsusFormItem,
   FsusIcon,
+  FsusInput,
   FsusSegmentedControl,
+  FsusSelect,
   FsusTag,
 } from '@ozwasyd/fsusui'
 import { FsusIconArrowLeft, FsusIconArrowRight } from '@ozwasyd/fsusui/icons'
@@ -22,6 +25,12 @@ const props = defineProps<{
 const clickCount = ref(0)
 const filterChecked = ref(props.initialOpen)
 const activeSegment = ref('overview')
+const ssrLanguage = ref('en')
+const ssrEmail = ref('')
+const languageOptions = [
+  { value: 'en', label: 'English' },
+  { value: 'zh', label: '中文' },
+]
 const segmentOptions = [
   { value: 'overview', label: 'Overview' },
   { value: 'changelog', label: 'Changelog' },
@@ -66,6 +75,10 @@ onMounted(() => {
         <FsusCard header="SSR Output">
           <FsusTag tone="info">Pure ESM</FsusTag>
           <FsusAlert title="Hydrated under strict CSP" tone="success" />
+          <FsusFormItem label="SSR Language">
+            <FsusSelect v-model="ssrLanguage" :options="languageOptions" data-testid="ssr-select" />
+          </FsusFormItem>
+          <FsusInput id="ssr-email" v-model="ssrEmail" inputmode="email" aria-label="SSR Email" />
         </FsusCard>
       </FsusDataList>
 

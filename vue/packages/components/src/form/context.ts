@@ -26,6 +26,9 @@ export interface FsusFormContext {
 
 export interface FsusFormItemContext {
   id: string
+  labelId: string
+  errorId: string
+  hasLabel: boolean
   invalid: boolean
   disabled: boolean
   size: FsusSize

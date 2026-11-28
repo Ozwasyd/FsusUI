@@ -16,6 +16,7 @@ export interface FsusLocale {
     back: string
     copy: string
     copied: string
+    copyFailed: string
     selectPlaceholder: string
     inputPlaceholder: string
   }
@@ -101,6 +102,7 @@ export const zhCN: FsusLocale = {
     back: '返回',
     copy: '复制',
     copied: '已复制',
+    copyFailed: '复制失败',
     selectPlaceholder: '请选择',
     inputPlaceholder: '请输入',
   },
@@ -186,6 +188,7 @@ export const en: FsusLocale = {
     back: 'Back',
     copy: 'Copy',
     copied: 'Copied',
+    copyFailed: 'Copy failed',
     selectPlaceholder: 'Select',
     inputPlaceholder: 'Enter value',
   },

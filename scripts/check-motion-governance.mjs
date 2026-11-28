@@ -39,16 +39,6 @@ const steps = [
       'vue/packages/motion/__tests__/fixtures/fsusblog-motion-adoption.json',
     ],
   },
-  {
-    name: 'legacy transition semantic registry',
-    cmd: 'node',
-    args: ['./scripts/check-legacy-transition-motion.mjs'],
-  },
-  {
-    name: 'legacy transition mutation corpus',
-    cmd: 'node',
-    args: ['./scripts/test-legacy-transition-motion.mjs'],
-  },
 ]
 
 let failed = false

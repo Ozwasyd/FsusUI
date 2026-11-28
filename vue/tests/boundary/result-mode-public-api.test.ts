@@ -10,16 +10,16 @@ import {
   isFsusOk,
   isFsusResult,
   isTruthyFsusOk,
-} from '../../packages/element-plus/result'
+} from '../../packages/fsusui/src/result'
 
 import type {
   FsusErrorCode,
   FsusErrorDetail,
   FsusResult,
-} from '../../packages/element-plus/result'
+} from '../../packages/fsusui/src/result'
 
 describe('result mode public API', () => {
-  it('exports stable Result helpers from element-plus/result', () => {
+  it('exports stable Result helpers from fsusui/result', () => {
     const ok = fsusOk('ready')
     const err = fsusErr(createFsusError('infra', 'runtime unavailable'))
 

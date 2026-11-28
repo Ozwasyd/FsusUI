@@ -3,9 +3,10 @@ import { readFileSync } from 'node:fs'
 const packageJson = JSON.parse(readFileSync('package.json', 'utf8'))
 const scripts = packageJson.scripts ?? {}
 const qualityWorkflow = readFileSync('.github/workflows/quality.yml', 'utf8')
-const reusableQualityWorkflow = readFileSync('.github/workflows/_quality.yml', 'utf8')
-const releaseGovernance = readFileSync('docs/releases/governance.md', 'utf8')
-const engineeringHandoff = readFileSync('docs/engineering-handoff.md', 'utf8')
+const reusableQualityWorkflow = readFileSync(
+  '.github/workflows/_quality.yml',
+  'utf8',
+)
 const capacitySuite = readFileSync('scripts/run-capacity-suite.mjs', 'utf8')
 
 function assert(condition, message) {
@@ -45,12 +46,6 @@ assert(
   scripts['verify:pr-fast']?.includes('_verify:pr-fast:parallel'),
   'verify:pr-fast must use the explicit PR-fast parallel group',
 )
-assert(
-  scripts['verify:pr-fast']?.includes('build:theme') &&
-    scripts['verify:pr-fast'].indexOf('build:theme') <
-      scripts['verify:pr-fast'].indexOf('_verify:pr-fast:parallel'),
-  'verify:pr-fast must prepare theme artifacts before package smoke enters the parallel group',
-)
 for (const script of ['_verify:pr-fast:parallel', '_verify:parallel']) {
   assert(
     scripts[script]?.includes('run-capacity-suite.mjs'),
@@ -82,52 +77,34 @@ assert(
   'test:unit:affected must use the affected gate runner instead of full unit groups',
 )
 assert(
-  scripts['build:package-smoke']?.includes(
-    'scripts/check-package-build-smoke.mjs',
-  ),
-  'build:package-smoke must use the lightweight package smoke checker',
-)
-assert(
   scripts['check:foundation-style-boundary']?.includes(
     'scripts/check-foundation-style-boundary.mjs',
   ),
   'package.json must expose the foundation style boundary checker',
 )
 assert(
-  !scripts['typecheck:affected']?.includes('pnpm run typecheck'),
-  'typecheck:affected must not call full typecheck',
-)
-assert(
-  !scripts['build:package-smoke']?.includes('pnpm run build'),
-  'build:package-smoke must not call the full package build',
-)
-assert(
   capacitySuite.includes("'lint'") &&
     capacitySuite.includes("'typecheck:affected'") &&
     capacitySuite.includes("'test:unit:affected'") &&
     capacitySuite.includes("'tokens:check'") &&
-    capacitySuite.includes("'icons:check'") &&
-    capacitySuite.includes("'build:package-smoke'"),
-  'PR-fast group must cover lint, affected typecheck/unit, tokens, icons, and package smoke',
+    capacitySuite.includes("'icons:check'"),
+  'PR-fast group must cover lint, affected typecheck/unit, tokens, and icons',
 )
 assert(
   capacitySuite.split("'check:foundation-style-boundary'").length - 1 === 2,
   'PR-fast and full verification must enforce the foundation style boundary',
 )
-
 assert(
   ![qualityWorkflow, reusableQualityWorkflow].some((workflow) =>
-    /(?:real-render-performance|perf:render|avalonia:performance)/u.test(workflow),
+    /(?:real-render-performance|perf:render|avalonia:performance)/u.test(
+      workflow,
+    ),
   ),
   'hosted quality workflows must not run or require render benchmarks',
 )
 
-const premergeMainJob = workflowJob('premerge-main')
-const premergeReadinessJob = workflowJob('premerge-readiness')
+const qualityJob = workflowJob('quality')
 const prFastJob = workflowJob('pr-fast')
-const mergeGroupPrFastJob = workflowJob('merge-group-pr-fast')
-const mainJob = workflowJob('main')
-
 assert(
   qualityWorkflow.includes('merge_group:') &&
     qualityWorkflow.includes('checks_requested'),
@@ -141,88 +118,14 @@ assert(
   'PR and merge-group quality runs must cancel superseded candidates',
 )
 assert(
-  premergeMainJob.includes(
-    "github.event_name == 'pull_request' || github.event_name == 'merge_group'",
-  ) &&
-    premergeMainJob.includes('uses: ./.github/workflows/_quality.yml') &&
-    premergeMainJob.includes('group: main'),
-  'PR heads and merge-group candidates must run the complete main quality profile before merge',
-)
-assert(
-  premergeReadinessJob.includes('uses: ./.github/workflows/_quality-readiness.yml') &&
-    premergeReadinessJob.includes('- premerge-main') &&
-    premergeReadinessJob.includes('- premerge-playwright'),
-  'PR heads and merge-group candidates must aggregate readiness across premerge-main and premerge-playwright',
+  qualityJob.includes('uses: ./.github/workflows/_quality.yml'),
+  'quality workflow must call _quality.yml',
 )
 assert(
   prFastJob.includes('if: always()') &&
-    prFastJob.includes('premerge-playwright') &&
-    prFastJob.includes('premerge-main') &&
-    prFastJob.includes('premerge-readiness') &&
-    prFastJob.includes('PREMERGE_MAIN_RESULT') &&
-    prFastJob.includes('PREMERGE_READINESS_RESULT') &&
-    !prFastJob.includes('pnpm run verify:pr-fast'),
-  'required pr-fast check must aggregate premerge main quality, Playwright, and readiness evidence',
-)
-assert(
-  mergeGroupPrFastJob.includes('name: pr-fast') &&
-    mergeGroupPrFastJob.includes("github.event_name == 'merge_group'") &&
-    mergeGroupPrFastJob.includes('premerge-main') &&
-    mergeGroupPrFastJob.includes('premerge-readiness'),
-  'merge-group candidates must preserve the existing required pr-fast check context',
-)
-assert(
-  mainJob.includes("github.event_name == 'push'") &&
-    mainJob.includes("inputs.group == 'main'") &&
-    mainJob.includes('uses: ./.github/workflows/_quality.yml') &&
-    mainJob.includes('group: main') &&
-    qualityWorkflow.includes("inputs.group == 'nightly'") &&
-    qualityWorkflow.includes("inputs.group == 'release'"),
-  'post-merge main, nightly, and release quality must keep using reusable quality profiles',
-)
-assert(
-  releaseGovernance.includes('verify:pr-fast') &&
-    releaseGovernance.includes('verify:full') &&
-    releaseGovernance.includes('verify:release') &&
-    releaseGovernance.includes('--continue-on-error'),
-  'release governance docs must explain verify gate selection',
-)
-assert(
-  engineeringHandoff.includes('verify:pr-fast') &&
-    engineeringHandoff.includes('verify:full') &&
-    engineeringHandoff.includes('verify:release'),
-  'engineering handoff docs must explain verify gate selection',
-)
-assert(
-  scripts['check:visual-governance']?.includes(
-    'scripts/check-visual-governance.mjs',
-  ),
-  'package.json must expose the composite visual governance gate',
-)
-assert(
-  scripts['governance:check']?.includes('check:visual-governance'),
-  'governance:check must include the visual governance gate',
-)
-assert(
-  scripts['test:visual-governance']?.includes(
-    'test:visual-governance:registry',
-  ) &&
-    scripts['test:visual-governance']?.includes(
-      'test:visual-governance:evaluator',
-    ) &&
-    scripts['test:visual-governance']?.includes(
-      'test:visual-governance:corpus',
-    ) &&
-    scripts['test:visual-governance:registry']?.includes(
-      'component-surface-semantic-registry.test.mjs',
-    ) &&
-    scripts['test:visual-governance:evaluator']?.includes(
-      'component-semantic-style-evaluator.test.mjs',
-    ) &&
-    scripts['test:visual-governance:corpus']?.includes(
-      'component-semantic-corpus.test.mjs',
-    ),
-  'test:visual-governance must run the registry, evaluator, and corpus suites',
+    prFastJob.includes('- quality') &&
+    prFastJob.includes('QUALITY_RESULT'),
+  'required pr-fast check must aggregate quality result',
 )
 
 console.log('[verify-gates] ok')

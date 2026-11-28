@@ -146,7 +146,7 @@
   {
     "Name": "shell-actions-light-24",
     "File": "tests/conformance/visual/artifacts/issue-814-shell-action-icons/shell-actions-light-24.png",
-    "Sha256": "303d4567aa263bf2bf162143fdbee7def663238e3b2bdcfa7074c16ff7597f30",
+    "Sha256": "4a517d0c6f000dfb18b2ec9b0de69df2d6321a7589085ec34229de7edc6f18a8",
     "PixelWidth": 560,
     "PixelHeight": 180,
     "IconSize": 24,

@@ -23,7 +23,7 @@ For icon-only buttons:
 Generated outputs and their regeneration checks are documented in
 [`README.md#generated-artifacts`](./README.md#generated-artifacts):
 
-- Web metadata: `vue/packages/icons-vue/generated/icon-metadata.json`
+- Web metadata: `vue/packages/icons/generated/icon-metadata.json`
 - Avalonia resources: `dotnet/FsusUI.Avalonia.Icons/Generated/FsusIcons.axaml`
 - C# keys: `dotnet/FsusUI.Avalonia.Icons/Generated/FsusIconKeys.g.cs`
 - Stable inventory: `docs/icons/generated/stable-icons.md`

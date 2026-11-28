@@ -15,7 +15,7 @@ import {
   type PropType,
   type VNode,
 } from 'vue'
-import { useFsusLocale, useRovingFocus } from '@fsusui/core'
+import { useFsusId, useFsusLocale, useRovingFocus } from '@fsusui/core'
 import { FsusIcon } from '@fsusui/icons'
 
 const flattenTopVNodes = (nodes: VNode[]): VNode[] => {
@@ -286,6 +286,8 @@ interface TabPaneMeta {
 }
 interface TabsCtx {
   active: string | number
+  getTabId: (name: string | number) => string
+  getPanelId: (name: string | number) => string
   register: (pane: TabPaneMeta) => void
   unregister: (name: string | number) => void
 }
@@ -316,7 +318,16 @@ export const FsusTabPane = defineComponent({
     })
     return () =>
       ctx?.value.active === props.name
-        ? h('div', { class: 'fsus-tabs__pane', role: 'tabpanel' }, slots.default?.())
+        ? h(
+            'div',
+            {
+              id: ctx.value.getPanelId(props.name),
+              class: 'fsus-tabs__pane',
+              role: 'tabpanel',
+              'aria-labelledby': ctx.value.getTabId(props.name),
+            },
+            slots.default?.(),
+          )
         : null
   },
 })
@@ -339,6 +350,27 @@ export const FsusTabs = defineComponent({
     const canScrollPrev = ref(false)
     const canScrollNext = ref(false)
     let resizeObserver: ResizeObserver | null = null
+    const tabsBaseId = useFsusId('tabs')
+    const paneKeySuffix = new Map<string, string>()
+    let nextPaneSuffixIndex = 0
+
+    const getPaneSuffix = (name: string | number) => {
+      const key = `${typeof name}:${String(name)}`
+      let suffix = paneKeySuffix.get(key)
+      if (!suffix) {
+        const slug = String(name)
+          .trim()
+          .toLowerCase()
+          .replace(/[^a-z0-9_-]+/gu, '-')
+          .replace(/^-+|-+$/gu, '')
+        suffix = slug ? `${nextPaneSuffixIndex}-${slug}` : String(nextPaneSuffixIndex)
+        nextPaneSuffixIndex += 1
+        paneKeySuffix.set(key, suffix)
+      }
+      return suffix
+    }
+    const getTabId = (name: string | number) => `${tabsBaseId}-tab-${getPaneSuffix(name)}`
+    const getPanelId = (name: string | number) => `${tabsBaseId}-panel-${getPaneSuffix(name)}`
 
     const { onKeydown } = useRovingFocus(tabListRef, '[role="tab"]', 'horizontal')
 
@@ -376,6 +408,8 @@ export const FsusTabs = defineComponent({
       TABS_KEY,
       computed(() => ({
         active: active.value,
+        getTabId,
+        getPanelId,
         register(meta: TabPaneMeta) {
           const idx = panes.value.findIndex((p) => p.name === meta.name)
           if (idx === -1) panes.value.push(meta)
@@ -407,6 +441,25 @@ export const FsusTabs = defineComponent({
       const children = slots.default?.()
       const showAdd = props.editable || props.addable
 
+      // Extract pane metadata directly from slot VNodes on first/SSR render before child setup runs
+      const slotPanes: TabPaneMeta[] = []
+      if (children) {
+        for (const vnode of flattenTopVNodes(children)) {
+          const vType = vnode.type as { name?: string } | undefined
+          if (vType?.name === 'FsusTabPane' && vnode.props && vnode.props.name !== undefined) {
+            const name = vnode.props.name as string | number
+            slotPanes.push({
+              name,
+              label: (vnode.props.label as string) || String(name),
+              disabled: vnode.props.disabled === '' || Boolean(vnode.props.disabled),
+              closable: vnode.props.closable === '' || Boolean(vnode.props.closable),
+            })
+          }
+        }
+      }
+      const renderedPanes = panes.value.length > 0 ? panes.value : slotPanes
+      const resolvedActive = props.modelValue || renderedPanes[0]?.name || ''
+
       return h('div', { class: 'fsus-tabs', 'data-variant': props.variant }, [
         h('div', { class: 'fsus-tabs__header' }, [
           isScrollable.value
@@ -433,17 +486,21 @@ export const FsusTabs = defineComponent({
               h(
                 'div',
                 { ref: tabListRef, class: 'fsus-tabs__nav', role: 'tablist', onKeydown },
-                panes.value.map((pane) => {
+                renderedPanes.map((pane) => {
                   const canClose = props.editable || props.closable || pane.closable
+                  const isActive = resolvedActive === pane.name
                   return h(
                     'button',
                     {
                       key: String(pane.name),
+                      id: getTabId(pane.name),
                       type: 'button',
                       role: 'tab',
                       class: 'fsus-tabs__tab',
-                      'aria-selected': active.value === pane.name ? 'true' : 'false',
-                      'data-active': active.value === pane.name ? '' : undefined,
+                      tabindex: isActive ? 0 : -1,
+                      'aria-selected': isActive ? 'true' : 'false',
+                      'aria-controls': getPanelId(pane.name),
+                      'data-active': isActive ? '' : undefined,
                       disabled: pane.disabled,
                       onClick: () => select(pane),
                     },

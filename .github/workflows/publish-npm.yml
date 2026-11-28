@@ -49,7 +49,6 @@ jobs:
     uses: ./.github/workflows/_quality-readiness.yml
     with:
       group: release
-      playwright_group: release
       release_tag: ${{ github.ref_name }}
 
   preflight:

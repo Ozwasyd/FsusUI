@@ -1,5 +1,15 @@
-import type { MarkdownRenderRequest } from '@fsusui/wasm'
+import type {
+  MarkdownAssetKind,
+  MarkdownRenderRequest,
+  WasmAssetUrlPair,
+} from '@fsusui/wasm'
 import type { ParserDocument, ParserResponse } from './markdown-parser.worker'
+
+type MarkdownWorkerConfigureRequest = {
+  type: 'configure'
+  parserWorkerUrl?: string
+  markdownAssets?: Partial<Record<MarkdownAssetKind, WasmAssetUrlPair>>
+}
 
 type MarkdownWorkerRunRequest = {
   generation: number
@@ -17,6 +27,7 @@ type MarkdownWorkerCancelRequest = {
 }
 
 type MarkdownWorkerRequest =
+  | MarkdownWorkerConfigureRequest
   | MarkdownWorkerRunRequest
   | MarkdownWorkerCancelRequest
 
@@ -42,6 +53,10 @@ const workerScope = self as unknown as {
 
 let parser: Worker | null = null
 let active: { generation: number; id: number } | undefined
+let configuredParserWorkerUrl: string | undefined
+let configuredMarkdownAssets:
+  | Partial<Record<MarkdownAssetKind, WasmAssetUrlPair>>
+  | undefined
 
 const terminateParser = () => {
   parser?.terminate()
@@ -50,7 +65,10 @@ const terminateParser = () => {
 
 const ensureParser = () => {
   if (parser) return parser
-  parser = new Worker(new URL('./markdown-parser.worker.ts', import.meta.url), {
+  const parserUrl = configuredParserWorkerUrl
+    ? new URL(configuredParserWorkerUrl, import.meta.url)
+    : new URL('./markdown-parser.worker.ts', import.meta.url)
+  parser = new Worker(parserUrl, {
     type: 'module',
   })
   parser.onmessage = (event: MessageEvent<ParserResponse>) => {
@@ -95,6 +113,15 @@ const ensureParser = () => {
 
 workerScope.onmessage = (event) => {
   const message = event.data
+  if (message.type === 'configure') {
+    if (typeof message.parserWorkerUrl === 'string' && message.parserWorkerUrl) {
+      configuredParserWorkerUrl = message.parserWorkerUrl
+    }
+    if (message.markdownAssets) {
+      configuredMarkdownAssets = message.markdownAssets
+    }
+    return
+  }
   if (message.type === 'cancel') {
     if (active?.id === message.id) {
       active = undefined
@@ -118,5 +145,9 @@ workerScope.onmessage = (event) => {
     })
   }
   active = { generation, id: message.id }
-  ensureParser().postMessage({ id: message.id, request: message.request })
+  ensureParser().postMessage({
+    id: message.id,
+    request: message.request,
+    markdownAssets: configuredMarkdownAssets,
+  })
 }

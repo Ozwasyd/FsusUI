@@ -1,5 +1,4 @@
 import type { vShow } from 'vue'
-import type { INSTALLED_KEY } from '@element-plus/constants'
 
 declare global {
   const process: {
@@ -53,52 +52,12 @@ interface FsusInputModelAttributes {
 }
 
 declare module '@vue/runtime-dom' {
-  export interface HTMLAttributes extends FsusAuditAttributes {
-    'data-audit-active'?: string | boolean
-    'data-audit-component'?: string
-    'data-audit-focus'?: string | boolean
-    'data-audit-target'?: string | boolean
-    'data-testid'?: string
-    'data-markdown-editor-probe-id'?: string
-    'data-markdown-instance'?: string
-    'data-markdown-scroll-container'?: string
-    'data-markdown-reveal-state'?: string | boolean
-    'data-markdown-surface-owner'?: string | boolean
-    'data-markdown-atomic-kind'?: string | boolean
-    'data-markdown-atomic-status'?: string | boolean
-    'data-markdown-layout-action'?: string | boolean
-    'data-markdown-layout-smooth'?: string | boolean
-    'data-markdown-live-decorations'?: string | boolean
-    'data-markdown-input-authority'?: string | boolean
-    'data-markdown-anchor-id'?: string
-    'data-markdown-anchor-epoch'?: string | number
-    'data-markdown-anchor-projection'?: string
-    'data-kind'?: string | boolean
-    'data-node-id'?: string | boolean
-    'data-role'?: string | boolean
-    'data-upload-help'?: string | boolean
-    'data-descriptions-spacing-fixtures'?: string | boolean
-    'data-input-number-hit-fixtures'?: string | boolean
-  }
-
+  export interface HTMLAttributes extends FsusAuditAttributes {}
   export interface AnchorHTMLAttributes extends FsusAuditAttributes {}
-
-  export interface InputHTMLAttributes extends FsusInputModelAttributes {
-    'true-value'?: boolean | number | string
-    'false-value'?: boolean | number | string
-  }
+  export interface InputHTMLAttributes extends FsusInputModelAttributes {}
 }
 
 declare module 'vue' {
-  export interface App {
-    [INSTALLED_KEY]?: boolean
-  }
-
-  export interface GlobalDirectives {
-    vLoading: (typeof import('../packages/components/loading'))['vLoading']
-    vInfiniteScroll: (typeof import('../packages/components/infinite-scroll'))['default']
-  }
-
   export interface GlobalComponents {
     Component: (props: { is: Component | string }) => void
   }
@@ -135,10 +94,10 @@ declare module '*.vue' {
 
 declare module '*.css' {}
 
-// theme-chalk side-effect style imports
-declare module '@element-plus/theme-chalk/*.css' {}
-declare module '@element-plus/theme-chalk/src/*.scss' {}
-declare module '@element-plus/theme-chalk/src/**/*.scss' {}
+// FsusUI theme style side-effect imports
+declare module '@fsusui/theme/*.css' {}
+declare module '@fsusui/theme/src/*.scss' {}
+declare module '@fsusui/theme/src/**/*.scss' {}
 
 declare module '*.mjs' {
   const mod: any

@@ -1,7 +1,0 @@
-.scope .el-select-dropdown__item {
-  min-height: 34px;
-}
-
-:where(#selector-decoy) .el-select-dropdown__item {
-  min-height: 32px;
-}

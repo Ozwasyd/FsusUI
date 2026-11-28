@@ -35,7 +35,6 @@
       "manager": "custom.regex",
       "customManager": "emsdk-version-input",
       "files": [
-        ".github/workflows/_quality-playwright.yml",
         ".github/workflows/_quality.yml"
       ],
       "versioning": "semver-coerced",
@@ -50,7 +49,6 @@
       "files": [
         ".github/actions/setup-pdf-tools/action.yml",
         ".github/workflows/_avalonia-aot-leaf.yml",
-        ".github/workflows/_quality-playwright.yml",
         ".github/workflows/_quality.yml",
         ".github/workflows/publish-npm.yml",
         ".github/workflows/verify-published-consumer-contracts.yml"
@@ -66,7 +64,6 @@
       "manager": "github-actions",
       "files": [
         ".github/workflows/_avalonia-aot-leaf.yml",
-        ".github/workflows/_quality-playwright.yml",
         ".github/workflows/_quality-readiness.yml",
         ".github/workflows/_quality.yml",
         ".github/workflows/dependency-freshness.yml",
@@ -85,7 +82,6 @@
       "manager": "github-actions",
       "files": [
         ".github/workflows/_avalonia-aot-leaf.yml",
-        ".github/workflows/_quality-playwright.yml",
         ".github/workflows/_quality-readiness.yml",
         ".github/workflows/_quality.yml",
         ".github/workflows/publish-npm.yml"
@@ -113,7 +109,6 @@
       "packageName": "actions/setup-node",
       "manager": "github-actions",
       "files": [
-        ".github/workflows/_quality-playwright.yml",
         ".github/workflows/_quality.yml",
         ".github/workflows/dependency-freshness.yml",
         ".github/workflows/publish-npm.yml",
@@ -132,7 +127,6 @@
       "files": [
         ".github/actions/readiness-manifest/action.yml",
         ".github/workflows/_avalonia-aot-leaf.yml",
-        ".github/workflows/_quality-playwright.yml",
         ".github/workflows/_quality-readiness.yml",
         ".github/workflows/_quality.yml",
         ".github/workflows/publish-npm.yml",
@@ -148,7 +142,6 @@
       "packageName": "emscripten-core/setup-emsdk",
       "manager": "github-actions",
       "files": [
-        ".github/workflows/_quality-playwright.yml",
         ".github/workflows/_quality.yml"
       ],
       "versioning": "docker",
@@ -161,7 +154,6 @@
       "packageName": "pnpm/action-setup",
       "manager": "github-actions",
       "files": [
-        ".github/workflows/_quality-playwright.yml",
         ".github/workflows/_quality.yml",
         ".github/workflows/dependency-freshness.yml",
         ".github/workflows/publish-npm.yml",
@@ -177,7 +169,6 @@
       "packageName": "actions/node-versions",
       "manager": "github-actions",
       "files": [
-        ".github/workflows/_quality-playwright.yml",
         ".github/workflows/_quality.yml",
         ".github/workflows/dependency-freshness.yml",
         ".github/workflows/publish-npm.yml",
@@ -227,9 +218,7 @@
       "customManager": "npm-authority",
       "files": [
         "config/dependencies/npm-authority.json",
-        "package.json",
-        "pnpm-lock.yaml",
-        "vue/packages/element-plus/package.json"
+        "pnpm-lock.yaml"
       ],
       "versioning": "npm",
       "group": "vue-runtime-dependencies",
@@ -244,8 +233,7 @@
       "customManager": "npm-authority",
       "files": [
         "config/dependencies/npm-authority.json",
-        "pnpm-lock.yaml",
-        "vue/packages/icons-vue/package.json"
+        "pnpm-lock.yaml"
       ],
       "versioning": "npm",
       "group": "vue-build-toolchain",
@@ -260,10 +248,7 @@
       "customManager": "npm-authority",
       "files": [
         "config/dependencies/npm-authority.json",
-        "pnpm-lock.yaml",
-        "vue/internal/build/package.json",
-        "vue/internal/metadata/package.json",
-        "vue/packages/theme-chalk/package.json"
+        "pnpm-lock.yaml"
       ],
       "versioning": "npm",
       "group": "vue-build-toolchain",
@@ -294,8 +279,7 @@
       "customManager": "npm-authority",
       "files": [
         "config/dependencies/npm-authority.json",
-        "pnpm-lock.yaml",
-        "vue/internal/build/package.json"
+        "pnpm-lock.yaml"
       ],
       "versioning": "npm",
       "group": "vue-build-toolchain",
@@ -326,12 +310,7 @@
       "customManager": "npm-authority",
       "files": [
         "config/dependencies/npm-authority.json",
-        "pnpm-lock.yaml",
-        "vue/internal/build-utils/package.json",
-        "vue/internal/build/package.json",
-        "vue/internal/metadata/package.json",
-        "vue/packages/icons-vue/package.json",
-        "vue/packages/theme-chalk/package.json"
+        "pnpm-lock.yaml"
       ],
       "versioning": "npm",
       "group": "vue-build-toolchain",
@@ -347,8 +326,7 @@
       "files": [
         "config/dependencies/npm-authority.json",
         "package.json",
-        "pnpm-lock.yaml",
-        "vue/packages/element-plus/package.json"
+        "pnpm-lock.yaml"
       ],
       "versioning": "npm",
       "group": "js-test-quality-tooling",
@@ -363,9 +341,7 @@
       "customManager": "npm-authority",
       "files": [
         "config/dependencies/npm-authority.json",
-        "package.json",
-        "pnpm-lock.yaml",
-        "vue/packages/element-plus/package.json"
+        "pnpm-lock.yaml"
       ],
       "versioning": "npm",
       "group": "vue-runtime-dependencies",
@@ -380,9 +356,7 @@
       "customManager": "npm-authority",
       "files": [
         "config/dependencies/npm-authority.json",
-        "package.json",
-        "pnpm-lock.yaml",
-        "vue/packages/element-plus/package.json"
+        "pnpm-lock.yaml"
       ],
       "versioning": "npm",
       "group": "vue-runtime-dependencies",
@@ -398,8 +372,7 @@
       "files": [
         "config/dependencies/npm-authority.json",
         "pnpm-lock.yaml",
-        "vue/internal/build/package.json",
-        "vue/packages/icons-vue/package.json"
+        "vue/internal/build/package.json"
       ],
       "versioning": "npm",
       "group": "vue-build-toolchain",
@@ -414,8 +387,7 @@
       "customManager": "npm-authority",
       "files": [
         "config/dependencies/npm-authority.json",
-        "pnpm-lock.yaml",
-        "vue/packages/theme-chalk/package.json"
+        "pnpm-lock.yaml"
       ],
       "versioning": "npm",
       "group": "vue-build-toolchain",
@@ -430,8 +402,7 @@
       "customManager": "npm-authority",
       "files": [
         "config/dependencies/npm-authority.json",
-        "pnpm-lock.yaml",
-        "vue/packages/icons-vue/package.json"
+        "pnpm-lock.yaml"
       ],
       "versioning": "npm",
       "group": "vue-build-toolchain",
@@ -446,9 +417,7 @@
       "customManager": "npm-authority",
       "files": [
         "config/dependencies/npm-authority.json",
-        "package.json",
-        "pnpm-lock.yaml",
-        "vue/packages/element-plus/package.json"
+        "pnpm-lock.yaml"
       ],
       "versioning": "npm",
       "group": "vue-runtime-dependencies",
@@ -549,8 +518,7 @@
         "config/dependencies/npm-authority.json",
         "package.json",
         "pnpm-lock.yaml",
-        "vue/internal/build/package.json",
-        "vue/internal/metadata/package.json"
+        "vue/internal/build/package.json"
       ],
       "versioning": "npm",
       "group": "vue-build-toolchain",
@@ -567,7 +535,8 @@
         "config/dependencies/npm-authority.json",
         "package.json",
         "pnpm-lock.yaml",
-        "vue/packages/element-plus/package.json"
+        "vue/packages/core/package.json",
+        "vue/packages/fsusui/package.json"
       ],
       "versioning": "npm",
       "group": "vue-runtime-dependencies",
@@ -614,8 +583,7 @@
       "customManager": "npm-authority",
       "files": [
         "config/dependencies/npm-authority.json",
-        "pnpm-lock.yaml",
-        "vue/internal/build/package.json"
+        "pnpm-lock.yaml"
       ],
       "versioning": "npm",
       "group": "vue-build-toolchain",
@@ -630,9 +598,7 @@
       "customManager": "npm-authority",
       "files": [
         "config/dependencies/npm-authority.json",
-        "pnpm-lock.yaml",
-        "vue/packages/element-plus/package.json",
-        "vue/packages/motion/package.json"
+        "pnpm-lock.yaml"
       ],
       "versioning": "npm",
       "group": "vue-runtime-dependencies",
@@ -647,9 +613,7 @@
       "customManager": "npm-authority",
       "files": [
         "config/dependencies/npm-authority.json",
-        "package.json",
-        "pnpm-lock.yaml",
-        "vue/internal/build/package.json"
+        "pnpm-lock.yaml"
       ],
       "versioning": "npm",
       "group": "vue-build-toolchain",
@@ -664,8 +628,7 @@
       "customManager": "npm-authority",
       "files": [
         "config/dependencies/npm-authority.json",
-        "pnpm-lock.yaml",
-        "vue/packages/theme-chalk/package.json"
+        "pnpm-lock.yaml"
       ],
       "versioning": "npm",
       "group": "vue-build-toolchain",
@@ -680,8 +643,7 @@
       "customManager": "npm-authority",
       "files": [
         "config/dependencies/npm-authority.json",
-        "pnpm-lock.yaml",
-        "vue/packages/theme-chalk/package.json"
+        "pnpm-lock.yaml"
       ],
       "versioning": "npm",
       "group": "vue-build-toolchain",
@@ -696,8 +658,7 @@
       "customManager": "npm-authority",
       "files": [
         "config/dependencies/npm-authority.json",
-        "pnpm-lock.yaml",
-        "vue/packages/theme-chalk/package.json"
+        "pnpm-lock.yaml"
       ],
       "versioning": "npm",
       "group": "vue-build-toolchain",
@@ -712,8 +673,7 @@
       "customManager": "npm-authority",
       "files": [
         "config/dependencies/npm-authority.json",
-        "pnpm-lock.yaml",
-        "vue/packages/theme-chalk/package.json"
+        "pnpm-lock.yaml"
       ],
       "versioning": "npm",
       "group": "vue-build-toolchain",
@@ -760,8 +720,10 @@
       "customManager": "npm-authority",
       "files": [
         "config/dependencies/npm-authority.json",
+        "package.json",
         "pnpm-lock.yaml",
-        "vue/packages/element-plus/package.json",
+        "vue/packages/fsusui/package.json",
+        "vue/packages/markdown/package.json",
         "vue/packages/wasm/package.json"
       ],
       "versioning": "npm",
@@ -809,9 +771,7 @@
       "customManager": "npm-authority",
       "files": [
         "config/dependencies/npm-authority.json",
-        "package.json",
-        "pnpm-lock.yaml",
-        "vue/packages/element-plus/package.json"
+        "pnpm-lock.yaml"
       ],
       "versioning": "npm",
       "group": "vue-runtime-dependencies",
@@ -826,11 +786,7 @@
       "customManager": "npm-authority",
       "files": [
         "config/dependencies/npm-authority.json",
-        "package.json",
-        "pnpm-lock.yaml",
-        "vue/internal/build/package.json",
-        "vue/internal/metadata/package.json",
-        "vue/packages/element-plus/package.json"
+        "pnpm-lock.yaml"
       ],
       "versioning": "npm",
       "group": "vue-runtime-dependencies",
@@ -845,9 +801,7 @@
       "customManager": "npm-authority",
       "files": [
         "config/dependencies/npm-authority.json",
-        "package.json",
-        "pnpm-lock.yaml",
-        "vue/packages/element-plus/package.json"
+        "pnpm-lock.yaml"
       ],
       "versioning": "npm",
       "group": "vue-runtime-dependencies",
@@ -862,9 +816,7 @@
       "customManager": "npm-authority",
       "files": [
         "config/dependencies/npm-authority.json",
-        "package.json",
-        "pnpm-lock.yaml",
-        "vue/packages/element-plus/package.json"
+        "pnpm-lock.yaml"
       ],
       "versioning": "npm",
       "group": "vue-runtime-dependencies",
@@ -879,8 +831,10 @@
       "customManager": "npm-authority",
       "files": [
         "config/dependencies/npm-authority.json",
+        "package.json",
         "pnpm-lock.yaml",
-        "vue/packages/element-plus/package.json",
+        "vue/packages/fsusui/package.json",
+        "vue/packages/markdown/package.json",
         "vue/packages/wasm/package.json"
       ],
       "versioning": "npm",
@@ -896,10 +850,7 @@
       "customManager": "npm-authority",
       "files": [
         "config/dependencies/npm-authority.json",
-        "package.json",
-        "pnpm-lock.yaml",
-        "vue/packages/element-plus/package.json",
-        "vue/packages/hooks/package.json"
+        "pnpm-lock.yaml"
       ],
       "versioning": "npm",
       "group": "vue-runtime-dependencies",
@@ -914,9 +865,7 @@
       "customManager": "npm-authority",
       "files": [
         "config/dependencies/npm-authority.json",
-        "package.json",
-        "pnpm-lock.yaml",
-        "vue/packages/element-plus/package.json"
+        "pnpm-lock.yaml"
       ],
       "versioning": "npm",
       "group": "vue-runtime-dependencies",
@@ -932,9 +881,7 @@
       "files": [
         "config/dependencies/npm-authority.json",
         "package.json",
-        "pnpm-lock.yaml",
-        "vue/internal/metadata/package.json",
-        "vue/packages/icons-vue/package.json"
+        "pnpm-lock.yaml"
       ],
       "versioning": "npm",
       "group": "npm-release-tooling",
@@ -949,8 +896,7 @@
       "customManager": "npm-authority",
       "files": [
         "config/dependencies/npm-authority.json",
-        "pnpm-lock.yaml",
-        "vue/internal/metadata/package.json"
+        "pnpm-lock.yaml"
       ],
       "versioning": "npm",
       "group": "npm-release-tooling",
@@ -982,9 +928,7 @@
       "files": [
         "config/dependencies/npm-authority.json",
         "package.json",
-        "pnpm-lock.yaml",
-        "vue/internal/build-utils/package.json",
-        "vue/internal/build/package.json"
+        "pnpm-lock.yaml"
       ],
       "versioning": "npm",
       "group": "npm-release-tooling",
@@ -1000,9 +944,7 @@
       "files": [
         "config/dependencies/npm-authority.json",
         "package.json",
-        "pnpm-lock.yaml",
-        "vue/internal/build-utils/package.json",
-        "vue/internal/build/package.json"
+        "pnpm-lock.yaml"
       ],
       "versioning": "npm",
       "group": "npm-release-tooling",
@@ -1018,8 +960,7 @@
       "files": [
         "config/dependencies/npm-authority.json",
         "package.json",
-        "pnpm-lock.yaml",
-        "vue/internal/build/package.json"
+        "pnpm-lock.yaml"
       ],
       "versioning": "npm",
       "group": "npm-release-tooling",
@@ -1034,9 +975,7 @@
       "customManager": "npm-authority",
       "files": [
         "config/dependencies/npm-authority.json",
-        "package.json",
-        "pnpm-lock.yaml",
-        "vue/packages/element-plus/package.json"
+        "pnpm-lock.yaml"
       ],
       "versioning": "npm",
       "group": "vue-runtime-dependencies",
@@ -1053,8 +992,7 @@
         "config/dependencies/npm-authority.json",
         "package.json",
         "pnpm-lock.yaml",
-        "vue/internal/eslint-config/package.json",
-        "vue/packages/icons-vue/package.json"
+        "vue/internal/eslint-config/package.json"
       ],
       "versioning": "npm",
       "group": "js-test-quality-tooling",
@@ -1069,7 +1007,6 @@
       "customManager": "npm-authority",
       "files": [
         "config/dependencies/npm-authority.json",
-        "package.json",
         "pnpm-lock.yaml"
       ],
       "versioning": "npm",
@@ -1118,8 +1055,7 @@
       "customManager": "npm-authority",
       "files": [
         "config/dependencies/npm-authority.json",
-        "pnpm-lock.yaml",
-        "vue/internal/build/package.json"
+        "pnpm-lock.yaml"
       ],
       "versioning": "npm",
       "group": "vue-build-toolchain",
@@ -1134,8 +1070,7 @@
       "customManager": "npm-authority",
       "files": [
         "config/dependencies/npm-authority.json",
-        "pnpm-lock.yaml",
-        "vue/internal/build/package.json"
+        "pnpm-lock.yaml"
       ],
       "versioning": "npm",
       "group": "vue-build-toolchain",
@@ -1150,8 +1085,7 @@
       "customManager": "npm-authority",
       "files": [
         "config/dependencies/npm-authority.json",
-        "pnpm-lock.yaml",
-        "vue/internal/build/package.json"
+        "pnpm-lock.yaml"
       ],
       "versioning": "npm",
       "group": "vue-build-toolchain",
@@ -1166,8 +1100,7 @@
       "customManager": "npm-authority",
       "files": [
         "config/dependencies/npm-authority.json",
-        "pnpm-lock.yaml",
-        "vue/internal/build/package.json"
+        "pnpm-lock.yaml"
       ],
       "versioning": "npm",
       "group": "vue-build-toolchain",
@@ -1184,6 +1117,7 @@
         "config/dependencies/npm-authority.json",
         "package.json",
         "pnpm-lock.yaml",
+        "vue/internal/build/package.json",
         "vue/packages/demo-app/package.json"
       ],
       "versioning": "npm",
@@ -1199,8 +1133,10 @@
       "customManager": "npm-authority",
       "files": [
         "config/dependencies/npm-authority.json",
+        "package.json",
         "pnpm-lock.yaml",
-        "vue/packages/element-plus/package.json",
+        "vue/packages/fsusui/package.json",
+        "vue/packages/markdown/package.json",
         "vue/packages/wasm/package.json"
       ],
       "versioning": "npm",
@@ -1216,8 +1152,7 @@
       "customManager": "npm-authority",
       "files": [
         "config/dependencies/npm-authority.json",
-        "pnpm-lock.yaml",
-        "vue/packages/icons-svg/package.json"
+        "pnpm-lock.yaml"
       ],
       "versioning": "npm",
       "group": "vue-build-toolchain",
@@ -1232,8 +1167,7 @@
       "customManager": "npm-authority",
       "files": [
         "config/dependencies/npm-authority.json",
-        "pnpm-lock.yaml",
-        "vue/packages/icons-vue/package.json"
+        "pnpm-lock.yaml"
       ],
       "versioning": "npm",
       "group": "vue-build-toolchain",
@@ -1249,8 +1183,7 @@
       "files": [
         "config/dependencies/npm-authority.json",
         "package.json",
-        "pnpm-lock.yaml",
-        "vue/internal/build/package.json"
+        "pnpm-lock.yaml"
       ],
       "versioning": "npm",
       "group": "vue-build-toolchain",
@@ -1266,10 +1199,7 @@
       "files": [
         "config/dependencies/npm-authority.json",
         "package.json",
-        "pnpm-lock.yaml",
-        "vue/internal/build/package.json",
-        "vue/internal/metadata/package.json",
-        "vue/packages/icons-vue/package.json"
+        "pnpm-lock.yaml"
       ],
       "versioning": "npm",
       "group": "vue-build-toolchain",
@@ -1316,7 +1246,6 @@
       "customManager": "npm-authority",
       "files": [
         "config/dependencies/npm-authority.json",
-        "package.json",
         "pnpm-lock.yaml"
       ],
       "versioning": "npm",
@@ -1332,8 +1261,7 @@
       "customManager": "npm-authority",
       "files": [
         "config/dependencies/npm-authority.json",
-        "pnpm-lock.yaml",
-        "vue/packages/theme-chalk/package.json"
+        "pnpm-lock.yaml"
       ],
       "versioning": "npm",
       "group": "vue-build-toolchain",
@@ -1348,8 +1276,7 @@
       "customManager": "npm-authority",
       "files": [
         "config/dependencies/npm-authority.json",
-        "pnpm-lock.yaml",
-        "vue/packages/theme-chalk/package.json"
+        "pnpm-lock.yaml"
       ],
       "versioning": "npm",
       "group": "vue-build-toolchain",
@@ -1364,8 +1291,7 @@
       "customManager": "npm-authority",
       "files": [
         "config/dependencies/npm-authority.json",
-        "pnpm-lock.yaml",
-        "vue/packages/theme-chalk/package.json"
+        "pnpm-lock.yaml"
       ],
       "versioning": "npm",
       "group": "vue-build-toolchain",
@@ -1380,8 +1306,7 @@
       "customManager": "npm-authority",
       "files": [
         "config/dependencies/npm-authority.json",
-        "pnpm-lock.yaml",
-        "vue/packages/theme-chalk/package.json"
+        "pnpm-lock.yaml"
       ],
       "versioning": "npm",
       "group": "vue-build-toolchain",
@@ -1412,8 +1337,7 @@
       "customManager": "npm-authority",
       "files": [
         "config/dependencies/npm-authority.json",
-        "pnpm-lock.yaml",
-        "vue/packages/element-plus/package.json"
+        "pnpm-lock.yaml"
       ],
       "versioning": "npm",
       "group": "vue-runtime-dependencies",
@@ -1428,10 +1352,7 @@
       "customManager": "npm-authority",
       "files": [
         "config/dependencies/npm-authority.json",
-        "package.json",
-        "pnpm-lock.yaml",
-        "vue/internal/metadata/package.json",
-        "vue/packages/element-plus/package.json"
+        "pnpm-lock.yaml"
       ],
       "versioning": "npm",
       "group": "vue-runtime-dependencies",
@@ -1447,9 +1368,7 @@
       "files": [
         "config/dependencies/npm-authority.json",
         "package.json",
-        "pnpm-lock.yaml",
-        "vue/packages/element-plus/package.json",
-        "vue/packages/icons-vue/package.json"
+        "pnpm-lock.yaml"
       ],
       "versioning": "npm",
       "group": "js-test-quality-tooling",
@@ -1483,7 +1402,6 @@
         "package.json",
         "pnpm-lock.yaml",
         "vue/packages/demo-app/package.json",
-        "vue/packages/icons-vue/package.json",
         "vue/tests/consumer-install/template/package.json"
       ],
       "versioning": "npm",
@@ -1517,9 +1435,6 @@
       "files": [
         "config/dependencies/npm-authority.json",
         "pnpm-lock.yaml",
-        "vue/internal/build-constants/package.json",
-        "vue/internal/build-utils/package.json",
-        "vue/internal/build/package.json",
         "vue/packages/wasm/package.json"
       ],
       "versioning": "npm",
@@ -1535,8 +1450,7 @@
       "customManager": "npm-authority",
       "files": [
         "config/dependencies/npm-authority.json",
-        "pnpm-lock.yaml",
-        "vue/packages/icons-vue/package.json"
+        "pnpm-lock.yaml"
       ],
       "versioning": "npm",
       "group": "vue-build-toolchain",
@@ -1551,9 +1465,7 @@
       "customManager": "npm-authority",
       "files": [
         "config/dependencies/npm-authority.json",
-        "package.json",
-        "pnpm-lock.yaml",
-        "vue/internal/build/package.json"
+        "pnpm-lock.yaml"
       ],
       "versioning": "npm",
       "group": "vue-build-toolchain",
@@ -1607,7 +1519,6 @@
         "config/dependencies/npm-authority.json",
         "package.json",
         "pnpm-lock.yaml",
-        "vue/internal/build/package.json",
         "vue/packages/demo-app/package.json"
       ],
       "versioning": "npm",
@@ -1673,15 +1584,13 @@
         "config/dependencies/npm-authority.json",
         "package.json",
         "pnpm-lock.yaml",
-        "vue/internal/build/package.json",
         "vue/packages/components/package.json",
+        "vue/packages/core/package.json",
         "vue/packages/demo-app/package.json",
-        "vue/packages/directives/package.json",
-        "vue/packages/element-plus/package.json",
-        "vue/packages/hooks/package.json",
-        "vue/packages/icons-vue/package.json",
+        "vue/packages/fsusui/package.json",
+        "vue/packages/icons/package.json",
+        "vue/packages/markdown/package.json",
         "vue/packages/motion/package.json",
-        "vue/packages/utils/package.json",
         "vue/tests/consumer-install/template/package.json"
       ],
       "versioning": "npm",
@@ -1715,8 +1624,7 @@
       "files": [
         "config/dependencies/npm-authority.json",
         "package.json",
-        "pnpm-lock.yaml",
-        "vue/packages/element-plus/package.json"
+        "pnpm-lock.yaml"
       ],
       "versioning": "npm",
       "group": "vue-build-toolchain",
@@ -1766,7 +1674,6 @@
         "package.json",
         "pnpm-lock.yaml",
         "vue/packages/demo-app/package.json",
-        "vue/packages/icons-vue/package.json",
         "vue/tests/consumer-install/template/package.json"
       ],
       "versioning": "npm",
@@ -1989,7 +1896,7 @@
     },
     {
       "id": "vue-public-api-package-fixture",
-      "path": "tests/fixtures/vue-public-api-baseline/vue/packages/element-plus/package.json",
+      "path": "tests/fixtures/vue-public-api-baseline/vue/packages/fsusui/package.json",
       "field": "*",
       "reason": "Frozen input fixture for public API baseline mutation tests, not a consumable manifest.",
       "owner": "api-governance",

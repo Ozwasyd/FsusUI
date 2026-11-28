@@ -1,10 +1,5 @@
 {
   "schemaVersion": 1,
-  "playwright": {
-    "owners": "spec/ci/playwright-owners.json",
-    "suites": "spec/ci/playwright-suites.json",
-    "ownerIds": []
-  },
   "profiles": {
     "main": [
       "static-quality",

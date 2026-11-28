@@ -220,27 +220,27 @@ const governanceMutations = [
         'static-quality',
       ]
     },
-    expected: /package candidate and consumer install/u,
+    expected: /package candidate and consumer verify/u,
   },
   {
-    name: 'peer build group omits consumer install',
+    name: 'peer build group omits consumer verify',
     mutate(next) {
       next.contract.groups['vue-build-toolchain'].requiredGateEvidence = [
         'build-package',
         'static-quality',
       ]
     },
-    expected: /package candidate and consumer install/u,
+    expected: /package candidate and consumer verify/u,
   },
   {
     name: 'Wasm group omits package candidate',
     mutate(next) {
       next.contract.groups['wasm-toolchain'].requiredGateEvidence = [
-        'consumer-install',
+        'consumer-verify',
         'static-quality',
       ]
     },
-    expected: /package candidate and consumer install/u,
+    expected: /package candidate and consumer verify/u,
   },
   {
     name: 'release tooling omits package gates',
@@ -249,7 +249,7 @@ const governanceMutations = [
         'static-quality',
       ]
     },
-    expected: /package candidate and consumer install/u,
+    expected: /package candidate and consumer verify/u,
   },
   {
     name: 'lockfile maintenance has no checks',

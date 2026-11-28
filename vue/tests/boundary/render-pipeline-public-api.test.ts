@@ -15,12 +15,13 @@ import {
   useFsusRenderPipelineRuntime,
   useFsusRenderScheduler,
   useFsusVirtualWindow,
-} from '../../packages/element-plus/render-pipeline'
+} from '../../packages/fsusui/src/render-pipeline'
 
 import type {
   FsusRenderPipelineAdapter,
   FsusRenderPipelineAdaptiveMode,
   FsusRenderPipelineAdaptiveSignals,
+  FsusRenderPipelineConfig,
   FsusRenderPipelineDomAttrs,
   FsusRenderHardwareProfile,
   FsusResolvedRenderPipelineAcceleration,
@@ -38,12 +39,11 @@ import type {
   FsusWorkerExecutorEvent,
   FsusWorkerRunOptions,
   FsusWorkerTaskLane,
-  RenderPipelineConfigContract,
-} from '../../packages/element-plus/render-pipeline'
+} from '../../packages/fsusui/src/render-pipeline'
 
 describe('render pipeline public api', () => {
   it('exposes the layered public entrypoint', () => {
-    const config: RenderPipelineConfigContract = {
+    const config: FsusRenderPipelineConfig = {
       adaptive: 'auto',
       mode: 'auto',
       thresholds: { htmlBytes: 128_000 },

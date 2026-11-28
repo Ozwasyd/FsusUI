@@ -12,7 +12,9 @@ export const readRepoFile = (relativePath, root = repoRoot) =>
   fs.readFileSync(path.join(root, relativePath), 'utf8')
 
 const resolveScssPartial = (baseDir, specifier) => {
-  const normalized = specifier.endsWith('.scss') ? specifier : `${specifier}.scss`
+  const normalized = specifier.endsWith('.scss')
+    ? specifier
+    : `${specifier}.scss`
   const direct = path.resolve(baseDir, normalized)
   if (fs.existsSync(direct) && fs.statSync(direct).isFile()) return direct
   const partial = path.resolve(
@@ -72,95 +74,8 @@ export const withoutLineComments = (source) =>
 export const stripAllComments = (source) =>
   source.replace(/\/\*[\s\S]*?\*\//gu, '').replace(/\/\/.*$/gmu, '')
 
-export const selectorItems = (selector) =>
-  selector
-    .split(',')
-    .map((item) => item.trim())
-    .filter(Boolean)
-
-export const extractMap = (source, mapName) => {
-  const start = source.indexOf(`$${mapName}: map.merge(`)
-  if (start === -1) {
-    throw new Error(`Missing $${mapName} map in common/var.scss`)
-  }
-  const endMarker = `\n  $${mapName}\n);`
-  const end = source.indexOf(endMarker, start)
-  if (end === -1) {
-    throw new Error(`Could not find end of $${mapName} map in common/var.scss`)
-  }
-  return {
-    source: source.slice(start, end + endMarker.length),
-    startLine: lineNumberAt(source, start),
-  }
-}
-
-export const extractBlock = (source, selector, openToken = ' {') => {
-  const start = source.indexOf(selector)
-  if (start === -1) return undefined
-  const open = source.indexOf(openToken, start)
-  if (open === -1) return undefined
-  const braceIndex = open + openToken.indexOf('{')
-
-  let depth = 0
-  for (let index = braceIndex; index < source.length; index += 1) {
-    const char = source[index]
-    if (char === '{') depth += 1
-    if (char === '}') {
-      depth -= 1
-      if (depth === 0) {
-        return {
-          body: source.slice(braceIndex + 1, index),
-          startLine: lineNumberAt(source, start),
-        }
-      }
-    }
-  }
-  return undefined
-}
-
-export const extractBlockAfter = (source, needle) =>
-  extractBlock(source, needle, '{')
-
-export const topLevelBlocks = (
-  source,
-  { normalizeInterpolations = true } = {},
-) => {
-  const stripped = withoutLineComments(source)
-  const normalizedSource = normalizeInterpolations
-    ? stripped.replace(/#\{[^}]+\}/gu, 'NS')
-    : stripped
-  const blocks = []
-  let depth = 0
-  let selectorStart = 0
-
-  for (let index = 0; index < normalizedSource.length; index += 1) {
-    const char = normalizedSource[index]
-    if (char === '{') {
-      if (depth === 0) {
-        blocks.push({
-          selector: normalizedSource.slice(selectorStart, index).trim(),
-          bodyStart: index + 1,
-          startLine: lineNumberAt(normalizedSource, selectorStart),
-        })
-      }
-      depth += 1
-      continue
-    }
-    if (char === '}') {
-      depth -= 1
-      if (depth === 0) {
-        const block = blocks[blocks.length - 1]
-        block.body = normalizedSource.slice(block.bodyStart, index)
-        selectorStart = index + 1
-      }
-    }
-  }
-
-  return blocks.filter((block) => typeof block.body === 'string')
-}
-
 export const walkScssFiles = (
-  relativeDir = 'vue/packages/theme-chalk/src',
+  relativeDir = 'vue/packages/theme/src',
   root = repoRoot,
 ) => {
   const results = []

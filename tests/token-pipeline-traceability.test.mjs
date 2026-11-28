@@ -56,7 +56,7 @@ const renderTokenFixture = (tokens) => {
       webCss: fs.readFileSync(
         path.join(
           fixtureRoot,
-          'vue/packages/theme-chalk/src/generated/tokens.css',
+          'vue/packages/theme/src/generated/tokens.css',
         ),
         'utf8',
       ),
@@ -68,7 +68,7 @@ const renderTokenFixture = (tokens) => {
 
 test('every generated token carries complete source-to-consumer traceability', () => {
   const generated = readJson(
-    'vue/packages/theme-chalk/src/generated/tokens.json',
+    'vue/packages/theme/src/generated/tokens.json',
   )
 
   for (const [name, token] of Object.entries(generated.tokens)) {
@@ -219,7 +219,7 @@ test('defines the overlay scrim as 60 percent black in CSS and Avalonia', () => 
   assert.equal(Number.parseInt(scrim.value.slice(7, 9), 16) / 255, 0.6)
 
   const webCss = fs.readFileSync(
-    path.join(root, 'vue/packages/theme-chalk/src/generated/tokens.css'),
+    path.join(root, 'vue/packages/theme/src/generated/tokens.css'),
     'utf8',
   )
   const avaloniaXaml = fs.readFileSync(

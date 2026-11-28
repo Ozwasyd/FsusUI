@@ -328,7 +328,7 @@ const checkSemanticPage = (file, source) => {
   }
 
   if (
-    /data-ux-filter-control|data-ux-filterable-list|<el-table\b|<ElTable\b|<el-table-v2\b|<ElTableV2\b/i.test(
+    /data-ux-filter-control|data-ux-filterable-list|<fsus-table\b|<FsusTable\b/i.test(
       cleanSource,
     ) &&
     /data-ux-filter-control|data-ux-filterable-list/i.test(cleanSource) &&

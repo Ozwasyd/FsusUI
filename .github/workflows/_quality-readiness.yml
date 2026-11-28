@@ -8,11 +8,6 @@ on:
         required: false
         type: string
         default: main
-      playwright_group:
-        description: Playwright evidence group to aggregate.
-        required: false
-        type: string
-        default: main
       release_tag:
         description: Expected v-prefixed package version for release identity binding.
         required: false
@@ -41,7 +36,6 @@ jobs:
             --root .readiness \
             --profile main \
             --workflow-group '${{ inputs.group }}' \
-            --playwright-group '${{ inputs.playwright_group }}' \
             --commit "$GITHUB_SHA" \
             --run-id "$GITHUB_RUN_ID" \
             --run-attempt "$GITHUB_RUN_ATTEMPT" \
@@ -85,7 +79,6 @@ jobs:
             --root .readiness \
             --profile nightly \
             --workflow-group nightly \
-            --playwright-group nightly \
             --commit "$GITHUB_SHA" \
             --run-id "$GITHUB_RUN_ID" \
             --run-attempt "$GITHUB_RUN_ATTEMPT" \
@@ -134,7 +127,6 @@ jobs:
             --root .readiness \
             --profile release \
             --workflow-group release \
-            --playwright-group release \
             --commit "$GITHUB_SHA" \
             --run-id "$GITHUB_RUN_ID" \
             --run-attempt "$GITHUB_RUN_ATTEMPT" \

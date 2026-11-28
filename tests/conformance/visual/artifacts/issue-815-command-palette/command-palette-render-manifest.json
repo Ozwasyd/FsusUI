@@ -13,7 +13,7 @@
   "captures": [
     {
       "file": "tests/conformance/visual/artifacts/issue-815-command-palette/command-palette-default-first-enabled-selection.png",
-      "sha256": "d0a810f7aaeafafbe72ac882b2f7ccb9b6dff7422a78af965dfb8f11f5b01bfc",
+      "sha256": "9188b72a2b2a408d414a07db3f4cd3a70e0c788da4c27f916bc40bf43b2d4e52",
       "automationFile": "tests/conformance/visual/artifacts/issue-815-command-palette/command-palette-default-first-enabled-selection-automation.json",
       "automationSha256": "36f850aa83c68531e0c84d4442dc68197f8fa2b4415e514960b9cdff1c2da875",
       "pixelSize": {
@@ -32,7 +32,7 @@
     },
     {
       "file": "tests/conformance/visual/artifacts/issue-815-command-palette/command-palette-none-initial-selection-localized-name.png",
-      "sha256": "76dd302c51c7791aefa2b83297858e3dda0df2266f4330e306d0ca1aa4536eec",
+      "sha256": "e1af71c9039716c1a9ee17ca73882f45f150e4a5312892d40fa3d5b8385115b1",
       "automationFile": "tests/conformance/visual/artifacts/issue-815-command-palette/command-palette-none-initial-selection-localized-name-automation.json",
       "automationSha256": "df3124191bef32d806022f882ac3fcb1a2f1c8a76001f5b0656429b464a00ca2",
       "pixelSize": {
@@ -51,7 +51,7 @@
     },
     {
       "file": "tests/conformance/visual/artifacts/issue-815-command-palette/command-palette-none-selection-keyboard-path.png",
-      "sha256": "d0a810f7aaeafafbe72ac882b2f7ccb9b6dff7422a78af965dfb8f11f5b01bfc",
+      "sha256": "9188b72a2b2a408d414a07db3f4cd3a70e0c788da4c27f916bc40bf43b2d4e52",
       "automationFile": "tests/conformance/visual/artifacts/issue-815-command-palette/command-palette-none-selection-keyboard-path-automation.json",
       "automationSha256": "62c7a239c503c91a8d1aea4467d6aa6bead954e803906bcc70ad2ee9214b2f07",
       "pixelSize": {

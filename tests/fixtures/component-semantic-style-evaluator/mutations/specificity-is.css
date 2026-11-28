@@ -1,7 +1,0 @@
-#fixture-select .scope .el-select-dropdown__item {
-  min-height: 34px;
-}
-
-:is(#selector-decoy, .el-select-dropdown__item) {
-  min-height: 32px;
-}

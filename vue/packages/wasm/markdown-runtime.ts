@@ -28,6 +28,12 @@ import {
 
 export { MarkdownRuntimeError, type MarkdownRuntimeErrorCode }
 export {
+  resolveMarkdownAsset,
+  setMarkdownRuntimeAssetOverrides,
+  type MarkdownAssetKind,
+  type WasmAssetUrlPair,
+} from './runtime/assets'
+export {
   isMarkdownRuntimeAuthorizedResult,
   renderMarkdownFallbackWithRuntime,
   type MarkdownRuntimeChunkResult,

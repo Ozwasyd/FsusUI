@@ -15,6 +15,7 @@ const MIME_TYPES = {
   '.mjs': 'text/javascript; charset=utf-8',
   '.png': 'image/png',
   '.svg': 'image/svg+xml; charset=utf-8',
+  '.wasm': 'application/wasm',
   '.woff': 'font/woff',
   '.woff2': 'font/woff2',
 }

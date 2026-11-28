@@ -39,9 +39,9 @@ const authority = {
   },
 }
 const candidatePackage = {
-  name: '@ozwasyd/element-plus',
+  name: '@ozwasyd/fsusui',
   peerDependencies: { vue: '^3.5.0' },
-  version: '1.5.1',
+  version: '2.0.0',
 }
 const digest = 'a'.repeat(64)
 

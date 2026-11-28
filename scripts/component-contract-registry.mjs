@@ -347,7 +347,7 @@ const validateRegistry = (registry, baseline) => {
 const platformMatrix = (classification) => ({
   web: {
     status: 'source',
-    package: '@ozwasyd/element-plus',
+    package: '@ozwasyd/fsusui',
   },
   avalonia: {
     status:

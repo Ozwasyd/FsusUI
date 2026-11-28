@@ -2,19 +2,17 @@
   "schemaVersion": 1,
   "componentModules": {
     "fixture-options-widget": "portable",
-    "fixture-service": "platform-override",
     "fixture-tsx-widget": "portable",
     "fixture-widget": "portable"
   },
   "directives": {
-    "ElFixtureDirective": "platform-override",
-    "vFixture": "platform-override"
+    "vFsusFixture": "platform-override"
   },
   "services": {
-    "ElFixtureService": "platform-override"
+    "FsusFixtureService": "platform-override"
   },
   "plugins": {
-    "ElFixtureService": "platform-override"
+    "FsusFixturePlugin": "platform-override"
   },
   "entryPoints": {
     ".": "portable"

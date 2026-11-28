@@ -6,44 +6,20 @@ const repoRoot = path.resolve(__dirname, '../../..')
 const packagesRoot = path.join(repoRoot, 'vue/packages')
 
 /**
- * Authoritative acyclic workspace dependency DAG for FsusUI Vue packages.
- * Each package may only import `@element-plus/*` packages listed in its
- * allowed lower-layer set.
+ * Authoritative acyclic workspace dependency DAG for FsusUI 2.0 Vue packages.
+ * Each package may only import `@fsusui/*` packages listed in its allowed
+ * lower-layer set, and zero retired V1 `@element-plus/*` imports are allowed.
  */
 const ALLOWED_PACKAGE_DEPS: Record<string, readonly string[]> = {
-  constants: [],
+  core: [],
   'icons-svg': [],
-  'icons-vue': [],
-  locale: [],
+  icons: [],
   motion: [],
-  'theme-chalk': [],
-  utils: ['constants', 'icons-vue'],
-  wasm: ['utils'],
-  directives: ['constants', 'utils'],
-  hooks: ['constants', 'locale', 'utils'],
-  components: [
-    'constants',
-    'directives',
-    'hooks',
-    'icons-vue',
-    'locale',
-    'motion',
-    'theme-chalk',
-    'utils',
-    'wasm',
-  ],
-  'element-plus': [
-    'components',
-    'constants',
-    'directives',
-    'hooks',
-    'icons-vue',
-    'locale',
-    'motion',
-    'theme-chalk',
-    'utils',
-    'wasm',
-  ],
+  theme: [],
+  wasm: ['core'],
+  components: ['core', 'icons', 'motion', 'theme'],
+  markdown: ['core', 'icons', 'motion', 'theme', 'wasm'],
+  fsusui: ['components', 'core', 'icons', 'markdown', 'motion', 'theme', 'wasm'],
 }
 
 const SOURCE_EXTENSIONS = new Set(['.ts', '.tsx', '.vue', '.mjs', '.js'])
@@ -58,6 +34,8 @@ const SKIP_DIRS = new Set([
   'build',
 ])
 const IMPORT_RE =
+  /(?:from\s+|import\s*\(\s*)['"]@fsusui\/([a-z0-9-]+)(?:\/[^'"]*)?['"]/gu
+const FORBIDDEN_V1_IMPORT_RE =
   /(?:from\s+|import\s*\(\s*)['"]@element-plus\/([a-z0-9-]+)(?:\/[^'"]*)?['"]/gu
 
 function walkProductionSources(dir: string, out: string[] = []): string[] {
@@ -75,7 +53,6 @@ function walkProductionSources(dir: string, out: string[] = []): string[] {
       entry.name.endsWith('.test.tsx') ||
       entry.name.endsWith('.spec.ts') ||
       entry.name === 'setup-mock.ts' ||
-      entry.name === 'gulpfile.ts' ||
       entry.name === 'build.config.ts'
     ) {
       continue
@@ -122,9 +99,14 @@ describe('workspace package dependency DAG boundary', () => {
           if (target === pkg) continue
           if (!allowedSet.has(target)) {
             violations.push(
-              `${path.relative(repoRoot, file)} imports forbidden @element-plus/${target} (allowed for ${pkg}: [${allowed.join(', ')}])`,
+              `${path.relative(repoRoot, file)} imports forbidden @fsusui/${target} (allowed for ${pkg}: [${allowed.join(', ')}])`,
             )
           }
+        }
+        for (const match of content.matchAll(FORBIDDEN_V1_IMPORT_RE)) {
+          violations.push(
+            `${path.relative(repoRoot, file)} imports retired V1 package @element-plus/${match[1]}`,
+          )
         }
       }
     }

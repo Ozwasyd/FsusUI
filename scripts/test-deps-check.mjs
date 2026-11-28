@@ -68,7 +68,7 @@ function writeJson(filePath, value) {
 
 function setupMinimalTree(tempRoot, authority, options = {}) {
   mkdirSync(path.join(tempRoot, 'config/dependencies'), { recursive: true })
-  mkdirSync(path.join(tempRoot, 'vue/packages/element-plus'), {
+  mkdirSync(path.join(tempRoot, 'vue/packages/fsusui'), {
     recursive: true,
   })
   mkdirSync(path.join(tempRoot, 'vue/packages'), { recursive: true })
@@ -83,7 +83,7 @@ function setupMinimalTree(tempRoot, authority, options = {}) {
 
   const projected = projectPublishedExternalFields(authority)
   writeJson(path.join(tempRoot, PUBLISHED_PACKAGE_REL), {
-    name: 'element-plus',
+    name: '@ozwasyd/fsusui',
     dependencies: { ...projected.dependencies },
     peerDependencies: { ...projected.peerDependencies },
   })
@@ -161,8 +161,8 @@ function setupMinimalTree(tempRoot, authority, options = {}) {
       peerDependencies: { vue: authority.published.peerDependencies.vue },
     })
     writeJson(path.join(tempRoot, 'vue/packages/components/package.json'), {
-      name: '@element-plus/components',
-      dependencies: { dayjs: '9.9.9' },
+      name: '@fsusui/components',
+      dependencies: { '@floating-ui/dom': '9.9.9' },
     })
     writeJson(path.join(tempRoot, CONSUMER_FIXTURE_RELS[0]), {
       name: 'consumer',
@@ -184,7 +184,7 @@ function setupMinimalTree(tempRoot, authority, options = {}) {
       result.errors.some(
         (e) =>
           e.file === 'vue/packages/components/package.json' &&
-          e.field === 'dependencies.dayjs',
+          e.field === 'dependencies.@floating-ui/dom',
       ),
       'workspace drift',
     )
@@ -206,15 +206,15 @@ function setupMinimalTree(tempRoot, authority, options = {}) {
 // --- 3) Published range does not contain install ---
 {
   const authority = structuredClone(loadAuthority())
-  authority.published.dependencies.dayjs = '^9.0.0'
+  authority.published.dependencies['@floating-ui/dom'] = '^9.0.0'
   const { errors } = checkAuthority(repoRoot, authority)
   assert.ok(
     hasCode(errors, 'published-range-excludes-install'),
     'must fail when published range excludes install',
   )
   assert.ok(
-    errors.some((e) => e.field.includes('published.dependencies.dayjs')),
-    'field points at published.dependencies.dayjs',
+    errors.some((e) => e.field.includes('published.dependencies.@floating-ui/dom')),
+    'field points at published.dependencies.@floating-ui/dom',
   )
   ok('published range excludes install')
 }
@@ -321,10 +321,10 @@ function setupMinimalTree(tempRoot, authority, options = {}) {
     })
     const projected = projectPublishedExternalFields(authority)
     writeJson(path.join(tempRoot, PUBLISHED_PACKAGE_REL), {
-      name: 'element-plus',
+      name: '@ozwasyd/fsusui',
       dependencies: {
         ...projected.dependencies,
-        dayjs: '^0.0.1',
+        '@floating-ui/dom': '^0.0.1',
       },
       peerDependencies: projected.peerDependencies,
     })
@@ -332,7 +332,7 @@ function setupMinimalTree(tempRoot, authority, options = {}) {
     assert.ok(
       errors.some(
         (e) =>
-          e.field === 'dependencies.dayjs' &&
+          e.field === 'dependencies.@floating-ui/dom' &&
           e.code === 'candidate-source-drift',
       ),
       'candidate external drift must fail',

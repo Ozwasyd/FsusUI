@@ -295,6 +295,11 @@ export const FsusSelect = defineComponent({
         activeIndex.value =
           (activeIndex.value - 1 + Math.max(filteredOptions.value.length, 1)) %
           Math.max(filteredOptions.value.length, 1)
+      } else if (event.key === FSUS_KEY.SPACE || event.key === ' ') {
+        if (!open.value) {
+          event.preventDefault()
+          setOpen(true)
+        }
       } else if (event.key === FSUS_KEY.ENTER) {
         event.preventDefault()
         if (!open.value) setOpen(true)
@@ -401,20 +406,50 @@ export const FsusSelect = defineComponent({
           ? Math.max(0, selectedValues.value.length - visibleChips.length)
           : 0
 
+      const comboboxId = (attrs.id as string | undefined) ?? formItem?.value.id
+      const hasExplicitAriaName = Boolean(attrs['aria-label'] || attrs['aria-labelledby'])
+      const ariaLabelledBy =
+        (attrs['aria-labelledby'] as string | undefined) ??
+        (!hasExplicitAriaName && formItem?.value.hasLabel ? formItem.value.labelId : undefined)
+      const ariaInvalid =
+        attrs['aria-invalid'] !== undefined
+          ? (attrs['aria-invalid'] as string | boolean)
+          : formItem?.value.invalid
+            ? 'true'
+            : undefined
+      const describedByParts: string[] = []
+      const explicitDescribedBy = attrs['aria-describedby']
+      if (typeof explicitDescribedBy === 'string' && explicitDescribedBy.trim()) {
+        describedByParts.push(...explicitDescribedBy.trim().split(/\s+/u))
+      }
+      if (
+        formItem?.value.invalid &&
+        formItem.value.errorId &&
+        !describedByParts.includes(formItem.value.errorId)
+      ) {
+        describedByParts.push(formItem.value.errorId)
+      }
+      const ariaDescribedBy = describedByParts.length > 0 ? describedByParts.join(' ') : undefined
+
       return [
         h(
           'div',
           {
             ...attrs,
+            id: comboboxId,
             ref: triggerRef,
             class: ['fsus-select', attrs.class],
             role: 'combobox',
             tabindex: isDisabled.value ? -1 : 0,
             'aria-expanded': open.value ? 'true' : 'false',
             'aria-disabled': isDisabled.value ? 'true' : undefined,
+            'aria-labelledby': ariaLabelledBy,
+            'aria-invalid': ariaInvalid,
+            'aria-describedby': ariaDescribedBy,
             'data-size': resolvedSize.value,
             'data-open': open.value ? '' : undefined,
             'data-disabled': isDisabled.value ? '' : undefined,
+            'data-invalid': formItem?.value.invalid ? '' : undefined,
             onClick: () => setOpen(!open.value),
             onKeydown,
           },
@@ -469,11 +504,9 @@ export const FsusSelect = defineComponent({
             ]),
           ],
         ),
-        h(
-          Teleport as any,
-          { to: 'body', disabled: !props.teleported },
-          open.value && !isDisabled.value
-            ? h(
+        open.value && !isDisabled.value
+          ? h(Teleport as any, { to: 'body', disabled: !props.teleported }, [
+              h(
                 'div',
                 {
                   ref: dropdownRef,
@@ -514,9 +547,9 @@ export const FsusSelect = defineComponent({
                         renderedOptions,
                       ),
                 ],
-              )
-            : undefined,
-        ),
+              ),
+            ])
+          : null,
       ]
     }
   },

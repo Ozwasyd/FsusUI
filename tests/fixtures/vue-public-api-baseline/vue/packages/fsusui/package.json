@@ -1,0 +1,9 @@
+{
+  "name": "@fsusui/fixture-pkg",
+  "version": "0.0.0",
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs"
+    }
+  }
+}

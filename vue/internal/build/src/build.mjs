@@ -140,15 +140,115 @@ async function buildPureEsm() {
   // Copy single-copy WASM runtime binaries (no 3x es/lib/dist duplication)
   const wasmSrcDist = path.join(packagesDir, 'wasm/dist')
   const wasmOutDir = path.join(distDir, 'wasm')
+  const wasmAssetFiles = [
+    'ep_wasm.wasm',
+    'ep_wasm.mjs',
+    'markdown_basic.wasm',
+    'markdown_basic.js',
+    'markdown_simd.wasm',
+    'markdown_simd.js',
+  ]
   if (fs.existsSync(wasmSrcDist)) {
     fs.mkdirSync(wasmOutDir, { recursive: true })
-    for (const file of ['ep_wasm.wasm', 'ep_wasm.mjs', 'markdown_basic.wasm', 'markdown_basic.js', 'markdown_simd.wasm', 'markdown_simd.js']) {
+    for (const file of wasmAssetFiles) {
       const srcFile = path.join(wasmSrcDist, file)
       if (fs.existsSync(srcFile)) {
         fs.copyFileSync(srcFile, path.join(wasmOutDir, file))
       }
     }
   }
+
+  // Build self-contained ESM Markdown worker bundles under dist/workers/
+  const workersOutDir = path.join(distDir, 'workers')
+  fs.mkdirSync(workersOutDir, { recursive: true })
+  const workerEntries = [
+    {
+      source: path.join(
+        packagesDir,
+        'markdown/src/markdown-renderer/src/markdown-renderer.worker.ts',
+      ),
+      outFile: path.join(workersOutDir, 'markdown-renderer.worker.mjs'),
+    },
+    {
+      source: path.join(
+        packagesDir,
+        'markdown/src/markdown-renderer/src/markdown-parser.worker.ts',
+      ),
+      outFile: path.join(workersOutDir, 'markdown-parser.worker.mjs'),
+    },
+  ]
+  for (const workerEntry of workerEntries) {
+    if (!fs.existsSync(workerEntry.source)) continue
+    await esbuild.build({
+      entryPoints: [workerEntry.source],
+      outfile: workerEntry.outFile,
+      bundle: true,
+      format: 'esm',
+      platform: 'browser',
+      target: 'es2022',
+      minify: true,
+      sourcemap: false,
+      treeShaking: true,
+      alias: workspaceMap,
+    })
+  }
+
+  // Rewrite source-relative WASM & worker URLs in emitted ESM bundles to packaged dist/ targets
+  const toRelativeUrlSpecifier = (fromFile, targetAbs) => {
+    let rel = path.relative(path.dirname(fromFile), targetAbs).replace(/\\/gu, '/')
+    if (!rel.startsWith('.')) rel = `./${rel}`
+    return rel
+  }
+  const wasmUrlTargetByName = new Map(
+    wasmAssetFiles.map((file) => [file, path.join(wasmOutDir, file)]),
+  )
+  const workerUrlTargetBySourceName = new Map([
+    [
+      'markdown-renderer.worker.ts',
+      path.join(workersOutDir, 'markdown-renderer.worker.mjs'),
+    ],
+    [
+      'markdown-parser.worker.ts',
+      path.join(workersOutDir, 'markdown-parser.worker.mjs'),
+    ],
+  ])
+  const rewriteRuntimeUrlsInDir = (dir) => {
+    if (!fs.existsSync(dir)) return
+    for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+      const full = path.join(dir, entry.name)
+      if (entry.isDirectory()) {
+        // Leave copied Emscripten runtime glue files in dist/wasm/ untouched here
+        if (full === wasmOutDir) continue
+        rewriteRuntimeUrlsInDir(full)
+        continue
+      }
+      if (!entry.name.endsWith('.mjs')) continue
+      const orig = fs.readFileSync(full, 'utf8')
+      let next = orig.replace(
+        /new URL\(\s*(['"])\.\.\/dist\/(ep_wasm\.mjs|ep_wasm\.wasm|markdown_basic\.js|markdown_basic\.wasm|markdown_simd\.js|markdown_simd\.wasm)\1\s*,\s*import\.meta\.url\s*\)/gu,
+        (_match, quote, fileName) => {
+          const target = wasmUrlTargetByName.get(fileName)
+          return `new URL(${quote}${toRelativeUrlSpecifier(full, target)}${quote}, import.meta.url)`
+        },
+      )
+      const isWorkerFile = full.startsWith(workersOutDir + path.sep)
+      next = next.replace(
+        /new URL\(\s*(['"])\.\/(markdown-renderer\.worker\.ts|markdown-parser\.worker\.ts)\1\s*,\s*import\.meta\.url\s*\)/gu,
+        (_match, quote, workerFileName) => {
+          const target = workerUrlTargetBySourceName.get(workerFileName)
+          const relSpec = toRelativeUrlSpecifier(full, target)
+          // Prevent Vite's assetsInlineLimit from turning small worker modules into data: URIs
+          // (Chromium rejects cross-origin data: URLs in new Worker(...)).
+          const suffix = isWorkerFile ? '' : '?no-inline'
+          return `new URL(${quote}${relSpec}${suffix}${quote}, import.meta.url)`
+        },
+      )
+      if (next !== orig) {
+        fs.writeFileSync(full, next, 'utf8')
+      }
+    }
+  }
+  rewriteRuntimeUrlsInDir(distDir)
 
   // Copy package manifest (stripping internal workspace deps -> bundled ESM)
   const manifest = JSON.parse(

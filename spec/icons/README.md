@@ -35,7 +35,7 @@ After changing the registry, run `pnpm run icons:generate`. CI runs
 
 | Artifact | Path |
 | --- | --- |
-| Web metadata | `vue/packages/icons-vue/generated/icon-metadata.json` |
+| Web metadata | `vue/packages/icons/generated/icon-metadata.json` |
 | Avalonia resources | `dotnet/FsusUI.Avalonia.Icons/Generated/FsusIcons.axaml` |
 | C# lookup keys | `dotnet/FsusUI.Avalonia.Icons/Generated/FsusIconKeys.g.cs` |
 | Stable inventory | `docs/icons/generated/stable-icons.md` |

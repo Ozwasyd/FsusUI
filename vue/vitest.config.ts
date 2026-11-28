@@ -39,6 +39,7 @@ export default defineConfig({
       'vue/packages/fsusui/**/__tests__/**/*.{test,spec}.{ts,tsx}',
       'vue/packages/theme/**/__tests__/**/*.{test,spec}.{ts,tsx}',
       'vue/packages/wasm/**/__tests__/**/*.{test,spec}.{ts,tsx}',
+      'vue/tests/boundary/**/*.{test,spec}.{ts,tsx}',
     ],
     exclude: [
       '**/node_modules/**',

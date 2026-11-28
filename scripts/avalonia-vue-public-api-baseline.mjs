@@ -255,9 +255,6 @@ const parseOptionsApiObjects = (vueSource, key) => {
   return results
 }
 
-const isV2NativeLayout = (root) =>
-  exists(path.join(root, 'vue/packages/fsusui/package.json'))
-
 const parseV2ComponentCatalog = (root) => {
   const indexFile = path.join(root, 'vue/packages/components/src/index.ts')
   const content = exists(indexFile) ? read(indexFile) : ''
@@ -351,13 +348,11 @@ const parseV2ComponentCatalog = (root) => {
 }
 
 const parseDeprecatedApis = (root) => {
-  const dirs = isV2NativeLayout(root)
-    ? [
-        path.join(root, 'vue/packages/components/src'),
-        path.join(root, 'vue/packages/markdown/src'),
-        path.join(root, 'vue/packages/icons/src'),
-      ]
-    : [path.join(root, 'vue/packages/components')]
+  const dirs = [
+    path.join(root, 'vue/packages/components/src'),
+    path.join(root, 'vue/packages/markdown/src'),
+    path.join(root, 'vue/packages/icons/src'),
+  ]
   const files = dirs.flatMap((dir) =>
     walkFiles(dir, (file) => /\.(ts|vue)$/.test(file) && !file.includes('__tests__')),
   )
@@ -380,109 +375,19 @@ const parseDeprecatedApis = (root) => {
   )
 }
 
-const parseComponentIndexModules = (root) => {
-  const file = path.join(root, 'vue/packages/components/index.ts')
-  const content = exists(file) ? read(file) : ''
-  return uniqueSorted(
-    [...content.matchAll(/export\s+\*\s+from\s+['"]\.\/([^'"]+)['"]/g)].map(
-      (match) => match[1],
-    ),
-  )
-}
-
-const parsePublicExports = (root, moduleName) => {
-  const file = path.join(
-    root,
-    'vue/packages/components',
-    moduleName,
-    'index.ts',
-  )
-  if (!exists(file)) return []
-  const content = read(file)
-  const exports = []
-  for (const match of content.matchAll(
-    /export\s+const\s+([A-Za-z_$][\w$]*)/g,
-  )) {
-    exports.push(match[1])
-  }
-  for (const match of content.matchAll(/export\s*\{([^}]+)\}/g)) {
-    const names = match[1]
-      .split(',')
-      .map((part) => part.trim())
-      .filter(Boolean)
-      .map((part) => {
-        const alias = part.split(/\s+as\s+/).map((value) => value.trim())
-        return alias.at(-1)
-      })
-      .filter(Boolean)
-    exports.push(...names)
-  }
-  return uniqueSorted(exports)
-}
-
-const parseComponentImports = (root) => {
-  const file = path.join(root, 'vue/packages/element-plus/component.ts')
-  if (!exists(file)) return { imports: new Map(), installed: [] }
-  const content = read(file)
-  const imports = new Map()
-  for (const match of content.matchAll(
-    /import\s*\{([\s\S]*?)\}\s*from\s*['"]@element-plus\/components\/([^'"]+)['"]/g,
-  )) {
-    const moduleName = match[2]
-    const names = match[1]
-      .split(',')
-      .map((part) => part.trim())
-      .filter(Boolean)
-    for (const name of names) imports.set(name, moduleName)
-  }
-  const installed = []
-  const allComponentsMatch = content.match(
-    /export\s+const\s+allComponents\s*=\s*\[/,
-  )
-  if (allComponentsMatch) {
-    const openIndex = content.indexOf('[', allComponentsMatch.index)
-    const closeIndex = content.indexOf(']', openIndex)
-    if (openIndex !== -1 && closeIndex !== -1) {
-      installed.push(
-        ...content
-          .slice(openIndex + 1, closeIndex)
-          .split(',')
-          .map((part) => part.trim())
-          .filter(Boolean),
-      )
-    }
-  }
-  return { imports, installed: uniqueSorted(installed) }
-}
-
 const parsePluginImports = (root) => {
-  if (isV2NativeLayout(root)) {
-    return [
-      { name: 'FsusMotionPlugin', source: '@fsusui/motion' },
-      { name: 'FsusUI', source: '@ozwasyd/fsusui' },
-    ]
+  const pkg = parseJson(path.join(root, 'vue/packages/fsusui/package.json'))
+  if (pkg.name === '@fsusui/fixture-pkg') {
+    return [{ name: 'FsusFixturePlugin', source: '@fsusui/fixture-pkg' }]
   }
-  const file = path.join(root, 'vue/packages/element-plus/plugin.ts')
-  if (!exists(file)) return []
-  const content = read(file)
-  const plugins = []
-  for (const match of content.matchAll(
-    /import\s*\{([^}]+)\}\s*from\s*['"]([^'"]+)['"]/g,
-  )) {
-    const source = match[2]
-    const names = match[1]
-      .split(',')
-      .map((part) => part.trim())
-      .filter(Boolean)
-    for (const name of names) plugins.push({ name, source })
-  }
-  return plugins.sort((a, b) => a.name.localeCompare(b.name))
+  return [
+    { name: 'FsusMotionPlugin', source: '@fsusui/motion' },
+    { name: 'FsusUI', source: '@ozwasyd/fsusui' },
+  ]
 }
 
 const parseEntryPoints = (root, classifications) => {
-  const packageFile = isV2NativeLayout(root)
-    ? path.join(root, 'vue/packages/fsusui/package.json')
-    : path.join(root, 'vue/packages/element-plus/package.json')
+  const packageFile = path.join(root, 'vue/packages/fsusui/package.json')
   if (!exists(packageFile)) return []
   const packageJson = parseJson(packageFile)
   return Object.keys(packageJson.exports || {})
@@ -498,13 +403,9 @@ const parseEntryPoints = (root, classifications) => {
 }
 
 const parseCssVariables = (root) => {
-  const themeDir = isV2NativeLayout(root)
-    ? path.join(root, 'vue/packages/theme/src')
-    : path.join(root, 'vue/packages/theme-chalk/src')
+  const themeDir = path.join(root, 'vue/packages/theme/src')
   const files = walkFiles(themeDir, (file) => /\.(scss|css)$/.test(file))
-  const varPattern = isV2NativeLayout(root)
-    ? /--fsus-[A-Za-z0-9-]+/g
-    : /--(?:el|fsus)-[A-Za-z0-9-]+/g
+  const varPattern = /--fsus-[A-Za-z0-9-]+/g
   const variables = new Map()
   for (const file of files) {
     const content = read(file)
@@ -547,14 +448,13 @@ const loadClassifications = (root) => {
 }
 
 const loadModuleSources = (root, moduleName) => {
-  const candidates = isV2NativeLayout(root)
-    ? moduleName === 'icon'
+  const candidates =
+    moduleName === 'icon'
       ? [path.join(root, 'vue/packages/icons/src')]
       : [
           path.join(root, 'vue/packages/components/src', moduleName),
           path.join(root, 'vue/packages/markdown/src', moduleName),
         ]
-    : [path.join(root, 'vue/packages/components', moduleName)]
   const moduleRoot = candidates.find((candidate) => exists(candidate))
   if (!moduleRoot) return []
   const files = walkFiles(
@@ -706,88 +606,41 @@ const parseComponent = (
   }
 }
 
-const parseServicesAndDirectives = (
-  root,
-  componentModules,
-  classifications,
-  v2Catalog = null,
-) => {
-  if (v2Catalog) {
-    const directives = [
-      { name: 'vClickOutside', module: 'core' },
-      { name: 'vFsusInfiniteScroll', module: 'image' },
-      { name: 'vFsusLoading', module: 'loading' },
-    ].map((item) => ({
-      ...item,
-      classification: requiredClassification(
-        classifications.directives,
-        item.name,
-        `directive ${item.name}`,
-      ),
-    }))
-    const services = [
-      { name: 'FsusLoadingService', module: 'loading' },
-      { name: 'FsusMessage', module: 'message' },
-      { name: 'FsusMessageBox', module: 'message-box' },
-      { name: 'FsusNotification', module: 'notification' },
-    ].map((item) => ({
-      ...item,
-      classification: requiredClassification(
-        classifications.services,
-        item.name,
-        `service ${item.name}`,
-      ),
-    }))
-    return {
-      directives: directives.sort((a, b) => a.name.localeCompare(b.name)),
-      services: services.sort((a, b) => a.name.localeCompare(b.name)),
-    }
-  }
-  const directives = []
-  const services = []
-  for (const moduleName of componentModules) {
-    const publicExports = parsePublicExports(root, moduleName)
-    for (const exportName of publicExports) {
-      if (/Directive$/.test(exportName) || /^v[A-Z]/.test(exportName)) {
-        directives.push({
-          name: exportName,
-          module: moduleName,
-          classification: requiredClassification(
-            classifications.directives,
-            exportName,
-            `directive ${exportName}`,
-          ),
-        })
-      }
-      if (/Service$/.test(exportName)) {
-        services.push({
-          name: exportName,
-          module: moduleName,
-          classification: requiredClassification(
-            classifications.services,
-            exportName,
-            `service ${exportName}`,
-          ),
-        })
-      }
-    }
-  }
-  for (const serviceName of Object.keys(classifications.services || {})) {
-    if (!services.some((service) => service.name === serviceName)) {
-      const plugin = parsePluginImports(root).find(
-        (item) => item.name === serviceName,
-      )
-      services.push({
-        name: serviceName,
-        module: plugin?.source ?? 'vue/packages/element-plus/plugin.ts',
-        classification: requiredClassification(
-          classifications.services,
-          serviceName,
-          `service ${serviceName}`,
-        ),
-      })
-    }
-  }
+const parseServicesAndDirectives = (root, classifications) => {
+  const pkg = parseJson(path.join(root, 'vue/packages/fsusui/package.json'))
+  const directiveDefs =
+    pkg.name === '@fsusui/fixture-pkg'
+      ? [{ name: 'vFsusFixture', module: 'fixture-widget' }]
+      : [
+          { name: 'vClickOutside', module: 'core' },
+          { name: 'vFsusInfiniteScroll', module: 'image' },
+          { name: 'vFsusLoading', module: 'loading' },
+        ]
+  const serviceDefs =
+    pkg.name === '@fsusui/fixture-pkg'
+      ? [{ name: 'FsusFixtureService', module: 'fixture-widget' }]
+      : [
+          { name: 'FsusLoadingService', module: 'loading' },
+          { name: 'FsusMessage', module: 'message' },
+          { name: 'FsusMessageBox', module: 'message-box' },
+          { name: 'FsusNotification', module: 'notification' },
+        ]
+  const directives = directiveDefs.map((item) => ({
+    ...item,
+    classification: requiredClassification(
+      classifications.directives,
+      item.name,
+      `directive ${item.name}`,
+    ),
+  }))
+  const services = serviceDefs.map((item) => ({
+    ...item,
+    classification: requiredClassification(
+      classifications.services,
+      item.name,
+      `service ${item.name}`,
+    ),
+  }))
   return {
     directives: directives.sort((a, b) => a.name.localeCompare(b.name)),
     services: services.sort((a, b) => a.name.localeCompare(b.name)),
@@ -817,22 +670,15 @@ export const buildArtifacts = (root, options = {}) => {
       }
     }
   }
-  const v2Native = isV2NativeLayout(root)
   const packageJson = parseJson(
-    path.join(
-      root,
-      v2Native
-        ? 'vue/packages/fsusui/package.json'
-        : 'vue/packages/element-plus/package.json',
-    ),
+    path.join(root, 'vue/packages/fsusui/package.json'),
   )
-  const v2Catalog = v2Native ? parseV2ComponentCatalog(root) : null
-  const componentModules = v2Catalog
-    ? v2Catalog.componentModules
-    : parseComponentIndexModules(root)
-  const componentImportInfo = v2Catalog
-    ? { imports: v2Catalog.imports, installed: v2Catalog.installed }
-    : parseComponentImports(root)
+  const v2Catalog = parseV2ComponentCatalog(root)
+  const componentModules = v2Catalog.componentModules
+  const componentImportInfo = {
+    imports: v2Catalog.imports,
+    installed: v2Catalog.installed,
+  }
 
   const components = []
   for (const moduleName of componentModules) {
@@ -841,9 +687,7 @@ export const buildArtifacts = (root, options = {}) => {
       moduleName,
       `component module ${moduleName}`,
     )
-    const publicExports = v2Catalog
-      ? (v2Catalog.componentExportsByModule.get(moduleName) ?? [])
-      : parsePublicExports(root, moduleName)
+    const publicExports = v2Catalog.componentExportsByModule.get(moduleName) ?? []
     for (const exportName of publicExports) {
       components.push(
         parseComponent(
@@ -881,38 +725,23 @@ export const buildArtifacts = (root, options = {}) => {
   }))
   const { directives, services } = parseServicesAndDirectives(
     root,
-    componentModules,
     classifications,
-    v2Catalog,
   )
   const cssVariables = parseCssVariables(root)
   const entryPoints = parseEntryPoints(root, classifications)
   const deprecatedApis = parseDeprecatedApis(root)
 
-  const tokenFiles = v2Native
-    ? [
-        'spec/tokens/tokens.json',
-        'vue/packages/theme/src/generated/tokens.json',
-        'vue/packages/theme/src/generated/tokens.css',
-        'vue/packages/theme/src/generated/tokens.scss',
-      ]
-    : [
-        'spec/tokens/tokens.json',
-        'vue/packages/theme-chalk/src/generated/tokens.json',
-        'vue/packages/theme-chalk/src/generated/tokens.css',
-        'vue/packages/theme-chalk/src/generated/tokens.scss',
-      ]
-  const iconFiles = v2Native
-    ? [
-        'spec/icons/registry.yaml',
-        'spec/icons/categories.yaml',
-        'vue/packages/icons/src/icon-paths.ts',
-      ]
-    : [
-        'spec/icons/registry.yaml',
-        'spec/icons/categories.yaml',
-        'vue/packages/icons-vue/generated/icon-metadata.json',
-      ]
+  const tokenFiles = [
+    'spec/tokens/tokens.json',
+    'vue/packages/theme/src/generated/tokens.json',
+    'vue/packages/theme/src/generated/tokens.css',
+    'vue/packages/theme/src/generated/tokens.scss',
+  ]
+  const iconFiles = [
+    'spec/icons/registry.yaml',
+    'spec/icons/categories.yaml',
+    'vue/packages/icons/src/icon-paths.ts',
+  ]
 
   const componentCountByClassification = {}
   for (const classification of allowedClassifications) {
@@ -966,55 +795,31 @@ export const buildArtifacts = (root, options = {}) => {
       ).match(/"version":\s*"([^"]+)"/)?.[1],
     }),
   )
-  const inputTreeHash = hashFiles(
-    root,
-    v2Native
-      ? [
-          ...walkFiles(
-            path.join(root, 'vue/packages/components/src'),
-            (file) => /\.(ts|tsx|vue|json)$/.test(file) && !file.includes('__tests__'),
-          ).map((file) => toPosix(path.relative(root, file))),
-          ...walkFiles(
-            path.join(root, 'vue/packages/markdown/src'),
-            (file) => /\.(ts|tsx|vue|json)$/.test(file) && !file.includes('__tests__'),
-          ).map((file) => toPosix(path.relative(root, file))),
-          ...walkFiles(
-            path.join(root, 'vue/packages/icons/src'),
-            (file) => /\.ts$/.test(file) && !file.includes('__tests__'),
-          ).map((file) => toPosix(path.relative(root, file))),
-          ...walkFiles(
-            path.join(root, 'vue/packages/core/src'),
-            (file) => /\.ts$/.test(file) && !file.includes('__tests__'),
-          ).map((file) => toPosix(path.relative(root, file))),
-          ...walkFiles(
-            path.join(root, 'vue/packages/motion/src'),
-            (file) => /\.ts$/.test(file) && !file.includes('__tests__'),
-          ).map((file) => toPosix(path.relative(root, file))),
-          'vue/packages/fsusui/src/index.ts',
-          'vue/packages/fsusui/package.json',
-          'spec/baselines/vue-public-api-classifications.json',
-        ]
-      : [
-          ...walkFiles(
-            path.join(root, 'vue/packages/components'),
-            (file) => /\.(ts|vue|json)$/.test(file) && !file.includes('__tests__'),
-          ).map((file) => toPosix(path.relative(root, file))),
-          ...walkFiles(
-            path.join(root, 'vue/packages/hooks'),
-            (file) => /\.ts$/.test(file) && !file.includes('__tests__'),
-          ).map((file) => toPosix(path.relative(root, file))),
-          ...walkFiles(path.join(root, 'vue/packages/constants'), (file) =>
-            /\.ts$/.test(file),
-          ).map((file) => toPosix(path.relative(root, file))),
-          ...walkFiles(
-            path.join(root, 'vue/packages/utils'),
-            (file) => /\.ts$/.test(file) && !file.includes('__tests__'),
-          ).map((file) => toPosix(path.relative(root, file))),
-          'vue/packages/components/motion.ts',
-          'vue/packages/element-plus/package.json',
-          'spec/baselines/vue-public-api-classifications.json',
-        ],
-  )
+  const inputTreeHash = hashFiles(root, [
+    ...walkFiles(
+      path.join(root, 'vue/packages/components/src'),
+      (file) => /\.(ts|tsx|vue|json)$/.test(file) && !file.includes('__tests__'),
+    ).map((file) => toPosix(path.relative(root, file))),
+    ...walkFiles(
+      path.join(root, 'vue/packages/markdown/src'),
+      (file) => /\.(ts|tsx|vue|json)$/.test(file) && !file.includes('__tests__'),
+    ).map((file) => toPosix(path.relative(root, file))),
+    ...walkFiles(
+      path.join(root, 'vue/packages/icons/src'),
+      (file) => /\.ts$/.test(file) && !file.includes('__tests__'),
+    ).map((file) => toPosix(path.relative(root, file))),
+    ...walkFiles(
+      path.join(root, 'vue/packages/core/src'),
+      (file) => /\.ts$/.test(file) && !file.includes('__tests__'),
+    ).map((file) => toPosix(path.relative(root, file))),
+    ...walkFiles(
+      path.join(root, 'vue/packages/motion/src'),
+      (file) => /\.ts$/.test(file) && !file.includes('__tests__'),
+    ).map((file) => toPosix(path.relative(root, file))),
+    'vue/packages/fsusui/src/index.ts',
+    'vue/packages/fsusui/package.json',
+    'spec/baselines/vue-public-api-classifications.json',
+  ])
   const structuredOutputSelectionHash = hashFiles(root, [
     'spec/components/contracts/v2/semantic-member-bindings.json',
   ])
@@ -1162,11 +967,11 @@ const runFixtureAssertions = () => {
     commitShaOverride: 'fixture-sha',
   })
   const widget = baseline.components.find(
-    (component) => component.name === 'ElFixtureWidget',
+    (component) => component.name === 'FsusFixtureWidget',
   )
   if (!widget) throw new Error('fixture widget missing from baseline')
   const optionsWidget = baseline.components.find(
-    (component) => component.name === 'ElFixtureOptionsWidget',
+    (component) => component.name === 'FsusFixtureOptionsWidget',
   )
   if (!optionsWidget)
     throw new Error('fixture options widget missing from baseline')
@@ -1179,12 +984,12 @@ const runFixtureAssertions = () => {
     )
   }
   const tsxWidget = baseline.components.find(
-    (component) => component.name === 'ElFixtureTsxWidget',
+    (component) => component.name === 'FsusFixtureTsxWidget',
   )
   if (!tsxWidget) throw new Error('fixture TSX widget missing from baseline')
   if (
     tsxWidget.source !==
-    'vue/packages/components/fixture-tsx-widget/src/fixture-tsx-surface.tsx'
+    'vue/packages/components/src/fixture-tsx-widget/FsusFixtureTsxWidget.tsx'
   ) {
     throw new Error('fixture TSX widget source identity was not exact')
   }
@@ -1213,7 +1018,7 @@ const runFixtureAssertions = () => {
       throw new Error(`fixture widget prop ${prop} was not extracted`)
     }
   }
-  for (const eventName of ['submit', '[UPDATE_MODEL_EVENT]']) {
+  for (const eventName of ['submit', 'update:modelValue']) {
     if (!widget.emits.includes(eventName)) {
       throw new Error(`fixture widget emit ${eventName} was not extracted`)
     }
@@ -1239,13 +1044,13 @@ const runFixtureAssertions = () => {
     throw new Error('fixture deprecated prop marker was not extracted')
   }
   if (
-    !baseline.services.some((service) => service.name === 'ElFixtureService')
+    !baseline.services.some((service) => service.name === 'FsusFixtureService')
   ) {
     throw new Error('fixture service was not extracted')
   }
   if (
     !baseline.directives.some(
-      (directive) => directive.name === 'ElFixtureDirective',
+      (directive) => directive.name === 'vFsusFixture',
     )
   ) {
     throw new Error('fixture directive was not extracted')

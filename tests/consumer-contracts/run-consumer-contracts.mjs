@@ -26,6 +26,7 @@ const SUITE_SPECS = {
   core: '01-core-and-dropdown.spec.ts',
   overlays: '02-overlays-and-image-viewer.spec.ts',
   ssr: '03-ssr-hydration-and-csp.spec.ts',
+  markdown: '04-wasm-and-markdown-worker.spec.ts',
 }
 
 const currentDir = path.dirname(fileURLToPath(import.meta.url))
@@ -186,6 +187,18 @@ function createSourceAliases(mode) {
         replacement: path.join(distRoot, 'dist', 'core.mjs'),
       },
       {
+        find: `${PACKAGE_NAME}/markdown`,
+        replacement: path.join(distRoot, 'dist', 'markdown.mjs'),
+      },
+      {
+        find: `${PACKAGE_NAME}/wasm`,
+        replacement: path.join(distRoot, 'dist', 'wasm.mjs'),
+      },
+      {
+        find: `${PACKAGE_NAME}/render-pipeline`,
+        replacement: path.join(distRoot, 'dist', 'render-pipeline.mjs'),
+      },
+      {
         find: new RegExp(`^${PACKAGE_NAME.replace('/', '\\/')}$`),
         replacement: path.join(distRoot, 'dist', 'index.mjs'),
       },
@@ -213,6 +226,18 @@ function createSourceAliases(mode) {
     {
       find: `${PACKAGE_NAME}/core`,
       replacement: path.join(packagesRoot, 'fsusui', 'src', 'core.ts'),
+    },
+    {
+      find: `${PACKAGE_NAME}/markdown`,
+      replacement: path.join(packagesRoot, 'fsusui', 'src', 'markdown.ts'),
+    },
+    {
+      find: `${PACKAGE_NAME}/wasm`,
+      replacement: path.join(packagesRoot, 'fsusui', 'src', 'wasm.ts'),
+    },
+    {
+      find: `${PACKAGE_NAME}/render-pipeline`,
+      replacement: path.join(packagesRoot, 'fsusui', 'src', 'render-pipeline.ts'),
     },
     {
       find: new RegExp(`^${PACKAGE_NAME.replace('/', '\\/')}$`),

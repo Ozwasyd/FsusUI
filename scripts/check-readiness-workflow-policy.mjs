@@ -3,12 +3,11 @@ import fs from 'node:fs'
 const read = (file) => fs.readFileSync(file, 'utf8')
 const workflow = read('.github/workflows/_quality.yml')
 const readinessWorkflow = read('.github/workflows/_quality-readiness.yml')
-const playwrightWorkflow = read('.github/workflows/_quality-playwright.yml')
 const qualityWorkflow = read('.github/workflows/quality.yml')
 const publishWorkflow = read('.github/workflows/publish-npm.yml')
 const packageJson = JSON.parse(read('package.json'))
 const scripts = packageJson.scripts ?? {}
-const ownersSpec = JSON.parse(read('spec/ci/playwright-owners.json'))
+const readinessSpec = JSON.parse(read('spec/ci/readiness-gates.json'))
 const failures = []
 const assert = (condition, message) => {
   if (!condition) failures.push(message)
@@ -30,7 +29,7 @@ for (const name of [
   assert(source, `${name} job is required in _quality-readiness.yml`)
   assert(
     !job(workflow, name),
-    `${name} must live in _quality-readiness.yml so core quality and Playwright run in parallel`,
+    `${name} must live in _quality-readiness.yml for read-only aggregation`,
   )
   assert(
     source.includes('scripts/ci-readiness.mjs check'),
@@ -39,10 +38,6 @@ for (const name of [
   assert(
     source.includes('pattern: readiness-manifest-*'),
     `${name} must download only this run's leaf manifests`,
-  )
-  assert(
-    source.includes('--playwright-group'),
-    `${name} must declare the playwright evidence group`,
   )
   for (const forbidden of [
     'verify:full',
@@ -70,23 +65,13 @@ for (const name of [
   }
 }
 
-for (const gate of [
-  'static-quality',
-  'dotnet-platform',
-  'dotnet-package',
-  'typecheck',
-  'unit',
-  'coverage',
-  'build-package',
-  'consumer-install',
-  'build-demo',
-  'visual',
-]) {
+for (const gate of readinessSpec.profiles.release) {
   assert(
     job(workflow, gate).includes('uses: ./.github/actions/readiness-manifest'),
     `${gate} must upload a structured readiness manifest`,
   )
 }
+
 for (const [name, fragment] of [
   ['ci:readiness:plan', 'scripts/ci-readiness.mjs plan'],
   ['ci:readiness:check', 'scripts/ci-readiness.mjs check'],
@@ -104,153 +89,21 @@ assert(
   'governance:check must retain readiness negative fixtures',
 )
 
-// Playwright owner jobs must be wired into the reusable playwright workflow.
-const pwOwners = Object.entries(ownersSpec.owners ?? {})
 assert(
-  pwOwners.length === 6,
-  'playwright-owners must declare exactly six owners',
-)
-for (const [ownerId, owner] of pwOwners) {
-  assert(owner.gate === ownerId, `owner ${ownerId} gate must equal its id`)
-  const source = job(playwrightWorkflow, ownerId)
-  assert(source, `_quality-playwright.yml must contain owner job ${ownerId}`)
-  assert(
-    source.includes('uses: ./.github/actions/readiness-manifest'),
-    `${ownerId} must call readiness-manifest`,
-  )
-  assert(
-    source.includes(`gate: ${ownerId}`),
-    `${ownerId} manifest must record gate ${ownerId}`,
-  )
-  assert(
-    source.includes('playwright-receipts:'),
-    `${ownerId} must pass playwright receipts`,
-  )
-  assert(
-    source.includes('playwright-plan:'),
-    `${ownerId} must pass the playwright plan input`,
-  )
-  assert(
-    source.includes('--impact-plan'),
-    `${ownerId} owner run must consume the PR impact plan`,
-  )
-  assert(
-    source.includes('needs: playwright-pr-impact-plan'),
-    `${ownerId} must wait for the PR impact plan job`,
-  )
-  assert(
-    !/gate:\s*visual\s*$/mu.test(source),
-    `${ownerId} must not reuse the generic visual owner`,
-  )
-}
-const planJob = job(playwrightWorkflow, 'playwright-pr-impact-plan')
-assert(planJob, 'playwright-pr-impact-plan job is required')
-assert(
-  planJob.includes('scripts/playwright-impact-plan.mjs'),
-  'playwright-pr-impact-plan must generate the #485 impact plan',
-)
-assert(
-  planJob.includes('name: playwright-pr-impact-plan'),
-  'playwright-pr-impact-plan must upload the plan receipt artifact',
-)
-const prAgg = job(playwrightWorkflow, 'playwright-pr-readiness')
-assert(prAgg, 'playwright-pr-readiness job is required')
-assert(
-  prAgg.includes('--profile pr-playwright'),
-  'playwright-pr-readiness must aggregate the pr-playwright profile',
-)
-assert(
-  prAgg.includes('--plan-receipt'),
-  'playwright-pr-readiness must bind the impact plan receipt',
-)
-for (const [ownerId] of pwOwners) {
-  assert(
-    prAgg.includes(ownerId),
-    `playwright-pr-readiness must depend on ${ownerId}`,
-  )
-}
-assert(
-  !/continue-on-error:\s*true/u.test(prAgg),
-  'playwright-pr-readiness must fail closed without continue-on-error',
-)
-
-// Caller workflows must run core quality and Playwright in parallel, then wait for both in readiness aggregation.
-assert(
-  qualityWorkflow.includes('uses: ./.github/workflows/_quality-playwright.yml'),
-  'quality.yml must call the reusable playwright workflow',
-)
-assert(
-  qualityWorkflow.includes('uses: ./.github/workflows/_quality-readiness.yml'),
-  'quality.yml must call the reusable readiness aggregator workflow',
-)
-const premergeReadinessJob = job(qualityWorkflow, 'premerge-readiness')
-assert(
-  premergeReadinessJob &&
-    premergeReadinessJob.includes('uses: ./.github/workflows/_quality-readiness.yml') &&
-    premergeReadinessJob.includes('- premerge-main') &&
-    premergeReadinessJob.includes('- premerge-playwright') &&
-    premergeReadinessJob.includes('group: main') &&
-    premergeReadinessJob.includes('playwright_group: pr'),
-  'quality.yml premerge-readiness must wait for both premerge-main and premerge-playwright',
-)
-for (const group of ['main', 'nightly', 'release']) {
-  const groupJob = job(qualityWorkflow, group)
-  const playwrightJob = job(qualityWorkflow, `${group}-playwright`)
-  const readinessJob = job(qualityWorkflow, `${group}-readiness`)
-  assert(groupJob, `quality.yml must call _quality.yml for ${group}`)
-  assert(
-    playwrightJob,
-    `quality.yml must call playwright workflow for ${group}`,
-  )
-  assert(
-    readinessJob,
-    `quality.yml must call _quality-readiness.yml for ${group}`,
-  )
-  assert(
-    !groupJob.includes(`needs: ${group}-playwright`),
-    `quality.yml ${group} must run in parallel with ${group}-playwright`,
-  )
-  assert(
-    playwrightJob.includes(`group: ${group}`),
-    `quality.yml ${group}-playwright must use group ${group}`,
-  )
-  assert(
-    readinessJob.includes('uses: ./.github/workflows/_quality-readiness.yml') &&
-      readinessJob.includes(`- ${group}`) &&
-      readinessJob.includes(`- ${group}-playwright`) &&
-      readinessJob.includes(`group: ${group}`) &&
-      readinessJob.includes(`playwright_group: ${group}`),
-    `quality.yml ${group}-readiness must aggregate both ${group} and ${group}-playwright`,
-  )
-}
-assert(
-  publishWorkflow.includes('uses: ./.github/workflows/_quality-playwright.yml'),
-  'publish-npm.yml must call the reusable playwright workflow for release',
+  qualityWorkflow.includes('uses: ./.github/workflows/_quality.yml'),
+  'quality.yml must call _quality.yml',
 )
 assert(
   publishWorkflow.includes('uses: ./.github/workflows/_quality-readiness.yml'),
   'publish-npm.yml must call the reusable readiness aggregator workflow for release',
 )
 assert(
-  job(publishWorkflow, 'quality-playwright').includes('group: release'),
-  'publish-npm.yml playwright workflow must use group release',
-)
-assert(
-  !job(publishWorkflow, 'quality').includes('needs: quality-playwright'),
-  'publish-npm.yml quality must run in parallel with quality-playwright',
-)
-assert(
-  job(publishWorkflow, 'quality-readiness').includes(
-    'needs: [quality, quality-playwright]',
-  ) &&
+  job(publishWorkflow, 'quality-readiness').includes('needs: [quality]') &&
     job(publishWorkflow, 'quality-readiness').includes(
       'uses: ./.github/workflows/_quality-readiness.yml',
     ) &&
-    job(publishWorkflow, 'quality-readiness').includes('group: release') &&
-    job(publishWorkflow, 'quality-readiness').includes(
-      'playwright_group: release',
-    ),
-  'publish-npm.yml quality-readiness must wait for both quality and quality-playwright',
+    job(publishWorkflow, 'quality-readiness').includes('group: release'),
+  'publish-npm.yml quality-readiness must wait for quality and aggregate release group',
 )
 
 if (failures.length) {

@@ -15,6 +15,7 @@ test.describe('FsusUI 2.0 SSR hydration & strict CSP consumer contract', () => {
     const rawHtml = await response.text()
     expect(rawHtml).toContain('fsus-button')
     expect(rawHtml).toContain('fsus-card')
+    expect(rawHtml).toContain('role="combobox"')
     expect(rawHtml).not.toContain('el-button')
 
     await page.goto('/ssr/closed?theme=light')

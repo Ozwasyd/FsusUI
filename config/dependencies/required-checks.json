@@ -22,11 +22,7 @@
     "pr-fast": {
       "workflow": ".github/workflows/quality.yml",
       "job": "pr-fast",
-      "aggregates": [
-        "premerge-main",
-        "premerge-playwright",
-        "premerge-readiness"
-      ]
+      "aggregates": ["quality"]
     }
   },
   "groups": {
@@ -34,7 +30,7 @@
       "updateTypes": ["digest", "major", "minor", "patch"],
       "requiredChecks": ["pr-fast"],
       "requiredGateEvidence": [
-        "consumer-install",
+        "consumer-verify",
         "dotnet-package",
         "dotnet-platform",
         "static-quality",
@@ -46,7 +42,7 @@
       "updateTypes": ["digest", "major", "minor", "patch"],
       "requiredChecks": ["pr-fast"],
       "requiredGateEvidence": [
-        "consumer-install",
+        "consumer-verify",
         "dotnet-package",
         "dotnet-platform",
         "static-quality",
@@ -70,34 +66,25 @@
       "requiredGateEvidence": [
         "build-demo",
         "build-package",
-        "consumer-install",
-        "coverage",
+        "consumer-verify",
         "dotnet-package",
         "dotnet-platform",
-        "playwright-boundary",
-        "playwright-layout",
-        "playwright-markdown",
-        "playwright-motion",
+        "markdown-xss",
         "static-quality",
         "typecheck",
         "unit",
-        "visual",
-        "visual-runtime-reuse"
+        "visual"
       ]
     },
     "js-test-quality-tooling": {
       "updateTypes": ["digest", "major", "minor", "patch"],
       "requiredChecks": ["pr-fast"],
       "requiredGateEvidence": [
-        "coverage",
-        "playwright-boundary",
-        "playwright-layout",
-        "playwright-markdown",
-        "playwright-motion",
+        "markdown-xss",
         "static-quality",
         "typecheck",
         "unit",
-        "visual-runtime-reuse"
+        "visual"
       ]
     },
     "node-dotnet-sdk-images": {
@@ -106,7 +93,7 @@
       "requiredGateEvidence": [
         "build-demo",
         "build-package",
-        "consumer-install",
+        "consumer-verify",
         "dotnet-package",
         "dotnet-platform",
         "static-quality",
@@ -119,7 +106,7 @@
       "requiredChecks": ["pr-fast"],
       "requiredGateEvidence": [
         "build-package",
-        "consumer-install",
+        "consumer-verify",
         "static-quality",
         "typecheck",
         "unit"
@@ -131,7 +118,7 @@
       "requiredGateEvidence": [
         "build-demo",
         "build-package",
-        "consumer-install",
+        "consumer-verify",
         "static-quality",
         "typecheck",
         "unit",
@@ -144,10 +131,8 @@
       "requiredGateEvidence": [
         "build-demo",
         "build-package",
-        "consumer-install",
-        "playwright-boundary",
-        "playwright-layout",
-        "playwright-markdown",
+        "consumer-verify",
+        "markdown-xss",
         "static-quality",
         "typecheck",
         "unit",
@@ -160,9 +145,8 @@
       "requiredGateEvidence": [
         "build-demo",
         "build-package",
-        "consumer-install",
-        "playwright-boundary",
-        "playwright-markdown",
+        "consumer-verify",
+        "markdown-xss",
         "static-quality",
         "typecheck",
         "unit"
@@ -175,7 +159,7 @@
     "requiredGateEvidence": [
       "build-demo",
       "build-package",
-      "consumer-install",
+      "consumer-verify",
       "dotnet-package",
       "dotnet-platform",
       "static-quality",

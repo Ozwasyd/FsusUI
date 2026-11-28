@@ -40,7 +40,7 @@ const DOTNET_GROUPS = [
   'dotnet-test-performance',
   'node-dotnet-sdk-images',
 ]
-const PLAYWRIGHT_GROUPS = ['github-actions', 'js-test-quality-tooling']
+const BROWSER_GROUPS = ['github-actions', 'js-test-quality-tooling']
 
 const sorted = (values) =>
   [...values].sort((left, right) => left.localeCompare(right))
@@ -114,13 +114,7 @@ export function auditRequiredChecks({
       fail(`${checkName} references missing workflow job ${check.job}`)
     }
   }
-  if (
-    !same(contract.checks?.['pr-fast']?.aggregates, [
-      'premerge-main',
-      'premerge-playwright',
-      'premerge-readiness',
-    ])
-  ) {
+  if (!same(contract.checks?.['pr-fast']?.aggregates, ['quality'])) {
     fail('pr-fast aggregate ownership is incomplete or contains extras')
   }
   const prFast = workflowJob(qualityWorkflow, 'pr-fast')
@@ -129,11 +123,7 @@ export function auditRequiredChecks({
       fail(`pr-fast no longer aggregates ${aggregate}`)
     }
   }
-  if (
-    !workflowJob(qualityWorkflow, 'merge-group-pr-fast').includes(
-      'name: pr-fast',
-    )
-  ) {
+  if (!prFast.includes("github.event_name == 'merge_group'")) {
     fail('merge-group workflow must preserve the required pr-fast context')
   }
 
@@ -181,9 +171,9 @@ export function auditRequiredChecks({
     const gates = contract.groups?.[group]?.requiredGateEvidence ?? []
     if (
       !gates.includes('build-package') ||
-      !gates.includes('consumer-install')
+      !gates.includes('consumer-verify')
     ) {
-      fail(`${group} must require package candidate and consumer install gates`)
+      fail(`${group} must require package candidate and consumer verify gates`)
     }
   }
   for (const group of DOTNET_GROUPS) {
@@ -195,10 +185,10 @@ export function auditRequiredChecks({
       fail(`${group} must require both .NET platform and package gates`)
     }
   }
-  for (const group of PLAYWRIGHT_GROUPS) {
+  for (const group of BROWSER_GROUPS) {
     const gates = contract.groups?.[group]?.requiredGateEvidence ?? []
-    if (!gates.some((gate) => gate.startsWith('playwright-'))) {
-      fail(`${group} must require real Playwright gate evidence`)
+    if (!gates.includes('visual') && !gates.includes('markdown-xss')) {
+      fail(`${group} must require real browser gate evidence`)
     }
   }
 
@@ -211,7 +201,7 @@ export function auditRequiredChecks({
   }
   for (const gate of [
     'build-package',
-    'consumer-install',
+    'consumer-verify',
     'dotnet-platform',
     'dotnet-package',
   ]) {

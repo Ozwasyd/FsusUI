@@ -22,7 +22,7 @@ import {
   loadVisualProfileRegistry,
 } from './visual-profiles.mjs'
 import { visualEvidencePolicy } from './visual-evidence-policy.mjs'
-import { collectConfigSources } from './playwright-suites.mjs'
+import { collectConfigSources } from './lib/playwright-config-sources.mjs'
 import { createDefaultVisualRuntimeConfig } from './visual-runtime-core.mjs'
 
 const packageJson = JSON.parse(readFileSync('package.json', 'utf8'))

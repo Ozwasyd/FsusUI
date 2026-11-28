@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, inject, onBeforeUnmount, onMounted, provide, ref } from 'vue'
+import { computed, inject, onBeforeUnmount, onMounted, provide, ref, useSlots } from 'vue'
 import {
   addUnit,
   deepClone,
@@ -41,10 +41,23 @@ const {
 } = defineProps<FsusFormItemProps>()
 
 const form = inject(FSUS_FORM_KEY, undefined)
+const slots = useSlots()
 const fieldId = useFsusId('field')
+const labelId = `${fieldId}-label`
 const errorId = `${fieldId}-error`
 const internalError = ref('')
 let initialValue: unknown
+
+const hasLabel = computed(() => Boolean(slots.label || label))
+
+const onLabelClick = (event: MouseEvent) => {
+  const labelEl = event.currentTarget as HTMLLabelElement | null
+  if (!labelEl || labelEl.control || typeof document === 'undefined') return
+  const target = document.getElementById(fieldId)
+  if (target instanceof HTMLElement && typeof target.focus === 'function') {
+    target.focus()
+  }
+}
 
 const resolvedSize = useFsusSize(
   computed(() => size),
@@ -112,6 +125,9 @@ provide(
   FSUS_FORM_ITEM_KEY,
   computed(() => ({
     id: fieldId,
+    labelId,
+    errorId,
+    hasLabel: hasLabel.value,
     invalid: isInvalid.value,
     disabled: Boolean(form?.value.disabled),
     size: resolvedSize.value,
@@ -121,9 +137,9 @@ provide(
   })),
 )
 
-const labelStyle = computed(() => {
+const labelStyleAttr = computed(() => {
   const w = labelWidth ?? form?.value.labelWidth
-  return w !== undefined ? { width: addUnit(w) } : undefined
+  return w !== undefined ? { style: { width: addUnit(w) } } : undefined
 })
 
 defineExpose({ validate, clearValidate, resetField })
@@ -138,9 +154,11 @@ defineExpose({ validate, clearValidate, resetField })
   >
     <label
       v-if="$slots.label || label"
+      :id="labelId"
       :for="fieldId"
       class="fsus-form-item__label"
-      :style="labelStyle"
+      v-bind="labelStyleAttr"
+      @click="onLabelClick"
     >
       <slot name="label">{{ label }}</slot>
       <span v-if="isRequired" class="fsus-form-item__asterisk" aria-hidden="true">*</span>

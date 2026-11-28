@@ -4,7 +4,6 @@ import {
   assertRegisteredGovernanceScript,
   createPolicyAssert,
   extractWorkflowJob,
-  loadGovernanceDocs,
   loadScriptsMap,
   readRepoText,
 } from './lib/ci-policy-utils.mjs'
@@ -17,11 +16,10 @@ const buildPackageJob = extractWorkflowJob(
   reusableQualityWorkflow,
   'build-package',
 )
-const consumerInstallJob = extractWorkflowJob(
+const consumerVerifyJob = extractWorkflowJob(
   reusableQualityWorkflow,
-  'consumer-install',
+  'consumer-verify',
 )
-const docs = loadGovernanceDocs()
 
 assertRegisteredGovernanceScript(
   assert,
@@ -37,15 +35,11 @@ assert(
 assertIncludesAll(
   assert,
   scripts['verify:release'] ?? '',
-  [
-    'package:candidate:build',
-    'package:candidate:verify',
-    'test:consumer-matrix',
-  ],
+  ['package:candidate:build', 'package:candidate:verify'],
   (fragment) => `verify:release must include ${fragment}`,
 )
 assert(buildPackageJob, '_quality.yml must define build-package job')
-assert(consumerInstallJob, '_quality.yml must define consumer-install job')
+assert(consumerVerifyJob, '_quality.yml must define consumer-verify job')
 
 assertIncludesAll(
   assert,
@@ -58,56 +52,34 @@ assertIncludesAll(
     'actions/upload-artifact@v4',
     'name: fsusui-npm-candidate',
     'candidate-digest',
-    'artifacts: npm-candidate=dist/npm-candidate',
+    'artifacts: npm-candidate=dist/npm-candidate/fsusui-npm-candidate.tgz',
   ],
   (fragment) => `build-package job must include ${fragment}`,
 )
 assertIncludesAll(
   assert,
-  consumerInstallJob,
+  consumerVerifyJob,
   [
     'actions/download-artifact@v4',
     'name: fsusui-npm-candidate',
-    'Verify immutable npm candidate',
     'node scripts/package-candidate.mjs verify',
-    'npm-candidate=.npm-candidate',
-    'scripts/consumer-matrix-impact.mjs',
-    'pnpm test:consumer-matrix:fixtures',
-    'pnpm test:consumer-matrix --',
-    '--candidate .npm-candidate/fsusui-npm-candidate.tgz',
-    '--output .consumer-matrix/receipts',
-    'name: consumer-matrix-${{ inputs.group }}',
-    'consumer-matrix=.consumer-matrix',
-    'no-package-impact',
+    'node scripts/verify-v2-consumer-candidate.mjs',
+    'npm-candidate=.npm-candidate/fsusui-npm-candidate.tgz',
     'needs.build-package.outputs.candidate-digest',
   ],
-  (fragment) => `consumer-install job must include ${fragment}`,
-)
-
-const npmCandidateDownload = consumerInstallJob.match(
-  /^ {6}- uses: actions\/download-artifact@v4\n {8}with:\n {10}name: fsusui-npm-candidate\n {10}path: \.npm-candidate$/mu,
-)
-const npmCandidateVerify = consumerInstallJob.match(
-  /^ {6}- name: Verify immutable npm candidate\n {8}env:\n {10}EXPECTED_CANDIDATE_DIGEST:[^\n]*needs\.build-package\.outputs\.candidate-digest[^\n]*\n {8}run: \|\n {10}node scripts\/package-candidate\.mjs verify --tarball \.npm-candidate\/fsusui-npm-candidate\.tgz --commit "\$GITHUB_SHA"\n {10}digest=[^\n]+\n {10}test -n "\$EXPECTED_CANDIDATE_DIGEST"\n {10}test "\$digest" = "\$EXPECTED_CANDIDATE_DIGEST"$/mu,
-)
-assert(
-  npmCandidateDownload &&
-    npmCandidateVerify &&
-    npmCandidateDownload.index < npmCandidateVerify.index &&
-    npmCandidateVerify.index < consumerInstallJob.indexOf('pnpm/action-setup'),
-  'consumer-install must unconditionally download and verify the npm candidate before impact-gated dependencies',
+  (fragment) => `consumer-verify job must include ${fragment}`,
 )
 
 assertExcludesAll(
   assert,
-  consumerInstallJob,
+  consumerVerifyJob,
   [
     'pnpm run build:npm-package',
     'emscripten-core/setup-emsdk',
     'actions/cache@v4',
     'continue-on-error',
   ],
-  (forbidden) => `consumer-install must not contain ${forbidden}`,
+  (forbidden) => `consumer-verify must not contain ${forbidden}`,
 )
 assertIncludesAll(
   assert,
@@ -126,23 +98,10 @@ assertExcludesAll(
   [
     'pnpm run build:npm-package',
     'pnpm run package:candidate:build',
-    'working-directory: dist/element-plus',
+    'working-directory: dist/fsusui',
   ],
   (forbidden) =>
     `publish-npm.yml must not rebuild or publish a mutable directory: ${forbidden}`,
-)
-assertIncludesAll(
-  assert,
-  docs,
-  [
-    'fsusui-npm-candidate',
-    'candidate manifest',
-    '同一个 tarball',
-    'consumer-install',
-    'verify:release',
-    'package:candidate:compare',
-  ],
-  (fragment) => `docs must describe package artifact reuse: ${fragment}`,
 )
 
 console.log('[package-artifact-reuse] ok')

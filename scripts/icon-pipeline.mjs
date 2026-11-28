@@ -97,13 +97,6 @@ const readVueComponentName = (source, files = undefined) => {
   const slug = sourceSlug(source)
   const expectedName = pascal(slug)
   const pathsFile = 'vue/packages/icons/src/icon-paths.ts'
-  if (files && Object.keys(files).some((k) => k.includes('icons-vue/src/components/'))) {
-    const legacyPath = `vue/packages/icons-vue/src/components/${slug}.vue`
-    const content = files[legacyPath] ?? ''
-    const nameMatch = content.match(/\bname:\s*['"]([^'"]+)['"]/)
-    if (!nameMatch) throw new Error(`${legacyPath} must define a component name`)
-    return { componentPath: legacyPath, name: nameMatch[1] }
-  }
   const content =
     files?.[pathsFile] ??
     fs.readFileSync(path.join(root, pathsFile), 'utf8')

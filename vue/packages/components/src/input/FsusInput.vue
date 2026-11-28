@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { computed, inject, ref } from 'vue'
+import { computed, inject, ref, useAttrs, type AriaAttributes, type StyleValue } from 'vue'
 import { useFsusLocale, useFsusSize, type FsusSize } from '@fsusui/core'
 import { FsusIcon } from '@fsusui/icons'
 import { FSUS_FORM_ITEM_KEY } from '../form/context'
 
-defineOptions({ name: 'FsusInput' })
+defineOptions({ name: 'FsusInput', inheritAttrs: false })
 
 export interface FsusInputProps {
   type?: 'text' | 'password' | 'textarea' | 'email' | 'search' | 'url' | 'tel' | 'number'
@@ -49,6 +49,7 @@ const emit = defineEmits<{
   clear: []
 }>()
 
+const attrs = useAttrs()
 const formItem = inject(FSUS_FORM_ITEM_KEY, undefined)
 const { t } = useFsusLocale()
 const resolvedSize = useFsusSize(
@@ -57,6 +58,47 @@ const resolvedSize = useFsusSize(
 )
 const isDisabled = computed(() => disabled || Boolean(formItem?.value.disabled))
 const isInvalid = computed(() => invalid || Boolean(formItem?.value.invalid))
+
+const nativeId = computed(() => (attrs.id as string | undefined) ?? formItem?.value.id)
+const mergedDescribedBy = computed(() => {
+  const parts: string[] = []
+  const explicit = attrs['aria-describedby']
+  if (typeof explicit === 'string' && explicit.trim()) {
+    parts.push(...explicit.trim().split(/\s+/u))
+  }
+  if (formItem?.value.invalid && formItem.value.errorId && !parts.includes(formItem.value.errorId)) {
+    parts.push(formItem.value.errorId)
+  }
+  return parts.length > 0 ? parts.join(' ') : undefined
+})
+const nativeAriaInvalid = computed<AriaAttributes['aria-invalid']>(() =>
+  attrs['aria-invalid'] !== undefined
+    ? (attrs['aria-invalid'] as AriaAttributes['aria-invalid'])
+    : isInvalid.value
+      ? 'true'
+      : undefined,
+)
+const rootStyleAttr = computed(() =>
+  attrs.style !== undefined && attrs.style !== ''
+    ? { style: attrs.style as StyleValue }
+    : undefined,
+)
+const nativeAttrs = computed(() => {
+  const forwarded: Record<string, unknown> = {}
+  for (const [key, val] of Object.entries(attrs)) {
+    if (
+      key === 'class' ||
+      key === 'style' ||
+      key === 'id' ||
+      key === 'aria-invalid' ||
+      key === 'aria-describedby'
+    ) {
+      continue
+    }
+    forwarded[key] = val
+  }
+  return forwarded
+})
 
 const inputRef = ref<HTMLInputElement | HTMLTextAreaElement | null>(null)
 const focused = ref(false)
@@ -113,7 +155,8 @@ defineExpose({
 
 <template>
   <div
-    class="fsus-input"
+    :class="['fsus-input', attrs.class]"
+    v-bind="rootStyleAttr"
     :data-type="type === 'textarea' ? 'textarea' : 'input'"
     :data-size="resolvedSize"
     :data-focused="focused ? '' : undefined"
@@ -131,7 +174,8 @@ defineExpose({
 
       <textarea
         v-if="type === 'textarea'"
-        :id="formItem?.id"
+        v-bind="nativeAttrs"
+        :id="nativeId"
         ref="inputRef"
         class="fsus-input__native"
         :value="nativeValue"
@@ -142,7 +186,8 @@ defineExpose({
         :rows="rows"
         :name="name"
         :autofocus="autofocus"
-        :aria-invalid="isInvalid ? 'true' : undefined"
+        :aria-invalid="nativeAriaInvalid"
+        :aria-describedby="mergedDescribedBy"
         @input="onInput"
         @change="onChange"
         @focus="onFocus"
@@ -150,7 +195,8 @@ defineExpose({
       />
       <input
         v-else
-        :id="formItem?.id"
+        v-bind="nativeAttrs"
+        :id="nativeId"
         ref="inputRef"
         class="fsus-input__native"
         :type="nativeType"
@@ -162,7 +208,8 @@ defineExpose({
         :autocomplete="autocomplete"
         :name="name"
         :autofocus="autofocus"
-        :aria-invalid="isInvalid ? 'true' : undefined"
+        :aria-invalid="nativeAriaInvalid"
+        :aria-describedby="mergedDescribedBy"
         @input="onInput"
         @change="onChange"
         @focus="onFocus"

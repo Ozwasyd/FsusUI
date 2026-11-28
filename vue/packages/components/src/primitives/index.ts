@@ -1,4 +1,5 @@
-import { defineComponent, h, ref, type PropType } from 'vue'
+import { computed, defineComponent, h, onBeforeUnmount, ref, type PropType } from 'vue'
+import { useFsusLocale } from '@fsusui/core'
 import { FsusIcon } from '@fsusui/icons'
 import FsusPagination from '../pagination/FsusPagination.vue'
 import FsusButton from '../button/FsusButton.vue'
@@ -605,30 +606,134 @@ export const FsusDiagnosticsItem = defineComponent({
   },
 })
 
+let lastCopyAnnouncement = ''
+
 export const FsusCopyableDetail = defineComponent({
   name: 'FsusCopyableDetail',
-  props: { value: { type: String, required: true }, label: { type: String, default: '' } },
-  setup(props) {
-    const copied = ref(false)
-    const copy = async () => {
-      try {
-        await navigator.clipboard?.writeText(props.value)
-        copied.value = true
-        setTimeout(() => (copied.value = false), 1500)
-      } catch {
-        // Clipboard unavailable in headless context
+  props: {
+    value: { type: String, required: true },
+    label: { type: String, default: '' },
+    copyLabel: { type: String, default: undefined },
+    copiedLabel: { type: String, default: undefined },
+    copyErrorLabel: { type: String, default: undefined },
+  },
+  emits: ['copy', 'copyError'],
+  setup(props, { emit }) {
+    const { t } = useFsusLocale()
+    const status = ref<'idle' | 'copied' | 'error'>('idle')
+    const announcement = ref('')
+    let resetTimer: ReturnType<typeof setTimeout> | null = null
+
+    const clearResetTimer = () => {
+      if (resetTimer !== null) {
+        clearTimeout(resetTimer)
+        resetTimer = null
       }
     }
-    return () =>
-      h('div', { class: 'fsus-copyable-detail' }, [
-        props.label ? h('span', { class: 'fsus-copyable-detail__label' }, props.label) : null,
-        h('code', { class: 'fsus-copyable-detail__code' }, props.value),
-        h(
-          'button',
-          { type: 'button', class: 'fsus-copyable-detail__btn', 'aria-label': 'Copy value', onClick: copy },
-          [h(FsusIcon, { name: copied.value ? 'check' : 'copy-document', size: 14 })],
-        ),
-      ])
+
+    onBeforeUnmount(clearResetTimer)
+
+    const resolveCopyLabel = computed(() => {
+      if (props.copyLabel) return props.copyLabel
+      const base = t('common.copy')
+      return props.label ? `${base} ${props.label}` : base
+    })
+    const resolveCopiedLabel = computed(() => props.copiedLabel ?? t('common.copied'))
+    const resolveErrorLabel = computed(() => props.copyErrorLabel ?? t('common.copyFailed'))
+
+    const announce = (rawMessage: string) => {
+      let message = rawMessage
+      if (message === lastCopyAnnouncement) {
+        message += '\u00A0'
+      }
+      lastCopyAnnouncement = message
+      announcement.value = message
+    }
+
+    const scheduleReset = (delayMs: number) => {
+      clearResetTimer()
+      resetTimer = setTimeout(() => {
+        status.value = 'idle'
+        announcement.value = ''
+        resetTimer = null
+      }, delayMs)
+    }
+
+    const copy = async () => {
+      clearResetTimer()
+      try {
+        if (
+          typeof navigator === 'undefined' ||
+          !navigator.clipboard ||
+          typeof navigator.clipboard.writeText !== 'function'
+        ) {
+          throw new Error('Clipboard API is unavailable')
+        }
+        await navigator.clipboard.writeText(props.value)
+        status.value = 'copied'
+        announce(resolveCopiedLabel.value)
+        emit('copy', props.value)
+        scheduleReset(1500)
+      } catch (err) {
+        const error = err instanceof Error ? err : new Error(String(err))
+        status.value = 'error'
+        announce(resolveErrorLabel.value)
+        emit('copyError', error)
+        scheduleReset(2000)
+      }
+    }
+
+    return () => {
+      const iconName =
+        status.value === 'copied'
+          ? 'check'
+          : status.value === 'error'
+            ? 'warning'
+            : 'copy-document'
+      const buttonLabel =
+        status.value === 'copied'
+          ? resolveCopiedLabel.value
+          : status.value === 'error'
+            ? resolveErrorLabel.value
+            : resolveCopyLabel.value
+
+      return h(
+        'div',
+        {
+          class: 'fsus-copyable-detail',
+          'data-status': status.value,
+          'data-copied': status.value === 'copied' ? '' : undefined,
+          'data-failed': status.value === 'error' ? '' : undefined,
+        },
+        [
+          props.label ? h('span', { class: 'fsus-copyable-detail__label' }, props.label) : null,
+          h('code', { class: 'fsus-copyable-detail__code' }, props.value),
+          h(
+            'button',
+            {
+              type: 'button',
+              class: 'fsus-copyable-detail__btn',
+              'aria-label': buttonLabel,
+              'data-status': status.value,
+              'data-copied': status.value === 'copied' ? '' : undefined,
+              'data-failed': status.value === 'error' ? '' : undefined,
+              onClick: copy,
+            },
+            [h(FsusIcon, { name: iconName, size: 14, 'aria-hidden': 'true' })],
+          ),
+          h(
+            'span',
+            {
+              class: 'fsus-sr-only',
+              role: 'status',
+              'aria-live': 'polite',
+              'aria-atomic': 'true',
+            },
+            announcement.value,
+          ),
+        ],
+      )
+    }
   },
 })
 

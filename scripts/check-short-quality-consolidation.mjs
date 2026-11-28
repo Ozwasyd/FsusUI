@@ -4,7 +4,6 @@ import {
   assertIncludesAll,
   assertRegisteredGovernanceScript,
   createPolicyAssert,
-  loadGovernanceDocs,
   loadScriptsMap,
   readRepoText,
 } from './lib/ci-policy-utils.mjs'
@@ -12,7 +11,6 @@ import {
 const assert = createPolicyAssert('short-quality')
 const scripts = loadScriptsMap()
 const reusableQualityWorkflow = readRepoText('.github/workflows/_quality.yml')
-const docs = loadGovernanceDocs().toLowerCase()
 
 assertRegisteredGovernanceScript(
   assert,
@@ -44,37 +42,25 @@ assertIncludesAll(
   assert,
   reusableQualityWorkflow,
   [
-    'Run contract checks',
     'pnpm run check:consumer-contract',
     'pnpm run check:npm-dist-tag',
     'Run lint',
-    'pnpm lint',
+    'pnpm run lint',
     'Run token checks',
     'pnpm run tokens:check',
     'pnpm run tokens:lint',
     'Run icon checks',
     'pnpm run icons:check',
     'pnpm run icons:lint',
-    'Run conformance',
-    'pnpm run conformance',
-    'Run governance',
-    'pnpm run governance:check',
   ],
   (fragment) => `static-quality must keep identifiable step/command: ${fragment}`,
 )
 
 assert(
-  /consumer-install:[\s\S]*needs:[\s\S]*static-quality[\s\S]*build-package/.test(
+  /consumer-verify:[\s\S]*needs:[\s\S]*build-package/.test(
     reusableQualityWorkflow,
   ),
-  'consumer-install must depend on static-quality and build-package',
-)
-
-assertIncludesAll(
-  assert,
-  docs,
-  ['static-quality', 'short quality', 'shared setup', 'failure output'],
-  (fragment) => `docs must describe ${fragment}`,
+  'consumer-verify must depend on build-package',
 )
 
 validateGovernanceStages({

@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "workflowGroup": "main",
+  "commitSha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "gate": "consumer-verify",
+  "status": "success",
+  "toolchain": {
+    "node": "v22.14.0",
+    "platform": "linux",
+    "arch": "x64"
+  },
+  "inputFingerprint": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+  "createdAt": "2026-11-28T00:00:00.000Z",
+  "run": {
+    "id": "42",
+    "attempt": "1"
+  },
+  "artifacts": [
+    {
+      "name": "npm-candidate",
+      "path": "artifacts/fsusui-npm-candidate.tgz",
+      "sha256": "82bf71e3ecf9234a1eecca39c474db0d01f15f7f148b5a4898650dd8f98d0491"
+    }
+  ],
+  "dimensions": {},
+  "reportSummary": "reports/consumer-verify.json"
+}

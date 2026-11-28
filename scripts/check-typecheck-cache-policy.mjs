@@ -2,7 +2,6 @@ import {
   assertIncludesAll,
   assertRegisteredGovernanceScript,
   createPolicyAssert,
-  loadGovernanceDocs,
   loadScriptsMap,
   readRepoText,
 } from './lib/ci-policy-utils.mjs'
@@ -10,7 +9,6 @@ import {
 const assert = createPolicyAssert('typecheck-cache')
 const scripts = loadScriptsMap()
 const workflows = `${readRepoText('.github/workflows/quality.yml')}\n${readRepoText('.github/workflows/_quality.yml')}`
-const docs = loadGovernanceDocs().toLowerCase()
 const capacityTypecheck = readRepoText('scripts/run-capacity-typecheck.mjs')
 const capacityPlanner = readRepoText('scripts/ci-capacity.cjs')
 const typecheckLanes = ['web', 'node', 'vite-config', 'vitest']
@@ -59,7 +57,7 @@ assertIncludesAll(
   workflows,
   [
     '.tmp/typecheck-cache',
-    'fsusui-typecheck-',
+    'fsusui-v2-typecheck-',
     'pnpm-lock.yaml',
     'package.json',
     'vue/tsconfig*.json',
@@ -67,23 +65,8 @@ assertIncludesAll(
     'vue/packages/**/*.vue',
     'vue/typings/**/*.d.ts',
     'scripts/run-typecheck.mjs',
-    'typecheck-cache-hit',
-    'cache-hit',
-    'cache-primary-key',
   ],
   (fragment) => `quality workflows must include ${fragment}`,
-)
-assertIncludesAll(
-  assert,
-  docs,
-  [
-    'typecheck cache',
-    'cache hit',
-    'cache miss',
-    'typecheck:no-cache',
-    'typecheck:affected',
-  ],
-  (fragment) => `docs must describe ${fragment}`,
 )
 
 console.log('[typecheck-cache] ok')

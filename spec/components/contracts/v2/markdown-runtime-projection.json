@@ -2,8 +2,8 @@
   "schemaVersion": 1,
   "id": "markdown-runtime-projection",
   "version": "markdown-projection-acceptance@2026-08-27",
-  "exportPath": "./markdown-runtime",
-  "package": "@ozwasyd/element-plus/markdown-runtime",
+  "exportPath": "./markdown",
+  "package": "@ozwasyd/fsusui/markdown",
   "classification": "native-adapter",
   "authority": "unique-projection",
   "projectionNode": {

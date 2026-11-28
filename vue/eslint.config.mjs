@@ -36,10 +36,6 @@ export default [
       '.tmp/**',
       'playwright-report/**',
       'vue/playwright-report/**',
-      'play/**',
-      'ssr-testing/cases/*',
-      'docs/.vitepress/i18n/*',
-      'docs/.vitepress/crowdin/*',
       'test-results/**',
       'vue/tests/visual/**/*.png',
       'vue/tests/visual/**/__screenshots__/**',
@@ -139,23 +135,6 @@ export default [
 
   {
     files: [
-      'vue/packages/components/table/src/**/*.{ts,tsx,vue}',
-      'vue/packages/components/tree/src/**/*.{ts,tsx,vue}',
-      'vue/packages/components/tree-select/src/**/*.{ts,tsx,vue}',
-      'vue/packages/components/tooltip-v2/src/**/*.{ts,tsx,vue}',
-    ],
-    rules: {
-      '@typescript-eslint/ban-ts-comment': 'off',
-      '@typescript-eslint/no-unused-expressions': 'off',
-      'no-useless-assignment': 'off',
-      'no-empty': 'off',
-      'vue/prefer-import-from-vue': 'off',
-      'unicorn/prefer-object-from-entries': 'off',
-    },
-  },
-
-  {
-    files: [
       'scripts/check-markdown-feature-trusted-types.mjs',
       'scripts/check-markdown-xss-browser.mjs',
     ],
@@ -215,9 +194,9 @@ export default [
   {
     files: [
       'scripts/**/*.{js,mjs,ts}',
-      'vue/packages/icons-vue/build/**/*.{js,mjs,ts}',
       'vue/playwright.config.ts',
-      'vue/playwright.reuse.config.ts',
+      'vue/playwright.dev.config.ts',
+      'vue/playwright.markdown-xss.config.ts',
       '.github/**/*.{js,mjs,ts}',
     ],
     rules: {

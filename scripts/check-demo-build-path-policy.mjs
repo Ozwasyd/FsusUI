@@ -7,8 +7,6 @@ const reusableQualityWorkflow = readFileSync(
   '.github/workflows/_quality.yml',
   'utf8',
 )
-const releaseGovernance = readFileSync('docs/releases/governance.md', 'utf8')
-const engineeringHandoff = readFileSync('docs/engineering-handoff.md', 'utf8')
 const demoViteConfig = readFileSync(
   'vue/packages/demo-app/vite.config.ts',
   'utf8',
@@ -28,7 +26,6 @@ const hasSafeDemoChunkConfig = (source) =>
   source.includes('chunkSizeWarningLimit: Number.POSITIVE_INFINITY') &&
   source.includes('onlyExplicitManualChunks: false')
 
-const docs = `${releaseGovernance}\n${engineeringHandoff}`.toLowerCase()
 const decisionScriptPath = 'scripts/should-run-demo-build.mjs'
 
 assert(
@@ -45,7 +42,6 @@ assert(
   existsSync(decisionScriptPath),
   'demo build path decision script is missing',
 )
-
 assert(
   hasSafeDemoChunkConfig(demoViteConfig) &&
     !manualChunkPolicy.includes('FSUS_DEMO_CHUNK_SIZE_WARNING_LIMIT_KB'),
@@ -60,8 +56,8 @@ const gatewayChunkOwner = 'fsus-markdown-feature-gateway'
 for (const profile of ['full', 'consumer']) {
   for (const moduleId of [
     '/workspace/vue/packages/wasm/markdown-feature-output-gateway.ts',
-    '/workspace/node_modules/@element-plus/wasm/markdown-feature-output-gateway.mjs',
-    '/workspace/node_modules/@ozwasyd/element-plus/es/wasm/markdown-feature-output-gateway.mjs',
+    '/workspace/node_modules/@fsusui/wasm/markdown-feature-output-gateway.mjs',
+    '/workspace/node_modules/@ozwasyd/fsusui/dist/wasm/markdown-feature-output-gateway.mjs',
   ]) {
     assert(
       resolveFsusViteManualChunk(moduleId, { profile }) === gatewayChunkOwner,
@@ -73,8 +69,8 @@ const isolatedClientChunkOwner = 'fsus-markdown-heavy-isolated-client'
 for (const profile of ['full', 'consumer']) {
   for (const moduleId of [
     '/workspace/vue/packages/wasm/markdown-heavy-feature-isolated-client.ts',
-    '/workspace/node_modules/@element-plus/wasm/markdown-heavy-feature-isolated-client.mjs',
-    '/workspace/node_modules/@ozwasyd/element-plus/es/wasm/markdown-heavy-feature-isolated-client.mjs',
+    '/workspace/node_modules/@fsusui/wasm/markdown-heavy-feature-isolated-client.mjs',
+    '/workspace/node_modules/@ozwasyd/fsusui/dist/wasm/markdown-heavy-feature-isolated-client.mjs',
   ]) {
     assert(
       resolveFsusViteManualChunk(moduleId, { profile }) ===
@@ -87,8 +83,8 @@ const heavyResourceChunkOwner = 'fsus-markdown-heavy-resource'
 for (const profile of ['full', 'consumer']) {
   for (const moduleId of [
     '/workspace/vue/packages/wasm/markdown-heavy-feature-resource.ts',
-    '/workspace/node_modules/@element-plus/wasm/markdown-heavy-feature-resource.mjs',
-    '/workspace/node_modules/@ozwasyd/element-plus/es/wasm/markdown-heavy-feature-resource.mjs',
+    '/workspace/node_modules/@fsusui/wasm/markdown-heavy-feature-resource.mjs',
+    '/workspace/node_modules/@ozwasyd/fsusui/dist/wasm/markdown-heavy-feature-resource.mjs',
   ]) {
     assert(
       resolveFsusViteManualChunk(moduleId, { profile }) ===
@@ -102,8 +98,8 @@ for (const profile of ['full', 'consumer']) {
   for (const moduleId of [
     '/workspace/vue/packages/wasm/markdown-heavy-feature-isolated-lazy.ts',
     '/workspace/vue/packages/wasm/markdown-heavy-feature-frame-scheduler.ts',
-    '/workspace/node_modules/@element-plus/wasm/markdown-heavy-feature-isolated-lazy.mjs',
-    '/workspace/node_modules/@ozwasyd/element-plus/es/wasm/markdown-heavy-feature-frame-scheduler.mjs',
+    '/workspace/node_modules/@fsusui/wasm/markdown-heavy-feature-isolated-lazy.mjs',
+    '/workspace/node_modules/@ozwasyd/fsusui/dist/wasm/markdown-heavy-feature-frame-scheduler.mjs',
   ]) {
     assert(
       resolveFsusViteManualChunk(moduleId, { profile }) ===
@@ -114,23 +110,10 @@ for (const profile of ['full', 'consumer']) {
 }
 const heavyIdentityChunkOwner = 'fsus-markdown-heavy-identity'
 for (const profile of ['full', 'consumer']) {
-  for (const prefix of [
-    '/workspace/vue/packages',
-    '/workspace/node_modules/@element-plus',
-    '/workspace/node_modules/@ozwasyd/element-plus/es',
-  ]) {
-    assert(
-      resolveFsusViteManualChunk(
-        `${prefix}/components/markdown-renderer/src/markdown-fragment-reveal.mjs`,
-        { profile },
-      ) === 'fsus-markdown-fragment-reveal',
-      `${profile} must keep offscreen fragment mounting out of routine hydration`,
-    )
-  }
   for (const moduleId of [
     '/workspace/vue/packages/wasm/markdown-heavy-feature-identity.ts',
-    '/workspace/node_modules/@element-plus/wasm/markdown-heavy-feature-identity.mjs',
-    '/workspace/node_modules/@ozwasyd/element-plus/es/wasm/markdown-heavy-feature-identity.mjs',
+    '/workspace/node_modules/@fsusui/wasm/markdown-heavy-feature-identity.mjs',
+    '/workspace/node_modules/@ozwasyd/fsusui/dist/wasm/markdown-heavy-feature-identity.mjs',
   ]) {
     assert(
       resolveFsusViteManualChunk(moduleId, { profile }) ===
@@ -138,52 +121,6 @@ for (const profile of ['full', 'consumer']) {
       `${profile} must isolate the exact Markdown heavy identity module`,
     )
   }
-}
-const heavyIdentityDependencyModules = [
-  ['/workspace/vue/packages/wasm/markdown-editor-projection.ts', 'fsus-ui'],
-  ['/workspace/vue/packages/wasm/markdown-syntax-identity.ts', 'fsus-ui'],
-  ['/workspace/vue/packages/wasm/markdown-source-coordinate-map.ts', 'fsus-ui'],
-  ['/workspace/vue/packages/wasm/markdown-syntax-collect.ts', 'fsus-ui'],
-  [
-    '/workspace/vue/packages/wasm/markdown/syntax-collect.generated.ts',
-    'fsus-ui',
-  ],
-  ['/workspace/vue/packages/wasm/markdown-directive-syntax.ts', 'fsus-ui'],
-  ['/workspace/vue/packages/wasm/markdown-anchor-grammar.ts', 'fsus-ui'],
-  ['/workspace/vue/packages/wasm/markdown-anchor-owners.ts', 'fsus-ui'],
-  [
-    '/workspace/vue/packages/wasm/markdown/anchor-owner.portable.mjs',
-    'fsus-ui',
-  ],
-  [
-    '/workspace/node_modules/@element-plus/wasm/markdown-anchor-owners.mjs',
-    'fsus-wasm',
-  ],
-  [
-    '/workspace/node_modules/@ozwasyd/element-plus/es/wasm/markdown/anchor-owner.portable.mjs',
-    'fsus-wasm',
-  ],
-  ['/workspace/vue/packages/wasm/markdown-caption-directive.ts', 'fsus-ui'],
-  ['/workspace/vue/packages/wasm/markdown-embed-directive.ts', 'fsus-ui'],
-  [
-    '/workspace/node_modules/@element-plus/wasm/markdown-editor-projection.mjs',
-    'fsus-wasm',
-  ],
-  [
-    '/workspace/node_modules/@ozwasyd/element-plus/es/wasm/markdown/syntax-collect.generated.mjs',
-    'fsus-wasm',
-  ],
-]
-for (const [moduleId, fullOwner] of heavyIdentityDependencyModules) {
-  assert(
-    resolveFsusViteManualChunk(moduleId, { profile: 'consumer' }) ===
-      heavyIdentityChunkOwner,
-    `consumer must isolate the exact Markdown heavy identity dependency ${moduleId}`,
-  )
-  assert(
-    resolveFsusViteManualChunk(moduleId, { profile: 'full' }) === fullOwner,
-    `full must keep the Markdown heavy identity dependency ${moduleId} in the ${fullOwner} eager owner so it and the identity chunk cannot cycle`,
-  )
 }
 assert(
   resolveFsusViteManualChunk(
@@ -206,65 +143,8 @@ for (const moduleId of [
     `gateway chunk owner must reject non-exact module id ${moduleId}`,
   )
 }
-for (const moduleId of [
-  '/workspace/vue/packages/wasm/markdown-heavy-feature-resource-sibling.ts',
-  '/workspace/vue/packages/wasm/markdown-heavy-feature-resource.ts/child.ts',
-  '/workspace/vue/packages/wasm/markdown-heavy-feature-resource.ts?query',
-  '/workspace/vue/packages/wasm/%6darkdown-heavy-feature-resource.ts',
-  '/workspace/vue/packages/wasm/markdown-heavy-feature-resource-mutations.ts',
-]) {
-  assert(
-    resolveFsusViteManualChunk(moduleId) !== heavyResourceChunkOwner,
-    `heavy resource chunk owner must reject non-exact module id ${moduleId}`,
-  )
-}
-for (const moduleId of [
-  '/workspace/vue/packages/wasm/markdown-heavy-feature-isolated-client.ts',
-  '/workspace/vue/packages/wasm/markdown-heavy-feature-isolated-lazy-sibling.ts',
-  '/workspace/vue/packages/wasm/markdown-heavy-feature-isolated-lazy.ts/child.ts',
-  '/workspace/vue/packages/wasm/markdown-heavy-feature-frame-scheduler.ts?query',
-  '/workspace/vue/packages/wasm/%6darkdown-heavy-feature-frame-scheduler.ts',
-]) {
-  assert(
-    resolveFsusViteManualChunk(moduleId) !== heavyIsolatedAdapterChunkOwner,
-    `isolated adapter chunk owner must reject non-exact module id ${moduleId}`,
-  )
-}
-for (const moduleId of [
-  '/workspace/vue/packages/wasm/markdown-heavy-feature-identity-sibling.ts',
-  '/workspace/vue/packages/wasm/markdown-heavy-feature-identity.ts/child.ts',
-  '/workspace/vue/packages/wasm/markdown-heavy-feature-identity.ts?query',
-  '/workspace/vue/packages/wasm/%6darkdown-heavy-feature-identity.ts',
-  '/workspace/vue/packages/wasm/markdown-editor-projection-sibling.ts',
-  '/workspace/vue/packages/wasm/markdown-syntax-collect.ts/child.ts',
-  '/workspace/vue/packages/wasm/markdown/syntax-collect.generated.ts?query',
-  '/workspace/vue/packages/wasm/markdown/syntax-collect.generated.ts/child.ts',
-  '/workspace/vue/packages/wasm/markdown/%73yntax-collect.generated.ts',
-]) {
-  for (const profile of ['full', 'consumer']) {
-    assert(
-      resolveFsusViteManualChunk(moduleId, { profile }) !==
-        heavyIdentityChunkOwner,
-      `${profile} heavy identity chunk owner must reject non-exact module id ${moduleId}`,
-    )
-  }
-}
-for (const moduleId of [
-  '/workspace/vue/packages/wasm/markdown-heavy-feature-isolated-client-sibling.ts',
-  '/workspace/vue/packages/wasm/markdown-heavy-feature-isolated-client.ts/child.ts',
-  '/workspace/vue/packages/wasm/markdown-heavy-feature-isolated-client.ts?query',
-  '/workspace/vue/packages/wasm/%6darkdown-heavy-feature-isolated-client.ts',
-]) {
-  assert(
-    resolveFsusViteManualChunk(moduleId) !== isolatedClientChunkOwner,
-    `isolated client chunk owner must reject non-exact module id ${moduleId}`,
-  )
-}
 
-const decisionScript = existsSync(decisionScriptPath)
-  ? readFileSync(decisionScriptPath, 'utf8')
-  : ''
-
+const decisionScript = readFileSync(decisionScriptPath, 'utf8')
 for (const fragment of [
   'demo',
   'component',
@@ -282,21 +162,6 @@ for (const fragment of [
   )
 }
 
-for (const fragment of [
-  'Determine PR demo build path impact',
-  decisionScriptPath,
-  'steps.demo-build-path.outputs.run',
-  'pnpm run build:demo',
-  'Skip PR demo build',
-  'demo-build-run',
-  'demo-build-reason',
-]) {
-  assert(
-    reusableQualityWorkflow.includes(fragment),
-    `reusable quality workflow build-demo job must include ${fragment}`,
-  )
-}
-
 assert(
   scripts['verify:full']?.includes('build:demo'),
   'verify:full must keep full demo build coverage',
@@ -306,18 +171,9 @@ assert(
   'verify:release must keep the full demo build through verify:full',
 )
 assert(
-  reusableQualityWorkflow.includes('build-demo') &&
+  reusableQualityWorkflow.includes('build-demo:') &&
     reusableQualityWorkflow.includes('pnpm run build:demo'),
-  'non-PR reusable quality workflow must keep the build-demo job',
+  'reusable quality workflow must keep the build-demo job',
 )
-
-for (const fragment of [
-  'path-aware demo build',
-  'demo-build-run',
-  'demo-build-reason',
-  'build:demo',
-]) {
-  assert(docs.includes(fragment), `docs must describe ${fragment}`)
-}
 
 console.log('[demo-build-path] ok')

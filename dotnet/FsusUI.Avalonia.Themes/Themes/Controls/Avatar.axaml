@@ -3,10 +3,9 @@
   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
   xmlns:fsus="using:FsusUI.Avalonia.Controls">
 
-  <!-- Web authority: fsus-theme.scss `.el-avatar` override — fill.base
-       surface, 1px border.subtle outline, text.primary foreground. The
-       theme-chalk gray disc (bg = text-color-disabled, white text) is
-       replaced by the FsusUI minimalist outlined avatar. -->
+  <!-- Web authority: FsusAvatar `.fsus-avatar` — fill.base surface, 1px
+       border.subtle outline, text.primary foreground (FsusUI minimalist
+       outlined avatar). -->
   <Style Selector="fsus|FsusAvatar">
     <Setter Property="Background" Value="{DynamicResource FsusColorFillBaseBrush}" />
     <Setter Property="Foreground" Value="{DynamicResource FsusThemeTextBrush}" />

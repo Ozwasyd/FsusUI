@@ -3,7 +3,6 @@ import {
   assertIncludesAll,
   assertRegisteredGovernanceScript,
   createPolicyAssert,
-  loadGovernanceDocs,
   loadScriptsMap,
   readRepoText,
 } from './lib/ci-policy-utils.mjs'
@@ -11,7 +10,6 @@ import {
 const assert = createPolicyAssert('test-artifact-cache')
 const scripts = loadScriptsMap()
 const workflows = `${readRepoText('.github/workflows/quality.yml')}\n${readRepoText('.github/workflows/_quality.yml')}`
-const docs = loadGovernanceDocs().toLowerCase()
 
 const wasmBundleFingerprint = artifactGroups.wasm.fingerprints.find(
   (fingerprint) => fingerprint.id === 'bundle',
@@ -41,12 +39,6 @@ assert(
   ),
   'prepare:test-artifacts must use the source-hash aware wrapper',
 )
-assert(
-  !scripts['prepare:test-artifacts']?.includes(
-    'run-p ensure:icons ensure:wasm',
-  ),
-  'prepare:test-artifacts must not directly run both ensure scripts on every test entry',
-)
 assertRegisteredGovernanceScript(
   assert,
   scripts,
@@ -63,36 +55,17 @@ assertIncludesAll(
   workflows,
   [
     'actions/cache@v4',
-    'vue/packages/icons-vue/dist',
     'vue/packages/wasm/dist',
-    'fsusui-test-artifacts-icons-',
-    'fsusui-test-artifacts-wasm-',
-    'vue/packages/icons-vue/src/**',
-    'vue/packages/icons-vue/build/**',
-    'scripts/ensure-icons-artifacts.mjs',
+    'fsusui-v2-wasm-',
     'vue/packages/wasm/**/*.ts',
     'vue/packages/wasm/**/*.cpp',
     'vue/packages/wasm/**/CMakeLists.txt',
     'scripts/ensure-wasm-artifacts.mjs',
     'scripts/run-wasm-build.mjs',
-    'icons-cache-hit',
-    'wasm-cache-hit',
     'cache-hit',
     'prepare:test-artifacts',
   ],
   (fragment) => `quality workflows must include ${fragment}`,
-)
-assertIncludesAll(
-  assert,
-  docs,
-  [
-    'test artifact cache',
-    'cache hit',
-    'cache miss',
-    'prepare:test-artifacts',
-    'build:wasm',
-  ],
-  (fragment) => `docs must describe ${fragment}`,
 )
 
 console.log('[test-artifact-cache] ok')

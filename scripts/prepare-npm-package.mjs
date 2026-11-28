@@ -52,6 +52,8 @@ const wasmRuntimeArtifacts = [
   'dist/wasm/markdown_simd.js',
   'dist/wasm/markdown_simd.wasm',
   'dist/wasm/markdown-heavy-feature-frame.mjs',
+  'dist/workers/markdown-renderer.worker.mjs',
+  'dist/workers/markdown-parser.worker.mjs',
 ]
 const rawSourceExtensions = new Set([
   '.c',
@@ -277,6 +279,45 @@ function assertWasmRuntimeArtifacts(rootDir) {
   }
 }
 
+function assertRuntimeUrlTargetsExist(rootDir) {
+  const distDir = path.join(rootDir, 'dist')
+  const jsFiles = collectDirectoryFiles(distDir).filter((filePath) =>
+    ['.mjs', '.js', '.cjs'].includes(path.extname(filePath)),
+  )
+  const urlPattern =
+    /new URL\(\s*(?:\/\*[\s\S]*?\*\/\s*)?(['"])([^'"]+)\1\s*,\s*import\.meta\.url\s*\)/gu
+  const broken = []
+
+  for (const filePath of jsFiles) {
+    const relFile = path.relative(rootDir, filePath).split(path.sep).join('/')
+    const content = readFileSync(filePath, 'utf8')
+    urlPattern.lastIndex = 0
+    for (const match of content.matchAll(urlPattern)) {
+      const fullMatch = match[0]
+      const specifier = match[2]
+      if (fullMatch.includes('@vite-ignore')) continue
+      const cleanSpecifier = specifier.split(/[?#]/u)[0]
+      if (cleanSpecifier.endsWith('.worker.ts')) {
+        broken.push(`${relFile}: raw TypeScript worker URL "${specifier}"`)
+        continue
+      }
+      if (!cleanSpecifier.startsWith('.')) continue
+      const resolvedTarget = path.resolve(path.dirname(filePath), cleanSpecifier)
+      if (!isRegularFile(resolvedTarget)) {
+        broken.push(
+          `${relFile}: missing runtime asset "${specifier}" (resolved to ${path.relative(rootDir, resolvedTarget)})`,
+        )
+      }
+    }
+  }
+
+  if (broken.length > 0) {
+    throw new Error(
+      `Published bundle contains unresolved import.meta.url runtime targets:\n${broken.join('\n')}`,
+    )
+  }
+}
+
 function assertMarkdownHeavyFeatureFrameArtifacts(rootDir) {
   const artifact = 'dist/wasm/markdown-heavy-feature-frame.mjs'
   const content = readFileSync(path.join(rootDir, artifact), 'utf8')
@@ -438,6 +479,7 @@ if (strict) {
   prunedSourceMaps = pruneSourceMaps(distRoot)
   rewrittenWasmFallbackReferences =
     rewriteEmscriptenWasmFallbackReferences(distRoot)
+  assertRuntimeUrlTargetsExist(distRoot)
 }
 
 packageJson.name = packageName

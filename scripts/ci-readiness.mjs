@@ -2,7 +2,6 @@
 
 import { createHash } from 'node:crypto'
 import {
-  copyFileSync,
   existsSync,
   mkdirSync,
   readFileSync,
@@ -12,15 +11,11 @@ import {
 import path from 'node:path'
 import process from 'node:process'
 import {
-  playwrightRegistry,
-  playwrightRegistryHash,
   readinessSpec,
   repositoryCommit,
   sha256Path,
-  validatePlaywrightPrReadiness,
   validateReadiness,
 } from './ci-readiness-contract.mjs'
-import { expectedPlaywrightCells } from './playwright-registry.mjs'
 import { verifyReleaseIdentity } from './release-profile-identity.mjs'
 
 const args = process.argv.slice(2).filter((arg) => arg !== '--')
@@ -42,8 +37,6 @@ const options = (name) => {
     return []
   })
 }
-const sha256FileContent = (target) =>
-  createHash('sha256').update(readFileSync(target)).digest('hex')
 const pairs = (values, label) =>
   Object.fromEntries(
     values.map((value) => {
@@ -52,6 +45,13 @@ const pairs = (values, label) =>
       return [value.slice(0, separator), value.slice(separator + 1)]
     }),
   )
+const readdirSafe = (directory) => {
+  try {
+    return readdirSync(directory, { withFileTypes: true })
+  } catch {
+    return []
+  }
+}
 const jsonFiles = (root) => {
   const files = []
   const visit = (directory) => {
@@ -69,17 +69,6 @@ const jsonFiles = (root) => {
   return files.sort()
 }
 
-const readdirSafe = (directory) => {
-  try {
-    return readdirSync(directory, { withFileTypes: true })
-  } catch {
-    return []
-  }
-}
-
-const isPlaywrightGate = (gate) =>
-  readinessSpec.playwright?.ownerIds?.includes(gate) ?? false
-
 const computeInputFingerprint = (root, explicitInputs) => {
   const inputFiles = explicitInputs.length
     ? explicitInputs
@@ -88,8 +77,6 @@ const computeInputFingerprint = (root, explicitInputs) => {
         'pnpm-lock.yaml',
         '.github/workflows/_quality.yml',
         'spec/ci/readiness-gates.json',
-        'spec/ci/playwright-owners.json',
-        'spec/ci/playwright-suites.json',
       ]
   const fingerprint = createHash('sha256')
   for (const input of inputFiles.sort()) {
@@ -123,238 +110,6 @@ const baseManifest = (root, gate, group, status) => ({
   run: runIdentity(),
 })
 
-const emitPlaywright = (root, gate, group) => {
-  const evidenceRoot = path.resolve(root, option('evidence-root', '.readiness'))
-  const profile = group === 'pr' ? 'pr' : group
-  const expected = expectedPlaywrightCells(playwrightRegistry, [gate], profile)
-  let plan = null
-  const planPath = option('playwright-plan')
-  if (planPath) {
-    const absolute = path.resolve(root, planPath)
-    if (!existsSync(absolute))
-      throw new Error(`playwright impact plan is missing: ${planPath}`)
-    plan = JSON.parse(readFileSync(absolute, 'utf8'))
-    if (plan.schemaVersion !== 1)
-      throw new Error('playwright impact plan schemaVersion must be 1.')
-  }
-  const decisions = new Map(
-    (plan?.decisions ?? []).map((decision) => [decision.suiteId, decision]),
-  )
-  const isPr = group === 'pr'
-  if (isPr && !plan)
-    throw new Error('emit playwright for pr group requires --playwright-plan.')
-  const cellsToRun = isPr
-    ? expected.filter((cell) => decisions.get(cell.suiteId)?.decision === 'run')
-    : expected
-  const skippedSuiteIds = isPr
-    ? [
-        ...new Set(
-          expected
-            .map((cell) => cell.suiteId)
-            .filter((suiteId, index, all) => all.indexOf(suiteId) === index)
-            .filter((suiteId) => decisions.get(suiteId)?.decision === 'skip'),
-        ),
-      ]
-    : []
-  const receiptsDir = path.resolve(
-    root,
-    option('playwright-receipts', path.join(evidenceRoot, 'receipts', gate)),
-  )
-  const emitted = []
-  for (const cell of cellsToRun) {
-    const receiptFile = `${cell.cellId.replaceAll('/', '-')}.json`
-    const receiptPath = path.join(receiptsDir, receiptFile)
-    if (!existsSync(receiptPath))
-      throw new Error(
-        `missing playwright receipt for ${cell.cellId} at ${receiptPath}.`,
-      )
-    const receipt = JSON.parse(readFileSync(receiptPath, 'utf8'))
-    if (receipt.cellId !== cell.cellId)
-      throw new Error(`playwright receipt cellId mismatch for ${cell.cellId}.`)
-    if (receipt.status !== 'success')
-      throw new Error(
-        `playwright receipt ${cell.cellId} status is ${receipt.status}.`,
-      )
-    const reportSource = receipt.report?.path
-      ? path.resolve(root, receipt.report.path)
-      : null
-    if (!reportSource || !existsSync(reportSource))
-      throw new Error(`missing playwright report for ${cell.cellId}.`)
-    let packagedReceiptPath = receiptPath
-    const reportRelative = path.join(
-      'receipts',
-      gate,
-      'reports',
-      `${cell.cellId.replaceAll('/', '-')}.json`,
-    )
-    const reportDest = path.resolve(evidenceRoot, reportRelative)
-    mkdirSync(path.dirname(reportDest), { recursive: true })
-    copyFileSync(reportSource, reportDest)
-    const reportDigest = sha256Path(reportDest)
-    const conformanceTraceArtifacts = []
-    let conformance = undefined
-    if (gate === 'playwright-conformance') {
-      if (!receipt.conformance || !Array.isArray(receipt.conformance.traces)) {
-        throw new Error(
-          `playwright receipt ${cell.cellId} missing conformance trace evidence.`,
-        )
-      }
-      const traces = []
-      for (const [index, trace] of receipt.conformance.traces.entries()) {
-        const traceSource = path.resolve(root, trace.path)
-        if (!existsSync(traceSource))
-          throw new Error(`missing conformance trace for ${cell.cellId}.`)
-        if (sha256FileContent(traceSource) !== trace.sha256)
-          throw new Error(
-            `conformance trace digest mismatch for ${cell.cellId}.`,
-          )
-        const traceRelative = path.join(
-          'receipts',
-          gate,
-          'traces',
-          cell.cellId.replaceAll('/', '-'),
-          `${index}.json`,
-        )
-        const traceDest = path.resolve(evidenceRoot, traceRelative)
-        mkdirSync(path.dirname(traceDest), { recursive: true })
-        copyFileSync(traceSource, traceDest)
-        const digest = sha256FileContent(traceDest)
-        traces.push({ path: traceRelative, sha256: digest })
-        conformanceTraceArtifacts.push({
-          name: `trace-${cell.cellId}-${index}`,
-          path: traceRelative,
-          sha256: sha256Path(traceDest),
-        })
-      }
-      conformance = { ...receipt.conformance, traces }
-      // Keep projected receipts outside the recursively loaded owner directory.
-      packagedReceiptPath = path.join(
-        evidenceRoot,
-        'receipt-projections',
-        gate,
-        receiptFile,
-      )
-      const ownerRelative = path.relative(receiptsDir, packagedReceiptPath)
-      if (
-        ownerRelative === '' ||
-        (!ownerRelative.startsWith(`..${path.sep}`) &&
-          ownerRelative !== '..' &&
-          !path.isAbsolute(ownerRelative))
-      ) {
-        throw new Error(
-          'projected receipt must be outside owner receipts directory.',
-        )
-      }
-      mkdirSync(path.dirname(packagedReceiptPath), { recursive: true })
-      writeFileSync(
-        packagedReceiptPath,
-        `${JSON.stringify({ ...receipt, conformance }, null, 2)}\n`,
-      )
-    }
-    const receiptRelative = path.relative(evidenceRoot, packagedReceiptPath)
-    const receiptDigest = sha256Path(packagedReceiptPath)
-    const id = `${gate}-${cell.cellId.replaceAll('/', '-')}`
-    const reportSummary = `reports/${id}.json`
-    const browser = cell.dimensions.browser
-    const revision =
-      receipt.toolchain?.[
-        browser === 'chromium'
-          ? 'chromiumRevision'
-          : browser === 'firefox'
-            ? 'firefoxRevision'
-            : 'webkitRevision'
-      ] ?? receipt.toolchain?.chromiumRevision
-    const manifest = {
-      ...baseManifest(root, gate, group, receipt.status),
-      artifacts: [
-        {
-          name: `receipt-${cell.cellId}`,
-          path: receiptRelative,
-          sha256: receiptDigest,
-        },
-        {
-          name: `report-${cell.cellId}`,
-          path: reportRelative,
-          sha256: reportDigest,
-        },
-        ...conformanceTraceArtifacts,
-      ],
-      dimensions: {},
-      playwright: {
-        decision: 'run',
-        suiteId: cell.suiteId,
-        cellId: cell.cellId,
-        dimensions: cell.dimensions,
-        registryHash: playwrightRegistryHash,
-        ...(isPr ? { impactPlanDigest: plan.planDigest } : {}),
-        tests: receipt.tests,
-        config: receipt.config,
-        runtime: {
-          browser,
-          browserRevision: revision ?? 'unknown',
-          runtimeMode:
-            receipt.runtime?.mode ?? cell.dimensions.runtimeMode ?? null,
-        },
-        report: { path: reportRelative, sha256: reportDigest },
-        receiptPath: receiptRelative,
-        receiptDigest,
-        ...(conformance ? { conformance } : {}),
-      },
-      reportSummary,
-    }
-    const output = path.resolve(
-      root,
-      option('output', path.join(evidenceRoot, 'manifests', `${id}.json`)),
-    )
-    mkdirSync(path.dirname(output), { recursive: true })
-    writeFileSync(output, `${JSON.stringify(manifest, null, 2)}\n`)
-    const reportPath = path.join(evidenceRoot, reportSummary)
-    mkdirSync(path.dirname(reportPath), { recursive: true })
-    writeFileSync(
-      reportPath,
-      `${JSON.stringify(
-        { gate, status: receipt.status, cellId: cell.cellId },
-        null,
-        2,
-      )}\n`,
-    )
-    emitted.push(id)
-  }
-  for (const suiteId of skippedSuiteIds) {
-    const id = `${gate}-${suiteId}-skip`
-    const reportSummary = `reports/${id}.json`
-    const manifest = {
-      ...baseManifest(root, gate, group, 'success'),
-      artifacts: [],
-      dimensions: {},
-      playwright: {
-        decision: 'skip',
-        suiteId,
-        registryHash: playwrightRegistryHash,
-        impactPlanDigest: plan.planDigest,
-        tests: { total: 0, passed: 0, failed: 0, skipped: 0 },
-      },
-      reportSummary,
-    }
-    const output = path.resolve(
-      root,
-      option('output', path.join(evidenceRoot, 'manifests', `${id}.json`)),
-    )
-    mkdirSync(path.dirname(output), { recursive: true })
-    writeFileSync(output, `${JSON.stringify(manifest, null, 2)}\n`)
-    const reportPath = path.join(evidenceRoot, reportSummary)
-    mkdirSync(path.dirname(reportPath), { recursive: true })
-    writeFileSync(
-      reportPath,
-      `${JSON.stringify({ gate, status: 'success', suiteId, skip: true }, null, 2)}\n`,
-    )
-    emitted.push(id)
-  }
-  console.log(
-    `[ci-readiness] playwright emitted=${emitted.join(',') || 'none'} gate=${gate} group=${group}`,
-  )
-}
-
 if (command === 'plan') {
   const profile = option('group', 'main')
   const required = readinessSpec.profiles[profile]
@@ -383,10 +138,6 @@ if (command === 'plan') {
   if (!gate || !readinessSpec.owners[gate])
     throw new Error(`Unknown leaf gate: ${gate}.`)
   if (!group) throw new Error('--group is required.')
-  if (isPlaywrightGate(gate)) {
-    emitPlaywright(root, gate, group)
-    process.exit(0)
-  }
   const dimensions = pairs(options('dimension'), '--dimension')
   const suffix = Object.values(dimensions).join('-')
   const id = [gate, suffix]
@@ -441,35 +192,15 @@ if (command === 'plan') {
   const commitSha = option('commit', first.commitSha)
   const runId = option('run-id', first.run?.id)
   const runAttempt = option('run-attempt', first.run?.attempt)
-  let evidence
-  if (profile === 'pr-playwright') {
-    const planPath = option('plan-receipt')
-    if (!planPath)
-      throw new Error('profile pr-playwright requires --plan-receipt.')
-    const plan = JSON.parse(
-      readFileSync(path.resolve(process.cwd(), planPath), 'utf8'),
-    )
-    evidence = validatePlaywrightPrReadiness({
-      manifests,
-      plan,
-      group: group === 'pr' ? group : 'pr',
-      commitSha,
-      runId,
-      runAttempt,
-      root,
-    })
-  } else {
-    evidence = validateReadiness({
-      manifests,
-      profile,
-      group,
-      commitSha,
-      runId,
-      runAttempt,
-      root,
-      playwrightGroup: option('playwright-group', profile),
-    })
-  }
+  const evidence = validateReadiness({
+    manifests,
+    profile,
+    group,
+    commitSha,
+    runId,
+    runAttempt,
+    root,
+  })
   if (evidence.profile === 'release') {
     evidence.releaseIdentity = verifyReleaseIdentity({
       repoRoot: process.cwd(),

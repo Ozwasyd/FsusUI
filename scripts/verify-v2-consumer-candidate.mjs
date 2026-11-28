@@ -115,9 +115,18 @@ import vue from '@vitejs/plugin-vue'
 
 export default defineConfig({
   plugins: [vue()],
+  worker: {
+    format: 'es',
+  },
   build: {
     target: 'es2022',
     minify: true,
+    rollupOptions: {
+      input: {
+        main: 'index.html',
+        markdown: 'markdown.html',
+      },
+    },
   },
 })
 `,
@@ -129,6 +138,16 @@ export default defineConfig({
 <html>
   <head><meta charset="UTF-8" /></head>
   <body><div id="app"></div><script type="module" src="/src/main.ts"></script></body>
+</html>
+`,
+  )
+
+  writeFileSync(
+    path.join(tempRoot, 'markdown.html'),
+    `<!doctype html>
+<html>
+  <head><meta charset="UTF-8" /></head>
+  <body><div id="md-app"></div><script type="module" src="/src/markdown.ts"></script></body>
 </html>
 `,
   )
@@ -185,10 +204,37 @@ app.mount('#app')
   )
 
   writeFileSync(
+    path.join(tempRoot, 'src/markdown.ts'),
+    `import { createApp, h } from 'vue'
+import { FsusMarkdownRenderer } from '@ozwasyd/fsusui/markdown'
+import {
+  ensureWasmReady,
+  initMarkdownRuntime,
+  renderMarkdownResultWithRuntime,
+} from '@ozwasyd/fsusui/wasm'
+import '@ozwasyd/fsusui/styles/markdown.css'
+
+export async function runWasmSmoke() {
+  const coreReady = await ensureWasmReady()
+  const mdReady = await initMarkdownRuntime()
+  const rendered = await renderMarkdownResultWithRuntime('# Preview baseline')
+  return { coreReady, mdReady, rendered }
+}
+
+const app = createApp({
+  render: () => h(FsusMarkdownRenderer, { content: '# Hello consumer' }),
+})
+app.mount('#md-app')
+`,
+  )
+
+  writeFileSync(
     path.join(tempRoot, 'verify-runtime.mjs'),
     `import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
+import { createSSRApp, h } from 'vue'
+import { renderToString } from 'vue/server-renderer'
 
 const pkgPath = fileURLToPath(import.meta.resolve('@ozwasyd/fsusui/package.json'))
 const pkg = JSON.parse(readFileSync(pkgPath, 'utf8'))
@@ -225,11 +271,53 @@ for (const subpath of [
   assert.ok(Object.keys(mod).length > 0, \`Empty subpath export: \${subpath}\`)
 }
 
+// #1143: Verify packed WASM loaders initialize and render Markdown in Node
+const wasmMod = await import('@ozwasyd/fsusui/wasm')
+const coreReady = await wasmMod.ensureWasmReady()
+assert.equal(coreReady.ok, true, \`ensureWasmReady failed: \${JSON.stringify(coreReady)}\`)
+const mdReady = await wasmMod.initMarkdownRuntime()
+assert.equal(mdReady.ok, true, \`initMarkdownRuntime failed: \${JSON.stringify(mdReady)}\`)
+const mdRender = await wasmMod.renderMarkdownResultWithRuntime('# Preview baseline')
+assert.equal(mdRender.ok, true, \`renderMarkdownResultWithRuntime failed: \${JSON.stringify(mdRender)}\`)
+assert.ok(
+  mdRender.value.html.includes('Preview baseline') && mdRender.value.html.includes('<h1'),
+  \`Unexpected Markdown HTML: \${mdRender.value.html}\`,
+)
+
+// #1144: Verify closed FsusSelect / FsusCascader / FsusDropdown render cleanly in Vue SSR
+const ssrHtml = await renderToString(
+  createSSRApp({
+    render: () =>
+      h('div', [
+        h(main.FsusSelect, {
+          modelValue: 'a',
+          options: [{ value: 'a', label: 'Alpha' }],
+        }),
+        h(main.FsusCascader, {
+          modelValue: [],
+          options: [{ value: 'a', label: 'Alpha' }],
+        }),
+        h(main.FsusDropdown, {}, {
+          default: () => h('button', 'Menu'),
+          dropdown: () => h('div', 'Item'),
+        }),
+      ]),
+  }),
+)
+assert.ok(ssrHtml.includes('role="combobox"'), 'Closed FsusSelect SSR missing combobox')
+assert.ok(ssrHtml.includes('Alpha'), 'Closed FsusSelect SSR missing selected label')
+
+// #1148: Verify canonical FsusMarkdownRenderer policy
+const rpMod = await import('@ozwasyd/fsusui/render-pipeline')
+const mdPolicy = rpMod.createFsusRenderPipelineComponentPolicy('FsusMarkdownRenderer')
+assert.equal(mdPolicy.role, 'chunk-adapter')
+assert.equal(mdPolicy.adapterId, 'markdown-renderer')
+
 const cssPath = fileURLToPath(import.meta.resolve('@ozwasyd/fsusui/styles/fsus.css'))
 const css = readFileSync(cssPath, 'utf8')
 assert.ok(css.includes('--fsus-'), 'fsus.css must expose canonical --fsus-* tokens')
 assert.ok(!css.includes('--el-'), 'fsus.css must contain zero --el-* variables')
-console.log('[v2-consumer] runtime ESM + CSS contract passed')
+console.log('[v2-consumer] runtime ESM + WASM + SSR + policy + CSS contract passed')
 `,
   )
 
@@ -237,13 +325,36 @@ console.log('[v2-consumer] runtime ESM + CSS contract passed')
   run('npm', ['install', '--no-audit', '--no-fund', '--prefer-offline'])
   run('node', ['verify-runtime.mjs'])
   run('npm', ['run', 'typecheck'])
-  run('npm', ['run', 'build'])
+  const viteBuildOutput = execFileSync('npm', ['run', 'build'], {
+    cwd: tempRoot,
+    encoding: 'utf8',
+    env: { ...process.env, CI: 'true' },
+  })
+  process.stdout.write(viteBuildOutput)
+  assert.ok(
+    !viteBuildOutput.includes("doesn't exist at build time"),
+    `Vite build emitted unresolved URL warnings:\n${viteBuildOutput}`,
+  )
 
-  // Ensure Vite output chunk has zero heavy markdown vendor leaks
+  // Ensure Vite output emitted all WASM & worker assets while keeping main entry free of heavy markdown vendors
   const assetsDir = path.join(tempRoot, 'dist/assets')
-  const jsFiles = readdirSync(assetsDir).filter((f) => f.endsWith('.js'))
-  assert.ok(jsFiles.length > 0, 'Vite build produced no JS bundles')
-  for (const file of jsFiles) {
+  const allAssets = readdirSync(assetsDir)
+  for (const expectedPrefix of [
+    'ep_wasm',
+    'markdown_basic',
+    'markdown_simd',
+    'markdown-renderer.worker',
+    'markdown-parser.worker',
+  ]) {
+    assert.ok(
+      allAssets.some((file) => file.startsWith(expectedPrefix)),
+      `Vite build missing expected emitted runtime asset starting with "${expectedPrefix}" in ${allAssets.join(', ')}`,
+    )
+  }
+  const mainHtml = readFileSync(path.join(tempRoot, 'dist/index.html'), 'utf8')
+  const mainJsMatches = [...mainHtml.matchAll(/assets\/([^"']+\.js)/g)].map((m) => m[1])
+  assert.ok(mainJsMatches.length > 0, 'Vite build produced no main entry JS bundles')
+  for (const file of mainJsMatches) {
     const content = readFileSync(path.join(assetsDir, file), 'utf8')
     assert.ok(
       !/\b(katex|mermaid|shiki)\b/.test(content),
@@ -252,7 +363,7 @@ console.log('[v2-consumer] runtime ESM + CSS contract passed')
   }
 
   console.log(
-    `[v2-consumer] PASSED: npm install, 11 ESM subpaths, CSS boundary, tsc --noEmit, and Vite build (${jsFiles.length} chunk(s), 0 heavy leaks)`,
+    `[v2-consumer] PASSED: npm install, 11 ESM subpaths, live WASM+Markdown init/render, closed Select SSR, policy, CSS boundary, tsc --noEmit, and Vite build (${allAssets.length} asset(s), 0 unresolved URL warnings, 0 heavy leaks)`,
   )
 } finally {
   rmSync(tempRoot, { recursive: true, force: true })

@@ -91,6 +91,7 @@ import {
   resolveMarkdownSourceIdentity,
   renderMarkdownChunksWithRuntime,
   renderMarkdownResultWithRuntime,
+  resolveMarkdownAsset,
 } from '@fsusui/wasm'
 import { activateMarkdownHeavyFeatures } from '@fsusui/wasm/markdown-heavy-feature-activation'
 import { MARKDOWN_FEATURE_OUTPUT_GATEWAY_VERSION } from '@fsusui/wasm/markdown-feature-output-gateway-version'
@@ -771,13 +772,25 @@ const canUseMarkdownWorker = () =>
 
 const createMarkdownRendererWorker = () => {
   const moduleUrl = new URL('./markdown-renderer.worker.ts', import.meta.url)
+  const parserModuleUrl = new URL('./markdown-parser.worker.ts', import.meta.url)
   const trustedModuleUrl = resolveMarkdownWorkerScriptUrl(
     moduleUrl,
     props.trustedScriptUrlFactory,
   )
-  return new Worker(trustedModuleUrl as string | URL, {
+  const worker = new Worker(trustedModuleUrl as string | URL, {
     type: 'module',
   })
+  if (typeof worker.postMessage === 'function') {
+    worker.postMessage({
+      type: 'configure',
+      parserWorkerUrl: parserModuleUrl.href,
+      markdownAssets: {
+        basic: resolveMarkdownAsset('basic'),
+        simd: resolveMarkdownAsset('simd'),
+      },
+    })
+  }
+  return worker
 }
 
 const markdownRenderPipelineAdapter: FsusRenderPipelineAdapter<

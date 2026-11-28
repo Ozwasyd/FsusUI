@@ -90,17 +90,13 @@ const workflowJob = (content, name) => {
   return match?.[1] ?? ''
 }
 
-const validateTopLevelGroups = (qualityWorkflow, spec, label) => {
-  for (const group of Object.keys(spec.groups)) {
-    if (group === 'pr-fast') continue
-    const job = workflowJob(qualityWorkflow, group)
-    if (!job) throw new Error(`${label} missing ${group} group job`)
-    assertIncludes(job, 'uses: ./.github/workflows/_quality.yml', label)
-    assertIncludes(job, `group: ${group}`, label)
-  }
-  assertIncludes(qualityWorkflow, "inputs.group == 'main'", label)
-  assertIncludes(qualityWorkflow, "inputs.group == 'nightly'", label)
-  assertIncludes(qualityWorkflow, "inputs.group == 'release'", label)
+const validateTopLevelGroups = (qualityWorkflow, _spec, label) => {
+  const job = workflowJob(qualityWorkflow, 'quality')
+  if (!job) throw new Error(`${label} missing quality job`)
+  assertIncludes(job, 'uses: ./.github/workflows/_quality.yml', label)
+  assertIncludes(qualityWorkflow, '- main', label)
+  assertIncludes(qualityWorkflow, '- nightly', label)
+  assertIncludes(qualityWorkflow, '- release', label)
 }
 
 const validateWorkflow = (qualityWorkflow, reusableWorkflow, spec, label) => {

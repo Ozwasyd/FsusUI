@@ -1,129 +1,85 @@
 # Server-side rendering (SSR)
 
-FsusUI SSR integrations must preserve the server/client identities and
-Teleport targets used during hydration.
+FsusUI 2.0 is pure ESM and supports Vue 3.5+ server-side rendering (`vue/server-renderer`), deterministic hydration, and strict Content Security Policy (`style-src-attr 'none'`).
 
 ## Markdown first-paint result
 
-`ElMarkdownRenderer` accepts only the runtime-produced
-`MarkdownSafeRenderResult` for its server-rendered first paint:
+`FsusMarkdownRenderer` (from `@ozwasyd/fsusui/markdown`) accepts only a runtime-produced `MarkdownSafeRenderResult` for server-rendered first paint:
 
 ```vue
-<el-markdown-renderer :content="content" :initial-render="serverRender" />
-```
+<script setup lang="ts">
+import { FsusMarkdownRenderer } from '@ozwasyd/fsusui/markdown'
+import type { MarkdownSafeRenderResult } from '@ozwasyd/fsusui/wasm'
 
-The client verifies the runtime authority, `rendererVersion`, normalized source,
-and `sourceIdentity`. A mismatch is discarded rather than passed to `v-html`;
-the current runtime renders again. The old string-first prop and HTML sanitizing
-switch are not public API.
-
-## Inject the ID sequence
-
-Server and client must share the generated IDs used by accessibility attributes;
-provide `ID_INJECTION_KEY` at the application root:
-
-```ts
-// main.ts
-import { createApp } from 'vue'
-import { ID_INJECTION_KEY } from '@ozwasyd/element-plus'
-import App from './App.vue'
-
-const app = createApp(App)
-app.provide(ID_INJECTION_KEY, {
-  prefix: 1024,
-  current: 0,
-})
-```
-
-## Inject the z-index sequence
-
-The auto-incrementing `z-index` also needs a shared initial value:
-
-```ts
-// main.ts
-import { createApp } from 'vue'
-import { ZINDEX_INJECTION_KEY } from '@ozwasyd/element-plus'
-import App from './App.vue'
-
-const app = createApp(App)
-app.provide(ZINDEX_INJECTION_KEY, { current: 0 })
-```
-
-## Handle Teleport
-
-`ElDialog`, `ElDrawer`, `ElTooltip`, `ElDropdown`, `ElSelect`, and `ElDatePicker`
-use Vue [Teleport](https://vuejs.org/guide/scaling-up/ssr.html#teleports). Use
-one of these approaches:
-
-### 1. Render after client mount
-
-```vue
-<script setup>
-import { ref, onMounted } from 'vue'
-
-const isClient = ref(false)
-onMounted(() => { isClient.value = true })
+defineProps<{
+  content: string
+  serverRender: MarkdownSafeRenderResult
+}>()
 </script>
 
 <template>
-  <el-tooltip v-if="isClient" content="提示内容">
-    <el-button>按钮</el-button>
-  </el-tooltip>
+  <FsusMarkdownRenderer :content="content" :initial-render="serverRender" />
 </template>
 ```
 
-### 2. Add Teleport markers to the HTML template
+The client verifies runtime authority, `rendererVersion`, normalized source, and `sourceIdentity`. Any mismatch is discarded rather than passed to `v-html`, and the client runtime re-renders safely.
 
-Place the marker near `<body>`:
+## Deterministic IDs and z-index during hydration
+
+FsusUI 2.0 generates hydration-safe component IDs using Vue 3.5's native `useId()` inside `useFsusId()`, and scopes theme/locale/z-index context through `FsusConfigProvider`:
+
+```vue
+<script setup lang="ts">
+import { FsusConfigProvider } from '@ozwasyd/fsusui'
+import { zhCN } from '@ozwasyd/fsusui/locale'
+</script>
+
+<template>
+  <FsusConfigProvider :locale="zhCN" theme-mode="light" :z-index="2000">
+    <slot />
+  </FsusConfigProvider>
+</template>
+```
+
+Because `useFsusId()` delegates to Vue's built-in `useId()`, server and client automatically produce matching `id`, `for`, `aria-controls`, and `aria-labelledby` attributes without manually providing legacy Element Plus injection keys.
+
+## Handling Teleport in SSR
+
+Overlay and popper components (`FsusDialog`, `FsusDrawer`, `FsusTooltip`, `FsusPopover`, `FsusDropdown`, `FsusSelect`, `FsusCascader`, `FsusImageViewer`) render floating content via Vue [Teleport](https://vuejs.org/guide/scaling-up/ssr.html#teleports) to `body` only when open (closed controls omit the teleported overlay during SSR).
+
+### 1. Keep overlays closed on initial SSR (default)
+
+Closed `FsusSelect`, `FsusCascader`, `FsusDropdown`, `FsusDialog`, and `FsusDrawer` components render cleanly during `renderToString` without emitting empty Teleports or requiring client-only wrappers.
+
+### 2. Extract Teleports when an overlay starts open during SSR
+
+Add a placeholder near `<body>` in your HTML shell:
 
 ```html
-<!-- index.html -->
 <!DOCTYPE html>
 <html lang="zh-CN">
   <head><title>FsusUI App</title></head>
   <body>
     <!--app-teleports-->
     <div id="app"><!--app-html--></div>
-    <script type="module" src="/src/entry-client.js"></script>
+    <script type="module" src="/src/entry-client.ts"></script>
   </body>
 </html>
 ```
 
-Extract matching Teleports in `entry-server.js`:
+Collect `ctx.teleports.body` during `renderToString`:
 
-```js
-// entry-server.js
+```ts
 import { renderToString } from 'vue/server-renderer'
 import { createApp } from './main'
 
-export async function render(url, manifest) {
+export async function render() {
   const { app } = createApp()
-  const ctx = {}
+  const ctx: { teleports?: Record<string, string> } = {}
   const html = await renderToString(app, ctx)
-  const teleports = renderTeleports(ctx.teleports)
-  return [html, teleports]
-}
-
-function renderTeleports(teleports) {
-  if (!teleports) return ''
-  return Object.entries(teleports).reduce((all, [key, value]) => {
-    if (key.startsWith('#el-popper-container-')) {
-      return `${all}<div id="${key.slice(1)}">${value}</div>`
-    }
-    return all
-  }, teleports.body || '')
+  const teleports = ctx.teleports?.body ?? ''
+  return { html, teleports }
 }
 ```
 
-Insert both rendered regions in `server.js`:
-
-```js
-// server.js
-const [appHtml, teleports] = await render(url, manifest)
-const html = template
-  .replace('<!--app-html-->', appHtml)
-  .replace(/(\n|\r\n)\s*<!--app-teleports-->/, teleports)
-```
-
-If the [namespace](./namespace.md) changes, update the
-`#el-popper-container-` selector prefix as well.
+Or pass `:teleported="false"` on components that support inline rendering when you want the overlay rendered in place without teleporting to `body`.

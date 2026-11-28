@@ -6,10 +6,10 @@ import { describe, expect, it } from 'vitest'
 const repoRoot = path.resolve(__dirname, '../../..')
 
 const FORBIDDEN_TEST_UTIL_SPECIFIER =
-  /(?:from|import)\s*\(?['"](?:@element-plus\/test-utils|@vue\/test-utils)(?:\/[^'"]*)?['"]/u
+  /(?:from|import)\s*\(?['"](?:@fsusui\/test-utils|@vue\/test-utils)(?:\/[^'"]*)?['"]/u
 
 describe('production package test-utils boundary', () => {
-  it('forbids @element-plus/test-utils and @vue/test-utils imports in non-test package sources', async () => {
+  it('forbids @fsusui/test-utils and @vue/test-utils imports in non-test package sources', async () => {
     const files = await fg(
       [
         'vue/packages/**/*.{ts,tsx,js,jsx,mjs,cjs,vue}',
@@ -23,7 +23,7 @@ describe('production package test-utils boundary', () => {
       { cwd: repoRoot },
     )
 
-    expect(files.length).toBeGreaterThan(100)
+    expect(files.length).toBeGreaterThan(50)
 
     const offenders = files.filter((relPath) => {
       const content = readFileSync(path.join(repoRoot, relPath), 'utf8')

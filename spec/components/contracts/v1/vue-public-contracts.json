@@ -5,9 +5,9 @@
   "owner": "FsusUI Core",
   "baseline": {
     "path": "spec/baselines/vue-current.json",
-    "hash": "6a2b5c0a2a05209972e04607f3b5e70f7ced847c7d76376ba2a29e6a1a2f6680",
-    "packageVersion": "2.0.0-preview.1",
-    "tokenHash": "04248d62cadbb317f904c9d95e1495fe19406a11d6a905437f2625158bfc2844",
+    "hash": "0816be8ce17ffd2906e17ced8f0da9c80b3541c2fcd26f265ded50dcad206fa2",
+    "packageVersion": "2.0.0-preview.2",
+    "tokenHash": "ac92c30fb037cb9fd6e84b6c507ea60be5c8b199d5b539d301e1a061408b14f6",
     "iconHash": "bec3e857ccc2a9bea03119d1d841f251dd21befd858577acb36715eb8d0ebf10"
   },
   "changeClassifications": [
@@ -25,7 +25,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "required",
@@ -229,7 +229,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "required",
@@ -341,7 +341,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "required",
@@ -497,7 +497,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "native-adapter",
@@ -767,7 +767,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "native-adapter",
@@ -890,7 +890,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "required",
@@ -992,7 +992,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "required",
@@ -1201,7 +1201,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "required",
@@ -1309,7 +1309,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "native-adapter",
@@ -1525,7 +1525,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "native-adapter",
@@ -1741,7 +1741,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "required",
@@ -1923,7 +1923,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "required",
@@ -2013,7 +2013,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "native-adapter",
@@ -2106,7 +2106,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "required",
@@ -2218,7 +2218,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "native-adapter",
@@ -2386,7 +2386,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "native-adapter",
@@ -2536,7 +2536,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "native-adapter",
@@ -2701,7 +2701,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "native-adapter",
@@ -2866,7 +2866,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "required",
@@ -2953,7 +2953,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "native-adapter",
@@ -3082,7 +3082,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "native-adapter",
@@ -3202,7 +3202,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "native-adapter",
@@ -3331,7 +3331,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "required",
@@ -3487,7 +3487,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "native-adapter",
@@ -3646,7 +3646,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "native-adapter",
@@ -3801,7 +3801,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "required",
@@ -3855,6 +3855,24 @@
         },
         {
           "name": "confirmText",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "copiedLabel",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "copyErrorLabel",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "copyLabel",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
@@ -4149,7 +4167,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "required",
@@ -4203,6 +4221,24 @@
         },
         {
           "name": "confirmText",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "copiedLabel",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "copyErrorLabel",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "copyLabel",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
@@ -4502,7 +4538,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "native-adapter",
@@ -4617,7 +4653,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "required",
@@ -4719,7 +4755,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "required",
@@ -4875,7 +4911,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "required",
@@ -4929,6 +4965,24 @@
         },
         {
           "name": "confirmText",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "copiedLabel",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "copyErrorLabel",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "copyLabel",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
@@ -5223,7 +5277,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "required",
@@ -5277,6 +5331,24 @@
         },
         {
           "name": "confirmText",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "copiedLabel",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "copyErrorLabel",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "copyLabel",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
@@ -5571,7 +5643,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "required",
@@ -5625,6 +5697,24 @@
         },
         {
           "name": "confirmText",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "copiedLabel",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "copyErrorLabel",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "copyLabel",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
@@ -5918,7 +6008,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "required",
@@ -5972,6 +6062,24 @@
         },
         {
           "name": "confirmText",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "copiedLabel",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "copyErrorLabel",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "copyLabel",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
@@ -6211,7 +6319,16 @@
           "required": false
         }
       ],
-      "events": [],
+      "events": [
+        {
+          "name": "copy",
+          "payload": "vue-source"
+        },
+        {
+          "name": "copyError",
+          "payload": "vue-source"
+        }
+      ],
       "contentRegions": [],
       "exposed": [],
       "defaults": {
@@ -6260,7 +6377,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "required",
@@ -6463,7 +6580,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "required",
@@ -6517,6 +6634,24 @@
         },
         {
           "name": "confirmText",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "copiedLabel",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "copyErrorLabel",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "copyLabel",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
@@ -6811,7 +6946,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "required",
@@ -6865,6 +7000,24 @@
         },
         {
           "name": "confirmText",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "copiedLabel",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "copyErrorLabel",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "copyLabel",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
@@ -7159,7 +7312,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "native-adapter",
@@ -7306,7 +7459,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "required",
@@ -7520,7 +7673,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "required",
@@ -7729,7 +7882,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "required",
@@ -7783,6 +7936,24 @@
         },
         {
           "name": "confirmText",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "copiedLabel",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "copyErrorLabel",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "copyLabel",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
@@ -8082,7 +8253,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "required",
@@ -8136,6 +8307,24 @@
         },
         {
           "name": "confirmText",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "copiedLabel",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "copyErrorLabel",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "copyLabel",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
@@ -8424,7 +8613,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "required",
@@ -8478,6 +8667,24 @@
         },
         {
           "name": "confirmText",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "copiedLabel",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "copyErrorLabel",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "copyLabel",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
@@ -8772,7 +8979,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "platform-override",
@@ -8939,7 +9146,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "required",
@@ -8993,6 +9200,24 @@
         },
         {
           "name": "confirmText",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "copiedLabel",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "copyErrorLabel",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "copyLabel",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
@@ -9281,7 +9506,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "required",
@@ -9335,6 +9560,24 @@
         },
         {
           "name": "confirmText",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "copiedLabel",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "copyErrorLabel",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "copyLabel",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
@@ -9629,7 +9872,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "required",
@@ -9725,7 +9968,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "platform-override",
@@ -9886,7 +10129,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "native-adapter",
@@ -10029,7 +10272,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "native-adapter",
@@ -10154,7 +10397,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "native-adapter",
@@ -10274,7 +10517,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "required",
@@ -10328,6 +10571,24 @@
         },
         {
           "name": "confirmText",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "copiedLabel",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "copyErrorLabel",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "copyLabel",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
@@ -10622,7 +10883,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "required",
@@ -10738,7 +10999,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "required",
@@ -10792,6 +11053,24 @@
         },
         {
           "name": "confirmText",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "copiedLabel",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "copyErrorLabel",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "copyLabel",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
@@ -11086,7 +11365,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "required",
@@ -11242,7 +11521,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "native-adapter",
@@ -11374,7 +11653,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "native-adapter",
@@ -11517,7 +11796,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "required",
@@ -11571,6 +11850,24 @@
         },
         {
           "name": "confirmText",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "copiedLabel",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "copyErrorLabel",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "copyLabel",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
@@ -11859,7 +12156,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "required",
@@ -12015,7 +12312,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "required",
@@ -12141,7 +12438,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "native-adapter",
@@ -12282,7 +12579,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "native-adapter",
@@ -12417,7 +12714,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "required",
@@ -12471,6 +12768,24 @@
         },
         {
           "name": "confirmText",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "copiedLabel",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "copyErrorLabel",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "copyLabel",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
@@ -12765,7 +13080,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "required",
@@ -12819,6 +13134,24 @@
         },
         {
           "name": "confirmText",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "copiedLabel",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "copyErrorLabel",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "copyLabel",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
@@ -13113,7 +13446,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "native-adapter",
@@ -13250,7 +13583,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "required",
@@ -13304,6 +13637,24 @@
         },
         {
           "name": "confirmText",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "copiedLabel",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "copyErrorLabel",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "copyLabel",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
@@ -13598,7 +13949,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "native-adapter",
@@ -13821,7 +14172,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "native-adapter",
@@ -13956,7 +14307,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "required",
@@ -14010,6 +14361,24 @@
         },
         {
           "name": "confirmText",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "copiedLabel",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "copyErrorLabel",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "copyLabel",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
@@ -14304,7 +14673,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "required",
@@ -14358,6 +14727,24 @@
         },
         {
           "name": "confirmText",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "copiedLabel",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "copyErrorLabel",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "copyLabel",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
@@ -14652,7 +15039,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "required",
@@ -14706,6 +15093,24 @@
         },
         {
           "name": "confirmText",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "copiedLabel",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "copyErrorLabel",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "copyLabel",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
@@ -15000,7 +15405,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "required",
@@ -15119,7 +15524,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "platform-override",
@@ -15203,7 +15608,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "native-adapter",
@@ -15286,7 +15691,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "required",
@@ -15442,7 +15847,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "native-adapter",
@@ -15892,7 +16297,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "native-adapter",
@@ -16064,7 +16469,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "native-adapter",
@@ -16294,7 +16699,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "native-adapter",
@@ -16515,7 +16920,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "native-adapter",
@@ -16736,7 +17141,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "required",
@@ -16790,6 +17195,24 @@
         },
         {
           "name": "confirmText",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "copiedLabel",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "copyErrorLabel",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "copyLabel",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
@@ -17084,7 +17507,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "required",
@@ -17138,6 +17561,24 @@
         },
         {
           "name": "confirmText",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "copiedLabel",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "copyErrorLabel",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "copyLabel",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
@@ -17432,7 +17873,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "required",
@@ -17486,6 +17927,24 @@
         },
         {
           "name": "confirmText",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "copiedLabel",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "copyErrorLabel",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "copyLabel",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
@@ -17780,7 +18239,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "required",
@@ -17834,6 +18293,24 @@
         },
         {
           "name": "confirmText",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "copiedLabel",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "copyErrorLabel",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "copyLabel",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
@@ -18128,7 +18605,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "required",
@@ -18182,6 +18659,24 @@
         },
         {
           "name": "confirmText",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "copiedLabel",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "copyErrorLabel",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "copyLabel",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
@@ -18470,7 +18965,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "required",
@@ -18524,6 +19019,24 @@
         },
         {
           "name": "confirmText",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "copiedLabel",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "copyErrorLabel",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "copyLabel",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
@@ -18818,7 +19331,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "native-adapter",
@@ -18901,7 +19414,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "native-adapter",
@@ -19099,7 +19612,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "native-adapter",
@@ -19297,7 +19810,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "native-adapter",
@@ -19543,7 +20056,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "native-adapter",
@@ -19690,7 +20203,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "required",
@@ -19744,6 +20257,24 @@
         },
         {
           "name": "confirmText",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "copiedLabel",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "copyErrorLabel",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "copyLabel",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
@@ -20041,7 +20572,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "native-adapter",
@@ -20124,7 +20655,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "native-adapter",
@@ -20207,7 +20738,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "platform-override",
@@ -20336,7 +20867,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "platform-override",
@@ -20500,7 +21031,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "required",
@@ -20620,7 +21151,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "required",
@@ -20674,6 +21205,24 @@
         },
         {
           "name": "confirmText",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "copiedLabel",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "copyErrorLabel",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "copyLabel",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
@@ -20997,7 +21546,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "native-adapter",
@@ -21114,7 +21663,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "native-adapter",
@@ -21222,7 +21771,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "native-adapter",
@@ -21339,7 +21888,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "native-adapter",
@@ -21450,7 +21999,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "required",
@@ -21504,6 +22053,24 @@
         },
         {
           "name": "confirmText",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "copiedLabel",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "copyErrorLabel",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "copyLabel",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
@@ -21798,7 +22365,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "required",
@@ -21852,6 +22419,24 @@
         },
         {
           "name": "confirmText",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "copiedLabel",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "copyErrorLabel",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "copyLabel",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
@@ -22146,7 +22731,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "required",
@@ -22200,6 +22785,24 @@
         },
         {
           "name": "confirmText",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "copiedLabel",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "copyErrorLabel",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "copyLabel",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
@@ -22499,7 +23102,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "required",
@@ -22553,6 +23156,24 @@
         },
         {
           "name": "confirmText",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "copiedLabel",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "copyErrorLabel",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "copyLabel",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
@@ -22847,7 +23468,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "required",
@@ -22952,7 +23573,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "required",
@@ -23006,6 +23627,24 @@
         },
         {
           "name": "confirmText",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "copiedLabel",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "copyErrorLabel",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "copyLabel",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
@@ -23300,7 +23939,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "required",
@@ -23456,7 +24095,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "native-adapter",
@@ -23584,7 +24223,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "required",
@@ -23638,6 +24277,24 @@
         },
         {
           "name": "confirmText",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "copiedLabel",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "copyErrorLabel",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "copyLabel",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
@@ -23932,7 +24589,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "required",
@@ -23986,6 +24643,24 @@
         },
         {
           "name": "confirmText",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "copiedLabel",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "copyErrorLabel",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "copyLabel",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
@@ -24280,7 +24955,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "required",
@@ -24334,6 +25009,24 @@
         },
         {
           "name": "confirmText",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "copiedLabel",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "copyErrorLabel",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "copyLabel",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
@@ -24631,7 +25324,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "native-adapter",
@@ -24854,7 +25547,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "required",
@@ -24908,6 +25601,24 @@
         },
         {
           "name": "confirmText",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "copiedLabel",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "copyErrorLabel",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "copyLabel",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
@@ -25202,7 +25913,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "required",
@@ -25256,6 +25967,24 @@
         },
         {
           "name": "confirmText",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "copiedLabel",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "copyErrorLabel",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "copyLabel",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
@@ -25560,7 +26289,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "required",
@@ -25673,7 +26402,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "required",
@@ -25775,7 +26504,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "native-adapter",
@@ -25922,7 +26651,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "required",
@@ -26030,7 +26759,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "required",
@@ -26084,6 +26813,24 @@
         },
         {
           "name": "confirmText",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "copiedLabel",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "copyErrorLabel",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "copyLabel",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
@@ -26388,7 +27135,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "required",
@@ -26592,7 +27339,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "required",
@@ -26646,6 +27393,24 @@
         },
         {
           "name": "confirmText",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "copiedLabel",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "copyErrorLabel",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "copyLabel",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
@@ -26940,7 +27705,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "native-adapter",
@@ -27161,7 +27926,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "native-adapter",
@@ -27377,7 +28142,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "native-adapter",
@@ -27598,7 +28363,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "native-adapter",
@@ -27715,7 +28480,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "native-adapter",
@@ -27931,7 +28696,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "native-adapter",
@@ -28244,7 +29009,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "native-adapter",
@@ -28508,7 +29273,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "native-adapter",
@@ -28745,7 +29510,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "required",
@@ -28862,7 +29627,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "required",
@@ -28970,7 +29735,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "native-adapter",
@@ -29053,7 +29818,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "platform-override",
@@ -29188,7 +29953,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "required",
@@ -29242,6 +30007,24 @@
         },
         {
           "name": "confirmText",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "copiedLabel",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "copyErrorLabel",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "copyLabel",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
@@ -29536,7 +30319,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "native-adapter",
@@ -29647,7 +30430,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "native-adapter",
@@ -29766,7 +30549,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "required",
@@ -29970,7 +30753,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "required",
@@ -30174,7 +30957,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "platform-override",
@@ -30316,7 +31099,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "native-adapter",
@@ -30415,7 +31198,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "native-adapter",
@@ -30644,7 +31427,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "native-adapter",
@@ -30839,7 +31622,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "required",
@@ -30893,6 +31676,24 @@
         },
         {
           "name": "confirmText",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "copiedLabel",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "copyErrorLabel",
+          "type": "vue-source",
+          "default": "vue-baseline",
+          "required": false
+        },
+        {
+          "name": "copyLabel",
           "type": "vue-source",
           "default": "vue-baseline",
           "required": false
@@ -31186,7 +31987,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "native-adapter",
@@ -31410,7 +32211,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "native-adapter",
@@ -31521,7 +32322,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "required",
@@ -31725,7 +32526,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "native-adapter",
@@ -31790,7 +32591,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "platform-override",
@@ -31855,7 +32656,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "platform-override",
@@ -31920,7 +32721,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "platform-override",
@@ -31985,7 +32786,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "platform-override",
@@ -32050,7 +32851,7 @@
       "supportedPlatforms": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus"
+          "package": "@ozwasyd/fsusui"
         },
         "avalonia": {
           "status": "platform-override",
