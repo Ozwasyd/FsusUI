@@ -27,6 +27,7 @@ const SUITE_SPECS = {
   overlays: '02-overlays-and-image-viewer.spec.ts',
   ssr: '03-ssr-hydration-and-csp.spec.ts',
   markdown: '04-wasm-and-markdown-worker.spec.ts',
+  isolation: '05-app-isolation-and-message.spec.ts',
 }
 
 const currentDir = path.dirname(fileURLToPath(import.meta.url))

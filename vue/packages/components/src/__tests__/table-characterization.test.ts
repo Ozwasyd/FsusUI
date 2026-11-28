@@ -21,7 +21,7 @@ describe('FsusTable characterization baseline (#1153)', () => {
         default: () => [
           h(
             FsusTableColumn,
-            { prop: 'name', label: 'Name', fixed: '', width: 120, sortable: '' },
+            { prop: 'name', label: 'Name', fixed: '' as any, width: 120, sortable: '' as any },
             {
               default: ({ row, index }: any) => [
                 h('strong', { class: 'slot-name' }, `${index}:${row.name}`),
