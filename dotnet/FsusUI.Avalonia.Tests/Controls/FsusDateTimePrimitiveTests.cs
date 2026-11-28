@@ -192,10 +192,10 @@ public class FsusDateTimePrimitiveTests
       "platform-overrides",
       "avalonia.yaml"));
     Assert.Contains("avalonia-date-time-native-picker-001", overrides);
-    Assert.Contains("component.el-date-picker", overrides);
-    Assert.Contains("component.el-time-picker", overrides);
-    Assert.Contains("component.el-time-select", overrides);
-    Assert.Contains("component.el-calendar", overrides);
+    Assert.Contains("component.fsus-date-picker", overrides);
+    Assert.Contains("component.fsus-time-picker", overrides);
+    Assert.Contains("component.fsus-time-select", overrides);
+    Assert.Contains("component.fsus-calendar", overrides);
 
     var releaseEvidence = File.ReadAllText(Path.Combine(
       RepositoryRoot(),
