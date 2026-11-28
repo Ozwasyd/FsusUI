@@ -25,6 +25,8 @@ export interface FsusMessageBoxOutcome {
   value?: string
 }
 
+let messageBoxSeed = 0
+
 const openMessageBox = (
   options: FsusMessageBoxOptions,
 ): Promise<FsusResult<FsusMessageBoxOutcome>> => {
@@ -36,6 +38,10 @@ const openMessageBox = (
     const container = document.createElement('div')
     document.body.appendChild(container)
     const mode = options.mode ?? 'alert'
+    const boxId = ++messageBoxSeed
+    const titleId = `fsus-message-box-title-${boxId}`
+    const descId = `fsus-message-box-desc-${boxId}`
+    const fallbackLabel = mode === 'confirm' ? 'Confirm' : mode === 'prompt' ? 'Input' : 'Notice'
 
     const cleanup = () => {
       render(null, container)
@@ -69,15 +75,19 @@ const openMessageBox = (
                   class: 'fsus-dialog fsus-message-box',
                   role: 'alertdialog',
                   'aria-modal': 'true',
+                  'aria-labelledby': options.title ? titleId : undefined,
+                  'aria-label': options.title ? undefined : fallbackLabel,
+                  'aria-describedby': options.message ? descId : undefined,
+                  tabindex: '-1',
                 },
                 [
                   options.title
                     ? h('header', { class: 'fsus-dialog__header' }, [
-                        h('h2', { class: 'fsus-dialog__title' }, options.title),
+                        h('h2', { id: titleId, class: 'fsus-dialog__title' }, options.title),
                       ])
                     : null,
                   h('div', { class: 'fsus-dialog__body' }, [
-                    h('p', { class: 'fsus-message-box__message' }, options.message),
+                    h('p', { id: descId, class: 'fsus-message-box__message' }, options.message),
                     mode === 'prompt'
                       ? h('input', {
                           class: 'fsus-input__native fsus-message-box__input',

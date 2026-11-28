@@ -7,6 +7,7 @@ import { FSUS_FORM_ITEM_KEY } from '../form/context'
 defineOptions({ name: 'FsusInput', inheritAttrs: false })
 
 export interface FsusInputProps {
+  id?: string
   type?: 'text' | 'password' | 'textarea' | 'email' | 'search' | 'url' | 'tel' | 'number'
   size?: FsusSize
   placeholder?: string
@@ -24,6 +25,7 @@ export interface FsusInputProps {
 }
 
 const {
+  id,
   type = 'text',
   size,
   placeholder,
@@ -59,7 +61,7 @@ const resolvedSize = useFsusSize(
 const isDisabled = computed(() => disabled || Boolean(formItem?.value.disabled))
 const isInvalid = computed(() => invalid || Boolean(formItem?.value.invalid))
 
-const nativeId = computed(() => (attrs.id as string | undefined) ?? formItem?.value.id)
+const nativeId = computed(() => id ?? (attrs.id as string | undefined) ?? formItem?.value.id)
 const mergedDescribedBy = computed(() => {
   const parts: string[] = []
   const explicit = attrs['aria-describedby']

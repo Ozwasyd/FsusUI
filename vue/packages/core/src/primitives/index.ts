@@ -148,17 +148,68 @@ export const useClickOutside = (
   onBeforeUnmount(() => document.removeEventListener('pointerdown', listener, true))
 }
 
+interface EscapeStackEntry {
+  readonly handler: (event: KeyboardEvent) => void
+}
+
+const escapeStack: EscapeStackEntry[] = []
+const consumedEscapeEvents = new WeakSet<KeyboardEvent>()
+let escapeListenerAttached = false
+
+const dispatchTopEscape = (event: KeyboardEvent) => {
+  if (
+    event.key !== FSUS_KEY.ESCAPE ||
+    event.defaultPrevented ||
+    consumedEscapeEvents.has(event) ||
+    escapeStack.length === 0
+  ) {
+    return
+  }
+  const top = escapeStack[escapeStack.length - 1]
+  if (!top) return
+  consumedEscapeEvents.add(event)
+  top.handler(event)
+}
+
+const syncEscapeDocumentListener = () => {
+  if (!isClient) return
+  if (escapeStack.length > 0 && !escapeListenerAttached) {
+    document.addEventListener('keydown', dispatchTopEscape)
+    escapeListenerAttached = true
+  } else if (escapeStack.length === 0 && escapeListenerAttached) {
+    document.removeEventListener('keydown', dispatchTopEscape)
+    escapeListenerAttached = false
+  }
+}
+
 export const useEscapeKeydown = (
   handler: (event: KeyboardEvent) => void,
   enabled: MaybeRef<boolean> = true,
 ) => {
   if (!isClient) return
-  const listener = (event: KeyboardEvent) => {
-    if (!unref(enabled) || event.key !== FSUS_KEY.ESCAPE) return
-    handler(event)
+  const entry: EscapeStackEntry = { handler }
+  const activate = () => {
+    const existing = escapeStack.indexOf(entry)
+    if (existing !== -1) escapeStack.splice(existing, 1)
+    escapeStack.push(entry)
+    syncEscapeDocumentListener()
   }
-  onMounted(() => document.addEventListener('keydown', listener))
-  onBeforeUnmount(() => document.removeEventListener('keydown', listener))
+  const deactivate = () => {
+    const idx = escapeStack.indexOf(entry)
+    if (idx !== -1) {
+      escapeStack.splice(idx, 1)
+      syncEscapeDocumentListener()
+    }
+  }
+  watch(
+    () => Boolean(unref(enabled)),
+    (isEnabled) => {
+      if (isEnabled) activate()
+      else deactivate()
+    },
+    { immediate: true },
+  )
+  onBeforeUnmount(deactivate)
 }
 
 let scrollLockCount = 0
@@ -195,6 +246,13 @@ export const useScrollLock = (locked: MaybeRef<boolean>) => {
   return { lock, unlock }
 }
 
+interface FocusTrapEntry {
+  readonly container: Ref<HTMLElement | null | undefined>
+  readonly onKeydown: (event: KeyboardEvent) => void
+}
+
+const focusTrapStack: FocusTrapEntry[] = []
+
 export const useFocusTrap = (
   container: Ref<HTMLElement | null | undefined>,
   active: MaybeRef<boolean>,
@@ -202,6 +260,7 @@ export const useFocusTrap = (
   let previousFocused: HTMLElement | null = null
 
   const onKeydown = (event: KeyboardEvent) => {
+    if (focusTrapStack[focusTrapStack.length - 1] !== entry) return
     if (!unref(active) || event.key !== FSUS_KEY.TAB || !container.value) return
     const focusables = getFocusableElements(container.value)
     if (focusables.length === 0) {
@@ -220,22 +279,35 @@ export const useFocusTrap = (
     }
   }
 
+  const entry: FocusTrapEntry = { container, onKeydown }
+
+  const removeFromStack = () => {
+    const idx = focusTrapStack.indexOf(entry)
+    if (idx !== -1) focusTrapStack.splice(idx, 1)
+  }
+
   watch(
     () => unref(active),
     (isActive) => {
       if (!isClient) return
       if (isActive) {
         previousFocused = document.activeElement as HTMLElement | null
+        removeFromStack()
+        focusTrapStack.push(entry)
         document.addEventListener('keydown', onKeydown)
         queueMicrotask(() => {
+          if (focusTrapStack[focusTrapStack.length - 1] !== entry) return
           const el = container.value
           if (!el) return
           const focusables = getFocusableElements(el)
           ;(focusables[0] ?? el).focus({ preventScroll: true })
         })
       } else {
+        removeFromStack()
         document.removeEventListener('keydown', onKeydown)
-        previousFocused?.focus?.({ preventScroll: true })
+        if (previousFocused?.isConnected) {
+          previousFocused.focus?.({ preventScroll: true })
+        }
         previousFocused = null
       }
     },
@@ -244,6 +316,7 @@ export const useFocusTrap = (
 
   onBeforeUnmount(() => {
     if (!isClient) return
+    removeFromStack()
     document.removeEventListener('keydown', onKeydown)
   })
 }
