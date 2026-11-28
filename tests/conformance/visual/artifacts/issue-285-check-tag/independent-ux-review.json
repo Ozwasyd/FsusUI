@@ -1,17 +1,17 @@
 {
   "schema": "fsusui-independent-ux-review.v1",
   "issue": 285,
-  "candidateSha": "f476fa535fc9ddd47a4a2b2375359a4dedd7f6de",
+  "candidateSha": "b2692bf6ae09dac834d7f06bdca4062d458585e0",
   "reviewMode": "read-only-rendered-evidence-inspection",
   "modifiedPaths": [],
   "productionFixture": true,
   "identity": {
-    "executionId": "conformance-v2-check-tag-f476fa535fc9ddd47a4a2b2375359a4dedd7f6de",
+    "executionId": "conformance-v2-check-tag-b2692bf6ae09dac834d7f06bdca4062d458585e0",
     "checkpoint": "check-tag-after-pointer-keyboard",
-    "candidate": "f476fa535fc9ddd47a4a2b2375359a4dedd7f6de",
-    "contractHash": "1d40900bfc64dd0ddc4fcb05d77e178abfbb69d923732d0b49d33b840086f2a6",
-    "webBaselineHash": "a5e77eff884a694e12f29d80a2c66849b13c4df161730e4402ee4c3da3172b45",
-    "avaloniaBaselineHash": "fbf55ff00179b0705c80a395b9cc7b5db31e759ca0729d107f02d2b7f86614a9",
+    "candidate": "b2692bf6ae09dac834d7f06bdca4062d458585e0",
+    "contractHash": "6c395bf4633eb99041b28c4a6bed9f0d45b8dcf7b7ab5de3c8ef26853759a825",
+    "webBaselineHash": "c82efcb5f06df57265a05766c34aa976d8df9226e5e97a54f262ac77ed394cfe",
+    "avaloniaBaselineHash": "f4b653980b92ba5f1d2b2bbdd2fc46c5fcac5ef8dc8c0ca83fa4b7e61b208082",
     "scenario": "scenario.v2.fsus-check-tag.real-interaction-trace",
     "contract": "component-v2.fsus-check-tag",
     "documentId": "check-tag-state",
@@ -22,7 +22,7 @@
     "locale": "zh-CN",
     "direction": "ltr",
     "motion": "reduced",
-    "runnerHash": "9119613272fffd8fd3de38e9d8eb3b51891a3681b4286ab59f8b6ef87e583b13"
+    "runnerHash": "144802a0d40b06dd922e33eaf8f3ce0e750e0d16fbf62e9b26173eed1f1c3ff3"
   },
   "viewportStateMatrix": [
     {
@@ -105,8 +105,8 @@
     }
   ],
   "observations": [
-    "Inspected both Linux production captures from GitHub Actions run 46137337830, job 140955471405, artifact 15260665218 (ZIP SHA-256 40e7c655663c529c20625d3191da06a2abf67ed9e04a4e0f15fe1c027fdd3d26, commit f476fa535fc9ddd47a4a2b2375359a4dedd7f6de).",
-    "The candidate manifests bind contract 1d40900bfc64dd0ddc4fcb05d77e178abfbb69d923732d0b49d33b840086f2a6, Web baseline a5e77eff884a694e12f29d80a2c66849b13c4df161730e4402ee4c3da3172b45, Avalonia baseline fbf55ff00179b0705c80a395b9cc7b5db31e759ca0729d107f02d2b7f86614a9, and runner 9119613272fffd8fd3de38e9d8eb3b51891a3681b4286ab59f8b6ef87e583b13.",
+    "Inspected both Linux production captures from GitHub Actions run 46145398816, job 140980227396, artifact 15263342847 (ZIP SHA-256 f264e4cab2659edc21e62b0e43abbaf9ca2b15ca01d741b40015a1d40f326425, commit b2692bf6ae09dac834d7f06bdca4062d458585e0).",
+    "The candidate manifests bind contract 6c395bf4633eb99041b28c4a6bed9f0d45b8dcf7b7ab5de3c8ef26853759a825, Web baseline c82efcb5f06df57265a05766c34aa976d8df9226e5e97a54f262ac77ed394cfe, Avalonia baseline f4b653980b92ba5f1d2b2bbdd2fc46c5fcac5ef8dc8c0ca83fa4b7e61b208082, and runner 144802a0d40b06dd922e33eaf8f3ce0e750e0d16fbf62e9b26173eed1f1c3ff3.",
     "Both current PNGs match the tracked comparator images byte for byte, including the verified crop and window sizes.",
     "web-a11y/manifest.json SHA-256 b550922bbb042f416937ce58b598765f177cbf2a8443a6b2fb0d37e822648bc6",
     "avalonia.json SHA-256 83db21ac08fce73d24dd7180e6ba749a057520007f2189cf8f52e8edeea1ed1e"
