@@ -196,6 +196,7 @@ jobs:
       - name: Build and verify immutable @ozwasyd/fsusui Pure-ESM candidate
         id: candidate
         run: |
+          pnpm run ensure:wasm
           pnpm run package:candidate:build
           pnpm run package:candidate:verify
           digest="$(node -p "require('./dist/npm-candidate/fsusui-npm-candidate.manifest.json').artifact.sha256")"

@@ -1,6 +1,6 @@
 import { createHash } from 'node:crypto'
 import { execFileSync } from 'node:child_process'
-import { readFileSync } from 'node:fs'
+import { readFileSync, readdirSync } from 'node:fs'
 import { readdir, readFile, stat } from 'node:fs/promises'
 import { resolve, relative } from 'node:path'
 import {
@@ -94,7 +94,54 @@ const checkSourceAuthority = async () => {
         .filter(Boolean)
     } catch (error) {
       if (error.status === 1) return []
-      throw error
+      if (error.code !== 'ENOENT') throw error
+      // Portable Node.js fallback when ripgrep is not installed on the runner
+      const regex = new RegExp(pattern, 'u')
+      const includeExts = globs
+        .filter((g) => !g.startsWith('!') && g.startsWith('*.'))
+        .map((g) => g.slice(1))
+      const excludedDirs = new Set([
+        'node_modules',
+        '.git',
+        '.tmp',
+        'dist',
+        'emsdk-cache',
+        'bin',
+        'obj',
+      ])
+      const matches = []
+      const scanSync = (dir) => {
+        let entries
+        try {
+          entries = readdirSync(dir, { withFileTypes: true })
+        } catch {
+          return
+        }
+        for (const entry of entries) {
+          if (entry.isDirectory()) {
+            if (excludedDirs.has(entry.name)) continue
+            scanSync(resolve(dir, entry.name))
+          } else {
+            if (
+              includeExts.length > 0 &&
+              !includeExts.some((ext) => entry.name.endsWith(ext))
+            ) {
+              continue
+            }
+            const full = resolve(dir, entry.name)
+            try {
+              const txt = readFileSync(full, 'utf8')
+              if (regex.test(txt)) {
+                matches.push(relative(root, full).split('\\').join('/'))
+              }
+            } catch {
+              // ignore unreadable files
+            }
+          }
+        }
+      }
+      for (const p of paths) scanSync(resolve(root, p))
+      return matches
     }
   }
   const corpusOwners = rgFiles(
