@@ -1,8 +1,8 @@
 {
   "schema": "fsusui-design-conformance.ux-acceptance-receipt.v2",
-  "classificationReceiptDigest": "e71120e4bd4eb3c4c0237d1ef55033c23027af4e5d6fc9edb12ad1b98c8e1121",
-  "candidateSha": "2abd2186cb33efd42f7439368622ab76e5e4be07",
-  "candidateDigest": "eab69c65abd3e462b265590543a556c7bb39925c8d33982305626df76291cff6",
+  "classificationReceiptDigest": "ed78365772f27d64bb3744f748b87f3ac3e6c7c8377e3989c9c785a20dfd276f",
+  "candidateSha": "c9e22cd21427ac38b524e11740c49dc2114c2886",
+  "candidateDigest": "64ed3a1582f0ec54c5a99076ed2d7ee348eee95e063edc8d500d230abbf0f2b1",
   "verificationClass": "ux-path",
   "requiredSkillDigests": [
     "c88357a6ba0340000bae5839daeb67a3cd2722e8242cf7e0148006c3610a44fe"
@@ -15,12 +15,12 @@
   ],
   "activeBaselineIdentityDigest": "1b76db6814c49aa483d3b4dacc2f0bdaf483c21e79388e8b7b6d91102fefeccb",
   "domainPolicyDigest": "620c4f746c1f259e3b640044975ad2878b7913806038706f7991bee9d72104d3",
-  "independenceEvidenceDigest": "6d2e970cc89d0c50cd38ee7781346cdbd8c5d1b6adc4c546a727470f5059fe24",
+  "independenceEvidenceDigest": "ab31765a537177d32bb72738fbc4ae7d49113829fc26f462fbff60c2c96c701f",
   "modifiedPaths": [],
   "productionFixture": true,
   "viewportStateMatrix": [
     {
-      "viewport": "88x24",
+      "viewport": "75x24",
       "state": "focused-unchecked-after-pointer-keyboard",
       "theme": "light",
       "inputModes": [
@@ -29,7 +29,7 @@
         "screen-reader",
         "reduced-motion"
       ],
-      "evidenceDigest": "cede06e2196173842ec99b1422f4242f3d54c3afdbfa8d8c35da70bad3e55277"
+      "evidenceDigest": "9be952350bc885ddc2ba857c05179f9d9336e491eb1085ed000f7d49bd25334b"
     },
     {
       "viewport": "960x720",
@@ -48,7 +48,7 @@
       "id": "check-tag-web-focused-unchecked",
       "kind": "screenshot",
       "path": "tests/conformance/visual/artifacts/issue-285-check-tag/check-tag-web-focused-unchecked.png",
-      "digest": "cede06e2196173842ec99b1422f4242f3d54c3afdbfa8d8c35da70bad3e55277",
+      "digest": "9be952350bc885ddc2ba857c05179f9d9336e491eb1085ed000f7d49bd25334b",
       "inspected": true,
       "fixtureClass": "production"
     },
@@ -63,5 +63,5 @@
   ],
   "blockers": [],
   "status": "accepted",
-  "receiptDigest": "e1bef2f63a5f618775c61a41a2b22d607638c530d33439e3d459613c44744397"
+  "receiptDigest": "1f3cf409a516a5ad89cf62902124f94bac5a75de4d839b7868a4090d99ddebb0"
 }

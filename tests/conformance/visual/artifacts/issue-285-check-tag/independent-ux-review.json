@@ -1,19 +1,19 @@
 {
   "schema": "fsusui-independent-ux-review.v1",
   "issue": 285,
-  "candidateSha": "2abd2186cb33efd42f7439368622ab76e5e4be07",
+  "candidateSha": "c9e22cd21427ac38b524e11740c49dc2114c2886",
   "reviewMode": "read-only-rendered-evidence-inspection",
   "modifiedPaths": [],
   "productionFixture": true,
   "identity": {
-    "executionId": "conformance-v2-check-tag-999000a7e18c572504b08daae9da48bbdf6c1345",
+    "executionId": "conformance-v2-check-tag-c1c96ca439393a75300a12ea0a8bef81602ea54c",
     "checkpoint": "check-tag-after-pointer-keyboard",
-    "candidate": "999000a7e18c572504b08daae9da48bbdf6c1345",
-    "contractHash": "192e4bf2d42f9ea28259862b1cfec7e96a4fda3c89978899c72921bfe3cecd43",
-    "webBaselineHash": "e7bbf196545b0362fc4033898fe615adc2b50fd12d1805ef027dbe6f94d43844",
-    "avaloniaBaselineHash": "295787beb93a551ab419e98f558e17f0eeab4b7c4defb9e2911cb7c0f5891dda",
-    "scenario": "scenario.v2.el-check-tag.real-interaction-trace",
-    "contract": "component-v2.el-check-tag",
+    "candidate": "c1c96ca439393a75300a12ea0a8bef81602ea54c",
+    "contractHash": "199b2ad9d59a03a6106e37bdca6b8dff79307c072ebfba56e6aaf39921c39408",
+    "webBaselineHash": "cc8ab81f4246153351f9477a56122f716fb23b2a8ec494232b03768a2c968863",
+    "avaloniaBaselineHash": "fbf55ff00179b0705c80a395b9cc7b5db31e759ca0729d107f02d2b7f86614a9",
+    "scenario": "scenario.v2.fsus-check-tag.real-interaction-trace",
+    "contract": "component-v2.fsus-check-tag",
     "documentId": "check-tag-state",
     "documentEpoch": 1,
     "sourceRevision": 2,
@@ -22,13 +22,13 @@
     "locale": "zh-CN",
     "direction": "ltr",
     "motion": "reduced",
-    "runnerHash": "bad9abc8910c29bd5104e47fc7d693443a414d707776a55c043be5d1e0c0baf2"
+    "runnerHash": "9119613272fffd8fd3de38e9d8eb3b51891a3681b4286ab59f8b6ef87e583b13"
   },
   "viewportStateMatrix": [
     {
       "platform": "web",
       "viewport": {
-        "width": 88,
+        "width": 75,
         "height": 24
       },
       "state": "focused-unchecked-after-pointer-keyboard",
@@ -43,7 +43,7 @@
         "screen-reader",
         "reduced-motion"
       ],
-      "evidenceDigest": "cede06e2196173842ec99b1422f4242f3d54c3afdbfa8d8c35da70bad3e55277"
+      "evidenceDigest": "9be952350bc885ddc2ba857c05179f9d9336e491eb1085ed000f7d49bd25334b"
     },
     {
       "platform": "avalonia",
@@ -72,9 +72,9 @@
       "platform": "web",
       "kind": "screenshot",
       "path": "tests/conformance/visual/artifacts/issue-285-check-tag/check-tag-web-focused-unchecked.png",
-      "digest": "cede06e2196173842ec99b1422f4242f3d54c3afdbfa8d8c35da70bad3e55277",
-      "bytes": 1246,
-      "width": 88,
+      "digest": "9be952350bc885ddc2ba857c05179f9d9336e491eb1085ed000f7d49bd25334b",
+      "bytes": 1216,
+      "width": 75,
       "height": 24,
       "inspected": true,
       "fixtureClass": "production"
@@ -96,27 +96,27 @@
     {
       "id": "blue-focus-ring-visible",
       "status": "accepted",
-      "observation": "Both current Linux production captures show the blue focus ring. The Avalonia perimeter probe matched all 192 samples."
+      "observation": "Both current Linux production captures for FsusUI 2.0.0 show the Scholarly Blue focus ring. The Avalonia perimeter probe matched all 192/192 samples."
     },
     {
       "id": "no-black-default-adorner",
       "status": "accepted",
-      "observation": "Both current captures show the expected focus indicator. The Avalonia perimeter probe found zero unexpected dark pixels."
+      "observation": "Both current captures show the expected focus indicator without a default black adorner. The Avalonia perimeter probe found zero unexpected dark pixels."
     },
     {
       "id": "unchecked-label-state-match",
       "status": "accepted",
-      "observation": "Both current captures show the Check tag label in the unchecked appearance after pointer and keyboard activation."
+      "observation": "Both current captures show the Check tag label in the unchecked appearance after real pointer and keyboard activation."
     },
     {
       "id": "focus-no-bounds-shift",
       "status": "accepted",
-      "observation": "The recorded bounds agree before focus, after focus, and after toggle. Web bounds are 0,136,87.625,24 CSS px. Avalonia bounds are 24,136,96,24 DIP."
+      "observation": "The recorded bounds agree before focus, after focus, and after toggle. Web bounds are 0,132,74.953125,24 CSS px. Avalonia bounds are 24,136,96,24 DIP."
     }
   ],
   "observations": [
-    "Independent review inspected both Linux production captures from GitHub Actions run 46021237104, attempt 1, artifact 15207954058. Rendered merge 999000a7e18c572504b08daae9da48bbdf6c1345 and source candidate 2abd2186cb33efd42f7439368622ab76e5e4be07 share tree ebdc5e13e291376dbadc578691ee9a719276121a.",
-    "The candidate manifests bind contract 192e4bf2d42f9ea28259862b1cfec7e96a4fda3c89978899c72921bfe3cecd43, Web baseline e7bbf196545b0362fc4033898fe615adc2b50fd12d1805ef027dbe6f94d43844, Avalonia baseline 295787beb93a551ab419e98f558e17f0eeab4b7c4defb9e2911cb7c0f5891dda, and runner bad9abc8910c29bd5104e47fc7d693443a414d707776a55c043be5d1e0c0baf2.",
+    "Inspected both Linux production captures from GitHub Actions run 46131173958, attempt 1, artifact 15258550236 (commit c1c96ca439393a75300a12ea0a8bef81602ea54c, with DateTime unit-test-only ancestor commit c9e22cd21427ac38b524e11740c49dc2114c2886).",
+    "The candidate manifests bind contract 199b2ad9d59a03a6106e37bdca6b8dff79307c072ebfba56e6aaf39921c39408, Web baseline cc8ab81f4246153351f9477a56122f716fb23b2a8ec494232b03768a2c968863, Avalonia baseline fbf55ff00179b0705c80a395b9cc7b5db31e759ca0729d107f02d2b7f86614a9, and runner 9119613272fffd8fd3de38e9d8eb3b51891a3681b4286ab59f8b6ef87e583b13.",
     "Both current PNGs match the tracked comparator images byte for byte, including the verified crop and window sizes.",
     "The functional cross-platform conformance comparison passes. Timing observations are diagnostic."
   ],
@@ -127,7 +127,7 @@
   ],
   "blockers": [],
   "status": "accepted",
-  "classificationReceiptDigest": "e71120e4bd4eb3c4c0237d1ef55033c23027af4e5d6fc9edb12ad1b98c8e1121",
-  "candidateDigest": "eab69c65abd3e462b265590543a556c7bb39925c8d33982305626df76291cff6",
-  "receiptDigest": "451ae0345c39d142146b450e0520d70dbabf6c418a305358cf55a2e7e85fc45b"
+  "classificationReceiptDigest": "ed78365772f27d64bb3744f748b87f3ac3e6c7c8377e3989c9c785a20dfd276f",
+  "candidateDigest": "64ed3a1582f0ec54c5a99076ed2d7ee348eee95e063edc8d500d230abbf0f2b1",
+  "receiptDigest": "c202b73cb76776e89a952230bdc4e228b45b94119a9344c0ae90ef995a40a980"
 }
