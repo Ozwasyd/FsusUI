@@ -16,10 +16,10 @@ export function verifyReleaseIdentity({
     throw new Error(`Release tag is invalid: ${releaseTag}.`)
   const manifest = readJson(path.resolve(candidateManifestPath))
   const sourcePackage = readJson(
-    path.resolve(repoRoot, 'vue/packages/element-plus/package.json'),
+    path.resolve(repoRoot, 'vue/packages/fsusui/package.json'),
   )
   const expectedPackageName =
-    process.env.NPM_PACKAGE_NAME || '@ozwasyd/element-plus'
+    process.env.NPM_PACKAGE_NAME || '@ozwasyd/fsusui'
   const tagVersion = releaseTag.slice(1)
   const candidateDigest = manifest.artifact?.sha256
   if (manifest.commitSha !== commitSha)

@@ -38,6 +38,8 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    vertical-align: middle;
+    vertical-align: calc(0.5cap - 0.5em);
     width: 1em;
     height: 1em;
     line-height: 1;
@@ -48,6 +50,15 @@
     & > svg {
       width: 1em;
       height: 1em;
+      display: block;
+    }
+
+    &--left {
+      margin-inline-end: var(--fsus-space-1);
+    }
+
+    &--right {
+      margin-inline-start: var(--fsus-space-1);
     }
 
     &[data-spin] > svg {

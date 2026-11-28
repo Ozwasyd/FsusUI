@@ -72,6 +72,13 @@ jobs:
         run: |
           pnpm run icons:check
           pnpm run icons:lint
+      - name: Record static quality leaf result
+        if: always()
+        uses: ./.github/actions/readiness-manifest
+        with:
+          gate: static-quality
+          group: ${{ inputs.group }}
+          status: ${{ job.status }}
 
   typecheck:
     runs-on: ubuntu-latest
@@ -96,6 +103,13 @@ jobs:
             ${{ runner.os }}-fsusui-v2-typecheck-
       - name: Run TypeScript typecheck across all lanes
         run: pnpm run typecheck
+      - name: Record typecheck leaf result
+        if: always()
+        uses: ./.github/actions/readiness-manifest
+        with:
+          gate: typecheck
+          group: ${{ inputs.group }}
+          status: ${{ job.status }}
 
   unit:
     runs-on: ubuntu-latest
@@ -133,6 +147,13 @@ jobs:
         run: |
           pnpm run check:markdown-wasm
           pnpm run check:markdown-wasm-runtime
+      - name: Record unit leaf result
+        if: always()
+        uses: ./.github/actions/readiness-manifest
+        with:
+          gate: unit
+          group: ${{ inputs.group }}
+          status: ${{ job.status }}
 
   markdown-xss:
     runs-on: ubuntu-24.04
@@ -173,6 +194,13 @@ jobs:
         run: pnpm exec playwright install --with-deps chromium firefox webkit
       - name: Run Markdown XSS security gate (corpus + fuzz + 3-browser DOM)
         run: pnpm run check:markdown-xss
+      - name: Record markdown XSS leaf result
+        if: always()
+        uses: ./.github/actions/readiness-manifest
+        with:
+          gate: markdown-xss
+          group: ${{ inputs.group }}
+          status: ${{ job.status }}
 
   build-package:
     runs-on: ubuntu-latest
@@ -222,6 +250,14 @@ jobs:
             dist/npm-candidate/fsusui-npm-candidate.sha256
             dist/npm-candidate/fsusui-npm-candidate.manifest.json
           retention-days: 7
+      - name: Record npm candidate build leaf result
+        if: always()
+        uses: ./.github/actions/readiness-manifest
+        with:
+          gate: build-package
+          group: ${{ inputs.group }}
+          status: ${{ job.status }}
+          artifacts: npm-candidate=dist/npm-candidate/fsusui-npm-candidate.tgz
 
   consumer-verify:
     runs-on: ubuntu-24.04
@@ -247,6 +283,14 @@ jobs:
           test "$digest" = "$EXPECTED_CANDIDATE_DIGEST"
       - name: Cold consumer install, ESM subpath, TypeScript & Vite build check
         run: node scripts/verify-v2-consumer-candidate.mjs --tarball .npm-candidate/fsusui-npm-candidate.tgz
+      - name: Record consumer verification leaf result
+        if: always()
+        uses: ./.github/actions/readiness-manifest
+        with:
+          gate: consumer-verify
+          group: ${{ inputs.group }}
+          status: ${{ job.status }}
+          artifacts: npm-candidate=.npm-candidate/fsusui-npm-candidate.tgz
 
   build-demo:
     runs-on: ubuntu-latest
@@ -278,6 +322,13 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - name: Build demo application
         run: pnpm run build:demo
+      - name: Record demo build leaf result
+        if: always()
+        uses: ./.github/actions/readiness-manifest
+        with:
+          gate: build-demo
+          group: ${{ inputs.group }}
+          status: ${{ job.status }}
 
   dotnet-platform:
     runs-on: ${{ matrix.os }}
@@ -328,6 +379,7 @@ jobs:
           group: ${{ inputs.group }}
           status: ${{ job.status }}
           dimensions: platform=${{ matrix.platform }}
+          artifact-suffix: ${{ matrix.platform }}
 
   dotnet-package:
     runs-on: ubuntu-22.04

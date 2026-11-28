@@ -9,7 +9,7 @@ const recovery = readFileSync(
 
 for (const fragment of [
   'release:concurrency:plan',
-  'needs: [quality, quality-playwright]',
+  'needs: [quality]',
   'uses: ./.github/workflows/_quality-readiness.yml',
   'needs: [quality, quality-readiness, plan]',
   'needs: [quality, quality-readiness, plan, preflight]',

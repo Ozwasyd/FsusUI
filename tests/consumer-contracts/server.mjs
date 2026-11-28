@@ -89,7 +89,7 @@ function buildSsrDocument({
     : ''
 
   return `<!doctype html>
-<html lang="en" class="${theme}" data-theme-mode="${theme}" data-theme-resolved="${theme}">
+<html lang="en" class="${theme}" data-fsus-theme="${theme}" data-theme-mode="${theme}" data-theme-resolved="${theme}">
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">

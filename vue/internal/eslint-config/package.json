@@ -1,6 +1,6 @@
 {
   "name": "@fsusui/eslint-config",
-  "version": "2.0.0-alpha.0",
+  "version": "2.0.0-preview.1",
   "private": true,
   "description": "FsusUI ESLint Config (Flat Config, ESLint 10)",
   "license": "MIT",

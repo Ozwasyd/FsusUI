@@ -20,15 +20,12 @@ import { startContractServer } from './server.mjs'
 
 const REGISTRY_URL = 'https://npm.pkg.github.com/'
 const REGISTRY_HOST = 'npm.pkg.github.com'
-const PACKAGE_NAME = '@ozwasyd/element-plus'
+const PACKAGE_NAME = '@ozwasyd/fsusui'
 const PACKAGE_SCOPE = '@ozwasyd'
 const SUITE_SPECS = {
-  '830': '830-dropdown.spec.ts',
-  '831': '831-data-list.spec.ts',
-  '832': '832-image-viewer-modal.spec.ts',
-  '833': '833-image-viewer-content.spec.ts',
-  '834': '834-image-viewer-geometry.spec.ts',
-  '835': '835-image-viewer-ssr-csp.spec.ts',
+  core: '01-core-and-dropdown.spec.ts',
+  overlays: '02-overlays-and-image-viewer.spec.ts',
+  ssr: '03-ssr-hydration-and-csp.spec.ts',
 }
 
 const currentDir = path.dirname(fileURLToPath(import.meta.url))
@@ -76,7 +73,7 @@ function parseArgs(argv) {
           'Options:',
           '  --mode <source|dist|published>  Target package mode (default: source)',
           '  --version <ver>                 Published package version (required for --mode published)',
-          '  --suite <all|830|831|832|833|834|835>  Suite(s) to run, comma-separated (default: all)',
+          '  --suite <all|core|overlays|ssr> Suite(s) to run, comma-separated (default: all)',
           '  --report-out <path>             Write structured run metadata JSON to <path>',
           '  --keep-temp                     Keep temporary build/install directory for inspection',
         ].join('\n'),
@@ -161,36 +158,36 @@ function downloadSha256(url, authToken = '') {
 
 function createSourceAliases(mode) {
   if (mode === 'dist') {
-    const distRoot = path.join(repoRoot, 'dist', 'element-plus')
-    if (!existsSync(path.join(distRoot, 'es', 'index.mjs'))) {
+    const distRoot = path.join(repoRoot, 'dist', 'fsusui')
+    if (!existsSync(path.join(distRoot, 'dist', 'index.mjs'))) {
       throw new Error(
-        `Built package not found at ${distRoot}. Run "pnpm run build" first or use --mode source.`,
+        `Built package not found at ${distRoot}. Run "pnpm run build:npm-package" first or use --mode source.`,
       )
     }
     return [
       {
-        find: `${PACKAGE_NAME}/dist/index.css`,
-        replacement: path.join(distRoot, 'dist', 'index.css'),
+        find: `${PACKAGE_NAME}/styles/fsus.css`,
+        replacement: path.join(distRoot, 'dist', 'styles', 'fsus.css'),
       },
       {
-        find: `${PACKAGE_NAME}/dist/fsus.css`,
-        replacement: path.join(distRoot, 'dist', 'fsus.css'),
+        find: `${PACKAGE_NAME}/styles/markdown.css`,
+        replacement: path.join(distRoot, 'dist', 'styles', 'markdown.css'),
       },
       {
-        find: `${PACKAGE_NAME}/icons-vue`,
-        replacement: path.join(distRoot, 'es', 'icons-vue.mjs'),
+        find: `${PACKAGE_NAME}/icons`,
+        replacement: path.join(distRoot, 'dist', 'icons.mjs'),
       },
       {
-        find: `${PACKAGE_NAME}/es/locale/lang/zh-cn`,
-        replacement: path.join(distRoot, 'es', 'locale', 'lang', 'zh-cn.mjs'),
+        find: `${PACKAGE_NAME}/locale`,
+        replacement: path.join(distRoot, 'dist', 'locale.mjs'),
       },
       {
-        find: `${PACKAGE_NAME}/es/locale/lang/en`,
-        replacement: path.join(distRoot, 'es', 'locale', 'lang', 'en.mjs'),
+        find: `${PACKAGE_NAME}/core`,
+        replacement: path.join(distRoot, 'dist', 'core.mjs'),
       },
       {
         find: new RegExp(`^${PACKAGE_NAME.replace('/', '\\/')}$`),
-        replacement: path.join(distRoot, 'es', 'index.mjs'),
+        replacement: path.join(distRoot, 'dist', 'index.mjs'),
       },
     ]
   }
@@ -198,70 +195,52 @@ function createSourceAliases(mode) {
   const packagesRoot = path.join(repoRoot, 'vue', 'packages')
   return [
     {
-      find: `${PACKAGE_NAME}/dist/index.css`,
-      replacement: path.join(packagesRoot, 'theme-chalk', 'src', 'index.scss'),
+      find: `${PACKAGE_NAME}/styles/fsus.css`,
+      replacement: path.join(packagesRoot, 'theme', 'src', 'fsus.scss'),
     },
     {
-      find: `${PACKAGE_NAME}/dist/fsus.css`,
-      replacement: path.join(packagesRoot, 'theme-chalk', 'src', 'fsus.scss'),
+      find: `${PACKAGE_NAME}/styles/markdown.css`,
+      replacement: path.join(packagesRoot, 'theme', 'src', 'markdown.scss'),
     },
     {
-      find: `${PACKAGE_NAME}/icons-vue`,
-      replacement: path.join(packagesRoot, 'icons-vue', 'src', 'index.ts'),
+      find: `${PACKAGE_NAME}/icons`,
+      replacement: path.join(packagesRoot, 'fsusui', 'src', 'icons.ts'),
     },
     {
-      find: `${PACKAGE_NAME}/es/locale/lang/zh-cn`,
-      replacement: path.join(packagesRoot, 'locale', 'lang', 'zh-cn.ts'),
+      find: `${PACKAGE_NAME}/locale`,
+      replacement: path.join(packagesRoot, 'fsusui', 'src', 'locale.ts'),
     },
     {
-      find: `${PACKAGE_NAME}/es/locale/lang/en`,
-      replacement: path.join(packagesRoot, 'locale', 'lang', 'en.ts'),
+      find: `${PACKAGE_NAME}/core`,
+      replacement: path.join(packagesRoot, 'fsusui', 'src', 'core.ts'),
     },
     {
       find: new RegExp(`^${PACKAGE_NAME.replace('/', '\\/')}$`),
-      replacement: path.join(packagesRoot, 'element-plus', 'index.ts'),
-    },
-    // Internal workspace source resolution for workspace files only;
-    // the consumer fixture itself imports ONLY documented @ozwasyd/element-plus paths.
-    {
-      find: '@element-plus/components',
-      replacement: path.join(packagesRoot, 'components'),
+      replacement: path.join(packagesRoot, 'fsusui', 'src', 'index.ts'),
     },
     {
-      find: '@element-plus/constants',
-      replacement: path.join(packagesRoot, 'constants'),
+      find: '@fsusui/components',
+      replacement: path.join(packagesRoot, 'components', 'src', 'index.ts'),
     },
     {
-      find: '@element-plus/directives',
-      replacement: path.join(packagesRoot, 'directives'),
+      find: '@fsusui/core',
+      replacement: path.join(packagesRoot, 'core', 'src', 'index.ts'),
     },
     {
-      find: '@element-plus/hooks',
-      replacement: path.join(packagesRoot, 'hooks'),
+      find: '@fsusui/icons',
+      replacement: path.join(packagesRoot, 'icons', 'src', 'index.ts'),
     },
     {
-      find: '@element-plus/locale',
-      replacement: path.join(packagesRoot, 'locale'),
+      find: '@fsusui/motion',
+      replacement: path.join(packagesRoot, 'motion', 'src', 'index.ts'),
     },
     {
-      find: '@element-plus/utils',
-      replacement: path.join(packagesRoot, 'utils'),
+      find: '@fsusui/markdown',
+      replacement: path.join(packagesRoot, 'markdown', 'src', 'index.ts'),
     },
     {
-      find: '@element-plus/icons-vue',
-      replacement: path.join(packagesRoot, 'icons-vue', 'src', 'index.ts'),
-    },
-    {
-      find: '@element-plus/motion',
-      replacement: path.join(packagesRoot, 'motion', 'index.ts'),
-    },
-    {
-      find: '@element-plus/wasm',
+      find: '@fsusui/wasm',
       replacement: path.join(packagesRoot, 'wasm', 'index.ts'),
-    },
-    {
-      find: '@element-plus/theme-chalk/src',
-      replacement: path.join(packagesRoot, 'theme-chalk', 'src'),
     },
   ]
 }
@@ -291,18 +270,6 @@ async function buildSourceOrDistFixture(mode, tempDir) {
     worker: {
       format: 'es',
     },
-    css: {
-      preprocessorOptions: {
-        scss: {
-          silenceDeprecations: [
-            'legacy-js-api',
-            'global-builtin',
-            'color-functions',
-            'import',
-          ],
-        },
-      },
-    },
     resolve: {
       alias,
       dedupe: ['vue'],
@@ -330,9 +297,8 @@ async function buildSourceOrDistFixture(mode, tempDir) {
       ssr: {
         noExternal: [
           PACKAGE_NAME,
-          /^@ozwasyd\/element-plus/,
-          /^@element-plus\//,
-          'lodash-unified',
+          /^@ozwasyd\/fsusui/,
+          /^@fsusui\//,
         ],
       },
       build: {
@@ -351,7 +317,7 @@ async function buildSourceOrDistFixture(mode, tempDir) {
 
   const sourcePkg = JSON.parse(
     readFileSync(
-      path.join(repoRoot, 'vue', 'packages', 'element-plus', 'package.json'),
+      path.join(repoRoot, 'vue', 'packages', 'fsusui', 'package.json'),
       'utf8',
     ),
   )
@@ -363,7 +329,7 @@ async function buildSourceOrDistFixture(mode, tempDir) {
       mode,
       packageName: PACKAGE_NAME,
       packageVersion: sourcePkg.version,
-      resolvedUrl: mode === 'dist' ? 'local:dist/element-plus' : 'local:workspace-source',
+      resolvedUrl: mode === 'dist' ? 'local:dist/fsusui' : 'local:workspace-source',
       integrity: 'local',
       tarballSha256: 'local',
     },
@@ -411,7 +377,7 @@ export default defineConfig(({ isSsrBuild }) => ({
     dedupe: ['vue'],
   },
   ssr: {
-    noExternal: ['${PACKAGE_NAME}', /^@ozwasyd\\/element-plus/, 'lodash-unified'],
+    noExternal: ['${PACKAGE_NAME}', /^@ozwasyd\\/fsusui/],
   },
   build: isSsrBuild
     ? {

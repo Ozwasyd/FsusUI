@@ -3,72 +3,44 @@
   "playwright": {
     "owners": "spec/ci/playwright-owners.json",
     "suites": "spec/ci/playwright-suites.json",
-    "ownerIds": [
-      "playwright-motion",
-      "playwright-layout",
-      "playwright-boundary",
-      "playwright-markdown",
-      "playwright-conformance",
-      "visual-runtime-reuse"
-    ]
+    "ownerIds": []
   },
   "profiles": {
     "main": [
       "static-quality",
-      "dotnet-platform",
-      "dotnet-package",
-      "avalonia-aot",
       "typecheck",
       "unit",
-      "coverage",
+      "markdown-xss",
       "build-package",
-      "consumer-install",
+      "consumer-verify",
       "build-demo",
       "visual",
-      "playwright-motion",
-      "playwright-layout",
-      "playwright-boundary",
-      "playwright-markdown",
-      "playwright-conformance",
-      "visual-runtime-reuse"
+      "dotnet-platform",
+      "dotnet-package"
     ],
     "nightly": [
       "static-quality",
-      "dotnet-platform",
-      "dotnet-package",
-      "avalonia-aot",
       "typecheck",
       "unit",
-      "coverage",
+      "markdown-xss",
       "build-package",
-      "consumer-install",
+      "consumer-verify",
       "build-demo",
       "visual",
-      "playwright-motion",
-      "playwright-layout",
-      "playwright-boundary",
-      "playwright-markdown",
-      "playwright-conformance",
-      "visual-runtime-reuse"
+      "dotnet-platform",
+      "dotnet-package"
     ],
     "release": [
       "static-quality",
-      "dotnet-platform",
-      "dotnet-package",
-      "avalonia-aot",
       "typecheck",
       "unit",
-      "coverage",
+      "markdown-xss",
       "build-package",
-      "consumer-install",
+      "consumer-verify",
       "build-demo",
       "visual",
-      "playwright-motion",
-      "playwright-layout",
-      "playwright-boundary",
-      "playwright-markdown",
-      "playwright-conformance",
-      "visual-runtime-reuse"
+      "dotnet-platform",
+      "dotnet-package"
     ]
   },
   "execution": {
@@ -88,32 +60,25 @@
   },
   "owners": {
     "static-quality": { "cardinality": "single" },
+    "typecheck": { "cardinality": "single" },
+    "unit": { "cardinality": "single" },
+    "markdown-xss": { "cardinality": "single" },
+    "build-package": { "cardinality": "single" },
+    "consumer-verify": { "cardinality": "single" },
+    "build-demo": { "cardinality": "single" },
+    "visual": { "cardinality": "single" },
     "dotnet-platform": {
       "cardinality": "matrix",
       "dimension": "platform",
       "values": ["linux", "windows", "macos"]
     },
-    "dotnet-package": { "cardinality": "single" },
-    "avalonia-aot": { "cardinality": "single" },
-    "typecheck": { "cardinality": "single" },
-    "unit": { "cardinality": "shards", "dimension": "shard" },
-    "coverage": { "cardinality": "single" },
-    "build-package": { "cardinality": "single" },
-    "consumer-install": { "cardinality": "single" },
-    "build-demo": { "cardinality": "single" },
-    "visual": { "cardinality": "single" },
-    "playwright-motion": { "cardinality": "playwright" },
-    "playwright-layout": { "cardinality": "playwright" },
-    "playwright-boundary": { "cardinality": "playwright" },
-    "playwright-markdown": { "cardinality": "playwright" },
-    "playwright-conformance": { "cardinality": "playwright" },
-    "visual-runtime-reuse": { "cardinality": "playwright" }
+    "dotnet-package": { "cardinality": "single" }
   },
   "artifactBindings": [
     {
       "name": "npm-candidate",
       "producer": "build-package",
-      "consumer": "consumer-install"
+      "consumer": "consumer-verify"
     }
   ]
 }

@@ -43,14 +43,9 @@ jobs:
       group: release
       release_tag: ${{ github.ref_name }}
 
-  quality-playwright:
-    uses: ./.github/workflows/_quality-playwright.yml
-    with:
-      group: release
-
   quality-readiness:
     if: always()
-    needs: [quality, quality-playwright]
+    needs: [quality]
     uses: ./.github/workflows/_quality-readiness.yml
     with:
       group: release

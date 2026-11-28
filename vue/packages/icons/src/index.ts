@@ -68,7 +68,7 @@ export const FsusIcon = defineComponent({
           'aria-hidden': isDecorative ? 'true' : undefined,
           'aria-label': isDecorative ? undefined : props.label,
           role: isDecorative ? undefined : 'img',
-          style: Object.keys(style).length ? style : undefined,
+          ...(Object.keys(style).length ? { style } : {}),
         },
         slots.default
           ? slots.default()

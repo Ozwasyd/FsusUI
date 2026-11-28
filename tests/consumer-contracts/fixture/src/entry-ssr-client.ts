@@ -1,5 +1,5 @@
 import { createSSRApp, h } from 'vue'
-import '@ozwasyd/element-plus/dist/fsus.css'
+import '@ozwasyd/fsusui/styles/fsus.css'
 import './style.css'
 import SsrContractApp from './SsrContractApp.vue'
 

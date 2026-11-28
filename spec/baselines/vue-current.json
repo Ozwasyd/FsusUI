@@ -1,18 +1,18 @@
 {
   "schemaVersion": 1,
   "source": {
-    "commitSha": "1a83874b59a456ef86a564c4a2fd926ec979c898",
+    "commitSha": "7a762f46364d4003d827623c55cf7b64d104e289",
     "packageName": "@ozwasyd/fsusui",
-    "packageVersion": "2.0.0-alpha.0",
+    "packageVersion": "2.0.0-preview.1",
     "tokenHash": "04248d62cadbb317f904c9d95e1495fe19406a11d6a905437f2625158bfc2844",
     "iconHash": "bec3e857ccc2a9bea03119d1d841f251dd21befd858577acb36715eb8d0ebf10",
     "toolVersion": "avalonia-vue-public-api-baseline@1.4.0+vue-semantic-baseline@1.4.0",
-    "inputTreeHash": "81a7cf1450da56958b6bd247ac14fe6cb8c7c06052695eb30b6f6b08d713fbc2",
+    "inputTreeHash": "3567da8fb5c6234058b07d6766ecd33d228ab57d4be711c21c5a1bef86853ac6",
     "compilerOptionsHash": "393ec83d1c8008acc01219c012f8fc4ae5334bc747ce3d33ca85efbe25323328",
     "dependencyVersionHash": "79ca1004d5204ee4ddc2de6b1d63f0946d36a42283d113ce8ad01ac4adaa7d27",
     "structuredOutputSelectionHash": "e05c18ef90e2aef167e0ecfbd021f172f1ba6e9851bc11981badd77b21df41bc",
     "contractSchemaVersion": "2.0.0",
-    "outputHash": "39b112b40e85345feca8d7313f943bc9a5e72906c8ba98df4e4d0a446f10dfd8"
+    "outputHash": "f90e339c3431e2558975bcae918ff94a77a01cf0da9cf807c1d203c7320c21cf"
   },
   "summary": {
     "componentModules": 59,
@@ -23741,6 +23741,7 @@
     {
       "name": "--fsus-space-1",
       "files": [
+        "vue/packages/theme/src/base.scss",
         "vue/packages/theme/src/components/core.scss",
         "vue/packages/theme/src/components/data-nav.scss",
         "vue/packages/theme/src/components/forms.scss",
