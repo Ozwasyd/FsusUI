@@ -1,18 +1,18 @@
 {
   "schemaVersion": 1,
   "source": {
-    "commitSha": "10efd8fd5de6b6753d202a213873ca56609e990e",
+    "commitSha": "69a9951037e4e7783435f613f35f749f0ee6a28e",
     "packageName": "@ozwasyd/fsusui",
-    "packageVersion": "2.0.0-preview.2",
+    "packageVersion": "2.0.0-preview.3",
     "tokenHash": "ac92c30fb037cb9fd6e84b6c507ea60be5c8b199d5b539d301e1a061408b14f6",
     "iconHash": "bec3e857ccc2a9bea03119d1d841f251dd21befd858577acb36715eb8d0ebf10",
     "toolVersion": "avalonia-vue-public-api-baseline@1.4.0+vue-semantic-baseline@1.4.0",
-    "inputTreeHash": "ba0918b016aedd3c6680710f0d1221ee0b9c71613d009d56b671921922bae3ee",
+    "inputTreeHash": "32ed86f3b63b7bcc63fe501c7dae0c01f69156187601eb7ee16862f6e9f08290",
     "compilerOptionsHash": "393ec83d1c8008acc01219c012f8fc4ae5334bc747ce3d33ca85efbe25323328",
     "dependencyVersionHash": "79ca1004d5204ee4ddc2de6b1d63f0946d36a42283d113ce8ad01ac4adaa7d27",
     "structuredOutputSelectionHash": "e05c18ef90e2aef167e0ecfbd021f172f1ba6e9851bc11981badd77b21df41bc",
     "contractSchemaVersion": "2.0.0",
-    "outputHash": "78425ec6d0c3e33467e92dcb7d67ae533f4e646f85eefdfd89eb0786b19a9f75"
+    "outputHash": "434c853a44be4e4d166fa8d68ad8945746dec4ff662c6847cfba240c05d42046"
   },
   "summary": {
     "componentModules": 59,
@@ -8835,6 +8835,7 @@
         "autofocus",
         "clearable",
         "disabled",
+        "id",
         "invalid",
         "maxlength",
         "modelValue",
@@ -8946,6 +8947,21 @@
             "default": {
               "kind": "literal",
               "value": false
+            },
+            "required": false,
+            "readonly": false,
+            "deprecated": false,
+            "deprecationMessage": null
+          },
+          {
+            "name": "id",
+            "runtimeType": "String",
+            "semanticType": "string",
+            "nullable": false,
+            "values": null,
+            "valuesKnown": false,
+            "default": {
+              "kind": "missing"
             },
             "required": false,
             "readonly": false,

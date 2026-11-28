@@ -1,6 +1,6 @@
 {
   "name": "@fsusui/markdown",
-  "version": "2.0.0-preview.2",
+  "version": "2.0.0-preview.3",
   "private": true,
   "type": "module",
   "main": "./src/index.ts",
@@ -13,9 +13,15 @@
     "shiki": "^4.0.0"
   },
   "peerDependenciesMeta": {
-    "katex": { "optional": true },
-    "mermaid": { "optional": true },
-    "shiki": { "optional": true }
+    "katex": {
+      "optional": true
+    },
+    "mermaid": {
+      "optional": true
+    },
+    "shiki": {
+      "optional": true
+    }
   },
   "dependencies": {
     "@fsusui/core": "workspace:*",

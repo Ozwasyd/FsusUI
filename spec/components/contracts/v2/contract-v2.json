@@ -10,8 +10,8 @@
   "baselines": {
     "web": {
       "path": "spec/baselines/vue-current.json",
-      "hash": "86f573d923f758e00303c5fb0e60ef2fb9412ac736608ad8a3d74f37cf7fedde",
-      "packageVersion": "2.0.0-preview.2"
+      "hash": "b4ccb08452e2b75c1d4d164da0d66463910daa788df468786e2cd892ed2d0fdd",
+      "packageVersion": "2.0.0-preview.3"
     },
     "avalonia": {
       "path": "spec/avalonia/semantic/FsusUI.Avalonia.semantic.json",
@@ -37124,6 +37124,52 @@
           }
         },
         {
+          "name": "id",
+          "kind": "input",
+          "web": {
+            "member": "id",
+            "baseline": "spec/baselines/vue-current.json",
+            "categories": [
+              "string"
+            ],
+            "runtimeType": "String",
+            "semanticType": "string",
+            "nullable": false,
+            "default": {
+              "kind": "missing"
+            },
+            "values": null,
+            "valuesKnown": false,
+            "required": false,
+            "readonly": false,
+            "deprecated": false,
+            "deprecationMessage": null
+          },
+          "avalonia": null,
+          "status": "missing",
+          "drift": {
+            "type": null,
+            "default": null,
+            "required": null,
+            "readWrite": null,
+            "nullability": null,
+            "eventPayload": null,
+            "operationSignature": null,
+            "contentRegion": null,
+            "enumValues": null,
+            "deprecated": null
+          },
+          "scenarioIds": [
+            "scenario.v2.fsus-input.input.id"
+          ],
+          "governance": {
+            "reason": "No matching real Avalonia public member in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
           "name": "invalid",
           "kind": "input",
           "web": {
@@ -38334,6 +38380,17 @@
           }
         },
         {
+          "member": "id",
+          "kind": "input",
+          "status": "missing",
+          "governance": {
+            "reason": "No matching real Avalonia public member in the semantic baseline.",
+            "owner": "FsusUI Core",
+            "testPolicy": "contract",
+            "reviewPolicy": "pr-review"
+          }
+        },
+        {
           "member": "maxlength",
           "kind": "input",
           "status": "missing",
@@ -38811,6 +38868,7 @@
         "scenario.v2.fsus-input.input.autofocus",
         "scenario.v2.fsus-input.input.clearable",
         "scenario.v2.fsus-input.input.disabled",
+        "scenario.v2.fsus-input.input.id",
         "scenario.v2.fsus-input.input.invalid",
         "scenario.v2.fsus-input.input.maxlength",
         "scenario.v2.fsus-input.input.model-value",
@@ -38851,12 +38909,12 @@
         "scenario.v2.fsus-input.perf"
       ],
       "coverage": {
-        "total": 30,
+        "total": 31,
         "alignedCandidate": 2,
         "partial": 1,
-        "missing": 27,
+        "missing": 28,
         "webOnly": 0,
-        "mappedPercent": 10
+        "mappedPercent": 9.7
       }
     },
     {
@@ -100995,9 +101053,9 @@
   "coverage": {
     "aligned-candidate": 27,
     "partial": 123,
-    "missing": 899,
+    "missing": 900,
     "web-only": 16,
-    "total": 1065,
+    "total": 1066,
     "mappedPercent": 14.1
   }
 }

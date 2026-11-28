@@ -28,6 +28,7 @@ const SUITE_SPECS = {
   ssr: '03-ssr-hydration-and-csp.spec.ts',
   markdown: '04-wasm-and-markdown-worker.spec.ts',
   isolation: '05-app-isolation-and-message.spec.ts',
+  preview3: '06-preview3-regressions.spec.ts',
 }
 
 const currentDir = path.dirname(fileURLToPath(import.meta.url))
@@ -374,6 +375,9 @@ async function buildPublishedFixture(version, tempDir) {
     type: 'module',
     dependencies: {
       [PACKAGE_NAME]: version,
+      katex: rootPkg.devDependencies.katex,
+      mermaid: rootPkg.devDependencies.mermaid,
+      shiki: rootPkg.devDependencies.shiki,
       vue: rootPkg.devDependencies.vue,
     },
     devDependencies: {

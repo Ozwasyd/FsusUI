@@ -1,6 +1,6 @@
 {
   "name": "@fsusui/wasm",
-  "version": "2.0.0-preview.2",
+  "version": "2.0.0-preview.3",
   "private": true,
   "type": "module",
   "description": "WebAssembly acceleration layer for FsusUI (C++23 / Emscripten)",
@@ -20,9 +20,15 @@
     "shiki": "^4.0.0"
   },
   "peerDependenciesMeta": {
-    "katex": { "optional": true },
-    "mermaid": { "optional": true },
-    "shiki": { "optional": true }
+    "katex": {
+      "optional": true
+    },
+    "mermaid": {
+      "optional": true
+    },
+    "shiki": {
+      "optional": true
+    }
   },
   "dependencies": {
     "@fsusui/core": "workspace:*"

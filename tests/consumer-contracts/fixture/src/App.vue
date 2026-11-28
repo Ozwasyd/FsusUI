@@ -22,6 +22,7 @@ import {
   FsusCopyableDetail,
   FsusDataList,
   FsusDialog,
+  FsusDrawer,
   FsusDropdown,
   FsusDropdownItem,
   FsusDropdownMenu,
@@ -31,6 +32,7 @@ import {
   FsusImageViewer,
   FsusInput,
   FsusMessage,
+  FsusMessageBox,
   FsusSegmentedControl,
   FsusSelect,
   FsusTabPane,
@@ -62,6 +64,7 @@ const activeRoute = computed(() => {
   if (pathname.startsWith('/overlays')) return 'overlays'
   if (pathname.startsWith('/markdown')) return 'markdown'
   if (pathname.startsWith('/isolation')) return 'isolation'
+  if (pathname.startsWith('/preview3')) return 'preview3'
   return 'home'
 })
 
@@ -185,6 +188,64 @@ onBeforeUnmount(() => {
   isoAppA?.unmount()
   isoAppB?.unmount()
 })
+
+// #1155, #1156, #1157 browser consumer contract state
+const p3ConfirmResult = ref('idle')
+const openP3Confirm = () => {
+  void FsusMessageBox.confirm('Remove the document?', 'Delete document').then((res) => {
+    p3ConfirmResult.value = res.ok ? 'confirmed' : 'cancelled'
+  })
+}
+
+const p3GuardedMounted = ref(false)
+const p3GuardedDrawerOpen = ref(false)
+const p3GuardedDialogOpen = ref(false)
+const openP3GuardedDrawer = () => {
+  p3GuardedMounted.value = true
+  p3GuardedDrawerOpen.value = true
+}
+
+const p3UnguardedMounted = ref(false)
+const p3UnguardedDrawerOpen = ref(false)
+const p3UnguardedDialogOpen = ref(false)
+const openP3UnguardedDrawer = () => {
+  p3UnguardedMounted.value = true
+  p3UnguardedDrawerOpen.value = true
+}
+
+const p3LockedDrawerOpen = ref(false)
+const p3LockedDialogOpen = ref(false)
+
+const p3HeavyRendererRef = ref<InstanceType<typeof FsusMarkdownRenderer> | null>(null)
+const p3RevealOutcome = ref('idle')
+const p3HeavyMarkdown = [
+  '## Heading witness ^harbor',
+  '',
+  '[Jump to code](#sample)',
+  '',
+  '```typescript',
+  'const answer = 42',
+  '```',
+  '^sample',
+  '',
+  '$$',
+  '\\begin{aligned}',
+  'activation_{3} &= mermaid + katex + shiki \\\\',
+  '\\end{aligned}',
+  '$$',
+  '',
+  '```mermaid',
+  'sequenceDiagram',
+  '  Alice->>Bob: preview3 isolated frame',
+  '```',
+].join('\n')
+
+const triggerP3RevealSample = async () => {
+  const result = await p3HeavyRendererRef.value?.revealFragment('#sample')
+  p3RevealOutcome.value = result
+    ? `${result.ok}:${result.element?.tagName ?? ''}:${result.element?.id ?? ''}:${result.element?.dataset.codeHighlighted ?? ''}`
+    : 'missing-ref'
+}
 const markdownContent = [
   '# Draft milestone',
   '',
@@ -381,6 +442,61 @@ onMounted(async () => {
           <FsusButton data-testid="iso-unmount-b" @click="isoUnmountB">Unmount B</FsusButton>
           <FsusButton data-testid="iso-run-repro" @click="runIssue1152ReproCycle">Run Repro</FsusButton>
         </div>
+      </section>
+
+      <section v-else-if="activeRoute === 'preview3'" data-testid="preview3-contract">
+        <div class="contract-toolbar">
+          <button id="p3-confirm-launch" type="button" @click="openP3Confirm">Delete document</button>
+          <span data-testid="p3-confirm-result">{{ p3ConfirmResult }}</span>
+
+          <button id="launch" type="button" @click="openP3GuardedDrawer">Open guarded drawer</button>
+          <button id="launch-unguarded" type="button" @click="openP3UnguardedDrawer">Open unguarded drawer</button>
+          <button id="launch-locked" type="button" @click="p3LockedDrawerOpen = true">Open locked drawer</button>
+          <button id="p3-reveal-sample" type="button" @click="triggerP3RevealSample">Reveal #sample</button>
+          <span data-testid="p3-reveal-outcome">{{ p3RevealOutcome }}</span>
+        </div>
+
+        <FsusDrawer
+          v-if="p3GuardedMounted"
+          v-model:open="p3GuardedDrawerOpen"
+          title="Parent"
+          :close-on-escape="!p3GuardedDialogOpen"
+        >
+          <button id="compare" type="button" @click="p3GuardedDialogOpen = true">Open dialog</button>
+          <FsusDialog v-model:open="p3GuardedDialogOpen" title="Child" destroy-on-close>
+            <textarea id="p3-source" aria-label="Source" readonly>Public demonstration source.</textarea>
+          </FsusDialog>
+        </FsusDrawer>
+
+        <FsusDrawer
+          v-if="p3UnguardedMounted"
+          v-model:open="p3UnguardedDrawerOpen"
+          title="Unguarded Parent"
+          :close-on-escape="true"
+        >
+          <button id="compare-unguarded" type="button" @click="p3UnguardedDialogOpen = true">Open unguarded dialog</button>
+          <FsusDialog v-model:open="p3UnguardedDialogOpen" title="Unguarded Child" destroy-on-close>
+            <textarea id="p3-source-unguarded" aria-label="Unguarded Source" readonly>Unguarded child source.</textarea>
+          </FsusDialog>
+        </FsusDrawer>
+
+        <FsusDrawer
+          v-model:open="p3LockedDrawerOpen"
+          title="Locked Parent"
+          :close-on-escape="true"
+        >
+          <button id="compare-locked" type="button" @click="p3LockedDialogOpen = true">Open locked dialog</button>
+          <FsusDialog v-model:open="p3LockedDialogOpen" title="Locked Child" :close-on-escape="false">
+            <textarea id="p3-source-locked" aria-label="Locked Source" readonly>Locked child source.</textarea>
+          </FsusDialog>
+        </FsusDrawer>
+
+        <FsusMarkdownRenderer
+          ref="p3HeavyRendererRef"
+          mode="article"
+          :content="p3HeavyMarkdown"
+          data-testid="p3-heavy-markdown"
+        />
       </section>
 
       <section v-else>

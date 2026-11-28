@@ -60,6 +60,7 @@ try {
   const viteVersion = rootPkg.devDependencies.vite
   const vuePluginVersion = rootPkg.devDependencies['@vitejs/plugin-vue']
   const tsVersion = rootPkg.devDependencies.typescript
+  const vueTscVersion = rootPkg.devDependencies['vue-tsc']
 
   writeFileSync(
     path.join(tempRoot, 'package.json'),
@@ -69,7 +70,7 @@ try {
         private: true,
         type: 'module',
         scripts: {
-          typecheck: 'tsc --noEmit',
+          typecheck: 'vue-tsc --noEmit',
           build: 'vite build',
         },
         dependencies: {
@@ -80,6 +81,7 @@ try {
           '@vitejs/plugin-vue': vuePluginVersion,
           typescript: tsVersion,
           vite: viteVersion,
+          'vue-tsc': vueTscVersion,
         },
       },
       null,
@@ -101,7 +103,10 @@ try {
           types: ['vite/client'],
           lib: ['ES2022', 'DOM', 'DOM.Iterable'],
         },
-        include: ['src/**/*.ts'],
+        vueCompilerOptions: {
+          strictTemplates: true,
+        },
+        include: ['src/**/*.ts', 'src/**/*.vue'],
       },
       null,
       2,
@@ -153,6 +158,18 @@ export default defineConfig({
   )
 
   mkdirSync(path.join(tempRoot, 'src'), { recursive: true })
+  writeFileSync(
+    path.join(tempRoot, 'src/StrictInput.vue'),
+    `<script setup lang="ts">
+import { FsusInput } from '@ozwasyd/fsusui'
+</script>
+
+<template>
+  <label for="email">Contact email</label>
+  <FsusInput id="email" type="email" />
+</template>
+`,
+  )
   writeFileSync(
     path.join(tempRoot, 'src/main.ts'),
     `import { createApp, h } from 'vue'
