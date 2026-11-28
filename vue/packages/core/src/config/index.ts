@@ -1,7 +1,15 @@
-import { computed, inject, provide, ref, unref, useId as vueUseId } from 'vue'
+import {
+  computed,
+  inject,
+  provide,
+  ref,
+  shallowRef,
+  unref,
+  useId as vueUseId,
+} from 'vue'
 import { zhCN, formatLocaleText, type FsusLocale } from '../locale'
 import { getByPath } from '../utils'
-import type { ComputedRef, InjectionKey, MaybeRef } from 'vue'
+import type { App, ComputedRef, InjectionKey, MaybeRef } from 'vue'
 import type { FsusSize } from '../constants'
 import type { ThemeMode } from '../theme/theme-mode'
 
@@ -25,21 +33,50 @@ export interface FsusConfigContext {
 export const FSUS_CONFIG_KEY: InjectionKey<ComputedRef<FsusConfigContext>> =
   Symbol('fsus-config')
 
-const globalConfig = ref<FsusConfigContext>({})
+const globalConfig = shallowRef<FsusConfigContext>({})
 
+const compactConfig = (config: FsusConfigContext): FsusConfigContext => {
+  const next: FsusConfigContext = {}
+  if (config.locale !== undefined) next.locale = config.locale
+  if (config.size !== undefined) next.size = config.size
+  if (config.zIndex !== undefined) next.zIndex = config.zIndex
+  if (config.themeMode !== undefined) next.themeMode = config.themeMode
+  if (config.motion !== undefined) next.motion = config.motion
+  return next
+}
+
+/**
+ * Explicit module-level fallback configuration used only by components outside
+ * an app installed with `createFsusUI()` or an ancestor `FsusConfigProvider`.
+ * Plugin installations create an app-owned scope via `installFsusConfig()` and
+ * never mutate this fallback.
+ */
 export const setFsusGlobalConfig = (config: FsusConfigContext): void => {
-  globalConfig.value = { ...globalConfig.value, ...config }
+  globalConfig.value = compactConfig({ ...globalConfig.value, ...config })
 }
 
 export const getFsusGlobalConfig = (): FsusConfigContext => globalConfig.value
+
+/**
+ * Installs an application-owned FsusUI configuration scope onto a Vue `App`
+ * instance via `app.provide(FSUS_CONFIG_KEY, ...)`.
+ */
+export const installFsusConfig = (
+  app: App,
+  config: FsusConfigContext = {},
+): ComputedRef<FsusConfigContext> => {
+  const appState = shallowRef<FsusConfigContext>(compactConfig(config))
+  const appConfig = computed<FsusConfigContext>(() => appState.value)
+  app.provide(FSUS_CONFIG_KEY, appConfig)
+  return appConfig
+}
 
 export const provideFsusConfig = (
   config: MaybeRef<FsusConfigContext>,
 ): ComputedRef<FsusConfigContext> => {
   const parent = inject(FSUS_CONFIG_KEY, undefined)
   const merged = computed<FsusConfigContext>(() => ({
-    ...globalConfig.value,
-    ...parent?.value,
+    ...(parent ? parent.value : globalConfig.value),
     ...unref(config),
   }))
   provide(FSUS_CONFIG_KEY, merged)
@@ -47,7 +84,8 @@ export const provideFsusConfig = (
 }
 
 export const useFsusConfig = (): ComputedRef<FsusConfigContext> =>
-  inject(FSUS_CONFIG_KEY, computed(() => globalConfig.value))
+  inject(FSUS_CONFIG_KEY, () => computed(() => globalConfig.value), true) ??
+  computed(() => globalConfig.value)
 
 export const useFsusSize = (
   explicit?: MaybeRef<FsusSize | undefined>,

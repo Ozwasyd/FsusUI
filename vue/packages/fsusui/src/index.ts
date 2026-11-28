@@ -1,6 +1,7 @@
 import type { App, Component, Plugin } from 'vue'
 import {
-  setFsusGlobalConfig,
+  installFsusConfig,
+  isClient,
   syncThemeMode,
   vClickOutside,
   type FsusConfigContext,
@@ -31,10 +32,8 @@ export const createFsusUI = (defaultOptions: FsusUIPluginOptions = {}): Plugin =
     const merged = { ...defaultOptions, ...runtimeOptions }
     const { components = fsusComponents, ...config } = merged
 
-    if (Object.keys(config).length > 0) {
-      setFsusGlobalConfig(config)
-    }
-    if (config.themeMode) {
+    installFsusConfig(app, config)
+    if (config.themeMode && isClient) {
       syncThemeMode(config.themeMode)
     }
 

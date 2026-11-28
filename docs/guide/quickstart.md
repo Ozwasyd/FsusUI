@@ -66,24 +66,34 @@ import { FsusIcon, FsusIconSearch, registerFsusIcon } from '@ozwasyd/fsusui/icon
 import { FsusMotion, runViewTransition } from '@ozwasyd/fsusui/motion'
 ```
 
-## Global configuration
+## Application-scoped configuration
+
+`createFsusUI()` installs an application-owned configuration scope onto each
+Vue `App` instance via `FSUS_CONFIG_KEY`, so multiple client or `createSSRApp()`
+instances can configure independent defaults without sharing state:
 
 ```ts
 import { createApp } from 'vue'
-import FsusUI, { zhCN } from '@ozwasyd/fsusui'
+import { createFsusUI, zhCN } from '@ozwasyd/fsusui'
 import App from './App.vue'
 
 createApp(App)
-  .use(FsusUI, {
-    size: 'md',
-    zIndex: 2000,
-    themeMode: 'system',
-    locale: zhCN,
-  })
+  .use(
+    createFsusUI({
+      size: 'md',
+      zIndex: 2000,
+      themeMode: 'system',
+      locale: zhCN,
+    }),
+  )
   .mount('#app')
 ```
 
-`themeMode` accepts `'light' | 'dark' | 'system'`.
+`themeMode` accepts `'light' | 'dark' | 'system'`. Nested
+`<FsusConfigProvider>` components inherit only their own application's defaults
+and override fields locally. `setFsusGlobalConfig()` remains an explicit
+module-level fallback only for trees that install neither `createFsusUI()` nor
+an ancestor `<FsusConfigProvider>`.
 
 ## Run the local demo
 

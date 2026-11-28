@@ -233,7 +233,7 @@ app.mount('#md-app')
     `import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
-import { createSSRApp, h } from 'vue'
+import { createApp, createSSRApp, h } from 'vue'
 import { renderToString } from 'vue/server-renderer'
 
 const pkgPath = fileURLToPath(import.meta.resolve('@ozwasyd/fsusui/package.json'))
@@ -306,6 +306,21 @@ const ssrHtml = await renderToString(
 )
 assert.ok(ssrHtml.includes('role="combobox"'), 'Closed FsusSelect SSR missing combobox')
 assert.ok(ssrHtml.includes('Alpha'), 'Closed FsusSelect SSR missing selected label')
+
+// #1151: Verify createFsusUI() isolates configuration per Vue app
+const root = { render: () => null }
+const appA = createApp(root)
+appA.use(main.createFsusUI({ components: [], size: 'sm' }))
+const configA = appA.runWithContext(() => main.useFsusConfig())
+const sizeBefore = configA.value.size
+const appB = createApp(root)
+appB.use(main.createFsusUI({ components: [], size: 'lg' }))
+const configB = appB.runWithContext(() => main.useFsusConfig())
+assert.deepEqual(
+  { before: sizeBefore, after: configA.value.size, appB: configB.value.size },
+  { before: 'sm', after: 'sm', appB: 'lg' },
+  '#1151: createFsusUI must isolate configuration across independent Vue apps',
+)
 
 // #1148: Verify canonical FsusMarkdownRenderer policy
 const rpMod = await import('@ozwasyd/fsusui/render-pipeline')
