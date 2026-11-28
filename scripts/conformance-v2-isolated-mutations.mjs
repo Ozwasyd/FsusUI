@@ -126,11 +126,11 @@ const cases = [
     inject: () =>
       mutateText(
         'scripts/vue-semantic-baseline.mjs',
-        `        if (resolved?.node?.type === 'ObjectExpression') {
-          result.push(...this.parseBuildPropsObject(resolved.node))
+        `        if (spreadTarget?.type === 'ObjectExpression') {
+          result.push(...this.parseBuildPropsObject(spreadTarget))
         }`,
-        `        if (resolved?.node?.type === 'MissingObjectExpression') {
-          result.push(...this.parseBuildPropsObject(resolved.node))
+        `        if (spreadTarget?.type === 'MissingObjectExpression') {
+          result.push(...this.parseBuildPropsObject(spreadTarget))
         }`,
       ),
     command: ['pnpm', ['run', 'avalonia:baseline:check']],
