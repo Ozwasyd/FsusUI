@@ -1,25 +1,31 @@
 {
-  "name": "@element-plus/wasm",
-  "version": "1.0.0",
+  "name": "@fsusui/wasm",
+  "version": "2.0.0-alpha.0",
   "private": true,
   "type": "module",
   "description": "WebAssembly acceleration layer for FsusUI (C++23 / Emscripten)",
-  "main": "./dist/index.cjs",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.mjs",
-      "require": "./dist/index.cjs"
-    }
+      "import": "./dist/index.mjs"
+    },
+    "./*": "./*.ts"
   },
   "sideEffects": false,
+  "peerDependencies": {
+    "katex": "^0.17.0",
+    "mermaid": "^11.0.0",
+    "shiki": "^4.0.0"
+  },
+  "peerDependenciesMeta": {
+    "katex": { "optional": true },
+    "mermaid": { "optional": true },
+    "shiki": { "optional": true }
+  },
   "dependencies": {
-    "@element-plus/utils": "workspace:*",
-    "katex": "0.17.0",
-    "mermaid": "11.15.0",
-    "shiki": "4.2.0"
+    "@fsusui/core": "workspace:*"
   },
   "scripts": {
     "build:wasm": "node ../../../scripts/with-node-heap.mjs node ../../../scripts/run-wasm-build.mjs",

@@ -20,17 +20,17 @@ const applyTokens = (
   tokens: Readonly<Record<string, string>>,
 ) => {
   const tokenNames: Record<string, string> = {
-    background: '--el-bg-color',
-    danger: '--el-color-danger',
-    edgeLabelBackground: '--el-bg-color-overlay',
-    lineColor: '--el-border-color-darker',
-    mainBackground: '--el-fill-color-light',
-    nodeBorder: '--el-color-primary',
-    primaryBorderColor: '--el-color-primary',
-    primaryColor: '--el-fill-color-light',
-    primaryTextColor: '--el-text-color-primary',
-    secondaryColor: '--el-fill-color-blank',
-    tertiaryColor: '--el-fill-color-lighter',
+    background: '--fsus-color-surface-base',
+    danger: '--fsus-color-status-danger',
+    edgeLabelBackground: '--fsus-color-surface-overlay',
+    lineColor: '--fsus-color-border-subtle',
+    mainBackground: '--fsus-color-fill-light',
+    nodeBorder: '--fsus-color-action-primary',
+    primaryBorderColor: '--fsus-color-action-primary',
+    primaryColor: '--fsus-color-fill-light',
+    primaryTextColor: '--fsus-color-text-primary',
+    secondaryColor: '--fsus-color-surface-base',
+    tertiaryColor: '--fsus-color-fill-lighter',
   }
   for (const [key, name] of Object.entries(tokenNames)) {
     const value = tokens[key]

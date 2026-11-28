@@ -3,57 +3,57 @@
     <h2>Data</h2>
     <div class="demo-block">
       <h3>Table & TableColumn</h3>
-      <el-table
+      <fsus-table
         :data="tableData"
         border
         responsive="auto"
         responsive-details-label="显示此行全部字段"
         style="width: 100%"
       >
-        <el-table-column type="selection" width="48" fixed />
-        <el-table-column
+        <fsus-table-column type="selection" width="48" fixed />
+        <fsus-table-column
           prop="name"
           label="标题"
           priority="primary"
           width="180"
         />
-        <el-table-column
+        <fsus-table-column
           prop="date"
           label="发布日期"
           priority="secondary"
           width="180"
         />
-        <el-table-column prop="author" label="作者" priority="secondary" />
-        <el-table-column prop="status" label="状态" priority="secondary" />
-        <el-table-column prop="category" label="分类" priority="detail" />
-        <el-table-column prop="views" label="阅读量" priority="detail" />
-        <el-table-column prop="identifier" label="标识符" priority="detail" />
-        <el-table-column prop="address" label="可见范围" priority="detail" />
-        <el-table-column
+        <fsus-table-column prop="author" label="作者" priority="secondary" />
+        <fsus-table-column prop="status" label="状态" priority="secondary" />
+        <fsus-table-column prop="category" label="分类" priority="detail" />
+        <fsus-table-column prop="views" label="阅读量" priority="detail" />
+        <fsus-table-column prop="identifier" label="标识符" priority="detail" />
+        <fsus-table-column prop="address" label="可见范围" priority="detail" />
+        <fsus-table-column
           label="操作"
           priority="primary"
           width="80"
           fixed="right"
         >
           <template #default>
-            <el-button text>打开</el-button>
+            <fsus-button text>打开</fsus-button>
           </template>
-        </el-table-column>
-      </el-table>
+        </fsus-table-column>
+      </fsus-table>
       <div
         class="demo-responsive-scroll-fixture"
         data-testid="table-scroll-fixture"
         style="width: 375px; max-width: 100%; margin-top: 16px"
       >
-        <el-table
+        <fsus-table
           :data="tableData.slice(0, 1)"
           responsive="scroll"
           scroll-aria-label="横向浏览文章字段"
         >
-          <el-table-column prop="name" label="标题" width="220" />
-          <el-table-column prop="identifier" label="标识符" width="360" />
-          <el-table-column prop="address" label="可见范围" width="320" />
-        </el-table>
+          <fsus-table-column prop="name" label="标题" width="220" />
+          <fsus-table-column prop="identifier" label="标识符" width="360" />
+          <fsus-table-column prop="address" label="可见范围" width="320" />
+        </fsus-table>
       </div>
       <div
         v-if="showTableResponsiveMatrix"
@@ -65,14 +65,14 @@
           :key="fixture.columnCount"
           :data-testid="`table-matrix-${fixture.columnCount}`"
         >
-          <el-table
+          <fsus-table
             :data="[fixture.row]"
             border
             responsive="auto"
             responsive-details-label="显示此行全部字段"
           >
-            <el-table-column type="selection" width="48" fixed />
-            <el-table-column
+            <fsus-table-column type="selection" width="48" fixed />
+            <fsus-table-column
               v-for="column in fixture.columns"
               :key="column.prop"
               :prop="column.prop"
@@ -80,7 +80,7 @@
               :priority="column.priority"
               :width="column.width"
             />
-            <el-table-column
+            <fsus-table-column
               class-name="matrix-operation-column"
               label="操作"
               priority="primary"
@@ -88,17 +88,17 @@
               fixed="right"
             >
               <template #default>
-                <el-button text>打开</el-button>
+                <fsus-button text>打开</fsus-button>
               </template>
-            </el-table-column>
-          </el-table>
+            </fsus-table-column>
+          </fsus-table>
         </div>
         <div data-testid="table-matrix-empty">
-          <el-table :data="[]" empty-text="暂无可展示的数据" responsive="auto">
-            <el-table-column prop="title" label="标题" priority="primary" />
-            <el-table-column prop="status" label="状态" priority="secondary" />
-            <el-table-column prop="owner" label="负责人" priority="detail" />
-          </el-table>
+          <fsus-table :data="[]" empty-text="暂无可展示的数据" responsive="auto">
+            <fsus-table-column prop="title" label="标题" priority="primary" />
+            <fsus-table-column prop="status" label="状态" priority="secondary" />
+            <fsus-table-column prop="owner" label="负责人" priority="detail" />
+          </fsus-table>
         </div>
         <div
           v-for="mode in ['auto', 'priority'] as const"
@@ -106,87 +106,87 @@
           :data-testid="`table-matrix-compact-${mode}`"
           style="max-width: 343px"
         >
-          <el-table :data="compactTableRows" row-key="id" :responsive="mode">
-            <el-table-column prop="title" label="Title" min-width="240" />
-            <el-table-column prop="actions" label="Actions" min-width="180" />
-          </el-table>
+          <fsus-table :data="compactTableRows" row-key="id" :responsive="mode">
+            <fsus-table-column prop="title" label="Title" min-width="240" />
+            <fsus-table-column prop="actions" label="Actions" min-width="180" />
+          </fsus-table>
         </div>
         <div
           data-testid="table-matrix-resize-overflow"
           style="width: 650px; max-width: 100%"
         >
-          <el-table :data="compactTableRows" row-key="id" responsive="auto">
-            <el-table-column prop="title" label="Title" min-width="240" />
-            <el-table-column prop="actions" label="Actions" min-width="480" />
-          </el-table>
+          <fsus-table :data="compactTableRows" row-key="id" responsive="auto">
+            <fsus-table-column prop="title" label="Title" min-width="240" />
+            <fsus-table-column prop="actions" label="Actions" min-width="480" />
+          </fsus-table>
         </div>
         <div data-testid="table-matrix-scroll">
-          <el-table
+          <fsus-table
             :data="[tableResponsiveFixtures[2].row]"
             responsive="scroll"
             scroll-aria-label="横向浏览十五列数据"
           >
-            <el-table-column
+            <fsus-table-column
               v-for="column in tableResponsiveFixtures[2].columns"
               :key="column.prop"
               :prop="column.prop"
               :label="column.label"
               :width="column.width"
             />
-          </el-table>
+          </fsus-table>
         </div>
       </div>
     </div>
     <div class="demo-block">
       <h3>TableV2 & AutoResizer</h3>
       <div class="demo-table-container">
-        <el-auto-resizer>
+        <fsus-auto-resizer>
           <template #default="{ height, width }">
-            <el-table-v2
+            <fsus-table
               :columns="tableV2Columns"
               :data="tableV2Data"
               :width="width"
               :height="height"
             />
           </template>
-        </el-auto-resizer>
+        </fsus-auto-resizer>
       </div>
     </div>
     <div class="demo-block">
       <h3>Tag / CheckTag</h3>
-      <el-space wrap>
-        <el-tag>文章</el-tag>
-        <el-tag type="success">已发布</el-tag>
-        <el-tag type="info">技术笔记</el-tag>
-        <el-tag type="warning">待复核</el-tag>
-        <el-tag type="danger">高风险</el-tag>
-        <el-check-tag :checked="checkTag" @change="checkTag = !checkTag">
+      <fsus-space wrap>
+        <fsus-tag>文章</fsus-tag>
+        <fsus-tag type="success">已发布</fsus-tag>
+        <fsus-tag type="info">技术笔记</fsus-tag>
+        <fsus-tag type="warning">待复核</fsus-tag>
+        <fsus-tag type="danger">高风险</fsus-tag>
+        <fsus-check-tag :checked="checkTag" @change="checkTag = !checkTag">
           已同步
-        </el-check-tag>
-      </el-space>
+        </fsus-check-tag>
+      </fsus-space>
     </div>
     <div class="demo-block">
       <h3>Progress</h3>
-      <el-space direction="vertical" style="width: 100%">
-        <el-progress :percentage="50" />
-        <el-progress :percentage="100" status="success" />
-        <el-progress :percentage="80" status="exception" />
-        <el-progress type="circle" :percentage="25" />
-      </el-space>
+      <fsus-space direction="vertical" style="width: 100%">
+        <fsus-progress :percentage="50" />
+        <fsus-progress :percentage="100" status="success" />
+        <fsus-progress :percentage="80" status="exception" />
+        <fsus-progress type="circle" :percentage="25" />
+      </fsus-space>
     </div>
     <div class="demo-block">
       <h3>Tree</h3>
-      <el-tree :data="treeData" show-checkbox />
+      <fsus-tree :data="treeData" show-checkbox />
     </div>
     <div class="demo-block">
       <h3>TreeV2</h3>
       <div style="height: 200px" data-testid="tree-v2-container">
-        <el-tree-v2 :data="treeDataV2" :height="200" :item-size="44" />
+        <fsus-tree :data="treeDataV2" :height="200" :item-size="44" />
       </div>
     </div>
     <div class="demo-block">
       <h3>Pagination</h3>
-      <el-pagination
+      <fsus-pagination
         background
         layout="prev, pager, next, jumper, total"
         responsive="auto"
@@ -197,64 +197,64 @@
     </div>
     <div class="demo-block">
       <h3>Badge</h3>
-      <el-space :size="30">
-        <el-badge :value="12"><el-button>Comments</el-button></el-badge>
-        <el-badge :value="3" is-dot>
-          <el-button :icon="Share" type="primary">
-            <el-visually-hidden>Share article</el-visually-hidden>
-          </el-button>
-        </el-badge>
-      </el-space>
+      <fsus-space :size="30">
+        <fsus-badge :value="12"><fsus-button>Comments</fsus-button></fsus-badge>
+        <fsus-badge :value="3" is-dot>
+          <fsus-button :icon="Share" type="primary">
+            <fsus-visually-hidden>Share article</fsus-visually-hidden>
+          </fsus-button>
+        </fsus-badge>
+      </fsus-space>
     </div>
     <div class="demo-block">
       <h3>Avatar</h3>
-      <el-space wrap>
-        <el-avatar :size="50" :src="circleUrl" />
-        <el-avatar shape="square" :size="50" :src="squareUrl" />
-        <el-avatar> User </el-avatar>
-      </el-space>
+      <fsus-space wrap>
+        <fsus-avatar :size="50" :src="circleUrl" />
+        <fsus-avatar shape="square" :size="50" :src="squareUrl" />
+        <fsus-avatar> User </fsus-avatar>
+      </fsus-space>
     </div>
     <div class="demo-block">
       <h3>Skeleton & SkeletonItem</h3>
-      <el-skeleton style="width: 240px" animated>
+      <fsus-skeleton style="width: 240px" animated>
         <template #template>
-          <el-skeleton-item
+          <fsus-skeleton-item
             variant="image"
             style="width: 240px; height: 240px"
           />
           <div style="padding: 14px">
-            <el-skeleton-item variant="p" style="width: 50%" />
+            <fsus-skeleton-item variant="p" style="width: 50%" />
             <div class="demo-skeleton-row">
-              <el-skeleton-item variant="text" style="margin-right: 16px" />
-              <el-skeleton-item variant="text" style="width: 30%" />
+              <fsus-skeleton-item variant="text" style="margin-right: 16px" />
+              <fsus-skeleton-item variant="text" style="width: 30%" />
             </div>
           </div>
         </template>
-      </el-skeleton>
+      </fsus-skeleton>
     </div>
     <div class="demo-block">
       <h3>Empty</h3>
-      <el-empty description="暂无文章" />
+      <fsus-empty-state description="暂无文章" />
     </div>
     <div class="demo-block">
       <h3>Descriptions & DescriptionsItem</h3>
-      <el-descriptions title="用户资料" border responsive="auto">
-        <el-descriptions-item label="笔名"> 青砚 </el-descriptions-item>
-        <el-descriptions-item label="联系电话">
+      <fsus-descriptions title="用户资料" border responsive="auto">
+        <fsus-descriptions-item label="笔名"> 青砚 </fsus-descriptions-item>
+        <fsus-descriptions-item label="联系电话">
           18100000000
-        </el-descriptions-item>
-        <el-descriptions-item label="所在地"> 苏州 </el-descriptions-item>
-        <el-descriptions-item label="标签">
-          <el-tag size="small">写作</el-tag>
-        </el-descriptions-item>
-        <el-descriptions-item label="地址">
+        </fsus-descriptions-item>
+        <fsus-descriptions-item label="所在地"> 苏州 </fsus-descriptions-item>
+        <fsus-descriptions-item label="标签">
+          <fsus-tag size="small">写作</fsus-tag>
+        </fsus-descriptions-item>
+        <fsus-descriptions-item label="地址">
           江苏省苏州市吴中区吴中大道 1188 号
-        </el-descriptions-item>
-        <el-descriptions-item label="主页" :span="2">
+        </fsus-descriptions-item>
+        <fsus-descriptions-item label="主页" :span="2">
           https://example.com/authors/青砚/research-notes-and-publications
-        </el-descriptions-item>
-        <el-descriptions-item label="备注"></el-descriptions-item>
-      </el-descriptions>
+        </fsus-descriptions-item>
+        <fsus-descriptions-item label="备注"></fsus-descriptions-item>
+      </fsus-descriptions>
     </div>
     <div
       class="demo-block"
@@ -262,107 +262,107 @@
       data-descriptions-spacing-fixtures
     >
       <h3>Descriptions spacing matrix</h3>
-      <el-space direction="vertical" :size="16" fill style="width: 100%">
-        <el-descriptions
+      <fsus-space direction="vertical" :size="16" fill style="width: 100%">
+        <fsus-descriptions
           border
           :column="2"
           size="large"
           data-descriptions-case="bordered-large"
           title="bordered large"
         >
-          <el-descriptions-item label="笔名">青砚</el-descriptions-item>
-          <el-descriptions-item label="所在地">苏州</el-descriptions-item>
-          <el-descriptions-item label="主页" :span="2">
+          <fsus-descriptions-item label="笔名">青砚</fsus-descriptions-item>
+          <fsus-descriptions-item label="所在地">苏州</fsus-descriptions-item>
+          <fsus-descriptions-item label="主页" :span="2">
             https://example.com/authors/qingyan
-          </el-descriptions-item>
-        </el-descriptions>
-        <el-descriptions
+          </fsus-descriptions-item>
+        </fsus-descriptions>
+        <fsus-descriptions
           border
           :column="2"
           data-descriptions-case="bordered-default"
           title="bordered default"
         >
-          <el-descriptions-item label="笔名">青砚</el-descriptions-item>
-          <el-descriptions-item label="所在地">苏州</el-descriptions-item>
-          <el-descriptions-item label="地址" :span="2">
+          <fsus-descriptions-item label="笔名">青砚</fsus-descriptions-item>
+          <fsus-descriptions-item label="所在地">苏州</fsus-descriptions-item>
+          <fsus-descriptions-item label="地址" :span="2">
             江苏省苏州市吴中区吴中大道 1188 号
-          </el-descriptions-item>
-        </el-descriptions>
-        <el-descriptions
+          </fsus-descriptions-item>
+        </fsus-descriptions>
+        <fsus-descriptions
           border
           :column="2"
           size="small"
           data-descriptions-case="bordered-small"
           title="bordered small"
         >
-          <el-descriptions-item label="笔名">青砚</el-descriptions-item>
-          <el-descriptions-item label="所在地">苏州</el-descriptions-item>
-        </el-descriptions>
-        <el-descriptions
+          <fsus-descriptions-item label="笔名">青砚</fsus-descriptions-item>
+          <fsus-descriptions-item label="所在地">苏州</fsus-descriptions-item>
+        </fsus-descriptions>
+        <fsus-descriptions
           :column="2"
           data-descriptions-case="non-bordered-default"
           title="non-bordered default"
         >
-          <el-descriptions-item label="笔名">青砚</el-descriptions-item>
-          <el-descriptions-item label="所在地">苏州</el-descriptions-item>
-        </el-descriptions>
-        <el-descriptions
+          <fsus-descriptions-item label="笔名">青砚</fsus-descriptions-item>
+          <fsus-descriptions-item label="所在地">苏州</fsus-descriptions-item>
+        </fsus-descriptions>
+        <fsus-descriptions
           border
           :column="2"
           direction="vertical"
           data-descriptions-case="bordered-vertical"
           title="bordered vertical"
         >
-          <el-descriptions-item label="笔名">青砚</el-descriptions-item>
-          <el-descriptions-item label="备注">
+          <fsus-descriptions-item label="笔名">青砚</fsus-descriptions-item>
+          <fsus-descriptions-item label="备注">
             长备注：研究笔记、出版记录与公开主页摘要。
-          </el-descriptions-item>
-        </el-descriptions>
-        <el-descriptions
+          </fsus-descriptions-item>
+        </fsus-descriptions>
+        <fsus-descriptions
           border
           :column="2"
           responsive="stack"
           data-descriptions-case="responsive-stack"
           title="responsive stack"
         >
-          <el-descriptions-item label="笔名">青砚</el-descriptions-item>
-          <el-descriptions-item label="所在地">苏州</el-descriptions-item>
-        </el-descriptions>
-      </el-space>
+          <fsus-descriptions-item label="笔名">青砚</fsus-descriptions-item>
+          <fsus-descriptions-item label="所在地">苏州</fsus-descriptions-item>
+        </fsus-descriptions>
+      </fsus-space>
     </div>
     <div class="demo-block">
       <h3>Result</h3>
-      <el-result icon="success" title="已发布" sub-title="读者将看到最新版本">
+      <fsus-result icon="success" title="已发布" sub-title="读者将看到最新版本">
         <template #extra>
-          <el-button type="primary">返回文章列表</el-button>
+          <fsus-button type="primary">返回文章列表</fsus-button>
         </template>
-      </el-result>
+      </fsus-result>
     </div>
     <div class="demo-block">
       <h3>Statistic / Countdown</h3>
-      <el-row>
-        <el-col :span="12">
-          <el-statistic title="今日活跃读者" :value="268500" />
-        </el-col>
-        <el-col :span="12">
-          <el-countdown title="距定时发布" :value="countdownValue" />
-        </el-col>
-      </el-row>
+      <fsus-row>
+        <fsus-col :span="12">
+          <fsus-statistic title="今日活跃读者" :value="268500" />
+        </fsus-col>
+        <fsus-col :span="12">
+          <fsus-countdown title="距定时发布" :value="countdownValue" />
+        </fsus-col>
+      </fsus-row>
     </div>
     <div class="demo-block">
       <h3>Timeline & TimelineItem</h3>
-      <el-timeline>
-        <el-timeline-item timestamp="2018/4/12" placement="top">
+      <fsus-timeline>
+        <fsus-timeline-item timestamp="2018/4/12" placement="top">
           更新封面图
-        </el-timeline-item>
-        <el-timeline-item timestamp="2018/4/3" placement="top">
+        </fsus-timeline-item>
+        <fsus-timeline-item timestamp="2018/4/3" placement="top">
           校对摘要
-        </el-timeline-item>
-      </el-timeline>
+        </fsus-timeline-item>
+      </fsus-timeline>
     </div>
     <div class="demo-block">
       <h3>Calendar</h3>
-      <el-calendar v-model="date" />
+      <fsus-calendar v-model="date" />
     </div>
   </div>
 </template>

@@ -15,9 +15,22 @@
     "rootDir": ".",
     "types": [],
     "paths": {
-      "@element-plus/icons-vue": ["./packages/icons-vue/src/index.ts"],
-      "@element-plus/icons-vue/*": ["./packages/icons-vue/src/*"],
-      "@element-plus/*": ["./packages/*"]
+      "@ozwasyd/fsusui": ["./packages/fsusui/src/index.ts"],
+      "@ozwasyd/fsusui/*": ["./packages/fsusui/src/*"],
+      "@fsusui/core": ["./packages/core/src/index.ts"],
+      "@fsusui/core/*": ["./packages/core/src/*"],
+      "@fsusui/icons": ["./packages/icons/src/index.ts"],
+      "@fsusui/icons/*": ["./packages/icons/src/*"],
+      "@fsusui/motion": ["./packages/motion/src/index.ts"],
+      "@fsusui/motion/*": ["./packages/motion/src/*"],
+      "@fsusui/components": ["./packages/components/src/index.ts"],
+      "@fsusui/components/*": ["./packages/components/src/*"],
+      "@fsusui/markdown": ["./packages/markdown/src/index.ts"],
+      "@fsusui/markdown/*": ["./packages/markdown/src/*"],
+      "@fsusui/wasm": ["./packages/wasm/index.ts"],
+      "@fsusui/wasm/*": ["./packages/wasm/*"],
+      "@fsusui/test-utils": ["./packages/test-utils/index.ts"],
+      "@fsusui/theme/*": ["./packages/theme/*"]
     }
   }
 }

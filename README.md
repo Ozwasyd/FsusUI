@@ -1,74 +1,69 @@
 # FsusUI
 
-FsusUI is a Vue 3 component library derived from Element Plus. Use “FsusUI” in
-documentation and adoption guidance; Element Plus remains the upstream
-provenance and compatibility context. The workspace includes the preview
-package, theme and motion tokens, icons, WASM-capable runtime paths, Markdown
-components, and a demo app.
+FsusUI 2.0 is a standalone, pure-ESM Vue 3.5+ component system and cross-platform
+Avalonia/.NET UI library built around **"The Intellectual Minimalist"** design
+language ([`docs/design.md`](./docs/design.md)).
 
-> FsusUI is in public preview. Documented components and theme tokens are
-> available for evaluation; internal paths, undocumented compatibility layers,
-> build internals, and WASM internals may change before the first stable release.
+Starting in **2.0.0**, FsusUI drops Element Plus compatibility completely in
+favor of 100% native `Fsus*` components, `<fsus-*>` tags, `.fsus-*` classes,
+`data-*` state attributes, and single-layer `--fsus-*` design tokens.
 
-## Status
+> FsusUI 2.0 is under active stabilization on the `next` branch. Use documented
+> entry points only; internal workspace packages (`@fsusui/*`), build scripts,
+> and test fixtures are not public API.
 
-| Area              | Status |
-| ---               | --- |
-| Release stage     | Public Preview |
-| Package stability | Preview |
-| API stability     | Experimental unless explicitly documented |
-| Recommended use   | Evaluation, controlled internal adoption, FsusBlog integration |
-| Production SLA    | None |
+## Architecture Highlights (2.0.0)
 
-## Relationship To Element Plus
-
-FsusUI retains much of the Element Plus source layout, component naming, and
-package structure. Full Element Plus compatibility is claimed only where local
-tests or explicit FsusUI docs cover the behavior.
-
-Public compatibility docs:
-
-- [Element Plus compatibility policy](./docs/element-plus-compatibility.md)
-- [Migration from Element Plus](./docs/migration/from-element-plus.md)
-- [Element Plus attribution](./docs/legal/element-plus-attribution.md)
-
-## Relationship To FsusBlog
-
-FsusUI is a design-system foundation for FsusBlog but is evaluated as a
-standalone library. FsusBlog adapters and examples are integration context, not
-public FsusUI API unless an FsusUI document explicitly says so.
+- **Native Vue 3.5+ Surface**: `defineProps<T>()` with reactive destructure,
+  `defineModel()`, native Floating UI positioning (`@floating-ui/dom` as the
+  sole published runtime dependency), and zero legacy `El*` / `--el-*` shims.
+- **Pure ESM Output**: `ES2022+` modules only; CommonJS (`lib/`), legacy UMD
+  bundles (`dist/index.full.*`), and duplicated type trees are removed.
+- **Single-Layer CSS (`@layer`)**: `styles/fsus.css` consumes canonical
+  `spec/tokens` `--fsus-*` variables directly; Markdown styles ship separately
+  in `styles/markdown.css`.
+- **Decoupled Heavy Features**: Markdown rendering/editing ships via
+  `@ozwasyd/fsusui/markdown` and `@ozwasyd/fsusui/wasm` with `katex`,
+  `mermaid`, and `shiki` as optional `peerDependencies`.
+- **Zero-Dep Unified Motion & Dates**: `@ozwasyd/fsusui/motion` combines WAAPI,
+  damped spring physics, FLIP layout, and scroll reveals without `gsap` or
+  `motion-dom`; date/time pickers run on native `Date` + `Intl.DateTimeFormat`
+  without `dayjs`.
 
 ## Install
 
-The public-preview package is `@ozwasyd/element-plus` published on GitHub
-Packages (`https://npm.pkg.github.com/`). It is FsusUI’s compatibility build,
-not the upstream Element Plus package.
+The published package is `@ozwasyd/fsusui` on GitHub Packages
+(`https://npm.pkg.github.com/`).
 
-Configure the `@ozwasyd` scope registry (GitHub Packages requires a token with
-`read:packages` even for public packages), then install:
+Configure the `@ozwasyd` scope in `.npmrc` (GitHub Packages requires a token
+with `read:packages`), then install:
 
 ```bash
-pnpm install @ozwasyd/element-plus
+pnpm install @ozwasyd/fsusui
 ```
 
-The package registry policy is documented in
+See [Installation](./docs/guide/installation.md) and
 [npm registry publishing policy](./docs/releases/policy/npm-registry.md).
 
 ## Basic Vue Usage
 
 ```ts
 import { createApp } from 'vue'
-import FsusUI from '@ozwasyd/element-plus'
-import '@ozwasyd/element-plus/dist/fsus.css'
+import FsusUI from '@ozwasyd/fsusui'
+import '@ozwasyd/fsusui/styles/fsus.css'
 import App from './App.vue'
 
 createApp(App).use(FsusUI).mount('#app')
 ```
 
-Icon imports:
+On-demand component, icon, motion, and Markdown imports:
 
 ```ts
-import { Search } from '@ozwasyd/element-plus/icons-vue'
+import { FsusButton, FsusTable, FsusSelect } from '@ozwasyd/fsusui'
+import { FsusIcon, FsusIconSearch, registerFsusIcon } from '@ozwasyd/fsusui/icons'
+import { FsusMotion, runViewTransition } from '@ozwasyd/fsusui/motion'
+import { FsusMarkdownRenderer, FsusMarkdownEditor } from '@ozwasyd/fsusui/markdown'
+import '@ozwasyd/fsusui/styles/markdown.css'
 ```
 
 ## Runtime Requirements
@@ -76,19 +71,15 @@ import { Search } from '@ozwasyd/element-plus/icons-vue'
 | Runtime                    | Requirement                                |
 | -------------------------- | ------------------------------------------ |
 | Vue                        | `^3.5.0`                                   |
-| JavaScript target          | ES2022                                     |
+| Module format              | Pure ESM (`ES2022+`)                       |
 | Browser baseline           | Chromium 106+ or equivalent ES2022 support |
 | Repository Node.js         | Node 22+                                   |
 | Repository package manager | pnpm 10                                    |
 | TypeScript baseline        | TypeScript 6                               |
 
-Consumers that target older browsers must transpile in their app build or stay
-on Element Plus for the affected surface.
+## Public API & Migration
 
-## Public API Boundaries
-
-Use only documented imports and docs pages:
-
+- [Migrating from FsusUI v1 to v2](./docs/migration/v1-to-v2.md)
 - [API stability](./docs/api-stability.md)
 - [Component docs](./docs/components/overview.md)
 - [Theme customization](./docs/theme/customization.md)
@@ -97,70 +88,32 @@ Use only documented imports and docs pages:
 - [Icons](./docs/icons.md)
 - [Playground and demo app](./docs/playground.md)
 
-Do not rely on undocumented `es/*`, `lib/*`, wildcard exports,
-`vue/packages/*`, `vue/internal/*`, generated WASM files, build scripts, or test
-fixtures as public API.
-
-## Demo And Development
-
-Repository setup:
+## Development
 
 ```bash
 pnpm install
-```
-
-Run the demo app from its workspace path:
-
-```bash
 pnpm -C vue/packages/demo-app dev
-```
-
-Common checks:
-
-```bash
 pnpm run lint
 pnpm run typecheck
 pnpm run test
 pnpm run build
-pnpm run verify
 ```
-
-See [playground docs](./docs/playground.md) and [contributing](./CONTRIBUTING.md)
-for visual regression and public-sample guidance.
-
-## Release Documentation and Evidence
-
-The release-domain map is maintained in [docs/releases/](./docs/releases/README.md).
-Public-preview readiness evidence includes:
-
-- [Public preview release notes](./docs/releases/channels/public-preview.md)
-- [Secret and history scan](./docs/releases/evidence/public-preview/secret-history-scan.md)
-- [Asset scan](./docs/releases/evidence/public-preview/asset-scan.md)
-- [Package content audit](./docs/releases/evidence/npm-public-preview/package-audit.md)
-- [Consumer install evidence](./docs/releases/evidence/npm-public-preview/consumer-install.md)
-- [Provenance plan and evidence](./docs/releases/evidence/npm-public-preview/provenance.md)
 
 ## Governance
 
 - [Documentation center](./docs/index.md)
 - [Documentation architecture](./docs/governance/documentation-architecture.md)
-- [Design documentation](./docs/design/README.md)
+- [Design contract](./docs/design.md)
 - [Release documentation](./docs/releases/README.md)
-- [Consumer integration boundary](./docs/consumers/design-integration.md)
 - [Contributing](./CONTRIBUTING.md)
 - [Security policy](./SECURITY.md)
 - [Code of conduct](./CODE_OF_CONDUCT.md)
 - [Notice and attribution](./NOTICE)
 - [License](./LICENSE)
 
-## Avalonia trimming and AOT library boundary
+## Avalonia Trimming and AOT Library Boundary
 
 The supported Avalonia packages target trimming- and AOT-compatible library
-consumption. This library contract does not create or validate a final Native
-AOT executable, RID-specific binary, or third-party plugin guarantee. Resource
-reachability (AXAML, themes, icons, and generated resources) and package
-metadata are included in the contract.
-
-It applies only to documented public Avalonia packages and their declared
-metadata. Third-party plugin discovery, runtime assembly/type loading, runtime
-code generation, and other dynamic extensions are consumer responsibilities.
+consumption. Resource reachability (AXAML, themes, icons, and generated
+resources) and package metadata are included in the contract; final Native AOT
+executables and third-party dynamic plugins remain consumer responsibilities.

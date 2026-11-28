@@ -1,5 +1,5 @@
 <template>
-  <ElPublicShell
+  <FsusPublicShell
     brand="Field Notes"
     brand-href="#home"
     active-nav="archive"
@@ -22,7 +22,7 @@
     @update:search-query="searchQuery = $event"
   >
     <template #desktop-actions>
-      <ElThemeModeToggle visibility="desktop" compact />
+      <FsusThemeModeToggle visibility="desktop" compact />
     </template>
 
     <article
@@ -57,16 +57,16 @@
     <template #footer>
       <p>Field Notes archive</p>
     </template>
-  </ElPublicShell>
+  </FsusPublicShell>
 </template>
 
 <script lang="ts" setup>
 import { computed, ref, watch } from 'vue'
 import {
-  ElPublicShell,
-  ElThemeModeToggle,
+  FsusPublicShell,
+  FsusThemeModeToggle,
   type PublicShellDesktopSearchMode,
-} from '../../../element-plus'
+} from '@ozwasyd/fsusui'
 
 const props = withDefaults(
   defineProps<{
@@ -118,7 +118,7 @@ watch(desktopSearchMode, (mode) => {
 }
 
 .public-shell-search-fixture__context {
-  color: var(--el-text-color-secondary);
+  color: var(--fsus-color-text-quiet);
   font-size: 12px;
   font-weight: 700;
 }

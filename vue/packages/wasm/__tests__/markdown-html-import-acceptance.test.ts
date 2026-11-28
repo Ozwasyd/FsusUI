@@ -273,7 +273,7 @@ describe('markdown HTML import aggregate acceptance corpus', () => {
       ),
       adapter: readFileSync(
         resolve(
-          'vue/packages/components/markdown-editor/src/markdown-editor-paste-markdown.ts',
+          'vue/packages/markdown/src/markdown-editor/src/markdown-editor-paste-markdown.ts',
         ),
         'utf8',
       ),

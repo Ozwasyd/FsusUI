@@ -52,7 +52,7 @@
         </svg>
       </span>
       <span data-testid="fsus-linear-icon">
-        <el-icon variant="linear">
+        <fsus-icon variant="linear">
           <svg viewBox="0 0 24 24" aria-hidden="true">
             <path
               d="M4 12h16"
@@ -63,7 +63,7 @@
               stroke-width="3"
             />
           </svg>
-        </el-icon>
+        </fsus-icon>
       </span>
     </section>
 
@@ -120,7 +120,7 @@
 }
 
 .foundation-boundary__eyebrow {
-  color: var(--el-text-color-secondary);
+  color: var(--fsus-color-text-quiet);
   font-size: 13px;
   font-weight: 700;
   text-transform: uppercase;
@@ -129,7 +129,7 @@
 .foundation-boundary__panel {
   min-width: 0;
   padding: 24px;
-  border: 1px solid var(--el-border-color);
+  border: 1px solid var(--fsus-color-border-subtle);
 }
 
 [data-testid='svg-owners'] {

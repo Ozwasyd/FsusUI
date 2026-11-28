@@ -29,18 +29,14 @@ const posixPath = (value) => value.replaceAll('\\', '/')
 const resolveArtifact = (file) => resolve(root, file)
 
 const iconArtifactFiles = [
-  'vue/packages/icons-vue/dist/index.js',
-  'vue/packages/icons-vue/dist/index.cjs',
-  'vue/packages/icons-vue/dist/global.js',
-  'vue/packages/icons-vue/dist/types/index.d.ts',
+  'vue/packages/icons/src/index.ts',
+  'vue/packages/icons/src/icon-paths.ts',
 ]
 
 const wasmBundleArtifacts = [
   'vue/packages/wasm/dist/index.mjs',
-  'vue/packages/wasm/dist/index.cjs',
   'vue/packages/wasm/dist/index.d.ts',
   'vue/packages/wasm/dist/index.d.mts',
-  'vue/packages/wasm/dist/index.d.cts',
 ]
 
 const wasmNativeArtifacts = [
@@ -55,19 +51,18 @@ const wasmNativeArtifacts = [
 export const artifactGroups = {
   icons: {
     id: 'icons',
-    label: 'icons-vue',
+    label: 'icons',
     scriptName: 'ensure:icons',
     scriptPath: 'scripts/ensure-icons-artifacts.mjs',
-    artifactsPath: 'vue/packages/icons-vue/dist',
+    artifactsPath: 'vue/packages/icons/src',
     fingerprints: [
       {
         id: 'icons',
-        fingerprintPath: 'vue/packages/icons-vue/dist/.artifact-fingerprint',
+        fingerprintPath: 'vue/packages/icons/.artifact-fingerprint',
         artifactFiles: iconArtifactFiles,
         inputPatterns: [
-          'vue/packages/icons-vue/package.json',
-          'vue/packages/icons-vue/src/**/*',
-          'vue/packages/icons-vue/build/**/*',
+          'vue/packages/icons/package.json',
+          'vue/packages/icons/src/**/*',
           'scripts/ensure-icons-artifacts.mjs',
           'scripts/prepare-test-artifacts.mjs',
           'scripts/test-artifact-cache.mjs',

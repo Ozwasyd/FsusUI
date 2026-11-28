@@ -1,0 +1,62 @@
+{
+  "version": "2.0.0-alpha.0",
+  "packageName": "@ozwasyd/fsusui",
+  "capturedAt": "2026-11-28",
+  "branch": "next",
+  "mainHeadSha": "c4c70eb07e3bd25cfa190e6cbaaed68a68ab6f11",
+  "source": {
+    "componentsSrcFiles": 63,
+    "componentsSrcLoc": 11552,
+    "coreSrcFiles": 22,
+    "coreSrcLoc": 6815,
+    "themeSrcFiles": 13,
+    "themeSrcLoc": 4167,
+    "iconsSrcFiles": 2,
+    "iconsSrcLoc": 252,
+    "motionSrcFiles": 14,
+    "motionSrcLoc": 3416,
+    "markdownSrcFiles": 82,
+    "markdownSrcLoc": 35994,
+    "entryPackageLoc": 126,
+    "wasmLoc": 23849
+  },
+  "artifacts": {
+    "fileCount": 293,
+    "unpackedBytes": 5000418,
+    "unpackedKB": 4883.2,
+    "tarballBytes": 898015,
+    "tarballKB": 877,
+    "dtsTotalKB": 1924,
+    "indexMjsKB": 373.7,
+    "indexMjsGzipKB": 66.7,
+    "fsusCssKB": 84.1,
+    "fsusCssGzipKB": 12.7,
+    "markdownCssKB": 14.1,
+    "markdownCssGzipKB": 2.9,
+    "markdownHeavyFrameKB": 33.7,
+    "markdownHeavyFrameCopies": 1
+  },
+  "dependencies": {
+    "publishedRuntimeCount": 1,
+    "publishedRuntime": [
+      "@floating-ui/dom"
+    ],
+    "peerDependencies": {
+      "katex": "^0.17.0",
+      "mermaid": "^11.0.0",
+      "shiki": "^4.0.0",
+      "vue": "^3.5.0"
+    },
+    "peerDependenciesMeta": {
+      "katex": {
+        "optional": true
+      },
+      "mermaid": {
+        "optional": true
+      },
+      "shiki": {
+        "optional": true
+      }
+    }
+  }
+}

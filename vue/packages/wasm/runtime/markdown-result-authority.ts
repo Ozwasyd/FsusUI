@@ -23,7 +23,7 @@ import type {
   FsusErrorCode,
   FsusErrorDetail,
   FsusResult,
-} from '@element-plus/utils'
+} from '@fsusui/core'
 
 const fsusErrorCategories = {
   aborted: 'runtime',

@@ -5,7 +5,7 @@ import { registerMarkdownHeavyFeatureIsolatedRenderFactory } from '../markdown-h
 import {
   createMarkdownHeavyFeatureLifecycle,
   type MarkdownHeavyFeatureKind,
-} from '../../hooks/use-markdown-heavy-feature-lifecycle'
+} from '../../markdown/src/hooks/use-markdown-heavy-feature-lifecycle'
 import { getMarkdownXssFeatureOutput } from '../../../tests/support/markdown-xss-corpus'
 
 const featureModuleMocks = vi.hoisted(() => ({
@@ -232,9 +232,9 @@ describe('markdown feature activation runtime', () => {
     const createElement = vi.spyOn(document, 'createElement')
     const getComputedStyle = vi.spyOn(window, 'getComputedStyle')
     root.setAttribute('data-theme-resolved', 'dark')
-    root.style.setProperty('--el-color-primary', 'red;} body{display:none')
+    root.style.setProperty('--fsus-color-action-primary', 'red;} body{display:none')
     root.style.setProperty(
-      '--el-color-danger',
+      '--fsus-color-status-danger',
       'url(https://evil.example/color)',
     )
     root.innerHTML = [
@@ -255,8 +255,8 @@ describe('markdown feature activation runtime', () => {
         startOnLoad: false,
         theme: 'dark',
         themeVariables: expect.objectContaining({
-          nodeBorder: '#409eff',
-          primaryBorderColor: '#409eff',
+          nodeBorder: '#2a599c',
+          primaryBorderColor: '#2a599c',
         }),
       }),
     )
@@ -269,7 +269,7 @@ describe('markdown feature activation runtime', () => {
       'x^2',
       expect.objectContaining({
         displayMode: false,
-        errorColor: '#f56c6c',
+        errorColor: '#d92d20',
         output: 'mathml',
         throwOnError: false,
         trust: false,
@@ -321,8 +321,8 @@ describe('markdown feature activation runtime', () => {
       const primaryColor = dark ? '#123456' : '#abcdef'
       const dangerColor = dark ? '#654321' : '#fedcba'
       root.setAttribute('data-theme-resolved', dark ? 'dark' : 'light')
-      root.style.setProperty('--el-color-primary', primaryColor)
-      root.style.setProperty('--el-color-danger', dangerColor)
+      root.style.setProperty('--fsus-color-action-primary', primaryColor)
+      root.style.setProperty('--fsus-color-status-danger', dangerColor)
       root.innerHTML = [
         `<figure class="markdown-renderer__mermaid" data-mermaid-placeholder="true"><code>sequenceDiagram\nAlice-->>Bob: revision ${revision}</code></figure>`,
         `<span class="markdown-renderer__latex" data-latex-placeholder="true"><code>x_${revision}</code></span>`,
@@ -521,14 +521,14 @@ describe('markdown feature activation runtime', () => {
       },
     ])
     expect(
-      root.querySelector('.el-markdown-renderer__feature-error'),
+      root.querySelector('.fsus-markdown-renderer__feature-error'),
     ).toBeTruthy()
     expect(
-      root.querySelector('.el-markdown-renderer__feature-error code')
+      root.querySelector('.fsus-markdown-renderer__feature-error code')
         ?.textContent,
     ).toBe('<img src=x onerror=alert(1)>')
     expect(
-      root.querySelector('.el-markdown-renderer__feature-error img'),
+      root.querySelector('.fsus-markdown-renderer__feature-error img'),
     ).toBeNull()
   })
 

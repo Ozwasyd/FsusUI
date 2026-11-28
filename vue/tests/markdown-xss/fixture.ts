@@ -1,10 +1,10 @@
 import { createApp, h, nextTick } from 'vue'
-import MarkdownRenderer from '../../packages/components/markdown-renderer/src/markdown-renderer.vue'
+import MarkdownRenderer from '../../packages/markdown/src/markdown-renderer/src/markdown-renderer.vue'
 import {
   renderMarkdownChunksWithRuntime,
   renderMarkdownHtmlWithRuntime,
   renderMarkdownResultWithRuntime,
-} from '@element-plus/wasm'
+} from '@fsusui/wasm'
 import { commitMarkdownFeatureOutput } from '../../packages/wasm/markdown-feature-output-gateway'
 import { markdownXssKillControls } from '../support/markdown-xss-kill-controls'
 import {

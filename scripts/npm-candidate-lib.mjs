@@ -80,7 +80,7 @@ function inputDigests(repoRoot) {
     'scripts/npm-candidate-lib.mjs',
     'scripts/package-candidate.mjs',
     'scripts/prepare-npm-package.mjs',
-    'vue/packages/element-plus/package.json',
+    'vue/packages/fsusui/package.json',
   ]
   return Object.fromEntries(
     inputPaths.map((relativePath) => {
@@ -524,7 +524,7 @@ export function verifyCandidate({
     const packageRoot = extractCandidate(tarballPath, tempDir)
     const packageJson = readJson(path.join(packageRoot, 'package.json'))
     const sourcePackageJson = readJson(
-      path.join(repoRoot, 'vue/packages/element-plus/package.json'),
+      path.join(repoRoot, 'vue/packages/fsusui/package.json'),
     )
     validatePackageShape(packageRoot, packageJson)
     if (
@@ -538,7 +538,7 @@ export function verifyCandidate({
     }
     if (
       packageJson.name !==
-        (process.env.NPM_PACKAGE_NAME || '@ozwasyd/element-plus') ||
+        (process.env.NPM_PACKAGE_NAME || '@ozwasyd/fsusui') ||
       packageJson.version !== sourcePackageJson.version
     ) {
       throw new Error(

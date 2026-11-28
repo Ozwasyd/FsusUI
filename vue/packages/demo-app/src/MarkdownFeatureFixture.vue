@@ -7,7 +7,7 @@
       'data-performance-scenario': scenario,
     }"
   >
-    <el-markdown-renderer
+    <fsus-markdown-renderer
       :content="markdown"
       :content-version="markdownContentVersion"
       :allow-latex="true"
@@ -26,9 +26,9 @@
 
 <script setup lang="ts">
 import { computed, nextTick, onBeforeUnmount, onMounted, ref } from 'vue'
-import { getFsusRenderPipelineDiagnosticsSnapshot } from '@element-plus/hooks'
-import { provideMarkdownHeavyFeatureDocumentContext } from '../../hooks/use-markdown-heavy-feature-lifecycle'
-import { createMarkdownHeavyFeatureIsolatedRender } from '../../wasm/markdown-heavy-feature-isolated-client'
+import { getFsusRenderPipelineDiagnosticsSnapshot } from '@fsusui/core/render-pipeline'
+import { provideMarkdownHeavyFeatureDocumentContext } from '@fsusui/markdown'
+import { createMarkdownHeavyFeatureIsolatedRender } from '@fsusui/wasm/markdown-heavy-feature-isolated-client'
 import {
   MARKDOWN_FEATURE_ACTIVATION_SCENARIO,
   MARKDOWN_HEAVY_LIFECYCLE_SCENARIO,
@@ -42,7 +42,7 @@ import type {
   MarkdownFeatureActivationResult,
   MarkdownRuntimeProfile,
   MarkdownSafeRenderResult,
-} from '@element-plus/wasm'
+} from '@fsusui/wasm'
 
 const props = defineProps<{
   scenario: string

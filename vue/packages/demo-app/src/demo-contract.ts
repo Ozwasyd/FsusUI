@@ -1,76 +1,43 @@
-import ElementPlus, {
-  ElLoading,
-  ElMessage,
-  ElMessageBox,
-  ElNotification,
-  ElOverlay,
-  ElPopperArrow,
-  ElPopperContent,
-  ElPopperTrigger,
+import FsusUI, {
+  FsusLoadingService,
+  FsusMessage,
+  FsusMessageBox,
+  FsusNotification,
+  en,
   normalizeThemeMode,
-  registerFsusDefaultRenderPipelineComponentPolicies,
-} from '../../element-plus'
-import * as localeLanguages from '../../locale'
+  zhCN,
+  type FsusLocale,
+  type ThemeMode,
+} from '@ozwasyd/fsusui'
+import { registerFsusDefaultRenderPipelineComponentPolicies } from '@ozwasyd/fsusui/render-pipeline'
 import { demoComponents } from './demo-components'
 
 import type { App, Component } from 'vue'
-import type { Language } from '../../locale'
-import type { ThemeMode } from '../../element-plus'
 
-const demoLocales = (Object.values(localeLanguages) as unknown[]).filter(
-  (locale): locale is Language =>
-    typeof locale === 'object' &&
-    locale !== null &&
-    typeof (locale as Language).name === 'string',
-)
+const demoLocales: readonly FsusLocale[] = [zhCN, en]
 
 const normalizeLanguageTag = (language: string) =>
   language.trim().toLowerCase().replaceAll('_', '-')
 
 const getBrowserLanguages = () => {
   if (typeof navigator === 'undefined') return []
-
-  if (navigator.languages.length > 0) {
-    return [...navigator.languages]
-  }
-
+  if (navigator.languages.length > 0) return [...navigator.languages]
   return navigator.language ? [navigator.language] : []
 }
 
 export const resolveDemoLocale = (
   preferredLanguages = getBrowserLanguages(),
-) => {
+): FsusLocale => {
   for (const language of preferredLanguages) {
     const normalized = normalizeLanguageTag(language)
     const exactMatch = demoLocales.find(
       (locale) => normalizeLanguageTag(locale.name) === normalized,
     )
-
     if (exactMatch) return exactMatch
-
-    if (normalized.startsWith('zh')) {
-      const chineseLocale = /-(tw|hk|mo|hant)\b/.test(normalized)
-        ? 'zh-tw'
-        : 'zh-cn'
-      const locale = demoLocales.find(
-        (item) => normalizeLanguageTag(item.name) === chineseLocale,
-      )
-
-      if (locale) return locale
-    }
-
-    const baseLanguage = normalized.split('-')[0]
-    const baseMatch = demoLocales.find((locale) => {
-      const localeName = normalizeLanguageTag(locale.name)
-      return (
-        localeName === baseLanguage || localeName.startsWith(`${baseLanguage}-`)
-      )
-    })
-
-    if (baseMatch) return baseMatch
+    if (normalized.startsWith('zh')) return zhCN
+    if (normalized.startsWith('en')) return en
   }
-
-  return undefined
+  return zhCN
 }
 
 export const createDemoContract = (
@@ -79,28 +46,22 @@ export const createDemoContract = (
 ) =>
   ({
     install(app: App) {
-      app.use(ElementPlus, { themeMode, locale })
+      app.use(FsusUI, { themeMode, locale })
       registerFsusDefaultRenderPipelineComponentPolicies(
         Object.values(demoComponents),
       )
       for (const [name, component] of Object.entries(demoComponents)) {
         if (!app.component(name)) {
-          app.component(name, component as Component)
+          app.component(name, component)
         }
       }
     },
     components: demoComponents,
     services: {
-      loading: ElLoading,
-      message: ElMessage,
-      messageBox: ElMessageBox,
-      notification: ElNotification,
-    },
-    rawPopper: {
-      Overlay: ElOverlay,
-      Arrow: ElPopperArrow,
-      Content: ElPopperContent,
-      Trigger: ElPopperTrigger,
+      loading: FsusLoadingService,
+      message: FsusMessage,
+      messageBox: FsusMessageBox,
+      notification: FsusNotification,
     },
   }) as const
 
@@ -129,7 +90,6 @@ export const resolveDemoRoot = async (
   }
 
   const performanceScenario = searchParams.get('performance')
-
   if (
     performanceScenario === 'markdown-feature-activation' ||
     performanceScenario === 'markdown-heavy-feature-lifecycle'
@@ -145,8 +105,8 @@ export const resolveDemoRoot = async (
       },
     }
   }
-  const auditMode = searchParams.get('audit')
 
+  const auditMode = searchParams.get('audit')
   if (auditMode === 'drawer-safe-area') {
     const { default: DrawerSafeAreaFixture } =
       await import('./DrawerSafeAreaFixture.vue')
@@ -186,17 +146,14 @@ export const resolveDemoRoot = async (
     const { default: CollapseFixture } = await import('./CollapseFixture.vue')
     return { component: CollapseFixture, themeMode }
   }
-
   if (searchParams.get('checktag') === '1') {
     const { default: CheckTagFixture } = await import('./CheckTagFixture.vue')
     return { component: CheckTagFixture, themeMode }
   }
-
   if (searchParams.get('avatar') === '1') {
     const { default: AvatarFixture } = await import('./AvatarFixture.vue')
     return { component: AvatarFixture, themeMode }
   }
-
   if (searchParams.get('checkboxbutton') === '1') {
     const { default: CheckboxButtonFixture } = await import('./CheckboxButtonFixture.vue')
     return { component: CheckboxButtonFixture, themeMode }

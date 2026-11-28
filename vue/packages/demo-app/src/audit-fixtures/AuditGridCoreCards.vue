@@ -74,30 +74,30 @@
         </div>
       </AuditCard>
 
-      <AuditCard name="ElVisuallyHidden" :state="auditState">
-        <el-visually-hidden>Hidden audit text</el-visually-hidden>
+      <AuditCard name="FsusVisuallyHidden" :state="auditState">
+        <fsus-visually-hidden>Hidden audit text</fsus-visually-hidden>
         <span class="audit-inline-note">Visible companion text</span>
       </AuditCard>
 
-      <AuditCard name="ElAffix" :state="auditState">
-        <el-affix :offset="8" target=".audit-page">
-          <el-button data-audit-focus data-audit-target>Affix action</el-button>
-        </el-affix>
+      <AuditCard name="FsusAffix" :state="auditState">
+        <fsus-affix :offset="8" target=".audit-page">
+          <fsus-button data-audit-focus data-audit-target>Affix action</fsus-button>
+        </fsus-affix>
       </AuditCard>
 
-      <AuditCard name="ElAlert" :state="auditState">
-        <el-alert title="Focused feedback" type="info" show-icon />
+      <AuditCard name="FsusAlert" :state="auditState">
+        <fsus-alert title="Focused feedback" type="info" show-icon />
       </AuditCard>
 
-      <AuditCard name="ElAside" :state="auditState">
-        <el-container class="audit-container">
-          <el-aside width="96px">Aside</el-aside>
-          <el-main>Main</el-main>
-        </el-container>
+      <AuditCard name="FsusAside" :state="auditState">
+        <fsus-container class="audit-container">
+          <fsus-aside width="96px">Aside</fsus-aside>
+          <fsus-main>Main</fsus-main>
+        </fsus-container>
       </AuditCard>
 
-      <AuditCard name="ElAutocomplete" :state="auditState">
-        <el-autocomplete
+      <AuditCard name="FsusAutocomplete" :state="auditState">
+        <fsus-autocomplete
           :model-value="activeText"
           :fetch-suggestions="querySearch"
           data-audit-focus
@@ -105,102 +105,102 @@
         />
       </AuditCard>
 
-      <AuditCard name="ElAvatar" :state="auditState">
-        <el-space wrap>
-          <el-avatar :src="imageData" />
-          <el-avatar shape="square">UI</el-avatar>
-        </el-space>
+      <AuditCard name="FsusAvatar" :state="auditState">
+        <fsus-space wrap>
+          <fsus-avatar :src="imageData" />
+          <fsus-avatar shape="square">UI</fsus-avatar>
+        </fsus-space>
       </AuditCard>
 
-      <AuditCard name="ElBacktop" :state="auditState">
+      <AuditCard name="FsusBacktop" :state="auditState">
         <div class="audit-scroll-shell">
           <div class="audit-scroll-content">Scroll shell</div>
-          <el-backtop :right="16" :bottom="16" :visibility-height="0" />
+          <fsus-backtop :right="16" :bottom="16" :visibility-height="0" />
         </div>
       </AuditCard>
 
-      <AuditCard name="ElBadge" :state="auditState">
-        <el-badge :value="active ? 24 : 8">
-          <el-button data-audit-focus data-audit-target>Inbox</el-button>
-        </el-badge>
+      <AuditCard name="FsusBadge" :state="auditState">
+        <fsus-badge :value="active ? 24 : 8">
+          <fsus-button data-audit-focus data-audit-target>Inbox</fsus-button>
+        </fsus-badge>
       </AuditCard>
 
-      <AuditCard name="ElBreadcrumb" :state="auditState">
-        <el-breadcrumb separator="/">
-          <el-breadcrumb-item>Home</el-breadcrumb-item>
-          <el-breadcrumb-item>Library</el-breadcrumb-item>
-        </el-breadcrumb>
+      <AuditCard name="FsusBreadcrumb" :state="auditState">
+        <fsus-breadcrumb separator="/">
+          <fsus-breadcrumb-item>Home</fsus-breadcrumb-item>
+          <fsus-breadcrumb-item>Library</fsus-breadcrumb-item>
+        </fsus-breadcrumb>
       </AuditCard>
 
-      <AuditCard name="ElBreadcrumbItem" :state="auditState">
-        <el-breadcrumb separator="/">
-          <el-breadcrumb-item :to="{ path: '/' }">
+      <AuditCard name="FsusBreadcrumbItem" :state="auditState">
+        <fsus-breadcrumb separator="/">
+          <fsus-breadcrumb-item :to="{ path: '/' }">
             Current item
-          </el-breadcrumb-item>
-        </el-breadcrumb>
+          </fsus-breadcrumb-item>
+        </fsus-breadcrumb>
       </AuditCard>
 
-      <AuditCard name="ElButton" :state="auditState">
-        <el-button
+      <AuditCard name="FsusButton" :state="auditState">
+        <fsus-button
           :type="active ? 'primary' : undefined"
           data-audit-focus
           data-audit-target
         >
           Button
-        </el-button>
+        </fsus-button>
       </AuditCard>
 
-      <AuditCard name="ElButtonGroup" :state="auditState">
-        <el-button-group>
-          <el-button :type="active ? 'primary' : undefined" :icon="ArrowLeft">
+      <AuditCard name="FsusButtonGroup" :state="auditState">
+        <fsus-button-group>
+          <fsus-button :type="active ? 'primary' : undefined" :icon="ArrowLeft">
             Prev
-          </el-button>
-          <el-button type="primary">
+          </fsus-button>
+          <fsus-button type="primary">
             Next
-            <el-icon class="el-icon--right"><ArrowRight /></el-icon>
-          </el-button>
-        </el-button-group>
+            <fsus-icon class="el-icon--right"><ArrowRight /></fsus-icon>
+          </fsus-button>
+        </fsus-button-group>
       </AuditCard>
 
-      <AuditCard name="ElCalendar" :state="auditState">
+      <AuditCard name="FsusCalendar" :state="auditState">
         <div class="audit-calendar-frame">
-          <el-calendar :model-value="dateValue" :range="calendarRange" />
+          <fsus-calendar :model-value="dateValue" :range="calendarRange" />
         </div>
       </AuditCard>
 
-      <AuditCard name="ElCard" :state="auditState">
-        <el-card>
+      <AuditCard name="FsusCard" :state="auditState">
+        <fsus-card>
           <template #header>Card header</template>
           <p>Curated surface content</p>
-        </el-card>
+        </fsus-card>
       </AuditCard>
 
-      <AuditCard name="ElCarousel" :state="auditState">
-        <el-carousel
+      <AuditCard name="FsusCarousel" :state="auditState">
+        <fsus-carousel
           height="120px"
           :autoplay="false"
           :initial-index="active ? 1 : 0"
         >
-          <el-carousel-item v-for="item in 3" :key="item">
+          <fsus-carousel-item v-for="item in 3" :key="item">
             <div class="audit-carousel-panel">Slide {{ item }}</div>
-          </el-carousel-item>
-        </el-carousel>
+          </fsus-carousel-item>
+        </fsus-carousel>
       </AuditCard>
 
-      <AuditCard name="ElCarouselItem" :state="auditState">
-        <el-carousel
+      <AuditCard name="FsusCarouselItem" :state="auditState">
+        <fsus-carousel
           height="120px"
           :autoplay="false"
           :initial-index="active ? 1 : 0"
         >
-          <el-carousel-item>
+          <fsus-carousel-item>
             <div class="audit-carousel-panel">Carousel item</div>
-          </el-carousel-item>
-        </el-carousel>
+          </fsus-carousel-item>
+        </fsus-carousel>
       </AuditCard>
 
-      <AuditCard name="ElCascader" :state="auditState">
-        <el-cascader
+      <AuditCard name="FsusCascader" :state="auditState">
+        <fsus-cascader
           :model-value="active ? ['guide', 'docs'] : []"
           :options="cascaderOptions"
           :teleported="false"
@@ -210,93 +210,93 @@
         />
       </AuditCard>
 
-      <AuditCard name="ElCascaderPanel" :state="auditState">
-        <el-cascader-panel
+      <AuditCard name="FsusCascaderPanel" :state="auditState">
+        <fsus-cascader-panel
           :model-value="active ? ['guide', 'docs'] : []"
           :options="cascaderOptions"
         />
       </AuditCard>
 
-      <AuditCard name="ElCheckbox" :state="auditState">
-        <el-checkbox :model-value="active" data-audit-focus data-audit-target>
+      <AuditCard name="FsusCheckbox" :state="auditState">
+        <fsus-checkbox :model-value="active" data-audit-focus data-audit-target>
           Checkbox
-        </el-checkbox>
+        </fsus-checkbox>
       </AuditCard>
 
-      <AuditCard name="ElCheckboxButton" :state="auditState">
-        <el-checkbox-group :model-value="active ? ['A'] : []">
-          <el-checkbox-button label="A">推送到首页</el-checkbox-button>
-        </el-checkbox-group>
+      <AuditCard name="FsusCheckboxButton" :state="auditState">
+        <fsus-checkbox-group :model-value="active ? ['A'] : []">
+          <fsus-checkbox-button label="A">推送到首页</fsus-checkbox-button>
+        </fsus-checkbox-group>
       </AuditCard>
 
-      <AuditCard name="ElCheckboxGroup" :state="auditState">
-        <el-checkbox-group :model-value="active ? ['A', 'B'] : ['A']">
-          <el-checkbox label="A">A</el-checkbox>
-          <el-checkbox label="B">B</el-checkbox>
-        </el-checkbox-group>
+      <AuditCard name="FsusCheckboxGroup" :state="auditState">
+        <fsus-checkbox-group :model-value="active ? ['A', 'B'] : ['A']">
+          <fsus-checkbox label="A">A</fsus-checkbox>
+          <fsus-checkbox label="B">B</fsus-checkbox>
+        </fsus-checkbox-group>
       </AuditCard>
 
-      <AuditCard name="ElCheckTag" :state="auditState">
-        <el-check-tag :checked="active" data-audit-target>
+      <AuditCard name="FsusCheckTag" :state="auditState">
+        <fsus-check-tag :checked="active" data-audit-target>
           Check tag
-        </el-check-tag>
+        </fsus-check-tag>
       </AuditCard>
 
-      <AuditCard name="ElCol" :state="auditState">
-        <el-row :gutter="12">
-          <el-col :span="12"><div class="audit-grid-cell">12</div></el-col>
-          <el-col :span="12"><div class="audit-grid-cell">12</div></el-col>
-        </el-row>
+      <AuditCard name="FsusCol" :state="auditState">
+        <fsus-row :gutter="12">
+          <fsus-col :span="12"><div class="audit-grid-cell">12</div></fsus-col>
+          <fsus-col :span="12"><div class="audit-grid-cell">12</div></fsus-col>
+        </fsus-row>
       </AuditCard>
 
-      <AuditCard name="ElCollapse" :state="auditState">
-        <el-collapse :model-value="active ? ['1', '2'] : ['1']">
-          <el-collapse-item title="Consistency" name="1">
+      <AuditCard name="FsusCollapse" :state="auditState">
+        <fsus-collapse :model-value="active ? ['1', '2'] : ['1']">
+          <fsus-collapse-item title="Consistency" name="1">
             First panel
-          </el-collapse-item>
-          <el-collapse-item title="Interaction" name="2">
+          </fsus-collapse-item>
+          <fsus-collapse-item title="Interaction" name="2">
             Second panel
-          </el-collapse-item>
-        </el-collapse>
+          </fsus-collapse-item>
+        </fsus-collapse>
       </AuditCard>
 
-      <AuditCard name="ElCollapseItem" :state="auditState">
-        <el-collapse :model-value="active ? ['item'] : []">
-          <el-collapse-item title="Collapse item" name="item">
+      <AuditCard name="FsusCollapseItem" :state="auditState">
+        <fsus-collapse :model-value="active ? ['item'] : []">
+          <fsus-collapse-item title="Collapse item" name="item">
             发布前检查摘要
-          </el-collapse-item>
-        </el-collapse>
+          </fsus-collapse-item>
+        </fsus-collapse>
       </AuditCard>
 
-      <AuditCard name="ElCollapseTransition" :state="auditState">
-        <el-button
+      <AuditCard name="FsusCollapseTransition" :state="auditState">
+        <fsus-button
           data-audit-target
           @click="transitionVisible = !transitionVisible"
         >
           Toggle
-        </el-button>
-        <el-collapse-transition>
+        </fsus-button>
+        <Transition name="fsus-fade">
           <div
             v-show="active || transitionVisible"
             class="audit-transition-box"
           >
             Transition content
           </div>
-        </el-collapse-transition>
+        </Transition>
       </AuditCard>
 
-      <AuditCard name="ElColorPicker" :state="auditState">
-        <el-color-picker
+      <AuditCard name="FsusColorPicker" :state="auditState">
+        <fsus-color-picker
           :model-value="active ? scholarlyBlue : dotGray"
           data-audit-focus
           data-audit-target
         />
       </AuditCard>
 
-      <AuditCard name="ElCollectionToolbar" :state="auditState">
-        <ElCollectionToolbar ariaLabel="Collection controls" density="compact">
+      <AuditCard name="FsusCollectionToolbar" :state="auditState">
+        <FsusCollectionToolbar ariaLabel="Collection controls" density="compact">
           <template #primary>
-            <el-input
+            <fsus-input
               :model-value="activeText"
               placeholder="Search"
               data-audit-focus
@@ -304,56 +304,56 @@
             />
           </template>
           <template #filters>
-            <ElFilterGroup label="State" density="compact">
-              <ElSegmentedControl
+            <FsusFilterGroup label="State" density="compact">
+              <FsusSegmentedControl
                 :model-value="active ? 'open' : 'all'"
                 :items="collectionStateItems"
                 ariaLabel="Filter state"
                 density="compact"
               />
-            </ElFilterGroup>
+            </FsusFilterGroup>
           </template>
           <template #actions>
-            <el-button data-audit-active data-audit-target>Refresh</el-button>
+            <fsus-button data-audit-active data-audit-target>Refresh</fsus-button>
           </template>
-        </ElCollectionToolbar>
-        <ElCollectionSummary
+        </FsusCollectionToolbar>
+        <FsusCollectionSummary
           title="Results"
           :total="12"
           :visible="active ? 3 : 12"
           :state="active ? 'Filtered' : ''"
           density="compact"
         />
-        <ElPaginationBar ariaLabel="Results pagination" density="compact">
+        <FsusPaginationBar ariaLabel="Results pagination" density="compact">
           <template #summary>Page 1 of 4</template>
           <template #pagination>
-            <el-pagination small layout="prev, pager, next" :total="40" />
+            <fsus-pagination small layout="prev, pager, next" :total="40" />
           </template>
-        </ElPaginationBar>
+        </FsusPaginationBar>
       </AuditCard>
 
-      <AuditCard name="ElConfigProvider" :state="auditState">
-        <el-config-provider :button="{ autoInsertSpace: false }">
-          <el-button type="primary" data-audit-target>
+      <AuditCard name="FsusConfigProvider" :state="auditState">
+        <fsus-config-provider :button="{ autoInsertSpace: false }">
+          <fsus-button type="primary" data-audit-target>
             Provider child
-          </el-button>
-        </el-config-provider>
+          </fsus-button>
+        </fsus-config-provider>
       </AuditCard>
 
-      <AuditCard name="ElContainer" :state="auditState">
-        <el-container class="audit-container">
-          <el-header height="36px">Header</el-header>
-          <el-main>Main</el-main>
-          <el-footer height="36px">Footer</el-footer>
-        </el-container>
+      <AuditCard name="FsusContainer" :state="auditState">
+        <fsus-container class="audit-container">
+          <fsus-header height="36px">Header</fsus-header>
+          <fsus-main>Main</fsus-main>
+          <fsus-footer height="36px">Footer</fsus-footer>
+        </fsus-container>
       </AuditCard>
 
-      <AuditCard name="ElCountdown" :state="auditState">
-        <el-countdown title="Countdown" :value="countdownValue" />
+      <AuditCard name="FsusCountdown" :state="auditState">
+        <fsus-countdown title="Countdown" :value="countdownValue" />
       </AuditCard>
 
-      <AuditCard name="ElDatePicker" :state="auditState">
-        <el-date-picker
+      <AuditCard name="FsusDatePicker" :state="auditState">
+        <fsus-date-picker
           :model-value="dateValue"
           type="date"
           placeholder="Pick day"
@@ -362,25 +362,25 @@
         />
       </AuditCard>
 
-      <AuditCard name="ElDescriptions" :state="auditState">
-        <el-descriptions title="Profile" border :column="1">
-          <el-descriptions-item label="Name">FsusUI</el-descriptions-item>
-          <el-descriptions-item label="State">
+      <AuditCard name="FsusDescriptions" :state="auditState">
+        <fsus-descriptions title="Profile" border :column="1">
+          <fsus-descriptions-item label="Name">FsusUI</fsus-descriptions-item>
+          <fsus-descriptions-item label="State">
             {{ active ? 'Active' : 'Ready' }}
-          </el-descriptions-item>
-        </el-descriptions>
+          </fsus-descriptions-item>
+        </fsus-descriptions>
       </AuditCard>
 
-      <AuditCard name="ElDescriptionsItem" :state="auditState">
-        <el-descriptions :column="1" border>
-          <el-descriptions-item label="文章状态">
+      <AuditCard name="FsusDescriptionsItem" :state="auditState">
+        <fsus-descriptions :column="1" border>
+          <fsus-descriptions-item label="文章状态">
             等待复核
-          </el-descriptions-item>
-        </el-descriptions>
+          </fsus-descriptions-item>
+        </fsus-descriptions>
       </AuditCard>
 
-      <AuditCard name="ElDialog" :state="auditState">
-        <el-button
+      <AuditCard name="FsusDialog" :state="auditState">
+        <fsus-button
           v-if="!dialogVisible"
           data-audit-active
           data-audit-focus
@@ -388,8 +388,8 @@
           @click="dialogVisible = true"
         >
           Open dialog
-        </el-button>
-        <el-dialog
+        </fsus-button>
+        <fsus-dialog
           v-model="dialogVisible"
           title="Dialog"
           width="280px"
@@ -399,17 +399,17 @@
           :lock-scroll="false"
         >
           <span>Dialog content</span>
-        </el-dialog>
+        </fsus-dialog>
       </AuditCard>
 
-      <AuditCard name="ElDivider" :state="auditState">
+      <AuditCard name="FsusDivider" :state="auditState">
         <span>Before</span>
-        <el-divider content-position="left">Divider</el-divider>
+        <fsus-divider content-position="left">Divider</fsus-divider>
         <span>After</span>
       </AuditCard>
 
-      <AuditCard name="ElDrawer" :state="auditState">
-        <el-button
+      <AuditCard name="FsusDrawer" :state="auditState">
+        <fsus-button
           v-if="!drawerVisible"
           data-audit-active
           data-audit-focus
@@ -417,8 +417,8 @@
           @click="drawerVisible = true"
         >
           Open drawer
-        </el-button>
-        <el-drawer
+        </fsus-button>
+        <fsus-drawer
           v-model="drawerVisible"
           title="Drawer"
           size="260px"
@@ -428,93 +428,93 @@
           :lock-scroll="false"
         >
           Drawer content
-        </el-drawer>
+        </fsus-drawer>
       </AuditCard>
 
-      <AuditCard name="ElDropdown" :state="auditState">
-        <el-dropdown trigger="click" :show-timeout="0" :teleported="false">
-          <el-button
+      <AuditCard name="FsusDropdown" :state="auditState">
+        <fsus-dropdown trigger="click" :show-timeout="0" :teleported="false">
+          <fsus-button
             type="primary"
             data-audit-focus
             data-audit-target
             data-audit-active
           >
             Dropdown
-            <el-icon class="el-icon--right"><ArrowDown /></el-icon>
-          </el-button>
+            <fsus-icon class="el-icon--right"><ArrowDown /></fsus-icon>
+          </fsus-button>
           <template #dropdown>
-            <el-dropdown-menu>
-              <el-dropdown-item>Action one</el-dropdown-item>
-              <el-dropdown-item :disabled="!active">
+            <fsus-dropdown-menu>
+              <fsus-dropdown-item>Action one</fsus-dropdown-item>
+              <fsus-dropdown-item :disabled="!active">
                 Action two
-              </el-dropdown-item>
-            </el-dropdown-menu>
+              </fsus-dropdown-item>
+            </fsus-dropdown-menu>
           </template>
-        </el-dropdown>
+        </fsus-dropdown>
       </AuditCard>
 
-      <AuditCard name="ElDropdownItem" :state="auditState">
-        <el-dropdown trigger="click" :show-timeout="0" :teleported="false">
-          <el-button data-audit-active data-audit-target>
+      <AuditCard name="FsusDropdownItem" :state="auditState">
+        <fsus-dropdown trigger="click" :show-timeout="0" :teleported="false">
+          <fsus-button data-audit-active data-audit-target>
             Dropdown item
-          </el-button>
+          </fsus-button>
           <template #dropdown>
-            <el-dropdown-menu>
-              <el-dropdown-item :divided="active">
+            <fsus-dropdown-menu>
+              <fsus-dropdown-item :divided="active">
                 导出 Markdown
-              </el-dropdown-item>
-            </el-dropdown-menu>
+              </fsus-dropdown-item>
+            </fsus-dropdown-menu>
           </template>
-        </el-dropdown>
+        </fsus-dropdown>
       </AuditCard>
 
-      <AuditCard name="ElDropdownMenu" :state="auditState">
-        <el-dropdown trigger="click" :show-timeout="0" :teleported="false">
-          <el-button data-audit-active data-audit-target>
+      <AuditCard name="FsusDropdownMenu" :state="auditState">
+        <fsus-dropdown trigger="click" :show-timeout="0" :teleported="false">
+          <fsus-button data-audit-active data-audit-target>
             Dropdown menu
-          </el-button>
+          </fsus-button>
           <template #dropdown>
-            <el-dropdown-menu>
-              <el-dropdown-item>Menu action</el-dropdown-item>
-            </el-dropdown-menu>
+            <fsus-dropdown-menu>
+              <fsus-dropdown-item>Menu action</fsus-dropdown-item>
+            </fsus-dropdown-menu>
           </template>
-        </el-dropdown>
+        </fsus-dropdown>
       </AuditCard>
 
-      <AuditCard name="ElEmpty" :state="auditState">
-        <el-empty description="No records" />
+      <AuditCard name="FsusEmptyState" :state="auditState">
+        <fsus-empty-state description="No records" />
       </AuditCard>
 
-      <AuditCard name="ElEmptyState" :state="auditState">
-        <ElEmptyState
+      <AuditCard name="FsusEmptyState" :state="auditState">
+        <FsusEmptyState
           :size="active ? 'page' : 'compact'"
           title="No records"
           description="Adjust filters or create a new item."
           :action-variant="active ? 'primary' : 'secondary'"
         >
-          <el-button
+          <fsus-button
             :type="active ? 'primary' : undefined"
             data-audit-focus
             data-audit-target
             data-audit-active
           >
             Create item
-          </el-button>
-        </ElEmptyState>
+          </fsus-button>
+        </FsusEmptyState>
       </AuditCard>
 </template>
 
 <script setup lang="ts">
 import { ref, watch } from 'vue'
-import * as Icons from '@element-plus/icons-vue'
+import * as Icons from '@fsusui/icons'
 import {
-  ElCollectionSummary,
-  ElCollectionToolbar,
-  ElEmptyState,
-  ElFilterGroup,
-  ElPaginationBar,
-  ElSegmentedControl,
-} from '../../../element-plus'
+  FsusCollectionSummary,
+  FsusCollectionToolbar,
+  FsusEmptyState,
+  FsusFilterGroup,
+  FsusPaginationBar,
+  FsusSegmentedControl,
+} from '@ozwasyd/fsusui'
 import AuditCard from '../AuditCard.vue'
 import type { UiAuditState } from '../ui-audit-manifest'
 import type { AuditGridData } from './use-audit-grid-data'

@@ -442,12 +442,12 @@ const createFeatureErrorElement = (
   inline = false,
 ) => {
   const element = document.createElement(inline ? 'span' : 'div')
-  element.className = 'el-markdown-renderer__feature-error'
+  element.className = 'fsus-markdown-renderer__feature-error'
   element.setAttribute('role', 'note')
   element.dataset.markdownFeatureError = kind
 
   const message = document.createElement(inline ? 'span' : 'p')
-  message.className = 'el-markdown-renderer__feature-error-message'
+  message.className = 'fsus-markdown-renderer__feature-error-message'
   message.textContent = formatFeatureErrorMessage(kind, error)
   element.append(message)
 
@@ -547,32 +547,32 @@ const resolveMarkdownFeatureThemeTokens = (
       ? window.getComputedStyle(styleRoot)
       : null
   return Object.freeze({
-    background: getComputedToken(style, '--el-bg-color', '#ffffff'),
-    danger: getComputedToken(style, '--el-color-danger', '#f56c6c'),
+    background: getComputedToken(style, '--fsus-color-surface-base', '#ffffff'),
+    danger: getComputedToken(style, '--fsus-color-status-danger', '#d92d20'),
     edgeLabelBackground: getComputedToken(
       style,
-      '--el-bg-color-overlay',
+      '--fsus-color-surface-overlay',
       '#ffffff',
     ),
-    lineColor: getComputedToken(style, '--el-border-color-darker', '#909399'),
-    mainBackground: getComputedToken(style, '--el-fill-color-light', '#f5f7fa'),
-    nodeBorder: getComputedToken(style, '--el-color-primary', '#409eff'),
+    lineColor: getComputedToken(style, '--fsus-color-border-subtle', '#e4e4e7'),
+    mainBackground: getComputedToken(style, '--fsus-color-fill-light', '#fafafa'),
+    nodeBorder: getComputedToken(style, '--fsus-color-action-primary', '#2a599c'),
     primaryBorderColor: getComputedToken(
       style,
-      '--el-color-primary',
-      '#409eff',
+      '--fsus-color-action-primary',
+      '#2a599c',
     ),
-    primaryColor: getComputedToken(style, '--el-fill-color-light', '#f5f7fa'),
+    primaryColor: getComputedToken(style, '--fsus-color-fill-light', '#fafafa'),
     primaryTextColor: getComputedToken(
       style,
-      '--el-text-color-primary',
-      '#303133',
+      '--fsus-color-text-primary',
+      '#0f0f11',
     ),
-    secondaryColor: getComputedToken(style, '--el-fill-color-blank', '#ffffff'),
+    secondaryColor: getComputedToken(style, '--fsus-color-surface-base', '#ffffff'),
     tertiaryColor: getComputedToken(
       style,
-      '--el-fill-color-lighter',
-      '#fafafa',
+      '--fsus-color-fill-lighter',
+      '#fcfcfc',
     ),
   })
 }

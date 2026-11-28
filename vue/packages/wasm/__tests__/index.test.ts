@@ -3,7 +3,7 @@
 import { readFile } from 'node:fs/promises'
 import { resolve } from 'node:path'
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest'
-import { fsusOk } from '@element-plus/utils'
+import { fsusOk } from '@fsusui/core'
 
 import {
   clampAndRound,
@@ -42,7 +42,7 @@ const getRequestUrl = (input: RequestInfo | URL): string => {
   return input.url
 }
 
-describe('@element-plus/wasm', () => {
+describe('@fsusui/wasm', () => {
   beforeAll(async () => {
     const wasmBinary = await readFile(wasmBinaryPath)
 

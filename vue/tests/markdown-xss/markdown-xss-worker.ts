@@ -1,5 +1,5 @@
-import { renderMarkdownChunksWithRuntime } from '@element-plus/wasm'
-import type { MarkdownRenderRequest } from '@element-plus/wasm'
+import { renderMarkdownChunksWithRuntime } from '@fsusui/wasm'
+import type { MarkdownRenderRequest } from '@fsusui/wasm'
 
 self.onmessage = async (
   event: MessageEvent<{ id: number; request: MarkdownRenderRequest }>,

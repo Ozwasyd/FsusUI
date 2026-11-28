@@ -24,79 +24,80 @@
     >
       <h2 class="audit-safe-area-lab__title">Safe-area surfaces</h2>
       <div class="audit-safe-area-lab__controls">
-        <el-button
+        <fsus-button
           v-bind="safeAreaDataAttributes.openOverlay"
           @click="safeOverlayVisible = true"
         >
           Open Overlay
-        </el-button>
-        <el-button
+        </fsus-button>
+        <fsus-button
           v-bind="safeAreaDataAttributes.openDialog"
           @click="openSafeDialog(false)"
         >
           Open Dialog
-        </el-button>
-        <el-button
+        </fsus-button>
+        <fsus-button
           v-bind="safeAreaDataAttributes.openDialogFullscreen"
           @click="openSafeDialog(true)"
         >
           Open Fullscreen Dialog
-        </el-button>
-        <el-button
+        </fsus-button>
+        <fsus-button
           v-bind="safeAreaDataAttributes.openMessageBox"
           @click="openSafeMessageBox"
         >
           Open MessageBox
-        </el-button>
-        <el-button
+        </fsus-button>
+        <fsus-button
           v-bind="safeAreaDataAttributes.openDrawerLtr"
           @click="openSafeDrawer('ltr')"
         >
           Open Drawer LTR
-        </el-button>
-        <el-button
+        </fsus-button>
+        <fsus-button
           v-bind="safeAreaDataAttributes.openDrawerRtl"
           @click="openSafeDrawer('rtl')"
         >
           Open Drawer RTL
-        </el-button>
-        <el-button
+        </fsus-button>
+        <fsus-button
           v-bind="safeAreaDataAttributes.openDrawerTtb"
           @click="openSafeDrawer('ttb')"
         >
           Open Drawer TTB
-        </el-button>
-        <el-button
+        </fsus-button>
+        <fsus-button
           v-bind="safeAreaDataAttributes.openDrawerBtt"
           @click="openSafeDrawer('btt')"
         >
           Open Drawer BTT
-        </el-button>
-        <el-button
+        </fsus-button>
+        <fsus-button
           v-bind="safeAreaDataAttributes.openImageViewer"
           @click="safeImageViewerVisible = true"
         >
           Open ImageViewer
-        </el-button>
+        </fsus-button>
       </div>
 
-      <el-overlay
+      <div
         v-if="safeOverlayVisible"
+        class="fsus-overlay"
         :z-index="4000"
         @click="safeOverlayVisible = false"
       >
         <div class="audit-safe-area-lab__panel" @click.stop>
           <p>Safe-area Overlay content</p>
-          <el-button
+          <fsus-button
             v-bind="safeAreaDataAttributes.actionOverlayClose"
             @click="safeOverlayVisible = false"
           >
             Close Overlay
-          </el-button>
+          </fsus-button>
         </div>
-      </el-overlay>
+      </div>
 
-      <el-dialog
+      <fsus-dialog
         v-model="safeDialogVisible"
         :title="
           safeDialogFullscreen
@@ -115,23 +116,23 @@
           </p>
         </div>
         <template #footer>
-          <el-button
+          <fsus-button
             v-bind="safeAreaDataAttributes.actionDialogCancel"
             @click="safeDialogVisible = false"
           >
             Cancel
-          </el-button>
-          <el-button
+          </fsus-button>
+          <fsus-button
             type="primary"
             v-bind="safeAreaDataAttributes.actionDialogConfirm"
             @click="safeDialogVisible = false"
           >
             Confirm
-          </el-button>
+          </fsus-button>
         </template>
-      </el-dialog>
+      </fsus-dialog>
 
-      <el-drawer
+      <fsus-drawer
         v-model="safeDrawerVisible"
         :direction="safeDrawerDirection"
         :title="`Safe-area Drawer ${safeDrawerDirection.toUpperCase()}`"
@@ -145,23 +146,23 @@
           </p>
         </div>
         <template #footer>
-          <el-button
+          <fsus-button
             v-bind="safeAreaDataAttributes.actionDrawerCancel"
             @click="safeDrawerVisible = false"
           >
             Cancel
-          </el-button>
-          <el-button
+          </fsus-button>
+          <fsus-button
             type="primary"
             v-bind="safeAreaDataAttributes.actionDrawerConfirm"
             @click="safeDrawerVisible = false"
           >
             Confirm
-          </el-button>
+          </fsus-button>
         </template>
-      </el-drawer>
+      </fsus-drawer>
 
-      <el-image-viewer
+      <fsus-image-viewer
         v-if="safeImageViewerVisible"
         :url-list="safeImageViewerUrls"
         teleported
@@ -191,7 +192,7 @@
 
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
-import { ElMessageBox } from '../../element-plus'
+import { FsusMessageBox } from '@ozwasyd/fsusui'
 import {
   auditComponentNames,
   auditStateNames,
@@ -293,7 +294,7 @@ const openSafeMessageBox = () => {
       `Safe-area MessageBox paragraph ${index + 1}. Short viewports must scroll to reach confirm/cancel.`,
   ).join('\n\n')
 
-  void ElMessageBox.confirm(message, 'Safe-area MessageBox', {
+  void FsusMessageBox.confirm(message, 'Safe-area MessageBox', {
     confirmButtonText: 'Confirm',
     cancelButtonText: 'Cancel',
     distinguishCancelAndClose: true,
@@ -308,7 +309,7 @@ const resetSafeAreaSurfaces = () => {
   safeDialogFullscreen.value = false
   safeDrawerVisible.value = false
   safeImageViewerVisible.value = false
-  ElMessageBox.close()
+  FsusMessageBox.close()
 }
 
 watch(auditState, () => {

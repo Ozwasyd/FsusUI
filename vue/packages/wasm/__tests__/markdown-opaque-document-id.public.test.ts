@@ -7,7 +7,7 @@ import {
   snapshotMarkdownStableProjection,
   reviveMarkdownStableProjection,
   resolveMarkdownConsumerIdentity,
-} from '../../element-plus/markdown-runtime'
+} from '../../fsusui/src/wasm'
 
 describe('public stable projection opaque document IDs (#850)', () => {
   describe.each(['direct', 'revived'] as const)('%s projection', (mode) => {

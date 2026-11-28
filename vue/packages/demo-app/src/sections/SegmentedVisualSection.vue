@@ -10,42 +10,42 @@
     <div class="demo-block" data-segmented-fixture="radio-button">
       <h3>RadioButton</h3>
       <div class="segmented-fixture-row" data-segmented-variant="radio-default">
-        <el-radio-group v-model="radio1">
-          <el-radio-button label="a">选项 A</el-radio-button>
-          <el-radio-button label="b">选项 B</el-radio-button>
-          <el-radio-button label="c">选项 C</el-radio-button>
-        </el-radio-group>
+        <fsus-radio-group v-model="radio1">
+          <fsus-radio-button label="a">选项 A</fsus-radio-button>
+          <fsus-radio-button label="b">选项 B</fsus-radio-button>
+          <fsus-radio-button label="c">选项 C</fsus-radio-button>
+        </fsus-radio-group>
       </div>
       <div class="segmented-fixture-row" data-segmented-variant="radio-disabled">
-        <el-radio-group v-model="radio2" disabled>
-          <el-radio-button label="a">选项 A</el-radio-button>
-          <el-radio-button label="b">选项 B</el-radio-button>
-          <el-radio-button label="c">选项 C</el-radio-button>
-        </el-radio-group>
+        <fsus-radio-group v-model="radio2" disabled>
+          <fsus-radio-button label="a">选项 A</fsus-radio-button>
+          <fsus-radio-button label="b">选项 B</fsus-radio-button>
+          <fsus-radio-button label="c">选项 C</fsus-radio-button>
+        </fsus-radio-group>
       </div>
       <div class="segmented-fixture-row" data-segmented-variant="radio-six">
-        <el-radio-group v-model="radio3">
-          <el-radio-button label="a">选项 A</el-radio-button>
-          <el-radio-button label="b">选项 B</el-radio-button>
-          <el-radio-button label="c">选项 C</el-radio-button>
-          <el-radio-button label="d">选项 D</el-radio-button>
-          <el-radio-button label="e">选项 E</el-radio-button>
-          <el-radio-button label="f">选项 F</el-radio-button>
-        </el-radio-group>
+        <fsus-radio-group v-model="radio3">
+          <fsus-radio-button label="a">选项 A</fsus-radio-button>
+          <fsus-radio-button label="b">选项 B</fsus-radio-button>
+          <fsus-radio-button label="c">选项 C</fsus-radio-button>
+          <fsus-radio-button label="d">选项 D</fsus-radio-button>
+          <fsus-radio-button label="e">选项 E</fsus-radio-button>
+          <fsus-radio-button label="f">选项 F</fsus-radio-button>
+        </fsus-radio-group>
       </div>
       <div class="segmented-fixture-row" data-segmented-variant="radio-cjk">
-        <el-radio-group v-model="radio4">
-          <el-radio-button label="zh">简体中文</el-radio-button>
-          <el-radio-button label="ja">日本語</el-radio-button>
-          <el-radio-button label="ko">한국어</el-radio-button>
-        </el-radio-group>
+        <fsus-radio-group v-model="radio4">
+          <fsus-radio-button label="zh">简体中文</fsus-radio-button>
+          <fsus-radio-button label="ja">日本語</fsus-radio-button>
+          <fsus-radio-button label="ko">한국어</fsus-radio-button>
+        </fsus-radio-group>
       </div>
       <div class="segmented-fixture-row" data-segmented-variant="radio-rtl" dir="rtl">
-        <el-radio-group v-model="radio5">
-          <el-radio-button label="a">אופציה א</el-radio-button>
-          <el-radio-button label="b">אופציה ב</el-radio-button>
-          <el-radio-button label="c">אופציה ג</el-radio-button>
-        </el-radio-group>
+        <fsus-radio-group v-model="radio5">
+          <fsus-radio-button label="a">אופציה א</fsus-radio-button>
+          <fsus-radio-button label="b">אופציה ב</fsus-radio-button>
+          <fsus-radio-button label="c">אופציה ג</fsus-radio-button>
+        </fsus-radio-group>
       </div>
     </div>
 
@@ -53,25 +53,25 @@
     <div class="demo-block" data-segmented-fixture="checkbox-button">
       <h3>CheckboxButton</h3>
       <div class="segmented-fixture-row" data-segmented-variant="checkbox-default">
-        <el-checkbox-group v-model="checkbox1">
-          <el-checkbox-button label="a">标签 A</el-checkbox-button>
-          <el-checkbox-button label="b">标签 B</el-checkbox-button>
-          <el-checkbox-button label="c">标签 C</el-checkbox-button>
-        </el-checkbox-group>
+        <fsus-checkbox-group v-model="checkbox1">
+          <fsus-checkbox-button label="a">标签 A</fsus-checkbox-button>
+          <fsus-checkbox-button label="b">标签 B</fsus-checkbox-button>
+          <fsus-checkbox-button label="c">标签 C</fsus-checkbox-button>
+        </fsus-checkbox-group>
       </div>
       <div class="segmented-fixture-row" data-segmented-variant="checkbox-disabled">
-        <el-checkbox-group v-model="checkbox2" disabled>
-          <el-checkbox-button label="a">标签 A</el-checkbox-button>
-          <el-checkbox-button label="b">标签 B</el-checkbox-button>
-        </el-checkbox-group>
+        <fsus-checkbox-group v-model="checkbox2" disabled>
+          <fsus-checkbox-button label="a">标签 A</fsus-checkbox-button>
+          <fsus-checkbox-button label="b">标签 B</fsus-checkbox-button>
+        </fsus-checkbox-group>
       </div>
       <div class="segmented-fixture-row" data-segmented-variant="checkbox-multi">
-        <el-checkbox-group v-model="checkbox3">
-          <el-checkbox-button label="a">标签 A</el-checkbox-button>
-          <el-checkbox-button label="b">标签 B</el-checkbox-button>
-          <el-checkbox-button label="c">标签 C</el-checkbox-button>
-          <el-checkbox-button label="d">标签 D</el-checkbox-button>
-        </el-checkbox-group>
+        <fsus-checkbox-group v-model="checkbox3">
+          <fsus-checkbox-button label="a">标签 A</fsus-checkbox-button>
+          <fsus-checkbox-button label="b">标签 B</fsus-checkbox-button>
+          <fsus-checkbox-button label="c">标签 C</fsus-checkbox-button>
+          <fsus-checkbox-button label="d">标签 D</fsus-checkbox-button>
+        </fsus-checkbox-group>
       </div>
     </div>
 
@@ -79,10 +79,10 @@
     <div class="demo-block" data-segmented-fixture="theme-toggle">
       <h3>ThemeModeToggle</h3>
       <div class="segmented-fixture-row" data-segmented-variant="toggle-default">
-        <el-theme-mode-toggle visibility="desktop" compact />
+        <fsus-theme-mode-toggle visibility="desktop" compact />
       </div>
       <div class="segmented-fixture-row" data-segmented-variant="toggle-menu">
-        <el-theme-mode-toggle visibility="always" variant="menu-button" />
+        <fsus-theme-mode-toggle visibility="always" variant="menu-button" />
       </div>
     </div>
 
@@ -90,7 +90,7 @@
     <div class="demo-block" data-segmented-fixture="collection">
       <h3>Collection Segmented</h3>
       <div class="segmented-fixture-row" data-segmented-variant="collection-default">
-        <ElSegmentedControl
+        <FsusSegmentedControl
           v-model="collectionActive"
           :items="collectionItems"
           ariaLabel="Collection state"
@@ -100,14 +100,14 @@
         <output hidden>{{ collectionResult('default', collectionActive) }}</output>
       </div>
       <div class="segmented-fixture-row" data-segmented-variant="collection-six">
-        <ElSegmentedControl
+        <FsusSegmentedControl
           v-model="collectionSixActive"
           :items="collectionSixItems"
           ariaLabel="Collection period"
         />
       </div>
       <div class="segmented-fixture-row" data-segmented-variant="collection-mixed">
-        <ElSegmentedControl
+        <FsusSegmentedControl
           v-model="collectionMixedActive"
           :items="collectionDisabledItems"
           ariaLabel="Collection with disabled item"
@@ -121,7 +121,7 @@
         data-segmented-variant="collection-disabled-selected"
         tabindex="-1"
       >
-        <ElSegmentedControl
+        <FsusSegmentedControl
           v-model="collectionDisabledActive"
           :items="collectionDisabledItems"
           ariaLabel="Collection with disabled selection"
@@ -131,7 +131,7 @@
         <output hidden>{{ collectionResult('disabled-selected', collectionDisabledActive) }}</output>
       </div>
       <div class="segmented-fixture-row" data-segmented-variant="collection-values">
-        <ElSegmentedControl
+        <FsusSegmentedControl
           v-model="collectionValueActive"
           :items="collectionValueItems"
           ariaLabel="Collection typed values"
@@ -153,12 +153,12 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { ElSegmentedControl } from '../../../element-plus'
+import { FsusSegmentedControl } from '@ozwasyd/fsusui'
 import type {
   SegmentedControlItem,
   SegmentedControlValue,
-} from '../../../element-plus'
-import type { CheckboxGroupValueType } from '@element-plus/components/checkbox'
+} from '@ozwasyd/fsusui'
+import type { CheckboxGroupValueType } from '@ozwasyd/fsusui'
 
 const radio1 = ref<string | number | boolean>('a')
 const radio2 = ref<string | number | boolean>('a')

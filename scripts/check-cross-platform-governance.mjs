@@ -127,8 +127,8 @@ const checkWorkspaceLayout = () => {
   }
 
   for (const requiredVueEntry of [
-    'vue/packages/element-plus/index.ts',
-    'vue/packages/icons-vue/src/index.ts',
+    'vue/packages/fsusui/src/index.ts',
+    'vue/packages/icons/src/index.ts',
     'vue/internal/build/package.json',
     'vue/typings/components.d.ts',
     'vue/global.d.ts',

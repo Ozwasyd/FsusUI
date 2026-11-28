@@ -33,7 +33,7 @@ jobs:
         id: plan
         run: |
           node ./scripts/release-concurrency-plan.mjs \
-            --package @ozwasyd/element-plus \
+            --package @ozwasyd/fsusui \
             --version "${GITHUB_REF_NAME#v}" \
             --github-output
 

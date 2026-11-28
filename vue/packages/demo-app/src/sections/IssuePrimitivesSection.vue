@@ -1,5 +1,5 @@
 <template>
-  <ElPublicShell
+  <FsusPublicShell
     brand="Fsus"
     active-nav="archive"
     auth-label="Login"
@@ -18,11 +18,11 @@
     @update:search-query="searchQuery = $event"
   >
     <template #desktop-actions>
-      <ElThemeModeToggle visibility="desktop" compact />
+      <FsusThemeModeToggle visibility="desktop" compact />
     </template>
 
     <template #mobile-primary-actions>
-      <ElThemeModeToggle
+      <FsusThemeModeToggle
         visibility="mobile"
         variant="menu-button"
         label="外观模式"
@@ -33,9 +33,9 @@
     <section class="issue-primitives">
       <header class="issue-primitives__header">
         <h2>Issue #1 primitives</h2>
-        <el-button text type="primary" inline-action>
+        <fsus-button text type="primary" inline-action>
           Platform guidelines
-        </el-button>
+        </fsus-button>
       </header>
 
       <section
@@ -71,7 +71,7 @@
                     v-if="fixture.action"
                     class="issue-primitives__legacy-page-header-actions"
                   >
-                    <el-button size="small">{{ fixture.action }}</el-button>
+                    <fsus-button size="small">{{ fixture.action }}</fsus-button>
                   </div>
                 </header>
               </div>
@@ -80,16 +80,16 @@
                 <span class="issue-primitives__task-page-header-variant">
                   After
                 </span>
-                <ElTaskPageHeader
+                <FsusPageHeader
                   :title="fixture.title"
                   :description="fixture.description"
                   title-tag="h4"
                   :density="compact ? 'compact' : 'default'"
                 >
                   <template v-if="fixture.action" #actions>
-                    <el-button size="small">{{ fixture.action }}</el-button>
+                    <fsus-button size="small">{{ fixture.action }}</fsus-button>
                   </template>
-                </ElTaskPageHeader>
+                </FsusPageHeader>
               </div>
             </div>
           </article>
@@ -97,7 +97,7 @@
       </section>
 
       <div class="issue-primitives__site-header-fixtures">
-        <ElSiteHeader
+        <FsusSiteHeader
           :sticky="false"
           max-width="100%"
           ariaLabel="Blog header fixture"
@@ -110,14 +110,14 @@
             <a href="#archive">Archive</a>
           </template>
           <template #desktop-actions>
-            <ElThemeModeToggle visibility="desktop" compact />
+            <FsusThemeModeToggle visibility="desktop" compact />
           </template>
           <template #mobile-primary-actions>
-            <ElThemeModeToggle visibility="mobile" variant="menu-button" />
+            <FsusThemeModeToggle visibility="mobile" variant="menu-button" />
           </template>
-        </ElSiteHeader>
+        </FsusSiteHeader>
 
-        <ElSiteHeader
+        <FsusSiteHeader
           :sticky="false"
           max-width="100%"
           ariaLabel="Auth header fixture"
@@ -131,9 +131,9 @@
           <template #mobile-primary-actions>
             <a href="#register-mobile">Register</a>
           </template>
-        </ElSiteHeader>
+        </FsusSiteHeader>
 
-        <ElSiteHeader
+        <FsusSiteHeader
           :sticky="false"
           max-width="100%"
           ariaLabel="Workspace header fixture"
@@ -151,57 +151,57 @@
           <template #mobile-secondary-actions>
             <a href="#workspace-settings">Settings</a>
           </template>
-        </ElSiteHeader>
+        </FsusSiteHeader>
       </div>
 
       <div class="issue-primitives__empty-grid">
-        <ElEmptyState
+        <FsusEmptyState
           title="No rows"
           description="Adjust filters and try again."
         >
-          <el-button text type="primary" inline-action>Clear filters</el-button>
-        </ElEmptyState>
+          <fsus-button text type="primary" inline-action>Clear filters</fsus-button>
+        </FsusEmptyState>
 
-        <ElEmptyState
+        <FsusEmptyState
           size="compact"
           title="Nothing selected"
           description="Select an item to view details."
         >
-          <el-button>Browse items</el-button>
-        </ElEmptyState>
+          <fsus-button>Browse items</fsus-button>
+        </FsusEmptyState>
 
-        <ElEmptyState
+        <FsusEmptyState
           size="page"
           title="No results"
           description="Try a broader search term."
           action-variant="primary"
         >
-          <el-button type="primary">Create item</el-button>
-        </ElEmptyState>
+          <fsus-button type="primary">Create item</fsus-button>
+        </FsusEmptyState>
       </div>
 
       <div class="issue-primitives__collection-panel">
-        <ElCollectionToolbar ariaLabel="Collection controls">
+        <FsusCollectionToolbar ariaLabel="Collection controls">
           <template #primary>
-            <el-input v-model="collectionQuery" placeholder="Search" />
+            <fsus-input v-model="collectionQuery" placeholder="Search" />
           </template>
 
           <template #filters>
-            <ElFilterGroup label="State">
-              <ElSegmentedControl
+            <FsusFilterGroup label="State">
+              <FsusSegmentedControl
                 v-model="collectionState"
                 :items="collectionStateItems"
                 ariaLabel="Filter state"
               />
-            </ElFilterGroup>
+            </FsusFilterGroup>
           </template>
 
           <template #actions>
-            <el-button>Refresh</el-button>
+            <fsus-button>Refresh</fsus-button>
           </template>
-        </ElCollectionToolbar>
+        </FsusCollectionToolbar>
 
-        <ElCollectionSummary
+        <FsusCollectionSummary
           title="Results"
           :total="12"
           :visible="rows.length"
@@ -210,14 +210,14 @@
       </div>
 
       <div class="issue-primitives__settings-demo">
-        <ElSectionNav
+        <FsusSectionNav
           ariaLabel="Settings primitive sections"
           :items="settingsNavItems"
           :density="compact ? 'compact' : 'default'"
         />
 
         <div class="issue-primitives__settings-grid">
-          <ElSettingsSection
+          <FsusSettingsSection
             id="settings-overview"
             title="Generic settings"
             description="Reusable section structure with product-owned copy."
@@ -225,17 +225,17 @@
             :density="compact ? 'compact' : 'default'"
           >
             <template #actions>
-              <el-button size="small">Save</el-button>
+              <fsus-button size="small">Save</fsus-button>
             </template>
 
-            <ElSectionHeader
+            <FsusSectionHeader
               title="Standalone header"
               description="Use this when a page needs only the header primitive."
               title-tag="h4"
               :density="compact ? 'compact' : 'default'"
             />
 
-            <ElFormSection
+            <FsusFormSection
               title="Form-compatible group"
               description="The consuming form owns labels, validation, and submit."
               title-tag="h4"
@@ -245,143 +245,143 @@
                 Label
                 <input value="Neutral value" />
               </label>
-            </ElFormSection>
-          </ElSettingsSection>
+            </FsusFormSection>
+          </FsusSettingsSection>
 
-          <ElSettingsSection
+          <FsusSettingsSection
             id="settings-resources"
             title="Resource list"
             description="Rows support metadata, badges, inline actions, and local empty states."
             title-tag="h3"
             :density="compact ? 'compact' : 'default'"
           >
-            <ElResourceList :density="compact ? 'compact' : 'default'">
-              <ElResourceListItem
+            <FsusResourceList :density="compact ? 'compact' : 'default'">
+              <FsusResourceListItem
                 title="Resource Alpha"
                 description="Updated recently"
                 :density="compact ? 'compact' : 'default'"
               >
                 <template #badge>
-                  <el-tag size="small" type="info">Ready</el-tag>
+                  <fsus-tag size="small" type="info">Ready</fsus-tag>
                 </template>
 
-                <ElMetadataRow :density="compact ? 'compact' : 'default'">
-                  <ElMetadataItem label="Created" value="2026-01-01" />
-                  <ElMetadataItem
+                <FsusMetadataRow :density="compact ? 'compact' : 'default'">
+                  <FsusMetadataItem label="Created" value="2026-01-01" />
+                  <FsusMetadataItem
                     label="Fingerprint"
                     value="A1B2-C3D4"
                     monospace
                   />
-                  <ElMetadataItem label="Optional" />
-                </ElMetadataRow>
+                  <FsusMetadataItem label="Optional" />
+                </FsusMetadataRow>
 
                 <template #actions>
-                  <ElInlineActions ariaLabel="Resource actions">
-                    <el-button text size="small">Edit</el-button>
-                    <el-button text size="small">Disable</el-button>
-                  </ElInlineActions>
+                  <FsusInlineActions ariaLabel="Resource actions">
+                    <fsus-button text size="small">Edit</fsus-button>
+                    <fsus-button text size="small">Disable</fsus-button>
+                  </FsusInlineActions>
                 </template>
-              </ElResourceListItem>
+              </FsusResourceListItem>
 
-              <ElResourceListItem title="Empty resource group">
-                <ElEmptyState
+              <FsusResourceListItem title="Empty resource group">
+                <FsusEmptyState
                   size="inline"
                   title="No resources"
                   description="Downstream apps supply the exact copy."
                 >
-                  <el-button text type="primary" inline-action>
+                  <fsus-button text type="primary" inline-action>
                     Add resource
-                  </el-button>
-                </ElEmptyState>
-              </ElResourceListItem>
-            </ElResourceList>
-          </ElSettingsSection>
+                  </fsus-button>
+                </FsusEmptyState>
+              </FsusResourceListItem>
+            </FsusResourceList>
+          </FsusSettingsSection>
         </div>
 
-        <ElDangerZone
+        <FsusDangerZone
           id="settings-risk"
           title="Risk area"
           description="Danger content uses explicit text in addition to color."
           title-tag="h3"
           :density="compact ? 'compact' : 'default'"
         >
-          <ElRiskNotice title="Review" role="note">
+          <FsusRiskNotice title="Review" role="note">
             Confirm the impact before continuing.
-          </ElRiskNotice>
+          </FsusRiskNotice>
 
-          <ElDestructiveActionPanel title="Destructive action">
+          <FsusDestructiveActionPanel title="Destructive action">
             <template #description>
               Product copy explains outcome, recovery, and permissions.
             </template>
             <template #actions>
-              <el-button type="danger" size="small">Continue</el-button>
+              <fsus-button type="danger" size="small">Continue</fsus-button>
             </template>
-          </ElDestructiveActionPanel>
+          </FsusDestructiveActionPanel>
 
-          <ElTypedConfirmField
+          <FsusTypedConfirmField
             v-model="confirmation"
             phrase="CONFIRM"
             label="Confirmation phrase"
             description="Type the exact phrase to continue."
           />
-        </ElDangerZone>
+        </FsusDangerZone>
       </div>
 
       <div class="issue-primitives__metrics-demo">
-        <ElKpiGroup :density="compact ? 'compact' : 'default'">
-          <ElMetricList :density="compact ? 'compact' : 'default'">
-            <ElMetricItem
+        <FsusKpiGroup :density="compact ? 'compact' : 'default'">
+          <FsusMetricList :density="compact ? 'compact' : 'default'">
+            <FsusMetricItem
               label="Metric Alpha"
               primary="P75 22ms"
               :secondary="['Avg 23ms', 'Min 8ms']"
               meta="58 samples"
               :density="compact ? 'compact' : 'default'"
             />
-            <ElMetricItem
+            <FsusMetricItem
               label="Metric Beta"
               primary="99.4%"
               secondary="Target 99%"
               meta="12 checks"
               :density="compact ? 'compact' : 'default'"
             />
-          </ElMetricList>
+          </FsusMetricList>
 
-          <ElKeyValueGrid :density="compact ? 'compact' : 'default'">
-            <ElKeyValueItem label="State" value="Ready" tone="success">
+          <FsusKeyValueGrid :density="compact ? 'compact' : 'default'">
+            <FsusKeyValueItem label="State" value="Ready" tone="success">
               <template #badge>
-                <el-tag size="small" type="success">OK</el-tag>
+                <fsus-tag size="small" type="success">OK</fsus-tag>
               </template>
-            </ElKeyValueItem>
-            <ElKeyValueItem label="Queue" value="0 / 0" monospace />
-            <ElKeyValueItem label="Optional" />
-          </ElKeyValueGrid>
-        </ElKpiGroup>
+            </FsusKeyValueItem>
+            <FsusKeyValueItem label="Queue" value="0 / 0" monospace />
+            <FsusKeyValueItem label="Optional" />
+          </FsusKeyValueGrid>
+        </FsusKpiGroup>
 
-        <ElDistributionList :density="compact ? 'compact' : 'default'">
-          <ElDistributionBarRow
+        <FsusDistributionList :density="compact ? 'compact' : 'default'">
+          <FsusDistributionBarRow
             rank="1"
             label="Segment Alpha"
             value="245"
             :ratio="1"
             :density="compact ? 'compact' : 'default'"
           />
-          <ElDistributionBarRow
+          <FsusDistributionBarRow
             rank="2"
             label="Segment Beta"
             value="106"
             :ratio="0.43"
             :density="compact ? 'compact' : 'default'"
           />
-          <ElDistributionBarRow
+          <FsusDistributionBarRow
             rank="3"
             label="Segment Gamma"
             value="31"
             :ratio="0.13"
             :density="compact ? 'compact' : 'default'"
           />
-        </ElDistributionList>
+        </FsusDistributionList>
 
-        <ElStatusSummary
+        <FsusStatusSummary
           label="Generic status"
           status="Stable"
           updated-at="2026-06-14 20:30"
@@ -392,12 +392,12 @@
             Product-owned detail copy can describe the current state.
           </template>
           <template #actions>
-            <el-button text size="small">Inspect</el-button>
+            <fsus-button text size="small">Inspect</fsus-button>
           </template>
-        </ElStatusSummary>
+        </FsusStatusSummary>
 
-        <ElDiagnosticsList :density="compact ? 'compact' : 'default'">
-          <ElDiagnosticsItem
+        <FsusDiagnosticsList :density="compact ? 'compact' : 'default'">
+          <FsusDiagnosticsItem
             title="diagnostic.event"
             message="Recent event summary supplied by the product."
             meta="warning - 17:48:11 - 3 times"
@@ -406,24 +406,24 @@
             :density="compact ? 'compact' : 'default'"
           >
             <template #actions>
-              <ElCopyableDetail
+              <FsusCopyableDetail
                 value="diagnostic-node:runCheck:sample-0001"
                 label="Copy detail"
                 inline
               />
             </template>
-          </ElDiagnosticsItem>
-          <ElDiagnosticsItem title="No diagnostic rows">
-            <ElEmptyState
+          </FsusDiagnosticsItem>
+          <FsusDiagnosticsItem title="No diagnostic rows">
+            <FsusEmptyState
               size="inline"
               title="No diagnostics"
               description="Downstream apps supply operational copy."
             />
-          </ElDiagnosticsItem>
-        </ElDiagnosticsList>
+          </FsusDiagnosticsItem>
+        </FsusDiagnosticsList>
       </div>
 
-      <ElResponsiveCollection
+      <FsusResponsiveCollection
         :items="rows"
         row-key="id"
         :compact="compact"
@@ -446,19 +446,19 @@
           <article class="issue-primitives__card">
             <strong>{{ getRowTitle(item) }}</strong>
             <span>{{ getRowMeta(item) }}</span>
-            <el-button text type="primary" inline-action>Edit</el-button>
+            <fsus-button text type="primary" inline-action>Edit</fsus-button>
           </article>
         </template>
-      </ElResponsiveCollection>
+      </FsusResponsiveCollection>
 
-      <ElPaginationBar ariaLabel="Results pagination">
+      <FsusPaginationBar ariaLabel="Results pagination">
         <template #summary>Page 1 of 6</template>
         <template #pagination>
-          <el-pagination small layout="prev, pager, next" :total="12" />
+          <fsus-pagination small layout="prev, pager, next" :total="12" />
         </template>
-      </ElPaginationBar>
+      </FsusPaginationBar>
 
-      <el-upload
+      <fsus-upload
         media-field
         media-aspect-ratio="1200 / 630"
         action="#"
@@ -468,9 +468,9 @@
         <div class="issue-primitives__upload-surface">
           <span>Upload cover</span>
         </div>
-      </el-upload>
+      </fsus-upload>
 
-      <ElInboxLayout
+      <FsusInboxLayout
         class="issue-primitives__inbox-demo"
         selected
         mobile-pane="detail"
@@ -478,8 +478,8 @@
         detail-label="Generic thread detail"
       >
         <template #list>
-          <ElConversationList ariaLabel="Generic conversation list">
-            <ElConversationListItem
+          <FsusConversationList ariaLabel="Generic conversation list">
+            <FsusConversationListItem
               title="关于评论权限的讨论"
               preview="长摘要内容仍然需要留在列表列宽内。"
               meta="09:00"
@@ -488,62 +488,62 @@
               @select="selectedInboxItem = 'alpha'"
             >
               <template #badges>
-                <el-tag size="small" type="info">Ready</el-tag>
+                <fsus-tag size="small" type="info">Ready</fsus-tag>
               </template>
-            </ElConversationListItem>
-            <ElConversationListItem
+            </FsusConversationListItem>
+            <FsusConversationListItem
               title="下周封面图评审"
               preview="第二条工作流摘要保持安全换行。"
               meta="10:30"
               :selected="selectedInboxItem === 'beta'"
               @select="selectedInboxItem = 'beta'"
             />
-            <ElInboxEmptyState
+            <FsusInboxEmptyState
               title="No more items"
               description="Adjust filters or broaden the current view."
             />
-          </ElConversationList>
+          </FsusConversationList>
         </template>
 
         <template #detail>
-          <ElThreadPanel title="评论权限讨论">
+          <FsusThreadPanel title="评论权限讨论">
             <template #back>
-              <el-button text inline-action>Back</el-button>
+              <fsus-button text inline-action>Back</fsus-button>
             </template>
             <template #status>
-              <el-tag size="small" type="info">Ready</el-tag>
+              <fsus-tag size="small" type="info">Ready</fsus-tag>
             </template>
             <template #actions>
-              <el-button text type="primary" inline-action>Open</el-button>
+              <fsus-button text type="primary" inline-action>Open</fsus-button>
             </template>
             <template #context>
-              <ElConversationContextBar>
+              <FsusConversationContextBar>
                 <span>Kind: Generic</span>
                 <span>Source: Neutral</span>
                 <span>Mode: Slot-first</span>
-              </ElConversationContextBar>
+              </FsusConversationContextBar>
             </template>
             <template #messages>
-              <ElMessageTimeline>
-                <ElMessageBubble author="A" meta="09:00">
+              <FsusMessageTimeline>
+                <FsusMessageBubble author="A" meta="09:00">
                   The message body preserves line breaks and wraps long text
                   without product-specific sender labels.
-                </ElMessageBubble>
-                <ElMessageBubble variant="self" author="B" meta="09:10">
+                </FsusMessageBubble>
+                <FsusMessageBubble variant="self" author="B" meta="09:10">
                   Slot-first reply content remains generic.
-                </ElMessageBubble>
-                <ElMessageBubble variant="system">
+                </FsusMessageBubble>
+                <FsusMessageBubble variant="system">
                   Generic state changed.
-                </ElMessageBubble>
-                <ElMessageBubble variant="muted">
+                </FsusMessageBubble>
+                <FsusMessageBubble variant="muted">
                   Muted note with neutral supporting copy.
-                </ElMessageBubble>
-              </ElMessageTimeline>
+                </FsusMessageBubble>
+              </FsusMessageTimeline>
             </template>
             <template #composer>
-              <ElReplyComposerShell title="Reply">
+              <FsusReplyComposerShell title="Reply">
                 <template #input>
-                  <el-input
+                  <fsus-input
                     type="textarea"
                     model-value=""
                     label="Reply body"
@@ -551,75 +551,75 @@
                   />
                 </template>
                 <template #actions>
-                  <el-button type="primary">Send</el-button>
+                  <fsus-button type="primary">Send</fsus-button>
                 </template>
-              </ElReplyComposerShell>
+              </FsusReplyComposerShell>
             </template>
-          </ElThreadPanel>
-          <ElEmptySelectionState
+          </FsusThreadPanel>
+          <FsusEmptySelectionState
             title="Select an item"
             description="Choose an item from the list to view details."
           />
         </template>
-      </ElInboxLayout>
+      </FsusInboxLayout>
     </section>
 
     <template #footer>
       <div class="issue-primitives__footer">Fsus public shell footer</div>
     </template>
-  </ElPublicShell>
+  </FsusPublicShell>
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue'
 import {
-  ElCollectionSummary,
-  ElCollectionToolbar,
-  ElConversationContextBar,
-  ElConversationList,
-  ElConversationListItem,
-  ElCopyableDetail,
-  ElDangerZone,
-  ElDiagnosticsItem,
-  ElDiagnosticsList,
-  ElDestructiveActionPanel,
-  ElDistributionBarRow,
-  ElDistributionList,
-  ElEmptySelectionState,
-  ElEmptyState,
-  ElFilterGroup,
-  ElFormSection,
-  ElInboxEmptyState,
-  ElInboxLayout,
-  ElInlineActions,
-  ElKeyValueGrid,
-  ElKeyValueItem,
-  ElKpiGroup,
-  ElMetadataItem,
-  ElMetadataRow,
-  ElMessageBubble,
-  ElMessageTimeline,
-  ElMetricItem,
-  ElMetricList,
-  ElPaginationBar,
-  ElPublicShell,
-  ElReplyComposerShell,
-  ElResourceList,
-  ElResourceListItem,
-  ElRiskNotice,
-  ElSectionHeader,
-  ElSectionNav,
-  ElSettingsSection,
-  ElResponsiveCollection,
-  ElSegmentedControl,
-  ElSiteHeader,
-  ElStatusSummary,
-  ElTaskPageHeader,
-  ElThemeModeToggle,
-  ElThreadPanel,
-  ElTypedConfirmField,
+  FsusCollectionSummary,
+  FsusCollectionToolbar,
+  FsusConversationContextBar,
+  FsusConversationList,
+  FsusConversationListItem,
+  FsusCopyableDetail,
+  FsusDangerZone,
+  FsusDiagnosticsItem,
+  FsusDiagnosticsList,
+  FsusDestructiveActionPanel,
+  FsusDistributionBarRow,
+  FsusDistributionList,
+  FsusEmptySelectionState,
+  FsusEmptyState,
+  FsusFilterGroup,
+  FsusFormSection,
+  FsusInboxEmptyState,
+  FsusInboxLayout,
+  FsusInlineActions,
+  FsusKeyValueGrid,
+  FsusKeyValueItem,
+  FsusKpiGroup,
+  FsusMetadataItem,
+  FsusMetadataRow,
+  FsusMessageBubble,
+  FsusMessageTimeline,
+  FsusMetricItem,
+  FsusMetricList,
+  FsusPaginationBar,
+  FsusPublicShell,
+  FsusReplyComposerShell,
+  FsusResourceList,
+  FsusResourceListItem,
+  FsusRiskNotice,
+  FsusSectionHeader,
+  FsusSectionNav,
+  FsusSettingsSection,
+  FsusResponsiveCollection,
+  FsusSegmentedControl,
+  FsusSiteHeader,
+  FsusStatusSummary,
+  FsusPageHeader,
+  FsusThemeModeToggle,
+  FsusThreadPanel,
+  FsusTypedConfirmField,
   type SegmentedControlValue,
-} from '../../../element-plus'
+} from '@ozwasyd/fsusui'
 
 defineProps<{
   compact?: boolean

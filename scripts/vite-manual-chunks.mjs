@@ -27,9 +27,7 @@ const resolveMermaidRuntimeChunk = (id) => {
   const mermaidChunk = id.match(
     /\/node_modules\/mermaid\/dist\/chunks\/mermaid\.(?:core|esm\.min)\/([^/]+)\.mjs$/,
   )
-  if (mermaidChunk) {
-    return `vendor-mermaid-${sanitizeChunkName(mermaidChunk[1])}`
-  }
+  if (mermaidChunk) return `vendor-mermaid-${sanitizeChunkName(mermaidChunk[1])}`
 
   if (
     id.includes('/node_modules/mermaid/dist/mermaid.core.mjs') ||
@@ -62,7 +60,6 @@ const resolveShikiRuntimeChunk = (id) => {
     const languageName = language[1] === 'bash' ? 'shellscript' : language[1]
     return `vendor-shiki-lang-${sanitizeChunkName(languageName)}`
   }
-
   return undefined
 }
 
@@ -71,114 +68,20 @@ const resolveScopedPackageChunk = (id) => {
   if (!pkgMatch) return undefined
 
   const packageName = pkgMatch[1]
-  if (packageName === '@ozwasyd/element-plus') return undefined
-  if (packageName === 'lodash-unified') return undefined
+  if (packageName === '@ozwasyd/fsusui') return undefined
   if (packageName === 'mermaid' || packageName === '@mermaid-js/parser') {
     return undefined
   }
   if (emptyChunkPronePackages.has(packageName)) return undefined
-  if (packageName === 'lodash' || packageName === 'lodash-es') {
-    return 'vendor-lodash'
-  }
 
   return `vendor-${sanitizeChunkName(packageName)}`
 }
 
-const resolveElementPlusComponentChunk = (id) => {
-  const packageComponent = id.match(
-    /\/node_modules\/@element-plus\/components\/([^/]+)\//,
-  )
-  if (packageComponent) {
-    return `ep-${sanitizeChunkName(packageComponent[1])}`
-  }
+const wasmRootRe =
+  '(?:vue/packages/wasm|node_modules/@fsusui/wasm|node_modules/@ozwasyd/fsusui/dist/wasm)'
 
-  const packageDistComponent = id.match(
-    /\/node_modules\/@ozwasyd\/element-plus\/es\/components\/([^/]+)\//,
-  )
-  if (packageDistComponent) {
-    return `ep-${sanitizeChunkName(packageDistComponent[1])}`
-  }
-
-  const workspaceComponent = id.match(/\/packages\/components\/([^/]+)\//)
-  if (workspaceComponent) {
-    return `ep-${sanitizeChunkName(workspaceComponent[1])}`
-  }
-
-  return undefined
-}
-
-const resolveElementPlusSupportChunk = (id) => {
-  const supportPattern =
-    '(constants|directives|hooks|locale|utils|render-pipeline)'
-
-  const workspaceSupport = id.match(
-    new RegExp(`/vue/packages/${supportPattern}/`),
-  )
-  if (workspaceSupport) {
-    return `ep-${sanitizeChunkName(workspaceSupport[1])}`
-  }
-
-  const packageSupport = id.match(
-    new RegExp(`/node_modules/@element-plus/${supportPattern}/`),
-  )
-  if (packageSupport) {
-    return `ep-${sanitizeChunkName(packageSupport[1])}`
-  }
-
-  const packageDistSupport = id.match(
-    new RegExp(
-      `/node_modules/@ozwasyd/element-plus/es/${supportPattern}(?:/|\\.)`,
-    ),
-  )
-  if (packageDistSupport) {
-    return `ep-${sanitizeChunkName(packageDistSupport[1])}`
-  }
-
-  return undefined
-}
-
-const isMarkdownFeatureOutputGateway = (id) =>
-  /\/(?:vue\/packages\/wasm|node_modules\/@element-plus\/wasm|node_modules\/@ozwasyd\/element-plus\/es\/wasm)\/markdown-feature-output-gateway\.(?:[cm]?[jt]sx?)$/u.test(
-    id,
-  )
-
-const isMarkdownHeavyFeatureIsolatedClient = (id) =>
-  /\/(?:vue\/packages\/wasm|node_modules\/@element-plus\/wasm|node_modules\/@ozwasyd\/element-plus\/es\/wasm)\/markdown-heavy-feature-isolated-client\.(?:[cm]?[jt]sx?)$/u.test(
-    id,
-  )
-
-const isMarkdownHeavyFeatureResource = (id) =>
-  /\/(?:vue\/packages\/wasm|node_modules\/@element-plus\/wasm|node_modules\/@ozwasyd\/element-plus\/es\/wasm)\/markdown-heavy-feature-resource\.(?:[cm]?[jt]sx?)$/u.test(
-    id,
-  )
-
-const markdownHeavyFeatureIsolatedAdapterModules =
-  '(?:markdown-heavy-feature-isolated-lazy|markdown-heavy-feature-frame-scheduler)'
-
-const isMarkdownHeavyFeatureIsolatedAdapter = (id) =>
-  new RegExp(
-    `/(?:vue/packages/wasm|node_modules/@element-plus/wasm|node_modules/@ozwasyd/element-plus/es/wasm)/(?:${markdownHeavyFeatureIsolatedAdapterModules})\\.(?:[cm]?[jt]sx?)$`,
-    'u',
-  ).test(id)
-
-const isMarkdownHeavyFeatureIdentity = (id) =>
-  /\/(?:vue\/packages\/wasm|node_modules\/@element-plus\/wasm|node_modules\/@ozwasyd\/element-plus\/es\/wasm)\/markdown-heavy-feature-identity\.(?:[cm]?[jt]sx?)$/u.test(
-    id,
-  )
-
-const isMarkdownHeavyRuntimeLoaders = (id) =>
-  /\/(?:vue\/packages\/wasm|node_modules\/@element-plus\/wasm|node_modules\/@ozwasyd\/element-plus\/es\/wasm)\/markdown-heavy-runtime-loaders\.(?:[cm]?[jt]sx?)$/u.test(
-    id,
-  )
-
-const markdownHeavyFeatureIdentityDependencies =
-  '(?:markdown-editor-projection|markdown-syntax-identity|markdown-source-coordinate-map|markdown-syntax-collect|markdown-directive-syntax|markdown-anchor-grammar|markdown-anchor-owners|markdown-caption-directive|markdown-embed-directive)'
-
-const isMarkdownHeavyFeatureIdentityDependency = (id) =>
-  new RegExp(
-    `/(?:vue/packages/wasm|node_modules/@element-plus/wasm|node_modules/@ozwasyd/element-plus/es/wasm)/(?:${markdownHeavyFeatureIdentityDependencies}\\.(?:[cm]?[jt]sx?)|markdown/(?:syntax-collect\\.generated|anchor-owner\\.portable)\\.(?:[cm]?[jt]sx?))$`,
-    'u',
-  ).test(id)
+const isWasmModule = (id, name) =>
+  new RegExp(`/${wasmRootRe}/${name}\\.(?:[cm]?[jt]sx?)$`, 'u').test(id)
 
 export const resolveFsusViteManualChunk = (
   moduleId,
@@ -188,43 +91,34 @@ export const resolveFsusViteManualChunk = (
   const consumerProfile = profile === 'consumer'
 
   if (
-    /\/(?:vue\/packages|node_modules\/@element-plus|node_modules\/@ozwasyd\/element-plus\/es)\/components\/markdown-renderer\/src\/markdown-fragment-reveal\.(?:[cm]?[jt]sx?)$/u.test(
+    /\/(?:vue\/packages\/markdown\/src|node_modules\/@fsusui\/markdown\/src)\/markdown-renderer\/src\/markdown-fragment-reveal\.(?:[cm]?[jt]sx?)$/u.test(
       id,
     )
   ) {
     return 'fsus-markdown-fragment-reveal'
   }
 
-  if (isMarkdownHeavyRuntimeLoaders(id)) {
+  if (isWasmModule(id, 'markdown-heavy-runtime-loaders')) {
     return 'fsus-markdown-heavy-loaders'
   }
-
-  if (isMarkdownFeatureOutputGateway(id)) {
+  if (isWasmModule(id, 'markdown-feature-output-gateway')) {
     return 'fsus-markdown-feature-gateway'
   }
-
-  if (isMarkdownHeavyFeatureIsolatedClient(id)) {
+  if (isWasmModule(id, 'markdown-heavy-feature-isolated-client')) {
     return 'fsus-markdown-heavy-isolated-client'
   }
-
-  if (isMarkdownHeavyFeatureResource(id)) {
+  if (isWasmModule(id, 'markdown-heavy-feature-resource')) {
     return 'fsus-markdown-heavy-resource'
   }
-
-  if (isMarkdownHeavyFeatureIsolatedAdapter(id)) {
+  if (
+    isWasmModule(
+      id,
+      '(?:markdown-heavy-feature-isolated-lazy|markdown-heavy-feature-frame-scheduler)',
+    )
+  ) {
     return 'fsus-markdown-heavy-isolated-adapter'
   }
-
-  if (isMarkdownHeavyFeatureIdentity(id)) {
-    return 'fsus-markdown-heavy-identity'
-  }
-
-  // Grouping the projection chain into the dynamically imported identity chunk
-  // is only safe when nothing eager reaches it. The consumer Markdown entry does
-  // not, but the full demo also loads the editor, which imports the chain
-  // eagerly; grouping it there makes fsus-ui and the identity chunk mutually
-  // dependent and the resulting circular chunk throws before the app mounts.
-  if (consumerProfile && isMarkdownHeavyFeatureIdentityDependency(id)) {
+  if (isWasmModule(id, 'markdown-heavy-feature-identity')) {
     return 'fsus-markdown-heavy-identity'
   }
 
@@ -238,8 +132,7 @@ export const resolveFsusViteManualChunk = (
 
   if (
     id.includes('/vue/packages/wasm/') ||
-    id.includes('/node_modules/@element-plus/wasm/') ||
-    id.includes('/node_modules/@ozwasyd/element-plus/es/wasm/') ||
+    id.includes('/node_modules/@fsusui/wasm/') ||
     id.includes('/ep_wasm') ||
     id.includes('/markdown_basic') ||
     id.includes('/markdown_simd')
@@ -248,30 +141,18 @@ export const resolveFsusViteManualChunk = (
   }
 
   if (
-    id.includes('/vue/packages/components/markdown-renderer/') ||
-    id.includes('/node_modules/@element-plus/components/markdown-renderer/') ||
-    id.includes(
-      '/node_modules/@ozwasyd/element-plus/es/components/markdown-renderer/',
-    ) ||
+    id.includes('/vue/packages/markdown/') ||
+    id.includes('/node_modules/@fsusui/markdown/') ||
     id.includes('markdown-renderer.worker')
   ) {
     return 'fsus-markdown'
   }
 
   if (
-    id.includes('/vue/packages/icons-vue/') ||
-    id.includes('/node_modules/@element-plus/icons-vue/') ||
-    id.includes('/node_modules/@ozwasyd/element-plus/es/icons-vue/')
+    id.includes('/vue/packages/icons/') ||
+    id.includes('/node_modules/@fsusui/icons/')
   ) {
     return 'fsus-icons'
-  }
-
-  if (!consumerProfile) {
-    const componentChunk = resolveElementPlusComponentChunk(id)
-    if (componentChunk) return componentChunk
-
-    const supportChunk = resolveElementPlusSupportChunk(id)
-    if (supportChunk) return supportChunk
   }
 
   if (id.includes('/node_modules/vue/') || id.includes('/node_modules/@vue/')) {

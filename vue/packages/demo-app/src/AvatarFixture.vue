@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { ElAvatar } from '@element-plus/components/avatar'
+import { FsusAvatar } from '@ozwasyd/fsusui'
 </script>
 
 <template>
   <div style="display: inline-flex; gap: 16px; padding: 24px; background: #fff">
-    <el-avatar :size="64" shape="circle">A</el-avatar>
-    <el-avatar :size="64" shape="square">B</el-avatar>
+    <fsus-avatar :size="64" shape="circle">A</fsus-avatar>
+    <fsus-avatar :size="64" shape="square">B</fsus-avatar>
   </div>
 </template>

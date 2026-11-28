@@ -1,7 +1,7 @@
 import { execFileSync } from 'node:child_process'
 
 export const registryUrl = 'https://npm.pkg.github.com/'
-export const defaultPackageName = '@ozwasyd/element-plus'
+export const defaultPackageName = '@ozwasyd/fsusui'
 
 export function sanitizePackagePart(value) {
   const sanitized = value

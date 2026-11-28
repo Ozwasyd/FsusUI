@@ -2,8 +2,6 @@
 
 ## Requirements
 
-The repository is maintained against these minimum tool versions:
-
 | Tool | Version |
 | --- | --- |
 | Node.js    | `22.x`    |
@@ -11,36 +9,16 @@ The repository is maintained against these minimum tool versions:
 | TypeScript | `6.0.x`   |
 | Vue        | `^3.5.0`  |
 
-FsusUI targets `ES2022`. Consumers must provide equivalent modern browser
-support or transpile the package in their application; no older browser
-baseline is promised.
-
-### SCSS compiler
-
-The `theme-chalk` SCSS source requires Sass `1.79.0` or newer.
-
-If the terminal reports `legacy JS API Deprecation Warning`, set the modern
-compiler API in `vite.config.ts`:
-
-```ts
-// vite.config.ts
-export default defineConfig({
-  css: {
-    preprocessorOptions: {
-      scss: { api: 'modern-compiler' },
-    },
-  },
-})
-```
+FsusUI 2.0 ships **pure ESM (`ES2022+`)**. Consumers targeting older browsers
+must transpile in their application bundler.
 
 ## Install from GitHub Packages
 
-FsusUI public-preview packages are published to GitHub Packages at
+FsusUI 2.0 packages are published to GitHub Packages at
 `https://npm.pkg.github.com/`.
 
 Configure the `@ozwasyd` scope in `.npmrc` with a GitHub token that has
-`read:packages` (GitHub Packages requires authentication even for public
-packages), then install `@ozwasyd/element-plus`:
+`read:packages`, then install `@ozwasyd/fsusui`:
 
 ```ini
 @ozwasyd:registry=https://npm.pkg.github.com/
@@ -48,33 +26,26 @@ packages), then install `@ozwasyd/element-plus`:
 ```
 
 ```bash
-pnpm install @ozwasyd/element-plus
+pnpm install @ozwasyd/fsusui
 ```
 
-### Optional Sass source dependency
+### Optional Markdown Peer Dependencies
 
-Install Sass when build-time SCSS variable overrides are needed:
+Core components require only `@floating-ui/dom` (installed automatically) and
+peer `vue@^3.5.0`. If you use `@ozwasyd/fsusui/markdown` with heavy rendering
+features, install only the optional peers you enable:
 
 ```bash
-pnpm install -D sass
+pnpm install katex mermaid shiki
 ```
 
 ## Develop in this repository
 
-For component or theme work, use the monorepo workspace directly:
-
 ```bash
-# 安装全部工作区依赖
 pnpm install
-
-# 启动 demo 开发服务器（端口 5173）
-pnpm dev
-
-# 构建包
-pnpm build
-
-# 执行全量测试
-pnpm test:run
+pnpm -C vue/packages/demo-app dev
+pnpm run build
+pnpm run test
 ```
 
 See [Engineering handoff](../engineering-handoff.md) for the complete command
@@ -82,22 +53,9 @@ reference.
 
 ## Optional WASM acceleration
 
-FsusUI includes an optional WASM acceleration layer. These paths select it when
-their runtime and adapter support it:
-
-- **Table sorting:** Number and ASCII-string data can return stable row indices
-  through Worker/WASM. Runtime history selects Worker/WASM or chunked JS; it
-  does not switch on a fixed row-count threshold.
-- **SelectV2 filtering:** A persistent index is rebuilt when options, labels, or
-  filter mode changes. Queries use generation/cancellation and transferable
-  index results; JS results remain available while WASM initializes.
-- **VirtualList row-height estimation:** Lists with `>= 2000` items try the WASM
-  batch estimator; smaller lists return to the caller's fallback estimate.
-- **MarkdownRenderer:** The built-in renderer accepts Markdown and presents raw
-  HTML as text. Its artifacts include `markdown_basic.js/.wasm` and
-  `markdown_simd.js/.wasm`; the component does not include Markdown styling.
-
-Rebuilding the WASM modules requires Emscripten `5.0.4`:
+FsusUI ships prebuilt WebAssembly artifacts (`ep_wasm`, `markdown_basic`,
+`markdown_simd`) with automatic JavaScript fallback. Rebuilding the C++23 WASM
+modules requires Emscripten `5.0.4`:
 
 ```bash
 pnpm run build:wasm
@@ -105,8 +63,4 @@ pnpm run check:markdown-wasm
 pnpm run check:markdown-wasm-runtime
 ```
 
-See [Engineering handoff](../engineering-handoff.md#wasm) for the WASM workflow.
-
-External consumers import the public wrapper `@ozwasyd/element-plus/wasm`.
-The workspace package `@element-plus/wasm` and generated modules under
-`es/wasm/*` or `lib/wasm/*` are internal build details.
+External consumers import the public wrapper `@ozwasyd/fsusui/wasm`.

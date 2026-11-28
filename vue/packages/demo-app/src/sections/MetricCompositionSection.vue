@@ -10,32 +10,32 @@
     <div class="demo-block" data-metric-fixture="metric-list">
       <h3>MetricList</h3>
       <div class="metric-fixture-row" data-metric-variant="metric-default">
-        <ElMetricList>
-          <ElMetricItem label="Active Users" primary="12,847" />
-          <ElMetricItem label="Avg Session" primary="4m 32s" />
-          <ElMetricItem label="Bounce Rate" primary="23.4%" />
-          <ElMetricItem
+        <FsusMetricList>
+          <FsusMetricItem label="Active Users" primary="12,847" />
+          <FsusMetricItem label="Avg Session" primary="4m 32s" />
+          <FsusMetricItem label="Bounce Rate" primary="23.4%" />
+          <FsusMetricItem
             v-bind="cjkEvidenceAttrs"
             label="请求延迟"
             primary="22 毫秒"
             secondary="第 75 百分位"
             meta="58 个样本"
           />
-          <ElMetricItem
+          <FsusMetricItem
             v-bind="rtlEvidenceAttrs"
             label="زمن الاستجابة"
             primary="٢٢ مللي ثانية"
             secondary="المئين ٧٥"
             meta="٥٨ عينة"
           />
-          <ElMetricItem
+          <FsusMetricItem
             v-bind="longEvidenceAttrs"
             label="Service availability over the trailing thirty-day reporting window"
             primary="99.999%"
             secondary="Objective 99.95%"
             meta="43,200 samples"
           />
-        </ElMetricList>
+        </FsusMetricList>
       </div>
     </div>
 
@@ -43,12 +43,12 @@
     <div class="demo-block" data-metric-fixture="kpi-group">
       <h3>KpiGroup</h3>
       <div class="metric-fixture-row" data-metric-variant="kpi-default">
-        <ElKpiGroup>
-          <ElMetricList>
-            <ElMetricItem label="Total Revenue" primary="$847,230" />
-            <ElMetricItem label="Conversion" primary="3.2%" />
-          </ElMetricList>
-        </ElKpiGroup>
+        <FsusKpiGroup>
+          <FsusMetricList>
+            <FsusMetricItem label="Total Revenue" primary="$847,230" />
+            <FsusMetricItem label="Conversion" primary="3.2%" />
+          </FsusMetricList>
+        </FsusKpiGroup>
       </div>
     </div>
 
@@ -59,20 +59,20 @@
         class="metric-fixture-row"
         data-metric-variant="distribution-default"
       >
-        <ElDistributionList>
-          <ElDistributionBarRow
+        <FsusDistributionList>
+          <FsusDistributionBarRow
             rank="1"
             label="Direct"
             value="245"
             :ratio="1"
           />
-          <ElDistributionBarRow
+          <FsusDistributionBarRow
             rank="2"
             label="Referral"
             value="106"
             :ratio="0.43"
           />
-        </ElDistributionList>
+        </FsusDistributionList>
       </div>
     </div>
 
@@ -80,75 +80,75 @@
     <div class="demo-block" data-metric-fixture="key-value">
       <h3>KeyValueGrid</h3>
       <div class="metric-fixture-row" data-metric-variant="kv-default">
-        <ElKeyValueGrid>
-          <ElKeyValueItem label="State" value="Ready" tone="success" />
-          <ElKeyValueItem label="Queue" value="0 / 0" monospace />
-          <ElKeyValueItem label="Region" value="us-east-1" />
-          <ElKeyValueItem label="Authority" value="Runtime">
+        <FsusKeyValueGrid>
+          <FsusKeyValueItem label="State" value="Ready" tone="success" />
+          <FsusKeyValueItem label="Queue" value="0 / 0" monospace />
+          <FsusKeyValueItem label="Region" value="us-east-1" />
+          <FsusKeyValueItem label="Authority" value="Runtime">
             <template #badge>
               <span aria-label="Highlighted metric">·</span>
             </template>
-          </ElKeyValueItem>
-        </ElKeyValueGrid>
+          </FsusKeyValueItem>
+        </FsusKeyValueGrid>
       </div>
     </div>
 
     <div class="demo-block" data-metric-variant="kv-narrow-desktop">
-      <ElKeyValueGrid density="compact">
-        <ElKeyValueItem label="Mode" value="Single instance" />
-        <ElKeyValueItem
+      <FsusKeyValueGrid density="compact">
+        <FsusKeyValueItem label="Mode" value="Single instance" />
+        <FsusKeyValueItem
           label="Scheduling"
           value="Unavailable in single-instance mode"
         />
-        <ElKeyValueItem label="Instance ID" monospace>
-          <ElCopyableDetail
+        <FsusKeyValueItem label="Instance ID" monospace>
+          <FsusCopyableDetail
             value="983732b7-a65e-4110-812e-8ecdcfad15f5"
             label="Copy detail"
           />
-        </ElKeyValueItem>
-        <ElKeyValueItem
+        </FsusKeyValueItem>
+        <FsusKeyValueItem
           label="Build version"
           value="1.0.0+eea3af55c2494ac18eb9d8a44d4eaf464e788f79"
         />
-        <ElKeyValueItem label="Started" value="2026/11/20 20:49:32" />
-        <ElKeyValueItem label="Observed" value="2026/11/20 20:49:37" />
-        <ElKeyValueItem
+        <FsusKeyValueItem label="Started" value="2026/11/20 20:49:32" />
+        <FsusKeyValueItem label="Observed" value="2026/11/20 20:49:37" />
+        <FsusKeyValueItem
           label="Lease"
           value="Confirmed on primary (174 ms ago)"
         />
-        <ElKeyValueItem label="Snapshot" value="Ready" />
-      </ElKeyValueGrid>
+        <FsusKeyValueItem label="Snapshot" value="Ready" />
+      </FsusKeyValueGrid>
     </div>
 
     <!-- StatusSummary -->
     <div class="demo-block" data-metric-fixture="status">
       <h3>StatusSummary</h3>
       <div class="metric-fixture-row" data-metric-variant="status-default">
-        <ElStatusSummary
+        <FsusStatusSummary
           label="Deployment"
           status="Stable"
           updated-at="2026-08-27 10:30"
           tone="success"
         >
           <template #detail>Production checks completed successfully.</template>
-        </ElStatusSummary>
+        </FsusStatusSummary>
       </div>
       <div class="metric-fixture-row" data-metric-variant="summary-success">
-        <ElStatusSummary
+        <FsusStatusSummary
           label="Deployment sync"
           status="Healthy"
           updated-at="2026-06-14 20:30"
           tone="success"
         >
           <template #actions>
-            <el-button text size="small">Inspect</el-button>
+            <fsus-button text size="small">Inspect</fsus-button>
             <a href="#deployment-history" role="button">History</a>
             <button type="button" aria-pressed="true">Pinned</button>
           </template>
-        </ElStatusSummary>
+        </FsusStatusSummary>
       </div>
       <div class="metric-fixture-row" data-metric-variant="summary-danger">
-        <ElStatusSummary
+        <FsusStatusSummary
           label="Quota watchdog"
           status="Over limit"
           updated-at="2026-06-15 02:12"
@@ -156,7 +156,7 @@
         />
       </div>
       <div class="metric-fixture-row" data-metric-variant="summary-info">
-        <ElStatusSummary
+        <FsusStatusSummary
           label="Index refresh"
           status="In progress"
           updated-at="2026-06-15 02:14"
@@ -169,8 +169,8 @@
     <div class="demo-block" data-metric-fixture="diagnostics">
       <h3>DiagnosticsList</h3>
       <div class="metric-fixture-row" data-metric-variant="diag-mixed">
-        <ElDiagnosticsList>
-          <ElDiagnosticsItem
+        <FsusDiagnosticsList>
+          <FsusDiagnosticsItem
             title="Memory usage"
             message="75% of allocated memory consumed."
             meta="warning - 17:48:11 - 3 times"
@@ -181,8 +181,8 @@
               <button type="button">Retry</button>
               <a href="#diagnostic-memory-log">Open log</a>
             </template>
-          </ElDiagnosticsItem>
-          <ElDiagnosticsItem
+          </FsusDiagnosticsItem>
+          <FsusDiagnosticsItem
             title="Disk space"
             message="98% full — immediate action required."
             meta="danger - 17:49:03 - current"
@@ -191,37 +191,37 @@
           >
             <template #detail>
               <div data-testid="nested-diagnostics">
-                <ElDiagnosticsList density="compact">
-                  <ElDiagnosticsItem
+                <FsusDiagnosticsList density="compact">
+                  <FsusDiagnosticsItem
                     title="Primary volume"
                     message="Cleanup queued."
                     tone="info"
                   />
-                  <ElDiagnosticsItem
+                  <FsusDiagnosticsItem
                     title="Archive volume"
                     message="Capacity remains available."
                     tone="success"
                   />
-                </ElDiagnosticsList>
+                </FsusDiagnosticsList>
               </div>
             </template>
-          </ElDiagnosticsItem>
-          <ElDiagnosticsItem
+          </FsusDiagnosticsItem>
+          <FsusDiagnosticsItem
             title="Index refresh"
             message="Background refresh is still running."
             meta="info - 17:49:30"
             tone="info"
           />
-          <ElDiagnosticsItem
+          <FsusDiagnosticsItem
             title="Replica status"
             message="All replicas are synchronized."
             meta="success - 17:50:00"
             tone="success"
           />
-        </ElDiagnosticsList>
+        </FsusDiagnosticsList>
       </div>
       <div class="metric-fixture-row" data-metric-variant="diag-empty">
-        <ElEmptyState
+        <FsusEmptyState
           size="inline"
           title="No diagnostics"
           description="No diagnostic events are available."
@@ -232,13 +232,13 @@
         data-metric-variant="diag-loading"
         aria-busy="true"
       >
-        <ElDiagnosticsList>
-          <ElDiagnosticsItem
+        <FsusDiagnosticsList>
+          <FsusDiagnosticsItem
             title="Loading diagnostics"
             message="Recent diagnostic events are being loaded."
             tone="info"
           />
-        </ElDiagnosticsList>
+        </FsusDiagnosticsList>
       </div>
     </div>
 
@@ -247,8 +247,8 @@
       <h3>DiagnosticsList (RTL)</h3>
       <div class="metric-fixture-row" data-metric-variant="diag-rtl">
         <div dir="rtl">
-          <ElDiagnosticsList>
-            <ElDiagnosticsItem
+          <FsusDiagnosticsList>
+            <FsusDiagnosticsItem
               title="diagnostic.event"
               message="Recent event summary supplied by the product."
               meta="warning - 17:48:11 - 3 times"
@@ -256,14 +256,14 @@
               tone="warning"
             >
               <template #actions>
-                <ElCopyableDetail
+                <FsusCopyableDetail
                   value="diagnostic-node:runCheck:sample-0001"
                   label="Copy detail"
                   inline
                 />
               </template>
-            </ElDiagnosticsItem>
-          </ElDiagnosticsList>
+            </FsusDiagnosticsItem>
+          </FsusDiagnosticsList>
         </div>
       </div>
     </div>
@@ -272,16 +272,16 @@
     <div class="demo-block" data-metric-fixture="copyable">
       <h3>CopyableDetail</h3>
       <div class="metric-fixture-row" data-metric-variant="copy-default">
-        <ElCopyableDetail value="sk-proj-abc123def456" />
+        <FsusCopyableDetail value="sk-proj-abc123def456" />
       </div>
       <div
         data-metric-variant="copy-wide"
         style="width: 425px; max-width: 100%"
       >
-        <ElCopyableDetail value="diagnostic-node:runCheck:sample-0001" />
+        <FsusCopyableDetail value="diagnostic-node:runCheck:sample-0001" />
       </div>
       <div class="metric-fixture-row" data-metric-variant="copy-disabled">
-        <ElCopyableDetail
+        <FsusCopyableDetail
           value="sk-proj-disabled"
           label="Copy unavailable detail"
           disabled
@@ -299,19 +299,19 @@
 
 <script setup lang="ts">
 import {
-  ElCopyableDetail,
-  ElDiagnosticsItem,
-  ElDiagnosticsList,
-  ElDistributionBarRow,
-  ElDistributionList,
-  ElEmptyState,
-  ElKeyValueGrid,
-  ElKeyValueItem,
-  ElKpiGroup,
-  ElMetricItem,
-  ElMetricList,
-  ElStatusSummary,
-} from '@element-plus/components'
+  FsusCopyableDetail,
+  FsusDiagnosticsItem,
+  FsusDiagnosticsList,
+  FsusDistributionBarRow,
+  FsusDistributionList,
+  FsusEmptyState,
+  FsusKeyValueGrid,
+  FsusKeyValueItem,
+  FsusKpiGroup,
+  FsusMetricItem,
+  FsusMetricList,
+  FsusStatusSummary,
+} from '@ozwasyd/fsusui'
 
 const cjkEvidenceAttrs = {
   'data-metric-typography': 'cjk',

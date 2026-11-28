@@ -3,7 +3,7 @@
       v-if="markdownProjectionFixture"
       data-testid="markdown-projection-production-fixture"
     >
-      <el-markdown-editor
+      <fsus-markdown-editor
         v-model="markdownProjectionSource"
         default-mode="live"
         :min-rows="4"
@@ -24,7 +24,7 @@
       :data-markdown-editor-probe-id="markdownEditorProbeId"
       :dir="markdownCommandDirection"
     >
-      <el-markdown-editor
+      <fsus-markdown-editor
         ref="markdownTransactionEditor"
         v-model="markdownTransactionValue"
         :commands="markdownPaletteImeCommands"
@@ -256,7 +256,7 @@
           Reset fixture
         </button>
       </div>
-      <el-markdown-editor
+      <fsus-markdown-editor
         :key="`markdown-search-embed-${markdownSearchEmbedEpoch}`"
         ref="markdownSearchEmbedEditor"
         v-model="markdownSearchEmbedValue"
@@ -311,7 +311,7 @@
         data-testid="markdown-writing-aids-nested-scroll"
         style="max-height: 38rem; overflow: auto"
       >
-        <el-markdown-editor
+        <fsus-markdown-editor
           ref="markdownWritingAidsEditor"
           v-model="markdownWritingAidsValue"
           :chrome="markdownWritingAidsChrome"
@@ -368,7 +368,7 @@ import {
   markdownEditorProjectionsEquivalent,
   type MarkdownEditorProjectionResult,
   type MarkdownProjectionWorkerRequest,
-} from '../../../wasm/markdown-runtime'
+} from '@fsusui/wasm'
 import type {
   MarkdownAttachmentBatchIntent,
   MarkdownEditorCommand,
@@ -381,7 +381,7 @@ import type {
   MarkdownEditorTransactionEvent,
   MarkdownEmbedProvider,
   MarkdownEmbedRequest,
-} from '../../../element-plus'
+} from '@ozwasyd/fsusui/markdown'
 
 const markdownProjectionSource = ref(
   '![初始 alt](/old.png "old title")\n::caption[说明 😀 RTL אב]',

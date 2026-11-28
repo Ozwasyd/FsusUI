@@ -1,0 +1,75 @@
+// Single-layer FsusUI 2.0 Token Surface — directly consumes spec/tokens generated output.
+// Zero Element Plus --el-* compatibility variables.
+@use './generated/tokens.css';
+
+@layer fsus.tokens {
+  :root,
+  [data-fsus-theme='light'],
+  html.light {
+    --fsus-ink: var(--fsus-color-text-primary);
+    --fsus-paper: var(--fsus-color-surface-base);
+    --fsus-page: var(--fsus-color-surface-page);
+    --fsus-surface-raised: var(--fsus-color-surface-raised);
+    --fsus-surface-overlay: var(--fsus-color-surface-overlay);
+    --fsus-border: var(--fsus-color-border-subtle);
+    --fsus-accent: var(--fsus-color-action-primary);
+    --fsus-accent-hover: var(--fsus-color-action-primary-hover);
+
+    --fsus-button-primary-bg: var(--fsus-ink);
+    --fsus-button-primary-text: var(--fsus-paper);
+    --fsus-button-primary-hover-bg: color-mix(in srgb, var(--fsus-ink) 88%, var(--fsus-paper));
+
+    --fsus-status-info: var(--fsus-color-action-primary);
+    --fsus-status-success: #16a34a;
+    --fsus-status-warning: #d97706;
+    --fsus-status-danger: var(--fsus-color-status-danger);
+
+    --fsus-form-readable-text: var(--fsus-color-text-quiet);
+    --fsus-form-state-text: var(--fsus-color-text-muted);
+    --fsus-form-decorative: var(--fsus-color-text-decorative);
+    --fsus-disabled-bg: var(--fsus-color-fill-light);
+    --fsus-disabled-border: var(--fsus-color-border-light);
+    --fsus-disabled-text: var(--fsus-color-text-muted);
+
+    // Viewport & safe-area single source of truth (100dvh only, no 100vh fallback)
+    --fsus-viewport-block-size: 100dvh;
+    --fsus-safe-area-inset-top: env(safe-area-inset-top, 0px);
+    --fsus-safe-area-inset-right: env(safe-area-inset-right, 0px);
+    --fsus-safe-area-inset-bottom: env(safe-area-inset-bottom, 0px);
+    --fsus-safe-area-inset-left: env(safe-area-inset-left, 0px);
+    --fsus-floating-viewport-gap: 24px;
+    --fsus-floating-max-width: min(420px, calc(100vw - var(--fsus-floating-viewport-gap)));
+    --fsus-notification-max-width: min(480px, calc(100vw - var(--fsus-floating-viewport-gap)));
+
+    // State surface tints (referencing canonical generated tokens)
+    --fsus-state-emphasis-bg: var(--fsus-component-state-surface-emphasis-background);
+    --fsus-state-focus-border: var(--fsus-color-focus-ring);
+    --fsus-state-invalid-border: var(--fsus-status-danger);
+  }
+
+  html.dark,
+  html[data-theme-resolved='dark'],
+  [data-fsus-theme='dark'] {
+    --fsus-status-success: #22c55e;
+    --fsus-status-warning: #f59e0b;
+    --fsus-form-readable-text: #a1a1aa;
+    --fsus-form-state-text: #85858f;
+    --fsus-form-decorative: #71717a;
+    --fsus-disabled-bg: #18181b;
+    --fsus-disabled-border: #27272a;
+    --fsus-disabled-text: #85858f;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    html:not(.light):not([data-theme-resolved='light']) {
+      --fsus-status-success: #22c55e;
+      --fsus-status-warning: #f59e0b;
+      --fsus-form-readable-text: #a1a1aa;
+      --fsus-form-state-text: #85858f;
+      --fsus-form-decorative: #71717a;
+      --fsus-disabled-bg: #18181b;
+      --fsus-disabled-border: #27272a;
+      --fsus-disabled-text: #85858f;
+    }
+  }
+}

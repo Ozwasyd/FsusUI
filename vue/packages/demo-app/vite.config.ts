@@ -18,43 +18,20 @@ export default defineConfig({
   optimizeDeps: {
     noDiscovery: true,
     exclude: [
-      'element-plus',
-      'element-plus/motion',
-      '@element-plus/components',
-      '@element-plus/constants',
-      '@element-plus/directives',
-      '@element-plus/hooks',
-      '@element-plus/locale',
-      '@element-plus/utils',
-      '@element-plus/icons-vue',
-      '@element-plus/wasm',
-      '@element-plus/motion',
+      '@ozwasyd/fsusui',
+      '@fsusui/core',
+      '@fsusui/icons',
+      '@fsusui/motion',
+      '@fsusui/theme',
+      '@fsusui/components',
+      '@fsusui/markdown',
+      '@fsusui/wasm',
     ],
     include: [
-      '@ctrl/tinycolor',
       '@floating-ui/dom',
-      '@popperjs/core',
       '@vue/shared',
-      'async-validator',
-      'dayjs',
-      'escape-html',
-      'gsap',
-      'gsap/ScrollTrigger',
-      'dayjs/plugin/advancedFormat.js',
-      'dayjs/plugin/customParseFormat.js',
-      'dayjs/plugin/dayOfYear.js',
-      'dayjs/plugin/isSameOrAfter.js',
-      'dayjs/plugin/isSameOrBefore.js',
-      'dayjs/plugin/localeData.js',
-      'dayjs/plugin/updateLocale',
-      'dayjs/plugin/weekOfYear.js',
-      'dayjs/plugin/weekYear.js',
       'katex',
-      'lodash-es',
-      'lodash-unified',
       'mermaid',
-      'motion-dom',
-      'normalize-wheel-es',
       'shiki/core',
       'shiki/dist/langs/bash.mjs',
       'shiki/dist/langs/csharp.mjs',
@@ -67,45 +44,80 @@ export default defineConfig({
     ],
   },
   resolve: {
-    alias: {
-      'element-plus/motion': fileURLToPath(
-        new URL('../element-plus/motion.ts', import.meta.url),
-      ),
-      'element-plus': fileURLToPath(
-        new URL('../element-plus/index.ts', import.meta.url),
-      ),
-      '@element-plus/motion': fileURLToPath(
-        new URL('../motion/index.ts', import.meta.url),
-      ),
-      '@element-plus/components': fileURLToPath(
-        new URL('../components', import.meta.url),
-      ),
-      '@element-plus/constants': fileURLToPath(
-        new URL('../constants', import.meta.url),
-      ),
-      '@element-plus/directives': fileURLToPath(
-        new URL('../directives', import.meta.url),
-      ),
-      '@element-plus/hooks': fileURLToPath(
-        new URL('../hooks', import.meta.url),
-      ),
-      '@element-plus/locale': fileURLToPath(
-        new URL('../locale', import.meta.url),
-      ),
-      '@element-plus/utils': fileURLToPath(
-        new URL('../utils', import.meta.url),
-      ),
-      '@element-plus/icons-vue': fileURLToPath(
-        new URL('../icons-vue/src/index.ts', import.meta.url),
-      ),
-      '@element-plus/theme-chalk/src': fileURLToPath(
-        new URL('../theme-chalk/src', import.meta.url),
-      ),
-      '@element-plus/wasm': fileURLToPath(
-        new URL('../wasm/index.ts', import.meta.url),
-      ),
-      '@': fileURLToPath(new URL('./src', import.meta.url)),
-    },
+    alias: [
+      {
+        find: /^@ozwasyd\/fsusui\/markdown$/,
+        replacement: fileURLToPath(new URL('../fsusui/src/markdown.ts', import.meta.url)),
+      },
+      {
+        find: /^@ozwasyd\/fsusui\/motion$/,
+        replacement: fileURLToPath(new URL('../fsusui/src/motion.ts', import.meta.url)),
+      },
+      {
+        find: /^@ozwasyd\/fsusui\/icons$/,
+        replacement: fileURLToPath(new URL('../fsusui/src/icons.ts', import.meta.url)),
+      },
+      {
+        find: /^@ozwasyd\/fsusui\/wasm$/,
+        replacement: fileURLToPath(new URL('../fsusui/src/wasm.ts', import.meta.url)),
+      },
+      {
+        find: /^@ozwasyd\/fsusui\/render-pipeline$/,
+        replacement: fileURLToPath(new URL('../fsusui/src/render-pipeline.ts', import.meta.url)),
+      },
+      {
+        find: /^@ozwasyd\/fsusui\/perception-challenge$/,
+        replacement: fileURLToPath(new URL('../fsusui/src/perception-challenge.ts', import.meta.url)),
+      },
+      {
+        find: /^@ozwasyd\/fsusui\/core$/,
+        replacement: fileURLToPath(new URL('../fsusui/src/core.ts', import.meta.url)),
+      },
+      {
+        find: /^@ozwasyd\/fsusui$/,
+        replacement: fileURLToPath(new URL('../fsusui/src/index.ts', import.meta.url)),
+      },
+      {
+        find: /^@fsusui\/core\/(.*)$/,
+        replacement: fileURLToPath(new URL('../core/src/$1', import.meta.url)),
+      },
+      {
+        find: /^@fsusui\/core$/,
+        replacement: fileURLToPath(new URL('../core/src/index.ts', import.meta.url)),
+      },
+      {
+        find: /^@fsusui\/icons$/,
+        replacement: fileURLToPath(new URL('../icons/src/index.ts', import.meta.url)),
+      },
+      {
+        find: /^@fsusui\/motion$/,
+        replacement: fileURLToPath(new URL('../motion/src/index.ts', import.meta.url)),
+      },
+      {
+        find: /^@fsusui\/components$/,
+        replacement: fileURLToPath(new URL('../components/src/index.ts', import.meta.url)),
+      },
+      {
+        find: /^@fsusui\/markdown$/,
+        replacement: fileURLToPath(new URL('../markdown/src/index.ts', import.meta.url)),
+      },
+      {
+        find: /^@fsusui\/theme\/src\/(.*)$/,
+        replacement: fileURLToPath(new URL('../theme/src/$1', import.meta.url)),
+      },
+      {
+        find: /^@fsusui\/wasm\/(.*)$/,
+        replacement: fileURLToPath(new URL('../wasm/$1', import.meta.url)),
+      },
+      {
+        find: /^@fsusui\/wasm$/,
+        replacement: fileURLToPath(new URL('../wasm/index.ts', import.meta.url)),
+      },
+      {
+        find: '@',
+        replacement: fileURLToPath(new URL('./src', import.meta.url)),
+      },
+    ],
     preserveSymlinks: true,
   },
   server: {

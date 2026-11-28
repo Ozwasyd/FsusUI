@@ -21,11 +21,16 @@
   },
   "vueCompilerOptions": {
     "target": 3.5,
-    "strictTemplates": true
+    "strictTemplates": true,
+    "fallthroughAttributes": true,
+    "dataAttributes": ["data-*"]
   },
   "include": [
-    "packages",
-    "typings/components.d.ts",
+    "packages/core/src",
+    "packages/icons/src",
+    "packages/motion/src",
+    "packages/components/src",
+    "packages/fsusui/src",
     "typings/env.d.ts",
     "typings/vite-worker.d.ts"
   ],
@@ -33,11 +38,8 @@
     "node_modules",
     "**/dist",
     "**/__tests__/**/*",
-    "**/gulpfile.ts",
-    "**/test-helper",
+    "packages/components/src/_native-pending/**/*",
     "packages/test-utils",
-    "**/*.md",
-    "packages/components/*/style/**",
-    "packages/components/*/styles/**"
+    "**/*.md"
   ]
 }

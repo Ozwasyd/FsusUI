@@ -74,7 +74,7 @@ import {
   ref,
   watch,
 } from 'vue'
-import { initMarkdownRuntime } from '@element-plus/wasm'
+import { initMarkdownRuntime } from '@fsusui/wasm'
 import { createDemoState, provideDemoState } from './demo-state'
 import BasicSection from './sections/BasicSection.vue'
 import CharacterChallengeConformanceSection from './sections/CharacterChallengeConformanceSection.vue'

@@ -13,7 +13,7 @@
       <h2 class="pagination-matrix__label">
         {{ fixture.label }}
       </h2>
-      <el-pagination
+      <fsus-pagination
         v-bind="fixture.pagination"
         background
         responsive="auto"

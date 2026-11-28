@@ -88,7 +88,7 @@ await build({
     outDir: browserOutput,
     rollupOptions: {
       external: (id) =>
-        /^(?:@element-plus\/utils|katex|mermaid|shiki(?:\/.*)?)$/u.test(id),
+        /^(?:@fsusui\/core|katex|mermaid|shiki(?:\/.*)?)$/u.test(id),
       output: {
         chunkFileNames: 'chunks/[name]-[hash].mjs',
         entryFileNames: '[name].mjs',

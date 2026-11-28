@@ -128,7 +128,7 @@ jobs:
         run: |
           release_tag="$RELEASE_TAG_INPUT"
           if [ -z "$release_tag" ]; then
-            release_tag="v$(node -p "require('./vue/packages/element-plus/package.json').version")"
+            release_tag="v$(node -p "require('./vue/packages/fsusui/package.json').version")"
           fi
           node scripts/ci-readiness.mjs check \
             --root .readiness \

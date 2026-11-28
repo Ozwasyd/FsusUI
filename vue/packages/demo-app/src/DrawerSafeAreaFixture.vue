@@ -3,7 +3,7 @@
   <input id="outside" aria-label="Outside drawer" />
   <output id="events">{{ events.join(',') }}</output>
   <output id="navigations">{{ navigations }}</output>
-  <el-drawer
+  <fsus-drawer
     v-model="visible"
     :direction="direction"
     :size="size"
@@ -32,12 +32,12 @@
     >
       Account profile
     </a>
-  </el-drawer>
+  </fsus-drawer>
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { ElDrawer } from '../../element-plus'
+import { FsusDrawer } from '@ozwasyd/fsusui'
 
 const props = withDefaults(
   defineProps<{

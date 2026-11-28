@@ -32,7 +32,7 @@ assert.match(`${invalid.stdout}\n${invalid.stderr}`, /group: release/u)
 
 const sourceVersion = JSON.parse(
   fs.readFileSync(
-    path.join(process.cwd(), 'vue/packages/element-plus/package.json'),
+    path.join(process.cwd(), 'vue/packages/fsusui/package.json'),
     'utf8',
   ),
 ).version
@@ -47,7 +47,7 @@ try {
   const candidate = {
     sourceProfile: 'Release',
     commitSha,
-    package: { name: '@ozwasyd/element-plus', version: sourceVersion },
+    package: { name: '@ozwasyd/fsusui', version: sourceVersion },
     artifact: { sha256: 'b'.repeat(64) },
   }
   fs.writeFileSync(candidateManifestPath, `${JSON.stringify(candidate)}\n`)

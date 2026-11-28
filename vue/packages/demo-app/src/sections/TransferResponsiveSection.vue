@@ -12,7 +12,7 @@
       v-bind="{ 'data-state': 'ten-items' }"
     >
       <h2>待同步文章</h2>
-      <el-transfer
+      <fsus-transfer
         v-model="selected"
         :data="items"
         :left-default-checked="[1]"
@@ -28,7 +28,7 @@
       v-bind="{ 'data-state': 'long-text' }"
     >
       <h2>长标题</h2>
-      <el-transfer
+      <fsus-transfer
         v-model="longSelected"
         :data="longItems"
         :titles="['可用文章', '已选文章']"
@@ -41,7 +41,7 @@
       v-bind="{ 'data-state': 'disabled' }"
     >
       <h2>部分文章不可移动</h2>
-      <el-transfer
+      <fsus-transfer
         v-model="disabledSelected"
         :data="disabledItems"
         :titles="['可用文章', '已选文章']"
@@ -54,7 +54,7 @@
       v-bind="{ 'data-state': 'all-checked' }"
     >
       <h2>全部选中</h2>
-      <el-transfer
+      <fsus-transfer
         v-model="allCheckedSelected"
         :data="allCheckedItems"
         :left-default-checked="allCheckedKeys"
@@ -63,13 +63,13 @@
     </section>
 
     <section
-      v-loading="true"
+      v-fsus-loading="true"
       class="transfer-responsive__case"
       data-testid="transfer-loading"
       v-bind="{ 'data-state': 'loading' }"
     >
       <h2>加载中</h2>
-      <el-transfer
+      <fsus-transfer
         v-model="loadingSelected"
         :data="items"
         :titles="['可用文章', '已选文章']"
@@ -82,7 +82,7 @@
       v-bind="{ 'data-state': 'empty' }"
     >
       <h2>暂无文章</h2>
-      <el-transfer
+      <fsus-transfer
         v-model="emptySelected"
         :data="[]"
         :titles="['可用文章', '已选文章']"
@@ -167,13 +167,13 @@ const emptySelected = ref<Array<string | number>>([])
 
 .transfer-responsive__header > p:last-child {
   margin-top: 8px;
-  color: var(--el-text-color-secondary);
+  color: var(--fsus-color-text-quiet);
   line-height: 1.6;
 }
 
 .transfer-responsive__eyebrow {
   margin-bottom: 6px !important;
-  color: var(--el-color-primary);
+  color: var(--fsus-color-action-primary);
   font-size: 13px;
   font-weight: 700;
 }
@@ -183,7 +183,7 @@ const emptySelected = ref<Array<string | number>>([])
   padding: 16px;
   border: 1px solid var(--fsus-border);
   border-radius: 12px;
-  background: var(--el-bg-color);
+  background: var(--fsus-color-surface-base);
   box-sizing: border-box;
 }
 

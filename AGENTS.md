@@ -1,6 +1,6 @@
 # AGENTS.md - FsusUI
 
-FsusUI is a fork and compatibility-focused Vue 3 component library based on Element Plus, with a WASM-capable runtime, Markdown components, theme/motion tokens, icons, and an Avalonia/.NET cross-platform surface. It is in public preview; the public npm package is `@ozwasyd/element-plus`.
+FsusUI 2.0 is a native, pure-ESM Vue 3.5+ component system and cross-platform Avalonia/.NET UI library with a WASM-capable runtime, decoupled Markdown subpaths, canonical `--fsus-*` theme/motion tokens, and lean SVG icons. The public npm package is `@ozwasyd/fsusui`; internal workspace packages live under `@fsusui/*`. Element Plus compatibility (`El*`, `--el-*`, CJS/UMD) has been permanently retired in 2.0.0.
 
 This file keeps only repository-specific decision boundaries and entry points that code cannot express. It is not a map, a style guide, or a command index. Long-term facts live under [`docs/index.md`](docs/index.md) and follow [`docs/governance/documentation-architecture.md`](docs/governance/documentation-architecture.md).
 
@@ -9,7 +9,7 @@ Write in English. The authoritative [`docs/index.md`](docs/index.md) and [`docs/
 ## Working style
 
 - Understand the goal, adjacent implementation, and existing tests before choosing the smallest complete change; do not expand into opportunistic refactors.
-- Match surrounding code: naming, comment density, error handling, and abstraction level. Generic style follows the repo tooling, not this file.
+- Match surrounding code: Vue 3.5 native `defineProps<T>()` + `defineModel()`, static `.fsus-*` classes + `data-*` state attributes, and `--fsus-*` tokens only.
 - Load context progressively; read only the fact source relevant to the change. A more specific current doc, test, or contract wins.
 - Check `git status` before editing. Existing working-tree changes belong to the user; do not overwrite, revert, reformat, or commit unrelated files.
 
@@ -18,25 +18,25 @@ Write in English. The authoritative [`docs/index.md`](docs/index.md) and [`docs/
 | Change | Read first | Cross-check |
 | --- | --- | --- |
 | Web/Vue component | [`docs/components/overview.md`](docs/components/overview.md), component doc | [`docs/api-stability.md`](docs/api-stability.md), `spec/components/`, focused unit + visual tests |
-| Theme / token | [`docs/theme/tokens.md`](docs/theme/tokens.md), [`spec/tokens/README.md`](spec/tokens/README.md) | [`docs/theme/customization.md`](docs/theme/customization.md), `tokens:check` |
+| Theme / token | [`docs/theme/tokens.md`](docs/theme/tokens.md), [`spec/tokens/README.md`](spec/tokens/README.md) | [`docs/theme/customization.md`](docs/theme/customization.md), `tokens:check`, `tokens:lint` |
 | Motion | [`docs/theme/motion.md`](docs/theme/motion.md) | `spec/motion`, `governance:motion` |
 | Visual / UX | [`docs/design.md`](docs/design.md), [`docs/design/change-classification.md`](docs/design/change-classification.md) | [`docs/workflows/visual-change.md`](docs/workflows/visual-change.md), `.agents/skills/fsusui-design-conformance/` |
-| Markdown / WASM | nearest `docs/api/markdown-*.md`, `vue/packages/wasm` | `check:markdown-wasm*`, `check:markdown-xss`, `ensure:wasm` |
+| Markdown / WASM | nearest `docs/api/markdown-*.md`, `vue/packages/markdown`, `vue/packages/wasm` | `check:markdown-wasm*`, `check:markdown-xss`, `ensure:wasm` |
 | Avalonia / .NET | [`docs/avalonia/README.md`](docs/avalonia/README.md) | `spec/avalonia/`, `dotnet:verify` |
-| API / package surface | [`docs/api-stability.md`](docs/api-stability.md), `docs/api/` | `test:consumer-install`, `package:candidate:*`, `check:npm-*` |
+| API / package surface | [`docs/api-stability.md`](docs/api-stability.md), `docs/api/` | `package:candidate:*`, `test:consumer-install`, `check:npm-*` |
 | Docs / release | [`docs/governance/documentation-architecture.md`](docs/governance/documentation-architecture.md) | `check:documentation-architecture` |
 
 ## Non-negotiable boundaries
 
-- Public API is documented imports only. `es/*`, `lib/*`, wildcard exports, `packages/*`, `internal/*`, generated WASM, build scripts, and test fixtures are not public API. `@ozwasyd/element-plus` is the FsusUI compatibility build, never upstream Element Plus.
+- Public API is documented `@ozwasyd/fsusui` ESM exports only. `@fsusui/*` workspace internals, `vue/internal/*`, generated WASM internals, build scripts, and test fixtures are not public API. Do not reintroduce Element Plus compatibility aliases (`El*`, `.el-*`, `--el-*`), CommonJS (`lib/`), or legacy UMD bundles.
 - Documentation authority is fixed, high to low: `spec/` -> [`docs/design.md`](docs/design.md) (the sole human-readable visual contract) -> domain contracts -> governance/workflow -> guides -> records/archive. A lower layer may apply a higher layer, never redefine it. Do not add new root-level `docs/*.md` files; place documents in their domain and run `check:documentation-architecture`.
 - Do not copy token values, geometry, motion budgets, or design prohibitions into workflows, skills, or this file; link to the contract. Generated documents must identify their generator and must not be edited by hand.
-- UI/UX work uses `.agents/skills/fsusui-design-conformance/SKILL.md` only for FsusUI-specific ownership, design classification, evidence requirements, and UX acceptance semantics. The Skill and repository instructions must not choose shared Root/controller behavior, permanent actor roles, model/profile/effort, routes, runtime permission classes, leases/resources/capacity, shared stage order, checkpoint/continuation, retry/recovery, delivery, cleanup, or terminalization. Those belong to an external scheduler when one is present. Never claim UX/visual acceptance without inspected rendered evidence.
+- UI/UX work uses `.agents/skills/fsusui-design-conformance/SKILL.md` only for FsusUI-specific ownership, design classification, evidence requirements, and UX acceptance semantics. Never claim UX/visual acceptance without inspected rendered evidence.
 - The design language is "The Intellectual Minimalist" ([`docs/design.md`](docs/design.md)). Preserve information architecture, primary focus, and existing restraint. Do not add decorative cards/badges/icons/copy, redesign adjacent components, mint new tokens/wrappers/variants, or use generic SaaS patterns as design evidence.
 - Runtime state boundaries ([`docs/runtime-state-boundaries.md`](docs/runtime-state-boundaries.md)): core components must not persist user data to `localStorage`, `sessionStorage`, IndexedDB, or cookies by default; durable persistence belongs to the consuming app, and library caches must be reconstructable from props/slots/injected config.
-- WASM changes must keep the JavaScript fallback intact and must not publish debug-only artifacts or source maps.
+- WASM changes must keep the JavaScript fallback intact and must not publish debug-only artifacts or source maps. Heavy Markdown renderers (`katex`, `mermaid`, `shiki`) must remain optional `peerDependencies` and must never leak into the main `@ozwasyd/fsusui` entry chunk.
 - Never report vulnerabilities in public issues, PRs, discussions, or screenshots; use GitHub private vulnerability reporting per [`SECURITY.md`](SECURITY.md). Do not expose private data, tokens, internal paths, or registry config in build/demo content.
-- Do not claim Element Plus compatibility unless behavior is covered by local tests or explicit FsusUI docs. Prefer `--el-*` variables; use `--fsus-*` only for a real semantic layer.
+- Use canonical `--fsus-*` CSS variables only; zero `--el-*` fallback variables.
 - Changesets are required for any consumer-visible change; mark breaking changes `BREAKING:` with migration docs. Internal-only changes state "changeset not needed" and why.
 
 ## Implement and verify
@@ -48,9 +48,9 @@ Write in English. The authoritative [`docs/index.md`](docs/index.md) and [`docs/
 5. Update the nearest current document when a public contract, visual contract, architecture, or security semantic changes. Do not create documents to pad count.
 6. On delivery, list actual commands, results, un-run items, risks, and a rollback path. Do not describe historical evidence, mocks, static checks, or a missing external environment as current end-to-end verification.
 
-Common gates: `pnpm run lint`, `typecheck`, `test`, `build`, `verify`, `verify:strict`, `verify:release`, `verify:pr-fast`, `governance:check`, `check:fsusui-design-conformance`, `check:documentation-architecture`, `test:consumer-install`, `dotnet:verify`.
+Common gates: `pnpm run lint`, `typecheck`, `test`, `build`, `tokens:check`, `icons:check`, `check:markdown-xss`, `check:documentation-architecture`, `package:candidate:build`, `package:candidate:verify`, `dotnet:verify`.
 
-Git and delivery: prefer `gh` for GitHub operations (PR and issue workflows). Work on an issue-scoped branch (issues on the same dependency chain may be combined into a single branch) and open a PR that completes the impact and release-note checklist; verify checks and the exact head before merging. After merging, delete the branch on both origin and locally. After an issue is completed, comment the evidence (exact test command and captured output) on each resolved issue. When GitHub Actions is unavailable, only local equivalent CI all-green plus recorded commands and results justify a merge; never describe a missing remote check as passing.
+Git and delivery: prefer `gh` for GitHub operations. Keep `main` untouched for unreleased major versions until explicit release sign-off.
 
 ## When to edit this file
 

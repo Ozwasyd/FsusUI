@@ -1,18 +1,18 @@
 {
-  "name": "@element-plus/components",
-  "version": "0.0.5",
-  "description": "all components are settled here",
-  "main": "index.ts",
-  "module": "index.ts",
-  "unpkg": "index.js",
-  "jsdelivr": "index.js",
+  "name": "@fsusui/components",
+  "version": "2.0.0-alpha.0",
+  "private": true,
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "sideEffects": false,
   "peerDependencies": {
     "vue": "^3.5.0"
   },
   "dependencies": {
-    "@element-plus/motion": "workspace:*"
-  },
-  "types": "index.d.ts",
-  "sideEffects": false,
-  "gitHead": "c69724230befa8fede0e6b9c37fb0b7e39fd7cdd"
+    "@fsusui/core": "workspace:*",
+    "@fsusui/icons": "workspace:*",
+    "@fsusui/motion": "workspace:*",
+    "@fsusui/wasm": "workspace:*"
+  }
 }

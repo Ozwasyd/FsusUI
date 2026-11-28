@@ -18,20 +18,32 @@ export const PACKAGE_CODE_EXTENSIONS = [
 
 export const BUNDLED_WORKSPACE_RUNTIME_ENTRIES = new Map([
   [
-    '@element-plus/icons-vue',
-    {
-      es: 'es/icons-vue/src/index.mjs',
-      lib: 'lib/icons-vue/src/index.js',
-      types: 'es/icons-vue',
-    },
+    '@fsusui/core',
+    { es: 'dist/core.mjs', lib: 'dist/core.mjs', types: 'dist/core' },
   ],
   [
-    '@element-plus/motion',
-    {
-      es: 'es/motion/index.mjs',
-      lib: 'lib/motion/index.js',
-      types: 'es/motion',
-    },
+    '@fsusui/icons',
+    { es: 'dist/icons.mjs', lib: 'dist/icons.mjs', types: 'dist/icons' },
+  ],
+  [
+    '@fsusui/motion',
+    { es: 'dist/motion.mjs', lib: 'dist/motion.mjs', types: 'dist/motion' },
+  ],
+  [
+    '@fsusui/components',
+    { es: 'dist/index.mjs', lib: 'dist/index.mjs', types: 'dist/index' },
+  ],
+  [
+    '@fsusui/markdown',
+    { es: 'dist/markdown.mjs', lib: 'dist/markdown.mjs', types: 'dist/markdown' },
+  ],
+  [
+    '@fsusui/theme',
+    { es: 'dist/theme.mjs', lib: 'dist/theme.mjs', types: 'dist/theme' },
+  ],
+  [
+    '@fsusui/wasm',
+    { es: 'dist/wasm.mjs', lib: 'dist/wasm.mjs', types: 'dist/wasm' },
   ],
 ])
 

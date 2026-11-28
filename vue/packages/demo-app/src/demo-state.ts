@@ -1,6 +1,6 @@
 import { inject, markRaw, provide, reactive, ref } from 'vue'
-import { ElMessage, ElMessageBox, ElNotification } from '../../element-plus'
-import * as Icons from '@element-plus/icons-vue'
+import { FsusMessage, FsusMessageBox, FsusNotification } from '@ozwasyd/fsusui'
+import * as Icons from '@fsusui/icons'
 
 import type { InjectionKey } from 'vue'
 
@@ -149,18 +149,18 @@ export const createDemoState = () => {
   const querySearch = (_queryString: string, cb: (items: any[]) => void) => {
     cb([{ value: 'vue' }, { value: 'element' }])
   }
-  const showMessage = () => ElMessage('This is a message.')
+  const showMessage = () => FsusMessage.info('This is a message.')
   const showMessageBox = () =>
-    ElMessageBox.alert(
+    FsusMessageBox.alert(
       'This is a message',
       'Title long close-clearance title Confirmation title must clear the close hit target',
     )
   const showNotification = () =>
-    ElNotification({
+    FsusNotification({
       title: 'Notification',
       message: 'This is a notification',
     })
-  const goBack = () => ElMessage.info('Back')
+  const goBack = () => FsusMessage.info('Back')
 
   return {
     activeCollapse,

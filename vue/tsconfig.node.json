@@ -12,9 +12,8 @@
     "internal/**/*.json",
     "../scripts/**/*",
     "packages/wasm/build.config.ts",
-    "packages/theme-chalk/*",
-    "packages/element-plus/version.ts",
-    "packages/element-plus/package.json"
+    "packages/theme/package.json",
+    "packages/fsusui/package.json"
   ],
   "exclude": ["**/__tests__/**", "**/tests/**", "**/dist"]
 }

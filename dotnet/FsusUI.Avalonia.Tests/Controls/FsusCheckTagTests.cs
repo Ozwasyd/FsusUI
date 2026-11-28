@@ -29,9 +29,10 @@ public class FsusCheckTagTests
       root,
       "vue",
       "packages",
-      "theme-chalk",
+      "theme",
       "src",
-      "check-tag.scss"));
+      "components",
+      "core.scss"));
     Assert.Contains("prefers-reduced-motion: reduce", webTheme);
     Assert.Contains("transition-duration: 1ms", webTheme);
   }

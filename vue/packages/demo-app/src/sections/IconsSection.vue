@@ -3,7 +3,7 @@
     <h2>Full Icon Gallery</h2>
     <div class="icon-gallery">
       <div v-for="(icon, name) in allIcons" :key="name" class="icon-item">
-        <el-icon :size="24"><component :is="icon" /></el-icon>
+        <fsus-icon :size="24"><component :is="icon" /></fsus-icon>
         <span class="icon-name">{{ name }}</span>
       </div>
     </div>

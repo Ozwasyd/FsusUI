@@ -6,7 +6,7 @@ const root = resolve(import.meta.dirname, '..')
 const outputRoot = resolve(root, '.tmp/markdown-xss-browser-fixture')
 const manifestPath = resolve(outputRoot, 'fixture-manifest.json')
 const sourceRoots = [
-  'vue/packages/components/markdown-renderer/src',
+  'vue/packages/markdown/src/markdown-renderer/src',
   'vue/packages/wasm',
   'vue/tests/markdown-xss',
   'vue/tests/support/markdown-xss-dom.ts',

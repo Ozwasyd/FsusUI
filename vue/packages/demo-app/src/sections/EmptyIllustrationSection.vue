@@ -13,12 +13,12 @@
         class="empty-illustration-fixture__panel empty-illustration-fixture__panel--default"
         v-bind="{ 'data-empty-variant': 'default' }"
       >
-        <h2>Default ElEmpty</h2>
-        <ElEmpty
+        <h2>Default FsusEmptyState</h2>
+        <FsusEmptyState
           description="No archived documents yet. Import one to start this collection."
         >
-          <ElButton type="primary">Import document</ElButton>
-        </ElEmpty>
+          <FsusButton type="primary">Import document</FsusButton>
+        </FsusEmptyState>
       </article>
 
       <article
@@ -42,7 +42,7 @@
           title="No matching rows"
           description="The current filters exclude every row."
         >
-          <ElButton text type="primary" inline-action>Clear filters</ElButton>
+          <FsusButton text type="primary" inline-action>Clear filters</FsusButton>
         </FsusEmptyState>
       </article>
 
@@ -56,7 +56,7 @@
           title="Nothing selected"
           description="Choose a document to inspect its metadata."
         >
-          <ElButton>Browse documents</ElButton>
+          <FsusButton>Browse documents</FsusButton>
         </FsusEmptyState>
       </article>
 
@@ -71,8 +71,8 @@
           title="No deployment target is configured"
           description="Choose the production workspace, then verify its release policy before the first deployment."
         >
-          <ElButton type="primary">Choose workspace</ElButton>
-          <ElButton>Review release policy</ElButton>
+          <FsusButton type="primary">Choose workspace</FsusButton>
+          <FsusButton>Review release policy</FsusButton>
         </FsusEmptyState>
       </article>
 
@@ -86,8 +86,8 @@
           title="The archive is still being indexed"
           description="You can retry when indexing completes, or return to the document list without losing your filters."
         >
-          <ElButton type="primary" loading>Checking archive</ElButton>
-          <ElButton disabled>Retry indexing</ElButton>
+          <FsusButton type="primary" loading>Checking archive</FsusButton>
+          <FsusButton disabled>Retry indexing</FsusButton>
         </FsusEmptyState>
       </article>
 
@@ -101,7 +101,7 @@
           title="The archive is empty"
           description="Import an existing document or create the first entry."
         >
-          <ElButton>Create entry</ElButton>
+          <FsusButton>Create entry</FsusButton>
         </FsusEmptyState>
       </article>
     </div>
@@ -109,15 +109,15 @@
 </template>
 
 <script lang="ts" setup>
-import { ElButton, ElEmpty, FsusEmptyState } from '../../../element-plus'
+import { FsusButton, FsusEmptyState } from '@ozwasyd/fsusui'
 </script>
 
 <style scoped>
 .empty-illustration-fixture {
   min-height: 100vh;
   padding: 48px;
-  background: var(--el-bg-color-page);
-  color: var(--el-text-color-primary);
+  background: var(--fsus-color-surface-page);
+  color: var(--fsus-color-text-primary);
   box-sizing: border-box;
 }
 
@@ -134,7 +134,7 @@ import { ElButton, ElEmpty, FsusEmptyState } from '../../../element-plus'
 .empty-illustration-fixture__header p,
 .empty-illustration-fixture__panel h2 {
   margin: 0;
-  color: var(--el-text-color-secondary);
+  color: var(--fsus-color-text-quiet);
   font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.06em;
@@ -157,8 +157,8 @@ import { ElButton, ElEmpty, FsusEmptyState } from '../../../element-plus'
 .empty-illustration-fixture__panel {
   min-height: 15rem;
   padding: 24px;
-  border: 1px solid var(--el-border-color-lighter);
-  background: var(--el-bg-color);
+  border: 1px solid var(--fsus-color-border-lighter);
+  background: var(--fsus-color-surface-base);
   box-sizing: border-box;
 }
 

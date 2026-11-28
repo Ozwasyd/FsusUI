@@ -1,14 +1,12 @@
 # FsusUI Documentation
 
-FsusUI is a cross-platform Vue 3 component system built on the Element Plus
-compatibility surface. The current npm public-preview package is
-`@ozwasyd/element-plus`. This page is navigation only; design, API, and
-verification rules remain owned by their domain documents.
+FsusUI 2.0 是以自有接口为核心的跨平台 Vue 3.5+ 与 Avalonia/.NET 组件体系，发布包名为 `@ozwasyd/fsusui`（纯 ESM，`Fsus*` / `--fsus-*` 原生表面，不再保留 Element Plus 兼容层）。本页仅作导航，设计、API 与验收规范由对应领域文档持有。
 
 ## Start with a task
 
 | Task | Start here | Then read |
 | --- | --- | --- |
+| Migrate from v1 to v2 | [v1 → v2 Migration](./migration/v1-to-v2.md) | [API stability](./api-stability.md), [Quickstart](./guide/quickstart.md) |
 | Install and use Web/Vue | [Quickstart](./guide/quickstart.md) | [Installation](./guide/installation.md), [Theme](./guide/theming.md), [Components](./components/overview.md) |
 | Change visual or interaction behavior | [Design map](./design/README.md) | [Design contract](./design.md), [Change classification](./design/change-classification.md), [Visual workflow](./workflows/visual-change.md) |
 | Consume FsusUI from a product | [Consumer docs](./consumers/README.md) | [Design integration](./consumers/design-integration.md), [FsusBlog examples](./ux/fsusblog-consumption-examples.md) |
@@ -42,23 +40,18 @@ for document roles, directory ownership, and placement rules.
 | Web/Vue components | [Component overview](./components/overview.md) | API, state, keyboard behavior, tokens, and limits |
 | Avalonia | [Avalonia adoption](./avalonia/README.md) | .NET packages, controls, platform differences, and migration |
 | Consumers | [docs/consumers/](./consumers/README.md) | Ownership, integration, and product examples |
-| Guides | [docs/guide/](./guide/quickstart.md) | Installation, theme, dark mode, i18n, SSR, namespace, and defaults |
-| Workflows and governance | [Workflows](./workflows/README.md) | Maintenance, testing, demo, compatibility, and release execution |
-| Migration and compatibility | [Element Plus compatibility](./element-plus-compatibility.md) | Package, import, and support boundaries |
+| Guides | [docs/guide/](./guide/quickstart.md) | Installation, theme, dark mode, i18n, SSR, and defaults |
+| Workflows and governance | [Workflows](./workflows/README.md) | Maintenance, testing, demo, and release execution |
+| Migration | [v1 → v2 Migration](./migration/v1-to-v2.md) | Breaking changes, renames, and bundle-size upgrades |
 | Versions and evidence | [Release docs](./releases/README.md) | Readiness, performance, audit, and release evidence |
 
 ## Stable top-level entries
-
-The following root paths are referenced by scripts, tests, contribution docs, or
-external links and therefore remain stable:
 
 - [Design contract](./design.md)
 - [Project overview](./project-overview.md)
 - [Engineering handoff](./engineering-handoff.md)
 - [Visual test profiles](./visual-testing.md)
 - [API stability](./api-stability.md)
-- [Element Plus integration](./element-plus-integration.md)
-- [Element Plus compatibility](./element-plus-compatibility.md)
 - [Icon system](./icons.md)
 - [Playground / Demo](./playground.md)
 
@@ -70,10 +63,5 @@ New documents should be placed in their domain rather than added to `docs/`.
 - [Security policy](../SECURITY.md)
 - [Code of Conduct](../CODE_OF_CONDUCT.md)
 - [License and attribution](./legal/element-plus-attribution.md)
-- [Element Plus migration](./migration/from-element-plus.md)
+- [v1 → v2 Migration](./migration/v1-to-v2.md)
 - [Release docs and evidence](./releases/README.md)
-
-FsusUI is the public-facing name for this fork and compatibility-focused Vue 3
-component library. Element Plus remains the upstream provenance and
-API-alignment context; `@ozwasyd/element-plus` is the FsusUI compatibility build,
-not the upstream package.

@@ -8,7 +8,7 @@ import {
   type MarkdownRenderRequest,
   type MarkdownSafeHtml,
 } from './markdown'
-import type { FsusResult } from '@element-plus/utils'
+import type { FsusResult } from '@fsusui/core'
 import {
   createFsusRuntimeError,
   fsusErr,

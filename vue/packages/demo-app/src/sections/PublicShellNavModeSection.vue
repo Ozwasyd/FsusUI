@@ -1,5 +1,5 @@
 <template>
-  <ElPublicShell
+  <FsusPublicShell
     :brand="fixture.brand"
     brand-href="#home"
     active-nav="archive"
@@ -45,13 +45,13 @@
     <template #footer>
       <p>Field Notes archive</p>
     </template>
-  </ElPublicShell>
+  </FsusPublicShell>
 </template>
 
 <script lang="ts" setup>
 import { computed } from 'vue'
-import { ElPublicShell } from '../../../element-plus'
-import type { PublicShellMobileNavMode } from '../../../element-plus'
+import { FsusPublicShell } from '@ozwasyd/fsusui'
+import type { PublicShellMobileNavMode } from '@ozwasyd/fsusui'
 
 const props = withDefaults(
   defineProps<{
@@ -151,7 +151,7 @@ const navItems = computed(() =>
 }
 
 .public-shell-nav-fixture__eyebrow {
-  color: var(--el-text-color-secondary);
+  color: var(--fsus-color-text-quiet);
   font-size: 13px;
   font-weight: 700;
   letter-spacing: 0.06em;

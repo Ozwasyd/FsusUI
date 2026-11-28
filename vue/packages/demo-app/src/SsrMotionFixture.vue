@@ -1,30 +1,30 @@
 <script setup lang="ts">
 import { nextTick, ref } from 'vue'
 import {
-  ElBadge,
-  ElButton,
-  ElCollapse,
-  ElCollapseItem,
-  ElDialog,
-  ElDrawer,
-  ElDropdown,
-  ElDropdownItem,
-  ElDropdownMenu,
-  ElMenu,
-  ElMenuItem,
-  ElNotification,
-  ElPopover,
-  ElSubMenu,
-  ElTabPane,
-  ElTabs,
-  ElTag,
-  ElUpload,
-  vLoading,
-} from '../../element-plus'
+  FsusBadge,
+  FsusButton,
+  FsusCollapse,
+  FsusCollapseItem,
+  FsusDialog,
+  FsusDrawer,
+  FsusDropdown,
+  FsusDropdownItem,
+  FsusDropdownMenu,
+  FsusMenu,
+  FsusMenuItem,
+  FsusNotification,
+  FsusPopover,
+  FsusSubMenu,
+  FsusTabPane,
+  FsusTabs,
+  FsusTag,
+  FsusUpload,
+  vFsusLoading,
+} from '@ozwasyd/fsusui'
 
-import type { CollapseModelValue } from '../../components/collapse'
-import type { TabPaneName } from '../../components/tabs'
-import type { UploadUserFile } from '../../components/upload'
+import type { CollapseModelValue } from '@ozwasyd/fsusui'
+import type { TabPaneName } from '@ozwasyd/fsusui'
+import type { UploadUserFile } from '@ozwasyd/fsusui'
 
 const dialogVisible = ref(false)
 const drawerVisible = ref(false)
@@ -43,7 +43,7 @@ const record = (event: string) => {
 }
 
 const openNotification = () => {
-  const instance = ElNotification({
+  const instance = FsusNotification({
     title: '同步完成',
     message: '状态机已进入最终位置',
     duration: 0,
@@ -90,14 +90,14 @@ const reorderUploadFiles = () => {
     <output data-testid="motion-events">{{ events.join('|') }}</output>
 
     <section class="ssr-motion-fixture__actions">
-      <el-button @click="dialogVisible = true">
+      <fsus-button @click="dialogVisible = true">
         <span data-testid="dialog-trigger">打开 Dialog</span>
-      </el-button>
-      <el-button @click="drawerVisible = true">
+      </fsus-button>
+      <fsus-button @click="drawerVisible = true">
         <span data-testid="drawer-trigger">打开 Drawer</span>
-      </el-button>
+      </fsus-button>
 
-      <el-popover
+      <fsus-popover
         v-model:visible="popoverVisible"
         trigger="click"
         :persistent="false"
@@ -108,30 +108,30 @@ const reorderUploadFiles = () => {
       >
         <div data-testid="popover-content">
           Popover 最终内容
-          <el-dropdown
+          <fsus-dropdown
             trigger="click"
             :teleported="false"
             :show-timeout="0"
             :hide-timeout="0"
           >
-            <el-button>
+            <fsus-button>
               <span data-testid="nested-dropdown-trigger">嵌套 Dropdown</span>
-            </el-button>
+            </fsus-button>
             <template #dropdown>
-              <el-dropdown-menu>
-                <el-dropdown-item>嵌套项</el-dropdown-item>
-              </el-dropdown-menu>
+              <fsus-dropdown-menu>
+                <fsus-dropdown-item>嵌套项</fsus-dropdown-item>
+              </fsus-dropdown-menu>
             </template>
-          </el-dropdown>
+          </fsus-dropdown>
         </div>
         <template #reference>
-          <el-button class="ssr-motion-fixture__flip-anchor">
+          <fsus-button class="ssr-motion-fixture__flip-anchor">
             <span data-testid="popover-trigger">打开 Popover</span>
-          </el-button>
+          </fsus-button>
         </template>
-      </el-popover>
+      </fsus-popover>
 
-      <el-dropdown
+      <fsus-dropdown
         trigger="click"
         :teleported="false"
         :show-timeout="0"
@@ -141,49 +141,49 @@ const reorderUploadFiles = () => {
             record(visible ? 'dropdown:visible' : 'dropdown:hidden')
         "
       >
-        <el-button>
+        <fsus-button>
           <span data-testid="dropdown-trigger">打开 Dropdown</span>
-        </el-button>
+        </fsus-button>
         <template #dropdown>
-          <el-dropdown-menu>
-            <el-dropdown-item>第一项</el-dropdown-item>
-            <el-dropdown-item>第二项</el-dropdown-item>
-          </el-dropdown-menu>
+          <fsus-dropdown-menu>
+            <fsus-dropdown-item>第一项</fsus-dropdown-item>
+            <fsus-dropdown-item>第二项</fsus-dropdown-item>
+          </fsus-dropdown-menu>
         </template>
-      </el-dropdown>
+      </fsus-dropdown>
 
-      <el-button @click="openNotification">
+      <fsus-button @click="openNotification">
         <span data-testid="notification-trigger">打开 Notification</span>
-      </el-button>
+      </fsus-button>
 
-      <el-button @click="badgeHidden = !badgeHidden">
+      <fsus-button @click="badgeHidden = !badgeHidden">
         <span data-testid="badge-toggle">切换 Badge</span>
-      </el-button>
-      <el-badge :hidden="badgeHidden" :value="8">
+      </fsus-button>
+      <fsus-badge :hidden="badgeHidden" :value="8">
         <span data-testid="badge-anchor">Badge anchor</span>
-      </el-badge>
+      </fsus-badge>
 
-      <el-button @click="rapidToggleTag">
+      <fsus-button @click="rapidToggleTag">
         <span data-testid="tag-rapid-toggle">快速切换 Tag</span>
-      </el-button>
+      </fsus-button>
       <span v-if="tagVisible" data-testid="motion-tag">
-        <el-tag closable>状态 Tag</el-tag>
+        <fsus-tag closable>状态 Tag</fsus-tag>
       </span>
     </section>
 
     <section class="ssr-motion-fixture__legacy-consumers">
       <div>
-        <el-button @click="addUploadFile">
+        <fsus-button @click="addUploadFile">
           <span data-testid="list-add">添加列表项</span>
-        </el-button>
-        <el-button @click="removeUploadFile">
+        </fsus-button>
+        <fsus-button @click="removeUploadFile">
           <span data-testid="list-remove">删除列表项</span>
-        </el-button>
-        <el-button @click="reorderUploadFiles">
+        </fsus-button>
+        <fsus-button @click="reorderUploadFiles">
           <span data-testid="list-reorder">重排列表</span>
-        </el-button>
+        </fsus-button>
         <div data-testid="motion-upload">
-          <el-upload
+          <fsus-upload
             :file-list="uploadFiles"
             :auto-upload="false"
             action="#"
@@ -192,31 +192,31 @@ const reorderUploadFiles = () => {
             <template #trigger>
               <span class="ssr-motion-fixture__hidden-trigger">上传</span>
             </template>
-          </el-upload>
+          </fsus-upload>
         </div>
       </div>
 
-      <el-menu
+      <fsus-menu
         class="ssr-motion-fixture__collapsed-menu"
         :collapse="true"
         :collapse-transition="false"
       >
-        <el-sub-menu index="motion-menu" :teleported="false">
+        <fsus-sub-menu index="motion-menu" :teleported="false">
           <template #title>
             <span data-testid="collapsed-menu-trigger">Menu</span>
           </template>
-          <el-menu-item index="motion-menu-1">第一项</el-menu-item>
-          <el-sub-menu index="motion-menu-nested" :teleported="false">
+          <fsus-menu-item index="motion-menu-1">第一项</fsus-menu-item>
+          <fsus-sub-menu index="motion-menu-nested" :teleported="false">
             <template #title>
               <span data-testid="nested-menu-trigger">嵌套菜单</span>
             </template>
-            <el-menu-item index="motion-menu-nested-1">嵌套项</el-menu-item>
-          </el-sub-menu>
-        </el-sub-menu>
-      </el-menu>
+            <fsus-menu-item index="motion-menu-nested-1">嵌套项</fsus-menu-item>
+          </fsus-sub-menu>
+        </fsus-sub-menu>
+      </fsus-menu>
     </section>
 
-    <el-dialog
+    <fsus-dialog
       v-model="dialogVisible"
       title="Dialog 状态机"
       width="420px"
@@ -228,9 +228,9 @@ const reorderUploadFiles = () => {
       @closed="record('dialog:closed')"
     >
       <p>Dialog 最终内容</p>
-    </el-dialog>
+    </fsus-dialog>
 
-    <el-drawer
+    <fsus-drawer
       v-model="drawerVisible"
       title="Drawer 状态机"
       size="360px"
@@ -242,40 +242,40 @@ const reorderUploadFiles = () => {
       @closed="record('drawer:closed')"
     >
       <p>Drawer 最终内容</p>
-    </el-drawer>
+    </fsus-drawer>
 
-    <el-collapse v-model="collapseActive">
-      <el-collapse-item name="motion">
+    <fsus-collapse v-model="collapseActive">
+      <fsus-collapse-item name="motion">
         <template #title>
           <span data-testid="collapse-trigger">切换 Collapse</span>
         </template>
         <div data-testid="collapse-content" class="ssr-motion-fixture__panel">
           Collapse 最终内容
         </div>
-      </el-collapse-item>
-    </el-collapse>
+      </fsus-collapse-item>
+    </fsus-collapse>
 
-    <el-tabs v-model="activeTab">
-      <el-tab-pane label="第一页" name="one">
+    <fsus-tabs v-model="activeTab">
+      <fsus-tab-pane label="第一页" name="one">
         <div class="ssr-motion-fixture__panel">第一页内容</div>
-      </el-tab-pane>
-      <el-tab-pane label="第二页" name="two">
+      </fsus-tab-pane>
+      <fsus-tab-pane label="第二页" name="two">
         <div data-testid="tab-panel-two" class="ssr-motion-fixture__panel">
           第二页最终内容
         </div>
-      </el-tab-pane>
-    </el-tabs>
+      </fsus-tab-pane>
+    </fsus-tabs>
 
     <div
-      v-loading="loading"
+      v-fsus-loading="loading"
       class="ssr-motion-fixture__loading"
       data-testid="loading-target"
     >
       Loading 最终几何目标
     </div>
-    <el-button @click="loading = false">
+    <fsus-button @click="loading = false">
       <span data-testid="loading-toggle">完成 Loading</span>
-    </el-button>
+    </fsus-button>
   </main>
 </template>
 
@@ -308,7 +308,7 @@ const reorderUploadFiles = () => {
   display: none;
 }
 
-:deep(.ssr-motion-fixture__legacy-consumers .el-upload--picture-card) {
+:deep(.ssr-motion-fixture__legacy-consumers .fsus-upload--picture-card) {
   display: none;
 }
 

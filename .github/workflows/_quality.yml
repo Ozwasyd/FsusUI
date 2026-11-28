@@ -18,12 +18,73 @@ on:
         description: SHA-256 of the immutable npm candidate tested by quality.
         value: ${{ jobs.build-package.outputs.candidate-digest }}
 
-env:
-  # Coverage shards and the merger must hash an identical Node patch version.
-  FSUSUI_COVERAGE_NODE_VERSION: '22.23.5'
-
 jobs:
   static-quality:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.33.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+      - run: pnpm install --frozen-lockfile
+      - name: Run contract, dependency, and design checks
+        run: |
+          pnpm run check:consumer-contract
+          pnpm run check:npm-dist-tag
+          pnpm run check:documentation-architecture
+          pnpm run deps:check
+          pnpm run deps:authority:check
+          pnpm run check:ux-semantics
+          pnpm run check:foundation-style-boundary
+          pnpm run check:design-source-drift
+          pnpm run typography:check
+          pnpm run a11y:check
+          pnpm run governance:cross-platform
+          pnpm run test:release-channel
+          pnpm run check:npm-release-workflow
+          pnpm run test:package-candidate
+      - name: Run lint
+        run: pnpm run lint
+      - name: Run token checks
+        run: |
+          pnpm run tokens:check
+          pnpm run tokens:lint
+      - name: Run icon checks
+        run: |
+          pnpm run icons:check
+          pnpm run icons:lint
+
+  typecheck:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.33.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+      - run: pnpm install --frozen-lockfile
+      - name: Restore TypeScript typecheck cache
+        uses: actions/cache@v4
+        with:
+          path: .tmp/typecheck-cache
+          key: ${{ runner.os }}-fsusui-v2-typecheck-${{ hashFiles('pnpm-lock.yaml', 'package.json', 'vue/tsconfig*.json', 'vue/packages/**/*.ts', 'vue/packages/**/*.tsx', 'vue/packages/**/*.vue', 'vue/packages/**/*.json', 'vue/internal/**/*.ts', 'vue/internal/**/*.json', 'vue/typings/**/*.d.ts', 'scripts/run-typecheck.mjs') }}
+          restore-keys: |
+            ${{ runner.os }}-fsusui-v2-typecheck-
+      - name: Run TypeScript typecheck across all lanes
+        run: pnpm run typecheck
+
+  unit:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
@@ -36,41 +97,173 @@ jobs:
           node-version: 22
           cache: pnpm
           cache-dependency-path: pnpm-lock.yaml
-      - uses: actions/setup-dotnet@v4
+      - name: Restore WASM artifact cache
+        id: wasm-cache
+        uses: actions/cache@v4
         with:
-          global-json-file: global.json
+          path: vue/packages/wasm/dist
+          key: ${{ runner.os }}-fsusui-v2-wasm-${{ hashFiles('vue/packages/wasm/package.json', 'vue/packages/wasm/build.config.ts', 'vue/packages/wasm/**/*.ts', 'vue/packages/wasm/**/*.cpp', 'vue/packages/wasm/**/*.hpp', 'vue/packages/wasm/**/*.h', 'vue/packages/wasm/**/CMakeLists.txt', 'vue/packages/wasm/build.sh', 'scripts/ensure-wasm-artifacts.mjs', 'scripts/run-wasm-build.mjs') }}
+          restore-keys: |
+            ${{ runner.os }}-fsusui-v2-wasm-
+      - name: Set up Emscripten when WASM cache misses
+        if: steps.wasm-cache.outputs.cache-hit != 'true'
+        uses: emscripten-core/setup-emsdk@v15
+        with:
+          version: 5.0.4
+          actions-cache-folder: emsdk-cache
       - run: pnpm install --frozen-lockfile
-      - name: Run contract checks
+      - name: Ensure WASM artifacts
+        run: pnpm run ensure:wasm
+      - name: Run Vitest unit & component suites
+        run: node ./scripts/with-node-heap.mjs pnpm exec vitest run --config vue/vitest.config.ts
+      - name: Verify WASM Markdown runtime
         run: |
-          pnpm run check:consumer-contract
-          pnpm run check:npm-dist-tag
-          pnpm run deps:baseline:verify
-          pnpm run check:ux-semantics
-          pnpm run check:design-source-drift
-          pnpm run check:foundation-style-boundary
-      - name: Run lint
-        run: pnpm lint
-      - name: Run token checks
-        run: |
-          pnpm run tokens:check
-          pnpm run tokens:lint
-      - name: Run icon checks
-        run: |
-          pnpm run icons:check
-          pnpm run icons:lint
-      - name: Run conformance
-        run: pnpm run conformance
-      - name: Run governance
-        run: pnpm run governance:check:ci-static
-      - name: Run accessibility contract
-        run: pnpm run a11y:check
-      - name: Record static quality leaf result
-        if: always()
-        uses: ./.github/actions/readiness-manifest
+          pnpm run check:markdown-wasm
+          pnpm run check:markdown-wasm-runtime
+
+  markdown-xss:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env:
+      PLAYWRIGHT_BROWSERS_PATH: ${{ github.workspace }}/.tmp/playwright-browsers
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
         with:
-          gate: static-quality
-          group: ${{ inputs.group }}
-          status: ${{ job.status }}
+          version: 10.33.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+      - name: Restore WASM artifact cache
+        id: wasm-cache
+        uses: actions/cache@v4
+        with:
+          path: vue/packages/wasm/dist
+          key: ${{ runner.os }}-fsusui-v2-wasm-${{ hashFiles('vue/packages/wasm/package.json', 'vue/packages/wasm/build.config.ts', 'vue/packages/wasm/**/*.ts', 'vue/packages/wasm/**/*.cpp', 'vue/packages/wasm/**/*.hpp', 'vue/packages/wasm/**/*.h', 'vue/packages/wasm/**/CMakeLists.txt', 'vue/packages/wasm/build.sh', 'scripts/ensure-wasm-artifacts.mjs', 'scripts/run-wasm-build.mjs') }}
+          restore-keys: |
+            ${{ runner.os }}-fsusui-v2-wasm-
+      - name: Set up Emscripten when WASM cache misses
+        if: steps.wasm-cache.outputs.cache-hit != 'true'
+        uses: emscripten-core/setup-emsdk@v15
+        with:
+          version: 5.0.4
+          actions-cache-folder: emsdk-cache
+      - run: pnpm install --frozen-lockfile
+      - name: Restore Playwright browser cache
+        uses: actions/cache@v4
+        with:
+          path: .tmp/playwright-browsers
+          key: ${{ runner.os }}-playwright-browsers-${{ hashFiles('package.json', 'pnpm-lock.yaml') }}
+      - name: Install Playwright browsers for XSS DOM verification
+        run: pnpm exec playwright install --with-deps chromium firefox webkit
+      - name: Run Markdown XSS security gate (corpus + fuzz + 3-browser DOM)
+        run: pnpm run check:markdown-xss
+
+  build-package:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    outputs:
+      candidate-digest: ${{ steps.candidate.outputs.digest }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.33.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22.14.0
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+      - name: Restore WASM artifact cache
+        id: wasm-cache
+        uses: actions/cache@v4
+        with:
+          path: vue/packages/wasm/dist
+          key: ${{ runner.os }}-fsusui-v2-wasm-${{ hashFiles('vue/packages/wasm/package.json', 'vue/packages/wasm/build.config.ts', 'vue/packages/wasm/**/*.ts', 'vue/packages/wasm/**/*.cpp', 'vue/packages/wasm/**/*.hpp', 'vue/packages/wasm/**/*.h', 'vue/packages/wasm/**/CMakeLists.txt', 'vue/packages/wasm/build.sh', 'scripts/ensure-wasm-artifacts.mjs', 'scripts/run-wasm-build.mjs') }}
+          restore-keys: |
+            ${{ runner.os }}-fsusui-v2-wasm-
+      - name: Set up Emscripten when WASM cache misses
+        if: steps.wasm-cache.outputs.cache-hit != 'true'
+        uses: emscripten-core/setup-emsdk@v15
+        with:
+          version: 5.0.4
+          actions-cache-folder: emsdk-cache
+      - run: pnpm install --frozen-lockfile
+      - name: Use release npm toolchain
+        run: npm install -g npm@^11.5.1
+      - name: Build and verify immutable @ozwasyd/fsusui Pure-ESM candidate
+        id: candidate
+        run: |
+          pnpm run package:candidate:build
+          pnpm run package:candidate:verify
+          digest="$(node -p "require('./dist/npm-candidate/fsusui-npm-candidate.manifest.json').artifact.sha256")"
+          echo "digest=${digest}" >> "${GITHUB_OUTPUT}"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: fsusui-npm-candidate
+          path: |
+            dist/npm-candidate/fsusui-npm-candidate.tgz
+            dist/npm-candidate/fsusui-npm-candidate.sha256
+            dist/npm-candidate/fsusui-npm-candidate.manifest.json
+          retention-days: 7
+
+  consumer-verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    needs:
+      - build-package
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22.14.0
+      - uses: actions/download-artifact@v4
+        with:
+          name: fsusui-npm-candidate
+          path: .npm-candidate
+      - name: Verify immutable npm candidate digest
+        env:
+          EXPECTED_CANDIDATE_DIGEST: ${{ needs.build-package.outputs.candidate-digest }}
+        run: |
+          node scripts/package-candidate.mjs verify --tarball .npm-candidate/fsusui-npm-candidate.tgz --commit "$GITHUB_SHA"
+          digest="$(node -p "require('./.npm-candidate/fsusui-npm-candidate.manifest.json').artifact.sha256")"
+          test -n "$EXPECTED_CANDIDATE_DIGEST"
+          test "$digest" = "$EXPECTED_CANDIDATE_DIGEST"
+      - name: Cold consumer install, ESM subpath, TypeScript & Vite build check
+        run: node scripts/verify-v2-consumer-candidate.mjs --tarball .npm-candidate/fsusui-npm-candidate.tgz
+
+  build-demo:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.33.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+      - name: Restore WASM artifact cache
+        id: wasm-cache
+        uses: actions/cache@v4
+        with:
+          path: vue/packages/wasm/dist
+          key: ${{ runner.os }}-fsusui-v2-wasm-${{ hashFiles('vue/packages/wasm/package.json', 'vue/packages/wasm/build.config.ts', 'vue/packages/wasm/**/*.ts', 'vue/packages/wasm/**/*.cpp', 'vue/packages/wasm/**/*.hpp', 'vue/packages/wasm/**/*.h', 'vue/packages/wasm/**/CMakeLists.txt', 'vue/packages/wasm/build.sh', 'scripts/ensure-wasm-artifacts.mjs', 'scripts/run-wasm-build.mjs') }}
+          restore-keys: |
+            ${{ runner.os }}-fsusui-v2-wasm-
+      - name: Set up Emscripten when WASM cache misses
+        if: steps.wasm-cache.outputs.cache-hit != 'true'
+        uses: emscripten-core/setup-emsdk@v15
+        with:
+          version: 5.0.4
+          actions-cache-folder: emsdk-cache
+      - run: pnpm install --frozen-lockfile
+      - name: Build demo application
+        run: pnpm run build:demo
 
   dotnet-platform:
     runs-on: ${{ matrix.os }}
@@ -113,802 +306,3 @@ jobs:
           name: dotnet-platform-${{ matrix.platform }}
           path: dotnet/artifacts/platform/${{ matrix.platform }}
           retention-days: 7
-      - name: Record .NET platform leaf result
-        if: always()
-        uses: ./.github/actions/readiness-manifest
-        with:
-          gate: dotnet-platform
-          group: ${{ inputs.group }}
-          status: ${{ job.status }}
-          dimensions: platform=${{ matrix.platform }}
-          artifacts: dotnet-platform=dotnet/artifacts/platform/${{ matrix.platform }}
-          artifact-suffix: ${{ matrix.platform }}
-
-  dotnet-package:
-    runs-on: ubuntu-22.04
-    timeout-minutes: 60
-    env:
-      PLAYWRIGHT_BROWSERS_PATH: ${{ github.workspace }}/.tmp/playwright-browsers
-    outputs:
-      candidate-digest: ${{ steps.candidate.outputs.digest }}
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - uses: pnpm/action-setup@v4
-        with:
-          version: 10.33.0
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: pnpm
-          cache-dependency-path: pnpm-lock.yaml
-      - name: Restore icons test artifact cache
-        id: icons-cache
-        uses: actions/cache@v4
-        with:
-          path: vue/packages/icons-vue/dist
-          key: ${{ runner.os }}-fsusui-test-artifacts-icons-${{ hashFiles('vue/packages/icons-vue/package.json', 'vue/packages/icons-vue/src/**', 'vue/packages/icons-vue/build/**', 'scripts/ensure-icons-artifacts.mjs', 'scripts/prepare-test-artifacts.mjs', 'scripts/test-artifact-cache.mjs') }}
-          restore-keys: |
-            ${{ runner.os }}-fsusui-test-artifacts-icons-
-      - name: Restore WASM test artifact cache
-        id: wasm-cache
-        uses: actions/cache@v4
-        with:
-          path: vue/packages/wasm/dist
-          key: ${{ runner.os }}-fsusui-test-artifacts-wasm-${{ hashFiles('vue/packages/wasm/package.json', 'vue/packages/wasm/build.config.ts', 'vue/packages/wasm/**/*.ts', 'vue/packages/wasm/**/*.cpp', 'vue/packages/wasm/**/*.hpp', 'vue/packages/wasm/**/*.h', 'vue/packages/wasm/**/CMakeLists.txt', 'vue/packages/wasm/build.sh', 'scripts/ensure-wasm-artifacts.mjs', 'scripts/run-wasm-build.mjs', 'scripts/prepare-test-artifacts.mjs', 'scripts/test-artifact-cache.mjs') }}
-          restore-keys: |
-            ${{ runner.os }}-fsusui-test-artifacts-wasm-
-      - name: Set up Emscripten when WASM cache misses
-        if: steps.wasm-cache.outputs.cache-hit != 'true'
-        uses: emscripten-core/setup-emsdk@v15
-        with:
-          version: 5.0.4
-          actions-cache-folder: emsdk-cache
-      - uses: actions/setup-dotnet@v4
-        with:
-          global-json-file: dotnet/global.json
-      - run: pnpm install --frozen-lockfile
-      - name: Restore Playwright Chromium cache
-        uses: actions/cache@v4
-        with:
-          path: .tmp/playwright-browsers
-          key: ${{ runner.os }}-ubuntu-22.04-playwright-chromium-${{ hashFiles('package.json', 'pnpm-lock.yaml') }}
-      - run: pnpm exec playwright install --with-deps chromium
-      - name: Pin Chromium for native screen-reader evidence
-        run: node scripts/pin-render-browser.mjs .tmp/conformance-browser-selection.json
-      - name: Install native screen-reader prerequisites
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y orca at-spi2-core python3-pyatspi dbus-x11
-      - name: Restore canonical .NET package cache
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.nuget/packages
-            dotnet/**/obj
-          key: ${{ runner.os }}-${{ runner.arch }}-fsusui-dotnet-package-ubuntu-22.04-sdk-${{ hashFiles('dotnet/global.json') }}-${{ hashFiles('dotnet/**/*.csproj', 'dotnet/**/*.props', 'dotnet/**/*.targets', 'dotnet/**/*.slnx', 'dotnet/**/packages.lock.json', 'NuGet.config') }}
-          restore-keys: |
-            ${{ runner.os }}-${{ runner.arch }}-fsusui-dotnet-package-ubuntu-22.04-sdk-${{ hashFiles('dotnet/global.json') }}-
-      - name: Build and verify the unique NuGet candidate
-        id: candidate
-        run: |
-          xvfb-run -a dbus-run-session -- pnpm run conformance:v2
-          pnpm run check:avalonia-stable-readiness
-          node scripts/dotnet-package-verify.mjs
-          digest="$(node -e '
-            const { candidateSha256 } = require("./dotnet/artifacts/package/manifest.json");
-            if (typeof candidateSha256 !== "string" || candidateSha256.length !== 64 || /[^0-9a-f]/u.test(candidateSha256)) {
-              throw new Error("Invalid NuGet candidateSha256");
-            }
-            process.stdout.write(candidateSha256);
-          ')"
-          printf 'digest=%s\n' "$digest" >> "$GITHUB_OUTPUT"
-      - name: Report workspace changes after candidate failure
-        if: failure()
-        run: git status --short --untracked-files=all
-      - name: Retain conformance evidence after candidate failure
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: dotnet-package-conformance-failure
-          path: .tmp/conformance-v2
-          include-hidden-files: true
-          if-no-files-found: ignore
-          retention-days: 7
-      - uses: actions/upload-artifact@v4
-        with:
-          name: dotnet-nuget-candidate
-          path: |
-            dotnet/artifacts/nuget
-            dotnet/artifacts/package/manifest.json
-            dotnet/artifacts/package/contract-v2-alignment.json
-          retention-days: 7
-      - name: Record unique NuGet candidate leaf result
-        if: always()
-        uses: ./.github/actions/readiness-manifest
-        with:
-          gate: dotnet-package
-          group: ${{ inputs.group }}
-          status: ${{ job.status }}
-          artifacts: nuget-candidate=dotnet/artifacts
-
-  avalonia-aot-linux:
-    needs: dotnet-package
-    uses: ./.github/workflows/_avalonia-aot-leaf.yml
-    with:
-      group: ${{ inputs.group }}
-      candidate-artifact: dotnet-nuget-candidate
-      candidate-digest: ${{ needs.dotnet-package.outputs.candidate-digest }}
-      commit-sha: ${{ github.sha }}
-      rid: linux-x64
-
-  avalonia-aot:
-    if: always()
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    needs:
-      - dotnet-package
-      - avalonia-aot-linux
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/download-artifact@v4
-        with:
-          name: avalonia-aot-leaf-${{ inputs.group }}-linux-x64
-          path: .avalonia-aot-leaves
-      - name: Aggregate required and optional Native AOT leaves
-        run: >-
-          node scripts/avalonia-aot-native.mjs aggregate
-          --leaf-dir .avalonia-aot-leaves
-          --out .avalonia-aot-readiness/manifest.json
-          --commit-sha "$GITHUB_SHA"
-          --candidate-digest '${{ needs.dotnet-package.outputs.candidate-digest }}'
-      - uses: actions/upload-artifact@v4
-        with:
-          name: avalonia-aot-readiness
-          path: .avalonia-aot-readiness
-          retention-days: 7
-      - name: Record Avalonia Native AOT readiness leaf result
-        if: always()
-        uses: ./.github/actions/readiness-manifest
-        with:
-          gate: avalonia-aot
-          group: ${{ inputs.group }}
-          status: ${{ job.status }}
-          artifacts: avalonia-aot=.avalonia-aot-readiness
-
-  typecheck:
-    runs-on: ubuntu-latest
-    timeout-minutes: 20
-    steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-        with:
-          version: 10.33.0
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: pnpm
-          cache-dependency-path: pnpm-lock.yaml
-      - run: pnpm install --frozen-lockfile
-      - name: Restore TypeScript typecheck cache
-        id: typecheck-cache
-        uses: actions/cache@v4
-        with:
-          path: .tmp/typecheck-cache
-          key: ${{ runner.os }}-fsusui-typecheck-${{ hashFiles('pnpm-lock.yaml', 'package.json', 'vue/tsconfig*.json', 'vue/packages/**/*.ts', 'vue/packages/**/*.tsx', 'vue/packages/**/*.vue', 'vue/packages/**/*.json', 'vue/internal/**/*.ts', 'vue/internal/**/*.json', 'vue/typings/**/*.d.ts', 'scripts/run-typecheck.mjs') }}
-          restore-keys: |
-            ${{ runner.os }}-fsusui-typecheck-
-      - name: Log TypeScript typecheck cache status
-        run: |
-          echo "typecheck-cache-hit=${{ steps.typecheck-cache.outputs.cache-hit }}"
-          echo "cache-hit=${{ steps.typecheck-cache.outputs.cache-hit }}"
-          echo "cache-primary-key=${{ steps.typecheck-cache.outputs.cache-primary-key }}"
-      - run: pnpm typecheck
-      - name: Record typecheck leaf result
-        if: always()
-        uses: ./.github/actions/readiness-manifest
-        with:
-          gate: typecheck
-          group: ${{ inputs.group }}
-          status: ${{ job.status }}
-
-  capacity:
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-    outputs:
-      unit-matrix: ${{ steps.plan.outputs.unit-matrix }}
-    steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-        with:
-          version: 10.33.0
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: pnpm
-          cache-dependency-path: pnpm-lock.yaml
-      - run: pnpm install --frozen-lockfile --ignore-scripts
-      - name: Create repository capacity plan
-        id: plan
-        run: node ./scripts/ci-capacity.mjs --dry-run --github-output="$GITHUB_OUTPUT"
-
-  unit-artifacts:
-    runs-on: ubuntu-latest
-    timeout-minutes: 30
-    steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-        with:
-          version: 10.33.0
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: pnpm
-          cache-dependency-path: pnpm-lock.yaml
-      - name: Restore icons test artifact cache
-        id: icons-cache
-        uses: actions/cache@v4
-        with:
-          path: vue/packages/icons-vue/dist
-          key: ${{ runner.os }}-fsusui-test-artifacts-icons-${{ hashFiles('vue/packages/icons-vue/package.json', 'vue/packages/icons-vue/src/**', 'vue/packages/icons-vue/build/**', 'scripts/ensure-icons-artifacts.mjs', 'scripts/prepare-test-artifacts.mjs', 'scripts/test-artifact-cache.mjs') }}
-          restore-keys: |
-            ${{ runner.os }}-fsusui-test-artifacts-icons-
-      - name: Restore WASM test artifact cache
-        id: wasm-cache
-        uses: actions/cache@v4
-        with:
-          path: vue/packages/wasm/dist
-          key: ${{ runner.os }}-fsusui-test-artifacts-wasm-${{ hashFiles('vue/packages/wasm/package.json', 'vue/packages/wasm/build.config.ts', 'vue/packages/wasm/**/*.ts', 'vue/packages/wasm/**/*.cpp', 'vue/packages/wasm/**/*.hpp', 'vue/packages/wasm/**/*.h', 'vue/packages/wasm/**/CMakeLists.txt', 'vue/packages/wasm/build.sh', 'scripts/ensure-wasm-artifacts.mjs', 'scripts/run-wasm-build.mjs', 'scripts/prepare-test-artifacts.mjs', 'scripts/test-artifact-cache.mjs') }}
-          restore-keys: |
-            ${{ runner.os }}-fsusui-test-artifacts-wasm-
-      - name: Set up Emscripten when WASM cache misses
-        if: steps.wasm-cache.outputs.cache-hit != 'true'
-        uses: emscripten-core/setup-emsdk@v15
-        with:
-          version: 5.0.4
-          actions-cache-folder: emsdk-cache
-      - run: pnpm install --frozen-lockfile
-      - name: Log test artifact cache status
-        run: |
-          echo "icons-cache-hit=${{ steps.icons-cache.outputs.cache-hit }}"
-          echo "wasm-cache-hit=${{ steps.wasm-cache.outputs.cache-hit }}"
-      - run: pnpm run prepare:test-artifacts
-      - name: Pack unit test artifacts
-        run: |
-          tar -czf unit-test-artifacts.tgz vue/packages/icons-vue/dist vue/packages/wasm/dist
-          sha256sum unit-test-artifacts.tgz
-      - uses: actions/upload-artifact@v4
-        with:
-          name: unit-test-artifacts
-          path: unit-test-artifacts.tgz
-          retention-days: 1
-
-  unit:
-    needs:
-      - capacity
-      - unit-artifacts
-    runs-on: ubuntu-latest
-    timeout-minutes: 30
-    strategy:
-      fail-fast: false
-      matrix: ${{ fromJSON(needs.capacity.outputs.unit-matrix) }}
-    steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-        with:
-          version: 10.33.0
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: pnpm
-          cache-dependency-path: pnpm-lock.yaml
-      - run: pnpm install --frozen-lockfile
-      - uses: actions/download-artifact@v4
-        with:
-          name: unit-test-artifacts
-          path: .unit-artifacts
-      - name: Unpack unit test artifacts
-        run: |
-          sha256sum .unit-artifacts/unit-test-artifacts.tgz
-          tar -xzf .unit-artifacts/unit-test-artifacts.tgz
-      - run: pnpm run check:test-artifacts-ready
-      - name: Run capacity-planned Unit shard
-        env:
-          FSUS_CI_UNIT_SHARDS: '1'
-          FSUS_VITEST_WORKERS: ${{ matrix.workers }}
-        run: node ./scripts/with-node-heap.mjs pnpm exec vitest run --config vue/vitest.config.ts --shard=${{ matrix.shard }}
-      - name: Record Unit shard leaf result
-        if: always()
-        uses: ./.github/actions/readiness-manifest
-        with:
-          gate: unit
-          group: ${{ inputs.group }}
-          status: ${{ job.status }}
-          dimensions: shard=${{ matrix.shard }}
-          artifact-suffix: ${{ strategy.job-index }}
-
-  coverage-plan:
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-    outputs:
-      mode: ${{ steps.plan.outputs.mode }}
-      shard-count: ${{ steps.plan.outputs.shard_count }}
-      matrix: ${{ steps.plan.outputs.matrix }}
-    steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-        with:
-          version: 10.33.0
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: pnpm
-          cache-dependency-path: pnpm-lock.yaml
-      - run: pnpm install --frozen-lockfile --ignore-scripts
-      - id: plan
-        name: Plan coverage from effective capacity and workload
-        run: node scripts/coverage-plan.mjs --dry-run --github-output="$GITHUB_OUTPUT"
-
-  coverage-single:
-    if: needs.coverage-plan.outputs.mode == 'single'
-    needs:
-      - coverage-plan
-      - unit-artifacts
-    runs-on: ubuntu-latest
-    timeout-minutes: 30
-    steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-        with:
-          version: 10.33.0
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: pnpm
-          cache-dependency-path: pnpm-lock.yaml
-      - run: pnpm install --frozen-lockfile
-      - uses: actions/download-artifact@v4
-        with:
-          name: unit-test-artifacts
-          path: .unit-artifacts
-      - name: Unpack unit test artifacts
-        run: |
-          sha256sum .unit-artifacts/unit-test-artifacts.tgz
-          tar -xzf .unit-artifacts/unit-test-artifacts.tgz
-      - run: pnpm run check:test-artifacts-ready
-      - name: Run coverage
-        env:
-          FSUSUI_COVERAGE_SHARDS: 1
-        run: pnpm coverage:run
-      - uses: actions/upload-artifact@v4
-        if: always()
-        continue-on-error: true
-        with:
-          name: coverage-report
-          path: coverage
-
-  coverage-shard:
-    if: needs.coverage-plan.outputs.mode == 'sharded'
-    needs:
-      - coverage-plan
-      - unit-artifacts
-    runs-on: ubuntu-latest
-    timeout-minutes: 30
-    strategy:
-      fail-fast: false
-      matrix: ${{ fromJSON(needs.coverage-plan.outputs.matrix) }}
-    steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-        with:
-          version: 10.33.0
-      - uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.FSUSUI_COVERAGE_NODE_VERSION }}
-          cache: pnpm
-          cache-dependency-path: pnpm-lock.yaml
-      - run: pnpm install --frozen-lockfile
-      - uses: actions/download-artifact@v4
-        with:
-          name: unit-test-artifacts
-          path: .unit-artifacts
-      - name: Unpack unit test artifacts
-        run: |
-          sha256sum .unit-artifacts/unit-test-artifacts.tgz
-          tar -xzf .unit-artifacts/unit-test-artifacts.tgz
-      - run: pnpm run check:test-artifacts-ready
-      - name: Run one coverage shard
-        env:
-          FSUS_CI_UNIT_SHARDS: '1'
-          FSUSUI_COVERAGE_SHARDS: ${{ matrix.total }}
-          FSUSUI_COVERAGE_WORKERS: ${{ matrix.workers }}
-          FSUSUI_COVERAGE_SHARD_INDEX: ${{ matrix.index }}
-          FSUSUI_COVERAGE_SHARD_TOTAL: ${{ matrix.total }}
-        run: pnpm coverage:run
-      - uses: actions/upload-artifact@v4
-        with:
-          name: coverage-shard-${{ matrix.index }}-${{ matrix.total }}
-          path: .tmp/coverage-run
-          retention-days: 1
-
-  coverage-merge:
-    if: needs.coverage-plan.outputs.mode == 'sharded'
-    needs:
-      - coverage-plan
-      - coverage-shard
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-        with:
-          version: 10.33.0
-      - uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.FSUSUI_COVERAGE_NODE_VERSION }}
-          cache: pnpm
-          cache-dependency-path: pnpm-lock.yaml
-      - run: pnpm install --frozen-lockfile
-      - uses: actions/download-artifact@v4
-        with:
-          pattern: coverage-shard-*
-          path: .tmp/coverage-run
-          merge-multiple: true
-      - name: Validate shards, merge, and apply final thresholds once
-        run: pnpm coverage:merge .tmp/coverage-run
-      - uses: actions/upload-artifact@v4
-        if: always()
-        continue-on-error: true
-        with:
-          name: coverage-report
-          path: coverage
-
-  coverage:
-    if: always()
-    needs:
-      - coverage-plan
-      - coverage-single
-      - coverage-shard
-      - coverage-merge
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-    steps:
-      - uses: actions/checkout@v4
-      - name: Require the selected complete coverage path
-        env:
-          PLAN_RESULT: ${{ needs.coverage-plan.result }}
-          MODE: ${{ needs.coverage-plan.outputs.mode }}
-          SINGLE_RESULT: ${{ needs.coverage-single.result }}
-          SHARD_RESULT: ${{ needs.coverage-shard.result }}
-          MERGE_RESULT: ${{ needs.coverage-merge.result }}
-        run: |
-          test "$PLAN_RESULT" = success
-          if test "$MODE" = single; then
-            test "$SINGLE_RESULT" = success
-          else
-            test "$SHARD_RESULT" = success
-            test "$MERGE_RESULT" = success
-          fi
-      - uses: actions/download-artifact@v4
-        if: always()
-        continue-on-error: true
-        with:
-          name: coverage-report
-          path: .coverage-evidence
-      - name: Record final coverage leaf result
-        if: always()
-        uses: ./.github/actions/readiness-manifest
-        with:
-          gate: coverage
-          group: ${{ inputs.group }}
-          status: ${{ job.status }}
-          dimensions: mode=${{ needs.coverage-plan.outputs.mode }}
-          artifacts: coverage-report=.coverage-evidence
-
-  build-package:
-    runs-on: ubuntu-latest
-    timeout-minutes: 40
-    outputs:
-      candidate-digest: ${{ steps.candidate.outputs.digest }}
-    steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-        with:
-          version: 10.33.0
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22.14.0
-          cache: pnpm
-          cache-dependency-path: pnpm-lock.yaml
-      - name: Restore icons test artifact cache
-        id: icons-cache
-        uses: actions/cache@v4
-        with:
-          path: vue/packages/icons-vue/dist
-          key: ${{ runner.os }}-fsusui-test-artifacts-icons-${{ hashFiles('vue/packages/icons-vue/package.json', 'vue/packages/icons-vue/src/**', 'vue/packages/icons-vue/build/**', 'scripts/ensure-icons-artifacts.mjs', 'scripts/prepare-test-artifacts.mjs', 'scripts/test-artifact-cache.mjs') }}
-          restore-keys: |
-            ${{ runner.os }}-fsusui-test-artifacts-icons-
-      - name: Restore WASM test artifact cache
-        id: wasm-cache
-        uses: actions/cache@v4
-        with:
-          path: vue/packages/wasm/dist
-          key: ${{ runner.os }}-fsusui-test-artifacts-wasm-${{ hashFiles('vue/packages/wasm/package.json', 'vue/packages/wasm/build.config.ts', 'vue/packages/wasm/**/*.ts', 'vue/packages/wasm/**/*.cpp', 'vue/packages/wasm/**/*.hpp', 'vue/packages/wasm/**/*.h', 'vue/packages/wasm/**/CMakeLists.txt', 'vue/packages/wasm/build.sh', 'scripts/ensure-wasm-artifacts.mjs', 'scripts/run-wasm-build.mjs', 'scripts/prepare-test-artifacts.mjs', 'scripts/test-artifact-cache.mjs') }}
-          restore-keys: |
-            ${{ runner.os }}-fsusui-test-artifacts-wasm-
-      - name: Set up Emscripten when WASM cache misses
-        if: steps.wasm-cache.outputs.cache-hit != 'true'
-        uses: emscripten-core/setup-emsdk@v15
-        with:
-          version: 5.0.4
-          actions-cache-folder: emsdk-cache
-      - run: pnpm install --frozen-lockfile
-      - name: Use release npm toolchain
-        run: npm install -g npm@^11.5.1
-      - name: Log test artifact cache status
-        run: |
-          echo "icons-cache-hit=${{ steps.icons-cache.outputs.cache-hit }}"
-          echo "wasm-cache-hit=${{ steps.wasm-cache.outputs.cache-hit }}"
-      - name: Build immutable npm candidate
-        id: candidate
-        run: |
-          pnpm run package:candidate:build
-          digest="$(node -p "require('./dist/npm-candidate/fsusui-npm-candidate.manifest.json').artifact.sha256")"
-          echo "digest=${digest}" >> "${GITHUB_OUTPUT}"
-      - uses: actions/upload-artifact@v4
-        with:
-          name: fsusui-npm-candidate
-          path: |
-            dist/npm-candidate/fsusui-npm-candidate.tgz
-            dist/npm-candidate/fsusui-npm-candidate.sha256
-            dist/npm-candidate/fsusui-npm-candidate.manifest.json
-          retention-days: 1
-      - name: Record npm candidate leaf result
-        if: always()
-        uses: ./.github/actions/readiness-manifest
-        with:
-          gate: build-package
-          group: ${{ inputs.group }}
-          status: ${{ job.status }}
-          artifacts: npm-candidate=dist/npm-candidate
-
-  consumer-install:
-    runs-on: ubuntu-24.04
-    timeout-minutes: 45
-    needs:
-      - static-quality
-      - build-package
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - name: Plan consumer matrix impact
-        id: consumer-impact
-        run: >-
-          node scripts/consumer-matrix-impact.mjs
-          --base '${{ github.event.pull_request.base.sha || github.event.merge_group.base_sha }}'
-          --output .consumer-matrix/impact-plan.json
-      - uses: actions/download-artifact@v4
-        with:
-          name: fsusui-npm-candidate
-          path: .npm-candidate
-      - name: Verify immutable npm candidate
-        env:
-          EXPECTED_CANDIDATE_DIGEST: ${{ needs.build-package.outputs.candidate-digest }}
-        run: |
-          node scripts/package-candidate.mjs verify --tarball .npm-candidate/fsusui-npm-candidate.tgz --commit "$GITHUB_SHA"
-          digest="$(node -p "require('./.npm-candidate/fsusui-npm-candidate.manifest.json').artifact.sha256")"
-          test -n "$EXPECTED_CANDIDATE_DIGEST"
-          test "$digest" = "$EXPECTED_CANDIDATE_DIGEST"
-      - uses: pnpm/action-setup@v4
-        if: steps.consumer-impact.outputs.run == 'true'
-        with:
-          version: 10.33.0
-      - uses: actions/setup-node@v4
-        if: steps.consumer-impact.outputs.run == 'true'
-        with:
-          node-version: 22.14.0
-          cache: pnpm
-          cache-dependency-path: pnpm-lock.yaml
-      - if: steps.consumer-impact.outputs.run == 'true'
-        run: pnpm install --frozen-lockfile
-      - name: Install Chromium headless shell for packaged runtime checks
-        if: steps.consumer-impact.outputs.run == 'true'
-        run: pnpm exec playwright install --with-deps --only-shell chromium
-      - name: Use release npm toolchain
-        if: steps.consumer-impact.outputs.run == 'true'
-        run: npm install -g npm@^11.5.1
-      - name: Run consumer matrix negative fixtures
-        if: steps.consumer-impact.outputs.run == 'true'
-        run: pnpm test:consumer-matrix:fixtures
-      - name: Run cold consumer matrix against candidate
-        if: steps.consumer-impact.outputs.run == 'true'
-        run: >-
-          pnpm test:consumer-matrix --
-          --candidate .npm-candidate/fsusui-npm-candidate.tgz
-          --output .consumer-matrix/receipts
-      - name: Record auditable no-package-impact skip
-        if: steps.consumer-impact.outputs.run != 'true'
-        run: echo "Consumer matrix skipped with ${{ steps.consumer-impact.outputs.reason }}"
-      - name: Upload consumer matrix receipts
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: consumer-matrix-${{ inputs.group }}
-          path: .consumer-matrix
-          include-hidden-files: true
-          if-no-files-found: error
-          retention-days: 30
-      - name: Record consumer matrix leaf result
-        if: always()
-        uses: ./.github/actions/readiness-manifest
-        with:
-          gate: consumer-install
-          group: ${{ inputs.group }}
-          status: ${{ job.status }}
-          dimensions: matrix-action=${{ steps.consumer-impact.outputs.run == 'true' && 'run' || 'skip' }}
-          artifacts: |
-            npm-candidate=.npm-candidate
-            consumer-matrix=.consumer-matrix
-
-  build-demo:
-    runs-on: ubuntu-latest
-    timeout-minutes: 20
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: ${{ github.event_name == 'pull_request' && 0 || 1 }}
-      - name: Determine PR demo build path impact
-        id: demo-build-path
-        if: github.event_name == 'pull_request'
-        run: node ./scripts/should-run-demo-build.mjs
-      - name: Log PR demo build path decision
-        if: github.event_name == 'pull_request'
-        run: |
-          echo "demo-build-run=${{ steps.demo-build-path.outputs.run }}"
-          echo "demo-build-reason=${{ steps.demo-build-path.outputs.reason }}"
-      - uses: pnpm/action-setup@v4
-        if: github.event_name != 'pull_request' || steps.demo-build-path.outputs.run == 'true'
-        with:
-          version: 10.33.0
-      - uses: actions/setup-node@v4
-        if: github.event_name != 'pull_request' || steps.demo-build-path.outputs.run == 'true'
-        with:
-          node-version: 22
-          cache: pnpm
-          cache-dependency-path: pnpm-lock.yaml
-      - name: Restore icons test artifact cache
-        id: icons-cache
-        if: github.event_name != 'pull_request' || steps.demo-build-path.outputs.run == 'true'
-        uses: actions/cache@v4
-        with:
-          path: vue/packages/icons-vue/dist
-          key: ${{ runner.os }}-fsusui-test-artifacts-icons-${{ hashFiles('vue/packages/icons-vue/package.json', 'vue/packages/icons-vue/src/**', 'vue/packages/icons-vue/build/**', 'scripts/ensure-icons-artifacts.mjs', 'scripts/prepare-test-artifacts.mjs', 'scripts/test-artifact-cache.mjs') }}
-          restore-keys: |
-            ${{ runner.os }}-fsusui-test-artifacts-icons-
-      - name: Restore WASM test artifact cache
-        id: wasm-cache
-        if: github.event_name != 'pull_request' || steps.demo-build-path.outputs.run == 'true'
-        uses: actions/cache@v4
-        with:
-          path: vue/packages/wasm/dist
-          key: ${{ runner.os }}-fsusui-test-artifacts-wasm-${{ hashFiles('vue/packages/wasm/package.json', 'vue/packages/wasm/build.config.ts', 'vue/packages/wasm/**/*.ts', 'vue/packages/wasm/**/*.cpp', 'vue/packages/wasm/**/*.hpp', 'vue/packages/wasm/**/*.h', 'vue/packages/wasm/**/CMakeLists.txt', 'vue/packages/wasm/build.sh', 'scripts/ensure-wasm-artifacts.mjs', 'scripts/run-wasm-build.mjs', 'scripts/prepare-test-artifacts.mjs', 'scripts/test-artifact-cache.mjs') }}
-          restore-keys: |
-            ${{ runner.os }}-fsusui-test-artifacts-wasm-
-      - name: Set up Emscripten when WASM cache misses
-        if: (github.event_name != 'pull_request' || steps.demo-build-path.outputs.run == 'true') && steps.wasm-cache.outputs.cache-hit != 'true'
-        uses: emscripten-core/setup-emsdk@v15
-        with:
-          version: 5.0.4
-          actions-cache-folder: emsdk-cache
-      - if: github.event_name != 'pull_request' || steps.demo-build-path.outputs.run == 'true'
-        run: pnpm install --frozen-lockfile
-      - name: Log test artifact cache status
-        if: github.event_name != 'pull_request' || steps.demo-build-path.outputs.run == 'true'
-        run: |
-          echo "icons-cache-hit=${{ steps.icons-cache.outputs.cache-hit }}"
-          echo "wasm-cache-hit=${{ steps.wasm-cache.outputs.cache-hit }}"
-      - name: Run demo build
-        if: github.event_name != 'pull_request' || steps.demo-build-path.outputs.run == 'true'
-        run: pnpm run build:demo
-      - name: Skip PR demo build
-        if: github.event_name == 'pull_request' && steps.demo-build-path.outputs.run != 'true'
-        run: |
-          echo "Skipping demo build: ${{ steps.demo-build-path.outputs.reason }}"
-      - name: Record demo build leaf result
-        if: always()
-        uses: ./.github/actions/readiness-manifest
-        with:
-          gate: build-demo
-          group: ${{ inputs.group }}
-          status: ${{ job.status }}
-
-  visual:
-    runs-on: ubuntu-24.04
-    timeout-minutes: 30
-    env:
-      FSUS_VISUAL_EVIDENCE: ${{ inputs.group == 'release' && '1' || '0' }}
-      FSUS_VISUAL_SUITE_MODE: auto
-      PLAYWRIGHT_BROWSERS_PATH: ${{ github.workspace }}/.tmp/playwright-browsers
-    steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-        with:
-          version: 10.33.0
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: pnpm
-          cache-dependency-path: pnpm-lock.yaml
-      - name: Restore icons test artifact cache
-        id: icons-cache
-        uses: actions/cache@v4
-        with:
-          path: vue/packages/icons-vue/dist
-          key: ${{ runner.os }}-fsusui-test-artifacts-icons-${{ hashFiles('vue/packages/icons-vue/package.json', 'vue/packages/icons-vue/src/**', 'vue/packages/icons-vue/build/**', 'scripts/ensure-icons-artifacts.mjs', 'scripts/prepare-test-artifacts.mjs', 'scripts/test-artifact-cache.mjs') }}
-          restore-keys: |
-            ${{ runner.os }}-fsusui-test-artifacts-icons-
-      - name: Restore WASM test artifact cache
-        id: wasm-cache
-        uses: actions/cache@v4
-        with:
-          path: vue/packages/wasm/dist
-          key: ${{ runner.os }}-fsusui-test-artifacts-wasm-${{ hashFiles('vue/packages/wasm/package.json', 'vue/packages/wasm/build.config.ts', 'vue/packages/wasm/**/*.ts', 'vue/packages/wasm/**/*.cpp', 'vue/packages/wasm/**/*.hpp', 'vue/packages/wasm/**/*.h', 'vue/packages/wasm/**/CMakeLists.txt', 'vue/packages/wasm/build.sh', 'scripts/ensure-wasm-artifacts.mjs', 'scripts/run-wasm-build.mjs', 'scripts/prepare-test-artifacts.mjs', 'scripts/test-artifact-cache.mjs') }}
-          restore-keys: |
-            ${{ runner.os }}-fsusui-test-artifacts-wasm-
-      - name: Set up Emscripten when WASM cache misses
-        if: steps.wasm-cache.outputs.cache-hit != 'true'
-        uses: emscripten-core/setup-emsdk@v15
-        with:
-          version: 5.0.4
-          actions-cache-folder: emsdk-cache
-      - run: pnpm install --frozen-lockfile
-      - name: Restore Playwright Chromium cache
-        uses: actions/cache@v4
-        with:
-          path: .tmp/playwright-browsers
-          key: ${{ runner.os }}-playwright-chromium-${{ hashFiles('package.json', 'pnpm-lock.yaml') }}
-      - name: Log test artifact cache status
-        run: |
-          echo "icons-cache-hit=${{ steps.icons-cache.outputs.cache-hit }}"
-          echo "wasm-cache-hit=${{ steps.wasm-cache.outputs.cache-hit }}"
-      - run: pnpm exec playwright install --with-deps chromium
-      - name: Probe visual capacity
-        run: pnpm visual:capacity
-      - name: Print visual execution plan
-        run: pnpm test:visual:plan
-      - name: Run visual suites
-        run: |
-          if [ "${{ inputs.group }}" = "release" ]; then
-            pnpm test:visual:evidence
-          else
-            pnpm test:visual:full
-          fi
-      - uses: actions/upload-artifact@v4
-        if: failure() && inputs.group != 'release'
-        continue-on-error: true
-        with:
-          name: avalonia-screenshots-${{ inputs.group }}
-          path: |
-            playwright-report/profile-*
-            vue/test-results/profile-*
-      - uses: actions/upload-artifact@v4
-        if: always() && inputs.group == 'release'
-        continue-on-error: true
-        with:
-          name: avalonia-screenshots-${{ inputs.group }}
-          path: |
-            playwright-report/profile-*
-            vue/test-results/profile-*
-            .tmp/visual-evidence/manifest.json
-            .tmp/visual-runtime/manifest.json
-            screenshots
-      - name: Record visual leaf result
-        if: always()
-        uses: ./.github/actions/readiness-manifest
-        with:
-          gate: visual
-          group: ${{ inputs.group }}
-          status: ${{ job.status }}
-          dimensions: profile=${{ inputs.group == 'release' && 'evidence' || 'full' }}

@@ -1,98 +1,44 @@
-# Public API Stability
+# Public API Stability (FsusUI 2.0)
 
-FsusUI is in public preview and retains selected Element Plus compatibility
-subpaths. This policy distinguishes public API from implementation detail.
+FsusUI 2.0 publishes a single pure-ESM package, `@ozwasyd/fsusui`, with 100%
+native `Fsus*` surfaces. Legacy Element Plus compatibility entry points
+(`@ozwasyd/element-plus`, `es/*`, `lib/*`, `dist/index.full.*`, `El*`, `--el-*`)
+have been removed in 2.0.0; see [v1 → v2 Migration](./migration/v1-to-v2.md).
 
 ## Stability Levels
 
-| Level              | Meaning                                                                              | Change policy during public preview                                      |
-| ------------------ | ------------------------------------------------------------------------------------ | ------------------------------------------------------------------------ |
-| Stable public API  | Documented, tested, and intended for broad external use.                             | Breaking changes require a major version or a documented migration path. |
-| Preview public API | Documented and intended for external use, but still allowed to change before 1.0 GA. | Breaking changes require release notes and migration guidance.           |
-| Experimental API   | Documented for early adopters only. Shape, defaults, and behavior may change.        | Breaking changes can happen in minor releases with explicit notes.       |
-| Internal API       | Not supported for external consumers, even if it is exported by package metadata.    | May change or disappear without notice.                                  |
-| Deprecated API     | Still present for compatibility, but scheduled for removal or replacement.           | Removal requires release notes and, where practical, an alternative.     |
+| Level              | Meaning                                                                    | Change policy                                                     |
+| ------------------ | -------------------------------------------------------------------------- | ----------------------------------------------------------------- |
+| Stable public API  | Documented, tested, and intended for broad external use.                   | Breaking changes require a major version and migration guide.     |
+| Preview public API | Documented and intended for external use while 2.0 stabilizes.             | Breaking changes require release notes and migration guidance.    |
+| Experimental API   | Documented for early adopters; shape and defaults may evolve.              | Changes noted in release notes.                                   |
+| Internal API       | Workspace packages (`@fsusui/*`), build scripts, fixtures, raw WASM files. | Not exported; may change without notice.                          |
 
-## Minimum Public Contract
-
-- A surface is public only when documented in this repository.
-- Unlisted package subpaths are encapsulated by `package.json` exports;
-  compatibility-directory exports do not make undocumented symbols stable API.
-- `vue/internal/*` workspace packages are build/maintenance utilities, not runtime
-  public API. Gulp tasks, build scripts, generated metadata, fixture data, and
-  test helpers are internal.
-- WASM generated files, Emscripten glue, worker implementations, and SIMD tuning
-  are internal unless a specific wrapper is documented.
-- FsusBlog-specific adapters, examples, and migration helpers are product
-  integration references, not general-purpose FsusUI API.
-
-## Package Entry Points
-
-The published package name is currently `@ozwasyd/element-plus`.
+## Package Entry Points (`@ozwasyd/fsusui`)
 
 | Import path | Level | Notes |
 | --- | --- | --- |
-| `@ozwasyd/element-plus` | Preview public API | Main Vue plugin, component exports, directives, hooks, constants, installer helpers, `version`, and `dayjs`. |
-| `@ozwasyd/element-plus/global` | Preview public API | Type-only global component declarations. |
-| `@ozwasyd/element-plus/es` | Preview public API | ESM aggregate entry for bundlers requiring an explicit module path. |
-| `@ozwasyd/element-plus/lib` | Preview public API | CommonJS aggregate entry for legacy pipelines. |
-| `@ozwasyd/element-plus/icons-vue` | Preview public API | Icon bridge for consumers migrating from `@element-plus/icons-vue`. |
-| `@ozwasyd/element-plus/theme` | Preview public API | Theme-mode helpers and documented theme contracts. |
-| `@ozwasyd/element-plus/result` | Preview public API | `FsusResult<T>` helpers and documented result-mode utilities. |
-| `@ozwasyd/element-plus/render-pipeline` | Experimental API | Render-budget and adapter primitives; use only with repository tests. |
-| `@ozwasyd/element-plus/wasm` | Experimental API | Public accelerated-path wrapper; generated internals remain unsupported. |
-| `@ozwasyd/element-plus/markdown-runtime` | Experimental API | Markdown runtime primitives. Projection, editor-input, and interaction-trace consumers are documented in `docs/api/markdown-runtime-projection.md`, `docs/api/markdown-editor-input.md`, and `docs/api/markdown-interaction-trace.md`. |
-| `@ozwasyd/element-plus/motion` | Preview public API | Motion runtime: `FsuMotion`, `FsuTransition`, `vMotion` / `vScrollReveal`, `runMotion` / `cancelMotion`, `useScrollReveal` / `useMotionRouteCleanup`, preset/recipe lookups, governance validators, and motion types. |
-| `@ozwasyd/element-plus/perception-challenge` | Preview public API | Perception challenge components (`ElPerceptionChallenge`, `ElPerceptionCharacterChallenge`, `ElTextTaskChallenge`, `ElLocalizationChallenge`, `ElMicroInteractionChallenge`, and `Fsus*` aliases) plus typed contracts from `perception-challenge/src/instance.ts`. |
-| `@ozwasyd/element-plus/dist/fsus.css` | Preview public API | Complete production theme: compatibility CSS followed by product tokens and overrides. |
-| `@ozwasyd/element-plus/dist/index.css` | Compatibility API | Element Plus-compatible base CSS; it omits FsusUI product overrides. |
-| `@ozwasyd/element-plus/dist/public-shell-critical.css` | Preview public API | Public-shell critical CSS. |
-| `@ozwasyd/element-plus/theme-chalk/*` | Preview public API | Built CSS and SCSS assets documented by theme guides. |
-| `@ozwasyd/element-plus/es/{components,constants,directives,hooks,locale,motion,utils}/*` | Compatibility API | ESM compatibility paths used by documented components, locale loading, declarations, and migration tooling. Extensionless and native `.mjs` spellings are supported; only documented symbols receive stability guarantees. |
-| `@ozwasyd/element-plus/lib/{components,constants,directives,hooks,locale,motion,utils}/*` | Compatibility API | CommonJS counterpart; extensionless and native `.js` spellings are supported. |
-| `@ozwasyd/element-plus/es/wasm/*` | Internal, not exported | Generated WASM modules, runtime helpers, and Markdown output gateway. Use `/wasm` or `/markdown-runtime`. |
-| `@ozwasyd/element-plus/lib/wasm/*` | Internal, not exported | CommonJS generated WASM internals in the same package boundary. |
-| Any other unlisted top-level or deep subpath | Internal, not exported | Use the root package, a named public entry above, documented component/locale compatibility paths, or `theme-chalk/*`. |
+| `@ozwasyd/fsusui` | Preview public API | Main Vue 3.5 plugin, all `Fsus*` core/form/data/navigation/overlay/primitive components, directives (`vFsusLoading`, `vFsusInfiniteScroll`, `vClickOutside`), services (`FsusMessage`, `FsusNotification`, `FsusMessageBox`, `FsusLoadingService`), core helpers, locales (`zhCN`, `en`), and `version`. Does **not** eagerly bundle Markdown or WASM. |
+| `@ozwasyd/fsusui/core` | Preview public API | Zero-dependency utilities, date engine, config provider context, validation (native + Standard Schema v1), floating/focus/scroll primitives, `FsusResult<T>`, and theme-mode helpers. |
+| `@ozwasyd/fsusui/icons` | Preview public API | `FsusIcon`, canonical core SVG icon set, `registerFsusIcon`, `registerFsusIcons`, and `createFsusIcon`. |
+| `@ozwasyd/fsusui/motion` | Preview public API | Unified zero-dependency motion runtime: WAAPI, damped spring/drag/inertia physics, FLIP/scroll-reveal composables, `runViewTransition`, `useSharedElementMotion`, `FsusMotion` / `FsusTransition` / `FsusSharedElement`, directives (`vFsusMotion`, `vFsusScrollReveal`), tokens, presets, recipes, and governance checks. |
+| `@ozwasyd/fsusui/markdown` | Preview public API | Decoupled `FsusMarkdownRenderer`, `FsusMarkdownEditor`, and Markdown editor/projection hooks. Optional peer dependencies (`katex`, `mermaid`, `shiki`) are loaded dynamically only when enabled. |
+| `@ozwasyd/fsusui/wasm` | Experimental API | Accelerated data-sorting/filtering and Markdown WASM + JS fallback runtime (`initMarkdownRuntime`, `renderMarkdownResultWithRuntime`, `activateMarkdownFeatures`, projection/coordinate/search/embed engines). |
+| `@ozwasyd/fsusui/theme` | Preview public API | `syncThemeMode`, `clearThemeMode`, `normalizeThemeMode`, and document theme-mode helpers. |
+| `@ozwasyd/fsusui/locale` | Preview public API | Built-in `zhCN`, `en`, and `defineFsusLocale`. |
+| `@ozwasyd/fsusui/result` | Preview public API | `FsusResult<T>`, `fsusOk`, `fsusErr`, `isFsusOk`, `isFsusErr`, and structured error helpers. |
+| `@ozwasyd/fsusui/render-pipeline` | Experimental API | Render-budget, virtual-window, and scheduling primitives. |
+| `@ozwasyd/fsusui/perception-challenge` | Preview public API | `FsusPerceptionChallenge`, `FsusPerceptionCharacterChallenge`, `FsusTextTaskChallenge`, `FsusLocalizationChallenge`, `FsusMicroInteractionChallenge`. |
+| `@ozwasyd/fsusui/styles/fsus.css` | Preview public API | Single-layer (`@layer fsus.tokens, fsus.base, fsus.components, fsus.overrides`) production CSS for core components (~67 KB uncompressed). |
+| `@ozwasyd/fsusui/styles/markdown.css` | Preview public API | Opt-in CSS for `FsusMarkdownRenderer`, `FsusMarkdownEditor`, `.fsus-prose`, and `.fsus-markdown-embed` (~14 KB uncompressed). |
+| `@ozwasyd/fsusui/styles/*.css` | Preview public API | Granular stylesheets (`tokens.css`, `base.css`, `core.css`, `forms.css`, `overlays.css`, `data-nav.css`). |
+| `@ozwasyd/fsusui/global` | Preview public API | Type-only Volar `GlobalComponents` declarations for `Fsus*` components. |
 
-## Component Package Groups
+## Theme & Motion Token Stability
 
-Preview component APIs include Vue props, emits, slots, and exposed methods
-documented under `docs/components/`. Element Plus compatibility is best-effort
-unless covered by a local test or explicit FsusUI doc page.
-
-- `components`: preview public when documented under `docs/components/`.
-- `directives`: preview public when exported from the main package and covered by component or guide docs.
-- `hooks`: preview public only when exported from the main package and used in public guides.
-- `constants`: preview public only for documented constants.
-- `utils`: internal by default. Treat utility deep imports as unsupported.
-- `locale`: preview public for documented locale imports and ConfigProvider usage.
-- `theme-chalk`: preview public for documented CSS and SCSS entry points.
-- `icons-vue`: preview public for exported icon components and package-level
-  imports.
-
-## Theme Token Stability
-
-Theme token stability is tracked in [`docs/theme/tokens.md`](./theme/tokens.md).
-Preview tokens include the documented Element Plus-compatible CSS custom
-properties and FsusUI semantic aliases listed there.
-
-Unlisted `--fsus-*` and component-private CSS variables are internal. They can
-change as component styling is normalized for the public preview.
-
-## Motion Token Stability
-
-Motion token stability is tracked in [`docs/theme/motion.md`](./theme/motion.md).
-High-level timing tokens and ConfigProvider `motion` settings are preview public
-API; low-level scroll, drag, trail, blur, and spring tokens are experimental
-unless promoted there.
-
-## Compatibility Claims
-
-Any Element Plus compatibility claim must have at least one of:
-
-- A local unit, visual, accessibility, or consumer-install test;
-- a component doc page naming the supported behavior;
-- a migration guide entry naming the expected difference; or
-- a release evidence document recording the command and result.
-
-Without one, the behavior should be described as best-effort or implementation detail.
+- Theme tokens are governed by [`spec/tokens/`](../spec/tokens/README.md) and
+  [`docs/theme/tokens.md`](./theme/tokens.md). Only canonical `--fsus-*`
+  variables are public.
+- Motion tokens and budgets are tracked in [`docs/theme/motion.md`](./theme/motion.md).
+- Internal workspace packages (`@fsusui/*`), `vue/internal/*`, and raw WASM
+  binaries under `dist/wasm/*` are implementation details and not public API.

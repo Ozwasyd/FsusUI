@@ -20,7 +20,7 @@ export const DEPENDENCY_FIELDS = [
   'optionalDependencies',
 ]
 
-export const PUBLISHED_PACKAGE_REL = 'vue/packages/element-plus/package.json'
+export const PUBLISHED_PACKAGE_REL = 'vue/packages/fsusui/package.json'
 
 /** Consumer install fixtures projected from authority install / consumerProfiles. */
 export const CONSUMER_FIXTURE_RELS = [

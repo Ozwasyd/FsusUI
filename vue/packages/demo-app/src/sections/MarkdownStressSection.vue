@@ -44,7 +44,7 @@
         </div>
       </div>
       <div data-testid="markdown-stress-renderer">
-        <el-scrollbar
+        <fsus-scrollbar
           ref="stressScrollbar"
           class="markdown-stress-scrollbar is-heavy-dom-motion"
           height="min(70vh, 760px)"
@@ -53,7 +53,7 @@
           noresize
           @scroll="handlePreviewScroll"
         >
-          <el-markdown-renderer
+          <fsus-markdown-renderer
             class="markdown-stress-content"
             :content="componentContent"
             :allow-latex="true"
@@ -64,7 +64,7 @@
             @render-error="handleRenderError"
             @render-profile="handleRenderProfile"
           />
-        </el-scrollbar>
+        </fsus-scrollbar>
       </div>
       <div
         v-if="placeholders.length"
@@ -95,8 +95,8 @@ import {
   type MarkdownRenderTimings,
   type MarkdownRuntimeKind,
   type MarkdownRuntimeProfile,
-} from '@element-plus/wasm'
-import { isFsusErr } from '@element-plus/utils'
+} from '@fsusui/wasm'
+import { isFsusErr } from '@fsusui/core'
 import {
   buildMarkdownStressCorpus,
   describeMarkdownStressCorpus,
@@ -263,7 +263,7 @@ const handleRenderProfile = (profile: MarkdownRuntimeProfile) => {
 
 const readVisibleStressSection = () => {
   const wrap = document.querySelector<HTMLElement>(
-    '.markdown-stress-scrollbar .el-scrollbar__wrap',
+    '.markdown-stress-scrollbar .fsus-scrollbar__wrap',
   )
   const renderer = document.querySelector<HTMLElement>(
     '.markdown-stress-renderer',
@@ -301,7 +301,7 @@ const handlePreviewScroll = ({
   if (!debugScroll) return
 
   const wrap = document.querySelector<HTMLElement>(
-    '.markdown-stress-scrollbar .el-scrollbar__wrap',
+    '.markdown-stress-scrollbar .fsus-scrollbar__wrap',
   )
   const visibleSection = readVisibleStressSection()
   const payload = {

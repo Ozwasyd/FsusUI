@@ -1,163 +1,100 @@
 # Quickstart
 
-This guide shows how to use FsusUI in a Vue project. See
-[Installation](./installation.md) for prerequisites and package setup.
+This guide shows how to use FsusUI 2.0 (`@ozwasyd/fsusui`) in a Vue 3.5+ project.
+See [Installation](./installation.md) for prerequisites and registry setup.
 
 ## Full import
-
-Use the full import when bundle size is not a concern:
 
 ```ts
 // main.ts
 import { createApp } from 'vue'
-import FsusUI from '@ozwasyd/element-plus'
-import '@ozwasyd/element-plus/dist/fsus.css'
+import FsusUI from '@ozwasyd/fsusui'
+import '@ozwasyd/fsusui/styles/fsus.css'
 import App from './App.vue'
 
-const app = createApp(App)
-app.use(FsusUI)
-app.mount('#app')
+createApp(App).use(FsusUI).mount('#app')
 ```
 
 ### Volar global types
 
-With Volar, add the global component declarations to
-`compilerOptions.types` in `vue/tsconfig.json`:
+Add global `Fsus*` component declarations to `compilerOptions.types` in
+`tsconfig.json`:
 
 ```json
 {
   "compilerOptions": {
-    "types": ["@ozwasyd/element-plus/global"]
+    "types": ["@ozwasyd/fsusui/global"]
   }
 }
 ```
 
-## On-demand imports (recommended)
+## Tree-shakable named imports (recommended)
 
-On-demand imports reduce bundle size. FsusUI is an ES module and supports tree
-shaking.
-
-### Automatic imports
-
-Install the import plugins:
-
-```bash
-pnpm install -D unplugin-vue-components unplugin-auto-import
-```
-
-Configure them in `vite.config.ts`:
-
-```ts
-// vite.config.ts
-import { defineConfig } from 'vite'
-import AutoImport from 'unplugin-auto-import/vite'
-import Components from 'unplugin-vue-components/vite'
-import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
-
-export default defineConfig({
-  plugins: [
-    AutoImport({
-      resolvers: [ElementPlusResolver()],
-    }),
-    Components({
-      resolvers: [ElementPlusResolver()],
-    }),
-  ],
-})
-```
-
-Components and APIs are then imported when used.
-
-### Manual imports
-
-Use [unplugin-element-plus](https://github.com/element-plus/unplugin-element-plus)
-to load component styles on demand:
+FsusUI 2.0 is pure ESM with `"sideEffects": ["styles/**/*.css", "dist/styles/**/*.css"]`.
+Import only the components and subpaths your page needs:
 
 ```vue
 <!-- App.vue -->
 <template>
-  <el-button>按钮</el-button>
+  <FsusConfigProvider size="md" theme-mode="system">
+    <FsusButton variant="primary" @click="notify">Continue</FsusButton>
+  </FsusConfigProvider>
 </template>
 
 <script setup lang="ts">
-import { ElButton } from '@ozwasyd/element-plus'
+import { FsusButton, FsusConfigProvider, FsusMessage } from '@ozwasyd/fsusui'
+import '@ozwasyd/fsusui/styles/fsus.css'
+
+const notify = () => FsusMessage.success('Saved')
 </script>
 ```
 
-```ts
-// vite.config.ts
-import { defineConfig } from 'vite'
-import ElementPlus from 'unplugin-element-plus/vite'
+## Markdown & WASM (opt-in subpath)
 
-export default defineConfig({
-  plugins: [ElementPlus()],
-})
+Markdown rendering and editing live on dedicated subpaths so applications that
+do not render Markdown pay zero JS and zero CSS overhead:
+
+```ts
+import { FsusMarkdownRenderer, FsusMarkdownEditor } from '@ozwasyd/fsusui/markdown'
+import '@ozwasyd/fsusui/styles/markdown.css'
 ```
 
----
+## Icons & Motion
+
+```ts
+import { FsusIcon, FsusIconSearch, registerFsusIcon } from '@ozwasyd/fsusui/icons'
+import { FsusMotion, runViewTransition } from '@ozwasyd/fsusui/motion'
+```
 
 ## Global configuration
 
-Pass global component `size`, overlay `zIndex`, and document-level `themeMode`
-when installing FsusUI.
-
-Full import:
-
 ```ts
-// main.ts
 import { createApp } from 'vue'
-import FsusUI from '@ozwasyd/element-plus'
+import FsusUI, { zhCN } from '@ozwasyd/fsusui'
 import App from './App.vue'
 
-const app = createApp(App)
-app.use(FsusUI, { size: 'small', zIndex: 3000 })
+createApp(App)
+  .use(FsusUI, {
+    size: 'md',
+    zIndex: 2000,
+    themeMode: 'system',
+    locale: zhCN,
+  })
+  .mount('#app')
 ```
 
-Add `themeMode` when the application must follow the system or force a mode:
-
-```ts
-app.use(FsusUI, {
-  size: 'small',
-  zIndex: 3000,
-  themeMode: 'system',
-})
-```
-
-On-demand setup with `ConfigProvider`:
-
-```vue
-<!-- App.vue -->
-<template>
-  <el-config-provider :size="size" :z-index="zIndex" :theme-mode="themeMode">
-    <app />
-  </el-config-provider>
-</template>
-
-<script setup lang="ts">
-import { ElConfigProvider } from '@ozwasyd/element-plus'
-
-const zIndex = 3000
-const size = 'small'
-const themeMode = 'system'
-</script>
-```
-
-`themeMode` accepts `'light' | 'dark' | 'system'`. See [Dark mode](./dark-mode.md)
-for behavior and SSR setup.
+`themeMode` accepts `'light' | 'dark' | 'system'`.
 
 ## Run the local demo
 
-Every component has a runnable demo in the monorepo:
-
 ```bash
-pnpm dev
+pnpm -C vue/packages/demo-app dev
 ```
-
-Open `http://localhost:5173` to inspect the interactive examples.
 
 ## Next steps
 
-- [Theme customization](./theming.md) — Override public color and style variables.
-- [Dark mode](./dark-mode.md) — Configure `themeMode` and SSR first paint.
-- [Internationalization](./i18n.md) — Configure locale support.
-- [Component docs](../components/overview.md) — Browse component APIs.
+- [Migrating from v1 to v2](../migration/v1-to-v2.md)
+- [Theme customization](./theming.md)
+- [Dark mode](./dark-mode.md)
+- [Internationalization](./i18n.md)
+- [Component docs](../components/overview.md)

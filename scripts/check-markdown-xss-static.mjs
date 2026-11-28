@@ -12,7 +12,8 @@ const root = resolve(import.meta.dirname, '..')
 const mode = process.argv.includes('--artifacts') ? 'artifacts' : 'source'
 const productionRoots = [
   'vue/packages/components',
-  'vue/packages/element-plus',
+  'vue/packages/fsusui',
+  'vue/packages/markdown',
   'vue/packages/wasm',
 ]
 const forbiddenMarkers = [
@@ -68,7 +69,7 @@ const checkSourceAuthority = async () => {
 
   const packageManifest = JSON.parse(
     await readFile(
-      resolve(root, 'vue/packages/element-plus/package.json'),
+      resolve(root, 'vue/packages/fsusui/package.json'),
       'utf8',
     ),
   )
@@ -190,7 +191,6 @@ const checkArtifacts = async () => {
   }
   const requiredArtifacts = [
     'vue/packages/wasm/dist/index.mjs',
-    'vue/packages/wasm/dist/index.cjs',
     'vue/packages/wasm/dist/markdown_basic.js',
     'vue/packages/wasm/dist/markdown_basic.wasm',
     'vue/packages/wasm/dist/markdown_simd.js',

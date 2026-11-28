@@ -9,7 +9,7 @@ const sourcePackagePath = path.join(
   repoRoot,
   'vue',
   'packages',
-  'element-plus',
+  'fsusui',
   'package.json',
 )
 const rootPackagePath = path.join(repoRoot, 'package.json')
@@ -21,16 +21,7 @@ const consumerDocs = [
   'docs/guide/quickstart.md',
   'docs/guide/dark-mode.md',
   'docs/guide/i18n.md',
-  'docs/guide/theming.md',
-  'docs/guide/ssr.md',
-  'docs/guide/custom-defaults.md',
-  'docs/guide/namespace.md',
-  'docs/element-plus-integration.md',
-  'docs/components/layout.md',
-  'docs/components/loading.md',
-  'docs/components/message-box.md',
-  'docs/components/config-provider.md',
-  'docs/components/form.md',
+  'docs/api-stability.md',
 ]
 
 const forbiddenSnippets = [
@@ -66,53 +57,45 @@ const requiredSnippets = new Map([
     'docs/guide/quickstart.md',
     [
       `import FsusUI from '${packageName}'`,
-      `import '${packageName}/dist/fsus.css'`,
+      `import '${packageName}/styles/fsus.css'`,
       `"types": ["${packageName}/global"]`,
     ],
   ],
   [
     'docs/guide/dark-mode.md',
     [
-      `import ElementPlus from '${packageName}'`,
+      `import FsusUI from '${packageName}'`,
       `import { syncThemeMode } from '${packageName}/theme'`,
     ],
   ],
   [
     'docs/guide/i18n.md',
     [
-      `import ElementPlus from '${packageName}'`,
-      `import zhCn from '${packageName}/es/locale/lang/zh-cn'`,
+      `import FsusUI from '${packageName}'`,
+      `import { en, zhCN } from '${packageName}/locale'`,
     ],
-  ],
-  [
-    'docs/element-plus-integration.md',
-    [`\`${packageName}\``, `\`${packageName}/dist/fsus.css\``],
-  ],
-  [
-    'docs/components/layout.md',
-    [`import '${packageName}/theme-chalk/display.css'`],
   ],
 ])
 
 expectEqual(
   sourcePackage.peerDependencies?.vue,
   rootPackage.peerDependencies?.vue,
-  'vue/packages/element-plus peerDependencies.vue',
+  'vue/packages/fsusui peerDependencies.vue',
 )
 expectEqual(
   sourcePackage.homepage,
   repositoryWebUrl,
-  'vue/packages/element-plus homepage',
+  'vue/packages/fsusui homepage',
 )
 expectEqual(
   sourcePackage.bugs?.url,
   `${repositoryWebUrl}/issues`,
-  'vue/packages/element-plus bugs.url',
+  'vue/packages/fsusui bugs.url',
 )
 expectEqual(
   sourcePackage.repository?.url,
   `git+${repositoryGitUrl}`,
-  'vue/packages/element-plus repository.url',
+  'vue/packages/fsusui repository.url',
 )
 
 for (const relativePath of consumerDocs) {
@@ -136,19 +119,8 @@ for (const relativePath of consumerDocs) {
   }
 }
 
-const installationGuide = readFileSync(
-  path.join(repoRoot, 'docs', 'guide', 'installation.md'),
-  'utf8',
-)
-
-if (!installationGuide.includes(registryUrl)) {
-  errors.push(
-    'docs/guide/installation.md must mention the npm public registry URL.',
-  )
-}
-
 if (errors.length > 0) {
   throw new Error(`Consumer contract drift detected:\n- ${errors.join('\n- ')}`)
 }
 
-console.log(`Consumer contract matches ${packageName} and npm public registry.`)
+console.log(`Consumer contract matches ${packageName} and ${registryUrl}.`)

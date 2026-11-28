@@ -1,0 +1,115 @@
+{
+  "name": "@ozwasyd/fsusui",
+  "version": "2.0.0-alpha.0",
+  "description": "FsusUI 2.0 — The Intellectual Minimalist Vue 3.5+ Component System",
+  "keywords": [
+    "fsusui",
+    "vue",
+    "vue3",
+    "component-library",
+    "design-system",
+    "ui",
+    "esm"
+  ],
+  "homepage": "https://github.com/Ozwasyd/FsusUI",
+  "bugs": {
+    "url": "https://github.com/Ozwasyd/FsusUI/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Ozwasyd/FsusUI.git"
+  },
+  "license": "MIT",
+  "type": "module",
+  "sideEffects": [
+    "styles/**/*.css",
+    "dist/styles/**/*.css"
+  ],
+  "main": "./dist/index.mjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs"
+    },
+    "./core": {
+      "types": "./dist/core.d.ts",
+      "import": "./dist/core.mjs"
+    },
+    "./icons": {
+      "types": "./dist/icons.d.ts",
+      "import": "./dist/icons.mjs"
+    },
+    "./motion": {
+      "types": "./dist/motion.d.ts",
+      "import": "./dist/motion.mjs"
+    },
+    "./markdown": {
+      "types": "./dist/markdown.d.ts",
+      "import": "./dist/markdown.mjs"
+    },
+    "./wasm": {
+      "types": "./dist/wasm.d.ts",
+      "import": "./dist/wasm.mjs"
+    },
+    "./theme": {
+      "types": "./dist/theme.d.ts",
+      "import": "./dist/theme.mjs"
+    },
+    "./locale": {
+      "types": "./dist/locale.d.ts",
+      "import": "./dist/locale.mjs"
+    },
+    "./result": {
+      "types": "./dist/result.d.ts",
+      "import": "./dist/result.mjs"
+    },
+    "./render-pipeline": {
+      "types": "./dist/render-pipeline.d.ts",
+      "import": "./dist/render-pipeline.mjs"
+    },
+    "./perception-challenge": {
+      "types": "./dist/perception-challenge.d.ts",
+      "import": "./dist/perception-challenge.mjs"
+    },
+    "./styles/fsus.css": "./dist/styles/fsus.css",
+    "./styles/markdown.css": "./dist/styles/markdown.css",
+    "./styles/*.css": "./dist/styles/*.css",
+    "./global": {
+      "types": "./dist/global.d.ts"
+    },
+    "./package.json": "./package.json"
+  },
+  "style": "./dist/styles/fsus.css",
+  "publishConfig": {
+    "access": "public"
+  },
+  "peerDependencies": {
+    "katex": "^0.17.0",
+    "mermaid": "^11.0.0",
+    "shiki": "^4.0.0",
+    "vue": "^3.5.0"
+  },
+  "peerDependenciesMeta": {
+    "katex": {
+      "optional": true
+    },
+    "mermaid": {
+      "optional": true
+    },
+    "shiki": {
+      "optional": true
+    }
+  },
+  "dependencies": {
+    "@floating-ui/dom": "^1.7.0",
+    "@fsusui/components": "workspace:*",
+    "@fsusui/core": "workspace:*",
+    "@fsusui/icons": "workspace:*",
+    "@fsusui/markdown": "workspace:*",
+    "@fsusui/motion": "workspace:*",
+    "@fsusui/theme": "workspace:*",
+    "@fsusui/wasm": "workspace:*"
+  }
+}

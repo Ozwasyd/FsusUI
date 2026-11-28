@@ -6,8 +6,8 @@ import { compile } from 'sass'
 import { findFoundationStyleBoundaryViolations } from './foundation-style-boundary.mjs'
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
-const themeRoot = path.join(root, 'vue/packages/theme-chalk/src')
-const entries = ['fsus.scss', 'reset.scss']
+const themeRoot = path.join(root, 'vue/packages/theme/src')
+const entries = ['fsus.scss']
 const violations = entries.flatMap((entry) => {
   const css = compile(path.join(themeRoot, entry), {
     loadPaths: [themeRoot],

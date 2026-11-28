@@ -10,7 +10,7 @@ internal static class TokenThemeSemanticEvaluator
 {
   private const string CanonicalPath = "spec/tokens/tokens.json";
   private const string GeneratedMetadataPath =
-    "vue/packages/theme-chalk/src/generated/tokens.json";
+    "vue/packages/theme/src/generated/tokens.json";
   private const string GeneratedXamlPath =
     "dotnet/FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml";
   private const string GeneratedCsharpPath =

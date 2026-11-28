@@ -14,7 +14,7 @@
       <h3>State replacement and route crossfade</h3>
       <div class="view-transition-demo__actions">
         <button
-          class="el-button"
+          class="fsus-button"
           type="button"
           data-testid="vt-state"
           @click="replaceState"
@@ -22,7 +22,7 @@
           <span>Replace state</span>
         </button>
         <button
-          class="el-button"
+          class="fsus-button"
           type="button"
           data-testid="vt-route"
           @click="crossfadeRoute"
@@ -30,7 +30,7 @@
           <span>Simulate route commit</span>
         </button>
         <button
-          class="el-button"
+          class="fsus-button"
           type="button"
           data-testid="vt-fallback"
           @click="forceFallback"
@@ -48,7 +48,7 @@
       <h3>Theme mode and bounded shared element</h3>
       <div class="view-transition-demo__actions">
         <button
-          class="el-button"
+          class="fsus-button"
           type="button"
           data-testid="vt-theme"
           @click="toggleTheme"
@@ -56,7 +56,7 @@
           <span>Toggle local theme</span>
         </button>
         <button
-          class="el-button"
+          class="fsus-button"
           type="button"
           data-testid="vt-shared"
           @click="moveSharedElement"
@@ -70,13 +70,13 @@
         data-testid="vt-theme-surface"
       >
         <div class="view-transition-demo__shared-track">
-          <FsuSharedElement
+          <FsusSharedElement
             id="view-transition-demo-card"
             class="view-transition-demo__shared"
             :class="{ 'is-end': sharedAtEnd }"
           >
             Shared card
-          </FsuSharedElement>
+          </FsusSharedElement>
         </div>
       </div>
     </div>
@@ -92,15 +92,15 @@
 <script setup lang="ts">
 import { nextTick, onMounted, onUnmounted, ref } from 'vue'
 import {
-  FsuSharedElement,
+  FsusSharedElement,
   runMotionRecipeUpdate,
   runViewTransition,
   useSharedElementMotion,
-} from '@element-plus/motion'
+} from '@fsusui/motion'
 import {
   clearThemeMode,
   syncThemeMode,
-} from '../../../components/config-provider'
+} from '@ozwasyd/fsusui'
 
 declare global {
   interface Window {

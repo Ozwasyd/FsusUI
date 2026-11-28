@@ -1,14 +1,14 @@
 /**
- * @element-plus/wasm
+ * @fsusui/wasm
  *
  * TypeScript 公共 API — 将 WASM 模块封装为 Promise-based 单例。
  * 组件仅需 import 对应函数，剩余部分 Tree-Shake 掉。
  *
  * 用法示例：
- *   import { sortNumbers, filterIndices } from '@element-plus/wasm'
+ *   import { sortNumbers, filterIndices } from '@fsusui/wasm'
  *   const sorted = await sortNumbers([3,1,2], true)
  */
-import type { FsusErrorDetail, FsusResult } from '@element-plus/utils'
+import type { FsusErrorDetail, FsusResult } from '@fsusui/core'
 import { resolveEpWasmAsset } from './runtime/assets'
 import { loadEmscriptenModule } from './runtime/emscripten'
 
@@ -156,7 +156,7 @@ async function getModule(): Promise<EpWasmModule> {
         asset.wasmUrl,
       )
       if (!module) {
-        throw createWasmError('@element-plus/wasm factory missing.')
+        throw createWasmError('@fsusui/wasm factory missing.')
       }
       _module = module
       _readiness = 'ready'
@@ -165,7 +165,7 @@ async function getModule(): Promise<EpWasmModule> {
       _module = null
       _moduleError = error
       _readiness = 'error'
-      throw createWasmError('@element-plus/wasm failed to initialize.', error)
+      throw createWasmError('@fsusui/wasm failed to initialize.', error)
     })
   }
   return _modulePromise
@@ -177,11 +177,11 @@ function getRequiredModule(): EpWasmModule {
   }
 
   if (_readiness === 'error') {
-    throw createWasmError('@element-plus/wasm is unavailable.', _moduleError)
+    throw createWasmError('@fsusui/wasm is unavailable.', _moduleError)
   }
 
   throw new Error(
-    '@element-plus/wasm is not ready. Call ensureWasmReady() before using sync APIs.',
+    '@fsusui/wasm is not ready. Call ensureWasmReady() before using sync APIs.',
   )
 }
 
@@ -201,7 +201,7 @@ function getInternalModule(module: EpWasmModule): LoadedEpWasmModule {
     !(module.HEAPF64 instanceof Float64Array)
   ) {
     throw new Error(
-      '@element-plus/wasm internal buffer helpers are unavailable. Rebuild vue/packages/wasm with `pnpm --filter @element-plus/wasm build:wasm`.',
+      '@fsusui/wasm internal buffer helpers are unavailable. Rebuild vue/packages/wasm with `pnpm --filter @fsusui/wasm build:wasm`.',
     )
   }
 
@@ -359,7 +359,7 @@ export class WasmDataSession {
   }
 
   private assertActive() {
-    if (this.disposed) throw new Error('@element-plus/wasm session disposed.')
+    if (this.disposed) throw new Error('@fsusui/wasm session disposed.')
   }
 
   private refreshHeapGeneration() {
@@ -437,7 +437,7 @@ export class WasmDataSession {
       offsetsPtr === undefined ||
       lengthsPtr === undefined
     ) {
-      throw new Error('@element-plus/wasm ASCII index is not loaded.')
+      throw new Error('@fsusui/wasm ASCII index is not loaded.')
     }
     this.refreshHeapGeneration()
     return { labelsPtr, lengthsPtr, offsetsPtr }
@@ -578,7 +578,7 @@ export async function createWasmDataSession(): Promise<
 > {
   return await wasmTryAsync(async () => {
     return new WasmDataSession(getInternalModule(await getModule()))
-  }, '@element-plus/wasm createWasmDataSession failed.')
+  }, '@fsusui/wasm createWasmDataSession failed.')
 }
 
 export function createWasmDataSessionSync(): WasmDataSession {
@@ -650,7 +650,7 @@ export function warmupWasm(): void {
 export async function ensureWasmReady(): Promise<FsusResult<void>> {
   return await wasmTryAsync(async () => {
     await getModule()
-  }, '@element-plus/wasm failed to initialize.')
+  }, '@fsusui/wasm failed to initialize.')
 }
 
 export function isWasmReady(): boolean {
@@ -676,7 +676,7 @@ export async function sortNumbers(
   return await wasmTryAsync(async () => {
     const m = await getModule()
     return sortNumbersWithModule(m, data, ascending)
-  }, '@element-plus/wasm sortNumbers failed.')
+  }, '@fsusui/wasm sortNumbers failed.')
 }
 
 export function sortNumbersSync(data: number[], ascending = true): number[] {
@@ -694,7 +694,7 @@ export async function sortNumberIndices(
     } finally {
       session.dispose()
     }
-  }, '@element-plus/wasm sortNumberIndices failed.')
+  }, '@fsusui/wasm sortNumberIndices failed.')
 }
 
 export function sortNumberIndicesSync(
@@ -724,7 +724,7 @@ export async function sortStrings(
     void locale
     m.sortStrings(copy as unknown as string[], ascending)
     return copy
-  }, '@element-plus/wasm sortStrings failed.')
+  }, '@fsusui/wasm sortStrings failed.')
 }
 
 export function sortStringsSync(
@@ -750,7 +750,7 @@ export async function sortAsciiIndices(
     } finally {
       session.dispose()
     }
-  }, '@element-plus/wasm sortAsciiIndices failed.')
+  }, '@fsusui/wasm sortAsciiIndices failed.')
 }
 
 export function sortAsciiIndicesSync(
@@ -781,7 +781,7 @@ export async function filterIndices(
   return await wasmTryAsync(async () => {
     const m = await getModule()
     return m.filterIndices(data, keyword, caseSensitive)
-  }, '@element-plus/wasm filterIndices failed.')
+  }, '@fsusui/wasm filterIndices failed.')
 }
 
 export function filterIndicesSync(
@@ -800,7 +800,7 @@ export async function filterAsciiIndices(
   return await wasmTryAsync(async () => {
     const m = await getModule()
     return filterAsciiIndicesWithModule(m, index, keyword, caseSensitive)
-  }, '@element-plus/wasm filterAsciiIndices failed.')
+  }, '@fsusui/wasm filterAsciiIndices failed.')
 }
 
 export function filterAsciiIndicesSync(
@@ -825,7 +825,7 @@ export async function hexToHsl(hex: string): Promise<FsusResult<string>> {
   return await wasmTryAsync(async () => {
     const m = await getModule()
     return m.hexToHsl(hex)
-  }, '@element-plus/wasm hexToHsl failed.')
+  }, '@fsusui/wasm hexToHsl failed.')
 }
 
 /** HSL 分量 → HEX (#RRGGBB) */
@@ -837,7 +837,7 @@ export async function hslToHex(
   return await wasmTryAsync(async () => {
     const m = await getModule()
     return m.hslToHex(h, s, l)
-  }, '@element-plus/wasm hslToHex failed.')
+  }, '@fsusui/wasm hslToHex failed.')
 }
 
 // ─────────────────────────────────
@@ -852,7 +852,7 @@ export async function roundToPrecision(
   return await wasmTryAsync(async () => {
     const m = await getModule()
     return m.roundToPrecision(value, precision)
-  }, '@element-plus/wasm roundToPrecision failed.')
+  }, '@fsusui/wasm roundToPrecision failed.')
 }
 
 /** 钳位并舍入 */
@@ -865,7 +865,7 @@ export async function clampAndRound(
   return await wasmTryAsync(async () => {
     const m = await getModule()
     return m.clampAndRound(value, min, max, precision)
-  }, '@element-plus/wasm clampAndRound failed.')
+  }, '@fsusui/wasm clampAndRound failed.')
 }
 
 // ─────────────────────────────────
@@ -897,7 +897,7 @@ export async function estimateRowHeights(
       lineHeight,
       padding,
     )
-  }, '@element-plus/wasm estimateRowHeights failed.')
+  }, '@fsusui/wasm estimateRowHeights failed.')
 }
 
 // ─────────────────────────────────
@@ -907,5 +907,5 @@ export async function wasmVersion(): Promise<FsusResult<string>> {
   return await wasmTryAsync(async () => {
     const m = await getModule()
     return m.version()
-  }, '@element-plus/wasm wasmVersion failed.')
+  }, '@fsusui/wasm wasmVersion failed.')
 }

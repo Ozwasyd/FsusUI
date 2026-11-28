@@ -428,55 +428,41 @@ try {
     'docs/api/web-contract-mapping.md',
   )
 
-  const runtimeTokens = read(
-    'vue/packages/theme-chalk/src/common/fsus-tokens.scss',
-  )
+  const runtimeTokens = read('vue/packages/theme/src/tokens.scss')
   for (const expected of [
-    '--el-color-primary: var(--fsus-scholarly-blue);',
+    "@use './generated/tokens.css';",
+    '--fsus-ink: var(--fsus-color-text-primary);',
+    '--fsus-paper: var(--fsus-color-surface-base);',
+    '--fsus-accent: var(--fsus-color-action-primary);',
     '--fsus-button-primary-bg: var(--fsus-ink);',
     '--fsus-button-primary-text: var(--fsus-paper);',
-    '--fsus-radius-control: #{generated.$fsus-radius-control-md};',
-    '--fsus-radius-control-small: #{generated.$fsus-radius-control-sm};',
-    '--fsus-radius-panel: #{generated.$fsus-radius-surface-md};',
-    '--fsus-radius-popover: #{generated.$fsus-radius-surface-sm};',
-    '--fsus-backdrop-blur: #{generated.$fsus-component-material-paper-blur};',
-    '--fsus-control-height-spacious: #{generated.$fsus-density-control-spacious-y};',
-    '--fsus-state-focus-border: #{generated.$fsus-component-state-surface-focus-border};',
-    '--fsus-state-invalid-border: #{generated.$fsus-component-state-surface-invalid-border};',
-    '--fsus-shadow-panel: var(--fsus-shadow-overlay-md);',
-    '--fsus-component-button-padding-x: #{generated.$fsus-component-button-padding-x};',
-    '--fsus-component-dialog-padding: #{generated.$fsus-component-dialog-padding};',
-    '--fsus-border-light: var(--fsus-color-border-light);',
-    '--fsus-border-lighter: var(--fsus-color-border-lighter);',
-    '--fsus-border-extra-light: var(--fsus-color-border-extra-light);',
     '--fsus-surface-overlay: var(--fsus-color-surface-overlay);',
-    '--fsus-shadow-panel-light: #{generated.$fsus-shadow-panel-light};',
-    '--fsus-motion-distance-sm: var(--fsus-motion-distance-small);',
-    '--fsus-motion-intensity-standard: #{generated.$fsus-motion-intensity-standard};',
-    '--fsus-component-overlay-scrim: #{generated.$fsus-component-overlay-scrim};',
+    '--fsus-state-focus-border: var(--fsus-color-focus-ring);',
+    '--fsus-state-invalid-border: var(--fsus-status-danger);',
   ]) {
-    assertIncludes(
-      runtimeTokens,
-      expected,
-      'vue/packages/theme-chalk/src/common/fsus-tokens.scss',
-    )
+    assertIncludes(runtimeTokens, expected, 'vue/packages/theme/src/tokens.scss')
   }
+  assertNotIncludes(
+    runtimeTokens,
+    '--el-color-primary',
+    'vue/packages/theme/src/tokens.scss',
+  )
 
-  const generatedCss = read('vue/packages/theme-chalk/src/generated/tokens.css')
+  const generatedCss = read('vue/packages/theme/src/generated/tokens.css')
   assertIncludes(
     generatedCss,
     '--fsus-scholarly-blue: var(--fsus-color-action-primary);',
-    'vue/packages/theme-chalk/src/generated/tokens.css',
+    'vue/packages/theme/src/generated/tokens.css',
   )
   assertNotIncludes(
     generatedCss,
     '--el-color-primary: var(--fsus-color-action-primary);',
-    'vue/packages/theme-chalk/src/generated/tokens.css',
+    'vue/packages/theme/src/generated/tokens.css',
   )
   assertNotIncludes(
     generatedCss,
     '[data-fsus-theme="high-contrast"]',
-    'vue/packages/theme-chalk/src/generated/tokens.css',
+    'vue/packages/theme/src/generated/tokens.css',
   )
   for (const expected of [
     '--fsus-component-button-padding-x: 16px;',
@@ -488,40 +474,17 @@ try {
     assertIncludes(
       generatedCss,
       expected,
-      'vue/packages/theme-chalk/src/generated/tokens.css',
+      'vue/packages/theme/src/generated/tokens.css',
     )
   }
 
-  const webTheme = readScssBundle('vue/packages/theme-chalk/src/fsus-theme.scss')
+  const webTheme = readScssBundle('vue/packages/theme/src/fsus.scss')
   for (const expected of [
-    'padding: 0 var(--fsus-component-button-padding-x);',
-    'background: var(--fsus-component-state-button-primary-background-default);',
-    'background: var(--fsus-component-state-button-primary-background-hover);',
-    'background-color: var(--fsus-component-overlay-scrim) !important;',
-    'box-shadow: var(--fsus-shadow-panel-light);',
+    '--fsus-component-button-padding-x',
+    '--fsus-button-primary-bg',
+    '--fsus-shadow-floating',
   ]) {
-    assertIncludes(
-      webTheme,
-      expected,
-      'vue/packages/theme-chalk/src/fsus-theme.scss',
-    )
-  }
-
-  const sassVariables = read('vue/packages/theme-chalk/src/common/var.scss')
-  for (const expected of [
-    "'light': var(--fsus-border-light)",
-    "'lighter': var(--fsus-border-lighter)",
-    "'extra-light': var(--fsus-border-extra-light)",
-    "'overlay': var(--fsus-surface-overlay)",
-    "'light': var(--fsus-shadow-panel-light)",
-    "'': var(--fsus-component-overlay-scrim)",
-    "'shadow': var(--fsus-shadow-panel-light)",
-  ]) {
-    assertIncludes(
-      sassVariables,
-      expected,
-      'vue/packages/theme-chalk/src/common/var.scss',
-    )
+    assertIncludes(webTheme, expected, 'vue/packages/theme/src/fsus.scss')
   }
 
   const avaloniaTokens = read(

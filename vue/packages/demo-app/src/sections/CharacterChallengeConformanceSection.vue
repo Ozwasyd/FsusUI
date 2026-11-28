@@ -19,7 +19,7 @@
         v-bind="{ 'data-state': fixture.state }"
       >
         <h2>{{ fixture.label }}</h2>
-        <ElPerceptionCharacterChallenge
+        <FsusPerceptionCharacterChallenge
           :challenge-id="`conformance-${fixture.state}`"
           :state="fixture.state"
           :media="fixture.media"
@@ -38,12 +38,12 @@
 
 <script setup lang="ts">
 import { reactive } from 'vue'
-import { ElPerceptionCharacterChallenge } from '../../../element-plus'
+import { FsusPerceptionCharacterChallenge } from '@ozwasyd/fsusui'
 
 import type {
   PerceptionCharacterMedia,
   PerceptionChallengeState,
-} from '../../../components/perception-challenge'
+} from '@ozwasyd/fsusui'
 
 type Fixture = {
   state: Extract<
@@ -154,7 +154,7 @@ const responses = reactive<Record<string, string>>(
   max-width: 1180px;
   margin: 0 auto;
   padding: var(--fsus-space-6, 24px);
-  color: var(--el-text-color-primary);
+  color: var(--fsus-color-text-primary);
 }
 
 .character-conformance > header {
@@ -176,9 +176,9 @@ const responses = reactive<Record<string, string>>(
 .character-conformance__fixture {
   min-width: 0;
   padding: var(--fsus-space-4, 16px);
-  border: 1px solid var(--el-border-color);
+  border: 1px solid var(--fsus-color-border-subtle);
   border-radius: var(--fsus-radius-panel, 12px);
-  background: var(--el-bg-color);
+  background: var(--fsus-color-surface-base);
 }
 
 .character-conformance__fixture h2 {

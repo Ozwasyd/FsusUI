@@ -28,7 +28,7 @@ const repoRoot = path.resolve(
 )
 const sourceVersion = JSON.parse(
   readFileSync(
-    path.join(repoRoot, 'vue/packages/element-plus/package.json'),
+    path.join(repoRoot, 'vue/packages/fsusui/package.json'),
     'utf8',
   ),
 ).version
@@ -59,7 +59,7 @@ function makePackage(directory, overrides = {}) {
     path.join(directory, 'package.json'),
     `${JSON.stringify(
       {
-        name: '@ozwasyd/element-plus',
+        name: '@ozwasyd/fsusui',
         version: sourceVersion,
         main: 'lib/index.js',
         module: 'es/index.mjs',
@@ -322,7 +322,7 @@ try {
   )
   writeFileSync(
     path.join(circularDtsRoot, 'es/icons-vue.d.ts'),
-    "export * from '@ozwasyd/element-plus/es/icons-vue'\n",
+    "export * from '@ozwasyd/fsusui/es/icons-vue'\n",
   )
   assertThrows(
     () =>

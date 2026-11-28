@@ -6,59 +6,59 @@
       data-testid="thread-panel-regression"
     >
       <div data-testid="thread-panel-both">
-        <ElThreadPanel
+        <FsusThreadPanel
           title="Inbox QA support case"
           title-tag="h2"
           density="compact"
         >
           <template #back>
-            <ElButton text @click="backClicks += 1">
+            <FsusButton text @click="backClicks += 1">
               Back to conversations
-            </ElButton>
+            </FsusButton>
           </template>
           <template #actions>
-            <ElButton text @click="reloadClicks += 1">
+            <FsusButton text @click="reloadClicks += 1">
               Reload conversation
-            </ElButton>
+            </FsusButton>
           </template>
           <template #messages>
             <p class="narrow-regression-message">Example message</p>
           </template>
-        </ElThreadPanel>
+        </FsusThreadPanel>
       </div>
 
       <div data-testid="thread-panel-back-only">
-        <ElThreadPanel
+        <FsusThreadPanel
           title="Back only thread title"
           title-tag="h2"
           density="compact"
         >
           <template #back>
-            <ElButton text>Back to conversations</ElButton>
+            <FsusButton text>Back to conversations</FsusButton>
           </template>
           <template #messages>
             <p class="narrow-regression-message">Example message</p>
           </template>
-        </ElThreadPanel>
+        </FsusThreadPanel>
       </div>
 
       <div data-testid="thread-panel-actions-only">
-        <ElThreadPanel
+        <FsusThreadPanel
           title="Actions only thread title"
           title-tag="h2"
           density="compact"
         >
           <template #actions>
-            <ElButton text>Reload conversation</ElButton>
+            <FsusButton text>Reload conversation</FsusButton>
           </template>
           <template #messages>
             <p class="narrow-regression-message">Example message</p>
           </template>
-        </ElThreadPanel>
+        </FsusThreadPanel>
       </div>
 
       <div data-testid="thread-panel-title-only">
-        <ElThreadPanel
+        <FsusThreadPanel
           title="Title only thread"
           title-tag="h2"
           density="compact"
@@ -66,7 +66,7 @@
           <template #messages>
             <p class="narrow-regression-message">Example message</p>
           </template>
-        </ElThreadPanel>
+        </FsusThreadPanel>
       </div>
 
       <span data-testid="thread-panel-click-counts">
@@ -80,41 +80,41 @@
       data-testid="checkbox-regression"
     >
       <div data-testid="checkbox-long-enabled">
-        <ElCheckbox v-model="checkedLong">
+        <FsusCheckbox v-model="checkedLong">
           I have verified these changes and confirm updating public site
           configuration immediately.
-        </ElCheckbox>
+        </FsusCheckbox>
       </div>
 
       <div data-testid="checkbox-long-disabled">
-        <ElCheckbox :model-value="false" disabled>
+        <FsusCheckbox :model-value="false" disabled>
           I have verified these changes and confirm updating public site
           configuration immediately.
-        </ElCheckbox>
+        </FsusCheckbox>
       </div>
 
       <div data-testid="checkbox-short-enabled">
-        <ElCheckbox v-model="checkedShort">Confirm changes</ElCheckbox>
+        <FsusCheckbox v-model="checkedShort">Confirm changes</FsusCheckbox>
       </div>
 
       <div data-testid="checkbox-long-bordered">
-        <ElCheckbox v-model="checkedBordered" border>
+        <FsusCheckbox v-model="checkedBordered" border>
           I have verified these changes and confirm updating public site
           configuration immediately.
-        </ElCheckbox>
+        </FsusCheckbox>
       </div>
 
       <div data-testid="checkbox-group-long">
-        <ElCheckboxGroup v-model="groupSelection">
-          <ElCheckbox label="first">
+        <FsusCheckboxGroup v-model="groupSelection">
+          <FsusCheckbox label="first">
             I have verified these changes and confirm updating public site
             configuration immediately.
-          </ElCheckbox>
-          <ElCheckbox label="second">
+          </FsusCheckbox>
+          <FsusCheckbox label="second">
             Notify workspace administrators after publishing updated site
             configuration.
-          </ElCheckbox>
-        </ElCheckboxGroup>
+          </FsusCheckbox>
+        </FsusCheckboxGroup>
       </div>
     </section>
 
@@ -124,31 +124,31 @@
       data-testid="resource-list-regression"
     >
       <div data-testid="toggle-resource-badge-wrap">
-        <ElButton
+        <FsusButton
           v-bind="{ 'data-testid': 'toggle-resource-badge' }"
           @click="named = !named"
         >
           Toggle name
-        </ElButton>
+        </FsusButton>
       </div>
-      <ElResourceList>
-        <ElResourceListItem
+      <FsusResourceList>
+        <FsusResourceListItem
           v-bind="{ 'data-testid': 'resource-list-dynamic' }"
           :title="named ? 'Named device' : 'Current device'"
         >
           <template v-if="named" #badge>
-            <ElTag>Current device</ElTag>
+            <FsusTag>Current device</FsusTag>
           </template>
-        </ElResourceListItem>
-        <ElResourceListItem
+        </FsusResourceListItem>
+        <FsusResourceListItem
           v-bind="{ 'data-testid': 'resource-list-initial' }"
           title="Initial named device"
         >
           <template #badge>
-            <ElTag>Current device</ElTag>
+            <FsusTag>Current device</FsusTag>
           </template>
-        </ElResourceListItem>
-      </ElResourceList>
+        </FsusResourceListItem>
+      </FsusResourceList>
     </section>
   </main>
 </template>
@@ -156,16 +156,16 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import {
-  ElButton,
-  ElCheckbox,
-  ElCheckboxGroup,
-  ElResourceList,
-  ElResourceListItem,
-  ElTag,
-  ElThreadPanel,
+  FsusButton,
+  FsusCheckbox,
+  FsusCheckboxGroup,
+  FsusResourceList,
+  FsusResourceListItem,
+  FsusTag,
+  FsusThreadPanel,
   type CheckboxGroupValueType,
   type CheckboxValueType,
-} from '../../../element-plus'
+} from '@ozwasyd/fsusui'
 
 const params =
   typeof window !== 'undefined'

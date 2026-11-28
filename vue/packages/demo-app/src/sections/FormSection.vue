@@ -32,7 +32,7 @@
         </div>
       </header>
 
-      <el-form
+      <fsus-form
         class="task-form-fixture"
         :model="productionForm"
         label-position="top"
@@ -40,32 +40,32 @@
         <!-- @vue-ignore custom test contract attribute -->
         <section class="task-form-section" data-form-fixture="full-width">
           <h4>{{ copy.releaseDetails }}</h4>
-          <el-form-item :label="copy.publicTitle">
-            <el-input
+          <fsus-form-item :label="copy.publicTitle">
+            <fsus-input
               v-model="productionForm.title"
               v-bind="{ 'data-form-state': 'empty' }"
               :placeholder="copy.publicTitlePlaceholder"
             />
             <p class="task-field-message">{{ copy.publicTitleHelper }}</p>
-          </el-form-item>
-          <el-form-item :label="copy.audience">
-            <el-select
+          </fsus-form-item>
+          <fsus-form-item :label="copy.audience">
+            <fsus-select
               v-model="productionForm.audience"
               v-bind="{ 'data-form-state': 'empty' }"
               :placeholder="copy.audiencePlaceholder"
             >
-              <el-option :label="copy.audiencePublic" value="public" />
-              <el-option :label="copy.audienceMembers" value="members" />
-            </el-select>
+              <fsus-option :label="copy.audiencePublic" value="public" />
+              <fsus-option :label="copy.audienceMembers" value="members" />
+            </fsus-select>
             <p class="task-field-message">{{ copy.audienceHelper }}</p>
-          </el-form-item>
-          <el-form-item class="is-error">
+          </fsus-form-item>
+          <fsus-form-item class="is-error">
             <template #label>
               <span class="task-copy-stress--long-label">
                 {{ copy.releaseSummary }}
               </span>
             </template>
-            <el-input
+            <fsus-input
               v-model="productionForm.summary"
               v-bind="{ 'data-form-state': 'empty' }"
               type="textarea"
@@ -79,63 +79,63 @@
             <p class="task-field-message task-copy-stress--long-helper">
               {{ copy.releaseSummaryHelper }}
             </p>
-          </el-form-item>
+          </fsus-form-item>
         </section>
 
         <!-- @vue-ignore custom test contract attribute -->
         <section class="task-form-section" data-form-fixture="short-values">
           <h4>{{ copy.schedule }}</h4>
           <div class="task-short-fields">
-            <el-form-item class="task-field--number" :label="copy.reviewLimit">
-              <el-input-number
+            <fsus-form-item class="task-field--number" :label="copy.reviewLimit">
+              <fsus-input-number
                 :model-value="productionForm.reviewLimit"
                 :min="1"
                 :max="30"
                 @update:model-value="productionForm.reviewLimit = $event ?? 1"
               />
               <p class="task-field-message">{{ copy.reviewLimitHelper }}</p>
-            </el-form-item>
-            <el-form-item class="task-field--date" :label="copy.publishDate">
-              <el-date-picker
+            </fsus-form-item>
+            <fsus-form-item class="task-field--date" :label="copy.publishDate">
+              <fsus-date-picker
                 v-model="productionForm.publishDate"
                 type="date"
                 :placeholder="copy.publishDatePlaceholder"
               />
               <p class="task-field-message">{{ copy.publishDateHelper }}</p>
-            </el-form-item>
-            <el-form-item class="task-field--timezone" :label="copy.timezone">
-              <el-select
+            </fsus-form-item>
+            <fsus-form-item class="task-field--timezone" :label="copy.timezone">
+              <fsus-select
                 v-model="productionForm.timezone"
                 :placeholder="copy.timezonePlaceholder"
               >
-                <el-option
+                <fsus-option
                   :label="copy.timezoneShanghai"
                   value="Asia/Shanghai"
                 />
-                <el-option :label="copy.timezoneUtc" value="UTC" />
-              </el-select>
+                <fsus-option :label="copy.timezoneUtc" value="UTC" />
+              </fsus-select>
               <p class="task-field-message">{{ copy.timezoneHelper }}</p>
-            </el-form-item>
+            </fsus-form-item>
           </div>
         </section>
 
         <!-- @vue-ignore custom test contract attribute -->
         <section class="task-form-section" data-form-fixture="inline-pair">
           <h4>{{ copy.reviewWindow }}</h4>
-          <el-button
+          <fsus-button
             v-bind="{ 'data-testid': 'form-validation-toggle' }"
             @click="
               productionForm.showInlineError = !productionForm.showInlineError
             "
           >
             {{ copy.validationToggle }}
-          </el-button>
+          </fsus-button>
           <div class="task-inline-pair">
-            <el-form-item
+            <fsus-form-item
               :class="{ 'is-error': productionForm.showInlineError }"
               :label="copy.starts"
             >
-              <el-date-picker
+              <fsus-date-picker
                 v-model="productionForm.reviewStart"
                 type="date"
                 :placeholder="copy.startPlaceholder"
@@ -147,23 +147,23 @@
                 {{ copy.startError }}
               </p>
               <p v-else class="task-field-message">{{ copy.startHelper }}</p>
-            </el-form-item>
-            <el-form-item :label="copy.ends">
-              <el-date-picker
+            </fsus-form-item>
+            <fsus-form-item :label="copy.ends">
+              <fsus-date-picker
                 v-model="productionForm.reviewEnd"
                 type="date"
                 :placeholder="copy.endPlaceholder"
               />
               <p class="task-field-message">{{ copy.endHelper }}</p>
-            </el-form-item>
+            </fsus-form-item>
           </div>
         </section>
 
         <!-- @vue-ignore custom test contract attribute -->
         <section class="task-form-section" data-form-fixture="upload">
           <h4>{{ copy.coverAsset }}</h4>
-          <el-form-item :label="copy.coverImage">
-            <el-upload
+          <fsus-form-item :label="copy.coverImage">
+            <fsus-upload
               class="task-upload-field"
               drag
               action="#"
@@ -177,34 +177,34 @@
                   {{ copy.uploadError }}
                 </p>
               </template>
-            </el-upload>
-          </el-form-item>
+            </fsus-upload>
+          </fsus-form-item>
         </section>
 
         <!-- @vue-ignore custom test contract attribute -->
         <section class="task-form-section" data-form-fixture="states">
           <h4>{{ copy.states }}</h4>
-          <el-form-item :label="copy.releaseOwner">
-            <el-input
+          <fsus-form-item :label="copy.releaseOwner">
+            <fsus-input
               :model-value="copy.releaseOwnerValue"
               v-bind="{ 'data-form-state': 'disabled' }"
               disabled
             />
             <p class="task-field-message">{{ copy.releaseOwnerHelper }}</p>
-          </el-form-item>
-          <el-form-item
+          </fsus-form-item>
+          <fsus-form-item
             class="task-approval-controls"
             :label="copy.approvalControls"
           >
-            <el-checkbox
+            <fsus-checkbox
               :model-value="productionForm.requiresApproval"
               @update:model-value="
                 productionForm.requiresApproval = Boolean($event)
               "
             >
               {{ copy.requireApproval }}
-            </el-checkbox>
-            <el-switch
+            </fsus-checkbox>
+            <fsus-switch
               :model-value="productionForm.notifyReviewers"
               :active-text="copy.notifyReviewers"
               :inactive-text="copy.doNotNotify"
@@ -212,23 +212,23 @@
                 productionForm.notifyReviewers = Boolean($event)
               "
             />
-            <el-radio-group
+            <fsus-radio-group
               :model-value="productionForm.reviewMode"
               @update:model-value="productionForm.reviewMode = String($event)"
             >
-              <el-radio value="required">{{ copy.approvalRequired }}</el-radio>
-              <el-radio value="advisory">{{ copy.advisoryReview }}</el-radio>
-            </el-radio-group>
-          </el-form-item>
-          <el-button
+              <fsus-radio value="required">{{ copy.approvalRequired }}</fsus-radio>
+              <fsus-radio value="advisory">{{ copy.advisoryReview }}</fsus-radio>
+            </fsus-radio-group>
+          </fsus-form-item>
+          <fsus-button
             type="primary"
             v-bind="{ 'data-form-state': 'loading' }"
             loading
           >
             {{ copy.loading }}
-          </el-button>
+          </fsus-button>
         </section>
-      </el-form>
+      </fsus-form>
     </div>
     <div
       class="demo-block dark-form-authority-matrix"
@@ -266,7 +266,7 @@
                 {{ control.label }} · {{ state }}
               </span>
 
-              <el-input
+              <fsus-input
                 v-if="control.id === 'input'"
                 :model-value="
                   darkFormIsFilled(state) ? 'Release brief ready' : ''
@@ -274,7 +274,7 @@
                 :placeholder="darkFormPlaceholder(state, 'Enter release brief')"
                 :disabled="state === 'disabled'"
               />
-              <el-input
+              <fsus-input
                 v-else-if="control.id === 'textarea'"
                 type="textarea"
                 :model-value="
@@ -287,22 +287,22 @@
                 "
                 :disabled="state === 'disabled'"
               />
-              <el-select
+              <fsus-select
                 v-else-if="control.id === 'select'"
                 :model-value="darkFormIsFilled(state) ? 'members' : ''"
                 :placeholder="darkFormPlaceholder(state, 'Choose an audience')"
                 :disabled="state === 'disabled'"
               >
-                <el-option label="Signed-in members" value="members" />
-              </el-select>
-              <el-select-v2
+                <fsus-option label="Signed-in members" value="members" />
+              </fsus-select>
+              <fsus-select
                 v-else-if="control.id === 'select-v2'"
                 :model-value="darkFormIsFilled(state) ? 'approval' : ''"
                 :options="darkFormSelectOptions"
                 :placeholder="darkFormPlaceholder(state, 'Choose a workflow')"
                 :disabled="state === 'disabled'"
               />
-              <el-date-picker
+              <fsus-date-picker
                 v-else-if="control.id === 'date-picker'"
                 :model-value="
                   darkFormIsFilled(state) ? darkFormDate : undefined
@@ -311,7 +311,7 @@
                 :placeholder="darkFormPlaceholder(state, 'Choose a date')"
                 :disabled="state === 'disabled'"
               />
-              <el-time-picker
+              <fsus-time-picker
                 v-else-if="control.id === 'time-picker'"
                 :model-value="
                   darkFormIsFilled(state) ? darkFormDate : undefined
@@ -319,7 +319,7 @@
                 :placeholder="darkFormPlaceholder(state, 'Choose a time')"
                 :disabled="state === 'disabled'"
               />
-              <el-time-select
+              <fsus-time-select
                 v-else-if="control.id === 'time-select'"
                 :model-value="darkFormIsFilled(state) ? '09:00' : ''"
                 start="08:00"
@@ -330,13 +330,13 @@
                 "
                 :disabled="state === 'disabled'"
               />
-              <el-input-number
+              <fsus-input-number
                 v-else-if="control.id === 'input-number'"
                 :model-value="darkFormIsFilled(state) ? 7 : undefined"
                 :placeholder="darkFormPlaceholder(state, 'Set review days')"
                 :disabled="state === 'disabled'"
               />
-              <el-cascader
+              <fsus-cascader
                 v-else-if="control.id === 'cascader'"
                 :model-value="
                   darkFormIsFilled(state) ? ['editorial', 'release'] : []
@@ -347,7 +347,7 @@
                 "
                 :disabled="state === 'disabled'"
               />
-              <el-upload
+              <fsus-upload
                 v-else
                 drag
                 action="#"
@@ -363,7 +363,7 @@
                         : 'Drop a cover or browse'
                   }}
                 </p>
-              </el-upload>
+              </fsus-upload>
 
               <!-- @vue-ignore custom visual contract attribute -->
               <p
@@ -383,41 +383,41 @@
     </div>
     <div class="demo-block">
       <h3>Radio & RadioButton</h3>
-      <el-space direction="vertical" alignment="flex-start">
-        <el-radio-group v-model="radio">
-          <el-radio label="1">公开</el-radio>
-          <el-radio label="2">仅自己可见</el-radio>
-        </el-radio-group>
-        <el-radio-group v-model="radio">
-          <el-radio-button label="1">公开</el-radio-button>
-          <el-radio-button label="2">仅自己可见</el-radio-button>
-        </el-radio-group>
-      </el-space>
+      <fsus-space direction="vertical" alignment="flex-start">
+        <fsus-radio-group v-model="radio">
+          <fsus-radio label="1">公开</fsus-radio>
+          <fsus-radio label="2">仅自己可见</fsus-radio>
+        </fsus-radio-group>
+        <fsus-radio-group v-model="radio">
+          <fsus-radio-button label="1">公开</fsus-radio-button>
+          <fsus-radio-button label="2">仅自己可见</fsus-radio-button>
+        </fsus-radio-group>
+      </fsus-space>
     </div>
     <div class="demo-block">
       <h3>Checkbox & CheckboxButton</h3>
-      <el-space direction="vertical" alignment="flex-start">
-        <el-checkbox v-model="checkbox">Checkbox</el-checkbox>
-        <el-checkbox-group v-model="checkboxGroup">
-          <el-checkbox label="A">推送到首页</el-checkbox>
-          <el-checkbox label="B">保持普通</el-checkbox>
-        </el-checkbox-group>
-        <el-checkbox-group v-model="checkboxGroup">
-          <el-checkbox-button label="A">推送到首页</el-checkbox-button>
-          <el-checkbox-button label="B">保持普通</el-checkbox-button>
-        </el-checkbox-group>
-      </el-space>
+      <fsus-space direction="vertical" alignment="flex-start">
+        <fsus-checkbox v-model="checkbox">Checkbox</fsus-checkbox>
+        <fsus-checkbox-group v-model="checkboxGroup">
+          <fsus-checkbox label="A">推送到首页</fsus-checkbox>
+          <fsus-checkbox label="B">保持普通</fsus-checkbox>
+        </fsus-checkbox-group>
+        <fsus-checkbox-group v-model="checkboxGroup">
+          <fsus-checkbox-button label="A">推送到首页</fsus-checkbox-button>
+          <fsus-checkbox-button label="B">保持普通</fsus-checkbox-button>
+        </fsus-checkbox-group>
+      </fsus-space>
     </div>
     <div class="demo-block">
       <h3>Input</h3>
-      <el-space direction="vertical" style="width: 100%">
-        <el-input v-model="input" placeholder="输入文章标题" clearable />
-        <el-input
+      <fsus-space direction="vertical" style="width: 100%">
+        <fsus-input v-model="input" placeholder="输入文章标题" clearable />
+        <fsus-input
           v-model="input"
           type="textarea"
           placeholder="写下摘要或更新说明"
         />
-      </el-space>
+      </fsus-space>
     </div>
     <div
       class="demo-block"
@@ -425,35 +425,35 @@
       data-input-number-hit-fixtures
     >
       <h3>InputNumber</h3>
-      <el-space wrap :size="16">
-        <el-input-number
+      <fsus-space wrap :size="16">
+        <fsus-input-number
           v-model="inputNumber"
           :min="1"
           :max="10"
           data-input-number-case="default-sides"
         />
-        <el-input-number
+        <fsus-input-number
           v-model="inputNumber"
           size="small"
           :min="1"
           :max="10"
           data-input-number-case="small-sides"
         />
-        <el-input-number
+        <fsus-input-number
           v-model="inputNumber"
           size="large"
           :min="1"
           :max="10"
           data-input-number-case="large-sides"
         />
-        <el-input-number
+        <fsus-input-number
           v-model="inputNumber"
           controls-position="right"
           :min="1"
           :max="10"
           data-input-number-case="default-right"
         />
-        <el-input-number
+        <fsus-input-number
           v-model="inputNumber"
           size="small"
           controls-position="right"
@@ -461,7 +461,7 @@
           :max="10"
           data-input-number-case="small-right"
         />
-        <el-input-number
+        <fsus-input-number
           v-model="inputNumber"
           size="large"
           controls-position="right"
@@ -469,27 +469,27 @@
           :max="10"
           data-input-number-case="large-right"
         />
-        <el-input-number
+        <fsus-input-number
           v-model="inputNumber"
           :min="1"
           :max="10"
           disabled
           data-input-number-case="disabled-sides"
         />
-      </el-space>
+      </fsus-space>
     </div>
     <div class="demo-block">
       <h3>Select & Option & OptionGroup</h3>
-      <el-select v-model="select" placeholder="选择可见范围">
-        <el-option-group label="发布范围">
-          <el-option label="公开" value="1" />
-          <el-option label="仅自己可见" value="2" />
-        </el-option-group>
-      </el-select>
+      <fsus-select v-model="select" placeholder="选择可见范围">
+        <fsus-option-group label="发布范围">
+          <fsus-option label="公开" value="1" />
+          <fsus-option label="仅自己可见" value="2" />
+        </fsus-option-group>
+      </fsus-select>
     </div>
     <div class="demo-block">
       <h3>SelectV2</h3>
-      <el-select-v2
+      <fsus-select
         v-model="select"
         :options="selectV2Options"
         placeholder="选择工作流"
@@ -497,14 +497,14 @@
     </div>
     <div class="demo-block">
       <h3>Cascader & CascaderPanel</h3>
-      <el-space wrap>
-        <el-cascader :options="cascaderOptions" placeholder="选择分类" />
-        <el-cascader-panel :options="cascaderOptions" />
-      </el-space>
+      <fsus-space wrap>
+        <fsus-cascader :options="cascaderOptions" placeholder="选择分类" />
+        <fsus-cascader-panel :options="cascaderOptions" />
+      </fsus-space>
     </div>
     <div class="demo-block">
       <h3>Switch</h3>
-      <el-switch
+      <fsus-switch
         v-model="switchValue"
         active-text="Open"
         inactive-text="Close"
@@ -512,86 +512,86 @@
     </div>
     <div class="demo-block">
       <h3>Slider</h3>
-      <el-slider v-model="slider" />
+      <fsus-slider v-model="slider" />
     </div>
     <div class="demo-block">
       <h3>TimePicker / TimeSelect</h3>
-      <el-space wrap>
-        <el-time-picker v-model="time" placeholder="选择发布时间" />
-        <el-time-select
+      <fsus-space wrap>
+        <fsus-time-picker v-model="time" placeholder="选择发布时间" />
+        <fsus-time-select
           v-model="timeSelect"
           start="08:30"
           step="00:15"
           end="18:30"
           placeholder="选择推送时段"
         />
-      </el-space>
+      </fsus-space>
     </div>
     <div class="demo-block">
       <h3>DatePicker</h3>
-      <el-space direction="vertical">
-        <el-date-picker v-model="date" type="date" placeholder="选择日期" />
-        <el-date-picker
+      <fsus-space direction="vertical">
+        <fsus-date-picker v-model="date" type="date" placeholder="选择日期" />
+        <fsus-date-picker
           v-model="dateRange"
           type="daterange"
           range-separator="至"
           start-placeholder="开始日期"
           end-placeholder="结束日期"
         />
-      </el-space>
+      </fsus-space>
     </div>
     <div class="demo-block">
       <h3>Upload</h3>
-      <el-upload action="#" multiple :limit="3">
-        <el-button type="primary">上传封面</el-button>
+      <fsus-upload action="#" multiple :limit="3">
+        <fsus-button type="primary">上传封面</fsus-button>
         <template #tip>
           <div class="el-upload__tip">支持 jpg/png，单个文件 ≤ 500KB</div>
         </template>
-      </el-upload>
+      </fsus-upload>
     </div>
     <div class="demo-block">
       <h3>Rate</h3>
-      <el-rate v-model="rate" allow-half />
+      <fsus-rate v-model="rate" allow-half />
     </div>
     <div class="demo-block">
       <h3>ColorPicker</h3>
-      <el-color-picker
+      <fsus-color-picker
         :model-value="color"
         @update:model-value="color = $event || ''"
       />
     </div>
     <div class="demo-block">
       <h3>Transfer</h3>
-      <el-transfer v-model="transferValue" :data="transferData" />
+      <fsus-transfer v-model="transferValue" :data="transferData" />
     </div>
     <div class="demo-block">
       <h3>Form & FormItem</h3>
-      <el-form :model="formModel" label-width="120px">
-        <el-form-item label="文章标题">
-          <el-input v-model="formModel.name" />
-        </el-form-item>
-        <el-form-item label="可见范围">
+      <fsus-form :model="formModel" label-width="120px">
+        <fsus-form-item label="文章标题">
+          <fsus-input v-model="formModel.name" />
+        </fsus-form-item>
+        <fsus-form-item label="可见范围">
           <div data-testid="activity-zone-select-wrapper">
-            <el-select
+            <fsus-select
               v-model="formModel.region"
               placeholder="选择可见范围"
               :teleported="false"
             >
-              <el-option label="公开" value="shanghai" />
-              <el-option label="仅自己可见" value="beijing" />
-            </el-select>
+              <fsus-option label="公开" value="shanghai" />
+              <fsus-option label="仅自己可见" value="beijing" />
+            </fsus-select>
           </div>
-        </el-form-item>
-      </el-form>
+        </fsus-form-item>
+      </fsus-form>
     </div>
     <div class="demo-block">
       <h3>Autocomplete</h3>
-      <el-autocomplete v-model="input" :fetch-suggestions="querySearch" />
+      <fsus-autocomplete v-model="input" :fetch-suggestions="querySearch" />
     </div>
     <div class="demo-block tree-select-demo-block">
       <h3>TreeSelect</h3>
       <div class="tree-select-test-wrapper" data-testid="unique-tree-select">
-        <el-tree-select
+        <fsus-tree-select
           v-model="treeSelectValue"
           :data="treeData"
           :teleported="false"
@@ -847,7 +847,7 @@ const {
 
 .dark-form-control-group h4 {
   margin-bottom: 12px;
-  color: var(--el-text-color-primary);
+  color: var(--fsus-color-text-primary);
   font-size: 15px;
   line-height: 1.4;
 }
@@ -885,48 +885,48 @@ const {
 }
 
 .dark-form-contract-cell > [data-dark-form-helper].is-invalid {
-  color: var(--el-color-danger);
+  color: var(--fsus-color-status-danger);
 }
 
-.dark-form-contract-cell[data-state='placeholder'] :deep(.el-upload-dragger p),
-.dark-form-contract-cell[data-state='disabled'] :deep(.el-upload-dragger p) {
+.dark-form-contract-cell[data-state='placeholder'] :deep(.fsus-upload-dragger p),
+.dark-form-contract-cell[data-state='disabled'] :deep(.fsus-upload-dragger p) {
   color: var(--fsus-form-state-text);
 }
 
-.dark-form-contract-cell :deep(.el-input),
-.dark-form-contract-cell :deep(.el-select),
-.dark-form-contract-cell :deep(.el-date-editor),
-.dark-form-contract-cell :deep(.el-input-number),
-.dark-form-contract-cell :deep(.el-cascader),
-.dark-form-contract-cell :deep(.el-upload),
-.dark-form-contract-cell :deep(.el-upload-dragger) {
+.dark-form-contract-cell :deep(.fsus-input),
+.dark-form-contract-cell :deep(.fsus-select),
+.dark-form-contract-cell :deep(.fsus-date-editor),
+.dark-form-contract-cell :deep(.fsus-input-number),
+.dark-form-contract-cell :deep(.fsus-cascader),
+.dark-form-contract-cell :deep(.fsus-upload),
+.dark-form-contract-cell :deep(.fsus-upload-dragger) {
   width: 100%;
   min-width: 0;
 }
 
 .dark-form-contract-cell[data-state='hover']
   :deep(
-    .el-input__wrapper,
-    .el-textarea__inner,
-    .el-select__wrapper,
-    .el-date-editor.el-input__wrapper,
-    .el-input-number,
-    .el-upload-dragger
+    .fsus-input__wrapper,
+    .fsus-textarea__inner,
+    .fsus-select__wrapper,
+    .fsus-date-editor.fsus-input__wrapper,
+    .fsus-input-number,
+    .fsus-upload-dragger
   ) {
-  background: var(--el-bg-color);
+  background: var(--fsus-color-surface-base);
   border-color: var(--fsus-scholarly-blue);
 }
 
 .dark-form-contract-cell[data-state='focus']
   :deep(
-    .el-input__wrapper,
-    .el-textarea__inner,
-    .el-select__wrapper,
-    .el-date-editor.el-input__wrapper,
-    .el-input-number,
-    .el-upload-dragger
+    .fsus-input__wrapper,
+    .fsus-textarea__inner,
+    .fsus-select__wrapper,
+    .fsus-date-editor.fsus-input__wrapper,
+    .fsus-input-number,
+    .fsus-upload-dragger
   ) {
-  background: var(--el-bg-color);
+  background: var(--fsus-color-surface-base);
   border-color: var(--fsus-scholarly-blue);
   box-shadow: inset 0 0 0 var(--fsus-focus-ring-width, 2px)
     var(--fsus-scholarly-blue) !important;
@@ -934,15 +934,15 @@ const {
 
 .dark-form-contract-cell[data-state='invalid']
   :deep(
-    .el-input__wrapper,
-    .el-textarea__inner,
-    .el-select__wrapper,
-    .el-date-editor.el-input__wrapper,
-    .el-input-number,
-    .el-upload-dragger
+    .fsus-input__wrapper,
+    .fsus-textarea__inner,
+    .fsus-select__wrapper,
+    .fsus-date-editor.fsus-input__wrapper,
+    .fsus-input-number,
+    .fsus-upload-dragger
   ) {
-  border-color: var(--el-color-danger);
-  box-shadow: inset 0 0 0 1px var(--el-color-danger) !important;
+  border-color: var(--fsus-color-status-danger);
+  box-shadow: inset 0 0 0 1px var(--fsus-color-status-danger) !important;
 }
 
 .production-form-fixtures__header,
@@ -979,17 +979,17 @@ const {
 .production-form-fixtures__language button {
   min-height: 44px;
   padding: 0 14px;
-  border: 1px solid var(--el-border-color);
+  border: 1px solid var(--fsus-color-border-subtle);
   border-radius: 6px;
-  color: var(--el-text-color-regular);
-  background: var(--el-fill-color-blank);
+  color: var(--fsus-color-text-quiet);
+  background: var(--fsus-color-surface-base);
   font: inherit;
   cursor: pointer;
 }
 
 .production-form-fixtures__language button[aria-pressed='true'] {
-  border-color: var(--el-color-primary);
-  color: var(--el-color-primary);
+  border-color: var(--fsus-color-action-primary);
+  color: var(--fsus-color-action-primary);
 }
 
 .task-form-section + .task-form-section {
@@ -1002,12 +1002,12 @@ const {
   line-height: 1.4;
 }
 
-.task-form-fixture :deep(.el-form-item) {
+.task-form-fixture :deep(.fsus-form-item) {
   width: 100%;
   margin-bottom: 16px;
 }
 
-.task-form-fixture :deep(.el-form-item__label) {
+.task-form-fixture :deep(.fsus-form-item__label) {
   margin-bottom: 8px;
   color: var(--fsus-color-text-quiet);
   font-size: 14px;
@@ -1015,11 +1015,11 @@ const {
   line-height: 1.5;
 }
 
-.task-form-fixture :deep(.el-form-item__content),
-.task-form-fixture :deep(.el-input),
-.task-form-fixture :deep(.el-input-number),
-.task-form-fixture :deep(.el-select),
-.task-form-fixture :deep(.el-date-editor),
+.task-form-fixture :deep(.fsus-form-item__content),
+.task-form-fixture :deep(.fsus-input),
+.task-form-fixture :deep(.fsus-input-number),
+.task-form-fixture :deep(.fsus-select),
+.task-form-fixture :deep(.fsus-date-editor),
 .task-upload-field {
   width: 100%;
   min-width: 0;
@@ -1035,7 +1035,7 @@ const {
 }
 
 .task-field-message--error {
-  color: var(--el-color-danger);
+  color: var(--fsus-color-status-danger);
 }
 
 .task-short-fields,
@@ -1066,7 +1066,7 @@ const {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
-[data-form-fixture='inline-pair'] > .el-button {
+[data-form-fixture='inline-pair'] > .fsus-button {
   margin-bottom: 16px;
 }
 
@@ -1074,17 +1074,17 @@ const {
   text-align: left;
 }
 
-.task-upload-field :deep(.el-upload),
-.task-upload-field :deep(.el-upload-dragger) {
+.task-upload-field :deep(.fsus-upload),
+.task-upload-field :deep(.fsus-upload-dragger) {
   width: 100%;
 }
 
-.task-form-fixture :deep(.task-approval-controls .el-form-item__content) {
+.task-form-fixture :deep(.task-approval-controls .fsus-form-item__content) {
   gap: 12px 16px;
 }
 
-.task-form-fixture :deep(.task-approval-controls .el-checkbox),
-.task-form-fixture :deep(.task-approval-controls .el-radio) {
+.task-form-fixture :deep(.task-approval-controls .fsus-checkbox),
+.task-form-fixture :deep(.task-approval-controls .fsus-radio) {
   max-width: 100%;
   height: auto;
   min-width: 0;
@@ -1092,8 +1092,8 @@ const {
   white-space: normal;
 }
 
-.task-form-fixture :deep(.task-approval-controls .el-checkbox__label),
-.task-form-fixture :deep(.task-approval-controls .el-radio__label) {
+.task-form-fixture :deep(.task-approval-controls .fsus-checkbox__label),
+.task-form-fixture :deep(.task-approval-controls .fsus-radio__label) {
   min-width: 0;
   overflow-wrap: anywhere;
   white-space: normal;
@@ -1120,9 +1120,9 @@ const {
     gap: 0;
   }
 
-  :deep(.el-space--vertical),
-  :deep(.el-space--vertical > .el-space__item),
-  :deep(.el-date-editor--daterange) {
+  :deep(.fsus-space--vertical),
+  :deep(.fsus-space--vertical > .fsus-space__item),
+  :deep(.fsus-date-editor--daterange) {
     width: 100% !important;
     min-width: 0;
     max-width: 100%;

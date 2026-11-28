@@ -37,7 +37,7 @@ if (command === 'build') {
   runPackageBuild()
   const { manifest, tarballPath } = createCandidate({
     repoRoot,
-    packageRoot: path.join(repoRoot, 'dist', 'element-plus'),
+    packageRoot: path.join(repoRoot, 'dist', 'fsusui'),
     outputDir,
     sourceProfile: option('--profile', 'Release'),
   })

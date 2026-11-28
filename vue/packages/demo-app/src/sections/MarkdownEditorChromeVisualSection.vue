@@ -10,7 +10,7 @@
       <p class="chrome-visual-meta">
         编辑器 chrome 变体验收样张 · {{ chrome }} / {{ mode }}
       </p>
-      <el-markdown-editor
+      <fsus-markdown-editor
         v-model="docSource"
         :chrome="chrome"
         :default-mode="mode"
@@ -34,7 +34,7 @@
             }}{{ capability.length ? ` · ${capability.join(' / ')}` : '' }}
           </span>
         </template>
-      </el-markdown-editor>
+      </fsus-markdown-editor>
       <section class="chrome-visual-context">
         <h2>变更摘要</h2>
         <p>
@@ -153,7 +153,7 @@ const docSource = computed({
 }
 
 .chrome-visual-meta {
-  color: var(--el-text-color-secondary);
+  color: var(--fsus-color-text-quiet);
   font-size: 13px;
 }
 

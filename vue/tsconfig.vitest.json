@@ -9,8 +9,7 @@
       "ES2022.Error",
       "ES2022.Object",
       "DOM",
-      "DOM.Iterable",
-      "DOM.AsyncIterable"
+      "DOM.Iterable"
     ],
     "types": ["node", "jsdom"],
     "skipLibCheck": true,
@@ -19,7 +18,13 @@
     "strictNullChecks": false
   },
   "include": [
-    "packages",
+    "packages/core/src",
+    "packages/icons/src",
+    "packages/motion/src",
+    "packages/components/src",
+    "packages/fsusui/src",
+    "packages/markdown/src/__tests__",
+    "packages/wasm/__tests__",
     "vitest.setup.ts",
     "typings/components.d.ts",
     "typings/env.d.ts",
@@ -29,9 +34,8 @@
   ],
   "exclude": [
     "node_modules",
-    "dist",
+    "**/dist",
     "**/*.md",
-    "packages/components/*/style/**",
-    "packages/components/*/styles/**"
+    "packages/components/src/_native-pending/**/*"
   ]
 }

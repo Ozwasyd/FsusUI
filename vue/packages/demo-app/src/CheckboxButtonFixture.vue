@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import type { CheckboxValueType } from '@element-plus/components/checkbox'
+import type { CheckboxValueType } from '@ozwasyd/fsusui'
 import { ref } from 'vue'
-import { ElCheckboxButton } from '@element-plus/components/checkbox'
+import { FsusCheckboxButton } from '@ozwasyd/fsusui'
 
 const first = ref<CheckboxValueType>(true)
 const second = ref<CheckboxValueType>(false)
@@ -10,8 +10,8 @@ const third = ref<CheckboxValueType>(false)
 
 <template>
   <div style="display: inline-flex; gap: 8px; padding: 24px; background: #fff">
-    <el-checkbox-button v-model="first">Checked</el-checkbox-button>
-    <el-checkbox-button v-model="second">Unchecked</el-checkbox-button>
-    <el-checkbox-button v-model="third" disabled>Disabled</el-checkbox-button>
+    <fsus-checkbox-button v-model="first">Checked</fsus-checkbox-button>
+    <fsus-checkbox-button v-model="second">Unchecked</fsus-checkbox-button>
+    <fsus-checkbox-button v-model="third" disabled>Disabled</fsus-checkbox-button>
   </div>
 </template>

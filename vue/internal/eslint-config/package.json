@@ -1,16 +1,14 @@
 {
-  "name": "@element-plus/eslint-config",
-  "version": "0.0.1",
-  "description": "ESLint Config (Flat Config, ESLint 10)",
+  "name": "@fsusui/eslint-config",
+  "version": "2.0.0-alpha.0",
+  "private": true,
+  "description": "FsusUI ESLint Config (Flat Config, ESLint 10)",
   "license": "MIT",
   "type": "module",
   "exports": {
     ".": "./index.js"
   },
   "main": "index.js",
-  "publishConfig": {
-    "access": "public"
-  },
   "peerDependencies": {
     "eslint": "10.2.0"
   },

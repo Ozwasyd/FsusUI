@@ -1,83 +1,83 @@
 <template>
-      <AuditCard name="ElProgress" :state="auditState">
-        <el-progress :percentage="active ? 88 : 44" />
-        <el-progress type="circle" :percentage="active ? 72 : 28" />
+      <AuditCard name="FsusProgress" :state="auditState">
+        <fsus-progress :percentage="active ? 88 : 44" />
+        <fsus-progress type="circle" :percentage="active ? 72 : 28" />
       </AuditCard>
 
-      <AuditCard name="ElRadio" :state="auditState">
-        <el-radio :model-value="active ? 'selected' : ''" label="selected">
+      <AuditCard name="FsusRadio" :state="auditState">
+        <fsus-radio :model-value="active ? 'selected' : ''" label="selected">
           Radio
-        </el-radio>
+        </fsus-radio>
       </AuditCard>
 
-      <AuditCard name="ElRadioButton" :state="auditState">
-        <el-radio-group :model-value="active ? 'B' : 'A'">
-          <el-radio-button label="A">A</el-radio-button>
-          <el-radio-button label="B">B</el-radio-button>
-        </el-radio-group>
+      <AuditCard name="FsusRadioButton" :state="auditState">
+        <fsus-radio-group :model-value="active ? 'B' : 'A'">
+          <fsus-radio-button label="A">A</fsus-radio-button>
+          <fsus-radio-button label="B">B</fsus-radio-button>
+        </fsus-radio-group>
       </AuditCard>
 
-      <AuditCard name="ElRadioGroup" :state="auditState">
-        <el-radio-group :model-value="active ? '2' : '1'">
-          <el-radio label="1">One</el-radio>
-          <el-radio label="2">Two</el-radio>
-        </el-radio-group>
+      <AuditCard name="FsusRadioGroup" :state="auditState">
+        <fsus-radio-group :model-value="active ? '2' : '1'">
+          <fsus-radio label="1">One</fsus-radio>
+          <fsus-radio label="2">Two</fsus-radio>
+        </fsus-radio-group>
       </AuditCard>
 
-      <AuditCard name="ElRate" :state="auditState">
-        <el-rate :model-value="active ? 5 : 3" allow-half />
+      <AuditCard name="FsusRate" :state="auditState">
+        <fsus-rate :model-value="active ? 5 : 3" allow-half />
       </AuditCard>
 
-      <AuditCard name="ElResult" :state="auditState">
-        <el-result icon="success" title="Success" sub-title="Result detail">
+      <AuditCard name="FsusResult" :state="auditState">
+        <fsus-result icon="success" title="Success" sub-title="Result detail">
           <template #extra>
-            <el-button type="primary">Confirm</el-button>
+            <fsus-button type="primary">Confirm</fsus-button>
           </template>
-        </el-result>
+        </fsus-result>
       </AuditCard>
 
-      <AuditCard name="ElResponsiveCollection" :state="auditState">
-        <el-responsive-collection
+      <AuditCard name="FsusResponsiveCollection" :state="auditState">
+        <fsus-responsive-collection
           :items="responsiveCollectionItems"
           row-key="name"
           :compact="compact"
         >
           <template #table>
-            <el-table
+            <fsus-table
               :data="responsiveCollectionItems"
               size="small"
               height="132"
             >
-              <el-table-column prop="name" label="Name" />
-              <el-table-column prop="state" label="State" />
-            </el-table>
+              <fsus-table-column prop="name" label="Name" />
+              <fsus-table-column prop="state" label="State" />
+            </fsus-table>
           </template>
           <template #card="{ item }">
             <div class="audit-responsive-card" role="listitem">
               {{ formatCollectionItem(item) }}
             </div>
           </template>
-        </el-responsive-collection>
+        </fsus-responsive-collection>
       </AuditCard>
 
-      <AuditCard name="ElRow" :state="auditState">
-        <el-row :gutter="12">
-          <el-col :span="8"><div class="audit-grid-cell">8</div></el-col>
-          <el-col :span="16"><div class="audit-grid-cell">16</div></el-col>
-        </el-row>
+      <AuditCard name="FsusRow" :state="auditState">
+        <fsus-row :gutter="12">
+          <fsus-col :span="8"><div class="audit-grid-cell">8</div></fsus-col>
+          <fsus-col :span="16"><div class="audit-grid-cell">16</div></fsus-col>
+        </fsus-row>
       </AuditCard>
 
-      <AuditCard name="ElScrollbar" :state="auditState">
-        <el-scrollbar height="140px">
+      <AuditCard name="FsusScrollbar" :state="auditState">
+        <fsus-scrollbar height="140px">
           <div v-for="item in 6" :key="item" class="audit-virtual-row">
             Scroll item {{ item }}
           </div>
-        </el-scrollbar>
+        </fsus-scrollbar>
       </AuditCard>
 
-      <AuditCard name="ElSectionNav" :state="auditState">
+      <AuditCard name="FsusSectionNav" :state="auditState">
         <div class="audit-settings-primitives">
-          <ElSectionNav
+          <FsusSectionNav
             ariaLabel="Settings audit sections"
             :density="compact ? 'compact' : 'default'"
           >
@@ -101,26 +101,26 @@
             >
               Disabled
             </a>
-          </ElSectionNav>
+          </FsusSectionNav>
 
-          <ElSettingsSection
+          <FsusSettingsSection
             title="Generic settings"
             description="Reusable layout for copy supplied by the product."
             title-tag="h3"
             :density="compact ? 'compact' : 'default'"
           >
             <template #actions>
-              <el-button size="small">Update</el-button>
+              <fsus-button size="small">Update</fsus-button>
             </template>
 
-            <ElSectionHeader
+            <FsusSectionHeader
               title="Standalone header"
               description="Header primitive without an eyebrow."
               title-tag="h4"
               :density="compact ? 'compact' : 'default'"
             />
 
-            <ElFormSection
+            <FsusFormSection
               title="Form group"
               description="Labels and inputs remain owned by the form."
               title-tag="h4"
@@ -130,66 +130,66 @@
                 Label
                 <input :value="activeText" />
               </label>
-            </ElFormSection>
+            </FsusFormSection>
 
-            <ElResourceList :density="compact ? 'compact' : 'default'">
-              <ElResourceListItem
+            <FsusResourceList :density="compact ? 'compact' : 'default'">
+              <FsusResourceListItem
                 title="Resource Alpha"
                 description="Updated recently"
                 :density="compact ? 'compact' : 'default'"
               >
                 <template #badge>
-                  <el-tag size="small" type="info">Ready</el-tag>
+                  <fsus-tag size="small" type="info">Ready</fsus-tag>
                 </template>
-                <ElMetadataRow :density="compact ? 'compact' : 'default'">
-                  <ElMetadataItem label="Created" value="2026-01-01" />
-                  <ElMetadataItem label="Fingerprint" monospace />
-                </ElMetadataRow>
+                <FsusMetadataRow :density="compact ? 'compact' : 'default'">
+                  <FsusMetadataItem label="Created" value="2026-01-01" />
+                  <FsusMetadataItem label="Fingerprint" monospace />
+                </FsusMetadataRow>
                 <template #actions>
-                  <ElInlineActions ariaLabel="Resource actions">
-                    <el-button text size="small">Edit</el-button>
-                  </ElInlineActions>
+                  <FsusInlineActions ariaLabel="Resource actions">
+                    <fsus-button text size="small">Edit</fsus-button>
+                  </FsusInlineActions>
                 </template>
-              </ElResourceListItem>
-              <ElResourceListItem title="Empty resource group">
-                <ElEmptyState
+              </FsusResourceListItem>
+              <FsusResourceListItem title="Empty resource group">
+                <FsusEmptyState
                   size="inline"
                   title="No resources"
                   description="Add product-owned copy here."
                 />
-              </ElResourceListItem>
-            </ElResourceList>
-          </ElSettingsSection>
+              </FsusResourceListItem>
+            </FsusResourceList>
+          </FsusSettingsSection>
 
-          <ElDangerZone
+          <FsusDangerZone
             title="Risk area"
             description="Use explicit text in addition to color."
             title-tag="h3"
             :density="compact ? 'compact' : 'default'"
           >
-            <ElRiskNotice title="Review" role="note">
+            <FsusRiskNotice title="Review" role="note">
               Confirm consequences before continuing.
-            </ElRiskNotice>
-            <ElDestructiveActionPanel title="Destructive action">
+            </FsusRiskNotice>
+            <FsusDestructiveActionPanel title="Destructive action">
               <template #description>
                 Product copy explains the outcome and recovery path.
               </template>
               <template #actions>
-                <el-button type="danger" size="small">Continue</el-button>
+                <fsus-button type="danger" size="small">Continue</fsus-button>
               </template>
-            </ElDestructiveActionPanel>
-            <ElTypedConfirmField
+            </FsusDestructiveActionPanel>
+            <FsusTypedConfirmField
               :model-value="active ? 'CONFIRM' : 'CONF'"
               phrase="CONFIRM"
               label="Confirmation phrase"
               description="Type the exact phrase to continue."
             />
-          </ElDangerZone>
+          </FsusDangerZone>
         </div>
       </AuditCard>
 
-      <AuditCard name="ElSiteHeader" :state="auditState">
-        <ElSiteHeader
+      <AuditCard name="FsusSiteHeader" :state="auditState">
+        <FsusSiteHeader
           :sticky="false"
           max-width="100%"
           ariaLabel="Audit site header"
@@ -202,18 +202,18 @@
             <a href="#audit-components">Components</a>
           </template>
           <template #desktop-actions>
-            <el-button size="small" data-audit-target data-audit-active>
+            <fsus-button size="small" data-audit-target data-audit-active>
               Action
-            </el-button>
+            </fsus-button>
           </template>
           <template #mobile-primary-actions>
-            <el-button size="small">Menu</el-button>
+            <fsus-button size="small">Menu</fsus-button>
           </template>
-        </ElSiteHeader>
+        </FsusSiteHeader>
       </AuditCard>
 
-      <AuditCard name="ElSelect" :state="auditState">
-        <el-select
+      <AuditCard name="FsusSelect" :state="auditState">
+        <fsus-select
           :model-value="active ? 'two' : ''"
           placeholder="Select"
           :teleported="false"
@@ -221,13 +221,13 @@
           data-audit-target
           data-audit-active
         >
-          <el-option label="One" value="one" />
-          <el-option label="Two" value="two" />
-        </el-select>
+          <fsus-option label="One" value="one" />
+          <fsus-option label="Two" value="two" />
+        </fsus-select>
       </AuditCard>
 
-      <AuditCard name="ElSelectV2" :state="auditState">
-        <el-select-v2
+      <AuditCard name="FsusSelect" :state="auditState">
+        <fsus-select
           :model-value="active ? 'cover-review' : ''"
           :options="selectV2Options"
           placeholder="选择工作流"
@@ -237,115 +237,115 @@
         />
       </AuditCard>
 
-      <AuditCard name="ElSlider" :state="auditState">
-        <el-slider :model-value="active ? 80 : 40" data-audit-target />
+      <AuditCard name="FsusSlider" :state="auditState">
+        <fsus-slider :model-value="active ? 80 : 40" data-audit-target />
       </AuditCard>
 
-      <AuditCard name="ElSkeleton" :state="auditState">
-        <el-skeleton style="width: 240px" animated>
+      <AuditCard name="FsusSkeleton" :state="auditState">
+        <fsus-skeleton style="width: 240px" animated>
           <template #template>
-            <el-skeleton-item
+            <fsus-skeleton-item
               variant="image"
               style="width: 100%; height: 88px"
             />
-            <el-skeleton-item
+            <fsus-skeleton-item
               variant="text"
               style="width: 80%; margin-top: 12px"
             />
           </template>
-        </el-skeleton>
+        </fsus-skeleton>
       </AuditCard>
 
-      <AuditCard name="ElSkeletonItem" :state="auditState">
-        <el-skeleton animated>
+      <AuditCard name="FsusSkeletonItem" :state="auditState">
+        <fsus-skeleton animated>
           <template #template>
-            <el-skeleton-item variant="p" style="width: 80%; height: 18px" />
+            <fsus-skeleton-item variant="p" style="width: 80%; height: 18px" />
           </template>
-        </el-skeleton>
+        </fsus-skeleton>
       </AuditCard>
 
-      <AuditCard name="ElSpace" :state="auditState">
-        <el-space wrap>
-          <el-button>A</el-button>
-          <el-button type="primary">B</el-button>
-        </el-space>
+      <AuditCard name="FsusSpace" :state="auditState">
+        <fsus-space wrap>
+          <fsus-button>A</fsus-button>
+          <fsus-button type="primary">B</fsus-button>
+        </fsus-space>
       </AuditCard>
 
-      <AuditCard name="ElStatistic" :state="auditState">
-        <el-statistic title="Active users" :value="active ? 268500 : 128000" />
+      <AuditCard name="FsusStatistic" :state="auditState">
+        <fsus-statistic title="Active users" :value="active ? 268500 : 128000" />
       </AuditCard>
 
-      <AuditCard name="ElStep" :state="auditState">
-        <el-steps :active="active ? 2 : 1">
-          <el-step title="Draft" />
-          <el-step title="Review" />
-          <el-step title="Ship" />
-        </el-steps>
+      <AuditCard name="FsusStep" :state="auditState">
+        <fsus-steps :active="active ? 2 : 1">
+          <fsus-step title="Draft" />
+          <fsus-step title="Review" />
+          <fsus-step title="Ship" />
+        </fsus-steps>
       </AuditCard>
 
-      <AuditCard name="ElSteps" :state="auditState">
-        <el-steps :active="active ? 2 : 1">
-          <el-step title="撰写" description="整理正文" />
-          <el-step title="复核" description="检查权限" />
-          <el-step title="发布" description="同步公开页" />
-        </el-steps>
+      <AuditCard name="FsusSteps" :state="auditState">
+        <fsus-steps :active="active ? 2 : 1">
+          <fsus-step title="撰写" description="整理正文" />
+          <fsus-step title="复核" description="检查权限" />
+          <fsus-step title="发布" description="同步公开页" />
+        </fsus-steps>
       </AuditCard>
 
-      <AuditCard name="ElSubMenu" :state="auditState">
-        <el-menu default-active="2" :default-openeds="['sub']">
-          <el-sub-menu index="sub">
+      <AuditCard name="FsusSubMenu" :state="auditState">
+        <fsus-menu default-active="2" :default-openeds="['sub']">
+          <fsus-sub-menu index="sub">
             <template #title>Sub menu</template>
-            <el-menu-item index="2">Nested item</el-menu-item>
-          </el-sub-menu>
-        </el-menu>
+            <fsus-menu-item index="2">Nested item</fsus-menu-item>
+          </fsus-sub-menu>
+        </fsus-menu>
       </AuditCard>
 
-      <AuditCard name="ElSwitch" :state="auditState">
-        <el-switch
+      <AuditCard name="FsusSwitch" :state="auditState">
+        <fsus-switch
           :model-value="active"
           active-text="Open"
           inactive-text="Closed"
         />
       </AuditCard>
 
-      <AuditCard name="ElTabPane" :state="auditState">
-        <el-tabs :model-value="active ? 'second' : 'first'">
-          <el-tab-pane label="First" name="first">First pane</el-tab-pane>
-          <el-tab-pane label="Second" name="second">Second pane</el-tab-pane>
-        </el-tabs>
+      <AuditCard name="FsusTabPane" :state="auditState">
+        <fsus-tabs :model-value="active ? 'second' : 'first'">
+          <fsus-tab-pane label="First" name="first">First pane</fsus-tab-pane>
+          <fsus-tab-pane label="Second" name="second">Second pane</fsus-tab-pane>
+        </fsus-tabs>
       </AuditCard>
 
-      <AuditCard name="ElTable" :state="auditState">
-        <el-table :data="tableData" border style="width: 100%">
-          <el-table-column prop="name" label="Name" width="120" />
-          <el-table-column prop="state" label="State" />
-        </el-table>
+      <AuditCard name="FsusTable" :state="auditState">
+        <fsus-table :data="tableData" border style="width: 100%">
+          <fsus-table-column prop="name" label="Name" width="120" />
+          <fsus-table-column prop="state" label="State" />
+        </fsus-table>
       </AuditCard>
 
-      <AuditCard name="ElTableColumn" :state="auditState">
-        <el-table :data="tableData" border style="width: 100%">
-          <el-table-column prop="name" label="Column" />
-        </el-table>
+      <AuditCard name="FsusTableColumn" :state="auditState">
+        <fsus-table :data="tableData" border style="width: 100%">
+          <fsus-table-column prop="name" label="Column" />
+        </fsus-table>
       </AuditCard>
 
-      <AuditCard name="ElAutoResizer" :state="auditState">
+      <AuditCard name="FsusAutoResizer" :state="auditState">
         <div class="audit-table-v2-frame">
-          <el-auto-resizer>
+          <fsus-auto-resizer>
             <template #default="{ height, width }">
-              <el-table-v2
+              <fsus-table
                 :columns="tableV2Columns"
                 :data="tableV2Data"
                 :width="width"
                 :height="height"
               />
             </template>
-          </el-auto-resizer>
+          </fsus-auto-resizer>
         </div>
       </AuditCard>
 
-      <AuditCard name="ElTableV2" :state="auditState">
+      <AuditCard name="FsusTable" :state="auditState">
         <div class="audit-table-v2-frame">
-          <el-table-v2
+          <fsus-table
             :columns="tableV2Columns"
             :data="tableV2Data"
             :width="260"
@@ -354,28 +354,28 @@
         </div>
       </AuditCard>
 
-      <AuditCard name="ElTabs" :state="auditState">
-        <el-tabs :model-value="active ? 'second' : 'first'">
-          <el-tab-pane label="First" name="first">First content</el-tab-pane>
-          <el-tab-pane label="Second" name="second">Second content</el-tab-pane>
-        </el-tabs>
+      <AuditCard name="FsusTabs" :state="auditState">
+        <fsus-tabs :model-value="active ? 'second' : 'first'">
+          <fsus-tab-pane label="First" name="first">First content</fsus-tab-pane>
+          <fsus-tab-pane label="Second" name="second">Second content</fsus-tab-pane>
+        </fsus-tabs>
       </AuditCard>
 
-      <AuditCard name="ElTag" :state="auditState">
-        <el-space wrap>
-          <el-tag :type="active ? 'info' : undefined">Tag</el-tag>
-          <el-tag type="info">Info</el-tag>
-        </el-space>
+      <AuditCard name="FsusTag" :state="auditState">
+        <fsus-space wrap>
+          <fsus-tag :type="active ? 'info' : undefined">Tag</fsus-tag>
+          <fsus-tag type="info">Info</fsus-tag>
+        </fsus-space>
       </AuditCard>
 
-      <AuditCard name="ElText" :state="auditState">
-        <el-text :type="active ? 'primary' : undefined">
+      <AuditCard name="FsusText" :state="auditState">
+        <fsus-text :type="active ? 'primary' : undefined">
           Editorial text sample
-        </el-text>
+        </fsus-text>
       </AuditCard>
 
-      <AuditCard name="ElThemeModeToggle" :state="auditState">
-        <el-theme-mode-toggle
+      <AuditCard name="FsusThemeModeToggle" :state="auditState">
+        <fsus-theme-mode-toggle
           :model-value="themeMode"
           :compact="compact"
           data-audit-focus
@@ -383,8 +383,8 @@
         />
       </AuditCard>
 
-      <AuditCard name="ElTimePicker" :state="auditState">
-        <el-time-picker
+      <AuditCard name="FsusTimePicker" :state="auditState">
+        <fsus-time-picker
           :model-value="dateValue"
           placeholder="Pick time"
           data-audit-focus
@@ -392,8 +392,8 @@
         />
       </AuditCard>
 
-      <AuditCard name="ElTimeSelect" :state="auditState">
-        <el-time-select
+      <AuditCard name="FsusTimeSelect" :state="auditState">
+        <fsus-time-select
           :model-value="active ? '09:00' : ''"
           start="08:30"
           step="00:15"
@@ -404,27 +404,27 @@
         />
       </AuditCard>
 
-      <AuditCard name="ElTimeline" :state="auditState">
-        <el-timeline>
-          <el-timeline-item timestamp="2026/05/20" placement="top">
+      <AuditCard name="FsusTimeline" :state="auditState">
+        <fsus-timeline>
+          <fsus-timeline-item timestamp="2026/05/20" placement="top">
             Audit started
-          </el-timeline-item>
-          <el-timeline-item timestamp="2026/05/21" placement="top">
+          </fsus-timeline-item>
+          <fsus-timeline-item timestamp="2026/05/21" placement="top">
             Review
-          </el-timeline-item>
-        </el-timeline>
+          </fsus-timeline-item>
+        </fsus-timeline>
       </AuditCard>
 
-      <AuditCard name="ElTimelineItem" :state="auditState">
-        <el-timeline>
-          <el-timeline-item timestamp="2026/05/20">
+      <AuditCard name="FsusTimelineItem" :state="auditState">
+        <fsus-timeline>
+          <fsus-timeline-item timestamp="2026/05/20">
             Timeline item
-          </el-timeline-item>
-        </el-timeline>
+          </fsus-timeline-item>
+        </fsus-timeline>
       </AuditCard>
 
-      <AuditCard name="ElTooltip" :state="auditState">
-        <el-tooltip
+      <AuditCard name="FsusTooltip" :state="auditState">
+        <fsus-tooltip
           content="Tooltip content"
           placement="bottom-start"
           :trigger="['hover', 'click']"
@@ -432,30 +432,30 @@
           :hide-after="0"
           :teleported="false"
         >
-          <el-button data-audit-focus data-audit-target data-audit-active>
+          <fsus-button data-audit-focus data-audit-target data-audit-active>
             Tooltip
-          </el-button>
-        </el-tooltip>
+          </fsus-button>
+        </fsus-tooltip>
       </AuditCard>
 
-      <AuditCard name="ElTooltipV2" :state="auditState">
-        <el-tooltip-v2
+      <AuditCard name="FsusTooltip" :state="auditState">
+        <fsus-tooltip
           :placement="boundary ? 'bottom-start' : 'right'"
           :open="active"
           :delay-duration="0"
           :teleported="false"
         >
           <template #trigger>
-            <el-button data-audit-focus data-audit-target data-audit-active>
+            <fsus-button data-audit-focus data-audit-target data-audit-active>
               Tooltip V2
-            </el-button>
+            </fsus-button>
           </template>
           Tooltip V2 content
-        </el-tooltip-v2>
+        </fsus-tooltip>
       </AuditCard>
 
-      <AuditCard name="ElTransfer" :state="auditState">
-        <el-transfer
+      <AuditCard name="FsusTransfer" :state="auditState">
+        <fsus-transfer
           :model-value="active ? [1, 2] : [1]"
           :data="transferData"
           filterable
@@ -463,8 +463,8 @@
         />
       </AuditCard>
 
-      <AuditCard name="ElTree" :state="auditState">
-        <el-tree
+      <AuditCard name="FsusTree" :state="auditState">
+        <fsus-tree
           :data="treeData"
           node-key="value"
           show-checkbox
@@ -473,8 +473,8 @@
         />
       </AuditCard>
 
-      <AuditCard name="ElTreeSelect" :state="auditState">
-        <el-tree-select
+      <AuditCard name="FsusTreeSelect" :state="auditState">
+        <fsus-tree-select
           :model-value="active ? 'level-1-1' : 'level-1'"
           :data="treeData"
           :teleported="false"
@@ -485,8 +485,8 @@
         />
       </AuditCard>
 
-      <AuditCard name="ElTreeV2" :state="auditState">
-        <el-tree-v2
+      <AuditCard name="FsusTree" :state="auditState">
+        <fsus-tree
           :data="treeDataV2"
           :height="180"
           :item-size="44"
@@ -494,40 +494,40 @@
         />
       </AuditCard>
 
-      <AuditCard name="ElUpload" :state="auditState">
-        <el-upload action="#" :auto-upload="false" drag>
-          <el-icon class="el-icon--upload"><UploadFilled /></el-icon>
+      <AuditCard name="FsusUpload" :state="auditState">
+        <fsus-upload action="#" :auto-upload="false" drag>
+          <fsus-icon class="el-icon--upload"><UploadFilled /></fsus-icon>
           <div class="el-upload__text">Drop a file here or <em>browse</em></div>
           <p data-upload-help>PNG/JPG, max 10 MB</p>
-        </el-upload>
+        </fsus-upload>
       </AuditCard>
 
-      <AuditCard name="ElWatermark" :state="auditState">
-        <el-watermark content="FsusUI">
+      <AuditCard name="FsusWatermark" :state="auditState">
+        <fsus-watermark content="FsusUI">
           <div class="audit-watermark-box" />
-        </el-watermark>
+        </fsus-watermark>
       </AuditCard>
 </template>
 
 <script setup lang="ts">
-import * as Icons from '@element-plus/icons-vue'
+import * as Icons from '@fsusui/icons'
 import {
-  ElDangerZone,
-  ElDestructiveActionPanel,
-  ElEmptyState,
-  ElFormSection,
-  ElInlineActions,
-  ElMetadataItem,
-  ElMetadataRow,
-  ElResourceList,
-  ElResourceListItem,
-  ElRiskNotice,
-  ElSectionHeader,
-  ElSectionNav,
-  ElSettingsSection,
-  ElSiteHeader,
-  ElTypedConfirmField,
-} from '../../../element-plus'
+  FsusDangerZone,
+  FsusDestructiveActionPanel,
+  FsusEmptyState,
+  FsusFormSection,
+  FsusInlineActions,
+  FsusMetadataItem,
+  FsusMetadataRow,
+  FsusResourceList,
+  FsusResourceListItem,
+  FsusRiskNotice,
+  FsusSectionHeader,
+  FsusSectionNav,
+  FsusSettingsSection,
+  FsusSiteHeader,
+  FsusTypedConfirmField,
+} from '@ozwasyd/fsusui'
 import AuditCard from '../AuditCard.vue'
 import type { UiAuditState } from '../ui-audit-manifest'
 import type { AuditGridData } from './use-audit-grid-data'

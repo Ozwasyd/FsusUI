@@ -1,8 +1,6 @@
-import { spawnSync } from 'node:child_process'
 import {
   artifactGroups,
   inspectArtifactGroup,
-  root,
   writeFingerprint,
 } from './test-artifact-cache.mjs'
 
@@ -14,39 +12,29 @@ const status = await inspectArtifactGroup(group)
 const [fingerprint] = status.fingerprints
 const sourceHash = status.sourceHash.slice(0, 16)
 
+if (fingerprint.missingArtifacts.length > 0) {
+  console.error(
+    `[ensure-icons] missing @fsusui/icons source artifacts: ${fingerprint.missingArtifacts.join(', ')}`,
+  )
+  process.exit(1)
+}
+
 if (!force && status.fresh) {
   console.log(
-    `[ensure-icons] cache-hit source-hash=${sourceHash}; reusing vue/packages/icons-vue/dist artifacts.`,
+    `[ensure-icons] cache-hit source-hash=${sourceHash}; @fsusui/icons pure-TS source ready.`,
   )
   process.exit(0)
 }
 
-const action = dryRun
-  ? 'dry-run skipped rebuild.'
-  : 'rebuilding icons-vue artifacts.'
-console.log(
-  [
-    `[ensure-icons] ${force ? 'force rebuild requested' : 'cache-miss'} source-hash=${sourceHash}; ${action}`,
-    ...status.staleReasons.map((reason) => `  - ${reason}`),
-  ].join('\n'),
-)
-if (dryRun) process.exit(0)
-
-const build = spawnSync(
-  'pnpm',
-  ['run', '-C', 'vue/packages/icons-vue', 'build'],
-  {
-    cwd: root,
-    stdio: 'inherit',
-    shell: process.platform === 'win32',
-  },
-)
-
-if (build.status !== 0) {
-  process.exit(build.status ?? 1)
+if (dryRun) {
+  console.log(`[ensure-icons] dry-run source-hash=${sourceHash}.`)
+  process.exit(0)
 }
 
 await writeFingerprint(
   fingerprint.fingerprintPath,
   fingerprint.currentFingerprint,
+)
+console.log(
+  `[ensure-icons] verified pure-TS @fsusui/icons source-hash=${sourceHash}.`,
 )

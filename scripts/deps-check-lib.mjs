@@ -746,7 +746,7 @@ export function checkPackageCandidateFields(root = repoRoot, authority) {
 
   // Optional prepared package candidate / dist package.json if present
   const candidateRels = [
-    'dist/element-plus/package.json',
+    'dist/fsusui/package.json',
     'dist/npm-candidate/package/package.json',
   ]
   for (const rel of candidateRels) {

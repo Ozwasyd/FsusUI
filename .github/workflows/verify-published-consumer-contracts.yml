@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: 'Published @ozwasyd/element-plus version on GitHub Packages (e.g. 1.6.0-preview.8)'
+        description: 'Published @ozwasyd/fsusui version on GitHub Packages (e.g. 2.0.0-alpha.0)'
         required: true
         type: string
 
@@ -40,7 +40,7 @@ jobs:
       - name: Verify published package metadata and run standalone consumer contracts
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          TARGET_PACKAGE: '@ozwasyd/element-plus'
+          TARGET_PACKAGE: '@ozwasyd/fsusui'
           TARGET_VERSION: ${{ inputs.version }}
         run: |
           mkdir -p .consumer-contracts

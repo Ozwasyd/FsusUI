@@ -10,36 +10,36 @@
     <div class="demo-block" data-upload-fixture="dragger">
       <h3>Dragger</h3>
       <div class="upload-fixture-row" data-upload-variant="dragger-default">
-        <el-upload drag action="#" :auto-upload="false">
+        <fsus-upload drag action="#" :auto-upload="false">
           <div class="el-upload__text">
             Drop file here or <em>click to upload</em>
           </div>
           <p data-upload-help>PNG or JPEG, up to 2 MB. 16:9 crop.</p>
-        </el-upload>
+        </fsus-upload>
       </div>
       <div class="upload-fixture-row" data-upload-variant="dragger-disabled">
-        <el-upload drag action="#" :auto-upload="false" disabled>
+        <fsus-upload drag action="#" :auto-upload="false" disabled>
           <div class="el-upload__text">
             Drop file here or <em>click to upload</em>
           </div>
           <p data-upload-help>Uploads are currently disabled.</p>
-        </el-upload>
+        </fsus-upload>
       </div>
       <div class="upload-fixture-row" data-upload-variant="dragger-cjk">
-        <el-upload drag action="#" :auto-upload="false">
+        <fsus-upload drag action="#" :auto-upload="false">
           <div class="el-upload__text">
             将文件拖到此处，或<em>点击上传</em>
           </div>
           <p data-upload-help>支持 PNG 或 JPEG，最大 2 MB，裁切比例为 16:9。</p>
-        </el-upload>
+        </fsus-upload>
       </div>
       <div class="upload-fixture-row" data-upload-variant="dragger-rtl" dir="rtl">
-        <el-upload drag action="#" :auto-upload="false">
+        <fsus-upload drag action="#" :auto-upload="false">
           <div class="el-upload__text">
             גרור קובץ לכאן או <em>לחץ להעלאה</em>
           </div>
           <p data-upload-help>PNG או JPEG, עד 2 MB.</p>
-        </el-upload>
+        </fsus-upload>
       </div>
     </div>
 
@@ -47,49 +47,49 @@
     <div class="demo-block" data-upload-fixture="text-list">
       <h3>Text File List</h3>
       <div class="upload-fixture-row" data-upload-variant="text-ready">
-        <el-upload
+        <fsus-upload
           action="#"
           :auto-upload="false"
           :file-list="textReadyFiles"
         />
       </div>
       <div class="upload-fixture-row" data-upload-variant="text-uploading">
-        <el-upload
+        <fsus-upload
           action="#"
           :auto-upload="false"
           :file-list="textUploadingFiles"
         />
       </div>
       <div class="upload-fixture-row" data-upload-variant="text-success">
-        <el-upload
+        <fsus-upload
           action="#"
           :auto-upload="false"
           :file-list="textSuccessFiles"
         />
       </div>
       <div class="upload-fixture-row" data-upload-variant="text-fail">
-        <el-upload
+        <fsus-upload
           action="#"
           :auto-upload="false"
           :file-list="textFailFiles"
         />
       </div>
       <div class="upload-fixture-row" data-upload-variant="text-long-filename">
-        <el-upload
+        <fsus-upload
           action="#"
           :auto-upload="false"
           :file-list="textLongFilenameFiles"
         />
       </div>
       <div class="upload-fixture-row" data-upload-variant="text-mixed">
-        <el-upload
+        <fsus-upload
           action="#"
           :auto-upload="false"
           :file-list="textMixedFiles"
         />
       </div>
       <div class="upload-fixture-row" data-upload-variant="text-disabled">
-        <el-upload
+        <fsus-upload
           action="#"
           :auto-upload="false"
           :file-list="textDisabledFiles"
@@ -102,7 +102,7 @@
     <div class="demo-block" data-upload-fixture="picture-list">
       <h3>Picture List</h3>
       <div class="upload-fixture-row" data-upload-variant="picture-default">
-        <el-upload
+        <fsus-upload
           action="#"
           list-type="picture"
           :auto-upload="false"
@@ -110,7 +110,7 @@
         />
       </div>
       <div class="upload-fixture-row" data-upload-variant="picture-multi">
-        <el-upload
+        <fsus-upload
           action="#"
           list-type="picture"
           :auto-upload="false"
@@ -118,7 +118,7 @@
         />
       </div>
       <div class="upload-fixture-row" data-upload-variant="picture-status">
-        <el-upload
+        <fsus-upload
           action="#"
           list-type="picture"
           :auto-upload="false"
@@ -131,7 +131,7 @@
         class="upload-fixture-row"
         data-upload-variant="picture-status-disabled"
       >
-        <el-upload
+        <fsus-upload
           action="#"
           list-type="picture"
           :auto-upload="false"
@@ -145,7 +145,7 @@
     <div class="demo-block" data-upload-fixture="picture-card-list">
       <h3>Picture Card List</h3>
       <div class="upload-fixture-row" data-upload-variant="picture-card-default">
-        <el-upload
+        <fsus-upload
           action="#"
           list-type="picture-card"
           :auto-upload="false"
@@ -153,7 +153,7 @@
         />
       </div>
       <div class="upload-fixture-row" data-upload-variant="picture-card-disabled">
-        <el-upload
+        <fsus-upload
           action="#"
           list-type="picture-card"
           :auto-upload="false"
@@ -177,7 +177,7 @@ import { ref } from 'vue'
 import type {
   UploadFile,
   UploadUserFile,
-} from '@element-plus/components/upload'
+} from '@ozwasyd/fsusui'
 
 const previewedPicture = ref('')
 const previewPicture = (file: UploadFile) => {

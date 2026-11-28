@@ -62,13 +62,6 @@ export default [
   },
 
   {
-    files: ['vue/packages/icons-vue/src/components/*.vue'],
-    rules: {
-      'vue/no-reserved-component-names': 'off',
-    },
-  },
-
-  {
     files: ['**/*.{ts,tsx,vue}'],
     rules: {
       'no-undef': 'off',

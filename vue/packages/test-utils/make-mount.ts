@@ -1,5 +1,5 @@
 import { mount } from '@vue/test-utils'
-import { merge } from 'lodash-es'
+import { deepMerge as merge } from '@fsusui/core'
 
 const makeMount = <C, O, E>(element: C, defaultOptions: O) => {
   return (props: (E | O) | (E & O) = {} as E) =>

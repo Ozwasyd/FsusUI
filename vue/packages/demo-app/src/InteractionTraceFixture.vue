@@ -4,19 +4,19 @@
     aria-label="Real Vue interaction trace fixture"
   >
     <section aria-label="Representative component interactions">
-      <el-button type="primary" @click="recordEvent('button.click')">
+      <fsus-button type="primary" @click="recordEvent('button.click')">
         Save draft
-      </el-button>
+      </fsus-button>
 
-      <el-input
+      <fsus-input
         v-model="inputValue"
         placeholder="Trace input"
         @input="recordEvent('input.input', $event)"
         @change="recordEvent('input.change', $event)"
       />
 
-      <el-button @click="dialogOpen = true"> Open trace dialog </el-button>
-      <el-dialog
+      <fsus-button @click="dialogOpen = true"> Open trace dialog </fsus-button>
+      <fsus-dialog
         v-model="dialogOpen"
         title="Trace dialog"
         @open="recordEvent('dialog.open')"
@@ -26,15 +26,15 @@
       >
         <p data-testid="trace-dialog-content">Real default slot content</p>
         <template #footer>
-          <el-button @click="dialogOpen = false">
+          <fsus-button @click="dialogOpen = false">
             Close trace dialog
-          </el-button>
+          </fsus-button>
         </template>
-      </el-dialog>
+      </fsus-dialog>
     </section>
 
     <section aria-label="CheckTag trace interactions">
-      <el-check-tag
+      <fsus-check-tag
         v-if="checkTagVisible"
         :checked="checkTagChecked"
         v-bind="{ 'data-testid': 'trace-check-tag' }"
@@ -42,12 +42,12 @@
         @update:checked="updateCheckTag"
       >
         Check tag
-      </el-check-tag>
+      </fsus-check-tag>
     </section>
 
     <section aria-label="Markdown editor trace interactions">
       <div data-testid="trace-markdown-editor">
-        <el-markdown-editor
+        <fsus-markdown-editor
           :key="markdownDocumentKey"
           ref="markdownEditor"
           v-model="markdownValue"
@@ -87,7 +87,7 @@
         </button>
       </div>
       <div data-testid="trace-markdown-atomic-editor">
-        <el-markdown-editor
+        <fsus-markdown-editor
           v-model="markdownAtomicValue"
           :document-identity="markdownAtomicIdentity"
           :min-rows="3"
@@ -106,12 +106,12 @@
 
 <script setup lang="ts">
 import { computed, nextTick, ref } from 'vue'
-import { resolveMarkdownLiveCapability } from '../../element-plus'
+import { resolveMarkdownLiveCapability } from '@ozwasyd/fsusui/markdown'
 import {
   createMarkdownEditorProjection,
   createMarkdownSourceCoordinateMap,
   stabilizeMarkdownEditorProjection,
-} from '../../element-plus/markdown-runtime'
+} from '@fsusui/wasm'
 
 import type {
   MarkdownEditorDispatchResult,
@@ -123,7 +123,7 @@ import type {
   MarkdownEditorSelectionEvent,
   MarkdownEditorTransaction,
   MarkdownEditorTransactionEvent,
-} from '../../element-plus'
+} from '@ozwasyd/fsusui/markdown'
 
 interface TraceEvent {
   readonly name: string
@@ -288,7 +288,7 @@ const serializeMarkdownOperation = (
 const readMountedMarkdownState = async () => {
   await nextTick()
   const root = document.querySelector(
-    '[data-testid="trace-markdown-editor"] .el-markdown-editor',
+    '[data-testid="trace-markdown-editor"] .fsus-markdown-editor',
   )
   const textarea = root?.querySelector('textarea')
   return {
