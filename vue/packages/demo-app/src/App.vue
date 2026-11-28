@@ -2,7 +2,7 @@
   <div class="demo-app-container">
     <div v-if="isDefaultGallery" class="demo-nav">
       <h1>FsusUI 组件预览</h1>
-      <p class="demo-version">v2.2-STABLE</p>
+      <p class="demo-version">v2.0.0</p>
       <div class="demo-nav-tabs" aria-label="Demo sections">
         <span
           class="demo-nav-active-pill"

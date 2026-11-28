@@ -135,9 +135,9 @@ export async function loadCurrentCheckTagVisualReview(web, avalonia) {
     digestFile(checkTagReviewFiles.independent)
   )
     fail('check-tag.visual-review independence digest mismatch')
-  const webExecution = web.contractExecutions?.['component-v2.el-check-tag']
+  const webExecution = web.contractExecutions?.['component-v2.fsus-check-tag']
   const avaloniaExecution =
-    avalonia.contractExecutions?.['component-v2.el-check-tag']
+    avalonia.contractExecutions?.['component-v2.fsus-check-tag']
   if (!webExecution || !avaloniaExecution)
     fail('check-tag.visual-review current executions missing')
   for (const field of [
@@ -219,7 +219,8 @@ export async function loadCurrentCheckTagVisualReview(web, avalonia) {
           'spec/components/component-surface-semantic-registry.json',
         ) &&
         !file.startsWith('generated/') &&
-        !file.startsWith('vue/packages/theme-chalk/src/generated/') &&
+        !file.startsWith('vue/packages/theme/src/generated/') &&
+        !file.startsWith('docs/avalonia/generated/') &&
         !file.startsWith('docs/theme/generated/') &&
         !file.startsWith('docs/releases/readiness/') &&
         !file.startsWith('dotnet/FsusUI.Avalonia/Generated/') &&
@@ -422,7 +423,7 @@ const same = (left, right, field) => {
 }
 
 const isCheckTagTimingStep = (contractId, step) =>
-  contractId === 'component-v2.el-check-tag' &&
+  contractId === 'component-v2.fsus-check-tag' &&
   step?.index === 9 &&
   step.action === 'performance'
 
@@ -598,7 +599,7 @@ const validateContractExecution = (execution, platform, contractId) => {
 }
 
 const validateMarkdownContractExecution = (execution, platform) => {
-  const contractId = 'component-v2.el-markdown-editor'
+  const contractId = 'component-v2.fsus-markdown-editor'
   if (!execution || typeof execution !== 'object')
     fail(`${platform}.contractExecutions.${contractId} missing`)
   for (const field of requiredIdentity) {
@@ -738,32 +739,32 @@ const validateMarkdownRuntimeObservations = (execution, platform) => {
     redo?.accepted !== true
   )
     fail(
-      `${platform}.component-v2.el-markdown-editor.operation evidence invalid`,
+      `${platform}.component-v2.fsus-markdown-editor.operation evidence invalid`,
     )
   same(
     execution.identity.documentId,
     dispatch.documentIdentity.id,
-    `${platform}.component-v2.el-markdown-editor.identity.documentId`,
+    `${platform}.component-v2.fsus-markdown-editor.identity.documentId`,
   )
   same(
     execution.identity.documentEpoch,
     dispatch.documentIdentity.epoch,
-    `${platform}.component-v2.el-markdown-editor.identity.documentEpoch`,
+    `${platform}.component-v2.fsus-markdown-editor.identity.documentEpoch`,
   )
   same(
     0,
     execution.identity.sourceRevision,
-    `${platform}.component-v2.el-markdown-editor.identity.sourceRevisionBaseline`,
+    `${platform}.component-v2.fsus-markdown-editor.identity.sourceRevisionBaseline`,
   )
   if (!Number.isInteger(dispatch.beforeRevision) || dispatch.beforeRevision < 0)
     fail(
-      `${platform}.component-v2.el-markdown-editor.operation baseline revision invalid`,
+      `${platform}.component-v2.fsus-markdown-editor.operation baseline revision invalid`,
     )
   return { baselineRevision: dispatch.beforeRevision, dispatch, undo, redo }
 }
 
 const compareMarkdownExecution = (web, avalonia) => {
-  const contractId = 'component-v2.el-markdown-editor'
+  const contractId = 'component-v2.fsus-markdown-editor'
   validateMarkdownContractExecution(web, 'web')
   validateMarkdownContractExecution(avalonia, 'avalonia')
   for (const field of requiredIdentity)
@@ -774,12 +775,12 @@ const compareMarkdownExecution = (web, avalonia) => {
     )
   same(web.coverage, avalonia.coverage, `${contractId}.coverage`)
   for (const forbidden of [
-    'scenario.v2.el-markdown-editor.state.split',
-    'scenario.v2.el-markdown-editor.state.preview',
-    'scenario.v2.el-markdown-editor.pointer',
-    'scenario.v2.el-markdown-editor.a11y',
-    'scenario.v2.el-markdown-editor.keyboard',
-    'scenario.v2.el-markdown-editor.perf',
+    'scenario.v2.fsus-markdown-editor.state.split',
+    'scenario.v2.fsus-markdown-editor.state.preview',
+    'scenario.v2.fsus-markdown-editor.pointer',
+    'scenario.v2.fsus-markdown-editor.a11y',
+    'scenario.v2.fsus-markdown-editor.keyboard',
+    'scenario.v2.fsus-markdown-editor.perf',
   ]) {
     if (web.coverage.requiredScenarios.includes(forbidden))
       fail(`${forbidden} must remain unclaimed`)
@@ -819,7 +820,7 @@ const checkedState = (value) => {
 }
 
 export const validateCheckTagFocusBounds = (bounds, platform) => {
-  const label = `component-v2.el-check-tag.${platform}.visual.focusBounds`
+  const label = `component-v2.fsus-check-tag.${platform}.visual.focusBounds`
   const coordinateSpace = platform === 'web' ? 'document' : 'window'
   const unit = platform === 'web' ? 'css-px' : 'dip'
   same(coordinateSpace, bounds?.coordinateSpace, `${label}.coordinateSpace`)
@@ -839,7 +840,7 @@ export const validateCheckTagFocusBounds = (bounds, platform) => {
 }
 
 const compareCheckTagExecution = (web, avalonia, visualReview = null) => {
-  const contractId = 'component-v2.el-check-tag'
+  const contractId = 'component-v2.fsus-check-tag'
   validateContractExecution(web, 'web', contractId)
   validateContractExecution(avalonia, 'avalonia', contractId)
   for (const field of requiredIdentity)
@@ -962,7 +963,7 @@ const normalizeWeb = (evidence) => {
   const normalizedMarkdownName = (value) =>
     value
       .replace(/^markdown\s*源码\s*编辑区$/iu, 'markdown editor')
-      .replace(/^markdown source$/iu, 'markdown editor')
+      .replace(/^markdown source(?:\s+editor)?$/iu, 'markdown editor')
   const node = evidence.browserAccessibility.nodes.find(
     (entry) =>
       entry.role === 'textbox' &&
@@ -1041,8 +1042,8 @@ const normalizedOperations = (evidence, platform) => {
   const selected = evidence.steps.filter((step) =>
     platform === 'web'
       ? [
-          'ElMarkdownEditor.dispatchTransaction',
-          'ElMarkdownEditor.undo',
+          'FsusMarkdownEditor.dispatchTransaction',
+          'FsusMarkdownEditor.undo',
         ].includes(step.target)
       : [
           'FsusMarkdownEditor.DispatchTransaction',
@@ -1128,14 +1129,14 @@ export function compareEvidence(web, avalonia, visualReview = null) {
   same(webContractIds, avaloniaContractIds, 'contractExecutions.ids')
   const receipts = {}
   for (const contractId of webContractIds) {
-    if (contractId === 'component-v2.el-markdown-editor') {
+    if (contractId === 'component-v2.fsus-markdown-editor') {
       receipts[contractId] = compareMarkdownExecution(
         web.contractExecutions[contractId],
         avalonia.contractExecutions[contractId],
       )
       continue
     }
-    if (contractId === 'component-v2.el-check-tag') {
+    if (contractId === 'component-v2.fsus-check-tag') {
       receipts[contractId] = compareCheckTagExecution(
         web.contractExecutions[contractId],
         avalonia.contractExecutions[contractId],
@@ -1280,8 +1281,8 @@ const currentComparisonIdentity = (contractPath) => {
         ),
       )
       .digest('hex'),
-    contract: 'component-v2.el-markdown-editor',
-    scenario: 'scenario.v2.el-markdown-editor.real-interaction-trace',
+    contract: 'component-v2.fsus-markdown-editor',
+    scenario: 'scenario.v2.fsus-markdown-editor.real-interaction-trace',
   }
 }
 
@@ -1841,7 +1842,10 @@ export function validateReadiness(alignment, expected = {}) {
     fail('readiness.consumers NuGet eligibility mismatch')
   if (alignment.consumers?.conformanceIntegrityReady !== true)
     fail('readiness.consumers conformance integrity mismatch')
-  if (alignment.consumers?.stableSubsetEligible !== expectedStable.length > 0)
+  if (
+    alignment.consumers?.stableSubsetEligible !==
+    (expectedStable.length > 0)
+  )
     fail('readiness.consumers stable subset eligibility mismatch')
   if (
     alignment.consumers?.fullSurfaceReleaseReady !==

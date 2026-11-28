@@ -278,6 +278,8 @@ const collectScriptBindings = (statements, unwrapExports = false) => {
   const consts = new Map()
   const functions = new Map()
   const imports = new Map()
+  const types = new Map()
+  const destructuredPropDefaults = new Map()
   for (const statement of statements) {
     if (statement.type === 'ImportDeclaration') {
       for (const spec of statement.specifiers ?? []) {
@@ -303,16 +305,46 @@ const collectScriptBindings = (statements, unwrapExports = false) => {
     const declaration =
       unwrapExports && statement.type === 'ExportNamedDeclaration'
         ? statement.declaration
-        : statement
+        : statement.type === 'ExportNamedDeclaration' &&
+            (statement.declaration?.type === 'TSInterfaceDeclaration' ||
+              statement.declaration?.type === 'TSTypeAliasDeclaration')
+          ? statement.declaration
+          : statement
+    if (
+      declaration?.type === 'TSInterfaceDeclaration' ||
+      declaration?.type === 'TSTypeAliasDeclaration'
+    ) {
+      if (declaration.id?.name) types.set(declaration.id.name, declaration)
+    }
     if (declaration?.type === 'VariableDeclaration') {
       for (const decl of declaration.declarations) {
         if (decl.id.type === 'Identifier') consts.set(decl.id.name, decl.init)
+        if (
+          decl.id.type === 'ObjectPattern' &&
+          decl.init?.type === 'CallExpression' &&
+          decl.init.callee?.type === 'Identifier' &&
+          (decl.init.callee.name === 'defineProps' ||
+            decl.init.callee.name === 'withDefaults')
+        ) {
+          for (const prop of decl.id.properties ?? []) {
+            if (prop.type !== 'ObjectProperty') continue
+            const propName =
+              prop.key?.type === 'Identifier'
+                ? prop.key.name
+                : prop.key?.type === 'StringLiteral'
+                  ? prop.key.value
+                  : null
+            if (propName && prop.value?.type === 'AssignmentPattern') {
+              destructuredPropDefaults.set(propName, prop.value.right)
+            }
+          }
+        }
       }
     }
     if (declaration?.type === 'FunctionDeclaration' && declaration.id)
       functions.set(declaration.id.name, declaration)
   }
-  return { consts, functions, imports }
+  return { consts, functions, imports, types, destructuredPropDefaults }
 }
 
 class SemanticResolver {
@@ -323,6 +355,12 @@ class SemanticResolver {
     this.constSearchCache = new Map()
     this.vueFileCache = new Map()
     this.sharedRoots = [
+      'vue/packages/core/src',
+      'vue/packages/components/src',
+      'vue/packages/markdown/src',
+      'vue/packages/icons/src',
+      'vue/packages/motion/src',
+      'vue/packages/wasm',
       'vue/packages/hooks',
       'vue/packages/constants',
       'vue/packages/utils',
@@ -400,9 +438,13 @@ class SemanticResolver {
           if (
             node.type === 'CallExpression' &&
             node.callee?.type === 'Identifier' &&
-            ['defineProps', 'defineEmits', 'defineExpose'].includes(
-              node.callee.name,
-            )
+            [
+              'defineProps',
+              'defineEmits',
+              'defineExpose',
+              'defineModel',
+              'withDefaults',
+            ].includes(node.callee.name)
           ) {
             macroCalls.push(node)
           }
@@ -440,6 +482,26 @@ class SemanticResolver {
       return null
     }
     if (spec === '@element-plus/icons-vue') return null
+    if (spec.startsWith('@fsusui/')) {
+      const rest = spec.slice('@fsusui/'.length)
+      const [pkg, ...sub] = rest.split('/')
+      const subPath = sub.join('/')
+      const candidates = subPath
+        ? [
+            `vue/packages/${pkg}/src/${subPath}.ts`,
+            `vue/packages/${pkg}/src/${subPath}/index.ts`,
+            `vue/packages/${pkg}/${subPath}.ts`,
+            `vue/packages/${pkg}/${subPath}/index.ts`,
+          ]
+        : [
+            `vue/packages/${pkg}/src/index.ts`,
+            `vue/packages/${pkg}/index.ts`,
+          ]
+      for (const candidate of candidates) {
+        if (this.readSource(candidate) !== null) return candidate
+      }
+      return null
+    }
     if (spec.startsWith('@element-plus/components/')) {
       const name = spec.slice('@element-plus/components/'.length)
       const candidates = [
@@ -1113,12 +1175,14 @@ export const extractComponentSemantics = ({
   root,
   moduleSources,
   vueSource,
+  exportName,
   structuredEmitNames = [],
   structuredExposedNames = [],
 }) => {
   const resolver = new SemanticResolver(root, moduleSources)
   const vueRel = vueSource ? vueSource.relativePath : null
   const vueModule = vueRel ? resolver.parseVueModule(vueRel) : null
+  const structuredEmitSet = new Set(structuredEmitNames ?? [])
 
   const props = []
   const emits = []
@@ -1209,34 +1273,358 @@ export const extractComponentSemantics = ({
       .filter((el) => el?.type === 'StringLiteral')
       .map((el) => ({ name: el.value, payload: [] }))
 
+  const tsTypeToRuntimeType = (typeNode) => {
+    if (!typeNode) return null
+    if (typeNode.type === 'TSStringKeyword') return 'String'
+    if (typeNode.type === 'TSNumberKeyword') return 'Number'
+    if (typeNode.type === 'TSBooleanKeyword') return 'Boolean'
+    if (typeNode.type === 'TSArrayType') return 'Array'
+    if (typeNode.type === 'TSFunctionType') return 'Function'
+    if (typeNode.type === 'TSObjectKeyword' || typeNode.type === 'TSTypeLiteral')
+      return 'Object'
+    if (typeNode.type === 'TSTypeReference' && typeNode.typeName?.type === 'Identifier') {
+      const refName = typeNode.typeName.name
+      if (refName === 'Array' || refName === 'ReadonlyArray') return 'Array'
+      if (refName === 'Date') return 'Date'
+      if (refName === 'Record' || refName === 'Partial') return 'Object'
+    }
+    return null
+  }
+
+  const resolveTsTypeMembers = (typeNode, source, fromRel, seen = new Set()) => {
+    if (!typeNode) return []
+    if (typeNode.type === 'TSTypeLiteral') {
+      return (typeNode.members ?? []).map((member) => ({ member, source, fromRel }))
+    }
+    if (typeNode.type === 'TSInterfaceDeclaration') {
+      const members = []
+      for (const ext of typeNode.extends ?? []) {
+        if (ext.expression?.type === 'Identifier') {
+          members.push(
+            ...resolveTsTypeMembers(
+              { type: 'TSTypeReference', typeName: ext.expression },
+              source,
+              fromRel,
+              seen,
+            ),
+          )
+        }
+      }
+      for (const member of typeNode.body?.body ?? []) {
+        members.push({ member, source, fromRel })
+      }
+      return members
+    }
+    if (typeNode.type === 'TSTypeAliasDeclaration') {
+      return resolveTsTypeMembers(typeNode.typeAnnotation, source, fromRel, seen)
+    }
+    if (typeNode.type === 'TSIntersectionType') {
+      return (typeNode.types ?? []).flatMap((part) =>
+        resolveTsTypeMembers(part, source, fromRel, seen),
+      )
+    }
+    if (
+      typeNode.type === 'TSTypeReference' &&
+      typeNode.typeName?.type === 'Identifier'
+    ) {
+      const refName = typeNode.typeName.name
+      const key = `${fromRel}:${refName}`
+      if (seen.has(key)) return []
+      seen.add(key)
+      const mod = fromRel.endsWith('.vue')
+        ? resolver.parseVueModule(fromRel)
+        : resolver.parseTsModule(fromRel)
+      if (mod?.types?.has(refName)) {
+        const modSource = mod.setup || mod.scriptAst || mod.content
+        return resolveTsTypeMembers(mod.types.get(refName), modSource, fromRel, seen)
+      }
+      if (mod?.imports?.has(refName)) {
+        const imp = mod.imports.get(refName)
+        const specFile = resolver.resolveSpecFile(imp.spec, fromRel)
+        if (specFile) {
+          const target = resolver.parseTsModule(specFile)
+          const targetName = imp.imported || refName
+          if (target?.types?.has(targetName)) {
+            return resolveTsTypeMembers(
+              target.types.get(targetName),
+              target.content,
+              specFile,
+              seen,
+            )
+          }
+        }
+      }
+    }
+    return []
+  }
+
+  const resolveLiteralValuesForTypeNode = (typeNode, fromRel, seen = new Set()) => {
+    const direct = literalTypeValues(typeNode)
+    if (direct.valuesKnown) return direct
+    if (
+      typeNode?.type === 'TSTypeReference' &&
+      typeNode.typeName?.type === 'Identifier'
+    ) {
+      const refName = typeNode.typeName.name
+      const key = `${fromRel}:${refName}`
+      if (seen.has(key)) return { values: null, valuesKnown: false }
+      seen.add(key)
+      const mod = fromRel.endsWith('.vue')
+        ? resolver.parseVueModule(fromRel)
+        : resolver.parseTsModule(fromRel)
+      if (mod?.types?.has(refName)) {
+        const decl = mod.types.get(refName)
+        if (decl.type === 'TSTypeAliasDeclaration') {
+          return resolveLiteralValuesForTypeNode(decl.typeAnnotation, fromRel, seen)
+        }
+      }
+      if (mod?.imports?.has(refName)) {
+        const imp = mod.imports.get(refName)
+        const specFile = resolver.resolveSpecFile(imp.spec, fromRel)
+        if (specFile) {
+          const target = resolver.parseTsModule(specFile)
+          const targetName = imp.imported || refName
+          const decl = target?.types?.get(targetName)
+          if (decl?.type === 'TSTypeAliasDeclaration') {
+            return resolveLiteralValuesForTypeNode(decl.typeAnnotation, specFile, seen)
+          }
+        }
+      }
+    }
+    return { values: null, valuesKnown: false }
+  }
+
+  const buildTypedParamList = (paramsList, source) =>
+    paramsList.map((item, idx) => {
+      let name = `arg${idx}`
+      let typeNode = item
+      let optional = false
+      let rest = false
+      if (item.type === 'TSNamedTupleMember') {
+        name = item.label?.name ?? name
+        typeNode = item.elementType
+        optional = Boolean(item.optional)
+      } else if (item.type === 'TSRestType') {
+        rest = true
+        typeNode = item.typeAnnotation
+      } else if (item.type === 'TSOptionalType') {
+        optional = true
+        typeNode = item.typeAnnotation
+      }
+      const typeStr = typeNode ? typeText(typeNode, source) : null
+      return {
+        name,
+        type: typeStr,
+        optional,
+        rest,
+        nullable: /\bnull\b/u.test(typeStr || ''),
+        shape: { kind: 'unknown', type: typeStr, reason: 'type-level emit parameter' },
+      }
+    })
+
   if (vueModule) {
+    const withDefaultsMap = new Map()
+    for (const call of vueModule.macroCalls || []) {
+      if (
+        call.callee.name === 'withDefaults' &&
+        call.arguments?.[1]?.type === 'ObjectExpression'
+      ) {
+        for (const prop of call.arguments[1].properties ?? []) {
+          if (prop.type !== 'ObjectProperty') continue
+          const propName = keyText(prop.key, vueModule.setup || vueModule.content)
+          if (propName) withDefaultsMap.set(propName, prop.value)
+        }
+      }
+    }
+    const setupSource = vueModule.setup || vueModule.scriptAst || vueModule.content
+
     for (const call of vueModule.macroCalls || []) {
       const macro = call.callee.name
       const arg = call.arguments?.[0]
       const fromRel = vueRel
       if (macro === 'defineProps') {
-        const resolved = resolveCallArg(arg, fromRel)
-        if (resolved?.object)
-          props.push(
-            ...collectPropsFromObject(
-              resolved.object,
-              resolved.source,
-              fromRel,
-            ),
+        if (!arg && call.typeParameters?.params?.[0]) {
+          const members = resolveTsTypeMembers(
+            call.typeParameters.params[0],
+            setupSource,
+            fromRel,
           )
+          for (const { member, source: memberSource, fromRel: memberRel } of members) {
+            if (member.type !== 'TSPropertySignature') continue
+            const name = keyText(member.key, memberSource)
+            if (!name) continue
+            const typeAnnotation = member.typeAnnotation?.typeAnnotation ?? null
+            const semanticType = typeAnnotation
+              ? typeText(typeAnnotation, memberSource)
+              : null
+            const runtimeType = tsTypeToRuntimeType(typeAnnotation)
+            const literalVals = resolveLiteralValuesForTypeNode(
+              typeAnnotation,
+              memberRel,
+            )
+            const defaultNode =
+              withDefaultsMap.get(name) ??
+              vueModule.destructuredPropDefaults?.get(name) ??
+              null
+            const defaultVal = defaultNode
+              ? literalToJson(defaultNode, setupSource)
+              : { kind: 'missing' }
+            const nullable =
+              /\bnull\b/u.test(semanticType || '') ||
+              defaultVal.kind === 'null'
+            const deprecated = deprecatedMetadataForNode(member)
+            props.push({
+              name,
+              runtimeType,
+              semanticType,
+              nullable,
+              values: literalVals.valuesKnown ? literalVals.values : null,
+              valuesKnown: literalVals.valuesKnown,
+              default: defaultVal,
+              required: !member.optional && defaultVal.kind === 'missing',
+              readonly: Boolean(member.readonly),
+              ...deprecated,
+            })
+          }
+        } else {
+          const resolved = resolveCallArg(arg, fromRel)
+          if (resolved?.object)
+            props.push(
+              ...collectPropsFromObject(
+                resolved.object,
+                resolved.source,
+                fromRel,
+              ),
+            )
+        }
+      } else if (macro === 'defineModel') {
+        const named = arg?.type === 'StringLiteral'
+        const modelName = named ? arg.value : 'modelValue'
+        const optionsArg = named ? call.arguments?.[1] : arg
+        const typeParam = call.typeParameters?.params?.[0] ?? null
+        const semanticType = typeParam ? typeText(typeParam, setupSource) : null
+        const runtimeType = tsTypeToRuntimeType(typeParam)
+        const literalVals = resolveLiteralValuesForTypeNode(typeParam, fromRel)
+        let defaultVal = { kind: 'missing' }
+        let required = false
+        if (optionsArg?.type === 'ObjectExpression') {
+          for (const property of optionsArg.properties ?? []) {
+            if (property.type !== 'ObjectProperty') continue
+            const k = keyText(property.key, setupSource)
+            if (k === 'default')
+              defaultVal = literalToJson(property.value, setupSource)
+            if (k === 'required')
+              required =
+                property.value?.type === 'BooleanLiteral' &&
+                property.value.value === true
+          }
+        }
+        const nullable =
+          /\bnull\b/u.test(semanticType || '') || defaultVal.kind === 'null'
+        props.push({
+          name: modelName,
+          runtimeType,
+          semanticType,
+          nullable,
+          values: literalVals.valuesKnown ? literalVals.values : null,
+          valuesKnown: literalVals.valuesKnown,
+          default: defaultVal,
+          required,
+          readonly: false,
+          deprecated: false,
+          deprecationMessage: null,
+        })
+        const emitName = `update:${modelName}`
+        const modelParam = {
+          name: modelName,
+          type: semanticType,
+          optional: false,
+          rest: false,
+          nullable,
+          shape: {
+            kind: 'unknown',
+            type: semanticType,
+            reason: 'defineModel value parameter',
+          },
+        }
+        emits.push({
+          name: emitName,
+          payload: [modelParam],
+          ...(structuredEmitSet.has(emitName)
+            ? { payloadShapeStatus: 'callable', payloadShapeReason: null }
+            : {}),
+        })
       } else if (macro === 'defineEmits') {
-        const resolved = resolveCallArg(arg, fromRel)
-        if (resolved?.object)
-          emits.push(
-            ...collectEmitsFromObject(
-              resolved.object,
-              resolved.source,
-              fromRel,
-              resolved.sourceRel,
-            ),
-          )
-        if (resolved?.array)
-          emits.push(...collectEmitsFromArray(resolved.array))
+        if (!arg && call.typeParameters?.params?.[0]) {
+          const emitType = call.typeParameters.params[0]
+          if (emitType.type === 'TSTypeLiteral') {
+            for (const member of emitType.members ?? []) {
+              if (member.type === 'TSPropertySignature') {
+                const name = keyText(member.key, setupSource)
+                if (!name) continue
+                const tupleType = member.typeAnnotation?.typeAnnotation
+                const tupleElements =
+                  tupleType?.type === 'TSTupleType'
+                    ? (tupleType.elementTypes ?? [])
+                    : []
+                const payload = buildTypedParamList(tupleElements, setupSource)
+                emits.push({
+                  name,
+                  payload,
+                  ...(structuredEmitSet.has(name)
+                    ? { payloadShapeStatus: 'callable', payloadShapeReason: null }
+                    : {}),
+                })
+              } else if (member.type === 'TSCallSignatureDeclaration') {
+                const firstParam = member.parameters?.[0]
+                const eventLiteral =
+                  firstParam?.typeAnnotation?.typeAnnotation?.literal?.value
+                if (typeof eventLiteral === 'string') {
+                  const restParams = (member.parameters ?? []).slice(1).map((p) => {
+                    const t = p.typeAnnotation?.typeAnnotation
+                      ? typeText(p.typeAnnotation.typeAnnotation, setupSource)
+                      : null
+                    return {
+                      name: p.name ?? 'value',
+                      type: t,
+                      optional: Boolean(p.optional),
+                      rest: p.type === 'RestElement',
+                      nullable: /\bnull\b/u.test(t || ''),
+                      shape: {
+                        kind: 'unknown',
+                        type: t,
+                        reason: 'call-signature emit parameter',
+                      },
+                    }
+                  })
+                  emits.push({
+                    name: eventLiteral,
+                    payload: restParams,
+                    ...(structuredEmitSet.has(eventLiteral)
+                      ? {
+                          payloadShapeStatus: 'callable',
+                          payloadShapeReason: null,
+                        }
+                      : {}),
+                  })
+                }
+              }
+            }
+          }
+        } else {
+          const resolved = resolveCallArg(arg, fromRel)
+          if (resolved?.object)
+            emits.push(
+              ...collectEmitsFromObject(
+                resolved.object,
+                resolved.source,
+                fromRel,
+                resolved.sourceRel,
+              ),
+            )
+          if (resolved?.array)
+            emits.push(...collectEmitsFromArray(resolved.array))
+        }
       } else if (macro === 'defineExpose' && arg?.type === 'ObjectExpression') {
         for (const property of arg.properties || []) {
           if (
@@ -1330,15 +1718,30 @@ export const extractComponentSemantics = ({
   if (tsRel) {
     const tsModule = resolver.parseTsModule(tsRel)
     if (tsModule) {
+      const defineCalls = []
       walkNodes(tsModule.ast.program.body, (node) => {
         if (
-          node.type !== 'CallExpression' ||
-          node.callee?.type !== 'Identifier' ||
-          node.callee.name !== 'defineComponent' ||
-          node.arguments?.[0]?.type !== 'ObjectExpression'
+          node.type === 'CallExpression' &&
+          node.callee?.type === 'Identifier' &&
+          node.callee.name === 'defineComponent' &&
+          node.arguments?.[0]?.type === 'ObjectExpression'
         ) {
-          return
+          defineCalls.push(node)
         }
+      })
+      const matchedCalls =
+        exportName && defineCalls.length > 1
+          ? defineCalls.filter((node) =>
+              (node.arguments[0].properties ?? []).some(
+                (prop) =>
+                  prop.type === 'ObjectProperty' &&
+                  keyText(prop.key, tsModule.content) === 'name' &&
+                  prop.value?.type === 'StringLiteral' &&
+                  prop.value.value === exportName,
+              ),
+            )
+          : defineCalls
+      for (const node of matchedCalls.length > 0 ? matchedCalls : defineCalls) {
         for (const property of node.arguments[0].properties ?? []) {
           if (
             property.type !== 'ObjectProperty' &&
@@ -1435,12 +1838,15 @@ export const extractComponentSemantics = ({
             ) {
               slots.push({
                 name: node.callee.property.name,
+                nameKnown: true,
                 scoped: (node.arguments ?? []).length > 0,
+                payload: [],
+                payloadComplete: (node.arguments ?? []).length === 0,
               })
             }
           })
         }
-      })
+      }
     }
   }
 
@@ -1455,6 +1861,7 @@ export const extractComponentSemantics = ({
   const propsSorted = uniqueBy(props)
   const emitsSorted = uniqueBy(emits)
   const exposedSorted = uniqueBy(exposed)
+  const slotsSorted = uniqueBy(slots)
   const requestedExposedNames = [...structuredExposedNames]
   if (vueModule?.setup && requestedExposedNames.length > 0) {
     const structured = extractStructuredExposedSignatures({
@@ -1482,17 +1889,25 @@ export const extractComponentSemantics = ({
     semanticProps: propsSorted,
     semanticEmits: emitsSorted,
     semanticExposed: exposedSorted,
-    semanticSlots: slots,
+    semanticSlots: slotsSorted,
     legacyProps: propsSorted.map((p) => p.name),
     legacyEmits: emitsSorted.map((e) => e.name),
     legacyExposed: exposedSorted.map((e) => e.name),
-    legacySlots: slots,
+    legacySlots: slotsSorted,
   }
 }
 
 export const loadModuleSources = (root, moduleName) => {
-  const moduleRoot = path.join(root, 'vue/packages/components', moduleName)
-  if (!fs.existsSync(moduleRoot)) return []
+  const candidates =
+    moduleName === 'icon'
+      ? [path.join(root, 'vue/packages/icons/src')]
+      : [
+          path.join(root, 'vue/packages/components/src', moduleName),
+          path.join(root, 'vue/packages/markdown/src', moduleName),
+          path.join(root, 'vue/packages/components', moduleName),
+        ]
+  const moduleRoot = candidates.find((candidate) => fs.existsSync(candidate))
+  if (!moduleRoot) return []
   const files = []
   const walk = (dir) => {
     for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
@@ -1578,6 +1993,8 @@ export const sourceForComponent = (sources, exportName) => {
   const kebab = toKebab(exportName)
   const exact = sources.find(
     (source) =>
+      source.relativePath.endsWith(`/${exportName}.vue`) ||
+      source.relativePath.endsWith(`/${exportName}.tsx`) ||
       source.relativePath.endsWith(`/src/${kebab}.vue`) ||
       source.relativePath.endsWith(`/src/${kebab}.tsx`),
   )

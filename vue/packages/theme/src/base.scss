@@ -53,6 +53,12 @@
     &[data-spin] > svg {
       animation: fsus-spin 0.9s linear infinite;
     }
+
+    &[data-variant='linear'] svg :where(path, circle, rect, line, polyline, polygon) {
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      paint-order: stroke fill;
+    }
   }
 
   // Reading surface restraint guard
@@ -91,9 +97,15 @@
     [class^='fsus-'],
     [class*=' fsus-'] {
       scroll-behavior: auto;
+      transition-duration: 1ms !important;
+      transition-delay: 0ms !important;
     }
     .fsus-icon[data-spin] > svg {
-      animation-duration: 2.4s;
+      animation-duration: 0.01ms;
+      animation-iteration-count: 1;
+    }
+    .fsus-image-viewer {
+      animation-duration: 0.01ms;
     }
   }
 }

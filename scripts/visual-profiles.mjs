@@ -30,7 +30,7 @@ export function loadVisualProfileRegistry(
 }
 
 const packageNameToAuditName = (packageName) =>
-  `El${packageName
+  `Fsus${packageName
     .split('-')
     .map((part) => part.slice(0, 1).toUpperCase() + part.slice(1))
     .join('')}`
@@ -115,12 +115,13 @@ export function validateVisualProfileRegistry(registry, repositoryRoot) {
     }
   }
 
-  const componentRoot = resolve(repositoryRoot, 'vue/packages/components')
+  const componentRoot = resolve(repositoryRoot, 'vue/packages/components/src')
   if (existsSync(componentRoot)) {
     const actual = readdirSync(componentRoot, { withFileTypes: true })
       .filter(
         (entry) =>
-          entry.isDirectory() && !['dist', 'node_modules'].includes(entry.name),
+          entry.isDirectory() &&
+          !['__tests__', 'dist', 'node_modules'].includes(entry.name),
       )
       .map((entry) => entry.name)
       .sort()
@@ -305,10 +306,10 @@ const sectionFromDemoPath = (path) => {
 }
 
 const componentPackageFromPath = (path) => {
-  const sourceMatch = path.match(/^vue\/packages\/components\/([^/]+)\//u)
+  const sourceMatch = path.match(/^vue\/packages\/components\/src\/([^/]+)\//u)
   if (sourceMatch) return sourceMatch[1]
   const themeMatch = path.match(
-    /^vue\/packages\/theme-chalk\/src\/([^/_][^/]*)\.scss$/u,
+    /^vue\/packages\/theme\/src\/components\/([^/_][^/]*)\.scss$/u,
   )
   return themeMatch?.[1]
 }
@@ -363,7 +364,7 @@ export function selectAffectedVisualTargets(files, registry) {
     }
 
     if (
-      /^vue\/packages\/(theme-chalk|demo-app)\//u.test(file) ||
+      /^vue\/packages\/(theme|demo-app|markdown)\//u.test(file) ||
       /^vue\/tests\/(visual|support)\//u.test(file)
     ) {
       unmappedVisualFiles.add(file)

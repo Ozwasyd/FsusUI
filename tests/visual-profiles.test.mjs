@@ -122,10 +122,15 @@ test('registry rejects smoke greps that omit Markdown feature activation', () =>
 test('registry rejects new public packages until an owner is registered', async (t) => {
   const root = await mkdtemp(join(tmpdir(), 'fsusui-visual-registry-'))
   t.after(() => rm(root, { recursive: true, force: true }))
-  await mkdir(join(root, 'vue/packages/components/button'), { recursive: true })
-  await mkdir(join(root, 'vue/packages/components/unowned-public-widget'), {
+  await mkdir(join(root, 'vue/packages/components/src/button'), {
     recursive: true,
   })
+  await mkdir(
+    join(root, 'vue/packages/components/src/unowned-public-widget'),
+    {
+      recursive: true,
+    },
+  )
   for (const spec of registry.smoke.specs) {
     const target = join(root, spec)
     await mkdir(join(target, '..'), { recursive: true })
@@ -158,7 +163,7 @@ test('affected explicit files are browser-free and need no Git or network', () =
     cwd: repositoryRoot,
     env: {
       FSUS_VISUAL_AFFECTED_FILES:
-        'vue/packages/components/button/src/button.vue',
+        'vue/packages/components/src/button/FsusButton.vue',
     },
     git: () => {
       throw new Error('explicit files must not invoke Git')
@@ -166,7 +171,10 @@ test('affected explicit files are browser-free and need no Git or network', () =
     registry,
   })
   assert.equal(selection.profile, 'affected')
-  assert.deepEqual(selection.auditComponents, ['ElButton'])
+  assert.deepEqual(selection.auditComponents, [
+    'FsusButton',
+    'FsusButtonGroup',
+  ])
   assert.match(selection.grep, /capture \(basic\)\$/u)
   assert.match(selection.grep, /ui audit/u)
 })

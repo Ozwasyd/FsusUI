@@ -1,20 +1,20 @@
 [
   {
     "name": "component source selects its audit owner and demo section",
-    "files": ["vue/packages/components/button/src/button.vue"],
+    "files": ["vue/packages/components/src/button/FsusButton.vue"],
     "expected": {
-      "auditComponents": ["ElButton"],
+      "auditComponents": ["FsusButton", "FsusButtonGroup"],
       "sections": ["basic"],
       "fullRequired": false
     }
   },
   {
-    "name": "component theme file uses the same owner",
-    "files": ["vue/packages/theme-chalk/src/input.scss"],
+    "name": "component theme file triggers full-required via theme glob",
+    "files": ["vue/packages/theme/src/components/forms.scss"],
     "expected": {
-      "auditComponents": ["ElInput"],
-      "sections": ["form"],
-      "fullRequired": false
+      "auditComponents": [],
+      "sections": [],
+      "fullRequired": true
     }
   },
   {

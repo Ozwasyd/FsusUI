@@ -2,8 +2,8 @@
   <div id="icons" class="demo-section" data-testid="section-icons">
     <h2>Full Icon Gallery</h2>
     <div class="icon-gallery">
-      <div v-for="(icon, name) in allIcons" :key="name" class="icon-item">
-        <fsus-icon :size="24"><component :is="icon" /></fsus-icon>
+      <div v-for="(_path, name) in allIcons" :key="name" class="icon-item">
+        <fsus-icon :name="name" :size="24" />
         <span class="icon-name">{{ name }}</span>
       </div>
     </div>

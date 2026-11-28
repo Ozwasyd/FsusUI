@@ -41,7 +41,7 @@ export const FsusImageViewer = defineComponent({
 
     return () =>
       h(Teleport as any, { to: 'body', disabled: !props.teleported }, [
-        h('div', { class: 'fsus-overlay fsus-image-viewer', role: 'dialog', 'aria-modal': 'true', style: { zIndex: currentZIndex.value } }, [
+        h('div', { class: 'fsus-overlay fsus-image-viewer', 'data-fsus-material': 'glass', role: 'dialog', 'aria-modal': 'true', style: { zIndex: currentZIndex.value } }, [
           h('div', { class: 'fsus-overlay__scrim', onClick: () => emit('close') }),
           h('div', { class: 'fsus-image-viewer__stage' }, [
             h('img', {

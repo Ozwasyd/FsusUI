@@ -98,7 +98,7 @@
             <fsus-form-item class="task-field--date" :label="copy.publishDate">
               <fsus-date-picker
                 v-model="productionForm.publishDate"
-                type="date"
+                mode="date"
                 :placeholder="copy.publishDatePlaceholder"
               />
               <p class="task-field-message">{{ copy.publishDateHelper }}</p>
@@ -137,7 +137,7 @@
             >
               <fsus-date-picker
                 v-model="productionForm.reviewStart"
-                type="date"
+                mode="date"
                 :placeholder="copy.startPlaceholder"
               />
               <p
@@ -151,7 +151,7 @@
             <fsus-form-item :label="copy.ends">
               <fsus-date-picker
                 v-model="productionForm.reviewEnd"
-                type="date"
+                mode="date"
                 :placeholder="copy.endPlaceholder"
               />
               <p class="task-field-message">{{ copy.endHelper }}</p>
@@ -170,7 +170,7 @@
               :auto-upload="false"
               :limit="3"
             >
-              <div class="el-upload__text">{{ copy.uploadAction }}</div>
+              <div class="fsus-upload__text">{{ copy.uploadAction }}</div>
               <p data-upload-help>{{ copy.uploadHelper }}</p>
               <template #tip>
                 <p class="task-field-message task-field-message--error">
@@ -307,14 +307,14 @@
                 :model-value="
                   darkFormIsFilled(state) ? darkFormDate : undefined
                 "
-                type="date"
+                mode="date"
                 :placeholder="darkFormPlaceholder(state, 'Choose a date')"
                 :disabled="state === 'disabled'"
               />
               <fsus-time-picker
                 v-else-if="control.id === 'time-picker'"
                 :model-value="
-                  darkFormIsFilled(state) ? darkFormDate : undefined
+                  darkFormIsFilled(state) ? '09:00:00' : ''
                 "
                 :placeholder="darkFormPlaceholder(state, 'Choose a time')"
                 :disabled="state === 'disabled'"
@@ -385,12 +385,12 @@
       <h3>Radio & RadioButton</h3>
       <fsus-space direction="vertical" alignment="flex-start">
         <fsus-radio-group v-model="radio">
-          <fsus-radio label="1">公开</fsus-radio>
-          <fsus-radio label="2">仅自己可见</fsus-radio>
+          <fsus-radio value="1">公开</fsus-radio>
+          <fsus-radio value="2">仅自己可见</fsus-radio>
         </fsus-radio-group>
         <fsus-radio-group v-model="radio">
-          <fsus-radio-button label="1">公开</fsus-radio-button>
-          <fsus-radio-button label="2">仅自己可见</fsus-radio-button>
+          <fsus-radio-button value="1">公开</fsus-radio-button>
+          <fsus-radio-button value="2">仅自己可见</fsus-radio-button>
         </fsus-radio-group>
       </fsus-space>
     </div>
@@ -399,12 +399,12 @@
       <fsus-space direction="vertical" alignment="flex-start">
         <fsus-checkbox v-model="checkbox">Checkbox</fsus-checkbox>
         <fsus-checkbox-group v-model="checkboxGroup">
-          <fsus-checkbox label="A">推送到首页</fsus-checkbox>
-          <fsus-checkbox label="B">保持普通</fsus-checkbox>
+          <fsus-checkbox value="A">推送到首页</fsus-checkbox>
+          <fsus-checkbox value="B">保持普通</fsus-checkbox>
         </fsus-checkbox-group>
         <fsus-checkbox-group v-model="checkboxGroup">
-          <fsus-checkbox-button label="A">推送到首页</fsus-checkbox-button>
-          <fsus-checkbox-button label="B">保持普通</fsus-checkbox-button>
+          <fsus-checkbox-button value="A">推送到首页</fsus-checkbox-button>
+          <fsus-checkbox-button value="B">保持普通</fsus-checkbox-button>
         </fsus-checkbox-group>
       </fsus-space>
     </div>
@@ -530,13 +530,12 @@
     <div class="demo-block">
       <h3>DatePicker</h3>
       <fsus-space direction="vertical">
-        <fsus-date-picker v-model="date" type="date" placeholder="选择日期" />
+        <fsus-date-picker v-model="date" mode="date" placeholder="选择日期" />
         <fsus-date-picker
           v-model="dateRange"
-          type="daterange"
+          mode="daterange"
           range-separator="至"
-          start-placeholder="开始日期"
-          end-placeholder="结束日期"
+          placeholder="选择日期范围"
         />
       </fsus-space>
     </div>
@@ -545,7 +544,7 @@
       <fsus-upload action="#" multiple :limit="3">
         <fsus-button type="primary">上传封面</fsus-button>
         <template #tip>
-          <div class="el-upload__tip">支持 jpg/png，单个文件 ≤ 500KB</div>
+          <div class="fsus-upload__tip">支持 jpg/png，单个文件 ≤ 500KB</div>
         </template>
       </fsus-upload>
     </div>

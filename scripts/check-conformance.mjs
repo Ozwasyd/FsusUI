@@ -74,9 +74,9 @@ const checkTokens = () => {
     'token hash must mark generated metadata',
   )
   for (const artifact of [
-    'vue/packages/theme-chalk/src/generated/tokens.css',
-    'vue/packages/theme-chalk/src/generated/tokens.scss',
-    'vue/packages/theme-chalk/src/generated/tokens.json',
+    'vue/packages/theme/src/generated/tokens.css',
+    'vue/packages/theme/src/generated/tokens.scss',
+    'vue/packages/theme/src/generated/tokens.json',
     'dotnet/FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml',
     'dotnet/FsusUI.Avalonia/Generated/FsusTokens.g.cs',
     'docs/theme/generated/tokens.md',
@@ -84,13 +84,11 @@ const checkTokens = () => {
     assert(hash.outputs?.[artifact], `token hash must include ${artifact}`)
     assert(exists(artifact), `${artifact} must exist`)
   }
-  const webTokenBridge = read(
-    'vue/packages/theme-chalk/src/common/fsus-tokens.scss',
-  )
+  const webTokenBridge = read('vue/packages/theme/src/tokens.scss')
   assertIncludes(
     webTokenBridge,
-    "@use '../generated/tokens'",
-    'vue/packages/theme-chalk/src/common/fsus-tokens.scss',
+    "@use './generated/tokens.css'",
+    'vue/packages/theme/src/tokens.scss',
   )
   console.log('conformance:tokens passed')
 }

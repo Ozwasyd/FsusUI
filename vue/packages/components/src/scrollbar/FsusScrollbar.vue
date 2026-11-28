@@ -9,9 +9,10 @@ export interface FsusScrollbarProps {
   maxHeight?: string | number
   always?: boolean
   tag?: string
+  viewClass?: string
 }
 
-const { height, maxHeight, always = false, tag = 'div' } = defineProps<FsusScrollbarProps>()
+const { height, maxHeight, always = false, tag = 'div', viewClass } = defineProps<FsusScrollbarProps>()
 
 const emit = defineEmits<{ scroll: [payload: { scrollTop: number; scrollLeft: number }] }>()
 
@@ -44,13 +45,17 @@ const setScrollLeft = (value: number) => {
   if (wrapRef.value) wrapRef.value.scrollLeft = value
 }
 
-defineExpose({ wrapRef, scrollTo, setScrollTop, setScrollLeft })
+const update = () => {
+  // Native CSS scrollbars recalculate automatically; kept for imperative ref callers.
+}
+
+defineExpose({ wrapRef, scrollTo, setScrollTop, setScrollLeft, update })
 </script>
 
 <template>
   <div class="fsus-scrollbar" :data-always="always ? '' : undefined">
     <div ref="wrapRef" class="fsus-scrollbar__wrap" :style="style" @scroll.passive="onScroll">
-      <component :is="tag" class="fsus-scrollbar__view">
+      <component :is="tag" :class="['fsus-scrollbar__view', viewClass]">
         <slot />
       </component>
     </div>

@@ -54,7 +54,7 @@ const reset = () => {
     'clean',
     '-fd',
     '-e',
-    'vue/packages/icons-vue/dist',
+    'vue/packages/icons/src',
     '-e',
     'vue/packages/wasm/dist',
   ])
@@ -162,36 +162,36 @@ const cases = [
   },
   {
     id: 'vue-public-alias-mutated',
-    file: 'vue/packages/components/collection-primitives/index.ts',
+    file: 'vue/packages/components/src/primitives/index.ts',
     inject: () =>
       mutateText(
-        'vue/packages/components/collection-primitives/index.ts',
-        'export const FsusCollectionSummary = ElCollectionSummary.FsusCollectionSummary',
-        'export const FsusCollectionSummaryMutation = ElCollectionSummary.FsusCollectionSummary',
+        'vue/packages/components/src/primitives/index.ts',
+        'export const FsusSiteHeader = defineComponent({',
+        'export const FsusSiteHeaderMutation = defineComponent({',
       ),
     command: ['pnpm', ['run', 'avalonia:baseline:check']],
     expected: 'Avalonia Vue public API baseline is stale',
   },
   {
-    id: 'vue-public-enum-mutated',
-    file: 'vue/packages/components/table-v2/src/constants.ts',
+    id: 'vue-public-directive-mutated',
+    file: 'vue/packages/fsusui/src/index.ts',
     inject: () =>
       mutateText(
-        'vue/packages/components/table-v2/src/constants.ts',
-        "  RIGHT = 'right',",
-        "  RIGHT = 'right-mutation',",
+        'vue/packages/fsusui/src/index.ts',
+        "app.directive('fsus-click-outside', vClickOutside)",
+        "app.directive('fsus-click-outside-mutation', vClickOutside)",
       ),
     command: ['pnpm', ['run', 'avalonia:baseline:check']],
     expected: 'Avalonia Vue public API baseline is stale',
   },
   {
-    id: 'vue-public-sentinel-mutated',
-    file: 'vue/packages/components/table-v2/src/private.ts',
+    id: 'vue-public-service-mutated',
+    file: 'vue/packages/components/src/index.ts',
     inject: () =>
       mutateText(
-        'vue/packages/components/table-v2/src/private.ts',
-        "Symbol('placeholder')",
-        "Symbol('placeholder-mutation')",
+        'vue/packages/components/src/index.ts',
+        'FsusLoadingService',
+        'FsusLoadingServiceMutation',
       ),
     command: ['pnpm', ['run', 'avalonia:baseline:check']],
     expected: 'Avalonia Vue public API baseline is stale',
@@ -211,18 +211,18 @@ const cases = [
   ...[
     [
       'consumer-binding-deleted',
-      "  'component-v2.el-check-tag': { releaseFamily: 'selection', galleryRoute: 'selection' },\n",
+      "  'component-v2.fsus-check-tag': { releaseFamily: 'selection', galleryRoute: 'selection' },\n",
       '',
     ],
     [
       'consumer-binding-route-mutated',
-      "  'component-v2.el-check-tag': { releaseFamily: 'selection', galleryRoute: 'selection' },",
-      "  'component-v2.el-check-tag': { releaseFamily: 'selection', galleryRoute: 'button' },",
+      "  'component-v2.fsus-check-tag': { releaseFamily: 'selection', galleryRoute: 'selection' },",
+      "  'component-v2.fsus-check-tag': { releaseFamily: 'selection', galleryRoute: 'button' },",
     ],
     [
       'consumer-binding-release-family-mutated',
-      "  'component-v2.el-check-tag': { releaseFamily: 'selection', galleryRoute: 'selection' },",
-      "  'component-v2.el-check-tag': { releaseFamily: 'selection-mutation', galleryRoute: 'selection' },",
+      "  'component-v2.fsus-check-tag': { releaseFamily: 'selection', galleryRoute: 'selection' },",
+      "  'component-v2.fsus-check-tag': { releaseFamily: 'selection-mutation', galleryRoute: 'selection' },",
     ],
   ].map(([id, from, to]) => ({
     id,
@@ -385,7 +385,7 @@ const cases = [
     file: 'spec/components/contracts/v2/contract-v2.json',
     inject: () =>
       mutateJson('spec/components/contracts/v2/contract-v2.json', (value) => {
-        value.consumerBindings.byContract['component-v2.el-unknown'] = {
+        value.consumerBindings.byContract['component-v2.fsus-unknown'] = {
           releaseFamily: 'selection',
           galleryRoute: 'selection',
         }
@@ -396,9 +396,9 @@ const cases = [
   ...[
     [
       'gallery-aligned-contract-not-instantiated',
-      'case "component-v2.el-check-tag":',
-      'case "component-v2.el-check-tag-missing":',
-      'Stable contract component-v2.el-check-tag has no exact Gallery implementation',
+      'case "component-v2.fsus-check-tag":',
+      'case "component-v2.fsus-check-tag-missing":',
+      'Stable contract component-v2.fsus-check-tag has no exact Gallery implementation',
     ],
     [
       'gallery-aligned-contract-fallback-mutated',
@@ -451,40 +451,40 @@ const cases = [
     expected: 'defaultKnown',
   },
   {
-    id: 'table-v2-input-binding-mutated',
+    id: 'markdown-editor-document-binding-mutated',
     file: 'spec/components/contracts/v2/contract-v2.json',
     inject: () =>
       mutateText(
         'spec/components/contracts/v2/contract-v2.json',
-        '"member": "ViewportHeight"',
-        '"member": "ViewportMissing"',
+        '"member": "Document"',
+        '"member": "DocumentMissing"',
       ),
     command: ['pnpm', ['run', 'contract-v2:check']],
     expected: 'contract-v2.json drifted from generated output',
   },
   {
-    id: 'table-v2-header-height-binding-mutated',
+    id: 'markdown-editor-readonly-binding-mutated',
     file: 'spec/components/contracts/v2/contract-v2.json',
     inject: () =>
       mutateText(
         'spec/components/contracts/v2/contract-v2.json',
-        '"member": "HeaderHeight"',
-        '"member": "HeaderHeightMissing"',
+        '"member": "IsReadOnly"',
+        '"member": "IsReadOnlyMissing"',
       ),
     command: ['pnpm', ['run', 'contract-v2:check']],
     expected: 'contract-v2.json drifted from generated output',
   },
   {
-    id: 'table-v2-header-height-alternate-mutated',
+    id: 'markdown-editor-readonly-alternate-mutated',
     file: 'spec/components/contracts/v2/semantic-member-bindings.json',
     inject: () =>
       mutateText(
         'spec/components/contracts/v2/semantic-member-bindings.json',
-        '"avalonia": "HeaderHeight"',
-        '"avalonia": "HeaderHeights"',
+        '"avalonia": "IsReadOnly"',
+        '"avalonia": "IsReadOnlyMissing"',
       ),
     command: ['pnpm', ['run', 'contract-v2:check']],
-    expected: 'contract-v2.json drifted from generated output',
+    expected: 'missing real Avalonia member IsReadOnlyMissing',
   },
   {
     id: 'vue-semantic-scoped-payload-mutated',
@@ -499,25 +499,25 @@ const cases = [
     expected: 'Avalonia Vue public API baseline is stale',
   },
   {
-    id: 'table-v2-sort-object-category-mutated',
+    id: 'clr-boolean-category-mutated',
     file: 'scripts/contract-v2.mjs',
     inject: () =>
       mutateText(
         'scripts/contract-v2.mjs',
-        "'FsusUI.Avalonia.Controls.FsusTableV2Sort': 'object',",
-        "'FsusUI.Avalonia.Controls.FsusTableV2Sort': 'unknown',",
+        "  'System.Boolean': 'boolean',",
+        "  'System.Boolean': 'unknown',",
       ),
     command: ['pnpm', ['run', 'contract-v2:check']],
     expected: 'contract-v2.json drifted from generated output',
   },
   {
-    id: 'auto-resizer-web-disabled-width-mutated',
-    file: 'vue/packages/components/table-v2/src/composables/use-auto-resize.ts',
+    id: 'check-tag-web-change-order-mutated',
+    file: 'vue/packages/components/src/tag/FsusCheckTag.vue',
     inject: () =>
       mutateText(
-        'vue/packages/components/table-v2/src/composables/use-auto-resize.ts',
-        'if (!props.disableWidth) width$.value = width - left - right',
-        'width$.value = width - left - right',
+        'vue/packages/components/src/tag/FsusCheckTag.vue',
+        '  emit(\'change\', next)\n  checked.value = next',
+        '  checked.value = next',
       ),
     command: [
       'pnpm',
@@ -527,10 +527,10 @@ const cases = [
         'run',
         '--config',
         'vue/vitest.config.ts',
-        'vue/packages/components/table-v2/__tests__/auto-resizer.test.tsx',
+        'vue/packages/components/src/__tests__/phase2-core-and-forms.test.ts',
       ],
     ],
-    expected: "to be '0x180'",
+    expected: 'to deeply equal',
   },
   ...[
     [
@@ -689,10 +689,10 @@ const cases = [
   })),
   {
     id: 'vue-prop-removed',
-    file: 'vue/packages/components/markdown-editor/src/markdown-editor.ts',
+    file: 'vue/packages/markdown/src/markdown-editor/src/markdown-editor.ts',
     inject: () =>
       mutateText(
-        'vue/packages/components/markdown-editor/src/markdown-editor.ts',
+        'vue/packages/markdown/src/markdown-editor/src/markdown-editor.ts',
         '  documentIdentity: {\n    type: definePropType<MarkdownEditorDocumentIdentity>(Object),\n    default: undefined,\n  },\n',
         '',
       ),
@@ -701,10 +701,10 @@ const cases = [
   },
   {
     id: 'vue-event-modified',
-    file: 'vue/packages/components/markdown-editor/src/markdown-editor.ts',
+    file: 'vue/packages/markdown/src/markdown-editor/src/markdown-editor.ts',
     inject: () =>
       mutateText(
-        'vue/packages/components/markdown-editor/src/markdown-editor.ts',
+        'vue/packages/markdown/src/markdown-editor/src/markdown-editor.ts',
         '  transaction: (event: MarkdownEditorTransactionEvent) =>',
         '  transactionChanged: (event: MarkdownEditorTransactionEvent) =>',
       ),
@@ -713,10 +713,10 @@ const cases = [
   },
   {
     id: 'vue-method-modified',
-    file: 'vue/packages/components/markdown-editor/src/markdown-editor.vue',
+    file: 'vue/packages/markdown/src/markdown-editor/src/markdown-editor.vue',
     inject: () =>
       mutateText(
-        'vue/packages/components/markdown-editor/src/markdown-editor.vue',
+        'vue/packages/markdown/src/markdown-editor/src/markdown-editor.vue',
         '  applyAttachmentResult,\n  dispatchTransaction,\n',
         '  applyAttachmentResult,\n  dispatchTransactionRemoved: dispatchTransaction,\n',
       ),
@@ -725,10 +725,10 @@ const cases = [
   },
   {
     id: 'check-tag-vue-role-mutated',
-    file: 'vue/packages/components/check-tag/src/check-tag.vue',
+    file: 'vue/packages/components/src/tag/FsusCheckTag.vue',
     inject: () =>
       mutateText(
-        'vue/packages/components/check-tag/src/check-tag.vue',
+        'vue/packages/components/src/tag/FsusCheckTag.vue',
         'role="checkbox"',
         'role="button"',
       ),
@@ -740,18 +740,18 @@ const cases = [
         'run',
         '--config',
         'vue/vitest.config.ts',
-        'vue/packages/components/check-tag/__tests__/check-tag.test.tsx',
+        'vue/packages/components/src/__tests__/phase2-core-and-forms.test.ts',
       ],
     ],
-    expected: 'to match object',
+    expected: 'checkbox',
   },
   {
     id: 'check-tag-vue-keyboard-mutated',
-    file: 'vue/packages/components/check-tag/src/check-tag.vue',
+    file: 'vue/packages/components/src/tag/FsusCheckTag.vue',
     inject: () =>
       mutateText(
-        'vue/packages/components/check-tag/src/check-tag.vue',
-        '@keydown.space.prevent="handleChange"',
+        'vue/packages/components/src/tag/FsusCheckTag.vue',
+        '@keydown.space.prevent="toggle"',
         '',
       ),
     command: [
@@ -762,7 +762,7 @@ const cases = [
         'run',
         '--config',
         'vue/vitest.config.ts',
-        'vue/packages/components/check-tag/__tests__/check-tag.test.tsx',
+        'vue/packages/components/src/__tests__/phase2-core-and-forms.test.ts',
       ],
     ],
     expected: 'to deeply equal',
@@ -842,9 +842,9 @@ const cases = [
     ],
     [
       'check-tag-web-motion-mutated',
-      'vue/packages/theme-chalk/src/check-tag.scss',
-      'transition-duration: 1ms',
-      'transition-duration: 200ms',
+      'vue/packages/theme/src/components/core.scss',
+      'transition-duration: 1ms;',
+      'transition-duration: 200ms;',
     ],
   ].map(([id, file, from, to]) => ({
     id,
@@ -871,9 +871,9 @@ const cases = [
                 'run',
                 '--config',
                 'vue/vitest.config.ts',
-                'vue/packages/theme-chalk/__tests__/fsus-theme.test.ts',
+                'vue/packages/components/src/__tests__/phase2-core-and-forms.test.ts',
                 '-t',
-                'uses Scholarly Blue state tokens',
+                'keeps FsusCheckTag reduced-motion transition duration bounded at 1ms',
               ],
             ],
     expected:
@@ -978,7 +978,9 @@ const cases = [
         (value.browserAccessibility.nodes.find(
           (node) =>
             node.role === 'textbox' &&
-            /^markdown\s*源码\s*编辑区$/iu.test(node.name ?? ''),
+            /^(?:markdown\s*源码\s*编辑区|markdown source(?:\s+editor)?|markdown editor source)$/iu.test(
+              node.name ?? '',
+            ),
         ).role = 'article'),
       'accessibility.nodes markdown textbox missing',
     ],
@@ -988,7 +990,9 @@ const cases = [
         (value.browserAccessibility.nodes.find(
           (node) =>
             node.role === 'textbox' &&
-            /^markdown\s*源码\s*编辑区$/iu.test(node.name ?? ''),
+            /^(?:markdown\s*源码\s*编辑区|markdown source(?:\s+editor)?|markdown editor source)$/iu.test(
+              node.name ?? '',
+            ),
         ).name = 'Fixture name'),
       'web.accessibility.nodes markdown textbox missing',
     ],
@@ -1111,16 +1115,16 @@ const cases = [
       'check-tag-evidence-coverage-mutated',
       (execution) =>
         (execution.coverage.executions[
-          'scenario.v2.el-check-tag.pointer'
+          'scenario.v2.fsus-check-tag.pointer'
         ].real = false),
-      'scenario.scenario.v2.el-check-tag.pointer metadata-only',
+      'scenario.scenario.v2.fsus-check-tag.pointer metadata-only',
     ],
   ].map(([id, mutation, expected]) => ({
     id,
     file: '.tmp/conformance-v2/web-a11y/manifest.json',
     inject: () =>
       mutateJson('.tmp/conformance-v2/web-a11y/manifest.json', (value) =>
-        mutation(value.contractExecutions['component-v2.el-check-tag']),
+        mutation(value.contractExecutions['component-v2.fsus-check-tag']),
       ),
     command: gate('compare', [
       '--web',
@@ -1264,10 +1268,7 @@ const workerCount =
       )
 
 function seedPreparedTestArtifacts(targetCheckout) {
-  const prebuiltDirs = [
-    'vue/packages/icons-vue/dist',
-    'vue/packages/wasm/dist',
-  ]
+  const prebuiltDirs = ['vue/packages/wasm/dist']
   const allExist = prebuiltDirs.every((relativeDir) =>
     fs.existsSync(path.join(root, relativeDir)),
   )

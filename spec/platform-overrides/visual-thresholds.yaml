@@ -5,7 +5,7 @@ thresholds:
     platform: all
     status: accepted
     reason: Tokenized colors should remain tight across generated Web and Avalonia outputs.
-    affectedContracts: [component.el-button]
+    affectedContracts: [component.fsus-button]
     visualThreshold: low
     behaviorExpectation: Color variance must not change state meaning, contrast intent, or token role semantics.
     allowedDeviation: low
@@ -19,7 +19,7 @@ thresholds:
     platform: all
     status: accepted
     reason: Font rasterization and baseline metrics differ across browser engines and Skia.
-    affectedContracts: [component.el-text]
+    affectedContracts: [component.fsus-text]
     visualThreshold: medium
     behaviorExpectation: Text content, line order, wrapping intent, and accessible name exposure must remain equivalent.
     allowedDeviation: medium
@@ -33,7 +33,7 @@ thresholds:
     platform: all
     status: accepted
     reason: Dense CJK source text rasterizes with sub-pixel glyph placement differences between browser engines and headless Skia; structure, wrapping, and token colors match.
-    affectedContracts: [component.el-markdown-editor]
+    affectedContracts: [component.fsus-markdown-editor]
     visualThreshold: medium
     behaviorExpectation: Source text content, line order, monospace family, 16px/1.6 metrics, and padding must remain equivalent; glyph anti-aliasing variance is bounded by the medium level.
     allowedDeviation: medium
@@ -47,7 +47,7 @@ thresholds:
     platform: all
     status: accepted
     reason: Element-level Web/Avalonia captures of alert, tag, progress, badge, breadcrumb, and switch contain glyph anti-aliasing and cross-rasterizer sub-pixel offsets (Chromium vs headless Skia; Noto Sans SC vs the locally licensable CJK face); layout bounds and token colors match within the low geometry and color budgets. On tiny element crops a single glyph row shift dominates the diff percentage, so the crop-level budget is registered explicitly instead of the medium level used for page-scale captures.
-    affectedContracts: [component.el-alert, component.el-tag, component.el-progress, component.el-badge, component.el-breadcrumb, component.el-switch, component.el-skeleton, component.el-empty]
+    affectedContracts: [component.fsus-alert, component.fsus-tag, component.fsus-progress, component.fsus-badge, component.fsus-breadcrumb, component.fsus-switch, component.fsus-skeleton, component.fsus-empty-state]
     visualThreshold: medium
     behaviorExpectation: Element bounds, stripe/dot/fill geometry, semantic colors, text content, and reading order must remain equivalent; glyph rasterization variance is bounded by the elementCrop level.
     allowedDeviation: elementCrop

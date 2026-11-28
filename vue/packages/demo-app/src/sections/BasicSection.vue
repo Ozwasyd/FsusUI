@@ -5,16 +5,16 @@
       <h3>Button & ButtonGroup</h3>
       <fsus-space wrap>
         <fsus-button>Default</fsus-button>
-        <fsus-button type="primary">Primary</fsus-button>
-        <fsus-button type="success">Success</fsus-button>
-        <fsus-button type="info">Info</fsus-button>
-        <fsus-button type="warning">Warning</fsus-button>
-        <fsus-button type="danger">Danger</fsus-button>
+        <fsus-button variant="primary">Primary</fsus-button>
+        <fsus-button variant="secondary">Secondary</fsus-button>
+        <fsus-button variant="ghost">Ghost</fsus-button>
+        <fsus-button variant="link">Link</fsus-button>
+        <fsus-button variant="danger">Danger</fsus-button>
         <fsus-button disabled>Disabled</fsus-button>
         <fsus-button-group>
-          <fsus-button type="primary" :icon="ArrowLeft">Prev</fsus-button>
-          <fsus-button type="primary">
-            Next<fsus-icon class="el-icon--right"><ArrowRight /></fsus-icon>
+          <fsus-button variant="primary" :icon="ArrowLeft">Prev</fsus-button>
+          <fsus-button variant="primary">
+            Next<fsus-icon class="fsus-icon--right"><ArrowRight /></fsus-icon>
           </fsus-button>
         </fsus-button-group>
       </fsus-space>
@@ -22,23 +22,23 @@
     <div class="demo-block">
       <h3>Link</h3>
       <fsus-space wrap>
-        <fsus-link>Default</fsus-link>
-        <fsus-link type="primary">Primary</fsus-link>
-        <fsus-link type="success">Success</fsus-link>
-        <fsus-link type="warning">Warning</fsus-link>
-        <fsus-link type="danger">Danger</fsus-link>
-        <fsus-link type="info">Info</fsus-link>
+        <fsus-link tone="neutral">Default</fsus-link>
+        <fsus-link tone="info">Primary</fsus-link>
+        <fsus-link tone="success">Success</fsus-link>
+        <fsus-link tone="warning">Warning</fsus-link>
+        <fsus-link tone="danger">Danger</fsus-link>
+        <fsus-link tone="info">Info</fsus-link>
       </fsus-space>
     </div>
     <div class="demo-block">
       <h3>Text</h3>
       <fsus-space wrap>
         <fsus-text>Default</fsus-text>
-        <fsus-text type="primary">Primary</fsus-text>
-        <fsus-text type="success">Success</fsus-text>
-        <fsus-text type="warning">Warning</fsus-text>
-        <fsus-text type="danger">Danger</fsus-text>
-        <fsus-text type="info">Info</fsus-text>
+        <fsus-text tone="info">Primary</fsus-text>
+        <fsus-text tone="success">Success</fsus-text>
+        <fsus-text tone="warning">Warning</fsus-text>
+        <fsus-text tone="danger">Danger</fsus-text>
+        <fsus-text tone="quiet">Info</fsus-text>
         <fsus-text truncated style="width: 100px">Truncated text content</fsus-text>
       </fsus-space>
     </div>
@@ -98,13 +98,13 @@
     <div class="demo-block">
       <h3>ConfigProvider</h3>
       <fsus-config-provider>
-        <fsus-button type="primary">Provider Child</fsus-button>
+        <fsus-button variant="primary">Provider Child</fsus-button>
       </fsus-config-provider>
     </div>
     <div class="demo-block">
       <h3>Affix</h3>
       <fsus-affix :offset="20">
-        <fsus-button type="primary">Affix top 20px</fsus-button>
+        <fsus-button variant="primary">Affix top 20px</fsus-button>
       </fsus-affix>
     </div>
     <div class="demo-block">
@@ -121,7 +121,7 @@
     </div>
     <div class="demo-block">
       <h3>VisuallyHidden</h3>
-      <fsus-visually-hidden>Hidden Text</fsus-visually-hidden>
+      <span class="fsus-sr-only">Hidden Text</span>
       <span>Text visible next to hidden one</span>
     </div>
   </div>

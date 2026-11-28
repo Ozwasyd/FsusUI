@@ -147,7 +147,7 @@ public static class FsusAvaloniaGalleryRegistry
     {
       switch (contractId)
       {
-        case "component-v2.el-check-tag":
+        case "component-v2.fsus-check-tag":
           panel.Children.Add(new FsusCheckTag
           {
             Content = "Check tag",

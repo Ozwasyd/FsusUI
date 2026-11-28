@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 /**
- * Native CJK IME acceptance harness for ElMarkdownEditor.
+ * Native CJK IME acceptance harness for FsusMarkdownEditor.
  *
  * Runs a real headed browser on a real X11 display, focuses the demo fixture's
  * real textarea, and injects OS-native ibus keystrokes through XTEST.
@@ -55,7 +55,7 @@ const defaultOutputDirectory = resolve(
   '.tmp/native-ime-evidence',
 )
 const fixtureTestId = 'markdown-editor-transaction-fixture'
-const defaultEditorSelector = `[data-testid="${fixtureTestId}"] .el-markdown-editor textarea`
+const defaultEditorSelector = `[data-testid="${fixtureTestId}"] .fsus-markdown-editor textarea`
 
 const EXIT_CODES = {
   'prerequisite-missing': 2,
@@ -329,7 +329,7 @@ const readEditorState = (page) =>
     const fixture = document.querySelector(
       '[data-testid="markdown-editor-transaction-fixture"]',
     )
-    const textarea = fixture?.querySelector('.el-markdown-editor textarea')
+    const textarea = fixture?.querySelector('.fsus-markdown-editor textarea')
     const readOutput = (testId) => {
       const element = document.querySelector(`[data-testid="${testId}"]`)
       const text = element?.textContent?.trim()
@@ -371,7 +371,7 @@ const installTrace = (page) =>
     const fixture = document.querySelector(
       '[data-testid="markdown-editor-transaction-fixture"]',
     )
-    const textarea = fixture?.querySelector('.el-markdown-editor textarea')
+    const textarea = fixture?.querySelector('.fsus-markdown-editor textarea')
     if (!textarea) return false
     const eventNames = [
       'keydown',
@@ -419,7 +419,7 @@ const readEditorBox = (page) =>
     const fixture = document.querySelector(
       '[data-testid="markdown-editor-transaction-fixture"]',
     )
-    const textarea = fixture?.querySelector('.el-markdown-editor textarea')
+    const textarea = fixture?.querySelector('.fsus-markdown-editor textarea')
     if (!textarea) return null
     const rectangle = textarea.getBoundingClientRect()
     return {

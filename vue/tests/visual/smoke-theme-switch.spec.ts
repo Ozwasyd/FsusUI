@@ -33,9 +33,9 @@ test(SMOKE_THEME_SWITCH_TEST_TITLE, async ({ page }, testInfo) => {
     waitUntil: 'domcontentloaded',
   })
 
-  const shell = page.locator('.el-public-shell').first()
+  const shell = page.locator('.fsus-public-shell').first()
   const toggle = shell
-    .locator('.el-theme-mode-toggle[data-theme-mode-visibility="desktop"]')
+    .locator('.fsus-theme-mode-toggle[data-theme-mode-visibility="desktop"]')
     .first()
   await expect(shell).toBeVisible()
   await expect(toggle).toBeVisible()
@@ -52,6 +52,12 @@ test(SMOKE_THEME_SWITCH_TEST_TITLE, async ({ page }, testInfo) => {
   await expect(root).not.toHaveClass(new RegExp(`\\b${initialMode}\\b`, 'u'))
   await expect(root).toHaveAttribute('data-theme-mode', alternateMode)
   await expect(root).toHaveAttribute('data-theme-resolved', alternateMode)
+  await expect(root).toHaveAttribute('data-fsus-theme', alternateMode)
+  const alternateAppearance = await readRenderedTheme(page)
+  expect(alternateAppearance).not.toEqual(initialAppearance)
+  expect(alternateAppearance.backgroundColor).not.toBe(
+    initialAppearance.backgroundColor,
+  )
   expect(await readRenderedTheme(page)).not.toEqual(initialAppearance)
 
   await toggle.locator(`[data-theme-mode="${initialMode}"]`).click()

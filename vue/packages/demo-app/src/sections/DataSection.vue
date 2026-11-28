@@ -156,11 +156,11 @@
       <h3>Tag / CheckTag</h3>
       <fsus-space wrap>
         <fsus-tag>文章</fsus-tag>
-        <fsus-tag type="success">已发布</fsus-tag>
-        <fsus-tag type="info">技术笔记</fsus-tag>
-        <fsus-tag type="warning">待复核</fsus-tag>
-        <fsus-tag type="danger">高风险</fsus-tag>
-        <fsus-check-tag :checked="checkTag" @change="checkTag = !checkTag">
+        <fsus-tag tone="success">已发布</fsus-tag>
+        <fsus-tag tone="info">技术笔记</fsus-tag>
+        <fsus-tag tone="warning">待复核</fsus-tag>
+        <fsus-tag tone="danger">高风险</fsus-tag>
+        <fsus-check-tag v-model:checked="checkTag">
           已同步
         </fsus-check-tag>
       </fsus-space>
@@ -201,7 +201,7 @@
         <fsus-badge :value="12"><fsus-button>Comments</fsus-button></fsus-badge>
         <fsus-badge :value="3" is-dot>
           <fsus-button :icon="Share" type="primary">
-            <fsus-visually-hidden>Share article</fsus-visually-hidden>
+            <span class="fsus-sr-only">Share article</span>
           </fsus-button>
         </fsus-badge>
       </fsus-space>

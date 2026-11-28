@@ -236,7 +236,8 @@ const formats: FsusColorFormat[] = ['hex', 'rgb', 'hsl']
 </script>
 
 <template>
-  <FsusPopover v-model:open="open" :disabled="disabled" :width="276">
+  <span class="fsus-color-picker" :data-size="size" :data-disabled="disabled ? '' : undefined">
+    <FsusPopover v-model:open="open" :disabled="disabled" :width="276">
     <template #reference>
       <button
         type="button"
@@ -356,4 +357,5 @@ const formats: FsusColorFormat[] = ['hex', 'rgb', 'hsl']
       </div>
     </div>
   </FsusPopover>
+  </span>
 </template>

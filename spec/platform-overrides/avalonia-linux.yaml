@@ -5,7 +5,7 @@ overrides:
     platform: avalonia-linux
     status: accepted
     reason: Linux compositor and X11/Wayland window shadows differ from browser box-shadow rendering.
-    affectedContracts: [component.el-dialog]
+    affectedContracts: [component.fsus-dialog]
     visualThreshold: medium
     behaviorExpectation: Dialog modality, focus trap, dismissal, and announced name must match the public dialog contract.
     allowedDeviation: medium
@@ -19,7 +19,7 @@ overrides:
     platform: avalonia-linux
     status: accepted
     reason: Linux fontconfig selection and Skia rasterization can differ from browser fallback metrics for the same stable font stack.
-    affectedContracts: [component.el-text]
+    affectedContracts: [component.fsus-text]
     visualThreshold: medium
     behaviorExpectation: Text content, wrapping intent, line count, ellipsis behavior, and accessible names must match the typography baseline.
     allowedDeviation: medium

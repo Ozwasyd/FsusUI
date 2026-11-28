@@ -74,6 +74,7 @@ const emitThemeModeChange = (
 
 const setResolvedThemeMode = (root: HTMLElement, mode: ResolvedTheme) => {
   root.dataset.themeResolved = mode
+  root.dataset.fsusTheme = mode
   root.style.colorScheme = mode
 }
 
@@ -124,6 +125,7 @@ export const clearThemeMode = (root = getThemeRoot()) => {
   root.classList.remove('dark', 'light')
   delete root.dataset.themeMode
   delete root.dataset.themeResolved
+  delete root.dataset.fsusTheme
   delete root.dataset.fsusThemeSwitching
   root.style.removeProperty('color-scheme')
 }

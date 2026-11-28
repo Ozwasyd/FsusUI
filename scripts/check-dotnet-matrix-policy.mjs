@@ -124,7 +124,6 @@ const validate = (source) => {
     'icons:check',
     'tokens:check',
     'conformance',
-    'governance:check',
     'a11y:check',
   ]) {
     assert(
@@ -132,6 +131,11 @@ const validate = (source) => {
       `static-quality must own ${command}`,
     )
   }
+  assert(
+    staticQuality.includes('governance:check') ||
+      staticQuality.includes('check:dotnet-matrix'),
+    'static-quality must own governance:check or check:dotnet-matrix',
+  )
   assert(
     stable.includes('node scripts/ci-readiness.mjs check') &&
       stable.includes('--profile main'),
@@ -165,13 +169,17 @@ if (sdk?.rollForward !== 'disable') {
 }
 const premergeMainJob = job(callerWorkflow, 'premerge-main')
 const premergeReadinessJob = job(callerWorkflow, 'premerge-readiness')
-if (
-  !premergeMainJob.includes('uses: ./.github/workflows/_quality.yml') ||
-  !premergeReadinessJob.includes(
+const qualityJob = job(callerWorkflow, 'quality')
+const validV1Caller =
+  premergeMainJob.includes('uses: ./.github/workflows/_quality.yml') &&
+  premergeReadinessJob.includes(
     'uses: ./.github/workflows/_quality-readiness.yml',
-  ) ||
-  !premergeReadinessJob.includes('- premerge-main')
-) {
+  ) &&
+  premergeReadinessJob.includes('- premerge-main')
+const validV2Caller = qualityJob.includes(
+  'uses: ./.github/workflows/_quality.yml',
+)
+if (!validV1Caller && !validV2Caller) {
   failures.push(
     'quality.yml package caller must route PRs through _quality.yml and _quality-readiness.yml',
   )

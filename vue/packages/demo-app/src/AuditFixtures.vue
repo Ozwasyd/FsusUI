@@ -98,7 +98,7 @@
       </div>
 
       <fsus-dialog
-        v-model="safeDialogVisible"
+        v-model:open="safeDialogVisible"
         :title="
           safeDialogFullscreen
             ? 'Safe-area Fullscreen Dialog'
@@ -133,7 +133,7 @@
       </fsus-dialog>
 
       <fsus-drawer
-        v-model="safeDrawerVisible"
+        v-model:open="safeDrawerVisible"
         :direction="safeDrawerDirection"
         :title="`Safe-area Drawer ${safeDrawerDirection.toUpperCase()}`"
         size="70%"

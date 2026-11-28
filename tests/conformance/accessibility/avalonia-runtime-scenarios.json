@@ -4,30 +4,33 @@
   "contractBindings": [
     {
       "snapshotId": "settings-primitives-stable39",
-      "contractId": "component-v2.el-settings-section"
+      "contractId": "component-v2.fsus-settings-section"
     },
     {
       "snapshotId": "metric-primitives-stable39",
-      "contractId": "component-v2.el-metric-list"
+      "contractId": "component-v2.fsus-metric-list"
     },
     {
       "snapshotId": "inbox-primitives-stable39",
-      "contractId": "component-v2.el-inbox-layout"
+      "contractId": "component-v2.fsus-inbox-layout"
     },
     {
       "snapshotId": "perception-challenge-stable40",
-      "contractId": "component-v2.el-perception-challenge"
+      "contractId": "component-v2.fsus-perception-challenge"
     },
     {
       "snapshotId": "perception-character-challenge-conformance",
-      "contractId": "component-v2.el-perception-character-challenge"
-    },
-    {
-      "snapshotId": "table-v2-stable34",
-      "contractId": "component-v2.el-table-v2"
+      "contractId": "component-v2.fsus-perception-character-challenge"
     }
   ],
   "bindingGaps": [
+    {
+      "snapshotId": "table-v2-stable34",
+      "reason": "Contract V2 has no Avalonia type binding for FsusTableV2 in FsusUI 2.0.0 (Web table APIs consolidated into FsusTable).",
+      "owner": "FsusUI Contract V2",
+      "testPolicy": "Construct the production control and capture its live AutomationPeer tree, but do not count this row as Contract V2 scenario coverage until an exact binding exists.",
+      "reviewAfter": "2026-12-05"
+    },
     {
       "snapshotId": "textarea-comment",
       "reason": "Contract V2 has no Avalonia type binding for FsusTextarea.",
@@ -43,15 +46,15 @@
       "reviewAfter": "2026-12-05"
     },
     {
-      "snapshotId": "data-table-stable33",
-      "reason": "Contract V2 has no Avalonia type binding for FsusDataTable.",
+      "snapshotId": "message-box-stable24",
+      "reason": "Contract V2 has no component-level Avalonia type binding for FsusMessageBox (FsusMessageBox is exposed as a service API in FsusUI 2.0.0).",
       "owner": "FsusUI Contract V2",
       "testPolicy": "Construct the production control and capture its live AutomationPeer tree, but do not count this row as Contract V2 scenario coverage until an exact binding exists.",
       "reviewAfter": "2026-12-05"
     },
     {
-      "snapshotId": "virtualization-stable34",
-      "reason": "Contract V2 has no Avalonia type binding for FsusVirtualList.",
+      "snapshotId": "data-table-stable33",
+      "reason": "Contract V2 has no Avalonia type binding for FsusDataTable.",
       "owner": "FsusUI Contract V2",
       "testPolicy": "Construct the production control and capture its live AutomationPeer tree, but do not count this row as Contract V2 scenario coverage until an exact binding exists.",
       "reviewAfter": "2026-12-05"

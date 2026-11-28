@@ -4,7 +4,12 @@ import * as Icons from '@fsusui/icons'
 
 import type { InjectionKey } from 'vue'
 
-export const { Search, ArrowLeft, ArrowRight, ArrowDown, Edit, Share } = Icons
+export const Search = Icons.FsusIconSearch
+export const ArrowLeft = Icons.FsusIconArrowLeft
+export const ArrowRight = Icons.FsusIconArrowRight
+export const ArrowDown = Icons.FsusIconArrowDown
+export const Edit = Icons.FsusIconEdit
+export const Share = Icons.FsusIconLink
 
 const readCssVar = (name: string, fallback: string) => {
   if (typeof window === 'undefined') return fallback
@@ -165,7 +170,7 @@ export const createDemoState = () => {
   return {
     activeCollapse,
     activeTab,
-    allIcons: markRaw(Icons),
+    allIcons: markRaw(Icons.FSUS_ICON_PATHS),
     cascaderOptions,
     checkbox,
     checkboxGroup,

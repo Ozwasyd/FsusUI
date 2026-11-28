@@ -87,7 +87,7 @@ const realCheckTagContract = () => {
     ),
   )
   return registry.contracts.find(
-    (contract) => contract.id === 'component-v2.el-check-tag',
+    (contract) => contract.id === 'component-v2.fsus-check-tag',
   )
 }
 
@@ -386,17 +386,17 @@ test('derive comparison validation rejects stale identity and tampered evidence'
 
   const failedMarkdownStep = structuredClone(web)
   failedMarkdownStep.contractExecutions[
-    'component-v2.el-markdown-editor'
+    'component-v2.fsus-markdown-editor'
   ].steps[0].observation.passed = false
   assert.throws(
     () => compareEvidence(failedMarkdownStep, avalonia),
-    /component-v2\.el-markdown-editor\.steps\[0\] failed/u,
+    /component-v2\.fsus-markdown-editor\.steps\[0\] failed/u,
   )
 
   const spoofedMarkdownIdentity = structuredClone(web)
   const spoofedExecution =
     spoofedMarkdownIdentity.contractExecutions[
-      'component-v2.el-markdown-editor'
+      'component-v2.fsus-markdown-editor'
     ]
   spoofedExecution.identity.documentId = 'runner-authored-document'
   for (const step of spoofedExecution.steps) {
@@ -423,13 +423,13 @@ test('derive comparison validation rejects stale identity and tampered evidence'
   const alignment = deriveAlignment(registry, comparison)
   assert.notEqual(
     alignment.statuses.find(
-      (entry) => entry.id === 'component-v2.el-markdown-editor',
+      (entry) => entry.id === 'component-v2.fsus-markdown-editor',
     )?.status,
     'aligned',
   )
   assert.ok(
     alignment.gaps.some(
-      (gap) => gap.contract === 'component-v2.el-markdown-editor',
+      (gap) => gap.contract === 'component-v2.fsus-markdown-editor',
     ),
   )
 
@@ -715,13 +715,13 @@ test('receipts align only statically complete contracts with same-identity evide
     {
       contracts: [checkTag, noEvidence],
       consumerBindings: consumerBindingsFor(
-        'component-v2.el-check-tag',
+        'component-v2.fsus-check-tag',
         'component-v2.no-evidence',
       ),
     },
     comparison,
   )
-  assert.deepEqual(alignment.stable, ['component-v2.el-check-tag'])
+  assert.deepEqual(alignment.stable, ['component-v2.fsus-check-tag'])
   assert.equal(
     alignment.statuses.find((entry) => entry.id === 'component-v2.no-evidence')
       .status,
@@ -772,14 +772,14 @@ test('alignment blocks an otherwise complete contract with uncovered members', a
 test('derived alignment re-validates receipt coverage claims against the contract', async () => {
   const comparison = await validatedRealComparison()
   const checkTag = realCheckTagContract()
-  const bindings = consumerBindingsFor('component-v2.el-check-tag')
+  const bindings = consumerBindingsFor('component-v2.fsus-check-tag')
   const registry = { contracts: [checkTag], consumerBindings: bindings }
   assert.deepEqual(deriveAlignment(registry, comparison).stable, [
-    'component-v2.el-check-tag',
+    'component-v2.fsus-check-tag',
   ])
 
   comparison.receipts[
-    'component-v2.el-check-tag'
+    'component-v2.fsus-check-tag'
   ].coverage.requiredMembers.push('input.forged')
   assert.throws(
     () => deriveAlignment(registry, comparison),

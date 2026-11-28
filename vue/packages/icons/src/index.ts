@@ -28,6 +28,7 @@ export interface FsusIconProps {
   spin?: boolean
   label?: string
   decorative?: boolean
+  variant?: 'default' | 'linear'
   viewBox?: string
 }
 
@@ -46,6 +47,7 @@ export const FsusIcon = defineComponent({
     spin: { type: Boolean, default: false },
     label: { type: String, default: undefined },
     decorative: { type: Boolean, default: undefined },
+    variant: { type: String as PropType<'default' | 'linear'>, default: undefined },
     viewBox: { type: String, default: '0 0 1024 1024' },
   },
   setup(props, { slots }) {
@@ -62,6 +64,7 @@ export const FsusIcon = defineComponent({
         {
           class: 'fsus-icon',
           'data-spin': props.spin ? '' : undefined,
+          'data-variant': props.variant === 'linear' ? 'linear' : undefined,
           'aria-hidden': isDecorative ? 'true' : undefined,
           'aria-label': isDecorative ? undefined : props.label,
           role: isDecorative ? undefined : 'img',

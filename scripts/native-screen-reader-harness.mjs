@@ -36,10 +36,10 @@ const contractRegistry = JSON.parse(
   ),
 )
 const checkTagPerformanceBudget = contractRegistry.contracts.find(
-  (contract) => contract.id === 'component-v2.el-check-tag',
+  (contract) => contract.id === 'component-v2.fsus-check-tag',
 )?.performanceBudget
 const markdownPerformanceBudget = contractRegistry.contracts.find(
-  (contract) => contract.id === 'component-v2.el-markdown-editor',
+  (contract) => contract.id === 'component-v2.fsus-markdown-editor',
 )?.performanceBudget
 if (
   !Number.isFinite(checkTagPerformanceBudget?.renderMs) ||
@@ -406,7 +406,7 @@ const main = async () => {
     )
     recordMarkdownStep(
       'render',
-      'ElMarkdownEditor.public-inputs',
+      'FsusMarkdownEditor.public-inputs',
       markdownMounted,
       markdownMounted.rendered.mounted === true &&
         markdownMounted.document === markdownRichSource &&
@@ -426,7 +426,7 @@ const main = async () => {
     )
     recordMarkdownStep(
       'pointer',
-      'ElMarkdownEditor.textarea',
+      'FsusMarkdownEditor.textarea',
       markdownAfterPointer.input,
       markdownAfterPointer.input.focused === true,
       performance.now() - stepStartedAt,
@@ -440,7 +440,7 @@ const main = async () => {
     )
     recordMarkdownStep(
       'focus',
-      'ElMarkdownEditor.textarea',
+      'FsusMarkdownEditor.textarea',
       markdownAfterFocus.input,
       markdownAfterFocus.input.focused === true,
       performance.now() - stepStartedAt,
@@ -455,7 +455,7 @@ const main = async () => {
     )
     recordMarkdownStep(
       'keyboard',
-      'ElMarkdownEditor.textarea.selection',
+      'FsusMarkdownEditor.textarea.selection',
       markdownAfterKeyboard.input.selection,
       markdownAfterKeyboard.input.focused === true &&
         markdownAfterKeyboard.input.selection?.end -
@@ -490,7 +490,7 @@ const main = async () => {
     )
     recordMarkdownStep(
       'operation',
-      'ElMarkdownEditor.dispatchTransaction',
+      'FsusMarkdownEditor.dispatchTransaction',
       markdownDispatch.result,
       markdownDispatch.result?.accepted === true &&
         markdownDispatch.result.positionMap?.range?.deleted === false &&
@@ -503,9 +503,9 @@ const main = async () => {
         'null',
     )
     for (const [name, target] of [
-      ['markdown.transaction', 'ElMarkdownEditor.transaction'],
-      ['markdown.selection-change', 'ElMarkdownEditor.selection-change'],
-      ['markdown.history-change', 'ElMarkdownEditor.history-change'],
+      ['markdown.transaction', 'FsusMarkdownEditor.transaction'],
+      ['markdown.selection-change', 'FsusMarkdownEditor.selection-change'],
+      ['markdown.history-change', 'FsusMarkdownEditor.history-change'],
     ]) {
       const eventIndex = markdownEventState.eventNames.lastIndexOf(name)
       recordMarkdownStep(
@@ -524,7 +524,7 @@ const main = async () => {
     )
     recordMarkdownStep(
       'operation',
-      'ElMarkdownEditor.undo',
+      'FsusMarkdownEditor.undo',
       markdownUndo.result,
       markdownUndo.result?.accepted === true &&
         markdownUndo.result.value === markdownRichSource,
@@ -537,7 +537,7 @@ const main = async () => {
     )
     recordMarkdownStep(
       'operation',
-      'ElMarkdownEditor.redo',
+      'FsusMarkdownEditor.redo',
       markdownRedo.result,
       markdownRedo.result?.accepted === true &&
         markdownRedo.result.value === `>${markdownRichSource} exposed`,
@@ -553,7 +553,7 @@ const main = async () => {
     )
     recordMarkdownStep(
       'render',
-      'ElMarkdownEditor.document-identity-switch',
+      'FsusMarkdownEditor.document-identity-switch',
       markdownIdentitySwitch,
       markdownIdentitySwitch.document === markdownRichSource &&
         markdownIdentitySwitch.documentIdentity.id === markdownDocumentB.id &&
@@ -573,14 +573,14 @@ const main = async () => {
       )
       markdownModes.push({
         classPresent: mounted.rendered.classNames.includes(
-          `el-markdown-editor--${mode}`,
+          `fsus-markdown-editor--${mode}`,
         ),
         mode: mounted.mode,
       })
     }
     recordMarkdownStep(
       'render',
-      'ElMarkdownEditor.modes',
+      'FsusMarkdownEditor.modes',
       markdownModes,
       markdownModes.every((entry) => entry.classPresent === true && entry.mode),
       performance.now() - stepStartedAt,
@@ -596,13 +596,13 @@ const main = async () => {
     )
     recordMarkdownStep(
       'render',
-      'ElMarkdownEditor.non-default-inputs',
+      'FsusMarkdownEditor.non-default-inputs',
       markdownNonDefaultInputs,
       markdownNonDefaultInputs.profile === 'prose' &&
         markdownNonDefaultInputs.input.lang === 'ja-JP' &&
         markdownNonDefaultInputs.input.readOnly === true &&
         markdownNonDefaultInputs.rendered.classNames.includes(
-          'el-markdown-editor--profile-prose',
+          'fsus-markdown-editor--profile-prose',
         ),
       performance.now() - stepStartedAt,
     )
@@ -620,7 +620,7 @@ const main = async () => {
     )
     recordMarkdownStep(
       'projection',
-      'ElMarkdownEditor.public-runtime-projection',
+      'FsusMarkdownEditor.public-runtime-projection',
       markdownProjection,
       markdownProjection.documentIdentity.id === markdownDocumentB.id &&
         markdownProjection.coordinates.rawSource === markdownRichSource &&
@@ -653,7 +653,7 @@ const main = async () => {
     })
     recordMarkdownStep(
       'motion',
-      'ElMarkdownEditor.reduced-motion',
+      'FsusMarkdownEditor.reduced-motion',
       markdownMotion,
       markdownMotion.mode === 'reduced' &&
         markdownMotion.activeAnimations === 0,
@@ -675,7 +675,7 @@ const main = async () => {
         })
         const elapsedMilliseconds = performance.now() - startedAt
         const root = document.querySelector(
-          '[data-testid="trace-markdown-editor"] .el-markdown-editor',
+          '[data-testid="trace-markdown-editor"] .fsus-markdown-editor',
         )
         return {
           descendantCount: root?.querySelectorAll('*').length ?? 0,
@@ -905,7 +905,7 @@ const main = async () => {
 
     const domProbe = await page.evaluate(() => {
       const editor = document.querySelector(
-        '[data-testid="trace-markdown-editor"] .el-markdown-editor',
+        '[data-testid="trace-markdown-editor"] .fsus-markdown-editor',
       )
       const textarea = editor?.querySelector('textarea')
       const live = [...document.querySelectorAll('[aria-live]')]
@@ -995,8 +995,8 @@ const main = async () => {
       avaloniaBaselineHash: sha256File(
         'spec/avalonia/semantic/FsusUI.Avalonia.semantic.json',
       ),
-      scenario: 'scenario.v2.el-markdown-editor.real-interaction-trace',
-      contract: 'component-v2.el-markdown-editor',
+      scenario: 'scenario.v2.fsus-markdown-editor.real-interaction-trace',
+      contract: 'component-v2.fsus-markdown-editor',
       documentId: publicState.markdown.documentIdentity.id,
       documentEpoch: publicState.markdown.documentIdentity.epoch,
       sourceRevision: publicState.markdown.revision,
@@ -1014,8 +1014,8 @@ const main = async () => {
       contractHash: identity.contractHash,
       webBaselineHash: identity.webBaselineHash,
       avaloniaBaselineHash: identity.avaloniaBaselineHash,
-      scenario: 'scenario.v2.el-markdown-editor.real-interaction-trace',
-      contract: 'component-v2.el-markdown-editor',
+      scenario: 'scenario.v2.fsus-markdown-editor.real-interaction-trace',
+      contract: 'component-v2.fsus-markdown-editor',
       documentId: markdownDispatch.result.documentIdentity.id,
       documentEpoch: markdownDispatch.result.documentIdentity.epoch,
       sourceRevision: 0,
@@ -1033,8 +1033,8 @@ const main = async () => {
       contractHash: identity.contractHash,
       webBaselineHash: identity.webBaselineHash,
       avaloniaBaselineHash: identity.avaloniaBaselineHash,
-      scenario: 'scenario.v2.el-check-tag.real-interaction-trace',
-      contract: 'component-v2.el-check-tag',
+      scenario: 'scenario.v2.fsus-check-tag.real-interaction-trace',
+      contract: 'component-v2.fsus-check-tag',
       documentId: 'check-tag-state',
       documentEpoch: 1,
       sourceRevision: 2,
@@ -1046,17 +1046,17 @@ const main = async () => {
       runnerHash,
     }
     const checkTagScenarios = [
-      'scenario.v2.el-check-tag.input.checked',
-      'scenario.v2.el-check-tag.output.change',
-      'scenario.v2.el-check-tag.output.update-checked',
-      'scenario.v2.el-check-tag.content-region.default',
-      'scenario.v2.el-check-tag.state.default',
-      'scenario.v2.el-check-tag.keyboard',
-      'scenario.v2.el-check-tag.pointer',
-      'scenario.v2.el-check-tag.focus',
-      'scenario.v2.el-check-tag.a11y',
-      'scenario.v2.el-check-tag.motion',
-      'scenario.v2.el-check-tag.perf',
+      'scenario.v2.fsus-check-tag.input.checked',
+      'scenario.v2.fsus-check-tag.output.change',
+      'scenario.v2.fsus-check-tag.output.update-checked',
+      'scenario.v2.fsus-check-tag.content-region.default',
+      'scenario.v2.fsus-check-tag.state.default',
+      'scenario.v2.fsus-check-tag.keyboard',
+      'scenario.v2.fsus-check-tag.pointer',
+      'scenario.v2.fsus-check-tag.focus',
+      'scenario.v2.fsus-check-tag.a11y',
+      'scenario.v2.fsus-check-tag.motion',
+      'scenario.v2.fsus-check-tag.perf',
     ]
     const normalizedAccessibilityNodes = (browserAccessibility.nodes || [])
       .filter((node) =>
@@ -1066,14 +1066,16 @@ const main = async () => {
     const markdownAccessibilityNode = normalizedAccessibilityNodes.find(
       (node) =>
         node.role === 'textbox' &&
-        /^markdown editor source$/i.test(node.name || ''),
+        /^(?:markdown editor source|markdown source editor|markdown\s*源码\s*编辑区)$/iu.test(
+          node.name || '',
+        ),
     )
     recordMarkdownStep(
       'accessibility',
-      'ElMarkdownEditor.chromium-cdp-and-atspi',
+      'FsusMarkdownEditor.chromium-cdp-and-atspi',
       markdownAccessibilityNode,
       markdownAccessibilityNode?.role === 'textbox' &&
-        /^markdown editor source$/i.test(
+        /^(?:markdown editor source|markdown source editor|markdown\s*源码\s*编辑区)$/iu.test(
           markdownAccessibilityNode.name || '',
         ) &&
         textboxHit &&
@@ -1084,9 +1086,9 @@ const main = async () => {
     const markdownBoundSteps = markdownContractSteps
       .filter((step) =>
         [
-          'ElMarkdownEditor.dispatchTransaction',
-          'ElMarkdownEditor.undo',
-          'ElMarkdownEditor.redo',
+          'FsusMarkdownEditor.dispatchTransaction',
+          'FsusMarkdownEditor.undo',
+          'FsusMarkdownEditor.redo',
         ].includes(step.target),
       )
       .map((step, index) => ({
@@ -1097,15 +1099,15 @@ const main = async () => {
     if (markdownBoundSteps.some((step) => step.observation.passed !== true))
       throw new Error('Markdown contract operation evidence failed')
     const markdownCoverageScenarios = [
-      'scenario.v2.el-markdown-editor.operation.dispatch-transaction',
-      'scenario.v2.el-markdown-editor.operation.redo',
-      'scenario.v2.el-markdown-editor.operation.undo',
+      'scenario.v2.fsus-markdown-editor.operation.dispatch-transaction',
+      'scenario.v2.fsus-markdown-editor.operation.redo',
+      'scenario.v2.fsus-markdown-editor.operation.undo',
     ]
     const markdownScenarioExecutions = Object.fromEntries(
       [
-        ['scenario.v2.el-markdown-editor.operation.dispatch-transaction', [0]],
-        ['scenario.v2.el-markdown-editor.operation.redo', [2]],
-        ['scenario.v2.el-markdown-editor.operation.undo', [1]],
+        ['scenario.v2.fsus-markdown-editor.operation.dispatch-transaction', [0]],
+        ['scenario.v2.fsus-markdown-editor.operation.redo', [2]],
+        ['scenario.v2.fsus-markdown-editor.operation.undo', [1]],
       ].map(([scenario, stepIndexes]) => {
         return [
           scenario,
@@ -1149,7 +1151,7 @@ const main = async () => {
         {
           index: 0,
           action: 'render',
-          target: 'ElMarkdownEditor',
+          target: 'FsusMarkdownEditor',
           focusTarget: initialFocus,
           binding: identity,
           observation: {
@@ -1160,7 +1162,7 @@ const main = async () => {
         {
           index: 1,
           action: 'operation',
-          target: 'ElMarkdownEditor.dispatchTransaction',
+          target: 'FsusMarkdownEditor.dispatchTransaction',
           focusTarget: dispatchedFocus,
           binding: identity,
           observation: {
@@ -1174,7 +1176,7 @@ const main = async () => {
         {
           index: 2,
           action: 'keyboard',
-          target: 'ElMarkdownEditor.undo',
+          target: 'FsusMarkdownEditor.undo',
           focusTarget: undoFocus,
           binding: identity,
           observation: {
@@ -1211,7 +1213,7 @@ const main = async () => {
       },
       domProbe,
       contractExecutions: {
-        'component-v2.el-markdown-editor': {
+        'component-v2.fsus-markdown-editor': {
           identity: markdownIdentity,
           steps: markdownBoundSteps,
           events: (markdownEventState.events || []).filter((event) =>
@@ -1232,13 +1234,13 @@ const main = async () => {
             ],
             memberScenarios: {
               'operation.dispatchTransaction': [
-                'scenario.v2.el-markdown-editor.operation.dispatch-transaction',
+                'scenario.v2.fsus-markdown-editor.operation.dispatch-transaction',
               ],
               'operation.redo': [
-                'scenario.v2.el-markdown-editor.operation.redo',
+                'scenario.v2.fsus-markdown-editor.operation.redo',
               ],
               'operation.undo': [
-                'scenario.v2.el-markdown-editor.operation.undo',
+                'scenario.v2.fsus-markdown-editor.operation.undo',
               ],
             },
             requiredScenarios: markdownCoverageScenarios,
@@ -1259,13 +1261,13 @@ const main = async () => {
             },
           },
         },
-        'component-v2.el-check-tag': {
+        'component-v2.fsus-check-tag': {
           identity: checkTagIdentity,
           steps: [
             {
               index: 0,
               action: 'render',
-              target: 'ElCheckTag',
+              target: 'FsusCheckTag',
               focusTarget: null,
               binding: checkTagIdentity,
               observation: {
@@ -1279,7 +1281,7 @@ const main = async () => {
             {
               index: 1,
               action: 'content',
-              target: 'ElCheckTag.default-slot',
+              target: 'FsusCheckTag.default-slot',
               focusTarget: null,
               binding: checkTagIdentity,
               observation: {
@@ -1298,7 +1300,7 @@ const main = async () => {
             {
               index: 2,
               action: 'pointer',
-              target: 'ElCheckTag',
+              target: 'FsusCheckTag',
               focusTarget: 'checkbox',
               binding: checkTagIdentity,
               observation: {
@@ -1313,7 +1315,7 @@ const main = async () => {
             {
               index: 3,
               action: 'event',
-              target: 'ElCheckTag.change',
+              target: 'FsusCheckTag.change',
               focusTarget: 'checkbox',
               binding: checkTagIdentity,
               observation: {
@@ -1328,7 +1330,7 @@ const main = async () => {
             {
               index: 4,
               action: 'event',
-              target: 'ElCheckTag.update:checked',
+              target: 'FsusCheckTag.update:checked',
               focusTarget: 'checkbox',
               binding: checkTagIdentity,
               observation: {
@@ -1343,7 +1345,7 @@ const main = async () => {
             {
               index: 5,
               action: 'focus',
-              target: 'ElCheckTag',
+              target: 'FsusCheckTag',
               focusTarget: checkTagFocus,
               binding: checkTagIdentity,
               observation: {
@@ -1360,7 +1362,7 @@ const main = async () => {
             {
               index: 6,
               action: 'keyboard',
-              target: 'ElCheckTag',
+              target: 'FsusCheckTag',
               focusTarget: checkTagFocus,
               binding: checkTagIdentity,
               observation: {
@@ -1376,7 +1378,7 @@ const main = async () => {
             {
               index: 7,
               action: 'accessibility',
-              target: 'ElCheckTag.chromium-cdp-and-atspi',
+              target: 'FsusCheckTag.chromium-cdp-and-atspi',
               focusTarget: 'checkbox',
               binding: checkTagIdentity,
               observation: {
@@ -1391,7 +1393,7 @@ const main = async () => {
             {
               index: 8,
               action: 'motion',
-              target: 'ElCheckTag.reduced-motion',
+              target: 'FsusCheckTag.reduced-motion',
               focusTarget: 'checkbox',
               binding: checkTagIdentity,
               observation: {
@@ -1406,7 +1408,7 @@ const main = async () => {
             {
               index: 9,
               action: 'performance',
-              target: 'ElCheckTag',
+              target: 'FsusCheckTag',
               focusTarget: 'checkbox',
               binding: checkTagIdentity,
               observation: {
@@ -1448,67 +1450,67 @@ const main = async () => {
             ],
             requiredScenarios: checkTagScenarios,
             memberScenarios: {
-              'input.checked': ['scenario.v2.el-check-tag.input.checked'],
-              'output.change': ['scenario.v2.el-check-tag.output.change'],
+              'input.checked': ['scenario.v2.fsus-check-tag.input.checked'],
+              'output.change': ['scenario.v2.fsus-check-tag.output.change'],
               'output.update:checked': [
-                'scenario.v2.el-check-tag.output.update-checked',
+                'scenario.v2.fsus-check-tag.output.update-checked',
               ],
               'content-region.default': [
-                'scenario.v2.el-check-tag.content-region.default',
+                'scenario.v2.fsus-check-tag.content-region.default',
               ],
             },
             executions: {
-              'scenario.v2.el-check-tag.input.checked': {
+              'scenario.v2.fsus-check-tag.input.checked': {
                 real: true,
                 stepIndexes: [0, 2],
                 artifacts: ['interaction', 'state'],
               },
-              'scenario.v2.el-check-tag.output.change': {
+              'scenario.v2.fsus-check-tag.output.change': {
                 real: true,
                 stepIndexes: [3],
                 artifacts: ['event'],
               },
-              'scenario.v2.el-check-tag.output.update-checked': {
+              'scenario.v2.fsus-check-tag.output.update-checked': {
                 real: true,
                 stepIndexes: [4],
                 artifacts: ['event'],
               },
-              'scenario.v2.el-check-tag.content-region.default': {
+              'scenario.v2.fsus-check-tag.content-region.default': {
                 real: true,
                 stepIndexes: [1, 7],
                 artifacts: ['content', 'accessibility', 'visual'],
               },
-              'scenario.v2.el-check-tag.state.default': {
+              'scenario.v2.fsus-check-tag.state.default': {
                 real: true,
                 stepIndexes: [0],
                 artifacts: ['state'],
               },
-              'scenario.v2.el-check-tag.keyboard': {
+              'scenario.v2.fsus-check-tag.keyboard': {
                 real: true,
                 stepIndexes: [6],
                 artifacts: ['interaction', 'event'],
               },
-              'scenario.v2.el-check-tag.pointer': {
+              'scenario.v2.fsus-check-tag.pointer': {
                 real: true,
                 stepIndexes: [2],
                 artifacts: ['interaction', 'event'],
               },
-              'scenario.v2.el-check-tag.focus': {
+              'scenario.v2.fsus-check-tag.focus': {
                 real: true,
                 stepIndexes: [5],
                 artifacts: ['focus', 'visual'],
               },
-              'scenario.v2.el-check-tag.a11y': {
+              'scenario.v2.fsus-check-tag.a11y': {
                 real: true,
                 stepIndexes: [7],
                 artifacts: ['accessibility'],
               },
-              'scenario.v2.el-check-tag.motion': {
+              'scenario.v2.fsus-check-tag.motion': {
                 real: true,
                 stepIndexes: [8],
                 artifacts: ['motion'],
               },
-              'scenario.v2.el-check-tag.perf': {
+              'scenario.v2.fsus-check-tag.perf': {
                 real: true,
                 stepIndexes: [9],
                 artifacts: ['performance'],

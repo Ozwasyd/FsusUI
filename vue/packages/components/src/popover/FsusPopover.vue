@@ -11,7 +11,7 @@ import {
   type FsusPlacement,
 } from '@fsusui/core'
 
-defineOptions({ name: 'FsusPopover' })
+defineOptions({ name: 'FsusPopover', inheritAttrs: false })
 
 export interface FsusPopoverProps {
   title?: string

@@ -37,7 +37,11 @@ test('resolves every project-owned visual dimension from one helper', () => {
 })
 
 test('selects desktop, mobile, and cross-theme specs before workers launch', () => {
-  assert(visualProjectTestIgnore('mobile-dark').includes('**/audit.spec.ts'))
+  assert(
+    visualProjectTestIgnore('mobile-dark').includes(
+      '**/smoke-theme-switch.spec.ts',
+    ),
+  )
   assert(
     visualProjectTestIgnore('desktop-dark').includes(
       '**/public-shell-mobile-nav.spec.ts',
@@ -55,7 +59,7 @@ test('selects desktop, mobile, and cross-theme specs before workers launch', () 
   )
   assert(
     visualProjectTestIgnore('mobile-dark').includes(
-      '**/transfer-responsive.spec.ts',
+      '**/public-shell-desktop-search.spec.ts',
     ),
   )
   assert(
@@ -107,10 +111,9 @@ expectMutationRejected(
 )
 
 test('rejects removal of pre-launch project selection', () => {
-  const previewConfig = baseline.previewConfig.replace(
-    "testIgnore: visualProjectTestIgnore('mobile-light'),",
-    '',
-  )
+  const previewConfig = baseline.previewConfig
+    .replace("testIgnore: visualProjectTestIgnore('mobile-light'),", '')
+    .replace('testIgnore: visualProjectTestIgnore(projectName),', '')
   const violations = validateVisualVariantOwnership({
     ...baseline,
     previewConfig,

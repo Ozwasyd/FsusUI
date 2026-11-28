@@ -32,7 +32,7 @@ const contractRegistry = JSON.parse(
   read('spec/components/contracts/v2/contract-v2.json'),
 )
 const checkTagContract = contractRegistry.contracts.find(
-  (contract) => contract.id === 'component-v2.el-check-tag',
+  (contract) => contract.id === 'component-v2.fsus-check-tag',
 )
 const checkTagBudget = checkTagContract?.performanceBudget?.interactionMs
 const checkTagRenderBudget = checkTagContract?.performanceBudget?.renderMs
@@ -104,7 +104,7 @@ if (!Array.isArray(evidence.steps) || evidence.steps.length < 4) {
   )
 }
 const checkTagVisual =
-  evidence.contractExecutions?.['component-v2.el-check-tag']?.visual
+  evidence.contractExecutions?.['component-v2.fsus-check-tag']?.visual
 if (
   checkTagVisual?.observation?.focusIndicatorVisible !== true ||
   checkTagVisual.observation?.focusRingPixels?.passed !== true

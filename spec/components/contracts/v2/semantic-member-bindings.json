@@ -2,14 +2,14 @@
   "schemaVersion": 2,
   "mappings": [
     {
-      "component": "ElCheckTag",
+      "component": "FsusCheckTag",
       "semantic": "default",
       "kind": "contentRegion",
       "web": "default",
       "avalonia": "Content"
     },
     {
-      "component": "ElCheckTag",
+      "component": "FsusCheckTag",
       "semantic": "change",
       "kind": "output",
       "web": "change",
@@ -17,7 +17,7 @@
       "avaloniaPayloadField": "NewChecked"
     },
     {
-      "component": "ElCheckTag",
+      "component": "FsusCheckTag",
       "semantic": "update-checked",
       "kind": "output",
       "web": "update:checked",
@@ -25,163 +25,128 @@
       "avaloniaPayloadField": "NewChecked"
     },
     {
-      "component": "ElMarkdownEditor",
+      "component": "FsusMarkdownEditor",
       "semantic": "chrome",
       "kind": "input",
       "web": "chrome",
       "avalonia": "Chrome"
     },
     {
-      "component": "ElMarkdownEditor",
+      "component": "FsusMarkdownEditor",
       "semantic": "document-identity",
       "kind": "input",
       "web": "documentIdentity",
       "avalonia": "DocumentIdentity"
     },
     {
-      "component": "ElMarkdownEditor",
+      "component": "FsusMarkdownEditor",
       "semantic": "editor-profile",
       "kind": "input",
       "web": "editorProfile",
       "avalonia": "Profile"
     },
     {
-      "component": "ElMarkdownEditor",
+      "component": "FsusMarkdownEditor",
       "semantic": "locale",
       "kind": "input",
       "web": "lang",
       "avalonia": "Locale"
     },
     {
-      "component": "ElMarkdownEditor",
+      "component": "FsusMarkdownEditor",
       "semantic": "mode",
       "kind": "input",
       "web": "mode",
       "avalonia": "Mode"
     },
     {
-      "component": "ElMarkdownEditor",
+      "component": "FsusMarkdownEditor",
       "semantic": "document",
       "kind": "input",
       "web": "modelValue",
       "avalonia": "Document"
     },
     {
-      "component": "ElMarkdownEditor",
+      "component": "FsusMarkdownEditor",
       "semantic": "read-only",
       "kind": "input",
       "web": "readonly",
       "avalonia": "IsReadOnly"
     },
     {
-      "component": "ElMarkdownEditor",
+      "component": "FsusMarkdownEditor",
       "semantic": "status-density",
       "kind": "input",
       "web": "statusDensity",
       "avalonia": "StatusDensity"
     },
     {
-      "component": "ElMarkdownEditor",
+      "component": "FsusMarkdownEditor",
       "semantic": "dispatch-transaction",
       "kind": "operation",
       "web": "dispatchTransaction",
       "avalonia": "DispatchTransaction"
     },
     {
-      "component": "ElMarkdownEditor",
+      "component": "FsusMarkdownEditor",
       "semantic": "redo",
       "kind": "operation",
       "web": "redo",
       "avalonia": "Redo"
     },
     {
-      "component": "ElMarkdownEditor",
+      "component": "FsusMarkdownEditor",
       "semantic": "reveal-heading",
       "kind": "operation",
       "web": "revealHeading",
       "avalonia": "RevealHeading"
     },
     {
-      "component": "ElMarkdownEditor",
+      "component": "FsusMarkdownEditor",
       "semantic": "reveal-source-range",
       "kind": "operation",
       "web": "revealSourceRange",
       "avalonia": "RevealSourceRange"
     },
     {
-      "component": "ElMarkdownEditor",
+      "component": "FsusMarkdownEditor",
       "semantic": "search-navigate",
       "kind": "operation",
       "web": "searchNavigate",
       "avalonia": "NavigateSearch"
     },
     {
-      "component": "ElMarkdownEditor",
+      "component": "FsusMarkdownEditor",
       "semantic": "undo",
       "kind": "operation",
       "web": "undo",
       "avalonia": "Undo"
     },
     {
-      "component": "ElMarkdownEditor",
+      "component": "FsusMarkdownEditor",
       "semantic": "history-change",
       "kind": "output",
       "web": "history-change",
       "avalonia": "HistoryChange"
     },
     {
-      "component": "ElMarkdownEditor",
+      "component": "FsusMarkdownEditor",
       "semantic": "selection-change",
       "kind": "output",
       "web": "selection-change",
       "avalonia": "SelectionChange"
     },
     {
-      "component": "ElMarkdownEditor",
+      "component": "FsusMarkdownEditor",
       "semantic": "transaction",
       "kind": "output",
       "web": "transaction",
       "avalonia": "Transaction"
-    },
-    {
-      "component": "ElTableV2",
-      "semantic": "cache-overload",
-      "kind": "input",
-      "web": "cache",
-      "avalonia": "Overscan"
-    },
-    {
-      "component": "ElTableV2",
-      "semantic": "header-height",
-      "kind": "input",
-      "web": "headerHeight",
-      "avalonia": "HeaderHeight"
-    },
-    {
-      "component": "ElTableV2",
-      "semantic": "height",
-      "kind": "input",
-      "web": "height",
-      "avalonia": "ViewportHeight"
-    },
-    {
-      "component": "ElTableV2",
-      "semantic": "max-height",
-      "kind": "input",
-      "web": "maxHeight",
-      "avalonia": "ViewportMaxHeight"
-    },
-    {
-      "component": "ElTableV2",
-      "semantic": "width",
-      "kind": "input",
-      "web": "width",
-      "avalonia": "ViewportWidth"
     }
   ],
   "dispositions": [
     {
-      "component": "ElMarkdownEditor",
+      "component": "FsusMarkdownEditor",
       "kind": "input",
       "web": "defaultMode",
       "status": "web-only",
@@ -192,7 +157,7 @@
       "alternative": "Set FsusMarkdownEditor.Mode; its compiler-known default is Source."
     },
     {
-      "component": "ElMarkdownEditor",
+      "component": "FsusMarkdownEditor",
       "kind": "input",
       "web": "textareaId",
       "status": "web-only",
@@ -203,7 +168,7 @@
       "alternative": "Use the Avalonia control Name or AutomationProperties.AutomationId at the native host."
     },
     {
-      "component": "ElMarkdownEditor",
+      "component": "FsusMarkdownEditor",
       "kind": "input",
       "web": "textareaName",
       "status": "web-only",
@@ -214,7 +179,7 @@
       "alternative": "Bind FsusMarkdownEditor.Document through the native view model."
     },
     {
-      "component": "ElMarkdownEditor",
+      "component": "FsusMarkdownEditor",
       "kind": "input",
       "web": "previewCspNonce",
       "status": "web-only",
@@ -225,7 +190,7 @@
       "alternative": "The native IFsusMarkdownEditorOutputHost owns renderer and print security policy."
     },
     {
-      "component": "ElMarkdownEditor",
+      "component": "FsusMarkdownEditor",
       "kind": "input",
       "web": "nativeWritingTools",
       "status": "web-only",
@@ -236,7 +201,7 @@
       "alternative": "Configure the native OS text-input service at the Avalonia host boundary."
     },
     {
-      "component": "ElMarkdownEditor",
+      "component": "FsusMarkdownEditor",
       "kind": "input",
       "web": "spellcheck",
       "status": "web-only",
@@ -247,7 +212,7 @@
       "alternative": "Provide native language tooling through the host-owned writing-aids boundary."
     },
     {
-      "component": "ElMarkdownEditor",
+      "component": "FsusMarkdownEditor",
       "kind": "output",
       "web": "change",
       "status": "web-only",
@@ -258,7 +223,7 @@
       "alternative": "Observe FsusMarkdownEditor.Transaction and Document changes."
     },
     {
-      "component": "ElMarkdownEditor",
+      "component": "FsusMarkdownEditor",
       "kind": "output",
       "web": "update:modelValue",
       "status": "web-only",
@@ -269,7 +234,7 @@
       "alternative": "Bind FsusMarkdownEditor.Document through Avalonia property binding."
     },
     {
-      "component": "ElMarkdownEditor",
+      "component": "FsusMarkdownEditor",
       "kind": "operation",
       "web": "closeCommandPalette",
       "status": "web-only",
@@ -280,7 +245,7 @@
       "alternative": "Close the host-composed native command palette."
     },
     {
-      "component": "ElMarkdownEditor",
+      "component": "FsusMarkdownEditor",
       "kind": "operation",
       "web": "openCommandPalette",
       "status": "web-only",
@@ -291,7 +256,7 @@
       "alternative": "Open the host-composed native command palette."
     },
     {
-      "component": "ElMarkdownEditor",
+      "component": "FsusMarkdownEditor",
       "kind": "operation",
       "web": "closeSearch",
       "status": "web-only",
@@ -302,7 +267,7 @@
       "alternative": "Close host search chrome and call FsusMarkdownEditor.ClearSearch."
     },
     {
-      "component": "ElMarkdownEditor",
+      "component": "FsusMarkdownEditor",
       "kind": "operation",
       "web": "openSearch",
       "status": "web-only",
@@ -313,7 +278,7 @@
       "alternative": "Open host search chrome and call FsusMarkdownEditor.RequestSearch."
     },
     {
-      "component": "ElMarkdownEditor",
+      "component": "FsusMarkdownEditor",
       "kind": "operation",
       "web": "searchReplaceAll",
       "status": "web-only",
@@ -324,7 +289,7 @@
       "alternative": "The native host computes replacements and submits one FsusMarkdownEditor.DispatchTransaction."
     },
     {
-      "component": "ElMarkdownEditor",
+      "component": "FsusMarkdownEditor",
       "kind": "operation",
       "web": "searchReplaceCurrent",
       "status": "web-only",
@@ -335,7 +300,7 @@
       "alternative": "The native host computes the current replacement and submits FsusMarkdownEditor.DispatchTransaction."
     },
     {
-      "component": "ElMarkdownEditor",
+      "component": "FsusMarkdownEditor",
       "kind": "operation",
       "web": "searchUi",
       "status": "web-only",
@@ -346,7 +311,7 @@
       "alternative": "The native host owns search-chrome state and uses RequestSearch, CommitSearch, NavigateSearch, and ClearSearch."
     },
     {
-      "component": "ElMarkdownEditor",
+      "component": "FsusMarkdownEditor",
       "kind": "contentRegion",
       "web": "status",
       "status": "web-only",

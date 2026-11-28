@@ -4,18 +4,27 @@ import FsusPagination from '../pagination/FsusPagination.vue'
 import FsusButton from '../button/FsusButton.vue'
 import FsusInput from '../input/FsusInput.vue'
 
+export interface FsusPublicShellNavItem {
+  key: string
+  label: string
+  href?: string
+}
+
 // ─── Shells (PublicShell, SiteHeader, ResponsiveCollection) ────────────────────
 export const FsusSiteHeader = defineComponent({
   name: 'FsusSiteHeader',
   props: {
     brand: { type: String, default: '' },
+    brandHref: { type: String, default: '' },
     sticky: { type: Boolean, default: true },
   },
   setup(props, { slots }) {
     return () =>
       h('header', { class: 'fsus-site-header', 'data-sticky': props.sticky ? '' : undefined }, [
         h('div', { class: 'fsus-site-header__inner' }, [
-          h('div', { class: 'fsus-site-header__brand' }, slots.brand ? slots.brand() : props.brand),
+          props.brandHref
+            ? h('a', { class: 'fsus-site-header__brand', href: props.brandHref }, slots.brand ? slots.brand() : props.brand)
+            : h('div', { class: 'fsus-site-header__brand' }, slots.brand ? slots.brand() : props.brand),
           h('nav', { class: 'fsus-site-header__nav' }, slots.nav?.()),
           h('div', { class: 'fsus-site-header__actions' }, slots.actions?.()),
         ]),
@@ -27,38 +36,182 @@ export const FsusPublicShell = defineComponent({
   name: 'FsusPublicShell',
   props: {
     brand: { type: String, default: '' },
+    brandHref: { type: String, default: '' },
     maxWidth: { type: String, default: '1200px' },
+    sticky: { type: Boolean, default: true },
+    activeNav: { type: String, default: '' },
+    navItems: { type: Array as PropType<FsusPublicShellNavItem[]>, default: () => [] },
+    desktopSearchMode: { type: String as PropType<'inline' | 'trigger' | 'none'>, default: 'none' },
+    desktopSearchTriggerLabel: { type: String, default: 'Search' },
+    mobileNavMode: { type: String as PropType<'menu' | 'inline' | 'bottom' | 'none'>, default: 'menu' },
+    mobileNavLabel: { type: String, default: 'Primary navigation' },
+    mobileNavMenuLabel: { type: String, default: 'Menu' },
+    mobileSearchMode: { type: String as PropType<'inline' | 'trigger' | 'none'>, default: 'none' },
+    mobileSearchTriggerLabel: { type: String, default: 'Search' },
+    searchQuery: { type: String, default: '' },
+    searchPlaceholder: { type: String, default: 'Search' },
+    searchAriaLabel: { type: String, default: 'Search' },
+    searchAction: { type: String, default: '/search' },
+    searchName: { type: String, default: 'q' },
+    spaSearch: { type: Boolean, default: false },
+    authLabel: { type: String, default: '' },
+    authHref: { type: String, default: '' },
+    cspSafe: { type: Boolean, default: false },
   },
-  setup(props, { slots }) {
+  emits: ['search', 'update:searchQuery'],
+  setup(props, { emit, slots }) {
     const mobileMenuOpen = ref(false)
+    const searchDisclosed = ref(false)
+
+    const renderNavLinks = () => {
+      if (slots.nav) return slots.nav()
+      return props.navItems.map((item) =>
+        h(
+          'a',
+          {
+            key: item.key,
+            class: 'fsus-site-header__nav-link',
+            href: item.href ?? `#${item.key}`,
+            'aria-current': props.activeNav === item.key ? 'page' : undefined,
+          },
+          item.label,
+        ),
+      )
+    }
+
+    const renderSearchForm = () =>
+      h(
+        'form',
+        {
+          class: 'fsus-public-shell__search',
+          role: 'search',
+          action: props.searchAction,
+          onSubmit: (event: Event) => {
+            if (props.spaSearch) event.preventDefault()
+            emit('search', props.searchQuery)
+          },
+        },
+        [
+          h('input', {
+            type: 'search',
+            name: props.searchName,
+            class: 'fsus-public-shell__search-input',
+            value: props.searchQuery,
+            placeholder: props.searchPlaceholder,
+            'aria-label': props.searchAriaLabel,
+            onInput: (event: Event) => {
+              emit('update:searchQuery', (event.target as HTMLInputElement).value)
+            },
+            onKeydown: (event: KeyboardEvent) => {
+              if (event.key === 'Escape' && props.desktopSearchMode === 'trigger') {
+                searchDisclosed.value = false
+              }
+            },
+          }),
+        ],
+      )
+
     return () =>
-      h('div', { class: 'fsus-public-shell' }, [
-        slots.header
-          ? slots.header()
-          : h(FsusSiteHeader, { brand: props.brand }, {
-              brand: slots.brand,
-              nav: slots.nav,
-              actions: () => [
-                slots.actions?.(),
-                h(
-                  'button',
-                  {
-                    type: 'button',
-                    class: 'fsus-public-shell__menu-btn',
-                    'aria-expanded': mobileMenuOpen.value ? 'true' : 'false',
-                    'aria-label': 'Toggle navigation',
-                    onClick: () => (mobileMenuOpen.value = !mobileMenuOpen.value),
-                  },
-                  [h(FsusIcon, { name: mobileMenuOpen.value ? 'close' : 'menu', size: 18 })],
-                ),
-              ],
-            }),
-        mobileMenuOpen.value
-          ? h('div', { class: 'fsus-public-shell__drawer' }, slots.nav?.())
-          : null,
-        h('main', { class: 'fsus-public-shell__main', style: { maxWidth: props.maxWidth } }, slots.default?.()),
-        slots.footer ? h('footer', { class: 'fsus-public-shell__footer' }, slots.footer()) : null,
-      ])
+      h(
+        'div',
+        {
+          class: 'fsus-public-shell',
+          'data-desktop-search-mode': props.desktopSearchMode,
+          'data-mobile-nav-mode': props.mobileNavMode,
+        },
+        [
+          slots.header
+            ? slots.header()
+            : h(
+                FsusSiteHeader,
+                {
+                  brand: props.brand,
+                  brandHref: props.brandHref,
+                  sticky: props.sticky,
+                  'data-public-shell-header': '',
+                },
+                {
+                  brand: slots.brand,
+                  nav: props.mobileNavMode === 'none' ? undefined : renderNavLinks,
+                  actions: () => [
+                    props.desktopSearchMode === 'inline' ? renderSearchForm() : null,
+                    props.desktopSearchMode === 'trigger'
+                      ? [
+                          searchDisclosed.value ? renderSearchForm() : null,
+                          h(
+                            'button',
+                            {
+                              type: 'button',
+                              class: 'fsus-public-shell__search-trigger',
+                              'data-public-shell-search-trigger': '',
+                              'aria-expanded': searchDisclosed.value ? 'true' : 'false',
+                              'aria-label': props.desktopSearchTriggerLabel,
+                              onClick: () => (searchDisclosed.value = !searchDisclosed.value),
+                            },
+                            [h(FsusIcon, { name: 'search', size: 16 })],
+                          ),
+                        ]
+                      : null,
+                    slots['desktop-actions']?.(),
+                    slots.actions?.(),
+                    props.authLabel
+                      ? h(
+                          'a',
+                          {
+                            class: 'fsus-site-header__nav-link',
+                            href: props.authHref || '#auth',
+                          },
+                          props.authLabel,
+                        )
+                      : null,
+                    props.mobileNavMode === 'menu'
+                      ? h(
+                          'button',
+                          {
+                            type: 'button',
+                            class: 'fsus-public-shell__menu-btn',
+                            'data-public-shell-menu-trigger': '',
+                            'aria-expanded': mobileMenuOpen.value ? 'true' : 'false',
+                            'aria-label': props.mobileNavMenuLabel,
+                            onClick: () => (mobileMenuOpen.value = !mobileMenuOpen.value),
+                          },
+                          [h(FsusIcon, { name: mobileMenuOpen.value ? 'close' : 'menu', size: 18 })],
+                        )
+                      : null,
+                  ],
+                },
+              ),
+          mobileMenuOpen.value
+            ? h(
+                'div',
+                {
+                  class: 'fsus-public-shell__drawer',
+                  'data-public-shell-drawer': '',
+                  role: 'region',
+                  'aria-label': props.mobileNavLabel,
+                },
+                [
+                  renderNavLinks(),
+                  slots['mobile-primary-actions']?.(),
+                  slots['mobile-menu-actions']?.(),
+                ],
+              )
+            : null,
+          h('main', { class: 'fsus-public-shell__main', style: { maxWidth: props.maxWidth } }, slots.default?.()),
+          props.mobileNavMode === 'bottom'
+            ? h(
+                'nav',
+                {
+                  class: 'fsus-public-shell__bottom-nav',
+                  'data-public-shell-bottom-nav': '',
+                  'aria-label': props.mobileNavLabel,
+                },
+                renderNavLinks(),
+              )
+            : null,
+          slots.footer ? h('footer', { class: 'fsus-public-shell__footer' }, slots.footer()) : null,
+        ],
+      )
   },
 })
 

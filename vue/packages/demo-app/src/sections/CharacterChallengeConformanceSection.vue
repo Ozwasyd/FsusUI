@@ -182,7 +182,7 @@ const responses = reactive<Record<string, string>>(
 }
 
 .character-conformance__fixture h2 {
-  font-size: var(--el-font-size-base, 14px);
+  font-size: var(--fsus-font-size-base, 14px);
   line-height: 1.5;
 }
 

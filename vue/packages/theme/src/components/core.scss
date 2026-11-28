@@ -373,12 +373,14 @@
 
   .fsus-check-tag {
     cursor: pointer;
+    user-select: none;
     transition: background-color var(--fsus-motion-control-fast) var(--fsus-motion-standard),
       border-color var(--fsus-motion-control-fast) var(--fsus-motion-standard),
       color var(--fsus-motion-control-fast) var(--fsus-motion-standard);
+    &:focus,
     &:focus-visible {
-      outline: var(--fsus-focus-ring-width) solid var(--fsus-color-focus-ring);
-      outline-offset: 2px;
+      outline: none;
+      box-shadow: 0 0 0 var(--fsus-focus-ring-width, 2px) var(--fsus-color-focus-ring);
     }
     @media (prefers-reduced-motion: reduce) {
       transition-duration: 1ms;

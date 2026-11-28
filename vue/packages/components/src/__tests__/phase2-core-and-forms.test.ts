@@ -1,3 +1,5 @@
+import { readFileSync } from 'node:fs'
+import { resolve } from 'node:path'
 import { describe, expect, it } from 'vitest'
 import { mount } from '@vue/test-utils'
 import { defineComponent, h, reactive, ref } from 'vue'
@@ -71,9 +73,15 @@ describe('Phase 2 Core, Overlay & Form Components', () => {
     expect(mount(FsusBadge, { props: { value: 120, max: 99 } }).find('.fsus-badge__content').text()).toBe('99+')
     expect(mount(FsusTag, { props: { tone: 'success' }, slots: { default: 'OK' } }).text()).toBe('OK')
 
-    const ct = mount(FsusCheckTag, { props: { modelValue: false }, slots: { default: 'Filter' } })
+    const ct = mount(FsusCheckTag, { props: { checked: false }, slots: { default: 'Filter' } })
+    expect(ct.attributes('role')).toBe('checkbox')
+    expect(ct.attributes('aria-checked')).toBe('false')
     await ct.trigger('click')
-    expect(ct.emitted('update:modelValue')?.[0]).toEqual([true])
+    expect(ct.emitted('change')?.[0]).toEqual([true])
+    expect(ct.emitted('update:checked')?.[0]).toEqual([true])
+    await ct.trigger('keydown.space')
+    expect(ct.emitted('change')?.[1]).toEqual([false])
+    expect(ct.emitted('update:checked')?.[1]).toEqual([false])
 
     expect(mount(FsusAlert, { props: { title: 'Heads up' } }).attributes('role')).toBe('alert')
     expect(mount(FsusProgress, { props: { percentage: 60 } }).attributes('aria-valuenow')).toBe('60')
@@ -225,5 +233,15 @@ describe('Phase 2 Core, Overlay & Form Components', () => {
     expect(mount(FsusCalendar).findAll('[role="gridcell"]')).toHaveLength(42)
     expect(mount(FsusColorPicker, { props: { modelValue: '#2A599C' } }).exists()).toBe(true)
     expect(mount(FsusUpload, { props: { drag: true } }).find('.fsus-upload__dropzone').exists()).toBe(true)
+  })
+
+  it('keeps FsusCheckTag reduced-motion transition duration bounded at 1ms', () => {
+    const coreScss = readFileSync(
+      resolve(__dirname, '../../../theme/src/components/core.scss'),
+      'utf8',
+    )
+    const checkTagSection = coreScss.slice(coreScss.indexOf('.fsus-check-tag {\n    cursor: pointer;'))
+    expect(checkTagSection).toContain('@media (prefers-reduced-motion: reduce)')
+    expect(checkTagSection).toContain('transition-duration: 1ms;')
   })
 })

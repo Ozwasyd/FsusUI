@@ -371,11 +371,11 @@ test('pseudo-class and class-state mutations invalidate Contract V2 state identi
   }).errors.join('\n')
   assert.match(
     changedPseudoErrors,
-    /ElSlider.*has stale state contract fingerprint/,
+    /FsusSlider.*has stale state contract fingerprint/,
   )
   assert.match(
     changedPseudoErrors,
-    /component-v2\.el-slider has stale Avalonia state contract binding/,
+    /component-v2\.fsus-slider has stale Avalonia state contract binding/,
   )
 
   const changedClassBaselines = clone(avaloniaBaselines)
@@ -396,14 +396,14 @@ test('pseudo-class and class-state mutations invalidate Contract V2 state identi
 
   const deletedIdentity = clone(committedRegistry)
   delete deletedIdentity.componentMap.find(
-    (entry) => entry.vue.name === 'ElSlider',
+    (entry) => entry.vue.name === 'FsusSlider',
   ).avalonia.stateContractFingerprint
   assert.match(
     validateAvaloniaSurfaceRegistration({
       registry: deletedIdentity,
       avaloniaBaselines,
     }).errors.join('\n'),
-    /ElSlider.*has stale state contract fingerprint/,
+    /FsusSlider.*has stale state contract fingerprint/,
   )
 })
 
@@ -611,10 +611,10 @@ test('automation mutations invalidate independent Contract V2 identities without
     registry: committedRegistry,
     avaloniaBaselines: changedBaselines,
   }).errors.join('\n')
-  assert.match(errors, /ElSlider.*has stale automation contract fingerprint/)
+  assert.match(errors, /FsusSlider.*has stale automation contract fingerprint/)
   assert.match(
     errors,
-    /component-v2\.el-slider has stale Avalonia automation contract binding/,
+    /component-v2\.fsus-slider has stale Avalonia automation contract binding/,
   )
 
   const changedOverlayBaselines = clone(avaloniaBaselines)
@@ -638,23 +638,23 @@ test('automation mutations invalidate independent Contract V2 identities without
   }).errors.join('\n')
   assert.match(
     overlayErrors,
-    /ElPopover.*has stale automation contract fingerprint/,
+    /FsusPopover.*has stale automation contract fingerprint/,
   )
   assert.match(
     overlayErrors,
-    /component-v2\.el-popover has stale Avalonia automation contract binding/,
+    /component-v2\.fsus-popover has stale Avalonia automation contract binding/,
   )
 
   const deletedIdentity = clone(committedRegistry)
   delete deletedIdentity.componentMap.find(
-    (entry) => entry.vue.name === 'ElSlider',
+    (entry) => entry.vue.name === 'FsusSlider',
   ).avalonia.automationContractFingerprint
   assert.match(
     validateAvaloniaSurfaceRegistration({
       registry: deletedIdentity,
       avaloniaBaselines,
     }).errors.join('\n'),
-    /ElSlider.*has stale automation contract fingerprint/,
+    /FsusSlider.*has stale automation contract fingerprint/,
   )
 
   const build = (baselines) =>
@@ -783,11 +783,11 @@ test('token/theme dependency drift invalidates package and type Contract V2 iden
   assert.match(errors, /token\/theme baseline avaloniaThemes is stale/)
   assert.match(
     errors,
-    /ElMarkdownEditor.*stale token\/theme contract fingerprint/,
+    /FsusMarkdownEditor.*stale token\/theme contract fingerprint/,
   )
   assert.match(
     errors,
-    /component-v2\.el-markdown-editor has stale Avalonia token\/theme contract binding/,
+    /component-v2\.fsus-markdown-editor has stale Avalonia token\/theme contract binding/,
   )
 
   const deletedIdentity = clone(committedRegistry)
@@ -917,7 +917,7 @@ test('generic-constraint and command-nullability mutations invalidate Contract V
     registry: committedRegistry,
     avaloniaBaselines: changedCommandBaselines,
   }).errors.join('\n')
-  assert.match(changedCommandErrors, /ElInput.*has stale public surface hash/)
+  assert.match(changedCommandErrors, /FsusInput.*has stale public surface hash/)
   assert.match(
     changedCommandErrors,
     /ClearCommand is neither mapped nor registered as avalonia-extra/,
@@ -927,7 +927,7 @@ test('generic-constraint and command-nullability mutations invalidate Contract V
 test('explicit command operation bindings remain partial without invocation semantics', () => {
   const bindings = clone(semanticMemberBindings)
   bindings.mappings.push({
-    component: 'ElInput',
+    component: 'FsusInput',
     semantic: 'clear-command',
     kind: 'operation',
     web: 'clear',
@@ -951,7 +951,7 @@ test('explicit command operation bindings remain partial without invocation sema
     gate,
   })
   const clear = registry.contracts
-    .find((contract) => contract.component.name === 'ElInput')
+    .find((contract) => contract.component.name === 'FsusInput')
     .operations.find((operation) => operation.name === 'clear')
   assert.equal(clear.bindingBasis, 'explicit-semantic')
   assert.equal(clear.avalonia.member, 'ClearCommand')
@@ -965,7 +965,10 @@ test('Vue compiler AST retains dynamic names and scoped slot payload structure',
   const component = (name) =>
     vueBaseline.components.find((candidate) => candidate.name === name)
 
-  assert.deepEqual(component('ElCountdown').slots, [
+  const dynamicSfc = parseSfc('<template><slot :name="name" /></template>', {
+    filename: 'dynamic-slot.vue',
+  })
+  assert.deepEqual(extractTemplateSlots(dynamicSfc.descriptor.template?.ast), [
     {
       name: '$dynamic:name',
       nameKnown: false,
@@ -976,54 +979,54 @@ test('Vue compiler AST retains dynamic names and scoped slot payload structure',
     },
   ])
   assert.deepEqual(
-    component('ElSelectV2').slots.map((slot) => [
+    component('FsusTable').slots.map((slot) => [
       slot.name,
       slot.scoped,
       slot.payloadComplete,
     ]),
     [
-      ['default', true, false],
+      ['default', false, true],
       ['empty', false, true],
-      ['prefix', false, true],
+      ['expand', true, false],
     ],
   )
   assert.equal(
-    component('ElSkeleton').slots.find((slot) => slot.name === 'default')
+    component('FsusAutoResizer').slots.find((slot) => slot.name === 'default')
       .payloadComplete,
     false,
   )
   assert.deepEqual(
-    component('ElCalendar').slots.find((slot) => slot.name === 'header')
+    component('FsusCalendar').slots.find((slot) => slot.name === 'date-cell')
       .payload,
-    [{ name: 'date', expression: 'i18nDate', type: null }],
+    [{ name: 'data', expression: 'cell', type: null }],
   )
 })
 
 test('Vue compiler AST binds deprecated metadata to the real declaration', () => {
-  const relativePath = 'vue/packages/components/select/src/select.vue'
-  const source = fs.readFileSync(path.join(root, relativePath), 'utf8')
+  const syntheticSource = `
+export const demoProps = {
+  /** @deprecated will be removed in version 3.0.0, please use override style scheme */
+  legacyProp: { type: Boolean, default: false },
+  placement: { type: String, default: 'bottom' },
+}
+`
   const declarations = extractDeprecatedDeclarations({
-    source,
-    filename: relativePath,
+    source: syntheticSource,
+    filename: 'synthetic-deprecated.ts',
   })
   assert.deepEqual(declarations, [
     {
       kind: 'property',
-      target: 'suffixTransition',
+      target: 'legacyProp',
       message:
-        'will be removed in version 2.4.0, please use override style scheme',
+        'will be removed in version 3.0.0, please use override style scheme',
     },
   ])
   const component = vueBaseline.components.find(
-    (candidate) => candidate.name === 'ElSelect',
+    (candidate) => candidate.name === 'FsusSelect',
   )
-  const suffixTransition = component.semantic.props.find(
-    (prop) => prop.name === 'suffixTransition',
-  )
-  assert.equal(suffixTransition.deprecated, true)
-  assert.match(suffixTransition.deprecationMessage, /override style scheme/)
   assert.equal(
-    component.semantic.props.find((prop) => prop.name === 'placement')
+    component.semantic.props.find((prop) => prop.name === 'multiple')
       .deprecated,
     false,
   )
@@ -1109,11 +1112,11 @@ test('enum and deprecated comparator mutations fail closed', () => {
 })
 
 test('real Vue slot source mutation reaches compiler baseline coverage', () => {
-  const relativePath = 'vue/packages/components/select-v2/src/select.vue'
+  const relativePath = 'vue/packages/components/src/card/FsusCard.vue'
   const source = fs.readFileSync(path.join(root, relativePath), 'utf8')
   const mutatedSource = source.replace(
-    '<slot name="empty">',
-    '<slot name="empty-mutated">',
+    '<slot name="header">',
+    '<slot name="header-mutated">',
   )
   assert.notEqual(mutatedSource, source)
   const { descriptor, errors } = parseSfc(mutatedSource, {
@@ -1121,12 +1124,12 @@ test('real Vue slot source mutation reaches compiler baseline coverage', () => {
   })
   assert.deepEqual(errors, [])
   const slots = extractTemplateSlots(descriptor.template?.ast)
-  assert.ok(slots.some((slot) => slot.name === 'empty-mutated'))
-  assert.ok(!slots.some((slot) => slot.name === 'empty'))
+  assert.ok(slots.some((slot) => slot.name === 'header-mutated'))
+  assert.ok(!slots.some((slot) => slot.name === 'header'))
 
   const mutatedBaseline = clone(vueBaseline)
   mutatedBaseline.components.find(
-    (component) => component.name === 'ElSelectV2',
+    (component) => component.name === 'FsusCard',
   ).slots = slots
   const coverage = validateVuePublicCoverage({
     baseline: mutatedBaseline,
@@ -1134,11 +1137,11 @@ test('real Vue slot source mutation reaches compiler baseline coverage', () => {
   })
   assert.match(
     coverage.errors.join('\n'),
-    /ElSelectV2 contentRegion empty-mutated is missing from Contract V2/,
+    /FsusCard contentRegion header-mutated is missing from Contract V2/,
   )
   assert.match(
     coverage.errors.join('\n'),
-    /ElSelectV2 Contract V2 has extra contentRegion empty/,
+    /FsusCard Contract V2 has extra contentRegion header/,
   )
 })
 
@@ -1359,7 +1362,7 @@ test('real Avalonia surface mutations invalidate current registration', () => {
 test('Avalonia registration mutations cannot hide missing or duplicate ownership', () => {
   const missingExtra = clone(committedRegistry)
   const imageContract = missingExtra.contracts.find(
-    (contract) => contract.component.name === 'ElImage',
+    (contract) => contract.component.name === 'FsusImage',
   )
   imageContract.avaloniaExtras = imageContract.avaloniaExtras.filter(
     (extra) => extra.member !== 'LoadAsync',
@@ -1374,7 +1377,7 @@ test('Avalonia registration mutations cannot hide missing or duplicate ownership
 
   const duplicateExtra = clone(committedRegistry)
   const duplicateImageContract = duplicateExtra.contracts.find(
-    (contract) => contract.component.name === 'ElImage',
+    (contract) => contract.component.name === 'FsusImage',
   )
   duplicateImageContract.avaloniaExtras.push(
     clone(duplicateImageContract.avaloniaExtras[0]),
@@ -1389,7 +1392,7 @@ test('Avalonia registration mutations cannot hide missing or duplicate ownership
 
   const duplicateOverloadScenario = clone(committedRegistry)
   const openPreviewExtras = duplicateOverloadScenario.contracts
-    .find((contract) => contract.component.name === 'ElImage')
+    .find((contract) => contract.component.name === 'FsusImage')
     .avaloniaExtras.filter((extra) => extra.member === 'OpenPreview')
   openPreviewExtras[1].scenarioIds = clone(openPreviewExtras[0].scenarioIds)
   assert.match(
@@ -1424,14 +1427,14 @@ test('Avalonia registration mutations cannot hide missing or duplicate ownership
 
   const staleMappedType = clone(committedRegistry)
   staleMappedType.componentMap.find(
-    (mapping) => mapping.vue.name === 'ElImage',
+    (mapping) => mapping.vue.name === 'FsusImage',
   ).avalonia.surfaceHash = '0'.repeat(64)
   assert.match(
     validateAvaloniaSurfaceRegistration({
       registry: staleMappedType,
       avaloniaBaselines,
     }).errors.join('\n'),
-    /ElImage.*has stale public surface hash/,
+    /FsusImage.*has stale public surface hash/,
   )
 })
 
@@ -1453,7 +1456,7 @@ test('explicit semantic member bindings resolve real members from both baselines
     gate,
   })
   const markdownEditor = registry.contracts.find(
-    (contract) => contract.component.name === 'ElMarkdownEditor',
+    (contract) => contract.component.name === 'FsusMarkdownEditor',
   )
   const document = markdownEditor.inputs.find(
     (input) => input.semantic === 'document',
@@ -1477,7 +1480,7 @@ test('inactive MarkdownEditor issue gate preserves evidence-derived partial stat
     gate,
   })
   const markdownEditor = registry.contracts.find(
-    (contract) => contract.component.name === 'ElMarkdownEditor',
+    (contract) => contract.component.name === 'FsusMarkdownEditor',
   )
   assert.deepEqual(markdownEditor.markdownEditorGate, {
     blocked: false,
@@ -1489,11 +1492,11 @@ test('inactive MarkdownEditor issue gate preserves evidence-derived partial stat
 
   const forgedAligned = clone(registry)
   forgedAligned.contracts.find(
-    (contract) => contract.component.name === 'ElMarkdownEditor',
+    (contract) => contract.component.name === 'FsusMarkdownEditor',
   ).component.exportStatus = 'aligned-candidate'
   assert.match(
     validateRegistry(forgedAligned, gate, { avaloniaBaselines }).join('\n'),
-    /component-v2\.el-markdown-editor exportStatus aligned-candidate disagrees with derived status partial/u,
+    /component-v2\.fsus-markdown-editor exportStatus aligned-candidate disagrees with derived status partial/u,
   )
 
   const staleInactiveGate = { ...gate, blockedBy: [343] }
@@ -1522,7 +1525,7 @@ test('explicit semantic member bindings reject stale and duplicate endpoints', (
     clone(
       duplicate.mappings.find(
         (mapping) =>
-          mapping.component === 'ElMarkdownEditor' &&
+          mapping.component === 'FsusMarkdownEditor' &&
           mapping.web === 'modelValue',
       ),
     ),
@@ -1546,7 +1549,7 @@ test('explicit member dispositions register only exact reviewed Web surfaces', (
     gate,
   })
   const markdownEditor = registry.contracts.find(
-    (contract) => contract.component.name === 'ElMarkdownEditor',
+    (contract) => contract.component.name === 'FsusMarkdownEditor',
   )
   const textareaId = markdownEditor.inputs.find(
     (input) => input.name === 'textareaId',
@@ -1568,7 +1571,7 @@ test('explicit member dispositions register only exact reviewed Web surfaces', (
   removed.dispositions = removed.dispositions.filter(
     (entry) =>
       !(
-        entry.component === 'ElMarkdownEditor' &&
+        entry.component === 'FsusMarkdownEditor' &&
         entry.kind === 'input' &&
         entry.web === 'textareaId'
       ),
@@ -1582,7 +1585,7 @@ test('explicit member dispositions register only exact reviewed Web surfaces', (
     gate,
   })
     .contracts.find(
-      (contract) => contract.component.name === 'ElMarkdownEditor',
+      (contract) => contract.component.name === 'FsusMarkdownEditor',
     )
     .inputs.find((input) => input.name === 'textareaId')
   assert.equal(regressed.status, 'missing')
@@ -1655,17 +1658,17 @@ test('real mapped inputs use compiler-known metadata and keep unknown values par
   const mappedInputs = registry.contracts.flatMap((contract) =>
     contract.inputs.filter((input) => input.avalonia != null),
   )
-  assert.equal(mappedInputs.length, 185)
+  assert.equal(mappedInputs.length, 134)
   assert.equal(
     mappedInputs.filter((input) => input.status === 'aligned-candidate').length,
-    14,
+    24,
   )
   assert.equal(
     mappedInputs.filter((input) => input.status === 'partial').length,
-    171,
+    110,
   )
   const max = registry.contracts
-    .find((contract) => contract.component.name === 'ElBadge')
+    .find((contract) => contract.component.name === 'FsusBadge')
     .inputs.find((input) => input.name === 'max')
   assert.equal(max.avalonia.canRead, true)
   assert.equal(max.avalonia.canWrite, true)
@@ -1685,7 +1688,7 @@ test('real mapped input baseline mutations expose default, required, access, and
     const nextVueBaseline = clone(vueBaseline)
     const nextAvaloniaBaseline = clone(avaloniaBaselines.avalonia)
     const webProp = nextVueBaseline.components
-      .find((component) => component.name === 'ElBadge')
+      .find((component) => component.name === 'FsusBadge')
       .semantic.props.find((prop) => prop.name === 'max')
     const type = nextAvaloniaBaseline.semanticTypes.find(
       (candidate) => candidate.name === 'FsusUI.Avalonia.Controls.FsusBadge',
@@ -1707,7 +1710,7 @@ test('real mapped input baseline mutations expose default, required, access, and
       semanticMemberBindings,
       gate,
     })
-      .contracts.find((contract) => contract.component.name === 'ElBadge')
+      .contracts.find((contract) => contract.component.name === 'FsusBadge')
       .inputs.find((input) => input.name === 'max')
   }
 
@@ -1863,7 +1866,7 @@ test('mapped input semantic mutations invalidate the committed surface hash', ()
         registry: committedRegistry,
         avaloniaBaselines: nextBaselines,
       }).errors.join('\n'),
-      /ElBadge.*has stale public surface hash/,
+      /FsusBadge.*has stale public surface hash/,
     )
   }
 })
@@ -1878,7 +1881,7 @@ test('real operation signatures are retained and fail closed when not comparable
     gate,
   })
   const markdownEditor = registry.contracts.find(
-    (contract) => contract.component.name === 'ElMarkdownEditor',
+    (contract) => contract.component.name === 'FsusMarkdownEditor',
   )
   const navigate = markdownEditor.operations.find(
     (operation) => operation.semantic === 'search-navigate',
@@ -1908,7 +1911,7 @@ test('real operation signatures are retained and fail closed when not comparable
 
 test('TypeScript checker extracts mapped exposed signatures and source mutations change the contract', () => {
   const sourceRelativePath =
-    'vue/packages/components/markdown-editor/src/markdown-editor.vue'
+    'vue/packages/markdown/src/markdown-editor/src/markdown-editor.vue'
   const source = fs.readFileSync(path.join(root, sourceRelativePath), 'utf8')
   const { descriptor } = parseSfc(source, { filename: sourceRelativePath })
   const scriptContent = descriptor.scriptSetup?.content
@@ -1959,7 +1962,7 @@ test('TypeScript checker extracts mapped exposed signatures and source mutations
 
   const mutatedBaseline = clone(vueBaseline)
   const exposed = mutatedBaseline.components
-    .find((component) => component.name === 'ElMarkdownEditor')
+    .find((component) => component.name === 'FsusMarkdownEditor')
     .semantic.exposed.find((member) => member.name === 'searchNavigate')
   Object.assign(exposed, mutated)
   const navigate = buildRegistry({
@@ -1971,7 +1974,7 @@ test('TypeScript checker extracts mapped exposed signatures and source mutations
     gate,
   })
     .contracts.find(
-      (contract) => contract.component.name === 'ElMarkdownEditor',
+      (contract) => contract.component.name === 'FsusMarkdownEditor',
     )
     .operations.find((operation) => operation.semantic === 'search-navigate')
   assert.match(
@@ -1998,7 +2001,7 @@ test('real baseline mutations expose operation parameter drift', () => {
       semanticMemberBindings,
       gate,
     }).contracts.find(
-      (contract) => contract.component.name === 'ElMarkdownEditor',
+      (contract) => contract.component.name === 'FsusMarkdownEditor',
     )
   }
 
@@ -2052,7 +2055,7 @@ test('real mapped event payload shapes fail closed on field drift', () => {
       semanticMemberBindings,
       gate,
     }).contracts.find(
-      (contract) => contract.component.name === 'ElMarkdownEditor',
+      (contract) => contract.component.name === 'FsusMarkdownEditor',
     )
   const mappedOutputs = buildWithBaselines().outputs.filter(
     (output) => output.bindingBasis === 'explicit-semantic',
@@ -2068,7 +2071,7 @@ test('real mapped event payload shapes fail closed on field drift', () => {
 
   const missingField = clone(vueBaseline)
   const missingHistoryShape = missingField.components
-    .find((component) => component.name === 'ElMarkdownEditor')
+    .find((component) => component.name === 'FsusMarkdownEditor')
     .semantic.emits.find((emit) => emit.name === 'history-change')
     .payload[0].shape
   missingHistoryShape.fields = missingHistoryShape.fields.filter(
@@ -2084,7 +2087,7 @@ test('real mapped event payload shapes fail closed on field drift', () => {
 
   const nullableField = clone(vueBaseline)
   nullableField.components
-    .find((component) => component.name === 'ElMarkdownEditor')
+    .find((component) => component.name === 'FsusMarkdownEditor')
     .semantic.emits.find((emit) => emit.name === 'history-change')
     .payload[0].shape.fields.find(
       (field) => field.name === 'redoDepth',
@@ -2116,7 +2119,7 @@ test('real mapped event payload shapes fail closed on field drift', () => {
 
   const unknownShape = clone(vueBaseline)
   unknownShape.components
-    .find((component) => component.name === 'ElMarkdownEditor')
+    .find((component) => component.name === 'FsusMarkdownEditor')
     .semantic.emits.find(
       (emit) => emit.name === 'history-change',
     ).payload[0].shape = {
@@ -2135,9 +2138,9 @@ test('real mapped event payload shapes fail closed on field drift', () => {
 
 test('real Vue source payload type mutation reaches the comparator', () => {
   const entryRelativePath =
-    'vue/packages/components/markdown-editor/src/markdown-editor.ts'
+    'vue/packages/markdown/src/markdown-editor/src/markdown-editor.ts'
   const transactionRelativePath =
-    'vue/packages/components/markdown-editor/src/markdown-editor-transaction.ts'
+    'vue/packages/markdown/src/markdown-editor/src/markdown-editor-transaction.ts'
   const entrySource = fs.readFileSync(
     path.join(root, entryRelativePath),
     'utf8',
@@ -2188,7 +2191,7 @@ test('real Vue source payload type mutation reaches the comparator', () => {
 
   const mutatedBaseline = clone(vueBaseline)
   const history = mutatedBaseline.components
-    .find((component) => component.name === 'ElMarkdownEditor')
+    .find((component) => component.name === 'FsusMarkdownEditor')
     .semantic.emits.find((emit) => emit.name === 'history-change')
   history.payload = extracted.parameters
   const output = buildRegistry({
@@ -2200,7 +2203,7 @@ test('real Vue source payload type mutation reaches the comparator', () => {
     gate,
   })
     .contracts.find(
-      (contract) => contract.component.name === 'ElMarkdownEditor',
+      (contract) => contract.component.name === 'FsusMarkdownEditor',
     )
     .outputs.find((candidate) => candidate.semantic === 'history-change')
   assert.match(

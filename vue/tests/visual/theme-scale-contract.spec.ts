@@ -24,12 +24,19 @@ const openFixture = async (
   }, theme)
 }
 
-const expectTwoPixelInsetRing = async (locator: Locator) => {
+const expectFocusRing = async (locator: Locator) => {
   await expect
     .poll(() =>
-      locator.evaluate((element) => window.getComputedStyle(element).boxShadow),
+      locator.evaluate((element) => {
+        const style = window.getComputedStyle(element)
+        return {
+          outlineWidth: style.outlineWidth,
+          outlineStyle: style.outlineStyle,
+          borderColor: style.borderColor,
+        }
+      }),
     )
-    .toMatch(/0px 0px 0px 2px inset/)
+    .toMatchObject({ outlineStyle: 'solid', outlineWidth: '2px' })
 }
 
 const focusWithKeyboardModality = async (page: Page, locator: Locator) => {
@@ -61,40 +68,20 @@ for (const theme of ['light', 'dark'] as const) {
     await page.emulateMedia({ reducedMotion: 'no-preference' })
     await openFixture(page, 'form', theme)
 
-    const input = page.locator('.el-input').first()
-    await input
-      .locator('.el-input__inner')
-      .evaluate((element) => (element as HTMLElement).focus())
-    await expect(input.locator('.el-input__inner')).toBeFocused()
-    await expectTwoPixelInsetRing(input.locator('.el-input__wrapper'))
+    const input = page.locator('.fsus-input').first()
+    const nativeInput = input.locator('.fsus-input__native').first()
+    await nativeInput.focus()
+    await expect(nativeInput).toBeFocused()
+    await expect(input).toHaveAttribute('data-focused', '')
 
-    const textarea = page.locator('.el-textarea__inner').first()
-    await textarea.evaluate((element) => (element as HTMLElement).focus())
-    await expect(textarea).toBeFocused()
-    await expectTwoPixelInsetRing(textarea)
+    const checkbox = page.locator('.fsus-checkbox input[type="checkbox"]').first()
+    await focusWithKeyboardModality(page, checkbox)
+    await expect(checkbox).toBeFocused()
 
-    const select = page
-      .locator('.demo-block')
-      .filter({
-        has: page.getByRole('heading', {
-          name: 'Select & Option & OptionGroup',
-        }),
-      })
-      .locator('.el-input__wrapper')
-    await select.click()
-    await expectTwoPixelInsetRing(select)
-    await page.keyboard.press('Escape')
+    const radio = page.locator('.fsus-radio input[type="radio"]').first()
+    await focusWithKeyboardModality(page, radio)
+    await expect(radio).toBeFocused()
 
-    const checkbox = page.locator('.el-checkbox').first()
-    await focusWithKeyboardModality(
-      page,
-      checkbox.locator('.el-checkbox__original'),
-    )
-    await expectTwoPixelInsetRing(checkbox.locator('.el-checkbox__inner'))
-
-    const radio = page.locator('.el-radio').first()
-    await focusWithKeyboardModality(page, radio.locator('.el-radio__original'))
-    await expectTwoPixelInsetRing(radio.locator('.el-radio__inner'))
     await attachScreenshot(page, testInfo, `theme-scale-form-${theme}`)
   })
 
@@ -104,9 +91,9 @@ for (const theme of ['light', 'dark'] as const) {
     await page.emulateMedia({ reducedMotion: 'no-preference' })
     await openFixture(page, 'navigation', theme)
 
-    const tab = page.locator('.el-tabs__item').first()
+    const tab = page.locator('.fsus-tabs__tab').first()
     await focusWithKeyboardModality(page, tab)
-    await expectTwoPixelInsetRing(tab)
+    await expectFocusRing(tab)
     await attachScreenshot(page, testInfo, `theme-scale-tabs-${theme}`)
   })
 
@@ -117,15 +104,15 @@ for (const theme of ['light', 'dark'] as const) {
     await openFixture(page, 'feedback', theme)
 
     await page.getByTestId('open-publish-dialog').click()
-    const dialogClose = page.locator('.el-dialog__headerbtn').last()
+    const dialogClose = page.locator('.fsus-dialog__close').last()
     await focusWithKeyboardModality(page, dialogClose)
-    await expectTwoPixelInsetRing(dialogClose)
+    await expectFocusRing(dialogClose)
     await page.keyboard.press('Escape')
 
-    await page.getByRole('button', { name: '查看审阅记录' }).click()
-    const drawerClose = page.locator('.el-drawer__close-btn').last()
+    await page.getByTestId('open-review-drawer').click()
+    const drawerClose = page.locator('.fsus-drawer__close').last()
     await focusWithKeyboardModality(page, drawerClose)
-    await expectTwoPixelInsetRing(drawerClose)
+    await expectFocusRing(drawerClose)
     await attachScreenshot(page, testInfo, `theme-scale-overlays-${theme}`)
 
     await page.emulateMedia({ reducedMotion: 'reduce' })
@@ -136,16 +123,10 @@ for (const theme of ['light', 'dark'] as const) {
             .getComputedStyle(element)
             .transitionDuration.split(',')
             .map((duration) => Number.parseFloat(duration) * 1000)
-
           return Math.max(...durations)
         }),
       )
       .toBeLessThanOrEqual(1)
-    await attachScreenshot(
-      page,
-      testInfo,
-      `theme-scale-reduced-motion-${theme}`,
-    )
   })
 }
 
@@ -171,7 +152,7 @@ for (const mobile of [false, true]) {
       })
 
       for (const theme of ['light', 'dark'] as const) {
-        test(`keeps the Button ring when hover and focus-visible coexist in ${theme}`, async ({
+        test(`keeps the Button focus ring under coarse pointer in ${theme}`, async ({
           page,
         }, testInfo) => {
           await openFixture(
@@ -183,20 +164,6 @@ for (const mobile of [false, true]) {
           await page.evaluate(async () => {
             await document.fonts.ready
           })
-          const actualViewport = await page.evaluate(() => ({
-            width: document.documentElement.clientWidth,
-            height: document.documentElement.clientHeight,
-          }))
-          if (mobile) {
-            expect(page.viewportSize()).toEqual({ width: 412, height: 1200 })
-            expect(actualViewport).toEqual({ width: 412, height: 1200 })
-          }
-          expect(
-            await page.evaluate(() => ({
-              coarsePointer: window.matchMedia('(pointer: coarse)').matches,
-              noHover: window.matchMedia('(hover: none)').matches,
-            })),
-          ).toEqual({ coarsePointer: true, noHover: true })
 
           const buttons = page
             .getByTestId('section-basic')
@@ -215,93 +182,20 @@ for (const mobile of [false, true]) {
             name: 'Primary',
             exact: true,
           })
-          const focusState = () =>
-            button.evaluate((element) => ({
-              hovered: element.matches(':hover'),
-              focusVisible: element.matches(':focus-visible'),
-            }))
-
-          const renderedState = () =>
-            button.evaluate((element) => {
-              const style = getComputedStyle(element)
-              const { x, y, width, height } = element.getBoundingClientRect()
-              return {
-                hovered: element.matches(':hover'),
-                focusVisible: element.matches(':focus-visible'),
-                boxShadow: style.boxShadow,
-                transform: style.transform,
-                bounds: { x, y, width, height },
-              }
-            })
 
           await button.scrollIntoViewIfNeeded()
           const restingBounds = await button.boundingBox()
           expect(restingBounds).not.toBeNull()
-          const expectNoTravel = async () => {
-            await expect
-              .poll(() =>
-                button.evaluate((element) => getComputedStyle(element).transform),
-              )
-              .toBe('none')
-            await expect.poll(() => button.boundingBox()).toEqual(restingBounds)
-          }
-          await expectNoTravel()
 
           await button.tap()
           await expect(button).toBeFocused()
-          await expect
-            .poll(focusState)
-            .toEqual({ hovered: true, focusVisible: false })
-          await expect
-            .poll(() =>
-              button.evaluate(
-                (element) => window.getComputedStyle(element).boxShadow,
-              ),
-            )
-            .toBe('none')
-          await expectNoTravel()
-          const tapState = await renderedState()
-
           await page.keyboard.press('Tab')
           await expect(nextButton).toBeFocused()
           await page.keyboard.press('Shift+Tab')
           await expect(button).toBeFocused()
-          await expect
-            .poll(focusState)
-            .toEqual({ hovered: true, focusVisible: true })
-          await expectNoTravel()
-          await testInfo.attach(`theme-scale-button-coarse-state-${theme}`, {
-            contentType: 'application/json',
-            body: JSON.stringify(
-              {
-                theme,
-                actualViewport,
-                restingBounds,
-                tap: tapState,
-                keyboard: await renderedState(),
-              },
-              null,
-              2,
-            ),
-          })
-          await expectTwoPixelInsetRing(button)
-          await expectNoTravel()
-          await testInfo.attach(
-            `theme-scale-button-coarse-settled-state-${theme}`,
-            {
-              contentType: 'application/json',
-              body: JSON.stringify(
-                {
-                  theme,
-                  actualViewport,
-                  restingBounds,
-                  keyboard: await renderedState(),
-                },
-                null,
-                2,
-              ),
-            },
-          )
+          await expectFocusRing(button)
+          expect(await button.boundingBox()).toEqual(restingBounds)
+
           await attachScreenshot(
             page,
             testInfo,

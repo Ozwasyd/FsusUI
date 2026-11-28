@@ -12,7 +12,7 @@
     },
     {
       "path": "tests/conformance/accessibility/avalonia-runtime-scenarios.json",
-      "sha256": "815391e8bd00511cbcae062febea0c3873aca39095a75b0af7c138b0b3dbe8dd"
+      "sha256": "251746e0721f5dfe94b7255f7e9259c6df1f3bb3555022aea0cb1ee0d9b1e9e1"
     }
   ],
   "requiredContractFields": [
@@ -34,8 +34,8 @@
     "metadataOnlyGeneratedTests": 0,
     "metadataOnlyRuntimeCoverage": 0,
     "realRuntimeScenarioDeclarations": 41,
-    "exactContractRuntimeBindings": 34,
-    "unboundRuntimeDispositions": 7,
+    "exactContractRuntimeBindings": 33,
+    "unboundRuntimeDispositions": 8,
     "appiumReleaseGates": 2,
     "allowedByOverride": 0
   },
@@ -1087,8 +1087,8 @@
   "declaredRuntimeScenarios": [
     {
       "id": "avalonia-button-primary",
-      "contractId": "component-v2.el-button",
-      "contractScenarioId": "scenario.v2.el-button.a11y",
+      "contractId": "component-v2.fsus-button",
+      "contractScenarioId": "scenario.v2.fsus-button.a11y",
       "checkpoint": "automation-peer-mounted",
       "snapshotId": "button-primary",
       "factory": "FsusButton",
@@ -1103,8 +1103,8 @@
     },
     {
       "id": "avalonia-input-invalid",
-      "contractId": "component-v2.el-input",
-      "contractScenarioId": "scenario.v2.el-input.a11y",
+      "contractId": "component-v2.fsus-input",
+      "contractScenarioId": "scenario.v2.fsus-input.a11y",
       "checkpoint": "automation-peer-mounted",
       "snapshotId": "input-invalid",
       "factory": "FsusInput",
@@ -1141,8 +1141,8 @@
     },
     {
       "id": "avalonia-input-number-quantity",
-      "contractId": "component-v2.el-input-number",
-      "contractScenarioId": "scenario.v2.el-input-number.a11y",
+      "contractId": "component-v2.fsus-input-number",
+      "contractScenarioId": "scenario.v2.fsus-input-number.a11y",
       "checkpoint": "automation-peer-mounted",
       "snapshotId": "input-number-quantity",
       "factory": "FsusInputNumber",
@@ -1157,8 +1157,8 @@
     },
     {
       "id": "avalonia-checkbox-accept",
-      "contractId": "component-v2.el-checkbox",
-      "contractScenarioId": "scenario.v2.el-checkbox.a11y",
+      "contractId": "component-v2.fsus-checkbox",
+      "contractScenarioId": "scenario.v2.fsus-checkbox.a11y",
       "checkpoint": "automation-peer-mounted",
       "snapshotId": "checkbox-accept",
       "factory": "FsusCheckbox",
@@ -1173,8 +1173,8 @@
     },
     {
       "id": "avalonia-radio-review",
-      "contractId": "component-v2.el-radio",
-      "contractScenarioId": "scenario.v2.el-radio.a11y",
+      "contractId": "component-v2.fsus-radio",
+      "contractScenarioId": "scenario.v2.fsus-radio.a11y",
       "checkpoint": "automation-peer-mounted",
       "snapshotId": "radio-review",
       "factory": "FsusRadio",
@@ -1189,8 +1189,8 @@
     },
     {
       "id": "avalonia-switch-alerts",
-      "contractId": "component-v2.el-switch",
-      "contractScenarioId": "scenario.v2.el-switch.a11y",
+      "contractId": "component-v2.fsus-switch",
+      "contractScenarioId": "scenario.v2.fsus-switch.a11y",
       "checkpoint": "automation-peer-mounted",
       "snapshotId": "switch-alerts",
       "factory": "FsusSwitch",
@@ -1205,8 +1205,8 @@
     },
     {
       "id": "avalonia-form-display-name",
-      "contractId": "component-v2.el-form",
-      "contractScenarioId": "scenario.v2.el-form.a11y",
+      "contractId": "component-v2.fsus-form",
+      "contractScenarioId": "scenario.v2.fsus-form.a11y",
       "checkpoint": "automation-peer-mounted",
       "snapshotId": "form-display-name",
       "factory": "FsusForm",
@@ -1240,8 +1240,8 @@
     },
     {
       "id": "avalonia-dialog-confirm",
-      "contractId": "component-v2.el-dialog",
-      "contractScenarioId": "scenario.v2.el-dialog.a11y",
+      "contractId": "component-v2.fsus-dialog",
+      "contractScenarioId": "scenario.v2.fsus-dialog.a11y",
       "checkpoint": "automation-peer-mounted",
       "snapshotId": "dialog-confirm",
       "factory": "FsusDialog",
@@ -1256,8 +1256,8 @@
     },
     {
       "id": "avalonia-tabs-main",
-      "contractId": "component-v2.el-tabs",
-      "contractScenarioId": "scenario.v2.el-tabs.a11y",
+      "contractId": "component-v2.fsus-tabs",
+      "contractScenarioId": "scenario.v2.fsus-tabs.a11y",
       "checkpoint": "automation-peer-mounted",
       "snapshotId": "tabs-main",
       "factory": "FsusTabs",
@@ -1282,8 +1282,8 @@
     },
     {
       "id": "avalonia-menu-main",
-      "contractId": "component-v2.el-menu",
-      "contractScenarioId": "scenario.v2.el-menu.a11y",
+      "contractId": "component-v2.fsus-menu",
+      "contractScenarioId": "scenario.v2.fsus-menu.a11y",
       "checkpoint": "automation-peer-mounted",
       "snapshotId": "menu-main",
       "factory": "FsusMenu",
@@ -1339,8 +1339,8 @@
     },
     {
       "id": "avalonia-link-release-notes",
-      "contractId": "component-v2.el-link",
-      "contractScenarioId": "scenario.v2.el-link.a11y",
+      "contractId": "component-v2.fsus-link",
+      "contractScenarioId": "scenario.v2.fsus-link.a11y",
       "checkpoint": "automation-peer-mounted",
       "snapshotId": "link-release-notes",
       "factory": "FsusLink",
@@ -1355,8 +1355,8 @@
     },
     {
       "id": "avalonia-alert-live-region",
-      "contractId": "component-v2.el-alert",
-      "contractScenarioId": "scenario.v2.el-alert.a11y",
+      "contractId": "component-v2.fsus-alert",
+      "contractScenarioId": "scenario.v2.fsus-alert.a11y",
       "checkpoint": "automation-peer-mounted",
       "snapshotId": "alert-live-region",
       "factory": "FsusAlert",
@@ -1371,8 +1371,8 @@
     },
     {
       "id": "avalonia-tabs-stable23",
-      "contractId": "component-v2.el-tabs",
-      "contractScenarioId": "scenario.v2.el-tabs.a11y",
+      "contractId": "component-v2.fsus-tabs",
+      "contractScenarioId": "scenario.v2.fsus-tabs.a11y",
       "checkpoint": "automation-peer-mounted",
       "snapshotId": "tabs-stable23",
       "factory": "FsusTabs",
@@ -1397,8 +1397,8 @@
     },
     {
       "id": "avalonia-menu-stable23",
-      "contractId": "component-v2.el-menu",
-      "contractScenarioId": "scenario.v2.el-menu.a11y",
+      "contractId": "component-v2.fsus-menu",
+      "contractScenarioId": "scenario.v2.fsus-menu.a11y",
       "checkpoint": "automation-peer-mounted",
       "snapshotId": "menu-stable23",
       "factory": "FsusMenu",
@@ -1432,8 +1432,8 @@
     },
     {
       "id": "avalonia-dialog-stable24",
-      "contractId": "component-v2.el-dialog",
-      "contractScenarioId": "scenario.v2.el-dialog.a11y",
+      "contractId": "component-v2.fsus-dialog",
+      "contractScenarioId": "scenario.v2.fsus-dialog.a11y",
       "checkpoint": "automation-peer-mounted",
       "snapshotId": "dialog-stable24",
       "factory": "FsusDialog",
@@ -1448,8 +1448,8 @@
     },
     {
       "id": "avalonia-drawer-stable24",
-      "contractId": "component-v2.el-drawer",
-      "contractScenarioId": "scenario.v2.el-drawer.a11y",
+      "contractId": "component-v2.fsus-drawer",
+      "contractScenarioId": "scenario.v2.fsus-drawer.a11y",
       "checkpoint": "automation-peer-mounted",
       "snapshotId": "drawer-stable24",
       "factory": "FsusDrawer",
@@ -1464,13 +1464,19 @@
     },
     {
       "id": "avalonia-message-box-stable24",
-      "contractId": "component-v2.el-message-box",
-      "contractScenarioId": "scenario.v2.el-message-box.a11y",
+      "contractId": null,
+      "contractScenarioId": null,
       "checkpoint": "automation-peer-mounted",
       "snapshotId": "message-box-stable24",
       "factory": "FsusMessageBox",
-      "bindingDisposition": "exact",
-      "bindingGap": null,
+      "bindingDisposition": "unbound",
+      "bindingGap": {
+        "snapshotId": "message-box-stable24",
+        "reason": "Contract V2 has no component-level Avalonia type binding for FsusMessageBox (FsusMessageBox is exposed as a service API in FsusUI 2.0.0).",
+        "owner": "FsusUI Contract V2",
+        "testPolicy": "Construct the production control and capture its live AutomationPeer tree, but do not count this row as Contract V2 scenario coverage until an exact binding exists.",
+        "reviewAfter": "2026-12-05"
+      },
       "implementationGaps": [],
       "realEvidenceArtifact": ".tmp/conformance-v2/accessibility/avalonia-generated.json",
       "evidenceKind": "runtime-input-declaration",
@@ -1480,8 +1486,8 @@
     },
     {
       "id": "avalonia-tooltip-stable25",
-      "contractId": "component-v2.el-tooltip",
-      "contractScenarioId": "scenario.v2.el-tooltip.a11y",
+      "contractId": "component-v2.fsus-tooltip",
+      "contractScenarioId": "scenario.v2.fsus-tooltip.a11y",
       "checkpoint": "automation-peer-mounted",
       "snapshotId": "tooltip-stable25",
       "factory": "FsusTooltip",
@@ -1496,8 +1502,8 @@
     },
     {
       "id": "avalonia-popover-stable25",
-      "contractId": "component-v2.el-popover",
-      "contractScenarioId": "scenario.v2.el-popover.a11y",
+      "contractId": "component-v2.fsus-popover",
+      "contractScenarioId": "scenario.v2.fsus-popover.a11y",
       "checkpoint": "automation-peer-mounted",
       "snapshotId": "popover-stable25",
       "factory": "FsusPopover",
@@ -1512,8 +1518,8 @@
     },
     {
       "id": "avalonia-popconfirm-stable25",
-      "contractId": "component-v2.el-popconfirm",
-      "contractScenarioId": "scenario.v2.el-popconfirm.a11y",
+      "contractId": "component-v2.fsus-popconfirm",
+      "contractScenarioId": "scenario.v2.fsus-popconfirm.a11y",
       "checkpoint": "automation-peer-mounted",
       "snapshotId": "popconfirm-stable25",
       "factory": "FsusPopconfirm",
@@ -1528,8 +1534,8 @@
     },
     {
       "id": "avalonia-dropdown-stable25",
-      "contractId": "component-v2.el-dropdown",
-      "contractScenarioId": "scenario.v2.el-dropdown.a11y",
+      "contractId": "component-v2.fsus-dropdown",
+      "contractScenarioId": "scenario.v2.fsus-dropdown.a11y",
       "checkpoint": "automation-peer-mounted",
       "snapshotId": "dropdown-stable25",
       "factory": "FsusDropdown",
@@ -1563,8 +1569,8 @@
     },
     {
       "id": "avalonia-media-decorative-stable32",
-      "contractId": "component-v2.el-image-viewer",
-      "contractScenarioId": "scenario.v2.el-image-viewer.a11y",
+      "contractId": "component-v2.fsus-image-viewer",
+      "contractScenarioId": "scenario.v2.fsus-image-viewer.a11y",
       "checkpoint": "automation-peer-mounted",
       "snapshotId": "media-decorative-stable32",
       "factory": "FsusImageViewer",
@@ -1648,19 +1654,13 @@
     },
     {
       "id": "avalonia-virtualization-stable34",
-      "contractId": null,
-      "contractScenarioId": null,
+      "contractId": "component-v2.fsus-virtual-list",
+      "contractScenarioId": "scenario.v2.fsus-virtual-list.a11y",
       "checkpoint": "automation-peer-mounted",
       "snapshotId": "virtualization-stable34",
       "factory": "FsusVirtualList",
-      "bindingDisposition": "unbound",
-      "bindingGap": {
-        "snapshotId": "virtualization-stable34",
-        "reason": "Contract V2 has no Avalonia type binding for FsusVirtualList.",
-        "owner": "FsusUI Contract V2",
-        "testPolicy": "Construct the production control and capture its live AutomationPeer tree, but do not count this row as Contract V2 scenario coverage until an exact binding exists.",
-        "reviewAfter": "2026-12-05"
-      },
+      "bindingDisposition": "exact",
+      "bindingGap": null,
       "implementationGaps": [
         {
           "snapshotId": "virtualization-stable34",
@@ -1680,13 +1680,19 @@
     },
     {
       "id": "avalonia-table-v2-stable34",
-      "contractId": "component-v2.el-table-v2",
-      "contractScenarioId": "scenario.v2.el-table-v2.a11y",
+      "contractId": null,
+      "contractScenarioId": null,
       "checkpoint": "automation-peer-mounted",
       "snapshotId": "table-v2-stable34",
       "factory": "FsusTableV2",
-      "bindingDisposition": "exact",
-      "bindingGap": null,
+      "bindingDisposition": "unbound",
+      "bindingGap": {
+        "snapshotId": "table-v2-stable34",
+        "reason": "Contract V2 has no Avalonia type binding for FsusTableV2 in FsusUI 2.0.0 (Web table APIs consolidated into FsusTable).",
+        "owner": "FsusUI Contract V2",
+        "testPolicy": "Construct the production control and capture its live AutomationPeer tree, but do not count this row as Contract V2 scenario coverage until an exact binding exists.",
+        "reviewAfter": "2026-12-05"
+      },
       "implementationGaps": [
         {
           "snapshotId": "table-v2-stable34",
@@ -1706,8 +1712,8 @@
     },
     {
       "id": "avalonia-tree-stable35",
-      "contractId": "component-v2.el-tree",
-      "contractScenarioId": "scenario.v2.el-tree.a11y",
+      "contractId": "component-v2.fsus-tree",
+      "contractScenarioId": "scenario.v2.fsus-tree.a11y",
       "checkpoint": "automation-peer-mounted",
       "snapshotId": "tree-stable35",
       "factory": "FsusTree",
@@ -1863,8 +1869,8 @@
     },
     {
       "id": "avalonia-public-shell-stable38",
-      "contractId": "component-v2.el-public-shell",
-      "contractScenarioId": "scenario.v2.el-public-shell.a11y",
+      "contractId": "component-v2.fsus-public-shell",
+      "contractScenarioId": "scenario.v2.fsus-public-shell.a11y",
       "checkpoint": "automation-peer-mounted",
       "snapshotId": "public-shell-stable38",
       "factory": "FsusPublicShell",
@@ -1889,8 +1895,8 @@
     },
     {
       "id": "avalonia-site-header-stable38",
-      "contractId": "component-v2.el-site-header",
-      "contractScenarioId": "scenario.v2.el-site-header.a11y",
+      "contractId": "component-v2.fsus-site-header",
+      "contractScenarioId": "scenario.v2.fsus-site-header.a11y",
       "checkpoint": "automation-peer-mounted",
       "snapshotId": "site-header-stable38",
       "factory": "FsusSiteHeader",
@@ -1915,8 +1921,8 @@
     },
     {
       "id": "avalonia-theme-mode-toggle-stable38",
-      "contractId": "component-v2.el-theme-mode-toggle",
-      "contractScenarioId": "scenario.v2.el-theme-mode-toggle.a11y",
+      "contractId": "component-v2.fsus-theme-mode-toggle",
+      "contractScenarioId": "scenario.v2.fsus-theme-mode-toggle.a11y",
       "checkpoint": "automation-peer-mounted",
       "snapshotId": "theme-mode-toggle-stable38",
       "factory": "FsusThemeModeToggle",
@@ -1941,8 +1947,8 @@
     },
     {
       "id": "avalonia-responsive-collection-stable38",
-      "contractId": "component-v2.el-responsive-collection",
-      "contractScenarioId": "scenario.v2.el-responsive-collection.a11y",
+      "contractId": "component-v2.fsus-responsive-collection",
+      "contractScenarioId": "scenario.v2.fsus-responsive-collection.a11y",
       "checkpoint": "automation-peer-mounted",
       "snapshotId": "responsive-collection-stable38",
       "factory": "FsusResponsiveCollection",
@@ -1967,8 +1973,8 @@
     },
     {
       "id": "avalonia-settings-primitives-stable39",
-      "contractId": "component-v2.el-settings-section",
-      "contractScenarioId": "scenario.v2.el-settings-section.a11y",
+      "contractId": "component-v2.fsus-settings-section",
+      "contractScenarioId": "scenario.v2.fsus-settings-section.a11y",
       "checkpoint": "automation-peer-mounted",
       "snapshotId": "settings-primitives-stable39",
       "factory": "FsusSettingsSection",
@@ -1993,8 +1999,8 @@
     },
     {
       "id": "avalonia-metric-primitives-stable39",
-      "contractId": "component-v2.el-metric-list",
-      "contractScenarioId": "scenario.v2.el-metric-list.a11y",
+      "contractId": "component-v2.fsus-metric-list",
+      "contractScenarioId": "scenario.v2.fsus-metric-list.a11y",
       "checkpoint": "automation-peer-mounted",
       "snapshotId": "metric-primitives-stable39",
       "factory": "FsusMetricList",
@@ -2019,8 +2025,8 @@
     },
     {
       "id": "avalonia-inbox-primitives-stable39",
-      "contractId": "component-v2.el-inbox-layout",
-      "contractScenarioId": "scenario.v2.el-inbox-layout.a11y",
+      "contractId": "component-v2.fsus-inbox-layout",
+      "contractScenarioId": "scenario.v2.fsus-inbox-layout.a11y",
       "checkpoint": "automation-peer-mounted",
       "snapshotId": "inbox-primitives-stable39",
       "factory": "FsusInboxLayout",
@@ -2045,8 +2051,8 @@
     },
     {
       "id": "avalonia-perception-challenge-stable40",
-      "contractId": "component-v2.el-perception-challenge",
-      "contractScenarioId": "scenario.v2.el-perception-challenge.a11y",
+      "contractId": "component-v2.fsus-perception-challenge",
+      "contractScenarioId": "scenario.v2.fsus-perception-challenge.a11y",
       "checkpoint": "automation-peer-mounted",
       "snapshotId": "perception-challenge-stable40",
       "factory": "FsusPerceptionChallenge",
@@ -2071,8 +2077,8 @@
     },
     {
       "id": "avalonia-perception-character-challenge-conformance",
-      "contractId": "component-v2.el-perception-character-challenge",
-      "contractScenarioId": "scenario.v2.el-perception-character-challenge.a11y",
+      "contractId": "component-v2.fsus-perception-character-challenge",
+      "contractScenarioId": "scenario.v2.fsus-perception-character-challenge.a11y",
       "checkpoint": "automation-peer-mounted",
       "snapshotId": "perception-character-challenge-conformance",
       "factory": "FsusPerceptionCharacterChallenge",
@@ -2106,8 +2112,8 @@
     },
     {
       "id": "avalonia-markdown-editor-atomic",
-      "contractId": "component-v2.el-markdown-editor",
-      "contractScenarioId": "scenario.v2.el-markdown-editor.a11y",
+      "contractId": "component-v2.fsus-markdown-editor",
+      "contractScenarioId": "scenario.v2.fsus-markdown-editor.a11y",
       "checkpoint": "automation-peer-atomic-projection",
       "snapshotId": "markdown-editor-atomic",
       "factory": "FsusMarkdownEditor",

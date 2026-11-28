@@ -7,7 +7,11 @@ import {
 } from '@fsusui/core'
 import { FsusIcon } from '@fsusui/icons'
 import { FsusMotionPlugin } from '@fsusui/motion'
-import { fsusComponents } from '@fsusui/components'
+import {
+  fsusComponents,
+  vFsusInfiniteScroll,
+  vFsusLoading,
+} from '@fsusui/components'
 import { version } from './version'
 
 export * from '@fsusui/core'
@@ -35,6 +39,8 @@ export const createFsusUI = (defaultOptions: FsusUIPluginOptions = {}): Plugin =
     }
 
     app.directive('fsus-click-outside', vClickOutside)
+    app.directive('fsus-loading', vFsusLoading)
+    app.directive('fsus-infinite-scroll', vFsusInfiniteScroll)
     app.component('FsusIcon', FsusIcon)
     app.use(FsusMotionPlugin)
 

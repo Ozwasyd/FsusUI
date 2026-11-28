@@ -5,7 +5,7 @@ overrides:
     platform: avalonia-windows
     status: accepted
     reason: Windows high-contrast and focus cues can override app brushes for accessibility.
-    affectedContracts: [component.el-button, component.el-input]
+    affectedContracts: [component.fsus-button, component.fsus-input]
     visualThreshold: low
     behaviorExpectation: Keyboard focus-visible state and accessibility state must remain equivalent to the public contracts.
     allowedDeviation: low
@@ -19,7 +19,7 @@ overrides:
     platform: avalonia-windows
     status: accepted
     reason: Windows DirectWrite font fallback and browser text rendering can produce small baseline and glyph-width differences.
-    affectedContracts: [component.el-text]
+    affectedContracts: [component.fsus-text]
     visualThreshold: medium
     behaviorExpectation: Text content, wrapping intent, line count, ellipsis behavior, and accessible names must match the typography baseline.
     allowedDeviation: medium

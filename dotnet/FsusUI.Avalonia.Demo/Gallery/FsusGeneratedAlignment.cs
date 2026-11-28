@@ -6,7 +6,7 @@ internal static class FsusGeneratedAlignment
 {
   public static IReadOnlySet<string> StableContractIds { get; } = new HashSet<string>(StringComparer.Ordinal)
   {
-    "component-v2.el-check-tag",
+    "component-v2.fsus-check-tag",
   };
 
   public static IReadOnlySet<string> StableRoutes { get; } = new HashSet<string>(StringComparer.Ordinal)
@@ -19,7 +19,7 @@ internal static class FsusGeneratedAlignment
   {
     ["selection"] = new HashSet<string>(StringComparer.Ordinal)
     {
-      "component-v2.el-check-tag",
+      "component-v2.fsus-check-tag",
     },
   };
 }

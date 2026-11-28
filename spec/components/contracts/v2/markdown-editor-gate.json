@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "component": "ElMarkdownEditor",
+  "component": "FsusMarkdownEditor",
   "blocked": false,
   "blockedBy": [],
-  "reason": "Issues #338-#343 and #288 are closed. Contract V2 now derives MarkdownEditor status only from its real static mappings and execution evidence."
+  "reason": "Issues #338-#343 and #288 are closed. Contract V2 now derives FsusMarkdownEditor status only from its real static mappings and execution evidence."
 }

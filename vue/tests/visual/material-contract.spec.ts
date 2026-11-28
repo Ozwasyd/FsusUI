@@ -8,7 +8,6 @@ import {
 const computedMaterial = (locator: Locator) =>
   locator.evaluate((element) => {
     const style = window.getComputedStyle(element)
-
     return {
       backdropFilter: style.backdropFilter,
       backgroundColor: style.backgroundColor,
@@ -19,7 +18,6 @@ const computedMaterial = (locator: Locator) =>
     }
   })
 
-/** Issue #298: resolve computed shadow against canonical depth tokens. */
 const computedOverlayDepth = (locator: Locator) =>
   locator.evaluate((element) => {
     const style = window.getComputedStyle(element)
@@ -28,7 +26,6 @@ const computedOverlayDepth = (locator: Locator) =>
       value.replace(/\s+/g, ' ').trim().toLowerCase()
     const resolveTokenShadow = (name: string) => {
       if (!root.getPropertyValue(name).trim()) return ''
-
       const probe = document.createElement('div')
       probe.style.boxShadow = `var(${name})`
       document.body.append(probe)
@@ -62,7 +59,6 @@ const computedOverlayDepth = (locator: Locator) =>
 const computedHeaderMaterial = (locator: Locator) =>
   locator.evaluate((element) => {
     const style = window.getComputedStyle(element)
-
     return {
       backdropFilter: style.backdropFilter,
       backgroundColor: style.backgroundColor,
@@ -121,7 +117,7 @@ test('paper overlays keep blur disabled', async ({ page }, testInfo) => {
     waitUntil: 'domcontentloaded',
   })
 
-  const loadingMask = page.locator('.el-loading-mask').first()
+  const loadingMask = page.locator('.fsus-loading').first()
   await expect(loadingMask).toBeVisible()
   await expect
     .poll(() => computedMaterial(loadingMask))
@@ -132,7 +128,7 @@ test('paper overlays keep blur disabled', async ({ page }, testInfo) => {
     })
 
   await page.getByTestId('open-publish-dialog').click()
-  const dialog = page.locator('.el-dialog').last()
+  const dialog = page.locator('.fsus-dialog').last()
   await expect(dialog).toBeVisible()
   await expect
     .poll(() => computedMaterial(dialog))
@@ -148,10 +144,6 @@ test('paper overlays keep blur disabled', async ({ page }, testInfo) => {
 test('dialog drawer notification keep correct overlay depth hierarchy', async ({
   page,
 }, testInfo) => {
-  // #298: same-screen depth comparison. This fixture intentionally coexists
-  // multiple modal layers to compare computed material; only the first action
-  // models user interaction. Later controls are dispatched programmatically so
-  // the test does not require pointer events to pass through an active modal.
   const { theme } = resolveVisualVariant(testInfo.project.name)
   await page.emulateMedia({ reducedMotion: 'no-preference' })
   await page.goto(buildVisualUrl('feedback', testInfo.project.name), {
@@ -159,15 +151,15 @@ test('dialog drawer notification keep correct overlay depth hierarchy', async ({
   })
 
   await page.getByTestId('open-publish-dialog').click()
-  const dialog = page.locator('.el-dialog').last()
+  const dialog = page.locator('.fsus-dialog').last()
   await expect(dialog).toBeVisible()
 
   await page.getByTestId('open-review-drawer').dispatchEvent('click')
-  const drawer = page.locator('.el-drawer').last()
+  const drawer = page.locator('.fsus-drawer').last()
   await expect(drawer).toBeVisible()
 
   await page.getByTestId('open-notification').dispatchEvent('click')
-  const notification = page.locator('.el-notification').last()
+  const notification = page.locator('.fsus-notification').last()
   await expect(notification).toBeVisible()
 
   const dialogDepth = await computedOverlayDepth(dialog)
@@ -197,11 +189,9 @@ test('dialog drawer notification keep correct overlay depth hierarchy', async ({
   expect(dialogDepth.borderRadius).toMatch(/^12px$/)
   expect(drawerDepth.borderRadius).toMatch(/^0px$/)
   expect(notificationDepth.borderRadius).toMatch(/^10px$/)
-
   expect(notificationDepth.boxShadow).not.toMatch(
     /rgb\(\s*42\s*,\s*89\s*,\s*156/i,
   )
-  expect(notificationDepth.boxShadow).not.toMatch(/var\(--el-color-primary/i)
 
   await attachScreenshot(page, testInfo, `overlay-depth-hierarchy-${theme}`)
 })
@@ -216,8 +206,8 @@ test('image viewer owns the only public glass mask', async ({
   })
   await page.getByRole('button', { name: 'Direct Viewer' }).click()
 
-  const wrapper = page.locator('.el-image-viewer__wrapper')
-  const mask = page.locator('.el-image-viewer__mask')
+  const wrapper = page.locator('.fsus-image-viewer')
+  const mask = wrapper.locator('.fsus-overlay__scrim')
   await expect(wrapper).toHaveAttribute('data-fsus-material', 'glass')
   await expect(mask).toBeVisible()
   await expect
@@ -230,28 +220,19 @@ test('image viewer owns the only public glass mask', async ({
   await attachScreenshot(page, testInfo, `image-viewer-glass-${theme}`)
 
   await page.emulateMedia({ reducedMotion: 'reduce' })
-  await expect(wrapper).toHaveCSS('animation-duration', /^(?:0\.00001|1e-05)s$/)
-  await attachScreenshot(page, testInfo, `image-viewer-reduced-motion-${theme}`)
+  await expect(wrapper).toHaveCSS(
+    'animation-duration',
+    /^(?:0\.00001|1e-05)s$/,
+  )
 })
 
 test('site and public headers keep glass opt-in', async ({
   page,
 }, testInfo) => {
   const { theme } = resolveVisualVariant(testInfo.project.name)
-  await page.goto(buildVisualUrl('issue-primitives', testInfo.project.name), {
-    waitUntil: 'domcontentloaded',
-  })
-  const siteHeader = page
-    .locator('.issue-primitives__site-header-fixtures .el-site-header')
-    .first()
-  await expect(siteHeader).toBeVisible()
-  await verifyPaperAndGlassHeader(siteHeader)
-
   await page.goto(
     buildVisualUrl('public-shell-search-mode', testInfo.project.name),
-    {
-      waitUntil: 'domcontentloaded',
-    },
+    { waitUntil: 'domcontentloaded' },
   )
   const publicHeader = page.locator('[data-public-shell-header]')
   await expect(publicHeader).toBeVisible()

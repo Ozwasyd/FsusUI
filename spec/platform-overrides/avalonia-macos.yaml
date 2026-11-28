@@ -5,7 +5,7 @@ overrides:
     platform: avalonia-macos
     status: accepted
     reason: macOS text smoothing differs from Linux, Windows, and browser rendering.
-    affectedContracts: [component.el-text]
+    affectedContracts: [component.fsus-text]
     visualThreshold: medium
     behaviorExpectation: Text content, wrapping behavior, and accessible name exposure must match the public text contract.
     allowedDeviation: medium
@@ -19,7 +19,7 @@ overrides:
     platform: avalonia-macos
     status: accepted
     reason: macOS uses Command and Option labels for the same platform-neutral shortcut semantics represented as Ctrl and Alt on Windows and Linux.
-    affectedContracts: [component.el-input]
+    affectedContracts: [component.fsus-input]
     visualThreshold: low
     behaviorExpectation: Captured key identity, modifier order, stable serialization, cancellation, clearing, collision detection, and accessible status remain equivalent across platforms.
     allowedDeviation: low
@@ -33,7 +33,7 @@ overrides:
     platform: avalonia-macos
     status: accepted
     reason: macOS application and Dock menus require platform roles and placement that do not appear in Windows or Linux menu bars.
-    affectedContracts: [component.el-menu]
+    affectedContracts: [component.fsus-menu]
     visualThreshold: low
     behaviorExpectation: The neutral command model retains command identity, enabled and checked state, shortcut updates, application roles, Services assignment, Dock routing, and deterministic degradation on other platforms.
     allowedDeviation: low

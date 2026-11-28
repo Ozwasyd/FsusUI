@@ -1,36 +1,27 @@
 <script setup lang="ts">
-import type { FsusSize } from '@fsusui/core'
-
 defineOptions({ name: 'FsusCheckTag' })
 
-export interface FsusCheckTagProps {
-  size?: FsusSize
-  disabled?: boolean
-}
-
-const { size = 'md', disabled = false } = defineProps<FsusCheckTagProps>()
-
-const checked = defineModel<boolean>({ default: false })
+const checked = defineModel<boolean>('checked', { default: false })
 const emit = defineEmits<{ change: [checked: boolean] }>()
 
 const toggle = () => {
-  if (disabled) return
-  checked.value = !checked.value
-  emit('change', checked.value)
+  const next = !checked.value
+  emit('change', next)
+  checked.value = next
 }
 </script>
 
 <template>
-  <button
-    type="button"
+  <span
+    role="checkbox"
     class="fsus-check-tag"
-    :aria-pressed="checked ? 'true' : 'false'"
-    :disabled="disabled"
+    tabindex="0"
+    :aria-checked="checked ? 'true' : 'false'"
     :data-checked="checked ? '' : undefined"
-    :data-size="size"
-    :data-disabled="disabled ? '' : undefined"
     @click="toggle"
+    @keydown.space.prevent="toggle"
+    @keydown.enter.prevent="toggle"
   >
     <slot />
-  </button>
+  </span>
 </template>

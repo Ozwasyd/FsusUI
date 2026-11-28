@@ -299,8 +299,8 @@ internal static class ConformanceV2Runner
       contractHash,
       webBaselineHash,
       avaloniaBaselineHash,
-      scenario = "scenario.v2.el-check-tag.real-interaction-trace",
-      contract = "component-v2.el-check-tag",
+      scenario = "scenario.v2.fsus-check-tag.real-interaction-trace",
+      contract = "component-v2.fsus-check-tag",
       documentId = "check-tag-state",
       documentEpoch = 1,
       sourceRevision = 2,
@@ -543,8 +543,8 @@ internal static class ConformanceV2Runner
       contractHash,
       webBaselineHash,
       avaloniaBaselineHash,
-      scenario = "scenario.v2.el-markdown-editor.real-interaction-trace",
-      contract = "component-v2.el-markdown-editor",
+      scenario = "scenario.v2.fsus-markdown-editor.real-interaction-trace",
+      contract = "component-v2.fsus-markdown-editor",
       documentId = markdownDocumentA.Id,
       documentEpoch = markdownDocumentA.Epoch,
       sourceRevision = 0,
@@ -864,8 +864,8 @@ internal static class ConformanceV2Runner
       contractHash,
       webBaselineHash,
       avaloniaBaselineHash,
-      scenario = "scenario.v2.el-markdown-editor.real-interaction-trace",
-      contract = "component-v2.el-markdown-editor",
+      scenario = "scenario.v2.fsus-markdown-editor.real-interaction-trace",
+      contract = "component-v2.fsus-markdown-editor",
       documentId = identity.Id,
       documentEpoch = identity.Epoch,
       sourceRevision = store.Revision,
@@ -900,9 +900,9 @@ internal static class ConformanceV2Runner
     markdownStepStopwatch.Stop();
     var markdownScenarios = new[]
     {
-      "scenario.v2.el-markdown-editor.operation.dispatch-transaction",
-      "scenario.v2.el-markdown-editor.operation.redo",
-      "scenario.v2.el-markdown-editor.operation.undo",
+      "scenario.v2.fsus-markdown-editor.operation.dispatch-transaction",
+      "scenario.v2.fsus-markdown-editor.operation.redo",
+      "scenario.v2.fsus-markdown-editor.operation.undo",
     };
     var markdownQualifiedSteps = markdownSteps
       .Where(step =>
@@ -921,17 +921,17 @@ internal static class ConformanceV2Runner
       throw new InvalidOperationException("Markdown contract operation evidence failed.");
     var checkTagScenarios = new[]
     {
-      "scenario.v2.el-check-tag.input.checked",
-      "scenario.v2.el-check-tag.output.change",
-      "scenario.v2.el-check-tag.output.update-checked",
-      "scenario.v2.el-check-tag.content-region.default",
-      "scenario.v2.el-check-tag.state.default",
-      "scenario.v2.el-check-tag.keyboard",
-      "scenario.v2.el-check-tag.pointer",
-      "scenario.v2.el-check-tag.focus",
-      "scenario.v2.el-check-tag.a11y",
-      "scenario.v2.el-check-tag.motion",
-      "scenario.v2.el-check-tag.perf",
+      "scenario.v2.fsus-check-tag.input.checked",
+      "scenario.v2.fsus-check-tag.output.change",
+      "scenario.v2.fsus-check-tag.output.update-checked",
+      "scenario.v2.fsus-check-tag.content-region.default",
+      "scenario.v2.fsus-check-tag.state.default",
+      "scenario.v2.fsus-check-tag.keyboard",
+      "scenario.v2.fsus-check-tag.pointer",
+      "scenario.v2.fsus-check-tag.focus",
+      "scenario.v2.fsus-check-tag.a11y",
+      "scenario.v2.fsus-check-tag.motion",
+      "scenario.v2.fsus-check-tag.perf",
     };
     var automationChildren = AutomationChildNodes(editor);
     var trace = new
@@ -1003,7 +1003,7 @@ internal static class ConformanceV2Runner
       },
       contractExecutions = new Dictionary<string, object>
       {
-        ["component-v2.el-markdown-editor"] = new
+        ["component-v2.fsus-markdown-editor"] = new
         {
           identity = markdownIdentity,
           steps = markdownQualifiedSteps,
@@ -1027,26 +1027,26 @@ internal static class ConformanceV2Runner
             },
             memberScenarios = new Dictionary<string, string[]>
             {
-              ["operation.dispatchTransaction"] = ["scenario.v2.el-markdown-editor.operation.dispatch-transaction"],
-              ["operation.redo"] = ["scenario.v2.el-markdown-editor.operation.redo"],
-              ["operation.undo"] = ["scenario.v2.el-markdown-editor.operation.undo"],
+              ["operation.dispatchTransaction"] = ["scenario.v2.fsus-markdown-editor.operation.dispatch-transaction"],
+              ["operation.redo"] = ["scenario.v2.fsus-markdown-editor.operation.redo"],
+              ["operation.undo"] = ["scenario.v2.fsus-markdown-editor.operation.undo"],
             },
             requiredScenarios = markdownScenarios,
             executions = new Dictionary<string, object>
             {
-              ["scenario.v2.el-markdown-editor.operation.dispatch-transaction"] = new
+              ["scenario.v2.fsus-markdown-editor.operation.dispatch-transaction"] = new
               {
                 real = true,
                 stepIndexes = new[] { 0 },
                 artifacts = new[] { "interaction", "state" },
               },
-              ["scenario.v2.el-markdown-editor.operation.redo"] = new
+              ["scenario.v2.fsus-markdown-editor.operation.redo"] = new
               {
                 real = true,
                 stepIndexes = new[] { 2 },
                 artifacts = new[] { "interaction", "state" },
               },
-              ["scenario.v2.el-markdown-editor.operation.undo"] = new
+              ["scenario.v2.fsus-markdown-editor.operation.undo"] = new
               {
                 real = true,
                 stepIndexes = new[] { 1 },
@@ -1074,7 +1074,7 @@ internal static class ConformanceV2Runner
             },
           },
         },
-        ["component-v2.el-check-tag"] = new
+        ["component-v2.fsus-check-tag"] = new
         {
           identity = checkTagIdentity,
           steps = checkTagSteps,
@@ -1107,75 +1107,75 @@ internal static class ConformanceV2Runner
             },
             memberScenarios = new Dictionary<string, string[]>
             {
-              ["input.checked"] = ["scenario.v2.el-check-tag.input.checked"],
-              ["output.change"] = ["scenario.v2.el-check-tag.output.change"],
-              ["output.update:checked"] = ["scenario.v2.el-check-tag.output.update-checked"],
-              ["content-region.default"] = ["scenario.v2.el-check-tag.content-region.default"],
+              ["input.checked"] = ["scenario.v2.fsus-check-tag.input.checked"],
+              ["output.change"] = ["scenario.v2.fsus-check-tag.output.change"],
+              ["output.update:checked"] = ["scenario.v2.fsus-check-tag.output.update-checked"],
+              ["content-region.default"] = ["scenario.v2.fsus-check-tag.content-region.default"],
             },
             requiredScenarios = checkTagScenarios,
             executions = new Dictionary<string, object>
             {
-              ["scenario.v2.el-check-tag.input.checked"] = new
+              ["scenario.v2.fsus-check-tag.input.checked"] = new
               {
                 real = true,
                 stepIndexes = new[] { 0, 2 },
                 artifacts = new[] { "interaction", "state" },
               },
-              ["scenario.v2.el-check-tag.output.change"] = new
+              ["scenario.v2.fsus-check-tag.output.change"] = new
               {
                 real = true,
                 stepIndexes = new[] { 3 },
                 artifacts = new[] { "event" },
               },
-              ["scenario.v2.el-check-tag.output.update-checked"] = new
+              ["scenario.v2.fsus-check-tag.output.update-checked"] = new
               {
                 real = true,
                 stepIndexes = new[] { 4 },
                 artifacts = new[] { "event" },
               },
-              ["scenario.v2.el-check-tag.content-region.default"] = new
+              ["scenario.v2.fsus-check-tag.content-region.default"] = new
               {
                 real = true,
                 stepIndexes = new[] { 1, 7 },
                 artifacts = new[] { "content", "accessibility", "visual" },
               },
-              ["scenario.v2.el-check-tag.state.default"] = new
+              ["scenario.v2.fsus-check-tag.state.default"] = new
               {
                 real = true,
                 stepIndexes = new[] { 0 },
                 artifacts = new[] { "state" },
               },
-              ["scenario.v2.el-check-tag.keyboard"] = new
+              ["scenario.v2.fsus-check-tag.keyboard"] = new
               {
                 real = true,
                 stepIndexes = new[] { 6 },
                 artifacts = new[] { "interaction", "event" },
               },
-              ["scenario.v2.el-check-tag.pointer"] = new
+              ["scenario.v2.fsus-check-tag.pointer"] = new
               {
                 real = true,
                 stepIndexes = new[] { 2 },
                 artifacts = new[] { "interaction", "event" },
               },
-              ["scenario.v2.el-check-tag.focus"] = new
+              ["scenario.v2.fsus-check-tag.focus"] = new
               {
                 real = true,
                 stepIndexes = new[] { 5 },
                 artifacts = new[] { "focus", "visual" },
               },
-              ["scenario.v2.el-check-tag.a11y"] = new
+              ["scenario.v2.fsus-check-tag.a11y"] = new
               {
                 real = true,
                 stepIndexes = new[] { 7 },
                 artifacts = new[] { "accessibility" },
               },
-              ["scenario.v2.el-check-tag.motion"] = new
+              ["scenario.v2.fsus-check-tag.motion"] = new
               {
                 real = true,
                 stepIndexes = new[] { 8 },
                 artifacts = new[] { "motion" },
               },
-              ["scenario.v2.el-check-tag.perf"] = new
+              ["scenario.v2.fsus-check-tag.perf"] = new
               {
                 real = true,
                 stepIndexes = new[] { 9 },
@@ -1511,8 +1511,8 @@ internal static class ConformanceV2Runner
       focusTarget,
       binding = new
       {
-        scenario = "scenario.v2.el-markdown-editor.real-interaction-trace",
-        contract = "component-v2.el-markdown-editor",
+        scenario = "scenario.v2.fsus-markdown-editor.real-interaction-trace",
+        contract = "component-v2.fsus-markdown-editor",
         candidate,
         contractHash,
         webBaselineHash,

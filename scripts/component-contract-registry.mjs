@@ -30,6 +30,15 @@ const allowedPlatformClassifications = new Set([
 ])
 
 const REVIEWED_WEB_ONLY_DECISIONS = {
+  vClickOutside: {
+    alternative:
+      'Use Avalonia native light-dismiss overlay dismissal via FsusOverlayHost and FsusOverlayOptions; Avalonia does not expose a DOM directive.',
+    authority: 'spec/avalonia/semantic/FsusUI.Avalonia.semantic.json',
+    nativeSymbols: [
+      { type: 'FsusUI.Avalonia.Overlay.FsusOverlayHost', members: [] },
+      { type: 'FsusUI.Avalonia.Overlay.FsusOverlayOptions', members: [] },
+    ],
+  },
   ElCollapseTransition: {
     alternative:
       'Use the native FsusCollapse public surface; Avalonia does not expose a browser transition-wrapper component.',

@@ -320,7 +320,7 @@ const objectMembers = (sourceText, variableName, filename) => {
 }
 const exposedMembers = () => {
   const sfc = parse(
-    read('vue/packages/components/markdown-editor/src/markdown-editor.vue'),
+    read('vue/packages/markdown/src/markdown-editor/src/markdown-editor.vue'),
   ).descriptor.scriptSetup?.content
   if (!sfc) throw new Error('MarkdownEditor script setup missing')
   const source = ts.createSourceFile(
@@ -358,11 +358,11 @@ const main = () => {
   }
 
   const expected = baseline.components.find(
-    (component) => component.name === 'ElMarkdownEditor',
+    (component) => component.name === 'FsusMarkdownEditor',
   )
-  if (!expected) throw new Error('ElMarkdownEditor Vue baseline missing')
+  if (!expected) throw new Error('FsusMarkdownEditor Vue baseline missing')
   const source = read(
-    'vue/packages/components/markdown-editor/src/markdown-editor.ts',
+    'vue/packages/markdown/src/markdown-editor/src/markdown-editor.ts',
   )
   const actual = {
     props: objectMembers(source, 'markdownEditorProps', 'markdown-editor.ts'),

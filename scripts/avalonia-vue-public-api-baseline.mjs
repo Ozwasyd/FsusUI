@@ -255,9 +255,111 @@ const parseOptionsApiObjects = (vueSource, key) => {
   return results
 }
 
+const isV2NativeLayout = (root) =>
+  exists(path.join(root, 'vue/packages/fsusui/package.json'))
+
+const parseV2ComponentCatalog = (root) => {
+  const indexFile = path.join(root, 'vue/packages/components/src/index.ts')
+  const content = exists(indexFile) ? read(indexFile) : ''
+  const moduleToExports = new Map()
+  const exportToModule = new Map()
+  const serviceOrDirectiveNames = new Set([
+    'FsusMessage',
+    'FsusNotification',
+    'FsusMessageBox',
+    'FsusLoadingService',
+    'vFsusLoading',
+    'vFsusInfiniteScroll',
+  ])
+
+  const registerExport = (name, moduleName) => {
+    exportToModule.set(name, moduleName)
+    if (!moduleToExports.has(moduleName)) moduleToExports.set(moduleName, [])
+    moduleToExports.get(moduleName).push(name)
+  }
+
+  for (const match of content.matchAll(
+    /import\s+([A-Za-z_$][\w$]*)\s+from\s+['"]\.\/([^/'"]+)(?:\/[^'"]+)?['"]/g,
+  )) {
+    const [, name, moduleName] = match
+    registerExport(name, moduleName)
+  }
+  for (const match of content.matchAll(
+    /import\s*\{([\s\S]*?)\}\s*from\s+['"]\.\/([^/'"]+)(?:\/[^'"]+)?['"]/g,
+  )) {
+    const [, namesBlock, moduleName] = match
+    const names = namesBlock
+      .split(',')
+      .map((part) => part.trim())
+      .filter((part) => part && !part.startsWith('type '))
+      .map((part) => part.split(/\s+as\s+/).at(-1)?.trim())
+      .filter(Boolean)
+    for (const name of names) registerExport(name, moduleName)
+  }
+
+  // Markdown subpath components (@ozwasyd/fsusui/markdown)
+  if (exists(path.join(root, 'vue/packages/markdown/src/markdown-editor'))) {
+    registerExport('FsusMarkdownEditor', 'markdown-editor')
+  }
+  if (exists(path.join(root, 'vue/packages/markdown/src/markdown-renderer'))) {
+    registerExport('FsusMarkdownRenderer', 'markdown-renderer')
+  }
+  // Icon component (@ozwasyd/fsusui/icons)
+  if (exists(path.join(root, 'vue/packages/icons/src/index.ts'))) {
+    registerExport('FsusIcon', 'icon')
+  }
+
+  const installed = []
+  const listMatch = content.match(
+    /export\s+const\s+fsusComponents(?:\s*:\s*[^=]+)?\s*=\s*\[/,
+  )
+  if (listMatch) {
+    const openIndex = listMatch.index + listMatch[0].length - 1
+    const closeIndex = content.indexOf(']', openIndex)
+    if (openIndex !== -1 && closeIndex !== -1) {
+      installed.push(
+        ...content
+          .slice(openIndex + 1, closeIndex)
+          .split(',')
+          .map((part) => part.trim())
+          .filter(Boolean),
+      )
+    }
+  }
+  if (exportToModule.has('FsusIcon')) installed.push('FsusIcon')
+
+  const componentModules = uniqueSorted([...moduleToExports.keys()])
+  const componentExportsByModule = new Map()
+  for (const moduleName of componentModules) {
+    componentExportsByModule.set(
+      moduleName,
+      uniqueSorted(
+        (moduleToExports.get(moduleName) ?? []).filter(
+          (name) => !serviceOrDirectiveNames.has(name),
+        ),
+      ),
+    )
+  }
+
+  return {
+    componentModules,
+    componentExportsByModule,
+    allExportsByModule: moduleToExports,
+    imports: exportToModule,
+    installed: uniqueSorted(installed),
+  }
+}
+
 const parseDeprecatedApis = (root) => {
-  const files = walkFiles(path.join(root, 'vue/packages/components'), (file) =>
-    /\.(ts|vue)$/.test(file),
+  const dirs = isV2NativeLayout(root)
+    ? [
+        path.join(root, 'vue/packages/components/src'),
+        path.join(root, 'vue/packages/markdown/src'),
+        path.join(root, 'vue/packages/icons/src'),
+      ]
+    : [path.join(root, 'vue/packages/components')]
+  const files = dirs.flatMap((dir) =>
+    walkFiles(dir, (file) => /\.(ts|vue)$/.test(file) && !file.includes('__tests__')),
   )
   const deprecated = []
   for (const file of files) {
@@ -354,6 +456,12 @@ const parseComponentImports = (root) => {
 }
 
 const parsePluginImports = (root) => {
+  if (isV2NativeLayout(root)) {
+    return [
+      { name: 'FsusMotionPlugin', source: '@fsusui/motion' },
+      { name: 'FsusUI', source: '@ozwasyd/fsusui' },
+    ]
+  }
   const file = path.join(root, 'vue/packages/element-plus/plugin.ts')
   if (!exists(file)) return []
   const content = read(file)
@@ -372,7 +480,9 @@ const parsePluginImports = (root) => {
 }
 
 const parseEntryPoints = (root, classifications) => {
-  const packageFile = path.join(root, 'vue/packages/element-plus/package.json')
+  const packageFile = isV2NativeLayout(root)
+    ? path.join(root, 'vue/packages/fsusui/package.json')
+    : path.join(root, 'vue/packages/element-plus/package.json')
   if (!exists(packageFile)) return []
   const packageJson = parseJson(packageFile)
   return Object.keys(packageJson.exports || {})
@@ -388,14 +498,17 @@ const parseEntryPoints = (root, classifications) => {
 }
 
 const parseCssVariables = (root) => {
-  const files = walkFiles(
-    path.join(root, 'vue/packages/theme-chalk/src'),
-    (file) => /\.(scss|css)$/.test(file),
-  )
+  const themeDir = isV2NativeLayout(root)
+    ? path.join(root, 'vue/packages/theme/src')
+    : path.join(root, 'vue/packages/theme-chalk/src')
+  const files = walkFiles(themeDir, (file) => /\.(scss|css)$/.test(file))
+  const varPattern = isV2NativeLayout(root)
+    ? /--fsus-[A-Za-z0-9-]+/g
+    : /--(?:el|fsus)-[A-Za-z0-9-]+/g
   const variables = new Map()
   for (const file of files) {
     const content = read(file)
-    for (const match of content.matchAll(/--(?:el|fsus)-[A-Za-z0-9-]+/g)) {
+    for (const match of content.matchAll(varPattern)) {
       const name = match[0]
       const entry = variables.get(name) || { name, files: [] }
       entry.files.push(toPosix(path.relative(root, file)))
@@ -434,8 +547,20 @@ const loadClassifications = (root) => {
 }
 
 const loadModuleSources = (root, moduleName) => {
-  const moduleRoot = path.join(root, 'vue/packages/components', moduleName)
-  const files = walkFiles(moduleRoot, (file) => /\.(ts|tsx|vue)$/.test(file))
+  const candidates = isV2NativeLayout(root)
+    ? moduleName === 'icon'
+      ? [path.join(root, 'vue/packages/icons/src')]
+      : [
+          path.join(root, 'vue/packages/components/src', moduleName),
+          path.join(root, 'vue/packages/markdown/src', moduleName),
+        ]
+    : [path.join(root, 'vue/packages/components', moduleName)]
+  const moduleRoot = candidates.find((candidate) => exists(candidate))
+  if (!moduleRoot) return []
+  const files = walkFiles(
+    moduleRoot,
+    (file) => /\.(ts|tsx|vue)$/.test(file) && !file.includes('__tests__'),
+  )
   return files.map((file) => ({
     file,
     relativePath: toPosix(path.relative(root, file)),
@@ -447,6 +572,8 @@ const sourceForComponent = (sources, exportName) => {
   const kebab = toKebab(exportName)
   const exact = sources.find(
     (source) =>
+      source.relativePath.endsWith(`/${exportName}.vue`) ||
+      source.relativePath.endsWith(`/${exportName}.tsx`) ||
       source.relativePath.endsWith(`/src/${kebab}.vue`) ||
       source.relativePath.endsWith(`/src/${kebab}.tsx`),
   )
@@ -557,15 +684,19 @@ const parseComponent = (
           exportName,
         })
 
+  const rawProps = uniqueSorted([...fromVue.props, ...fallback.props])
+  const rawEmits = uniqueSorted([...fromVue.emits, ...fallback.emits])
+  const rawExposed = vueSource ? parseDefineExpose(vueSource.content) : []
+
   return {
     name: exportName,
     module: moduleName,
     classification,
     source: vueSource?.relativePath ?? null,
-    props: uniqueSorted([...fromVue.props, ...fallback.props]),
-    emits: uniqueSorted([...fromVue.emits, ...fallback.emits]),
+    props: rawProps.length > 0 ? rawProps : semantics.legacyProps,
+    emits: rawEmits.length > 0 ? rawEmits : semantics.legacyEmits,
     slots: slotSemantics.semanticSlots,
-    exposed: vueSource ? parseDefineExpose(vueSource.content) : [],
+    exposed: rawExposed.length > 0 ? rawExposed : semantics.legacyExposed,
     semantic: {
       props: semantics.semanticProps,
       emits: semantics.semanticEmits,
@@ -579,7 +710,39 @@ const parseServicesAndDirectives = (
   root,
   componentModules,
   classifications,
+  v2Catalog = null,
 ) => {
+  if (v2Catalog) {
+    const directives = [
+      { name: 'vClickOutside', module: 'core' },
+      { name: 'vFsusInfiniteScroll', module: 'image' },
+      { name: 'vFsusLoading', module: 'loading' },
+    ].map((item) => ({
+      ...item,
+      classification: requiredClassification(
+        classifications.directives,
+        item.name,
+        `directive ${item.name}`,
+      ),
+    }))
+    const services = [
+      { name: 'FsusLoadingService', module: 'loading' },
+      { name: 'FsusMessage', module: 'message' },
+      { name: 'FsusMessageBox', module: 'message-box' },
+      { name: 'FsusNotification', module: 'notification' },
+    ].map((item) => ({
+      ...item,
+      classification: requiredClassification(
+        classifications.services,
+        item.name,
+        `service ${item.name}`,
+      ),
+    }))
+    return {
+      directives: directives.sort((a, b) => a.name.localeCompare(b.name)),
+      services: services.sort((a, b) => a.name.localeCompare(b.name)),
+    }
+  }
   const directives = []
   const services = []
   for (const moduleName of componentModules) {
@@ -654,11 +817,22 @@ export const buildArtifacts = (root, options = {}) => {
       }
     }
   }
+  const v2Native = isV2NativeLayout(root)
   const packageJson = parseJson(
-    path.join(root, 'vue/packages/element-plus/package.json'),
+    path.join(
+      root,
+      v2Native
+        ? 'vue/packages/fsusui/package.json'
+        : 'vue/packages/element-plus/package.json',
+    ),
   )
-  const componentModules = parseComponentIndexModules(root)
-  const componentImportInfo = parseComponentImports(root)
+  const v2Catalog = v2Native ? parseV2ComponentCatalog(root) : null
+  const componentModules = v2Catalog
+    ? v2Catalog.componentModules
+    : parseComponentIndexModules(root)
+  const componentImportInfo = v2Catalog
+    ? { imports: v2Catalog.imports, installed: v2Catalog.installed }
+    : parseComponentImports(root)
 
   const components = []
   for (const moduleName of componentModules) {
@@ -667,7 +841,9 @@ export const buildArtifacts = (root, options = {}) => {
       moduleName,
       `component module ${moduleName}`,
     )
-    const publicExports = parsePublicExports(root, moduleName)
+    const publicExports = v2Catalog
+      ? (v2Catalog.componentExportsByModule.get(moduleName) ?? [])
+      : parsePublicExports(root, moduleName)
     for (const exportName of publicExports) {
       components.push(
         parseComponent(
@@ -707,22 +883,36 @@ export const buildArtifacts = (root, options = {}) => {
     root,
     componentModules,
     classifications,
+    v2Catalog,
   )
   const cssVariables = parseCssVariables(root)
   const entryPoints = parseEntryPoints(root, classifications)
   const deprecatedApis = parseDeprecatedApis(root)
 
-  const tokenFiles = [
-    'spec/tokens/tokens.json',
-    'vue/packages/theme-chalk/src/generated/tokens.json',
-    'vue/packages/theme-chalk/src/generated/tokens.css',
-    'vue/packages/theme-chalk/src/generated/tokens.scss',
-  ]
-  const iconFiles = [
-    'spec/icons/registry.yaml',
-    'spec/icons/categories.yaml',
-    'vue/packages/icons-vue/generated/icon-metadata.json',
-  ]
+  const tokenFiles = v2Native
+    ? [
+        'spec/tokens/tokens.json',
+        'vue/packages/theme/src/generated/tokens.json',
+        'vue/packages/theme/src/generated/tokens.css',
+        'vue/packages/theme/src/generated/tokens.scss',
+      ]
+    : [
+        'spec/tokens/tokens.json',
+        'vue/packages/theme-chalk/src/generated/tokens.json',
+        'vue/packages/theme-chalk/src/generated/tokens.css',
+        'vue/packages/theme-chalk/src/generated/tokens.scss',
+      ]
+  const iconFiles = v2Native
+    ? [
+        'spec/icons/registry.yaml',
+        'spec/icons/categories.yaml',
+        'vue/packages/icons/src/icon-paths.ts',
+      ]
+    : [
+        'spec/icons/registry.yaml',
+        'spec/icons/categories.yaml',
+        'vue/packages/icons-vue/generated/icon-metadata.json',
+      ]
 
   const componentCountByClassification = {}
   for (const classification of allowedClassifications) {
@@ -776,26 +966,55 @@ export const buildArtifacts = (root, options = {}) => {
       ).match(/"version":\s*"([^"]+)"/)?.[1],
     }),
   )
-  const inputTreeHash = hashFiles(root, [
-    ...walkFiles(
-      path.join(root, 'vue/packages/components'),
-      (file) => /\.(ts|vue|json)$/.test(file) && !file.includes('__tests__'),
-    ).map((file) => toPosix(path.relative(root, file))),
-    ...walkFiles(
-      path.join(root, 'vue/packages/hooks'),
-      (file) => /\.ts$/.test(file) && !file.includes('__tests__'),
-    ).map((file) => toPosix(path.relative(root, file))),
-    ...walkFiles(path.join(root, 'vue/packages/constants'), (file) =>
-      /\.ts$/.test(file),
-    ).map((file) => toPosix(path.relative(root, file))),
-    ...walkFiles(
-      path.join(root, 'vue/packages/utils'),
-      (file) => /\.ts$/.test(file) && !file.includes('__tests__'),
-    ).map((file) => toPosix(path.relative(root, file))),
-    'vue/packages/components/motion.ts',
-    'vue/packages/element-plus/package.json',
-    'spec/baselines/vue-public-api-classifications.json',
-  ])
+  const inputTreeHash = hashFiles(
+    root,
+    v2Native
+      ? [
+          ...walkFiles(
+            path.join(root, 'vue/packages/components/src'),
+            (file) => /\.(ts|tsx|vue|json)$/.test(file) && !file.includes('__tests__'),
+          ).map((file) => toPosix(path.relative(root, file))),
+          ...walkFiles(
+            path.join(root, 'vue/packages/markdown/src'),
+            (file) => /\.(ts|tsx|vue|json)$/.test(file) && !file.includes('__tests__'),
+          ).map((file) => toPosix(path.relative(root, file))),
+          ...walkFiles(
+            path.join(root, 'vue/packages/icons/src'),
+            (file) => /\.ts$/.test(file) && !file.includes('__tests__'),
+          ).map((file) => toPosix(path.relative(root, file))),
+          ...walkFiles(
+            path.join(root, 'vue/packages/core/src'),
+            (file) => /\.ts$/.test(file) && !file.includes('__tests__'),
+          ).map((file) => toPosix(path.relative(root, file))),
+          ...walkFiles(
+            path.join(root, 'vue/packages/motion/src'),
+            (file) => /\.ts$/.test(file) && !file.includes('__tests__'),
+          ).map((file) => toPosix(path.relative(root, file))),
+          'vue/packages/fsusui/src/index.ts',
+          'vue/packages/fsusui/package.json',
+          'spec/baselines/vue-public-api-classifications.json',
+        ]
+      : [
+          ...walkFiles(
+            path.join(root, 'vue/packages/components'),
+            (file) => /\.(ts|vue|json)$/.test(file) && !file.includes('__tests__'),
+          ).map((file) => toPosix(path.relative(root, file))),
+          ...walkFiles(
+            path.join(root, 'vue/packages/hooks'),
+            (file) => /\.ts$/.test(file) && !file.includes('__tests__'),
+          ).map((file) => toPosix(path.relative(root, file))),
+          ...walkFiles(path.join(root, 'vue/packages/constants'), (file) =>
+            /\.ts$/.test(file),
+          ).map((file) => toPosix(path.relative(root, file))),
+          ...walkFiles(
+            path.join(root, 'vue/packages/utils'),
+            (file) => /\.ts$/.test(file) && !file.includes('__tests__'),
+          ).map((file) => toPosix(path.relative(root, file))),
+          'vue/packages/components/motion.ts',
+          'vue/packages/element-plus/package.json',
+          'spec/baselines/vue-public-api-classifications.json',
+        ],
+  )
   const structuredOutputSelectionHash = hashFiles(root, [
     'spec/components/contracts/v2/semantic-member-bindings.json',
   ])

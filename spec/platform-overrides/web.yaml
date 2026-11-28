@@ -5,7 +5,7 @@ overrides:
     platform: web
     status: accepted
     reason: Browser font rendering and line box metrics differ from Skia text metrics.
-    affectedContracts: [component.el-text]
+    affectedContracts: [component.fsus-text]
     visualThreshold: medium
     behaviorExpectation: Text content, line order, wrapping intent, and accessible name exposure must remain equivalent.
     allowedDeviation: medium

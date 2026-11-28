@@ -856,7 +856,7 @@ body {
 
 .audit-page.is-boundary .fsus-tree-node__content {
   height: auto;
-  min-height: var(--el-tree-node-content-height);
+  min-height: 34px;
   align-items: flex-start;
   padding-top: 6px;
   padding-bottom: 6px;
@@ -1086,7 +1086,7 @@ body {
 }
 
 .audit-card[data-audit-component='FsusCalendar'] .fsus-calendar {
-  --el-calendar-cell-width: 26px;
+  --fsus-calendar-cell-width: 26px;
 }
 
 .audit-card[data-audit-component='FsusCalendar'] .fsus-calendar__header {
@@ -1309,12 +1309,6 @@ body {
 }
 
 .audit-card .fsus-transfer {
-  --el-transfer-panel-width: 128px;
-  --el-transfer-panel-header-height: 34px;
-  --el-transfer-panel-body-height: 156px;
-  --el-transfer-filter-height: 28px;
-  --el-transfer-item-height: 28px;
-
   display: grid;
   grid-template-columns: 128px 34px 128px;
   align-items: start;
@@ -1335,8 +1329,6 @@ body {
 }
 
 .audit-page.is-boundary.is-compact .audit-card .fsus-transfer {
-  --el-transfer-panel-width: 108px;
-
   grid-template-columns: 108px 34px 108px;
   gap: 4px;
 }

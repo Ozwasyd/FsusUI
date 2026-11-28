@@ -32,7 +32,7 @@ public class AvaloniaGalleryRegistryTests
     var route = Assert.Single(FsusAvaloniaGalleryRegistry.StableRoutes);
     Assert.Equal("selection", route.ComponentId);
     Assert.Equal(
-      ["component-v2.el-check-tag"],
+      ["component-v2.fsus-check-tag"],
       route.StableContractIds.Order(StringComparer.Ordinal));
 
     var page = route.CreatePage();

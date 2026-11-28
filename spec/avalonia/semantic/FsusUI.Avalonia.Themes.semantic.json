@@ -4,11 +4,11 @@
   "source": {
     "toolVersion": "FsusUI.Avalonia.ApiTool@1.8.0",
     "assemblyVersion": "0.0.0.0",
-    "inputTreeHash": "7150c963fe381f0cd06f745b93a283e3b15bdc58743ffffe2f26bc509aac49e5",
+    "inputTreeHash": "bd5e0712fa6d6a089821f64bfbc3c19ff9eb686e469c0e8d9f86885ec09cca23",
     "compilerOptionsHash": "7e5271d568360ccb03852002c427b2d740466121049706513eb89a731476ad09",
     "dependencyVersionHash": "b0acaf728062500d48b252b58655a9fad423f83f197e79ddcdfff680a80ab71e",
     "contractSchemaVersion": "2.0.0",
-    "outputHash": "31bef0b9d2811729d4db5fb20c544cc03b571768444e48db468634bdbf51f453"
+    "outputHash": "f294312994a6e9802652b91d9eb4468882cef7ef5174648100c0809fa8405b3a"
   },
   "semanticTypes": [
     {
@@ -1611,7 +1611,7 @@
   ],
   "tokenThemeContract": {
     "canonicalAuthority": "spec/tokens/tokens.json",
-    "generatedMetadataAuthority": "vue/packages/theme-chalk/src/generated/tokens.json",
+    "generatedMetadataAuthority": "vue/packages/theme/src/generated/tokens.json",
     "generatedXamlAuthority": "dotnet/FsusUI.Avalonia.Themes/Generated/FsusTokens.axaml",
     "generatedCsharpAuthority": "dotnet/FsusUI.Avalonia/Generated/FsusTokens.g.cs",
     "contractDeclared": false,

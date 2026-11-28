@@ -12,8 +12,8 @@
 
       <AuditCard name="FsusRadioButton" :state="auditState">
         <fsus-radio-group :model-value="active ? 'B' : 'A'">
-          <fsus-radio-button label="A">A</fsus-radio-button>
-          <fsus-radio-button label="B">B</fsus-radio-button>
+          <fsus-radio-button value="A">A</fsus-radio-button>
+          <fsus-radio-button value="B">B</fsus-radio-button>
         </fsus-radio-group>
       </AuditCard>
 
@@ -82,7 +82,7 @@
             :density="compact ? 'compact' : 'default'"
           >
             <a
-              class="el-section-nav__link is-current"
+              class="fsus-section-nav__link is-current"
               href="#audit-overview"
               aria-current="location"
               data-audit-focus
@@ -91,11 +91,11 @@
             >
               Overview
             </a>
-            <a class="el-section-nav__link" href="#audit-resources">
+            <a class="fsus-section-nav__link" href="#audit-resources">
               Resources
             </a>
             <a
-              class="el-section-nav__link is-disabled"
+              class="fsus-section-nav__link is-disabled"
               aria-disabled="true"
               tabindex="-1"
             >
@@ -226,17 +226,6 @@
         </fsus-select>
       </AuditCard>
 
-      <AuditCard name="FsusSelect" :state="auditState">
-        <fsus-select
-          :model-value="active ? 'cover-review' : ''"
-          :options="selectV2Options"
-          placeholder="选择工作流"
-          :teleported="false"
-          data-audit-focus
-          data-audit-target
-        />
-      </AuditCard>
-
       <AuditCard name="FsusSlider" :state="auditState">
         <fsus-slider :model-value="active ? 80 : 40" data-audit-target />
       </AuditCard>
@@ -343,17 +332,6 @@
         </div>
       </AuditCard>
 
-      <AuditCard name="FsusTable" :state="auditState">
-        <div class="audit-table-v2-frame">
-          <fsus-table
-            :columns="tableV2Columns"
-            :data="tableV2Data"
-            :width="260"
-            :height="160"
-          />
-        </div>
-      </AuditCard>
-
       <AuditCard name="FsusTabs" :state="auditState">
         <fsus-tabs :model-value="active ? 'second' : 'first'">
           <fsus-tab-pane label="First" name="first">First content</fsus-tab-pane>
@@ -438,22 +416,6 @@
         </fsus-tooltip>
       </AuditCard>
 
-      <AuditCard name="FsusTooltip" :state="auditState">
-        <fsus-tooltip
-          :placement="boundary ? 'bottom-start' : 'right'"
-          :open="active"
-          :delay-duration="0"
-          :teleported="false"
-        >
-          <template #trigger>
-            <fsus-button data-audit-focus data-audit-target data-audit-active>
-              Tooltip V2
-            </fsus-button>
-          </template>
-          Tooltip V2 content
-        </fsus-tooltip>
-      </AuditCard>
-
       <AuditCard name="FsusTransfer" :state="auditState">
         <fsus-transfer
           :model-value="active ? [1, 2] : [1]"
@@ -485,19 +447,10 @@
         />
       </AuditCard>
 
-      <AuditCard name="FsusTree" :state="auditState">
-        <fsus-tree
-          :data="treeDataV2"
-          :height="180"
-          :item-size="44"
-          :default-expanded-keys="[0]"
-        />
-      </AuditCard>
-
       <AuditCard name="FsusUpload" :state="auditState">
         <fsus-upload action="#" :auto-upload="false" drag>
-          <fsus-icon class="el-icon--upload"><UploadFilled /></fsus-icon>
-          <div class="el-upload__text">Drop a file here or <em>browse</em></div>
+          <fsus-icon class="fsus-icon--upload"><UploadFilled /></fsus-icon>
+          <div class="fsus-upload__text">Drop a file here or <em>browse</em></div>
           <p data-upload-help>PNG/JPG, max 10 MB</p>
         </fsus-upload>
       </AuditCard>
@@ -546,13 +499,11 @@ const {
   dateValue,
   formatCollectionItem,
   responsiveCollectionItems,
-  selectV2Options,
   tableData,
   tableV2Columns,
   tableV2Data,
   themeMode,
   transferData,
   treeData,
-  treeDataV2,
 } = props.data
 </script>

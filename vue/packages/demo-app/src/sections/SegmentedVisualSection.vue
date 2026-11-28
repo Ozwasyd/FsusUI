@@ -11,40 +11,40 @@
       <h3>RadioButton</h3>
       <div class="segmented-fixture-row" data-segmented-variant="radio-default">
         <fsus-radio-group v-model="radio1">
-          <fsus-radio-button label="a">选项 A</fsus-radio-button>
-          <fsus-radio-button label="b">选项 B</fsus-radio-button>
-          <fsus-radio-button label="c">选项 C</fsus-radio-button>
+          <fsus-radio-button value="a">选项 A</fsus-radio-button>
+          <fsus-radio-button value="b">选项 B</fsus-radio-button>
+          <fsus-radio-button value="c">选项 C</fsus-radio-button>
         </fsus-radio-group>
       </div>
       <div class="segmented-fixture-row" data-segmented-variant="radio-disabled">
         <fsus-radio-group v-model="radio2" disabled>
-          <fsus-radio-button label="a">选项 A</fsus-radio-button>
-          <fsus-radio-button label="b">选项 B</fsus-radio-button>
-          <fsus-radio-button label="c">选项 C</fsus-radio-button>
+          <fsus-radio-button value="a">选项 A</fsus-radio-button>
+          <fsus-radio-button value="b">选项 B</fsus-radio-button>
+          <fsus-radio-button value="c">选项 C</fsus-radio-button>
         </fsus-radio-group>
       </div>
       <div class="segmented-fixture-row" data-segmented-variant="radio-six">
         <fsus-radio-group v-model="radio3">
-          <fsus-radio-button label="a">选项 A</fsus-radio-button>
-          <fsus-radio-button label="b">选项 B</fsus-radio-button>
-          <fsus-radio-button label="c">选项 C</fsus-radio-button>
-          <fsus-radio-button label="d">选项 D</fsus-radio-button>
-          <fsus-radio-button label="e">选项 E</fsus-radio-button>
-          <fsus-radio-button label="f">选项 F</fsus-radio-button>
+          <fsus-radio-button value="a">选项 A</fsus-radio-button>
+          <fsus-radio-button value="b">选项 B</fsus-radio-button>
+          <fsus-radio-button value="c">选项 C</fsus-radio-button>
+          <fsus-radio-button value="d">选项 D</fsus-radio-button>
+          <fsus-radio-button value="e">选项 E</fsus-radio-button>
+          <fsus-radio-button value="f">选项 F</fsus-radio-button>
         </fsus-radio-group>
       </div>
       <div class="segmented-fixture-row" data-segmented-variant="radio-cjk">
         <fsus-radio-group v-model="radio4">
-          <fsus-radio-button label="zh">简体中文</fsus-radio-button>
-          <fsus-radio-button label="ja">日本語</fsus-radio-button>
-          <fsus-radio-button label="ko">한국어</fsus-radio-button>
+          <fsus-radio-button value="zh">简体中文</fsus-radio-button>
+          <fsus-radio-button value="ja">日本語</fsus-radio-button>
+          <fsus-radio-button value="ko">한국어</fsus-radio-button>
         </fsus-radio-group>
       </div>
       <div class="segmented-fixture-row" data-segmented-variant="radio-rtl" dir="rtl">
         <fsus-radio-group v-model="radio5">
-          <fsus-radio-button label="a">אופציה א</fsus-radio-button>
-          <fsus-radio-button label="b">אופציה ב</fsus-radio-button>
-          <fsus-radio-button label="c">אופציה ג</fsus-radio-button>
+          <fsus-radio-button value="a">אופציה א</fsus-radio-button>
+          <fsus-radio-button value="b">אופציה ב</fsus-radio-button>
+          <fsus-radio-button value="c">אופציה ג</fsus-radio-button>
         </fsus-radio-group>
       </div>
     </div>
@@ -54,23 +54,23 @@
       <h3>CheckboxButton</h3>
       <div class="segmented-fixture-row" data-segmented-variant="checkbox-default">
         <fsus-checkbox-group v-model="checkbox1">
-          <fsus-checkbox-button label="a">标签 A</fsus-checkbox-button>
-          <fsus-checkbox-button label="b">标签 B</fsus-checkbox-button>
-          <fsus-checkbox-button label="c">标签 C</fsus-checkbox-button>
+          <fsus-checkbox-button value="a">标签 A</fsus-checkbox-button>
+          <fsus-checkbox-button value="b">标签 B</fsus-checkbox-button>
+          <fsus-checkbox-button value="c">标签 C</fsus-checkbox-button>
         </fsus-checkbox-group>
       </div>
       <div class="segmented-fixture-row" data-segmented-variant="checkbox-disabled">
         <fsus-checkbox-group v-model="checkbox2" disabled>
-          <fsus-checkbox-button label="a">标签 A</fsus-checkbox-button>
-          <fsus-checkbox-button label="b">标签 B</fsus-checkbox-button>
+          <fsus-checkbox-button value="a">标签 A</fsus-checkbox-button>
+          <fsus-checkbox-button value="b">标签 B</fsus-checkbox-button>
         </fsus-checkbox-group>
       </div>
       <div class="segmented-fixture-row" data-segmented-variant="checkbox-multi">
         <fsus-checkbox-group v-model="checkbox3">
-          <fsus-checkbox-button label="a">标签 A</fsus-checkbox-button>
-          <fsus-checkbox-button label="b">标签 B</fsus-checkbox-button>
-          <fsus-checkbox-button label="c">标签 C</fsus-checkbox-button>
-          <fsus-checkbox-button label="d">标签 D</fsus-checkbox-button>
+          <fsus-checkbox-button value="a">标签 A</fsus-checkbox-button>
+          <fsus-checkbox-button value="b">标签 B</fsus-checkbox-button>
+          <fsus-checkbox-button value="c">标签 C</fsus-checkbox-button>
+          <fsus-checkbox-button value="d">标签 D</fsus-checkbox-button>
         </fsus-checkbox-group>
       </div>
     </div>
@@ -92,7 +92,7 @@
       <div class="segmented-fixture-row" data-segmented-variant="collection-default">
         <FsusSegmentedControl
           v-model="collectionActive"
-          :items="collectionItems"
+          :options="collectionItems"
           ariaLabel="Collection state"
           @update:model-value="recordCollectionEvent('default', 'update:modelValue', $event)"
           @change="recordCollectionEvent('default', 'change', $event)"
@@ -102,14 +102,14 @@
       <div class="segmented-fixture-row" data-segmented-variant="collection-six">
         <FsusSegmentedControl
           v-model="collectionSixActive"
-          :items="collectionSixItems"
+          :options="collectionSixItems"
           ariaLabel="Collection period"
         />
       </div>
       <div class="segmented-fixture-row" data-segmented-variant="collection-mixed">
         <FsusSegmentedControl
           v-model="collectionMixedActive"
-          :items="collectionDisabledItems"
+          :options="collectionDisabledItems"
           ariaLabel="Collection with disabled item"
           @update:model-value="recordCollectionEvent('mixed', 'update:modelValue', $event)"
           @change="recordCollectionEvent('mixed', 'change', $event)"
@@ -123,7 +123,7 @@
       >
         <FsusSegmentedControl
           v-model="collectionDisabledActive"
-          :items="collectionDisabledItems"
+          :options="collectionDisabledItems"
           ariaLabel="Collection with disabled selection"
           @update:model-value="recordCollectionEvent('disabled-selected', 'update:modelValue', $event)"
           @change="recordCollectionEvent('disabled-selected', 'change', $event)"
@@ -133,7 +133,7 @@
       <div class="segmented-fixture-row" data-segmented-variant="collection-values">
         <FsusSegmentedControl
           v-model="collectionValueActive"
-          :items="collectionValueItems"
+          :options="collectionValueItems"
           ariaLabel="Collection typed values"
           @update:model-value="recordCollectionEvent('values', 'update:modelValue', $event)"
           @change="recordCollectionEvent('values', 'change', $event)"

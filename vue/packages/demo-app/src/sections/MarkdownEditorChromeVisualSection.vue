@@ -57,7 +57,7 @@ const SHORT_DOCUMENT = [
   '- Live 模式：语法 marker reveal 与 caret/scroll 稳定性达标。',
   '- Avalonia 端：FsusMarkdownEditor 共享同一 source 事务合同。',
   '',
-  '> 兼容 Element Plus 公共 API，主题 token 保持 `--el-*` 优先。',
+  '> FsusUI 2.0 原生 Pure-ESM 公共 API，主题 token 统一使用 `--fsus-*`。',
   '',
 ].join('\n')
 

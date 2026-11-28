@@ -101,8 +101,8 @@ const stabilizePage = async (page: Page) => {
         animation-delay: 0s !important;
         scroll-behavior: auto !important;
       }
-      .el-overlay,
-      .el-overlay-dialog {
+      .fsus-overlay,
+      .fsus-dialog__host {
         animation: none !important;
       }
     `,

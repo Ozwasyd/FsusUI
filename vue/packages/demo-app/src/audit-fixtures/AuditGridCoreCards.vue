@@ -1,82 +1,16 @@
 <template>
-      <AuditCard name="FixedSizeList" :state="auditState">
+      <AuditCard name="FsusVirtualList" :state="auditState">
         <div class="audit-virtual-frame audit-virtual-frame--list">
-          <fixed-size-list
-            :item-size="44"
-            :total="12"
-            :width="260"
+          <fsus-virtual-list
+            :items="Array.from({ length: 12 }, (_, i) => i)"
+            :item-height="44"
             :height="176"
           >
-            <template #default="{ index, style }">
-              <div :style="style" class="audit-virtual-row">
-                Fixed row {{ index }}
-              </div>
+            <template #default="{ item }">
+              <div class="audit-virtual-row">Virtual row {{ item }}</div>
             </template>
-          </fixed-size-list>
+          </fsus-virtual-list>
         </div>
-      </AuditCard>
-
-      <AuditCard name="DynamicSizeList" :state="auditState">
-        <div class="audit-virtual-frame audit-virtual-frame--list">
-          <dynamic-size-list
-            :estimated-item-size="44"
-            :item-size="() => 44"
-            :total="12"
-            :width="260"
-            :height="176"
-          >
-            <template #default="{ index, style }">
-              <div :style="style" class="audit-virtual-row">
-                Dynamic row {{ index }}
-              </div>
-            </template>
-          </dynamic-size-list>
-        </div>
-      </AuditCard>
-
-      <AuditCard name="FixedSizeGrid" :state="auditState">
-        <div class="audit-virtual-frame audit-virtual-frame--grid">
-          <fixed-size-grid
-            :column-width="88"
-            :row-height="44"
-            :total-column="8"
-            :total-row="8"
-            :width="264"
-            :height="176"
-          >
-            <template #default="{ columnIndex, rowIndex, style }">
-              <div :style="style" class="audit-virtual-row">
-                {{ rowIndex }},{{ columnIndex }}
-              </div>
-            </template>
-          </fixed-size-grid>
-        </div>
-      </AuditCard>
-
-      <AuditCard name="DynamicSizeGrid" :state="auditState">
-        <div class="audit-virtual-frame audit-virtual-frame--grid">
-          <dynamic-size-grid
-            :column-width="() => 88"
-            :row-height="() => 44"
-            :estimated-column-width="88"
-            :estimated-row-height="44"
-            :total-column="8"
-            :total-row="8"
-            :width="264"
-            :height="176"
-          >
-            <template #default="{ columnIndex, rowIndex, style }">
-              <div :style="style" class="audit-virtual-row">
-                {{ rowIndex }},{{ columnIndex }}
-              </div>
-            </template>
-          </dynamic-size-grid>
-        </div>
-      </AuditCard>
-
-      <AuditCard name="FsusVisuallyHidden" :state="auditState">
-        <fsus-visually-hidden>Hidden audit text</fsus-visually-hidden>
-        <span class="audit-inline-note">Visible companion text</span>
       </AuditCard>
 
       <AuditCard name="FsusAffix" :state="auditState">
@@ -157,7 +91,7 @@
           </fsus-button>
           <fsus-button type="primary">
             Next
-            <fsus-icon class="el-icon--right"><ArrowRight /></fsus-icon>
+            <fsus-icon class="fsus-icon--right"><ArrowRight /></fsus-icon>
           </fsus-button>
         </fsus-button-group>
       </AuditCard>
@@ -225,7 +159,7 @@
 
       <AuditCard name="FsusCheckboxButton" :state="auditState">
         <fsus-checkbox-group :model-value="active ? ['A'] : []">
-          <fsus-checkbox-button label="A">推送到首页</fsus-checkbox-button>
+          <fsus-checkbox-button value="A">推送到首页</fsus-checkbox-button>
         </fsus-checkbox-group>
       </AuditCard>
 
@@ -266,23 +200,6 @@
             发布前检查摘要
           </fsus-collapse-item>
         </fsus-collapse>
-      </AuditCard>
-
-      <AuditCard name="FsusCollapseTransition" :state="auditState">
-        <fsus-button
-          data-audit-target
-          @click="transitionVisible = !transitionVisible"
-        >
-          Toggle
-        </fsus-button>
-        <Transition name="fsus-fade">
-          <div
-            v-show="active || transitionVisible"
-            class="audit-transition-box"
-          >
-            Transition content
-          </div>
-        </Transition>
       </AuditCard>
 
       <AuditCard name="FsusColorPicker" :state="auditState">
@@ -390,7 +307,7 @@
           Open dialog
         </fsus-button>
         <fsus-dialog
-          v-model="dialogVisible"
+          v-model:open="dialogVisible"
           title="Dialog"
           width="280px"
           :append-to-body="false"
@@ -419,7 +336,7 @@
           Open drawer
         </fsus-button>
         <fsus-drawer
-          v-model="drawerVisible"
+          v-model:open="drawerVisible"
           title="Drawer"
           size="260px"
           :append-to-body="false"
@@ -440,7 +357,7 @@
             data-audit-active
           >
             Dropdown
-            <fsus-icon class="el-icon--right"><ArrowDown /></fsus-icon>
+            <fsus-icon class="fsus-icon--right"><ArrowDown /></fsus-icon>
           </fsus-button>
           <template #dropdown>
             <fsus-dropdown-menu>
@@ -479,10 +396,6 @@
             </fsus-dropdown-menu>
           </template>
         </fsus-dropdown>
-      </AuditCard>
-
-      <AuditCard name="FsusEmptyState" :state="auditState">
-        <fsus-empty-state description="No records" />
       </AuditCard>
 
       <AuditCard name="FsusEmptyState" :state="auditState">

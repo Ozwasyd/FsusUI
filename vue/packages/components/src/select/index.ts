@@ -100,6 +100,7 @@ export const FsusOptionGroup = defineComponent({
  */
 export const FsusSelect = defineComponent({
   name: 'FsusSelect',
+  inheritAttrs: false,
   props: {
     modelValue: {
       type: [String, Number, Boolean, Array] as PropType<
@@ -130,7 +131,7 @@ export const FsusSelect = defineComponent({
     teleported: { type: Boolean, default: true },
   },
   emits: ['update:modelValue', 'change', 'clear', 'visibleChange', 'create', 'removeTag'],
-  setup(props, { emit, slots }) {
+  setup(props, { attrs, emit, slots }) {
     const formItem = inject(FSUS_FORM_ITEM_KEY, undefined)
     const { t } = useFsusLocale()
     const resolvedSize = useFsusSize(
@@ -404,8 +405,9 @@ export const FsusSelect = defineComponent({
         h(
           'div',
           {
+            ...attrs,
             ref: triggerRef,
-            class: 'fsus-select',
+            class: ['fsus-select', attrs.class],
             role: 'combobox',
             tabindex: isDisabled.value ? -1 : 0,
             'aria-expanded': open.value ? 'true' : 'false',

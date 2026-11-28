@@ -5,12 +5,12 @@
   "owner": "FsusUI Core",
   "contracts": [
     {
-      "id": "component-v2.el-fixture",
+      "id": "component-v2.fsus-fixture",
       "version": "2.0.0",
       "releaseClassification": "preview",
       "owner": "FsusUI Core",
       "component": {
-        "name": "ElFixture",
+        "name": "FsusFixture",
         "module": "fixture",
         "classification": "portable",
         "exportStatus": "partial"
@@ -18,7 +18,7 @@
       "bindings": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus",
+          "package": "@ozwasyd/fsusui",
           "memberRef": {
             "baseline": "spec/baselines/vue-current.json",
             "kind": "component"
@@ -69,7 +69,7 @@
             "enumValues": null
           },
           "scenarioIds": [
-            "scenario.v2.el-fixture.input.loading"
+            "scenario.v2.fsus-fixture.input.loading"
           ],
           "governance": null
         },
@@ -112,7 +112,7 @@
             "enumValues": null
           },
           "scenarioIds": [
-            "scenario.v2.el-fixture.input.label"
+            "scenario.v2.fsus-fixture.input.label"
           ],
           "governance": {
             "reason": "Real member exists on both sides but semantic drift was detected.",
@@ -187,19 +187,19 @@
             "reviewPolicy": "pr-review"
           },
           "scenarioIds": [
-            "scenario.v2.el-fixture.avalonia-extra.accessible-name"
+            "scenario.v2.fsus-fixture.avalonia-extra.accessible-name"
           ]
         }
       ],
       "scenarioIds": [
-        "scenario.v2.el-fixture.input.loading",
-        "scenario.v2.el-fixture.input.label",
-        "scenario.v2.el-fixture.state.default",
-        "scenario.v2.el-fixture.state.loading",
-        "scenario.v2.el-fixture.keyboard",
-        "scenario.v2.el-fixture.focus",
-        "scenario.v2.el-fixture.motion",
-        "scenario.v2.el-fixture.perf"
+        "scenario.v2.fsus-fixture.input.loading",
+        "scenario.v2.fsus-fixture.input.label",
+        "scenario.v2.fsus-fixture.state.default",
+        "scenario.v2.fsus-fixture.state.loading",
+        "scenario.v2.fsus-fixture.keyboard",
+        "scenario.v2.fsus-fixture.focus",
+        "scenario.v2.fsus-fixture.motion",
+        "scenario.v2.fsus-fixture.perf"
       ],
       "coverage": {
         "total": 2,
@@ -211,12 +211,12 @@
       }
     },
     {
-      "id": "component-v2.el-markdown-editor",
+      "id": "component-v2.fsus-markdown-editor",
       "version": "2.0.0",
       "releaseClassification": "preview",
       "owner": "FsusUI Core",
       "component": {
-        "name": "ElMarkdownEditor",
+        "name": "FsusMarkdownEditor",
         "module": "markdown-editor",
         "classification": "native-adapter",
         "exportStatus": "missing"
@@ -224,7 +224,7 @@
       "bindings": {
         "web": {
           "status": "source",
-          "package": "@ozwasyd/element-plus",
+          "package": "@ozwasyd/fsusui",
           "memberRef": {
             "baseline": "spec/baselines/vue-current.json",
             "kind": "component"
@@ -273,7 +273,7 @@
             "enumValues": null
           },
           "scenarioIds": [
-            "scenario.v2.el-markdown-editor.input.mode"
+            "scenario.v2.fsus-markdown-editor.input.mode"
           ],
           "governance": {
             "reason": "No matching real Avalonia public member in the semantic baseline.",
@@ -365,16 +365,16 @@
         "blockedBy": []
       },
       "scenarioIds": [
-        "scenario.v2.el-markdown-editor.input.mode",
-        "scenario.v2.el-markdown-editor.state.default",
-        "scenario.v2.el-markdown-editor.state.source",
-        "scenario.v2.el-markdown-editor.state.live",
-        "scenario.v2.el-markdown-editor.state.split",
-        "scenario.v2.el-markdown-editor.state.preview",
-        "scenario.v2.el-markdown-editor.keyboard",
-        "scenario.v2.el-markdown-editor.focus",
-        "scenario.v2.el-markdown-editor.motion",
-        "scenario.v2.el-markdown-editor.perf"
+        "scenario.v2.fsus-markdown-editor.input.mode",
+        "scenario.v2.fsus-markdown-editor.state.default",
+        "scenario.v2.fsus-markdown-editor.state.source",
+        "scenario.v2.fsus-markdown-editor.state.live",
+        "scenario.v2.fsus-markdown-editor.state.split",
+        "scenario.v2.fsus-markdown-editor.state.preview",
+        "scenario.v2.fsus-markdown-editor.keyboard",
+        "scenario.v2.fsus-markdown-editor.focus",
+        "scenario.v2.fsus-markdown-editor.motion",
+        "scenario.v2.fsus-markdown-editor.perf"
       ],
       "coverage": {
         "total": 1,
@@ -389,7 +389,7 @@
   "componentMap": [
     {
       "vue": {
-        "name": "ElFixture",
+        "name": "FsusFixture",
         "module": "fixture"
       },
       "avalonia": {
@@ -419,11 +419,11 @@
   ],
   "consumerBindings": {
     "byContract": {
-      "component-v2.el-fixture": {
+      "component-v2.fsus-fixture": {
         "releaseFamily": "display",
         "galleryRoute": "display"
       },
-      "component-v2.el-markdown-editor": {
+      "component-v2.fsus-markdown-editor": {
         "releaseFamily": "text-editor",
         "galleryRoute": "markdown-editor"
       }

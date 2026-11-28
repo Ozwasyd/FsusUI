@@ -339,21 +339,6 @@
         </fsus-select>
       </AuditCard>
 
-      <AuditCard name="FsusOverlay" :state="auditState">
-        <div class="audit-overlay-demo">
-          <div v-if="active" class="fsus-overlay" :z-index="1">
-            <div class="audit-overlay-panel">Overlay content</div>
-          </div>
-          <fsus-button v-else data-audit-focus data-audit-target>
-            Overlay trigger
-          </fsus-button>
-        </div>
-      </AuditCard>
-
-      <AuditCard name="FsusPageHeader" :state="auditState">
-        <fsus-page-header content="Detail" title="Back" />
-      </AuditCard>
-
       <AuditCard name="FsusPageHeader" :state="auditState">
         <FsusPageHeader
           title="Review release evidence"
@@ -440,53 +425,6 @@
             </fsus-button>
           </template>
         </fsus-popover>
-      </AuditCard>
-
-      <AuditCard name="FsusPopper" :state="auditState">
-        <div>
-          <div>
-            <fsus-button data-audit-focus data-audit-target>Raw popper</fsus-button>
-          </div>
-          <div :visible="true">
-            <span />
-            Raw content
-          </div>
-        </div>
-      </AuditCard>
-
-      <AuditCard name="FsusPopperArrow" :state="auditState">
-        <div>
-          <div>
-            <fsus-button>Arrow</fsus-button>
-          </div>
-          <div :visible="true">
-            <span />Arrow content
-          </div>
-        </div>
-      </AuditCard>
-
-      <AuditCard name="FsusPopperContent" :state="auditState">
-        <div>
-          <div>
-            <fsus-button>Content trigger</fsus-button>
-          </div>
-          <div :visible="true">Popper content</div>
-        </div>
-      </AuditCard>
-
-      <AuditCard name="FsusPopperTrigger" :state="auditState">
-        <div>
-          <div>
-            <fsus-button data-audit-focus data-audit-target>Trigger</fsus-button>
-          </div>
-          <div
-            v-if="active"
-            :visible="true"
-            placement="bottom-start"
-          >
-            Triggered content
-          </div>
-        </div>
       </AuditCard>
 </template>
 

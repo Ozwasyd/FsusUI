@@ -11,7 +11,7 @@
       <h3>Dragger</h3>
       <div class="upload-fixture-row" data-upload-variant="dragger-default">
         <fsus-upload drag action="#" :auto-upload="false">
-          <div class="el-upload__text">
+          <div class="fsus-upload__text">
             Drop file here or <em>click to upload</em>
           </div>
           <p data-upload-help>PNG or JPEG, up to 2 MB. 16:9 crop.</p>
@@ -19,7 +19,7 @@
       </div>
       <div class="upload-fixture-row" data-upload-variant="dragger-disabled">
         <fsus-upload drag action="#" :auto-upload="false" disabled>
-          <div class="el-upload__text">
+          <div class="fsus-upload__text">
             Drop file here or <em>click to upload</em>
           </div>
           <p data-upload-help>Uploads are currently disabled.</p>
@@ -27,7 +27,7 @@
       </div>
       <div class="upload-fixture-row" data-upload-variant="dragger-cjk">
         <fsus-upload drag action="#" :auto-upload="false">
-          <div class="el-upload__text">
+          <div class="fsus-upload__text">
             将文件拖到此处，或<em>点击上传</em>
           </div>
           <p data-upload-help>支持 PNG 或 JPEG，最大 2 MB，裁切比例为 16:9。</p>
@@ -35,7 +35,7 @@
       </div>
       <div class="upload-fixture-row" data-upload-variant="dragger-rtl" dir="rtl">
         <fsus-upload drag action="#" :auto-upload="false">
-          <div class="el-upload__text">
+          <div class="fsus-upload__text">
             גרור קובץ לכאן או <em>לחץ להעלאה</em>
           </div>
           <p data-upload-help>PNG או JPEG, עד 2 MB.</p>

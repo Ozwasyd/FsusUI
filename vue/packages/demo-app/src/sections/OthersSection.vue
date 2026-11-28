@@ -66,71 +66,18 @@
       </fsus-space>
     </div>
     <div class="demo-block">
-      <h3>Virtual List (Fixed/Dynamic List/Grid)</h3>
-      <fsus-space wrap>
-        <div class="demo-virtual-fixture">
-          <h4>FixedSizeList</h4>
-          <fixed-size-list :item-size="50" :total="20" :width="250" :height="150">
-            <template #default="{ index, style }">
-              <div :style="style" class="demo-layout-box demo-virtual-cell">
-                Row {{ index }}
-              </div>
-            </template>
-          </fixed-size-list>
-        </div>
-        <div class="demo-virtual-fixture">
-          <h4>DynamicSizeList</h4>
-          <dynamic-size-list
-            :estimated-item-size="50"
-            :total="20"
-            :width="250"
-            :height="150"
-            :item-size="() => 50"
-          >
-            <template #default="{ index, style }">
-              <div :style="style" class="demo-layout-box demo-virtual-cell">
-                Row {{ index }}
-              </div>
-            </template>
-          </dynamic-size-list>
-        </div>
-        <div class="demo-virtual-fixture">
-          <h4>FixedSizeGrid</h4>
-          <fixed-size-grid
-            :column-width="100"
-            :total-column="20"
-            :row-height="50"
-            :total-row="20"
-            :width="250"
-            :height="150"
-          >
-            <template #default="{ columnIndex, rowIndex, style }">
-              <div :style="style" class="demo-layout-box demo-virtual-cell">
-                {{ rowIndex }},{{ columnIndex }}
-              </div>
-            </template>
-          </fixed-size-grid>
-        </div>
-        <div class="demo-virtual-fixture">
-          <h4>DynamicSizeGrid</h4>
-          <dynamic-size-grid
-            :column-width="() => 100"
-            :total-column="20"
-            :row-height="() => 50"
-            :total-row="20"
-            :width="250"
-            :height="150"
-            :estimated-column-width="100"
-            :estimated-row-height="50"
-          >
-            <template #default="{ columnIndex, rowIndex, style }">
-              <div :style="style" class="demo-layout-box demo-virtual-cell">
-                {{ rowIndex }},{{ columnIndex }}
-              </div>
-            </template>
-          </dynamic-size-grid>
-        </div>
-      </fsus-space>
+      <h3>Virtual List</h3>
+      <div class="demo-virtual-fixture">
+        <fsus-virtual-list
+          :items="Array.from({ length: 20 }, (_, i) => i)"
+          :item-height="44"
+          :height="176"
+        >
+          <template #default="{ item }">
+            <div class="demo-layout-box demo-virtual-cell">Row {{ item }}</div>
+          </template>
+        </fsus-virtual-list>
+      </div>
     </div>
     <div class="demo-block">
       <h3>InfiniteScroll (Plugin)</h3>

@@ -17,7 +17,7 @@
 
       <fsus-button @click="dialogOpen = true"> Open trace dialog </fsus-button>
       <fsus-dialog
-        v-model="dialogOpen"
+        v-model:open="dialogOpen"
         title="Trace dialog"
         @open="recordEvent('dialog.open')"
         @opened="recordEvent('dialog.opened')"

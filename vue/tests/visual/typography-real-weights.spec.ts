@@ -1,9 +1,13 @@
 import { expect, test } from '@playwright/test'
-import { buildVisualUrl } from '../../../scripts/visual-variant.mjs'
+import {
+  buildVisualUrl,
+  resolveVisualVariant,
+} from '../../../scripts/visual-variant.mjs'
 
 test('CJK and Latin use real bundled weights in light and dark modes', async ({
   page,
 }, testInfo) => {
+  const { theme } = resolveVisualVariant(testInfo.project.name)
   await page.goto(buildVisualUrl('basic', testInfo.project.name))
   const fixture = page.getByTestId('typography-real-weight-fixture')
 
@@ -23,5 +27,26 @@ test('CJK and Latin use real bundled weights in light and dark modes', async ({
       })),
     )
     .toEqual({ synthesis: 'none', google: true, noto: true })
-  await expect(fixture).toHaveScreenshot('typography-real-weights.png')
+
+  const weightMetrics = await fixture.evaluate((el) =>
+    [...el.querySelectorAll('span')].map((span) => {
+      const style = getComputedStyle(span)
+      const rect = span.getBoundingClientRect()
+      return {
+        fontWeight: style.fontWeight,
+        width: rect.width,
+        height: rect.height,
+      }
+    }),
+  )
+  expect(weightMetrics.map((m) => m.fontWeight)).toEqual(['400', '500', '700'])
+  for (const metric of weightMetrics) {
+    expect(metric.width).toBeGreaterThan(80)
+    expect(metric.height).toBeGreaterThan(12)
+  }
+
+  await testInfo.attach(`typography-real-weights-${theme}`, {
+    body: await fixture.screenshot({ animations: 'disabled' }),
+    contentType: 'image/png',
+  })
 })

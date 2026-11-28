@@ -22,20 +22,32 @@ export interface FsusPerceptionChallengeSubmitPayload {
   answer: unknown
 }
 
+const defaultAssignment = (
+  kind: FsusPerceptionChallengeKind,
+): FsusPerceptionChallengeAssignment => ({
+  id: '',
+  kind,
+  prompt: '',
+})
+
 export const FsusPerceptionCharacterChallenge = defineComponent({
   name: 'FsusPerceptionCharacterChallenge',
   props: {
-    assignment: { type: Object as PropType<FsusPerceptionChallengeAssignment>, required: true },
+    assignment: {
+      type: Object as PropType<FsusPerceptionChallengeAssignment>,
+      default: () => defaultAssignment('character'),
+    },
     disabled: { type: Boolean, default: false },
   },
   emits: ['submit'],
   setup(props, { emit }) {
     const answer = ref('')
-    return () =>
-      h('div', { class: 'fsus-challenge' }, [
-        h('p', { class: 'fsus-challenge__prompt' }, props.assignment.prompt),
-        props.assignment.mediaUrl
-          ? h('img', { class: 'fsus-challenge__media', src: props.assignment.mediaUrl, alt: props.assignment.prompt })
+    return () => {
+      const assignment = props.assignment ?? defaultAssignment('character')
+      return h('div', { class: 'fsus-challenge' }, [
+        h('p', { class: 'fsus-challenge__prompt' }, assignment.prompt),
+        assignment.mediaUrl
+          ? h('img', { class: 'fsus-challenge__media', src: assignment.mediaUrl, alt: assignment.prompt })
           : null,
         h(FsusInput, {
           modelValue: answer.value,
@@ -49,7 +61,7 @@ export const FsusPerceptionCharacterChallenge = defineComponent({
             disabled: props.disabled || !answer.value.trim(),
             onClick: () =>
               emit('submit', {
-                assignmentId: props.assignment.id,
+                assignmentId: assignment.id,
                 kind: 'character',
                 answer: answer.value.trim(),
               } satisfies FsusPerceptionChallengeSubmitPayload),
@@ -57,6 +69,7 @@ export const FsusPerceptionCharacterChallenge = defineComponent({
           () => 'Submit',
         ),
       ])
+    }
   },
 })
 

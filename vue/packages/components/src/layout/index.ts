@@ -4,11 +4,26 @@ import { addUnit } from '@fsusui/core'
 export const FsusContainer = defineComponent({
   name: 'FsusContainer',
   props: {
-    direction: { type: String as PropType<'horizontal' | 'vertical'>, default: 'horizontal' },
+    direction: {
+      type: String as PropType<'horizontal' | 'vertical'>,
+      default: undefined,
+    },
   },
   setup(props, { slots }) {
-    return () =>
-      h('section', { class: 'fsus-container', 'data-direction': props.direction }, slots.default?.())
+    return () => {
+      const children = slots.default?.() ?? []
+      const hasVerticalLandmark = children.some((vnode) => {
+        const type = vnode.type as { name?: string } | null
+        return type?.name === 'FsusHeader' || type?.name === 'FsusFooter'
+      })
+      const direction =
+        props.direction ?? (hasVerticalLandmark ? 'vertical' : 'horizontal')
+      return h(
+        'section',
+        { class: 'fsus-container', 'data-direction': direction },
+        children,
+      )
+    }
   },
 })
 

@@ -110,7 +110,7 @@
       <h3>Dropdown & DropdownMenu & DropdownItem</h3>
       <fsus-dropdown>
         <fsus-button type="primary">
-          Dropdown List<fsus-icon class="el-icon--right"><ArrowDown /></fsus-icon>
+          Dropdown List<fsus-icon class="fsus-icon--right"><ArrowDown /></fsus-icon>
         </fsus-button>
         <template #dropdown>
           <fsus-dropdown-menu>

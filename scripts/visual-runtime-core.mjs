@@ -87,7 +87,9 @@ async function collectPathEntries(
   entries.push({ kind: 'directory', label })
   const children = (await readdir(target, { withFileTypes: true }))
     .filter(
-      (entry) => !entry.isDirectory() || !ignoredDirectoryNames.has(entry.name),
+      (entry) =>
+        entry.name !== '.artifact-fingerprint' &&
+        (!entry.isDirectory() || !ignoredDirectoryNames.has(entry.name)),
     )
     .sort((left, right) => left.name.localeCompare(right.name))
   for (const child of children) {
@@ -438,14 +440,13 @@ export function createDefaultVisualRuntimeConfig(
         command: ['pnpm', 'run', 'ensure:icons'],
         id: 'icons',
         inputPaths: [
-          'vue/packages/icons-vue/package.json',
-          'vue/packages/icons-vue/src',
-          'vue/packages/icons-vue/build',
+          'vue/packages/icons/package.json',
+          'vue/packages/icons/src',
           'scripts/ensure-icons-artifacts.mjs',
           'scripts/test-artifact-cache.mjs',
         ],
         runtimePath: 'artifacts/icons',
-        sourceArtifactPath: 'vue/packages/icons-vue/dist',
+        sourceArtifactPath: 'vue/packages/icons/src',
       },
       {
         command: ['pnpm', 'run', 'ensure:wasm'],

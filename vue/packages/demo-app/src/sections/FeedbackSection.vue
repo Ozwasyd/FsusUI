@@ -4,10 +4,10 @@
     <div class="demo-block">
       <h3>Alert</h3>
       <fsus-space direction="vertical" style="width: 100%">
-        <fsus-alert title="草稿已保存" type="success" show-icon />
-        <fsus-alert title="权限更新已生效" type="info" show-icon />
-        <fsus-alert title="标题不能为空" type="warning" show-icon />
-        <fsus-alert title="删除后不可恢复" type="error" show-icon />
+        <fsus-alert title="草稿已保存" tone="success" show-icon />
+        <fsus-alert title="权限更新已生效" tone="info" show-icon />
+        <fsus-alert title="标题不能为空" tone="warning" show-icon />
+        <fsus-alert title="删除后不可恢复" tone="danger" show-icon />
       </fsus-space>
     </div>
     <div class="demo-block">
@@ -31,28 +31,28 @@
         >
           长标题 Dialog
         </fsus-button>
-        <fsus-dialog v-model="dialogVisible" title="确认发布" width="30%">
+        <fsus-dialog v-model:open="dialogVisible" title="确认发布" width="30%">
           <span>发布后读者将看到最新版本。</span>
           <template #footer>
             <span class="dialog-footer">
               <fsus-button @click="dialogVisible = false">继续编辑</fsus-button>
-              <fsus-button type="primary" @click="dialogVisible = false">
+              <fsus-button variant="primary" @click="dialogVisible = false">
                 确认发布
               </fsus-button>
             </span>
           </template>
         </fsus-dialog>
         <fsus-dialog
-          v-model="longTitleDialogVisible"
+          v-model:open="longTitleDialogVisible"
           title="确认发布超长中英文标题 Confirmation with very long Latin and 中文混合标题避免与关闭按钮重叠"
           width="30%"
         >
           <span>长标题不得侵入 54px 关闭命中盒。</span>
         </fsus-dialog>
         <fsus-drawer
-          v-model="drawerVisible"
+          v-model:open="drawerVisible"
           title="审阅记录超长标题 Review history with extended Latin and 中文"
-          direction="rtl"
+          placement="right"
         >
           <span>查看最近一次修改摘要。</span>
         </fsus-drawer>
