@@ -1,16 +1,16 @@
 {
   "schema": "fsusui-independent-ux-review.v1",
   "issue": 285,
-  "candidateSha": "d6bada9efbc7b0f89a4599970fdbdcaece9ed762",
+  "candidateSha": "56dc410d058f4d14c363ddbb1ca21dec7b3e46f1",
   "reviewMode": "read-only-rendered-evidence-inspection",
   "modifiedPaths": [],
   "productionFixture": true,
   "identity": {
-    "executionId": "conformance-v2-check-tag-d6bada9efbc7b0f89a4599970fdbdcaece9ed762",
+    "executionId": "conformance-v2-check-tag-56dc410d058f4d14c363ddbb1ca21dec7b3e46f1",
     "checkpoint": "check-tag-after-pointer-keyboard",
-    "candidate": "d6bada9efbc7b0f89a4599970fdbdcaece9ed762",
-    "contractHash": "f97e7952ee1fc7b6aa7d9ac471daf9ee38343434abfc9ee9ee4d0766c3f9890c",
-    "webBaselineHash": "86f573d923f758e00303c5fb0e60ef2fb9412ac736608ad8a3d74f37cf7fedde",
+    "candidate": "56dc410d058f4d14c363ddbb1ca21dec7b3e46f1",
+    "contractHash": "1e4a6c7e1d4cccf3bfcd9406185e0a240ed427b8cf5fe9140946f261c6cec1bf",
+    "webBaselineHash": "b4ccb08452e2b75c1d4d164da0d66463910daa788df468786e2cd892ed2d0fdd",
     "avaloniaBaselineHash": "f4b653980b92ba5f1d2b2bbdd2fc46c5fcac5ef8dc8c0ca83fa4b7e61b208082",
     "scenario": "scenario.v2.fsus-check-tag.real-interaction-trace",
     "contract": "component-v2.fsus-check-tag",
@@ -105,11 +105,11 @@
     }
   ],
   "observations": [
-    "Inspected both Linux production captures from GitHub Actions run 46150142374, artifact 15265351525 (ZIP SHA-256 da206d665a891c1da8b357879698475fa5e8e88031f8011f92404eb2abf7d0fa, commit d6bada9efbc7b0f89a4599970fdbdcaece9ed762).",
-    "The candidate manifests bind contract f97e7952ee1fc7b6aa7d9ac471daf9ee38343434abfc9ee9ee4d0766c3f9890c, Web baseline 86f573d923f758e00303c5fb0e60ef2fb9412ac736608ad8a3d74f37cf7fedde, Avalonia baseline f4b653980b92ba5f1d2b2bbdd2fc46c5fcac5ef8dc8c0ca83fa4b7e61b208082, and runner 144802a0d40b06dd922e33eaf8f3ce0e750e0d16fbf62e9b26173eed1f1c3ff3.",
+    "Inspected both Linux production captures from GitHub Actions run 46160756860, artifact 15269511311 (ZIP SHA-256 9dd81a787ccd60e244f1e40c1796887bea2a6e804e01e5ca72fe1c93c2c9af59, commit 56dc410d058f4d14c363ddbb1ca21dec7b3e46f1).",
+    "The candidate manifests bind contract 1e4a6c7e1d4cccf3bfcd9406185e0a240ed427b8cf5fe9140946f261c6cec1bf, Web baseline b4ccb08452e2b75c1d4d164da0d66463910daa788df468786e2cd892ed2d0fdd, Avalonia baseline f4b653980b92ba5f1d2b2bbdd2fc46c5fcac5ef8dc8c0ca83fa4b7e61b208082, and runner 144802a0d40b06dd922e33eaf8f3ce0e750e0d16fbf62e9b26173eed1f1c3ff3.",
     "Both current PNGs match the tracked comparator images byte for byte, including the verified crop and window sizes.",
-    "web-a11y/manifest.json SHA-256 48ae211bf0563b2429cf0054817fd519d62bbcfa0efb81ac1d3bd59522c15328",
-    "avalonia.json SHA-256 deecb600971edaa1d4cb46d18a846e9744d8c2e7d6550b8f34e9de43d65e844b"
+    "web-a11y/manifest.json SHA-256 c112b154f9269403fac7c376de0e019b062ee8a9e9eb852ee07b3886fa73fbe3",
+    "avalonia.json SHA-256 c02cbb76f2195f3bfadb6a8b51e9de525dbc4e64610627f72ebda7390b5ce206"
   ],
   "limitations": [
     "Only the light/default/zh-CN/ltr/reduced-motion CheckTag checkpoint was independently accepted, not full CI, AOT, package, cross-platform rendering equivalence or performance.",
@@ -118,7 +118,7 @@
   ],
   "blockers": [],
   "status": "accepted",
-  "classificationReceiptDigest": "1af95e743003dce640e818b3791014f5f69a87211762a75ea0a0b5a25bcf9053",
-  "candidateDigest": "298eb468a448c3335e9974788431f3f843c53be7d19d508d2fe55cf5d380384d",
-  "receiptDigest": "d9b1bf182647bc81e80986d17e3e964bd94176abbd4966131ba506c030ae344e"
+  "classificationReceiptDigest": "c1523a0f26bd00e0a47dc7017a7a43d2ee8d8740ae7a8dc15a88fe5ec51cc0c1",
+  "candidateDigest": "27bc8dcfa005d8fe9e4f5f20f21310fb0e91bab95a56369cfe45422fc6de17aa",
+  "receiptDigest": "210ad1ec539b974eec95d81f9d310d942565906ba42c053cc25cd6201ed1babb"
 }
